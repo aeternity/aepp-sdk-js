@@ -1,0 +1,24 @@
+{
+  "name": "epoch-http-js",
+  "version": "0.0.1",
+  "description": "An HTTP wrapper for the Aeternity Epoch net",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --compilers js:@babel/register"
+  },
+  "author": "Till Kolter <till.kolter@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.17.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.0.0-beta.39",
+    "@babel/preset-env": "^7.0.0-beta.39",
+    "@babel/register": "^7.0.0-beta.39",
+    "babel-polyfill": "^6.26.0",
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "mocha": "^5.0.0",
+    "sinon": "^4.2.2"
+  }
+}
