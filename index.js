@@ -19,5 +19,6 @@
 
  */
 
-import './lib/epoch-http'
+const EpochHtmlClient = require('./lib/epoch-http')
 
+module.exports = EpochHtmlClient
