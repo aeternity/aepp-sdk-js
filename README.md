@@ -1,4 +1,4 @@
-# epoch-http-js
+# aepp-sdk-js
 
 A wrapper for the Aeternity Epoch net
 
