@@ -19,6 +19,6 @@
 
  */
 
-const EpochHtmlClient = require('./lib/epoch-http')
+const EpochHtmlClient = require('./lib/aepp-sdk')
 
 module.exports = EpochHtmlClient
