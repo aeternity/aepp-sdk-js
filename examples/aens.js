@@ -32,20 +32,23 @@ const aensLifecycle = async (domain) => {
     console.log(`Updated AENS ${JSON.stringify(aensData)}`)
   }
 
-  let currentBalance = await clientAccount2.account.balance(ACCOUNT2)
-  console.log(`Current balance is ${currentBalance}`)
+  let balance1 = await localClient1.account.balance()
+  let balance3 = await localClient3.account.balance()
+  console.log(`Current balances: AK 1 ${balance1}, AK3 ${balance3}`)
   let success = await localClient1.base.spend(domain, 1, 1)
-  console.log(`Current spent ${success}`)
+  console.log(`Account 1 sent ${success} token to Domain of Account 3!`)
   await clientAccount2.base.waitNBlocks(1)
-  // currentBalance = await clientAccount2.account.balance(ACCOUNT2)
-  // console.log(`After receiving the balance is ${currentBalance}`)
+
+  balance1 = await localClient1.account.balance()
+  balance3 = await localClient3.account.balance()
+  console.log(`Balances after transfer: AK1 ${balance1}, AK3 ${balance3}`)
 
 
   await clientAccount2.aens.transfer(nameHash, ACCOUNT1, 1)
   await clientAccount2.base.waitNBlocks(1)
   let transferedData = await clientAccount2.aens.query(domain)
   if (transferedData) {
-    console.log(`Domain data now has pointer address ${JSON.parse(transferedData.pointers)['account_key']}`)
+    console.log(`Domain data now has pointer address ${JSON.parse(transferedData.pointers)['account_pubkey']}`)
   }
 
   await clientAccount2.aens.revoke(nameHash, 1)
