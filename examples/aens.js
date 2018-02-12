@@ -41,7 +41,7 @@ const aensLifecycle = async (domain) => {
   // currentBalance = await account.balance(internalClient, ACCOUNT2)
   // console.log(`After receiving the balance is ${currentBalance}`)
 
-  let transferedHash = await clientAccount2.aens.transfer(nameHash, ACCOUNT1, 1)
+  await clientAccount2.aens.transfer(nameHash, ACCOUNT1, 1)
   await clientAccount2.base.waitNBlocks(1)
   let transferedData = await clientAccount2.aens.query(domain)
   if (transferedData) {
