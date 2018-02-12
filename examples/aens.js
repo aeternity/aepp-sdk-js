@@ -12,36 +12,15 @@ const ACCOUNT1 = 'ak$3iABijXLcdH17i6EDv84qkVKacKHCVwkGJ1bC9svzmfWmHxmXkD6qCeY6ew
 const ACCOUNT2 = 'ak$3XpVuN8nVHmgSCtZGXtpzkiS2DufNDjWs9PdY2wxhDtMfeAGfJp8GfDMhH7rou2B2RVWcNhQtrVFNsRdvDsecsrLYHyuA2'
 const ACCOUNT3 = 'ak$3Xz1iHhC3wbySq1K4B6pEXjT1rbi5p6CzCta5FjxDMCUiMPaWyPXhnUqGu7HqqwanbYqwhCVpL9WCCFGqSP6ngMgwth3Nd'
 
-
-const fullClaim = async (domain, client = clientAccount2) => {
-  let salt = 12345
-  let commitment = await client.aens.getCommitmentHash(domain, salt)
-  console.log(`Commitment ${commitment}`)
-  let preClaimedCommitment = await client.aens.preClaim(commitment, 1)
-  console.log(`Preclaimed ${preClaimedCommitment}`)
-  await clientAccount2.base.waitNBlocks(1)
-
-  let nameHash = await client.aens.claim(domain, salt, 1)
-  console.log(`Name Hash ${nameHash}`)
-  let provingName = await clientAccount2.aens.query(domain)
-  if (provingName) {
-    console.log(`${domain} is mine! Data: ${JSON.stringify(provingName)}`)
-  }
-
-  return nameHash
-}
-
-
 const aensLifecycle = async (domain) => {
   let claimedDomain = await clientAccount2.aens.query(domain)
 
   let nameHash
-
   if (claimedDomain) {
     nameHash = claimedDomain['name_hash']
     console.log(`${domain} has already been registered: ${JSON.stringify(claimedDomain)}`)
   } else {
-    nameHash = await fullClaim(domain, clientAccount2)
+    nameHash = await clientAccount2.aens.fullClaim(domain, clientAccount2)
   }
 
   let updatedNameHash = await clientAccount2.aens.update(ACCOUNT3, nameHash)
