@@ -31,17 +31,16 @@ const aensLifecycle = async (domain) => {
     console.log(`Updated AENS ${JSON.stringify(aensData)}`)
   }
 
-  let balance1 = await client1.account.balance()
-  let balance3 = await client3.account.balance()
+  let balance1 = await client1.account.getBalance()
+  let balance3 = await client3.account.getBalance()
   console.log(`Current balances: AK 1 ${balance1}, AK3 ${balance3}`)
   let success = await client1.base.spend(domain, 1, 1)
   console.log(`Account 1 sent ${success} token to Domain of Account 3!`)
   await client2.base.waitNBlocks(1)
 
-  balance1 = await client1.account.balance()
-  balance3 = await client3.account.balance()
+  balance1 = await client1.account.getBalance()
+  balance3 = await client3.account.getBalance()
   console.log(`Balances after transfer: AK1 ${balance1}, AK3 ${balance3}`)
-
 
   await client2.aens.transfer(nameHash, account1, 1)
   await client2.base.waitNBlocks(1)
@@ -56,7 +55,7 @@ const aensLifecycle = async (domain) => {
   return true
 }
 
-aensLifecycle('tillkolter.aet').then(
+aensLifecycle('aepps.aet').then(
   (claimedDomain) => {
     console.log(claimedDomain ? 'finished with success': 'something went wrong')
   }
