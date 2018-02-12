@@ -53,7 +53,8 @@ const aensLifecycle = async (domain, salt) => {
   }
 }
 
-// salt must be an int256
+// salt should be random integer
+let randomInt = Math.floor(Math.random() * Math.floor(Number.MAX_SAFE_INTEGER))
 aensLifecycle('aepps.aet', 12345).then((nameHash) => console.log("Life and death of 'aepps.aet'"))
 
 ```
