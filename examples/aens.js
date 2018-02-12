@@ -20,26 +20,26 @@ const aensLifecycle = async (domain) => {
     nameHash = claimedDomain['name_hash']
     console.log(`${domain} has already been registered: ${JSON.stringify(claimedDomain)}`)
   } else {
-    nameHash = await clientAccount2.aens.fullClaim(domain, clientAccount2)
+    nameHash = await clientAccount2.aens.fullClaim(domain, 1, 1)
   }
 
   let updatedNameHash = await clientAccount2.aens.update(ACCOUNT3, nameHash)
   console.log(`${updatedNameHash} has been updated!`)
+  await clientAccount2.base.waitNBlocks(1)
 
   let aensData = await clientAccount2.aens.query(domain)
   if (aensData) {
     console.log(`Updated AENS ${JSON.stringify(aensData)}`)
   }
 
-  // TRANSFERING TOKENS TO NS DOES NOT WORK ???!!!!
-  // let currentBalance = await account.balance(internalClient, ACCOUNT2)
-  // console.log(`Current balance is ${currentBalance}`)
-  // let success = await spend(internalClient1, domain, 1, 1)
-  // console.log(`Current spent ${success}`)
-  // await waitNBlocks(client, 1)
-  //
-  // currentBalance = await account.balance(internalClient, ACCOUNT2)
+  let currentBalance = await clientAccount2.account.balance(ACCOUNT2)
+  console.log(`Current balance is ${currentBalance}`)
+  let success = await localClient1.base.spend(domain, 1, 1)
+  console.log(`Current spent ${success}`)
+  await clientAccount2.base.waitNBlocks(1)
+  // currentBalance = await clientAccount2.account.balance(ACCOUNT2)
   // console.log(`After receiving the balance is ${currentBalance}`)
+
 
   await clientAccount2.aens.transfer(nameHash, ACCOUNT1, 1)
   await clientAccount2.base.waitNBlocks(1)
@@ -48,20 +48,9 @@ const aensLifecycle = async (domain) => {
     console.log(`Domain data now has pointer address ${JSON.parse(transferedData.pointers)['account_key']}`)
   }
 
-  let revokedNameHash = await clientAccount2.aens.revoke(nameHash, 1)
-  console.log(`Revoked hash: ${revokedNameHash}`)
+  await clientAccount2.aens.revoke(nameHash, 1)
+  // The
   await clientAccount2.base.waitNBlocks(1)
-
-  let otherNameHash = await fullClaim(domain, localClient1)
-  console.log(`Claimed by another account`)
-
-  await fullClaim(domain, clientAccount2)
-
-  // let nsData = await aens.query(clientAccount2, domain)
-  // console.log(`Data after revoking: ${JSON.stringify(nsData)}`)
-  //
-  // let someOtherNsData = await aens.query(clientAccount2, domain)
-  // console.log(`Some other data after revoking: ${JSON.stringify(someOtherNsData)}`)
 
   return true
 }
