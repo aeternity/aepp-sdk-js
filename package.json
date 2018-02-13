@@ -11,9 +11,7 @@
   "author": "Till Kolter <till.kolter@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "await-to-js": "^2.0.1",
-    "axios": "^0.17.1",
-    "sha256": "^0.2.0"
+    "axios": "^0.17.1"
   },
 	"repository": {
     "type": "git",
