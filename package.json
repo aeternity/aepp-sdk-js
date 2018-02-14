@@ -11,9 +11,10 @@
   "author": "Till Kolter <till.kolter@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.17.1"
+    "axios": "^0.17.1",
+    "ws": "^4.0.0"
   },
-	"repository": {
+  "repository": {
     "type": "git",
     "url": "https://github.com/aeternity/aepp-sdk-js"
   },

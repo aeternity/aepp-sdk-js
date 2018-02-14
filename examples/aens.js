@@ -1,11 +1,12 @@
 
 require('@babel/polyfill')
 
-const EpochHtmlClient = require('../index')
+const AeternityClient = require('../index')
+const HttpProvider = require('../lib/providers/http')
 
-let client1 = new EpochHtmlClient('localhost', 3013, 3113, null, false)
-let client2 = new EpochHtmlClient('localhost', 3023, 3123, null, false)
-let client3 = new EpochHtmlClient('localhost', 3033, 3133, null, false)
+let client1 = new AeternityClient(new HttpProvider('localhost', 3013, {internalPort: 3113, secured: false}))
+let client2 = new AeternityClient(new HttpProvider('localhost', 3023, {internalPort: 3123, secured: false}))
+let client3 = new AeternityClient(new HttpProvider('localhost', 3033, {internalPort: 3133, secured: false}))
 
 const aensLifecycle = async (domain) => {
   // get account pubkeys
@@ -31,16 +32,28 @@ const aensLifecycle = async (domain) => {
     console.log(`Updated AENS ${JSON.stringify(aensData)}`)
   }
 
-  let balance1 = await client1.account.getBalance()
-  let balance3 = await client3.account.getBalance()
-  console.log(`Current balances: AK 1 ${balance1}, AK3 ${balance3}`)
-  let success = await client1.base.spend(domain, 1, 1)
-  console.log(`Account 1 sent ${success} token to Domain of Account 3!`)
+  let balance1
+  let balance3
+
+  try {
+    balance1 = await client1.account.getBalance ()
+    balance3 = await client3.account.getBalance()
+    console.log(`Current balances: AK 1 ${balance1}, AK3 ${balance3}`)
+  } catch (error) {
+    console.error(error)
+  }
+
+  let spentTokens = await client1.base.spend(domain, 1, 1)
+  console.log(`Account 1 sent ${spentTokens} token to Domain of Account 3!`)
   await client2.base.waitNBlocks(1)
 
-  balance1 = await client1.account.getBalance()
-  balance3 = await client3.account.getBalance()
-  console.log(`Balances after transfer: AK1 ${balance1}, AK3 ${balance3}`)
+  try {
+    balance1 = await client1.account.getBalance()
+    balance3 = await client3.account.getBalance()
+    console.log(`Balances after transfer: AK1 ${balance1}, AK3 ${balance3}`)
+  } catch (error) {
+    console.error(error)
+  }
 
   await client2.aens.transfer(nameHash, account1, 1)
   await client2.base.waitNBlocks(1)
