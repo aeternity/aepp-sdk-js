@@ -68,7 +68,7 @@ let runOracleServer = (options) => {
   })
 
   wsProvider.on ('response', function (response) {
-    console.log(`CLIENT RESPONSE: ${response}`)
+    console.log(`CLIENT RESPONSE: ${JSON.stringify(response)}`)
   })
 }
 
