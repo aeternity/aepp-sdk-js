@@ -2,9 +2,9 @@
   "name": "aepp-sdk-js",
   "version": "0.0.1-alpha.1",
   "description": "An HTTP wrapper for the Aeternity Epoch net",
-  "main": "./lib/aepp-sdk.js",
+  "main": "./dist/aepp-sdk.js",
   "scripts": {
-    "build": "webpack --config build/webpack.prod.conf.js --output-path dist",
+    "build": "babel lib --presets @babel/env --out-dir dist",
     "prepublish": "npm run build",
     "test": "mocha --compilers js:@babel/register"
   },
@@ -28,14 +28,10 @@
     "@babel/polyfill": "^7.0.0-beta.39",
     "@babel/preset-env": "^7.0.0-beta.39",
     "@babel/register": "^7.0.0-beta.39",
-    "babel-loader": "^8.0.0-beta.0",
     "bufferutil": "^3.0.3",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "mocha": "^5.0.0",
-    "sinon": "^4.2.2",
-    "uglifyjs-webpack-plugin": "^1.1.8",
-    "webpack": "^3.11.0",
-    "webpack-merge": "^4.1.1"
+    "sinon": "^4.2.2"
   }
 }
