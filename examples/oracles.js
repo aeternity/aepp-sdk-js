@@ -25,7 +25,7 @@ const WebSocketProvider = require('../lib/providers/ws')
 const program = require('commander')
 const axios = require('axios')
 
-let runOracleServer = (options) => {
+let runOracleServer = async (options) => {
 
   console.log(`${options.host}:${options.port}`)
 
@@ -35,28 +35,25 @@ let runOracleServer = (options) => {
 
   wsProvider.on ('open', function () {
       console.log ('Websocket connection is open')
-      client.oracles.register ('queryFormat', 'responseFormat', 4, 500, 5)
+      client.oracles.register ('queryFormat', 'responseFormat', 4, 500, 5).then(
+        (oracleId) => {
+          console.log (`Oracle online! ID: ${oracleId}`)
+          client.oracles.setResolver((queryData) => {
+            console.log (`New query data ${JSON.stringify(queryData)}`)
+            console.log(`Received query ${queryData['query']}`)
+            let statementId = queryData['query']
+            axios.get(`https://vote.aepps.com/statements/${statementId}/json`).then((response) => {
+              client.oracles.respond (queryData['query_id'], 4, JSON.stringify(response.data))
+            }).catch(
+              (error) => {
+                console.error(error)
+              }
+            )
+          })
+        }
+      )
     }
   )
-
-  wsProvider.on ('registeredOracle', function (oracleId) {
-      console.log (`Oracle online! ID: ${oracleId}`)
-      client.oracles.subscribe (oracleId)
-    }
-  )
-
-  wsProvider.on ('newQuery', function (queryData) {
-    console.log (`New query data ${JSON.stringify(queryData)}`)
-    console.log(`Received query ${queryData['query']}`)
-    let statementId = queryData['query']
-    axios.get(`https://vote.aepps.com/statements/${statementId}/json`).then((response) => {
-      client.oracles.respond (queryData['query_id'], 4, JSON.stringify(response.data))
-    }).catch(
-      (error) => {
-        console.error(error)
-      }
-    )
-  })
 
 }
 
@@ -65,24 +62,15 @@ const queryOracleServer = (oracle, query, options) => {
 
   let wsProvider = client.provider
 
-  console.log(` hello fucking world ${options.host}, ${options.port}`)
-
   wsProvider.on ('open', function () {
       console.log ('Websocket connection is open')
-      client.oracles.query (oracle, 4, 10, 10, 7, query)
+      client.oracles.query (oracle, 4, 10, 10, 7, query).then(
+        (response) => {
+          console.log(`New response:\n ${JSON.stringify(response)}`)
+        }
+      )
     }
   )
-
-  wsProvider.on ('query', function (queryId) {
-      console.log (`Query id ${queryId}`)
-      client.oracles.subscribeQuery (queryId)
-    }
-  )
-
-  wsProvider.on ('response', function (response) {
-    console.log(`New response:\n ${JSON.stringify(response)}`)
-  })
-
 }
 
 program
