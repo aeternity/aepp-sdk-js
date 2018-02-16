@@ -16,24 +16,3 @@
  */
 
 
-const Service = require('./index')
-
-class AENS extends Service {
-
-  constructor(provider) {
-    super(provider, 'aens', [
-      'getCommitmentHash',
-      'getName',
-      'preClaim',
-      'claim',
-      'update',
-      'transfer',
-      'revoke',
-      'fullClaim',
-      'getName'
-    ])
-  }
-
-}
-
-module.exports = AENS
