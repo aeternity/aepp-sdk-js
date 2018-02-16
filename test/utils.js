@@ -18,11 +18,8 @@
 require('@babel/polyfill')
 
 const chai = require ('chai')
-const chaiAsPromised = require ('chai-as-promised')
-const should = chai.should ()
 const assert = chai.assert
 
-chai.use (chaiAsPromised)
 
 const AeHttpProvider = require ('../lib/providers/http/index')
 
