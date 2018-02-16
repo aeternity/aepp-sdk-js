@@ -15,40 +15,4 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-const HttpService = require('./index')
 
-class Oracles extends HttpService {
-
-  async register(queryFormat, responseFormat, queryFee, ttl, fee) {
-
-  }
-
-  async query(oracleId, queryFee, queryTtl, responseTtl, fee, query) {
-
-  }
-
-  async getOracles() {
-    let {data} = await this.client.get('oracles', {}, true)
-    return data
-  }
-
-  async getOracleQuestions(oracleId, from, max) {
-    let params = {
-      'oracle_pub_key': oracleId,
-      from: from,
-      max: max
-    }
-    let {data} = await this.client.get('oracle-questions', params, true)
-    return data
-  }
-
-  // TODO register
-  // TODO query
-  // TODO preclaim
-  // TODO update
-  // TODO transfer
-  // TODO revoke
-
-}
-
-module.exports = Oracles
