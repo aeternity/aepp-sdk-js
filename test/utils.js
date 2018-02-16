@@ -22,6 +22,7 @@ const assert = chai.assert
 
 
 const AeHttpProvider = require ('../lib/providers/http/index')
+const AeternityClient = require('../lib/aepp-sdk')
 
 // Naive assertion
 const assertIsBlock = (data) => {
@@ -41,18 +42,18 @@ const randomAeName = () => {
   return `${text}.aet`
 }
 
-let httpProvider1 = new AeHttpProvider ('localhost', 3013, {
+let httpProvider1 = new AeternityClient(new AeHttpProvider ('localhost', 3013, {
   internalPort: 3113,
   secured: false
-})
-let httpProvider2 = new AeHttpProvider ('localhost', 3023, {
+}))
+let httpProvider2 = new AeternityClient(new AeHttpProvider ('localhost', 3023, {
   internalPort: 3123,
   secured: false
-})
-let httpProvider3 = new AeHttpProvider ('localhost', 3033, {
+}))
+let httpProvider3 = new AeternityClient(new AeHttpProvider ('localhost', 3033, {
   internalPort: 3133,
   secured: false
-})
+}))
 
 
 module.exports = {

@@ -39,7 +39,6 @@ describe ('Http service aens', () => {
 
       await utils.httpProvider2.base.waitNBlocks(1)
       let nameData = await utils.httpProvider1.aens.getName(name)
-      console.log(`name data ${JSON.stringify(nameData)}`)
       assert.ok(nameData)
       assert.equal(nameHash, nameData['name_hash'])
     })
