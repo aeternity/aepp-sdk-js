@@ -17,6 +17,6 @@
  *
  */
 
-const EpochHtmlClient = require('./lib/aepp-sdk')
+const AeternityClient = require('./lib/aepp-sdk')
 
-module.exports = EpochHtmlClient
+module.exports = AeternityClient

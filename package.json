@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.17.1",
+    "websocket": "^1.0.25",
     "ws": "^4.0.0"
   },
   "repository": {

@@ -19,78 +19,81 @@
 'use strict'
 
 
-const AeternityClient = require('../index')
-const WebSocketProvider = require('../lib/providers/ws')
+const AeternityClient = require ('../index')
+const {AeSubscription} = require ('../lib/providers/ws/subscriptions')
+const WebSocketProvider = require ('../lib/providers/ws')
 
-const program = require('commander')
-const axios = require('axios')
+const program = require ('commander')
+const axios = require ('axios')
 
 let runOracleServer = async (options) => {
 
-  console.log(`${options.host}:${options.port}`)
+  let client = new AeternityClient (new WebSocketProvider (options.host, options.port))
 
-  let client = new AeternityClient(new WebSocketProvider(options.host, options.port))
-
-  let wsProvider = client.provider
-
-  wsProvider.on ('open', function () {
+  client.addSubscription (new AeSubscription ({
+    matches: (data) => data.type === 'ws-open',
+    update: () => {
       console.log ('Websocket connection is open')
-      client.oracles.register ('queryFormat', 'responseFormat', 4, 500, 5).then(
+      client.oracles.register ('queryFormat', 'responseFormat', 4, 500, 5).then (
         (oracleId) => {
           console.log (`Oracle online! ID: ${oracleId}`)
-          client.oracles.setResolver((queryData) => {
-            console.log (`New query data ${JSON.stringify(queryData)}`)
-            console.log(`Received query ${queryData['query']}`)
+          client.oracles.setResolver ((queryData) => {
+            console.log (`New query data ${JSON.stringify (queryData)}`)
+            console.log (`Received query ${queryData['query']}`)
             let statementId = queryData['query']
-            axios.get(`https://vote.aepps.com/statements/${statementId}/json`).then((response) => {
-              client.oracles.respond (queryData['query_id'], 4, JSON.stringify(response.data))
-            }).catch(
+            axios.get (`https://vote.aepps.com/statements/${statementId}/json`).then ((response) => {
+              client.oracles.respond (queryData['query_id'], 4, JSON.stringify (response.data))
+            }).catch (
               (error) => {
-                console.error(error)
+                console.error (error)
               }
             )
           })
         }
       )
     }
-  )
-
+  }))
 }
 
 const queryOracleServer = (oracle, query, options) => {
-  let client = new AeternityClient(new WebSocketProvider(options.host, options.port))
+  let client = new AeternityClient (new WebSocketProvider (options.host, options.port))
 
-  let wsProvider = client.provider
+  client.addSubscription (new AeSubscription ({
+    matches: (data) => data.type !== 'ws-open',
+    update: (data) => console.log (`> ${JSON.stringify(data)}`)
+  }))
 
-  wsProvider.on ('open', function () {
+  client.addSubscription (new AeSubscription ({
+    matches: (data) => data.type === 'ws-open',
+    update: () => {
       console.log ('Websocket connection is open')
-      client.oracles.query (oracle, 4, 10, 10, 7, query).then(
+      client.oracles.query (oracle, 4, 10, 10, 7, query).then (
         (response) => {
-          console.log(`New response:\n ${JSON.stringify(response)}`)
+          console.log (`New response:\n ${JSON.stringify (response)}`)
         }
       )
     }
-  )
+  }))
 }
 
 program
-  .version('0.1.0')
-  .command('serve')
-  .description('Starts an oracle server')
-  .option('-p, --port [port]', 'Websocket port', 3104)
-  .option('-h, --host [host]', 'Websocket host', 'localhost')
-  .action(runOracleServer)
+  .version ('0.1.0')
+  .command ('serve')
+  .description ('Starts an oracle server')
+  .option ('-p, --port [port]', 'Websocket port', 3104)
+  .option ('-h, --host [host]', 'Websocket host', 'localhost')
+  .action (runOracleServer)
 
 program
-  .version('0.1.0')
-  .usage('[options] <oracle_id> \'q9KS5jrMp83vTS7ZN\'')
-  .command('ask <oracle> <query>')
-  .description('Queries an oracle')
-  .option('-p, --port [port]', 'Websocket port', 3104)
-  .option('-h, --host [host]', 'Websocket host', 'localhost')
-  .action(queryOracleServer)
+  .version ('0.1.0')
+  .usage ('[options] <oracle_id> \'q9KS5jrMp83vTS7ZN\'')
+  .command ('ask <oracle> <query>')
+  .description ('Queries an oracle')
+  .option ('-p, --port [port]', 'Websocket port', 3104)
+  .option ('-h, --host [host]', 'Websocket host', 'localhost')
+  .action (queryOracleServer)
 
 
-program.parse(process.argv)
+program.parse (process.argv)
 
-if (program.args.length === 0) program.help();
+if (program.args.length === 0) program.help ()
