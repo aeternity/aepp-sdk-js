@@ -93,27 +93,19 @@ describe ('Http service base', () => {
     })
   })
   describe ('getPendingBlock', () => {
-    it ('should return a block', async () => {
-      let data = await utils.httpProvider1.base.getPendingBlock ()
-      utils.assertIsBlock (data)
+    it ('should return a block or 404', async () => {
+      try {
+        let data = await utils.httpProvider1.base.getPendingBlock ()
+        utils.assertIsBlock (data)
+      } catch (e) {
+        assert(404, e.response.status)
+      }
     })
   })
   describe ('getGenesisBlock', () => {
     it ('should return a block', async () => {
       let data = await utils.httpProvider1.base.getGenesisBlock ()
       console.log(data)
-      utils.assertIsBlock (data)
-    })
-  })
-  describe ('getBlockByHash', () => {
-    it ('should return a block', async () => {
-      let data = await utils.httpProvider1.base.getBlockByHash (prevHash)
-      utils.assertIsBlock (data)
-    })
-  })
-  describe ('getBlockByHeight', () => {
-    it ('should return a block', async () => {
-      let data = await utils.httpProvider1.base.getBlockByHeight (1)
       utils.assertIsBlock (data)
     })
   })
