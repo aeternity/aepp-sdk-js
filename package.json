@@ -1,8 +1,8 @@
 {
-  "name": "aepps-epoch-js",
+  "name": "aepp-sdk",
   "version": "0.0.1-alpha.1",
   "description": "An HTTP wrapper for the Aeternity Epoch net",
-  "main": "./dist/epoch.js",
+  "main": "./dist/aepp-sdk.js",
   "scripts": {
     "build": "babel lib/aepp-sdk.js --presets @babel/env --out-dir dist",
     "prepublish": "npm run build",
@@ -13,10 +13,13 @@
   "dependencies": {
     "axios": "^0.17.1"
   },
-	"repository": {
+  "repository": {
     "type": "git",
     "url": "https://github.com/aeternity/aepp-sdk-js"
   },
+	"browser": {
+		"./lib/providers/ws/websocket.js": "./lib/providers/ws/browser/websocket.js"
+	},
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.39",
     "@babel/core": "^7.0.0-beta.39",
