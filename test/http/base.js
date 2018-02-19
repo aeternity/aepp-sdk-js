@@ -92,11 +92,6 @@ describe ('Http service base', () => {
     })
   })
   describe ('getPendingBlock', () => {
-<<<<<<< HEAD
-    it ('should return a block', async () => {
-      let data = await utils.httpProvider1.base.getPendingBlock ()
-      utils.assertIsBlock (data)
-=======
     it ('should return a block or 404', async () => {
       try {
         let data = await utils.httpProvider1.base.getPendingBlock ()
@@ -104,13 +99,11 @@ describe ('Http service base', () => {
       } catch (e) {
         assert(404, e.response.status)
       }
->>>>>>> develop
     })
   })
   describe ('getGenesisBlock', () => {
     it ('should return a block', async () => {
       let data = await utils.httpProvider1.base.getGenesisBlock ()
-<<<<<<< HEAD
       utils.assertIsBlock (data)
     })
   })
@@ -123,9 +116,6 @@ describe ('Http service base', () => {
   describe ('getBlockByHeight', () => {
     it ('should return a block', async () => {
       let data = await utils.httpProvider1.base.getBlockByHeight (1)
-=======
-      console.log(data)
->>>>>>> develop
       utils.assertIsBlock (data)
     })
   })
