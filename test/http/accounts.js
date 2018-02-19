@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright 2018 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -16,33 +16,19 @@
  */
 
 
-const WebsocketProvider = require('./providers/ws')
-const HttpProvider = require('./providers/http')
+require('@babel/polyfill')
 
-/**
- * Client to interact with the Epoch reference implementation
- */
-class AeternityClient {
+const chai = require ('chai')
+const assert = chai.assert
 
-  /**
-   *
-   * @param provider
-   */
-  constructor(provider) {
-    this.provider = provider
+const utils = require('../utils')
 
-    // Semantically close services are bundeled in classes
-    this.base = provider.base
-    this.aens = provider.aens
-    this.accounts = provider.accounts
-    this.oracles = provider.oracles
-    this.tx = provider.tx
-    this.contracts = provider.contracts
-  }
-}
 
-AeternityClient.providers = {
-  HttpProvider: HttpProvider
-}
-
-module.exports = AeternityClient
+describe('Http accounts service', () => {
+  describe('getTransactions', () => {
+    it('should return something', async () => {
+      let transactions = await utils.httpProvider1.accounts.getTransactions()
+      assert.ok(transactions)
+    })
+  })
+})

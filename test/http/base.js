@@ -17,7 +17,6 @@
 require('@babel/polyfill')
 
 const chai = require ('chai')
-const should = chai.should ()
 const assert = chai.assert
 
 const utils = require('../utils')
