@@ -101,7 +101,6 @@ describe ('Http service base', () => {
   describe ('getGenesisBlock', () => {
     it ('should return a block', async () => {
       let data = await utils.httpProvider1.base.getGenesisBlock ()
-      console.log(data)
       utils.assertIsBlock (data)
     })
   })
