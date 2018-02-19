@@ -12,7 +12,7 @@ const aensLifecycle = async (domain) => {
   let account1 = await client1.account.getPublicKey()
   let account3 = await client3.account.getPublicKey()
 
-  let claimedDomain = await client2.aens.query(domain)
+  let claimedDomain = await client2.aens.getName(domain)
 
   let nameHash
   if (claimedDomain) {
@@ -26,7 +26,7 @@ const aensLifecycle = async (domain) => {
   console.log(`${updatedNameHash} has been updated!`)
   await client2.base.waitNBlocks(1)
 
-  let aensData = await client2.aens.query(domain)
+  let aensData = await client2.aens.getName(domain)
   if (aensData) {
     console.log(`Updated AENS ${JSON.stringify(aensData)}`)
   }
@@ -44,7 +44,7 @@ const aensLifecycle = async (domain) => {
 
   await client2.aens.transfer(nameHash, account1, 1)
   await client2.base.waitNBlocks(1)
-  let transferedData = await client2.aens.query(domain)
+  let transferedData = await client2.aens.getName(domain)
   if (transferedData) {
     console.log(`Domain data now has pointer address ${JSON.parse(transferedData.pointers)['account_pubkey']}`)
   }
