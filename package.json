@@ -11,15 +11,19 @@
   "author": "Till Kolter <till.kolter@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.17.1"
+    "axios": "^0.17.1",
+    "bs58": "^4.0.1",
+    "secp256k1": "^3.5.0",
+    "sha256": "^0.2.0",
+    "elliptic": "^6.4.0"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/aeternity/aepp-sdk-js"
   },
-	"browser": {
-		"./lib/providers/ws/websocket.js": "./lib/providers/ws/browser/websocket.js"
-	},
+  "browser": {
+    "./lib/providers/ws/websocket.js": "./lib/providers/ws/browser/websocket.js"
+  },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.39",
     "@babel/core": "^7.0.0-beta.39",
@@ -30,7 +34,6 @@
     "@babel/register": "^7.0.0-beta.39",
     "chai": "^4.1.2",
     "mocha": "^5.0.0",
-    "sinon": "^4.2.2",
-    "utf-8-validate": "^4.0.0"
+    "sinon": "^4.2.2"
   }
 }
