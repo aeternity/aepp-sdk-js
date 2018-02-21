@@ -1,3 +1,9 @@
+---
+layout: page
+title: SDK.js
+navigation: 5
+---
+
 # aepp-sdk-js
 
 A wrapper for the Aeternity Epoch net
