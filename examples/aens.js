@@ -10,8 +10,19 @@ let client3 = new AeternityClient(new HttpProvider('localhost', 3033, {internalP
 
 const aensLifecycle = async (domain) => {
   // get account pubkeys
-  let account1 = await client1.account.getPublicKey()
-  let account3 = await client3.account.getPublicKey()
+  let account1 = await client1.accounts.getPublicKey()
+  let account3 = await client3.accounts.getPublicKey()
+
+  let balance2
+  try {
+    balance2 = await client2.accounts.getBalance()
+  } catch (e) {
+    balance2 = 0
+  }
+  if (balance2 === 0) {
+    await client1.base.spend(await client2.accounts.getPublicKey(), 50, 5)
+    await client1.base.waitNBlocks(1)
+  }
 
   let claimedDomain = await client2.aens.getName(domain)
 
