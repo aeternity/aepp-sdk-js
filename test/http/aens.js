@@ -22,6 +22,7 @@ const assert = chai.assert
 
 const assertHasPointer = async (name, address, type = 'account') => {
   let nameData = await utils.httpProvider1.aens.getName(name)
+  assert.ok(nameData)
   assert.equal(address, JSON.parse(nameData.pointers)[`${type}_pubkey`])
 }
 
