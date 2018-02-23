@@ -72,7 +72,7 @@ describe ('Http service contracts', () => {
     it('should deploy a contract', async function () {
       this.timeout(utils.TIMEOUT)
       try {
-        let params = {excludeTxTypes: 'aec_coinbase_tx'}
+        let params = {txTypes: 'aect_create_tx'}
         let txCountBefore = await utils.httpProvider1.accounts.getTransactionCount(params)
         let success = await utils.httpProvider1.contracts.deployContract(byteCode, utils.privateKey)
         assert.ok(success)
@@ -86,5 +86,4 @@ describe ('Http service contracts', () => {
       }
     })
   })
-  // describe()
 })
