@@ -55,6 +55,8 @@ let httpProvider3 = new AeternityClient(new AeHttpProvider ('localhost', 3033, {
   secured: false
 }))
 
+let privateKey = '56b61283ec0ea87f891347f95895f9e1f339cd8854d649043c9b32b908cda646'
+
 
 module.exports = {
   httpProvider1,
@@ -62,5 +64,6 @@ module.exports = {
   httpProvider3,
   assertIsBlock,
   randomAeName,
+  privateKey,
   TIMEOUT: 120000
 }
