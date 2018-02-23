@@ -6,7 +6,7 @@
   "scripts": {
     "build": "babel lib/aepp-sdk.js --presets @babel/env --out-dir dist",
     "prepublish": "npm run build",
-    "test": "mocha --compilers js:@babel/register"
+    "test": "mocha --recursive --compilers js:@babel/register"
   },
   "author": "Till Kolter <till.kolter@gmail.com>",
   "license": "ISC",
