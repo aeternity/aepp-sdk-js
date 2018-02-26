@@ -111,7 +111,6 @@ const signTransaction = async function (recipient, amount, options) {
     throw 'Either --keys or --private has to be set'
   }
 
-  // console.log (`${JSON.stringify (options)}`)
   amount = parseInt(amount)
 
   let privateHex
