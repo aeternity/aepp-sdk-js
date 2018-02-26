@@ -4,11 +4,39 @@ A wrapper for the Aeternity Epoch net
 
 ## Install
 
+### Local branch development
+This package makes use of ES6 language patterns. To be able to use the full command line functionality provided in this repository, please make sure, that you set up your local environment to use **NodeJS v9 or above**.
+
+### NPM
+
 ```
 npm install aepps-sdk
 ```
 
 ## Usage 
+
+### Transaction Signing
+
+Signing transactions with private keys is a fundamental feature of the blockchain protocol. Epoch provides useful convenience methods for constructing transactions of different kinds. For more information on these endpoints the [Swagger Explorer](https://aeternity.github.io/epoch-api-docs/?config=https://raw.githubusercontent.com/aeternity/epoch/master/apps/aehttp/priv/swagger.json) is a good starting point. The relevant transactions are grouped under `/tx/*`.
+
+The following snippet demonstrates the most basic usage for offchain signing in the SDK. First call a convenience method to receive a serialized, packed (/w msgpack) and base encrypted version of the transaction which is used in the second step to create a signature on the transaction with the private key.
+
+```javascript
+
+const privateKey = '<lets assume you extracted your private key which is store here as a hex>'
+...
+
+// Convenience method to receive a valid spending transaction hash from the server
+client.base.getSpendTx (recipient, amount).then(
+    (data) => {
+        let unsignedTx = data.tx
+        client.tx.sendSigned(tx, privateKey)
+    }
+)
+
+```
+
+If you are interested in more details how the transactions are encrypted, please use the CLI example [here](https://github.com/aeternity/aepp-sdk-js/blob/develop/examples/signing.js) which provides detailed output on the whole process.
 
 ### AENS
 
@@ -64,29 +92,6 @@ let randomInt = Math.floor(Math.random() * Math.floor(Number.MAX_SAFE_INTEGER))
 aensLifecycle('aepps.aet', 12345).then((nameHash) => console.log("Life and death of 'aepps.aet'"))
 
 ```
-
-### Transaction Signing
-
-Signing transactions with private keys is a fundamental feature of the blockchain protocol. Epoch provides useful convenience methods for constructing transactions of different kinds. For more information on these endpoints the [Swagger Explorer](https://aeternity.github.io/epoch-api-docs/?config=https://raw.githubusercontent.com/aeternity/epoch/master/apps/aehttp/priv/swagger.json) is a good starting point. The relevant transactions are grouped under `/tx/*`.
-
-The following snippet demonstrates the most basic usage for offchain signing in the SDK. First call a convenience method to receive a serialized, packed (/w msgpack) and base encrypted version of the transaction which is used in the second step to create a signature on the transaction with the private key.
-
-```javascript
-
-const privateKey = '<lets assume you extracted your private key which is store here as a hex>'
-...
-
-// Convenience method to receive a valid spending transaction hash from the server
-client.base.getSpendTx (recipient, amount).then(
-    (data) => {
-        let unsignedTx = data.tx
-        client.tx.sendSigned(tx, privateKey)
-    }
-)
-
-```
-
-If you are interested in more details how the transactions are encrypted, please use the CLI example [here](https://github.com/aeternity/aepp-sdk-js/blob/develop/examples/signing.js) which provides detailed output on the whole process.
 
 ## Tools
 
