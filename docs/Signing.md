@@ -33,7 +33,7 @@ let client = new AeternityClient(new AeternityClient.providers.HttpProvider('loc
 
 ```
 
-### Get unsinged transaction from node
+### Get unsigned transaction from node
 
 *For readibility reasons we are using the async/await pattern here. Please make sure your function has the **async** keyword and to setup the apprioriate NodeJS version if you copy and paste the code.*
 
