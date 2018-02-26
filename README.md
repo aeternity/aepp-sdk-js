@@ -36,7 +36,7 @@ client.base.getSpendTx (recipient, amount).then(
 
 ```
 
-If you are interested in more details how the transactions are encrypted, please use the CLI example [here](https://github.com/aeternity/aepp-sdk-js/blob/develop/examples/signing.js) which provides detailed output on the whole process.
+If you are interested in more details how the transactions are encrypted, please use the CLI example [here](https://github.com/aeternity/aepp-sdk-js/blob/develop/examples/signing.js) which provides detailed output on the whole process or walk through the documentation [here](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/Signing.md)
 
 ### AENS
 
