@@ -59,6 +59,17 @@ aensLifecycle('aepps.aet', 12345).then((nameHash) => console.log("Life and death
 
 ```
 
+## Tools
+
+### Key decryption
+
+This CLI can be used during development to transform the stored keys on a node
+to test offchain signing.
+
+```
+npm run decrypt -- <KEYS DIRECTORY>
+```
+
 ## License
 
 ISC

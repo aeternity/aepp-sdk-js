@@ -6,20 +6,26 @@
   "scripts": {
     "build": "babel lib/aepp-sdk.js --presets @babel/env --out-dir dist",
     "prepublish": "npm run build",
-    "test": "mocha --compilers js:@babel/register"
+    "decrypt": "node bin/keys decrypt",
+    "test": "mocha --recursive --compilers js:@babel/register"
   },
   "author": "Till Kolter <till.kolter@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.17.1"
+    "aes-js": "^3.1.0",
+    "axios": "^0.17.1",
+    "bs58check": "^2.1.1",
+    "elliptic": "^6.4.0",
+    "msgpack-lite": "aeternity/msgpack-lite",
+    "sha.js": "^2.4.10"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/aeternity/aepp-sdk-js"
   },
-	"browser": {
-		"./lib/providers/ws/websocket.js": "./lib/providers/ws/browser/websocket.js"
-	},
+  "browser": {
+    "./lib/providers/ws/websocket.js": "./lib/providers/ws/browser/websocket.js"
+  },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.39",
     "@babel/core": "^7.0.0-beta.39",
@@ -29,8 +35,9 @@
     "@babel/preset-env": "^7.0.0-beta.39",
     "@babel/register": "^7.0.0-beta.39",
     "chai": "^4.1.2",
+    "commander": "^2.14.1",
     "mocha": "^5.0.0",
-    "sinon": "^4.2.2",
-    "utf-8-validate": "^4.0.0"
+    "prompt": "^1.0.0",
+    "sinon": "^4.2.2"
   }
 }

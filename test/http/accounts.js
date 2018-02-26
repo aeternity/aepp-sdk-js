@@ -29,6 +29,8 @@ describe('Http accounts service', () => {
     it('should return something', async () => {
       let transactions = await utils.httpProvider1.accounts.getTransactions()
       assert.ok(transactions)
+      assert.isTrue(Array.isArray(transactions))
+      assert.ok(transactions.length)
     })
   })
 })
