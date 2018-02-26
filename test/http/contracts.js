@@ -20,6 +20,7 @@ require('@babel/polyfill')
 const chai = require ('chai')
 const assert = chai.assert
 const utils = require('../utils')
+const {encodeTx, decodeTx} = require('../../lib/utils/crypto')
 
 let exampleContract = `
 contract type Identity = {
@@ -68,12 +69,19 @@ describe ('Http service contracts', () => {
     })
   })
   describe('deployContract', () => {
-    it('should deploy a contract', async () => {
+    it('should deploy a contract', async function () {
+      this.timeout(utils.TIMEOUT)
       try {
-        let success = await utils.httpProvider1.contracts.deployContract(byteCode)
+        let params = {txTypes: 'aect_create_tx'}
+        let txCountBefore = await utils.httpProvider1.accounts.getTransactionCount(params)
+        let success = await utils.httpProvider1.contracts.deployContract(byteCode, utils.privateKey)
         assert.ok(success)
+        await utils.httpProvider1.base.waitNBlocks(1)
+        let txCountAfter = await utils.httpProvider1.accounts.getTransactionCount(params)
+        assert.isTrue(txCountAfter > 0)
+        assert.isTrue(txCountBefore < txCountAfter)
       } catch (e) {
-        console.log(`Error ${e.response.status} ${JSON.stringify(e.response.data)}`)
+        console.log(e)
         assert.isTrue(false)
       }
     })
