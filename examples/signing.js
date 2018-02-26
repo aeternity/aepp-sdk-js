@@ -65,7 +65,7 @@ const signTransaction = (amount, dir) => {
 
     let recipient = await client2.accounts.getPublicKey()
 
-    let data = await client1.base.getSpendTx(recipient, 5)
+    let data = await client1.base.getSpendTx(recipient, amount)
 
     console.log(`\nCreate an unsigned spend transaction: ${JSON.stringify(data)}`)
 
