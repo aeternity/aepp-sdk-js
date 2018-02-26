@@ -17,6 +17,8 @@ Private key (hex): asbdkjshdf238nefdhwu2asj
 Public key (base check): ak$<Base58Check encoded key> 
 ```
 
+## Signing a transaction
+
 ### Instantiate Aeternity client and HTTP provider:
 
 ```javascript
