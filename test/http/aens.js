@@ -26,7 +26,6 @@ const assertHasPointer = async (name, address, type = 'account') => {
   assert.equal(address, JSON.parse(nameData.pointers)[`${type}_pubkey`])
 }
 
-
 describe ('Http service aens', () => {
   describe ('two-step name claiming', () => {
     it ('should result in a claimed name', async function () {
@@ -93,7 +92,6 @@ describe ('Http service aens', () => {
       } catch (e) {
         console.error(e)
       }
-
     })
   })
 })

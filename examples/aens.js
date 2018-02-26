@@ -43,16 +43,28 @@ const aensLifecycle = async (domain) => {
     console.log(`Updated AENS ${JSON.stringify(aensData)}`)
   }
 
-  let balance1 = await client1.accounts.getBalance()
-  let balance3 = await client3.accounts.getBalance()
-  console.log(`Current balances: AK 1 ${balance1}, AK3 ${balance3}`)
-  let success = await client1.base.spend(domain, 1, 1)
-  console.log(`Account 1 sent ${success} token to Domain of Account 3!`)
+  let balance1
+  let balance3
+
+  try {
+    balance1 = await client1.account.getBalance ()
+    balance3 = await client3.account.getBalance()
+    console.log(`Current balances: AK 1 ${balance1}, AK3 ${balance3}`)
+  } catch (error) {
+    console.error(error)
+  }
+
+  let spentTokens = await client1.base.spend(domain, 1, 1)
+  console.log(`Account 1 sent ${spentTokens} token to Domain of Account 3!`)
   await client2.base.waitNBlocks(1)
 
-  balance1 = await client1.accounts.getBalance()
-  balance3 = await client3.accounts.getBalance()
-  console.log(`Balances after transfer: AK1 ${balance1}, AK3 ${balance3}`)
+  try {
+    balance1 = await client1.account.getBalance()
+    balance3 = await client3.account.getBalance()
+    console.log(`Balances after transfer: AK1 ${balance1}, AK3 ${balance3}`)
+  } catch (error) {
+    console.error(error)
+  }
 
   await client2.aens.transfer(nameHash, account1, 1)
   await client2.base.waitNBlocks(1)
