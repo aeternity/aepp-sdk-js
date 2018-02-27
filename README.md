@@ -2,7 +2,7 @@
 
 A wrapper for the Aeternity Epoch net
 
-## Disclaimer
+#### Disclaimer
 
 **The current state of the SDK is Alpha and might be subject to breaking changes and restructuring until it has stabilized** 
 
