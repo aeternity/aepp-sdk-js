@@ -36,7 +36,21 @@ client.base.getSpendTx (recipient, amount).then(
 
 ```
 
-If you are interested in more details how the transactions are encrypted, please use the CLI example [here](https://github.com/aeternity/aepp-sdk-js/blob/develop/examples/signing.js) which provides detailed output on the whole process or walk through the documentation [here](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/Signing.md)
+If you are interested in more details how the transactions are encrypted, please use the CLI example [here](https://github.com/aeternity/aepp-sdk-js/blob/develop/examples/signing.js). 
+
+The example demonstrates how to send token with an offchain signed transaction and outputs a detailed description of the decryption process. Before you can run the example you either have to get access to the `keys` pair in your Epoch distribution (option `--keys`) or you have already a hex version of your private key which you can use (option `--private`).
+
+**Option /w --keys (you have to know your passwort to decrypt the keys, defaults to: 'secret')**
+```
+examples/signing.js spend-signed <recipient_pub_key> <amount> --keys <your Epoch keys>
+```
+
+**Option /w --private**
+
+```
+examples/signing.js spend-signed <recipient_pub_key> <amount> --keys <your Epoch keys>
+```
+The documentation [here](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/Signing.md) also walks you through that demo. 
 
 ### AENS
 
