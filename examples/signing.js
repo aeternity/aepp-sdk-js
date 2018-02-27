@@ -27,10 +27,6 @@ let client1 = new AeternityClient (new HttpProvider ('localhost', 3013, {
   internalPort: 3113,
   secured: false
 }))
-let client2 = new AeternityClient (new HttpProvider ('localhost', 3023, {
-  internalPort: 3123,
-  secured: false
-}))
 
 
 const program = require ('commander')
@@ -132,12 +128,10 @@ const signTransaction = async function (recipient, amount, options) {
       console.log (`Private key (hex): ${privateHex}`)
       console.log (`Public key (base check): ak\$${Crypto.encodeBase58Check (decryptedPub)}`)
 
-      // let recipient = await client2.accounts.getPublicKey ()
       await signTransactionInternal(recipient, amount, privateHex)
     })
   } else {
     privateHex = options.private
-    // let recipient = await client2.accounts.getPublicKey ()
     await signTransactionInternal(recipient, amount, privateHex)
 
   }
@@ -146,9 +140,9 @@ const signTransaction = async function (recipient, amount, options) {
 program
   .version ('0.1.0')
   .command ('spend-signed <recipient> <amount>')
-  .description ('Decrypts public and private key to readable formats for testing purposes')
   .option ('-d, --keys <keys>', 'Keys directory')
   .option ('-k, --private <private>', 'Private key')
+  .description ('Sign and send a token transfer transaction with a private key')
   .action (signTransaction)
 
 

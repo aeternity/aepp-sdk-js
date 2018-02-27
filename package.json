@@ -12,13 +12,13 @@
   "author": "Till Kolter <till.kolter@gmail.com>",
   "license": "ISC",
   "dependencies": {
-		"aes-js": "^3.1.0",
+    "aes-js": "^3.1.0",
     "axios": "^0.17.1",
-		"bs58check": "^2.1.1",
-		"elliptic": "^6.4.0",
-		"msgpack-lite": "aeternity/msgpack-lite",
-		"sha.js": "^2.4.10",
-		"websocket": "^1.0.25"
+    "bs58check": "^2.1.1",
+    "elliptic": "^6.4.0",
+    "msgpack-lite": "aeternity/msgpack-lite",
+    "sha.js": "^2.4.10",
+    "websocket": "^1.0.25"
   },
   "repository": {
     "type": "git",
