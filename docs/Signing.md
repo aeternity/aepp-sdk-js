@@ -13,7 +13,7 @@ bin/keys decrypt <KEYS_DIR>
 Results in:
 
 ```
-Private key (hex): asbdkjshdf238nefdhwu2asj
+Private key (hex): 800aec1dab248bc48cdce13fb2bfda58da7a5670dfffb26279562fd49179231e
 Public key (base check): ak$<Base58Check encoded key> 
 ```
 
