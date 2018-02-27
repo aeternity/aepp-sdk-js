@@ -55,7 +55,7 @@ let httpProvider3 = new AeternityClient(new AeHttpProvider ('localhost', 3033, {
   secured: false
 }))
 
-let privateKey = '800aec1dab248bc48cdce13fb2bfda58da7a5670dfffb26279562fd49179231e'
+let privateKey = '72d5832c5ad60d794de4651cd00a3c19874d01b1f03cfcc649342a62664dee27'
 
 
 module.exports = {
