@@ -1,6 +1,6 @@
 # epoch-http-js
 
-A wrapper for the Aeternity Epoch net
+A wrapper for the Aeternity Epoch net. 
 
 #### Disclaimer
 
