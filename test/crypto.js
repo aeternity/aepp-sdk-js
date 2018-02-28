@@ -40,6 +40,32 @@ describe('crypto', () => {
       assert.equal(97, keyPair.pub.length)
     })
   })
+  describe('encryptPassword', () => {
+    describe('generate a password encrypted key pair', () => {
+      let keyPair = Crypto.generateKeyPair(true)
+      let password = 'verysecret'
+
+      it('works for private keys', () => {
+        let privateBinary = keyPair.priv
+
+        let encryptedPrivate = Crypto.encryptPrivateKey(password, privateBinary)
+        let decryptedPrivate = Crypto.decryptPrivateKey(password, encryptedPrivate)
+        assert.equal(
+          Buffer.from(decryptedPrivate).toString('hex'),
+          Buffer.from(privateBinary).toString('hex')
+        )
+      })
+      it('works for public keys', () => {
+        let publicBinary = keyPair.pub
+        let encryptedPublic = Crypto.encryptPublicKey(password, publicBinary)
+        let decryptedPublic = Crypto.decryptPubKey(password, encryptedPublic)
+        assert.equal(
+          Buffer.from(decryptedPublic).toString('hex'),
+          Buffer.from(publicBinary).toString('hex')
+        )
+      })
+    })
+  })
   describe('encodeBase', () => {
     it('can be encoded and decoded', () => {
       let input = 'helloword010101023'
