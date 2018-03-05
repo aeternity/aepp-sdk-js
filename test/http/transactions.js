@@ -16,3 +16,25 @@
  */
 
 
+require('@babel/polyfill')
+
+const chai = require ('chai')
+const assert = chai.assert
+const utils = require('../utils')
+
+describe('Http service transactions', () => {
+  describe('transaction detail', () => {
+    it('should return transaction details', async function () {
+      this.timeout(utils.TIMEOUT)
+      let pubKey2 = await utils.httpProvider2.accounts.getPublicKey()
+      let txData = await utils.httpProvider1.base.getSpendTx(pubKey2, 10)
+      let spendData = await utils.httpProvider1.tx.sendSigned(txData.tx, utils.privateKey)
+      await utils.httpProvider1.base.waitNBlocks(1)
+      let transaction = await utils.httpProvider1.tx.getTransaction(txData['tx_hash'])
+      console.log(`${JSON.stringify(transaction.data)}`)
+      assert.ok(transaction)
+      assert.notEqual(-1, transaction['block_height'])
+    })
+  })
+})
+
