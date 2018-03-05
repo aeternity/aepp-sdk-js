@@ -20,7 +20,6 @@ require('@babel/polyfill')
 const chai = require ('chai')
 const assert = chai.assert
 const utils = require('../utils')
-const {encodeTx, decodeTx} = require('../../lib/utils/crypto')
 
 let exampleContract = `
 contract type Identity = {

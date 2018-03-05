@@ -72,7 +72,7 @@ describe ('Http service base', () => {
       }
 
       let pubKey2 = await utils.httpProvider2.accounts.getPublicKey ()
-      let spent = await utils.httpProvider1.base.spend (pubKey2, 5, 1)
+      let spent = await utils.httpProvider1.base.spend (pubKey2, 5, 1, {privateKey: utils.privateKey})
       assert.equal(5, spent)
       await utils.httpProvider1.base.waitNBlocks (1)
       let balance = await utils.httpProvider2.accounts.getBalance ()
