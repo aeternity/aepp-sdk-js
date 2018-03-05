@@ -31,7 +31,6 @@ describe('Http service transactions', () => {
       let spendData = await utils.httpProvider1.tx.sendSigned(txData.tx, utils.privateKey)
       await utils.httpProvider1.base.waitNBlocks(1)
       let transaction = await utils.httpProvider1.tx.getTransaction(txData['tx_hash'])
-      console.log(`${JSON.stringify(transaction.data)}`)
       assert.ok(transaction)
       assert.notEqual(-1, transaction['block_height'])
     })
