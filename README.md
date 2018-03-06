@@ -5,7 +5,7 @@ navigation: 5
 ---
 
 # aepp-sdk-js
-A wrapper for the æternity Epoch net
+A wrapper for the æternity Epoch network
 
 This SDK is at an alpha stage where things easily can break. We aim to make our alpha releases as stable as possible. Neverless it should not be taken as production-ready. To catch up with the more edgy state of development please check out the [develop branch](https://github.com/aeternity/aepp-sdk-js/tree/develop).
 
