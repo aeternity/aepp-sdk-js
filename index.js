@@ -17,6 +17,6 @@
  *
  */
 
-const AeternityClient = require('./lib/aepp-sdk')
+const AeternityClient = require('./dist/aepp-sdk')
 
 module.exports = AeternityClient

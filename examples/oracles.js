@@ -19,7 +19,7 @@
 'use strict'
 
 
-const AeternityClient = require ('../index')
+const AeternityClient = require ('../index.js')
 const {AeSubscription} = require ('../lib/providers/ws/subscriptions')
 const WebSocketProvider = require ('../lib/providers/ws')
 

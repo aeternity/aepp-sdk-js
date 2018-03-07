@@ -64,7 +64,7 @@ describe ('Http service contracts', () => {
     it('should create a tx', async () => {
       createTx = await utils.httpProvider1.contracts.getCreateTx(byteCode)
       assert.ok(createTx)
-      assert.isTrue(createTx.startsWith('tx$'))
+      assert.isTrue(createTx.tx.startsWith('tx$'))
     })
   })
   describe('deployContract', () => {
