@@ -23,6 +23,8 @@ const assert = chai.assert
 
 const Crypto = require('../lib/utils/crypto')
 
+// These keys are fixations for the encryption lifecycle tests and will
+// not be used for signing
 const privateKeyAsHex = '56b61283ec0ea87f891347f95895f9e1f339cd8854d649043c9b32b908cda646'
 const publicKey = 'ak$3iDEWVFVERNggenRRyREbQWWoE1QiWaqXnEtknkP8noSiAPboe5ikkEtwgYDJ9SsBqjUnxUBpRtj1J9PnTTUji22UGybzW'
 
@@ -38,6 +40,32 @@ describe('crypto', () => {
       assert.ok(keyPair)
       assert.isTrue(keyPair.pub.startsWith('ak$'))
       assert.equal(97, keyPair.pub.length)
+    })
+  })
+  describe('encryptPassword', () => {
+    describe('generate a password encrypted key pair', () => {
+      let keyPair = Crypto.generateKeyPair(true)
+      let password = 'verysecret'
+
+      it('works for private keys', () => {
+        let privateBinary = keyPair.priv
+
+        let encryptedPrivate = Crypto.encryptPrivateKey(password, privateBinary)
+        let decryptedPrivate = Crypto.decryptPrivateKey(password, encryptedPrivate)
+        assert.equal(
+          Buffer.from(decryptedPrivate).toString('hex'),
+          Buffer.from(privateBinary).toString('hex')
+        )
+      })
+      it('works for public keys', () => {
+        let publicBinary = keyPair.pub
+        let encryptedPublic = Crypto.encryptPublicKey(password, publicBinary)
+        let decryptedPublic = Crypto.decryptPubKey(password, encryptedPublic)
+        assert.equal(
+          Buffer.from(decryptedPublic).toString('hex'),
+          Buffer.from(publicBinary).toString('hex')
+        )
+      })
     })
   })
   describe('encodeBase', () => {

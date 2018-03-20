@@ -1,7 +1,6 @@
 /*
- *  Æternity Naming System interface
- *  Author: Till Kolter
- *  Copyright (c) 2018 aeternity developers
+ * ISC License (ISC)
+ * Copyright 2018 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -14,11 +13,24 @@
  *  LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
- *
  */
-
-const AeternityClient = require('./dist/aepp-sdk')
-
-export default AeternityClient
-
-export {default as Crypto} from './dist/utils/crypto'
+module.exports = {
+  actions: {
+    MINED_BLOCK: 'mined_block',
+    NEW_BLOCK: 'new_block',
+    REGISTER: 'register',
+    RESPONSE: 'response',
+    NEW_ORACLE_QUERY: 'new_oracle_query',
+    NEW_ORACLE_RESPONSE: 'new_oracle_response',
+    QUERY: 'query',
+    SUBSCRIBE: 'subscribe'
+  },
+  origins: {
+    ORACLE: 'oracle',
+    CHAIN: 'chain'
+  },
+  targets: {
+    CHAIN: 'chain',
+    ORACLE: 'oracle'
+  }
+};

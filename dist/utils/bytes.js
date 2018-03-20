@@ -1,7 +1,6 @@
 /*
- *  Æternity Naming System interface
- *  Author: Till Kolter
- *  Copyright (c) 2018 aeternity developers
+ * ISC License (ISC)
+ * Copyright 2018 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -14,11 +13,32 @@
  *  LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
- *
  */
+var leftPad = function leftPad(length, inputBuffer) {
+  var fill = length - inputBuffer.length;
 
-const AeternityClient = require('./dist/aepp-sdk')
+  if (fill > 0) {
+    var fillArray = new Uint8Array(fill);
+    fillArray.fill(0, fill);
+    return Buffer.concat([fillArray, inputBuffer]);
+  } else {
+    return inputBuffer;
+  }
+};
 
-export default AeternityClient
+var rightPad = function rightPad(length, inputBuffer) {
+  var fill = length - inputBuffer.length;
 
-export {default as Crypto} from './dist/utils/crypto'
+  if (fill > 0) {
+    var fillArray = new Uint8Array(fill);
+    fillArray.fill(0, fill);
+    return Buffer.concat([inputBuffer, fillArray]);
+  } else {
+    return inputBuffer;
+  }
+};
+
+module.exports = {
+  leftPad: leftPad,
+  rightPad: rightPad
+};
