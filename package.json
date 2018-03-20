@@ -1,32 +1,47 @@
 {
-  "name": "aepps-epoch-js",
-  "version": "0.0.1-alpha.1",
+  "name": "aepp-sdk",
+  "version": "0.0.1-alpha.4",
   "description": "An HTTP wrapper for the Aeternity Epoch net",
-  "main": "./dist/epoch.js",
+  "main": "../dist/aepp-sdk.js",
   "scripts": {
-    "build": "babel lib/aepp-sdk.js --presets @babel/env --out-dir dist",
+    "build": "babel lib --presets @babel/env --out-dir dist",
     "prepublish": "npm run build",
-    "test": "mocha --compilers js:@babel/register"
+    "decrypt": "node bin/keys decrypt",
+    "test": "mocha --recursive --compilers js:@babel/register"
   },
   "author": "Till Kolter <till.kolter@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.17.1"
+    "aes-js": "^3.1.0",
+    "axios": "^0.17.1",
+    "bs58check": "^2.1.1",
+    "elliptic": "^6.4.0",
+    "msgpack-lite": "aeternity/msgpack-lite",
+    "sha.js": "^2.4.10",
+    "websocket": "^1.0.25"
   },
-	"repository": {
+  "repository": {
     "type": "git",
     "url": "https://github.com/aeternity/aepp-sdk-js"
+  },
+  "browser": {
+    "./lib/providers/ws/websocket.js": "./lib/providers/ws/browser/websocket.js"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.39",
     "@babel/core": "^7.0.0-beta.39",
     "@babel/node": "^7.0.0-beta.39",
+    "@babel/plugin-proposal-object-rest-spread": "^7.0.0-beta.40",
+    "@babel/plugin-transform-runtime": "^7.0.0-beta.40",
     "@babel/polyfill": "^7.0.0-beta.39",
     "@babel/preset-env": "^7.0.0-beta.39",
     "@babel/register": "^7.0.0-beta.39",
+    "@babel/runtime": "^7.0.0-beta.40",
+    "bufferutil": "^3.0.3",
     "chai": "^4.1.2",
-    "chai-as-promised": "^7.1.1",
+    "commander": "^2.14.1",
     "mocha": "^5.0.0",
+    "prompt": "^1.0.0",
     "sinon": "^4.2.2"
   }
 }

@@ -1,7 +1,6 @@
 /*
- *  Æternity Naming System interface
- *  Author: Till Kolter
- *  Copyright (c) 2018 aeternity developers
+ * ISC License (ISC)
+ * Copyright 2018 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -14,9 +13,24 @@
  *  LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
- *
  */
 
-const AeternityClient = require('./dist/aepp-sdk')
 
-module.exports = AeternityClient
+require('@babel/polyfill')
+
+const chai = require ('chai')
+const assert = chai.assert
+
+const utils = require('../utils')
+
+
+describe('Http accounts service', () => {
+  describe('getTransactions', () => {
+    it('should return something', async () => {
+      let transactions = await utils.httpProvider1.accounts.getTransactions()
+      assert.ok(transactions)
+      assert.isTrue(Array.isArray(transactions))
+      assert.ok(transactions.length)
+    })
+  })
+})
