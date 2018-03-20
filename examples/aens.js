@@ -4,9 +4,9 @@ require('@babel/polyfill')
 const AeternityClient = require('../index.js')
 const HttpProvider = require('../lib/providers/http')
 
-let client1 = new AeternityClient(new HttpProvider('localhost', 3013, {internalPort: 3113, secured: false}))
-let client2 = new AeternityClient(new HttpProvider('localhost', 3023, {internalPort: 3123, secured: false}))
-let client3 = new AeternityClient(new HttpProvider('localhost', 3033, {internalPort: 3133, secured: false}))
+let client1 = new AeternityClient(new HttpProvider('localhost', 3013, {secured: false}))
+let client2 = new AeternityClient(new HttpProvider('localhost', 3023, {secured: false}))
+let client3 = new AeternityClient(new HttpProvider('localhost', 3033, {secured: false}))
 
 const aensLifecycle = async (domain) => {
   // get account pubkeys

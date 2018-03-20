@@ -1,7 +1,8 @@
+var _classCallCheck = require("@babel/runtime/helpers/classCallCheck");
+
 /*
- *  Æternity Naming System interface
- *  Author: Till Kolter
- *  Copyright (c) 2018 aeternity developers
+ * ISC License (ISC)
+ * Copyright 2018 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -14,11 +15,11 @@
  *  LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
- *
  */
+var HttpService = function HttpService(epochClient) {
+  _classCallCheck(this, HttpService);
 
-const AeternityClient = require('./dist/aepp-sdk')
+  this.client = epochClient;
+};
 
-export default AeternityClient
-
-export {default as Crypto} from './dist/utils/crypto'
+module.exports = HttpService;

@@ -16,22 +16,25 @@
  */
 
 
+require('@babel/polyfill')
 
-const leftPad = (length, user_str, fill = '0') => {
-  let pad = fill.repeat(length)
-  if (typeof user_str === 'undefined')
-    return pad;
-  return (pad + user_str).slice(-pad.length);
-}
+const chai = require ('chai')
+const assert = chai.assert
+const utils = require('../../utils')
 
-const rightPad = (length, user_str, fill = '0') => {
-  let pad = fill.repeat(length)
-  if (typeof user_str === 'undefined')
-    return pad;
-  return (user_str + pad).substring(0, pad.length)
-}
+describe('Http service transactions', () => {
+  describe('transaction detail', () => {
+    it('should return transaction details', async function () {
+      this.timeout(utils.TIMEOUT)
+      const { pub:pub1, priv } = utils.wallets[0]
+      const { pub:pub2 } = utils.wallets[0]
+      let txData = await utils.httpProvider.base.getSpendTx(pub2, 10, pub1)
+      let spendData = await utils.httpProvider.tx.sendSigned(txData.tx, priv)
+      await utils.httpProvider.base.waitNBlocks(1)
+      let transaction = await utils.httpProvider.tx.getTransaction(txData['tx_hash'])
+      assert.ok(transaction)
+      assert.notEqual(-1, transaction['block_height'])
+    })
+  })
+})
 
-module.exports = {
-  leftPad,
-  rightPad
-}

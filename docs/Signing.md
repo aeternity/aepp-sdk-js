@@ -28,7 +28,7 @@ const AeternityClient = require('aepp-sdk')
 // Import crypto tools 
 const Crypto = require('lib/utils/crypto')
 
-let client = new AeternityClient(new AeternityClient.providers.HttpProvider('localhost', 3013, {internalPort: 3113, secured: false}))
+let client = new AeternityClient(new AeternityClient.providers.HttpProvider('localhost', 3013, {secured: false}))
 
 
 ```
