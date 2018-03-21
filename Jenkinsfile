@@ -24,15 +24,12 @@ pipeline {
     stage('Test') {
       steps {
         sh '''#!/bin/bash
-          FOO=bar
-          WALLET_PRIV_0=$(cat /tmp/wallet-0)
-          WALLET_PRIV_1=$(cat /tmp/wallet-1)
-          WALLET_PRIV_2=$(cat /tmp/wallet-2)
-          WALLET_PUB_0=$(cat /tmp/wallet-0.pub)
-          WALLET_PUB_1=$(cat /tmp/wallet-1.pub)
-          WALLET_PUB_2=$(cat /tmp/wallet-2.pub)
-          echo $FOO
-          echo $WALLET_PRIV_0
+          export WALLET_PRIV_0=$(</tmp/wallet-0)
+          export WALLET_PRIV_1=$(</tmp/wallet-1)
+          export WALLET_PRIV_2=$(</tmp/wallet-2)
+          export WALLET_PUB_0=$(</tmp/wallet-0.pub)
+          export WALLET_PUB_1=$(</tmp/wallet-1.pub)
+          export WALLET_PUB_2=$(</tmp/wallet-2.pub)
           npm run test-jenkins
         '''
       }
