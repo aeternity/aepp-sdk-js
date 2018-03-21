@@ -5,7 +5,7 @@ USER root
 ADD . /app
 WORKDIR /app
 RUN npm install
-RUN cp -r node_modules/* /usr/local/lib/node_modules/
+RUN mv node_modules /
 
 WORKDIR /
 RUN rm -rf /app

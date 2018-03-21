@@ -23,7 +23,7 @@ pipeline {
 
     stage('Test') {
       steps {
-        sh '''
+        sh '''#!/bin/bash
           FOO=bar
           WALLET_PRIV_0=$(cat /tmp/wallet-0)
           WALLET_PRIV_1=$(cat /tmp/wallet-1)
