@@ -42,30 +42,24 @@ const randomAeName = () => {
   return `${text}.aet`
 }
 
-const testHost = process.env.TEST_NODE || 'localhost'
+const [host, port] = (process.env.TEST_NODE || 'localhost:3013').split(':')
 
-let httpProvider1 = new AeternityClient(new AeHttpProvider (testHost, 3013, {
+let httpProvider = new AeternityClient(new AeHttpProvider (host, port, {
   internalPort: 3113,
   secured: false
 }))
-let httpProvider2 = new AeternityClient(new AeHttpProvider (testHost, 3023, {
-  internalPort: 3123,
-  secured: false
-}))
-let httpProvider3 = new AeternityClient(new AeHttpProvider (testHost, 3033, {
-  internalPort: 3133,
-  secured: false
-}))
 
-let privateKey = 'a4a84b072facde2a6a3a0d13babc6cc548945bf9f61e8be1890981516f8bcdba'
+const wallets = [0, 1, 2].map((i) => {
+  return {
+    private: process.env[`WALLET_PRIV_${i}`],
+    public: process.env[`WALLET_PUB_${i}`]
+  }
+})
 
-
-module.exports = {
-  httpProvider1,
-  httpProvider2,
-  httpProvider3,
+export default {
+  httpProvider,
   assertIsBlock,
   randomAeName,
-  privateKey,
+  wallets,
   TIMEOUT: 120000
 }

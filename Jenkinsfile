@@ -13,6 +13,14 @@ pipeline {
       }
     }
 
+    stage('Generate wallets') {
+      steps {
+        sh 'bin/keys genkey wallet-0 -o /tmp'
+        sh 'bin/keys genkey wallet-1 -o /tmp'
+        sh 'bin/keys genkey wallet-2 -o /tmp'
+      }
+    }
+
     stage('Build') {
       steps {
         sh 'npm run build'
@@ -21,7 +29,15 @@ pipeline {
 
     stage('Test') {
       steps {
-        sh 'npm run test-jenkins'
+        sh '''
+          WALLET_PRIV_0=$(</tmp/wallet-0)
+          WALLET_PRIV_1=$(</tmp/wallet-1)
+          WALLET_PRIV_2=$(</tmp/wallet-2)
+          WALLET_PUB_0=$(</tmp/wallet-0.pub)
+          WALLET_PUB_1=$(</tmp/wallet-1.pub)
+          WALLET_PUB_2=$(</tmp/wallet-2.pub)
+          npm run test-jenkins
+        '''
       }
     }
   }
