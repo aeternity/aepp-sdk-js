@@ -31,6 +31,8 @@ pipeline {
           WALLET_PUB_0=$(cat /tmp/wallet-0.pub)
           WALLET_PUB_1=$(cat /tmp/wallet-1.pub)
           WALLET_PUB_2=$(cat /tmp/wallet-2.pub)
+          echo $FOO
+          echo $WALLET_PRIV_0
           npm run test-jenkins
         '''
       }
