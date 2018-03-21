@@ -9,3 +9,4 @@ RUN mv node_modules /
 
 WORKDIR /
 RUN rm -rf /app
+RUN ln -s /node_modules/.bin/* /usr/local/bin/
