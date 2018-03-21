@@ -1,18 +1,12 @@
 pipeline {
   agent {
-    docker {
-      image 'node:9.8.0'
+    dockerfile {
+      filename 'Dockerfile.ci'
       args '-v /etc/group:/etc/group:ro -v /etc/passwd:/etc/passwd:ro -v /var/lib/jenkins:/var/lib/jenkins'
     }
   }
 
   stages {
-    stage('Dependencies') {
-      steps {
-        sh 'npm install'
-      }
-    }
-
     stage('Generate wallets') {
       steps {
         sh 'bin/keys genkey wallet-0 -o /tmp'
