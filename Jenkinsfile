@@ -30,6 +30,7 @@ pipeline {
     stage('Test') {
       steps {
         sh '''
+          FOO=bar
           WALLET_PRIV_0=$(</tmp/wallet-0)
           WALLET_PRIV_1=$(</tmp/wallet-1)
           WALLET_PRIV_2=$(</tmp/wallet-2)
