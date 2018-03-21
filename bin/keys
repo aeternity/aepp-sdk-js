@@ -23,6 +23,7 @@ const program = require ('commander')
 const prompt = require('prompt')
 const fs = require('fs')
 const Crypto = require('../lib/utils/crypto')
+const path = require('path')
 
 let promptSchema = {
   properties: {
@@ -39,12 +40,15 @@ let promptSchema = {
   }
 }
 
-const extractReadableKeys = (dir) => {
+const extractReadableKeys = (dir, options) => {
+  let pwd = options.pwd
   prompt.start()
   prompt.get(promptSchema, function (err, result) {
     let password = result.password
-    let key = fs.readFileSync(`${dir}/key`)
-    let pubKey = fs.readFileSync(`${dir}/key.pub`)
+
+    let key = fs.readFileSync(path.join(pwd, dir, 'key'))
+    let pubKey = fs.readFileSync(path.join(pwd, dir, 'key.pub'))
+
     let decrypted = Crypto.decryptPrivateKey(password, key)
 
     let privateHex = Buffer.from(decrypted).toString('hex')
@@ -59,6 +63,7 @@ program
   .version ('0.1.0')
   .command ('decrypt <directory>')
   .description ('Decrypts public and private key to readable formats for testing purposes')
+  .option('-d, --pwd [workingDir]', 'Set the working directory for relative paths', '.')
   .action (extractReadableKeys)
 
 program.parse (process.argv)

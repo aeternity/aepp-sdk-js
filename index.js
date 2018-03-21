@@ -19,4 +19,6 @@
 
 const AeternityClient = require('./dist/aepp-sdk')
 
-module.exports = AeternityClient
+export default AeternityClient
+
+export {default as Crypto} from './dist/utils/crypto'
