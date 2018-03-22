@@ -29,20 +29,20 @@ const assertHasPointer = async (name, address, type = 'account') => {
 describe ('Http service aens', () => {
   describe ('two-step name claiming', () => {
     it ('should result in a claimed name', async function () {
-      this.timeout(utils.TIMEOUT)
+      this.timeout(utils.TIMEOUT * 4)
       let name = utils.randomAeName()
       let salt = 1234
       let commitment = await utils.httpProvider.aens.getCommitmentHash (name, salt)
       const account = utils.wallets[0]
       assert.ok (commitment)
       // preclaim the domain
-      let pleclaimHash = await utils.httpProvider.aens.preClaim(commitment, 1, account)
+      let preclaimData = await utils.httpProvider.aens.preClaim(commitment, 1, account)
       // wait one block
-      await utils.httpProvider.base.waitNBlocks(1)
+      await utils.httpProvider.tx.waitForTransaction(preclaimData['tx_hash'])
       // claim the domain
-      let nameHash = await utils.httpProvider.aens.claim(name, salt, 1, account)
+      let claimData = await utils.httpProvider.aens.claim(name, salt, 1, account)
 
-      await utils.httpProvider.base.waitNBlocks(1)
+      await utils.httpProvider.tx.waitForTransaction(claimData['tx_hash'])
       let nameData = await utils.httpProvider.aens.getName(name)
       assert.ok(nameData)
       assert.equal(name, nameData['name'])
@@ -50,38 +50,38 @@ describe ('Http service aens', () => {
   })
   describe('update', () => {
       it ('should update the pointer to a name', async function () {
-        this.timeout (utils.TIMEOUT)
+        this.timeout (utils.TIMEOUT * 2)
         let name = utils.randomAeName ()
         const account = utils.wallets[0]
         // use the two step aggregation method for convenience
 
-        await utils.httpProvider.aens.fullClaim (name, 1, 1, account)
+        let claimData = await utils.httpProvider.aens.fullClaim (name, 1, 1, account)
 
-        await utils.httpProvider.base.waitNBlocks(1)
+        await utils.httpProvider.tx.waitForTransaction(claimData['tx_hash'])
         let nameData = await utils.httpProvider.aens.getName(name)
         let nameHash = nameData['name_hash']
         let { pub } = utils.wallets[1]
-        await utils.httpProvider.aens.update (pub, nameHash, account)
-        await utils.httpProvider.base.waitNBlocks (1)
+        let updateData = await utils.httpProvider.aens.update (pub, nameHash, account)
+        await utils.httpProvider.tx.waitForTransaction(updateData['tx_hash'])
         nameData = await utils.httpProvider.aens.getName (name)
         assert.equal(pub, JSON.parse (nameData.pointers)['account_pubkey'])
       })
     })
   describe('transfer', () => {
     it('should transfer the address', async function () {
-      this.timeout(utils.TIMEOUT * 2)
+      this.timeout(utils.TIMEOUT * 4)
       let name = utils.randomAeName()
       // use the two step aggregation method for convenience
       const account = utils.wallets[0]
-      await utils.httpProvider.aens.fullClaim(name, 1, 1, account)
-      await utils.httpProvider.base.waitNBlocks(1)
+      let fullClaimData = await utils.httpProvider.aens.fullClaim(name, 1, 1, account)
+      await utils.httpProvider.tx.waitForTransaction(fullClaimData['tx_hash'])
       let nameData = await utils.httpProvider.aens.getName(name)
       let nameHash = nameData['name_hash']
 
       let account2 = utils.wallets[1].pub
 
-      await utils.httpProvider.aens.update(account2, nameHash, account)
-      await utils.httpProvider.base.waitNBlocks(1)
+      let updateData = await utils.httpProvider.aens.update(account2, nameHash, account)
+      await utils.httpProvider.tx.waitForTransaction(updateData['tx_hash'])
 
       await assertHasPointer(name, account2)
 
@@ -91,10 +91,10 @@ describe ('Http service aens', () => {
 
       // Now account3 can point to himself
       try {
-        await utils.httpProvider.base.spend(account3, 5, 1, account)
-        await utils.httpProvider.base.waitNBlocks(1)
-        await utils.httpProvider.aens.update(account3, nameHash, account)
-        await utils.httpProvider.base.waitNBlocks(1)
+        let spendData = await utils.httpProvider.base.spend(account3, 5, 1, account)
+        await utils.httpProvider.tx.waitForTransaction(spendData['tx_hash'])
+        let updateData = await utils.httpProvider.aens.update(account3, nameHash, account)
+        await utils.httpProvider.tx.waitForTransaction(updateData['tx_hash'])
 
         await assertHasPointer(name, account3)
 
