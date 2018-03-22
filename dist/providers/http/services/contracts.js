@@ -238,9 +238,9 @@ function (_HttpService) {
       };
     }()
   }, {
-    key: "call",
+    key: "callStatic",
     value: function () {
-      var _call = _asyncToGenerator(
+      var _callStatic = _asyncToGenerator(
       /*#__PURE__*/
       _regeneratorRuntime.mark(function _callee5(abi, code, func, arg) {
         var inputData, _ref5, data;
@@ -271,8 +271,8 @@ function (_HttpService) {
         }, _callee5, this);
       }));
 
-      return function call(_x8, _x9, _x10, _x11) {
-        return _call.apply(this, arguments);
+      return function callStatic(_x8, _x9, _x10, _x11) {
+        return _callStatic.apply(this, arguments);
       };
     }()
   }, {

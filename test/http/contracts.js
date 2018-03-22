@@ -50,7 +50,7 @@ describe ('Http service contracts', () => {
   })
   describe('call ring', () => {
     it('should return a value', async () => {
-      let result = await utils.httpProvider1.contracts.call('ring', byteCode, 'main', '1')
+      let result = await utils.httpProvider1.contracts.callStatic('ring', byteCode, 'main', '1')
       assert.equal(1, result)
     })
   })
