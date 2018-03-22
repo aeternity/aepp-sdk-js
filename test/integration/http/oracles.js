@@ -49,7 +49,7 @@ describe ('Oracles HTTP endpoint', () => {
 
       // We know for a fact, what the oracle id will be the same as the public
       // key but with a different prefix
-      publicKey = await utils.httpProvider.accounts.getPublicKey()
+      publicKey = utils.wallets[0].pub
       oracleId = `ok$${publicKey.split('$')[1]}`
       assert.ok(oracles)
 
@@ -63,7 +63,7 @@ describe ('Oracles HTTP endpoint', () => {
   describe('query an oracle', () => {
     it('should query an oracle', async function () {
       this.timeout(utils.TIMEOUT)
-      let publicKey2 = await utils.httpProvider.accounts.getPublicKey()
+      let publicKey2 = utils.wallets[1].pub
       await utils.httpProvider.base.spend(publicKey2, 100, 5)
       await utils.httpProvider.base.waitNBlocks(1)
       let data = await utils.httpProvider.oracles.query(

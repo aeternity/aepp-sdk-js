@@ -45,18 +45,15 @@ const randomAeName = () => {
 const [host, port] = (process.env.TEST_NODE || 'localhost:3013').split(':')
 
 const httpProvider = new AeternityClient(new AeHttpProvider (host, port, {
-  internalPort: 3113,
   secured: false
 }))
 
 const wallets = [0, 1, 2].map((i) => {
   return {
-    private: process.env[`WALLET_PRIV_${i}`],
-    public: process.env[`WALLET_PUB_${i}`]
+    priv: process.env[`WALLET_PRIV_${i}`],
+    pub: process.env[`WALLET_PUB_${i}`]
   }
 })
-
-console.log(wallets)
 
 module.exports = {
   httpProvider,

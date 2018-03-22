@@ -66,16 +66,16 @@ describe ('Http service base', () => {
       this.timeout (utils.TIMEOUT)
       let balanceBefore
       try {
-        balanceBefore = await utils.httpProvider.accounts.getBalance ()
+        balanceBefore = await utils.httpProvider.accounts.getBalance(utils.wallets[0].pub)
       } catch (e) {
         balanceBefore = 0
       }
 
-      let pubKey2 = await utils.httpProvider.accounts.getPublicKey ()
+      let pubKey2 = utils.wallets[0].pub
       let spent = await utils.httpProvider.base.spend (pubKey2, 5, 1, {privateKey: utils.privateKey})
       assert.equal(5, spent)
       await utils.httpProvider.base.waitNBlocks (1)
-      let balance = await utils.httpProvider.accounts.getBalance ()
+      let balance = await utils.httpProvider.accounts.getBalance(utils.wallets[0].pub)
       assert.equal(balanceBefore + 5, balance)
     })
   })
