@@ -20,17 +20,20 @@ require('@babel/polyfill')
 
 const chai = require ('chai')
 const assert = chai.assert
+const utils = require('../../utils')
 
-const utils = require('../utils')
-
-
-describe('Http accounts service', () => {
-  describe('getTransactions', () => {
-    it('should return something', async () => {
-      let transactions = await utils.httpProvider1.accounts.getTransactions()
-      assert.ok(transactions)
-      assert.isTrue(Array.isArray(transactions))
-      assert.ok(transactions.length)
+describe('Http service transactions', () => {
+  describe('transaction detail', () => {
+    it('should return transaction details', async function () {
+      this.timeout(utils.TIMEOUT)
+      let pubKey2 = await utils.httpProvider.accounts.getPublicKey()
+      let txData = await utils.httpProvider.base.getSpendTx(pubKey2, 10)
+      let spendData = await utils.httpProvider.tx.sendSigned(txData.tx, utils.privateKey)
+      await utils.httpProvider.base.waitNBlocks(1)
+      let transaction = await utils.httpProvider.tx.getTransaction(txData['tx_hash'])
+      assert.ok(transaction)
+      assert.notEqual(-1, transaction['block_height'])
     })
   })
 })
+

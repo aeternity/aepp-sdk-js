@@ -44,7 +44,7 @@ const randomAeName = () => {
 
 const [host, port] = (process.env.TEST_NODE || 'localhost:3013').split(':')
 
-let httpProvider = new AeternityClient(new AeHttpProvider (host, port, {
+const httpProvider = new AeternityClient(new AeHttpProvider (host, port, {
   internalPort: 3113,
   secured: false
 }))
@@ -56,9 +56,7 @@ const wallets = [0, 1, 2].map((i) => {
   }
 })
 
-console.log(wallets)
-
-export default {
+module.exports = {
   httpProvider,
   assertIsBlock,
   randomAeName,

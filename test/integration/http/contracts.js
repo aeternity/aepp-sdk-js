@@ -19,7 +19,7 @@ require('@babel/polyfill')
 
 const chai = require ('chai')
 const assert = chai.assert
-const utils = require('../utils')
+const utils = require('../../utils')
 
 let exampleContract = `
 contract type Identity = {
@@ -40,7 +40,7 @@ describe ('Http service contracts', () => {
   let createTx
   describe ('compile', () => {
     it ('should compile a ring contract', async () => {
-      byteCode = await utils.httpProvider1.contracts.compile(
+      byteCode = await utils.httpProvider.contracts.compile(
         exampleContract,
         ''
       )
@@ -50,19 +50,19 @@ describe ('Http service contracts', () => {
   })
   describe('call ring', () => {
     it('should return a value', async () => {
-      let result = await utils.httpProvider1.contracts.call('ring', byteCode, 'main', '1')
+      let result = await utils.httpProvider.contracts.call('ring', byteCode, 'main', '1')
       assert.equal(1, result)
     })
   })
   describe('encodeCallData ring', () => {
     it('should return an encoded string', async () => {
-      let calldata = await utils.httpProvider1.contracts.encodeCallData('ring', byteCode, 'main', '1')
+      let calldata = await utils.httpProvider.contracts.encodeCallData('ring', byteCode, 'main', '1')
       assert.isTrue(calldata.startsWith('0x'))
     })
   })
   describe('getCreateTx', () => {
     it('should create a tx', async () => {
-      createTx = await utils.httpProvider1.contracts.getCreateTx(byteCode)
+      createTx = await utils.httpProvider.contracts.getCreateTx(byteCode)
       assert.ok(createTx)
       assert.isTrue(createTx.tx.startsWith('tx$'))
     })
@@ -72,11 +72,11 @@ describe ('Http service contracts', () => {
       this.timeout(utils.TIMEOUT)
       try {
         let params = {txTypes: 'aect_create_tx'}
-        let txCountBefore = await utils.httpProvider1.accounts.getTransactionCount(params)
-        let success = await utils.httpProvider1.contracts.deployContract(byteCode, utils.privateKey)
+        let txCountBefore = await utils.httpProvider.accounts.getTransactionCount(params)
+        let success = await utils.httpProvider.contracts.deployContract(byteCode, utils.privateKey)
         assert.ok(success)
-        await utils.httpProvider1.base.waitNBlocks(1)
-        let txCountAfter = await utils.httpProvider1.accounts.getTransactionCount(params)
+        await utils.httpProvider.base.waitNBlocks(1)
+        let txCountAfter = await utils.httpProvider.accounts.getTransactionCount(params)
         assert.isTrue(txCountAfter > 0)
         assert.isTrue(txCountBefore < txCountAfter)
       } catch (e) {

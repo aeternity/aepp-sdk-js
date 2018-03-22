@@ -15,13 +15,13 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-const utils = require ('../utils')
+const utils = require ('../../utils')
 
 const chai = require ('chai')
 const assert = chai.assert
 
 const assertHasPointer = async (name, address, type = 'account') => {
-  let nameData = await utils.httpProvider1.aens.getName(name)
+  let nameData = await utils.httpProvider.aens.getName(name)
   assert.ok(nameData)
   assert.equal(address, JSON.parse(nameData.pointers)[`${type}_pubkey`])
 }
@@ -32,17 +32,17 @@ describe ('Http service aens', () => {
       this.timeout(utils.TIMEOUT)
       let name = utils.randomAeName()
       let salt = 1234
-      let commitment = await utils.httpProvider1.aens.getCommitmentHash (name, salt)
+      let commitment = await utils.httpProvider.aens.getCommitmentHash (name, salt)
       assert.ok (commitment)
       // preclaim the domain
-      let pleclaimHash = await utils.httpProvider1.aens.preClaim(commitment, 1, {privateKey: utils.privateKey})
+      let pleclaimHash = await utils.httpProvider.aens.preClaim(commitment, 1, {privateKey: utils.privateKey})
       // wait one block
-      await utils.httpProvider1.base.waitNBlocks(1)
+      await utils.httpProvider.base.waitNBlocks(1)
       // claim the domain
-      let nameHash = await utils.httpProvider1.aens.claim(name, salt, 1, {privateKey: utils.privateKey})
+      let nameHash = await utils.httpProvider.aens.claim(name, salt, 1, {privateKey: utils.privateKey})
 
-      await utils.httpProvider1.base.waitNBlocks(1)
-      let nameData = await utils.httpProvider1.aens.getName(name)
+      await utils.httpProvider.base.waitNBlocks(1)
+      let nameData = await utils.httpProvider.aens.getName(name)
       assert.ok(nameData)
       assert.equal(name, nameData['name'])
     })
@@ -53,15 +53,15 @@ describe ('Http service aens', () => {
         let name = utils.randomAeName ()
         // use the two step aggregation method for convenience
 
-        await utils.httpProvider1.aens.fullClaim (name, 1, 1, {privateKey: utils.privateKey})
+        await utils.httpProvider.aens.fullClaim (name, 1, 1, {privateKey: utils.privateKey})
 
-        await utils.httpProvider1.base.waitNBlocks(1)
-        let nameData = await utils.httpProvider1.aens.getName(name)
+        await utils.httpProvider.base.waitNBlocks(1)
+        let nameData = await utils.httpProvider.aens.getName(name)
         let nameHash = nameData['name_hash']
-        let account2 = await utils.httpProvider2.accounts.getPublicKey ()
-        await utils.httpProvider1.aens.update (account2, nameHash, {privateKey: utils.privateKey})
-        await utils.httpProvider1.base.waitNBlocks (1)
-        nameData = await utils.httpProvider1.aens.getName (name)
+        let account2 = await utils.httpProvider.accounts.getPublicKey ()
+        await utils.httpProvider.aens.update (account2, nameHash, {privateKey: utils.privateKey})
+        await utils.httpProvider.base.waitNBlocks (1)
+        nameData = await utils.httpProvider.aens.getName (name)
         assert.equal (account2, JSON.parse (nameData.pointers)['account_pubkey'])
       })
     })
@@ -70,28 +70,28 @@ describe ('Http service aens', () => {
       this.timeout(utils.TIMEOUT * 2)
       let name = utils.randomAeName()
       // use the two step aggregation method for convenience
-      await utils.httpProvider1.aens.fullClaim(name, 1, 1, {privateKey: utils.privateKey})
-      await utils.httpProvider1.base.waitNBlocks(1)
-      let nameData = await utils.httpProvider1.aens.getName(name)
+      await utils.httpProvider.aens.fullClaim(name, 1, 1, {privateKey: utils.privateKey})
+      await utils.httpProvider.base.waitNBlocks(1)
+      let nameData = await utils.httpProvider.aens.getName(name)
       let nameHash = nameData['name_hash']
 
-      let account2 = await utils.httpProvider2.accounts.getPublicKey()
+      let account2 = await utils.httpProvider.accounts.getPublicKey()
 
-      await utils.httpProvider1.aens.update(account2, nameHash, {privateKey: utils.privateKey})
-      await utils.httpProvider1.base.waitNBlocks(1)
+      await utils.httpProvider.aens.update(account2, nameHash, {privateKey: utils.privateKey})
+      await utils.httpProvider.base.waitNBlocks(1)
 
       await assertHasPointer(name, account2)
 
-      let account3 = await utils.httpProvider3.accounts.getPublicKey()
-      await utils.httpProvider1.aens.transfer(nameHash, account3, 1, {privateKey: utils.privateKey})
-      await utils.httpProvider1.base.waitNBlocks(1)
+      let account3 = await utils.httpProvider.accounts.getPublicKey()
+      await utils.httpProvider.aens.transfer(nameHash, account3, 1, {privateKey: utils.privateKey})
+      await utils.httpProvider.base.waitNBlocks(1)
 
       // Now account3 can point to himself
       try {
-        await utils.httpProvider1.base.spend(account3, 5, 1, {privateKey: utils.privateKey})
-        await utils.httpProvider3.base.waitNBlocks(1)
-        await utils.httpProvider3.aens.update(account3, nameHash, {privateKey: utils.privateKey})
-        await utils.httpProvider3.base.waitNBlocks(1)
+        await utils.httpProvider.base.spend(account3, 5, 1, {privateKey: utils.privateKey})
+        await utils.httpProvider.base.waitNBlocks(1)
+        await utils.httpProvider.aens.update(account3, nameHash, {privateKey: utils.privateKey})
+        await utils.httpProvider.base.waitNBlocks(1)
 
         await assertHasPointer(name, account3)
 
