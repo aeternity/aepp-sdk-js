@@ -56,6 +56,8 @@ const wallets = [0, 1, 2].map((i) => {
   }
 })
 
+console.log(wallets)
+
 module.exports = {
   httpProvider,
   assertIsBlock,
