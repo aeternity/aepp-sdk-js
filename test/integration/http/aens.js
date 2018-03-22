@@ -86,7 +86,7 @@ describe ('Http service aens', () => {
       await assertHasPointer(name, account2)
 
       let account3 = utils.wallets[2].pub
-      let transferData = await utils.httpProvider.aens.transfer(nameHash, account3, 1, account)
+      let transferData = await utils.httpProvider.aens.transfer(nameHash, account3, account)
       await utils.httpProvider.tx.waitForTransaction(transferData['tx_hash'])
 
       // Now account3 can point to himself
