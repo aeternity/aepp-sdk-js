@@ -21,19 +21,10 @@ const chai = require ('chai')
 const assert = chai.assert
 const utils = require('../../utils')
 
-let exampleContract = `
-contract type Identity = {
-  type state;
-  
-  let main: int => int;
-};
-
-contract Identity = {
-  let main(x:int) = {
-    x;
-  };
-};
-`
+const exampleContract = `
+contract Identity =
+  function main (x:int) = x
+ `
 
 describe ('Http service contracts', () => {
   let byteCode
@@ -62,7 +53,7 @@ describe ('Http service contracts', () => {
   })
   describe('getCreateTx', () => {
     it('should create a tx', async () => {
-      createTx = await utils.httpProvider.contracts.getCreateTx(byteCode)
+      createTx = await utils.httpProvider.contracts.getCreateTx(byteCode, utils.wallets[0].pub)
       assert.ok(createTx)
       assert.isTrue(createTx.tx.startsWith('tx$'))
     })
@@ -70,19 +61,10 @@ describe ('Http service contracts', () => {
   describe('deployContract', () => {
     it('should deploy a contract', async function () {
       this.timeout(utils.TIMEOUT)
-      try {
-        let params = {txTypes: 'aect_create_tx'}
-        let txCountBefore = await utils.httpProvider.accounts.getTransactionCount(params)
-        let success = await utils.httpProvider.contracts.deployContract(byteCode, utils.privateKey)
-        assert.ok(success)
-        await utils.httpProvider.base.waitNBlocks(1)
-        let txCountAfter = await utils.httpProvider.accounts.getTransactionCount(params)
-        assert.isTrue(txCountAfter > 0)
-        assert.isTrue(txCountBefore < txCountAfter)
-      } catch (e) {
-        console.log(e)
-        assert.isTrue(false)
-      }
+      let params = {txTypes: 'aect_create_tx'}
+      
+      const ret = await utils.httpProvider.contracts.deployContract(byteCode, utils.wallets[0])
+      await utils.httpProvider.tx.waitForTransaction(ret['tx_hash'], 60000)
     })
   })
 })

@@ -62,20 +62,21 @@ describe ('Http service base', () => {
     })
   })
   describe ('spend', () => {
-    it ('should increase the balance', async function () {
+    // TODO: Waiting on /account/balance/{account_pubkey} to move to external endpoint
+    it.skip('should increase the balance', async function () {
       this.timeout (utils.TIMEOUT)
+      const { pub:pub1 } = utils.wallets[0]
       let balanceBefore
       try {
-        balanceBefore = await utils.httpProvider.accounts.getBalance(utils.wallets[0].pub)
+        balanceBefore = await utils.httpProvider.accounts.getBalance(pub1)
       } catch (e) {
         balanceBefore = 0
       }
 
-      let pubKey2 = utils.wallets[0].pub
-      let spent = await utils.httpProvider.base.spend (pubKey2, 5, 1, {privateKey: utils.privateKey})
-      assert.equal(5, spent)
-      await utils.httpProvider.base.waitNBlocks (1)
-      let balance = await utils.httpProvider.accounts.getBalance(utils.wallets[0].pub)
+      const { pub:pub2 } = utils.wallets[1]
+      const { tx_hash } = await utils.httpProvider.base.spend(pub2, 5, utils.wallets[0])
+      await utils.httpProvider.tx.waitForTransaction(tx_hash)
+      const balance = await utils.httpProvider.accounts.getBalance(pub1)
       assert.equal(balanceBefore + 5, balance)
     })
   })
@@ -101,14 +102,9 @@ describe ('Http service base', () => {
       }
     })
   })
-  describe ('getGenesisBlock', () => {
-    it ('should return a block', async () => {
-      let data = await utils.httpProvider.base.getGenesisBlock ()
-      utils.assertIsBlock (data)
-    })
-  })
   describe ('getBlockByHash', () => {
-    it ('should return a block', async () => {
+    // TODO: Waiting on /block/hash/{hash} to move to external endpoint
+    it.skip('should return a block', async () => {
       let data = await utils.httpProvider.base.getBlockByHash (prevHash)
       utils.assertIsBlock (data)
     })

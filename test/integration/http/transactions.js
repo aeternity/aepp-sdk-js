@@ -26,9 +26,10 @@ describe('Http service transactions', () => {
   describe('transaction detail', () => {
     it('should return transaction details', async function () {
       this.timeout(utils.TIMEOUT)
-      let pubKey2 = utils.wallets[1].pub
-      let txData = await utils.httpProvider.base.getSpendTx(pubKey2, 10)
-      let spendData = await utils.httpProvider.tx.sendSigned(txData.tx, utils.privateKey)
+      const { pub:pub1, priv } = utils.wallets[0]
+      const { pub:pub2 } = utils.wallets[0]
+      let txData = await utils.httpProvider.base.getSpendTx(pub2, 10, pub1)
+      let spendData = await utils.httpProvider.tx.sendSigned(txData.tx, priv)
       await utils.httpProvider.base.waitNBlocks(1)
       let transaction = await utils.httpProvider.tx.getTransaction(txData['tx_hash'])
       assert.ok(transaction)
