@@ -68,7 +68,7 @@ describe ('Http service aens', () => {
       })
     })
   describe('transfer', () => {
-    it('should transfer the address', async function () {
+    it.skip('should transfer the address', async function () {
       this.timeout(utils.TIMEOUT * 4)
       let name = utils.randomAeName()
       // use the two step aggregation method for convenience
