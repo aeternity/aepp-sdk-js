@@ -7,8 +7,8 @@
     "build": "babel lib --presets @babel/env --out-dir dist",
     "prepublish": "npm run build",
     "decrypt": "node bin/keys decrypt",
-    "test": "mocha --recursive --compilers js:@babel/register",
-    "test-jenkins": "mocha --recursive --compilers js:@babel/register --reporter mocha-junit-reporter"
+    "test": "mocha --recursive --require @babel/register",
+    "test-jenkins": "mocha --recursive --require @babel/register --reporter mocha-junit-reporter"
   },
   "author": "Till Kolter <till.kolter@gmail.com>",
   "license": "ISC",
