@@ -23,6 +23,8 @@ const assert = chai.assert
 
 const Crypto = require('../lib/utils/crypto')
 
+// These keys are fixations for the encryption lifecycle tests and will
+// not be used for signing
 const privateKeyAsHex = '56b61283ec0ea87f891347f95895f9e1f339cd8854d649043c9b32b908cda646'
 const publicKey = 'ak$3iDEWVFVERNggenRRyREbQWWoE1QiWaqXnEtknkP8noSiAPboe5ikkEtwgYDJ9SsBqjUnxUBpRtj1J9PnTTUji22UGybzW'
 

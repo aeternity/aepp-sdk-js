@@ -1,13 +1,14 @@
 {
   "name": "aepp-sdk",
-  "version": "0.8.0-0.2.0",
+  "version": "0.9.0-0.1.0",
   "description": "An HTTP wrapper for the Aeternity Epoch net",
   "main": "../dist/aepp-sdk.js",
   "scripts": {
     "build": "babel lib --presets @babel/env --out-dir dist",
     "prepublish": "npm run build",
     "decrypt": "node bin/keys decrypt",
-    "test": "mocha --recursive --compilers js:@babel/register"
+    "test": "mocha --recursive --require @babel/register",
+    "test-jenkins": "mocha --recursive --require @babel/register --reporter mocha-junit-reporter"
   },
   "author": "Till Kolter <till.kolter@gmail.com>",
   "license": "ISC",
@@ -41,6 +42,7 @@
     "chai": "^4.1.2",
     "commander": "^2.14.1",
     "mocha": "^5.0.0",
+    "mocha-junit-reporter": "^1.17.0",
     "prompt": "^1.0.0",
     "sinon": "^4.2.2"
   }

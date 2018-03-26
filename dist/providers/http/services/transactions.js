@@ -1,3 +1,5 @@
+var _Promise = require("@babel/runtime/core-js/promise");
+
 var _regeneratorRuntime = require("@babel/runtime/regenerator");
 
 var _asyncToGenerator = require("@babel/runtime/helpers/asyncToGenerator");
@@ -514,6 +516,110 @@ function (_HttpService) {
 
       return function getTransaction(_x19) {
         return _getTransaction.apply(this, arguments);
+      };
+    }()
+  }, {
+    key: "waitForTransaction",
+    value: function () {
+      var _waitForTransaction = _asyncToGenerator(
+      /*#__PURE__*/
+      _regeneratorRuntime.mark(function _callee13(txHash) {
+        var _this = this;
+
+        var timeout,
+            intervalTimeout,
+            maxAttempts,
+            _args13 = arguments;
+        return _regeneratorRuntime.wrap(function _callee13$(_context13) {
+          while (1) {
+            switch (_context13.prev = _context13.next) {
+              case 0:
+                timeout = _args13.length > 1 && _args13[1] !== undefined ? _args13[1] : 60 * 60 * 1000;
+                intervalTimeout = 2000;
+                maxAttempts = Math.floor(timeout / intervalTimeout);
+                _context13.next = 5;
+                return new _Promise(function (resolve, reject) {
+                  var attempts = 0;
+                  var interval = setInterval(
+                  /*#__PURE__*/
+                  _asyncToGenerator(
+                  /*#__PURE__*/
+                  _regeneratorRuntime.mark(function _callee12() {
+                    var transaction, blockHeight;
+                    return _regeneratorRuntime.wrap(function _callee12$(_context12) {
+                      while (1) {
+                        switch (_context12.prev = _context12.next) {
+                          case 0:
+                            if (!(++attempts < maxAttempts)) {
+                              _context12.next = 21;
+                              break;
+                            }
+
+                            _context12.t0 = process.stdout;
+                            _context12.t1 = "\rWaiting for ".concat(txHash, " on ");
+                            _context12.next = 5;
+                            return _this.client.base.getHeight();
+
+                          case 5:
+                            _context12.t2 = _context12.sent;
+                            _context12.t3 = _context12.t1.concat.call(_context12.t1, _context12.t2);
+
+                            _context12.t0.write.call(_context12.t0, _context12.t3);
+
+                            _context12.prev = 8;
+                            _context12.next = 11;
+                            return _this.getTransaction(txHash);
+
+                          case 11:
+                            transaction = _context12.sent;
+                            _context12.next = 17;
+                            break;
+
+                          case 14:
+                            _context12.prev = 14;
+                            _context12.t4 = _context12["catch"](8);
+                            return _context12.abrupt("return", reject(_context12.t4));
+
+                          case 17:
+                            blockHeight = transaction['block_height'];
+
+                            if (blockHeight !== -1) {
+                              process.stdout.write("\rTx has been mined in ".concat(blockHeight));
+                              console.log('');
+                              clearInterval(interval);
+                              resolve(blockHeight);
+                            }
+
+                            _context12.next = 23;
+                            break;
+
+                          case 21:
+                            clearInterval(interval);
+                            reject(new Error("Timeout reached after ".concat(attempts, " attempts")));
+
+                          case 23:
+                          case "end":
+                            return _context12.stop();
+                        }
+                      }
+                    }, _callee12, this, [[8, 14]]);
+                  })), intervalTimeout);
+                  interval.unref();
+                });
+
+              case 5:
+                return _context13.abrupt("return", _context13.sent);
+
+              case 6:
+              case "end":
+                return _context13.stop();
+            }
+          }
+        }, _callee13, this);
+      }));
+
+      return function waitForTransaction(_x20) {
+        return _waitForTransaction.apply(this, arguments);
       };
     }()
   }]);

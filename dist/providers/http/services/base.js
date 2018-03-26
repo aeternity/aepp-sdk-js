@@ -201,6 +201,7 @@ function (_HttpService) {
      * @param recipient
      * @param amount
      * @param fee
+     * @param account
      * @param options
      * @returns {Promise<*>}
      */
@@ -210,32 +211,46 @@ function (_HttpService) {
     value: function () {
       var _spend = _asyncToGenerator(
       /*#__PURE__*/
-      _regeneratorRuntime.mark(function _callee5(recipient, amount, fee, options) {
-        var data;
+      _regeneratorRuntime.mark(function _callee5(recipient, amount, account) {
+        var _ref2,
+            _ref2$fee,
+            fee,
+            nonce,
+            pub,
+            priv,
+            data,
+            _args5 = arguments;
+
         return _regeneratorRuntime.wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                if (!(options && options.privateKey)) {
-                  _context5.next = 9;
+                _ref2 = _args5.length > 3 && _args5[3] !== undefined ? _args5[3] : {}, _ref2$fee = _ref2.fee, fee = _ref2$fee === void 0 ? 1 : _ref2$fee, nonce = _ref2.nonce;
+                pub = account.pub, priv = account.priv;
+
+                if (!priv) {
+                  _context5.next = 11;
                   break;
                 }
 
-                _context5.next = 3;
-                return this.client.base.getSpendTx(recipient, amount, options);
+                _context5.next = 5;
+                return this.client.base.getSpendTx(recipient, amount, pub, {
+                  fee: fee,
+                  nonce: nonce
+                });
 
-              case 3:
+              case 5:
                 data = _context5.sent;
-                _context5.next = 6;
-                return this.client.tx.sendSigned(data.tx, options.privateKey, options);
+                _context5.next = 8;
+                return this.client.tx.sendSigned(data.tx, priv);
 
-              case 6:
+              case 8:
                 return _context5.abrupt("return", data);
 
-              case 9:
+              case 11:
                 throw new Error('Private key is not set');
 
-              case 10:
+              case 12:
               case "end":
                 return _context5.stop();
             }
@@ -243,7 +258,7 @@ function (_HttpService) {
         }, _callee5, this);
       }));
 
-      return function spend(_x3, _x4, _x5, _x6) {
+      return function spend(_x3, _x4, _x5) {
         return _spend.apply(this, arguments);
       };
     }()
@@ -260,7 +275,7 @@ function (_HttpService) {
       var _getBlockByHeight = _asyncToGenerator(
       /*#__PURE__*/
       _regeneratorRuntime.mark(function _callee6(height) {
-        var _ref2, data;
+        var _ref3, data;
 
         return _regeneratorRuntime.wrap(function _callee6$(_context6) {
           while (1) {
@@ -272,8 +287,8 @@ function (_HttpService) {
                 }, false);
 
               case 2:
-                _ref2 = _context6.sent;
-                data = _ref2.data;
+                _ref3 = _context6.sent;
+                data = _ref3.data;
                 return _context6.abrupt("return", data);
 
               case 5:
@@ -284,7 +299,7 @@ function (_HttpService) {
         }, _callee6, this);
       }));
 
-      return function getBlockByHeight(_x7) {
+      return function getBlockByHeight(_x6) {
         return _getBlockByHeight.apply(this, arguments);
       };
     }()
@@ -301,7 +316,7 @@ function (_HttpService) {
       var _getBlockByHash = _asyncToGenerator(
       /*#__PURE__*/
       _regeneratorRuntime.mark(function _callee7(hash) {
-        var _ref3, data;
+        var _ref4, data;
 
         return _regeneratorRuntime.wrap(function _callee7$(_context7) {
           while (1) {
@@ -313,8 +328,8 @@ function (_HttpService) {
                 }, false);
 
               case 2:
-                _ref3 = _context7.sent;
-                data = _ref3.data;
+                _ref4 = _context7.sent;
+                data = _ref4.data;
                 return _context7.abrupt("return", data);
 
               case 5:
@@ -325,7 +340,7 @@ function (_HttpService) {
         }, _callee7, this);
       }));
 
-      return function getBlockByHash(_x8) {
+      return function getBlockByHash(_x7) {
         return _getBlockByHash.apply(this, arguments);
       };
     }()
@@ -342,7 +357,7 @@ function (_HttpService) {
       var _getGenesisBlock = _asyncToGenerator(
       /*#__PURE__*/
       _regeneratorRuntime.mark(function _callee8(encoding) {
-        var params, _ref4, data;
+        var params, _ref5, data;
 
         return _regeneratorRuntime.wrap(function _callee8$(_context8) {
           while (1) {
@@ -355,8 +370,8 @@ function (_HttpService) {
                 return this.client.get('block/genesis', params, true);
 
               case 3:
-                _ref4 = _context8.sent;
-                data = _ref4.data;
+                _ref5 = _context8.sent;
+                data = _ref5.data;
                 return _context8.abrupt("return", data);
 
               case 6:
@@ -367,7 +382,7 @@ function (_HttpService) {
         }, _callee8, this);
       }));
 
-      return function getGenesisBlock(_x9) {
+      return function getGenesisBlock(_x8) {
         return _getGenesisBlock.apply(this, arguments);
       };
     }()
@@ -384,7 +399,7 @@ function (_HttpService) {
       var _getPendingBlock = _asyncToGenerator(
       /*#__PURE__*/
       _regeneratorRuntime.mark(function _callee9(encoding) {
-        var params, _ref5, data;
+        var params, _ref6, data;
 
         return _regeneratorRuntime.wrap(function _callee9$(_context9) {
           while (1) {
@@ -397,8 +412,8 @@ function (_HttpService) {
                 return this.client.get('block/pending', params, true);
 
               case 3:
-                _ref5 = _context9.sent;
-                data = _ref5.data;
+                _ref6 = _context9.sent;
+                data = _ref6.data;
                 return _context9.abrupt("return", data);
 
               case 6:
@@ -409,7 +424,7 @@ function (_HttpService) {
         }, _callee9, this);
       }));
 
-      return function getPendingBlock(_x10) {
+      return function getPendingBlock(_x9) {
         return _getPendingBlock.apply(this, arguments);
       };
     }()
@@ -426,7 +441,7 @@ function (_HttpService) {
       var _getVersion = _asyncToGenerator(
       /*#__PURE__*/
       _regeneratorRuntime.mark(function _callee10() {
-        var _ref6, data;
+        var _ref7, data;
 
         return _regeneratorRuntime.wrap(function _callee10$(_context10) {
           while (1) {
@@ -436,8 +451,8 @@ function (_HttpService) {
                 return this.client.get('version');
 
               case 2:
-                _ref6 = _context10.sent;
-                data = _ref6.data;
+                _ref7 = _context10.sent;
+                data = _ref7.data;
                 return _context10.abrupt("return", data);
 
               case 5:
@@ -465,7 +480,7 @@ function (_HttpService) {
       var _getInfo = _asyncToGenerator(
       /*#__PURE__*/
       _regeneratorRuntime.mark(function _callee11() {
-        var _ref7, data;
+        var _ref8, data;
 
         return _regeneratorRuntime.wrap(function _callee11$(_context11) {
           while (1) {
@@ -475,8 +490,8 @@ function (_HttpService) {
                 return this.client.get('info');
 
               case 2:
-                _ref7 = _context11.sent;
-                data = _ref7.data;
+                _ref8 = _context11.sent;
+                data = _ref8.data;
                 return _context11.abrupt("return", data);
 
               case 5:
@@ -502,7 +517,7 @@ function (_HttpService) {
       var _getBalances = _asyncToGenerator(
       /*#__PURE__*/
       _regeneratorRuntime.mark(function _callee12() {
-        var _ref8, data;
+        var _ref9, data;
 
         return _regeneratorRuntime.wrap(function _callee12$(_context12) {
           while (1) {
@@ -512,8 +527,8 @@ function (_HttpService) {
                 return this.client.get('balances');
 
               case 2:
-                _ref8 = _context12.sent;
-                data = _ref8.data;
+                _ref9 = _context12.sent;
+                data = _ref9.data;
                 return _context12.abrupt("return", data);
 
               case 5:
@@ -533,10 +548,13 @@ function (_HttpService) {
     value: function () {
       var _getSpendTx = _asyncToGenerator(
       /*#__PURE__*/
-      _regeneratorRuntime.mark(function _callee13(recipient, amount) {
-        var options,
+      _regeneratorRuntime.mark(function _callee13(recipient, amount, sender) {
+        var _ref10,
+            _ref10$fee,
+            fee,
+            nonce,
             payload,
-            _ref9,
+            _ref11,
             data,
             _args13 = arguments;
 
@@ -544,30 +562,30 @@ function (_HttpService) {
           while (1) {
             switch (_context13.prev = _context13.next) {
               case 0:
-                options = _args13.length > 2 && _args13[2] !== undefined ? _args13[2] : {};
+                _ref10 = _args13.length > 3 && _args13[3] !== undefined ? _args13[3] : {}, _ref10$fee = _ref10.fee, fee = _ref10$fee === void 0 ? 1 : _ref10$fee, nonce = _ref10.nonce;
                 payload = {
-                  'amount': amount,
-                  'sender': options && options.sender,
-                  // || await this.client.accounts.getPublicKey (),
-                  'fee': options && options.fee || 1,
+                  amount: amount,
+                  sender: sender,
+                  fee: fee,
                   'recipient_pubkey': recipient,
-                  'nonce': options && options.nonce
+                  nonce: nonce
                 };
                 _context13.prev = 2;
                 _context13.next = 5;
                 return this.client.post('tx/spend', payload);
 
               case 5:
-                _ref9 = _context13.sent;
-                data = _ref9.data;
+                _ref11 = _context13.sent;
+                data = _ref11.data;
                 return _context13.abrupt("return", data);
 
               case 10:
                 _context13.prev = 10;
                 _context13.t0 = _context13["catch"](2);
                 console.log(_context13.t0);
+                return _context13.abrupt("return", undefined);
 
-              case 13:
+              case 14:
               case "end":
                 return _context13.stop();
             }
@@ -575,7 +593,7 @@ function (_HttpService) {
         }, _callee13, this, [[2, 10]]);
       }));
 
-      return function getSpendTx(_x11, _x12) {
+      return function getSpendTx(_x10, _x11, _x12) {
         return _getSpendTx.apply(this, arguments);
       };
     }()

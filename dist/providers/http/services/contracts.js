@@ -2,8 +2,6 @@ var _regeneratorRuntime = require("@babel/runtime/regenerator");
 
 var _extends = require("@babel/runtime/helpers/extends");
 
-var _JSON$stringify = require("@babel/runtime/core-js/json/stringify");
-
 var _asyncToGenerator = require("@babel/runtime/helpers/asyncToGenerator");
 
 var _Object$getPrototypeOf = require("@babel/runtime/core-js/object/get-prototype-of");
@@ -53,7 +51,7 @@ function (_HttpService) {
     value: function () {
       var _getCreateTx = _asyncToGenerator(
       /*#__PURE__*/
-      _regeneratorRuntime.mark(function _callee(code) {
+      _regeneratorRuntime.mark(function _callee(code, owner) {
         var options,
             contractTxData,
             _ref,
@@ -64,24 +62,23 @@ function (_HttpService) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                options = _args.length > 1 && _args[1] !== undefined ? _args[1] : {};
-                console.log("ito: ".concat(_JSON$stringify(options)));
+                options = _args.length > 2 && _args[2] !== undefined ? _args[2] : {};
                 contractTxData = _extends({}, createTxCallParams(options), {
-                  owner: options.owner,
+                  owner: owner,
                   'vm_version': options.vmVersion || 1,
                   code: code,
                   'call_data': options.callData || '',
                   deposit: options.deposit || 4
                 });
-                _context.next = 5;
+                _context.next = 4;
                 return this.client.post('tx/contract/create', contractTxData);
 
-              case 5:
+              case 4:
                 _ref = _context.sent;
                 data = _ref.data;
                 return _context.abrupt("return", data);
 
-              case 8:
+              case 7:
               case "end":
                 return _context.stop();
             }
@@ -89,7 +86,7 @@ function (_HttpService) {
         }, _callee, this);
       }));
 
-      return function getCreateTx(_x) {
+      return function getCreateTx(_x, _x2) {
         return _getCreateTx.apply(this, arguments);
       };
     }()
@@ -110,43 +107,21 @@ function (_HttpService) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 options = _args2.length > 2 && _args2[2] !== undefined ? _args2[2] : {};
-                _context2.t0 = _extends;
-                _context2.t1 = {};
-                _context2.t2 = createTxCallParams(options);
-                _context2.t3 = options.caller;
-
-                if (_context2.t3) {
-                  _context2.next = 9;
-                  break;
-                }
-
-                _context2.next = 8;
-                return this.client.accounts.getPublicKey();
-
-              case 8:
-                _context2.t3 = _context2.sent;
-
-              case 9:
-                _context2.t4 = _context2.t3;
-                _context2.t5 = options.vmVersion || 1;
-                _context2.t6 = callData;
-                _context2.t7 = contractPubKey;
-                _context2.t8 = {
-                  'caller': _context2.t4,
-                  'vm_version': _context2.t5,
-                  'call_data': _context2.t6,
-                  'contract': _context2.t7
-                };
-                payload = (0, _context2.t0)(_context2.t1, _context2.t2, _context2.t8);
-                _context2.next = 17;
+                payload = _extends({}, createTxCallParams(options), {
+                  'caller': options.caller,
+                  'vm_version': options.vmVersion || 1,
+                  'call_data': callData,
+                  'contract': contractPubKey
+                });
+                _context2.next = 4;
                 return this.client.post('tx/contract/call', payload);
 
-              case 17:
+              case 4:
                 _ref2 = _context2.sent;
                 data = _ref2.data;
                 return _context2.abrupt("return", data);
 
-              case 20:
+              case 7:
               case "end":
                 return _context2.stop();
             }
@@ -154,7 +129,7 @@ function (_HttpService) {
         }, _callee2, this);
       }));
 
-      return function getCallTxWithData(_x2, _x3) {
+      return function getCallTxWithData(_x3, _x4) {
         return _getCallTxWithData.apply(this, arguments);
       };
     }()
@@ -197,7 +172,7 @@ function (_HttpService) {
         }, _callee3, this);
       }));
 
-      return function getCallTx(_x4, _x5) {
+      return function getCallTx(_x5, _x6) {
         return _getCallTx.apply(this, arguments);
       };
     }()
@@ -233,7 +208,7 @@ function (_HttpService) {
         }, _callee4, this);
       }));
 
-      return function compile(_x6, _x7) {
+      return function compile(_x7, _x8) {
         return _compile.apply(this, arguments);
       };
     }()
@@ -271,7 +246,7 @@ function (_HttpService) {
         }, _callee5, this);
       }));
 
-      return function call(_x8, _x9, _x10, _x11) {
+      return function call(_x9, _x10, _x11, _x12) {
         return _call.apply(this, arguments);
       };
     }()
@@ -314,7 +289,7 @@ function (_HttpService) {
         }, _callee6, this);
       }));
 
-      return function encodeCallData(_x12, _x13, _x14) {
+      return function encodeCallData(_x13, _x14, _x15) {
         return _encodeCallData.apply(this, arguments);
       };
     }()
@@ -323,7 +298,7 @@ function (_HttpService) {
     value: function () {
       var _deployContract = _asyncToGenerator(
       /*#__PURE__*/
-      _regeneratorRuntime.mark(function _callee7(code, privateKey) {
+      _regeneratorRuntime.mark(function _callee7(code, account) {
         var options,
             data,
             _args7 = arguments;
@@ -333,12 +308,12 @@ function (_HttpService) {
               case 0:
                 options = _args7.length > 2 && _args7[2] !== undefined ? _args7[2] : {};
                 _context7.next = 3;
-                return this.getCreateTx(code, options);
+                return this.getCreateTx(code, account.pub, options);
 
               case 3:
                 data = _context7.sent;
                 _context7.next = 6;
-                return this.client.tx.sendSigned(data.tx, privateKey, options);
+                return this.client.tx.sendSigned(data.tx, account.priv, options);
 
               case 6:
                 return _context7.abrupt("return", data);
@@ -351,7 +326,7 @@ function (_HttpService) {
         }, _callee7, this);
       }));
 
-      return function deployContract(_x15, _x16) {
+      return function deployContract(_x16, _x17) {
         return _deployContract.apply(this, arguments);
       };
     }()
@@ -400,7 +375,7 @@ function (_HttpService) {
         }, _callee8, this);
       }));
 
-      return function getComputeCallTx(_x17, _x18, _x19) {
+      return function getComputeCallTx(_x18, _x19, _x20) {
         return _getComputeCallTx.apply(this, arguments);
       };
     }()
