@@ -28,45 +28,48 @@ const chai = require ('chai')
 const assert = chai.assert
 const utils = require ('../../utils')
 
+import { generateKeyPair } from '../../../lib/utils/crypto'
 
 describe ('Oracles HTTP endpoint', () => {
-  let publicKey
-  let oracleId
+  const account = generateKeyPair()
+  const { pub } = account
+
+  // We know for a fact, what the oracle id will be the same as the public
+  // key but with a different prefix
+  const oracleId = `ok$${pub.split('$')[1]}`
 
   describe ('register oracle', () => {
-    it ('should register an oracle', async function () {
+    // TODO waiting on /account/txs/{account_pubkey} to become external
+    it.skip('should register an oracle', async function () {
       this.timeout(utils.TIMEOUT)
-      const { pub } = utils.wallets[0]
-      let ret = await utils.httpProvider.oracles.register(
+
+      let ret = await utils.httpProvider.base.spend(pub, 5, utils.wallets[0])
+      await utils.httpProvider.tx.waitForTransaction(ret['tx_hash'])
+
+      ret = await utils.httpProvider.oracles.register(
         'unused query format',
         'unused response format',
         5,
         50,
         5,
-        utils.wallets[0]
+        account
       )
 
       // Let the blockchain digest
       await utils.httpProvider.tx.waitForTransaction(ret['tx_hash'])
 
-      // We know for a fact, what the oracle id will be the same as the public
-      // key but with a different prefix
-      oracleId = `ok$${pub.split('$')[1]}`
-
-      let transactions = await utils.httpProvider.accounts.getTransactions(
-        {txTypes: ['aeo_register_tx']}
-      )
+      let transactions = await utils.httpProvider.accounts.getTransactions(pub, {
+        txTypes: ['aeo_register_tx']
+      })
       assert.isTrue(transactions.length > 0)
     })
-
   })
+
   describe('query an oracle', () => {
-    it('should query an oracle', async function () {
+    it.skip('should query an oracle', async function () {
       this.timeout(utils.TIMEOUT)
-      const { pub } = utils.wallets[1]
-      let data = await utils.httpProvider.base.spend(pub, 100, 5)
-      await utils.httpProvider.tx.waitForTransaction(data['tx_hash'])
-      data = await utils.httpProvider.oracles.query(
+
+      let data = await utils.httpProvider.oracles.query(
         oracleId,
         5,
         10,
@@ -77,17 +80,16 @@ describe ('Oracles HTTP endpoint', () => {
       )
       assert.ok(data)
       await utils.httpProvider.tx.waitForTransaction(data['tx_hash'])
-      let transactions = await utils.httpProvider.accounts.getTransactions(
-        {
-          excludeTxTypes: ['aec_coinbase_tx'],
-          txTypes: ['aeo_query_tx']
-        }
-      )
+      let transactions = await utils.httpProvider.accounts.getTransactions(oracleId, {
+        excludeTxTypes: ['aec_coinbase_tx'],
+        txTypes: ['aeo_query_tx']
+      })
       assert.isTrue(transactions.length > 0)
 
-      queryId = transactions[0]
+      // queryId = transactions[0]
     })
   })
+
   describe('respond an oracle', () => {
     it.skip('should respond to a query', async () => {
       // Before we are not able to receive a query this is senseless
