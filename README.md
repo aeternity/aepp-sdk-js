@@ -19,7 +19,7 @@ check out the [develop branch](https://github.com/aeternity/aepp-sdk-js/tree/dev
 ### NPM
 
 ```
-npm install aepps-sdk
+npm install @aeternity/aepp-sdk
 ```
 
 ### Local branch development
