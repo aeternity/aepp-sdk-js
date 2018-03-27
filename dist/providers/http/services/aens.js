@@ -283,15 +283,9 @@ function (_HttpService) {
                 return _context4.abrupt("return", data);
 
               case 14:
-<<<<<<< HEAD
-                return _context4.abrupt("return");
-
-              case 16:
-=======
                 throw new Error('Private key must be set');
 
               case 15:
->>>>>>> 91b014ba5374c364edc4208c01da471dbf0bc943
               case "end":
                 return _context4.stop();
             }

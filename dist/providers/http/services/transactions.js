@@ -551,58 +551,48 @@ function (_HttpService) {
                         switch (_context12.prev = _context12.next) {
                           case 0:
                             if (!(++attempts < maxAttempts)) {
-                              _context12.next = 21;
+                              _context12.next = 14;
                               break;
                             }
 
-                            _context12.t0 = process.stdout;
-                            _context12.t1 = "\rWaiting for ".concat(txHash, " on ");
-                            _context12.next = 5;
-                            return _this.client.base.getHeight();
-
-                          case 5:
-                            _context12.t2 = _context12.sent;
-                            _context12.t3 = _context12.t1.concat.call(_context12.t1, _context12.t2);
-
-                            _context12.t0.write.call(_context12.t0, _context12.t3);
-
-                            _context12.prev = 8;
-                            _context12.next = 11;
+                            _context12.prev = 1;
+                            _context12.next = 4;
                             return _this.getTransaction(txHash);
 
-                          case 11:
+                          case 4:
                             transaction = _context12.sent;
-                            _context12.next = 17;
+                            _context12.next = 10;
                             break;
 
-                          case 14:
-                            _context12.prev = 14;
-                            _context12.t4 = _context12["catch"](8);
-                            return _context12.abrupt("return", reject(_context12.t4));
+                          case 7:
+                            _context12.prev = 7;
+                            _context12.t0 = _context12["catch"](1);
+                            return _context12.abrupt("return", reject(_context12.t0));
 
-                          case 17:
+                          case 10:
                             blockHeight = transaction['block_height'];
 
                             if (blockHeight !== -1) {
-                              process.stdout.write("\rTx has been mined in ".concat(blockHeight));
-                              console.log('');
+                              // TODO integrate into proper logging
+                              // process.stdout.write(`\rTx has been mined in ${blockHeight}`)
+                              // console.log('')
                               clearInterval(interval);
                               resolve(blockHeight);
                             }
 
-                            _context12.next = 23;
+                            _context12.next = 16;
                             break;
 
-                          case 21:
+                          case 14:
                             clearInterval(interval);
                             reject(new Error("Timeout reached after ".concat(attempts, " attempts")));
 
-                          case 23:
+                          case 16:
                           case "end":
                             return _context12.stop();
                         }
                       }
-                    }, _callee12, this, [[8, 14]]);
+                    }, _callee12, this, [[1, 7]]);
                   })), intervalTimeout);
                   interval.unref();
                 });
