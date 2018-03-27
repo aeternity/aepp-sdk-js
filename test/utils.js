@@ -20,9 +20,10 @@ require('@babel/polyfill')
 const chai = require ('chai')
 const assert = chai.assert
 
-
 const AeHttpProvider = require ('../lib/providers/http/index')
 const AeternityClient = require('../lib/aepp-sdk')
+import * as Crypto from '../lib/utils/crypto'
+import * as _ from 'ramda'
 
 // Naive assertion
 const assertIsBlock = (data) => {
@@ -48,17 +49,28 @@ const httpProvider = new AeternityClient(new AeHttpProvider (host, port, {
   secured: false
 }))
 
-const wallets = [0, 1, 2].map((i) => {
-  return {
-    priv: process.env[`WALLET_PRIV_${i}`],
-    pub: process.env[`WALLET_PUB_${i}`]
-  }
-})
+const sourceWallet = {
+  priv: process.env['WALLET_PRIV'],
+  pub: process.env['WALLET_PUB']
+}
+
+if (!sourceWallet.pub || !sourceWallet.priv) {
+  throw Error('Environment variables WALLET_PRIV and WALLET_PUB need to be set')
+}
+
+const wallets = _.times(() => Crypto.generateKeyPair(), 3)
+
+async function charge (receiver, amount) {
+  console.log(`Charging ${receiver} with ${amount}`)
+  const { tx_hash } = await httpProvider.base.spend(receiver, amount, sourceWallet)
+  await httpProvider.tx.waitForTransaction(tx_hash)
+}
 
 module.exports = {
   httpProvider,
   assertIsBlock,
   randomAeName,
   wallets,
+  charge,
   TIMEOUT: 120000
 }

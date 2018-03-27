@@ -35,6 +35,8 @@ describe ('Http service aens', () => {
       let commitment = await utils.httpProvider.aens.getCommitmentHash (name, salt)
       const account = utils.wallets[0]
       assert.ok (commitment)
+      // charge wallet first
+      await utils.charge(account.pub, 10)
       // preclaim the domain
       let preclaimData = await utils.httpProvider.aens.preClaim(commitment, 1, account)
       // wait one block
@@ -49,24 +51,27 @@ describe ('Http service aens', () => {
     })
   })
   describe('update', () => {
-      it ('should update the pointer to a name', async function () {
-        this.timeout (utils.TIMEOUT * 2)
-        let name = utils.randomAeName ()
-        const account = utils.wallets[0]
-        // use the two step aggregation method for convenience
+    it ('should update the pointer to a name', async function () {
+      this.timeout (utils.TIMEOUT * 4)
+      let name = utils.randomAeName ()
+      const account = utils.wallets[0]
+      // use the two step aggregation method for convenience
 
-        let claimData = await utils.httpProvider.aens.fullClaim (name, 1, 1, account)
+      // charge wallet first
+      await utils.charge(utils.wallets[0].pub, 10)
 
-        await utils.httpProvider.tx.waitForTransaction(claimData['tx_hash'])
-        let nameData = await utils.httpProvider.aens.getName(name)
-        let nameHash = nameData['name_hash']
-        let { pub } = utils.wallets[1]
-        let updateData = await utils.httpProvider.aens.update (pub, nameHash, account)
-        await utils.httpProvider.tx.waitForTransaction(updateData['tx_hash'])
-        nameData = await utils.httpProvider.aens.getName (name)
-        assert.equal(pub, JSON.parse (nameData.pointers)['account_pubkey'])
-      })
+      let claimData = await utils.httpProvider.aens.fullClaim (name, 1, 1, account)
+
+      await utils.httpProvider.tx.waitForTransaction(claimData['tx_hash'])
+      let nameData = await utils.httpProvider.aens.getName(name)
+      let nameHash = nameData['name_hash']
+      let { pub } = utils.wallets[1]
+      let updateData = await utils.httpProvider.aens.update (pub, nameHash, account)
+      await utils.httpProvider.tx.waitForTransaction(updateData['tx_hash'])
+      nameData = await utils.httpProvider.aens.getName (name)
+      assert.equal(pub, JSON.parse (nameData.pointers)['account_pubkey'])
     })
+  })
   describe('transfer', () => {
     it.skip('should transfer the address', async function () {
       this.timeout(utils.TIMEOUT * 4)
