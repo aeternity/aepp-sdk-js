@@ -47,7 +47,7 @@ second step to create a signature on the transaction with the private key.
 ```javascript
 const AeternityClient = require('aepps-sdk')
 
-let provider = new AeternityClient.providers.HttpProvider('localhost', 3003, {internalPort: 3103, secured: false})
+let provider = new AeternityClient.providers.HttpProvider('localhost', 3003, {secured: false})
 let client = AeternityClient(provider)
 
 const privateKey = '<lets assume you extracted your private key which is store here as a hex>'

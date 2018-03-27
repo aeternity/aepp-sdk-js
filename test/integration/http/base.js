@@ -19,109 +19,105 @@ require('@babel/polyfill')
 const chai = require ('chai')
 const assert = chai.assert
 
-const utils = require('../utils')
+const utils = require('../../utils')
 
 
 describe ('Http service base', () => {
   let prevHash
   describe ('getHeight', () => {
     it ('should return an integer', async () => {
-      let height = await utils.httpProvider1.base.getHeight ()
+      let height = await utils.httpProvider.base.getHeight ()
       assert (Number.isInteger (height))
     })
   })
   describe ('getBlockByHeight', () => {
     it ('should return a block', async () => {
-      let data = await utils.httpProvider1.base.getBlockByHeight (2)
+      let data = await utils.httpProvider.base.getBlockByHeight (2)
       prevHash = data['prev_hash']
       utils.assertIsBlock (data)
     })
   })
   describe ('getBlockByHash', () => {
     it ('should return a block', async () => {
-      let data = await utils.httpProvider1.base.getBlockByHash (prevHash)
+      let data = await utils.httpProvider.base.getBlockByHash (prevHash)
       utils.assertIsBlock (data)
     })
   })
   describe ('waitForNBlocks', () => {
     it ('should at least wait for N blocks', async function () {
       this.timeout (utils.TIMEOUT)
-      let start = await utils.httpProvider1.base.getHeight ()
+      let start = await utils.httpProvider.base.getHeight ()
       let period = 2
-      let finish = await utils.httpProvider1.base.waitNBlocks (period)
+      let finish = await utils.httpProvider.base.waitNBlocks (period)
       assert.ok (finish >= start + period)
     })
   })
   describe ('waitForBlock', () => {
     it ('should wait at least for that block', async function () {
       this.timeout (utils.TIMEOUT)
-      let start = await utils.httpProvider1.base.getHeight ()
+      let start = await utils.httpProvider.base.getHeight ()
       let period = 2
-      let finish = await utils.httpProvider1.base.waitForBlock (start + period)
+      let finish = await utils.httpProvider.base.waitForBlock (start + period)
       assert.ok (finish >= start + period)
     })
   })
   describe ('spend', () => {
-    it ('should increase the balance', async function () {
+    // TODO: Waiting on /account/balance/{account_pubkey} to move to external endpoint
+    it.skip('should increase the balance', async function () {
       this.timeout (utils.TIMEOUT)
+      const { pub:pub1 } = utils.wallets[0]
       let balanceBefore
       try {
-        balanceBefore = await utils.httpProvider2.accounts.getBalance ()
+        balanceBefore = await utils.httpProvider.accounts.getBalance(pub1)
       } catch (e) {
         balanceBefore = 0
       }
 
-      let pubKey2 = await utils.httpProvider2.accounts.getPublicKey ()
-      let spent = await utils.httpProvider1.base.spend (pubKey2, 5, 1, {privateKey: utils.privateKey})
-      assert.equal(5, spent)
-      await utils.httpProvider1.base.waitNBlocks (1)
-      let balance = await utils.httpProvider2.accounts.getBalance ()
+      const { pub:pub2 } = utils.wallets[1]
+      const { tx_hash } = await utils.httpProvider.base.spend(pub2, 5, utils.wallets[0])
+      await utils.httpProvider.tx.waitForTransaction(tx_hash)
+      const balance = await utils.httpProvider.accounts.getBalance(pub1)
       assert.equal(balanceBefore + 5, balance)
     })
   })
   describe ('getInfo', () => {
     it ('should return some info', async function () {
-      let info = await utils.httpProvider1.base.getInfo ()
+      let info = await utils.httpProvider.base.getInfo ()
       assert.ok (info)
     })
   })
   describe ('getVersion', () => {
     it ('should return some info', async function () {
-      let version = await utils.httpProvider1.base.getVersion ()
+      let version = await utils.httpProvider.base.getVersion ()
       assert.ok (version)
     })
   })
   describe ('getPendingBlock', () => {
     it ('should return a block or 404', async () => {
       try {
-        let data = await utils.httpProvider1.base.getPendingBlock ()
+        let data = await utils.httpProvider.base.getPendingBlock ()
         utils.assertIsBlock (data)
       } catch (e) {
         assert(404, e.response.status)
       }
     })
   })
-  describe ('getGenesisBlock', () => {
-    it ('should return a block', async () => {
-      let data = await utils.httpProvider1.base.getGenesisBlock ()
-      utils.assertIsBlock (data)
-    })
-  })
   describe ('getBlockByHash', () => {
-    it ('should return a block', async () => {
-      let data = await utils.httpProvider1.base.getBlockByHash (prevHash)
+    // TODO: Waiting on /block/hash/{hash} to move to external endpoint
+    it.skip('should return a block', async () => {
+      let data = await utils.httpProvider.base.getBlockByHash (prevHash)
       utils.assertIsBlock (data)
     })
   })
   describe ('getBlockByHeight', () => {
     it ('should return a block', async () => {
-      let data = await utils.httpProvider1.base.getBlockByHeight (1)
+      let data = await utils.httpProvider.base.getBlockByHeight (1)
       utils.assertIsBlock (data)
     })
   })
   describe ('getBalances', () => {
     it ('should return something', async () => {
-      let data = await utils.httpProvider1.base.getBalances ()
+      let data = await utils.httpProvider.base.getBalances ()
       assert.ok(data)
     })
   })

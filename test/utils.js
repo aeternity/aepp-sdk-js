@@ -20,9 +20,10 @@ require('@babel/polyfill')
 const chai = require ('chai')
 const assert = chai.assert
 
-
 const AeHttpProvider = require ('../lib/providers/http/index')
 const AeternityClient = require('../lib/aepp-sdk')
+import * as Crypto from '../lib/utils/crypto'
+import * as _ from 'ramda'
 
 // Naive assertion
 const assertIsBlock = (data) => {
@@ -42,28 +43,34 @@ const randomAeName = () => {
   return `${text}.aet`
 }
 
-let httpProvider1 = new AeternityClient(new AeHttpProvider ('localhost', 3013, {
-  internalPort: 3113,
-  secured: false
-}))
-let httpProvider2 = new AeternityClient(new AeHttpProvider ('localhost', 3023, {
-  internalPort: 3123,
-  secured: false
-}))
-let httpProvider3 = new AeternityClient(new AeHttpProvider ('localhost', 3033, {
-  internalPort: 3133,
+const [host, port] = (process.env.TEST_NODE || 'localhost:3013').split(':')
+
+const httpProvider = new AeternityClient(new AeHttpProvider (host, port, {
   secured: false
 }))
 
-let privateKey = 'a4a84b072facde2a6a3a0d13babc6cc548945bf9f61e8be1890981516f8bcdba'
+const sourceWallet = {
+  priv: process.env['WALLET_PRIV'],
+  pub: process.env['WALLET_PUB']
+}
 
+if (!sourceWallet.pub || !sourceWallet.priv) {
+  throw Error('Environment variables WALLET_PRIV and WALLET_PUB need to be set')
+}
+
+const wallets = _.times(() => Crypto.generateKeyPair(), 3)
+
+async function charge (receiver, amount) {
+  console.log(`Charging ${receiver} with ${amount}`)
+  const { tx_hash } = await httpProvider.base.spend(receiver, amount, sourceWallet)
+  await httpProvider.tx.waitForTransaction(tx_hash)
+}
 
 module.exports = {
-  httpProvider1,
-  httpProvider2,
-  httpProvider3,
+  httpProvider,
   assertIsBlock,
   randomAeName,
-  privateKey,
+  wallets,
+  charge,
   TIMEOUT: 120000
 }

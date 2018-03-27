@@ -24,7 +24,6 @@ const HttpProvider = require ('../lib/providers/http')
 
 
 let client1 = new AeternityClient (new HttpProvider ('localhost', 3013, {
-  internalPort: 3113,
   secured: false
 }))
 
