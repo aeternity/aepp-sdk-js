@@ -54,36 +54,91 @@ function (_HttpService) {
     return _this;
   }
   /**
+<<<<<<< HEAD
    * Retrieves the account balance
    *
    *
    * @returns {Promise<Accounts.getBalance>}
+=======
+   * Retrieve the public key of the account
+   *
+   * @returns {Promise<string>}
+>>>>>>> feature/call-contracts
    */
 
 
   _createClass(Accounts, [{
-    key: "getBalance",
+<<<<<<< HEAD
+=======
+    key: "getPublicKey",
     value: function () {
-      var _getBalance = _asyncToGenerator(
+      var _getPublicKey = _asyncToGenerator(
       /*#__PURE__*/
-      _regeneratorRuntime.mark(function _callee(account) {
-        var _ref,
-            height,
-            hash,
-            url,
-            _ref2,
-            data,
-            response,
-            _args = arguments;
+      _regeneratorRuntime.mark(function _callee() {
+        var url, _ref, data;
 
         return _regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                _ref = _args.length > 1 && _args[1] !== undefined ? _args[1] : {}, height = _ref.height, hash = _ref.hash;
-                url = "".concat(this.BASE_ENDPOINT, "/balance/").concat(account);
-                _context.prev = 2;
-                _context.next = 5;
+                url = "".concat(this.BASE_ENDPOINT, "/pub-key");
+                _context.next = 3;
+                return this.client.get(url, {}, true);
+
+              case 3:
+                _ref = _context.sent;
+                data = _ref.data;
+                return _context.abrupt("return", data['pub_key']);
+
+              case 6:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      return function getPublicKey() {
+        return _getPublicKey.apply(this, arguments);
+      };
+    }()
+    /**
+     * Retrieves the account balance
+     *
+     *
+     * @returns {Promise<Accounts.getBalance>}
+     */
+
+  }, {
+>>>>>>> feature/call-contracts
+    key: "getBalance",
+    value: function () {
+      var _getBalance = _asyncToGenerator(
+      /*#__PURE__*/
+      _regeneratorRuntime.mark(function _callee2() {
+        var _ref2,
+            height,
+            hash,
+            pubKey,
+            url,
+            _ref3,
+            data,
+            response,
+            _args2 = arguments;
+
+        return _regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _ref2 = _args2.length > 0 && _args2[0] !== undefined ? _args2[0] : {}, height = _ref2.height, hash = _ref2.hash;
+                _context2.next = 3;
+                return this.getPublicKey();
+
+              case 3:
+                pubKey = _context2.sent;
+                url = "".concat(this.BASE_ENDPOINT, "/balance/").concat(pubKey);
+                _context2.prev = 5;
+                _context2.next = 8;
                 return this.client.get(url, {
                   height: height,
                   hash: hash
@@ -127,8 +182,8 @@ function (_HttpService) {
     value: function () {
       var _getTransactions = _asyncToGenerator(
       /*#__PURE__*/
-      _regeneratorRuntime.mark(function _callee2(account) {
-        var _ref4,
+      _regeneratorRuntime.mark(function _callee3() {
+        var _ref5,
             limit,
             offset,
             txTypes,
@@ -144,6 +199,17 @@ function (_HttpService) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 _ref4 = _args2.length > 1 && _args2[1] !== undefined ? _args2[1] : {}, limit = _ref4.limit, offset = _ref4.offset, txTypes = _ref4.txTypes, excludeTxTypes = _ref4.excludeTxTypes;
+            pubKey,
+            url,
+            _ref6,
+            data,
+            _args3 = arguments;
+
+        return _regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                _ref5 = _args3.length > 0 && _args3[0] !== undefined ? _args3[0] : {}, limit = _ref5.limit, offset = _ref5.offset, txTypes = _ref5.txTypes, excludeTxTypes = _ref5.excludeTxTypes;
                 // TODO tests?
                 params = _extends({}, createTxParams({
                   txTypes: txTypes,
@@ -194,19 +260,19 @@ function (_HttpService) {
     value: function () {
       var _getTransactionCount = _asyncToGenerator(
       /*#__PURE__*/
-      _regeneratorRuntime.mark(function _callee3() {
-        var _ref6,
+      _regeneratorRuntime.mark(function _callee4() {
+        var _ref7,
             txTypes,
             excludeTxTypes,
             options,
             transactions,
-            _args3 = arguments;
+            _args4 = arguments;
 
-        return _regeneratorRuntime.wrap(function _callee3$(_context3) {
+        return _regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
-                _ref6 = _args3.length > 0 && _args3[0] !== undefined ? _args3[0] : {}, txTypes = _ref6.txTypes, excludeTxTypes = _ref6.excludeTxTypes;
+                _ref7 = _args4.length > 0 && _args4[0] !== undefined ? _args4[0] : {}, txTypes = _ref7.txTypes, excludeTxTypes = _ref7.excludeTxTypes;
                 // This method is a work around to receive a nonce until a
                 // proper endpoint is implemented
                 // TODO change this when endpoint is provided
@@ -215,19 +281,19 @@ function (_HttpService) {
                   excludeTxTypes: excludeTxTypes,
                   limit: 100
                 };
-                _context3.next = 4;
+                _context4.next = 4;
                 return this.getTransactions(options);
 
               case 4:
-                transactions = _context3.sent;
-                return _context3.abrupt("return", transactions && transactions.length || 0);
+                transactions = _context4.sent;
+                return _context4.abrupt("return", transactions && transactions.length || 0);
 
               case 6:
               case "end":
-                return _context3.stop();
+                return _context4.stop();
             }
           }
-        }, _callee3, this);
+        }, _callee4, this);
       }));
 
       return function getTransactionCount() {

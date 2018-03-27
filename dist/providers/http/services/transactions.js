@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 var _Promise = require("@babel/runtime/core-js/promise");
 
+=======
+>>>>>>> feature/call-contracts
 var _regeneratorRuntime = require("@babel/runtime/regenerator");
 
 var _asyncToGenerator = require("@babel/runtime/helpers/asyncToGenerator");
@@ -518,6 +521,7 @@ function (_HttpService) {
         return _getTransaction.apply(this, arguments);
       };
     }()
+<<<<<<< HEAD
   }, {
     key: "waitForTransaction",
     value: function () {
@@ -622,6 +626,8 @@ function (_HttpService) {
         return _waitForTransaction.apply(this, arguments);
       };
     }()
+=======
+>>>>>>> feature/call-contracts
   }]);
 
   return Transactions;

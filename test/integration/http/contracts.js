@@ -41,7 +41,7 @@ describe ('Http service contracts', () => {
   })
   describe('call ring', () => {
     it('should return a value', async () => {
-      let result = await utils.httpProvider.contracts.call('ring', byteCode, 'main', '1')
+      let result = await utils.httpProvider.contracts.callStatic('ring', byteCode, 'main', '1')
       assert.equal(1, result)
     })
   })
@@ -62,7 +62,7 @@ describe ('Http service contracts', () => {
     it('should deploy a contract', async function () {
       this.timeout(utils.TIMEOUT)
       let params = {txTypes: 'aect_create_tx'}
-      
+
       const ret = await utils.httpProvider.contracts.deployContract(byteCode, utils.wallets[0])
       await utils.httpProvider.tx.waitForTransaction(ret['tx_hash'], 60000)
     })
