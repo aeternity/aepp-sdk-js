@@ -213,9 +213,15 @@ function (_HttpService) {
       };
     }()
   }, {
+<<<<<<< HEAD
     key: "callStatic",
     value: function () {
       var _callStatic = _asyncToGenerator(
+=======
+    key: "call",
+    value: function () {
+      var _call = _asyncToGenerator(
+>>>>>>> 91b014ba5374c364edc4208c01da471dbf0bc943
       /*#__PURE__*/
       _regeneratorRuntime.mark(function _callee5(abi, code, func, arg) {
         var inputData, _ref5, data;
@@ -246,8 +252,13 @@ function (_HttpService) {
         }, _callee5, this);
       }));
 
+<<<<<<< HEAD
       return function callStatic(_x9, _x10, _x11, _x12) {
         return _callStatic.apply(this, arguments);
+=======
+      return function call(_x9, _x10, _x11, _x12) {
+        return _call.apply(this, arguments);
+>>>>>>> 91b014ba5374c364edc4208c01da471dbf0bc943
       };
     }()
   }, {
