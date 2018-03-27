@@ -51,17 +51,11 @@ function () {
    *
    * @param host Hostname
    * @param port External HTTP port
-   * @param internalPort Internal HTTP port
    * @param version HTTP API version
    * @param secured Use the https protocol if set to `true`
    */
   function AeHttpProvider(host, port) {
     var _ref = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},
-<<<<<<< HEAD
-=======
-        _ref$internalPort = _ref.internalPort,
-        internalPort = _ref$internalPort === void 0 ? 3103 : _ref$internalPort,
->>>>>>> feature/call-contracts
         _ref$version = _ref.version,
         version = _ref$version === void 0 ? CURRENT_API_VERSION : _ref$version,
         _ref$secured = _ref.secured,
@@ -71,10 +65,6 @@ function () {
 
     this.host = host || 'localhost';
     this.port = port || 3003;
-<<<<<<< HEAD
-=======
-    this.internalPort = internalPort;
->>>>>>> feature/call-contracts
     this.version = version;
     this.protocol = secured ? 'https' : 'http';
     this.base = new Base(this);
@@ -82,7 +72,6 @@ function () {
     this.accounts = new Accounts(this);
     this.oracles = new Oracles(this);
     this.tx = new Transactions(this);
-<<<<<<< HEAD
     this.contracts = new Contracts(this);
     this.baseUrl = "".concat(this.protocol, "://").concat(this.host, ":").concat(this.port, "/").concat(this.version, "/");
   } // noinspection JSUnusedGlobalSymbols
@@ -93,75 +82,21 @@ function () {
    * @param endpoint
    * @param params
    * @returns {Promise<*>}
-=======
-    this.contracts = new Contracts(this); // This pattern might change during the alpha phase as the topic
-    // internal vs. external ports still has to be discussed.
-    // Until then the base url can be set programmatically via `setBaseUrl`
-
-    this.baseUrls = {
-      external: "".concat(this.protocol, "://").concat(this.host, ":").concat(this.port, "/").concat(this.version, "/"),
-      internal: "".concat(this.protocol, "://").concat(this.host, ":").concat(this.internalPort, "/").concat(this.version, "/")
-    };
-  }
-  /**
-   * Return the base url
-   *
-   * @param internal Use an internal endpoint route
-   * @returns {string}
->>>>>>> feature/call-contracts
    */
 
 
   _createClass(AeHttpProvider, [{
-<<<<<<< HEAD
-=======
-    key: "getBaseUrl",
-    value: function getBaseUrl(internal) {
-      return this.baseUrls[internal ? 'internal' : 'external'];
-    }
-    /**
-     * Set base url programmatically
-     *
-     * @param url
-     * @param internal if `true` the url represents the internal base url
-     */
-
-  }, {
-    key: "setBaseUrl",
-    value: function setBaseUrl(url, internal) {
-      this.baseUrls[internal ? 'internal' : 'external'] = url;
-    } // noinspection JSUnusedGlobalSymbols
-
-    /**
-     * Call Http `GET` for a given endpoint
-     *
-     * @param endpoint
-     * @param params
-     * @param internal
-     * @returns {Promise<*>}
-     */
-
-  }, {
->>>>>>> feature/call-contracts
     key: "get",
     value: function () {
       var _get = _asyncToGenerator(
       /*#__PURE__*/
-<<<<<<< HEAD
       _regeneratorRuntime.mark(function _callee(endpoint, params) {
-=======
-      _regeneratorRuntime.mark(function _callee(endpoint, params, internal) {
->>>>>>> feature/call-contracts
         var url;
         return _regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-<<<<<<< HEAD
                 url = "".concat(this.baseUrl).concat(endpoint);
-=======
-                url = "".concat(this.getBaseUrl(internal)).concat(endpoint);
->>>>>>> feature/call-contracts
                 _context.next = 3;
                 return axios.get(url, {
                   params: params
@@ -178,11 +113,7 @@ function () {
         }, _callee, this);
       }));
 
-<<<<<<< HEAD
       return function get(_x, _x2) {
-=======
-      return function get(_x, _x2, _x3) {
->>>>>>> feature/call-contracts
         return _get.apply(this, arguments);
       };
     }()
@@ -201,32 +132,19 @@ function () {
       var _post = _asyncToGenerator(
       /*#__PURE__*/
       _regeneratorRuntime.mark(function _callee2(endpoint, data, options) {
-<<<<<<< HEAD
         var headers, fullUrl;
-=======
-        var internal, headers, fullUrl;
->>>>>>> feature/call-contracts
         return _regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-<<<<<<< HEAD
                 headers = options && options.headers || DEFAULT_HEADERS;
                 fullUrl = "".concat(this.baseUrl).concat(endpoint);
                 _context2.prev = 2;
                 _context2.next = 5;
-=======
-                internal = options && options.internal;
-                headers = options && options.headers || DEFAULT_HEADERS;
-                fullUrl = "".concat(this.getBaseUrl(internal)).concat(endpoint);
-                _context2.prev = 3;
-                _context2.next = 6;
->>>>>>> feature/call-contracts
                 return axios.post(fullUrl, data, {
                   headers: headers
                 });
 
-<<<<<<< HEAD
               case 5:
                 return _context2.abrupt("return", _context2.sent);
 
@@ -236,32 +154,14 @@ function () {
                 throw _context2.t0;
 
               case 11:
-=======
-              case 6:
-                return _context2.abrupt("return", _context2.sent);
-
-              case 9:
-                _context2.prev = 9;
-                _context2.t0 = _context2["catch"](3);
-                throw _context2.t0;
-
-              case 12:
->>>>>>> feature/call-contracts
               case "end":
                 return _context2.stop();
             }
           }
-<<<<<<< HEAD
         }, _callee2, this, [[2, 8]]);
       }));
 
       return function post(_x3, _x4, _x5) {
-=======
-        }, _callee2, this, [[3, 9]]);
-      }));
-
-      return function post(_x4, _x5, _x6) {
->>>>>>> feature/call-contracts
         return _post.apply(this, arguments);
       };
     }()

@@ -4,6 +4,8 @@ var _extends = require("@babel/runtime/helpers/extends");
 
 var _JSON$stringify = require("@babel/runtime/core-js/json/stringify");
 
+var _typeof = require("@babel/runtime/helpers/typeof");
+
 var _regeneratorRuntime = require("@babel/runtime/regenerator");
 
 var _asyncToGenerator = require("@babel/runtime/helpers/asyncToGenerator");
@@ -169,9 +171,10 @@ function (_HttpService) {
     value: function () {
       var _preClaim = _asyncToGenerator(
       /*#__PURE__*/
-      _regeneratorRuntime.mark(function _callee3(commitment, fee) {
+      _regeneratorRuntime.mark(function _callee3(commitment, fee, account) {
         var options,
-            privateKey,
+            pub,
+            priv,
             payload,
             _ref3,
             data,
@@ -181,54 +184,36 @@ function (_HttpService) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                options = _args3.length > 2 && _args3[2] !== undefined ? _args3[2] : {};
-                privateKey = options && options.privateKey;
+                options = _args3.length > 3 && _args3[3] !== undefined ? _args3[3] : {};
+                pub = account.pub, priv = account.priv;
 
-                if (!privateKey) {
-                  _context3.next = 22;
+                if (!priv) {
+                  _context3.next = 13;
                   break;
                 }
 
-                _context3.t0 = fee;
-                _context3.t1 = commitment;
-                _context3.t2 = options && options.nonce;
-                _context3.t3 = options && options.account;
-
-                if (_context3.t3) {
-                  _context3.next = 11;
-                  break;
-                }
-
-                _context3.next = 10;
-                return this.client.accounts.getPublicKey();
-
-              case 10:
-                _context3.t3 = _context3.sent;
-
-              case 11:
-                _context3.t4 = _context3.t3;
                 payload = {
-                  'fee': _context3.t0,
-                  'commitment': _context3.t1,
-                  'nonce': _context3.t2,
-                  'account': _context3.t4
+                  'fee': fee,
+                  'commitment': commitment,
+                  'nonce': options && options.nonce,
+                  'account': pub
                 };
-                _context3.next = 15;
+                _context3.next = 6;
                 return this.client.post('tx/name/preclaim', payload);
 
-              case 15:
+              case 6:
                 _ref3 = _context3.sent;
                 data = _ref3.data;
-                _context3.next = 19;
-                return this.client.tx.sendSigned(data.tx, privateKey);
+                _context3.next = 10;
+                return this.client.tx.sendSigned(data.tx, priv);
 
-              case 19:
+              case 10:
                 return _context3.abrupt("return", data);
 
-              case 22:
+              case 13:
                 throw new Error('Private key must be set');
 
-              case 23:
+              case 14:
               case "end":
                 return _context3.stop();
             }
@@ -236,7 +221,7 @@ function (_HttpService) {
         }, _callee3, this);
       }));
 
-      return function preClaim(_x4, _x5) {
+      return function preClaim(_x4, _x5, _x6) {
         return _preClaim.apply(this, arguments);
       };
     }()
@@ -255,9 +240,10 @@ function (_HttpService) {
     value: function () {
       var _claim = _asyncToGenerator(
       /*#__PURE__*/
-      _regeneratorRuntime.mark(function _callee4(name, salt, fee) {
+      _regeneratorRuntime.mark(function _callee4(name, salt, fee, account) {
         var options,
-            privateKey,
+            pub,
+            priv,
             payload,
             _ref4,
             data,
@@ -268,57 +254,38 @@ function (_HttpService) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                options = _args4.length > 3 && _args4[3] !== undefined ? _args4[3] : {};
-                privateKey = options && options.privateKey;
+                options = _args4.length > 4 && _args4[4] !== undefined ? _args4[4] : {};
+                pub = account.pub, priv = account.priv;
 
-                if (!privateKey) {
-                  _context4.next = 24;
+                if (!(_typeof(priv) !== void 0)) {
+                  _context4.next = 14;
                   break;
                 }
 
-                _context4.t0 = salt;
-                _context4.t1 = fee;
-                _context4.t2 = "nm$".concat(Crypto.encodeBase58Check(Buffer.from(name)));
-                _context4.t3 = options && options.nonce;
-                _context4.t4 = options && options.account;
-
-                if (_context4.t4) {
-                  _context4.next = 12;
-                  break;
-                }
-
-                _context4.next = 11;
-                return this.client.accounts.getPublicKey();
-
-              case 11:
-                _context4.t4 = _context4.sent;
-
-              case 12:
-                _context4.t5 = _context4.t4;
                 payload = {
-                  'name_salt': _context4.t0,
-                  'fee': _context4.t1,
-                  'name': _context4.t2,
-                  'nonce': _context4.t3,
-                  'account': _context4.t5
+                  'name_salt': salt,
+                  'fee': fee,
+                  'name': "nm$".concat(Crypto.encodeBase58Check(Buffer.from(name))),
+                  'nonce': options && options.nonce,
+                  'account': pub
                 };
-                _context4.next = 16;
+                _context4.next = 6;
                 return this.client.post('tx/name/claim', payload);
 
-              case 16:
+              case 6:
                 _ref4 = _context4.sent;
                 data = _ref4.data;
                 txHash = data.tx;
-                _context4.next = 21;
-                return this.client.tx.sendSigned(txHash, privateKey);
+                _context4.next = 11;
+                return this.client.tx.sendSigned(txHash, priv);
 
-              case 21:
+              case 11:
                 return _context4.abrupt("return", data);
 
-              case 24:
+              case 14:
                 return _context4.abrupt("return");
 
-              case 26:
+              case 16:
               case "end":
                 return _context4.stop();
             }
@@ -326,7 +293,7 @@ function (_HttpService) {
         }, _callee4, this);
       }));
 
-      return function claim(_x6, _x7, _x8) {
+      return function claim(_x7, _x8, _x9, _x10) {
         return _claim.apply(this, arguments);
       };
     }()
@@ -336,9 +303,8 @@ function (_HttpService) {
      *
      * @param target account or oracle address
      * @param nameHash
-     * @param nameTtl
-     * @param ttl
-     * @param fee
+     * @param account
+     * @param options
      * @returns {Promise<*>}
      */
 
@@ -347,91 +313,86 @@ function (_HttpService) {
     value: function () {
       var _update = _asyncToGenerator(
       /*#__PURE__*/
-      _regeneratorRuntime.mark(function _callee5(target, nameHash, _ref5) {
-        var _ref5$nameTtl, nameTtl, _ref5$ttl, ttl, _ref5$fee, fee, privateKey, account, pointers, inputData, _ref6, data;
+      _regeneratorRuntime.mark(function _callee5(target, nameHash, account) {
+        var options,
+            _options$nameTtl,
+            nameTtl,
+            _options$ttl,
+            ttl,
+            _options$fee,
+            fee,
+            pub,
+            priv,
+            pointers,
+            inputData,
+            _ref5,
+            data,
+            _args5 = arguments;
 
         return _regeneratorRuntime.wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                _ref5$nameTtl = _ref5.nameTtl, nameTtl = _ref5$nameTtl === void 0 ? 600000 : _ref5$nameTtl, _ref5$ttl = _ref5.ttl, ttl = _ref5$ttl === void 0 ? 1 : _ref5$ttl, _ref5$fee = _ref5.fee, fee = _ref5$fee === void 0 ? 1 : _ref5$fee, privateKey = _ref5.privateKey, account = _ref5.account;
+                options = _args5.length > 3 && _args5[3] !== undefined ? _args5[3] : {};
+                _options$nameTtl = options.nameTtl, nameTtl = _options$nameTtl === void 0 ? 600000 : _options$nameTtl, _options$ttl = options.ttl, ttl = _options$ttl === void 0 ? 1 : _options$ttl, _options$fee = options.fee, fee = _options$fee === void 0 ? 1 : _options$fee;
+                pub = account.pub, priv = account.priv;
 
-                if (!(typeof privateKey !== 'undefined')) {
-                  _context5.next = 32;
+                if (!(typeof priv !== 'undefined')) {
+                  _context5.next = 23;
                   break;
                 }
 
                 if (!target.startsWith('ak')) {
-                  _context5.next = 6;
+                  _context5.next = 8;
                   break;
                 }
 
                 pointers = _JSON$stringify({
                   'account_pubkey': target
                 });
-                _context5.next = 11;
+                _context5.next = 13;
                 break;
 
-              case 6:
+              case 8:
                 if (!target.startsWith('ok')) {
-                  _context5.next = 10;
+                  _context5.next = 12;
                   break;
                 }
 
                 pointers = _JSON$stringify({
                   'oracle_pubkey': target
                 });
-                _context5.next = 11;
+                _context5.next = 13;
                 break;
 
-              case 10:
+              case 12:
                 throw 'Target does not match account or oracle key';
 
-              case 11:
-                _context5.t0 = nameHash;
-                _context5.t1 = nameTtl;
-                _context5.t2 = ttl;
-                _context5.t3 = fee;
-                _context5.t4 = pointers;
-                _context5.t5 = account;
-
-                if (_context5.t5) {
-                  _context5.next = 21;
-                  break;
-                }
-
-                _context5.next = 20;
-                return this.client.accounts.getPublicKey();
-
-              case 20:
-                _context5.t5 = _context5.sent;
-
-              case 21:
-                _context5.t6 = _context5.t5;
+              case 13:
                 inputData = {
-                  'name_hash': _context5.t0,
-                  'name_ttl': _context5.t1,
-                  ttl: _context5.t2,
-                  fee: _context5.t3,
-                  pointers: _context5.t4,
-                  account: _context5.t6
+                  'name_hash': nameHash,
+                  'name_ttl': nameTtl,
+                  ttl: ttl,
+                  fee: fee,
+                  pointers: pointers,
+                  account: pub
                 };
-                _context5.next = 25;
+                _context5.next = 16;
                 return this.client.post('tx/name/update', inputData);
 
-              case 25:
-                _ref6 = _context5.sent;
-                data = _ref6.data;
-                _context5.next = 29;
-                return this.client.tx.sendSigned(data.tx, privateKey);
+              case 16:
+                _ref5 = _context5.sent;
+                data = _ref5.data;
+                _context5.next = 20;
+                return this.client.tx.sendSigned(data.tx, priv);
 
-              case 29:
+              case 20:
                 return _context5.abrupt("return", data);
 
-              case 32:
+              case 23:
                 throw new Error('Private key must be set');
 
-              case 33:
+              case 24:
               case "end":
                 return _context5.stop();
             }
@@ -439,7 +400,7 @@ function (_HttpService) {
         }, _callee5, this);
       }));
 
-      return function update(_x9, _x10, _x11) {
+      return function update(_x11, _x12, _x13) {
         return _update.apply(this, arguments);
       };
     }()
@@ -449,6 +410,7 @@ function (_HttpService) {
      * @param nameHash
      * @param recipient
      * @param fee
+     * @param account
      * @param options
      * @returns {Promise<*>}
      */
@@ -458,12 +420,14 @@ function (_HttpService) {
     value: function () {
       var _transfer = _asyncToGenerator(
       /*#__PURE__*/
-      _regeneratorRuntime.mark(function _callee6(nameHash, recipient) {
-        var fee,
-            options,
+      _regeneratorRuntime.mark(function _callee6(nameHash, recipient, account) {
+        var options,
+            _options$fee2,
+            fee,
+            priv,
+            pub,
             payload,
-            privateKey,
-            _ref7,
+            _ref6,
             data,
             _args6 = arguments;
 
@@ -471,60 +435,40 @@ function (_HttpService) {
           while (1) {
             switch (_context6.prev = _context6.next) {
               case 0:
-                fee = _args6.length > 2 && _args6[2] !== undefined ? _args6[2] : 1;
                 options = _args6.length > 3 && _args6[3] !== undefined ? _args6[3] : {};
+                _options$fee2 = options.fee, fee = _options$fee2 === void 0 ? 1 : _options$fee2;
+                priv = account.priv, pub = account.pub;
                 payload = {
                   'name_hash': nameHash,
                   'recipient_pubkey': recipient,
                   fee: fee
                 };
-                privateKey = options && options.privateKey;
 
-                if (!privateKey) {
-                  _context6.next = 26;
+                if (!priv) {
+                  _context6.next = 15;
                   break;
                 }
 
-                _context6.t0 = _extends;
-                _context6.t1 = {};
-                _context6.t2 = payload;
-                _context6.t3 = options && options.nonce;
-                _context6.t4 = options && options.account;
-
-                if (_context6.t4) {
-                  _context6.next = 14;
-                  break;
-                }
-
-                _context6.next = 13;
-                return this.client.accounts.getPublicKey();
-
-              case 13:
-                _context6.t4 = _context6.sent;
-
-              case 14:
-                _context6.t5 = _context6.t4;
-                _context6.t6 = {
-                  nonce: _context6.t3,
-                  account: _context6.t5
-                };
-                payload = (0, _context6.t0)(_context6.t1, _context6.t2, _context6.t6);
-                _context6.next = 19;
+                payload = _extends({}, payload, {
+                  nonce: options && options.nonce,
+                  account: pub
+                });
+                _context6.next = 8;
                 return this.client.post('tx/name/transfer', payload);
 
-              case 19:
-                _ref7 = _context6.sent;
-                data = _ref7.data;
-                _context6.next = 23;
-                return this.client.tx.sendSigned(data.tx, privateKey);
+              case 8:
+                _ref6 = _context6.sent;
+                data = _ref6.data;
+                _context6.next = 12;
+                return this.client.tx.sendSigned(data.tx, priv);
 
-              case 23:
+              case 12:
                 return _context6.abrupt("return", data);
 
-              case 26:
+              case 15:
                 throw new Error('Private key must be set');
 
-              case 27:
+              case 16:
               case "end":
                 return _context6.stop();
             }
@@ -532,7 +476,7 @@ function (_HttpService) {
         }, _callee6, this);
       }));
 
-      return function transfer(_x12, _x13) {
+      return function transfer(_x14, _x15, _x16) {
         return _transfer.apply(this, arguments);
       };
     }()
@@ -555,7 +499,7 @@ function (_HttpService) {
             options,
             payload,
             privateKey,
-            _ref8,
+            _ref7,
             data,
             _args7 = arguments;
 
@@ -572,50 +516,30 @@ function (_HttpService) {
                 privateKey = options && options.privateKey;
 
                 if (!privateKey) {
-                  _context7.next = 26;
+                  _context7.next = 15;
                   break;
                 }
 
-                _context7.t0 = _extends;
-                _context7.t1 = {};
-                _context7.t2 = payload;
-                _context7.t3 = options && options.nonce;
-                _context7.t4 = options && options.account;
-
-                if (_context7.t4) {
-                  _context7.next = 14;
-                  break;
-                }
-
-                _context7.next = 13;
-                return this.client.accounts.getPublicKey();
-
-              case 13:
-                _context7.t4 = _context7.sent;
-
-              case 14:
-                _context7.t5 = _context7.t4;
-                _context7.t6 = {
-                  nonce: _context7.t3,
-                  account: _context7.t5
-                };
-                payload = (0, _context7.t0)(_context7.t1, _context7.t2, _context7.t6);
-                _context7.next = 19;
+                payload = _extends({}, payload, {
+                  nonce: options && options.nonce,
+                  account: options && options.account
+                });
+                _context7.next = 8;
                 return this.client.post('tx/name/revoke', payload);
 
-              case 19:
-                _ref8 = _context7.sent;
-                data = _ref8.data;
-                _context7.next = 23;
+              case 8:
+                _ref7 = _context7.sent;
+                data = _ref7.data;
+                _context7.next = 12;
                 return this.client.tx.sendSigned(data.tx, privateKey);
 
-              case 23:
+              case 12:
                 return _context7.abrupt("return", data);
 
-              case 26:
+              case 15:
                 throw new Error('Private key must be set');
 
-              case 27:
+              case 16:
               case "end":
                 return _context7.stop();
             }
@@ -623,7 +547,7 @@ function (_HttpService) {
         }, _callee7, this);
       }));
 
-      return function revoke(_x14) {
+      return function revoke(_x17) {
         return _revoke.apply(this, arguments);
       };
     }()
@@ -633,6 +557,7 @@ function (_HttpService) {
      * @param domain
      * @param preClaimFee
      * @param claimFee
+     * @param account
      * @param options
      * @returns {Promise<*>}
      */
@@ -642,16 +567,17 @@ function (_HttpService) {
     value: function () {
       var _fullClaim = _asyncToGenerator(
       /*#__PURE__*/
-      _regeneratorRuntime.mark(function _callee8(domain, preClaimFee, claimFee) {
+      _regeneratorRuntime.mark(function _callee8(domain, preClaimFee, claimFee, account) {
         var options,
             salt,
             commitment,
+            data,
             _args8 = arguments;
         return _regeneratorRuntime.wrap(function _callee8$(_context8) {
           while (1) {
             switch (_context8.prev = _context8.next) {
               case 0:
-                options = _args8.length > 3 && _args8[3] !== undefined ? _args8[3] : {};
+                options = _args8.length > 4 && _args8[4] !== undefined ? _args8[4] : {};
                 salt = options && options.salt;
 
                 if (typeof salt === 'undefined') {
@@ -665,20 +591,21 @@ function (_HttpService) {
               case 5:
                 commitment = _context8.sent;
                 _context8.next = 8;
-                return this.preClaim(commitment, preClaimFee, options);
+                return this.preClaim(commitment, preClaimFee, account, options);
 
               case 8:
-                _context8.next = 10;
-                return this.client.base.waitNBlocks(1);
+                data = _context8.sent;
+                _context8.next = 11;
+                return this.client.tx.waitForTransaction(data['tx_hash']);
 
-              case 10:
-                _context8.next = 12;
-                return this.claim(domain, salt, claimFee, options);
-
-              case 12:
-                return _context8.abrupt("return", _context8.sent);
+              case 11:
+                _context8.next = 13;
+                return this.claim(domain, salt, claimFee, account, options);
 
               case 13:
+                return _context8.abrupt("return", _context8.sent);
+
+              case 14:
               case "end":
                 return _context8.stop();
             }
@@ -686,7 +613,7 @@ function (_HttpService) {
         }, _callee8, this);
       }));
 
-      return function fullClaim(_x15, _x16, _x17) {
+      return function fullClaim(_x18, _x19, _x20, _x21) {
         return _fullClaim.apply(this, arguments);
       };
     }()

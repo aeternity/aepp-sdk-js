@@ -47,7 +47,7 @@ describe ('Http service contracts', () => {
   })
   describe('encodeCallData ring', () => {
     it('should return an encoded string', async () => {
-      let calldata = await utils.httpProvider.contracts.encodeCallData('ring', byteCode, 'main', '1')
+      let calldata = await utils.httpProvider.contracts.encodeCallData('ring', byteCode, 'main', ['1'])
       assert.isTrue(calldata.startsWith('0x'))
     })
   })
