@@ -43,6 +43,9 @@ describe ('Oracles HTTP endpoint', () => {
     it.skip('should register an oracle', async function () {
       this.timeout(utils.TIMEOUT)
 
+      // charge wallet first
+      await utils.charge(utils.wallets[0], 20)
+
       let ret = await utils.httpProvider.base.spend(pub, 5, utils.wallets[0])
       await utils.httpProvider.tx.waitForTransaction(ret['tx_hash'])
 
@@ -68,6 +71,9 @@ describe ('Oracles HTTP endpoint', () => {
   describe('query an oracle', () => {
     it.skip('should query an oracle', async function () {
       this.timeout(utils.TIMEOUT)
+
+      // charge wallet first
+      await utils.charge(utils.wallets[0], 10)
 
       let data = await utils.httpProvider.oracles.query(
         oracleId,

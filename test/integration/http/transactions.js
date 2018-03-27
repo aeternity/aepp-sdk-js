@@ -27,13 +27,13 @@ describe('Http service transactions', () => {
     it('should return transaction details', async function () {
       this.timeout(utils.TIMEOUT)
       const { pub:pub1, priv } = utils.wallets[0]
-      const { pub:pub2 } = utils.wallets[0]
+      const { pub:pub2 } = utils.wallets[1]
+      // charge wallet first
+      await utils.charge(pub1, 20)
       let txData = await utils.httpProvider.base.getSpendTx(pub2, 10, pub1)
-      let spendData = await utils.httpProvider.tx.sendSigned(txData.tx, priv)
-      await utils.httpProvider.base.waitNBlocks(1)
-      let transaction = await utils.httpProvider.tx.getTransaction(txData['tx_hash'])
-      assert.ok(transaction)
-      assert.notEqual(-1, transaction['block_height'])
+      await utils.httpProvider.tx.sendSigned(txData.tx, priv)      
+      const height = await utils.httpProvider.tx.waitForTransaction(txData['tx_hash'])
+      assert.notEqual(-1, height)
     })
   })
 })
