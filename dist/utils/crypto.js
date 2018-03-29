@@ -22,6 +22,8 @@ var shajs = require('sha.js');
 
 var msgpack = require('msgpack-lite');
 
+var RLP = require('rlp');
+
 var codec = msgpack.createCodec({
   int64: true
 });
@@ -118,14 +120,11 @@ var Crypto = {
   },
   decodeTx: function decodeTx(txHash) {
     var decodedTx = Crypto.decodeBase58Check(txHash.split('$')[1]);
-    return msgpack.decode(Buffer.from(decodedTx, 'hex'), {
-      codec: codec
-    });
+    var decoded = RLP.decode(Buffer.from(decodedTx, 'hex'));
+    return decoded;
   },
   encodeTx: function encodeTx(txData) {
-    var encodedTxData = msgpack.encode(txData, {
-      codec: codec
-    });
+    var encodedTxData = RLP.encode(txData);
     var encodedTx = Crypto.encodeBase58Check(Buffer.from(encodedTxData));
     return "tx$".concat(encodedTx);
   }

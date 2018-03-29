@@ -19,7 +19,7 @@
     "axios": "^0.17.1",
     "bs58check": "^2.1.1",
     "elliptic": "^6.4.0",
-    "msgpack-lite": "github:aeternity/msgpack-lite",
+    "rlp": "^2.0.0",
     "sha.js": "^2.4.10",
     "websocket": "^1.0.25"
   },

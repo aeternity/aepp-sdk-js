@@ -451,7 +451,6 @@ function (_HttpService) {
             base58CheckTx,
             binaryTx,
             signature,
-            decoded,
             unpackedSignedTx,
             _args10 = arguments;
         return _regeneratorRuntime.wrap(function _callee10$(_context10) {
@@ -466,13 +465,12 @@ function (_HttpService) {
 
                 binaryTx = Crypto.decodeBase58Check(base58CheckTx);
                 signature = Crypto.sign(binaryTx, binaryKey); // the signed tx deserializer expects a 4-tuple:
-                // <tx_type, version, tx_dict, signatures_array>
+                // <tag, version, signatures_array, binary_tx>
 
-                decoded = Crypto.decodeTx(txHash);
-                unpackedSignedTx = [Buffer.from('sig_tx'), options.version || 1, decoded, [Buffer.from(signature)]];
+                unpackedSignedTx = [Buffer.from([11]), Buffer.from([options.version || 1]), [Buffer.from(signature)], binaryTx];
                 return _context10.abrupt("return", this.client.tx.send(Crypto.encodeTx(unpackedSignedTx)));
 
-              case 8:
+              case 7:
               case "end":
                 return _context10.stop();
             }
@@ -551,48 +549,59 @@ function (_HttpService) {
                         switch (_context12.prev = _context12.next) {
                           case 0:
                             if (!(++attempts < maxAttempts)) {
-                              _context12.next = 14;
+                              _context12.next = 21;
                               break;
                             }
 
-                            _context12.prev = 1;
-                            _context12.next = 4;
+                            _context12.t0 = process.stdout;
+                            _context12.t1 = "\rWaiting for ".concat(txHash, " on ");
+                            _context12.next = 5;
+                            return _this.client.base.getHeight();
+
+                          case 5:
+                            _context12.t2 = _context12.sent;
+                            _context12.t3 = _context12.t1.concat.call(_context12.t1, _context12.t2);
+
+                            _context12.t0.write.call(_context12.t0, _context12.t3);
+
+                            _context12.prev = 8;
+                            _context12.next = 11;
                             return _this.getTransaction(txHash);
 
-                          case 4:
+                          case 11:
                             transaction = _context12.sent;
-                            _context12.next = 10;
+                            _context12.next = 17;
                             break;
 
-                          case 7:
-                            _context12.prev = 7;
-                            _context12.t0 = _context12["catch"](1);
-                            return _context12.abrupt("return", reject(_context12.t0));
+                          case 14:
+                            _context12.prev = 14;
+                            _context12.t4 = _context12["catch"](8);
+                            return _context12.abrupt("return", reject(_context12.t4));
 
-                          case 10:
+                          case 17:
                             blockHeight = transaction['block_height'];
 
                             if (blockHeight !== -1) {
                               // TODO integrate into proper logging
-                              // process.stdout.write(`\rTx has been mined in ${blockHeight}`)
-                              // console.log('')
+                              process.stdout.write("\rTx has been mined in ".concat(blockHeight));
+                              console.log('');
                               clearInterval(interval);
                               resolve(blockHeight);
                             }
 
-                            _context12.next = 16;
+                            _context12.next = 23;
                             break;
 
-                          case 14:
+                          case 21:
                             clearInterval(interval);
                             reject(new Error("Timeout reached after ".concat(attempts, " attempts")));
 
-                          case 16:
+                          case 23:
                           case "end":
                             return _context12.stop();
                         }
                       }
-                    }, _callee12, this, [[1, 7]]);
+                    }, _callee12, this, [[8, 14]]);
                   })), intervalTimeout);
                   interval.unref();
                 });
