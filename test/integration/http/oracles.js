@@ -18,11 +18,6 @@
 
 require ('@babel/polyfill')
 
-const AeternityClient = require('../../../lib/aepp-sdk')
-const WebsocketProvider = require('../../../lib/providers/ws/index')
-const {AeSubscription} = require('../../../lib/providers/ws/subscriptions')
-const {actions, origins} = require('../../../lib/providers/ws/types')
-
 
 const chai = require ('chai')
 const assert = chai.assert
