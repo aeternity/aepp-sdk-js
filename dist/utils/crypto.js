@@ -20,13 +20,7 @@ var bs58check = require('bs58check');
 
 var shajs = require('sha.js');
 
-var msgpack = require('msgpack-lite');
-
 var RLP = require('rlp');
-
-var codec = msgpack.createCodec({
-  int64: true
-});
 
 var EC = require('elliptic').ec;
 
