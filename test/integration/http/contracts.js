@@ -66,7 +66,6 @@ describe ('Http service contracts', () => {
   describe('deployContract', () => {
     it('should deploy a contract', async function () {
       this.timeout(utils.TIMEOUT * 4)
-      let params = {txTypes: 'aect_create_tx'}
 
       // charge wallet first
       await utils.charge(utils.wallets[0].pub, 10)

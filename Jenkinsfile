@@ -7,7 +7,7 @@ pipeline {
   }
 
   environment {
-    TEST_NODE = 'sdk-testnet.aepps.com:3013'
+    TEST_NODE = '31.13.249.3:3013'
   }
 
   stages {

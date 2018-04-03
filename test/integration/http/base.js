@@ -31,7 +31,8 @@ describe ('Http service base', () => {
     })
   })
   describe ('getBlockByHeight', () => {
-    it ('should return a block', async () => {
+    it ('should return a block', async function () {
+      this.timeout(utils.TIMEOUT)
       let data = await utils.httpProvider.base.getBlockByHeight (2)
       prevHash = data['prev_hash']
       utils.assertIsBlock (data)
@@ -81,7 +82,8 @@ describe ('Http service base', () => {
     })
   })
   describe ('getInfo', () => {
-    it ('should return some info', async function () {
+    // TODO re-enable after PT-156463140 is resolved
+    it.skip('should return some info', async function () {
       let info = await utils.httpProvider.base.getInfo ()
       assert.ok (info)
     })
@@ -102,21 +104,9 @@ describe ('Http service base', () => {
       }
     })
   })
-  describe ('getBlockByHash', () => {
-    // TODO: Waiting on /block/hash/{hash} to move to external endpoint
-    it.skip('should return a block', async () => {
-      let data = await utils.httpProvider.base.getBlockByHash (prevHash)
-      utils.assertIsBlock (data)
-    })
-  })
-  describe ('getBlockByHeight', () => {
-    it ('should return a block', async () => {
-      let data = await utils.httpProvider.base.getBlockByHeight (1)
-      utils.assertIsBlock (data)
-    })
-  })
   describe ('getBalances', () => {
-    it ('should return something', async () => {
+    // TODO re-enable after PT-156463140 is resolved
+    it.skip('should return something', async () => {
       let data = await utils.httpProvider.base.getBalances ()
       assert.ok(data)
     })
