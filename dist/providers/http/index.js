@@ -59,7 +59,9 @@ function () {
         _ref$version = _ref.version,
         version = _ref$version === void 0 ? CURRENT_API_VERSION : _ref$version,
         _ref$secured = _ref.secured,
-        secured = _ref$secured === void 0 ? false : _ref$secured;
+        secured = _ref$secured === void 0 ? false : _ref$secured,
+        _ref$internal = _ref.internal,
+        internal = _ref$internal === void 0 ? false : _ref$internal;
 
     _classCallCheck(this, AeHttpProvider);
 
@@ -67,13 +69,14 @@ function () {
     this.port = port || 3003;
     this.version = version;
     this.protocol = secured ? 'https' : 'http';
+    this.internal = internal ? 'internal/' : '';
     this.base = new Base(this);
     this.aens = new AENS(this);
     this.accounts = new Accounts(this);
     this.oracles = new Oracles(this);
     this.tx = new Transactions(this);
     this.contracts = new Contracts(this);
-    this.baseUrl = "".concat(this.protocol, "://").concat(this.host, ":").concat(this.port, "/").concat(this.version, "/");
+    this.baseUrl = "".concat(this.protocol, "://").concat(this.host, ":").concat(this.port, "/").concat(this.internal).concat(this.version, "/");
   } // noinspection JSUnusedGlobalSymbols
 
   /**
