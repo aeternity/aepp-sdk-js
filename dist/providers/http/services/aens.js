@@ -484,7 +484,7 @@ function (_HttpService) {
      * Revoke a name
      *
      * @param nameHash
-     * @param fee
+     * @param account
      * @param options
      * @returns {Promise<*>}
      */
@@ -494,11 +494,13 @@ function (_HttpService) {
     value: function () {
       var _revoke = _asyncToGenerator(
       /*#__PURE__*/
-      _regeneratorRuntime.mark(function _callee7(nameHash) {
-        var fee,
-            options,
+      _regeneratorRuntime.mark(function _callee7(nameHash, account) {
+        var options,
+            _options$fee3,
+            fee,
+            pub,
+            priv,
             payload,
-            privateKey,
             _ref7,
             data,
             _args7 = arguments;
@@ -507,22 +509,22 @@ function (_HttpService) {
           while (1) {
             switch (_context7.prev = _context7.next) {
               case 0:
-                fee = _args7.length > 1 && _args7[1] !== undefined ? _args7[1] : 1;
                 options = _args7.length > 2 && _args7[2] !== undefined ? _args7[2] : {};
+                _options$fee3 = options.fee, fee = _options$fee3 === void 0 ? 1 : _options$fee3;
+                pub = account.pub, priv = account.priv;
                 payload = {
                   'name_hash': nameHash,
                   fee: fee
                 };
-                privateKey = options && options.privateKey;
 
-                if (!privateKey) {
+                if (!priv) {
                   _context7.next = 15;
                   break;
                 }
 
                 payload = _extends({}, payload, {
                   nonce: options && options.nonce,
-                  account: options && options.account
+                  account: pub
                 });
                 _context7.next = 8;
                 return this.client.post('tx/name/revoke', payload);
@@ -531,7 +533,7 @@ function (_HttpService) {
                 _ref7 = _context7.sent;
                 data = _ref7.data;
                 _context7.next = 12;
-                return this.client.tx.sendSigned(data.tx, privateKey);
+                return this.client.tx.sendSigned(data.tx, priv);
 
               case 12:
                 return _context7.abrupt("return", data);
@@ -547,7 +549,7 @@ function (_HttpService) {
         }, _callee7, this);
       }));
 
-      return function revoke(_x17) {
+      return function revoke(_x17, _x18) {
         return _revoke.apply(this, arguments);
       };
     }()
@@ -613,7 +615,7 @@ function (_HttpService) {
         }, _callee8, this);
       }));
 
-      return function fullClaim(_x18, _x19, _x20, _x21) {
+      return function fullClaim(_x19, _x20, _x21, _x22) {
         return _fullClaim.apply(this, arguments);
       };
     }()
