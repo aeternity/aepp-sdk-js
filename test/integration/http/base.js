@@ -63,21 +63,21 @@ describe ('Http service base', () => {
     })
   })
   describe ('spend', () => {
-    // TODO: Waiting on /account/balance/{account_pubkey} to move to external endpoint
-    it.skip('should increase the balance', async function () {
-      this.timeout (utils.TIMEOUT)
-      const { pub:pub1 } = utils.wallets[0]
-      let balanceBefore
-      try {
-        balanceBefore = await utils.httpProvider.accounts.getBalance(pub1)
-      } catch (e) {
-        balanceBefore = 0
-      }
+    it('should increase the balance', async function () {
+      this.timeout (utils.TIMEOUT * 2)
 
+      const { pub:pub1 } = utils.wallets[0]
       const { pub:pub2 } = utils.wallets[1]
+
+      // charge wallets first
+      await utils.charge(pub1, 10)
+      await utils.charge(pub2, 10)
+
+      const balanceBefore = await utils.httpProvider.accounts.getBalance(pub2)
+
       const { tx_hash } = await utils.httpProvider.base.spend(pub2, 5, utils.wallets[0])
       await utils.httpProvider.tx.waitForTransaction(tx_hash)
-      const balance = await utils.httpProvider.accounts.getBalance(pub1)
+      const balance = await utils.httpProvider.accounts.getBalance(pub2)
       assert.equal(balanceBefore + 5, balance)
     })
   })

@@ -26,9 +26,15 @@ const utils = require('../../utils')
 
 describe('Http accounts service', () => {
   describe('getTransactions', () => {
-    // TODO Should work after porting the endpoint to the external route
-    it.skip('should return something', async () => {
-      let transactions = await utils.httpProvider.accounts.getTransactions(utils.wallets[0].pub)
+    it('should return something', async function () {
+      this.timeout(utils.TIMEOUT)
+
+      const { pub } = utils.wallets[0]
+
+      // charge wallet first
+      await utils.charge(pub, 10)
+
+      let transactions = await utils.httpProvider.accounts.getTransactions(pub)
       assert.ok(transactions)
       assert.isTrue(Array.isArray(transactions))
       assert.ok(transactions.length)
