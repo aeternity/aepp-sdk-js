@@ -82,8 +82,7 @@ describe ('Http service base', () => {
     })
   })
   describe ('getInfo', () => {
-    // TODO re-enable after PT-156463140 is resolved
-    it.skip('should return some info', async function () {
+    it('should return some info', async function () {
       let info = await utils.httpProvider.base.getInfo ()
       assert.ok (info)
     })
@@ -105,8 +104,7 @@ describe ('Http service base', () => {
     })
   })
   describe ('getBalances', () => {
-    // TODO re-enable after PT-156463140 is resolved
-    it.skip('should return something', async () => {
+    it('should return something', async () => {
       let data = await utils.httpProvider.base.getBalances ()
       assert.ok(data)
     })
