@@ -1,6 +1,6 @@
 {
   "name": "@aeternity/aepp-sdk",
-  "version": "0.10.2-0.1.0",
+  "version": "0.10.2-0.1.0-alpha.1",
   "description": "An HTTP wrapper for the Aeternity Epoch net",
   "main": "../dist/aepp-sdk.js",
   "scripts": {
