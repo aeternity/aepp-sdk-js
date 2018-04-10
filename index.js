@@ -1,6 +1,6 @@
 /*
  *  Æternity Naming System interface
- *  Author: Till Kolter
+ *  Author: Till Kolter, Alexander Kahl
  *  Copyright (c) 2018 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
@@ -19,6 +19,7 @@
 
 const AeternityClient = require('./dist/aepp-sdk')
 
-export default AeternityClient
-
-export {default as Crypto} from './dist/utils/crypto'
+module.exports = {
+  AeternityClient,
+  Crypto: require('./dist/utils/crypto')
+}
