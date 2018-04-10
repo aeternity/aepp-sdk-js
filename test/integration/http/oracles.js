@@ -34,14 +34,13 @@ describe ('Oracles HTTP endpoint', () => {
   const oracleId = `ok$${pub.split('$')[1]}`
 
   describe ('register oracle', () => {
-    // TODO waiting on /account/txs/{account_pubkey} to become external
-    it.skip('should register an oracle', async function () {
-      this.timeout(utils.TIMEOUT)
+    it('should register an oracle', async function () {
+      this.timeout(utils.TIMEOUT * 2)
 
-      let ret = await utils.httpProvider.base.spend(pub, 5, utils.wallets[0])
-      await utils.httpProvider.tx.waitForTransaction(ret['tx_hash'])
+      // charge wallet first
+      await utils.charge(pub, 10)
 
-      ret = await utils.httpProvider.oracles.register(
+      const { tx_hash } = await utils.httpProvider.oracles.register(
         'unused query format',
         'unused response format',
         5,
@@ -51,10 +50,10 @@ describe ('Oracles HTTP endpoint', () => {
       )
 
       // Let the blockchain digest
-      await utils.httpProvider.tx.waitForTransaction(ret['tx_hash'])
+      await utils.httpProvider.tx.waitForTransaction(tx_hash)
 
       let transactions = await utils.httpProvider.accounts.getTransactions(pub, {
-        txTypes: ['aeo_register_tx']
+        txTypes: ['oracle_register_tx'] // epoch/apps/aetx/src/aetx.erl:200
       })
       assert.isTrue(transactions.length > 0)
     })
@@ -62,7 +61,10 @@ describe ('Oracles HTTP endpoint', () => {
 
   describe('query an oracle', () => {
     it.skip('should query an oracle', async function () {
-      this.timeout(utils.TIMEOUT)
+      this.timeout(utils.TIMEOUT * 2)
+
+      // charge wallet first
+      await utils.charge(pub, 10)
 
       let data = await utils.httpProvider.oracles.query(
         oracleId,
@@ -71,13 +73,14 @@ describe ('Oracles HTTP endpoint', () => {
         10,
         5,
         "whats wrong?",
-        utils.wallets[0]
+        account
       )
+
       assert.ok(data)
       await utils.httpProvider.tx.waitForTransaction(data['tx_hash'])
       let transactions = await utils.httpProvider.accounts.getTransactions(oracleId, {
-        excludeTxTypes: ['aec_coinbase_tx'],
-        txTypes: ['aeo_query_tx']
+        excludeTxTypes: ['coinbase_tx'],
+        txTypes: ['oracle_query_tx'] // epoch/apps/aetx/src/aetx.erl:200
       })
       assert.isTrue(transactions.length > 0)
 
