@@ -7,7 +7,7 @@ pipeline {
   }
 
   environment {
-    TEST_NODE = '31.13.249.3:3013'
+    TEST_NODE = credentials('TEST_NODE')
   }
 
   stages {
