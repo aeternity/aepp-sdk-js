@@ -602,7 +602,6 @@ function (_HttpService) {
                       }
                     }, _callee12, this, [[8, 14]]);
                   })), intervalTimeout);
-                  interval.unref();
                 });
 
               case 5:
