@@ -98,9 +98,10 @@ function (_HttpService) {
                 _context.prev = 10;
                 _context.t0 = _context["catch"](2);
                 response = _context.t0.response;
-                throw "".concat(account, ": ").concat(response.data.reason);
+                console.log(response);
+                throw new Error("".concat(account, ": ").concat(response.data.reason));
 
-              case 14:
+              case 15:
               case "end":
                 return _context.stop();
             }
@@ -175,7 +176,7 @@ function (_HttpService) {
                 throw new Error('Account has no transactions');
 
               case 17:
-                throw new Error("Status: ".concat(_context2.t0.response.status, " Data: '").concat(_context2.t0.response.data, "'"));
+                throw new Error("Status: ".concat(_context2.t0.response.status, " Reason: '").concat(_context2.t0.response.data.reason, "'"));
 
               case 18:
               case "end":

@@ -553,7 +553,7 @@ function (_HttpService) {
                               break;
                             }
 
-                            _context12.t0 = process.stdout;
+                            _context12.t0 = console;
                             _context12.t1 = "\rWaiting for ".concat(txHash, " on ");
                             _context12.next = 5;
                             return _this.client.base.getHeight();
@@ -562,7 +562,7 @@ function (_HttpService) {
                             _context12.t2 = _context12.sent;
                             _context12.t3 = _context12.t1.concat.call(_context12.t1, _context12.t2);
 
-                            _context12.t0.write.call(_context12.t0, _context12.t3);
+                            _context12.t0.log.call(_context12.t0, _context12.t3);
 
                             _context12.prev = 8;
                             _context12.next = 11;
@@ -583,8 +583,7 @@ function (_HttpService) {
 
                             if (blockHeight !== -1) {
                               // TODO integrate into proper logging
-                              process.stdout.write("\rTx has been mined in ".concat(blockHeight));
-                              console.log('');
+                              console.log("\rTx has been mined in ".concat(blockHeight));
                               clearInterval(interval);
                               resolve(blockHeight);
                             }

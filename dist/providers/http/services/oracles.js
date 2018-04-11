@@ -206,7 +206,7 @@ function (_HttpService) {
                     'type': 'delta',
                     'value': responseTtl
                   },
-                  'sender': options.sender,
+                  sender: account.pub,
                   query: _query,
                   'query_ttl': {
                     'type': 'delta',
