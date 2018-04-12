@@ -14,6 +14,9 @@ alpha releases as stable as possible. Neverless it should not be taken as
 production-ready. To catch up with the more edgy state of development please
 check out the [develop branch](https://github.com/aeternity/aepp-sdk-js/tree/develop).
 
+## Requirements
+node.js >= 8.11
+
 ## Install
 
 ### NPM
