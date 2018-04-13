@@ -19,29 +19,30 @@
 
 const url = require('url')
 const program = require ('commander')
-const AeternityClient = require('../dist/aepp-sdk.js')
-const { HttpProvider } = AeternityClient.providers
-const Crypto = require('../lib/utils/crypto')
+const {AeternityClient, Crypto} = require('../')
+const {HttpProvider} = AeternityClient.providers
 
 const wallet = {
   priv: process.env['WALLET_PRIV'],
   pub: process.env['WALLET_PUB']
 }
 
-async function spend (receiver, amount, { host }) {
+function spend (receiver, amount, { host }) {
   const node = url.parse(host)
-  const client = new AeternityClient(new HttpProvider(node.hostname, node.port, { secured: node.protocol === 'https:' }))
-  const { tx_hash } = await client.base.spend(receiver, parseInt(amount), wallet)
-  console.log(`Waiting for ${tx_hash} to be mined...`)
-  await client.tx.waitForTransaction(tx_hash)
+  const client = new AeternityClient(new HttpProvider(node.hostname, node.port, {secured: node.protocol === 'https:'}))
+
+  client.base.spend(receiver, parseInt(amount), wallet).then(({ tx_hash }) => {
+    console.log(`Waiting for ${tx_hash} to be mined...`)
+    return client.tx.waitForTransaction(tx_hash)
+  })
 }
 
 program.version ('0.1.0')
 
 program
-  .command ('spend <receiver> <amount>')
+  .command('spend <receiver> <amount>')
   .option('-h, --host [host]', 'Node to connect to', 'http://localhost:3013')
-  .action (spend)
+  .action(spend)
 
 program.parse (process.argv)
 if (program.args.length === 0) program.help ()
