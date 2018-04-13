@@ -6,7 +6,7 @@
   "scripts": {
     "build": "babel lib --presets @babel/env --out-dir dist",
     "prepublish": "npm run build",
-    "preinstall": "npm run build",
+    "preinstall": "npm install && npm run build",
     "decrypt": "node bin/keys decrypt",
     "test": "mocha --recursive --require @babel/register",
     "test-jenkins": "mocha --recursive --require @babel/register --reporter mocha-junit-reporter"
