@@ -5,7 +5,8 @@
   "main": "../dist/aepp-sdk.js",
   "scripts": {
     "build": "babel lib --presets @babel/env --out-dir dist",
-    "prepare": "npm run build",
+    "prepublish": "npm run build",
+    "preinstall": "npm run build",
     "decrypt": "node bin/keys decrypt",
     "test": "mocha --recursive --require @babel/register",
     "test-jenkins": "mocha --recursive --require @babel/register --reporter mocha-junit-reporter"
