@@ -17,16 +17,12 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-require ('@babel/polyfill')
-
-const AeternityClient = require ('../lib/aepp-sdk')
-const HttpProvider = require ('../lib/providers/http')
-
+const {AeternityClient} = require('../index.js')
+const {HttpProvider} = AeternityClient.providers
 
 let client1 = new AeternityClient (new HttpProvider ('localhost', 3013, {
   secured: false
 }))
-
 
 const program = require ('commander')
 const prompt = require ('prompt')

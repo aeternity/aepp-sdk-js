@@ -1,8 +1,5 @@
-
-require('@babel/polyfill')
-
-const AeternityClient = require('../index.js')
-const HttpProvider = require('../lib/providers/http')
+const {AeternityClient} = require('../index.js')
+const {HttpProvider} = AeternityClient.providers
 
 let client1 = new AeternityClient(new HttpProvider('localhost', 3013, {secured: false}))
 let client2 = new AeternityClient(new HttpProvider('localhost', 3023, {secured: false}))

@@ -16,12 +16,9 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-'use strict'
-
-
-const AeternityClient = require ('../index.js')
-const {AeSubscription} = require ('../lib/providers/ws/subscriptions')
-const WebSocketProvider = require ('../lib/providers/ws')
+const {AeternityClient} = require('../index.js')
+const {WebsocketProvider} = AeternityClient.providers
+const {AeSubscription} = WebsocketProvider
 
 const program = require ('commander')
 const axios = require ('axios')
@@ -29,7 +26,7 @@ const ConnectionListener = require('../lib/utils/listeners').ConnectionListener
 
 let runOracleServer = async (options) => {
 
-  let client = new AeternityClient (new WebSocketProvider (options.host, options.port))
+  let client = new AeternityClient (new WebsocketProvider (options.host, options.port))
 
   client.addConnectionListener(new ConnectionListener({
     onOpen: () => {
@@ -65,7 +62,7 @@ let runOracleServer = async (options) => {
 }
 
 const runOracleQueryClient = (oracle, query, options) => {
-  let client = new AeternityClient (new WebSocketProvider (options.host, options.port))
+  let client = new AeternityClient (new WebsocketProvider (options.host, options.port))
 
   client.addConnectionListener(new ConnectionListener({
     onOpen: () => {

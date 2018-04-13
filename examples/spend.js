@@ -18,7 +18,7 @@
  */
 
 const url = require('url')
-const program = require ('commander')
+const program = require('commander')
 const {AeternityClient, Crypto} = require('../')
 const {HttpProvider} = AeternityClient.providers
 
@@ -27,11 +27,11 @@ const wallet = {
   pub: process.env['WALLET_PUB']
 }
 
-function spend (receiver, amount, { host }) {
+function spend (receiver, amount, {host}) {
   const node = url.parse(host)
   const client = new AeternityClient(new HttpProvider(node.hostname, node.port, {secured: node.protocol === 'https:'}))
 
-  client.base.spend(receiver, parseInt(amount), wallet).then(({ tx_hash }) => {
+  client.base.spend(receiver, parseInt(amount), wallet).then(({tx_hash}) => {
     console.log(`Waiting for ${tx_hash} to be mined...`)
     return client.tx.waitForTransaction(tx_hash)
   })
