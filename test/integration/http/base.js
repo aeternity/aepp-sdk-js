@@ -82,7 +82,8 @@ describe ('Http service base', () => {
     })
   })
   describe ('getInfo', () => {
-    it('should return some info', async function () {
+    // TODO re-enable once node with debug support exists, again
+    it.skip('should return some info', async function () {
       let info = await utils.httpProvider.base.getInfo ()
       assert.ok (info)
     })
@@ -104,7 +105,8 @@ describe ('Http service base', () => {
     })
   })
   describe ('getBalances', () => {
-    it('should return something', async () => {
+    // TODO re-enable once node with debug support exists, again
+    it.skip('should return something', async () => {
       let data = await utils.httpProvider.base.getBalances ()
       assert.ok(data)
     })
