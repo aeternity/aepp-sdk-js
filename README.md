@@ -5,7 +5,7 @@ navigation: 5
 ---
 
 # aepp-sdk-js
-A wrapper for the æternity Epoch network. [Github](https://github.com/aeternity/aepp-sdk-js)
+A wrapper for the æternity Epoch network. [Github repository here](https://github.com/aeternity/aepp-sdk-js)
 
 #### Disclaimer
 
