@@ -5,8 +5,7 @@
   "main": "../dist/aepp-sdk.js",
   "scripts": {
     "build": "babel lib --presets @babel/env --out-dir dist",
-    "prepublish": "npm run build",
-    "preinstall": "npm run build",
+    "postinstall": "postinstall-build dist",
     "decrypt": "node bin/keys decrypt",
     "test": "mocha --recursive --require @babel/register",
     "test-jenkins": "mocha --recursive --require @babel/register --reporter mocha-junit-reporter"
@@ -20,6 +19,7 @@
     "axios": "^0.17.1",
     "bs58check": "^2.1.1",
     "elliptic": "^6.4.0",
+    "postinstall-build": "^5.0.1",
     "rlp": "^2.0.0",
     "sha.js": "^2.4.10",
     "websocket": "^1.0.25"
