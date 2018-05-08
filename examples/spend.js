@@ -19,7 +19,8 @@
 
 const url = require('url')
 const program = require('commander')
-const {AeternityClient, Crypto} = require('../')
+
+const {AeternityClient, Crypto} = require('../dist/aepp-sdk.js')
 const {HttpProvider} = AeternityClient.providers
 
 const wallet = {
@@ -37,12 +38,12 @@ function spend (receiver, amount, {host}) {
   })
 }
 
-program.version ('0.1.0')
+program.version('0.1.0')
 
 program
   .command('spend <receiver> <amount>')
   .option('-h, --host [host]', 'Node to connect to', 'http://localhost:3013')
   .action(spend)
 
-program.parse (process.argv)
-if (program.args.length === 0) program.help ()
+program.parse(process.argv)
+if (program.args.length === 0) program.help()

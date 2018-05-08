@@ -1,0 +1,39 @@
+{
+  "/block/height/{height}" : {
+    "get" : {
+      "tags" : [ "external", "chain" ],
+      "description" : "Get a block by height",
+      "operationId" : "GetBlockByHeight",
+      "produces" : [ "application/json" ],
+      "parameters" : [ {
+        "name" : "height",
+        "in" : "path",
+        "description" : "Height of the block to fetch",
+        "required" : true,
+        "type" : "integer"
+      }, {
+        "name" : "tx_encoding",
+        "in" : "query",
+        "description" : "Transactions encoding",
+        "required" : false,
+        "type" : "string",
+        "default" : "json",
+        "enum" : [ "message_pack", "json" ]
+      } ],
+      "responses" : {
+        "200" : {
+          "description" : "The block being found",
+          "schema" : {
+            "$ref" : "#/definitions/GenericBlock"
+          }
+        },
+        "404" : {
+          "description" : "Block not found",
+          "schema" : {
+            "$ref" : "#/definitions/Error"
+          }
+        }
+      }
+    }
+  }
+}

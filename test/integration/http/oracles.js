@@ -15,17 +15,18 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-
-require ('@babel/polyfill')
-
-
-const chai = require ('chai')
+const chai = require('chai')
 const assert = chai.assert
-const utils = require ('../../utils')
+const utils = require('../../utils')
 
-import { generateKeyPair } from '../../../lib/utils/crypto'
+import Crypto from '../../../src/utils/crypto'
+const { generateKeyPair } = Crypto
 
-describe ('Oracles HTTP endpoint', () => {
+describe('Oracles HTTP endpoint', () => {
+  before(async () => {
+    await utils.httpProvider.provider.ready
+  })
+
   const account = generateKeyPair()
   const { pub } = account
 
@@ -33,7 +34,7 @@ describe ('Oracles HTTP endpoint', () => {
   // key but with a different prefix
   const oracleId = `ok$${pub.split('$')[1]}`
 
-  describe ('register oracle', () => {
+  describe('register oracle', () => {
     it('should register an oracle', async function () {
       this.timeout(utils.TIMEOUT * 2)
 
@@ -72,7 +73,7 @@ describe ('Oracles HTTP endpoint', () => {
         10,
         10,
         5,
-        "whats wrong?",
+        'whats wrong?',
         account
       )
 

@@ -44,7 +44,7 @@ const aensLifecycle = async (domain) => {
   let balance3
 
   try {
-    balance1 = await client1.account.getBalance ()
+    balance1 = await client1.account.getBalance()
     balance3 = await client3.account.getBalance()
     console.log(`Current balances: AK 1 ${balance1}, AK3 ${balance3}`)
   } catch (error) {
@@ -78,6 +78,6 @@ const aensLifecycle = async (domain) => {
 
 aensLifecycle('aepps.aet').then(
   (claimedDomain) => {
-    console.log(claimedDomain ? 'finished with success': 'something went wrong')
+    console.log(claimedDomain ? 'finished with success' : 'something went wrong')
   }
 ).catch((error) => console.log(error))

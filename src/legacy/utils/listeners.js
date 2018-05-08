@@ -15,31 +15,20 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-require('@babel/polyfill')
+class ConnectionListener {
+  constructor ({onOpen, onClosed}) {
+    if (onOpen && typeof onOpen === 'function') {
+      this.onOpen = onOpen
+    }
+    if (onClosed && typeof onClosed === 'function') {
+      this.onClosed = onClosed
+    }
+  }
 
-const chai = require('chai')
-const assert = chai.assert
+  onOpen () {}
+  onClosed () {}
+}
 
-const utils = require('../../utils')
-
-describe('Http accounts service', () => {
-  before(async () => {
-    await utils.httpProvider.provider.ready
-  })
-
-  describe('getTransactions', () => {
-    it('should return something', async function () {
-      this.timeout(utils.TIMEOUT)
-
-      const { pub } = utils.wallets[0]
-
-      // charge wallet first
-      await utils.charge(pub, 10)
-
-      let transactions = await utils.httpProvider.accounts.getTransactions(pub)
-      assert.ok(transactions)
-      assert.isTrue(Array.isArray(transactions))
-      assert.ok(transactions.length)
-    })
-  })
-})
+module.exports = {
+  ConnectionListener
+}

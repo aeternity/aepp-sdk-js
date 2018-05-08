@@ -15,19 +15,22 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-
 require('@babel/polyfill')
 
-const chai = require ('chai')
+const chai = require('chai')
 const assert = chai.assert
 const utils = require('../../utils')
 
 describe('Http service transactions', () => {
+  before(async () => {
+    await utils.httpProvider.provider.ready
+  })
+
   describe('transaction detail', () => {
     it('should return transaction details', async function () {
       this.timeout(utils.TIMEOUT)
-      const { pub:pub1, priv } = utils.wallets[0]
-      const { pub:pub2 } = utils.wallets[1]
+      const { pub: pub1, priv } = utils.wallets[0]
+      const { pub: pub2 } = utils.wallets[1]
       // charge wallet first
       await utils.charge(pub1, 20)
       let txData = await utils.httpProvider.base.getSpendTx(pub2, 10, pub1)
@@ -37,4 +40,3 @@ describe('Http service transactions', () => {
     })
   })
 })
-

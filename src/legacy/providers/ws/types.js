@@ -15,31 +15,23 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-require('@babel/polyfill')
-
-const chai = require('chai')
-const assert = chai.assert
-
-const utils = require('../../utils')
-
-describe('Http accounts service', () => {
-  before(async () => {
-    await utils.httpProvider.provider.ready
-  })
-
-  describe('getTransactions', () => {
-    it('should return something', async function () {
-      this.timeout(utils.TIMEOUT)
-
-      const { pub } = utils.wallets[0]
-
-      // charge wallet first
-      await utils.charge(pub, 10)
-
-      let transactions = await utils.httpProvider.accounts.getTransactions(pub)
-      assert.ok(transactions)
-      assert.isTrue(Array.isArray(transactions))
-      assert.ok(transactions.length)
-    })
-  })
-})
+module.exports = {
+  actions: {
+    MINED_BLOCK: 'mined_block',
+    NEW_BLOCK: 'new_block',
+    REGISTER: 'register',
+    RESPONSE: 'response',
+    NEW_ORACLE_QUERY: 'new_oracle_query',
+    NEW_ORACLE_RESPONSE: 'new_oracle_response',
+    QUERY: 'query',
+    SUBSCRIBE: 'subscribe'
+  },
+  origins: {
+    ORACLE: 'oracle',
+    CHAIN: 'chain'
+  },
+  targets: {
+    CHAIN: 'chain',
+    ORACLE: 'oracle'
+  }
+}

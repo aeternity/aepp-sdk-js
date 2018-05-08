@@ -17,7 +17,7 @@
 
 require('@babel/polyfill')
 
-const chai = require ('chai')
+const chai = require('chai')
 const assert = chai.assert
 const utils = require('../../utils')
 
@@ -26,11 +26,11 @@ contract Identity =
   function main (x:int) = x
  `
 
-describe ('Http service contracts', () => {
+describe('Http service contracts', () => {
   let byteCode
   let createTx
-  describe ('compile', () => {
-    it ('should compile a ring contract', async () => {
+  describe('compile', () => {
+    it('should compile a ring contract', async () => {
       byteCode = await utils.httpProvider.contracts.compile(
         exampleContract,
         ''
