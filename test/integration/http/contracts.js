@@ -40,13 +40,15 @@ describe ('Http service contracts', () => {
     })
   })
   describe('call ring', () => {
-    it('should return a value', async () => {
+    // TODO:
+    it.skip('should return a value', async () => {
       let result = await utils.httpProvider.contracts.callStatic('ring', byteCode, 'main', '1')
       assert.equal(1, result)
     })
   })
   describe('encodeCallData ring', () => {
-    it('should return an encoded string', async () => {
+    // TODO:
+    it.skip('should return an encoded string', async () => {
       let calldata = await utils.httpProvider.contracts.encodeCallData('ring', byteCode, 'main', ['1'])
       assert.isTrue(calldata.startsWith('0x'))
     })
