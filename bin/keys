@@ -46,8 +46,8 @@ const extractReadableKeys = (dir, options) => {
   prompt.get(promptSchema, function (err, result) {
     let password = result.password
 
-    let key = fs.readFileSync(path.join(pwd, dir, 'key'))
-    let pubKey = fs.readFileSync(path.join(pwd, dir, 'key.pub'))
+    let key = fs.readFileSync(path.join(pwd, dir, 'sign_key'))
+    let pubKey = fs.readFileSync(path.join(pwd, dir, 'sign_key.pub'))
 
     let decrypted = Crypto.decryptPrivateKey(password, key)
 
@@ -56,6 +56,7 @@ const extractReadableKeys = (dir, options) => {
 
     console.log(`Private key (hex): ${privateHex}`)
     console.log(`Public key (base check): ak\$${Crypto.encodeBase58Check(decryptedPub)}`)
+    console.log(`Public key (hex): ${decryptedPub.toString('hex')}`)
   })
 }
 
