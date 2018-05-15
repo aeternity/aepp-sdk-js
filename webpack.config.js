@@ -12,6 +12,8 @@ module.exports = (env, argv) => {
       globalObject: 'typeof self !== \'undefined\' ? self : this'
     },
     mode: 'development',
+    target: 'node',
+    node: { process: false },
     devtool: argv.mode === 'production' ? false : 'eval-source-map',
     module: {
       rules: [
