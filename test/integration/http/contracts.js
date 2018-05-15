@@ -42,14 +42,12 @@ describe ('Http service contracts', () => {
     })
   })
   describe('call sophia', () => {
-    // TODO:
     it('should return a value', async () => {
       let result = await utils.httpProvider.contracts.callStatic('sophia', byteCode, 'main', '1')
       assert.equal(1, result)
     })
   })
   describe('encodeCallData sophia', () => {
-    // TODO:
     it('should return an encoded string', async () => {
       let calldata = await utils.httpProvider.contracts.encodeCallData('sophia', byteCode, 'main', ['1'])
       assert.isTrue(calldata.startsWith('0x'))
