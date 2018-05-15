@@ -15,31 +15,34 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-require('@babel/polyfill')
+const EventEmitter = require('events').EventEmitter
 
-const chai = require('chai')
-const assert = chai.assert
+class WebSocketProxy extends EventEmitter {
+  constructor (host, port, endpoint) {
+    super()
 
-const utils = require('../../utils')
+    this.wsProvider = new WebSocket(`ws://${host}:${port}/${endpoint}`)
+    this.readyState = this.wsProvider.readyState
 
-describe('Http accounts service', () => {
-  before(async () => {
-    await utils.httpProvider.provider.ready
-  })
+    this.wsProvider.onclose = () => {
+      this.emit('close')
+      this.readyState = WebSocket.CLOSED
+    }
+    this.wsProvider.onopen = () => {
+      this.emit('open')
+      this.readyState = WebSocket.OPEN
+    }
+    this.wsProvider.onerror = (error) => this.emit('error', error)
+    this.wsProvider.onmessage = (message) => this.emit('message', message.data)
+  }
 
-  describe('getTransactions', () => {
-    it('should return something', async function () {
-      this.timeout(utils.TIMEOUT)
+  send (message) {
+    this.wsProvider.send(message)
+  }
 
-      const { pub } = utils.wallets[0]
+  close () {
+    this.wsProvider.close()
+  }
+}
 
-      // charge wallet first
-      await utils.charge(pub, 10)
-
-      let transactions = await utils.httpProvider.accounts.getTransactions(pub)
-      assert.ok(transactions)
-      assert.isTrue(Array.isArray(transactions))
-      assert.ok(transactions.length)
-    })
-  })
-})
+module.exports = WebSocketProxy

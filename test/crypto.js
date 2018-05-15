@@ -15,13 +15,8 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-
-const fs = require('fs')
-
-const chai = require ('chai')
-const assert = chai.assert
-
-const Crypto = require('../lib/utils/crypto')
+import { assert } from 'chai'
+import Crypto from '../src/utils/crypto'
 
 // These keys are fixations for the encryption lifecycle tests and will
 // not be used for signing
