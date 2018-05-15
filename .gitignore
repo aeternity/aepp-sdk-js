@@ -5,3 +5,5 @@ node_modules
 .tern-project
 .dir-locals.el
 /dist
+/.envrc
+/yarn-error.log
