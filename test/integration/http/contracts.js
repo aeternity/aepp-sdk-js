@@ -21,16 +21,18 @@ const chai = require('chai')
 const assert = chai.assert
 const utils = require('../../utils')
 
+// Sample contract taken from: https://github.com/aeternity/epoch/blob/master/py/tests/integration/identity.aes
 const exampleContract = `
 contract Identity =
-  function main (x:int) = x
+  type state = ()
+  function main(x : int) = x
  `
 
 describe('Http service contracts', () => {
   let byteCode
   let createTx
-  describe('compile', () => {
-    it('should compile a ring contract', async () => {
+  describe ('compile', () => {
+    it ('should compile a sophia contract', async () => {
       byteCode = await utils.httpProvider.contracts.compile(
         exampleContract,
         ''
@@ -39,17 +41,15 @@ describe('Http service contracts', () => {
       assert.isTrue(byteCode.startsWith('0x'))
     })
   })
-  describe('call ring', () => {
-    // TODO:
-    it.skip('should return a value', async () => {
-      let result = await utils.httpProvider.contracts.callStatic('ring', byteCode, 'main', '1')
+  describe('call sophia', () => {
+    it('should return a value', async () => {
+      let result = await utils.httpProvider.contracts.callStatic('sophia', byteCode, 'main', '1')
       assert.equal(1, result)
     })
   })
-  describe('encodeCallData ring', () => {
-    // TODO:
-    it.skip('should return an encoded string', async () => {
-      let calldata = await utils.httpProvider.contracts.encodeCallData('ring', byteCode, 'main', ['1'])
+  describe('encodeCallData sophia', () => {
+    it('should return an encoded string', async () => {
+      let calldata = await utils.httpProvider.contracts.encodeCallData('sophia', byteCode, 'main', ['1'])
       assert.isTrue(calldata.startsWith('0x'))
     })
   })
