@@ -16,8 +16,8 @@
  */
 
 import { Crypto } from '../../../../'
-const {createTxParams, createTxRangeParams} = require('./utils')
-const HttpService = require('./index')
+import { createTxParams, createTxRangeParams } from './utils'
+import HttpService from './index'
 
 class Transactions extends HttpService {
   /**
@@ -178,4 +178,4 @@ class Transactions extends HttpService {
   }
 }
 
-module.exports = Transactions
+export default Transactions

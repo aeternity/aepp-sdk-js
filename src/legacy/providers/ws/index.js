@@ -17,7 +17,7 @@
 
 // const {AeSubscription} = require('./subscriptions')
 
-const WebSocket = require('websocket').w3cwebsocket
+import { w3cwebsocket as WebSocket } from 'websocket'
 
 // let WebSocket
 // if (process.browser || typeof window !== 'undefined') {
@@ -91,4 +91,4 @@ class WebSocketProvider {
   }
 }
 
-module.exports = WebSocketProvider
+export default WebSocketProvider

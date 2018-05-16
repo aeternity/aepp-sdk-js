@@ -15,7 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-const WebSocket = require('ws')
+import WebSocket from 'ws'
 
 class WebSocketProxy extends WebSocket {
   constructor (host, port, endpoint) {
@@ -25,4 +25,4 @@ class WebSocketProxy extends WebSocket {
   }
 }
 
-module.exports = WebSocketProxy
+export default WebSocketProxy

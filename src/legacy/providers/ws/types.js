@@ -15,23 +15,29 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-module.exports = {
-  actions: {
-    MINED_BLOCK: 'mined_block',
-    NEW_BLOCK: 'new_block',
-    REGISTER: 'register',
-    RESPONSE: 'response',
-    NEW_ORACLE_QUERY: 'new_oracle_query',
-    NEW_ORACLE_RESPONSE: 'new_oracle_response',
-    QUERY: 'query',
-    SUBSCRIBE: 'subscribe'
-  },
-  origins: {
-    ORACLE: 'oracle',
-    CHAIN: 'chain'
-  },
-  targets: {
-    CHAIN: 'chain',
-    ORACLE: 'oracle'
-  }
+const actions = {
+  MINED_BLOCK: 'mined_block',
+  NEW_BLOCK: 'new_block',
+  REGISTER: 'register',
+  RESPONSE: 'response',
+  NEW_ORACLE_QUERY: 'new_oracle_query',
+  NEW_ORACLE_RESPONSE: 'new_oracle_response',
+  QUERY: 'query',
+  SUBSCRIBE: 'subscribe'
+}
+
+const origins = {
+  ORACLE: 'oracle',
+  CHAIN: 'chain'
+}
+
+const targets = {
+  CHAIN: 'chain',
+  ORACLE: 'oracle'
+}
+
+export {
+  actions,
+  origins,
+  targets
 }
