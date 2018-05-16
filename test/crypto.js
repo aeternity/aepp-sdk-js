@@ -15,73 +15,74 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+import { describe, it } from 'mocha'
 import { assert, expect } from 'chai'
 import Crypto from '../src/utils/crypto'
 
 // These keys are fixations for the encryption lifecycle tests and will
 // not be used for signing
 const privateKeyAsHex = '4d881dd1917036cc231f9881a0db978c8899dd76a817252418606b02bf6ab9d22378f892b7cc82c2d2739e994ec9953aa36461f1eb5a4a49a5b0de17b3d23ae8'
-const publicKey = 'ak$Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm'
+const privateKey = Buffer.from(privateKeyAsHex, 'hex')
+const publicKeyWithPrefix = 'ak$Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm'
+const publicKey = Buffer.from(Crypto.decodeBase58Check(publicKeyWithPrefix.split('$')[1]))
 
-const txBinary = [248, 76, 12, 1, 160, 35, 120, 248, 146, 183, 204, 130, 194, 210, 115, 158, 153, 78, 201, 149, 58, 163, 100, 97, 241, 235, 90, 74, 73, 165, 176, 222, 23, 179, 210, 58, 232, 160, 63, 40, 35, 12, 40, 65, 38, 215, 218, 236, 136, 133, 42, 120, 160, 179, 18, 191, 241, 162, 198, 203, 209, 173, 89, 136, 202, 211, 158, 59, 12, 122, 1, 1, 1, 132, 84, 101, 115, 116]
-const signature = [95, 146, 31, 37, 95, 194, 36, 76, 58, 49, 167, 156, 127, 131, 142, 248, 25, 121, 139, 109, 59, 243, 203, 205, 16, 172, 115, 143, 254, 236, 33, 4, 43, 46, 16, 190, 46, 46, 140, 166, 76, 39, 249, 54, 38, 27, 93, 159, 58, 148, 67, 198, 81, 206, 106, 237, 91, 131, 27, 14, 143, 178, 130, 2]
+const txBinaryAsArray = [248, 76, 12, 1, 160, 35, 120, 248, 146, 183, 204, 130, 194, 210, 115, 158, 153, 78, 201, 149, 58, 163, 100, 97, 241, 235, 90, 74, 73, 165, 176, 222, 23, 179, 210, 58, 232, 160, 63, 40, 35, 12, 40, 65, 38, 215, 218, 236, 136, 133, 42, 120, 160, 179, 18, 191, 241, 162, 198, 203, 209, 173, 89, 136, 202, 211, 158, 59, 12, 122, 1, 1, 1, 132, 84, 101, 115, 116]
+const txBinary = Buffer.from(txBinaryAsArray)
+const signatureAsArray = [95, 146, 31, 37, 95, 194, 36, 76, 58, 49, 167, 156, 127, 131, 142, 248, 25, 121, 139, 109, 59, 243, 203, 205, 16, 172, 115, 143, 254, 236, 33, 4, 43, 46, 16, 190, 46, 46, 140, 166, 76, 39, 249, 54, 38, 27, 93, 159, 58, 148, 67, 198, 81, 206, 106, 237, 91, 131, 27, 14, 143, 178, 130, 2]
+const signature = Buffer.from(signatureAsArray)
 
 describe('crypto', () => {
   describe('generateKeyPair', () => {
     it('generates an account key pair', () => {
-      let keyPair = Crypto.generateKeyPair()
+      const keyPair = Crypto.generateKeyPair()
       assert.ok(keyPair)
       assert.isTrue(keyPair.pub.startsWith('ak$'))
       assert.isAtLeast(keyPair.pub.length, 52)
       assert.isAtMost(keyPair.pub.length, 53)
     })
   })
+
   describe('encryptPassword', () => {
     describe('generate a password encrypted key pair', () => {
-      let keyPair = Crypto.generateKeyPair(true)
-      let password = 'verysecret'
+      const keyPair = Crypto.generateKeyPair(true)
+      const password = 'verysecret'
 
       it('works for private keys', () => {
-        let privateBinary = keyPair.priv
+        const privateBinary = keyPair.priv
 
-        let encryptedPrivate = Crypto.encryptPrivateKey(password, privateBinary)
-        let decryptedPrivate = Crypto.decryptPrivateKey(password, encryptedPrivate)
-        assert.equal(
-          Buffer.from(decryptedPrivate).toString('hex'),
-          Buffer.from(privateBinary).toString('hex')
-        )
+        const encryptedPrivate = Crypto.encryptPrivateKey(password, privateBinary)
+        const decryptedPrivate = Crypto.decryptPrivateKey(password, encryptedPrivate)
+        assert.deepEqual(decryptedPrivate, privateBinary)
       })
       it('works for public keys', () => {
-        let publicBinary = keyPair.pub
-        let encryptedPublic = Crypto.encryptPublicKey(password, publicBinary)
-        let decryptedPublic = Crypto.decryptPubKey(password, encryptedPublic)
-        assert.equal(
-          Buffer.from(decryptedPublic).toString('hex'),
-          Buffer.from(publicBinary).toString('hex')
-        )
+        const publicBinary = keyPair.pub
+        const encryptedPublic = Crypto.encryptPublicKey(password, publicBinary)
+        const decryptedPublic = Crypto.decryptPubKey(password, encryptedPublic)
+        assert.deepEqual(decryptedPublic, publicBinary)
       })
     })
   })
+
   describe('encodeBase', () => {
     it('can be encoded and decoded', () => {
-      let input = 'helloword010101023'
-      let inputBuffer = Buffer.from(input)
-      let encoded = Crypto.encodeBase58Check(inputBuffer)
-      let decoded = Crypto.decodeBase58Check(encoded)
+      const input = 'helloword010101023'
+      const inputBuffer = Buffer.from(input)
+      const encoded = Crypto.encodeBase58Check(inputBuffer)
+      const decoded = Crypto.decodeBase58Check(encoded)
       assert.equal(input, decoded)
     })
   })
+
   describe('sign', () => {
-    it('should produce correct signature', async () => {
-      let privateKey = Buffer.from(privateKeyAsHex, 'hex')
-      let s = Crypto.sign(Buffer.from(txBinary), privateKey)
-      expect(s).to.eql(Buffer.from(signature))
+    it('should produce correct signature', () => {
+      const s = Crypto.sign(txBinary, privateKey)
+      expect(s).to.eql(signature)
     })
   })
+
   describe('verify', () => {
-    it('should verify tx with correct signature', async () => {
-      let pub = Buffer.from(Crypto.decodeBase58Check(publicKey.split('$')[1]))
-      let result = Crypto.verify(Buffer.from(txBinary), Buffer.from(signature), pub)
+    it('should verify tx with correct signature', () => {
+      const result = Crypto.verify(txBinary, signature, publicKey)
       assert.isTrue(result)
     })
   })
