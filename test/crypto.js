@@ -15,7 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { assert } from 'chai'
+import { assert, expect } from 'chai'
 import Crypto from '../src/utils/crypto'
 
 // These keys are fixations for the encryption lifecycle tests and will
@@ -23,7 +23,6 @@ import Crypto from '../src/utils/crypto'
 const privateKeyAsHex = '4d881dd1917036cc231f9881a0db978c8899dd76a817252418606b02bf6ab9d22378f892b7cc82c2d2739e994ec9953aa36461f1eb5a4a49a5b0de17b3d23ae8'
 const publicKey = 'ak$Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm'
 
-const validUnsignedTx = 'tx$2uE4tuGbXmmXCAxBgykHq8JwrHf38xXtBE8NaUhjahLUaAdquBsspqpGmyEC9QE9gv5Zu4oTMcvoxCiKLDzipkUqBWCVB9Liuk73fqANjiAEtjUv2PsRC7hrRG4qjB6m1d4UVyrag815kodXygDUCaNXgfeqjGbffJy7sBwGd6cruDqYRLxpALxaCZEdY14T3DTvxWDnXGM2pR3Z4o9HujQY9PbDrk8XuuG9gKYFMmxvSRPje34ZXRxkeXicmGfn9TF63PYQhM4EjvAZXsfL2ZdAB8zCQpCVGwFWmuTxSL9yDoZmCwK9gP7g7G2AnsrJZjdv2UZKY6rrHwZLEgpdkADfKvHT9cjvuXcQfBfFRW17PP3fmiPpXaG4BpaiTuf4Cj79egcx2Wo6gB9rBqKndSQeCvUb8a25D2XoR7yyVjF6to2hPnw'
 const txBinary = [248, 76, 12, 1, 160, 35, 120, 248, 146, 183, 204, 130, 194, 210, 115, 158, 153, 78, 201, 149, 58, 163, 100, 97, 241, 235, 90, 74, 73, 165, 176, 222, 23, 179, 210, 58, 232, 160, 63, 40, 35, 12, 40, 65, 38, 215, 218, 236, 136, 133, 42, 120, 160, 179, 18, 191, 241, 162, 198, 203, 209, 173, 89, 136, 202, 211, 158, 59, 12, 122, 1, 1, 1, 132, 84, 101, 115, 116]
 const signature = [95, 146, 31, 37, 95, 194, 36, 76, 58, 49, 167, 156, 127, 131, 142, 248, 25, 121, 139, 109, 59, 243, 203, 205, 16, 172, 115, 143, 254, 236, 33, 4, 43, 46, 16, 190, 46, 46, 140, 166, 76, 39, 249, 54, 38, 27, 93, 159, 58, 148, 67, 198, 81, 206, 106, 237, 91, 131, 27, 14, 143, 178, 130, 2]
 
@@ -72,13 +71,11 @@ describe('crypto', () => {
       assert.equal(input, decoded)
     })
   })
-  describe('sign and verify', () => {
-    it('should work together', async () => {
+  describe('sign', () => {
+    it('should produce correct signature', async () => {
       let privateKey = Buffer.from(privateKeyAsHex, 'hex')
-      let signature = Crypto.sign(validUnsignedTx, privateKey)
-      let pub = Buffer.from(Crypto.decodeBase58Check(publicKey.split('$')[1]))
-      let verified = Crypto.verify(validUnsignedTx, signature, pub)
-      assert.isTrue(verified)
+      let s = Crypto.sign(Buffer.from(txBinary), privateKey)
+      expect(s).to.eql(Buffer.from(signature))
     })
   })
   describe('verify', () => {
