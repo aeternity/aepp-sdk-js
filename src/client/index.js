@@ -164,44 +164,54 @@ const operation = R.memoize((path, method, definition, types) => {
 
   return (url) => {
     const fn = async function () {
-      const [arg, opt] = (() => {
-        if (arguments.length === req.length) {
-          return [arguments, {}]
-        } else if (arguments.length === req.length + 1) {
-          return [R.dropLast(1, arguments), R.last(arguments)]
-        } else {
-          throw Error(`Function call doesn't conform to ${signature}`)
-        }
-      })()
-
-      if (opt.debug) {
-        console.log(`Invoked ${name} with ${R.toString(arg)} ${R.toString(opt)}`)
-      }
-
-      const values = R.merge(R.reject(R.isNil, R.pick(optNames, opt)), R.zipObj(R.pluck('name', req), arg))
-      const conformed = R.mapObjIndexed((val, key) => conform(val, indexedParameters[key], types), values)
-      const expandedPath = expandPath(path, R.pick(pathArgs, conformed))
-
-      const params = (() => {
-        if (method === 'get') {
-          return { params: R.pick(queryArgs, conformed) }
-        } else if (method === 'post') {
-          return conformed[assertOne(bodyArgs)]
-        } else {
-          throw Error(`Unsupported method ${method}`)
-        }
-      })()
-
-      if (opt.debug) {
-        console.log(`Going to ${R.toUpper(method)} ${url}${expandedPath} with ${R.toString(params)}`)
-      }
-
       try {
-        const response = await client(`${url}${expandedPath}`, params, { headers: {'Content-Type': 'application/json'} })
-        return opt.fullResponse ? response : response.data
-      } catch (error) {
-        console.log(destructureClientError(error))
-        throw error
+        const [arg, opt] = (() => {
+          if (arguments.length === req.length) {
+            return [arguments, {}]
+          } else if (arguments.length === req.length + 1) {
+            return [R.dropLast(1, arguments), R.last(arguments)]
+          } else {
+            throw Error(`Function call doesn't conform to ${signature}`)
+          }
+        })()
+
+        if (opt.debug) {
+          console.log(`Invoked ${name} with ${R.toString(arg)} ${R.toString(opt)}`)
+        }
+
+        const values = R.merge(R.reject(R.isNil, R.pick(optNames, opt)), R.zipObj(R.pluck('name', req), arg))
+        const conformed = R.mapObjIndexed((val, key) => {
+          try {
+            return conform(val, indexedParameters[key], types)
+          } catch (e) {
+            throw Error(`validating ${key} against ${val}: ${e.message}`)
+          }
+        }, values)
+        const expandedPath = expandPath(path, R.pick(pathArgs, conformed))
+
+        const params = (() => {
+          if (method === 'get') {
+            return { params: R.pick(queryArgs, conformed) }
+          } else if (method === 'post') {
+            return conformed[assertOne(bodyArgs)]
+          } else {
+            throw Error(`Unsupported method ${method}`)
+          }
+        })()
+
+        if (opt.debug) {
+          console.log(`Going to ${R.toUpper(method)} ${url}${expandedPath} with ${R.toString(params)}`)
+        }
+
+        try {
+          const response = await client(`${url}${expandedPath}`, params, { headers: {'Content-Type': 'application/json'} })
+          return opt.fullResponse ? response : response.data
+        } catch (error) {
+          console.log(destructureClientError(error))
+          throw error
+        }
+      } catch (e) {
+        throw Error(`While calling ${signature}, ${e.message}`)
       }
     }
 
