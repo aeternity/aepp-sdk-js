@@ -15,31 +15,26 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-require('@babel/polyfill')
+function leftPad (length, inputBuffer) {
+  let fill = length - inputBuffer.length
+  if (fill > 0) {
+    let fillArray = new Uint8Array(fill)
+    fillArray.fill(0, fill)
+    return Buffer.concat([fillArray, inputBuffer])
+  } else {
+    return inputBuffer
+  }
+}
 
-const chai = require('chai')
-const assert = chai.assert
+function rightPad (length, inputBuffer) {
+  let fill = length - inputBuffer.length
+  if (fill > 0) {
+    let fillArray = new Uint8Array(fill)
+    fillArray.fill(0, fill)
+    return Buffer.concat([inputBuffer, fillArray])
+  } else {
+    return inputBuffer
+  }
+}
 
-const utils = require('../../utils')
-
-describe('Http accounts service', () => {
-  before(async () => {
-    await utils.httpProvider.provider.ready
-  })
-
-  describe('getTransactions', () => {
-    it('should return something', async function () {
-      this.timeout(utils.TIMEOUT)
-
-      const { pub } = utils.wallets[0]
-
-      // charge wallet first
-      await utils.charge(pub, 10)
-
-      let transactions = await utils.httpProvider.accounts.getTransactions(pub)
-      assert.ok(transactions)
-      assert.isTrue(Array.isArray(transactions))
-      assert.ok(transactions.length)
-    })
-  })
-})
+export { leftPad, rightPad }

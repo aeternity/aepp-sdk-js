@@ -15,31 +15,26 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-require('@babel/polyfill')
+class AeSubscription {
+  constructor (options = {}) {
+    this.origin = options && options.origin
+    this.action = options && options.action
+    if (options && options.update) {
+      this.update = options.update
+    }
+    if (options && options.matches) {
+      this.matches = options.matches
+    }
+  }
 
-const chai = require('chai')
-const assert = chai.assert
+  matches (data) {
+    return (typeof this.origin === 'undefined' || this.origin === data.origin) &&
+      (typeof this.action === 'undefined' || this.action === data.action)
+  }
 
-const utils = require('../../utils')
+  update (data) {}
+}
 
-describe('Http accounts service', () => {
-  before(async () => {
-    await utils.httpProvider.provider.ready
-  })
-
-  describe('getTransactions', () => {
-    it('should return something', async function () {
-      this.timeout(utils.TIMEOUT)
-
-      const { pub } = utils.wallets[0]
-
-      // charge wallet first
-      await utils.charge(pub, 10)
-
-      let transactions = await utils.httpProvider.accounts.getTransactions(pub)
-      assert.ok(transactions)
-      assert.isTrue(Array.isArray(transactions))
-      assert.ok(transactions.length)
-    })
-  })
-})
+module.exports = {
+  AeSubscription
+}
