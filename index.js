@@ -17,9 +17,4 @@
  *
  */
 
-const AeternityClient = require('./dist/aepp-sdk')
-
-module.exports = {
-  AeternityClient,
-  Crypto: require('./dist/utils/crypto')
-}
+module.exports = require('./dist/aepp-sdk')

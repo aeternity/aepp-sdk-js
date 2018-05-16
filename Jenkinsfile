@@ -34,7 +34,7 @@ pipeline {
   post {
     always {
       junit 'test-results.xml'
-      archive 'dist/aepp-sdk.js'
+      archive 'dist/*'
       sh 'docker-compose down -v'
     }
   }

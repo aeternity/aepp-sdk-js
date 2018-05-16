@@ -3,6 +3,7 @@
   "version": "0.12.0-0.1.0-alpha.1",
   "description": "SDK for the Æternity blockchain",
   "main": "dist/aepp-sdk.js",
+  "browser": "dist/aepp-sdk.browser.js",
   "scripts": {
     "build": "webpack -p",
     "build:dev": "webpack --mode=development",
@@ -26,9 +27,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/aeternity/aepp-sdk-js"
-  },
-  "browser": {
-    "./src/providers/ws/websocket.js": "./src/providers/ws/browser/websocket.js"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.46",
