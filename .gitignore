@@ -7,3 +7,4 @@ node_modules
 /dist
 /.envrc
 /yarn-error.log
+.idea
