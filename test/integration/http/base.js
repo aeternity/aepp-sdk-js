@@ -49,7 +49,7 @@ describe('Http service base', () => {
   })
   describe('waitForNBlocks', () => {
     it('should at least wait for N blocks', async function () {
-      this.timeout(utils.TIMEOUT)
+      this.timeout(utils.TIMEOUT * 4)
       let start = await utils.httpProvider.base.getHeight()
       let period = 2
       let finish = await utils.httpProvider.base.waitNBlocks(period)
