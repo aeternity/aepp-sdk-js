@@ -21,6 +21,8 @@ const assert = chai.assert
 
 const utils = require('../../utils')
 
+utils.plan(10)
+
 describe('Http service base', () => {
   before(async function () {
     this.timeout(utils.TIMEOUT)
@@ -73,8 +75,7 @@ describe('Http service base', () => {
       const { pub: pub1 } = utils.wallets[0]
       const { pub: pub2 } = utils.wallets[1]
 
-      // charge wallets first
-      await utils.charge(pub1, 10)
+      // charge wallet first
       await utils.charge(pub2, 10)
 
       const balanceBefore = await utils.httpProvider.accounts.getBalance(pub2)
