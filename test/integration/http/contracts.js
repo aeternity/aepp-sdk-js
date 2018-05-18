@@ -29,6 +29,11 @@ contract Identity =
  `
 
 describe('Http service contracts', () => {
+  before(async function () {
+    this.timeout(utils.TIMEOUT)
+    await utils.waitReady()
+  })
+
   let byteCode
   let createTx
   describe ('compile', () => {

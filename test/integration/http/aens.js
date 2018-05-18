@@ -27,10 +27,9 @@ const assertHasPointer = async (name, address, type = 'account') => {
 }
 
 describe('Http service aens', function () {
-  this.timeout(120000)
-
-  before(async () => {
-    await utils.httpProvider.provider.ready
+  before(async function () {
+    this.timeout(utils.TIMEOUT)
+    await utils.waitReady()
   })
 
   describe('two-step name claiming', () => {

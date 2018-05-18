@@ -22,8 +22,9 @@ const assert = chai.assert
 const utils = require('../../utils')
 
 describe('Http service transactions', () => {
-  before(async () => {
-    await utils.httpProvider.provider.ready
+  before(async function () {
+    this.timeout(utils.TIMEOUT)
+    await utils.waitReady()
   })
 
   describe('transaction detail', () => {
