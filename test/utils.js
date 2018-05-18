@@ -57,6 +57,7 @@ if (!sourceWallet.pub || !sourceWallet.priv) {
 const wallets = Array(3).fill().map(() => Crypto.generateKeyPair())
 
 let planned = 0
+let charged = false
 
 function plan (amount) {
   planned += amount
@@ -73,7 +74,10 @@ const TIMEOUT = 120000
 async function waitReady () {
   await httpProvider.provider.ready
   await httpProvider.base.waitForBlock(10, 1000)
-  await charge(wallets[0].pub, planned)
+  if (!charged) {
+    await charge(wallets[0].pub, planned)
+    charged = true
+  }
 }
 
 export {
