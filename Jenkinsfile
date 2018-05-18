@@ -36,6 +36,7 @@ pipeline {
       junit 'test-results.xml'
       archive 'dist/*'
       sh 'docker-compose down -v ||:'
+      sh 'rm -rf node_modules'
     }
   }
 }
