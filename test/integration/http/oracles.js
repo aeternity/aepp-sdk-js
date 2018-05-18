@@ -23,8 +23,9 @@ import Crypto from '../../../src/utils/crypto'
 const { generateKeyPair } = Crypto
 
 describe('Oracles HTTP endpoint', () => {
-  before(async () => {
-    await utils.httpProvider.provider.ready
+  before(async function () {
+    this.timeout(utils.TIMEOUT)
+    await utils.waitReady()
   })
 
   const account = generateKeyPair()

@@ -18,15 +18,16 @@
 import { assert, expect } from 'chai'
 import { internal } from '../src/client'
 import Ae from '../src'
-import { url, internalUrl } from './utils'
+import { url, internalUrl, waitReady, TIMEOUT } from './utils'
 import * as R from 'ramda'
 import op from './sample-operation.json'
 
 describe('client', function () {
-  this.timeout(120000)
   let client
 
   before(async function () {
+    this.timeout(TIMEOUT)
+    await waitReady()
     client = await Ae.create(url, { internal: internalUrl })
   })
 
@@ -99,6 +100,7 @@ describe('client', function () {
   })
 
   it('gets blocks by height for the first 10 blocks', () => {
+    this.timeout(TIMEOUT)
     expect(client.getBlockByHeight).to.be.a('function')
     expect(client.getBlockByHeight.length).to.equal(2)
 

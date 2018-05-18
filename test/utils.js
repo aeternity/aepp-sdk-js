@@ -64,6 +64,11 @@ async function charge (receiver, amount) {
 
 const TIMEOUT = 120000
 
+async function waitReady () {
+  await httpProvider.provider.ready
+  await httpProvider.base.waitForBlock(10, 1000)
+}
+
 export {
   httpProvider,
   assertIsBlock,
@@ -72,5 +77,6 @@ export {
   charge,
   TIMEOUT,
   url,
-  internalUrl
+  internalUrl,
+  waitReady
 }
