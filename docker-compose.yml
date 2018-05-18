@@ -1,7 +1,9 @@
 version: '3'
 services:
   sdk:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.ci
     depends_on: [node1, node2, node3]
     entrypoint: docker/wait-for-it.sh node1:3013 --
     env_file: [./docker/sdk.env]
