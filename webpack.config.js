@@ -25,7 +25,9 @@ function configure (filename, opts = {}) {
   return (env, argv) => Object.assign({
     output: {
       path: path.resolve(__dirname, 'dist'),
-      filename
+      filename,
+      library: 'AeternityClient',
+      libraryTarget: 'umd'
     }
   }, common(env, argv), opts)
 }
