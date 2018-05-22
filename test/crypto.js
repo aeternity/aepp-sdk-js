@@ -86,4 +86,38 @@ describe('crypto', () => {
       assert.isTrue(result)
     })
   })
+
+  describe('personal messages', () => {
+    const message = 'test'
+    const messageSignatureAsHex = '0d969f938571d1436106af659bc1893e7efeda685d7f096be39d0f2c68f712e4e9ba7551df31350a4a6d07943fbfc1cbe0acfe8271cd2dcdaac3274168e53901'
+    const messageSignature = Buffer.from(messageSignatureAsHex, 'hex')
+
+    const messageNonASCII = 'tæst'
+    const messageNonASCIISignatureAsHex = '0aad557b424b33f4a2e415339d7ee143dea1f00c4a7c6c8680e1f70ff21e42b17e0e3729420daaed962999e089a18d099d39dc4a5ab4598d2b062106b59f1d01'
+    const messageNonASCIISignature = Buffer.from(messageNonASCIISignatureAsHex, 'hex')
+
+    describe('sign', () => {
+      it('should produce correct signature of message', () => {
+        const s = Crypto.signPersonalMessage(message, privateKey)
+        expect(s).to.eql(messageSignature)
+      })
+
+      it('should produce correct signature of message with non-ASCII chars', () => {
+        const s = Crypto.signPersonalMessage(messageNonASCII, privateKey)
+        expect(s).to.eql(messageNonASCIISignature)
+      })
+    })
+
+    describe('verify', () => {
+      it('should verify message', () => {
+        const result = Crypto.verifyPersonalMessage(message, messageSignature, publicKey)
+        assert.isTrue(result)
+      })
+
+      it('should verify message with non-ASCII chars', () => {
+        const result = Crypto.verifyPersonalMessage(messageNonASCII, messageNonASCIISignature, publicKey)
+        assert.isTrue(result)
+      })
+    })
+  })
 })

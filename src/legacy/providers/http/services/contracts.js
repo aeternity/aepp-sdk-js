@@ -15,8 +15,8 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-const HttpService = require('./index')
-const {createTxCallParams} = require('./utils')
+import HttpService from './index'
+import { createTxCallParams } from './utils'
 
 class Contracts extends HttpService {
   async getCreateTx (code, owner, options = {}) {
@@ -99,4 +99,4 @@ class Contracts extends HttpService {
   }
 }
 
-module.exports = Contracts
+export default Contracts

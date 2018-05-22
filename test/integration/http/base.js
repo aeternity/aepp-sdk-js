@@ -21,9 +21,12 @@ const assert = chai.assert
 
 const utils = require('../../utils')
 
+utils.plan(10)
+
 describe('Http service base', () => {
-  before(async () => {
-    await utils.httpProvider.provider.ready
+  before(async function () {
+    this.timeout(utils.TIMEOUT)
+    await utils.waitReady(this)
   })
 
   let prevHash
@@ -49,7 +52,7 @@ describe('Http service base', () => {
   })
   describe('waitForNBlocks', () => {
     it('should at least wait for N blocks', async function () {
-      this.timeout(utils.TIMEOUT)
+      this.timeout(utils.TIMEOUT * 4)
       let start = await utils.httpProvider.base.getHeight()
       let period = 2
       let finish = await utils.httpProvider.base.waitNBlocks(period)
@@ -72,8 +75,7 @@ describe('Http service base', () => {
       const { pub: pub1 } = utils.wallets[0]
       const { pub: pub2 } = utils.wallets[1]
 
-      // charge wallets first
-      await utils.charge(pub1, 10)
+      // charge wallet first
       await utils.charge(pub2, 10)
 
       const balanceBefore = await utils.httpProvider.accounts.getBalance(pub2)

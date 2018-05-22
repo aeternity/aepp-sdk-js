@@ -28,7 +28,14 @@ contract Identity =
   function main(x : int) = x
  `
 
+utils.plan(20)
+
 describe('Http service contracts', () => {
+  before(async function () {
+    this.timeout(utils.TIMEOUT)
+    await utils.waitReady(this)
+  })
+
   let byteCode
   let createTx
   describe ('compile', () => {
@@ -57,9 +64,6 @@ describe('Http service contracts', () => {
     it('should create a tx', async function () {
       this.timeout(utils.TIMEOUT)
 
-      // charge wallet first
-      await utils.charge(utils.wallets[0].pub, 10)
-
       createTx = await utils.httpProvider.contracts.getCreateTx(byteCode, utils.wallets[0].pub)
       assert.ok(createTx)
       assert.isTrue(createTx.tx.startsWith('tx$'))
@@ -68,9 +72,6 @@ describe('Http service contracts', () => {
   describe('deployContract', () => {
     it('should deploy a contract', async function () {
       this.timeout(utils.TIMEOUT * 4)
-
-      // charge wallet first
-      await utils.charge(utils.wallets[0].pub, 10)
 
       const ret = await utils.httpProvider.contracts.deployContract(byteCode, utils.wallets[0])
       await utils.httpProvider.tx.waitForTransaction(ret['tx_hash'])

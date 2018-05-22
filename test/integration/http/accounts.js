@@ -22,9 +22,12 @@ const assert = chai.assert
 
 const utils = require('../../utils')
 
+utils.plan(1)
+
 describe('Http accounts service', () => {
-  before(async () => {
-    await utils.httpProvider.provider.ready
+  before(async function () {
+    this.timeout(utils.TIMEOUT)
+    await utils.waitReady(this)
   })
 
   describe('getTransactions', () => {
@@ -32,9 +35,6 @@ describe('Http accounts service', () => {
       this.timeout(utils.TIMEOUT)
 
       const { pub } = utils.wallets[0]
-
-      // charge wallet first
-      await utils.charge(pub, 10)
 
       let transactions = await utils.httpProvider.accounts.getTransactions(pub)
       assert.ok(transactions)

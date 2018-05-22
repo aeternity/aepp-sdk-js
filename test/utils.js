@@ -56,6 +56,13 @@ if (!sourceWallet.pub || !sourceWallet.priv) {
 
 const wallets = Array(3).fill().map(() => Crypto.generateKeyPair())
 
+let planned = 0
+let charged = false
+
+function plan (amount) {
+  planned += amount
+}
+
 async function charge (receiver, amount) {
   console.log(`Charging ${receiver} with ${amount}`)
   const { tx_hash } = await httpProvider.base.spend(receiver, amount, sourceWallet)
@@ -63,6 +70,16 @@ async function charge (receiver, amount) {
 }
 
 const TIMEOUT = 120000
+
+async function waitReady (mocha) {
+  mocha.timeout(TIMEOUT * 10)
+  await httpProvider.provider.ready
+  await httpProvider.base.waitForBlock(10, 1000)
+  if (!charged && planned > 0) {
+    await charge(wallets[0].pub, planned)
+    charged = true
+  }
+}
 
 export {
   httpProvider,
@@ -72,5 +89,7 @@ export {
   charge,
   TIMEOUT,
   url,
-  internalUrl
+  internalUrl,
+  waitReady,
+  plan
 }

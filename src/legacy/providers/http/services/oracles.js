@@ -15,7 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-const HttpService = require('./index')
+import HttpService from './index'
 
 class Oracles extends HttpService {
   async getOracles () {
@@ -111,4 +111,4 @@ class Oracles extends HttpService {
   }
 }
 
-module.exports = Oracles
+export default Oracles

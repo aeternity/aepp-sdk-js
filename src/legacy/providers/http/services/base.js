@@ -15,7 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-const HttpService = require('./index')
+import HttpService from './index'
 
 /**
  * Wraps the core functionalities of the Epoch HTTP API
@@ -179,4 +179,4 @@ class Base extends HttpService {
   }
 }
 
-module.exports = Base
+export default Base

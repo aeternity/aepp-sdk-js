@@ -19,7 +19,7 @@
 */
 
 import { Crypto } from '../../../../'
-const HttpService = require('./index')
+import HttpService from './index'
 
 /**
  * Wraps all AENS related services of the Epoch HTTP API
@@ -229,4 +229,4 @@ class AENS extends HttpService {
   }
 }
 
-module.exports = AENS
+export default AENS

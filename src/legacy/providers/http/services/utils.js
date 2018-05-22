@@ -48,7 +48,7 @@ const createTxCallParams = (options) => {
   }
 }
 
-module.exports = {
+export {
   createTxRangeParams,
   createTxParams,
   createTxCallParams

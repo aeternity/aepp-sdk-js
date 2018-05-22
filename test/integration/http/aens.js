@@ -26,11 +26,12 @@ const assertHasPointer = async (name, address, type = 'account') => {
   assert.equal(address, JSON.parse(nameData.pointers)[`${type}_pubkey`])
 }
 
-describe('Http service aens', function () {
-  this.timeout(120000)
+utils.plan(20)
 
-  before(async () => {
-    await utils.httpProvider.provider.ready
+describe('Http service aens', function () {
+  before(async function () {
+    this.timeout(utils.TIMEOUT)
+    await utils.waitReady(this)
   })
 
   describe('two-step name claiming', () => {
@@ -41,8 +42,6 @@ describe('Http service aens', function () {
       let commitment = await utils.httpProvider.aens.getCommitmentHash(name, salt)
       const account = utils.wallets[0]
       assert.ok(commitment)
-      // charge wallet first
-      await utils.charge(account.pub, 10)
       // preclaim the domain
       let preclaimData = await utils.httpProvider.aens.preClaim(commitment, 1, account)
       // wait one block
@@ -62,9 +61,6 @@ describe('Http service aens', function () {
       let name = utils.randomAeName()
       const account = utils.wallets[0]
       // use the two step aggregation method for convenience
-
-      // charge wallet first
-      await utils.charge(utils.wallets[0].pub, 10)
 
       let claimData = await utils.httpProvider.aens.fullClaim(name, 1, 1, account)
 

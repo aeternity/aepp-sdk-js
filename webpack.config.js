@@ -1,19 +1,9 @@
 const path = require('path')
 
-module.exports = (env, argv) => {
+const common = (env, argv) => {
   return {
     entry: './src/index.js',
-    output: {
-      path: path.resolve(__dirname, 'dist'),
-      filename: 'aepp-sdk.js',
-      library: 'AeternityClient',
-      libraryTarget: 'umd',
-      umdNamedDefine: true,
-      globalObject: 'typeof self !== \'undefined\' ? self : this'
-    },
     mode: 'development',
-    target: 'node',
-    node: { process: false },
     devtool: argv.mode === 'production' ? false : 'eval-source-map',
     module: {
       rules: [
@@ -27,9 +17,22 @@ module.exports = (env, argv) => {
           loader: 'import-glob-loader'
         }
       ]
-    },
-    externals: {
-      crypto: 'crypto'
     }
   }
 }
+
+function configure (filename, opts = {}) {
+  return (env, argv) => Object.assign({
+    output: {
+      path: path.resolve(__dirname, 'dist'),
+      filename,
+      library: 'AeternityClient',
+      libraryTarget: 'umd'
+    }
+  }, common(env, argv), opts)
+}
+
+module.exports = [
+  configure('aepp-sdk.js', { target: 'node' }),
+  configure('aepp-sdk.browser.js')
+]

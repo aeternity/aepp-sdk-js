@@ -2,18 +2,18 @@ pipeline {
   agent {
     dockerfile {
       filename 'Dockerfile.ci'
-      args '-v /etc/group:/etc/group:ro -v /etc/passwd:/etc/passwd:ro -v /var/lib/jenkins:/var/lib/jenkins'
+      args '-v /etc/group:/etc/group:ro ' +
+           '-v /etc/passwd:/etc/passwd:ro ' +
+           '-v /var/lib/jenkins:/var/lib/jenkins ' +
+           '-v /usr/bin/docker:/usr/bin/docker:ro ' +
+           '--network=host'
     }
-  }
-
-  environment {
-    TEST_URL = credentials('TEST_URL')
-    TEST_NODE = credentials('TEST_NODE')
   }
 
   stages {
     stage('Build') {
       steps {
+        sh 'ln -sf /node_modules ./'
         sh 'yarn build'
       }
     }
@@ -23,7 +23,8 @@ pipeline {
         withCredentials([usernamePassword(credentialsId: 'genesis-wallet',
                                           usernameVariable: 'WALLET_PUB',
                                           passwordVariable: 'WALLET_PRIV')]) {
-          sh 'yarn test-jenkins'
+          sh 'docker-compose -H localhost:2376 build'
+          sh 'docker-compose -H localhost:2376 run sdk yarn test-jenkins'
         }
       }
     }
@@ -32,7 +33,8 @@ pipeline {
   post {
     always {
       junit 'test-results.xml'
-      archive 'dist/aepp-sdk.js'
+      archive 'dist/*'
+      sh 'docker-compose -H localhost:2376 down -v ||:'
     }
   }
 }
