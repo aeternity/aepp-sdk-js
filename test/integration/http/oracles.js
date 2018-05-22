@@ -22,13 +22,15 @@ const utils = require('../../utils')
 import Crypto from '../../../src/utils/crypto'
 const { generateKeyPair } = Crypto
 
+utils.plan(20)
+
 describe('Oracles HTTP endpoint', () => {
   before(async function () {
     this.timeout(utils.TIMEOUT)
     await utils.waitReady()
   })
 
-  const account = generateKeyPair()
+  const account = utils.wallets[0]
   const { pub } = account
 
   // We know for a fact, what the oracle id will be the same as the public
@@ -38,9 +40,6 @@ describe('Oracles HTTP endpoint', () => {
   describe('register oracle', () => {
     it('should register an oracle', async function () {
       this.timeout(utils.TIMEOUT * 2)
-
-      // charge wallet first
-      await utils.charge(pub, 10)
 
       const { tx_hash } = await utils.httpProvider.oracles.register(
         'unused query format',
@@ -64,9 +63,6 @@ describe('Oracles HTTP endpoint', () => {
   describe('query an oracle', () => {
     it.skip('should query an oracle', async function () {
       this.timeout(utils.TIMEOUT * 2)
-
-      // charge wallet first
-      await utils.charge(pub, 10)
 
       let data = await utils.httpProvider.oracles.query(
         oracleId,

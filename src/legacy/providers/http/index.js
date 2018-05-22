@@ -14,14 +14,14 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-const axios = require('axios')
-const Base = require('./services/base')
-const AENS = require('./services/aens')
-const Accounts = require('./services/accounts')
-const Transactions = require('./services/transactions')
-const Oracles = require('./services/oracles')
-const Contracts = require('./services/contracts')
-const Ae = require('../../../client').default
+import axios from 'axios'
+import Base from './services/base'
+import AENS from './services/aens'
+import Accounts from './services/accounts'
+import Transactions from './services/transactions'
+import Oracles from './services/oracles'
+import Contracts from './services/contracts'
+import Ae from '../../../client'
 
 const CURRENT_API_VERSION = 'v2'
 const DEFAULT_HEADERS = {'Content-Type': 'application/json'}
@@ -92,4 +92,4 @@ class AeHttpProvider {
   }
 }
 
-module.exports = AeHttpProvider
+export default AeHttpProvider

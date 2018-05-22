@@ -15,8 +15,8 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-const {actions, origins, targets} = require('../types')
-const {AeSubscription} = require('../subscriptions')
+import { actions, origins, targets } from '../types'
+import AeSubscription from '../subscriptions'
 
 class Oracles {
   /**
@@ -218,4 +218,4 @@ class Oracles {
   }
 }
 
-module.exports = Oracles
+export default Oracles

@@ -15,8 +15,8 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-const HttpProvider = require('./providers/http')
-const WebsocketProvider = require('./providers/ws')
+import HttpProvider from './providers/http'
+import WebsocketProvider from './providers/ws'
 
 /**
  * Client to interact with the Epoch reference implementation
@@ -74,4 +74,4 @@ AeternityClient.providers = {
   HttpProvider
 }
 
-module.exports = AeternityClient
+export default AeternityClient

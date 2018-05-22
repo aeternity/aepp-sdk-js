@@ -1,9 +1,11 @@
 version: '3'
 services:
   sdk:
-    build: .
-    depends_on: [node1, node2, node3]
-    entrypoint: docker/wait-for-it.sh node1:3013 --
+    build:
+      context: .
+      dockerfile: Dockerfile.ci
+    depends_on: [node]
+    entrypoint: docker/wait-for-it.sh node:3013 --
     env_file: [./docker/sdk.env]
     environment:
       - WALLET_PRIV=${WALLET_PRIV}
@@ -11,47 +13,19 @@ services:
     volumes:
       - .:/app
 
-  node1:
+  node:
     image: aeternity/epoch:${TAG}
-    hostname: node1
+    hostname: node
     ports: [3013, 3113]
     environment:
       EPOCH_CONFIG: /home/epoch/epoch.yaml
     command: -aecore expected_mine_rate ${EPOCH_MINE_RATE:-15000}
     volumes:
-      - ${PWD}/docker/epoch_node1_mean16.yaml:/home/epoch/epoch.yaml
-      - ${PWD}/docker/keys/node1:/home/epoch/node/keys
-      - node1_db:/home/epoch/node/data/mnesia
-      - node1_keys:/home/epoch/node/keys
-
-  node2:
-    image: aeternity/epoch:${TAG}
-    hostname: node2
-    environment:
-      EPOCH_CONFIG: /home/epoch/epoch.yaml
-    command: -aecore expected_mine_rate ${EPOCH_MINE_RATE:-15000}
-    volumes:
-      - ${PWD}/docker/epoch_node2_mean16.yaml:/home/epoch/epoch.yaml
-      - ${PWD}/docker/keys/node2:/home/epoch/node/keys
-      - node2_db:/home/epoch/node/data/mnesia
-      - node2_keys:/home/epoch/node/keys
-
-  node3:
-    image: aeternity/epoch:${TAG}
-    hostname: node3
-    environment:
-      EPOCH_CONFIG: /home/epoch/epoch.yaml
-    command: -aecore expected_mine_rate ${EPOCH_MINE_RATE:-15000}
-    volumes:
-      - ${PWD}/docker/epoch_node3_mean16.yaml:/home/epoch/epoch.yaml
-      - ${PWD}/docker/keys/node3:/home/epoch/node/keys
-      - node3_db:/home/epoch/node/data/mnesia
-      - node3_keys:/home/epoch/node/keys
+      - ${PWD}/docker/epoch_node_mean16.yaml:/home/epoch/epoch.yaml
+      - ${PWD}/docker/keys/node:/home/epoch/node/keys
+      - node_db:/home/epoch/node/data/mnesia
+      - node_keys:/home/epoch/node/keys
 
 volumes:
-  node1_db:
-  node1_keys:
-  node2_db:
-  node2_keys:
-  node3_db:
-  node3_keys:
+  node_db:
+  node_keys:

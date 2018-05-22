@@ -15,8 +15,8 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-const {createTxParams} = require('./utils')
-const HttpService = require('./index')
+import { createTxParams } from './utils'
+import HttpService from './index'
 
 /**
  * Wraps all account related services of the Epoch HTTP API
@@ -61,4 +61,4 @@ class Accounts extends HttpService {
   }
 }
 
-module.exports = Accounts
+export default Accounts

@@ -35,6 +35,4 @@ class AeSubscription {
   update (data) {}
 }
 
-module.exports = {
-  AeSubscription
-}
+export default AeSubscription
