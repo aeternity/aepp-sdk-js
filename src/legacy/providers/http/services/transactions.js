@@ -114,11 +114,7 @@ class Transactions extends HttpService {
   }
 
   async send (tx) {
-    const result = await this.client.ae.api.postTx({ tx })
-    result.wait = async () => {
-      return this.client.tx.waitForTransaction(result.txHash)
-    }
-    return result
+    return this.client.ae.api.postTx({ tx })
   }
 
   async sendSigned (txHash, privateKey, options = {}) {
