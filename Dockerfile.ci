@@ -9,5 +9,4 @@ RUN curl -L https://github.com/docker/compose/releases/download/1.21.2/docker-co
 ADD package.json yarn.lock /
 RUN yarn install
 RUN ln -f -s /node_modules/.bin/* /usr/local/bin/
-RUN groupadd -g 993 docker
 WORKDIR /app

@@ -5,10 +5,8 @@ pipeline {
       args '-v /etc/group:/etc/group:ro ' +
            '-v /etc/passwd:/etc/passwd:ro ' +
            '-v /var/lib/jenkins:/var/lib/jenkins ' +
-           '-v /usr/bin/docker-compose:/usr/bin/docker-compose:ro ' +
            '-v /usr/bin/docker:/usr/bin/docker:ro ' +
-           '-v /var/run/docker.sock:/var/run/docker.sock ' +
-           '--group-add docker'
+           '--network=host'
     }
   }
 
@@ -24,8 +22,8 @@ pipeline {
         withCredentials([usernamePassword(credentialsId: 'genesis-wallet',
                                           usernameVariable: 'WALLET_PUB',
                                           passwordVariable: 'WALLET_PRIV')]) {
-          sh 'docker-compose build'
-          sh 'docker-compose run sdk yarn test-jenkins'
+          sh 'docker-compose -H localhost:2376 build'
+          sh 'docker-compose -H localhost:2376 run sdk yarn test-jenkins'
         }
       }
     }
@@ -36,7 +34,6 @@ pipeline {
       junit 'test-results.xml'
       archive 'dist/*'
       sh 'docker-compose down -v ||:'
-      sh 'rm -rf node_modules'
     }
   }
 }
