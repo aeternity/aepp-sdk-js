@@ -69,12 +69,13 @@ async function charge (receiver, amount) {
   await httpProvider.tx.waitForTransaction(tx_hash)
 }
 
-const TIMEOUT = 180000
+const TIMEOUT = 120000
 
-async function waitReady () {
+async function waitReady (mocha) {
+  mocha.timeout(TIMEOUT * 10)
   await httpProvider.provider.ready
   await httpProvider.base.waitForBlock(10, 1000)
-  if (!charged) {
+  if (!charged && planned > 0) {
     await charge(wallets[0].pub, planned)
     charged = true
   }

@@ -27,7 +27,7 @@ describe('client', function () {
 
   before(async function () {
     this.timeout(TIMEOUT)
-    await waitReady()
+    await waitReady(this)
     client = await Ae.create(url, { internal: internalUrl })
   })
 

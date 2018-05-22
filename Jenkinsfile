@@ -34,7 +34,7 @@ pipeline {
     always {
       junit 'test-results.xml'
       archive 'dist/*'
-      sh 'docker-compose down -v ||:'
+      sh 'docker-compose -H localhost:2376 down -v ||:'
     }
   }
 }
