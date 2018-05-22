@@ -69,7 +69,7 @@ async function charge (receiver, amount) {
   await httpProvider.tx.waitForTransaction(tx_hash)
 }
 
-const TIMEOUT = 120000
+const TIMEOUT = 180000
 
 async function waitReady () {
   await httpProvider.provider.ready

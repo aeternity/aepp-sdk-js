@@ -30,7 +30,7 @@ describe('Oracles HTTP endpoint', () => {
     await utils.waitReady()
   })
 
-  const account = generateKeyPair()
+  const account = utils.wallets[0]
   const { pub } = account
 
   // We know for a fact, what the oracle id will be the same as the public
