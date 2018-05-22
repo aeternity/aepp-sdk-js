@@ -13,6 +13,7 @@ pipeline {
   stages {
     stage('Build') {
       steps {
+        sh 'ln -sf /node_modules ./'
         sh 'yarn build'
       }
     }
