@@ -87,6 +87,21 @@ function verify (str, signature, publicKey) {
   return nacl.sign.detached.verify(new Uint8Array(str), signature, publicKey)
 }
 
+function personalMessageToBinary (message) {
+  const p = Buffer.from('‎Æternity Signed Message:\n', 'utf8')
+  const msg = Buffer.from(message, 'utf8')
+  if (msg.length >= 0xFD) throw new Error('message too long')
+  return Buffer.concat([Buffer.from([p.length]), p, Buffer.from([msg.length]), msg])
+}
+
+function signPersonalMessage (message, privateKey) {
+  return sign(personalMessageToBinary(message), privateKey)
+}
+
+function verifyPersonalMessage (str, signature, publicKey) {
+  return verify(personalMessageToBinary(str), signature, publicKey)
+}
+
 export default {
   hash,
   encodeBase58Check,
@@ -122,6 +137,9 @@ export default {
 
   sign,
   verify,
+
+  signPersonalMessage,
+  verifyPersonalMessage,
 
   decodeTx (txHash) {
     let decodedTx = decodeBase58Check(txHash.split('$')[1])
