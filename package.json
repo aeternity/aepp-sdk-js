@@ -1,7 +1,7 @@
 {
   "name": "@aeternity/aepp-sdk",
   "version": "0.13.0-0.1.0",
-  "description": "SDK for the Æternity blockchain",
+  "description": "SDK for the æternity blockchain",
   "main": "dist/aepp-sdk.js",
   "browser": "dist/aepp-sdk.browser.js",
   "scripts": {
