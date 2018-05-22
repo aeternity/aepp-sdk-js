@@ -19,11 +19,11 @@ import HttpService from './index'
 
 class Oracles extends HttpService {
   async getOracles () {
-    return this.client.ae.getActiveRegisteredOracles()
+    return this.client.ae.api.getActiveRegisteredOracles()
   }
 
   async getOracleQuestions (oracleId, from, max) {
-    return this.client.ae.getOracleQuestions(oracleId, { from, max })
+    return this.client.ae.api.getOracleQuestions(oracleId, { from, max })
   }
 
   /**
@@ -51,7 +51,7 @@ class Oracles extends HttpService {
       'query_format': queryFormat,
       'account': pub
     }
-    const data = await this.client.ae.postOracleRegister(payload)
+    const data = await this.client.ae.api.postOracleRegister(payload)
     await this.client.tx.sendSigned(data.tx, priv, options)
     return data
   }
@@ -86,7 +86,7 @@ class Oracles extends HttpService {
       'oracle_pubkey': oracleId
     }
 
-    const data = await this.client.ae.postOracleQuery(payload)
+    const data = await this.client.ae.api.postOracleQuery(payload)
     return this.client.tx.sendSigned(data.tx, account.priv, options)
   }
 
@@ -106,7 +106,7 @@ class Oracles extends HttpService {
       'fee': 0,
       'nonce': options && options.nonce
     }
-    const data = await this.client.ae.postOracleResponse(payload)
+    const data = await this.client.ae.api.postOracleResponse(payload)
     return this.client.tx.sendSigned(data.tx, privateKey)
   }
 }

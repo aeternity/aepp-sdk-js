@@ -27,7 +27,7 @@ class Base extends HttpService {
    * @returns {Promise<void>}
    */
   async getHeight () {
-    const { height } = await this.client.ae.getTop()
+    const { height } = await this.client.ae.api.getTop()
     return height
   }
 
@@ -148,7 +148,7 @@ class Base extends HttpService {
    * @returns {Promise<*>}
    */
   async getInfo () {
-    return this.client.ae.getInfo()
+    return this.client.ae.api.getInfo()
   }
 
   /**
@@ -156,7 +156,7 @@ class Base extends HttpService {
    * @returns {Promise<*>}
    */
   async getBalances () {
-    return this.client.ae.getAccountsBalances()
+    return this.client.ae.api.getAccountsBalances()
   }
 
   async getSpendTx (recipient, amount, sender, { fee = 1, nonce, payload = '' } = {}) {
@@ -170,7 +170,7 @@ class Base extends HttpService {
     }
 
     try {
-      const data = await this.client.ae.postSpend(dataToSend)
+      const data = await this.client.ae.api.postSpend(dataToSend)
       return data
     } catch (e) {
       console.log(e)

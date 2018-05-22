@@ -101,12 +101,12 @@ describe('client', function () {
 
   it('gets blocks by height for the first 10 blocks', () => {
     this.timeout(TIMEOUT)
-    expect(client.getBlockByHeight).to.be.a('function')
-    expect(client.getBlockByHeight.length).to.equal(2)
+    expect(client.api.getBlockByHeight).to.be.a('function')
+    expect(client.api.getBlockByHeight.length).to.equal(2)
 
     return Promise.all(
       R.map(async i => {
-        const result = await client.getBlockByHeight(i)
+        const result = await client.api.getBlockByHeight(i)
         expect(result.height, i).to.equal(i)
       }, R.range(1, 11))
     )
@@ -119,6 +119,6 @@ describe('client', function () {
   })
 
   it('throws on unsupported interface', () => {
-    expect(() => client.getPubKey()).to.throw()
+    expect(() => client.api.getPubKey()).to.throw()
   })
 })

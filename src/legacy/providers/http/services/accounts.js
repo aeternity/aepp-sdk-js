@@ -34,7 +34,7 @@ class Accounts extends HttpService {
    * @returns {Promise<Accounts.getBalance>}
    */
   async getBalance (account, {height, hash} = {}) {
-    const { balance } = await this.client.ae.getAccountBalance(account, {height, hash})
+    const { balance } = await this.client.ae.api.getAccountBalance(account, {height, hash})
     return balance
   }
 
@@ -56,7 +56,7 @@ class Accounts extends HttpService {
       'tx_encoding': 'json'
     }
 
-    const { transactions } = await this.client.ae.getAccountTransactions(account, params)
+    const { transactions } = await this.client.ae.api.getAccountTransactions(account, params)
     return transactions
   }
 }

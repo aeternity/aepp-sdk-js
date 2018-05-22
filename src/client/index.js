@@ -252,10 +252,11 @@ async function create (url, { internalUrl, websocketUrl } = {}) {
     }
   }, methods)), paths))))
 
-  return Object.freeze(Object.assign({
+  return Object.freeze({
     version,
-    methods: R.keys(methods)
-  }, methods))
+    methods: R.keys(methods),
+    api: methods
+  })
 }
 
 const internal = {

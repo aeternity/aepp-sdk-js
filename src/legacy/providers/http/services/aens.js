@@ -38,7 +38,7 @@ class AENS extends HttpService {
    * @returns {Promise<string>}
    */
   async getCommitmentHash (name, salt) {
-    const { commitment } = await this.client.ae.getCommitmentHash(name, salt)
+    const { commitment } = await this.client.ae.api.getCommitmentHash(name, salt)
     return commitment
   }
 
@@ -49,7 +49,7 @@ class AENS extends HttpService {
    * @returns {Promise<*>}
    */
   async getName (name) {
-    return this.client.ae.getName(name)
+    return this.client.ae.api.getName(name)
   }
 
   /**
@@ -73,7 +73,7 @@ class AENS extends HttpService {
         'nonce': options && options.nonce,
         'account': pub
       }
-      const data = await this.client.ae.postNamePreclaim(payload)
+      const data = await this.client.ae.api.postNamePreclaim(payload)
       await this.client.tx.sendSigned(data.tx, priv)
       return data
     } else {
@@ -100,7 +100,7 @@ class AENS extends HttpService {
         'nonce': options && options.nonce,
         'account': pub
       }
-      const data = await this.client.ae.postNameClaim(payload)
+      const data = await this.client.ae.api.postNameClaim(payload)
       let txHash = data.tx
       await this.client.tx.sendSigned(txHash, priv)
       return data
@@ -140,7 +140,7 @@ class AENS extends HttpService {
         pointers,
         account: pub
       }
-      const data = await this.client.ae.postNameUpdate(inputData)
+      const data = await this.client.ae.api.postNameUpdate(inputData)
       await this.client.tx.sendSigned(data.tx, priv)
       return data
     } else {
@@ -168,7 +168,7 @@ class AENS extends HttpService {
         nonce: options && options.nonce,
         account: pub
       }
-      const data = await this.client.ae.postNameTransfer(payload)
+      const data = await this.client.ae.api.postNameTransfer(payload)
       await this.client.tx.sendSigned(data.tx, priv)
       return data
     } else {
@@ -194,7 +194,7 @@ class AENS extends HttpService {
         nonce: options && options.nonce,
         account: pub
       }
-      const data = await this.client.ae.postNameRevoke(payload)
+      const data = await this.client.ae.api.postNameRevoke(payload)
       await this.client.tx.sendSigned(data.tx, priv)
       return data
     } else {
