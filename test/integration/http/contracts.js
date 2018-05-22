@@ -33,7 +33,7 @@ utils.plan(20)
 describe('Http service contracts', () => {
   before(async function () {
     this.timeout(utils.TIMEOUT)
-    await utils.waitReady()
+    await utils.waitReady(this)
   })
 
   let byteCode
