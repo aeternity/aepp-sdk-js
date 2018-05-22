@@ -26,7 +26,7 @@ utils.plan(20)
 describe('Http service transactions', () => {
   before(async function () {
     this.timeout(utils.TIMEOUT)
-    await utils.waitReady()
+    await utils.waitReady(this)
   })
 
   describe('transaction detail', () => {

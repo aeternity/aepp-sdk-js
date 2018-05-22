@@ -27,7 +27,7 @@ utils.plan(1)
 describe('Http accounts service', () => {
   before(async function () {
     this.timeout(utils.TIMEOUT)
-    await utils.waitReady()
+    await utils.waitReady(this)
   })
 
   describe('getTransactions', () => {

@@ -27,7 +27,7 @@ utils.plan(20)
 describe('Oracles HTTP endpoint', () => {
   before(async function () {
     this.timeout(utils.TIMEOUT)
-    await utils.waitReady()
+    await utils.waitReady(this)
   })
 
   const account = utils.wallets[0]

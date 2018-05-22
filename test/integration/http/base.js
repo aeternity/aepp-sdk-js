@@ -26,7 +26,7 @@ utils.plan(10)
 describe('Http service base', () => {
   before(async function () {
     this.timeout(utils.TIMEOUT)
-    await utils.waitReady()
+    await utils.waitReady(this)
   })
 
   let prevHash
