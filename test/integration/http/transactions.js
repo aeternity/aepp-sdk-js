@@ -34,9 +34,9 @@ describe('Http service transactions', () => {
       this.timeout(utils.TIMEOUT)
       const { pub: pub1, priv } = utils.wallets[0]
       const { pub: pub2 } = utils.wallets[1]
-      let txData = await utils.httpProvider.base.getSpendTx(pub2, 10, pub1)
-      await utils.httpProvider.tx.sendSigned(txData.tx, priv)
-      const height = await utils.httpProvider.tx.waitForTransaction(txData['tx_hash'])
+      const { tx } = await utils.httpProvider.base.getSpendTx(pub2, 10, pub1)
+      const result = await utils.httpProvider.tx.sendSigned(tx, priv)
+      const height = await result.wait()
       assert.notEqual(-1, height)
     })
   })

@@ -77,8 +77,7 @@ class Base extends HttpService {
     const { pub, priv } = account
     if (priv) {
       let data = await this.client.base.getSpendTx(recipient, amount, pub, { fee, nonce, payload })
-      await this.client.tx.sendSigned(data.tx, priv)
-      return data
+      return this.client.tx.sendSigned(data.tx, priv)
     } else {
       throw new Error('Private key is not set')
     }
@@ -91,8 +90,7 @@ class Base extends HttpService {
    * @returns {Promise<*>}
    */
   async getBlockByHeight (height) {
-    let {data} = await this.client.get('block-by-height', {height}, false)
-    return data
+    return this.client.ae.api.getBlockByHeight(height)
   }
 
   /**
@@ -102,8 +100,7 @@ class Base extends HttpService {
    * @returns {Promise<*>}
    */
   async getBlockByHash (hash) {
-    let {data} = await this.client.get('block-by-hash', {hash}, false)
-    return data
+    return this.client.ae.api.getBlockByHash(hash)
   }
 
   /**
@@ -113,9 +110,7 @@ class Base extends HttpService {
    * @returns {Promise<*>}
    */
   async getGenesisBlock (encoding) {
-    let params = {'tx_encoding': encoding}
-    let {data} = await this.client.get('block/genesis', params, true)
-    return data
+    return this.client.ae.api.getBlockGenesis({ txEncoding: encoding })
   }
 
   /**
@@ -125,9 +120,7 @@ class Base extends HttpService {
    * @returns {Promise<*>}
    */
   async getPendingBlock (encoding) {
-    let params = {'tx_encoding': encoding}
-    let {data} = await this.client.get('block/pending', params, true)
-    return data
+    return this.client.ae.api.getBlockPending({ txEncoding: encoding })
   }
 
   /**
@@ -137,8 +130,7 @@ class Base extends HttpService {
    * @returns {Promise<*>}
    */
   async getVersion () {
-    let {data} = await this.client.get('version')
-    return data
+    return this.client.ae.api.getVersion()
   }
 
   /**
@@ -165,17 +157,11 @@ class Base extends HttpService {
       sender,
       fee,
       payload,
-      'recipient_pubkey': recipient,
+      recipientPubkey: recipient,
       nonce
     }
 
-    try {
-      const data = await this.client.ae.api.postSpend(dataToSend)
-      return data
-    } catch (e) {
-      console.log(e)
-      return undefined
-    }
+    return this.client.ae.api.postSpend(dataToSend)
   }
 }
 

@@ -114,7 +114,11 @@ class Transactions extends HttpService {
   }
 
   async send (tx) {
-    return this.client.ae.api.postTx({ tx })
+    const result = await this.client.ae.api.postTx({ tx })
+    result.wait = async () => {
+      return this.client.tx.waitForTransaction(result.txHash)
+    }
+    return result
   }
 
   async sendSigned (txHash, privateKey, options = {}) {
@@ -140,7 +144,7 @@ class Transactions extends HttpService {
   }
 
   async getTransaction (txHash) {
-    const { transaction } = await this.client.ae.api.getTx(txHash, { 'tx_encoding': 'json' })
+    const { transaction } = await this.client.ae.api.getTx(txHash, { txEncoding: 'json' })
     return transaction
   }
 
@@ -160,7 +164,7 @@ class Transactions extends HttpService {
             } catch (e) {
               return reject(e)
             }
-            let blockHeight = transaction['block_height']
+            const { blockHeight } = transaction
             if (blockHeight !== -1) {
               // TODO integrate into proper logging
               console.log(`\rTx has been mined in ${blockHeight}`)

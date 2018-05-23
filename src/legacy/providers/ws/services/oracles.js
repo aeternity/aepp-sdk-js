@@ -111,10 +111,10 @@ class Oracles {
       'payload': {
         'type': 'OracleQueryTxObject',
         'vsn': 1,
-        'oracle_pubkey': oracleId,
-        'query_fee': queryFee,
-        'query_ttl': {'type': 'delta', 'value': queryTtl},
-        'response_ttl': {'type': 'delta', 'value': responseTtl},
+        'oraclePubkey': oracleId,
+        'queryFee': queryFee,
+        'queryTtl': {'type': 'delta', 'value': queryTtl},
+        'responseTtl': {'type': 'delta', 'value': responseTtl},
         'fee': fee,
         'query': typeof query.toString !== 'undefined' ? query.toString() : query
       }

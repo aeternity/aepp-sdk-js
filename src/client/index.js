@@ -19,13 +19,21 @@ import axios from 'axios'
 import * as R from 'ramda'
 import urlparse from 'url'
 
+function snakeToPascal (s) {
+  return s.replace(/_./g, match => R.toUpper(match[1]))
+}
+
+function pascalToSnake (s) {
+  return s.replace(/[A-Z]/g, match => `_${R.toLower(match)}`)
+}
+
 function expandPath (path, replacements) {
   return R.reduce((path, [key, value]) => path.replace(`{${key}}`, value), path, R.toPairs(replacements))
 }
 
 async function remoteEpochVersion (url) {
   const result = await axios.get(urlparse.resolve(url, '/v2/version'))
-  return result.data.version
+  return result.data
 }
 
 function swag (version) {
@@ -74,8 +82,10 @@ const conformTypes = {
   },
   object (value, spec, types) {
     if (typeof value === 'object') {
-      const { required, properties } = spec
-      const missing = R.difference(required || [], R.keys(value))
+      const required = R.map(snakeToPascal, spec.required || [])
+      const properties = pascalizeKeys(spec.properties)
+      const missing = R.difference(required, R.keys(value))
+
       if (missing.length > 0) {
         throw Error(`Required properties missing: ${R.join(', ', missing)}`)
       } else {
@@ -129,6 +139,27 @@ function classifyParameters (parameters) {
   }
 }
 
+function pascalizeParameters (parameters) {
+  return R.map(o => R.assoc('name', snakeToPascal(o.name), o), parameters)
+}
+
+const traverseKeys = R.curry((fn, o) => {
+  const dispatch = {
+    Object: o => R.fromPairs(R.map(([k, v]) => [fn(k), traverseKeys(fn, v)], R.toPairs(o))),
+    Array: o => R.map(traverseKeys(fn), o)
+  }
+
+  return (dispatch[R.type(o)] || R.identity)(o)
+})
+
+function snakizeKeys (o) {
+  return traverseKeys(pascalToSnake, o)
+}
+
+function pascalizeKeys (o) {
+  return traverseKeys(snakeToPascal, o)
+}
+
 function operationSignature (name, req, opts) {
   const args = req.length ? `${R.join(', ', R.pluck('name', req))}` : null
   const opt = opts.length ? `{${R.join(', ', R.pluck('name', opts))}}` : null
@@ -146,18 +177,20 @@ function assertOne (coll) {
 
 function destructureClientError (error) {
   const { method, url } = error.config
-  const { status } = error.response
+  const { status, data } = error.response
+  const reason = R.has('reason', data) ? data.reason : R.toString(data)
 
-  return `${R.toUpper(method)} to ${url} failed with ${status}: ${R.toString(error.response.data)}`
+  return `${R.toUpper(method)} to ${url} failed with ${status}: ${reason}`
 }
 
 const operation = R.memoize((path, method, definition, types) => {
   const { operationId, parameters, description } = definition
   const name = `${R.toLower(R.head(operationId))}${R.drop(1, operationId)}`
+  const pascalized = pascalizeParameters(parameters)
 
-  const { pathArgs, queryArgs, bodyArgs, req, opts } = classifyParameters(parameters)
+  const { pathArgs, queryArgs, bodyArgs, req, opts } = classifyParameters(pascalized)
   const optNames = R.pluck('name', opts)
-  const indexedParameters = R.indexBy(R.prop('name'), parameters)
+  const indexedParameters = R.indexBy(R.prop('name'), pascalized)
 
   const signature = operationSignature(name, req, opts)
   const client = httpClients[method]
@@ -184,12 +217,13 @@ const operation = R.memoize((path, method, definition, types) => {
           try {
             return conform(val, indexedParameters[key], types)
           } catch (e) {
-            throw Error(`validating ${key} against ${val}: ${e.message}`)
+            e.value = val
+            e.message = `validating ${key}: ${e.message}`
+            throw e
           }
         }, values)
-        const expandedPath = expandPath(path, R.pick(pathArgs, conformed))
-
-        const params = (() => {
+        const expandedPath = expandPath(path, snakizeKeys(R.pick(pathArgs, conformed)))
+        const params = snakizeKeys((() => {
           if (method === 'get') {
             return { params: R.pick(queryArgs, conformed) }
           } else if (method === 'post') {
@@ -197,7 +231,7 @@ const operation = R.memoize((path, method, definition, types) => {
           } else {
             throw Error(`Unsupported method ${method}`)
           }
-        })()
+        })())
 
         if (opt.debug) {
           console.log(`Going to ${R.toUpper(method)} ${url}${expandedPath} with ${R.toString(params)}`)
@@ -205,13 +239,14 @@ const operation = R.memoize((path, method, definition, types) => {
 
         try {
           const response = await client(`${url}${expandedPath}`, params, { headers: {'Content-Type': 'application/json'} })
-          return opt.fullResponse ? response : response.data
+          return opt.fullResponse ? response : pascalizeKeys(response.data)
         } catch (error) {
           console.log(destructureClientError(error))
           throw error
         }
       } catch (e) {
-        throw Error(`While calling ${signature}, ${e.message}`)
+        e.message = `While calling ${signature}, ${e.message}`
+        throw e
       }
     }
 
@@ -234,8 +269,14 @@ const operation = R.memoize((path, method, definition, types) => {
 })
 
 async function create (url, { internalUrl, websocketUrl } = {}) {
-  const version = await remoteEpochVersion(url)
-  const { basePath, paths, definitions } = swag(version)
+  const { version, revision } = await remoteEpochVersion(url)
+  const { basePath, paths, definitions } = (() => {
+    try {
+      return swag(revision)
+    } catch (e) {
+      return swag(version)
+    }
+  })()
 
   const methods = R.indexBy(R.prop('name'), R.flatten(R.values(R.mapObjIndexed((methods, path) => R.values(R.mapObjIndexed((definition, method) => {
     const op = operation(path, method, definition, definitions)
@@ -254,6 +295,7 @@ async function create (url, { internalUrl, websocketUrl } = {}) {
 
   return Object.freeze({
     version,
+    revision,
     methods: R.keys(methods),
     api: methods
   })
@@ -263,7 +305,10 @@ const internal = {
   conform,
   operation,
   expandPath,
-  assertOne
+  assertOne,
+  snakeToPascal,
+  pascalToSnake,
+  traverseKeys
 }
 
 export default {

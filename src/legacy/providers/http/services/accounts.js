@@ -53,7 +53,7 @@ class Accounts extends HttpService {
       ...createTxParams({txTypes, excludeTxTypes}),
       limit,
       offset,
-      'tx_encoding': 'json'
+      txEncoding: 'json'
     }
 
     const { transactions } = await this.client.ae.api.getAccountTransactions(account, params)

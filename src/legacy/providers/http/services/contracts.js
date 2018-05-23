@@ -17,85 +17,85 @@
 
 import HttpService from './index'
 import { createTxCallParams } from './utils'
+import * as R from 'ramda'
 
 class Contracts extends HttpService {
   async getCreateTx (code, owner, options = {}) {
     let contractTxData = {
       ...createTxCallParams(options),
       owner,
-      'vm_version': options.vmVersion || 1,
+      vmVersion: options.vmVersion || 1,
       code: code,
-      'call_data': options.callData || '',
+      callData: options.callData || '',
       deposit: options.deposit || 4
     }
-    const {data} = await this.client.post('tx/contract/create', contractTxData)
-    return data
+
+    return this.client.ae.api.postContractCreate(contractTxData)
   }
 
   async getCallTxWithData (callData, contractPubKey, options = {}) {
     const payload = {
       ...createTxCallParams(options),
-      'caller': options.caller,
-      'vm_version': options.vmVersion || 1,
-      'call_data': callData,
-      'contract': contractPubKey
+      caller: options.caller,
+      vmVersion: options.vmVersion || 1,
+      callData: callData,
+      contract: contractPubKey
     }
-    const {data} = await this.client.post('tx/contract/call', payload)
-    return data
+
+    return this.client.ae.api.postContractCall(payload)
   }
 
   async getCallTx (contractAddress, callData, options = {}) {
     const payload = {
       ...createTxCallParams(options),
-      'caller': options.caller,
-      'vm_version': options.vmVersion || 1,
-      'call_data': callData,
-      'contract': contractAddress
+      caller: options.caller,
+      vmVersion: options.vmVersion || 1,
+      callData: callData,
+      contract: contractAddress
     }
-    const {data} = await this.client.post('tx/contract/call', payload)
-    return data
+
+    return this.client.ae.api.postContractCall(payload)
   }
 
   async compile (code, options) {
-    const inputData = {code, options}
-    const {data} = await this.client.post('contract/compile', inputData)
-    return data.bytecode
+    const { bytecode } = await this.client.ae.api.compileContract({code, options})
+    return bytecode
   }
 
   async callStatic (abi, code, func, arg) {
-    const inputData = {abi: abi, code, 'function': func, arg}
-    const {data} = await this.client.post('contract/call', inputData)
-    return data.out
+    const { out } = await this.client.ae.api.callContract({abi: abi, code, 'function': func, arg})
+    return out
   }
 
   async encodeCallData (abi, code, func, args = []) {
     const body = {code, abi, 'function': func, 'arg': args.join(',')}
-    const {data} = await this.client.post('contract/encode-calldata', body)
-    return data.calldata
+    const { calldata } = await this.client.ae.api.encodeCalldata(body)
+    return calldata
   }
 
   async deployContract (code, account, options = {}) {
     // Create the transaction
     const data = await this.getCreateTx(code, account.pub, options)
-    await this.client.tx.sendSigned(data.tx, account.priv, options)
-    return data
+    const send = await this.client.tx.sendSigned(data.tx, account.priv, options)
+
+    return R.merge(data, send)
   }
 
   async getComputeCallTx (contract, func, args, options = {}) {
     const body = {
-      'gas_price': options.gasPrice || 1,
-      'caller': options.caller,
-      'vm_version': options.vmVersion || 1,
-      'amount': options.amount || 0,
-      'contract': contract,
-      'fee': options.fee || 1,
+      gasPrice: options.gasPrice || 1,
+      caller: options.caller,
+      vmVersion: options.vmVersion || 1,
+      amount: options.amount || 0,
+      contract: contract,
+      fee: options.fee || 1,
       'function': func,
-      'gas': options.gas || 1,
-      'arguments': args,
-      'nonce': options.nonce
+      gas: options.gas || 1,
+      arguments: args,
+      nonce: options.nonce
     }
-    const {data} = await this.client.post('tx/contract/call/compute', body)
-    return data
+
+    return this.client.ae.api.postContractCallCompute(body)
   }
 }
 
