@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
-## [Unreleased]
+## [0.13.0-0.1.0]
 ### Added
 - This change log file
 
@@ -11,12 +11,14 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 - Generate basic API directly from Swagger files, also validate input data
 - Compiled library now self-contained with all dependencies
 - Use Webpack 4 based cross-platform (Node/Web) compilation
-- Package description now reads `SDK for the Æternity blockchain`
+- Package description now reads `SDK for the æternity blockchain`
 - Authors are now taken from `AUTHORS` instead of `package.json`
+- Moved code examples from README to separate file in docs
 
 ### Removed
+- Defunct scripts; will be brought back later
 
 ### Fixed
 - More consistent code examples
 
-[Unreleased]: https://github.com/aeternity/aepp-sdk-js/compare/v0.10.0-0.1.0...HEAD
+[0.13.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.10.0-0.1.0...0.13.0-0.1.0
