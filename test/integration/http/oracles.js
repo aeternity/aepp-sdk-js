@@ -77,12 +77,9 @@ describe('Oracles HTTP endpoint', () => {
       await query.wait()
 
       const transactions = await utils.httpProvider.accounts.getTransactions(pub, {
-        excludeTxTypes: ['coinbase_tx'],
         txTypes: ['oracle_query_tx'] // epoch/apps/aetx/src/aetx.erl:200
       })
       assert.isTrue(transactions.length > 0)
-
-      // queryId = transactions[0]
     })
   })
 
