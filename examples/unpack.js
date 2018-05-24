@@ -6,7 +6,9 @@ const RLP = require('rlp')
 
 const OBJECT_TAGS = {
   SIGNED_TX: 11,
-  CHANNEL_CREATE_TX: 50
+  CHANNEL_CREATE_TX: 50,
+  CHANNEL_CLOSE_MUTUAL_TX: 53,
+  CHANNEL_OFFCHAIN_TX: 57
 }
 
 function readInt(buf) {
@@ -20,6 +22,19 @@ function readSignatures(buf) {
     signatures.push(aepp.Crypto.encodeBase58Check(buf[i]))
 
   return signatures
+}
+
+function readOffChainTXUpdates(buf) {
+  const updates = []
+
+  for (let i = 0; i < buf.length; i++)
+    updates.push([
+      'ak$' + aepp.Crypto.encodeBase58Check(buf[i][0]),
+      'ak$' + aepp.Crypto.encodeBase58Check(buf[i][1]),
+      readInt(buf[i][2])
+    ])
+
+  return updates
 }
 
 function deserializeObject(binary) {
@@ -46,6 +61,29 @@ function deserializeObject(binary) {
         ttl: readInt(binary[8]),
         fee: readInt(binary[9]),
         nonce: readInt(binary[10])
+      })
+
+    case OBJECT_TAGS.CHANNEL_CLOSE_MUTUAL_TX:
+      return Object.assign(obj, {
+        channelId: aepp.Crypto.encodeBase58Check(binary[2]),
+        initiatorAmount: readInt(binary[3]),
+        responderAmount: readInt(binary[4]),
+        ttl: readInt(binary[5]),
+        fee: readInt(binary[6]),
+        nonce: readInt(binary[7])
+      })
+
+    case OBJECT_TAGS.CHANNEL_OFFCHAIN_TX:
+      return Object.assign(obj, {
+        channelId: aepp.Crypto.encodeBase58Check(binary[2]),
+        previousRound: readInt(binary[3]),
+        round: readInt(binary[4]),
+        initiator: 'ak$' + aepp.Crypto.encodeBase58Check(binary[5]),
+        responder: 'ak$' + aepp.Crypto.encodeBase58Check(binary[6]),
+        initiatorAmount: readInt(binary[7]),
+        responderAmount: readInt(binary[8]),
+        updates: readOffChainTXUpdates(binary[9]), // TODO
+        state: aepp.Crypto.encodeBase58Check(binary[10])
       })
   }
 }
