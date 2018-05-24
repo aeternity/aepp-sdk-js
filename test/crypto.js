@@ -15,23 +15,17 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-
-const fs = require('fs')
-
-const chai = require ('chai')
-const assert = chai.assert
-
-const Crypto = require('../lib/utils/crypto')
+import { assert } from 'chai'
+import Crypto from '../src/utils/crypto'
 
 // These keys are fixations for the encryption lifecycle tests and will
 // not be used for signing
-const privateKeyAsHex = '56b61283ec0ea87f891347f95895f9e1f339cd8854d649043c9b32b908cda646'
-const publicKey = 'ak$3iDEWVFVERNggenRRyREbQWWoE1QiWaqXnEtknkP8noSiAPboe5ikkEtwgYDJ9SsBqjUnxUBpRtj1J9PnTTUji22UGybzW'
+const privateKeyAsHex = '4d881dd1917036cc231f9881a0db978c8899dd76a817252418606b02bf6ab9d22378f892b7cc82c2d2739e994ec9953aa36461f1eb5a4a49a5b0de17b3d23ae8'
+const publicKey = 'ak$Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm'
 
 const validUnsignedTx = 'tx$2uE4tuGbXmmXCAxBgykHq8JwrHf38xXtBE8NaUhjahLUaAdquBsspqpGmyEC9QE9gv5Zu4oTMcvoxCiKLDzipkUqBWCVB9Liuk73fqANjiAEtjUv2PsRC7hrRG4qjB6m1d4UVyrag815kodXygDUCaNXgfeqjGbffJy7sBwGd6cruDqYRLxpALxaCZEdY14T3DTvxWDnXGM2pR3Z4o9HujQY9PbDrk8XuuG9gKYFMmxvSRPje34ZXRxkeXicmGfn9TF63PYQhM4EjvAZXsfL2ZdAB8zCQpCVGwFWmuTxSL9yDoZmCwK9gP7g7G2AnsrJZjdv2UZKY6rrHwZLEgpdkADfKvHT9cjvuXcQfBfFRW17PP3fmiPpXaG4BpaiTuf4Cj79egcx2Wo6gB9rBqKndSQeCvUb8a25D2XoR7yyVjF6to2hPnw'
-const txBinary = [156,129,196,4,116,121,112,101,196,14,97,101,99,116,95,99,114,101,97,116,101,95,116,120,129,196,3,118,115,110,1,129,196,5,111,119,110,101,114,196,65,4,177,168,30,198,176,42,228,118,211,232,158,166,211,212,172,215,6,45,130,220,8,153,5,158,199,177,129,214,56,60,181,186,82,210,139,232,127,11,228,166,244,251,28,117,89,185,165,142,194,161,53,0,48,78,129,252,124,206,44,12,240,247,182,9,129,196,5,110,111,110,99,101,26,129,196,4,99,111,100,101,196,113,54,96,0,128,55,98,0,0,33,96,0,128,128,128,81,128,81,96,4,20,98,0,0,48,87,80,91,80,96,1,25,81,0,91,96,0,82,96,32,96,0,243,91,128,144,80,144,86,91,96,32,1,81,127,109,97,105,110,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,98,0,0,97,87,98,0,0,26,86,91,96,32,1,81,144,80,128,145,80,80,98,0,0,42,86,129,196,10,118,109,95,118,101,114,115,105,111,110,1,129,196,3,102,101,101,10,129,196,7,100,101,112,111,115,105,116,4,129,196,6,97,109,111,117,110,116,4,129,196,3,103,97,115,4,129,196,9,103,97,115,95,112,114,105,99,101,1,129,196,9,99,97,108,108,95,100,97,116,97,196,0]
-const signature = [48,69,2,33,0,238,198,111,188,121,207,4,134,245,53,62,75,65,236,78,48,94,122,0,198,136,201,60,240,88,55,172,95,118,148,168,127,2,32,19,65,168,2,104,134,195,121,28,253,186,139,84,191,0,80,49,121,233,58,20,197,237,2,215,58,40,27,192,99,91,211]
-
+const txBinary = [248, 76, 12, 1, 160, 35, 120, 248, 146, 183, 204, 130, 194, 210, 115, 158, 153, 78, 201, 149, 58, 163, 100, 97, 241, 235, 90, 74, 73, 165, 176, 222, 23, 179, 210, 58, 232, 160, 63, 40, 35, 12, 40, 65, 38, 215, 218, 236, 136, 133, 42, 120, 160, 179, 18, 191, 241, 162, 198, 203, 209, 173, 89, 136, 202, 211, 158, 59, 12, 122, 1, 1, 1, 132, 84, 101, 115, 116]
+const signature = [95, 146, 31, 37, 95, 194, 36, 76, 58, 49, 167, 156, 127, 131, 142, 248, 25, 121, 139, 109, 59, 243, 203, 205, 16, 172, 115, 143, 254, 236, 33, 4, 43, 46, 16, 190, 46, 46, 140, 166, 76, 39, 249, 54, 38, 27, 93, 159, 58, 148, 67, 198, 81, 206, 106, 237, 91, 131, 27, 14, 143, 178, 130, 2]
 
 describe('crypto', () => {
   describe('generateKeyPair', () => {
@@ -39,7 +33,8 @@ describe('crypto', () => {
       let keyPair = Crypto.generateKeyPair()
       assert.ok(keyPair)
       assert.isTrue(keyPair.pub.startsWith('ak$'))
-      assert.equal(97, keyPair.pub.length)
+      assert.isAtLeast(keyPair.pub.length, 52)
+      assert.isAtMost(keyPair.pub.length, 53)
     })
   })
   describe('encryptPassword', () => {
@@ -82,7 +77,7 @@ describe('crypto', () => {
       let privateKey = Buffer.from(privateKeyAsHex, 'hex')
       let signature = Crypto.sign(validUnsignedTx, privateKey)
       let pub = Buffer.from(Crypto.decodeBase58Check(publicKey.split('$')[1]))
-      let verified = Crypto.verify(Buffer.from(validUnsignedTx), signature, pub)
+      let verified = Crypto.verify(validUnsignedTx, signature, pub)
       assert.isTrue(verified)
     })
   })

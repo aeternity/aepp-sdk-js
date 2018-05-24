@@ -1,6 +1,8 @@
 node_modules
-/.env
 /test-results.xml
 .tern-port
 .tern-project
 .dir-locals.el
+/dist
+/.envrc
+/yarn-error.log

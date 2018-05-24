@@ -15,19 +15,14 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-require('@babel/polyfill')
-
-const chai = require ('chai')
-const assert = chai.assert
-
-const AeHttpProvider = require ('../lib/providers/http/index')
-const AeternityClient = require('../lib/aepp-sdk')
-import * as Crypto from '../lib/utils/crypto'
+import { AeternityClient, Crypto } from '../src'
+import { assert } from 'chai'
+const AeHttpProvider = AeternityClient.providers.HttpProvider
 
 // Naive assertion
 const assertIsBlock = (data) => {
-  assert.ok (data)
-  assert.ok (data['state_hash'])
+  assert.ok(data)
+  assert.ok(data['state_hash'])
   assert.ok(Number.isInteger(data.height))
 }
 
@@ -37,14 +32,16 @@ const randomAeName = () => {
   let urlLength = 10
 
   for (let i = 0; i < urlLength; i++) {
-    text += possible.charAt (Math.floor (Math.random () * possible.length))
+    text += possible.charAt(Math.floor(Math.random() * possible.length))
   }
   return `${text}.aet`
 }
 
 const [host, port] = (process.env.TEST_NODE || 'localhost:3013').split(':')
+const url = process.env.TEST_URL || 'http://localhost:3013'
+const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
 
-const httpProvider = new AeternityClient(new AeHttpProvider (host, port, {
+const httpProvider = new AeternityClient(new AeHttpProvider(host, port, {
   secured: false
 }))
 
@@ -59,17 +56,40 @@ if (!sourceWallet.pub || !sourceWallet.priv) {
 
 const wallets = Array(3).fill().map(() => Crypto.generateKeyPair())
 
+let planned = 0
+let charged = false
+
+function plan (amount) {
+  planned += amount
+}
+
 async function charge (receiver, amount) {
   console.log(`Charging ${receiver} with ${amount}`)
   const { tx_hash } = await httpProvider.base.spend(receiver, amount, sourceWallet)
   await httpProvider.tx.waitForTransaction(tx_hash)
 }
 
-module.exports = {
+const TIMEOUT = 120000
+
+async function waitReady (mocha) {
+  mocha.timeout(TIMEOUT * 10)
+  await httpProvider.provider.ready
+  await httpProvider.base.waitForBlock(10, 1000)
+  if (!charged && planned > 0) {
+    await charge(wallets[0].pub, planned)
+    charged = true
+  }
+}
+
+export {
   httpProvider,
   assertIsBlock,
   randomAeName,
   wallets,
   charge,
-  TIMEOUT: 120000
+  TIMEOUT,
+  url,
+  internalUrl,
+  waitReady,
+  plan
 }

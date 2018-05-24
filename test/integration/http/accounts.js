@@ -15,20 +15,28 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-
 require('@babel/polyfill')
 
-const chai = require ('chai')
+const chai = require('chai')
 const assert = chai.assert
 
 const utils = require('../../utils')
 
+utils.plan(1)
 
 describe('Http accounts service', () => {
+  before(async function () {
+    this.timeout(utils.TIMEOUT)
+    await utils.waitReady(this)
+  })
+
   describe('getTransactions', () => {
-    // TODO Should work after porting the endpoint to the external route
-    it.skip('should return something', async () => {
-      let transactions = await utils.httpProvider.accounts.getTransactions(utils.wallets[0].pub)
+    it('should return something', async function () {
+      this.timeout(utils.TIMEOUT)
+
+      const { pub } = utils.wallets[0]
+
+      let transactions = await utils.httpProvider.accounts.getTransactions(pub)
       assert.ok(transactions)
       assert.isTrue(Array.isArray(transactions))
       assert.ok(transactions.length)
