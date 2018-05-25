@@ -82,19 +82,15 @@ function deserializeObject(binary) {
         responder: 'ak$' + aepp.Crypto.encodeBase58Check(binary[6]),
         initiatorAmount: readInt(binary[7]),
         responderAmount: readInt(binary[8]),
-        updates: readOffChainTXUpdates(binary[9]), // TODO
+        updates: readOffChainTXUpdates(binary[9]),
         state: aepp.Crypto.encodeBase58Check(binary[10])
       })
   }
 }
 
-function deserializeTx(tx) {
-  return deserializeObject(aepp.Crypto.decodeTx(tx))
-}
-
 function unpackTx(tx) {
   const binaryTx = aepp.Crypto.decodeTx(tx)
-  const deserializedTx = deserializeTx(tx)
+  const deserializedTx = deserializeObject(binaryTx)
 
   console.log(JSON.stringify(deserializedTx, undefined, 2))
 }
