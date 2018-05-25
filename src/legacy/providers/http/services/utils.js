@@ -18,14 +18,14 @@
 const createTxParams = ({txTypes, excludeTxTypes}) => {
   let params = {}
   if (Array.isArray(txTypes)) {
-    params['tx_types'] = txTypes.join(',')
+    params['txTypes'] = txTypes.join(',')
   } else {
-    params['tx_types'] = txTypes
+    params['txTypes'] = txTypes
   }
   if (Array.isArray(excludeTxTypes)) {
-    params['exclude_tx_types'] = excludeTxTypes.join(',')
+    params['excludeTxTypes'] = excludeTxTypes.join(',')
   } else {
-    params['exclude_tx_types'] = excludeTxTypes
+    params['excludeTxTypes'] = excludeTxTypes
   }
   return params
 }
@@ -34,13 +34,13 @@ const createTxRangeParams = (from, to, {txTypes, excludeTxTypes}) => {
   let params = createTxParams({txTypes, excludeTxTypes})
   params.from = from
   params.to = to
-  params['tx_encoding'] = 'json'
+  params['txEncoding'] = 'json'
   return params
 }
 
 const createTxCallParams = (options) => {
   return {
-    'gas_price': options.gasPrice || 1,
+    'gasPrice': options.gasPrice || 1,
     'amount': options.amount || 4,
     'fee': options.fee || 10,
     'gas': options.gas || 4,

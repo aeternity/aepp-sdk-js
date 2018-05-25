@@ -41,7 +41,7 @@ describe('Oracles HTTP endpoint', () => {
     it('should register an oracle', async function () {
       this.timeout(utils.TIMEOUT * 2)
 
-      const { tx_hash } = await utils.httpProvider.oracles.register(
+      const register = await utils.httpProvider.oracles.register(
         'unused query format',
         'unused response format',
         5,
@@ -51,7 +51,7 @@ describe('Oracles HTTP endpoint', () => {
       )
 
       // Let the blockchain digest
-      await utils.httpProvider.tx.waitForTransaction(tx_hash)
+      await register.wait()
 
       let transactions = await utils.httpProvider.accounts.getTransactions(pub, {
         txTypes: ['oracle_register_tx'] // epoch/apps/aetx/src/aetx.erl:200
@@ -61,10 +61,10 @@ describe('Oracles HTTP endpoint', () => {
   })
 
   describe('query an oracle', () => {
-    it.skip('should query an oracle', async function () {
+    it('should query an oracle', async function () {
       this.timeout(utils.TIMEOUT * 2)
 
-      let data = await utils.httpProvider.oracles.query(
+      const query = await utils.httpProvider.oracles.query(
         oracleId,
         5,
         10,
@@ -74,15 +74,12 @@ describe('Oracles HTTP endpoint', () => {
         account
       )
 
-      assert.ok(data)
-      await utils.httpProvider.tx.waitForTransaction(data['tx_hash'])
-      let transactions = await utils.httpProvider.accounts.getTransactions(oracleId, {
-        excludeTxTypes: ['coinbase_tx'],
+      await query.wait()
+
+      const transactions = await utils.httpProvider.accounts.getTransactions(pub, {
         txTypes: ['oracle_query_tx'] // epoch/apps/aetx/src/aetx.erl:200
       })
       assert.isTrue(transactions.length > 0)
-
-      // queryId = transactions[0]
     })
   })
 

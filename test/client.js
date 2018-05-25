@@ -31,6 +31,42 @@ describe('client', function () {
     client = await Ae.create(url, { internal: internalUrl })
   })
 
+  it('walks through deep structures', () => {
+    const input = {
+      a: 1,
+      b: {
+        ba: 2
+      },
+      c: [3, {
+        ca: 4
+      }]
+    }
+
+    expect(internal.traverseKeys(k => 'x' + k, input)).to.deep.equal({
+      xa: 1,
+      xb: {
+        xba: 2
+      },
+      xc: [3, {
+        xca: 4
+      }]
+    })
+  })
+
+  describe('converts case', () => {
+    it('from snake to pascal', () => {
+      expect(internal.snakeToPascal('foo_bar_baz')).to.equal('fooBarBaz')
+      expect(internal.snakeToPascal('foo_bar_')).to.equal('fooBar_')
+      expect(internal.snakeToPascal('_bar_baz')).to.equal('BarBaz')
+    })
+
+    it('from pascal to snake', () => {
+      expect(internal.pascalToSnake('fooBarBaz')).to.equal('foo_bar_baz')
+      expect(internal.pascalToSnake('fooBar')).to.equal('foo_bar')
+      expect(internal.pascalToSnake('BarBaz')).to.equal('_bar_baz')
+    })
+  }),
+
   it('expands paths', () => {
     assert.equal(internal.expandPath('/foo/{bar}/baz/{bop}', { bar: 1, bop: 2, useless: 3 }), '/foo/1/baz/2')
     assert.equal(internal.expandPath('unchanged'), 'unchanged')
@@ -38,6 +74,7 @@ describe('client', function () {
 
   it('determines remote version', () => {
     expect(client.version).to.be.a('string')
+    expect(client.revision).to.be.a('string')
   }),
   
   describe('conforms', () => {
@@ -95,18 +132,18 @@ describe('client', function () {
     const [method, operation] = R.head(R.toPairs(data))
     const fn = internal.operation(path, method, operation)(`${url}/v2`)
     assert.equal(fn.length, 2)
-    const result = await fn(5, { tx_encoding: 'message_pack' })
+    const result = await fn(5, { txEncoding: 'message_pack' })
     assert.ok(result)
   })
 
   it('gets blocks by height for the first 10 blocks', () => {
     this.timeout(TIMEOUT)
-    expect(client.getBlockByHeight).to.be.a('function')
-    expect(client.getBlockByHeight.length).to.equal(2)
+    expect(client.api.getBlockByHeight).to.be.a('function')
+    expect(client.api.getBlockByHeight.length).to.equal(2)
 
     return Promise.all(
       R.map(async i => {
-        const result = await client.getBlockByHeight(i)
+        const result = await client.api.getBlockByHeight(i)
         expect(result.height, i).to.equal(i)
       }, R.range(1, 11))
     )
@@ -119,6 +156,6 @@ describe('client', function () {
   })
 
   it('throws on unsupported interface', () => {
-    expect(() => client.getPubKey()).to.throw()
+    expect(() => client.api.getPubKey()).to.throw()
   })
 })

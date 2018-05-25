@@ -2,6 +2,20 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [Unreleased]
+### Added
+
+### Changed
+- Rest of legacy API now uses new API as well
+- Generated API now encapsulated in `api` object
+- Automatic case conversion for remote parameter names
+- Remaining tests to use new API
+- Adapte new method of obtaining transaction hash
+
+### Removed
+
+### Fixed
+
 ## [0.13.0-0.1.0]
 ### Added
 - This change log file
@@ -22,3 +36,4 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 - More consistent code examples
 
 [0.13.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.10.0-0.1.0...0.13.0-0.1.0
+[Unreleased]: https://github.com/aeternity/aepp-sdk-js/compare/v0.13.0-0.1.0...develop

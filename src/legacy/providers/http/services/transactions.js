@@ -26,7 +26,7 @@ class Transactions extends HttpService {
    * @returns {Promise<*>}
    */
   async getPendingList () {
-    return this.client.ae.getTxs()
+    return this.client.ae.api.getTxs()
   }
 
   /**
@@ -38,7 +38,7 @@ class Transactions extends HttpService {
    * @returns {Promise<number>}
    */
   async getCountByHash (hash, {txTypes, excludeTxTypes}) {
-    const { count } = await this.client.ae.getBlockTxsCountByHash(hash, createTxParams({txTypes, excludeTxTypes}))
+    const { count } = await this.client.ae.api.getBlockTxsCountByHash(hash, createTxParams({txTypes, excludeTxTypes}))
     return count
   }
 
@@ -51,7 +51,7 @@ class Transactions extends HttpService {
    * @returns {Promise<number>}
    */
   async getCountByHeight (height, {txTypes, excludeTxTypes}) {
-    const { count } = await this.client.ae.getBlockTxsCountByHeight(height, createTxParams({txTypes, excludeTxTypes}))
+    const { count } = await this.client.ae.api.getBlockTxsCountByHeight(height, createTxParams({txTypes, excludeTxTypes}))
     return count
   }
 
@@ -63,7 +63,7 @@ class Transactions extends HttpService {
    * @returns {Promise<*>}
    */
   async getFromBlockHash (blockHash, txIdx) {
-    return this.client.ae.getTransactionFromBlockHash(blockHash, txIdx)
+    return this.client.ae.api.getTransactionFromBlockHash(blockHash, txIdx)
   }
 
   /**
@@ -74,7 +74,7 @@ class Transactions extends HttpService {
    * @returns {Promise<*>}
    */
   async getFromBlockHeight (height, txIdx) {
-    return this.client.ae.getTransactionFromBlockHeight(height, txIdx)
+    return this.client.ae.api.getTransactionFromBlockHeight(height, txIdx)
   }
 
   /**
@@ -84,7 +84,7 @@ class Transactions extends HttpService {
    * @returns {Promise<*>}
    */
   async getFromLatest (txIdx) {
-    return this.client.ae.getTransactionFromBlockLatest(txIdx)
+    return this.client.ae.api.getTransactionFromBlockLatest(txIdx)
   }
 
   /**
@@ -97,7 +97,7 @@ class Transactions extends HttpService {
    * @returns {Promise<*>}
    */
   async filterByHashRange (from, to, {txTypes, excludeTxTypes}) {
-    return this.client.ae.getTxsListFromBlockRangeByHash(createTxRangeParams(from, to, {txTypes, excludeTxTypes}))
+    return this.client.ae.api.getTxsListFromBlockRangeByHash(createTxRangeParams(from, to, {txTypes, excludeTxTypes}))
   }
 
   /**
@@ -110,11 +110,15 @@ class Transactions extends HttpService {
    * @returns {Promise<*>}
    */
   async filterByHeightRange (from, to, {txTypes, excludeTxTypes}) {
-    return this.client.ae.getTxsListFromBlockRangeByHeight(createTxRangeParams(from, to, {txTypes, excludeTxTypes}))
+    return this.client.ae.api.getTxsListFromBlockRangeByHeight(createTxRangeParams(from, to, {txTypes, excludeTxTypes}))
   }
 
   async send (tx) {
-    return this.client.ae.postTx({ tx })
+    const result = await this.client.ae.api.postTx({ tx })
+    result.wait = async () => {
+      return this.client.tx.waitForTransaction(result.txHash)
+    }
+    return result
   }
 
   async sendSigned (txHash, privateKey, options = {}) {
@@ -140,7 +144,7 @@ class Transactions extends HttpService {
   }
 
   async getTransaction (txHash) {
-    const { transaction } = await this.client.ae.getTx(txHash, { 'tx_encoding': 'json' })
+    const { transaction } = await this.client.ae.api.getTx(txHash, { txEncoding: 'json' })
     return transaction
   }
 
@@ -160,7 +164,7 @@ class Transactions extends HttpService {
             } catch (e) {
               return reject(e)
             }
-            let blockHeight = transaction['block_height']
+            const { blockHeight } = transaction
             if (blockHeight !== -1) {
               // TODO integrate into proper logging
               console.log(`\rTx has been mined in ${blockHeight}`)

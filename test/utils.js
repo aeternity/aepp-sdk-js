@@ -22,7 +22,7 @@ const AeHttpProvider = AeternityClient.providers.HttpProvider
 // Naive assertion
 const assertIsBlock = (data) => {
   assert.ok(data)
-  assert.ok(data['state_hash'])
+  assert.ok(data.stateHash)
   assert.ok(Number.isInteger(data.height))
 }
 
@@ -65,8 +65,9 @@ function plan (amount) {
 
 async function charge (receiver, amount) {
   console.log(`Charging ${receiver} with ${amount}`)
-  const { tx_hash } = await httpProvider.base.spend(receiver, amount, sourceWallet)
-  await httpProvider.tx.waitForTransaction(tx_hash)
+  const { txHash } = await httpProvider.base.spend(receiver, amount, sourceWallet)
+  const tx = await httpProvider.base.spend(receiver, amount, sourceWallet)
+  return tx.wait()
 }
 
 const TIMEOUT = 120000
