@@ -87,6 +87,12 @@ function verify (str, signature, publicKey) {
   return nacl.sign.detached.verify(new Uint8Array(str), signature, publicKey)
 }
 
+function prepareTx (signature, data) {
+  // the signed tx deserializer expects a 4-tuple:
+  // <tag, version, signatures_array, binary_tx>
+  return [Buffer.from([11]), Buffer.from([1]), [Buffer.from(signature)], data]
+}
+
 function personalMessageToBinary (message) {
   const p = Buffer.from('‎Æternity Signed Message:\n', 'utf8')
   const msg = Buffer.from(message, 'utf8')
@@ -140,6 +146,8 @@ export default {
 
   signPersonalMessage,
   verifyPersonalMessage,
+
+  prepareTx,
 
   decodeTx (txHash) {
     let decodedTx = decodeBase58Check(txHash.split('$')[1])
