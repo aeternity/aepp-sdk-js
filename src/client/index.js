@@ -18,6 +18,7 @@
 import axios from 'axios'
 import * as R from 'ramda'
 import urlparse from 'url'
+import Wallet from './wallet'
 
 function snakeToPascal (s) {
   return s.replace(/_./g, match => R.toUpper(match[1]))
@@ -57,12 +58,17 @@ function lookupType (path, spec, types) {
   }
 }
 
+function TypeError (msg, spec, value) {
+  const e = Error(msg)
+  return Object.assign(e, { spec, value })
+}
+
 const conformTypes = {
   integer (value, spec, types) {
-    if (typeof value === 'number') {
+    if (R.type(value) === 'Number') {
       return Math.floor(value)
     } else {
-      throw Error(`Not an integer: ${value}`)
+      throw TypeError('Not an integer', spec, value)
     }
   },
   enum (value, spec, types) {
@@ -70,29 +76,36 @@ const conformTypes = {
     if (R.contains(value, values)) {
       return value
     } else {
-      throw Error(`${value} is not one of [${R.join(', ', values)}]`)
+      throw TypeError(`Not one of [${R.join(', ', values)}]`, spec, value)
     }
   },
   string (value, spec, types) {
-    if (typeof value === 'string') {
+    if (R.type(value) === 'String') {
       return value
     } else {
-      throw Error(`Not a string: ${value}`)
+      throw TypeError(`Not a string`, spec, value)
     }
   },
   object (value, spec, types) {
-    if (typeof value === 'object') {
+    if (R.type(value) === 'Object') {
       const required = R.map(snakeToPascal, spec.required || [])
       const properties = pascalizeKeys(spec.properties)
       const missing = R.difference(required, R.keys(value))
 
       if (missing.length > 0) {
-        throw Error(`Required properties missing: ${R.join(', ', missing)}`)
+        throw TypeError(`Required properties missing: ${R.join(', ', missing)}`, spec, value)
       } else {
         return R.mapObjIndexed((value, key) => conform(value, properties[key], types), R.reject(R.isNil, R.pick(R.keys(properties), value)))
       }
     } else {
-      throw Error(`Not an object: ${value}`)
+      throw TypeError(`Not an object`, spec, value)
+    }
+  },
+  array (value, spec, types) {
+    if (R.type(value) === 'Array') {
+      return R.map(o => conform(o, spec.items, types), value)
+    } else {
+      throw TypeError(`Not an array`, spec, value)
     }
   },
   schema (value, spec, types) {
@@ -100,6 +113,9 @@ const conformTypes = {
   },
   $ref (value, spec, types) {
     return conform(value, lookupType(['$ref'], spec, types), types)
+  },
+  allOf (value, spec, types) {
+    return R.mergeAll(R.map(spec => conform(value, spec, types), spec.allOf))
   }
 }
 
@@ -110,14 +126,18 @@ function conformDispatch (spec) {
     return '$ref'
   } else if ('enum' in spec) {
     return 'enum'
-  } else {
+  } else if ('allOf' in spec) {
+    return 'allOf'
+  } else if ('type' in spec) {
     return spec.type
+  } else {
+    throw Object.assign(Error('Could not determine type'), { spec })
   }
 }
 
 function conform (value, spec, types) {
   return (conformTypes[conformDispatch(spec)] || (() => {
-    throw Error(`Unsupported type ${spec.type}`)
+    throw Object.assign(Error('Unsupported type'), { spec })
   }))(value, spec, types)
 }
 
@@ -184,7 +204,7 @@ function destructureClientError (error) {
 }
 
 const operation = R.memoize((path, method, definition, types) => {
-  const { operationId, parameters, description } = definition
+  const { operationId, parameters, description, responses } = definition
   const name = `${R.toLower(R.head(operationId))}${R.drop(1, operationId)}`
   const pascalized = pascalizeParameters(parameters)
 
@@ -239,10 +259,13 @@ const operation = R.memoize((path, method, definition, types) => {
 
         try {
           const response = await client(`${url}${expandedPath}`, params, { headers: {'Content-Type': 'application/json'} })
+          // return opt.fullResponse ? response : conform(pascalizeKeys(response.data), responses['200'], types)
           return opt.fullResponse ? response : pascalizeKeys(response.data)
-        } catch (error) {
-          console.log(destructureClientError(error))
-          throw error
+        } catch (e) {
+          if (R.has('request', e)) {
+            e.message = destructureClientError(e)
+          }
+          throw e
         }
       } catch (e) {
         e.message = `While calling ${signature}, ${e.message}`
@@ -267,6 +290,25 @@ const operation = R.memoize((path, method, definition, types) => {
     })
   }
 })
+
+const poll = (fn) => async (th, { blocks = 10, interval = 1000 } = {}) => {
+  async function probe (resolve, reject, attempts) {
+    try {
+      const { transaction } = await fn(th, { txEncoding: 'json' })
+      if (transaction.blockHeight !== -1) {
+        resolve(transaction)
+      } else if (attempts > 0) {
+        setInterval(() => probe(resolve, reject, attempts - 1), interval)
+      } else {
+        reject(Error(`Giving up after ${blocks} mined`))
+      }
+    } catch (e) {
+      reject(e)
+    }
+  }
+
+  return new Promise((resolve, reject) => probe(resolve, reject, blocks))
+}
 
 async function create (url, { internalUrl, websocketUrl } = {}) {
   const { version, revision } = await remoteEpochVersion(url)
@@ -297,7 +339,11 @@ async function create (url, { internalUrl, websocketUrl } = {}) {
     version,
     revision,
     methods: R.keys(methods),
-    api: methods
+    api: methods,
+    poll: poll(methods.getTx),
+    wallet (keypair) {
+      return Wallet.create(this, keypair)
+    }
   })
 }
 

@@ -15,6 +15,13 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+import chai from 'chai'
+import chaiAsPromised from 'chai-as-promised'
+
+chai.use(chaiAsPromised)
+chai.should()
+
+import Ae from '../src'
 import { AeternityClient, Crypto } from '../src'
 import { assert } from 'chai'
 const AeHttpProvider = AeternityClient.providers.HttpProvider
@@ -40,6 +47,8 @@ const randomAeName = () => {
 const [host, port] = (process.env.TEST_NODE || 'localhost:3013').split(':')
 const url = process.env.TEST_URL || 'http://localhost:3013'
 const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
+
+const client = Ae.create(url, { internalUrl })
 
 const httpProvider = new AeternityClient(new AeHttpProvider(host, port, {
   secured: false
@@ -72,6 +81,10 @@ async function charge (receiver, amount) {
 
 const TIMEOUT = 120000
 
+function configure (mocha) {
+  mocha.timeout(TIMEOUT)
+}
+
 async function waitReady (mocha) {
   mocha.timeout(TIMEOUT * 10)
   await httpProvider.provider.ready
@@ -83,6 +96,7 @@ async function waitReady (mocha) {
 }
 
 export {
+  sourceWallet,
   httpProvider,
   assertIsBlock,
   randomAeName,
@@ -92,5 +106,7 @@ export {
   url,
   internalUrl,
   waitReady,
-  plan
+  plan,
+  client,
+  configure
 }

@@ -18,17 +18,18 @@
 import { assert, expect } from 'chai'
 import { internal } from '../src/client'
 import Ae from '../src'
-import { url, internalUrl, waitReady, TIMEOUT } from './utils'
+import * as utils from './utils'
 import * as R from 'ramda'
 import op from './sample-operation.json'
+import def from './sample-definition.json'
 
 describe('client', function () {
+  utils.configure(this)
+
   let client
 
   before(async function () {
-    this.timeout(TIMEOUT)
-    await waitReady(this)
-    client = await Ae.create(url, { internal: internalUrl })
+    client = await utils.client
   })
 
   it('walks through deep structures', () => {
@@ -117,7 +118,7 @@ describe('client', function () {
       expect(() => internal.conform({ bar: 'xxx' }, spec).to.throw())
     })
 
-    it('error', () => {
+    it('errors', () => {
       const spec = { type: 'shizzle' }
       expect(() => internal.conform({}, spec).to.throw())
     })
@@ -130,14 +131,14 @@ describe('client', function () {
   it('maps operations', async () => {
     const [path, data] = R.head(R.toPairs(op))
     const [method, operation] = R.head(R.toPairs(data))
-    const fn = internal.operation(path, method, operation)(`${url}/v2`)
+    const fn = internal.operation(path, method, operation, def)(`${utils.url}/v2`)
     assert.equal(fn.length, 2)
     const result = await fn(5, { txEncoding: 'message_pack' })
-    assert.ok(result)
+    result.should.be.an('object')
+    result.height.should.equal(5)
   })
 
   it('gets blocks by height for the first 10 blocks', () => {
-    this.timeout(TIMEOUT)
     expect(client.api.getBlockByHeight).to.be.a('function')
     expect(client.api.getBlockByHeight.length).to.equal(2)
 
@@ -155,7 +156,7 @@ describe('client', function () {
     expect(() => internal.assertOne([1, 2]).to.throw())
   })
 
-  it('throws on unsupported interface', () => {
-    expect(() => client.api.getPubKey()).to.throw()
+  it('throws on unsupported interface', async () => {
+    await client.api.getPubKey().should.be.rejectedWith(Error)
   })
 })
