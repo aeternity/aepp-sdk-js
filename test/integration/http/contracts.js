@@ -21,6 +21,9 @@ const chai = require('chai')
 const assert = chai.assert
 const utils = require('../../utils')
 
+const account = utils.wallets[0]
+const { pub, priv } = account
+
 // Sample contract taken from: https://github.com/aeternity/epoch/blob/master/py/tests/integration/identity.aes
 const exampleContract = `
 contract Identity =
@@ -38,7 +41,7 @@ describe('Http service contracts', () => {
 
   let byteCode
   let createTx
-  describe ('compile', () => {
+  describe('compile', () => {
     it ('should compile a sophia contract', async () => {
       byteCode = await utils.httpProvider.contracts.compile(
         exampleContract,
@@ -51,7 +54,7 @@ describe('Http service contracts', () => {
   describe('call sophia', () => {
     it('should return a value', async () => {
       let result = await utils.httpProvider.contracts.callStatic('sophia', byteCode, 'main', '1')
-      assert.equal(1, result)
+      assert.equal(result, 1)
     })
   })
   describe('encodeCallData sophia', () => {
@@ -74,7 +77,7 @@ describe('Http service contracts', () => {
       this.timeout(utils.TIMEOUT * 4)
 
       const ret = await utils.httpProvider.contracts.deployContract(byteCode, utils.wallets[0])
-      await utils.httpProvider.tx.waitForTransaction(ret['tx_hash'])
+      await ret.wait()
     })
   })
 })

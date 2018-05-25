@@ -38,7 +38,7 @@ class AENS extends HttpService {
    * @returns {Promise<string>}
    */
   async getCommitmentHash (name, salt) {
-    const { commitment } = await this.client.ae.getCommitmentHash(name, salt)
+    const { commitment } = await this.client.ae.api.getCommitmentHash(name, salt)
     return commitment
   }
 
@@ -49,7 +49,7 @@ class AENS extends HttpService {
    * @returns {Promise<*>}
    */
   async getName (name) {
-    return this.client.ae.getName(name)
+    return this.client.ae.api.getName(name)
   }
 
   /**
@@ -73,9 +73,8 @@ class AENS extends HttpService {
         'nonce': options && options.nonce,
         'account': pub
       }
-      const data = await this.client.ae.postNamePreclaim(payload)
-      await this.client.tx.sendSigned(data.tx, priv)
-      return data
+      const data = await this.client.ae.api.postNamePreclaim(payload)
+      return this.client.tx.sendSigned(data.tx, priv)
     } else {
       throw new Error('Private key must be set')
     }
@@ -94,16 +93,14 @@ class AENS extends HttpService {
     const { pub, priv } = account
     if (typeof priv !== 'undefined') {
       let payload = {
-        'name_salt': salt,
+        'nameSalt': salt,
         'fee': fee,
         'name': `nm$${Crypto.encodeBase58Check(Buffer.from(name))}`,
         'nonce': options && options.nonce,
         'account': pub
       }
-      const data = await this.client.ae.postNameClaim(payload)
-      let txHash = data.tx
-      await this.client.tx.sendSigned(txHash, priv)
-      return data
+      const data = await this.client.ae.api.postNameClaim(payload)
+      return this.client.tx.sendSigned(data.tx, priv)
     } else {
       throw new Error('Private key must be set')
     }
@@ -125,24 +122,23 @@ class AENS extends HttpService {
     if (typeof priv !== 'undefined') {
       let pointers
       if (target.startsWith('ak')) {
-        pointers = JSON.stringify({'account_pubkey': target})
+        pointers = JSON.stringify({'accountPubkey': target})
       } else if (target.startsWith('ok')) {
-        pointers = JSON.stringify({'oracle_pubkey': target})
+        pointers = JSON.stringify({'oraclePubkey': target})
       } else {
         throw new Error('Target does not match account or oracle key')
       }
 
       let inputData = {
-        'name_hash': nameHash,
-        'name_ttl': nameTtl,
+        nameHash,
+        nameTtl,
         ttl,
         fee,
         pointers,
         account: pub
       }
-      const data = await this.client.ae.postNameUpdate(inputData)
-      await this.client.tx.sendSigned(data.tx, priv)
-      return data
+      const data = await this.client.ae.api.postNameUpdate(inputData)
+      return this.client.tx.sendSigned(data.tx, priv)
     } else {
       throw new Error('Private key must be set')
     }
@@ -161,16 +157,15 @@ class AENS extends HttpService {
   async transfer (nameHash, recipient, account, options = {}) {
     let {fee = 1} = options
     let {priv, pub} = account
-    let payload = {'name_hash': nameHash, 'recipient_pubkey': recipient, fee}
+    let payload = {nameHash: nameHash, recipientPubkey: recipient, fee}
     if (priv) {
       payload = {
         ...payload,
         nonce: options && options.nonce,
         account: pub
       }
-      const data = await this.client.ae.postNameTransfer(payload)
-      await this.client.tx.sendSigned(data.tx, priv)
-      return data
+      const data = await this.client.ae.api.postNameTransfer(payload)
+      return this.client.tx.sendSigned(data.tx, priv)
     } else {
       throw new Error('Private key must be set')
     }
@@ -187,16 +182,15 @@ class AENS extends HttpService {
   async revoke (nameHash, account, options = {}) {
     const { fee = 1 } = options
     const { pub, priv } = account
-    let payload = {'name_hash': nameHash, fee}
+    let payload = {nameHash, fee}
     if (priv) {
       payload = {
         ...payload,
         nonce: options && options.nonce,
         account: pub
       }
-      const data = await this.client.ae.postNameRevoke(payload)
-      await this.client.tx.sendSigned(data.tx, priv)
-      return data
+      const data = await this.client.ae.api.postNameRevoke(payload)
+      return this.client.tx.sendSigned(data.tx, priv)
     } else {
       throw new Error('Private key must be set')
     }
@@ -221,9 +215,7 @@ class AENS extends HttpService {
     let commitment = await this.getCommitmentHash(domain, salt)
     // preclaim the domain
     let data = await this.preClaim(commitment, preClaimFee, account, options)
-
-    // wait one block
-    await this.client.tx.waitForTransaction(data['tx_hash'])
+    await data.wait()
     // claim the domain
     return this.claim(domain, salt, claimFee, account, options)
   }

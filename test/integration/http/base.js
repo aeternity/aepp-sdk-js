@@ -40,7 +40,7 @@ describe('Http service base', () => {
     it('should return a block', async function () {
       this.timeout(utils.TIMEOUT)
       let data = await utils.httpProvider.base.getBlockByHeight(2)
-      prevHash = data['prev_hash']
+      prevHash = data.prevHash
       utils.assertIsBlock(data)
     })
   })
@@ -80,8 +80,8 @@ describe('Http service base', () => {
 
       const balanceBefore = await utils.httpProvider.accounts.getBalance(pub2)
 
-      const { tx_hash } = await utils.httpProvider.base.spend(pub2, 5, utils.wallets[0])
-      await utils.httpProvider.tx.waitForTransaction(tx_hash)
+      const { txHash } = await utils.httpProvider.base.spend(pub2, 5, utils.wallets[0])
+      await utils.httpProvider.tx.waitForTransaction(txHash)
       const balance = await utils.httpProvider.accounts.getBalance(pub2)
       assert.equal(balanceBefore + 5, balance)
     })

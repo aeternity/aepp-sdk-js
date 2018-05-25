@@ -19,11 +19,11 @@ import HttpService from './index'
 
 class Oracles extends HttpService {
   async getOracles () {
-    return this.client.ae.getActiveRegisteredOracles()
+    return this.client.ae.api.getActiveRegisteredOracles()
   }
 
   async getOracleQuestions (oracleId, from, max) {
-    return this.client.ae.getOracleQuestions(oracleId, { from, max })
+    return this.client.ae.api.getOracleQuestions(oracleId, { from, max })
   }
 
   /**
@@ -40,20 +40,19 @@ class Oracles extends HttpService {
   async register (queryFormat, responseFormat, queryFee, ttl, fee, account, options) {
     const { priv, pub } = account
     let payload = {
-      'response_format': responseFormat,
-      'fee': fee,
-      'query_fee': queryFee,
+      responseFormat,
+      fee,
+      queryFee,
       'ttl': {
         'type': 'delta',
         'value': ttl
       },
       'nonce': options && options.nonce,
-      'query_format': queryFormat,
+      queryFormat,
       'account': pub
     }
-    const data = await this.client.ae.postOracleRegister(payload)
-    await this.client.tx.sendSigned(data.tx, priv, options)
-    return data
+    const data = await this.client.ae.api.postOracleRegister(payload)
+    return this.client.tx.sendSigned(data.tx, priv, options)
   }
 
   /**
@@ -70,23 +69,23 @@ class Oracles extends HttpService {
    */
   async query (oracleId, queryFee, queryTtl, responseTtl, fee, query, account, options = {}) {
     let payload = {
-      'response_ttl': {
+      'responseTtl': {
         'type': 'delta',
         'value': responseTtl
       },
       sender: account.pub,
       query,
-      'query_ttl': {
+      'queryTtl': {
         'type': 'delta',
         'value': queryTtl
       },
       'fee': fee,
-      'query_fee': queryFee,
+      'queryFee': queryFee,
       'nonce': options && options.nonce,
-      'oracle_pubkey': oracleId
+      'oraclePubkey': oracleId
     }
 
-    const data = await this.client.ae.postOracleQuery(payload)
+    const data = await this.client.ae.api.postOracleQuery(payload)
     return this.client.tx.sendSigned(data.tx, account.priv, options)
   }
 
@@ -101,12 +100,12 @@ class Oracles extends HttpService {
   async respond (queryId, fee, response, privateKey, options) {
     let payload = {
       'oracle': null,
-      'query_id': {},
+      'queryId': {},
       'response': 'response',
       'fee': 0,
       'nonce': options && options.nonce
     }
-    const data = await this.client.ae.postOracleResponse(payload)
+    const data = await this.client.ae.api.postOracleResponse(payload)
     return this.client.tx.sendSigned(data.tx, privateKey)
   }
 }

@@ -43,13 +43,12 @@ describe('Http service aens', function () {
       const account = utils.wallets[0]
       assert.ok(commitment)
       // preclaim the domain
-      let preclaimData = await utils.httpProvider.aens.preClaim(commitment, 1, account)
-      // wait one block
-      await utils.httpProvider.tx.waitForTransaction(preclaimData['tx_hash'])
+      let preclaim = await utils.httpProvider.aens.preClaim(commitment, 1, account)
+      await preclaim.wait()
       // claim the domain
       let claimData = await utils.httpProvider.aens.claim(name, salt, 1, account)
 
-      await utils.httpProvider.tx.waitForTransaction(claimData['tx_hash'])
+      await utils.httpProvider.tx.waitForTransaction(claimData.txHash)
       let nameData = await utils.httpProvider.aens.getName(name)
       assert.ok(nameData)
       assert.equal(name, nameData['name'])
@@ -62,16 +61,15 @@ describe('Http service aens', function () {
       const account = utils.wallets[0]
       // use the two step aggregation method for convenience
 
-      let claimData = await utils.httpProvider.aens.fullClaim(name, 1, 1, account)
+      let claim = await utils.httpProvider.aens.fullClaim(name, 1, 1, account)
+      await claim.wait()
 
-      await utils.httpProvider.tx.waitForTransaction(claimData['tx_hash'])
-      let nameData = await utils.httpProvider.aens.getName(name)
-      let nameHash = nameData['name_hash']
+      const { nameHash } = await utils.httpProvider.aens.getName(name)
       let { pub } = utils.wallets[1]
-      let updateData = await utils.httpProvider.aens.update(pub, nameHash, account)
-      await utils.httpProvider.tx.waitForTransaction(updateData['tx_hash'])
-      nameData = await utils.httpProvider.aens.getName(name)
-      assert.equal(pub, JSON.parse(nameData.pointers)['account_pubkey'])
+      const update = await utils.httpProvider.aens.update(pub, nameHash, account)
+      await update.wait()
+      const { pointers } = await utils.httpProvider.aens.getName(name)
+      assert.equal(JSON.parse(pointers).accountPubkey, pub)
     })
   })
   describe('transfer', () => {
@@ -80,28 +78,29 @@ describe('Http service aens', function () {
       let name = utils.randomAeName()
       // use the two step aggregation method for convenience
       const account = utils.wallets[0]
-      let fullClaimData = await utils.httpProvider.aens.fullClaim(name, 1, 1, account)
-      await utils.httpProvider.tx.waitForTransaction(fullClaimData['tx_hash'])
-      let nameData = await utils.httpProvider.aens.getName(name)
-      let nameHash = nameData['name_hash']
+      let fullClaim = await utils.httpProvider.aens.fullClaim(name, 1, 1, account)
+      await fullClaim.wait()
+
+      const { nameHash } = await utils.httpProvider.aens.getName(name)
 
       let account2 = utils.wallets[1].pub
 
-      let updateData = await utils.httpProvider.aens.update(account2, nameHash, account)
-      await utils.httpProvider.tx.waitForTransaction(updateData['tx_hash'])
+      let update = await utils.httpProvider.aens.update(account2, nameHash, account)
+      await update.wait()
 
       await assertHasPointer(name, account2)
 
       let account3 = utils.wallets[2].pub
-      let transferData = await utils.httpProvider.aens.transfer(nameHash, account3, account)
-      await utils.httpProvider.tx.waitForTransaction(transferData['tx_hash'])
+
+      const transfer = await utils.httpProvider.aens.transfer(nameHash, account3, account)
+      await transfer.wait()
 
       // Now account3 can point to himself
       try {
-        let spendData = await utils.httpProvider.base.spend(account3, 5, 1, account)
-        await utils.httpProvider.tx.waitForTransaction(spendData['tx_hash'])
-        let updateData = await utils.httpProvider.aens.update(account3, nameHash, account)
-        await utils.httpProvider.tx.waitForTransaction(updateData['tx_hash'])
+        const spend = await utils.httpProvider.base.spend(account3, 5, account)
+        await spend.wait()
+        const update = await utils.httpProvider.aens.update(account3, nameHash, account)
+        await update.wait()
 
         await assertHasPointer(name, account3)
       } catch (e) {
