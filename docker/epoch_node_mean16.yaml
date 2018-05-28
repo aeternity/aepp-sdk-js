@@ -1,29 +1,29 @@
 ---
 peers:
-    - aenode://pp$28uQUgsPcsy7TQwnRxhF8GMKU4ykFLKsgf4TwDwPMNaSCXwWV8@node2:3015
-    - aenode://pp$Dxq41rJN33j26MLqryvh7AnhuZywefWKEPBiiYu2Da2vDWLBq@node3:3015
+  - aenode://pp$28uQUgsPcsy7TQwnRxhF8GMKU4ykFLKsgf4TwDwPMNaSCXwWV8@node2:3015
+  - aenode://pp$Dxq41rJN33j26MLqryvh7AnhuZywefWKEPBiiYu2Da2vDWLBq@node3:3015
 
 http:
-    external:
-        port: 3013
-    internal:
-        listen_address: 0.0.0.0
+  external:
+    port: 3013
+  internal:
+    listen_address: 0.0.0.0
 
 websocket:
-    internal:
-        listen_address: 0.0.0.0
+  internal:
+    listen_address: 0.0.0.0
 
 keys:
-    password: "top secret"
-    dir: ./keys
+  password: "top secret"
+  dir: ./keys
 
 chain:
-    persist: true
+  persist: true
 
 mining:
-    autostart: true
-    cuckoo:
-        miner:
-            executable: mean16s-generic
-            extra_args: ""
-            node_bits: 16
+  autostart: true
+  cuckoo:
+    miner:
+      executable: mean16s-generic
+      extra_args: ""
+      node_bits: 16
