@@ -7,3 +7,4 @@ node_modules
 /.envrc
 /yarn-error.log
 .idea
+/docker-compose.override.yml
