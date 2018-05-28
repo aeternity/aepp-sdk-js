@@ -15,7 +15,6 @@ pipeline {
       steps {
         sh 'ln -sf /node_modules ./'
         sh 'yarn build'
-        sh 'yarn link'
       }
     }
 
