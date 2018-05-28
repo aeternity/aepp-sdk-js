@@ -15,10 +15,10 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-const utils = require('../../utils')
-
-const chai = require('chai')
-const assert = chai.assert
+import Ae from '@aeternity/aepp-sdk'
+import { Crypto } from '@aeternity/aepp-sdk'
+import { assert } from 'chai'
+import * as utils from '../utils'
 
 const assertHasPointer = async (name, address, type = 'account') => {
   let nameData = await utils.httpProvider.aens.getName(name)

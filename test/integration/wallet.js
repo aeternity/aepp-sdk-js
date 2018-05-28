@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright 2018 aeternity developers
+ * Copyright (c) 2018 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -15,10 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import Wallet from '../src/client/wallet'
-import { internal } from '../src/client/wallet'
-import Ae from '../src'
-import { Crypto } from '../src'
+import { Wallet, Crypto } from '@aeternity/aepp-sdk'
 import * as utils from './utils'
 import * as R from 'ramda'
 

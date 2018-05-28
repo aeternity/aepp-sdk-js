@@ -14,12 +14,11 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-require('@babel/polyfill')
 
-const chai = require('chai')
-const assert = chai.assert
-
-const utils = require('../../utils')
+import Ae from '@aeternity/aepp-sdk'
+import { Crypto } from '@aeternity/aepp-sdk'
+import { assert } from 'chai'
+import * as utils from '../utils'
 
 utils.plan(10)
 

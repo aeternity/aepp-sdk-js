@@ -15,11 +15,11 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-const chai = require('chai')
-const assert = chai.assert
-const utils = require('../../utils')
+import Ae from '@aeternity/aepp-sdk'
+import { Crypto } from '@aeternity/aepp-sdk'
+import { assert } from 'chai'
+import * as utils from '../utils'
 
-import Crypto from '../../../src/utils/crypto'
 const { generateKeyPair } = Crypto
 
 utils.plan(20)
