@@ -47,8 +47,8 @@ const spend = (client, key, address, defaults) => async (amount, receiver, opts)
 
   return sendTransaction(client, key)(tx)
 }
- 
-function create (client, keypair, { fee } = { fee: 1 }) {
+
+function create (client, keypair, { fee = 1 } = {}) {
   const { pub, priv } = keypair
   const key = Buffer.from(priv, 'hex')
 
