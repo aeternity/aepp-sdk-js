@@ -12,6 +12,7 @@ services:
       - WALLET_PUB=${WALLET_PUB}
     volumes:
       - .:/app
+      - .:/node_modules/@aeternity/aepp-sdk
 
   node:
     image: aeternity/epoch:${TAG}

@@ -24,8 +24,6 @@ import op from './sample-operation.json'
 import def from './sample-definition.json'
 
 describe('client', function () {
-  utils.configure(this)
-
   it('walks through deep structures', () => {
     const input = {
       a: 1,
