@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright 2018 aeternity developers
+ * Copyright (c) 2018 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -16,21 +16,15 @@
  */
 
 import { assert, expect } from 'chai'
-import { internal } from '../src/client'
-import Ae from '../src'
-import * as utils from './utils'
+import { internal } from '../../src/client'
+import Ae from '../../src'
+import * as utils from '../utils'
 import * as R from 'ramda'
 import op from './sample-operation.json'
 import def from './sample-definition.json'
 
 describe('client', function () {
   utils.configure(this)
-
-  let client
-
-  before(async function () {
-    client = await utils.client
-  })
 
   it('walks through deep structures', () => {
     const input = {
@@ -73,11 +67,6 @@ describe('client', function () {
     assert.equal(internal.expandPath('unchanged'), 'unchanged')
   }),
 
-  it('determines remote version', () => {
-    expect(client.version).to.be.a('string')
-    expect(client.revision).to.be.a('string')
-  }),
-  
   describe('conforms', () => {
     it('integers', () => {
       const spec = { type: 'integer' }
@@ -124,8 +113,10 @@ describe('client', function () {
     })
   })
 
-  it('loads operations', async () => {
-    expect(client.methods).to.include.members(['postTx', 'getBlockByHeight'])
+  it('asserts single element collections', () => {
+    expect(() => internal.assertOne([]).to.throw())
+    expect(internal.assertOne([1])).to.equal(1)
+    expect(() => internal.assertOne([1, 2]).to.throw())
   })
 
   it('maps operations', async () => {
@@ -133,30 +124,5 @@ describe('client', function () {
     const [method, operation] = R.head(R.toPairs(data))
     const fn = internal.operation(path, method, operation, def)(`${utils.url}/v2`)
     assert.equal(fn.length, 2)
-    const result = await fn(5, { txEncoding: 'message_pack' })
-    result.should.be.an('object')
-    result.height.should.equal(5)
-  })
-
-  it('gets blocks by height for the first 10 blocks', () => {
-    expect(client.api.getBlockByHeight).to.be.a('function')
-    expect(client.api.getBlockByHeight.length).to.equal(2)
-
-    return Promise.all(
-      R.map(async i => {
-        const result = await client.api.getBlockByHeight(i)
-        expect(result.height, i).to.equal(i)
-      }, R.range(1, 11))
-    )
-  })
-
-  it('asserts single element collections', () => {
-    expect(() => internal.assertOne([]).to.throw())
-    expect(internal.assertOne([1])).to.equal(1)
-    expect(() => internal.assertOne([1, 2]).to.throw())
-  })
-
-  it('throws on unsupported interface', async () => {
-    await client.api.getPubKey().should.be.rejectedWith(Error)
   })
 })

@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright 2018 aeternity developers
+ * Copyright (c) 2018 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -15,32 +15,10 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import chai from 'chai'
-import { assert } from 'chai'
-import chaiAsPromised from 'chai-as-promised'
+import { internal } from '../../src/client/wallet'
+import * as utils from '../utils'
+import * as R from 'ramda'
 
-chai.use(chaiAsPromised)
-chai.should()
+describe('wallet', function () {
 
-// Naive assertion
-const assertIsBlock = (data) => {
-  assert.ok(data)
-  assert.ok(data.stateHash)
-  assert.ok(Number.isInteger(data.height))
-}
-
-const randomAeName = () => {
-  let text = ''
-  let possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  let urlLength = 10
-
-  for (let i = 0; i < urlLength; i++) {
-    text += possible.charAt(Math.floor(Math.random() * possible.length))
-  }
-  return `${text}.aet`
-}
-
-export {
-  assertIsBlock,
-  randomAeName,
-}
+})

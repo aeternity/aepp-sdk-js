@@ -3,8 +3,8 @@ const path = require('path')
 const common = (env, argv) => {
   return {
     entry: './src/index.js',
-    mode: 'development',
-    devtool: argv.mode === 'production' ? false : 'eval-source-map',
+    mode: 'development', // automatically overriden by production flag
+    devtool: argv.mode === 'production' ? 'source-map' : 'eval-source-map',
     module: {
       rules: [
         {

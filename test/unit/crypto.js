@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright 2018 aeternity developers
+ * Copyright (c) 2018 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -17,7 +17,7 @@
 
 import { describe, it } from 'mocha'
 import { assert, expect } from 'chai'
-import Crypto from '../src/utils/crypto'
+import Crypto from '../../src/utils/crypto'
 
 // These keys are fixations for the encryption lifecycle tests and will
 // not be used for signing
