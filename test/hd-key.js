@@ -20,7 +20,7 @@ import { expect } from 'chai'
 import {
   getMasterKeyFromSeed,
   deriveChild,
-  getPublicKey,
+  getKeyPair,
   derivePathFromKey,
   derivePathFromSeed
 } from '../src/utils/hd-key'
@@ -137,6 +137,7 @@ describe('hd-key', () => {
             const { privateKey, chainCode } = derivePathFromSeed(test.path, seed)
             expect(chainCode).to.eql(test.chain)
             expect(privateKey).to.eql(test.prv)
-            expect(getPublicKey(privateKey)).to.eql(test.pub)
+            const pub = Buffer.concat([Buffer.alloc(1, 0), getKeyPair(privateKey).publicKey])
+            expect(pub).to.eql(test.pub)
           })))))
 })

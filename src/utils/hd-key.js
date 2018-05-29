@@ -50,10 +50,8 @@ export function deriveChild ({ privateKey, chainCode }, index) {
   }
 }
 
-export function getPublicKey (privateKey) {
-  const pk = new Uint8Array(32)
-  nacl.lowlevel.crypto_sign_keypair(pk, privateKey, true)
-  return Buffer.concat([Buffer.alloc(1, 0), Buffer.from(pk)])
+export function getKeyPair (privateKey) {
+  return nacl.sign.keyPair.fromSeed(privateKey)
 }
 
 export function derivePathFromKey (path, key) {
