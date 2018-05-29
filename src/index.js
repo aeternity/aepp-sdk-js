@@ -19,11 +19,13 @@ import AeternityClient from './legacy'
 import Crypto from './utils/crypto'
 import Ae from './client'
 import Wallet from './client/wallet'
+import Contract from './client/contract'
 
 export {
   AeternityClient,
   Crypto,
-  Wallet
+  Wallet,
+  Contract
 }
 
 export default Ae

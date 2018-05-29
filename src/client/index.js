@@ -19,7 +19,6 @@ import axios from 'axios'
 import * as R from 'ramda'
 import urlparse from 'url'
 import Chain from './chain'
-import Wallet from './wallet'
 
 function snakeToPascal (s) {
   return s.replace(/_./g, match => R.toUpper(match[1]))
@@ -59,6 +58,14 @@ function lookupType (path, spec, types) {
   }
 }
 
+function extendingErrorPath (key, fn) {
+  try {
+    return fn()
+  } catch (e) {
+    throw Object.assign(e, { path: [key].concat(e.path || []) })
+  }                             
+}
+
 function TypeError (msg, spec, value) {
   const e = Error(msg)
   return Object.assign(e, { spec, value })
@@ -96,7 +103,7 @@ const conformTypes = {
       if (missing.length > 0) {
         throw TypeError(`Required properties missing: ${R.join(', ', missing)}`, spec, value)
       } else {
-        return R.mapObjIndexed((value, key) => conform(value, properties[key], types), R.reject(R.isNil, R.pick(R.keys(properties), value)))
+        return R.mapObjIndexed((value, key) => extendingErrorPath(key, () => conform(value, properties[key], types)), R.reject(R.isNil, R.pick(R.keys(properties), value)))
       }
     } else {
       throw TypeError(`Not an object`, spec, value)
@@ -238,9 +245,12 @@ const operation = R.memoize((path, method, definition, types) => {
           try {
             return conform(val, indexedParameters[key], types)
           } catch (e) {
-            e.value = val
-            e.message = `validating ${key}: ${e.message}`
-            throw e
+            const path = [key].concat(e.path || [])
+            throw Object.assign(e, {
+              path,
+              value: val,
+              message: `validating ${R.join(' -> ', path)}: ${e.message}`
+            })
           }
         }, values)
         const expandedPath = expandPath(path, snakizeKeys(R.pick(pathArgs, conformed)))
@@ -324,13 +334,7 @@ async function create (url, { internalUrl, websocketUrl, debug = false } = {}) {
     api: methods
   }
 
-  Object.assign(o, Chain.create(o))
-
-  return Object.freeze(Object.assign(o, {
-    wallet (keypair) {
-      return Wallet.create(o, keypair)
-    }
-  }))
+  return Object.freeze(Object.assign(o, Chain.create(o)))
 }
 
 const internal = {
