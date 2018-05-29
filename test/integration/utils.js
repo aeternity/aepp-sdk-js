@@ -22,15 +22,6 @@ import { AeternityClient, Crypto } from '@aeternity/aepp-sdk'
 
 const AeHttpProvider = AeternityClient.providers.HttpProvider
 
-const [host, port] = (process.env.TEST_NODE || 'localhost:3013').split(':')
-const url = process.env.TEST_URL || 'http://localhost:3013'
-const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
-
-const client = Ae.create(url, { internalUrl })
-const httpProvider = new AeternityClient(new AeHttpProvider(host, port, {
-  secured: false
-}))
-
 const sourceWallet = {
   priv: process.env['WALLET_PRIV'],
   pub: process.env['WALLET_PUB']
@@ -39,6 +30,16 @@ const sourceWallet = {
 if (!sourceWallet.pub || !sourceWallet.priv) {
   throw Error('Environment variables WALLET_PRIV and WALLET_PUB need to be set')
 }
+
+const [host, port] = (process.env.TEST_NODE || 'localhost:3013').split(':')
+const url = process.env.TEST_URL || 'http://localhost:3013'
+const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
+
+const client = Ae.create(url, { internalUrl })
+
+const httpProvider = new AeternityClient(new AeHttpProvider(host, port, {
+  secured: false
+}))
 
 const wallets = Array(3).fill().map(() => Crypto.generateKeyPair())
 
@@ -49,13 +50,6 @@ function plan (amount) {
   planned += amount
 }
 
-async function charge (receiver, amount) {
-  console.log(`Charging ${receiver} with ${amount}`)
-  const { txHash } = await httpProvider.base.spend(receiver, amount, sourceWallet)
-  const tx = await httpProvider.base.spend(receiver, amount, sourceWallet)
-  return tx.wait()
-}
-
 const TIMEOUT = 120000
 
 function configure (mocha) {
@@ -64,26 +58,26 @@ function configure (mocha) {
 
 async function waitReady (mocha) {
   mocha.timeout(TIMEOUT * 10)
+  await client
   await httpProvider.provider.ready
-  await httpProvider.base.waitForBlock(10, 1000)
+  await client.awaitHeight(10)
   if (!charged && planned > 0) {
-    await charge(wallets[0].pub, planned)
+    await client.wallet(sourceWallet).spend(planned, wallets[0].pub)
     charged = true
   }
 }
 
 export {
-  sourceWallet,
   httpProvider,
   assertIsBlock,
   randomAeName,
   wallets,
-  charge,
   TIMEOUT,
   url,
   internalUrl,
   waitReady,
   plan,
   client,
-  configure
+  configure,
+  sourceWallet
 }

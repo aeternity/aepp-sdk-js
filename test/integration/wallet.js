@@ -21,16 +21,16 @@ import * as R from 'ramda'
 
 describe('wallet', function () {
   utils.configure(this)
-  
+
   let client
   let wallet
-  
+
   before(async function () {
     client = await utils.client
     wallet = Wallet.create(client, utils.sourceWallet)
   })
 
-  const receiver = Crypto.generateKeyPair()
+  const { pub: receiver } = Crypto.generateKeyPair()
 
   describe('fails on unknown keypairs', () => {
     let wallet
@@ -45,7 +45,7 @@ describe('wallet', function () {
     })
 
     it('spending tokens', async () => {
-      await wallet.spend(1, receiver.pub).should.be.rejectedWith(Error)
+      await wallet.spend(1, receiver).should.be.rejectedWith(Error)
     })
   })
   
@@ -54,7 +54,10 @@ describe('wallet', function () {
   })
 
   it('spends tokens', async () => {
-    const ret = await wallet.spend(1, receiver.pub)
-    console.log(ret)
+    const ret = await wallet.spend(1, receiver)
+    ret.should.have.property('tx')
+    ret.tx.should.include({
+      amount: 1, recipient: receiver
+    })
   })
 })

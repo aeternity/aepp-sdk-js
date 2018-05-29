@@ -22,7 +22,7 @@ const sign = key => data => {
   return Crypto.sign(data, key)
 }
 
-const sendTransaction = (client, key) => async (tx) => {
+const sendTransaction = (client, key) => async tx => {
   if (tx.match(/^tx\$.+$/)) {
     const binaryTx = Crypto.decodeBase58Check(tx.split('$')[1])
     const signature = sign(key)(binaryTx)
