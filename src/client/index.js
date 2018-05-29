@@ -18,6 +18,7 @@
 import axios from 'axios'
 import * as R from 'ramda'
 import urlparse from 'url'
+import Chain from './chain'
 import Wallet from './wallet'
 
 function snakeToPascal (s) {
@@ -262,7 +263,7 @@ const operation = R.memoize((path, method, definition, types) => {
           // return opt.fullResponse ? response : conform(pascalizeKeys(response.data), responses['200'], types)
           return opt.fullResponse ? response : pascalizeKeys(response.data)
         } catch (e) {
-          if (R.has('request', e)) {
+          if (R.path(['response', 'data'], e)) {
             e.message = destructureClientError(e)
           }
           throw e
@@ -291,26 +292,7 @@ const operation = R.memoize((path, method, definition, types) => {
   }
 })
 
-const poll = (fn) => async (th, { blocks = 10, interval = 1000 } = {}) => {
-  async function probe (resolve, reject, attempts) {
-    try {
-      const { transaction } = await fn(th, { txEncoding: 'json' })
-      if (transaction.blockHeight !== -1) {
-        resolve(transaction)
-      } else if (attempts > 0) {
-        setInterval(() => probe(resolve, reject, attempts - 1), interval)
-      } else {
-        reject(Error(`Giving up after ${blocks} mined`))
-      }
-    } catch (e) {
-      reject(e)
-    }
-  }
-
-  return new Promise((resolve, reject) => probe(resolve, reject, blocks))
-}
-
-async function create (url, { internalUrl, websocketUrl } = {}) {
+async function create (url, { internalUrl, websocketUrl, debug = false } = {}) {
   const { version, revision } = await remoteEpochVersion(url)
   const { basePath, paths, definitions } = (() => {
     try {
@@ -335,16 +317,20 @@ async function create (url, { internalUrl, websocketUrl } = {}) {
     }
   }, methods)), paths))))
 
-  return Object.freeze({
+  const o = {
     version,
     revision,
     methods: R.keys(methods),
-    api: methods,
-    poll: poll(methods.getTx),
+    api: methods
+  }
+
+  Object.assign(o, Chain.create(o))
+
+  return Object.freeze(Object.assign(o, {
     wallet (keypair) {
-      return Wallet.create(this, keypair)
+      return Wallet.create(o, keypair)
     }
-  })
+  }))
 }
 
 const internal = {

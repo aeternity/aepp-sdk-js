@@ -17,11 +17,9 @@
 
 import Ae from '@aeternity/aepp-sdk'
 import { Crypto } from '@aeternity/aepp-sdk'
-import { assert, expect } from 'chai'
 import * as utils from './utils'
-import * as R from 'ramda'
 
-describe('client', function () {
+describe('chain', function () {
   utils.configure(this)
 
   let client
@@ -30,28 +28,30 @@ describe('client', function () {
     client = await utils.client
   })
 
-  it('determines remote version', () => {
-    expect(client.version).to.be.a('string')
-    expect(client.revision).to.be.a('string')
-  }),
-
-  it('loads operations', async () => {
-    expect(client.methods).to.include.members(['postTx', 'getBlockByHeight'])
+  it('determines the height', async () => {
+    await client.height().should.eventually.be.a('number')
   })
 
-  it('gets blocks by height for the first 10 blocks', () => {
-    expect(client.api.getBlockByHeight).to.be.a('function')
-    expect(client.api.getBlockByHeight.length).to.equal(2)
-
-    return Promise.all(
-      R.map(async i => {
-        const result = await client.api.getBlockByHeight(i)
-        expect(result.height, i).to.equal(i)
-      }, R.range(1, 11))
-    )
+  it('waits for specified heights', async () => {
+    const target = await client.height() + 2
+    await client.awaitHeight(target, { attempts: 120 }).should.eventually.be.at.least(target)
+    await client.height().should.eventually.be.at.least(target)
   })
 
-  it('throws on unsupported interface', async () => {
-    await client.api.getAccountsBalances().should.be.rejectedWith(Error)
+  it('polls for transactions', async () => {
+    const { pub, priv } = utils.sourceWallet
+    const key = Buffer.from(priv, 'hex')
+    const { tx } = await client.api.postSpend({
+      fee: 1,
+      amount: 1,
+      sender: pub,
+      recipientPubkey: utils.wallets[0].pub,
+      payload: ''
+    })
+    const binaryTx = Crypto.decodeBase58Check(tx.split('$')[1])
+    const { txHash } = await client.api.postTx({ tx: Crypto.encodeTx(Crypto.prepareTx(Crypto.sign(binaryTx, key), binaryTx)) })
+
+    await client.poll(txHash).should.eventually.be.fulfilled
+    await client.poll('th$xxx', { blocks: 1 }).should.eventually.be.rejected
   })
 })
