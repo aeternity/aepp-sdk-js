@@ -53,6 +53,7 @@ function create (client, keypair, { fee = 1 } = {}) {
   const key = Buffer.from(priv, 'hex')
 
   return Object.freeze({
+    account: pub,
     balance: balance(client, pub),
     sign: sign(key),
     sendTransaction: sendTransaction(client, key),

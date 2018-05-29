@@ -18,7 +18,7 @@
 import { assertIsBlock, randomAeName } from '../utils'
 
 import Ae from '@aeternity/aepp-sdk'
-import { AeternityClient, Crypto } from '@aeternity/aepp-sdk'
+import { AeternityClient, Crypto, Wallet } from '@aeternity/aepp-sdk'
 
 const AeHttpProvider = AeternityClient.providers.HttpProvider
 
@@ -62,7 +62,7 @@ async function waitReady (mocha) {
   await httpProvider.provider.ready
   await client.awaitHeight(10)
   if (!charged && planned > 0) {
-    await client.wallet(sourceWallet).spend(planned, wallets[0].pub)
+    await Wallet.create(client, sourceWallet).spend(planned, wallets[0].pub)
     charged = true
   }
 }
