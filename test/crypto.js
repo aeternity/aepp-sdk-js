@@ -120,4 +120,33 @@ describe('crypto', () => {
       })
     })
   })
+
+  describe('hd wallet', () => {
+    const h = ([hexString]) => Buffer.from(hexString, 'hex')
+    const testMnemonic = 'eye quarter chapter suit cruel scrub verify stuff volume control learn dust'
+    const testPassword = 'test-password'
+    const testSaveHDWallet = {
+      chainCode: h`dd5cb572e8bddab36882ebbf87854e3b66f565447f20cfac874a5d3d7dd6d0d5`,
+      privateKey: h`731b6d83ff699d992959cd7f728285e07456a3589c4f1aac774158a63d9181fe`
+    }
+    const testAccounts = [{
+      publicKey: h`f75e53f57822227a58b463095d6dab657cab804574be62de0be1f95279d09037`,
+      secretKey: h`87abcb9c765f3259cf448542cae4c2e9bbff2ad2588693239fd7ca00b17fd463f75e53f57822227a58b463095d6dab657cab804574be62de0be1f95279d09037`
+    }, {
+      publicKey: h`1d7ce9bcf06e93c844c02489862b623c23b14a7364350a36336c87bc76b6650a`,
+      secretKey: h`e78fdb3c2600a0684906adfcb5fac33167576dcb099580bde000bc5a363c939c1d7ce9bcf06e93c844c02489862b623c23b14a7364350a36336c87bc76b6650a`
+    }]
+
+    describe('generateSaveHDWallet', () =>
+      it('generates encrypted extended wallet key', () => {
+        const saveHDWallet = Crypto.generateSaveHDWallet(testMnemonic, testPassword)
+        expect(saveHDWallet).to.eql(testSaveHDWallet)
+      }))
+
+    describe('getSaveHDWalletAccounts', () =>
+      it('generates array of accounts', () => {
+        const accounts = Crypto.getSaveHDWalletAccounts(testSaveHDWallet, testPassword, 2)
+        expect(accounts).to.eql(testAccounts)
+      }))
+  })
 })

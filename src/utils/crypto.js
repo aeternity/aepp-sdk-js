@@ -20,7 +20,9 @@ import shajs from 'sha.js'
 import RLP from 'rlp'
 import nacl from 'tweetnacl'
 import aesjs from 'aes-js'
+import Mnemonic from 'bitcore-mnemonic'
 import { leftPad, rightPad } from './bytes'
+import { derivePathFromSeed, derivePathFromKey, getKeyPair } from './hd-key'
 
 const Ecb = aesjs.ModeOfOperation.ecb
 
@@ -120,6 +122,25 @@ export default {
       pub: encryptPublicKey(password, keys.pub),
       priv: encryptPrivateKey(password, keys.priv)
     }
+  },
+
+  generateSaveHDWallet (mnemonic, password) {
+    const seed = (new Mnemonic(mnemonic)).toSeed()
+    const walletKey = derivePathFromSeed('m/44h/457h', seed)
+    return {
+      privateKey: encryptKey(password, walletKey.privateKey),
+      chainCode: encryptKey(password, walletKey.chainCode)
+    }
+  },
+
+  getSaveHDWalletAccounts (saveHDWallet, password, accountCount) {
+    const walletKey = {
+      privateKey: decryptKey(password, saveHDWallet.privateKey),
+      chainCode: decryptKey(password, saveHDWallet.chainCode)
+    }
+    return (new Array(accountCount)).fill()
+      .map((_, idx) =>
+        getKeyPair(derivePathFromKey(`${idx}h/0h/0h`, walletKey).privateKey))
   },
 
   encryptPublicKey,
