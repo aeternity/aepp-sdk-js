@@ -20,7 +20,7 @@ import shajs from 'sha.js'
 import RLP from 'rlp'
 import nacl from 'tweetnacl'
 import aesjs from 'aes-js'
-import { mnemonicToSeed } from 'bip39'
+import { validateMnemonic, mnemonicToSeed } from 'bip39'
 import { leftPad, rightPad } from './bytes'
 import { derivePathFromSeed, derivePathFromKey, getKeyPair } from './hd-key'
 
@@ -125,6 +125,9 @@ export default {
   },
 
   generateSaveHDWallet (mnemonic, password) {
+    if (!validateMnemonic(mnemonic)) {
+      throw new Error('Invalid mnemonic')
+    }
     const seed = mnemonicToSeed(mnemonic)
     const walletKey = derivePathFromSeed('m/44h/457h', seed)
     return {
