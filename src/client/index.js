@@ -223,14 +223,14 @@ const operation = R.memoize((path, method, definition, types) => {
   const signature = operationSignature(name, req, opts)
   const client = httpClients[method]
 
-  return (url) => {
+  return (url, defaults = {}) => {
     const fn = async function () {
       try {
         const [arg, opt] = (() => {
           if (arguments.length === req.length) {
-            return [arguments, {}]
+            return [Array.from(arguments), defaults]
           } else if (arguments.length === req.length + 1) {
-            return [R.dropLast(1, arguments), R.last(arguments)]
+            return [R.dropLast(1, arguments), R.merge(defaults, R.last(arguments))]
           } else {
             throw Error(`Function call doesn't conform to ${signature}`)
           }
@@ -317,9 +317,9 @@ async function create (url, { internalUrl, websocketUrl, debug = false } = {}) {
     const { tags, operationId } = definition
 
     if (R.contains('external', tags)) {
-      return op(urlparse.resolve(url, basePath))
+      return op(urlparse.resolve(url, basePath), { debug })
     } else if (internalUrl !== void 0 && R.contains('internal', tags)) {
-      return op(urlparse.resolve(internalUrl, basePath))
+      return op(urlparse.resolve(internalUrl, basePath), { debug })
     } else {
       return () => {
         throw Error(`Method ${operationId} is unsupported. No interface for ${R.toString(tags)}`)

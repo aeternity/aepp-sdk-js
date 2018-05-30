@@ -35,7 +35,7 @@ const [host, port] = (process.env.TEST_NODE || 'localhost:3013').split(':')
 const url = process.env.TEST_URL || 'http://localhost:3013'
 const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
 
-const client = Ae.create(url, { internalUrl })
+const client = Ae.create(url, { internalUrl, debug: !!process.env['DEBUG'] })
 
 const httpProvider = new AeternityClient(new AeHttpProvider(host, port, {
   secured: false
