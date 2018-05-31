@@ -16,7 +16,7 @@
  */
 
 import bs58check from 'bs58check'
-import shajs from 'sha.js'
+import Sha256 from 'sha.js/sha256'
 import RLP from 'rlp'
 import nacl from 'tweetnacl'
 import aesjs from 'aes-js'
@@ -25,7 +25,7 @@ import { leftPad, rightPad } from './bytes'
 const Ecb = aesjs.ModeOfOperation.ecb
 
 function hash (input) {
-  return shajs('sha256').update(input).digest()
+  return (new Sha256()).update(input).digest()
 }
 
 function encodeBase58Check (input) {
