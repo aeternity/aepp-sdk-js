@@ -63,7 +63,7 @@ function extendingErrorPath (key, fn) {
     return fn()
   } catch (e) {
     throw Object.assign(e, { path: [key].concat(e.path || []) })
-  }                             
+  }
 }
 
 function TypeError (msg, spec, value) {
