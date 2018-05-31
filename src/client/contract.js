@@ -16,7 +16,6 @@
  */
 
 import * as R from 'ramda'
-import Crypto from '../utils/crypto'
 
 const defaults = {
   callData: '',
@@ -66,7 +65,7 @@ const deploy = (client, wallet) => code => async (options = {}) => {
   })
 }
 
-const compile = (client, { wallet } = {}) => async (code, options = '') => {  
+const compile = (client, { wallet } = {}) => async (code, options = '') => {
   const o = await client.api.compileContract({ code, options })
 
   function noWallet () {
