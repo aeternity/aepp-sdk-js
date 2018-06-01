@@ -4,6 +4,8 @@
   "description": "SDK for the æternity blockchain",
   "main": "dist/aepp-sdk.js",
   "browser": "dist/aepp-sdk.browser.js",
+  "module": "src/index.js",
+  "sideEffects": false,
   "scripts": {
     "build": "webpack -p",
     "build:dev": "webpack --mode=development",
