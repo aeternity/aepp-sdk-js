@@ -33,8 +33,6 @@ program
   .parse(process.argv)
 
 function exec (infile, fn, args) {
-  console.log(infile, fn, args)
-
   const keypair = {
     priv: process.env['WALLET_PRIV'],
     pub: process.env['WALLET_PUB']
