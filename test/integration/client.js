@@ -51,7 +51,7 @@ describe('client', function () {
     )
   })
 
-  it('throws on unsupported interface', async () => {
+  it.skip('throws on unsupported interface', async () => {
     await client.api.getAccountsBalances().should.be.rejectedWith(Error)
   })
 })
