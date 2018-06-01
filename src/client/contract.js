@@ -16,10 +16,8 @@
  */
 
 import * as R from 'ramda'
-import Crypto from '../utils/crypto'
 
 const defaults = {
-  callData: '',
   deposit: 4,
   vmVersion: 1,
   gasPrice: 1,
@@ -28,12 +26,16 @@ const defaults = {
   gas: 40000000
 }
 
-const callStatic = client => (code, abi) => async (name, args, { conformFn = R.identity }) => {
+const encodeCall = client => (code, abi) => async (name, args) => {
+  return (await client.api.encodeCalldata({ abi: abi, code, 'function': name, arg: args })).calldata
+}
+
+const callStatic = client => (code, abi) => async (name, { args = '()', conformFn = R.identity } = {}) => {
   const { out } = await client.api.callContract({ abi: abi, code, 'function': name, arg: args })
   return conformFn(out)
 }
 
-const call = (client, wallet) => address => async (name, args, { conformFn = R.identity }, options = {}) => {
+const call = (client, wallet) => address => async (name, { args = '()', conformFn = R.identity } = {}, options = {}) => {
   const { tx } = await client.api.postContractCallCompute(R.mergeAll([defaults, options, {
     function: name,
     arguments: args,
@@ -52,8 +54,11 @@ const call = (client, wallet) => address => async (name, args, { conformFn = R.i
   }
 }
 
-const deploy = (client, wallet) => code => async (options = {}) => {
+const deploy = (client, wallet) => (code, abi) => async (options = {}) => {
+  const callData = options.initState ? await encodeCall(client)(code, abi)('init', options.initState) : ''
+  console.log(callData)
   const { tx, contractAddress } = await client.api.postContractCreate(R.mergeAll([defaults, options, {
+    callData,
     code,
     owner: wallet.account
   }]))
@@ -66,7 +71,7 @@ const deploy = (client, wallet) => code => async (options = {}) => {
   })
 }
 
-const compile = (client, { wallet } = {}) => async (code, options = '') => {  
+const compile = (client, { wallet } = {}) => async (code, options = '') => {
   const o = await client.api.compileContract({ code, options })
 
   function noWallet () {
@@ -74,8 +79,9 @@ const compile = (client, { wallet } = {}) => async (code, options = '') => {
   }
 
   return Object.freeze(Object.assign({
+    encodeCall: encodeCall(client)(o.bytecode, 'sophia'),
     call: callStatic(client)(o.bytecode, 'sophia'),
-    deploy: R.isNil(wallet) ? noWallet : deploy(client, wallet)(o.bytecode)
+    deploy: R.isNil(wallet) ? noWallet : deploy(client, wallet)(o.bytecode, 'sophia')
   }, o))
 }
 
@@ -84,7 +90,8 @@ function create (client, { wallet } = {}) {
     compile: compile(client, { wallet }),
     callStatic: callStatic(client),
     deploy: deploy(client, wallet),
-    call: call(client, wallet)
+    call: call(client, wallet),
+    encodeCall: encodeCall(client)
   })
 }
 
