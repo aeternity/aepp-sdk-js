@@ -41,16 +41,16 @@ describe('wallet', function () {
     })
 
     it('determining the balance', async () => {
-      await wallet.balance().should.be.rejectedWith(Error)
+      return wallet.balance().should.be.rejectedWith(Error)
     })
 
     it('spending tokens', async () => {
-      await wallet.spend(1, receiver).should.be.rejectedWith(Error)
+      return wallet.spend(1, receiver).should.be.rejectedWith(Error)
     })
   })
   
   it('determines the balance', async () => {
-    await wallet.balance().should.eventually.be.a('number')
+    return wallet.balance().should.eventually.be.a('number')
   })
 
   it('spends tokens', async () => {
@@ -58,6 +58,21 @@ describe('wallet', function () {
     ret.should.have.property('tx')
     ret.tx.should.include({
       amount: 1, recipient: receiver
+    })
+  })
+
+  describe('can be configured to return th', () => {
+    it('on creation', async () => {
+      const wallet = Wallet.create(client, utils.sourceWallet, { waitMined: false })
+      const th = await wallet.spend(1, receiver)
+      th.should.be.a('string')
+      th.slice(0, 3).should.equal('th$')
+    })
+
+    it('on call', async () => {
+      const th = await wallet.spend(1, receiver, { waitMined: false })
+      th.should.be.a('string')
+      th.slice(0, 3).should.equal('th$')
     })
   })
 })

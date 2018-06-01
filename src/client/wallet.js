@@ -22,12 +22,14 @@ const sign = key => data => {
   return Crypto.sign(data, key)
 }
 
-const sendTransaction = (client, key) => async tx => {
+const sendTransaction = (client, key, defaults) => async (tx, options = {}) => {
+  const { waitMined } = R.merge(defaults, options)
+
   if (tx.match(/^tx\$.+$/)) {
     const binaryTx = Crypto.decodeBase58Check(tx.split('$')[1])
     const signature = sign(key)(binaryTx)
     const { txHash } = await client.api.postTx({ tx: Crypto.encodeTx(Crypto.prepareTx(signature, binaryTx)) })
-    return client.poll(txHash)
+    return waitMined ? client.poll(txHash) : txHash
   } else {
     throw Error(`Not a valid transaction hash: ${tx}`)
   }
@@ -37,18 +39,19 @@ const balance = (client, address) => async ({ height, hash } = {}) => {
   return (await client.api.getAccountBalance(address, { height, hash })).balance
 }
 
-const spend = (client, key, address, defaults) => async (amount, receiver, opts) => {
-  const { tx } = await client.api.postSpend(R.mergeAll([defaults, opts, {
+const spend = (client, key, address, defaults) => async (amount, receiver, options = {}) => {
+  const opts = R.mergeAll([defaults, options, {
     amount,
     sender: address,
     recipientPubkey: receiver,
     payload: ''
-  }]))
+  }])
 
-  return sendTransaction(client, key)(tx)
+  const { tx } = await client.api.postSpend(opts)
+  return sendTransaction(client, key)(tx, R.pick(['waitMined', 'ttl'], opts))
 }
 
-function create (client, keypair, { fee = 1 } = {}) {
+function create (client, keypair, { waitMined = true, fee = 1, ttl } = {}) {
   const { pub, priv } = keypair
   const key = Buffer.from(priv, 'hex')
 
@@ -56,8 +59,8 @@ function create (client, keypair, { fee = 1 } = {}) {
     account: pub,
     balance: balance(client, pub),
     sign: sign(key),
-    sendTransaction: sendTransaction(client, key),
-    spend: spend(client, key, pub, { fee })
+    sendTransaction: sendTransaction(client, key, { waitMined, ttl }),
+    spend: spend(client, key, pub, { fee, waitMined, ttl })
   })
 }
 
