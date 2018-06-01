@@ -45,7 +45,8 @@ describe('chain', function () {
       amount: 1,
       sender: pub,
       recipientPubkey: utils.wallets[0].pub,
-      payload: ''
+      payload: '',
+      ttl: 100
     })
     const binaryTx = Crypto.decodeBase58Check(tx.split('$')[1])
     const { txHash } = await client.api.postTx({ tx: Crypto.encodeTx(Crypto.prepareTx(Crypto.sign(binaryTx, key), binaryTx)) })
