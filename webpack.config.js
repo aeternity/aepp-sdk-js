@@ -10,7 +10,7 @@ const common = (env, argv) => {
         {
           test: /\.js$/,
           exclude: /node_modules/,
-          loader: 'standard-loader?error=true'
+          loader: 'babel-loader!standard-loader?error=true'
         },
         {
           test: /^assets\/swagger\/.*\.json$/,
