@@ -23,7 +23,8 @@ const defaults = {
   gasPrice: 1,
   amount: 1,
   fee: 10,
-  gas: 40000000
+  gas: 40000000,
+  ttl: 1000000
 }
 
 const encodeCall = client => (code, abi) => async (name, args) => {
@@ -56,7 +57,6 @@ const call = (client, wallet) => address => async (name, { args = '()', conformF
 
 const deploy = (client, wallet) => (code, abi) => async (options = {}) => {
   const callData = options.initState ? await encodeCall(client)(code, abi)('init', options.initState) : ''
-  console.log(callData)
   const { tx, contractAddress } = await client.api.postContractCreate(R.mergeAll([defaults, options, {
     callData,
     code,

@@ -48,10 +48,11 @@ const spend = (client, key, address, defaults) => async (amount, receiver, optio
   }])
 
   const { tx } = await client.api.postSpend(opts)
-  return sendTransaction(client, key)(tx, R.pick(['waitMined', 'ttl'], opts))
+  return sendTransaction(client, key)(tx, R.pick(['waitMined'], opts))
 }
 
-function create (client, keypair, { waitMined = true, fee = 1, ttl } = {}) {
+// TODO ttl workaround (relative)
+function create (client, keypair, { waitMined = true, fee = 1, ttl = 1000000 } = {}) {
   const { pub, priv } = keypair
   const key = Buffer.from(priv, 'hex')
 
@@ -59,8 +60,9 @@ function create (client, keypair, { waitMined = true, fee = 1, ttl } = {}) {
     account: pub,
     balance: balance(client, pub),
     sign: sign(key),
-    sendTransaction: sendTransaction(client, key, { waitMined, ttl }),
-    spend: spend(client, key, pub, { fee, waitMined, ttl })
+    sendTransaction: sendTransaction(client, key, { waitMined }),
+    spend: spend(client, key, pub, { fee, waitMined, ttl }),
+    ttl
   })
 }
 
