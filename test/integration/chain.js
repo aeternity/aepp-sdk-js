@@ -15,7 +15,6 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import Ae from '@aeternity/aepp-sdk'
 import { Crypto } from '@aeternity/aepp-sdk'
 import * as utils from './utils'
 
