@@ -82,6 +82,10 @@ async function waitReady (mocha) {
   }
 }
 
+function hex ([hexString]) {
+  return Buffer.from(hexString, 'hex')
+}
+
 export {
   httpProvider,
   assertIsBlock,
@@ -92,5 +96,6 @@ export {
   url,
   internalUrl,
   waitReady,
-  plan
+  plan,
+  hex
 }
