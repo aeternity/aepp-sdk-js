@@ -20,12 +20,13 @@ const height = client => async () => (await client.api.getTop()).height
 const awaitHeight = client => async (h, {interval = 5000, attempts = 12} = {}) => {
   const heightFn = height(client)
   async function probe (resolve, reject, left) {
+    const _probe = probe // Workaround for Webpack bug
     try {
       const current = await heightFn()
       if (current >= h) {
         resolve(current)
-      } else if (attempts > 0) {
-        setTimeout(() => probe(resolve, reject, left - 1), interval)
+      } else if (left > 0) {
+        setTimeout(() => _probe(resolve, reject, left - 1), interval)
       } else {
         reject(Error(`Giving up after ${attempts * interval}ms`))
       }
@@ -42,13 +43,14 @@ const poll = client => async (th, { blocks = 10, interval = 5000 } = {}) => {
   const max = await heightFn() + blocks
 
   async function probe (resolve, reject) {
+    const _probe = probe // Workaround for Webpack bug
     try {
       const { transaction } = await client.api.getTx(th, { txEncoding: 'json' })
       if (transaction.blockHeight !== -1) {
         resolve(transaction)
       } else {
         if (await heightFn() < max) {
-          setTimeout(() => probe(resolve, reject), interval)
+          setTimeout(() => _probe(resolve, reject), interval)
         } else {
           reject(Error(`Giving up after ${blocks} blocks mined`))
         }
