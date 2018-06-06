@@ -1,7 +1,8 @@
 const path = require('path')
+const R = require('ramda')
 
-const common = (env, argv) => {
-  return {
+function configure (filename, opts = {}) {
+  return (env, argv) => R.mergeDeepLeft({
     entry: './src/index.js',
     mode: 'development', // automatically overriden by production flag
     devtool: argv.mode === 'production' ? 'source-map' : 'eval-source-map',
@@ -17,22 +18,16 @@ const common = (env, argv) => {
           loader: 'import-glob-loader'
         }
       ]
-    }
-  }
-}
-
-function configure (filename, opts = {}) {
-  return (env, argv) => Object.assign({
+    },
     output: {
       path: path.resolve(__dirname, 'dist'),
       filename,
-      library: 'AeternityClient',
-      libraryTarget: 'umd'
+      library: 'Ae'
     }
-  }, common(env, argv), opts)
+  }, opts)
 }
 
 module.exports = [
-  configure('aepp-sdk.js', { target: 'node' }),
+  configure('aepp-sdk.js', { target: 'node', output: { libraryTarget: 'umd' }}),
   configure('aepp-sdk.browser.js')
 ]
