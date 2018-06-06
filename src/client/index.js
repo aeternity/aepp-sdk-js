@@ -46,7 +46,7 @@ function swag (version) {
 
 async function retrieveSwagger (url) {
   try {
-    return remoteSwagger(url)
+    return await remoteSwagger(url)
   } catch (e) {
     const { version, revision } = await remoteEpochVersion(url)
     try {
