@@ -17,7 +17,8 @@
 
 import { describe, it } from 'mocha'
 import { assert, expect } from 'chai'
-import Crypto from '../../src/utils/crypto'
+import * as Crypto from '../../src/utils/crypto'
+import * as utils from '../utils'
 
 // These keys are fixations for the encryption lifecycle tests and will
 // not be used for signing
@@ -119,5 +120,11 @@ describe('crypto', () => {
         assert.isTrue(result)
       })
     })
+  })
+
+  it('hashing produces 256 bit blake2b byte buffers', () => {
+    const hash = Crypto.hash('foobar')
+    hash.should.be.a('UInt8Array')
+    Buffer.from(hash).toString('hex').should.be.equal('93a0e84a8cdd4166267dbe1263e937f08087723ac24e7dcc35b3d5941775ef47')
   })
 })
