@@ -146,4 +146,3 @@ export function isValidKeypair (privateKey, publicKey) {
   const signature = sign(message, privateKey)
   return verify(message, signature, publicKey)
 }
-
