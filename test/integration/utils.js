@@ -57,7 +57,7 @@ function configure (mocha) {
 }
 
 async function waitReady (mocha) {
-  mocha.timeout(TIMEOUT * 10)
+  configure(mocha)
   await client
   await httpProvider.provider.ready
   await client.awaitHeight(10)
