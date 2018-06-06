@@ -32,13 +32,29 @@ function expandPath (path, replacements) {
   return R.reduce((path, [key, value]) => path.replace(`{${key}}`, value), path, R.toPairs(replacements))
 }
 
+async function remoteSwagger (url) {
+  return (await axios.get(urlparse.resolve(url, '/api'))).data
+}
+
 async function remoteEpochVersion (url) {
-  const result = await axios.get(urlparse.resolve(url, '/v2/version'))
-  return result.data
+  return (await axios.get(urlparse.resolve(url, '/v2/version'))).data
 }
 
 function swag (version) {
   return require(`../../assets/swagger/${version}.json`)
+}
+
+async function retrieveSwagger (url) {
+  try {
+    return remoteSwagger(url)
+  } catch (e) {
+    const { version, revision } = await remoteEpochVersion(url)
+    try {
+      return swag(revision)
+    } catch (e) {
+      return swag(version)
+    }
+  }
 }
 
 function lookupType (path, spec, types) {
@@ -303,15 +319,7 @@ const operation = R.memoize((path, method, definition, types) => {
 })
 
 async function create (url, { internalUrl, websocketUrl, debug = false } = {}) {
-  const { version, revision } = await remoteEpochVersion(url)
-  const { basePath, paths, definitions } = (() => {
-    try {
-      return swag(revision)
-    } catch (e) {
-      return swag(version)
-    }
-  })()
-
+  const { basePath, paths, definitions, info } = await retrieveSwagger(url)
   const methods = R.indexBy(R.prop('name'), R.flatten(R.values(R.mapObjIndexed((methods, path) => R.values(R.mapObjIndexed((definition, method) => {
     const op = operation(path, method, definition, definitions)
     const { tags, operationId } = definition
@@ -328,8 +336,7 @@ async function create (url, { internalUrl, websocketUrl, debug = false } = {}) {
   }, methods)), paths))))
 
   const o = {
-    version,
-    revision,
+    version: info.version,
     methods: R.keys(methods),
     api: methods
   }
