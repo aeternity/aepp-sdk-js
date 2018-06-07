@@ -17,7 +17,7 @@
 
 const height = client => async () => (await client.api.getTop()).height
 
-const awaitHeight = client => async (h, {interval = 5000, attempts = 12} = {}) => {
+const awaitHeight = client => async (h, { interval = 5000, attempts = 12 } = {}) => {
   const heightFn = height(client)
   async function probe (resolve, reject, left) {
     const _probe = probe // Workaround for Webpack bug
