@@ -15,8 +15,9 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+import { describe, it } from 'mocha'
 import { assert, expect } from 'chai'
-import { internal } from '../../src/client'
+import * as internal from '../../src/client'
 import Ae from '../../src'
 import * as utils from '../utils'
 import * as R from 'ramda'
