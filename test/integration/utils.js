@@ -15,12 +15,9 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { assertIsBlock, randomAeName } from '../utils'
-
+import '../utils'
 import Ae from '@aeternity/aepp-sdk'
-import { AeternityClient, Crypto, Wallet } from '@aeternity/aepp-sdk'
-
-const AeHttpProvider = AeternityClient.providers.HttpProvider
+import { Crypto, Wallet } from '@aeternity/aepp-sdk'
 
 const sourceWallet = {
   priv: process.env['WALLET_PRIV'],
@@ -31,16 +28,10 @@ if (!sourceWallet.pub || !sourceWallet.priv) {
   throw Error('Environment variables WALLET_PRIV and WALLET_PUB need to be set')
 }
 
-const [host, port] = (process.env.TEST_NODE || 'localhost:3013').split(':')
 const url = process.env.TEST_URL || 'http://localhost:3013'
 const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
 
 const client = Ae.create(url, { internalUrl, debug: !!process.env['DEBUG'] })
-
-const httpProvider = new AeternityClient(new AeHttpProvider(host, port, {
-  secured: false
-}))
-
 const wallets = Array(3).fill().map(() => Crypto.generateKeyPair())
 
 let planned = 0
@@ -59,7 +50,6 @@ function configure (mocha) {
 async function waitReady (mocha) {
   configure(mocha)
   const _client = await client
-  await httpProvider.provider.ready
   await _client.awaitHeight(10)
   if (!charged && planned > 0) {
     await Wallet.create(_client, sourceWallet).spend(planned, wallets[0].pub)
@@ -68,9 +58,6 @@ async function waitReady (mocha) {
 }
 
 export {
-  httpProvider,
-  assertIsBlock,
-  randomAeName,
   wallets,
   TIMEOUT,
   url,
