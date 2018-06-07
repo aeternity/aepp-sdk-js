@@ -58,11 +58,11 @@ function configure (mocha) {
 
 async function waitReady (mocha) {
   configure(mocha)
-  await client
+  const _client = await client
   await httpProvider.provider.ready
-  await client.awaitHeight(10)
+  await _client.awaitHeight(10)
   if (!charged && planned > 0) {
-    await Wallet.create(client, sourceWallet).spend(planned, wallets[0].pub)
+    await Wallet.create(_client, sourceWallet).spend(planned, wallets[0].pub)
     charged = true
   }
 }
