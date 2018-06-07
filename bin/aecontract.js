@@ -50,7 +50,7 @@ function exec (infile, fn, args) {
   const code = fs.readFileSync(infile, 'utf-8')
 
   Ae.create(program.host, { debug: program.debug }).then(client => {
-    return Contract.create(client, { wallet: Wallet.create(client, keypair) }).compile(code)
+    return Contract.create(client, Wallet.create(client, keypair)).compile(code)
   }).then(bytecode => {
     console.log(`Obtained bytecode ${bytecode.bytecode}`)
     return bytecode.deploy({ initState: program.init })
