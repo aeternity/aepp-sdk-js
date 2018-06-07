@@ -17,14 +17,14 @@
 
 import * as R from 'ramda'
 
-const defaults = {
+const DEFAULTS = {
   deposit: 4,
   vmVersion: 1,
   gasPrice: 1,
   amount: 1,
   fee: 10,
   gas: 40000000,
-  ttl: 1000000
+  ttl: Number.MAX_SAFE_INTEGER
 }
 
 const encodeCall = client => (code, abi) => async (name, args) => {
@@ -36,7 +36,7 @@ const callStatic = client => (code, abi) => async (name, { args = '()', conformF
   return conformFn(out)
 }
 
-const call = (client, wallet) => address => async (name, { args = '()', conformFn = R.identity } = {}, options = {}) => {
+const call = (client, wallet, defaults) => address => async (name, { args = '()', conformFn = R.identity } = {}, options = {}) => {
   const { tx } = await client.api.postContractCallCompute(R.mergeAll([defaults, options, {
     function: name,
     arguments: args,
@@ -55,7 +55,7 @@ const call = (client, wallet) => address => async (name, { args = '()', conformF
   }
 }
 
-const deploy = (client, wallet) => (code, abi) => async (options = {}) => {
+const deploy = (client, wallet, defaults) => (code, abi) => async (options = {}) => {
   const callData = options.initState ? await encodeCall(client)(code, abi)('init', options.initState) : ''
   const { tx, contractAddress } = await client.api.postContractCreate(R.mergeAll([defaults, options, {
     callData,
@@ -67,12 +67,15 @@ const deploy = (client, wallet) => (code, abi) => async (options = {}) => {
 
   return Object.freeze({
     address: contractAddress,
-    call: call(client, wallet)(contractAddress)
+    call: call(client, wallet, defaults)(contractAddress)
   })
 }
 
-const compile = (client, { wallet } = {}) => async (code, options = '') => {
-  const o = await client.api.compileContract({ code, options })
+const compile = (client, { wallet } = {}, defaults) => async (code, options = {}) => {
+  const o = await client.api.compileContract(R.mergeAll([defaults, options, {
+    code,
+    options: ''
+  }]))
 
   function noWallet () {
     throw Error('Wallet not provided')
@@ -81,16 +84,18 @@ const compile = (client, { wallet } = {}) => async (code, options = '') => {
   return Object.freeze(Object.assign({
     encodeCall: encodeCall(client)(o.bytecode, 'sophia'),
     call: callStatic(client)(o.bytecode, 'sophia'),
-    deploy: R.isNil(wallet) ? noWallet : deploy(client, wallet)(o.bytecode, 'sophia')
+    deploy: R.isNil(wallet) ? noWallet : deploy(client, wallet, defaults)(o.bytecode, 'sophia')
   }, o))
 }
 
-function create (client, { wallet } = {}) {
+function create (client, { wallet } = {}, defaults = {}) {
+  const options = R.merge(DEFAULTS, defaults)
+
   return Object.freeze({
-    compile: compile(client, { wallet }),
+    compile: compile(client, { wallet }, options),
     callStatic: callStatic(client),
-    deploy: deploy(client, wallet),
-    call: call(client, wallet),
+    deploy: deploy(client, wallet, options),
+    call: call(client, wallet, options),
     encodeCall: encodeCall(client)
   })
 }

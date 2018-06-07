@@ -63,7 +63,8 @@ describe('contract', function () {
     return contract.deploy(identityContractByteCode)().should.eventually.have.property('address')
   })
 
-  it('calls deployed contracts', async () => {
+  // TODO re-enable at 0.15.0
+  it.skip('calls deployed contracts', async () => {
     return deployed.call('main', { args: '42', conformFn: parseInt }).should.eventually.become(42)
   })
 

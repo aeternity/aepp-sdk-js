@@ -18,6 +18,12 @@
 import * as R from 'ramda'
 import * as Crypto from '../utils/crypto'
 
+const DEFAULTS = {
+  ttl: Number.MAX_SAFE_INTEGER,
+  fee: 1,
+  waitMined: true
+}
+
 const sign = key => data => {
   return Crypto.sign(data, key)
 }
@@ -51,18 +57,17 @@ const spend = (client, key, address, defaults) => async (amount, receiver, optio
   return sendTransaction(client, key)(tx, R.pick(['waitMined'], opts))
 }
 
-// TODO ttl workaround (relative)
-function create (client, keypair, { waitMined = true, fee = 1, ttl = 1000000 } = {}) {
+function create (client, keypair, defaults = {}) {
   const { pub, priv } = keypair
   const key = Buffer.from(priv, 'hex')
+  const options = R.merge(DEFAULTS, defaults)
 
   return Object.freeze({
     account: pub,
     balance: balance(client, pub),
     sign: sign(key),
-    sendTransaction: sendTransaction(client, key, { waitMined }),
-    spend: spend(client, key, pub, { fee, waitMined, ttl }),
-    ttl
+    sendTransaction: sendTransaction(client, key, options),
+    spend: spend(client, key, pub, options)
   })
 }
 

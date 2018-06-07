@@ -44,11 +44,10 @@ function swag (version) {
   return require(`../../assets/swagger/${version}.json`)
 }
 
-async function retrieveSwagger (url) {
+async function retrieveSwagger (url, version, revision) {
   try {
     return await remoteSwagger(url)
   } catch (e) {
-    const { version, revision } = await remoteEpochVersion(url)
     try {
       return swag(revision)
     } catch (e) {
@@ -319,7 +318,8 @@ const operation = R.memoize((path, method, definition, types) => {
 })
 
 async function create (url, { internalUrl, websocketUrl, debug = false } = {}) {
-  const { basePath, paths, definitions, info } = await retrieveSwagger(url)
+  const { version, revision } = await remoteEpochVersion(url)
+  const { basePath, paths, definitions } = await retrieveSwagger(url, version, revision)
   const methods = R.indexBy(R.prop('name'), R.flatten(R.values(R.mapObjIndexed((methods, path) => R.values(R.mapObjIndexed((definition, method) => {
     const op = operation(path, method, definition, definitions)
     const { tags, operationId } = definition
@@ -336,22 +336,13 @@ async function create (url, { internalUrl, websocketUrl, debug = false } = {}) {
   }, methods)), paths))))
 
   const o = {
-    version: info.version,
+    version,
+    revision,
     methods: R.keys(methods),
-    api: methods
+    api: methods,
   }
 
   return Object.freeze(Object.assign(o, Chain.create(o)))
-}
-
-const internal = {
-  conform,
-  operation,
-  expandPath,
-  assertOne,
-  snakeToPascal,
-  pascalToSnake,
-  traverseKeys
 }
 
 export default {
@@ -359,5 +350,11 @@ export default {
 }
 
 export {
-  internal
+  conform,
+  operation,
+  expandPath,
+  assertOne,
+  snakeToPascal,
+  pascalToSnake,
+  traverseKeys
 }
