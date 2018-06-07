@@ -339,7 +339,7 @@ async function create (url, { internalUrl, websocketUrl, debug = false } = {}) {
     version,
     revision,
     methods: R.keys(methods),
-    api: methods,
+    api: methods
   }
 
   return Object.freeze(Object.assign(o, Chain.create(o)))
