@@ -16,7 +16,7 @@
  */
 
 import * as R from 'ramda'
-import Crypto from '../utils/crypto'
+import * as Crypto from '../utils/crypto'
 
 const sign = key => data => {
   return Crypto.sign(data, key)
