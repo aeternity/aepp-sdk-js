@@ -10,7 +10,7 @@ function configure (filename, opts = {}) {
       rules: [
         {
           test: /\.js$/,
-          exclude: /node_modules/,
+          include: path.resolve(__dirname, 'src'),
           loader: 'babel-loader!standard-loader?error=true'
         },
         {
@@ -22,12 +22,13 @@ function configure (filename, opts = {}) {
     output: {
       path: path.resolve(__dirname, 'dist'),
       filename,
-      library: 'Ae'
+      library: 'Ae',
+      libraryTarget: 'umd'
     }
   }, opts)
 }
 
 module.exports = [
-  configure('aepp-sdk.js', { target: 'node', output: { libraryTarget: 'umd' }}),
+  configure('aepp-sdk.js', { target: 'node' }),
   configure('aepp-sdk.browser.js')
 ]
