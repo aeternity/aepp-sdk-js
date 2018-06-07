@@ -15,14 +15,12 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import AeternityClient from './legacy'
 import * as Crypto from './utils/crypto'
 import Ae from './client'
 import Wallet from './client/wallet'
 import Contract from './client/contract'
 
 export {
-  AeternityClient,
   Crypto,
   Wallet,
   Contract
