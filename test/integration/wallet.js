@@ -15,6 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+import { describe, it, before } from 'mocha'
 import { Wallet, Crypto } from '@aeternity/aepp-sdk'
 import * as utils from './utils'
 import * as R from 'ramda'

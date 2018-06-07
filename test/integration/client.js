@@ -15,6 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+import { describe, it, before } from 'mocha'
 import Ae from '@aeternity/aepp-sdk'
 import { Crypto } from '@aeternity/aepp-sdk'
 import { assert, expect } from 'chai'

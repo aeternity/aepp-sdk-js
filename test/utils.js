@@ -16,31 +16,7 @@
  */
 
 import chai from 'chai'
-import { assert } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 
 chai.use(chaiAsPromised)
 chai.should()
-
-// Naive assertion
-const assertIsBlock = (data) => {
-  assert.ok(data)
-  assert.ok(data.stateHash)
-  assert.ok(Number.isInteger(data.height))
-}
-
-const randomAeName = () => {
-  let text = ''
-  let possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  let urlLength = 10
-
-  for (let i = 0; i < urlLength; i++) {
-    text += possible.charAt(Math.floor(Math.random() * possible.length))
-  }
-  return `${text}.aet`
-}
-
-export {
-  assertIsBlock,
-  randomAeName,
-}
