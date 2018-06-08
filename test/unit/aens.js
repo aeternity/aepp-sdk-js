@@ -15,17 +15,24 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import * as Crypto from './utils/crypto'
-import Ae from './client'
-import Wallet from './client/wallet'
-import Contract from './client/contract'
-import Aens from './client/aens'
+import { describe, it } from 'mocha'
+import Aens from '../../src/client/aens'
+import * as utils from '../utils'
+import * as R from 'ramda'
 
-export {
-  Crypto,
-  Wallet,
-  Contract,
-  Aens
-}
+describe('aens', function () {
+  it('salt produces random sequences every time', () => {
+    const salt1 = Aens.salt()
+    const salt2 = Aens.salt()
+    salt1.should.be.a('Number')
+    salt2.should.be.a('Number')
+    salt1.should.not.be.equal(salt2)
+  })
 
-export default Ae
+  it('reproducible commitment hashes can be generated', () => {
+    const salt = Aens.salt()
+    const hash = Aens.commitmentHash('foobar.aet', salt)
+    hash.should.be.a('string')
+    hash.should.be.equal(Aens.commitmentHash('foobar.aet', salt))
+  })
+})
