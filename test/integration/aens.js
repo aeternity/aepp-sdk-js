@@ -81,7 +81,7 @@ describe('aens', function () {
   })
 
   // TODO re-enable after release; no idea why it doesn't work
-  it.skip('tranfers names', async () => {
+  it.skip('transfers names', async () => {
     const claim = await aens.query(name)
     await claim.transfer(utils.wallets[0].pub)
     const aens2 = Aens.create(client, { wallet: Wallet.create(client, utils.wallets[0]) })
