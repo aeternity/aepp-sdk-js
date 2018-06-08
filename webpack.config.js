@@ -14,6 +14,12 @@ function configure (filename, opts = {}) {
           loader: 'babel-loader!standard-loader?error=true'
         },
         {
+          test: /\.js$/,
+          include: path.resolve(__dirname, 'node_modules/rlp'),
+          loader: 'babel-loader',
+          options: { presets: ["@babel/preset-env"] }
+        },
+        {
           test: /^assets\/swagger\/.*\.json$/,
           loader: 'import-glob-loader'
         }
