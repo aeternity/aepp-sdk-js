@@ -41,14 +41,15 @@ const callStatic = client => (code, abi) => async (name, { args = '()', conformF
 }
 
 const call = (client, wallet, { defaults = {} } = {}) => address => async (name, { args = '()', conformFn = R.identity, options = {} } = {}) => {
-  const { tx } = await client.api.postContractCallCompute(R.mergeAll([defaults, options, {
+  const opt = R.merge(defaults, options)
+  const { tx } = await client.api.postContractCallCompute(R.merge(opt, {
     function: name,
     arguments: args,
     contract: address,
     caller: wallet.account
-  }]))
+  }))
 
-  const { hash } = await wallet.sendTransaction(tx)
+  const { hash } = await wallet.sendTransaction(tx, { options: opt })
   const result = await client.api.getContractCallFromTx(hash)
 
   if (result.returnType === 'ok') {
@@ -61,13 +62,14 @@ const call = (client, wallet, { defaults = {} } = {}) => address => async (name,
 
 const deploy = (client, wallet, { defaults = {} } = {}) => (code, abi) => async ({ options = {} } = {}) => {
   const callData = options.initState ? await encodeCall(client)(code, abi)('init', options.initState) : ''
-  const { tx, contractAddress } = await client.api.postContractCreate(R.mergeAll([defaults, options, {
+  const opt = R.merge(defaults, options)
+  const { tx, contractAddress } = await client.api.postContractCreate(R.merge(opt, {
     callData,
     code,
     owner: wallet.account
-  }]))
+  }))
 
-  await wallet.sendTransaction(tx)
+  await wallet.sendTransaction(tx, { options: opt })
 
   return Object.freeze({
     address: contractAddress,

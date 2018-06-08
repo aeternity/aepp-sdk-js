@@ -64,14 +64,14 @@ describe('wallet', function () {
 
   describe('can be configured to return th', () => {
     it('on creation', async () => {
-      const wallet = Wallet.create(client, utils.sourceWallet, { waitMined: false })
+      const wallet = Wallet.create(client, utils.sourceWallet, { defaults: { waitMined: false } })
       const th = await wallet.spend(1, receiver)
       th.should.be.a('string')
       th.slice(0, 3).should.equal('th$')
     })
 
     it('on call', async () => {
-      const th = await wallet.spend(1, receiver, { waitMined: false })
+      const th = await wallet.spend(1, receiver, { options: { waitMined: false } })
       th.should.be.a('string')
       th.slice(0, 3).should.equal('th$')
     })
