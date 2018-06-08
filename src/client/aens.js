@@ -46,7 +46,7 @@ function commitmentHash (input, salt) {
 const transfer = (client, wallet, { defaults = {} } = {}) => nameHash => async (account, { options = {} } = {}) => {
   const opt = R.merge(defaults, options)
 
-  const { tx } = await client.api.postNameTransfer(R.merge(opt, { 
+  const { tx } = await client.api.postNameTransfer(R.merge(opt, {
     nameHash,
     recipientPubkey: account
   }))
@@ -75,7 +75,7 @@ function classify (s) {
 const update = (client, wallet, { defaults = {} } = {}) => nameHash => async (target, { options = {} } = {}) => {
   const opt = R.merge(defaults, options)
 
-  const { tx } = await client.api.postNameUpdate(R.merge(opt, { 
+  const { tx } = await client.api.postNameUpdate(R.merge(opt, {
     nameHash,
     account: wallet.account,
     pointers: JSON.stringify(R.fromPairs([[classify(target), target]]))
@@ -89,7 +89,7 @@ const query = (client, { wallet, defaults = {} }) => async name => {
   const { nameHash } = o
   const updateFn = R.apply(update(client, wallet, { defaults })(nameHash))
   const transferFn = R.apply(transfer(client, wallet, { defaults })(nameHash))
-  
+
   return Object.freeze(Object.assign(o, {
     pointers: JSON.parse(o.pointers || '{}'),
     update: R.isNil(wallet) ? noWallet : async function () {
