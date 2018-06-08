@@ -28,6 +28,7 @@ describe('client', function () {
   let client
 
   before(async function () {
+    await utils.waitReady(this)
     client = await utils.client
   })
 
