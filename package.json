@@ -4,6 +4,8 @@
   "description": "SDK for the æternity blockchain",
   "main": "dist/aepp-sdk.js",
   "browser": "dist/aepp-sdk.browser.js",
+  "module": "src/index.js",
+  "sideEffects": false,
   "scripts": {
     "build": "webpack -p",
     "build:dev": "webpack --mode=development",
@@ -15,13 +17,13 @@
   "license": "ISC",
   "dependencies": {
     "@babel/runtime": "^7.0.0-beta.46",
-    "aes-js": "^3.1.0",
+    "aes-js": "^3.1.1",
     "axios": "^0.18.0",
+    "blakejs": "^1.1.0",
     "bs58check": "^2.1.1",
     "postinstall-build": "^5.0.1",
     "ramda": "^0.25.0",
     "rlp": "^2.0.0",
-    "sha.js": "^2.4.10",
     "tweetnacl": "^1.0.0",
     "url": "^0.11.0",
     "websocket": "^1.0.25"
@@ -44,6 +46,7 @@
     "babel-plugin-ramda": "^1.6.1",
     "bufferutil": "^3.0.3",
     "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
     "commander": "^2.14.1",
     "import-glob-loader": "^1.1.0",
     "mocha": "^5.0.0",
@@ -52,7 +55,7 @@
     "sinon": "^4.2.2",
     "standard": "*",
     "standard-loader": "^6.0.1",
-    "webpack": "^4.8.1",
+    "webpack": "^4.10.2",
     "webpack-cli": "^2.1.3"
   }
 }

@@ -18,6 +18,7 @@
 import axios from 'axios'
 import * as R from 'ramda'
 import urlparse from 'url'
+import Chain from './chain'
 
 function snakeToPascal (s) {
   return s.replace(/_./g, match => R.toUpper(match[1]))
@@ -31,13 +32,28 @@ function expandPath (path, replacements) {
   return R.reduce((path, [key, value]) => path.replace(`{${key}}`, value), path, R.toPairs(replacements))
 }
 
+async function remoteSwagger (url) {
+  return (await axios.get(urlparse.resolve(url, '/api'))).data
+}
+
 async function remoteEpochVersion (url) {
-  const result = await axios.get(urlparse.resolve(url, '/v2/version'))
-  return result.data
+  return (await axios.get(urlparse.resolve(url, '/v2/version'))).data
 }
 
 function swag (version) {
   return require(`../../assets/swagger/${version}.json`)
+}
+
+async function retrieveSwagger (url, version, revision) {
+  try {
+    return await remoteSwagger(url)
+  } catch (e) {
+    try {
+      return swag(revision)
+    } catch (e) {
+      return swag(version)
+    }
+  }
 }
 
 function lookupType (path, spec, types) {
@@ -57,12 +73,25 @@ function lookupType (path, spec, types) {
   }
 }
 
+function extendingErrorPath (key, fn) {
+  try {
+    return fn()
+  } catch (e) {
+    throw Object.assign(e, { path: [key].concat(e.path || []) })
+  }
+}
+
+function TypeError (msg, spec, value) {
+  const e = Error(msg)
+  return Object.assign(e, { spec, value })
+}
+
 const conformTypes = {
   integer (value, spec, types) {
-    if (typeof value === 'number') {
+    if (R.type(value) === 'Number') {
       return Math.floor(value)
     } else {
-      throw Error(`Not an integer: ${value}`)
+      throw TypeError('Not an integer', spec, value)
     }
   },
   enum (value, spec, types) {
@@ -70,29 +99,36 @@ const conformTypes = {
     if (R.contains(value, values)) {
       return value
     } else {
-      throw Error(`${value} is not one of [${R.join(', ', values)}]`)
+      throw TypeError(`Not one of [${R.join(', ', values)}]`, spec, value)
     }
   },
   string (value, spec, types) {
-    if (typeof value === 'string') {
+    if (R.type(value) === 'String') {
       return value
     } else {
-      throw Error(`Not a string: ${value}`)
+      throw TypeError(`Not a string`, spec, value)
     }
   },
   object (value, spec, types) {
-    if (typeof value === 'object') {
+    if (R.type(value) === 'Object') {
       const required = R.map(snakeToPascal, spec.required || [])
       const properties = pascalizeKeys(spec.properties)
       const missing = R.difference(required, R.keys(value))
 
       if (missing.length > 0) {
-        throw Error(`Required properties missing: ${R.join(', ', missing)}`)
+        throw TypeError(`Required properties missing: ${R.join(', ', missing)}`, spec, value)
       } else {
-        return R.mapObjIndexed((value, key) => conform(value, properties[key], types), R.reject(R.isNil, R.pick(R.keys(properties), value)))
+        return R.mapObjIndexed((value, key) => extendingErrorPath(key, () => conform(value, properties[key], types)), R.reject(R.isNil, R.pick(R.keys(properties), value)))
       }
     } else {
-      throw Error(`Not an object: ${value}`)
+      throw TypeError(`Not an object`, spec, value)
+    }
+  },
+  array (value, spec, types) {
+    if (R.type(value) === 'Array') {
+      return R.map(o => conform(o, spec.items, types), value)
+    } else {
+      throw TypeError(`Not an array`, spec, value)
     }
   },
   schema (value, spec, types) {
@@ -100,6 +136,9 @@ const conformTypes = {
   },
   $ref (value, spec, types) {
     return conform(value, lookupType(['$ref'], spec, types), types)
+  },
+  allOf (value, spec, types) {
+    return R.mergeAll(R.map(spec => conform(value, spec, types), spec.allOf))
   }
 }
 
@@ -110,14 +149,18 @@ function conformDispatch (spec) {
     return '$ref'
   } else if ('enum' in spec) {
     return 'enum'
-  } else {
+  } else if ('allOf' in spec) {
+    return 'allOf'
+  } else if ('type' in spec) {
     return spec.type
+  } else {
+    throw Object.assign(Error('Could not determine type'), { spec })
   }
 }
 
 function conform (value, spec, types) {
   return (conformTypes[conformDispatch(spec)] || (() => {
-    throw Error(`Unsupported type ${spec.type}`)
+    throw Object.assign(Error('Unsupported type'), { spec })
   }))(value, spec, types)
 }
 
@@ -195,14 +238,14 @@ const operation = R.memoize((path, method, definition, types) => {
   const signature = operationSignature(name, req, opts)
   const client = httpClients[method]
 
-  return (url) => {
+  return (url, defaults = {}) => {
     const fn = async function () {
       try {
         const [arg, opt] = (() => {
           if (arguments.length === req.length) {
-            return [arguments, {}]
+            return [Array.from(arguments), defaults]
           } else if (arguments.length === req.length + 1) {
-            return [R.dropLast(1, arguments), R.last(arguments)]
+            return [R.dropLast(1, arguments), R.merge(defaults, R.last(arguments))]
           } else {
             throw Error(`Function call doesn't conform to ${signature}`)
           }
@@ -217,9 +260,12 @@ const operation = R.memoize((path, method, definition, types) => {
           try {
             return conform(val, indexedParameters[key], types)
           } catch (e) {
-            e.value = val
-            e.message = `validating ${key}: ${e.message}`
-            throw e
+            const path = [key].concat(e.path || [])
+            throw Object.assign(e, {
+              path,
+              value: val,
+              message: `validating ${R.join(' -> ', path)}: ${e.message}`
+            })
           }
         }, values)
         const expandedPath = expandPath(path, snakizeKeys(R.pick(pathArgs, conformed)))
@@ -239,10 +285,13 @@ const operation = R.memoize((path, method, definition, types) => {
 
         try {
           const response = await client(`${url}${expandedPath}`, params, { headers: {'Content-Type': 'application/json'} })
+          // return opt.fullResponse ? response : conform(pascalizeKeys(response.data), responses['200'], types)
           return opt.fullResponse ? response : pascalizeKeys(response.data)
-        } catch (error) {
-          console.log(destructureClientError(error))
-          throw error
+        } catch (e) {
+          if (R.path(['response', 'data'], e)) {
+            e.message = destructureClientError(e)
+          }
+          throw e
         }
       } catch (e) {
         e.message = `While calling ${signature}, ${e.message}`
@@ -268,24 +317,17 @@ const operation = R.memoize((path, method, definition, types) => {
   }
 })
 
-async function create (url, { internalUrl, websocketUrl } = {}) {
+async function create (url, { internalUrl, websocketUrl, debug = false } = {}) {
   const { version, revision } = await remoteEpochVersion(url)
-  const { basePath, paths, definitions } = (() => {
-    try {
-      return swag(revision)
-    } catch (e) {
-      return swag(version)
-    }
-  })()
-
+  const { basePath, paths, definitions } = await retrieveSwagger(url, version, revision)
   const methods = R.indexBy(R.prop('name'), R.flatten(R.values(R.mapObjIndexed((methods, path) => R.values(R.mapObjIndexed((definition, method) => {
     const op = operation(path, method, definition, definitions)
     const { tags, operationId } = definition
 
     if (R.contains('external', tags)) {
-      return op(urlparse.resolve(url, basePath))
+      return op(urlparse.resolve(url, basePath), { debug })
     } else if (internalUrl !== void 0 && R.contains('internal', tags)) {
-      return op(urlparse.resolve(internalUrl, basePath))
+      return op(urlparse.resolve(internalUrl, basePath), { debug })
     } else {
       return () => {
         throw Error(`Method ${operationId} is unsupported. No interface for ${R.toString(tags)}`)
@@ -293,22 +335,14 @@ async function create (url, { internalUrl, websocketUrl } = {}) {
     }
   }, methods)), paths))))
 
-  return Object.freeze({
+  const o = {
     version,
     revision,
     methods: R.keys(methods),
     api: methods
-  })
-}
+  }
 
-const internal = {
-  conform,
-  operation,
-  expandPath,
-  assertOne,
-  snakeToPascal,
-  pascalToSnake,
-  traverseKeys
+  return Object.freeze(Object.assign(o, Chain.create(o)))
 }
 
 export default {
@@ -316,5 +350,11 @@ export default {
 }
 
 export {
-  internal
+  conform,
+  operation,
+  expandPath,
+  assertOne,
+  snakeToPascal,
+  pascalToSnake,
+  traverseKeys
 }

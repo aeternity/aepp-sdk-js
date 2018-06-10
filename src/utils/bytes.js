@@ -15,7 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-function leftPad (length, inputBuffer) {
+export function leftPad (length, inputBuffer) {
   let fill = length - inputBuffer.length
   if (fill > 0) {
     let fillArray = new Uint8Array(fill)
@@ -26,7 +26,7 @@ function leftPad (length, inputBuffer) {
   }
 }
 
-function rightPad (length, inputBuffer) {
+export function rightPad (length, inputBuffer) {
   let fill = length - inputBuffer.length
   if (fill > 0) {
     let fillArray = new Uint8Array(fill)
@@ -36,5 +36,3 @@ function rightPad (length, inputBuffer) {
     return inputBuffer
   }
 }
-
-export { leftPad, rightPad }

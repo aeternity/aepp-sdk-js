@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright 2018 aeternity developers
+ * Copyright (c) 2018 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -15,22 +15,16 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+import { describe, it } from 'mocha'
 import { assert, expect } from 'chai'
-import { internal } from '../src/client'
-import Ae from '../src'
-import { url, internalUrl, waitReady, TIMEOUT } from './utils'
+import * as internal from '../../src/client'
+import Ae from '../../src'
+import * as utils from '../utils'
 import * as R from 'ramda'
 import op from './sample-operation.json'
+import def from './sample-definition.json'
 
 describe('client', function () {
-  let client
-
-  before(async function () {
-    this.timeout(TIMEOUT)
-    await waitReady(this)
-    client = await Ae.create(url, { internal: internalUrl })
-  })
-
   it('walks through deep structures', () => {
     const input = {
       a: 1,
@@ -72,11 +66,6 @@ describe('client', function () {
     assert.equal(internal.expandPath('unchanged'), 'unchanged')
   }),
 
-  it('determines remote version', () => {
-    expect(client.version).to.be.a('string')
-    expect(client.revision).to.be.a('string')
-  }),
-  
   describe('conforms', () => {
     it('integers', () => {
       const spec = { type: 'integer' }
@@ -117,36 +106,10 @@ describe('client', function () {
       expect(() => internal.conform({ bar: 'xxx' }, spec).to.throw())
     })
 
-    it('error', () => {
+    it('errors', () => {
       const spec = { type: 'shizzle' }
       expect(() => internal.conform({}, spec).to.throw())
     })
-  })
-
-  it('loads operations', async () => {
-    expect(client.methods).to.include.members(['postTx', 'getBlockByHeight'])
-  })
-
-  it('maps operations', async () => {
-    const [path, data] = R.head(R.toPairs(op))
-    const [method, operation] = R.head(R.toPairs(data))
-    const fn = internal.operation(path, method, operation)(`${url}/v2`)
-    assert.equal(fn.length, 2)
-    const result = await fn(5, { txEncoding: 'message_pack' })
-    assert.ok(result)
-  })
-
-  it('gets blocks by height for the first 10 blocks', () => {
-    this.timeout(TIMEOUT)
-    expect(client.api.getBlockByHeight).to.be.a('function')
-    expect(client.api.getBlockByHeight.length).to.equal(2)
-
-    return Promise.all(
-      R.map(async i => {
-        const result = await client.api.getBlockByHeight(i)
-        expect(result.height, i).to.equal(i)
-      }, R.range(1, 11))
-    )
   })
 
   it('asserts single element collections', () => {
@@ -155,7 +118,10 @@ describe('client', function () {
     expect(() => internal.assertOne([1, 2]).to.throw())
   })
 
-  it('throws on unsupported interface', () => {
-    expect(() => client.api.getPubKey()).to.throw()
+  it('maps operations', async () => {
+    const [path, data] = R.head(R.toPairs(op))
+    const [method, operation] = R.head(R.toPairs(data))
+    const fn = internal.operation(path, method, operation, def)(`${utils.url}/v2`)
+    assert.equal(fn.length, 2)
   })
 })

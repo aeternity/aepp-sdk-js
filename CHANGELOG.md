@@ -13,6 +13,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 - Adapte new method of obtaining transaction hash
 
 ### Removed
+- Oracle API
 
 ### Fixed
 
