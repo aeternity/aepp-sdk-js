@@ -33,11 +33,11 @@ function expandPath (path, replacements) {
 }
 
 async function remoteSwagger (url) {
-  return (await axios.get(urlparse.resolve(url, '/api'))).data
+  return (await axios.get(urlparse.resolve(url, 'api'))).data
 }
 
 async function remoteEpochVersion (url) {
-  return (await axios.get(urlparse.resolve(url, '/v2/version'))).data
+  return (await axios.get(urlparse.resolve(url, 'v2/version'))).data
 }
 
 function swag (version) {
