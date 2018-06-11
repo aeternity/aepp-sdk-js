@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
-## [Unreleased]
+## [0.14.0-0.1.0]
 ### Added
 - New, opinionated top-level API
 
@@ -43,5 +43,5 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 - More consistent code examples
 
 [0.13.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.10.0-0.1.0...0.13.0-0.1.0
-[Unreleased]: https://github.com/aeternity/aepp-sdk-js/compare/v0.13.0-0.1.0...develop
+[0.14.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.13.0-0.1.0...0.14.0-0.1.0
 [GH-49]: https://github.com/aeternity/aepp-sdk-js/issues/49
