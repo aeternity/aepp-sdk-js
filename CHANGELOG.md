@@ -4,16 +4,21 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
 ### Added
+- New, opinionated top-level API
 
 ### Changed
 - Rest of legacy API now uses new API as well
 - Generated API now encapsulated in `api` object
 - Automatic case conversion for remote parameter names
 - Remaining tests to use new API
-- Adapte new method of obtaining transaction hash
+- Adapted new method of obtaining transaction hash, breaks compatibility (see
+  below)
 
 ### Removed
-- Oracle API
+- Oracle API (for the time being)
+- Legacy API and tests
+- Compatibility with older versions of Epoch which provide the transaction hash
+  the old way
 
 ### Fixed
 
