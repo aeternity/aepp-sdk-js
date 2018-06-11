@@ -42,6 +42,6 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 ### Fixed
 - More consistent code examples
 
-[0.13.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.10.0-0.1.0...0.13.0-0.1.0
-[0.14.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.13.0-0.1.0...0.14.0-0.1.0
+[0.13.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.10.0-0.1.0...v0.13.0-0.1.0
+[0.14.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.13.0-0.1.0...v0.14.0-0.1.0
 [GH-49]: https://github.com/aeternity/aepp-sdk-js/issues/49
