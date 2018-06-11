@@ -1,6 +1,6 @@
 # Examples
 
-## Browser &lt;script&gt; tag
+## Browser <script> tag
 ```html
 <!doctype html>
 <html lang="en">
@@ -27,9 +27,9 @@ Use a prebuilt package from npmjs
 ```
 yarn add @aeternity/aepp-sdk
 ```
-Or use a branch directly from github
+Or use a branch directly from github if you want to try unreleased features
 ```
-yarn add aeternity/aepp-sdk-js#feature/sweet-api
+yarn add aeternity/aepp-sdk-js#develop
 ```
 create index.js
 ```js
