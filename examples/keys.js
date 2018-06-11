@@ -21,7 +21,7 @@
 const program = require('commander')
 const prompt = require('prompt')
 const fs = require('fs')
-const { Crypto } = require('../dist/aepp-sdk')
+const { Crypto } = require('../dist/aepp-sdk').default
 const path = require('path')
 
 let promptSchema = {
