@@ -1,5 +1,92 @@
 # Examples
 
+## Browser <script> tag
+```html
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
+  <script src="aepp-sdk.browser.js"></script>
+  <script type="text/javascript">
+    Ae.default.create('https://sdk-testnet.aepps.com').then(client => {
+      client.height().then(height => {
+        console.log('Current Block', height)
+      })
+    })
+  </script>
+</body>
+</html>
+```
+
+## nodejs (without compiling)
+
+Use either yarn or npm to install the sdk.
+Use a prebuilt package from npmjs
+```
+yarn add @aeternity/aepp-sdk
+```
+Or use a branch directly from github if you want to try unreleased features
+```
+yarn add aeternity/aepp-sdk-js#develop
+```
+create index.js
+```js
+const Ae = require('@aeternity/aepp-sdk')
+
+Ae.default.create('https://sdk-testnet.aepps.com').then(client => {
+  client.height().then(height => {
+    console.log('Current Block', height)
+  })
+})
+
+// same with async
+const main = async () => {
+  const client = await Ae.default.create('https://sdk-testnet.aepps.com')
+  const height = await client.height()
+  console.log('Current Block', height)
+}
+main()
+```
+
+run:
+```
+node index.js
+```
+
+## vue.js with webpack
+set up a new vue project with webpack
+```
+vue init webpack my-project
+cd my-project
+yarn add @aeternity/aepp-sdk
+```
+edit src/components/HelloWorld.vue
+```js
+<script>
+import Ae from '@aeternity/aepp-sdk'
+const ae = Ae.create('https://sdk-testnet.aepps.com')
+export default {
+  name: 'HelloWorld',
+  data () {
+    return {
+      msg: 'Welcome to Your Vue.js App'
+    }
+  },
+  async mounted () {
+    const client = await ae
+    const height = await client.height()
+    this.msg = 'Current Block: ' + height
+  }
+}
+</script>
+```
+start the application
+```
+yarn dev
+```
+
 ## Transaction Signing
 
 Signing transactions with private keys is a fundamental feature of the
@@ -54,8 +141,8 @@ examples/signing.js spend-signed <recipient_pub_key> <amount> --keys <your Epoch
 ```
 examples/signing.js spend-signed <recipient_pub_key> <amount> --keys <your Epoch keys>
 ```
-The [documentation](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/Signing.md) 
-also walks you through that demo. 
+The [documentation](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/Signing.md)
+also walks you through that demo.
 
 ## AENS
 
