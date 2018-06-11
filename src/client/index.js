@@ -33,11 +33,11 @@ function expandPath (path, replacements) {
 }
 
 async function remoteSwagger (url) {
-  return (await axios.get(urlparse.resolve(url, '/api'))).data
+  return (await axios.get(urlparse.resolve(url, 'api'))).data
 }
 
 async function remoteEpochVersion (url) {
-  return (await axios.get(urlparse.resolve(url, '/v2/version'))).data
+  return (await axios.get(urlparse.resolve(url, 'v2/version'))).data
 }
 
 function swag (version) {
@@ -318,16 +318,18 @@ const operation = R.memoize((path, method, definition, types) => {
 })
 
 async function create (url, { internalUrl, websocketUrl, debug = false } = {}) {
-  const { version, revision } = await remoteEpochVersion(url)
-  const { basePath, paths, definitions } = await retrieveSwagger(url, version, revision)
+  const baseUrl = url.replace(/\/?$/, '/')
+  const { version, revision } = await remoteEpochVersion(baseUrl)
+  const { basePath, paths, definitions } = await retrieveSwagger(baseUrl, version, revision)
+  const trimmedBasePath = basePath.replace(/^\//, '')
   const methods = R.indexBy(R.prop('name'), R.flatten(R.values(R.mapObjIndexed((methods, path) => R.values(R.mapObjIndexed((definition, method) => {
     const op = operation(path, method, definition, definitions)
     const { tags, operationId } = definition
 
     if (R.contains('external', tags)) {
-      return op(urlparse.resolve(url, basePath), { debug })
+      return op(urlparse.resolve(baseUrl, trimmedBasePath), { debug })
     } else if (internalUrl !== void 0 && R.contains('internal', tags)) {
-      return op(urlparse.resolve(internalUrl, basePath), { debug })
+      return op(urlparse.resolve(internalUrl.replace(/\/?$/, '/'), trimmedBasePath), { debug })
     } else {
       return () => {
         throw Error(`Method ${operationId} is unsupported. No interface for ${R.toString(tags)}`)
