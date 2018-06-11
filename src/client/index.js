@@ -319,8 +319,6 @@ const operation = R.memoize((path, method, definition, types) => {
 
 async function create (url, { internalUrl, websocketUrl, debug = false } = {}) {
   const baseUrl = url.replace(/\/?$/, '/')
-  const baseInternalUrl = internalUrl.replace(/\/?$/, '/')
-
   const { version, revision } = await remoteEpochVersion(baseUrl)
   const { basePath, paths, definitions } = await retrieveSwagger(baseUrl, version, revision)
   const trimmedBasePath = basePath.replace(/^\//, '')
@@ -331,7 +329,7 @@ async function create (url, { internalUrl, websocketUrl, debug = false } = {}) {
     if (R.contains('external', tags)) {
       return op(urlparse.resolve(baseUrl, trimmedBasePath), { debug })
     } else if (internalUrl !== void 0 && R.contains('internal', tags)) {
-      return op(urlparse.resolve(baseInternalUrl, trimmedBasePath), { debug })
+      return op(urlparse.resolve(internalUrl.replace(/\/?$/, '/'), trimmedBasePath), { debug })
     } else {
       return () => {
         throw Error(`Method ${operationId} is unsupported. No interface for ${R.toString(tags)}`)
