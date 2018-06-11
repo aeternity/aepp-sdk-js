@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright 2018 aeternity developers
+ * Copyright (c) 2018 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -15,29 +15,24 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-const actions = {
-  MINED_BLOCK: 'mined_block',
-  NEW_BLOCK: 'new_block',
-  REGISTER: 'register',
-  RESPONSE: 'response',
-  NEW_ORACLE_QUERY: 'new_oracle_query',
-  NEW_ORACLE_RESPONSE: 'new_oracle_response',
-  QUERY: 'query',
-  SUBSCRIBE: 'subscribe'
-}
+import { describe, it } from 'mocha'
+import Aens from '../../src/client/aens'
+import * as utils from '../utils'
+import * as R from 'ramda'
 
-const origins = {
-  ORACLE: 'oracle',
-  CHAIN: 'chain'
-}
+describe('aens', function () {
+  it('salt produces random sequences every time', () => {
+    const salt1 = Aens.salt()
+    const salt2 = Aens.salt()
+    salt1.should.be.a('Number')
+    salt2.should.be.a('Number')
+    salt1.should.not.be.equal(salt2)
+  })
 
-const targets = {
-  CHAIN: 'chain',
-  ORACLE: 'oracle'
-}
-
-export {
-  actions,
-  origins,
-  targets
-}
+  it('reproducible commitment hashes can be generated', () => {
+    const salt = Aens.salt()
+    const hash = Aens.commitmentHash('foobar.aet', salt)
+    hash.should.be.a('string')
+    hash.should.be.equal(Aens.commitmentHash('foobar.aet', salt))
+  })
+})

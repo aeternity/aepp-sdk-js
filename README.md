@@ -30,7 +30,7 @@ The minimum version Node.js is still expected to work at is 8.11.
 
 ## Building
 
-aepp-sdk is built using [Yarn]. In order to build a develoment version yourself,
+aepp-sdk is built using [Yarn]. In order to build a development version yourself,
 install all dependencies from `package.json` and issue the `build` command.
 
 ```

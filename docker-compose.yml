@@ -12,11 +12,12 @@ services:
       - WALLET_PUB=${WALLET_PUB}
     volumes:
       - .:/app
+      - .:/node_modules/@aeternity/aepp-sdk
 
   node:
     image: aeternity/epoch:${TAG}
     hostname: node
-    ports: [3013, 3113]
+    expose: [3013, 3113]
     environment:
       EPOCH_CONFIG: /home/epoch/epoch.yaml
     command: -aecore expected_mine_rate ${EPOCH_MINE_RATE:-15000}

@@ -1,35 +1,37 @@
 const path = require('path')
+const R = require('ramda')
 
-const common = (env, argv) => {
-  return {
+function configure (filename, opts = {}) {
+  return (env, argv) => R.mergeDeepLeft({
     entry: './src/index.js',
-    mode: 'development',
-    devtool: argv.mode === 'production' ? false : 'eval-source-map',
+    mode: 'development', // automatically overriden by production flag
+    devtool: argv.mode === 'production' ? 'source-map' : 'eval-source-map',
     module: {
       rules: [
         {
           test: /\.js$/,
-          exclude: /node_modules/,
+          include: path.resolve(__dirname, 'src'),
           loader: 'babel-loader!standard-loader?error=true'
+        },
+        {
+          test: /\.js$/,
+          include: path.resolve(__dirname, 'node_modules/rlp'),
+          loader: 'babel-loader',
+          options: { presets: ["@babel/preset-env"] }
         },
         {
           test: /^assets\/swagger\/.*\.json$/,
           loader: 'import-glob-loader'
         }
       ]
-    }
-  }
-}
-
-function configure (filename, opts = {}) {
-  return (env, argv) => Object.assign({
+    },
     output: {
       path: path.resolve(__dirname, 'dist'),
       filename,
-      library: 'AeternityClient',
+      library: 'Ae',
       libraryTarget: 'umd'
     }
-  }, common(env, argv), opts)
+  }, opts)
 }
 
 module.exports = [

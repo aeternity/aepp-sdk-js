@@ -2,6 +2,27 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.14.0-0.1.0]
+### Added
+- New, opinionated top-level API
+
+### Changed
+- Rest of legacy API now uses new API as well
+- Generated API now encapsulated in `api` object
+- Automatic case conversion for remote parameter names
+- Remaining tests to use new API
+- Adapted new method of obtaining transaction hash, breaks compatibility (see
+  below)
+
+### Removed
+- Oracle API (for the time being)
+- Legacy API and tests
+- Compatibility with older versions of Epoch which provide the transaction hash
+  the old way
+
+### Fixed
+- [GH-49]: Handle existing path components correctly
+
 ## [0.13.0-0.1.0]
 ### Added
 - This change log file
@@ -22,3 +43,5 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 - More consistent code examples
 
 [0.13.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.10.0-0.1.0...0.13.0-0.1.0
+[0.14.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.13.0-0.1.0...0.14.0-0.1.0
+[GH-49]: https://github.com/aeternity/aepp-sdk-js/issues/49

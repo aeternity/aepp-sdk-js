@@ -1,0 +1,80 @@
+{
+  "EncodedHash" : {
+    "type" : "string"
+  },
+  "Pow" : {
+    "type" : "array",
+    "items" : {
+      "type" : "integer",
+      "format" : "int32"
+    }
+  },
+  "Header" : {
+    "type" : "object",
+    "properties" : {
+      "height" : {
+        "type" : "integer",
+        "format" : "int64"
+      },
+      "prev_hash" : {
+        "$ref" : "#/definitions/EncodedHash"
+      },
+      "state_hash" : {
+        "$ref" : "#/definitions/EncodedHash"
+      },
+      "txs_hash" : {
+        "$ref" : "#/definitions/EncodedHash"
+      },
+      "target" : {
+        "type" : "integer",
+        "format" : "int64"
+      },
+      "nonce" : {
+        "type" : "integer",
+        "format" : "uint64"
+      },
+      "time" : {
+        "type" : "integer",
+        "format" : "int64"
+      },
+      "version" : {
+        "type" : "integer"
+      },
+      "pow" : {
+        "$ref" : "#/definitions/Pow"
+      },
+      "miner" : {
+        "$ref" : "#/definitions/EncodedHash"
+      }
+    },
+    "example" : {
+      "txs_hash" : null,
+      "state_hash" : null,
+      "prev_hash" : { },
+      "pow" : "",
+      "time" : 5,
+      "nonce" : 1,
+      "version" : 5,
+      "miner" : null,
+      "height" : 0,
+      "target" : 6
+    }
+  },
+  "GenericBlock" : {
+    "allOf" : [ {
+      "$ref" : "#/definitions/Header"
+    }, {
+      "type" : "object",
+      "required" : [ "data_schema" ],
+      "discriminator" : "data_schema",
+      "properties" : {
+        "data_schema" : {
+          "type" : "string"
+        },
+        "hash" : {
+          "$ref" : "#/definitions/EncodedHash"
+        }
+      }
+    } ]
+  }
+}

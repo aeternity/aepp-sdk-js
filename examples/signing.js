@@ -104,7 +104,7 @@ const signTransaction = async function (recipient, amount, options) {
   let privateHex
   if (!options.private) {
     let dir = options['keys']
-    console.log('kets ' + dir)
+    console.log('keys ' + dir)
     prompt.start()
     prompt.get(promptSchema, async function (err, result) {
       let password = result.password
