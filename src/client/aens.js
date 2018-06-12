@@ -46,6 +46,7 @@ const transfer = (client, wallet, { defaults = {} } = {}) => nameHash => async (
 
   const { tx } = await client.api.postNameTransfer(R.merge(opt, {
     nameHash,
+    account: wallet.account,
     recipientPubkey: account
   }))
 

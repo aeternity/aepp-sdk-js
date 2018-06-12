@@ -13,6 +13,10 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ### Fixed
 - Contract unit state initialization
+- Missing required parameter for name transfers (workaround for
+  [Swagger file bug])
+
+[Swagger file bug]: https://www.pivotaltracker.com/n/projects/2124891
 
 ## [0.14.0-0.1.0]
 ### Added
