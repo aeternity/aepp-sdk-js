@@ -4,6 +4,40 @@
 
 The Javascript SDK wraps the æternity API, as explosed by [the swagger file](https://github.com/aeternity/epoch/blob/master/config/swagger.yaml). It aims to abstract the API, while still providing low-level access when necessary.
 
+It uses the following Javascript technologies and principles:
+
+- [Promises](https://developers.google.com/web/fundamentals/primers/promises) for interactions with the node.
+- Classless Javascript using composition rather than inheritance, adhering to [Crockford's good Javascript](https://code.tutsplus.com/tutorials/crockford-on-javascript-the-complete-series--net-10952) rules
+- modern modules, using `export` and `import`
+- we attempt to be completely stateless, to avoid surprise interactions
+- [webpack4](https://webpack.js.org/) and the [Babel](https://babeljs.io/) [loader](https://github.com/babel/babel-loader)
+- standard linter
+- [Ramda](https://ramdajs.com/)
+- loose coupling of modules to enable [tree-shaking](https://webpack.js.org/guides/tree-shaking/)
+- support for 
+  - direct-use in node scripts
+  - direct use in browser <script> tags
+  - bundling through webpack
+  - source access via webpack, enabling tree-shaking
+
+## Basic structure of an æpp (using JS SDK)
+
+the `examples/` directory in the JS SDK's github repo 
+
+
+```
+'use strict'
+
+const { default: Ae, Wallet, Contract } = require('@aeternity/aepp-sdk')
+const program = require('commander')
+const fs = require('fs')
+
+```
+node.js ^^^^^^
+
+
+
+
 
 There are two approaches, purist and high-level. This document descr
 
