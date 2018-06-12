@@ -47,31 +47,38 @@ describe('contract', function () {
     client = await utils.client
     contract = Contract.create(client, { wallet: Wallet.create(client, utils.sourceWallet) })
   })
-  
+
+  describe('precompiled bytecode', () => {
+    it('can be invoked', async () => {
+      return contract.callStatic(identityContractByteCode, 'sophia')('main', { args: '42', conformFn: parseInt }).should.eventually.become(42)
+    })
+
+    it('can be deployed', async () => {
+      return contract.deploy(identityContractByteCode, 'sophia')().should.eventually.have.property('address')
+    })
+  })
+
   it('compiles Sophia code', async () => {
     bytecode = await contract.compile(identityContract)
     return bytecode.should.have.property('bytecode')
   })
 
   it('invokes function against compiled code', async () => {
-    await contract.callStatic(identityContractByteCode, 'sophia')('main', { args: '42', conformFn: parseInt }).should.eventually.become(42)
     return bytecode.call('main', { args: '42', conformFn: parseInt }).should.eventually.become(42)
   })
 
   it('deploys compiled contracts', async () => {
     deployed = await bytecode.deploy()
-    deployed.should.have.property('address')
-    return contract.deploy(identityContractByteCode)().should.eventually.have.property('address')
+    return deployed.should.have.property('address')
   })
 
-  // TODO re-enable at 0.15.0
-  it.skip('calls deployed contracts', async () => {
+  it('calls deployed contracts', async () => {
     return deployed.call('main', { args: '42', conformFn: parseInt }).should.eventually.become(42)
   })
 
   // TODO datatype decoding
   it.skip('initializes contract state', async () => {
     const data = `"Hello World!"`
-    return contract.compile(stateContract).then(bytecode => bytecode.deploy({ initState: data })).then(deployed => deployed.call('retrieve', '()')).catch(e => { console.log(e); throw e }).should.eventually.become('Hello World!')
+    return contract.compile(stateContract).then(bytecode => bytecode.deploy({ options: { initState: data } })).then(deployed => deployed.call('retrieve', '()')).catch(e => { console.log(e); throw e }).should.eventually.become('Hello World!')
   })
 })

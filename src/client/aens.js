@@ -20,11 +20,9 @@ import * as Crypto from '../utils/crypto'
 
 const DEFAULTS = {
   fee: 10,
-  ttl: 1,
-  // 0.15.0+
-  // ttl: Number.MAX_SAFE_INTEGER,
-  // clientTtl: 1
-  nameTtl: 600000
+  ttl: Number.MAX_SAFE_INTEGER,
+  clientTtl: 1,
+  nameTtl: 50000 // aec_governance:name_claim_max_expiration() => 50000
 }
 
 function noWallet () {
@@ -48,6 +46,7 @@ const transfer = (client, wallet, { defaults = {} } = {}) => nameHash => async (
 
   const { tx } = await client.api.postNameTransfer(R.merge(opt, {
     nameHash,
+    account: wallet.account,
     recipientPubkey: account
   }))
 
