@@ -18,10 +18,6 @@ function configure (filename, opts = {}) {
           include: path.resolve(__dirname, 'node_modules/rlp'),
           loader: 'babel-loader',
           options: { presets: ["@babel/preset-env"] }
-        },
-        {
-          test: /^assets\/swagger\/.*\.json$/,
-          loader: 'import-glob-loader'
         }
       ]
     },

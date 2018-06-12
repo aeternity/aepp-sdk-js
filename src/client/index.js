@@ -36,26 +36,6 @@ async function remoteSwagger (url) {
   return (await axios.get(urlparse.resolve(url, 'api'))).data
 }
 
-async function remoteEpochVersion (url) {
-  return (await axios.get(urlparse.resolve(url, 'v2/version'))).data
-}
-
-function swag (version) {
-  return require(`../../assets/swagger/${version}.json`)
-}
-
-async function retrieveSwagger (url, version, revision) {
-  try {
-    return await remoteSwagger(url)
-  } catch (e) {
-    try {
-      return swag(revision)
-    } catch (e) {
-      return swag(version)
-    }
-  }
-}
-
 function lookupType (path, spec, types) {
   const type = (() => {
     const match = R.path(path, spec).match(/^#\/definitions\/(.+)/)
@@ -319,8 +299,7 @@ const operation = R.memoize((path, method, definition, types) => {
 
 async function create (url, { internalUrl, websocketUrl, debug = false } = {}) {
   const baseUrl = url.replace(/\/?$/, '/')
-  const { version, revision } = await remoteEpochVersion(baseUrl)
-  const { basePath, paths, definitions } = await retrieveSwagger(baseUrl, version, revision)
+  const { basePath, paths, definitions } = await remoteSwagger(url)
   const trimmedBasePath = basePath.replace(/^\//, '')
   const methods = R.indexBy(R.prop('name'), R.flatten(R.values(R.mapObjIndexed((methods, path) => R.values(R.mapObjIndexed((definition, method) => {
     const op = operation(path, method, definition, definitions)
@@ -336,6 +315,8 @@ async function create (url, { internalUrl, websocketUrl, debug = false } = {}) {
       }
     }
   }, methods)), paths))))
+
+  const { version, revision } = await methods.getVersion()
 
   const o = {
     version,
