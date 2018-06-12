@@ -21,7 +21,7 @@
 const program = require('commander')
 const prompt = require('prompt')
 const fs = require('fs')
-const { Crypto } = require('../dist/aepp-sdk').default
+const { Crypto } = require('../dist/aepp-sdk')
 const path = require('path')
 
 let promptSchema = {
@@ -39,6 +39,7 @@ let promptSchema = {
   }
 }
 
+// Here we read the keys from the on-disk structure, decrypting if necessary.
 const extractReadableKeys = (dir, options) => {
   let pwd = options.input
   prompt.start()
@@ -59,10 +60,12 @@ const extractReadableKeys = (dir, options) => {
   })
 }
 
+// This is the method by which we make a new key pair. The æternity key pairs are
+// [Ed25519 keys](https://en.wikipedia.org/wiki/EdDSA).
 function generateKeyPair (name, { output }) {
   const { pub, priv } = Crypto.generateKeyPair()
 
-  // Parser doesn't like it if we use this literally, i.e. without binding to `data`
+  // The parser doesn't like it if we use this literally, i.e. without binding to `data`
   const data = [[path.join(output, name), priv],
                 [path.join(output, `${name}.pub`), pub]]
 

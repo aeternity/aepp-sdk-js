@@ -24,20 +24,30 @@ const program = require('commander')
 const axios = require('axios')
 const ConnectionListener = require('../lib/utils/listeners').ConnectionListener
 
+// An Oracle is a source of information on the blockchain. Oracles are registered, and live for
+// a certain number of blocks on the chain. With the registration an oracle specifies the fee
+// it charges for its services. The Oracle receives a request, which has a payload of a text query,
+// and replies with a text response.
+
 let runOracleServer = async (options) => {
   let client = new AeternityClient(new WebsocketProvider(options.host, options.port))
 
   client.addConnectionListener(new ConnectionListener({
     onOpen: () => {
       console.log('Websocket connection is open')
+      // The 'queryFormat' and 'responseFormat' parameters are not currenty used. This oracle charges
+      // 4 tokens for its service, will live for 500 blocks, and a fee of 5 tokens is paid for
+      // the registration fee
       client.oracles.register('queryFormat', 'responseFormat', 4, 500, 5).then(
         (oracleId) => {
           console.log(`Oracle online! ID: ${oracleId}`)
           client.oracles.setResolver((queryData) => {
+	    // Here a request is received
             console.log(`New query data ${JSON.stringify(queryData)}`)
             console.log(`Received query ${queryData['query']}`)
             let statementId = queryData['query']
             axios.get(`https://vote.aepps.com/statements/${statementId}/json`)
+	    // and the response is made, after calling out to an external website
               .then((response) => {
                 client.oracles.respond(queryData['query_id'], 4, JSON.stringify(response.data))
               })
