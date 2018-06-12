@@ -60,8 +60,8 @@ const call = (client, wallet, { defaults = {} } = {}) => address => async (name,
   }
 }
 
-const deploy = (client, wallet, { defaults = {} } = {}) => (code, abi) => async ({ options = {} } = {}) => {
-  const callData = options.initState ? await encodeCall(client)(code, abi)('init', options.initState) : ''
+const deploy = (client, wallet, { defaults = {} } = {}) => (code, abi) => async ({ options = { initState: '()' } } = {}) => {
+  const callData = await encodeCall(client)(code, abi)('init', options.initState)
   const opt = R.merge(defaults, options)
   const { tx, contractAddress } = await client.api.postContractCreate(R.merge(opt, {
     callData,

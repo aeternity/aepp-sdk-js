@@ -41,7 +41,7 @@ function plan (amount) {
   planned += amount
 }
 
-const TIMEOUT = 120000
+const TIMEOUT = 180000
 
 function configure (mocha) {
   mocha.timeout(TIMEOUT)

@@ -2,6 +2,22 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [Unreleased]
+### Added
+
+### Changed
+
+### Removed
+- Legacy Swagger file loading
+- Compatibility with < 0.15.0
+
+### Fixed
+- Contract unit state initialization
+- Missing required parameter for name transfers (workaround for
+  [Swagger file bug])
+
+[Swagger file bug]: https://www.pivotaltracker.com/n/projects/2124891
+
 ## [0.14.0-0.1.0]
 ### Added
 - New, opinionated top-level API
@@ -44,4 +60,5 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 [0.13.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.10.0-0.1.0...v0.13.0-0.1.0
 [0.14.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.13.0-0.1.0...v0.14.0-0.1.0
+[Unreleased]: https://github.com/aeternity/aepp-sdk-js/compare/v0.14.0-0.1.0...develop
 [GH-49]: https://github.com/aeternity/aepp-sdk-js/issues/49
