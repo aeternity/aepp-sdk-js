@@ -6,20 +6,12 @@ navigation: 5
 
 # aepp-sdk
 
-JavaScript SDK for the æternity network, targeting [Epoch].  
-aepp-sdk is [hosted on GitHub].
+This is the main SDK for the æternity blockchain. It aims to encapsulate interactions with the blockchain and hide the implementation details.
+
+It is [hosted on GitHub].
 
 [Epoch]: https://github.com/aeternity/epoch
 [hosted on GitHub]: https://github.com/aeternity/aepp-sdk-js
-
-#### Disclaimer
-
-This SDK is at an alpha stage where things easily can break. We aim to make our
-alpha releases as stable as possible. Neverless it should not be taken as
-production-ready. To catch up with the more edgy state of development please
-check out the [develop branch].
-
-[develop branch]: https://github.com/aeternity/aepp-sdk-js/tree/develop
 
 ## Requirements
 
@@ -30,8 +22,11 @@ The minimum version Node.js is still expected to work at is 8.11.
 
 ## Building
 
-aepp-sdk is built using [Yarn]. In order to build a development version yourself,
-install all dependencies from `package.json` and issue the `build` command.
+aepp-sdk is built using [Yarn](https://yarnpkg.com). In order to install yarn, check out the [install page](https://yarnpkg.com/en/docs/install). Please note that `apt-get install yarn` on Debian systems does not do what you want.
+
+
+In order to build a development version yourself,
+install all dependencies from `package.json` and issue the `build` command:
 
 ```
 yarn install
@@ -42,8 +37,6 @@ The WebPack compilation provides two different build artifacts in `dist/`, one
 for Node.JS and one for browsers. When referencing aepp-sdk through any modern
 build tooling, it should pick the right one automatically through the entry
 points defined in `package.json`.
-
-[Yarn]: https://yarnpkg.com/
 
 ## Installation
 
