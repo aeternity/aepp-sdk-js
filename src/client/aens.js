@@ -15,6 +15,16 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+/**
+ * Module containing routines to interact with the æternity naming system.
+ *
+ * The high-level description of the naming system is
+ * https://github.com/aeternity/protocol/blob/master/AENS.md in the
+ * protocol repository.
+ *
+ * 
+ */
+
 import * as R from 'ramda'
 import * as Crypto from '../utils/crypto'
 
@@ -59,9 +69,9 @@ function commitmentHash (input, salt) {
 
 /**
  * Transfer a domain to another account.
- * @param client
- * @param wallet
- * @return
+ * @param account
+ * @param options
+ * @return 
  */
 const transfer = (client, wallet, { defaults = {} } = {}) => nameHash => async (account, { options = {} } = {}) => {
   const opt = R.merge(defaults, options)
@@ -75,6 +85,13 @@ const transfer = (client, wallet, { defaults = {} } = {}) => nameHash => async (
   return wallet.sendTransaction(tx, { options: opt })
 }
 
+/**
+ * What kind of a hash is this? If it begins with 'ak$' it is an
+ * account key, if with 'ok$' it's an oracle key.
+ *
+ * @param s - the hash.
+ * returns the type, or throws an exception if type not found.
+ */
 function classify (s) {
   const keys = {
     ak: 'accountPubkey',
@@ -94,10 +111,10 @@ function classify (s) {
 }
 
 /**
- * 
- * @param 
- * @param
- * @return promise wrapping 
+ * Update an aens entry
+ * @param target new target
+ * @param options
+ * @return 
  */
 const update = (client, wallet, { defaults = {} } = {}) => nameHash => async (target, { options = {} } = {}) => {
   const opt = R.merge(defaults, options)

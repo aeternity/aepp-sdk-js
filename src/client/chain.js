@@ -15,6 +15,11 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+/**
+ * General methods which interact with the chain
+ */
+
+
 const height = client => async () => (await client.api.getTop()).height
 
 /**

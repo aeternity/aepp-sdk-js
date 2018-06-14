@@ -17,6 +17,12 @@
 
 /**
  * Contracts functions
+ *
+ * High level documentation of the contracts are available at
+ * https://github.com/aeternity/protocol/tree/master/contracts and
+ * example code which uses this API at
+ * https://github.com/aeternity/aepp-sdk-js/blob/develop/bin/aecontract.js
+ *
  */
 
 import * as R from 'ramda'

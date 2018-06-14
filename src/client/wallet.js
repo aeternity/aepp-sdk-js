@@ -15,6 +15,10 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+/**
+ * Wallet functionality--key management, spending tokens
+ */
+
 import * as R from 'ramda'
 import * as Crypto from '../utils/crypto'
 
