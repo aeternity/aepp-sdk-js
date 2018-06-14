@@ -24,10 +24,22 @@ const DEFAULTS = {
   waitMined: true
 }
 
+/**
+ * Sign data using key. 
+ * @param key
+ * @param data
+ * @return signed data
+ */
 const sign = key => data => {
   return Crypto.sign(data, key)
 }
 
+/**
+ * Send a transaction to the blockchain
+ * @param client - the client object for communication with the blockchain
+ * @param key - public key of account the transaction belongs to
+ * @return the transaction hash
+ */
 const sendTransaction = (client, key, { defaults = {} } = {}) => async (tx, { options = {} } = {}) => {
   const opt = R.merge(defaults, options)
 
@@ -41,10 +53,23 @@ const sendTransaction = (client, key, { defaults = {} } = {}) => async (tx, { op
   }
 }
 
+/**
+ * Get balance for account
+ * @param client
+ * @param address - the public key of this account
+ * @return balance of the account.
+ */
 const balance = (client, address) => async ({ height, hash } = {}) => {
   return (await client.api.getAccountBalance(address, { height, hash })).balance
 }
 
+/**
+ * Send tokens to another account
+ * @param client
+ * @param key - the public key of this account
+ * @param options
+ * @return the transaction hash
+ */
 const spend = (client, key, address, { defaults = {} } = {}) => async (amount, receiver, { options = {} } = {}) => {
   const opt = R.merge(defaults, options)
   const { tx } = await client.api.postSpend(R.merge(opt, {
@@ -57,6 +82,12 @@ const spend = (client, key, address, { defaults = {} } = {}) => async (amount, r
   return sendTransaction(client, key)(tx, { options: opt })
 }
 
+/**
+ * Create a new wallet object
+ * @param client
+ * @param keypair
+ * @return the new wallet object
+ */
 function create (client, keypair, { defaults = {} } = {}) {
   const { pub, priv } = keypair
   const key = Buffer.from(priv, 'hex')

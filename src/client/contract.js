@@ -15,6 +15,10 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+/**
+ * Contracts functions
+ */
+
 import * as R from 'ramda'
 
 const DEFAULTS = {
@@ -31,15 +35,33 @@ function noWallet () {
   throw Error('Wallet not provided')
 }
 
+/**
+ * Encode the call data for an already-deployed contract.
+ * @param code 
+ * @param abi
+ * @return
+ */
 const encodeCall = client => (code, abi) => async (name, args) => {
   return (await client.api.encodeCalldata({ abi: abi, code, 'function': name, arg: args })).calldata
 }
 
+/**
+ *
+ * @param 
+ * @param
+ * @return
+ */
 const callStatic = client => (code, abi) => async (name, { args = '()', conformFn = R.identity } = {}) => {
   const { out } = await client.api.callContract({ abi: abi, code, 'function': name, arg: args })
   return conformFn(out)
 }
 
+/**
+ *
+ * @param 
+ * @param
+ * @return
+ */
 const call = (client, wallet, { defaults = {} } = {}) => address => async (name, { args = '()', conformFn = R.identity, options = {} } = {}) => {
   const opt = R.merge(defaults, options)
   const { tx } = await client.api.postContractCallCompute(R.merge(opt, {
@@ -60,6 +82,12 @@ const call = (client, wallet, { defaults = {} } = {}) => address => async (name,
   }
 }
 
+/**
+ *
+ * @param 
+ * @param
+ * @return
+ */
 const deploy = (client, wallet, { defaults = {} } = {}) => (code, abi) => async ({ options = { initState: '()' } } = {}) => {
   const callData = await encodeCall(client)(code, abi)('init', options.initState)
   const opt = R.merge(defaults, options)
@@ -77,6 +105,12 @@ const deploy = (client, wallet, { defaults = {} } = {}) => (code, abi) => async 
   })
 }
 
+/**
+ *
+ * @param 
+ * @param
+ * @return
+ */
 const compile = (client, { wallet, defaults = {} } = {}) => async (code, { options = {} } = {}) => {
   const o = await client.api.compileContract(R.mergeAll([defaults, options, {
     code,
@@ -90,6 +124,12 @@ const compile = (client, { wallet, defaults = {} } = {}) => async (code, { optio
   }, o))
 }
 
+/**
+ *
+ * @param 
+ * @param
+ * @return
+ */
 function create (client, { wallet, defaults = {} } = {}) {
   const options = R.merge(DEFAULTS, defaults)
 
