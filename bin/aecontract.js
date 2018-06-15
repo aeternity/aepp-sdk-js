@@ -1,5 +1,10 @@
 #!/usr/bin/env node
-
+// # Simple Sophia Contract Compiler
+// 
+// This script demonstrates how to deal with the different phases of compiling
+// Sophia contracts to bytecode, deploying the bytecode to get a callable
+// contract address and ultimately, invoke the deployed contract on the
+// æternity blockchain.
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
@@ -19,28 +24,14 @@
 
 'use strict'
 
-const { default: Ae, Wallet, Contract } = require('@aeternity/aepp-sdk')
+// We'll need the main client module `Ae`, the `Wallet` module, the `Crypto`
+// module and the `contract` module from the SDK.
+const { default: Ae, Wallet, Contract, Crypto } = require('@aeternity/aepp-sdk')
 const program = require('commander')
 const fs = require('fs')
 
-program
-  .version('0.1.0')
-  .arguments('<infile> <function> [args...]')
-  .option('-i, --init [state]', 'Arguments to contructor function')
-  .option('-H, --host [hostname]', 'Node to connect to', 'http://localhost:3013')
-  .option('--debug', 'Switch on debugging')
-  .action(exec)
-  .parse(process.argv)
-
 function exec (infile, fn, args) {
-  const keypair = {
-    priv: process.env['WALLET_PRIV'],
-    pub: process.env['WALLET_PUB']
-  }
-
-  if (!keypair.pub || !keypair.priv) {
-    throw Error('Environment variables WALLET_PRIV and WALLET_PUB need to be set')
-  }
+  const keypair = Crypto.envKeypair(process.env)
 
   if (!infile || !fn) {
     program.outputHelp()
@@ -49,15 +40,55 @@ function exec (infile, fn, args) {
 
   const code = fs.readFileSync(infile, 'utf-8')
 
+  // Most methods in the SDK return _Promises_, so the recommended way of
+  // dealing with subsequent actions is `then` chaining with a final `catch`
+  // callback.
+
+  // `Ae.create` itself is asynchronous as it determines the node's version and
+  // rest interface automatically. Only once the Promise is fulfilled, we know
+  // we have a working client object.  
+  // Both `Wallet.create` and `Contract.create` need to be initialized with
+  // the Ae client. The Wallet object needs to be passed in because some of
+  // the following actions requires sending signed transactions to be mined,
+  // which implies spending reward tokens to the miner.  
+  // `compile` takes a raw Sophia contract in string form and sends it off to
+  // the node for bytecode compilation. This might in the future be done
+  // without talking to the node, but requires a bytecode compiler
+  // implementation directly in the SDK.
   Ae.create(program.host, { debug: program.debug }).then(client => {
     return Contract.create(client, Wallet.create(client, keypair)).compile(code)
+    // Invoking `deploy` on the bytecode object will result in the contract
+    // being written to the chain, once the block has been mined.
+    // Sophia contracts always have an `init` method which needs to be invoked,
+    // even when the contract's `state` is `unit` (`()`). The arguments to
+    // `init` have to be provided at deployment time and will be written to the
+    // block as well, together with the contract's bytecode.
   }).then(bytecode => {
     console.log(`Obtained bytecode ${bytecode.bytecode}`)
     return bytecode.deploy({ initState: program.init })
+    // Once the contract has been successfully mined, we can attempt to invoke
+    // any public function defined within it. The miner who found the next block
+    // will not only be rewarded a fixed amount, but also an amount depending on
+    // the amount of gas spend.
   }).then(deployed => {
     console.log(`Contract deployed at ${deployed.address}`)
     return deployed.call(fn, { args: args.join(' ') })
+    // The execution result, if successful, will be an AEVM-encoded result
+    // value. Once type decoding will be implemented in the SDK, this value will
+    // not be a hexadecimal string, anymore.
   }).then(value => {
     console.log(`Execution result: ${value}`)
   }).catch(e => console.log(e.message))
 }
+
+// ## Command Line Interface
+// 
+// The `commander` library provides maximum command line parsing convenience.
+program
+  .version('0.1.0')
+  .arguments('<infile> <function> [args...]')
+  .option('-i, --init [state]', 'Arguments to contructor function')
+  .option('-H, --host [hostname]', 'Node to connect to', 'http://localhost:3013')
+  .option('--debug', 'Switch on debugging')
+  .action(exec)
+  .parse(process.argv)
