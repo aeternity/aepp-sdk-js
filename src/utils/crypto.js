@@ -25,18 +25,42 @@ import { leftPad, rightPad } from './bytes'
 
 const Ecb = aesjs.ModeOfOperation.ecb
 
+/**
+ *
+ * @param
+ * @param
+ * @return
+ */
 export function hash (input) {
   return blake2b(input, null, 32) // 256 bits
 }
 
+/**
+ *
+ * @param
+ * @param
+ * @return
+ */
 export function encodeBase58Check (input) {
   return bs58check.encode(input)
 }
 
+/**
+ *
+ * @param
+ * @param
+ * @return
+ */
 export function decodeBase58Check (str) {
   return bs58check.decode(str)
 }
 
+/**
+ *
+ * @param
+ * @param
+ * @return
+ */
 export function generateKeyPair (raw = false) {
   // <epoch>/apps/aens/test/aens_test_utils.erl
   const keyPair = nacl.sign.keyPair()
@@ -57,20 +81,44 @@ export function generateKeyPair (raw = false) {
   }
 }
 
+/**
+ *
+ * @param
+ * @param
+ * @return
+ */
 export function encryptPublicKey (password, binaryKey) {
   return encryptKey(password, rightPad(32, binaryKey))
 }
 
+/**
+ *
+ * @param
+ * @param
+ * @return
+ */
 export function encryptPrivateKey (password, binaryKey) {
   return encryptKey(password, leftPad(64, binaryKey))
 }
 
+/**
+ *
+ * @param
+ * @param
+ * @return
+ */
 export function encryptKey (password, binaryData) {
   let hashedPasswordBytes = hash(password)
   let aesEcb = new Ecb(hashedPasswordBytes)
   return aesEcb.encrypt(binaryData)
 }
 
+/**
+ *
+ * @param
+ * @param
+ * @return
+ */
 export function decryptKey (password, encrypted) {
   const encryptedBytes = Buffer.from(encrypted)
   let hashedPasswordBytes = hash(password)
@@ -78,20 +126,47 @@ export function decryptKey (password, encrypted) {
   return Buffer.from(aesEcb.decrypt(encryptedBytes))
 }
 
+/**
+ *
+ * @param
+ * @param
+ * @return
+ */
 export function sign (txBin, privateKey) {
   return nacl.sign.detached(new Uint8Array(txBin), privateKey)
 }
 
+/**
+ * Verify that signature was signed by public key
+ * @param str
+ * @param signature
+ * @param publicKey
+ * @return true if the
+ */
 export function verify (str, signature, publicKey) {
   return nacl.sign.detached.verify(new Uint8Array(str), signature, publicKey)
 }
 
+/**
+ * Prepare a transaction for posting to the blockchain, by creating
+ * the 4-tuple of <tag, version, signatures_array, binary_tx> which is
+ * posted.
+ * @param signature
+ * @param data
+ * @return the 4-tuple
+ */
 export function prepareTx (signature, data) {
   // the signed tx deserializer expects a 4-tuple:
   // <tag, version, signatures_array, binary_tx>
   return [Buffer.from([11]), Buffer.from([1]), [Buffer.from(signature)], data]
 }
 
+/**
+ *
+ * @param
+ * @param
+ * @return
+ */
 export function personalMessageToBinary (message) {
   const p = Buffer.from('‎Æternity Signed Message:\n', 'utf8')
   const msg = Buffer.from(message, 'utf8')
@@ -99,20 +174,43 @@ export function personalMessageToBinary (message) {
   return Buffer.concat([Buffer.from([p.length]), p, Buffer.from([msg.length]), msg])
 }
 
+/**
+ *
+ * @param
+ * @param
+ * @return
+ */
 export function signPersonalMessage (message, privateKey) {
   return sign(personalMessageToBinary(message), privateKey)
 }
 
+/**
+ *
+ * @param
+ * @param
+ * @return
+ */
 export function verifyPersonalMessage (str, signature, publicKey) {
   return verify(personalMessageToBinary(str), signature, publicKey)
 }
 
+/**
+ * æternity readable public keys are the base58-encoded public key,
+ * prepended with 'ak$'.
+ * @param binaryKey
+ * @return the readable public key
+ */
 export function getReadablePublicKey (binaryKey) {
   const publicKeyBuffer = Buffer.from(binaryKey, 'hex')
   const pubKeyAddress = encodeBase58Check(publicKeyBuffer)
   return `ak$${pubKeyAddress}`
 }
 
+/**
+ * Generate and save a wallet (key pair)
+ * @param password to encrypt wallet with
+ * @return the key pair
+ */
 export function generateSaveWallet (password) {
   let keys = generateKeyPair(true)
   return {
@@ -121,26 +219,56 @@ export function generateSaveWallet (password) {
   }
 }
 
+/**
+ * Decrypt an encrypted private key
+ * @param password
+ * @param encrypted
+ * @return the decrypted private key
+ */
 export function decryptPrivateKey (password, encrypted) {
   return decryptKey(password, encrypted)
 }
 
+/**
+ *
+ * @param
+ * @param
+ * @return
+ */
 export function decryptPubKey (password, encrypted) {
   return decryptKey(password, encrypted).slice(0, 65)
 }
 
+/**
+ * Decode a transaction by removing everything before the first '$'
+ * sign, and RLP-decoding the rest.
+ * @param txHash, the encoded transaction
+ * @return the decoded transaction
+ */
 export function decodeTx (txHash) {
   let decodedTx = decodeBase58Check(txHash.split('$')[1])
   var decoded = RLP.decode(Buffer.from(decodedTx, 'hex'))
   return decoded
 }
 
+/**
+ * Encode a transaction using RLP
+ * @param txData
+ * @return encoded transaction
+ */
 export function encodeTx (txData) {
   const encodedTxData = RLP.encode(txData)
   const encodedTx = encodeBase58Check(Buffer.from(encodedTxData))
   return `tx$${encodedTx}`
 }
 
+/**
+ * Check key pair for validity, by signing a message, and then
+ * verifying that signature
+ * @param privateKey
+ * @param publicKey
+ * @return true if key pair is valid, false otherwise
+ */
 export function isValidKeypair (privateKey, publicKey) {
   const message = 'TheMessage'
   const signature = sign(message, privateKey)

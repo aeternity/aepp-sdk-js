@@ -15,6 +15,12 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+/**
+ * Left pad the input data with 0 bytes
+ * @param length to pad to
+ * @param inputBuffer data to pad
+ * @return the padded data
+ */
 export function leftPad (length, inputBuffer) {
   let fill = length - inputBuffer.length
   if (fill > 0) {
@@ -26,6 +32,12 @@ export function leftPad (length, inputBuffer) {
   }
 }
 
+/**
+ * Right pad the input data with 0 bytes
+ * @param length to pad to
+ * @param inputBuffer data to pad
+ * @return the padded data
+ */
 export function rightPad (length, inputBuffer) {
   let fill = length - inputBuffer.length
   if (fill > 0) {

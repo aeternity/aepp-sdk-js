@@ -15,8 +15,17 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+/**
+ * General methods which interact with the chain
+ */
+
 const height = client => async () => (await client.api.getTop()).height
 
+/**
+ * Wait for the chain to reach given height.
+ * @param interval -- how often to check
+ * @param attempts - how many times to poll
+ */
 const awaitHeight = client => async (h, { interval = 5000, attempts = 12 } = {}) => {
   const heightFn = height(client)
   async function probe (resolve, reject, left) {
@@ -38,6 +47,11 @@ const awaitHeight = client => async (h, { interval = 5000, attempts = 12 } = {})
   return new Promise((resolve, reject) => probe(resolve, reject, attempts))
 }
 
+/**
+ * Wait for the a transaction to be mined.
+ * @param blocks - how many blocks to wait
+ * @param interval - how long between polls
+ */
 const poll = client => async (th, { blocks = 10, interval = 5000 } = {}) => {
   const heightFn = height(client)
   const max = await heightFn() + blocks
