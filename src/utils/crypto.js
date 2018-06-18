@@ -27,7 +27,7 @@ const Ecb = aesjs.ModeOfOperation.ecb
 
 /**
  *
- * @param 
+ * @param
  * @param
  * @return
  */
@@ -37,7 +37,7 @@ export function hash (input) {
 
 /**
  *
- * @param 
+ * @param
  * @param
  * @return
  */
@@ -47,7 +47,7 @@ export function encodeBase58Check (input) {
 
 /**
  *
- * @param 
+ * @param
  * @param
  * @return
  */
@@ -57,7 +57,7 @@ export function decodeBase58Check (str) {
 
 /**
  *
- * @param 
+ * @param
  * @param
  * @return
  */
@@ -83,7 +83,7 @@ export function generateKeyPair (raw = false) {
 
 /**
  *
- * @param 
+ * @param
  * @param
  * @return
  */
@@ -93,7 +93,7 @@ export function encryptPublicKey (password, binaryKey) {
 
 /**
  *
- * @param 
+ * @param
  * @param
  * @return
  */
@@ -103,7 +103,7 @@ export function encryptPrivateKey (password, binaryKey) {
 
 /**
  *
- * @param 
+ * @param
  * @param
  * @return
  */
@@ -115,7 +115,7 @@ export function encryptKey (password, binaryData) {
 
 /**
  *
- * @param 
+ * @param
  * @param
  * @return
  */
@@ -128,7 +128,7 @@ export function decryptKey (password, encrypted) {
 
 /**
  *
- * @param 
+ * @param
  * @param
  * @return
  */
@@ -141,7 +141,7 @@ export function sign (txBin, privateKey) {
  * @param str
  * @param signature
  * @param publicKey
- * @return true if the 
+ * @return true if the
  */
 export function verify (str, signature, publicKey) {
   return nacl.sign.detached.verify(new Uint8Array(str), signature, publicKey)
@@ -163,7 +163,7 @@ export function prepareTx (signature, data) {
 
 /**
  *
- * @param 
+ * @param
  * @param
  * @return
  */
@@ -176,7 +176,7 @@ export function personalMessageToBinary (message) {
 
 /**
  *
- * @param 
+ * @param
  * @param
  * @return
  */
@@ -186,7 +186,7 @@ export function signPersonalMessage (message, privateKey) {
 
 /**
  *
- * @param 
+ * @param
  * @param
  * @return
  */
@@ -231,7 +231,7 @@ export function decryptPrivateKey (password, encrypted) {
 
 /**
  *
- * @param 
+ * @param
  * @param
  * @return
  */

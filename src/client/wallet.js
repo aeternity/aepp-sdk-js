@@ -29,7 +29,7 @@ const DEFAULTS = {
 }
 
 /**
- * Sign data using key. 
+ * Sign data using key.
  * @param key
  * @param data
  * @return signed data

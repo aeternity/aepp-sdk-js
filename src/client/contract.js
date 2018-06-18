@@ -43,7 +43,7 @@ function noWallet () {
 
 /**
  * Encode the call data for an already-deployed contract.
- * @param code 
+ * @param code
  * @param abi
  * @return
  */
@@ -53,7 +53,7 @@ const encodeCall = client => (code, abi) => async (name, args) => {
 
 /**
  *
- * @param 
+ * @param
  * @param
  * @return
  */
@@ -64,7 +64,7 @@ const callStatic = client => (code, abi) => async (name, { args = '()', conformF
 
 /**
  *
- * @param 
+ * @param
  * @param
  * @return
  */
@@ -90,7 +90,7 @@ const call = (client, wallet, { defaults = {} } = {}) => address => async (name,
 
 /**
  *
- * @param 
+ * @param
  * @param
  * @return
  */
@@ -113,7 +113,7 @@ const deploy = (client, wallet, { defaults = {} } = {}) => (code, abi) => async 
 
 /**
  *
- * @param 
+ * @param
  * @param
  * @return
  */
@@ -132,7 +132,7 @@ const compile = (client, { wallet, defaults = {} } = {}) => async (code, { optio
 
 /**
  *
- * @param 
+ * @param
  * @param
  * @return
  */

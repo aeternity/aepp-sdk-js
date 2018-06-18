@@ -22,7 +22,7 @@
  * https://github.com/aeternity/protocol/blob/master/AENS.md in the
  * protocol repository.
  *
- * 
+ *
  */
 
 import * as R from 'ramda'
@@ -71,7 +71,7 @@ function commitmentHash (input, salt) {
  * Transfer a domain to another account.
  * @param account
  * @param options
- * @return 
+ * @return
  */
 const transfer = (client, wallet, { defaults = {} } = {}) => nameHash => async (account, { options = {} } = {}) => {
   const opt = R.merge(defaults, options)
@@ -114,7 +114,7 @@ function classify (s) {
  * Update an aens entry
  * @param target new target
  * @param options
- * @return 
+ * @return
  */
 const update = (client, wallet, { defaults = {} } = {}) => nameHash => async (target, { options = {} } = {}) => {
   const opt = R.merge(defaults, options)
@@ -132,7 +132,7 @@ const update = (client, wallet, { defaults = {} } = {}) => nameHash => async (ta
  * Query the status of an AENS registration
  * @param name
  * @return Registration status in the form TODO:
- */ 
+ */
 const query = (client, { wallet, defaults = {} }) => async name => {
   const o = await client.api.getName(name)
   const { nameHash } = o
