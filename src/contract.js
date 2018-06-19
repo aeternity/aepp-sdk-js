@@ -136,7 +136,7 @@ const compile = (client, { wallet, defaults = {} } = {}) => async (code, { optio
  * @param
  * @return
  */
-function create (client, { wallet, defaults = {} } = {}) {
+export default function Contract (client, { wallet, defaults = {} } = {}) {
   const options = R.merge(DEFAULTS, defaults)
 
   return Object.freeze({
@@ -146,8 +146,4 @@ function create (client, { wallet, defaults = {} } = {}) {
     call: call(client, wallet, { defaults: options }),
     encodeCall: encodeCall(client)
   })
-}
-
-export default {
-  create
 }

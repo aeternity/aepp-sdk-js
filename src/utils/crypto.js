@@ -36,6 +36,14 @@ export function hash (input) {
 }
 
 /**
+ * Generate a random salt
+ * @return {number} random salt
+ */
+export function salt () {
+  return Math.floor(Math.random() * Math.floor(Number.MAX_SAFE_INTEGER))
+}
+
+/**
  *
  * @param
  * @param

@@ -15,23 +15,13 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import '../'
-import { describe, it } from 'mocha'
-import Aens from '../../src/client/aens'
-
-describe('aens', function () {
-  it('salt produces random sequences every time', () => {
-    const salt1 = Aens.salt()
-    const salt2 = Aens.salt()
-    salt1.should.be.a('Number')
-    salt2.should.be.a('Number')
-    salt1.should.not.be.equal(salt2)
-  })
-
-  it('reproducible commitment hashes can be generated', () => {
-    const salt = Aens.salt()
-    const hash = Aens.commitmentHash('foobar.aet', salt)
-    hash.should.be.a('string')
-    hash.should.be.equal(Aens.commitmentHash('foobar.aet', salt))
-  })
-})
+/**
+ * @typedef {Object} Chain
+ * @property {function (tx: string, options: ?Object): Promise<string>} sendTransaction - Commit a signed transaction
+ * @property {function (): Promise<number>} height - Current height of the chain
+ * @property {function (h: number, options: ?Object): Promise<number>} awaitHeight - Wait for the chain to reach given height
+ * @property {function (th: string, options: ?Object): Promise<string>} poll - Wait for transaction (hash) to be mined
+ * @property {function (address: string, options: ?Object): Promise<number>} balance - Determine balance of public key `address`
+ * @property {function (hash: string, options: ?Object): Promise<string>} tx - Find transaction by hash
+ * @property {function (): Promise<string[]>} mempool - Open transactions in the mempool
+ */

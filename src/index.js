@@ -15,17 +15,25 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+import Ae from './ae'
 import * as Crypto from './utils/crypto'
-import Ae from './client'
-import Wallet from './client/wallet'
-import Contract from './client/contract'
-import Aens from './client/aens'
+import * as Chain from './chain'
+import * as EpochChain from './chain/epoch'
+import * as Tx from './tx'
+import * as EpochTx from './tx/epoch'
+import * as Account from './account'
+import * as PostMessageAccount from './account/postMessage'
+import * as MemoryAccount from './account/memory'
+
+export default Ae
 
 export {
   Crypto,
-  Wallet,
-  Contract,
-  Aens
+  Chain,
+  EpochChain,
+  Tx,
+  EpochTx,
+  Account,
+  PostMessageAccount,
+  MemoryAccount
 }
-
-export default Ae

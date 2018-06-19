@@ -15,23 +15,23 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import '../'
-import { describe, it } from 'mocha'
-import Aens from '../../src/client/aens'
+import * as R from 'ramda'
+import Ae from './'
+import EpochTx from '../tx/epoch'
+import JsTx from '../tx/js'
+import Account from '../account/memory'
+import Epoch from '../chain/epoch'
 
-describe('aens', function () {
-  it('salt produces random sequences every time', () => {
-    const salt1 = Aens.salt()
-    const salt2 = Aens.salt()
-    salt1.should.be.a('Number')
-    salt2.should.be.a('Number')
-    salt1.should.not.be.equal(salt2)
-  })
-
-  it('reproducible commitment hashes can be generated', () => {
-    const salt = Aens.salt()
-    const hash = Aens.commitmentHash('foobar.aet', salt)
-    hash.should.be.a('string')
-    hash.should.be.equal(Aens.commitmentHash('foobar.aet', salt))
-  })
-})
+/**
+ * Dumb `Ae` factory
+ *
+ * @param {string} url
+ * @param {string} keypair
+ * @param {{ debug: boolean, defaults: Object }} [options={}]
+ * @return {Ae}
+ */
+export default async function dumbAe (url, keypair, { debug, defaults } = {}) {
+  const epoch = await Epoch(url, { debug, defaults })
+  const tx = R.mergeAll([{}, EpochTx(epoch), JsTx()])
+  return Ae({ tx, account: Account(keypair), chain: epoch, defaults })
+}

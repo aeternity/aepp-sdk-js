@@ -17,8 +17,7 @@
 
 import { describe, it, before } from 'mocha'
 import { Wallet, Crypto } from '@aeternity/aepp-sdk'
-import * as utils from './utils'
-import * as R from 'ramda'
+import * as utils from './'
 
 describe('wallet', function () {
   utils.configure(this)
@@ -35,7 +34,7 @@ describe('wallet', function () {
 
   describe('fails on unknown keypairs', () => {
     let wallet
-    
+
     before(async function () {
       client = await utils.client
       wallet = Wallet.create(client, Crypto.generateKeyPair())
@@ -49,7 +48,7 @@ describe('wallet', function () {
       return wallet.spend(1, receiver).should.be.rejectedWith(Error)
     })
   })
-  
+
   it('determines the balance', async () => {
     return wallet.balance().should.eventually.be.a('number')
   })
@@ -71,7 +70,7 @@ describe('wallet', function () {
     })
 
     it('on call', async () => {
-      const th = await wallet.spend(1, receiver, { options: { waitMined: false } })
+      const th = await wallet.spend(1, receiver, { waitMined: false })
       th.should.be.a('string')
       th.slice(0, 3).should.equal('th$')
     })

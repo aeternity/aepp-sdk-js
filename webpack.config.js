@@ -17,7 +17,7 @@ function configure (filename, opts = {}) {
           test: /\.js$/,
           include: path.resolve(__dirname, 'node_modules/rlp'),
           loader: 'babel-loader',
-          options: { presets: ["@babel/preset-env"] }
+          options: { presets: ['@babel/preset-env'] }
         }
       ]
     },

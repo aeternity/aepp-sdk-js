@@ -15,24 +15,19 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import '../utils'
-import Ae from '@aeternity/aepp-sdk'
-import { Crypto, Wallet } from '@aeternity/aepp-sdk'
-
-const sourceWallet = {
-  priv: process.env['WALLET_PRIV'],
-  pub: process.env['WALLET_PUB']
-}
-
-if (!sourceWallet.pub || !sourceWallet.priv) {
-  throw Error('Environment variables WALLET_PRIV and WALLET_PUB need to be set')
-}
+import '../'
+import Ae from '../../src/ae'
+import EpochChain from '../../src/chain/epoch'
+import Account from '../../src/account/memory'
+import EpochTx from '../../src/tx/epoch'
+import * as Crypto from '../../src/utils/crypto'
 
 const url = process.env.TEST_URL || 'http://localhost:3013'
 const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
 
-const client = Ae.create(url, { internalUrl, debug: !!process.env['DEBUG'] })
-const wallets = Array(3).fill().map(() => Crypto.generateKeyPair())
+const chainPromise = EpochChain(url, { internalUrl, debug: !!process.env['DEBUG'] })
+const masterAccount = Account(Crypto.envKeypair(process.env))
+const accounts = Array(3).fill().map(() => Account(Crypto.generateKeyPair()))
 
 let planned = 0
 let charged = false
@@ -47,24 +42,25 @@ function configure (mocha) {
   mocha.timeout(TIMEOUT)
 }
 
-async function waitReady (mocha) {
+async function ready (mocha) {
   configure(mocha)
-  const _client = await client
-  await _client.awaitHeight(10)
+  const chain = await chainPromise
+  const tx = EpochTx(chain)
+  const ae = Ae({ tx, chain, account: masterAccount })
+  await ae.chain.awaitHeight(10)
   if (!charged && planned > 0) {
-    await Wallet.create(_client, sourceWallet).spend(planned, wallets[0].pub)
+    await ae.account.spend(planned, await accounts[0].address())
     charged = true
   }
+  return ae
 }
 
 export {
-  wallets,
-  TIMEOUT,
+  masterAccount,
+  accounts,
   url,
   internalUrl,
-  waitReady,
-  plan,
-  client,
   configure,
-  sourceWallet
+  ready,
+  plan
 }

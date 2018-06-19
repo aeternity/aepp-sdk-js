@@ -15,16 +15,15 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+import '../'
 import { describe, it } from 'mocha'
 import { assert, expect } from 'chai'
-import * as internal from '../../src/client'
-import Ae from '../../src'
-import * as utils from '../utils'
+import * as internal from '../../src/utils/swagger'
 import * as R from 'ramda'
 import op from './sample-operation.json'
 import def from './sample-definition.json'
 
-describe('client', function () {
+describe('Swagger', function () {
   it('walks through deep structures', () => {
     const input = {
       a: 1,
@@ -59,12 +58,12 @@ describe('client', function () {
       expect(internal.pascalToSnake('fooBar')).to.equal('foo_bar')
       expect(internal.pascalToSnake('BarBaz')).to.equal('_bar_baz')
     })
-  }),
+  })
 
   it('expands paths', () => {
     assert.equal(internal.expandPath('/foo/{bar}/baz/{bop}', { bar: 1, bop: 2, useless: 3 }), '/foo/1/baz/2')
     assert.equal(internal.expandPath('unchanged'), 'unchanged')
-  }),
+  })
 
   describe('conforms', () => {
     it('integers', () => {
@@ -121,7 +120,7 @@ describe('client', function () {
   it('maps operations', async () => {
     const [path, data] = R.head(R.toPairs(op))
     const [method, operation] = R.head(R.toPairs(data))
-    const fn = internal.operation(path, method, operation, def)(`${utils.url}/v2`)
+    const fn = internal.operation(path, method, operation, def)(`//v2`)
     assert.equal(fn.length, 2)
   })
 })

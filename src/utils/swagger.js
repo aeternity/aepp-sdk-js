@@ -17,8 +17,6 @@
 
 import axios from 'axios'
 import * as R from 'ramda'
-import urlparse from 'url'
-import Chain from './chain'
 
 function snakeToPascal (s) {
   return s.replace(/_./g, match => R.toUpper(match[1]))
@@ -30,10 +28,6 @@ function pascalToSnake (s) {
 
 function expandPath (path, replacements) {
   return R.reduce((path, [key, value]) => path.replace(`{${key}}`, value), path, R.toPairs(replacements))
-}
-
-async function remoteSwagger (url) {
-  return (await axios.get(urlparse.resolve(url, 'api'))).data
 }
 
 function lookupType (path, spec, types) {
@@ -297,39 +291,18 @@ const operation = R.memoize((path, method, definition, types) => {
   }
 })
 
-async function create (url, { internalUrl, websocketUrl, debug = false } = {}) {
-  const baseUrl = url.replace(/\/?$/, '/')
-  const { basePath, paths, definitions } = await remoteSwagger(url)
-  const trimmedBasePath = basePath.replace(/^\//, '')
+export default function Swagger (swag, methodFn) {
+  const { basePath, paths, definitions } = swag
+  const f = methodFn(basePath)
   const methods = R.indexBy(R.prop('name'), R.flatten(R.values(R.mapObjIndexed((methods, path) => R.values(R.mapObjIndexed((definition, method) => {
     const op = operation(path, method, definition, definitions)
-    const { tags, operationId } = definition
-
-    if (R.contains('external', tags)) {
-      return op(urlparse.resolve(baseUrl, trimmedBasePath), { debug })
-    } else if (internalUrl !== void 0 && R.contains('internal', tags)) {
-      return op(urlparse.resolve(internalUrl.replace(/\/?$/, '/'), trimmedBasePath), { debug })
-    } else {
-      return () => {
-        throw Error(`Method ${operationId} is unsupported. No interface for ${R.toString(tags)}`)
-      }
-    }
+    return f(op, definition)
   }, methods)), paths))))
 
-  const { version, revision } = await methods.getVersion()
-
-  const o = {
-    version,
-    revision,
+  return Object.freeze({
     methods: R.keys(methods),
     api: methods
-  }
-
-  return Object.freeze(Object.assign(o, Chain.create(o)))
-}
-
-export default {
-  create
+  })
 }
 
 export {

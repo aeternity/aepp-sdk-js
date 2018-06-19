@@ -16,26 +16,23 @@
  */
 
 import { describe, it, before } from 'mocha'
-import Ae from '@aeternity/aepp-sdk'
-import { Crypto } from '@aeternity/aepp-sdk'
-import { assert, expect } from 'chai'
-import * as utils from './utils'
+import { expect } from 'chai'
+import { configure, ready } from './'
 import * as R from 'ramda'
 
-describe('client', function () {
-  utils.configure(this)
+describe('Epoch client', function () {
+  configure(this)
 
   let client
 
   before(async function () {
-    await utils.waitReady(this)
-    client = await utils.client
+    client = (await ready(this)).chain
   })
 
   it('determines remote version', () => {
     expect(client.version).to.be.a('string')
     expect(client.revision).to.be.a('string')
-  }),
+  })
 
   it('loads operations', async () => {
     expect(client.methods).to.include.members(['postTx', 'getBlockByHeight'])
@@ -51,9 +48,5 @@ describe('client', function () {
         expect(result.height, i).to.equal(i)
       }, R.range(1, 11))
     )
-  })
-
-  it.skip('throws on unsupported interface', async () => {
-    await client.api.getAccountsBalances().should.be.rejectedWith(Error)
   })
 })

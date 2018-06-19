@@ -15,23 +15,30 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-/**
- * General methods which interact with the chain
- */
+import * as R from 'ramda'
+import Epoch from '../epoch'
+
+const sendTransaction = client => async (tx, options = {}) => {
+  const opt = R.merge(client.defaults, options)
+  const { txHash } = await client.api.postTx({ tx })
+  return opt.waitMined ? client.poll(txHash, opt) : txHash
+}
+
+const balance = client => async (address, { height, hash } = {}) => {
+  return (await client.api.getAccountBalance(address, { height, hash })).balance
+}
+
+const tx = client => async hash => {
+  return (await client.api.getTx(hash, { txEncoding: 'json' })).transaction
+}
 
 const height = client => async () => (await client.api.getTop()).height
 
-/**
- * Wait for the chain to reach given height.
- * @param interval -- how often to check
- * @param attempts - how many times to poll
- */
 const awaitHeight = client => async (h, { interval = 5000, attempts = 12 } = {}) => {
-  const heightFn = height(client)
   async function probe (resolve, reject, left) {
     const _probe = probe // Workaround for Webpack bug
     try {
-      const current = await heightFn()
+      const current = await client.height()
       if (current >= h) {
         resolve(current)
       } else if (left > 0) {
@@ -47,23 +54,17 @@ const awaitHeight = client => async (h, { interval = 5000, attempts = 12 } = {})
   return new Promise((resolve, reject) => probe(resolve, reject, attempts))
 }
 
-/**
- * Wait for the a transaction to be mined.
- * @param blocks - how many blocks to wait
- * @param interval - how long between polls
- */
 const poll = client => async (th, { blocks = 10, interval = 5000 } = {}) => {
-  const heightFn = height(client)
-  const max = await heightFn() + blocks
+  const max = await client.height() + blocks
 
   async function probe (resolve, reject) {
     const _probe = probe // Workaround for Webpack bug
     try {
-      const { transaction } = await client.api.getTx(th, { txEncoding: 'json' })
-      if (transaction.blockHeight !== -1) {
-        resolve(transaction)
+      const tx = await client.tx(th)
+      if (tx.blockHeight !== -1) {
+        resolve(tx)
       } else {
-        if (await heightFn() < max) {
+        if (await client.height() < max) {
           setTimeout(() => _probe(resolve, reject), interval)
         } else {
           reject(Error(`Giving up after ${blocks} blocks mined`))
@@ -77,14 +78,27 @@ const poll = client => async (th, { blocks = 10, interval = 5000 } = {}) => {
   return new Promise((resolve, reject) => probe(resolve, reject))
 }
 
-function create (client) {
-  return Object.freeze({
-    height: height(client),
-    poll: poll(client),
-    awaitHeight: awaitHeight(client)
-  })
+const mempool = client => async () => {
+  return client.getTxs()
 }
 
-export default {
-  create
+/**
+ * Epoch node based `Chain` factory
+ *
+ * @param {string} url - URL to connect to
+ * @param {{ internalUrl: string, websocketUrl: string, debug: boolean, defaults: Object }} [options={}]
+ * @return {Promise<Chain>}
+ */
+export default async function EpochChain (url, options = {}) {
+  const epoch = Epoch(url, options)
+
+  return Object.freeze(Object.assign(epoch, {
+    sendTransaction: sendTransaction(epoch),
+    balance: balance(epoch),
+    tx: tx(epoch),
+    height: height(epoch),
+    awaitHeight: awaitHeight(epoch),
+    poll: poll(epoch),
+    mempool: mempool(epoch)
+  }))
 }

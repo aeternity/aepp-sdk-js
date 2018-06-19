@@ -40,34 +40,6 @@ function noWallet () {
 }
 
 /**
- * Generate a random salt for the preclaim
- * @return random salt
- */
-function salt () {
-  return Math.floor(Math.random() * Math.floor(Number.MAX_SAFE_INTEGER))
-}
-
-/**
- * Format the salt into a 64-byte hex string.
- * @param salt
- * @return formatted string containing salt as 0 padded hex
- */
-function formatSalt (salt) {
-  return Buffer.from(salt.toString(16).padStart(64, '0'), 'hex')
-}
-
-/**
- * Generate the commitment hash by hashing the formatted salt and
- * name, base 58 encoding the result and prepending 'cm$'
- * @param input - the name to be registered
- * @param salt
- * @return the commitment hash
- */
-function commitmentHash (input, salt) {
-  return `cm$${Crypto.encodeBase58Check(Crypto.hash(Buffer.concat([Crypto.hash(input), formatSalt(salt)])))}`
-}
-
-/**
  * Transfer a domain to another account.
  * @param account
  * @param options
@@ -200,7 +172,7 @@ const preclaim = (client, wallet, { defaults = {} } = {}) => async (name, { opti
  * @param client
  * @return the object
  */
-function create (client, { wallet, defaults = {} } = {}) {
+export default function Aens (client, { wallet, defaults = {} } = {}) {
   const options = R.merge(DEFAULTS, defaults)
 
   return Object.freeze({
@@ -209,12 +181,6 @@ function create (client, { wallet, defaults = {} } = {}) {
     claim: claim(client, wallet, { defaults: options }),
     update: R.isNil(wallet) ? noWallet : update(client, wallet, { defaults: options })
   })
-}
-
-export default {
-  create,
-  salt,
-  commitmentHash
 }
 
 export {

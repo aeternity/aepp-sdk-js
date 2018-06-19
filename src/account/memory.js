@@ -15,23 +15,24 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import '../'
-import { describe, it } from 'mocha'
-import Aens from '../../src/client/aens'
+import Account from './'
+import * as Crypto from '../utils/crypto'
 
-describe('aens', function () {
-  it('salt produces random sequences every time', () => {
-    const salt1 = Aens.salt()
-    const salt2 = Aens.salt()
-    salt1.should.be.a('Number')
-    salt2.should.be.a('Number')
-    salt1.should.not.be.equal(salt2)
-  })
+const sign = key => async data => Promise.resolve(Crypto.sign(data, key))
+const address = pub => async () => Promise.resolve(pub)
 
-  it('reproducible commitment hashes can be generated', () => {
-    const salt = Aens.salt()
-    const hash = Aens.commitmentHash('foobar.aet', salt)
-    hash.should.be.a('string')
-    hash.should.be.equal(Aens.commitmentHash('foobar.aet', salt))
+/**
+ * In-memory `Account` factory
+ *
+ * @param {{pub: string, priv: string}} keypair - Key pair to use
+ * @return {Account}
+ */
+export default function MemoryAccount (keypair) {
+  const { pub, priv } = keypair
+  const key = Buffer.from(priv, 'hex')
+
+  return Account({
+    address: address(pub),
+    sign: sign(key)
   })
-})
+}
