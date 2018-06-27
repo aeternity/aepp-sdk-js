@@ -13,7 +13,7 @@
     "test": "mocha --recursive --require @babel/register",
     "test:watch": "mocha --recursive --require @babel/register --watch",
     "test-jenkins": "mocha --recursive --require @babel/register --reporter mocha-junit-reporter",
-    "postinstall": "postinstall-build --only-as-dependency dist 'yarn build'"
+    "postinstall": "postinstall-build --only-as-dependency dist"
   },
   "license": "ISC",
   "dependencies": {
