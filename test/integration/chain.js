@@ -15,16 +15,16 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { describe, it, before } from 'mocha'
-import { configure, ready, masterAccount, accounts } from './'
+import {describe, it, before} from 'mocha'
+import {configure, ready, accounts} from './'
 
-describe('Epoch chain client', function () {
+describe('Epoch Chain', function () {
   configure(this)
 
   let client
 
   before(async function () {
-    client = (await ready(this)).chain
+    client = await ready(this)
   })
 
   it('determines the height', async () => {
@@ -33,14 +33,14 @@ describe('Epoch chain client', function () {
 
   it('waits for specified heights', async () => {
     const target = await client.height() + 2
-    await client.awaitHeight(target, { attempts: 120 }).should.eventually.be.at.least(target)
+    await client.awaitHeight(target, {attempts: 120}).should.eventually.be.at.least(target)
     return client.height().should.eventually.be.at.least(target)
   })
 
   it('polls for transactions', async () => {
-    const sender = await masterAccount.address()
-    const receiver = await accounts[0].address()
-    const { tx } = await client.api.postSpend({
+    const sender = await client.address()
+    const receiver = accounts[0].pub
+    const {tx} = await client.api.postSpend({
       fee: 1,
       amount: 1,
       sender,
@@ -48,10 +48,10 @@ describe('Epoch chain client', function () {
       payload: '',
       ttl: Number.MAX_SAFE_INTEGER
     })
-    const signed = await masterAccount.signTransaction(tx)
-    const { txHash } = await client.api.postTx({ tx: signed })
+    const signed = await client.signTransaction(tx)
+    const {txHash} = await client.api.postTx({tx: signed})
 
     await client.poll(txHash).should.eventually.be.fulfilled
-    return client.poll('th$xxx', { blocks: 1 }).should.eventually.be.rejected
+    return client.poll('th$xxx', {blocks: 1}).should.eventually.be.rejected
   })
 })

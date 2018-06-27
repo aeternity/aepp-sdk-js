@@ -15,11 +15,18 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import Account from './'
+import Account from '../account'
 import * as Crypto from '../utils/crypto'
 
-const sign = key => async data => Promise.resolve(Crypto.sign(data, key))
-const address = pub => async () => Promise.resolve(pub)
+const secrets = new WeakMap()
+
+async function sign (data) {
+  return Promise.resolve(Crypto.sign(data, secrets.get(this).priv))
+}
+
+async function address () {
+  return Promise.resolve(secrets.get(this).pub)
+}
 
 /**
  * In-memory `Account` factory
@@ -27,12 +34,14 @@ const address = pub => async () => Promise.resolve(pub)
  * @param {{pub: string, priv: string}} keypair - Key pair to use
  * @return {Account}
  */
-export default function MemoryAccount (keypair) {
-  const { pub, priv } = keypair
-  const key = Buffer.from(priv, 'hex')
+const MemoryAccount = Account.compose({
+  init ({keypair}) {
+    secrets.set(this, {
+      priv: Buffer.from(keypair.priv, 'hex'),
+      pub: keypair.pub
+    })
+  },
+  methods: {sign, address}
+})
 
-  return Account({
-    address: address(pub),
-    sign: sign(key)
-  })
-}
+export default MemoryAccount

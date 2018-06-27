@@ -15,6 +15,9 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+import stampit from '@stamp/it'
+import {required} from '@stamp/required'
+
 /**
  * @typedef {Object} Chain
  * @property {function (tx: string, options: ?Object): Promise<string>} sendTransaction - Commit a signed transaction
@@ -25,3 +28,19 @@
  * @property {function (hash: string, options: ?Object): Promise<string>} tx - Find transaction by hash
  * @property {function (): Promise<string[]>} mempool - Open transactions in the mempool
  */
+
+const Chain = stampit({
+  deepProps: {Chain: {defaults: {waitMined: true}}}
+}, required({
+  methods: {
+    sendTransaction: required,
+    height: required,
+    awaitHeight: required,
+    poll: required,
+    balance: required,
+    tx: required,
+    mempool: required
+  }
+}))
+
+export default Chain

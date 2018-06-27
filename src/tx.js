@@ -15,6 +15,8 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+import {required} from '@stamp/required'
+
 /**
  * @typedef {{ sender: string, recipient: number, amount: number, fee: number, ttl: number, nonce: number, payload: string }} SpendTx
  */
@@ -42,13 +44,29 @@
 
 /**
  * @typedef {Object} Tx
- * @property {function (data: SpendTx): Promise<string>} spend - Create a `spend_tx` transaction
- * @property {function (data: NamePreclaimTx): Promise<string>} namePreclaim - Create a `name_preclaim` transaction
- * @property {function (data: NameClaimTx): Promise<string>} nameClaim - Create a `name_claim` transaction
- * @property {function (data: NameTransferTx): Promise<string>} nameTransfer - Create a `name_transfer` transaction
- * @property {function (data: NameUpdateTx): Promise<string>} nameUpdate - Create a `name_update` transaction
- * @property {function (data: NameRevokeTx): Promise<string>} nameRevoke - Create a `name_revoke` transaction
- * @property {function (data: ContractCreateTx): Promise<string>} contractCreate - Create a `contract_create` transaction
- * @property {function (data: ContractCallTx): Promise<string>} contractCall - Create a `contract_call` transaction
+ * @property {function (data: SpendTx): Promise<string>} spendTx - Create a `spend_tx` transaction
+ * @property {function (data: NamePreclaimTx): Promise<string>} namePreclaimTx - Create a `name_preclaim` transaction
+ * @property {function (data: NameClaimTx): Promise<string>} nameClaimTx - Create a `name_claim` transaction
+ * @property {function (data: NameTransferTx): Promise<string>} nameTransferTx - Create a `name_transfer` transaction
+ * @property {function (data: NameUpdateTx): Promise<string>} nameUpdateTx - Create a `name_update` transaction
+ * @property {function (data: NameRevokeTx): Promise<string>} nameRevokeTx - Create a `name_revoke` transaction
+ * @property {function (data: ContractCreateTx): Promise<string>} contractCreateTx - Create a `contract_create` transaction
+ * @property {function (data: ContractCallTx): Promise<string>} contractCallTx - Create a `contract_call` transaction
  * @property {function (name: string): Promise<string>} commitmentHash - Create a commitment hash
  */
+
+const Tx = required({
+  methods: {
+    spendTx: required,
+    namePreclaimTx: required,
+    nameClaimTx: required,
+    nameTransferTx: required,
+    nameUpdateTx: required,
+    nameRevokeTx: required,
+    contractCreateTx: required,
+    contractCallTx: required,
+    commitmentHash: required
+  }
+})
+
+export default Tx

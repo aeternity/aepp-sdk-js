@@ -120,7 +120,7 @@ describe('Swagger', function () {
   it('maps operations', async () => {
     const [path, data] = R.head(R.toPairs(op))
     const [method, operation] = R.head(R.toPairs(data))
-    const fn = internal.operation(path, method, operation, def)(`//v2`)
+    const fn = internal.operation(path, method, operation, def)(this, `//v2`)
     assert.equal(fn.length, 2)
   })
 })

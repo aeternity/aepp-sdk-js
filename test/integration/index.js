@@ -17,17 +17,23 @@
 
 import '../'
 import Ae from '../../src/ae'
-import EpochChain from '../../src/chain/epoch'
+import Chain from '../../src/chain/epoch'
+import Tx from '../../src/tx/epoch'
+import JsTx from '../../src/tx/js'
 import Account from '../../src/account/memory'
-import EpochTx from '../../src/tx/epoch'
+import Aens from '../../src/aens'
+import Contract from '../../src/contract'
 import * as Crypto from '../../src/utils/crypto'
 
 const url = process.env.TEST_URL || 'http://localhost:3013'
 const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
+const masterAccount = Crypto.envKeypair(process.env)
+const accounts = Array(3).fill().map(() => Crypto.generateKeyPair())
 
-const chainPromise = EpochChain(url, { internalUrl, debug: !!process.env['DEBUG'] })
-const masterAccount = Account(Crypto.envKeypair(process.env))
-const accounts = Array(3).fill().map(() => Account(Crypto.generateKeyPair()))
+const BaseAe = Ae.compose(Chain, Tx, JsTx, Account, Aens, Contract, {
+  deepProps: {Swagger: {defaults: {debug: !!process.env['DEBUG']}}},
+  props: {url, internalUrl}
+})
 
 let planned = 0
 let charged = false
@@ -44,18 +50,21 @@ function configure (mocha) {
 
 async function ready (mocha) {
   configure(mocha)
-  const chain = await chainPromise
-  const tx = EpochTx(chain)
-  const ae = Ae({ tx, chain, account: masterAccount })
-  await ae.chain.awaitHeight(10)
+
+  const ae = await BaseAe({keypair: masterAccount})
+
+  await ae.awaitHeight(10)
+
   if (!charged && planned > 0) {
-    await ae.account.spend(planned, await accounts[0].address())
+    await ae.spend(planned, accounts[0].pub)
     charged = true
   }
+
   return ae
 }
 
 export {
+  BaseAe,
   masterAccount,
   accounts,
   url,

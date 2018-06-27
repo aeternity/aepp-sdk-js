@@ -15,33 +15,20 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import stampit from '@stamp/it'
-import {encodeBase58Check, hash, salt} from '../utils/crypto'
+import '../'
+import { describe, it } from 'mocha'
+import AsyncInit from '../../src/utils/async-init'
 
-const createSalt = salt
-
-/**
- * Format the salt into a 64-byte hex string
- *
- * @param {number} salt
- * @return {string} Zero-padded hex string of salt
- */
-function formatSalt (salt) {
-  return Buffer.from(salt.toString(16).padStart(64, '0'), 'hex')
-}
-
-/**
- * Generate the commitment hash by hashing the formatted salt and
- * name, base 58 encoding the result and prepending 'cm$'
- *
- * @param {string} name - Name to be registered
- * @param {number} salt
- * @return {string} Commitment hash
- */
-async function commitmentHash (name, salt = createSalt()) {
-  return `cm$${encodeBase58Check(hash(Buffer.concat([hash(name), formatSalt(salt)])))}`
-}
-
-const JsTx = stampit({methods: {commitmentHash}})
-
-export default JsTx
+describe('AsyncInit', function () {
+  it('composes Stamps', async () => {
+    return AsyncInit.compose({
+      async init (val) {
+        return Promise.resolve(val)
+      }
+    }, {
+      async init (val) {
+        return Promise.resolve(`${val} World`)
+      }
+    })('Hello').should.eventually.be.equal('Hello World')
+  })
+})

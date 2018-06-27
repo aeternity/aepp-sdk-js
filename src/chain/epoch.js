@@ -16,33 +16,37 @@
  */
 
 import * as R from 'ramda'
+import Chain from '../chain'
 import Epoch from '../epoch'
 
-const sendTransaction = client => async (tx, options = {}) => {
-  const opt = R.merge(client.defaults, options)
-  const { txHash } = await client.api.postTx({ tx })
-  return opt.waitMined ? client.poll(txHash, opt) : txHash
+async function sendTransaction (tx, options = {}) {
+  const {waitMined} = R.merge(this.Chain.defaults, options)
+  const {txHash} = await this.api.postTx({tx})
+  return waitMined ? this.poll(txHash, options) : txHash
 }
 
-const balance = client => async (address, { height, hash } = {}) => {
-  return (await client.api.getAccountBalance(address, { height, hash })).balance
+async function balance (address, {height, hash} = {}) {
+  return (await this.api.getAccountBalance(address, {height, hash})).balance
 }
 
-const tx = client => async hash => {
-  return (await client.api.getTx(hash, { txEncoding: 'json' })).transaction
+async function tx (hash) {
+  return (await this.api.getTx(hash, {txEncoding: 'json'})).transaction
 }
 
-const height = client => async () => (await client.api.getTop()).height
+async function height () {
+  return (await this.api.getTop()).height
+}
 
-const awaitHeight = client => async (h, { interval = 5000, attempts = 12 } = {}) => {
+async function awaitHeight (h, {interval = 5000, attempts = 12} = {}) {
+  const instance = this
+
   async function probe (resolve, reject, left) {
-    const _probe = probe // Workaround for Webpack bug
     try {
-      const current = await client.height()
+      const current = await instance.height()
       if (current >= h) {
         resolve(current)
       } else if (left > 0) {
-        setTimeout(() => _probe(resolve, reject, left - 1), interval)
+        setTimeout(() => probe(resolve, reject, left - 1), interval)
       } else {
         reject(Error(`Giving up after ${attempts * interval}ms`))
       }
@@ -54,18 +58,18 @@ const awaitHeight = client => async (h, { interval = 5000, attempts = 12 } = {})
   return new Promise((resolve, reject) => probe(resolve, reject, attempts))
 }
 
-const poll = client => async (th, { blocks = 10, interval = 5000 } = {}) => {
-  const max = await client.height() + blocks
+async function poll (th, {blocks = 10, interval = 5000} = {}) {
+  const instance = this
+  const max = await this.height() + blocks
 
   async function probe (resolve, reject) {
-    const _probe = probe // Workaround for Webpack bug
     try {
-      const tx = await client.tx(th)
+      const tx = await instance.tx(th)
       if (tx.blockHeight !== -1) {
         resolve(tx)
       } else {
-        if (await client.height() < max) {
-          setTimeout(() => _probe(resolve, reject), interval)
+        if (await instance.height() < max) {
+          setTimeout(() => probe(resolve, reject), interval)
         } else {
           reject(Error(`Giving up after ${blocks} blocks mined`))
         }
@@ -78,27 +82,20 @@ const poll = client => async (th, { blocks = 10, interval = 5000 } = {}) => {
   return new Promise((resolve, reject) => probe(resolve, reject))
 }
 
-const mempool = client => async () => {
-  return client.getTxs()
+async function mempool () {
+  return this.getTxs()
 }
 
-/**
- * Epoch node based `Chain` factory
- *
- * @param {string} url - URL to connect to
- * @param {{ internalUrl: string, websocketUrl: string, debug: boolean, defaults: Object }} [options={}]
- * @return {Promise<Chain>}
- */
-export default async function EpochChain (url, options = {}) {
-  const epoch = Epoch(url, options)
+const EpochChain = Chain.compose(Epoch, {
+  methods: {
+    sendTransaction,
+    balance,
+    tx,
+    height,
+    awaitHeight,
+    poll,
+    mempool
+  }
+})
 
-  return Object.freeze(Object.assign(epoch, {
-    sendTransaction: sendTransaction(epoch),
-    balance: balance(epoch),
-    tx: tx(epoch),
-    height: height(epoch),
-    awaitHeight: awaitHeight(epoch),
-    poll: poll(epoch),
-    mempool: mempool(epoch)
-  }))
-}
+export default EpochChain

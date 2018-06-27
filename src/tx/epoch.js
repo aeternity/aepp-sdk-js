@@ -15,61 +15,61 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+import Tx from '../tx'
+import Epoch from '../epoch'
 import * as R from 'ramda'
-import { salt } from '../utils/crypto'
+import {salt} from '../utils/crypto'
 
-const spend = client => async ({ sender, recipient, amount, fee, ttl, nonce, payload }) => {
-  return (await client.api.postSpend(R.merge(R.head(arguments), { recipientPubkey: recipient }))).tx
+const createSalt = salt
+
+async function spendTx ({ sender, recipient, amount, fee, ttl, nonce, payload }) {
+  return (await this.api.postSpend(R.merge(R.head(arguments), { recipientPubkey: recipient }))).tx
 }
 
-const namePreclaim = client => async ({ account, nonce, commitment, fee, ttl }) => {
-  return (await client.api.postNamePreclaim(R.head(arguments))).tx
+async function namePreclaimTx ({ account, nonce, commitment, fee, ttl }) {
+  return (await this.api.postNamePreclaim(R.head(arguments))).tx
 }
 
-const nameClaim = client => async ({ account, nonce, name, nameSalt, fee, ttl }) => {
-  return (await client.api.postNameClaim(R.head(arguments))).tx
+async function nameClaimTx ({ account, nonce, name, nameSalt, fee, ttl }) {
+  return (await this.api.postNameClaim(R.head(arguments))).tx
 }
 
-const nameTransfer = client => async ({ account, nonce, nameHash, recipientAccount, fee, ttl }) => {
-  return (await client.api.postNameTransfer(R.merge(R.head(arguments), { recipientPubkey: recipientAccount }))).tx
+async function nameTransferTx ({ account, nonce, nameHash, recipientAccount, fee, ttl }) {
+  return (await this.api.postNameTransfer(R.merge(R.head(arguments), { recipientPubkey: recipientAccount }))).tx
 }
 
-const nameUpdate = client => async ({ account, nonce, nameHash, nameTtl, pointers, clientTtl, fee, ttl }) => {
-  return (await client.api.postNameUpdate(R.head(arguments))).tx
+async function nameUpdateTx ({ account, nonce, nameHash, nameTtl, pointers, clientTtl, fee, ttl }) {
+  return (await this.api.postNameUpdate(R.head(arguments))).tx
 }
 
-const nameRevoke = client => async ({ account, nonce, nameHash, fee, ttl }) => {
-  return (await client.api.postNameRevoke(R.head(arguments))).tx
+async function nameRevokeTx ({ account, nonce, nameHash, fee, ttl }) {
+  return (await this.api.postNameRevoke(R.head(arguments))).tx
 }
 
-const contractCreate = client => async ({ owner, nonce, code, vmVersion, deposit, amount, gas, gasPrice, fee, ttl, callData }) => {
-  return (await client.api.postContractCreate(R.head(arguments))).tx
+async function contractCreateTx ({ owner, nonce, code, vmVersion, deposit, amount, gas, gasPrice, fee, ttl, callData }) {
+  return this.api.postContractCreate(R.head(arguments))
 }
 
-const contractCall = client => async ({ caller, nonce, contract, vmVersion, fee, ttl, amount, gas, gasPrice, callData }) => {
-  return (await client.api.postContractCall(R.head(arguments))).tx
+async function contractCallTx ({ caller, nonce, contract, vmVersion, fee, ttl, amount, gas, gasPrice, callData }) {
+  return (await this.api.postContractCall(R.head(arguments))).tx
 }
 
-const commitmentHash = client => async name => {
-  return (await client.api.getCommitmentHash(name, salt())).commitment
+async function commitmentHash (name, salt = createSalt()) {
+  return (await this.api.getCommitmentHash(name, salt)).commitment
 }
 
-/**
- * Epoch transaction proxy factory
- *
- * @param {Object} client - `Epoch` client
- * @return {Tx}
- */
-export default function epochTx (client) {
-  return Object.freeze({
-    spend: spend(client),
-    namePreclaim: namePreclaim(client),
-    nameClaim: nameClaim(client),
-    nameTransfer: nameTransfer(client),
-    nameUpdate: nameUpdate(client),
-    nameRevoke: nameRevoke(client),
-    contractCreate: contractCreate(client),
-    contractCall: contractCall(client),
-    commitmentHash: commitmentHash(client)
-  })
-}
+const EpochTx = Epoch.compose(Tx, {
+  methods: {
+    spendTx,
+    namePreclaimTx,
+    nameClaimTx,
+    nameTransferTx,
+    nameUpdateTx,
+    nameRevokeTx,
+    contractCreateTx,
+    contractCallTx,
+    commitmentHash
+  }
+})
+
+export default EpochTx

@@ -24,8 +24,8 @@ const sign = post => async data => post('sign', data)
 const address = post => async () => post('account')
 
 export function accountProxy (account, window) {
-  async function receive ({ data, source }) {
-    const { id, method, params } = data
+  async function receive ({data, source}) {
+    const {id, method, params} = data
     const methods = {
       async account () {
         return account.address()
@@ -39,7 +39,7 @@ export function accountProxy (account, window) {
       return Promise.resolve(Error(`No such method ${method}`))
     }
 
-    source.postMessage({ jsonrpc: '2.0', id, result: await R.apply(methods[method] || error, params) }, '*')
+    source.postMessage({jsonrpc: '2.0', id, result: await R.apply(methods[method] || error, params)}, '*')
   }
 
   window.addEventListener('message', receive, false)
@@ -56,33 +56,37 @@ export function accountProxy (account, window) {
  *
  * @return {Account}
  */
-export default function PostMessageAccount (target, window) {
-  const callbacks = {}
+const PostMessageAccount = Account.compose({
+  init ({target, window}) {
+    const callbacks = {}
 
-  function receive ({ data }) {
-    const { result, id } = data
+    function receive ({data}) {
+      const {result, id} = data
 
-    if (callbacks[id]) {
-      callbacks[id].resolve(result)
-      delete callbacks[id]
+      if (callbacks[id]) {
+        callbacks[id].resolve(result)
+        delete callbacks[id]
+      }
     }
-  }
 
-  function post (method, ...params) {
-    const ret = new Promise((resolve, reject) => {
-      callbacks[sequence] = { resolve, reject }
+    function post (method, ...params) {
+      const ret = new Promise((resolve, reject) => {
+        callbacks[sequence] = {resolve, reject}
+      })
+
+      target.postMessage({jsonrpc: '2.0', id: sequence, method, params}, '*')
+      sequence++
+
+      return ret
+    }
+
+    window.addEventListener('message', receive, false)
+
+    return Object.assign(this, {
+      address: address(post),
+      sign: sign(post)
     })
-
-    target.postMessage({ jsonrpc: '2.0', id: sequence, method, params }, '*')
-    sequence++
-
-    return ret
   }
+})
 
-  window.addEventListener('message', receive, false)
-
-  return Account({
-    address: address(post),
-    sign: sign(post)
-  })
-}
+export default PostMessageAccount

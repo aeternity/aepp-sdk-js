@@ -15,6 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+import stampit from '@stamp/it'
 import axios from 'axios'
 import * as R from 'ramda'
 import urlparse from 'url'
@@ -24,41 +25,34 @@ async function remoteSwag (url) {
   return (await axios.get(urlparse.resolve(url, 'api'))).data
 }
 
-/**
- * Epoch node factory
- *
- * @param {string} url - URL to connect to
- * @param {{ internalUrl: string, websocketUrl: string, debug: boolean, defaults: Object }} [options={}]
- * @return {Promise<Object>}
- */
-export default async function Epoch (url, { internalUrl, websocketUrl, debug = false, defaults = {} } = {}) {
-  const baseUrl = url.replace(/\/?$/, '/')
-  const methodFn = basePath => {
-    const trimmedBasePath = basePath.replace(/^\//, '')
-    return (op, definition) => {
-      const { tags, operationId } = definition
+const loader = ({url, internalUrl}) => (path, definition) => {
+  const {tags, operationId} = definition
 
-      if (R.contains('external', tags)) {
-        return op(urlparse.resolve(baseUrl, trimmedBasePath), { debug })
-      } else if (internalUrl !== void 0 && R.contains('internal', tags)) {
-        return op(urlparse.resolve(internalUrl.replace(/\/?$/, '/'), trimmedBasePath), { debug })
-      } else {
-        return () => {
-          throw Error(`Method ${operationId} is unsupported. No interface for ${R.toString(tags)}`)
-        }
-      }
+  if (R.contains('external', tags)) {
+    return urlparse.resolve(url, path)
+  } else if (!R.isNil(internalUrl) && R.contains('internal', tags)) {
+    return urlparse.resolve(internalUrl.replace(/\/?$/, '/'), path)
+  } else {
+    return () => {
+      throw Error(`Method ${operationId} is unsupported. No interface for ${R.toString(tags)}`)
     }
   }
-
-  const swag = await remoteSwag(url)
-  const { methods, api } = Swagger(swag, methodFn)
-  const { version, revision } = await api.getVersion()
-
-  return Object.freeze({
-    defaults,
-    version,
-    revision,
-    methods,
-    api
-  })
 }
+
+const Epoch = stampit({
+  async init ({url = this.url, internalUrl = this.internalUrl}) {
+    url = url.replace(/\/?$/, '/')
+
+    return Object.assign(this, {
+      swag: await remoteSwag(url),
+      urlFor: loader({url, internalUrl})
+    })
+  }
+}, Swagger, {
+  async init () {
+    const {version, revision} = await this.api.getVersion()
+    return Object.assign(this, {version, revision})
+  }
+})
+
+export default Epoch

@@ -21,23 +21,12 @@
  * The high-level description of the naming system is
  * https://github.com/aeternity/protocol/blob/master/AENS.md in the
  * protocol repository.
- *
- *
  */
 
 import * as R from 'ramda'
-import * as Crypto from '../utils/crypto'
-
-const DEFAULTS = {
-  fee: 10,
-  ttl: Number.MAX_SAFE_INTEGER,
-  clientTtl: 1,
-  nameTtl: 50000 // aec_governance:name_claim_max_expiration() => 50000
-}
-
-function noWallet () {
-  throw Error('Wallet not provided')
-}
+import {encodeBase58Check, salt} from './utils/crypto'
+import Ae from './ae'
+import stampit from '@stamp/it'
 
 /**
  * Transfer a domain to another account.
@@ -45,16 +34,16 @@ function noWallet () {
  * @param options
  * @return
  */
-const transfer = (client, wallet, { defaults = {} } = {}) => nameHash => async (account, { options = {} } = {}) => {
-  const opt = R.merge(defaults, options)
+async function transfer (nameHash, account, options = {}) {
+  const opt = R.merge(this.Ae.defaults, options)
 
-  const { tx } = await client.api.postNameTransfer(R.merge(opt, {
+  const nameTransferTx = await this.nameTransferTx(R.merge(opt, {
     nameHash,
-    account: wallet.account,
-    recipientPubkey: account
+    account: await this.address(),
+    recipientAccount: account
   }))
 
-  return wallet.sendTransaction(tx, { options: opt })
+  return this.send(nameTransferTx, opt)
 }
 
 /**
@@ -88,102 +77,95 @@ function classify (s) {
  * @param options
  * @return
  */
-const update = (client, wallet, { defaults = {} } = {}) => nameHash => async (target, { options = {} } = {}) => {
-  const opt = R.merge(defaults, options)
+async function update (nameHash, target, options = {}) {
+  const opt = R.merge(this.Ae.defaults, options)
 
-  const { tx } = await client.api.postNameUpdate(R.merge(opt, {
+  const nameUpdateTx = await this.nameUpdateTx(R.merge(opt, {
     nameHash,
-    account: wallet.account,
+    account: await this.address(),
     pointers: JSON.stringify(R.fromPairs([[classify(target), target]]))
   }))
 
-  return wallet.sendTransaction(tx, { options: opt })
+  return this.send(nameUpdateTx, opt)
 }
 
 /**
  * Query the status of an AENS registration
- * @param name
- * @return Registration status in the form TODO:
+ * @param {string} name
+ * @return {Promise<Object>}
  */
-const query = (client, { wallet, defaults = {} }) => async name => {
-  const o = await client.api.getName(name)
-  const { nameHash } = o
-  const updateFn = R.apply(update(client, wallet, { defaults })(nameHash))
-  const transferFn = R.apply(transfer(client, wallet, { defaults })(nameHash))
+async function query (name) {
+  const o = await this.api.getName(name)
+  const {nameHash} = o
 
   return Object.freeze(Object.assign(o, {
     pointers: JSON.parse(o.pointers || '{}'),
-    update: R.isNil(wallet) ? noWallet : async function () {
-      await updateFn(arguments)
-      return query(client, { wallet, defaults })(name)
+    update: async (target, options) => {
+      await this.aensUpdate(nameHash, target, options)
+      return this.aensQuery(name)
     },
-    transfer: R.isNil(wallet) ? noWallet : async function () {
-      await transferFn(arguments)
-      return query(client, { wallet, defaults })(name)
+    transfer: async (account, options) => {
+      await this.aensTransfer(nameHash, account, options)
+      return this.aensQuery(name)
     }
   }))
 }
 
 /**
- * Claim a previously preclaimed registration. This can only be done after the preclaim step
- * @param options
- * @return the result of the claim
+ * Claim a previously preclaimed registration. This can only be done after the
+ * preclaim step
+ * @param {Record} [options={}]
+ * @return {Promise<Object>} the result of the claim
  */
-const claim = (client, wallet, { defaults = {} } = {}) => (name, salt) => async ({ options = {} } = {}) => {
-  const opt = R.merge(defaults, options)
-  const { tx } = await client.api.postNameClaim(R.merge(opt, {
-    account: wallet.account,
+async function claim (name, salt, options = {}) {
+  const opt = R.merge(this.Ae.defaults, options)
+  const claimTx = await this.nameClaimTx(R.merge(opt, {
+    account: await this.address(),
     nameSalt: salt,
-    name: `nm$${Crypto.encodeBase58Check(Buffer.from(name))}`
+    name: `nm$${encodeBase58Check(Buffer.from(name))}`
   }))
 
-  await wallet.sendTransaction(tx, { options: opt })
-
-  return query(client, defaults)(name)
+  await this.send(claimTx, opt)
+  return this.aensQuery(name)
 }
 
 /**
  * Preclaim a name. Sends a hash of the name and a random salt to the node
- * @param name
- * @param options
- * @return the status of the claim TODO:
+ * @param {string} name
+ * @param {Record} [options={}]
+ * @return {Promise<Object>}
  */
-const preclaim = (client, wallet, { defaults = {} } = {}) => async (name, { options = {} } = {}) => {
+async function preclaim (name, options = {}) {
+  const opt = R.merge(this.Ae.defaults, options)
   const _salt = salt()
-  const hash = commitmentHash(name, _salt)
-  const opt = R.merge(defaults, options)
+  const hash = await this.commitmentHash(name, _salt)
 
-  const { tx } = await client.api.postNamePreclaim(R.merge(opt, {
-    account: wallet.account,
+  const preclaimTx = await this.namePreclaimTx(R.merge(opt, {
+    account: await this.address(),
     commitment: hash
   }))
 
-  await wallet.sendTransaction(tx, { options: opt })
+  await this.send(preclaimTx, opt)
 
   return Object.freeze({
-    claim: claim(client, wallet, { defaults })(name, _salt),
+    claim: options => this.aensClaim(name, _salt, options),
     salt: _salt,
     commitment: hash
   })
 }
 
-/**
- * Create an aens instance
- * @param client
- * @return the object
- */
-export default function Aens (client, { wallet, defaults = {} } = {}) {
-  const options = R.merge(DEFAULTS, defaults)
+const Aens = stampit(Ae, {
+  methods: {
+    aensQuery: query,
+    aensPreclaim: preclaim,
+    aensClaim: claim,
+    aensUpdate: update,
+    aensTransfer: transfer
+  },
+  deepProps: {Ae: {defaults: {
+    clientTtl: 1,
+    nameTtl: 50000 // aec_governance:name_claim_max_expiration() => 50000
+  }}}
+})
 
-  return Object.freeze({
-    query: query(client, { wallet, defaults: options }),
-    preclaim: R.isNil(wallet) ? noWallet : preclaim(client, wallet, { defaults: options }),
-    claim: claim(client, wallet, { defaults: options }),
-    update: R.isNil(wallet) ? noWallet : update(client, wallet, { defaults: options })
-  })
-}
-
-export {
-  query,
-  preclaim
-}
+export default Aens

@@ -25,21 +25,9 @@
  *
  */
 
+import stampit from '@stamp/it'
+import Ae from './ae'
 import * as R from 'ramda'
-
-const DEFAULTS = {
-  deposit: 4,
-  vmVersion: 1,
-  gasPrice: 1,
-  amount: 1,
-  fee: 10,
-  gas: 40000000,
-  ttl: Number.MAX_SAFE_INTEGER
-}
-
-function noWallet () {
-  throw Error('Wallet not provided')
-}
 
 /**
  * Encode the call data for an already-deployed contract.
@@ -47,8 +35,8 @@ function noWallet () {
  * @param abi
  * @return
  */
-const encodeCall = client => (code, abi) => async (name, args) => {
-  return (await client.api.encodeCalldata({ abi: abi, code, 'function': name, arg: args })).calldata
+async function encodeCall (code, abi, name, args) {
+  return (await this.api.encodeCalldata({ abi: abi, code, 'function': name, arg: args })).calldata
 }
 
 /**
@@ -57,8 +45,8 @@ const encodeCall = client => (code, abi) => async (name, args) => {
  * @param
  * @return
  */
-const callStatic = client => (code, abi) => async (name, { args = '()', conformFn = R.identity } = {}) => {
-  const { out } = await client.api.callContract({ abi: abi, code, 'function': name, arg: args })
+async function callStatic (code, abi, name, { args = '()', conformFn = R.identity } = {}) {
+  const {out} = await this.api.callContract({ abi: abi, code, 'function': name, arg: args })
   return conformFn(out)
 }
 
@@ -68,17 +56,17 @@ const callStatic = client => (code, abi) => async (name, { args = '()', conformF
  * @param
  * @return
  */
-const call = (client, wallet, { defaults = {} } = {}) => address => async (name, { args = '()', conformFn = R.identity, options = {} } = {}) => {
-  const opt = R.merge(defaults, options)
-  const { tx } = await client.api.postContractCallCompute(R.merge(opt, {
-    function: name,
-    arguments: args,
+async function call (code, abi, address, name, { args = '()', conformFn = R.identity, options = {} } = {}) {
+  const opt = R.merge(this.Ae.defaults, options)
+
+  const tx = await this.contractCallTx(R.merge(opt, {
+    callData: await this.contractEncodeCall(code, abi, name, args),
     contract: address,
-    caller: wallet.account
+    caller: await this.address()
   }))
 
-  const { hash } = await wallet.sendTransaction(tx, { options: opt })
-  const result = await client.api.getContractCallFromTx(hash)
+  const {hash} = await this.send(tx, opt)
+  const result = await this.api.getContractCallFromTx(hash)
 
   if (result.returnType === 'ok') {
     return conformFn(result.returnValue)
@@ -94,20 +82,20 @@ const call = (client, wallet, { defaults = {} } = {}) => address => async (name,
  * @param
  * @return
  */
-const deploy = (client, wallet, { defaults = {} } = {}) => (code, abi) => async ({ options = { initState: '()' } } = {}) => {
-  const callData = await encodeCall(client)(code, abi)('init', options.initState)
-  const opt = R.merge(defaults, options)
-  const { tx, contractAddress } = await client.api.postContractCreate(R.merge(opt, {
+async function deploy (code, abi, {initState = '()', options = {}} = {}) {
+  const opt = R.merge(this.Ae.defaults, options)
+  const callData = await this.contractEncodeCall(code, abi, 'init', initState)
+  const {tx, contractAddress} = await this.contractCreateTx(R.merge(opt, {
     callData,
     code,
-    owner: wallet.account
+    owner: await this.address()
   }))
 
-  await wallet.sendTransaction(tx, { options: opt })
+  await this.send(tx, opt)
 
   return Object.freeze({
     address: contractAddress,
-    call: call(client, wallet, { defaults })(contractAddress)
+    call: async (name, options) => this.contractCall(code, abi, contractAddress, name, options)
   })
 }
 
@@ -117,33 +105,32 @@ const deploy = (client, wallet, { defaults = {} } = {}) => (code, abi) => async 
  * @param
  * @return
  */
-const compile = (client, { wallet, defaults = {} } = {}) => async (code, { options = {} } = {}) => {
-  const o = await client.api.compileContract(R.mergeAll([defaults, options, {
-    code,
-    options: ''
-  }]))
+async function compile (code, options = {}) {
+  const o = await this.api.compileContract(R.mergeAll([this.Ae.defaults, options, {code}]))
 
   return Object.freeze(Object.assign({
-    encodeCall: encodeCall(client)(o.bytecode, 'sophia'),
-    call: callStatic(client)(o.bytecode, 'sophia'),
-    deploy: R.isNil(wallet) ? noWallet : deploy(client, wallet, { defaults })(o.bytecode, 'sophia')
+    encodeCall: async (name, args) => this.contractEncodeCall(o.bytecode, 'sophia', name, args),
+    call: async (name, options) => this.contractCallStatic(o.bytecode, 'sophia', name, options),
+    deploy: async (options) => this.contractDeploy(o.bytecode, 'sophia', options)
   }, o))
 }
 
-/**
- *
- * @param
- * @param
- * @return
- */
-export default function Contract (client, { wallet, defaults = {} } = {}) {
-  const options = R.merge(DEFAULTS, defaults)
+const Contract = stampit(Ae, {
+  methods: {
+    contractCompile: compile,
+    contractCallStatic: callStatic,
+    contractDeploy: deploy,
+    contractCall: call,
+    contractEncodeCall: encodeCall
+  },
+  deepProps: {Ae: {defaults: {
+    deposit: 4,
+    vmVersion: 1,
+    gasPrice: 1,
+    amount: 1,
+    gas: 40000000,
+    options: ''
+  }}}
+})
 
-  return Object.freeze({
-    compile: compile(client, { wallet, defaults: options }),
-    callStatic: callStatic(client),
-    deploy: deploy(client, wallet, { defaults: options }),
-    call: call(client, wallet, { defaults: options }),
-    encodeCall: encodeCall(client)
-  })
-}
+export default Contract

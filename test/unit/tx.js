@@ -16,22 +16,16 @@
  */
 
 import '../'
-import { describe, it } from 'mocha'
-import Aens from '../../src/client/aens'
+import {describe, it} from 'mocha'
+import {salt} from '../../src/utils/crypto'
+import Tx from '../../src/tx/js'
 
-describe('aens', function () {
-  it('salt produces random sequences every time', () => {
-    const salt1 = Aens.salt()
-    const salt2 = Aens.salt()
-    salt1.should.be.a('Number')
-    salt2.should.be.a('Number')
-    salt1.should.not.be.equal(salt2)
-  })
-
-  it('reproducible commitment hashes can be generated', () => {
-    const salt = Aens.salt()
-    const hash = Aens.commitmentHash('foobar.aet', salt)
+describe('Tx', function () {
+  it('reproducible commitment hashes can be generated', async () => {
+    const tx = Tx()
+    const _salt = salt()
+    const hash = await tx.commitmentHash('foobar.aet', _salt)
     hash.should.be.a('string')
-    hash.should.be.equal(Aens.commitmentHash('foobar.aet', salt))
+    return hash.should.be.equal(await tx.commitmentHash('foobar.aet', _salt))
   })
 })

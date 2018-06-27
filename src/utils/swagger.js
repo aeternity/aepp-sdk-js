@@ -15,6 +15,8 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+import stampit from '@stamp/it'
+import AsyncInit from './async-init'
 import axios from 'axios'
 import * as R from 'ramda'
 
@@ -51,13 +53,13 @@ function extendingErrorPath (key, fn) {
   try {
     return fn()
   } catch (e) {
-    throw Object.assign(e, { path: [key].concat(e.path || []) })
+    throw Object.assign(e, {path: [key].concat(e.path || [])})
   }
 }
 
 function TypeError (msg, spec, value) {
   const e = Error(msg)
-  return Object.assign(e, { spec, value })
+  return Object.assign(e, {spec, value})
 }
 
 const conformTypes = {
@@ -69,7 +71,7 @@ const conformTypes = {
     }
   },
   enum (value, spec, types) {
-    const { enum: values } = spec
+    const {enum: values} = spec
     if (R.contains(value, values)) {
       return value
     } else {
@@ -128,13 +130,13 @@ function conformDispatch (spec) {
   } else if ('type' in spec) {
     return spec.type
   } else {
-    throw Object.assign(Error('Could not determine type'), { spec })
+    throw Object.assign(Error('Could not determine type'), {spec})
   }
 }
 
 function conform (value, spec, types) {
   return (conformTypes[conformDispatch(spec)] || (() => {
-    throw Object.assign(Error('Unsupported type'), { spec })
+    throw Object.assign(Error('Unsupported type'), {spec})
   }))(value, spec, types)
 }
 
@@ -144,8 +146,8 @@ const httpClients = {
 }
 
 function classifyParameters (parameters) {
-  const { req, opts } = R.groupBy(p => p.required ? 'req' : 'opts', parameters)
-  const { path, query, body } = R.groupBy(p => p.in, parameters)
+  const {req, opts} = R.groupBy(p => p.required ? 'req' : 'opts', parameters)
+  const {path, query, body} = R.groupBy(p => p.in, parameters)
 
   return {
     pathArgs: R.pluck('name', path || []),
@@ -193,27 +195,29 @@ function assertOne (coll) {
 }
 
 function destructureClientError (error) {
-  const { method, url } = error.config
-  const { status, data } = error.response
+  const {method, url} = error.config
+  const {status, data} = error.response
   const reason = R.has('reason', data) ? data.reason : R.toString(data)
 
   return `${R.toUpper(method)} to ${url} failed with ${status}: ${reason}`
 }
 
 const operation = R.memoize((path, method, definition, types) => {
-  const { operationId, parameters, description } = definition
+  const {operationId, parameters, description} = definition
   const name = `${R.toLower(R.head(operationId))}${R.drop(1, operationId)}`
   const pascalized = pascalizeParameters(parameters)
 
-  const { pathArgs, queryArgs, bodyArgs, req, opts } = classifyParameters(pascalized)
+  const {pathArgs, queryArgs, bodyArgs, req, opts} = classifyParameters(pascalized)
   const optNames = R.pluck('name', opts)
   const indexedParameters = R.indexBy(R.prop('name'), pascalized)
 
   const signature = operationSignature(name, req, opts)
   const client = httpClients[method]
 
-  return (url, defaults = {}) => {
-    const fn = async function () {
+  return (instance, url) => {
+    const fn = (async function () {
+      const {defaults} = this.Swagger
+
       try {
         const [arg, opt] = (() => {
           if (arguments.length === req.length) {
@@ -245,7 +249,7 @@ const operation = R.memoize((path, method, definition, types) => {
         const expandedPath = expandPath(path, snakizeKeys(R.pick(pathArgs, conformed)))
         const params = snakizeKeys((() => {
           if (method === 'get') {
-            return { params: R.pick(queryArgs, conformed) }
+            return {params: R.pick(queryArgs, conformed)}
           } else if (method === 'post') {
             return conformed[assertOne(bodyArgs)]
           } else {
@@ -258,7 +262,7 @@ const operation = R.memoize((path, method, definition, types) => {
         }
 
         try {
-          const response = await client(`${url}${expandedPath}`, params, { headers: {'Content-Type': 'application/json'} })
+          const response = await client(`${url}${expandedPath}`, params, {headers: {'Content-Type': 'application/json'}})
           // return opt.fullResponse ? response : conform(pascalizeKeys(response.data), responses['200'], types)
           return opt.fullResponse ? response : pascalizeKeys(response.data)
         } catch (e) {
@@ -271,7 +275,7 @@ const operation = R.memoize((path, method, definition, types) => {
         e.message = `While calling ${signature}, ${e.message}`
         throw e
       }
-    }
+    }).bind(instance)
 
     Object.assign(fn, {
       signature,
@@ -291,19 +295,26 @@ const operation = R.memoize((path, method, definition, types) => {
   }
 })
 
-export default function Swagger (swag, methodFn) {
-  const { basePath, paths, definitions } = swag
-  const f = methodFn(basePath)
-  const methods = R.indexBy(R.prop('name'), R.flatten(R.values(R.mapObjIndexed((methods, path) => R.values(R.mapObjIndexed((definition, method) => {
-    const op = operation(path, method, definition, definitions)
-    return f(op, definition)
-  }, methods)), paths))))
+const Swagger = stampit(AsyncInit, {
+  async init ({swag = this.swag}, {stamp}) {
+    const {paths, definitions} = swag
+    const basePath = swag.basePath.replace(/^\//, '')
+    const methods = R.indexBy(R.prop('name'), R.flatten(R.values(R.mapObjIndexed((methods, path) => R.values(R.mapObjIndexed((definition, method) => {
+      const op = operation(path, method, definition, definitions)
+      return op(this, this.urlFor(basePath, definition))
+    }, methods)), paths))))
 
-  return Object.freeze({
-    methods: R.keys(methods),
-    api: methods
-  })
-}
+    return Object.assign(this, {
+      methods: R.keys(methods),
+      api: methods
+    })
+  },
+  deepProps: {Swagger: {defaults: {
+    debug: false
+  }}}
+})
+
+export default Swagger
 
 export {
   conform,

@@ -15,6 +15,8 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+import stampit from '@stamp/it'
+import {required} from '@stamp/required'
 import * as Crypto from './utils/crypto'
 
 /**
@@ -22,10 +24,10 @@ import * as Crypto from './utils/crypto'
  * @param {string} tx - Transaction to sign
  * @return {Promise<string>} Signed transaction
  */
-const signTransaction = ({ sign }) => async tx => {
+async function signTransaction (tx) {
   if (tx.match(/^tx\$.+$/)) {
     const binaryTx = Crypto.decodeBase58Check(tx.split('$')[1])
-    const sig = await sign(binaryTx)
+    const sig = await this.sign(binaryTx)
     return Crypto.encodeTx(Crypto.prepareTx(sig, binaryTx))
   } else {
     throw Error(`Not a valid transaction hash: ${tx}`)
@@ -39,19 +41,9 @@ const signTransaction = ({ sign }) => async tx => {
  * @property {function (tx: string): Promise<string>} signTransaction - Sign encoded transaction
  */
 
-/**
- * @typedef {Object} Signer
- * @property {function (data: string): Promise<string>} sign - Calculate binary signature of data
- */
+const Account = stampit({methods: {signTransaction}}, required({methods: {
+  sign: required,
+  address: required
+}}))
 
-/**
- * `Account` factory
- *
- * @param {Signer} signer - Object to decorate
- * @return {Account}
- */
-export default async function Account (signer) {
-  return Object.freeze(Object.assign(signer, {
-    signTransaction: signTransaction(signer)
-  }))
-}
+export default Account

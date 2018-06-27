@@ -15,33 +15,30 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { describe, it, before } from 'mocha'
-import { Wallet, Crypto } from '@aeternity/aepp-sdk'
-import * as utils from './'
+import {describe, it, before} from 'mocha'
+import {configure, ready, BaseAe, masterAccount} from './'
+import {generateKeyPair} from '../../src/utils/crypto'
 
-describe('wallet', function () {
-  utils.configure(this)
+describe('Account', function () {
+  configure(this)
 
-  let client
   let wallet
 
   before(async function () {
-    client = await utils.client
-    wallet = Wallet.create(client, utils.sourceWallet)
+    wallet = await ready(this)
   })
 
-  const { pub: receiver } = Crypto.generateKeyPair()
+  const {pub: receiver} = generateKeyPair()
 
   describe('fails on unknown keypairs', () => {
     let wallet
 
     before(async function () {
-      client = await utils.client
-      wallet = Wallet.create(client, Crypto.generateKeyPair())
+      wallet = await BaseAe({keypair: generateKeyPair()})
     })
 
     it('determining the balance', async () => {
-      return wallet.balance().should.be.rejectedWith(Error)
+      return wallet.balance(await wallet.address()).should.be.rejectedWith(Error)
     })
 
     it('spending tokens', async () => {
@@ -50,7 +47,7 @@ describe('wallet', function () {
   })
 
   it('determines the balance', async () => {
-    return wallet.balance().should.eventually.be.a('number')
+    return wallet.balance(await wallet.address()).should.eventually.be.a('number')
   })
 
   it('spends tokens', async () => {
@@ -63,14 +60,14 @@ describe('wallet', function () {
 
   describe('can be configured to return th', () => {
     it('on creation', async () => {
-      const wallet = Wallet.create(client, utils.sourceWallet, { defaults: { waitMined: false } })
+      const wallet = await BaseAe.compose({deepProps: {Ae: {defaults: {waitMined: false}}}})({keypair: masterAccount})
       const th = await wallet.spend(1, receiver)
       th.should.be.a('string')
       th.slice(0, 3).should.equal('th$')
     })
 
     it('on call', async () => {
-      const th = await wallet.spend(1, receiver, { waitMined: false })
+      const th = await wallet.spend(1, receiver, {waitMined: false})
       th.should.be.a('string')
       th.slice(0, 3).should.equal('th$')
     })

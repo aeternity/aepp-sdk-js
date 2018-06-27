@@ -15,54 +15,32 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+import stampit from '@stamp/it'
+import Tx from './tx'
+import Account from './account'
+import Chain from './chain'
 import * as R from 'ramda'
 
-const DEFAULTS = {
-  ttl: Number.MAX_SAFE_INTEGER,
-  fee: 1,
-  payload: ''
+async function send (tx, options) {
+  const opt = R.merge(this.Ae.defaults, options)
+  const signed = await this.signTransaction(tx)
+  return this.sendTransaction(signed, opt)
 }
 
-const send = ae => async (tx, options) => {
-  const opt = R.mergeAll([DEFAULTS, ae.defaults, options])
-  const signed = await ae.account.signTransaction(tx)
-  return ae.chain.sendTransaction(signed, opt)
+async function spend (amount, recipient, options = {}) {
+  const opt = R.merge(this.Ae.defaults, options)
+  const sender = await this.address()
+  const spendTx = await this.spendTx(R.merge({sender, recipient, amount}, opt))
+  return this.send(spendTx, opt)
 }
 
-const spend = ae => async (amount, recipient, options = {}) => {
-  const opt = R.mergeAll([DEFAULTS, ae.defaults, options])
-  const sender = await ae.account.address()
-  const spendTx = await ae.tx.spend(R.merge({ sender, recipient, amount }, opt))
-  return ae.send(spendTx, opt)
-}
+const Ae = stampit(Tx, Account, Chain, {
+  methods: {send, spend},
+  deepProperties: {Ae: {defaults: {
+    ttl: Number.MAX_SAFE_INTEGER,
+    fee: 1,
+    payload: ''
+  }}}
+})
 
-const balance = ae => async () => ae.account.balance()
-
-/**
- * @typedef {Object} Ae
- * @property {Tx} tx
- * @property {Account} account
- * @property {Chain} chain
- * @property {function (tx: string, options: Record): Promise<string>} send - Sign and send a transaction off to the chain
- */
-
-/**
- * `Ae` factory
- *
- * @param {{ tx: Tx, account: Account, chain: Chain, defaults: ?Object }} spec
- * @return {Ae}
- */
-export default function ae ({ tx, account, chain, defaults = {} }) {
-  const o = {
-    tx,
-    account,
-    chain,
-    defaults
-  }
-
-  return Object.freeze(Object.assign(o, {
-    send: send(o),
-    spend: spend(o),
-    balance: balance(o)
-  }))
-}
+export default Ae
