@@ -35,21 +35,21 @@ describe('Aens', function () {
     aens = await ready(this)
   })
 
-  // describe('fails on', () => {
-  //   const name = randomName()
+  describe('fails on', () => {
+    const name = randomName()
 
-  //   it('querying non-existent names', async () => {
-  //     return aens.aensQuery(name).should.eventually.be.rejected
-  //   })
+    it('querying non-existent names', async () => {
+      return aens.aensQuery(name).should.eventually.be.rejected
+    })
 
-  //   it('updating names not owned by the account', async () => {
-  //     const preclaim = await aens.aensPreclaim(name)
-  //     const claim = await preclaim.claim()
+    it('updating names not owned by the account', async () => {
+      const preclaim = await aens.aensPreclaim(name)
+      const claim = await preclaim.claim()
 
-  //     const aens2 = await BaseAe({keypair: accounts[0]})
-  //     return aens2.aensUpdate(claim.nameHash, accounts[0].pub, {blocks: 1}).should.eventually.be.rejected
-  //   })
-  // })
+      const aens2 = await BaseAe({keypair: accounts[0]})
+      return aens2.aensUpdate(claim.nameHash, accounts[0].pub, {blocks: 1}).should.eventually.be.rejected
+    })
+  })
 
   it('claims names', async () => {
     const preclaim = await aens.aensPreclaim(name)
