@@ -310,8 +310,10 @@ const Swagger = stampit(AsyncInit, {
     })
   },
   deepProps: {Swagger: {defaults: {
-    debug: false
-  }}}
+    debug: false,
+    txEncoding: 'json'
+  }}},
+  statics: {debugSwagger (bool) { return this.deepProps({Swagger: {defaults: {debug: bool}}}) }}
 })
 
 export default Swagger
