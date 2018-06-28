@@ -29,11 +29,15 @@ async function address () {
   return this.post('address')
 }
 
+async function confirmSign (data) {
+  return true
+}
+
 async function receive ({data, source}) {
   const {id, method, params} = data
   const methods = {
     address: async () => this.address(),
-    sign: async (data) => this.sign(data)
+    sign: async (data) => await this.confirmSign(data) ? this.sign(data) : 'Denied'
   }
 
   function error () {
@@ -78,7 +82,7 @@ const PostMessageAccount = stampit(Account, {
 
     window.addEventListener('message', receive, false)
   },
-  methods: {address, sign}
+  methods: {address, sign, confirmSign}
 })
 
 const PostMessageAccountReceiver = stampit(Account, {
