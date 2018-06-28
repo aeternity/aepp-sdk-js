@@ -21,42 +21,37 @@ import Account from '../account'
 
 let sequence = 0
 
-const sign = post => async data => post('sign', data)
-const address = post => async () => post('account')
-
-export function accountProxy (account, window) {
-  async function receive ({data, source}) {
-    const {id, method, params} = data
-    const methods = {
-      async account () {
-        return account.address()
-      },
-      async sign (data) {
-        return account.sign(data)
-      }
-    }
-
-    function error () {
-      return Promise.resolve(Error(`No such method ${method}`))
-    }
-
-    source.postMessage({jsonrpc: '2.0', id, result: await R.apply(methods[method] || error, params)}, '*')
-  }
-
-  window.addEventListener('message', receive, false)
-
-  return Object.freeze(Object.assign({
-    unregister () {
-      window.removeEventListener('message', receive)
-    }
-  }, account))
+async function sign (data) {
+  return this.post('sign', data)
 }
 
-/**
- * window.postMessage `Account` factory
- *
- * @return {Account}
- */
+async function address () {
+  return this.post('address')
+}
+
+async function receive ({data, source}) {
+  const {id, method, params} = data
+  const methods = {
+    address: async () => this.address(),
+    sign: async (data) => this.sign(data)
+  }
+
+  function error () {
+    return Promise.resolve(`Error: No such method ${method}`)
+  }
+
+  source.postMessage({jsonrpc: '2.0', id, result: await R.apply(methods[method] || error, params)}, '*')
+}
+
+function registerAccountProxy (window) {
+  this.accountProxy = this.receive.bind(this)
+  window.addEventListener('message', this.accountProxy, false)
+}
+
+function unRegisterAccountProxy (window) {
+  window.removeEventListener('message', this.accountProxy)
+}
+
 const PostMessageAccount = stampit(Account, {
   init ({target, window}) {
     const callbacks = {}
@@ -70,7 +65,7 @@ const PostMessageAccount = stampit(Account, {
       }
     }
 
-    function post (method, ...params) {
+    this.post = (method, ...params) => {
       const ret = new Promise((resolve, reject) => {
         callbacks[sequence] = {resolve, reject}
       })
@@ -82,12 +77,12 @@ const PostMessageAccount = stampit(Account, {
     }
 
     window.addEventListener('message', receive, false)
-
-    return Object.assign(this, {
-      address: address(post),
-      sign: sign(post)
-    })
-  }
+  },
+  methods: {address, sign}
 })
 
-export default PostMessageAccount
+const PostMessageAccountReceiver = stampit(Account, {
+  methods: {receive, registerAccountProxy, unRegisterAccountProxy}
+})
+
+export {PostMessageAccount, PostMessageAccountReceiver}
