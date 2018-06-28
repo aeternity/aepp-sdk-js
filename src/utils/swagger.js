@@ -215,7 +215,7 @@ const operation = R.memoize((path, method, definition, types) => {
   const client = httpClients[method]
 
   return (instance, url) => {
-    const fn = (async function () {
+    const fn = async function () {
       const {defaults} = this.Swagger
 
       try {
@@ -275,7 +275,7 @@ const operation = R.memoize((path, method, definition, types) => {
         e.message = `While calling ${signature}, ${e.message}`
         throw e
       }
-    }).bind(instance)
+    }.bind(instance)
 
     Object.assign(fn, {
       signature,

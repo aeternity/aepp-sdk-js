@@ -15,8 +15,9 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+import stampit from '@stamp/it'
 import * as R from 'ramda'
-import Account from './'
+import Account from '../account'
 
 let sequence = 0
 
@@ -56,7 +57,7 @@ export function accountProxy (account, window) {
  *
  * @return {Account}
  */
-const PostMessageAccount = Account.compose({
+const PostMessageAccount = stampit(Account, {
   init ({target, window}) {
     const callbacks = {}
 

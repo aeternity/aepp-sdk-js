@@ -22,7 +22,7 @@ import * as EpochChain from './chain/epoch'
 import * as Tx from './tx'
 import * as EpochTx from './tx/epoch'
 import * as Account from './account'
-import * as PostMessageAccount from './account/postMessage'
+import * as PostMessageAccount from './account/post-message'
 import * as MemoryAccount from './account/memory'
 
 export default Ae
