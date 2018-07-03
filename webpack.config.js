@@ -10,7 +10,7 @@ function configure (filename, opts = {}) {
       rules: [
         {
           test: /\.js$/,
-          include: path.resolve(__dirname, 'src'),
+          include: path.resolve(__dirname, 'es'),
           loader: 'babel-loader!standard-loader?error=true'
         },
         {

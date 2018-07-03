@@ -15,16 +15,38 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+/**
+ * Epoch module
+ * @module @aeternity/aepp-sdk/es/epoch
+ * @export Epoch
+ * @example import Epoch from '@aeternity/aepp-sdk/es/epoch'
+ */
+
 import stampit from '@stamp/it'
 import axios from 'axios'
 import * as R from 'ramda'
 import urlparse from 'url'
 import Swagger from './utils/swagger'
 
+/**
+ * Obtain Swagger configuration from Epoch node
+ * @category async
+ * @rtype (url: String) => swagger: Object
+ * @param {String} url - Epoch base URL
+ * @return {Object} Swagger configuration
+ */
 async function remoteSwag (url) {
   return (await axios.get(urlparse.resolve(url, 'api'))).data
 }
 
+/**
+ * Epoch specific loader for `urlFor`
+ * @rtype ({url: String, internalUrl?: String}) => (path: String, definition: Object) => tx: String
+ * @param {Object} options
+ * @param {String} options.url - Base URL for Epoch
+ * @param {String} [options.internalUrl] - Base URL for internal requests
+ * @return {Function} Implementation for {@link urlFor}
+ */
 const loader = ({url, internalUrl}) => (path, definition) => {
   const {tags, operationId} = definition
 
@@ -39,6 +61,17 @@ const loader = ({url, internalUrl}) => (path, definition) => {
   }
 }
 
+/**
+ * {@link Swagger} based Epoch remote API Stamp
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/epoch
+ * @rtype Stamp
+ * @param {Object} options
+ * @param {String} options.url - Base URL for Epoch
+ * @param {String} [options.internalUrl] - Base URL for internal requests
+ * @return {Object} Epoch client
+ * @example Epoch({url: 'https://sdk-testnet.aepps.com'})
+ */
 const Epoch = stampit({
   async init ({url = this.url, internalUrl = this.internalUrl}) {
     url = url.replace(/\/?$/, '/')

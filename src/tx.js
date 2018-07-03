@@ -15,46 +15,26 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+/**
+ * Tx module
+ * @module @aeternity/aepp-sdk/es/tx
+ * @export Tx
+ * @example import Tx from '@aeternity/aepp-sdk/es/tx'
+ */
+
 import {required} from '@stamp/required'
 
 /**
- * @typedef {{ sender: string, recipient: number, amount: number, fee: number, ttl: number, nonce: number, payload: string }} SpendTx
+ * Basic Tx Stamp
+ *
+ * Attempting to create instances from the Stamp without overwriting all abstract methods using composition will result in an exception.
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/tx
+ * @rtype Stamp
+ * @param {Object} [options={}] - Initializer object
+ * @return {Object} Tx instance
+ * @example Tx()
  */
-/**
- * @typedef {{ account: string, nonce: number, commitment: string, fee: number, ttl: number }} NamePreclaimTx
- */
-/**
- * @typedef {{ account: string, nonce: number, name: string, nameSalt: string, fee: number, ttl: number }} NameClaimTx
- */
-/**
- * @typedef {{ account: string, nonce: number, nameHash: string, recipientAccunt: string, fee: number, ttl: number }} NameTransferTx
- */
-/**
- * @typedef {{ account: string, nonce: number, nameHash: string, nameTtl: number, pointers: string, clientTtl: number, fee: number, ttl: number }} NameUpdateTx
- */
-/**
- * @typedef {{ account: string, nonce: number, nameHash: string, fee: number, ttl: number }} NameRevokeTx
- */
-/**
- * @typedef {{ owner: string, nonce: number, code: string, vmVersion: number, deposit: number, amount: number, gas: number, gasPrice: number, fee: number, ttl: number, callData: string }} ContractCreateTx
- */
-/**
- * @typedef {{ caller: string, nonce: number, contract: string, vmVersion: number, fee: number, ttl: number, amount: number, gas: number, gasPrice: number, callData: string }} ContractCallTx
- */
-
-/**
- * @typedef {Object} Tx
- * @property {function (data: SpendTx): Promise<string>} spendTx - Create a `spend_tx` transaction
- * @property {function (data: NamePreclaimTx): Promise<string>} namePreclaimTx - Create a `name_preclaim` transaction
- * @property {function (data: NameClaimTx): Promise<string>} nameClaimTx - Create a `name_claim` transaction
- * @property {function (data: NameTransferTx): Promise<string>} nameTransferTx - Create a `name_transfer` transaction
- * @property {function (data: NameUpdateTx): Promise<string>} nameUpdateTx - Create a `name_update` transaction
- * @property {function (data: NameRevokeTx): Promise<string>} nameRevokeTx - Create a `name_revoke` transaction
- * @property {function (data: ContractCreateTx): Promise<string>} contractCreateTx - Create a `contract_create` transaction
- * @property {function (data: ContractCallTx): Promise<string>} contractCallTx - Create a `contract_call` transaction
- * @property {function (name: string): Promise<string>} commitmentHash - Create a commitment hash
- */
-
 const Tx = required({
   methods: {
     spendTx: required,
@@ -68,5 +48,105 @@ const Tx = required({
     commitmentHash: required
   }
 })
+
+/**
+ * Create a `spend_tx` transaction
+ * @function spendTx
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype ({sender?: String, recipient: String, amount: Number, fee: Number, ttl: Number, nonce?: Number, payload?: String}) => tx: Promise[String]
+ * @param {Object} options - The object to extract properties from
+ * @return {String} `spend_tx` transaction
+ */
+
+/**
+ * Create a `name_preclaim_tx` transaction
+ * @function namePreclaimTx
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype ({account?: String, commitment: String, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]
+ * @param {Object} options - The object to extract properties from
+ * @return {String} `name_preclaim_tx` transaction
+ */
+
+/**
+ * Create a `name_claim_tx` transaction
+ * @function nameClaimTx
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype ({account?: String, name: String, nameSalt: String, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]
+ * @param {Object} options - The object to extract properties from
+ * @return {String} `name_claim_tx` transaction
+ */
+
+/**
+ * Create a `name_transfer_tx` transaction
+ * @function nameTransferTx
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype ({account?: String, nameHash: String, recipientAccount: String, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]
+ * @param {Object} options - The object to extract properties from
+ * @return {String} `name_transfer_tx` transaction
+ */
+
+/**
+ * Create a `name_update_tx` transaction
+ * @function nameUpdateTx
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype ({account?: String, nameHash: String, pointers: Object, nameTtl: Number, clientTtl: Number, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]
+ * @param {Object} options - The object to extract properties from
+ * @return {String} `name_update_tx` transaction
+ */
+
+/**
+ * Create a `name_revoke_tx` transaction
+ * @function nameRevokeTx
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype ({account?: String, nameHash: String, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]
+ * @param {Object} options - The object to extract properties from
+ * @return {String} `name_revoke_tx` transaction
+ */
+
+/**
+ * Create a `contract_create_tx` transaction
+ * @function contractCreateTx
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype ({owner: String, code: String, callData: String, vmVersion: Number, deposit: Number, amount: Number, gas: Number, gasPrice: Number, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]
+ * @param {Object} options - The object to extract properties from
+ * @return {String} `contract_create_tx` transaction
+ */
+
+/**
+ * Create a `contract_call_tx` transaction
+ * @function contractCallTx
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype ({caller: String, contract: String, callData: String, vmVersion: Number, amount: Number, gas: Number, gasPrice: Number, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]
+ * @param {Object} options - The object to extract properties from
+ * @return {String} `contract_call_tx` transaction
+ */
+
+/**
+ * Create a commitment hash for claiming names
+ * @function commitmentHash
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype (name: String, salt?: String) => hash: Promise[String]
+ * @param {String} name - The name to claim
+ * @param {String} salt - Random salt
+ * @return {String} Commitment hash
+ */
 
 export default Tx

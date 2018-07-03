@@ -29,33 +29,15 @@ import stampit from '@stamp/it'
 import Ae from './ae'
 import * as R from 'ramda'
 
-/**
- * Encode the call data for an already-deployed contract.
- * @param code
- * @param abi
- * @return
- */
 async function encodeCall (code, abi, name, args) {
   return (await this.api.encodeCalldata({ abi: abi, code, 'function': name, arg: args })).calldata
 }
 
-/**
- *
- * @param
- * @param
- * @return
- */
 async function callStatic (code, abi, name, { args = '()', conformFn = R.identity } = {}) {
   const {out} = await this.api.callContract({ abi: abi, code, 'function': name, arg: args })
   return conformFn(out)
 }
 
-/**
- *
- * @param
- * @param
- * @return
- */
 async function call (code, abi, address, name, { args = '()', conformFn = R.identity, options = {} } = {}) {
   const opt = R.merge(this.Ae.defaults, options)
 
@@ -76,12 +58,6 @@ async function call (code, abi, address, name, { args = '()', conformFn = R.iden
   }
 }
 
-/**
- *
- * @param
- * @param
- * @return
- */
 async function deploy (code, abi, {initState = '()', options = {}} = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   const callData = await this.contractEncodeCall(code, abi, 'init', initState)
@@ -99,12 +75,6 @@ async function deploy (code, abi, {initState = '()', options = {}} = {}) {
   })
 }
 
-/**
- *
- * @param
- * @param
- * @return
- */
 async function compile (code, options = {}) {
   const o = await this.api.compileContract(R.mergeAll([this.Ae.defaults, options, {code}]))
 
