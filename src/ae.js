@@ -15,36 +15,32 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import Ae from './ae'
-import * as Crypto from './utils/crypto'
-import Chain from './chain'
-import EpochChain from './chain/epoch'
+import stampit from '@stamp/it'
 import Tx from './tx'
-import EpochTx from './tx/epoch'
-import JsTx from './tx/js'
 import Account from './account'
-import {PostMessageAccount, PostMessageAccountReceiver} from './account/post-message'
-import MemoryAccount from './account/memory'
-import Aens from './aens'
-import Contract from './contract'
+import Chain from './chain'
+import * as R from 'ramda'
 
-const Wallet = Ae.compose(EpochChain, EpochTx, JsTx, MemoryAccount, PostMessageAccountReceiver)
-const Aepp = Ae.compose(EpochChain, EpochTx, JsTx, PostMessageAccount, Contract, Aens)
+async function send (tx, options) {
+  const opt = R.merge(this.Ae.defaults, options)
+  const signed = await this.signTransaction(tx)
+  return this.sendTransaction(signed, opt)
+}
+
+async function spend (amount, recipient, options = {}) {
+  const opt = R.merge(this.Ae.defaults, options)
+  const sender = await this.address()
+  const spendTx = await this.spendTx(R.merge({sender, recipient, amount}, opt))
+  return this.send(spendTx, opt)
+}
+
+const Ae = stampit(Tx, Account, Chain, {
+  methods: {send, spend},
+  deepProperties: {Ae: {defaults: {
+    ttl: Number.MAX_SAFE_INTEGER,
+    fee: 1,
+    payload: ''
+  }}}
+})
 
 export default Ae
-
-export {
-  Wallet,
-  Aepp,
-  Crypto,
-  Chain,
-  EpochChain,
-  Tx,
-  EpochTx,
-  Account,
-  PostMessageAccount,
-  PostMessageAccountReceiver,
-  MemoryAccount,
-  Aens,
-  Contract
-}

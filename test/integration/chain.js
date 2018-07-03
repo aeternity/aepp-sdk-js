@@ -15,43 +15,43 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { Crypto } from '@aeternity/aepp-sdk'
-import * as utils from './utils'
+import {describe, it, before} from 'mocha'
+import {configure, ready, accounts} from './'
 
-describe('chain', function () {
-  utils.configure(this)
+describe('Epoch Chain', function () {
+  configure(this)
 
   let client
 
   before(async function () {
-    client = await utils.client
+    client = await ready(this)
   })
 
   it('determines the height', async () => {
-    await client.height().should.eventually.be.a('number')
+    return client.height().should.eventually.be.a('number')
   })
 
   it('waits for specified heights', async () => {
     const target = await client.height() + 2
-    await client.awaitHeight(target, { attempts: 120 }).should.eventually.be.at.least(target)
-    await client.height().should.eventually.be.at.least(target)
+    await client.awaitHeight(target, {attempts: 120}).should.eventually.be.at.least(target)
+    return client.height().should.eventually.be.at.least(target)
   })
 
   it('polls for transactions', async () => {
-    const { pub, priv } = utils.sourceWallet
-    const key = Buffer.from(priv, 'hex')
-    const { tx } = await client.api.postSpend({
+    const sender = await client.address()
+    const receiver = accounts[0].pub
+    const {tx} = await client.api.postSpend({
       fee: 1,
       amount: 1,
-      sender: pub,
-      recipientPubkey: utils.wallets[0].pub,
+      sender,
+      recipientPubkey: receiver,
       payload: '',
       ttl: Number.MAX_SAFE_INTEGER
     })
-    const binaryTx = Crypto.decodeBase58Check(tx.split('$')[1])
-    const { txHash } = await client.api.postTx({ tx: Crypto.encodeTx(Crypto.prepareTx(Crypto.sign(binaryTx, key), binaryTx)) })
+    const signed = await client.signTransaction(tx)
+    const {txHash} = await client.api.postTx({tx: signed})
 
     await client.poll(txHash).should.eventually.be.fulfilled
-    await client.poll('th$xxx', { blocks: 1 }).should.eventually.be.rejected
+    return client.poll('th$xxx', {blocks: 1}).should.eventually.be.rejected
   })
 })

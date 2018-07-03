@@ -15,24 +15,33 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { describe, it } from 'mocha'
-import Aens from '../../src/client/aens'
-import * as utils from '../utils'
-import * as R from 'ramda'
+import stampit from '@stamp/it'
+import {encodeBase58Check, hash, salt} from '../utils/crypto'
 
-describe('aens', function () {
-  it('salt produces random sequences every time', () => {
-    const salt1 = Aens.salt()
-    const salt2 = Aens.salt()
-    salt1.should.be.a('Number')
-    salt2.should.be.a('Number')
-    salt1.should.not.be.equal(salt2)
-  })
+const createSalt = salt
 
-  it('reproducible commitment hashes can be generated', () => {
-    const salt = Aens.salt()
-    const hash = Aens.commitmentHash('foobar.aet', salt)
-    hash.should.be.a('string')
-    hash.should.be.equal(Aens.commitmentHash('foobar.aet', salt))
-  })
-})
+/**
+ * Format the salt into a 64-byte hex string
+ *
+ * @param {number} salt
+ * @return {string} Zero-padded hex string of salt
+ */
+function formatSalt (salt) {
+  return Buffer.from(salt.toString(16).padStart(64, '0'), 'hex')
+}
+
+/**
+ * Generate the commitment hash by hashing the formatted salt and
+ * name, base 58 encoding the result and prepending 'cm$'
+ *
+ * @param {string} name - Name to be registered
+ * @param {number} salt
+ * @return {string} Commitment hash
+ */
+async function commitmentHash (name, salt = createSalt()) {
+  return `cm$${encodeBase58Check(hash(Buffer.concat([hash(name), formatSalt(salt)])))}`
+}
+
+const JsTx = stampit({methods: {commitmentHash}})
+
+export default JsTx

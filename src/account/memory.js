@@ -15,36 +15,33 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import Ae from './ae'
-import * as Crypto from './utils/crypto'
-import Chain from './chain'
-import EpochChain from './chain/epoch'
-import Tx from './tx'
-import EpochTx from './tx/epoch'
-import JsTx from './tx/js'
-import Account from './account'
-import {PostMessageAccount, PostMessageAccountReceiver} from './account/post-message'
-import MemoryAccount from './account/memory'
-import Aens from './aens'
-import Contract from './contract'
+import Account from '../account'
+import * as Crypto from '../utils/crypto'
 
-const Wallet = Ae.compose(EpochChain, EpochTx, JsTx, MemoryAccount, PostMessageAccountReceiver)
-const Aepp = Ae.compose(EpochChain, EpochTx, JsTx, PostMessageAccount, Contract, Aens)
+const secrets = new WeakMap()
 
-export default Ae
-
-export {
-  Wallet,
-  Aepp,
-  Crypto,
-  Chain,
-  EpochChain,
-  Tx,
-  EpochTx,
-  Account,
-  PostMessageAccount,
-  PostMessageAccountReceiver,
-  MemoryAccount,
-  Aens,
-  Contract
+async function sign (data) {
+  return Promise.resolve(Crypto.sign(data, secrets.get(this).priv))
 }
+
+async function address () {
+  return Promise.resolve(secrets.get(this).pub)
+}
+
+/**
+ * In-memory `Account` factory
+ *
+ * @param {{pub: string, priv: string}} keypair - Key pair to use
+ * @return {Account}
+ */
+const MemoryAccount = Account.compose({
+  init ({keypair}) {
+    secrets.set(this, {
+      priv: Buffer.from(keypair.priv, 'hex'),
+      pub: keypair.pub
+    })
+  },
+  methods: {sign, address}
+})
+
+export default MemoryAccount

@@ -15,24 +15,25 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import '../utils'
-import Ae from '@aeternity/aepp-sdk'
-import { Crypto, Wallet } from '@aeternity/aepp-sdk'
-
-const sourceWallet = {
-  priv: process.env['WALLET_PRIV'],
-  pub: process.env['WALLET_PUB']
-}
-
-if (!sourceWallet.pub || !sourceWallet.priv) {
-  throw Error('Environment variables WALLET_PRIV and WALLET_PUB need to be set')
-}
+import '../'
+import Ae from '../../src/ae'
+import Chain from '../../src/chain/epoch'
+import Tx from '../../src/tx/epoch'
+import JsTx from '../../src/tx/js'
+import Account from '../../src/account/memory'
+import Aens from '../../src/aens'
+import Contract from '../../src/contract'
+import * as Crypto from '../../src/utils/crypto'
 
 const url = process.env.TEST_URL || 'http://localhost:3013'
 const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
+const masterAccount = Crypto.envKeypair(process.env)
+const accounts = Array(3).fill().map(() => Crypto.generateKeyPair())
 
-const client = Ae.create(url, { internalUrl, debug: !!process.env['DEBUG'] })
-const wallets = Array(3).fill().map(() => Crypto.generateKeyPair())
+const BaseAe = Ae.compose(Chain, Tx, JsTx, Account, Aens, Contract, {
+  deepProps: {Swagger: {defaults: {debug: !!process.env['DEBUG']}}},
+  props: {url, internalUrl}
+})
 
 let planned = 0
 let charged = false
@@ -47,24 +48,28 @@ function configure (mocha) {
   mocha.timeout(TIMEOUT)
 }
 
-async function waitReady (mocha) {
+async function ready (mocha) {
   configure(mocha)
-  const _client = await client
-  await _client.awaitHeight(10)
+
+  const ae = await BaseAe({keypair: masterAccount})
+
+  await ae.awaitHeight(10)
+
   if (!charged && planned > 0) {
-    await Wallet.create(_client, sourceWallet).spend(planned, wallets[0].pub)
+    await ae.spend(planned, accounts[0].pub)
     charged = true
   }
+
+  return ae
 }
 
 export {
-  wallets,
-  TIMEOUT,
+  BaseAe,
+  masterAccount,
+  accounts,
   url,
   internalUrl,
-  waitReady,
-  plan,
-  client,
   configure,
-  sourceWallet
+  ready,
+  plan
 }

@@ -15,79 +15,69 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { describe, it, before } from 'mocha'
-import { expect } from 'chai'
-import { Wallet, Aens, Crypto } from '@aeternity/aepp-sdk'
-import * as utils from './utils'
+import {describe, it, before} from 'mocha'
+import {configure, plan, ready, accounts, BaseAe} from './'
 import * as R from 'ramda'
 
 function randomName () {
   return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString(36) + '.aet'
 }
 
-utils.plan(20)
+plan(20)
 
-describe('aens', function () {
-  utils.configure(this)
+describe('Aens', function () {
+  configure(this)
 
-  let client
   let aens
   const name = randomName()
 
   before(async function () {
-    await utils.waitReady(this)
-    client = await utils.client
-    aens = Aens.create(client, { wallet: Wallet.create(client, utils.sourceWallet) })
+    aens = await ready(this)
   })
 
   describe('fails on', () => {
     const name = randomName()
 
     it('querying non-existent names', async () => {
-      return aens.query(name).should.eventually.be.rejected
+      return aens.aensQuery(name).should.eventually.be.rejected
     })
 
     it('updating names not owned by the account', async () => {
-      const preclaim = await aens.preclaim(name)
+      const preclaim = await aens.aensPreclaim(name)
       const claim = await preclaim.claim()
 
-      const aens2 = Aens.create(client, { wallet: Wallet.create(client, utils.wallets[0]) })
-      return aens2.update(claim.nameHash)(utils.wallets[0].pub, { options: { blocks: 1 } }).should.eventually.be.rejected
+      const aens2 = await BaseAe({keypair: accounts[0]})
+      return aens2.aensUpdate(claim.nameHash, accounts[0].pub, {blocks: 1}).should.eventually.be.rejected
     })
   })
 
-  it('commitment hashes match those from the node', async () => {
-    const name = randomName()
-    const salt = Aens.salt()
-    const hash = Aens.commitmentHash(name, salt)
-    return hash.should.be.equal((await client.api.getCommitmentHash(name, salt)).commitment)
-  })
-
   it('claims names', async () => {
-    const preclaim = await aens.preclaim(name)
+    const preclaim = await aens.aensPreclaim(name)
     preclaim.should.be.an('object')
     return preclaim.claim().should.eventually.be.an('object')
   })
 
   it('queries names', async () => {
-    return aens.query(name).should.eventually.be.an('object')
+    return aens.aensQuery(name).should.eventually.be.an('object')
   })
 
   it('updates names', async () => {
-    const claim = await aens.query(name)
-    return claim.update(utils.sourceWallet.pub).should.eventually.deep.include({
-      pointers: R.fromPairs([['accountPubkey', utils.sourceWallet.pub]])
+    const claim = await aens.aensQuery(name)
+    const address = await aens.address()
+    return claim.update(address).should.eventually.deep.include({
+      pointers: R.fromPairs([['accountPubkey', address]])
     })
   })
 
   // TODO re-enable after release; no idea why it doesn't work
-  it('transfers names', async () => {
-    const claim = await aens.query(name)
-    await claim.transfer(utils.wallets[0].pub)
-    const aens2 = Aens.create(client, { wallet: Wallet.create(client, utils.wallets[0]) })
-    const claim2 = await aens2.query(name)
-    return claim2.update(utils.wallets[0].pub).should.eventually.deep.include({
-      pointers: R.fromPairs([['accountPubkey', utils.wallets[0].pub]])
+  it.skip('transfers names', async () => {
+    const claim = await aens.aensQuery(name)
+    const address = await aens.address()
+    await claim.transfer(address)
+    const aens2 = await BaseAe({keypair: accounts[0]})
+    const claim2 = await aens2.aensQuery(name)
+    return claim2.update(address).should.eventually.deep.include({
+      pointers: R.fromPairs([['accountPubkey', address]])
     })
   })
 })

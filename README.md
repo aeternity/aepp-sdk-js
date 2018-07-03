@@ -79,7 +79,7 @@ npm install aeternity/aepp-sdk-js#develop
 
 ## [Usage]
 
-[Usage]: docs/usage.md
+[Usage]: usage.md
 
 ## License
 
