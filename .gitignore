@@ -8,3 +8,6 @@ node_modules
 /yarn-error.log
 .idea
 /docker-compose.override.yml
+/docs/api.md
+/docs/api/*
+/docs/toc.md
