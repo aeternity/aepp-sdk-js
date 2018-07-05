@@ -35,11 +35,11 @@ import * as Crypto from './utils/crypto'
  * @return {String} Signed transaction
  */
 async function signTransaction (tx) {
-  if (tx.match(/^tx\$.+$/)) {
-    const binaryTx = Crypto.decodeBase58Check(tx.split('$')[1])
+  try {
+    const binaryTx = Crypto.decodeBase58Check(Crypto.assertedType(tx, 'tx'))
     const sig = await this.sign(binaryTx)
     return Crypto.encodeTx(Crypto.prepareTx(sig, binaryTx))
-  } else {
+  } catch (e) {
     throw Error(`Not a valid transaction hash: ${tx}`)
   }
 }
