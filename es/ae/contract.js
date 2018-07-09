@@ -26,29 +26,29 @@
  */
 
 import stampit from '@stamp/it'
-import Ae from './ae'
+import Account from '../account'
 import * as R from 'ramda'
 
 async function encodeCall (code, abi, name, args) {
-  return (await this.api.encodeCalldata({ abi: abi, code, 'function': name, arg: args })).calldata
+  return (await this.ae.api.encodeCalldata({ abi: abi, code, 'function': name, arg: args })).calldata
 }
 
 async function callStatic (code, abi, name, { args = '()', conformFn = R.identity } = {}) {
-  const {out} = await this.api.callContract({ abi: abi, code, 'function': name, arg: args })
+  const {out} = await this.ae.api.callContract({ abi: abi, code, 'function': name, arg: args })
   return conformFn(out)
 }
 
 async function call (code, abi, address, name, { args = '()', conformFn = R.identity, options = {} } = {}) {
   const opt = R.merge(this.Ae.defaults, options)
 
-  const tx = await this.contractCallTx(R.merge(opt, {
+  const tx = await this.ae.contractCallTx(R.merge(opt, {
     callData: await this.contractEncodeCall(code, abi, name, args),
     contract: address,
-    caller: await this.address()
+    caller: await this.ae.address()
   }))
 
   const {hash} = await this.send(tx, opt)
-  const result = await this.api.getContractCallFromTx(hash)
+  const result = await this.ae.api.getContractCallFromTx(hash)
 
   if (result.returnType === 'ok') {
     return conformFn(result.returnValue)
@@ -61,10 +61,10 @@ async function call (code, abi, address, name, { args = '()', conformFn = R.iden
 async function deploy (code, abi, {initState = '()', options = {}} = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   const callData = await this.contractEncodeCall(code, abi, 'init', initState)
-  const {tx, contractAddress} = await this.contractCreateTx(R.merge(opt, {
+  const {tx, contractAddress} = await this.ae.contractCreateTx(R.merge(opt, {
     callData,
     code,
-    owner: await this.address()
+    owner: await this.ae.address()
   }))
 
   await this.send(tx, opt)
@@ -76,7 +76,7 @@ async function deploy (code, abi, {initState = '()', options = {}} = {}) {
 }
 
 async function compile (code, options = {}) {
-  const o = await this.api.compileContract(R.mergeAll([this.Ae.defaults, options, {code}]))
+  const o = await this.ae.api.compileContract(R.mergeAll([this.Ae.defaults, options, {code}]))
 
   return Object.freeze(Object.assign({
     encodeCall: async (name, args) => this.contractEncodeCall(o.bytecode, 'sophia', name, args),
@@ -85,7 +85,7 @@ async function compile (code, options = {}) {
   }, o))
 }
 
-const Contract = stampit(Ae, {
+const Contract = stampit(Account, {
   methods: {
     contractCompile: compile,
     contractCallStatic: callStatic,

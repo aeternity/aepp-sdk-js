@@ -15,36 +15,11 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import Account from '../account'
-import * as Crypto from '../utils/crypto'
+import Ae from '../ae'
+import Aens from './aens'
+import Contract from './contract'
+import Rpc from '../rpc/client'
 
-const secrets = new WeakMap()
+const Aepp = Ae.compose(Contract, Aens, Rpc)
 
-async function sign (data) {
-  return Promise.resolve(Crypto.sign(data, secrets.get(this).priv))
-}
-
-async function address () {
-  return Promise.resolve(secrets.get(this).pub)
-}
-
-/**
- * In-memory `Account` factory
- * @function
- * @rtype Stamp
- * @param {Object} keypair - Key pair to use
- * @param {String} keypair.pub - Public key
- * @param {String} keypair.priv - Private key
- * @return {Account}
- */
-const MemoryAccount = Account.compose({
-  init ({keypair}) {
-    secrets.set(this, {
-      priv: Buffer.from(keypair.priv, 'hex'),
-      pub: keypair.pub
-    })
-  },
-  methods: {sign, address}
-})
-
-export default MemoryAccount
+export default Aepp

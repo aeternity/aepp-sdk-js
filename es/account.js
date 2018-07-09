@@ -30,24 +30,21 @@ import * as Crypto from './utils/crypto'
  * Sign encoded transaction
  * @instance
  * @category async
- * @rtype (tx: String) => tx: Promise[String]
+ * @rtype (tx: String) => tx: Promise[String], throws: Error
  * @param {String} tx - Transaction to sign
  * @return {String} Signed transaction
  */
 async function signTransaction (tx) {
-  try {
-    const binaryTx = Crypto.decodeBase58Check(Crypto.assertedType(tx, 'tx'))
-    const sig = await this.sign(binaryTx)
-    return Crypto.encodeTx(Crypto.prepareTx(sig, binaryTx))
-  } catch (e) {
-    throw Error(`Not a valid transaction hash: ${tx}`)
-  }
+  const binaryTx = Crypto.decodeBase58Check(Crypto.assertedType(tx, 'tx'))
+  const sig = await this.sign(binaryTx)
+  return Crypto.encodeTx(Crypto.prepareTx(sig, binaryTx))
 }
 
 /**
  * Basic Account Stamp
  *
- * Attempting to create instances from the Stamp without overwriting all abstract methods using composition will result in an exception.
+ * Attempting to create instances from the Stamp without overwriting all
+ * abstract methods using composition will result in an exception.
  * @function
  * @alias module:@aeternity/aepp-sdk/es/account
  * @rtype Stamp
@@ -55,7 +52,14 @@ async function signTransaction (tx) {
  * @return {Object} Account instance
  * @example Account()
  */
-const Account = stampit({methods: {signTransaction}}, required({methods: {
+const Account = stampit({
+  methods: {signTransaction},
+  deepConf: {
+    Ae: {
+      methods: ['sign', 'address']
+    }
+  }
+}, required({methods: {
   sign: required,
   address: required
 }}))

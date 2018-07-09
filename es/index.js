@@ -23,18 +23,15 @@ import Tx from './tx'
 import EpochTx from './tx/epoch'
 import JsTx from './tx/js'
 import Account from './account'
-import {PostMessageAccount, PostMessageAccountReceiver} from './account/post-message'
 import MemoryAccount from './account/memory'
-import Aens from './aens'
-import Contract from './contract'
-
-const Wallet = Ae.compose(EpochChain, EpochTx, JsTx, MemoryAccount, PostMessageAccountReceiver)
-const Aepp = Ae.compose(EpochChain, EpochTx, JsTx, PostMessageAccount, Contract, Aens)
-
-export default Ae
+import Aens from './ae/aens'
+import Contract from './ae/contract'
+import Wallet from './ae/wallet'
+import Aepp from './ae/aepp'
+import Selector from './account/selector'
 
 export {
-  Wallet,
+  Ae,
   Aepp,
   Crypto,
   Chain,
@@ -42,9 +39,10 @@ export {
   Tx,
   EpochTx,
   Account,
-  PostMessageAccount,
-  PostMessageAccountReceiver,
   MemoryAccount,
   Aens,
-  Contract
+  Contract,
+  Wallet,
+  JsTx,
+  Selector
 }

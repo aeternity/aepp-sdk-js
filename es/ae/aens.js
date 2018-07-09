@@ -24,8 +24,8 @@
  */
 
 import * as R from 'ramda'
-import {encodeBase58Check, salt} from './utils/crypto'
-import Ae from './ae'
+import {encodeBase58Check, salt} from '../utils/crypto'
+import Account from '../account'
 import stampit from '@stamp/it'
 
 /**
@@ -37,9 +37,9 @@ import stampit from '@stamp/it'
 async function transfer (nameHash, account, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
 
-  const nameTransferTx = await this.nameTransferTx(R.merge(opt, {
+  const nameTransferTx = await this.ae.nameTransferTx(R.merge(opt, {
     nameHash,
-    account: await this.address(),
+    account: await this.ae.address(),
     recipientAccount: account
   }))
 
@@ -80,9 +80,9 @@ function classify (s) {
 async function update (nameHash, target, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
 
-  const nameUpdateTx = await this.nameUpdateTx(R.merge(opt, {
+  const nameUpdateTx = await this.ae.nameUpdateTx(R.merge(opt, {
     nameHash,
-    account: await this.address(),
+    account: await this.ae.address(),
     pointers: JSON.stringify(R.fromPairs([[classify(target), target]]))
   }))
 
@@ -95,7 +95,7 @@ async function update (nameHash, target, options = {}) {
  * @return {Promise<Object>}
  */
 async function query (name) {
-  const o = await this.api.getName(name)
+  const o = await this.ae.api.getName(name)
   const {nameHash} = o
 
   return Object.freeze(Object.assign(o, {
@@ -119,8 +119,8 @@ async function query (name) {
  */
 async function claim (name, salt, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const claimTx = await this.nameClaimTx(R.merge(opt, {
-    account: await this.address(),
+  const claimTx = await this.ae.nameClaimTx(R.merge(opt, {
+    account: await this.ae.address(),
     nameSalt: salt,
     name: `nm$${encodeBase58Check(Buffer.from(name))}`
   }))
@@ -138,10 +138,10 @@ async function claim (name, salt, options = {}) {
 async function preclaim (name, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   const _salt = salt()
-  const hash = await this.commitmentHash(name, _salt)
+  const hash = await this.ae.commitmentHash(name, _salt)
 
-  const preclaimTx = await this.namePreclaimTx(R.merge(opt, {
-    account: await this.address(),
+  const preclaimTx = await this.ae.namePreclaimTx(R.merge(opt, {
+    account: await this.ae.address(),
     commitment: hash
   }))
 
@@ -154,7 +154,7 @@ async function preclaim (name, options = {}) {
   })
 }
 
-const Aens = stampit(Ae, {
+const Aens = stampit(Account, {
   methods: {
     aensQuery: query,
     aensPreclaim: preclaim,

@@ -22,6 +22,7 @@
  * @example import Tx from '@aeternity/aepp-sdk/es/tx'
  */
 
+import stampit from '@stamp/it'
 import {required} from '@stamp/required'
 
 /**
@@ -35,7 +36,17 @@ import {required} from '@stamp/required'
  * @return {Object} Tx instance
  * @example Tx()
  */
-const Tx = required({
+const Tx = stampit({
+  deepConf: {
+    Ae: {
+      methods: [
+        'spendTx', 'namePreclaimTx', 'nameClaimTx', 'nameTransferTx',
+        'nameUpdateTx', 'nameRevokeTx', 'contractCreateTx', 'contractCallTx',
+        'commitmentHash'
+      ]
+    }
+  }
+}, required({
   methods: {
     spendTx: required,
     namePreclaimTx: required,
@@ -47,7 +58,7 @@ const Tx = required({
     contractCallTx: required,
     commitmentHash: required
   }
-})
+}))
 
 /**
  * Create a `spend_tx` transaction

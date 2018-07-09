@@ -17,20 +17,19 @@
 
 import stampit from '@stamp/it'
 import Tx from './tx'
-import Account from './account'
 import Chain from './chain'
+import Account from './account'
 import * as R from 'ramda'
 
 async function send (tx, options) {
   const opt = R.merge(this.Ae.defaults, options)
-  const signed = await this.signTransaction(tx)
+  const signed = await this.signTransaction(tx, await this.address())
   return this.sendTransaction(signed, opt)
 }
 
 async function spend (amount, recipient, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const sender = await this.address()
-  const spendTx = await this.spendTx(R.merge({sender, recipient, amount}, opt))
+  const spendTx = await this.spendTx(R.merge({sender: await this.address(), recipient, amount}, opt))
   return this.send(spendTx, opt)
 }
 

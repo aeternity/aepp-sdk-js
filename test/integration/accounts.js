@@ -19,7 +19,7 @@ import {describe, it, before} from 'mocha'
 import {configure, ready, BaseAe, masterAccount} from './'
 import {generateKeyPair} from '../../es/utils/crypto'
 
-describe('Account', function () {
+describe('Accounts', function () {
   configure(this)
 
   let wallet
