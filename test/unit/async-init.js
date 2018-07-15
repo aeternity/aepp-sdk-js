@@ -16,8 +16,8 @@
  */
 
 import '../'
-import { describe, it } from 'mocha'
-import AsyncInit from '../../src/utils/async-init'
+import {describe, it} from 'mocha'
+import AsyncInit from '../../es/utils/async-init'
 
 describe('AsyncInit', function () {
   it('composes Stamps', async () => {
