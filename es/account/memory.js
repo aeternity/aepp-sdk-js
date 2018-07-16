@@ -28,6 +28,13 @@ async function address () {
   return Promise.resolve(secrets.get(this).pub)
 }
 
+function setKeypair (keypair) {
+  secrets.set(this, {
+    priv: Buffer.from(keypair.priv, 'hex'),
+    pub: keypair.pub
+  })
+}
+
 /**
  * In-memory `Account` factory
  * @function
@@ -39,12 +46,11 @@ async function address () {
  */
 const MemoryAccount = Account.compose({
   init ({keypair}) {
-    secrets.set(this, {
-      priv: Buffer.from(keypair.priv, 'hex'),
-      pub: keypair.pub
-    })
+    if (keypair !== undefined) {
+      this.setKeypair(keypair)
+    }
   },
-  methods: {sign, address}
+  methods: {sign, address, setKeypair}
 })
 
 export default MemoryAccount

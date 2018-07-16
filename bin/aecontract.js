@@ -24,15 +24,12 @@
 
 'use strict'
 
-// We'll need the main client module `Ae`, the `Wallet` module, the `Crypto`
-// module and the `contract` module from the SDK.
-const { default: Ae, Wallet, Contract, Crypto } = require('@aeternity/aepp-sdk')
+// We'll need the main client module `Ae` in the `Cli` flavor from the SDK.
+const {Cli: Ae} = require('@aeternity/aepp-sdk')
 const program = require('commander')
 const fs = require('fs')
 
 function exec (infile, fn, args) {
-  const keypair = Crypto.envKeypair(process.env)
-
   if (!infile || !fn) {
     program.outputHelp()
     process.exit(1)
@@ -44,19 +41,16 @@ function exec (infile, fn, args) {
   // dealing with subsequent actions is `then` chaining with a final `catch`
   // callback.
 
-  // `Ae.create` itself is asynchronous as it determines the node's version and
+  // `Ae` itself is asynchronous as it determines the node's version and
   // rest interface automatically. Only once the Promise is fulfilled, we know
-  // we have a working client object.  
-  // Both `Wallet.create` and `Contract.create` need to be initialized with
-  // the Ae client. The Wallet object needs to be passed in because some of
-  // the following actions requires sending signed transactions to be mined,
-  // which implies spending reward tokens to the miner.  
-  // `compile` takes a raw Sophia contract in string form and sends it off to
-  // the node for bytecode compilation. This might in the future be done
+  // we have a working ae client. Please take note `Ae` is not a constructor but
+  // a factory factory, which means it's *not* invoked with `new`.
+  // `contractCompile` takes a raw Sophia contract in string form and sends it
+  // off to the node for bytecode compilation. This might in the future be done
   // without talking to the node, but requires a bytecode compiler
   // implementation directly in the SDK.
-  Ae.create(program.host, { debug: program.debug }).then(client => {
-    return Contract.create(client, Wallet.create(client, keypair)).compile(code)
+  Ae({url: program.host, debug: program.debug, process}).then(ae => {
+    return ae.contractCompile(code)
     // Invoking `deploy` on the bytecode object will result in the contract
     // being written to the chain, once the block has been mined.
     // Sophia contracts always have an `init` method which needs to be invoked,
@@ -65,14 +59,14 @@ function exec (infile, fn, args) {
     // block as well, together with the contract's bytecode.
   }).then(bytecode => {
     console.log(`Obtained bytecode ${bytecode.bytecode}`)
-    return bytecode.deploy({ initState: program.init })
+    return bytecode.deploy({initState: program.init})
     // Once the contract has been successfully mined, we can attempt to invoke
     // any public function defined within it. The miner who found the next block
     // will not only be rewarded a fixed amount, but also an amount depending on
     // the amount of gas spend.
   }).then(deployed => {
     console.log(`Contract deployed at ${deployed.address}`)
-    return deployed.call(fn, { args: args.join(' ') })
+    return deployed.call(fn, {args: args.join(' ')})
     // The execution result, if successful, will be an AEVM-encoded result
     // value. Once type decoding will be implemented in the SDK, this value will
     // not be a hexadecimal string, anymore.
@@ -82,7 +76,7 @@ function exec (infile, fn, args) {
 }
 
 // ## Command Line Interface
-// 
+//
 // The `commander` library provides maximum command line parsing convenience.
 program
   .version('0.1.0')
