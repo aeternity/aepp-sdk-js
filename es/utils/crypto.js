@@ -27,6 +27,7 @@ import {blake2b} from 'blakejs'
 import nacl from 'tweetnacl'
 import aesjs from 'aes-js'
 import {leftPad, rightPad} from './bytes'
+import shajs from 'sha.js'
 
 const Ecb = aesjs.ModeOfOperation.ecb
 
@@ -38,6 +39,16 @@ const Ecb = aesjs.ModeOfOperation.ecb
  */
 export function hash (input) {
   return blake2b(input, null, 32) // 256 bits
+}
+
+/**
+ * Calculate SHA256 hash of `input`
+ * @rtype (input: String) => hash: String
+ * @param {String} input - Data to hash
+ * @return {String} Hash
+ */
+export function sha256hash (input) {
+  return shajs('sha256').update(input).digest()
 }
 
 /**
@@ -125,7 +136,7 @@ export function encryptPrivateKey (password, binaryKey) {
  * @return {UInt8Array} Encrypted data
  */
 export function encryptKey (password, binaryData) {
-  let hashedPasswordBytes = hash(password)
+  let hashedPasswordBytes = sha256hash(password)
   let aesEcb = new Ecb(hashedPasswordBytes)
   return aesEcb.encrypt(binaryData)
 }
@@ -139,7 +150,7 @@ export function encryptKey (password, binaryData) {
  */
 export function decryptKey (password, encrypted) {
   const encryptedBytes = Buffer.from(encrypted)
-  let hashedPasswordBytes = hash(password)
+  let hashedPasswordBytes = sha256hash(password)
   let aesEcb = new Ecb(hashedPasswordBytes)
   return Buffer.from(aesEcb.decrypt(encryptedBytes))
 }
