@@ -15,7 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import Ae from '../ae'
+import Ae from './'
 import Account from '../account'
 import Accounts from '../accounts'
 import Chain from '../chain/epoch'

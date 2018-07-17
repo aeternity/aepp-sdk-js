@@ -24,7 +24,7 @@
 
 import stampit from '@stamp/it'
 import {required} from '@stamp/required'
-import * as Crypto from './utils/crypto'
+import * as Crypto from '../utils/crypto'
 
 /**
  * Sign encoded transaction

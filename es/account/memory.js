@@ -15,7 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import Account from '../account'
+import Account from './'
 import * as Crypto from '../utils/crypto'
 
 const secrets = new WeakMap()

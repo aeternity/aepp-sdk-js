@@ -15,7 +15,14 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import Ae from '../ae'
+/**
+ * Aepp module
+ * @module @aeternity/aepp-sdk/es/ae/aepp
+ * @export Aepp
+ * @example import Ae from '@aeternity/aepp-sdk/es/ae/aepp'
+ */
+
+import Ae from './'
 import Aens from './aens'
 import Contract from './contract'
 import Rpc from '../rpc/client'

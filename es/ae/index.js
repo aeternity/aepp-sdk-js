@@ -16,9 +16,9 @@
  */
 
 import stampit from '@stamp/it'
-import Tx from './tx'
-import Chain from './chain'
-import Account from './account'
+import Tx from '../tx'
+import Chain from '../chain'
+import Account from '../account'
 import * as R from 'ramda'
 
 async function send (tx, options) {

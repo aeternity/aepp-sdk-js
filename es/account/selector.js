@@ -24,7 +24,7 @@
  * @example import Selector from '@aeternity/aepp-sdk/es/account/selector'
  */
 
-import stampit from '@stamp/it'
+import Account from './'
 import required from '@stamp/required'
 
 async function sign (data) {
@@ -48,17 +48,16 @@ async function selectAccount (address) {
  * @return {Account} Account instance
  * @example Selector()
  */
-const Selector = stampit({
+const Selector = Account.compose({
   async init ({address}) {
     this.Selector.address = address
   },
   methods: {sign, address, selectAccount},
   deepProps: {
     Selector: {}
-  },
-  required: {
-    methods: {signWith: required}
   }
-})
+}, required({
+  methods: {signWith: required}
+}))
 
 export default Selector
