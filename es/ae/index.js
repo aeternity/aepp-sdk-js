@@ -29,7 +29,7 @@ async function send (tx, options) {
 
 async function spend (amount, recipient, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const spendTx = await this.spendTx(R.merge({sender: await this.address(), recipient, amount}, opt))
+  const spendTx = await this.spendTx(R.merge(opt, {sender: await this.address(), recipient, amount}))
   return this.send(spendTx, opt)
 }
 

@@ -16,12 +16,14 @@
  */
 
 import {describe, it, before} from 'mocha'
-import {configure, ready, accounts} from './'
+import {configure, ready} from './'
+import {generateKeyPair} from '../../es/utils/crypto'
 
 describe('Epoch Chain', function () {
   configure(this)
 
   let client
+  const {pub} = generateKeyPair()
 
   before(async function () {
     client = await ready(this)
@@ -39,7 +41,7 @@ describe('Epoch Chain', function () {
 
   it('polls for transactions', async () => {
     const sender = await client.address()
-    const receiver = accounts[0].pub
+    const receiver = pub
     const {tx} = await client.api.postSpend({
       fee: 1,
       amount: 1,
