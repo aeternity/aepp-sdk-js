@@ -16,10 +16,10 @@
  */
 
 import {describe, it, before} from 'mocha'
-import {configure, ready, BaseAe, masterAccount} from './'
+import {configure, ready, BaseAe} from './'
 import {generateKeyPair} from '../../es/utils/crypto'
 
-describe('Account', function () {
+describe('Accounts', function () {
   configure(this)
 
   let wallet
@@ -34,7 +34,8 @@ describe('Account', function () {
     let wallet
 
     before(async function () {
-      wallet = await BaseAe({keypair: generateKeyPair()})
+      wallet = await BaseAe()
+      wallet.setKeypair(generateKeyPair())
     })
 
     it('determining the balance', async () => {
@@ -60,7 +61,7 @@ describe('Account', function () {
 
   describe('can be configured to return th', () => {
     it('on creation', async () => {
-      const wallet = await BaseAe.compose({deepProps: {Ae: {defaults: {waitMined: false}}}})({keypair: masterAccount})
+      const wallet = await BaseAe.compose({deepProps: {Chain: {defaults: {waitMined: false}}}})()
       const th = await wallet.spend(1, receiver)
       th.should.be.a('string')
       th.slice(0, 3).should.equal('th$')

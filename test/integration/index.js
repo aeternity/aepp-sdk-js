@@ -16,23 +16,17 @@
  */
 
 import '../'
-import Ae from '../../es/ae'
-import Chain from '../../es/chain/epoch'
-import Tx from '../../es/tx/epoch'
-import JsTx from '../../es/tx/js'
-import Account from '../../es/account/memory'
-import Aens from '../../es/aens'
-import Contract from '../../es/contract'
+import Ae from '../../es/ae/cli'
 import * as Crypto from '../../es/utils/crypto'
 
 const url = process.env.TEST_URL || 'http://localhost:3013'
 const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
-const masterAccount = Crypto.envKeypair(process.env)
-const accounts = Array(3).fill().map(() => Crypto.generateKeyPair())
+const account = Crypto.generateKeyPair()
+// Array(3).fill().map(() => Crypto.generateKeyPair())
 
-const BaseAe = Ae.compose(Chain, Tx, JsTx, Account, Aens, Contract, {
+const BaseAe = Ae.compose({
   deepProps: {Swagger: {defaults: {debug: !!process.env['DEBUG']}}},
-  props: {url, internalUrl}
+  props: {url, internalUrl, process}
 })
 
 let planned = 0
@@ -51,22 +45,22 @@ function configure (mocha) {
 async function ready (mocha) {
   configure(mocha)
 
-  const ae = await BaseAe({keypair: masterAccount})
-
+  const ae = await BaseAe()
   await ae.awaitHeight(10)
 
   if (!charged && planned > 0) {
-    await ae.spend(planned, accounts[0].pub)
+    console.log(`Charging new wallet ${account.pub} with ${planned}`)
+    await ae.spend(planned, account.pub)
     charged = true
   }
 
-  return ae
+  const client = await BaseAe()
+  client.setKeypair(account)
+  return client
 }
 
 export {
   BaseAe,
-  masterAccount,
-  accounts,
   url,
   internalUrl,
   configure,

@@ -16,7 +16,7 @@
  */
 
 import * as R from 'ramda'
-import Chain from '../chain'
+import Chain from './'
 import Epoch from '../epoch'
 
 async function sendTransaction (tx, options = {}) {

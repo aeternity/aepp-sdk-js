@@ -24,9 +24,8 @@
  */
 
 import * as R from 'ramda'
-import {encodeBase58Check, salt} from './utils/crypto'
-import Ae from './ae'
-import stampit from '@stamp/it'
+import {encodeBase58Check, salt} from '../utils/crypto'
+import Ae from './'
 
 /**
  * Transfer a domain to another account.
@@ -154,7 +153,7 @@ async function preclaim (name, options = {}) {
   })
 }
 
-const Aens = stampit(Ae, {
+const Aens = Ae.compose({
   methods: {
     aensQuery: query,
     aensPreclaim: preclaim,

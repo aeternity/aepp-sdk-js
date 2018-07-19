@@ -15,36 +15,18 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import Ae from './ae'
-import * as Crypto from './utils/crypto'
-import Chain from './chain'
-import EpochChain from './chain/epoch'
-import Tx from './tx'
-import EpochTx from './tx/epoch'
-import JsTx from './tx/js'
-import Account from './account'
-import MemoryAccount from './account/memory'
-import Aens from './ae/aens'
-import Contract from './ae/contract'
-import Wallet from './ae/wallet'
-import Aepp from './ae/aepp'
-import Selector from './account/selector'
-import Cli from './ae/cli'
+/**
+ * Aepp module
+ * @module @aeternity/aepp-sdk/es/ae/aepp
+ * @export Aepp
+ * @example import Ae from '@aeternity/aepp-sdk/es/ae/aepp'
+ */
 
-export {
-  Ae,
-  Aepp,
-  Crypto,
-  Chain,
-  EpochChain,
-  Tx,
-  EpochTx,
-  Account,
-  MemoryAccount,
-  Aens,
-  Contract,
-  Wallet,
-  JsTx,
-  Selector,
-  Cli
-}
+import Ae from './'
+import Aens from './aens'
+import Contract from './contract'
+import Rpc from '../rpc/client'
+
+const Aepp = Ae.compose(Contract, Aens, Rpc)
+
+export default Aepp

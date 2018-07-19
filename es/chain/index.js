@@ -38,7 +38,15 @@ import {required} from '@stamp/required'
  */
 const Chain = stampit({
   deepProps: {Chain: {defaults: {waitMined: true}}},
-  statics: {waitMined (bool) { return this.deepProps({Chain: {defaults: {waitMined: bool}}}) }}
+  statics: {waitMined (bool) { return this.deepProps({Chain: {defaults: {waitMined: bool}}}) }},
+  deepConf: {
+    Ae: {
+      methods: [
+        'sendTransaction', 'height', 'awaitHeight', 'poll', 'balance', 'tx',
+        'mempool'
+      ]
+    }
+  }
 }, required({
   methods: {
     sendTransaction: required,

@@ -15,7 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import Tx from '../tx'
+import Tx from './'
 import Epoch from '../epoch'
 import * as R from 'ramda'
 import {salt} from '../utils/crypto'

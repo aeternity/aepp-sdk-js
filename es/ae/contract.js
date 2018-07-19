@@ -25,8 +25,7 @@
  *
  */
 
-import stampit from '@stamp/it'
-import Ae from './ae'
+import Ae from './'
 import * as R from 'ramda'
 
 async function encodeCall (code, abi, name, args) {
@@ -85,7 +84,7 @@ async function compile (code, options = {}) {
   }, o))
 }
 
-const Contract = stampit(Ae, {
+const Contract = Ae.compose({
   methods: {
     contractCompile: compile,
     contractCallStatic: callStatic,

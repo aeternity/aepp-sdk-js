@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // # Simple AE Token Spending Script
-// 
+//
 // This script shows how to use the `Wallet` module from the SDK to send AE to
 // other addresses.
 /*
@@ -22,23 +22,23 @@
 
 'use strict'
 
-// We'll need the main client module `Ae`, `Wallet` module and the `Crypto`
-// module from the SDK.
-const { default: Ae, Wallet, Crypto } = require('@aeternity/aepp-sdk')
+// We'll need the main client module `Ae` in the `Cli` flavor from the SDK.
+const {Cli: Ae} = require('@aeternity/aepp-sdk')
 const program = require('commander')
 
-function spend (receiver, amount, { host, debug }) {
-  const keypair = Crypto.envKeypair(process.env)
-
+function spend (receiver, amount, {host, debug}) {
   // This code is relatively simple: We create the Ae client asynchronously and
-  // create a Wallet object ad hoc, only to invoke the spend method on it.
-  Ae.create(host, { debug }).then(client => {
-    return Wallet.create(client, keypair).spend(parseInt(amount), receiver)
-  }).catch(e => console.log(e.message))
+  // invoke the spend method on it. Passing in `process` from nodejs will make
+  // the implementation grab the key pair from the `WALLET_PRIV` and
+  // `WALLET_PUB` environment variables, respectively.
+  Ae({url: host, debug, process})
+    .then(ae => ae.spend(parseInt(amount), receiver))
+    .then(tx => console.log('Transaction mined', tx))
+    .catch(e => console.log(e.message))
 }
 
 // ## Command Line Interface
-// 
+//
 // The `commander` library provides maximum command line parsing convenience.
 program.version('0.1.0')
 

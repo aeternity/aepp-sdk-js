@@ -15,36 +15,31 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import Ae from './ae'
-import * as Crypto from './utils/crypto'
-import Chain from './chain'
-import EpochChain from './chain/epoch'
-import Tx from './tx'
-import EpochTx from './tx/epoch'
-import JsTx from './tx/js'
-import Account from './account'
-import MemoryAccount from './account/memory'
-import Aens from './ae/aens'
-import Contract from './ae/contract'
-import Wallet from './ae/wallet'
-import Aepp from './ae/aepp'
-import Selector from './account/selector'
-import Cli from './ae/cli'
+import stampit from '@stamp/it'
+import Tx from '../tx'
+import Chain from '../chain'
+import Account from '../account'
+import * as R from 'ramda'
 
-export {
-  Ae,
-  Aepp,
-  Crypto,
-  Chain,
-  EpochChain,
-  Tx,
-  EpochTx,
-  Account,
-  MemoryAccount,
-  Aens,
-  Contract,
-  Wallet,
-  JsTx,
-  Selector,
-  Cli
+async function send (tx, options) {
+  const opt = R.merge(this.Ae.defaults, options)
+  const signed = await this.signTransaction(tx, await this.address())
+  return this.sendTransaction(signed, opt)
 }
+
+async function spend (amount, recipient, options = {}) {
+  const opt = R.merge(this.Ae.defaults, options)
+  const spendTx = await this.spendTx(R.merge(opt, {sender: await this.address(), recipient, amount}))
+  return this.send(spendTx, opt)
+}
+
+const Ae = stampit(Tx, Account, Chain, {
+  methods: {send, spend},
+  deepProperties: {Ae: {defaults: {
+    ttl: Number.MAX_SAFE_INTEGER,
+    fee: 1,
+    payload: ''
+  }}}
+})
+
+export default Ae

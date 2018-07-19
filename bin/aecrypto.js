@@ -24,7 +24,7 @@
 
 // We'll only load the `Crypto` module from the SDK to work with keys and
 // transactions.
-const { Crypto } = require('@aeternity/aepp-sdk')
+const {Crypto} = require('@aeternity/aepp-sdk')
 const program = require('commander')
 const fs = require('fs')
 const prompt = require('prompt')
@@ -40,7 +40,7 @@ const promptSchema = {
       required: true,
       replace: '*',
       conform: function (value) {
-        return true;
+        return true
       }
     }
   }
@@ -50,7 +50,7 @@ const promptSchema = {
 function extractReadableKeys (dir, options) {
   const pwd = options.input
   prompt.start()
-  prompt.get(promptSchema, (err, { password }) => {
+  prompt.get(promptSchema, (err, {password}) => {
     const key = fs.readFileSync(path.join(pwd, dir, 'sign_key'))
     const pubKey = fs.readFileSync(path.join(pwd, dir, 'sign_key.pub'))
 
@@ -60,7 +60,7 @@ function extractReadableKeys (dir, options) {
     const decryptedPub = Crypto.decryptPubKey(password, pubKey)
 
     console.log(`Private key (hex): ${privateHex}`)
-    console.log(`Public key (base check): ak\$${Crypto.encodeBase58Check(decryptedPub)}`)
+    console.log(`Public key (base check): ak$${Crypto.encodeBase58Check(decryptedPub)}`)
     console.log(`Public key (hex): ${decryptedPub.toString('hex')}`)
   })
 }
@@ -69,17 +69,19 @@ function extractReadableKeys (dir, options) {
 function generateKeyPair (name, { output }) {
   const { pub, priv } = Crypto.generateKeyPair()
 
-  const data = [[path.join(output, name), priv],
-                [path.join(output, `${name}.pub`), pub]]
+  const data = [
+    [path.join(output, name), priv],
+    [path.join(output, `${name}.pub`), pub]
+  ]
 
   data.forEach(([path, data]) => {
-     fs.writeFileSync(path, data)
-     console.log(`Wrote ${path}`)
+    fs.writeFileSync(path, data)
+    console.log(`Wrote ${path}`)
   })
 }
 
 // ## Transaction Signing
-// 
+//
 // This function shows how to use a compliant private key to sign an æternity
 // transaction and turn it into an RLP-encoded tuple ready for mining
 function signTx (tx, privKey) {
@@ -127,7 +129,7 @@ function unpackTx (tx) {
 }
 
 // ## Command Line Interface
-// 
+//
 // The `commander` library provides maximum command line parsing convenience.
 program.version('0.1.0')
 
