@@ -32,7 +32,7 @@ import stampit from '@stamp/it'
  * Transfer a domain to another account.
  * @param account
  * @param options
- * @return
+ * @return {Object}
  */
 async function transfer (nameHash, account, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
@@ -75,7 +75,7 @@ function classify (s) {
  * Update an aens entry
  * @param target new target
  * @param options
- * @return
+ * @return {Object}
  */
 async function update (nameHash, target, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)

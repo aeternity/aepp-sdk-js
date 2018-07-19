@@ -1,0 +1,3 @@
+{
+  "plugins": ["tooling/docs/rtype.js"]
+}

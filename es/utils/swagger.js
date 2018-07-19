@@ -15,23 +15,57 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+/**
+ * Swagger module
+ * @module @aeternity/aepp-sdk/es/utils/swagger
+ * @export Swagger
+ * @example import Swagger from '@aeternity/aepp-sdk/es/utils/swagger'
+ */
+
 import stampit from '@stamp/it'
 import AsyncInit from './async-init'
 import axios from 'axios'
 import * as R from 'ramda'
 
+/**
+ * Convert string from snake_case to PascalCase
+ * @rtype (s: String) => String
+ * @param {String} s - String to convert
+ * @return {String} Converted string
+ */
 function snakeToPascal (s) {
   return s.replace(/_./g, match => R.toUpper(match[1]))
 }
 
+/**
+ * Convert string from PascalCase to snake_case
+ * @rtype (s: String) => String
+ * @param {String} s - String to convert
+ * @return {String} Converted string
+ */
 function pascalToSnake (s) {
   return s.replace(/[A-Z]/g, match => `_${R.toLower(match)}`)
 }
 
+/**
+ * Perform path string interpolation
+ * @static
+ * @rtype (path: String, replacements: Object) => String
+ * @param {String} s - String to convert
+ * @return {String} Converted string
+ */
 function expandPath (path, replacements) {
   return R.reduce((path, [key, value]) => path.replace(`{${key}}`, value), path, R.toPairs(replacements))
 }
 
+/**
+ * Lookup type
+ * @rtype (path: [String...], spec: Object, types: Object) => Object
+ * @param {String[]} path - Path to look up
+ * @param {Object} spec
+ * @param {Object} types
+ * @return {Object} Looked up type definition
+ */
 function lookupType (path, spec, types) {
   const type = (() => {
     const match = R.path(path, spec).match(/^#\/definitions\/(.+)/)
@@ -49,6 +83,13 @@ function lookupType (path, spec, types) {
   }
 }
 
+/**
+ * Intercept errors thrown by `fn()`, extending them with information from `key`
+ * @rtype (key: String, fn: Function) => Any
+ * @param {String} key - Information to attach
+ * @param {Function} fn - Thunk
+ * @return {Any} Execution result
+ */
 function extendingErrorPath (key, fn) {
   try {
     return fn()
@@ -57,11 +98,23 @@ function extendingErrorPath (key, fn) {
   }
 }
 
+/**
+ * Construct Error with additional type information (not thrown)
+ * @rtype (msg: String, spec: String, value: String) => Error
+ * @param {String} msg - Error message
+ * @param {String} spec
+ * @param {String} value
+ * @return {Error} Enhanced Error
+ */
 function TypeError (msg, spec, value) {
   const e = Error(msg)
   return Object.assign(e, {spec, value})
 }
 
+/**
+ * Per-type {@link conform} dispatcher
+ * @rtype [(dispatch(value: String, spec: Object, types: Object) => Any, throws: Error)...]
+ */
 const conformTypes = {
   integer (value, spec, types) {
     if (R.type(value) === 'Number') {
@@ -118,6 +171,12 @@ const conformTypes = {
   }
 }
 
+/**
+ * {@link conform} dispatcher
+ * @rtype (spec: Object) => String, throws: Error
+ * @param {Object} spec
+ * @return {String} Value to dispatch on
+ */
 function conformDispatch (spec) {
   if ('schema' in spec) {
     return 'schema'
@@ -134,6 +193,15 @@ function conformDispatch (spec) {
   }
 }
 
+/**
+ * Conform `value` against its `spec`
+ * @static
+ * @rtype (value: Any, spec: Object, types: Object) => Any, throws: Error
+ * @param {Object} value - Value to conform (validate and transform)
+ * @param {Object} spec - Specification object
+ * @param {Object} types - Types specification
+ * @return {Object} Conformed value
+ */
 function conform (value, spec, types) {
   return (conformTypes[conformDispatch(spec)] || (() => {
     throw Object.assign(Error('Unsupported type'), {spec})
@@ -145,6 +213,12 @@ const httpClients = {
   post: axios.post
 }
 
+/**
+ * Classify given `parameters`
+ * @rtype (parameters: [{required: Boolean, in: String}...]) => {pathArgs: [...Object], queryArgs: [...Object], bodyArgs: [...Object], req: [...Object], opts: [...Object]}
+ * @param {Object[]} parameters - Parameters to classify
+ * @return {Object[]} Classified parameters
+ */
 function classifyParameters (parameters) {
   const {req, opts} = R.groupBy(p => p.required ? 'req' : 'opts', parameters)
   const {path, query, body} = R.groupBy(p => p.in, parameters)
@@ -158,10 +232,25 @@ function classifyParameters (parameters) {
   }
 }
 
+/**
+ * Convert `name` attributes in `parameters` from snake_case to PascalCase
+ * @rtype (parameters: [{name: String}...]) => [{name: String}...]
+ * @param {Object[]} parameters - Parameters to pascalize
+ * @return {Object[]} Pascalized parameters
+ */
 function pascalizeParameters (parameters) {
   return R.map(o => R.assoc('name', snakeToPascal(o.name), o), parameters)
 }
 
+/**
+ * Key traversal metafunction
+ * @static
+ * @function
+ * @rtype (fn: (s: String) => String) => (o: Object) => Object
+ * @param {Function} fn - Key transformation function
+ * @param {Object} o - Object to traverse
+ * @return {Object} Transformed object
+ */
 const traverseKeys = R.curry((fn, o) => {
   const dispatch = {
     Object: o => R.fromPairs(R.map(([k, v]) => [fn(k), traverseKeys(fn, v)], R.toPairs(o))),
@@ -171,14 +260,38 @@ const traverseKeys = R.curry((fn, o) => {
   return (dispatch[R.type(o)] || R.identity)(o)
 })
 
+/**
+ * snake_case key traversal
+ * @static
+ * @rtype (o: Object) => Object
+ * @param {Object} o - Object to traverse
+ * @return {Object} Transformed object
+ * @see pascalToSnake
+ */
 function snakizeKeys (o) {
   return traverseKeys(pascalToSnake, o)
 }
 
+/**
+ * PascalCase key traversal
+ * @static
+ * @rtype (o: Object) => Object
+ * @param {Object} o - Object to traverse
+ * @return {Object} Transformed object
+ * @see snakeToPascal
+ */
 function pascalizeKeys (o) {
   return traverseKeys(snakeToPascal, o)
 }
 
+/**
+ * Obtain readable signature for operation
+ * @rtype (name: String, req: [...Object], opts: [...Object]) => Object
+ * @param {String} name - Name of operation
+ * @param {Object[]} req - Required parameters to operation
+ * @param {Object[]} opts - Optional parameters to operation
+ * @return {String} Signature
+ */
 function operationSignature (name, req, opts) {
   const args = req.length ? `${R.join(', ', R.pluck('name', req))}` : null
   const opt = opts.length ? `{${R.join(', ', R.pluck('name', opts))}}` : null
@@ -186,6 +299,13 @@ function operationSignature (name, req, opts) {
   return `${name} (${R.join(', ', R.filter(R.identity, [args, opt]))})`
 }
 
+/**
+ * Assert that `coll` is a sequence with a length of 1 and extract the only element
+ * @static
+ * @rtype (coll: [...Any]) => Any, throws: Error
+ * @param {Object[]} coll
+ * @return {Object}
+ */
 function assertOne (coll) {
   if (coll.length === 1) {
     return R.head(coll)
@@ -194,6 +314,12 @@ function assertOne (coll) {
   }
 }
 
+/**
+ * Destructure HTTP client `error`
+ * @rtype (error: Error) => String
+ * @param {Error} error
+ * @return {String}
+ */
 function destructureClientError (error) {
   const {method, url} = error.config
   const {status, data} = error.response
@@ -202,6 +328,17 @@ function destructureClientError (error) {
   return `${R.toUpper(method)} to ${url} failed with ${status}: ${reason}`
 }
 
+/**
+ * Generate callable operation
+ * @function
+ * @static
+ * @rtype (path: String, method: String, definition: Object, types: Object) => (instance: Swagger, url: String) => Promise[Any], throws: Error
+ * @param {String} path - Path to call in URL
+ * @param {String} method - HTTP method
+ * @param {Object} definition - Complex definition
+ * @param {Object} types - Swagger types
+ * @return {Function}
+ */
 const operation = R.memoize((path, method, definition, types) => {
   const {operationId, parameters, description} = definition
   const name = `${R.toLower(R.head(operationId))}${R.drop(1, operationId)}`
@@ -295,6 +432,16 @@ const operation = R.memoize((path, method, definition, types) => {
   }
 })
 
+/**
+ * Swagger Stamp
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/utils/swagger
+ * @rtype Stamp
+ * @param {Object} options - Initializer object
+ * @param {Object} options.swag - Swagger definition
+ * @return {Object} Account instance
+ * @example Swagger({swag})
+ */
 const Swagger = stampit(AsyncInit, {
   async init ({swag = this.swag}, {stamp}) {
     const {paths, definitions} = swag
@@ -315,6 +462,15 @@ const Swagger = stampit(AsyncInit, {
   }}},
   statics: {debugSwagger (bool) { return this.deepProps({Swagger: {defaults: {debug: bool}}}) }}
 })
+
+/**
+ * Reconfigure Swagger to (not) spill debugging logs
+ * @function debugSwagger
+ * @static
+ * @rtype (bool: Boolean) => Stamp
+ * @param {boolean} bool - Whether to debug
+ * @return {Stamp} Reconfigured Swagger Stamp
+ */
 
 export default Swagger
 

@@ -17,7 +17,7 @@
 
 import {describe, it, before} from 'mocha'
 import {configure, ready, BaseAe, masterAccount} from './'
-import {generateKeyPair} from '../../src/utils/crypto'
+import {generateKeyPair} from '../../es/utils/crypto'
 
 describe('Account', function () {
   configure(this)

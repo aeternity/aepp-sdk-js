@@ -3,7 +3,7 @@
 There are three different ways of incorporating aepp-sdk into your project, depending on the particular scenario:
 * Node.js bundle at `dist/aepp-sdk.js`
 * Browser bundle at `dist/aepp-sdk.browser.js`
-* ES Modules at `src/`
+* ES Modules at `es/`
 
 Also, please be aware that using `require` instead of module loader syntax
 (`import`) means that the default export automatically becomes exposed as
@@ -25,7 +25,7 @@ that understands ESM. In order to make sure the modules are loaded directly, use
 the following syntax to load parts of aepp-sdk:
 
 ```js
-import Ae from '@aeternity/aepp-sdk/src/client'
+import Ae from '@aeternity/aepp-sdk/es/client'
 
 Ae.create('https://sdk-testnet.aepps.com').then(client => {
   client.height().then(height => {

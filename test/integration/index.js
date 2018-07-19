@@ -16,14 +16,14 @@
  */
 
 import '../'
-import Ae from '../../src/ae'
-import Chain from '../../src/chain/epoch'
-import Tx from '../../src/tx/epoch'
-import JsTx from '../../src/tx/js'
-import Account from '../../src/account/memory'
-import Aens from '../../src/aens'
-import Contract from '../../src/contract'
-import * as Crypto from '../../src/utils/crypto'
+import Ae from '../../es/ae'
+import Chain from '../../es/chain/epoch'
+import Tx from '../../es/tx/epoch'
+import JsTx from '../../es/tx/js'
+import Account from '../../es/account/memory'
+import Aens from '../../es/aens'
+import Contract from '../../es/contract'
+import * as Crypto from '../../es/utils/crypto'
 
 const url = process.env.TEST_URL || 'http://localhost:3013'
 const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'

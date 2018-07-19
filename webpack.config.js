@@ -3,14 +3,14 @@ const R = require('ramda')
 
 function configure (filename, opts = {}) {
   return (env, argv) => R.mergeDeepLeft({
-    entry: './src/index.js',
+    entry: './es/index.js',
     mode: 'development', // automatically overriden by production flag
     devtool: argv.mode === 'production' ? 'source-map' : 'eval-source-map',
     module: {
       rules: [
         {
           test: /\.js$/,
-          include: path.resolve(__dirname, 'src'),
+          include: path.resolve(__dirname, 'es'),
           loader: 'babel-loader!standard-loader?error=true'
         },
         {

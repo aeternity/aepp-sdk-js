@@ -1,0 +1,8 @@
+{
+  "gitbook":   "3.2.2",
+  "root":      "./docs",
+  "structure": {
+    "readme":  "intro.md",
+    "summary": "toc.md"
+  }
+}
