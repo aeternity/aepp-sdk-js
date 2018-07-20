@@ -35,7 +35,8 @@ module.exports = {
     filename: 'bundle.js?[hash]'
   },
   devServer: {
-    contentBase: path.join(__dirname, 'dist')
+    contentBase: path.join(__dirname, 'dist'),
+    port: 9001
   },
   devtool: process.env.NODE_ENV === 'prod' ? '' : 'eval-source-map',
   plugins: [
