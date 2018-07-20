@@ -20,20 +20,22 @@
 </template>
 
 <script>
-import Ae from 'AE_SDK/aepp-sdk.browser.js'
-// import account from '../account.js'
+// AE_SDK_MODULES is a webpack alias present in webpack.config.js
+import Aepp from 'AE_SDK_MODULES/ae/aepp.js'
 
 export default {
   name: 'Home',
   components: {},
-  data: {
-    message: 'App',
-    // get from secure storage
-    client: null,
-    to: null,
-    amount: null,
-    height: null,
-    pub: null
+  data () {
+    return {
+      message: 'App',
+      // get from secure storage
+      client: null,
+      to: null,
+      amount: null,
+      height: null,
+      pub: null
+    }
   },
   computed: {
   },
@@ -41,7 +43,7 @@ export default {
     send () {}
   },
   created () {
-    Ae.Aepp().then(ae => {
+    Aepp().then(ae => {
       this.account = ae
       ae.address()
         .then(address => { this.pub = address })

@@ -25,44 +25,33 @@ module.exports = {
   mode: process.env.NODE_ENV === 'prod' ? 'production' : 'development',
   resolve: {
     alias: {
-      AE_SDK: '../../../../../dist/'
+      AE_SDK_MODULES: '@aeternity/aepp-sdk/es'
     }
   },
   entry: {
-    'aepp': './aepp/src/index.js',
-    'wallet': './wallet/src/index.js'
+    'wallet': './src/index.js'
   },
   output: {
-    filename: '[name]/bundle.js?[hash]'
+    filename: 'bundle.js?[hash]'
   },
   devServer: {
-    contentBase: [path.join(__dirname, 'dist/wallet'), path.join(__dirname, 'dist/aepp')]
+    contentBase: path.join(__dirname, 'dist')
   },
   devtool: process.env.NODE_ENV === 'prod' ? '' : 'eval-source-map',
   plugins: [
     new HtmlWebpackPlugin({
       inject: true,
-      chunks: ['wallet'],
+      // chunks: ['wallet'],
       title: 'Base (Wallet) Example Æpp',
-      template: './wallet/src/index.html',
-      filename: 'wallet/index.html',
-      alwaysWriteToDisk: true
-    }),
-    new HtmlWebpackPlugin({
-      inject: true,
-      chunks: ['aepp'],
-      title: 'Example Æpp',
-      template: './aepp/src/index.html',
-      filename: 'aepp/index.html',
+      template: './src/index.html',
+      filename: distFolder + '/index.html',
       alwaysWriteToDisk: true
     }),
     new PurgecssPlugin({
       // Specify the locations of any files you want to scan for class names.
       paths: glob.sync([
-        path.join(__dirname, 'wallet/src/**/*.vue'),
-        path.join(__dirname, 'wallet/src/index.html'),
-        path.join(__dirname, 'aepp/src/**/*.vue'),
-        path.join(__dirname, 'aepp/src/index.html')
+        path.join(__dirname, './src/**/*.vue'),
+        path.join(__dirname, './src/index.html')
       ]),
       extractors: [
         {
