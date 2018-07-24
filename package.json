@@ -1,6 +1,6 @@
 {
   "name": "@aeternity/aepp-sdk",
-  "version": "0.18.0-0.1.0",
+  "version": "0.18.0-0.1.1-alpha.1",
   "description": "SDK for the æternity blockchain",
   "main": "dist/aepp-sdk.js",
   "browser": "dist/aepp-sdk.browser.js",
@@ -11,10 +11,10 @@
     "build:dev": "webpack --mode=development",
     "docs:docco": "docco -l linear bin/*",
     "docs:api": "node apidoc.js",
-    "docs:build": "yarn docs:prepare && yarn docs:api",
     "test": "mocha --recursive --require @babel/register",
     "test:watch": "mocha --recursive --require @babel/register --watch",
     "test-jenkins": "mocha --recursive --require @babel/register --reporter mocha-junit-reporter",
+    "prepublish": "npm run build && npm run docs:docco && npm run docs:api",
     "postinstall": "postinstall-build --only-as-dependency dist"
   },
   "license": "ISC",
