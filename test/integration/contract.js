@@ -15,10 +15,8 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { describe, it, before } from 'mocha'
-import { Wallet, Contract } from '@aeternity/aepp-sdk'
-import * as utils from './utils'
-import * as R from 'ramda'
+import {describe, it, before} from 'mocha'
+import {configure, plan, ready} from './'
 
 const identityContract = `
 contract Identity =
@@ -28,43 +26,51 @@ contract Identity =
 
 const stateContract = `
 contract StateContract =
-  type state = { value: string }
+  record state = { value: string }
   public function init(value) : state = { value = value }
   public function retrieve() = state.value
 `
 
-const identityContractByteCode = '0x366000602037620000606200003460205180805180516004146200007b57505b80518051600414620000d857505b5060011951005b805903906000518059600081529081818162000056915b805081590391505090565b8352505060005250f35b8059039060008052f35b5990565b5080620001289080905090565b602001517f696e69740000000000000000000000000000000000000000000000000000000014620000ac576200001f565b50829150620000ba6200006a565b596000815290818181620000ce916200004b565b835250505b905090565b602001517f6d61696e000000000000000000000000000000000000000000000000000000001462000109576200002d565b6020015159506000516200006e90805180826200017291600091505090565b5960008152908181816200013d918091505090565b835250509050620000d3565b825180599081525060208401602084038393509350935050600082136200014957809250505090565b915050806000525959905090509056'
+const identityContractByteCode = '0x36600060203762000062620000366020518080805180516004146200007d57505b5080518051600414620000db57505b5060011951005b805903906000518059600081529081818162000058915b805081590391505090565b8352505060005250f35b8059039060008052f35b5990565b50806200012c9080905090565b602001517f696e69740000000000000000000000000000000000000000000000000000000014620000ae5762000020565b5050829150620000bd6200006c565b596000815290818181620000d1916200004d565b835250505b905090565b602001517f6d61696e00000000000000000000000000000000000000000000000000000000146200010c576200002f565b602001515159506000516200007090805180826200017691600091505090565b59600081529081818162000141918091505090565b835250509050620000d6565b825180599081525060208401602084038393509350935050600082136200014d57809250505090565b915050806000525959905090509056'
 
-describe('contract', function () {
-  utils.configure(this)
+plan(1000000000)
 
-  let client
+describe('Contract', function () {
+  configure(this)
+
   let contract
   let bytecode
   let deployed
 
   before(async function () {
-    client = await utils.client
-    contract = Contract.create(client, { wallet: Wallet.create(client, utils.sourceWallet) })
+    contract = await ready(this)
   })
 
   describe('precompiled bytecode', () => {
     it('can be invoked', async () => {
-      return contract.callStatic(identityContractByteCode, 'sophia')('main', { args: '42', conformFn: parseInt }).should.eventually.become(42)
+      const result = await contract.contractCallStatic(identityContractByteCode, 'sophia', 'main', {args: '42'})
+      return result.decode('int').should.eventually.become({
+        type: 'word',
+        value: 42
+      })
     })
 
     it('can be deployed', async () => {
-      return contract.deploy(identityContractByteCode, 'sophia')().should.eventually.have.property('address')
+      return contract.contractDeploy(identityContractByteCode, 'sophia').should.eventually.have.property('address')
     })
   })
 
   it('compiles Sophia code', async () => {
-    bytecode = await contract.compile(identityContract)
+    bytecode = await contract.contractCompile(identityContract)
     return bytecode.should.have.property('bytecode')
   })
 
   it('invokes function against compiled code', async () => {
-    return bytecode.call('main', { args: '42', conformFn: parseInt }).should.eventually.become(42)
+    const result = await bytecode.call('main', {args: '42'})
+    return result.decode('int').should.eventually.become({
+      type: 'word',
+      value: 42
+    })
   })
 
   it('deploys compiled contracts', async () => {
@@ -73,12 +79,23 @@ describe('contract', function () {
   })
 
   it('calls deployed contracts', async () => {
-    return deployed.call('main', { args: '42', conformFn: parseInt }).should.eventually.become(42)
+    const result = await deployed.call('main', {args: '42'})
+    return result.decode('int').should.eventually.become({
+      type: 'word',
+      value: 42
+    })
   })
 
-  // TODO datatype decoding
-  it.skip('initializes contract state', async () => {
+  it('initializes contract state', async () => {
     const data = `"Hello World!"`
-    return contract.compile(stateContract).then(bytecode => bytecode.deploy({ options: { initState: data } })).then(deployed => deployed.call('retrieve', '()')).catch(e => { console.log(e); throw e }).should.eventually.become('Hello World!')
+    return contract.contractCompile(stateContract)
+      .then(bytecode => bytecode.deploy({initState: data}))
+      .then(deployed => deployed.call('retrieve'))
+      .then(result => result.decode('string'))
+      .catch(e => { console.log(e); throw e })
+      .should.eventually.become({
+        type: 'string',
+        value: 'Hello World!'
+      })
   })
 })

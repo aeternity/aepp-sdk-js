@@ -15,10 +15,10 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+import '../'
 import { describe, it } from 'mocha'
 import { assert, expect } from 'chai'
-import * as Crypto from '../../src/utils/crypto'
-import * as utils from '../utils'
+import * as Crypto from '../../es/utils/crypto'
 
 // These keys are fixations for the encryption lifecycle tests and will
 // not be used for signing
@@ -50,7 +50,6 @@ describe('crypto', () => {
 
       it('works for private keys', () => {
         const privateBinary = keyPair.priv
-
         const encryptedPrivate = Crypto.encryptPrivateKey(password, privateBinary)
         const decryptedPrivate = Crypto.decryptPrivateKey(password, encryptedPrivate)
         assert.deepEqual(decryptedPrivate, privateBinary)
@@ -90,11 +89,11 @@ describe('crypto', () => {
 
   describe('personal messages', () => {
     const message = 'test'
-    const messageSignatureAsHex = '0d969f938571d1436106af659bc1893e7efeda685d7f096be39d0f2c68f712e4e9ba7551df31350a4a6d07943fbfc1cbe0acfe8271cd2dcdaac3274168e53901'
+    const messageSignatureAsHex = '2210ac69d9585387ecb097814d68cb71e9773e53d5f262211eadcf36a374f0728385940a3e90f961d6560e9f72698011ef238f6129a8082d3856bfbe80b5ff08'
     const messageSignature = Buffer.from(messageSignatureAsHex, 'hex')
 
     const messageNonASCII = 'tæst'
-    const messageNonASCIISignatureAsHex = '0aad557b424b33f4a2e415339d7ee143dea1f00c4a7c6c8680e1f70ff21e42b17e0e3729420daaed962999e089a18d099d39dc4a5ab4598d2b062106b59f1d01'
+    const messageNonASCIISignatureAsHex = '4f6fbe7f2e3bb920c0a3650c1aea9114c59c9e8080e77b59c937a64f0437c2ff198a5a5eb198211fcab957ddd4279739588fc1605728c767679cf25c0700b402'
     const messageNonASCIISignature = Buffer.from(messageNonASCIISignatureAsHex, 'hex')
 
     describe('sign', () => {
@@ -126,5 +125,13 @@ describe('crypto', () => {
     const hash = Crypto.hash('foobar')
     hash.should.be.a('UInt8Array')
     Buffer.from(hash).toString('hex').should.be.equal('93a0e84a8cdd4166267dbe1263e937f08087723ac24e7dcc35b3d5941775ef47')
+  })
+
+  it('salt produces random sequences every time', () => {
+    const salt1 = Crypto.salt()
+    const salt2 = Crypto.salt()
+    salt1.should.be.a('Number')
+    salt2.should.be.a('Number')
+    salt1.should.not.be.equal(salt2)
   })
 })

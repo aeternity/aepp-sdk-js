@@ -77,9 +77,9 @@ or, for development
 npm install aeternity/aepp-sdk-js#develop
 ```
 
-## [Examples]
+## [Usage]
 
-[Examples]: docs/examples.md
+[Usage]: docs/usage.md
 
 ## License
 

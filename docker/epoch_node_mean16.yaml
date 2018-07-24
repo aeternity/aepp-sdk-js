@@ -1,7 +1,5 @@
 ---
-peers:
-  - aenode://pp$28uQUgsPcsy7TQwnRxhF8GMKU4ykFLKsgf4TwDwPMNaSCXwWV8@node2:3015
-  - aenode://pp$Dxq41rJN33j26MLqryvh7AnhuZywefWKEPBiiYu2Da2vDWLBq@node3:3015
+peers: []
 
 http:
   external:
@@ -21,6 +19,7 @@ chain:
   persist: true
 
 mining:
+  beneficiary: "ak$25MZX3BXYP32YDPGWsJqYZ6CgWnqD93VdpCYaTk6KsThEbeFJX"
   autostart: true
   cuckoo:
     miner:
