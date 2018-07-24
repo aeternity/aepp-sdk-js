@@ -20,7 +20,7 @@ services:
     expose: [3013, 3113]
     environment:
       EPOCH_CONFIG: /home/epoch/epoch.yaml
-    command: -aecore expected_mine_rate ${EPOCH_MINE_RATE:-15000}
+    command: -aecore expected_mine_rate ${EPOCH_MINE_RATE:-5000}
     volumes:
       - ${PWD}/docker/epoch_node_mean16.yaml:/home/epoch/epoch.yaml
       - ${PWD}/docker/keys/node:/home/epoch/node/keys

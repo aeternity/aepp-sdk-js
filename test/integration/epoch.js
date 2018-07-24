@@ -36,16 +36,16 @@ describe('Epoch client', function () {
   })
 
   it('loads operations', async () => {
-    expect(client.methods).to.include.members(['postTx', 'getBlockByHeight'])
+    expect(client.methods).to.include.members(['postTx', 'getBlockLatest'])
   })
 
-  it('gets blocks by height for the first 10 blocks', () => {
-    expect(client.api.getBlockByHeight).to.be.a('function')
-    expect(client.api.getBlockByHeight.length).to.equal(2)
+  it('gets key blocks by height for the first 10 blocks', () => {
+    expect(client.api.getKeyBlockByHeight).to.be.a('function')
+    expect(client.api.getKeyBlockByHeight.length).to.equal(1)
 
     return Promise.all(
       R.map(async i => {
-        const result = await client.api.getBlockByHeight(i)
+        const result = await client.api.getKeyBlockByHeight(i)
         expect(result.height, i).to.equal(i)
       }, R.range(1, 11))
     )

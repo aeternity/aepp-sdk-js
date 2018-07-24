@@ -32,12 +32,19 @@ async function encodeCall (code, abi, name, args) {
   return (await this.api.encodeCalldata({ abi: abi, code, 'function': name, arg: args })).calldata
 }
 
-async function callStatic (code, abi, name, { args = '()', conformFn = R.identity } = {}) {
+async function callStatic (code, abi, name, { args = '()' } = {}) {
   const {out} = await this.api.callContract({ abi: abi, code, 'function': name, arg: args })
-  return conformFn(out)
+  return {
+    result: out,
+    decode: (type) => this.contractDecodeData(type, out)
+  }
 }
 
-async function call (code, abi, address, name, { args = '()', conformFn = R.identity, options = {} } = {}) {
+async function decode (type, data) {
+  return (await this.api.decodeData({data, 'sophia-type': type})).data
+}
+
+async function call (code, abi, address, name, { args = '()', options = {} } = {}) {
   const opt = R.merge(this.Ae.defaults, options)
 
   const tx = await this.contractCallTx(R.merge(opt, {
@@ -50,7 +57,10 @@ async function call (code, abi, address, name, { args = '()', conformFn = R.iden
   const result = await this.api.getContractCallFromTx(hash)
 
   if (result.returnType === 'ok') {
-    return conformFn(result.returnValue)
+    return {
+      result,
+      decode: (type) => this.contractDecodeData(type, result.returnValue)
+    }
   } else {
     const error = Buffer.from(result.returnValue.slice(2)).toString()
     throw Object.assign(Error(`Invocation failed: ${error}`), R.merge(result, { error }))
@@ -90,7 +100,8 @@ const Contract = Ae.compose({
     contractCallStatic: callStatic,
     contractDeploy: deploy,
     contractCall: call,
-    contractEncodeCall: encodeCall
+    contractEncodeCall: encodeCall,
+    contractDecodeData: decode
   },
   deepProps: {Ae: {defaults: {
     deposit: 4,
