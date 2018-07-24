@@ -62,10 +62,29 @@ based on its hash, you would invoke `client.api.getTx(query)`.
 
 In this way the SDK is simply a mapping of the raw API calls into Javascript. It's excellent for low-level control, and as a teaching tool to understand the node's operations. Most real-world requirements involves a series of chain operations, so the SDK provides abstractions for these. The Javscript Promises framework makes this somewhat easy:
 
-Example spend using the SDK abstraction (**high-level**):
 
+Example spend function, using the SDK, talking directly to the API (**purist**):
 ```js
-  // AE_SDK_MODULES could be a path or a webpack alias from webpack configuration
+  // Import necessary Modules
+  import Tx from '@aeternity/aepp-sdk/es/tx/epoch.js'
+  import Chain from '@aeternity/aepp-sdk/es/chain/epoch.js'
+  import Account from '@aeternity/aepp-sdk/es/account/memory.js'
+
+  async function spend (amount, receiver_pub_key) {
+
+    const tx = await Tx({url: 'HOST_URL_HERE'})
+    const chain = await Chain({url: 'HOST_URL_HERE'})
+    const account = Account({keypair: {priv: 'PRIV_KEY_HERE', pub: 'PUB_KEY_HERE'}})
+    const spendTx = await tx.spendTx({sender: 'PUB_KEY_HERE', receiver_pub_key, amount}))
+
+    const signed = await account.signTransaction(spendTx, 'PUB_KEY_HERE')
+    return chain.sendTransaction(signed, opt)
+
+  }
+```
+The same code, using the SDK abstraction (**high-level**):
+```js
+  // Import necessary Modules by simply importing the Wallet module
   import Wallet from '@aeternity/aepp-sdk/es/ae/wallet' // import from SDK es-modules
 
   Wallet({
@@ -75,30 +94,6 @@ Example spend using the SDK abstraction (**high-level**):
     onTx: confirm, // guard returning boolean
     onChain: confirm, // guard returning boolean
     onAccount: confirm // guard returning boolean
-  }).then(ae => ae.spend(parseInt(amount), receiver))
+  }).then(ae => ae.spend(parseInt(amount), receiver_pub_key))
 ```
-
-The same code, using the SDK, talking directly to the API (**purist**):
-
-```js
-
-  import Tx from '@aeternity/aepp-sdk/es/tx/epoch.js'
-  import Chain from '@aeternity/aepp-sdk/es/chain/epoch.js'
-  import Account from '@aeternity/aepp-sdk/es/account/memory.js'
-
-  async function spend (amount, recipient, options = {}) {
-    // options:
-    // { sender, recipient, amount, fee, ttl, nonce, payload }
-
-    const tx = await Tx({url: 'HOST_URL_HERE'})
-    const chain = await Chain({url: 'HOST_URL_HERE'})
-    const account = Account({keypair: {priv: 'PRIV_KEY_HERE', pub: 'PUB_KEY_HERE'}})
-    const spendTx = await tx.spendTx({sender: 'PUB_KEY_HERE', recipient, amount}))
-
-    const signed = await account.signTransaction(spendTx, 'PUB_KEY_HERE')
-    return chain.sendTransaction(signed, opt)
-
-  }
-```
-
 
