@@ -2,6 +2,24 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.18.0-0.1.0]
+### Added
+- Support for Epoch 0.18.0 (changed endpoints)
+- Wallet/Aepp RPC support
+- Contract call result decoding support
+- Per-module API documentation (Markdown based on JSDoc) 
+- More API documentation (still incomplete)
+
+### Removed
+- Support for < 0.18.0 (changed endpoints)
+
+### Changed
+- SDK entrypoint factories
+- Module load path (src -> es)
+
+### Fixed
+- Symmetric key encryption/decryption
+
 ## [0.15.0-0.1.0]
 ### Removed
 - Legacy Swagger file loading
@@ -57,4 +75,5 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 [0.13.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.10.0-0.1.0...v0.13.0-0.1.0
 [0.14.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.13.0-0.1.0...v0.14.0-0.1.0
 [0.15.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.14.0-0.1.0...v0.15.0-0.1.0
+[0.18.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.15.0-0.1.0...v0.18.0-0.1.0
 [GH-49]: https://github.com/aeternity/aepp-sdk-js/issues/49
