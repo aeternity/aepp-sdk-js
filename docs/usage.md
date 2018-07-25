@@ -3,12 +3,24 @@
 There are three different ways of incorporating aepp-sdk into your project, depending on the particular scenario:
 * Node.js bundle at `dist/aepp-sdk.js`
 * Browser bundle at `dist/aepp-sdk.browser.js`
-* ES Modules at `es/`
+* ES Modules at `es/` (recommended)
 
 Also, please be aware that using `require` instead of module loader syntax
 (`import`) means that the default export automatically becomes exposed as
 `default`, which is reflected below in the code examples. This is due to a
 recent change in [Babel] compilation and fully compliant with the standard.
+
+## Flavors
+
+The recommended approach to using aepp-sdk is to import one of the following _Ae
+Factories_ based on the specific use case:
+
+* [@aeternity/aepp-sdk/es/ae/aepp](api/ae/aepp.md): Web Aepp development
+* [@aeternity/aepp-sdk/es/ae/wallet](api/ae/wallet.md): Wallet development
+* [@aeternity/aepp-sdk/es/ae/cli](api/ae/cli.md): Command line tool development
+
+In order to cater to more specific needs, it is recommended to refer to the
+[hacking documentation](hacking.md).
 
 ## ES Modules
 
@@ -25,9 +37,9 @@ that understands ESM. In order to make sure the modules are loaded directly, use
 the following syntax to load parts of aepp-sdk:
 
 ```js
-import Ae from '@aeternity/aepp-sdk/es/client'
+import Aepp from '@aeternity/aepp-sdk/es/ae/aepp'
 
-Ae.create('https://sdk-testnet.aepps.com').then(client => {
+Aepp({url: 'https://sdk-testnet.aepps.com'}).then(client => {
   client.height().then(height => {
     console.log('Current Block', height)
   })
@@ -37,7 +49,6 @@ Ae.create('https://sdk-testnet.aepps.com').then(client => {
 [webpack]: https://webpack.js.org/
 [Babel]: https://babeljs.io/
 [Tree shaking]: https://webpack.js.org/guides/tree-shaking/
-
 
 ## Browser bundle
 
@@ -58,8 +69,8 @@ The bundle will assign the SDK to a global `var` called `Ae`.
 <body>
   <script src="aepp-sdk.browser.js"></script>
   <script type="text/javascript">
-    Ae.default.create('https://sdk-testnet.aepps.com').then(client => {
-      client.height().then(height => {
+    Ae.Aepp.default({url: 'https://sdk-testnet.aepps.com'}).then(ae => {
+      ae.height().then(height => {
         console.log('Current Block', height)
       })
     })
@@ -74,10 +85,10 @@ The bundle is wrapped in UMD format, which is understood by webpack and
 automatically used if no `/src` suffix is given.
 
 ```js
-import Ae, { Wallet } from '@aeternity/aepp-sdk'
+import Aepp from '@aeternity/aepp-sdk/es/ae/aepp'
 
-Ae.create('https://sdk-testnet.aepps.com').then(client => {
-  client.height().then(height => {
+Aepp({url: 'https://sdk-testnet.aepps.com'}).then(ae => {
+  ae.height().then(height => {
     console.log('Current Block', height)
   })
 })
@@ -89,17 +100,17 @@ The Node.js bundle is primarily interesting for scripts which use non-transpiled
 code, such as the ones provided in the `bin/` directory of the project.
 
 ```js
-const { default: Ae } = require('@aeternity/aepp-sdk')
+const {Cli: Ae} = require('@aeternity/aepp-sdk')
 
-Ae.create('https://sdk-testnet.aepps.com').then(client => {
-  client.height().then(height => {
+Ae({url: 'https://sdk-testnet.aepps.com'}).then(ae => {
+  ae.height().then(height => {
     console.log('Current Block', height)
   })
 })
 
 // same with async
 const main = async () => {
-  const client = await Ae.create('https://sdk-testnet.aepps.com')
+  const client = await Ae({url: 'https://sdk-testnet.aepps.com'})
   const height = await client.height()
   console.log('Current Block', height)
 }
@@ -122,8 +133,9 @@ yarn add @aeternity/aepp-sdk
 # src/components/HelloWorld.vue
 
 <script>
-import Ae from '@aeternity/aepp-sdk'
-const ae = Ae.create('https://sdk-testnet.aepps.com')
+import Aepp from '@aeternity/aepp-sdk/es/ae/aepp'
+const ae = Aepp({url: 'https://sdk-testnet.aepps.com'})
+
 export default {
   name: 'HelloWorld',
   data () {
@@ -141,4 +153,3 @@ export default {
 ```
 
 [Vue.js]: https://vuejs.org/
-
