@@ -15,8 +15,6 @@ pipeline {
       steps {
         sh 'ln -sf /node_modules ./'
         sh 'npm run build'
-        sh 'npm run docs:docco'
-        sh 'npm run docs:api'
       }
     }
 
@@ -36,7 +34,6 @@ pipeline {
     always {
       junit 'test-results.xml'
       archive 'dist/*'
-      archive 'docs/**'
       sh 'docker-compose -H localhost:2376 down -v ||:'
     }
   }
