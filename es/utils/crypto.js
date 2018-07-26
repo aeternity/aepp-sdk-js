@@ -366,9 +366,10 @@ function readOffChainTXUpdates (buf) {
 
   for (let i = 0; i < buf.length; i++) {
     updates.push([
-      'ak$' + encodeBase58Check(buf[i][0]),
+      readInt(buf[i][0]),
       'ak$' + encodeBase58Check(buf[i][1]),
-      readInt(buf[i][2])
+      'ak$' + encodeBase58Check(buf[i][2]),
+      readInt(buf[i][3])
     ])
   }
 
@@ -420,14 +421,9 @@ export function deserialize (binary) {
     case OBJECT_TAGS.CHANNEL_OFFCHAIN_TX:
       return Object.assign(obj, {
         channelId: encodeBase58Check(binary[2]),
-        previousRound: readInt(binary[3]),
-        round: readInt(binary[4]),
-        initiator: 'ak$' + encodeBase58Check(binary[5]),
-        responder: 'ak$' + encodeBase58Check(binary[6]),
-        initiatorAmount: readInt(binary[7]),
-        responderAmount: readInt(binary[8]),
-        updates: readOffChainTXUpdates(binary[9]),
-        state: encodeBase58Check(binary[10])
+        round: readInt(binary[3]),
+        updates: readOffChainTXUpdates(binary[4]),
+        state: encodeBase58Check(binary[5])
       })
   }
 }
