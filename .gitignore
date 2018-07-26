@@ -11,3 +11,4 @@ node_modules
 /docs/api.md
 /docs/api/*
 /docs/toc.md
+/docs/bin

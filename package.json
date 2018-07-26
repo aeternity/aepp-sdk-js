@@ -9,7 +9,7 @@
   "scripts": {
     "build": "webpack -p",
     "build:dev": "webpack --mode=development",
-    "docs:docco": "docco -l linear bin/*",
+    "docs:docco": "docco -t tooling/docs/markdown.jst -c /dev/null bin/* && rm -f docs/null && rename .html .md docs/bin/*.html",
     "docs:api": "node apidoc.js",
     "test": "mocha --recursive --require @babel/register",
     "test:watch": "mocha --recursive --require @babel/register --watch",

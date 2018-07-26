@@ -207,3 +207,7 @@ The same code, using the SDK abstraction (**high-level**):
     onAccount: confirm // guard returning boolean
   }).then(ae => ae.spend(parseInt(amount), receiver_pub_key))
 ```
+
+## [CLI Examples]
+
+[CLI Examples]: bin/
