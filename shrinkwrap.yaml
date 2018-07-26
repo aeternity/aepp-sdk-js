@@ -33,6 +33,14 @@ devDependencies:
   docco: 0.8.0
   esdoc: 1.1.0
   esdoc-standard-plugin: 1.0.0
+  eslint-config-standard: 11.0.0
+  eslint-config-standard-jsx: 5.0.0
+  eslint-import-resolver-node: 0.3.2
+  eslint-plugin-import: 2.13.0
+  eslint-plugin-node: 7.0.1
+  eslint-plugin-promise: 3.8.0
+  eslint-plugin-react: 7.10.0
+  eslint-plugin-standard: 3.1.0
   jsdoc-to-markdown: 4.0.1
   mocha: 5.2.0
   mocha-junit-reporter: 1.17.0
@@ -3456,6 +3464,13 @@ packages:
     hasBin: true
     resolution:
       integrity: sha512-vsUcp52XJkOWg9m1vDYplGZN2iDzvmjDL5M/Mp8qkoDG3p2s0yIQCIjKR5wfPBaM3eV14a6zhQNYiNTCVzPnxA==
+  /eslint-config-standard-jsx/5.0.0:
+    dev: true
+    peerDependencies:
+      eslint: '>=4.18.0'
+      eslint-plugin-react: '>=7.6.1'
+    resolution:
+      integrity: sha512-rLToPAEqLMPBfWnYTu6xRhm2OWziS2n40QFqJ8jAM8NSVzeVKTa3nclhsU4DpPJQRY60F34Oo1wi/71PN/eITg==
   /eslint-config-standard-jsx/5.0.0/a29ea137ae2ee20fc7ae4a36ca6e0955:
     dependencies:
       eslint: 4.18.2
@@ -3467,6 +3482,16 @@ packages:
       eslint-plugin-react: '>=7.6.1'
     resolution:
       integrity: sha512-rLToPAEqLMPBfWnYTu6xRhm2OWziS2n40QFqJ8jAM8NSVzeVKTa3nclhsU4DpPJQRY60F34Oo1wi/71PN/eITg==
+  /eslint-config-standard/11.0.0:
+    dev: true
+    peerDependencies:
+      eslint: '>=4.18.0'
+      eslint-plugin-import: '>=2.8.0'
+      eslint-plugin-node: '>=5.2.1'
+      eslint-plugin-promise: '>=3.6.0'
+      eslint-plugin-standard: '>=3.0.1'
+    resolution:
+      integrity: sha512-oDdENzpViEe5fwuRCWla7AXQd++/oyIp8zP+iP9jiUPG6NBj3SHgdgtl/kTn00AjeN+1HNvavTKmYbMo+xMOlw==
   /eslint-config-standard/11.0.0/c2d7c70aafbe4f1fc6da77aaebc0d43a:
     dependencies:
       eslint: 4.18.2
@@ -3500,6 +3525,36 @@ packages:
       node: '>=4'
     resolution:
       integrity: sha1-snA2LNiLGkitMIl2zn+lTphBF0Y=
+  /eslint-plugin-es/1.3.1:
+    dependencies:
+      eslint-utils: 1.3.1
+      regexpp: 2.0.0
+    dev: true
+    engines:
+      node: '>=6.5.0'
+    peerDependencies:
+      eslint: '>=4.19.1'
+    resolution:
+      integrity: sha512-9XcVyZiQRVeFjqHw8qHNDAZcQLqaHlOGGpeYqzYh8S4JYCWTCO3yzyen8yVmA5PratfzTRWDwCOFphtDEG+w/w==
+  /eslint-plugin-import/2.13.0:
+    dependencies:
+      contains-path: 0.1.0
+      debug: 2.6.9
+      doctrine: 1.5.0
+      eslint-import-resolver-node: 0.3.2
+      eslint-module-utils: 2.2.0
+      has: 1.0.3
+      lodash: 4.17.10
+      minimatch: 3.0.4
+      read-pkg-up: 2.0.0
+      resolve: 1.8.1
+    dev: true
+    engines:
+      node: '>=4'
+    peerDependencies:
+      eslint: 2.x - 5.x
+    resolution:
+      integrity: sha512-t6hGKQDMIt9N8R7vLepsYXgDfeuhp6ZJSgtrLEDxonpSubyxUZHjhm6LsAaZX8q6GYVxkbT3kTsV9G5mBCFR6A==
   /eslint-plugin-import/2.9.0/eslint@4.18.2:
     dependencies:
       builtin-modules: 1.1.1
@@ -3536,12 +3591,46 @@ packages:
       eslint: '>=3.1.0'
     resolution:
       integrity: sha512-Q/Cc2sW1OAISDS+Ji6lZS2KV4b7ueA/WydVWd1BECTQwVvfQy5JAi3glhINoKzoMnfnuRgNP+ZWKrGAbp3QDxw==
+  /eslint-plugin-node/7.0.1:
+    dependencies:
+      eslint-plugin-es: 1.3.1
+      eslint-utils: 1.3.1
+      ignore: 4.0.2
+      minimatch: 3.0.4
+      resolve: 1.8.1
+      semver: 5.5.0
+    dev: true
+    engines:
+      node: '>=6'
+    peerDependencies:
+      eslint: '>=4.19.1'
+    resolution:
+      integrity: sha512-lfVw3TEqThwq0j2Ba/Ckn2ABdwmL5dkOgAux1rvOk6CO7A6yGyPI2+zIxN6FyNkp1X1X/BSvKOceD6mBWSj4Yw==
   /eslint-plugin-promise/3.7.0:
     dev: true
     engines:
       node: '>=4'
     resolution:
       integrity: sha512-2WO+ZFh7vxUKRfR0cOIMrWgYKdR6S1AlOezw6pC52B6oYpd5WFghN+QHxvrRdZMtbo8h3dfUZ2o1rWb0UPbKtg==
+  /eslint-plugin-promise/3.8.0:
+    dev: true
+    engines:
+      node: '>=4'
+    resolution:
+      integrity: sha512-JiFL9UFR15NKpHyGii1ZcvmtIqa3UTwiDAGb8atSffe43qJ3+1czVGN6UtkklpcJ2DVnqvTMzEKRaJdBkAL2aQ==
+  /eslint-plugin-react/7.10.0:
+    dependencies:
+      doctrine: 2.1.0
+      has: 1.0.3
+      jsx-ast-utils: 2.0.1
+      prop-types: 15.6.2
+    dev: true
+    engines:
+      node: '>=4'
+    peerDependencies:
+      eslint: ^3.0.0 || ^4.0.0 || ^5.0.0
+    resolution:
+      integrity: sha512-18rzWn4AtbSUxFKKM7aCVcj5LXOhOKdwBino3KKWy4psxfPW0YtIbE8WNRDUdyHFL50BeLb6qFd4vpvNYyp7hw==
   /eslint-plugin-react/7.7.0/eslint@4.18.2:
     dependencies:
       doctrine: 2.1.0
@@ -3566,6 +3655,12 @@ packages:
       eslint: '>=3.19.0'
     resolution:
       integrity: sha1-NNDJFbRe3G8BA5PH7vOCOwhWXPI=
+  /eslint-plugin-standard/3.1.0:
+    dev: true
+    peerDependencies:
+      eslint: '>=3.19.0'
+    resolution:
+      integrity: sha512-fVcdyuKRr0EZ4fjWl3c+gp1BANFJD1+RaWa2UPYfMZ6jCtp5RG00kSaXnK/dE5sYzt4kaWJ9qdxqUfc0d9kX0w==
   /eslint-scope/3.7.3:
     dependencies:
       esrecurse: 4.2.1
@@ -3584,6 +3679,12 @@ packages:
       node: '>=4.0.0'
     resolution:
       integrity: sha512-1G6UTDi7Jc1ELFwnR58HV4fK9OQK4S6N985f166xqXxpjU6plxFISJa2Ba9KCQuFa8RCnj/lSFJbHo7UFDBnUA==
+  /eslint-utils/1.3.1:
+    dev: true
+    engines:
+      node: '>=6'
+    resolution:
+      integrity: sha512-Z7YjnIldX+2XMcjr7ZkgEsOj/bREONV60qYeB/bjMAqqqZ4zxKyWX+BOUkdmRmA9riiIPVvo5x86m5elviOk0Q==
   /eslint-visitor-keys/1.0.0:
     dev: true
     engines:
@@ -4625,6 +4726,12 @@ packages:
     dev: true
     resolution:
       integrity: sha512-Pgs951kaMm5GXP7MOvxERINe3gsaVjUWFm+UZPSq9xYriQAksyhg0csnS0KXSNRD5NmNdapXEpjxG49+AKh/ug==
+  /ignore/4.0.2:
+    dev: true
+    engines:
+      node: '>= 4'
+    resolution:
+      integrity: sha512-uoxnT7PYpyEnsja+yX+7v49B7LXxmzDJ2JALqHH3oEGzpM2U1IGcbfnOr8Dt57z3B/UWs7/iAgPFbmye8m4I0g==
   /import-local/1.0.0:
     dependencies:
       pkg-dir: 2.0.0
@@ -7071,6 +7178,12 @@ packages:
       node: '>=0.10.0'
     resolution:
       integrity: sha512-J6SDjUgDxQj5NusnOtdFxDwN/+HWykR8GELwctJ7mdqhcyy1xEc4SRFHUXvxTp661YaVKAjfRLZ9cCqS6tn32A==
+  /regexpp/2.0.0:
+    dev: true
+    engines:
+      node: '>=6.5.0'
+    resolution:
+      integrity: sha512-g2FAVtR8Uh8GO1Nv5wpxW7VFVwHcCEr4wyA8/MHiRkO8uHoR5ntAA8Uq3P1vvMTX/BeQiRVSpDGLd+Wn5HNOTA==
   /regexpu-core/2.0.0:
     dependencies:
       regenerate: 1.4.0
@@ -8893,6 +9006,14 @@ specifiers:
   docco: ^0.8.0
   esdoc: ^1.1.0
   esdoc-standard-plugin: ^1.0.0
+  eslint-config-standard: ^11.0.0
+  eslint-config-standard-jsx: ^5.0.0
+  eslint-import-resolver-node: ^0.3.2
+  eslint-plugin-import: ^2.13.0
+  eslint-plugin-node: ^7.0.1
+  eslint-plugin-promise: ^3.8.0
+  eslint-plugin-react: ^7.10.0
+  eslint-plugin-standard: ^3.1.0
   jsdoc-to-markdown: ^4.0.1
   mocha: ^5.0.0
   mocha-junit-reporter: ^1.17.0
