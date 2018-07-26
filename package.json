@@ -18,6 +18,12 @@
     "postinstall": "postinstall-build --only-as-dependency dist"
   },
   "license": "ISC",
+  "keywords": [
+    "API",
+    "aeternity",
+    "blockchain",
+    "SDK"
+  ],
   "dependencies": {
     "@babel/runtime": "^7.0.0-beta.46",
     "@stamp/it": "^1.0.3",

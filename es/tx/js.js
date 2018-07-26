@@ -15,6 +15,13 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+/**
+ * Js Tx module
+ * @module @aeternity/aepp-sdk/es/tx/js
+ * @export JsTx
+ * @example import JsTx from '@aeternity/aepp-sdk/es/tx/js'
+ */
+
 import stampit from '@stamp/it'
 import {encodeBase58Check, hash, salt} from '../utils/crypto'
 
@@ -42,6 +49,18 @@ async function commitmentHash (name, salt = createSalt()) {
   return `cm$${encodeBase58Check(hash(Buffer.concat([hash(name), formatSalt(salt)])))}`
 }
 
+/**
+ * JavaScript-based Tx Stamp
+ *
+ * This incomplete implementation of {@link module:@aeternity/aepp-sdk/es/tx--Tx}
+ * will eventually provide native code to produce transactions from scratch.
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/tx/js
+ * @rtype Stamp
+ * @param {Object} [options={}] - Initializer object
+ * @return {Object} Tx instance
+ * @example JsTx()
+ */
 const JsTx = stampit({methods: {commitmentHash}})
 
 export default JsTx

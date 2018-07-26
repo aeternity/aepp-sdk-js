@@ -68,4 +68,4 @@ const output = jsdoc2md.renderSync({
   partial: ['tooling/docs/toc.hbs']
 })
 
-fs.writeFileSync(path.resolve(outputDir, 'toc.md'), output)
+fs.writeFileSync(path.resolve(outputDir, 'api.md'), output)

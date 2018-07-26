@@ -15,24 +15,68 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+/**
+ * Ae module
+ * @module @aeternity/aepp-sdk/es/ae
+ * @export Ae
+ * @example import Ae from '@aeternity/aepp-sdk/es/ae'
+ */
+
 import stampit from '@stamp/it'
 import Tx from '../tx'
 import Chain from '../chain'
 import Account from '../account'
 import * as R from 'ramda'
 
+/**
+ * Sign and post a transaction to the chain
+ * @instance
+ * @category async
+ * @rtype (tx: String, options: Object) => Promise[String]
+ * @param {String} tx - Transaction
+ * @param {Object} options - Options
+ * @return {String|String} Transaction or transaction hash
+ */
 async function send (tx, options) {
   const opt = R.merge(this.Ae.defaults, options)
   const signed = await this.signTransaction(tx, await this.address())
   return this.sendTransaction(signed, opt)
 }
 
+/**
+ * Send tokens to recipient
+ * @instance
+ * @category async
+ * @rtype (amount: Number, recipient: String, options?: Object) => Promise[String]
+ * @param {String} tx - Transaction
+ * @param {Object} options - Options
+ * @return {String|String} Transaction or transaction hash
+ */
 async function spend (amount, recipient, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   const spendTx = await this.spendTx(R.merge(opt, {sender: await this.address(), recipient, amount}))
   return this.send(spendTx, opt)
 }
 
+/**
+ * Basic Account Stamp
+ *
+ * Attempting to create instances from the Stamp without overwriting all
+ * abstract methods using composition will result in an exception.
+ *
+ * Ae objects are the composition of three basic building blocks:
+ * * {@link module:@aeternity/aepp-sdk/es/tx--Tx}
+ * * {@link module:@aeternity/aepp-sdk/es/account--Account}
+ * * {@link module:@aeternity/aepp-sdk/es/chain--Chain}
+ * Only by providing the joint functionality of those three, most more advanced
+ * operations, i.e. the ones with actual use value on the chain, become
+ * available.
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae
+ * @rtype Stamp
+ * @param {Object} [options={}] - Initializer object
+ * @return {Object} Ae instance
+ */
 const Ae = stampit(Tx, Account, Chain, {
   methods: {send, spend},
   deepProperties: {Ae: {defaults: {

@@ -28,17 +28,52 @@ check out the [develop branch].
 
 [develop branch]: https://github.com/aeternity/aepp-sdk-js/tree/develop
 
-## [Change Log]
-
-[Change Log]: CHANGELOG.md
-
 ## [Usage]
+
+1. Add the latest `@aeternity/aepp-sdk` release from npmjs.com to your project
+
+```
+pnpm i @aeternity/aepp-sdk
+npm i @aeternity/aepp-sdk
+yarn add @aeternity/aepp-sdk
+```
+
+2. Import the right flavor
+
+```js
+import Aepp from '@aeternity/aepp-sdk/es/ae/aepp'
+```
+
+3. Create an instance
+
+```js
+const ae = Aepp()
+```
+
+4. Start interacting with the blockchain
+
+```js
+ae.then(ae => ae.height()).then(h => console.log(h))
+```
+
+5. Go check out the [Usage] documentation!
 
 [Usage]: docs/usage.md
 
 ## [Hacking]
 
+For advanced use, development versions and to get a deeper understanding of the
+SDK, it is advised to read the [Hacking] documentation.
+
 [Hacking]: docs/hacking.md
+
+## [API]
+
+[API]: docs/api.md
+
+## [Change Log]
+
+[Change Log]: CHANGELOG.md
 
 ## License
 

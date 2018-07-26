@@ -15,6 +15,13 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+/**
+ * Accounts module
+ * @module @aeternity/aepp-sdk/es/ae/wallet
+ * @export Wallet
+ * @example import Wallet from '@aeternity/aepp-sdk/es/ae/wallet'
+ */
+
 import Ae from './'
 import Account from '../account'
 import Accounts from '../accounts'
@@ -35,6 +42,13 @@ const handlers = [
   {pred: isAccountMethod, handler: 'onAccount', error: 'Account operation [{}] rejected'}
 ]
 
+/**
+ * Confirm client connection attempt and associate new session with currently
+ * selected account preset
+ * @instance
+ * @category async
+ * @return {Promise<String>} Session ID
+ */
 async function hello () {
   const id = this.createSession()
   Object.assign(this.rpcSessions[id], {address: await this.address()})
@@ -84,6 +98,28 @@ async function rpcAddress ({params, session}) {
   }
 }
 
+/**
+ * Wallet Stamp
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/wallet
+ * @rtype Stamp
+ * @param {Object} [options={}] - Initializer object
+ * @param {String} options.url - Epoch instance to connect to
+ * @param {Account[]} [options.accounts] - Accounts to initialize with
+ * @param {String} [options.account] - Public key of account to preselect
+ * @param {Function} [options.onTx] - Tx method protector function
+ * @param {Function} [options.onChain] - Chain method protector function
+ * @param {Function} [options.onAccount] - Account method protector function
+ * @return {Object} Wallet instance
+ * @example Wallet({
+  url: 'https://sdk-testnet.aepps.com/',
+  accounts: [MemoryAccount({keypair})],
+  address: keypair.pub,
+  onTx: confirm,
+  onChain: confirm,
+  onAccount: confirm
+})
+ */
 const Wallet = Ae.compose(Accounts, Chain, Tx, JsTx, Rpc, Selector, {
   init ({onTx = this.onTx, onChain = this.onChain, onAccount = this.onAccount}, {stamp}) {
     this.onTx = onTx
