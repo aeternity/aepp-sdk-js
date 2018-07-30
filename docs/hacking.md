@@ -70,45 +70,10 @@ points defined in `package.json`.
 
 ## Installation
 
-In order to add aepp-sdk to your project, use pnpm, [Yarn] or NPM to either
-include a released version from the NPM package repositories, or directly from
-GitHub. The latter is especially interesting if you'd like to stay up to date
-with recent developments.
+In order to add a local development version of aepp-sdk to a project, `npm link`[1] can be used.
 
-[Yarn]: https://yarnpkg.com/
+[1]: https://docs.npmjs.com/cli/link
 
-### pnpm
+## [Releases]
 
-```
-pnpm install @aeternity/aepp-sdk
-```
-
-or, for development
-
-```
-pnpm install aeternity/aepp-sdk-js#develop
-```
-
-### Yarn
-
-```
-yarn add @aeternity/aepp-sdk
-```
-
-or, for development
-
-```
-yarn add aeternity/aepp-sdk-js#develop
-```
-
-### NPM
-
-```
-npm install @aeternity/aepp-sdk
-```
-
-or, for development
-
-```
-npm install aeternity/aepp-sdk-js#develop
-```
+[Releases]: releases.md
