@@ -38,6 +38,10 @@ npm i @aeternity/aepp-sdk
 yarn add @aeternity/aepp-sdk
 ```
 
+> Hint: You can also add a development version from GitHub by dropping the `@` and
+> adding `#` and a branch name at the end, for example
+> `pnpm i aeternity/aepp-sdk#develop`.
+
 2. Import the right flavor
 
 ```js
