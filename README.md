@@ -15,6 +15,10 @@ JavaScript SDK for the revolutionary [æternity] blockchain, targeting the
 
 aepp-sdk is [hosted on GitHub].
 
+![Concept Drawing of aepp-sdk][concept]
+
+[concept]: concept.png "Concept Drawing of aepp-sdk"
+
 [æternity]: https://aeternity.com/
 [Epoch]: https://github.com/aeternity/epoch
 [hosted on GitHub]: https://github.com/aeternity/aepp-sdk-js
