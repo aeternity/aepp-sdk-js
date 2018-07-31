@@ -2,12 +2,14 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
-## [Unreleased]
+## [0.18.0-0.1.1]
 ### Added
 - Lots of new documentation (prose and API)
 - Fancy badges to README
 - Transitive dev dependencies for standard-loader not covered by pnpm
 - CI Dockerfile to include pnpm
+- Fancy-shmancy diagram in README
+- Generated documentation files since they are linked in static docs
 
 ### Changed
 - Switch from Yarn to pnpm for building
@@ -89,5 +91,5 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 [0.14.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.13.0-0.1.0...v0.14.0-0.1.0
 [0.15.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.14.0-0.1.0...v0.15.0-0.1.0
 [0.18.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.15.0-0.1.0...v0.18.0-0.1.0
-[Unreleased]: https://github.com/aeternity/aepp-sdk-js/compare/v0.18.0-0.1.0...develop
+[0.18.0-0.1.1]: https://github.com/aeternity/aepp-sdk-js/compare/v0.18.0-0.1.0...v0.18.0-0.1.1
 [GH-49]: https://github.com/aeternity/aepp-sdk-js/issues/49
