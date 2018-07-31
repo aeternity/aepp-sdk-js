@@ -45,12 +45,15 @@ async function signTransaction (tx) {
  *
  * Attempting to create instances from the Stamp without overwriting all
  * abstract methods using composition will result in an exception.
+ *
+ * Account is one of the three basic building blocks of an
+ * {@link module:@aeternity/aepp-sdk/es/ae--Ae} client and provides access to a
+ * signing key pair.
  * @function
  * @alias module:@aeternity/aepp-sdk/es/account
  * @rtype Stamp
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Account instance
- * @example Account()
  */
 const Account = stampit({
   methods: {signTransaction},

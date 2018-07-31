@@ -14,7 +14,7 @@ pipeline {
     stage('Build') {
       steps {
         sh 'ln -sf /node_modules ./'
-        sh 'yarn build'
+        sh 'npm run build'
       }
     }
 
@@ -24,7 +24,7 @@ pipeline {
                                           usernameVariable: 'WALLET_PUB',
                                           passwordVariable: 'WALLET_PRIV')]) {
           sh 'docker-compose -H localhost:2376 build'
-          sh 'docker-compose -H localhost:2376 run sdk yarn test-jenkins'
+          sh 'docker-compose -H localhost:2376 run sdk npm run test-jenkins'
         }
       }
     }

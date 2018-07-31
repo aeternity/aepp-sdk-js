@@ -15,6 +15,13 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+/**
+ * Epoch Tx module
+ * @module @aeternity/aepp-sdk/es/tx/epoch
+ * @export EpochTx
+ * @example import EpochTx from '@aeternity/aepp-sdk/es/tx/epoch'
+ */
+
 import Tx from './'
 import Epoch from '../epoch'
 import * as R from 'ramda'
@@ -58,6 +65,21 @@ async function commitmentHash (name, salt = createSalt()) {
   return (await this.api.getCommitmentHash(name, salt)).commitment
 }
 
+/**
+ * Epoch-based Tx Stamp
+ *
+ * This implementation of {@link module:@aeternity/aepp-sdk/es/tx--Tx} relays
+ * the creation of transactions to {@link module:@aeternity/aepp-sdk/es/epoch--Epoch}.
+ * As there is no built-in security between Epoch and client communication, it
+ * must never be used for production but can be very useful to verify other
+ * implementations.
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/tx/epoch
+ * @rtype Stamp
+ * @param {Object} [options={}] - Initializer object
+ * @return {Object} Tx instance
+ * @example EpochTx({url: 'https://sdk-testnet.aepps.com/'})
+ */
 const EpochTx = Epoch.compose(Tx, {
   methods: {
     spendTx,

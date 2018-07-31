@@ -15,6 +15,13 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+/**
+ * RPC client module
+ * @module @aeternity/aepp-sdk/es/rpc/client
+ * @export RpcClient
+ * @example import RpcClient from '@aeternity/aepp-sdk/es/rpc/client'
+ */
+
 import stampit from '@stamp/it'
 import AsyncInit from '../utils/async-init'
 import * as R from 'ramda'
@@ -25,6 +32,17 @@ function post (method) {
   }
 }
 
+/**
+ * RPC client Stamp
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/rpc/client
+ * @rtype Stamp
+ * @param {Object} [options={}] - Initializer object
+ * @param {Object} [options.parent=window.parent] - IFrame parent window
+ * @param {Object} [options.self=window] - IFrame window
+ * @return {Object} RPC client
+ * @example RpcClient()
+ */
 const RpcClient = stampit(AsyncInit, {
   async init ({parent = window.parent, self = window}, {stamp}) {
     let sequence = 0

@@ -28,7 +28,12 @@ import {required} from '@stamp/required'
 /**
  * Basic Tx Stamp
  *
- * Attempting to create instances from the Stamp without overwriting all abstract methods using composition will result in an exception.
+ * Attempting to create instances from the Stamp without overwriting all
+ * abstract methods using composition will result in an exception.
+ *
+ * Tx is one of the three basic building blocks of an
+ * {@link module:@aeternity/aepp-sdk/es/ae--Ae} client and provides methods to
+ * create aeternity transactions.
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx
  * @rtype Stamp

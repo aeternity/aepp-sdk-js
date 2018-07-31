@@ -15,6 +15,13 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+/**
+ * Memory Account module
+ * @module @aeternity/aepp-sdk/es/account/memory
+ * @export MemoryAccount
+ * @example import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
+ */
+
 import Account from './'
 import * as Crypto from '../utils/crypto'
 
@@ -28,6 +35,16 @@ async function address () {
   return Promise.resolve(secrets.get(this).pub)
 }
 
+/**
+ * Select specific account
+ * @instance
+ * @rtype (keypair: {pub: String, priv: String}) => Void
+ * @param {Object} keypair - Key pair to use
+ * @param {String} keypair.pub - Public key
+ * @param {String} keypair.priv - Private key
+ * @return {Void}
+ * @example setKeypair(keypair)
+ */
 function setKeypair (keypair) {
   secrets.set(this, {
     priv: Buffer.from(keypair.priv, 'hex'),
@@ -38,10 +55,12 @@ function setKeypair (keypair) {
 /**
  * In-memory `Account` factory
  * @function
+ * @alias module:@aeternity/aepp-sdk/es/account/memory
  * @rtype Stamp
- * @param {Object} keypair - Key pair to use
- * @param {String} keypair.pub - Public key
- * @param {String} keypair.priv - Private key
+ * @param {Object} [options={}] - Initializer object
+ * @param {Object} options.keypair - Key pair to use
+ * @param {String} options.keypair.pub - Public key
+ * @param {String} options.keypair.priv - Private key
  * @return {Account}
  */
 const MemoryAccount = Account.compose({

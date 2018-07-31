@@ -16,11 +16,14 @@
  */
 
 /**
- * Module containing routines to interact with the æternity naming system.
+ * Aens module - routines to interact with the æternity naming system
  *
  * The high-level description of the naming system is
- * https://github.com/aeternity/protocol/blob/master/AENS.md in the
- * protocol repository.
+ * https://github.com/aeternity/protocol/blob/master/AENS.md in the protocol
+ * repository.
+ * @module @aeternity/aepp-sdk/es/ae/aens
+ * @export Aens
+ * @example import Aens from '@aeternity/aepp-sdk/es/ae/aens'
  */
 
 import * as R from 'ramda'
@@ -28,10 +31,13 @@ import {encodeBase58Check, salt} from '../utils/crypto'
 import Ae from './'
 
 /**
- * Transfer a domain to another account.
- * @param account
- * @param options
- * @return {Object}
+ * Transfer a domain to another account
+ * @instance
+ * @category async
+ * @param {String} nameHash
+ * @param {String} account
+ * @param {Object} [options={}]
+ * @return {Promise<Object>}
  */
 async function transfer (nameHash, account, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
@@ -153,6 +159,17 @@ async function preclaim (name, options = {}) {
   })
 }
 
+/**
+ * Aens Stamp
+ *
+ * Aens provides name-system related methods atop
+ * {@link module:@aeternity/aepp-sdk/es/ae--Ae} clients.
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/aens
+ * @rtype Stamp
+ * @param {Object} [options={}] - Initializer object
+ * @return {Object} Aens instance
+ */
 const Aens = Ae.compose({
   methods: {
     aensQuery: query,

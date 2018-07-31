@@ -18,7 +18,7 @@
 /**
  * Accounts Selector module
  *
- * This is the complement to {@link @aeternity/aepp-sdk/es/accounts}.
+ * This is the complement to {@link module:@aeternity/aepp-sdk/es/accounts}.
  * @module @aeternity/aepp-sdk/es/account/selector
  * @export Account
  * @example import Selector from '@aeternity/aepp-sdk/es/account/selector'
@@ -35,6 +35,13 @@ async function address () {
   return Promise.resolve(this.Selector.address)
 }
 
+/**
+ * Select specific account
+ * @instance
+ * @rtype (address: String) => Void
+ * @param {String} address - Address of account to select
+ * @example selectAccount('ak$xxxxxxxx')
+ */
 async function selectAccount (address) {
   this.Selector.address = address
 }
