@@ -1,9 +1,3 @@
----
-layout: page
-title: JavaScript SDK
-navigation: 5
----
-
 # aepp-sdk
 
 [![Build Status](https://ci.aepps.com/buildStatus/icon?job=aepp-sdk-js/develop)](https://ci.aepps.com/job/aepp-sdk-js/job/develop/)
