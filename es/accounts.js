@@ -18,8 +18,8 @@
 /**
  * Accounts module
  * @module @aeternity/aepp-sdk/es/accounts
- * @export Account
- * @example import Wallet from '@aeternity/aepp-sdk/es/accounts'
+ * @export Accounts
+ * @example import Accounts from '@aeternity/aepp-sdk/es/accounts'
  */
 
 import stampit from '@stamp/it'
@@ -43,6 +43,11 @@ async function addAccount (account) {
 
 /**
  * Accounts Stamp
+ *
+ * The purpose of the Accounts Stamp is to wrap up
+ * {@link module:@aeternity/aepp-sdk/es/account--Account} objects and provide a
+ * common interface to all of them. Accounts are a substantial part of
+ * {@link module:@aeternity/aepp-sdk/es/ae/wallet--Wallet}s.
  * @function
  * @alias module:@aeternity/aepp-sdk/es/accounts
  * @rtype Stamp

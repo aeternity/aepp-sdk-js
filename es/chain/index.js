@@ -28,13 +28,13 @@ import {required} from '@stamp/required'
 /**
  * Basic Chain Stamp
  *
- * Attempting to create instances from the Stamp without overwriting all abstract methods using composition will result in an exception.
+ * Attempting to create instances from the Stamp without overwriting all
+ * abstract methods using composition will result in an exception.
  * @function
  * @alias module:@aeternity/aepp-sdk/es/chain
  * @rtype Stamp
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Chain instance
- * @example Chain()
  */
 const Chain = stampit({
   deepProps: {Chain: {defaults: {waitMined: true}}},
