@@ -96,7 +96,6 @@ function txSignCallback (i, action) {
 function onMessage (i, data) {
   const { emitter } = priv.get(i)
   const msg = JSON.parse(data)
-  console.log(JSON.stringify(msg, undefined, 2))
 
   switch (msg.action) {
     case 'info':
