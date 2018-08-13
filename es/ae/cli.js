@@ -25,7 +25,7 @@ import Contract from './contract'
 import {envKeypair} from '../utils/crypto'
 
 const Cli = Ae.compose(Account, Chain, Tx, JsTx, Aens, Contract, {
-  init ({process = this.process}) {
+  init () {
     this.setKeypair(envKeypair(process.env))
   },
   props: {process: {}}
