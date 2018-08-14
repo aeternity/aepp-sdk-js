@@ -73,8 +73,24 @@ module.exports = {
       {
         test: /\.js$/,
         loader: jsLoader,
-        include: [path.resolve(__dirname, 'aepp'), path.resolve(__dirname, 'wallet')]
-        // exclude: /node_modules/
+        // include: [path.resolve(__dirname, 'aepp'), path.resolve(__dirname, 'wallet')]
+        exclude: /node_modules/
+      },
+      {
+        test: /\.js$/,
+        include: [
+          path.resolve(__dirname, 'node_modules/@aeternity'),
+          path.resolve(__dirname, 'node_modules/rlp')
+        ],
+        loader: 'babel-loader',
+        options: {
+          presets: ['@babel/preset-env'],
+          plugins: [
+            '@babel/plugin-proposal-object-rest-spread',
+            '@babel/plugin-transform-runtime',
+            '@babel/plugin-proposal-export-default-from'
+          ]
+        }
       },
       {
         test: /\.css$/,

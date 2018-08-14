@@ -43,8 +43,6 @@
 import Wallet from 'AE_SDK_MODULES/ae/wallet.js'
 import MemoryAccount from 'AE_SDK_MODULES/account/memory.js'
 
-console.log(Wallet)
-
 export default {
   name: 'Wallet',
   components: {},
@@ -57,28 +55,29 @@ export default {
       wallet: null,
       balance: null,
       height: null,
-      dappUrl: null
+      dappUrl: '//0.0.0.0:9001'
     }
   },
   computed: {
   },
-  created () {
-    window.addEventListener('message', console.log, false)
-
-    function confirm (method, params, {id}) {
+  methods: {
+    confirmDialog (method, params, {id}) {
+      // return new Promise((resolve, reject) => { resolve ('test') })
       return Promise.resolve(window.confirm(`User ${id} wants to run ${method} ${params}`))
     }
+  },
+  created () {
+    window.addEventListener('message', console.log, false)
 
     Wallet({
       url: 'https://sdk-testnet.aepps.com',
       accounts: [MemoryAccount({keypair: {priv: this.priv, pub: this.pub}})],
       address: this.pub,
-      onTx: confirm,
-      onChain: confirm,
-      onAccount: confirm
+      // onTx: this.confirmDialog,
+      // onChain: this.confirmDialog,
+      onAccount: this.confirmDialog
     }).then(ae => {
       this.client = ae
-      this.dappUrl = '//0.0.0.0:9001'
       this.$refs.dapp.src = this.dappUrl
 
       ae.height().then(height => {

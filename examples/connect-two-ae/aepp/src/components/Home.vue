@@ -65,6 +65,8 @@
 <script>
 // AE_SDK_MODULES is a webpack alias present in webpack.config.js
 import Aepp from 'AE_SDK_MODULES/ae/aepp.js'
+// import server from 'AE_SDK_MODULES/rpc/server.js'
+// console.log(server)
 
 export default {
   name: 'Home',
@@ -85,7 +87,9 @@ export default {
     send () {}
   },
   created () {
-    Aepp().then(ae => {
+    Aepp({
+      url: 'https://sdk-testnet.aepps.com'
+    }).then(ae => {
       this.account = ae
       ae.address()
         .then(address => { this.pub = address })
