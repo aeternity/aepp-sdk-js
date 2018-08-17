@@ -23,7 +23,7 @@
  */
 
 import stampit from '@stamp/it'
-import {encodeBase58Check, hash, salt} from '../utils/crypto'
+import {encodeBase58Check, hash, nameHash, salt} from '../utils/crypto'
 
 const createSalt = salt
 
@@ -46,7 +46,7 @@ function formatSalt (salt) {
  * @return {string} Commitment hash
  */
 async function commitmentHash (name, salt = createSalt()) {
-  return `cm$${encodeBase58Check(hash(Buffer.concat([hash(name), formatSalt(salt)])))}`
+  return `cm$${encodeBase58Check(hash(Buffer.concat([nameHash(name), formatSalt(salt)])))}`
 }
 
 /**
