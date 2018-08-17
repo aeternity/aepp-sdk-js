@@ -15,19 +15,27 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import Ae from './'
-import Account from '../account/memory'
-import Chain from '../chain/epoch'
-import Tx from '../tx/epoch'
-import JsTx from '../tx/js'
-import Aens from './aens'
-import Contract from './contract'
-import {envKeypair} from '../utils/crypto'
+import program from 'commander';
 
-const Cli = Ae.compose(Account, Chain, Tx, JsTx, Aens, Contract, {
-  init () {
-    this.setKeypair(envKeypair(process.env))
-  }
-})
+import chainCLI from './chain';
+import cryptoCLI from './crypto';
+import walletCLI from './wallet';
 
-export default Cli
+/**
+ * CLI Interface module
+ * @module @aeternity/aepp-sdk/es/cli
+ * @export CLI
+ */
+
+function init() {
+  program.version('0.1.0');
+
+  chainCLI();
+  cryptoCLI();
+  walletCLI();
+
+  program.parse(process.argv);
+  if (program.args.length === 0) program.help();
+}
+
+export default init;

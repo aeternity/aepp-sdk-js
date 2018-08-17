@@ -15,19 +15,27 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import Ae from './'
-import Account from '../account/memory'
-import Chain from '../chain/epoch'
-import Tx from '../tx/epoch'
-import JsTx from '../tx/js'
-import Aens from './aens'
-import Contract from './contract'
-import {envKeypair} from '../utils/crypto'
+'use strict'
 
-const Cli = Ae.compose(Account, Chain, Tx, JsTx, Aens, Contract, {
-  init () {
-    this.setKeypair(envKeypair(process.env))
-  }
-})
+import Cli from '../ae/cli';
 
-export default Cli
+import program from 'commander';
+
+function spend (receiver, amount, {host, debug}) {
+  // the implementation grab the key pair from the `WALLET_PRIV` and
+  // `WALLET_PUB` environment variables, respectively.
+  Cli({url: host, debug, process})
+    .then(ae => ae.spend(parseInt(amount), receiver))
+    .then(tx => console.log('Transaction mined', tx))
+    .catch(e => console.log(e.message));
+}
+
+function init() {
+  program
+    .command('spend <receiver> <amount>')
+    .option('-H, --host [hostname]', 'Node to connect to', 'http://localhost:3013')
+    .option('--debug', 'Switch on debugging')
+    .action(spend);
+}
+
+export default init;

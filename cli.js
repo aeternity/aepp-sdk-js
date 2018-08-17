@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
@@ -15,19 +16,8 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import Ae from './'
-import Account from '../account/memory'
-import Chain from '../chain/epoch'
-import Tx from '../tx/epoch'
-import JsTx from '../tx/js'
-import Aens from './aens'
-import Contract from './contract'
-import {envKeypair} from '../utils/crypto'
+require = require("esm")(module/*, options*/); //use to handle es6 import/export
+const initCLI = require('./es/cli').default;
 
-const Cli = Ae.compose(Account, Chain, Tx, JsTx, Aens, Contract, {
-  init () {
-    this.setKeypair(envKeypair(process.env))
-  }
-})
-
-export default Cli
+// init CLI commands
+initCLI();
