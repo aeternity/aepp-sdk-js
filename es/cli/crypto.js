@@ -17,7 +17,6 @@
 
 import * as Crypto from '../utils/crypto';
 
-import program from 'commander';
 import fs from 'fs';
 import prompt from 'prompt';
 import path  from 'path';
@@ -120,7 +119,7 @@ function unpackTx (tx) {
   console.log(JSON.stringify(deserializedTx, undefined, 2))
 }
 
-function init() {
+function init(program) {
 
   program
     .command('decrypt <directory>')

@@ -15,88 +15,65 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import program from 'commander'
-import Cli from '../ae/cli'
+import { initClient, printBlock } from './utils'
 
-async function initClient(url) {
-  return await Cli({ url, process });
-}
-
-async function version() {
+export async function version () {
   try {
-    const client = await initClient('https://sdk-testnet.aepps.com');
-    const version = await client.api.getVersion()
-    console.log(version)
+    const client = await initClient('https://sdk-testnet.aepps.com')
+    const {version} = await client.api.getVersion()
+    console.log(`Epoch node version____________  ${version}`)
   } catch (e) {
-    console.error(e.message);
+    console.error(e.message)
   }
 }
 
-async function top() {
+export async function top () {
   try {
-    const client = await initClient('https://sdk-testnet.aepps.com');
-    const top = await client.api.getTop();
-    console.log(top);
+    const client = await initClient('https://sdk-testnet.aepps.com')
+    printBlock(await client.api.getTop())
   } catch (e) {
-    console.error(e.message);
+    console.error(e.message)
   }
 }
 
-async function mempool() {
+export async function mempool () {
   try {
-    const client = await initClient('https://sdk-testnet.aepps.com');
-    const mempool = await client.mempool();
-    console.log(mempool);
+    const client = await initClient('https://sdk-testnet.aepps.com')
+    const mempool = await client.mempool()
+    console.log(mempool)
   } catch (e) {
-    console.error(e.message);
+    console.error(e.message)
   }
 }
 
-async function play() {
+export async function play (interval = 3000) {
   try {
-    const client = await initClient('https://sdk-testnet.aepps.com');
-    await poll(client)
+    const client = await initClient('https://sdk-testnet.aepps.com')
+    await poll(client, interval)
   } catch (e) {
-    console.error(e.message);
+    console.error(e.message)
   }
 }
 
-async function poll (client, height, interval = 3000) {
+async function poll (client, interval) {
   let currentTop = {}
-  const intervalId = setInterval(async () => {
-    try {
-      let top = await client.api.getTop()
-      if (currentTop.height === top.height) return;
 
-      console.log('<------------------------------------------->')
-      console.log(
-        Object.assign(top, { transactions: 0 })
-      );
-      console.log('<------------------------------------------->')
-      currentTop = top
-    } catch (e) {
-      console.error(e.message);
-      clearInterval(intervalId)
-    }
-  }, interval)
+  const intervalId = setInterval(
+    async () => {
+      try {
+        let top = await client.api.getTop()
+        if (currentTop.height === top.height) return
+
+        console.log('<------------------------------------------->')
+        printBlock(top)
+        console.log('<------------------------------------------->')
+
+        currentTop = top
+      } catch (e) {
+        console.error(e.message)
+        clearInterval(intervalId)
+      }
+    },
+    interval
+  )
 }
-
-function init () {
-  program
-    .command('version')
-    .action(version)
-
-  program
-    .command('play')
-    .action(play)
-
-  program
-    .command('mempool')
-    .action(mempool)
-
-  program
-    .command('top')
-    .action(top)
-}
-
-export default init
