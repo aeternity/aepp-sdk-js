@@ -18,36 +18,47 @@
 import program from 'commander'
 import Cli from '../ae/cli'
 
-function version () {
-  Cli({url: 'https://sdk-testnet.aepps.com'})
-    .then(async client => {
-      const version = await client.api.getVersion()
-      console.log(version)
-    }).catch(err => console.log(err))
+async function initClient(url) {
+  return await Cli({ url, process });
 }
 
-function top () {
-  Cli({url: 'https://sdk-testnet.aepps.com'})
-    .then(async client => {
-      const top = await client.api.getTop()
-      console.log(top)
-    }).catch(err => console.log(err))
+async function version() {
+  try {
+    const client = await initClient('https://sdk-testnet.aepps.com');
+    const version = await client.api.getVersion()
+    console.log(version)
+  } catch (e) {
+    console.error(e.message);
+  }
 }
 
-function mempool () {
-  Cli({url: 'https://sdk-testnet.aepps.com'})
-    .then(async client => {
-      const pool = await client.mempool()
-      console.log(pool)
-    }).catch(err => console.log(err.message))
+async function top() {
+  try {
+    const client = await initClient('https://sdk-testnet.aepps.com');
+    const top = await client.api.getTop();
+    console.log(top);
+  } catch (e) {
+    console.error(e.message);
+  }
 }
 
-function play () {
+async function mempool() {
+  try {
+    const client = await initClient('https://sdk-testnet.aepps.com');
+    const mempool = await client.mempool();
+    console.log(mempool);
+  } catch (e) {
+    console.error(e.message);
+  }
+}
 
-  Cli({url: 'https://sdk-testnet.aepps.com'})
-    .then(async client => {
-        await poll(client)
-    }).catch(err => console.log(err.message))
+async function play() {
+  try {
+    const client = await initClient('https://sdk-testnet.aepps.com');
+    await poll(client)
+  } catch (e) {
+    console.error(e.message);
+  }
 }
 
 async function poll (client, height, interval = 3000) {
