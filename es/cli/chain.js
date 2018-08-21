@@ -17,9 +17,40 @@
 
 import { initClient, printBlock } from './utils'
 
-export async function version () {
+export default function initChainCommands(chain) {
+  chain.command( 'top',
+    {
+      desc: 'Get top of Chain',
+      callback: async (options) => await top(options)
+    }
+  );
+
+  chain
+    .command('version',
+      {
+        desc: 'Get Epoch version',
+        callback: async ( options ) => await version(options)
+      }
+    );
+
+  chain
+    .command('play',
+      {
+        desc: 'Real-time block monitoring',
+        callback: async (options) => await play(options)
+      });
+
+  chain
+    .command('mempool',
+      {
+        desc: 'Get mempool of Chain',
+        callback: async (options) => await mempool(options)
+      });
+}
+
+async function version ({host}) {
   try {
-    const client = await initClient('https://sdk-testnet.aepps.com')
+    const client = await initClient(url)
     const {version} = await client.api.getVersion()
     console.log(`Epoch node version____________  ${version}`)
   } catch (e) {
@@ -27,18 +58,18 @@ export async function version () {
   }
 }
 
-export async function top () {
+async function top ({host}) {
   try {
-    const client = await initClient('https://sdk-testnet.aepps.com')
+    const client = await initClient(url)
     printBlock(await client.api.getTop())
   } catch (e) {
     console.error(e.message)
   }
 }
 
-export async function mempool () {
+async function mempool ({host}) {
   try {
-    const client = await initClient('https://sdk-testnet.aepps.com')
+    const client = await initClient(url)
     const mempool = await client.mempool()
     console.log(mempool)
   } catch (e) {
@@ -46,16 +77,31 @@ export async function mempool () {
   }
 }
 
-export async function play (interval = 3000) {
+async function play ({host, limit}) {
   try {
-    const client = await initClient('https://sdk-testnet.aepps.com')
-    await poll(client, interval)
+    const client = await initClient(host)
+    // await poll(client, interval)
+    console.log(client)
+    let top = await client.api.getTop()
+    await playWithLimit(--limit, top.prevHash)
   } catch (e) {
     console.error(e.message)
   }
 }
 
-async function poll (client, interval) {
+async function playWithLimit(limit, blockHash) {
+  if (!limit) return;
+
+  let block = await client.api.getBlockByHash(blockHash);
+
+  console.log('<------------------------------------------->')
+  printBlock(top)
+  console.log('<------------------------------------------->')
+
+  await playWithLimit(--limit, block.prevHash);
+}
+
+function poll (client, interval) {
   let currentTop = {}
 
   const intervalId = setInterval(

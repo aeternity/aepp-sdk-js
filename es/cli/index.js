@@ -17,7 +17,7 @@
 
 import sc from 'subcommander';
 
-import { top, mempool, play, version } from './chain';
+import initChainCommands from './chain'
 import { spend } from './wallet';
 
 /**
@@ -27,8 +27,8 @@ import { spend } from './wallet';
  */
 
 
-function printConfig() {
-  const epochUrl = process.env['EPOCH_URL'] ? process.env['EPOCH_URL'] : 'https://sdk-testnet.aepps.com';
+function printConfig({host}) {
+  const epochUrl = host;
   console.log('WALLET_PUB___________' + process.env['WALLET_PUB']);
   console.log('EPOCH_URL___________' + epochUrl);
 }
@@ -36,67 +36,42 @@ function printConfig() {
 
 async function init() {
 
+  // Top level Options
+  sc
+    .option('host', {
+    abbr: 'h',
+    desc: 'Node to connect',
+    default: 'https://sdk-testnet.aepps.com'
+  });
+  //<-----------------------------------------------
+
+
   // CONFIG
   sc
     .command('config', {
       desc: 'Print Config',
-      callback: () => printConfig()
+      callback: (options) => printConfig(options)
     })
 
   //<-----------------------------------------------
 
 
   // CHAIN CLI
-  const chain = sc.command( 'chain', {
+  const chain = sc.command('chain', {
     desc: 'Interact with Chain',
     callback: () => chain.usage()
   })
-    .option('interval', {
-    abbr: 'i',
-    desc: 'interval for polling'
+    .option('limit', {
+    abbr: 'l',
+    desc: 'Limit for play command',
+    default: 10
   });
 
-  chain.command( 'top',
-    {
-      desc: 'Get top of Chain',
-      callback: async function ( options ) {
-        await top();
-      }
-    }
-  );
-
-  chain
-    .command('version',
-    {
-      desc: 'Get Epoch version',
-      callback: async function ( options ) {
-        await version();
-      }
-    }
-    );
-
-  chain
-    .command('play',
-      {
-        desc: 'Real-time block monitoring',
-        callback: async function ( options ) {
-          await play();
-        }
-      })
-
-  chain
-    .command('mempool',
-      {
-        desc: 'Get mempool of Chain',
-        callback: async function ( options ) {
-          await mempool();
-        }
-      })
-
+  // Init chain Sub-Commands
+  initChainCommands(chain);
   // <--------------------------------------------------->
 
   // WALLET CLI
-
   const wallet = sc.command( 'wallet', {
     desc: 'Wallet implementation',
     callback: () => wallet.usage()
