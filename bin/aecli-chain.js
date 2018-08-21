@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
@@ -15,42 +16,39 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { initClient, printBlock } from './utils'
+const {initClient, printBlock} = require('./utils')
+const program = require('commander')
 
-export default function initChainCommands(chain) {
-  chain.command( 'top',
-    {
-      desc: 'Get top of Chain',
-      callback: async (options) => await top(options)
-    }
-  );
+program
+  .option('-H, --host [hostname]', 'Node to connect to', 'https://sdk-testnet.aepps.com')
+  .option('-L --limit [playlimit]', 'Limit for play command', 10)
 
-  chain
-    .command('version',
-      {
-        desc: 'Get Epoch version',
-        callback: async ( options ) => await version(options)
-      }
-    );
+program
+  .command('top')
+  .description('Get top of Chain')
+  .action(async (cmd) => await top(cmd.parent))
 
-  chain
-    .command('play',
-      {
-        desc: 'Real-time block monitoring',
-        callback: async (options) => await play(options)
-      });
+program
+  .command('version')
+  .description('Get Epoch version')
+  .action(async (cmd) => await version(cmd.parent))
 
-  chain
-    .command('mempool',
-      {
-        desc: 'Get mempool of Chain',
-        callback: async (options) => await mempool(options)
-      });
-}
+program
+  .command('mempool')
+  .description('Get mempool of Chain')
+  .action(async (cmd) => await mempool(cmd.parent))
+
+program
+  .command('play')
+  .description('Real-time block monitoring')
+  .action(async (cmd) => await play(cmd.parent))
+
+program.parse(process.argv)
+if (program.args.length === 0) program.help()
 
 async function version ({host}) {
   try {
-    const client = await initClient(url)
+    const client = await initClient(host)
     const {version} = await client.api.getVersion()
     console.log(`Epoch node version____________  ${version}`)
   } catch (e) {
@@ -60,7 +58,7 @@ async function version ({host}) {
 
 async function top ({host}) {
   try {
-    const client = await initClient(url)
+    const client = await initClient(host)
     printBlock(await client.api.getTop())
   } catch (e) {
     console.error(e.message)
@@ -69,7 +67,7 @@ async function top ({host}) {
 
 async function mempool ({host}) {
   try {
-    const client = await initClient(url)
+    const client = await initClient(host)
     const mempool = await client.mempool()
     console.log(mempool)
   } catch (e) {
@@ -78,27 +76,27 @@ async function mempool ({host}) {
 }
 
 async function play ({host, limit}) {
+  limit = parseInt(limit)
   try {
     const client = await initClient(host)
-    // await poll(client, interval)
-    console.log(client)
     let top = await client.api.getTop()
-    await playWithLimit(--limit, top.prevHash)
+    printBlock(top)
+    await playWithLimit(--limit, top.prevHash, client)
   } catch (e) {
     console.error(e.message)
   }
 }
 
-async function playWithLimit(limit, blockHash) {
-  if (!limit) return;
+async function playWithLimit (limit, blockHash, client) {
+  if (!limit) return
 
-  let block = await client.api.getBlockByHash(blockHash);
-
-  console.log('<------------------------------------------->')
-  printBlock(top)
-  console.log('<------------------------------------------->')
-
-  await playWithLimit(--limit, block.prevHash);
+  let block = await client.api.getBlockByHash(blockHash)
+  setTimeout(async () => {
+    console.log('<------------------------------------------->')
+    printBlock(block)
+    console.log('<------------------------------------------->')
+    await playWithLimit(--limit, block.prevHash, client)
+  }, 2000)
 }
 
 function poll (client, interval) {

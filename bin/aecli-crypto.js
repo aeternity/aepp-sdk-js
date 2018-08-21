@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
@@ -14,12 +15,13 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-
-import * as Crypto from '../utils/crypto';
-
-import fs from 'fs';
-import prompt from 'prompt';
-import path  from 'path';
+const program = require('commander')
+const {initClient} = require('./utils')
+const fs = require('fs')
+const prompt = require('prompt')
+const path = require('path')
+require = require('esm')(module/*, options*/) //use to handle es6 import/export
+const Crypto = require('../es/utils/crypto')
 
 // The `prompt` library provides concealed input of passwords.
 const promptSchema = {
@@ -57,8 +59,8 @@ function extractReadableKeys (dir, options) {
 }
 
 // ## Key Pair Generation
-function generateKeyPair (name, { output }) {
-  const { pub, priv } = Crypto.generateKeyPair()
+function generateKeyPair (name, {output}) {
+  const {pub, priv} = Crypto.generateKeyPair()
 
   const data = [
     [path.join(output, name), priv],
@@ -119,30 +121,27 @@ function unpackTx (tx) {
   console.log(JSON.stringify(deserializedTx, undefined, 2))
 }
 
-function init(program) {
+program
+  .command('decrypt <directory>')
+  .description('Decrypts public and private key to readable formats for testing purposes')
+  .option('-i, --input [directory]', 'Directory where to look for keys', '.')
+  .action(extractReadableKeys)
 
-  program
-    .command('decrypt <directory>')
-    .description('Decrypts public and private key to readable formats for testing purposes')
-    .option('-i, --input [directory]', 'Directory where to look for keys', '.')
-    .action(extractReadableKeys)
+program
+  .command('genkey <keyname>')
+  .description('Generate keypair')
+  .option('-o, --output [directory]', 'Output directory for the keys', '.')
+  .action(generateKeyPair)
 
-  program
-    .command('genkey <keyname>')
-    .description('Generate keypair')
-    .option('-o, --output [directory]', 'Output directory for the keys', '.')
-    .action(generateKeyPair)
+program
+  .command('sign <tx> [privkey]')
+  .option('-p, --password [password]', 'password of the private key')
+  .option('-f, --file [file]', 'private key file')
+  .action(signTx)
 
-  program
-    .command('sign <tx> [privkey]')
-    .option('-p, --password [password]', 'password of the private key')
-    .option('-f, --file [file]', 'private key file')
-    .action(signTx)
+program
+  .command('unpack <tx>')
+  .action(unpackTx)
 
-  program
-    .command('unpack <tx>')
-    .action(unpackTx)
-
-}
-
-export default init;
+program.parse(process.argv)
+if (program.args.length === 0) program.help()

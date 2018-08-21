@@ -6,7 +6,7 @@
   "browser": "dist/aepp-sdk.browser.js",
   "module": "es/index.js",
   "bin": {
-    "aecli": "./cli.js"
+    "aecli": "./bin/aecli.js"
   },
   "sideEffects": false,
   "scripts": {
@@ -41,8 +41,6 @@
     "ramda": "^0.25.0",
     "rlp": "^2.0.0",
     "sha.js": "^2.4.11",
-    "structured-cli": "^1.0.5",
-    "subcommander": "^1.0.0",
     "tweetnacl": "^1.0.0",
     "url": "^0.11.0",
     "uuid": "^3.3.2",

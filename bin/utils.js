@@ -14,16 +14,35 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-
 'use strict'
 
-import Cli from '../ae/cli';
+require = require('esm')(module/*, options*/) //use to handle es6 import/export
+const {default: Cli} = require('../es/ae/cli')
 
-export function spend (receiver, amount, {host, debug}) {
-  // the implementation grab the key pair from the `WALLET_PRIV` and
-  // `WALLET_PUB` environment variables, respectively.
-  Cli({url: host, debug, process})
-    .then(ae => ae.spend(parseInt(amount), receiver))
-    .then(tx => console.log('Transaction mined', tx))
-    .catch(e => console.log(e.message));
+async function initClient (url) {
+  return await Cli({url, process})
+}
+
+function printConfig ({host}) {
+  const epochUrl = host
+  console.log('WALLET_PUB___________' + process.env['WALLET_PUB'])
+  console.log('EPOCH_URL___________' + epochUrl)
+}
+
+function printBlock (block) {
+  console.log(`
+Block hash____________________ ${block.hash}
+Block height__________________ ${block.height}
+State hash____________________ ${block.stateHash}
+Miner_________________________ ${block.miner}
+Time__________________________ ${new Date(block.time)}
+Previous block hash___________ ${block.prevHash}
+Transactions__________________ 0
+`)
+}
+
+module.exports = {
+  printBlock,
+  initClient,
+  printConfig
 }

@@ -15,9 +15,28 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
+const program = require('commander')
+const {initClient} = require('./utils')
 
-require = require("esm")(module/*, options*/); //use to handle es6 import/export
-const initCLI = require('./es/cli').default;
+program
+  .option('-H, --host [hostname]', 'Node to connect to', 'https://sdk-testnet.aepps.com')
 
-// init CLI commands
-initCLI();
+program
+  .command('spend <receiver> <amount>')
+  .description('Create a transaction to another wallet')
+  .action(async (receiver, amount, cmd) => await spend(receiver, amount, cmd.parent))
+
+program.parse(process.argv)
+if (program.args.length === 0) program.help()
+
+async function spend (receiver, amount, host) {
+  // the implementation grab the key pair from the `WALLET_PRIV` and
+  // `WALLET_PUB` environment variables, respectively.
+  try {
+    const client = await initClient(host)
+    const tx = await client.spend(parseInt(amount), receiver)
+    console.log('Transaction mined', tx)
+  } catch (e) {
+
+  }
+}
