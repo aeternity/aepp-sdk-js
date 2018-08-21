@@ -1,6 +1,6 @@
-# Usage
+# Using the Javascript SDK
 
-There are three different ways of incorporating aepp-sdk into your project, depending on the particular scenario:
+There are three different ways of incorporating aepp-sdk-js into your project, depending on the particular scenario:
 * ES Modules at `es/` (recommended)
 * Node.js bundle at `dist/aepp-sdk.js`
 * Browser bundle at `dist/aepp-sdk.browser.js`
@@ -208,6 +208,3 @@ The same code, using the SDK abstraction (**high-level**):
   }).then(ae => ae.spend(parseInt(amount), receiver_pub_key))
 ```
 
-## [CLI Examples]
-
-[CLI Examples]: bin/
