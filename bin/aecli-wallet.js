@@ -16,24 +16,29 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 const program = require('commander')
-const {initClient} = require('./utils')
+
+const {initClient, generateSecureWallet, handleApiError, getWalletByPathAndDecrypt} = require('./utils')
 
 let WALLET_KEY_PAIR
-const walletPath = process.argv[2]
+let WALLET_NAME
 
 // Grab WALLET_PATH and try to read and decrypt keypair. IF success -> remove wallet path from argv and take it commander.js
-initWallet(walletPath)
+initWallet()
   .then(() => {
+    console.log(WALLET_KEY_PAIR)
+    // remove wallet_name from argv
     process.argv = process.argv.filter((e, i) => i !== 2)
 
     program.parse(process.argv)
     if (program.args.length === 0) program.help()
-
   })
   .catch(e => console.log(e.message))
 
 program
   .option('-H, --host [hostname]', 'Node to connect to', 'https://sdk-testnet.aepps.com')
+  .option('-P, --password [password]', 'Wallet Password')
+  .option('-O --output [output]', 'Output directory', '.')
+  .option('-P --password [password]', 'Wallet Password')
   .usage('<wallet-name> [options] [commands]')
 
 program
@@ -54,11 +59,16 @@ program
 program
   .command('create')
   .description('Create a secure wallet')
-  .action(async (cmd) => await spend(cmd.parent))
+  .action(async (cmd) => await createSecureWallet(WALLET_NAME, Object.assign({}, cmd, cmd.parent)))
 
 program
   .command('name', 'Name lifecycle api')
   .command('contract', 'Contract lifecycle api')
+
+program.on('command:*', function () {
+  console.error('Invalid command: %s\nSee --help for a list of available commands.', program.args.join(' '))
+  process.exit(1)
+})
 
 async function spend (receiver, amount, host) {
   try {
@@ -89,16 +99,30 @@ async function getAddress ({host}) {
   }
 }
 
+async function createSecureWallet (name, {output, password}) {
+  try {
+    await generateSecureWallet(name, {output, password})
+  } catch (e) {
+    console.log(e.message)
+  }
+}
+
 //HELPERS
-async function initWallet (walletPath) {
-  const pass = '123' // prompt pass
-  WALLET_KEY_PAIR = await getWalletByPathAndDecrypt(walletPath, pass) || 123
-}
+async function initWallet () {
+  return new Promise((resolve, reject) => {
+    program
+      .arguments('<wallet_name>')
+      .action(async (name) => {
+        WALLET_NAME = name
+        try {
+          WALLET_KEY_PAIR = await getWalletByPathAndDecrypt(name, '')
+        } catch (e) {
+          reject(e)
+        }
+        resolve()
+      })
+      .parse(process.argv)
 
-async function getWalletByPathAndDecrypt (path, password) {
-  // TODO
-}
-
-async function createSecureWallet (name, password) {
-  // TODO
+    if (program.args.length === 0) program.help()
+  })
 }

@@ -17,7 +17,28 @@
 'use strict'
 
 require = require('esm')(module/*, options*/) //use to handle es6 import/export
+const path = require('path')
+const fs = require('fs')
+const prompt = require('prompt')
+
 const {default: Cli} = require('../es/ae/cli')
+const Crypto = require('../es/utils/crypto')
+
+// The `prompt` library provides concealed input of passwords.
+const promptSchema = {
+  properties: {
+    password: {
+      type: 'string',
+      description: 'Enter your password',
+      hidden: true,
+      required: true,
+      replace: '*',
+      conform: function (value) {
+        return true
+      }
+    }
+  }
+}
 
 async function initClient (url, keypair) {
   return await Cli({url, process, keypair})
@@ -41,11 +62,11 @@ Transactions__________________ ${block.transactions || 0}
 `)
 }
 
-function logApiError({response}) {
+function logApiError ({response}) {
   console.log(response.data)
 }
 
-async function handleApiError(fn) {
+async function handleApiError (fn) {
   try {
     await fn()
   } catch (e) {
@@ -53,10 +74,48 @@ async function handleApiError(fn) {
   }
 }
 
+async function generateSecureWallet (name, {output, password}) {
+  password = password || await promptPasswordAsync()
+  const {pub, priv} = Crypto.generateSaveWallet(password)
+
+  const data = [
+    [path.join(output, name), priv],
+    [path.join(output, `${name}.pub`), pub]
+  ]
+
+  data.forEach(([path, data]) => {
+    fs.writeFileSync(path, data)
+    console.log(`Wrote ${path}`)
+  })
+}
+
+async function getWalletByPathAndDecrypt(name, {password}) {
+  //TODO
+  return name
+}
+
+async function promptPasswordAsync () {
+  return new Promise(
+    (resolve, reject) => {
+      prompt.start()
+      prompt.get(
+        promptSchema,
+        (err, {password}) => {
+          if (err) reject(err)
+          resolve(password)
+        }
+      )
+    }
+  )
+}
+
 module.exports = {
   printBlock,
   initClient,
   printConfig,
   logApiError,
-  handleApiError
+  promptPasswordAsync,
+  getWalletByPathAndDecrypt,
+  handleApiError,
+  generateSecureWallet
 }
