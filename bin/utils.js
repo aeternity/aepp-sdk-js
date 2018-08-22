@@ -19,8 +19,8 @@
 require = require('esm')(module/*, options*/) //use to handle es6 import/export
 const {default: Cli} = require('../es/ae/cli')
 
-async function initClient (url) {
-  return await Cli({url, process})
+async function initClient (url, keypair) {
+  return await Cli({url, process, keypair})
 }
 
 function printConfig ({host}) {
