@@ -37,12 +37,26 @@ State hash____________________ ${block.stateHash}
 Miner_________________________ ${block.miner}
 Time__________________________ ${new Date(block.time)}
 Previous block hash___________ ${block.prevHash}
-Transactions__________________ 0
+Transactions__________________ ${block.transactions || 0}
 `)
+}
+
+function logApiError({response}) {
+  console.log(response.data)
+}
+
+async function handleApiError(fn) {
+  try {
+    await fn()
+  } catch (e) {
+    logApiError(e)
+  }
 }
 
 module.exports = {
   printBlock,
   initClient,
-  printConfig
+  printConfig,
+  logApiError,
+  handleApiError
 }
