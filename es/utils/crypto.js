@@ -344,7 +344,8 @@ const OBJECT_TAGS = {
   SIGNED_TX: 11,
   CHANNEL_CREATE_TX: 50,
   CHANNEL_CLOSE_MUTUAL_TX: 53,
-  CHANNEL_OFFCHAIN_TX: 57
+  CHANNEL_OFFCHAIN_TX: 57,
+  CHANNEL_OFFCHAIN_UPDATE_TRANSFER: 570
 }
 
 function readInt (buf) {
@@ -361,16 +362,29 @@ function readSignatures (buf) {
   return signatures
 }
 
+function deserializeOffChainUpdate (binary) {
+  const obj = {
+    tag: readInt(binary[0]),
+    version: readInt(binary[1])
+  }
+
+  switch (obj.tag) {
+    case OBJECT_TAGS.CHANNEL_OFFCHAIN_UPDATE_TRANSFER:
+      return Object.assign(obj, {
+        from: 'ak$' + encodeBase58Check(binary[2]),
+        to: 'ak$' + encodeBase58Check(binary[3]),
+        amount: readInt(binary[4])
+      })
+  }
+
+  return obj
+}
+
 function readOffChainTXUpdates (buf) {
   const updates = []
 
   for (let i = 0; i < buf.length; i++) {
-    updates.push([
-      readInt(buf[i][0]),
-      'ak$' + encodeBase58Check(buf[i][1]),
-      'ak$' + encodeBase58Check(buf[i][2]),
-      readInt(buf[i][3])
-    ])
+    updates.push(deserializeOffChainUpdate(decode(buf[i])))
   }
 
   return updates
@@ -404,8 +418,7 @@ export function deserialize (binary) {
         channelReserve: readInt(binary[6]),
         lockPeriod: readInt(binary[7]),
         ttl: readInt(binary[8]),
-        fee: readInt(binary[9]),
-        nonce: readInt(binary[10])
+        fee: readInt(binary[9])
       })
 
     case OBJECT_TAGS.CHANNEL_CLOSE_MUTUAL_TX:
