@@ -16,7 +16,16 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-const {initClient, printBlock, handleApiError} = require('./utils')
+//    _____                           _
+//   |_   _|                         | |
+//     | |  _ __  ___ _ __   ___  ___| |_
+//     | | | '_ \/ __| '_ \ / _ \/ __| __|
+//    _| |_| | | \__ \ |_) |  __/ (__| |_
+//   |_____|_| |_|___/ .__/ \___|\___|\__|
+//                   | |
+//                   |_|
+
+const {initClient, printBlock, handleApiError, unknownCommandHandler} = require('./utils')
 const program = require('commander')
 
 program
@@ -51,6 +60,9 @@ program
   .command('name <name>')
   .description('The name to inspect (eg: mydomain.aet)')
   .action(async (name, cmd) => await getName(name, cmd.parent))
+
+// HANDLE UNKNOWN COMMAND
+program.on('command:*', () => unknownCommandHandler(program)())
 
 program.parse(process.argv)
 if (program.args.length === 0) program.help()

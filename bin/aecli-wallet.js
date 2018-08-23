@@ -15,9 +15,32 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
+
+//   __          __   _ _      _
+//   \ \        / /  | | |    | |
+//    \ \  /\  / /_ _| | | ___| |_ ___
+//     \ \/  \/ / _` | | |/ _ \ __/ __|
+//      \  /\  / (_| | | |  __/ |_\__ \
+//       \/  \/ \__,_|_|_|\___|\__|___/
+//
+//
+
 const program = require('commander')
 
-const {initClient, generateSecureWallet, handleApiError, getWalletByPathAndDecrypt} = require('./utils')
+const {
+  initClient,
+  generateSecureWallet,
+  handleApiError,
+  getWalletByPathAndDecrypt,
+  initExecCommands,
+  unknownCommandHandler
+} = require('./utils')
+
+// EXEC COMMANDS LIST
+const EXECUTABLE_CMD = [
+  {name: 'name', desc: 'Name lifecycle api'},
+  {name: 'contract', desc: 'Contract lifecycle api'}
+]
 
 let WALLET_KEY_PAIR
 let WALLET_NAME
@@ -25,7 +48,9 @@ let WALLET_NAME
 // Grab WALLET_PATH and try to read and decrypt keypair. IF success -> remove wallet path from argv and take it commander.js
 initWallet()
   .then(() => {
-    console.log(WALLET_KEY_PAIR)
+    // SET KEYPAIR TO PROCESS.ENV
+    process.env['WALLET_KEYS'] = WALLET_KEY_PAIR
+
     // remove wallet_name from argv
     process.argv = process.argv.filter((e, i) => i !== 2)
 
@@ -37,9 +62,12 @@ initWallet()
 program
   .option('-H, --host [hostname]', 'Node to connect to', 'https://sdk-testnet.aepps.com')
   .option('-P, --password [password]', 'Wallet Password')
-  .option('-O --output [output]', 'Output directory', '.')
-  .option('-P --password [password]', 'Wallet Password')
+  .option('-O, --output [output]', 'Output directory', '.')
+  .option('-P, --password [password]', 'Wallet Password')
   .usage('<wallet-name> [options] [commands]')
+
+// INIT EXECUTABLE COMMANDS
+initExecCommands(program)(EXECUTABLE_CMD)
 
 program
   .command('spend <receiver> <amount>')
@@ -61,14 +89,7 @@ program
   .description('Create a secure wallet')
   .action(async (cmd) => await createSecureWallet(WALLET_NAME, Object.assign({}, cmd, cmd.parent)))
 
-program
-  .command('name', 'Name lifecycle api')
-  .command('contract', 'Contract lifecycle api')
-
-program.on('command:*', function () {
-  console.error('Invalid command: %s\nSee --help for a list of available commands.', program.args.join(' '))
-  process.exit(1)
-})
+program.on('command:*', () => unknownCommandHandler(program)(EXECUTABLE_CMD))
 
 async function spend (receiver, amount, host) {
   try {
@@ -93,7 +114,10 @@ async function getBalance ({host}) {
 
 async function getAddress ({host}) {
   try {
-    console.log(WALLET_KEY_PAIR.pub)
+    const client = await initClient(host, WALLET_KEY_PAIR)
+    await handleApiError(
+      async () => console.log('Your address is: ' + await client.address())
+    )
   } catch (e) {
     console.log(e.message)
   }
@@ -111,11 +135,16 @@ async function createSecureWallet (name, {output, password}) {
 async function initWallet () {
   return new Promise((resolve, reject) => {
     program
-      .arguments('<wallet_name>')
-      .action(async (name) => {
+      .arguments('<wallet_name> [command]')
+      .option('-P, --password [password]', 'Wallet Password')
+      .action(async (name, command, cmd) => {
         WALLET_NAME = name
+
+        // Prevent grab wallet keys and create new wallet
+        if (command === 'create') resolve()
+
         try {
-          WALLET_KEY_PAIR = await getWalletByPathAndDecrypt(name, '')
+          WALLET_KEY_PAIR = await getWalletByPathAndDecrypt(name, cmd.password)
         } catch (e) {
           reject(e)
         }

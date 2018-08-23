@@ -16,7 +16,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 const program = require('commander')
-const {initClient} = require('./utils')
+const {unknownCommandHandler} = require('./utils')
 const fs = require('fs')
 const prompt = require('prompt')
 const path = require('path')
@@ -142,6 +142,9 @@ program
 program
   .command('unpack <tx>')
   .action(unpackTx)
+
+// HANDLE UNKNOWN COMMAND
+program.on('command:*', () => unknownCommandHandler(program)())
 
 program.parse(process.argv)
 if (program.args.length === 0) program.help()

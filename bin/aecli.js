@@ -18,7 +18,16 @@
 'use strict'
 
 const program = require('commander')
-const {printConfig} = require('./utils')
+const {initExecCommands, unknownCommandHandler, printConfig} = require('./utils')
+
+const EXECUTABLE_CMD = [
+  {name: 'chain', desc: 'Interact with the blockchain'},
+  {name: 'inspect', desc: 'Get information on transactions, blocks,...'},
+  {name: 'wallet', desc: 'Handle wallet operations'},
+  {name: 'contract', desc: 'Compile contracts'},
+  {name: 'oracle', desc: 'Interact with oracles'},
+  {name: 'crypto', desc: 'Crypto helpers'},
+]
 
 program
   .version('1.0.0')
@@ -29,15 +38,14 @@ program
   .action((cmd) => printConfig(cmd))
   .option('-H, --host [hostname]', 'Node to connect to', 'https://sdk-testnet.aepps.com')
 
-program
-  .command('chain', 'Interact with the blockchain')
-  .command('inspect', 'Get information on transactions, blocks,...')
-  .command('wallet', 'Handle wallet operations')
-  .command('contract', 'Compile contracts')
-  .command('oracle', 'Interact with oracles')
-  .command('crypto', 'Crypto helpers')
+// INIT EXEC COMMANDS
+initExecCommands(program)(EXECUTABLE_CMD)
+
+// HANDLE UNKNOWN COMMAND
+program.on('command:*', () => unknownCommandHandler(program)(EXECUTABLE_CMD))
 
 program
   .parse(process.argv)
 
 if (program.args.length === 0) program.help()
+

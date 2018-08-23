@@ -40,18 +40,17 @@ const promptSchema = {
   }
 }
 
-async function initClient (url, keypair) {
+const initClient = async (url, keypair) => {
   return await Cli({url, process, keypair})
 }
 
-function printConfig ({host}) {
-  const epochUrl = host
+// CONSOLE PRINT HELPERS
+const printConfig = ({host}) => {
   console.log('WALLET_PUB___________' + process.env['WALLET_PUB'])
-  console.log('EPOCH_URL___________' + epochUrl)
+  console.log('EPOCH_URL___________' + host)
 }
 
-function printBlock (block) {
-  console.log(`
+const printBlock = (block) => console.log(`
 Block hash____________________ ${block.hash}
 Block height__________________ ${block.height}
 State hash____________________ ${block.stateHash}
@@ -60,13 +59,12 @@ Time__________________________ ${new Date(block.time)}
 Previous block hash___________ ${block.prevHash}
 Transactions__________________ ${block.transactions || 0}
 `)
-}
+//
 
-function logApiError ({response}) {
-  console.log(response.data)
-}
+// ERROR HANDLERS
+const logApiError = (response) => console.log(`API ERROR: ${response}`)
 
-async function handleApiError (fn) {
+const handleApiError = async (fn) => {
   try {
     await fn()
   } catch (e) {
@@ -74,7 +72,17 @@ async function handleApiError (fn) {
   }
 }
 
-async function generateSecureWallet (name, {output, password}) {
+const unknownCommandHandler = (program) => (execCommands = []) => {
+  const cmd = program.args[0]
+
+  if (isExecCommand(cmd, execCommands)) return
+
+  console.log('Invalid command: %s\nSee --help for a list of available commands.', cmd)
+  program.help()
+}
+//
+
+const generateSecureWallet = async (name, {output, password}) => {
   password = password || await promptPasswordAsync()
   const {pub, priv} = Crypto.generateSaveWallet(password)
 
@@ -89,25 +97,47 @@ async function generateSecureWallet (name, {output, password}) {
   })
 }
 
-async function getWalletByPathAndDecrypt(name, {password}) {
-  //TODO
-  return name
+const getWalletByPathAndDecrypt = async (name, password) => {
+  if (!password || typeof password !== 'string' || !password.length) password = await promptPasswordAsync()
+
+  const privBinaryKey = fs.readFileSync(name)
+  const pubBinaryKey = fs.readFileSync(`${name}.pub`)
+
+  if (!privBinaryKey) throw new Error('Key not found')
+
+  const decryptedPriv = Crypto.decryptPrivateKey(password, privBinaryKey)
+  const decryptedPub = Crypto.decryptPubKey(password, pubBinaryKey)
+
+  return {
+    priv: decryptedPriv.toString('hex'),
+    pub: `ak$${Crypto.encodeBase58Check(decryptedPub)}`
+  }
 }
 
-async function promptPasswordAsync () {
+const promptPasswordAsync = async () => {
   return new Promise(
     (resolve, reject) => {
       prompt.start()
       prompt.get(
         promptSchema,
-        (err, {password}) => {
+        (err, res) => {
           if (err) reject(err)
-          resolve(password)
+          if (!res || !res.password) {
+            reject({message: 'Password required'})
+          }
+          resolve(res.password)
         }
       )
     }
   )
 }
+
+//
+
+// UTILS
+const initExecCommands = (program) => (cmds) => cmds.forEach(({name, desc}) => program.command(name, desc))
+
+const isExecCommand = (cmd, commands) => commands.find(({name}) => cmd === name)
 
 module.exports = {
   printBlock,
@@ -117,5 +147,8 @@ module.exports = {
   promptPasswordAsync,
   getWalletByPathAndDecrypt,
   handleApiError,
-  generateSecureWallet
+  generateSecureWallet,
+  initExecCommands,
+  isExecCommand,
+  unknownCommandHandler
 }

@@ -16,7 +16,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-const {initClient, printBlock} = require('./utils')
+const {initClient, printBlock, unknownCommandHandler, handleApiError} = require('./utils')
 const program = require('commander')
 
 program
@@ -43,14 +43,20 @@ program
   .description('Real-time block monitoring')
   .action(async (cmd) => await play(cmd.parent))
 
+// HANDLE UNKNOWN COMMAND
+program.on('command:*', () => unknownCommandHandler(program)())
+
 program.parse(process.argv)
 if (program.args.length === 0) program.help()
 
 async function version ({host}) {
   try {
     const client = await initClient(host)
-    const {version} = await client.api.getVersion()
-    console.log(`Epoch node version____________  ${version}`)
+
+    await handleApiError(async () => {
+      const {version} = await client.api.getVersion()
+      console.log(`Epoch node version____________  ${version}`)
+    })
   } catch (e) {
     console.error(e.message)
   }
@@ -59,7 +65,10 @@ async function version ({host}) {
 async function top ({host}) {
   try {
     const client = await initClient(host)
-    printBlock(await client.api.getTop())
+
+    await handleApiError(
+      async () => printBlock(await client.api.getTop())
+    )
   } catch (e) {
     console.error(e.message)
   }
@@ -68,8 +77,11 @@ async function top ({host}) {
 async function mempool ({host}) {
   try {
     const client = await initClient(host)
-    const mempool = await client.mempool()
-    console.log(mempool)
+
+    await handleApiError(async () => {
+      const mempool = await client.mempool()
+      console.log(mempool)
+    })
   } catch (e) {
     console.error(e.message)
   }
@@ -79,9 +91,12 @@ async function play ({host, limit}) {
   limit = parseInt(limit)
   try {
     const client = await initClient(host)
-    let top = await client.api.getTop()
-    printBlock(top)
-    await playWithLimit(--limit, top.prevHash, client)
+
+    await handleApiError(async () => {
+      const top = await client.api.getTop()
+      printBlock(top)
+      await playWithLimit(--limit, top.prevHash, client)
+    })
   } catch (e) {
     console.error(e.message)
   }
@@ -96,28 +111,5 @@ async function playWithLimit (limit, blockHash, client) {
     printBlock(block)
     console.log('<------------------------------------------->')
     await playWithLimit(--limit, block.prevHash, client)
-  }, 2000)
-}
-
-function poll (client, interval) {
-  let currentTop = {}
-
-  const intervalId = setInterval(
-    async () => {
-      try {
-        let top = await client.api.getTop()
-        if (currentTop.height === top.height) return
-
-        console.log('<------------------------------------------->')
-        printBlock(top)
-        console.log('<------------------------------------------->')
-
-        currentTop = top
-      } catch (e) {
-        console.error(e.message)
-        clearInterval(intervalId)
-      }
-    },
-    interval
-  )
+  }, 1000)
 }
