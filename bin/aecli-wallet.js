@@ -33,7 +33,8 @@ const {
   handleApiError,
   getWalletByPathAndDecrypt,
   initExecCommands,
-  unknownCommandHandler
+  unknownCommandHandler,
+  generateSecureWalletFromPrivKey
 } = require('./utils')
 
 // EXEC COMMANDS LIST
@@ -89,6 +90,11 @@ program
   .description('Create a secure wallet')
   .action(async (cmd) => await createSecureWallet(WALLET_NAME, Object.assign({}, cmd, cmd.parent)))
 
+program
+  .command('save <privkey>')
+  .description('Save a private keys string to a password protected file wallet')
+  .action(async (priv, cmd) => await createSecureWalletByPrivKey(WALLET_NAME, priv, Object.assign({}, cmd, cmd.parent)))
+
 program.on('command:*', () => unknownCommandHandler(program)(EXECUTABLE_CMD))
 
 async function spend (receiver, amount, host) {
@@ -131,6 +137,14 @@ async function createSecureWallet (name, {output, password}) {
   }
 }
 
+async function createSecureWalletByPrivKey (name, priv, {output, password}) {
+  try {
+    await generateSecureWalletFromPrivKey(name, priv, {output, password})
+  } catch (e) {
+    console.log(e.message)
+  }
+}
+
 //HELPERS
 async function initWallet () {
   return new Promise((resolve, reject) => {
@@ -141,7 +155,7 @@ async function initWallet () {
         WALLET_NAME = name
 
         // Prevent grab wallet keys and create new wallet
-        if (command === 'create') resolve()
+        if (command === 'create' || command === 'save') resolve()
 
         try {
           WALLET_KEY_PAIR = await getWalletByPathAndDecrypt(name, cmd.password)

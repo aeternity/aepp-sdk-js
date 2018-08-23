@@ -81,6 +81,36 @@ export function decodeBase58Check (str) {
 }
 
 /**
+ * Conver hex string to Uint8Array
+ * @rtype (str: String) => Uint8Array
+ * @param {String} str - Data to conver
+ * @return {Uint8Array} - converted data
+ */
+export function hexStringToByte(str) {
+  if (!str) {
+    return new Uint8Array();
+  }
+
+  var a = [];
+  for (var i = 0, len = str.length; i < len; i+=2) {
+    a.push(parseInt(str.substr(i,2),16));
+  }
+
+  return new Uint8Array(a);
+}
+
+/**
+ * Generate keyPair from secret key
+ * @rtype (secret: Uint8Array) => KeyPair
+ * @param {Uint8Array} secret - secret key
+ * @return {Object} - Object with Private(privateKey) and Public(publicKey) keys
+ */
+export function generateKeyPairFromSecret(secret) {
+  return nacl.sign.keyPair.fromSecretKey(secret)
+}
+
+
+/**
  * Generate a random ED25519 keypair
  * @rtype (raw: Boolean) => {pub: String, priv: String} | {pub: Buffer, priv: Buffer}
  * @param {Boolean} raw - Whether to return raw (binary) keys

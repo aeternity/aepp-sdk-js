@@ -16,6 +16,7 @@
  */
 'use strict'
 
+
 require = require('esm')(module/*, options*/) //use to handle es6 import/export
 const path = require('path')
 const fs = require('fs')
@@ -97,6 +98,33 @@ const generateSecureWallet = async (name, {output, password}) => {
   })
 }
 
+const generateSecureWalletFromPrivKey = async (name, priv, {output, password}) => {
+  password = password || await promptPasswordAsync()
+
+  const hexStr = Crypto.hexStringToByte(priv.trim())
+  const keys = Crypto.generateKeyPairFromSecret(hexStr)
+
+  const encryptedKeyPair = {
+    pub: Crypto.encryptPublicKey(password, keys.publicKey),
+    priv: Crypto.encryptPrivateKey(password, keys.secretKey)
+  }
+
+  const data = [
+    [path.join(output, name), encryptedKeyPair.priv],
+    [path.join(output, `${name}.pub`), encryptedKeyPair.pub]
+  ]
+
+  data.forEach(([path, data]) => {
+    fs.writeFileSync(path, data)
+  })
+
+  console.log(`
+    Wallet saved
+    Wallet address________________ ${Crypto.aeEncodeKey(keys.publicKey)}
+    Wallet path___________________ ${__dirname + '/' + name}
+  `)
+}
+
 const getWalletByPathAndDecrypt = async (name, password) => {
   if (!password || typeof password !== 'string' || !password.length) password = await promptPasswordAsync()
 
@@ -150,5 +178,6 @@ module.exports = {
   generateSecureWallet,
   initExecCommands,
   isExecCommand,
-  unknownCommandHandler
+  unknownCommandHandler,
+  generateSecureWalletFromPrivKey
 }
