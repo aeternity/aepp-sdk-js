@@ -26,6 +26,7 @@
 //
 
 const program = require('commander')
+const R = require('ramda')
 
 const {
   initClient,
@@ -36,8 +37,10 @@ const {
   unknownCommandHandler,
   generateSecureWalletFromPrivKey,
   checkPref,
+  print,
   printError,
   printTransaction,
+  getCmdFromAguments,
   HASH_TYPES
 } = require('./utils')
 
@@ -53,6 +56,9 @@ let WALLET_NAME
 // Grab WALLET_PATH and try to read and decrypt keypair. IF success -> remove wallet path from argv and take it commander.js
 initWallet()
   .then(() => {
+    // Prevent parsing wallet-path --> issue with arguments parsing in sub-commands
+    program._args = []
+
     // SET KEYPAIR TO PROCESS.ENV
     process.env['WALLET_KEYS'] = JSON.stringify(WALLET_KEY_PAIR)
 
@@ -60,12 +66,12 @@ initWallet()
     process.argv = process.argv.filter((e, i) => i !== 2)
 
     program.parse(process.argv)
+
     if (program.args.length === 0) program.help()
   })
   .catch(e => printError(e.message))
 
 program
-  .option('-H, --host [hostname]', 'Node to connect to', 'https://sdk-testnet.aepps.com')
   .option('-O, --output [output]', 'Output directory', '.')
   .option('-T, --ttl [ttl]', 'Validity of the spend transaction in number of blocks (default forever)', Number.MAX_SAFE_INTEGER)
   .usage('<wallet-name> [options] [commands]')
@@ -81,17 +87,17 @@ program
 program
   .command('balance')
   .description('Get wallet balance')
-  .action(async (cmd) => await getBalance(cmd.parent))
+  .action(async (...arguments) => await getBalance(getCmdFromAguments(arguments)))
 
 program
   .command('address')
   .description('Get wallet address')
-  .action(async (cmd) => await getAddress(cmd.parent))
+  .action(async (...arguments) => await getAddress(getCmdFromAguments(arguments)))
 
 program
   .command('create')
   .description('Create a secure wallet')
-  .action(async (cmd) => await createSecureWallet(WALLET_NAME, Object.assign({}, cmd, cmd.parent)))
+  .action(async (...arguments) => await createSecureWallet(WALLET_NAME, getCmdFromAguments(arguments)))
 
 program
   .command('save <privkey>')
@@ -105,33 +111,38 @@ async function spend (receiver, amount, {host, ttl}) {
   try {
     checkPref(receiver, HASH_TYPES.account)
     const client = await initClient(host, WALLET_KEY_PAIR)
-    const tx = await client.spend(parseInt(amount), receiver, {ttl})
-    print('Transaction mined')
-    printTransaction(tx)
+
+    await handleApiError(async () => {
+      const tx = await client.spend(parseInt(amount), receiver, {ttl})
+      print('Transaction mined')
+      printTransaction(tx)
+    })
   } catch (e) {
-    console.log(e.message)
+    printError(e.message)
   }
 }
 
 async function getBalance ({host}) {
   try {
     const client = await initClient(host, WALLET_KEY_PAIR)
-    await handleApiError(async () => {
-      console.log('Your balance is: ' + (await client.balance(WALLET_KEY_PAIR.pub)))
-    })
+
+    await handleApiError(
+      async () => print('Your balance is: ' + (await client.balance(WALLET_KEY_PAIR.pub)))
+    )
   } catch (e) {
-    console.log(e.message)
+    printError(e.message)
   }
 }
 
 async function getAddress ({host}) {
   try {
     const client = await initClient(host, WALLET_KEY_PAIR)
+
     await handleApiError(
-      async () => console.log('Your address is: ' + await client.address())
+      async () => print('Your address is: ' + await client.address())
     )
   } catch (e) {
-    console.log(e.message)
+    printError(e.message)
   }
 }
 
@@ -139,7 +150,7 @@ async function createSecureWallet (name, {output, password}) {
   try {
     await generateSecureWallet(name, {output, password})
   } catch (e) {
-    console.log(e.message)
+    printError(e.message)
   }
 }
 
@@ -147,7 +158,7 @@ async function createSecureWalletByPrivKey (name, priv, {output, password}) {
   try {
     await generateSecureWalletFromPrivKey(name, priv, {output, password})
   } catch (e) {
-    console.log(e.message)
+    printError(e.message)
   }
 }
 
@@ -155,16 +166,20 @@ async function createSecureWalletByPrivKey (name, priv, {output, password}) {
 async function initWallet () {
   return new Promise((resolve, reject) => {
     program
-      .arguments('<wallet_name> [command]')
+    .arguments('<wallet_path> [command]')
       .option('-P, --password [password]', 'Wallet Password')
-      .action(async (name, command, cmd) => {
-        WALLET_NAME = name
+      .action(async (path, command, cmd) => {
+        WALLET_NAME = R.last(path.split('/'))
 
-        // Prevent grab wallet keys and create new wallet
-        if (command === 'create' || command === 'save') resolve()
+        // Prevent grab wallet keys for create save commands
+        if (!command || command === 'create' || command === 'save') resolve()
+        // Add host option if it is no sub-command (commander issue with parsing options in sub-command)
+        if (!EXECUTABLE_CMD.find(cmd => cmd.name === command)) {
+          program.option('-H, --host [hostname]', 'Node to connect to', 'https://sdk-testnet.aepps.com')
+        }
 
         try {
-          WALLET_KEY_PAIR = await getWalletByPathAndDecrypt(name, cmd.password)
+          WALLET_KEY_PAIR = await getWalletByPathAndDecrypt(path, cmd.password)
         } catch (e) {
           reject(e)
         }

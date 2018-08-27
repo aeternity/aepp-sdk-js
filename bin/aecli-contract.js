@@ -25,7 +25,12 @@
 
 
 
-const {initClient, unknownCommandHandler, handleApiError} = require('./utils')
+const {
+  initClient,
+  print,
+  unknownCommandHandler,
+  handleApiError
+} = require('./utils')
 const program = require('commander')
 const fs = require('fs')
 
@@ -51,7 +56,8 @@ async function compile (file, {host}) {
     handleApiError(async () => {
       const client = await initClient(host)
       const contract = await client.contractCompile(code)
-      console.log(contract)
+      print(`Contract bytecode:
+      ${contract.bytecode}`)
     })
   } catch (e) {
     console.log(e.message)

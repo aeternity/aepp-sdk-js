@@ -82,7 +82,9 @@ async function getBlockByHash (hash, {host}) {
     checkPref(hash, HASH_TYPES.block)
     const client = await initClient(host)
 
-    await handleApiError(async () => printBlock(await client.api.getBlockByHash(hash)))
+    await handleApiError(
+      async () => printBlock(await client.api.getBlockByHash(hash))
+    )
   } catch (e) {
     printError(e.message)
   }
@@ -93,8 +95,8 @@ async function getTransactionByHash (hash, {host}) {
     checkPref(hash, HASH_TYPES.transaction)
     const client = await initClient(host)
 
-    printTransaction(
-      await handleApiError(async () => await client.tx(hash))
+    await handleApiError(
+      async () => printTransaction(await client.tx(hash))
     )
   } catch (e) {
     printError(e.message)
@@ -106,9 +108,9 @@ async function getAccountByHash (hash, {host}) {
     checkPref(hash, HASH_TYPES.account)
     const client = await initClient(host)
 
-    await handleApiError(async () => {
-      print('Account balance___________ ' + await client.balance(hash))
-    })
+    await handleApiError(
+      async () => print('Account balance___________ ' + await client.balance(hash))
+    )
   } catch (e) {
     printError(e.message)
   }
@@ -119,7 +121,9 @@ async function getBlockByHeight (height, {host}) {
   try {
     const client = await initClient(host)
 
-    printBlock(await handleApiError(async () => client.api.getKeyBlockByHeight(height)))
+    await handleApiError(
+      async () => printBlock(client.api.getKeyBlockByHeight(height))
+    )
   } catch (e) {
     printError(e.message)
   }
@@ -128,6 +132,7 @@ async function getBlockByHeight (height, {host}) {
 async function getName (name, {host}) {
   try {
     const client = await initClient(host)
+
     await handleApiError(async () => {
       //TODO implement after AENS module
       print(await client.api.getName(name))

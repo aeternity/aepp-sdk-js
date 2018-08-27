@@ -50,7 +50,7 @@ const PROMPT_SCHEMA = {
   }
 }
 
-const getCmdFromAguments= (args) => args[args.length - 1]
+const getCmdFromAguments= (args) => Object.assign({}, args[args.length - 1], args[args.length - 1].parent)
 
 const initClient = async (url, keypair) => {
   return await Cli({url, process, keypair})
@@ -132,7 +132,7 @@ const generateSecureWallet = async (name, {output, password}) => {
 
   data.forEach(([path, data]) => {
     fs.writeFileSync(path, data)
-    console.log(`Wrote ${path}`)
+    print(`Wrote ${path}`)
   })
 }
 
@@ -163,13 +163,11 @@ const generateSecureWalletFromPrivKey = async (name, priv, {output, password}) =
   `)
 }
 
-const getWalletByPathAndDecrypt = async (name, password) => {
+const getWalletByPathAndDecrypt = async (path, password) => {
+  const privBinaryKey = fs.readFileSync(path)
+  const pubBinaryKey = fs.readFileSync(`${path}.pub`)
+
   if (!password || typeof password !== 'string' || !password.length) password = await promptPasswordAsync()
-
-  const privBinaryKey = fs.readFileSync(name)
-  const pubBinaryKey = fs.readFileSync(`${name}.pub`)
-
-  if (!privBinaryKey) throw new Error('Key not found')
 
   const decryptedPriv = Crypto.decryptPrivateKey(password, privBinaryKey)
   const decryptedPub = Crypto.decryptPubKey(password, pubBinaryKey)

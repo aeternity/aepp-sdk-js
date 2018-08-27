@@ -49,6 +49,7 @@ initAensName()
 
 program
   .usage('<aens-name> [options] [commands]')
+  .option('-H, --host [hostname]', 'Node to connect to', 'https://sdk-testnet.aepps.com')
 
 program
   .command('claim')
