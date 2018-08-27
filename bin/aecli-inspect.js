@@ -25,7 +25,14 @@
 //                   | |
 //                   |_|
 
-const {initClient, printBlock, handleApiError, unknownCommandHandler} = require('./utils')
+const {
+  initClient,
+  printBlock,
+  handleApiError,
+  unknownCommandHandler,
+  checkPref,
+  HASH_TYPES
+} = require('./utils')
 const program = require('commander')
 
 program
@@ -70,10 +77,10 @@ if (program.args.length === 0) program.help()
 
 async function getBlockByHash (hash ,{host}) {
   try {
+    checkPref(hash, HASH_TYPES.block)
     const client = await initClient(host)
     await handleApiError(async () => {
-      const {version} = await client.api.getBlockByHash(hash)
-      console.log(`Epoch node version____________  ${version}`)
+      printBlock(await client.api.getBlockByHash(hash))
     })
   } catch (e) {
     console.log(e.message)
@@ -82,6 +89,7 @@ async function getBlockByHash (hash ,{host}) {
 
 async function getTransactionByHash (hash, {host}) {
   try {
+    checkPref(hash, HASH_TYPES.transaction)
     const client = await initClient(host)
     await handleApiError(async () => {
       console.log(await client.tx(hash))
@@ -93,6 +101,7 @@ async function getTransactionByHash (hash, {host}) {
 
 async function getAccountByHash (hash, {host}) {
   try {
+    checkPref(hash, HASH_TYPES.account)
     const client = await initClient(host)
     await handleApiError(async () => {
       console.log(await client.balance(hash))

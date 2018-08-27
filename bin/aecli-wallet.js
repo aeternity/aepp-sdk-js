@@ -34,7 +34,9 @@ const {
   getWalletByPathAndDecrypt,
   initExecCommands,
   unknownCommandHandler,
-  generateSecureWalletFromPrivKey
+  generateSecureWalletFromPrivKey,
+  checkPref,
+  HASH_TYPES
 } = require('./utils')
 
 // EXEC COMMANDS LIST
@@ -62,9 +64,7 @@ initWallet()
 
 program
   .option('-H, --host [hostname]', 'Node to connect to', 'https://sdk-testnet.aepps.com')
-  .option('-P, --password [password]', 'Wallet Password')
   .option('-O, --output [output]', 'Output directory', '.')
-  .option('-P, --password [password]', 'Wallet Password')
   .usage('<wallet-name> [options] [commands]')
 
 // INIT EXECUTABLE COMMANDS
@@ -97,8 +97,9 @@ program
 
 program.on('command:*', () => unknownCommandHandler(program)(EXECUTABLE_CMD))
 
-async function spend (receiver, amount, host) {
+async function spend (receiver, amount, {host}) {
   try {
+    checkPref(receiver, HASH_TYPES.account)
     const client = await initClient(host, WALLET_KEY_PAIR)
     const tx = await client.spend(parseInt(amount), receiver)
     console.log('Transaction mined', tx)

@@ -25,8 +25,17 @@ const prompt = require('prompt')
 const {default: Cli} = require('../es/ae/cli')
 const Crypto = require('../es/utils/crypto')
 
+// HAST TYPES
+const HASH_TYPES = {
+  transaction: 'th',
+  block: 'bh',
+  signature: 'sg',
+  account: 'ak',
+  stateHash: 'bs'
+}
+
 // The `prompt` library provides concealed input of passwords.
-const promptSchema = {
+const PROMPT_SCHEMA = {
   properties: {
     password: {
       type: 'string',
@@ -83,6 +92,7 @@ const unknownCommandHandler = (program) => (execCommands = []) => {
 }
 //
 
+// WALLET HELPERS
 const generateSecureWallet = async (name, {output, password}) => {
   password = password || await promptPasswordAsync()
   const {pub, priv} = Crypto.generateSaveWallet(password)
@@ -147,7 +157,7 @@ const promptPasswordAsync = async () => {
     (resolve, reject) => {
       prompt.start()
       prompt.get(
-        promptSchema,
+        PROMPT_SCHEMA,
         (err, res) => {
           if (err) reject(err)
           if (!res || !res.password) {
@@ -159,13 +169,34 @@ const promptPasswordAsync = async () => {
     }
   )
 }
-
 //
 
 // UTILS
 const initExecCommands = (program) => (cmds) => cmds.forEach(({name, desc}) => program.command(name, desc))
 
 const isExecCommand = (cmd, commands) => commands.find(({name}) => cmd === name)
+
+const checkPref = (hash, hashType) => {
+  if (hash.length < 3 || hash.indexOf('$') === -1)
+    throw new Error(`Invalid input, likely you forgot to escape the $ sign (use \\$)`);
+
+  if (hash.slice(0, 3) !== hashType + '$') {
+    let msg;
+    switch (hashType) {
+      case HASH_TYPES.transaction:
+        msg = 'Invalid transaction hash, it should be like: th$....'
+        break;
+      case HASH_TYPES.block:
+        msg = 'Invalid block hash, it should be like: bh$....'
+        break;
+      case HASH_TYPES.account:
+        msg = 'Invalid account address, it should be like: ak$....'
+        break;
+    }
+    throw new Error(msg);
+  }
+
+}
 
 module.exports = {
   printBlock,
@@ -177,7 +208,8 @@ module.exports = {
   handleApiError,
   generateSecureWallet,
   initExecCommands,
-  isExecCommand,
   unknownCommandHandler,
-  generateSecureWalletFromPrivKey
+  generateSecureWalletFromPrivKey,
+  checkPref,
+  HASH_TYPES
 }
