@@ -36,6 +36,7 @@ const {
   unknownCommandHandler,
   generateSecureWalletFromPrivKey,
   checkPref,
+  printError,
   HASH_TYPES
 } = require('./utils')
 
@@ -52,7 +53,7 @@ let WALLET_NAME
 initWallet()
   .then(() => {
     // SET KEYPAIR TO PROCESS.ENV
-    process.env['WALLET_KEYS'] = WALLET_KEY_PAIR
+    process.env['WALLET_KEYS'] = JSON.stringify(WALLET_KEY_PAIR)
 
     // remove wallet_name from argv
     process.argv = process.argv.filter((e, i) => i !== 2)
@@ -60,7 +61,7 @@ initWallet()
     program.parse(process.argv)
     if (program.args.length === 0) program.help()
   })
-  .catch(e => console.log(e.message))
+  .catch(e => printError(e.message))
 
 program
   .option('-H, --host [hostname]', 'Node to connect to', 'https://sdk-testnet.aepps.com')

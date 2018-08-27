@@ -16,7 +16,24 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-const {initClient, printBlock, unknownCommandHandler, handleApiError} = require('./utils')
+//   _____ _           _
+//  / ____| |         (_)
+// | |    | |__   __ _ _ _ __
+// | |    | '_ \ / _` | | '_ \
+// | |____| | | | (_| | | | | |
+//  \_____|_| |_|\__,_|_|_| |_|
+
+
+
+const {
+  initClient,
+  printBlock,
+  unknownCommandHandler,
+  handleApiError,
+  print,
+  printError,
+  getCmdFromAguments
+} = require('./utils')
 const program = require('commander')
 
 program
@@ -26,22 +43,22 @@ program
 program
   .command('top')
   .description('Get top of Chain')
-  .action(async (cmd) => await top(cmd.parent))
+  .action(async (...arguments) => await top(getCmdFromAguments(arguments).parent))
 
 program
   .command('version')
   .description('Get Epoch version')
-  .action(async (cmd) => await version(cmd.parent))
+  .action(async (...arguments) => await version(getCmdFromAguments(arguments).parent))
 
 program
   .command('mempool')
   .description('Get mempool of Chain')
-  .action(async (cmd) => await mempool(cmd.parent))
+  .action(async (...arguments) => await mempool(getCmdFromAguments(arguments).parent))
 
 program
   .command('play')
   .description('Real-time block monitoring')
-  .action(async (cmd) => await play(cmd.parent))
+  .action(async (...arguments) => await play(getCmdFromAguments(arguments).parent))
 
 // HANDLE UNKNOWN COMMAND
 program.on('command:*', () => unknownCommandHandler(program)())
@@ -55,10 +72,10 @@ async function version ({host}) {
 
     await handleApiError(async () => {
       const {version} = await client.api.getVersion()
-      console.log(`Epoch node version____________  ${version}`)
+      print(`Epoch node version____________  ${version}`)
     })
   } catch (e) {
-    console.error(e.message)
+    printError(e.message)
   }
 }
 
@@ -70,7 +87,7 @@ async function top ({host}) {
       async () => printBlock(await client.api.getTop())
     )
   } catch (e) {
-    console.error(e.message)
+    printError(e.message)
   }
 }
 
@@ -80,10 +97,10 @@ async function mempool ({host}) {
 
     await handleApiError(async () => {
       const mempool = await client.mempool()
-      console.log(mempool)
+      print('Memmpool______________ ' + mempool)
     })
   } catch (e) {
-    console.error(e.message)
+    printError(e.message)
   }
 }
 
@@ -95,10 +112,11 @@ async function play ({host, limit}) {
     await handleApiError(async () => {
       const top = await client.api.getTop()
       printBlock(top)
+      console.log('>>>>>>>>>')
       await playWithLimit(--limit, top.prevHash, client)
     })
   } catch (e) {
-    console.error(e.message)
+    printError(e.message)
   }
 }
 
@@ -107,9 +125,8 @@ async function playWithLimit (limit, blockHash, client) {
 
   let block = await client.api.getBlockByHash(blockHash)
   setTimeout(async () => {
-    console.log('<------------------------------------------->')
     printBlock(block)
-    console.log('<------------------------------------------->')
+    console.log('>>>>>>>>>')
     await playWithLimit(--limit, block.prevHash, client)
   }, 1000)
 }

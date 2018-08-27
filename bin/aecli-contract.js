@@ -16,6 +16,15 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+//   _____            _                  _
+//  / ____|          | |                | |
+// | |     ___  _ __ | |_ _ __ __ _  ___| |_ ___
+// | |    / _ \| '_ \| __| '__/ _` |/ __| __/ __|
+// | |___| (_) | | | | |_| | | (_| | (__| |_\__ \
+//  \_____\___/|_| |_|\__|_|  \__,_|\___|\__|___/
+
+
+
 const {initClient, unknownCommandHandler, handleApiError} = require('./utils')
 const program = require('commander')
 const fs = require('fs')

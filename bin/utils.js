@@ -50,6 +50,8 @@ const PROMPT_SCHEMA = {
   }
 }
 
+const getCmdFromAguments= (args) => args[args.length - 1]
+
 const initClient = async (url, keypair) => {
   return await Cli({url, process, keypair})
 }
@@ -60,25 +62,51 @@ const printConfig = ({host}) => {
   console.log('EPOCH_URL___________' + host)
 }
 
-const printBlock = (block) => console.log(`
-Block hash____________________ ${block.hash}
+const printBlock = (block) => {
+console
+  .log(`Block hash____________________ ${block.hash}
 Block height__________________ ${block.height}
 State hash____________________ ${block.stateHash}
-Miner_________________________ ${block.miner}
+Miner_________________________ ${block.miner || 'N/A'} 
 Time__________________________ ${new Date(block.time)}
 Previous block hash___________ ${block.prevHash}
-Transactions__________________ ${block.transactions || 0}
+Transactions__________________ ${block.transactions ? block.transactions.length : 0}`)
+  if (block.transactions && block.transactions.length)
+    printBlockTransactions (block.transactions)
+}
+
+const printBlockTransactions = (ts) => ts.forEach(tx => console
+.log(`-->
+   Tx hash____________________ ${tx.hash}
+   Signatures_________________ ${tx.signatures}
+   Sender account_____________ ${tx.tx && tx.tx.sender ? tx.tx.sender : 'N/A'}
+   Recipient account__________ ${tx.tx && tx.tx.recipient ? tx.tx.recipient : 'N/A'}
+   Amount_____________________ ${tx.tx && tx.tx.amount ? tx.tx.amount : 'N/A'}`))
+
+const printTransaction = (tx) => console.log(`
+Block hash_____________________${tx.blockHash}
+Block height___________________${tx.blockHeight}
+Signatures_____________________${tx.signatures}
+Sender account_________________${tx.tx && tx.tx.sender ? tx.tx.sender : 'N/A'}
+Recipient account______________${tx.tx && tx.tx.recipient ? tx.tx.recipient : 'N/A'}
+Amount_________________________${tx.tx && tx.tx.amount ? tx.tx.amount : 'N/A'}
+TTL____________________________${tx.tx && tx.tx.ttl? tx.tx.ttl : 'N/A'}
 `)
+
+const print = (msg) => console.log(msg)
+
+const printError = (msg) => console.log(msg)
 //
 
 // ERROR HANDLERS
-const logApiError = (response) => console.log(`API ERROR: ${response}`)
+const logApiError = (error) => printError(`API ERROR: ${error}`)
 
 const handleApiError = async (fn) => {
   try {
-    await fn()
+    return await fn()
   } catch (e) {
-    logApiError(e)
+    const response = e.response;
+    logApiError(response && response.data ? response.data.reason : e)
   }
 }
 
@@ -202,6 +230,7 @@ module.exports = {
   printBlock,
   initClient,
   printConfig,
+  printTransaction,
   logApiError,
   promptPasswordAsync,
   getWalletByPathAndDecrypt,
@@ -211,5 +240,8 @@ module.exports = {
   unknownCommandHandler,
   generateSecureWalletFromPrivKey,
   checkPref,
+  print,
+  printError,
+  getCmdFromAguments,
   HASH_TYPES
 }

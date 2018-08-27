@@ -31,6 +31,9 @@ const {
   handleApiError,
   unknownCommandHandler,
   checkPref,
+  printTransaction,
+  print,
+  printError,
   HASH_TYPES
 } = require('./utils')
 const program = require('commander')
@@ -74,16 +77,14 @@ program.on('command:*', () => unknownCommandHandler(program)())
 program.parse(process.argv)
 if (program.args.length === 0) program.help()
 
-
-async function getBlockByHash (hash ,{host}) {
+async function getBlockByHash (hash, {host}) {
   try {
     checkPref(hash, HASH_TYPES.block)
     const client = await initClient(host)
-    await handleApiError(async () => {
-      printBlock(await client.api.getBlockByHash(hash))
-    })
+
+    await handleApiError(async () => printBlock(await client.api.getBlockByHash(hash)))
   } catch (e) {
-    console.log(e.message)
+    printError(e.message)
   }
 }
 
@@ -91,11 +92,12 @@ async function getTransactionByHash (hash, {host}) {
   try {
     checkPref(hash, HASH_TYPES.transaction)
     const client = await initClient(host)
-    await handleApiError(async () => {
-      console.log(await client.tx(hash))
-    })
+
+    printTransaction(
+      await handleApiError(async () => await client.tx(hash))
+    )
   } catch (e) {
-    console.log(e.message)
+    printError(e.message)
   }
 }
 
@@ -103,11 +105,12 @@ async function getAccountByHash (hash, {host}) {
   try {
     checkPref(hash, HASH_TYPES.account)
     const client = await initClient(host)
+
     await handleApiError(async () => {
-      console.log(await client.balance(hash))
+      print('Account balance___________ ' + await client.balance(hash))
     })
   } catch (e) {
-    console.error(e.message)
+    printError(e.message)
   }
 }
 
@@ -115,11 +118,10 @@ async function getBlockByHeight (height, {host}) {
   height = parseInt(height)
   try {
     const client = await initClient(host)
-    await handleApiError(async () => {
-      printBlock(await client.api.getKeyBlockByHeight(height))
-    })
+
+    printBlock(await handleApiError(async () => client.api.getKeyBlockByHeight(height)))
   } catch (e) {
-    console.error(e.message)
+    printError(e.message)
   }
 }
 
@@ -127,14 +129,15 @@ async function getName (name, {host}) {
   try {
     const client = await initClient(host)
     await handleApiError(async () => {
-      console.log(await client.api.getName(name))
+      //TODO implement after AENS module
+      print(await client.api.getName(name))
     })
   } catch (e) {
-    console.error(e.message)
+    printError(e.message)
   }
 }
 
 async function getContractByDescr (desc, {host}) {
-  // TODO
+  // TODO implement after cointract modile
   console.log('Get contract info')
 }
