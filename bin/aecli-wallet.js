@@ -37,6 +37,7 @@ const {
   generateSecureWalletFromPrivKey,
   checkPref,
   printError,
+  printTransaction,
   HASH_TYPES
 } = require('./utils')
 
@@ -66,6 +67,7 @@ initWallet()
 program
   .option('-H, --host [hostname]', 'Node to connect to', 'https://sdk-testnet.aepps.com')
   .option('-O, --output [output]', 'Output directory', '.')
+  .option('-T, --ttl [ttl]', 'Validity of the spend transaction in number of blocks (default forever)', Number.MAX_SAFE_INTEGER)
   .usage('<wallet-name> [options] [commands]')
 
 // INIT EXECUTABLE COMMANDS
@@ -74,7 +76,7 @@ initExecCommands(program)(EXECUTABLE_CMD)
 program
   .command('spend <receiver> <amount>')
   .description('Create a transaction to another wallet')
-  .action(async (receiver, amount, cmd) => await spend(receiver, amount, cmd.parent))
+  .action(async (receiver, amount, cmd) => await spend(receiver, amount, Object.assign({}, cmd, cmd.parent)))
 
 program
   .command('balance')
@@ -98,12 +100,14 @@ program
 
 program.on('command:*', () => unknownCommandHandler(program)(EXECUTABLE_CMD))
 
-async function spend (receiver, amount, {host}) {
+async function spend (receiver, amount, {host, ttl}) {
+  ttl = parseInt(ttl)
   try {
     checkPref(receiver, HASH_TYPES.account)
     const client = await initClient(host, WALLET_KEY_PAIR)
-    const tx = await client.spend(parseInt(amount), receiver)
-    console.log('Transaction mined', tx)
+    const tx = await client.spend(parseInt(amount), receiver, {ttl})
+    print('Transaction mined')
+    printTransaction(tx)
   } catch (e) {
     console.log(e.message)
   }
