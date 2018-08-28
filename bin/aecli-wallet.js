@@ -40,7 +40,7 @@ const {
   print,
   printError,
   printTransaction,
-  getCmdFromAguments,
+  getCmdFromArguments,
   HASH_TYPES
 } = require('./utils')
 
@@ -82,27 +82,27 @@ initExecCommands(program)(EXECUTABLE_CMD)
 program
   .command('spend <receiver> <amount>')
   .description('Create a transaction to another wallet')
-  .action(async (receiver, amount, cmd) => await spend(receiver, amount, Object.assign({}, cmd, cmd.parent)))
+  .action(async (receiver, amount, ...arguments) => await spend(receiver, amount, getCmdFromArguments(arguments)))
 
 program
   .command('balance')
   .description('Get wallet balance')
-  .action(async (...arguments) => await getBalance(getCmdFromAguments(arguments)))
+  .action(async (...arguments) => await getBalance(getCmdFromArguments(arguments)))
 
 program
   .command('address')
   .description('Get wallet address')
-  .action(async (...arguments) => await getAddress(getCmdFromAguments(arguments)))
+  .action(async (...arguments) => await getAddress(getCmdFromArguments(arguments)))
 
 program
   .command('create')
   .description('Create a secure wallet')
-  .action(async (...arguments) => await createSecureWallet(WALLET_NAME, getCmdFromAguments(arguments)))
+  .action(async (...arguments) => await createSecureWallet(WALLET_NAME, getCmdFromArguments(arguments)))
 
 program
   .command('save <privkey>')
   .description('Save a private keys string to a password protected file wallet')
-  .action(async (priv, cmd) => await createSecureWalletByPrivKey(WALLET_NAME, priv, Object.assign({}, cmd, cmd.parent)))
+  .action(async (priv, ...arguments) => await createSecureWalletByPrivKey(WALLET_NAME, priv, getCmdFromArguments(arguments)))
 
 program.on('command:*', () => unknownCommandHandler(program)(EXECUTABLE_CMD))
 
@@ -166,13 +166,14 @@ async function createSecureWalletByPrivKey (name, priv, {output, password}) {
 async function initWallet () {
   return new Promise((resolve, reject) => {
     program
-    .arguments('<wallet_path> [command]')
+      .arguments('<wallet_path> [command]')
       .option('-P, --password [password]', 'Wallet Password')
       .action(async (path, command, cmd) => {
         WALLET_NAME = R.last(path.split('/'))
 
         // Prevent grab wallet keys for create save commands
         if (!command || command === 'create' || command === 'save') resolve()
+
         // Add host option if it is no sub-command (commander issue with parsing options in sub-command)
         if (!EXECUTABLE_CMD.find(cmd => cmd.name === command)) {
           program.option('-H, --host [hostname]', 'Node to connect to', 'https://sdk-testnet.aepps.com')

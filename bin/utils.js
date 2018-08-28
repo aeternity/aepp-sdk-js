@@ -16,7 +16,6 @@
  */
 'use strict'
 
-
 require = require('esm')(module/*, options*/) //use to handle es6 import/export
 const path = require('path')
 const fs = require('fs')
@@ -43,28 +42,65 @@ const PROMPT_SCHEMA = {
       hidden: true,
       required: true,
       replace: '*',
-      conform: function (value) {
+      conform: function () {
         return true
       }
     }
   }
 }
 
-const getCmdFromAguments= (args) => Object.assign({}, args[args.length - 1], args[args.length - 1].parent)
+const getCmdFromArguments = (args) => Object.assign({}, args[args.length - 1], args[args.length - 1].parent)
 
 const initClient = async (url, keypair) => {
   return await Cli({url, process, keypair})
 }
 
+// FILE I/O
+const writeFile = (name, data) => {
+  try {
+    fs.writeFileSync(
+      name,
+      JSON.stringify(data),
+    )
+    return true
+  } catch (e) {
+    printError('WRITE FILE ERROR: ' + e)
+    process.exit(1)
+  }
+}
+
+const readFile = (path, encoding = '') => {
+  try {
+    return fs.readFileSync(
+      path,
+      encoding
+    )
+  } catch (e) {
+    switch (e.code) {
+      case 'ENOENT':
+        printError('READ FILE ERROR: ' + 'File not found')
+        break
+      default:
+        printError('READ FILE ERROR: ' + e)
+        break
+    }
+    process.exit(1)
+  }
+}
+
 // CONSOLE PRINT HELPERS
+const print = (msg) => console.log(msg)
+
+const printError = (msg) => console.log(msg)
+
 const printConfig = ({host}) => {
   console.log('WALLET_PUB___________' + process.env['WALLET_PUB'])
   console.log('EPOCH_URL___________' + host)
 }
 
 const printBlock = (block) => {
-console
-  .log(`Block hash____________________ ${block.hash}
+  console
+    .log(`Block hash____________________ ${block.hash}
 Block height__________________ ${block.height}
 State hash____________________ ${block.stateHash}
 Miner_________________________ ${block.miner || 'N/A'} 
@@ -72,30 +108,31 @@ Time__________________________ ${new Date(block.time)}
 Previous block hash___________ ${block.prevHash}
 Transactions__________________ ${block.transactions ? block.transactions.length : 0}`)
   if (block.transactions && block.transactions.length)
-    printBlockTransactions (block.transactions)
+    printBlockTransactions(block.transactions)
 }
 
 const printBlockTransactions = (ts) => ts.forEach(tx => console
-.log(`-->
+  .log(`-->
    Tx hash____________________ ${tx.hash}
    Signatures_________________ ${tx.signatures}
    Sender account_____________ ${tx.tx && tx.tx.sender ? tx.tx.sender : 'N/A'}
    Recipient account__________ ${tx.tx && tx.tx.recipient ? tx.tx.recipient : 'N/A'}
    Amount_____________________ ${tx.tx && tx.tx.amount ? tx.tx.amount : 'N/A'}`))
 
-const printTransaction = (tx) => console.log(`
-Block hash_____________________${tx.blockHash}
-Block height___________________${tx.blockHeight}
-Signatures_____________________${tx.signatures}
-Sender account_________________${tx.tx && tx.tx.sender ? tx.tx.sender : 'N/A'}
-Recipient account______________${tx.tx && tx.tx.recipient ? tx.tx.recipient : 'N/A'}
-Amount_________________________${tx.tx && tx.tx.amount ? tx.tx.amount : 'N/A'}
-TTL____________________________${tx.tx && tx.tx.ttl? tx.tx.ttl : 'N/A'}
+const printTransaction = (tx) => console
+  .log(`Block hash____________________ ${tx.blockHash}
+Block height__________________ ${tx.blockHeight}
+Signatures____________________ ${tx.signatures}
+Sender account________________ ${tx.tx && tx.tx.sender ? tx.tx.sender : 'N/A'}
+Recipient account_____________ ${tx.tx && tx.tx.recipient ? tx.tx.recipient : 'N/A'}
+Amount________________________ ${tx.tx && tx.tx.amount ? tx.tx.amount : 'N/A'}
+TTL___________________________ ${tx.tx && tx.tx.ttl ? tx.tx.ttl : 'N/A'}
 `)
 
-const print = (msg) => console.log(msg)
-
-const printError = (msg) => console.log(msg)
+const logContractDescriptor = (desc, title = '') => print(`${title}
+Contract address________________ ${desc.address}
+Transaction hash________________ ${desc.transaction}
+Deploy descriptor_______________ ${desc.descPath}`)
 //
 
 // ERROR HANDLERS
@@ -105,7 +142,7 @@ const handleApiError = async (fn) => {
   try {
     return await fn()
   } catch (e) {
-    const response = e.response;
+    const response = e.response
     logApiError(response && response.data ? response.data.reason : e)
   }
 }
@@ -204,22 +241,22 @@ const isExecCommand = (cmd, commands) => commands.find(({name}) => cmd === name)
 
 const checkPref = (hash, hashType) => {
   if (hash.length < 3 || hash.indexOf('$') === -1)
-    throw new Error(`Invalid input, likely you forgot to escape the $ sign (use \\$)`);
+    throw new Error(`Invalid input, likely you forgot to escape the $ sign (use \\$)`)
 
   if (hash.slice(0, 3) !== hashType + '$') {
-    let msg;
+    let msg
     switch (hashType) {
       case HASH_TYPES.transaction:
         msg = 'Invalid transaction hash, it should be like: th$....'
-        break;
+        break
       case HASH_TYPES.block:
         msg = 'Invalid block hash, it should be like: bh$....'
-        break;
+        break
       case HASH_TYPES.account:
         msg = 'Invalid account address, it should be like: ak$....'
-        break;
+        break
     }
-    throw new Error(msg);
+    throw new Error(msg)
   }
 
 }
@@ -240,6 +277,9 @@ module.exports = {
   checkPref,
   print,
   printError,
-  getCmdFromAguments,
+  logContractDescriptor,
+  getCmdFromArguments,
+  readFile,
+  writeFile,
   HASH_TYPES
 }

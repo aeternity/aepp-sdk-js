@@ -32,7 +32,7 @@ const {
   handleApiError,
   print,
   printError,
-  getCmdFromAguments
+  getCmdFromArguments
 } = require('./utils')
 const program = require('commander')
 
@@ -43,22 +43,22 @@ program
 program
   .command('top')
   .description('Get top of Chain')
-  .action(async (...arguments) => await top(getCmdFromAguments(arguments).parent))
+  .action(async (...arguments) => await top(getCmdFromArguments(arguments)))
 
 program
   .command('version')
   .description('Get Epoch version')
-  .action(async (...arguments) => await version(getCmdFromAguments(arguments).parent))
+  .action(async (...arguments) => await version(getCmdFromArguments(arguments)))
 
 program
   .command('mempool')
   .description('Get mempool of Chain')
-  .action(async (...arguments) => await mempool(getCmdFromAguments(arguments).parent))
+  .action(async (...arguments) => await mempool(getCmdFromArguments(arguments)))
 
 program
   .command('play')
   .description('Real-time block monitoring')
-  .action(async (...arguments) => await play(getCmdFromAguments(arguments).parent))
+  .action(async (...arguments) => await play(getCmdFromArguments(arguments)))
 
 // HANDLE UNKNOWN COMMAND
 program.on('command:*', () => unknownCommandHandler(program)())
@@ -112,7 +112,7 @@ async function play ({host, limit}) {
     await handleApiError(async () => {
       const top = await client.api.getTop()
       printBlock(top)
-      console.log('>>>>>>>>>')
+      print('>>>>>>>>>')
       await playWithLimit(--limit, top.prevHash, client)
     })
   } catch (e) {
@@ -126,7 +126,7 @@ async function playWithLimit (limit, blockHash, client) {
   let block = await client.api.getBlockByHash(blockHash)
   setTimeout(async () => {
     printBlock(block)
-    console.log('>>>>>>>>>')
+    print('>>>>>>>>>')
     await playWithLimit(--limit, block.prevHash, client)
   }, 1000)
 }

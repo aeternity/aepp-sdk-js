@@ -142,7 +142,23 @@ async function getName (name, {host}) {
   }
 }
 
-async function getContractByDescr (desc, {host}) {
-  // TODO implement after cointract modile
-  console.log('Get contract info')
+async function getContractByDescr (path, {host}) {
+  const descriptor = JSON.parse(require("./" + path))
+  try {
+    const client = await initClient(host)
+
+    await handleApiError(
+      async () => {
+        print('Source________________________ ' + descriptor.source)
+        print('Bytecode______________________ ' + descriptor.bytecode)
+        print('Address_______________________ ' + descriptor.address)
+        print('Transaction___________________ ' + descriptor.transaction)
+        print('Owner_________________________ ' + descriptor.owner)
+        print('Created_At____________________ ' + descriptor.createdAt)
+        printTransaction(await client.tx(descriptor.transaction))
+      }
+    )
+  } catch (e) {
+    printError(e.message)
+  }
 }

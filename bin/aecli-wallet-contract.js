@@ -24,14 +24,18 @@
 //  \_____\___/|_| |_|\__|_|  \__,_|\___|\__|___/
 
 const program = require('commander')
-const fs = require('fs')
+const R = require('ramda')
 
 const {
   initClient,
+  print,
   printError,
-  getCmdFromAguments,
+  getCmdFromArguments,
   unknownCommandHandler,
-  handleApiError
+  logContractDescriptor,
+  handleApiError,
+  readFile,
+  writeFile
 } = require('./utils')
 
 const WALLET_KEY_PAIR = JSON.parse(process.env['WALLET_KEYS'])
@@ -42,18 +46,18 @@ program
   .option('-G --gas [gas]', 'Amount of gas to deploy the contract', 40000000)
 
 program
-  .command('call <desc_path> <fn>')
+  .command('call <desc_path> <fn> [args...]')
   .description('Execute a function of the contract')
-  .action(async (path, dn, ...arguments) => {})
+  .action(async (path, fn, args) => await call(path, fn, args))
 
 program
   .command('deploy <contract_path>')
   .description('Execute a function of the contract')
-  .action(async (path, cmd) => await deploy(path, cmd.parent))
+  .action(async (path, ...arguments) => await deploy(path, getCmdFromArguments(arguments)))
 
 program.on('command:*', () => unknownCommandHandler(program)())
 
-program.parse(process.argv)
+program.parse(R.init(process.argv))
 if (program.args.length === 0) program.help()
 
 async function deploy (path, {host, gas, init}) {
@@ -64,25 +68,72 @@ async function deploy (path, {host, gas, init}) {
   // source file. Multiple deploy of the same contract file will generate different
   // deploy descriptor
   try {
-    const code = fs.readFileSync(path, 'utf-8')
+    const contractFile = readFile(path, 'utf-8')
     const client = await initClient(host, WALLET_KEY_PAIR)
+
     await handleApiError(
       async () => {
-        const contract = await client.contractCompile(code, {gas})
-        console.log('after compile')
-        console.log(contract)
-        console.log('---------------------')
-        const descr = await contract.deploy({initState: init})
-        console.log('after deploy')
-        console.log(descr)
-        console.log('---------------------')
+        // `contractCompile` takes a raw Sophia contract in string form and sends it
+        // off to the node for bytecode compilation. This might in the future be done
+        // without talking to the node, but requires a bytecode compiler
+        // implementation directly in the SDK.
+        const contract = await client.contractCompile(contractFile, {gas})
+        // Invoking `deploy` on the bytecode object will result in the contract
+        // being written to the chain, once the block has been mined.
+        // Sophia contracts always have an `init` method which needs to be invoked,
+        // even when the contract's `state` is `unit` (`()`). The arguments to
+        // `init` have to be provided at deployment time and will be written to the
+        // block as well, together with the contract's bytecode.
+        const deployDescriptor = await contract.deploy({initState: init})
+
+        // Write contractDescriptor to file
+        delete deployDescriptor.call
+        const descPath = `${R.last(path.split('/'))}.deploy.${deployDescriptor.owner.slice(3)}.json`
+        const contractDescriptor = R.merge({
+          descPath,
+          source: contractFile,
+          bytecode: contract.bytecode,
+          abi: 'sophia',
+        }, deployDescriptor)
+
+        writeFile(
+          descPath,
+          JSON.stringify(contractDescriptor)
+        )
+
+        // Log contract descriptor
+        logContractDescriptor(contractDescriptor, 'Contract was successfully deployed')
       }
     )
   } catch (e) {
     printError(e.message)
+    process.exit(1)
   }
 }
 
-const call = async (descr, fn) => {
-  // TODO
+async function call (path, fn, args) {
+  if (!path || !fn) {
+    program.outputHelp()
+    process.exit(1)
+  }
+  try {
+    const descr = JSON.parse(require('./' + path))
+    const client = await initClient(program.host, WALLET_KEY_PAIR)
+
+
+    await handleApiError(
+      async () => {
+        args = args.length ? `(${args.join(' ')})` : ''
+        const callResult = await client.contractCall(descr.bytecode, descr.abi, descr.address, fn, {args})
+        // The execution result, if successful, will be an AEVM-encoded result
+        // value. Once type decoding will be implemented in the SDK, this value will
+        // not be a hexadecimal string, anymore.
+        print(callResult)
+      }
+    )
+  } catch (e) {
+    printError(e.message)
+    process.exit(1)
+  }
 }
+
