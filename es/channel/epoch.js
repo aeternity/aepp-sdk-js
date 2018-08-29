@@ -16,6 +16,7 @@
  */
 
 import Channel from './'
+import AsyncInit from '../utils/async-init'
 import { decodeTx, deserialize } from '../utils/crypto'
 import { w3cwebsocket as WebSocket } from 'websocket'
 import { EventEmitter } from 'events'
@@ -140,9 +141,8 @@ function onMessage (i, data) {
   }
 }
 
-// TODO: Compose with AsyncInit?
-const EpochChannel = Channel.compose({
-  init (options) {
+const EpochChannel = AsyncInit.compose(Channel, {
+  async init (options) {
     const params = R.pick([
       'initiator',
       'responder',
@@ -157,19 +157,27 @@ const EpochChannel = Channel.compose({
       'role'
     ], options)
 
-    const ws = new WebSocket(channelURL(options.url, params))
-    ws.onmessage = ({ data }) => onMessage(this, data)
-    ws.onopen = () => changeStatus(this, 'connected')
-    ws.onclose = () => changeStatus(this, 'disconnected')
+    await new Promise((resolve, reject) => {
+      const resolveOnce = R.once(resolve)
+      const rejectOnce = R.once(reject)
+      const ws = new WebSocket(channelURL(options.url, params))
+      ws.onmessage = ({ data }) => onMessage(this, data)
+      ws.onopen = () => {
+        resolveOnce()
+        changeStatus(this, 'connected')
+      }
+      ws.onclose = () => changeStatus(this, 'disconnected')
+      ws.onerror = (err) => rejectOnce(err)
 
-    setPrivate(this, {
-      status: 'conecting',
-      emitter: new EventEmitter(),
-      updateInProgress: false,
-      pendingUpdates: [],
-      state: R.pick(['initiator', 'responder', 'initiatorAmount', 'responderAmount'], options),
-      params,
-      ws
+      setPrivate(this, {
+        status: 'conecting',
+        emitter: new EventEmitter(),
+        updateInProgress: false,
+        pendingUpdates: [],
+        state: R.pick(['initiator', 'responder', 'initiatorAmount', 'responderAmount'], options),
+        params,
+        ws
+      })
     })
   },
   methods: {
