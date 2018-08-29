@@ -42,17 +42,17 @@ const WALLET_KEY_PAIR = JSON.parse(process.env['WALLET_KEYS'])
 
 program
   .option('-H, --host [hostname]', 'Node to connect to', 'https://sdk-testnet.aepps.com')
-  .option('-I, --init [state]', 'Arguments to contructor function')
+  .option('-I, --init [state]', 'Deploying contract arguments for constructor function')
   .option('-G --gas [gas]', 'Amount of gas to deploy the contract', 40000000)
 
 program
-  .command('call <desc_path> <fn> [args...]')
+  .command('call <desc_path> <fn> <return_type> [args...]')
   .description('Execute a function of the contract')
-  .action(async (path, fn, args) => await call(path, fn, args))
+  .action(async (path, fn, returnType, args) => await call(path, fn, returnType, args))
 
 program
   .command('deploy <contract_path>')
-  .description('Execute a function of the contract')
+  .description('Deploy a contract on the chain')
   .action(async (path, ...arguments) => await deploy(path, getCmdFromArguments(arguments)))
 
 program.on('command:*', () => unknownCommandHandler(program)())
@@ -111,8 +111,8 @@ async function deploy (path, {host, gas, init}) {
   }
 }
 
-async function call (path, fn, args) {
-  if (!path || !fn) {
+async function call (path, fn, returnType, args) {
+  if (!path || !fn || !returnType) {
     program.outputHelp()
     process.exit(1)
   }
@@ -120,15 +120,21 @@ async function call (path, fn, args) {
     const descr = JSON.parse(require('./' + path))
     const client = await initClient(program.host, WALLET_KEY_PAIR)
 
-
     await handleApiError(
       async () => {
-        args = args.length ? `(${args.join(' ')})` : ''
-        const callResult = await client.contractCall(descr.bytecode, descr.abi, descr.address, fn, {args})
+        args = args.length ? `(${args.join(',')})` : '()'
+        const callResult = await client.contractCall(descr.bytecode, descr.abi || 'sophia', descr.address, fn, {args})
         // The execution result, if successful, will be an AEVM-encoded result
         // value. Once type decoding will be implemented in the SDK, this value will
         // not be a hexadecimal string, anymore.
-        print(callResult)
+        print('Contract address_________ ' + descr.address)
+        print('Gas price________________ ' + R.path(['result', 'gasPrice'])(callResult))
+        print('Gas used_________________ ' + R.path(['result', 'gasUsed'])(callResult))
+        print('Return value (encoded)___ ' + R.path(['result', 'returnValue'])(callResult))
+        // Decode result
+        const {type, value} = await callResult.decode(returnType)
+        print('Return value (decoded)___ ' + value)
+        print('Return remote type_______ ' + type)
       }
     )
   } catch (e) {
