@@ -17,7 +17,7 @@
 
 import Channel from './'
 import AsyncInit from '../utils/async-init'
-import { decodeTx, deserialize } from '../utils/crypto'
+import { decodeTx, deserialize, generateKeyPair } from '../utils/crypto'
 import { w3cwebsocket as WebSocket } from 'websocket'
 import { EventEmitter } from 'events'
 import * as R from 'ramda'
@@ -75,17 +75,43 @@ function sendNextUpdate (i) {
     return
   }
 
-  const update = pendingUpdates.shift()
-  setPrivate(i, {updateInProgress: true})
+  const {from, to, amount, callback} = pendingUpdates.shift()
+  setPrivate(i, {updateInProgress: true, updateCallback: callback})
   send(i, {
     action: 'update',
     tag: 'new',
-    payload: update
+    payload: {from, to, amount}
+  })
+}
+
+function finishUpdate (i, err, state) {
+  const {updateCallback} = priv.get(i)
+
+  setPrivate(i, {
+    updateInProgress: false,
+    updateCallback: null,
+    updateSigned: undefined
+  })
+  if (updateCallback) {
+    updateCallback(err, state)
+    sendNextUpdate(i)
+  }
+}
+
+function rejectUpdate (i) {
+  send(i, {
+    action: 'update',
+    tag: 'new',
+    payload: {
+      from: generateKeyPair().pub,
+      to: generateKeyPair().pub,
+      amount: 1
+    }
   })
 }
 
 function onMessage (i, data) {
-  const {emitter, sign} = priv.get(i)
+  const {emitter, sign, updateSigned} = priv.get(i)
   const msg = JSON.parse(data)
 
   switch (msg.action) {
@@ -99,15 +125,22 @@ function onMessage (i, data) {
       return changeStatus(i, channelStatusFromEvent[msg.payload.event])
     case 'sign':
       return Promise.resolve(sign(msg.tag, msg.payload.tx)).then(tx => {
-        if (tx) {
-          send(i, {
-            action: msg.tag,
-            payload: { tx }
-          })
+        if (!tx) {
+          if (msg.tag === 'update') {
+            setPrivate(i, {updateSigned: false})
+          }
+          return rejectUpdate(i)
         }
+        if (msg.tag === 'update') {
+          setPrivate(i, {updateSigned: true})
+        }
+        send(i, {
+          action: msg.tag,
+          payload: { tx }
+        })
       })
     case 'update':
-      changeState(i, R.pick([
+      const state = R.pick([
         'channelId',
         'initiator',
         'responder',
@@ -117,16 +150,19 @@ function onMessage (i, data) {
         'state',
         'previousRound',
         'round'
-      ], deserialize(decodeTx(msg.payload.state))))
-      setPrivate(i, { updateInProgress: false })
-      return sendNextUpdate(i)
+      ], deserialize(decodeTx(msg.payload.state)).tx)
+      changeState(i, state)
+      return finishUpdate(i, null, state)
     case 'on_chain_tx':
       return emitter.emit('onChainTx', {tx: msg.payload.tx})
     case 'error':
+      // ignore update conflict if update has been rejected by acknowledger
+      if (msg.payload.reason === 'conflict' && updateSigned === undefined) {
+        return null
+      }
       return emitter.emit('error', msg.payload)
     case 'conflict':
-      setPrivate(i, {updateInProgress: false})
-      return sendNextUpdate(i)
+      return finishUpdate(i, updateSigned === true ? null : new Error('conflict'), null)
   }
 }
 
@@ -182,8 +218,20 @@ const EpochChannel = AsyncInit.compose(Channel, {
       return priv.get(this).state
     },
     update (from, to, amount) {
-      priv.get(this).pendingUpdates.push({from, to, amount})
-      sendNextUpdate(this)
+      return new Promise((resolve, reject) => {
+        priv.get(this).pendingUpdates.push({
+          from,
+          to,
+          amount,
+          callback (err, tx) {
+            if (err) {
+              return reject(err)
+            }
+            return resolve(tx)
+          }
+        })
+        sendNextUpdate(this)
+      })
     },
     shutdown () {
       send(this, {action: 'shutdown'})
