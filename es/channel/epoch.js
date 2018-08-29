@@ -16,7 +16,7 @@
  */
 
 import Channel from './'
-import { deserialize } from '../utils/crypto'
+import { decodeTx, deserialize } from '../utils/crypto'
 import { w3cwebsocket as WebSocket } from 'websocket'
 import { EventEmitter } from 'events'
 import * as R from 'ramda'
@@ -51,13 +51,13 @@ function changeStatus (i, newStatus) {
 
   if (newStatus && newStatus !== status) {
     setPrivate(i, {status: newStatus})
-    emitter.emit('statusChanged', status)
+    emitter.emit('statusChanged', newStatus)
   }
 }
 
 function changeState (i, newState) {
   const {state, emitter} = priv.get(i)
-  Object.assign(state, newState)
+  priv.get(i).state = {...state, ...newState}
   emitter.emit('stateChanged', state)
 }
 
@@ -73,15 +73,19 @@ function send (i, msg) {
 }
 
 function sendNextUpdate (i) {
-  const { updateInProgress, pendingUpdates } = priv.get(i)
+  const {updateInProgress, pendingUpdates} = priv.get(i)
 
-  if (updateInProgress || !(pendingUpdates || pendingUpdates.length)) {
+  if (updateInProgress || !pendingUpdates || !pendingUpdates.length) {
     return
   }
 
   const update = pendingUpdates.shift()
   setPrivate(i, {updateInProgress: true})
-  send({action: 'update', tag: 'new', payload: update})
+  send(i, {
+    action: 'update',
+    tag: 'new',
+    payload: update
+  })
 }
 
 function txSignCallback (i, action) {
@@ -102,6 +106,9 @@ function onMessage (i, data) {
       if (msg.payload.event === 'update') {
         setPrivate(i, {updateInProgress: true})
       }
+      if (msg.payload.event === 'open') {
+        setPrivate(i, {channelId: msg.channel_id})
+      }
       return changeStatus(i, channelStatusFromEvent[msg.payload.event])
     case 'sign':
       return emitter.emit('sign', {
@@ -120,7 +127,7 @@ function onMessage (i, data) {
         'state',
         'previousRound',
         'round'
-      ], deserialize(msg.payload.state)))
+      ], deserialize(decodeTx(msg.payload.state))))
       setPrivate(i, { updateInProgress: false })
       return sendNextUpdate(i)
     case 'on_chain_tx':
