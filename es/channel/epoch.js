@@ -89,17 +89,8 @@ function sendNextUpdate (i) {
   })
 }
 
-function txSignCallback (i, action) {
-  return function (tx) {
-    send(i, {
-      action,
-      payload: { tx }
-    })
-  }
-}
-
 function onMessage (i, data) {
-  const { emitter } = priv.get(i)
+  const {emitter, sign} = priv.get(i)
   const msg = JSON.parse(data)
 
   switch (msg.action) {
@@ -112,10 +103,13 @@ function onMessage (i, data) {
       }
       return changeStatus(i, channelStatusFromEvent[msg.payload.event])
     case 'sign':
-      return emitter.emit('sign', {
-        tag: msg.tag,
-        tx: msg.payload.tx,
-        callback: txSignCallback(i, msg.tag)
+      return Promise.resolve(sign(msg.tag, msg.payload.tx)).then(tx => {
+        if (tx) {
+          send(i, {
+            action: msg.tag,
+            payload: { tx }
+          })
+        }
       })
     case 'update':
       changeState(i, R.pick([
@@ -176,7 +170,8 @@ const EpochChannel = AsyncInit.compose(Channel, {
         pendingUpdates: [],
         state: R.pick(['initiator', 'responder', 'initiatorAmount', 'responderAmount'], options),
         params,
-        ws
+        ws,
+        sign: options.sign
       })
     })
   },
