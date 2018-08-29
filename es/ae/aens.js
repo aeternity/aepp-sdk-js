@@ -52,6 +52,25 @@ async function transfer (nameHash, account, options = {}) {
 }
 
 /**
+ * Revoke a domain
+ * @instance
+ * @category async
+ * @param {String} nameHash
+ * @param {Object} [options={}]
+ * @return {Promise<Object>}
+ */
+async function revoke (nameHash, options = {}) {
+  const opt = R.merge(this.Ae.defaults, options)
+
+  const nameRevokeTx = await this.nameRevokeTx(R.merge(opt, {
+    nameHash,
+    account: await this.address(),
+  }))
+
+  return this.send(nameRevokeTx, opt)
+}
+
+/**
  * What kind of a hash is this? If it begins with 'ak$' it is an
  * account key, if with 'ok$' it's an oracle key.
  *
@@ -122,8 +141,10 @@ async function query (name) {
  * @param {Record} [options={}]
  * @return {Promise<Object>} the result of the claim
  */
-async function claim (name, salt, options = {}) {
+async function claim (name, salt, waitForHeight, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
+  // wait until block was mined before send claim transaction
+  if (waitForHeight) await this.awaitHeight(waitForHeight, {attempts: 200})
   const claimTx = await this.nameClaimTx(R.merge(opt, {
     account: await this.address(),
     nameSalt: salt,
@@ -143,17 +164,16 @@ async function claim (name, salt, options = {}) {
 async function preclaim (name, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   const _salt = salt()
+  const height = await this.height()
   const hash = await this.commitmentHash(name, _salt)
-
   const preclaimTx = await this.namePreclaimTx(R.merge(opt, {
     account: await this.address(),
     commitment: hash
   }))
-
   await this.send(preclaimTx, opt)
 
   return Object.freeze({
-    claim: options => this.aensClaim(name, _salt, options),
+    claim: options => this.aensClaim(name, _salt, (height + 1), options),
     salt: _salt,
     commitment: hash
   })
@@ -176,12 +196,17 @@ const Aens = Ae.compose({
     aensPreclaim: preclaim,
     aensClaim: claim,
     aensUpdate: update,
-    aensTransfer: transfer
+    aensTransfer: transfer,
+    aensRevoke: revoke
   },
-  deepProps: {Ae: {defaults: {
-    clientTtl: 1,
-    nameTtl: 50000 // aec_governance:name_claim_max_expiration() => 50000
-  }}}
+  deepProps: {
+    Ae: {
+      defaults: {
+        clientTtl: 1,
+        nameTtl: 50000 // aec_governance:name_claim_max_expiration() => 50000
+      }
+    }
+  }
 })
 
 export default Aens

@@ -40,7 +40,7 @@ const PROMPT_SCHEMA = {
       type: 'string',
       description: 'Enter your password',
       hidden: true,
-      required: true,
+      required: false,
       replace: '*',
       conform: function () {
         return true
@@ -109,6 +109,13 @@ Previous block hash___________ ${block.prevHash}
 Transactions__________________ ${block.transactions ? block.transactions.length : 0}`)
   if (block.transactions && block.transactions.length)
     printBlockTransactions(block.transactions)
+}
+
+const printName = (name) => {
+  print(`Status___________ ${name.status || 'N/A'}`)
+  print(`Name hash________ ${name.nameHash || 'N/A'}`)
+  print(`Pointers_________ ${JSON.parse(name.pointers || '\"\"') || 'N/A'}`)
+  print(`TTL______________ ${name.nameTtl || 0}`)
 }
 
 const printBlockTransactions = (ts) => ts.forEach(tx => console
@@ -223,9 +230,6 @@ const promptPasswordAsync = async () => {
         PROMPT_SCHEMA,
         (err, res) => {
           if (err) reject(err)
-          if (!res || !res.password) {
-            reject({message: 'Password required'})
-          }
           resolve(res.password)
         }
       )
@@ -266,8 +270,6 @@ module.exports = {
   initClient,
   printConfig,
   printTransaction,
-  logApiError,
-  promptPasswordAsync,
   getWalletByPathAndDecrypt,
   handleApiError,
   generateSecureWallet,
@@ -281,5 +283,6 @@ module.exports = {
   getCmdFromArguments,
   readFile,
   writeFile,
+  printName,
   HASH_TYPES
 }

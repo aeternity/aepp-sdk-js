@@ -34,6 +34,7 @@ const {
   printTransaction,
   print,
   printError,
+  printName,
   HASH_TYPES
 } = require('./utils')
 const program = require('commander')
@@ -133,11 +134,12 @@ async function getName (name, {host}) {
   try {
     const client = await initClient(host)
 
-    await handleApiError(async () => {
-      //TODO implement after AENS module
-      print(await client.api.getName(name))
-    })
+    printName(Object.assign(await client.api.getName(name), {status: 'CLAIMED'}))
   } catch (e) {
+    if (e.response && e.response.status === 404) {
+      printName({status: 'AVAILABLE'})
+      process.exit(1)
+    }
     printError(e.message)
   }
 }
