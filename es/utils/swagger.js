@@ -26,26 +26,7 @@ import stampit from '@stamp/it'
 import AsyncInit from './async-init'
 import axios from 'axios'
 import * as R from 'ramda'
-
-/**
- * Convert string from snake_case to PascalCase
- * @rtype (s: String) => String
- * @param {String} s - String to convert
- * @return {String} Converted string
- */
-function snakeToPascal (s) {
-  return s.replace(/_./g, match => R.toUpper(match[1]))
-}
-
-/**
- * Convert string from PascalCase to snake_case
- * @rtype (s: String) => String
- * @param {String} s - String to convert
- * @return {String} Converted string
- */
-function pascalToSnake (s) {
-  return s.replace(/[A-Z]/g, match => `_${R.toLower(match)}`)
-}
+import {snakeToPascal, pascalToSnake} from './string'
 
 /**
  * Perform path string interpolation

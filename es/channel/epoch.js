@@ -21,6 +21,7 @@ import { decodeTx, deserialize } from '../utils/crypto'
 import { w3cwebsocket as WebSocket } from 'websocket'
 import { EventEmitter } from 'events'
 import * as R from 'ramda'
+import {pascalToSnake} from '../utils/string'
 
 const channelStatusFromEvent = {
   channel_open: 'initialized',
@@ -30,12 +31,6 @@ const channelStatusFromEvent = {
   own_funding_locked: 'open',
   funding_locked: 'open',
   died: 'died'
-}
-
-// TODO: This is copy-paste from '../utils/swagger'.
-//       Move this to separate module.
-function pascalToSnake (s) {
-  return s.replace(/[A-Z]/g, match => `_${R.toLower(match)}`)
 }
 
 const priv = new WeakMap()
