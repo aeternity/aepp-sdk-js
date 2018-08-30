@@ -75,12 +75,17 @@ function sendNextUpdate (i) {
     return
   }
 
-  const {from, to, amount, callback} = pendingUpdates.shift()
-  setPrivate(i, {updateInProgress: true, updateCallback: callback})
+  const {from, to, amount, callback, sign} = pendingUpdates.shift()
+  setPrivate(i, {
+    updateInProgress: true,
+    updateCallback: callback,
+    signUpdate: sign
+  })
   send(i, {
     action: 'update',
     tag: 'new',
-    payload: {from, to, amount}
+    payload: {from, to, amount},
+    signUpdate: sign
   })
 }
 
@@ -90,7 +95,8 @@ function finishUpdate (i, err, state) {
   setPrivate(i, {
     updateInProgress: false,
     updateCallback: null,
-    updateSigned: undefined
+    updateSigned: undefined,
+    signUpdate: null
   })
   if (updateCallback) {
     updateCallback(err, state)
@@ -111,7 +117,7 @@ function rejectUpdate (i) {
 }
 
 function onMessage (i, data) {
-  const {emitter, sign, updateSigned} = priv.get(i)
+  const {emitter, sign, updateSigned, signUpdate} = priv.get(i)
   const msg = JSON.parse(data)
 
   switch (msg.action) {
@@ -124,7 +130,10 @@ function onMessage (i, data) {
       }
       return changeStatus(i, channelStatusFromEvent[msg.payload.event])
     case 'sign':
-      return Promise.resolve(sign(msg.tag, msg.payload.tx)).then(tx => {
+      const signPromise = msg.tag === 'update'
+        ? signUpdate(msg.payload.tx)
+        : sign(msg.tag, msg.payload.tx)
+      return Promise.resolve(signPromise).then(tx => {
         if (!tx) {
           if (msg.tag === 'update') {
             setPrivate(i, {updateSigned: false})
@@ -217,12 +226,13 @@ const EpochChannel = AsyncInit.compose(Channel, {
     state () {
       return priv.get(this).state
     },
-    update (from, to, amount) {
+    update (from, to, amount, sign) {
       return new Promise((resolve, reject) => {
         priv.get(this).pendingUpdates.push({
           from,
           to,
           amount,
+          sign,
           callback (err, tx) {
             if (err) {
               return reject(err)
