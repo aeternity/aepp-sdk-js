@@ -117,7 +117,8 @@ async function call (path, fn, returnType, args) {
     process.exit(1)
   }
   try {
-    const descr = JSON.parse(require('./' + path))
+    path = R.startsWith('.', path) ? path : `./` + path
+    const descr = getJsonFile(path)
     const client = await initClient(program.host, WALLET_KEY_PAIR)
 
     await handleApiError(
@@ -142,4 +143,13 @@ async function call (path, fn, returnType, args) {
     process.exit(1)
   }
 }
+
+function getJsonFile(path) {
+    try {
+        return JSON.parse(require(path))
+    } catch (e) {
+        printError('file not found or invalid json')
+        process.exit(1)
+    }
+ }
 
