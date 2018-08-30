@@ -48,7 +48,7 @@ async function transfer (nameHash, account, options = {}) {
     recipientAccount: account
   }))
 
-  return this.send(nameTransferTx, opt)
+  return await this.send(nameTransferTx, opt)
 }
 
 /**
@@ -67,7 +67,7 @@ async function revoke (nameHash, options = {}) {
     account: await this.address(),
   }))
 
-  return this.send(nameRevokeTx, opt)
+  return await this.send(nameRevokeTx, opt)
 }
 
 /**
@@ -97,6 +97,7 @@ function classify (s) {
 
 /**
  * Update an aens entry
+ * @param nameHash domain hash
  * @param target new target
  * @param options
  * @return {Object}
@@ -110,7 +111,7 @@ async function update (nameHash, target, options = {}) {
     pointers: JSON.stringify(R.fromPairs([[classify(target), target]]))
   }))
 
-  return this.send(nameUpdateTx, opt)
+  return await this.send(nameUpdateTx, opt)
 }
 
 /**
@@ -173,6 +174,7 @@ async function preclaim (name, options = {}) {
   await this.send(preclaimTx, opt)
 
   return Object.freeze({
+    height,
     claim: options => this.aensClaim(name, _salt, (height + 1), options),
     salt: _salt,
     commitment: hash

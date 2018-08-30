@@ -100,9 +100,13 @@ async function claim (domain, {host, ttl, nameTtl}) {
       process.exit(1)
     }
 
-    const preclaim = await client.aensPreclaim(domain, {nameTtl, ttl})
-    const claim = await preclaim.claim({nameTtl, ttl})
-    const {hash} = await claim.update(await client.address())
+    // Preclaim name before claim
+    const {salt, height} = await client.aensPreclaim(domain, {nameTtl, ttl})
+    // Wait for next block and claim name
+    await client.aensClaim(domain, salt, (height + 1), {nameTtl, ttl})
+    // Update name pointer
+    const {nameHash} = await updateNameStatus(domain)(client)
+    const {hash} = await client.aensUpdate(nameHash, await client.address(), {nameTtl, ttl})
 
     print(`Name ${domain} claimed`)
     print('Transaction hash -------> ' + hash)
@@ -127,9 +131,9 @@ async function transferName (domain, address, {host, ttl, nameTtl}) {
       process.exit(1)
     }
 
-    const revokeTx = await client.aensTransfer(name.nameHash, address, {ttl, nameTtl})
+    const transferTX = await client.aensTransfer(name.nameHash, address, {ttl, nameTtl})
     print('Transfer Success')
-    print('Transaction hash -------> ' + revokeTx.hash)
+    print('Transaction hash -------> ' + transferTX.hash)
   } catch (e) {
     printError(e.message)
   }
