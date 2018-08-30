@@ -92,16 +92,16 @@ function sendNextUpdate (i) {
 function finishUpdate (i, err, state) {
   const {updateCallback} = priv.get(i)
 
+  if (updateCallback) {
+    updateCallback(err, err ? null : {accepted: !!state, state})
+  }
   setPrivate(i, {
     updateInProgress: false,
     updateCallback: null,
     updateSigned: undefined,
     signUpdate: null
   })
-  if (updateCallback) {
-    updateCallback(err, state)
-    sendNextUpdate(i)
-  }
+  sendNextUpdate(i)
 }
 
 function rejectUpdate (i) {
