@@ -59,7 +59,7 @@ const initClient = async (url, keypair) => {
 const writeFile = (name, data) => {
   try {
     fs.writeFileSync(
-      name,
+      path.resolve(process.cwd(), name),
       JSON.stringify(data),
     )
     return true
@@ -69,10 +69,10 @@ const writeFile = (name, data) => {
   }
 }
 
-const readFile = (path, encoding = '') => {
+const readFile = (pathToFile, encoding = '') => {
   try {
     return fs.readFileSync(
-      path,
+      path.resolve(process.cwd(), pathToFile),
       encoding
     )
   } catch (e) {
@@ -203,13 +203,13 @@ const generateSecureWalletFromPrivKey = async (name, priv, {output, password}) =
   console.log(`
     Wallet saved
     Wallet address________________ ${Crypto.aeEncodeKey(keys.publicKey)}
-    Wallet path___________________ ${__dirname + '/' + name}
+    Wallet path___________________ ${process.cwd() + '/' + name}
   `)
 }
 
-const getWalletByPathAndDecrypt = async (path, password) => {
-  const privBinaryKey = fs.readFileSync(path)
-  const pubBinaryKey = fs.readFileSync(`${path}.pub`)
+const getWalletByPathAndDecrypt = async (pathToFile, password) => {
+  const privBinaryKey = fs.readFileSync(path.resolve(process.cwd(), pathToFile))
+  const pubBinaryKey = fs.readFileSync(path.resolve(process.cwd(), `${pathToFile}.pub`))
 
   if (!password || typeof password !== 'string' || !password.length) password = await promptPasswordAsync()
 

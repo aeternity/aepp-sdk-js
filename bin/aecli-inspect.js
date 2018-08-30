@@ -144,8 +144,8 @@ async function getName (name, {host}) {
   }
 }
 
-async function getContractByDescr (path, {host}) {
-  const descriptor = JSON.parse(require("./" + path))
+async function getContractByDescr (descPath, {host}) {
+  const descriptor = JSON.parse(require(path.resolve(process.cwd(), descPath)))
   try {
     const client = await initClient(host)
 

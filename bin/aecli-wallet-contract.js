@@ -25,6 +25,7 @@
 
 const program = require('commander')
 const R = require('ramda')
+const path = require('path')
 
 const {
   initClient,
@@ -144,11 +145,13 @@ async function call (path, fn, returnType, args) {
   }
 }
 
-function getJsonFile(path) {
+function getJsonFile(pathToFile) {
     try {
-        return JSON.parse(require(path))
+        const file = require(path.resolve(process.cwd(), pathToFile))
+        return JSON.parse(file)
     } catch (e) {
         printError('file not found or invalid json')
+        printError(e.message)
         process.exit(1)
     }
  }

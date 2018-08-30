@@ -33,6 +33,7 @@ const {
 } = require('./utils')
 const program = require('commander')
 const fs = require('fs')
+const path = require('path')
 
 program
   .option('-H, --host [hostname]', 'Node to connect to', 'https://sdk-testnet.aepps.com')
@@ -50,7 +51,7 @@ if (program.args.length === 0) program.help()
 
 async function compile (file, {host}) {
   try {
-    const code = fs.readFileSync(file, 'utf-8')
+    const code = fs.readFileSync(path.resolve(process.cwd(), file), 'utf-8')
     if (!code) throw new Error('Contract file not found')
 
     handleApiError(async () => {
