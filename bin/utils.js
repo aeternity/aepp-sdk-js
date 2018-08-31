@@ -49,18 +49,12 @@ const PROMPT_SCHEMA = {
   }
 }
 
-const getCmdFromArguments = (args) => Object.assign({}, args[args.length - 1], args[args.length - 1].parent)
-
-const initClient = async (url, keypair) => {
-  return await Cli({url, process, keypair})
-}
-
 // FILE I/O
 const writeFile = (name, data) => {
   try {
     fs.writeFileSync(
       name,
-      JSON.stringify(data),
+      data
     )
     return true
   } catch (e) {
@@ -69,7 +63,7 @@ const writeFile = (name, data) => {
   }
 }
 
-const readFile = (path, encoding = '') => {
+const readFile = (path, encoding = null) => {
   try {
     return fs.readFileSync(
       path,
@@ -88,8 +82,19 @@ const readFile = (path, encoding = '') => {
   }
 }
 
+const readJSONFile = (filePath) => {
+  try {
+    return require(
+      path.resolve(process.cwd(), filePath)
+    )
+  } catch (e) {
+    printError('READ FILE ERROR: ' + 'File not found')
+    process.exit(1)
+  }
+}
+
 // CONSOLE PRINT HELPERS
-const print = (msg) => console.log(msg)
+const print = (msg, obj = '') => console.log(msg, obj)
 
 const printError = (msg) => console.log(msg)
 
@@ -114,7 +119,7 @@ Transactions__________________ ${block.transactions ? block.transactions.length 
 const printName = (name) => {
   print(`Status___________ ${name.status || 'N/A'}`)
   print(`Name hash________ ${name.nameHash || 'N/A'}`)
-  print(`Pointers_________ ${JSON.parse(name.pointers || '\"\"') || 'N/A'}`)
+  print(`Pointers_________ `, JSON.parse(name.pointers || '\"\"') || 'N/A')
   print(`TTL______________ ${name.nameTtl || 0}`)
 }
 
@@ -151,6 +156,7 @@ const handleApiError = async (fn) => {
   } catch (e) {
     const response = e.response
     logApiError(response && response.data ? response.data.reason : e)
+    process.exit(1)
   }
 }
 
@@ -174,9 +180,9 @@ const generateSecureWallet = async (name, {output, password}) => {
     [path.join(output, `${name}.pub`), pub]
   ]
 
-  data.forEach(([path, data]) => {
-    fs.writeFileSync(path, data)
-    print(`Wrote ${path}`)
+  data.forEach(([walletPath, data]) => {
+    writeFile(walletPath, data)
+    print(`Wrote ${path.resolve(process.cwd(), walletPath)}`)
   })
 }
 
@@ -197,24 +203,26 @@ const generateSecureWalletFromPrivKey = async (name, priv, {output, password}) =
   ]
 
   data.forEach(([path, data]) => {
-    fs.writeFileSync(path, data)
+    writeFile(path, data)
   })
 
   console.log(`
     Wallet saved
     Wallet address________________ ${Crypto.aeEncodeKey(keys.publicKey)}
-    Wallet path___________________ ${__dirname + '/' + name}
+    Wallet path___________________ ${path.resolve(process.cwd(), name)}
   `)
 }
 
-const getWalletByPathAndDecrypt = async (path, password) => {
-  const privBinaryKey = fs.readFileSync(path)
-  const pubBinaryKey = fs.readFileSync(`${path}.pub`)
+const getWalletByPathAndDecrypt = async () => {
+  let {pass, path: walletPath} = JSON.parse(process.env['WALLET_DATA'])
 
-  if (!password || typeof password !== 'string' || !password.length) password = await promptPasswordAsync()
+  const privBinaryKey = readFile(path.resolve(process.cwd(), walletPath))
+  const pubBinaryKey = readFile(path.resolve(process.cwd(), `${walletPath}.pub`))
 
-  const decryptedPriv = Crypto.decryptPrivateKey(password, privBinaryKey)
-  const decryptedPub = Crypto.decryptPubKey(password, pubBinaryKey)
+  if (!pass || typeof pass !== 'string' || !pass.length) pass = await promptPasswordAsync()
+
+  const decryptedPriv = Crypto.decryptPrivateKey(pass, privBinaryKey)
+  const decryptedPub = Crypto.decryptPubKey(pass, pubBinaryKey)
 
   return {
     priv: decryptedPriv.toString('hex'),
@@ -239,6 +247,12 @@ const promptPasswordAsync = async () => {
 //
 
 // UTILS
+const getCmdFromArguments = (args) => Object.assign({}, args[args.length - 1], args[args.length - 1].parent)
+
+const initClient = async (url, keypair) => {
+  return await Cli({url, process, keypair})
+}
+
 const initExecCommands = (program) => (cmds) => cmds.forEach(({name, desc}) => program.command(name, desc))
 
 const isExecCommand = (cmd, commands) => commands.find(({name}) => cmd === name)
@@ -284,5 +298,6 @@ module.exports = {
   readFile,
   writeFile,
   printName,
+  readJSONFile,
   HASH_TYPES
 }

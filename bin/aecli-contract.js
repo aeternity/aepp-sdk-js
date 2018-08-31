@@ -26,13 +26,12 @@
 
 
 const {
-  initClient,
-  print,
   unknownCommandHandler,
-  handleApiError
 } = require('./utils')
 const program = require('commander')
-const fs = require('fs')
+
+require = require('esm')(module/*, options*/) //use to handle es6 import/export
+const {Contract} = require('./commands')
 
 program
   .option('-H, --host [hostname]', 'Node to connect to', 'https://sdk-testnet.aepps.com')
@@ -40,27 +39,10 @@ program
 program
   .command('compile <file>')
   .description('Compile a contract')
-  .action(async (file, cmd) => await compile(file, cmd.parent))
+  .action(async (file, cmd) => await Contract.compile(file, cmd.parent))
 
 // HANDLE UNKNOWN COMMAND
 program.on('command:*', () => unknownCommandHandler(program)())
 
 program.parse(process.argv)
 if (program.args.length === 0) program.help()
-
-async function compile (file, {host}) {
-  try {
-    const code = fs.readFileSync(file, 'utf-8')
-    if (!code) throw new Error('Contract file not found')
-
-    handleApiError(async () => {
-      const client = await initClient(host)
-      const contract = await client.contractCompile(code)
-      print(`Contract bytecode:
-      ${contract.bytecode}`)
-    })
-  } catch (e) {
-    console.log(e.message)
-  }
-
-}

@@ -29,20 +29,13 @@ const program = require('commander')
 const R = require('ramda')
 
 const {
-  initClient,
-  generateSecureWallet,
-  handleApiError,
-  getWalletByPathAndDecrypt,
   initExecCommands,
   unknownCommandHandler,
-  generateSecureWalletFromPrivKey,
-  checkPref,
-  print,
   printError,
-  printTransaction,
   getCmdFromArguments,
-  HASH_TYPES
 } = require('./utils')
+require = require('esm')(module/*, options*/) //use to handle es6 import/export
+const {Wallet} = require('./commands')
 
 // EXEC COMMANDS LIST
 const EXECUTABLE_CMD = [
@@ -50,7 +43,8 @@ const EXECUTABLE_CMD = [
   {name: 'contract', desc: 'Contract lifecycle api'}
 ]
 
-let WALLET_KEY_PAIR
+let WALLET_PATH
+let WALLET_PASSWORD
 let WALLET_NAME
 
 // Grab WALLET_PATH and try to read and decrypt keypair. IF success -> remove wallet path from argv and take it commander.js
@@ -59,8 +53,12 @@ initWallet()
     // Prevent parsing wallet-path --> issue with arguments parsing in sub-commands
     program._args = []
 
-    // SET KEYPAIR TO PROCESS.ENV
-    process.env['WALLET_KEYS'] = JSON.stringify(WALLET_KEY_PAIR)
+    // SET WALLET DATA TO PROCESS.ENV
+    process.env['WALLET_DATA'] = JSON.stringify({
+      pass: WALLET_PASSWORD,
+      path: WALLET_PATH,
+      name: WALLET_NAME
+    })
 
     // remove wallet_name from argv
     process.argv = process.argv.filter((e, i) => i !== 2)
@@ -82,85 +80,29 @@ initExecCommands(program)(EXECUTABLE_CMD)
 program
   .command('spend <receiver> <amount>')
   .description('Create a transaction to another wallet')
-  .action(async (receiver, amount, ...arguments) => await spend(receiver, amount, getCmdFromArguments(arguments)))
+  .action(async (receiver, amount, ...arguments) => await Wallet.spend(receiver, amount, getCmdFromArguments(arguments)))
 
 program
   .command('balance')
   .description('Get wallet balance')
-  .action(async (...arguments) => await getBalance(getCmdFromArguments(arguments)))
+  .action(async (...arguments) => await Wallet.getBalance(getCmdFromArguments(arguments)))
 
 program
   .command('address')
   .description('Get wallet address')
-  .action(async (...arguments) => await getAddress(getCmdFromArguments(arguments)))
+  .action(async (...arguments) => await Wallet.getAddress(getCmdFromArguments(arguments)))
 
 program
   .command('create')
   .description('Create a secure wallet')
-  .action(async (...arguments) => await createSecureWallet(WALLET_NAME, getCmdFromArguments(arguments)))
+  .action(async (...arguments) => await Wallet.createSecureWallet(WALLET_NAME, getCmdFromArguments(arguments)))
 
 program
   .command('save <privkey>')
   .description('Save a private keys string to a password protected file wallet')
-  .action(async (priv, ...arguments) => await createSecureWalletByPrivKey(WALLET_NAME, priv, getCmdFromArguments(arguments)))
+  .action(async (priv, ...arguments) => await Wallet.createSecureWalletByPrivKey(WALLET_NAME, priv, getCmdFromArguments(arguments)))
 
 program.on('command:*', () => unknownCommandHandler(program)(EXECUTABLE_CMD))
-
-async function spend (receiver, amount, {host, ttl}) {
-  ttl = parseInt(ttl)
-  try {
-    checkPref(receiver, HASH_TYPES.account)
-    const client = await initClient(host, WALLET_KEY_PAIR)
-
-    await handleApiError(async () => {
-      const tx = await client.spend(parseInt(amount), receiver, {ttl})
-      print('Transaction mined')
-      printTransaction(tx)
-    })
-  } catch (e) {
-    printError(e.message)
-  }
-}
-
-async function getBalance ({host}) {
-  try {
-    const client = await initClient(host, WALLET_KEY_PAIR)
-
-    await handleApiError(
-      async () => print('Your balance is: ' + (await client.balance(WALLET_KEY_PAIR.pub)))
-    )
-  } catch (e) {
-    printError(e.message)
-  }
-}
-
-async function getAddress ({host}) {
-  try {
-    const client = await initClient(host, WALLET_KEY_PAIR)
-
-    await handleApiError(
-      async () => print('Your address is: ' + await client.address())
-    )
-  } catch (e) {
-    printError(e.message)
-  }
-}
-
-async function createSecureWallet (name, {output, password}) {
-  try {
-    await generateSecureWallet(name, {output, password})
-  } catch (e) {
-    printError(e.message)
-  }
-}
-
-async function createSecureWalletByPrivKey (name, priv, {output, password}) {
-  try {
-    await generateSecureWalletFromPrivKey(name, priv, {output, password})
-  } catch (e) {
-    printError(e.message)
-  }
-}
 
 //HELPERS
 async function initWallet () {
@@ -170,6 +112,8 @@ async function initWallet () {
       .option('-P, --password [password]', 'Wallet Password')
       .action(async (path, command, cmd) => {
         WALLET_NAME = R.last(path.split('/'))
+        WALLET_PATH = path;
+        WALLET_PASSWORD = program.password
 
         // Prevent grab wallet keys for create save commands
         if (!command || command === 'create' || command === 'save') resolve()
@@ -177,12 +121,6 @@ async function initWallet () {
         // Add host option if it is no sub-command (commander issue with parsing options in sub-command)
         if (!EXECUTABLE_CMD.find(cmd => cmd.name === command)) {
           program.option('-H, --host [hostname]', 'Node to connect to', 'https://sdk-testnet.aepps.com')
-        }
-
-        try {
-          WALLET_KEY_PAIR = await getWalletByPathAndDecrypt(path, cmd.password)
-        } catch (e) {
-          reject(e)
         }
         resolve()
       })

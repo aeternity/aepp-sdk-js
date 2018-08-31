@@ -27,18 +27,11 @@ const program = require('commander')
 const R = require('ramda')
 
 const {
-  initClient,
-  print,
-  printError,
   getCmdFromArguments,
   unknownCommandHandler,
-  logContractDescriptor,
-  handleApiError,
-  readFile,
-  writeFile
 } = require('./utils')
-
-const WALLET_KEY_PAIR = JSON.parse(process.env['WALLET_KEYS'])
+require = require('esm')(module/*, options*/) //use to handle es6 import/export
+const {Contract} = require('./commands')
 
 program
   .option('-H, --host [hostname]', 'Node to connect to', 'https://sdk-testnet.aepps.com')
@@ -48,98 +41,14 @@ program
 program
   .command('call <desc_path> <fn> <return_type> [args...]')
   .description('Execute a function of the contract')
-  .action(async (path, fn, returnType, args) => await call(path, fn, returnType, args))
+  .action(async (path, fn, returnType, args, ...arguments) => await Contract.call(path, fn, returnType, args, getCmdFromArguments(arguments)))
 
 program
   .command('deploy <contract_path>')
   .description('Deploy a contract on the chain')
-  .action(async (path, ...arguments) => await deploy(path, getCmdFromArguments(arguments)))
+  .action(async (path, ...arguments) => await Contract.deploy(path, getCmdFromArguments(arguments)))
 
 program.on('command:*', () => unknownCommandHandler(program)())
 
 program.parse(R.init(process.argv))
 if (program.args.length === 0) program.help()
-
-async function deploy (path, {host, gas, init}) {
-  // Deploy a contract to the chain and create a deploy descriptor
-  // with the contract informations that can be use to invoke the contract
-  // later on.
-  //   The generated descriptor will be created in the same folde of the contract
-  // source file. Multiple deploy of the same contract file will generate different
-  // deploy descriptor
-  try {
-    const contractFile = readFile(path, 'utf-8')
-    const client = await initClient(host, WALLET_KEY_PAIR)
-
-    await handleApiError(
-      async () => {
-        // `contractCompile` takes a raw Sophia contract in string form and sends it
-        // off to the node for bytecode compilation. This might in the future be done
-        // without talking to the node, but requires a bytecode compiler
-        // implementation directly in the SDK.
-        const contract = await client.contractCompile(contractFile, {gas})
-        // Invoking `deploy` on the bytecode object will result in the contract
-        // being written to the chain, once the block has been mined.
-        // Sophia contracts always have an `init` method which needs to be invoked,
-        // even when the contract's `state` is `unit` (`()`). The arguments to
-        // `init` have to be provided at deployment time and will be written to the
-        // block as well, together with the contract's bytecode.
-        const deployDescriptor = await contract.deploy({initState: init})
-
-        // Write contractDescriptor to file
-        delete deployDescriptor.call
-        const descPath = `${R.last(path.split('/'))}.deploy.${deployDescriptor.owner.slice(3)}.json`
-        const contractDescriptor = R.merge({
-          descPath,
-          source: contractFile,
-          bytecode: contract.bytecode,
-          abi: 'sophia',
-        }, deployDescriptor)
-
-        writeFile(
-          descPath,
-          JSON.stringify(contractDescriptor)
-        )
-
-        // Log contract descriptor
-        logContractDescriptor(contractDescriptor, 'Contract was successfully deployed')
-      }
-    )
-  } catch (e) {
-    printError(e.message)
-    process.exit(1)
-  }
-}
-
-async function call (path, fn, returnType, args) {
-  if (!path || !fn || !returnType) {
-    program.outputHelp()
-    process.exit(1)
-  }
-  try {
-    const descr = JSON.parse(require('./' + path))
-    const client = await initClient(program.host, WALLET_KEY_PAIR)
-
-    await handleApiError(
-      async () => {
-        args = args.length ? `(${args.join(',')})` : '()'
-        const callResult = await client.contractCall(descr.bytecode, descr.abi || 'sophia', descr.address, fn, {args})
-        // The execution result, if successful, will be an AEVM-encoded result
-        // value. Once type decoding will be implemented in the SDK, this value will
-        // not be a hexadecimal string, anymore.
-        print('Contract address_________ ' + descr.address)
-        print('Gas price________________ ' + R.path(['result', 'gasPrice'])(callResult))
-        print('Gas used_________________ ' + R.path(['result', 'gasUsed'])(callResult))
-        print('Return value (encoded)___ ' + R.path(['result', 'returnValue'])(callResult))
-        // Decode result
-        const {type, value} = await callResult.decode(returnType)
-        print('Return value (decoded)___ ' + value)
-        print('Return remote type_______ ' + type)
-      }
-    )
-  } catch (e) {
-    printError(e.message)
-    process.exit(1)
-  }
-}
-

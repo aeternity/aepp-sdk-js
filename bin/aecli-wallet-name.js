@@ -27,19 +27,18 @@ const program = require('commander')
 const R = require('ramda')
 
 const {
-  initClient,
   getCmdFromArguments,
   printError,
-  print,
   unknownCommandHandler
 } = require('./utils')
 
-const WALLET_KEY_PAIR = JSON.parse(process.env['WALLET_KEYS'])
+require = require('esm')(module/*, options*/) //use to handle es6 import/export
+const {AENS} = require('./commands')
+
 let AENS_NAME
 
 initAensName()
   .then((name) => {
-    // SET KEYPAIR TO PROCESS.ENV
     AENS_NAME = name
 
     // remove wallet_name from argv
@@ -58,130 +57,24 @@ program
 program
   .command('claim')
   .description('Claim a domain name')
-  .action(async (...arguments) => await claim(AENS_NAME, getCmdFromArguments(arguments)))
+  .action(async (...arguments) => await AENS.claim(AENS_NAME, getCmdFromArguments(arguments)))
 
 program
   .command('revoke')
   .description('Claim a domain name')
-  .action(async (...arguments) => await revokeName(AENS_NAME, getCmdFromArguments(arguments)))
+  .action(async (...arguments) => await AENS.revokeName(AENS_NAME, getCmdFromArguments(arguments)))
 
 program
   .command('transfer <address>')
   .description('Transfer a name to another account')
-  .action(async (address, ...arguments) => await transferName(AENS_NAME, address, getCmdFromArguments(arguments)))
+  .action(async (address, ...arguments) => await AENS.transferName(AENS_NAME, address, getCmdFromArguments(arguments)))
 
 program
   .command('update <address>')
   .description('Update a name pointer')
-  .action(async (address, ...arguments) => await updateName(AENS_NAME, address, getCmdFromArguments(arguments)))
+  .action(async (address, ...arguments) => await AENS.updateName(AENS_NAME, address, getCmdFromArguments(arguments)))
 
 program.on('command:*', () => unknownCommandHandler(program)())
-
-const updateNameStatus = (name) => async (client) => {
-  try {
-    return await client.api.getName(name)
-  } catch (e) {
-    if (e.response && e.response.status === 404)
-      return {name, status: 'AVAILABLE'}
-    throw e
-  }
-}
-
-const isAvailable = (name) => name.status === 'AVAILABLE'
-
-async function claim (domain, {host, ttl, nameTtl}) {
-  try {
-    const client = await initClient(host, WALLET_KEY_PAIR)
-
-    // Retrieve name
-    const name = await updateNameStatus(domain)(client)
-    if (!isAvailable(name)) {
-      print('Domain not available')
-      process.exit(1)
-    }
-
-    // Preclaim name before claim
-    const {salt, height} = await client.aensPreclaim(domain, {nameTtl, ttl})
-    // Wait for next block and claim name
-    await client.aensClaim(domain, salt, (height + 1), {nameTtl, ttl})
-    // Update name pointer
-    const {nameHash} = await updateNameStatus(domain)(client)
-    const {hash} = await client.aensUpdate(nameHash, await client.address(), {nameTtl, ttl})
-
-    print(`Name ${domain} claimed`)
-    print('Transaction hash -------> ' + hash)
-  } catch (e) {
-    printError(e.message)
-  }
-}
-
-async function transferName (domain, address, {host, ttl, nameTtl}) {
-  if (!address) {
-    program.outputHelp()
-    process.exit(1)
-  }
-  try {
-    const client = await initClient(host, WALLET_KEY_PAIR)
-
-    // Retrieve name
-    const name = await updateNameStatus(domain)(client)
-
-    if (isAvailable(name)) {
-      print(`Domain is available, nothing to transfer`)
-      process.exit(1)
-    }
-
-    const transferTX = await client.aensTransfer(name.nameHash, address, {ttl, nameTtl})
-    print('Transfer Success')
-    print('Transaction hash -------> ' + transferTX.hash)
-  } catch (e) {
-    printError(e.message)
-  }
-}
-
-async function updateName (domain, address, {host, ttl, nameTtl}) {
-  if (!address) {
-    program.outputHelp()
-    process.exit(1)
-  }
-
-  try {
-    const client = await initClient(host, WALLET_KEY_PAIR)
-
-    // Retrieve name
-    const name = await updateNameStatus(domain)(client)
-    if (isAvailable(name)) {
-      print(`Domain is ${name.status} and cannot be transferred`)
-      process.exit(1)
-    }
-
-    const updateNameTx = await client.aensUpdate(name.nameHash, address, {ttl, nameTtl})
-    print('Update Success')
-    print('Transaction Hash -------> ' + updateNameTx.hash)
-  } catch (e) {
-    printError(e.message)
-  }
-}
-
-async function revokeName (domain, {host, ttl, nameTtl}) {
-  try {
-    const client = await initClient(host, WALLET_KEY_PAIR)
-
-    // Retrieve name
-    const name = await updateNameStatus(domain)(client)
-
-    if (isAvailable(name)) {
-      print(`Domain is available, nothing to revoke`)
-      process.exit(1)
-    }
-
-    const revokeTx = await client.aensRevoke(name.nameHash, {ttl, nameTtl})
-    print('Revoke Success')
-    print('Transaction hash -------> ' + revokeTx.hash)
-  } catch (e) {
-    printError(e.message)
-  }
-}
 
 //HELPERS
 async function initAensName () {
