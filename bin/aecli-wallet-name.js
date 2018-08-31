@@ -81,7 +81,9 @@ async function initAensName () {
   return new Promise((resolve, reject) => {
     program
       .arguments('<aens_name> [command]')
-      .action(async (aens_name) => {
+      .action(async (aens_name, command) => {
+        if (!command) program.help()
+
         if (aens_name.slice(aens_name.length - 4) === '.aet')
           resolve(aens_name)
         else

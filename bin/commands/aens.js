@@ -56,11 +56,14 @@ async function claim (domain, {host, ttl, nameTtl}) {
 
     // Preclaim name before claim
     const {salt, height} = await client.aensPreclaim(domain, {nameTtl, ttl})
+    print('Pre-Claimed')
     // Wait for next block and claim name
     await client.aensClaim(domain, salt, (height + 1), {nameTtl, ttl})
+    print('Claimed')
     // Update name pointer
     const {nameHash} = await updateNameStatus(domain)(client)
     const {hash} = await client.aensUpdate(nameHash, await client.address(), {nameTtl, ttl})
+    print('Updated')
 
     print(`Name ${domain} claimed`)
     print('Transaction hash -------> ' + hash)
