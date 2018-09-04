@@ -42,6 +42,26 @@ export function hash (input) {
 }
 
 /**
+ * Calculate 256bits Blake2b nameHash of `input`
+ * as defined in https://github.com/aeternity/protocol/blob/master/AENS.md#hashing
+ * @rtype (input: String) => hash: String
+ * @param {String} input - Data to hash
+ * @return {String} Hash
+ */
+export function nameHash (input) {
+  let buf = Buffer.allocUnsafe(32).fill(0)
+  if (!input) {
+    return buf
+  } else {
+    const labels = input.split('.')
+    for (let i = 0; i < labels.length; i++) {
+      buf = hash(Buffer.concat([buf, hash(labels[i])]))
+    }
+    return buf
+  }
+}
+
+/**
  * Calculate SHA256 hash of `input`
  * @rtype (input: String) => hash: String
  * @param {String} input - Data to hash
