@@ -34,7 +34,7 @@ async function tx (hash) {
 }
 
 async function height () {
-  return (await this.api.getTop()).height
+  return (await this.api.getTopBlock()).height
 }
 
 async function awaitHeight (h, {interval = 5000, attempts = 12} = {}) {

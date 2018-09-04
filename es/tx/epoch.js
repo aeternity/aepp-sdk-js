@@ -30,7 +30,7 @@ import {salt} from '../utils/crypto'
 const createSalt = salt
 
 async function spendTx ({ sender, recipient, amount, fee, ttl, nonce, payload }) {
-  return (await this.api.postSpend(R.merge(R.head(arguments), { recipientPubkey: recipient }))).tx
+  return (await this.api.postSpend(R.merge(R.head(arguments), { senderId: sender, payload: payload, recipientId: recipient }))).tx
 }
 
 async function namePreclaimTx ({ account, nonce, commitment, fee, ttl }) {
@@ -42,7 +42,7 @@ async function nameClaimTx ({ account, nonce, name, nameSalt, fee, ttl }) {
 }
 
 async function nameTransferTx ({ account, nonce, nameHash, recipientAccount, fee, ttl }) {
-  return (await this.api.postNameTransfer(R.merge(R.head(arguments), { recipientPubkey: recipientAccount }))).tx
+  return (await this.api.postNameTransfer(R.merge(R.head(arguments), { recipientId: recipientAccount }))).tx
 }
 
 async function nameUpdateTx ({ account, nonce, nameHash, nameTtl, pointers, clientTtl, fee, ttl }) {
