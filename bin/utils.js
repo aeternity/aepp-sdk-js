@@ -15,11 +15,12 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 'use strict'
-
-require = require('esm')(module/*, options*/) //use to handle es6 import/export
+const R = require('ramda')
 const path = require('path')
 const fs = require('fs')
 const prompt = require('prompt')
+
+require = require('esm')(module/*, options*/) //use to handle es6 import/export
 
 const {default: Cli} = require('../es/ae/cli')
 const Crypto = require('../es/utils/crypto')
@@ -50,7 +51,7 @@ const PROMPT_SCHEMA = {
 }
 
 // FILE I/O
-const writeFile = (name, data) => {
+function writeFile (name, data) {
   try {
     fs.writeFileSync(
       name,
@@ -63,7 +64,7 @@ const writeFile = (name, data) => {
   }
 }
 
-const readFile = (path, encoding = null) => {
+function readFile (path, encoding = null) {
   try {
     return fs.readFileSync(
       path,
@@ -82,75 +83,92 @@ const readFile = (path, encoding = null) => {
   }
 }
 
-const readJSONFile = (filePath) => {
+function readJSONFile (filePath) {
   try {
-    return require(
-      path.resolve(process.cwd(), filePath)
-    )
+    return JSON.parse(readFile(filePath))
   } catch (e) {
-    printError('READ FILE ERROR: ' + 'File not found')
+    printError('READ FILE ERROR: ' + e.message)
     process.exit(1)
   }
 }
 
 // CONSOLE PRINT HELPERS
-const print = (msg, obj = '') => console.log(msg, obj)
-
-const printError = (msg) => console.log(msg)
-
-const printConfig = ({host}) => {
-  console.log('WALLET_PUB___________' + process.env['WALLET_PUB'])
-  console.log('EPOCH_URL___________' + host)
+function print (msg, obj = '') {
+  console.log(msg, obj)
 }
 
-const printBlock = (block) => {
-  console
-    .log(`Block hash____________________ ${block.hash}
-Block height__________________ ${block.height}
-State hash____________________ ${block.stateHash}
-Miner_________________________ ${block.miner || 'N/A'} 
-Time__________________________ ${new Date(block.time)}
-Previous block hash___________ ${block.prevHash}
-Transactions__________________ ${block.transactions ? block.transactions.length : 0}`)
-  if (block.transactions && block.transactions.length)
+function printError (msg) {
+  console.log(msg)
+}
+
+function printConfig ({host}) {
+  print('WALLET_PUB___________' + process.env['WALLET_PUB'])
+  print('EPOCH_URL___________' + host)
+}
+
+function printBlock (block) {
+  print(`Block hash____________________ ${R.prop('hash', block)}`)
+  print(`Block height__________________ ${R.prop('height', block)}`)
+  print(`State hash____________________ ${R.prop('stateHash', block)}`)
+  print(`Miner_________________________ ${R.defaultTo('N/A', R.prop('miner', block))}`)
+  print(`Time__________________________ ${new Date(R.prop('time', block))}`)
+  print(`Previous block hash___________ ${R.prop('prevHash', block)}`)
+  print(`Transactions__________________ ${R.defaultTo(0, R.path(['transactions', 'length'], block))}`)
+  if (R.defaultTo(0, R.path(['transactions', 'length'], block)))
     printBlockTransactions(block.transactions)
 }
 
-const printName = (name) => {
-  print(`Status___________ ${name.status || 'N/A'}`)
-  print(`Name hash________ ${name.nameHash || 'N/A'}`)
-  print(`Pointers_________ `, JSON.parse(name.pointers || '\"\"') || 'N/A')
-  print(`TTL______________ ${name.nameTtl || 0}`)
+function printName (name) {
+  print(`Status___________ ${R.defaultTo('N/A', R.prop('status', name))}`)
+  print(`Name hash________ ${R.defaultTo('N/A', R.prop('nameHash', name))}`)
+  print(`Pointers_________`, R.defaultTo('N/A', JSON.parse(R.defaultTo('\"[]\"', name.pointers))))
+  print(`TTL______________ ${R.defaultTo(0, R.prop('nameTtl', name))}`)
 }
 
-const printBlockTransactions = (ts) => ts.forEach(tx => console
-  .log(`-->
-   Tx hash____________________ ${tx.hash}
-   Signatures_________________ ${tx.signatures}
-   Sender account_____________ ${tx.tx && tx.tx.sender ? tx.tx.sender : 'N/A'}
-   Recipient account__________ ${tx.tx && tx.tx.recipient ? tx.tx.recipient : 'N/A'}
-   Amount_____________________ ${tx.tx && tx.tx.amount ? tx.tx.amount : 'N/A'}`))
+function printBlockTransactions (ts) {
+  ts.forEach(
+    tx => {
+      print(`-->
+         Tx hash____________________ ${tx.hash}
+         Signatures_________________ ${tx.signatures}
+         Sender account_____________ ${R.defaultTo('N/A', R.path(['tx', 'sender'], tx))}
+         Recipient account__________ ${R.defaultTo('N/A', R.path(['tx', 'recipient'], tx))}
+         Amount_____________________ ${R.defaultTo('N/A', R.path(['tx', 'amount'], tx))}`)
+    })
+}
 
-const printTransaction = (tx) => console
-  .log(`Block hash____________________ ${tx.blockHash}
-Block height__________________ ${tx.blockHeight}
-Signatures____________________ ${tx.signatures}
-Sender account________________ ${tx.tx && tx.tx.sender ? tx.tx.sender : 'N/A'}
-Recipient account_____________ ${tx.tx && tx.tx.recipient ? tx.tx.recipient : 'N/A'}
-Amount________________________ ${tx.tx && tx.tx.amount ? tx.tx.amount : 'N/A'}
-TTL___________________________ ${tx.tx && tx.tx.ttl ? tx.tx.ttl : 'N/A'}
-`)
+function printTransaction (tx) {
+  print(`Block hash____________________ ${tx.blockHash}`)
+  print(`Block height__________________ ${tx.blockHeight}`)
+  print(`Signatures____________________ ${tx.signatures}`)
+  print(`Sender account________________ ${R.defaultTo('N/A', R.path(['tx', 'sender'], tx))}`)
+  print(`Recipient account_____________ ${R.defaultTo('N/A', R.path(['tx', 'recipient'], tx))}`)
+  print(`Amount________________________ ${R.defaultTo('N/A', R.path(['tx', 'amount'], tx))}`)
+  print(`TTL___________________________ ${R.defaultTo('N/A', R.path(['tx', 'ttl'], tx))}`)
+}
 
-const logContractDescriptor = (desc, title = '') => print(`${title}
-Contract address________________ ${desc.address}
-Transaction hash________________ ${desc.transaction}
-Deploy descriptor_______________ ${desc.descPath}`)
+function printContractDescr (descriptor) {
+  print('Source________________________ ' + descriptor.source)
+  print('Bytecode______________________ ' + descriptor.bytecode)
+  print('Address_______________________ ' + descriptor.address)
+  print('Transaction___________________ ' + descriptor.transaction)
+  print('Owner_________________________ ' + descriptor.owner)
+  print('Created_At____________________ ' + descriptor.createdAt)
+}
+
+function logContractDescriptor (desc, title = '') {
+  print(`${title}`)
+  print(`Contract address________________ ${desc.address}`)
+  print(`Transaction hash________________ ${desc.transaction}`)
+  print(`Deploy descriptor_______________ ${desc.descPath}`)
+}
+
 //
 
 // ERROR HANDLERS
-const logApiError = (error) => printError(`API ERROR: ${error}`)
+function logApiError (error) { printError(`API ERROR: ${error}`) }
 
-const handleApiError = async (fn) => {
+async function handleApiError (fn) {
   try {
     return await fn()
   } catch (e) {
@@ -160,18 +178,21 @@ const handleApiError = async (fn) => {
   }
 }
 
-const unknownCommandHandler = (program) => (execCommands = []) => {
-  const cmd = program.args[0]
+function unknownCommandHandler (program) {
+  return (execCommands = []) => {
+    const cmd = program.args[0]
 
-  if (isExecCommand(cmd, execCommands)) return
+    if (isExecCommand(cmd, execCommands)) return
 
-  console.log('Invalid command: %s\nSee --help for a list of available commands.', cmd)
-  program.help()
+    print('Invalid command: %s\nSee --help for a list of available commands.', cmd)
+    program.help()
+  }
 }
+
 //
 
 // WALLET HELPERS
-const generateSecureWallet = async (name, {output, password}) => {
+async function generateSecureWallet (name, {output, password}) {
   password = password || await promptPasswordAsync()
   const {pub, priv} = Crypto.generateSaveWallet(password)
 
@@ -186,7 +207,7 @@ const generateSecureWallet = async (name, {output, password}) => {
   })
 }
 
-const generateSecureWalletFromPrivKey = async (name, priv, {output, password}) => {
+async function generateSecureWalletFromPrivKey (name, priv, {output, password}) {
   password = password || await promptPasswordAsync()
 
   const hexStr = Crypto.hexStringToByte(priv.trim())
@@ -206,14 +227,14 @@ const generateSecureWalletFromPrivKey = async (name, priv, {output, password}) =
     writeFile(path, data)
   })
 
-  console.log(`
+  print(`
     Wallet saved
     Wallet address________________ ${Crypto.aeEncodeKey(keys.publicKey)}
     Wallet path___________________ ${path.resolve(process.cwd(), name)}
   `)
 }
 
-const getWalletByPathAndDecrypt = async () => {
+async function getWalletByPathAndDecrypt () {
   let {pass, path: walletPath} = JSON.parse(process.env['WALLET_DATA'])
 
   const privBinaryKey = readFile(path.resolve(process.cwd(), walletPath))
@@ -230,7 +251,7 @@ const getWalletByPathAndDecrypt = async () => {
   }
 }
 
-const promptPasswordAsync = async () => {
+async function promptPasswordAsync () {
   return new Promise(
     (resolve, reject) => {
       prompt.start()
@@ -244,20 +265,30 @@ const promptPasswordAsync = async () => {
     }
   )
 }
+
 //
 
 // UTILS
-const getCmdFromArguments = (args) => Object.assign({}, args[args.length - 1], args[args.length - 1].parent)
+function getCmdFromArguments (args) {
+  return R.merge(
+    args[args.length - 1],
+    args[args.length - 1].parent
+  )
+}
 
-const initClient = async (url, keypair) => {
+async function initClient (url, keypair) {
   return await Cli({url, process, keypair})
 }
 
-const initExecCommands = (program) => (cmds) => cmds.forEach(({name, desc}) => program.command(name, desc))
+function initExecCommands (program) {
+  return (cmds) => cmds.forEach(({name, desc}) => program.command(name, desc))
+}
 
-const isExecCommand = (cmd, commands) => commands.find(({name}) => cmd === name)
+function isExecCommand (cmd, commands) {
+  return commands.find(({name}) => cmd === name)
+}
 
-const checkPref = (hash, hashType) => {
+function checkPref (hash, hashType) {
   if (hash.length < 3 || hash.indexOf('$') === -1)
     throw new Error(`Invalid input, likely you forgot to escape the $ sign (use \\$)`)
 
@@ -294,6 +325,7 @@ module.exports = {
   print,
   printError,
   logContractDescriptor,
+  printContractDescr,
   getCmdFromArguments,
   readFile,
   writeFile,

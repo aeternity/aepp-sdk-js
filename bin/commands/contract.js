@@ -26,7 +26,7 @@
 import * as R from 'ramda'
 import path from 'path'
 
-const {
+import {
   handleApiError,
   initClient,
   print,
@@ -36,7 +36,7 @@ const {
   logContractDescriptor,
   getWalletByPathAndDecrypt,
   readJSONFile
-} = require('../utils')
+} from '../utils'
 
 export async function compile (file, {host}) {
   try {

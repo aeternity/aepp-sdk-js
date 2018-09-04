@@ -23,12 +23,12 @@
 // | |\  | (_| | | | | | |  __/\__ \
 // |_| \_|\__,_|_| |_| |_|\___||___/
 
-const {
+import {
   initClient,
   print,
   printError,
   getWalletByPathAndDecrypt
-} = require('../utils')
+} from '../utils'
 
 const updateNameStatus = (name) => async (client) => {
   try {

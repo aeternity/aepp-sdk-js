@@ -25,8 +25,8 @@
 
 const program = require('commander')
 
-require = require('esm')(module/*, options*/) //use to handle es6 import/export
 const {unknownCommandHandler, getCmdFromArguments} = require('./utils')
+require = require('esm')(module/*, options*/) //use to handle es6 import/export
 const {Chain} = require('./commands')
 
 program

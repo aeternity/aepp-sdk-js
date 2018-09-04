@@ -25,7 +25,7 @@
 //
 //
 
-const {
+import {
   initClient,
   generateSecureWallet,
   handleApiError,
@@ -36,7 +36,7 @@ const {
   printTransaction,
   getWalletByPathAndDecrypt,
   HASH_TYPES
-} = require('../utils')
+} from '../utils'
 
 async function spend (receiver, amount, {host, ttl}) {
   ttl = parseInt(ttl)

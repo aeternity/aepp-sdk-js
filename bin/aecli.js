@@ -25,12 +25,13 @@ const EXECUTABLE_CMD = [
   {name: 'inspect', desc: 'Get information on transactions, blocks,...'},
   {name: 'wallet', desc: 'Handle wallet operations'},
   {name: 'contract', desc: 'Compile contracts'},
-  {name: 'oracle', desc: 'Interact with oracles'},
+  // TODO implement oracle module
+  // {name: 'oracle', desc: 'Interact with oracles'},
   {name: 'crypto', desc: 'Crypto helpers'},
 ]
 
 program
-  .version('1.0.0')
+  .version(require('../package.json').version)
 
 program
   .command('config')

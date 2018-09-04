@@ -25,7 +25,9 @@
 //                   | |
 //                   |_|
 
-const {
+import * as R from 'ramda'
+import path from 'path'
+import {
   handleApiError,
   initClient,
   print,
@@ -35,8 +37,9 @@ const {
   printName,
   checkPref,
   readJSONFile,
+  printContractDescr,
   HASH_TYPES
-} = require('../utils')
+} from '../utils'
 
 async function getBlockByHash (hash, {host}) {
   try {
@@ -69,6 +72,7 @@ async function getAccountByHash (hash, {host}) {
     checkPref(hash, HASH_TYPES.account)
     const client = await initClient(host)
 
+    console.log(hash)
     await handleApiError(
       async () => print('Account balance___________ ' + await client.balance(hash))
     )
@@ -92,6 +96,7 @@ async function getBlockByHeight (height, {host}) {
 
 async function getName (name, {host}) {
   try {
+    if (R.last(name.split('.')) !== 'aet') throw new Error('AENS TLDs must end in .aet')
     const client = await initClient(host)
 
     printName(Object.assign(await client.api.getName(name), {status: 'CLAIMED'}))
@@ -105,20 +110,13 @@ async function getName (name, {host}) {
 }
 
 async function getContractByDescr (descrPath, {host}) {
-  const descriptor = JSON.parse(
-    await readJSONFile(descrPath)
-  )
   try {
+    const descriptor = await readJSONFile(path.resolve(process.cwd(), descrPath))
     const client = await initClient(host)
 
     await handleApiError(
       async () => {
-        print('Source________________________ ' + descriptor.source)
-        print('Bytecode______________________ ' + descriptor.bytecode)
-        print('Address_______________________ ' + descriptor.address)
-        print('Transaction___________________ ' + descriptor.transaction)
-        print('Owner_________________________ ' + descriptor.owner)
-        print('Created_At____________________ ' + descriptor.createdAt)
+        printContractDescr(descriptor)
         printTransaction(await client.tx(descriptor.transaction))
       }
     )

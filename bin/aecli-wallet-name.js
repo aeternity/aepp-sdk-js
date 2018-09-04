@@ -84,7 +84,7 @@ async function initAensName () {
       .action(async (aens_name, command) => {
         if (!command) program.help()
 
-        if (aens_name.slice(aens_name.length - 4) === '.aet')
+        if (R.last(aens_name.split('.')) === 'aet')
           resolve(aens_name)
         else
           reject('AENS TLDs must end in .aet')

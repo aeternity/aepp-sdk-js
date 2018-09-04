@@ -23,10 +23,10 @@
 
 import bs58check from 'bs58check'
 import RLP from 'rlp'
-import { blake2b } from 'blakejs'
+import {blake2b} from 'blakejs'
 import nacl from 'tweetnacl'
 import aesjs from 'aes-js'
-import { leftPad, rightPad } from './bytes'
+import {leftPad, rightPad} from './bytes'
 import shajs from 'sha.js'
 
 const Ecb = aesjs.ModeOfOperation.ecb

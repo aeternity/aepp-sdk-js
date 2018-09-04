@@ -16,10 +16,12 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 const program = require('commander')
-const {unknownCommandHandler} = require('./utils')
 const fs = require('fs')
 const prompt = require('prompt')
 const path = require('path')
+
+const {unknownCommandHandler} = require('./utils')
+
 require = require('esm')(module/*, options*/) //use to handle es6 import/export
 const Crypto = require('../es/utils/crypto')
 
@@ -32,7 +34,7 @@ const promptSchema = {
       hidden: true,
       required: true,
       replace: '*',
-      conform: function (value) {
+      conform: function () {
         return true
       }
     }

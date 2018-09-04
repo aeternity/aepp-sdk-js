@@ -23,13 +23,13 @@
 // | |____| | | | (_| | | | | |
 //  \_____|_| |_|\__,_|_|_| |_|
 
-const {
+import {
   initClient,
   handleApiError,
   printError,
   print,
   printBlock,
-} = require('../utils')
+} from '../utils'
 
 async function version ({host}) {
   try {
@@ -61,7 +61,16 @@ async function mempool ({host}) {
     const client = await initClient(host)
 
     await handleApiError(async () => {
-      print('Memmpool______________ ' + await client.mempool())
+      const mempool = await client.mempool()
+
+      print('Mempool______________')
+      if (mempool && mempool.length) {
+        mempool.forEach(tx => {
+          print('--------------------->')
+          print(tx.tx)
+          print('--------------------->')
+        })
+      }
     })
   } catch (e) {
     printError(e.message)

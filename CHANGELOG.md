@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.18.0-0.1.2]
+### Added
+- Add CLI implementation
+
+### Changed
+- Add keywords ('SDK', 'CLI') to package.json
+- Link aecli to ./bin/aecli.js in package.json (After "npm link" you can use CLI globally)
+- Wait until pre-claim transaction block was mined before send claim transaction
+
 ## [0.18.0-0.1.1]
 ### Added
 - Lots of new documentation (prose and API)
