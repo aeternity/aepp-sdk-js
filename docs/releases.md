@@ -36,7 +36,7 @@ targeting Epoch 0.20.0.
 
 ## Preparing the Pre-Release (Edgenet)
 
-If Testnet is not yet running the latest Epoch version (but Edgenet is) you can do a pre-release for the latest `beta` or `alpha` version, tagging the release as `next` on npmjs.
+If Testnet is not yet targeting the latest Epoch version (but Edgenet is) you can do a pre-release for the latest `beta` or `alpha` version, tagging the release as `next` on npmjs.
 
 To do this, You can follow the following steps, but keeping the `alpha` or `beta` portion in both `CHANGELOG.md` and `package.json` files.
 
