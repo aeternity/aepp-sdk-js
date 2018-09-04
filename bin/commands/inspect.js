@@ -38,7 +38,6 @@ const {
   HASH_TYPES
 } = require('../utils')
 
-
 async function getBlockByHash (hash, {host}) {
   try {
     checkPref(hash, HASH_TYPES.block)

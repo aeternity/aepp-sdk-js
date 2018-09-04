@@ -23,14 +23,11 @@
 // | |____| | | | (_| | | | | |
 //  \_____|_| |_|\__,_|_|_| |_|
 
-
-
 const program = require('commander')
 
 require = require('esm')(module/*, options*/) //use to handle es6 import/export
 const {unknownCommandHandler, getCmdFromArguments} = require('./utils')
 const {Chain} = require('./commands')
-
 
 program
   .option('-H, --host [hostname]', 'Node to connect to', 'https://sdk-testnet.aepps.com')

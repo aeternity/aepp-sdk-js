@@ -112,7 +112,7 @@ async function initWallet () {
       .option('-P, --password [password]', 'Wallet Password')
       .action(async (path, command, cmd) => {
         WALLET_NAME = R.last(path.split('/'))
-        WALLET_PATH = path;
+        WALLET_PATH = path
         WALLET_PASSWORD = program.password
 
         // Prevent grab wallet keys for create save commands

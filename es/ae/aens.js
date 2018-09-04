@@ -48,7 +48,7 @@ async function transfer (nameHash, account, options = {}) {
     recipientAccount: account
   }))
 
-  return await this.send(nameTransferTx, opt)
+  return this.send(nameTransferTx, opt)
 }
 
 /**
@@ -64,10 +64,10 @@ async function revoke (nameHash, options = {}) {
 
   const nameRevokeTx = await this.nameRevokeTx(R.merge(opt, {
     nameHash,
-    account: await this.address(),
+    account: await this.address()
   }))
 
-  return await this.send(nameRevokeTx, opt)
+  return this.send(nameRevokeTx, opt)
 }
 
 /**
@@ -111,7 +111,7 @@ async function update (nameHash, target, options = {}) {
     pointers: JSON.stringify(R.fromPairs([[classify(target), target]]))
   }))
 
-  return await this.send(nameUpdateTx, opt)
+  return this.send(nameUpdateTx, opt)
 }
 
 /**

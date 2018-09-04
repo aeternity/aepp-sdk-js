@@ -24,7 +24,6 @@
 
 import Account from './'
 import * as Crypto from '../utils/crypto'
-import { envKeypair } from '../utils/crypto'
 
 const secrets = new WeakMap()
 
@@ -66,7 +65,7 @@ function setKeypair (keypair) {
  */
 const MemoryAccount = Account.compose({
   init ({keypair}) {
-      this.setKeypair(keypair || envKeypair(process.env))
+    this.setKeypair(keypair || Crypto.envKeypair(process.env))
   },
   methods: {sign, address, setKeypair}
 })

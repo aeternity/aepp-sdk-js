@@ -140,8 +140,6 @@ async function call (descrPath, fn, returnType, args, {host}) {
   }
 }
 
-
-
 export const Contract = {
   compile,
   deploy,
