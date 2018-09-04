@@ -38,6 +38,13 @@ npm i @aeternity/aepp-sdk
 yarn add @aeternity/aepp-sdk
 ```
 
+**Note:** To install a _Pre-Release_ (latest `beta` or `alpha` version) using on the latest Epoch version, you have to install the package appending the `@next` tag reference.
+```
+pnpm i @aeternity/aepp-sdk@next
+npm i @aeternity/aepp-sdk@next
+yarn add @aeternity/aepp-sdk@next
+```
+
 > Hint: You can also add a development version from GitHub by dropping the `@` and
 > adding `#` and a branch name at the end, for example
 > `pnpm i aeternity/aepp-sdk#develop`.

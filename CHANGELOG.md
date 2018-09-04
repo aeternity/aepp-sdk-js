@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
-## [0.20.0-0.1.0]
+## [0.20.0-0.1.0-alpha.1]
 ### Added
 - nameHash function for commitment hash calculations
 
@@ -102,5 +102,5 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 [0.15.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.14.0-0.1.0...v0.15.0-0.1.0
 [0.18.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.15.0-0.1.0...v0.18.0-0.1.0
 [0.18.0-0.1.1]: https://github.com/aeternity/aepp-sdk-js/compare/v0.18.0-0.1.0...v0.18.0-0.1.1
-[0.20.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.18.0-0.1.1...v0.20.0-0.1.0
+[0.20.0-0.1.0-alpha.1]: https://github.com/aeternity/aepp-sdk-js/compare/v0.18.0-0.1.1...v0.20.0-0.1.0-alpha.1
 [GH-49]: https://github.com/aeternity/aepp-sdk-js/issues/49
