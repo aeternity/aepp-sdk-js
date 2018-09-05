@@ -262,8 +262,8 @@ function shutdown () {
  * @param {Object} [options={}] - Initializer object
  * @param {String} options.url - Channel url (for example: "ws://localhost:3001/channel")
  * @param {String} options.role - Participant role ("initiator" or "responder")
- * @param {String} options.initiator - Initiator's public key
- * @param {String} options.responder - Responder's public key
+ * @param {String} options.initiatorId - Initiator's public key
+ * @param {String} options.responderId - Responder's public key
  * @param {Number} options.pushAmount - Initial deposit in favour of the responder by the initiator
  * @param {Number} options.initiatorAmount - Amount of tokens the initiator has committed to the channel
  * @param {Number} options.responderAmount - Amount of tokens the responder has committed to the channel
@@ -277,8 +277,8 @@ function shutdown () {
  * @example EpochChannel({
   url: 'ws://localhost:3001',
   role: 'initiator'
-  initiator: 'ak$2QC98ahNHSrZLWKrpQyv91eQfCDA3aFVSNoYKdQ1ViYWVF8Z9d',
-  responder: 'ak$Gi42jcRm9DcZjk72UWQQBSxi43BG3285C9n4QSvP5JdzDyH2o',
+  initiatorId: 'ak$2QC98ahNHSrZLWKrpQyv91eQfCDA3aFVSNoYKdQ1ViYWVF8Z9d',
+  responderId: 'ak$Gi42jcRm9DcZjk72UWQQBSxi43BG3285C9n4QSvP5JdzDyH2o',
   pushAmount: 3,
   initiatorAmount: 10,
   responderAmount: 10,
@@ -293,8 +293,8 @@ function shutdown () {
 const EpochChannel = AsyncInit.compose(Channel, {
   async init (options) {
     const params = R.pick([
-      'initiator',
-      'responder',
+      'initiatorId',
+      'responderId',
       'pushAmount',
       'initiatorAmount',
       'responderAmount',
@@ -323,7 +323,7 @@ const EpochChannel = AsyncInit.compose(Channel, {
         emitter: new EventEmitter(),
         updateInProgress: false,
         pendingUpdates: [],
-        state: R.pick(['initiator', 'responder', 'initiatorAmount', 'responderAmount'], options),
+        state: R.pick(['initiatorId', 'responder', 'initiatorAmount', 'responderAmount'], options),
         params,
         ws,
         sign: options.sign
@@ -335,7 +335,7 @@ const EpochChannel = AsyncInit.compose(Channel, {
     status,
     state,
     update,
-    shutdown,
+    shutdown
   }
 })
 
