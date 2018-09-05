@@ -15,6 +15,13 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+/**
+ * EpochChannel module
+ * @module @aeternity/aepp-sdk/es/channel/epoch
+ * @export EpochChannel
+ * @example import EpochChannel from '@aeternity/aepp-sdk/es/channel/epoch'
+ */
+
 import Channel from './'
 import AsyncInit from '../utils/async-init'
 import { decodeTx, deserialize, generateKeyPair } from '../utils/crypto'
@@ -175,6 +182,114 @@ function onMessage (i, data) {
   }
 }
 
+/**
+ * Register event listener function
+ *
+ * @param {string} event - Event name
+ * @param {function} callback - Callback function
+ */
+function on (event, callback) {
+  const {emitter} = priv.get(this)
+  emitter.on(event, callback)
+}
+
+/**
+ * Get current status
+ *
+ * @return {string}
+ */
+function status () {
+  return priv.get(this).status
+}
+
+/**
+ * Get current state
+ *
+ * @return {object}
+ */
+function state () {
+  return priv.get(this).state
+}
+
+/**
+ * Trigger an update
+ *
+ * Returned promise resolves to an object containing `accepted` and `state`
+ * properties.
+ * @param {string} from - Sender's public address
+ * @param {string} to - Receiver's public address
+ * @param {number} amount - Transaction amount
+ * @param {function} sign - Function which verifies and signs transaction
+ * @return {Promise}
+ * @example channel.update(
+ *   'ak$2QC98ahNHSrZLWKrpQyv91eQfCDA3aFVSNoYKdQ1ViYWVF8Z9d',
+ *   'ak$Gi42jcRm9DcZjk72UWQQBSxi43BG3285C9n4QSvP5JdzDyH2o',
+ *   10,
+ *   async (tx) => await account.signTransaction(tx)
+ * )
+ */
+function update (from, to, amount, sign) {
+  return new Promise((resolve, reject) => {
+    priv.get(this).pendingUpdates.push({
+      from,
+      to,
+      amount,
+      sign,
+      callback (err, tx) {
+        if (err) {
+          return reject(err)
+        }
+        return resolve(tx)
+      }
+    })
+    sendNextUpdate(this)
+  })
+}
+
+/**
+ * Trigger a channel shutdown
+ */
+function shutdown () {
+  send(this, {action: 'shutdown'})
+}
+
+/**
+ * Epoch Channel
+ *
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/channel/epoch
+ * @rtype Channel
+ * @param {Object} [options={}] - Initializer object
+ * @param {String} options.url - Channel url (for example: "ws://localhost:3001/channel")
+ * @param {String} options.role - Participant role ("initiator" or "responder")
+ * @param {String} options.initiator - Initiator's public key
+ * @param {String} options.responder - Responder's public key
+ * @param {Number} options.pushAmount - Initial deposit in favour of the responder by the initiator
+ * @param {Number} options.initiatorAmount - Amount of tokens the initiator has committed to the channel
+ * @param {Number} options.responderAmount - Amount of tokens the responder has committed to the channel
+ * @param {Number} options.channelReserve - The minimum amount both peers need to maintain
+ * @param {Number} [options.ttl] - Minimum block height to include the channel_create_tx
+ * @param {String} options.host - Host of the responder's node
+ * @param {Number} options.port - The port of the responders node
+ * @param {Number} options.lockPeriod - Amount of blocks for disputing a solo close
+ * @param {Function} options.sign - Function which verifies and signs transactions
+ * @return {Object} Channel instance
+ * @example EpochChannel({
+  url: 'ws://localhost:3001',
+  role: 'initiator'
+  initiator: 'ak$2QC98ahNHSrZLWKrpQyv91eQfCDA3aFVSNoYKdQ1ViYWVF8Z9d',
+  responder: 'ak$Gi42jcRm9DcZjk72UWQQBSxi43BG3285C9n4QSvP5JdzDyH2o',
+  pushAmount: 3,
+  initiatorAmount: 10,
+  responderAmount: 10,
+  channelReserve: 2,
+  ttl: 1000,
+  host: 'localhost',
+  port: 3002,
+  lockPeriod: 10,
+  async sign (tag, tx) => await account.signTransaction(tx)
+})
+ */
 const EpochChannel = AsyncInit.compose(Channel, {
   async init (options) {
     const params = R.pick([
@@ -216,36 +331,11 @@ const EpochChannel = AsyncInit.compose(Channel, {
     })
   },
   methods: {
-    on (e, fn) {
-      const {emitter} = priv.get(this)
-      emitter.on(e, fn)
-    },
-    status () {
-      return priv.get(this).status
-    },
-    state () {
-      return priv.get(this).state
-    },
-    update (from, to, amount, sign) {
-      return new Promise((resolve, reject) => {
-        priv.get(this).pendingUpdates.push({
-          from,
-          to,
-          amount,
-          sign,
-          callback (err, tx) {
-            if (err) {
-              return reject(err)
-            }
-            return resolve(tx)
-          }
-        })
-        sendNextUpdate(this)
-      })
-    },
-    shutdown () {
-      send(this, {action: 'shutdown'})
-    }
+    on,
+    status,
+    state,
+    update,
+    shutdown,
   }
 })
 

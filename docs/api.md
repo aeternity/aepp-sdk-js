@@ -8,6 +8,7 @@
   * [@aeternity/aepp-sdk/es/ae](api/ae.md)
   * [@aeternity/aepp-sdk/es/ae/wallet](api/ae/wallet.md)
   * [@aeternity/aepp-sdk/es/chain](api/chain.md)
+  * [@aeternity/aepp-sdk/es/channel/epoch](api/channel/epoch.md)
   * [@aeternity/aepp-sdk/es/epoch](api/epoch.md)
   * [@aeternity/aepp-sdk/es/rpc/client](api/rpc/client.md)
   * [@aeternity/aepp-sdk/es/tx/epoch](api/tx/epoch.md)

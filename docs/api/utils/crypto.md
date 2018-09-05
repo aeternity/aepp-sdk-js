@@ -12,6 +12,7 @@ import * as Crypto from '@aeternity/aepp-sdk/es/utils/crypto'
     * _static_
         * [.decode](#module_@aeternity/aepp-sdk/es/utils/crypto.decode) ⇒ `Array`
         * [.hash(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.hash) ⇒ `String`
+        * [.nameHash(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.nameHash) ⇒ `String`
         * [.sha256hash(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.sha256hash) ⇒ `String`
         * [.salt()](#module_@aeternity/aepp-sdk/es/utils/crypto.salt) ⇒ `Number`
         * [.encodeBase58Check(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.encodeBase58Check) ⇒ `Buffer`
@@ -54,6 +55,20 @@ RLP decode
 
 ### @aeternity/aepp-sdk/es/utils/crypto.hash(input) ⇒ `String`
 Calculate 256bits Blake2b hash of `input`
+
+**Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
+**Returns**: `String` - Hash  
+**rtype**: `(input: String) => hash: String`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| input | `String` | Data to hash |
+
+<a id="module_@aeternity/aepp-sdk/es/utils/crypto.nameHash"></a>
+
+### @aeternity/aepp-sdk/es/utils/crypto.nameHash(input) ⇒ `String`
+Calculate 256bits Blake2b nameHash of `input`
+as defined in https://github.com/aeternity/protocol/blob/master/AENS.md#hashing
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
 **Returns**: `String` - Hash  
