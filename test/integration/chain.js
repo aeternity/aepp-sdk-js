@@ -45,7 +45,7 @@ describe('Epoch Chain', function () {
     const {tx} = await client.api.postSpend({
       fee: 1,
       amount: 1,
-      sender,
+      senderId: sender,
       recipientPubkey: receiver,
       payload: '',
       ttl: Number.MAX_SAFE_INTEGER

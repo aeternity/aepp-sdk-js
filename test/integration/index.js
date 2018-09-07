@@ -54,9 +54,9 @@ async function ready (mocha) {
     charged = true
   }
 
-  const client = await BaseAe()
-  client.setKeypair(account)
-  return client
+  // const client = await BaseAe()
+  ae.setKeypair(account)
+  return ae
 }
 
 export {
