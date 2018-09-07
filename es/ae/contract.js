@@ -73,7 +73,7 @@ async function deploy (code, abi, {initState = '()', options = {}} = {}) {
   const {tx, contractAddress} = await this.contractCreateTx(R.merge(opt, {
     callData,
     code,
-    owner: await this.address()
+    ownerId: await this.address()
   }))
 
   await this.send(tx, opt)

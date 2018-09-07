@@ -21,20 +21,20 @@ import Epoch from '../epoch'
 
 async function sendTransaction (tx, options = {}) {
   const {waitMined} = R.merge(this.Chain.defaults, options)
-  const {txHash} = await this.api.postTx({tx})
+  const {txHash} = await this.api.postTransaction({tx})
   return waitMined ? this.poll(txHash, options) : txHash
 }
 
 async function balance (address, {height, hash} = {}) {
-  return (await this.api.getAccountBalance(address, {height, hash})).balance
+  return (await this.api.getAccountByPubkey(address, {height, hash})).balance
 }
 
 async function tx (hash) {
-  return (await this.api.getTx(hash)).transaction
+  return await this.api.getTransactionByHash(hash)
 }
 
 async function height () {
-  return (await this.api.getTopBlock()).height
+  return (await await this.api.getCurrentKeyBlockHeight()).height
 }
 
 async function awaitHeight (h, {interval = 5000, attempts = 12} = {}) {

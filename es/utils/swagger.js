@@ -33,8 +33,8 @@ import * as R from 'ramda'
  * @param {String} s - String to convert
  * @return {String} Converted string
  */
-function snakeToPascal (s) {
-  return s.replace(/_./g, match => R.toUpper(match[1]))
+function snakeOrKebabToPascal (s) {
+  return s.replace(/[_|-]./g, match => R.toUpper(match[1]))
 }
 
 /**
@@ -140,7 +140,7 @@ const conformTypes = {
   },
   object (value, spec, types) {
     if (R.type(value) === 'Object') {
-      const required = R.map(snakeToPascal, spec.required || [])
+      const required = R.map(snakeOrKebabToPascal, spec.required || [])
       const properties = pascalizeKeys(spec.properties)
       const missing = R.difference(required, R.keys(value))
 
@@ -239,7 +239,7 @@ function classifyParameters (parameters) {
  * @return {Object[]} Pascalized parameters
  */
 function pascalizeParameters (parameters) {
-  return R.map(o => R.assoc('name', snakeToPascal(o.name), o), parameters)
+  return R.map(o => R.assoc('name', snakeOrKebabToPascal(o.name), o), parameters)
 }
 
 /**
@@ -278,10 +278,10 @@ function snakizeKeys (o) {
  * @rtype (o: Object) => Object
  * @param {Object} o - Object to traverse
  * @return {Object} Transformed object
- * @see snakeToPascal
+ * @see snakeOrKebabToPascal
  */
 function pascalizeKeys (o) {
-  return traverseKeys(snakeToPascal, o)
+  return traverseKeys(snakeOrKebabToPascal, o)
 }
 
 /**
@@ -479,7 +479,7 @@ export {
   operation,
   expandPath,
   assertOne,
-  snakeToPascal,
+  snakeOrKebabToPascal,
   pascalToSnake,
   traverseKeys
 }

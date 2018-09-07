@@ -83,7 +83,7 @@ const Epoch = stampit({
   }
 }, Swagger, {
   async init () {
-    const {version, revision, genesisHash} = await this.api.getStatus()
+    const {nodeVersion: version, nodeRevision: revision, genesisKeyBlockHash: genesisHash} = await this.api.getStatus()
     return Object.assign(this, {version, revision, genesisHash})
   }
 })
