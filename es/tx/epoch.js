@@ -46,8 +46,7 @@ async function nameTransferTx ({ accountId, nonce, nameId, recipientId, fee, ttl
 }
 
 async function nameUpdateTx ({ accountId, nonce, nameId, nameTtl, pointers, clientTtl, fee, ttl }) {
-  console.log(nameId)
-  return (await this.api.postNameUpdate(R.merge(R.head(arguments), { nameId }))).tx
+  return (await this.api.postNameUpdate(R.head(arguments))).tx
 }
 
 async function nameRevokeTx ({ accountId, nonce, nameId, fee, ttl }) {
@@ -59,7 +58,7 @@ async function contractCreateTx ({ owner, nonce, code, vmVersion, deposit, amoun
 }
 
 async function contractCallTx ({ callerId, nonce, contractId, vmVersion, fee, ttl, amount, gas, gasPrice, callData }) {
-  return (await this.api.postContractCall(R.merge(R.head(arguments), { callerId, contractId }))).tx
+  return (await this.api.postContractCall(R.head(arguments))).tx
 }
 
 async function commitmentHash (name, salt = createSalt()) {

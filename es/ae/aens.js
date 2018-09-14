@@ -84,9 +84,6 @@ function classify (s) {
  */
 async function update (nameId, target, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-
-  console.log('update name ----------------', nameId, target, options)
-  console.log('END update name ----------------')
   const nameUpdateTx = await this.nameUpdateTx(R.merge(opt, {
     nameId: nameId,
     accountId: await this.address(),
@@ -104,7 +101,7 @@ async function update (nameId, target, options = {}) {
  */
 async function query (name) {
   const o = await this.api.getNameEntryByName(name)
-  const {nameId} = o
+  const nameId = o.id
 
   return Object.freeze(Object.assign(o, {
     pointers: o.pointers || {},
