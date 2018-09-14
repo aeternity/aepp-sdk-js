@@ -49,8 +49,8 @@ async function call (code, abi, address, name, { args = '()', options = {} } = {
 
   const tx = await this.contractCallTx(R.merge(opt, {
     callData: await this.contractEncodeCall(code, abi, name, args),
-    contract: address,
-    caller: await this.address()
+    contractId: address,
+    callerId: await this.address()
   }))
 
   const {hash} = await this.send(tx, opt)

@@ -54,6 +54,6 @@ describe('Epoch Chain', function () {
     const {txHash} = await client.api.postTransaction({tx: signed})
 
     await client.poll(txHash).should.eventually.be.fulfilled
-    return client.poll('th$xxx', {blocks: 1}).should.eventually.be.rejected
+    return client.poll('th_xxx', {blocks: 1}).should.eventually.be.rejected
   })
 })

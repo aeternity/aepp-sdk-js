@@ -31,10 +31,10 @@ describe('Accounts', function () {
   const {pub: receiver} = generateKeyPair()
 
   describe('fails on unknown keypairs', () => {
-    // let wallet
+    let wallet
 
     before(async function () {
-      // wallet = await ready(this)
+      wallet = await ready(this)
       wallet.setKeypair(generateKeyPair())
     })
 
@@ -60,20 +60,18 @@ describe('Accounts', function () {
   })
 
   describe('can be configured to return th', () => {
-    it.skip('on creation', async () => {
+    it('on creation', async () => {
       const wallet = await ready(this)
       // const wallet = await BaseAe.compose({deepProps: {Chain: {defaults: {waitMined: false}}}})()
-      // console.log('-------------------------------', wallet)
       const th = await wallet.spend(1, receiver)
-      console.log('-------------------------------', th.hash)
       th.should.be.a('object')
-      th.hash.slice(0, 3).should.equal('th$')
+      th.hash.slice(0, 3).should.equal('th_')
     })
 
-    it.skip('on call', async () => {
-      const th = await wallet.spend(1, receiver, {waitMined: false})
+    it('on call', async () => {
+      const th = await wallet.spend(1, receiver)
       th.should.be.a('object')
-      th.hash.slice(0, 3).should.equal('th$')
+      th.hash.slice(0, 3).should.equal('th_')
     })
   })
 })

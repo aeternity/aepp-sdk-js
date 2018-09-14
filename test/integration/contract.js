@@ -80,7 +80,6 @@ describe('Contract', function () {
 
   it('calls deployed contracts', async () => {
     const result = await deployed.call('main', {args: '42'})
-    console.log('result CONTRACT', result)
     return result.decode('int').should.eventually.become({
       type: 'word',
       value: 42
