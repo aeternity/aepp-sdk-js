@@ -100,7 +100,8 @@ async function update (nameHash, target, options = {}) {
  * @return {Promise<Object>}
  */
 async function query (name) {
-  const o = await this.api.getName(name)
+  console.log('name-----------------------', name)
+  const o = await this.api.getNameEntryByName(name)
   const {nameHash} = o
 
   return Object.freeze(Object.assign(o, {

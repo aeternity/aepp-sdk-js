@@ -50,7 +50,7 @@ describe('Contract', function () {
     it('can be invoked', async () => {
       const result = await contract.contractCallStatic(identityContractByteCode, 'sophia', 'main', {args: '42'})
       return result.decode('int').should.eventually.become({
-        type: 'word',
+        sophiaType: 'word',
         value: 42
       })
     })
@@ -68,7 +68,7 @@ describe('Contract', function () {
   it('invokes function against compiled code', async () => {
     const result = await bytecode.call('main', {args: '42'})
     return result.decode('int').should.eventually.become({
-      type: 'word',
+      sophiaType: 'word',
       value: 42
     })
   })
@@ -80,6 +80,7 @@ describe('Contract', function () {
 
   it('calls deployed contracts', async () => {
     const result = await deployed.call('main', {args: '42'})
+    console.log('result CONTRACT', result)
     return result.decode('int').should.eventually.become({
       type: 'word',
       value: 42

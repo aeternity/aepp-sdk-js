@@ -46,12 +46,12 @@ describe('Epoch Chain', function () {
       fee: 1,
       amount: 1,
       senderId: sender,
-      recipientPubkey: receiver,
+      recipientId: receiver,
       payload: '',
       ttl: Number.MAX_SAFE_INTEGER
     })
     const signed = await client.signTransaction(tx)
-    const {txHash} = await client.api.postTx({tx: signed})
+    const {txHash} = await client.api.postTransaction({tx: signed})
 
     await client.poll(txHash).should.eventually.be.fulfilled
     return client.poll('th$xxx', {blocks: 1}).should.eventually.be.rejected

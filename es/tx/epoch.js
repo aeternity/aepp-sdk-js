@@ -34,7 +34,7 @@ async function spendTx ({ sender, recipient, amount, fee, ttl, nonce, payload })
 }
 
 async function namePreclaimTx ({ account, nonce, commitment, fee, ttl }) {
-  return (await this.api.postNamePreclaim(R.head(arguments))).tx
+  return (await this.api.postNamePreclaim(R.merge(R.head(arguments), { commitmentId: commitment }))).tx
 }
 
 async function nameClaimTx ({ account, nonce, name, nameSalt, fee, ttl }) {
@@ -58,7 +58,10 @@ async function contractCreateTx ({ owner, nonce, code, vmVersion, deposit, amoun
 }
 
 async function contractCallTx ({ caller, nonce, contract, vmVersion, fee, ttl, amount, gas, gasPrice, callData }) {
-  return (await this.api.postContractCall(R.head(arguments))).tx
+  console.log('caller, contract ----------------------------------- ')
+  console.log(caller, contract)
+  console.log('END caller, contract ----------------------------------- ')
+  return (await this.api.postContractCall(R.merge(R.head(arguments), { callerId: caller, contractId: contract }))).tx
 }
 
 async function commitmentHash (name, salt = createSalt()) {
