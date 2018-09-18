@@ -33,7 +33,7 @@ export function snakeToPascal (s) {
  * @param {String} s - String to convert
  * @return {String} Converted string
  */
-function snakeOrKebabToPascal (s) {
+export function snakeOrKebabToPascal (s) {
   return s.replace(/[_|-]./g, match => R.toUpper(match[1]))
 }
 

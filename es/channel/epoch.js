@@ -24,45 +24,21 @@
 
 import Channel from './'
 import AsyncInit from '../utils/async-init'
-import { decodeTx, deserialize, generateKeyPair } from '../utils/crypto'
-import { w3cwebsocket as WebSocket } from 'websocket'
-import { EventEmitter } from 'events'
+import {w3cwebsocket as WebSocket} from 'websocket'
+import {EventEmitter} from 'events'
 import * as R from 'ramda'
 import {pascalToSnake} from '../utils/string'
+import {generateKeyPair} from '../utils/crypto'
 
-const channelStatusFromEvent = {
-  channel_open: 'initialized',
-  channel_accept: 'accepted',
-  funding_created: 'halfSigned',
-  funding_signed: 'signed',
-  own_funding_locked: 'open',
-  funding_locked: 'open',
-  died: 'died'
-}
-
-const priv = new WeakMap()
-
-function setPrivate (i, value) {
-  priv.set(i, {
-    ...priv.get(i) || {},
-    ...value
-  })
-}
-
-function changeStatus (i, newStatus) {
-  const {status, emitter} = priv.get(i)
-
-  if (newStatus && newStatus !== status) {
-    setPrivate(i, {status: newStatus})
-    emitter.emit('statusChanged', newStatus)
-  }
-}
-
-function changeState (i, newState) {
-  const {state, emitter} = priv.get(i)
-  priv.get(i).state = {...state, ...newState}
-  emitter.emit('stateChanged', state)
-}
+const channelOptions = new WeakMap()
+const channelStatus = new WeakMap()
+const channelState = new WeakMap()
+const connections = new WeakMap()
+const emitters = new WeakMap()
+const pendingUpdates = new WeakMap()
+const currentState = new WeakMap()
+const messageQueue = new WeakMap()
+const isProcessingMessage = new WeakMap()
 
 function channelURL (url, { endpoint = 'channel', ...params }) {
   const paramString = R.join('&', R.values(R.mapObjIndexed((value, key) =>
@@ -71,115 +47,246 @@ function channelURL (url, { endpoint = 'channel', ...params }) {
   return `${url}/${endpoint}?${paramString}`
 }
 
-function send (i, msg) {
-  priv.get(i).ws.send(JSON.stringify(msg))
+function changeStatus (channel, newStatus) {
+  const status = channelStatus.get(channel)
+  const emitter = emitters.get(channel)
+  if (newStatus !== status) {
+    channelStatus.set(channel, newStatus)
+    emitter.emit('statusChanged', newStatus)
+  }
 }
 
-function sendNextUpdate (i) {
-  const {updateInProgress, pendingUpdates} = priv.get(i)
+function changeState (channel, newState) {
+  const emitter = emitters.get(channel)
+  const prevState = channelState.get(channel)
+  const state = {...prevState, ...newState}
+  channelState.set(channel, state)
+  emitter.emit('stateChanged', state)
+}
 
-  if (updateInProgress || !pendingUpdates || !pendingUpdates.length) {
+function send (channel, message) {
+  connections.get(channel).send(JSON.stringify(message, undefined, 2))
+}
+
+function awaitingConnection (channel, message, state) {
+  if (message.action === 'info') {
+    if (['channel_accept', 'funding_created'].includes(message.payload.event)) {
+      changeStatus(channel, {
+        channel_accept: 'accepted',
+        funding_created: 'halfSigned'
+      }[message.payload.event])
+      return {handler: awaitingChannelCreateTx}
+    }
+    return {handler: awaitingConnection}
+  }
+}
+
+async function awaitingChannelCreateTx (channel, message, state) {
+  if (message.action === 'sign') {
+    const signedTx = await channelOptions.get(channel).sign(message.tag, message.payload.tx)
+    send(channel, {action: message.tag, payload: {tx: signedTx}})
+    return {handler: awaitingOnChainTx}
+  }
+}
+
+function awaitingOnChainTx (channel, message, state) {
+  if (message.action === 'on_chain_tx') {
+    emitters.get(channel).emit('onChainTx', message.payload.tx)
+    return {handler: awaitingBlockInclusion}
+  }
+  if (
+    message.action === 'info' &&
+    message.payload.event === 'funding_signed' &&
+    channelOptions.get(channel).role === 'initiator'
+  ) {
+    changeStatus(channel, 'signed')
+    return {handler: awaitingOnChainTx}
+  }
+}
+
+function awaitingBlockInclusion (channel, message, state) {
+  if (message.action === 'info') {
+    const handler = {
+      own_funding_locked: awaitingBlockInclusion,
+      funding_locked: awaitingOpenConfirmation
+    }[message.payload.event]
+    if (handler) {
+      return {handler}
+    }
+  }
+}
+
+function awaitingOpenConfirmation (channel, message, state) {
+  if (message.action === 'info' && message.payload.event === 'open') {
+    return {handler: awaitingInitialState}
+  }
+}
+
+function awaitingInitialState (channel, message, state) {
+  if (message.action === 'update') {
+    changeState(channel, message.payload.state)
+    return {handler: channelOpen}
+  }
+}
+
+async function channelOpen (channel, message, state) {
+  if (message.action === 'info') {
+    if (message.payload.event === 'died') {
+      changeStatus(channel, 'died')
+    }
+    const handler = {
+      update: awaitingUpdateTxSignRequest,
+      close_mutual: channelOpen,
+      died: channelClosed
+    }[message.payload.event]
+    if (handler) {
+      return {handler}
+    }
+  }
+  if (message.action === 'sign' && message.tag === 'shutdown_sign_ack') {
+    const signedTx = await Promise.resolve(channelOptions.get(channel).sign(message.tag, message.payload.tx))
+    send(channel, {action: message.tag, payload: {tx: signedTx}})
+    return {handler: channelOpen}
+  }
+  if (message.action === 'on_chain_tx') {
+    emitters.get(channel).emit('onChainTx', message.payload.tx)
+    return {handler: channelOpen}
+  }
+}
+channelOpen.enter = (channel) => {
+  changeStatus(channel, 'open')
+  sendNextUpdate(channel)
+}
+
+async function awaitingOffChainTx (channel, message, state) {
+  if (message.action === 'sign' && message.tag === 'update') {
+    const {sign} = state
+    const signedTx = await sign(message.payload.tx)
+    send(channel, {action: message.tag, payload: {tx: signedTx}})
+    return {handler: awaitingOffChainUpdate, state}
+  }
+  if (message.action === 'error') {
+    state.callback(new Error(JSON.stringify(message.payload)))
+    return {handler: channelOpen}
+  }
+}
+
+function awaitingOffChainUpdate (channel, message, state) {
+  if (message.action === 'update') {
+    changeState(channel, message.payload.state)
+    state.callback(null, {accepted: true, state: message.payload.state})
+    return {handler: channelOpen}
+  }
+  if (message.action === 'conflict') {
+    state.callback(null, {accepted: false, state: {}})
+    return {handler: channelOpen}
+  }
+}
+
+async function awaitingUpdateTxSignRequest (channel, message, state) {
+  if (message.action === 'sign' && message.tag === 'update_ack') {
+    const signedTx = await channelOptions.get(channel).sign(message.tag, message.payload.tx)
+    if (signedTx) {
+      send(channel, {action: message.tag, payload: {tx: signedTx}})
+      return {handler: awaitingUpdateTx}
+    }
+    // soft-reject via competing update
+    send(channel, {
+      action: 'update',
+      tag: 'new',
+      payload: {
+        from: generateKeyPair().pub,
+        to: generateKeyPair().pub,
+        amount: 1
+      }
+    })
+    return {handler: awaitingUpdateConflict}
+  }
+}
+
+function awaitingUpdateTx (channel, message, state) {
+  if (message.action === 'update') {
+    return {handler: channelOpen}
+  }
+}
+
+function awaitingUpdateConflict (channel, message, state) {
+  if (message.action === 'error' && message.payload.reason === 'conflict') {
+    return {handler: awaitingUpdateConflict}
+  }
+  if (message.action === 'conflict') {
+    return {handler: channelOpen}
+  }
+}
+
+async function awaitingShutdownTx (channel, message, state) {
+  if (message.action === 'sign' && message.tag === 'shutdown_sign') {
+    const signedTx = await Promise.resolve(state.sign(message.payload.tx))
+    send(channel, {action: message.tag, payload: {tx: signedTx}})
+    return {handler: awaitingShutdownOnChainTx, state}
+  }
+}
+
+function awaitingShutdownOnChainTx (channel, message, state) {
+  if (message.action === 'on_chain_tx') {
+    state.resolveShutdownPromise(message.payload.tx)
+    return {handler: channelOpen}
+  }
+}
+
+function channelClosed (channel, message, state) {
+  return {handler: channelClosed}
+}
+
+async function handleMessage (channel, message) {
+  const { handler, state } = currentState.get(channel)
+  const nextState = await Promise.resolve(handler(channel, message, state))
+  if (!nextState) {
+    throw new Error('State Channels FSM entered unknown state')
+  }
+  currentState.set(channel, nextState)
+  if (nextState.handler.enter) {
+    nextState.handler.enter(channel)
+  }
+}
+
+async function onMessage (channel, message) {
+  const queue = messageQueue.get(channel) || []
+  messageQueue.set(channel, [...queue, JSON.parse(message)])
+  processMessageQueue(channel)
+}
+
+function processMessageQueue (channel) {
+  const queue = messageQueue.get(channel)
+  if (isProcessingMessage.get(channel) || !queue.length) {
     return
   }
-
-  const {from, to, amount, callback, sign} = pendingUpdates.shift()
-  setPrivate(i, {
-    updateInProgress: true,
-    updateCallback: callback,
-    signUpdate: sign
+  const [message, ...remaining] = queue
+  messageQueue.set(channel, remaining || [])
+  isProcessingMessage.set(channel, true)
+  handleMessage(channel, message).then(() => {
+    isProcessingMessage.set(channel, false)
+    processMessageQueue(channel)
   })
-  send(i, {
+}
+
+function sendNextUpdate (channel) {
+  const queue = messageQueue.get(channel) || []
+  if (currentState.get(channel).handler !== channelOpen || !queue.length) {
+    return
+  }
+  const [update, ...remaining] = queue
+  const {from, to, amount, callback, sign} = update
+  currentState.set(channel, {
+    handler: awaitingOffChainTx,
+    state: {callback, sign}
+  })
+  send(channel, {
     action: 'update',
     tag: 'new',
-    payload: {from, to, amount},
-    signUpdate: sign
+    payload: {from, to, amount}
   })
-}
-
-function finishUpdate (i, err, state) {
-  const {updateCallback} = priv.get(i)
-
-  if (updateCallback) {
-    updateCallback(err, err ? null : {accepted: !!state, state})
-  }
-  setPrivate(i, {
-    updateInProgress: false,
-    updateCallback: null,
-    updateSigned: undefined,
-    signUpdate: null
-  })
-  sendNextUpdate(i)
-}
-
-function rejectUpdate (i) {
-  send(i, {
-    action: 'update',
-    tag: 'new',
-    payload: {
-      from: generateKeyPair().pub,
-      to: generateKeyPair().pub,
-      amount: 1
-    }
-  })
-}
-
-function onMessage (i, data) {
-  const {emitter, sign, updateSigned, signUpdate} = priv.get(i)
-  const msg = JSON.parse(data)
-
-  switch (msg.action) {
-    case 'info':
-      if (msg.payload.event === 'update') {
-        setPrivate(i, {updateInProgress: true})
-      }
-      if (msg.payload.event === 'open') {
-        setPrivate(i, {channelId: msg.channel_id})
-      }
-      return changeStatus(i, channelStatusFromEvent[msg.payload.event])
-    case 'sign':
-      const signPromise = msg.tag === 'update'
-        ? signUpdate(msg.payload.tx)
-        : sign(msg.tag, msg.payload.tx)
-      return Promise.resolve(signPromise).then(tx => {
-        if (!tx) {
-          if (msg.tag === 'update') {
-            setPrivate(i, {updateSigned: false})
-          }
-          return rejectUpdate(i)
-        }
-        if (msg.tag === 'update') {
-          setPrivate(i, {updateSigned: true})
-        }
-        send(i, {
-          action: msg.tag,
-          payload: { tx }
-        })
-      })
-    case 'update':
-      const state = R.pick([
-        'channelId',
-        'initiator',
-        'responder',
-        'initiatorAmount',
-        'responderAmount',
-        'updates',
-        'state',
-        'previousRound',
-        'round'
-      ], deserialize(decodeTx(msg.payload.state)).tx)
-      changeState(i, state)
-      return finishUpdate(i, null, state)
-    case 'on_chain_tx':
-      return emitter.emit('onChainTx', {tx: msg.payload.tx})
-    case 'error':
-      // ignore update conflict if update has been rejected by acknowledger
-      if (msg.payload.reason === 'conflict' && updateSigned === undefined) {
-        return null
-      }
-      return emitter.emit('error', msg.payload)
-    case 'conflict':
-      return finishUpdate(i, updateSigned === true ? null : new Error('conflict'), null)
-  }
+  pendingUpdates.set(channel, remaining)
 }
 
 /**
@@ -189,8 +296,7 @@ function onMessage (i, data) {
  * @param {function} callback - Callback function
  */
 function on (event, callback) {
-  const {emitter} = priv.get(this)
-  emitter.on(event, callback)
+  emitters.get(this).on(event, callback)
 }
 
 /**
@@ -199,7 +305,7 @@ function on (event, callback) {
  * @return {string}
  */
 function status () {
-  return priv.get(this).status
+  channelStatus.get(this)
 }
 
 /**
@@ -208,7 +314,7 @@ function status () {
  * @return {object}
  */
 function state () {
-  return priv.get(this).state
+  channelState.get(this)
 }
 
 /**
@@ -226,31 +332,52 @@ function state () {
  *   'ak$Gi42jcRm9DcZjk72UWQQBSxi43BG3285C9n4QSvP5JdzDyH2o',
  *   10,
  *   async (tx) => await account.signTransaction(tx)
+ * ).then({accepted, state} =>
+ *   if (accepted) {
+ *     console.log('Update has been accepted')
+ *   }
  * )
  */
 function update (from, to, amount, sign) {
   return new Promise((resolve, reject) => {
-    priv.get(this).pendingUpdates.push({
+    const queue = pendingUpdates.get(this) || []
+    pendingUpdates.set(this, [...queue, {
       from,
       to,
       amount,
       sign,
-      callback (err, tx) {
+      callback (err, result) {
         if (err) {
           return reject(err)
         }
-        return resolve(tx)
+        resolve(result)
       }
-    })
+    }])
     sendNextUpdate(this)
   })
 }
 
 /**
  * Trigger a channel shutdown
+ * 
+ * Returned promise resolves to on-chain transaction.
+ * @param {function} sign - Function which verifies and signs transaction
+ * @return {Promise}
+ * @example channel.shutdown(
+ *   async (tx) => await account.signTransaction(tx)
+ * ).then(tx => console.log('on_chain_tx', tx))
  */
-function shutdown () {
-  send(this, {action: 'shutdown'})
+function shutdown (sign) {
+  return new Promise((resolve) => {
+    currentState.set(this, {
+      handler: awaitingShutdownTx,
+      state: {
+        sign,
+        resolveShutdownPromise: resolve
+      }
+    })
+    send(this, {action: 'shutdown'})
+  })
 }
 
 /**
@@ -306,10 +433,15 @@ const EpochChannel = AsyncInit.compose(Channel, {
       'role'
     ], options)
 
+    channelOptions.set(this, options)
+    emitters.set(this, new EventEmitter())
+    currentState.set(this, { handler: awaitingConnection, state: {} })
+
     await new Promise((resolve, reject) => {
       const resolveOnce = R.once(resolve)
       const rejectOnce = R.once(reject)
       const ws = new WebSocket(channelURL(options.url, params))
+      connections.set(this, ws)
       ws.onmessage = ({ data }) => onMessage(this, data)
       ws.onopen = () => {
         resolveOnce()
@@ -317,17 +449,6 @@ const EpochChannel = AsyncInit.compose(Channel, {
       }
       ws.onclose = () => changeStatus(this, 'disconnected')
       ws.onerror = (err) => rejectOnce(err)
-
-      setPrivate(this, {
-        status: 'conecting',
-        emitter: new EventEmitter(),
-        updateInProgress: false,
-        pendingUpdates: [],
-        state: R.pick(['initiatorId', 'responder', 'initiatorAmount', 'responderAmount'], options),
-        params,
-        ws,
-        sign: options.sign
-      })
     })
   },
   methods: {
