@@ -46,11 +46,12 @@ async function decode (type, data) {
 
 async function call (code, abi, address, name, { args = '()', options = {} } = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-
+  // console.log('---------------------------- address', code, abi, address, name)
+  // console.log('---------------------------- opt', opt)
   const tx = await this.contractCallTx(R.merge(opt, {
     callData: await this.contractEncodeCall(code, abi, name, args),
-    contract: address,
-    caller: await this.address()
+    contractId: address,
+    callerId: await this.address()
   }))
 
   const {hash} = await this.send(tx, opt)
@@ -73,11 +74,11 @@ async function deploy (code, abi, {initState = '()', options = {}} = {}) {
   const {tx, contractAddress} = await this.contractCreateTx(R.merge(opt, {
     callData,
     code,
-    owner: await this.address()
+    ownerId: await this.address()
   }))
 
   await this.send(tx, opt)
-
+  console.log('contractAddressssssssss', contractAddress)
   return Object.freeze({
     address: contractAddress,
     call: async (name, options) => this.contractCall(code, abi, contractAddress, name, options)

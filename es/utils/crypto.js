@@ -42,13 +42,13 @@ export function hash (input) {
 }
 
 /**
- * Calculate 256bits Blake2b nameHash of `input`
+ * Calculate 256bits Blake2b nameId of `input`
  * as defined in https://github.com/aeternity/protocol/blob/master/AENS.md#hashing
  * @rtype (input: String) => hash: String
  * @param {String} input - Data to hash
  * @return {String} Hash
  */
-export function nameHash (input) {
+export function nameId (input) {
   let buf = Buffer.allocUnsafe(32).fill(0)
   if (!input) {
     return buf
@@ -120,7 +120,7 @@ export function generateKeyPair (raw = false) {
     }
   } else {
     return {
-      pub: `ak$${encodeBase58Check(publicBuffer)}`,
+      pub: `ak_${encodeBase58Check(publicBuffer)}`,
       priv: secretBuffer.toString('hex')
     }
   }
@@ -233,7 +233,7 @@ export function verifyPersonalMessage (str, signature, publicKey) {
 
 /**
  * æternity readable public keys are the base58-encoded public key, prepended
- * with 'ak$'
+ * with 'ak_'
  * @rtype (binaryKey: Buffer) => String
  * @param {Buffer} binaryKey - Key to encode
  * @return {String} Encoded key
@@ -241,7 +241,7 @@ export function verifyPersonalMessage (str, signature, publicKey) {
 export function aeEncodeKey (binaryKey) {
   const publicKeyBuffer = Buffer.from(binaryKey, 'hex')
   const pubKeyAddress = encodeBase58Check(publicKeyBuffer)
-  return `ak$${pubKeyAddress}`
+  return `ak_${pubKeyAddress}`
 }
 
 /**
@@ -286,8 +286,8 @@ export function decryptPubKey (password, encrypted) {
  * @return {String} Payload
  */
 export function assertedType (data, type) {
-  if (RegExp(`^${type}\\$.+$`).test(data)) {
-    return data.split('$')[1]
+  if (RegExp(`^${type}_.+$`).test(data)) {
+    return data.split('_')[1]
   } else {
     throw Error(`Data doesn't match expected type ${type}`)
   }
@@ -312,7 +312,7 @@ export function decodeTx (txHash) {
 export function encodeTx (txData) {
   const encodedTxData = RLP.encode(txData)
   const encodedTx = encodeBase58Check(Buffer.from(encodedTxData))
-  return `tx$${encodedTx}`
+  return `tx_${encodedTx}`
 }
 
 /**
@@ -391,8 +391,8 @@ function deserializeOffChainUpdate (binary) {
   switch (obj.tag) {
     case OBJECT_TAGS.CHANNEL_OFFCHAIN_UPDATE_TRANSFER:
       return Object.assign(obj, {
-        from: 'ak$' + encodeBase58Check(binary[2]),
-        to: 'ak$' + encodeBase58Check(binary[3]),
+        from: 'ak_' + encodeBase58Check(binary[2]),
+        to: 'ak_' + encodeBase58Check(binary[3]),
         amount: readInt(binary[4])
       })
   }
@@ -431,9 +431,9 @@ export function deserialize (binary) {
 
     case OBJECT_TAGS.CHANNEL_CREATE_TX:
       return Object.assign(obj, {
-        initiator: 'ak$' + encodeBase58Check(binary[2]),
+        initiator: 'ak_' + encodeBase58Check(binary[2]),
         initiatorAmount: readInt(binary[3]),
-        responder: 'ak$' + encodeBase58Check(binary[4]),
+        responder: 'ak_' + encodeBase58Check(binary[4]),
         responderAmount: readInt(binary[5]),
         channelReserve: readInt(binary[6]),
         lockPeriod: readInt(binary[7]),
