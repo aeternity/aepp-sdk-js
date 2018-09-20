@@ -69,7 +69,7 @@ describe('Aens', function () {
     const claim = await aens.aensQuery(name)
     const address = await aens.address()
     return claim.update(address).should.eventually.deep.include({
-      pointers: R.fromPairs([['accountPubkey', address]])
+      pointers: [R.fromPairs([['key', 'account_pubkey'], ['id', address]])]
     })
   })
 
@@ -82,7 +82,7 @@ describe('Aens', function () {
     aens2.setKeypair(account)
     const claim2 = await aens2.aensQuery(name)
     return claim2.update(address).should.eventually.deep.include({
-      pointers: R.fromPairs([['accountPubkey', address]])
+      pointers: [R.fromPairs([['key', 'account_pubkey'], ['id', address]])]
     })
   })
 })

@@ -34,7 +34,7 @@ describe('Accounts', function () {
     let wallet
 
     before(async function () {
-      wallet = await BaseAe()
+      wallet = await ready(this)
       wallet.setKeypair(generateKeyPair())
     })
 
@@ -55,22 +55,23 @@ describe('Accounts', function () {
     const ret = await wallet.spend(1, receiver)
     ret.should.have.property('tx')
     ret.tx.should.include({
-      amount: 1, recipient: receiver
+      amount: 1, recipientId: receiver
     })
   })
 
   describe('can be configured to return th', () => {
     it('on creation', async () => {
-      const wallet = await BaseAe.compose({deepProps: {Chain: {defaults: {waitMined: false}}}})()
+      const wallet = await ready(this)
+      // const wallet = await BaseAe.compose({deepProps: {Chain: {defaults: {waitMined: false}}}})()
       const th = await wallet.spend(1, receiver)
-      th.should.be.a('string')
-      th.slice(0, 3).should.equal('th$')
+      th.should.be.a('object')
+      th.hash.slice(0, 3).should.equal('th_')
     })
 
     it('on call', async () => {
-      const th = await wallet.spend(1, receiver, {waitMined: false})
-      th.should.be.a('string')
-      th.slice(0, 3).should.equal('th$')
+      const th = await wallet.spend(1, receiver)
+      th.should.be.a('object')
+      th.hash.slice(0, 3).should.equal('th_')
     })
   })
 })

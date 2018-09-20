@@ -44,17 +44,17 @@ async function send (tx, options) {
 }
 
 /**
- * Send tokens to recipient
+ * Send tokens to recipientId
  * @instance
  * @category async
- * @rtype (amount: Number, recipient: String, options?: Object) => Promise[String]
+ * @rtype (amount: Number, recipientId: String, options?: Object) => Promise[String]
  * @param {String} tx - Transaction
  * @param {Object} options - Options
  * @return {String|String} Transaction or transaction hash
  */
-async function spend (amount, recipient, options = {}) {
+async function spend (amount, recipientId, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const spendTx = await this.spendTx(R.merge(opt, {sender: await this.address(), recipient, amount}))
+  const spendTx = await this.spendTx(R.merge(opt, {senderId: await this.address(), recipientId, amount}))
   return this.send(spendTx, opt)
 }
 
