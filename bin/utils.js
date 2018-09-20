@@ -28,7 +28,8 @@ const Crypto = require('../es/utils/crypto')
 // HAST TYPES
 const HASH_TYPES = {
   transaction: 'th',
-  block: 'bh',
+  block: 'kh',
+  micro_block: 'mh',
   signature: 'sg',
   account: 'ak',
   stateHash: 'bs'
@@ -107,12 +108,15 @@ function printConfig ({host}) {
 }
 
 function printBlock (block) {
+  const type = Object.keys(HASH_TYPES).find(t => block.hash.indexOf(HASH_TYPES[t] + '_') !== -1)
+  print('---------------- ' + type.toUpperCase() + ' ----------------')
   print(`Block hash____________________ ${R.prop('hash', block)}`)
   print(`Block height__________________ ${R.prop('height', block)}`)
   print(`State hash____________________ ${R.prop('stateHash', block)}`)
   print(`Miner_________________________ ${R.defaultTo('N/A', R.prop('miner', block))}`)
   print(`Time__________________________ ${new Date(R.prop('time', block))}`)
   print(`Previous block hash___________ ${R.prop('prevHash', block)}`)
+  print(`Previous key block hash_______ ${R.prop('prevKeyHash', block)}`)
   print(`Transactions__________________ ${R.defaultTo(0, R.path(['transactions', 'length'], block))}`)
   if (R.defaultTo(0, R.path(['transactions', 'length'], block)))
     printBlockTransactions(block.transactions)
@@ -131,8 +135,8 @@ function printBlockTransactions (ts) {
       print(`-->
          Tx hash____________________ ${tx.hash}
          Signatures_________________ ${tx.signatures}
-         Sender account_____________ ${R.defaultTo('N/A', R.path(['tx', 'sender'], tx))}
-         Recipient account__________ ${R.defaultTo('N/A', R.path(['tx', 'recipient'], tx))}
+         Sender account_____________ ${R.defaultTo('N/A', R.path(['tx', 'senderId'], tx))}
+         Recipient account__________ ${R.defaultTo('N/A', R.path(['tx', 'recipientId'], tx))}
          Amount_____________________ ${R.defaultTo('N/A', R.path(['tx', 'amount'], tx))}`)
     })
 }
@@ -141,8 +145,8 @@ function printTransaction (tx) {
   print(`Block hash____________________ ${tx.blockHash}`)
   print(`Block height__________________ ${tx.blockHeight}`)
   print(`Signatures____________________ ${tx.signatures}`)
-  print(`Sender account________________ ${R.defaultTo('N/A', R.path(['tx', 'sender'], tx))}`)
-  print(`Recipient account_____________ ${R.defaultTo('N/A', R.path(['tx', 'recipient'], tx))}`)
+  print(`Sender account________________ ${R.defaultTo('N/A', R.path(['tx', 'senderId'], tx))}`)
+  print(`Recipient account_____________ ${R.defaultTo('N/A', R.path(['tx', 'recipientId'], tx))}`)
   print(`Amount________________________ ${R.defaultTo('N/A', R.path(['tx', 'amount'], tx))}`)
   print(`TTL___________________________ ${R.defaultTo('N/A', R.path(['tx', 'ttl'], tx))}`)
 }
@@ -195,7 +199,6 @@ function unknownCommandHandler (program) {
 async function generateSecureWallet (name, {output, password}) {
   password = password || await promptPasswordAsync()
   const {pub, priv} = Crypto.generateSaveWallet(password)
-
   const data = [
     [path.join(output, name), priv],
     [path.join(output, `${name}.pub`), pub]
@@ -247,7 +250,7 @@ async function getWalletByPathAndDecrypt () {
 
   return {
     priv: decryptedPriv.toString('hex'),
-    pub: `ak$${Crypto.encodeBase58Check(decryptedPub)}`
+    pub: `ak_${Crypto.encodeBase58Check(decryptedPub)}`
   }
 }
 
@@ -277,7 +280,7 @@ function getCmdFromArguments (args) {
 }
 
 async function initClient (url, keypair) {
-  return await Cli({url, process, keypair})
+  return await Cli({url, process, keypair, internalUrl: url})
 }
 
 function initExecCommands (program) {
@@ -289,25 +292,44 @@ function isExecCommand (cmd, commands) {
 }
 
 function checkPref (hash, hashType) {
-  if (hash.length < 3 || hash.indexOf('$') === -1)
+  if (hash.length < 3 || hash.indexOf('_') === -1)
     throw new Error(`Invalid input, likely you forgot to escape the $ sign (use \\$)`)
 
-  if (hash.slice(0, 3) !== hashType + '$') {
+  // block and micro block check
+  if (Array.isArray(hashType)) {
+    const res = hashType.find(ht => hash.slice(0, 3) === ht + '_')
+    if (res)
+      return res
+    throw new Error('Invalid block hash, it should be like: mh_.... or kh._...')
+  }
+
+  if (hash.slice(0, 3) !== hashType + '_') {
     let msg
     switch (hashType) {
       case HASH_TYPES.transaction:
-        msg = 'Invalid transaction hash, it should be like: th$....'
-        break
-      case HASH_TYPES.block:
-        msg = 'Invalid block hash, it should be like: bh$....'
+        msg = 'Invalid transaction hash, it should be like: th_....'
         break
       case HASH_TYPES.account:
-        msg = 'Invalid account address, it should be like: ak$....'
+        msg = 'Invalid account address, it should be like: ak_....'
         break
     }
     throw new Error(msg)
   }
 
+}
+
+function getBlock(hash) {
+  return async (client) => {
+    if (hash.indexOf(HASH_TYPES.block  + '_') !== -1) {
+      return await client.api.getKeyBlockByHash(hash)
+    }
+    if (hash.indexOf(HASH_TYPES.micro_block  + '_') !== -1) {
+      return R.merge(
+        await client.api.getMicroBlockHeaderByHash(hash),
+        await client.api.getMicroBlockTransactionsByHash(hash)
+      )
+    }
+  }
 }
 
 module.exports = {
@@ -331,5 +353,7 @@ module.exports = {
   writeFile,
   printName,
   readJSONFile,
-  HASH_TYPES
+  getBlock,
+  HASH_TYPES,
+  HOST: 'https://sdk-edgenet.aepps.com'
 }

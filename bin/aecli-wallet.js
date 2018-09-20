@@ -33,6 +33,7 @@ const {
   unknownCommandHandler,
   printError,
   getCmdFromArguments,
+  HOST
 } = require('./utils')
 require = require('esm')(module/*, options*/) //use to handle es6 import/export
 const {Wallet} = require('./commands')
@@ -120,7 +121,7 @@ async function initWallet () {
 
         // Add host option if it is no sub-command (commander issue with parsing options in sub-command)
         if (!EXECUTABLE_CMD.find(cmd => cmd.name === command)) {
-          program.option('-H, --host [hostname]', 'Node to connect to', 'https://sdk-testnet.aepps.com')
+          program.option('-H, --host [hostname]', 'Node to connect to', HOST)
         }
         resolve()
       })

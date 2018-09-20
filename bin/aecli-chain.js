@@ -25,12 +25,12 @@
 
 const program = require('commander')
 
-const {unknownCommandHandler, getCmdFromArguments} = require('./utils')
+const {unknownCommandHandler, getCmdFromArguments, HOST} = require('./utils')
 require = require('esm')(module/*, options*/) //use to handle es6 import/export
 const {Chain} = require('./commands')
 
 program
-  .option('-H, --host [hostname]', 'Node to connect to', 'https://sdk-testnet.aepps.com')
+  .option('-H, --host [hostname]', 'Node to connect to', HOST)
   .option('-L --limit [playlimit]', 'Limit for play command', 10)
 
 program

@@ -23,14 +23,14 @@
 // | |___| (_) | | | | |_| | | (_| | (__| |_\__ \
 //  \_____\___/|_| |_|\__|_|  \__,_|\___|\__|___/
 
-const {unknownCommandHandler} = require('./utils')
+const {unknownCommandHandler, HOST} = require('./utils')
 const program = require('commander')
 
 require = require('esm')(module/*, options*/) //use to handle es6 import/export
 const {Contract} = require('./commands')
 
 program
-  .option('-H, --host [hostname]', 'Node to connect to', 'https://sdk-testnet.aepps.com')
+  .option('-H, --host [hostname]', 'Node to connect to', HOST)
 
 program
   .command('compile <file>')

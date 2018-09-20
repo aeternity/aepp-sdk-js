@@ -55,16 +55,16 @@ async function transfer (nameId, account, options = {}) {
  * Revoke a domain
  * @instance
  * @category async
- * @param {String} nameHash
+ * @param {String} nameId
  * @param {Object} [options={}]
  * @return {Promise<Object>}
  */
-async function revoke (nameHash, options = {}) {
+async function revoke (nameId, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
 
   const nameRevokeTx = await this.nameRevokeTx(R.merge(opt, {
-    nameHash,
-    account: await this.address()
+    nameId,
+    accountId: await this.address()
   }))
 
   return this.send(nameRevokeTx, opt)
@@ -97,7 +97,7 @@ function classify (s) {
 
 /**
  * Update an aens entry
- * @param nameHash domain hash
+ * @param nameId domain hash
  * @param target new target
  * @param options
  * @return {Object}
@@ -139,6 +139,9 @@ async function query (name) {
 /**
  * Claim a previously preclaimed registration. This can only be done after the
  * preclaim step
+ * @param {String} name
+ * @param {String} salt
+ * @param {Number} waitForHeight
  * @param {Record} [options={}]
  * @return {Promise<Object>} the result of the claim
  */

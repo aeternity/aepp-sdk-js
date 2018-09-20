@@ -55,7 +55,7 @@ function extractReadableKeys (dir, options) {
     const decryptedPub = Crypto.decryptPubKey(password, pubKey)
 
     console.log(`Private key (hex): ${privateHex}`)
-    console.log(`Public key (base check): ak$${Crypto.encodeBase58Check(decryptedPub)}`)
+    console.log(`Public key (base check): ak_${Crypto.encodeBase58Check(decryptedPub)}`)
     console.log(`Public key (hex): ${decryptedPub.toString('hex')}`)
   })
 }
@@ -80,7 +80,7 @@ function generateKeyPair (name, {output}) {
 // This function shows how to use a compliant private key to sign an æternity
 // transaction and turn it into an RLP-encoded tuple ready for mining
 function signTx (tx, privKey) {
-  if (!tx.match(/^tx\$.+/)) {
+  if (!tx.match(/^tx\_.+/)) {
     throw Error('Not a valid transaction')
   }
 
@@ -97,7 +97,7 @@ function signTx (tx, privKey) {
   const decryptedKey = program.password ? Crypto.decryptKey(program.password, binaryKey) : binaryKey
 
   // Split the base58Check part of the transaction
-  const base58CheckTx = tx.split('$')[1]
+  const base58CheckTx = tx.split('_')[1]
   // ... and sign the binary create_contract transaction
   const binaryTx = Crypto.decodeBase58Check(base58CheckTx)
 

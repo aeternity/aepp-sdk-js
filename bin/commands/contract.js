@@ -45,7 +45,7 @@ export async function compile (file, {host}) {
 
     const client = await initClient(host)
 
-    handleApiError(async () => {
+    await handleApiError(async () => {
       const contract = await client.contractCompile(code)
       print(`Contract bytecode:
       ${contract.bytecode}`)

@@ -71,20 +71,20 @@ async function call (code, abi, address, name, { args = '()', options = {} } = {
 async function deploy (code, abi, {initState = '()', options = {}} = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   const callData = await this.contractEncodeCall(code, abi, 'init', initState)
-  const owner = await this.address()
-  const {tx, contractAddress} = await this.contractCreateTx(R.merge(opt, {
+  const ownerId = await this.address()
+  const {tx, contractId} = await this.contractCreateTx(R.merge(opt, {
     callData,
     code,
-    owner
+    ownerId
   }))
 
   const {hash} = await this.send(tx, opt)
-  console.log('contractAddressssssssss', contractAddress)
+  console.log('contractAddressssssssss', contractId)
   return Object.freeze({
-    owner,
+    owner: ownerId,
     transaction: hash,
-    address: contractAddress,
-    call: async (name, options) => this.contractCall(code, abi, contractAddress, name, options),
+    address: contractId,
+    call: async (name, options) => this.contractCall(code, abi, contractId, name, options),
     createdAt: new Date()
   })
 }

@@ -17,8 +17,9 @@
  */
 'use strict'
 
+
 const program = require('commander')
-const {initExecCommands, unknownCommandHandler, printConfig} = require('./utils')
+const {initExecCommands, unknownCommandHandler, printConfig, HOST} = require('./utils')
 
 const EXECUTABLE_CMD = [
   {name: 'chain', desc: 'Interact with the blockchain'},
@@ -37,7 +38,7 @@ program
   .command('config')
   .description('Print the client configuration')
   .action((cmd) => printConfig(cmd))
-  .option('-H, --host [hostname]', 'Node to connect to', 'https://sdk-testnet.aepps.com')
+  .option('-H, --host [hostname]', 'Node to connect to', HOST)
 
 // INIT EXEC COMMANDS
 initExecCommands(program)(EXECUTABLE_CMD)
