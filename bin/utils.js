@@ -28,7 +28,7 @@ const Crypto = require('../es/utils/crypto')
 // HAST TYPES
 const HASH_TYPES = {
   transaction: 'th',
-  block: 'bh',
+  block: 'kh',
   signature: 'sg',
   account: 'ak',
   stateHash: 'bs'
@@ -195,7 +195,6 @@ function unknownCommandHandler (program) {
 async function generateSecureWallet (name, {output, password}) {
   password = password || await promptPasswordAsync()
   const {pub, priv} = Crypto.generateSaveWallet(password)
-
   const data = [
     [path.join(output, name), priv],
     [path.join(output, `${name}.pub`), pub]
@@ -247,7 +246,7 @@ async function getWalletByPathAndDecrypt () {
 
   return {
     priv: decryptedPriv.toString('hex'),
-    pub: `ak$${Crypto.encodeBase58Check(decryptedPub)}`
+    pub: `ak_${Crypto.encodeBase58Check(decryptedPub)}`
   }
 }
 
@@ -289,20 +288,20 @@ function isExecCommand (cmd, commands) {
 }
 
 function checkPref (hash, hashType) {
-  if (hash.length < 3 || hash.indexOf('$') === -1)
+  if (hash.length < 3 || hash.indexOf('_') === -1)
     throw new Error(`Invalid input, likely you forgot to escape the $ sign (use \\$)`)
 
-  if (hash.slice(0, 3) !== hashType + '$') {
+  if (hash.slice(0, 3) !== hashType + '_') {
     let msg
     switch (hashType) {
       case HASH_TYPES.transaction:
-        msg = 'Invalid transaction hash, it should be like: th$....'
+        msg = 'Invalid transaction hash, it should be like: th_....'
         break
       case HASH_TYPES.block:
-        msg = 'Invalid block hash, it should be like: bh$....'
+        msg = 'Invalid block hash, it should be like: bh_....'
         break
       case HASH_TYPES.account:
-        msg = 'Invalid account address, it should be like: ak$....'
+        msg = 'Invalid account address, it should be like: ak_....'
         break
     }
     throw new Error(msg)
@@ -331,5 +330,6 @@ module.exports = {
   writeFile,
   printName,
   readJSONFile,
-  HASH_TYPES
+  HASH_TYPES,
+  HOST: 'https://sdk-edgenet.aepps.com'
 }

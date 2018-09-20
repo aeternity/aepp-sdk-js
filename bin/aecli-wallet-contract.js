@@ -29,12 +29,13 @@ const R = require('ramda')
 const {
   getCmdFromArguments,
   unknownCommandHandler,
+  HOST
 } = require('./utils')
 require = require('esm')(module/*, options*/) //use to handle es6 import/export
 const {Contract} = require('./commands')
 
 program
-  .option('-H, --host [hostname]', 'Node to connect to', 'https://sdk-testnet.aepps.com')
+  .option('-H, --host [hostname]', 'Node to connect to', HOST)
   .option('-I, --init [state]', 'Deploying contract arguments for constructor function')
   .option('-G --gas [gas]', 'Amount of gas to deploy the contract', 40000000)
 

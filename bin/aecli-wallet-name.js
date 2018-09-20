@@ -29,7 +29,8 @@ const R = require('ramda')
 const {
   getCmdFromArguments,
   printError,
-  unknownCommandHandler
+  unknownCommandHandler,
+  HOST
 } = require('./utils')
 
 require = require('esm')(module/*, options*/) //use to handle es6 import/export
@@ -51,7 +52,7 @@ initAensName()
 
 program
   .usage('<aens-name> [options] [commands]')
-  .option('-H, --host [hostname]', 'Node to connect to', 'https://sdk-testnet.aepps.com')
+  .option('-H, --host [hostname]', 'Node to connect to', HOST)
   .option('-N, --nameTtl [ttl]', 'Name life Ttl', 50000)
 
 program

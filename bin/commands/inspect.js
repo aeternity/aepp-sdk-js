@@ -47,7 +47,7 @@ async function getBlockByHash (hash, {host}) {
     const client = await initClient(host)
 
     await handleApiError(
-      async () => printBlock(await client.api.getBlockByHash(hash))
+      async () => printBlock(await client.api.getKeyBlockByHash(hash))
     )
   } catch (e) {
     printError(e.message)
@@ -72,9 +72,8 @@ async function getAccountByHash (hash, {host}) {
     checkPref(hash, HASH_TYPES.account)
     const client = await initClient(host)
 
-    console.log(hash)
     await handleApiError(
-      async () => print('Account balance___________ ' + await client.balance(hash))
+      async () => print('Account balance___________ ' + await client.api.getAccountByPubkey(hash))
     )
   } catch (e) {
     printError(e.message)
@@ -99,7 +98,7 @@ async function getName (name, {host}) {
     if (R.last(name.split('.')) !== 'aet') throw new Error('AENS TLDs must end in .aet')
     const client = await initClient(host)
 
-    printName(Object.assign(await client.api.getName(name), {status: 'CLAIMED'}))
+    printName(Object.assign(await client.api.getNameEntryByName(name), {status: 'CLAIMED'}))
   } catch (e) {
     if (e.response && e.response.status === 404) {
       printName({status: 'AVAILABLE'})

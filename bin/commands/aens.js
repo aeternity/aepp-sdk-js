@@ -32,7 +32,7 @@ import {
 
 const updateNameStatus = (name) => async (client) => {
   try {
-    return await client.api.getName(name)
+    return await client.api.getNameEntryByName(name)
   } catch (e) {
     if (e.response && e.response.status === 404)
       return {name, status: 'AVAILABLE'}

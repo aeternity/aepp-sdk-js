@@ -34,10 +34,9 @@ import {
 async function version ({host}) {
   try {
     const client = await initClient(host)
-
     await handleApiError(async () => {
-      const {version} = await client.api.getVersion()
-      print(`Epoch node version____________  ${version}`)
+      const {nodeVersion} = await client.api.getStatus()
+      print(`Epoch node version____________  ${nodeVersion}`)
     })
   } catch (e) {
     printError(e.message)
@@ -48,7 +47,7 @@ async function top ({host}) {
   try {
     const client = await initClient(host)
     await handleApiError(
-      async () => printBlock(await client.api.getTop())
+      async () => printBlock(await client.api.getTopBlock())
     )
   } catch (e) {
     console.log(e)
@@ -61,16 +60,18 @@ async function mempool ({host}) {
     const client = await initClient(host)
 
     await handleApiError(async () => {
-      const mempool = await client.mempool()
+      const {pendingTransactionsCount} = await client.api.getStatus()
 
-      print('Mempool______________')
-      if (mempool && mempool.length) {
-        mempool.forEach(tx => {
-          print('--------------------->')
-          print(tx.tx)
-          print('--------------------->')
-        })
-      }
+      print('Mempool______________________________')
+      print('Pending Transactions Count___________ ' + pendingTransactionsCount)
+      // TODO getPendingTransactions API doesn't work
+      // if (mempool && mempool.length) {
+      //   mempool.forEach(tx => {
+      //     print('--------------------->')
+      //     print(tx.tx)
+      //     print('--------------------->')
+      //   })
+      // }
     })
   } catch (e) {
     printError(e.message)
@@ -83,7 +84,7 @@ async function play ({host, limit}) {
     const client = await initClient(host)
 
     await handleApiError(async () => {
-      const top = await client.api.getTop()
+      const top = await client.api.getTopBlock()
       printBlock(top)
       print('>>>>>>>>>')
       await playWithLimit(--limit, top.prevHash, client)
@@ -96,7 +97,7 @@ async function play ({host, limit}) {
 export async function playWithLimit (limit, blockHash, client) {
   if (!limit) return
 
-  let block = await client.api.getBlockByHash(blockHash)
+  let block = await client.api.getKeyBlockByHash(blockHash)
   setTimeout(async () => {
     printBlock(block)
     print('>>>>>>>>>')
