@@ -137,6 +137,7 @@ function printBlockTransactions (ts) {
          Block height_______________ ${tx.blockHeigh}
          Tx hash____________________ ${tx.hash}
          Signatures_________________ ${tx.signatures}
+         Tx Type____________________ ${R.defaultTo('N/A', R.path(['tx', 'type'], tx))}
          Sender account_____________ ${R.defaultTo('N/A', R.path(['tx', 'senderId'], tx))}
          Recipient account__________ ${R.defaultTo('N/A', R.path(['tx', 'recipientId'], tx))}
          Nonce______________________ ${R.defaultTo('N/A', R.path(['tx', 'nonce'], tx))}
@@ -149,6 +150,7 @@ function printTransaction (tx) {
   print(`Block hash____________________ ${tx.blockHash}`)
   print(`Block height__________________ ${tx.blockHeight}`)
   print(`Signatures____________________ ${tx.signatures}`)
+  print(`Tx Type_______________________ ${R.defaultTo('N/A', R.path(['tx', 'type'], tx))}`)
   print(`Sender account________________ ${R.defaultTo('N/A', R.path(['tx', 'senderId'], tx))}`)
   print(`Recipient account_____________ ${R.defaultTo('N/A', R.path(['tx', 'recipientId'], tx))}`)
   print(`Amount________________________ ${R.defaultTo('N/A', R.path(['tx', 'amount'], tx))}`)
