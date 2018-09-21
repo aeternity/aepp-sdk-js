@@ -56,7 +56,7 @@ export async function compile (file, {host, internalUrl}) {
 
 }
 
-async function deploy (path, {host, gas, init, internalUrl}) {
+async function deploy (contractPath, {host, gas, init, internalUrl}) {
   // Deploy a contract to the chain and create a deploy descriptor
   // with the contract informations that can be use to invoke the contract
   // later on.
@@ -64,7 +64,7 @@ async function deploy (path, {host, gas, init, internalUrl}) {
   // source file. Multiple deploy of the same contract file will generate different
   // deploy descriptor
   try {
-    const contractFile = readFile(path, 'utf-8')
+    const contractFile = readFile(path.resolve(process.cwd(), contractPath), 'utf-8')
     const keypair = await getWalletByPathAndDecrypt()
     const client = await initClient(host, keypair, internalUrl)
 
@@ -84,7 +84,7 @@ async function deploy (path, {host, gas, init, internalUrl}) {
         const deployDescriptor = await contract.deploy({initState: init})
 
         // Write contractDescriptor to file
-        const descPath = `${R.last(path.split('/'))}.deploy.${deployDescriptor.owner.slice(3)}.json`
+        const descPath = `${R.last(contractPath.split('/'))}.deploy.${deployDescriptor.owner.slice(3)}.json`
         const contractDescriptor = R.merge({
           descPath,
           source: contractFile,

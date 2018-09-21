@@ -183,7 +183,6 @@ async function handleApiError (fn) {
   try {
     return await fn()
   } catch (e) {
-    // console.log(e)
     const response = e.response
     logApiError(response && response.data ? response.data.reason : e)
     process.exit(1)
