@@ -38,6 +38,7 @@ import {
   checkPref,
   readJSONFile,
   printContractDescr,
+  printBlockTransactions,
   getBlock,
   HASH_TYPES
 } from '../utils'
@@ -73,7 +74,14 @@ async function getAccountByHash (hash, {host, internalUrl}) {
     checkPref(hash, HASH_TYPES.account)
     const client = await initClient(host, null, internalUrl)
     await handleApiError(
-      async () => print('Account balance___________ ' + (await client.api.getAccountByPubkey(hash)).balance)
+      async () => {
+        const {balance, id, nonce} = await client.api.getAccountByPubkey(hash)
+        print('Account ID________________ ' + id)
+        print('Account balance___________ ' + balance)
+        print('Account nonce_____________ ' + nonce)
+        print('Account Transactions: ')
+        printBlockTransactions((await client.api.getPendingAccountTransactionsByPubkey(hash)).transactions)
+      }
     )
   } catch (e) {
     printError(e.message)

@@ -64,9 +64,8 @@ async function getBalance ({host, internalUrl}) {
   try {
     const keypair = await getWalletByPathAndDecrypt()
     const client = await initClient(host, keypair, internalUrl)
-
     await handleApiError(
-      async () => print('Your balance is: ' + (await client.balance(keypair.pub)))
+      async () => print('Your balance is: ' + (await client.balance(await client.address())))
     )
   } catch (e) {
     printError(e.message)

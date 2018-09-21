@@ -124,8 +124,8 @@ function printBlock (block) {
 
 function printName (name) {
   print(`Status___________ ${R.defaultTo('N/A', R.prop('status', name))}`)
-  print(`Name hash________ ${R.defaultTo('N/A', R.prop('nameHash', name))}`)
-  print(`Pointers_________`, R.defaultTo('N/A', JSON.parse(R.defaultTo('\"[]\"', name.pointers))))
+  print(`Name hash________ ${R.defaultTo('N/A', R.prop('id', name))}`)
+  print(`Pointers_________`, R.defaultTo('N/A', R.prop('pointers', name)))
   print(`TTL______________ ${R.defaultTo(0, R.prop('nameTtl', name))}`)
 }
 
@@ -133,21 +133,26 @@ function printBlockTransactions (ts) {
   ts.forEach(
     tx => {
       print(`-->
+         Block hash_________________ ${tx.blockHash}
+         Block height_______________ ${tx.blockHeigh}
          Tx hash____________________ ${tx.hash}
          Signatures_________________ ${tx.signatures}
          Sender account_____________ ${R.defaultTo('N/A', R.path(['tx', 'senderId'], tx))}
          Recipient account__________ ${R.defaultTo('N/A', R.path(['tx', 'recipientId'], tx))}
+         Nonce______________________ ${R.defaultTo('N/A', R.path(['tx', 'nonce'], tx))}
          Amount_____________________ ${R.defaultTo('N/A', R.path(['tx', 'amount'], tx))}`)
     })
 }
 
 function printTransaction (tx) {
+  print(`Tx hash_______________________ ${tx.hash}`)
   print(`Block hash____________________ ${tx.blockHash}`)
   print(`Block height__________________ ${tx.blockHeight}`)
   print(`Signatures____________________ ${tx.signatures}`)
   print(`Sender account________________ ${R.defaultTo('N/A', R.path(['tx', 'senderId'], tx))}`)
   print(`Recipient account_____________ ${R.defaultTo('N/A', R.path(['tx', 'recipientId'], tx))}`)
   print(`Amount________________________ ${R.defaultTo('N/A', R.path(['tx', 'amount'], tx))}`)
+  print(`Nonce_________________________ ${R.defaultTo('N/A', R.path(['tx', 'nonce'], tx))}`)
   print(`TTL___________________________ ${R.defaultTo('N/A', R.path(['tx', 'ttl'], tx))}`)
 }
 
@@ -176,6 +181,7 @@ async function handleApiError (fn) {
   try {
     return await fn()
   } catch (e) {
+    // console.log(e)
     const response = e.response
     logApiError(response && response.data ? response.data.reason : e)
     process.exit(1)
@@ -337,6 +343,7 @@ module.exports = {
   initClient,
   printConfig,
   printTransaction,
+  printBlockTransactions,
   getWalletByPathAndDecrypt,
   handleApiError,
   generateSecureWallet,
@@ -355,6 +362,6 @@ module.exports = {
   readJSONFile,
   getBlock,
   HASH_TYPES,
-  HOST: 'https://sdk-edgenet.aepps.com',
-  INTERNAL_URL: 'https://sdk-edgenet.aepps.com'
+  HOST: 'http://localhost:3013',
+  INTERNAL_URL: 'http://localhost:3113'
 }

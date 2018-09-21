@@ -18,30 +18,28 @@
 import fs from 'fs'
 import {before, describe, it} from 'mocha'
 
-import {configure, plan, ready, execute, parseBlock, BaseAe, KEY_PAIR} from './index'
+import {configure, plan, ready, execute, parseBlock, BaseAe, KEY_PAIR, WALLET_NAME} from './index'
 import {generateKeyPair} from '../../es/utils/crypto'
 
 const walletName = 'test.wallet'
 
 plan(1000000000)
 
-describe.skip('CLI Wallet Module', function () {
+describe('CLI Wallet Module', function () {
   configure(this)
 
   let wallet
 
   before(async function () {
     // Spend tokens for wallet
-    // wallet = await ready(this)
-
-    // TODO create wallet by ready function
-    // Create wallet files for CLI
-    // await execute(['wallet', walletName, '--password', 'test', 'save', KEY_PAIR.priv])
+    wallet = await ready(this)
   })
   after(function () {
     // Remove wallet files
-    fs.unlinkSync(walletName)
-    fs.unlinkSync(`${walletName}.pub`)
+    if (fs.existsSync(walletName))
+      fs.unlinkSync(walletName)
+    if (fs.existsSync(`${walletName}.pub`))
+      fs.unlinkSync(`${walletName}.pub`)
   })
 
   it('Create Wallet', async () => {
@@ -68,14 +66,12 @@ describe.skip('CLI Wallet Module', function () {
   })
   it('Check Wallet Address', async () => {
     // check if wallet valid
-    parseBlock(await execute(['wallet', walletName, '--password', 'test', 'address']))['your_address_is'].should.equal(KEY_PAIR.pub)
+    parseBlock(await execute(['wallet', WALLET_NAME, '--password', 'test', 'address']))['your_address_is'].should.equal(KEY_PAIR.pub)
   })
   it('Check Wallet Balance', async () => {
-    const w = await BaseAe()
-    w.setKeypair(KEY_PAIR)
-
-    const balance = await w.balance(KEY_PAIR.pub)
-    parseInt(parseBlock(await execute(['wallet', walletName, '--password', 'test', 'balance']))['your_balance_is']).should.equal(balance)
+    const balance = await wallet.balance(await wallet.address())
+    const cliBalance = parseBlock(await execute(['wallet', WALLET_NAME, '--password', 'test', 'balance']))
+    parseInt(cliBalance['your_balance_is']).should.equal(balance)
   })
   it('Spend coins to another wallet', async () => {
     const amount = 100
@@ -84,9 +80,9 @@ describe.skip('CLI Wallet Module', function () {
     receiver.setKeypair(receiverKeys)
 
     // send coins
-    await execute(['wallet', walletName, '--password', 'test', 'spend', receiverKeys.pub, amount])
-
-    return receiver.balance(receiverKeys.pub).should.equal(amount)
+    await execute(['wallet', WALLET_NAME, '--password', 'test', 'spend', await receiver.address(), amount])
+    const receiverBalance = await receiver.balance(await receiver.address())
+    await receiverBalance.should.equal(amount)
 
   })
 })

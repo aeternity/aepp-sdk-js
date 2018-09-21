@@ -29,7 +29,8 @@ import {
   printError,
   print,
   printBlock,
-  getBlock
+  getBlock,
+  printBlockTransactions
 } from '../utils'
 
 async function version ({host, internalUrl}) {
@@ -61,18 +62,13 @@ async function mempool ({host, internalUrl}) {
     const client = await initClient(host, null, internalUrl)
 
     await handleApiError(async () => {
-      const {pendingTransactionsCount} = await client.api.getStatus()
+      const {transactions} = await client.mempool()
 
       print('Mempool______________________________')
-      print('Pending Transactions Count___________ ' + pendingTransactionsCount)
-      // TODO getPendingTransactions API doesn't work
-      // if (mempool && mempool.length) {
-      //   mempool.forEach(tx => {
-      //     print('--------------------->')
-      //     print(tx.tx)
-      //     print('--------------------->')
-      //   })
-      // }
+      print('Pending Transactions Count___________ ' + transactions.length)
+      if (transactions && transactions.length) {
+        printBlockTransactions(transactions)
+      }
     })
   } catch (e) {
     printError(e.message)

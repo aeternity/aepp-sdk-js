@@ -77,7 +77,6 @@ async function deploy (code, abi, {initState = '()', options = {}} = {}) {
   }))
 
   const {hash} = await this.send(tx, opt)
-  console.log('contractAddressssssssss', contractId)
   return Object.freeze({
     owner: ownerId,
     transaction: hash,

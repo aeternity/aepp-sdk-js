@@ -18,7 +18,7 @@
 import fs from 'fs'
 import {describe, it} from 'mocha'
 
-import {configure, BaseAe, execute, parseBlock, KEY_PAIR} from './index'
+import {configure, BaseAe, execute, parseBlock, KEY_PAIR, ready} from './index'
 import {generateKeyPair} from '../../es/utils/crypto'
 
 // CONTRACT DESCRIPTOR
@@ -27,20 +27,18 @@ const contractDescriptor = {
   source: "contract Identity =\\n  type state = ()\\n  function mainx(x : int, y: int) = x + y\\n",
   bytecode: "0x36600060203762000062620000366020518080805180516004146200008157505b5080518051600514620000df57505b5060011951005b805903906000518059600081529081818162000058915b805081590391505090565b8352505060005250f35b8059039060008052f35b5990565b508082620001369180820191505090565b602001517f696e69740000000000000000000000000000000000000000000000000000000014620000b25762000020565b5050829150620000c16200006c565b596000815290818181620000d5916200004d565b835250505b905090565b602001517f6d61696e780000000000000000000000000000000000000000000000000000001462000110576200002f565b602001518051906020015159506000516200007090805180826200018191600091505090565b5960008152908181816200014b918091505090565b83525050915050620000da565b825180599081525060208401602084038393509350935050600082136200015857809250505090565b915050806000525959905090509056",
   abi: "sophia",
-  owner: "ak$MA8Qe8ac7e9EARYK7fQxEqFufRGrG1i6qFvHA21eXXMDcnmuc",
-  transaction :"th$2rEEFjGiz5ijQFkEH4Q657Z7wJVa7rx7fiv34BTL47nF4JFNnV",
-  address: "ct$214YXa24QLoqWMSpsf5t6rACUyffxDthPDfHzP2G31c5HSmLV9",
+  owner: "ak_MA8Qe8ac7e9EARYK7fQxEqFufRGrG1i6qFvHA21eXXMDcnmuc",
+  transaction :"th_2rEEFjGiz5ijQFkEH4Q657Z7wJVa7rx7fiv34BTL47nF4JFNnV",
+  address: "ct_214YXa24QLoqWMSpsf5t6rACUyffxDthPDfHzP2G31c5HSmLV9",
   createdAt: "2018-09-04T11:32:17.207Z"}
 
-describe.skip('CLI Inspect Module', function () {
+describe('CLI Inspect Module', function () {
   configure(this)
+  let wallet
 
   it('Inspect Account', async () => {
-    // TODO create wallet by ready function
-    const wallet = await BaseAe()
-    wallet.setKeypair(KEY_PAIR)
+    wallet = await ready(this)
 
-    // Create transaction to inspect
     const balance = await wallet.balance(KEY_PAIR.pub)
     const {account_balance} = parseBlock(await execute(['inspect', 'account', KEY_PAIR.pub]))
 
@@ -48,11 +46,7 @@ describe.skip('CLI Inspect Module', function () {
   })
   it('Inspect Transaction', async () => {
     const recipient = (generateKeyPair()).pub
-    const amount = 1
-
-    // TODO create wallet by ready function
-    const wallet = await BaseAe()
-    wallet.setKeypair(KEY_PAIR)
+    const amount = 420
 
     // Create transaction to inspect
     const {hash} = await wallet.spend(amount, recipient)
@@ -87,17 +81,15 @@ describe.skip('CLI Inspect Module', function () {
     const descriptor = parseBlock(await execute(['inspect', 'deploy', fileName]))
     // remove contract descriptor file
     fs.unlinkSync(fileName)
-    const transaction = await wallet.tx(descriptor.transaction)
-
+    // const transaction = await wallet.tx(descriptor.transaction)
     descriptor.source.should.equal(contractDescriptor.source)
     descriptor.bytecode.should.equal(contractDescriptor.bytecode)
     descriptor.address.should.equal(contractDescriptor.address)
     descriptor.transaction.should.equal(contractDescriptor.transaction)
-    descriptor.created.should.equal(contractDescriptor.createdAt)
+    descriptor.created_at.should.equal(contractDescriptor.createdAt)
     descriptor.owner.should.equal(contractDescriptor.owner)
-    descriptor.block_hash.should.equal(transaction.blockHash)
-    parseInt(descriptor.block_height).should.equal(transaction.blockHeight)
-    descriptor.signatures.should.equal(transaction.signatures[0])
+    // CLI try to get transaction which doest exist
+    descriptor.api_error.should.equal('Transaction not found')
   })
   it('Inspect Name', async () => {
     const invalidName = await execute(['inspect', 'name', 'asd'])

@@ -18,7 +18,7 @@
 import fs from 'fs'
 import {before, describe, it} from 'mocha'
 
-import {configure, plan, ready, execute, parseBlock, BaseAe, KEY_PAIR} from './index'
+import {configure, plan, ready, execute, parseBlock, KEY_PAIR, WALLET_NAME} from './index'
 
 // CONTRACT DESCRIPTOR
 const testContract = `contract Identity =
@@ -29,33 +29,33 @@ const walletName = 'test.wallet'
 
 plan(1000000000)
 
-describe.skip('CLI Contract Module', function () {
+describe('CLI Contract Module', function () {
   configure(this)
   const contractFile = 'testContract'
-  let wallet
   let deployDescriptor
+  let wallet
 
   before(async function () {
     // Spend tokens for wallet
-    // wallet = await ready(this)
-
-    // TODO create wallet by ready function
-    // Create wallet files for CLI
-    await execute(['wallet', walletName, '--password', 'test', 'save', KEY_PAIR.priv])
+    wallet = await ready(this)
   })
   after(function () {
     // Remove wallet files
-    fs.unlinkSync(walletName)
-    fs.unlinkSync(`${walletName}.pub`)
+    if (fs.existsSync(walletName))
+      fs.unlinkSync(walletName)
+    if (fs.existsSync(`${walletName}.pub`))
+      fs.unlinkSync(`${walletName}.pub`)
+
     // Remove contract files
-    fs.unlinkSync(deployDescriptor)
-    fs.unlinkSync(contractFile)
+    if (fs.existsSync(deployDescriptor))
+      fs.unlinkSync(deployDescriptor)
+    if (fs.existsSync(contractFile))
+      fs.unlinkSync(contractFile)
   })
 
   it('Compile Contract', async () => {
     // Create contract file
     fs.writeFileSync(contractFile, testContract)
-    const wallet = await BaseAe()
 
     // Compile contract
     const compiled = await wallet.contractCompile(testContract)
@@ -65,10 +65,11 @@ describe.skip('CLI Contract Module', function () {
     bytecodeCLI.should.equal(compiled.bytecode)
   })
   it('Deploy Contract', async () => {
+    // Create contract file
+    fs.writeFileSync(contractFile, testContract)
 
     // Deploy contract
-    const res = await execute(['wallet', walletName, '--password', 'test', 'contract', 'deploy', contractFile])
-    console.log(res)
+    const res = await execute(['wallet', WALLET_NAME, '--password', 'test', 'contract', 'deploy', contractFile])
     const {contract_address, transaction_hash, deploy_descriptor} = (parseBlock(res))
     deployDescriptor = deploy_descriptor
     const [name, pref, address] = deployDescriptor.split('.')
@@ -77,12 +78,11 @@ describe.skip('CLI Contract Module', function () {
     transaction_hash.should.be.ok
     name.should.equal(contractFile)
     pref.should.equal('deploy')
-    address.should.equal(KEY_PAIR.pub.split('$')[1])
+    address.should.equal(KEY_PAIR.pub.split('_')[1])
   })
-  it.skip('Call Contract', async () => {
-
+  it('Call Contract', async () => {
     // Call contract
-    const callResponse = (parseBlock(await execute(['wallet', walletName, '--password', 'test', 'contract', 'call', deployDescriptor, 'main', 'int', '1', '2'])))
+    const callResponse = (parseBlock(await execute(['wallet', WALLET_NAME, '--password', 'test', 'contract', 'call', deployDescriptor, 'main', 'int', '1', '2'])))
 
     callResponse['return_value_(decoded)'].should.equal('3')
     callResponse.return_remote_type.should.equal('word')

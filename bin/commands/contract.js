@@ -113,12 +113,13 @@ async function call (descrPath, fn, returnType, args, {host, internalUrl}) {
     process.exit(1)
   }
   try {
-    const descr = await readJSONFile(descrPath)
+    const descr = await readJSONFile(path.resolve(process.cwd(), descrPath))
     const keypair = await getWalletByPathAndDecrypt()
     const client = await initClient(host, keypair, internalUrl)
 
     await handleApiError(
       async () => {
+        args = args.filter(arg => arg !== '[object Object]')
         args = args.length ? `(${args.join(',')})` : '()'
         const callResult = await client.contractCall(descr.bytecode, descr.abi || 'sophia', descr.address, fn, {args})
         // The execution result, if successful, will be an AEVM-encoded result

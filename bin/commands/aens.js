@@ -61,8 +61,8 @@ async function claim (domain, {host, ttl, nameTtl, internalUrl}) {
     await client.aensClaim(domain, salt, (height + 1), {nameTtl, ttl})
     print('Claimed')
     // Update name pointer
-    const {nameHash} = await updateNameStatus(domain)(client)
-    const {hash} = await client.aensUpdate(nameHash, await client.address(), {nameTtl, ttl})
+    const {id} = await updateNameStatus(domain)(client)
+    const {hash} = await client.aensUpdate(id, await client.address(), {nameTtl, ttl})
     print('Updated')
 
     print(`Name ${domain} claimed`)
@@ -89,7 +89,7 @@ async function transferName (domain, address, {host, ttl, nameTtl, internalUrl})
       process.exit(1)
     }
 
-    const transferTX = await client.aensTransfer(name.nameHash, address, {ttl, nameTtl})
+    const transferTX = await client.aensTransfer(name.id, address, {ttl, nameTtl})
     print('Transfer Success')
     print('Transaction hash -------> ' + transferTX.hash)
   } catch (e) {
@@ -114,7 +114,7 @@ async function updateName (domain, address, {host, ttl, nameTtl, internalUrl}) {
       process.exit(1)
     }
 
-    const updateNameTx = await client.aensUpdate(name.nameHash, address, {ttl, nameTtl})
+    const updateNameTx = await client.aensUpdate(name.id, address, {ttl, nameTtl})
     print('Update Success')
     print('Transaction Hash -------> ' + updateNameTx.hash)
   } catch (e) {
@@ -135,7 +135,7 @@ async function revokeName (domain, {host, ttl, nameTtl, internalUrl}) {
       process.exit(1)
     }
 
-    const revokeTx = await client.aensRevoke(name.nameHash, {ttl, nameTtl})
+    const revokeTx = await client.aensRevoke(name.id, {ttl, nameTtl})
     print('Revoke Success')
     print('Transaction hash -------> ' + revokeTx.hash)
   } catch (e) {
