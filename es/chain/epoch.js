@@ -34,7 +34,7 @@ async function tx (hash) {
 }
 
 async function height () {
-  return (await await this.api.getCurrentKeyBlockHeight()).height
+  return (await this.api.getCurrentKeyBlockHeight()).height
 }
 
 async function awaitHeight (h, {interval = 5000, attempts = 12} = {}) {
