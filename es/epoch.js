@@ -83,7 +83,17 @@ const Epoch = stampit({
   }
 }, Swagger, {
   async init () {
-    const {version, revision, genesisHash} = await this.api.getVersion()
+    const {nodeVersion: version, nodeRevision: revision, genesisKeyBlockHash: genesisHash} = await this.api.getStatus()
+    // TODO:
+    // getStatus fails with an Error 500 (and crashes everything)
+    // core team says:
+    // Hans 2:27 PM
+    // > Looks to me like `GetStatus` will crash horribly if the top block is a micro block. So stop sending transactions to the node 😉
+    // > @juraj.hlista and @fabian is this the expected behavior?
+    // juraj.hlista 2:29 PM
+    // > it doesn't look like it's expected
+    // FIX:
+    // because of this: https://github.com/aeternity/epoch/pull/1546/files
     return Object.assign(this, {version, revision, genesisHash})
   }
 })
