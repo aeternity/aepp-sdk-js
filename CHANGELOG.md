@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
-## [0.21.0-0.1.0-alpha.2]
+## [0.22.0-0.1.0-alpha.2]
 ### Added
 - Add CLI implementation
 
@@ -11,12 +11,16 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 - Link aecli to ./bin/aecli.js in package.json (After "npm link" you can use CLI globally)
 - Wait until pre-claim transaction block was mined before send claim transaction
 
-## [0.21.0-0.1.0-alpha.1]
+## [0.22.0-0.1.0-alpha.1]
 ### Added
 - nameId function for commitment hash calculations
 
+### Changed
+- API endpoints to meet new Epoch specifications
+- change hash prefix separator from $ to _
+
 ### Removed
-- Support for < 0.21.0
+- Support for < 0.22.0
 
 ### Changed
 - Fixes commitment hash calculations in naming system, to be `Hash(nameId(name) + name_salt)` instead of `Hash(Hash(name + name_salt))`.
