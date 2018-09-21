@@ -19,7 +19,7 @@
 
 
 const program = require('commander')
-const {initExecCommands, unknownCommandHandler, printConfig, HOST} = require('./utils')
+const {initExecCommands, unknownCommandHandler, printConfig, HOST, INTERNAL_URL} = require('./utils')
 
 const EXECUTABLE_CMD = [
   {name: 'chain', desc: 'Interact with the blockchain'},
@@ -39,6 +39,7 @@ program
   .description('Print the client configuration')
   .action((cmd) => printConfig(cmd))
   .option('-H, --host [hostname]', 'Node to connect to', HOST)
+  .option('-U, --internalUrl [internal]', 'Node to connect to(internal)', INTERNAL_URL)
 
 // INIT EXEC COMMANDS
 initExecCommands(program)(EXECUTABLE_CMD)

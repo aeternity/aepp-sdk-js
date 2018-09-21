@@ -38,16 +38,21 @@ import {
   HASH_TYPES
 } from '../utils'
 
-async function spend (receiver, amount, {host, ttl}) {
+async function spend (receiver, amount, {host, ttl, internalUrl}) {
   ttl = parseInt(ttl)
   try {
     checkPref(receiver, HASH_TYPES.account)
     const keypair = await getWalletByPathAndDecrypt()
-    const client = await initClient(host, keypair)
+    const client = await initClient(host, keypair, internalUrl)
 
     await handleApiError(async () => {
-      const tx = await client.spend(parseInt(amount), receiver, {ttl})
-      print('Transaction mined')
+      let tx = await client.spend(parseInt(amount), receiver, {ttl})
+      // if waitMined false
+      if (typeof tx !== 'object') {
+        tx = await client.tx(tx)
+      } else {
+        print('Transaction mined')
+      }
       printTransaction(tx)
     })
   } catch (e) {
@@ -55,10 +60,10 @@ async function spend (receiver, amount, {host, ttl}) {
   }
 }
 
-async function getBalance ({host}) {
+async function getBalance ({host, internalUrl}) {
   try {
     const keypair = await getWalletByPathAndDecrypt()
-    const client = await initClient(host, keypair)
+    const client = await initClient(host, keypair, internalUrl)
 
     await handleApiError(
       async () => print('Your balance is: ' + (await client.balance(keypair.pub)))
@@ -68,10 +73,10 @@ async function getBalance ({host}) {
   }
 }
 
-async function getAddress ({host}) {
+async function getAddress ({host, internalUrl}) {
   try {
     const keypair = await getWalletByPathAndDecrypt()
-    const client = await initClient(host, keypair)
+    const client = await initClient(host, keypair, internalUrl)
 
     await handleApiError(
       async () => print('Your address is: ' + await client.address())

@@ -42,10 +42,10 @@ const updateNameStatus = (name) => async (client) => {
 
 const isAvailable = (name) => name.status === 'AVAILABLE'
 
-async function claim (domain, {host, ttl, nameTtl}) {
+async function claim (domain, {host, ttl, nameTtl, internalUrl}) {
   try {
     const keypair = await getWalletByPathAndDecrypt()
-    const client = await initClient(host, keypair)
+    const client = await initClient(host, keypair, internalUrl)
 
     // Retrieve name
     const name = await updateNameStatus(domain)(client)
@@ -72,14 +72,14 @@ async function claim (domain, {host, ttl, nameTtl}) {
   }
 }
 
-async function transferName (domain, address, {host, ttl, nameTtl}) {
+async function transferName (domain, address, {host, ttl, nameTtl, internalUrl}) {
   if (!address) {
     program.outputHelp()
     process.exit(1)
   }
   try {
     const keypair = await getWalletByPathAndDecrypt()
-    const client = await initClient(host, keypair)
+    const client = await initClient(host, keypair, internalUrl)
 
     // Retrieve name
     const name = await updateNameStatus(domain)(client)
@@ -97,7 +97,7 @@ async function transferName (domain, address, {host, ttl, nameTtl}) {
   }
 }
 
-async function updateName (domain, address, {host, ttl, nameTtl}) {
+async function updateName (domain, address, {host, ttl, nameTtl, internalUrl}) {
   if (!address) {
     program.outputHelp()
     process.exit(1)
@@ -105,7 +105,7 @@ async function updateName (domain, address, {host, ttl, nameTtl}) {
 
   try {
     const keypair = await getWalletByPathAndDecrypt()
-    const client = await initClient(host, keypair)
+    const client = await initClient(host, keypair, internalUrl)
 
     // Retrieve name
     const name = await updateNameStatus(domain)(client)
@@ -122,10 +122,10 @@ async function updateName (domain, address, {host, ttl, nameTtl}) {
   }
 }
 
-async function revokeName (domain, {host, ttl, nameTtl}) {
+async function revokeName (domain, {host, ttl, nameTtl, internalUrl}) {
   try {
     const keypair = await getWalletByPathAndDecrypt()
-    const client = await initClient(host, keypair)
+    const client = await initClient(host, keypair, internalUrl)
 
     // Retrieve name
     const name = await updateNameStatus(domain)(client)

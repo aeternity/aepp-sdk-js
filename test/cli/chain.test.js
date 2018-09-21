@@ -34,16 +34,18 @@ describe.skip('CLI Chain Module', function () {
       let wallet = await BaseAe()
       wallet.setKeypair(generateKeyPair())
 
-      const {version} = await wallet.api.getVersion()
+      const {nodeVersion} = await wallet.api.getStatus()
       const res = await execute(['chain', 'version'])
-      R.last(res.split(/_/)).trim().should.equal(version)
+      R.last(res.split(/_/)).trim().should.equal(nodeVersion)
   })
   it('PLAY', async () => {
-    const res = await execute(['chain', 'play', '--limit', '2'])
-    res.split('>>>>>>>>>').length.should.equal(2)
+    const res = await execute(['chain', 'play', '--limit', '4'])
+    res.split('>>>>>>>>>').length.should.equal(4)
 
     const parsed = res.split('>>>>>>>>>').map(parseBlock)
     parsed[0].previous_block_hash.should.equal(parsed[1].block_hash)
+    parsed[1].previous_block_hash.should.equal(parsed[2].block_hash)
+    parsed[2].previous_block_hash.should.equal(parsed[3].block_hash)
   })
   it('MEMPOOL', async () => {
     const res = await execute(['chain', 'mempool'])

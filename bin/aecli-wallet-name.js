@@ -30,7 +30,8 @@ const {
   getCmdFromArguments,
   printError,
   unknownCommandHandler,
-  HOST
+  HOST,
+  INTERNAL_URL
 } = require('./utils')
 
 require = require('esm')(module/*, options*/) //use to handle es6 import/export
@@ -53,6 +54,7 @@ initAensName()
 program
   .usage('<aens-name> [options] [commands]')
   .option('-H, --host [hostname]', 'Node to connect to', HOST)
+  .option('-U, --internalUrl [internal]', 'Node to connect to(internal)', INTERNAL_URL)
   .option('-N, --nameTtl [ttl]', 'Name life Ttl', 50000)
 
 program

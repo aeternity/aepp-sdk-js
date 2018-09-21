@@ -25,8 +25,8 @@ export const KEY_PAIR = {
   pub: 'ak_XeSuxD8wZ1eDWYu71pWVMJTDopUKrSxZAuiQtNT6bgmNWe9D3'
 }
 
-const url = process.env.TEST_URL || 'https://sdk-testnet.aepps.com'
-const internalUrl = process.env.TEST_INTERNAL_URL || 'https://sdk-testnet.aepps.com'
+const url = process.env.TEST_URL || 'https://sdk-edgenet.aepps.com'
+const internalUrl = process.env.TEST_INTERNAL_URL || 'https://sdk-edgenet.aepps.com'
 const TIMEOUT = 180000
 
 export const BaseAe = Ae.compose({
@@ -86,13 +86,13 @@ export function parseBlock (res) {
   return res
     .split('\n')
     .reduce((acc, val) => {
-      let v = val.split(/_/)
+      let v = val.split(/__/)
       if (v.length < 2)
         v = val.split(':')
       return Object.assign(
         acc,
         {
-          [R.head(v).replace(' ', '_').replace(' ', '_').toLowerCase()]: R.last(v).trim()
+          [R.head(v).replace(' ', '_').replace(' ', '_').toLowerCase()]: R.last(R.last(v).split(/_ /)).trim()
         }
       )
     }, {})

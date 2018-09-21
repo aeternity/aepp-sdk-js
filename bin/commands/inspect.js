@@ -42,10 +42,10 @@ import {
   HASH_TYPES
 } from '../utils'
 
-async function getBlockByHash (hash, {host}) {
+async function getBlockByHash (hash, {host, internalUrl}) {
   try {
     checkPref(hash, [HASH_TYPES.block, HASH_TYPES.micro_block])
-    const client = await initClient(host)
+    const client = await initClient(host, null, internalUrl)
     await handleApiError(
       async () => printBlock(
         await getBlock(hash)(client)
@@ -56,10 +56,10 @@ async function getBlockByHash (hash, {host}) {
   }
 }
 
-async function getTransactionByHash (hash, {host}) {
+async function getTransactionByHash (hash, {host, internalUrl}) {
   try {
     checkPref(hash, HASH_TYPES.transaction)
-    const client = await initClient(host)
+    const client = await initClient(host, null, internalUrl)
     await handleApiError(
       async () => printTransaction(await client.tx(hash))
     )
@@ -68,10 +68,10 @@ async function getTransactionByHash (hash, {host}) {
   }
 }
 
-async function getAccountByHash (hash, {host}) {
+async function getAccountByHash (hash, {host, internalUrl}) {
   try {
     checkPref(hash, HASH_TYPES.account)
-    const client = await initClient(host)
+    const client = await initClient(host, null, internalUrl)
     await handleApiError(
       async () => print('Account balance___________ ' + (await client.api.getAccountByPubkey(hash)).balance)
     )
@@ -80,10 +80,10 @@ async function getAccountByHash (hash, {host}) {
   }
 }
 
-async function getBlockByHeight (height, {host}) {
+async function getBlockByHeight (height, {host, internalUrl}) {
   height = parseInt(height)
   try {
-    const client = await initClient(host)
+    const client = await initClient(host, null, internalUrl)
 
     await handleApiError(
       async () => printBlock(await client.api.getKeyBlockByHeight(height))
@@ -93,10 +93,10 @@ async function getBlockByHeight (height, {host}) {
   }
 }
 
-async function getName (name, {host}) {
+async function getName (name, {host, internalUrl}) {
   try {
     if (R.last(name.split('.')) !== 'aet') throw new Error('AENS TLDs must end in .aet')
-    const client = await initClient(host)
+    const client = await initClient(host, null, internalUrl)
 
     printName(Object.assign(await client.api.getNameEntryByName(name), {status: 'CLAIMED'}))
   } catch (e) {
@@ -108,10 +108,10 @@ async function getName (name, {host}) {
   }
 }
 
-async function getContractByDescr (descrPath, {host}) {
+async function getContractByDescr (descrPath, {host, internalUrl}) {
   try {
     const descriptor = await readJSONFile(path.resolve(process.cwd(), descrPath))
-    const client = await initClient(host)
+    const client = await initClient(host, null, internalUrl)
 
     await handleApiError(
       async () => {

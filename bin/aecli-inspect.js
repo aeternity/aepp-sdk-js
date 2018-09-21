@@ -25,7 +25,7 @@
 //                   | |
 //                   |_|
 
-const {unknownCommandHandler, HOST} = require('./utils')
+const {unknownCommandHandler, HOST, INTERNAL_URL} = require('./utils')
 const program = require('commander')
 
 require = require('esm')(module/*, options*/) //use to handle es6 import/export
@@ -33,6 +33,7 @@ const {Inspect} = require('./commands')
 
 program
   .option('-H, --host [hostname]', 'Node to connect to', HOST)
+  .option('-U, --internalUrl [internal]', 'Node to connect to(internal)', INTERNAL_URL)
 
 program
   .command('account <hash>')

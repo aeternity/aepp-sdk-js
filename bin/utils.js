@@ -279,8 +279,8 @@ function getCmdFromArguments (args) {
   )
 }
 
-async function initClient (url, keypair) {
-  return await Cli({url, process, keypair, internalUrl: url})
+async function initClient (url, keypair, internalUrl) {
+  return await Cli({url, process, keypair, internalUrl})
 }
 
 function initExecCommands (program) {
@@ -355,5 +355,6 @@ module.exports = {
   readJSONFile,
   getBlock,
   HASH_TYPES,
-  HOST: 'https://sdk-edgenet.aepps.com'
+  HOST: 'https://sdk-edgenet.aepps.com',
+  INTERNAL_URL: 'https://sdk-edgenet.aepps.com'
 }

@@ -32,9 +32,9 @@ import {
   getBlock
 } from '../utils'
 
-async function version ({host}) {
+async function version ({host, internalUrl}) {
   try {
-    const client = await initClient(host)
+    const client = await initClient(host, null, internalUrl)
     await handleApiError(async () => {
       const {nodeVersion} = await client.api.getStatus()
       print(`Epoch node version____________  ${nodeVersion}`)
@@ -44,9 +44,9 @@ async function version ({host}) {
   }
 }
 
-async function top ({host}) {
+async function top ({host, internalUrl}) {
   try {
-    const client = await initClient(host)
+    const client = await initClient(host, null, internalUrl)
     await handleApiError(
       async () => printBlock(await client.api.getTopBlock())
     )
@@ -56,9 +56,9 @@ async function top ({host}) {
   }
 }
 
-async function mempool ({host}) {
+async function mempool ({host, internalUrl}) {
   try {
-    const client = await initClient(host)
+    const client = await initClient(host, null, internalUrl)
 
     await handleApiError(async () => {
       const {pendingTransactionsCount} = await client.api.getStatus()
@@ -79,10 +79,10 @@ async function mempool ({host}) {
   }
 }
 
-async function play ({host, limit}) {
+async function play ({host, limit, internalUrl}) {
   limit = parseInt(limit)
   try {
-    const client = await initClient(host)
+    const client = await initClient(host, null, internalUrl)
 
     await handleApiError(async () => {
       const top = await client.api.getTopBlock()

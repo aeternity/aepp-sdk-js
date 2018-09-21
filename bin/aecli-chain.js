@@ -25,12 +25,13 @@
 
 const program = require('commander')
 
-const {unknownCommandHandler, getCmdFromArguments, HOST} = require('./utils')
+const {unknownCommandHandler, getCmdFromArguments, HOST, INTERNAL_URL} = require('./utils')
 require = require('esm')(module/*, options*/) //use to handle es6 import/export
 const {Chain} = require('./commands')
 
 program
   .option('-H, --host [hostname]', 'Node to connect to', HOST)
+  .option('-U, --internalUrl [internal]', 'Node to connect to(internal)', INTERNAL_URL)
   .option('-L --limit [playlimit]', 'Limit for play command', 10)
 
 program

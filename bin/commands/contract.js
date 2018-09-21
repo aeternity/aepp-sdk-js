@@ -38,12 +38,12 @@ import {
   readJSONFile
 } from '../utils'
 
-export async function compile (file, {host}) {
+export async function compile (file, {host, internalUrl}) {
   try {
     const code = readFile(path.resolve(process.cwd(), file), 'utf-8')
     if (!code) throw new Error('Contract file not found')
 
-    const client = await initClient(host)
+    const client = await initClient(host, null, internalUrl)
 
     await handleApiError(async () => {
       const contract = await client.contractCompile(code)
@@ -56,7 +56,7 @@ export async function compile (file, {host}) {
 
 }
 
-async function deploy (path, {host, gas, init}) {
+async function deploy (path, {host, gas, init, internalUrl}) {
   // Deploy a contract to the chain and create a deploy descriptor
   // with the contract informations that can be use to invoke the contract
   // later on.
@@ -66,7 +66,7 @@ async function deploy (path, {host, gas, init}) {
   try {
     const contractFile = readFile(path, 'utf-8')
     const keypair = await getWalletByPathAndDecrypt()
-    const client = await initClient(host, keypair)
+    const client = await initClient(host, keypair, internalUrl)
 
     await handleApiError(
       async () => {
@@ -107,7 +107,7 @@ async function deploy (path, {host, gas, init}) {
   }
 }
 
-async function call (descrPath, fn, returnType, args, {host}) {
+async function call (descrPath, fn, returnType, args, {host, internalUrl}) {
   if (!path || !fn || !returnType) {
     program.outputHelp()
     process.exit(1)
@@ -115,7 +115,7 @@ async function call (descrPath, fn, returnType, args, {host}) {
   try {
     const descr = await readJSONFile(descrPath)
     const keypair = await getWalletByPathAndDecrypt()
-    const client = await initClient(host, keypair)
+    const client = await initClient(host, keypair, internalUrl)
 
     await handleApiError(
       async () => {
