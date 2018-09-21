@@ -30,51 +30,27 @@ import {salt} from '../utils/crypto'
 const createSalt = salt
 
 async function spendTx ({ senderId, recipientId, amount, fee, ttl, nonce, payload }) {
-  try {
-    return (await this.api.postSpend(R.merge(R.head(arguments), { recipientId }))).tx
-  } catch (e) {
-    throw e
-  }
+  return (await this.api.postSpend(R.merge(R.head(arguments), { recipientId }))).tx
 }
 
 async function namePreclaimTx ({ accountId, nonce, commitmentId, fee, ttl }) {
-  try {
-    return (await this.api.postNamePreclaim(R.head(arguments))).tx
-  } catch (e) {
-    throw e
-  }
+  return (await this.api.postNamePreclaim(R.head(arguments))).tx
 }
 
 async function nameClaimTx ({ accountId, nonce, name, nameSalt, fee, ttl }) {
-  try {
-    return (await this.api.postNameClaim(R.head(arguments))).tx
-  } catch (e) {
-    throw e
-  }
+  return (await this.api.postNameClaim(R.head(arguments))).tx
 }
 
 async function nameTransferTx ({ accountId, nonce, nameId, recipientId, fee, ttl }) {
-  try {
-    return (await this.api.postNameTransfer(R.merge(R.head(arguments), { recipientId }))).tx
-  } catch (e) {
-    throw e
-  }
+  return (await this.api.postNameTransfer(R.merge(R.head(arguments), { recipientId }))).tx
 }
 
 async function nameUpdateTx ({ accountId, nonce, nameId, nameTtl, pointers, clientTtl, fee, ttl }) {
-  try {
-    return (await this.api.postNameUpdate(R.head(arguments))).tx
-  } catch (e) {
-    throw e
-  }
+  return (await this.api.postNameUpdate(R.head(arguments))).tx
 }
 
 async function nameRevokeTx ({ accountId, nonce, nameId, fee, ttl }) {
-  try {
-    return (await this.api.postNameRevoke(R.head(arguments))).tx
-  } catch (e) {
-    throw e
-  }
+  return (await this.api.postNameRevoke(R.head(arguments))).tx
 }
 
 async function contractCreateTx ({ owner, nonce, code, vmVersion, deposit, amount, gas, gasPrice, fee, ttl, callData }) {
@@ -82,19 +58,11 @@ async function contractCreateTx ({ owner, nonce, code, vmVersion, deposit, amoun
 }
 
 async function contractCallTx ({ callerId, nonce, contractId, vmVersion, fee, ttl, amount, gas, gasPrice, callData }) {
-  try {
-    return (await this.api.postContractCall(R.head(arguments))).tx
-  } catch (e) {
-    throw e
-  }
+  return (await this.api.postContractCall(R.head(arguments))).tx
 }
 
 async function commitmentHash (name, salt = createSalt()) {
-  try {
-    return (await this.api.getCommitmentHash(name, salt)).commitmentId
-  } catch (e) {
-    throw e
-  }
+  return (await this.api.getCommitmentHash(name, salt)).commitmentId
 }
 
 /**

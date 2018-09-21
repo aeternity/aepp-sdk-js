@@ -30,7 +30,7 @@ async function balance (address, {height, hash} = {}) {
 }
 
 async function tx (hash) {
-  return await this.api.getTransactionByHash(hash)
+  return this.api.getTransactionByHash(hash)
 }
 
 async function height () {
