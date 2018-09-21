@@ -29,40 +29,72 @@ import {salt} from '../utils/crypto'
 
 const createSalt = salt
 
-async function spendTx ({ sender, recipient, amount, fee, ttl, nonce, payload }) {
-  return (await this.api.postSpend(R.merge(R.head(arguments), { recipientPubkey: recipient }))).tx
+async function spendTx ({ senderId, recipientId, amount, fee, ttl, nonce, payload }) {
+  try {
+    return (await this.api.postSpend(R.merge(R.head(arguments), { recipientId }))).tx
+  } catch (e) {
+    throw e
+  }
 }
 
-async function namePreclaimTx ({ account, nonce, commitment, fee, ttl }) {
-  return (await this.api.postNamePreclaim(R.head(arguments))).tx
+async function namePreclaimTx ({ accountId, nonce, commitmentId, fee, ttl }) {
+  try {
+    return (await this.api.postNamePreclaim(R.head(arguments))).tx
+  } catch (e) {
+    throw e
+  }
 }
 
-async function nameClaimTx ({ account, nonce, name, nameSalt, fee, ttl }) {
-  return (await this.api.postNameClaim(R.head(arguments))).tx
+async function nameClaimTx ({ accountId, nonce, name, nameSalt, fee, ttl }) {
+  try {
+    return (await this.api.postNameClaim(R.head(arguments))).tx
+  } catch (e) {
+    throw e
+  }
 }
 
-async function nameTransferTx ({ account, nonce, nameHash, recipientAccount, fee, ttl }) {
-  return (await this.api.postNameTransfer(R.merge(R.head(arguments), { recipientPubkey: recipientAccount }))).tx
+async function nameTransferTx ({ accountId, nonce, nameId, recipientId, fee, ttl }) {
+  try {
+    return (await this.api.postNameTransfer(R.merge(R.head(arguments), { recipientId }))).tx
+  } catch (e) {
+    throw e
+  }
 }
 
-async function nameUpdateTx ({ account, nonce, nameHash, nameTtl, pointers, clientTtl, fee, ttl }) {
-  return (await this.api.postNameUpdate(R.head(arguments))).tx
+async function nameUpdateTx ({ accountId, nonce, nameId, nameTtl, pointers, clientTtl, fee, ttl }) {
+  try {
+    return (await this.api.postNameUpdate(R.head(arguments))).tx
+  } catch (e) {
+    throw e
+  }
 }
 
-async function nameRevokeTx ({ account, nonce, nameHash, fee, ttl }) {
-  return (await this.api.postNameRevoke(R.head(arguments))).tx
+async function nameRevokeTx ({ accountId, nonce, nameId, fee, ttl }) {
+  try {
+    return (await this.api.postNameRevoke(R.head(arguments))).tx
+  } catch (e) {
+    throw e
+  }
 }
 
 async function contractCreateTx ({ owner, nonce, code, vmVersion, deposit, amount, gas, gasPrice, fee, ttl, callData }) {
   return this.api.postContractCreate(R.head(arguments))
 }
 
-async function contractCallTx ({ caller, nonce, contract, vmVersion, fee, ttl, amount, gas, gasPrice, callData }) {
-  return (await this.api.postContractCall(R.head(arguments))).tx
+async function contractCallTx ({ callerId, nonce, contractId, vmVersion, fee, ttl, amount, gas, gasPrice, callData }) {
+  try {
+    return (await this.api.postContractCall(R.head(arguments))).tx
+  } catch (e) {
+    throw e
+  }
 }
 
 async function commitmentHash (name, salt = createSalt()) {
-  return (await this.api.getCommitmentHash(name, salt)).commitment
+  try {
+    return (await this.api.getCommitmentHash(name, salt)).commitmentId
+  } catch (e) {
+    throw e
+  }
 }
 
 /**

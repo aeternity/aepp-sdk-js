@@ -40,7 +40,7 @@ async function address () {
  * @instance
  * @rtype (address: String) => Void
  * @param {String} address - Address of account to select
- * @example selectAccount('ak$xxxxxxxx')
+ * @example selectAccount('ak_xxxxxxxx')
  */
 async function selectAccount (address) {
   this.Selector.address = address

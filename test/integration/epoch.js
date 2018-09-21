@@ -36,7 +36,7 @@ describe('Epoch client', function () {
   })
 
   it('loads operations', async () => {
-    expect(client.methods).to.include.members(['postTx', 'getBlockLatest'])
+    expect(client.methods).to.include.members(['postTransaction', 'getCurrentKeyBlock'])
   })
 
   it('gets key blocks by height for the first 10 blocks', () => {

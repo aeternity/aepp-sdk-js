@@ -46,15 +46,14 @@ async function decode (type, data) {
 
 async function call (code, abi, address, name, { args = '()', options = {} } = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-
   const tx = await this.contractCallTx(R.merge(opt, {
     callData: await this.contractEncodeCall(code, abi, name, args),
-    contract: address,
-    caller: await this.address()
+    contractId: address,
+    callerId: await this.address()
   }))
 
   const {hash} = await this.send(tx, opt)
-  const result = await this.api.getContractCallFromTx(hash)
+  const result = await this.api.getTransactionInfoByHash(hash)
 
   if (result.returnType === 'ok') {
     return {
@@ -70,17 +69,16 @@ async function call (code, abi, address, name, { args = '()', options = {} } = {
 async function deploy (code, abi, {initState = '()', options = {}} = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   const callData = await this.contractEncodeCall(code, abi, 'init', initState)
-  const {tx, contractAddress} = await this.contractCreateTx(R.merge(opt, {
+  const {tx, contractId} = await this.contractCreateTx(R.merge(opt, {
     callData,
     code,
-    owner: await this.address()
+    ownerId: await this.address()
   }))
 
   await this.send(tx, opt)
-
   return Object.freeze({
-    address: contractAddress,
-    call: async (name, options) => this.contractCall(code, abi, contractAddress, name, options)
+    address: contractId,
+    call: async (name, options) => this.contractCall(code, abi, contractId, name, options)
   })
 }
 
