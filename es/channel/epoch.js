@@ -359,7 +359,7 @@ function update (from, to, amount, sign) {
 
 /**
  * Trigger a channel shutdown
- * 
+ *
  * Returned promise resolves to on-chain transaction.
  * @param {function} sign - Function which verifies and signs transaction
  * @return {Promise}
