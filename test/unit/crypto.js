@@ -24,8 +24,8 @@ import * as Crypto from '../../es/utils/crypto'
 // not be used for signing
 const privateKeyAsHex = '4d881dd1917036cc231f9881a0db978c8899dd76a817252418606b02bf6ab9d22378f892b7cc82c2d2739e994ec9953aa36461f1eb5a4a49a5b0de17b3d23ae8'
 const privateKey = Buffer.from(privateKeyAsHex, 'hex')
-const publicKeyWithPrefix = 'ak$Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm'
-const publicKey = Buffer.from(Crypto.decodeBase58Check(publicKeyWithPrefix.split('$')[1]))
+const publicKeyWithPrefix = 'ak_Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm'
+const publicKey = Buffer.from(Crypto.decodeBase58Check(publicKeyWithPrefix.split('_')[1]))
 
 const txBinaryAsArray = [248, 76, 12, 1, 160, 35, 120, 248, 146, 183, 204, 130, 194, 210, 115, 158, 153, 78, 201, 149, 58, 163, 100, 97, 241, 235, 90, 74, 73, 165, 176, 222, 23, 179, 210, 58, 232, 160, 63, 40, 35, 12, 40, 65, 38, 215, 218, 236, 136, 133, 42, 120, 160, 179, 18, 191, 241, 162, 198, 203, 209, 173, 89, 136, 202, 211, 158, 59, 12, 122, 1, 1, 1, 132, 84, 101, 115, 116]
 const txBinary = Buffer.from(txBinaryAsArray)
@@ -37,7 +37,7 @@ describe('crypto', () => {
     it('generates an account key pair', () => {
       const keyPair = Crypto.generateKeyPair()
       assert.ok(keyPair)
-      assert.isTrue(keyPair.pub.startsWith('ak$'))
+      assert.isTrue(keyPair.pub.startsWith('ak_'))
       assert.isAtLeast(keyPair.pub.length, 52)
       assert.isAtMost(keyPair.pub.length, 53)
     })
