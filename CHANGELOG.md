@@ -11,6 +11,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 - Link aecli to ./bin/aecli.js in package.json (After "npm link" you can use CLI globally)
 - Wait until pre-claim transaction block was mined before send claim transaction
 
+
 ## [0.22.0-0.1.0-alpha.1]
 ### Added
 - nameId function for commitment hash calculations
