@@ -76,10 +76,6 @@ async function deploy (code, abi, {initState = '()', options = {}} = {}) {
   }))
 
   await this.send(tx, opt)
-<<<<<<< HEAD
-  console.log('contractAddressssssssss', contractAddress)
-=======
->>>>>>> develop
   return Object.freeze({
     address: contractId,
     call: async (name, options) => this.contractCall(code, abi, contractId, name, options)
