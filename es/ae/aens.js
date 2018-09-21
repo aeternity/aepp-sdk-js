@@ -107,7 +107,6 @@ async function update (nameId, target, options = {}) {
   const nameUpdateTx = await this.nameUpdateTx(R.merge(opt, {
     nameId: nameId,
     accountId: await this.address(),
-    // pointers: R.fromPairs([[classify(target), target]])
     pointers: [R.fromPairs([['id', target], ['key', classify(target)]])]
   }))
 
