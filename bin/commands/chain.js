@@ -52,7 +52,6 @@ async function top ({host, internalUrl}) {
       async () => printBlock(await client.api.getTopBlock())
     )
   } catch (e) {
-    console.log(e)
     printError(e.message)
   }
 }
@@ -75,31 +74,57 @@ async function mempool ({host, internalUrl}) {
   }
 }
 
-async function play ({host, limit, internalUrl}) {
+async function play ({host, height, limit, internalUrl}) {
   limit = parseInt(limit)
+  height = parseInt(height)
   try {
     const client = await initClient(host, null, internalUrl)
 
     await handleApiError(async () => {
       const top = await client.api.getTopBlock()
+
+      if (height && height > parseInt(top.height)) {
+        printError('Height is bigger then height of top block')
+        process.exit(1)
+      }
+
       printBlock(top)
-      await playWithLimit(--limit, top.prevHash, client)
+
+      height ?
+        await playWithHeight(height, top.prevHash)(client) :
+        await playWithLimit(--limit, top.prevHash)(client)
     })
   } catch (e) {
     printError(e.message)
   }
 }
 
-export async function playWithLimit (limit, blockHash, client) {
-  if (!limit) return
+function playWithLimit (limit, blockHash) {
+  return async (client) => {
+    if (!limit) return
 
-  let block = await getBlock(blockHash)(client)
+    let block = await getBlock(blockHash)(client)
 
-  setTimeout(async () => {
-    print('>>>>>>>>>')
-    printBlock(block)
-    await playWithLimit(--limit, block.prevHash, client)
-  }, 1000)
+    setTimeout(async () => {
+      print('>>>>>>>>>')
+      printBlock(block)
+      await playWithLimit(--limit, block.prevHash)(client)
+    }, 1000)
+  }
+}
+
+function playWithHeight (height, blockHash) {
+  return async (client) => {
+
+    let block = await getBlock(blockHash)(client)
+    if (parseInt(block.height) < height) return
+
+    setTimeout(async () => {
+      print('>>>>>>>>>')
+      printBlock(block)
+      await playWithHeight(height, block.prevHash)(client)
+    }, 1000)
+  }
 }
 
 export const Chain = {

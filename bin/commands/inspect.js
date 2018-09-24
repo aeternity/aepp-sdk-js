@@ -43,6 +43,36 @@ import {
   HASH_TYPES
 } from '../utils'
 
+async function inspect(hash, option) {
+  if (!hash) throw new Error('Hash required')
+
+  if (!isNaN(parseInt(hash))) {
+    await getBlockByHeight(hash, option)
+    return
+  }
+
+  const [pref, _] = hash.split('_')
+  switch (pref) {
+    case HASH_TYPES.block:
+      await getBlockByHash(hash, option)
+      break
+    case HASH_TYPES.micro_block:
+      await getBlockByHash(hash, option)
+      break
+    case HASH_TYPES.account:
+      await getAccountByHash(hash, option)
+      break
+    case HASH_TYPES.transaction:
+      await getTransactionByHash(hash, option)
+      break
+    // case HASH_TYPES.contract:
+    //   break
+    default:
+      await getName(hash, option)
+      break
+  }
+}
+
 async function getBlockByHash (hash, {host, internalUrl}) {
   try {
     checkPref(hash, [HASH_TYPES.block, HASH_TYPES.micro_block])
@@ -133,10 +163,5 @@ async function getContractByDescr (descrPath, {host, internalUrl}) {
 }
 
 export const Inspect = {
-  getName,
-  getAccountByHash,
-  getBlockByHash,
-  getBlockByHeight,
-  getContractByDescr,
-  getTransactionByHash
+  inspect
 }

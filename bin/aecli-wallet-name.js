@@ -44,9 +44,9 @@ initAensName()
     AENS_NAME = name
 
     // remove wallet_name from argv
-    process.argv = process.argv.filter((e, i) => i !== 2)
+    process.argv = process.argv.filter((e, i) => i !== 2 && e !== '[object Object]')
 
-    program.parse(R.init(process.argv))
+    program.parse(process.argv)
     if (program.args.length === 0) program.help()
   })
   .catch(e => printError(e))
@@ -55,7 +55,8 @@ program
   .usage('<aens-name> [options] [commands]')
   .option('-H, --host [hostname]', 'Node to connect to', HOST)
   .option('-U, --internalUrl [internal]', 'Node to connect to(internal)', INTERNAL_URL)
-  .option('-N, --nameTtl [ttl]', 'Name life Ttl', 50000)
+  .option('-N, --nameTtl [nameTtl]', 'Name life Ttl', 50000)
+  .option('-T, --ttl [ttl]', 'Life Ttl', 50000)
 
 program
   .command('claim')

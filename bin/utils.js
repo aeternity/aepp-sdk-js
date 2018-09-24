@@ -28,6 +28,7 @@ const Crypto = require('../es/utils/crypto')
 // HAST TYPES
 const HASH_TYPES = {
   transaction: 'th',
+  contract: 'ct',
   block: 'kh',
   micro_block: 'mh',
   signature: 'sg',

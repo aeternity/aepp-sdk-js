@@ -24,7 +24,6 @@
 //  \_____\___/|_| |_|\__|_|  \__,_|\___|\__|___/
 
 const program = require('commander')
-const R = require('ramda')
 
 const {
   getCmdFromArguments,
@@ -53,5 +52,5 @@ program
 
 program.on('command:*', () => unknownCommandHandler(program)())
 
-program.parse(R.init(process.argv))
+program.parse(process.argv)
 if (program.args.length === 0) program.help()

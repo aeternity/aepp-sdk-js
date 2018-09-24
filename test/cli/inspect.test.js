@@ -40,7 +40,7 @@ describe('CLI Inspect Module', function () {
     wallet = await ready(this)
 
     const balance = await wallet.balance(KEY_PAIR.pub)
-    const {account_balance} = parseBlock(await execute(['inspect', 'account', KEY_PAIR.pub]))
+    const {account_balance} = parseBlock(await execute(['inspect', KEY_PAIR.pub]))
 
     parseInt(balance).should.equal(parseInt(account_balance))
   })
@@ -51,7 +51,7 @@ describe('CLI Inspect Module', function () {
     // Create transaction to inspect
     const {hash} = await wallet.spend(amount, recipient)
 
-    const res = parseBlock(await execute(['inspect', 'transaction', hash]))
+    const res = parseBlock(await execute(['inspect', hash]))
     res.recipient_account.should.equal(recipient)
     res.sender_account.should.equal(KEY_PAIR.pub)
     parseInt(res.amount).should.equal(amount)
@@ -59,19 +59,19 @@ describe('CLI Inspect Module', function () {
   })
   it('Inspect Block', async () => {
     const top = parseBlock(await execute(['chain', 'top']))
-    const inspectRes = parseBlock(await execute(['inspect', 'block', top.block_hash]))
+    const inspectRes = parseBlock(await execute(['inspect', top.block_hash]))
 
     top.block_hash.should.equal(inspectRes.block_hash)
 
   })
   it('Inspect Height', async () => {
     const top = parseBlock(await execute(['chain', 'top']))
-    const inspectRes = parseBlock(await execute(['inspect', 'height', top.block_height]))
+    const inspectRes = parseBlock(await execute(['inspect', top.block_height]))
 
     top.block_height.should.equal(inspectRes.block_height)
 
   })
-  it('Inspect Deploy', async () => {
+  it.skip('Inspect Deploy', async () => {
     const fileName = 'test.deploy.json'
     const wallet = await BaseAe()
 
@@ -92,8 +92,8 @@ describe('CLI Inspect Module', function () {
     descriptor.api_error.should.equal('Transaction not found')
   })
   it('Inspect Name', async () => {
-    const invalidName = await execute(['inspect', 'name', 'asd'])
-    const validName = await execute(['inspect', 'name', 'nazdou2222222.aet'])
+    const invalidName = await execute(['inspect', 'asd'])
+    const validName = await execute(['inspect', 'nazdou2222222.aet'])
     invalidName.indexOf('AENS TLDs must end in .aet').should.not.equal(-1)
     validName.indexOf('Status___________ AVAILABLE \n').should.not.equal(-1)
   })

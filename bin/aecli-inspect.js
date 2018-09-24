@@ -25,7 +25,7 @@
 //                   | |
 //                   |_|
 
-const {unknownCommandHandler, HOST, INTERNAL_URL} = require('./utils')
+const {HOST, INTERNAL_URL} = require('./utils')
 const program = require('commander')
 
 require = require('esm')(module/*, options*/) //use to handle es6 import/export
@@ -36,37 +36,9 @@ program
   .option('-U, --internalUrl [internal]', 'Node to connect to(internal)', INTERNAL_URL)
 
 program
-  .command('account <hash>')
-  .description('The address of the account to inspect (eg: ak$...)')
-  .action(async (hash, cmd) => await Inspect.getAccountByHash(hash, cmd.parent))
-
-program
-  .command('block <hash>')
-  .description('The block hash to inspect (eg: bh$...)')
-  .action(async (hash, cmd) => await Inspect.getBlockByHash(hash, cmd.parent))
-
-program
-  .command('transaction <hash>')
-  .description('The transaction hash to inspect (eg: th$...)')
-  .action(async (hash, cmd) => await Inspect.getTransactionByHash(hash, cmd.parent))
-
-program
-  .command('deploy <descriptor>')
-  .description('The contract deploy descriptor to inspect')
-  .action(async (descriptor, cmd) => await Inspect.getContractByDescr(descriptor, cmd.parent))
-
-program
-  .command('height <height>')
-  .description('The height of the chain to inspect (eg:14352)')
-  .action(async (height, cmd) => await Inspect.getBlockByHeight(height, cmd.parent))
-
-program
-  .command('name <name>')
-  .description('The name to inspect (eg: mydomain.aet)')
-  .action(async (name, cmd) => await Inspect.getName(name, cmd.parent))
-
-// HANDLE UNKNOWN COMMAND
-program.on('command:*', () => unknownCommandHandler(program)())
+  .arguments('<hash>')
+  .description('Hash or Name to inspect (eg: ak_..., mk_..., name.aet)')
+  .action(async (hash, cmd) => await Inspect.inspect(hash, cmd))
 
 program.parse(process.argv)
 if (program.args.length === 0) program.help()

@@ -64,7 +64,6 @@ initWallet()
 
     // remove wallet_name from argv
     process.argv = process.argv.filter((e, i) => i !== 2)
-
     program.parse(process.argv)
 
     if (program.args.length === 0) program.help()
@@ -101,6 +100,7 @@ program
 
 program
   .command('save <privkey>')
+  .option('-O, --output [output]', 'Output directory', '.')
   .description('Save a private keys string to a password protected file wallet')
   .action(async (priv, ...arguments) => await Wallet.createSecureWalletByPrivKey(WALLET_NAME, priv, getCmdFromArguments(arguments)))
 
