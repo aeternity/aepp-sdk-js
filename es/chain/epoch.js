@@ -29,7 +29,7 @@ async function balance (address, {height, hash} = {}) {
   return (await this.api.getAccountByPubkey(address, {height, hash})).balance
 }
 
-function tx (hash) {
+async function tx (hash) {
   return this.api.getTransactionByHash(hash)
 }
 

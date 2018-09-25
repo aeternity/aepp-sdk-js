@@ -26,7 +26,7 @@ import stampit from '@stamp/it'
 import AsyncInit from './async-init'
 import axios from 'axios'
 import * as R from 'ramda'
-import {snakeOrKebabToPascal, pascalToSnake} from './string'
+import {snakeToPascal, pascalToSnake} from './string'
 
 /**
  * Perform path string interpolation
@@ -121,7 +121,7 @@ const conformTypes = {
   },
   object (value, spec, types) {
     if (R.type(value) === 'Object') {
-      const required = R.map(snakeOrKebabToPascal, spec.required || [])
+      const required = R.map(snakeToPascal, spec.required || [])
       const properties = pascalizeKeys(spec.properties)
       const missing = R.difference(required, R.keys(value))
 
@@ -220,7 +220,7 @@ function classifyParameters (parameters) {
  * @return {Object[]} Pascalized parameters
  */
 function pascalizeParameters (parameters) {
-  return R.map(o => R.assoc('name', snakeOrKebabToPascal(o.name), o), parameters)
+  return R.map(o => R.assoc('name', snakeToPascal(o.name), o), parameters)
 }
 
 /**
@@ -259,10 +259,10 @@ function snakizeKeys (o) {
  * @rtype (o: Object) => Object
  * @param {Object} o - Object to traverse
  * @return {Object} Transformed object
- * @see snakeOrKebabToPascal
+ * @see snakeToPascal
  */
 function pascalizeKeys (o) {
-  return traverseKeys(snakeOrKebabToPascal, o)
+  return traverseKeys(snakeToPascal, o)
 }
 
 /**
@@ -460,7 +460,7 @@ export {
   operation,
   expandPath,
   assertOne,
-  snakeOrKebabToPascal,
+  snakeToPascal,
   pascalToSnake,
   traverseKeys
 }

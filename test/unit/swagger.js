@@ -47,13 +47,10 @@ describe('Swagger', function () {
   })
 
   describe('converts case', () => {
-    it('from snake or kebab to pascal', () => {
-      expect(internal.snakeOrKebabToPascal('foo_bar_baz')).to.equal('fooBarBaz')
-      expect(internal.snakeOrKebabToPascal('foo_bar_')).to.equal('fooBar_')
-      expect(internal.snakeOrKebabToPascal('_bar_baz')).to.equal('BarBaz')
-      expect(internal.snakeOrKebabToPascal('foo-bar-baz')).to.equal('fooBarBaz')
-      expect(internal.snakeOrKebabToPascal('foo-bar-')).to.equal('fooBar-')
-      expect(internal.snakeOrKebabToPascal('-bar-baz')).to.equal('BarBaz')
+    it('from snake to pascal', () => {
+      expect(internal.snakeToPascal('foo_bar_baz')).to.equal('fooBarBaz')
+      expect(internal.snakeToPascal('foo_bar_')).to.equal('fooBar_')
+      expect(internal.snakeToPascal('_bar_baz')).to.equal('BarBaz')
     })
 
     it('from pascal to snake', () => {

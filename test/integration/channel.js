@@ -32,42 +32,42 @@ describe('Epoch Channel', function () {
     initiator = await ready(this)
     responder = await BaseAe()
     responder.setKeypair(generateKeyPair())
-    await initiator.spend(1000, await responder.address())
+    await initiator.spend(100, await responder.address())
   })
 
-  it('should open a channel', (callback) => {
-    initiator.address().then(initiatorId =>
-      responder.address().then(responderId => {
-        const sharedParams = {
-          url: 'ws://proxy:3001',
-          initiatorId,
-          responderId,
-          pushAmount: 3,
-          initiatorAmount: 10,
-          responderAmount: 10,
-          channelReserve: 2,
-          ttl: 10000,
-          host: 'proxy',
-          port: 3001,
-          lockPeriod: 10
-        }
-        Channel({
-          ...sharedParams,
-          role: 'initiator',
-          sign: async tx => await initiator.signTransaction(tx)
-        }).then(channel => {
-          channel.on('statusChanged', status => {
-            if (status === 'open') {
-              callback(null)
-            }
-          })
-          Channel({
-            ...sharedParams,
-            role: 'responder',
-            sign: async tx => await responder.signTransaction(tx)
-          })
+  it('should open a channel', async () => {
+    function waitForChannel (channel) {
+      return new Promise(resolve =>
+        channel.on('statusChanged', (status) => {
+          if (status === 'open') {
+            resolve()
+          }
         })
-      })
-    )
+      )
+    }
+    const sharedParams = {
+      url: 'ws://proxy:3001',
+      initiatorId: await initiator.address(),
+      responderId: await responder.address(),
+      pushAmount: 3,
+      initiatorAmount: 10,
+      responderAmount: 10,
+      channelReserve: 2,
+      ttl: 10000,
+      host: 'localhost',
+      port: 3001,
+      lockPeriod: 10
+    }
+    const initiatorCh = await Channel({
+      ...sharedParams,
+      role: 'initiator',
+      sign: async (tag, tx) => await initiator.signTransaction(tx)
+    })
+    const responderCh = await Channel({
+      ...sharedParams,
+      role: 'responder',
+      sign: async (tag, tx) => await responder.signTransaction(tx)
+    })
+    return Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
   })
 })
