@@ -65,9 +65,7 @@ function setKeypair (keypair) {
  */
 const MemoryAccount = Account.compose({
   init ({keypair}) {
-    if (keypair !== undefined) {
-      this.setKeypair(keypair)
-    }
+    this.setKeypair(keypair || Crypto.envKeypair(process.env))
   },
   methods: {sign, address, setKeypair}
 })

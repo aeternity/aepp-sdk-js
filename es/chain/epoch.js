@@ -83,7 +83,7 @@ async function poll (th, {blocks = 10, interval = 5000} = {}) {
 }
 
 async function mempool () {
-  return this.getTxs()
+  return this.api.getPendingTransactions()
 }
 
 const EpochChain = Chain.compose(Epoch, {

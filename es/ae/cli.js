@@ -22,12 +22,9 @@ import Tx from '../tx/epoch'
 import JsTx from '../tx/js'
 import Aens from './aens'
 import Contract from './contract'
-import {envKeypair} from '../utils/crypto'
 
 const Cli = Ae.compose(Account, Chain, Tx, JsTx, Aens, Contract, {
-  init ({process = this.process}) {
-    this.setKeypair(envKeypair(process.env))
-  },
+  init () {},
   props: {process: {}}
 })
 
