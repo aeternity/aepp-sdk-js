@@ -94,7 +94,7 @@ function extendingErrorPath (key, fn) {
   try {
     return fn()
   } catch (e) {
-    throw Object.assign(e, {path: [key].concat(e.path || [])})
+    throw Object.assign(e, { path: [key].concat(e.path || []) })
   }
 }
 
