@@ -16,9 +16,9 @@
  */
 
 import fs from 'fs'
-import {before, describe, it} from 'mocha'
+import { before, describe, it } from 'mocha'
 
-import {configure, plan, ready, execute, parseBlock, KEY_PAIR, WALLET_NAME} from './index'
+import { configure, plan, ready, execute, parseBlock, KEY_PAIR, WALLET_NAME } from './index'
 
 // CONTRACT DESCRIPTOR
 const testContract = `contract Identity =
@@ -41,16 +41,12 @@ describe('CLI Contract Module', function () {
   })
   after(function () {
     // Remove wallet files
-    if (fs.existsSync(walletName))
-      fs.unlinkSync(walletName)
-    if (fs.existsSync(`${walletName}.pub`))
-      fs.unlinkSync(`${walletName}.pub`)
+    if (fs.existsSync(walletName)) { fs.unlinkSync(walletName) }
+    if (fs.existsSync(`${walletName}.pub`)) { fs.unlinkSync(`${walletName}.pub`) }
 
     // Remove contract files
-    if (fs.existsSync(deployDescriptor))
-      fs.unlinkSync(deployDescriptor)
-    if (fs.existsSync(contractFile))
-      fs.unlinkSync(contractFile)
+    if (fs.existsSync(deployDescriptor)) { fs.unlinkSync(deployDescriptor) }
+    if (fs.existsSync(contractFile)) { fs.unlinkSync(contractFile) }
   })
 
   it('Compile Contract', async () => {
@@ -70,7 +66,7 @@ describe('CLI Contract Module', function () {
 
     // Deploy contract
     const res = await execute(['wallet', WALLET_NAME, '--password', 'test', 'contract', 'deploy', contractFile])
-    const {contract_address, transaction_hash, deploy_descriptor} = (parseBlock(res))
+    const { contract_address, transaction_hash, deploy_descriptor } = (parseBlock(res))
     deployDescriptor = deploy_descriptor
     const [name, pref, address] = deployDescriptor.split('.')
 

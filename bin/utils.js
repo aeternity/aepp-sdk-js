@@ -20,9 +20,9 @@ const path = require('path')
 const fs = require('fs')
 const prompt = require('prompt')
 
-require = require('esm')(module/*, options*/) //use to handle es6 import/export
+require = require('esm')(module/*, options */) // use to handle es6 import/export
 
-const {default: Cli} = require('../es/ae/cli')
+const { default: Cli } = require('../es/ae/cli')
 const Crypto = require('../es/utils/crypto')
 
 // HAST TYPES
@@ -103,7 +103,7 @@ function printError (msg) {
   console.log(msg)
 }
 
-function printConfig ({host}) {
+function printConfig ({ host }) {
   print('WALLET_PUB___________' + process.env['WALLET_PUB'])
   print('EPOCH_URL___________' + host)
 }
@@ -119,8 +119,7 @@ function printBlock (block) {
   print(`Previous block hash___________ ${R.prop('prevHash', block)}`)
   print(`Previous key block hash_______ ${R.prop('prevKeyHash', block)}`)
   print(`Transactions__________________ ${R.defaultTo(0, R.path(['transactions', 'length'], block))}`)
-  if (R.defaultTo(0, R.path(['transactions', 'length'], block)))
-    printBlockTransactions(block.transactions)
+  if (R.defaultTo(0, R.path(['transactions', 'length'], block))) { printBlockTransactions(block.transactions) }
 }
 
 function printName (name) {
@@ -204,9 +203,9 @@ function unknownCommandHandler (program) {
 //
 
 // WALLET HELPERS
-async function generateSecureWallet (name, {output, password}) {
+async function generateSecureWallet (name, { output, password }) {
   password = password || await promptPasswordAsync()
-  const {pub, priv} = Crypto.generateSaveWallet(password)
+  const { pub, priv } = Crypto.generateSaveWallet(password)
   const data = [
     [path.join(output, name), priv],
     [path.join(output, `${name}.pub`), pub]
@@ -218,7 +217,7 @@ async function generateSecureWallet (name, {output, password}) {
   })
 }
 
-async function generateSecureWalletFromPrivKey (name, priv, {output, password}) {
+async function generateSecureWalletFromPrivKey (name, priv, { output, password }) {
   password = password || await promptPasswordAsync()
 
   const hexStr = Crypto.hexStringToByte(priv.trim())
@@ -246,7 +245,7 @@ async function generateSecureWalletFromPrivKey (name, priv, {output, password}) 
 }
 
 async function getWalletByPathAndDecrypt () {
-  let {pass, path: walletPath} = JSON.parse(process.env['WALLET_DATA'])
+  let { pass, path: walletPath } = JSON.parse(process.env['WALLET_DATA'])
 
   const privBinaryKey = readFile(path.resolve(process.cwd(), walletPath))
   const pubBinaryKey = readFile(path.resolve(process.cwd(), `${walletPath}.pub`))
@@ -288,26 +287,24 @@ function getCmdFromArguments (args) {
 }
 
 async function initClient (url, keypair, internalUrl) {
-  return await Cli({url, process, keypair, internalUrl})
+  return await Cli({ url, process, keypair, internalUrl })
 }
 
 function initExecCommands (program) {
-  return (cmds) => cmds.forEach(({name, desc}) => program.command(name, desc))
+  return (cmds) => cmds.forEach(({ name, desc }) => program.command(name, desc))
 }
 
 function isExecCommand (cmd, commands) {
-  return commands.find(({name}) => cmd === name)
+  return commands.find(({ name }) => cmd === name)
 }
 
 function checkPref (hash, hashType) {
-  if (hash.length < 3 || hash.indexOf('_') === -1)
-    throw new Error(`Invalid input, likely you forgot to escape the $ sign (use \\$)`)
+  if (hash.length < 3 || hash.indexOf('_') === -1) { throw new Error(`Invalid input, likely you forgot to escape the $ sign (use \\$)`) }
 
   // block and micro block check
   if (Array.isArray(hashType)) {
     const res = hashType.find(ht => hash.slice(0, 3) === ht + '_')
-    if (res)
-      return res
+    if (res) { return res }
     throw new Error('Invalid block hash, it should be like: mh_.... or kh._...')
   }
 
@@ -323,15 +320,14 @@ function checkPref (hash, hashType) {
     }
     throw new Error(msg)
   }
-
 }
 
-function getBlock(hash) {
+function getBlock (hash) {
   return async (client) => {
-    if (hash.indexOf(HASH_TYPES.block  + '_') !== -1) {
+    if (hash.indexOf(HASH_TYPES.block + '_') !== -1) {
       return await client.api.getKeyBlockByHash(hash)
     }
-    if (hash.indexOf(HASH_TYPES.micro_block  + '_') !== -1) {
+    if (hash.indexOf(HASH_TYPES.micro_block + '_') !== -1) {
       return R.merge(
         await client.api.getMicroBlockHeaderByHash(hash),
         await client.api.getMicroBlockTransactionsByHash(hash)

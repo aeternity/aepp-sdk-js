@@ -27,7 +27,7 @@
  */
 
 import * as R from 'ramda'
-import {encodeBase58Check, salt} from '../utils/crypto'
+import { encodeBase58Check, salt } from '../utils/crypto'
 import Ae from './'
 
 /**
@@ -147,7 +147,7 @@ async function query (name) {
 async function claim (name, salt, waitForHeight, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   // wait until block was mined before send claim transaction
-  if (waitForHeight) await this.awaitHeight(waitForHeight, {attempts: 200})
+  if (waitForHeight) await this.awaitHeight(waitForHeight, { attempts: 200 })
   const claimTx = await this.nameClaimTx(R.merge(opt, {
     accountId: await this.address(),
     nameSalt: salt,
@@ -205,10 +205,10 @@ const Aens = Ae.compose({
     aensTransfer: transfer,
     aensRevoke: revoke
   },
-  deepProps: {Ae: {defaults: {
+  deepProps: { Ae: { defaults: {
     clientTtl: 1,
     nameTtl: 50000 // aec_governance:name_claim_max_expiration() => 50000
-  }}}
+  } } }
 })
 
 export default Aens

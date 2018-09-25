@@ -16,10 +16,10 @@
  */
 
 import fs from 'fs'
-import {before, describe, it} from 'mocha'
+import { before, describe, it } from 'mocha'
 
-import {configure, plan, ready, execute, parseBlock, BaseAe, KEY_PAIR, WALLET_NAME} from './index'
-import {generateKeyPair} from '../../es/utils/crypto'
+import { configure, plan, ready, execute, parseBlock, BaseAe, KEY_PAIR, WALLET_NAME } from './index'
+import { generateKeyPair } from '../../es/utils/crypto'
 
 const walletName = 'test.wallet'
 
@@ -36,10 +36,8 @@ describe('CLI Wallet Module', function () {
   })
   after(function () {
     // Remove wallet files
-    if (fs.existsSync(walletName))
-      fs.unlinkSync(walletName)
-    if (fs.existsSync(`${walletName}.pub`))
-      fs.unlinkSync(`${walletName}.pub`)
+    if (fs.existsSync(walletName)) { fs.unlinkSync(walletName) }
+    if (fs.existsSync(`${walletName}.pub`)) { fs.unlinkSync(`${walletName}.pub`) }
   })
 
   it('Create Wallet', async () => {
@@ -83,6 +81,5 @@ describe('CLI Wallet Module', function () {
     await execute(['wallet', WALLET_NAME, '--password', 'test', 'spend', await receiver.address(), amount])
     const receiverBalance = await receiver.balance(await receiver.address())
     await receiverBalance.should.equal(amount)
-
   })
 })

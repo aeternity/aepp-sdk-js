@@ -54,7 +54,7 @@ async function send (tx, options) {
  */
 async function spend (amount, recipientId, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const spendTx = await this.spendTx(R.merge(opt, {senderId: await this.address(), recipientId, amount}))
+  const spendTx = await this.spendTx(R.merge(opt, { senderId: await this.address(), recipientId, amount }))
   return this.send(spendTx, opt)
 }
 
@@ -78,12 +78,12 @@ async function spend (amount, recipientId, options = {}) {
  * @return {Object} Ae instance
  */
 const Ae = stampit(Tx, Account, Chain, {
-  methods: {send, spend},
-  deepProperties: {Ae: {defaults: {
+  methods: { send, spend },
+  deepProperties: { Ae: { defaults: {
     ttl: Number.MAX_SAFE_INTEGER,
     fee: 1,
     payload: ''
-  }}}
+  } } }
 })
 
 export default Ae

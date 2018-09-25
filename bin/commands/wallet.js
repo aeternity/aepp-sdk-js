@@ -38,7 +38,7 @@ import {
   HASH_TYPES
 } from '../utils'
 
-async function spend (receiver, amount, {host, ttl, internalUrl}) {
+async function spend (receiver, amount, { host, ttl, internalUrl }) {
   ttl = parseInt(ttl)
   try {
     checkPref(receiver, HASH_TYPES.account)
@@ -46,7 +46,7 @@ async function spend (receiver, amount, {host, ttl, internalUrl}) {
     const client = await initClient(host, keypair, internalUrl)
 
     await handleApiError(async () => {
-      let tx = await client.spend(parseInt(amount), receiver, {ttl})
+      let tx = await client.spend(parseInt(amount), receiver, { ttl })
       // if waitMined false
       if (typeof tx !== 'object') {
         tx = await client.tx(tx)
@@ -60,7 +60,7 @@ async function spend (receiver, amount, {host, ttl, internalUrl}) {
   }
 }
 
-async function getBalance ({host, internalUrl}) {
+async function getBalance ({ host, internalUrl }) {
   try {
     const keypair = await getWalletByPathAndDecrypt()
     const client = await initClient(host, keypair, internalUrl)
@@ -72,7 +72,7 @@ async function getBalance ({host, internalUrl}) {
   }
 }
 
-async function getAddress ({host, internalUrl}) {
+async function getAddress ({ host, internalUrl }) {
   try {
     const keypair = await getWalletByPathAndDecrypt()
     const client = await initClient(host, keypair, internalUrl)
@@ -85,17 +85,17 @@ async function getAddress ({host, internalUrl}) {
   }
 }
 
-async function createSecureWallet (name, {output, password}) {
+async function createSecureWallet (name, { output, password }) {
   try {
-    await generateSecureWallet(name, {output, password})
+    await generateSecureWallet(name, { output, password })
   } catch (e) {
     printError(e.message)
   }
 }
 
-async function createSecureWalletByPrivKey (name, priv, {output, password}) {
+async function createSecureWalletByPrivKey (name, priv, { output, password }) {
   try {
-    await generateSecureWalletFromPrivKey(name, priv, {output, password})
+    await generateSecureWalletFromPrivKey(name, priv, { output, password })
   } catch (e) {
     printError(e.message)
   }

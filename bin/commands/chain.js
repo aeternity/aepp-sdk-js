@@ -33,11 +33,11 @@ import {
   printBlockTransactions
 } from '../utils'
 
-async function version ({host, internalUrl}) {
+async function version ({ host, internalUrl }) {
   try {
     const client = await initClient(host, null, internalUrl)
     await handleApiError(async () => {
-      const {nodeVersion} = await client.api.getStatus()
+      const { nodeVersion } = await client.api.getStatus()
       print(`Epoch node version____________  ${nodeVersion}`)
     })
   } catch (e) {
@@ -45,7 +45,7 @@ async function version ({host, internalUrl}) {
   }
 }
 
-async function top ({host, internalUrl}) {
+async function top ({ host, internalUrl }) {
   try {
     const client = await initClient(host, null, internalUrl)
     await handleApiError(
@@ -56,12 +56,12 @@ async function top ({host, internalUrl}) {
   }
 }
 
-async function mempool ({host, internalUrl}) {
+async function mempool ({ host, internalUrl }) {
   try {
     const client = await initClient(host, null, internalUrl)
 
     await handleApiError(async () => {
-      const {transactions} = await client.mempool()
+      const { transactions } = await client.mempool()
 
       print('Mempool______________________________')
       print('Pending Transactions Count___________ ' + transactions.length)
@@ -74,7 +74,7 @@ async function mempool ({host, internalUrl}) {
   }
 }
 
-async function play ({host, height, limit, internalUrl}) {
+async function play ({ host, height, limit, internalUrl }) {
   limit = parseInt(limit)
   height = parseInt(height)
   try {
@@ -90,9 +90,9 @@ async function play ({host, height, limit, internalUrl}) {
 
       printBlock(top)
 
-      height ?
-        await playWithHeight(height, top.prevHash)(client) :
-        await playWithLimit(--limit, top.prevHash)(client)
+      height
+        ? await playWithHeight(height, top.prevHash)(client)
+        : await playWithLimit(--limit, top.prevHash)(client)
     })
   } catch (e) {
     printError(e.message)
@@ -115,7 +115,6 @@ function playWithLimit (limit, blockHash) {
 
 function playWithHeight (height, blockHash) {
   return async (client) => {
-
     let block = await getBlock(blockHash)(client)
     if (parseInt(block.height) < height) return
 

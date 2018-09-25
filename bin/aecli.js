@@ -17,18 +17,17 @@
  */
 'use strict'
 
-
 const program = require('commander')
-const {initExecCommands, unknownCommandHandler, printConfig, HOST, INTERNAL_URL} = require('./utils')
+const { initExecCommands, unknownCommandHandler, printConfig, HOST, INTERNAL_URL } = require('./utils')
 
 const EXECUTABLE_CMD = [
-  {name: 'chain', desc: 'Interact with the blockchain'},
-  {name: 'inspect', desc: 'Get information on transactions, blocks,...'},
-  {name: 'wallet', desc: 'Handle wallet operations'},
-  {name: 'contract', desc: 'Compile contracts'},
+  { name: 'chain', desc: 'Interact with the blockchain' },
+  { name: 'inspect', desc: 'Get information on transactions, blocks,...' },
+  { name: 'wallet', desc: 'Handle wallet operations' },
+  { name: 'contract', desc: 'Compile contracts' },
   // TODO implement oracle module
   // {name: 'oracle', desc: 'Interact with oracles'},
-  {name: 'crypto', desc: 'Crypto helpers'},
+  { name: 'crypto', desc: 'Crypto helpers' }
 ]
 
 program
@@ -51,4 +50,3 @@ program
   .parse(process.argv)
 
 if (program.args.length === 0) program.help()
-
