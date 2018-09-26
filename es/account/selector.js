@@ -40,7 +40,7 @@ async function address () {
  * @instance
  * @rtype (address: String) => Void
  * @param {String} address - Address of account to select
- * @example selectAccount('ak$xxxxxxxx')
+ * @example selectAccount('ak_xxxxxxxx')
  */
 async function selectAccount (address) {
   this.Selector.address = address
@@ -56,15 +56,15 @@ async function selectAccount (address) {
  * @example Selector()
  */
 const Selector = Account.compose({
-  async init ({address}) {
+  async init ({ address }) {
     this.Selector.address = address
   },
-  methods: {sign, address, selectAccount},
+  methods: { sign, address, selectAccount },
   deepProps: {
     Selector: {}
   }
 }, required({
-  methods: {signWith: required}
+  methods: { signWith: required }
 }))
 
 export default Selector

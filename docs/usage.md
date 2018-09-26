@@ -1,6 +1,6 @@
-# Usage
+# Using the Javascript SDK
 
-There are three different ways of incorporating aepp-sdk into your project, depending on the particular scenario:
+There are three different ways of incorporating aepp-sdk-js into your project, depending on the particular scenario:
 * ES Modules at `es/` (recommended)
 * Node.js bundle at `dist/aepp-sdk.js`
 * Browser bundle at `dist/aepp-sdk.browser.js`
@@ -22,6 +22,15 @@ Factories_ based on the specific use case:
 In order to cater to more specific needs, it is recommended to refer to the
 [hacking documentation](hacking.md).
 
+## Testing Networks
+When initialising a client, to test, you can choose from 2 URLs:
+
+### 1. **Testnet** (https://sdk-testnet.aepps.com)
+You can use this URL with any releasee on [npmjs](https://www.npmjs.com/package/@aeternity/aepp-sdk). It offers the last stable version of [Epoch](https://github.com/aeternity/epoch), used by all of of Aeternity's Dev Tools.
+
+### 2. **Edgenet** (https://sdk-edgened.aepps.com)
+You can use this URL with releases tagged as `alpha`, `beta` or `next` on [npmjs](https://www.npmjs.com/package/@aeternity/aepp-sdk). It offers the latest stable version of [Epoch](https://github.com/aeternity/epoch), which all of of Aeternity's Dev Tools are going to use in the near future.
+
 ## ES Modules
 
 In is generally advised to use ESM (EcmaScript Modules), whenever possible. At
@@ -29,9 +38,9 @@ this point however, this requires a modern _bundler_ which understands ES2015
 `import/export` syntax, such as [webpack] 4 (or newer). In addition, a compiler
 which translates the subset of ES used by aepp-sdk will have to be used, such as
 [Babel] - `.babelrc` in the project's root directory shows which plugins are
-required, at least.  
+required, at least.
 Using this method also enables the use of [Tree shaking] (dead code
-elimination).  
+elimination).
 aepp-sdk's `package.json` specifies a seperate entry point for any such tool
 that understands ESM. In order to make sure the modules are loaded directly, use
 the following syntax to load parts of aepp-sdk:
@@ -208,6 +217,3 @@ The same code, using the SDK abstraction (**high-level**):
   }).then(ae => ae.spend(parseInt(amount), receiver_pub_key))
 ```
 
-## [CLI Examples]
-
-[CLI Examples]: bin/

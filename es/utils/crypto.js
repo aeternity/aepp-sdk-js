@@ -23,10 +23,10 @@
 
 import bs58check from 'bs58check'
 import RLP from 'rlp'
-import {blake2b} from 'blakejs'
+import { blake2b } from 'blakejs'
 import nacl from 'tweetnacl'
 import aesjs from 'aes-js'
-import {leftPad, rightPad} from './bytes'
+import { leftPad, rightPad } from './bytes'
 import shajs from 'sha.js'
 
 const Ecb = aesjs.ModeOfOperation.ecb
@@ -39,6 +39,26 @@ const Ecb = aesjs.ModeOfOperation.ecb
  */
 export function hash (input) {
   return blake2b(input, null, 32) // 256 bits
+}
+
+/**
+ * Calculate 256bits Blake2b nameId of `input`
+ * as defined in https://github.com/aeternity/protocol/blob/master/AENS.md#hashing
+ * @rtype (input: String) => hash: String
+ * @param {String} input - Data to hash
+ * @return {String} Hash
+ */
+export function nameId (input) {
+  let buf = Buffer.allocUnsafe(32).fill(0)
+  if (!input) {
+    return buf
+  } else {
+    const labels = input.split('.')
+    for (let i = 0; i < labels.length; i++) {
+      buf = hash(Buffer.concat([buf, hash(labels[i])]))
+    }
+    return buf
+  }
 }
 
 /**
@@ -81,6 +101,35 @@ export function decodeBase58Check (str) {
 }
 
 /**
+ * Conver hex string to Uint8Array
+ * @rtype (str: String) => Uint8Array
+ * @param {String} str - Data to conver
+ * @return {Uint8Array} - converted data
+ */
+export function hexStringToByte (str) {
+  if (!str) {
+    return new Uint8Array()
+  }
+
+  var a = []
+  for (var i = 0, len = str.length; i < len; i += 2) {
+    a.push(parseInt(str.substr(i, 2), 16))
+  }
+
+  return new Uint8Array(a)
+}
+
+/**
+ * Generate keyPair from secret key
+ * @rtype (secret: Uint8Array) => KeyPair
+ * @param {Uint8Array} secret - secret key
+ * @return {Object} - Object with Private(privateKey) and Public(publicKey) keys
+ */
+export function generateKeyPairFromSecret (secret) {
+  return nacl.sign.keyPair.fromSecretKey(secret)
+}
+
+/**
  * Generate a random ED25519 keypair
  * @rtype (raw: Boolean) => {pub: String, priv: String} | {pub: Buffer, priv: Buffer}
  * @param {Boolean} raw - Whether to return raw (binary) keys
@@ -100,7 +149,7 @@ export function generateKeyPair (raw = false) {
     }
   } else {
     return {
-      pub: `ak$${encodeBase58Check(publicBuffer)}`,
+      pub: `ak_${encodeBase58Check(publicBuffer)}`,
       priv: secretBuffer.toString('hex')
     }
   }
@@ -213,7 +262,7 @@ export function verifyPersonalMessage (str, signature, publicKey) {
 
 /**
  * æternity readable public keys are the base58-encoded public key, prepended
- * with 'ak$'
+ * with 'ak_'
  * @rtype (binaryKey: Buffer) => String
  * @param {Buffer} binaryKey - Key to encode
  * @return {String} Encoded key
@@ -221,7 +270,7 @@ export function verifyPersonalMessage (str, signature, publicKey) {
 export function aeEncodeKey (binaryKey) {
   const publicKeyBuffer = Buffer.from(binaryKey, 'hex')
   const pubKeyAddress = encodeBase58Check(publicKeyBuffer)
-  return `ak$${pubKeyAddress}`
+  return `ak_${pubKeyAddress}`
 }
 
 /**
@@ -266,8 +315,8 @@ export function decryptPubKey (password, encrypted) {
  * @return {String} Payload
  */
 export function assertedType (data, type) {
-  if (RegExp(`^${type}\\$.+$`).test(data)) {
-    return data.split('$')[1]
+  if (RegExp(`^${type}_.+$`).test(data)) {
+    return data.split('_')[1]
   } else {
     throw Error(`Data doesn't match expected type ${type}`)
   }
@@ -292,7 +341,7 @@ export function decodeTx (txHash) {
 export function encodeTx (txData) {
   const encodedTxData = RLP.encode(txData)
   const encodedTx = encodeBase58Check(Buffer.from(encodedTxData))
-  return `tx$${encodedTx}`
+  return `tx_${encodedTx}`
 }
 
 /**
@@ -367,8 +416,8 @@ function readOffChainTXUpdates (buf) {
   for (let i = 0; i < buf.length; i++) {
     updates.push([
       readInt(buf[i][0]),
-      'ak$' + encodeBase58Check(buf[i][1]),
-      'ak$' + encodeBase58Check(buf[i][2]),
+      'ak_' + encodeBase58Check(buf[i][1]),
+      'ak_' + encodeBase58Check(buf[i][2]),
       readInt(buf[i][3])
     ])
   }
@@ -397,9 +446,9 @@ export function deserialize (binary) {
 
     case OBJECT_TAGS.CHANNEL_CREATE_TX:
       return Object.assign(obj, {
-        initiator: 'ak$' + encodeBase58Check(binary[2]),
+        initiator: 'ak_' + encodeBase58Check(binary[2]),
         initiatorAmount: readInt(binary[3]),
-        responder: 'ak$' + encodeBase58Check(binary[4]),
+        responder: 'ak_' + encodeBase58Check(binary[4]),
         responderAmount: readInt(binary[5]),
         channelReserve: readInt(binary[6]),
         lockPeriod: readInt(binary[7]),

@@ -1,8 +1,4 @@
 #!/usr/bin/env node
-// # æternity Crypto Helper Script
-//
-// This script shows how to use the SDK to generate and decrypt æternity
-// compliant key pairs, as well as encode and decode transactions.
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
@@ -19,16 +15,15 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-
-'use strict'
-
-// We'll only load the `Crypto` module from the SDK to work with keys and
-// transactions.
-const { Crypto } = require('@aeternity/aepp-sdk')
 const program = require('commander')
 const fs = require('fs')
 const prompt = require('prompt')
 const path = require('path')
+
+const { unknownCommandHandler } = require('./utils')
+
+require = require('esm')(module/*, options */) // use to handle es6 import/export
+const Crypto = require('../es/utils/crypto')
 
 // The `prompt` library provides concealed input of passwords.
 const promptSchema = {
@@ -39,7 +34,7 @@ const promptSchema = {
       hidden: true,
       required: true,
       replace: '*',
-      conform: function (value) {
+      conform: function () {
         return true
       }
     }
@@ -128,11 +123,6 @@ function unpackTx (tx) {
   console.log(JSON.stringify(deserializedTx, undefined, 2))
 }
 
-// ## Command Line Interface
-//
-// The `commander` library provides maximum command line parsing convenience.
-program.version('0.1.0')
-
 program
   .command('decrypt <directory>')
   .description('Decrypts public and private key to readable formats for testing purposes')
@@ -154,6 +144,9 @@ program
 program
   .command('unpack <tx>')
   .action(unpackTx)
+
+// HANDLE UNKNOWN COMMAND
+program.on('command:*', () => unknownCommandHandler(program)())
 
 program.parse(process.argv)
 if (program.args.length === 0) program.help()

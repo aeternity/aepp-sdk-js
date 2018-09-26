@@ -27,44 +27,63 @@
  */
 
 import * as R from 'ramda'
-import {encodeBase58Check, salt} from '../utils/crypto'
+import { encodeBase58Check, salt } from '../utils/crypto'
 import Ae from './'
 
 /**
  * Transfer a domain to another account
  * @instance
  * @category async
- * @param {String} nameHash
+ * @param {String} nameId
  * @param {String} account
  * @param {Object} [options={}]
  * @return {Promise<Object>}
  */
-async function transfer (nameHash, account, options = {}) {
+async function transfer (nameId, account, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
 
   const nameTransferTx = await this.nameTransferTx(R.merge(opt, {
-    nameHash,
-    account: await this.address(),
-    recipientAccount: account
+    nameId,
+    accountId: await this.address(),
+    recipientId: account
   }))
 
   return this.send(nameTransferTx, opt)
 }
 
 /**
- * What kind of a hash is this? If it begins with 'ak$' it is an
- * account key, if with 'ok$' it's an oracle key.
+ * Revoke a domain
+ * @instance
+ * @category async
+ * @param {String} nameId
+ * @param {Object} [options={}]
+ * @return {Promise<Object>}
+ */
+async function revoke (nameId, options = {}) {
+  const opt = R.merge(this.Ae.defaults, options)
+
+  const nameRevokeTx = await this.nameRevokeTx(R.merge(opt, {
+    nameId,
+    accountId: await this.address()
+  }))
+
+  return this.send(nameRevokeTx, opt)
+}
+
+/**
+ * What kind of a hash is this? If it begins with 'ak_' it is an
+ * account key, if with 'ok_' it's an oracle key.
  *
  * @param s - the hash.
  * returns the type, or throws an exception if type not found.
  */
 function classify (s) {
   const keys = {
-    ak: 'accountPubkey',
-    ok: 'oraclePubkey'
+    ak: 'account_pubkey',
+    ok: 'oracle_pubkey'
   }
 
-  if (!s.match(/^[a-z]{2}\$.+/)) {
+  if (!s.match(/^[a-z]{2}_.+/)) {
     throw Error('Not a valid hash')
   }
 
@@ -78,17 +97,17 @@ function classify (s) {
 
 /**
  * Update an aens entry
+ * @param nameId domain hash
  * @param target new target
  * @param options
  * @return {Object}
  */
-async function update (nameHash, target, options = {}) {
+async function update (nameId, target, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-
   const nameUpdateTx = await this.nameUpdateTx(R.merge(opt, {
-    nameHash,
-    account: await this.address(),
-    pointers: JSON.stringify(R.fromPairs([[classify(target), target]]))
+    nameId: nameId,
+    accountId: await this.address(),
+    pointers: [R.fromPairs([['id', target], ['key', classify(target)]])]
   }))
 
   return this.send(nameUpdateTx, opt)
@@ -100,17 +119,17 @@ async function update (nameHash, target, options = {}) {
  * @return {Promise<Object>}
  */
 async function query (name) {
-  const o = await this.api.getName(name)
-  const {nameHash} = o
+  const o = await this.api.getNameEntryByName(name)
+  const nameId = o.id
 
   return Object.freeze(Object.assign(o, {
-    pointers: JSON.parse(o.pointers || '{}'),
+    pointers: o.pointers || {},
     update: async (target, options) => {
-      await this.aensUpdate(nameHash, target, options)
+      await this.aensUpdate(nameId, target, options)
       return this.aensQuery(name)
     },
     transfer: async (account, options) => {
-      await this.aensTransfer(nameHash, account, options)
+      await this.aensTransfer(nameId, account, options)
       return this.aensQuery(name)
     }
   }))
@@ -119,15 +138,20 @@ async function query (name) {
 /**
  * Claim a previously preclaimed registration. This can only be done after the
  * preclaim step
+ * @param {String} name
+ * @param {String} salt
+ * @param {Number} waitForHeight
  * @param {Record} [options={}]
  * @return {Promise<Object>} the result of the claim
  */
-async function claim (name, salt, options = {}) {
+async function claim (name, salt, waitForHeight, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
+  // wait until block was mined before send claim transaction
+  if (waitForHeight) await this.awaitHeight(waitForHeight, { attempts: 200 })
   const claimTx = await this.nameClaimTx(R.merge(opt, {
-    account: await this.address(),
+    accountId: await this.address(),
     nameSalt: salt,
-    name: `nm$${encodeBase58Check(Buffer.from(name))}`
+    name: `nm_${encodeBase58Check(Buffer.from(name))}`
   }))
 
   await this.send(claimTx, opt)
@@ -143,19 +167,21 @@ async function claim (name, salt, options = {}) {
 async function preclaim (name, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   const _salt = salt()
+  const height = await this.height()
   const hash = await this.commitmentHash(name, _salt)
 
   const preclaimTx = await this.namePreclaimTx(R.merge(opt, {
-    account: await this.address(),
-    commitment: hash
+    accountId: await this.address(),
+    commitmentId: hash
   }))
 
   await this.send(preclaimTx, opt)
 
   return Object.freeze({
-    claim: options => this.aensClaim(name, _salt, options),
+    height,
+    claim: options => this.aensClaim(name, _salt, (height + 1), options),
     salt: _salt,
-    commitment: hash
+    commitmentId: hash
   })
 }
 
@@ -176,12 +202,13 @@ const Aens = Ae.compose({
     aensPreclaim: preclaim,
     aensClaim: claim,
     aensUpdate: update,
-    aensTransfer: transfer
+    aensTransfer: transfer,
+    aensRevoke: revoke
   },
-  deepProps: {Ae: {defaults: {
+  deepProps: { Ae: { defaults: {
     clientTtl: 1,
     nameTtl: 50000 // aec_governance:name_claim_max_expiration() => 50000
-  }}}
+  } } }
 })
 
 export default Aens

@@ -56,13 +56,13 @@ async function addAccount (account) {
  * @example Accounts()
  */
 const Accounts = stampit(AsyncInit, {
-  async init ({accounts = []}) {
+  async init ({ accounts = [] }) {
     this.accounts = R.fromPairs(await Promise.all(accounts.map(async a => [await a.address(), a])))
   },
   props: {
     accounts: {}
   },
-  methods: {signWith, addAccount}
+  methods: { signWith, addAccount }
 })
 
 /**

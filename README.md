@@ -28,12 +28,21 @@ check out the [develop branch].
 
 ## [Usage]
 
-1. Add the latest `@aeternity/aepp-sdk` release from npmjs.com to your project
+1. Add the latest `@aeternity/aepp-sdk` release from npmjs.com to your project using one of these commands
 
 ```
 pnpm i @aeternity/aepp-sdk
+# or
 npm i @aeternity/aepp-sdk
+# or
 yarn add @aeternity/aepp-sdk
+```
+
+**Note:** To install a _Pre-Release_ (latest `beta` or `alpha` version) using on the latest Epoch version, you have to install the package appending the `@next` tag reference.
+```
+pnpm i @aeternity/aepp-sdk@next
+npm i @aeternity/aepp-sdk@next
+yarn add @aeternity/aepp-sdk@next
 ```
 
 > Hint: You can also add a development version from GitHub by dropping the `@` and
