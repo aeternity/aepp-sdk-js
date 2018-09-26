@@ -23,7 +23,7 @@
  */
 
 import stampit from '@stamp/it'
-import {required} from '@stamp/required'
+import { required } from '@stamp/required'
 import * as Crypto from '../utils/crypto'
 
 /**
@@ -56,16 +56,16 @@ async function signTransaction (tx) {
  * @return {Object} Account instance
  */
 const Account = stampit({
-  methods: {signTransaction},
+  methods: { signTransaction },
   deepConf: {
     Ae: {
       methods: ['sign', 'address', 'signTransaction']
     }
   }
-}, required({methods: {
+}, required({ methods: {
   sign: required,
   address: required
-}}))
+} }))
 
 /**
  * Sign data blob

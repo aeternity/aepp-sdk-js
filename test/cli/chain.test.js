@@ -15,11 +15,10 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import {describe, it} from 'mocha'
+import { describe, it } from 'mocha'
 import * as R from 'ramda'
-import {configure, BaseAe, execute, parseBlock} from './index'
-import {generateKeyPair} from '../../es/utils/crypto'
-
+import { configure, BaseAe, execute, parseBlock } from './index'
+import { generateKeyPair } from '../../es/utils/crypto'
 
 describe('CLI Chain Module', function () {
   configure(this)
@@ -31,12 +30,12 @@ describe('CLI Chain Module', function () {
     parseInt(res.block_height).should.be.a('number')
   })
   it('VERSION', async () => {
-      let wallet = await BaseAe()
-      wallet.setKeypair(generateKeyPair())
+    let wallet = await BaseAe()
+    wallet.setKeypair(generateKeyPair())
 
-      const {nodeVersion} = await wallet.api.getStatus()
-      const res = await execute(['chain', 'version'])
-      R.last(res.split(/_/)).trim().should.equal(nodeVersion)
+    const { nodeVersion } = await wallet.api.getStatus()
+    const res = await execute(['chain', 'version'])
+    R.last(res.split(/_/)).trim().should.equal(nodeVersion)
   })
   it('PLAY', async () => {
     const res = await execute(['chain', 'play', '--limit', '4'])

@@ -25,11 +25,11 @@
 //                   | |
 //                   |_|
 
-const {HOST, INTERNAL_URL} = require('./utils')
+const { HOST, INTERNAL_URL } = require('./utils')
 const program = require('commander')
 
-require = require('esm')(module/*, options*/) //use to handle es6 import/export
-const {Inspect} = require('./commands')
+require = require('esm')(module/*, options */) // use to handle es6 import/export
+const { Inspect } = require('./commands')
 
 program
   .option('-H, --host [hostname]', 'Node to connect to', HOST)

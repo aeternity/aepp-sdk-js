@@ -15,9 +15,9 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import {describe, it, before} from 'mocha'
-import {configure, ready, BaseAe} from './'
-import {generateKeyPair} from '../../es/utils/crypto'
+import { describe, it, before } from 'mocha'
+import { configure, ready, BaseAe } from './'
+import { generateKeyPair } from '../../es/utils/crypto'
 
 describe('Accounts', function () {
   configure(this)
@@ -28,7 +28,7 @@ describe('Accounts', function () {
     wallet = await ready(this)
   })
 
-  const {pub: receiver} = generateKeyPair()
+  const { pub: receiver } = generateKeyPair()
 
   describe('fails on unknown keypairs', () => {
     let wallet

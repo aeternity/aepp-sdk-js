@@ -23,7 +23,7 @@
  */
 
 import stampit from '@stamp/it'
-import {required} from '@stamp/required'
+import { required } from '@stamp/required'
 
 /**
  * Basic Chain Stamp
@@ -37,8 +37,8 @@ import {required} from '@stamp/required'
  * @return {Object} Chain instance
  */
 const Chain = stampit({
-  deepProps: {Chain: {defaults: {waitMined: true}}},
-  statics: {waitMined (bool) { return this.deepProps({Chain: {defaults: {waitMined: bool}}}) }},
+  deepProps: { Chain: { defaults: { waitMined: true } } },
+  statics: { waitMined (bool) { return this.deepProps({ Chain: { defaults: { waitMined: bool } } }) } },
   deepConf: {
     Ae: {
       methods: [

@@ -25,7 +25,7 @@ import Contract from './contract'
 
 const Cli = Ae.compose(Account, Chain, Tx, JsTx, Aens, Contract, {
   init () {},
-  props: {process: {}}
+  props: { process: {} }
 })
 
 export default Cli

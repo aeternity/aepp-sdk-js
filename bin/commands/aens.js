@@ -34,15 +34,14 @@ const updateNameStatus = (name) => async (client) => {
   try {
     return await client.api.getNameEntryByName(name)
   } catch (e) {
-    if (e.response && e.response.status === 404)
-      return {name, status: 'AVAILABLE'}
+    if (e.response && e.response.status === 404) { return { name, status: 'AVAILABLE' } }
     throw e
   }
 }
 
 const isAvailable = (name) => name.status === 'AVAILABLE'
 
-async function claim (domain, {host, ttl, nameTtl, internalUrl}) {
+async function claim (domain, { host, ttl, nameTtl, internalUrl }) {
   try {
     const keypair = await getWalletByPathAndDecrypt()
     const client = await initClient(host, keypair, internalUrl)
@@ -55,14 +54,14 @@ async function claim (domain, {host, ttl, nameTtl, internalUrl}) {
     }
 
     // Preclaim name before claim
-    const {salt, height} = await client.aensPreclaim(domain, {nameTtl, ttl})
+    const { salt, height } = await client.aensPreclaim(domain, { nameTtl, ttl })
     print('Pre-Claimed')
     // Wait for next block and claim name
-    await client.aensClaim(domain, salt, (height + 1), {nameTtl, ttl})
+    await client.aensClaim(domain, salt, (height + 1), { nameTtl, ttl })
     print('Claimed')
     // Update name pointer
-    const {id} = await updateNameStatus(domain)(client)
-    const {hash} = await client.aensUpdate(id, await client.address(), {nameTtl, ttl})
+    const { id } = await updateNameStatus(domain)(client)
+    const { hash } = await client.aensUpdate(id, await client.address(), { nameTtl, ttl })
     print('Updated')
 
     print(`Name ${domain} claimed`)
@@ -72,7 +71,7 @@ async function claim (domain, {host, ttl, nameTtl, internalUrl}) {
   }
 }
 
-async function transferName (domain, address, {host, ttl, nameTtl, internalUrl}) {
+async function transferName (domain, address, { host, ttl, nameTtl, internalUrl }) {
   if (!address) {
     program.outputHelp()
     process.exit(1)
@@ -89,7 +88,7 @@ async function transferName (domain, address, {host, ttl, nameTtl, internalUrl})
       process.exit(1)
     }
 
-    const transferTX = await client.aensTransfer(name.id, address, {ttl, nameTtl})
+    const transferTX = await client.aensTransfer(name.id, address, { ttl, nameTtl })
     print('Transfer Success')
     print('Transaction hash -------> ' + transferTX.hash)
   } catch (e) {
@@ -97,7 +96,7 @@ async function transferName (domain, address, {host, ttl, nameTtl, internalUrl})
   }
 }
 
-async function updateName (domain, address, {host, ttl, nameTtl, internalUrl}) {
+async function updateName (domain, address, { host, ttl, nameTtl, internalUrl }) {
   if (!address) {
     program.outputHelp()
     process.exit(1)
@@ -114,7 +113,7 @@ async function updateName (domain, address, {host, ttl, nameTtl, internalUrl}) {
       process.exit(1)
     }
 
-    const updateNameTx = await client.aensUpdate(name.id, address, {ttl, nameTtl})
+    const updateNameTx = await client.aensUpdate(name.id, address, { ttl, nameTtl })
     print('Update Success')
     print('Transaction Hash -------> ' + updateNameTx.hash)
   } catch (e) {
@@ -122,7 +121,7 @@ async function updateName (domain, address, {host, ttl, nameTtl, internalUrl}) {
   }
 }
 
-async function revokeName (domain, {host, ttl, nameTtl, internalUrl}) {
+async function revokeName (domain, { host, ttl, nameTtl, internalUrl }) {
   try {
     const keypair = await getWalletByPathAndDecrypt()
     const client = await initClient(host, keypair, internalUrl)
@@ -135,7 +134,7 @@ async function revokeName (domain, {host, ttl, nameTtl, internalUrl}) {
       process.exit(1)
     }
 
-    const revokeTx = await client.aensRevoke(name.id, {ttl, nameTtl})
+    const revokeTx = await client.aensRevoke(name.id, { ttl, nameTtl })
     print('Revoke Success')
     print('Transaction hash -------> ' + revokeTx.hash)
   } catch (e) {

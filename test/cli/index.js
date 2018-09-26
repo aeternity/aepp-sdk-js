@@ -14,10 +14,10 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-import {spawn} from "child_process";
+import { spawn } from 'child_process'
 import * as R from 'ramda'
 import Ae from '../../es/ae/cli'
-import {generateKeyPair} from '../../es/utils/crypto'
+import { generateKeyPair } from '../../es/utils/crypto'
 
 const cliCommand = './bin/aecli.js'
 
@@ -29,14 +29,13 @@ export const KEY_PAIR = generateKeyPair()
 export const WALLET_NAME = 'mywallet'
 
 export const BaseAe = Ae.compose({
-  deepProps: {Swagger: {defaults: {debug: !!process.env['DEBUG']}}},
-  props: {url, internalUrl, process}
+  deepProps: { Swagger: { defaults: { debug: !!process.env['DEBUG'] } } },
+  props: { url, internalUrl, process }
 })
 
-export function configure(mocha) {
+export function configure (mocha) {
   mocha.timeout(TIMEOUT)
 }
-
 
 let planned = 0
 let charged = false
@@ -67,18 +66,18 @@ export async function execute (args) {
   return new Promise((resolve, reject) => {
     let result = ''
     const child = spawn(cliCommand, [...args, '--host', url, '--internalUrl', internalUrl])
-    child.stdin.setEncoding('utf-8');
+    child.stdin.setEncoding('utf-8')
     child.stdout.on('data', (data) => {
       result += (data.toString())
-    });
+    })
 
     child.stderr.on('data', (data) => {
-      reject(data);
-    });
+      reject(data)
+    })
 
     child.on('close', (code) => {
       resolve(result)
-    });
+    })
   })
 }
 
@@ -87,8 +86,7 @@ export function parseBlock (res) {
     .split('\n')
     .reduce((acc, val) => {
       let v = val.split(/__/)
-      if (v.length < 2)
-        v = val.split(':')
+      if (v.length < 2) { v = val.split(':') }
       return Object.assign(
         acc,
         {
