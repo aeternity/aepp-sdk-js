@@ -51,6 +51,7 @@ devDependencies:
   prompt: 1.0.0
   safe-buffer: 5.1.2
   sinon: 4.5.0
+  source-map: 0.7.3
   standard: 11.0.1
   standard-loader: 6.0.1
   supports-color: 5.4.0
@@ -6122,6 +6123,12 @@ packages:
       node: '>=0.10.0'
     resolution:
       integrity: sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==
+  /source-map/0.7.3:
+    dev: true
+    engines:
+      node: '>= 8'
+    resolution:
+      integrity: sha512-CkCj6giN3S+n9qrYiBTX5gystlENnRW5jZeNLHpe6aue+SrHcG5VYwujhW9s4dY31mEGsxBDrHR6oI69fTXsaQ==
   /spdx-correct/3.0.0:
     dependencies:
       spdx-expression-parse: 3.0.0
@@ -7171,6 +7178,7 @@ specifiers:
   serialize-javascript: ^1.5.0
   sha.js: ^2.4.11
   sinon: ^4.2.2
+  source-map: ^0.7.3
   standard: '*'
   standard-loader: ^6.0.1
   supports-color: ^5.4.0

@@ -86,6 +86,7 @@
     "prompt": "^1.0.0",
     "safe-buffer": "^5.1.2",
     "sinon": "^4.2.2",
+    "source-map": "^0.7.3",
     "standard": "*",
     "standard-loader": "^6.0.1",
     "supports-color": "^5.4.0",
