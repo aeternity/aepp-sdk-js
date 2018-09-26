@@ -26,17 +26,13 @@
 import * as R from 'ramda'
 import path from 'path'
 
-import {
-  handleApiError,
-  initClient,
-  print,
-  printError,
-  readFile,
-  writeFile,
-  logContractDescriptor,
-  getWalletByPathAndDecrypt,
-  readJSONFile
-} from '../utils'
+import { readFile, readJSONFile, writeFile } from '../utils/helpers'
+import { initClient } from '../utils/cli'
+import { handleApiError } from '../utils/errors'
+import { printError, print, logContractDescriptor } from '../utils/print'
+import { getWalletByPathAndDecrypt } from '../utils/account'
+
+
 
 export async function compile (file, {host, internalUrl}) {
   try {
@@ -56,7 +52,7 @@ export async function compile (file, {host, internalUrl}) {
 
 }
 
-async function deploy (contractPath, {host, gas, init, internalUrl}) {
+async function deploy (walletPath, contractPath, {host, gas, init, internalUrl, password, ttl}) {
   // Deploy a contract to the chain and create a deploy descriptor
   // with the contract informations that can be use to invoke the contract
   // later on.
@@ -64,9 +60,9 @@ async function deploy (contractPath, {host, gas, init, internalUrl}) {
   // source file. Multiple deploy of the same contract file will generate different
   // deploy descriptor
   try {
-    const contractFile = readFile(path.resolve(process.cwd(), contractPath), 'utf-8')
-    const keypair = await getWalletByPathAndDecrypt()
+    const keypair = await getWalletByPathAndDecrypt(walletPath, { password })
     const client = await initClient(host, keypair, internalUrl)
+    const contractFile = readFile(path.resolve(process.cwd(), contractPath), 'utf-8')
 
     await handleApiError(
       async () => {
@@ -81,7 +77,7 @@ async function deploy (contractPath, {host, gas, init, internalUrl}) {
         // even when the contract's `state` is `unit` (`()`). The arguments to
         // `init` have to be provided at deployment time and will be written to the
         // block as well, together with the contract's bytecode.
-        const deployDescriptor = await contract.deploy({initState: init})
+        const deployDescriptor = await contract.deploy({initState: init, ttl})
 
         // Write contractDescriptor to file
         const descPath = `${R.last(contractPath.split('/'))}.deploy.${deployDescriptor.owner.slice(3)}.json`
@@ -107,15 +103,15 @@ async function deploy (contractPath, {host, gas, init, internalUrl}) {
   }
 }
 
-async function call (descrPath, fn, returnType, args, {host, internalUrl}) {
+async function call (walletPath, descrPath, fn, returnType, args, {host, internalUrl, password}) {
   if (!path || !fn || !returnType) {
     program.outputHelp()
     process.exit(1)
   }
   try {
-    const descr = await readJSONFile(path.resolve(process.cwd(), descrPath))
-    const keypair = await getWalletByPathAndDecrypt()
+    const keypair = await getWalletByPathAndDecrypt(walletPath, { password })
     const client = await initClient(host, keypair, internalUrl)
+    const descr = await readJSONFile(path.resolve(process.cwd(), descrPath))
 
     await handleApiError(
       async () => {

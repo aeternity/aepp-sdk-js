@@ -23,12 +23,11 @@
 // | |\  | (_| | | | | | |  __/\__ \
 // |_| \_|\__,_|_| |_| |_|\___||___/
 
-import {
-  initClient,
-  print,
-  printError,
-  getWalletByPathAndDecrypt
-} from '../utils'
+import * as R from 'ramda'
+
+import { getWalletByPathAndDecrypt } from '../utils/account'
+import { initClient } from '../utils/cli'
+import { printError, print } from '../utils/print'
 
 const updateNameStatus = (name) => async (client) => {
   try {
@@ -42,9 +41,15 @@ const updateNameStatus = (name) => async (client) => {
 
 const isAvailable = (name) => name.status === 'AVAILABLE'
 
-async function claim (domain, {host, ttl, nameTtl, internalUrl}) {
+const validateName = (name) => {
+  if (R.last(name.split('.')) !== 'aet')
+    throw new Error('AENS TLDs must end in .aet')
+}
+
+async function claim (walletPath, domain, {host, ttl, nameTtl, internalUrl, password}) {
   try {
-    const keypair = await getWalletByPathAndDecrypt()
+    validateName(domain)
+    const keypair = await getWalletByPathAndDecrypt(walletPath, { password })
     const client = await initClient(host, keypair, internalUrl)
 
     // Retrieve name
@@ -72,13 +77,13 @@ async function claim (domain, {host, ttl, nameTtl, internalUrl}) {
   }
 }
 
-async function transferName (domain, address, {host, ttl, nameTtl, internalUrl}) {
+async function transferName (walletPath, domain, address, {host, ttl, internalUrl, password}) {
   if (!address) {
     program.outputHelp()
     process.exit(1)
   }
   try {
-    const keypair = await getWalletByPathAndDecrypt()
+    const keypair = await getWalletByPathAndDecrypt(walletPath, {password})
     const client = await initClient(host, keypair, internalUrl)
 
     // Retrieve name
@@ -89,7 +94,7 @@ async function transferName (domain, address, {host, ttl, nameTtl, internalUrl})
       process.exit(1)
     }
 
-    const transferTX = await client.aensTransfer(name.id, address, {ttl, nameTtl})
+    const transferTX = await client.aensTransfer(name.id, address, {ttl})
     print('Transfer Success')
     print('Transaction hash -------> ' + transferTX.hash)
   } catch (e) {
@@ -97,14 +102,14 @@ async function transferName (domain, address, {host, ttl, nameTtl, internalUrl})
   }
 }
 
-async function updateName (domain, address, {host, ttl, nameTtl, internalUrl}) {
+async function updateName (walletPath, domain, address, {host, ttl, nameTtl, internalUrl, password}) {
   if (!address) {
     program.outputHelp()
     process.exit(1)
   }
 
   try {
-    const keypair = await getWalletByPathAndDecrypt()
+    const keypair = await getWalletByPathAndDecrypt(walletPath, {password})
     const client = await initClient(host, keypair, internalUrl)
 
     // Retrieve name
@@ -122,9 +127,9 @@ async function updateName (domain, address, {host, ttl, nameTtl, internalUrl}) {
   }
 }
 
-async function revokeName (domain, {host, ttl, nameTtl, internalUrl}) {
+async function revokeName (walletPath, domain, {host, ttl, internalUrl, password}) {
   try {
-    const keypair = await getWalletByPathAndDecrypt()
+    const keypair = await getWalletByPathAndDecrypt(walletPath, {password})
     const client = await initClient(host, keypair, internalUrl)
 
     // Retrieve name
@@ -135,7 +140,7 @@ async function revokeName (domain, {host, ttl, nameTtl, internalUrl}) {
       process.exit(1)
     }
 
-    const revokeTx = await client.aensRevoke(name.id, {ttl, nameTtl})
+    const revokeTx = await client.aensRevoke(name.id, {ttl})
     print('Revoke Success')
     print('Transaction hash -------> ' + revokeTx.hash)
   } catch (e) {

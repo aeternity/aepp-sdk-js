@@ -59,8 +59,8 @@ async function nameRevokeTx ({ accountId, nonce, nameId, fee, ttl }) {
   return (await this.api.postNameRevoke(R.merge(R.head(arguments), {nonce}))).tx
 }
 
-async function contractCreateTx ({ owner, nonce, code, vmVersion, deposit, amount, gas, gasPrice, fee, ttl, callData }) {
-  nonce = await (calculateNonce.bind(this)(owner))
+async function contractCreateTx ({ ownerId, nonce, code, vmVersion, deposit, amount, gas, gasPrice, fee, ttl, callData }) {
+  nonce = await (calculateNonce.bind(this)(ownerId))
   return this.api.postContractCreate(R.merge(R.head(arguments), {nonce}))
 }
 

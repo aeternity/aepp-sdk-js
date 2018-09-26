@@ -32,7 +32,7 @@ const contractDescriptor = {
   address: "ct_214YXa24QLoqWMSpsf5t6rACUyffxDthPDfHzP2G31c5HSmLV9",
   createdAt: "2018-09-04T11:32:17.207Z"}
 
-describe('CLI Inspect Module', function () {
+describe.skip('CLI Inspect Module', function () {
   configure(this)
   let wallet
 

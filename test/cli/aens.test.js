@@ -21,9 +21,12 @@ import {configure, plan, ready, execute, parseBlock, WALLET_NAME} from './index'
 
 plan(1000000000)
 
-describe.skip('CLI AENS Module', function () {
+function randomName () {
+  return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString(36) + '.aet'
+}
+describe('CLI AENS Module', function () {
   configure(this)
-  const name = 'test.aet'
+  const name = randomName()
   let wallet
 
   before(async function () {
@@ -32,18 +35,18 @@ describe.skip('CLI AENS Module', function () {
   })
 
   it('Claim Name', async () => {
-    console.log((await execute(['wallet', WALLET_NAME, '--password', 'test', 'name', name, 'claim'])))
+    console.log((await execute(['name', 'claim', WALLET_NAME, '--password', 'test', name])))
 
-    const nameResult = parseBlock(await execute(['inspect', 'name', name]))
+    const nameResult = parseBlock(await execute(['inspect', name]))
     const isHash = nameResult.name_hash !== 'N/A'
 
     nameResult.status.should.equal('CLAIMED')
     isHash.status.should.equal(true)
   })
-  it('Revoke Name', async () => {
-    (await execute(['wallet', WALLET_NAME, '--password', 'test', 'name', name, 'revoke']))
+  it.skip('Revoke Name', async () => {
+    console.log(await execute(['name', 'revoke', WALLET_NAME, '--password', 'test', name]))
 
-    const nameResult = parseBlock(await execute(['inspect', 'name', name]))
+    const nameResult = parseBlock(await execute(['inspect', name]))
 
     nameResult.status.should.equal('AVAILABLE')
     nameResult.name_hash.should.equal('N/A')

@@ -27,23 +27,22 @@
 
 import * as R from 'ramda'
 import path from 'path'
-import {
-  handleApiError,
-  initClient,
-  print,
-  printError,
-  printBlock,
-  printTransaction,
-  printName,
-  checkPref,
-  readJSONFile,
-  printContractDescr,
-  printBlockTransactions,
-  getBlock,
-  HASH_TYPES
-} from '../utils'
 
-async function inspect(hash, option) {
+import { HASH_TYPES } from '../utils/constant'
+import { initClient } from '../utils/cli'
+import { handleApiError } from '../utils/errors'
+import {
+  print,
+  printBlock,
+  printBlockTransactions,
+  printContractDescr,
+  printError,
+  printName,
+  printTransaction
+} from '../utils/print'
+import { checkPref, getBlock, readJSONFile } from '../utils/helpers'
+
+async function inspect (hash, option) {
   if (!hash) throw new Error('Hash required')
 
   if (!isNaN(parseInt(hash))) {

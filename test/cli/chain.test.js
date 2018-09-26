@@ -21,7 +21,7 @@ import {configure, BaseAe, execute, parseBlock} from './index'
 import {generateKeyPair} from '../../es/utils/crypto'
 
 
-describe('CLI Chain Module', function () {
+describe.skip('CLI Chain Module', function () {
   configure(this)
 
   it('TOP', async () => {

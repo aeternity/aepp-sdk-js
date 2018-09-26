@@ -19,13 +19,16 @@
 
 
 const program = require('commander')
-const {initExecCommands, unknownCommandHandler, printConfig, HOST, INTERNAL_URL} = require('./utils')
+
+require = require('esm')(module/*, options*/) //use to handle es6 import/export
+const utils = require('./utils/index')
 
 const EXECUTABLE_CMD = [
   {name: 'chain', desc: 'Interact with the blockchain'},
   {name: 'inspect', desc: 'Get information on transactions, blocks,...'},
-  {name: 'wallet', desc: 'Handle wallet operations'},
+  {name: 'account', desc: 'Handle wallet operations'},
   {name: 'contract', desc: 'Compile contracts'},
+  {name: 'name', desc: 'AENS system'},
   // TODO implement oracle module
   // {name: 'oracle', desc: 'Interact with oracles'},
   {name: 'crypto', desc: 'Crypto helpers'},
@@ -33,22 +36,20 @@ const EXECUTABLE_CMD = [
 
 program
   .version(require('../package.json').version)
+  // .option('-H, --host [hostname]', 'Node to connect to', utils.constant.EPOCH_URL)
+  // .option('-U, --internalUrl [internal]', 'Node to connect to(internal)', utils.constant.EPOCH_INTERNAL_URL)
+  // .option('--json [json]', 'Print result in json format')
 
 program
   .command('config')
   .description('Print the client configuration')
-  .action((cmd) => printConfig(cmd))
-  .option('-H, --host [hostname]', 'Node to connect to', HOST)
-  .option('-U, --internalUrl [internal]', 'Node to connect to(internal)', INTERNAL_URL)
+  .action((cmd) => utils.print.printConfig(cmd))
 
 // INIT EXEC COMMANDS
-initExecCommands(program)(EXECUTABLE_CMD)
+utils.cli.initExecCommands(program)(EXECUTABLE_CMD)
 
 // HANDLE UNKNOWN COMMAND
-program.on('command:*', () => unknownCommandHandler(program)(EXECUTABLE_CMD))
+program.on('command:*', () => utils.errors.unknownCommandHandler(program)(EXECUTABLE_CMD))
 
-program
-  .parse(process.argv)
-
+program.parse(process.argv)
 if (program.args.length === 0) program.help()
-

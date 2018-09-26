@@ -23,15 +23,10 @@
 // | |____| | | | (_| | | | | |
 //  \_____|_| |_|\__,_|_|_| |_|
 
-import {
-  initClient,
-  handleApiError,
-  printError,
-  print,
-  printBlock,
-  getBlock,
-  printBlockTransactions
-} from '../utils'
+import { initClient } from '../utils/cli'
+import { handleApiError } from '../utils/errors'
+import { printBlock, print, printBlockTransactions, printError } from '../utils/print'
+import { getBlock } from '../utils/helpers'
 
 async function version ({host, internalUrl}) {
   try {

@@ -25,11 +25,9 @@ const testContract = `contract Identity =
   type state = ()
   function main(x : int, y: int) = x + y
 `
-const walletName = 'test.wallet'
-
 plan(1000000000)
 
-describe('CLI Contract Module', function () {
+describe.skip('CLI Contract Module', function () {
   configure(this)
   const contractFile = 'testContract'
   let deployDescriptor
@@ -41,10 +39,10 @@ describe('CLI Contract Module', function () {
   })
   after(function () {
     // Remove wallet files
-    if (fs.existsSync(walletName))
-      fs.unlinkSync(walletName)
-    if (fs.existsSync(`${walletName}.pub`))
-      fs.unlinkSync(`${walletName}.pub`)
+    if (fs.existsSync(WALLET_NAME))
+      fs.unlinkSync(WALLET_NAME)
+    if (fs.existsSync(`${WALLET_NAME}.pub`))
+      fs.unlinkSync(`${WALLET_NAME}.pub`)
 
     // Remove contract files
     if (fs.existsSync(deployDescriptor))
@@ -69,7 +67,7 @@ describe('CLI Contract Module', function () {
     fs.writeFileSync(contractFile, testContract)
 
     // Deploy contract
-    const res = await execute(['wallet', WALLET_NAME, '--password', 'test', 'contract', 'deploy', contractFile])
+    const res = await execute(['contract', 'deploy', WALLET_NAME, '--password', 'test', contractFile])
     const {contract_address, transaction_hash, deploy_descriptor} = (parseBlock(res))
     deployDescriptor = deploy_descriptor
     const [name, pref, address] = deployDescriptor.split('.')
@@ -82,7 +80,7 @@ describe('CLI Contract Module', function () {
   })
   it('Call Contract', async () => {
     // Call contract
-    const callResponse = (parseBlock(await execute(['wallet', WALLET_NAME, '--password', 'test', 'contract', 'call', deployDescriptor, 'main', 'int', '1', '2'])))
+    const callResponse = (parseBlock(await execute(['contract', 'call', WALLET_NAME, '--password', 'test', deployDescriptor, 'main', 'int', '1', '2'])))
 
     callResponse['return_value_(decoded)'].should.equal('3')
     callResponse.return_remote_type.should.equal('word')

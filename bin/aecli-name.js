@@ -16,47 +16,47 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-//   _____ _           _
-//  / ____| |         (_)
-// | |    | |__   __ _ _ _ __
-// | |    | '_ \ / _` | | '_ \
-// | |____| | | | (_| | | | | |
-//  \_____|_| |_|\__,_|_|_| |_|
+//  _   _
+// | \ | |
+// |  \| | __ _ _ __ ___   ___  ___
+// | . ` |/ _` | '_ ` _ \ / _ \/ __|
+// | |\  | (_| | | | | | |  __/\__ \
+// |_| \_|\__,_|_| |_| |_|\___||___/
 
 const program = require('commander')
 
 require = require('esm')(module/*, options*/) //use to handle es6 import/export
 const utils = require('./utils/index')
-const {Chain} = require('./commands')
+const { AENS } = require('./commands')
 
 program
   .option('-H, --host [hostname]', 'Node to connect to', utils.constant.EPOCH_URL)
   .option('-U, --internalUrl [internal]', 'Node to connect to(internal)', utils.constant.EPOCH_INTERNAL_URL)
-  .option('-L --limit [playlimit]', 'Limit for play command', utils.constant.PLAY_LIMIT)
-  .option('-P --height [playToHeight]', 'Play to selected height')
+  .option('-P, --password [password]', 'Wallet Password')
+  .option('-N, --nameTtl [nameTtl]', 'Name life Ttl', utils.constant.NAME_TTL)
+  .option('-T, --ttl [ttl]', 'Life Ttl', utils.constant.AENS_TX_TTL)
   .option('--json [json]', 'Print result in json format')
 
 program
-  .command('top')
-  .description('Get top of Chain')
-  .action(async (...arguments) => await Chain.top(utils.cli.getCmdFromArguments(arguments)))
+  .command('claim <wallet_path> <name>')
+  .description('Claim a domain name')
+  .action(async (walletPath, name, ...arguments) => await AENS.claim(walletPath, name, utils.cli.getCmdFromArguments(arguments)))
 
 program
-  .command('version')
-  .description('Get Epoch version')
-  .action(async (...arguments) => await Chain.version(utils.cli.getCmdFromArguments(arguments)))
+  .command('revoke  <wallet_path> <name>')
+  .description('Claim a domain name')
+  .action(async (walletPath, name, ...arguments) => await AENS.revokeName(walletPath, name, utils.cli.getCmdFromArguments(arguments)))
 
 program
-  .command('mempool')
-  .description('Get mempool of Chain')
-  .action(async (...arguments) => await Chain.mempool(utils.cli.getCmdFromArguments(arguments)))
+  .command('transfer <wallet_path> <name> <address>')
+  .description('Transfer a name to another account')
+  .action(async (walletPath, name, address, ...arguments) => await AENS.transferName(walletPath, name, address, utils.cli.getCmdFromArguments(arguments)))
 
 program
-  .command('play')
-  .description('Real-time block monitoring')
-  .action(async (...arguments) => await Chain.play(utils.cli.getCmdFromArguments(arguments)))
+  .command('update <wallet_path> <name> <address>')
+  .description('Update a name pointer')
+  .action(async (walletPath, name, address, ...arguments) => await AENS.updateName(walletPath, name, address, utils.cli.getCmdFromArguments(arguments)))
 
-// HANDLE UNKNOWN COMMAND
 program.on('command:*', () => utils.errors.unknownCommandHandler(program)())
 
 program.parse(process.argv)
