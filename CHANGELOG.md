@@ -4,12 +4,13 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [0.22.0-0.1.0-alpha.2]
 ### Added
-- Add CLI implementation
+- Add **CLI** implementation
 
 ### Changed
 - Add keywords ('SDK', 'CLI') to package.json
-- Link aecli to ./bin/aecli.js in package.json (After "npm link" you can use CLI globally)
+- Link aecli to `./bin/aecli.js` in package.json (After "npm link" you can use CLI globally)
 - Wait until pre-claim transaction block was mined before send claim transaction
+- Updated `webpack`, `webpack-cli` and added new dev deps accordingly
 
 
 ## [0.22.0-0.1.0-alpha.1]
@@ -116,3 +117,4 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 [0.15.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.14.0-0.1.0...v0.15.0-0.1.0
 [0.18.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.15.0-0.1.0...v0.18.0-0.1.0
 [0.18.0-0.1.1]: https://github.com/aeternity/aepp-sdk-js/compare/v0.18.0-0.1.0...v0.18.0-0.1.1
+[0.22.0-0.1.0-alpha.2]: https://github.com/aeternity/aepp-sdk-js/compare/v0.18.0-0.1.1...v0.22.0-0.1.0-alpha.2
