@@ -28,7 +28,7 @@ import { handleApiError } from '../utils/errors'
 import { printBlock, print, printBlockTransactions, printError } from '../utils/print'
 import { getBlock } from '../utils/helpers'
 
-async function version ({host, internalUrl, json}) {
+async function version ({host, internalUrl}) {
   try {
     const client = await initClient(host, null, internalUrl)
     await handleApiError(async () => {

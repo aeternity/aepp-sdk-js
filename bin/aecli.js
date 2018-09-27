@@ -36,9 +36,6 @@ const EXECUTABLE_CMD = [
 
 program
   .version(require('../package.json').version)
-  // .option('-H, --host [hostname]', 'Node to connect to', utils.constant.EPOCH_URL)
-  // .option('-U, --internalUrl [internal]', 'Node to connect to(internal)', utils.constant.EPOCH_INTERNAL_URL)
-  // .option('--json [json]', 'Print result in json format')
 
 program
   .command('config')

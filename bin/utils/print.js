@@ -74,12 +74,13 @@ export function printTransaction (tx, json) {
     print(tx)
     return
   }
+  const senderId = R.path(['tx', 'senderId'], tx) || R.path(['tx', 'accountId'], tx)
   print(`Tx hash_______________________ ${tx.hash}`)
   print(`Block hash____________________ ${tx.blockHash}`)
   print(`Block height__________________ ${tx.blockHeight}`)
   print(`Signatures____________________ ${tx.signatures}`)
   print(`Tx Type_______________________ ${R.defaultTo('N/A', R.path(['tx', 'type'], tx))}`)
-  print(`Sender account________________ ${R.defaultTo('N/A', R.path(['tx', 'senderId'], tx))}`)
+  print(`Sender account________________ ${R.defaultTo('N/A', senderId)}`)
   print(`Recipient account_____________ ${R.defaultTo('N/A', R.path(['tx', 'recipientId'], tx))}`)
   print(`Amount________________________ ${R.defaultTo('N/A', R.path(['tx', 'amount'], tx))}`)
   print(`Nonce_________________________ ${R.defaultTo('N/A', R.path(['tx', 'nonce'], tx))}`)

@@ -46,7 +46,7 @@ const validateName = (name) => {
     throw new Error('AENS TLDs must end in .aet')
 }
 
-async function claim (walletPath, domain, {host, ttl, nameTtl, internalUrl, password, json}) {
+async function claim (walletPath, domain, {host, ttl, nameTtl, internalUrl, password}) {
   try {
     validateName(domain)
     const keypair = await getWalletByPathAndDecrypt(walletPath, { password })
@@ -77,7 +77,7 @@ async function claim (walletPath, domain, {host, ttl, nameTtl, internalUrl, pass
   }
 }
 
-async function transferName (walletPath, domain, address, {host, ttl, internalUrl, password, json}) {
+async function transferName (walletPath, domain, address, {host, ttl, internalUrl, password}) {
   if (!address) {
     program.outputHelp()
     process.exit(1)
@@ -102,7 +102,7 @@ async function transferName (walletPath, domain, address, {host, ttl, internalUr
   }
 }
 
-async function updateName (walletPath, domain, address, {host, ttl, nameTtl, internalUrl, password, json}) {
+async function updateName (walletPath, domain, address, {host, ttl, nameTtl, internalUrl, password}) {
   if (!address) {
     program.outputHelp()
     process.exit(1)
@@ -127,7 +127,7 @@ async function updateName (walletPath, domain, address, {host, ttl, nameTtl, int
   }
 }
 
-async function revokeName (walletPath, domain, {host, ttl, internalUrl, password, json}) {
+async function revokeName (walletPath, domain, {host, ttl, internalUrl, password}) {
   try {
     const keypair = await getWalletByPathAndDecrypt(walletPath, {password})
     const client = await initClient(host, keypair, internalUrl)

@@ -43,13 +43,13 @@ export const PLAY_LIMIT = 10
 export const PLAY_INTERVAL = 1000
 
 // CONTRACT
-export const CONTRACT_TTL = Number.MAX_SAFE_INTEGER
+export const CONTRACT_TTL = 50000
 export const GAS = 40000000
 
 // AENS
-export const AENS_TX_TTL = Number.MAX_SAFE_INTEGER
-export const NAME_TTL = Number.MAX_SAFE_INTEGER
+export const AENS_TX_TTL = 50000
+export const NAME_TTL = 500
 
 // ACCOUNT
-export const ACCOUNT_TX_TTL = Number.MAX_SAFE_INTEGER
+export const ACCOUNT_TX_TTL = 50000
 

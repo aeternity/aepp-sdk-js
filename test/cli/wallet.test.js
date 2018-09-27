@@ -16,16 +16,16 @@
  */
 
 import fs from 'fs'
-import {before, describe, it} from 'mocha'
+import { before, describe, it } from 'mocha'
 
-import {configure, plan, ready, execute, parseBlock, BaseAe, KEY_PAIR, WALLET_NAME} from './index'
-import {generateKeyPair} from '../../es/utils/crypto'
+import { configure, plan, ready, execute, parseBlock, BaseAe, KEY_PAIR, WALLET_NAME } from './index'
+import { generateKeyPair } from '../../es/utils/crypto'
 
 const walletName = 'test.wallet'
 
 plan(1000000000)
 
-describe.skip('CLI Wallet Module', function () {
+describe('CLI Wallet Module', function () {
   configure(this)
 
   let wallet

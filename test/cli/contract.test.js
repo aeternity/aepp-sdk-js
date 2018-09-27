@@ -16,9 +16,9 @@
  */
 
 import fs from 'fs'
-import {before, describe, it} from 'mocha'
+import { before, describe, it } from 'mocha'
 
-import {configure, plan, ready, execute, parseBlock, KEY_PAIR, WALLET_NAME} from './index'
+import { configure, plan, ready, execute, parseBlock, KEY_PAIR, WALLET_NAME } from './index'
 
 // CONTRACT DESCRIPTOR
 const testContract = `contract Identity =
@@ -27,7 +27,7 @@ const testContract = `contract Identity =
 `
 plan(1000000000)
 
-describe.skip('CLI Contract Module', function () {
+describe('CLI Contract Module', function () {
   configure(this)
   const contractFile = 'testContract'
   let deployDescriptor
