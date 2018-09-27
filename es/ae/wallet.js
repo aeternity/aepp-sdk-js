@@ -37,9 +37,9 @@ const isTxMethod = contains(Tx.compose.deepConfiguration.Ae.methods)
 const isChainMethod = contains(Chain.compose.deepConfiguration.Ae.methods)
 const isAccountMethod = contains(Account.compose.deepConfiguration.Ae.methods)
 const handlers = [
-  {pred: isTxMethod, handler: 'onTx', error: 'Creating transaction [{}] rejected'},
-  {pred: isChainMethod, handler: 'onChain', error: 'Chain operation [{}] rejected'},
-  {pred: isAccountMethod, handler: 'onAccount', error: 'Account operation [{}] rejected'}
+  { pred: isTxMethod, handler: 'onTx', error: 'Creating transaction [{}] rejected' },
+  { pred: isChainMethod, handler: 'onChain', error: 'Chain operation [{}] rejected' },
+  { pred: isAccountMethod, handler: 'onAccount', error: 'Account operation [{}] rejected' }
 ]
 
 /**
@@ -51,12 +51,12 @@ const handlers = [
  */
 async function hello () {
   const id = this.createSession()
-  Object.assign(this.rpcSessions[id], {address: await this.address()})
+  Object.assign(this.rpcSessions[id], { address: await this.address() })
   return Promise.resolve(id)
 }
 
 async function rpc (method, params, session) {
-  const {handler, error} = R.find(({pred}) => pred(method), handlers)
+  const { handler, error } = R.find(({ pred }) => pred(method), handlers)
 
   if (handler === undefined) {
     return Promise.reject(Error(`Unknown method ${method}`))
@@ -82,7 +82,7 @@ function onAccount () {
   return Promise.resolve(false)
 }
 
-async function rpcSign ({params, session}) {
+async function rpcSign ({ params, session }) {
   if (await this.onAccount('sign', params, session)) {
     return this.signWith(session.address, params[0])
   } else {
@@ -90,7 +90,7 @@ async function rpcSign ({params, session}) {
   }
 }
 
-async function rpcAddress ({params, session}) {
+async function rpcAddress ({ params, session }) {
   if (await this.onAccount('address', params, session)) {
     return Promise.resolve(session.address)
   } else {
@@ -121,15 +121,15 @@ async function rpcAddress ({params, session}) {
 })
  */
 const Wallet = Ae.compose(Accounts, Chain, Tx, JsTx, Rpc, Selector, {
-  init ({onTx = this.onTx, onChain = this.onChain, onAccount = this.onAccount}, {stamp}) {
+  init ({ onTx = this.onTx, onChain = this.onChain, onAccount = this.onAccount }, { stamp }) {
     this.onTx = onTx
     this.onChain = onChain
     this.onAccount = onAccount
 
-    const {methods} = stamp.compose.deepConfiguration.Ae
-    this.rpcMethods = Object.assign(R.fromPairs(methods.map(m => [m, ({params, session}) => this.rpc(m, params, session)])), this.rpcMethods)
+    const { methods } = stamp.compose.deepConfiguration.Ae
+    this.rpcMethods = Object.assign(R.fromPairs(methods.map(m => [m, ({ params, session }) => this.rpc(m, params, session)])), this.rpcMethods)
   },
-  methods: {rpc, onTx, onChain, onAccount},
+  methods: { rpc, onTx, onChain, onAccount },
   deepProps: {
     rpcMethods: {
       sign: rpcSign,

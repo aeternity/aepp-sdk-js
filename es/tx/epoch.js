@@ -25,7 +25,7 @@
 import Tx from './'
 import Epoch from '../epoch'
 import * as R from 'ramda'
-import {salt} from '../utils/crypto'
+import { salt } from '../utils/crypto'
 
 const createSalt = salt
 

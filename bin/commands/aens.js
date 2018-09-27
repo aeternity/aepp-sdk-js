@@ -60,14 +60,14 @@ async function claim (walletPath, domain, {host, ttl, nameTtl, internalUrl, pass
     }
 
     // Preclaim name before claim
-    const {salt, height} = await client.aensPreclaim(domain, {nameTtl, ttl})
+    const { salt, height } = await client.aensPreclaim(domain, { nameTtl, ttl })
     print('Pre-Claimed')
     // Wait for next block and claim name
-    await client.aensClaim(domain, salt, (height + 1), {nameTtl, ttl})
+    await client.aensClaim(domain, salt, (height + 1), { nameTtl, ttl })
     print('Claimed')
     // Update name pointer
-    const {id} = await updateNameStatus(domain)(client)
-    const {hash} = await client.aensUpdate(id, await client.address(), {nameTtl, ttl})
+    const { id } = await updateNameStatus(domain)(client)
+    const { hash } = await client.aensUpdate(id, await client.address(), { nameTtl, ttl })
     print('Updated')
 
     print(`Name ${domain} claimed`)

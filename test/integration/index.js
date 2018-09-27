@@ -25,8 +25,8 @@ const account = Crypto.generateKeyPair()
 // Array(3).fill().map(() => Crypto.generateKeyPair())
 
 const BaseAe = Ae.compose({
-  deepProps: {Swagger: {defaults: {debug: !!process.env['DEBUG']}}},
-  props: {url, internalUrl, process}
+  deepProps: { Swagger: { defaults: { debug: !!process.env['DEBUG'] } } },
+  props: { url, internalUrl, process }
 })
 
 let planned = 0

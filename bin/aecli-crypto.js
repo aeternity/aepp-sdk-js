@@ -20,9 +20,9 @@ const fs = require('fs')
 const prompt = require('prompt')
 const path = require('path')
 
-const {unknownCommandHandler} = require('./utils')
+const { unknownCommandHandler } = require('./utils')
 
-require = require('esm')(module/*, options*/) //use to handle es6 import/export
+require = require('esm')(module/*, options */) // use to handle es6 import/export
 const Crypto = require('../es/utils/crypto')
 
 // The `prompt` library provides concealed input of passwords.
@@ -45,7 +45,7 @@ const promptSchema = {
 function extractReadableKeys (dir, options) {
   const pwd = options.input
   prompt.start()
-  prompt.get(promptSchema, (err, {password}) => {
+  prompt.get(promptSchema, (err, { password }) => {
     const key = fs.readFileSync(path.join(pwd, dir, 'sign_key'))
     const pubKey = fs.readFileSync(path.join(pwd, dir, 'sign_key.pub'))
 
@@ -61,8 +61,8 @@ function extractReadableKeys (dir, options) {
 }
 
 // ## Key Pair Generation
-function generateKeyPair (name, {output}) {
-  const {pub, priv} = Crypto.generateKeyPair()
+function generateKeyPair (name, { output }) {
+  const { pub, priv } = Crypto.generateKeyPair()
 
   const data = [
     [path.join(output, name), priv],

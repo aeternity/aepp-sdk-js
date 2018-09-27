@@ -24,14 +24,14 @@ require = require('esm')(module/*, options*/) //use to handle es6 import/export
 const utils = require('./utils/index')
 
 const EXECUTABLE_CMD = [
-  {name: 'chain', desc: 'Interact with the blockchain'},
-  {name: 'inspect', desc: 'Get information on transactions, blocks,...'},
-  {name: 'account', desc: 'Handle wallet operations'},
-  {name: 'contract', desc: 'Compile contracts'},
-  {name: 'name', desc: 'AENS system'},
+  { name: 'chain', desc: 'Interact with the blockchain' },
+  { name: 'inspect', desc: 'Get information on transactions, blocks,...' },
+  { name: 'account', desc: 'Handle wallet operations' },
+  { name: 'contract', desc: 'Compile contracts' },
+  { name: 'name', desc: 'AENS system' },
   // TODO implement oracle module
   // {name: 'oracle', desc: 'Interact with oracles'},
-  {name: 'crypto', desc: 'Crypto helpers'},
+  { name: 'crypto', desc: 'Crypto helpers' },
 ]
 
 program

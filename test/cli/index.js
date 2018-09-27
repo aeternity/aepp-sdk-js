@@ -29,8 +29,8 @@ export const KEY_PAIR = generateKeyPair()
 export const WALLET_NAME = 'mywallet'
 
 export const BaseAe = Ae.compose({
-  deepProps: {Swagger: {defaults: {debug: !!process.env['DEBUG']}}},
-  props: {url, internalUrl, process}
+  deepProps: { Swagger: { defaults: { debug: !!process.env['DEBUG'] } } },
+  props: { url, internalUrl, process }
 })
 
 export function configure (mocha) {
@@ -86,8 +86,7 @@ export function parseBlock (res) {
     .split('\n')
     .reduce((acc, val) => {
       let v = val.split(/__/)
-      if (v.length < 2)
-        v = val.split(':')
+      if (v.length < 2) { v = val.split(':') }
       return Object.assign(
         acc,
         {

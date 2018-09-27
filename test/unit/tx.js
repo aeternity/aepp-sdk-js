@@ -16,8 +16,8 @@
  */
 
 import '../'
-import {describe, it} from 'mocha'
-import {salt} from '../../es/utils/crypto'
+import { describe, it } from 'mocha'
+import { salt } from '../../es/utils/crypto'
 import Tx from '../../es/tx/js'
 
 describe('Tx', function () {

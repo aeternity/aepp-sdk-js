@@ -95,10 +95,12 @@ describe('Swagger', function () {
     })
 
     it('objects', () => {
-      const spec = { type: 'object', required: ['foo'], properties: {
-        foo: { type: 'integer' },
-        bar: { type: 'string' }
-      }}
+      const spec = { type: 'object',
+        required: ['foo'],
+        properties: {
+          foo: { type: 'integer' },
+          bar: { type: 'string' }
+        } }
       expect(internal.conform({ foo: 5 }, spec)).to.deep.equal({ foo: 5 })
       expect(internal.conform({ foo: 5, bar: 'xxx' }, spec)).to.deep.equal({ foo: 5, bar: 'xxx' })
       expect(internal.conform({ foo: 5, baz: 'yyy' }, spec)).to.deep.equal({ foo: 5 })

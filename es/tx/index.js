@@ -23,7 +23,7 @@
  */
 
 import stampit from '@stamp/it'
-import {required} from '@stamp/required'
+import { required } from '@stamp/required'
 
 /**
  * Basic Tx Stamp
