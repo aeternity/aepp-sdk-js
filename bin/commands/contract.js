@@ -52,7 +52,7 @@ export async function compile (file, {host, internalUrl}) {
 
 }
 
-async function deploy (walletPath, contractPath, {host, gas, init, internalUrl, password, ttl}) {
+async function deploy (walletPath, contractPath, {host, gas, init, internalUrl, password, ttl, json}) {
   // Deploy a contract to the chain and create a deploy descriptor
   // with the contract informations that can be use to invoke the contract
   // later on.
@@ -94,7 +94,7 @@ async function deploy (walletPath, contractPath, {host, gas, init, internalUrl, 
         )
 
         // Log contract descriptor
-        logContractDescriptor(contractDescriptor, 'Contract was successfully deployed')
+        logContractDescriptor(contractDescriptor, 'Contract was successfully deployed', json)
       }
     )
   } catch (e) {

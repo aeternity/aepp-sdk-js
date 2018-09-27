@@ -32,7 +32,7 @@ import { handleApiError } from '../utils/errors'
 import { print, printError, printTransaction } from '../utils/print'
 import { checkPref } from '../utils/helpers'
 
-async function spend (walletPath, receiver, amount, { host, ttl, internalUrl, password }) {
+async function spend (walletPath, receiver, amount, { host, ttl, internalUrl, password, json }) {
   ttl = parseInt(ttl)
   try {
     checkPref(receiver, HASH_TYPES.account)
@@ -47,7 +47,7 @@ async function spend (walletPath, receiver, amount, { host, ttl, internalUrl, pa
       } else {
         print('Transaction mined')
       }
-      printTransaction(tx)
+      printTransaction(tx, json)
     })
   } catch (e) {
     printError(e.message)

@@ -72,13 +72,14 @@ async function inspect (hash, option) {
   }
 }
 
-async function getBlockByHash (hash, {host, internalUrl}) {
+async function getBlockByHash (hash, {host, internalUrl, json}) {
   try {
     checkPref(hash, [HASH_TYPES.block, HASH_TYPES.micro_block])
     const client = await initClient(host, null, internalUrl)
     await handleApiError(
       async () => printBlock(
-        await getBlock(hash)(client)
+        await getBlock(hash)(client),
+        json
       )
     )
   } catch (e) {
@@ -86,19 +87,19 @@ async function getBlockByHash (hash, {host, internalUrl}) {
   }
 }
 
-async function getTransactionByHash (hash, {host, internalUrl}) {
+async function getTransactionByHash (hash, {host, internalUrl, json}) {
   try {
     checkPref(hash, HASH_TYPES.transaction)
     const client = await initClient(host, null, internalUrl)
     await handleApiError(
-      async () => printTransaction(await client.tx(hash))
+      async () => printTransaction(await client.tx(hash), json)
     )
   } catch (e) {
     printError(e.message)
   }
 }
 
-async function getAccountByHash (hash, {host, internalUrl}) {
+async function getAccountByHash (hash, {host, internalUrl, json}) {
   try {
     checkPref(hash, HASH_TYPES.account)
     const client = await initClient(host, null, internalUrl)
@@ -109,7 +110,7 @@ async function getAccountByHash (hash, {host, internalUrl}) {
         print('Account balance___________ ' + balance)
         print('Account nonce_____________ ' + nonce)
         print('Account Transactions: ')
-        printBlockTransactions((await client.api.getPendingAccountTransactionsByPubkey(hash)).transactions)
+        printBlockTransactions((await client.api.getPendingAccountTransactionsByPubkey(hash)).transactions, json)
       }
     )
   } catch (e) {
@@ -117,43 +118,43 @@ async function getAccountByHash (hash, {host, internalUrl}) {
   }
 }
 
-async function getBlockByHeight (height, {host, internalUrl}) {
+async function getBlockByHeight (height, {host, internalUrl, json}) {
   height = parseInt(height)
   try {
     const client = await initClient(host, null, internalUrl)
 
     await handleApiError(
-      async () => printBlock(await client.api.getKeyBlockByHeight(height))
+      async () => printBlock(await client.api.getKeyBlockByHeight(height), json)
     )
   } catch (e) {
     printError(e.message)
   }
 }
 
-async function getName (name, {host, internalUrl}) {
+async function getName (name, {host, internalUrl, json}) {
   try {
     if (R.last(name.split('.')) !== 'aet') throw new Error('AENS TLDs must end in .aet')
     const client = await initClient(host, null, internalUrl)
 
-    printName(Object.assign(await client.api.getNameEntryByName(name), {status: 'CLAIMED'}))
+    printName(Object.assign(await client.api.getNameEntryByName(name), {status: 'CLAIMED'}), json)
   } catch (e) {
     if (e.response && e.response.status === 404) {
-      printName({status: 'AVAILABLE'})
+      printName({status: 'AVAILABLE'}, json)
       process.exit(1)
     }
     printError(e.message)
   }
 }
 
-async function getContractByDescr (descrPath, {host, internalUrl}) {
+async function getContractByDescr (descrPath, {host, internalUrl, json}) {
   try {
     const descriptor = await readJSONFile(path.resolve(process.cwd(), descrPath))
     const client = await initClient(host, null, internalUrl)
 
     await handleApiError(
       async () => {
-        printContractDescr(descriptor)
-        printTransaction(await client.tx(descriptor.transaction))
+        printContractDescr(descriptor, json)
+        printTransaction(await client.tx(descriptor.transaction), json)
       }
     )
   } catch (e) {

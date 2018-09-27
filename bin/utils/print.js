@@ -3,8 +3,11 @@ import * as R from 'ramda'
 import { HASH_TYPES } from './constant'
 
 // CONSOLE PRINT HELPERS
-export function print (msg, obj = '') {
-  console.log(msg, obj)
+export function print (msg, obj) {
+  if (obj)
+    console.log(msg, obj)
+  else
+    console.log(msg)
 }
 
 export function printError (msg) {
@@ -16,7 +19,11 @@ export function printConfig ({host}) {
   print('EPOCH_URL___________' + host)
 }
 
-export function printBlock (block) {
+export function printBlock (block, json) {
+  if (json) {
+    print(block)
+    return
+  }
   const type = Object.keys(HASH_TYPES).find(t => block.hash.indexOf(HASH_TYPES[t] + '_') !== -1)
   print('---------------- ' + type.toUpperCase() + ' ----------------')
   print(`Block hash____________________ ${R.prop('hash', block)}`)
@@ -31,14 +38,22 @@ export function printBlock (block) {
     printBlockTransactions(block.transactions)
 }
 
-export function printName (name) {
+export function printName (name, json) {
+  if (json) {
+    print(name)
+    return
+  }
   print(`Status___________ ${R.defaultTo('N/A', R.prop('status', name))}`)
   print(`Name hash________ ${R.defaultTo('N/A', R.prop('id', name))}`)
   print(`Pointers_________`, R.defaultTo('N/A', R.prop('pointers', name)))
   print(`TTL______________ ${R.defaultTo(0, R.prop('nameTtl', name))}`)
 }
 
-export function printBlockTransactions (ts) {
+export function printBlockTransactions (ts, json) {
+  if (json) {
+    print(ts)
+    return
+  }
   ts.forEach(
     tx => {
       print(`-->
@@ -54,7 +69,11 @@ export function printBlockTransactions (ts) {
     })
 }
 
-export function printTransaction (tx) {
+export function printTransaction (tx, json) {
+  if (json) {
+    print(tx)
+    return
+  }
   print(`Tx hash_______________________ ${tx.hash}`)
   print(`Block hash____________________ ${tx.blockHash}`)
   print(`Block height__________________ ${tx.blockHeight}`)
@@ -67,7 +86,11 @@ export function printTransaction (tx) {
   print(`TTL___________________________ ${R.defaultTo('N/A', R.path(['tx', 'ttl'], tx))}`)
 }
 
-export function printContractDescr (descriptor) {
+export function printContractDescr (descriptor, json) {
+  if (json) {
+    print(descriptor)
+    return
+  }
   print('Source________________________ ' + descriptor.source)
   print('Bytecode______________________ ' + descriptor.bytecode)
   print('Address_______________________ ' + descriptor.address)
@@ -76,7 +99,11 @@ export function printContractDescr (descriptor) {
   print('Created_At____________________ ' + descriptor.createdAt)
 }
 
-export function logContractDescriptor (desc, title = '') {
+export function logContractDescriptor (desc, title = '', json) {
+  if (json) {
+    print(desc)
+    return
+  }
   print(`${title}`)
   print(`Contract address________________ ${desc.address}`)
   print(`Transaction hash________________ ${desc.transaction}`)
