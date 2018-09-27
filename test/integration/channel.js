@@ -22,6 +22,16 @@ import Channel from '../../es/channel/epoch'
 
 plan(1000)
 
+function waitForChannel (channel) {
+  return new Promise(resolve =>
+    channel.on('statusChanged', (status) => {
+      if (status === 'open') {
+        resolve()
+      }
+    })
+  )
+}
+
 describe('Epoch Channel', function () {
   configure(this)
 
@@ -30,11 +40,26 @@ describe('Epoch Channel', function () {
   let initiatorCh
   let responderCh
   let responderShouldRejectUpdate
+  let existingChannelId
+  let offchainTx
+  const sharedParams = {
+    url: 'ws://proxy:3001',
+    pushAmount: 3,
+    initiatorAmount: 10,
+    responderAmount: 10,
+    channelReserve: 2,
+    ttl: 10000,
+    host: 'localhost',
+    port: 3001,
+    lockPeriod: 10
+  }
 
   before(async function () {
     initiator = await ready(this)
     responder = await BaseAe()
     responder.setKeypair(generateKeyPair())
+    sharedParams.initiatorId = await initiator.address()
+    sharedParams.responderId = await responder.address()
     await initiator.spend(100, await responder.address())
   })
 
@@ -43,28 +68,6 @@ describe('Epoch Channel', function () {
   })
 
   it('can open a channel', async () => {
-    function waitForChannel (channel) {
-      return new Promise(resolve =>
-        channel.on('statusChanged', (status) => {
-          if (status === 'open') {
-            resolve()
-          }
-        })
-      )
-    }
-    const sharedParams = {
-      url: 'ws://proxy:3001',
-      initiatorId: await initiator.address(),
-      responderId: await responder.address(),
-      pushAmount: 3,
-      initiatorAmount: 10,
-      responderAmount: 10,
-      channelReserve: 2,
-      ttl: 10000,
-      host: 'localhost',
-      port: 3001,
-      lockPeriod: 10
-    }
     initiatorCh = await Channel({
       ...sharedParams,
       role: 'initiator',
@@ -109,5 +112,43 @@ describe('Epoch Channel', function () {
   it('can close a channel', async () => {
     const tx = await initiatorCh.shutdown(async (tx) => await initiator.signTransaction(tx))
     tx.should.be.a('string')
+  })
+
+  it('can leave a channel', async () => {
+    initiatorCh = await Channel({
+      ...sharedParams,
+      role: 'initiator',
+      sign: async (tag, tx) => await initiator.signTransaction(tx)
+    })
+    responderCh = await Channel({
+      ...sharedParams,
+      role: 'responder',
+      sign: async (tag, tx) => await responder.signTransaction(tx)
+    })
+    await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
+    const result = await initiatorCh.leave()
+    result.channelId.should.be.a('string')
+    result.state.should.be.a('string')
+    existingChannelId = result.channelId
+    offchainTx = result.state
+  })
+
+  it('can reestablish a channel', async () => {
+    initiatorCh = await Channel({
+      ...sharedParams,
+      role: 'initiator',
+      existingChannelId,
+      offchainTx,
+      sign: async (tag, tx) => await initiator.signTransaction(tx)
+    })
+    responderCh = await Channel({
+      ...sharedParams,
+      role: 'responder',
+      existingChannelId,
+      offchainTx,
+      sign: async (tag, tx) => await responder.signTransaction(tx)
+    })
+    await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
+    await initiatorCh.leave()
   })
 })

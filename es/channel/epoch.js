@@ -35,16 +35,28 @@ const channelStatus = new WeakMap()
 const channelState = new WeakMap()
 const connections = new WeakMap()
 const emitters = new WeakMap()
-const pendingUpdates = new WeakMap()
 const currentState = new WeakMap()
 const messageQueue = new WeakMap()
 const isProcessingMessage = new WeakMap()
+const actionQueue = new WeakMap()
+const actionQueueLocked = new WeakMap()
 
 function channelURL (url, { endpoint = 'channel', ...params }) {
   const paramString = R.join('&', R.values(R.mapObjIndexed((value, key) =>
     `${pascalToSnake(key)}=${value}`, params)))
 
   return `${url}/${endpoint}?${paramString}`
+}
+
+function changeFSM (channel, nextState) {
+  if (!nextState) {
+    throw new Error('State Channels FSM entered unknown state')
+  }
+  currentState.set(channel, nextState)
+  if (nextState.handler.enter) {
+    nextState.handler.enter(channel)
+  }
+  dequeueAction(channel)
 }
 
 function changeStatus (channel, newStatus) {
@@ -68,6 +80,32 @@ function send (channel, message) {
   connections.get(channel).send(JSON.stringify(message, undefined, 2))
 }
 
+function enqueueAction (channel, guard, action) {
+  actionQueue.set(channel, [
+    ...actionQueue.get(channel) || [],
+    {guard, action}
+  ])
+  dequeueAction(channel)
+}
+
+async function dequeueAction (channel) {
+  const locked = actionQueueLocked.get(channel)
+  const queue = actionQueue.get(channel) || []
+  if (locked || !queue.length) {
+    return
+  }
+  const state = currentState.get(channel)
+  const index = queue.findIndex(item => item.guard(channel, state))
+  if (index === -1) {
+    return
+  }
+  actionQueue.set(channel, queue.filter((_, i) => index !== i))
+  actionQueueLocked.set(channel, true)
+  const nextState = await Promise.resolve(queue[index].action(channel, state))
+  actionQueueLocked.set(channel, false)
+  changeFSM(channel, nextState)
+}
+
 function awaitingConnection (channel, message, state) {
   if (message.action === 'info') {
     if (['channel_accept', 'funding_created'].includes(message.payload.event)) {
@@ -76,6 +114,9 @@ function awaitingConnection (channel, message, state) {
         funding_created: 'halfSigned'
       }[message.payload.event])
       return {handler: awaitingChannelCreateTx}
+    }
+    if (message.payload.event === 'channel_reestablished') {
+      return {handler: awaitingOpenConfirmation}
     }
     return {handler: awaitingConnection}
   }
@@ -152,10 +193,13 @@ async function channelOpen (channel, message, state) {
     emitters.get(channel).emit('onChainTx', message.payload.tx)
     return {handler: channelOpen}
   }
+  if (message.action === 'leave') {
+    // TODO: emit event
+    return {handler: channelOpen}
+  }
 }
 channelOpen.enter = (channel) => {
   changeStatus(channel, 'open')
-  sendNextUpdate(channel)
 }
 
 async function awaitingOffChainTx (channel, message, state) {
@@ -166,7 +210,7 @@ async function awaitingOffChainTx (channel, message, state) {
     return {handler: awaitingOffChainUpdate, state}
   }
   if (message.action === 'error') {
-    state.callback(new Error(JSON.stringify(message.payload)))
+    state.reject(new Error(JSON.stringify(message.payload)))
     return {handler: channelOpen}
   }
 }
@@ -174,11 +218,11 @@ async function awaitingOffChainTx (channel, message, state) {
 function awaitingOffChainUpdate (channel, message, state) {
   if (message.action === 'update') {
     changeState(channel, message.payload.state)
-    state.callback(null, {accepted: true, state: message.payload.state})
+    state.resolve({accepted: true, state: message.payload.state})
     return {handler: channelOpen}
   }
   if (message.action === 'conflict') {
-    state.callback(null, {accepted: false})
+    state.resolve({accepted: false})
     return {handler: channelOpen}
   }
 }
@@ -234,20 +278,18 @@ function awaitingShutdownOnChainTx (channel, message, state) {
   }
 }
 
+function awaitingLeave (channel, message, state) {
+  state.resolve({channelId: message.channel_id, state: message.payload.state})
+  return {handler: channelClosed}
+}
+
 function channelClosed (channel, message, state) {
   return {handler: channelClosed}
 }
 
 async function handleMessage (channel, message) {
   const { handler, state } = currentState.get(channel)
-  const nextState = await Promise.resolve(handler(channel, message, state))
-  if (!nextState) {
-    throw new Error('State Channels FSM entered unknown state')
-  }
-  currentState.set(channel, nextState)
-  if (nextState.handler.enter) {
-    nextState.handler.enter(channel)
-  }
+  changeFSM(channel, await Promise.resolve(handler(channel, message, state)))
 }
 
 async function onMessage (channel, message) {
@@ -268,25 +310,6 @@ function processMessageQueue (channel) {
     isProcessingMessage.set(channel, false)
     processMessageQueue(channel)
   })
-}
-
-function sendNextUpdate (channel) {
-  const queue = pendingUpdates.get(channel) || []
-  if (currentState.get(channel).handler !== channelOpen || !queue.length) {
-    return
-  }
-  const [update, ...remaining] = queue
-  const {from, to, amount, callback, sign} = update
-  currentState.set(channel, {
-    handler: awaitingOffChainTx,
-    state: {callback, sign}
-  })
-  send(channel, {
-    action: 'update',
-    tag: 'new',
-    payload: {from, to, amount}
-  })
-  pendingUpdates.set(channel, remaining)
 }
 
 /**
@@ -340,20 +363,51 @@ function state () {
  */
 function update (from, to, amount, sign) {
   return new Promise((resolve, reject) => {
-    const queue = pendingUpdates.get(this) || []
-    pendingUpdates.set(this, [...queue, {
-      from,
-      to,
-      amount,
-      sign,
-      callback (err, result) {
-        if (err) {
-          return reject(err)
+    enqueueAction(
+      this,
+      (channel, state) => state.handler === channelOpen,
+      (channel, state) => {
+        send(channel, {
+          action: 'update',
+          tag: 'new',
+          payload: {from, to, amount}
+        })
+        return {
+          handler: awaitingOffChainTx,
+          state: {
+            resolve,
+            reject,
+            sign
+          }
         }
-        resolve(result)
       }
-    }])
-    sendNextUpdate(this)
+    )
+  })
+}
+
+/**
+ * Leave channel
+ *
+ * Returned promise resolves to an object containing `channelId` and `state`
+ * properties.
+ * @return {Promise}
+ * @example channel.leave().then(({channelId, state}) =>
+ *   console.log(channelId)
+ *   console.log(state)
+ * )
+ */
+function leave () {
+  return new Promise((resolve) => {
+    enqueueAction(
+      this,
+      (channel, state) => state.handler === channelOpen,
+      (channel, state) => {
+        send(channel, {action: 'leave'})
+        return {
+          handler: awaitingLeave,
+          state: {resolve}
+        }
+      })
   })
 }
 
@@ -430,12 +484,14 @@ const EpochChannel = AsyncInit.compose(Channel, {
       'host',
       'port',
       'lockPeriod',
-      'role'
+      'role',
+      'existingChannelId',
+      'offchainTx'
     ], options)
 
     channelOptions.set(this, options)
     emitters.set(this, new EventEmitter())
-    currentState.set(this, { handler: awaitingConnection, state: {} })
+    currentState.set(this, {handler: awaitingConnection})
 
     await new Promise((resolve, reject) => {
       const resolveOnce = R.once(resolve)
@@ -456,6 +512,7 @@ const EpochChannel = AsyncInit.compose(Channel, {
     status,
     state,
     update,
+    leave,
     shutdown
   }
 })

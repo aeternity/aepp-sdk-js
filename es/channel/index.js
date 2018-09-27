@@ -21,7 +21,7 @@ import {required} from '@stamp/required'
 const Channel = stampit({
   deepConf: {
     Ae: {
-      methods: ['on', 'status', 'state', 'update', 'shutdown']
+      methods: ['on', 'status', 'state', 'update', 'leave', 'shutdown']
     }
   }
 }, required({
@@ -30,6 +30,7 @@ const Channel = stampit({
     status: required,
     state: required,
     update: required,
+    leave: required,
     shutdown: required
   }
 }))
