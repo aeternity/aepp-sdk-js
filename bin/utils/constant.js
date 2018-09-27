@@ -69,4 +69,3 @@ export const NAME_TTL = 500
 
 // ACCOUNT
 export const ACCOUNT_TX_TTL = 50000
-

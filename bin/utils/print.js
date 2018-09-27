@@ -118,5 +118,3 @@ export function logContractDescriptor (desc, title = '', json) {
   print(`Transaction hash________________ ${desc.transaction}`)
   print(`Deploy descriptor_______________ ${desc.descPath}`)
 }
-
-//

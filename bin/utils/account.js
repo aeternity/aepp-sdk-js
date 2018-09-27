@@ -126,4 +126,3 @@ export async function getWalletByPathAndDecrypt (walletPath, { privateKey, passw
     throw new Error('GET WALLET ERROR: ' + e.message)
   }
 }
-
