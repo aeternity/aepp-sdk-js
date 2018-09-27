@@ -73,7 +73,7 @@ async function commitmentHash (name, salt = createSalt()) {
   return (await this.api.getCommitmentHash(name, salt)).commitmentId
 }
 
-async function calculateNonce(accountId) {
+async function calculateNonce (accountId) {
   return +(await this.api.getAccountByPubkey(accountId)).nonce + 1
 }
 
@@ -102,7 +102,7 @@ const EpochTx = Epoch.compose(Tx, {
     nameRevokeTx,
     contractCreateTx,
     contractCallTx,
-    commitmentHash,
+    commitmentHash
   }
 })
 
