@@ -32,15 +32,15 @@ import { handleApiError } from '../utils/errors'
 import { print, printError, printTransaction } from '../utils/print'
 import { checkPref } from '../utils/helpers'
 
-async function spend (walletPath, receiver, amount, {host, ttl, internalUrl, password, json}) {
+async function spend (walletPath, receiver, amount, { host, ttl, internalUrl, password, json }) {
   ttl = parseInt(ttl)
   try {
     checkPref(receiver, HASH_TYPES.account)
-    const keypair = await getWalletByPathAndDecrypt(walletPath, {password})
+    const keypair = await getWalletByPathAndDecrypt(walletPath, { password })
     const client = await initClient(host, keypair, internalUrl)
 
     await handleApiError(async () => {
-      let tx = await client.spend(parseInt(amount), receiver, {ttl})
+      let tx = await client.spend(parseInt(amount), receiver, { ttl })
       // if waitMined false
       if (typeof tx !== 'object') {
         tx = await client.tx(tx)
@@ -54,9 +54,9 @@ async function spend (walletPath, receiver, amount, {host, ttl, internalUrl, pas
   }
 }
 
-async function getBalance (walletPath, {host, internalUrl, password}) {
+async function getBalance (walletPath, { host, internalUrl, password }) {
   try {
-    const keypair = await getWalletByPathAndDecrypt(walletPath, {password})
+    const keypair = await getWalletByPathAndDecrypt(walletPath, { password })
     const client = await initClient(host, keypair, internalUrl)
     await handleApiError(
       async () => print('Your balance is: ' + (await client.balance(await client.address())))
@@ -66,9 +66,9 @@ async function getBalance (walletPath, {host, internalUrl, password}) {
   }
 }
 
-async function getAddress (walletPath, {host, internalUrl, password, privateKey}) {
+async function getAddress (walletPath, { host, internalUrl, password, privateKey }) {
   try {
-    const keypair = await getWalletByPathAndDecrypt(walletPath, {password, privateKey})
+    const keypair = await getWalletByPathAndDecrypt(walletPath, { password, privateKey })
     const client = await initClient(host, keypair, internalUrl)
 
     await handleApiError(
@@ -79,17 +79,17 @@ async function getAddress (walletPath, {host, internalUrl, password, privateKey}
   }
 }
 
-async function createSecureWallet (walletPath, {output, password}) {
+async function createSecureWallet (walletPath, { output, password }) {
   try {
-    await generateSecureWallet(walletPath, {output, password})
+    await generateSecureWallet(walletPath, { output, password })
   } catch (e) {
     printError(e.message)
   }
 }
 
-async function createSecureWalletByPrivKey (walletPath, priv, {output, password}) {
+async function createSecureWalletByPrivKey (walletPath, priv, { output, password }) {
   try {
-    await generateSecureWalletFromPrivKey(walletPath, priv, {output, password})
+    await generateSecureWalletFromPrivKey(walletPath, priv, { output, password })
   } catch (e) {
     printError(e.message)
   }

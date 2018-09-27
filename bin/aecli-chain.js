@@ -27,7 +27,7 @@ const program = require('commander')
 
 require = require('esm')(module/*, options*/) //use to handle es6 import/export
 const utils = require('./utils/index')
-const {Chain} = require('./commands')
+const { Chain } = require('./commands')
 
 program
   .option('-H, --host [hostname]', 'Node to connect to', utils.constant.EPOCH_URL)

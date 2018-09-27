@@ -28,19 +28,19 @@ import { handleApiError } from '../utils/errors'
 import { printBlock, print, printBlockTransactions, printError } from '../utils/print'
 import { getBlock } from '../utils/helpers'
 
-async function version ({host, internalUrl}) {
+async function version ({ host, internalUrl }) {
   try {
     const client = await initClient(host, null, internalUrl)
     await handleApiError(async () => {
       const {nodeVersion} = await client.api.getStatus()
-      print(`Epoch node version____________  ${nodeVersion}`)
+      print(`Epoch node version____________  ${ nodeVersion }`)
     })
   } catch (e) {
     printError(e.message)
   }
 }
 
-async function top ({host, internalUrl, json}) {
+async function top ({ host, internalUrl, json }) {
   try {
     const client = await initClient(host, null, internalUrl)
     await handleApiError(
@@ -51,7 +51,7 @@ async function top ({host, internalUrl, json}) {
   }
 }
 
-async function mempool ({host, internalUrl, json}) {
+async function mempool ({ host, internalUrl, json }) {
   try {
     const client = await initClient(host, null, internalUrl)
 
@@ -69,7 +69,7 @@ async function mempool ({host, internalUrl, json}) {
   }
 }
 
-async function play ({host, height, limit, internalUrl, json}) {
+async function play ({ host, height, limit, internalUrl, json }) {
   limit = parseInt(limit)
   height = parseInt(height)
   try {

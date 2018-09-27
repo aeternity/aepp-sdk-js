@@ -55,7 +55,7 @@ export async function generateSecureWallet (name, {output, password}) {
   })
 }
 
-export async function generateSecureWalletFromPrivKey (name, priv, {output, password}) {
+export async function generateSecureWalletFromPrivKey (name, priv, { output, password }) {
   password = password || await promptPasswordAsync()
 
   const hexStr = Crypto.hexStringToByte(priv.trim())
@@ -82,7 +82,7 @@ export async function generateSecureWalletFromPrivKey (name, priv, {output, pass
   `)
 }
 
-export async function getWalletByPathAndDecrypt (walletPath, {privateKey, password} = {}) {
+export async function getWalletByPathAndDecrypt (walletPath, { privateKey, password } = {}) {
   try {
     if (privateKey) {
       const hexStr = Crypto.hexStringToByte(privateKey.trim())

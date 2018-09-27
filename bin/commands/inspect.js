@@ -72,7 +72,7 @@ async function inspect (hash, option) {
   }
 }
 
-async function getBlockByHash (hash, {host, internalUrl, json}) {
+async function getBlockByHash (hash, { host, internalUrl, json }) {
   try {
     checkPref(hash, [HASH_TYPES.block, HASH_TYPES.micro_block])
     const client = await initClient(host, null, internalUrl)
@@ -87,7 +87,7 @@ async function getBlockByHash (hash, {host, internalUrl, json}) {
   }
 }
 
-async function getTransactionByHash (hash, {host, internalUrl, json}) {
+async function getTransactionByHash (hash, { host, internalUrl, json }) {
   try {
     checkPref(hash, HASH_TYPES.transaction)
     const client = await initClient(host, null, internalUrl)
@@ -99,7 +99,7 @@ async function getTransactionByHash (hash, {host, internalUrl, json}) {
   }
 }
 
-async function getAccountByHash (hash, {host, internalUrl, json}) {
+async function getAccountByHash (hash, { host, internalUrl, json }) {
   try {
     checkPref(hash, HASH_TYPES.account)
     const client = await initClient(host, null, internalUrl)
@@ -118,7 +118,7 @@ async function getAccountByHash (hash, {host, internalUrl, json}) {
   }
 }
 
-async function getBlockByHeight (height, {host, internalUrl, json}) {
+async function getBlockByHeight (height, { host, internalUrl, json }) {
   height = parseInt(height)
   try {
     const client = await initClient(host, null, internalUrl)
@@ -131,12 +131,12 @@ async function getBlockByHeight (height, {host, internalUrl, json}) {
   }
 }
 
-async function getName (name, {host, internalUrl, json}) {
+async function getName (name, { host, internalUrl, json }) {
   try {
     if (R.last(name.split('.')) !== 'aet') throw new Error('AENS TLDs must end in .aet')
     const client = await initClient(host, null, internalUrl)
 
-    printName(Object.assign(await client.api.getNameEntryByName(name), {status: 'CLAIMED'}), json)
+    printName(Object.assign(await client.api.getNameEntryByName(name), { status: 'CLAIMED' }), json)
   } catch (e) {
     if (e.response && e.response.status === 404) {
       printName({status: 'AVAILABLE'}, json)
@@ -146,7 +146,7 @@ async function getName (name, {host, internalUrl, json}) {
   }
 }
 
-async function getContractByDescr (descrPath, {host, internalUrl, json}) {
+async function getContractByDescr (descrPath, { host, internalUrl, json }) {
   try {
     const descriptor = await readJSONFile(path.resolve(process.cwd(), descrPath))
     const client = await initClient(host, null, internalUrl)

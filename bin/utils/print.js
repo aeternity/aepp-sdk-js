@@ -14,7 +14,7 @@ export function printError (msg) {
   console.log(msg)
 }
 
-export function printConfig ({host}) {
+export function printConfig ({ host }) {
   print('WALLET_PUB___________' + process.env['WALLET_PUB'])
   print('EPOCH_URL___________' + host)
 }
@@ -56,16 +56,7 @@ export function printBlockTransactions (ts, json) {
   }
   ts.forEach(
     tx => {
-      print(`-->
-         Block hash_________________ ${tx.blockHash}
-         Block height_______________ ${tx.blockHeigh}
-         Tx hash____________________ ${tx.hash}
-         Signatures_________________ ${tx.signatures}
-         Tx Type____________________ ${R.defaultTo('N/A', R.path(['tx', 'type'], tx))}
-         Sender account_____________ ${R.defaultTo('N/A', R.path(['tx', 'senderId'], tx))}
-         Recipient account__________ ${R.defaultTo('N/A', R.path(['tx', 'recipientId'], tx))}
-         Nonce______________________ ${R.defaultTo('N/A', R.path(['tx', 'nonce'], tx))}
-         Amount_____________________ ${R.defaultTo('N/A', R.path(['tx', 'amount'], tx))}`)
+      printTransaction(tx)
     })
 }
 

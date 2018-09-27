@@ -1,5 +1,6 @@
 import * as R from 'ramda'
 import fs from "fs"
+
 import { HASH_TYPES } from './constant'
 import { printError } from './print'
 

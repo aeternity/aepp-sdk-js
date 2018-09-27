@@ -10,13 +10,13 @@ export function getCmdFromArguments (args) {
 }
 
 export async function initClient (url, keypair, internalUrl) {
-  return await Cli({url, process, keypair, internalUrl})
+  return await Cli({ url, process, keypair, internalUrl })
 }
 
 export function initExecCommands (program) {
-  return (cmds) => cmds.forEach(({name, desc}) => program.command(name, desc))
+  return (cmds) => cmds.forEach(({ name, desc }) => program.command(name, desc))
 }
 
 export function isExecCommand (cmd, commands) {
-  return commands.find(({name}) => cmd === name)
+  return commands.find(({ name }) => cmd === name)
 }

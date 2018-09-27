@@ -32,9 +32,7 @@ import { handleApiError } from '../utils/errors'
 import { printError, print, logContractDescriptor } from '../utils/print'
 import { getWalletByPathAndDecrypt } from '../utils/account'
 
-
-
-export async function compile (file, {host, internalUrl}) {
+export async function compile (file, { host, internalUrl }) {
   try {
     const code = readFile(path.resolve(process.cwd(), file), 'utf-8')
     if (!code) throw new Error('Contract file not found')
@@ -52,7 +50,7 @@ export async function compile (file, {host, internalUrl}) {
 
 }
 
-async function deploy (walletPath, contractPath, {host, gas, init, internalUrl, password, ttl, json}) {
+async function deploy (walletPath, contractPath, { host, gas, init, internalUrl, password, ttl, json  }) {
   // Deploy a contract to the chain and create a deploy descriptor
   // with the contract informations that can be use to invoke the contract
   // later on.
@@ -70,14 +68,14 @@ async function deploy (walletPath, contractPath, {host, gas, init, internalUrl, 
         // off to the node for bytecode compilation. This might in the future be done
         // without talking to the node, but requires a bytecode compiler
         // implementation directly in the SDK.
-        const contract = await client.contractCompile(contractFile, {gas})
+        const contract = await client.contractCompile(contractFile, { gas })
         // Invoking `deploy` on the bytecode object will result in the contract
         // being written to the chain, once the block has been mined.
         // Sophia contracts always have an `init` method which needs to be invoked,
         // even when the contract's `state` is `unit` (`()`). The arguments to
         // `init` have to be provided at deployment time and will be written to the
         // block as well, together with the contract's bytecode.
-        const deployDescriptor = await contract.deploy({initState: init, ttl})
+        const deployDescriptor = await contract.deploy({ initState: init, ttl })
 
         // Write contractDescriptor to file
         const descPath = `${R.last(contractPath.split('/'))}.deploy.${deployDescriptor.owner.slice(3)}.json`
@@ -103,7 +101,7 @@ async function deploy (walletPath, contractPath, {host, gas, init, internalUrl, 
   }
 }
 
-async function call (walletPath, descrPath, fn, returnType, args, {host, internalUrl, password}) {
+async function call (walletPath, descrPath, fn, returnType, args, { host, internalUrl, password }) {
   if (!path || !fn || !returnType) {
     program.outputHelp()
     process.exit(1)
@@ -117,7 +115,7 @@ async function call (walletPath, descrPath, fn, returnType, args, {host, interna
       async () => {
         args = args.filter(arg => arg !== '[object Object]')
         args = args.length ? `(${args.join(',')})` : '()'
-        const callResult = await client.contractCall(descr.bytecode, descr.abi || 'sophia', descr.address, fn, {args})
+        const callResult = await client.contractCall(descr.bytecode, descr.abi || 'sophia', descr.address, fn, { args })
         // The execution result, if successful, will be an AEVM-encoded result
         // value. Once type decoding will be implemented in the SDK, this value will
         // not be a hexadecimal string, anymore.
