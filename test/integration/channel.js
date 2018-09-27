@@ -27,6 +27,9 @@ describe('Epoch Channel', function () {
 
   let initiator
   let responder
+  let initiatorCh
+  let responderCh
+  let responderShouldRejectUpdate
 
   before(async function () {
     initiator = await ready(this)
@@ -35,7 +38,11 @@ describe('Epoch Channel', function () {
     await initiator.spend(100, await responder.address())
   })
 
-  it('should open a channel', async () => {
+  beforeEach(() => {
+    responderShouldRejectUpdate = false
+  })
+
+  it('can open a channel', async () => {
     function waitForChannel (channel) {
       return new Promise(resolve =>
         channel.on('statusChanged', (status) => {
@@ -58,16 +65,49 @@ describe('Epoch Channel', function () {
       port: 3001,
       lockPeriod: 10
     }
-    const initiatorCh = await Channel({
+    initiatorCh = await Channel({
       ...sharedParams,
       role: 'initiator',
       sign: async (tag, tx) => await initiator.signTransaction(tx)
     })
-    const responderCh = await Channel({
+    responderCh = await Channel({
       ...sharedParams,
       role: 'responder',
-      sign: async (tag, tx) => await responder.signTransaction(tx)
+      sign: async (tag, tx) => {
+        if (!responderShouldRejectUpdate) {
+          return await responder.signTransaction(tx)
+        }
+        return null
+      }
     })
     return Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
+  })
+
+  it('can post update and accept', async () => {
+    responderShouldRejectUpdate = false
+    const result = await initiatorCh.update(
+      await initiator.address(),
+      await responder.address(),
+      1,
+      async (tx) => await initiator.signTransaction(tx)
+    )
+    result.accepted.should.equal(true)
+    result.state.should.be.a('string')
+  })
+
+  it('can post update and reject', async () => {
+    responderShouldRejectUpdate = true
+    const result = await initiatorCh.update(
+      await responder.address(),
+      await initiator.address(),
+      1,
+      async (tx) => await initiator.signTransaction(tx)
+    )
+    result.accepted.should.equal(false)
+  })
+
+  it('can close a channel', async () => {
+    const tx = await initiatorCh.shutdown(async (tx) => await initiator.signTransaction(tx))
+    tx.should.be.a('string')
   })
 })

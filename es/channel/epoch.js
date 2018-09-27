@@ -178,7 +178,7 @@ function awaitingOffChainUpdate (channel, message, state) {
     return {handler: channelOpen}
   }
   if (message.action === 'conflict') {
-    state.callback(null, {accepted: false, state: {}})
+    state.callback(null, {accepted: false})
     return {handler: channelOpen}
   }
 }
@@ -271,7 +271,7 @@ function processMessageQueue (channel) {
 }
 
 function sendNextUpdate (channel) {
-  const queue = messageQueue.get(channel) || []
+  const queue = pendingUpdates.get(channel) || []
   if (currentState.get(channel).handler !== channelOpen || !queue.length) {
     return
   }
