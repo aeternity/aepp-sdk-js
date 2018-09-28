@@ -23,10 +23,10 @@
 
 import bs58check from 'bs58check'
 import RLP from 'rlp'
-import {blake2b} from 'blakejs'
+import { blake2b } from 'blakejs'
 import nacl from 'tweetnacl'
 import aesjs from 'aes-js'
-import {leftPad, rightPad} from './bytes'
+import { leftPad, rightPad } from './bytes'
 import shajs from 'sha.js'
 
 const Ecb = aesjs.ModeOfOperation.ecb
@@ -98,6 +98,35 @@ export function encodeBase58Check (input) {
  */
 export function decodeBase58Check (str) {
   return bs58check.decode(str)
+}
+
+/**
+ * Conver hex string to Uint8Array
+ * @rtype (str: String) => Uint8Array
+ * @param {String} str - Data to conver
+ * @return {Uint8Array} - converted data
+ */
+export function hexStringToByte (str) {
+  if (!str) {
+    return new Uint8Array()
+  }
+
+  var a = []
+  for (var i = 0, len = str.length; i < len; i += 2) {
+    a.push(parseInt(str.substr(i, 2), 16))
+  }
+
+  return new Uint8Array(a)
+}
+
+/**
+ * Generate keyPair from secret key
+ * @rtype (secret: Uint8Array) => KeyPair
+ * @param {Uint8Array} secret - secret key
+ * @return {Object} - Object with Private(privateKey) and Public(publicKey) keys
+ */
+export function generateKeyPairFromSecret (secret) {
+  return nacl.sign.keyPair.fromSecretKey(secret)
 }
 
 /**

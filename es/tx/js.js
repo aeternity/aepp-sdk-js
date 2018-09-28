@@ -23,7 +23,7 @@
  */
 
 import stampit from '@stamp/it'
-import {encodeBase58Check, hash, nameId, salt} from '../utils/crypto'
+import { encodeBase58Check, hash, nameId, salt } from '../utils/crypto'
 
 const createSalt = salt
 
@@ -61,6 +61,6 @@ async function commitmentHash (name, salt = createSalt()) {
  * @return {Object} Tx instance
  * @example JsTx()
  */
-const JsTx = stampit({methods: {commitmentHash}})
+const JsTx = stampit({ methods: { commitmentHash } })
 
 export default JsTx

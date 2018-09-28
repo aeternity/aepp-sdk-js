@@ -16,7 +16,7 @@
  */
 
 import '../'
-import {describe, it} from 'mocha'
+import { describe, it } from 'mocha'
 import AsyncInit from '../../es/utils/async-init'
 
 describe('AsyncInit', function () {

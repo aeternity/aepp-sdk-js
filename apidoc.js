@@ -41,11 +41,11 @@ function createDirs (path) {
   }, paths)
 }
 
-const modules = R.map(({name}) => {
-  return {name, out: `api/${name.replace(prefix, '')}`}
+const modules = R.map(({ name }) => {
+  return { name, out: `api/${name.replace(prefix, '')}` }
 }, R.filter(R.propEq('kind', 'module'), templateData))
 
-R.forEachObjIndexed(({name, out}) => {
+R.forEachObjIndexed(({ name, out }) => {
   const template = `{{#module name="${name}"}}{{>docs}}{{/module}}`
   console.log(`rendering ${name}`)
   const dest = path.resolve(outputDir, `${out}.md`)

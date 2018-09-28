@@ -21,7 +21,7 @@ import uuid from 'uuid/v4'
 
 function createSession () {
   const id = uuid()
-  this.rpcSessions[id] = {id}
+  this.rpcSessions[id] = { id }
   return id
 }
 
@@ -29,30 +29,30 @@ function hello () {
   return Promise.resolve(this.createSession())
 }
 
-async function receive ({data, source}) {
-  const {id, method, params, session} = data
+async function receive ({ data, source }) {
+  const { id, method, params, session } = data
 
   function error () {
     return Promise.reject(Error(`Error: No such method ${method}`))
   }
 
-  R.call(this.rpcMethods[method].bind(this) || error, {params, session: this.rpcSessions[session]}).then(result => {
-    source.postMessage({jsonrpc: '2.0', id, result: {resolve: result}}, '*')
+  R.call(this.rpcMethods[method].bind(this) || error, { params, session: this.rpcSessions[session] }).then(result => {
+    source.postMessage({ jsonrpc: '2.0', id, result: { resolve: result } }, '*')
   }).catch(error => {
-    source.postMessage({jsonrpc: '2.0', id, result: {reject: error.message}}, '*')
+    source.postMessage({ jsonrpc: '2.0', id, result: { reject: error.message } }, '*')
   })
 }
 
 const RpcServer = stampit({
-  init ({self = window}) {
+  init ({ self = window }) {
     self.addEventListener('message', e => this.receive(e), false)
   },
-  methods: {receive, createSession},
+  methods: { receive, createSession },
   props: {
     rpcSessions: {}
   },
   deepProps: {
-    rpcMethods: {hello}
+    rpcMethods: { hello }
   }
 })
 

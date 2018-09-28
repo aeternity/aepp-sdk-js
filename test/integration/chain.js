@@ -15,15 +15,15 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import {describe, it, before} from 'mocha'
-import {configure, ready} from './'
-import {generateKeyPair} from '../../es/utils/crypto'
+import { describe, it, before } from 'mocha'
+import { configure, ready } from './'
+import { generateKeyPair } from '../../es/utils/crypto'
 
 describe('Epoch Chain', function () {
   configure(this)
 
   let client
-  const {pub} = generateKeyPair()
+  const { pub } = generateKeyPair()
 
   before(async function () {
     client = await ready(this)
@@ -35,14 +35,14 @@ describe('Epoch Chain', function () {
 
   it('waits for specified heights', async () => {
     const target = await client.height() + 2
-    await client.awaitHeight(target, {attempts: 120}).should.eventually.be.at.least(target)
+    await client.awaitHeight(target, { attempts: 120 }).should.eventually.be.at.least(target)
     return client.height().should.eventually.be.at.least(target)
   })
 
   it('polls for transactions', async () => {
     const sender = await client.address()
     const receiver = pub
-    const {tx} = await client.api.postSpend({
+    const { tx } = await client.api.postSpend({
       fee: 1,
       amount: 1,
       senderId: sender,
@@ -51,9 +51,9 @@ describe('Epoch Chain', function () {
       ttl: Number.MAX_SAFE_INTEGER
     })
     const signed = await client.signTransaction(tx)
-    const {txHash} = await client.api.postTransaction({tx: signed})
+    const { txHash } = await client.api.postTransaction({ tx: signed })
 
     await client.poll(txHash).should.eventually.be.fulfilled
-    return client.poll('th_xxx', {blocks: 1}).should.eventually.be.rejected
+    return client.poll('th_xxx', { blocks: 1 }).should.eventually.be.rejected
   })
 })
