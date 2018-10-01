@@ -20,8 +20,8 @@ import Cli from '../../es/ae/cli'
 
 export function getCmdFromArguments (args) {
   return R.merge(
-    R.last(args),
-    R.last(args).parent
+    R.head(args),
+    R.head(args).parent
   )
 }
 

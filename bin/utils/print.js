@@ -72,7 +72,8 @@ export function printBlockTransactions (ts, json) {
     return
   }
   ts.forEach(
-    tx => {
+    (tx, i) => {
+      if (i !== 0) print('--------->')
       printTransaction(tx)
     })
 }

@@ -75,7 +75,7 @@ async function deploy (walletPath, contractPath, options) {
         // even when the contract's `state` is `unit` (`()`). The arguments to
         // `init` have to be provided at deployment time and will be written to the
         // block as well, together with the contract's bytecode.
-        const deployDescriptor = await contract.deploy({ initState: init, ttl })
+        const deployDescriptor = await contract.deploy({ initState: init, options: { ttl }})
 
         // Write contractDescriptor to file
         const descPath = `${R.last(contractPath.split('/'))}.deploy.${deployDescriptor.owner.slice(3)}.json`
@@ -116,7 +116,7 @@ async function call (walletPath, descrPath, fn, returnType, args, options) {
       async () => {
         args = args.filter(arg => arg !== '[object Object]')
         args = args.length ? `(${args.join(',')})` : '()'
-        const callResult = await client.contractCall(descr.bytecode, descr.abi || 'sophia', descr.address, fn, { args })
+        const callResult = await client.contractCall(descr.bytecode, descr.abi || 'sophia', descr.address, fn, { args, options })
         // The execution result, if successful, will be an AEVM-encoded result
         // value. Once type decoding will be implemented in the SDK, this value will
         // not be a hexadecimal string, anymore.
