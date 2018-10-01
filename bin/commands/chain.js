@@ -28,9 +28,9 @@ import { handleApiError } from '../utils/errors'
 import { printBlock, print, printBlockTransactions, printError } from '../utils/print'
 import { getBlock } from '../utils/helpers'
 
-async function version ({ host, internalUrl }) {
+async function version (options) {
   try {
-    const client = await initClient(host, null, internalUrl)
+    const client = await initClient(options)
     await handleApiError(async () => {
       const {nodeVersion} = await client.api.getStatus()
       print(`Epoch node version____________  ${ nodeVersion }`)
@@ -40,9 +40,10 @@ async function version ({ host, internalUrl }) {
   }
 }
 
-async function top ({ host, internalUrl, json }) {
+async function top (options) {
+  const { json } = options
   try {
-    const client = await initClient(host, null, internalUrl)
+    const client = await initClient(options)
     await handleApiError(
       async () => printBlock(await client.api.getTopBlock(), json)
     )
@@ -51,9 +52,10 @@ async function top ({ host, internalUrl, json }) {
   }
 }
 
-async function mempool ({ host, internalUrl, json }) {
+async function mempool (options) {
+  const { json } = options
   try {
-    const client = await initClient(host, null, internalUrl)
+    const client = await initClient(options)
 
     await handleApiError(async () => {
       const {transactions} = await client.mempool()
@@ -69,11 +71,12 @@ async function mempool ({ host, internalUrl, json }) {
   }
 }
 
-async function play ({ host, height, limit, internalUrl, json }) {
+async function play (options) {
+  let { height, limit, json } = options
   limit = parseInt(limit)
   height = parseInt(height)
   try {
-    const client = await initClient(host, null, internalUrl)
+    const client = await initClient(options)
 
     await handleApiError(async () => {
       const top = await client.api.getTopBlock()

@@ -32,12 +32,12 @@ import { handleApiError } from '../utils/errors'
 import { printError, print, logContractDescriptor } from '../utils/print'
 import { getWalletByPathAndDecrypt } from '../utils/account'
 
-export async function compile (file, { host, internalUrl }) {
+export async function compile (file, options) {
   try {
     const code = readFile(path.resolve(process.cwd(), file), 'utf-8')
     if (!code) throw new Error('Contract file not found')
 
-    const client = await initClient(host, null, internalUrl)
+    const client = await initClient(options)
 
     await handleApiError(async () => {
       const contract = await client.contractCompile(code)
@@ -47,10 +47,10 @@ export async function compile (file, { host, internalUrl }) {
   } catch (e) {
     printError(e.message)
   }
-
 }
 
-async function deploy (walletPath, contractPath, { host, gas, init, internalUrl, password, ttl, json  }) {
+async function deploy (walletPath, contractPath, options) {
+  const { gas, init, password, json } = options
   // Deploy a contract to the chain and create a deploy descriptor
   // with the contract informations that can be use to invoke the contract
   // later on.
@@ -59,7 +59,7 @@ async function deploy (walletPath, contractPath, { host, gas, init, internalUrl,
   // deploy descriptor
   try {
     const keypair = await getWalletByPathAndDecrypt(walletPath, { password })
-    const client = await initClient(host, keypair, internalUrl)
+    const client = await initClient(R.merge(options, { keypair }))
     const contractFile = readFile(path.resolve(process.cwd(), contractPath), 'utf-8')
 
     await handleApiError(
@@ -108,7 +108,7 @@ async function call (walletPath, descrPath, fn, returnType, args, { host, intern
   }
   try {
     const keypair = await getWalletByPathAndDecrypt(walletPath, { password })
-    const client = await initClient(host, keypair, internalUrl)
+    const client = await initClient(R.merge(options, { keypair }))
     const descr = await readJSONFile(path.resolve(process.cwd(), descrPath))
 
     await handleApiError(

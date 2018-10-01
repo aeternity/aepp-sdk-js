@@ -17,7 +17,6 @@
  */
 'use strict'
 
-
 const program = require('commander')
 
 require = require('esm')(module/*, options*/) //use to handle es6 import/export

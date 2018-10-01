@@ -72,10 +72,11 @@ async function inspect (hash, option) {
   }
 }
 
-async function getBlockByHash (hash, { host, internalUrl, json }) {
+async function getBlockByHash (hash, options) {
+  const { json } = options
   try {
     checkPref(hash, [HASH_TYPES.block, HASH_TYPES.micro_block])
-    const client = await initClient(host, null, internalUrl)
+    const client = await initClient(options)
     await handleApiError(
       async () => printBlock(
         await getBlock(hash)(client),
@@ -87,10 +88,11 @@ async function getBlockByHash (hash, { host, internalUrl, json }) {
   }
 }
 
-async function getTransactionByHash (hash, { host, internalUrl, json }) {
+async function getTransactionByHash (hash, options) {
+  const { josn } = options
   try {
     checkPref(hash, HASH_TYPES.transaction)
-    const client = await initClient(host, null, internalUrl)
+    const client = await initClient(options)
     await handleApiError(
       async () => printTransaction(await client.tx(hash), json)
     )
@@ -99,10 +101,11 @@ async function getTransactionByHash (hash, { host, internalUrl, json }) {
   }
 }
 
-async function getAccountByHash (hash, { host, internalUrl, json }) {
+async function getAccountByHash (hash, options) {
+  const { josn } = options
   try {
     checkPref(hash, HASH_TYPES.account)
-    const client = await initClient(host, null, internalUrl)
+    const client = await initClient(options)
     await handleApiError(
       async () => {
         const {balance, id, nonce} = await client.api.getAccountByPubkey(hash)
@@ -118,10 +121,11 @@ async function getAccountByHash (hash, { host, internalUrl, json }) {
   }
 }
 
-async function getBlockByHeight (height, { host, internalUrl, json }) {
+async function getBlockByHeight (height, options) {
+  const { josn } = options
   height = parseInt(height)
   try {
-    const client = await initClient(host, null, internalUrl)
+    const client = await initClient(options)
 
     await handleApiError(
       async () => printBlock(await client.api.getKeyBlockByHeight(height), json)
@@ -131,25 +135,27 @@ async function getBlockByHeight (height, { host, internalUrl, json }) {
   }
 }
 
-async function getName (name, { host, internalUrl, json }) {
+async function getName (name, options) {
+  const { josn } = options
   try {
     if (R.last(name.split('.')) !== 'aet') throw new Error('AENS TLDs must end in .aet')
-    const client = await initClient(host, null, internalUrl)
+    const client = await initClient(options)
 
     printName(Object.assign(await client.api.getNameEntryByName(name), { status: 'CLAIMED' }), json)
   } catch (e) {
     if (e.response && e.response.status === 404) {
-      printName({status: 'AVAILABLE'}, json)
+      printName({ status: 'AVAILABLE' }, json)
       process.exit(1)
     }
     printError(e.message)
   }
 }
 
-async function getContractByDescr (descrPath, { host, internalUrl, json }) {
+async function getContractByDescr (descrPath, options) {
+  const { josn } = options
   try {
     const descriptor = await readJSONFile(path.resolve(process.cwd(), descrPath))
-    const client = await initClient(host, null, internalUrl)
+    const client = await initClient(options)
 
     await handleApiError(
       async () => {

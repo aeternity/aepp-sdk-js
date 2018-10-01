@@ -32,12 +32,13 @@ import { handleApiError } from '../utils/errors'
 import { print, printError, printTransaction } from '../utils/print'
 import { checkPref } from '../utils/helpers'
 
-async function spend (walletPath, receiver, amount, { host, ttl, internalUrl, password, json }) {
+async function spend (walletPath, receiver, amount, options) {
+  let { ttl, password, json } = options
   ttl = parseInt(ttl)
   try {
     checkPref(receiver, HASH_TYPES.account)
     const keypair = await getWalletByPathAndDecrypt(walletPath, { password })
-    const client = await initClient(host, keypair, internalUrl)
+    const client = await initClient(R.merge(options, { keypair }))
 
     await handleApiError(async () => {
       let tx = await client.spend(parseInt(amount), receiver, { ttl })
@@ -57,7 +58,7 @@ async function spend (walletPath, receiver, amount, { host, ttl, internalUrl, pa
 async function getBalance (walletPath, { host, internalUrl, password }) {
   try {
     const keypair = await getWalletByPathAndDecrypt(walletPath, { password })
-    const client = await initClient(host, keypair, internalUrl)
+    const client = await initClient(R.merge(options, { keypair }))
     await handleApiError(
       async () => print('Your balance is: ' + (await client.balance(await client.address())))
     )
@@ -66,10 +67,11 @@ async function getBalance (walletPath, { host, internalUrl, password }) {
   }
 }
 
-async function getAddress (walletPath, { host, internalUrl, password, privateKey }) {
+async function getAddress (walletPath, options) {
+  const { password, privateKey } = options
   try {
     const keypair = await getWalletByPathAndDecrypt(walletPath, { password, privateKey })
-    const client = await initClient(host, keypair, internalUrl)
+    const client = await initClient(R.merge(options, { keypair }))
 
     await handleApiError(
       async () => print('Your address is: ' + await client.address())
