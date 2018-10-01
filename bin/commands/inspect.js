@@ -89,7 +89,7 @@ async function getBlockByHash (hash, options) {
 }
 
 async function getTransactionByHash (hash, options) {
-  const { josn } = options
+  const { json } = options
   try {
     checkPref(hash, HASH_TYPES.transaction)
     const client = await initClient(options)
@@ -102,7 +102,7 @@ async function getTransactionByHash (hash, options) {
 }
 
 async function getAccountByHash (hash, options) {
-  const { josn } = options
+  const { json } = options
   try {
     checkPref(hash, HASH_TYPES.account)
     const client = await initClient(options)
@@ -122,7 +122,7 @@ async function getAccountByHash (hash, options) {
 }
 
 async function getBlockByHeight (height, options) {
-  const { josn } = options
+  const { json } = options
   height = parseInt(height)
   try {
     const client = await initClient(options)
@@ -136,7 +136,7 @@ async function getBlockByHeight (height, options) {
 }
 
 async function getName (name, options) {
-  const { josn } = options
+  const { json } = options
   try {
     if (R.last(name.split('.')) !== 'aet') throw new Error('AENS TLDs must end in .aet')
     const client = await initClient(options)
@@ -152,7 +152,7 @@ async function getName (name, options) {
 }
 
 async function getContractByDescr (descrPath, options) {
-  const { josn } = options
+  const { json } = options
   try {
     const descriptor = await readJSONFile(path.resolve(process.cwd(), descrPath))
     const client = await initClient(options)

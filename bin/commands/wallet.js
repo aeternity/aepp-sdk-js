@@ -25,6 +25,8 @@
 //
 //
 
+import * as R from 'ramda'
+
 import { generateSecureWallet, generateSecureWalletFromPrivKey, getWalletByPathAndDecrypt } from '../utils/account'
 import { HASH_TYPES } from '../utils/constant'
 import { initClient } from '../utils/cli'
@@ -55,7 +57,8 @@ async function spend (walletPath, receiver, amount, options) {
   }
 }
 
-async function getBalance (walletPath, { host, internalUrl, password }) {
+async function getBalance (walletPath, options) {
+  const { password, json } = options
   try {
     const keypair = await getWalletByPathAndDecrypt(walletPath, { password })
     const client = await initClient(R.merge(options, { keypair }))

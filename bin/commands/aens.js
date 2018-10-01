@@ -47,7 +47,7 @@ const validateName = (name) => {
 }
 
 async function claim (walletPath, domain, options) {
-  const { ttl, nameTtl } = options
+  const { ttl, nameTtl, password } = options
   try {
     validateName(domain)
     const keypair = await getWalletByPathAndDecrypt(walletPath, { password })
@@ -79,7 +79,7 @@ async function claim (walletPath, domain, options) {
 }
 
 async function transferName (walletPath, domain, address, options) {
-  const { ttl, nameTtl } = options
+  const { ttl, nameTtl, password } = options
   if (!address) {
     program.outputHelp()
     process.exit(1)
@@ -96,7 +96,7 @@ async function transferName (walletPath, domain, address, options) {
       process.exit(1)
     }
 
-    const transferTX = await client.aensTransfer(name.id, address, { ttl })
+    const transferTX = await client.aensTransfer(name.id, address, { ttl, nameTtl })
     print('Transfer Success')
     print('Transaction hash -------> ' + transferTX.hash)
   } catch (e) {
@@ -105,7 +105,7 @@ async function transferName (walletPath, domain, address, options) {
 }
 
 async function updateName (walletPath, domain, address, options) {
-  const { ttl, nameTtl } = options
+  const { ttl, nameTtl, password } = options
   if (!address) {
     program.outputHelp()
     process.exit(1)
@@ -131,7 +131,7 @@ async function updateName (walletPath, domain, address, options) {
 }
 
 async function revokeName (walletPath, domain, options) {
-  const { ttl, nameTtl } = options
+  const { ttl, password } = options
   try {
     const keypair = await getWalletByPathAndDecrypt(walletPath, { password })
     const client = await initClient(R.merge(options, { keypair }))
