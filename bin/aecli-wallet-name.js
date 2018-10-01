@@ -53,10 +53,11 @@ initAensName()
 
 program
   .usage('<aens-name> [options] [commands]')
-  .option('-H, --host [hostname]', 'Node to connect to', HOST)
-  .option('-U, --internalUrl [internal]', 'Node to connect to(internal)', INTERNAL_URL)
+  .option('--host [hostname]', 'Node to connect to', HOST)
+  .option('--internalUrl [internal]', 'Node to connect to(internal)', INTERNAL_URL)
   .option('-N, --nameTtl [nameTtl]', 'Name life Ttl', 50000)
   .option('-T, --ttl [ttl]', 'Life Ttl', 50000)
+  .option('-f --force', 'Ignore epoch version compatibility check')
 
 program
   .command('claim')

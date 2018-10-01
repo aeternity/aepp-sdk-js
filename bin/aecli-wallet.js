@@ -73,6 +73,7 @@ initWallet()
 program
   .option('-O, --output [output]', 'Output directory', '.')
   .option('-T, --ttl [ttl]', 'Validity of the spend transaction in number of blocks (default forever)', Number.MAX_SAFE_INTEGER)
+  .option('-f --force', 'Ignore epoch version compatibility check')
   .usage('<wallet-name> [options] [commands]')
 
 // INIT EXECUTABLE COMMANDS
@@ -123,8 +124,8 @@ async function initWallet () {
         // Add host option if it is no sub-command (commander issue with parsing options in sub-command)
         if (!EXECUTABLE_CMD.find(cmd => cmd.name === command)) {
           program
-            .option('-H, --host [hostname]', 'Node to connect to', HOST)
-            .option('-U, --internalUrl [internal]', 'Node to connect to(internal)', INTERNAL_URL)
+            .option('--host [hostname]', 'Node to connect to', HOST)
+            .option('--internalUrl [internal]', 'Node to connect to(internal)', INTERNAL_URL)
         }
         resolve()
       })

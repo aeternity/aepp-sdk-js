@@ -23,6 +23,7 @@
 // | |\  | (_| | | | | | |  __/\__ \
 // |_| \_|\__,_|_| |_| |_|\___||___/
 
+import * as R from 'ramda'
 import {
   initClient,
   print,
@@ -41,10 +42,11 @@ const updateNameStatus = (name) => async (client) => {
 
 const isAvailable = (name) => name.status === 'AVAILABLE'
 
-async function claim (domain, { host, ttl, nameTtl, internalUrl }) {
+async function claim (domain, options) {
+  const { ttl, nameTtl } = options
   try {
     const keypair = await getWalletByPathAndDecrypt()
-    const client = await initClient(host, keypair, internalUrl)
+    const client = await initClient(R.merge(options, { keypair }))
 
     // Retrieve name
     const name = await updateNameStatus(domain)(client)
@@ -71,14 +73,15 @@ async function claim (domain, { host, ttl, nameTtl, internalUrl }) {
   }
 }
 
-async function transferName (domain, address, { host, ttl, nameTtl, internalUrl }) {
+async function transferName (domain, address, options) {
+  const { ttl, nameTtl } = options
   if (!address) {
     program.outputHelp()
     process.exit(1)
   }
   try {
     const keypair = await getWalletByPathAndDecrypt()
-    const client = await initClient(host, keypair, internalUrl)
+    const client = await initClient(R.merge(options, { keypair }))
 
     // Retrieve name
     const name = await updateNameStatus(domain)(client)
@@ -96,7 +99,8 @@ async function transferName (domain, address, { host, ttl, nameTtl, internalUrl 
   }
 }
 
-async function updateName (domain, address, { host, ttl, nameTtl, internalUrl }) {
+async function updateName (domain, address, options) {
+  const { ttl, nameTtl } = options
   if (!address) {
     program.outputHelp()
     process.exit(1)
@@ -104,7 +108,7 @@ async function updateName (domain, address, { host, ttl, nameTtl, internalUrl })
 
   try {
     const keypair = await getWalletByPathAndDecrypt()
-    const client = await initClient(host, keypair, internalUrl)
+    const client = await initClient(R.merge(options, { keypair }))
 
     // Retrieve name
     const name = await updateNameStatus(domain)(client)
@@ -121,10 +125,11 @@ async function updateName (domain, address, { host, ttl, nameTtl, internalUrl })
   }
 }
 
-async function revokeName (domain, { host, ttl, nameTtl, internalUrl }) {
+async function revokeName (domain, options) {
+  const { ttl, nameTtl } = options
   try {
     const keypair = await getWalletByPathAndDecrypt()
-    const client = await initClient(host, keypair, internalUrl)
+    const client = await initClient(R.merge(options, { keypair }))
 
     // Retrieve name
     const name = await updateNameStatus(domain)(client)

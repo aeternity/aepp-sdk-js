@@ -37,8 +37,8 @@ program
   .command('config')
   .description('Print the client configuration')
   .action((cmd) => printConfig(cmd))
-  .option('-H, --host [hostname]', 'Node to connect to', HOST)
-  .option('-U, --internalUrl [internal]', 'Node to connect to(internal)', INTERNAL_URL)
+  .option('--host [hostname]', 'Node to connect to', HOST)
+  .option('--internalUrl [internal]', 'Node to connect to(internal)', INTERNAL_URL)
 
 // INIT EXEC COMMANDS
 initExecCommands(program)(EXECUTABLE_CMD)

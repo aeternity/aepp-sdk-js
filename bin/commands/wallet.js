@@ -25,6 +25,7 @@
 //
 //
 
+import * as R from 'ramda'
 import {
   initClient,
   generateSecureWallet,
@@ -38,12 +39,13 @@ import {
   HASH_TYPES
 } from '../utils'
 
-async function spend (receiver, amount, { host, ttl, internalUrl }) {
+async function spend (receiver, amount, options) {
+  let { ttl } = options
   ttl = parseInt(ttl)
   try {
     checkPref(receiver, HASH_TYPES.account)
     const keypair = await getWalletByPathAndDecrypt()
-    const client = await initClient(host, keypair, internalUrl)
+    const client = await initClient(R.merge(options, { keypair }))
 
     await handleApiError(async () => {
       let tx = await client.spend(parseInt(amount), receiver, { ttl })
@@ -60,10 +62,10 @@ async function spend (receiver, amount, { host, ttl, internalUrl }) {
   }
 }
 
-async function getBalance ({ host, internalUrl }) {
+async function getBalance (options) {
   try {
     const keypair = await getWalletByPathAndDecrypt()
-    const client = await initClient(host, keypair, internalUrl)
+    const client = await initClient(R.merge(options, { keypair }))
     await handleApiError(
       async () => print('Your balance is: ' + (await client.balance(await client.address())))
     )
@@ -72,10 +74,10 @@ async function getBalance ({ host, internalUrl }) {
   }
 }
 
-async function getAddress ({ host, internalUrl }) {
+async function getAddress (options) {
   try {
     const keypair = await getWalletByPathAndDecrypt()
-    const client = await initClient(host, keypair, internalUrl)
+    const client = await initClient(R.merge(options, { keypair }))
 
     await handleApiError(
       async () => print('Your address is: ' + await client.address())

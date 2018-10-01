@@ -35,10 +35,11 @@ require = require('esm')(module/*, options*/) //use to handle es6 import/export
 const {Contract} = require('./commands')
 
 program
-  .option('-H, --host [hostname]', 'Node to connect to', HOST)
-  .option('-U, --internalUrl [internal]', 'Node to connect to(internal)', INTERNAL_URL)
+  .option('--host [hostname]', 'Node to connect to', HOST)
+  .option('--internalUrl [internal]', 'Node to connect to(internal)', INTERNAL_URL)
   .option('-I, --init [state]', 'Deploying contract arguments for constructor function')
   .option('-G --gas [gas]', 'Amount of gas to deploy the contract', 40000000)
+  .option('-f --force', 'Ignore epoch version compatibility check')
 
 program
   .command('call <desc_path> <fn> <return_type> [args...]')

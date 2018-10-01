@@ -286,8 +286,8 @@ function getCmdFromArguments (args) {
   )
 }
 
-async function initClient (url, keypair, internalUrl) {
-  return await Cli({ url, process, keypair, internalUrl })
+async function initClient ({host: url, keypair, internalUrl, force: forceCompatibility}) {
+  return await Cli({ url, process, keypair, internalUrl, forceCompatibility })
 }
 
 function initExecCommands (program) {

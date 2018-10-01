@@ -38,12 +38,12 @@ import {
   readJSONFile
 } from '../utils'
 
-export async function compile (file, { host, internalUrl }) {
+export async function compile (file, options) {
   try {
     const code = readFile(path.resolve(process.cwd(), file), 'utf-8')
     if (!code) throw new Error('Contract file not found')
 
-    const client = await initClient(host, null, internalUrl)
+    const client = await initClient(options)
 
     await handleApiError(async () => {
       const contract = await client.contractCompile(code)
@@ -55,7 +55,8 @@ export async function compile (file, { host, internalUrl }) {
   }
 }
 
-async function deploy (contractPath, { host, gas, init, internalUrl }) {
+async function deploy (contractPath, options) {
+  const { gas, init } = options
   // Deploy a contract to the chain and create a deploy descriptor
   // with the contract informations that can be use to invoke the contract
   // later on.
@@ -65,7 +66,7 @@ async function deploy (contractPath, { host, gas, init, internalUrl }) {
   try {
     const contractFile = readFile(path.resolve(process.cwd(), contractPath), 'utf-8')
     const keypair = await getWalletByPathAndDecrypt()
-    const client = await initClient(host, keypair, internalUrl)
+    const client = await initClient(R.merge(options, { keypair }))
 
     await handleApiError(
       async () => {
@@ -106,7 +107,7 @@ async function deploy (contractPath, { host, gas, init, internalUrl }) {
   }
 }
 
-async function call (descrPath, fn, returnType, args, { host, internalUrl }) {
+async function call (descrPath, fn, returnType, args, options) {
   if (!path || !fn || !returnType) {
     program.outputHelp()
     process.exit(1)
@@ -114,7 +115,7 @@ async function call (descrPath, fn, returnType, args, { host, internalUrl }) {
   try {
     const descr = await readJSONFile(path.resolve(process.cwd(), descrPath))
     const keypair = await getWalletByPathAndDecrypt()
-    const client = await initClient(host, keypair, internalUrl)
+    const client = await initClient(R.merge(options, { keypair }))
 
     await handleApiError(
       async () => {

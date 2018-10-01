@@ -32,8 +32,9 @@ require = require('esm')(module/*, options */) // use to handle es6 import/expor
 const { Inspect } = require('./commands')
 
 program
-  .option('-H, --host [hostname]', 'Node to connect to', HOST)
-  .option('-U, --internalUrl [internal]', 'Node to connect to(internal)', INTERNAL_URL)
+  .option('--host [hostname]', 'Node to connect to', HOST)
+  .option('--internalUrl [internal]', 'Node to connect to(internal)', INTERNAL_URL)
+  .option('-f --force', 'Ignore epoch version compatibility check')
 
 program
   .arguments('<hash>')

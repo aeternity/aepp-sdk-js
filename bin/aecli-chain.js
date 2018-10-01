@@ -30,10 +30,11 @@ require = require('esm')(module/*, options*/) //use to handle es6 import/export
 const {Chain} = require('./commands')
 
 program
-  .option('-H, --host [hostname]', 'Node to connect to', HOST)
-  .option('-U, --internalUrl [internal]', 'Node to connect to(internal)', INTERNAL_URL)
-  .option('-L --limit [playlimit]', 'Limit for play command', 10)
-  .option('-P --height [playToHeight]', 'Play to selected height')
+  .option('--host [hostname]', 'Node to connect to', HOST)
+  .option('--internalUrl [internal]', 'Node to connect to(internal)', INTERNAL_URL)
+  .option('-f --force', 'Ignore epoch version compatibility check')
+  .option('-l --limit [playlimit]', 'Limit for play command', 10)
+  .option('-h --height [playToHeight]', 'Play to selected height')
 
 program
   .command('top')
