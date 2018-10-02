@@ -25,15 +25,17 @@
 //                   | |
 //                   |_|
 
-const { HOST, INTERNAL_URL } = require('./utils')
 const program = require('commander')
 
-require = require('esm')(module/*, options */) // use to handle es6 import/export
+require = require('esm')(module/*, options*/) //use to handle es6 import/export
+const utils = require('./utils/index')
 const { Inspect } = require('./commands')
 
 program
-  .option('-H, --host [hostname]', 'Node to connect to', HOST)
-  .option('-U, --internalUrl [internal]', 'Node to connect to(internal)', INTERNAL_URL)
+  .option('--host [hostname]', 'Node to connect to', utils.constant.EPOCH_URL)
+  .option('--internalUrl [internal]', 'Node to connect to(internal)', utils.constant.EPOCH_INTERNAL_URL)
+  .option('-f --force', 'Ignore epoch version compatibility check')
+  .option('--json', 'Print result in json format')
 
 program
   .arguments('<hash>')

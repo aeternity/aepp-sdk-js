@@ -20,7 +20,7 @@ const fs = require('fs')
 const prompt = require('prompt')
 const path = require('path')
 
-const { unknownCommandHandler } = require('./utils')
+const utils = require('./utils/index')
 
 require = require('esm')(module/*, options */) // use to handle es6 import/export
 const Crypto = require('../es/utils/crypto')
@@ -146,7 +146,7 @@ program
   .action(unpackTx)
 
 // HANDLE UNKNOWN COMMAND
-program.on('command:*', () => unknownCommandHandler(program)())
+program.on('command:*', () => utils.errors.unknownCommandHandler(program)())
 
 program.parse(process.argv)
 if (program.args.length === 0) program.help()

@@ -25,38 +25,40 @@
 
 const program = require('commander')
 
-const {unknownCommandHandler, getCmdFromArguments, HOST, INTERNAL_URL} = require('./utils')
 require = require('esm')(module/*, options*/) //use to handle es6 import/export
-const {Chain} = require('./commands')
+const utils = require('./utils/index')
+const { Chain } = require('./commands')
 
 program
-  .option('-H, --host [hostname]', 'Node to connect to', HOST)
-  .option('-U, --internalUrl [internal]', 'Node to connect to(internal)', INTERNAL_URL)
-  .option('-L --limit [playlimit]', 'Limit for play command', 10)
+  .option('--host [hostname]', 'Node to connect to', utils.constant.EPOCH_URL)
+  .option('--internalUrl [internal]', 'Node to connect to(internal)', utils.constant.EPOCH_INTERNAL_URL)
+  .option('-L --limit [playlimit]', 'Limit for play command', utils.constant.PLAY_LIMIT)
   .option('-P --height [playToHeight]', 'Play to selected height')
+  .option('-f --force', 'Ignore epoch version compatibility check')
+  .option('--json', 'Print result in json format')
 
 program
   .command('top')
   .description('Get top of Chain')
-  .action(async (...arguments) => await Chain.top(getCmdFromArguments(arguments)))
+  .action(async (...arguments) => await Chain.top(utils.cli.getCmdFromArguments(arguments)))
 
 program
   .command('version')
   .description('Get Epoch version')
-  .action(async (...arguments) => await Chain.version(getCmdFromArguments(arguments)))
+  .action(async (...arguments) => await Chain.version(utils.cli.getCmdFromArguments(arguments)))
 
 program
   .command('mempool')
   .description('Get mempool of Chain')
-  .action(async (...arguments) => await Chain.mempool(getCmdFromArguments(arguments)))
+  .action(async (...arguments) => await Chain.mempool(utils.cli.getCmdFromArguments(arguments)))
 
 program
   .command('play')
   .description('Real-time block monitoring')
-  .action(async (...arguments) => await Chain.play(getCmdFromArguments(arguments)))
+  .action(async (...arguments) => await Chain.play(utils.cli.getCmdFromArguments(arguments)))
 
 // HANDLE UNKNOWN COMMAND
-program.on('command:*', () => unknownCommandHandler(program)())
+program.on('command:*', () => utils.errors.unknownCommandHandler(program)())
 
 program.parse(process.argv)
 if (program.args.length === 0) program.help()

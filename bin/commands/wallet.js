@@ -25,25 +25,22 @@
 //
 //
 
-import {
-  initClient,
-  generateSecureWallet,
-  handleApiError,
-  generateSecureWalletFromPrivKey,
-  checkPref,
-  print,
-  printError,
-  printTransaction,
-  getWalletByPathAndDecrypt,
-  HASH_TYPES
-} from '../utils'
+import * as R from 'ramda'
 
-async function spend (receiver, amount, { host, ttl, internalUrl }) {
+import { generateSecureWallet, generateSecureWalletFromPrivKey, getWalletByPathAndDecrypt } from '../utils/account'
+import { HASH_TYPES } from '../utils/constant'
+import { initClient } from '../utils/cli'
+import { handleApiError } from '../utils/errors'
+import { print, printError, printTransaction } from '../utils/print'
+import { checkPref } from '../utils/helpers'
+
+async function spend (walletPath, receiver, amount, options) {
+  let { ttl, password, json } = options
   ttl = parseInt(ttl)
   try {
     checkPref(receiver, HASH_TYPES.account)
-    const keypair = await getWalletByPathAndDecrypt()
-    const client = await initClient(host, keypair, internalUrl)
+    const keypair = await getWalletByPathAndDecrypt(walletPath, { password })
+    const client = await initClient(R.merge(options, { keypair }))
 
     await handleApiError(async () => {
       let tx = await client.spend(parseInt(amount), receiver, { ttl })
@@ -53,17 +50,18 @@ async function spend (receiver, amount, { host, ttl, internalUrl }) {
       } else {
         print('Transaction mined')
       }
-      printTransaction(tx)
+      printTransaction(tx, json)
     })
   } catch (e) {
     printError(e.message)
   }
 }
 
-async function getBalance ({ host, internalUrl }) {
+async function getBalance (walletPath, options) {
+  const { password, json } = options
   try {
-    const keypair = await getWalletByPathAndDecrypt()
-    const client = await initClient(host, keypair, internalUrl)
+    const keypair = await getWalletByPathAndDecrypt(walletPath, { password })
+    const client = await initClient(R.merge(options, { keypair }))
     await handleApiError(
       async () => print('Your balance is: ' + (await client.balance(await client.address())))
     )
@@ -72,10 +70,11 @@ async function getBalance ({ host, internalUrl }) {
   }
 }
 
-async function getAddress ({ host, internalUrl }) {
+async function getAddress (walletPath, options) {
+  const { password, privateKey } = options
   try {
-    const keypair = await getWalletByPathAndDecrypt()
-    const client = await initClient(host, keypair, internalUrl)
+    const keypair = await getWalletByPathAndDecrypt(walletPath, { password, privateKey })
+    const client = await initClient(R.merge(options, { keypair }))
 
     await handleApiError(
       async () => print('Your address is: ' + await client.address())
@@ -85,17 +84,17 @@ async function getAddress ({ host, internalUrl }) {
   }
 }
 
-async function createSecureWallet (name, { output, password }) {
+async function createSecureWallet (walletPath, { output, password }) {
   try {
-    await generateSecureWallet(name, { output, password })
+    await generateSecureWallet(walletPath, { output, password })
   } catch (e) {
     printError(e.message)
   }
 }
 
-async function createSecureWalletByPrivKey (name, priv, { output, password }) {
+async function createSecureWalletByPrivKey (walletPath, priv, { output, password }) {
   try {
-    await generateSecureWalletFromPrivKey(name, priv, { output, password })
+    await generateSecureWalletFromPrivKey(walletPath, priv, { output, password })
   } catch (e) {
     printError(e.message)
   }

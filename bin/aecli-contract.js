@@ -23,23 +23,41 @@
 // | |___| (_) | | | | |_| | | (_| | (__| |_\__ \
 //  \_____\___/|_| |_|\__|_|  \__,_|\___|\__|___/
 
-const { unknownCommandHandler, HOST, INTERNAL_URL } = require('./utils')
 const program = require('commander')
 
-require = require('esm')(module/*, options */) // use to handle es6 import/export
+require = require('esm')(module/*, options*/) //use to handle es6 import/export
+const utils = require('./utils/index')
 const { Contract } = require('./commands')
 
 program
-  .option('-H, --host [hostname]', 'Node to connect to', HOST)
-  .option('-U, --internalUrl [internal]', 'Node to connect to(internal)', INTERNAL_URL)
+  .option('--host [hostname]', 'Node to connect to', utils.constant.EPOCH_URL)
+  .option('--internalUrl [internal]', 'Node to connect to(internal)', utils.constant.EPOCH_INTERNAL_URL)
+  .option('-T, --ttl [ttl]', 'Validity of the transaction in number of blocks (default forever)', utils.constant.CONTRACT_TTL)
+  .option('-f --force', 'Ignore epoch version compatibility check')
+  .option('--json', 'Print result in json format')
+
 
 program
   .command('compile <file>')
   .description('Compile a contract')
-  .action(async (file, cmd) => await Contract.compile(file, cmd.parent))
+  .action(async (file, ...arguments) => await Contract.compile(file, utils.cli.getCmdFromArguments(arguments)))
+
+program
+  .command('call <wallet_path> <desc_path> <fn> <return_type> [args...]')
+  .option('-P, --password [password]', 'Wallet Password')
+  .description('Execute a function of the contract')
+  .action(async (walletPath, path, fn, returnType, args, ...arguments) => await Contract.call(walletPath, path, fn, returnType, args, utils.cli.getCmdFromArguments(arguments)))
+
+program
+  .command('deploy <wallet_path> <contract_path>')
+  .option('-P, --password [password]', 'Wallet Password')
+  .option('-I, --init [state]', 'Deploying contract arguments for constructor function')
+  .option('-G --gas [gas]', 'Amount of gas to deploy the contract', utils.constant.GAS)
+  .description('Deploy a contract on the chain')
+  .action(async (walletPath, path, ...arguments) => await Contract.deploy(walletPath, path, utils.cli.getCmdFromArguments(arguments)))
 
 // HANDLE UNKNOWN COMMAND
-program.on('command:*', () => unknownCommandHandler(program)())
+program.on('command:*', () => utils.errors.unknownCommandHandler(program)())
 
 program.parse(process.argv)
 if (program.args.length === 0) program.help()

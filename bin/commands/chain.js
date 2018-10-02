@@ -23,50 +23,47 @@
 // | |____| | | | (_| | | | | |
 //  \_____|_| |_|\__,_|_|_| |_|
 
-import {
-  initClient,
-  handleApiError,
-  printError,
-  print,
-  printBlock,
-  getBlock,
-  printBlockTransactions
-} from '../utils'
+import { initClient } from '../utils/cli'
+import { handleApiError } from '../utils/errors'
+import { printBlock, print, printBlockTransactions, printError } from '../utils/print'
+import { getBlock } from '../utils/helpers'
 
-async function version ({ host, internalUrl }) {
+async function version (options) {
   try {
-    const client = await initClient(host, null, internalUrl)
+    const client = await initClient(options)
     await handleApiError(async () => {
-      const { nodeVersion } = await client.api.getStatus()
-      print(`Epoch node version____________  ${nodeVersion}`)
+      const {nodeVersion} = await client.api.getStatus()
+      print(`Epoch node version____________  ${ nodeVersion }`)
     })
   } catch (e) {
     printError(e.message)
   }
 }
 
-async function top ({ host, internalUrl }) {
+async function top (options) {
+  const { json } = options
   try {
-    const client = await initClient(host, null, internalUrl)
+    const client = await initClient(options)
     await handleApiError(
-      async () => printBlock(await client.api.getTopBlock())
+      async () => printBlock(await client.api.getTopBlock(), json)
     )
   } catch (e) {
     printError(e.message)
   }
 }
 
-async function mempool ({ host, internalUrl }) {
+async function mempool (options) {
+  const { json } = options
   try {
-    const client = await initClient(host, null, internalUrl)
+    const client = await initClient(options)
 
     await handleApiError(async () => {
-      const { transactions } = await client.mempool()
+      const {transactions} = await client.mempool()
 
       print('Mempool______________________________')
       print('Pending Transactions Count___________ ' + transactions.length)
       if (transactions && transactions.length) {
-        printBlockTransactions(transactions)
+        printBlockTransactions(transactions, json)
       }
     })
   } catch (e) {
@@ -74,11 +71,12 @@ async function mempool ({ host, internalUrl }) {
   }
 }
 
-async function play ({ host, height, limit, internalUrl }) {
+async function play (options) {
+  let { height, limit, json } = options
   limit = parseInt(limit)
   height = parseInt(height)
   try {
-    const client = await initClient(host, null, internalUrl)
+    const client = await initClient(options)
 
     await handleApiError(async () => {
       const top = await client.api.getTopBlock()
@@ -88,11 +86,11 @@ async function play ({ host, height, limit, internalUrl }) {
         process.exit(1)
       }
 
-      printBlock(top)
+      printBlock(top, json)
 
-      height
-        ? await playWithHeight(height, top.prevHash)(client)
-        : await playWithLimit(--limit, top.prevHash)(client)
+      height ?
+        await playWithHeight(height, top.prevHash)(client, json) :
+        await playWithLimit(--limit, top.prevHash)(client, json)
     })
   } catch (e) {
     printError(e.message)
@@ -100,28 +98,29 @@ async function play ({ host, height, limit, internalUrl }) {
 }
 
 function playWithLimit (limit, blockHash) {
-  return async (client) => {
+  return async (client, json) => {
     if (!limit) return
 
     let block = await getBlock(blockHash)(client)
 
     setTimeout(async () => {
       print('>>>>>>>>>')
-      printBlock(block)
-      await playWithLimit(--limit, block.prevHash)(client)
+      printBlock(block, json)
+      await playWithLimit(--limit, block.prevHash)(client, json)
     }, 1000)
   }
 }
 
 function playWithHeight (height, blockHash) {
-  return async (client) => {
+  return async (client, json) => {
+
     let block = await getBlock(blockHash)(client)
     if (parseInt(block.height) < height) return
 
     setTimeout(async () => {
       print('>>>>>>>>>')
-      printBlock(block)
-      await playWithHeight(height, block.prevHash)(client)
+      printBlock(block, json)
+      await playWithHeight(height, block.prevHash)(client, json)
     }, 1000)
   }
 }
