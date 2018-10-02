@@ -47,8 +47,8 @@ async function remoteSwag (url) {
  * @param {String} [options.internalUrl] - Base URL for internal requests
  * @return {Function} Implementation for {@link urlFor}
  */
-const loader = ({url, internalUrl}) => (path, definition) => {
-  const {tags, operationId} = definition
+const loader = ({ url, internalUrl }) => (path, definition) => {
+  const { tags, operationId } = definition
 
   if (R.contains('external', tags)) {
     return urlparse.resolve(url, path)
@@ -73,17 +73,17 @@ const loader = ({url, internalUrl}) => (path, definition) => {
  * @example Epoch({url: 'https://sdk-testnet.aepps.com'})
  */
 const Epoch = stampit({
-  async init ({url = this.url, internalUrl = this.internalUrl}) {
+  async init ({ url = this.url, internalUrl = this.internalUrl }) {
     url = url.replace(/\/?$/, '/')
 
     return Object.assign(this, {
       swag: await remoteSwag(url),
-      urlFor: loader({url, internalUrl})
+      urlFor: loader({ url, internalUrl })
     })
   }
 }, Swagger, {
   async init () {
-    const {nodeVersion: version, nodeRevision: revision, genesisKeyBlockHash: genesisHash} = await this.api.getStatus()
+    const { nodeVersion: version, nodeRevision: revision, genesisKeyBlockHash: genesisHash } = await this.api.getStatus()
     // TODO:
     // getStatus fails with an Error 500 (and crashes everything)
     // core team says:
@@ -94,7 +94,7 @@ const Epoch = stampit({
     // > it doesn't look like it's expected
     // FIX:
     // because of this: https://github.com/aeternity/epoch/pull/1546/files
-    return Object.assign(this, {version, revision, genesisHash})
+    return Object.assign(this, { version, revision, genesisHash })
   }
 })
 

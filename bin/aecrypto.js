@@ -24,7 +24,7 @@
 
 // We'll only load the `Crypto` module from the SDK to work with keys and
 // transactions.
-const {Crypto} = require('@aeternity/aepp-sdk')
+const { Crypto } = require('@aeternity/aepp-sdk')
 const program = require('commander')
 const fs = require('fs')
 const prompt = require('prompt')
@@ -50,7 +50,7 @@ const promptSchema = {
 function extractReadableKeys (dir, options) {
   const pwd = options.input
   prompt.start()
-  prompt.get(promptSchema, (err, {password}) => {
+  prompt.get(promptSchema, (err, { password }) => {
     const key = fs.readFileSync(path.join(pwd, dir, 'sign_key'))
     const pubKey = fs.readFileSync(path.join(pwd, dir, 'sign_key.pub'))
 

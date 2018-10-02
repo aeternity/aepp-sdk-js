@@ -64,12 +64,10 @@ function setKeypair (keypair) {
  * @return {Account}
  */
 const MemoryAccount = Account.compose({
-  init ({keypair}) {
-    if (keypair !== undefined) {
-      this.setKeypair(keypair)
-    }
+  init ({ keypair }) {
+    this.setKeypair(keypair || Crypto.envKeypair(process.env))
   },
-  methods: {sign, address, setKeypair}
+  methods: { sign, address, setKeypair }
 })
 
 export default MemoryAccount

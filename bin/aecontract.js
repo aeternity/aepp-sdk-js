@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // # Simple Sophia Contract Compiler
-// 
+//
 // This script demonstrates how to deal with the different phases of compiling
 // Sophia contracts to bytecode, deploying the bytecode to get a callable
 // contract address and ultimately, invoke the deployed contract on the
@@ -25,7 +25,7 @@
 'use strict'
 
 // We'll need the main client module `Ae` in the `Cli` flavor from the SDK.
-const {Cli: Ae} = require('@aeternity/aepp-sdk')
+const { Cli: Ae } = require('@aeternity/aepp-sdk')
 const program = require('commander')
 const fs = require('fs')
 
@@ -49,7 +49,7 @@ function exec (infile, fn, args) {
   // off to the node for bytecode compilation. This might in the future be done
   // without talking to the node, but requires a bytecode compiler
   // implementation directly in the SDK.
-  Ae({url: program.host, debug: program.debug, process}).then(ae => {
+  Ae({ url: program.host, debug: program.debug, process }).then(ae => {
     return ae.contractCompile(code)
     // Invoking `deploy` on the bytecode object will result in the contract
     // being written to the chain, once the block has been mined.
@@ -59,14 +59,14 @@ function exec (infile, fn, args) {
     // block as well, together with the contract's bytecode.
   }).then(bytecode => {
     console.log(`Obtained bytecode ${bytecode.bytecode}`)
-    return bytecode.deploy({initState: program.init})
+    return bytecode.deploy({ initState: program.init })
     // Once the contract has been successfully mined, we can attempt to invoke
     // any public function defined within it. The miner who found the next block
     // will not only be rewarded a fixed amount, but also an amount depending on
     // the amount of gas spend.
   }).then(deployed => {
     console.log(`Contract deployed at ${deployed.address}`)
-    return deployed.call(fn, {args: args.join(' ')})
+    return deployed.call(fn, { args: args.join(' ') })
     // The execution result, if successful, will be an AEVM-encoded result
     // value. Once type decoding will be implemented in the SDK, this value will
     // not be a hexadecimal string, anymore.

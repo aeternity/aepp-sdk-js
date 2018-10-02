@@ -20,13 +20,13 @@ import Chain from './'
 import Epoch from '../epoch'
 
 async function sendTransaction (tx, options = {}) {
-  const {waitMined} = R.merge(this.Chain.defaults, options)
-  const {txHash} = await this.api.postTransaction({tx})
+  const { waitMined } = R.merge(this.Chain.defaults, options)
+  const { txHash } = await this.api.postTransaction({ tx })
   return waitMined ? this.poll(txHash, options) : txHash
 }
 
-async function balance (address, {height, hash} = {}) {
-  return (await this.api.getAccountByPubkey(address, {height, hash})).balance
+async function balance (address, { height, hash } = {}) {
+  return (await this.api.getAccountByPubkey(address, { height, hash })).balance
 }
 
 async function tx (hash) {
@@ -37,7 +37,7 @@ async function height () {
   return (await this.api.getCurrentKeyBlockHeight()).height
 }
 
-async function awaitHeight (h, {interval = 5000, attempts = 12} = {}) {
+async function awaitHeight (h, { interval = 5000, attempts = 12 } = {}) {
   const instance = this
 
   async function probe (resolve, reject, left) {
@@ -58,7 +58,7 @@ async function awaitHeight (h, {interval = 5000, attempts = 12} = {}) {
   return new Promise((resolve, reject) => probe(resolve, reject, attempts))
 }
 
-async function poll (th, {blocks = 10, interval = 5000} = {}) {
+async function poll (th, { blocks = 10, interval = 5000 } = {}) {
   const instance = this
   const max = await this.height() + blocks
 
@@ -83,7 +83,7 @@ async function poll (th, {blocks = 10, interval = 5000} = {}) {
 }
 
 async function mempool () {
-  return this.getTxs()
+  return this.api.getPendingTransactions()
 }
 
 const EpochChain = Chain.compose(Epoch, {

@@ -15,8 +15,8 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import {describe, it, before} from 'mocha'
-import {configure, plan, ready} from './'
+import { describe, it, before } from 'mocha'
+import { configure, plan, ready } from './'
 
 const identityContract = `
 contract Identity =
@@ -48,7 +48,7 @@ describe('Contract', function () {
 
   describe('precompiled bytecode', () => {
     it('can be invoked', async () => {
-      const result = await contract.contractCallStatic(identityContractByteCode, 'sophia', 'main', {args: '42'})
+      const result = await contract.contractCallStatic(identityContractByteCode, 'sophia', 'main', { args: '42' })
       return result.decode('int').should.eventually.become({
         type: 'word',
         value: 42
@@ -66,7 +66,7 @@ describe('Contract', function () {
   })
 
   it('invokes function against compiled code', async () => {
-    const result = await bytecode.call('main', {args: '42'})
+    const result = await bytecode.call('main', { args: '42' })
     return result.decode('int').should.eventually.become({
       type: 'word',
       value: 42
@@ -79,7 +79,7 @@ describe('Contract', function () {
   })
 
   it('calls deployed contracts', async () => {
-    const result = await deployed.call('main', {args: '42'})
+    const result = await deployed.call('main', { args: '42' })
     return result.decode('int').should.eventually.become({
       type: 'word',
       value: 42
@@ -89,7 +89,7 @@ describe('Contract', function () {
   it('initializes contract state', async () => {
     const data = `"Hello World!"`
     return contract.contractCompile(stateContract)
-      .then(bytecode => bytecode.deploy({initState: data}))
+      .then(bytecode => bytecode.deploy({ initState: data }))
       .then(deployed => deployed.call('retrieve'))
       .then(result => result.decode('string'))
       .catch(e => { console.log(e); throw e })

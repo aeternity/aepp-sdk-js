@@ -27,7 +27,7 @@
  */
 
 import * as R from 'ramda'
-import {encodeBase58Check, salt} from '../utils/crypto'
+import { encodeBase58Check, salt } from '../utils/crypto'
 import Ae from './'
 
 /**
@@ -49,6 +49,25 @@ async function transfer (nameId, account, options = {}) {
   }))
 
   return this.send(nameTransferTx, opt)
+}
+
+/**
+ * Revoke a domain
+ * @instance
+ * @category async
+ * @param {String} nameId
+ * @param {Object} [options={}]
+ * @return {Promise<Object>}
+ */
+async function revoke (nameId, options = {}) {
+  const opt = R.merge(this.Ae.defaults, options)
+
+  const nameRevokeTx = await this.nameRevokeTx(R.merge(opt, {
+    nameId,
+    accountId: await this.address()
+  }))
+
+  return this.send(nameRevokeTx, opt)
 }
 
 /**
@@ -78,6 +97,7 @@ function classify (s) {
 
 /**
  * Update an aens entry
+ * @param nameId domain hash
  * @param target new target
  * @param options
  * @return {Object}
@@ -118,11 +138,16 @@ async function query (name) {
 /**
  * Claim a previously preclaimed registration. This can only be done after the
  * preclaim step
+ * @param {String} name
+ * @param {String} salt
+ * @param {Number} waitForHeight
  * @param {Record} [options={}]
  * @return {Promise<Object>} the result of the claim
  */
-async function claim (name, salt, options = {}) {
+async function claim (name, salt, waitForHeight, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
+  // wait until block was mined before send claim transaction
+  if (waitForHeight) await this.awaitHeight(waitForHeight, { attempts: 200 })
   const claimTx = await this.nameClaimTx(R.merge(opt, {
     accountId: await this.address(),
     nameSalt: salt,
@@ -142,6 +167,7 @@ async function claim (name, salt, options = {}) {
 async function preclaim (name, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   const _salt = salt()
+  const height = await this.height()
   const hash = await this.commitmentHash(name, _salt)
 
   const preclaimTx = await this.namePreclaimTx(R.merge(opt, {
@@ -152,7 +178,8 @@ async function preclaim (name, options = {}) {
   await this.send(preclaimTx, opt)
 
   return Object.freeze({
-    claim: options => this.aensClaim(name, _salt, options),
+    height,
+    claim: options => this.aensClaim(name, _salt, (height + 1), options),
     salt: _salt,
     commitmentId: hash
   })
@@ -175,12 +202,13 @@ const Aens = Ae.compose({
     aensPreclaim: preclaim,
     aensClaim: claim,
     aensUpdate: update,
-    aensTransfer: transfer
+    aensTransfer: transfer,
+    aensRevoke: revoke
   },
-  deepProps: {Ae: {defaults: {
+  deepProps: { Ae: { defaults: {
     clientTtl: 1,
     nameTtl: 50000 // aec_governance:name_claim_max_expiration() => 50000
-  }}}
+  } } }
 })
 
 export default Aens
