@@ -23,7 +23,7 @@
  */
 
 import stampit from '@stamp/it'
-import {encodeBase58Check, hash, salt} from '../utils/crypto'
+import { encodeBase58Check, hash, nameId, salt } from '../utils/crypto'
 
 const createSalt = salt
 
@@ -39,14 +39,14 @@ function formatSalt (salt) {
 
 /**
  * Generate the commitment hash by hashing the formatted salt and
- * name, base 58 encoding the result and prepending 'cm$'
+ * name, base 58 encoding the result and prepending 'cm_'
  *
  * @param {string} name - Name to be registered
  * @param {number} salt
  * @return {string} Commitment hash
  */
 async function commitmentHash (name, salt = createSalt()) {
-  return `cm$${encodeBase58Check(hash(Buffer.concat([hash(name), formatSalt(salt)])))}`
+  return `cm_${encodeBase58Check(hash(Buffer.concat([nameId(name), formatSalt(salt)])))}`
 }
 
 /**
@@ -61,6 +61,6 @@ async function commitmentHash (name, salt = createSalt()) {
  * @return {Object} Tx instance
  * @example JsTx()
  */
-const JsTx = stampit({methods: {commitmentHash}})
+const JsTx = stampit({ methods: { commitmentHash } })
 
 export default JsTx

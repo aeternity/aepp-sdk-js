@@ -44,16 +44,16 @@ function post (method) {
  * @example RpcClient()
  */
 const RpcClient = stampit(AsyncInit, {
-  async init ({parent = window.parent, self = window}, {stamp}) {
+  async init ({ parent = window.parent, self = window }, { stamp }) {
     let sequence = 0
     const callbacks = {}
 
-    function receive ({data}) {
-      if (typeof data !== 'object') {
+    function receive ({ data }) {
+      if (typeof data !== 'object' || data.type === 'webpackOk') {
         return
       }
 
-      const {result: {resolve, reject}, id} = data
+      const { result: { resolve, reject }, id } = data
 
       if (callbacks[id]) {
         if (resolve) {
@@ -67,10 +67,10 @@ const RpcClient = stampit(AsyncInit, {
 
     this.post = (method, params) => {
       const ret = new Promise((resolve, reject) => {
-        callbacks[sequence] = {resolve, reject}
+        callbacks[sequence] = { resolve, reject }
       })
 
-      parent.postMessage({jsonrpc: '2.0', id: sequence, method, params, session: this.session}, '*')
+      parent.postMessage({ jsonrpc: '2.0', id: sequence, method, params, session: this.session }, '*')
       sequence++
 
       return ret
@@ -80,7 +80,7 @@ const RpcClient = stampit(AsyncInit, {
 
     this.session = await this.post('hello')
   },
-  composers ({stamp, composables}) {
+  composers ({ stamp, composables }) {
     const methods = R.path(['compose', 'deepConfiguration', 'Ae', 'methods'], stamp) || []
     const rpcMethods = R.fromPairs(methods.map(m => [m, post(m)]))
     stamp.compose.methods = Object.assign(rpcMethods, stamp.compose.methods)

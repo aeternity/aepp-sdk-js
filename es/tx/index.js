@@ -23,7 +23,7 @@
  */
 
 import stampit from '@stamp/it'
-import {required} from '@stamp/required'
+import { required } from '@stamp/required'
 
 /**
  * Basic Tx Stamp
@@ -71,7 +71,7 @@ const Tx = stampit({
  * @instance
  * @abstract
  * @category async
- * @rtype ({sender?: String, recipient: String, amount: Number, fee: Number, ttl: Number, nonce?: Number, payload?: String}) => tx: Promise[String]
+ * @rtype ({sender?: String, recipientId: String, amount: Number, fee: Number, ttl: Number, nonce?: Number, payload?: String}) => tx: Promise[String]
  * @param {Object} options - The object to extract properties from
  * @return {String} `spend_tx` transaction
  */
@@ -104,7 +104,7 @@ const Tx = stampit({
  * @instance
  * @abstract
  * @category async
- * @rtype ({account?: String, nameHash: String, recipientAccount: String, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]
+ * @rtype ({account?: String, nameId: String, recipientId: String, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]
  * @param {Object} options - The object to extract properties from
  * @return {String} `name_transfer_tx` transaction
  */
@@ -115,7 +115,7 @@ const Tx = stampit({
  * @instance
  * @abstract
  * @category async
- * @rtype ({account?: String, nameHash: String, pointers: Object, nameTtl: Number, clientTtl: Number, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]
+ * @rtype ({account?: String, nameId: String, pointers: Object, nameTtl: Number, clientTtl: Number, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]
  * @param {Object} options - The object to extract properties from
  * @return {String} `name_update_tx` transaction
  */
@@ -126,7 +126,7 @@ const Tx = stampit({
  * @instance
  * @abstract
  * @category async
- * @rtype ({account?: String, nameHash: String, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]
+ * @rtype ({account?: String, nameId: String, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]
  * @param {Object} options - The object to extract properties from
  * @return {String} `name_revoke_tx` transaction
  */
@@ -148,7 +148,7 @@ const Tx = stampit({
  * @instance
  * @abstract
  * @category async
- * @rtype ({caller: String, contract: String, callData: String, vmVersion: Number, amount: Number, gas: Number, gasPrice: Number, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]
+ * @rtype ({callerId: String, contract: String, callData: String, vmVersion: Number, amount: Number, gas: Number, gasPrice: Number, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]
  * @param {Object} options - The object to extract properties from
  * @return {String} `contract_call_tx` transaction
  */

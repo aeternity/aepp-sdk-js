@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // # æternity Crypto Helper Script
-// 
+//
 // This script shows how to use the SDK to generate and decrypt æternity
 // compliant key pairs, as well as encode and decode transactions.
 /*
@@ -24,7 +24,7 @@
 
 // We'll only load the `Crypto` module from the SDK to work with keys and
 // transactions.
-const {Crypto} = require('@aeternity/aepp-sdk')
+const { Crypto } = require('@aeternity/aepp-sdk')
 const program = require('commander')
 const fs = require('fs')
 const prompt = require('prompt')
@@ -50,7 +50,7 @@ const promptSchema = {
 function extractReadableKeys (dir, options) {
   const pwd = options.input
   prompt.start()
-  prompt.get(promptSchema, (err, {password}) => {
+  prompt.get(promptSchema, (err, { password }) => {
     const key = fs.readFileSync(path.join(pwd, dir, 'sign_key'))
     const pubKey = fs.readFileSync(path.join(pwd, dir, 'sign_key.pub'))
 
@@ -60,7 +60,7 @@ function extractReadableKeys (dir, options) {
     const decryptedPub = Crypto.decryptPubKey(password, pubKey)
 
     console.log(`Private key (hex): ${privateHex}`)
-    console.log(`Public key (base check): ak$${Crypto.encodeBase58Check(decryptedPub)}`)
+    console.log(`Public key (base check): ak_${Crypto.encodeBase58Check(decryptedPub)}`)
     console.log(`Public key (hex): ${decryptedPub.toString('hex')}`)
   })
 }
@@ -85,7 +85,7 @@ function generateKeyPair (name, { output }) {
 // This function shows how to use a compliant private key to sign an æternity
 // transaction and turn it into an RLP-encoded tuple ready for mining
 function signTx (tx, privKey) {
-  if (!tx.match(/^tx\$.+/)) {
+  if (!tx.match(/^tx\_.+/)) {
     throw Error('Not a valid transaction')
   }
 
@@ -102,7 +102,7 @@ function signTx (tx, privKey) {
   const decryptedKey = program.password ? Crypto.decryptKey(program.password, binaryKey) : binaryKey
 
   // Split the base58Check part of the transaction
-  const base58CheckTx = tx.split('$')[1]
+  const base58CheckTx = tx.split('_')[1]
   // ... and sign the binary create_contract transaction
   const binaryTx = Crypto.decodeBase58Check(base58CheckTx)
 

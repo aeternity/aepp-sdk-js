@@ -25,44 +25,56 @@
 import Tx from './'
 import Epoch from '../epoch'
 import * as R from 'ramda'
-import {salt} from '../utils/crypto'
+import { salt } from '../utils/crypto'
 
 const createSalt = salt
 
-async function spendTx ({ sender, recipient, amount, fee, ttl, nonce, payload }) {
-  return (await this.api.postSpend(R.merge(R.head(arguments), { recipientPubkey: recipient }))).tx
+async function spendTx ({ senderId, recipientId, amount, fee, ttl, nonce, payload }) {
+  nonce = await (calculateNonce.bind(this)(senderId))
+  return (await this.api.postSpend(R.merge(R.head(arguments), { recipientId, nonce }))).tx
 }
 
-async function namePreclaimTx ({ account, nonce, commitment, fee, ttl }) {
-  return (await this.api.postNamePreclaim(R.head(arguments))).tx
+async function namePreclaimTx ({ accountId, nonce, commitmentId, fee, ttl }) {
+  nonce = await (calculateNonce.bind(this)(accountId))
+  return (await this.api.postNamePreclaim(R.merge(R.head(arguments), { nonce }))).tx
 }
 
-async function nameClaimTx ({ account, nonce, name, nameSalt, fee, ttl }) {
-  return (await this.api.postNameClaim(R.head(arguments))).tx
+async function nameClaimTx ({ accountId, nonce, name, nameSalt, fee, ttl }) {
+  nonce = await (calculateNonce.bind(this)(accountId))
+  return (await this.api.postNameClaim(R.merge(R.head(arguments), { nonce }))).tx
 }
 
-async function nameTransferTx ({ account, nonce, nameHash, recipientAccount, fee, ttl }) {
-  return (await this.api.postNameTransfer(R.merge(R.head(arguments), { recipientPubkey: recipientAccount }))).tx
+async function nameTransferTx ({ accountId, nonce, nameId, recipientId, fee, ttl }) {
+  nonce = await (calculateNonce.bind(this)(accountId))
+  return (await this.api.postNameTransfer(R.merge(R.head(arguments), { recipientId, nonce }))).tx
 }
 
-async function nameUpdateTx ({ account, nonce, nameHash, nameTtl, pointers, clientTtl, fee, ttl }) {
-  return (await this.api.postNameUpdate(R.head(arguments))).tx
+async function nameUpdateTx ({ accountId, nonce, nameId, nameTtl, pointers, clientTtl, fee, ttl }) {
+  nonce = await (calculateNonce.bind(this)(accountId))
+  return (await this.api.postNameUpdate(R.merge(R.head(arguments), { nonce }))).tx
 }
 
-async function nameRevokeTx ({ account, nonce, nameHash, fee, ttl }) {
-  return (await this.api.postNameRevoke(R.head(arguments))).tx
+async function nameRevokeTx ({ accountId, nonce, nameId, fee, ttl }) {
+  nonce = await (calculateNonce.bind(this)(accountId))
+  return (await this.api.postNameRevoke(R.merge(R.head(arguments), { nonce }))).tx
 }
 
-async function contractCreateTx ({ owner, nonce, code, vmVersion, deposit, amount, gas, gasPrice, fee, ttl, callData }) {
-  return this.api.postContractCreate(R.head(arguments))
+async function contractCreateTx ({ ownerId, nonce, code, vmVersion, deposit, amount, gas, gasPrice, fee, ttl, callData }) {
+  nonce = await (calculateNonce.bind(this)(ownerId))
+  return this.api.postContractCreate(R.merge(R.head(arguments), { nonce }))
 }
 
-async function contractCallTx ({ caller, nonce, contract, vmVersion, fee, ttl, amount, gas, gasPrice, callData }) {
-  return (await this.api.postContractCall(R.head(arguments))).tx
+async function contractCallTx ({ callerId, nonce, contractId, vmVersion, fee, ttl, amount, gas, gasPrice, callData }) {
+  nonce = await (calculateNonce.bind(this)(callerId))
+  return (await this.api.postContractCall(R.merge(R.head(arguments), { nonce }))).tx
 }
 
 async function commitmentHash (name, salt = createSalt()) {
-  return (await this.api.getCommitmentHash(name, salt)).commitment
+  return (await this.api.getCommitmentHash(name, salt)).commitmentId
+}
+
+async function calculateNonce (accountId) {
+  return +(await this.api.getAccountByPubkey(accountId)).nonce + 1
 }
 
 /**

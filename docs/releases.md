@@ -34,7 +34,13 @@ targeting Epoch 0.20.0.
 
 [git-flow strategy]: https://danielkummer.github.io/git-flow-cheatsheet/
 
-## Preparing the Release
+## Preparing the Pre-Release (Edgenet)
+
+If Testnet is not yet targeting the latest Epoch version (but Edgenet is) you can do a pre-release for the latest `beta` or `alpha` version, tagging the release as `@next` on npmjs.
+
+To do this, You can follow the steps listed below, while keeping the `alpha` or `beta` portion in both `CHANGELOG.md` and `package.json` files.
+
+## Preparing the Release (Testnet)
 
 On the release branch, remove the `alpha` (or `beta`) portion of the `version`
 string in `package.json`. Replace the `[Unreleased]` header in the
@@ -42,7 +48,7 @@ string in `package.json`. Replace the `[Unreleased]` header in the
 branch against `master` and validate that all changes are covered in the change
 log. Also, make sure to add a new link at the bottom of the file that will
 provide a diff between the last released version and the to-be released
-version. 
+version.
 
 There's a catch: That link won't be able to work until after the release has
 been made!
@@ -79,6 +85,8 @@ releasing, perform a full clean and build in order to release to npmjs.com!
    investigate the resulting tarball's contents. This tarball resembles what
    users will actual download from npmjs.com once the release is completed!
 3. Execute `npm publish` and follow the on-screen instructions
+
+**Important:** If you are releasing a Pre-Release (`beta` or `alpha`), make sure to tag the release as `next` using the command `npm publish --tag next`.
 
 At this point, the release should already be in npmjs.com. The final step is to
 also tag the release on GitHub and push the tag, *which requires direct write
