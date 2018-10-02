@@ -54,6 +54,7 @@ export const HASH_TYPES = {
 export const EPOCH_URL = 'https://sdk-edgenet.aepps.com'
 export const EPOCH_INTERNAL_URL = 'https://sdk-edgenet.aepps.com'
 export const EPOCH_WEBSOCKET_URL = 'https://sdk-edgenet.aepps.com'
+export const EPOCH_CHANNEL_URL = 'wss://sdk-edgenet.aepps.com/channel'
 
 // CHAIN
 export const PLAY_LIMIT = 10
