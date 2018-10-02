@@ -2,30 +2,24 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
-## [0.22.0-0.1.0-alpha.2]
+## [0.22.0-0.1.0-beta.1]
 ### Added
 - Add **CLI** implementation
-
-### Changed
-- Add keywords ('SDK', 'CLI') to package.json
-- Link aecli to `./bin/aecli.js` in package.json (After "npm link" you can use CLI globally)
-- Wait until pre-claim transaction block was mined before send claim transaction
-- Updated `webpack`, `webpack-cli` and added new dev deps accordingly
-
-
-## [0.22.0-0.1.0-alpha.1]
-### Added
 - nameId function for commitment hash calculations
 
 ### Changed
 - API endpoints to meet new Epoch specifications
 - change hash prefix separator from $ to _
+- Add keywords ('SDK', 'CLI') to package.json
+- Link aecli to `./bin/aecli.js` in package.json (After "npm link" you can use CLI globally)
+- Wait until pre-claim transaction block was mined before send claim transaction
+- Updated `webpack`, `webpack-cli` and added new dev deps accordingly
+- Add Epoch Compatibility Check
+- Add SDK nonce calculations
+- Fixes commitment hash calculations in naming system, to be `Hash(nameId(name) + name_salt)` instead of `Hash(Hash(name + name_salt))`.
 
 ### Removed
 - Support for < 0.22.0
-
-### Changed
-- Fixes commitment hash calculations in naming system, to be `Hash(nameId(name) + name_salt)` instead of `Hash(Hash(name + name_salt))`.
 
 ## [0.18.0-0.1.1]
 ### Added
@@ -117,4 +111,4 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 [0.15.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.14.0-0.1.0...v0.15.0-0.1.0
 [0.18.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.15.0-0.1.0...v0.18.0-0.1.0
 [0.18.0-0.1.1]: https://github.com/aeternity/aepp-sdk-js/compare/v0.18.0-0.1.0...v0.18.0-0.1.1
-[0.22.0-0.1.0-alpha.2]: https://github.com/aeternity/aepp-sdk-js/compare/v0.18.0-0.1.1...v0.22.0-0.1.0-alpha.2
+[0.22.0-0.1.0-beta.1]: https://github.com/aeternity/aepp-sdk-js/compare/v0.18.0-0.1.1...v0.22.0-0.1.0-beta.1
