@@ -108,7 +108,7 @@ async function getAccountByHash (hash, options) {
     const client = await initClient(options)
     await handleApiError(
       async () => {
-        const {balance, id, nonce} = await client.api.getAccountByPubkey(hash)
+        const { balance, id, nonce } = await client.api.getAccountByPubkey(hash)
         print('Account ID________________ ' + id)
         print('Account balance___________ ' + balance)
         print('Account nonce_____________ ' + nonce)

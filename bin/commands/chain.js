@@ -32,8 +32,8 @@ async function version (options) {
   try {
     const client = await initClient(options)
     await handleApiError(async () => {
-      const {nodeVersion} = await client.api.getStatus()
-      print(`Epoch node version____________  ${ nodeVersion }`)
+      const { nodeVersion } = await client.api.getStatus()
+      print(`Epoch node version____________  ${nodeVersion}`)
     })
   } catch (e) {
     printError(e.message)
@@ -58,7 +58,7 @@ async function mempool (options) {
     const client = await initClient(options)
 
     await handleApiError(async () => {
-      const {transactions} = await client.mempool()
+      const { transactions } = await client.mempool()
 
       print('Mempool______________________________')
       print('Pending Transactions Count___________ ' + transactions.length)
@@ -88,9 +88,9 @@ async function play (options) {
 
       printBlock(top, json)
 
-      height ?
-        await playWithHeight(height, top.prevHash)(client, json) :
-        await playWithLimit(--limit, top.prevHash)(client, json)
+      height
+        ? await playWithHeight(height, top.prevHash)(client, json)
+        : await playWithLimit(--limit, top.prevHash)(client, json)
     })
   } catch (e) {
     printError(e.message)
@@ -113,7 +113,6 @@ function playWithLimit (limit, blockHash) {
 
 function playWithHeight (height, blockHash) {
   return async (client, json) => {
-
     let block = await getBlock(blockHash)(client)
     if (parseInt(block.height) < height) return
 

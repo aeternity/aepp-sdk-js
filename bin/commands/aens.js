@@ -33,8 +33,7 @@ const updateNameStatus = (name) => async (client) => {
   try {
     return await client.api.getNameEntryByName(name)
   } catch (e) {
-    if (e.response && e.response.status === 404)
-      return {name, status: 'AVAILABLE'}
+    if (e.response && e.response.status === 404) { return { name, status: 'AVAILABLE' } }
     throw e
   }
 }
@@ -42,8 +41,7 @@ const updateNameStatus = (name) => async (client) => {
 const isAvailable = (name) => name.status === 'AVAILABLE'
 
 const validateName = (name) => {
-  if (R.last(name.split('.')) !== 'aet')
-    throw new Error('AENS TLDs must end in .aet')
+  if (R.last(name.split('.')) !== 'aet') { throw new Error('AENS TLDs must end in .aet') }
 }
 
 async function claim (walletPath, domain, options) {
