@@ -19,7 +19,26 @@ import * as R from 'ramda'
 
 import { HASH_TYPES } from './constant'
 
-// CONSOLE PRINT HELPERS
+// #CONSTANT
+const TX_TYPE_PRINT_MAP = {
+  'spend_tx': printSpendTransaction,
+  'contract_create_tx': printContractCreateTransaction,
+  'contract_call_tx': printContractCallTransaction,
+  'name_preclaim_tx': printNamePreclaimTransaction ,
+  'name_claim_tx': printNameClaimTransaction,
+  'name_transfer_tx': printNameTransferTransaction,
+  'name_update_tx': printNameUpdateTransaction,
+  'name_revoke_tx': printNameRevokeTransaction
+}
+const WIDTH = 40
+
+
+// #CONSOLE PRINT HELPERS
+function getTabs(tabs) {
+  if (!tabs) return ''
+  return R.repeat(' ', tabs*4).reduce((a, b) => a += b, '')
+}
+
 export function print (msg, obj) {
   if (obj)
     console.log(msg, obj)
@@ -31,69 +50,184 @@ export function printError (msg) {
   console.log(msg)
 }
 
-export function printConfig ({ host }) {
-  print('WALLET_PUB___________' + process.env['WALLET_PUB'])
-  print('EPOCH_URL___________' + host)
+export function printUnderscored(key, val) {
+  print(`${key}${R.repeat('_', WIDTH - key.length).reduce((a,b) => a += b, '')} ${val}`)
 }
 
+// #BLOCK
 export function printBlock (block, json) {
   if (json) {
     print(block)
     return
   }
-  const type = Object.keys(HASH_TYPES).find(t => block.hash.indexOf(HASH_TYPES[t] + '_') !== -1)
-  print('---------------- ' + type.toUpperCase() + ' ----------------')
-  print(`Block hash____________________ ${R.prop('hash', block)}`)
-  print(`Block height__________________ ${R.prop('height', block)}`)
-  print(`State hash____________________ ${R.prop('stateHash', block)}`)
-  print(`Miner_________________________ ${R.defaultTo('N/A', R.prop('miner', block))}`)
-  print(`Time__________________________ ${new Date(R.prop('time', block))}`)
-  print(`Previous block hash___________ ${R.prop('prevHash', block)}`)
-  print(`Previous key block hash_______ ${R.prop('prevKeyHash', block)}`)
-  print(`Transactions__________________ ${R.defaultTo(0, R.path(['transactions', 'length'], block))}`)
+  const type = Object.keys(HASH_TYPES).find(t => block.hash.indexOf(HASH_TYPES[t] + '') !== -1)
+  const tabs = type === 'MICRO_BLOCK' ? 1 : 0
+  const tabString = getTabs(tabs)
+
+  print(tabString + '<<--------------- ' + type.toUpperCase() + ' --------------->>')
+
+  printUnderscored(tabString + 'Block hash', R.prop('hash', block))
+  printUnderscored(tabString + 'Block height', R.prop('height', block))
+  printUnderscored(tabString + 'State hash', R.prop('stateHash', block))
+  printUnderscored(tabString + 'Miner', R.defaultTo('N/A', R.prop('miner', block)))
+  printUnderscored(tabString + 'Time', new Date(R.prop('time', block)))
+  printUnderscored(tabString + 'Previous block hash', R.prop('prevHash', block))
+  printUnderscored(tabString + 'Previous key block hash', R.prop('prevKeyHash', block))
+  printUnderscored(tabString + 'Version', R.prop('version', block))
+  printUnderscored(tabString + 'Target', R.prop('target', block))
+  printUnderscored(tabString + 'Transactions', R.defaultTo(0, R.path(['transactions', 'length'], block)))
   if (R.defaultTo(0, R.path(['transactions', 'length'], block)))
-    printBlockTransactions(block.transactions)
+    printBlockTransactions(block.transactions, false, tabs + 1)
+
+  print('<<------------------------------------->>')
 }
 
+export function printBlockTransactions (ts, json, tabs = 0) {
+  if (json) {
+    print(ts)
+    return
+  }
+  const tabsString = getTabs(tabs)
+  ts.forEach(
+    (tx, i) => {
+      print(tabsString + '----------------  TX  ----------------')
+      printTransaction(tx, false, tabs + 1)
+      print(tabsString + '--------------------------------------')
+    })
+}
+
+// #TX
+function printTxBase(tx = {}, tabs = '') {
+  printUnderscored(tabs + 'Tx hash', tx.hash)
+  printUnderscored(tabs + 'Block hash', tx.blockHash)
+  printUnderscored(tabs + 'Block height', tx.blockHeight)
+  printUnderscored(tabs + 'Signatures', tx.signatures)
+
+  printUnderscored(tabs + 'Tx Type', R.defaultTo('N/A', R.path(['tx', 'type'], tx)))
+}
+
+function printContractCreateTransaction(tx = {}, tabs = '') {
+  printUnderscored(tabs + 'Owner', R.defaultTo('N/A', R.path(['tx', 'ownerId'], tx)))
+  printUnderscored(tabs + 'Amount', R.defaultTo('N/A', R.path(['tx', 'amount'], tx)))
+  printUnderscored(tabs + 'Deposit', R.defaultTo('N/A', R.path(['tx', 'deposit'], tx)))
+  printUnderscored(tabs + 'Gas', R.defaultTo('N/A', R.path(['tx', 'gas'], tx)))
+  printUnderscored(tabs + 'Gas Price', R.defaultTo('N/A', R.path(['tx', 'gasPrice'], tx)))
+  printUnderscored(tabs + 'Payload', R.defaultTo('N/A', R.path(['tx', 'payload'], tx)))
+
+  printUnderscored(tabs + 'Fee', R.defaultTo('N/A', R.path(['tx', 'fee'], tx)))
+  printUnderscored(tabs + 'Nonce', R.defaultTo('N/A', R.path(['tx', 'nonce'], tx)))
+  printUnderscored(tabs + 'TTL', R.defaultTo('N/A', R.path(['tx', 'ttl'], tx)))
+  printUnderscored(tabs + 'Version', R.defaultTo('N/A', R.path(['tx', 'version'], tx)))
+  printUnderscored(tabs + 'VM Version', R.defaultTo('N/A', R.path(['tx', 'vmVersion'], tx)))
+}
+
+function printContractCallTransaction(tx = {}, tabs = '') {
+  printUnderscored(tabs + 'Caller Account', R.defaultTo('N/A', R.path(['tx', 'callerId'], tx)))
+  printUnderscored(tabs + 'Contract Hash', R.defaultTo('N/A', R.path(['tx', 'contractId'], tx)))
+  printUnderscored(tabs + 'Amount', R.defaultTo('N/A', R.path(['tx', 'amount'], tx)))
+  printUnderscored(tabs + 'Deposit', R.defaultTo('N/A', R.path(['tx', 'deposit'], tx)))
+  printUnderscored(tabs + 'Gas', R.defaultTo('N/A', R.path(['tx', 'gas'], tx)))
+  printUnderscored(tabs + 'Gas Price', R.defaultTo('N/A', R.path(['tx', 'gasPrice'], tx)))
+  printUnderscored(tabs + 'Payload', R.defaultTo('N/A', R.path(['tx', 'payload'], tx)))
+
+  printUnderscored(tabs + 'Fee', R.defaultTo('N/A', R.path(['tx', 'fee'], tx)))
+  printUnderscored(tabs + 'Nonce', R.defaultTo('N/A', R.path(['tx', 'nonce'], tx)))
+  printUnderscored(tabs + 'TTL', R.defaultTo('N/A', R.path(['tx', 'ttl'], tx)))
+  printUnderscored(tabs + 'Version', R.defaultTo('N/A', R.path(['tx', 'version'], tx)))
+  printUnderscored(tabs + 'VM Version', R.defaultTo('N/A', R.path(['tx', 'vmVersion'], tx)))
+}
+
+function printSpendTransaction(tx = {}, tabs = '') {
+
+  printUnderscored(tabs + 'Sender account', R.defaultTo('N/A', R.path(['tx', 'senderId'], tx)))
+  printUnderscored(tabs + 'Recipient account', R.defaultTo('N/A', R.path(['tx', 'recipientId'], tx)))
+  printUnderscored(tabs + 'Amount', R.defaultTo('N/A', R.path(['tx', 'amount'], tx)))
+  printUnderscored(tabs + 'Payload', R.defaultTo('N/A', R.path(['tx', 'payload'], tx)))
+
+  printUnderscored(tabs + 'Fee', R.defaultTo('N/A', R.path(['tx', 'fee'], tx)))
+  printUnderscored(tabs + 'Nonce', R.defaultTo('N/A', R.path(['tx', 'nonce'], tx)))
+  printUnderscored(tabs + 'TTL', R.defaultTo('N/A', R.path(['tx', 'ttl'], tx)))
+  printUnderscored(tabs + 'Version', R.defaultTo('N/A', R.path(['tx', 'version'], tx)))
+}
+
+function printNamePreclaimTransaction(tx = {}, tabs = '') {
+  printUnderscored(tabs + 'Account', R.defaultTo('N/A', R.path(['tx', 'accountId'], tx)))
+  printUnderscored(tabs + 'Commitment', R.defaultTo('N/A', R.path(['tx', 'commitmentId'], tx)))
+
+  printUnderscored(tabs + 'Fee', R.defaultTo('N/A', R.path(['tx', 'fee'], tx)))
+  printUnderscored(tabs + 'Nonce', R.defaultTo('N/A', R.path(['tx', 'nonce'], tx)))
+  printUnderscored(tabs + 'TTL', R.defaultTo('N/A', R.path(['tx', 'ttl'], tx)))
+  printUnderscored(tabs + 'Version', R.defaultTo('N/A', R.path(['tx', 'version'], tx)))
+}
+
+function printNameClaimTransaction(tx = {}, tabs = '') {
+
+  printUnderscored(tabs + 'Account', R.defaultTo('N/A', R.path(['tx', 'accountId'], tx)))
+  printUnderscored(tabs + 'Name', R.defaultTo('N/A', R.path(['tx', 'name'], tx)))
+  printUnderscored(tabs + 'Name Salt', R.defaultTo('N/A', R.path(['tx', 'nameSalt'], tx)))
+
+  printUnderscored(tabs + 'Fee', R.defaultTo('N/A', R.path(['tx', 'fee'], tx)))
+  printUnderscored(tabs + 'Nonce', R.defaultTo('N/A', R.path(['tx', 'nonce'], tx)))
+  printUnderscored(tabs + 'TTL', R.defaultTo('N/A', R.path(['tx', 'ttl'], tx)))
+  printUnderscored(tabs + 'Version', R.defaultTo('N/A', R.path(['tx', 'version'], tx)))
+}
+
+function printNameUpdateTransaction(tx = {}, tabs = '') {
+  printUnderscored(tabs + 'Account', R.defaultTo('N/A', R.path(['tx', 'accountId'], tx)))
+  printUnderscored(tabs + 'Client TTL', R.defaultTo('N/A', R.path(['tx', 'clientTtl'], tx)))
+  printUnderscored(tabs + 'Name ID', R.defaultTo('N/A', R.path(['tx', 'nameId'], tx)))
+  printUnderscored(tabs + 'Name TTL', R.defaultTo('N/A', R.path(['tx', 'nameTtl'], tx)))
+  printUnderscored(tabs + 'Pointers', R.defaultTo('N/A', R.path(['tx', 'pointers'], tx)))
+
+  printUnderscored(tabs + 'Fee', R.defaultTo('N/A', R.path(['tx', 'fee'], tx)))
+  printUnderscored(tabs + 'Nonce', R.defaultTo('N/A', R.path(['tx', 'nonce'], tx)))
+  printUnderscored(tabs + 'TTL', R.defaultTo('N/A', R.path(['tx', 'ttl'], tx)))
+  printUnderscored(tabs + 'Version', R.defaultTo('N/A', R.path(['tx', 'version'], tx)))
+}
+
+function printNameTransferTransaction(tx = {}, tabs = '') {
+  printUnderscored(tabs + 'Account', R.defaultTo('N/A', R.path(['tx', 'accountId'], tx)))
+  printUnderscored(tabs + 'Recipient', R.defaultTo('N/A', R.path(['tx', 'recipientId'], tx)))
+  printUnderscored(tabs + 'Name ID', R.defaultTo('N/A', R.path(['tx', 'nameId'], tx)))
+
+  printUnderscored(tabs + 'Fee', R.defaultTo('N/A', R.path(['tx', 'fee'], tx)))
+  printUnderscored(tabs + 'Nonce', R.defaultTo('N/A', R.path(['tx', 'nonce'], tx)))
+  printUnderscored(tabs + 'TTL', R.defaultTo('N/A', R.path(['tx', 'ttl'], tx)))
+  printUnderscored(tabs + 'Version', R.defaultTo('N/A', R.path(['tx', 'version'], tx)))
+}
+
+function printNameRevokeTransaction(tx = {}, tabs = '') {
+  printUnderscored(tabs + 'Account', R.defaultTo('N/A', R.path(['tx', 'accountId'], tx)))
+  printUnderscored(tabs + 'Name ID', R.defaultTo('N/A', R.path(['tx', 'nameId'], tx)))
+
+  printUnderscored(tabs + 'Fee', R.defaultTo('N/A', R.path(['tx', 'fee'], tx)))
+  printUnderscored(tabs + 'Nonce', R.defaultTo('N/A', R.path(['tx', 'nonce'], tx)))
+  printUnderscored(tabs + 'TTL', R.defaultTo('N/A', R.path(['tx', 'ttl'], tx)))
+  printUnderscored(tabs + 'Version', R.defaultTo('N/A', R.path(['tx', 'version'], tx)))
+}
+
+export function printTransaction (tx, json, tabs = 0) {
+  if (json) {
+    print(tx)
+    return
+  }
+  const tabsString = getTabs(tabs)
+  printTxBase(tx, tabsString)
+  TX_TYPE_PRINT_MAP[R.path(['tx', 'type'], tx)](tx, tabsString)
+
+}
+
+
+// #OTHER
 export function printName (name, json) {
   if (json) {
     print(name)
     return
   }
-  print(`Status___________ ${R.defaultTo('N/A', R.prop('status', name))}`)
-  print(`Name hash________ ${R.defaultTo('N/A', R.prop('id', name))}`)
-  print(`Pointers_________`, R.defaultTo('N/A', R.prop('pointers', name)))
-  print(`TTL______________ ${R.defaultTo(0, R.prop('nameTtl', name))}`)
-}
-
-export function printBlockTransactions (ts, json) {
-  if (json) {
-    print(ts)
-    return
-  }
-  ts.forEach(
-    (tx, i) => {
-      if (i !== 0) print('--------->')
-      printTransaction(tx)
-    })
-}
-
-export function printTransaction (tx, json) {
-  if (json) {
-    print(tx)
-    return
-  }
-  const senderId = R.path(['tx', 'senderId'], tx) || R.path(['tx', 'accountId'], tx)
-  print(`Tx hash_______________________ ${tx.hash}`)
-  print(`Block hash____________________ ${tx.blockHash}`)
-  print(`Block height__________________ ${tx.blockHeight}`)
-  print(`Signatures____________________ ${tx.signatures}`)
-  print(`Tx Type_______________________ ${R.defaultTo('N/A', R.path(['tx', 'type'], tx))}`)
-  print(`Sender account________________ ${R.defaultTo('N/A', senderId)}`)
-  print(`Recipient account_____________ ${R.defaultTo('N/A', R.path(['tx', 'recipientId'], tx))}`)
-  print(`Amount________________________ ${R.defaultTo('N/A', R.path(['tx', 'amount'], tx))}`)
-  print(`Nonce_________________________ ${R.defaultTo('N/A', R.path(['tx', 'nonce'], tx))}`)
-  print(`TTL___________________________ ${R.defaultTo('N/A', R.path(['tx', 'ttl'], tx))}`)
+  printUnderscored('Status', R.defaultTo('N/A', R.prop('status', name)))
+  printUnderscored('Name hash', R.defaultTo('N/A', R.prop('id', name)))
+  printUnderscored('Pointers', R.defaultTo('N/A', R.prop('pointers', name)))
+  printUnderscored('TTL', R.defaultTo(0, R.prop('nameTtl', name)))
 }
 
 export function printContractDescr (descriptor, json) {
@@ -101,12 +235,12 @@ export function printContractDescr (descriptor, json) {
     print(descriptor)
     return
   }
-  print('Source________________________ ' + descriptor.source)
-  print('Bytecode______________________ ' + descriptor.bytecode)
-  print('Address_______________________ ' + descriptor.address)
-  print('Transaction___________________ ' + descriptor.transaction)
-  print('Owner_________________________ ' + descriptor.owner)
-  print('Created_At____________________ ' + descriptor.createdAt)
+  printUnderscored('Source ' + descriptor.source)
+  printUnderscored('Bytecode ' + descriptor.bytecode)
+  printUnderscored('Address ' + descriptor.address)
+  printUnderscored('Transaction ' + descriptor.transaction)
+  printUnderscored('Owner ' + descriptor.owner)
+  printUnderscored('CreatedAt ' + descriptor.createdAt)
 }
 
 export function logContractDescriptor (desc, title = '', json) {
@@ -115,7 +249,12 @@ export function logContractDescriptor (desc, title = '', json) {
     return
   }
   print(`${title}`)
-  print(`Contract address________________ ${desc.address}`)
-  print(`Transaction hash________________ ${desc.transaction}`)
-  print(`Deploy descriptor_______________ ${desc.descPath}`)
+  printUnderscored('Contract address', desc.address)
+  printUnderscored('Transaction hash', desc.transaction)
+  printUnderscored('Deploy descriptor', desc.descPath)
+}
+
+export function printConfig ({ host }) {
+  print('WALLET_PUB' + process.env['WALLET_PUB'])
+  print('EPOCH_URL' + host)
 }

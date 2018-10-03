@@ -21,7 +21,7 @@ import fs from "fs"
 import { HASH_TYPES } from './constant'
 import { printError } from './print'
 
-
+// Read JSON file
 export function readJSONFile (filePath) {
   try {
     return JSON.parse(readFile(filePath))
@@ -31,6 +31,9 @@ export function readJSONFile (filePath) {
   }
 }
 
+// Method which retrieve block info by hash
+// if it's `MICRO_BLOCK` call `getMicroBlockHeaderByHash` and `getMicroBlockTransactionsByHash`
+// if it's `BLOCK` call `getKeyBlockByHash`
 export function getBlock(hash) {
   return async (client) => {
     if (hash.indexOf(HASH_TYPES.block  + '_') !== -1) {
@@ -45,9 +48,10 @@ export function getBlock(hash) {
   }
 }
 
+// Method which validate `hash`
 export function checkPref (hash, hashType) {
   if (hash.length < 3 || hash.indexOf('_') === -1)
-    throw new Error(`Invalid input, likely you forgot to escape the $ sign (use \\$)`)
+    throw new Error(`Invalid input, likely you forgot to escape the $ sign (use \\_)`)
 
   // block and micro block check
   if (Array.isArray(hashType)) {
@@ -72,7 +76,9 @@ export function checkPref (hash, hashType) {
 
 }
 
-// FILE I/O
+// #FILE I/O
+
+// Write file to filesystem
 export function writeFile (name, data, errTitle = 'WRITE FILE ERROR') {
   try {
     fs.writeFileSync(
@@ -86,6 +92,7 @@ export function writeFile (name, data, errTitle = 'WRITE FILE ERROR') {
   }
 }
 
+// Read file from filesystem
 export function readFile (path, encoding = null, errTitle = 'READ FILE ERR') {
   try {
     return fs.readFileSync(
