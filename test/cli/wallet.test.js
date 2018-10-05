@@ -36,10 +36,8 @@ describe('CLI Wallet Module', function () {
   })
   after(function () {
     // Remove wallet files
-    if (fs.existsSync(walletName))
-      fs.unlinkSync(walletName)
-    if (fs.existsSync(`${walletName}.pub`))
-      fs.unlinkSync(`${walletName}.pub`)
+    if (fs.existsSync(walletName)) { fs.unlinkSync(walletName) }
+    if (fs.existsSync(`${walletName}.pub`)) { fs.unlinkSync(`${walletName}.pub`) }
   })
 
   it('Create Wallet', async () => {
@@ -83,6 +81,5 @@ describe('CLI Wallet Module', function () {
     await execute(['account', 'spend', WALLET_NAME, '--password', 'test', await receiver.address(), amount])
     const receiverBalance = await receiver.balance(await receiver.address())
     await receiverBalance.should.equal(amount)
-
   })
 })

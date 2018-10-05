@@ -25,7 +25,7 @@ export function getCmdFromArguments (args) {
   )
 }
 
-export async function initClient ({host: url, keypair, internalUrl, force: forceCompatibility}) {
+export async function initClient ({ host: url, keypair, internalUrl, force: forceCompatibility }) {
   return await Cli({ url, process, keypair, internalUrl, forceCompatibility })
 }
 

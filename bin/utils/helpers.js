@@ -16,11 +16,10 @@
 */
 
 import * as R from 'ramda'
-import fs from "fs"
+import fs from 'fs'
 
 import { HASH_TYPES } from './constant'
 import { printError } from './print'
-
 
 export function readJSONFile (filePath) {
   try {
@@ -31,12 +30,12 @@ export function readJSONFile (filePath) {
   }
 }
 
-export function getBlock(hash) {
+export function getBlock (hash) {
   return async (client) => {
-    if (hash.indexOf(HASH_TYPES.block  + '_') !== -1) {
+    if (hash.indexOf(HASH_TYPES.block + '_') !== -1) {
       return await client.api.getKeyBlockByHash(hash)
     }
-    if (hash.indexOf(HASH_TYPES.micro_block  + '_') !== -1) {
+    if (hash.indexOf(HASH_TYPES.micro_block + '_') !== -1) {
       return R.merge(
         await client.api.getMicroBlockHeaderByHash(hash),
         await client.api.getMicroBlockTransactionsByHash(hash)
@@ -46,14 +45,12 @@ export function getBlock(hash) {
 }
 
 export function checkPref (hash, hashType) {
-  if (hash.length < 3 || hash.indexOf('_') === -1)
-    throw new Error(`Invalid input, likely you forgot to escape the $ sign (use \\$)`)
+  if (hash.length < 3 || hash.indexOf('_') === -1) { throw new Error(`Invalid input, likely you forgot to escape the $ sign (use \\$)`) }
 
   // block and micro block check
   if (Array.isArray(hashType)) {
     const res = hashType.find(ht => hash.slice(0, 3) === ht + '_')
-    if (res)
-      return res
+    if (res) { return res }
     throw new Error('Invalid block hash, it should be like: mh_.... or kh._...')
   }
 
@@ -69,7 +66,6 @@ export function checkPref (hash, hashType) {
     }
     throw new Error(msg)
   }
-
 }
 
 // FILE I/O

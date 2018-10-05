@@ -33,7 +33,7 @@ describe('CLI Chain Module', function () {
     let wallet = await BaseAe()
     wallet.setKeypair(generateKeyPair())
 
-    const {nodeVersion} = await wallet.api.getStatus()
+    const { nodeVersion } = await wallet.api.getStatus()
     const res = await execute(['chain', 'version'])
     R.last(res.split(/_/)).trim().should.equal(nodeVersion)
   })
