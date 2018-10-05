@@ -73,11 +73,15 @@ async function getBalance (walletPath, options) {
 async function getAddress (walletPath, options) {
   const { password, privateKey } = options
   try {
-    const keypair = await getWalletByPathAndDecrypt(walletPath, { password, privateKey })
+    const keypair = await getWalletByPathAndDecrypt(walletPath, { password })
     const client = await initClient(R.merge(options, { keypair }))
 
     await handleApiError(
-      async () => print('Your address is: ' + await client.address())
+      async () => {
+        print('Your address is: ' + await client.address())
+        if (privateKey)
+          print('Your private key is: ' + keypair.priv)
+      }
     )
   } catch (e) {
     printError(e.message)

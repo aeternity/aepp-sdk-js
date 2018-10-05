@@ -99,16 +99,6 @@ export async function generateSecureWalletFromPrivKey (name, priv, { output, pas
 
 export async function getWalletByPathAndDecrypt (walletPath, { privateKey, password } = {}) {
   try {
-    if (privateKey) {
-      const hexStr = Crypto.hexStringToByte(privateKey.trim())
-      const keys = Crypto.generateKeyPairFromSecret(hexStr)
-
-      return {
-        priv: privateKey.trim(),
-        pub: `ak_${Crypto.encodeBase58Check(keys.publicKey)}`
-      }
-    }
-
     const privBinaryKey = readFile(path.resolve(process.cwd(), walletPath))
     const pubBinaryKey = readFile(path.resolve(process.cwd(), `${walletPath}.pub`))
 

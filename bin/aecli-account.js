@@ -51,7 +51,7 @@ program
 
 program
   .command('address [wallet_path]')
-  .option('-K, --privateKey [privateKey]', 'Use private key instead wallet file')
+  .option('-K, --privateKey', 'Print private key')
   .description('Get wallet address')
   .action(async (walletPath, ...arguments) => await Wallet.getAddress(walletPath, utils.cli.getCmdFromArguments(arguments)))
 
