@@ -19,7 +19,7 @@
 
 const program = require('commander')
 
-require = require('esm')(module/*, options*/) //use to handle es6 import/export
+require = require('esm')(module/*, options */) // use to handle es6 import/export
 const utils = require('./utils/index')
 
 const EXECUTABLE_CMD = [
@@ -30,7 +30,7 @@ const EXECUTABLE_CMD = [
   { name: 'name', desc: 'AENS system' },
   // TODO implement oracle module
   // {name: 'oracle', desc: 'Interact with oracles'},
-  { name: 'crypto', desc: 'Crypto helpers' },
+  { name: 'crypto', desc: 'Crypto helpers' }
 ]
 
 program

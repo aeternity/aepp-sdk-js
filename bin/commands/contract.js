@@ -75,7 +75,7 @@ async function deploy (walletPath, contractPath, options) {
         // even when the contract's `state` is `unit` (`()`). The arguments to
         // `init` have to be provided at deployment time and will be written to the
         // block as well, together with the contract's bytecode.
-        const deployDescriptor = await contract.deploy({ initState: init, options: { ttl }})
+        const deployDescriptor = await contract.deploy({ initState: init, options: { ttl } })
 
         // Write contractDescriptor to file
         const descPath = `${R.last(contractPath.split('/'))}.deploy.${deployDescriptor.owner.slice(3)}.json`
@@ -83,7 +83,7 @@ async function deploy (walletPath, contractPath, options) {
           descPath,
           source: contractFile,
           bytecode: contract.bytecode,
-          abi: 'sophia',
+          abi: 'sophia'
         }, deployDescriptor)
 
         writeFile(
@@ -125,7 +125,7 @@ async function call (walletPath, descrPath, fn, returnType, args, options) {
         print('Gas used_________________ ' + R.path(['result', 'gasUsed'])(callResult))
         print('Return value (encoded)___ ' + R.path(['result', 'returnValue'])(callResult))
         // Decode result
-        const {type, value} = await callResult.decode(returnType)
+        const { type, value } = await callResult.decode(returnType)
         print('Return value (decoded)___ ' + value)
         print('Return remote type_______ ' + type)
       }
