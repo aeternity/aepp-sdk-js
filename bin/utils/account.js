@@ -62,13 +62,12 @@ async function promptPasswordAsync () {
 // #WALLET HELPERS
 
 // Generate `keypair` encrypt it using password and write to filesystem
-export async function generateSecureWallet (name, {output, password}) {
+export async function generateSecureWallet (name, { output, password }) {
   password = password || await promptPasswordAsync()
   const { priv } = Crypto.generateKeyPair()
 
   writeFile(path.join(output, name), JSON.stringify(await dump(password, priv)))
   print(`Wrote ${path.resolve(process.cwd(), path.join(output, name))}`)
-
 }
 
 // Generate `keypair` from `PRIVATE KEY` encrypt it using password and write to filesystem
@@ -91,7 +90,7 @@ export async function generateSecureWalletFromPrivKey (name, priv, { output, pas
 
 // Get account files by path, decrypt it using password and return `keypair`
 // Also can generate `keypair` using `PRIVATE KEY`
-export async function getWalletByPathAndDecrypt (walletPath, { privateKey, password } = {}) {
+export async function getWalletByPathAndDecrypt (walletPath, { password } = {}) {
   try {
     const keyFile = readJSONFile(path.resolve(process.cwd(), walletPath))
 

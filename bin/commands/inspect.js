@@ -146,7 +146,6 @@ async function getName (name, options) {
   } catch (e) {
     if (e.response && e.response.status === 404) {
       printName({ status: 'AVAILABLE' }, json)
-      process.exit(1)
     }
     printError(e.message)
   }

@@ -37,6 +37,7 @@ async function version (options) {
     })
   } catch (e) {
     printError(e.message)
+    process.exit(1)
   }
 }
 
@@ -49,6 +50,7 @@ async function top (options) {
     )
   } catch (e) {
     printError(e.message)
+    process.exit(1)
   }
 }
 
@@ -68,6 +70,7 @@ async function mempool (options) {
     })
   } catch (e) {
     printError(e.message)
+    process.exit(1)
   }
 }
 
@@ -94,6 +97,7 @@ async function play (options) {
     })
   } catch (e) {
     printError(e.message)
+    process.exit(1)
   }
 }
 
