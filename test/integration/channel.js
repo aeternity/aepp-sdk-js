@@ -109,6 +109,30 @@ describe('Channel', function () {
     result.accepted.should.equal(false)
   })
 
+  it('can get proof of inclusion', async () => {
+    const initiatorAddr = await initiator.address()
+    const responderAddr = await responder.address()
+    const params = {addresses: [initiatorAddr, responderAddr]}
+    const initiatorPoi = await initiatorCh.poi(params)
+    const responderPoi = await responderCh.poi(params)
+    initiatorPoi.should.be.a('string')
+    responderPoi.should.be.a('string')
+  })
+
+  it('can get balances', async () => {
+    const initiatorAddr = await initiator.address()
+    const responderAddr = await responder.address()
+    const addresses = [initiatorAddr, responderAddr]
+    const initiatorBalances = await initiatorCh.balances(addresses)
+    const responderBalances = await responderCh.balances(addresses)
+    initiatorBalances.should.be.an('object')
+    responderBalances.should.be.an('object')
+    initiatorBalances[initiatorAddr].should.be.a('number')
+    initiatorBalances[responderAddr].should.be.a('number')
+    responderBalances[initiatorAddr].should.be.a('number')
+    responderBalances[responderAddr].should.be.a('number')
+  })
+
   it('can close a channel', async () => {
     const tx = await initiatorCh.shutdown(async (tx) => await initiator.signTransaction(tx))
     tx.should.be.a('string')

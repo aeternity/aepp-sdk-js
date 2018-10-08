@@ -105,6 +105,74 @@ function update (from, to, amount, sign) {
 }
 
 /**
+ * Get proof of inclusion
+ *
+ * @param {object} addresses
+ * @param {array<string>} [addresses.accounts] - List of account addresses to include in poi
+ * @param {array<string>} [addresses.contracts] - List of contract addresses to include in poi
+ * @return {Promise<string>}
+ * @example channel.poi({
+ *   accounts: [
+ *     'ak_Y1NRjHuoc3CGMYMvCmdHSBpJsMDR6Ra2t5zjhRcbtMeXXLpLH',
+ *     'ak_V6an1xhec1xVaAhLuak7QoEbi6t7w5hEtYWp9bMKaJ19i6A9E'
+ *   ],
+ *   contracts: ['ct_2dCUAWYZdrWfACz3a2faJeKVTVrfDYxCQHCqAt5zM15f3u2UfA']
+ * }).then(poi => console.log(poi))
+ */
+function poi ({accounts, contracts}) {
+  return new Promise((resolve, reject) => {
+    enqueueAction(
+      this,
+      (channel, state) => state.handler === handlers.channelOpen,
+      (channel, state) => {
+        send(channel, {
+          action: 'get',
+          tag: 'poi',
+          payload: {accounts, contracts}
+        })
+        return {
+          handler: handlers.awaitingProofOfInclusion,
+          state: {resolve, reject}
+        }
+      }
+    )
+  })
+}
+
+/**
+ * Get balances
+ *
+ * @param {array<string>} accounts - List of addresses to fetch balances from
+ * @return {Promise<object>}
+ * @example channel.balances([
+ *   'ak_Y1NRjHuoc3CGMYMvCmdHSBpJsMDR6Ra2t5zjhRcbtMeXXLpLH',
+ *   'ak_V6an1xhec1xVaAhLuak7QoEbi6t7w5hEtYWp9bMKaJ19i6A9E'
+ *   'ct_2dCUAWYZdrWfACz3a2faJeKVTVrfDYxCQHCqAt5zM15f3u2UfA'
+ * ]).then(balances =>
+ *   console.log(balances['ak_Y1NRjHuoc3CGMYMvCmdHSBpJsMDR6Ra2t5zjhRcbtMeXXLpLH'])
+ * )
+ */
+function balances (accounts) {
+  return new Promise((resolve, reject) => {
+    enqueueAction(
+      this,
+      (channel, state) => state.handler === handlers.channelOpen,
+      (channel, state) => {
+        send(channel, {
+          action: 'get',
+          tag: 'balances',
+          payload: {accounts}
+        })
+        return {
+          handler: handlers.awaitingBalances,
+          state: {resolve, reject}
+        }
+      }
+    )
+  })
+}
+
+/**
  * Leave channel
  *
  * @return {Promise<object>}
@@ -204,6 +272,8 @@ const Channel = AsyncInit.compose({
     status,
     state,
     update,
+    poi,
+    balances,
     leave,
     shutdown
   }

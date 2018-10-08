@@ -24,6 +24,8 @@ const COMMANDS = ([
   ['sign', 's', `(${chalk.bold('s')})ign`],
   ['reject', 'r', `(${chalk.bold('r')})eject`],
   ['update', 'u', `(${chalk.bold('u')})pdate`],
+  ['balances', 'b', `(${chalk.bold('b')})alances`],
+  ['poi', 'p', `(${chalk.bold('p')})oi`],
   ['shutdown', 's', `(${chalk.bold('s')})hutdown`]
 ]).reduce((commands, [cmd, short, pretty]) => ({
   ...commands,
@@ -56,6 +58,36 @@ function ask (query, insertNewline = true) {
     })
     activeReadline = rl
   })
+}
+
+async function askUntil (query, guard, answers = []) {
+  const answer = await ask(query(answers), false)
+  let stop = false
+
+  try {
+    stop = guard(answer)
+  } catch (err) {
+    console.log(chalk.red.bold(err.message))
+    return await askUntil(query, guard, answers)
+  }
+
+  if (stop) {
+    return answers
+  }
+  return await askUntil(query, guard, [...answers, answer])
+}
+
+async function askForAddresses () {
+  return await askUntil(
+    (items) => `${chalk.black.bold(`#${items.length + 1}: `)}`,
+    (input) => {
+      const stop = /^\s*$/.test(input)
+      if (!stop && !/^(ak_|ct_).*/.test(input)) {
+        throw new Error('address must be prefixed with ak_ or ct_')
+      }
+      return stop
+    }
+  )
 }
 
 function execCommand (commands) {
@@ -119,6 +151,39 @@ async function execUserCommand (channel, account) {
       console.log(chalk.grey(prettyTx(tx)))
       process.stdout.write('\n')
       return false
+    },
+    async poi() {
+      console.log(chalk.black.bold('Addresses to include'), chalk.grey('(hit enter to stop)'))
+      const addresses = await askForAddresses()
+      const args = addresses.reduce((acc, addr) => {
+        switch (addr.substring(0, 3)) {
+          case 'ak_':
+            acc.accounts.push(addr)
+            break
+          case 'ct_':
+            acc.contracts.push(addr)
+            break
+        }
+        return acc
+      }, {accounts: [], contracts: []})
+      try {
+        const poi = await channel.poi(args)
+        console.log(chalk.grey(poi))
+      } catch (err) {
+        console.log(chalk.red.bold(err.message))
+      }
+      return true
+    },
+    async balances() {
+      console.log(chalk.black.bold('Addresses to fetch balances from'), chalk.grey('(hit enter to stop)'))
+      const accounts = await askForAddresses()
+      try {
+        const balances = await channel.balances(accounts)
+        console.log(chalk.grey(JSON.stringify(balances, undefined, 2)))
+      } catch (err) {
+        console.log(chalk.red.bold(err.message))
+      }
+      return true
     }
   })
   if (repeat) {
