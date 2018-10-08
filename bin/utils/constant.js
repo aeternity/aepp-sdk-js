@@ -15,29 +15,7 @@
 *  PERFORMANCE OF THIS SOFTWARE.
 */
 
-//
-// const CONFIG_PATH = './config'
-//
-// const DEFAULT_CONFIG = {}
-//
-// class AEConfig {
-//   configs = []
-//   constructor (){
-//
-//   }
-//
-//   validate(config) {}
-//
-//   removeConfig(configName) {}
-//
-//   createConfig(configName) {}
-//
-//   selectConfig(configName) {}
-//
-//   getConfigsFromFS() {}
-// }
-//
-// const instance = new AEConfig(CONFIG_PATH)
+// #CONFIG
 
 // HAST TYPES
 export const HASH_TYPES = {

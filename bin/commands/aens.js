@@ -16,19 +16,23 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-//  _   _
-// | \ | |
-// |  \| | __ _ _ __ ___   ___  ___
-// | . ` |/ _` | '_ ` _ \ / _ \/ __|
-// | |\  | (_| | | | | | |  __/\__ \
-// |_| \_|\__,_|_| |_| |_|\___||___/
+/*  _   _
+ * | \ | |
+ * |  \| | __ _ _ __ ___   ___  ___
+ * | . ` |/ _` | '_ ` _ \ / _ \/ __|
+ * | |\  | (_| | | | | | |  __/\__ \
+ * |_| \_|\__,_|_| |_| |_|\___||___/
+ */
 
 import * as R from 'ramda'
 
-import { getWalletByPathAndDecrypt } from '../utils/account'
-import { initClient } from '../utils/cli'
-import { printError, print } from '../utils/print'
+import { initClientByWalletFile } from '../utils/cli'
+import { printError, print, printUnderscored } from '../utils/print'
+import { handleApiError } from '../utils/errors'
 
+// #Name helpers methods
+
+// Get `name` status
 const updateNameStatus = (name) => async (client) => {
   try {
     return await client.api.getNameEntryByName(name)
@@ -38,113 +42,144 @@ const updateNameStatus = (name) => async (client) => {
   }
 }
 
+// Check if `name` is `AVAILABLE`
 const isAvailable = (name) => name.status === 'AVAILABLE'
 
+// Validate `name`
 const validateName = (name) => {
   if (R.last(name.split('.')) !== 'aet') { throw new Error('AENS TLDs must end in .aet') }
 }
 
+// #Claim `name` function
 async function claim (walletPath, domain, options) {
-  const { ttl, nameTtl, password } = options
+  // Parse options(`ttl`, `nameTtl` and account `password`)
+  const ttl = parseInt(options.ttl)
+  const nameTtl = parseInt(options.nameTtl)
   try {
+    // Validate `name`(check if `name` end on `.aet`)
     validateName(domain)
-    const keypair = await getWalletByPathAndDecrypt(walletPath, { password })
-    const client = await initClient(R.merge(options, { keypair }))
 
-    // Retrieve name
-    const name = await updateNameStatus(domain)(client)
-    if (!isAvailable(name)) {
-      print('Domain not available')
-      process.exit(1)
-    }
+    // Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
+    const client = await initClientByWalletFile(walletPath, options)
 
-    // Preclaim name before claim
-    const { salt, height } = await client.aensPreclaim(domain, { nameTtl, ttl })
-    print('Pre-Claimed')
-    // Wait for next block and claim name
-    await client.aensClaim(domain, salt, (height + 1), { nameTtl, ttl })
-    print('Claimed')
-    // Update name pointer
-    const { id } = await updateNameStatus(domain)(client)
-    const { hash } = await client.aensUpdate(id, await client.address(), { nameTtl, ttl })
-    print('Updated')
+    await handleApiError(async () => {
+      // Check if that `name' available
+      const name = await updateNameStatus(domain)(client)
+      if (!isAvailable(name)) {
+        print('Domain not available')
+        process.exit(1)
+      }
 
-    print(`Name ${domain} claimed`)
-    print('Transaction hash -------> ' + hash)
+      // Create `preclaimName` transaction
+      const { salt, height } = await client.aensPreclaim(domain, { nameTtl, ttl })
+      print('Pre-Claimed')
+
+      // Wait for next block and create `claimName` transaction
+      await client.aensClaim(domain, salt, (height + 1), { nameTtl, ttl })
+      print('Claimed')
+
+      // Update `name` pointer
+      const { id } = await updateNameStatus(domain)(client)
+      const { hash } = await client.aensUpdate(id, await client.address(), { nameTtl, ttl })
+      print('Updated')
+
+      print(`Name ${domain} claimed`)
+      printUnderscored('Transaction hash', hash)
+    })
   } catch (e) {
     printError(e.message)
   }
 }
 
+// #Transfer `name` function
 async function transferName (walletPath, domain, address, options) {
-  const { ttl, nameTtl, password } = options
+  // Parse options(`ttl`, `nameTtl` and account `password`)
+  const ttl = parseInt(options.ttl)
+  const nameTtl = parseInt(options.nameTtl)
+
   if (!address) {
     program.outputHelp()
     process.exit(1)
   }
   try {
-    const keypair = await getWalletByPathAndDecrypt(walletPath, { password })
-    const client = await initClient(R.merge(options, { keypair }))
+    // Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
+    const client = await initClientByWalletFile(walletPath, options)
 
-    // Retrieve name
-    const name = await updateNameStatus(domain)(client)
+    await handleApiError(async () => {
+      // Check if that `name` is unavailable and we can transfer it
+      const name = await updateNameStatus(domain)(client)
+      if (isAvailable(name)) {
+        print(`Domain is available, nothing to transfer`)
+        process.exit(1)
+      }
 
-    if (isAvailable(name)) {
-      print(`Domain is available, nothing to transfer`)
-      process.exit(1)
-    }
-
-    const transferTX = await client.aensTransfer(name.id, address, { ttl, nameTtl })
-    print('Transfer Success')
-    print('Transaction hash -------> ' + transferTX.hash)
+      // Create `transferName` transaction
+      const transferTX = await client.aensTransfer(name.id, address, { ttl, nameTtl })
+      print('Transfer Success')
+      printUnderscored('Transaction hash', transferTX.hash)
+    })
   } catch (e) {
     printError(e.message)
   }
 }
 
+// #Update `name` function
 async function updateName (walletPath, domain, address, options) {
-  const { ttl, nameTtl, password } = options
+  // Parse options(`ttl`, `nameTtl` and account `password`)
+  const { password } = options
+  const ttl = parseInt(options.ttl)
+  const nameTtl = parseInt(options.nameTtl)
+
   if (!address) {
     program.outputHelp()
     process.exit(1)
   }
 
   try {
-    const keypair = await getWalletByPathAndDecrypt(walletPath, { password })
-    const client = await initClient(R.merge(options, { keypair }))
+    // Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
+    const client = await initClientByWalletFile(walletPath, options)
 
-    // Retrieve name
-    const name = await updateNameStatus(domain)(client)
-    if (isAvailable(name)) {
-      print(`Domain is ${name.status} and cannot be transferred`)
-      process.exit(1)
-    }
+    await handleApiError(async () => {
+      // Check if that `name` is unavailable and we can update it
+      const name = await updateNameStatus(domain)(client)
+      if (isAvailable(name)) {
+        print(`Domain is ${name.status} and cannot be transferred`)
+        process.exit(1)
+      }
 
-    const updateNameTx = await client.aensUpdate(name.id, address, { ttl, nameTtl })
-    print('Update Success')
-    print('Transaction Hash -------> ' + updateNameTx.hash)
+      // Create `updateName` transaction
+      const updateNameTx = await client.aensUpdate(name.id, address, { ttl, nameTtl })
+      print('Update Success')
+      printUnderscored('Transaction Hash', updateNameTx.hash)
+    })
   } catch (e) {
     printError(e.message)
   }
 }
 
+// #Revoke `name` function
 async function revokeName (walletPath, domain, options) {
-  const { ttl, password } = options
+  // Parse options(`ttl` and account `password`)
+  const { password } = options
+  const ttl = parseInt(options.ttl)
+
   try {
-    const keypair = await getWalletByPathAndDecrypt(walletPath, { password })
-    const client = await initClient(R.merge(options, { keypair }))
+    // Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
+    const client = await initClientByWalletFile(walletPath, options)
 
-    // Retrieve name
-    const name = await updateNameStatus(domain)(client)
+    await handleApiError(async () => {
+      // Check if `name` is unavailable and we can revoke it
+      const name = await updateNameStatus(domain)(client)
+      if (isAvailable(name)) {
+        print(`Domain is available, nothing to revoke`)
+        process.exit(1)
+      }
 
-    if (isAvailable(name)) {
-      print(`Domain is available, nothing to revoke`)
-      process.exit(1)
-    }
-
-    const revokeTx = await client.aensRevoke(name.id, { ttl })
-    print('Revoke Success')
-    print('Transaction hash -------> ' + revokeTx.hash)
+      // Create `revokeName` transaction
+      const revokeTx = await client.aensRevoke(name.id, { ttl })
+      print('Revoke Success')
+      printUnderscored('Transaction hash', revokeTx.hash)
+    })
   } catch (e) {
     printError(e.message)
   }

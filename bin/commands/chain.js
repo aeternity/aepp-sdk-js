@@ -25,7 +25,7 @@
 
 import { initClient } from '../utils/cli'
 import { handleApiError } from '../utils/errors'
-import { printBlock, print, printBlockTransactions, printError } from '../utils/print'
+import { printBlock, print, printBlockTransactions, printError, printUnderscored } from '../utils/print'
 import { getBlock } from '../utils/helpers'
 
 async function version (options) {
@@ -60,8 +60,8 @@ async function mempool (options) {
     await handleApiError(async () => {
       const { transactions } = await client.mempool()
 
-      print('Mempool______________________________')
-      print('Pending Transactions Count___________ ' + transactions.length)
+      printUnderscored('Mempool', '')
+      printUnderscored('Pending Transactions Count', transactions.length)
       if (transactions && transactions.length) {
         printBlockTransactions(transactions, json)
       }
@@ -104,7 +104,6 @@ function playWithLimit (limit, blockHash) {
     let block = await getBlock(blockHash)(client)
 
     setTimeout(async () => {
-      print('>>>>>>>>>')
       printBlock(block, json)
       await playWithLimit(--limit, block.prevHash)(client, json)
     }, 1000)
@@ -117,7 +116,6 @@ function playWithHeight (height, blockHash) {
     if (parseInt(block.height) < height) return
 
     setTimeout(async () => {
-      print('>>>>>>>>>')
       printBlock(block, json)
       await playWithHeight(height, block.prevHash)(client, json)
     }, 1000)

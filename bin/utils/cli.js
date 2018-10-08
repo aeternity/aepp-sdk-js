@@ -17,7 +17,9 @@
 import * as R from 'ramda'
 
 import Cli from '../../es/ae/cli'
+import { getWalletByPathAndDecrypt } from './account'
 
+// Merge options with parent options. Commander issue with parsing nested options
 export function getCmdFromArguments (args) {
   return R.merge(
     R.head(args),
@@ -25,14 +27,25 @@ export function getCmdFromArguments (args) {
   )
 }
 
-export async function initClient ({ host: url, keypair, internalUrl, force: forceCompatibility }) {
+// Create `Ae` client
+export async function initClient ({host: url, keypair, internalUrl, force: forceCompatibility}) {
   return await Cli({ url, process, keypair, internalUrl, forceCompatibility })
 }
 
+// Get account files and decrypt it using password
+// After that create`Ae` client using this `keyPair`
+export async function initClientByWalletFile (walletPath, options) {
+  const { password, privateKey  } = options
+  const keypair = await getWalletByPathAndDecrypt(walletPath, { password, privateKey })
+  return initClient(R.merge(options, { keypair }))
+}
+
+// Initialize commander executable commands
 export function initExecCommands (program) {
   return (cmds) => cmds.forEach(({ name, desc }) => program.command(name, desc))
 }
 
-export function isExecCommand (cmd, commands) {
-  return commands.find(({ name }) => cmd === name)
+// Check if `command` is `EXECUTABLE`
+export function isExecCommand (cmd, execCommands) {
+  return execCommands.find(({ name }) => cmd === name)
 }

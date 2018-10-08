@@ -21,7 +21,9 @@ import * as Crypto from '../../es/utils/crypto'
 import { print } from './print'
 import { readFile, writeFile } from './helpers'
 
-// The `prompt` library provides concealed input of passwords.
+// #The `prompt` library provides concealed input of passwords.
+
+// `prompt` schema
 const PROMPT_SCHEMA = {
   properties: {
     password: {
@@ -37,6 +39,7 @@ const PROMPT_SCHEMA = {
   }
 }
 
+// Prompt password using `prompt`
 async function promptPasswordAsync () {
   return new Promise(
     (resolve, reject) => {
@@ -55,8 +58,10 @@ async function promptPasswordAsync () {
   )
 }
 
-// WALLET HELPERS
-export async function generateSecureWallet (name, { output, password }) {
+// #WALLET HELPERS
+
+// Generate `keypair` encrypt it using password and write to filesystem
+export async function generateSecureWallet (name, {output, password}) {
   password = password || await promptPasswordAsync()
   const { pub, priv } = Crypto.generateSaveWallet(password)
   const data = [
@@ -70,6 +75,7 @@ export async function generateSecureWallet (name, { output, password }) {
   })
 }
 
+// Generate `keypair` from `PRIVATE KEY` encrypt it using password and write to filesystem
 export async function generateSecureWalletFromPrivKey (name, priv, { output, password }) {
   password = password || await promptPasswordAsync()
 
@@ -97,6 +103,9 @@ export async function generateSecureWalletFromPrivKey (name, priv, { output, pas
   `)
 }
 
+
+// Get account files by path, decrypt it using password and return `keypair`
+// Also can generate `keypair` using `PRIVATE KEY`
 export async function getWalletByPathAndDecrypt (walletPath, { privateKey, password } = {}) {
   try {
     const privBinaryKey = readFile(path.resolve(process.cwd(), walletPath))

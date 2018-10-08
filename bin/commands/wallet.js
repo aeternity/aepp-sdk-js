@@ -25,22 +25,20 @@
 //
 //
 
-import * as R from 'ramda'
-
-import { generateSecureWallet, generateSecureWalletFromPrivKey, getWalletByPathAndDecrypt } from '../utils/account'
+import { generateSecureWallet, generateSecureWalletFromPrivKey } from '../utils/account'
 import { HASH_TYPES } from '../utils/constant'
-import { initClient } from '../utils/cli'
+import { initClientByWalletFile } from '../utils/cli'
 import { handleApiError } from '../utils/errors'
 import { print, printError, printTransaction } from '../utils/print'
 import { checkPref } from '../utils/helpers'
 
 async function spend (walletPath, receiver, amount, options) {
-  let { ttl, password, json } = options
+  let { ttl, json } = options
   ttl = parseInt(ttl)
   try {
     checkPref(receiver, HASH_TYPES.account)
-    const keypair = await getWalletByPathAndDecrypt(walletPath, { password })
-    const client = await initClient(R.merge(options, { keypair }))
+    // Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
+    const client = await initClientByWalletFile(walletPath, options)
 
     await handleApiError(async () => {
       let tx = await client.spend(parseInt(amount), receiver, { ttl })
@@ -58,10 +56,9 @@ async function spend (walletPath, receiver, amount, options) {
 }
 
 async function getBalance (walletPath, options) {
-  const { password, json } = options
   try {
-    const keypair = await getWalletByPathAndDecrypt(walletPath, { password })
-    const client = await initClient(R.merge(options, { keypair }))
+    // Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
+    const client = await initClientByWalletFile(walletPath, options)
     await handleApiError(
       async () => print('Your balance is: ' + (await client.balance(await client.address())))
     )
@@ -71,10 +68,9 @@ async function getBalance (walletPath, options) {
 }
 
 async function getAddress (walletPath, options) {
-  const { password, privateKey } = options
   try {
-    const keypair = await getWalletByPathAndDecrypt(walletPath, { password })
-    const client = await initClient(R.merge(options, { keypair }))
+    // Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
+    const client = await initClientByWalletFile(walletPath, options)
 
     await handleApiError(
       async () => {
