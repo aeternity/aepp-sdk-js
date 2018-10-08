@@ -23,7 +23,6 @@ import { decodeTx, deserialize } from '../../es/utils/crypto'
 const COMMANDS = ([
   ['sign', 's', `(${chalk.bold('s')})ign`],
   ['reject', 'r', `(${chalk.bold('r')})eject`],
-  ['decode', 'd', `(${chalk.bold('d')})ecode`],
   ['update', 'u', `(${chalk.bold('u')})pdate`],
   ['shutdown', 's', `(${chalk.bold('s')})hutdown`]
 ]).reduce((commands, [cmd, short, pretty]) => ({
@@ -32,6 +31,10 @@ const COMMANDS = ([
 }), {})
 
 let activeReadline
+
+function prettyTx (tx) {
+  return JSON.stringify(deserialize(decodeTx(tx), {prettyTags: true}), undefined, 2)
+}
 
 function ask (query, insertNewline = true) {
   if (activeReadline) {
@@ -78,15 +81,8 @@ function signTx (account, tag, tx) {
   if (activeReadline) {
     console.log('\n')
   }
-  console.log(chalk.green.bold({
-    initiator_sign: 'Channel Create Tx',
-    responder_sign: 'Channel Create Tx',
-    shutdown: 'Shutdown Tx',
-    shutdown_sign_ack: 'Shutdown Tx',
-    update: 'Update Tx',
-    update_ack: 'Update Tx'
-  }[tag] || `${tag} tx`))
-  console.log(chalk.grey(tx))
+  console.log(chalk.green.bold(tag))
+  console.log(chalk.grey(prettyTx(tx)))
   process.stdout.write('\n')
 
   return execCommand({
@@ -95,11 +91,6 @@ function signTx (account, tag, tx) {
     },
     reject() {
       return null
-    },
-    decode(repeat) {
-      console.log(chalk.grey(JSON.stringify(deserialize(decodeTx(tx)), undefined, 2)))
-      process.stdout.write('\n')
-      return repeat()
     }
   })
 }
@@ -107,9 +98,9 @@ function signTx (account, tag, tx) {
 async function execUserCommand (channel, account) {
   const repeat = await execCommand({
     async update() {
-      const from = await ask(`${chalk.black.bold('From:')} `, false)
-      const to = await ask(`${chalk.black.bold('To:')} `, false)
-      const amount = Number(await ask(`${chalk.black.bold('Amount:')} `))
+      const from = await ask(`${chalk.black.bold('from:')} `, false)
+      const to = await ask(`${chalk.black.bold('to:')} `, false)
+      const amount = Number(await ask(`${chalk.black.bold('amount:')} `))
       try {
         const result = await channel.update(from, to, amount, async (tx) =>
           signTx(account, 'update', tx))
@@ -124,8 +115,8 @@ async function execUserCommand (channel, account) {
     },
     async shutdown() {
       const tx = await channel.shutdown((tx) => signTx(account, 'shutdown', tx))
-      console.log(`${chalk.green.bold('On Chain Tx')}`)
-      console.log(tx)
+      console.log(`${chalk.green.bold('onchain transaction')}`)
+      console.log(chalk.grey(prettyTx(tx)))
       process.stdout.write('\n')
       return false
     }
@@ -147,12 +138,12 @@ export async function repl (account, params) {
     }
   })
   channel.on('onChainTx', (tx) => {
-    console.log(chalk.yellow.bold('On Chain Tx'))
-    console.log(chalk.grey(tx))
+    console.log(chalk.yellow.bold('onchain transaction'))
+    console.log(chalk.grey(prettyTx(tx)))
     process.stdout.write('\n')
   })
   channel.on('stateChanged', (state) => {
-    console.log(chalk.yellow.bold('State changed'))
+    console.log(chalk.yellow.bold('state changed'))
     console.log(chalk.grey(state))
     process.stdout.write('\n')
   })
