@@ -144,7 +144,7 @@ export async function repl (account, params) {
   })
   channel.on('stateChanged', (state) => {
     console.log(chalk.yellow.bold('state changed'))
-    console.log(chalk.grey(state))
+    console.log(chalk.grey(prettyTx(state)))
     process.stdout.write('\n')
   })
   channel.on('statusChanged', (status) => {

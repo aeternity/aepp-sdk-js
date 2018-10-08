@@ -63,10 +63,8 @@ function changeStatus (channel, newStatus) {
 }
 
 function changeState (channel, newState) {
-  const prevState = state.get(channel)
-  const nextState = {...prevState, ...newState}
-  state.set(channel, nextState)
-  emit(channel, 'stateChanged', nextState)
+  state.set(channel, newState)
+  emit(channel, 'stateChanged', newState)
 }
 
 function send (channel, message) {
