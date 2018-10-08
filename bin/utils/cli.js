@@ -34,9 +34,12 @@ export async function initClient ({host: url, keypair, internalUrl, force: force
 
 // Get account files and decrypt it using password
 // After that create`Ae` client using this `keyPair`
-export async function initClientByWalletFile (walletPath, options) {
+export async function initClientByWalletFile (walletPath, options, returnKeyPair = false) {
   const { password, privateKey  } = options
   const keypair = await getWalletByPathAndDecrypt(walletPath, { password, privateKey })
+
+  if (returnKeyPair)
+    return { client: await initClient(R.merge(options, { keypair })), keypair }
   return initClient(R.merge(options, { keypair }))
 }
 

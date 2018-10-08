@@ -68,9 +68,10 @@ async function getBalance (walletPath, options) {
 }
 
 async function getAddress (walletPath, options) {
+  const { privateKey } = options
   try {
     // Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
-    const client = await initClientByWalletFile(walletPath, options)
+    const { client, keypair } = await initClientByWalletFile(walletPath, options, true)
 
     await handleApiError(
       async () => {

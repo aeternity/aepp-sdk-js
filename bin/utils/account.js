@@ -19,7 +19,8 @@ import prompt from 'prompt'
 
 import * as Crypto from '../../es/utils/crypto'
 import { print } from './print'
-import { readFile, writeFile } from './helpers'
+import { readJSONFile, writeFile } from './helpers'
+import { dump, getAddressFromPriv, recover } from './keystore'
 
 // #The `prompt` library provides concealed input of passwords.
 
@@ -63,16 +64,11 @@ async function promptPasswordAsync () {
 // Generate `keypair` encrypt it using password and write to filesystem
 export async function generateSecureWallet (name, {output, password}) {
   password = password || await promptPasswordAsync()
-  const { pub, priv } = Crypto.generateSaveWallet(password)
-  const data = [
-    [path.join(output, name), priv],
-    [path.join(output, `${name}.pub`), pub]
-  ]
+  const { priv } = Crypto.generateKeyPair()
 
-  data.forEach(([walletPath, data]) => {
-    writeFile(walletPath, data)
-    print(`Wrote ${path.resolve(process.cwd(), walletPath)}`)
-  })
+  writeFile(path.join(output, name), JSON.stringify(await dump(password, priv)))
+  print(`Wrote ${path.resolve(process.cwd(), path.join(output, name))}`)
+
 }
 
 // Generate `keypair` from `PRIVATE KEY` encrypt it using password and write to filesystem
@@ -82,19 +78,9 @@ export async function generateSecureWalletFromPrivKey (name, priv, { output, pas
   const hexStr = Crypto.hexStringToByte(priv.trim())
   const keys = Crypto.generateKeyPairFromSecret(hexStr)
 
-  const encryptedKeyPair = {
-    pub: Crypto.encryptPublicKey(password, keys.publicKey),
-    priv: Crypto.encryptPrivateKey(password, keys.secretKey)
-  }
+  const encryptedKeyPair = await dump(password, keys.secretKey)
 
-  const data = [
-    [path.join(output, name), encryptedKeyPair.priv],
-    [path.join(output, `${name}.pub`), encryptedKeyPair.pub]
-  ]
-
-  data.forEach(([path, data]) => {
-    writeFile(path, data)
-  })
+  writeFile(path.join(output, name), JSON.stringify(encryptedKeyPair))
 
   print(`
     Wallet saved
@@ -103,22 +89,19 @@ export async function generateSecureWalletFromPrivKey (name, priv, { output, pas
   `)
 }
 
-
 // Get account files by path, decrypt it using password and return `keypair`
 // Also can generate `keypair` using `PRIVATE KEY`
 export async function getWalletByPathAndDecrypt (walletPath, { privateKey, password } = {}) {
   try {
-    const privBinaryKey = readFile(path.resolve(process.cwd(), walletPath))
-    const pubBinaryKey = readFile(path.resolve(process.cwd(), `${walletPath}.pub`))
+    const keyFile = readJSONFile(path.resolve(process.cwd(), walletPath))
 
     if (!password || typeof password !== 'string' || !password.length) password = await promptPasswordAsync()
 
-    const decryptedPriv = Crypto.decryptPrivateKey(password, privBinaryKey)
-    const decryptedPub = Crypto.decryptPubKey(password, pubBinaryKey)
+    const privKey = await recover(password, keyFile)
 
     return {
-      priv: decryptedPriv.toString('hex'),
-      pub: `ak_${Crypto.encodeBase58Check(decryptedPub)}`
+      priv: privKey,
+      pub: getAddressFromPriv(privKey)
     }
   } catch (e) {
     throw new Error('GET WALLET ERROR: ' + e.message)

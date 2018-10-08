@@ -126,7 +126,6 @@ async function transferName (walletPath, domain, address, options) {
 // #Update `name` function
 async function updateName (walletPath, domain, address, options) {
   // Parse options(`ttl`, `nameTtl` and account `password`)
-  const { password } = options
   const ttl = parseInt(options.ttl)
   const nameTtl = parseInt(options.nameTtl)
 
@@ -160,7 +159,6 @@ async function updateName (walletPath, domain, address, options) {
 // #Revoke `name` function
 async function revokeName (walletPath, domain, options) {
   // Parse options(`ttl` and account `password`)
-  const { password } = options
   const ttl = parseInt(options.ttl)
 
   try {
