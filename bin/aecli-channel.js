@@ -41,6 +41,8 @@ program
   .option('--host <host>', 'Host of the responder\'s node')
   .option('--port <port>', 'The port of the responders node')
   .option('--lockPeriod <lockPeriod>', 'Amount of blocks for disputing a solo close', 10)
+  .option('--existingChannelId <existingChannelId>', 'Existing channel id')
+  .option('--offchainTx <offchainTx>', 'Offchain transaction')
   .option('--file <file>', 'Private key file')
   .description('State channels')
   .action(async (url, privKey, options) => {
@@ -55,7 +57,9 @@ program
       'ttl',
       'host',
       'port',
-      'lockPeriod'
+      'lockPeriod',
+      'existingChannelId',
+      'offchainTx'
     ].reduce((params, key) => {
       const value = options[key]
       if (value) {

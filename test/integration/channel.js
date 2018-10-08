@@ -18,7 +18,7 @@
 import {describe, it, before} from 'mocha'
 import {configure, ready, plan, BaseAe} from './'
 import {generateKeyPair} from '../../es/utils/crypto'
-import Channel from '../../es/channel/epoch'
+import Channel from '../../es/channel'
 
 plan(1000)
 
@@ -32,7 +32,7 @@ function waitForChannel (channel) {
   )
 }
 
-describe('Epoch Channel', function () {
+describe('Channel', function () {
   configure(this)
 
   let initiator

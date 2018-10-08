@@ -17,7 +17,7 @@
 
 import readline from 'readline'
 import chalk from 'chalk'
-import Channel from '../../es/channel/epoch'
+import Channel from '../../es/channel'
 import { decodeTx, deserialize } from '../../es/utils/crypto'
 
 const COMMANDS = ([

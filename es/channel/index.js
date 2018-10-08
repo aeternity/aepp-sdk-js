@@ -15,24 +15,198 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import stampit from '@stamp/it'
-import {required} from '@stamp/required'
+/**
+ * Channel module
+ * @module @aeternity/aepp-sdk/es/channel/index
+ * @export Channel
+ * @example import Channel from '@aeternity/aepp-sdk/es/channel/index'
+ */
 
-const Channel = stampit({
-  deepConf: {
-    Ae: {
-      methods: ['on', 'status', 'state', 'update', 'leave', 'shutdown']
-    }
-  }
-}, required({
+import AsyncInit from '../utils/async-init'
+import * as handlers from './handlers'
+import {
+  eventEmitters,
+  status as channelStatus,
+  state as channelState,
+  initialize,
+  enqueueAction,
+  send
+} from './internal'
+
+/**
+ * Register event listener function
+ *
+ * @param {string} event - Event name
+ * @param {function} callback - Callback function
+ */
+function on (event, callback) {
+  eventEmitters.get(this).on(event, callback)
+}
+
+/**
+ * Get current status
+ *
+ * @return {string}
+ */
+function status () {
+  channelStatus.get(this)
+}
+
+/**
+ * Get current state
+ *
+ * @return {object}
+ */
+function state () {
+  channelState.get(this)
+}
+
+/**
+ * Trigger an update
+ *
+ * @param {string} from - Sender's public address
+ * @param {string} to - Receiver's public address
+ * @param {number} amount - Transaction amount
+ * @param {function} sign - Function which verifies and signs transaction
+ * @return {Promise<object>}
+ * @example channel.update(
+ *   'ak$2QC98ahNHSrZLWKrpQyv91eQfCDA3aFVSNoYKdQ1ViYWVF8Z9d',
+ *   'ak$Gi42jcRm9DcZjk72UWQQBSxi43BG3285C9n4QSvP5JdzDyH2o',
+ *   10,
+ *   async (tx) => await account.signTransaction(tx)
+ * ).then({accepted, state} =>
+ *   if (accepted) {
+ *     console.log('Update has been accepted')
+ *   }
+ * )
+ */
+function update (from, to, amount, sign) {
+  return new Promise((resolve, reject) => {
+    enqueueAction(
+      this,
+      (channel, state) => state.handler === handlers.channelOpen,
+      (channel, state) => {
+        send(channel, {
+          action: 'update',
+          tag: 'new',
+          payload: {from, to, amount}
+        })
+        return {
+          handler: handlers.awaitingOffChainTx,
+          state: {
+            resolve,
+            reject,
+            sign
+          }
+        }
+      }
+    )
+  })
+}
+
+/**
+ * Leave channel
+ *
+ * @return {Promise<object>}
+ * @example channel.leave().then(({channelId, state}) =>
+ *   console.log(channelId)
+ *   console.log(state)
+ * )
+ */
+function leave () {
+  return new Promise((resolve) => {
+    enqueueAction(
+      this,
+      (channel, state) => state.handler === handlers.channelOpen,
+      (channel, state) => {
+        send(channel, {action: 'leave'})
+        return {
+          handler: handlers.awaitingLeave,
+          state: {resolve}
+        }
+      })
+  })
+}
+
+/**
+ * Trigger a channel shutdown
+ *
+ * @param {function} sign - Function which verifies and signs transaction
+ * @return {Promise<string>}
+ * @example channel.shutdown(
+ *   async (tx) => await account.signTransaction(tx)
+ * ).then(tx => console.log('on_chain_tx', tx))
+ */
+function shutdown (sign) {
+  return new Promise((resolve) => {
+    enqueueAction(
+      this,
+      (channel, state) => true,
+      (channel, state) => {
+        send(channel, {action: 'shutdown'})
+        return {
+          handler: handlers.awaitingShutdownTx,
+          state: {
+            sign,
+            resolveShutdownPromise: resolve
+          }
+        }
+      }
+    )
+  })
+}
+
+/**
+ * Channel
+ *
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/channel/index
+ * @rtype Channel
+ * @param {Object} [options={}] - Initializer object
+ * @param {String} options.url - Channel url (for example: "ws://localhost:3001/channel")
+ * @param {String} options.role - Participant role ("initiator" or "responder")
+ * @param {String} options.initiatorId - Initiator's public key
+ * @param {String} options.responderId - Responder's public key
+ * @param {Number} options.pushAmount - Initial deposit in favour of the responder by the initiator
+ * @param {Number} options.initiatorAmount - Amount of tokens the initiator has committed to the channel
+ * @param {Number} options.responderAmount - Amount of tokens the responder has committed to the channel
+ * @param {Number} options.channelReserve - The minimum amount both peers need to maintain
+ * @param {Number} [options.ttl] - Minimum block height to include the channel_create_tx
+ * @param {String} options.host - Host of the responder's node
+ * @param {Number} options.port - The port of the responders node
+ * @param {Number} options.lockPeriod - Amount of blocks for disputing a solo close
+ * @param {Number} [options.existingChannelId] - Existing channel id (required if reestablishing a channel)
+ * @param {Number} [options.offchainTx] - Offchain transaction (required if reestablishing a channel)
+ * @param {Function} options.sign - Function which verifies and signs transactions
+ * @return {Object} Channel instance
+ * @example Channel({
+  url: 'ws://localhost:3001',
+  role: 'initiator'
+  initiatorId: 'ak$2QC98ahNHSrZLWKrpQyv91eQfCDA3aFVSNoYKdQ1ViYWVF8Z9d',
+  responderId: 'ak$Gi42jcRm9DcZjk72UWQQBSxi43BG3285C9n4QSvP5JdzDyH2o',
+  pushAmount: 3,
+  initiatorAmount: 10,
+  responderAmount: 10,
+  channelReserve: 2,
+  ttl: 1000,
+  host: 'localhost',
+  port: 3002,
+  lockPeriod: 10,
+  async sign (tag, tx) => await account.signTransaction(tx)
+})
+ */
+const Channel = AsyncInit.compose({
+  async init (options) {
+    initialize(this, options)
+  },
   methods: {
-    on: required,
-    status: required,
-    state: required,
-    update: required,
-    leave: required,
-    shutdown: required
+    on,
+    status,
+    state,
+    update,
+    leave,
+    shutdown
   }
-}))
+})
 
 export default Channel
