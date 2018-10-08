@@ -397,6 +397,14 @@ const OBJECT_TAGS = {
   CHANNEL_OFFCHAIN_UPDATE_TRANSFER: 570
 }
 
+function objectTag (tag, pretty) {
+  if (pretty) {
+    const entry = Object.entries(OBJECT_TAGS).find(([key, value]) => tag === value)
+    return entry ? entry[0] : tag
+  }
+  return tag
+}
+
 function readInt (buf) {
   return buf.readIntBE(0, buf.length)
 }
@@ -411,13 +419,14 @@ function readSignatures (buf) {
   return signatures
 }
 
-function deserializeOffChainUpdate (binary) {
+function deserializeOffChainUpdate (binary, opts) {
+  const tag = readInt(binary[0])
   const obj = {
-    tag: readInt(binary[0]),
+    tag: objectTag(tag, opts.prettyTags),
     version: readInt(binary[1])
   }
 
-  switch (obj.tag) {
+  switch (tag) {
     case OBJECT_TAGS.CHANNEL_OFFCHAIN_UPDATE_TRANSFER:
       return Object.assign(obj, {
         from: 'ak_' + encodeBase58Check(binary[2]),
@@ -429,11 +438,11 @@ function deserializeOffChainUpdate (binary) {
   return obj
 }
 
-function readOffChainTXUpdates (buf) {
+function readOffChainTXUpdates (buf, opts) {
   const updates = []
 
   for (let i = 0; i < buf.length; i++) {
-    updates.push(deserializeOffChainUpdate(decode(buf[i])))
+    updates.push(deserializeOffChainUpdate(decode(buf[i]), opts))
   }
 
   return updates
@@ -445,17 +454,18 @@ function readOffChainTXUpdates (buf) {
  * @param {String} binary - Data to deserialize
  * @return {Object} Channel data
  */
-export function deserialize (binary) {
+export function deserialize (binary, opts = {prettyTags: false}) {
+  const tag = readInt(binary[0])
   const obj = {
-    tag: readInt(binary[0]),
+    tag: objectTag(tag, opts.prettyTags),
     version: readInt(binary[1])
   }
 
-  switch (obj.tag) {
+  switch (tag) {
     case OBJECT_TAGS.SIGNED_TX:
       return Object.assign(obj, {
         signatures: readSignatures(binary[2]),
-        tx: deserialize(decode(binary[3]))
+        tx: deserialize(decode(binary[3]), opts)
       })
 
     case OBJECT_TAGS.CHANNEL_CREATE_TX:
@@ -484,7 +494,7 @@ export function deserialize (binary) {
       return Object.assign(obj, {
         channelId: encodeBase58Check(binary[2]),
         round: readInt(binary[3]),
-        updates: readOffChainTXUpdates(binary[4]),
+        updates: readOffChainTXUpdates(binary[4], opts),
         state: encodeBase58Check(binary[5])
       })
   }
