@@ -88,7 +88,7 @@ export default {
   },
   created () {
     Aepp({
-      url: 'https://sdk-testnet.aepps.com'
+      url: 'https://sdk-edgenet.aepps.com'
     }).then(ae => {
       this.account = ae
       ae.address()

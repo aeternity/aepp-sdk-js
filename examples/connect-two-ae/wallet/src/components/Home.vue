@@ -70,7 +70,7 @@ export default {
     window.addEventListener('message', console.log, false)
 
     Wallet({
-      url: 'https://sdk-testnet.aepps.com',
+      url: 'https://sdk-edgenet.aepps.com',
       accounts: [MemoryAccount({keypair: {priv: this.priv, pub: this.pub}})],
       address: this.pub,
       // onTx: this.confirmDialog,
