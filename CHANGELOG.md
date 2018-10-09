@@ -9,6 +9,8 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ### Changed
 - API endpoints to meet new Epoch specifications
+- Add Nonce calculation on SDK side
+- Add check for MAX_GAS in call and deploy contract
 - change hash prefix separator from $ to _
 - Add keywords ('SDK', 'CLI') to package.json
 - Link aecli to `./bin/aecli.js` in package.json (After "npm link" you can use CLI globally)

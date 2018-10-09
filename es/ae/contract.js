@@ -46,6 +46,12 @@ async function decode (type, data) {
 
 async function call (code, abi, address, name, { args = '()', options = {} } = {}) {
   const opt = R.merge(this.Ae.defaults, options)
+
+  // Check for MAX_GAS
+  if (opt.gas > this.Ae.defaults.gas) {
+    opt.gas = this.Ae.defaults.gas
+  }
+
   const tx = await this.contractCallTx(R.merge(opt, {
     callData: await this.contractEncodeCall(code, abi, name, args),
     contractId: address,
@@ -70,6 +76,12 @@ async function deploy (code, abi, { initState = '()', options = {} } = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   const callData = await this.contractEncodeCall(code, abi, 'init', initState)
   const ownerId = await this.address()
+
+  // Check for MAX_GAS
+  if (opt.gas > this.Ae.defaults.gas) {
+    opt.gas = this.Ae.defaults.gas
+  }
+
   const { tx, contractId } = await this.contractCreateTx(R.merge(opt, {
     callData,
     code,
@@ -110,7 +122,7 @@ const Contract = Ae.compose({
     vmVersion: 1,
     gasPrice: 1,
     amount: 1,
-    gas: 40000000,
+    gas: 1600000 - 21000, // MAX GAS
     options: ''
   } } }
 })

@@ -15,12 +15,14 @@
 *  PERFORMANCE OF THIS SOFTWARE.
 */
 
-// ERROR HANDLERS
+// #ERROR HANDLERS
 import { printError, print } from './print'
 import { isExecCommand } from './cli'
 
+// `API` errors logger
 export function logApiError (error) { printError(`API ERROR: ${error}`) }
 
+// `API` errors handler
 export async function handleApiError (fn) {
   try {
     return await fn()
@@ -32,6 +34,7 @@ export async function handleApiError (fn) {
   }
 }
 
+// `COMMANDER` unknown commands handler
 export function unknownCommandHandler (program) {
   return (execCommands = []) => {
     const cmd = program.args[0]

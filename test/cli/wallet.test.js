@@ -46,7 +46,6 @@ describe('CLI Wallet Module', function () {
 
     // check for wallet files
     fs.existsSync(walletName).should.equal(true)
-    fs.existsSync(`${walletName}.pub`).should.equal(true)
 
     // check if wallet files valid
     parseBlock(await execute(['account', 'address', walletName, '--password', 'test']))['your_address_is'].should.be.a('string')
@@ -57,7 +56,6 @@ describe('CLI Wallet Module', function () {
 
     // check for wallet files
     fs.existsSync(walletName).should.equal(true)
-    fs.existsSync(`${walletName}.pub`).should.equal(true)
 
     // check if wallet valid
     parseBlock(await execute(['account', 'address', walletName, '--password', 'test']))['your_address_is'].should.equal(KEY_PAIR.pub)
