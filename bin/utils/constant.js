@@ -29,8 +29,8 @@ export const HASH_TYPES = {
 }
 
 // CONNECTION
-export const EPOCH_URL = 'http://localhost:3013'
-export const EPOCH_INTERNAL_URL = 'http://localhost:3113'
+export const EPOCH_URL = 'https://sdk-edgenet.aepps.com'
+export const EPOCH_INTERNAL_URL = 'https://sdk-edgenet.aepps.com'
 export const EPOCH_WEBSOCKET_URL = 'https://sdk-edgenet.aepps.com'
 
 // CHAIN
@@ -39,11 +39,11 @@ export const PLAY_INTERVAL = 1000
 
 // CONTRACT
 export const CONTRACT_TTL = Number.MAX_SAFE_INTEGER
-export const GAS = 40000000
+export const GAS = 1600000
 
 // AENS
 export const AENS_TX_TTL = Number.MAX_SAFE_INTEGER
-export const NAME_TTL = Number.MAX_SAFE_INTEGER
+export const NAME_TTL = 50000
 
 // ACCOUNT
-export const ACCOUNT_TX_TTL = Number.MAX_SAFE_INTEGER
+export const SPEND_TX_TTL = Number.MAX_SAFE_INTEGER

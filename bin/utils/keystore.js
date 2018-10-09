@@ -58,10 +58,10 @@ function isBase64 (str) {
  * will be used if the input is valid hex.  If the input is valid base64 but
  * not valid hex, base64 will be used.  Otherwise, utf8 will be used.
  * @param {string} str String to be converted.
- * @param {string} enc Encoding of the input string (optional).
- * @return {Buffer|String} Buffer (bytearray) containing the input data.
+ * @param {string=} enc Encoding of the input string (optional).
+ * @return {buffer} Buffer (bytearray) containing the input data.
  */
-function str2buf (str, enc = 'utf8') {
+function str2buf (str, enc) {
   if (!str || str.constructor !== String) return str
   if (!enc && isHex(str)) enc = 'hex'
   if (!enc && isBase64(str)) enc = 'base64'
@@ -70,20 +70,20 @@ function str2buf (str, enc = 'utf8') {
 
 /**
  * Check if the selected cipher is available.
- * @param {string} cipher Encryption algorithm.
+ * @param {string} algo Encryption algorithm.
  * @return {boolean} If available true, otherwise false.
  */
 function isCipherAvailable (cipher) {
-  return crypto.getCiphers().some((name) => name === cipher)
+  return crypto.getCiphers().some(function (name) { return name === cipher })
 }
 
 /**
  * Symmetric private key encryption using secret (derived) key.
- * @param {Buffer|String} plaintext Data to be encrypted.
- * @param {Buffer|String} key Secret key.
- * @param {Buffer|String} iv Initialization vector.
- * @param {Buffer} algo Encryption algorithm (default: OPTIONS.cipher).
- * @return {Buffer} Encrypted data.
+ * @param {buffer|string} plaintext Data to be encrypted.
+ * @param {buffer|string} key Secret key.
+ * @param {buffer|string} iv Initialization vector.
+ * @param {string=} algo Encryption algorithm (default: constants.cipher).
+ * @return {buffer} Encrypted data.
  */
 function encrypt (plaintext, key, iv, algo) {
   let cipher, ciphertext
@@ -99,8 +99,8 @@ function encrypt (plaintext, key, iv, algo) {
  * @param {buffer|string} ciphertext Data to be decrypted.
  * @param {buffer|string} key Secret key.
  * @param {buffer|string} iv Initialization vector.
- * @param {string=} algo Encryption algorithm (default: OPTIONS.cipher).
- * @return {Buffer} Decrypted data.
+ * @param {string=} algo Encryption algorithm (default: constants.cipher).
+ * @return {buffer} Decrypted data.
  */
 function decrypt (ciphertext, key, iv, algo) {
   let decipher, plaintext
@@ -137,12 +137,14 @@ function getMAC (derivedKey, ciphertext) {
  * @param {string=} options.kdf Key derivation function (default: pbkdf2).
  * @param {string=} options.cipher Symmetric cipher (default: constants.cipher).
  * @param {Object=} options.kdfparams KDF parameters (default: constants.<kdf>).
+ * @param {function=} cb Callback function (optional).
  * @return {buffer} Secret key derived from password.
  */
-async function deriveKey (password, salt, options = {}) {
+async function deriveKey (password, salt, options, cb) {
   if (typeof password === 'undefined' || password === null || !salt) {
     throw new Error('Must provide password and salt to derive a key')
   }
+  options = options || {}
   options.kdfparams = options.kdfparams || OPTIONS.scrypt
 
   // convert strings to buffers
@@ -151,11 +153,11 @@ async function deriveKey (password, salt, options = {}) {
 
   // TODO add support of pbkdf2
   // use scrypt as key derivation function
-  return await deriveKeyUsingScrypt(password, salt, options)
+  return await deriveKeyUsingScrypt(password, salt, options, cb)
 }
 
 async function deriveKeyUsingScrypt (password, salt, options) {
-  const { n: N, r, p, dklen } = options.kdfparams
+  const {n: N, r, p, dklen} = options.kdfparams
   return await scrypt.hash(password, { N, r, p }, dklen, salt)
 }
 
@@ -171,10 +173,11 @@ async function deriveKeyUsingScrypt (password, salt, options) {
  * @param {Object=} options.kdfparams KDF parameters (default: constants.<kdf>).
  * @return {Object}
  */
-function marshal (derivedKey, privateKey, salt, iv, options = {}) {
+function marshal (derivedKey, privateKey, salt, iv, options) {
   let ciphertext, keyObject, algo
+  options = options || {}
   options.kdf = 'scrypt' //Always use SCRYPT
-  options.kdfparams = OPTIONS.scrypt
+  options.kdfparams = options.kdfparams || OPTIONS.scrypt
   algo = options.cipher || OPTIONS.cipher
 
   // encrypt using first 16 bytes of derived key
@@ -214,60 +217,76 @@ export function getAddressFromPriv (secret) {
 
 /**
  * Recover plaintext private key from secret-storage key object.
- * @param {String|Buffer} password User-supplied password
  * @param {Object} keyObject Keystore object.
- * @return {Object} Return KeyPair Object.
+ * @param {function=} cb Callback function (optional).
+ * @return {buffer} Plaintext private key.
  */
-export async function recover (password, keyObject) {
+export async function recover (password, keyObject, cb) {
   const keyObjectCrypto = keyObject.Crypto || keyObject.crypto
-  let { chiper: algo } = keyObjectCrypto
+  let { ciphertext, chiper: algo } = keyObjectCrypto
   const iv = str2buf(keyObjectCrypto.cipherparams.iv)
   const salt = str2buf(keyObjectCrypto.kdfparams.salt)
 
   // verify that message authentication codes match, then decrypt
-  function verifyAndDecrypt (derivedKey, iv, ciphertext, algo) {
+  function verifyAndDecrypt (derivedKey, salt, iv, ciphertext, algo) {
     if (getMAC(derivedKey, ciphertext) !== keyObjectCrypto.mac) {
       throw new Error('Wrong password')
     }
     return decrypt(ciphertext, derivedKey.slice(0, 16), iv, algo)
   }
 
+  ciphertext = str2buf(ciphertext)
+
   // Get derive key using scrypt
   const dKey = await deriveKey(password, salt, keyObjectCrypto)
 
-  const priv = verifyAndDecrypt.bind(this)(dKey, salt, iv, str2buf(keyObjectCrypto.ciphertext), algo).toString('hex')
   // Verify deriveKey and decrypt
-  return { priv, pub: getAddressFromPriv() }
-}
-
-function getRandomSalt() {
-  return Buffer.from(nacl.randomBytes(128).slice(OPTIONS.keyBytes + OPTIONS.ivBytes))
-}
-
-function getRandomIv() {
-  return Buffer.from(nacl.randomBytes(128).slice(OPTIONS.keyBytes, OPTIONS.keyBytes + OPTIONS.ivBytes))
+  return verifyAndDecrypt.bind(this)(dKey, salt, iv, ciphertext, algo).toString('hex')
 }
 
 /**
  * Export private key to keystore secret-storage format.
  * @param {string|buffer} password User-supplied password.
  * @param {string|buffer} privateKey Private key.
- * @param {string|buffer=} salt Randomly generated salt.
- * @param {string|buffer=} iv Initialization vector.
+ * @param {string|buffer} salt Randomly generated salt.
+ * @param {string|buffer} iv Initialization vector.
  * @param {Object=} options Encryption parameters.
  * @param {string=} options.kdf Key derivation function (default: pbkdf2).
  * @param {string=} options.cipher Symmetric cipher (default: constants.cipher).
  * @param {Object=} options.kdfparams KDF parameters (default: constants.<kdf>).
+ * @param {function=} cb Callback function (optional).
  * @return {Object}
  */
+export async function dump (
+  password,
+  privateKey,
+  salt = Buffer.from(nacl.randomBytes(128).slice(OPTIONS.keyBytes + OPTIONS.ivBytes)),
+  iv = Buffer.from(nacl.randomBytes(128).slice(OPTIONS.keyBytes, OPTIONS.keyBytes + OPTIONS.ivBytes)),
+  options
+) {
 
-export async function dump (password, privateKey, salt, iv , options = {}) {
-  iv =  iv ? str2buf(iv) : str2buf(getRandomIv())
-  salt = salt ? salt : getRandomSalt()
-  privateKey = str2buf(privateKey, )
+  options = options || {}
+  iv = str2buf(iv)
+  privateKey = str2buf(privateKey)
 
   const dKey = await deriveKey(password, salt, options)
   return marshal(dKey, privateKey, salt, iv, options)
 }
+
+/**
+ * Generate filename for a keystore file.
+ * @param {string} address address.
+ * @return {string} Keystore filename.
+ */
+export function generateKeystoreFilename (address) {
+  let filename = "UTC--" + new Date().toISOString() + "--" + address
+
+  // Windows does not permit ":" in filenames, replace all with "-"
+  if (process.platform === "win32") filename = filename.split(":").join("-")
+
+  return filename
+}
+
+
 
 

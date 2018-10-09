@@ -110,7 +110,7 @@ const Contract = Ae.compose({
     vmVersion: 1,
     gasPrice: 1,
     amount: 1,
-    gas: 40000000,
+    gas: 1600000,
     options: ''
   } } }
 })
