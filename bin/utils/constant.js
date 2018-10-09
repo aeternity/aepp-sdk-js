@@ -39,7 +39,7 @@ export const PLAY_INTERVAL = 1000
 
 // CONTRACT
 export const CONTRACT_TTL = Number.MAX_SAFE_INTEGER
-export const GAS = 1600000
+export const GAS = 1600000 - 21000 // MAX GAS
 
 // AENS
 export const AENS_TX_TTL = Number.MAX_SAFE_INTEGER
