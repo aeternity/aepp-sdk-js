@@ -20,13 +20,13 @@ import Cli from '../../es/ae/cli'
 
 export function getCmdFromArguments (args) {
   return R.merge(
-    R.last(args),
-    R.last(args).parent
+    R.head(args),
+    R.head(args).parent
   )
 }
 
-export async function initClient (url, keypair, internalUrl) {
-  return await Cli({ url, process, keypair, internalUrl })
+export async function initClient ({ host: url, keypair, internalUrl, force: forceCompatibility }) {
+  return await Cli({ url, process, keypair, internalUrl, forceCompatibility })
 }
 
 export function initExecCommands (program) {

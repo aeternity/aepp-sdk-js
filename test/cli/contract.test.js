@@ -39,16 +39,12 @@ describe('CLI Contract Module', function () {
   })
   after(function () {
     // Remove wallet files
-    if (fs.existsSync(WALLET_NAME))
-      fs.unlinkSync(WALLET_NAME)
-    if (fs.existsSync(`${WALLET_NAME}.pub`))
-      fs.unlinkSync(`${WALLET_NAME}.pub`)
+    if (fs.existsSync(WALLET_NAME)) { fs.unlinkSync(WALLET_NAME) }
+    if (fs.existsSync(`${WALLET_NAME}.pub`)) { fs.unlinkSync(`${WALLET_NAME}.pub`) }
 
     // Remove contract files
-    if (fs.existsSync(deployDescriptor))
-      fs.unlinkSync(deployDescriptor)
-    if (fs.existsSync(contractFile))
-      fs.unlinkSync(contractFile)
+    if (fs.existsSync(deployDescriptor)) { fs.unlinkSync(deployDescriptor) }
+    if (fs.existsSync(contractFile)) { fs.unlinkSync(contractFile) }
   })
 
   it('Compile Contract', async () => {
@@ -68,7 +64,7 @@ describe('CLI Contract Module', function () {
 
     // Deploy contract
     const res = await execute(['contract', 'deploy', WALLET_NAME, '--password', 'test', contractFile])
-    const {contract_address, transaction_hash, deploy_descriptor} = (parseBlock(res))
+    const { contract_address, transaction_hash, deploy_descriptor } = (parseBlock(res))
     deployDescriptor = deploy_descriptor
     const [name, pref, address] = deployDescriptor.split('.')
 

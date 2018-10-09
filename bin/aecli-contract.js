@@ -30,10 +30,11 @@ const utils = require('./utils/index')
 const { Contract } = require('./commands')
 
 program
-  .option('-H, --host [hostname]', 'Node to connect to', utils.constant.EPOCH_URL)
-  .option('-U, --internalUrl [internal]', 'Node to connect to(internal)', utils.constant.EPOCH_INTERNAL_URL)
+  .option('--host [hostname]', 'Node to connect to', utils.constant.EPOCH_URL)
+  .option('--internalUrl [internal]', 'Node to connect to(internal)', utils.constant.EPOCH_INTERNAL_URL)
   .option('-T, --ttl [ttl]', 'Validity of the transaction in number of blocks (default forever)', utils.constant.CONTRACT_TTL)
-  .option('--json [json]', 'Print result in json format')
+  .option('-f --force', 'Ignore epoch version compatibility check')
+  .option('--json', 'Print result in json format')
 
 
 program

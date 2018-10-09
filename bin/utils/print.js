@@ -21,10 +21,7 @@ import { HASH_TYPES } from './constant'
 
 // CONSOLE PRINT HELPERS
 export function print (msg, obj) {
-  if (obj)
-    console.log(msg, obj)
-  else
-    console.log(msg)
+  if (obj) { console.log(msg, obj) } else { console.log(msg) }
 }
 
 export function printError (msg) {
@@ -51,8 +48,7 @@ export function printBlock (block, json) {
   print(`Previous block hash___________ ${R.prop('prevHash', block)}`)
   print(`Previous key block hash_______ ${R.prop('prevKeyHash', block)}`)
   print(`Transactions__________________ ${R.defaultTo(0, R.path(['transactions', 'length'], block))}`)
-  if (R.defaultTo(0, R.path(['transactions', 'length'], block)))
-    printBlockTransactions(block.transactions)
+  if (R.defaultTo(0, R.path(['transactions', 'length'], block))) { printBlockTransactions(block.transactions) }
 }
 
 export function printName (name, json) {
@@ -72,7 +68,8 @@ export function printBlockTransactions (ts, json) {
     return
   }
   ts.forEach(
-    tx => {
+    (tx, i) => {
+      if (i !== 0) print('--------->')
       printTransaction(tx)
     })
 }

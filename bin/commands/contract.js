@@ -32,12 +32,12 @@ import { handleApiError } from '../utils/errors'
 import { printError, print, logContractDescriptor } from '../utils/print'
 import { getWalletByPathAndDecrypt } from '../utils/account'
 
-export async function compile (file, { host, internalUrl }) {
+export async function compile (file, options) {
   try {
     const code = readFile(path.resolve(process.cwd(), file), 'utf-8')
     if (!code) throw new Error('Contract file not found')
 
-    const client = await initClient(host, null, internalUrl)
+    const client = await initClient(options)
 
     await handleApiError(async () => {
       const contract = await client.contractCompile(code)
@@ -47,10 +47,10 @@ export async function compile (file, { host, internalUrl }) {
   } catch (e) {
     printError(e.message)
   }
-
 }
 
-async function deploy (walletPath, contractPath, { host, gas, init, internalUrl, password, ttl, json  }) {
+async function deploy (walletPath, contractPath, options) {
+  const { gas, init, ttl, password, json } = options
   // Deploy a contract to the chain and create a deploy descriptor
   // with the contract informations that can be use to invoke the contract
   // later on.
@@ -59,7 +59,7 @@ async function deploy (walletPath, contractPath, { host, gas, init, internalUrl,
   // deploy descriptor
   try {
     const keypair = await getWalletByPathAndDecrypt(walletPath, { password })
-    const client = await initClient(host, keypair, internalUrl)
+    const client = await initClient(R.merge(options, { keypair }))
     const contractFile = readFile(path.resolve(process.cwd(), contractPath), 'utf-8')
 
     await handleApiError(
@@ -75,7 +75,7 @@ async function deploy (walletPath, contractPath, { host, gas, init, internalUrl,
         // even when the contract's `state` is `unit` (`()`). The arguments to
         // `init` have to be provided at deployment time and will be written to the
         // block as well, together with the contract's bytecode.
-        const deployDescriptor = await contract.deploy({ initState: init, ttl })
+        const deployDescriptor = await contract.deploy({ initState: init, options: { ttl } })
 
         // Write contractDescriptor to file
         const descPath = `${R.last(contractPath.split('/'))}.deploy.${deployDescriptor.owner.slice(3)}.json`
@@ -83,7 +83,7 @@ async function deploy (walletPath, contractPath, { host, gas, init, internalUrl,
           descPath,
           source: contractFile,
           bytecode: contract.bytecode,
-          abi: 'sophia',
+          abi: 'sophia'
         }, deployDescriptor)
 
         writeFile(
@@ -101,21 +101,22 @@ async function deploy (walletPath, contractPath, { host, gas, init, internalUrl,
   }
 }
 
-async function call (walletPath, descrPath, fn, returnType, args, { host, internalUrl, password }) {
+async function call (walletPath, descrPath, fn, returnType, args, options) {
+  const { password } = options
   if (!path || !fn || !returnType) {
     program.outputHelp()
     process.exit(1)
   }
   try {
     const keypair = await getWalletByPathAndDecrypt(walletPath, { password })
-    const client = await initClient(host, keypair, internalUrl)
+    const client = await initClient(R.merge(options, { keypair }))
     const descr = await readJSONFile(path.resolve(process.cwd(), descrPath))
 
     await handleApiError(
       async () => {
         args = args.filter(arg => arg !== '[object Object]')
         args = args.length ? `(${args.join(',')})` : '()'
-        const callResult = await client.contractCall(descr.bytecode, descr.abi || 'sophia', descr.address, fn, { args })
+        const callResult = await client.contractCall(descr.bytecode, descr.abi || 'sophia', descr.address, fn, { args, options })
         // The execution result, if successful, will be an AEVM-encoded result
         // value. Once type decoding will be implemented in the SDK, this value will
         // not be a hexadecimal string, anymore.
@@ -124,7 +125,7 @@ async function call (walletPath, descrPath, fn, returnType, args, { host, intern
         print('Gas used_________________ ' + R.path(['result', 'gasUsed'])(callResult))
         print('Return value (encoded)___ ' + R.path(['result', 'returnValue'])(callResult))
         // Decode result
-        const {type, value} = await callResult.decode(returnType)
+        const { type, value } = await callResult.decode(returnType)
         print('Return value (decoded)___ ' + value)
         print('Return remote type_______ ' + type)
       }

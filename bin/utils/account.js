@@ -14,9 +14,8 @@
 *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 *  PERFORMANCE OF THIS SOFTWARE.
 */
-import path from "path"
+import path from 'path'
 import prompt from 'prompt'
-
 
 import * as Crypto from '../../es/utils/crypto'
 import { print } from './print'
@@ -57,9 +56,9 @@ async function promptPasswordAsync () {
 }
 
 // WALLET HELPERS
-export async function generateSecureWallet (name, {output, password}) {
+export async function generateSecureWallet (name, { output, password }) {
   password = password || await promptPasswordAsync()
-  const {pub, priv} = Crypto.generateSaveWallet(password)
+  const { pub, priv } = Crypto.generateSaveWallet(password)
   const data = [
     [path.join(output, name), priv],
     [path.join(output, `${name}.pub`), pub]
@@ -100,16 +99,6 @@ export async function generateSecureWalletFromPrivKey (name, priv, { output, pas
 
 export async function getWalletByPathAndDecrypt (walletPath, { privateKey, password } = {}) {
   try {
-    if (privateKey) {
-      const hexStr = Crypto.hexStringToByte(privateKey.trim())
-      const keys = Crypto.generateKeyPairFromSecret(hexStr)
-
-      return {
-        priv: privateKey.trim(),
-        pub: `ak_${Crypto.encodeBase58Check(keys.publicKey)}`
-      }
-    }
-
     const privBinaryKey = readFile(path.resolve(process.cwd(), walletPath))
     const pubBinaryKey = readFile(path.resolve(process.cwd(), `${walletPath}.pub`))
 

@@ -35,7 +35,8 @@ program
   .option('-H, --host [hostname]', 'Node to connect to', utils.constant.EPOCH_URL)
   .option('-U, --internalUrl [internal]', 'Node to connect to(internal)', utils.constant.EPOCH_INTERNAL_URL)
   .option('-P, --password [password]', 'Wallet Password')
-  .option('--json [json]', 'Print result in json format')
+  .option('-f --force', 'Ignore epoch version compatibility check')
+  .option('--json ', 'Print result in json format')
 
 program
   .command('spend <wallet_path> <receiver> <amount>')
@@ -50,7 +51,7 @@ program
 
 program
   .command('address [wallet_path]')
-  .option('-K, --privateKey [privateKey]', 'Use private key instead wallet file')
+  .option('-K, --privateKey', 'Print private key')
   .description('Get wallet address')
   .action(async (walletPath, ...arguments) => await Wallet.getAddress(walletPath, utils.cli.getCmdFromArguments(arguments)))
 

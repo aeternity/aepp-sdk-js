@@ -26,7 +26,7 @@ import stampit from '@stamp/it'
 import AsyncInit from './async-init'
 import axios from 'axios'
 import * as R from 'ramda'
-import {snakeToPascal, pascalToSnake} from './string'
+import { snakeToPascal, pascalToSnake } from './string'
 
 /**
  * Perform path string interpolation

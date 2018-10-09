@@ -21,7 +21,6 @@ import * as cli from './cli'
 import * as errors from './errors'
 import * as print from './print'
 import * as helpers from './helpers'
-import * as channel from './channel'
 
 export {
   helpers,
@@ -29,6 +28,5 @@ export {
   errors,
   cli,
   account,
-  print,
-  channel
+  print
 }

@@ -35,6 +35,7 @@ program
   .option('-P, --password [password]', 'Wallet Password')
   .option('-N, --nameTtl [nameTtl]', 'Name life Ttl', utils.constant.NAME_TTL)
   .option('-T, --ttl [ttl]', 'Life Ttl', utils.constant.AENS_TX_TTL)
+  .option('-f --force', 'Ignore epoch version compatibility check')
   .option('--json [json]', 'Print result in json format')
 
 program

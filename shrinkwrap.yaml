@@ -10,6 +10,7 @@ dependencies:
   esm: 3.0.84
   postinstall-build: 5.0.1
   ramda: 0.25.0
+  recursive-rename: 2.0.0
   rlp: 2.1.0
   serialize-javascript: 1.5.0
   sha.js: 2.4.11
@@ -1346,7 +1347,6 @@ packages:
     dependencies:
       core-js: 2.5.7
       regenerator-runtime: 0.11.1
-    dev: true
     resolution:
       integrity: sha1-llxwWGaOgrVde/4E/yM3vItWR/4=
   /babel-template/6.26.0:
@@ -1973,6 +1973,12 @@ packages:
       node: '>=0.1.90'
     resolution:
       integrity: sha512-jg/vxRmv430jixZrC+La5kMbUWqIg32/JsYNZb94+JEmzceYbWKTsv1OuTp+7EaqiaWRR2tPcykibwCRgclIsw==
+  /colors/1.3.2:
+    dev: false
+    engines:
+      node: '>=0.1.90'
+    resolution:
+      integrity: sha512-rhP0JSBGYvpcNQj4s5AdShMeE5ahMop96cTeDl/v9qQQm2fYClE2QXZRi8wLzc+GmXSxdIqqbOIAhyObEXDbfQ==
   /combined-stream/1.0.6:
     dependencies:
       delayed-stream: 1.0.0
@@ -2464,6 +2470,10 @@ packages:
     dev: true
     resolution:
       integrity: sha1-BzxpdUbOB4DOI75KKOKT5AvDDII=
+  /dom-walk/0.1.1:
+    dev: false
+    resolution:
+      integrity: sha1-ZyIm3HTI95mtNTB9+TaroRrNYBg=
   /domain-browser/1.2.0:
     dev: true
     engines:
@@ -3525,6 +3535,13 @@ packages:
     dev: true
     resolution:
       integrity: sha512-HchvMJNYh9dGSCy8pOQ2O8u/hoXaL+0XhnrwH0RyLiSXMMTl9W3N6KUU73+JFOg5PGjtzl6VZzUQsnrpm7Szag==
+  /global/4.3.2:
+    dependencies:
+      min-document: 2.19.0
+      process: 0.5.2
+    dev: false
+    resolution:
+      integrity: sha1-52mJJopsdMOJCLEwWxD8DjlOnQ8=
   /globals/11.7.0:
     dev: true
     engines:
@@ -4662,6 +4679,12 @@ packages:
       node: '>=4'
     resolution:
       integrity: sha512-j5EctnkH7amfV/q5Hgmoal1g2QHFJRraOtmx0JpIqkxhBhI/lJSl1nMpQ45hVarwNETOoWEimndZ4QK0RHxuxQ==
+  /min-document/2.19.0:
+    dependencies:
+      dom-walk: 0.1.1
+    dev: false
+    resolution:
+      integrity: sha1-e9KC4/WELtKVu3SM3Z8f+iyCRoU=
   /minimalistic-assert/1.0.1:
     dev: true
     resolution:
@@ -4684,7 +4707,6 @@ packages:
       integrity: sha1-hX/Kv8M5fSYluCKCYuhqp6ARsF0=
       tarball: 'http://registry.npmjs.org/minimist/-/minimist-0.0.8.tgz'
   /minimist/1.2.0:
-    dev: true
     resolution:
       integrity: sha1-o1AIsg9BOD7sH7kU9M1d95omQoQ=
   /mississippi/3.0.0:
@@ -5394,6 +5416,12 @@ packages:
       node: '>= 0.6.0'
     resolution:
       integrity: sha1-czIwDoQBYb2j5podHZGn1LwW8YI=
+  /process/0.5.2:
+    dev: false
+    engines:
+      node: '>= 0.6.0'
+    resolution:
+      integrity: sha1-FjjYqONML0QKkduVq5rrZ3/Bhc8=
   /progress/2.0.0:
     dev: true
     engines:
@@ -5590,6 +5618,19 @@ packages:
       node: '>=0.6'
     resolution:
       integrity: sha1-TtCtBg3zBzMAxIRANz9y0cxkLXg=
+  /recursive-rename/2.0.0:
+    dependencies:
+      babel-runtime: 6.26.0
+      bluebird: 3.5.2
+      colors: 1.3.2
+      global: 4.3.2
+      minimist: 1.2.0
+    dev: false
+    engines:
+      node: '>=6.8.1'
+    hasBin: true
+    resolution:
+      integrity: sha1-da66Q08kJk1QjR2Dr5U9iYknMec=
   /reduce-extract/1.0.0:
     dependencies:
       test-value: 1.1.0
@@ -5631,7 +5672,6 @@ packages:
     resolution:
       integrity: sha512-1G6jJVDWrt0rK99kBjvEtziZNCICAuvIPkSiUFIQxVP06RCVpq3dmDo2oi6ABpYaDYaTRr67BEhL8r1wgEZZKg==
   /regenerator-runtime/0.11.1:
-    dev: true
     resolution:
       integrity: sha512-MguG95oij0fC3QV3URf4V2SDYGJhJnJGqvIIgdECeODCT98wSWDAJ94SSuVpYQUoTcGUIL6L4yNB7j1DFFHSBg==
   /regenerator-runtime/0.12.0:
@@ -7173,6 +7213,7 @@ specifiers:
   postinstall-build: ^5.0.1
   prompt: ^1.0.0
   ramda: ^0.25.0
+  recursive-rename: ^2.0.0
   rlp: ^2.0.0
   safe-buffer: ^5.1.2
   serialize-javascript: ^1.5.0
