@@ -24,7 +24,7 @@
       </div>
     </div>
 
-    <h2 class="mt-4">Send Money</h2>
+    <h2 class="mt-4">Compile Contract</h2>
 
     <div class="border mt-4 rounded">
       <div class="bg-grey-lightest w-full flex flex-row font-mono">
@@ -40,31 +40,33 @@
       </div>
       <div class="bg-grey-lightest w-full flex flex-row font-mono">
         <div class="p-2 w-1/4">
-          To
+          Contract Code
         </div>
         <div class="p-2 w-3/4 bg-white">
-          <input class="bg-purple-lightest border-b border-black w-full h-full" v-model='to'  type="text" placeholder="ak$d55g5ffgThD4Hx3kf54tRoMUkK6HcoJ265HPBQjEFrg5tGERT">
+          <textarea class="bg-black text-white border-b border-black p-2 w-full h-64" v-model='contractCode' placeholder="contact code"/>
         </div>
       </div>
-      <div class="bg-grey-lightest w-full flex flex-row font-mono">
-        <div class="p-2 w-1/4">
-          Amount
-        </div>
-        <div class="p-2 w-3/4 bg-white">
-          <input class="bg-purple-lightest border-b border-black w-1/6 h-full" v-model='amount' type="number" placeholder="250">
-          <span class="w-1/6">AE Tokens</span>
-        </div>
-      </div>
-      <button class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 absolute text-xs" @click='send'>
-        Send
+      <button class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 absolute text-xs" @click='onCompile'>
+        Compile
       </button>
     </div>
+
+    <div v-if="byteCode" class="border mt-4 rounded">
+      <div class="bg-grey-lightest w-full flex flex-row font-mono">
+        {{byteCode}}
+      </div>
+    </div>
+
+
   </div>
 </template>
 
 <script>
 // AE_SDK_MODULES is a webpack alias present in webpack.config.js
 import Aepp from 'AE_SDK_MODULES/ae/aepp.js'
+// import Contract from 'AE_SDK_MODULES/ae/contract.js'
+// import Cli from 'AE_SDK_MODULES/ae/cli.js'
+// import Wallet from 'AE_SDK_MODULES/ae/wallet.js'
 // import server from 'AE_SDK_MODULES/rpc/server.js'
 // console.log(server)
 
@@ -78,21 +80,48 @@ export default {
       to: null,
       amount: null,
       height: null,
-      pub: null
+      pub: null,
+      contractCode: `contract Identity =
+  type state = ()
+  function main(x : int) = x`,
+      byteCode: null
     }
   },
   computed: {
   },
   methods: {
-    send () {}
+    send () {},
+    async compile (code) {
+      console.log(`Compiling contract...`)
+      try {
+        console.log(await this.client.contractCompile(code))
+        return await this.client.contractCompile(code)
+      } catch (err) {
+        this.compileError = err
+        console.error(err)
+      }
+    },
+    onCompile () {
+      this.compile(this.contractCode)
+        .then(byteCodeObj => {
+          this.byteCode = byteCodeObj.bytecode
+        })
+    }
   },
   created () {
     Aepp({
-      url: 'https://sdk-edgenet.aepps.com'
+      url: 'https://sdk-edgenet.aepps.com',
+      internalUrl: 'https://sdk-edgenet.aepps.com'
     }).then(ae => {
-      this.account = ae
+      console.log('client: ', ae)
+      this.client = ae
       ae.address()
-        .then(address => { this.pub = address })
+        .then(address => {
+          this.pub = address
+          // Wallet.compose(Contract)({
+          //   accounts: [MemoryAccount({keypair: {priv: this.account.priv, pub: this.account.pub}})]
+          // })
+        })
         .catch(e => { this.pub = `Rejected: ${e}` })
 
       // ae.sign('Hello World')
