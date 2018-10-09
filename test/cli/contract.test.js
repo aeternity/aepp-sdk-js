@@ -63,7 +63,7 @@ describe('CLI Contract Module', function () {
     fs.writeFileSync(contractFile, testContract)
 
     // Deploy contract
-    const res = await execute(['contract', 'deploy', WALLET_NAME, '--password', 'test', contractFile])
+    const res = await execute(['contract', 'deploy', WALLET_NAME, '--password', 'test', contractFile, '--ttl', 346345])
     const { contract_address, transaction_hash, deploy_descriptor } = (parseBlock(res))
     deployDescriptor = deploy_descriptor
     const [name, pref, address] = deployDescriptor.split('.')
