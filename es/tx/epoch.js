@@ -31,42 +31,50 @@ const createSalt = salt
 
 async function spendTx ({ senderId, recipientId, amount, fee, ttl, nonce, payload }) {
   nonce = await (calculateNonce.bind(this)(senderId))
-  return (await this.api.postSpend(R.merge(R.head(arguments), { recipientId, nonce }))).tx
+  ttl = await (calculateTtl.bind(this)(ttl))
+  return (await this.api.postSpend(R.merge(R.head(arguments), { recipientId, nonce, ttl }))).tx
 }
 
 async function namePreclaimTx ({ accountId, nonce, commitmentId, fee, ttl }) {
   nonce = await (calculateNonce.bind(this)(accountId))
-  return (await this.api.postNamePreclaim(R.merge(R.head(arguments), { nonce }))).tx
+  ttl = await (calculateTtl.bind(this)(ttl))
+  return (await this.api.postNamePreclaim(R.merge(R.head(arguments), { nonce, ttl }))).tx
 }
 
 async function nameClaimTx ({ accountId, nonce, name, nameSalt, fee, ttl }) {
   nonce = await (calculateNonce.bind(this)(accountId))
-  return (await this.api.postNameClaim(R.merge(R.head(arguments), { nonce }))).tx
+  ttl = await (calculateTtl.bind(this)(ttl))
+  return (await this.api.postNameClaim(R.merge(R.head(arguments), { nonce, ttl }))).tx
 }
 
 async function nameTransferTx ({ accountId, nonce, nameId, recipientId, fee, ttl }) {
   nonce = await (calculateNonce.bind(this)(accountId))
-  return (await this.api.postNameTransfer(R.merge(R.head(arguments), { recipientId, nonce }))).tx
+  ttl = await (calculateTtl.bind(this)(ttl))
+  return (await this.api.postNameTransfer(R.merge(R.head(arguments), { recipientId, nonce, ttl }))).tx
 }
 
 async function nameUpdateTx ({ accountId, nonce, nameId, nameTtl, pointers, clientTtl, fee, ttl }) {
   nonce = await (calculateNonce.bind(this)(accountId))
-  return (await this.api.postNameUpdate(R.merge(R.head(arguments), { nonce }))).tx
+  ttl = await (calculateTtl.bind(this)(ttl))
+  return (await this.api.postNameUpdate(R.merge(R.head(arguments), { nonce, ttl }))).tx
 }
 
 async function nameRevokeTx ({ accountId, nonce, nameId, fee, ttl }) {
   nonce = await (calculateNonce.bind(this)(accountId))
-  return (await this.api.postNameRevoke(R.merge(R.head(arguments), { nonce }))).tx
+  ttl = await (calculateTtl.bind(this)(ttl))
+  return (await this.api.postNameRevoke(R.merge(R.head(arguments), { nonce, ttl }))).tx
 }
 
 async function contractCreateTx ({ ownerId, nonce, code, vmVersion, deposit, amount, gas, gasPrice, fee, ttl, callData }) {
   nonce = await (calculateNonce.bind(this)(ownerId))
-  return this.api.postContractCreate(R.merge(R.head(arguments), { nonce }))
+  ttl = await (calculateTtl.bind(this)(ttl))
+  return this.api.postContractCreate(R.merge(R.head(arguments), { nonce, ttl }))
 }
 
 async function contractCallTx ({ callerId, nonce, contractId, vmVersion, fee, ttl, amount, gas, gasPrice, callData }) {
   nonce = await (calculateNonce.bind(this)(callerId))
-  return (await this.api.postContractCall(R.merge(R.head(arguments), { nonce }))).tx
+  ttl = await (calculateTtl.bind(this)(ttl))
+  return (await this.api.postContractCall(R.merge(R.head(arguments), { nonce, ttl }))).tx
 }
 
 async function commitmentHash (name, salt = createSalt()) {
@@ -75,6 +83,11 @@ async function commitmentHash (name, salt = createSalt()) {
 
 async function calculateNonce (accountId) {
   return +(await this.api.getAccountByPubkey(accountId)).nonce + 1
+}
+
+async function calculateTtl(ttl) {
+  const { height } = await this.api.getCurrentKeyBlock()
+  return +(height) + ttl
 }
 
 /**
