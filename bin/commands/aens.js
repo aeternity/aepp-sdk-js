@@ -88,6 +88,7 @@ async function claim (walletPath, domain, options) {
     })
   } catch (e) {
     printError(e.message)
+    process.exit(1)
   }
 }
 
@@ -120,6 +121,7 @@ async function transferName (walletPath, domain, address, options) {
     })
   } catch (e) {
     printError(e.message)
+    process.exit(1)
   }
 }
 
@@ -153,6 +155,7 @@ async function updateName (walletPath, domain, address, options) {
     })
   } catch (e) {
     printError(e.message)
+    process.exit(1)
   }
 }
 
@@ -180,6 +183,7 @@ async function revokeName (walletPath, domain, options) {
     })
   } catch (e) {
     printError(e.message)
+    process.exit(1)
   }
 }
 

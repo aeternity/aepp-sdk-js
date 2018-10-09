@@ -105,6 +105,5 @@ export function readFile (path, encoding = null, errTitle = 'READ FILE ERR') {
       default:
         throw e
     }
-    process.exit(1)
   }
 }
