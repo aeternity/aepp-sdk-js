@@ -48,9 +48,9 @@ export default {
   components: {},
   data () {
     return {
-      pub: 'ak$s8NmcLjRZhD4Hx3kf54tRoMUkK6HcoJ265HPBQjBjHSYwrfD9',
+      pub: 'ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU',
       // get from secure storage
-      priv: '828a283888c976253d39f9da69d0e146e9794a319d32bfad6698d258b7b3ebec71d1e1c03d340aed1a1d1033f633502adc33311ad22ee8e727a10fe0dc60c192',
+      priv: 'a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61',
       client: null,
       wallet: null,
       balance: null,
@@ -81,10 +81,13 @@ export default {
       this.$refs.dapp.src = this.dappUrl
 
       ae.height().then(height => {
+        console.log('height', height)
         this.height = height
       })
+      console.log(ae)
 
-      ae.balance().then(balance => {
+      ae.balance(this.pub).then(balance => {
+        console.log('balance', balance)
         this.balance = balance
       }).catch(e => {
         this.balance = 0
