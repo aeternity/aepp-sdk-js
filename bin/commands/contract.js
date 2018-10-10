@@ -32,7 +32,7 @@ import { handleApiError } from '../utils/errors'
 import { printError, print, logContractDescriptor } from '../utils/print'
 import { getWalletByPathAndDecrypt } from '../utils/account'
 
-export async function compile(file, options) {
+export async function compile (file, options) {
   try {
     const code = readFile(path.resolve(process.cwd(), file), 'utf-8')
     if (!code) throw new Error('Contract file not found')
@@ -49,7 +49,7 @@ export async function compile(file, options) {
   }
 }
 
-async function deploy(walletPath, contractPath, options) {
+async function deploy (walletPath, contractPath, options) {
   const { gas, init, ttl, password, json, nonce } = options
   // Deploy a contract to the chain and create a deploy descriptor
   // with the contract informations that can be use to invoke the contract
@@ -101,7 +101,7 @@ async function deploy(walletPath, contractPath, options) {
   }
 }
 
-async function call(walletPath, descrPath, fn, returnType, args, options) {
+async function call (walletPath, descrPath, fn, returnType, args, options) {
   const { password } = options
   options.gas = parseInt(options.gas);
   options.nonce = parseInt(options.nonce);
