@@ -37,7 +37,7 @@ async function height () {
   return (await this.api.getCurrentKeyBlockHeight()).height
 }
 
-async function awaitHeight (h, { interval = 5000, attempts = 12 } = {}) {
+async function awaitHeight (h, { interval = 500, attempts = 10 } = {}) {
   const instance = this
 
   async function probe (resolve, reject, left) {
@@ -48,7 +48,7 @@ async function awaitHeight (h, { interval = 5000, attempts = 12 } = {}) {
       } else if (left > 0) {
         setTimeout(() => probe(resolve, reject, left - 1), interval)
       } else {
-        reject(Error(`Giving up after ${attempts * interval}ms`))
+        reject(Error(`Giving up after ${attempts * interval}ms, current=${current}, h=${h}`))
       }
     } catch (e) {
       reject(e)

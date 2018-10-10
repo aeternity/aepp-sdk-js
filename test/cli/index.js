@@ -48,7 +48,11 @@ export async function ready (mocha) {
   configure(mocha)
 
   const ae = await BaseAe()
-  await ae.awaitHeight(10)
+  try {
+    await ae.awaitHeight(10)
+  } catch (e) {
+    console.log(e)
+  }
 
   if (!charged && planned > 0) {
     console.log(`Charging new wallet ${KEY_PAIR.pub} with ${planned}`)
