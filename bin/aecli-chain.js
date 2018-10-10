@@ -43,7 +43,7 @@ program
   .action(async (...arguments) => await Chain.top(utils.cli.getCmdFromArguments(arguments)))
 
 program
-  .command('version')
+  .command('status')
   .description('Get Epoch version')
   .action(async (...arguments) => await Chain.version(utils.cli.getCmdFromArguments(arguments)))
 

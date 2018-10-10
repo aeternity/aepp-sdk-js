@@ -20,10 +20,10 @@ const fs = require('fs')
 const prompt = require('prompt')
 const path = require('path')
 
-const utils = require('./utils/index')
 
 require = require('esm')(module/*, options */) // use to handle es6 import/export
 const Crypto = require('../es/utils/crypto')
+const utils = require('./utils/index')
 
 // The `prompt` library provides concealed input of passwords.
 const promptSchema = {
@@ -46,33 +46,28 @@ function extractReadableKeys (dir, options) {
   const pwd = options.input
   prompt.start()
   prompt.get(promptSchema, (err, { password }) => {
-    const key = fs.readFileSync(path.join(pwd, dir, 'sign_key'))
-    const pubKey = fs.readFileSync(path.join(pwd, dir, 'sign_key.pub'))
+    try {
+      const key = fs.readFileSync(path.join(pwd, dir, 'sign_key'))
+      const pubKey = fs.readFileSync(path.join(pwd, dir, 'sign_key.pub'))
 
-    const decrypted = Crypto.decryptPrivateKey(password, key)
+      const decrypted = Crypto.decryptPrivateKey(password, key)
 
-    const privateHex = Buffer.from(decrypted).toString('hex')
-    const decryptedPub = Crypto.decryptPubKey(password, pubKey)
+      const privateHex = Buffer.from(decrypted).toString('hex')
+      const decryptedPub = Crypto.decryptPubKey(password, pubKey)
 
-    console.log(`Private key (hex): ${privateHex}`)
-    console.log(`Public key (base check): ak_${Crypto.encodeBase58Check(decryptedPub)}`)
-    console.log(`Public key (hex): ${decryptedPub.toString('hex')}`)
+      console.log(`Private key (hex): ${privateHex}`)
+      console.log(`Public key (base check): ak_${Crypto.encodeBase58Check(decryptedPub)}`)
+      console.log(`Public key (hex): ${decryptedPub.toString('hex')}`)
+    } catch (e) {
+      console.log(e.message)
+      process.exit(1)
+    }
   })
 }
 
 // ## Key Pair Generation
-function generateKeyPair (name, { output }) {
-  const { pub, priv } = Crypto.generateKeyPair()
-
-  const data = [
-    [path.join(output, name), priv],
-    [path.join(output, `${name}.pub`), pub]
-  ]
-
-  data.forEach(([path, data]) => {
-    fs.writeFileSync(path, data)
-    console.log(`Wrote ${path}`)
-  })
+async function generateKeyPair (name, { output, password }) {
+  await utils.account.generateSecureWallet(name, { output, password })
 }
 
 // ## Transaction Signing
@@ -133,7 +128,8 @@ program
   .command('genkey <keyname>')
   .description('Generate keypair')
   .option('-o, --output [directory]', 'Output directory for the keys', '.')
-  .action(generateKeyPair)
+  .option('-p, --password [directory]', 'Password for keypair', '.')
+  .action(async (keyname) => await generateKeyPair(keyname))
 
 program
   .command('sign <tx> [privkey]')

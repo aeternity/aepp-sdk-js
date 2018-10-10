@@ -27,10 +27,9 @@ import * as R from 'ramda'
 import path from 'path'
 
 import { readFile, readJSONFile, writeFile } from '../utils/helpers'
-import { initClient } from '../utils/cli'
+import { initClient, initClientByWalletFile } from '../utils/cli'
 import { handleApiError } from '../utils/errors'
 import { printError, print, logContractDescriptor } from '../utils/print'
-import { getWalletByPathAndDecrypt } from '../utils/account'
 
 export async function compile (file, options) {
   try {
@@ -50,7 +49,11 @@ export async function compile (file, options) {
 }
 
 async function deploy (walletPath, contractPath, options) {
-  const { gas, init, ttl, password, json } = options
+  const { init, json } = options
+  const ttl = parseInt(options.ttl)
+  const gas = parseInt(options.gas)
+  const nonce = parseInt(options.nonce)
+
   // Deploy a contract to the chain and create a deploy descriptor
   // with the contract informations that can be use to invoke the contract
   // later on.
@@ -58,8 +61,8 @@ async function deploy (walletPath, contractPath, options) {
   // source file. Multiple deploy of the same contract file will generate different
   // deploy descriptor
   try {
-    const keypair = await getWalletByPathAndDecrypt(walletPath, { password })
-    const client = await initClient(R.merge(options, { keypair }))
+    // Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
+    const client = await initClientByWalletFile(walletPath, options)
     const contractFile = readFile(path.resolve(process.cwd(), contractPath), 'utf-8')
 
     await handleApiError(
@@ -75,7 +78,7 @@ async function deploy (walletPath, contractPath, options) {
         // even when the contract's `state` is `unit` (`()`). The arguments to
         // `init` have to be provided at deployment time and will be written to the
         // block as well, together with the contract's bytecode.
-        const deployDescriptor = await contract.deploy({ initState: init, options: { ttl } })
+        const deployDescriptor = await contract.deploy({ initState: init, options: { ttl, gas, nonce } })
 
         // Write contractDescriptor to file
         const descPath = `${R.last(contractPath.split('/'))}.deploy.${deployDescriptor.owner.slice(3)}.json`
@@ -102,21 +105,25 @@ async function deploy (walletPath, contractPath, options) {
 }
 
 async function call (walletPath, descrPath, fn, returnType, args, options) {
-  const { password } = options
+  const ttl = parseInt(options.ttl)
+  const nonce = parseInt(options.nonce)
+  const gas = parseInt(options.gas)
+
   if (!path || !fn || !returnType) {
     program.outputHelp()
     process.exit(1)
   }
   try {
-    const keypair = await getWalletByPathAndDecrypt(walletPath, { password })
-    const client = await initClient(R.merge(options, { keypair }))
+    // Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
+    const client = await initClientByWalletFile(walletPath, options)
     const descr = await readJSONFile(path.resolve(process.cwd(), descrPath))
 
     await handleApiError(
       async () => {
         args = args.filter(arg => arg !== '[object Object]')
         args = args.length ? `(${args.join(',')})` : '()'
-        const callResult = await client.contractCall(descr.bytecode, descr.abi || 'sophia', descr.address, fn, { args, options })
+        // Send ContractCall Tx
+        const callResult = await client.contractCall(descr.bytecode, descr.abi || 'sophia', descr.address, fn, { args, options: { ttl, gas, nonce } })
         // The execution result, if successful, will be an AEVM-encoded result
         // value. Once type decoding will be implemented in the SDK, this value will
         // not be a hexadecimal string, anymore.

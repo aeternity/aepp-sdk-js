@@ -35,12 +35,13 @@ program
   .option('-H, --host [hostname]', 'Node to connect to', utils.constant.EPOCH_URL)
   .option('-U, --internalUrl [internal]', 'Node to connect to(internal)', utils.constant.EPOCH_INTERNAL_URL)
   .option('-P, --password [password]', 'Wallet Password')
+  .option('-n, --nonce [nonce]', 'Override the nonce that the transaction is going to be sent with')
   .option('-f --force', 'Ignore epoch version compatibility check')
   .option('--json ', 'Print result in json format')
 
 program
   .command('spend <wallet_path> <receiver> <amount>')
-  .option('-T, --ttl [ttl]', 'Validity of the spend transaction in number of blocks (default forever)', utils.constant.ACCOUNT_TX_TTL)
+  .option('-T, --ttl [ttl]', 'Validity of the spend transaction in number of blocks (default forever)', utils.constant.SPEND_TX_TTL)
   .description('Create a transaction to another wallet')
   .action(async (walletPath, receiver, amount, ...arguments) => await Wallet.spend(walletPath, receiver, amount, utils.cli.getCmdFromArguments(arguments)))
 
@@ -51,7 +52,7 @@ program
 
 program
   .command('address [wallet_path]')
-  .option('-K, --privateKey [privateKey]', 'Use private key instead wallet file')
+  .option('-K, --privateKey', 'Print private key')
   .description('Get wallet address')
   .action(async (walletPath, ...arguments) => await Wallet.getAddress(walletPath, utils.cli.getCmdFromArguments(arguments)))
 

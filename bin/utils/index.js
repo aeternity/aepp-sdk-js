@@ -21,6 +21,7 @@ import * as cli from './cli'
 import * as errors from './errors'
 import * as print from './print'
 import * as helpers from './helpers'
+// import * as keystore from './keystore'
 
 export {
   helpers,

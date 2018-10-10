@@ -80,7 +80,7 @@ async function spend (amount, recipientId, options = {}) {
 const Ae = stampit(Tx, Account, Chain, {
   methods: { send, spend },
   deepProperties: { Ae: { defaults: {
-    ttl: Number.MAX_SAFE_INTEGER,
+    ttl: 500,
     fee: 1,
     payload: ''
   } } }
