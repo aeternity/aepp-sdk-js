@@ -58,7 +58,7 @@ async function awaitHeight (h, { interval = 5000, attempts = 12 } = {}) {
   return new Promise((resolve, reject) => probe(resolve, reject, attempts))
 }
 
-async function poll (th, { blocks = 10, interval = 5000 } = {}) {
+async function poll (th, { blocks = 20, interval = 5000 } = {}) {
   const instance = this
   const max = await this.height() + blocks
 

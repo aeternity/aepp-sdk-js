@@ -29,12 +29,12 @@ describe('CLI Chain Module', function () {
     res.block_hash.should.be.a('string')
     parseInt(res.block_height).should.be.a('number')
   })
-  it('VERSION', async () => {
+  it('STATUS', async () => {
     let wallet = await BaseAe()
     wallet.setKeypair(generateKeyPair())
 
     const { nodeVersion } = await wallet.api.getStatus()
-    const res = await execute(['chain', 'version'])
+    const res = await execute(['chain', 'status'])
     R.last(res.split(/_/)).trim().should.equal(nodeVersion)
   })
   it('PLAY', async () => {
