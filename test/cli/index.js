@@ -50,6 +50,7 @@ export async function ready (mocha) {
   const ae = await BaseAe()
   try {
     await ae.awaitHeight(5)
+    console.log(await ae.height())
   } catch (e) {
     console.log(e)
   }
