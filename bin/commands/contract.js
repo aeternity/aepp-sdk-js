@@ -32,7 +32,7 @@ import { handleApiError } from '../utils/errors'
 import { printError, print, logContractDescriptor } from '../utils/print'
 import { getWalletByPathAndDecrypt } from '../utils/account'
 
-export async function compile (file, options) {
+export async function compile(file, options) {
   try {
     const code = readFile(path.resolve(process.cwd(), file), 'utf-8')
     if (!code) throw new Error('Contract file not found')
@@ -49,8 +49,8 @@ export async function compile (file, options) {
   }
 }
 
-async function deploy (walletPath, contractPath, options) {
-  const { gas, init, ttl, password, json } = options
+async function deploy(walletPath, contractPath, options) {
+  const { gas, init, ttl, password, json, nonce } = options
   // Deploy a contract to the chain and create a deploy descriptor
   // with the contract informations that can be use to invoke the contract
   // later on.
@@ -75,7 +75,7 @@ async function deploy (walletPath, contractPath, options) {
         // even when the contract's `state` is `unit` (`()`). The arguments to
         // `init` have to be provided at deployment time and will be written to the
         // block as well, together with the contract's bytecode.
-        const deployDescriptor = await contract.deploy({ initState: init, options: { ttl } })
+        const deployDescriptor = await contract.deploy({ initState: init, options: { ttl, gas: parseInt(gas), nonce: parseInt(nonce) } })
 
         // Write contractDescriptor to file
         const descPath = `${R.last(contractPath.split('/'))}.deploy.${deployDescriptor.owner.slice(3)}.json`
@@ -101,8 +101,11 @@ async function deploy (walletPath, contractPath, options) {
   }
 }
 
-async function call (walletPath, descrPath, fn, returnType, args, options) {
+async function call(walletPath, descrPath, fn, returnType, args, options) {
   const { password } = options
+  options.gas = parseInt(options.gas);
+  options.nonce = parseInt(options.nonce);
+
   if (!path || !fn || !returnType) {
     program.outputHelp()
     process.exit(1)

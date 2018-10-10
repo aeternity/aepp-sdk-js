@@ -45,6 +45,8 @@ program
 program
   .command('call <wallet_path> <desc_path> <fn> <return_type> [args...]')
   .option('-P, --password [password]', 'Wallet Password')
+  .option('-G --gas [gas]', 'Amount of gas to deploy the contract', utils.constant.GAS)
+  .option('-N --nonce [nonce]', 'Override the nonce that the transaction is going to be sent with')
   .description('Execute a function of the contract')
   .action(async (walletPath, path, fn, returnType, args, ...arguments) => await Contract.call(walletPath, path, fn, returnType, args, utils.cli.getCmdFromArguments(arguments)))
 
@@ -53,6 +55,7 @@ program
   .option('-P, --password [password]', 'Wallet Password')
   .option('-I, --init [state]', 'Deploying contract arguments for constructor function')
   .option('-G --gas [gas]', 'Amount of gas to deploy the contract', utils.constant.GAS)
+  .option('-N --nonce [nonce]', 'Override the nonce that the transaction is going to be sent with')
   .description('Deploy a contract on the chain')
   .action(async (walletPath, path, ...arguments) => await Contract.deploy(walletPath, path, utils.cli.getCmdFromArguments(arguments)))
 
