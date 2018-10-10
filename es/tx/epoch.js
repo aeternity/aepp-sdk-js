@@ -85,7 +85,7 @@ async function calculateNonce (accountId) {
   return +(await this.api.getAccountByPubkey(accountId)).nonce + 1
 }
 
-async function calculateTtl(ttl) {
+async function calculateTtl (ttl) {
   const { height } = await this.api.getCurrentKeyBlock()
   return +(height) + ttl
 }
