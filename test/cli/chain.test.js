@@ -40,10 +40,12 @@ describe('CLI Chain Module', function () {
   it('PLAY', async () => {
     try {
       const res = await execute(['chain', 'play', '--limit', '4'])
-      conosle.log(res)
+      console.log(res)
       res.split('<<------------------------------------->>').length.should.equal(5)
+      console.log(res)
 
       const parsed = res.split('<<------------------------------------->>').map(parseBlock)
+      console.log(parsed)
       parsed[0].previous_block_hash.should.equal(parsed[1].block_hash)
       parsed[1].previous_block_hash.should.equal(parsed[2].block_hash)
       parsed[2].previous_block_hash.should.equal(parsed[3].block_hash)

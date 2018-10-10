@@ -37,7 +37,7 @@ async function height () {
   return (await this.api.getCurrentKeyBlockHeight()).height
 }
 
-async function awaitHeight (h, { interval = 500, attempts = 10 } = {}) {
+async function awaitHeight (h, { interval = 5000, attempts = 30 } = {}) {
   const instance = this
 
   async function probe (resolve, reject, left) {
