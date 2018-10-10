@@ -15,14 +15,19 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { describe, it } from 'mocha'
+import { before, describe, it } from 'mocha'
 import * as R from 'ramda'
-import { configure, BaseAe, execute, parseBlock } from './index'
+import { configure, BaseAe, execute, parseBlock, ready } from './index'
 import { generateKeyPair } from '../../es/utils/crypto'
 
 describe('CLI Chain Module', function () {
+  let wallet
   configure(this)
 
+  before(async function () {
+    // Spend tokens for wallet
+    wallet = await ready(this)
+  })
   it('TOP', async () => {
     const res = parseBlock(await execute(['chain', 'top']))
     res.should.be.a('object')
