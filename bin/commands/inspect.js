@@ -38,7 +38,8 @@ import {
   printContractDescr,
   printError,
   printName,
-  printTransaction
+  printTransaction,
+  printUnderscored
 } from '../utils/print'
 import { checkPref, getBlock, readJSONFile } from '../utils/helpers'
 
@@ -108,10 +109,10 @@ async function getAccountByHash (hash, options) {
     const client = await initClient(options)
     await handleApiError(
       async () => {
-        const { balance, id, nonce } = await client.api.getAccountByPubkey(hash)
-        print('Account ID________________ ' + id)
-        print('Account balance___________ ' + balance)
-        print('Account nonce_____________ ' + nonce)
+        const {balance, id, nonce} = await client.api.getAccountByPubkey(hash)
+        printUnderscored('Account ID', id)
+        printUnderscored('Account balance', balance)
+        printUnderscored('Account nonce', nonce)
         print('Account Transactions: ')
         printBlockTransactions((await client.api.getPendingAccountTransactionsByPubkey(hash)).transactions, json)
       }
@@ -145,7 +146,6 @@ async function getName (name, options) {
   } catch (e) {
     if (e.response && e.response.status === 404) {
       printName({ status: 'AVAILABLE' }, json)
-      process.exit(1)
     }
     printError(e.message)
   }

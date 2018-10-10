@@ -15,33 +15,38 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { describe, it } from 'mocha'
+import { before, describe, it } from 'mocha'
 import * as R from 'ramda'
-import { configure, BaseAe, execute, parseBlock } from './index'
+import { configure, BaseAe, execute, parseBlock, ready } from './index'
 import { generateKeyPair } from '../../es/utils/crypto'
 
 describe('CLI Chain Module', function () {
+  let wallet
   configure(this)
 
+  before(async function () {
+    // Spend tokens for wallet
+    wallet = await ready(this)
+  })
   it('TOP', async () => {
     const res = parseBlock(await execute(['chain', 'top']))
     res.should.be.a('object')
     res.block_hash.should.be.a('string')
     parseInt(res.block_height).should.be.a('number')
   })
-  it('VERSION', async () => {
+  it('STATUS', async () => {
     let wallet = await BaseAe()
     wallet.setKeypair(generateKeyPair())
 
     const { nodeVersion } = await wallet.api.getStatus()
-    const res = await execute(['chain', 'version'])
+    const res = await execute(['chain', 'status'])
     R.last(res.split(/_/)).trim().should.equal(nodeVersion)
   })
   it('PLAY', async () => {
     const res = await execute(['chain', 'play', '--limit', '4'])
-    res.split('>>>>>>>>>').length.should.equal(4)
+    res.split('<<------------------------------------->>').length.should.equal(5)
 
-    const parsed = res.split('>>>>>>>>>').map(parseBlock)
+    const parsed = res.split('<<------------------------------------->>').map(parseBlock)
     parsed[0].previous_block_hash.should.equal(parsed[1].block_hash)
     parsed[1].previous_block_hash.should.equal(parsed[2].block_hash)
     parsed[2].previous_block_hash.should.equal(parsed[3].block_hash)

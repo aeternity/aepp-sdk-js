@@ -36,6 +36,7 @@ program
   .option('-N, --nameTtl [nameTtl]', 'Name life Ttl', utils.constant.NAME_TTL)
   .option('-T, --ttl [ttl]', 'Life Ttl', utils.constant.AENS_TX_TTL)
   .option('-f --force', 'Ignore epoch version compatibility check')
+  .option('-n, --nonce [nonce]', 'Override the nonce that the transaction is going to be sent with')
   .option('--json [json]', 'Print result in json format')
 
 program

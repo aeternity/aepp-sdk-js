@@ -37,8 +37,10 @@ describe('CLI Inspect Module', function () {
   configure(this)
   let wallet
 
-  it('Inspect Account', async () => {
+  before(async function() {
     wallet = await ready(this)
+  })
+  it('Inspect Account', async () => {
 
     const balance = await wallet.balance(KEY_PAIR.pub)
     const { account_balance } = parseBlock(await execute(['inspect', KEY_PAIR.pub]))
@@ -93,6 +95,6 @@ describe('CLI Inspect Module', function () {
     const invalidName = await execute(['inspect', 'asd'])
     const validName = await execute(['inspect', 'nazdou2222222.aet'])
     invalidName.indexOf('AENS TLDs must end in .aet').should.not.equal(-1)
-    validName.indexOf('Status___________ AVAILABLE').should.not.equal(-1)
+    validName.indexOf('AVAILABLE').should.not.equal(-1)
   })
 })

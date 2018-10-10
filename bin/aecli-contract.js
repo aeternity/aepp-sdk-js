@@ -33,6 +33,7 @@ program
   .option('--host [hostname]', 'Node to connect to', utils.constant.EPOCH_URL)
   .option('--internalUrl [internal]', 'Node to connect to(internal)', utils.constant.EPOCH_INTERNAL_URL)
   .option('-T, --ttl [ttl]', 'Validity of the transaction in number of blocks (default forever)', utils.constant.CONTRACT_TTL)
+  .option('-n, --nonce [nonce]', 'Override the nonce that the transaction is going to be sent with')
   .option('-f --force', 'Ignore epoch version compatibility check')
   .option('--json', 'Print result in json format')
 
@@ -45,6 +46,7 @@ program
 program
   .command('call <wallet_path> <desc_path> <fn> <return_type> [args...]')
   .option('-P, --password [password]', 'Wallet Password')
+  .option('-G --gas [gas]', 'Amount of gas to call the contract', utils.constant.GAS)
   .description('Execute a function of the contract')
   .action(async (walletPath, path, fn, returnType, args, ...arguments) => await Contract.call(walletPath, path, fn, returnType, args, utils.cli.getCmdFromArguments(arguments)))
 

@@ -15,29 +15,7 @@
 *  PERFORMANCE OF THIS SOFTWARE.
 */
 
-//
-// const CONFIG_PATH = './config'
-//
-// const DEFAULT_CONFIG = {}
-//
-// class AEConfig {
-//   configs = []
-//   constructor (){
-//
-//   }
-//
-//   validate(config) {}
-//
-//   removeConfig(configName) {}
-//
-//   createConfig(configName) {}
-//
-//   selectConfig(configName) {}
-//
-//   getConfigsFromFS() {}
-// }
-//
-// const instance = new AEConfig(CONFIG_PATH)
+// #CONFIG
 
 // HAST TYPES
 export const HASH_TYPES = {
@@ -60,12 +38,12 @@ export const PLAY_LIMIT = 10
 export const PLAY_INTERVAL = 1000
 
 // CONTRACT
-export const CONTRACT_TTL = 50000
-export const GAS = 40000000
+export const CONTRACT_TTL = 500
+export const GAS = 1600000 - 21000 // MAX GAS
 
 // AENS
-export const AENS_TX_TTL = 50000
-export const NAME_TTL = 500
+export const AENS_TX_TTL = 500
+export const NAME_TTL = 50000
 
 // ACCOUNT
-export const ACCOUNT_TX_TTL = 50000
+export const SPEND_TX_TTL = 500

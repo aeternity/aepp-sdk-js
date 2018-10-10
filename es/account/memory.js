@@ -65,7 +65,13 @@ function setKeypair (keypair) {
  */
 const MemoryAccount = Account.compose({
   init ({ keypair }) {
-    this.setKeypair(keypair || Crypto.envKeypair(process.env))
+    try {
+      this.setKeypair(keypair || Crypto.envKeypair(process.env))
+    } catch (e) {
+      // Instead of throw error and crash show warning that you do not set `KEYPAIR`
+      // and can not sign transaction
+      console.log('Please provide KEY_PAIR for sign transaction')
+    }
   },
   methods: { sign, address, setKeypair }
 })
