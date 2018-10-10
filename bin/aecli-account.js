@@ -40,6 +40,7 @@ program
 
 program
   .command('spend <wallet_path> <receiver> <amount>')
+  .option('-n, --nonce [nonce]', 'Transaction nonce')
   .option('-T, --ttl [ttl]', 'Validity of the spend transaction in number of blocks (default forever)', utils.constant.SPEND_TX_TTL)
   .description('Create a transaction to another wallet')
   .action(async (walletPath, receiver, amount, ...arguments) => await Wallet.spend(walletPath, receiver, amount, utils.cli.getCmdFromArguments(arguments)))

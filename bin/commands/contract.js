@@ -52,6 +52,7 @@ async function deploy (walletPath, contractPath, options) {
   const { init, json } = options
   const ttl = parseInt(options.ttl)
   const gas = parseInt(options.gas)
+  const nonce = parseInt(options.nonce)
 
   // Deploy a contract to the chain and create a deploy descriptor
   // with the contract informations that can be use to invoke the contract
@@ -77,7 +78,7 @@ async function deploy (walletPath, contractPath, options) {
         // even when the contract's `state` is `unit` (`()`). The arguments to
         // `init` have to be provided at deployment time and will be written to the
         // block as well, together with the contract's bytecode.
-        const deployDescriptor = await contract.deploy({ initState: init, options: { ttl, gas } })
+        const deployDescriptor = await contract.deploy({ initState: init, options: { ttl, gas, nonce } })
 
         // Write contractDescriptor to file
         const descPath = `${R.last(contractPath.split('/'))}.deploy.${deployDescriptor.owner.slice(3)}.json`
@@ -105,6 +106,8 @@ async function deploy (walletPath, contractPath, options) {
 
 async function call (walletPath, descrPath, fn, returnType, args, options) {
   const ttl = parseInt(options.ttl)
+  const nonce = parseInt(options.nonce)
+  const gas = parseInt(options.gas)
 
   if (!path || !fn || !returnType) {
     program.outputHelp()
@@ -120,7 +123,7 @@ async function call (walletPath, descrPath, fn, returnType, args, options) {
         args = args.filter(arg => arg !== '[object Object]')
         args = args.length ? `(${args.join(',')})` : '()'
         // Send ContractCall Tx
-        const callResult = await client.contractCall(descr.bytecode, descr.abi || 'sophia', descr.address, fn, { args, options: { ttl } })
+        const callResult = await client.contractCall(descr.bytecode, descr.abi || 'sophia', descr.address, fn, { args, options: { ttl, gas, nonce } })
         // The execution result, if successful, will be an AEVM-encoded result
         // value. Once type decoding will be implemented in the SDK, this value will
         // not be a hexadecimal string, anymore.

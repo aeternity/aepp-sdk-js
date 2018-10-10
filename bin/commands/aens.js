@@ -97,6 +97,7 @@ async function transferName (walletPath, domain, address, options) {
   // Parse options(`ttl`, `nameTtl` and account `password`)
   const ttl = parseInt(options.ttl)
   const nameTtl = parseInt(options.nameTtl)
+  const nonce = parseInt(options.nonce)
 
   if (!address) {
     program.outputHelp()
@@ -115,7 +116,7 @@ async function transferName (walletPath, domain, address, options) {
       }
 
       // Create `transferName` transaction
-      const transferTX = await client.aensTransfer(name.id, address, { ttl, nameTtl })
+      const transferTX = await client.aensTransfer(name.id, address, { ttl, nameTtl, nonce })
       print('Transfer Success')
       printUnderscored('Transaction hash', transferTX.hash)
     })
@@ -130,6 +131,7 @@ async function updateName (walletPath, domain, address, options) {
   // Parse options(`ttl`, `nameTtl` and account `password`)
   const ttl = parseInt(options.ttl)
   const nameTtl = parseInt(options.nameTtl)
+  const nonce = parseInt(options.nonce)
 
   if (!address) {
     program.outputHelp()
@@ -149,7 +151,7 @@ async function updateName (walletPath, domain, address, options) {
       }
 
       // Create `updateName` transaction
-      const updateNameTx = await client.aensUpdate(name.id, address, { ttl, nameTtl })
+      const updateNameTx = await client.aensUpdate(name.id, address, { ttl, nameTtl, nonce })
       print('Update Success')
       printUnderscored('Transaction Hash', updateNameTx.hash)
     })
@@ -163,6 +165,7 @@ async function updateName (walletPath, domain, address, options) {
 async function revokeName (walletPath, domain, options) {
   // Parse options(`ttl` and account `password`)
   const ttl = parseInt(options.ttl)
+  const nonce = parseInt(options.nonce)
 
   try {
     // Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
@@ -177,7 +180,7 @@ async function revokeName (walletPath, domain, options) {
       }
 
       // Create `revokeName` transaction
-      const revokeTx = await client.aensRevoke(name.id, { ttl })
+      const revokeTx = await client.aensRevoke(name.id, { ttl, nonce })
       print('Revoke Success')
       printUnderscored('Transaction hash', revokeTx.hash)
     })

@@ -33,15 +33,16 @@ import { print, printError, printTransaction } from '../utils/print'
 import { checkPref } from '../utils/helpers'
 
 async function spend (walletPath, receiver, amount, options) {
-  let { ttl, json } = options
+  let { ttl, json, nonce } = options
   ttl = parseInt(ttl)
+  nonce = parseInt(nonce)
   try {
     checkPref(receiver, HASH_TYPES.account)
     // Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
     const client = await initClientByWalletFile(walletPath, options)
 
     await handleApiError(async () => {
-      let tx = await client.spend(parseInt(amount), receiver, { ttl })
+      let tx = await client.spend(parseInt(amount), receiver, { ttl, nonce })
       // if waitMined false
       if (typeof tx !== 'object') {
         tx = await client.tx(tx)
