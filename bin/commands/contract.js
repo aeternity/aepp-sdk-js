@@ -75,7 +75,7 @@ async function deploy (walletPath, contractPath, options) {
         // even when the contract's `state` is `unit` (`()`). The arguments to
         // `init` have to be provided at deployment time and will be written to the
         // block as well, together with the contract's bytecode.
-        const deployDescriptor = await contract.deploy({ initState: init, options: { ttl } })
+        const deployDescriptor = await contract.deploy({ initState: init, options: { ttl, gas: parseInt(gas) } })
 
         // Write contractDescriptor to file
         const descPath = `${R.last(contractPath.split('/'))}.deploy.${deployDescriptor.owner.slice(3)}.json`
