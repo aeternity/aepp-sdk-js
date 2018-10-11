@@ -3,7 +3,7 @@ import createKeccakHash from 'keccak'
 import scrypt from 'scrypt'
 import nacl from 'tweetnacl'
 
-import { encodeBase58Check } from '../../es/utils/crypto'
+import { encodeBase58Check } from './crypto'
 
 const OPTIONS = {
   // Symmetric cipher for private key encryption
@@ -70,7 +70,7 @@ function str2buf (str, enc) {
 
 /**
  * Check if the selected cipher is available.
- * @param {string} algo Encryption algorithm.
+ * @param {string} cipher Encryption algorithm.
  * @return {boolean} If available true, otherwise false.
  */
 function isCipherAvailable (cipher) {
@@ -137,14 +137,14 @@ function getMAC (derivedKey, ciphertext) {
  * @param {string=} options.kdf Key derivation function (default: pbkdf2).
  * @param {string=} options.cipher Symmetric cipher (default: constants.cipher).
  * @param {Object=} options.kdfparams KDF parameters (default: constants.<kdf>).
- * @param {function=} cb Callback function (optional).
  * @return {buffer} Secret key derived from password.
  */
-async function deriveKey (password, salt, options, cb) {
+async function deriveKey (password, salt, options) {
   if (typeof password === 'undefined' || password === null || !salt) {
     throw new Error('Must provide password and salt to derive a key')
   }
   options = options || {}
+
   options.kdfparams = options.kdfparams || OPTIONS.scrypt
 
   // convert strings to buffers
@@ -153,7 +153,7 @@ async function deriveKey (password, salt, options, cb) {
 
   // TODO add support of pbkdf2
   // use scrypt as key derivation function
-  return await deriveKeyUsingScrypt(password, salt, options, cb)
+  return await deriveKeyUsingScrypt(password, salt, options)
 }
 
 async function deriveKeyUsingScrypt (password, salt, options) {
@@ -254,7 +254,6 @@ export async function recover (password, keyObject, cb) {
  * @param {string=} options.kdf Key derivation function (default: pbkdf2).
  * @param {string=} options.cipher Symmetric cipher (default: constants.cipher).
  * @param {Object=} options.kdfparams KDF parameters (default: constants.<kdf>).
- * @param {function=} cb Callback function (optional).
  * @return {Object}
  */
 export async function dump (
@@ -272,21 +271,6 @@ export async function dump (
   const dKey = await deriveKey(password, salt, options)
   return marshal(dKey, privateKey, salt, iv, options)
 }
-
-/**
- * Generate filename for a keystore file.
- * @param {string} address address.
- * @return {string} Keystore filename.
- */
-export function generateKeystoreFilename (address) {
-  let filename = "UTC--" + new Date().toISOString() + "--" + address
-
-  // Windows does not permit ":" in filenames, replace all with "-"
-  if (process.platform === "win32") filename = filename.split(":").join("-")
-
-  return filename
-}
-
 
 
 
