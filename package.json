@@ -41,7 +41,7 @@
     "keccak": "^1.4.0",
     "postinstall-build": "^5.0.1",
     "ramda": "^0.25.0",
-    "renamer": "^1.0.0",
+    "recursive-rename": "^2.0.0",
     "rlp": "^2.0.0",
     "scrypt": "^6.0.3",
     "serialize-javascript": "^1.5.0",
