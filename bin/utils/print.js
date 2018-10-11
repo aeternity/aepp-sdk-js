@@ -14,12 +14,13 @@
 *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 *  PERFORMANCE OF THIS SOFTWARE.
 */
-
+// # Utils `print` Module
+// That script contains helper function for `console` print
 import * as R from 'ramda'
 
 import { HASH_TYPES } from './constant'
 
-// #CONSTANT
+// ## CONSTANT
 const TX_TYPE_PRINT_MAP = {
   'spend_tx': printSpendTransaction,
   'contract_create_tx': printContractCreateTransaction,
@@ -30,28 +31,36 @@ const TX_TYPE_PRINT_MAP = {
   'name_update_tx': printNameUpdateTransaction,
   'name_revoke_tx': printNameRevokeTransaction
 }
+// ## Row width
 const WIDTH = 40
 
 
-// #CONSOLE PRINT HELPERS
+// ## CONSOLE PRINT HELPERS
+
+// Calculate tabs length
 function getTabs(tabs) {
   if (!tabs) return ''
   return R.repeat(' ', tabs*4).reduce((a, b) => a += b, '')
 }
 
+// Print helper
 export function print (msg, obj) {
   if (obj) { console.log(msg, obj) } else { console.log(msg) }
 }
 
+// Print error helper
 export function printError (msg) {
   console.log(msg)
 }
 
+// Print `underscored`
 export function printUnderscored(key, val) {
   print(`${key}${R.repeat('_', WIDTH - key.length).reduce((a,b) => a += b, '')} ${val}`)
 }
 
-// #BLOCK
+// ## BLOCK
+//
+// Print block
 export function printBlock (block, json) {
   if (json) {
     print(block)
@@ -79,6 +88,7 @@ export function printBlock (block, json) {
   print('<<------------------------------------->>')
 }
 
+// Print block `transactions`
 export function printBlockTransactions (ts, json, tabs = 0) {
   if (json) {
     print(ts)
@@ -93,7 +103,9 @@ export function printBlockTransactions (ts, json, tabs = 0) {
     })
 }
 
-// #TX
+// ## TX
+//
+// Print base `tx` info
 function printTxBase(tx = {}, tabs = '') {
   printUnderscored(tabs + 'Tx hash', tx.hash)
   printUnderscored(tabs + 'Block hash', tx.blockHash)
@@ -103,6 +115,7 @@ function printTxBase(tx = {}, tabs = '') {
   printUnderscored(tabs + 'Tx Type', R.defaultTo('N/A', R.path(['tx', 'type'], tx)))
 }
 
+// Print `contract_create_tx` info
 function printContractCreateTransaction(tx = {}, tabs = '') {
   printUnderscored(tabs + 'Owner', R.defaultTo('N/A', R.path(['tx', 'ownerId'], tx)))
   printUnderscored(tabs + 'Amount', R.defaultTo('N/A', R.path(['tx', 'amount'], tx)))
@@ -118,6 +131,7 @@ function printContractCreateTransaction(tx = {}, tabs = '') {
   printUnderscored(tabs + 'VM Version', R.defaultTo('N/A', R.path(['tx', 'vmVersion'], tx)))
 }
 
+// Print `contract_call_tx` info
 function printContractCallTransaction(tx = {}, tabs = '') {
   printUnderscored(tabs + 'Caller Account', R.defaultTo('N/A', R.path(['tx', 'callerId'], tx)))
   printUnderscored(tabs + 'Contract Hash', R.defaultTo('N/A', R.path(['tx', 'contractId'], tx)))
@@ -134,6 +148,7 @@ function printContractCallTransaction(tx = {}, tabs = '') {
   printUnderscored(tabs + 'VM Version', R.defaultTo('N/A', R.path(['tx', 'vmVersion'], tx)))
 }
 
+// Print `spend_tx` info
 function printSpendTransaction(tx = {}, tabs = '') {
 
   printUnderscored(tabs + 'Sender account', R.defaultTo('N/A', R.path(['tx', 'senderId'], tx)))
@@ -147,6 +162,7 @@ function printSpendTransaction(tx = {}, tabs = '') {
   printUnderscored(tabs + 'Version', R.defaultTo('N/A', R.path(['tx', 'version'], tx)))
 }
 
+// Print `pre_claim_tx` info
 function printNamePreclaimTransaction(tx = {}, tabs = '') {
   printUnderscored(tabs + 'Account', R.defaultTo('N/A', R.path(['tx', 'accountId'], tx)))
   printUnderscored(tabs + 'Commitment', R.defaultTo('N/A', R.path(['tx', 'commitmentId'], tx)))
@@ -157,6 +173,7 @@ function printNamePreclaimTransaction(tx = {}, tabs = '') {
   printUnderscored(tabs + 'Version', R.defaultTo('N/A', R.path(['tx', 'version'], tx)))
 }
 
+// Print `claim_tx` info
 function printNameClaimTransaction(tx = {}, tabs = '') {
 
   printUnderscored(tabs + 'Account', R.defaultTo('N/A', R.path(['tx', 'accountId'], tx)))
@@ -169,6 +186,7 @@ function printNameClaimTransaction(tx = {}, tabs = '') {
   printUnderscored(tabs + 'Version', R.defaultTo('N/A', R.path(['tx', 'version'], tx)))
 }
 
+// Print `update_name_tx` info
 function printNameUpdateTransaction(tx = {}, tabs = '') {
   printUnderscored(tabs + 'Account', R.defaultTo('N/A', R.path(['tx', 'accountId'], tx)))
   printUnderscored(tabs + 'Client TTL', R.defaultTo('N/A', R.path(['tx', 'clientTtl'], tx)))
@@ -182,6 +200,7 @@ function printNameUpdateTransaction(tx = {}, tabs = '') {
   printUnderscored(tabs + 'Version', R.defaultTo('N/A', R.path(['tx', 'version'], tx)))
 }
 
+// Print `transfer_name_tx` info
 function printNameTransferTransaction(tx = {}, tabs = '') {
   printUnderscored(tabs + 'Account', R.defaultTo('N/A', R.path(['tx', 'accountId'], tx)))
   printUnderscored(tabs + 'Recipient', R.defaultTo('N/A', R.path(['tx', 'recipientId'], tx)))
@@ -193,6 +212,7 @@ function printNameTransferTransaction(tx = {}, tabs = '') {
   printUnderscored(tabs + 'Version', R.defaultTo('N/A', R.path(['tx', 'version'], tx)))
 }
 
+// Print `revoke_name_tx` info
 function printNameRevokeTransaction(tx = {}, tabs = '') {
   printUnderscored(tabs + 'Account', R.defaultTo('N/A', R.path(['tx', 'accountId'], tx)))
   printUnderscored(tabs + 'Name ID', R.defaultTo('N/A', R.path(['tx', 'nameId'], tx)))
@@ -203,6 +223,8 @@ function printNameRevokeTransaction(tx = {}, tabs = '') {
   printUnderscored(tabs + 'Version', R.defaultTo('N/A', R.path(['tx', 'version'], tx)))
 }
 
+// Function which print `tx`
+// Get type of `tx` to now which `print` method to use
 export function printTransaction (tx, json, tabs = 0) {
   if (json) {
     print(tx)
@@ -215,7 +237,9 @@ export function printTransaction (tx, json, tabs = 0) {
 }
 
 
-// #OTHER
+// ##OTHER
+//
+// Print `name`
 export function printName (name, json) {
   if (json) {
     print(name)
@@ -227,6 +251,7 @@ export function printName (name, json) {
   printUnderscored('TTL', R.defaultTo(0, R.prop('nameTtl', name)))
 }
 
+// Print `contract_descriptor` file
 export function printContractDescr (descriptor, json) {
   if (json) {
     print(descriptor)
@@ -240,6 +265,7 @@ export function printContractDescr (descriptor, json) {
   printUnderscored('CreatedAt ' + descriptor.createdAt)
 }
 
+// Print `contract_descriptor` file base info
 export function logContractDescriptor (desc, title = '', json) {
   if (json) {
     print(desc)
@@ -251,6 +277,7 @@ export function logContractDescriptor (desc, title = '', json) {
   printUnderscored('Deploy descriptor', desc.descPath)
 }
 
+// Print `config`
 export function printConfig ({ host }) {
   print('WALLET_PUB' + process.env['WALLET_PUB'])
   print('EPOCH_URL' + host)

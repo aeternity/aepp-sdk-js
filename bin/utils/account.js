@@ -24,7 +24,7 @@ import { print } from './print'
 import { readJSONFile, writeFile } from './helpers'
 import { dump, getAddressFromPriv, recover } from './keystore'
 
-// #The `prompt` library provides concealed input of passwords.
+// ## The `prompt` library provides concealed input of passwords.
 
 // `prompt` schema
 const PROMPT_SCHEMA = {
@@ -42,7 +42,7 @@ const PROMPT_SCHEMA = {
   }
 }
 
-// Prompt password using `prompt`
+// `Async` prompt password using `prompt`
 async function promptPasswordAsync () {
   return new Promise(
     (resolve, reject) => {
@@ -61,9 +61,9 @@ async function promptPasswordAsync () {
   )
 }
 
-// #WALLET HELPERS
+// ##WALLET HELPERS
 
-// Generate `keypair` encrypt it using password and write to filesystem
+// Generate `keypair` encrypt it using password and write to `ethereum` keystore file
 export async function generateSecureWallet (name, { output, password }) {
   password = password || await promptPasswordAsync()
   const { priv, pub } = Crypto.generateKeyPair()
@@ -77,7 +77,7 @@ export async function generateSecureWallet (name, { output, password }) {
   `)
 }
 
-// Generate `keypair` from `PRIVATE KEY` encrypt it using password and write to filesystem
+// Generate `keypair` from `PRIVATE KEY` encrypt it using password and to `ethereum` keystore file
 export async function generateSecureWalletFromPrivKey (name, priv, { output, password }) {
   password = password || await promptPasswordAsync()
 
@@ -95,8 +95,7 @@ export async function generateSecureWalletFromPrivKey (name, priv, { output, pas
   `)
 }
 
-// Get account files by path, decrypt it using password and return `keypair`
-// Also can generate `keypair` using `PRIVATE KEY`
+// Get account file by path, decrypt it using password and return `keypair`
 export async function getWalletByPathAndDecrypt (walletPath, { password } = {}) {
   try {
     const keyFile = readJSONFile(path.resolve(process.cwd(), walletPath))

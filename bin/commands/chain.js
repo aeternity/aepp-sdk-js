@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+// # æternity CLI `chain` file
+//
+// This script initialize all `chain` function
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
@@ -16,21 +19,17 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-//   _____ _           _
-//  / ____| |         (_)
-// | |    | |__   __ _ _ _ __
-// | |    | '_ \ / _` | | '_ \
-// | |____| | | | (_| | | | | |
-//  \_____|_| |_|\__,_|_|_| |_|
-
 import { initClient } from '../utils/cli'
 import { handleApiError } from '../utils/errors'
 import { printBlock, print, printBlockTransactions, printError, printUnderscored } from '../utils/print'
 import { getBlock } from '../utils/helpers'
 
+// ## Retrieve `Epoch` version
 async function version (options) {
   try {
+    // Initialize `Ae`
     const client = await initClient(options)
+    // Call `getStatus` API and print it
     await handleApiError(async () => {
       const { nodeVersion } = await client.api.getStatus()
       print(`Epoch node version____________  ${nodeVersion}`)
@@ -41,10 +40,13 @@ async function version (options) {
   }
 }
 
+// ## Retrieve `TOP` block
 async function top (options) {
   const { json } = options
   try {
+    // Initialize `Ae`
     const client = await initClient(options)
+    // Call `getTopBlock` API and print it
     await handleApiError(
       async () => printBlock(await client.api.getTopBlock(), json)
     )
@@ -54,16 +56,20 @@ async function top (options) {
   }
 }
 
+// ## Retrieve `mempool`
 async function mempool (options) {
   const { json } = options
   try {
+    // Initialize `Ae`
     const client = await initClient(options)
 
     await handleApiError(async () => {
+      // Get `mempool` from `API`
       const { transactions } = await client.mempool()
 
       printUnderscored('Mempool', '')
       printUnderscored('Pending Transactions Count', transactions.length)
+      // If we have `transaction's` in `mempool` print them
       if (transactions && transactions.length) {
         printBlockTransactions(transactions, json)
       }
@@ -74,6 +80,7 @@ async function mempool (options) {
   }
 }
 
+// ## This function `Play`(print all block) from `top` block to some condition(reach some `height` or `limit`)
 async function play (options) {
   let { height, limit, json } = options
   limit = parseInt(limit)
@@ -82,6 +89,7 @@ async function play (options) {
     const client = await initClient(options)
 
     await handleApiError(async () => {
+      // Get top block from `Epoch`. It is a start point for play.
       const top = await client.api.getTopBlock()
 
       if (height && height > parseInt(top.height)) {
@@ -91,6 +99,7 @@ async function play (options) {
 
       printBlock(top, json)
 
+      // Play by `height` or by `limit` using `top` block as start point
       height
         ? await playWithHeight(height, top.prevHash)(client, json)
         : await playWithLimit(--limit, top.prevHash)(client, json)
@@ -101,6 +110,7 @@ async function play (options) {
   }
 }
 
+// # Play by `limit`
 function playWithLimit (limit, blockHash) {
   return async (client, json) => {
     if (!limit) return
@@ -114,6 +124,7 @@ function playWithLimit (limit, blockHash) {
   }
 }
 
+// # Play by `height`
 function playWithHeight (height, blockHash) {
   return async (client, json) => {
     let block = await getBlock(blockHash)(client)

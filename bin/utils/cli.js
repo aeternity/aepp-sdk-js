@@ -1,3 +1,5 @@
+// # Utils `cli` Module
+// That script contains helper function's for work with `cli`
 /*
 * ISC License (ISC)
 * Copyright (c) 2018 aeternity developers
@@ -19,7 +21,7 @@ import * as R from 'ramda'
 import Cli from '../../es/ae/cli'
 import { getWalletByPathAndDecrypt } from './account'
 
-// Merge options with parent options. Commander issue with parsing nested options
+// ## Merge options with parent options.
 export function getCmdFromArguments (args) {
   return R.merge(
     R.head(args),
@@ -27,13 +29,15 @@ export function getCmdFromArguments (args) {
   )
 }
 
-// Create `Ae` client
+// ## Create `Ae` client
 export async function initClient ({host: url, keypair, internalUrl, force: forceCompatibility}) {
   return await Cli({ url, process, keypair, internalUrl, forceCompatibility })
 }
 
-// Get account files and decrypt it using password
+// ## Get account files and decrypt it using password
 // After that create`Ae` client using this `keyPair`
+//
+// We use `getWalletByPathAndDecrypt` from `utils/account` to get `keypair` from file
 export async function initClientByWalletFile (walletPath, options, returnKeyPair = false) {
   const { password, privateKey  } = options
   const keypair = await getWalletByPathAndDecrypt(walletPath, { password, privateKey })
@@ -43,12 +47,12 @@ export async function initClientByWalletFile (walletPath, options, returnKeyPair
   return initClient(R.merge(options, { keypair }))
 }
 
-// Initialize commander executable commands
+// ## Initialize commander executable commands
 export function initExecCommands (program) {
   return (cmds) => cmds.forEach(({ name, desc }) => program.command(name, desc))
 }
 
-// Check if `command` is `EXECUTABLE`
+// ## Check if `command` is `EXECUTABLE`
 export function isExecCommand (cmd, execCommands) {
   return execCommands.find(({ name }) => cmd === name)
 }

@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+// # æternity CLI `account` file
+//
+// This script initialize all `account` function
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
@@ -16,15 +19,6 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-//   __          __   _ _      _
-//   \ \        / /  | | |    | |
-//    \ \  /\  / /_ _| | | ___| |_ ___
-//     \ \/  \/ / _` | | |/ _ \ __/ __|
-//      \  /\  / (_| | | |  __/ |_\__ \
-//       \/  \/ \__,_|_|_|\___|\__|___/
-//
-//
-
 import { generateSecureWallet, generateSecureWalletFromPrivKey } from '../utils/account'
 import { HASH_TYPES } from '../utils/constant'
 import { initClientByWalletFile } from '../utils/cli'
@@ -32,6 +26,8 @@ import { handleApiError } from '../utils/errors'
 import { print, printError, printTransaction } from '../utils/print'
 import { checkPref } from '../utils/helpers'
 
+// ## Spend function
+// this function allow you to `send` token's to another `account`
 async function spend (walletPath, receiver, amount, options) {
   let { ttl, json, nonce } = options
   ttl = parseInt(ttl)
@@ -56,6 +52,8 @@ async function spend (walletPath, receiver, amount, options) {
   }
 }
 
+// ## Get `balace` function
+// This function allow you retrieve account `balance`
 async function getBalance (walletPath, options) {
   try {
     // Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
@@ -68,6 +66,8 @@ async function getBalance (walletPath, options) {
   }
 }
 
+// ## Get `address` function
+// This function allow you retrieve account `public` and `private` keys
 async function getAddress (walletPath, options) {
   const { privateKey } = options
   try {
@@ -86,6 +86,8 @@ async function getAddress (walletPath, options) {
   }
 }
 
+// ## Create secure `wallet` file
+// This function allow you to generate `keypair` and write it to secure `ethereum` like key-file
 async function createSecureWallet (walletPath, { output, password }) {
   try {
     await generateSecureWallet(walletPath, { output, password })
@@ -94,6 +96,8 @@ async function createSecureWallet (walletPath, { output, password }) {
   }
 }
 
+// ## Create secure `wallet` file from `private-key`
+// This function allow you to generate `keypair` from `private-key` and write it to secure `ethereum` like key-file
 async function createSecureWalletByPrivKey (walletPath, priv, { output, password }) {
   try {
     await generateSecureWalletFromPrivKey(walletPath, priv, { output, password })

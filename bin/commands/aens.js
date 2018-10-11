@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+// # æternity CLI `AENS` file
+//
+// This script initialize all `AENS` function
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
@@ -16,21 +19,13 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-/*  _   _
- * | \ | |
- * |  \| | __ _ _ __ ___   ___  ___
- * | . ` |/ _` | '_ ` _ \ / _ \/ __|
- * | |\  | (_| | | | | | |  __/\__ \
- * |_| \_|\__,_|_| |_| |_|\___||___/
- */
-
 import * as R from 'ramda'
 
 import { initClientByWalletFile } from '../utils/cli'
 import { printError, print, printUnderscored } from '../utils/print'
 import { handleApiError } from '../utils/errors'
 
-// #Name helpers methods
+// ## Name helpers methods
 
 // Get `name` status
 const updateNameStatus = (name) => async (client) => {
@@ -50,9 +45,9 @@ const validateName = (name) => {
   if (R.last(name.split('.')) !== 'aet') { throw new Error('AENS TLDs must end in .aet') }
 }
 
-// #Claim `name` function
+// ## Claim `name` function
 async function claim (walletPath, domain, options) {
-  // Parse options(`ttl`, `nameTtl` and account `password`)
+  // Parse options(`ttl`, `nameTtl`)
   const ttl = parseInt(options.ttl)
   const nameTtl = parseInt(options.nameTtl)
   try {
@@ -92,9 +87,9 @@ async function claim (walletPath, domain, options) {
   }
 }
 
-// #Transfer `name` function
+// ##Transfer `name` function
 async function transferName (walletPath, domain, address, options) {
-  // Parse options(`ttl`, `nameTtl` and account `password`)
+  // Parse options(`ttl`, `nameTtl` and `nonce`)
   const ttl = parseInt(options.ttl)
   const nameTtl = parseInt(options.nameTtl)
   const nonce = parseInt(options.nonce)
@@ -126,9 +121,9 @@ async function transferName (walletPath, domain, address, options) {
   }
 }
 
-// #Update `name` function
+// ##Update `name` function
 async function updateName (walletPath, domain, address, options) {
-  // Parse options(`ttl`, `nameTtl` and account `password`)
+  // Parse options(`ttl`, `nameTtl` and `nonce``)
   const ttl = parseInt(options.ttl)
   const nameTtl = parseInt(options.nameTtl)
   const nonce = parseInt(options.nonce)
@@ -161,9 +156,9 @@ async function updateName (walletPath, domain, address, options) {
   }
 }
 
-// #Revoke `name` function
+// ##Revoke `name` function
 async function revokeName (walletPath, domain, options) {
-  // Parse options(`ttl` and account `password`)
+  // Parse options(`ttl` and `nonce`)
   const ttl = parseInt(options.ttl)
   const nonce = parseInt(options.nonce)
 

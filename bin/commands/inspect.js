@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+// # æternity CLI `inspect` file
+//
+// This script initialize all `inspect` function
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
@@ -15,15 +18,6 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-
-//    _____                           _
-//   |_   _|                         | |
-//     | |  _ __  ___ _ __   ___  ___| |_
-//     | | | '_ \/ __| '_ \ / _ \/ __| __|
-//    _| |_| | | \__ \ |_) |  __/ (__| |_
-//   |_____|_| |_|___/ .__/ \___|\___|\__|
-//                   | |
-//                   |_|
 
 import * as R from 'ramda'
 import path from 'path'
@@ -43,9 +37,12 @@ import {
 } from '../utils/print'
 import { checkPref, getBlock, readJSONFile } from '../utils/helpers'
 
+// ## Inspect function
+// That function get the param(`hash`, `height` or `name`) and show you info about it
 async function inspect (hash, option) {
   if (!hash) throw new Error('Hash required')
 
+  // Get `block` by `height`
   if (!isNaN(parseInt(hash))) {
     await getBlockByHeight(hash, option)
     return
@@ -53,26 +50,30 @@ async function inspect (hash, option) {
 
   const [pref, _] = hash.split('_')
   switch (pref) {
+    // Get `block` by `hash`
     case HASH_TYPES.block:
       await getBlockByHash(hash, option)
       break
+    // Get `micro_block` by `hash`
     case HASH_TYPES.micro_block:
       await getBlockByHash(hash, option)
       break
+    // Get `account` by `hash`
     case HASH_TYPES.account:
       await getAccountByHash(hash, option)
       break
+    // Get `transaction` by `hash`
     case HASH_TYPES.transaction:
       await getTransactionByHash(hash, option)
       break
-    // case HASH_TYPES.contract:
-    //   break
+    // Get `name`
     default:
       await getName(hash, option)
       break
   }
 }
 
+// ## Inspect helper function's
 async function getBlockByHash (hash, options) {
   const { json } = options
   try {

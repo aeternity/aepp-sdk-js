@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+// # æternity CLI `contract` file
+//
+// This script initialize all `contract` function
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
@@ -16,13 +19,6 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-//   _____            _                  _
-//  / ____|          | |                | |
-// | |     ___  _ __ | |_ _ __ __ _  ___| |_ ___
-// | |    / _ \| '_ \| __| '__/ _` |/ __| __/ __|
-// | |___| (_) | | | | |_| | | (_| | (__| |_\__ \
-//  \_____\___/|_| |_|\__|_|  \__,_|\___|\__|___/
-
 import * as R from 'ramda'
 import path from 'path'
 
@@ -31,6 +27,7 @@ import { initClient, initClientByWalletFile } from '../utils/cli'
 import { handleApiError } from '../utils/errors'
 import { printError, print, logContractDescriptor } from '../utils/print'
 
+// ## Function which compile your `source` code
 export async function compile (file, options) {
   try {
     const code = readFile(path.resolve(process.cwd(), file), 'utf-8')
@@ -39,6 +36,7 @@ export async function compile (file, options) {
     const client = await initClient(options)
 
     await handleApiError(async () => {
+      // Call `Epoch` API which return `compiled code`
       const contract = await client.contractCompile(code)
       print(`Contract bytecode:
       ${contract.bytecode}`)
@@ -48,6 +46,7 @@ export async function compile (file, options) {
   }
 }
 
+// ## Function which `deploy ` contract
 async function deploy (walletPath, contractPath, options) {
   const { init, json } = options
   const ttl = parseInt(options.ttl)
@@ -103,7 +102,7 @@ async function deploy (walletPath, contractPath, options) {
     process.exit(1)
   }
 }
-
+// ## Function which `call` contract
 async function call (walletPath, descrPath, fn, returnType, args, options) {
   const ttl = parseInt(options.ttl)
   const nonce = parseInt(options.nonce)

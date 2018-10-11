@@ -14,6 +14,8 @@
 *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 *  PERFORMANCE OF THIS SOFTWARE.
 */
+// # Utils `helpers` Module
+// That script contains base helper function
 
 import * as R from 'ramda'
 import fs from 'fs'
@@ -21,18 +23,9 @@ import fs from 'fs'
 import { HASH_TYPES } from './constant'
 import { printError } from './print'
 
-// Read JSON file
-export function readJSONFile (filePath) {
-  try {
-    return JSON.parse(readFile(filePath))
-  } catch (e) {
-    printError('READ FILE ERROR: ' + e.message)
-    process.exit(1)
-  }
-}
-
-// Method which retrieve block info by hash
+// ## Method which retrieve block info by hash
 // if it's `MICRO_BLOCK` call `getMicroBlockHeaderByHash` and `getMicroBlockTransactionsByHash`
+//
 // if it's `BLOCK` call `getKeyBlockByHash`
 export function getBlock(hash) {
   return async (client) => {
@@ -48,12 +41,12 @@ export function getBlock(hash) {
   }
 }
 
-// Method which validate `hash`
+// ## Method which validate `hash`
 export function checkPref (hash, hashType) {
   if (hash.length < 3 || hash.indexOf('_') === -1)
     throw new Error(`Invalid input, likely you forgot to escape the $ sign (use \\_)`)
 
-  // block and micro block check
+  /* block and micro block check */
   if (Array.isArray(hashType)) {
     const res = hashType.find(ht => hash.slice(0, 3) === ht + '_')
     if (res) { return res }
@@ -74,7 +67,17 @@ export function checkPref (hash, hashType) {
   }
 }
 
-// #FILE I/O
+// ## FILE I/O
+
+// Read JSON file
+export function readJSONFile (filePath) {
+  try {
+    return JSON.parse(readFile(filePath))
+  } catch (e) {
+    printError('READ FILE ERROR: ' + e.message)
+    process.exit(1)
+  }
+}
 
 // Write file to filesystem
 export function writeFile (name, data, errTitle = 'WRITE FILE ERROR') {
