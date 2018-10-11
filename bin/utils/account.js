@@ -1,3 +1,5 @@
+// # Utils `account` Module
+// That script contains helper function's for work with `account`
 /*
 * ISC License (ISC)
 * Copyright (c) 2018 aeternity developers
