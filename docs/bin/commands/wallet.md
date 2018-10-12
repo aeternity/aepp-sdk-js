@@ -1,7 +1,30 @@
+
+
+
+
+
+
+  
+
+```js
 #!/usr/bin/env node
-// # æternity CLI `account` file
-//
-// This script initialize all `account` function
+
+```
+
+
+
+
+
+
+
+# æternity CLI `account` file
+
+This script initialize all `account` function
+
+
+  
+
+```js
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
@@ -26,20 +49,62 @@ import { handleApiError } from '../utils/errors'
 import { print, printError, printTransaction } from '../utils/print'
 import { checkPref } from '../utils/helpers'
 
-// ## Spend function
-// this function allow you to `send` token's to another `account`
+
+```
+
+
+
+
+
+
+
+## Spend function
+this function allow you to `send` token's to another `account`
+
+
+  
+
+```js
 async function spend (walletPath, receiver, amount, options) {
   let { ttl, json, nonce } = options
   ttl = parseInt(ttl)
   nonce = parseInt(nonce)
   try {
     checkPref(receiver, HASH_TYPES.account)
-    // Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
+
+```
+
+
+
+
+
+
+
+Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
+
+
+  
+
+```js
     const client = await initClientByWalletFile(walletPath, options)
 
     await handleApiError(async () => {
       let tx = await client.spend(parseInt(amount), receiver, { ttl, nonce })
-      // if waitMined false
+
+```
+
+
+
+
+
+
+
+if waitMined false
+
+
+  
+
+```js
       if (typeof tx !== 'object') {
         tx = await client.tx(tx)
       } else {
@@ -52,11 +117,39 @@ async function spend (walletPath, receiver, amount, options) {
   }
 }
 
-// ## Get `balace` function
-// This function allow you retrieve account `balance`
+
+```
+
+
+
+
+
+
+
+## Get `balace` function
+This function allow you retrieve account `balance`
+
+
+  
+
+```js
 async function getBalance (walletPath, options) {
   try {
-    // Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
+
+```
+
+
+
+
+
+
+
+Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
+
+
+  
+
+```js
     const client = await initClientByWalletFile(walletPath, options)
     await handleApiError(
       async () => print('Your balance is: ' + (await client.balance(await client.address())))
@@ -66,12 +159,40 @@ async function getBalance (walletPath, options) {
   }
 }
 
-// ## Get `address` function
-// This function allow you retrieve account `public` and `private` keys
+
+```
+
+
+
+
+
+
+
+## Get `address` function
+This function allow you retrieve account `public` and `private` keys
+
+
+  
+
+```js
 async function getAddress (walletPath, options) {
   const { privateKey } = options
   try {
-    // Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
+
+```
+
+
+
+
+
+
+
+Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
+
+
+  
+
+```js
     const { client, keypair } = await initClientByWalletFile(walletPath, options, true)
 
     await handleApiError(
@@ -86,8 +207,22 @@ async function getAddress (walletPath, options) {
   }
 }
 
-// ## Create secure `wallet` file
-// This function allow you to generate `keypair` and write it to secure `ethereum` like key-file
+
+```
+
+
+
+
+
+
+
+## Create secure `wallet` file
+This function allow you to generate `keypair` and write it to secure `ethereum` like key-file
+
+
+  
+
+```js
 async function createSecureWallet (walletPath, { output, password }) {
   try {
     await generateSecureWallet(walletPath, { output, password })
@@ -96,8 +231,22 @@ async function createSecureWallet (walletPath, { output, password }) {
   }
 }
 
-// ## Create secure `wallet` file from `private-key`
-// This function allow you to generate `keypair` from `private-key` and write it to secure `ethereum` like key-file
+
+```
+
+
+
+
+
+
+
+## Create secure `wallet` file from `private-key`
+This function allow you to generate `keypair` from `private-key` and write it to secure `ethereum` like key-file
+
+
+  
+
+```js
 async function createSecureWalletByPrivKey (walletPath, priv, { output, password }) {
   try {
     await generateSecureWalletFromPrivKey(walletPath, priv, { output, password })
@@ -113,3 +262,10 @@ export const Wallet = {
   createSecureWallet,
   createSecureWalletByPrivKey
 }
+
+
+```
+
+
+
+

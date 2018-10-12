@@ -1,3 +1,12 @@
+
+
+
+
+
+
+  
+
+```js
 #!/usr/bin/env node
 /*
  * ISC License (ISC)
@@ -20,12 +29,26 @@ const fs = require('fs')
 const prompt = require('prompt')
 const path = require('path')
 
+const utils = require('./utils/index')
 
 require = require('esm')(module/*, options */) // use to handle es6 import/export
 const Crypto = require('../es/utils/crypto')
-const utils = require('./utils/index')
 
-// The `prompt` library provides concealed input of passwords.
+
+```
+
+
+
+
+
+
+
+The `prompt` library provides concealed input of passwords.
+
+
+  
+
+```js
 const promptSchema = {
   properties: {
     password: {
@@ -41,39 +64,86 @@ const promptSchema = {
   }
 }
 
-// ## Key Extraction (from Epoch nodes)
+
+```
+
+
+
+
+
+
+
+## Key Extraction (from Epoch nodes)
+
+
+  
+
+```js
 function extractReadableKeys (dir, options) {
   const pwd = options.input
   prompt.start()
   prompt.get(promptSchema, (err, { password }) => {
-    try {
-      const key = fs.readFileSync(path.join(pwd, dir, 'sign_key'))
-      const pubKey = fs.readFileSync(path.join(pwd, dir, 'sign_key.pub'))
+    const key = fs.readFileSync(path.join(pwd, dir, 'sign_key'))
+    const pubKey = fs.readFileSync(path.join(pwd, dir, 'sign_key.pub'))
 
-      const decrypted = Crypto.decryptPrivateKey(password, key)
+    const decrypted = Crypto.decryptPrivateKey(password, key)
 
-      const privateHex = Buffer.from(decrypted).toString('hex')
-      const decryptedPub = Crypto.decryptPubKey(password, pubKey)
+    const privateHex = Buffer.from(decrypted).toString('hex')
+    const decryptedPub = Crypto.decryptPubKey(password, pubKey)
 
-      console.log(`Private key (hex): ${privateHex}`)
-      console.log(`Public key (base check): ak_${Crypto.encodeBase58Check(decryptedPub)}`)
-      console.log(`Public key (hex): ${decryptedPub.toString('hex')}`)
-    } catch (e) {
-      console.log(e.message)
-      process.exit(1)
-    }
+    console.log(`Private key (hex): ${privateHex}`)
+    console.log(`Public key (base check): ak_${Crypto.encodeBase58Check(decryptedPub)}`)
+    console.log(`Public key (hex): ${decryptedPub.toString('hex')}`)
   })
 }
 
-// ## Key Pair Generation
-async function generateKeyPair (name, { output, password }) {
-  await utils.account.generateSecureWallet(name, { output, password })
+
+```
+
+
+
+
+
+
+
+## Key Pair Generation
+
+
+  
+
+```js
+function generateKeyPair (name, { output }) {
+  const { pub, priv } = Crypto.generateKeyPair()
+
+  const data = [
+    [path.join(output, name), priv],
+    [path.join(output, `${name}.pub`), pub]
+  ]
+
+  data.forEach(([path, data]) => {
+    fs.writeFileSync(path, data)
+    console.log(`Wrote ${path}`)
+  })
 }
 
-// ## Transaction Signing
-//
-// This function shows how to use a compliant private key to sign an æternity
-// transaction and turn it into an RLP-encoded tuple ready for mining
+
+```
+
+
+
+
+
+
+
+## Transaction Signing
+
+This function shows how to use a compliant private key to sign an æternity
+transaction and turn it into an RLP-encoded tuple ready for mining
+
+
+  
+
+```js
 function signTx (tx, privKey) {
   if (!tx.match(/^tx\_.+/)) {
     throw Error('Not a valid transaction')
@@ -91,15 +161,57 @@ function signTx (tx, privKey) {
 
   const decryptedKey = program.password ? Crypto.decryptKey(program.password, binaryKey) : binaryKey
 
-  // Split the base58Check part of the transaction
+
+```
+
+
+
+
+
+
+
+Split the base58Check part of the transaction
+
+
+  
+
+```js
   const base58CheckTx = tx.split('_')[1]
-  // ... and sign the binary create_contract transaction
+
+```
+
+
+
+
+
+
+
+... and sign the binary create_contract transaction
+
+
+  
+
+```js
   const binaryTx = Crypto.decodeBase58Check(base58CheckTx)
 
   const signature = Crypto.sign(binaryTx, decryptedKey)
 
-  // the signed tx deserializer expects a 4-tuple:
-  // <tag, version, signatures_array, binary_tx>
+
+```
+
+
+
+
+
+
+
+the signed tx deserializer expects a 4-tuple:
+<tag, version, signatures_array, binary_tx>
+
+
+  
+
+```js
   const unpackedSignedTx = [
     Buffer.from([11]),
     Buffer.from([1]),
@@ -110,26 +222,27 @@ function signTx (tx, privKey) {
   console.log(Crypto.encodeTx(unpackedSignedTx))
 }
 
-// ## Transaction Deserialization
-//
-// This helper function deserialized the transaction `tx` and prints the result.
+
+```
+
+
+
+
+
+
+
+## Transaction Deserialization
+
+This helper function deserialized the transaction `tx` and prints the result.
+
+
+  
+
+```js
 function unpackTx (tx) {
   const deserializedTx = Crypto.deserialize(Crypto.decodeTx(tx))
   console.log(JSON.stringify(deserializedTx, undefined, 2))
 }
-
-// ## Address decoder
-//
-// This helper function decodes address(base58) to hex
-function decodeAddress (address) {
-  const decoded = Crypto.decodeBase58Check(address.split('_')[1]).toString('hex');
-  console.log(`Decoded address (hex): ${decoded}`)
-}
-
-program
-  .command('decode <base58address>')
-  .description('Decodes base58 address to hex')
-  .action(decodeAddress)
 
 program
   .command('decrypt <directory>')
@@ -141,8 +254,7 @@ program
   .command('genkey <keyname>')
   .description('Generate keypair')
   .option('-o, --output [directory]', 'Output directory for the keys', '.')
-  .option('-p, --password [directory]', 'Password for keypair', '.')
-  .action(async (keyname) => await generateKeyPair(keyname))
+  .action(generateKeyPair)
 
 program
   .command('sign <tx> [privkey]')
@@ -154,8 +266,29 @@ program
   .command('unpack <tx>')
   .action(unpackTx)
 
-// HANDLE UNKNOWN COMMAND
+
+```
+
+
+
+
+
+
+
+HANDLE UNKNOWN COMMAND
+
+
+  
+
+```js
 program.on('command:*', () => utils.errors.unknownCommandHandler(program)())
 
 program.parse(process.argv)
 if (program.args.length === 0) program.help()
+
+
+```
+
+
+
+

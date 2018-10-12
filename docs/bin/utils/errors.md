@@ -1,3 +1,12 @@
+
+
+
+
+
+
+  
+
+```js
 /*
 * ISC License (ISC)
 * Copyright (c) 2018 aeternity developers
@@ -14,16 +23,58 @@
 *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 *  PERFORMANCE OF THIS SOFTWARE.
 */
-// # Utils `errors` Module
-// That script contains helper function for error handling
+
+```
+
+
+
+
+
+
+
+# Utils `errors` Module
+That script contains helper function for error handling
+
+
+  
+
+```js
 
 import { printError, print } from './print'
 import { isExecCommand } from './cli'
 
-// ## `API` errors logger
+
+```
+
+
+
+
+
+
+
+## `API` errors logger
+
+
+  
+
+```js
 export function logApiError (error) { printError(`API ERROR: ${error}`) }
 
-// ## `API` errors handler
+
+```
+
+
+
+
+
+
+
+## `API` errors handler
+
+
+  
+
+```js
 export async function handleApiError (fn) {
   try {
     return await fn()
@@ -34,7 +85,21 @@ export async function handleApiError (fn) {
   }
 }
 
-// ## `COMMANDER` unknown commands handler
+
+```
+
+
+
+
+
+
+
+## `COMMANDER` unknown commands handler
+
+
+  
+
+```js
 export function unknownCommandHandler (program) {
   return (execCommands = []) => {
     const cmd = program.args[0]
@@ -45,3 +110,10 @@ export function unknownCommandHandler (program) {
     program.help()
   }
 }
+
+
+```
+
+
+
+

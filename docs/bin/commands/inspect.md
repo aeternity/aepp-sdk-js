@@ -1,7 +1,30 @@
+
+
+
+
+
+
+  
+
+```js
 #!/usr/bin/env node
-// # æternity CLI `inspect` file
-//
-// This script initialize all `inspect` function
+
+```
+
+
+
+
+
+
+
+# æternity CLI `inspect` file
+
+This script initialize all `inspect` function
+
+
+  
+
+```js
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
@@ -37,12 +60,40 @@ import {
 } from '../utils/print'
 import { checkPref, getBlock, readJSONFile } from '../utils/helpers'
 
-// ## Inspect function
-// That function get the param(`hash`, `height` or `name`) and show you info about it
+
+```
+
+
+
+
+
+
+
+## Inspect function
+That function get the param(`hash`, `height` or `name`) and show you info about it
+
+
+  
+
+```js
 async function inspect (hash, option) {
   if (!hash) throw new Error('Hash required')
 
-  // Get `block` by `height`
+
+```
+
+
+
+
+
+
+
+Get `block` by `height`
+
+
+  
+
+```js
   if (!isNaN(parseInt(hash))) {
     await getBlockByHeight(hash, option)
     return
@@ -50,30 +101,114 @@ async function inspect (hash, option) {
 
   const [pref, _] = hash.split('_')
   switch (pref) {
-    // Get `block` by `hash`
+
+```
+
+
+
+
+
+
+
+Get `block` by `hash`
+
+
+  
+
+```js
     case HASH_TYPES.block:
       await getBlockByHash(hash, option)
       break
-    // Get `micro_block` by `hash`
+
+```
+
+
+
+
+
+
+
+Get `micro_block` by `hash`
+
+
+  
+
+```js
     case HASH_TYPES.micro_block:
       await getBlockByHash(hash, option)
       break
-    // Get `account` by `hash`
+
+```
+
+
+
+
+
+
+
+Get `account` by `hash`
+
+
+  
+
+```js
     case HASH_TYPES.account:
       await getAccountByHash(hash, option)
       break
-    // Get `transaction` by `hash`
+
+```
+
+
+
+
+
+
+
+Get `transaction` by `hash`
+
+
+  
+
+```js
     case HASH_TYPES.transaction:
       await getTransactionByHash(hash, option)
       break
-    // Get `name`
+
+```
+
+
+
+
+
+
+
+Get `name`
+
+
+  
+
+```js
     default:
       await getName(hash, option)
       break
   }
 }
 
-// ## Inspect helper function's
+
+```
+
+
+
+
+
+
+
+## Inspect helper function's
+
+
+  
+
+```js
 async function getBlockByHash (hash, options) {
   const { json } = options
   try {
@@ -172,3 +307,10 @@ async function getContractByDescr (descrPath, options) {
 export const Inspect = {
   inspect
 }
+
+
+```
+
+
+
+

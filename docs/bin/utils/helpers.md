@@ -1,3 +1,12 @@
+
+
+
+
+
+
+  
+
+```js
 /*
 * ISC License (ISC)
 * Copyright (c) 2018 aeternity developers
@@ -14,8 +23,22 @@
 *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 *  PERFORMANCE OF THIS SOFTWARE.
 */
-// # Utils `helpers` Module
-// That script contains base helper function
+
+```
+
+
+
+
+
+
+
+# Utils `helpers` Module
+That script contains base helper function
+
+
+  
+
+```js
 
 import * as R from 'ramda'
 import fs from 'fs'
@@ -23,10 +46,24 @@ import fs from 'fs'
 import { HASH_TYPES } from './constant'
 import { printError } from './print'
 
-// ## Method which retrieve block info by hash
-// if it's `MICRO_BLOCK` call `getMicroBlockHeaderByHash` and `getMicroBlockTransactionsByHash`
-//
-// if it's `BLOCK` call `getKeyBlockByHash`
+
+```
+
+
+
+
+
+
+
+## Method which retrieve block info by hash
+if it's `MICRO_BLOCK` call `getMicroBlockHeaderByHash` and `getMicroBlockTransactionsByHash`
+
+if it's `BLOCK` call `getKeyBlockByHash`
+
+
+  
+
+```js
 export function getBlock(hash) {
   return async (client) => {
     if (hash.indexOf(HASH_TYPES.block + '_') !== -1) {
@@ -41,7 +78,21 @@ export function getBlock(hash) {
   }
 }
 
-// ## Method which validate `hash`
+
+```
+
+
+
+
+
+
+
+## Method which validate `hash`
+
+
+  
+
+```js
 export function checkPref (hash, hashType) {
   if (hash.length < 3 || hash.indexOf('_') === -1)
     throw new Error(`Invalid input, likely you forgot to escape the $ sign (use \\_)`)
@@ -67,9 +118,30 @@ export function checkPref (hash, hashType) {
   }
 }
 
-// ## FILE I/O
 
-// Read JSON file
+```
+
+
+
+
+
+
+
+## FILE I/O
+
+
+
+
+
+
+
+
+Read JSON file
+
+
+  
+
+```js
 export function readJSONFile (filePath) {
   try {
     return JSON.parse(readFile(filePath))
@@ -79,7 +151,21 @@ export function readJSONFile (filePath) {
   }
 }
 
-// Write file to filesystem
+
+```
+
+
+
+
+
+
+
+Write file to filesystem
+
+
+  
+
+```js
 export function writeFile (name, data, errTitle = 'WRITE FILE ERROR') {
   try {
     fs.writeFileSync(
@@ -93,7 +179,21 @@ export function writeFile (name, data, errTitle = 'WRITE FILE ERROR') {
   }
 }
 
-// Read file from filesystem
+
+```
+
+
+
+
+
+
+
+Read file from filesystem
+
+
+  
+
+```js
 export function readFile (path, encoding = null, errTitle = 'READ FILE ERR') {
   try {
     return fs.readFileSync(
@@ -110,3 +210,10 @@ export function readFile (path, encoding = null, errTitle = 'READ FILE ERR') {
     }
   }
 }
+
+
+```
+
+
+
+
