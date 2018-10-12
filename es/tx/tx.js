@@ -147,7 +147,7 @@ const Transaction = Epoch.compose(JsTx, {
     nameRevokeTx,
     contractCreateTx,
     contractCallTx,
-    commitmentHash
+    // commitmentHash
   }
 })
 
