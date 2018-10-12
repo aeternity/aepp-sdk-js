@@ -118,6 +118,20 @@ function unpackTx (tx) {
   console.log(JSON.stringify(deserializedTx, undefined, 2))
 }
 
+// ## Address decoder
+//
+// This helper function decodes address(base58) to hex
+function decodeAddress (options) {
+  const decoded = Crypto.decodeBase58Check(options.split('_')[1]).toString('hex');
+  console.log(`Decoded address (hex): ${decoded}`)
+}
+
+program
+  .command('decode <base58address>')
+  .description('Decodes base58 address to hex')
+  .option('-a, --address base58address]', 'Address to decrypt', '.')
+  .action(decodeAddress)
+
 program
   .command('decrypt <directory>')
   .description('Decrypts public and private key to readable formats for testing purposes')
