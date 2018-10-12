@@ -119,6 +119,9 @@ export function hexStringToByte (str) {
   return new Uint8Array(a)
 }
 
+
+// KEY-PAIR HELPERS
+
 /**
  * Generate keyPair from secret key
  * @rtype (secret: Uint8Array) => KeyPair
@@ -204,6 +207,8 @@ export function decryptKey (password, encrypted) {
   return Buffer.from(aesEcb.decrypt(encryptedBytes))
 }
 
+// SIGNATURES
+
 /**
  * Generate signature
  * @rtype (data: String, privateKey: Buffer) => Buffer
@@ -226,6 +231,7 @@ export function sign (data, privateKey) {
 export function verify (str, signature, publicKey) {
   return nacl.sign.detached.verify(new Uint8Array(str), signature, publicKey)
 }
+
 
 /**
  * @typedef {Array} Transaction

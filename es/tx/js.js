@@ -23,7 +23,16 @@
  */
 
 import stampit from '@stamp/it'
-import { encodeBase58Check, decodeBase58Check, hash, nameId, salt } from '../utils/crypto'
+import {
+  encodeBase58Check,
+  decodeBase58Check,
+  hash,
+  nameId,
+  salt,
+  encodeTx,
+  assertedType,
+} from '../utils/crypto'
+import { toBytes } from '../utils/bytes'
 
 // # RLP version number
 // # https://github.com/aeternity/protocol/blob/epoch-v0.10.1/serializations.md#binary-serialization
@@ -84,71 +93,50 @@ const OBJECT_TAG_LIGHT_MICRO_BLOCK = 102
 
 
 const createSalt = salt
-// HELPERS
 
 /**
- * Compute the absolute ttl by adding the ttl to the current height of the chain
+ * Decode data using the default encoding/decoding algorithm
  *
- * @param {number} relativeTtl
- * @return {number} Absolute Ttl
+ * @param {string} recipientId Tthe public key of the recipient
+ * @param {string} data  An encoded and prefixed string (ex tx_..., sg_..., ak_....)
+ * @param {string} type Prefix of Transaction
+ * @return {Buffer} Buffer of decoded Base58 data
  */
-async function computeAbsoluteTtl (relativeTtl) {
-  if (relativeTtl <= 0) throw new Error('ttl must be greather than 0')
-
-  const { height } = await this.api.getCurrentKeyBlock()
-  return +(height) + relativeTtl
+export function decode(data, type) {
+  return decodeBase58Check(assertedType(data, type))
 }
 
 /**
- * Get the next nonce to be used for a transaction for an account
+ * Create a spend transaction
  *
- * @param {string} accountAddress
- * @return {number} Next Nonce
+ * @param {string} recipientId Tthe public key of the recipient
+ * @param {number} amount The amount to send
+ * @param {string} payload The payload associated with the data
+ * @param {number} fee The fee for the transaction
+ * @param {number} ttl The relative ttl of the transaction
+ * @param {number} nonce the nonce of the transaction
+ * @return {string} Encrypted spend tx hash
  */
-async function getNextNonce (accountAddress) {
-  return +(await this.api.getAccountByPubkey(accountId)).nonce + 1
+async function spendTxNative({ recipientId, amount, payload, fee, ttl, nonce }) {
+  const address = await this.address()
+
+  const sid = Buffer.from([...toBytes(ID_TAG_ACCOUNT), ...decode(address, 'ak')])
+  const rid = Buffer.from([...toBytes(ID_TAG_ACCOUNT), ...decode(recipientId, 'ak')])
+  let tx = [
+    toBytes(OBJECT_TAG_SPEND_TRANSACTION),
+    toBytes(VSN),
+    sid,
+    rid,
+    toBytes(amount),
+    toBytes(fee),
+    toBytes(ttl),
+    toBytes(nonce),
+    toBytes(payload)
+  ]
+  // Encode RLP
+  tx = encodeTx(tx)
+  return { tx }
 }
-
-/**
- * Helper method to compute both ttl and nonce
- *
- * @param {number} relativeTtl
- * @param {string} accountAddress
- * @return {object} { nonce, ttl } Object which contain next nonce and absolute ttl
- */
-async function getNonceTtl (relativeTtl, accountAddress) {
-  return {
-    ttl: await computeAbsoluteTtl.bind(this)(relativeTtl),
-    nonce: await getNextNonce.bind(this)(accountAddress)
-  }
-}
-
-//
-
-
-/**
- * Generate the hash from a signed and encoded transaction
- *
- * @param {number} signedTx an encoded signed transaction
- */
-async function computeTxHash(signedTx) {
-  if (signedTx[2] !== '_') throw new Error('Invalid hash')
-
-  const signed = decodeBase58Check(signedTx.slice(3))
-  return encode('tx', hash(signed))
-}
-
-/**
- * Encode data using the default encoding/decoding algorithm and prepending the prefix with a prefix, ex: ak_encoded_data, th_encoded_data,...
- *
- * @param {string} pref TX Prefix
- * @param {buffer} data Data to encode
- */
-async function encode(pref, data) {
-  return `${pref}_${encodeBase58Check(data)}`
-}
-
-async function encodeSignedTransaction(signedTx, signature) {}
 
 /**
  * Format the salt into a 64-byte hex string
@@ -184,6 +172,11 @@ async function commitmentHash (name, salt = createSalt()) {
  * @return {Object} Tx instance
  * @example JsTx()
  */
-const JsTx = stampit({ methods: { commitmentHash } })
+const JsTx = stampit({
+  methods: {
+    commitmentHash,
+    spendTxNative
+  }
+})
 
 export default JsTx

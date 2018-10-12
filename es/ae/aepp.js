@@ -26,7 +26,9 @@ import Ae from './'
 import Aens from './aens'
 import Contract from './contract'
 import Rpc from '../rpc/client'
+import Transaction from '../tx/tx'
+import Chain from '../chain'
 
-const Aepp = Ae.compose(Contract, Aens, Rpc)
+const Aepp = Ae.compose(Contract, Chain, Transaction, Aens, Rpc)
 
 export default Aepp

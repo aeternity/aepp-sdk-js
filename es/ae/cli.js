@@ -18,12 +18,11 @@
 import Ae from './'
 import Account from '../account/memory'
 import Chain from '../chain/epoch'
-import Tx from '../tx/epoch'
-import JsTx from '../tx/js'
 import Aens from './aens'
 import Contract from './contract'
+import Transaction from '../tx/tx'
 
-const Cli = Ae.compose(Account, Chain, Tx, JsTx, Aens, Contract, {
+const Cli = Ae.compose(Account, Chain, Transaction, Aens, Contract, {
   init () {},
   props: { process: {} }
 })

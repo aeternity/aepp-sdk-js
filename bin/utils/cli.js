@@ -28,8 +28,8 @@ export function getCmdFromArguments (args) {
 }
 
 // Create `Ae` client
-export async function initClient ({host: url, keypair, internalUrl, force: forceCompatibility}) {
-  return await Cli({ url, process, keypair, internalUrl, forceCompatibility })
+export async function initClient ({host: url, keypair, internalUrl, force: forceCompatibility, nativeMode = true}) {
+  return await Cli({ url, process, keypair, internalUrl, forceCompatibility, nativeMode })
 }
 
 // Get account files and decrypt it using password
