@@ -23,7 +23,7 @@ const cliCommand = './bin/aecli.js'
 
 const url = process.env.TEST_URL || 'http://localhost:3013'
 const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
-const TIMEOUT = 180000
+const TIMEOUT = 18000000
 
 export const KEY_PAIR = generateKeyPair()
 export const WALLET_NAME = 'mywallet'
@@ -48,7 +48,7 @@ export async function ready (mocha) {
   configure(mocha)
 
   const ae = await BaseAe()
-  await ae.awaitHeight(10)
+  await ae.awaitHeight(5)
 
   if (!charged && planned > 0) {
     console.log(`Charging new wallet ${KEY_PAIR.pub} with ${planned}`)

@@ -14,24 +14,27 @@
 *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 *  PERFORMANCE OF THIS SOFTWARE.
 */
+// # Utils `errors` Module
+// That script contains helper function for error handling
 
-// ERROR HANDLERS
 import { printError, print } from './print'
 import { isExecCommand } from './cli'
 
+// ## `API` errors logger
 export function logApiError (error) { printError(`API ERROR: ${error}`) }
 
+// ## `API` errors handler
 export async function handleApiError (fn) {
   try {
     return await fn()
   } catch (e) {
-    // console.log(e)
     const response = e.response
     logApiError(response && response.data ? response.data.reason : e)
     process.exit(1)
   }
 }
 
+// ## `COMMANDER` unknown commands handler
 export function unknownCommandHandler (program) {
   return (execCommands = []) => {
     const cmd = program.args[0]

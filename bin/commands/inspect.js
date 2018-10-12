@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+// # æternity CLI `inspect` file
+//
+// This script initialize all `inspect` function
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
@@ -16,15 +19,6 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-//    _____                           _
-//   |_   _|                         | |
-//     | |  _ __  ___ _ __   ___  ___| |_
-//     | | | '_ \/ __| '_ \ / _ \/ __| __|
-//    _| |_| | | \__ \ |_) |  __/ (__| |_
-//   |_____|_| |_|___/ .__/ \___|\___|\__|
-//                   | |
-//                   |_|
-
 import * as R from 'ramda'
 import path from 'path'
 
@@ -38,13 +32,17 @@ import {
   printContractDescr,
   printError,
   printName,
-  printTransaction
+  printTransaction,
+  printUnderscored
 } from '../utils/print'
 import { checkPref, getBlock, readJSONFile } from '../utils/helpers'
 
+// ## Inspect function
+// That function get the param(`hash`, `height` or `name`) and show you info about it
 async function inspect (hash, option) {
   if (!hash) throw new Error('Hash required')
 
+  // Get `block` by `height`
   if (!isNaN(parseInt(hash))) {
     await getBlockByHeight(hash, option)
     return
@@ -52,26 +50,30 @@ async function inspect (hash, option) {
 
   const [pref, _] = hash.split('_')
   switch (pref) {
+    // Get `block` by `hash`
     case HASH_TYPES.block:
       await getBlockByHash(hash, option)
       break
+    // Get `micro_block` by `hash`
     case HASH_TYPES.micro_block:
       await getBlockByHash(hash, option)
       break
+    // Get `account` by `hash`
     case HASH_TYPES.account:
       await getAccountByHash(hash, option)
       break
+    // Get `transaction` by `hash`
     case HASH_TYPES.transaction:
       await getTransactionByHash(hash, option)
       break
-    // case HASH_TYPES.contract:
-    //   break
+    // Get `name`
     default:
       await getName(hash, option)
       break
   }
 }
 
+// ## Inspect helper function's
 async function getBlockByHash (hash, options) {
   const { json } = options
   try {
@@ -108,10 +110,10 @@ async function getAccountByHash (hash, options) {
     const client = await initClient(options)
     await handleApiError(
       async () => {
-        const { balance, id, nonce } = await client.api.getAccountByPubkey(hash)
-        print('Account ID________________ ' + id)
-        print('Account balance___________ ' + balance)
-        print('Account nonce_____________ ' + nonce)
+        const {balance, id, nonce} = await client.api.getAccountByPubkey(hash)
+        printUnderscored('Account ID', id)
+        printUnderscored('Account balance', balance)
+        printUnderscored('Account nonce', nonce)
         print('Account Transactions: ')
         printBlockTransactions((await client.api.getPendingAccountTransactionsByPubkey(hash)).transactions, json)
       }
@@ -145,7 +147,6 @@ async function getName (name, options) {
   } catch (e) {
     if (e.response && e.response.status === 404) {
       printName({ status: 'AVAILABLE' }, json)
-      process.exit(1)
     }
     printError(e.message)
   }

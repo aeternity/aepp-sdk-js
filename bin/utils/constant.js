@@ -14,32 +14,10 @@
 *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 *  PERFORMANCE OF THIS SOFTWARE.
 */
+// # Utils `constant` Module
+// That script contains default configuration for `CLI`
 
-//
-// const CONFIG_PATH = './config'
-//
-// const DEFAULT_CONFIG = {}
-//
-// class AEConfig {
-//   configs = []
-//   constructor (){
-//
-//   }
-//
-//   validate(config) {}
-//
-//   removeConfig(configName) {}
-//
-//   createConfig(configName) {}
-//
-//   selectConfig(configName) {}
-//
-//   getConfigsFromFS() {}
-// }
-//
-// const instance = new AEConfig(CONFIG_PATH)
-
-// HAST TYPES
+// ## HAST TYPES
 export const HASH_TYPES = {
   transaction: 'th',
   contract: 'ct',
@@ -50,22 +28,22 @@ export const HASH_TYPES = {
   stateHash: 'bs'
 }
 
-// CONNECTION
+// ## CONNECTION
 export const EPOCH_URL = 'https://sdk-edgenet.aepps.com'
 export const EPOCH_INTERNAL_URL = 'https://sdk-edgenet.aepps.com'
 export const EPOCH_WEBSOCKET_URL = 'https://sdk-edgenet.aepps.com'
 
-// CHAIN
+// ## CHAIN
 export const PLAY_LIMIT = 10
 export const PLAY_INTERVAL = 1000
 
-// CONTRACT
-export const CONTRACT_TTL = 50000
-export const GAS = 40000000
+// ## CONTRACT
+export const CONTRACT_TTL = 500
+export const GAS = 1600000 - 21000 // MAX GAS
 
-// AENS
-export const AENS_TX_TTL = 50000
-export const NAME_TTL = 500
+// ## AENS
+export const AENS_TX_TTL = 500
+export const NAME_TTL = 50000
 
-// ACCOUNT
-export const ACCOUNT_TX_TTL = 50000
+// ## ACCOUNT
+export const SPEND_TX_TTL = 500
