@@ -218,7 +218,7 @@ export async function awaitingShutdownTx (channel, message, state) {
 export function awaitingShutdownOnChainTx (channel, message, state) {
   if (message.action === 'on_chain_tx') {
     state.resolveShutdownPromise(message.payload.tx)
-    return {handler: channelOpen}
+    return {handler: channelClosed}
   }
 }
 
