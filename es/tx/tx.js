@@ -29,8 +29,6 @@ import Epoch from '../epoch'
 
 import { salt } from '../utils/crypto'
 
-const createSalt = salt
-
 async function spendTx ({ senderId, recipientId, amount, fee, ttl, nonce, payload }) {
   nonce = await (calculateNonce.bind(this)(senderId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
@@ -83,10 +81,6 @@ async function contractCallTx ({ callerId, nonce, contractId, vmVersion, fee, tt
   nonce = await (calculateNonce.bind(this)(callerId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
   return (await this.api.postContractCall(R.merge(R.head(arguments), { nonce, ttl }))).tx
-}
-
-async function commitmentHash (name, salt = createSalt()) {
-  return (await this.api.getCommitmentHash(name, salt)).commitmentId
 }
 
 /**
@@ -146,8 +140,7 @@ const Transaction = Epoch.compose(JsTx, {
     nameUpdateTx,
     nameRevokeTx,
     contractCreateTx,
-    contractCallTx,
-    // commitmentHash
+    contractCallTx
   }
 })
 
