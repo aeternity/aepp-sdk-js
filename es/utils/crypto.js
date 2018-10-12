@@ -119,7 +119,6 @@ export function hexStringToByte (str) {
   return new Uint8Array(a)
 }
 
-
 // KEY-PAIR HELPERS
 
 /**
@@ -231,7 +230,6 @@ export function sign (data, privateKey) {
 export function verify (str, signature, publicKey) {
   return nacl.sign.detached.verify(new Uint8Array(str), signature, publicKey)
 }
-
 
 /**
  * @typedef {Array} Transaction

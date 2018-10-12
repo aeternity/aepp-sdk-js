@@ -49,21 +49,21 @@ export function rightPad (length, inputBuffer) {
   }
 }
 
-function bitSize(num) {
-  return num.toString(2).length;
+function bitSize (num) {
+  return num.toString(2).length
 }
 
-function dec2hex (n){
-  return n ? [n%256].concat(dec2hex(~~(n/256))) : [];
+function dec2hex (n) {
+  return n ? [n % 256].concat(dec2hex(~~(n / 256))) : []
 }
 
-export function toBigEndian(s, n){
-  const hexar = dec2hex(n);
-  return hexar.map(h => (h < 16 ? "0x0" : "0x") + h.toString(16))
-    .concat(Array(4-hexar.length).fill("0x00")).slice(0, s).reverse();
+export function toBigEndian (s, n) {
+  const hexar = dec2hex(n)
+  return hexar.map(h => (h < 16 ? '0x0' : '0x') + h.toString(16))
+    .concat(Array(4 - hexar.length).fill('0x00')).slice(0, s).reverse()
 }
 
-export function toBytes(val) {
+export function toBytes (val) {
   // """
   // Encode a value to bytes.
   // If the value is an int it will be encoded as bytes big endian
@@ -77,5 +77,4 @@ export function toBytes(val) {
   } else {
     throw new Error('Byte serialization not supported')
   }
-
 }

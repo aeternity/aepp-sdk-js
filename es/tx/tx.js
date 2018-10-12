@@ -29,7 +29,6 @@ import Epoch from '../epoch'
 
 import { salt } from '../utils/crypto'
 
-
 const createSalt = salt
 
 async function spendTx ({ senderId, recipientId, amount, fee, ttl, nonce, payload }) {
@@ -37,9 +36,9 @@ async function spendTx ({ senderId, recipientId, amount, fee, ttl, nonce, payloa
   ttl = await (calculateTtl.bind(this)(ttl))
 
   // Build transaction using sdk (if nativeMode) or build on `EPOCH` side
-  const { tx } = this.nativeMode ?
-    await this.spendTxNative(R.merge(R.head(arguments), { recipientId, nonce, ttl })) :
-    await this.api.postSpend(R.merge(R.head(arguments), { recipientId, nonce, ttl }))
+  const { tx } = this.nativeMode
+    ? await this.spendTxNative(R.merge(R.head(arguments), { recipientId, nonce, ttl }))
+    : await this.api.postSpend(R.merge(R.head(arguments), { recipientId, nonce, ttl }))
 
   return tx
 }
@@ -117,7 +116,6 @@ async function calculateNonce (accountId, nonce) {
   return nonce
 }
 
-
 /**
  * Transaction Stamp
  *
@@ -134,7 +132,7 @@ async function calculateNonce (accountId, nonce) {
  * @example Transaction({url: 'https://sdk-testnet.aepps.com/'})
  */
 const Transaction = Epoch.compose(JsTx, {
-  init({ nativeMode = true }) {
+  init ({ nativeMode = true }) {
     this.nativeMode = nativeMode
   },
   props: {
