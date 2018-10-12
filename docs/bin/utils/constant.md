@@ -1,3 +1,12 @@
+
+
+
+
+
+
+  
+
+```js
 /*
 * ISC License (ISC)
 * Copyright (c) 2018 aeternity developers
@@ -14,10 +23,31 @@
 *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 *  PERFORMANCE OF THIS SOFTWARE.
 */
-// # Utils `constant` Module
-// That script contains default configuration for `CLI`
 
-// ## HAST TYPES
+```
+
+
+
+
+
+
+
+# Utils `constant` Module
+That script contains default configuration for `CLI`
+
+
+
+
+
+
+
+
+## HAST TYPES
+
+
+  
+
+```js
 export const HASH_TYPES = {
   transaction: 'th',
   contract: 'ct',
@@ -28,22 +58,99 @@ export const HASH_TYPES = {
   stateHash: 'bs'
 }
 
-// ## CONNECTION
+
+```
+
+
+
+
+
+
+
+## CONNECTION
+
+
+  
+
+```js
 export const EPOCH_URL = 'https://sdk-edgenet.aepps.com'
 export const EPOCH_INTERNAL_URL = 'https://sdk-edgenet.aepps.com'
 export const EPOCH_WEBSOCKET_URL = 'https://sdk-edgenet.aepps.com'
 
-// ## CHAIN
+
+```
+
+
+
+
+
+
+
+## CHAIN
+
+
+  
+
+```js
 export const PLAY_LIMIT = 10
 export const PLAY_INTERVAL = 1000
 
-// ## CONTRACT
+
+```
+
+
+
+
+
+
+
+## CONTRACT
+
+
+  
+
+```js
 export const CONTRACT_TTL = 500
 export const GAS = 1600000 - 21000 // MAX GAS
 
-// ## AENS
+
+```
+
+
+
+
+
+
+
+## AENS
+
+
+  
+
+```js
 export const AENS_TX_TTL = 500
 export const NAME_TTL = 50000
 
-// ## ACCOUNT
+
+```
+
+
+
+
+
+
+
+## ACCOUNT
+
+
+  
+
+```js
 export const SPEND_TX_TTL = 500
+
+
+```
+
+
+
+

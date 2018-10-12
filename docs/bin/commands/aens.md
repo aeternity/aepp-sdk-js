@@ -1,7 +1,30 @@
+
+
+
+
+
+
+  
+
+```js
 #!/usr/bin/env node
-// # æternity CLI `AENS` file
-//
-// This script initialize all `AENS` function
+
+```
+
+
+
+
+
+
+
+# æternity CLI `AENS` file
+
+This script initialize all `AENS` function
+
+
+  
+
+```js
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
@@ -25,9 +48,30 @@ import { initClientByWalletFile } from '../utils/cli'
 import { printError, print, printUnderscored } from '../utils/print'
 import { handleApiError } from '../utils/errors'
 
-// ## Name helpers methods
 
-// Get `name` status
+```
+
+
+
+
+
+
+
+## Name helpers methods
+
+
+
+
+
+
+
+
+Get `name` status
+
+
+  
+
+```js
 const updateNameStatus = (name) => async (client) => {
   try {
     return await client.api.getNameEntryByName(name)
@@ -37,43 +81,183 @@ const updateNameStatus = (name) => async (client) => {
   }
 }
 
-// Check if `name` is `AVAILABLE`
+
+```
+
+
+
+
+
+
+
+Check if `name` is `AVAILABLE`
+
+
+  
+
+```js
 const isAvailable = (name) => name.status === 'AVAILABLE'
 
-// Validate `name`
+
+```
+
+
+
+
+
+
+
+Validate `name`
+
+
+  
+
+```js
 const validateName = (name) => {
   if (R.last(name.split('.')) !== 'aet') { throw new Error('AENS TLDs must end in .aet') }
 }
 
-// ## Claim `name` function
+
+```
+
+
+
+
+
+
+
+## Claim `name` function
+
+
+  
+
+```js
 async function claim (walletPath, domain, options) {
-  // Parse options(`ttl`, `nameTtl`)
+
+```
+
+
+
+
+
+
+
+Parse options(`ttl`, `nameTtl`)
+
+
+  
+
+```js
   const ttl = parseInt(options.ttl)
   const nameTtl = parseInt(options.nameTtl)
   try {
-    // Validate `name`(check if `name` end on `.aet`)
+
+```
+
+
+
+
+
+
+
+Validate `name`(check if `name` end on `.aet`)
+
+
+  
+
+```js
     validateName(domain)
 
-    // Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
+
+```
+
+
+
+
+
+
+
+Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
+
+
+  
+
+```js
     const client = await initClientByWalletFile(walletPath, options)
 
     await handleApiError(async () => {
-      // Check if that `name' available
+
+```
+
+
+
+
+
+
+
+Check if that `name' available
+
+
+  
+
+```js
       const name = await updateNameStatus(domain)(client)
       if (!isAvailable(name)) {
         print('Domain not available')
         process.exit(1)
       }
 
-      // Create `preclaimName` transaction
+
+```
+
+
+
+
+
+
+
+Create `preclaimName` transaction
+
+
+  
+
+```js
       const { salt, height } = await client.aensPreclaim(domain, { nameTtl, ttl })
       print('Pre-Claimed')
 
-      // Wait for next block and create `claimName` transaction
+
+```
+
+
+
+
+
+
+
+Wait for next block and create `claimName` transaction
+
+
+  
+
+```js
       await client.aensClaim(domain, salt, (height + 1), { nameTtl, ttl })
       print('Claimed')
 
-      // Update `name` pointer
+
+```
+
+
+
+
+
+
+
+Update `name` pointer
+
+
+  
+
+```js
       const { id } = await updateNameStatus(domain)(client)
       const { hash } = await client.aensUpdate(id, await client.address(), { nameTtl, ttl })
       print('Updated')
@@ -87,9 +271,37 @@ async function claim (walletPath, domain, options) {
   }
 }
 
-// ##Transfer `name` function
+
+```
+
+
+
+
+
+
+
+##Transfer `name` function
+
+
+  
+
+```js
 async function transferName (walletPath, domain, address, options) {
-  // Parse options(`ttl`, `nameTtl` and `nonce`)
+
+```
+
+
+
+
+
+
+
+Parse options(`ttl`, `nameTtl` and `nonce`)
+
+
+  
+
+```js
   const ttl = parseInt(options.ttl)
   const nameTtl = parseInt(options.nameTtl)
   const nonce = parseInt(options.nonce)
@@ -99,18 +311,60 @@ async function transferName (walletPath, domain, address, options) {
     process.exit(1)
   }
   try {
-    // Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
+
+```
+
+
+
+
+
+
+
+Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
+
+
+  
+
+```js
     const client = await initClientByWalletFile(walletPath, options)
 
     await handleApiError(async () => {
-      // Check if that `name` is unavailable and we can transfer it
+
+```
+
+
+
+
+
+
+
+Check if that `name` is unavailable and we can transfer it
+
+
+  
+
+```js
       const name = await updateNameStatus(domain)(client)
       if (isAvailable(name)) {
         print(`Domain is available, nothing to transfer`)
         process.exit(1)
       }
 
-      // Create `transferName` transaction
+
+```
+
+
+
+
+
+
+
+Create `transferName` transaction
+
+
+  
+
+```js
       const transferTX = await client.aensTransfer(name.id, address, { ttl, nameTtl, nonce })
       print('Transfer Success')
       printUnderscored('Transaction hash', transferTX.hash)
@@ -121,9 +375,37 @@ async function transferName (walletPath, domain, address, options) {
   }
 }
 
-// ##Update `name` function
+
+```
+
+
+
+
+
+
+
+##Update `name` function
+
+
+  
+
+```js
 async function updateName (walletPath, domain, address, options) {
-  // Parse options(`ttl`, `nameTtl` and `nonce``)
+
+```
+
+
+
+
+
+
+
+Parse options(`ttl`, `nameTtl` and `nonce``)
+
+
+  
+
+```js
   const ttl = parseInt(options.ttl)
   const nameTtl = parseInt(options.nameTtl)
   const nonce = parseInt(options.nonce)
@@ -134,18 +416,60 @@ async function updateName (walletPath, domain, address, options) {
   }
 
   try {
-    // Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
+
+```
+
+
+
+
+
+
+
+Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
+
+
+  
+
+```js
     const client = await initClientByWalletFile(walletPath, options)
 
     await handleApiError(async () => {
-      // Check if that `name` is unavailable and we can update it
+
+```
+
+
+
+
+
+
+
+Check if that `name` is unavailable and we can update it
+
+
+  
+
+```js
       const name = await updateNameStatus(domain)(client)
       if (isAvailable(name)) {
         print(`Domain is ${name.status} and cannot be transferred`)
         process.exit(1)
       }
 
-      // Create `updateName` transaction
+
+```
+
+
+
+
+
+
+
+Create `updateName` transaction
+
+
+  
+
+```js
       const updateNameTx = await client.aensUpdate(name.id, address, { ttl, nameTtl, nonce })
       print('Update Success')
       printUnderscored('Transaction Hash', updateNameTx.hash)
@@ -156,25 +480,95 @@ async function updateName (walletPath, domain, address, options) {
   }
 }
 
-// ##Revoke `name` function
+
+```
+
+
+
+
+
+
+
+##Revoke `name` function
+
+
+  
+
+```js
 async function revokeName (walletPath, domain, options) {
-  // Parse options(`ttl` and `nonce`)
+
+```
+
+
+
+
+
+
+
+Parse options(`ttl` and `nonce`)
+
+
+  
+
+```js
   const ttl = parseInt(options.ttl)
   const nonce = parseInt(options.nonce)
 
   try {
-    // Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
+
+```
+
+
+
+
+
+
+
+Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
+
+
+  
+
+```js
     const client = await initClientByWalletFile(walletPath, options)
 
     await handleApiError(async () => {
-      // Check if `name` is unavailable and we can revoke it
+
+```
+
+
+
+
+
+
+
+Check if `name` is unavailable and we can revoke it
+
+
+  
+
+```js
       const name = await updateNameStatus(domain)(client)
       if (isAvailable(name)) {
         print(`Domain is available, nothing to revoke`)
         process.exit(1)
       }
 
-      // Create `revokeName` transaction
+
+```
+
+
+
+
+
+
+
+Create `revokeName` transaction
+
+
+  
+
+```js
       const revokeTx = await client.aensRevoke(name.id, { ttl, nonce })
       print('Revoke Success')
       printUnderscored('Transaction hash', revokeTx.hash)
@@ -191,3 +585,10 @@ export const AENS = {
   claim,
   transferName
 }
+
+
+```
+
+
+
+

@@ -1,5 +1,14 @@
-// # Utils `account` Module
-// That script contains helper function's for work with `account`
+
+
+
+
+# Utils `account` Module
+That script contains helper function's for work with `account`
+
+
+  
+
+```js
 /*
 * ISC License (ISC)
 * Copyright (c) 2018 aeternity developers
@@ -24,9 +33,30 @@ import { print } from './print'
 import { readJSONFile, writeFile } from './helpers'
 import { dump, getAddressFromPriv, recover } from './keystore'
 
-// ## The `prompt` library provides concealed input of passwords.
 
-// `prompt` schema
+```
+
+
+
+
+
+
+
+## The `prompt` library provides concealed input of passwords.
+
+
+
+
+
+
+
+
+`prompt` schema
+
+
+  
+
+```js
 const PROMPT_SCHEMA = {
   properties: {
     password: {
@@ -42,7 +72,21 @@ const PROMPT_SCHEMA = {
   }
 }
 
-// `Async` prompt password using `prompt`
+
+```
+
+
+
+
+
+
+
+`Async` prompt password using `prompt`
+
+
+  
+
+```js
 async function promptPasswordAsync () {
   return new Promise(
     (resolve, reject) => {
@@ -61,9 +105,30 @@ async function promptPasswordAsync () {
   )
 }
 
-// ##WALLET HELPERS
 
-// Generate `keypair` encrypt it using password and write to `ethereum` keystore file
+```
+
+
+
+
+
+
+
+##WALLET HELPERS
+
+
+
+
+
+
+
+
+Generate `keypair` encrypt it using password and write to `ethereum` keystore file
+
+
+  
+
+```js
 export async function generateSecureWallet (name, { output, password }) {
   password = password || await promptPasswordAsync()
   const { priv, pub } = Crypto.generateKeyPair()
@@ -77,7 +142,21 @@ export async function generateSecureWallet (name, { output, password }) {
   `)
 }
 
-// Generate `keypair` from `PRIVATE KEY` encrypt it using password and to `ethereum` keystore file
+
+```
+
+
+
+
+
+
+
+Generate `keypair` from `PRIVATE KEY` encrypt it using password and to `ethereum` keystore file
+
+
+  
+
+```js
 export async function generateSecureWalletFromPrivKey (name, priv, { output, password }) {
   password = password || await promptPasswordAsync()
 
@@ -95,7 +174,21 @@ export async function generateSecureWalletFromPrivKey (name, priv, { output, pas
   `)
 }
 
-// Get account file by path, decrypt it using password and return `keypair`
+
+```
+
+
+
+
+
+
+
+Get account file by path, decrypt it using password and return `keypair`
+
+
+  
+
+```js
 export async function getWalletByPathAndDecrypt (walletPath, { password } = {}) {
   try {
     const keyFile = readJSONFile(path.resolve(process.cwd(), walletPath))
@@ -112,3 +205,10 @@ export async function getWalletByPathAndDecrypt (walletPath, { password } = {}) 
     throw new Error('GET WALLET ERROR: ' + e.message)
   }
 }
+
+
+```
+
+
+
+

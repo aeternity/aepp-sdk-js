@@ -1,7 +1,30 @@
+
+
+
+
+
+
+  
+
+```js
 #!/usr/bin/env node
-// # æternity CLI `contract` file
-//
-// This script initialize all `contract` function
+
+```
+
+
+
+
+
+
+
+# æternity CLI `contract` file
+
+This script initialize all `contract` function
+
+
+  
+
+```js
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
@@ -27,7 +50,21 @@ import { initClient, initClientByWalletFile } from '../utils/cli'
 import { handleApiError } from '../utils/errors'
 import { printError, print, logContractDescriptor } from '../utils/print'
 
-// ## Function which compile your `source` code
+
+```
+
+
+
+
+
+
+
+## Function which compile your `source` code
+
+
+  
+
+```js
 export async function compile (file, options) {
   try {
     const code = readFile(path.resolve(process.cwd(), file), 'utf-8')
@@ -36,7 +73,21 @@ export async function compile (file, options) {
     const client = await initClient(options)
 
     await handleApiError(async () => {
-      // Call `Epoch` API which return `compiled code`
+
+```
+
+
+
+
+
+
+
+Call `Epoch` API which return `compiled code`
+
+
+  
+
+```js
       const contract = await client.contractCompile(code)
       print(`Contract bytecode:
       ${contract.bytecode}`)
@@ -46,40 +97,124 @@ export async function compile (file, options) {
   }
 }
 
-// ## Function which `deploy ` contract
+
+```
+
+
+
+
+
+
+
+## Function which `deploy ` contract
+
+
+  
+
+```js
 async function deploy (walletPath, contractPath, options) {
   const { init, json } = options
   const ttl = parseInt(options.ttl)
   const gas = parseInt(options.gas)
   const nonce = parseInt(options.nonce)
 
-  // Deploy a contract to the chain and create a deploy descriptor
-  // with the contract informations that can be use to invoke the contract
-  // later on.
-  //   The generated descriptor will be created in the same folde of the contract
-  // source file. Multiple deploy of the same contract file will generate different
-  // deploy descriptor
+
+```
+
+
+
+
+
+
+
+Deploy a contract to the chain and create a deploy descriptor
+with the contract informations that can be use to invoke the contract
+later on.
+  The generated descriptor will be created in the same folde of the contract
+source file. Multiple deploy of the same contract file will generate different
+deploy descriptor
+
+
+  
+
+```js
   try {
-    // Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
+
+```
+
+
+
+
+
+
+
+Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
+
+
+  
+
+```js
     const client = await initClientByWalletFile(walletPath, options)
     const contractFile = readFile(path.resolve(process.cwd(), contractPath), 'utf-8')
 
     await handleApiError(
       async () => {
-        // `contractCompile` takes a raw Sophia contract in string form and sends it
-        // off to the node for bytecode compilation. This might in the future be done
-        // without talking to the node, but requires a bytecode compiler
-        // implementation directly in the SDK.
+
+```
+
+
+
+
+
+
+
+`contractCompile` takes a raw Sophia contract in string form and sends it
+off to the node for bytecode compilation. This might in the future be done
+without talking to the node, but requires a bytecode compiler
+implementation directly in the SDK.
+
+
+  
+
+```js
         const contract = await client.contractCompile(contractFile, { gas })
-        // Invoking `deploy` on the bytecode object will result in the contract
-        // being written to the chain, once the block has been mined.
-        // Sophia contracts always have an `init` method which needs to be invoked,
-        // even when the contract's `state` is `unit` (`()`). The arguments to
-        // `init` have to be provided at deployment time and will be written to the
-        // block as well, together with the contract's bytecode.
+
+```
+
+
+
+
+
+
+
+Invoking `deploy` on the bytecode object will result in the contract
+being written to the chain, once the block has been mined.
+Sophia contracts always have an `init` method which needs to be invoked,
+even when the contract's `state` is `unit` (`()`). The arguments to
+`init` have to be provided at deployment time and will be written to the
+block as well, together with the contract's bytecode.
+
+
+  
+
+```js
         const deployDescriptor = await contract.deploy({ initState: init, options: { ttl, gas, nonce } })
 
-        // Write contractDescriptor to file
+
+```
+
+
+
+
+
+
+
+Write contractDescriptor to file
+
+
+  
+
+```js
         const descPath = `${R.last(contractPath.split('/'))}.deploy.${deployDescriptor.owner.slice(3)}.json`
         const contractDescriptor = R.merge({
           descPath,
@@ -93,7 +228,21 @@ async function deploy (walletPath, contractPath, options) {
           JSON.stringify(contractDescriptor)
         )
 
-        // Log contract descriptor
+
+```
+
+
+
+
+
+
+
+Log contract descriptor
+
+
+  
+
+```js
         logContractDescriptor(contractDescriptor, 'Contract was successfully deployed', json)
       }
     )
@@ -102,7 +251,21 @@ async function deploy (walletPath, contractPath, options) {
     process.exit(1)
   }
 }
-// ## Function which `call` contract
+
+```
+
+
+
+
+
+
+
+## Function which `call` contract
+
+
+  
+
+```js
 async function call (walletPath, descrPath, fn, returnType, args, options) {
   const ttl = parseInt(options.ttl)
   const nonce = parseInt(options.nonce)
@@ -113,7 +276,21 @@ async function call (walletPath, descrPath, fn, returnType, args, options) {
     process.exit(1)
   }
   try {
-    // Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
+
+```
+
+
+
+
+
+
+
+Get `keyPair` by `walletPath`, decrypt using password and initialize `Ae` client with this `keyPair`
+
+
+  
+
+```js
     const client = await initClientByWalletFile(walletPath, options)
     const descr = await readJSONFile(path.resolve(process.cwd(), descrPath))
 
@@ -121,16 +298,58 @@ async function call (walletPath, descrPath, fn, returnType, args, options) {
       async () => {
         args = args.filter(arg => arg !== '[object Object]')
         args = args.length ? `(${args.join(',')})` : '()'
-        // Send ContractCall Tx
+
+```
+
+
+
+
+
+
+
+Send ContractCall Tx
+
+
+  
+
+```js
         const callResult = await client.contractCall(descr.bytecode, descr.abi || 'sophia', descr.address, fn, { args, options: { ttl, gas, nonce } })
-        // The execution result, if successful, will be an AEVM-encoded result
-        // value. Once type decoding will be implemented in the SDK, this value will
-        // not be a hexadecimal string, anymore.
+
+```
+
+
+
+
+
+
+
+The execution result, if successful, will be an AEVM-encoded result
+value. Once type decoding will be implemented in the SDK, this value will
+not be a hexadecimal string, anymore.
+
+
+  
+
+```js
         print('Contract address_________ ' + descr.address)
         print('Gas price________________ ' + R.path(['result', 'gasPrice'])(callResult))
         print('Gas used_________________ ' + R.path(['result', 'gasUsed'])(callResult))
         print('Return value (encoded)___ ' + R.path(['result', 'returnValue'])(callResult))
-        // Decode result
+
+```
+
+
+
+
+
+
+
+Decode result
+
+
+  
+
+```js
         const { type, value } = await callResult.decode(returnType)
         print('Return value (decoded)___ ' + value)
         print('Return remote type_______ ' + type)
@@ -147,3 +366,10 @@ export const Contract = {
   deploy,
   call
 }
+
+
+```
+
+
+
+

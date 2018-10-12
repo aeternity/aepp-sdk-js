@@ -1,7 +1,30 @@
+
+
+
+
+
+
+  
+
+```js
 #!/usr/bin/env node
-// # æternity CLI `chain` file
-//
-// This script initialize all `chain` function
+
+```
+
+
+
+
+
+
+
+# æternity CLI `chain` file
+
+This script initialize all `chain` function
+
+
+  
+
+```js
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
@@ -24,12 +47,54 @@ import { handleApiError } from '../utils/errors'
 import { printBlock, print, printBlockTransactions, printError, printUnderscored } from '../utils/print'
 import { getBlock } from '../utils/helpers'
 
-// ## Retrieve `Epoch` version
+
+```
+
+
+
+
+
+
+
+## Retrieve `Epoch` version
+
+
+  
+
+```js
 async function version (options) {
   try {
-    // Initialize `Ae`
+
+```
+
+
+
+
+
+
+
+Initialize `Ae`
+
+
+  
+
+```js
     const client = await initClient(options)
-    // Call `getStatus` API and print it
+
+```
+
+
+
+
+
+
+
+Call `getStatus` API and print it
+
+
+  
+
+```js
     await handleApiError(async () => {
       const { nodeVersion } = await client.api.getStatus()
       print(`Epoch node version____________  ${nodeVersion}`)
@@ -40,13 +105,55 @@ async function version (options) {
   }
 }
 
-// ## Retrieve `TOP` block
+
+```
+
+
+
+
+
+
+
+## Retrieve `TOP` block
+
+
+  
+
+```js
 async function top (options) {
   const { json } = options
   try {
-    // Initialize `Ae`
+
+```
+
+
+
+
+
+
+
+Initialize `Ae`
+
+
+  
+
+```js
     const client = await initClient(options)
-    // Call `getTopBlock` API and print it
+
+```
+
+
+
+
+
+
+
+Call `getTopBlock` API and print it
+
+
+  
+
+```js
     await handleApiError(
       async () => printBlock(await client.api.getTopBlock(), json)
     )
@@ -56,20 +163,76 @@ async function top (options) {
   }
 }
 
-// ## Retrieve `mempool`
+
+```
+
+
+
+
+
+
+
+## Retrieve `mempool`
+
+
+  
+
+```js
 async function mempool (options) {
   const { json } = options
   try {
-    // Initialize `Ae`
+
+```
+
+
+
+
+
+
+
+Initialize `Ae`
+
+
+  
+
+```js
     const client = await initClient(options)
 
     await handleApiError(async () => {
-      // Get `mempool` from `API`
+
+```
+
+
+
+
+
+
+
+Get `mempool` from `API`
+
+
+  
+
+```js
       const { transactions } = await client.mempool()
 
       printUnderscored('Mempool', '')
       printUnderscored('Pending Transactions Count', transactions.length)
-      // If we have `transaction's` in `mempool` print them
+
+```
+
+
+
+
+
+
+
+If we have `transaction's` in `mempool` print them
+
+
+  
+
+```js
       if (transactions && transactions.length) {
         printBlockTransactions(transactions, json)
       }
@@ -80,7 +243,21 @@ async function mempool (options) {
   }
 }
 
-// ## This function `Play`(print all block) from `top` block to some condition(reach some `height` or `limit`)
+
+```
+
+
+
+
+
+
+
+## This function `Play`(print all block) from `top` block to some condition(reach some `height` or `limit`)
+
+
+  
+
+```js
 async function play (options) {
   let { height, limit, json } = options
   limit = parseInt(limit)
@@ -89,7 +266,21 @@ async function play (options) {
     const client = await initClient(options)
 
     await handleApiError(async () => {
-      // Get top block from `Epoch`. It is a start point for play.
+
+```
+
+
+
+
+
+
+
+Get top block from `Epoch`. It is a start point for play.
+
+
+  
+
+```js
       const top = await client.api.getTopBlock()
 
       if (height && height > parseInt(top.height)) {
@@ -99,7 +290,21 @@ async function play (options) {
 
       printBlock(top, json)
 
-      // Play by `height` or by `limit` using `top` block as start point
+
+```
+
+
+
+
+
+
+
+Play by `height` or by `limit` using `top` block as start point
+
+
+  
+
+```js
       height
         ? await playWithHeight(height, top.prevHash)(client, json)
         : await playWithLimit(--limit, top.prevHash)(client, json)
@@ -110,7 +315,21 @@ async function play (options) {
   }
 }
 
-// # Play by `limit`
+
+```
+
+
+
+
+
+
+
+# Play by `limit`
+
+
+  
+
+```js
 function playWithLimit (limit, blockHash) {
   return async (client, json) => {
     if (!limit) return
@@ -124,7 +343,21 @@ function playWithLimit (limit, blockHash) {
   }
 }
 
-// # Play by `height`
+
+```
+
+
+
+
+
+
+
+# Play by `height`
+
+
+  
+
+```js
 function playWithHeight (height, blockHash) {
   return async (client, json) => {
     let block = await getBlock(blockHash)(client)
@@ -143,3 +376,10 @@ export const Chain = {
   version,
   play
 }
+
+
+```
+
+
+
+
