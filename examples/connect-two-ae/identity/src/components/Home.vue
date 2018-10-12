@@ -1,6 +1,6 @@
 <template>
   <div class="w-full p-4 flex justify-center flex-col bg-grey h-screen">
-    <h1 class="mb-4">Wallet (BASE) App</h1>
+    <h1 class="mb-4">Identity (BASE) Aepp</h1>
 
     <div class="border">
       <div class="bg-green w-full flex flex-row font-mono border border-b">
@@ -29,11 +29,11 @@
       </div>
     </div>
 
-    <div v-if="!dappUrl" class="w-full p-4 h-64 border border-black border-dashed shadow mx-auto mt-4 bg-grey-lighter">
-      Loading DApp...
+    <div v-if="!aeppUrl" class="w-full p-4 h-64 border border-black border-dashed shadow mx-auto mt-4 bg-grey-lighter">
+      Loading Aepp...
     </div>
     <!-- external app -->
-    <iframe v-show="dappUrl" ref="dapp" class="w-full h-screen border border-black border-dashed mx-auto mt-4 shadow" src="about:blank" frameborder="1"></iframe>
+    <iframe v-show="aeppUrl" ref="aepp" class="w-full h-screen border border-black border-dashed bg-grey-light mx-auto mt-4 shadow" src="about:blank" frameborder="1"></iframe>
 
   </div>
 </template>
@@ -55,7 +55,7 @@ export default {
       wallet: null,
       balance: null,
       height: null,
-      dappUrl: '//0.0.0.0:9001'
+      aeppUrl: '//0.0.0.0:9001'
     }
   },
   computed: {
@@ -79,7 +79,7 @@ export default {
       onAccount: this.confirmDialog
     }).then(ae => {
       this.client = ae
-      this.$refs.dapp.src = this.dappUrl
+      this.$refs.aepp.src = this.aeppUrl
 
       ae.height().then(height => {
         console.log('height', height)
