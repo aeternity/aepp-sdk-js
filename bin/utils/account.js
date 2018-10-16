@@ -20,9 +20,10 @@ import path from 'path'
 import prompt from 'prompt'
 
 import * as Crypto from '../../es/utils/crypto'
+import { dump, getAddressFromPriv, recover } from '../../es/utils/keystore'
+
 import { print } from './print'
 import { readJSONFile, writeFile } from './helpers'
-import { dump, getAddressFromPriv, recover } from './keystore'
 
 // ## The `prompt` library provides concealed input of passwords.
 

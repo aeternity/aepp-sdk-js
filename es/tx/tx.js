@@ -16,23 +16,27 @@
  */
 
 /**
- * Epoch Tx module
- * @module @aeternity/aepp-sdk/es/tx/epoch
- * @export EpochTx
- * @example import EpochTx from '@aeternity/aepp-sdk/es/tx/epoch'
+ * Transaction module
+ * @module @aeternity/aepp-sdk/es/tx/tx
+ * @export Transaction
+ * @example import Transaction from '@aeternity/aepp-sdk/es/tx/tx'
  */
 
-import Tx from './'
-import Epoch from '../epoch'
 import * as R from 'ramda'
-import { salt } from '../utils/crypto'
 
-const createSalt = salt
+import JsTx from './js'
+import Epoch from '../epoch'
 
 async function spendTx ({ senderId, recipientId, amount, fee, ttl, nonce, payload }) {
   nonce = await (calculateNonce.bind(this)(senderId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
-  return (await this.api.postSpend(R.merge(R.head(arguments), { recipientId, nonce, ttl }))).tx
+
+  // Build transaction using sdk (if nativeMode) or build on `EPOCH` side
+  const { tx } = this.nativeMode
+    ? await this.spendTxNative(R.merge(R.head(arguments), { recipientId, nonce, ttl }))
+    : await this.api.postSpend(R.merge(R.head(arguments), { recipientId, nonce, ttl }))
+
+  return tx
 }
 
 async function namePreclaimTx ({ accountId, nonce, commitmentId, fee, ttl }) {
@@ -77,10 +81,26 @@ async function contractCallTx ({ callerId, nonce, contractId, vmVersion, fee, tt
   return (await this.api.postContractCall(R.merge(R.head(arguments), { nonce, ttl }))).tx
 }
 
-async function commitmentHash (name, salt = createSalt()) {
-  return (await this.api.getCommitmentHash(name, salt)).commitmentId
+/**
+ * Compute the absolute ttl by adding the ttl to the current height of the chain
+ *
+ * @param {number} relativeTtl
+ * @return {number} Absolute Ttl
+ */
+async function calculateTtl (relativeTtl) {
+  if (relativeTtl <= 0) throw new Error('ttl must be greather than 0')
+
+  const { height } = await this.api.getCurrentKeyBlock()
+  return +(height) + relativeTtl
 }
 
+/**
+ * Get the next nonce to be used for a transaction for an account
+ *
+ * @param {string} accountId
+ * @param {number} nonce
+ * @return {number} Next Nonce
+ */
 async function calculateNonce (accountId, nonce) {
   if (!nonce) {
     return +(await this.api.getAccountByPubkey(accountId)).nonce + 1
@@ -88,13 +108,8 @@ async function calculateNonce (accountId, nonce) {
   return nonce
 }
 
-async function calculateTtl (ttl) {
-  const { height } = await this.api.getCurrentKeyBlock()
-  return +(height) + ttl
-}
-
 /**
- * Epoch-based Tx Stamp
+ * Transaction Stamp
  *
  * This implementation of {@link module:@aeternity/aepp-sdk/es/tx--Tx} relays
  * the creation of transactions to {@link module:@aeternity/aepp-sdk/es/epoch--Epoch}.
@@ -102,13 +117,19 @@ async function calculateTtl (ttl) {
  * must never be used for production but can be very useful to verify other
  * implementations.
  * @function
- * @alias module:@aeternity/aepp-sdk/es/tx/epoch
+ * @alias module:@aeternity/aepp-sdk/es/tx/tx
  * @rtype Stamp
  * @param {Object} [options={}] - Initializer object
- * @return {Object} Tx instance
- * @example EpochTx({url: 'https://sdk-testnet.aepps.com/'})
+ * @return {Object} Transaction instance
+ * @example Transaction({url: 'https://sdk-testnet.aepps.com/'})
  */
-const EpochTx = Epoch.compose(Tx, {
+const Transaction = Epoch.compose(JsTx, {
+  init ({ nativeMode = true }) {
+    this.nativeMode = nativeMode
+  },
+  props: {
+    nativeMode: null
+  },
   methods: {
     spendTx,
     namePreclaimTx,
@@ -117,9 +138,8 @@ const EpochTx = Epoch.compose(Tx, {
     nameUpdateTx,
     nameRevokeTx,
     contractCreateTx,
-    contractCallTx,
-    commitmentHash
+    contractCallTx
   }
 })
 
-export default EpochTx
+export default Transaction

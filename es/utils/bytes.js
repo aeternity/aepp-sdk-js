@@ -48,3 +48,33 @@ export function rightPad (length, inputBuffer) {
     return inputBuffer
   }
 }
+
+function bitSize (num) {
+  return num.toString(2).length
+}
+
+function dec2hex (n) {
+  return n ? [n % 256].concat(dec2hex(~~(n / 256))) : []
+}
+
+export function toBigEndian (s, n) {
+  const hexar = dec2hex(n)
+  return hexar.map(h => (h < 16 ? '0x0' : '0x') + h.toString(16))
+    .concat(Array(4 - hexar.length).fill('0x00')).slice(0, s).reverse()
+}
+
+export function toBytes (val) {
+  // """
+  // Encode a value to bytes.
+  // If the value is an int it will be encoded as bytes big endian
+  // Raises ValueError if the input is not an int or string
+
+  if (Number.isInteger(val)) {
+    const s = Math.ceil(bitSize(val) / 8)
+    return Buffer.from(toBigEndian(s, val))
+  } else if (typeof val === 'string') {
+    return val.toString('utf-8')
+  } else {
+    throw new Error('Byte serialization not supported')
+  }
+}
