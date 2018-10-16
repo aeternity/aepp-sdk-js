@@ -27,18 +27,14 @@ import * as R from 'ramda'
 import JsTx from './js'
 import Epoch from '../epoch'
 
-import { salt } from '../utils/crypto'
-
 async function spendTx ({ senderId, recipientId, amount, fee, ttl, nonce, payload }) {
   nonce = await (calculateNonce.bind(this)(senderId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
 
   // Build transaction using sdk (if nativeMode) or build on `EPOCH` side
-  const { tx } = this.nativeMode
-    ? await this.spendTxNative(R.merge(R.head(arguments), { recipientId, nonce, ttl }))
-    : await this.api.postSpend(R.merge(R.head(arguments), { recipientId, nonce, ttl }))
-
-  return tx
+  return this.nativeMode
+    ? this.spendTxNative(R.merge(R.head(arguments), { recipientId, nonce, ttl }))
+    : this.api.postSpend(R.merge(R.head(arguments), { recipientId, nonce, ttl }))
 }
 
 async function namePreclaimTx ({ accountId, nonce, commitmentId, fee, ttl }) {
