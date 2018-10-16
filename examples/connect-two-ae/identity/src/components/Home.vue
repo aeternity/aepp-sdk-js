@@ -79,6 +79,8 @@ export default {
       onAccount: this.confirmDialog
     }).then(ae => {
       this.client = ae
+      console.log('status', this.client.api.getTopBlock())
+      console.log('version', this.client.api.getStatus())
       this.$refs.aepp.src = this.aeppUrl
 
       ae.height().then(height => {

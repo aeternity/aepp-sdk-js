@@ -2,7 +2,7 @@
 # yarn lockfile v1
 
 
-"@aeternity/aepp-sdk@^0.22.0-0.1.0-beta.1":
+"@aeternity/aepp-sdk@0.22.0-0.1.0":
   version "0.22.0-0.1.0-beta.1"
   resolved "https://registry.yarnpkg.com/@aeternity/aepp-sdk/-/aepp-sdk-0.22.0-0.1.0-beta.1.tgz#4b7ac5335de58eff801560429742294c52858564"
   dependencies:
