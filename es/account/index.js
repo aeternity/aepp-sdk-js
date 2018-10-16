@@ -35,7 +35,6 @@ import * as Crypto from '../utils/crypto'
  * @return {String} Signed transaction
  */
 async function signTransaction (tx) {
-  console.log(tx)
   const binaryTx = Crypto.decodeBase58Check(Crypto.assertedType(tx, 'tx'))
   const sig = await this.sign(binaryTx)
   return Crypto.encodeTx(Crypto.prepareTx(sig, binaryTx))

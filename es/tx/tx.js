@@ -32,9 +32,11 @@ async function spendTx ({ senderId, recipientId, amount, fee, ttl, nonce, payloa
   ttl = await (calculateTtl.bind(this)(ttl))
 
   // Build transaction using sdk (if nativeMode) or build on `EPOCH` side
-  return this.nativeMode
-    ? this.spendTxNative(R.merge(R.head(arguments), { recipientId, nonce, ttl }))
-    : this.api.postSpend(R.merge(R.head(arguments), { recipientId, nonce, ttl }))
+  const { tx } = this.nativeMode
+    ? await this.spendTxNative(R.merge(R.head(arguments), { recipientId, nonce, ttl }))
+    : await this.api.postSpend(R.merge(R.head(arguments), { recipientId, nonce, ttl }))
+
+  return tx
 }
 
 async function namePreclaimTx ({ accountId, nonce, commitmentId, fee, ttl }) {

@@ -102,7 +102,6 @@ const createSalt = salt
  * @return {Buffer} Buffer of decoded Base58 data
  */
 export function decode (data, type) {
-  console.log(data)
   return decodeBase58Check(assertedType(data, type))
 }
 
