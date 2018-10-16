@@ -21,6 +21,7 @@ const program = require('commander')
 
 require = require('esm')(module/*, options */) // use to handle es6 import/export
 const utils = require('./utils/index')
+require('./aecli-channel')
 
 const EXECUTABLE_CMD = [
   { name: 'chain', desc: 'Interact with the blockchain' },
