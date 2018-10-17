@@ -24,6 +24,7 @@
 
 import * as R from 'ramda'
 
+import Tx from './'
 import JsTx from './js'
 import Epoch from '../epoch'
 
@@ -123,7 +124,7 @@ async function calculateNonce (accountId, nonce) {
  * @return {Object} Transaction instance
  * @example Transaction({url: 'https://sdk-testnet.aepps.com/'})
  */
-const Transaction = Epoch.compose(JsTx, {
+const Transaction = Epoch.compose(Tx, JsTx, {
   init ({ nativeMode = true }) {
     this.nativeMode = nativeMode
   },
