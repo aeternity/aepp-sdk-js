@@ -31,6 +31,7 @@ async function version (options) {
     const client = await initClient(options)
     // Call `getStatus` API and print it
     await handleApiError(async () => {
+      console.log(await client.api.getStatus())
       const { nodeVersion } = await client.api.getStatus()
       print(`Epoch node version____________  ${nodeVersion}`)
     })
@@ -48,7 +49,7 @@ async function top (options) {
     const client = await initClient(options)
     // Call `getTopBlock` API and print it
     await handleApiError(
-      async () => printBlock(await client.api.getTopBlock(), json)
+      async () => printBlock(await client.topBlock(), json)
     )
   } catch (e) {
     printError(e.message)
@@ -90,7 +91,7 @@ async function play (options) {
 
     await handleApiError(async () => {
       // Get top block from `Epoch`. It is a start point for play.
-      const top = await client.api.getTopBlock()
+      const top = await client.topBlock()
 
       if (height && height > parseInt(top.height)) {
         printError('Height is bigger then height of top block')
