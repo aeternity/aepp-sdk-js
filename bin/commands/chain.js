@@ -31,7 +31,6 @@ async function version (options) {
     const client = await initClient(options)
     // Call `getStatus` API and print it
     await handleApiError(async () => {
-      console.log(await client.api.getStatus())
       const { nodeVersion } = await client.api.getStatus()
       print(`Epoch node version____________  ${nodeVersion}`)
     })

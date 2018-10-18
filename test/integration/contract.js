@@ -46,7 +46,7 @@ describe('Contract', function () {
     contract = await ready(this)
   })
 
-  describe.only('precompiled bytecode', () => {
+  describe('precompiled bytecode', () => {
     it('can be invoked', async () => {
       const result = await contract.contractCallStatic(identityContractByteCode, 'sophia', 'main', { args: '42' })
       return result.decode('int').should.eventually.become({
