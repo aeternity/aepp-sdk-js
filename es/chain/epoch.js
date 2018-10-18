@@ -58,7 +58,7 @@ async function awaitHeight (h, { interval = 5000, attempts = 30 } = {}) {
   return new Promise((resolve, reject) => probe(resolve, reject, attempts))
 }
 
-async function topBlock() {
+async function topBlock () {
   const top = await this.api.getTopBlock()
   return top[R.head(R.keys(top))]
 }
