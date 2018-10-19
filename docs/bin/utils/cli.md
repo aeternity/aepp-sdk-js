@@ -61,14 +61,14 @@ export function getCmdFromArguments (args) {
 
 
 
-## Create `Ae` client
+Create `Ae` client
 
 
   
 
 ```js
-export async function initClient ({host: url, keypair, internalUrl, force: forceCompatibility}) {
-  return await Cli({ url, process, keypair, internalUrl, forceCompatibility })
+export async function initClient ({host: url, keypair, internalUrl, force: forceCompatibility, nativeMode = true}) {
+  return await Cli({ url, process, keypair, internalUrl, forceCompatibility, nativeMode })
 }
 
 

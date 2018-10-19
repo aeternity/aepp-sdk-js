@@ -4,7 +4,7 @@
 
 
 
-
+  
 
 ```js
 #!/usr/bin/env node
@@ -22,7 +22,7 @@
 This script initialize all `chain` function
 
 
-
+  
 
 ```js
 /*
@@ -59,7 +59,7 @@ import { getBlock } from '../utils/helpers'
 ## Retrieve `Epoch` version
 
 
-
+  
 
 ```js
 async function version (options) {
@@ -76,7 +76,7 @@ async function version (options) {
 Initialize `Ae`
 
 
-
+  
 
 ```js
     const client = await initClient(options)
@@ -92,7 +92,7 @@ Initialize `Ae`
 Call `getStatus` API and print it
 
 
-
+  
 
 ```js
     await handleApiError(async () => {
@@ -117,7 +117,7 @@ Call `getStatus` API and print it
 ## Retrieve `TOP` block
 
 
-
+  
 
 ```js
 async function top (options) {
@@ -135,7 +135,7 @@ async function top (options) {
 Initialize `Ae`
 
 
-
+  
 
 ```js
     const client = await initClient(options)
@@ -151,11 +151,11 @@ Initialize `Ae`
 Call `getTopBlock` API and print it
 
 
-
+  
 
 ```js
     await handleApiError(
-      async () => printBlock(await client.api.getTopBlock(), json)
+      async () => printBlock(await client.topBlock(), json)
     )
   } catch (e) {
     printError(e.message)
@@ -175,7 +175,7 @@ Call `getTopBlock` API and print it
 ## Retrieve `mempool`
 
 
-
+  
 
 ```js
 async function mempool (options) {
@@ -193,7 +193,7 @@ async function mempool (options) {
 Initialize `Ae`
 
 
-
+  
 
 ```js
     const client = await initClient(options)
@@ -211,7 +211,7 @@ Initialize `Ae`
 Get `mempool` from `API`
 
 
-
+  
 
 ```js
       const { transactions } = await client.mempool()
@@ -230,7 +230,7 @@ Get `mempool` from `API`
 If we have `transactions` in `mempool` print them
 
 
-
+  
 
 ```js
       if (transactions && transactions.length) {
@@ -255,7 +255,7 @@ If we have `transactions` in `mempool` print them
 ## This function `Play`(print all block) from `top` block to some condition(reach some `height` or `limit`)
 
 
-
+  
 
 ```js
 async function play (options) {
@@ -278,10 +278,10 @@ async function play (options) {
 Get top block from `Epoch`. It is a start point for play.
 
 
-
+  
 
 ```js
-      const top = await client.api.getTopBlock()
+      const top = await client.topBlock()
 
       if (height && height > parseInt(top.height)) {
         printError('Height is bigger then height of top block')
@@ -302,7 +302,7 @@ Get top block from `Epoch`. It is a start point for play.
 Play by `height` or by `limit` using `top` block as start point
 
 
-
+  
 
 ```js
       height
@@ -327,7 +327,7 @@ Play by `height` or by `limit` using `top` block as start point
 # Play by `limit`
 
 
-
+  
 
 ```js
 function playWithLimit (limit, blockHash) {
@@ -355,7 +355,7 @@ function playWithLimit (limit, blockHash) {
 # Play by `height`
 
 
-
+  
 
 ```js
 function playWithHeight (height, blockHash) {
