@@ -94,7 +94,7 @@ Get `block` by `height`
   
 
 ```js
-  if (!isNaN(parseInt(hash))) {
+  if (!isNaN(hash)) {
     await getBlockByHeight(hash, option)
     return
   }
@@ -277,13 +277,14 @@ async function getName (name, options) {
   try {
     if (R.last(name.split('.')) !== 'aet') throw new Error('AENS TLDs must end in .aet')
     const client = await initClient(options)
-
-    printName(Object.assign(await client.api.getNameEntryByName(name), { status: 'CLAIMED' }), json)
+    const nameStatus = await client.api.getNameEntryByName(name)
+    printName(Object.assign(nameStatus, { status: 'CLAIMED' }), json)
   } catch (e) {
     if (e.response && e.response.status === 404) {
       printName({ status: 'AVAILABLE' }, json)
+    } else {
+      printError(e.message)
     }
-    printError(e.message)
   }
 }
 

@@ -43,7 +43,7 @@ const Chain = stampit({
     Ae: {
       methods: [
         'sendTransaction', 'height', 'awaitHeight', 'poll', 'balance', 'tx',
-        'mempool'
+        'mempool', 'topBlock'
       ]
     }
   }
@@ -52,6 +52,7 @@ const Chain = stampit({
     sendTransaction: required,
     height: required,
     awaitHeight: required,
+    topBlock: required,
     poll: required,
     balance: required,
     tx: required,

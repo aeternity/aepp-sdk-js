@@ -56,12 +56,12 @@ Sign and post a transaction to the chain
 <a id="module_@aeternity/aepp-sdk/es/ae--Ae+spend"></a>
 
 #### ae.spend(tx, options) ⇒ `String` \| `String`
-Send tokens to recipient
+Send tokens to recipientId
 
 **Kind**: instance method of [`Ae`](#exp_module_@aeternity/aepp-sdk/es/ae--Ae)  
 **Returns**: `String` \| `String` - Transaction or transaction hash  
 **Category**: async  
-**rtype**: `(amount: Number, recipient: String, options?: Object) => Promise[String]`
+**rtype**: `(amount: Number, recipientId: String, options?: Object) => Promise[String]`
 
 | Param | Type | Description |
 | --- | --- | --- |
