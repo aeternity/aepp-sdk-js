@@ -69,7 +69,7 @@ async function mempool (options) {
 
       printUnderscored('Mempool', '')
       printUnderscored('Pending Transactions Count', transactions.length)
-      // If we have `transaction's` in `mempool` print them
+      // If we have `transactions` in `mempool` print them
       if (transactions && transactions.length) {
         printBlockTransactions(transactions, json)
       }
