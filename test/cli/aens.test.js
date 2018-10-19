@@ -18,6 +18,7 @@
 import { before, describe, it } from 'mocha'
 
 import { configure, plan, ready, execute, parseBlock, WALLET_NAME } from './index'
+import { generateKeyPair } from '../../es/utils/crypto'
 
 plan(1000000000)
 
@@ -25,7 +26,7 @@ function randomName () {
   return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString(36) + '.aet'
 }
 
-describe.skip('CLI AENS Module', function () {
+describe('CLI AENS Module', function () {
   configure(this)
   const name = randomName()
   let wallet
@@ -39,12 +40,23 @@ describe.skip('CLI AENS Module', function () {
     console.log((await execute(['name', 'claim', WALLET_NAME, '--password', 'test', name])))
 
     const nameResult = parseBlock(await execute(['inspect', name]))
+    console.log(nameResult)
     const isHash = nameResult.name_hash !== 'N/A'
 
     nameResult.status.should.equal('CLAIMED')
-    isHash.status.should.equal(true)
+    isHash.should.equal(true)
   })
-  it.skip('Revoke Name', async () => {
+  it.skip('Update Name', async () => {
+    const { pub } = generateKeyPair()
+    console.log(await execute(['name', 'update', WALLET_NAME, '--password', 'test', name, pub]))
+
+    const nameResult = parseBlock(await execute(['inspect', name]))
+    console.log(nameResult)
+
+    nameResult.status.should.equal('CLAIMED')
+    nameResult.pointers.should.equal({ id: pub, key: 'account_pubkey' })
+  })
+  it('Revoke Name', async () => {
     console.log(await execute(['name', 'revoke', WALLET_NAME, '--password', 'test', name]))
 
     const nameResult = parseBlock(await execute(['inspect', name]))
@@ -53,4 +65,13 @@ describe.skip('CLI AENS Module', function () {
     nameResult.name_hash.should.equal('N/A')
     nameResult.pointers.should.equal('N/A')
   })
+  // it.skip('Transfer Name', async () => {
+  //   console.log(await execute(['name', 'revoke', WALLET_NAME, '--password', 'test', name]))
+  //
+  //   const nameResult = parseBlock(await execute(['inspect', name]))
+  //
+  //   nameResult.status.should.equal('AVAILABLE')
+  //   nameResult.name_hash.should.equal('N/A')
+  //   nameResult.pointers.should.equal('N/A')
+  // })
 })
