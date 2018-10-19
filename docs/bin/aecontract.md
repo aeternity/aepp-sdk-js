@@ -62,7 +62,7 @@ We'll need the main client module `Ae` in the `Cli` flavor from the SDK.
   
 
 ```js
-const {Cli: Ae} = require('@aeternity/aepp-sdk')
+const { Cli: Ae } = require('@aeternity/aepp-sdk')
 const program = require('commander')
 const fs = require('fs')
 
@@ -107,7 +107,7 @@ implementation directly in the SDK.
   
 
 ```js
-  Ae({url: program.host, debug: program.debug, process}).then(ae => {
+  Ae({ url: program.host, debug: program.debug, process }).then(ae => {
     return ae.contractCompile(code)
 
 ```
@@ -131,7 +131,7 @@ block as well, together with the contract's bytecode.
 ```js
   }).then(bytecode => {
     console.log(`Obtained bytecode ${bytecode.bytecode}`)
-    return bytecode.deploy({initState: program.init})
+    return bytecode.deploy({ initState: program.init })
 
 ```
 
@@ -152,7 +152,7 @@ the amount of gas spend.
 ```js
   }).then(deployed => {
     console.log(`Contract deployed at ${deployed.address}`)
-    return deployed.call(fn, {args: args.join(' ')})
+    return deployed.call(fn, { args: args.join(' ') })
 
 ```
 

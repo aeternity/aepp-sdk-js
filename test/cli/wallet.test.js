@@ -46,7 +46,6 @@ describe('CLI Wallet Module', function () {
 
     // check for wallet files
     fs.existsSync(walletName).should.equal(true)
-    fs.existsSync(`${walletName}.pub`).should.equal(true)
 
     // check if wallet files valid
     parseBlock(await execute(['account', 'address', walletName, '--password', 'test']))['your_address_is'].should.be.a('string')
@@ -57,7 +56,6 @@ describe('CLI Wallet Module', function () {
 
     // check for wallet files
     fs.existsSync(walletName).should.equal(true)
-    fs.existsSync(`${walletName}.pub`).should.equal(true)
 
     // check if wallet valid
     parseBlock(await execute(['account', 'address', walletName, '--password', 'test']))['your_address_is'].should.equal(KEY_PAIR.pub)
@@ -65,6 +63,12 @@ describe('CLI Wallet Module', function () {
   it('Check Wallet Address', async () => {
     // check if wallet valid
     parseBlock(await execute(['account', 'address', WALLET_NAME, '--password', 'test']))['your_address_is'].should.equal(KEY_PAIR.pub)
+  })
+  it('Check Wallet Address with Private Key', async () => {
+    // check if wallet valid
+    const res =  parseBlock(await execute(['account', 'address', WALLET_NAME, '--password', 'test', '--privateKey']))
+    const [pub, priv] = Object.keys(res)
+   res[priv].should.equal(KEY_PAIR.priv)
   })
   it('Check Wallet Balance', async () => {
     const balance = await wallet.balance(await wallet.address())

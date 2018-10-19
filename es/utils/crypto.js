@@ -119,6 +119,8 @@ export function hexStringToByte (str) {
   return new Uint8Array(a)
 }
 
+// KEY-PAIR HELPERS
+
 /**
  * Generate keyPair from secret key
  * @rtype (secret: Uint8Array) => KeyPair
@@ -203,6 +205,8 @@ export function decryptKey (password, encrypted) {
   let aesEcb = new Ecb(hashedPasswordBytes)
   return Buffer.from(aesEcb.decrypt(encryptedBytes))
 }
+
+// SIGNATURES
 
 /**
  * Generate signature

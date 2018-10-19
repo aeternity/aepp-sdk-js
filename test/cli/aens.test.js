@@ -18,6 +18,7 @@
 import { before, describe, it } from 'mocha'
 
 import { configure, plan, ready, execute, parseBlock, WALLET_NAME } from './index'
+import { generateKeyPair } from '../../es/utils/crypto'
 
 plan(1000000000)
 
@@ -25,7 +26,7 @@ function randomName () {
   return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString(36) + '.aet'
 }
 
-describe.skip('CLI AENS Module', function () {
+describe('CLI AENS Module', function () {
   configure(this)
   const name = randomName()
   let wallet
@@ -42,9 +43,19 @@ describe.skip('CLI AENS Module', function () {
     const isHash = nameResult.name_hash !== 'N/A'
 
     nameResult.status.should.equal('CLAIMED')
-    isHash.status.should.equal(true)
+    isHash.should.equal(true)
   })
-  it.skip('Revoke Name', async () => {
+  it('Update Name', async () => {
+    const { pub } = generateKeyPair()
+    console.log(await execute(['name', 'update', WALLET_NAME, '--password', 'test', name, pub]))
+
+    const nameResult = parseBlock(await execute(['inspect', name]))
+    const isHaveUpdatedPointer = !!(JSON.parse(nameResult.pointers).find(p => p.id === pub))
+
+    nameResult.status.should.equal('CLAIMED')
+    isHaveUpdatedPointer.should.equal(true)
+  })
+  it('Revoke Name', async () => {
     console.log(await execute(['name', 'revoke', WALLET_NAME, '--password', 'test', name]))
 
     const nameResult = parseBlock(await execute(['inspect', name]))

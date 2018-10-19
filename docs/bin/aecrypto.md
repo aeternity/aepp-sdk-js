@@ -61,7 +61,7 @@ transactions.
   
 
 ```js
-const {Crypto} = require('@aeternity/aepp-sdk')
+const { Crypto } = require('@aeternity/aepp-sdk')
 const program = require('commander')
 const fs = require('fs')
 const prompt = require('prompt')
@@ -115,7 +115,7 @@ const promptSchema = {
 function extractReadableKeys (dir, options) {
   const pwd = options.input
   prompt.start()
-  prompt.get(promptSchema, (err, {password}) => {
+  prompt.get(promptSchema, (err, { password }) => {
     const key = fs.readFileSync(path.join(pwd, dir, 'sign_key'))
     const pubKey = fs.readFileSync(path.join(pwd, dir, 'sign_key.pub'))
 
@@ -125,7 +125,7 @@ function extractReadableKeys (dir, options) {
     const decryptedPub = Crypto.decryptPubKey(password, pubKey)
 
     console.log(`Private key (hex): ${privateHex}`)
-    console.log(`Public key (base check): ak$${Crypto.encodeBase58Check(decryptedPub)}`)
+    console.log(`Public key (base check): ak_${Crypto.encodeBase58Check(decryptedPub)}`)
     console.log(`Public key (hex): ${decryptedPub.toString('hex')}`)
   })
 }
@@ -178,7 +178,7 @@ transaction and turn it into an RLP-encoded tuple ready for mining
 
 ```js
 function signTx (tx, privKey) {
-  if (!tx.match(/^tx\$.+/)) {
+  if (!tx.match(/^tx\_.+/)) {
     throw Error('Not a valid transaction')
   }
 
@@ -209,7 +209,7 @@ Split the base58Check part of the transaction
   
 
 ```js
-  const base58CheckTx = tx.split('$')[1]
+  const base58CheckTx = tx.split('_')[1]
 
 ```
 

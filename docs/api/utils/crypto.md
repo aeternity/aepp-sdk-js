@@ -12,10 +12,13 @@ import * as Crypto from '@aeternity/aepp-sdk/es/utils/crypto'
     * _static_
         * [.decode](#module_@aeternity/aepp-sdk/es/utils/crypto.decode) ⇒ `Array`
         * [.hash(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.hash) ⇒ `String`
+        * [.nameId(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.nameId) ⇒ `String`
         * [.sha256hash(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.sha256hash) ⇒ `String`
         * [.salt()](#module_@aeternity/aepp-sdk/es/utils/crypto.salt) ⇒ `Number`
         * [.encodeBase58Check(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.encodeBase58Check) ⇒ `Buffer`
         * [.decodeBase58Check(str)](#module_@aeternity/aepp-sdk/es/utils/crypto.decodeBase58Check) ⇒ `Buffer`
+        * [.hexStringToByte(str)](#module_@aeternity/aepp-sdk/es/utils/crypto.hexStringToByte) ⇒ `Uint8Array`
+        * [.generateKeyPairFromSecret(secret)](#module_@aeternity/aepp-sdk/es/utils/crypto.generateKeyPairFromSecret) ⇒ `Object`
         * [.generateKeyPair(raw)](#module_@aeternity/aepp-sdk/es/utils/crypto.generateKeyPair) ⇒ `Object`
         * [.encryptPublicKey(password, binaryKey)](#module_@aeternity/aepp-sdk/es/utils/crypto.encryptPublicKey) ⇒ `UInt8Array`
         * [.encryptPrivateKey(password, binaryKey)](#module_@aeternity/aepp-sdk/es/utils/crypto.encryptPrivateKey) ⇒ `UInt8Array`
@@ -54,6 +57,20 @@ RLP decode
 
 ### @aeternity/aepp-sdk/es/utils/crypto.hash(input) ⇒ `String`
 Calculate 256bits Blake2b hash of `input`
+
+**Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
+**Returns**: `String` - Hash  
+**rtype**: `(input: String) => hash: String`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| input | `String` | Data to hash |
+
+<a id="module_@aeternity/aepp-sdk/es/utils/crypto.nameId"></a>
+
+### @aeternity/aepp-sdk/es/utils/crypto.nameId(input) ⇒ `String`
+Calculate 256bits Blake2b nameId of `input`
+as defined in https://github.com/aeternity/protocol/blob/master/AENS.md#hashing
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
 **Returns**: `String` - Hash  
@@ -109,6 +126,32 @@ Base58 decode given `str`
 | Param | Type | Description |
 | --- | --- | --- |
 | str | `String` | Data to decode |
+
+<a id="module_@aeternity/aepp-sdk/es/utils/crypto.hexStringToByte"></a>
+
+### @aeternity/aepp-sdk/es/utils/crypto.hexStringToByte(str) ⇒ `Uint8Array`
+Conver hex string to Uint8Array
+
+**Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
+**Returns**: `Uint8Array` - - converted data  
+**rtype**: `(str: String) => Uint8Array`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| str | `String` | Data to conver |
+
+<a id="module_@aeternity/aepp-sdk/es/utils/crypto.generateKeyPairFromSecret"></a>
+
+### @aeternity/aepp-sdk/es/utils/crypto.generateKeyPairFromSecret(secret) ⇒ `Object`
+Generate keyPair from secret key
+
+**Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
+**Returns**: `Object` - - Object with Private(privateKey) and Public(publicKey) keys  
+**rtype**: `(secret: Uint8Array) => KeyPair`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| secret | `Uint8Array` | secret key |
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.generateKeyPair"></a>
 
@@ -226,7 +269,7 @@ Prepare a transaction for posting to the blockchain
 
 ### @aeternity/aepp-sdk/es/utils/crypto.aeEncodeKey(binaryKey) ⇒ `String`
 æternity readable public keys are the base58-encoded public key, prepended
-with 'ak$'
+with 'ak_'
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
 **Returns**: `String` - Encoded key  
