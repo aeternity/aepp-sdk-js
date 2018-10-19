@@ -8,6 +8,23 @@
 
 ```js
 #!/usr/bin/env node
+
+```
+
+
+
+
+
+
+
+# æternity CLI `inspect` file
+
+This script initialize all `inspect` commands
+
+
+  
+
+```js
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
@@ -25,6 +42,28 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+```
+
+
+
+
+
+
+
+We'll use `commander` for parsing options
+
+Also we need `esm` package to handle `ES imports`
+
+
+  
+
+```js
+const program = require('commander')
+
+require = require('esm')(module/*, options */) // use to handle es6 import/export
+const utils = require('./utils/index')
+const { Inspect } = require('./commands')
+
 
 ```
 
@@ -34,37 +73,67 @@
 
 
 
-   _____                           _
-  |_   _|                         | |
-    | |  _ __  ___ _ __   ___  ___| |_
-    | | | '_ \/ __| '_ \ / _ \/ __| __|
-   _| |_| | | \__ \ |_) |  __/ (__| |_
-  |_____|_| |_|___/ .__/ \___|\___|\__|
-                  | |
-                  |_|
+## Initialize `options`
 
 
   
 
 ```js
-
-const program = require('commander')
-
-require = require('esm')(module/*, options */) // use to handle es6 import/export
-const utils = require('./utils/index')
-const { Inspect } = require('./commands')
-
 program
   .option('--host [hostname]', 'Node to connect to', utils.constant.EPOCH_URL)
   .option('--internalUrl [internal]', 'Node to connect to(internal)', utils.constant.EPOCH_INTERNAL_URL)
   .option('-f --force', 'Ignore epoch version compatibility check')
   .option('--json', 'Print result in json format')
 
+
+```
+
+
+
+
+
+
+
+## Initialize `inspect` command
+
+You can use this command to get info about account, block, transaction or name
+
+Example: `aecli inspect testName.aet` --> get info about AENS `name`
+
+Example: `aecli inspect ak_134defawsgf34gfq4f` --> get info about `account`
+
+Example: `aecli inspect kh_134defawsgf34gfq4f` --> get info about `key block` by block `hash`
+
+Example: `aecli inspect mh_134defawsgf34gfq4f` --> get info about `micro block` by block `hash`
+
+Example: `aecli inspect 1234` --> get info about `block` by block `height`
+
+Example: `aecli inspect th_asfwegfj34234t34t` --> get info about `transaction` by transaction `hash`
+
+
+  
+
+```js
 program
   .arguments('<hash>')
   .description('Hash or Name to inspect (eg: ak_..., mk_..., name.aet)')
   .action(async (hash, cmd) => await Inspect.inspect(hash, cmd))
 
+
+```
+
+
+
+
+
+
+
+Parse arguments or show `help` if argument's is empty
+
+
+  
+
+```js
 program.parse(process.argv)
 if (program.args.length === 0) program.help()
 

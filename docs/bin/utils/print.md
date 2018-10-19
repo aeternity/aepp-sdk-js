@@ -59,14 +59,14 @@ import { HASH_TYPES } from './constant'
 
 ```js
 const TX_TYPE_PRINT_MAP = {
-  'spend_tx': printSpendTransaction,
-  'contract_create_tx': printContractCreateTransaction,
-  'contract_call_tx': printContractCallTransaction,
-  'name_preclaim_tx': printNamePreclaimTransaction ,
-  'name_claim_tx': printNameClaimTransaction,
-  'name_transfer_tx': printNameTransferTransaction,
-  'name_update_tx': printNameUpdateTransaction,
-  'name_revoke_tx': printNameRevokeTransaction
+  'SpendTx': printSpendTransaction,
+  'ContractCreateTx': printContractCreateTransaction,
+  'ContractCallTx': printContractCallTransaction,
+  'NamePreclaimTx': printNamePreclaimTransaction ,
+  'NameClaimTx': printNameClaimTransaction,
+  'NameTransferTx': printNameTransferTransaction,
+  'NameUpdateTx': printNameUpdateTransaction,
+  'NameRevokeTx': printNameRevokeTransaction
 }
 
 ```
@@ -194,7 +194,7 @@ export function printBlock (block, json) {
     print(block)
     return
   }
-  const type = Object.keys(HASH_TYPES).find(t => block.hash.indexOf(HASH_TYPES[t] + '') !== -1)
+  const type = Object.keys(HASH_TYPES).find(t => R.head(block.hash.split('_')) === (HASH_TYPES[t]))
   const tabs = type === 'MICRO_BLOCK' ? 1 : 0
   const tabString = getTabs(tabs)
 
@@ -203,12 +203,13 @@ export function printBlock (block, json) {
   printUnderscored(tabString + 'Block hash', R.prop('hash', block))
   printUnderscored(tabString + 'Block height', R.prop('height', block))
   printUnderscored(tabString + 'State hash', R.prop('stateHash', block))
+  printUnderscored(tabString + 'Nonce', R.defaultTo('N/A', R.prop('nonce', block)))
   printUnderscored(tabString + 'Miner', R.defaultTo('N/A', R.prop('miner', block)))
   printUnderscored(tabString + 'Time', new Date(R.prop('time', block)))
   printUnderscored(tabString + 'Previous block hash', R.prop('prevHash', block))
   printUnderscored(tabString + 'Previous key block hash', R.prop('prevKeyHash', block))
   printUnderscored(tabString + 'Version', R.prop('version', block))
-  printUnderscored(tabString + 'Target', R.prop('target', block))
+  printUnderscored(tabString + 'Target', R.defaultTo('N/A', R.prop('target', block)))
   printUnderscored(tabString + 'Transactions', R.defaultTo(0, R.path(['transactions', 'length'], block)))
   if (R.defaultTo(0, R.path(['transactions', 'length'], block)))
     printBlockTransactions(block.transactions, false, tabs + 1)

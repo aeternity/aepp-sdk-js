@@ -26,11 +26,11 @@ check out the [develop branch].
 
 [develop branch]: https://github.com/aeternity/aepp-sdk-js/tree/develop
 
-## [Usage]
+## [Usage Documentation]
 
 1. Add the latest `@aeternity/aepp-sdk` release from npmjs.com to your project using one of these commands
 
-```
+```bash
 pnpm i @aeternity/aepp-sdk
 # or
 npm i @aeternity/aepp-sdk
@@ -39,7 +39,7 @@ yarn add @aeternity/aepp-sdk
 ```
 
 **Note:** To install a _Pre-Release_ (latest `beta` or `alpha` version) using on the latest Epoch version, you have to install the package appending the `@next` tag reference.
-```
+```bash
 pnpm i @aeternity/aepp-sdk@next
 npm i @aeternity/aepp-sdk@next
 yarn add @aeternity/aepp-sdk@next
@@ -67,9 +67,9 @@ const ae = Aepp()
 ae.then(ae => ae.height()).then(h => console.log(h))
 ```
 
-5. Go check out the [Usage] documentation!
+5. **IMPORTANT:** 🤓 Check out the [Usage Documentation] to avoid common pitfalls!
 
-[Usage]: docs/usage.md
+[Usage Documentation]: docs/usage.md
 
 ## [Hacking]
 

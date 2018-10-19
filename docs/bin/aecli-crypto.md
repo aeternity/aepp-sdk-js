@@ -29,10 +29,10 @@ const fs = require('fs')
 const prompt = require('prompt')
 const path = require('path')
 
-const utils = require('./utils/index')
 
 require = require('esm')(module/*, options */) // use to handle es6 import/export
 const Crypto = require('../es/utils/crypto')
+const utils = require('./utils/index')
 
 
 ```
@@ -83,17 +83,22 @@ function extractReadableKeys (dir, options) {
   const pwd = options.input
   prompt.start()
   prompt.get(promptSchema, (err, { password }) => {
-    const key = fs.readFileSync(path.join(pwd, dir, 'sign_key'))
-    const pubKey = fs.readFileSync(path.join(pwd, dir, 'sign_key.pub'))
+    try {
+      const key = fs.readFileSync(path.join(pwd, dir, 'sign_key'))
+      const pubKey = fs.readFileSync(path.join(pwd, dir, 'sign_key.pub'))
 
-    const decrypted = Crypto.decryptPrivateKey(password, key)
+      const decrypted = Crypto.decryptPrivateKey(password, key)
 
-    const privateHex = Buffer.from(decrypted).toString('hex')
-    const decryptedPub = Crypto.decryptPubKey(password, pubKey)
+      const privateHex = Buffer.from(decrypted).toString('hex')
+      const decryptedPub = Crypto.decryptPubKey(password, pubKey)
 
-    console.log(`Private key (hex): ${privateHex}`)
-    console.log(`Public key (base check): ak_${Crypto.encodeBase58Check(decryptedPub)}`)
-    console.log(`Public key (hex): ${decryptedPub.toString('hex')}`)
+      console.log(`Private key (hex): ${privateHex}`)
+      console.log(`Public key (base check): ak_${Crypto.encodeBase58Check(decryptedPub)}`)
+      console.log(`Public key (hex): ${decryptedPub.toString('hex')}`)
+    } catch (e) {
+      console.log(e.message)
+      process.exit(1)
+    }
   })
 }
 
@@ -112,18 +117,8 @@ function extractReadableKeys (dir, options) {
   
 
 ```js
-function generateKeyPair (name, { output }) {
-  const { pub, priv } = Crypto.generateKeyPair()
-
-  const data = [
-    [path.join(output, name), priv],
-    [path.join(output, `${name}.pub`), pub]
-  ]
-
-  data.forEach(([path, data]) => {
-    fs.writeFileSync(path, data)
-    console.log(`Wrote ${path}`)
-  })
+async function generateKeyPair (name, { output, password }) {
+  await utils.account.generateSecureWallet(name, { output, password })
 }
 
 
@@ -244,6 +239,33 @@ function unpackTx (tx) {
   console.log(JSON.stringify(deserializedTx, undefined, 2))
 }
 
+
+```
+
+
+
+
+
+
+
+## Address decoder
+
+This helper function decodes address(base58) to hex
+
+
+  
+
+```js
+function decodeAddress (address) {
+  const decoded = Crypto.decodeBase58Check(address.split('_')[1]).toString('hex');
+  console.log(`Decoded address (hex): ${decoded}`)
+}
+
+program
+  .command('decode <base58address>')
+  .description('Decodes base58 address to hex')
+  .action(decodeAddress)
+
 program
   .command('decrypt <directory>')
   .description('Decrypts public and private key to readable formats for testing purposes')
@@ -254,7 +276,8 @@ program
   .command('genkey <keyname>')
   .description('Generate keypair')
   .option('-o, --output [directory]', 'Output directory for the keys', '.')
-  .action(generateKeyPair)
+  .option('-p, --password [directory]', 'Password for keypair', '.')
+  .action(async (keyname) => await generateKeyPair(keyname))
 
 program
   .command('sign <tx> [privkey]')

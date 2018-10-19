@@ -4,20 +4,26 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [0.24.0-0.1.0-alpha.1]
 ### Added
-- (CLI) Develop `decode base58` address command in `crypto` module 
-- (CLI) Add `nonce` param to all tx command's 
+- Full support of [Epoch-0.24.0](https://github.com/aeternity/epoch/releases/tag/v0.24.0)
+- (CLI) Develop `decode base58` address command in `crypto` module
+- (CLI) Add `nonce` param to all tx command's
 - (CLI) Add `gas` param to `deploy` and `call` commands
 - Add ability to create `spend` transaction natively
 - Implement `ethereum keystore` using `AES-126-CTR` and `SCRYPT` as key derivation function
 
 ### Changed
-- (CLI)Change `--privateKey` to `flag` on `ACCOUNT ADDRESS` command
+- (CLI) Change `--privateKey` to `flag` on `ACCOUNT ADDRESS` command
 - Change `node version` in `Dockerfile`
 - API endpoints to meet new Epoch specifications
 - Update `docco` config and change `rename` package to `recursive-rename`
+- Improved documentation
 
 ### Removed
 - Support for < 0.24.0
+
+### Notes and known Issues
+- `ethereum keystore` usage will be removed in the next release
+- CLI will move to a separate package
 
 
 ## [0.22.0-0.1.0-beta.1]
@@ -132,3 +138,4 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 [0.18.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.15.0-0.1.0...v0.18.0-0.1.0
 [0.18.0-0.1.1]: https://github.com/aeternity/aepp-sdk-js/compare/v0.18.0-0.1.0...v0.18.0-0.1.1
 [0.22.0-0.1.0-beta.1]: https://github.com/aeternity/aepp-sdk-js/compare/v0.18.0-0.1.1...v0.22.0-0.1.0-beta.1
+[0.24.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.22.0-0.1.0-beta.1...v0.24.0-0.1.0
