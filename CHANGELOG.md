@@ -2,16 +2,16 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
-## [0.24.0-0.1.0]
+## [0.24.0-0.1.0-alpha.1]
 ### Added
 - (CLI) Develop `decode base58` address command in `crypto` module 
 - (CLI) Add `nonce` param to all tx command's 
 - (CLI) Add `gas` param to `deploy` and `call` commands
 - Add ability to create `spend` transaction natively
-- Change `--privateKey` to `flag` on `ACCOUNT ADDRESS` command
 - Implement `ethereum keystore` using `AES-126-CTR` and `SCRYPT` as key derivation function
 
 ### Changed
+- (CLI)Change `--privateKey` to `flag` on `ACCOUNT ADDRESS` command
 - Change `node version` in `Dockerfile`
 - API endpoints to meet new Epoch specifications
 - Update `docco` config and change `rename` package to `recursive-rename`
