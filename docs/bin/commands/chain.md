@@ -155,7 +155,7 @@ Call `getTopBlock` API and print it
 
 ```js
     await handleApiError(
-      async () => printBlock(await client.api.getTopBlock(), json)
+      async () => printBlock(await client.topBlock(), json)
     )
   } catch (e) {
     printError(e.message)
@@ -227,7 +227,7 @@ Get `mempool` from `API`
 
 
 
-If we have `transaction's` in `mempool` print them
+If we have `transactions` in `mempool` print them
 
 
   
@@ -281,7 +281,7 @@ Get top block from `Epoch`. It is a start point for play.
   
 
 ```js
-      const top = await client.api.getTopBlock()
+      const top = await client.topBlock()
 
       if (height && height > parseInt(top.height)) {
         printError('Height is bigger then height of top block')

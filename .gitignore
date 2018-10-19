@@ -8,4 +8,4 @@ node_modules
 /yarn-error.log
 .idea
 /docker-compose.override.yml
-dist/
+/pnpm-debug.log

@@ -84,7 +84,6 @@ const Epoch = stampit({
 }, Swagger, {
   async init ({ forceCompatibility }) {
     const { nodeVersion: version, nodeRevision: revision, genesisKeyBlockHash: genesisHash } = await this.api.getStatus()
-
     if (!R.contains(version)(COMPATIBILITY) && !forceCompatibility) throw new Error(`Unsupported epoch version ${version}`)
     // TODO:
     // getStatus fails with an Error 500 (and crashes everything)
@@ -101,6 +100,6 @@ const Epoch = stampit({
 })
 
 // Array with compatible epoch node versions
-export const COMPATIBILITY = ['0.22.0']
+export const COMPATIBILITY = ['0.24.0']
 
 export default Epoch

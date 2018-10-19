@@ -8,6 +8,23 @@
 
 ```js
 #!/usr/bin/env node
+
+```
+
+
+
+
+
+
+
+# æternity CLI `chain` file
+
+This script initialize all `chain` command's
+
+
+  
+
+```js
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
@@ -25,6 +42,28 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+```
+
+
+
+
+
+
+
+We'll use `commander` for parsing options
+
+Also we need `esm` package to handle `ES imports`
+
+
+  
+
+```js
+const program = require('commander')
+
+require = require('esm')(module/*, options*/) //use to handle es6 import/export
+const utils = require('./utils/index')
+const { Chain } = require('./commands')
+
 
 ```
 
@@ -34,24 +73,12 @@
 
 
 
-  _____ _           _
- / ____| |         (_)
-| |    | |__   __ _ _ _ __
-| |    | '_ \ / _` | | '_ \
-| |____| | | | (_| | | | | |
- \_____|_| |_|\__,_|_|_| |_|
+# Initialize `options`
 
 
   
 
 ```js
-
-const program = require('commander')
-
-require = require('esm')(module/*, options*/) //use to handle es6 import/export
-const utils = require('./utils/index')
-const { Chain } = require('./commands')
-
 program
   .option('--host [hostname]', 'Node to connect to', utils.constant.EPOCH_URL)
   .option('--internalUrl [internal]', 'Node to connect to(internal)', utils.constant.EPOCH_INTERNAL_URL)
@@ -60,21 +87,99 @@ program
   .option('-f --force', 'Ignore epoch version compatibility check')
   .option('--json', 'Print result in json format')
 
+
+```
+
+
+
+
+
+
+
+## Initialize `top` command
+
+You can use this command to retrieve `top block` from `epoch`
+
+Example: `aecli chain top`
+
+
+  
+
+```js
 program
   .command('top')
   .description('Get top of Chain')
   .action(async (...arguments) => await Chain.top(utils.cli.getCmdFromArguments(arguments)))
 
+
+```
+
+
+
+
+
+
+
+## Initialize `status` command
+
+You can use this command to retrieve `epoch version`
+
+Example: `aecli chain status`
+
+
+  
+
+```js
 program
-  .command('version')
+  .command('status')
   .description('Get Epoch version')
   .action(async (...arguments) => await Chain.version(utils.cli.getCmdFromArguments(arguments)))
 
+
+```
+
+
+
+
+
+
+
+## Initialize `mempool` command
+
+You can use this command to retrieve list of `mempool` transaction from `epoch`
+
+Example: `aecli chain mempool`
+
+
+  
+
+```js
 program
   .command('mempool')
   .description('Get mempool of Chain')
   .action(async (...arguments) => await Chain.mempool(utils.cli.getCmdFromArguments(arguments)))
 
+
+```
+
+
+
+
+
+
+
+## Initialize `play` command
+
+You can use this command to get list of block by some condition(by `limit` or `height`)
+
+Example: `aecli chain play --limit 10` --> print 10 blocks starting from top
+
+Example: `aecli chain play --height` --> print blocks until reach some height starting from top
+
+
+  
+
+```js
 program
   .command('play')
   .description('Real-time block monitoring')
@@ -89,7 +194,7 @@ program
 
 
 
-HANDLE UNKNOWN COMMAND
+Handle unknown command's
 
 
   
@@ -97,6 +202,21 @@ HANDLE UNKNOWN COMMAND
 ```js
 program.on('command:*', () => utils.errors.unknownCommandHandler(program)())
 
+
+```
+
+
+
+
+
+
+
+Parse arguments or show `help` if argument's is empty
+
+
+  
+
+```js
 program.parse(process.argv)
 if (program.args.length === 0) program.help()
 

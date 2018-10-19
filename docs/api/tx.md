@@ -3,8 +3,8 @@
 ## @aeternity/aepp-sdk/es/tx
 Tx module
 
-**Export**: Tx
-**Example**
+**Export**: Tx  
+**Example**  
 ```js
 import Tx from '@aeternity/aepp-sdk/es/tx'
 ```
@@ -33,15 +33,15 @@ Tx is one of the three basic building blocks of an
 [Ae](#exp_module_@aeternity/aepp-sdk/es/ae--Ae) client and provides methods to
 create aeternity transactions.
 
-**Kind**: Exported function
-**Returns**: `Object` - Tx instance
+**Kind**: Exported function  
+**Returns**: `Object` - Tx instance  
 **rtype**: `Stamp`
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | [options] | `Object` | <code>{}</code> | Initializer object |
 
-**Example**
+**Example**  
 ```js
 Tx()
 ```
@@ -50,10 +50,10 @@ Tx()
 #### *tx.spendTx(options) ⇒ `String`*
 Create a `spend_tx` transaction
 
-**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)
-**Returns**: `String` - `spend_tx` transaction
-**Category**: async
-**rtype**: `({sender?: String, recipient: String, amount: Number, fee: Number, ttl: Number, nonce?: Number, payload?: String}) => tx: Promise[String]`
+**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)  
+**Returns**: `String` - `spend_tx` transaction  
+**Category**: async  
+**rtype**: `({sender?: String, recipientId: String, amount: Number, fee: Number, ttl: Number, nonce?: Number, payload?: String}) => tx: Promise[String]`
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -64,9 +64,9 @@ Create a `spend_tx` transaction
 #### *tx.namePreclaimTx(options) ⇒ `String`*
 Create a `name_preclaim_tx` transaction
 
-**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)
-**Returns**: `String` - `name_preclaim_tx` transaction
-**Category**: async
+**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)  
+**Returns**: `String` - `name_preclaim_tx` transaction  
+**Category**: async  
 **rtype**: `({account?: String, commitment: String, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]`
 
 | Param | Type | Description |
@@ -78,9 +78,9 @@ Create a `name_preclaim_tx` transaction
 #### *tx.nameClaimTx(options) ⇒ `String`*
 Create a `name_claim_tx` transaction
 
-**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)
-**Returns**: `String` - `name_claim_tx` transaction
-**Category**: async
+**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)  
+**Returns**: `String` - `name_claim_tx` transaction  
+**Category**: async  
 **rtype**: `({account?: String, name: String, nameSalt: String, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]`
 
 | Param | Type | Description |
@@ -92,10 +92,10 @@ Create a `name_claim_tx` transaction
 #### *tx.nameTransferTx(options) ⇒ `String`*
 Create a `name_transfer_tx` transaction
 
-**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)
-**Returns**: `String` - `name_transfer_tx` transaction
-**Category**: async
-**rtype**: `({account?: String, nameId: String, recipientAccount: String, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]`
+**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)  
+**Returns**: `String` - `name_transfer_tx` transaction  
+**Category**: async  
+**rtype**: `({account?: String, nameId: String, recipientId: String, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]`
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -106,9 +106,9 @@ Create a `name_transfer_tx` transaction
 #### *tx.nameUpdateTx(options) ⇒ `String`*
 Create a `name_update_tx` transaction
 
-**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)
-**Returns**: `String` - `name_update_tx` transaction
-**Category**: async
+**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)  
+**Returns**: `String` - `name_update_tx` transaction  
+**Category**: async  
 **rtype**: `({account?: String, nameId: String, pointers: Object, nameTtl: Number, clientTtl: Number, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]`
 
 | Param | Type | Description |
@@ -120,9 +120,9 @@ Create a `name_update_tx` transaction
 #### *tx.nameRevokeTx(options) ⇒ `String`*
 Create a `name_revoke_tx` transaction
 
-**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)
-**Returns**: `String` - `name_revoke_tx` transaction
-**Category**: async
+**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)  
+**Returns**: `String` - `name_revoke_tx` transaction  
+**Category**: async  
 **rtype**: `({account?: String, nameId: String, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]`
 
 | Param | Type | Description |
@@ -134,9 +134,9 @@ Create a `name_revoke_tx` transaction
 #### *tx.contractCreateTx(options) ⇒ `String`*
 Create a `contract_create_tx` transaction
 
-**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)
-**Returns**: `String` - `contract_create_tx` transaction
-**Category**: async
+**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)  
+**Returns**: `String` - `contract_create_tx` transaction  
+**Category**: async  
 **rtype**: `({owner: String, code: String, callData: String, vmVersion: Number, deposit: Number, amount: Number, gas: Number, gasPrice: Number, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]`
 
 | Param | Type | Description |
@@ -148,10 +148,10 @@ Create a `contract_create_tx` transaction
 #### *tx.contractCallTx(options) ⇒ `String`*
 Create a `contract_call_tx` transaction
 
-**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)
-**Returns**: `String` - `contract_call_tx` transaction
-**Category**: async
-**rtype**: `({caller: String, contract: String, callData: String, vmVersion: Number, amount: Number, gas: Number, gasPrice: Number, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]`
+**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)  
+**Returns**: `String` - `contract_call_tx` transaction  
+**Category**: async  
+**rtype**: `({callerId: String, contract: String, callData: String, vmVersion: Number, amount: Number, gas: Number, gasPrice: Number, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]`
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -162,9 +162,9 @@ Create a `contract_call_tx` transaction
 #### *tx.commitmentHash(name, salt) ⇒ `String`*
 Create a commitment hash for claiming names
 
-**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)
-**Returns**: `String` - Commitment hash
-**Category**: async
+**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)  
+**Returns**: `String` - Commitment hash  
+**Category**: async  
 **rtype**: `(name: String, salt?: String) => hash: Promise[String]`
 
 | Param | Type | Description |
