@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
-## [0.24.0-0.1.0-alpha.1]
+## [0.24.0-0.1.0]
 ### Added
 - Full support of [Epoch-0.24.0](https://github.com/aeternity/epoch/releases/tag/v0.24.0)
 - (CLI) Develop `decode base58` address command in `crypto` module
