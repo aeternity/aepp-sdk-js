@@ -8,10 +8,12 @@ dependencies:
   bs58check: 2.1.1
   cacache: 11.2.0
   esm: 3.0.84
+  keccak: 1.4.0
   postinstall-build: 5.0.1
   ramda: 0.25.0
   recursive-rename: 2.0.0
   rlp: 2.1.0
+  scrypt: 6.0.3
   serialize-javascript: 1.5.0
   sha.js: 2.4.11
   tweetnacl: 1.0.0
@@ -1439,7 +1441,6 @@ packages:
     resolution:
       integrity: sha1-RqoXUftqL5PuXmibsQh9SxTGwgU=
   /bindings/1.3.0:
-    dev: true
     resolution:
       integrity: sha512-DpLh5EzMR2kzvX1KIlVC0VkC3iZtHKTgdtZ0a3pglBZdaQFjt5S9g9xd1lE+YvXyfd6mtCeRnrUfOLYiTMlNSw==
   /bl/1.2.2:
@@ -4332,6 +4333,18 @@ packages:
     dev: true
     resolution:
       integrity: sha512-mJVp13Ix6gFo3SBAy9U/kL+oeZqzlYYYLQBwXVBlVzIsZwBqGREnOro24oC/8s8aox+rJhtZ2DiQof++IrkA+g==
+  /keccak/1.4.0:
+    dependencies:
+      bindings: 1.3.0
+      inherits: 2.0.3
+      nan: 2.11.1
+      safe-buffer: 5.1.2
+    dev: false
+    engines:
+      node: '>=4.0.0'
+    requiresBuild: true
+    resolution:
+      integrity: sha512-eZVaCpblK5formjPjeTBik7TAg+pqnDrMHIffSvi9Lh7PQgM1+hSzakUeZFCk9DVVG0dacZJuaz2ntwlzZUIBw==
   /kind-of/3.2.2:
     dependencies:
       is-buffer: 1.1.6
@@ -4798,6 +4811,10 @@ packages:
   /nan/2.10.0:
     resolution:
       integrity: sha512-bAdJv7fBLhWC+/Bls0Oza+mvTaNQtP+1RyhhhvD95pgUJz6XM5IzgmxOkItJ9tkoCiplvAnXI1tNmmUD/eScyA==
+  /nan/2.11.1:
+    dev: false
+    resolution:
+      integrity: sha512-iji6k87OSXa0CcrLl9z+ZiYSuR2o+c0bGuNmXdrhTQTakxytAFsC56SArGYoiHlJlFoHSnvmhpceZJaXkVuOtA==
   /nanomatch/1.2.13:
     dependencies:
       arr-diff: 4.0.0
@@ -5949,6 +5966,15 @@ packages:
       webpack: ^2.0.0 || ^3.0.0 || ^4.0.0
     resolution:
       integrity: sha512-yYrjb9TX2k/J1Y5UNy3KYdZq10xhYcF8nMpAW6o3hy6Q8WSIEf9lJHG/ePnOBfziPM3fvQwfOwa13U/Fh8qTfA==
+  /scrypt/6.0.3:
+    dependencies:
+      nan: 2.11.1
+    dev: false
+    engines:
+      node: '>= 0.10'
+    requiresBuild: true
+    resolution:
+      integrity: sha1-BOAUpWgrU/pQwtXM4WfXGcBthw0=
   /semver/5.5.0:
     dev: true
     hasBin: true
@@ -7208,6 +7234,7 @@ specifiers:
   esm: ^3.0.77
   find-cache-dir: ^2.0.0
   jsdoc-to-markdown: ^4.0.1
+  keccak: ^1.4.0
   mocha: ^5.0.0
   mocha-junit-reporter: ^1.17.0
   postinstall-build: ^5.0.1
@@ -7216,6 +7243,7 @@ specifiers:
   recursive-rename: ^2.0.0
   rlp: ^2.0.0
   safe-buffer: ^5.1.2
+  scrypt: ^6.0.3
   serialize-javascript: ^1.5.0
   sha.js: ^2.4.11
   sinon: ^4.2.2
