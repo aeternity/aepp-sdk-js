@@ -35,10 +35,14 @@ You can use this URL with releases tagged as `alpha`, `beta` or `next` on [npmjs
 
 In is generally advised to use ESM (EcmaScript Modules), whenever possible. At
 this point however, this requires a modern _bundler_ which understands ES2015
-`import/export` syntax, such as [webpack] 4 (or newer). In addition, a compiler
-which translates the subset of ES used by aepp-sdk will have to be used, such as
-[Babel] - `.babelrc` in the project's root directory shows which plugins are
-required, at least.
+`import/export` syntax, such as [webpack] 4 (or newer).
+
+> In addition, **a compiler
+which translates the subset of ES used by aepp-sdk will have to be used**, such as
+[Babel] - `.babelrc` in the project's root directory, shows which transpilation plugins are required, at least.
+
+Also, in the project's root directory, double check the `devDependencies` of the `package.json`, looking for `@babel`/packages that might be helping you to correctly transpile the SDK code `import`ed into your project.
+
 Using this method also enables the use of [Tree shaking] (dead code
 elimination).
 aepp-sdk's `package.json` specifies a seperate entry point for any such tool
@@ -132,17 +136,19 @@ main()
 Adding aepp-sdk to a Vue.js project requires nothing special, but it should be
 noted that `Ae.create` is asynchronous which needs to be taken into account.
 
-```
+```bash
 vue init webpack my-project
 cd my-project
 yarn add @aeternity/aepp-sdk
 ```
 
-```js
+```html
 # src/components/HelloWorld.vue
 
 <script>
+// import Aepp
 import Aepp from '@aeternity/aepp-sdk/es/ae/aepp'
+// Init Ae Client
 const ae = Aepp({url: 'https://sdk-testnet.aepps.com'})
 
 export default {
@@ -153,7 +159,9 @@ export default {
     }
   },
   async mounted () {
+    // Wait Ae client
     const client = await ae
+    // Start Using Ae client
     const height = await client.height()
     this.msg = 'Current Block: ' + height
   }
