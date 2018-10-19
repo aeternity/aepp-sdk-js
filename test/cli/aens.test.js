@@ -40,21 +40,20 @@ describe('CLI AENS Module', function () {
     console.log((await execute(['name', 'claim', WALLET_NAME, '--password', 'test', name])))
 
     const nameResult = parseBlock(await execute(['inspect', name]))
-    console.log(nameResult)
     const isHash = nameResult.name_hash !== 'N/A'
 
     nameResult.status.should.equal('CLAIMED')
     isHash.should.equal(true)
   })
-  it.skip('Update Name', async () => {
+  it('Update Name', async () => {
     const { pub } = generateKeyPair()
     console.log(await execute(['name', 'update', WALLET_NAME, '--password', 'test', name, pub]))
 
     const nameResult = parseBlock(await execute(['inspect', name]))
-    console.log(nameResult)
+    const isHaveUpdatedPointer = !!(JSON.parse(nameResult.pointers).find(p => p.id === pub))
 
     nameResult.status.should.equal('CLAIMED')
-    nameResult.pointers.should.equal({ id: pub, key: 'account_pubkey' })
+    isHaveUpdatedPointer.should.equal(true)
   })
   it('Revoke Name', async () => {
     console.log(await execute(['name', 'revoke', WALLET_NAME, '--password', 'test', name]))
@@ -65,13 +64,4 @@ describe('CLI AENS Module', function () {
     nameResult.name_hash.should.equal('N/A')
     nameResult.pointers.should.equal('N/A')
   })
-  // it.skip('Transfer Name', async () => {
-  //   console.log(await execute(['name', 'revoke', WALLET_NAME, '--password', 'test', name]))
-  //
-  //   const nameResult = parseBlock(await execute(['inspect', name]))
-  //
-  //   nameResult.status.should.equal('AVAILABLE')
-  //   nameResult.name_hash.should.equal('N/A')
-  //   nameResult.pointers.should.equal('N/A')
-  // })
 })
