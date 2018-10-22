@@ -26,11 +26,10 @@ import Ae from './'
 import Account from '../account'
 import Accounts from '../accounts'
 import Chain from '../chain/epoch'
-import Tx from '../tx/epoch'
-import JsTx from '../tx/js'
 import Rpc from '../rpc/server'
 import Selector from '../account/selector'
 import * as R from 'ramda'
+import Tx from '../tx/tx'
 
 const contains = R.flip(R.contains)
 const isTxMethod = contains(Tx.compose.deepConfiguration.Ae.methods)
@@ -120,7 +119,7 @@ async function rpcAddress ({ params, session }) {
   onAccount: confirm
 })
  */
-const Wallet = Ae.compose(Accounts, Chain, Tx, JsTx, Rpc, Selector, {
+const Wallet = Ae.compose(Accounts, Chain, Tx, Rpc, Selector, {
   init ({ onTx = this.onTx, onChain = this.onChain, onAccount = this.onAccount }, { stamp }) {
     this.onTx = onTx
     this.onChain = onChain

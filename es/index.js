@@ -20,7 +20,7 @@ import * as Crypto from './utils/crypto'
 import Chain from './chain'
 import EpochChain from './chain/epoch'
 import Tx from './tx'
-import EpochTx from './tx/epoch'
+import Transaction from './tx/tx'
 import JsTx from './tx/js'
 import Account from './account'
 import MemoryAccount from './account/memory'
@@ -39,7 +39,7 @@ export {
   Chain,
   EpochChain,
   Tx,
-  EpochTx,
+  Transaction,
   Account,
   MemoryAccount,
   Aens,

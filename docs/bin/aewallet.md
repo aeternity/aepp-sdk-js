@@ -60,10 +60,10 @@ We'll need the main client module `Ae` in the `Cli` flavor from the SDK.
   
 
 ```js
-const {Cli: Ae} = require('@aeternity/aepp-sdk')
+const { Cli: Ae } = require('@aeternity/aepp-sdk')
 const program = require('commander')
 
-function spend (receiver, amount, {host, debug}) {
+function spend (receiver, amount, { host, debug }) {
 
 ```
 
@@ -82,7 +82,7 @@ the implementation grab the key pair from the `WALLET_PRIV` and
   
 
 ```js
-  Ae({url: host, debug, process})
+  Ae({ url: host, debug, process })
     .then(ae => ae.spend(parseInt(amount), receiver))
     .then(tx => console.log('Transaction mined', tx))
     .catch(e => console.log(e.message))

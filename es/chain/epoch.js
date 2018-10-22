@@ -37,7 +37,7 @@ async function height () {
   return (await this.api.getCurrentKeyBlockHeight()).height
 }
 
-async function awaitHeight (h, { interval = 5000, attempts = 12 } = {}) {
+async function awaitHeight (h, { interval = 5000, attempts = 30 } = {}) {
   const instance = this
 
   async function probe (resolve, reject, left) {
@@ -48,7 +48,7 @@ async function awaitHeight (h, { interval = 5000, attempts = 12 } = {}) {
       } else if (left > 0) {
         setTimeout(() => probe(resolve, reject, left - 1), interval)
       } else {
-        reject(Error(`Giving up after ${attempts * interval}ms`))
+        reject(Error(`Giving up after ${attempts * interval}ms, current=${current}, h=${h}`))
       }
     } catch (e) {
       reject(e)
@@ -58,7 +58,12 @@ async function awaitHeight (h, { interval = 5000, attempts = 12 } = {}) {
   return new Promise((resolve, reject) => probe(resolve, reject, attempts))
 }
 
-async function poll (th, { blocks = 10, interval = 5000 } = {}) {
+async function topBlock () {
+  const top = await this.api.getTopBlock()
+  return top[R.head(R.keys(top))]
+}
+
+async function poll (th, { blocks = 20, interval = 5000 } = {}) {
   const instance = this
   const max = await this.height() + blocks
 
@@ -90,6 +95,7 @@ const EpochChain = Chain.compose(Epoch, {
   methods: {
     sendTransaction,
     balance,
+    topBlock,
     tx,
     height,
     awaitHeight,
