@@ -70,7 +70,7 @@ const RpcClient = stampit(AsyncInit, {
         callbacks[sequence] = { resolve, reject }
       })
 
-      parent.postMessage(JSON.parse(JSON.stringify({ jsonrpc: '2.0', id: sequence, method, params, session: this.session })), '*')
+      parent.postMessage({ jsonrpc: '2.0', id: sequence, method, params, session: this.session }, '*')
       sequence++
 
       return ret
@@ -81,6 +81,7 @@ const RpcClient = stampit(AsyncInit, {
     this.session = await this.post('hello')
   },
   composers ({ stamp, composables }) {
+    // Combine Ae and Contract methods
     const methods = [
       ...(R.path(['compose', 'deepConfiguration', 'Ae', 'methods'], stamp) || []),
       ...(R.path(['compose', 'deepConfiguration', 'Contract', 'methods'], stamp) || [])

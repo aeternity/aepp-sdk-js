@@ -40,8 +40,8 @@
 
 <script>
 // AE_SDK_MODULES is a webpack alias present in webpack.config.js
-import Wallet from 'AE_SDK_MODULES/ae/wallet.js'
-import MemoryAccount from 'AE_SDK_MODULES/account/memory.js'
+import Wallet from '../../../../../es/ae/wallet'
+import MemoryAccount from '../../../../../es/account/memory'
 
 export default {
   name: 'Wallet',
@@ -74,9 +74,10 @@ export default {
       internalUrl: 'https://sdk-edgenet.aepps.com',
       accounts: [MemoryAccount({keypair: {priv: this.priv, pub: this.pub}})],
       address: this.pub,
-      // onTx: this.confirmDialog,
-      // onChain: this.confirmDialog,
-      onAccount: this.confirmDialog
+      onTx: this.confirmDialog,
+      onChain: this.confirmDialog,
+      onAccount: this.confirmDialog,
+      onContract: this.confirmDialog
     }).then(ae => {
       this.client = ae
       console.log('status', this.client.api.getTopBlock())

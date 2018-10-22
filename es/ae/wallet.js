@@ -136,6 +136,7 @@ const Wallet = Ae.compose(Accounts, Chain, Tx, EpochContract, Contract, Rpc, Sel
     this.onAccount = onAccount
     this.onContract = onContract
 
+    // Combine `AE` methods with `Contract` and `AENS`
     const methods = [
       ...stamp.compose.deepConfiguration.Ae.methods,
       ...stamp.compose.deepConfiguration.Contract.methods
