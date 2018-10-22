@@ -26,6 +26,7 @@ import stampit from '@stamp/it'
 import Tx from '../tx'
 import Chain from '../chain'
 import Account from '../account'
+import Contract from '../contract'
 import * as R from 'ramda'
 
 /**
@@ -77,7 +78,7 @@ async function spend (amount, recipientId, options = {}) {
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Ae instance
  */
-const Ae = stampit(Tx, Account, Chain, {
+const Ae = stampit(Tx, Account, Chain, Contract, {
   methods: { send, spend },
   deepProperties: { Ae: { defaults: {
     ttl: 500,

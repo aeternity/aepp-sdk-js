@@ -37,9 +37,9 @@ async function receive ({ data, source }) {
   }
 
   R.call(this.rpcMethods[method].bind(this) || error, { params, session: this.rpcSessions[session] }).then(result => {
-    source.postMessage({ jsonrpc: '2.0', id, result: { resolve: result } }, '*')
+    source.postMessage(JSON.parse(JSON.stringify({ jsonrpc: '2.0', id, result: { resolve: result } })), '*')
   }).catch(error => {
-    source.postMessage({ jsonrpc: '2.0', id, result: { reject: error.message } }, '*')
+    source.postMessage(JSON.parse(JSON.stringify({ jsonrpc: '2.0', id, result: { reject: error.message } })), '*')
   })
 }
 
