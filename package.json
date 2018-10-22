@@ -6,7 +6,8 @@
   "browser": "dist/aepp-sdk.browser.js",
   "module": "es/index.js",
   "bin": {
-    "aecli": "./bin/aecli.js"
+    "aecli": "./bin/aecli.js",
+    "aeproject": "./bin/aeproject/aeproject-cli.js"
   },
   "sideEffects": false,
   "scripts": {
