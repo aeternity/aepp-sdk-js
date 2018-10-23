@@ -8,6 +8,23 @@
 
 ```js
 #!/usr/bin/env node
+
+```
+
+
+
+
+
+
+
+# æternity CLI `root` file
+
+This script initialize all `cli` commands
+
+
+  
+
+```js
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
@@ -26,17 +43,26 @@
  */
 'use strict'
 
+```
+
+
+
+
+
+
+
+We'll use `commander` for parsing options
+Also we need `esm` package to handle `ES imports`
+
+
+  
+
+```js
 const program = require('commander')
 
 require = require('esm')(module/*, options */) // use to handle es6 import/export
 const utils = require('./utils/index')
 
-const EXECUTABLE_CMD = [
-  { name: 'chain', desc: 'Interact with the blockchain' },
-  { name: 'inspect', desc: 'Get information on transactions, blocks,...' },
-  { name: 'account', desc: 'Handle wallet operations' },
-  { name: 'contract', desc: 'Compile contracts' },
-  { name: 'name', desc: 'AENS system' },
 
 ```
 
@@ -46,19 +72,58 @@ const EXECUTABLE_CMD = [
 
 
 
-TODO implement oracle module
-{name: 'oracle', desc: 'Interact with oracles'},
+Array of child command's
 
 
   
 
 ```js
+const EXECUTABLE_CMD = [
+  { name: 'chain', desc: 'Interact with the blockchain' },
+  { name: 'inspect', desc: 'Get information on transactions, blocks,...' },
+  { name: 'account', desc: 'Handle wallet operations' },
+  { name: 'contract', desc: 'Compile contracts' },
+  { name: 'name', desc: 'AENS system' },
+  /* TODO implement oracle module
+  * {name: 'oracle', desc: 'Interact with oracles'},
+  */
   { name: 'crypto', desc: 'Crypto helpers' }
 ]
 
+```
+
+
+
+
+
+
+
+##Get version from `package.json`
+
+You get get CLI version by exec `aecli version`
+
+
+  
+
+```js
 program
   .version(require('../package.json').version)
 
+
+```
+
+
+
+
+
+
+
+## Initialize `config` command
+
+
+  
+
+```js
 program
   .command('config')
   .description('Print the client configuration')
@@ -73,7 +138,7 @@ program
 
 
 
-INIT EXEC COMMANDS
+## Initialize `child` command's
 
 
   
@@ -90,7 +155,7 @@ utils.cli.initExecCommands(program)(EXECUTABLE_CMD)
 
 
 
-HANDLE UNKNOWN COMMAND
+Handle unknown command's
 
 
   
@@ -98,6 +163,21 @@ HANDLE UNKNOWN COMMAND
 ```js
 program.on('command:*', () => utils.errors.unknownCommandHandler(program)(EXECUTABLE_CMD))
 
+
+```
+
+
+
+
+
+
+
+Parse arguments or show `help` if argument's is empty
+
+
+  
+
+```js
 program.parse(process.argv)
 if (program.args.length === 0) program.help()
 

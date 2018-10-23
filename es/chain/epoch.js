@@ -58,6 +58,11 @@ async function awaitHeight (h, { interval = 5000, attempts = 30 } = {}) {
   return new Promise((resolve, reject) => probe(resolve, reject, attempts))
 }
 
+async function topBlock () {
+  const top = await this.api.getTopBlock()
+  return top[R.head(R.keys(top))]
+}
+
 async function poll (th, { blocks = 20, interval = 5000 } = {}) {
   const instance = this
   const max = await this.height() + blocks
@@ -82,6 +87,10 @@ async function poll (th, { blocks = 20, interval = 5000 } = {}) {
   return new Promise((resolve, reject) => probe(resolve, reject))
 }
 
+async function getTxInfo (hash) {
+  return this.api.getTransactionInfoByHash(hash)
+}
+
 async function mempool () {
   return this.api.getPendingTransactions()
 }
@@ -90,10 +99,12 @@ const EpochChain = Chain.compose(Epoch, {
   methods: {
     sendTransaction,
     balance,
+    topBlock,
     tx,
     height,
     awaitHeight,
     poll,
+    getTxInfo,
     mempool
   }
 })

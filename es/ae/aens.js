@@ -147,7 +147,7 @@ async function query (name) {
 async function claim (name, salt, waitForHeight, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   // wait until block was mined before send claim transaction
-  if (waitForHeight) await this.awaitHeight(waitForHeight, { attempts: 200 })
+  // if (waitForHeight) await this.awaitHeight(waitForHeight, { attempts: 200 })
   const claimTx = await this.nameClaimTx(R.merge(opt, {
     accountId: await this.address(),
     nameSalt: salt,

@@ -26,7 +26,7 @@ import stampit from '@stamp/it'
 import { required } from '@stamp/required'
 
 /**
- * Basic Chain Stamp
+ * Basic Contract Stamp
  *
  * Attempting to create instances from the Stamp without overwriting all
  * abstract methods using composition will result in an exception.
@@ -36,28 +36,23 @@ import { required } from '@stamp/required'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Chain instance
  */
-const Chain = stampit({
-  deepProps: { Chain: { defaults: { waitMined: true } } },
-  statics: { waitMined (bool) { return this.deepProps({ Chain: { defaults: { waitMined: bool } } }) } },
+const ContractBase = stampit({
   deepConf: {
-    Ae: {
+    Contract: {
       methods: [
-        'sendTransaction', 'height', 'awaitHeight', 'poll', 'balance', 'tx',
-        'mempool', 'topBlock', 'getTxInfo'
+        'contractEpochEncodeCallData',
+        'contractEpochCall',
+        'contractEpochDecodeData',
+        'compileEpochContract'
       ]
     }
   }
 }, required({
   methods: {
-    sendTransaction: required,
-    height: required,
-    awaitHeight: required,
-    topBlock: required,
-    poll: required,
-    balance: required,
-    tx: required,
-    getTxInfo: required,
-    mempool: required
+    contractEpochEncodeCallData: required,
+    contractEpochCall: required,
+    contractEpochDecodeData: required,
+    compileEpochContract: required
   }
 }))
 
@@ -144,17 +139,6 @@ const Chain = stampit({
  */
 
 /**
- * Obtain a transaction info based on its hash
- * @function getTxInfo
- * @instance
- * @abstract
- * @category async
- * @rtype (hash: String) => tx: String
- * @param {String} hash - Transaction hash
- * @return {String} Transaction
- */
-
-/**
  * Obtain transactions currently in the mempool
  * @function mempool
  * @instance
@@ -164,4 +148,4 @@ const Chain = stampit({
  * @return {String[]} Transactions
  */
 
-export default Chain
+export default ContractBase

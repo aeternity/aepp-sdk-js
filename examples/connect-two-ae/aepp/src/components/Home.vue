@@ -46,7 +46,7 @@
           <textarea class="bg-black text-white border-b border-black p-2 w-full h-64" v-model='contractCode' placeholder="contact code"/>
         </div>
       </div>
-      <button class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 text-xs" @click='onCompile'>
+      <button v-if="client" class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 text-xs" @click='onCompile'>
         Compile
       </button>
     </div>
@@ -61,6 +61,34 @@
         </div>
       </div>
     </div>
+    <button v-if="byteCode" class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 text-xs" @click='onDeploy'>
+      Deploy
+    </button>
+
+    <div v-if="deployInfo" class="border mt-4 mb-8 rounded">
+      <div class="bg-green w-full flex flex-row font-mono border border-b">
+        <div class="p-2 w-1/4">
+          Deployed Contract
+        </div>
+        <div v-if="pub" class="p-2 w-3/4 bg-grey-lightest break-words">
+          {{ deployInfo }}
+        </div>
+      </div>
+    </div>
+    <button v-if="deployInfo" class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 text-xs" @click='onCall'>
+      Call
+    </button>
+
+    <div v-if="callResult" class="border mt-4 mb-8 rounded">
+      <div class="bg-green w-full flex flex-row font-mono border border-b">
+        <div class="p-2 w-1/4">
+          Deployed Contract
+        </div>
+        <div v-if="pub" class="p-2 w-3/4 bg-grey-lightest break-words">
+          {{ callResult }}
+        </div>
+      </div>
+    </div>
 
 
   </div>
@@ -68,7 +96,7 @@
 
 <script>
 // AE_SDK_MODULES is a webpack alias present in webpack.config.js
-import Aepp from 'AE_SDK_MODULES/ae/aepp.js'
+import Aepp from '../../../../../es/ae/aepp'
 // import Contract from 'AE_SDK_MODULES/ae/contract.js'
 // import Cli from 'AE_SDK_MODULES/ae/cli.js'
 // import Wallet from 'AE_SDK_MODULES/ae/wallet.js'
@@ -82,14 +110,18 @@ export default {
     return {
       // get from secure storage
       client: null,
+      abi: 'sophia',
       to: null,
       amount: null,
       height: null,
       pub: null,
+      callResult: null,
       contractCode: `contract Identity =
   type state = ()
   function main(x : int) = x`,
-      byteCode: null
+      byteCode: null,
+      contractInitState: '()',
+      deployInfo: null
     }
   },
   computed: {
@@ -99,10 +131,31 @@ export default {
     async compile (code) {
       console.log(`Compiling contract...`)
       try {
-        console.log(await this.client.contractCompile(code))
         return await this.client.contractCompile(code)
       } catch (err) {
         this.compileError = err
+        console.error(err)
+      }
+    },
+    async deploy (code, options = {}) {
+      console.log(`Deploying contract...`)
+      try {
+        return await this.client.contractDeploy(this.byteCode, this.abi, { initState: this.contractInitState, options })
+      } catch (err) {
+        this.deployErr = err
+        console.error(err)
+      }
+    },
+    async call (code, abi, contractAddress, method = 'main', returnType = 'int', args = '(5)', options = {}) {
+      console.log(`Deploying contract...`)
+      try {
+        const { result } = await this.client.contractCall(this.byteCode, this.abi, this.deployInfo.address, method, { args: args, options })
+        return Object.assign(
+          result,
+          { decodedRes: await this.client.contractDecodeData(returnType, result.returnValue) }
+        )
+      } catch (err) {
+        this.deployErr = err
         console.error(err)
       }
     },
@@ -110,6 +163,19 @@ export default {
       this.compile(this.contractCode)
         .then(byteCodeObj => {
           this.byteCode = byteCodeObj.bytecode
+        })
+    },
+    onDeploy (options = {}) {
+      this.deploy(this.byteCode, options)
+        .then(deployedContract => {
+          this.deployInfo = deployedContract
+        })
+    },
+    onCall (options = {}) {
+      this.call(this.byteCode)
+        .then(callRes => {
+          console.log(callRes)
+          this.callResult = callRes
         })
     }
   },
@@ -123,15 +189,22 @@ export default {
       ae.address()
         .then(address => {
           this.pub = address
-          // Wallet.compose(Contract)({
-          //   accounts: [MemoryAccount({keypair: {priv: this.account.priv, pub: this.account.pub}})]
-          // })
         })
         .catch(e => { this.pub = `Rejected: ${e}` })
 
-      // ae.sign('Hello World')
-      //   .then(signed => { this.height = signed })
-      //   .catch(e => { this.height = `Rejected: ${e}` })
+      // ae.contractCompile(this.contractCode)
+      //   .then(bytecode => {
+      //     this.bytecode = bytecode.bytecode
+      //     console.log('compiled --> ', bytecode)
+      //     return ae.contractDeploy(bytecode.bytecode, 'sophia', {})
+      //   })
+      //   .then(contract => {
+      //     console.log('deployed contract --->')
+      //     console.log(contract)
+      //     return ae.contractCall(this.bytecode, 'sophia', contract.address, 'main', { args: '(5)', options: {} })
+      //   })
+      //   .then(callRes => console.log(callRes))
+      //   .catch(e => console.log(e))
     })
   }
 }
