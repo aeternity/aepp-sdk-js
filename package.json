@@ -39,6 +39,7 @@
     "bs58check": "^2.1.1",
     "cacache": "^11.2.0",
     "esm": "^3.0.77",
+    "fs": "0.0.1-security",
     "keccak": "^1.4.0",
     "postinstall-build": "^5.0.1",
     "ramda": "^0.25.0",
