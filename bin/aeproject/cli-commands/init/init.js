@@ -5,13 +5,16 @@ const utils = require('../../utils.js');
 const { spawn } = require('promisify-child-process');
 
 const testDir = './test';
-const testFileDestination = `${testDir}/exampleTest.js`;
+const testTemplateFile = 'exampleTests.js';
+const testFileDestination = `${testDir}/example.js`;
 
 const deployDir = './deploy';
+const deployTemplateFile = 'deployTemplate.js';
 const deployFileDestination = `${deployDir}/deploy.js`;
 
 const contractsDir = './contracts';
-const contractFileDestination = `${contractsDir}/LimeFactory.aes`;
+const contractTemplateFile = 'Identity.aes';
+const contractFileDestination = `${contractsDir}/Identity.aes`;
 const artifactsDirectory = `${__dirname}/artifacts/`;
 
 async function run() {
@@ -58,19 +61,19 @@ const installAeppSDK = async () => {
 const setupContracts = () => {
   print(`===== Creating contracts directory =====`);
   utils.createIfExistsFolder(contractsDir);
-  utils.copyFile("Identity.aes", contractFileDestination, artifactsDirectory)
+  utils.copyFile(contractTemplateFile, contractFileDestination, artifactsDirectory)
 }
 
 const setupTests = () => {
   print(`===== Creating tests directory =====`);
   utils.createIfExistsFolder(testDir, "Creating tests file structure");
-  // util.copyFile("example.js", testFileDestination, artifactsDirectory)
+  utils.copyFile(testTemplateFile, testFileDestination, artifactsDirectory)
 }
 
 const setupDeploy = () => {
   print(`===== Creating deploy directory =====`);
   utils.createIfExistsFolder(deployDir, "Creating tests file structure");
-  // util.copyFile("deploy.js", testFileDestination, artifactsDirectory)
+  utils.copyFile(deployTemplateFile, deployFileDestination, artifactsDirectory)
 }
 
 module.exports = {
