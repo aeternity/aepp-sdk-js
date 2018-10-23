@@ -1,19 +1,19 @@
 const fs = require('fs')
 
-const createIfExistsFolder = (dir, message) => {
+const createIfExistsFolder = (dir) => {
 	if (!fs.existsSync(dir)) {
 		fs.mkdirSync(dir);
 	}
 }
 
-const copyFile = (file, dir, libraryDirectory) => {
-	if (fs.existsSync(`${dir}/${file}`)) {
-		throw new Error(`${file} already exists in ${dir} directory. You've probably already initialized aeproject for this project.`);
+const copyFile = (file, targetDir, srcDir) => {
+	if (fs.existsSync(`${targetDir}/${file}`)) {
+		throw new Error(`${file} already exists in ${targetDir} directory.`);
 	}
 
-	const fileSource = `${libraryDirectory}/${file}`;
+	const fileSource = `${srcDir}/${file}`;
 
-	fs.copyFileSync(fileSource, dir);
+	fs.copyFileSync(fileSource, targetDir);
 }
 
 module.exports = {
