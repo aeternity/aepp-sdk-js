@@ -1,28 +1,39 @@
 #!/usr/bin/env node
-// todo
-//
-// todo
-/*
- * todo
- */
 'use strict'
 
-const program = require('commander')
 require = require('esm')(module/*, options */) // use to handle es6 import/export
 
-const utils = require('./../utils/index')
-require('./aeproject-cli-init')
+const program = require('commander')
+const commands = require('./commands')
 
-const EXECUTABLE_CMD = [
-  { name: 'test', desc: 'Scaffold initial project.' }
-]
+const setupVersion = () => {
+  program.version("0.0.1")
+}
 
-utils
- .cli
- .initExecCommands(program)(EXECUTABLE_CMD)
+const setupDefaultHandler = () => {
+  program.on('command:*', () => {
+    program.help();
+  })
+}
 
-program
-  .version("0.0.1")
+const setupCommands = () => {
+  commands.initCommands(program);
+}
 
-program.on('command:*', () => utils.errors.unknownCommandHandler(program)(EXECUTABLE_CMD))
-program.parse(process.argv)
+const parseParams = () => {
+  program.parse(process.argv)
+}
+
+const presentHelpIfNeeded = () => {
+  if (!program.args.length) program.help();
+}
+
+const run = () => {
+  setupVersion();
+  setupDefaultHandler();
+  setupCommands();
+  parseParams();
+  presentHelpIfNeeded();
+}
+
+run();
