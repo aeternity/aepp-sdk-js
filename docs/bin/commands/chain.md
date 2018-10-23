@@ -227,7 +227,7 @@ Get `mempool` from `API`
 
 
 
-If we have `transactions` in `mempool` print them
+If we have `transaction's` in `mempool` print them
 
 
   
