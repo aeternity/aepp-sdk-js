@@ -30,7 +30,7 @@ export function getCmdFromArguments (args) {
 }
 
 // Create `Ae` client
-export async function initClient ({host: url, keypair, internalUrl, force: forceCompatibility, nativeMode = true}) {
+export async function initClient ({url, keypair, internalUrl, force: forceCompatibility, nativeMode = true}) {
   return await Cli({ url, process, keypair, internalUrl, forceCompatibility, nativeMode })
 }
 
