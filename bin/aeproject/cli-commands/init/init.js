@@ -45,11 +45,11 @@ const installAeppSDK = async () => {
   const sdkInstallProcess = spawn('npm', ['install', '@aeternity/aepp-sdk'], {});
 
   sdkInstallProcess.stdout.on('data', (data) => {
-    console.log(`${data}`);
+    print(`${data}`);
   });
 
   sdkInstallProcess.stderr.on('data', (data) => {
-    console.log(`WARN: ${data}`);
+    print(`WARN: ${data}`);
   });
 
   await sdkInstallProcess;
