@@ -28,7 +28,7 @@ const { Contract } = require('./commands')
 
 // ## Initialize `options`
 program
-  .option('--host [hostname]', 'Node to connect to', utils.constant.EPOCH_URL)
+  .option('-u --url [hostname]', 'Node to connect to', utils.constant.EPOCH_URL)
   .option('--internalUrl [internal]', 'Node to connect to(internal)', utils.constant.EPOCH_INTERNAL_URL)
   .option('-T, --ttl [ttl]', 'Validity of the transaction in number of blocks (default forever)', utils.constant.CONTRACT_TTL)
   .option('-n, --nonce [nonce]', 'Override the nonce that the transaction is going to be sent with')
