@@ -16,7 +16,6 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-
 'use strict'
 
 require = require('esm')(module /*, options */ ) // use to handle es6 import/export
