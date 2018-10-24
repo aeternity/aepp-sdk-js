@@ -101,7 +101,6 @@ const setupDocker = () => {
   }
 
   const fileSourceYml = `${artifactsDirectory}/${dockerYmlFile}`;
-  // utils.createIfExistsFolder(dockerDir, "Creating docker directory file structure");
   utils.copyFileOrDir(fileSourceYml, dockerYmlFileDestination, copyOptions)
   utils.copyFileOrDir(fileSourceDir, dockerFilesDestination, copyOptions)
 }
