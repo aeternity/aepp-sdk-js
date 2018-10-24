@@ -6,7 +6,8 @@
   "browser": "dist/aepp-sdk.browser.js",
   "module": "es/index.js",
   "bin": {
-    "aecli": "./bin/aecli.js"
+    "aecli": "./bin/aecli.js",
+    "aeproject": "./bin/aeproject/aeproject-cli.js"
   },
   "sideEffects": false,
   "scripts": {
@@ -38,8 +39,10 @@
     "bs58check": "^2.1.1",
     "cacache": "^11.2.0",
     "esm": "^3.0.77",
+    "fs": "0.0.1-security",
     "keccak": "^1.4.0",
     "postinstall-build": "^5.0.1",
+    "promisify-child-process": "^2.1.2",
     "ramda": "^0.25.0",
     "recursive-rename": "^2.0.0",
     "rlp": "^2.0.0",
