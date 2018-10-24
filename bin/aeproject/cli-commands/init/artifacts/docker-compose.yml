@@ -1,0 +1,32 @@
+version: '3'
+services:
+  sdk:
+    build:
+      context: .
+      dockerfile: Dockerfile.ci
+    depends_on: [node]
+    entrypoint: docker/wait-for-it.sh node:3013 --
+    env_file: [./docker/sdk.env]
+    environment:
+      - WALLET_PRIV=${WALLET_PRIV}
+      - WALLET_PUB=${WALLET_PUB}
+    volumes:
+      - .:/app
+      - .:/node_modules/@aeternity/aepp-sdk
+
+  node:
+    image: aeternity/epoch:${TAG}
+    hostname: node
+    expose: [3013, 3113]
+    environment:
+      EPOCH_CONFIG: /home/epoch/epoch.yaml
+    command: -aecore expected_mine_rate ${EPOCH_MINE_RATE:-5000}
+    volumes:
+      - ${PWD}/docker/epoch_node_mean16.yaml:/home/epoch/epoch.yaml
+      - ${PWD}/docker/keys/node:/home/epoch/node/keys
+      - node_db:/home/epoch/node/data/mnesia
+      - node_keys:/home/epoch/node/keys
+
+volumes:
+  node_db:
+  node_keys:

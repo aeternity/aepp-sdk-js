@@ -1,0 +1,28 @@
+---
+peers: []
+
+http:
+  external:
+    port: 3013
+  internal:
+    listen_address: 0.0.0.0
+
+websocket:
+  internal:
+    listen_address: 0.0.0.0
+
+keys:
+  password: "top secret"
+  dir: ./keys
+
+chain:
+  persist: true
+
+mining:
+  beneficiary: "ak_25MZX3BXYP32YDPGWsJqYZ6CgWnqD93VdpCYaTk6KsThEbeFJX"
+  autostart: true
+  cuckoo:
+    miner:
+      executable: mean16s-generic
+      extra_args: ""
+      node_bits: 16

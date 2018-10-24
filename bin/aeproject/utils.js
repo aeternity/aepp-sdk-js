@@ -1,4 +1,4 @@
-const fs = require('fs')
+const fs = require('fs-extra')
 
 const createIfExistsFolder = (dir) => {
 	if (!fs.existsSync(dir)) {
@@ -6,17 +6,15 @@ const createIfExistsFolder = (dir) => {
 	}
 }
 
-const copyFile = (file, targetDir, srcDir) => {
-	if (fs.existsSync(`${targetDir}/${file}`)) {
-		throw new Error(`${file} already exists in ${targetDir} directory.`);
+const copyFileOrDir = (sourceFileOrDir, destinationFileOrDir, copyOptions = {}) => {
+	if (fs.existsSync(`${destinationFileOrDir}`)) {
+		throw new Error(`${destinationFileOrDir} already exists.`);
 	}
 
-	const fileSource = `${srcDir}/${file}`;
-
-	fs.copyFileSync(fileSource, targetDir);
+	fs.copySync(sourceFileOrDir, destinationFileOrDir, copyOptions)
 }
 
 module.exports = {
 	createIfExistsFolder,
-	copyFile
+	copyFileOrDir
 }
