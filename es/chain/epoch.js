@@ -87,6 +87,10 @@ async function poll (th, { blocks = 20, interval = 5000 } = {}) {
   return new Promise((resolve, reject) => probe(resolve, reject))
 }
 
+async function getTxInfo (hash) {
+  return this.api.getTransactionInfoByHash(hash)
+}
+
 async function mempool () {
   return this.api.getPendingTransactions()
 }
@@ -100,6 +104,7 @@ const EpochChain = Chain.compose(Epoch, {
     height,
     awaitHeight,
     poll,
+    getTxInfo,
     mempool
   }
 })
