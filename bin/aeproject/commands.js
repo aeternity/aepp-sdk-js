@@ -34,4 +34,3 @@ const initCommands = (program) => {
 module.exports = {
   initCommands
 }
-

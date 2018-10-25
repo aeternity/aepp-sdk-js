@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
@@ -17,7 +18,7 @@
  */
 'use strict'
 
-require = require('esm')(module/*, options */) // use to handle es6 import/export
+require = require('esm')(module /*, options */ ) // use to handle es6 import/export
 
 const program = require('commander')
 const commands = require('./commands')

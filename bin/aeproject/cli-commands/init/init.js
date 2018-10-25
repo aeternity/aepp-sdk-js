@@ -14,11 +14,16 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-require = require('esm')(module/*, options */) // use to handle es6 import/export
+require = require('esm')(module /*, options */ ) // use to handle es6 import/export
 
-import { printError, print } from '../../../utils/print'
+import {
+  printError,
+  print
+} from '../../../utils/print'
 const utils = require('../../utils.js');
-const { spawn } = require('promisify-child-process');
+const {
+  spawn
+} = require('promisify-child-process');
 
 const testDir = './test';
 const testTemplateFile = 'exampleTests.js';
@@ -31,7 +36,14 @@ const deployFileDestination = `${deployDir}/deploy.js`;
 const contractsDir = './contracts';
 const contractTemplateFile = 'Identity.aes';
 const contractFileDestination = `${contractsDir}/Identity.aes`;
-const artifactsDirectory = `${__dirname}/artifacts/`;
+const artifactsDir = `${__dirname}/artifacts/`;
+
+const dockerDir = './docker';
+const dockerTemplateDir = 'docker';
+const dockerFilesDestination = `${dockerDir}`;
+
+const dockerYmlFile = 'docker-compose.yml'
+const dockerYmlFileDestination = './docker-compose.yml'
 
 async function run() {
   try {
@@ -44,6 +56,7 @@ async function run() {
     setupContracts();
     setupTests();
     setupDeploy();
+    setupDocker();
 
     print('===== Aeproject was successfully initialized! =====');
 
@@ -54,7 +67,8 @@ async function run() {
 }
 
 const installLibraries = async () => {
-  utils.copyFile("package.json", "./package.json", artifactsDirectory)
+  const fileSource = `${artifactsDir}/package.json`;
+  utils.copyFileOrDir(fileSource, "./package.json")
   await installAeppSDK();
 }
 
@@ -76,20 +90,35 @@ const installAeppSDK = async () => {
 
 const setupContracts = () => {
   print(`===== Creating contracts directory =====`);
+  const fileSource = `${artifactsDir}/${contractTemplateFile}`;
   utils.createIfExistsFolder(contractsDir);
-  utils.copyFile(contractTemplateFile, contractFileDestination, artifactsDirectory)
+  utils.copyFileOrDir(fileSource, contractFileDestination)
 }
 
 const setupTests = () => {
   print(`===== Creating tests directory =====`);
+  const fileSource = `${artifactsDir}/${testTemplateFile}`;
   utils.createIfExistsFolder(testDir, "Creating tests file structure");
-  utils.copyFile(testTemplateFile, testFileDestination, artifactsDirectory)
+  utils.copyFileOrDir(fileSource, testFileDestination)
 }
 
 const setupDeploy = () => {
   print(`===== Creating deploy directory =====`);
-  utils.createIfExistsFolder(deployDir, "Creating tests file structure");
-  utils.copyFile(deployTemplateFile, deployFileDestination, artifactsDirectory)
+  const fileSource = `${artifactsDir}/${deployTemplateFile}`;
+  utils.createIfExistsFolder(deployDir, "Creating deploy directory file structure");
+  utils.copyFileOrDir(fileSource, deployFileDestination)
+}
+
+const setupDocker = () => {
+  print(`===== Creating docker directory =====`);
+  const dockerFilesSource = `${artifactsDir}/${dockerTemplateDir}`;
+  const copyOptions = {
+    overwrite: true
+  }
+
+  const dockerYmlFileSource = `${artifactsDir}/${dockerYmlFile}`;
+  utils.copyFileOrDir(dockerYmlFileSource, dockerYmlFileDestination, copyOptions)
+  utils.copyFileOrDir(dockerFilesSource, dockerFilesDestination, copyOptions)
 }
 
 module.exports = {
