@@ -25,7 +25,7 @@ module.exports = {
   mode: process.env.NODE_ENV === 'prod' ? 'production' : 'development',
   resolve: {
     alias: {
-      AE_SDK_MODULES: '@aeternity/aepp-sdk/es'
+      AE_SDK_MODULES: path.resolve(__dirname, 'node_modules/@aeternity/aepp-sdk/es/')
     }
   },
   entry: {
@@ -70,27 +70,18 @@ module.exports = {
   ],
   module: {
     rules: [
+      // {
+      //   test: /\.js$/,
+      //   loader: jsLoader,
+      //   // include: [path.resolve(__dirname, 'aepp'), path.resolve(__dirname, 'wallet')]
+      //   exclude: /node_modules/
+      // },
       {
         test: /\.js$/,
-        loader: jsLoader,
-        // include: [path.resolve(__dirname, 'aepp'), path.resolve(__dirname, 'wallet')]
-        exclude: /node_modules/
-      },
-      {
-        test: /\.js$/,
-        include: [
-          path.resolve(__dirname, 'node_modules/@aeternity'),
-          path.resolve(__dirname, 'node_modules/rlp')
-        ],
-        loader: 'babel-loader',
-        options: {
-          presets: ['@babel/preset-env'],
-          plugins: [
-            '@babel/plugin-proposal-object-rest-spread',
-            '@babel/plugin-transform-runtime',
-            '@babel/plugin-proposal-export-default-from'
-          ]
-        }
+        // exclude: /node_modules/,
+        exclude: [/node_modules/],
+        include: [/node_modules\/@aeternity/, /node_modules\/rlp/],
+        loader: 'babel-loader'
       },
       {
         test: /\.css$/,
