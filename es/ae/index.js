@@ -49,7 +49,8 @@ async function send (tx, options) {
  * @instance
  * @category async
  * @rtype (amount: Number, recipientId: String, options?: Object) => Promise[String]
- * @param {String} tx - Transaction
+ * @param {Number} amount - Amount of tokens to send
+ * @param {String} recipientId - An address of tokens receiver
  * @param {Object} options - Options
  * @return {String|String} Transaction or transaction hash
  */
