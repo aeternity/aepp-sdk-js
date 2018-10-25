@@ -65,7 +65,7 @@ export async function ready (mocha) {
 export async function execute (args) {
   return new Promise((resolve, reject) => {
     let result = ''
-    const child = spawn(cliCommand, [...args, '--host', url, '--internalUrl', internalUrl])
+    const child = spawn(cliCommand, [...args, '--url', url, '--internalUrl', internalUrl])
     child.stdin.setEncoding('utf-8')
     child.stdout.on('data', (data) => {
       result += (data.toString())

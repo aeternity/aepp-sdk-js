@@ -21,8 +21,9 @@ import Chain from '../chain/epoch'
 import Aens from './aens'
 import Contract from './contract'
 import Transaction from '../tx/tx'
+import EpochContract from '../contract/epoch'
 
-const Cli = Ae.compose(Account, Chain, Transaction, Aens, Contract, {
+const Cli = Ae.compose(Account, Chain, Transaction, Aens, EpochContract, Contract, {
   init () {},
   props: { process: {} }
 })
