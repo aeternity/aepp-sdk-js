@@ -19,15 +19,14 @@ import stampit from '@stamp/it'
 import * as R from 'ramda'
 
 function asyncInit (options = {}, { stamp, args, instance }) {
-  return R.reduce(async (instance, init) => {
+  return stamp.compose.deepConfiguration.AsyncInit.initializers.reduce(async (instance, init) => {
     instance = await Promise.resolve(instance)
     if (typeof init === 'function') {
       const ret = await Promise.resolve(init.call(instance, options, { stamp, args, instance }))
       return ret === undefined ? instance : ret
-    } else {
-      return instance
     }
-  }, instance, stamp.compose.deepConfiguration.AsyncInit.initializers)
+    return instance
+  }, instance)
 }
 
 const AsyncInit = stampit({
