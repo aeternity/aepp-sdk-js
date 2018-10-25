@@ -16,10 +16,10 @@
  */
 
 /**
- * Chain module
- * @module @aeternity/aepp-sdk/es/chain
- * @export Chain
- * @example import Chain from '@aeternity/aepp-sdk/es/chain'
+ * Contract module
+ * @module @aeternity/aepp-sdk/es/contract
+ * @export ContractBase
+ * @example import ContractBase from '@aeternity/aepp-sdk/es/contract'
  */
 
 import stampit from '@stamp/it'
