@@ -73,7 +73,7 @@ export function toBytes (val) {
     const s = Math.ceil(bitSize(val) / 8)
     return Buffer.from(toBigEndian(s, val))
   } else if (typeof val === 'string') {
-    return val.toString('utf-8')
+    return val
   } else {
     throw new Error('Byte serialization not supported')
   }
