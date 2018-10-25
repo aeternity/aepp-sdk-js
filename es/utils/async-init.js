@@ -20,9 +20,9 @@ import * as R from 'ramda'
 
 function asyncInit (options = {}, { stamp, args, instance }) {
   return R.reduce(async (instance, init) => {
-    instance = await Promise.resolve(instance)
+    instance = await instance
     if (typeof init === 'function') {
-      const ret = await Promise.resolve(init.call(instance, options, { stamp, args, instance }))
+      const ret = await init.call(instance, options, { stamp, args, instance })
       return ret === undefined ? instance : ret
     } else {
       return instance
