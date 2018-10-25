@@ -73,12 +73,6 @@ module.exports = {
   ],
   module: {
     rules: [
-      // {
-      //   test: /\.js$/,
-      //   loader: jsLoader,
-      //   // include: [path.resolve(__dirname, 'aepp'), path.resolve(__dirname, 'wallet')]
-      //   exclude: /node_modules/
-      // },
       {
         test: /\.js$/,
         // exclude: /node_modules/,
