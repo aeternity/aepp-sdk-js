@@ -96,7 +96,6 @@ const createSalt = salt
 /**
  * Decode data using the default encoding/decoding algorithm
  *
- * @param {string} recipientId Tthe public key of the recipient
  * @param {string} data  An encoded and prefixed string (ex tx_..., sg_..., ak_....)
  * @param {string} type Prefix of Transaction
  * @return {Buffer} Buffer of decoded Base58 data
