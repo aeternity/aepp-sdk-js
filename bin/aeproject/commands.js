@@ -15,6 +15,8 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 const init = require('./cli-commands/init/init.js');
+const testConfig = require('./cli-commands/test/test-config.js');
+
 
 const addInitOption = (program) => {
   program
@@ -25,12 +27,26 @@ const addInitOption = (program) => {
     })
 }
 
+const addTestOption = (program) => {
+  program
+    .command('test')
+    .description('Running the tests')
+    .action(async () => {
+      await testConfig.run();
+    })
+}
+
 
 const initCommands = (program) => {
   addInitOption(program);
 }
 
+const testCommands = (program) => {
+  addTestOption(program);
+}
+
 
 module.exports = {
-  initCommands
+  initCommands,
+  testCommands
 }
