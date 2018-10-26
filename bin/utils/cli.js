@@ -18,7 +18,7 @@
 */
 import * as R from 'ramda'
 
-import Cli from '../../es/ae/cli'
+import Cli from '../../src/ae/cli'
 import { getWalletByPathAndDecrypt } from './account'
 
 // ## Merge options with parent options.

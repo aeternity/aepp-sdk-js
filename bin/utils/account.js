@@ -19,8 +19,8 @@
 import path from 'path'
 import prompt from 'prompt'
 
-import * as Crypto from '../../es/utils/crypto'
-import { dump, getAddressFromPriv, recover } from '../../es/utils/keystore'
+import * as Crypto from '../../src/utils/crypto'
+import { dump, getAddressFromPriv, recover } from '../../src/utils/keystore'
 
 import { print } from './print'
 import { readJSONFile, writeFile } from './helpers'

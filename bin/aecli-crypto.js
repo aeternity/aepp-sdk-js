@@ -22,7 +22,7 @@ const path = require('path')
 
 
 require = require('esm')(module/*, options */) // use to handle es6 import/export
-const Crypto = require('../es/utils/crypto')
+const Crypto = require('../src/utils/crypto')
 const utils = require('./utils/index')
 
 // The `prompt` library provides concealed input of passwords.

@@ -18,7 +18,7 @@
 import { describe, it, before } from 'mocha'
 import { configure, plan, ready, BaseAe } from './'
 import * as R from 'ramda'
-import { generateKeyPair } from '../../es/utils/crypto'
+import { generateKeyPair } from '../../src/utils/crypto'
 
 function randomName () {
   return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString(36) + '.aet'

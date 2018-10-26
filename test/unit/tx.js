@@ -17,8 +17,8 @@
 
 import '../'
 import { describe, it } from 'mocha'
-import { salt } from '../../es/utils/crypto'
-import Tx from '../../es/tx/js'
+import { salt } from '../../src/utils/crypto'
+import Tx from '../../src/tx/js'
 
 describe('Tx', function () {
   it('reproducible commitment hashes can be generated', async () => {

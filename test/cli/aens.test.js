@@ -18,7 +18,7 @@
 import { before, describe, it } from 'mocha'
 
 import { configure, plan, ready, execute, parseBlock, WALLET_NAME } from './index'
-import { generateKeyPair } from '../../es/utils/crypto'
+import { generateKeyPair } from '../../src/utils/crypto'
 
 plan(1000000000)
 

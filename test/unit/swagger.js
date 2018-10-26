@@ -18,7 +18,7 @@
 import '../'
 import { describe, it } from 'mocha'
 import { assert, expect } from 'chai'
-import * as internal from '../../es/utils/swagger'
+import * as internal from '../../src/utils/swagger'
 import * as R from 'ramda'
 import op from './sample-operation.json'
 import def from './sample-definition.json'

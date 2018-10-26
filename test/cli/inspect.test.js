@@ -19,7 +19,7 @@ import fs from 'fs'
 import { describe, it } from 'mocha'
 
 import { configure, BaseAe, execute, parseBlock, KEY_PAIR, ready } from './index'
-import { generateKeyPair } from '../../es/utils/crypto'
+import { generateKeyPair } from '../../src/utils/crypto'
 
 // CONTRACT DESCRIPTOR
 const contractDescriptor = {

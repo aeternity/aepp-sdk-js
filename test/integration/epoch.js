@@ -18,7 +18,7 @@
 import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
 import { configure, url, internalUrl } from './'
-import Epoch from '../../es/epoch'
+import Epoch from '../../src/epoch'
 import * as R from 'ramda'
 
 describe('Epoch client', function () {

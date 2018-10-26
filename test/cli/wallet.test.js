@@ -19,7 +19,7 @@ import fs from 'fs'
 import { before, describe, it } from 'mocha'
 
 import { configure, plan, ready, execute, parseBlock, BaseAe, KEY_PAIR, WALLET_NAME } from './index'
-import { generateKeyPair } from '../../es/utils/crypto'
+import { generateKeyPair } from '../../src/utils/crypto'
 
 const walletName = 'test.wallet'
 

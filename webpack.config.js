@@ -3,7 +3,7 @@ const R = require('ramda')
 
 function configure (filename, opts = {}) {
   return (env, argv) => R.mergeDeepLeft({
-    entry: './es/index.js',
+    entry: './src/index.js',
     mode: 'development', // automatically overriden by production flag
     devtool: argv.mode === 'production' ? 'source-map' : 'eval-source-map',
     module: {

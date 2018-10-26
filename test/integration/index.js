@@ -16,8 +16,8 @@
  */
 
 import '../'
-import Ae from '../../es/ae/cli'
-import * as Crypto from '../../es/utils/crypto'
+import Ae from '../../src/ae/cli'
+import * as Crypto from '../../src/utils/crypto'
 
 const url = process.env.TEST_URL || 'http://localhost:3013'
 const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'

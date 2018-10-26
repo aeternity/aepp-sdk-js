@@ -18,7 +18,7 @@
 import { before, describe, it } from 'mocha'
 import * as R from 'ramda'
 import { configure, BaseAe, execute, parseBlock, ready } from './index'
-import { generateKeyPair } from '../../es/utils/crypto'
+import { generateKeyPair } from '../../src/utils/crypto'
 
 describe('CLI Chain Module', function () {
   let wallet
