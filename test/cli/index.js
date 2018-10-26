@@ -21,7 +21,7 @@ import { generateKeyPair } from '../../es/utils/crypto'
 
 const cliCommand = './bin/aecli.js'
 
-const url = process.env.TEST_URL || ''
+const url = process.env.TEST_URL || 'http://localhost:3013'
 const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
 const TIMEOUT = 18000000
 
