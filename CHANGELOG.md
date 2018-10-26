@@ -10,7 +10,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ### Changed
 - (CLI) New keystore following these specifications: https://www.pivotaltracker.com/n/projects/2124891/stories/155155204
-- (CLI) `Host` parameter `-H` became `Url`. (`-u` for hostname, `-U` for internal)
+- (CLI) `Host` parameter became `Url`. (`-u` for hostname, `-U` for internal)
 
 ### Breaking Change
 - the keypair keys changed from `{ pub, priv }` to `{ publicKey, secretKey }` for consistency with other systems using them (eg. AirGap and [HD Wallet](https://github.com/aeternity/hd-wallet-js))
