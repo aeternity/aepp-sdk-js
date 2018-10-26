@@ -4,7 +4,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [0.24.0-0.2.0]
 ### Added
-- RPC Client improvement
+- RPC Client improvements
 - (RPC) `onContract` Guard
 - (AE PROJECT CLI) born
 
@@ -12,7 +12,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 - (CLI) New keystore following these specifications: https://www.pivotaltracker.com/n/projects/2124891/stories/155155204
 
 ### Breaking Change
-- the keypair keys changed from `{ pub, priv }` to `{ publicKey, secretKey }` for consistency with other systems using them
+- the keypair keys changed from `{ pub, priv }` to `{ publicKey, secretKey }` for consistency with other systems using them (eg. AirGap and [HD Wallet](https://github.com/aeternity/hd-wallet-js))
 
 ### Notes and known Issues
 - CLI and AE PROJECT CLI will move to a separate package
