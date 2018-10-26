@@ -37,12 +37,6 @@ In is generally advised to use ESM (EcmaScript Modules), whenever possible. At
 this point however, this requires a modern _bundler_ which understands ES2015
 `import/export` syntax, such as [webpack] 4 (or newer).
 
-> In addition, **a compiler
-which translates the subset of ES used by aepp-sdk will have to be used**, such as
-[Babel] - `.babelrc` in the project's root directory, shows which transpilation plugins are required, at least.
-
-Also, in the project's root directory, double check the `devDependencies` of the `package.json`, looking for `@babel`/packages that might be helping you to correctly transpile the SDK code `import`ed into your project.
-
 Using this method also enables the use of [Tree shaking] (dead code
 elimination).
 aepp-sdk's `package.json` specifies a seperate entry point for any such tool

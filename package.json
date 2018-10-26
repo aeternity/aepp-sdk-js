@@ -11,7 +11,8 @@
   },
   "sideEffects": false,
   "scripts": {
-    "build": "webpack -p",
+    "build:es": "PRESERVE_ES_IMPORTS=true babel -d es src",
+    "build": "webpack -p && npm run build:es",
     "build:dev": "webpack --mode=development",
     "docs:docco": "docco -t tooling/docs/markdown.jst -c /dev/null bin/*.js && docco -t tooling/docs/markdown.jst -c /dev/null bin/commands/*.js && docco -t tooling/docs/markdown.jst -c /dev/null bin/utils/*.js &&  rm -f docs/null && node rename-to-md.js",
     "docs:api": "node apidoc.js",
