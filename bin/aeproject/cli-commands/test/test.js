@@ -14,53 +14,55 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-require = require('esm')(module /*, options */ ) // use to handle es6 import/export
-import {
-  printError,
-  print
-} from '../../../utils/print'
 
-const Mocha = require("mocha");
-const originalRequire = require("original-require");
+const aeprojectTest = require('./aeproject-test');
+const dir = require('node-dir');
+let path = require("path");
 
-async function run(files) {
-  try {
 
-    print('===== Starting Tests =====');
+const run = async (path) => {
+  var workingDirectory = getWorkDirectoryPath();
+  var testDirectory = '';
 
-    let mochaConfig = {
-      'useColors': true
-    };
-    let mocha = await createMocha(mochaConfig, files);
+  if (path.includes('.js')) {
+    await aeprojectTest.run([path]);
 
-    files.forEach(function (file) {
-      delete originalRequire.cache[file];
-      mocha.addFile(file);
-    });
-
-    await runMocha(mocha);
-
-  } catch (e) {
-    printError(e.message)
-    console.error(e);
+    return;
   }
+
+  testDirectory = path;
+
+  if (!path.includes(workingDirectory)) {
+    testDirectory = `${process.cwd()}/${path}`;
+  }
+
+  const files = await getFiles(testDirectory);
+
+  await aeprojectTest.run(files);
 }
 
-const createMocha = async (config, files) => {
+const getFiles = async function (testDirectory) {
+  let testsRegex = /.*\.(js|es|es6|jsx|sol)$/
 
-  let mocha = new Mocha(config);
+  return new Promise((resolve, reject) => {
+    dir.files(testDirectory, (error, files) => {
+      if (error) {
+        reject(new Error(error));
 
-  files.forEach(file => {
-    mocha.addFile(file);
+        return;
+      }
+
+      files = files.filter(function (file) {
+        return file.match(testsRegex) != null;
+      });
+
+      resolve(files);
+    });
   });
-
-  return mocha
 }
 
-const runMocha = (mocha) => {
-  mocha.run(failures => {
-    process.exitCode = failures ? -1 : 0;
-  });
+function getWorkDirectoryPath() {
+  return path.join(process.cwd());
 }
 
 module.exports = {

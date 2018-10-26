@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
@@ -16,41 +14,55 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-'use strict'
-
 require = require('esm')(module /*, options */ ) // use to handle es6 import/export
+import {
+  printError,
+  print
+} from '../../../utils/print'
 
-const program = require('commander')
-const commands = require('./commands')
+const Mocha = require("mocha");
+const originalRequire = require("original-require");
 
-const setupVersion = () => {
-  program.version("0.0.1")
+async function run(files) {
+  try {
+
+    print('===== Starting Tests =====');
+
+    let mochaConfig = {
+      'useColors': true
+    };
+    let mocha = await createMocha(mochaConfig, files);
+
+    files.forEach(function (file) {
+      delete originalRequire.cache[file];
+      mocha.addFile(file);
+    });
+
+    await runMocha(mocha);
+
+  } catch (e) {
+    printError(e.message)
+    console.error(e);
+  }
 }
 
-const setupDefaultHandler = () => {
-  program.on('command:*', () => {
-    program.help();
-  })
+const createMocha = async (config, files) => {
+
+  let mocha = new Mocha(config);
+
+  files.forEach(file => {
+    mocha.addFile(file);
+  });
+
+  return mocha
 }
 
-const setupCommands = () => {
-  commands.initCommands(program);
+const runMocha = (mocha) => {
+  mocha.run(failures => {
+    process.exitCode = failures ? -1 : 0;
+  });
 }
 
-const parseParams = () => {
-  program.parse(process.argv)
+module.exports = {
+  run
 }
-
-const presentHelpIfNeeded = () => {
-  if (!program.args.length) program.help();
-}
-
-const run = () => {
-  setupVersion();
-  setupDefaultHandler();
-  setupCommands();
-  parseParams();
-  presentHelpIfNeeded();
-}
-
-run();
