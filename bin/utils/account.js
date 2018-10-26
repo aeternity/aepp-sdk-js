@@ -67,13 +67,13 @@ async function promptPasswordAsync () {
 // Generate `keypair` encrypt it using password and write to `ethereum` keystore file
 export async function generateSecureWallet (name, { output, password }) {
   password = password || await promptPasswordAsync()
-  const { priv, pub } = Crypto.generateKeyPair()
+  const { secretKey, publicKey } = Crypto.generateKeyPair(true)
 
-  writeFile(path.join(output, name), JSON.stringify(await dump(password, priv)))
+  writeFile(path.join(output, name), JSON.stringify(await dump(name, password, secretKey)))
 
   print(`
     Wallet saved
-    Wallet address________________ ${pub}
+    Wallet address________________ ${Crypto.aeEncodeKey(publicKey)}
     Wallet path___________________ ${path.resolve(process.cwd(), path.join(output, name))}
   `)
 }
@@ -85,7 +85,7 @@ export async function generateSecureWalletFromPrivKey (name, priv, { output, pas
   const hexStr = Crypto.hexStringToByte(priv.trim())
   const keys = Crypto.generateKeyPairFromSecret(hexStr)
 
-  const encryptedKeyPair = await dump(password, keys.secretKey)
+  const encryptedKeyPair = await dump(name, password, keys.secretKey)
 
   writeFile(path.join(output, name), JSON.stringify(encryptedKeyPair))
 
@@ -106,8 +106,8 @@ export async function getWalletByPathAndDecrypt (walletPath, { password } = {}) 
     const privKey = await recover(password, keyFile)
 
     return {
-      priv: privKey,
-      pub: getAddressFromPriv(privKey)
+      secretKey: privKey,
+      publicKey: getAddressFromPriv(privKey)
     }
   } catch (e) {
     throw new Error('GET WALLET ERROR: ' + e.message)
