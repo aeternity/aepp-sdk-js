@@ -69,11 +69,11 @@ export async function generateSecureWallet (name, { output, password }) {
   password = password || await promptPasswordAsync()
   const { secretKey, publicKey } = Crypto.generateKeyPair(true)
 
-  writeFile(path.join(output, name), JSON.stringify(await dump(name, password, priv)))
+  writeFile(path.join(output, name), JSON.stringify(await dump(name, password, secretKey)))
 
   print(`
     Wallet saved
-    Wallet address________________ ${Crypto.aeEncodeKey(pub)}
+    Wallet address________________ ${Crypto.aeEncodeKey(publicKey)}
     Wallet path___________________ ${path.resolve(process.cwd(), path.join(output, name))}
   `)
 }
