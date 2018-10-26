@@ -123,7 +123,7 @@ async function rpcAddress ({ params, session }) {
  * @example Wallet({
   url: 'https://sdk-testnet.aepps.com/',
   accounts: [MemoryAccount({keypair})],
-  address: keypair.pub,
+  address: keypair.publicKey,
   onTx: confirm,
   onChain: confirm,
   onAccount: confirm

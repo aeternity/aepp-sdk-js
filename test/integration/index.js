@@ -49,8 +49,8 @@ async function ready (mocha) {
   await ae.awaitHeight(3)
 
   if (!charged && planned > 0) {
-    console.log(`Charging new wallet ${account.pub} with ${planned}`)
-    await ae.spend(planned, account.pub)
+    console.log(`Charging new wallet ${account.publicKey} with ${planned}`)
+    await ae.spend(planned, account.publicKey)
     charged = true
   }
 

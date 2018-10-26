@@ -21,8 +21,8 @@ import { generateKeyPair } from '../../es/utils/crypto'
 
 const cliCommand = './bin/aecli.js'
 
-const url = process.env.TEST_URL || 'http://localhost:3013'
-const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
+const url = process.env.TEST_URL || 'https://sdk-edgenet.aepps.com'
+const internalUrl = process.env.TEST_INTERNAL_URL || 'https://sdk-edgenet.aepps.com'
 const TIMEOUT = 18000000
 
 export const KEY_PAIR = generateKeyPair()
@@ -51,14 +51,14 @@ export async function ready (mocha) {
   await ae.awaitHeight(3)
 
   if (!charged && planned > 0) {
-    console.log(`Charging new wallet ${KEY_PAIR.pub} with ${planned}`)
-    await ae.spend(planned, KEY_PAIR.pub)
+    console.log(`Charging new wallet ${KEY_PAIR.publicKey} with ${planned}`)
+    await ae.spend(planned, KEY_PAIR.publicKey)
     charged = true
   }
 
   const client = await BaseAe()
   client.setKeypair(KEY_PAIR)
-  await execute(['account', 'save', WALLET_NAME, '--password', 'test', KEY_PAIR.priv])
+  await execute(['account', 'save', WALLET_NAME, '--password', 'test', KEY_PAIR.secretKey])
   return client
 }
 

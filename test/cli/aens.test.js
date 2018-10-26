@@ -46,11 +46,11 @@ describe('CLI AENS Module', function () {
     isHash.should.equal(true)
   })
   it('Update Name', async () => {
-    const { pub } = generateKeyPair()
-    console.log(await execute(['name', 'update', WALLET_NAME, '--password', 'test', name, pub]))
+    const { publicKey } = generateKeyPair()
+    console.log(await execute(['name', 'update', WALLET_NAME, '--password', 'test', name, publicKey]))
 
     const nameResult = parseBlock(await execute(['inspect', name]))
-    const isHaveUpdatedPointer = !!(JSON.parse(nameResult.pointers).find(p => p.id === pub))
+    const isHaveUpdatedPointer = !!(JSON.parse(nameResult.pointers).find(p => p.id === publicKey))
 
     nameResult.status.should.equal('CLAIMED')
     isHaveUpdatedPointer.should.equal(true)

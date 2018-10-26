@@ -72,7 +72,7 @@ describe('CLI Contract Module', function () {
     transaction_hash.should.be.ok
     name.should.equal(contractFile)
     pref.should.equal('deploy')
-    address.should.equal(KEY_PAIR.pub.split('_')[1])
+    address.should.equal(KEY_PAIR.publicKey.split('_')[1])
   })
   it('Call Contract', async () => {
     // Call contract
