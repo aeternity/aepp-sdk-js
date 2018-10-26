@@ -2,6 +2,23 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.24.0-0.2.0]
+### Added
+- RPC Client improvement
+- (RPC) `onContract` Guard
+- (AE PROJECT CLI) born
+
+### Changed
+- (CLI) New keystore following these specifications: https://www.pivotaltracker.com/n/projects/2124891/stories/155155204
+
+### Breaking Change
+- the keypair keys changed from `{ pub, priv }` to `{ publicKey, secretKey }` for consistency with other systems using them
+
+### Notes and known Issues
+- CLI and AE PROJECT CLI will move to a separate package
+
+
+
 ## [0.24.0-0.1.0]
 ### Added
 - Full support of [Epoch-0.24.0](https://github.com/aeternity/epoch/releases/tag/v0.24.0)
@@ -139,3 +156,4 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 [0.18.0-0.1.1]: https://github.com/aeternity/aepp-sdk-js/compare/v0.18.0-0.1.0...v0.18.0-0.1.1
 [0.22.0-0.1.0-beta.1]: https://github.com/aeternity/aepp-sdk-js/compare/v0.18.0-0.1.1...v0.22.0-0.1.0-beta.1
 [0.24.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.22.0-0.1.0-beta.1...v0.24.0-0.1.0
+[0.24.0-0.2.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.24.0-0.1.0...v0.24.0-0.2.0
