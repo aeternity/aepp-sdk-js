@@ -30,7 +30,8 @@ const prefix = /^@aeternity\/aepp-sdk\/es\//
 const templateData = jsdoc2md.getTemplateDataSync(config)
 
 function createDirs (path) {
-  const paths = R.reduce((acc, e) => acc.concat([`${R.last(acc)}/${e}`]), [''], path.split(/\//).slice(1, -1)).slice(1)
+  const paths = path.split(/\//).slice(1, -1)
+    .reduce((acc, e) => acc.concat([`${R.last(acc)}/${e}`]), ['']).slice(1)
 
   R.forEach(dir => {
     try {

@@ -55,7 +55,7 @@ function pascalToSnake (s) {
  * @return {String} Converted string
  */
 function expandPath (path, replacements) {
-  return R.reduce((path, [key, value]) => path.replace(`{${key}}`, value), path, R.toPairs(replacements))
+  return R.toPairs(replacements).reduce((path, [key, value]) => path.replace(`{${key}}`, value), path)
 }
 
 /**
