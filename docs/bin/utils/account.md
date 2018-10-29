@@ -132,7 +132,7 @@ Generate `keypair` encrypt it using password and write to `ethereum` keystore fi
 ```js
 export async function generateSecureWallet (name, { output, password }) {
   password = password || await promptPasswordAsync()
-  const { priv, pub } = Crypto.generateKeyPair()
+  const { secretKey, publicKey } = Crypto.generateKeyPair()
 
   writeFile(path.join(output, name), JSON.stringify(await dump(password, priv)))
 
@@ -199,8 +199,8 @@ export async function getWalletByPathAndDecrypt (walletPath, { password } = {}) 
     const privKey = await recover(password, keyFile)
 
     return {
-      priv: privKey,
-      pub: getAddressFromPriv(privKey)
+      secretKey: privKey,
+      publicKey: getAddressFromPriv(privKey)
     }
   } catch (e) {
     throw new Error('GET WALLET ERROR: ' + e.message)

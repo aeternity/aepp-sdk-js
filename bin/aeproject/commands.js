@@ -33,10 +33,9 @@ const addTestOption = (program) => {
   program
     .command('test')
     .description('Running the tests')
-    .option('-D, --dir [testsDirectory]', 'Directory where tests are', './test')
+    .option('--path [tests path]', 'Path to test files', './test')
     .action(async (options) => {
-
-      await testConfig.run(options);
+      await testConfig.run(options.path);
     })
 }
 

@@ -21,7 +21,7 @@ let path = require("path");
 
 
 const run = async (path) => {
-  var workingDirectory = getWorkDirectoryPath();
+  var workingDirectory = process.cwd();
   var testDirectory = '';
 
   if (path.includes('.js')) {
@@ -59,10 +59,6 @@ const getFiles = async function (testDirectory) {
       resolve(files);
     });
   });
-}
-
-function getWorkDirectoryPath() {
-  return path.join(process.cwd());
 }
 
 module.exports = {
