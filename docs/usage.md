@@ -201,7 +201,7 @@ Example spend function, using the SDK, talking directly to the API (**purist**):
 
     const tx = await Tx({url: 'HOST_URL_HERE'})
     const chain = await Chain({url: 'HOST_URL_HERE'})
-    const account = Account({keypair: {priv: 'PRIV_KEY_HERE', pub: 'PUB_KEY_HERE'}})
+    const account = Account({keypair: {secretKey: 'PRIV_KEY_HERE', publicKey: 'PUB_KEY_HERE'}})
     const spendTx = await tx.spendTx({sender: 'PUB_KEY_HERE', receiver_pub_key, amount}))
 
     const signed = await account.signTransaction(spendTx, 'PUB_KEY_HERE')
@@ -217,7 +217,7 @@ The same code, using the SDK abstraction (**high-level**):
 
   Wallet({
     url: 'HOST_URL_HERE',
-    accounts: [MemoryAccount({keypair: {priv: 'PRIV_KEY_HERE', pub: 'PUB_KEY_HERE'}})],
+    accounts: [MemoryAccount({keypair: {secretKey: 'PRIV_KEY_HERE', publicKey: 'PUB_KEY_HERE'}})],
     address: 'PUB_KEY_HERE',
     onTx: confirm, // guard returning boolean
     onChain: confirm, // guard returning boolean

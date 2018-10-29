@@ -23,7 +23,7 @@ describe('Epoch Chain', function () {
   configure(this)
 
   let client
-  const { pub } = generateKeyPair()
+  const { publicKey } = generateKeyPair()
 
   before(async function () {
     client = await ready(this)
@@ -41,7 +41,7 @@ describe('Epoch Chain', function () {
 
   it('polls for transactions', async () => {
     const sender = await client.address()
-    const receiver = pub
+    const receiver = publicKey
     const { tx } = await client.api.postSpend({
       fee: 1,
       amount: 1,

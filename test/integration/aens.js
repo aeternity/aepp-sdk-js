@@ -51,7 +51,7 @@ describe('Aens', function () {
 
       const aens2 = await BaseAe()
       aens2.setKeypair(newAccount)
-      return aens2.aensUpdate(claim.id, newAccount.pub, { blocks: 1 }).should.eventually.be.rejected
+      return aens2.aensUpdate(claim.id, newAccount.publicKey, { blocks: 1 }).should.eventually.be.rejected
     })
   })
 

@@ -28,7 +28,7 @@ describe('Accounts', function () {
     wallet = await ready(this)
   })
 
-  const { pub: receiver } = generateKeyPair()
+  const { publicKey: receiver } = generateKeyPair()
 
   describe('fails on unknown keypairs', () => {
     let wallet

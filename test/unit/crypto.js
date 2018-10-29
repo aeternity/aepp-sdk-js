@@ -37,9 +37,9 @@ describe('crypto', () => {
     it('generates an account key pair', () => {
       const keyPair = Crypto.generateKeyPair()
       assert.ok(keyPair)
-      assert.isTrue(keyPair.pub.startsWith('ak_'))
-      assert.isAtLeast(keyPair.pub.length, 52)
-      assert.isAtMost(keyPair.pub.length, 53)
+      assert.isTrue(keyPair.publicKey.startsWith('ak_'))
+      assert.isAtLeast(keyPair.publicKey.length, 51)
+      assert.isAtMost(keyPair.publicKey.length, 53)
     })
   })
 
@@ -49,13 +49,13 @@ describe('crypto', () => {
       const password = 'verysecret'
 
       it('works for private keys', () => {
-        const privateBinary = keyPair.priv
+        const privateBinary = keyPair.secretKey
         const encryptedPrivate = Crypto.encryptPrivateKey(password, privateBinary)
         const decryptedPrivate = Crypto.decryptPrivateKey(password, encryptedPrivate)
         assert.deepEqual(decryptedPrivate, privateBinary)
       })
       it('works for public keys', () => {
-        const publicBinary = keyPair.pub
+        const publicBinary = keyPair.publicKey
         const encryptedPublic = Crypto.encryptPublicKey(password, publicBinary)
         const decryptedPublic = Crypto.decryptPubKey(password, encryptedPublic)
         assert.deepEqual(decryptedPublic, publicBinary)
