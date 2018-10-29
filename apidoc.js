@@ -42,8 +42,8 @@ function createDirs (path) {
   }, paths)
 }
 
-const modules = R
-  .filter(R.propEq('kind', 'module'), templateData)
+const modules = templateData
+  .filter(R.propEq('kind', 'module'))
   .map(({ name }) => {
     return { name, out: `api/${name.replace(prefix, '')}` }
   })

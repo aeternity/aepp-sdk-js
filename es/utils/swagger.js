@@ -296,7 +296,7 @@ function operationSignature (name, req, opts) {
   const args = req.length ? `${R.join(', ', R.pluck('name', req))}` : null
   const opt = opts.length ? `{${R.join(', ', R.pluck('name', opts))}}` : null
 
-  return `${name} (${R.join(', ', R.filter(R.identity, [args, opt]))})`
+  return `${name} (${R.join(', ', [args, opt].filter(R.identity))})`
 }
 
 /**
