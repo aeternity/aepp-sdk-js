@@ -42,9 +42,11 @@ function createDirs (path) {
   }, paths)
 }
 
-const modules = R.map(({ name }) => {
-  return { name, out: `api/${name.replace(prefix, '')}` }
-}, R.filter(R.propEq('kind', 'module'), templateData))
+const modules = R
+  .filter(R.propEq('kind', 'module'), templateData)
+  .map(({ name }) => {
+    return { name, out: `api/${name.replace(prefix, '')}` }
+  })
 
 R.forEachObjIndexed(({ name, out }) => {
   const template = `{{#module name="${name}"}}{{>docs}}{{/module}}`

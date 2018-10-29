@@ -33,7 +33,7 @@ const AsyncInit = stampit({
   deepConf: { AsyncInit: { initializers: [] } },
   composers ({ stamp, composables }) {
     const conf = stamp.compose.deepConfiguration.AsyncInit
-    conf.initializers = R.without([asyncInit], R.uniqWith(R.identical, R.flatten(R.map(c => R.path(['compose', 'deepConfiguration', 'AsyncInit', 'initializers'], c) || (c.compose || c).initializers || [], composables))))
+    conf.initializers = R.without([asyncInit], R.uniqWith(R.identical, R.flatten(composables.map(c => R.path(['compose', 'deepConfiguration', 'AsyncInit', 'initializers'], c) || (c.compose || c).initializers || []))))
     stamp.compose.initializers = [asyncInit]
   }
 })

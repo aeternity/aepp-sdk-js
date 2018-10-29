@@ -140,7 +140,7 @@ const conformTypes = {
   },
   object (value, spec, types) {
     if (R.type(value) === 'Object') {
-      const required = R.map(snakeToPascal, spec.required || [])
+      const required = (spec.required || []).map(snakeToPascal)
       const properties = pascalizeKeys(spec.properties)
       const missing = R.difference(required, R.keys(value))
 
@@ -155,7 +155,7 @@ const conformTypes = {
   },
   array (value, spec, types) {
     if (R.type(value) === 'Array') {
-      return R.map(o => conform(o, spec.items, types), value)
+      return value.map(o => conform(o, spec.items, types))
     } else {
       throw TypeError(`Not an array`, spec, value)
     }
@@ -167,7 +167,7 @@ const conformTypes = {
     return conform(value, lookupType(['$ref'], spec, types), types)
   },
   allOf (value, spec, types) {
-    return R.mergeAll(R.map(spec => conform(value, spec, types), spec.allOf))
+    return R.mergeAll(spec.allOf.map(spec => conform(value, spec, types)))
   }
 }
 
@@ -239,7 +239,7 @@ function classifyParameters (parameters) {
  * @return {Object[]} Pascalized parameters
  */
 function pascalizeParameters (parameters) {
-  return R.map(o => R.assoc('name', snakeToPascal(o.name), o), parameters)
+  return parameters.map(o => R.assoc('name', snakeToPascal(o.name), o))
 }
 
 /**
@@ -253,8 +253,8 @@ function pascalizeParameters (parameters) {
  */
 const traverseKeys = R.curry((fn, o) => {
   const dispatch = {
-    Object: o => R.fromPairs(R.map(([k, v]) => [fn(k), traverseKeys(fn, v)], R.toPairs(o))),
-    Array: o => R.map(traverseKeys(fn), o)
+    Object: o => R.fromPairs(R.toPairs(o).map(([k, v]) => [fn(k), traverseKeys(fn, v)])),
+    Array: o => o.map(traverseKeys(fn))
   }
 
   return (dispatch[R.type(o)] || R.identity)(o)
