@@ -58,38 +58,43 @@ const ContractBase = stampit({
 }))
 
 /**
- * Submit a signed transaction for mining
+ * Encode contract data
  * @function contractEpochEncodeCallData
  * @instance
  * @abstract
  * @category async
- * @rtype (tx: String, options?: Object) => tx: Promise[String]|txHash: Promise[String]
- * @param {String} tx - Transaction to submit
- * @param {String} [options={}] - Options to pass to the implementation
- * @return {String|String} Transaction or transaction hash
+ * @rtype (code: String, abi: String, name: String, args: Object) => callData: Promise[String]
+ * @param {String} code - Contract code
+ * @param {String} abu - Contract compiler name
+ * @param {String} name - Function name
+ * @param {String} args - Function argument's
+ * @return {String} - Contract encoded data
  */
 
 /**
- * Obtain current height of the chain
+ * Call the contract
  * @function contractEpochCall
  * @instance
  * @abstract
  * @category async
- * @rtype () => height: Number
- * @return {Number} Current chain height
+ * @rtype (code: String, abi: String, name: String, args: Object) => callData: Promise[String]
+ * @param {String} code - Contract code
+ * @param {String} abu - Contract compiler name
+ * @param {String} name - Function name
+ * @param {String} args - Function argument's
+ * @return {Object} - Contract call result
  */
 
 /**
- * Wait for the chain to reach a specific height
+ * Decode data
  * @function contractEpochDecodeData
  * @instance
  * @abstract
  * @category async
- * @rtype (height: Number, options?: Object) => height: Number
- * @param {Object} [options={}] - Options
- * @param {Number} options.interval - Interval (in ms) at which to poll the chain
- * @param {Number} options.attempts - Number of polling attempts after which to fail
- * @return {Number} Current chain height
+ * @rtype (type: String, data: String) => decodedResult: Promise[String]
+ * @param {String} type - Contract call result type
+ * @param {String} data - Encoded contract call result
+ * @return {String} - Decoded contract call result
  */
 
 /**
