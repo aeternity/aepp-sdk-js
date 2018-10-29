@@ -72,7 +72,7 @@ export default {
     Wallet({
       url: 'https://sdk-edgenet.aepps.com',
       internalUrl: 'https://sdk-edgenet.aepps.com',
-      accounts: [MemoryAccount({keypair: {priv: this.priv, pub: this.pub}})],
+      accounts: [MemoryAccount({keypair: {secretKey: this.priv, publicKey: this.pub}})],
       address: this.pub,
       onTx: this.confirmDialog,
       onChain: this.confirmDialog,

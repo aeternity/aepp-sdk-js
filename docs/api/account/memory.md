@@ -20,6 +20,6 @@ In-memory `Account` factory
 | --- | --- | --- | --- |
 | [options] | `Object` | <code>{}</code> | Initializer object |
 | options.keypair | `Object` |  | Key pair to use |
-| options.keypair.pub | `String` |  | Public key |
-| options.keypair.priv | `String` |  | Private key |
+| options.keypair.publicKey | `String` |  | Public key |
+| options.keypair.secretKey| `String` |  | Private key |
 

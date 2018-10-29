@@ -67,11 +67,11 @@ function extractReadableKeys (dir, options) {
 
 // ## Key Pair Generation
 function generateKeyPair (name, { output }) {
-  const { pub, priv } = Crypto.generateKeyPair()
+  const { publicKey, secretKey } = Crypto.generateKeyPair()
 
   const data = [
-    [path.join(output, name), priv],
-    [path.join(output, `${name}.pub`), pub]
+    [path.join(output, name), secretKey],
+    [path.join(output, `${name}.pub`), publicKey]
   ]
 
   data.forEach(([path, data]) => {

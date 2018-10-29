@@ -48,17 +48,17 @@ export async function ready (mocha) {
   configure(mocha)
 
   const ae = await BaseAe()
-  await ae.awaitHeight(5)
+  await ae.awaitHeight(3)
 
   if (!charged && planned > 0) {
-    console.log(`Charging new wallet ${KEY_PAIR.pub} with ${planned}`)
-    await ae.spend(planned, KEY_PAIR.pub)
+    console.log(`Charging new wallet ${KEY_PAIR.publicKey} with ${planned}`)
+    await ae.spend(planned, KEY_PAIR.publicKey)
     charged = true
   }
 
   const client = await BaseAe()
   client.setKeypair(KEY_PAIR)
-  await execute(['account', 'save', WALLET_NAME, '--password', 'test', KEY_PAIR.priv])
+  await execute(['account', 'save', WALLET_NAME, '--password', 'test', KEY_PAIR.secretKey])
   return client
 }
 
