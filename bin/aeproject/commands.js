@@ -16,6 +16,7 @@
  */
 const init = require('./cli-commands/init/init.js');
 const testConfig = require('./cli-commands/test/test.js');
+const epoch = require('./cli-commands/epoch/epoch.js');
 const utils = require('../utils/index')
 
 
@@ -39,10 +40,22 @@ const addTestOption = (program) => {
     })
 }
 
+const addEpochOption = (program) => {
+  program
+    .command('epoch')
+    .description('Running the epoch')
+    .option('-off, --stop', 'Stop the epoch')
+    .option('-on, --start', 'Start the epoch')
+    .action(async (options) => {
+      await testConfig.run(options);
+    })
+}
+
 
 const initCommands = (program) => {
   addInitOption(program);
   addTestOption(program);
+  addEpochOption(program);
 }
 
 module.exports = {
