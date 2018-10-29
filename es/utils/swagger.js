@@ -34,7 +34,7 @@ import * as R from 'ramda'
  * @return {String} Converted string
  */
 function snakeToPascal (s) {
-  return s.replace(/_./g, match => R.toUpper(match[1]))
+  return s.replace(/_./g, match => match[1].toUpperCase())
 }
 
 /**
@@ -44,7 +44,7 @@ function snakeToPascal (s) {
  * @return {String} Converted string
  */
 function pascalToSnake (s) {
-  return s.replace(/[A-Z]/g, match => `_${R.toLower(match)}`)
+  return s.replace(/[A-Z]/g, match => `_${match.toLowerCase()}`)
 }
 
 /**
@@ -325,7 +325,7 @@ function destructureClientError (error) {
   const { status, data } = error.response
   const reason = R.has('reason', data) ? data.reason : R.toString(data)
 
-  return `${R.toUpper(method)} to ${url} failed with ${status}: ${reason}`
+  return `${method.toUpperCase()} to ${url} failed with ${status}: ${reason}`
 }
 
 /**
@@ -341,7 +341,7 @@ function destructureClientError (error) {
  */
 const operation = R.memoize((path, method, definition, types) => {
   const { operationId, parameters, description } = definition
-  const name = `${R.toLower(R.head(operationId))}${R.drop(1, operationId)}`
+  const name = `${R.head(operationId).toLowerCase()}${R.drop(1, operationId)}`
   const pascalized = pascalizeParameters(parameters)
 
   const { pathArgs, queryArgs, bodyArgs, req, opts } = classifyParameters(pascalized)
@@ -395,7 +395,7 @@ const operation = R.memoize((path, method, definition, types) => {
         })())
 
         if (opt.debug) {
-          console.log(`Going to ${R.toUpper(method)} ${url}${expandedPath} with ${R.toString(params)}`)
+          console.log(`Going to ${method.toUpperCase()} ${url}${expandedPath} with ${R.toString(params)}`)
         }
 
         try {
