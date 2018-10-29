@@ -16,7 +16,7 @@
  */
 
 /**
- * Accounts module
+ * Wallet module
  * @module @aeternity/aepp-sdk/es/ae/wallet
  * @export Wallet
  * @example import Wallet from '@aeternity/aepp-sdk/es/ae/wallet'
@@ -119,6 +119,7 @@ async function rpcAddress ({ params, session }) {
  * @param {Function} [options.onTx] - Tx method protector function
  * @param {Function} [options.onChain] - Chain method protector function
  * @param {Function} [options.onAccount] - Account method protector function
+ * @param {Function} [options.onContract] - Contract method protector function
  * @return {Object} Wallet instance
  * @example Wallet({
   url: 'https://sdk-testnet.aepps.com/',
@@ -127,6 +128,7 @@ async function rpcAddress ({ params, session }) {
   onTx: confirm,
   onChain: confirm,
   onAccount: confirm
+  onContract: confirm
 })
  */
 const Wallet = Ae.compose(Accounts, Chain, Tx, EpochContract, Contract, Rpc, Selector, {

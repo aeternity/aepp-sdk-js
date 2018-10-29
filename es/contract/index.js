@@ -16,10 +16,10 @@
  */
 
 /**
- * Chain module
- * @module @aeternity/aepp-sdk/es/chain
- * @export Chain
- * @example import Chain from '@aeternity/aepp-sdk/es/chain'
+ * Contract module
+ * @module @aeternity/aepp-sdk/es/contract
+ * @export Contract
+ * @example import Contract from '@aeternity/aepp-sdk/es/contract'
  */
 
 import stampit from '@stamp/it'
@@ -28,13 +28,14 @@ import { required } from '@stamp/required'
 /**
  * Basic Contract Stamp
  *
+ * This stamp include api call's related to contract functionality.
  * Attempting to create instances from the Stamp without overwriting all
  * abstract methods using composition will result in an exception.
  * @function
- * @alias module:@aeternity/aepp-sdk/es/chain
+ * @alias module:@aeternity/aepp-sdk/es/contract
  * @rtype Stamp
  * @param {Object} [options={}] - Initializer object
- * @return {Object} Chain instance
+ * @return {Object} Contract instance
  */
 const ContractBase = stampit({
   deepConf: {
@@ -57,17 +58,8 @@ const ContractBase = stampit({
 }))
 
 /**
- * Reconfigure Stamp to (not) wait until transactions are mined
- * @function waitMined
- * @static
- * @rtype (bool: Boolean) => Stamp
- * @param {boolean} bool - Whether to wait for transactions
- * @return {Stamp} Reconfigured Chain Stamp
- */
-
-/**
  * Submit a signed transaction for mining
- * @function sendTransaction
+ * @function contractEpochEncodeCallData
  * @instance
  * @abstract
  * @category async
@@ -79,7 +71,7 @@ const ContractBase = stampit({
 
 /**
  * Obtain current height of the chain
- * @function height
+ * @function contractEpochCall
  * @instance
  * @abstract
  * @category async
@@ -89,7 +81,7 @@ const ContractBase = stampit({
 
 /**
  * Wait for the chain to reach a specific height
- * @function awaitHeight
+ * @function contractEpochDecodeData
  * @instance
  * @abstract
  * @category async
@@ -101,51 +93,15 @@ const ContractBase = stampit({
  */
 
 /**
- * Wait for a transaction to be mined
- * @function poll
+ * Compile epoch contract
+ * @function compileEpochContract
  * @instance
  * @abstract
  * @category async
- * @rtype (th: String, options?: Object) => tx: String
+ * @rtype (code: String, options?: Object) => compiledContract: Object
+ * @param {String} code - Contract source code
  * @param {Object} [options={}] - Options
- * @param {Number} options.interval - Interval (in ms) at which to poll the chain
- * @param {Number} options.blocks - Number of blocks mined after which to fail
- * @return {String} The transaction as it was mined
- */
-
-/**
- * Request the balance of specified account
- * @function balance
- * @instance
- * @abstract
- * @category async
- * @rtype (address: String, options?: Object) => balance: Number
- * @param {String} address - The public account address to obtain the balance for
- * @param {Object} [options={}] - Options
- * @param {Number} options.height - The chain height at which to obtain the balance for (default: top of chain)
- * @param {String} options.hash - TODO
- * @return {String} The transaction as it was mined
- */
-
-/**
- * Obtain a transaction based on its hash
- * @function tx
- * @instance
- * @abstract
- * @category async
- * @rtype (hash: String) => tx: String
- * @param {String} hash - Transaction hash
- * @return {String} Transaction
- */
-
-/**
- * Obtain transactions currently in the mempool
- * @function mempool
- * @instance
- * @abstract
- * @category async
- * @rtype () => txs: [...String]
- * @return {String[]} Transactions
+ * @return {Object} Object which contain bytecode of contract
  */
 
 export default ContractBase

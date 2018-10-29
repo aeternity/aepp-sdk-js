@@ -56,13 +56,13 @@ contract address and ultimately, invoke the deployed contract on the
 
 
 
-We'll need the main client module `Ae` in the `Cli` flavor from the SDK.
+We'll need the main client module `Ae` in the `Universal` flavor from the SDK.
 
 
   
 
 ```js
-const { Cli: Ae } = require('@aeternity/aepp-sdk')
+const { Universal: Ae } = require('@aeternity/aepp-sdk')
 const program = require('commander')
 const fs = require('fs')
 

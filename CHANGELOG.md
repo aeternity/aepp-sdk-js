@@ -68,7 +68,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 - Contract call result decoding support
 - Per-module API documentation (Markdown based on JSDoc)
 - More API documentation (still incomplete)
-- SDK entrypoint factories (in `/es/ae/cli.js`)
+- SDK entrypoint factories (in `/es/ae/universal.js`)
 
 ### Removed
 - Support for < 0.18.0 (changed endpoints)
