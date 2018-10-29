@@ -25,7 +25,7 @@
 'use strict'
 
 // We'll need the main client module `Ae` in the `Universal` flavor from the SDK.
-const { Cli: Ae } = require('@aeternity/aepp-sdk')
+const { Universal: Ae } = require('@aeternity/aepp-sdk')
 const program = require('commander')
 const fs = require('fs')
 
