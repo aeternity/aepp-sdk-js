@@ -26,8 +26,24 @@ const {
 } = require('promisify-child-process');
 
 async function run(option) {
-    console.log(option)
+  
+
   try {
+    var sdkInstallProcess
+    
+    if(option == 'off'){
+      console.log('offfff')
+    }else{
+      sdkInstallProcess = spawn('docker', ['ps'], {});
+      
+      var test = await  sdkInstallProcess.stdout.on('data', (data) => {
+           print(`${data}`);
+         });
+      console.log(test)
+
+      console.log('onnnnnnnnnn')
+    }
+
     print('===== Starting epoch =====');
 
     // const sdkInstallProcess = spawn('npm', ['install', '@aeternity/aepp-sdk'], {});

@@ -46,7 +46,7 @@ const addEpochOption = (program) => {
     .option('-off, --stop', 'Stop the epoch')
     .option('-on, --start', 'Start the epoch')
     .action(async (options) => {
-      await testConfig.run(options);
+      await epoch.run(options);
     })
 }
 
