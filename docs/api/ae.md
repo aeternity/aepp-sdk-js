@@ -12,12 +12,12 @@ import Ae from '@aeternity/aepp-sdk/es/ae'
 * [@aeternity/aepp-sdk/es/ae](#module_@aeternity/aepp-sdk/es/ae)
     * [Ae([options])](#exp_module_@aeternity/aepp-sdk/es/ae--Ae) ⇒ `Object` ⏏
         * [.send(tx, options)](#module_@aeternity/aepp-sdk/es/ae--Ae+send) ⇒ `String` \| `String`
-        * [.spend(tx, options)](#module_@aeternity/aepp-sdk/es/ae--Ae+spend) ⇒ `String` \| `String`
+        * [.spend(amount, recipientId, options)](#module_@aeternity/aepp-sdk/es/ae--Ae+spend) ⇒ `String` \| `String`
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae--Ae"></a>
 
 ### Ae([options]) ⇒ `Object` ⏏
-Basic Account Stamp
+Basic Ae Stamp
 
 Attempting to create instances from the Stamp without overwriting all
 abstract methods using composition will result in an exception.
@@ -55,8 +55,8 @@ Sign and post a transaction to the chain
 
 <a id="module_@aeternity/aepp-sdk/es/ae--Ae+spend"></a>
 
-#### ae.spend(tx, options) ⇒ `String` \| `String`
-Send tokens to recipientId
+#### ae.spend(amount, recipientId, options) ⇒ `String` \| `String`
+Send tokens to another account
 
 **Kind**: instance method of [`Ae`](#exp_module_@aeternity/aepp-sdk/es/ae--Ae)  
 **Returns**: `String` \| `String` - Transaction or transaction hash  
@@ -65,6 +65,7 @@ Send tokens to recipientId
 
 | Param | Type | Description |
 | --- | --- | --- |
-| tx | `String` | Transaction |
+| amount | `Number` | Amount to spend |
+| recipientId | `String` | Address of recipient account |
 | options | `Object` | Options |
 

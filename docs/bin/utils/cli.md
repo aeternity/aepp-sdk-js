@@ -27,7 +27,7 @@ That script contains helper function's for work with `cli`
 */
 import * as R from 'ramda'
 
-import Universal from '../../es/ae/cli'
+import Universal from '../../es/ae/universal'
 import { getWalletByPathAndDecrypt } from './account'
 
 
@@ -67,7 +67,7 @@ Create `Ae` client
   
 
 ```js
-export async function initClient ({host: url, keypair, internalUrl, force: forceCompatibility, nativeMode = true}) {
+export async function initClient ({url, keypair, internalUrl, force: forceCompatibility, nativeMode = true}) {
   return await Universal({ url, process, keypair, internalUrl, forceCompatibility, nativeMode })
 }
 
