@@ -42,9 +42,9 @@ const addTestOption = (program) => {
 const addEpochOption = (program) => {
   program
     .command('epoch')
-    .description('Running the epoch')
-    .option('-off, --stop', 'Stop the epoch')
-    .option('-on, --start', 'Start the epoch')
+    .description('Running the epoch. Without any argument epoch will be runned with --start argument')
+    .option('-p, --stop', 'Stop the epoch')
+    .option('-s, --start', 'Start the epoch')
     .action(async (options) => {
       await epoch.run(options);
     })

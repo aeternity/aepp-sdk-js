@@ -14,50 +14,71 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-require = require('esm')(module /*, options */ ) // use to handle es6 import/export
+require = require('esm')(module /*, options */) // use to handle es6 import/export
 
 import {
   printError,
   print
 } from '../../../utils/print'
 const utils = require('../../utils.js');
-const {
-  spawn
-} = require('promisify-child-process');
+const { spawn } = require('promisify-child-process');
+const dockerCLI = require('docker-cli-js');
+const docker = new dockerCLI.Docker();
+
+async function dockerPs(){
+  let running = false
+  await docker.command('ps', function (err, data) {
+    data.containerList.forEach(function (container) {
+      if (container.image.startsWith("aeternity") && container.status.indexOf("healthy") != -1) {
+        running = true;
+      }
+    })
+  });
+
+  return running;
+}
 
 async function run(option) {
   
-
   try {
     var sdkInstallProcess
+    let running = await dockerPs()
     
-    if(option == 'off'){
-      console.log('offfff')
-    }else{
-      sdkInstallProcess = spawn('docker', ['ps'], {});
+    if (option.stop) {
+      if(running){
+        print('===== Stopping epoch =====');
       
-      var test = await  sdkInstallProcess.stdout.on('data', (data) => {
-           print(`${data}`);
-         });
-      console.log(test)
+        sdkInstallProcess = await spawn('docker-compose', ['down', '-v'], {});
+  
+        print('===== Epoch was successfully stopped! =====');
+      } else {
+        print('===== Epoch is not running! =====');
+      }
+    } else {
+      if(!running){
+        print('===== Starting epoch =====');
 
-      console.log('onnnnnnnnnn')
+        sdkInstallProcess = spawn('docker-compose', ['up', '-d'], {});
+        
+        let notHealthy = true;
+        while(notHealthy){
+          await docker.command('ps', function (err, data) {
+              data.containerList.forEach(function (container) {
+                if (container.image.startsWith("aeternity") && container.status.indexOf("healthy") != -1) {
+                  notHealthy = false;
+                }
+              })
+            });
+  
+          process.stdout.write(".");
+          utils.sleep(1000);
+        }
+  
+        print('\n\r===== Epoch was successfully started! =====');
+      } else {
+        print('===== Epoch already started and healthy started! =====');
+      }
     }
-
-    print('===== Starting epoch =====');
-
-    // const sdkInstallProcess = spawn('npm', ['install', '@aeternity/aepp-sdk'], {});
-
-    // sdkInstallProcess.stdout.on('data', (data) => {
-    //     print(`${data}`);
-    // });
-
-    // sdkInstallProcess.stderr.on('data', (data) => {
-    //     print(`WARN: ${data}`);
-    // });
-
-    print('===== Epoch was successfully started! =====');
-
   } catch (e) {
     printError(e.message)
     console.error(e);
