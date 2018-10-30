@@ -98,7 +98,7 @@
 // AE_SDK_MODULES is a webpack alias present in webpack.config.js
 import Aepp from '../../../../../es/ae/aepp'
 // import Contract from 'AE_SDK_MODULES/ae/contract.js'
-// import Cli from 'AE_SDK_MODULES/ae/cli.js'
+// import Universal from 'AE_SDK_MODULES/ae/universal.js'
 // import Wallet from 'AE_SDK_MODULES/ae/wallet.js'
 // import server from 'AE_SDK_MODULES/rpc/server.js'
 // console.log(server)

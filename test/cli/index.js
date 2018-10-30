@@ -16,7 +16,7 @@
  */
 import { spawn } from 'child_process'
 import * as R from 'ramda'
-import Ae from '../../es/ae/cli'
+import Ae from '../../es/ae/universal'
 import { generateKeyPair } from '../../es/utils/crypto'
 
 const cliCommand = './bin/aecli.js'

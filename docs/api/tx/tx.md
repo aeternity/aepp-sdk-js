@@ -15,6 +15,8 @@ Transaction Stamp
 
 This implementation of [Tx](#exp_module_@aeternity/aepp-sdk/es/tx--Tx) relays
 the creation of transactions to [Epoch](#exp_module_@aeternity/aepp-sdk/es/epoch--Epoch).
+This stamp provide ability to create native spend transaction,
+all other transaction's using Epoch API.
 As there is no built-in security between Epoch and client communication, it
 must never be used for production but can be very useful to verify other
 implementations.
