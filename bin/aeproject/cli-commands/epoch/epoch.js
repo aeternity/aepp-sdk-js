@@ -27,6 +27,7 @@ const docker = new dockerCLI.Docker();
 
 async function dockerPs(){
   let running = false
+
   await docker.command('ps', function (err, data) {
     data.containerList.forEach(function (container) {
       if (container.image.startsWith("aeternity") && container.status.indexOf("healthy") != -1) {
@@ -41,9 +42,9 @@ async function dockerPs(){
 async function run(option) {
   
   try {
-    var sdkInstallProcess
-    let running = await dockerPs()
-    
+    var sdkInstallProcess;
+    let running = await dockerPs();
+
     if (option.stop) {
       if(running){
         print('===== Stopping epoch =====');
@@ -60,16 +61,7 @@ async function run(option) {
 
         sdkInstallProcess = spawn('docker-compose', ['up', '-d'], {});
         
-        let notHealthy = true;
-        while(notHealthy){
-          await docker.command('ps', function (err, data) {
-              data.containerList.forEach(function (container) {
-                if (container.image.startsWith("aeternity") && container.status.indexOf("healthy") != -1) {
-                  notHealthy = false;
-                }
-              })
-            });
-  
+        while(!(await dockerPs())){
           process.stdout.write(".");
           utils.sleep(1000);
         }
