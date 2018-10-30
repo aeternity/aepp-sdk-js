@@ -12,7 +12,8 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 - (CLI) New keystore following these specifications: https://www.pivotaltracker.com/n/projects/2124891/stories/155155204
 - (CLI) `Host` parameter became `Url`. (`-u` for hostname, `-U` for internal)
 
-### Breaking Change
+### Breaking Changes
+- The `Cli` flavor is now `Universal`
 - the keypair keys changed from `{ pub, priv }` to `{ publicKey, secretKey }` for consistency with other systems using them (eg. AirGap and [HD Wallet](https://github.com/aeternity/hd-wallet-js))
 
 ### Notes and known Issues
@@ -86,7 +87,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 - Contract call result decoding support
 - Per-module API documentation (Markdown based on JSDoc)
 - More API documentation (still incomplete)
-- SDK entrypoint factories (in `/es/ae/cli.js`)
+- SDK entrypoint factories (in `/es/ae/universal.js`)
 
 ### Removed
 - Support for < 0.18.0 (changed endpoints)

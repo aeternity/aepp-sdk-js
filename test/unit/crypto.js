@@ -38,7 +38,7 @@ describe('crypto', () => {
       const keyPair = Crypto.generateKeyPair()
       assert.ok(keyPair)
       assert.isTrue(keyPair.publicKey.startsWith('ak_'))
-      assert.isAtLeast(keyPair.publicKey.length, 52)
+      assert.isAtLeast(keyPair.publicKey.length, 51)
       assert.isAtMost(keyPair.publicKey.length, 53)
     })
   })
