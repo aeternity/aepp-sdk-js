@@ -78,7 +78,7 @@ async function getAddress (walletPath, options) {
       async () => {
         print('Your address is: ' + await client.address())
         if (privateKey)
-          print('Your private key is: ' + keypair.priv)
+          print('Your private key is: ' + keypair.secretKey)
       }
     )
   } catch (e) {

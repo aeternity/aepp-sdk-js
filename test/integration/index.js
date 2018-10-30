@@ -16,7 +16,7 @@
  */
 
 import '../'
-import Ae from '../../es/ae/cli'
+import Ae from '../../es/ae/universal'
 import * as Crypto from '../../es/utils/crypto'
 
 const url = process.env.TEST_URL || 'http://localhost:3013'
@@ -46,11 +46,11 @@ async function ready (mocha) {
   configure(mocha)
 
   const ae = await BaseAe()
-  await ae.awaitHeight(10)
+  await ae.awaitHeight(3)
 
   if (!charged && planned > 0) {
-    console.log(`Charging new wallet ${account.pub} with ${planned}`)
-    await ae.spend(planned, account.pub)
+    console.log(`Charging new wallet ${account.publicKey} with ${planned}`)
+    await ae.spend(planned, account.publicKey)
     charged = true
   }
 

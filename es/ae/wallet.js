@@ -16,7 +16,7 @@
  */
 
 /**
- * Accounts module
+ * Wallet module
  * @module @aeternity/aepp-sdk/es/ae/wallet
  * @export Wallet
  * @example import Wallet from '@aeternity/aepp-sdk/es/ae/wallet'
@@ -24,21 +24,26 @@
 
 import Ae from './'
 import Account from '../account'
+import ContractBase from '../contract'
+import Contract from './contract'
 import Accounts from '../accounts'
 import Chain from '../chain/epoch'
 import Rpc from '../rpc/server'
 import Selector from '../account/selector'
 import * as R from 'ramda'
 import Tx from '../tx/tx'
+import EpochContract from '../contract/epoch'
 
 const contains = R.flip(R.contains)
 const isTxMethod = contains(Tx.compose.deepConfiguration.Ae.methods)
 const isChainMethod = contains(Chain.compose.deepConfiguration.Ae.methods)
 const isAccountMethod = contains(Account.compose.deepConfiguration.Ae.methods)
+const isContractMethod = contains(ContractBase.compose.deepConfiguration.Contract.methods)
 const handlers = [
   { pred: isTxMethod, handler: 'onTx', error: 'Creating transaction [{}] rejected' },
   { pred: isChainMethod, handler: 'onChain', error: 'Chain operation [{}] rejected' },
-  { pred: isAccountMethod, handler: 'onAccount', error: 'Account operation [{}] rejected' }
+  { pred: isAccountMethod, handler: 'onAccount', error: 'Account operation [{}] rejected' },
+  { pred: isContractMethod, handler: 'onContract', error: 'Contract operation [{}] rejected' }
 ]
 
 /**
@@ -81,6 +86,11 @@ function onAccount () {
   return Promise.resolve(false)
 }
 
+function onContract () {
+  console.log('Implement onContract!')
+  return Promise.resolve(false)
+}
+
 async function rpcSign ({ params, session }) {
   if (await this.onAccount('sign', params, session)) {
     return this.signWith(session.address, params[0])
@@ -109,26 +119,33 @@ async function rpcAddress ({ params, session }) {
  * @param {Function} [options.onTx] - Tx method protector function
  * @param {Function} [options.onChain] - Chain method protector function
  * @param {Function} [options.onAccount] - Account method protector function
+ * @param {Function} [options.onContract] - Contract method protector function
  * @return {Object} Wallet instance
  * @example Wallet({
   url: 'https://sdk-testnet.aepps.com/',
   accounts: [MemoryAccount({keypair})],
-  address: keypair.pub,
+  address: keypair.publicKey,
   onTx: confirm,
   onChain: confirm,
   onAccount: confirm
+  onContract: confirm
 })
  */
-const Wallet = Ae.compose(Accounts, Chain, Tx, Rpc, Selector, {
-  init ({ onTx = this.onTx, onChain = this.onChain, onAccount = this.onAccount }, { stamp }) {
+const Wallet = Ae.compose(Accounts, Chain, Tx, EpochContract, Contract, Rpc, Selector, {
+  init ({ onTx = this.onTx, onChain = this.onChain, onAccount = this.onAccount, onContract = this.onContract }, { stamp }) {
     this.onTx = onTx
     this.onChain = onChain
     this.onAccount = onAccount
+    this.onContract = onContract
 
-    const { methods } = stamp.compose.deepConfiguration.Ae
+    // Combine `AE` methods with `Contract` and `AENS`
+    const methods = [
+      ...stamp.compose.deepConfiguration.Ae.methods,
+      ...stamp.compose.deepConfiguration.Contract.methods
+    ]
     this.rpcMethods = Object.assign(R.fromPairs(methods.map(m => [m, ({ params, session }) => this.rpc(m, params, session)])), this.rpcMethods)
   },
-  methods: { rpc, onTx, onChain, onAccount },
+  methods: { rpc, onTx, onChain, onAccount, onContract },
   deepProps: {
     rpcMethods: {
       sign: rpcSign,

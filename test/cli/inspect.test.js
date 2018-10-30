@@ -42,13 +42,13 @@ describe('CLI Inspect Module', function () {
   })
   it('Inspect Account', async () => {
 
-    const balance = await wallet.balance(KEY_PAIR.pub)
-    const { account_balance } = parseBlock(await execute(['inspect', KEY_PAIR.pub]))
+    const balance = await wallet.balance(KEY_PAIR.publicKey)
+    const { account_balance } = parseBlock(await execute(['inspect', KEY_PAIR.publicKey]))
 
     parseInt(balance).should.equal(parseInt(account_balance))
   })
   it('Inspect Transaction', async () => {
-    const recipient = (generateKeyPair()).pub
+    const recipient = (generateKeyPair()).publicKey
     const amount = 420
 
     // Create transaction to inspect
@@ -56,7 +56,7 @@ describe('CLI Inspect Module', function () {
 
     const res = parseBlock(await execute(['inspect', hash]))
     res.recipient_account.should.equal(recipient)
-    res.sender_account.should.equal(KEY_PAIR.pub)
+    res.sender_account.should.equal(KEY_PAIR.publicKey)
     parseInt(res.amount).should.equal(amount)
   })
   it('Inspect Block', async () => {
