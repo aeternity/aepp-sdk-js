@@ -102,22 +102,17 @@ async function fundWallets(){
       internalUrl: config.internalHost
     })
   
-  let accountEmpty = true;
-  while(accountEmpty){
+  let balance = 0;
+  while(parseInt(balance) > 0){
     try{
       process.stdout.write(".");
       utils.sleep(1500)
-      
-      let balance = (await client.balance(await client.address()));
-      
-      if(parseInt(balance) > 0){
-        accountEmpty = false
-      }
-
+      balance = (await client.balance(await client.address()));
     }catch(e){
       //todo
     }
   }
+
   let walletIndex = 1;
   defaultWallets.forEach(async function(wallet){
     await fundWallet(client, wallet.publicKey)
@@ -171,20 +166,17 @@ async function run(option) {
         }
   
         print('\n\r===== Epoch was successfully started! =====');
-
         print('===== Funding default wallets! =====');
         
         await fundWallets();
         
         print('\r\n===== Default wallets was successfully funded! =====');
-
       } else {
         print('\r\n===== Epoch already started and healthy started! =====');
       }
     }
   } catch (e) {
     printError(e.message)
-    console.error(e);
   }
 }
 
