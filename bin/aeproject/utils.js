@@ -18,6 +18,9 @@
 const fs = require('fs-extra')
 const dir = require('node-dir');
 const cli = require('./../utils/cli');
+import { printError } from '../utils/print'
+import { handleApiError } from '../utils/errors'
+
 
 const config = {
   host: "http://localhost:3001/",
@@ -45,8 +48,6 @@ const copyFileOrDir = (sourceFileOrDir, destinationFileOrDir, copyOptions = {}) 
 
 const getFiles = async function (directory, regex) {
    return new Promise((resolve, reject) => {
-    console.log(directory)  
-    console.log(regex)  
     dir.files(directory, (error, files) => {
       if (error) {
         reject(new Error(error));
@@ -62,13 +63,18 @@ const getFiles = async function (directory, regex) {
 }
 
 const getClient = async function(){
-  return await cli.initClient(
+  let client;
+
+  await handleApiError(async () => {
+    client = await cli.initClient(
     {
       url: config.host, 
       keypair: config.keyPair, 
       internalUrl: config.internalHost
     })
+  })
 
+  return client;
 }
 
 module.exports = {
