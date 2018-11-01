@@ -1,6 +1,6 @@
 {
   "name": "@aeternity/aepp-sdk",
-  "version": "0.24.0-0.1.0",
+  "version": "0.24.0-0.2.0",
   "description": "SDK for the æternity blockchain",
   "main": "dist/aepp-sdk.js",
   "browser": "dist/aepp-sdk.browser.js",
@@ -102,7 +102,7 @@
     "supports-color": "^5.4.0",
     "uglify-es": "^3.3.9",
     "webpack": "^4.20.1",
-    "webpack-cli": "^3.1.1",
+    "webpack-cli": "^3.1.2",
     "worker-farm": "^1.6.0"
   }
 }

@@ -19,6 +19,7 @@ import Chain from '@aeternity/aepp-sdk/es/chain'
                 * *[.poll([options])](#module_@aeternity/aepp-sdk/es/chain--Chain+poll) ⇒ `String`*
                 * *[.balance(address, [options])](#module_@aeternity/aepp-sdk/es/chain--Chain+balance) ⇒ `String`*
                 * *[.tx(hash)](#module_@aeternity/aepp-sdk/es/chain--Chain+tx) ⇒ `String`*
+                * *[.getTxInfo(hash)](#module_@aeternity/aepp-sdk/es/chain--Chain+getTxInfo) ⇒ `String`*
                 * *[.mempool()](#module_@aeternity/aepp-sdk/es/chain--Chain+mempool) ⇒ `Array.&lt;String&gt;`*
         * _static_
             * [.waitMined(bool)](#module_@aeternity/aepp-sdk/es/chain--Chain.waitMined) ⇒ `Stamp`
@@ -126,10 +127,24 @@ Obtain a transaction based on its hash
 | --- | --- | --- |
 | hash | `String` | Transaction hash |
 
+<a id="module_@aeternity/aepp-sdk/es/chain--Chain+getTxInfo"></a>
+
+#### *chain.getTxInfo(hash) ⇒ `String`*
+Obtain a transaction info based on its hash
+
+**Kind**: instance abstract method of [`Chain`](#exp_module_@aeternity/aepp-sdk/es/chain--Chain)  
+**Returns**: `String` - Transaction  
+**Category**: async  
+**rtype**: `(hash: String) => tx: String`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| hash | `String` | Transaction hash |
+
 <a id="module_@aeternity/aepp-sdk/es/chain--Chain+mempool"></a>
 
 #### *chain.mempool() ⇒ `Array.&lt;String&gt;`*
-Obtain transactions currently in the mempool
+Obtain transaction's from mempool
 
 **Kind**: instance abstract method of [`Chain`](#exp_module_@aeternity/aepp-sdk/es/chain--Chain)  
 **Returns**: `Array.&lt;String&gt;` - Transactions  
