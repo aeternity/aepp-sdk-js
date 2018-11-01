@@ -12,7 +12,7 @@ aeproject init
 The **init** command creates aeternity project structure with a few folders in which the developer can create
 the contracts, tests and deployment files and  scripts. Docker configuration files are also created, for easy use of the aeternity blockchain network.
 
-
+The **compile** command compiles sophia contract. Files should be with .aes file extension. Default directory is $projectDir/contracts.
 
 
 

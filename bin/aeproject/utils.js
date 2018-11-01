@@ -16,6 +16,18 @@
  */
 
 const fs = require('fs-extra')
+const dir = require('node-dir');
+const cli = require('./../utils/cli');
+
+const config = {
+  host: "http://localhost:3001/",
+	internalHost: "http://localhost:3001/internal/",
+	keyPair: {
+		secretKey: 'bb9f0b01c8c9553cfbaf7ef81a50f977b1326801ebf7294d1c2cbccdedf27476e9bbf604e611b5460a3b3999e9771b6f60417d73ce7c5519e12f7e127a1225ca',
+		publicKey: 'ak_2mwRmUeYmfuW93ti9HMSUJzCk1EYcQEfikVSzgo6k2VghsWhgU'
+  },
+  nonce: 1
+}
 
 const createIfExistsFolder = (dir) => {
   if (!fs.existsSync(dir)) {
@@ -31,7 +43,37 @@ const copyFileOrDir = (sourceFileOrDir, destinationFileOrDir, copyOptions = {}) 
   fs.copySync(sourceFileOrDir, destinationFileOrDir, copyOptions)
 }
 
+const getFiles = async function (directory, regex) {
+   return new Promise((resolve, reject) => {
+    console.log(directory)  
+    console.log(regex)  
+    dir.files(directory, (error, files) => {
+      if (error) {
+        reject(new Error(error));
+         return;
+      }
+
+      files = files.filter(function (file) {
+        return file.match(regex) != null;
+      });
+      resolve(files);
+    });
+  });
+}
+
+const getClient = async function(){
+  return await cli.initClient(
+    {
+      url: config.host, 
+      keypair: config.keyPair, 
+      internalUrl: config.internalHost
+    })
+
+}
+
 module.exports = {
   createIfExistsFolder,
-  copyFileOrDir
+  copyFileOrDir,
+  getFiles,
+  getClient
 }

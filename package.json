@@ -43,6 +43,8 @@
     "esm": "^3.0.77",
     "fs": "0.0.1-security",
     "fs-extra": "^7.0.0",
+    "node-dir": "^0.1.17",
+    "path": "^0.12.7",
     "postinstall-build": "^5.0.1",
     "promisify-child-process": "^2.1.2",
     "prompt": "^1.0.0",

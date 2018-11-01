@@ -14,7 +14,7 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-const init = require('./cli-commands/init/init.js');
+const compile = require('./cli-commands/compile/compile.js');
 
 const addInitOption = (program) => {
   program
@@ -25,9 +25,20 @@ const addInitOption = (program) => {
     })
 }
 
+const addCompileOption = (program) => {
+  program
+    .command('compile')
+    .option('--path [compile path]', 'Path to contract files', './contracts')
+    .description('Compile contracts')
+    .action(async (option) => {
+      await compile.run(option.path);
+    })
+}
+
 
 const initCommands = (program) => {
   addInitOption(program);
+  addCompileOption(program);
 }
 
 
