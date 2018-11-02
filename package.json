@@ -50,13 +50,9 @@
     "tweetnacl": "^1.0.0",
     "url": "^0.11.0",
     "uuid": "^3.3.2",
-<<<<<<< HEAD
-    "websocket": "^1.0.26"
-=======
-    "websocket": "^1.0.25",
+    "websocket": "^1.0.26",
     "commander": "^2.14.1",
     "prompt": "^1.0.0"
->>>>>>> develop
   },
   "repository": {
     "type": "git",
