@@ -45,11 +45,12 @@ async function send (tx, options) {
 }
 
 /**
- * Send tokens to recipientId
+ * Send tokens to another account
  * @instance
  * @category async
  * @rtype (amount: Number, recipientId: String, options?: Object) => Promise[String]
- * @param {String} tx - Transaction
+ * @param {Number} amount - Amount to spend
+ * @param {String} recipientId - Address of recipient account
  * @param {Object} options - Options
  * @return {String|String} Transaction or transaction hash
  */
@@ -60,7 +61,7 @@ async function spend (amount, recipientId, options = {}) {
 }
 
 /**
- * Basic Account Stamp
+ * Basic Ae Stamp
  *
  * Attempting to create instances from the Stamp without overwriting all
  * abstract methods using composition will result in an exception.

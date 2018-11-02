@@ -2,6 +2,25 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.24.0-0.2.0]
+### Added
+- RPC Client improvements
+- (RPC) `onContract` Guard
+- (AE PROJECT CLI) born
+
+### Changed
+- (CLI) New keystore following these specifications: https://www.pivotaltracker.com/n/projects/2124891/stories/155155204
+- (CLI) `Host` parameter became `Url`. (`-u` for hostname, `-U` for internal)
+
+### Breaking Changes
+- The `Cli` flavor is now `Universal`
+- the keypair keys changed from `{ pub, priv }` to `{ publicKey, secretKey }` for consistency with other systems using them (eg. AirGap and [HD Wallet](https://github.com/aeternity/hd-wallet-js))
+
+### Notes and known Issues
+- CLI and AE PROJECT CLI will move to a separate package
+
+
+
 ## [0.24.0-0.1.0]
 ### Added
 - Full support of [Epoch-0.24.0](https://github.com/aeternity/epoch/releases/tag/v0.24.0)
@@ -68,7 +87,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 - Contract call result decoding support
 - Per-module API documentation (Markdown based on JSDoc)
 - More API documentation (still incomplete)
-- SDK entrypoint factories (in `/es/ae/cli.js`)
+- SDK entrypoint factories (in `/es/ae/universal.js`)
 
 ### Removed
 - Support for < 0.18.0 (changed endpoints)
@@ -139,3 +158,4 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 [0.18.0-0.1.1]: https://github.com/aeternity/aepp-sdk-js/compare/v0.18.0-0.1.0...v0.18.0-0.1.1
 [0.22.0-0.1.0-beta.1]: https://github.com/aeternity/aepp-sdk-js/compare/v0.18.0-0.1.1...v0.22.0-0.1.0-beta.1
 [0.24.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.22.0-0.1.0-beta.1...v0.24.0-0.1.0
+[0.24.0-0.2.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.24.0-0.1.0...v0.24.0-0.2.0

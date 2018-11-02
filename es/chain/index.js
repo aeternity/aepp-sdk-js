@@ -155,7 +155,7 @@ const Chain = stampit({
  */
 
 /**
- * Obtain transactions currently in the mempool
+ * Obtain transaction's from mempool
  * @function mempool
  * @instance
  * @abstract
