@@ -77,9 +77,18 @@ const getClient = async function(){
   return client;
 }
 
+const sleep = (ms) => {
+  var start = Date.now();
+  while (true) {
+    var clock = (Date.now() - start);
+    if (clock >= ms) break;
+  }
+}
+
 module.exports = {
   createIfExistsFolder,
   copyFileOrDir,
   getFiles,
-  getClient
+  getClient,
+  sleep
 }
