@@ -22,6 +22,9 @@ import {
 
 const Mocha = require("mocha");
 const originalRequire = require("original-require");
+const chai = require("chai");
+const chaiAsPromised = require("chai-as-promised");
+chai.use(chaiAsPromised);
 
 async function run(files) {
   try {
@@ -29,15 +32,17 @@ async function run(files) {
     print('===== Starting Tests =====');
 
     let mochaConfig = {
-      'useColors': true
+      useColors: true,
+      timeout: 550000,
+      exit: true
     };
     let mocha = await createMocha(mochaConfig, files);
+    setGlobalOptions();
 
     files.forEach(function (file) {
       delete originalRequire.cache[file];
       mocha.addFile(file);
     });
-
     await runMocha(mocha);
 
   } catch (e) {
@@ -61,6 +66,10 @@ const runMocha = (mocha) => {
   mocha.run(failures => {
     process.exitCode = failures ? -1 : 0;
   });
+}
+
+async function setGlobalOptions() {
+  global.assert = chai.assert
 }
 
 module.exports = {
