@@ -13,6 +13,15 @@ The **init** command creates aeternity project structure with a few folders in w
 the contracts, tests and deployment files and  scripts. Docker configuration files are also created, for easy use of the aeternity blockchain network.
 
 
+## Run unit tests
+
+```
+aeproject test
+```
+
+The **test** command help developers run their unit tests for aeternity proejcts. The command executes the tests scripts that are located in the **test** folder
+of your aeternity project.
+
 
 
 
