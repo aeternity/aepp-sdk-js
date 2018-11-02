@@ -16,7 +16,7 @@
  */
 const init = require('./cli-commands/init/init.js');
 const testConfig = require('./cli-commands/test/test.js');
-const utils = require('../utils/index')
+
 
 
 const addInitOption = (program) => {

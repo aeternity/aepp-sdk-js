@@ -17,6 +17,16 @@
 
 const fs = require('fs-extra')
 
+// Print helper
+const print = (msg, obj) => {
+  if (obj) { console.log(msg, obj) } else { console.log(msg) }
+}
+
+// Print error helper
+const printError = (msg) => {
+  console.log(msg)
+}
+
 const createIfExistsFolder = (dir) => {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
@@ -32,6 +42,8 @@ const copyFileOrDir = (sourceFileOrDir, destinationFileOrDir, copyOptions = {}) 
 }
 
 module.exports = {
+  print,
+  printError,
   createIfExistsFolder,
   copyFileOrDir
 }

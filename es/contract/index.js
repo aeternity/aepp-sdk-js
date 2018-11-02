@@ -68,6 +68,7 @@ const ContractBase = stampit({
  * @param {String} abu - Contract compiler name
  * @param {String} name - Function name
  * @param {String} args - Function argument's
+ * @param {String} call - Pseudo contract with `__call()` function which simply execute function with params. If you pass this param's `name` and `args` will be ignored
  * @return {String} - Contract encoded data
  */
 
@@ -82,6 +83,7 @@ const ContractBase = stampit({
  * @param {String} abu - Contract compiler name
  * @param {String} name - Function name
  * @param {String} args - Function argument's
+ * @param {String} call - Pseudo contract with `__call()` function which simply execute function with params. If you pass this param's `name` and `args` will be ignored
  * @return {Object} - Contract call result
  */
 
