@@ -89,7 +89,7 @@ program
       throw Error('--role must be either "initiator" or "responder"')
     }
 
-    const binaryKey = (() => {
+    const secretKey = (() => {
       if (program.file) {
         return fs.readFileSync(program.file)
       } else if (privKey) {
@@ -98,14 +98,14 @@ program
         throw Error('Must provide either [privkey] or [file]')
       }
     })()
-    const pub = ({
+    const publicKey = ({
       initiator: params.initiatorId,
       responder: params.responderId
     })[params.role]
     const account = Account({
       keypair: {
-        pub,
-        priv: binaryKey
+        publicKey,
+        secretKey,
       }
     })
     
