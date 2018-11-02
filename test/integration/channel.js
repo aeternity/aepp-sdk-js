@@ -34,6 +34,7 @@ function waitForChannel (channel) {
 
 describe('Channel', function () {
   configure(this)
+  this.retries(3)
 
   let initiator
   let responder
