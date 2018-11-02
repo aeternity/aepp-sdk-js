@@ -35,7 +35,6 @@ async function contractEpochEncodeCallData (code, abi, name, arg, call) {
   return (await this.api.encodeCalldata({ abi, code, 'function': name, arg })).calldata
 }
 
-
 async function contractEpochCall (code, abi, name, arg = '()', call) {
   if (call && TYPE_CHECKED_ABI.includes(abi)) return this.api.callContract({ abi, code, call })
   return this.api.callContract({ abi, code, 'function': name, arg })
@@ -54,7 +53,7 @@ const EpochContract = ContractBase.compose(Epoch, {
     contractEpochEncodeCallData,
     contractEpochCall,
     contractEpochDecodeData,
-    compileEpochContract,
+    compileEpochContract
   }
 })
 
