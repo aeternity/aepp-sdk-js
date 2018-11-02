@@ -31,6 +31,7 @@ import Aepp from './ae/aepp'
 import Selector from './account/selector'
 import Cli from './ae/cli'
 import Channel from './channel'
+import Universal from './ae/universal'
 
 export {
   Ae,
@@ -48,5 +49,6 @@ export {
   JsTx,
   Selector,
   Cli,
-  Channel
+  Channel,
+  Universal
 }

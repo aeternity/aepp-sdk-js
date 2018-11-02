@@ -80,7 +80,7 @@ const { Inspect } = require('./commands')
 
 ```js
 program
-  .option('--host [hostname]', 'Node to connect to', utils.constant.EPOCH_URL)
+  .option('-u --url [hostname]', 'Node to connect to', utils.constant.EPOCH_URL)
   .option('--internalUrl [internal]', 'Node to connect to(internal)', utils.constant.EPOCH_INTERNAL_URL)
   .option('-f --force', 'Ignore epoch version compatibility check')
   .option('--json', 'Print result in json format')

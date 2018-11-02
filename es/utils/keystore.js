@@ -1,35 +1,44 @@
-import crypto from 'crypto'
-import createKeccakHash from 'keccak'
-import scrypt from 'scrypt'
 import nacl from 'tweetnacl'
+import * as argon2 from 'argon2'
+import uuid from 'uuid'
 
 import { encodeBase58Check } from './crypto'
 
-const OPTIONS = {
-  // Symmetric cipher for private key encryption
-  cipher: 'aes-128-ctr',
-  // Initialization vector size in bytes
-  ivBytes: 16,
-  // ECDSA private key size in bytes
-  keyBytes: 32,
-  // Key derivation function parameters
-  pbkdf2: {
-    c: 262144,
-    dklen: 32,
-    hash: 'sha256',
-    prf: 'hmac-sha256'
-  },
-  scrypt: {
-    memory: 280000000,
-    dklen: 32,
-    n: 262144,
-    r: 8,
-    p: 1
+const DEFAULTS = {
+  crypto: {
+    secret_type: 'ed25519',
+    symmetric_alg: 'xsalsa20-poly1305',
+    kdf: 'argon2id',
+    kdf_params: {
+      memlimit: 1024,
+      opslimit: 3
+    }
   }
 }
 
-function keccak256 (buffer) {
-  return createKeccakHash('keccak256').update(buffer).digest()
+// DERIVED KEY PART
+const DERIVED_KEY_FUNCTIONS = {
+  'argon2id': deriveKeyUsingArgon2id
+}
+
+async function deriveKeyUsingArgon2id (password, nonce, options) {
+  const { memlimit: memoryCost, opslimit: parallelism } = options.kdf_params
+  return argon2.hash(password, { memoryCost, parallelism, type: argon2.argon2id, raw: true, salt: nonce })
+}
+
+// CRYPTO PART
+const CRYPTO_FUNCTIONS = {
+  'xsalsa20-poly1305': { encrypt: encryptXsalsa20Poly1305, decrypt: decryptXsalsa20Poly1305 }
+}
+
+function encryptXsalsa20Poly1305 ({ plaintext, key, nonce }) {
+  return nacl.secretbox(plaintext, nonce, key)
+}
+
+function decryptXsalsa20Poly1305 ({ ciphertext, key, nonce }) {
+  const res = nacl.secretbox.open(ciphertext, nonce, key)
+  if (!res) throw new Error('Invalid password or nonce')
+  return res
 }
 
 /**
@@ -69,144 +78,77 @@ function str2buf (str, enc) {
 }
 
 /**
- * Check if the selected cipher is available.
- * @param {string} cipher Encryption algorithm.
- * @return {boolean} If available true, otherwise false.
- */
-function isCipherAvailable (cipher) {
-  return crypto.getCiphers().some(function (name) { return name === cipher })
-}
-
-/**
  * Symmetric private key encryption using secret (derived) key.
  * @param {buffer|string} plaintext Data to be encrypted.
  * @param {buffer|string} key Secret key.
- * @param {buffer|string} iv Initialization vector.
- * @param {string=} algo Encryption algorithm (default: constants.cipher).
+ * @param {buffer|string} nonce Randomly generated nonce.
+ * @param {string=} algo Encryption algorithm (default: DEFAULTS.crypto.symmetric_alg).
  * @return {buffer} Encrypted data.
  */
-function encrypt (plaintext, key, iv, algo) {
-  let cipher, ciphertext
-  algo = algo || OPTIONS.cipher
-  if (!isCipherAvailable(algo)) throw new Error(algo + ' is not available')
-  cipher = crypto.createCipheriv(algo, str2buf(key), str2buf(iv))
-  ciphertext = cipher.update(str2buf(plaintext))
-  return Buffer.concat([ciphertext, cipher.final()])
+function encrypt (plaintext, key, nonce, algo = DEFAULTS.crypto.symmetric_alg) {
+  if (!CRYPTO_FUNCTIONS[algo]) throw new Error(algo + ' is not available')
+  return CRYPTO_FUNCTIONS[algo].encrypt({ plaintext, nonce, key })
 }
 
 /**
  * Symmetric private key decryption using secret (derived) key.
- * @param {buffer|string} ciphertext Data to be decrypted.
- * @param {buffer|string} key Secret key.
- * @param {buffer|string} iv Initialization vector.
- * @param {string=} algo Encryption algorithm (default: constants.cipher).
+ * @param {buffer|Uint8Array} ciphertext Data to be decrypted.
+ * @param {buffer|Uint8Array} key Secret key.
+ * @param {buffer|Uint8Array} nonce Nonce from key-object.
+ * @param {string=} algo Encryption algorithm.
  * @return {buffer} Decrypted data.
  */
-function decrypt (ciphertext, key, iv, algo) {
-  let decipher, plaintext
-  algo = algo || OPTIONS.cipher
-  if (!isCipherAvailable(algo)) throw new Error(algo + ' is not available')
-  decipher = crypto.createDecipheriv(algo, str2buf(key), str2buf(iv))
-  plaintext = decipher.update(str2buf(ciphertext))
-  return Buffer.concat([plaintext, decipher.final()])
+function decrypt (ciphertext, key, nonce, algo) {
+  if (!CRYPTO_FUNCTIONS[algo]) throw new Error(algo + ' is not available')
+  return CRYPTO_FUNCTIONS[algo].decrypt({ ciphertext, nonce, key })
 }
 
 /**
- * Calculate message authentication code from secret (derived) key and
- * encrypted text.  The MAC is the keccak-256 hash of the byte array
- * formed by concatenating the second 16 bytes of the derived key with
- * the ciphertext key's contents.
- * @param {buffer|string} derivedKey Secret key derived from password.
- * @param {buffer|string} ciphertext Text encrypted with secret key.
- * @return {string} Hex-encoded MAC.
- */
-function getMAC (derivedKey, ciphertext) {
-  if (derivedKey !== undefined && derivedKey !== null && ciphertext !== undefined && ciphertext !== null) {
-    return keccak256(Buffer.concat([
-      str2buf(derivedKey).slice(16, 32),
-      str2buf(ciphertext)
-    ])).toString('hex')
-  }
-}
-
-/**
- * Derive secret key from password with key dervation function.
- * @param {string|buffer} password User-supplied password.
- * @param {string|buffer} salt Randomly generated salt.
+ * Derive secret key from password with key derivation function.
+ * @param {string} password User-supplied password.
+ * @param {buffer|Uint8Array} nonce Randomly generated nonce.
  * @param {Object=} options Encryption parameters.
- * @param {string=} options.kdf Key derivation function (default: pbkdf2).
- * @param {string=} options.cipher Symmetric cipher (default: constants.cipher).
- * @param {Object=} options.kdfparams KDF parameters (default: constants.<kdf>).
+ * @param {string=} options.kdf Key derivation function (default: DEFAULTS.crypto.kdf).
+ * @param {Object=} options.kdf_params KDF parameters (default: DEFAULTS.crypto.kdf_params).
  * @return {buffer} Secret key derived from password.
  */
-async function deriveKey (password, salt, options) {
-  if (typeof password === 'undefined' || password === null || !salt) {
-    throw new Error('Must provide password and salt to derive a key')
+async function deriveKey (password, nonce, options = { kdf_params: DEFAULTS.crypto.kdf_params, kdf: DEFAULTS.crypto.kdf }) {
+  if (typeof password === 'undefined' || password === null || !nonce) {
+    throw new Error('Must provide password and nonce to derive a key')
   }
-  options = options || {}
 
-  options.kdfparams = options.kdfparams || OPTIONS.scrypt
+  if (!DERIVED_KEY_FUNCTIONS.hasOwnProperty(options.kdf)) throw new Error('Unsupported kdf type')
 
-  // convert strings to buffers
-  password = str2buf(password)
-  salt = str2buf(salt)
-
-  // TODO add support of pbkdf2
-  // use scrypt as key derivation function
-  return await deriveKeyUsingScrypt(password, salt, options)
-}
-
-async function deriveKeyUsingScrypt (password, salt, options) {
-  const {n: N, r, p, dklen} = options.kdfparams
-  return await scrypt.hash(password, { N, r, p }, dklen, salt)
+  return await DERIVED_KEY_FUNCTIONS[options.kdf](password, nonce, options)
 }
 
 /**
  * Assemble key data object in secret-storage format.
+ * @param {buffer} name Key name.
  * @param {buffer} derivedKey Password-derived secret key.
  * @param {buffer} privateKey Private key.
- * @param {buffer} salt Randomly generated salt.
- * @param {buffer} iv Initialization vector.
+ * @param {buffer} nonce Randomly generated nonce.
  * @param {Object=} options Encryption parameters.
  * @param {string=} options.kdf Key derivation function (default: pbkdf2).
  * @param {string=} options.cipher Symmetric cipher (default: constants.cipher).
  * @param {Object=} options.kdfparams KDF parameters (default: constants.<kdf>).
  * @return {Object}
  */
-function marshal (derivedKey, privateKey, salt, iv, options) {
-  let ciphertext, keyObject, algo
-  options = options || {}
-  options.kdf = 'scrypt' //Always use SCRYPT
-  options.kdfparams = options.kdfparams || OPTIONS.scrypt
-  algo = options.cipher || OPTIONS.cipher
-
-  // encrypt using first 16 bytes of derived key
-  ciphertext = encrypt(privateKey, derivedKey.slice(0, 16), iv, algo).toString('hex')
-
-  keyObject = {
-    address: getAddressFromPriv(privateKey),
-    crypto: {
-      cipher: options.cipher || OPTIONS.cipher,
-      ciphertext: ciphertext,
-      cipherparams: { iv: iv.toString('hex') },
-      mac: getMAC(derivedKey, ciphertext)
-    },
-    id: 'uuid.v4()', // use uuid to generate ID
-    version: 3
-  }
-
-  if (options.kdf === 'scrypt') {
-    keyObject.crypto.kdf = 'scrypt'
-    keyObject.crypto.kdfparams = {
-      dklen: options.kdfparams.dklen || OPTIONS.scrypt.dklen,
-      n: options.kdfparams.n || OPTIONS.scrypt.n,
-      r: options.kdfparams.r || OPTIONS.scrypt.r,
-      p: options.kdfparams.p || OPTIONS.scrypt.p,
-      salt: salt.toString('hex')
+function marshal (name, derivedKey, privateKey, nonce, options = {}) {
+  const opt = Object.assign({}, DEFAULTS.crypto, options)
+  return Object.assign(
+    { name, version: 1, address: getAddressFromPriv(privateKey), id: uuid.v4() },
+    { crypto: Object.assign(
+      {
+        secret_type: opt.secret_type,
+        symmetric_alg: opt.symmetric_alg,
+        ciphertext: Buffer.from(encrypt(Buffer.from(privateKey), derivedKey, nonce, opt.symmetric_alg)).toString('hex'),
+        cipher_params: { nonce: Buffer.from(nonce).toString('hex') }
+      },
+      { kdf: opt.kdf, kdf_params: opt.kdf_params }
+      )
     }
-
-  }
-  return keyObject
+  )
 }
 
 export function getAddressFromPriv (secret) {
@@ -217,59 +159,57 @@ export function getAddressFromPriv (secret) {
 
 /**
  * Recover plaintext private key from secret-storage key object.
+ * @param {string} password Keystore object password.
  * @param {Object} keyObject Keystore object.
- * @param {function=} cb Callback function (optional).
  * @return {buffer} Plaintext private key.
  */
-export async function recover (password, keyObject, cb) {
-  const keyObjectCrypto = keyObject.Crypto || keyObject.crypto
-  let { ciphertext, chiper: algo } = keyObjectCrypto
-  const iv = str2buf(keyObjectCrypto.cipherparams.iv)
-  const salt = str2buf(keyObjectCrypto.kdfparams.salt)
-
-  // verify that message authentication codes match, then decrypt
-  function verifyAndDecrypt (derivedKey, salt, iv, ciphertext, algo) {
-    if (getMAC(derivedKey, ciphertext) !== keyObjectCrypto.mac) {
-      throw new Error('Wrong password')
-    }
-    return decrypt(ciphertext, derivedKey.slice(0, 16), iv, algo)
-  }
-
-  ciphertext = str2buf(ciphertext)
-
-  // Get derive key using scrypt
-  const dKey = await deriveKey(password, salt, keyObjectCrypto)
-
-  // Verify deriveKey and decrypt
-  return verifyAndDecrypt.bind(this)(dKey, salt, iv, ciphertext, algo).toString('hex')
+export async function recover (password, keyObject) {
+  validateKeyObj(keyObject)
+  const nonce = Uint8Array.from(str2buf(keyObject.crypto.cipher_params.nonce))
+  const key = await decrypt(
+    Uint8Array.from(str2buf(keyObject.crypto.ciphertext)),
+    await deriveKey(password, nonce),
+    nonce,
+    keyObject.crypto.symmetric_alg
+  )
+  if (!key) throw new Error('Invalid password or nonce')
+  return Buffer.from(key).toString('hex')
 }
 
 /**
  * Export private key to keystore secret-storage format.
+ * @param {string|buffer} name Key name.
  * @param {string|buffer} password User-supplied password.
  * @param {string|buffer} privateKey Private key.
- * @param {string|buffer} salt Randomly generated salt.
- * @param {string|buffer} iv Initialization vector.
+ * @param {buffer|Uint8Array} nonce Randomly generated nonce.
  * @param {Object=} options Encryption parameters.
  * @param {string=} options.kdf Key derivation function (default: pbkdf2).
  * @param {string=} options.cipher Symmetric cipher (default: constants.cipher).
  * @param {Object=} options.kdfparams KDF parameters (default: constants.<kdf>).
  * @return {Object}
  */
-export async function dump (
-  password,
-  privateKey,
-  salt = Buffer.from(nacl.randomBytes(128).slice(OPTIONS.keyBytes + OPTIONS.ivBytes)),
-  iv = Buffer.from(nacl.randomBytes(128).slice(OPTIONS.keyBytes, OPTIONS.keyBytes + OPTIONS.ivBytes)),
-  options
-) {
+export async function dump (name, password, privateKey, nonce = nacl.randomBytes(24), options = {}) {
+  const opt = Object.assign({}, DEFAULTS.crypto, options)
+  return marshal(
+    name,
+    await deriveKey(password, nonce, opt),
+    privateKey,
+    nonce,
+    opt
+  )
+}
 
-  options = options || {}
-  iv = str2buf(iv)
-  privateKey = str2buf(privateKey)
+function validateKeyObj (obj) {
+  const root = ['crypto', 'id', 'version', 'address']
+  const crypto_keys = ['cipher_params', 'ciphertext', 'symmetric_alg', 'kdf', 'kdf_params']
 
-  const dKey = await deriveKey(password, salt, options)
-  return marshal(dKey, privateKey, salt, iv, options)
+  const missingRootKeys = root.filter(key => !obj.hasOwnProperty(key))
+  if (missingRootKeys.length) throw new Error(`Invalid key file format. Require properties: ${missingRootKeys}`)
+
+  const missingCryptoKeys = crypto_keys.filter(key => !obj['crypto'].hasOwnProperty(key))
+  if (missingCryptoKeys.length) throw new Error(`Invalid key file format. Require properties: ${missingCryptoKeys}`)
+
+  return true
 }
 
 

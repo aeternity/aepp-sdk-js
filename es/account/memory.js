@@ -28,27 +28,31 @@ import * as Crypto from '../utils/crypto'
 const secrets = new WeakMap()
 
 async function sign (data) {
-  return Promise.resolve(Crypto.sign(data, secrets.get(this).priv))
+  return Promise.resolve(Crypto.sign(data, secrets.get(this).secretKey))
 }
 
 async function address () {
-  return Promise.resolve(secrets.get(this).pub)
+  return Promise.resolve(secrets.get(this).publicKey)
 }
 
 /**
  * Select specific account
  * @instance
- * @rtype (keypair: {pub: String, priv: String}) => Void
+ * @rtype (keypair: {publicKey: String, secretKey: String}) => Void
  * @param {Object} keypair - Key pair to use
- * @param {String} keypair.pub - Public key
- * @param {String} keypair.priv - Private key
+ * @param {String} keypair.publicKey - Public key
+ * @param {String} keypair.secretKey - Private key
  * @return {Void}
  * @example setKeypair(keypair)
  */
 function setKeypair (keypair) {
+  if (keypair.hasOwnProperty('priv') && keypair.hasOwnProperty('pub')) {
+    keypair = { secretKey: keypair.priv, publicKey: keypair.pub }
+    console.warn('pub/priv naming for accounts has been deprecated, please use secretKey/publicKey')
+  }
   secrets.set(this, {
-    priv: Buffer.from(keypair.priv, 'hex'),
-    pub: keypair.pub
+    secretKey: Buffer.from(keypair.secretKey, 'hex'),
+    publicKey: keypair.publicKey
   })
 }
 
@@ -59,8 +63,8 @@ function setKeypair (keypair) {
  * @rtype Stamp
  * @param {Object} [options={}] - Initializer object
  * @param {Object} options.keypair - Key pair to use
- * @param {String} options.keypair.pub - Public key
- * @param {String} options.keypair.priv - Private key
+ * @param {String} options.keypair.publicKey - Public key
+ * @param {String} options.keypair.secretKey - Private key
  * @return {Account}
  */
 const MemoryAccount = Account.compose({

@@ -16,24 +16,27 @@
  */
 
 /**
- * Contracts functions
+ * Contract module - routines to interact with the æternity contract
  *
  * High level documentation of the contracts are available at
  * https://github.com/aeternity/protocol/tree/master/contracts and
  * example code which uses this API at
  * https://github.com/aeternity/aepp-sdk-js/blob/develop/bin/aecontract.js
  *
+ * @module @aeternity/aepp-sdk/es/ae/contract
+ * @export Contract
+ * @example import Contract from '@aeternity/aepp-sdk/es/ae/contract'
  */
 
 import Ae from './'
 import * as R from 'ramda'
 
 async function encodeCall (code, abi, name, args) {
-  return (await this.api.encodeCalldata({ abi: abi, code, 'function': name, arg: args })).calldata
+  return this.contractEpochEncodeCallData(code, abi, name, args)
 }
 
 async function callStatic (code, abi, name, { args = '()' } = {}) {
-  const { out } = await this.api.callContract({ abi: abi, code, 'function': name, arg: args })
+  const { out } = await this.contractEpochCall(code, abi, name, args)
   return {
     result: out,
     decode: (type) => this.contractDecodeData(type, out)
@@ -41,7 +44,7 @@ async function callStatic (code, abi, name, { args = '()' } = {}) {
 }
 
 async function decode (type, data) {
-  return (await this.api.decodeData({ data, 'sophia-type': type })).data
+  return this.contractEpochDecodeData(type, data)
 }
 
 async function call (code, abi, address, name, { args = '()', options = {} } = {}) {
@@ -59,7 +62,7 @@ async function call (code, abi, address, name, { args = '()', options = {} } = {
   }))
 
   const { hash } = await this.send(tx, opt)
-  const result = await this.api.getTransactionInfoByHash(hash)
+  const result = await this.getTxInfo(hash)
 
   if (result.returnType === 'ok') {
     return {
@@ -99,7 +102,7 @@ async function deploy (code, abi, { initState = '()', options = {} } = {}) {
 }
 
 async function compile (code, options = {}) {
-  const o = await this.api.compileContract(R.mergeAll([this.Ae.defaults, options, { code }]))
+  const o = await this.compileEpochContract(code, options)
 
   return Object.freeze(Object.assign({
     encodeCall: async (name, args) => this.contractEncodeCall(o.bytecode, 'sophia', name, args),

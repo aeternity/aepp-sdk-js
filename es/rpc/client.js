@@ -81,7 +81,11 @@ const RpcClient = stampit(AsyncInit, {
     this.session = await this.post('hello')
   },
   composers ({ stamp, composables }) {
-    const methods = R.path(['compose', 'deepConfiguration', 'Ae', 'methods'], stamp) || []
+    // Combine Ae and Contract methods
+    const methods = [
+      ...(R.path(['compose', 'deepConfiguration', 'Ae', 'methods'], stamp) || []),
+      ...(R.path(['compose', 'deepConfiguration', 'Contract', 'methods'], stamp) || [])
+    ]
     const rpcMethods = R.fromPairs(methods.map(m => [m, post(m)]))
     stamp.compose.methods = Object.assign(rpcMethods, stamp.compose.methods)
   }

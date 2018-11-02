@@ -1,12 +1,13 @@
 {
   "name": "@aeternity/aepp-sdk",
-  "version": "0.24.0-0.1.0",
+  "version": "0.24.0-0.2.0",
   "description": "SDK for the æternity blockchain",
   "main": "dist/aepp-sdk.js",
   "browser": "dist/aepp-sdk.browser.js",
   "module": "es/index.js",
   "bin": {
-    "aecli": "./bin/aecli.js"
+    "aecli": "./bin/aecli.js",
+    "aeproject": "./bin/aeproject/aeproject-cli.js"
   },
   "sideEffects": false,
   "scripts": {
@@ -33,25 +34,31 @@
     "@stamp/it": "^1.0.3",
     "@stamp/required": "^1.0.1",
     "aes-js": "^3.1.1",
+    "argon2": "^0.19.3",
     "axios": "^0.18.0",
     "blakejs": "^1.1.0",
     "bs58check": "^2.1.1",
     "cacache": "^11.2.0",
     "chalk": "^2.4.1",
+    "commander": "^2.14.1",
+    "docker-cli-js": "^2.5.1",
     "esm": "^3.0.77",
-    "keccak": "^1.4.0",
+    "fs": "0.0.1-security",
+    "fs-extra": "^7.0.0",
+    "node-dir": "^0.1.17",
+    "original-require": "^1.0.1",
+    "path": "^0.12.7",
     "postinstall-build": "^5.0.1",
+    "promisify-child-process": "^2.1.2",
     "ramda": "^0.25.0",
     "recursive-rename": "^2.0.0",
     "rlp": "^2.0.0",
-    "scrypt": "^6.0.3",
     "serialize-javascript": "^1.5.0",
     "sha.js": "^2.4.11",
     "tweetnacl": "^1.0.0",
     "url": "^0.11.0",
     "uuid": "^3.3.2",
     "websocket": "^1.0.26",
-    "commander": "^2.14.1",
     "prompt": "^1.0.0"
   },
   "repository": {
@@ -96,7 +103,7 @@
     "supports-color": "^5.4.0",
     "uglify-es": "^3.3.9",
     "webpack": "^4.20.1",
-    "webpack-cli": "^3.1.1",
+    "webpack-cli": "^3.1.2",
     "worker-farm": "^1.6.0"
   }
 }

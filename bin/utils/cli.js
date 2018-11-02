@@ -18,7 +18,7 @@
 */
 import * as R from 'ramda'
 
-import Cli from '../../es/ae/cli'
+import Universal from '../../es/ae/universal'
 import { getWalletByPathAndDecrypt } from './account'
 
 // ## Merge options with parent options.
@@ -30,8 +30,8 @@ export function getCmdFromArguments (args) {
 }
 
 // Create `Ae` client
-export async function initClient ({host: url, keypair, internalUrl, force: forceCompatibility, nativeMode = true}) {
-  return await Cli({ url, process, keypair, internalUrl, forceCompatibility, nativeMode })
+export async function initClient ({url, keypair, internalUrl, force: forceCompatibility, nativeMode = true}) {
+  return await Universal({ url, process, keypair, internalUrl, forceCompatibility, nativeMode })
 }
 
 // ## Get account files and decrypt it using password

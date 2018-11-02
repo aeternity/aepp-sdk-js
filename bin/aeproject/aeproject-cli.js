@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
@@ -14,17 +16,41 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
+'use strict'
 
-import Ae from './'
-import Account from '../account/memory'
-import Chain from '../chain/epoch'
-import Aens from './aens'
-import Contract from './contract'
-import Transaction from '../tx/tx'
+require = require('esm')(module /*, options */ ) // use to handle es6 import/export
 
-const Cli = Ae.compose(Account, Chain, Transaction, Aens, Contract, {
-  init () {},
-  props: { process: {} }
-})
+const program = require('commander')
+const commands = require('./commands')
 
-export default Cli
+const setupVersion = () => {
+  program.version("0.0.1")
+}
+
+const setupDefaultHandler = () => {
+  program.on('command:*', () => {
+    program.help();
+  })
+}
+
+const setupCommands = () => {
+  commands.initCommands(program);
+}
+
+const parseParams = () => {
+  program.parse(process.argv)
+}
+
+const presentHelpIfNeeded = () => {
+  if (!program.args.length) program.help();
+}
+
+const run = () => {
+  setupVersion();
+  setupDefaultHandler();
+  setupCommands();
+  parseParams();
+  presentHelpIfNeeded();
+}
+
+run();

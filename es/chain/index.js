@@ -43,7 +43,7 @@ const Chain = stampit({
     Ae: {
       methods: [
         'sendTransaction', 'height', 'awaitHeight', 'poll', 'balance', 'tx',
-        'mempool', 'topBlock'
+        'mempool', 'topBlock', 'getTxInfo'
       ]
     }
   }
@@ -56,6 +56,7 @@ const Chain = stampit({
     poll: required,
     balance: required,
     tx: required,
+    getTxInfo: required,
     mempool: required
   }
 }))
@@ -143,7 +144,18 @@ const Chain = stampit({
  */
 
 /**
- * Obtain transactions currently in the mempool
+ * Obtain a transaction info based on its hash
+ * @function getTxInfo
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype (hash: String) => tx: String
+ * @param {String} hash - Transaction hash
+ * @return {String} Transaction
+ */
+
+/**
+ * Obtain transaction's from mempool
  * @function mempool
  * @instance
  * @abstract

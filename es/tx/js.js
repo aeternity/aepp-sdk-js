@@ -96,7 +96,6 @@ const createSalt = salt
 /**
  * Decode data using the default encoding/decoding algorithm
  *
- * @param {string} recipientId Tthe public key of the recipient
  * @param {string} data  An encoded and prefixed string (ex tx_..., sg_..., ak_....)
  * @param {string} type Prefix of Transaction
  * @return {Buffer} Buffer of decoded Base58 data
@@ -108,7 +107,7 @@ export function decode (data, type) {
 /**
  * Create a spend transaction
  *
- * @param {string} recipientId Tthe public key of the recipient
+ * @param {string} recipientId The public key of the recipient
  * @param {number} amount The amount to send
  * @param {string} payload The payload associated with the data
  * @param {number} fee The fee for the transaction

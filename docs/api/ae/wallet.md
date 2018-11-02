@@ -1,7 +1,7 @@
 <a id="module_@aeternity/aepp-sdk/es/ae/wallet"></a>
 
 ## @aeternity/aepp-sdk/es/ae/wallet
-Accounts module
+Wallet module
 
 **Export**: Wallet  
 **Example**  
@@ -26,15 +26,17 @@ Wallet Stamp
 | [options.onTx] | `function` |  | Tx method protector function |
 | [options.onChain] | `function` |  | Chain method protector function |
 | [options.onAccount] | `function` |  | Account method protector function |
+| [options.onContract] | `function` |  | Contract method protector function |
 
 **Example**  
 ```js
 Wallet({
   url: 'https://sdk-testnet.aepps.com/',
   accounts: [MemoryAccount({keypair})],
-  address: keypair.pub,
+  address: keypair.publicKey,
   onTx: confirm,
   onChain: confirm,
   onAccount: confirm
+  onContract: confirm
 })
 ```
