@@ -17,6 +17,7 @@
 
 const aeprojectTest = require('./aeproject-test');
 const dir = require('node-dir');
+const utils = require('./../../utils.js');
 let path = require("path");
 
 
@@ -36,29 +37,9 @@ const run = async (path) => {
     testDirectory = `${process.cwd()}/${path}`;
   }
 
-  const files = await getFiles(testDirectory);
+  const files = await utils.getFiles(`${process.cwd()}/${path}/`, `/.*\.(js|es|es6|jsx|sol)$/`);
 
   await aeprojectTest.run(files);
-}
-
-const getFiles = async function (testDirectory) {
-  let testsRegex = /.*\.(js|es|es6|jsx|sol)$/
-
-  return new Promise((resolve, reject) => {
-    dir.files(testDirectory, (error, files) => {
-      if (error) {
-        reject(new Error(error));
-
-        return;
-      }
-
-      files = files.filter(function (file) {
-        return file.match(testsRegex) != null;
-      });
-
-      resolve(files);
-    });
-  });
 }
 
 module.exports = {

@@ -28,7 +28,7 @@ async function compileAndPrint(file){
         let code = readFile(file)
         let contract = await client.contractCompile(code.toString());
 
-        print(`Contract '${file} has been succeffully compiled'`)
+        print(`Contract '${file} has been successfully compiled'`)
         print(`Contract bytecode: ${contract.bytecode}`)
     } catch(error){
         printError(`Contract '${file} has not been compiled'`)
