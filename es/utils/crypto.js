@@ -413,6 +413,20 @@ function readInt (buf) {
   return buf.readIntBE(0, buf.length)
 }
 
+function readId (buf) {
+  const type = buf.readUIntBE(0, 1)
+  const prefix = {
+    1: 'ak_',
+    // TODO: 2: name
+    // TODO: 3: commitment
+    // TODO: 4: oracle
+    // TODO: 5: contract
+    6: 'ch_'
+  }[type]
+  const hash = encodeBase58Check(buf.slice(1, buf.length))
+  return `${prefix}${hash}`
+}
+
 function readSignatures (buf) {
   const signatures = []
 
@@ -433,8 +447,8 @@ function deserializeOffChainUpdate (binary, opts) {
   switch (tag) {
     case OBJECT_TAGS.CHANNEL_OFFCHAIN_UPDATE_TRANSFER:
       return Object.assign(obj, {
-        from: 'ak_' + encodeBase58Check(binary[2]),
-        to: 'ak_' + encodeBase58Check(binary[3]),
+        from: readId(binary[2]),
+        to: readId(binary[3]),
         amount: readInt(binary[4])
       })
   }
@@ -474,9 +488,9 @@ export function deserialize (binary, opts = {prettyTags: false}) {
 
     case OBJECT_TAGS.CHANNEL_CREATE_TX:
       return Object.assign(obj, {
-        initiator: 'ak_' + encodeBase58Check(binary[2]),
+        initiator: readId(binary[2]),
         initiatorAmount: readInt(binary[3]),
-        responder: 'ak_' + encodeBase58Check(binary[4]),
+        responder: readId(binary[4]),
         responderAmount: readInt(binary[5]),
         channelReserve: readInt(binary[6]),
         lockPeriod: readInt(binary[7]),
@@ -486,7 +500,7 @@ export function deserialize (binary, opts = {prettyTags: false}) {
 
     case OBJECT_TAGS.CHANNEL_CLOSE_MUTUAL_TX:
       return Object.assign(obj, {
-        channelId: encodeBase58Check(binary[2]),
+        channelId: readId(binary[2]),
         initiatorAmount: readInt(binary[3]),
         responderAmount: readInt(binary[4]),
         ttl: readInt(binary[5]),
@@ -496,7 +510,7 @@ export function deserialize (binary, opts = {prettyTags: false}) {
 
     case OBJECT_TAGS.CHANNEL_OFFCHAIN_TX:
       return Object.assign(obj, {
-        channelId: encodeBase58Check(binary[2]),
+        channelId: readId(binary[2]),
         round: readInt(binary[3]),
         updates: readOffChainTXUpdates(binary[4], opts),
         state: encodeBase58Check(binary[5])
