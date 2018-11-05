@@ -14,7 +14,7 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-const Ae = require('@aeternity/aepp-sdk').Cli;
+const Ae = require('@aeternity/aepp-sdk').Universal;
 
 const config = {
   host: "http://localhost:3001/",
