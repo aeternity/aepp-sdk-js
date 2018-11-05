@@ -25,7 +25,7 @@
 import Account from './'
 import * as Crypto from '../utils/crypto'
 
-const DEFAULT_NETWORK_ID = "ae_mainnet"
+const DEFAULT_NETWORK_ID = 'ae_mainnet'
 const secrets = new WeakMap()
 
 async function sign (data) {
