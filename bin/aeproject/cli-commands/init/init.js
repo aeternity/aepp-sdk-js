@@ -34,9 +34,9 @@ const deployTemplateFile = 'deployTemplate.js';
 const deployFileDestination = `${deployDir}/deploy.js`;
 
 const contractsDir = './contracts';
-const contractTemplateFile = 'Identity.aes';
-const contractFileDestination = `${contractsDir}/Identity.aes`;
-const artifactsDir = `${__dirname}/artifacts/`;
+const contractTemplateFile = 'ExampleContract.aes';
+const contractFileDestination = `${contractsDir}/ExampleContract.aes`;
+const artifactsDir = `${__dirname}/artifacts`;
 
 const dockerDir = './docker';
 const dockerTemplateDir = 'docker';
