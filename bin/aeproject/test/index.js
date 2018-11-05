@@ -1,4 +1,4 @@
 require('./compile')
-// require('./test')
-// require('./init')
-// require('./epoch')
+require('./test')
+require('./init')
+require('./epoch')
