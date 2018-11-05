@@ -23,10 +23,10 @@ import { generateKeyPair } from '../../es/utils/crypto'
 plan(1000000000)
 
 function randomName () {
-  return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString(36) + '.aet'
+  return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString(36) + '.test'
 }
 
-describe('CLI AENS Module', function () {
+describe.skip('CLI AENS Module', function () {
   configure(this)
   const name = randomName()
   let wallet

@@ -140,7 +140,7 @@ async function getBlockByHeight (height, options) {
 async function getName (name, options) {
   const { json } = options
   try {
-    if (R.last(name.split('.')) !== 'aet') throw new Error('AENS TLDs must end in .aet')
+    if (R.last(name.split('.')) !== 'test') throw new Error('AENS TLDs must end in .test')
     const client = await initClient(options)
     const nameStatus = await client.api.getNameEntryByName(name)
     printName(Object.assign(nameStatus, { status: 'CLAIMED' }), json)
