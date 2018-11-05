@@ -18,6 +18,7 @@
     "test": "mocha --recursive --require @babel/register",
     "test:watch": "mocha --recursive --require @babel/register --watch",
     "test-jenkins": "mocha --recursive --require @babel/register --reporter mocha-junit-reporter",
+    "test-aeproject": "mocha './bin/aeproject/test/index.js' --timeout 0 --exit",
     "prepublishOnly": "npm run build && npm run docs:docco && npm run docs:api",
     "postinstall": "postinstall-build --only-as-dependency dist"
   },

@@ -38,6 +38,7 @@ const addCompileOption = (program) => {
     .action(async (option) => {
       await compile.run(option.path);
     })
+  }
     
 const addTestOption = (program) => {
   program

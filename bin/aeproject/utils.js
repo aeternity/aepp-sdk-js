@@ -15,11 +15,12 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+require = require('esm')(module /*, options */) // use to handle es6 import/export
+ 
 const fs = require('fs-extra')
 const dir = require('node-dir');
 const cli = require('./../utils/cli');
-import { printError } from '../utils/print'
-import { handleApiError } from '../utils/errors'
+const handleApiError = require('./../utils/errors').handleApiError;
 
 
 const config = {
@@ -32,6 +33,7 @@ const config = {
   nonce: 1
 }
 
+const { spawn } = require('promisify-child-process');
 const createIfExistsFolder = (dir) => {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
@@ -70,7 +72,8 @@ const getClient = async function(){
     {
       url: config.host, 
       keypair: config.keyPair, 
-      internalUrl: config.internalHost
+      internalUrl: config.internalHost,
+      force: true
     })
   })
 
@@ -85,10 +88,33 @@ const sleep = (ms) => {
   }
 }
 
+
+const execute = (command, args, options = {}) => {
+  return new Promise((resolve, reject) => {
+    let result = ''
+
+    const child = spawn('aeproject', [command, ...args], options)
+    
+    child.stdin.setEncoding('utf-8')
+    child.stdout.on('data', (data) => {
+      result += (data.toString())
+    })
+
+    child.stderr.on('data', (data) => {
+      reject(data)
+    })
+
+    child.on('close', (code) => {
+      resolve(result)
+    })
+  })
+}
+
 module.exports = {
   createIfExistsFolder,
   copyFileOrDir,
   getFiles,
   getClient,
-  sleep
+  sleep,
+  execute
 }

@@ -32,7 +32,7 @@ async function compileAndPrint(file){
         print(`Contract bytecode: ${contract.bytecode}`)
     } catch(error){
         printError(`Contract '${file} has not been compiled'`)
-        printError(`reason: ${error.response.data.reason}`)
+        printError(`Reason: ${error.response.data.reason}`)
     }
 
     print('\r')
@@ -40,7 +40,7 @@ async function compileAndPrint(file){
 
 async function run(path) {
     print('===== Compiling contracts =====');
-
+    
     if (path.includes('.aes')) {
         compileAndPrint(path)
     } else {
