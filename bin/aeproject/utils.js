@@ -31,7 +31,16 @@ const copyFileOrDir = (sourceFileOrDir, destinationFileOrDir, copyOptions = {}) 
   fs.copySync(sourceFileOrDir, destinationFileOrDir, copyOptions)
 }
 
+const sleep = (ms) => {
+  var start = Date.now();
+  while (true) {
+    var clock = (Date.now() - start);
+    if (clock >= ms) break;
+  }
+}
+
 module.exports = {
   createIfExistsFolder,
-  copyFileOrDir
+  copyFileOrDir,
+  sleep
 }

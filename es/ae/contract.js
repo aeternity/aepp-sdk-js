@@ -16,13 +16,16 @@
  */
 
 /**
- * Contracts functions
+ * Contract module - routines to interact with the æternity contract
  *
  * High level documentation of the contracts are available at
  * https://github.com/aeternity/protocol/tree/master/contracts and
  * example code which uses this API at
  * https://github.com/aeternity/aepp-sdk-js/blob/develop/bin/aecontract.js
  *
+ * @module @aeternity/aepp-sdk/es/ae/contract
+ * @export Contract
+ * @example import Contract from '@aeternity/aepp-sdk/es/ae/contract'
  */
 
 import Ae from './'
