@@ -15,6 +15,15 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+/**
+ * EpochContract module
+ *
+ * This is the complement to {@link module:@aeternity/aepp-sdk/es/contract}.
+ * @module @aeternity/aepp-sdk/es/contract/epoch
+ * @export EpochContract
+ * @example import Selector from '@aeternity/aepp-sdk/es/contract/apoch'
+ */
+
 import * as R from 'ramda'
 import ContractBase from './'
 import Epoch from '../epoch'

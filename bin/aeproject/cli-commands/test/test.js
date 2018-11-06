@@ -15,17 +15,33 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import Ae from './'
-import Account from '../account/memory'
-import Chain from '../chain/epoch'
-import Aens from './aens'
-import Contract from './contract'
-import Transaction from '../tx/tx'
-import EpochContract from '../contract/epoch'
+const aeprojectTest = require('./aeproject-test');
+const dir = require('node-dir');
+const utils = require('./../../utils.js');
+let path = require("path");
 
-const Cli = Ae.compose(Account, Chain, Transaction, Aens, EpochContract, Contract, {
-  init () {},
-  props: { process: {} }
-})
 
-export default Cli
+const run = async (path) => {
+  var workingDirectory = process.cwd();
+  var testDirectory = '';
+
+  if (path.includes('.js')) {
+    await aeprojectTest.run([path]);
+
+    return;
+  }
+
+  testDirectory = path;
+
+  if (!path.includes(workingDirectory)) {
+    testDirectory = `${process.cwd()}/${path}`;
+  }
+
+  const files = await utils.getFiles(`${process.cwd()}/${path}/`, `/.*\.(js|es|es6|jsx|sol)$/`);
+
+  await aeprojectTest.run(files);
+}
+
+module.exports = {
+  run
+}
