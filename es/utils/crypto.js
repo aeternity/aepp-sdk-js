@@ -210,8 +210,8 @@ export function decryptKey (password, encrypted) {
 
 /**
  * Generate signature
- * @rtype (data: String, privateKey: Buffer) => Buffer
- * @param {String} data - Data to sign
+ * @rtype (data: String|Buffer, privateKey: Buffer) => Buffer
+ * @param {String|Buffer} data - Data to sign
  * @param {Buffer} privateKey - Key to sign with
  * @return {Buffer} Signature
  */
