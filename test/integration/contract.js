@@ -31,8 +31,6 @@ contract StateContract =
   public function retrieve() = state.value
 `
 
-const identityContractByteCode = 'cb_8TfnaSmi7HKCLz4oeoMuyPzGoWbCWMGHKcokE815juzWq8L15xENS435GHB1sYMLkBMee5n9xVUKokfsDqqhdhekX6dFn2Xi7uQ9wGaQ5F92osUnPbfJhKpsjEKSdc44CucTJciKAGUBoZDqtPma6GbtnyC2y1scMJHV3rjvtz3qjCeSiryd8LiKZpdkhKa6V6x51rv9b57CLFLSTiLJQFPAfSwJmTgavoJJJRBmcfVYMDqfwA7gQwiQSM3481YbpZMXqQQCvaufVGDDNT9khvn8wTR1ynsmceNh1vY4H8isUQ6njou4X1mhPHoaMWiw61kHWGkanasbv7NpYrT2P6FZFqbRfm5jPzocrspSaWacXPfDp8XXv9LGoQ4wsZPWjdu26e5kHohnuCRxWb9csGjpfVB3ZXUG65XEiEDYXzvkFW4Z8DVx9S3zpU57fuWRpdphbrt4LxfzWqmLSNUpcSwjpZX8Q4jiNj6N6bU23FddzsLgHapAss3i4KYD184XXAze4KUSqyT1818UfEJB8M7LeYzcZetoFvfVN8aPHdSsLiuEUJu1zXyzTmSEGrP5d1p26AV7b'
-
 plan(1000000000)
 
 describe('Contract', function () {
@@ -41,6 +39,7 @@ describe('Contract', function () {
   let contract
   let bytecode
   let deployed
+  let compiledIdentity
 
   before(async function () {
     contract = await ready(this)
@@ -48,7 +47,8 @@ describe('Contract', function () {
 
   describe('precompiled bytecode', () => {
     it('can be invoked', async () => {
-      const result = await contract.contractCallStatic(identityContractByteCode, 'sophia', 'main', { args: '42' })
+      compiledIdentity = await contract.contractCompile(identityContract)
+      const result = await contract.contractCallStatic(compiledIdentity.bytecode, 'sophia', 'main', { args: '(42)' })
       return result.decode('int').should.eventually.become({
         type: 'word',
         value: 42
@@ -56,7 +56,7 @@ describe('Contract', function () {
     })
 
     it('can be deployed', async () => {
-      return contract.contractDeploy(identityContractByteCode, 'sophia').should.eventually.have.property('address')
+      return contract.contractDeploy(compiledIdentity.bytecode, 'sophia').should.eventually.have.property('address')
     })
   })
 

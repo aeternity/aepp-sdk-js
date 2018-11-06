@@ -93,8 +93,8 @@ describe('CLI Inspect Module', function () {
   })
   it('Inspect Name', async () => {
     const invalidName = await execute(['inspect', 'asd'])
-    const validName = await execute(['inspect', 'nazdou2222222.aet'])
-    invalidName.indexOf('AENS TLDs must end in .aet').should.not.equal(-1)
+    const validName = await execute(['inspect', 'nazdou2222222.test'])
+    invalidName.indexOf('AENS TLDs must end in .test').should.not.equal(-1)
     validName.indexOf('AVAILABLE').should.not.equal(-1)
   })
 })
