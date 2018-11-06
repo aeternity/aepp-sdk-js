@@ -55,9 +55,7 @@ const loader = ({ url, internalUrl }) => (path, definition) => {
   } else if (!R.isNil(internalUrl) && R.contains('internal', tags)) {
     return urlparse.resolve(internalUrl.replace(/\/?$/, '/'), path)
   } else {
-    return () => {
-      throw Error(`Method ${operationId} is unsupported. No interface for ${R.toString(tags)}`)
-    }
+    throw Error(`Method ${operationId} is unsupported. No interface for ${R.toString(tags)}`)
   }
 }
 
