@@ -14,10 +14,10 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
+const compile = require('./cli-commands/compile/compile.js');
 const init = require('./cli-commands/init/init.js');
 const testConfig = require('./cli-commands/test/test.js');
-
-
+const epoch = require('./cli-commands/epoch/epoch.js');
 
 const addInitOption = (program) => {
   program
@@ -27,6 +27,15 @@ const addInitOption = (program) => {
       await init.run();
     })
 }
+
+const addCompileOption = (program) => {
+  program
+    .command('compile')
+    .option('--path [compile path]', 'Path to contract files', './contracts')
+    .description('Compile contracts')
+    .action(async (option) => {
+      await compile.run(option.path);
+    })
 
 const addTestOption = (program) => {
   program
@@ -38,10 +47,23 @@ const addTestOption = (program) => {
     })
 }
 
+const addEpochOption = (program) => {
+  program
+    .command('epoch')
+    .description('Running the epoch. Without any argument epoch will be runned with --start argument')
+    .option('--stop', 'Stop the epoch')
+    .option('--start', 'Start the epoch')
+    .action(async (options) => {
+      await epoch.run(options);
+    })
+}
+
 
 const initCommands = (program) => {
   addInitOption(program);
+  addCompileOption(program);
   addTestOption(program);
+  addEpochOption(program);
 }
 
 module.exports = {

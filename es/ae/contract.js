@@ -31,12 +31,12 @@
 import Ae from './'
 import * as R from 'ramda'
 
-async function encodeCall (code, abi, name, args) {
-  return this.contractEpochEncodeCallData(code, abi, name, args)
+async function encodeCall (code, abi, name, args, call) {
+  return this.contractEpochEncodeCallData(code, abi, name, args, call)
 }
 
-async function callStatic (code, abi, name, { args = '()' } = {}) {
-  const { out } = await this.contractEpochCall(code, abi, name, args)
+async function callStatic (code, abi, name, { args = '()', call } = {}) {
+  const { out } = await this.contractEpochCall(code, abi, name, args, call)
   return {
     result: out,
     decode: (type) => this.contractDecodeData(type, out)
@@ -47,7 +47,7 @@ async function decode (type, data) {
   return this.contractEpochDecodeData(type, data)
 }
 
-async function call (code, abi, address, name, { args = '()', options = {} } = {}) {
+async function call (code, abi, address, name, { args = '()', options = {}, call } = {}) {
   const opt = R.merge(this.Ae.defaults, options)
 
   // Check for MAX_GAS
@@ -56,7 +56,7 @@ async function call (code, abi, address, name, { args = '()', options = {} } = {
   }
 
   const tx = await this.contractCallTx(R.merge(opt, {
-    callData: await this.contractEncodeCall(code, abi, name, args),
+    callData: await this.contractEncodeCall(code, abi, name, args, call),
     contractId: address,
     callerId: await this.address()
   }))
@@ -105,9 +105,9 @@ async function compile (code, options = {}) {
   const o = await this.compileEpochContract(code, options)
 
   return Object.freeze(Object.assign({
-    encodeCall: async (name, args) => this.contractEncodeCall(o.bytecode, 'sophia', name, args),
-    call: async (name, options) => this.contractCallStatic(o.bytecode, 'sophia', name, options),
-    deploy: async (options) => this.contractDeploy(o.bytecode, 'sophia', options)
+    encodeCall: async (name, args, { call, abi }) => this.contractEncodeCall(o.bytecode, R.defaultTo('sophia', abi), name, args, call),
+    call: async (name, options = {}) => this.contractCallStatic(o.bytecode, R.defaultTo('sophia', options.abi), name, options),
+    deploy: async (options = {}) => this.contractDeploy(o.bytecode, R.defaultTo('sophia', options.abi), options)
   }, o))
 }
 
