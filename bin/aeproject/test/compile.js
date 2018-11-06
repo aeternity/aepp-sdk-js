@@ -13,19 +13,19 @@ let executeOptions = { cwd : process.cwd() + "/bin/aeproject/test/"};
 describe('Aeproject', () => {
 
 	describe('Compile', () => {
-		it('Should compile contract successfully with specif contract path ', async () => {
+		it('Should compile contract successfully with specif contract path', async () => {
 			let result = await execute("compile", ["--path", "./contracts/SampleContract.aes"], executeOptions)
 
 			assert.include(result, expectedCompileResult)
 		})
 
-		it('Should compile contract successfully without path ', async () => {
+		it('Should compile contract successfully without path', async () => {
 			let result = await execute("compile", [], executeOptions)
 
 			assert.include(result, expectedCompileResult)
 		})
 
-		it('Should compile multiple contracts successfully with path ', async () => {
+		it('Should compile multiple contracts successfully with path', async () => {
 			let result = await execute("compile", ["--path", "./multipleContractsFolder"], executeOptions)
 
 			assert.include(result, expectedResult1)
