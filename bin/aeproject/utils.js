@@ -32,6 +32,16 @@ const config = {
   nonce: 1
 }
 
+// Print helper
+const print = (msg, obj) => {
+  if (obj) { console.log(msg, obj) } else { console.log(msg) }
+}
+
+// Print error helper
+const printError = (msg) => {
+  console.log(msg)
+}
+
 const createIfExistsFolder = (dir) => {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
@@ -86,6 +96,8 @@ const sleep = (ms) => {
 }
 
 module.exports = {
+  print,
+  printError,
   createIfExistsFolder,
   copyFileOrDir,
   getFiles,

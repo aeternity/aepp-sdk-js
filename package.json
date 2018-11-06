@@ -6,7 +6,6 @@
   "browser": "dist/aepp-sdk.browser.js",
   "module": "es/index.js",
   "bin": {
-    "aecli": "./bin/aecli.js",
     "aeproject": "./bin/aeproject/aeproject-cli.js"
   },
   "sideEffects": false,
@@ -26,8 +25,7 @@
     "API",
     "aeternity",
     "blockchain",
-    "SDK",
-    "CLI"
+    "SDK"
   ],
   "dependencies": {
     "@babel/runtime": "^7.0.0-beta.46",
@@ -49,7 +47,6 @@
     "path": "^0.12.7",
     "postinstall-build": "^5.0.1",
     "promisify-child-process": "^2.1.2",
-    "prompt": "^1.0.0",
     "ramda": "^0.25.0",
     "recursive-rename": "^2.0.0",
     "rlp": "^2.0.0",
