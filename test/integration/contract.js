@@ -108,7 +108,7 @@ describe('Contract', function () {
     })
   })
 
-  it('type:check call deployed contracts', async () => {
+  it('type-check call deployed contracts', async () => {
     const result = await deployed.call('main', { call: callIdentityExample })
     return result.decode('int').should.eventually.become({
       type: 'word',
