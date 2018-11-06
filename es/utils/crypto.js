@@ -133,7 +133,7 @@ export function generateKeyPairFromSecret (secret) {
 
 /**
  * Generate a random ED25519 keypair
- * @rtype (raw: Boolean) => {pub: String, priv: String} | {pub: Buffer, priv: Buffer}
+ * @rtype (raw: Boolean) => {publicKey: String, secretKey: String} | {publicKey: Buffer, secretKey: Buffer}
  * @param {Boolean} raw - Whether to return raw (binary) keys
  * @return {Object} Key pair
  */
@@ -146,13 +146,13 @@ export function generateKeyPair (raw = false) {
 
   if (raw) {
     return {
-      pub: publicBuffer,
-      priv: secretBuffer
+      publicKey: publicBuffer,
+      secretKey: secretBuffer
     }
   } else {
     return {
-      pub: `ak_${encodeBase58Check(publicBuffer)}`,
-      priv: secretBuffer.toString('hex')
+      publicKey: `ak_${encodeBase58Check(publicBuffer)}`,
+      secretKey: secretBuffer.toString('hex')
     }
   }
 }
@@ -210,8 +210,8 @@ export function decryptKey (password, encrypted) {
 
 /**
  * Generate signature
- * @rtype (data: String, privateKey: Buffer) => Buffer
- * @param {String} data - Data to sign
+ * @rtype (data: String|Buffer, privateKey: Buffer) => Buffer
+ * @param {String|Buffer} data - Data to sign
  * @param {Buffer} privateKey - Key to sign with
  * @return {Buffer} Signature
  */
@@ -250,7 +250,7 @@ export function prepareTx (signature, data) {
 }
 
 export function personalMessageToBinary (message) {
-  const p = Buffer.from('‎æternity Signed Message:\n', 'utf8')
+  const p = Buffer.from('æternity Signed Message:\n', 'utf8')
   const msg = Buffer.from(message, 'utf8')
   if (msg.length >= 0xFD) throw new Error('message too long')
   return Buffer.concat([Buffer.from([p.length]), p, Buffer.from([msg.length]), msg])
@@ -279,15 +279,15 @@ export function aeEncodeKey (binaryKey) {
 
 /**
  * Generate a new key pair using {@link generateKeyPair} and encrypt it using `password`
- * @rtype (password: String) => {pub: UInt8Array, priv: UInt8Array}
+ * @rtype (password: String) => {publicKey: UInt8Array, secretKey: UInt8Array}
  * @param {String} password - Password to encrypt with
  * @return {Object} Encrypted key pair
  */
 export function generateSaveWallet (password) {
   let keys = generateKeyPair(true)
   return {
-    pub: encryptPublicKey(password, keys.pub),
-    priv: encryptPrivateKey(password, keys.priv)
+    publicKey: encryptPublicKey(password, keys.publicKey),
+    secretKey: encryptPrivateKey(password, keys.secretKey)
   }
 }
 
@@ -368,17 +368,17 @@ export function isValidKeypair (privateKey, publicKey) {
  *
  * Designed to be used with `env` from nodejs. Assumes enviroment variables
  * `WALLET_PRIV` and `WALLET_PUB`.
- * @rtype (env: Object) => {pub: String, priv: String}, throws: Error
+ * @rtype (env: Object) => {publicKey: String, secretKey: String}, throws: Error
  * @param {Object} env - Environment
  * @return {Object} Key pair
  */
 export function envKeypair (env) {
   const keypair = {
-    priv: env['WALLET_PRIV'],
-    pub: env['WALLET_PUB']
+    secretKey: env['WALLET_PRIV'],
+    publicKey: env['WALLET_PUB']
   }
 
-  if (keypair.pub && keypair.priv) {
+  if (keypair.publicKey && keypair.secretKey) {
     return keypair
   } else {
     throw Error('Environment variables WALLET_PRIV and WALLET_PUB need to be set')

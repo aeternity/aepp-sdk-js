@@ -21,7 +21,7 @@ import * as R from 'ramda'
 import { generateKeyPair } from '../../es/utils/crypto'
 
 function randomName () {
-  return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString(36) + '.aet'
+  return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString(36) + '.test'
 }
 
 plan(20)
@@ -51,7 +51,7 @@ describe('Aens', function () {
 
       const aens2 = await BaseAe()
       aens2.setKeypair(newAccount)
-      return aens2.aensUpdate(claim.id, newAccount.pub, { blocks: 1 }).should.eventually.be.rejected
+      return aens2.aensUpdate(claim.id, newAccount.publicKey, { blocks: 1 }).should.eventually.be.rejected
     })
   })
 

@@ -160,7 +160,7 @@ Generate a random ED25519 keypair
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
 **Returns**: `Object` - Key pair  
-**rtype**: `(raw: Boolean) => {pub: String, priv: String} | {pub: Buffer, priv: Buffer}`
+**rtype**: `(raw: Boolean) => {publicKey: String, secretKey: String} | {publicKey: Buffer, secretKey: Buffer}`
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -286,7 +286,7 @@ Generate a new key pair using [generateKeyPair](generateKeyPair) and encrypt it 
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
 **Returns**: `Object` - Encrypted key pair  
-**rtype**: `(password: String) => {pub: UInt8Array, priv: UInt8Array}`
+**rtype**: `(password: String) => {publicKey: UInt8Array, secretKey: UInt8Array}`
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -384,7 +384,7 @@ Designed to be used with `env` from nodejs. Assumes enviroment variables
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
 **Returns**: `Object` - Key pair  
-**rtype**: `(env: Object) => {pub: String, priv: String}, throws: Error`
+**rtype**: `(env: Object) => {publicKey: String, secretKey: String}, throws: Error`
 
 | Param | Type | Description |
 | --- | --- | --- |

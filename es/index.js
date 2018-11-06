@@ -29,7 +29,7 @@ import Contract from './ae/contract'
 import Wallet from './ae/wallet'
 import Aepp from './ae/aepp'
 import Selector from './account/selector'
-import Cli from './ae/cli'
+import Universal from './ae/universal'
 
 export {
   Ae,
@@ -46,5 +46,5 @@ export {
   Wallet,
   JsTx,
   Selector,
-  Cli
+  Universal
 }
