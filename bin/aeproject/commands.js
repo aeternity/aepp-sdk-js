@@ -14,11 +14,10 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
+const compile = require('./cli-commands/compile/compile.js');
 const init = require('./cli-commands/init/init.js');
 const testConfig = require('./cli-commands/test/test.js');
 const epoch = require('./cli-commands/epoch/epoch.js');
-const utils = require('../utils/index')
-
 
 const addInitOption = (program) => {
   program
@@ -28,6 +27,15 @@ const addInitOption = (program) => {
       await init.run();
     })
 }
+
+const addCompileOption = (program) => {
+  program
+    .command('compile')
+    .option('--path [compile path]', 'Path to contract files', './contracts')
+    .description('Compile contracts')
+    .action(async (option) => {
+      await compile.run(option.path);
+    })
 
 const addTestOption = (program) => {
   program
@@ -53,6 +61,7 @@ const addEpochOption = (program) => {
 
 const initCommands = (program) => {
   addInitOption(program);
+  addCompileOption(program);
   addTestOption(program);
   addEpochOption(program);
 }
