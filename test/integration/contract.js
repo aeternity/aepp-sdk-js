@@ -31,6 +31,14 @@ contract StateContract =
   public function retrieve() = state.value
 `
 
+const callIdentityExample = `
+contract StateContract =
+  function main : int => int
+  function __call() = main(42)
+`
+
+const identityContractByteCode = 'cb_PrYsBBtixiciNyCyavZheKqeu4ADSKyu8jftRmVstB58vKJfTjEJbgJYgqZpvWxgyWk94RuJLnAeFJi4WcC4bQwdZHZZrsktCyjoWW6RXFCF6xPa1g5EDZtau3TZtzA7d5z5ZG8gzSCaDD8fPyBx8C6wfzDgE5w9j5waTHD1bQqtMXFXZ4MPrY6K5oi7afEBqLEeDzAeSWABaDYvJsysunTRsiztpGy4jUbkV7bh7v9mtVTMkNiv9Vf9EocF3rDjMy1abRgsxJrSV9MhTo3xRAmRbDQb3hDD6H4NRFLY5ghVDAVxcCHDQgfJGKSjqBZPB2qMsCRESDjywU2gxwmi9e164ysK2UcLuxSUXzPMk6mDhFQiDt29StpwmE5Py3U3BDvEA8mtp7Bv7e6YyshHgWAc26d4PLQkKr5hx7RcYucQtSrVh47sHTzBHCaFP5k4RGzGdrme4v8npsLKggcGU5TgPfLbAQUR8kCQRZr8XFn7p59foAxw4SM6xEtvNuXqpA8fPh96D8So7bJVJ2Zn7cTfABgPPf4ADEWAxwnbgtGzzDqzHhuU4PbXAFZLZZo2xy22dEHRcvvrJqVjTuwyz2EMQcBAsjRynf4TaUehnBCEAmViasikh11yEwwsoSj8usarRurfaT2AvRMx7hv6nK8GrdbSQUyLJk2RRdrpNorYhpyHhBeBj69HTVZTTY87F4c92PndQPXm51HuHetd7fgFxbVZTy1nTgANM16qJJVgAk9xjLVoRncP6Eveh8SHuxCbXR5EqxsMFMZExrEFgeFDF7Z7n4DKwiVFjG5MyWJNYQFn5NCUhapY1PLjecPU4p5k5nLd1BVyZpL5MqtRhFcwmK4RMT73koTvgj5GAb5WocPEntZgPKnPkr8EGzj9ZMwMwd8AkaEwqtocmHhxeqGRjjRsZjEACD3LRoPYEaU17ydBpKxiVWqytADkgC1bHtZmfKPqdTQAjvpWpgy2BDDwMBjs7sFVMsV44vi47oLep9pgAt5ofoZmaEm4jbdnnvKQq9owQ5QE4o2WHuKVLBCnfHALT4dpyWtpJVq5ajpjUADCEyZqhwoW1rmnaT9MjM7Zt6ohTc8tM2zrCPVu6a7XbqmgZjz69wKza65t78AWow7t1Ry4yhegRJ6SiPtTn3wYRhKHSJc7z4iRz7WnnuLyZXLd63pp6jvF8XtDT4gjt2fdGEvgdX9jdDimdbXhkmScXbNk4gbwzvzZheKwknhhgTpMnopG9Y5zrMj62v4Py9YsYJkqW1Hs1kfeTRGiwxF2KmPP3ysTUQ1PE6oTRSwLsZVbVGxjhmtTyR4Fa4U9Cr1yBfUtSKy1kntPCKyx3TfouKy44V4tCLRdZGyr2rfuzw6k9ppP2Uh9MnDnt'
+
 plan(1000000000)
 
 describe('Contract', function () {
@@ -39,7 +47,6 @@ describe('Contract', function () {
   let contract
   let bytecode
   let deployed
-  let compiledIdentity
 
   before(async function () {
     contract = await ready(this)
@@ -47,8 +54,15 @@ describe('Contract', function () {
 
   describe('precompiled bytecode', () => {
     it('can be invoked', async () => {
-      compiledIdentity = await contract.contractCompile(identityContract)
-      const result = await contract.contractCallStatic(compiledIdentity.bytecode, 'sophia', 'main', { args: '(42)' })
+      const result = await contract.contractCallStatic(identityContractByteCode, 'sophia', 'main', { args: '(42)' })
+      return result.decode('int').should.eventually.become({
+        type: 'word',
+        value: 42
+      })
+    })
+
+    it('can be invoked using type-check', async () => {
+      const result = await contract.contractCallStatic(identityContractByteCode, 'sophia', 'main', { call: callIdentityExample  })
       return result.decode('int').should.eventually.become({
         type: 'word',
         value: 42
@@ -56,7 +70,7 @@ describe('Contract', function () {
     })
 
     it('can be deployed', async () => {
-      return contract.contractDeploy(compiledIdentity.bytecode, 'sophia').should.eventually.have.property('address')
+      return contract.contractDeploy(identityContractByteCode, 'sophia').should.eventually.have.property('address')
     })
   })
 
@@ -73,6 +87,14 @@ describe('Contract', function () {
     })
   })
 
+  it('invokes function with type-check against compiled code', async () => {
+    const result = await bytecode.call('main', { call: callIdentityExample })
+    return result.decode('int').should.eventually.become({
+      type: 'word',
+      value: 42
+    })
+  })
+
   it('deploys compiled contracts', async () => {
     deployed = await bytecode.deploy()
     return deployed.should.have.property('address')
@@ -80,6 +102,14 @@ describe('Contract', function () {
 
   it('calls deployed contracts', async () => {
     const result = await deployed.call('main', { args: '42' })
+    return result.decode('int').should.eventually.become({
+      type: 'word',
+      value: 42
+    })
+  })
+
+  it('type-check call deployed contracts', async () => {
+    const result = await deployed.call('main', { call: callIdentityExample })
     return result.decode('int').should.eventually.become({
       type: 'word',
       value: 42
