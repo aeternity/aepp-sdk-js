@@ -5,9 +5,6 @@ const assert = chai.assert;
 const execute = require('./../utils.js').execute;
 
 describe('Aeproject', () => {
-
-	xdescribe('Test', () => {
-		it('Test', async () => {
-		})
-    })
+	it('Test', async () => {
+	})
 })
