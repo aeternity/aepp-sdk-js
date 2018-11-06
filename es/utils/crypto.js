@@ -210,8 +210,8 @@ export function decryptKey (password, encrypted) {
 
 /**
  * Generate signature
- * @rtype (data: String, privateKey: Buffer) => Buffer
- * @param {String} data - Data to sign
+ * @rtype (data: String|Buffer, privateKey: Buffer) => Buffer
+ * @param {String|Buffer} data - Data to sign
  * @param {Buffer} privateKey - Key to sign with
  * @return {Buffer} Signature
  */
@@ -250,7 +250,7 @@ export function prepareTx (signature, data) {
 }
 
 export function personalMessageToBinary (message) {
-  const p = Buffer.from('‎æternity Signed Message:\n', 'utf8')
+  const p = Buffer.from('æternity Signed Message:\n', 'utf8')
   const msg = Buffer.from(message, 'utf8')
   if (msg.length >= 0xFD) throw new Error('message too long')
   return Buffer.concat([Buffer.from([p.length]), p, Buffer.from([msg.length]), msg])

@@ -31,7 +31,7 @@ contract StateContract =
   public function retrieve() = state.value
 `
 
-const callIdentyExample = `
+const callIdentityExample = `
 contract StateContract =
   function main : int => int
   function __call() = main(42)
@@ -47,7 +47,6 @@ describe('Contract', function () {
   let contract
   let bytecode
   let deployed
-  let identityCompiled
 
   before(async function () {
     contract = await ready(this)
@@ -55,7 +54,7 @@ describe('Contract', function () {
 
   describe.only('precompiled bytecode', () => {
     it('can be invoked', async () => {
-      const result = await contract.contractCallStatic(identityContractByteCode, 'sophia', 'main', { args: '42' })
+      const result = await contract.contractCallStatic(identityContractByteCode, 'sophia', 'main', { args: '(42)' })
       return result.decode('int').should.eventually.become({
         type: 'word',
         value: 42
@@ -63,7 +62,7 @@ describe('Contract', function () {
     })
 
     it('can be invoked using type-check', async () => {
-      const result = await contract.contractCallStatic(identityContractByteCode, 'sophia', 'main', { call: callIdentyExample  })
+      const result = await contract.contractCallStatic(identityContractByteCode, 'sophia', 'main', { call: callIdentityExample  })
       return result.decode('int').should.eventually.become({
         type: 'word',
         value: 42
@@ -89,7 +88,7 @@ describe('Contract', function () {
   })
 
   it('invokes function with type-check against compiled code', async () => {
-    const result = await bytecode.call('main', { call: callIdentyExample })
+    const result = await bytecode.call('main', { call: callIdentityExample })
     return result.decode('int').should.eventually.become({
       type: 'word',
       value: 42
@@ -110,7 +109,7 @@ describe('Contract', function () {
   })
 
   it('type:check call deployed contracts', async () => {
-    const result = await deployed.call('main', { call: callIdentyExample })
+    const result = await deployed.call('main', { call: callIdentityExample })
     return result.decode('int').should.eventually.become({
       type: 'word',
       value: 42
