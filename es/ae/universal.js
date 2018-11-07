@@ -16,29 +16,34 @@
  */
 
 /**
- * Aepp module
- * @module @aeternity/aepp-sdk/es/ae/aepp
- * @export Aepp
- * @example import Ae from '@aeternity/aepp-sdk/es/ae/aepp'
+ * Universal module
+ * @module @aeternity/aepp-sdk/es/ae/universal
+ * @export Universal
+ * @example import Ae from '@aeternity/aepp-sdk/es/ae/universal'
  */
 
 import Ae from './'
+import Account from '../account/memory'
+import Chain from '../chain/epoch'
 import Aens from './aens'
 import Contract from './contract'
-import Rpc from '../rpc/client'
+import Transaction from '../tx/tx'
+import EpochContract from '../contract/epoch'
 
 /**
- * Aepp Stamp
+ * Universal Stamp
  *
- * Aepp provides Ae base functionality with Contract and Aens.
- * This stamp can be used only with Wallet, all Aepp method's going through RPC to Wallet.
+ * Universal provides Ae base functionality with Contract and Aens
  * {@link module:@aeternity/aepp-sdk/es/ae--Ae} clients.
  * @function
- * @alias module:@aeternity/aepp-sdk/es/ae/aepp
+ * @alias module:@aeternity/aepp-sdk/es/ae/universal
  * @rtype Stamp
  * @param {Object} [options={}] - Initializer object
- * @return {Object} Aepp instance
+ * @return {Object} Universal instance
  */
-const Aepp = Ae.compose(Contract, Aens, Rpc)
+const Universal = Ae.compose(Account, Chain, Transaction, Aens, EpochContract, Contract, {
+  init () {},
+  props: { process: {} }
+})
 
-export default Aepp
+export default Universal

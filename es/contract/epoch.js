@@ -15,15 +15,28 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+/**
+ * EpochContract module
+ *
+ * This is the complement to {@link module:@aeternity/aepp-sdk/es/contract}.
+ * @module @aeternity/aepp-sdk/es/contract/epoch
+ * @export EpochContract
+ * @example import Selector from '@aeternity/aepp-sdk/es/contract/apoch'
+ */
+
 import * as R from 'ramda'
 import ContractBase from './'
 import Epoch from '../epoch'
 
-async function contractEpochEncodeCallData (code, abi, name, arg) {
+const TYPE_CHECKED_ABI = ['sophia', 'sophia-address']
+
+async function contractEpochEncodeCallData (code, abi, name, arg, call) {
+  if (call && TYPE_CHECKED_ABI.includes(abi)) return (await this.api.encodeCalldata({ abi, code, call })).calldata
   return (await this.api.encodeCalldata({ abi, code, 'function': name, arg })).calldata
 }
 
-async function contractEpochCall (code, abi, name, arg = '()') {
+async function contractEpochCall (code, abi, name, arg = '()', call) {
+  if (call && TYPE_CHECKED_ABI.includes(abi)) return this.api.callContract({ abi, code, call })
   return this.api.callContract({ abi, code, 'function': name, arg })
 }
 

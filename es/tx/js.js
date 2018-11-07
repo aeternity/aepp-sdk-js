@@ -107,7 +107,7 @@ export function decode (data, type) {
 /**
  * Create a spend transaction
  *
- * @param {string} recipientId Tthe public key of the recipient
+ * @param {string} recipientId The public key of the recipient
  * @param {number} amount The amount to send
  * @param {string} payload The payload associated with the data
  * @param {number} fee The fee for the transaction
