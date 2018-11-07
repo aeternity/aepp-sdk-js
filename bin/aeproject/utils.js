@@ -80,7 +80,7 @@ const getClient = async function(){
   return client;
 }
 
-const sleep = (ms) => {
+const sleep = async (ms) => {
   var start = Date.now();
   while (true) {
     var clock = (Date.now() - start);
@@ -89,25 +89,30 @@ const sleep = (ms) => {
 }
 
 
-const execute = (command, args, options = {}) => {
-  return new Promise((resolve, reject) => {
+const execute = async (command, args, options = {}) => {
     let result = ''
-
     const child = spawn('aeproject', [command, ...args], options)
-    
-    child.stdin.setEncoding('utf-8')
+
+    // // child.stdin.setEncoding('utf-8')
     child.stdout.on('data', (data) => {
-      result += (data.toString())
+      console.log(data.toString())
+      // result += (data.toString())
     })
 
     child.stderr.on('data', (data) => {
-      reject(data)
+      // reject(data)
+      console.log(data.toString())
     })
 
-    child.on('close', (code) => {
-      resolve(result)
-    })
-  })
+    await child;
+
+    
+
+    // child.on('close', (code) => {
+    //   console.log(result)
+      
+    //   // return(result)
+    // })
 }
 
 module.exports = {

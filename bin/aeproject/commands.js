@@ -54,10 +54,12 @@ const addEpochOption = (program) => {
   program
     .command('epoch')
     .description('Running the epoch. Without any argument epoch will be runned with --start argument')
-    .option('--stop', 'Stop the epoch')
-    .option('--start', 'Start the epoch')
+    .option('--stop [bool]', 'Stop the epoch')
+    .option('--start [bool]', 'Start the epoch')
+    .option('--dir [path]', 'Set start dir for epoch')
     .action(async (options) => {
-      await epoch.run(options);
+      // console.log(options)
+      await epoch.run(options.stop, options.start, options.dir);
     })
 }
 

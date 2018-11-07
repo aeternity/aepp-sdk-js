@@ -1,38 +1,21 @@
 const chai = require('chai');
 const chaiFiles = require('chai-files');
-const fs = require('fs-extra')
 const assert = chai.assert;
 const execute = require('./../utils.js').execute;
+const cleanUp = require("./utils").cleanUp
 
 let executeOptions = { cwd : process.cwd() + "/bin/aeproject/test/"};
 let expect = chai.expect;
 let file = chaiFiles.file;
 let dir = chaiFiles.dir;
 
-let filesAndfoldersToRemove = [
-	'node_modules',
-	'deploy',
-	'docker',
-	'test',
-	'contracts/Identity.aes',
-	'package.json',
-	'package-lock.json',
-	'docker-compose.yml'
-]
 chai.use(chaiFiles);
 
 
 describe('Aeproject Epoch', () => {
-	after(async () => {
-		filesAndfoldersToRemove.forEach((e) => {
-			try{
-				fs.removeSync(executeOptions.cwd + e); 
-			} catch(e){
-
-			}
-		})
+	before(async () => {
+		await cleanUp()
 	})
-
 
 	it('Should init project successfully', async () => {
 		let result = await execute("init", [], executeOptions)
@@ -53,5 +36,9 @@ describe('Aeproject Epoch', () => {
 		expect(file(executeOptions.cwd + 'docker/nginx-default.conf')).to.exist;
 		expect(file(executeOptions.cwd + 'docker/nginx-ws.conf')).to.exist;
 		expect(dir('docker/keys')).to.not.be.empty;
+	})
+
+	after(async () => {
+		await cleanUp()
 	})
 })
