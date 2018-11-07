@@ -18,8 +18,6 @@ const compile = require('./cli-commands/compile/compile.js');
 const init = require('./cli-commands/init/init.js');
 const testConfig = require('./cli-commands/test/test.js');
 const epoch = require('./cli-commands/epoch/epoch.js');
-const utils = require('../utils/index')
-
 
 const addInitOption = (program) => {
   program
