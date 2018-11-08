@@ -14,7 +14,6 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-
 require = require('esm')(module /*, options */) // use to handle es6 import/export
 import { printError, print } from '../../../utils/print'
 const utils = require('../../utils.js');
@@ -33,7 +32,7 @@ async function compileAndPrint(file){
         print(`Contract bytecode: ${contract.bytecode}`)
     } catch(error){
         printError(`Contract '${file} has not been compiled'`)
-        printError(`reason: ${error.response.data.reason}`)
+        printError(`Reason: ${error.response.data.reason}`)
     }
 
     print('\r')
@@ -41,7 +40,7 @@ async function compileAndPrint(file){
 
 async function run(path) {
     print('===== Compiling contracts =====');
-
+    
     if (path.includes('.aes')) {
         compileAndPrint(path)
     } else {

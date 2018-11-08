@@ -81,7 +81,7 @@ const installAeppSDK = async () => {
   sdkInstallProcess.stdout.on('data', (data) => {
     print(`${data}`);
   });
-
+  
   sdkInstallProcess.stderr.on('data', (data) => {
     print(`WARN: ${data}`);
   });

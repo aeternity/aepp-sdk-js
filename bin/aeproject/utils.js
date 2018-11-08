@@ -15,11 +15,12 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+require = require('esm')(module /*, options */) // use to handle es6 import/export
+ 
 const fs = require('fs-extra')
 const dir = require('node-dir');
 const cli = require('./../utils/cli');
-import { printError } from '../utils/print'
-import { handleApiError } from '../utils/errors'
+const handleApiError = require('./../utils/errors').handleApiError;
 
 
 const config = {
@@ -42,6 +43,17 @@ const printError = (msg) => {
   console.log(msg)
 }
 
+const config = {
+  host: "http://localhost:3001/",
+	internalHost: "http://localhost:3001/internal/",
+	keyPair: {
+		secretKey: 'bb9f0b01c8c9553cfbaf7ef81a50f977b1326801ebf7294d1c2cbccdedf27476e9bbf604e611b5460a3b3999e9771b6f60417d73ce7c5519e12f7e127a1225ca',
+		publicKey: 'ak_2mwRmUeYmfuW93ti9HMSUJzCk1EYcQEfikVSzgo6k2VghsWhgU'
+  },
+  nonce: 1
+}
+
+const { spawn } = require('promisify-child-process');
 const createIfExistsFolder = (dir) => {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
@@ -80,19 +92,47 @@ const getClient = async function(){
     {
       url: config.host, 
       keypair: config.keyPair, 
-      internalUrl: config.internalHost
+      internalUrl: config.internalHost,
+      force: true
     })
   })
 
   return client;
 }
 
-const sleep = (ms) => {
+const sleep = async (ms) => {
   var start = Date.now();
   while (true) {
     var clock = (Date.now() - start);
     if (clock >= ms) break;
   }
+}
+
+
+const execute = async (command, args, options = {}) => {
+    let result = ''
+    const child = spawn('aeproject', [command, ...args], options)
+
+    // // child.stdin.setEncoding('utf-8')
+    child.stdout.on('data', (data) => {
+      console.log(data.toString())
+      // result += (data.toString())
+    })
+
+    child.stderr.on('data', (data) => {
+      // reject(data)
+      console.log(data.toString())
+    })
+
+    await child;
+
+    
+
+    // child.on('close', (code) => {
+    //   console.log(result)
+      
+    //   // return(result)
+    // })
 }
 
 module.exports = {
@@ -102,5 +142,6 @@ module.exports = {
   copyFileOrDir,
   getFiles,
   getClient,
-  sleep
+  sleep,
+  execute
 }
