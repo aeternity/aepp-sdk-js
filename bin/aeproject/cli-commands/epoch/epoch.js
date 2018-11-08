@@ -95,32 +95,39 @@ async function dockerPs(){
 }
 
 async function fundWallets(){
-  let client = await cli.initClient(
-    {
-      url: config.host, 
-      keypair: config.keyPair, 
-      internalUrl: config.internalHost
-    })
   
-  let balance = 0;
-  while(parseInt(balance) > 0){
-    try{
-      process.stdout.write(".");
-      utils.sleep(1500)
-      balance = (await client.balance(await client.address()));
-    }catch(e){
-      //todo
-    }
+  try{
+    let client = await cli.initClient(
+      {
+        url: config.host, 
+        keypair: config.keyPair, 
+        internalUrl: config.internalHost
+      })
+    
+      
+      let balance = 0;
+      while(parseInt(balance) > 0){
+        try{
+          process.stdout.write(".");
+          utils.sleep(1500)
+          balance = (await client.balance(await client.address()));
+        }catch(e){
+          //todo
+        }
+      }
+    
+    
+      for (var i = 0, len = defaultWallets.length; i < len; i++) {
+        await fundWallet(client, defaultWallets[0].publicKey)
+        print(`#${i + 1} ------------------------------------------------------------`)
+        print(`public key: ${defaultWallets[0].publicKey}`)
+        print(`private key: ${defaultWallets[0].secretKey}`)
+      }
   }
-
-  let walletIndex = 1;
-  defaultWallets.forEach(async function(wallet){
-    await fundWallet(client, wallet.publicKey)
-    print(`#${walletIndex++} ------------------------------------------------------------`)
-    print(`public key: ${wallet.publicKey}`)
-    print(`private key: ${wallet.secretKey}`)
-  })
-
+  catch(e){
+    print("fundWallets Error")
+    print(e)
+  }
 }
 
 async function fundWallet(client, recipient){
@@ -138,46 +145,68 @@ async function fundWallet(client, recipient){
   await client.api.postTransaction({ tx: signed })
 }
 
-async function run(option) {
-
-  try {
-    var sdkInstallProcess;
-    let running = await dockerPs();
-
-    if (option.stop) {
-      if(running){
-        print('===== Stopping epoch =====');
-      
-        sdkInstallProcess = await spawn('docker-compose', ['down', '-v'], {});
-  
-        print('===== Epoch was successfully stopped! =====');
-      } else {
-        print('===== Epoch is not running! =====');
+async function run(stop, start, dir) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if(dir == undefined){
+        dir = process.cwd();
       }
-    } else {
-      if(!running){
-        print('===== Starting epoch =====');
 
-        sdkInstallProcess = spawn('docker-compose', ['up', '-d'], {});
+      let running = await dockerPs();
+      if (stop == true) {
+        if(running){
+          print('===== Stopping epoch =====');
         
-        while(!(await dockerPs())){
-          process.stdout.write(".");
-          utils.sleep(1000);
+          await spawn('docker-compose', ['down', '-v'], {cwd: dir});
+          
+          print('===== Epoch was successfully stopped! =====');
+        } else {
+          print('===== Epoch is not running! =====');
         }
-  
-        print('\n\r===== Epoch was successfully started! =====');
-        print('===== Funding default wallets! =====');
-        
-        await fundWallets();
-        
-        print('\r\n===== Default wallets was successfully funded! =====');
       } else {
-        print('\r\n===== Epoch already started and healthy started! =====');
+        if(!running){
+          print('===== Starting epoch =====');
+   
+          var sdkInstallProcess = spawn('docker-compose', ['up', '-d'], {cwd: dir});
+                
+          sdkInstallProcess.stdout.on('data', (data) => {
+            print(`${data}`);
+          });
+          
+          sdkInstallProcess.stderr.on('data', (data) => {
+            print(`WARN: ${data}`);
+          });
+
+          var rdy = false;
+          sdkInstallProcess.on('close', (code) => {
+            rdy = true;
+          })
+
+          await sdkInstallProcess;
+          
+          while(!(await dockerPs()) && !rdy){
+            process.stdout.write(".");
+            utils.sleep(1000);
+          }
+    
+          print('\n\r===== Epoch was successfully started! =====');
+          print('===== Funding default wallets! =====');
+
+          utils.sleep(10000);
+          await fundWallets();
+
+          
+          print('\r\n===== Default wallets was successfully funded! =====');
+          resolve();
+        } else {
+          print('\r\n===== Epoch already started and healthy! =====');
+        }
       }
+    } catch (e) {
+      printError(e.message)
+      reject(e.message)
     }
-  } catch (e) {
-    printError(e.message)
-  }
+  })
 }
 
 module.exports = {

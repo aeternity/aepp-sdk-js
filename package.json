@@ -17,6 +17,7 @@
     "test": "mocha --recursive --require @babel/register",
     "test:watch": "mocha --recursive --require @babel/register --watch",
     "test-jenkins": "mocha --recursive --require @babel/register --reporter mocha-junit-reporter",
+    "test-aeproject": "mocha './bin/aeproject/test/index.js' --timeout 0 --exit",
     "prepublishOnly": "npm run build && npm run docs:docco && npm run docs:api",
     "postinstall": "postinstall-build --only-as-dependency dist"
   },
@@ -76,6 +77,7 @@
     "bufferutil": "^3.0.3",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
+    "chai-files": "^1.4.0",
     "docco": "^0.8.0",
     "esdoc": "^1.1.0",
     "esdoc-standard-plugin": "^1.0.0",
