@@ -340,7 +340,8 @@ function destructureClientError (error) {
  * @return {Function}
  */
 const operation = R.memoize((path, method, definition, types) => {
-  const { operationId, parameters, description } = definition
+  const { operationId, description } = definition
+  let { parameters } = definition
   const name = `${R.head(operationId).toLowerCase()}${R.drop(1, operationId)}`
   const pascalized = pascalizeParameters(parameters)
 
