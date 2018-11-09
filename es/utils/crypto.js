@@ -31,6 +31,9 @@ import shajs from 'sha.js'
 
 const Ecb = aesjs.ModeOfOperation.ecb
 
+// NETWORK_ID using for signing transation's
+export const NETWORK_ID = 'ae_mainnet'
+
 /**
  * Calculate 256bits Blake2b hash of `input`
  * @rtype (input: String) => hash: String
@@ -159,10 +162,10 @@ export function generateKeyPair (raw = false) {
 
 /**
  * Encrypt given public key using `password`
- * @rtype (password: String, binaryKey: Buffer) => UInt8Array
+ * @rtype (password: String, binaryKey: Buffer) => Uint8Array
  * @param {String} password - Password to encrypt with
  * @param {Buffer} binaryKey - Key to encrypt
- * @return {UInt8Array} Encrypted key
+ * @return {Uint8Array} Encrypted key
  */
 export function encryptPublicKey (password, binaryKey) {
   return encryptKey(password, rightPad(32, binaryKey))
@@ -170,10 +173,10 @@ export function encryptPublicKey (password, binaryKey) {
 
 /**
  * Encrypt given private key using `password`
- * @rtype (password: String, binaryKey: Buffer) => UInt8Array
+ * @rtype (password: String, binaryKey: Buffer) => Uint8Array
  * @param {String} password - Password to encrypt with
  * @param {Buffer} binaryKey - Key to encrypt
- * @return {UInt8Array} Encrypted key
+ * @return {Uint8Array} Encrypted key
  */
 export function encryptPrivateKey (password, binaryKey) {
   return encryptKey(password, leftPad(64, binaryKey))
@@ -181,10 +184,10 @@ export function encryptPrivateKey (password, binaryKey) {
 
 /**
  * Encrypt given data using `password`
- * @rtype (password: String, binaryData: Buffer) => UInt8Array
+ * @rtype (password: String, binaryData: Buffer) => Uint8Array
  * @param {String} password - Password to encrypt with
  * @param {Buffer} binaryData - Data to encrypt
- * @return {UInt8Array} Encrypted data
+ * @return {Uint8Array} Encrypted data
  */
 export function encryptKey (password, binaryData) {
   let hashedPasswordBytes = sha256hash(password)
@@ -194,7 +197,7 @@ export function encryptKey (password, binaryData) {
 
 /**
  * Decrypt given data using `password`
- * @rtype (password: String, encrypted: String) => UInt8Array
+ * @rtype (password: String, encrypted: String) => Uint8Array
  * @param {String} password - Password to decrypt with
  * @param {String} encrypted - Data to decrypt
  * @return {Buffer} Decrypted data
@@ -279,7 +282,7 @@ export function aeEncodeKey (binaryKey) {
 
 /**
  * Generate a new key pair using {@link generateKeyPair} and encrypt it using `password`
- * @rtype (password: String) => {publicKey: UInt8Array, secretKey: UInt8Array}
+ * @rtype (password: String) => {publicKey: Uint8Array, secretKey: Uint8Array}
  * @param {String} password - Password to encrypt with
  * @return {Object} Encrypted key pair
  */

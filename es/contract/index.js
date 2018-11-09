@@ -16,10 +16,10 @@
  */
 
 /**
- * Contract module
+ * Contract Base module
  * @module @aeternity/aepp-sdk/es/contract
  * @export Contract
- * @example import Contract from '@aeternity/aepp-sdk/es/contract'
+ * @example import ContractBase from '@aeternity/aepp-sdk/es/contract'
  */
 
 import stampit from '@stamp/it'
