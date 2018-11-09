@@ -5,9 +5,6 @@
   "main": "dist/aepp-sdk.js",
   "browser": "dist/aepp-sdk.browser.js",
   "module": "es/index.js",
-  "bin": {
-    "aeproject": "./bin/aeproject/aeproject-cli.js"
-  },
   "sideEffects": false,
   "scripts": {
     "build": "webpack -p",
