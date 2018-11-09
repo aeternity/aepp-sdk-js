@@ -20,9 +20,9 @@ import * as Crypto from '@aeternity/aepp-sdk/es/utils/crypto'
         * [.hexStringToByte(str)](#module_@aeternity/aepp-sdk/es/utils/crypto.hexStringToByte) ⇒ `Uint8Array`
         * [.generateKeyPairFromSecret(secret)](#module_@aeternity/aepp-sdk/es/utils/crypto.generateKeyPairFromSecret) ⇒ `Object`
         * [.generateKeyPair(raw)](#module_@aeternity/aepp-sdk/es/utils/crypto.generateKeyPair) ⇒ `Object`
-        * [.encryptPublicKey(password, binaryKey)](#module_@aeternity/aepp-sdk/es/utils/crypto.encryptPublicKey) ⇒ `UInt8Array`
-        * [.encryptPrivateKey(password, binaryKey)](#module_@aeternity/aepp-sdk/es/utils/crypto.encryptPrivateKey) ⇒ `UInt8Array`
-        * [.encryptKey(password, binaryData)](#module_@aeternity/aepp-sdk/es/utils/crypto.encryptKey) ⇒ `UInt8Array`
+        * [.encryptPublicKey(password, binaryKey)](#module_@aeternity/aepp-sdk/es/utils/crypto.encryptPublicKey) ⇒ `Uint8Array`
+        * [.encryptPrivateKey(password, binaryKey)](#module_@aeternity/aepp-sdk/es/utils/crypto.encryptPrivateKey) ⇒ `Uint8Array`
+        * [.encryptKey(password, binaryData)](#module_@aeternity/aepp-sdk/es/utils/crypto.encryptKey) ⇒ `Uint8Array`
         * [.decryptKey(password, encrypted)](#module_@aeternity/aepp-sdk/es/utils/crypto.decryptKey) ⇒ `Buffer`
         * [.sign(data, privateKey)](#module_@aeternity/aepp-sdk/es/utils/crypto.sign) ⇒ `Buffer`
         * [.verify(str, signature, publicKey)](#module_@aeternity/aepp-sdk/es/utils/crypto.verify) ⇒ `Boolean`
@@ -168,12 +168,12 @@ Generate a random ED25519 keypair
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.encryptPublicKey"></a>
 
-### @aeternity/aepp-sdk/es/utils/crypto.encryptPublicKey(password, binaryKey) ⇒ `UInt8Array`
+### @aeternity/aepp-sdk/es/utils/crypto.encryptPublicKey(password, binaryKey) ⇒ `Uint8Array`
 Encrypt given public key using `password`
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
-**Returns**: `UInt8Array` - Encrypted key  
-**rtype**: `(password: String, binaryKey: Buffer) => UInt8Array`
+**Returns**: `Uint8Array` - Encrypted key  
+**rtype**: `(password: String, binaryKey: Buffer) => Uint8Array`
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -182,12 +182,12 @@ Encrypt given public key using `password`
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.encryptPrivateKey"></a>
 
-### @aeternity/aepp-sdk/es/utils/crypto.encryptPrivateKey(password, binaryKey) ⇒ `UInt8Array`
+### @aeternity/aepp-sdk/es/utils/crypto.encryptPrivateKey(password, binaryKey) ⇒ `Uint8Array`
 Encrypt given private key using `password`
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
-**Returns**: `UInt8Array` - Encrypted key  
-**rtype**: `(password: String, binaryKey: Buffer) => UInt8Array`
+**Returns**: `Uint8Array` - Encrypted key  
+**rtype**: `(password: String, binaryKey: Buffer) => Uint8Array`
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -196,12 +196,12 @@ Encrypt given private key using `password`
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.encryptKey"></a>
 
-### @aeternity/aepp-sdk/es/utils/crypto.encryptKey(password, binaryData) ⇒ `UInt8Array`
+### @aeternity/aepp-sdk/es/utils/crypto.encryptKey(password, binaryData) ⇒ `Uint8Array`
 Encrypt given data using `password`
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
-**Returns**: `UInt8Array` - Encrypted data  
-**rtype**: `(password: String, binaryData: Buffer) => UInt8Array`
+**Returns**: `Uint8Array` - Encrypted data  
+**rtype**: `(password: String, binaryData: Buffer) => Uint8Array`
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -215,7 +215,7 @@ Decrypt given data using `password`
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
 **Returns**: `Buffer` - Decrypted data  
-**rtype**: `(password: String, encrypted: String) => UInt8Array`
+**rtype**: `(password: String, encrypted: String) => Uint8Array`
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -286,7 +286,7 @@ Generate a new key pair using [generateKeyPair](generateKeyPair) and encrypt it 
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
 **Returns**: `Object` - Encrypted key pair  
-**rtype**: `(password: String) => {publicKey: UInt8Array, secretKey: UInt8Array}`
+**rtype**: `(password: String) => {publicKey: Uint8Array, secretKey: Uint8Array}`
 
 | Param | Type | Description |
 | --- | --- | --- |

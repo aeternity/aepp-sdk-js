@@ -54,8 +54,8 @@ const handlers = [
  * @return {Promise<String>} Session ID
  */
 async function hello () {
-  const id = this.createSession()
-  Object.assign(this.rpcSessions[id], { address: await this.address() })
+  const id = await Rpc.compose.deepProperties.rpcMethods.hello.call(this)
+  this.rpcSessions[id].address = await this.address()
   return Promise.resolve(id)
 }
 
