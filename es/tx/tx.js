@@ -82,6 +82,16 @@ async function contractCallTx ({ callerId, nonce, contractId, vmVersion, fee, tt
   return (await this.api.postContractCall(R.merge(R.head(arguments), { nonce, ttl }))).tx
 }
 
+async function contractCallComputeTx ({ callerId, nonce, contractId, vmVersion, fee, ttl, amount, gas, gasPrice, fn, args, call }) {
+  nonce = await (calculateNonce.bind(this)(callerId, nonce))
+  ttl = await (calculateTtl.bind(this)(ttl))
+
+  // If we pass `call` make a type-checked call and ignore `fn` and `args` params
+  const callOpt = call ? { call } : { 'function': fn, 'arguments': args };
+
+  return (await this.api.postContractCallCompute({ callerId, contractId, vmVersion, fee, amount, gas, gasPrice, nonce, ttl, ...callOpt })).tx
+}
+
 /**
  * Compute the absolute ttl by adding the ttl to the current height of the chain
  *
@@ -141,7 +151,8 @@ const Transaction = Epoch.compose(Tx, JsTx, {
     nameUpdateTx,
     nameRevokeTx,
     contractCreateTx,
-    contractCallTx
+    contractCallTx,
+    contractCallComputeTx
   }
 })
 

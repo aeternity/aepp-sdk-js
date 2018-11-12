@@ -55,8 +55,10 @@ async function call (code, abi, address, name, { args = '()', options = {}, call
     opt.gas = this.Ae.defaults.gas
   }
 
-  const tx = await this.contractCallTx(R.merge(opt, {
-    callData: await this.contractEncodeCall(code, abi, name, args, call),
+  const tx = await this.contractCallComputeTx(R.merge(opt, {
+    call,
+    fn: name,
+    args,
     contractId: address,
     callerId: await this.address()
   }))
