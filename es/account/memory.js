@@ -25,12 +25,10 @@
 import Account from './'
 import * as Crypto from '../utils/crypto'
 
-const DEFAULT_NETWORK_ID = 'ae_mainnet'
 const secrets = new WeakMap()
 
 async function sign (data) {
-  const dataWithNetworkId = Buffer.concat([Buffer.from(DEFAULT_NETWORK_ID), data])
-  return Promise.resolve(Crypto.sign(dataWithNetworkId, secrets.get(this).secretKey))
+  return Promise.resolve(Crypto.sign(data, secrets.get(this).secretKey))
 }
 
 async function address () {
