@@ -419,15 +419,15 @@ function readInt (buf) {
 function readId (buf) {
   const type = buf.readUIntBE(0, 1)
   const prefix = {
-    1: 'ak_',
-    // TODO: 2: name
-    // TODO: 3: commitment
-    // TODO: 4: oracle
-    // TODO: 5: contract
-    6: 'ch_'
+    1: 'ak',
+    2: 'nm',
+    3: 'cm',
+    4: 'ok',
+    5: 'ct',
+    6: 'ch'
   }[type]
   const hash = encodeBase58Check(buf.slice(1, buf.length))
-  return `${prefix}${hash}`
+  return `${prefix}_${hash}`
 }
 
 function readSignatures (buf) {
