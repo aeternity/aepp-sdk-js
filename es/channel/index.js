@@ -30,7 +30,8 @@ import {
   state as channelState,
   initialize,
   enqueueAction,
-  send
+  send,
+  sendMessage as channelSendMessage
 } from './internal'
 
 /**
@@ -225,6 +226,36 @@ function shutdown (sign) {
 }
 
 /**
+ * Send generic message
+ *
+ * If message is an object it will be serialized into JSON string
+ * before sending.
+ *
+ * @param {string|object} message
+ * @param {string} recipient - Address of the recipient
+ * @example channel.sendMessage(
+ *   'hello world',
+ *   'ak_Y1NRjHuoc3CGMYMvCmdHSBpJsMDR6Ra2t5zjhRcbtMeXXLpLH'
+ * )
+ */
+function sendMessage (message, recipient) {
+  let info = message
+  if (typeof message === 'object') {
+    info = JSON.stringify(message)
+  }
+  // TODO: is it possible to send a message when channel is in other state
+  //       than `channelOpen`? For example in the middle of an update.
+  enqueueAction(
+    this,
+    (channel, state) => state.handler === handlers.channelOpen,
+    (channel, state) => {
+      channelSendMessage(channel, info, recipient)
+      return state
+    }
+  )
+}
+
+/**
  * Channel
  *
  * @function
@@ -275,7 +306,8 @@ const Channel = AsyncInit.compose({
     poi,
     balances,
     leave,
-    shutdown
+    shutdown,
+    sendMessage
   }
 })
 

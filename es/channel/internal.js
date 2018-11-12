@@ -121,6 +121,10 @@ async function dequeueMessage (channel) {
   dequeueMessage(channel)
 }
 
+function sendMessage (channel, info, to) {
+  send(channel, {action: 'message', payload: {info, to}})
+}
+
 function WebSocket (url, callbacks) {
   function fireOnce (target, key, always) {
     target[key] = (...args) => {
@@ -178,5 +182,6 @@ export {
   changeStatus,
   changeState,
   send,
-  enqueueAction
+  enqueueAction,
+  sendMessage
 }

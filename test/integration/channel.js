@@ -135,6 +135,21 @@ describe('Channel', function () {
     responderBalances[responderAddr].should.be.a('number')
   })
 
+  it('can send a message', async () => {
+    const sender = await initiator.address()
+    const recipient = await responder.address()
+    const info = 'hello world'
+    initiatorCh.sendMessage(info, recipient)
+    const message = await new Promise(resolve => responderCh.on('message', resolve))
+    message.should.eql({
+      // TODO: don't ignore `channel_id` equality check
+      channel_id: message.channel_id,
+      from: sender,
+      to: recipient,
+      info
+    })
+  })
+
   it('can close a channel', async () => {
     const tx = await initiatorCh.shutdown(async (tx) => await initiator.signTransaction(tx))
     tx.should.be.a('string')

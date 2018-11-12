@@ -116,6 +116,10 @@ export async function channelOpen (channel, message, state) {
     // TODO: emit event
     return {handler: channelOpen}
   }
+  if (message.action === 'message') {
+    emit(channel, 'message', message.payload.message)
+    return {handler: channelOpen}
+  }
 }
 channelOpen.enter = (channel) => {
   changeStatus(channel, 'open')
