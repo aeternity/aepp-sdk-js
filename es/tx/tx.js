@@ -87,7 +87,7 @@ async function contractCallComputeTx ({ callerId, nonce, contractId, vmVersion, 
   ttl = await (calculateTtl.bind(this)(ttl))
 
   // If we pass `call` make a type-checked call and ignore `fn` and `args` params
-  const callOpt = call ? { call } : { 'function': fn, 'arguments': args };
+  const callOpt = call ? { call } : { 'function': fn, 'arguments': args }
 
   return (await this.api.postContractCallCompute({ callerId, contractId, vmVersion, fee, amount, gas, gasPrice, nonce, ttl, ...callOpt })).tx
 }
