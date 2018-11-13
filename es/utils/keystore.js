@@ -22,8 +22,8 @@ const DERIVED_KEY_FUNCTIONS = {
 }
 
 async function deriveKeyUsingArgon2id (password, salt, options) {
-  const { memlimit: memoryCost, opslimit: parallelism } = options.kdf_params
-  return argon2.hash(password, { memoryCost, parallelism, type: argon2.argon2id, raw: true, salt })
+  const { memlimit: memoryCost, parallelism = 1,  opslimit: timeCost } = options.kdf_params
+  return argon2.hash(password, { timeCost, memoryCost, parallelism, type: argon2.argon2id, raw: true, salt })
 }
 
 // CRYPTO PART
