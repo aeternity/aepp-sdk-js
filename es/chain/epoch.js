@@ -37,25 +37,26 @@ async function height () {
   return (await this.api.getCurrentKeyBlockHeight()).height
 }
 
+async function pause (duration) {
+  await new Promise(resolve => setTimeout(resolve, duration))
+}
+
 async function awaitHeight (h, { interval = 5000, attempts = 30 } = {}) {
   const instance = this
 
-  async function probe (resolve, reject, left) {
-    try {
-      const current = await instance.height()
-      if (current >= h) {
-        resolve(current)
-      } else if (left > 0) {
-        setTimeout(() => probe(resolve, reject, left - 1), interval)
-      } else {
-        reject(Error(`Giving up after ${attempts * interval}ms, current=${current}, h=${h}`))
-      }
-    } catch (e) {
-      reject(e)
+  async function probe (left) {
+    const current = await instance.height()
+    if (current >= h) {
+      return current
     }
+    if (left > 0) {
+      await pause(interval)
+      return probe(left - 1)
+    }
+    throw Error(`Giving up after ${attempts * interval}ms, current=${current}, h=${h}`)
   }
 
-  return new Promise((resolve, reject) => probe(resolve, reject, attempts))
+  return probe(attempts)
 }
 
 async function topBlock () {
@@ -67,24 +68,19 @@ async function poll (th, { blocks = 20, interval = 5000 } = {}) {
   const instance = this
   const max = await this.height() + blocks
 
-  async function probe (resolve, reject) {
-    try {
-      const tx = await instance.tx(th)
-      if (tx.blockHeight !== -1) {
-        resolve(tx)
-      } else {
-        if (await instance.height() < max) {
-          setTimeout(() => probe(resolve, reject), interval)
-        } else {
-          reject(Error(`Giving up after ${blocks} blocks mined`))
-        }
-      }
-    } catch (e) {
-      reject(e)
+  async function probe () {
+    const tx = await instance.tx(th)
+    if (tx.blockHeight !== -1) {
+      return tx
     }
+    if (await instance.height() < max) {
+      await pause(interval)
+      return probe()
+    }
+    throw Error(`Giving up after ${blocks} blocks mined`)
   }
 
-  return new Promise((resolve, reject) => probe(resolve, reject))
+  return probe()
 }
 
 async function getTxInfo (hash) {
