@@ -21,9 +21,9 @@ const DERIVED_KEY_FUNCTIONS = {
   'argon2id': deriveKeyUsingArgon2id
 }
 
-async function deriveKeyUsingArgon2id (password, nonce, options) {
+async function deriveKeyUsingArgon2id (password, salt, options) {
   const { memlimit: memoryCost, opslimit: parallelism } = options.kdf_params
-  return argon2.hash(password, { memoryCost, parallelism, type: argon2.argon2id, raw: true, salt: nonce })
+  return argon2.hash(password, { memoryCost, parallelism, type: argon2.argon2id, raw: true, salt })
 }
 
 // CRYPTO PART
@@ -127,14 +127,15 @@ async function deriveKey (password, nonce, options = { kdf_params: DEFAULTS.cryp
  * @param {buffer} name Key name.
  * @param {buffer} derivedKey Password-derived secret key.
  * @param {buffer} privateKey Private key.
- * @param {buffer} nonce Randomly generated nonce.
+ * @param {buffer} nonce Randomly generated 24byte nonce.
+ * @param {buffer} salt Randomly generated 16byte salt.
  * @param {Object=} options Encryption parameters.
- * @param {string=} options.kdf Key derivation function (default: pbkdf2).
+ * @param {string=} options.kdf Key derivation function (default: argon2id).
  * @param {string=} options.cipher Symmetric cipher (default: constants.cipher).
- * @param {Object=} options.kdfparams KDF parameters (default: constants.<kdf>).
+ * @param {Object=} options.kdf_params KDF parameters (default: constants.<kdf>).
  * @return {Object}
  */
-function marshal (name, derivedKey, privateKey, nonce, options = {}) {
+function marshal (name, derivedKey, privateKey, nonce, salt, options = {}) {
   const opt = Object.assign({}, DEFAULTS.crypto, options)
   return Object.assign(
     { name, version: 1, address: getAddressFromPriv(privateKey), id: uuid.v4() },
@@ -145,7 +146,7 @@ function marshal (name, derivedKey, privateKey, nonce, options = {}) {
         ciphertext: Buffer.from(encrypt(Buffer.from(privateKey), derivedKey, nonce, opt.symmetric_alg)).toString('hex'),
         cipher_params: { nonce: Buffer.from(nonce).toString('hex') }
       },
-      { kdf: opt.kdf, kdf_params: opt.kdf_params }
+      { kdf: opt.kdf, kdf_params: { ...opt.kdf_params, salt: Buffer.from(salt).toString('hex') }}
       )
     }
   )
@@ -166,13 +167,17 @@ export function getAddressFromPriv (secret) {
 export async function recover (password, keyObject) {
   validateKeyObj(keyObject)
   const nonce = Uint8Array.from(str2buf(keyObject.crypto.cipher_params.nonce))
+  const salt = Uint8Array.from(str2buf(keyObject.crypto.kdf_params.salt))
+  const kdf_params = keyObject.crypto.kdf_params
+  const kdf = keyObject.crypto.kdf
+
   const key = await decrypt(
     Uint8Array.from(str2buf(keyObject.crypto.ciphertext)),
-    await deriveKey(password, nonce),
+    await deriveKey(password, salt, { kdf, kdf_params }),
     nonce,
     keyObject.crypto.symmetric_alg
   )
-  if (!key) throw new Error('Invalid password or nonce')
+  if (!key) throw new Error('Invalid password')
   return Buffer.from(key).toString('hex')
 }
 
@@ -181,20 +186,22 @@ export async function recover (password, keyObject) {
  * @param {string|buffer} name Key name.
  * @param {string|buffer} password User-supplied password.
  * @param {string|buffer} privateKey Private key.
- * @param {buffer|Uint8Array} nonce Randomly generated nonce.
+ * @param {buffer|Uint8Array} nonce Randomly generated 24byte nonce.
+ * @param {buffer|Uint8Array} salt Randomly generated 16byte salt.
  * @param {Object=} options Encryption parameters.
  * @param {string=} options.kdf Key derivation function (default: pbkdf2).
  * @param {string=} options.cipher Symmetric cipher (default: constants.cipher).
  * @param {Object=} options.kdfparams KDF parameters (default: constants.<kdf>).
  * @return {Object}
  */
-export async function dump (name, password, privateKey, nonce = nacl.randomBytes(24), options = {}) {
+export async function dump (name, password, privateKey, nonce = nacl.randomBytes(24), salt = nacl.randomBytes(16), options = {}) {
   const opt = Object.assign({}, DEFAULTS.crypto, options)
   return marshal(
     name,
-    await deriveKey(password, nonce, opt),
+    await deriveKey(password, salt, opt),
     privateKey,
     nonce,
+    salt,
     opt
   )
 }

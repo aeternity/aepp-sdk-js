@@ -40,7 +40,7 @@ import * as R from 'ramda'
  */
 async function send (tx, options) {
   const opt = R.merge(this.Ae.defaults, options)
-  const signed = await this.signTransaction(tx, await this.address())
+  const signed = await this.signTransaction(tx)
   return this.sendTransaction(signed, opt)
 }
 
