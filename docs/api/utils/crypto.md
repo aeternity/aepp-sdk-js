@@ -229,11 +229,11 @@ Generate signature
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
 **Returns**: `Buffer` - Signature  
-**rtype**: `(data: String, privateKey: Buffer) => Buffer`
+**rtype**: `(data: String|Buffer, privateKey: Buffer) => Buffer`
 
 | Param | Type | Description |
 | --- | --- | --- |
-| data | `String` | Data to sign |
+| data | `String` \| `Buffer` | Data to sign |
 | privateKey | `Buffer` | Key to sign with |
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.verify"></a>

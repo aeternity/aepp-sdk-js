@@ -1,18 +1,18 @@
 <a id="module_@aeternity/aepp-sdk/es/contract"></a>
 
 ## @aeternity/aepp-sdk/es/contract
-Contract module
+Contract Base module
 
 **Export**: Contract  
 **Example**  
 ```js
-import Contract from '@aeternity/aepp-sdk/es/contract'
+import ContractBase from '@aeternity/aepp-sdk/es/contract'
 ```
 
 * [@aeternity/aepp-sdk/es/contract](#module_@aeternity/aepp-sdk/es/contract)
     * [ContractBase([options])](#exp_module_@aeternity/aepp-sdk/es/contract--ContractBase) ⇒ `Object` ⏏
         * *[.contractEpochEncodeCallData(code, abu, name, args)](#module_@aeternity/aepp-sdk/es/contract--ContractBase+contractEpochEncodeCallData) ⇒ `String`*
-        * *[.contractEpochCall(code, abu, name, args)](#module_@aeternity/aepp-sdk/es/contract--ContractBase+contractEpochCall) ⇒ `Object`*
+        * *[.contractEpochCall(code, abu, name, args, call)](#module_@aeternity/aepp-sdk/es/contract--ContractBase+contractEpochCall) ⇒ `Object`*
         * *[.contractEpochDecodeData(type, data)](#module_@aeternity/aepp-sdk/es/contract--ContractBase+contractEpochDecodeData) ⇒ `String`*
         * *[.compileEpochContract(code, [options])](#module_@aeternity/aepp-sdk/es/contract--ContractBase+compileEpochContract) ⇒ `Object`*
 
@@ -48,11 +48,11 @@ Encode contract data
 | code | `String` | Contract code |
 | abu | `String` | Contract compiler name |
 | name | `String` | Function name |
-| args | `String` | Function argument's |
+| args | `String` | Function argument's * @param {String} call - Pseudo contract with `__call()` function which simply call function with params. You can use this parametr only for `abi` one of ['sophia', 'sophia-address'] When you are passing `call` argument `name` and `args` will be ignored Yiu can find additional info here: https://github.com/aeternity/protocol/blob/master/epoch/api/contract_api_usage.md#sophia-calldata-creation |
 
 <a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+contractEpochCall"></a>
 
-#### *contractBase.contractEpochCall(code, abu, name, args) ⇒ `Object`*
+#### *contractBase.contractEpochCall(code, abu, name, args, call) ⇒ `Object`*
 Call the contract
 
 **Kind**: instance abstract method of [`ContractBase`](#exp_module_@aeternity/aepp-sdk/es/contract--ContractBase)  
@@ -66,6 +66,7 @@ Call the contract
 | abu | `String` | Contract compiler name |
 | name | `String` | Function name |
 | args | `String` | Function argument's |
+| call | `String` | Pseudo contract with `__call()` function which simply call function with params. You can use this parametr only for `abi` one of ['sophia', 'sophia-address'] When you are passing `call` argument `name` and `args` will be ignored You can find additional info here: https://github.com/aeternity/protocol/blob/master/epoch/api/contract_api_usage.md#sophia-calldata-creation |
 
 <a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+contractEpochDecodeData"></a>
 
