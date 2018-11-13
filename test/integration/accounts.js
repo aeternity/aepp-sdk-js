@@ -48,7 +48,7 @@ describe('Accounts', function () {
   })
 
   it('determines the balance', async () => {
-    return wallet.balance(await wallet.address()).should.eventually.be.a('number')
+    return wallet.balance(await wallet.address()).should.eventually.be.a('string')
   })
 
   it('spends tokens', async () => {

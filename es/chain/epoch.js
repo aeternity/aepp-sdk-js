@@ -18,6 +18,7 @@
 import * as R from 'ramda'
 import Chain from './'
 import Epoch from '../epoch'
+import { parseBigNumber } from '../utils/bignumber'
 
 async function sendTransaction (tx, options = {}) {
   const { waitMined } = R.merge(this.Chain.defaults, options)
@@ -26,7 +27,7 @@ async function sendTransaction (tx, options = {}) {
 }
 
 async function balance (address, { height, hash } = {}) {
-  return (await this.api.getAccountByPubkey(address, { height, hash })).balance
+  return parseBigNumber((await this.api.getAccountByPubkey(address, { height, hash })).balance)
 }
 
 async function tx (hash) {
