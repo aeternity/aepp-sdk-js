@@ -39,15 +39,15 @@ describe('Epoch client', function () {
     expect(client.methods).to.include.members(['postTransaction', 'getCurrentKeyBlock'])
   })
 
-  it('gets key blocks by height for the first 10 blocks', () => {
+  it('gets key blocks by height for the first 3 blocks', () => {
     expect(client.api.getKeyBlockByHeight).to.be.a('function')
     expect(client.api.getKeyBlockByHeight.length).to.equal(1)
 
     return Promise.all(
-      R.map(async i => {
+      R.range(1, 3).map(async i => {
         const result = await client.api.getKeyBlockByHeight(i)
         expect(result.height, i).to.equal(i)
-      }, R.range(1, 11))
+      })
     )
   })
 })

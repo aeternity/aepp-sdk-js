@@ -16,10 +16,10 @@
  */
 
 /**
- * Contract module
+ * Contract Base module
  * @module @aeternity/aepp-sdk/es/contract
  * @export Contract
- * @example import Contract from '@aeternity/aepp-sdk/es/contract'
+ * @example import ContractBase from '@aeternity/aepp-sdk/es/contract'
  */
 
 import stampit from '@stamp/it'
@@ -68,6 +68,10 @@ const ContractBase = stampit({
  * @param {String} abu - Contract compiler name
  * @param {String} name - Function name
  * @param {String} args - Function argument's
+ * * @param {String} call - Pseudo contract with `__call()` function which simply call function with params.
+ * You can use this parametr only for `abi` one of ['sophia', 'sophia-address']
+ * When you are passing `call` argument `name` and `args` will be ignored
+ * Yiu can find additional info here: https://github.com/aeternity/protocol/blob/master/epoch/api/contract_api_usage.md#sophia-calldata-creation
  * @return {String} - Contract encoded data
  */
 
@@ -82,6 +86,10 @@ const ContractBase = stampit({
  * @param {String} abu - Contract compiler name
  * @param {String} name - Function name
  * @param {String} args - Function argument's
+ * @param {String} call - Pseudo contract with `__call()` function which simply call function with params.
+ * You can use this parametr only for `abi` one of ['sophia', 'sophia-address']
+ * When you are passing `call` argument `name` and `args` will be ignored
+ * You can find additional info here: https://github.com/aeternity/protocol/blob/master/epoch/api/contract_api_usage.md#sophia-calldata-creation
  * @return {Object} - Contract call result
  */
 
