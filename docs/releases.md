@@ -81,8 +81,7 @@ releasing, perform a full clean and build in order to release to npmjs.com!
 1. Cleanup - run `git clean -ffdx` to completely wipe out your workspace of
    files not in the repository. This might wipe out files you still need, so
    consider a seperate clone of the project!
-2. (optional) Execute `npm run prepublishOnly` followed by `npm pack` and
-   investigate the resulting tarball's contents. This tarball resembles what
+2. Execute `npm run prepublishOnly` to generate Documentation for the API and the SDK codebase, optionally followed by `npm pack` and investigate the resulting tarball's contents. This tarball resembles what
    users will actual download from npmjs.com once the release is completed!
 3. Execute `npm publish` and follow the on-screen instructions
 
