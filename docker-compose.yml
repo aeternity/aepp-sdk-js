@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.ci
-    depends_on: [proxy, node]
+    depends_on: [node]
     entrypoint: docker/wait-for-it.sh node:3013 --
     env_file: [./docker/sdk.env]
     environment:
@@ -26,14 +26,6 @@ services:
       - ${PWD}/docker/keys/node:/home/epoch/node/keys
       - node_db:/home/epoch/node/data/mnesia
       - node_keys:/home/epoch/node/keys
-
-  proxy:
-    image: nginx:1.13.8
-    hostname: proxy
-    volumes:
-      - ${PWD}/docker/nginx-default.conf:/etc/nginx/conf.d/default.conf
-      - ${PWD}/docker/nginx-cors.conf:/etc/nginx/cors.conf
-      - ${PWD}/docker/nginx-ws.conf:/etc/nginx/ws.conf
 
 volumes:
   node_db:

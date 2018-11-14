@@ -44,7 +44,7 @@ describe('Channel', function () {
   let existingChannelId
   let offchainTx
   const sharedParams = {
-    url: 'ws://proxy:3001',
+    url: 'ws://node:3014',
     pushAmount: 3,
     initiatorAmount: 10,
     responderAmount: 10,
