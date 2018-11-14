@@ -49,24 +49,22 @@ export function rightPad (length, inputBuffer) {
   }
 }
 
-function bitSize (num) {
-  return num.toString(2).length
-}
-
-export function toBytes (val) {
+export function toBytes (val, big = false) {
   // """
   // Encode a value to bytes.
   // If the value is an int it will be encoded as bytes big endian
   // Raises ValueError if the input is not an int or string
 
-  if (Number.isInteger(val)) {
-    const s = Math.ceil(bitSize(val) / 8)
-    const buffer = Buffer.allocUnsafe(s)
-    buffer.writeUIntBE(val, 0, s)
-    return buffer
+  if (Number.isInteger(val) || big) {
+    let v = bignum(val)
+    let s = Math.ceil(v.bitLength(val) / 8)
+    return v.toBuffer({
+      endian : 'big',
+      size : s,
+    })
   }
   if (typeof val === 'string') {
-    return val
+    return val.toString('utf-8')
   }
   throw new Error('Byte serialization not supported')
 }

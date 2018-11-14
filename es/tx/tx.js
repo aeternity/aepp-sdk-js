@@ -43,31 +43,56 @@ async function spendTx ({ senderId, recipientId, amount, fee, ttl, nonce, payloa
 async function namePreclaimTx ({ accountId, nonce, commitmentId, fee, ttl }) {
   nonce = await (calculateNonce.bind(this)(accountId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
-  return (await this.api.postNamePreclaim(R.merge(R.head(arguments), { nonce, ttl }))).tx
+
+  const { tx } = this.nativeMode
+    ? this.namePreclaimTxNative(R.merge(R.head(arguments), { nonce, ttl }))
+    : await this.api.postNamePreclaim(R.merge(R.head(arguments), { nonce, ttl }))
+
+  return tx
 }
 
 async function nameClaimTx ({ accountId, nonce, name, nameSalt, fee, ttl }) {
   nonce = await (calculateNonce.bind(this)(accountId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
-  return (await this.api.postNameClaim(R.merge(R.head(arguments), { nonce, ttl }))).tx
+
+  const { tx } = this.nativeMode
+    ? this.nameClaimTxNative(R.merge(R.head(arguments), { nonce, ttl }))
+    : await this.api.postNameClaim(R.merge(R.head(arguments), { nonce, ttl }))
+
+  return tx
 }
 
 async function nameTransferTx ({ accountId, nonce, nameId, recipientId, fee, ttl }) {
   nonce = await (calculateNonce.bind(this)(accountId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
-  return (await this.api.postNameTransfer(R.merge(R.head(arguments), { recipientId, nonce, ttl }))).tx
+
+  const { tx } = this.nativeMode
+    ? this.nameTransferTxNative(R.merge(R.head(arguments), { recipientId, nonce, ttl }))
+    : await this.api.postNameTransfer(R.merge(R.head(arguments), { recipientId, nonce, ttl }))
+
+  return tx
 }
 
 async function nameUpdateTx ({ accountId, nonce, nameId, nameTtl, pointers, clientTtl, fee, ttl }) {
   nonce = await (calculateNonce.bind(this)(accountId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
-  return (await this.api.postNameUpdate(R.merge(R.head(arguments), { nonce, ttl }))).tx
+
+  const { tx } = this.nativeMode
+    ? this.nameUpdateTxNative(R.merge(R.head(arguments), { nonce, ttl }))
+    : await this.api.postNameUpdate(R.merge(R.head(arguments), { nonce, ttl }))
+
+  return tx
 }
 
 async function nameRevokeTx ({ accountId, nonce, nameId, fee, ttl }) {
   nonce = await (calculateNonce.bind(this)(accountId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
-  return (await this.api.postNameRevoke(R.merge(R.head(arguments), { nonce, ttl }))).tx
+
+  const { tx } = this.nativeMode
+    ? this.nameRevokeTxNative(R.merge(R.head(arguments), { nonce, ttl }))
+    : await this.api.postNameRevoke(R.merge(R.head(arguments), { nonce, ttl }))
+
+  return tx
 }
 
 async function contractCreateTx ({ ownerId, nonce, code, vmVersion, deposit, amount, gas, gasPrice, fee, ttl, callData }) {
