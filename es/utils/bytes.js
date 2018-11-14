@@ -14,7 +14,7 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-
+import bignum from 'bignum'
 /**
  * Left pad the input data with 0 bytes
  * @param length to pad to
@@ -59,8 +59,8 @@ export function toBytes (val, big = false) {
     let v = bignum(val)
     let s = Math.ceil(v.bitLength(val) / 8)
     return v.toBuffer({
-      endian : 'big',
-      size : s,
+      endian: 'big',
+      size: s
     })
   }
   if (typeof val === 'string') {

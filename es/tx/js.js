@@ -105,7 +105,6 @@ const createSalt = salt
  * @example JsTx()
  */
 
-
 /**
  * Decode data using the default encoding/decoding algorithm
  *
@@ -160,10 +159,10 @@ async function commitmentHash (name, salt = createSalt()) {
  */
 function buildPointers (pointers) {
   const POINTERS_TAGS = {
-    "account_pubkey": ID_TAG_ACCOUNT,
-    "oracle_pubkey": ID_TAG_ORACLE,
-    "contract_pubkey": ID_TAG_CONTRACT,
-    "channel_pubkey": ID_TAG_CHANNEL
+    'account_pubkey': ID_TAG_ACCOUNT,
+    'oracle_pubkey': ID_TAG_ORACLE,
+    'contract_pubkey': ID_TAG_CONTRACT,
+    'channel_pubkey': ID_TAG_CHANNEL
   }
   return pointers.map(p => [toBytes(p['key']), _id(POINTERS_TAGS[p['key']], p['id'])])
 }
@@ -171,6 +170,7 @@ function buildPointers (pointers) {
 /**
  * Create a spend transaction
  *
+ * @param {string} senderId The public key of the sender
  * @param {string} recipientId The public key of the recipient
  * @param {number} amount The amount to send
  * @param {string} payload The payload associated with the data
@@ -179,13 +179,11 @@ function buildPointers (pointers) {
  * @param {number} nonce the nonce of the transaction
  * @return {Object}  { tx } Encrypted spend tx hash
  */
-async function spendTxNative ({ recipientId, amount, payload, fee, ttl, nonce }) {
-  const address = await this.address()
-
+function spendTxNative ({ senderId, recipientId, amount, payload, fee, ttl, nonce }) {
   let tx = [
     toBytes(OBJECT_TAG_SPEND_TRANSACTION),
     toBytes(VSN),
-    _id(ID_TAG_ACCOUNT, address, 'ak'),
+    _id(ID_TAG_ACCOUNT, senderId, 'ak'),
     _id(ID_TAG_ACCOUNT, recipientId, 'ak'),
     toBytes(amount, true),
     toBytes(fee),
@@ -216,7 +214,7 @@ function namePreclaimTxNative ({ accountId, nonce, commitmentId, fee, ttl }) {
     toBytes(nonce),
     _id(ID_TAG_COMMITMENT, commitmentId, 'cm'),
     toBytes(fee),
-    toBytes(ttl),
+    toBytes(ttl)
   ]
 
   // Encode RLP
@@ -244,7 +242,7 @@ function nameClaimTxNative ({ accountId, nonce, name, nameSalt, fee, ttl }) {
     decode(name, 'nm'),
     toBytes(nameSalt),
     toBytes(fee),
-    toBytes(ttl),
+    toBytes(ttl)
   ]
 
   // Encode RLP
@@ -279,7 +277,7 @@ function nameUpdateTxNative ({ accountId, nonce, nameId, nameTtl, pointers, clie
     pointers,
     toBytes(clientTtl),
     toBytes(fee),
-    toBytes(ttl),
+    toBytes(ttl)
   ]
 
   // Encode RLP
@@ -307,7 +305,7 @@ function nameTransferTxNative ({ accountId, nonce, nameId, recipientId, fee, ttl
     _id(ID_TAG_NAME, nameId, 'nm'),
     _id(ID_TAG_ACCOUNT, recipientId, 'ak'),
     toBytes(fee),
-    toBytes(ttl),
+    toBytes(ttl)
   ]
 
   // Encode RLP
@@ -333,7 +331,7 @@ function nameRevokeTxNative ({ accountId, nonce, nameId, fee, ttl }) {
     toBytes(nonce),
     _id(ID_TAG_NAME, nameId, 'nm'),
     toBytes(fee),
-    toBytes(ttl),
+    toBytes(ttl)
   ]
 
   // Encode RLP

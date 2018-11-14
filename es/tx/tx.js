@@ -34,8 +34,8 @@ async function spendTx ({ senderId, recipientId, amount, fee, ttl, nonce, payloa
 
   // Build transaction using sdk (if nativeMode) or build on `EPOCH` side
   const { tx } = this.nativeMode
-    ? await this.spendTxNative(R.merge(R.head(arguments), { recipientId, nonce, ttl }))
-    : await this.api.postSpend(R.merge(R.head(arguments), { recipientId, nonce, ttl }))
+    ? await this.spendTxNative(R.merge(R.head(arguments), { recipientId, senderId, nonce, ttl }))
+    : await this.api.postSpend(R.merge(R.head(arguments), { recipientId, senderId, nonce, ttl }))
 
   return tx
 }
