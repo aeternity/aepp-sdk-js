@@ -2,6 +2,25 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.25.0-0.1.0-next]
+### Added
+- Contract type checked call (Ability to call contract using contract address)
+
+### Changed
+- Use ES methods instead of Ramda, where possible
+- Fixed keystore by adding a salt param for derivedKey function
+
+### Removed
+- Support for < 0.25.0
+- [AE CLI](https://github.com/aeternity/aecli-js) and [AE PROJECT CLI](https://github.com/aeternity/aeproject) moved to separate repos and packages
+
+### Breaking Changes
+- Aens use domain `.test` instead of `.aet` (see [here](https://github.com/aeternity/aepp-sdk-js/commit/9c252f937f7ea501c4aaacbbef53c4c1833e48e4#diff-8ef3b328d008ef3dbb72a0bca42eba37L24))
+- Use NETWORK_ID for signing (see [here](https://github.com/aeternity/aepp-sdk-js/commit/9c252f937f7ea501c4aaacbbef53c4c1833e48e4#diff-ffb275ebb09085c85c59f140998199e0R28))
+
+### Notes and known Issues
+
+
 ## [0.24.0-0.2.0]
 ### Added
 - RPC Client improvements
@@ -159,3 +178,4 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 [0.22.0-0.1.0-beta.1]: https://github.com/aeternity/aepp-sdk-js/compare/v0.18.0-0.1.1...v0.22.0-0.1.0-beta.1
 [0.24.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.22.0-0.1.0-beta.1...v0.24.0-0.1.0
 [0.24.0-0.2.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.24.0-0.1.0...v0.24.0-0.2.0
+[0.25.0-0.1.0-next]: https://github.com/aeternity/aepp-sdk-js/compare/v0.24.0-0.2.0...v0.25.0-0.1.0-next
