@@ -31,9 +31,6 @@ import shajs from 'sha.js'
 
 const Ecb = aesjs.ModeOfOperation.ecb
 
-// NETWORK_ID using for signing transation's
-export const NETWORK_ID = 'ae_mainnet'
-
 /**
  * Calculate 256bits Blake2b hash of `input`
  * @rtype (input: String) => hash: String

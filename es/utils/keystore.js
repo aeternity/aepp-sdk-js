@@ -207,7 +207,7 @@ export async function dump (name, password, privateKey, nonce = nacl.randomBytes
   )
 }
 
-function validateKeyObj (obj) {
+export function validateKeyObj (obj) {
   const root = ['crypto', 'id', 'version', 'public_key']
   const crypto_keys = ['cipher_params', 'ciphertext', 'symmetric_alg', 'kdf', 'kdf_params']
 
