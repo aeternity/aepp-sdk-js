@@ -60,7 +60,7 @@ async function signTransaction (tx) {
  * @return {Object} Account instance
  */
 const Account = stampit({
-  init({ networkId = 'ae_mainnet' }) { // NETWORK_ID using for signing transaction's
+  init ({ networkId = 'ae_mainnet' }) { // NETWORK_ID using for signing transaction's
     this.networkId = networkId
   },
   methods: { signTransaction },
