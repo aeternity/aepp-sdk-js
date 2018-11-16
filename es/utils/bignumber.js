@@ -1,5 +1,5 @@
-import BigNumber from 'bignumber.js'
+import bignum from 'bignum'
 
 export async function parseBigNumber (number) {
-  return (new BigNumber(number)).toString(10)
+  return bignum(number).toString(10)
 }
