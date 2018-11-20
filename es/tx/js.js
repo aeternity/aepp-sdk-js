@@ -186,7 +186,7 @@ function spendTxNative ({ senderId, recipientId, amount, payload, fee, ttl, nonc
     _id(ID_TAG_ACCOUNT, senderId, 'ak'),
     _id(ID_TAG_ACCOUNT, recipientId, 'ak'),
     toBytes(amount, true),
-    toBytes(fee),
+    toBytes(fee, true),
     toBytes(ttl),
     toBytes(nonce),
     toBytes(payload)
@@ -213,7 +213,7 @@ function namePreclaimTxNative ({ accountId, nonce, commitmentId, fee, ttl }) {
     _id(ID_TAG_ACCOUNT, accountId, 'ak'),
     toBytes(nonce),
     _id(ID_TAG_COMMITMENT, commitmentId, 'cm'),
-    toBytes(fee),
+    toBytes(fee, true),
     toBytes(ttl)
   ]
 
@@ -241,7 +241,7 @@ function nameClaimTxNative ({ accountId, nonce, name, nameSalt, fee, ttl }) {
     toBytes(nonce),
     decode(name, 'nm'),
     toBytes(nameSalt),
-    toBytes(fee),
+    toBytes(fee, true),
     toBytes(ttl)
   ]
 
@@ -276,7 +276,7 @@ function nameUpdateTxNative ({ accountId, nonce, nameId, nameTtl, pointers, clie
     toBytes(nameTtl),
     pointers,
     toBytes(clientTtl),
-    toBytes(fee),
+    toBytes(fee, true),
     toBytes(ttl)
   ]
 
@@ -304,7 +304,7 @@ function nameTransferTxNative ({ accountId, nonce, nameId, recipientId, fee, ttl
     toBytes(nonce),
     _id(ID_TAG_NAME, nameId, 'nm'),
     _id(ID_TAG_ACCOUNT, recipientId, 'ak'),
-    toBytes(fee),
+    toBytes(fee, true),
     toBytes(ttl)
   ]
 
@@ -330,7 +330,7 @@ function nameRevokeTxNative ({ accountId, nonce, nameId, fee, ttl }) {
     _id(ID_TAG_ACCOUNT, accountId, 'ak'),
     toBytes(nonce),
     _id(ID_TAG_NAME, nameId, 'nm'),
-    toBytes(fee),
+    toBytes(fee, true),
     toBytes(ttl)
   ]
 
