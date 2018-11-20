@@ -98,13 +98,13 @@ async function nameRevokeTx ({ accountId, nonce, nameId, fee, ttl }) {
 async function contractCreateTx ({ ownerId, nonce, code, vmVersion, deposit, amount, gas, gasPrice, fee, ttl, callData }) {
   nonce = await (calculateNonce.bind(this)(ownerId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
-  return this.api.postContractCreate(R.merge(R.head(arguments), { nonce, ttl,  fee: parseInt(fee) }))
+  return this.api.postContractCreate(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
 }
 
 async function contractCallTx ({ callerId, nonce, contractId, vmVersion, fee, ttl, amount, gas, gasPrice, callData }) {
   nonce = await (calculateNonce.bind(this)(callerId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
-  return (await this.api.postContractCall(R.merge(R.head(arguments), { nonce, ttl,  fee: parseInt(fee) }))).tx
+  return (await this.api.postContractCall(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))).tx
 }
 
 async function contractCallComputeTx ({ callerId, nonce, contractId, vmVersion, fee, ttl, amount, gas, gasPrice, fn, args, call }) {
@@ -114,7 +114,7 @@ async function contractCallComputeTx ({ callerId, nonce, contractId, vmVersion, 
   // If we pass `call` make a type-checked call and ignore `fn` and `args` params
   const callOpt = call ? { call } : { 'function': fn, 'arguments': args }
 
-  return (await this.api.postContractCallCompute({ callerId, contractId, vmVersion,  fee: parseInt(fee), amount, gas, gasPrice, nonce, ttl, ...callOpt })).tx
+  return (await this.api.postContractCallCompute({ callerId, contractId, vmVersion, fee: parseInt(fee), amount, gas, gasPrice, nonce, ttl, ...callOpt })).tx
 }
 
 /**
