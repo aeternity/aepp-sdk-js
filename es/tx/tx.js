@@ -98,7 +98,10 @@ async function nameRevokeTx ({ accountId, nonce, nameId, fee, ttl }) {
 async function contractCreateTx ({ ownerId, nonce, code, vmVersion, deposit, amount, gas, gasPrice, fee, ttl, callData }) {
   nonce = await (calculateNonce.bind(this)(ownerId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
-  return this.api.postContractCreate(R.merge(R.head(arguments), { nonce, ttl }))
+
+  return this.nativeMode
+    ? this.contractCreateTxNative(R.merge(R.head(arguments), { nonce, ttl }))
+    : this.api.postContractCreate(R.merge(R.head(arguments), { nonce, ttl }))
 }
 
 async function contractCallTx ({ callerId, nonce, contractId, vmVersion, fee, ttl, amount, gas, gasPrice, callData }) {
@@ -162,7 +165,7 @@ async function calculateNonce (accountId, nonce) {
  * @example Transaction({url: 'https://sdk-testnet.aepps.com/'})
  */
 const Transaction = Epoch.compose(Tx, JsTx, {
-  init ({ nativeMode = true }) {
+  init ({ nativeMode = false }) {
     this.nativeMode = nativeMode
   },
   props: {

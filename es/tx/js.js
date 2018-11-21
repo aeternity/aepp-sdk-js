@@ -69,7 +69,7 @@ const OBJECT_TAG_NAME_SERVICE_REVOKE_TRANSACTION = 35
 const OBJECT_TAG_NAME_SERVICE_TRANSFER_TRANSACTION = 36
 // const OBJECT_TAG_CONTRACT = 40
 // const OBJECT_TAG_CONTRACT_CALL = 41
-// const OBJECT_TAG_CONTRACT_CREATE_TRANSACTION = 42
+const OBJECT_TAG_CONTRACT_CREATE_TRANSACTION = 42
 // const OBJECT_TAG_CONTRACT_CALL_TRANSACTION = 43
 // const OBJECT_TAG_CHANNEL_CREATE_TRANSACTION = 50
 // const OBJECT_TAG_CHANNEL_DEPOSIT_TRANSACTION = 51
@@ -339,6 +339,44 @@ function nameRevokeTxNative ({ accountId, nonce, nameId, fee, ttl }) {
   return { tx }
 }
 
+/**
+ * Create a contract create transaction
+ *
+ * @param {string} ownerId The public key of the owner account
+ * @param {string} code Compiled contract
+ * @param {number} vmVersion VM Version
+ * @param {number} deposit deposit amount
+ * @param {number} amount Amount to spend on contract account
+ * @param {number} gas Gas for contract create
+ * @param {number} gasPrice Gas price
+ * @param {number} fee The fee for the transaction
+ * @param {number} ttl The relative ttl of the transaction
+ * @param {number} nonce the nonce of the transaction
+ * @param {string} callData Call Data
+ * @return {Object} { tx } Encrypted contract create tx hash
+ */
+function contractCreateTxNative ({ ownerId, nonce, code, vmVersion, deposit, amount, gas, gasPrice, fee, ttl, callData }) {
+  let tx = [
+    toBytes(OBJECT_TAG_CONTRACT_CREATE_TRANSACTION),
+    toBytes(VSN),
+    _id(ID_TAG_ACCOUNT, ownerId, 'ak'),
+    toBytes(nonce),
+    decode(code, 'cb'),
+    toBytes(vmVersion),
+    toBytes(fee),
+    toBytes(ttl),
+    toBytes(deposit),
+    toBytes(amount),
+    toBytes(gas),
+    toBytes(gasPrice),
+    decode(callData, 'cb')
+  ]
+
+  // Encode RLP
+  tx = encodeTx(tx)
+  return { tx }
+}
+
 const JsTx = stampit({
   methods: {
     commitmentHash,
@@ -347,7 +385,8 @@ const JsTx = stampit({
     nameClaimTxNative,
     nameUpdateTxNative,
     nameTransferTxNative,
-    nameRevokeTxNative
+    nameRevokeTxNative,
+    contractCreateTxNative
   }
 })
 
