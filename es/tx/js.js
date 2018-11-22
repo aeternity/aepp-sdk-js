@@ -374,8 +374,20 @@ function contractCreateTxNative ({ ownerId, nonce, code, vmVersion, deposit, amo
 
   // Encode RLP
   tx = encodeTx(tx)
-  // TODO generate contractId
-  return { tx }
+  return { tx, contractId: buildContractId(ownerId, nonce) }
+}
+
+/**
+* Build a contract public key
+*
+* @param {string} ownerId The public key of the owner account
+* @param {number} nonce the nonce of the transaction
+* @return {string} Contract public key
+*/
+function buildContractId (ownerId, nonce) {
+  const ownerIdAndNonce = Buffer.from([...decodeBase58Check(ownerId.slice(3)), ...toBytes(nonce)])
+  const b2bHash = hash(ownerIdAndNonce)
+  return `ct_${encodeBase58Check(b2bHash)}`
 }
 
 /**

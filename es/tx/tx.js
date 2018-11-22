@@ -107,7 +107,7 @@ async function contractCreateTx ({ ownerId, nonce, code, vmVersion, deposit, amo
 async function contractCallTx ({ callerId, nonce, contractId, vmVersion, fee, ttl, amount, gas, gasPrice, callData }) {
   nonce = await (calculateNonce.bind(this)(callerId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
-  // TODO investigate how to get callData without bytecode
+
   const { tx } = this.nativeMode
     ? await this.contractCallTxNative(R.merge(R.head(arguments), { nonce, ttl }))
     : await this.api.postContractCall(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
@@ -118,7 +118,6 @@ async function contractCallTx ({ callerId, nonce, contractId, vmVersion, fee, tt
 async function contractCallComputeTx ({ callerId, nonce, contractId, vmVersion, fee, ttl, amount, gas, gasPrice, fn, args, call }) {
   nonce = await (calculateNonce.bind(this)(callerId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
-
   // If we pass `call` make a type-checked call and ignore `fn` and `args` params
   const callOpt = call ? { call } : { 'function': fn, 'arguments': args }
 

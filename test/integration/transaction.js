@@ -115,9 +115,10 @@ describe('Native Transaction', function () {
     const txFromAPI = await client.contractCreateTx({ ownerId: senderId, code, vmVersion, deposit, amount, gas, gasPrice, fee, ttl, callData: create_callData })
     const nativeTx = await clientNative.contractCreateTx({ ownerId: senderId, code, vmVersion, deposit, amount, gas, gasPrice, fee, ttl, callData: create_callData })
     txFromAPI.tx.should.be.equal(nativeTx.tx)
+    txFromAPI.contractId.should.be.equal(nativeTx.contractId)
   })
 
-  it.only('native build of contract call tx', async () => {
+  it('native build of contract call tx', async () => {
     const txFromAPI = await client.contractCallTx({ callerId: senderId, contractId, vmVersion, amount, gas, gasPrice, fee, ttl, callData: call_callData })
     const nativeTx = await clientNative.contractCallTx({ callerId: senderId, contractId, vmVersion, amount, gas, gasPrice, fee, ttl, callData: call_callData })
     txFromAPI.should.be.equal(nativeTx)
