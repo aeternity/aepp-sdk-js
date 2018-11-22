@@ -70,7 +70,7 @@ const OBJECT_TAG_NAME_SERVICE_TRANSFER_TRANSACTION = 36
 // const OBJECT_TAG_CONTRACT = 40
 // const OBJECT_TAG_CONTRACT_CALL = 41
 const OBJECT_TAG_CONTRACT_CREATE_TRANSACTION = 42
-// const OBJECT_TAG_CONTRACT_CALL_TRANSACTION = 43
+const OBJECT_TAG_CONTRACT_CALL_TRANSACTION = 43
 // const OBJECT_TAG_CHANNEL_CREATE_TRANSACTION = 50
 // const OBJECT_TAG_CHANNEL_DEPOSIT_TRANSACTION = 51
 // const OBJECT_TAG_CHANNEL_WITHDRAW_TRANSACTION = 52
@@ -374,6 +374,43 @@ function contractCreateTxNative ({ ownerId, nonce, code, vmVersion, deposit, amo
 
   // Encode RLP
   tx = encodeTx(tx)
+  // TODO generate contractId
+  return { tx }
+}
+
+/**
+ * Create a contract call transaction
+ *
+ * @param {string} callerId The public key of the caller account
+ * @param {number} vmVersion VM Version
+ * @param {string} contractId Contract public key
+ * @param {number} amount Amount to spend on contract account
+ * @param {number} gas Gas for contract create
+ * @param {number} gasPrice Gas price
+ * @param {number} fee The fee for the transaction
+ * @param {number} ttl The relative ttl of the transaction
+ * @param {number} nonce the nonce of the transaction
+ * @param {string} callData Call Data
+ * @return {Object} { tx } Encrypted contract call tx hash
+ */
+function contractCallTxNative ({ callerId, nonce, contractId, vmVersion, fee, ttl, amount, gas, gasPrice, callData }) {
+  let tx = [
+    toBytes(OBJECT_TAG_CONTRACT_CALL_TRANSACTION),
+    toBytes(VSN),
+    _id(ID_TAG_ACCOUNT, callerId, 'ak'),
+    toBytes(nonce),
+    _id(ID_TAG_CONTRACT, contractId, 'ct'),
+    toBytes(vmVersion),
+    toBytes(fee),
+    toBytes(ttl),
+    toBytes(amount),
+    toBytes(gas),
+    toBytes(gasPrice),
+    decode(callData, 'cb')
+  ]
+
+  // Encode RLP
+  tx = encodeTx(tx)
   return { tx }
 }
 
@@ -386,7 +423,8 @@ const JsTx = stampit({
     nameUpdateTxNative,
     nameTransferTxNative,
     nameRevokeTxNative,
-    contractCreateTxNative
+    contractCreateTxNative,
+    contractCallTxNative
   }
 })
 

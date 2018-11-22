@@ -107,7 +107,12 @@ async function contractCreateTx ({ ownerId, nonce, code, vmVersion, deposit, amo
 async function contractCallTx ({ callerId, nonce, contractId, vmVersion, fee, ttl, amount, gas, gasPrice, callData }) {
   nonce = await (calculateNonce.bind(this)(callerId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
-  return (await this.api.postContractCall(R.merge(R.head(arguments), { nonce, ttl }))).tx
+  // TODO investigate how to get callData without bytecode
+  const { tx } = this.nativeMode
+    ? await this.contractCallTxNative(R.merge(R.head(arguments), { nonce, ttl }))
+    : await this.api.postContractCall(R.merge(R.head(arguments), { nonce, ttl }))
+
+  return tx
 }
 
 async function contractCallComputeTx ({ callerId, nonce, contractId, vmVersion, fee, ttl, amount, gas, gasPrice, fn, args, call }) {
