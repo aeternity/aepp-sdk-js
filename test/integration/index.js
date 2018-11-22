@@ -38,7 +38,7 @@ function plan (amount) {
 
 const TIMEOUT = 180000
 
-function configure (mocha) {
+function configure (mocha, native = false) {
   mocha.timeout(TIMEOUT)
 }
 
@@ -55,8 +55,10 @@ async function ready (mocha) {
   }
 
   const client = await BaseAe()
+  const clientNative = await BaseAe({ nativeMode: true })
   client.setKeypair(account)
-  return client
+  clientNative.setKeypair(account)
+  return native ? clientNative : client
 }
 
 export {
