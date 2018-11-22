@@ -42,7 +42,7 @@ const invalidKeystore = {
 
 const password = 'test'
 
-describe.only('Keystore', function () {
+describe('Keystore', function () {
   const { secretKey } = generateKeyPair(true);
   const publicKey = getAddressFromPriv(secretKey)
   let keystore;
