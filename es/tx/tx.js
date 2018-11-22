@@ -101,7 +101,7 @@ async function contractCreateTx ({ ownerId, nonce, code, vmVersion, deposit, amo
 
   return this.nativeMode
     ? this.contractCreateTxNative(R.merge(R.head(arguments), { nonce, ttl }))
-    : this.api.postContractCreate(R.merge(R.head(arguments), { nonce, ttl }))
+    : this.api.postContractCreate(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
 }
 
 async function contractCallTx ({ callerId, nonce, contractId, vmVersion, fee, ttl, amount, gas, gasPrice, callData }) {
@@ -110,7 +110,7 @@ async function contractCallTx ({ callerId, nonce, contractId, vmVersion, fee, tt
   // TODO investigate how to get callData without bytecode
   const { tx } = this.nativeMode
     ? await this.contractCallTxNative(R.merge(R.head(arguments), { nonce, ttl }))
-    : await this.api.postContractCall(R.merge(R.head(arguments), { nonce, ttl }))
+    : await this.api.postContractCall(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
 
   return tx
 }
