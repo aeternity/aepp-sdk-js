@@ -38,11 +38,11 @@ function plan (amount) {
 
 const TIMEOUT = 180000
 
-function configure (mocha, native = false) {
+function configure (mocha) {
   mocha.timeout(TIMEOUT)
 }
 
-async function ready (mocha) {
+async function ready (mocha, native = false) {
   configure(mocha)
 
   const ae = await BaseAe()
