@@ -26,7 +26,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ### Changed
 - Update keystore for new [requirements](https://www.pivotaltracker.com/n/projects/2124891/stories/155155204)
-
+-
 ### Removed
 - Support for < 0.25.0
 - [AE CLI](https://github.com/aeternity/aecli-js) and [AE PROJECT CLI](https://github.com/aeternity/aeproject) moved to separate repos and packages
