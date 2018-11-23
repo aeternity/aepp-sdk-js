@@ -2,14 +2,30 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.25.0-0.1.1]
+### Added
+- see [0.25.0-0.1.0]
+
+### Changed
+- Change bignumbers.js with [bn.js](https://github.com/indutny/bn.js/) due to binding errors in browser's package
+
+### Removed
+- see [0.25.0-0.1.0]
+
+### Breaking Changes
+- see [0.25.0-0.1.0]
+
+### Notes and known Issues
+- none, see [0.25.0-0.1.0]
+
 ## [0.25.0-0.1.0]
 ### Added
 - Parsing of `fee` using `bignum.js`
 - Add `networkId` as param to `Account` flavor(default: `ae_mainnet`)
-- Implement native build of `AENS` transaction. 
+- Implement native build of `AENS` transaction.
 
 ### Changed
-- Update keystore for new [requirements](https://www.pivotaltracker.com/n/projects/2124891/stories/155155204)  
+- Update keystore for new [requirements](https://www.pivotaltracker.com/n/projects/2124891/stories/155155204)
 
 ### Removed
 - Support for < 0.25.0
@@ -20,6 +36,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 - Keystore format [changes](https://www.pivotaltracker.com/n/projects/2124891/stories/155155204)
 
 ### Notes and known Issues
+- none
 
 
 ## [0.25.0-0.1.0-next]
@@ -200,4 +217,4 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 [0.24.0-0.2.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.24.0-0.1.0...v0.24.0-0.2.0
 [0.25.0-0.1.0-next]: https://github.com/aeternity/aepp-sdk-js/compare/v0.24.0-0.2.0...v0.25.0-0.1.0-next
 [0.25.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.25.0-0.1.0-next...v0.25.0-0.1.0
-
+[0.25.0-0.1.1]: https://github.com/aeternity/aepp-sdk-js/compare/v0.25.0-0.1.0...v0.25.0-0.1.1
