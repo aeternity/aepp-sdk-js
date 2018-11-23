@@ -15,7 +15,6 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import '../'
 import Ae from '../../es/ae/universal'
 import * as Crypto from '../../es/utils/crypto'
 
