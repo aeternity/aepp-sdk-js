@@ -34,6 +34,7 @@ signing key pair.
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | [options] | `Object` | <code>{}</code> | Initializer object |
+| options.networkId | `String` |  | NETWORK_ID using for signing transaction's |
 
 <a id="module_@aeternity/aepp-sdk/es/account--Account+signTransaction"></a>
 
