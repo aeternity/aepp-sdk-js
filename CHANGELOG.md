@@ -2,6 +2,25 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.25.0-0.1.0]
+### Added
+- Parsing of `fee` using `bignum.js`
+- Add `networkId` as param to `Account` flavor(default: `ae_mainnet`)
+- Implement native build of `AENS` transaction. 
+
+### Changed
+- Update keystore for new [requirements](https://www.pivotaltracker.com/n/projects/2124891/stories/155155204)  
+
+### Removed
+- Support for < 0.25.0
+- [AE CLI](https://github.com/aeternity/aecli-js) and [AE PROJECT CLI](https://github.com/aeternity/aeproject) moved to separate repos and packages
+
+### Breaking Changes
+- Use NETWORK_ID for signing (see [here](https://github.com/aeternity/aepp-sdk-js/commit/9c252f937f7ea501c4aaacbbef53c4c1833e48e4#diff-ffb275ebb09085c85c59f140998199e0R28))
+
+### Notes and known Issues
+
+
 ## [0.25.0-0.1.0-next]
 ### Added
 - Contract type checked call (Ability to call contract using contract address)
