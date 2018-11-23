@@ -45,7 +45,7 @@ describe('Native Transaction', function () {
 
   before(async () => {
     client = await Ae({ url, internalUrl, nativeMode: false })
-    clientNative = await Ae({ url, internalUrl })
+    clientNative = await Ae({ url, internalUrl, nativeMode: true })
 
     _salt = salt()
     commitmentId = await client.commitmentHash(name, _salt)
