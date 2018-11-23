@@ -1,6 +1,6 @@
 {
   "name": "@aeternity/aepp-sdk",
-  "version": "0.25.0-0.1.0-next",
+  "version": "0.25.0-0.1.0",
   "description": "SDK for the æternity blockchain",
   "main": "dist/aepp-sdk.js",
   "browser": "dist/aepp-sdk.browser.js",
@@ -32,7 +32,7 @@
     "aes-js": "^3.1.1",
     "argon2": "^0.19.3",
     "axios": "^0.18.0",
-    "bignumber.js": "^8.0.1",
+    "bignum": "^0.13.0",
     "blakejs": "^1.1.0",
     "bs58check": "^2.1.1",
     "cacache": "^11.2.0",

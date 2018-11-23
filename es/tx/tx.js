@@ -28,14 +28,14 @@ import Tx from './'
 import JsTx from './js'
 import Epoch from '../epoch'
 
-async function spendTx ({ senderId, recipientId, amount, fee, ttl, nonce, payload }) {
+async function spendTx ({ senderId, recipientId, amount, fee, ttl, nonce, payload = '' }) {
   nonce = await (calculateNonce.bind(this)(senderId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
 
   // Build transaction using sdk (if nativeMode) or build on `EPOCH` side
   const { tx } = this.nativeMode
-    ? await this.spendTxNative(R.merge(R.head(arguments), { recipientId, nonce, ttl }))
-    : await this.api.postSpend(R.merge(R.head(arguments), { recipientId, nonce, ttl }))
+    ? await this.spendTxNative(R.merge(R.head(arguments), { recipientId, senderId, nonce, ttl, fee }))
+    : await this.api.postSpend(R.merge(R.head(arguments), { amount: parseInt(amount), recipientId, senderId, nonce, ttl, fee: parseInt(fee) }))
 
   return tx
 }
@@ -43,43 +43,68 @@ async function spendTx ({ senderId, recipientId, amount, fee, ttl, nonce, payloa
 async function namePreclaimTx ({ accountId, nonce, commitmentId, fee, ttl }) {
   nonce = await (calculateNonce.bind(this)(accountId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
-  return (await this.api.postNamePreclaim(R.merge(R.head(arguments), { nonce, ttl }))).tx
+
+  const { tx } = this.nativeMode
+    ? this.namePreclaimTxNative(R.merge(R.head(arguments), { nonce, ttl }))
+    : await this.api.postNamePreclaim(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
+
+  return tx
 }
 
 async function nameClaimTx ({ accountId, nonce, name, nameSalt, fee, ttl }) {
   nonce = await (calculateNonce.bind(this)(accountId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
-  return (await this.api.postNameClaim(R.merge(R.head(arguments), { nonce, ttl }))).tx
+
+  const { tx } = this.nativeMode
+    ? this.nameClaimTxNative(R.merge(R.head(arguments), { nonce, ttl }))
+    : await this.api.postNameClaim(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
+
+  return tx
 }
 
 async function nameTransferTx ({ accountId, nonce, nameId, recipientId, fee, ttl }) {
   nonce = await (calculateNonce.bind(this)(accountId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
-  return (await this.api.postNameTransfer(R.merge(R.head(arguments), { recipientId, nonce, ttl }))).tx
+
+  const { tx } = this.nativeMode
+    ? this.nameTransferTxNative(R.merge(R.head(arguments), { recipientId, nonce, ttl }))
+    : await this.api.postNameTransfer(R.merge(R.head(arguments), { recipientId, nonce, ttl, fee: parseInt(fee) }))
+
+  return tx
 }
 
 async function nameUpdateTx ({ accountId, nonce, nameId, nameTtl, pointers, clientTtl, fee, ttl }) {
   nonce = await (calculateNonce.bind(this)(accountId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
-  return (await this.api.postNameUpdate(R.merge(R.head(arguments), { nonce, ttl }))).tx
+
+  const { tx } = this.nativeMode
+    ? this.nameUpdateTxNative(R.merge(R.head(arguments), { nonce, ttl }))
+    : await this.api.postNameUpdate(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
+
+  return tx
 }
 
 async function nameRevokeTx ({ accountId, nonce, nameId, fee, ttl }) {
   nonce = await (calculateNonce.bind(this)(accountId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
-  return (await this.api.postNameRevoke(R.merge(R.head(arguments), { nonce, ttl }))).tx
+
+  const { tx } = this.nativeMode
+    ? this.nameRevokeTxNative(R.merge(R.head(arguments), { nonce, ttl }))
+    : await this.api.postNameRevoke(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
+
+  return tx
 }
 
 async function contractCreateTx ({ ownerId, nonce, code, vmVersion, deposit, amount, gas, gasPrice, fee, ttl, callData }) {
   nonce = await (calculateNonce.bind(this)(ownerId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
-  return this.api.postContractCreate(R.merge(R.head(arguments), { nonce, ttl }))
+  return this.api.postContractCreate(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
 }
 
 async function contractCallTx ({ callerId, nonce, contractId, vmVersion, fee, ttl, amount, gas, gasPrice, callData }) {
   nonce = await (calculateNonce.bind(this)(callerId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
-  return (await this.api.postContractCall(R.merge(R.head(arguments), { nonce, ttl }))).tx
+  return (await this.api.postContractCall(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))).tx
 }
 
 async function contractCallComputeTx ({ callerId, nonce, contractId, vmVersion, fee, ttl, amount, gas, gasPrice, fn, args, call }) {
@@ -89,7 +114,7 @@ async function contractCallComputeTx ({ callerId, nonce, contractId, vmVersion, 
   // If we pass `call` make a type-checked call and ignore `fn` and `args` params
   const callOpt = call ? { call } : { 'function': fn, 'arguments': args }
 
-  return (await this.api.postContractCallCompute({ callerId, contractId, vmVersion, fee, amount, gas, gasPrice, nonce, ttl, ...callOpt })).tx
+  return (await this.api.postContractCallCompute({ callerId, contractId, vmVersion, fee: parseInt(fee), amount, gas, gasPrice, nonce, ttl, ...callOpt })).tx
 }
 
 /**
@@ -137,7 +162,7 @@ async function calculateNonce (accountId, nonce) {
  * @example Transaction({url: 'https://sdk-testnet.aepps.com/'})
  */
 const Transaction = Epoch.compose(Tx, JsTx, {
-  init ({ nativeMode = true }) {
+  init ({ nativeMode = false }) {
     this.nativeMode = nativeMode
   },
   props: {
