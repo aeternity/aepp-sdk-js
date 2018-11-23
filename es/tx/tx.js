@@ -162,7 +162,7 @@ async function calculateNonce (accountId, nonce) {
  * @example Transaction({url: 'https://sdk-testnet.aepps.com/'})
  */
 const Transaction = Epoch.compose(Tx, JsTx, {
-  init ({ nativeMode = true }) {
+  init ({ nativeMode = false }) {
     this.nativeMode = nativeMode
   },
   props: {
