@@ -53,7 +53,7 @@ async function ready (mocha, native = false) {
     charged = true
   }
 
-  const client = await BaseAe()
+  const client = await BaseAe({ nativeMode: false })
   const clientNative = await BaseAe({ nativeMode: true })
   client.setKeypair(account)
   clientNative.setKeypair(account)

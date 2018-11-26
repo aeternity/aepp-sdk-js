@@ -17,9 +17,8 @@
 
 import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
-import { configure, url, internalUrl } from './'
+import { configure } from './'
 import { encodeBase58Check, salt } from '../../es/utils/crypto'
-import Ae from '../../es/ae/universal'
 import { ready } from './index'
 
 const nonce = 1
@@ -58,8 +57,6 @@ describe('Native Transaction', function () {
   let client
 
   before(async () => {
-    client = await Ae({ url, internalUrl, nativeMode: false })
-    clientNative = await Ae({ url, internalUrl, nativeMode: true })
     client = await ready(this)
     clientNative = await ready(this, true)
 
