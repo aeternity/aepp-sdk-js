@@ -114,7 +114,7 @@ const base64Types = ['tx', 'st', 'ss', 'pi', 'ov', 'or', 'cb']
  * @return {Buffer} Buffer of decoded Base58 data
  */
 export function decode (data, type) {
-  if (!type) type = data.split('_')[1]
+  if (!type) type = data.split('_')[0]
   return base64Types.includes(type)
     ? decodeBase64Check(assertedType(data, type))
     : decodeBase58Check(assertedType(data, type))
@@ -282,7 +282,6 @@ function nameUpdateTxNative ({ accountId, nonce, nameId, nameTtl, pointers, clie
     toBytes(fee, true),
     toBytes(ttl)
   ]
-
   // Encode RLP
   tx = encodeTx(tx)
   return { tx }

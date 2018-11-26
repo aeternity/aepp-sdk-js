@@ -1,12 +1,19 @@
 ---
-peers:
-- aenode://pp_28uQUgsPcsy7TQwnRxhF8GMKU4ykFLKsgf4TwDwPMNaSCXwWV8@node2:3015
+peers: []
+  # - aenode://pp_HdcpgTX2C1aZ5sjGGysFEuup67K9XiFsWqSPJs4RahEcSyF7X@sync.sdk-testnet.aepps.com:3015
+  # - aenode://pp_HdcpgTX2C1aZ5sjGGysFEuup67K9XiFsWqSPJs4RahEcSyF7X@localhost:3016
+#- aenode://pp_HdcpgTX2C1aZ5sjGGysFEuup67K9XiFsWqSPJs4RahEcSyF7X@af5621d1de36f11e8bb0b1215f72bd59-742041481.us-east-1.elb.amazonaws.com:3015
 
 http:
   external:
     port: 3013
   internal:
+    port: 3113
     listen_address: 0.0.0.0
+  endpoints:
+    debug: true
+  debug: true
+
 
 websocket:
   channel:
@@ -22,9 +29,13 @@ chain:
 
 mining:
   autostart: true
-  beneficiary: "ak_25MZX3BXYP32YDPGWsJqYZ6CgWnqD93VdpCYaTk6KsThEbeFJX"
-  cuckoo:
-    miner:
-      executable: mean16s-generic
-      extra_args: ""
-      node_bits: 16
+  beneficiary: "ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688"
+#    cuckoo:
+#        miner:
+#            executable: mean29s-generic
+#            extra_args: ""
+#            node_bits: 29
+#            edge_bits: 29
+
+# fork_management:
+#     network_id: "localnet"
