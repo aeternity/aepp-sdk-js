@@ -2,6 +2,43 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.25.0-0.1.1]
+### Added
+- see [0.25.0-0.1.0]
+
+### Changed
+- Change bignumbers.js with [bn.js](https://github.com/indutny/bn.js/) due to binding errors in browser's package
+
+### Removed
+- see [0.25.0-0.1.0]
+
+### Breaking Changes
+- see [0.25.0-0.1.0]
+
+### Notes and known Issues
+- none, see [0.25.0-0.1.0]
+
+## [0.25.0-0.1.0]
+### Added
+- Parsing of `fee` using `bignum.js`
+- Add `networkId` as param to `Account` flavor(default: `ae_mainnet`)
+- Implement native build of `AENS` transaction.
+
+### Changed
+- Update keystore for new [requirements](https://www.pivotaltracker.com/n/projects/2124891/stories/155155204)
+-
+### Removed
+- Support for < 0.25.0
+- [AE CLI](https://github.com/aeternity/aecli-js) and [AE PROJECT CLI](https://github.com/aeternity/aeproject) moved to separate repos and packages
+
+### Breaking Changes
+- Use NETWORK_ID for signing (see [here](https://github.com/aeternity/aepp-sdk-js/commit/9c252f937f7ea501c4aaacbbef53c4c1833e48e4#diff-ffb275ebb09085c85c59f140998199e0R28))
+- Keystore format [changes](https://www.pivotaltracker.com/n/projects/2124891/stories/155155204)
+
+### Notes and known Issues
+- none
+
+
 ## [0.25.0-0.1.0-next]
 ### Added
 - Contract type checked call (Ability to call contract using contract address)
@@ -179,3 +216,5 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 [0.24.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.22.0-0.1.0-beta.1...v0.24.0-0.1.0
 [0.24.0-0.2.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.24.0-0.1.0...v0.24.0-0.2.0
 [0.25.0-0.1.0-next]: https://github.com/aeternity/aepp-sdk-js/compare/v0.24.0-0.2.0...v0.25.0-0.1.0-next
+[0.25.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.25.0-0.1.0-next...v0.25.0-0.1.0
+[0.25.0-0.1.1]: https://github.com/aeternity/aepp-sdk-js/compare/v0.25.0-0.1.0...v0.25.0-0.1.1

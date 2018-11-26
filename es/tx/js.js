@@ -177,7 +177,7 @@ function buildPointers (pointers) {
  * @param {number} fee The fee for the transaction
  * @param {number} ttl The relative ttl of the transaction
  * @param {number} nonce the nonce of the transaction
- * @return {Object}  { tx } Encrypted spend tx hash
+ * @return {Object}  { tx } Unsigned spend tx hash
  */
 function spendTxNative ({ senderId, recipientId, amount, payload, fee, ttl, nonce }) {
   let tx = [
@@ -204,7 +204,7 @@ function spendTxNative ({ senderId, recipientId, amount, payload, fee, ttl, nonc
  * @param {number} fee The fee for the transaction
  * @param {number} ttl The relative ttl of the transaction
  * @param {number} nonce the nonce of the transaction
- * @return {Object} { tx } Encrypted name pre-claim tx hash
+ * @return {Object} { tx } Unsigned name pre-claim tx hash
  */
 function namePreclaimTxNative ({ accountId, nonce, commitmentId, fee, ttl }) {
   let tx = [
@@ -231,7 +231,7 @@ function namePreclaimTxNative ({ accountId, nonce, commitmentId, fee, ttl }) {
  * @param {number} fee The fee for the transaction
  * @param {number} ttl The relative ttl of the transaction
  * @param {number} nonce the nonce of the transaction
- * @return {Object}  { tx } Encrypted name claim tx hash
+ * @return {Object}  { tx } Unsigned name claim tx hash
  */
 function nameClaimTxNative ({ accountId, nonce, name, nameSalt, fee, ttl }) {
   let tx = [
@@ -261,7 +261,7 @@ function nameClaimTxNative ({ accountId, nonce, name, nameSalt, fee, ttl }) {
  * @param {number} clientTtl The relative ttl of the client
  * @param {Array} pointers Array of pointers
  * @param {number} nonce the nonce of the transaction
- * @return {Object} { tx } Encrypted name update tx hash
+ * @return {Object} { tx } Unsigned name update tx hash
  */
 function nameUpdateTxNative ({ accountId, nonce, nameId, nameTtl, pointers, clientTtl, fee, ttl }) {
   // Build pointers
@@ -294,7 +294,7 @@ function nameUpdateTxNative ({ accountId, nonce, nameId, nameTtl, pointers, clie
  * @param {number} fee The fee for the transaction
  * @param {number} ttl The relative ttl of the transaction
  * @param {number} nonce the nonce of the transaction
- * @return {Object} { tx } Encrypted name transfer tx hash
+ * @return {Object} { tx } Unsigned name transfer tx hash
  */
 function nameTransferTxNative ({ accountId, nonce, nameId, recipientId, fee, ttl }) {
   let tx = [
@@ -321,7 +321,7 @@ function nameTransferTxNative ({ accountId, nonce, nameId, recipientId, fee, ttl
  * @param {number} fee The fee for the transaction
  * @param {number} ttl The relative ttl of the transaction
  * @param {number} nonce the nonce of the transaction
- * @return {Object} { tx } Encrypted name revoke tx hash
+ * @return {Object} { tx } Unsigned name revoke tx hash
  */
 function nameRevokeTxNative ({ accountId, nonce, nameId, fee, ttl }) {
   let tx = [

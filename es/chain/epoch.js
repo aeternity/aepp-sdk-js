@@ -14,7 +14,6 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-
 import * as R from 'ramda'
 import Chain from './'
 import Epoch from '../epoch'

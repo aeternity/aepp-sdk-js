@@ -58,6 +58,8 @@ describe('Native Transaction', function () {
   let client
 
   before(async () => {
+    client = await Ae({ url, internalUrl, nativeMode: false })
+    clientNative = await Ae({ url, internalUrl, nativeMode: true })
     client = await ready(this)
     clientNative = await ready(this, true)
 
