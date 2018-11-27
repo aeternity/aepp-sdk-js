@@ -57,8 +57,7 @@ export function toBytes (val, big = false) {
 
   if (Number.isInteger(val) || big) {
     let v = new BN(val)
-    let s = Math.ceil(v.bitLength(val) / 8)
-    return Buffer.from(v.toArray('be', s))
+    return v.toArrayLike(Buffer, 'be')
   }
   if (typeof val === 'string') {
     return val.toString('utf-8')
