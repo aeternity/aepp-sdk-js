@@ -22,6 +22,7 @@
  */
 
 import bs58check from 'bs58check'
+import base64js from 'base64-js'
 import RLP from 'rlp'
 import { blake2b } from 'blakejs'
 import nacl from 'tweetnacl'
@@ -78,6 +79,49 @@ export function sha256hash (input) {
  */
 export function salt () {
   return Math.floor(Math.random() * Math.floor(Number.MAX_SAFE_INTEGER))
+}
+
+/**
+ * Base64 encode given `input`
+ * @rtype (input: String|buffer) => Buffer
+ * @param {String} input - Data to encode
+ * @return {Buffer} Base64 encoded data
+ */
+export function encodeBase64Check (input) {
+  const buffer = Buffer.from(input)
+  const checksum = checkSumFn(input)
+  const payloadWithChecksum = Buffer.concat([buffer, checksum], buffer.length + 4)
+  return base64js.fromByteArray(payloadWithChecksum)
+}
+
+export function checkSumFn (payload) {
+  return sha256hash(sha256hash(payload)).slice(0, 4)
+}
+
+function decodeRaw (buffer) {
+  const payload = buffer.slice(0, -4)
+  const checksum = buffer.slice(-4)
+  const newChecksum = checkSumFn(payload)
+
+  if (checksum[0] ^ newChecksum[0] |
+    checksum[1] ^ newChecksum[1] |
+    checksum[2] ^ newChecksum[2] |
+    checksum[3] ^ newChecksum[3]) return
+
+  return payload
+}
+
+/**
+ * Base64 decode given `str`
+ * @rtype (str: String) => Buffer
+ * @param {String} str - Data to decode
+ * @return {Buffer} Base64 decoded data
+ */
+export function decodeBase64Check (str) {
+  const buffer = base64js.toByteArray(str)
+  const payload = decodeRaw(buffer)
+  if (!payload) throw new Error('Invalid checksum')
+  return Buffer.from(payload)
 }
 
 /**
@@ -333,7 +377,7 @@ export function assertedType (data, type) {
  * @return {Array} Decoded transaction
  */
 export function decodeTx (txHash) {
-  return RLP.decode(Buffer.from(decodeBase58Check(assertedType(txHash, 'tx')), 'hex'))
+  return RLP.decode(Buffer.from(decodeBase64Check(assertedType(txHash, 'tx'))))
 }
 
 /**
@@ -344,7 +388,7 @@ export function decodeTx (txHash) {
  */
 export function encodeTx (txData) {
   const encodedTxData = RLP.encode(txData)
-  const encodedTx = encodeBase58Check(Buffer.from(encodedTxData))
+  const encodedTx = encodeBase64Check(encodedTxData)
   return `tx_${encodedTx}`
 }
 

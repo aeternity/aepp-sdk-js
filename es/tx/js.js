@@ -30,7 +30,7 @@ import {
   nameId,
   salt,
   encodeTx,
-  assertedType
+  assertedType, decodeBase64Check
 } from '../utils/crypto'
 import { toBytes } from '../utils/bytes'
 
@@ -105,16 +105,19 @@ const createSalt = salt
  * @example JsTx()
  */
 
+const base64Types = ['tx', 'st', 'ss', 'pi', 'ov', 'or', 'cb']
 /**
  * Decode data using the default encoding/decoding algorithm
  *
  * @param {string} data  An encoded and prefixed string (ex tx_..., sg_..., ak_....)
  * @param {string} type Prefix of Transaction
- * @return {Buffer} Buffer of decoded Base58 data
+ * @return {Buffer} Buffer of decoded Base58 or Base64 data
  */
 export function decode (data, type) {
-  if (!type) return decodeBase58Check(data.split('_')[1])
-  return decodeBase58Check(assertedType(data, type))
+  if (!type) type = data.split('_')[0]
+  return base64Types.includes(type)
+    ? decodeBase64Check(assertedType(data, type))
+    : decodeBase58Check(assertedType(data, type))
 }
 
 /**
@@ -279,7 +282,6 @@ function nameUpdateTxNative ({ accountId, nonce, nameId, nameTtl, pointers, clie
     toBytes(fee, true),
     toBytes(ttl)
   ]
-
   // Encode RLP
   tx = encodeTx(tx)
   return { tx }
