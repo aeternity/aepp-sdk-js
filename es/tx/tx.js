@@ -178,7 +178,7 @@ function calculateFee (fee, txType, gas = 0) {
     'contractCallTx': 5 * BASE_GAS + gas,
     'contractCallComputeTx': 5 * BASE_GAS + gas
   }
-  function getGasBySize(size) {
+  function getGasBySize (size) {
     return GAS_PER_BYTE * size
   }
 

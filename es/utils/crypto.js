@@ -94,7 +94,7 @@ export function encodeBase64Check (input) {
   return base64js.fromByteArray(payloadWithChecksum)
 }
 
-export function checkSumFn(payload) {
+export function checkSumFn (payload) {
   return sha256hash(sha256hash(payload)).slice(0, 4)
 }
 
@@ -118,7 +118,7 @@ function decodeRaw (buffer) {
  * @return {Buffer} Base64 decoded data
  */
 export function decodeBase64Check (str) {
-  const buffer =  base64js.toByteArray(str)
+  const buffer = base64js.toByteArray(str)
   const payload = decodeRaw(buffer)
   if (!payload) throw new Error('Invalid checksum')
   return Buffer.from(payload)
