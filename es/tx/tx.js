@@ -117,7 +117,7 @@ async function contractCallTx ({ callerId, nonce, contractId, vmVersion, fee, tt
   fee = this.calculateFee(fee, 'contractCallTx', gas)
 
   const { tx } = this.nativeMode
-    ? await this.contractCallTxNative(R.merge(R.head(arguments), { nonce, ttl }))
+    ? await this.contractCallTxNative(R.merge(R.head(arguments), { nonce, ttl, fee }))
     : await this.api.postContractCall(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
 
   return tx
@@ -177,14 +177,16 @@ function calculateFee (fee, txType, gas = 0) {
     'spendTx': 32 + 32 + 8 + 8 + 8, // sender(32) + recipient(32) + amount(8) + ttl(8) + nonce(8),
     'contractCreateTx': 32 + 8 + 8 + 8 + 8 + 8 + 8 + 8, // owner(32) + ttl(8) + nonce(8) + vm_version(8) + deposit(8) + amount(8) + gas(8) + gas_price(8)
     'contractCallTx': 32 + 8 + 8 + 8 + 8 + 8 + 8, // caller(32) + ttl(8) + nonce(8) + vm_version(8) + amount(8) + gas(8) + gas_price(8)
-    'contractCallComputeTx': 32 + 8 + 8 + 8 + 8 + 8 + 8 // caller(32) + ttl(8) + nonce(8) + vm_version(8) + amount(8) + gas(8) + gas_price(8)
+    'contractCallComputeTx': 32 + 8 + 8 + 8 + 8 + 8 + 8, // caller(32) + ttl(8) + nonce(8) + vm_version(8) + amount(8) + gas(8) + gas_price(8)
+    'nameUpdateTx': 200
   }
   // MAP WITH FEE CALCULATION https://github.com/aeternity/protocol/blob/epoch-v1.0.0-rc6/consensus/consensus.md#gas
   const TX_FEE_FORMULA = {
     'spendTx': BASE_GAS,
     'contractCreateTx': 5 * BASE_GAS + gas,
     'contractCallTx': 5 * BASE_GAS + gas,
-    'contractCallComputeTx': 5 * BASE_GAS + gas
+    'contractCallComputeTx': 5 * BASE_GAS + gas,
+    'nameUpdateTx': BASE_GAS
   }
   function getGasBySize (size) {
     return GAS_PER_BYTE * size

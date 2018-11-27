@@ -97,6 +97,7 @@ async function deploy (code, abi, { initState = '()', options = {} } = {}) {
     transaction: hash,
     address: contractId,
     call: async (name, options) => this.contractCall(code, abi, contractId, name, options),
+    callStatic: async (name, options) => this.contractCallStatic(contractId, 'sophia-address', name, options),
     createdAt: new Date()
   })
 }

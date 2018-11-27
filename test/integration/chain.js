@@ -33,7 +33,7 @@ describe('Epoch Chain', function () {
     return client.height().should.eventually.be.a('number')
   })
 
-  it.skip('waits for specified heights', async () => {
+  it('waits for specified heights', async () => {
     const target = await client.height() + 1
     await client.awaitHeight(target, { attempts: 120 }).should.eventually.be.at.least(target)
     return client.height().should.eventually.be.at.least(target)
