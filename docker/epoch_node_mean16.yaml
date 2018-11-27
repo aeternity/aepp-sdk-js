@@ -30,12 +30,13 @@ chain:
 mining:
   autostart: true
   beneficiary: "ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688"
-#    cuckoo:
-#        miner:
-#            executable: mean29s-generic
-#            extra_args: ""
-#            node_bits: 29
-#            edge_bits: 29
+  expected_mine_rate: 4000
+  micro_block_cycle: 1000
+  cuckoo:
+    miner:
+      executable: mean15-generic
+      extra_args: ""
+      edge_bits: 15
 
 fork_management:
   network_id: "ae_mainnet"
