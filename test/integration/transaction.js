@@ -17,9 +17,9 @@
 
 import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
-import { configure, url, internalUrl } from './'
+import { configure } from './'
 import { encodeBase58Check, salt } from '../../es/utils/crypto'
-import Ae from '../../es/ae/universal'
+import { ready } from './index'
 
 const nonce = 1
 const ttl = 1
@@ -34,6 +34,19 @@ const nameHash = `nm_${encodeBase58Check(Buffer.from(name))}`
 const nameId = 'nm_2sFnPHi5ziAqhdApSpRBsYdomCahtmk3YGNZKYUTtUNpVSMccC'
 const pointers = [{ key: 'account_pubkey', id: senderId }]
 
+// Contract test data
+const contractCode = `
+contract Identity =
+  type state = ()
+  function main(x : int) = x
+`
+let bytecode
+let contractId
+const vmVersion = 1
+const deposit = 4
+const gasPrice =  1
+const gas =  1600000 - 21000 // MAX GAS
+
 let _salt;
 let commitmentId;
 
@@ -44,8 +57,8 @@ describe('Native Transaction', function () {
   let client
 
   before(async () => {
-    client = await Ae({ url, internalUrl, nativeMode: false })
-    clientNative = await Ae({ url, internalUrl, nativeMode: true })
+    client = await ready(this)
+    clientNative = await ready(this, true)
 
     _salt = salt()
     commitmentId = await client.commitmentHash(name, _salt)
@@ -99,5 +112,36 @@ describe('Native Transaction', function () {
     const txFromAPI = await client.nameTransferTx({ accountId: senderId, nonce, nameId, recipientId, fee, ttl })
     const nativeTx = await clientNative.nameTransferTx({ accountId: senderId, nonce, nameId, recipientId, fee, ttl })
     txFromAPI.should.be.equal(nativeTx)
+  })
+
+  it('native build of contract create tx', async () => {
+    const { bytecode } = await client.contractCompile(contractCode)
+    const callData = await client.contractEncodeCall(bytecode, 'sophia', 'init', '()')
+    const owner = await client.address()
+
+    const txFromAPI = await client.contractCreateTx({ ownerId: owner, code: bytecode, vmVersion, deposit, amount, gas, gasPrice, fee, ttl, callData  })
+    const nativeTx = await clientNative.contractCreateTx({ ownerId: owner, code: bytecode, vmVersion, deposit, amount, gas, gasPrice, fee, ttl, callData })
+
+    txFromAPI.tx.should.be.equal(nativeTx.tx)
+    txFromAPI.contractId.should.be.equal(nativeTx.contractId)
+
+    // deploy contract
+    await client.send(nativeTx.tx)
+    contractId = txFromAPI.contractId
+  })
+
+  it('native build of contract call tx', async () => {
+    const { bytecode } = await client.contractCompile(contractCode)
+    const callData = await client.contractEncodeCall(bytecode, 'sophia', 'main', '(2)')
+    const owner = await client.address()
+
+    const txFromAPI = await client.contractCallTx({ callerId: owner, contractId, vmVersion, amount, gas, gasPrice, fee, ttl, callData })
+    const nativeTx = await clientNative.contractCallTx({ callerId: owner, contractId, vmVersion, amount, gas, gasPrice, fee, ttl, callData })
+
+    txFromAPI.should.be.equal(nativeTx)
+    const { hash } = await client.send(nativeTx)
+    const result = await client.getTxInfo(hash)
+
+    result.returnType.should.be.equal('ok')
   })
 })

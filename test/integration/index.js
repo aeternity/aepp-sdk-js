@@ -15,7 +15,6 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import '../'
 import Ae from '../../es/ae/universal'
 import * as Crypto from '../../es/utils/crypto'
 
@@ -42,7 +41,7 @@ function configure (mocha) {
   mocha.timeout(TIMEOUT)
 }
 
-async function ready (mocha) {
+async function ready (mocha, native = false) {
   configure(mocha)
 
   const ae = await BaseAe()
@@ -54,9 +53,11 @@ async function ready (mocha) {
     charged = true
   }
 
-  const client = await BaseAe()
+  const client = await BaseAe({ nativeMode: false })
+  const clientNative = await BaseAe({ nativeMode: true })
   client.setKeypair(account)
-  return client
+  clientNative.setKeypair(account)
+  return native ? clientNative : client
 }
 
 export {
