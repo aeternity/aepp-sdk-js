@@ -33,8 +33,8 @@ describe('Epoch Chain', function () {
     return client.height().should.eventually.be.a('number')
   })
 
-  it('waits for specified heights', async () => {
-    const target = await client.height() + 2
+  it.skip('waits for specified heights', async () => {
+    const target = await client.height() + 1
     await client.awaitHeight(target, { attempts: 120 }).should.eventually.be.at.least(target)
     return client.height().should.eventually.be.at.least(target)
   })
@@ -42,8 +42,7 @@ describe('Epoch Chain', function () {
   it('polls for transactions', async () => {
     const sender = await client.address()
     const receiver = publicKey
-    const { tx } = await client.api.postSpend({
-      fee: 1,
+    const tx = await client.spendTx({
       amount: 1,
       senderId: sender,
       recipientId: receiver,

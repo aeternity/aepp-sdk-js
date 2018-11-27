@@ -37,7 +37,7 @@ const pointers = [{ key: 'account_pubkey', id: senderId }]
 let _salt;
 let commitmentId;
 
-describe.only('Native Transaction', function () {
+describe('Native Transaction', function () {
   configure(this)
 
   let clientNative

@@ -41,7 +41,7 @@ const identityContractByteCode = 'cb_PrYsBBtixiciNyCyavZheKqeu4ADSKyu8jftRmVstB5
 
 plan(1000000000)
 
-describe('Contract', function () {
+describe.skip('Contract', function () {
   configure(this)
 
   let contract
