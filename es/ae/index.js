@@ -83,7 +83,6 @@ const Ae = stampit(Tx, Account, Chain, Contract, {
   methods: { send, spend },
   deepProperties: { Ae: { defaults: {
     ttl: 500,
-    fee: 1,
     payload: ''
   } } }
 })
