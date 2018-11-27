@@ -37,5 +37,5 @@ mining:
 #            node_bits: 29
 #            edge_bits: 29
 
-# fork_management:
-#     network_id: "localnet"
+fork_management:
+  network_id: "ae_mainnet"

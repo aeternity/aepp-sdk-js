@@ -53,7 +53,7 @@ describe.skip('Contract', function () {
   })
 
   describe('precompiled bytecode', () => {
-    it('can be invoked', async () => {
+    it.skip('can be invoked', async () => {
       const result = await contract.contractCallStatic(identityContractByteCode, 'sophia', 'main', { args: '(42)' })
       return result.decode('int').should.eventually.become({
         type: 'word',
@@ -61,7 +61,7 @@ describe.skip('Contract', function () {
       })
     })
 
-    it('can be invoked using type-check', async () => {
+    it.skip('can be invoked using type-check', async () => {
       const result = await contract.contractCallStatic(identityContractByteCode, 'sophia', 'main', { call: callIdentityExample  })
       return result.decode('int').should.eventually.become({
         type: 'word',
@@ -79,7 +79,7 @@ describe.skip('Contract', function () {
     return bytecode.should.have.property('bytecode')
   })
 
-  it('invokes function against compiled code', async () => {
+  it.skip('invokes function against compiled code', async () => {
     const result = await bytecode.call('main', { args: '42' })
     return result.decode('int').should.eventually.become({
       type: 'word',
@@ -87,7 +87,7 @@ describe.skip('Contract', function () {
     })
   })
 
-  it('invokes function with type-check against compiled code', async () => {
+  it.skip('invokes function with type-check against compiled code', async () => {
     const result = await bytecode.call('main', { call: callIdentityExample })
     return result.decode('int').should.eventually.become({
       type: 'word',

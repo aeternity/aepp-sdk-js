@@ -106,7 +106,7 @@ async function compile (code, options = {}) {
 
   return Object.freeze(Object.assign({
     encodeCall: async (name, args, { call, abi }) => this.contractEncodeCall(o.bytecode, R.defaultTo('sophia', abi), name, args, call),
-    call: async (name, options = {}) => this.contractCallStatic(o.bytecode, R.defaultTo('sophia', options.abi), name, options),
+    // call: async (name, options = {}) => this.contractCallStatic(o.bytecode, R.defaultTo('sophia', options.abi), name, options),
     deploy: async (options = {}) => this.contractDeploy(o.bytecode, R.defaultTo('sophia', options.abi), options)
   }, o))
 }
