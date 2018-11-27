@@ -41,9 +41,9 @@ const invalidKeystore = {
 }
 
 const password = 'test'
-
 describe('Keystore', function () {
-  this.timeout(180000)
+  this.timeout(18000000)
+
   const { secretKey } = generateKeyPair(true);
   const publicKey = getAddressFromPriv(secretKey)
   let keystore;

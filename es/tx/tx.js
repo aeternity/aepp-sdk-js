@@ -105,14 +105,22 @@ async function contractCreateTx ({ ownerId, nonce, code, vmVersion, deposit, amo
   nonce = await (calculateNonce.bind(this)(ownerId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
   fee = this.calculateFee(fee, 'contractCreateTx', gas)
-  return this.api.postContractCreate(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
+
+  return this.nativeMode
+    ? this.contractCreateTxNative(R.merge(R.head(arguments), { nonce, ttl, fee }))
+    : this.api.postContractCreate(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
 }
 
 async function contractCallTx ({ callerId, nonce, contractId, vmVersion, fee, ttl, amount, gas, gasPrice, callData }) {
   nonce = await (calculateNonce.bind(this)(callerId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
   fee = this.calculateFee(fee, 'contractCallTx', gas)
-  return (await this.api.postContractCall(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))).tx
+
+  const { tx } = this.nativeMode
+    ? await this.contractCallTxNative(R.merge(R.head(arguments), { nonce, ttl }))
+    : await this.api.postContractCall(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
+
+  return tx
 }
 
 async function contractCallComputeTx ({ callerId, nonce, contractId, vmVersion, fee, ttl, amount, gas, gasPrice, fn, args, call }) {
