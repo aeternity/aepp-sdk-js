@@ -111,7 +111,7 @@ const base64Types = ['tx', 'st', 'ss', 'pi', 'ov', 'or', 'cb']
  *
  * @param {string} data  An encoded and prefixed string (ex tx_..., sg_..., ak_....)
  * @param {string} type Prefix of Transaction
- * @return {Buffer} Buffer of decoded Base58 data
+ * @return {Buffer} Buffer of decoded Base58 or Base64 data
  */
 export function decode (data, type) {
   if (!type) type = data.split('_')[0]
