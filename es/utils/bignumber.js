@@ -1,5 +1,5 @@
-import BN from 'bn.js'
+import { BigNumber } from 'bignumber.js'
 
 export function parseBigNumber (number) {
-  return new BN(number.toString()).toString(10)
+  return BigNumber(number.toString()).toString(10)
 }
