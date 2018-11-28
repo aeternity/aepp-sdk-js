@@ -15,12 +15,12 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import '../'
 import Ae from '../../es/ae/universal'
 import * as Crypto from '../../es/utils/crypto'
 
 const url = process.env.TEST_URL || 'http://localhost:3013'
 const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
+const networkId = process.env.TEST_NETWORK_ID || 'ae_devnet'
 const account = Crypto.generateKeyPair()
 // Array(3).fill().map(() => Crypto.generateKeyPair())
 
@@ -36,17 +36,17 @@ function plan (amount) {
   planned += amount
 }
 
-const TIMEOUT = 180000
+const TIMEOUT = 18000000
 
 function configure (mocha) {
   mocha.timeout(TIMEOUT)
 }
 
-async function ready (mocha) {
+async function ready (mocha, native = false) {
   configure(mocha)
 
-  const ae = await BaseAe()
-  await ae.awaitHeight(3)
+  const ae = await BaseAe({ networkId })
+  // await ae.awaitHeight(3)
 
   if (!charged && planned > 0) {
     console.log(`Charging new wallet ${account.publicKey} with ${planned}`)
@@ -54,9 +54,11 @@ async function ready (mocha) {
     charged = true
   }
 
-  const client = await BaseAe()
+  const client = await BaseAe({ nativeMode: false, networkId })
+  const clientNative = await BaseAe({ nativeMode: true, networkId })
   client.setKeypair(account)
-  return client
+  clientNative.setKeypair(account)
+  return native ? clientNative : client
 }
 
 export {

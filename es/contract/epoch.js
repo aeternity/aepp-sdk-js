@@ -30,14 +30,22 @@ import Epoch from '../epoch'
 
 const TYPE_CHECKED_ABI = ['sophia', 'sophia-address']
 
-async function contractEpochEncodeCallData (code, abi, name, arg, call) {
+async function contractEpochEncodeCallData (codeOrAddress, abi, name, arg, call) {
+  // Get contract bytecode from epoch if we want to get callData using { abi: 'sophia-address', code: 'contract address' }
+  let code = codeOrAddress
+  if (abi === 'sophia-address' && codeOrAddress.slice(0, 2) === 'ct') {
+    code = (await this.getContractByteCode(code)).bytecode
+    abi = 'sophia'
+  }
+  // If we pass `call` argument we use type-checked call
   if (call && TYPE_CHECKED_ABI.includes(abi)) return (await this.api.encodeCalldata({ abi, code, call })).calldata
+
   return (await this.api.encodeCalldata({ abi, code, 'function': name, arg })).calldata
 }
 
-async function contractEpochCall (code, abi, name, arg = '()', call) {
-  if (call && TYPE_CHECKED_ABI.includes(abi)) return this.api.callContract({ abi, code, call })
-  return this.api.callContract({ abi, code, 'function': name, arg })
+async function contractEpochCall (address, abi = 'sophia-address', name, arg = '()', call) {
+  if (call && TYPE_CHECKED_ABI.includes(abi)) return this.api.callContract({ abi, code: address, call })
+  return this.api.callContract({ abi, code: address, 'function': name, arg })
 }
 
 async function contractEpochDecodeData (type, data) {
@@ -48,12 +56,23 @@ async function compileEpochContract (code, options = {}) {
   return this.api.compileContract(R.mergeAll([this.Ae.defaults, options, { code }]))
 }
 
+/**
+ * Get bytecode by contract public key
+ *
+ * @param {string} contractId
+ * @return {number} Contract byte code
+ */
+async function getContractByteCode (contractId) {
+  return this.api.getContractCode(contractId)
+}
+
 const EpochContract = ContractBase.compose(Epoch, {
   methods: {
     contractEpochEncodeCallData,
     contractEpochCall,
     contractEpochDecodeData,
-    compileEpochContract
+    compileEpochContract,
+    getContractByteCode
   }
 })
 
