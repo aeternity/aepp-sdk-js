@@ -22,6 +22,7 @@
  * @example import Swagger from '@aeternity/aepp-sdk/es/utils/swagger'
  */
 
+import JSONbig from 'json-bigint';
 import stampit from '@stamp/it'
 import AsyncInit from './async-init'
 import axios from 'axios'
@@ -208,9 +209,17 @@ function conform (value, spec, types) {
   }))(value, spec, types)
 }
 
+const httpCofig = {
+  headers: { 'Content-Type': 'application/json' },
+  transformResponse: [
+    data => {
+      return JSONbig.parse(data)
+    }
+  ]
+}
 const httpClients = {
-  get: axios.get,
-  post: axios.post
+  get: (url) => axios.get(url, httpCofig),
+  post: (url, params) => axios.post(url, params, httpCofig)
 }
 
 /**
@@ -400,7 +409,7 @@ const operation = R.memoize((path, method, definition, types) => {
         }
 
         try {
-          const response = await client(`${url}${expandedPath}`, params, { headers: { 'Content-Type': 'application/json' } })
+          const response = await client(`${url}${expandedPath}`, params)
           // return opt.fullResponse ? response : conform(pascalizeKeys(response.data), responses['200'], types)
           return opt.fullResponse ? response : pascalizeKeys(response.data)
         } catch (e) {
