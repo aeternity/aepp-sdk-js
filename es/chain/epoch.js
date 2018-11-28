@@ -17,7 +17,6 @@
 import * as R from 'ramda'
 import Chain from './'
 import Epoch from '../epoch'
-import { parseBigNumber } from '../utils/bignumber'
 
 async function sendTransaction (tx, options = {}) {
   const { waitMined } = R.merge(this.Chain.defaults, options)

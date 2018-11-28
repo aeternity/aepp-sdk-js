@@ -22,7 +22,7 @@
  * @example import Swagger from '@aeternity/aepp-sdk/es/utils/swagger'
  */
 
-import JSONbig from 'json-bigint';
+import JSONbig from 'json-bigint'
 import stampit from '@stamp/it'
 import AsyncInit from './async-init'
 import axios from 'axios'
