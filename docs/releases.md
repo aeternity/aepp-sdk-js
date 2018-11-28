@@ -29,7 +29,7 @@ As aepp-sdk follows the [git-flow strategy] for develoment, the release process
 is modelled after that strategy accordingly, with a few additions.
 
 Branch out from `develop` to a dedicated release branch denoting the target
-version number, e.g. `release/v0.20.0-0.1.0` for a hypothetical first release
+version number, e.g. `release/0.20.0-0.1.0` for a hypothetical first release
 targeting Epoch 0.20.0.
 
 [git-flow strategy]: https://danielkummer.github.io/git-flow-cheatsheet/
@@ -91,8 +91,8 @@ At this point, the release should already be in npmjs.com. The final step is to
 also tag the release on GitHub and push the tag, *which requires direct write
 access*.
 
-1. `git tag v$VERSION`
-2. `git push tag v$VERSION`
+1. `git tag $VERSION`
+2. `git push tag $VERSION`
 
 > Recommendation: Use signed tags using the -s option to increase community's
 > trust in the project!

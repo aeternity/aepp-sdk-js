@@ -2,6 +2,24 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [1.0.0]
+### Added
+- Contract native Transactions
+
+### Changed
+- Rolled back to bignumbers.js for easier fix with axios.get/post
+
+### Removed
+- Support for Epoch < 1.0.0
+
+### Breaking Changes
+- New NETWORK_ID (also used in docker/sdk.env for CI tests)
+-  Encoding of transaction (and other objects) [changed from base58check to base64check](https://github.com/aeternity/protocol/blob/epoch-v1.0.0/epoch/api/api_encoding.md)
+
+### Notes and known Issues
+- State Channels have been excluded for problems with CI, will be included in next release
+
+
 ## [0.25.0-0.1.1]
 ### Added
 - see [0.25.0-0.1.0]
@@ -218,3 +236,4 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 [0.25.0-0.1.0-next]: https://github.com/aeternity/aepp-sdk-js/compare/v0.24.0-0.2.0...v0.25.0-0.1.0-next
 [0.25.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.25.0-0.1.0-next...v0.25.0-0.1.0
 [0.25.0-0.1.1]: https://github.com/aeternity/aepp-sdk-js/compare/v0.25.0-0.1.0...v0.25.0-0.1.1
+[1.0.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.25.0-0.1.0...1.0.0
