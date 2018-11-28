@@ -98,6 +98,6 @@ const Epoch = stampit({
 })
 
 // Array with compatible epoch node versions
-export const COMPATIBILITY = ['1.0.0-rc6']
+export const COMPATIBILITY = ['1.0.0']
 
 export default Epoch
