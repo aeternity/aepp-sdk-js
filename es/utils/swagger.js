@@ -211,11 +211,7 @@ function conform (value, spec, types) {
 
 const httpCofig = {
   headers: { 'Content-Type': 'application/json' },
-  transformResponse: [
-    data => {
-      return JSONbig.parse(data)
-    }
-  ]
+  transformResponse: [JSONbig({'storeAsString': true}).parse]
 }
 const httpClients = {
   get: (url) => axios.get(url, httpCofig),
