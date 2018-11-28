@@ -25,7 +25,7 @@ async function sendTransaction (tx, options = {}) {
 }
 
 async function balance (address, { height, hash } = {}) {
-  return (await this.api.getAccountByPubkey(address, { height, hash })).balance
+  return (await this.api.getAccountByPubkey(address, { height, hash })).balance.toString()
 }
 
 async function tx (hash) {
