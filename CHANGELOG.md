@@ -4,7 +4,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [1.0.0]
 ### Added
-
+- Contract native Transactions
 
 ### Changed
 - Rolled back to bignumbers.js for easier fix with axios.get/post
