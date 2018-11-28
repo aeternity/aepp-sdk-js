@@ -22,7 +22,6 @@
  */
 
 import bs58check from 'bs58check'
-import base64js from 'base64-js'
 import RLP from 'rlp'
 import { blake2b } from 'blakejs'
 import nacl from 'tweetnacl'
@@ -91,7 +90,7 @@ export function encodeBase64Check (input) {
   const buffer = Buffer.from(input)
   const checksum = checkSumFn(input)
   const payloadWithChecksum = Buffer.concat([buffer, checksum], buffer.length + 4)
-  return base64js.fromByteArray(payloadWithChecksum)
+  return payloadWithChecksum.toString('base64')
 }
 
 export function checkSumFn (payload) {
@@ -118,7 +117,7 @@ function decodeRaw (buffer) {
  * @return {Buffer} Base64 decoded data
  */
 export function decodeBase64Check (str) {
-  const buffer = base64js.toByteArray(str)
+  const buffer = Buffer.from(str, 'base64')
   const payload = decodeRaw(buffer)
   if (!payload) throw new Error('Invalid checksum')
   return Buffer.from(payload)
