@@ -14,7 +14,7 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-import bignum from 'bignum'
+import BN from 'bn.js'
 /**
  * Left pad the input data with 0 bytes
  * @param length to pad to
@@ -56,12 +56,8 @@ export function toBytes (val, big = false) {
   // Raises ValueError if the input is not an int or string
 
   if (Number.isInteger(val) || big) {
-    let v = bignum(val)
-    let s = Math.ceil(v.bitLength(val) / 8)
-    return v.toBuffer({
-      endian: 'big',
-      size: s
-    })
+    let v = new BN(val)
+    return v.toArrayLike(Buffer, 'be')
   }
   if (typeof val === 'string') {
     return val.toString('utf-8')

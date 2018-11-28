@@ -5,8 +5,8 @@ dependencies:
   aes-js: 3.1.1
   argon2: 0.19.3
   axios: 0.18.0
-  bignumber.js: 8.0.1
   blakejs: 1.1.0
+  bn.js: 4.11.8
   bs58check: 2.1.1
   cacache: 11.2.0
   commander: 2.16.0
@@ -1458,10 +1458,6 @@ packages:
     dev: true
     resolution:
       integrity: sha512-+hN/Zh2D08Mx65pZ/4g5bsmNiZUuChDiQfTUQ7qJr4/kuopCr88xZsAXv6mBoZEsUI4OuGHlX59qE94K2mMW8Q==
-  /bignumber.js/8.0.1:
-    dev: false
-    resolution:
-      integrity: sha512-zAySveTJXkgLYCBi0b14xzfnOs+f3G6x36I8w2a1+PFQpWk/dp0mI0F+ZZK2bu+3ELewDcSyP+Cfq++NcHX7sg==
   /binary-extensions/1.11.0:
     dev: true
     engines:
@@ -1491,7 +1487,6 @@ packages:
     resolution:
       integrity: sha512-dhHTWMI7kMx5whMQntl7Vr9C6BvV10lFXDAasnqnrMYhXVCzzk6IO9Fo2L75jXHT07WrOngL1WDXOp+yYS91Yg==
   /bn.js/4.11.8:
-    dev: true
     resolution:
       integrity: sha512-ItfYfPLkWHUjckQCk8xC+LwxgK8NYcXywGigJgSwOP8Y2iyWT4f2vsZnoOXTTbo+o5yXmIUJ4gn5538SO5S3gA==
   /boolbase/1.0.0:
@@ -7125,8 +7120,8 @@ specifiers:
   babel-core: '6'
   babel-loader: ^8.0.0-beta.2
   babel-plugin-ramda: ^1.6.1
-  bignumber.js: ^8.0.1
   blakejs: ^1.1.0
+  bn.js: ^4.11.8
   bs58check: ^2.1.1
   bufferutil: ^3.0.3
   cacache: ^11.2.0

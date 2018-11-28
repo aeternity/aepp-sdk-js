@@ -35,7 +35,7 @@ import * as Crypto from '../utils/crypto'
  * @return {String} Signed transaction
  */
 async function signTransaction (tx) {
-  const binaryTx = Crypto.decodeBase58Check(Crypto.assertedType(tx, 'tx'))
+  const binaryTx = Crypto.decodeBase64Check(Crypto.assertedType(tx, 'tx'))
   // Prepend `NETWORK_ID` to begin of data binary
   const txWithNetworkId = Buffer.concat([Buffer.from(this.networkId), binaryTx])
 

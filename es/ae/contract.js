@@ -55,12 +55,10 @@ async function call (code, abi, address, name, { args = '()', options = {}, call
     opt.gas = this.Ae.defaults.gas
   }
 
-  const tx = await this.contractCallComputeTx(R.merge(opt, {
-    call,
-    fn: name,
-    args,
+  const tx = await this.contractCallTx(R.merge(opt, {
+    callerId: await this.address(),
     contractId: address,
-    callerId: await this.address()
+    callData: await this.contractEncodeCall(code, abi, name, args, call)
   }))
 
   const { hash } = await this.send(tx, opt)
@@ -99,6 +97,7 @@ async function deploy (code, abi, { initState = '()', options = {} } = {}) {
     transaction: hash,
     address: contractId,
     call: async (name, options) => this.contractCall(code, abi, contractId, name, options),
+    callStatic: async (name, options) => this.contractCallStatic(contractId, 'sophia-address', name, options),
     createdAt: new Date()
   })
 }
@@ -108,7 +107,7 @@ async function compile (code, options = {}) {
 
   return Object.freeze(Object.assign({
     encodeCall: async (name, args, { call, abi }) => this.contractEncodeCall(o.bytecode, R.defaultTo('sophia', abi), name, args, call),
-    call: async (name, options = {}) => this.contractCallStatic(o.bytecode, R.defaultTo('sophia', options.abi), name, options),
+    // call: async (name, options = {}) => this.contractCallStatic(o.bytecode, R.defaultTo('sophia', options.abi), name, options),
     deploy: async (options = {}) => this.contractDeploy(o.bytecode, R.defaultTo('sophia', options.abi), options)
   }, o))
 }
