@@ -17,7 +17,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 -  Encoding of transaction (and other objects) [changed from base58check to base64check](https://github.com/aeternity/protocol/blob/epoch-v1.0.0/epoch/api/api_encoding.md)
 
 ### Notes and known Issues
-- none, see [0.25.0-0.1.0]
+- State Channels have been excluded for problems with CI, will be included in next release
 
 
 ## [0.25.0-0.1.1]
