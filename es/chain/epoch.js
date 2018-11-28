@@ -26,7 +26,7 @@ async function sendTransaction (tx, options = {}) {
 }
 
 async function balance (address, { height, hash } = {}) {
-  return parseBigNumber((await this.api.getAccountByPubkey(address, { height, hash })).balance)
+  return (await this.api.getAccountByPubkey(address, { height, hash })).balance
 }
 
 async function tx (hash) {
