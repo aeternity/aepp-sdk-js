@@ -102,10 +102,7 @@ function decodeRaw (buffer) {
   const checksum = buffer.slice(-4)
   const newChecksum = checkSumFn(payload)
 
-  if (checksum[0] ^ newChecksum[0] |
-    checksum[1] ^ newChecksum[1] |
-    checksum[2] ^ newChecksum[2] |
-    checksum[3] ^ newChecksum[3]) return
+  if (!checksum.equals(newChecksum)) return
 
   return payload
 }
