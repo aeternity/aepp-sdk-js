@@ -2,6 +2,24 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [1.0.1]
+### Added
+- ability to support Epoch range(s) using semver package (see https://www.npmjs.com/package/semver#ranges)
+
+### Changed
+- Support for Epoch >= 1.0.0 and < 2.0.0
+
+### Removed
+- none
+
+### Breaking Changes
+- none
+
+### Notes and known Issues
+- none
+
+
+
 ## [1.0.0]
 ### Added
 - Contract native Transactions
@@ -237,3 +255,4 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 [0.25.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.25.0-0.1.0-next...v0.25.0-0.1.0
 [0.25.0-0.1.1]: https://github.com/aeternity/aepp-sdk-js/compare/v0.25.0-0.1.0...v0.25.0-0.1.1
 [1.0.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.25.0-0.1.0...1.0.0
+[1.0.1]: https://github.com/aeternity/aepp-sdk-js/compare/1.0.0...1.0.1
