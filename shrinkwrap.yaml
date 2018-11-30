@@ -5,7 +5,6 @@ dependencies:
   aes-js: 3.1.1
   argon2: 0.19.3
   axios: 0.18.0
-  base64-js: 1.3.0
   bignumber.js: 8.0.1
   blakejs: 1.1.0
   bs58check: 2.1.1
@@ -21,6 +20,7 @@ dependencies:
   ramda: 0.25.0
   recursive-rename: 2.0.0
   rlp: 2.1.0
+  semver: 5.6.0
   serialize-javascript: 1.5.0
   sha.js: 2.4.11
   tweetnacl: 1.0.0
@@ -1446,6 +1446,7 @@ packages:
     resolution:
       integrity: sha512-5T6P4xPgpp0YDFvSWwEZ4NoE3aM4QBQXDzmVbraCkFj8zHM+mba8SyqB5DbZWyR7mYHo6Y7BdQo3MoA4m0TeQg==
   /base64-js/1.3.0:
+    dev: true
     resolution:
       integrity: sha512-ccav/yGvoa80BQDljCxsmmQ3Xvx60/UpBIij5QN21W3wBi/hhIC9OoO+KLpu9IJTS9j4DRVJ3aDDF9cMSoa2lw==
   /bcrypt-pbkdf/1.0.2:
@@ -5937,7 +5938,6 @@ packages:
     resolution:
       integrity: sha512-4SJ3dm0WAwWy/NVeioZh5AntkdJoWKxHxcmyP622fOkgHa4z3R0TdBJICINyaSDE6uNwVc8gZr+ZinwZAH4xIA==
   /semver/5.6.0:
-    dev: true
     hasBin: true
     resolution:
       integrity: sha512-RS9R6R35NYgQn++fkDWaOmqGoj4Ek9gGs+DPxNUZKuwE183xjJroKvyo1IzVFeXvUrvmALy6FWD5xrdJT25gMg==
@@ -7136,7 +7136,6 @@ specifiers:
   babel-core: '6'
   babel-loader: ^8.0.0-beta.2
   babel-plugin-ramda: ^1.6.1
-  base64-js: ^1.3.0
   bignumber.js: ^8.0.1
   blakejs: ^1.1.0
   bs58check: ^2.1.1
@@ -7172,6 +7171,7 @@ specifiers:
   recursive-rename: ^2.0.0
   rlp: ^2.0.0
   safe-buffer: ^5.1.2
+  semver: ^5.6.0
   serialize-javascript: ^1.5.0
   sha.js: ^2.4.11
   sinon: ^4.2.2
