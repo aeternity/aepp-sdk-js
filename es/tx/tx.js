@@ -28,6 +28,7 @@ import Tx from './'
 import JsTx from './js'
 import Epoch from '../epoch'
 
+
 async function spendTx ({ senderId, recipientId, amount, fee, ttl, nonce, payload = '' }) {
   nonce = await (calculateNonce.bind(this)(senderId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
@@ -161,13 +162,16 @@ async function calculateNonce (accountId, nonce) {
   return nonce
 }
 
+
 /**
- * Calculate fee of transaction
- *
- * @param {number|string} fee
- * @param {string} txType Type of transaction
- * @param {number|string} gas Gas of transaction
- * @return {number|string} Transaction fee
+ * Select specific account
+ * @instance
+ * @rtype (fee, txtype, gas = 0) => String
+ * @param {String|Number} fee - fee
+ * @param {String} txType - Transaction type
+ * @param {String|Number} gas - Gas amount
+ * @return {String}
+ * @example calculateFee(null, 'spendtx')
  */
 function calculateFee (fee, txType, gas = 0) {
   const BASE_GAS = 15000
@@ -213,6 +217,9 @@ function calculateFee (fee, txType, gas = 0) {
  * @alias module:@aeternity/aepp-sdk/es/tx/tx
  * @rtype Stamp
  * @param {Object} [options={}] - Initializer object
+ * @param {Object} [options.nativeMode] - Use Native build of transaction's
+ * @param {Object} [options.url] - Node url
+ * @param {Object} [options.internalUrl] - Node internal url
  * @return {Object} Transaction instance
  * @example Transaction({url: 'https://sdk-testnet.aepps.com/'})
  */
