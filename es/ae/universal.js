@@ -29,6 +29,7 @@ import Aens from './aens'
 import Contract from './contract'
 import Transaction from '../tx/tx'
 import EpochContract from '../contract/epoch'
+import EpochOracle from '../oracle/epoch'
 
 /**
  * Universal Stamp
@@ -41,7 +42,7 @@ import EpochContract from '../contract/epoch'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Universal instance
  */
-const Universal = Ae.compose(Account, Chain, Transaction, Aens, EpochContract, Contract, {
+const Universal = Ae.compose(Account, Chain, Transaction, Aens, EpochContract, EpochOracle, Contract, {
   init () {},
   props: { process: {} }
 })

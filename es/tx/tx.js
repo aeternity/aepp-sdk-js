@@ -135,6 +135,39 @@ async function contractCallComputeTx ({ callerId, nonce, contractId, vmVersion, 
   return (await this.api.postContractCallCompute({ callerId, contractId, vmVersion, fee: parseInt(fee), amount, gas, gasPrice, nonce, ttl, ...callOpt })).tx
 }
 
+async function oracleRegisterTx ({ accountId, queryFormat, responseFormat, queryFee,  oracleTtl, fee, ttl, nonce, vmVersion }) {
+  nonce = await (calculateNonce.bind(this)(accountId, nonce))
+  ttl = await (calculateTtl.bind(this)(ttl))
+  fee = this.calculateFee(fee, 'oracleRegisterTx')
+
+  return (await this.api.postOracleRegister({ accountId, queryFee, vmVersion, fee: parseInt(fee), oracleTtl, nonce, ttl, queryFormat, responseFormat })).tx
+}
+
+async function oracleExtendTx ({ oracleId, callerId, fee, oracleTtl, nonce, ttl }) {
+  nonce = await (calculateNonce.bind(this)(callerId, nonce))
+  ttl = await (calculateTtl.bind(this)(ttl))
+  fee = this.calculateFee(fee, 'oracleExtendTx')
+
+  return (await this.api.postOracleExtend({ oracleId, fee, oracleTtl, nonce, ttl })).tx
+}
+
+async function oraclePostQueryTx ({ oracleId, responseTtl, query, queryTtl, fee, queryFee, ttl, nonce, senderId }) {
+  nonce = await (calculateNonce.bind(this)(senderId, nonce))
+  ttl = await (calculateTtl.bind(this)(ttl))
+  fee = this.calculateFee(fee, 'oraclePostQueryTx')
+
+  return (await this.api.postOracleQuery({ oracleId, responseTtl, query, queryTtl, fee: parseInt(fee), queryFee, ttl, nonce, senderId })).tx
+}
+
+async function oracleRespondTx ({ oracleId, callerId, responseTtl, queryId, response, fee, ttl, nonce }) {
+  nonce = await (calculateNonce.bind(this)(callerId, nonce))
+  ttl = await (calculateTtl.bind(this)(ttl))
+  fee = this.calculateFee(fee, 'oracleRespondTx')
+
+
+  return (await this.api.postOracleRespond({ oracleId, responseTtl, queryId, response, fee, ttl, nonce })).tx
+}
+
 /**
  * Compute the absolute ttl by adding the ttl to the current height of the chain
  *
@@ -241,7 +274,11 @@ const Transaction = Epoch.compose(Tx, JsTx, {
     contractCreateTx,
     contractCallTx,
     contractCallComputeTx,
-    calculateFee
+    calculateFee,
+    oracleRegisterTx,
+    oracleExtendTx,
+    oraclePostQueryTx,
+    oracleRespondTx
   }
 })
 

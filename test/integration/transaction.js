@@ -18,7 +18,7 @@
 import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
 import { configure } from './'
-import { encodeBase58Check, salt } from '../../es/utils/crypto'
+import { encodeBase58Check, encodeBase64Check, salt } from '../../es/utils/crypto'
 import { ready } from './index'
 
 const nonce = 1
@@ -143,5 +143,66 @@ describe('Native Transaction', function () {
     const result = await client.getTxInfo(hash)
 
     result.returnType.should.be.equal('ok')
+  })
+
+  it.only('native build of oracle register tx', async () => {
+    const owner = await client.address()
+
+    const txFromAPI = await client.oracleRegisterTx({
+      accountId: owner,
+      queryFormat: "{'city': str}",
+      responseFormat: "{'tmp': int}",
+      queryFee: 30000,
+      oracleTtl: {type: 'delta', value: 500},
+      fee: 20000,
+      ttl: 500,
+      vmVersion: 0
+    })
+    const oracleId = `ok_${owner.slice(3)}`
+    await client.send(txFromAPI)
+    console.log('After register oracle')
+    console.log(await client.getOracle(oracleId))
+
+    const oracleExtendTx = await client.oracleExtendTx({
+      oracleId,
+      callerId: owner,
+      fee: 20000,
+      oracleTtl: {type: 'delta', value: 100},
+      ttl: 500
+    })
+    await client.send(oracleExtendTx)
+    console.log('After Extend oracle')
+    console.log(await client.getOracle(oracleId))
+
+    const oracleQueryTx = await client.oraclePostQueryTx({
+      oracleId,
+      responseTtl: {type: 'delta', value: 10},
+      query: "{'city': 'Berlin'}",
+      queryTtl: {type: 'delta', value: 10},
+      senderId: owner,
+      fee: 20000,
+      ttl: 500,
+      queryFee: 30000
+    })
+    await client.send(oracleQueryTx)
+    console.log('After Query oracle')
+    const queryRes = (await client.getOracleQueries(oracleId)).oracleQueries
+    const queryId = queryRes[0].id
+    console.log(queryRes)
+
+    const oracleRespondTx = await client.oracleRespondTx({
+      oracleId,
+      callerId: owner,
+      responseTtl: {type: 'delta', value: 10},
+      queryId,
+      response: "{'tmp': 129}",
+      fee: 20000,
+      ttl: 500,
+    })
+    await client.send(oracleRespondTx)
+    console.log('After Respond oracle')
+    const query = (await client.getOracleQuery(oracleId, queryId))
+    console.log(query)
+    console.log('Encoded expected result: ' + encodeBase64Check("{'tmp': 129}"))
   })
 })
