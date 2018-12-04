@@ -5,20 +5,22 @@ dependencies:
   aes-js: 3.1.1
   argon2: 0.19.3
   axios: 0.18.0
+  bignumber.js: 8.0.1
   blakejs: 1.1.0
-  bn.js: 4.11.8
   bs58check: 2.1.1
   cacache: 11.2.0
   commander: 2.16.0
   esm: 3.0.84
   fs: 0.0.1-security
   fs-extra: 7.0.0
+  json-bigint: 0.3.0
   path: 0.12.7
   postinstall-build: 5.0.1
   promisify-child-process: 2.1.2
   ramda: 0.25.0
   recursive-rename: 2.0.0
   rlp: 2.1.0
+  semver: 5.6.0
   serialize-javascript: 1.5.0
   sha.js: 2.4.11
   tweetnacl: 1.0.0
@@ -1458,6 +1460,14 @@ packages:
     dev: true
     resolution:
       integrity: sha512-+hN/Zh2D08Mx65pZ/4g5bsmNiZUuChDiQfTUQ7qJr4/kuopCr88xZsAXv6mBoZEsUI4OuGHlX59qE94K2mMW8Q==
+  /bignumber.js/7.2.1:
+    dev: false
+    resolution:
+      integrity: sha512-S4XzBk5sMB+Rcb/LNcpzXr57VRTxgAvaAEDAl1AwRx27j00hT84O6OkteE7u8UB3NuaaygCRrEpqox4uDOrbdQ==
+  /bignumber.js/8.0.1:
+    dev: false
+    resolution:
+      integrity: sha512-zAySveTJXkgLYCBi0b14xzfnOs+f3G6x36I8w2a1+PFQpWk/dp0mI0F+ZZK2bu+3ELewDcSyP+Cfq++NcHX7sg==
   /binary-extensions/1.11.0:
     dev: true
     engines:
@@ -1487,6 +1497,7 @@ packages:
     resolution:
       integrity: sha512-dhHTWMI7kMx5whMQntl7Vr9C6BvV10lFXDAasnqnrMYhXVCzzk6IO9Fo2L75jXHT07WrOngL1WDXOp+yYS91Yg==
   /bn.js/4.11.8:
+    dev: true
     resolution:
       integrity: sha512-ItfYfPLkWHUjckQCk8xC+LwxgK8NYcXywGigJgSwOP8Y2iyWT4f2vsZnoOXTTbo+o5yXmIUJ4gn5538SO5S3gA==
   /boolbase/1.0.0:
@@ -4264,6 +4275,12 @@ packages:
     hasBin: true
     resolution:
       integrity: sha1-5CGiqOINawgZ3yiQj3glJrlt0f4=
+  /json-bigint/0.3.0:
+    dependencies:
+      bignumber.js: 7.2.1
+    dev: false
+    resolution:
+      integrity: sha1-DM2RLEuCcNBfBW+9E4FLU9OCWx4=
   /json-parse-better-errors/1.0.2:
     dev: true
     resolution:
@@ -5921,7 +5938,6 @@ packages:
     resolution:
       integrity: sha512-4SJ3dm0WAwWy/NVeioZh5AntkdJoWKxHxcmyP622fOkgHa4z3R0TdBJICINyaSDE6uNwVc8gZr+ZinwZAH4xIA==
   /semver/5.6.0:
-    dev: true
     hasBin: true
     resolution:
       integrity: sha512-RS9R6R35NYgQn++fkDWaOmqGoj4Ek9gGs+DPxNUZKuwE183xjJroKvyo1IzVFeXvUrvmALy6FWD5xrdJT25gMg==
@@ -7120,8 +7136,8 @@ specifiers:
   babel-core: '6'
   babel-loader: ^8.0.0-beta.2
   babel-plugin-ramda: ^1.6.1
+  bignumber.js: ^8.0.1
   blakejs: ^1.1.0
-  bn.js: ^4.11.8
   bs58check: ^2.1.1
   bufferutil: ^3.0.3
   cacache: ^11.2.0
@@ -7145,6 +7161,7 @@ specifiers:
   fs: 0.0.1-security
   fs-extra: ^7.0.0
   jsdoc-to-markdown: ^4.0.1
+  json-bigint: ^0.3.0
   mocha: ^5.0.0
   mocha-junit-reporter: ^1.17.0
   path: ^0.12.7
@@ -7154,6 +7171,7 @@ specifiers:
   recursive-rename: ^2.0.0
   rlp: ^2.0.0
   safe-buffer: ^5.1.2
+  semver: ^5.6.0
   serialize-javascript: ^1.5.0
   sha.js: ^2.4.11
   sinon: ^4.2.2

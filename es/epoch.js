@@ -27,6 +27,7 @@ import axios from 'axios'
 import * as R from 'ramda'
 import urlparse from 'url'
 import Swagger from './utils/swagger'
+import semver from 'semver'
 
 /**
  * Obtain Swagger configuration from Epoch node
@@ -82,22 +83,15 @@ const Epoch = stampit({
 }, Swagger, {
   async init ({ forceCompatibility }) {
     const { nodeVersion: version, nodeRevision: revision, genesisKeyBlockHash: genesisHash } = await this.api.getStatus()
-    if (!R.contains(version)(COMPATIBILITY) && !forceCompatibility) throw new Error(`Unsupported epoch version ${version}`)
+    if (!semver.satisfies(version, COMPATIBILITY_RANGE)) throw new Error(`Unsupported epoch version ${version}. Supported: ${COMPATIBILITY_RANGE}`)
     // TODO:
-    // getStatus fails with an Error 500 (and crashes everything)
-    // core team says:
-    // Hans 2:27 PM
-    // > Looks to me like `GetStatus` will crash horribly if the top block is a micro block. So stop sending transactions to the node 😉
-    // > @juraj.hlista and @fabian is this the expected behavior?
-    // juraj.hlista 2:29 PM
-    // > it doesn't look like it's expected
-    // FIX:
-    // because of this: https://github.com/aeternity/epoch/pull/1546/files
+    // We should not get the node version from getStatus
+    // but read the version that we get from "URL/api" > info > version
     return Object.assign(this, { version, revision, genesisHash })
   }
 })
 
-// Array with compatible epoch node versions
-export const COMPATIBILITY = ['1.0.0-rc6']
+// String of compatibility range (see https://www.npmjs.com/package/semver#ranges)
+export const COMPATIBILITY_RANGE = '>= 1.0.0 < 2.0.0'
 
 export default Epoch
