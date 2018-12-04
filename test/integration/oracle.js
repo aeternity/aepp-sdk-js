@@ -20,7 +20,7 @@ import { configure, plan, ready } from './'
 import { encodeBase64Check } from '../../es/utils/crypto'
 
 
-plan(100000)
+plan(100000000000)
 
 describe('Oracle', function () {
   configure(this)

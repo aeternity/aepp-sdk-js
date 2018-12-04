@@ -24,7 +24,7 @@ function randomName () {
   return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString(36) + '.test'
 }
 
-plan(20)
+plan(200000000)
 
 describe('Aens', function () {
   configure(this)

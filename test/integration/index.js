@@ -46,7 +46,7 @@ async function ready (mocha, native = false) {
   configure(mocha)
 
   const ae = await BaseAe({ networkId })
-  // await ae.awaitHeight(3)
+  await ae.awaitHeight(2)
 
   if (!charged && planned > 0) {
     console.log(`Charging new wallet ${account.publicKey} with ${planned}`)
