@@ -43,7 +43,7 @@ const OracleBase = stampit({
       methods: [
         'getOracle',
         'getOracleQueries',
-        'getOracleQuery',
+        'getOracleQuery'
       ]
     }
   }
@@ -51,7 +51,7 @@ const OracleBase = stampit({
   methods: {
     getOracle: required,
     getOracleQueries: required,
-    getOracleQuery: required,
+    getOracleQuery: required
   }
 }))
 

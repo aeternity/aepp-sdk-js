@@ -28,7 +28,6 @@ import Tx from './'
 import JsTx from './js'
 import Epoch from '../epoch'
 
-
 async function spendTx ({ senderId, recipientId, amount, fee, ttl, nonce, payload = '' }) {
   nonce = await (calculateNonce.bind(this)(senderId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
@@ -135,7 +134,7 @@ async function contractCallComputeTx ({ callerId, nonce, contractId, vmVersion, 
   return (await this.api.postContractCallCompute({ callerId, contractId, vmVersion, fee: parseInt(fee), amount, gas, gasPrice, nonce, ttl, ...callOpt })).tx
 }
 
-async function oracleRegisterTx ({ accountId, queryFormat, responseFormat, queryFee,  oracleTtl, fee, ttl, nonce, vmVersion }) {
+async function oracleRegisterTx ({ accountId, queryFormat, responseFormat, queryFee, oracleTtl, fee, ttl, nonce, vmVersion }) {
   nonce = await (calculateNonce.bind(this)(accountId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
   fee = this.calculateFee(fee, 'oracleRegisterTx')
@@ -163,7 +162,6 @@ async function oracleRespondTx ({ oracleId, callerId, responseTtl, queryId, resp
   nonce = await (calculateNonce.bind(this)(callerId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
   fee = this.calculateFee(fee, 'oracleRespondTx')
-
 
   return (await this.api.postOracleRespond({ oracleId, responseTtl, queryId, response, fee, ttl, nonce })).tx
 }
@@ -194,7 +192,6 @@ async function calculateNonce (accountId, nonce) {
   }
   return nonce
 }
-
 
 /**
  * Select specific account
@@ -261,7 +258,7 @@ const Transaction = Epoch.compose(Tx, JsTx, {
     this.nativeMode = nativeMode
   },
   props: {
-    fee: 16760,
+    fee: 20000,
     nativeMode: null
   },
   methods: {

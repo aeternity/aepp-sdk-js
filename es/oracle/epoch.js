@@ -43,7 +43,7 @@ const EpochOracle = OracleBase.compose(Epoch, {
   methods: {
     getOracle,
     getOracleQueries,
-    getOracleQuery,
+    getOracleQuery
   }
 })
 
