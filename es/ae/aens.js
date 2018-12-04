@@ -207,7 +207,7 @@ const Aens = Ae.compose({
   },
   deepProps: { Ae: { defaults: {
     clientTtl: 1,
-    nameTtl: 60000// aec_governance:name_claim_max_expiration() => 50000
+    nameTtl: 50000 // aec_governance:name_claim_max_expiration() => 50000
   } } }
 })
 
