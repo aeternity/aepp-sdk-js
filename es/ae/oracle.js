@@ -180,12 +180,12 @@ const Oracle = Ae.compose({
     postQueryToOracle
   },
   deepProps: { Ae: { defaults: {
-      vmVersion: 0,
-      queryFee: 30000,
-      oracleTtl: {type: 'delta', value: 500},
-      queryTtl: {type: 'delta', value: 10},
-      responseTtl: {type: 'delta', value: 10}
-      } } }
+    vmVersion: 0,
+    queryFee: 30000,
+    oracleTtl: {type: 'delta', value: 500},
+    queryTtl: {type: 'delta', value: 10},
+    responseTtl: {type: 'delta', value: 10}
+  } } }
 })
 
 export default Oracle
