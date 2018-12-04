@@ -8,9 +8,9 @@ Js Tx module
 ```js
 import JsTx from '@aeternity/aepp-sdk/es/tx/js'
 ```
-<a id="exp_module_@aeternity/aepp-sdk/es/tx/js--JsTx"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/tx/js--base64Types"></a>
 
-### JsTx([options]) ⇒ `Object` ⏏
+### base64Types([options]) ⇒ `Object` ⏏
 JavaScript-based Tx Stamp
 
 This incomplete implementation of [Tx](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)

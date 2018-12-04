@@ -10,8 +10,9 @@ const DEFAULTS = {
     symmetric_alg: 'xsalsa20-poly1305',
     kdf: 'argon2id',
     kdf_params: {
-      memlimit: 1024,
-      opslimit: 3
+      memlimit_kib: 65536,
+      opslimit: 3,
+      parallelism: 1
     }
   }
 }
@@ -22,8 +23,8 @@ const DERIVED_KEY_FUNCTIONS = {
 }
 
 async function deriveKeyUsingArgon2id (password, salt, options) {
-  const { memlimit: memoryCost, opslimit: parallelism } = options.kdf_params
-  return argon2.hash(password, { memoryCost, parallelism, type: argon2.argon2id, raw: true, salt })
+  const { memlimit_kib: memoryCost, parallelism ,  opslimit: timeCost } = options.kdf_params
+  return argon2.hash(password, { timeCost, memoryCost, parallelism, type: argon2.argon2id, raw: true, salt })
 }
 
 // CRYPTO PART
@@ -138,7 +139,7 @@ async function deriveKey (password, nonce, options = { kdf_params: DEFAULTS.cryp
 function marshal (name, derivedKey, privateKey, nonce, salt, options = {}) {
   const opt = Object.assign({}, DEFAULTS.crypto, options)
   return Object.assign(
-    { name, version: 1, address: getAddressFromPriv(privateKey), id: uuid.v4() },
+    { name, version: 1, public_key: getAddressFromPriv(privateKey), id: uuid.v4() },
     { crypto: Object.assign(
       {
         secret_type: opt.secret_type,
@@ -206,8 +207,8 @@ export async function dump (name, password, privateKey, nonce = nacl.randomBytes
   )
 }
 
-function validateKeyObj (obj) {
-  const root = ['crypto', 'id', 'version', 'address']
+export function validateKeyObj (obj) {
+  const root = ['crypto', 'id', 'version', 'public_key']
   const crypto_keys = ['cipher_params', 'ciphertext', 'symmetric_alg', 'kdf', 'kdf_params']
 
   const missingRootKeys = root.filter(key => !obj.hasOwnProperty(key))

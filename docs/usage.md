@@ -15,9 +15,9 @@ recent change in [Babel] compilation and fully compliant with the standard.
 The recommended approach to using aepp-sdk is to import one of the following _Ae
 Factories_ based on the specific use case:
 
-* [@aeternity/aepp-sdk/es/ae/aepp](api/ae/aepp.md): Web Aepp development
-* [@aeternity/aepp-sdk/es/ae/wallet](api/ae/wallet.md): Wallet development
-* [@aeternity/aepp-sdk/es/ae/cli](api/ae/cli.md): Command line tool development
+* [@aeternity/aepp-sdk/es/ae/aepp](api/ae/aepp.md): **Web Aepp** development
+* [@aeternity/aepp-sdk/es/ae/wallet](api/ae/wallet.md): **Wallet** development
+* [@aeternity/aepp-sdk/es/ae/cli](api/ae/universal.md): **Universal** development (include all SDK features)
 
 In order to cater to more specific needs, it is recommended to refer to the
 [hacking documentation](hacking.md).

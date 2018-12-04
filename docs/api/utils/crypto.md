@@ -15,6 +15,8 @@ import * as Crypto from '@aeternity/aepp-sdk/es/utils/crypto'
         * [.nameId(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.nameId) ⇒ `String`
         * [.sha256hash(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.sha256hash) ⇒ `String`
         * [.salt()](#module_@aeternity/aepp-sdk/es/utils/crypto.salt) ⇒ `Number`
+        * [.encodeBase64Check(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.encodeBase64Check) ⇒ `Buffer`
+        * [.decodeBase64Check(str)](#module_@aeternity/aepp-sdk/es/utils/crypto.decodeBase64Check) ⇒ `Buffer`
         * [.encodeBase58Check(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.encodeBase58Check) ⇒ `Buffer`
         * [.decodeBase58Check(str)](#module_@aeternity/aepp-sdk/es/utils/crypto.decodeBase58Check) ⇒ `Buffer`
         * [.hexStringToByte(str)](#module_@aeternity/aepp-sdk/es/utils/crypto.hexStringToByte) ⇒ `Uint8Array`
@@ -101,6 +103,32 @@ Generate a random salt (positive integer)
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
 **Returns**: `Number` - random salt  
 **rtype**: `() => salt: Number`
+<a id="module_@aeternity/aepp-sdk/es/utils/crypto.encodeBase64Check"></a>
+
+### @aeternity/aepp-sdk/es/utils/crypto.encodeBase64Check(input) ⇒ `Buffer`
+Base64 encode given `input`
+
+**Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
+**Returns**: `Buffer` - Base64 encoded data  
+**rtype**: `(input: String|buffer) => Buffer`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| input | `String` | Data to encode |
+
+<a id="module_@aeternity/aepp-sdk/es/utils/crypto.decodeBase64Check"></a>
+
+### @aeternity/aepp-sdk/es/utils/crypto.decodeBase64Check(str) ⇒ `Buffer`
+Base64 decode given `str`
+
+**Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
+**Returns**: `Buffer` - Base64 decoded data  
+**rtype**: `(str: String) => Buffer`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| str | `String` | Data to decode |
+
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.encodeBase58Check"></a>
 
 ### @aeternity/aepp-sdk/es/utils/crypto.encodeBase58Check(input) ⇒ `Buffer`
@@ -229,11 +257,11 @@ Generate signature
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
 **Returns**: `Buffer` - Signature  
-**rtype**: `(data: String, privateKey: Buffer) => Buffer`
+**rtype**: `(data: String|Buffer, privateKey: Buffer) => Buffer`
 
 | Param | Type | Description |
 | --- | --- | --- |
-| data | `String` | Data to sign |
+| data | `String` \| `Buffer` | Data to sign |
 | privateKey | `Buffer` | Key to sign with |
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.verify"></a>

@@ -14,7 +14,6 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-
 import * as R from 'ramda'
 import Chain from './'
 import Epoch from '../epoch'
@@ -26,7 +25,7 @@ async function sendTransaction (tx, options = {}) {
 }
 
 async function balance (address, { height, hash } = {}) {
-  return (await this.api.getAccountByPubkey(address, { height, hash })).balance
+  return (await this.api.getAccountByPubkey(address, { height, hash })).balance.toString()
 }
 
 async function tx (hash) {
