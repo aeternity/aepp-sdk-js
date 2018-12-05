@@ -40,7 +40,7 @@ async function pause (duration) {
   await new Promise(resolve => setTimeout(resolve, duration))
 }
 
-async function awaitHeight (h, { interval = 5000, attempts = 30 } = {}) {
+async function awaitHeight (h, { interval = 5000, attempts = 20 } = {}) {
   const instance = this
 
   async function probe (left) {
@@ -63,7 +63,7 @@ async function topBlock () {
   return top[R.head(R.keys(top))]
 }
 
-async function poll (th, { blocks = 20, interval = 5000 } = {}) {
+async function poll (th, { blocks = 5, interval = 5000 } = {}) {
   const instance = this
   const max = await this.height() + blocks
 

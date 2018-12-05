@@ -32,7 +32,8 @@ async function spendTx ({ senderId, recipientId, amount, fee, ttl, nonce, payloa
   nonce = await (calculateNonce.bind(this)(senderId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
   fee = this.calculateFee(fee, 'spendTx')
-
+  console.log(this.nativeMode)
+  console.log(R.merge(R.head(arguments), { recipientId, senderId, nonce, ttl, fee }))
   // Build transaction using sdk (if nativeMode) or build on `EPOCH` side
   const { tx } = this.nativeMode
     ? await this.spendTxNative(R.merge(R.head(arguments), { recipientId, senderId, nonce, ttl, fee }))

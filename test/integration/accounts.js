@@ -19,7 +19,7 @@ import { describe, it, before } from 'mocha'
 import { configure, ready, BaseAe } from './'
 import { generateKeyPair } from '../../es/utils/crypto'
 
-describe('Accounts', function () {
+describe.only('Accounts', function () {
   configure(this)
 
   let wallet
