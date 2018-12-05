@@ -95,20 +95,14 @@
 </template>
 
 <script>
-// AE_SDK_MODULES is a webpack alias present in webpack.config.js
-import Aepp from '../../../../../es/ae/aepp'
-// import Contract from 'AE_SDK_MODULES/ae/contract.js'
-// import Universal from 'AE_SDK_MODULES/ae/universal.js'
-// import Wallet from 'AE_SDK_MODULES/ae/wallet.js'
-// import server from 'AE_SDK_MODULES/rpc/server.js'
-// console.log(server)
+//  is a webpack alias present in webpack.config.js
+import Aepp from 'AE_SDK_MODULES/ae/aepp'
 
 export default {
   name: 'Home',
   components: {},
   data () {
     return {
-      // get from secure storage
       client: null,
       abi: 'sophia',
       to: null,
@@ -180,10 +174,7 @@ export default {
     }
   },
   created () {
-    Aepp({
-      url: 'https://sdk-edgenet.aepps.com',
-      internalUrl: 'https://sdk-edgenet.aepps.com'
-    }).then(ae => {
+    Aepp().then(ae => {
       console.log('client: ', ae)
       this.client = ae
       ae.address()
@@ -191,20 +182,6 @@ export default {
           this.pub = address
         })
         .catch(e => { this.pub = `Rejected: ${e}` })
-
-      // ae.contractCompile(this.contractCode)
-      //   .then(bytecode => {
-      //     this.bytecode = bytecode.bytecode
-      //     console.log('compiled --> ', bytecode)
-      //     return ae.contractDeploy(bytecode.bytecode, 'sophia', {})
-      //   })
-      //   .then(contract => {
-      //     console.log('deployed contract --->')
-      //     console.log(contract)
-      //     return ae.contractCall(this.bytecode, 'sophia', contract.address, 'main', { args: '(5)', options: {} })
-      //   })
-      //   .then(callRes => console.log(callRes))
-      //   .catch(e => console.log(e))
     })
   }
 }
