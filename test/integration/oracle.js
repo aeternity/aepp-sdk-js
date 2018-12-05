@@ -22,7 +22,7 @@ import { encodeBase64Check } from '../../es/utils/crypto'
 
 plan(1000000000)
 
-describe.skip('Oracle', function () {
+describe('Oracle', function () {
   configure(this)
   let client;
   let oracle;
