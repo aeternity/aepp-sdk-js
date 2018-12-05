@@ -145,7 +145,7 @@ async function oracleRegisterTx ({ accountId, queryFormat, responseFormat, query
     ? await this.oracleRegisterTxNative({ accountId, queryFee, vmVersion, fee, oracleTtl, nonce, ttl, queryFormat, responseFormat })
     : await this.api.postOracleRegister({ accountId, queryFee, vmVersion, fee: parseInt(fee), oracleTtl, nonce, ttl, queryFormat, responseFormat })
 
-  return tx;
+  return tx
 }
 
 async function oracleExtendTx ({ oracleId, callerId, fee, oracleTtl, nonce, ttl }) {
@@ -177,12 +177,10 @@ async function oracleRespondTx ({ oracleId, callerId, responseTtl, queryId, resp
   ttl = await (calculateTtl.bind(this)(ttl))
   fee = this.calculateFee(fee, 'oracleRespondTx')
 
-  // console.log({ oracleId, responseTtl, queryId, response, fee, ttl, nonce })
-  // const { tx } = this.nativeMode
-  //   ? await this.oracleRespondQueryTxNative({ oracleId, responseTtl, queryId, response, fee, ttl, nonce })
-  //   : await this.api.postOracleRespond({ oracleId, responseTtl, queryId, response, fee: parseInt(fee), ttl, nonce })
-
-  return (await this.api.postOracleRespond({ oracleId, responseTtl, queryId, response, fee: parseInt(fee), ttl, nonce })).tx
+  const { tx } = this.nativeMode
+    ? await this.oracleRespondQueryTxNative({ oracleId, responseTtl, queryId, response, fee, ttl, nonce })
+    : await this.api.postOracleRespond({ oracleId, responseTtl, queryId, response, fee: parseInt(fee), ttl, nonce })
+  return tx
 }
 
 /**

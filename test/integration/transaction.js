@@ -209,21 +209,17 @@ describe('Native Transaction', function () {
     queryId = orQueries[0].id
   })
 
-  it.skip('native build of oracle respond query tx', async () => {
+  it('native build of oracle respond query tx', async () => {
     const callerId = await client.address()
-    const params = { oracleId, callerId, responseTtl, queryId, response: queryResponse, ttl: 5, nonce: 5, fee: 5}
+    const params = { oracleId, callerId, responseTtl, queryId, response: queryResponse, ttl, fee}
 
     const txFromAPI = await client.oracleRespondTx(params)
     const nativeTx = await clientNative.oracleRespondTx(params)
-
-    console.log('API:\n' + txFromAPI)
-    console.log('NATIVE:\n' + nativeTx)
-
     txFromAPI.should.be.equal(nativeTx)
 
-    // await client.send(txFromAPI)
-    //
-    // const orQuery = (await client.getOracleQuery(oracleId, queryId))
-    // orQuery.response.should.be.equal(`or_${encodeBase64Check(queryResponse)}`)
+    await client.send(nativeTx)
+
+    const orQuery = (await client.getOracleQuery(oracleId, queryId))
+    orQuery.response.should.be.equal(`or_${encodeBase64Check(queryResponse)}`)
   })
 })

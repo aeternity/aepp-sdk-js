@@ -36,7 +36,7 @@ import { toBytes } from '../utils/bytes'
 
 const ORACLE_TTL_TYPES = {
   delta: 'delta',
-  block: 'block',
+  block: 'block'
 }
 
 // # RLP version number
@@ -487,7 +487,7 @@ function oracleExtendTxNative ({ oracleId, oracleTtl, fee, nonce, ttl }) {
     toBytes(oracleTtl.type === ORACLE_TTL_TYPES.delta ? 0 : 1),
     toBytes(oracleTtl.value),
     toBytes(fee),
-    toBytes(ttl),
+    toBytes(ttl)
   ]
 
   // Encode RLP
@@ -549,7 +549,7 @@ function oracleRespondQueryTxNative ({ oracleId, responseTtl, queryId, response,
     toBytes(VSN),
     _id(ID_TAG_ORACLE, oracleId, 'ok'),
     toBytes(nonce),
-    toBytes(queryId),
+    decode(queryId, 'oq'),
     toBytes(response),
     toBytes(responseTtl.type === ORACLE_TTL_TYPES.delta ? 0 : 1),
     toBytes(responseTtl.value),
