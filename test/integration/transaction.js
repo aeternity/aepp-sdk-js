@@ -22,10 +22,10 @@ import { encodeBase58Check, encodeBase64Check, salt } from '../../es/utils/crypt
 import { ready } from './index'
 
 const nonce = 1
-const ttl = 1
+const ttl = 500
 const nameTtl = 1
 const clientTtl = 1
-const fee = 1
+const fee = 20000
 const amount = 1
 const senderId = 'ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688'
 const recipientId = 'ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688'
@@ -33,6 +33,16 @@ const name = 'test123test.test'
 const nameHash = `nm_${encodeBase58Check(Buffer.from(name))}`
 const nameId = 'nm_2sFnPHi5ziAqhdApSpRBsYdomCahtmk3YGNZKYUTtUNpVSMccC'
 const pointers = [{ key: 'account_pubkey', id: senderId }]
+
+// Oracle
+const queryFormat = "{'city': str}"
+const responseFormat = "{'tmp': num}"
+const queryFee = 30000
+const oracleTtl = {type: 'delta', value: 500}
+const responseTtl = {type: 'delta', value: 10}
+const queryTtl = {type: 'delta', value: 10}
+const query = "{'city': 'Berlin'}"
+const queryResponse = "{'tmp': 101}"
 
 // Contract test data
 const contractCode = `
@@ -55,11 +65,13 @@ describe('Native Transaction', function () {
 
   let clientNative
   let client
+  let oracleId
+  let queryId
 
   before(async () => {
     client = await ready(this)
     clientNative = await ready(this, true)
-
+    oracleId = `ok_${(await client.address()).slice(3)}`
     _salt = salt()
     commitmentId = await client.commitmentHash(name, _salt)
   })
@@ -143,5 +155,75 @@ describe('Native Transaction', function () {
     const result = await client.getTxInfo(hash)
 
     result.returnType.should.be.equal('ok')
+  })
+
+  it('native build of oracle create tx', async () => {
+    const accountId = await client.address()
+    const params = {
+      accountId,
+      queryFormat,
+      responseFormat,
+      queryFee,
+      oracleTtl,
+      ttl,
+    }
+
+    const txFromAPI = await client.oracleRegisterTx(params)
+    const nativeTx = await clientNative.oracleRegisterTx(params)
+
+    txFromAPI.should.be.equal(nativeTx)
+
+    await client.send(nativeTx)
+    const oId = (await client.getOracle(oracleId)).id
+    oId.should.be.equal(oracleId)
+  })
+
+  it('native build of oracle extends tx', async () => {
+    const callerId = await client.address()
+    const params = { oracleId, callerId, oracleTtl, ttl }
+    const orTtl = (await client.getOracle(oracleId)).ttl
+
+    const txFromAPI = await client.oracleExtendTx(params)
+    const nativeTx = await clientNative.oracleExtendTx(params)
+
+    txFromAPI.should.be.equal(nativeTx)
+
+    await client.send(nativeTx)
+    const orNewTtl = (await client.getOracle(oracleId)).ttl
+    orNewTtl.should.be.equal(orTtl + oracleTtl.value)
+  })
+
+  it('native build of oracle post query tx', async () => {
+    const senderId = await client.address()
+
+    const params = { oracleId, responseTtl, query, queryTtl, queryFee, ttl, senderId, fee }
+
+    const txFromAPI = await client.oraclePostQueryTx(params)
+    const nativeTx = await clientNative.oraclePostQueryTx(params)
+
+    txFromAPI.should.be.equal(nativeTx)
+
+    await client.send(nativeTx)
+    const { oracleQueries: orQueries } = (await client.getOracleQueries(oracleId))
+    orQueries.length.should.be.equal(1)
+    queryId = orQueries[0].id
+  })
+
+  it.skip('native build of oracle respond query tx', async () => {
+    const callerId = await client.address()
+    const params = { oracleId, callerId, responseTtl, queryId, response: queryResponse, ttl: 5, nonce: 5, fee: 5}
+
+    const txFromAPI = await client.oracleRespondTx(params)
+    const nativeTx = await clientNative.oracleRespondTx(params)
+
+    console.log('API:\n' + txFromAPI)
+    console.log('NATIVE:\n' + nativeTx)
+
+    txFromAPI.should.be.equal(nativeTx)
+
+    // await client.send(txFromAPI)
+    //
+    // const orQuery = (await client.getOracleQuery(oracleId, queryId))
+    // orQuery.response.should.be.equal(`or_${encodeBase64Check(queryResponse)}`)
   })
 })
