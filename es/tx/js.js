@@ -211,8 +211,8 @@ function buildContractId (ownerId, nonce) {
  * @param {Number} oracleId The oracle public key
  * @return {string} Contract public key
  */
-export function oracleQueryId(senderId, nonce, oracleId) {
-  function _int32(val) {
+export function oracleQueryId (senderId, nonce, oracleId) {
+  function _int32 (val) {
     const nonceBE = toBytes(val, true)
     return Buffer.concat([Buffer.alloc(32 - nonceBE.length), nonceBE])
   }

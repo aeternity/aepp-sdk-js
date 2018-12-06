@@ -62,7 +62,7 @@ async function OracleObject (oracleId) {
  * @param {String} queryId Oracle Query id
  * @return {Promise<Object>} OracleQuery object
  */
-function OracleQuery(oracleId, queryId) {
+function OracleQuery (oracleId, queryId) {
   return {
     respond: (response, options) => this.respondToQuery(oracleId, queryId, response, options),
     pullForResponse: () => {},
