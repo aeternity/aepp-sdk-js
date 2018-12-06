@@ -36,7 +36,7 @@ import { decodeBase64Check } from '../utils/crypto'
  * @param {String} oracleId Oracle public key
  * @return {Promise<Object>} Oracle object
  */
-async function OracleObject (oracleId) {
+async function getOracleObject (oracleId) {
   const oracle = await this.getOracle(oracleId)
   const { oracleQueries: queries } = await this.getOracleQueries(oracleId)
   return {
@@ -45,12 +45,8 @@ async function OracleObject (oracleId) {
     postQuery: (query, options) => this.postQueryToOracle(oracleId, query, options),
     respondToQuery: (queryId, response, options) => this.respondToQuery(oracleId, queryId, response, options),
     extendOracle: (oracleTtl, options) => this.extendOracleTtl(oracleId, oracleTtl, options),
-    getQuery: (queryId) => {
-      const query = queries.find(q => q.id === queryId)
-      return {
-        ...query,
-        ...OracleQuery.bind(this)(oracleId, queryId)
-      }
+    getQuery: async (queryId) => {
+      return getQueryObject.bind(this)(oracleId, queryId)
     }
   }
 }
@@ -62,12 +58,44 @@ async function OracleObject (oracleId) {
  * @param {String} queryId Oracle Query id
  * @return {Promise<Object>} OracleQuery object
  */
-function OracleQuery (oracleId, queryId) {
+async function getQueryObject (oracleId, queryId) {
   return {
+    ...(await this.getOracleQuery(oracleId, queryId)),
     respond: (response, options) => this.respondToQuery(oracleId, queryId, response, options),
-    pullForResponse: () => {},
+    pollForResponse: ({attempts, interval}) => this.pollForQueryResponse(oracleId, queryId, {attempts, interval}),
     decode: (data) => decodeBase64Check(data.slice(3))
   }
+}
+
+/**
+ * Poll for oracle query response
+ * @instance
+ * @category async
+ * * @category async
+ * @param {String} oracleId Oracle public key
+ * @param {String} queryId Oracle Query id
+ * @param {Object} [options] Options object
+ * @param {Object} [options.attempts] Poll attempt's(default: 20)
+ * @param {Object} [options.interval] Poll interval(default: 5000)
+ * @return {Promise<Object>} OracleQuery object
+ */
+export async function pollForQueryResponse (oracleId, queryId, { attempts = 20, interval = 5000 } = {}) {
+  const emptyResponse = 'or_Xfbg4g=='
+  async function pause (duration) {
+    await new Promise(resolve => setTimeout(resolve, duration))
+  }
+  async function probe (left) {
+    const query = await this.getOracleQuery(oracleId, queryId)
+    if (query.response !== emptyResponse) {
+      return { response: query.response, decode: () => decodeBase64Check(query.response.slice(3)) }
+    }
+    if (left > 0) {
+      await pause(interval)
+      return probe.bind(this)(left - 1)
+    }
+    throw Error(`Giving up after ${attempts * interval}ms`)
+  }
+  return probe.bind(this)(attempts)
 }
 
 /**
@@ -94,7 +122,7 @@ async function registerOracle (queryFormat, responseFormat, options = {}) {
     responseFormat
   }))
   await this.send(oracleRegisterTx, opt)
-  return OracleObject.bind(this)(`ok_${accountId.slice(3)}`)
+  return getOracleObject.bind(this)(`ok_${accountId.slice(3)}`)
 }
 
 /**
@@ -121,7 +149,7 @@ async function postQueryToOracle (oracleId, query, options = {}) {
     query
   }))
   await this.send(oracleRegisterTx, opt)
-  return (await OracleObject.bind(this)(oracleId)).getQuery(queryId)
+  return (await getOracleObject.bind(this)(oracleId)).getQuery(queryId)
 }
 
 /**
@@ -145,7 +173,7 @@ async function extendOracleTtl (oracleId, oracleTtl, options = {}) {
     oracleTtl
   }))
   await this.send(oracleExtendTx, opt)
-  return OracleObject.bind(this)(oracleId)
+  return getOracleObject.bind(this)(oracleId)
 }
 
 /**
@@ -172,7 +200,7 @@ async function respondToQuery (oracleId, queryId, response, options = {}) {
     response
   }))
   await this.send(oracleRespondTx, opt)
-  return OracleObject.bind(this)(oracleId)
+  return getOracleObject.bind(this)(oracleId)
 }
 
 /**
@@ -191,7 +219,10 @@ const Oracle = Ae.compose({
     registerOracle,
     respondToQuery,
     extendOracleTtl,
-    postQueryToOracle
+    postQueryToOracle,
+    pollForQueryResponse,
+    getOracleObject,
+    getQueryObject
   },
   deepProps: { Ae: { defaults: {
     oracleVmVersion: 0,

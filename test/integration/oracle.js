@@ -41,8 +41,9 @@ describe('Oracle', function () {
 
   it('Extend Oracle', async () => {
     const ttlToExtend = { type: 'delta', value: 123 }
-    const extendedOracle = await oracle.extendOracle({ type: 'delta', value: 123 }, "{'city': 'Berlin'}")
-    extendedOracle.ttl.should.be.equal(oracle.ttl + ttlToExtend.value)
+    const extendedOracle = await oracle.extendOracle(ttlToExtend)
+    const isExtended = extendedOracle.ttl > oracle.ttl
+    isExtended.should.be.equal(true)
   })
 
   it('Post Oracle Query(Ask for weather in Berlin)', async () => {
@@ -50,12 +51,21 @@ describe('Oracle', function () {
     query.decode(query.query).toString().should.be.equal("{'city': 'Berlin'}")
   })
 
+  it('Poll for response for query without response', async () => {
+    return await query.pollForResponse({ attempts: 2, interval: 1000 }).should.be.rejectedWith(Error)
+  })
+
   it('Respond to query', async () => {
     oracle = await query.respond(queryResponse)
-    query = oracle.getQuery(query.id)
+    query = await oracle.getQuery(query.id)
     const decodeResponse = await query.decode(query.response).toString()
 
     decodeResponse.should.be.equal(queryResponse)
     query.response.slice(3).should.be.equal(encodeBase64Check(queryResponse))
+  })
+
+  it('Poll for response', async () => {
+    const response = await query.pollForResponse({ attempts: 2, interval: 1000 })
+    response.decode().toString().should.be.equal(queryResponse)
   })
 })
