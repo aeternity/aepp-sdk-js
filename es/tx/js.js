@@ -30,7 +30,9 @@ import {
   nameId,
   salt,
   encodeTx,
-  assertedType, decodeBase64Check
+  assertedType,
+  decodeBase64Check,
+  encodeBase64Check
 } from '../utils/crypto'
 import { toBytes } from '../utils/bytes'
 
@@ -126,6 +128,19 @@ export function decode (data, type) {
 }
 
 /**
+ * Encode data using the default encoding/decoding algorithm
+ *
+ * @param {Buffer|String} data  An decoded data
+ * @param {string} type Prefix of Transaction
+ * @return {String} Encoded string Base58 or Base64 data
+ */
+export function encode (data, type) {
+  return `${type}_${base64Types.includes(type)
+    ? encodeBase64Check(data)
+    : encodeBase58Check(data)}`
+}
+
+/**
  * Utility function to create and _id type
  *
  * @param {number} idTag Tag
@@ -173,6 +188,36 @@ function buildPointers (pointers) {
     'channel_pubkey': ID_TAG_CHANNEL
   }
   return pointers.map(p => [toBytes(p['key']), _id(POINTERS_TAGS[p['key']], p['id'])])
+}
+
+/**
+ * Build a contract public key
+ *
+ * @param {string} ownerId The public key of the owner account
+ * @param {number} nonce the nonce of the transaction
+ * @return {string} Contract public key
+ */
+function buildContractId (ownerId, nonce) {
+  const ownerIdAndNonce = Buffer.from([...decodeBase58Check(ownerId.slice(3)), ...toBytes(nonce)])
+  const b2bHash = hash(ownerIdAndNonce)
+  return encode(b2bHash, 'ct')
+}
+
+/**
+ * Build a oracle query id
+ *
+ * @param {String} senderId The public key of the sender account
+ * @param {Number} nonce the nonce of the transaction
+ * @param {Number} oracleId The oracle public key
+ * @return {string} Contract public key
+ */
+export function oracleQueryId(senderId, nonce, oracleId) {
+  function _int32(val) {
+    const nonceBE = toBytes(val, true)
+    return Buffer.concat([Buffer.alloc(32 - nonceBE.length), nonceBE])
+  }
+  const b2bHash = hash(Buffer.from([...decode(senderId, 'ak'), ..._int32(nonce), ...decode(oracleId, 'ok')]))
+  return encode(b2bHash, 'oq')
 }
 
 /**
@@ -385,19 +430,6 @@ function contractCreateTxNative ({ ownerId, nonce, code, vmVersion, deposit, amo
 }
 
 /**
-* Build a contract public key
-*
-* @param {string} ownerId The public key of the owner account
-* @param {number} nonce the nonce of the transaction
-* @return {string} Contract public key
-*/
-function buildContractId (ownerId, nonce) {
-  const ownerIdAndNonce = Buffer.from([...decodeBase58Check(ownerId.slice(3)), ...toBytes(nonce)])
-  const b2bHash = hash(ownerIdAndNonce)
-  return `ct_${encodeBase58Check(b2bHash)}`
-}
-
-/**
  * Create a contract call transaction
  *
  * @param {string} callerId The public key of the caller account
@@ -576,7 +608,8 @@ const JsTx = stampit({
     oracleExtendTxNative,
     oracleRegisterTxNative,
     oraclePostQueryTxNative,
-    oracleRespondQueryTxNative
+    oracleRespondQueryTxNative,
+    oracleQueryId
   }
 })
 

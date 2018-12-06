@@ -26,6 +26,7 @@ describe('Oracle', function () {
   configure(this)
   let client;
   let oracle;
+  let query;
   let queryResponse = "{'tmp': 30}";
 
   before(async function () {
@@ -45,16 +46,14 @@ describe('Oracle', function () {
   })
 
   it('Post Oracle Query(Ask for weather in Berlin)', async () => {
-    oracle = await client.postQueryToOracle(oracle.id, "{'city': 'Berlin'}")
-    const queriesLength = oracle.queries.length
-    queriesLength.should.be.equal(1)
+    query = await oracle.postQuery("{'city': 'Berlin'}")
+    query.decode(query.query).toString().should.be.equal("{'city': 'Berlin'}")
   })
 
   it('Respond to query', async () => {
-    const queryId = oracle.queries[0].id
-    oracle = await client.respondToQuery(oracle.id, queryId, queryResponse)
-    const query = oracle.getQuery(queryId)
-    const decodeResponse = await query.decode().toString()
+    oracle = await query.respond(queryResponse)
+    query = oracle.getQuery(query.id)
+    const decodeResponse = await query.decode(query.response).toString()
 
     decodeResponse.should.be.equal(queryResponse)
     query.response.slice(3).should.be.equal(encodeBase64Check(queryResponse))

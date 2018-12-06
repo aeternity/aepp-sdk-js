@@ -169,7 +169,7 @@ async function oraclePostQueryTx ({ oracleId, responseTtl, query, queryTtl, fee,
     ? await this.oraclePostQueryTxNative({ oracleId, responseTtl, query, queryTtl, fee, queryFee, ttl, nonce, senderId })
     : await this.api.postOracleQuery({ oracleId, responseTtl, query, queryTtl, fee: parseInt(fee), queryFee, ttl, nonce, senderId })
 
-  return tx
+  return { tx, queryId: this.oracleQueryId(senderId, nonce, oracleId) }
 }
 
 async function oracleRespondTx ({ oracleId, callerId, responseTtl, queryId, response, fee, ttl, nonce }) {

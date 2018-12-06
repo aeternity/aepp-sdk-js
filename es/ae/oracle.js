@@ -43,16 +43,30 @@ async function OracleObject (oracleId) {
     ...oracle,
     queries,
     postQuery: (query, options) => this.postQueryToOracle(oracleId, query, options),
+    respondToQuery: (queryId, response, options) => this.respondToQuery(oracleId, queryId, response, options),
     extendOracle: (oracleTtl, options) => this.extendOracleTtl(oracleId, oracleTtl, options),
-    respond: (queryId, response, options) => this.respondToQuery(oracleId, queryId, response, options),
     getQuery: (queryId) => {
       const query = queries.find(q => q.id === queryId)
       return {
         ...query,
-        pullForResponse: () => {},
-        decode: () => decodeBase64Check(query.response.slice(3))
+        ...OracleQuery.bind(this)(oracleId, queryId)
       }
     }
+  }
+}
+
+/**
+ * Constructor for OracleQuery Object (helper object for using OracleQuery)
+ * @category async
+ * @param {String} oracleId Oracle public key
+ * @param {String} queryId Oracle Query id
+ * @return {Promise<Object>} OracleQuery object
+ */
+function OracleQuery(oracleId, queryId) {
+  return {
+    respond: (response, options) => this.respondToQuery(oracleId, queryId, response, options),
+    pullForResponse: () => {},
+    decode: (data) => decodeBase64Check(data.slice(3))
   }
 }
 
@@ -101,13 +115,13 @@ async function postQueryToOracle (oracleId, query, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   const senderId = await this.address()
 
-  const oracleRegisterTx = await this.oraclePostQueryTx(R.merge(opt, {
+  const { tx: oracleRegisterTx, queryId } = await this.oraclePostQueryTx(R.merge(opt, {
     oracleId,
     senderId,
     query
   }))
   await this.send(oracleRegisterTx, opt)
-  return OracleObject.bind(this)(oracleId)
+  return (await OracleObject.bind(this)(oracleId)).getQuery(queryId)
 }
 
 /**
