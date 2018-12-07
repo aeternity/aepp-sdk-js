@@ -30,9 +30,16 @@ import {
   nameId,
   salt,
   encodeTx,
-  assertedType, decodeBase64Check
+  assertedType,
+  decodeBase64Check,
+  encodeBase64Check
 } from '../utils/crypto'
 import { toBytes } from '../utils/bytes'
+
+const ORACLE_TTL_TYPES = {
+  delta: 'delta',
+  block: 'block'
+}
 
 // # RLP version number
 // # https://github.com/aeternity/protocol/blob/epoch-v0.10.1/serializations.md#binary-serialization
@@ -56,10 +63,10 @@ const ID_TAG_CHANNEL = 6
 const OBJECT_TAG_SPEND_TRANSACTION = 12
 // const OBJECT_TAG_ORACLE = 20
 // const OBJECT_TAG_ORACLE_QUERY = 21
-// const OBJECT_TAG_ORACLE_REGISTER_TRANSACTION = 22
-// const OBJECT_TAG_ORACLE_QUERY_TRANSACTION = 23
-// const OBJECT_TAG_ORACLE_RESPONSE_TRANSACTION = 24
-// const OBJECT_TAG_ORACLE_EXTEND_TRANSACTION = 25
+const OBJECT_TAG_ORACLE_REGISTER_TRANSACTION = 22
+const OBJECT_TAG_ORACLE_QUERY_TRANSACTION = 23
+const OBJECT_TAG_ORACLE_RESPONSE_TRANSACTION = 24
+const OBJECT_TAG_ORACLE_EXTEND_TRANSACTION = 25
 // const OBJECT_TAG_NAME_SERVICE_NAME = 30
 // const OBJECT_TAG_NAME_SERVICE_COMMITMENT = 31
 const OBJECT_TAG_NAME_SERVICE_CLAIM_TRANSACTION = 32
@@ -121,6 +128,19 @@ export function decode (data, type) {
 }
 
 /**
+ * Encode data using the default encoding/decoding algorithm
+ *
+ * @param {Buffer|String} data  An decoded data
+ * @param {string} type Prefix of Transaction
+ * @return {String} Encoded string Base58 or Base64 data
+ */
+export function encode (data, type) {
+  return `${type}_${base64Types.includes(type)
+    ? encodeBase64Check(data)
+    : encodeBase58Check(data)}`
+}
+
+/**
  * Utility function to create and _id type
  *
  * @param {number} idTag Tag
@@ -168,6 +188,36 @@ function buildPointers (pointers) {
     'channel_pubkey': ID_TAG_CHANNEL
   }
   return pointers.map(p => [toBytes(p['key']), _id(POINTERS_TAGS[p['key']], p['id'])])
+}
+
+/**
+ * Build a contract public key
+ *
+ * @param {string} ownerId The public key of the owner account
+ * @param {number} nonce the nonce of the transaction
+ * @return {string} Contract public key
+ */
+function buildContractId (ownerId, nonce) {
+  const ownerIdAndNonce = Buffer.from([...decodeBase58Check(ownerId.slice(3)), ...toBytes(nonce)])
+  const b2bHash = hash(ownerIdAndNonce)
+  return encode(b2bHash, 'ct')
+}
+
+/**
+ * Build a oracle query id
+ *
+ * @param {String} senderId The public key of the sender account
+ * @param {Number} nonce the nonce of the transaction
+ * @param {Number} oracleId The oracle public key
+ * @return {string} Contract public key
+ */
+export function oracleQueryId (senderId, nonce, oracleId) {
+  function _int32 (val) {
+    const nonceBE = toBytes(val, true)
+    return Buffer.concat([Buffer.alloc(32 - nonceBE.length), nonceBE])
+  }
+  const b2bHash = hash(Buffer.from([...decode(senderId, 'ak'), ..._int32(nonce), ...decode(oracleId, 'ok')]))
+  return encode(b2bHash, 'oq')
 }
 
 /**
@@ -380,19 +430,6 @@ function contractCreateTxNative ({ ownerId, nonce, code, vmVersion, deposit, amo
 }
 
 /**
-* Build a contract public key
-*
-* @param {string} ownerId The public key of the owner account
-* @param {number} nonce the nonce of the transaction
-* @return {string} Contract public key
-*/
-function buildContractId (ownerId, nonce) {
-  const ownerIdAndNonce = Buffer.from([...decodeBase58Check(ownerId.slice(3)), ...toBytes(nonce)])
-  const b2bHash = hash(ownerIdAndNonce)
-  return `ct_${encodeBase58Check(b2bHash)}`
-}
-
-/**
  * Create a contract call transaction
  *
  * @param {string} callerId The public key of the caller account
@@ -428,6 +465,135 @@ function contractCallTxNative ({ callerId, nonce, contractId, vmVersion, fee, tt
   return { tx }
 }
 
+/**
+ * Create a oracle register transaction
+ *
+ * @param {String} accountId The public key of the account
+ * @param {String} queryFormat Oracle query format
+ * @param {String} responseFormat Oracle query response format
+ * @param {String|Number} queryFee Oracle query fee
+ * @param {Object} oracleTtl Oracle time to leave
+ * @param {Number|String} fee The fee for the transaction
+ * @param {Number|String} ttl The relative ttl of the transaction
+ * @param {Number|String} nonce the nonce of the transaction
+ * @param {Number} vmVersion VM Version
+ * @return {Object} { tx } Oracle register tx
+ */
+function oracleRegisterTxNative ({ accountId, queryFormat, responseFormat, queryFee, oracleTtl, fee, ttl, nonce, vmVersion }) {
+  let tx = [
+    toBytes(OBJECT_TAG_ORACLE_REGISTER_TRANSACTION),
+    toBytes(VSN),
+    _id(ID_TAG_ACCOUNT, accountId, 'ak'),
+    toBytes(nonce),
+    toBytes(queryFormat),
+    toBytes(responseFormat),
+    toBytes(queryFee),
+    toBytes(oracleTtl.type === ORACLE_TTL_TYPES.delta ? 0 : 1),
+    toBytes(oracleTtl.value),
+    toBytes(fee),
+    toBytes(ttl),
+    toBytes(vmVersion)
+  ]
+
+  // Encode RLP
+  tx = encodeTx(tx)
+  return { tx }
+}
+
+/**
+ * Create a oracle extend transaction
+ *
+ * @param {String} oracleId The public key of the oracle
+ * @param {Object} oracleTtl Oracle time to leave
+ * @param {Number|String} fee The fee for the transaction
+ * @param {Number|String} ttl The relative ttl of the transaction
+ * @param {Number|String} nonce the nonce of the transaction
+ * @return {Object} { tx } Oracle extend tx hash
+ */
+function oracleExtendTxNative ({ oracleId, oracleTtl, fee, nonce, ttl }) {
+  let tx = [
+    toBytes(OBJECT_TAG_ORACLE_EXTEND_TRANSACTION),
+    toBytes(VSN),
+    _id(ID_TAG_ORACLE, oracleId, 'ok'),
+    toBytes(nonce),
+    toBytes(oracleTtl.type === ORACLE_TTL_TYPES.delta ? 0 : 1),
+    toBytes(oracleTtl.value),
+    toBytes(fee),
+    toBytes(ttl)
+  ]
+
+  // Encode RLP
+  tx = encodeTx(tx)
+  return { tx }
+}
+
+/**
+ * Create a oracle post query transaction
+ *
+ * @param {String} oracleId The public key of the oracle
+ * @param {String} senderId The public key of sender account
+ * @param {Object} responseTtl Oracle query response time to leave
+ * @param {String} query Oracle query data
+ * @param {Object} queryTtl Oracle query time to leave
+ * @param {Number|String} queryFee Oracle query fee
+ * @param {Number|String} fee The fee for the transaction
+ * @param {Number|String} ttl The relative ttl of the transaction
+ * @param {Number|String} nonce the nonce of the transaction
+ * @return {Object} { tx } Oracle post query tx hash
+ */
+function oraclePostQueryTxNative ({ senderId, oracleId, responseTtl, query, queryTtl, fee, queryFee, ttl, nonce }) {
+  let tx = [
+    toBytes(OBJECT_TAG_ORACLE_QUERY_TRANSACTION),
+    toBytes(VSN),
+    _id(ID_TAG_ACCOUNT, senderId, 'ak'),
+    toBytes(nonce),
+    _id(ID_TAG_ORACLE, oracleId, 'ok'),
+    toBytes(query),
+    toBytes(queryFee),
+    toBytes(queryTtl.type === ORACLE_TTL_TYPES.delta ? 0 : 1),
+    toBytes(queryTtl.value),
+    toBytes(responseTtl.type === ORACLE_TTL_TYPES.delta ? 0 : 1),
+    toBytes(responseTtl.value),
+    toBytes(fee),
+    toBytes(ttl)
+  ]
+
+  // Encode RLP
+  tx = encodeTx(tx)
+  return { tx }
+}
+
+/**
+ * Create a oracle respond query transaction
+ *
+ * @param {String} oracleId The public key of the oracle
+ * @param {String} queryId The oracle query id
+ * @param {Object} responseTtl Oracle query response time to leave
+ * @param {String} response Oracle query response data
+ * @param {Number|String} fee The fee for the transaction
+ * @param {Number|String} ttl The relative ttl of the transaction
+ * @param {Number|String} nonce the nonce of the transaction
+ * @return {Object} { tx } Oracle respond query tx hash
+ */
+function oracleRespondQueryTxNative ({ oracleId, responseTtl, queryId, response, fee, ttl, nonce }) {
+  let tx = [
+    toBytes(OBJECT_TAG_ORACLE_RESPONSE_TRANSACTION),
+    toBytes(VSN),
+    _id(ID_TAG_ORACLE, oracleId, 'ok'),
+    toBytes(nonce),
+    decode(queryId, 'oq'),
+    toBytes(response),
+    toBytes(responseTtl.type === ORACLE_TTL_TYPES.delta ? 0 : 1),
+    toBytes(responseTtl.value),
+    toBytes(fee, true),
+    toBytes(ttl)
+  ]
+
+  // Encode RLP
+  tx = encodeTx(tx)
+  return { tx }
+}
+
 const JsTx = stampit({
   methods: {
     commitmentHash,
@@ -438,7 +604,12 @@ const JsTx = stampit({
     nameTransferTxNative,
     nameRevokeTxNative,
     contractCreateTxNative,
-    contractCallTxNative
+    contractCallTxNative,
+    oracleExtendTxNative,
+    oracleRegisterTxNative,
+    oraclePostQueryTxNative,
+    oracleRespondQueryTxNative,
+    oracleQueryId
   }
 })
 

@@ -13,8 +13,7 @@ import Ae from '@aeternity/aepp-sdk/es/ae/universal'
 ### Universal([options]) ⇒ `Object` ⏏
 Universal Stamp
 
-Universal provides Ae base functionality with Contract and Aens
-[Ae](#exp_module_@aeternity/aepp-sdk/es/ae--Ae) clients.
+Universal provides [Ae](#exp_module_@aeternity/aepp-sdk/es/ae--Ae) base functionality with Contract, Aens and Oracle clients.
 
 **Kind**: Exported function  
 **Returns**: `Object` - Universal instance  
