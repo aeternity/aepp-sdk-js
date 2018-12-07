@@ -272,7 +272,7 @@ function calculateFee (fee, txType, gas = 0) {
  * @example Transaction({url: 'https://sdk-testnet.aepps.com/'})
  */
 const Transaction = Epoch.compose(Tx, JsTx, {
-  init ({ nativeMode = false }) {
+  init ({ nativeMode = true }) {
     this.nativeMode = nativeMode
   },
   props: {
