@@ -61,7 +61,7 @@ describe('Accounts', function () {
     })
   })
 
-  it.only('spends big amount of tokens', async () => {
+  it('spends big amount of tokens', async () => {
     const bigAmount = '2702702702700000000123'
     const genesis = await BaseAe({ networkId })
     const balanceBefore = await wallet.balance(await wallet.address())
