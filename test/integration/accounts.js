@@ -18,6 +18,8 @@
 import { describe, it, before } from 'mocha'
 import { configure, ready, BaseAe } from './'
 import { generateKeyPair } from '../../es/utils/crypto'
+import { networkId } from './index'
+import { BigNumber } from 'bignumber.js'
 
 describe('Accounts', function () {
   configure(this)
@@ -56,6 +58,21 @@ describe('Accounts', function () {
     ret.should.have.property('tx')
     ret.tx.should.include({
       amount: 1, recipientId: receiver
+    })
+  })
+
+  it.only('spends big amount of tokens', async () => {
+    const bigAmount = '2702702702700000000123'
+    const genesis = await BaseAe({ networkId })
+    const balanceBefore = await wallet.balance(await wallet.address())
+    const receiverId = await wallet.address()
+    const ret = await genesis.spend(bigAmount, receiverId)
+
+    const balanceAfter = await wallet.balance(await wallet.address())
+    balanceAfter.should.be.equal(BigNumber(bigAmount).plus(balanceBefore).toString(10))
+    ret.should.have.property('tx')
+    ret.tx.should.include({
+      amount: bigAmount, recipientId: receiverId
     })
   })
 

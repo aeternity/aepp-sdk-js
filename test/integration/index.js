@@ -65,6 +65,7 @@ export {
   BaseAe,
   url,
   internalUrl,
+  networkId,
   configure,
   ready,
   plan
