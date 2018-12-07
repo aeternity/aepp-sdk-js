@@ -189,8 +189,9 @@ async function oracleRespondTx ({ oracleId, callerId, responseTtl, queryId, resp
  * @param {number} relativeTtl
  * @return {number} Absolute Ttl
  */
-async function calculateTtl (relativeTtl) {
-  if (relativeTtl <= 0) throw new Error('ttl must be greather than 0')
+async function calculateTtl (relativeTtl = 0) {
+  if (relativeTtl < 0) throw new Error('ttl must be greater than 0')
+  if (relativeTtl === 0) return 0
 
   const { height } = await this.api.getCurrentKeyBlock()
   return +(height) + relativeTtl

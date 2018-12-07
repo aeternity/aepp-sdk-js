@@ -83,7 +83,7 @@ async function spend (amount, recipientId, options = {}) {
 const Ae = stampit(Tx, Account, Chain, Contract, Oracle, {
   methods: { send, spend },
   deepProperties: { Ae: { defaults: {
-    ttl: 500,
+    ttl: 0,
     payload: ''
   } } }
 })
