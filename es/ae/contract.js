@@ -16,24 +16,27 @@
  */
 
 /**
- * Contracts functions
+ * Contract module - routines to interact with the æternity contract
  *
  * High level documentation of the contracts are available at
  * https://github.com/aeternity/protocol/tree/master/contracts and
  * example code which uses this API at
  * https://github.com/aeternity/aepp-sdk-js/blob/develop/bin/aecontract.js
  *
+ * @module @aeternity/aepp-sdk/es/ae/contract
+ * @export Contract
+ * @example import Contract from '@aeternity/aepp-sdk/es/ae/contract'
  */
 
 import Ae from './'
 import * as R from 'ramda'
 
-async function encodeCall (code, abi, name, args) {
-  return this.contractEpochEncodeCallData(code, abi, name, args)
+async function encodeCall (code, abi, name, args, call) {
+  return this.contractEpochEncodeCallData(code, abi, name, args, call)
 }
 
-async function callStatic (code, abi, name, { args = '()' } = {}) {
-  const { out } = await this.contractEpochCall(code, abi, name, args)
+async function callStatic (code, abi, name, { args = '()', call } = {}) {
+  const { out } = await this.contractEpochCall(code, abi, name, args, call)
   return {
     result: out,
     decode: (type) => this.contractDecodeData(type, out)
@@ -44,7 +47,7 @@ async function decode (type, data) {
   return this.contractEpochDecodeData(type, data)
 }
 
-async function call (code, abi, address, name, { args = '()', options = {} } = {}) {
+async function call (code, abi, address, name, { args = '()', options = {}, call } = {}) {
   const opt = R.merge(this.Ae.defaults, options)
 
   // Check for MAX_GAS
@@ -53,9 +56,9 @@ async function call (code, abi, address, name, { args = '()', options = {} } = {
   }
 
   const tx = await this.contractCallTx(R.merge(opt, {
-    callData: await this.contractEncodeCall(code, abi, name, args),
+    callerId: await this.address(),
     contractId: address,
-    callerId: await this.address()
+    callData: await this.contractEncodeCall(code, abi, name, args, call)
   }))
 
   const { hash } = await this.send(tx, opt)
@@ -77,10 +80,10 @@ async function deploy (code, abi, { initState = '()', options = {} } = {}) {
   const callData = await this.contractEncodeCall(code, abi, 'init', initState)
   const ownerId = await this.address()
 
-  // Check for MAX_GAS
-  if (opt.gas > this.Ae.defaults.gas) {
-    opt.gas = this.Ae.defaults.gas
-  }
+  // // Check for MAX_GAS
+  // if (opt.gas > this.Ae.defaults.gas) {
+  //   opt.gas = this.Ae.defaults.gas
+  // }
 
   const { tx, contractId } = await this.contractCreateTx(R.merge(opt, {
     callData,
@@ -94,6 +97,7 @@ async function deploy (code, abi, { initState = '()', options = {} } = {}) {
     transaction: hash,
     address: contractId,
     call: async (name, options) => this.contractCall(code, abi, contractId, name, options),
+    callStatic: async (name, options) => this.contractCallStatic(contractId, 'sophia-address', name, options),
     createdAt: new Date()
   })
 }
@@ -102,9 +106,9 @@ async function compile (code, options = {}) {
   const o = await this.compileEpochContract(code, options)
 
   return Object.freeze(Object.assign({
-    encodeCall: async (name, args) => this.contractEncodeCall(o.bytecode, 'sophia', name, args),
-    call: async (name, options) => this.contractCallStatic(o.bytecode, 'sophia', name, options),
-    deploy: async (options) => this.contractDeploy(o.bytecode, 'sophia', options)
+    encodeCall: async (name, args, { call, abi }) => this.contractEncodeCall(o.bytecode, R.defaultTo('sophia', abi), name, args, call),
+    // call: async (name, options = {}) => this.contractCallStatic(o.bytecode, R.defaultTo('sophia', options.abi), name, options),
+    deploy: async (options = {}) => this.contractDeploy(o.bytecode, R.defaultTo('sophia', options.abi), options)
   }, o))
 }
 

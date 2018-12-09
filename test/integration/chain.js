@@ -23,7 +23,7 @@ describe('Epoch Chain', function () {
   configure(this)
 
   let client
-  const { pub } = generateKeyPair()
+  const { publicKey } = generateKeyPair()
 
   before(async function () {
     client = await ready(this)
@@ -34,16 +34,15 @@ describe('Epoch Chain', function () {
   })
 
   it('waits for specified heights', async () => {
-    const target = await client.height() + 2
+    const target = await client.height() + 1
     await client.awaitHeight(target, { attempts: 120 }).should.eventually.be.at.least(target)
     return client.height().should.eventually.be.at.least(target)
   })
 
   it('polls for transactions', async () => {
     const sender = await client.address()
-    const receiver = pub
-    const { tx } = await client.api.postSpend({
-      fee: 1,
+    const receiver = publicKey
+    const tx = await client.spendTx({
       amount: 1,
       senderId: sender,
       recipientId: receiver,

@@ -6,6 +6,9 @@ function configure (filename, opts = {}) {
     entry: './es/index.js',
     mode: 'development', // automatically overriden by production flag
     devtool: argv.mode === 'production' ? 'source-map' : 'eval-source-map',
+    node: {
+      fs: 'empty'
+    },
     module: {
       rules: [
         {

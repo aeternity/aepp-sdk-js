@@ -81,6 +81,46 @@ export function salt () {
 }
 
 /**
+ * Base64 encode given `input`
+ * @rtype (input: String|buffer) => Buffer
+ * @param {String} input - Data to encode
+ * @return {Buffer} Base64 encoded data
+ */
+export function encodeBase64Check (input) {
+  const buffer = Buffer.from(input)
+  const checksum = checkSumFn(input)
+  const payloadWithChecksum = Buffer.concat([buffer, checksum], buffer.length + 4)
+  return payloadWithChecksum.toString('base64')
+}
+
+export function checkSumFn (payload) {
+  return sha256hash(sha256hash(payload)).slice(0, 4)
+}
+
+function decodeRaw (buffer) {
+  const payload = buffer.slice(0, -4)
+  const checksum = buffer.slice(-4)
+  const newChecksum = checkSumFn(payload)
+
+  if (!checksum.equals(newChecksum)) return
+
+  return payload
+}
+
+/**
+ * Base64 decode given `str`
+ * @rtype (str: String) => Buffer
+ * @param {String} str - Data to decode
+ * @return {Buffer} Base64 decoded data
+ */
+export function decodeBase64Check (str) {
+  const buffer = Buffer.from(str, 'base64')
+  const payload = decodeRaw(buffer)
+  if (!payload) throw new Error('Invalid checksum')
+  return Buffer.from(payload)
+}
+
+/**
  * Base58 encode given `input`
  * @rtype (input: String) => Buffer
  * @param {String} input - Data to encode
@@ -133,7 +173,7 @@ export function generateKeyPairFromSecret (secret) {
 
 /**
  * Generate a random ED25519 keypair
- * @rtype (raw: Boolean) => {pub: String, priv: String} | {pub: Buffer, priv: Buffer}
+ * @rtype (raw: Boolean) => {publicKey: String, secretKey: String} | {publicKey: Buffer, secretKey: Buffer}
  * @param {Boolean} raw - Whether to return raw (binary) keys
  * @return {Object} Key pair
  */
@@ -146,23 +186,23 @@ export function generateKeyPair (raw = false) {
 
   if (raw) {
     return {
-      pub: publicBuffer,
-      priv: secretBuffer
+      publicKey: publicBuffer,
+      secretKey: secretBuffer
     }
   } else {
     return {
-      pub: `ak_${encodeBase58Check(publicBuffer)}`,
-      priv: secretBuffer.toString('hex')
+      publicKey: `ak_${encodeBase58Check(publicBuffer)}`,
+      secretKey: secretBuffer.toString('hex')
     }
   }
 }
 
 /**
  * Encrypt given public key using `password`
- * @rtype (password: String, binaryKey: Buffer) => UInt8Array
+ * @rtype (password: String, binaryKey: Buffer) => Uint8Array
  * @param {String} password - Password to encrypt with
  * @param {Buffer} binaryKey - Key to encrypt
- * @return {UInt8Array} Encrypted key
+ * @return {Uint8Array} Encrypted key
  */
 export function encryptPublicKey (password, binaryKey) {
   return encryptKey(password, rightPad(32, binaryKey))
@@ -170,10 +210,10 @@ export function encryptPublicKey (password, binaryKey) {
 
 /**
  * Encrypt given private key using `password`
- * @rtype (password: String, binaryKey: Buffer) => UInt8Array
+ * @rtype (password: String, binaryKey: Buffer) => Uint8Array
  * @param {String} password - Password to encrypt with
  * @param {Buffer} binaryKey - Key to encrypt
- * @return {UInt8Array} Encrypted key
+ * @return {Uint8Array} Encrypted key
  */
 export function encryptPrivateKey (password, binaryKey) {
   return encryptKey(password, leftPad(64, binaryKey))
@@ -181,10 +221,10 @@ export function encryptPrivateKey (password, binaryKey) {
 
 /**
  * Encrypt given data using `password`
- * @rtype (password: String, binaryData: Buffer) => UInt8Array
+ * @rtype (password: String, binaryData: Buffer) => Uint8Array
  * @param {String} password - Password to encrypt with
  * @param {Buffer} binaryData - Data to encrypt
- * @return {UInt8Array} Encrypted data
+ * @return {Uint8Array} Encrypted data
  */
 export function encryptKey (password, binaryData) {
   let hashedPasswordBytes = sha256hash(password)
@@ -194,7 +234,7 @@ export function encryptKey (password, binaryData) {
 
 /**
  * Decrypt given data using `password`
- * @rtype (password: String, encrypted: String) => UInt8Array
+ * @rtype (password: String, encrypted: String) => Uint8Array
  * @param {String} password - Password to decrypt with
  * @param {String} encrypted - Data to decrypt
  * @return {Buffer} Decrypted data
@@ -210,8 +250,8 @@ export function decryptKey (password, encrypted) {
 
 /**
  * Generate signature
- * @rtype (data: String, privateKey: Buffer) => Buffer
- * @param {String} data - Data to sign
+ * @rtype (data: String|Buffer, privateKey: Buffer) => Buffer
+ * @param {String|Buffer} data - Data to sign
  * @param {Buffer} privateKey - Key to sign with
  * @return {Buffer} Signature
  */
@@ -250,7 +290,7 @@ export function prepareTx (signature, data) {
 }
 
 export function personalMessageToBinary (message) {
-  const p = Buffer.from('‎æternity Signed Message:\n', 'utf8')
+  const p = Buffer.from('æternity Signed Message:\n', 'utf8')
   const msg = Buffer.from(message, 'utf8')
   if (msg.length >= 0xFD) throw new Error('message too long')
   return Buffer.concat([Buffer.from([p.length]), p, Buffer.from([msg.length]), msg])
@@ -279,15 +319,15 @@ export function aeEncodeKey (binaryKey) {
 
 /**
  * Generate a new key pair using {@link generateKeyPair} and encrypt it using `password`
- * @rtype (password: String) => {pub: UInt8Array, priv: UInt8Array}
+ * @rtype (password: String) => {publicKey: Uint8Array, secretKey: Uint8Array}
  * @param {String} password - Password to encrypt with
  * @return {Object} Encrypted key pair
  */
 export function generateSaveWallet (password) {
   let keys = generateKeyPair(true)
   return {
-    pub: encryptPublicKey(password, keys.pub),
-    priv: encryptPrivateKey(password, keys.priv)
+    publicKey: encryptPublicKey(password, keys.publicKey),
+    secretKey: encryptPrivateKey(password, keys.secretKey)
   }
 }
 
@@ -333,7 +373,7 @@ export function assertedType (data, type) {
  * @return {Array} Decoded transaction
  */
 export function decodeTx (txHash) {
-  return RLP.decode(Buffer.from(decodeBase58Check(assertedType(txHash, 'tx')), 'hex'))
+  return RLP.decode(Buffer.from(decodeBase64Check(assertedType(txHash, 'tx'))))
 }
 
 /**
@@ -344,7 +384,7 @@ export function decodeTx (txHash) {
  */
 export function encodeTx (txData) {
   const encodedTxData = RLP.encode(txData)
-  const encodedTx = encodeBase58Check(Buffer.from(encodedTxData))
+  const encodedTx = encodeBase64Check(encodedTxData)
   return `tx_${encodedTx}`
 }
 
@@ -368,17 +408,17 @@ export function isValidKeypair (privateKey, publicKey) {
  *
  * Designed to be used with `env` from nodejs. Assumes enviroment variables
  * `WALLET_PRIV` and `WALLET_PUB`.
- * @rtype (env: Object) => {pub: String, priv: String}, throws: Error
+ * @rtype (env: Object) => {publicKey: String, secretKey: String}, throws: Error
  * @param {Object} env - Environment
  * @return {Object} Key pair
  */
 export function envKeypair (env) {
   const keypair = {
-    priv: env['WALLET_PRIV'],
-    pub: env['WALLET_PUB']
+    secretKey: env['WALLET_PRIV'],
+    publicKey: env['WALLET_PUB']
   }
 
-  if (keypair.pub && keypair.priv) {
+  if (keypair.publicKey && keypair.secretKey) {
     return keypair
   } else {
     throw Error('Environment variables WALLET_PRIV and WALLET_PUB need to be set')

@@ -22,6 +22,7 @@
  * @example import Swagger from '@aeternity/aepp-sdk/es/utils/swagger'
  */
 
+import JSONbig from 'json-bigint'
 import stampit from '@stamp/it'
 import AsyncInit from './async-init'
 import axios from 'axios'
@@ -34,7 +35,7 @@ import * as R from 'ramda'
  * @return {String} Converted string
  */
 function snakeToPascal (s) {
-  return s.replace(/_./g, match => R.toUpper(match[1]))
+  return s.replace(/_./g, match => match[1].toUpperCase())
 }
 
 /**
@@ -44,7 +45,7 @@ function snakeToPascal (s) {
  * @return {String} Converted string
  */
 function pascalToSnake (s) {
-  return s.replace(/[A-Z]/g, match => `_${R.toLower(match)}`)
+  return s.replace(/[A-Z]/g, match => `_${match.toLowerCase()}`)
 }
 
 /**
@@ -55,7 +56,7 @@ function pascalToSnake (s) {
  * @return {String} Converted string
  */
 function expandPath (path, replacements) {
-  return R.reduce((path, [key, value]) => path.replace(`{${key}}`, value), path, R.toPairs(replacements))
+  return R.toPairs(replacements).reduce((path, [key, value]) => path.replace(`{${key}}`, value), path)
 }
 
 /**
@@ -140,7 +141,7 @@ const conformTypes = {
   },
   object (value, spec, types) {
     if (R.type(value) === 'Object') {
-      const required = R.map(snakeToPascal, spec.required || [])
+      const required = (spec.required || []).map(snakeToPascal)
       const properties = pascalizeKeys(spec.properties)
       const missing = R.difference(required, R.keys(value))
 
@@ -155,7 +156,7 @@ const conformTypes = {
   },
   array (value, spec, types) {
     if (R.type(value) === 'Array') {
-      return R.map(o => conform(o, spec.items, types), value)
+      return value.map(o => conform(o, spec.items, types))
     } else {
       throw TypeError(`Not an array`, spec, value)
     }
@@ -167,7 +168,7 @@ const conformTypes = {
     return conform(value, lookupType(['$ref'], spec, types), types)
   },
   allOf (value, spec, types) {
-    return R.mergeAll(R.map(spec => conform(value, spec, types), spec.allOf))
+    return R.mergeAll(spec.allOf.map(spec => conform(value, spec, types)))
   }
 }
 
@@ -208,9 +209,13 @@ function conform (value, spec, types) {
   }))(value, spec, types)
 }
 
+const httpCofig = {
+  headers: { 'Content-Type': 'application/json' },
+  transformResponse: [JSONbig({'storeAsString': true}).parse]
+}
 const httpClients = {
-  get: axios.get,
-  post: axios.post
+  get: (url) => axios.get(url, httpCofig),
+  post: (url, params) => axios.post(url, params, httpCofig)
 }
 
 /**
@@ -239,7 +244,7 @@ function classifyParameters (parameters) {
  * @return {Object[]} Pascalized parameters
  */
 function pascalizeParameters (parameters) {
-  return R.map(o => R.assoc('name', snakeToPascal(o.name), o), parameters)
+  return parameters.map(o => R.assoc('name', snakeToPascal(o.name), o))
 }
 
 /**
@@ -253,8 +258,8 @@ function pascalizeParameters (parameters) {
  */
 const traverseKeys = R.curry((fn, o) => {
   const dispatch = {
-    Object: o => R.fromPairs(R.map(([k, v]) => [fn(k), traverseKeys(fn, v)], R.toPairs(o))),
-    Array: o => R.map(traverseKeys(fn), o)
+    Object: o => R.fromPairs(R.toPairs(o).map(([k, v]) => [fn(k), traverseKeys(fn, v)])),
+    Array: o => o.map(traverseKeys(fn))
   }
 
   return (dispatch[R.type(o)] || R.identity)(o)
@@ -296,7 +301,7 @@ function operationSignature (name, req, opts) {
   const args = req.length ? `${R.join(', ', R.pluck('name', req))}` : null
   const opt = opts.length ? `{${R.join(', ', R.pluck('name', opts))}}` : null
 
-  return `${name} (${R.join(', ', R.filter(R.identity, [args, opt]))})`
+  return `${name} (${R.join(', ', [args, opt].filter(R.identity))})`
 }
 
 /**
@@ -325,7 +330,7 @@ function destructureClientError (error) {
   const { status, data } = error.response
   const reason = R.has('reason', data) ? data.reason : R.toString(data)
 
-  return `${R.toUpper(method)} to ${url} failed with ${status}: ${reason}`
+  return `${method.toUpperCase()} to ${url} failed with ${status}: ${reason}`
 }
 
 /**
@@ -340,8 +345,9 @@ function destructureClientError (error) {
  * @return {Function}
  */
 const operation = R.memoize((path, method, definition, types) => {
-  const { operationId, parameters, description } = definition
-  const name = `${R.toLower(R.head(operationId))}${R.drop(1, operationId)}`
+  const { operationId, description } = definition
+  let { parameters } = definition
+  const name = `${R.head(operationId).toLowerCase()}${R.drop(1, operationId)}`
   const pascalized = pascalizeParameters(parameters)
 
   const { pathArgs, queryArgs, bodyArgs, req, opts } = classifyParameters(pascalized)
@@ -395,11 +401,11 @@ const operation = R.memoize((path, method, definition, types) => {
         })())
 
         if (opt.debug) {
-          console.log(`Going to ${R.toUpper(method)} ${url}${expandedPath} with ${R.toString(params)}`)
+          console.log(`Going to ${method.toUpperCase()} ${url}${expandedPath} with ${R.toString(params)}`)
         }
 
         try {
-          const response = await client(`${url}${expandedPath}`, params, { headers: { 'Content-Type': 'application/json' } })
+          const response = await client(`${url}${expandedPath}`, params)
           // return opt.fullResponse ? response : conform(pascalizeKeys(response.data), responses['200'], types)
           return opt.fullResponse ? response : pascalizeKeys(response.data)
         } catch (e) {

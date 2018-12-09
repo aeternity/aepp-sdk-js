@@ -40,8 +40,8 @@
 
 <script>
 // AE_SDK_MODULES is a webpack alias present in webpack.config.js
-import Wallet from '../../../../../es/ae/wallet'
-import MemoryAccount from '../../../../../es/account/memory'
+import Wallet from 'AE_SDK_MODULES/ae/wallet'
+import MemoryAccount from 'AE_SDK_MODULES/account/memory'
 
 export default {
   name: 'Wallet',
@@ -49,7 +49,6 @@ export default {
   data () {
     return {
       pub: 'ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU',
-      // get from secure storage
       priv: 'a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61',
       client: null,
       wallet: null,
@@ -70,9 +69,9 @@ export default {
     window.addEventListener('message', console.log, false)
 
     Wallet({
-      url: 'https://sdk-edgenet.aepps.com',
-      internalUrl: 'https://sdk-edgenet.aepps.com',
-      accounts: [MemoryAccount({keypair: {priv: this.priv, pub: this.pub}})],
+      url: 'https://sdk-mainnet.aepps.com',
+      internalUrl: 'https://sdk-mainnet.aepps.com',
+      accounts: [MemoryAccount({keypair: {secretKey: this.priv, publicKey: this.pub}})],
       address: this.pub,
       onTx: this.confirmDialog,
       onChain: this.confirmDialog,

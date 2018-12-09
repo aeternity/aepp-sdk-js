@@ -27,6 +27,7 @@ import Tx from '../tx'
 import Chain from '../chain'
 import Account from '../account'
 import Contract from '../contract'
+import Oracle from '../oracle'
 import * as R from 'ramda'
 
 /**
@@ -40,27 +41,28 @@ import * as R from 'ramda'
  */
 async function send (tx, options) {
   const opt = R.merge(this.Ae.defaults, options)
-  const signed = await this.signTransaction(tx, await this.address())
+  const signed = await this.signTransaction(tx)
   return this.sendTransaction(signed, opt)
 }
 
 /**
- * Send tokens to recipientId
+ * Send tokens to another account
  * @instance
  * @category async
  * @rtype (amount: Number, recipientId: String, options?: Object) => Promise[String]
- * @param {String} tx - Transaction
+ * @param {Number} amount - Amount to spend
+ * @param {String} recipientId - Address of recipient account
  * @param {Object} options - Options
  * @return {String|String} Transaction or transaction hash
  */
 async function spend (amount, recipientId, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const spendTx = await this.spendTx(R.merge(opt, { senderId: await this.address(), recipientId, amount }))
+  const spendTx = await this.spendTx(R.merge(opt, { senderId: await this.address(), recipientId, amount: amount }))
   return this.send(spendTx, opt)
 }
 
 /**
- * Basic Account Stamp
+ * Basic Ae Stamp
  *
  * Attempting to create instances from the Stamp without overwriting all
  * abstract methods using composition will result in an exception.
@@ -78,11 +80,10 @@ async function spend (amount, recipientId, options = {}) {
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Ae instance
  */
-const Ae = stampit(Tx, Account, Chain, Contract, {
+const Ae = stampit(Tx, Account, Chain, Contract, Oracle, {
   methods: { send, spend },
   deepProperties: { Ae: { defaults: {
-    ttl: 500,
-    fee: 1,
+    ttl: 0,
     payload: ''
   } } }
 })

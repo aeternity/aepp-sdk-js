@@ -9,3 +9,5 @@ node_modules
 .idea
 /docker-compose.override.yml
 /pnpm-debug.log
+.vscode/
+debug/

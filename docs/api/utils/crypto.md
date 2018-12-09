@@ -15,14 +15,16 @@ import * as Crypto from '@aeternity/aepp-sdk/es/utils/crypto'
         * [.nameId(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.nameId) ⇒ `String`
         * [.sha256hash(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.sha256hash) ⇒ `String`
         * [.salt()](#module_@aeternity/aepp-sdk/es/utils/crypto.salt) ⇒ `Number`
+        * [.encodeBase64Check(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.encodeBase64Check) ⇒ `Buffer`
+        * [.decodeBase64Check(str)](#module_@aeternity/aepp-sdk/es/utils/crypto.decodeBase64Check) ⇒ `Buffer`
         * [.encodeBase58Check(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.encodeBase58Check) ⇒ `Buffer`
         * [.decodeBase58Check(str)](#module_@aeternity/aepp-sdk/es/utils/crypto.decodeBase58Check) ⇒ `Buffer`
         * [.hexStringToByte(str)](#module_@aeternity/aepp-sdk/es/utils/crypto.hexStringToByte) ⇒ `Uint8Array`
         * [.generateKeyPairFromSecret(secret)](#module_@aeternity/aepp-sdk/es/utils/crypto.generateKeyPairFromSecret) ⇒ `Object`
         * [.generateKeyPair(raw)](#module_@aeternity/aepp-sdk/es/utils/crypto.generateKeyPair) ⇒ `Object`
-        * [.encryptPublicKey(password, binaryKey)](#module_@aeternity/aepp-sdk/es/utils/crypto.encryptPublicKey) ⇒ `UInt8Array`
-        * [.encryptPrivateKey(password, binaryKey)](#module_@aeternity/aepp-sdk/es/utils/crypto.encryptPrivateKey) ⇒ `UInt8Array`
-        * [.encryptKey(password, binaryData)](#module_@aeternity/aepp-sdk/es/utils/crypto.encryptKey) ⇒ `UInt8Array`
+        * [.encryptPublicKey(password, binaryKey)](#module_@aeternity/aepp-sdk/es/utils/crypto.encryptPublicKey) ⇒ `Uint8Array`
+        * [.encryptPrivateKey(password, binaryKey)](#module_@aeternity/aepp-sdk/es/utils/crypto.encryptPrivateKey) ⇒ `Uint8Array`
+        * [.encryptKey(password, binaryData)](#module_@aeternity/aepp-sdk/es/utils/crypto.encryptKey) ⇒ `Uint8Array`
         * [.decryptKey(password, encrypted)](#module_@aeternity/aepp-sdk/es/utils/crypto.decryptKey) ⇒ `Buffer`
         * [.sign(data, privateKey)](#module_@aeternity/aepp-sdk/es/utils/crypto.sign) ⇒ `Buffer`
         * [.verify(str, signature, publicKey)](#module_@aeternity/aepp-sdk/es/utils/crypto.verify) ⇒ `Boolean`
@@ -101,6 +103,32 @@ Generate a random salt (positive integer)
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
 **Returns**: `Number` - random salt  
 **rtype**: `() => salt: Number`
+<a id="module_@aeternity/aepp-sdk/es/utils/crypto.encodeBase64Check"></a>
+
+### @aeternity/aepp-sdk/es/utils/crypto.encodeBase64Check(input) ⇒ `Buffer`
+Base64 encode given `input`
+
+**Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
+**Returns**: `Buffer` - Base64 encoded data  
+**rtype**: `(input: String|buffer) => Buffer`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| input | `String` | Data to encode |
+
+<a id="module_@aeternity/aepp-sdk/es/utils/crypto.decodeBase64Check"></a>
+
+### @aeternity/aepp-sdk/es/utils/crypto.decodeBase64Check(str) ⇒ `Buffer`
+Base64 decode given `str`
+
+**Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
+**Returns**: `Buffer` - Base64 decoded data  
+**rtype**: `(str: String) => Buffer`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| str | `String` | Data to decode |
+
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.encodeBase58Check"></a>
 
 ### @aeternity/aepp-sdk/es/utils/crypto.encodeBase58Check(input) ⇒ `Buffer`
@@ -160,7 +188,7 @@ Generate a random ED25519 keypair
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
 **Returns**: `Object` - Key pair  
-**rtype**: `(raw: Boolean) => {pub: String, priv: String} | {pub: Buffer, priv: Buffer}`
+**rtype**: `(raw: Boolean) => {publicKey: String, secretKey: String} | {publicKey: Buffer, secretKey: Buffer}`
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -168,12 +196,12 @@ Generate a random ED25519 keypair
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.encryptPublicKey"></a>
 
-### @aeternity/aepp-sdk/es/utils/crypto.encryptPublicKey(password, binaryKey) ⇒ `UInt8Array`
+### @aeternity/aepp-sdk/es/utils/crypto.encryptPublicKey(password, binaryKey) ⇒ `Uint8Array`
 Encrypt given public key using `password`
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
-**Returns**: `UInt8Array` - Encrypted key  
-**rtype**: `(password: String, binaryKey: Buffer) => UInt8Array`
+**Returns**: `Uint8Array` - Encrypted key  
+**rtype**: `(password: String, binaryKey: Buffer) => Uint8Array`
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -182,12 +210,12 @@ Encrypt given public key using `password`
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.encryptPrivateKey"></a>
 
-### @aeternity/aepp-sdk/es/utils/crypto.encryptPrivateKey(password, binaryKey) ⇒ `UInt8Array`
+### @aeternity/aepp-sdk/es/utils/crypto.encryptPrivateKey(password, binaryKey) ⇒ `Uint8Array`
 Encrypt given private key using `password`
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
-**Returns**: `UInt8Array` - Encrypted key  
-**rtype**: `(password: String, binaryKey: Buffer) => UInt8Array`
+**Returns**: `Uint8Array` - Encrypted key  
+**rtype**: `(password: String, binaryKey: Buffer) => Uint8Array`
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -196,12 +224,12 @@ Encrypt given private key using `password`
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.encryptKey"></a>
 
-### @aeternity/aepp-sdk/es/utils/crypto.encryptKey(password, binaryData) ⇒ `UInt8Array`
+### @aeternity/aepp-sdk/es/utils/crypto.encryptKey(password, binaryData) ⇒ `Uint8Array`
 Encrypt given data using `password`
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
-**Returns**: `UInt8Array` - Encrypted data  
-**rtype**: `(password: String, binaryData: Buffer) => UInt8Array`
+**Returns**: `Uint8Array` - Encrypted data  
+**rtype**: `(password: String, binaryData: Buffer) => Uint8Array`
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -215,7 +243,7 @@ Decrypt given data using `password`
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
 **Returns**: `Buffer` - Decrypted data  
-**rtype**: `(password: String, encrypted: String) => UInt8Array`
+**rtype**: `(password: String, encrypted: String) => Uint8Array`
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -229,11 +257,11 @@ Generate signature
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
 **Returns**: `Buffer` - Signature  
-**rtype**: `(data: String, privateKey: Buffer) => Buffer`
+**rtype**: `(data: String|Buffer, privateKey: Buffer) => Buffer`
 
 | Param | Type | Description |
 | --- | --- | --- |
-| data | `String` | Data to sign |
+| data | `String` \| `Buffer` | Data to sign |
 | privateKey | `Buffer` | Key to sign with |
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.verify"></a>
@@ -286,7 +314,7 @@ Generate a new key pair using [generateKeyPair](generateKeyPair) and encrypt it 
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
 **Returns**: `Object` - Encrypted key pair  
-**rtype**: `(password: String) => {pub: UInt8Array, priv: UInt8Array}`
+**rtype**: `(password: String) => {publicKey: Uint8Array, secretKey: Uint8Array}`
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -384,7 +412,7 @@ Designed to be used with `env` from nodejs. Assumes enviroment variables
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
 **Returns**: `Object` - Key pair  
-**rtype**: `(env: Object) => {pub: String, priv: String}, throws: Error`
+**rtype**: `(env: Object) => {publicKey: String, secretKey: String}, throws: Error`
 
 | Param | Type | Description |
 | --- | --- | --- |

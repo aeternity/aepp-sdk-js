@@ -61,9 +61,22 @@ const Tx = stampit({
     nameRevokeTx: required,
     contractCreateTx: required,
     contractCallTx: required,
-    commitmentHash: required
+    commitmentHash: required,
+    calculateFee: required
   }
 }))
+
+/**
+ * Select specific account
+ * @function calculateFee
+ * @instance
+ * @category async
+ * @rtype (fee, txtype, gas = 0) => String
+ * @param {String|Number} fee - fee
+ * @param {String} txType - Transaction type
+ * @param {String|Number} gas - Gas amount
+ * @return {String} fee
+ */
 
 /**
  * Create a `spend_tx` transaction

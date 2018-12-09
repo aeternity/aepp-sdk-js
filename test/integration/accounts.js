@@ -18,6 +18,8 @@
 import { describe, it, before } from 'mocha'
 import { configure, ready, BaseAe } from './'
 import { generateKeyPair } from '../../es/utils/crypto'
+import { networkId } from './index'
+import { BigNumber } from 'bignumber.js'
 
 describe('Accounts', function () {
   configure(this)
@@ -28,7 +30,7 @@ describe('Accounts', function () {
     wallet = await ready(this)
   })
 
-  const { pub: receiver } = generateKeyPair()
+  const { publicKey: receiver } = generateKeyPair()
 
   describe('fails on unknown keypairs', () => {
     let wallet
@@ -48,7 +50,7 @@ describe('Accounts', function () {
   })
 
   it('determines the balance', async () => {
-    return wallet.balance(await wallet.address()).should.eventually.be.a('number')
+    return wallet.balance(await wallet.address()).should.eventually.be.a('string')
   })
 
   it('spends tokens', async () => {
@@ -56,6 +58,21 @@ describe('Accounts', function () {
     ret.should.have.property('tx')
     ret.tx.should.include({
       amount: 1, recipientId: receiver
+    })
+  })
+
+  it('spends big amount of tokens', async () => {
+    const bigAmount = '2702702702700000000123'
+    const genesis = await BaseAe({ networkId })
+    const balanceBefore = await wallet.balance(await wallet.address())
+    const receiverId = await wallet.address()
+    const ret = await genesis.spend(bigAmount, receiverId)
+
+    const balanceAfter = await wallet.balance(await wallet.address())
+    balanceAfter.should.be.equal(BigNumber(bigAmount).plus(balanceBefore).toString(10))
+    ret.should.have.property('tx')
+    ret.tx.should.include({
+      amount: bigAmount, recipientId: receiverId
     })
   })
 

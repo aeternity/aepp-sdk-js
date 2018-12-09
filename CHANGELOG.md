@@ -2,6 +2,117 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [1.0.1]
+### Added
+- ability to support Epoch range(s) using semver package (see https://www.npmjs.com/package/semver#ranges)
+
+### Changed
+- Support for Epoch >= 1.0.0 and < 2.0.0
+
+### Removed
+- none
+
+### Breaking Changes
+- none
+
+### Notes and known Issues
+- none
+
+
+
+## [1.0.0]
+### Added
+- Contract native Transactions
+
+### Changed
+- Rolled back to bignumbers.js for easier fix with axios.get/post
+
+### Removed
+- Support for Epoch < 1.0.0
+
+### Breaking Changes
+- New NETWORK_ID (also used in docker/sdk.env for CI tests)
+-  Encoding of transaction (and other objects) [changed from base58check to base64check](https://github.com/aeternity/protocol/blob/epoch-v1.0.0/epoch/api/api_encoding.md)
+
+### Notes and known Issues
+- State Channels have been excluded for problems with CI, will be included in next release
+
+
+## [0.25.0-0.1.1]
+### Added
+- see [0.25.0-0.1.0]
+
+### Changed
+- Change bignumbers.js with [bn.js](https://github.com/indutny/bn.js/) due to binding errors in browser's package
+
+### Removed
+- see [0.25.0-0.1.0]
+
+### Breaking Changes
+- see [0.25.0-0.1.0]
+
+### Notes and known Issues
+- none, see [0.25.0-0.1.0]
+
+## [0.25.0-0.1.0]
+### Added
+- Parsing of `fee` using `bignum.js`
+- Add `networkId` as param to `Account` flavor(default: `ae_mainnet`)
+- Implement native build of `AENS` transaction.
+
+### Changed
+- Update keystore for new [requirements](https://www.pivotaltracker.com/n/projects/2124891/stories/155155204)
+-
+### Removed
+- Support for < 0.25.0
+- [AE CLI](https://github.com/aeternity/aecli-js) and [AE PROJECT CLI](https://github.com/aeternity/aeproject) moved to separate repos and packages
+
+### Breaking Changes
+- Use NETWORK_ID for signing (see [here](https://github.com/aeternity/aepp-sdk-js/commit/9c252f937f7ea501c4aaacbbef53c4c1833e48e4#diff-ffb275ebb09085c85c59f140998199e0R28))
+- Keystore format [changes](https://www.pivotaltracker.com/n/projects/2124891/stories/155155204)
+
+### Notes and known Issues
+- none
+
+
+## [0.25.0-0.1.0-next]
+### Added
+- Contract type checked call (Ability to call contract using contract address)
+
+### Changed
+- Use ES methods instead of Ramda, where possible
+- Fixed keystore by adding a salt param for derivedKey function
+
+### Removed
+- Support for < 0.25.0
+- [AE CLI](https://github.com/aeternity/aecli-js) and [AE PROJECT CLI](https://github.com/aeternity/aeproject) moved to separate repos and packages
+
+### Breaking Changes
+- Aens use domain `.test` instead of `.aet` (see [here](https://github.com/aeternity/aepp-sdk-js/commit/9c252f937f7ea501c4aaacbbef53c4c1833e48e4#diff-8ef3b328d008ef3dbb72a0bca42eba37L24))
+- Use NETWORK_ID for signing (see [here](https://github.com/aeternity/aepp-sdk-js/commit/9c252f937f7ea501c4aaacbbef53c4c1833e48e4#diff-ffb275ebb09085c85c59f140998199e0R28))
+
+### Notes and known Issues
+
+
+## [0.24.0-0.2.0]
+### Added
+- RPC Client improvements
+- (RPC) `onContract` Guard
+- (AE PROJECT CLI) born
+
+### Changed
+- (CLI) New keystore following these specifications: https://www.pivotaltracker.com/n/projects/2124891/stories/155155204
+- (CLI) `Host` parameter became `Url`. (`-u` for hostname, `-U` for internal)
+
+### Breaking Changes
+- The `Cli` flavor is now `Universal`
+- the keypair keys changed from `{ pub, priv }` to `{ publicKey, secretKey }` for consistency with other systems using them (eg. AirGap and [HD Wallet](https://github.com/aeternity/hd-wallet-js))
+
+### Notes and known Issues
+- CLI and AE PROJECT CLI will move to a separate package
+
+
+
 ## [0.24.0-0.1.0]
 ### Added
 - Full support of [Epoch-0.24.0](https://github.com/aeternity/epoch/releases/tag/v0.24.0)
@@ -68,7 +179,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 - Contract call result decoding support
 - Per-module API documentation (Markdown based on JSDoc)
 - More API documentation (still incomplete)
-- SDK entrypoint factories (in `/es/ae/cli.js`)
+- SDK entrypoint factories (in `/es/ae/universal.js`)
 
 ### Removed
 - Support for < 0.18.0 (changed endpoints)
@@ -139,3 +250,9 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 [0.18.0-0.1.1]: https://github.com/aeternity/aepp-sdk-js/compare/v0.18.0-0.1.0...v0.18.0-0.1.1
 [0.22.0-0.1.0-beta.1]: https://github.com/aeternity/aepp-sdk-js/compare/v0.18.0-0.1.1...v0.22.0-0.1.0-beta.1
 [0.24.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.22.0-0.1.0-beta.1...v0.24.0-0.1.0
+[0.24.0-0.2.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.24.0-0.1.0...v0.24.0-0.2.0
+[0.25.0-0.1.0-next]: https://github.com/aeternity/aepp-sdk-js/compare/v0.24.0-0.2.0...v0.25.0-0.1.0-next
+[0.25.0-0.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.25.0-0.1.0-next...v0.25.0-0.1.0
+[0.25.0-0.1.1]: https://github.com/aeternity/aepp-sdk-js/compare/v0.25.0-0.1.0...v0.25.0-0.1.1
+[1.0.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.25.0-0.1.0...1.0.0
+[1.0.1]: https://github.com/aeternity/aepp-sdk-js/compare/1.0.0...1.0.1
