@@ -24,6 +24,7 @@ services:
     volumes:
       - ${PWD}/docker/epoch_node_mean16.yaml:/home/epoch/epoch.yaml
       - ${PWD}/docker/keys/node:/home/epoch/node/keys
+      - ${PWD}/docker/accounts_test.json:/home/epoch/node/data/aecore/.genesis/accounts_test.json
       - node_db:/home/epoch/node/data/mnesia
       - node_keys:/home/epoch/node/keys
 

@@ -28,6 +28,8 @@ import Tx from './'
 import JsTx from './js'
 import Epoch from '../epoch'
 
+const ORACLE_VM_VERSION = 0
+
 async function spendTx ({ senderId, recipientId, amount, fee, ttl, nonce, payload = '' }) {
   nonce = await (calculateNonce.bind(this)(senderId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
@@ -134,14 +136,62 @@ async function contractCallComputeTx ({ callerId, nonce, contractId, vmVersion, 
   return (await this.api.postContractCallCompute({ callerId, contractId, vmVersion, fee: parseInt(fee), amount, gas, gasPrice, nonce, ttl, ...callOpt })).tx
 }
 
+async function oracleRegisterTx ({ accountId, queryFormat, responseFormat, queryFee, oracleTtl, fee, ttl, nonce, vmVersion = ORACLE_VM_VERSION }) {
+  nonce = await (calculateNonce.bind(this)(accountId, nonce))
+  ttl = await (calculateTtl.bind(this)(ttl))
+  fee = this.calculateFee(fee, 'oracleRegisterTx')
+
+  const { tx } = this.nativeMode
+    ? await this.oracleRegisterTxNative({ accountId, queryFee, vmVersion, fee, oracleTtl, nonce, ttl, queryFormat, responseFormat })
+    : await this.api.postOracleRegister({ accountId, queryFee, vmVersion, fee: parseInt(fee), oracleTtl, nonce, ttl, queryFormat, responseFormat })
+
+  return tx
+}
+
+async function oracleExtendTx ({ oracleId, callerId, fee, oracleTtl, nonce, ttl }) {
+  nonce = await (calculateNonce.bind(this)(callerId, nonce))
+  ttl = await (calculateTtl.bind(this)(ttl))
+  fee = this.calculateFee(fee, 'oracleExtendTx')
+
+  const { tx } = this.nativeMode
+    ? await this.oracleExtendTxNative({ oracleId, fee, oracleTtl, nonce, ttl })
+    : await this.api.postOracleExtend({ oracleId, fee: parseInt(fee), oracleTtl, nonce, ttl })
+
+  return tx
+}
+
+async function oraclePostQueryTx ({ oracleId, responseTtl, query, queryTtl, fee, queryFee, ttl, nonce, senderId }) {
+  nonce = await (calculateNonce.bind(this)(senderId, nonce))
+  ttl = await (calculateTtl.bind(this)(ttl))
+  fee = this.calculateFee(fee, 'oraclePostQueryTx')
+
+  const { tx } = this.nativeMode
+    ? await this.oraclePostQueryTxNative({ oracleId, responseTtl, query, queryTtl, fee, queryFee, ttl, nonce, senderId })
+    : await this.api.postOracleQuery({ oracleId, responseTtl, query, queryTtl, fee: parseInt(fee), queryFee, ttl, nonce, senderId })
+
+  return { tx, queryId: this.oracleQueryId(senderId, nonce, oracleId) }
+}
+
+async function oracleRespondTx ({ oracleId, callerId, responseTtl, queryId, response, fee, ttl, nonce }) {
+  nonce = await (calculateNonce.bind(this)(callerId, nonce))
+  ttl = await (calculateTtl.bind(this)(ttl))
+  fee = this.calculateFee(fee, 'oracleRespondTx')
+
+  const { tx } = this.nativeMode
+    ? await this.oracleRespondQueryTxNative({ oracleId, responseTtl, queryId, response, fee, ttl, nonce })
+    : await this.api.postOracleRespond({ oracleId, responseTtl, queryId, response, fee: parseInt(fee), ttl, nonce })
+  return tx
+}
+
 /**
  * Compute the absolute ttl by adding the ttl to the current height of the chain
  *
  * @param {number} relativeTtl
  * @return {number} Absolute Ttl
  */
-async function calculateTtl (relativeTtl) {
-  if (relativeTtl <= 0) throw new Error('ttl must be greather than 0')
+async function calculateTtl (relativeTtl = 0) {
+  if (relativeTtl < 0) throw new Error('ttl must be greater than 0')
+  if (relativeTtl === 0) return 0
 
   const { height } = await this.api.getCurrentKeyBlock()
   return +(height) + relativeTtl
@@ -162,12 +212,14 @@ async function calculateNonce (accountId, nonce) {
 }
 
 /**
- * Calculate fee of transaction
- *
- * @param {number|string} fee
- * @param {string} txType Type of transaction
- * @param {number|string} gas Gas of transaction
- * @return {number|string} Transaction fee
+ * Select specific account
+ * @instance
+ * @rtype (fee, txtype, gas = 0) => String
+ * @param {String|Number} fee - fee
+ * @param {String} txType - Transaction type
+ * @param {String|Number} gas - Gas amount
+ * @return {String}
+ * @example calculateFee(null, 'spendtx')
  */
 function calculateFee (fee, txType, gas = 0) {
   const BASE_GAS = 15000
@@ -213,15 +265,18 @@ function calculateFee (fee, txType, gas = 0) {
  * @alias module:@aeternity/aepp-sdk/es/tx/tx
  * @rtype Stamp
  * @param {Object} [options={}] - Initializer object
+ * @param {Object} [options.nativeMode] - Use Native build of transaction's
+ * @param {Object} [options.url] - Node url
+ * @param {Object} [options.internalUrl] - Node internal url
  * @return {Object} Transaction instance
  * @example Transaction({url: 'https://sdk-testnet.aepps.com/'})
  */
 const Transaction = Epoch.compose(Tx, JsTx, {
-  init ({ nativeMode = false }) {
+  init ({ nativeMode = true }) {
     this.nativeMode = nativeMode
   },
   props: {
-    fee: 16760,
+    fee: 20000,
     nativeMode: null
   },
   methods: {
@@ -234,7 +289,11 @@ const Transaction = Epoch.compose(Tx, JsTx, {
     contractCreateTx,
     contractCallTx,
     contractCallComputeTx,
-    calculateFee
+    calculateFee,
+    oracleRegisterTx,
+    oracleExtendTx,
+    oraclePostQueryTx,
+    oracleRespondTx
   }
 })
 

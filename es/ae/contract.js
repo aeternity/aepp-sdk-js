@@ -80,10 +80,10 @@ async function deploy (code, abi, { initState = '()', options = {} } = {}) {
   const callData = await this.contractEncodeCall(code, abi, 'init', initState)
   const ownerId = await this.address()
 
-  // Check for MAX_GAS
-  if (opt.gas > this.Ae.defaults.gas) {
-    opt.gas = this.Ae.defaults.gas
-  }
+  // // Check for MAX_GAS
+  // if (opt.gas > this.Ae.defaults.gas) {
+  //   opt.gas = this.Ae.defaults.gas
+  // }
 
   const { tx, contractId } = await this.contractCreateTx(R.merge(opt, {
     callData,
