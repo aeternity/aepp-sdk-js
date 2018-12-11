@@ -109,8 +109,8 @@ async function contractCreateTx ({ ownerId, nonce, code, vmVersion, deposit, amo
   fee = this.calculateFee(fee, 'contractCreateTx', gas)
 
   return this.nativeMode
-    ? this.contractCreateTxNative(R.merge(R.merge(this.Ae.defaults, R.head(arguments)), { nonce, ttl, fee }))
-    : this.api.postContractCreate(R.merge(R.merge(this.Ae.defaults, R.head(arguments)), { nonce, ttl, fee: parseInt(fee), gas: parseInt(gas) }))
+    ? this.contractCreateTxNative(R.merge(R.head(arguments), { nonce, ttl, fee }))
+    : this.api.postContractCreate(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee), gas: parseInt(gas) }))
 }
 
 async function contractCallTx ({ callerId, nonce, contractId, vmVersion, fee, ttl, amount, gas, gasPrice, callData }) {
@@ -119,8 +119,8 @@ async function contractCallTx ({ callerId, nonce, contractId, vmVersion, fee, tt
   fee = this.calculateFee(fee, 'contractCallTx', gas)
 
   const { tx } = this.nativeMode
-    ? await this.contractCallTxNative(R.merge(R.merge(this.Ae.defaults, R.head(arguments)), { nonce, ttl, fee }))
-    : await this.api.postContractCall(R.merge(R.merge(this.Ae.defaults, R.head(arguments)), { nonce, ttl, fee: parseInt(fee), gas: parseInt(gas) }))
+    ? await this.contractCallTxNative(R.merge(R.head(arguments), { nonce, ttl, fee }))
+    : await this.api.postContractCall(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee), gas: parseInt(gas) }))
 
   return tx
 }
@@ -274,18 +274,6 @@ function calculateFee (fee, txType, gas = 0) {
 const Transaction = Epoch.compose(Tx, JsTx, {
   init ({ nativeMode = true }) {
     this.nativeMode = nativeMode
-  },
-  deepProps: {
-    Ae: {
-      defaults: {
-        deposit: 4,
-        vmVersion: 1,
-        gasPrice: 1,
-        amount: 1,
-        gas: 1600000 - 21000, // MAX GAS
-        options: ''
-      }
-    }
   },
   props: {
     fee: 20000,

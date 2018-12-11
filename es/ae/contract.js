@@ -50,11 +50,6 @@ async function decode (type, data) {
 async function call (code, abi, address, name, { args = '()', options = {}, call } = {}) {
   const opt = R.merge(this.Ae.defaults, options)
 
-  // Check for MAX_GAS
-  if (opt.gas > this.Ae.defaults.gas) {
-    opt.gas = this.Ae.defaults.gas
-  }
-
   const tx = await this.contractCallTx(R.merge(opt, {
     callerId: await this.address(),
     contractId: address,
@@ -79,11 +74,6 @@ async function deploy (code, abi, { initState = '()', options = {} } = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   const callData = await this.contractEncodeCall(code, abi, 'init', initState)
   const ownerId = await this.address()
-
-  // // Check for MAX_GAS
-  // if (opt.gas > this.Ae.defaults.gas) {
-  //   opt.gas = this.Ae.defaults.gas
-  // }
 
   const { tx, contractId } = await this.contractCreateTx(R.merge(opt, {
     callData,
