@@ -110,7 +110,7 @@ async function contractCreateTx ({ ownerId, nonce, code, vmVersion, deposit, amo
 
   return this.nativeMode
     ? this.contractCreateTxNative(R.merge(R.head(arguments), { nonce, ttl, fee }))
-    : this.api.postContractCreate(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
+    : this.api.postContractCreate(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee), gas: parseInt(gas) }))
 }
 
 async function contractCallTx ({ callerId, nonce, contractId, vmVersion, fee, ttl, amount, gas, gasPrice, callData }) {
@@ -120,7 +120,7 @@ async function contractCallTx ({ callerId, nonce, contractId, vmVersion, fee, tt
 
   const { tx } = this.nativeMode
     ? await this.contractCallTxNative(R.merge(R.head(arguments), { nonce, ttl, fee }))
-    : await this.api.postContractCall(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
+    : await this.api.postContractCall(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee), gas: parseInt(gas) }))
 
   return tx
 }
@@ -222,7 +222,7 @@ async function calculateNonce (accountId, nonce) {
  * @example calculateFee(null, 'spendtx')
  */
 function calculateFee (fee, txType, gas = 0) {
-  const BASE_GAS = 15000
+  const BASE_GAS = 20000 // Increase BASE_GAS util we are implemented fee calculation
   const GAS_PER_BYTE = 20
   // MAP WITH TX BYTE SIZE
   const TX_BYTE_SIZE = {

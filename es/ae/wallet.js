@@ -33,6 +33,7 @@ import Selector from '../account/selector'
 import * as R from 'ramda'
 import Tx from '../tx/tx'
 import EpochContract from '../contract/epoch'
+import EpochOracle from '../oracle/epoch'
 
 const contains = R.flip(R.contains)
 const isTxMethod = contains(Tx.compose.deepConfiguration.Ae.methods)
@@ -131,7 +132,7 @@ async function rpcAddress ({ params, session }) {
   onContract: confirm
 })
  */
-const Wallet = Ae.compose(Accounts, Chain, Tx, EpochContract, Contract, Rpc, Selector, {
+const Wallet = Ae.compose(Accounts, Chain, Tx, EpochContract, Contract, EpochOracle, Rpc, Selector, {
   init ({ onTx = this.onTx, onChain = this.onChain, onAccount = this.onAccount, onContract = this.onContract }, { stamp }) {
     this.onTx = onTx
     this.onChain = onChain
