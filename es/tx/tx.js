@@ -222,7 +222,7 @@ async function calculateNonce (accountId, nonce) {
  * @example calculateFee(null, 'spendtx')
  */
 function calculateFee (fee, txType, gas = 0) {
-  const BASE_GAS = 15000
+  const BASE_GAS = 20000 // Increase BASE_GAS util we are implemented fee calculation
   const GAS_PER_BYTE = 20
   // MAP WITH TX BYTE SIZE
   const TX_BYTE_SIZE = {
