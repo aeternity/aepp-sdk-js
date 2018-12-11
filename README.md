@@ -49,25 +49,46 @@ yarn add @aeternity/aepp-sdk@next
 > adding `#` and a branch name at the end, for example
 > `pnpm i aeternity/aepp-sdk#develop`.
 
-2. Import the right flavor
+2. Import the right flavor. For this example with get the `Uninveral` flavor, which contains all the features of the SDK:
 
 ```js
-import Aepp from '@aeternity/aepp-sdk/es/ae/aepp'
+import Ae from '@aeternity/aepp-sdk/es/ae/universal'
+import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
 ```
 
-3. Create an instance
+3. Create an instance and interact with it
 
 ```js
-const ae = Aepp()
+
+// Start the instance
+
+Ae({
+  url: 'https://sdk-testnet.aepps.com',
+  internalUrl: 'https://sdk-testnet.aepps.com',
+  accounts: [MemoryAccount({keypair: {secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS'}})],
+}).then(ae => {
+
+  // Interacting with the blockchain client
+
+  ae.height().then(height => {
+    // logs current height
+    console.log('height', height)
+  }).catch(e => {
+    // logs error
+    console.log(e)
+  })
+
+  ae.balance('A_PUB_ADDRESS').then(balance => {
+    // logs current balance of "A_PUB_ADDRESS"
+    console.log('balance', balance)
+  }).catch(e => {
+    // logs error
+    console.log(e)
+  })
+})
+
 ```
-
-4. Start interacting with the blockchain
-
-```js
-ae.then(ae => ae.height()).then(h => console.log(h))
-```
-
-5. **IMPORTANT:** 🤓 Check out the [Usage Documentation] to avoid common pitfalls!
+4. **IMPORTANT:** 🤓 Check out the [Usage Documentation] to avoid common pitfalls!
 
 [Usage Documentation]: docs/usage.md
 
