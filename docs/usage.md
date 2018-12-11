@@ -47,10 +47,12 @@ which translates the subset of ES used by aepp-sdk will have to be used**, such 
 
 1. **Dev Dependencies**: Make sure to do not forget to double check the `devDependencies` of the `package.json` of this SDK, looking for `@babel`/packages that might be helping you to correctly transpile the SDK code `import`ed into your project, as modules.
 
-2. **ES Modules Transpilation**: Include all the need babel package and additional plugins to the `.babelrc` (or `babel.config.js`) of your project, as explained above.
+2. **ES Modules Transpilation**: Include all the babel packages and plugins needed to transpile _your_ code to the `.babelrc` (or `babel.config.js`) of your project.
 
-3. **Bundlers Setup**: Do not forget to allow your bundler (eg. **_webpack_**) to scan the needed files that needs transpilation. This is, for example, what needs to be added, in case you're using babel+webpack:
+3. **Bundlers Setup**: Do not forget to **allow your bundler (eg. _webpack_) to scan the SDK files** that needs transpilation. This will allow your bundler to transpile the SDK `import`ed modules correctly.
 
+
+##### Webpack Example:
 ```js
  // ... webpack config
  entry: {
