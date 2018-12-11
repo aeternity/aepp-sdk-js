@@ -28,6 +28,9 @@ implementations.
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | [options] | `Object` | <code>{}</code> | Initializer object |
+| [options.nativeMode] | `Object` |  | Use Native build of transaction's |
+| [options.url] | `Object` |  | Node url |
+| [options.internalUrl] | `Object` |  | Node internal url |
 
 **Example**  
 ```js

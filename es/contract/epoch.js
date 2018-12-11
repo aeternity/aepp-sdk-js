@@ -73,7 +73,11 @@ const EpochContract = ContractBase.compose(Epoch, {
     contractEpochDecodeData,
     compileEpochContract,
     getContractByteCode
-  }
+  },
+  deepProps: { Ae:
+      { defaults: {
+        options: ''
+      }}}
 })
 
 export default EpochContract
