@@ -2,6 +2,23 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [1.1.0]
+### Added
+- Oracles functionality and flavor
+- Simple example of aepp-in-aepp (see `/examples` folder)
+
+### Changed
+- Fixed issue with big numbers and `TX`
+
+### Removed
+- none
+
+### Breaking Changes
+- none
+
+### Notes and known Issues
+- none
+
 ## [1.0.1]
 ### Added
 - ability to support Epoch range(s) using semver package (see https://www.npmjs.com/package/semver#ranges)
@@ -256,3 +273,4 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 [0.25.0-0.1.1]: https://github.com/aeternity/aepp-sdk-js/compare/v0.25.0-0.1.0...v0.25.0-0.1.1
 [1.0.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.25.0-0.1.0...1.0.0
 [1.0.1]: https://github.com/aeternity/aepp-sdk-js/compare/1.0.0...1.0.1
+[1.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/1.0.0...1.1.0
