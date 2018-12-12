@@ -238,7 +238,7 @@ function calculateFee (fee, txType, { gas = 0, params } = {}) {
     'nameUpdateTx': BASE_GAS,
     'nameClaimTx': BASE_GAS,
     'namePreclaimTx': BASE_GAS,
-    'nameRevokeTx': BASE_GAS,
+    'nameRevokeTx': BASE_GAS
   }
 
   function getGasBySize (size) {
