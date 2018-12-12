@@ -28,9 +28,9 @@ async function balance (address, { height, hash } = {}) {
   return (await this.api.getAccountByPubkey(address, { height, hash })).balance.toString()
 }
 
-async function tx (hash) {
+async function tx (hash, info = false) {
   const tx = await this.api.getTransactionByHash(hash)
-  if (['ContractCreateTx', 'ContractCallTx'].includes(tx.tx.type)) {
+  if (['ContractCreateTx', 'ContractCallTx'].includes(tx.tx.type) && info) {
     return { ...tx, ...await this.getTxInfo(hash) }
   }
   return tx
