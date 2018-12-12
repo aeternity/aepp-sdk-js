@@ -29,7 +29,10 @@ async function balance (address, { height, hash } = {}) {
 }
 
 async function tx (hash) {
-  return { ...await this.api.getTransactionByHash(hash), ...await this.getTxInfo(hash) }
+  const tx = await this.api.getTransactionByHash(hash)
+  if (['ContractCreateTx', 'ContractCallTx'].includes(tx.tx.type))
+    return { ...tx, ......await this.getTxInfo(hash) }
+  return tx
 }
 
 async function height () {

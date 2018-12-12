@@ -126,17 +126,6 @@ async function contractCallTx ({ callerId, nonce, contractId, vmVersion, fee, tt
   return tx
 }
 
-async function contractCallComputeTx ({ callerId, nonce, contractId, vmVersion, fee, ttl, amount, gas, gasPrice, fn, args, call }) {
-  nonce = await (calculateNonce.bind(this)(callerId, nonce))
-  ttl = await (calculateTtl.bind(this)(ttl))
-  fee = this.calculateFee(fee, 'contractCallComputeTx', gas)
-
-  // If we pass `call` make a type-checked call and ignore `fn` and `args` params
-  const callOpt = call ? { call } : { 'function': fn, 'arguments': args }
-
-  return (await this.api.postContractCallCompute({ callerId, contractId, vmVersion, fee: parseInt(fee), amount, gas, gasPrice, nonce, ttl, ...callOpt })).tx
-}
-
 async function oracleRegisterTx ({ accountId, queryFormat, responseFormat, queryFee, oracleTtl, fee, ttl, nonce, vmVersion = ORACLE_VM_VERSION }) {
   nonce = await (calculateNonce.bind(this)(accountId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
@@ -215,7 +204,7 @@ async function calculateNonce (accountId, nonce) {
 /**
  * Select specific account
  * @instance
- * @rtype (fee, txtype, gas = 0) => String
+ * @rtype (fee, txType, gas = 0) => String
  * @param {String|Number} fee - fee
  * @param {String} txType - Transaction type
  * @param {Options} options - Options object
@@ -246,16 +235,11 @@ function calculateFee (fee, txType, { gas = 0, params } = {}) {
   }
 
   if (!fee) {
+    // TODO remove that after implement oracle fee calculation
     if (!params) return this.fee
 
     const txWithOutFee = this[`${txType}Native`](params, false).tx.filter(e => e !== undefined)
     const txSize = encode(txWithOutFee).length
-    // console.log('-----------------------------------------')
-    // console.log('------------' + txType + '-----------------------')
-    // console.log(params)
-    // console.log(txSize)
-    // console.log(TX_FEE_FORMULA[txType] ? TX_FEE_FORMULA[txType] + getGasBySize(txSize) : this.fee)
-    // console.log('///-----------------------------------------/////')
 
     return TX_FEE_FORMULA[txType] ? TX_FEE_FORMULA[txType] + getGasBySize(txSize) : this.fee
   }
@@ -299,7 +283,6 @@ const Transaction = Epoch.compose(Tx, JsTx, {
     nameRevokeTx,
     contractCreateTx,
     contractCallTx,
-    contractCallComputeTx,
     calculateFee,
     oracleRegisterTx,
     oracleExtendTx,
