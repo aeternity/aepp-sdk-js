@@ -432,6 +432,7 @@ export function envKeypair (env) {
  * @return {Array} Array of Buffers containing the original message
  */
 export const decode = RLP.decode
+export const encode = RLP.encode
 
 const OBJECT_TAGS = {
   SIGNED_TX: 11,

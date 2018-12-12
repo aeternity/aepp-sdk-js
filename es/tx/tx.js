@@ -27,13 +27,14 @@ import * as R from 'ramda'
 import Tx from './'
 import JsTx from './js'
 import Epoch from '../epoch'
+import { encode } from '../utils/crypto'
 
 const ORACLE_VM_VERSION = 0
 
 async function spendTx ({ senderId, recipientId, amount, fee, ttl, nonce, payload = '' }) {
   nonce = await (calculateNonce.bind(this)(senderId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
-  fee = this.calculateFee(fee, 'spendTx')
+  fee = this.calculateFee(fee, 'spendTx', { params: R.merge(R.head(arguments), { nonce, ttl }) })
 
   // Build transaction using sdk (if nativeMode) or build on `EPOCH` side
   const { tx } = this.nativeMode
@@ -46,7 +47,7 @@ async function spendTx ({ senderId, recipientId, amount, fee, ttl, nonce, payloa
 async function namePreclaimTx ({ accountId, nonce, commitmentId, fee, ttl }) {
   nonce = await (calculateNonce.bind(this)(accountId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
-  fee = this.calculateFee(fee, 'namePreclaimTx')
+  fee = this.calculateFee(fee, 'namePreclaimTx', { params: R.merge(R.head(arguments), { nonce, ttl }) })
 
   const { tx } = this.nativeMode
     ? this.namePreclaimTxNative(R.merge(R.head(arguments), { nonce, ttl, fee }))
@@ -58,7 +59,7 @@ async function namePreclaimTx ({ accountId, nonce, commitmentId, fee, ttl }) {
 async function nameClaimTx ({ accountId, nonce, name, nameSalt, fee, ttl }) {
   nonce = await (calculateNonce.bind(this)(accountId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
-  fee = this.calculateFee(fee, 'nameClaimTx')
+  fee = this.calculateFee(fee, 'nameClaimTx', { params: R.merge(R.head(arguments), { nonce, ttl }) })
 
   const { tx } = this.nativeMode
     ? this.nameClaimTxNative(R.merge(R.head(arguments), { nonce, ttl, fee }))
@@ -70,7 +71,7 @@ async function nameClaimTx ({ accountId, nonce, name, nameSalt, fee, ttl }) {
 async function nameTransferTx ({ accountId, nonce, nameId, recipientId, fee, ttl }) {
   nonce = await (calculateNonce.bind(this)(accountId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
-  fee = this.calculateFee(fee, 'nameTransferTx')
+  fee = this.calculateFee(fee, 'nameTransferTx', { params: R.merge(R.head(arguments), { nonce, ttl }) })
 
   const { tx } = this.nativeMode
     ? this.nameTransferTxNative(R.merge(R.head(arguments), { recipientId, nonce, ttl, fee }))
@@ -82,7 +83,7 @@ async function nameTransferTx ({ accountId, nonce, nameId, recipientId, fee, ttl
 async function nameUpdateTx ({ accountId, nonce, nameId, nameTtl, pointers, clientTtl, fee, ttl }) {
   nonce = await (calculateNonce.bind(this)(accountId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
-  fee = this.calculateFee(fee, 'nameUpdateTx')
+  fee = this.calculateFee(fee, 'nameUpdateTx', { params: R.merge(R.head(arguments), { nonce, ttl }) })
 
   const { tx } = this.nativeMode
     ? this.nameUpdateTxNative(R.merge(R.head(arguments), { nonce, ttl, fee }))
@@ -94,7 +95,7 @@ async function nameUpdateTx ({ accountId, nonce, nameId, nameTtl, pointers, clie
 async function nameRevokeTx ({ accountId, nonce, nameId, fee, ttl }) {
   nonce = await (calculateNonce.bind(this)(accountId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
-  fee = this.calculateFee(fee, 'nameRevokeTx')
+  fee = this.calculateFee(fee, 'nameRevokeTx', { params: R.merge(R.head(arguments), { nonce, ttl }) })
 
   const { tx } = this.nativeMode
     ? this.nameRevokeTxNative(R.merge(R.head(arguments), { nonce, ttl, fee }))
@@ -106,7 +107,7 @@ async function nameRevokeTx ({ accountId, nonce, nameId, fee, ttl }) {
 async function contractCreateTx ({ ownerId, nonce, code, vmVersion, deposit, amount, gas, gasPrice, fee, ttl, callData }) {
   nonce = await (calculateNonce.bind(this)(ownerId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
-  fee = this.calculateFee(fee, 'contractCreateTx', gas)
+  fee = this.calculateFee(fee, 'contractCreateTx', { gas, params: R.merge(R.head(arguments), { nonce, ttl }) })
 
   return this.nativeMode
     ? this.contractCreateTxNative(R.merge(R.head(arguments), { nonce, ttl, fee }))
@@ -116,7 +117,7 @@ async function contractCreateTx ({ ownerId, nonce, code, vmVersion, deposit, amo
 async function contractCallTx ({ callerId, nonce, contractId, vmVersion, fee, ttl, amount, gas, gasPrice, callData }) {
   nonce = await (calculateNonce.bind(this)(callerId, nonce))
   ttl = await (calculateTtl.bind(this)(ttl))
-  fee = this.calculateFee(fee, 'contractCallTx', gas)
+  fee = this.calculateFee(fee, 'contractCallTx', { gas, params: R.merge(R.head(arguments), { nonce, ttl }) })
 
   const { tx } = this.nativeMode
     ? await this.contractCallTxNative(R.merge(R.head(arguments), { nonce, ttl, fee }))
@@ -217,36 +218,46 @@ async function calculateNonce (accountId, nonce) {
  * @rtype (fee, txtype, gas = 0) => String
  * @param {String|Number} fee - fee
  * @param {String} txType - Transaction type
- * @param {String|Number} gas - Gas amount
+ * @param {Options} options - Options object
+ * @param {String|Number} options.gas - Gas amount
+ * @param {Object} options.params - Tx params
  * @return {String}
  * @example calculateFee(null, 'spendtx')
  */
-function calculateFee (fee, txType, gas = 0) {
-  const BASE_GAS = 20000 // Increase BASE_GAS util we are implemented fee calculation
+function calculateFee (fee, txType, { gas = 0, params } = {}) {
+  const BASE_GAS = 15000
   const GAS_PER_BYTE = 20
-  // MAP WITH TX BYTE SIZE
-  const TX_BYTE_SIZE = {
-    'spendTx': 32 + 32 + 8 + 8 + 8, // sender(32) + recipient(32) + amount(8) + ttl(8) + nonce(8),
-    'contractCreateTx': 32 + 8 + 8 + 8 + 8 + 8 + 8 + 8, // owner(32) + ttl(8) + nonce(8) + vm_version(8) + deposit(8) + amount(8) + gas(8) + gas_price(8)
-    'contractCallTx': 32 + 8 + 8 + 8 + 8 + 8 + 8, // caller(32) + ttl(8) + nonce(8) + vm_version(8) + amount(8) + gas(8) + gas_price(8)
-    'contractCallComputeTx': 32 + 8 + 8 + 8 + 8 + 8 + 8, // caller(32) + ttl(8) + nonce(8) + vm_version(8) + amount(8) + gas(8) + gas_price(8)
-    'nameUpdateTx': 200
-  }
+  const FEE_BYTE_SIZE = 8
+
   // MAP WITH FEE CALCULATION https://github.com/aeternity/protocol/blob/epoch-v1.0.0-rc6/consensus/consensus.md#gas
   const TX_FEE_FORMULA = {
     'spendTx': BASE_GAS,
     'contractCreateTx': 5 * BASE_GAS + gas,
-    'contractCallTx': 5 * BASE_GAS + gas,
-    'contractCallComputeTx': 5 * BASE_GAS + gas,
-    'nameUpdateTx': BASE_GAS
-  }
-  function getGasBySize (size) {
-    return GAS_PER_BYTE * size
+    'contractCallTx': 30 * BASE_GAS + gas,
+    'nameTransferTx': BASE_GAS,
+    'nameUpdateTx': BASE_GAS,
+    'nameClaimTx': BASE_GAS,
+    'namePreclaimTx': BASE_GAS,
+    'nameRevokeTx': BASE_GAS,
   }
 
-  const txSize = TX_BYTE_SIZE[txType]
+  function getGasBySize (size) {
+    return GAS_PER_BYTE * (size + FEE_BYTE_SIZE)
+  }
+
   if (!fee) {
-    return txSize ? TX_FEE_FORMULA[txType] + getGasBySize(txSize) : this.fee
+    if (!params) return this.fee
+
+    const txWithOutFee = this[`${txType}Native`](params, false).tx.filter(e => e !== undefined)
+    const txSize = encode(txWithOutFee).length
+    // console.log('-----------------------------------------')
+    // console.log('------------' + txType + '-----------------------')
+    // console.log(params)
+    // console.log(txSize)
+    // console.log(TX_FEE_FORMULA[txType] ? TX_FEE_FORMULA[txType] + getGasBySize(txSize) : this.fee)
+    // console.log('///-----------------------------------------/////')
+
+    return TX_FEE_FORMULA[txType] ? TX_FEE_FORMULA[txType] + getGasBySize(txSize) : this.fee
   }
   return fee
 }
