@@ -32,6 +32,23 @@ import shajs from 'sha.js'
 const Ecb = aesjs.ModeOfOperation.ecb
 
 /**
+ * Check if address is valid
+ * @rtype (input: String) => valid: Boolean
+ * @param {String} address - Address
+ * @return {Boolean} valid
+ */
+export function isAddressValid (address) {
+  let isValid
+  try {
+    isValid = recipient.slice(0, 3) === 'ak_' &&
+      decodeBase58Check(recipient.slice(3)).length === 32
+  } catch (e) {
+    isValid = false
+  }
+  return isValid
+}
+
+/**
  * Calculate 256bits Blake2b hash of `input`
  * @rtype (input: String) => hash: String
  * @param {String} input - Data to hash
