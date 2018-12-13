@@ -40,8 +40,7 @@ const Ecb = aesjs.ModeOfOperation.ecb
 export function isAddressValid (address) {
   let isValid
   try {
-    isValid = recipient.slice(0, 3) === 'ak_' &&
-      decodeBase58Check(recipient.slice(3)).length === 32
+    isValid = decodeBase58Check(assertedType(address, 'ak')).length === 32
   } catch (e) {
     isValid = false
   }
