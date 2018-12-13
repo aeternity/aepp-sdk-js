@@ -65,6 +65,7 @@ async function call (code, abi, address, name, { args = '()', options = {}, call
 
   if (result.returnType === 'ok') {
     return {
+      hash,
       result,
       decode: (type) => this.contractDecodeData(type, result.returnValue)
     }
