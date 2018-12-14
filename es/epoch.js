@@ -79,14 +79,18 @@ const Epoch = stampit({
       swag: await remoteSwag(url),
       urlFor: loader({ url, internalUrl })
     })
+  },
+  props: {
+    nodeNetworkId: null
   }
 }, Swagger, {
   async init ({ forceCompatibility }) {
-    const { nodeVersion: version, nodeRevision: revision, genesisKeyBlockHash: genesisHash } = await this.api.getStatus()
+    const { nodeVersion: version, nodeRevision: revision, genesisKeyBlockHash: genesisHash, networkId } = await this.api.getStatus()
     if (!semver.satisfies(version, COMPATIBILITY_RANGE)) throw new Error(`Unsupported epoch version ${version}. Supported: ${COMPATIBILITY_RANGE}`)
     // TODO:
     // We should not get the node version from getStatus
     // but read the version that we get from "URL/api" > info > version
+    this.nodeNetworkId = networkId
     return Object.assign(this, { version, revision, genesisHash })
   }
 })

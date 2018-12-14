@@ -26,6 +26,8 @@ import stampit from '@stamp/it'
 import { required } from '@stamp/required'
 import * as Crypto from '../utils/crypto'
 
+const DEFAULT_NETWORK_ID = `ae_mainnet`
+
 /**
  * Sign encoded transaction
  * @instance
@@ -35,9 +37,10 @@ import * as Crypto from '../utils/crypto'
  * @return {String} Signed transaction
  */
 async function signTransaction (tx) {
+  const networkId = this.networkId || this.nodeNetworkId || DEFAULT_NETWORK_ID
   const binaryTx = Crypto.decodeBase64Check(Crypto.assertedType(tx, 'tx'))
   // Prepend `NETWORK_ID` to begin of data binary
-  const txWithNetworkId = Buffer.concat([Buffer.from(this.networkId), binaryTx])
+  const txWithNetworkId = Buffer.concat([Buffer.from(networkId), binaryTx])
 
   const sig = await this.sign(txWithNetworkId)
   return Crypto.encodeTx(Crypto.prepareTx(sig, binaryTx))
@@ -60,7 +63,7 @@ async function signTransaction (tx) {
  * @return {Object} Account instance
  */
 const Account = stampit({
-  init ({ networkId = 'ae_mainnet' }) { // NETWORK_ID using for signing transaction's
+  init ({ networkId }) { // NETWORK_ID using for signing transaction's
     this.networkId = networkId
   },
   methods: { signTransaction },

@@ -98,7 +98,7 @@ describe('Contract', function () {
   })
 
   it('calls deployed contracts static', async () => {
-    const result = await deployed.call('main', { args: '42' })
+    const result = await deployed.callStatic('main', { args: '42' })
     return result.decode('int').should.eventually.become({
       type: 'word',
       value: 42

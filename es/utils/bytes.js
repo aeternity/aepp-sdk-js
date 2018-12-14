@@ -71,6 +71,7 @@ export function toBytes (val, big = false) {
   // If the value is an int it will be encoded as bytes big endian
   // Raises ValueError if the input is not an int or string
 
+  if (val === undefined) return undefined
   if (Number.isInteger(val) || BigNumber.isBigNumber(val) || big) {
     if (!BigNumber.isBigNumber(val)) val = BigNumber(val)
     return bigNumberToByteArray(val)
