@@ -38,7 +38,6 @@ const DEFAULT_NETWORK_ID = `ae_mainnet`
  */
 async function signTransaction (tx) {
   const networkId = this.networkId || this.nodeNetworkId || DEFAULT_NETWORK_ID
-  console.log(networkId)
   const binaryTx = Crypto.decodeBase64Check(Crypto.assertedType(tx, 'tx'))
   // Prepend `NETWORK_ID` to begin of data binary
   const txWithNetworkId = Buffer.concat([Buffer.from(networkId), binaryTx])
