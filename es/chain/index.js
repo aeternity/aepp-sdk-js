@@ -164,4 +164,55 @@ const Chain = stampit({
  * @return {String[]} Transactions
  */
 
+/**
+ * Obtain current generation
+ * @function getCurrentGeneration
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype () => generation: Object
+ * @return {Object} Current Generation
+ */
+
+/**
+ * Get generation by hash or height
+ * @function getGeneration
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype (hashOrHeight) => generation: Object
+ * @param {String|Number} hashOrHeight - Generation hash or height
+ * @return {Object} Generation
+ */
+
+/**
+ * Get micro block transactions
+ * @function getMicroBlockTransactions
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype (hash) => txs: [...Object]
+ * @return {Object[]} Transactions
+ */
+
+/**
+ * Get key block
+ * @function getKeyBlock
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype (hashOrHeight) => keyBlock: Object
+ * @return {Object} Key Block
+ */
+
+/**
+ * Get micro block header
+ * @function getMicroBlockHeader
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype (hash) => header: Object
+ * @return {Object} Micro block header
+ */
+
 export default Chain

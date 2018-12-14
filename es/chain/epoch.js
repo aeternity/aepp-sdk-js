@@ -31,7 +31,11 @@ async function balance (address, { height, hash } = {}) {
 async function tx (hash, info = false) {
   const tx = await this.api.getTransactionByHash(hash)
   if (['ContractCreateTx', 'ContractCallTx'].includes(tx.tx.type) && info) {
-    return { ...tx, ...await this.getTxInfo(hash) }
+    try {
+      return { ...tx, ...await this.getTxInfo(hash) }
+    } catch (e) {
+      return tx
+    }
   }
   return tx
 }
@@ -94,6 +98,30 @@ async function mempool () {
   return this.api.getPendingTransactions()
 }
 
+async function getCurrentGeneration () {
+  return this.api.getCurrentGeneration()
+}
+
+async function getGeneration (hashOrHeight) {
+  if (typeof hashOrHeight === 'string') return this.api.getGenerationByHash(hashOrHeight)
+  if (typeof hashOrHeight === 'number') return this.api.getGenerationByHeight(hashOrHeight)
+  throw new Error('Invalid param, param must be hash or height')
+}
+
+async function getMicroBlockTransactions (hash) {
+  return (await this.api.getMicroBlockTransactionsByHash(hash)).transactions
+}
+
+async function getKeyBlock (hashOrHeight) {
+  if (typeof hashOrHeight === 'string') return this.api.getKeyBlockByHash(hashOrHeight)
+  if (typeof hashOrHeight === 'number') return this.api.getKeyBlockByHeight(hashOrHeight)
+  throw new Error('Invalid param, param must be hash or height')
+}
+
+async function getMicroBlockHeader (hash) {
+  return this.api.getMicroBlockHeaderByHash(hash)
+}
+
 const EpochChain = Chain.compose(Epoch, {
   methods: {
     sendTransaction,
@@ -104,7 +132,12 @@ const EpochChain = Chain.compose(Epoch, {
     awaitHeight,
     poll,
     getTxInfo,
-    mempool
+    mempool,
+    getCurrentGeneration,
+    getGeneration,
+    getMicroBlockHeader,
+    getMicroBlockTransactions,
+    getKeyBlock
   }
 })
 
