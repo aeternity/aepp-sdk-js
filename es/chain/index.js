@@ -76,10 +76,10 @@ const Chain = stampit({
  * @instance
  * @abstract
  * @category async
- * @rtype (tx: String, options?: Object) => tx: Promise[String]|txHash: Promise[String]
+ * @rtype (tx: String, options?: Object) => tx: Promise[Object]|txHash: Promise[String]
  * @param {String} tx - Transaction to submit
  * @param {String} [options={}] - Options to pass to the implementation
- * @return {String|String} Transaction or transaction hash
+ * @return {Object|String} Transaction or transaction hash
  */
 
 /**
@@ -111,11 +111,11 @@ const Chain = stampit({
  * @instance
  * @abstract
  * @category async
- * @rtype (th: String, options?: Object) => tx: String
+ * @rtype (th: String, options?: Object) => tx: Object
  * @param {Object} [options={}] - Options
  * @param {Number} options.interval - Interval (in ms) at which to poll the chain
  * @param {Number} options.blocks - Number of blocks mined after which to fail
- * @return {String} The transaction as it was mined
+ * @return {Object} The transaction as it was mined
  */
 
 /**
@@ -129,7 +129,7 @@ const Chain = stampit({
  * @param {Object} [options={}] - Options
  * @param {Number} options.height - The chain height at which to obtain the balance for (default: top of chain)
  * @param {String} options.hash - TODO
- * @return {String} The transaction as it was mined
+ * @return {Object} The transaction as it was mined
  */
 
 /**
@@ -138,9 +138,10 @@ const Chain = stampit({
  * @instance
  * @abstract
  * @category async
- * @rtype (hash: String) => tx: String
+ * @rtype (hash: String, info = false) => tx: Object
  * @param {String} hash - Transaction hash
- * @return {String} Transaction
+ * @param {Boolean} info - Retrieve additional transaction date. Works only for (ContractCreate and ContractCall transaction's)
+ * @return {Object} Transaction
  */
 
 /**
@@ -149,9 +150,9 @@ const Chain = stampit({
  * @instance
  * @abstract
  * @category async
- * @rtype (hash: String) => tx: String
+ * @rtype (hash: String) => tx: Object
  * @param {String} hash - Transaction hash
- * @return {String} Transaction
+ * @return {Object} Transaction
  */
 
 /**
@@ -160,8 +161,8 @@ const Chain = stampit({
  * @instance
  * @abstract
  * @category async
- * @rtype () => txs: [...String]
- * @return {String[]} Transactions
+ * @rtype () => txs: [...Object]
+ * @return {Object[]} Transactions
  */
 
 /**
