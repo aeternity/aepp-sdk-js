@@ -27,13 +27,13 @@ import * as R from 'ramda'
 import Tx from './'
 import JsTx from './js'
 import Epoch from '../epoch'
+import { encode } from '../utils/crypto'
 
 const ORACLE_VM_VERSION = 0
 
-async function spendTx ({ senderId, recipientId, amount, fee, ttl, nonce, payload = '' }) {
-  nonce = await (calculateNonce.bind(this)(senderId, nonce))
-  ttl = await (calculateTtl.bind(this)(ttl))
-  fee = this.calculateFee(fee, 'spendTx')
+async function spendTx ({ senderId, recipientId, amount, payload = '' }) {
+  // Calculate fee, get absolute ttl (ttl + height), get account nonce
+  const { fee, ttl, nonce } = await this.prepareTxParams('spendTx', { senderId, ...R.head(arguments) })
 
   // Build transaction using sdk (if nativeMode) or build on `EPOCH` side
   const { tx } = this.nativeMode
@@ -43,11 +43,11 @@ async function spendTx ({ senderId, recipientId, amount, fee, ttl, nonce, payloa
   return tx
 }
 
-async function namePreclaimTx ({ accountId, nonce, commitmentId, fee, ttl }) {
-  nonce = await (calculateNonce.bind(this)(accountId, nonce))
-  ttl = await (calculateTtl.bind(this)(ttl))
-  fee = this.calculateFee(fee, 'namePreclaimTx')
+async function namePreclaimTx ({ accountId, commitmentId }) {
+  // Calculate fee, get absolute ttl (ttl + height), get account nonce
+  const { fee, ttl, nonce } = await this.prepareTxParams('namePreclaimTx', { senderId: accountId, ...R.head(arguments) })
 
+  // Build transaction using sdk (if nativeMode) or build on `EPOCH` side
   const { tx } = this.nativeMode
     ? this.namePreclaimTxNative(R.merge(R.head(arguments), { nonce, ttl, fee }))
     : await this.api.postNamePreclaim(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
@@ -55,11 +55,11 @@ async function namePreclaimTx ({ accountId, nonce, commitmentId, fee, ttl }) {
   return tx
 }
 
-async function nameClaimTx ({ accountId, nonce, name, nameSalt, fee, ttl }) {
-  nonce = await (calculateNonce.bind(this)(accountId, nonce))
-  ttl = await (calculateTtl.bind(this)(ttl))
-  fee = this.calculateFee(fee, 'nameClaimTx')
+async function nameClaimTx ({ accountId, name, nameSalt }) {
+  // Calculate fee, get absolute ttl (ttl + height), get account nonce
+  const { fee, ttl, nonce } = await this.prepareTxParams('nameClaimTx', { senderId: accountId, ...R.head(arguments) })
 
+  // Build transaction using sdk (if nativeMode) or build on `EPOCH` side
   const { tx } = this.nativeMode
     ? this.nameClaimTxNative(R.merge(R.head(arguments), { nonce, ttl, fee }))
     : await this.api.postNameClaim(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
@@ -67,11 +67,11 @@ async function nameClaimTx ({ accountId, nonce, name, nameSalt, fee, ttl }) {
   return tx
 }
 
-async function nameTransferTx ({ accountId, nonce, nameId, recipientId, fee, ttl }) {
-  nonce = await (calculateNonce.bind(this)(accountId, nonce))
-  ttl = await (calculateTtl.bind(this)(ttl))
-  fee = this.calculateFee(fee, 'nameTransferTx')
+async function nameTransferTx ({ accountId, nameId, recipientId }) {
+  // Calculate fee, get absolute ttl (ttl + height), get account nonce
+  const { fee, ttl, nonce } = await this.prepareTxParams('nameTransferTx', { senderId: accountId, ...R.head(arguments) })
 
+  // Build transaction using sdk (if nativeMode) or build on `EPOCH` side
   const { tx } = this.nativeMode
     ? this.nameTransferTxNative(R.merge(R.head(arguments), { recipientId, nonce, ttl, fee }))
     : await this.api.postNameTransfer(R.merge(R.head(arguments), { recipientId, nonce, ttl, fee: parseInt(fee) }))
@@ -79,11 +79,11 @@ async function nameTransferTx ({ accountId, nonce, nameId, recipientId, fee, ttl
   return tx
 }
 
-async function nameUpdateTx ({ accountId, nonce, nameId, nameTtl, pointers, clientTtl, fee, ttl }) {
-  nonce = await (calculateNonce.bind(this)(accountId, nonce))
-  ttl = await (calculateTtl.bind(this)(ttl))
-  fee = this.calculateFee(fee, 'nameUpdateTx')
+async function nameUpdateTx ({ accountId, nameId, nameTtl, pointers, clientTtl }) {
+  // Calculate fee, get absolute ttl (ttl + height), get account nonce
+  const { fee, ttl, nonce } = await this.prepareTxParams('nameUpdateTx', { senderId: accountId, ...R.head(arguments) })
 
+  // Build transaction using sdk (if nativeMode) or build on `EPOCH` side
   const { tx } = this.nativeMode
     ? this.nameUpdateTxNative(R.merge(R.head(arguments), { nonce, ttl, fee }))
     : await this.api.postNameUpdate(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
@@ -91,11 +91,11 @@ async function nameUpdateTx ({ accountId, nonce, nameId, nameTtl, pointers, clie
   return tx
 }
 
-async function nameRevokeTx ({ accountId, nonce, nameId, fee, ttl }) {
-  nonce = await (calculateNonce.bind(this)(accountId, nonce))
-  ttl = await (calculateTtl.bind(this)(ttl))
-  fee = this.calculateFee(fee, 'nameRevokeTx')
+async function nameRevokeTx ({ accountId, nameId }) {
+  // Calculate fee, get absolute ttl (ttl + height), get account nonce
+  const { fee, ttl, nonce } = await this.prepareTxParams('nameRevokeTx', { senderId: accountId, ...R.head(arguments) })
 
+  // Build transaction using sdk (if nativeMode) or build on `EPOCH` side
   const { tx } = this.nativeMode
     ? this.nameRevokeTxNative(R.merge(R.head(arguments), { nonce, ttl, fee }))
     : await this.api.postNameRevoke(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
@@ -103,21 +103,21 @@ async function nameRevokeTx ({ accountId, nonce, nameId, fee, ttl }) {
   return tx
 }
 
-async function contractCreateTx ({ ownerId, nonce, code, vmVersion, deposit, amount, gas, gasPrice, fee, ttl, callData }) {
-  nonce = await (calculateNonce.bind(this)(ownerId, nonce))
-  ttl = await (calculateTtl.bind(this)(ttl))
-  fee = this.calculateFee(fee, 'contractCreateTx', gas)
+async function contractCreateTx ({ ownerId, code, vmVersion, deposit, amount, gas, gasPrice, callData }) {
+  // Calculate fee, get absolute ttl (ttl + height), get account nonce
+  const { fee, ttl, nonce } = await this.prepareTxParams('contractCreateTx', { senderId: ownerId, ...R.head(arguments) })
 
+  // Build transaction using sdk (if nativeMode) or build on `EPOCH` side
   return this.nativeMode
     ? this.contractCreateTxNative(R.merge(R.head(arguments), { nonce, ttl, fee }))
     : this.api.postContractCreate(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee), gas: parseInt(gas) }))
 }
 
-async function contractCallTx ({ callerId, nonce, contractId, vmVersion, fee, ttl, amount, gas, gasPrice, callData }) {
-  nonce = await (calculateNonce.bind(this)(callerId, nonce))
-  ttl = await (calculateTtl.bind(this)(ttl))
-  fee = this.calculateFee(fee, 'contractCallTx', gas)
+async function contractCallTx ({ callerId, contractId, vmVersion, amount, gas, gasPrice, callData }) {
+  // Calculate fee, get absolute ttl (ttl + height), get account nonce
+  const { fee, ttl, nonce } = await this.prepareTxParams('contractCallTx', { senderId: callerId, ...R.head(arguments) })
 
+  // Build transaction using sdk (if nativeMode) or build on `EPOCH` side
   const { tx } = this.nativeMode
     ? await this.contractCallTxNative(R.merge(R.head(arguments), { nonce, ttl, fee }))
     : await this.api.postContractCall(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee), gas: parseInt(gas) }))
@@ -125,22 +125,11 @@ async function contractCallTx ({ callerId, nonce, contractId, vmVersion, fee, tt
   return tx
 }
 
-async function contractCallComputeTx ({ callerId, nonce, contractId, vmVersion, fee, ttl, amount, gas, gasPrice, fn, args, call }) {
-  nonce = await (calculateNonce.bind(this)(callerId, nonce))
-  ttl = await (calculateTtl.bind(this)(ttl))
-  fee = this.calculateFee(fee, 'contractCallComputeTx', gas)
+async function oracleRegisterTx ({ accountId, queryFormat, responseFormat, queryFee, oracleTtl, vmVersion = ORACLE_VM_VERSION }) {
+  // Calculate fee, get absolute ttl (ttl + height), get account nonce
+  const { fee, ttl, nonce } = await this.prepareTxParams('oracleRegisterTx', { senderId: accountId, ...R.head(arguments) })
 
-  // If we pass `call` make a type-checked call and ignore `fn` and `args` params
-  const callOpt = call ? { call } : { 'function': fn, 'arguments': args }
-
-  return (await this.api.postContractCallCompute({ callerId, contractId, vmVersion, fee: parseInt(fee), amount, gas, gasPrice, nonce, ttl, ...callOpt })).tx
-}
-
-async function oracleRegisterTx ({ accountId, queryFormat, responseFormat, queryFee, oracleTtl, fee, ttl, nonce, vmVersion = ORACLE_VM_VERSION }) {
-  nonce = await (calculateNonce.bind(this)(accountId, nonce))
-  ttl = await (calculateTtl.bind(this)(ttl))
-  fee = this.calculateFee(fee, 'oracleRegisterTx')
-
+  // Build transaction using sdk (if nativeMode) or build on `EPOCH` side
   const { tx } = this.nativeMode
     ? await this.oracleRegisterTxNative({ accountId, queryFee, vmVersion, fee, oracleTtl, nonce, ttl, queryFormat, responseFormat })
     : await this.api.postOracleRegister({ accountId, queryFee, vmVersion, fee: parseInt(fee), oracleTtl, nonce, ttl, queryFormat, responseFormat })
@@ -148,11 +137,11 @@ async function oracleRegisterTx ({ accountId, queryFormat, responseFormat, query
   return tx
 }
 
-async function oracleExtendTx ({ oracleId, callerId, fee, oracleTtl, nonce, ttl }) {
-  nonce = await (calculateNonce.bind(this)(callerId, nonce))
-  ttl = await (calculateTtl.bind(this)(ttl))
-  fee = this.calculateFee(fee, 'oracleExtendTx')
+async function oracleExtendTx ({ oracleId, callerId, oracleTtl }) {
+  // Calculate fee, get absolute ttl (ttl + height), get account nonce
+  const { fee, ttl, nonce } = await this.prepareTxParams('oracleExtendTx', { senderId: callerId, ...R.head(arguments) })
 
+  // Build transaction using sdk (if nativeMode) or build on `EPOCH` side
   const { tx } = this.nativeMode
     ? await this.oracleExtendTxNative({ oracleId, fee, oracleTtl, nonce, ttl })
     : await this.api.postOracleExtend({ oracleId, fee: parseInt(fee), oracleTtl, nonce, ttl })
@@ -160,11 +149,11 @@ async function oracleExtendTx ({ oracleId, callerId, fee, oracleTtl, nonce, ttl 
   return tx
 }
 
-async function oraclePostQueryTx ({ oracleId, responseTtl, query, queryTtl, fee, queryFee, ttl, nonce, senderId }) {
-  nonce = await (calculateNonce.bind(this)(senderId, nonce))
-  ttl = await (calculateTtl.bind(this)(ttl))
-  fee = this.calculateFee(fee, 'oraclePostQueryTx')
+async function oraclePostQueryTx ({ oracleId, responseTtl, query, queryTtl, queryFee, senderId }) {
+  // Calculate fee, get absolute ttl (ttl + height), get account nonce
+  const { fee, ttl, nonce } = await this.prepareTxParams('oraclePostQueryTx', { senderId, ...R.head(arguments) })
 
+  // Build transaction using sdk (if nativeMode) or build on `EPOCH` side
   const { tx } = this.nativeMode
     ? await this.oraclePostQueryTxNative({ oracleId, responseTtl, query, queryTtl, fee, queryFee, ttl, nonce, senderId })
     : await this.api.postOracleQuery({ oracleId, responseTtl, query, queryTtl, fee: parseInt(fee), queryFee, ttl, nonce, senderId })
@@ -172,11 +161,11 @@ async function oraclePostQueryTx ({ oracleId, responseTtl, query, queryTtl, fee,
   return { tx, queryId: this.oracleQueryId(senderId, nonce, oracleId) }
 }
 
-async function oracleRespondTx ({ oracleId, callerId, responseTtl, queryId, response, fee, ttl, nonce }) {
-  nonce = await (calculateNonce.bind(this)(callerId, nonce))
-  ttl = await (calculateTtl.bind(this)(ttl))
-  fee = this.calculateFee(fee, 'oracleRespondTx')
+async function oracleRespondTx ({ oracleId, callerId, responseTtl, queryId, response }) {
+  // Calculate fee, get absolute ttl (ttl + height), get account nonce
+  const { fee, ttl, nonce } = await this.prepareTxParams('oracleRespondQueryTx', { senderId: callerId, ...R.head(arguments) })
 
+  // Build transaction using sdk (if nativeMode) or build on `EPOCH` side
   const { tx } = this.nativeMode
     ? await this.oracleRespondQueryTxNative({ oracleId, responseTtl, queryId, response, fee, ttl, nonce })
     : await this.api.postOracleRespond({ oracleId, responseTtl, queryId, response, fee: parseInt(fee), ttl, nonce })
@@ -212,41 +201,60 @@ async function calculateNonce (accountId, nonce) {
 }
 
 /**
- * Select specific account
+ * Calculate fee, get absolute ttl (ttl + height), get account nonce
+ *
+ * @param {String} txType Type of transaction
+ * @param {Object} params Object which contains all tx data
+ * @return {Object} { ttl, nonce, fee } Object with account nonce, absolute ttl and transaction fee
+ */
+async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, gas }) {
+  const nonce = await (calculateNonce.bind(this)(senderId, n))
+  const ttl = await (calculateTtl.bind(this)(t))
+  const fee = this.calculateFee(f, txType, { gas, params: R.merge(R.last(arguments), { nonce, ttl }) })
+  return { fee, ttl, nonce }
+}
+
+/**
+ * Calculate fee
  * @instance
- * @rtype (fee, txtype, gas = 0) => String
+ * @rtype (fee, txType, gas = 0) => String
  * @param {String|Number} fee - fee
  * @param {String} txType - Transaction type
- * @param {String|Number} gas - Gas amount
+ * @param {Options} options - Options object
+ * @param {String|Number} options.gas - Gas amount
+ * @param {Object} options.params - Tx params
  * @return {String}
  * @example calculateFee(null, 'spendtx')
  */
-function calculateFee (fee, txType, gas = 0) {
-  const BASE_GAS = 20000 // Increase BASE_GAS util we are implemented fee calculation
+function calculateFee (fee, txType, { gas = 0, params } = {}) {
+  const BASE_GAS = 15000
   const GAS_PER_BYTE = 20
-  // MAP WITH TX BYTE SIZE
-  const TX_BYTE_SIZE = {
-    'spendTx': 32 + 32 + 8 + 8 + 8, // sender(32) + recipient(32) + amount(8) + ttl(8) + nonce(8),
-    'contractCreateTx': 32 + 8 + 8 + 8 + 8 + 8 + 8 + 8, // owner(32) + ttl(8) + nonce(8) + vm_version(8) + deposit(8) + amount(8) + gas(8) + gas_price(8)
-    'contractCallTx': 32 + 8 + 8 + 8 + 8 + 8 + 8, // caller(32) + ttl(8) + nonce(8) + vm_version(8) + amount(8) + gas(8) + gas_price(8)
-    'contractCallComputeTx': 32 + 8 + 8 + 8 + 8 + 8 + 8, // caller(32) + ttl(8) + nonce(8) + vm_version(8) + amount(8) + gas(8) + gas_price(8)
-    'nameUpdateTx': 200
-  }
+  const FEE_BYTE_SIZE = 8
+
   // MAP WITH FEE CALCULATION https://github.com/aeternity/protocol/blob/epoch-v1.0.0-rc6/consensus/consensus.md#gas
   const TX_FEE_FORMULA = {
     'spendTx': BASE_GAS,
     'contractCreateTx': 5 * BASE_GAS + gas,
-    'contractCallTx': 5 * BASE_GAS + gas,
-    'contractCallComputeTx': 5 * BASE_GAS + gas,
-    'nameUpdateTx': BASE_GAS
-  }
-  function getGasBySize (size) {
-    return GAS_PER_BYTE * size
+    'contractCallTx': 30 * BASE_GAS + gas,
+    'nameTransferTx': BASE_GAS,
+    'nameUpdateTx': BASE_GAS,
+    'nameClaimTx': BASE_GAS,
+    'namePreclaimTx': BASE_GAS,
+    'nameRevokeTx': BASE_GAS
   }
 
-  const txSize = TX_BYTE_SIZE[txType]
+  function getGasBySize (size) {
+    return GAS_PER_BYTE * (size + FEE_BYTE_SIZE)
+  }
+
   if (!fee) {
-    return txSize ? TX_FEE_FORMULA[txType] + getGasBySize(txSize) : this.fee
+    // TODO remove that after implement oracle fee calculation
+    if (!params) return this.fee
+
+    const txWithOutFee = this[`${txType}Native`](params, false).tx.filter(e => e !== undefined)
+    const txSize = encode(txWithOutFee).length
+
+    return TX_FEE_FORMULA[txType] ? TX_FEE_FORMULA[txType] + getGasBySize(txSize) : this.fee
   }
   return fee
 }
@@ -288,8 +296,8 @@ const Transaction = Epoch.compose(Tx, JsTx, {
     nameRevokeTx,
     contractCreateTx,
     contractCallTx,
-    contractCallComputeTx,
     calculateFee,
+    prepareTxParams,
     oracleRegisterTx,
     oracleExtendTx,
     oraclePostQueryTx,

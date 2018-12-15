@@ -24,7 +24,6 @@ import { ready } from './index'
 const nonce = 1
 const nameTtl = 1
 const clientTtl = 1
-const fee = 20000
 const amount = 1
 const senderId = 'ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688'
 const recipientId = 'ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688'
@@ -80,14 +79,14 @@ describe('Native Transaction', function () {
   })
 
   it('native build of spend tx', async () => {
-    const txFromAPI = await client.spendTx({ senderId, recipientId, amount, fee, nonce, payload: 'test' })
-    const nativeTx = await clientNative.spendTx({ senderId, recipientId, amount, fee, nonce, payload: 'test' })
+    const txFromAPI = await client.spendTx({ senderId, recipientId, amount, nonce, payload: 'test' })
+    const nativeTx = await clientNative.spendTx({ senderId, recipientId, amount, nonce, payload: 'test' })
     txFromAPI.should.be.equal(nativeTx)
   })
 
   it('native build of name pre-claim tx', async () => {
-    const txFromAPI = await client.namePreclaimTx({ accountId: senderId, nonce, fee, commitmentId })
-    const nativeTx = await clientNative.namePreclaimTx( {accountId: senderId, nonce, fee, commitmentId })
+    const txFromAPI = await client.namePreclaimTx({ accountId: senderId, nonce, commitmentId })
+    const nativeTx = await clientNative.namePreclaimTx( {accountId: senderId, nonce, commitmentId })
     txFromAPI.should.be.equal(nativeTx)
   })
 
@@ -97,33 +96,31 @@ describe('Native Transaction', function () {
       nonce,
       name: nameHash,
       nameSalt: _salt,
-      fee
     })
     const nativeTx = await clientNative.nameClaimTx({
       accountId: senderId,
       nonce,
       name: nameHash,
       nameSalt: _salt,
-      fee
     })
     txFromAPI.should.be.equal(nativeTx)
   })
 
   it('native build of update tx', async () => {
-    const nativeTx = await clientNative.nameUpdateTx({ accountId: senderId, nonce, nameId, nameTtl, pointers, clientTtl, fee })
-    const txFromAPI = await client.nameUpdateTx({ accountId: senderId, nonce, nameId, nameTtl, pointers, clientTtl, fee })
+    const nativeTx = await clientNative.nameUpdateTx({ accountId: senderId, nonce, nameId, nameTtl, pointers, clientTtl })
+    const txFromAPI = await client.nameUpdateTx({ accountId: senderId, nonce, nameId, nameTtl, pointers, clientTtl })
     txFromAPI.should.be.equal(nativeTx)
   })
 
   it('native build of revoke tx', async () => {
-    const txFromAPI = await client.nameRevokeTx({ accountId: senderId, nonce, nameId, fee })
-    const nativeTx = await clientNative.nameRevokeTx({ accountId: senderId, nonce, nameId, fee })
+    const txFromAPI = await client.nameRevokeTx({ accountId: senderId, nonce, nameId })
+    const nativeTx = await clientNative.nameRevokeTx({ accountId: senderId, nonce, nameId })
     txFromAPI.should.be.equal(nativeTx)
   })
 
   it('native build of transfer tx', async () => {
-    const txFromAPI = await client.nameTransferTx({ accountId: senderId, nonce, nameId, recipientId, fee })
-    const nativeTx = await clientNative.nameTransferTx({ accountId: senderId, nonce, nameId, recipientId, fee })
+    const txFromAPI = await client.nameTransferTx({ accountId: senderId, nonce, nameId, recipientId })
+    const nativeTx = await clientNative.nameTransferTx({ accountId: senderId, nonce, nameId, recipientId })
     txFromAPI.should.be.equal(nativeTx)
   })
 
@@ -196,7 +193,7 @@ describe('Native Transaction', function () {
   it('native build of oracle post query tx', async () => {
     const senderId = await client.address()
 
-    const params = { oracleId, responseTtl, query, queryTtl, queryFee, senderId, fee }
+    const params = { oracleId, responseTtl, query, queryTtl, queryFee, senderId }
 
     const { tx: txFromAPI, queryId: oracleQueryId } = await client.oraclePostQueryTx(params)
     const { tx: nativeTx } = await clientNative.oraclePostQueryTx(params)
@@ -212,7 +209,7 @@ describe('Native Transaction', function () {
 
   it('native build of oracle respond query tx', async () => {
     const callerId = await client.address()
-    const params = { oracleId, callerId, responseTtl, queryId, response: queryResponse, fee}
+    const params = { oracleId, callerId, responseTtl, queryId, response: queryResponse}
 
     const txFromAPI = await client.oracleRespondTx(params)
     const nativeTx = await clientNative.oracleRespondTx(params)
