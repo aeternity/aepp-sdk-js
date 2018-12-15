@@ -143,7 +143,7 @@ export function decodeBase64Check (str) {
  * @return {Buffer} Base58 encoded data
  */
 export function encodeBase58Check (input) {
-  return bs58check.encode(input)
+  return bs58check.encode(Buffer.from(input))
 }
 
 /**
