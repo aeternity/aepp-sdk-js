@@ -81,7 +81,7 @@ const Epoch = stampit({
     })
   },
   props: {
-    networkId: null
+    nodeNetworkId: null
   }
 }, Swagger, {
   async init ({ forceCompatibility }) {
@@ -90,7 +90,7 @@ const Epoch = stampit({
     // TODO:
     // We should not get the node version from getStatus
     // but read the version that we get from "URL/api" > info > version
-    this.networkId = networkId
+    this.nodeNetworkId = networkId
     return Object.assign(this, { version, revision, genesisHash })
   }
 })

@@ -64,7 +64,9 @@ async function signTransaction (tx) {
  */
 const Account = stampit({
   init ({ networkId }) { // NETWORK_ID using for signing transaction's
-    this.networkId = networkId
+    if (!this.networkId && networkId) {
+      this.networkId = networkId
+    }
   },
   methods: { signTransaction },
   deepConf: {
