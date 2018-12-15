@@ -4,10 +4,13 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [1.1.2]
 ### Added
-- none
+- isAddressValid check
 
 ### Changed
-- todo
+- Compatibility with Epoch >= 1.0.0 and <= 1.1.0
+- Fixed networkId propagation (and overriding on init of Flavors)
+- Tx Fee formulas
+- Fixed encodeBase58Check by feeding Buffered input
 
 ### Removed
 - none
