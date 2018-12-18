@@ -12,6 +12,8 @@ import * as Crypto from '@aeternity/aepp-sdk/es/utils/crypto'
     * _static_
         * [.decode](#module_@aeternity/aepp-sdk/es/utils/crypto.decode) ⇒ `Array`
         * [.isAddressValid(address)](#module_@aeternity/aepp-sdk/es/utils/crypto.isAddressValid) ⇒ `Boolean`
+        * [.addressToHex(base58CheckAddress)](#module_@aeternity/aepp-sdk/es/utils/crypto.addressToHex) ⇒ `String`
+        * [.addressFromDecimal(decimalAddress)](#module_@aeternity/aepp-sdk/es/utils/crypto.addressFromDecimal) ⇒ `String`
         * [.hash(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.hash) ⇒ `String`
         * [.nameId(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.nameId) ⇒ `String`
         * [.sha256hash(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.sha256hash) ⇒ `String`
@@ -68,6 +70,32 @@ Check if address is valid
 | Param | Type | Description |
 | --- | --- | --- |
 | address | `String` | Address |
+
+<a id="module_@aeternity/aepp-sdk/es/utils/crypto.addressToHex"></a>
+
+### @aeternity/aepp-sdk/es/utils/crypto.addressToHex(base58CheckAddress) ⇒ `String`
+Convert base58Check address to hex string
+
+**Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
+**Returns**: `String` - Hex string  
+**rtype**: `(base58CheckAddress: String) => hexAddress: String`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| base58CheckAddress | `String` | Address |
+
+<a id="module_@aeternity/aepp-sdk/es/utils/crypto.addressFromDecimal"></a>
+
+### @aeternity/aepp-sdk/es/utils/crypto.addressFromDecimal(decimalAddress) ⇒ `String`
+Parse decimal address and return base58Check encoded address with prefix 'ak'
+
+**Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
+**Returns**: `String` - address  
+**rtype**: `(input: String) => address: String`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| decimalAddress | `String` | Address |
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.hash"></a>
 
