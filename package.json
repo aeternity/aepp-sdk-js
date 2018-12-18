@@ -15,8 +15,8 @@
     "test:watch": "mocha --recursive --require @babel/register --watch",
     "test-jenkins": "mocha --recursive --require @babel/register --reporter mocha-junit-reporter",
     "test-aeproject": "mocha './bin/aeproject/test/index.js' --timeout 0 --exit",
-    "prepublishOnly": "npm run build && npm run docs:docco && npm run docs:api",
-    "postinstall": "postinstall-build --only-as-dependency dist"
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run docs:docco && npm run docs:api"
   },
   "license": "ISC",
   "keywords": [
@@ -42,7 +42,6 @@
     "fs-extra": "^7.0.0",
     "json-bigint": "^0.3.0",
     "path": "^0.12.7",
-    "postinstall-build": "^5.0.1",
     "promisify-child-process": "^2.1.2",
     "ramda": "^0.25.0",
     "recursive-rename": "^2.0.0",
