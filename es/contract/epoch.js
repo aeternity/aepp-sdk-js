@@ -37,12 +37,12 @@ async function contractEpochEncodeCallData (codeOrAddress, abi, name, arg, call)
     code = (await this.getContractByteCode(code)).bytecode
     abi = 'sophia'
   }
-  //Prepare `call` code
-  call = this.generateCallCode(name, arg)
-  console.log('generated callCode')
-  console.log(call)
+  // // Prepare `call` code
+  // call = this.generateCallCode(name, arg)
+  // console.log('generated callCode')
+  // console.log(call)
   // If we pass `call` argument we use type-checked call
-  if (TYPE_CHECKED_ABI.includes(abi)) return (await this.api.encodeCalldata({ abi, code, call })).calldata
+  if (TYPE_CHECKED_ABI.includes(abi) && call) return (await this.api.encodeCalldata({ abi, code, call })).calldata
 
   return (await this.api.encodeCalldata({ abi, code, 'function': name, arg })).calldata
 }
