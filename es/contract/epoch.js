@@ -47,7 +47,7 @@ async function contractEpochEncodeCallData (codeOrAddress, abi, name, arg, call)
   return (await this.api.encodeCalldata({ abi, code, 'function': name, arg })).calldata
 }
 
-function generateCallCode(fn, arg, returnType) {
+function generateCallCode (fn, arg, returnType) {
   return `contract CallCode =
   function __call() = ${fn}${arg}`
 }
