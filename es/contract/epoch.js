@@ -37,16 +37,12 @@ async function contractEpochEncodeCallData (codeOrAddress, abi, name, arg, call)
     code = (await this.getContractByteCode(code)).bytecode
     abi = 'sophia'
   }
-  // // Prepare `call` code
-  // call = this.generateCallCode(name, arg)
-  // console.log('generated callCode')
-  // console.log(call)
-  // If we pass `call` argument we use type-checked call
   if (TYPE_CHECKED_ABI.includes(abi) && call) return (await this.api.encodeCalldata({ abi, code, call })).calldata
 
   return (await this.api.encodeCalldata({ abi, code, 'function': name, arg })).calldata
 }
 
+// TODO investigate that genration
 function generateCallCode (fn, arg, returnType) {
   return `contract CallCode =
   function __call() = ${fn}${arg}`
@@ -81,8 +77,7 @@ const EpochContract = ContractBase.compose(Epoch, {
     contractEpochCall,
     contractEpochDecodeData,
     compileEpochContract,
-    getContractByteCode,
-    generateCallCode
+    getContractByteCode
   },
   deepProps: { Ae:
       { defaults: {
