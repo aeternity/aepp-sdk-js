@@ -168,9 +168,12 @@ export function formatSalt (salt) {
  * Generate the commitment hash by hashing the formatted salt and
  * name, base 58 encoding the result and prepending 'cm_'
  *
- * @param {string} name - Name to be registered
- * @param {number} salt
- * @return {string} Commitment hash
+ * @function commitmentHash
+ * @category async
+ * @rtype (name: String, salt?: String) => hash: Promise[String]
+ * @param {String} name - Name to be registered
+ * @param {Number} salt Random salt
+ * @return {String} Commitment hash
  */
 export async function commitmentHash (name, salt = createSalt()) {
   return `cm_${encodeBase58Check(hash(Buffer.concat([nameId(name), formatSalt(salt)])))}`
