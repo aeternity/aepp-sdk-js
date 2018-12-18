@@ -22,7 +22,7 @@
  */
 
 import bs58check from 'bs58check'
-import RLP from 'rlp'
+import * as RLP from 'rlp'
 import { blake2b } from 'blakejs'
 import nacl from 'tweetnacl'
 import aesjs from 'aes-js'
