@@ -2,6 +2,24 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [1.2.0]
+### Added
+- TODO
+
+### Changed
+- TODO
+
+### Removed
+- TODO
+
+### Breaking Changes
+- TODO
+
+### Notes and known Issues
+- TODO
+
+
+
 ## [1.1.2]
 ### Added
 - isAddressValid check
@@ -314,3 +332,4 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 [1.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/1.0.0...1.1.0
 [1.1.1]: https://github.com/aeternity/aepp-sdk-js/compare/1.1.0...1.1.1
 [1.1.2]: https://github.com/aeternity/aepp-sdk-js/compare/1.1.1...1.1.2
+[1.2.0]: https://github.com/aeternity/aepp-sdk-js/compare/1.1.2...1.2.0
