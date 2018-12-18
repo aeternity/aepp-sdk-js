@@ -50,11 +50,9 @@ describe('Contract', function () {
     contract = await ready(this)
   })
 
-  describe('precompiled bytecode', () => {
-    it('can be deployed', async () => {
-      const { bytecode } = await contract.contractCompile(identityContract)
-      return contract.contractDeploy(bytecode, 'sophia').should.eventually.have.property('address')
-    })
+  it('precompiled bytecode can be deployed', async () => {
+    const { bytecode } = await contract.contractCompile(identityContract)
+    return contract.contractDeploy(bytecode, 'sophia').should.eventually.have.property('address')
   })
 
   it('compiles Sophia code', async () => {
@@ -100,7 +98,7 @@ describe('Contract', function () {
   })
 
   it('calls deployed contracts static', async () => {
-    const result = await deployed.call('main', { args: '42' })
+    const result = await deployed.callStatic('main', { args: '42' })
     return result.decode('int').should.eventually.become({
       type: 'word',
       value: 42

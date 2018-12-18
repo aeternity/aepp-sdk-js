@@ -22,7 +22,7 @@
  */
 
 import bs58check from 'bs58check'
-import RLP from 'rlp'
+import * as RLP from 'rlp'
 import { blake2b } from 'blakejs'
 import nacl from 'tweetnacl'
 import aesjs from 'aes-js'
@@ -30,6 +30,22 @@ import { leftPad, rightPad } from './bytes'
 import shajs from 'sha.js'
 
 const Ecb = aesjs.ModeOfOperation.ecb
+
+/**
+ * Check if address is valid
+ * @rtype (input: String) => valid: Boolean
+ * @param {String} address - Address
+ * @return {Boolean} valid
+ */
+export function isAddressValid (address) {
+  let isValid
+  try {
+    isValid = decodeBase58Check(assertedType(address, 'ak')).length === 32
+  } catch (e) {
+    isValid = false
+  }
+  return isValid
+}
 
 /**
  * Calculate 256bits Blake2b hash of `input`
@@ -127,7 +143,7 @@ export function decodeBase64Check (str) {
  * @return {Buffer} Base58 encoded data
  */
 export function encodeBase58Check (input) {
-  return bs58check.encode(input)
+  return bs58check.encode(Buffer.from(input))
 }
 
 /**
@@ -432,6 +448,7 @@ export function envKeypair (env) {
  * @return {Array} Array of Buffers containing the original message
  */
 export const decode = RLP.decode
+export const encode = RLP.encode
 
 const OBJECT_TAGS = {
   SIGNED_TX: 11,

@@ -30,6 +30,8 @@
 
 import Ae from './'
 import * as R from 'ramda'
+import { aeEncodeKey } from '../utils/crypto'
+import { toBytes } from '../utils/bytes'
 
 async function encodeCall (code, abi, name, args, call) {
   return this.contractEpochEncodeCallData(code, abi, name, args, call)
@@ -44,16 +46,13 @@ async function callStatic (code, abi, name, { args = '()', call } = {}) {
 }
 
 async function decode (type, data) {
-  return this.contractEpochDecodeData(type, data)
+  const result = await this.contractEpochDecodeData(type, data)
+  if (type === 'address') return aeEncodeKey(toBytes(result.value, true))
+  return result
 }
 
 async function call (code, abi, address, name, { args = '()', options = {}, call } = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-
-  // Check for MAX_GAS
-  if (opt.gas > this.Ae.defaults.gas) {
-    opt.gas = this.Ae.defaults.gas
-  }
 
   const tx = await this.contractCallTx(R.merge(opt, {
     callerId: await this.address(),
@@ -66,6 +65,7 @@ async function call (code, abi, address, name, { args = '()', options = {}, call
 
   if (result.returnType === 'ok') {
     return {
+      hash,
       result,
       decode: (type) => this.contractDecodeData(type, result.returnValue)
     }
@@ -79,11 +79,6 @@ async function deploy (code, abi, { initState = '()', options = {} } = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   const callData = await this.contractEncodeCall(code, abi, 'init', initState)
   const ownerId = await this.address()
-
-  // // Check for MAX_GAS
-  // if (opt.gas > this.Ae.defaults.gas) {
-  //   opt.gas = this.Ae.defaults.gas
-  // }
 
   const { tx, contractId } = await this.contractCreateTx(R.merge(opt, {
     callData,
@@ -126,7 +121,7 @@ const Contract = Ae.compose({
     vmVersion: 1,
     gasPrice: 1,
     amount: 1,
-    gas: 1600000 - 21000, // MAX GAS
+    gas: 1600000 - 21000,
     options: ''
   } } }
 })

@@ -2,6 +2,44 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [1.1.2]
+### Added
+- isAddressValid check
+
+### Changed
+- Compatibility with Epoch >= 1.0.0 and <= 1.1.0
+- Fixed networkId propagation (and overriding on init of Flavors)
+- Tx Fee formulas
+- Fixed encodeBase58Check by feeding Buffered input
+
+### Removed
+- none
+
+### Breaking Changes
+- none
+
+### Notes and known Issues
+- none
+
+
+## [1.1.1]
+### Added
+- none
+
+### Changed
+- Fix Testing
+- Added a command to remove images after CI testing
+- Fixed Oracle error for Wallet flavor
+
+### Removed
+- none
+
+### Breaking Changes
+- none
+
+### Notes and known Issues
+- none
+
 ## [1.1.0]
 ### Added
 - Oracles functionality and flavor
@@ -274,3 +312,5 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 [1.0.0]: https://github.com/aeternity/aepp-sdk-js/compare/v0.25.0-0.1.0...1.0.0
 [1.0.1]: https://github.com/aeternity/aepp-sdk-js/compare/1.0.0...1.0.1
 [1.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/1.0.0...1.1.0
+[1.1.1]: https://github.com/aeternity/aepp-sdk-js/compare/1.1.0...1.1.1
+[1.1.2]: https://github.com/aeternity/aepp-sdk-js/compare/1.1.1...1.1.2
