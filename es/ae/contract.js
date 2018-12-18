@@ -30,8 +30,7 @@
 
 import Ae from './'
 import * as R from 'ramda'
-import { aeEncodeKey } from '../utils/crypto'
-import { toBytes } from '../utils/bytes'
+import { addressFromDecimal } from '../utils/crypto'
 
 async function encodeCall (code, abi, name, args, call) {
   return this.contractEpochEncodeCallData(code, abi, name, args, call)
@@ -47,7 +46,7 @@ async function callStatic (code, abi, name, { args = '()', call } = {}) {
 
 async function decode (type, data) {
   const result = await this.contractEpochDecodeData(type, data)
-  if (type === 'address') return aeEncodeKey(toBytes(result.value, true))
+  if (type === 'address') return addressFromDecimal(data.value)
   return result
 }
 
