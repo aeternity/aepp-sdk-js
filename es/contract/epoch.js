@@ -43,6 +43,7 @@ async function contractEpochEncodeCallData (codeOrAddress, abi, name, arg, call)
 }
 
 // TODO investigate that genration
+// eslint-disable-next-line no-unused-vars
 function generateCallCode (fn, arg, returnType) {
   return `contract CallCode =
   function __call() = ${fn}${arg}`
