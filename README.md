@@ -52,8 +52,8 @@ yarn add @aeternity/aepp-sdk@next
 2. Import the right flavor. For this example with get the `Uninveral` flavor, which contains all the features of the SDK:
 
 ```js
-import Ae from '@aeternity/aepp-sdk/es/ae/universal'
-import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
+const {AE} = require('@aeternity/aepp-sdk')
+const {MemoryAccount} = require('@aeternity/aepp-sdk')
 ```
 
 3. Create an instance and interact with it
