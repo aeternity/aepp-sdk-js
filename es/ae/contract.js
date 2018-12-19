@@ -60,7 +60,8 @@ async function call (code, abi, address, name, { args = '()', options = {}, call
     callData: await this.contractEncodeCall(code, abi, name, args, call)
   }))
 
-  const { hash } = await this.send(tx, opt)
+  const txFromChain = await this.send(tx, opt)
+  const hash = typeof txFromChain === 'string' ? txFromChain : txFromChain.hash
   const result = await this.getTxInfo(hash)
 
   if (result.returnType === 'ok') {
@@ -86,7 +87,9 @@ async function deploy (code, abi, { initState = '()', options = {} } = {}) {
     ownerId
   }))
 
-  const { hash } = await this.send(tx, opt)
+  const txFromChain = await this.send(tx, opt)
+  const hash = typeof txFromChain === 'string' ? txFromChain : txFromChain.hash
+
   return Object.freeze({
     owner: ownerId,
     transaction: hash,
