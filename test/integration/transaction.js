@@ -16,10 +16,9 @@
  */
 
 import { describe, it, before } from 'mocha'
-import { expect } from 'chai'
-import { configure } from './'
 import { encodeBase58Check, encodeBase64Check, generateKeyPair, salt } from '../../es/utils/crypto'
-import { ready } from './index'
+import { ready, configure } from './index'
+import { commitmentHash } from '../../es/tx/js'
 
 const nonce = 1
 const nameTtl = 1
@@ -52,11 +51,11 @@ let bytecode
 let contractId
 const vmVersion = 1
 const deposit = 4
-const gasPrice =  1
-const gas =  1600000 - 21000 // MAX GAS
+const gasPrice = 1
+const gas = 1600000 - 21000 // MAX GAS
 
-let _salt;
-let commitmentId;
+let _salt
+let commitmentId
 
 describe('Native Transaction', function () {
   configure(this)
@@ -75,7 +74,7 @@ describe('Native Transaction', function () {
     clientNative.setKeypair(keyPair)
     oracleId = `ok_${(await client.address()).slice(3)}`
     _salt = salt()
-    commitmentId = await client.commitmentHash(name, _salt)
+    commitmentId = await commitmentHash(name, _salt)
   })
 
   it('native build of spend tx', async () => {

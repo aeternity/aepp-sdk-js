@@ -11,6 +11,7 @@ import * as Crypto from '@aeternity/aepp-sdk/es/utils/crypto'
 * [@aeternity/aepp-sdk/es/utils/crypto](#module_@aeternity/aepp-sdk/es/utils/crypto)
     * _static_
         * [.decode](#module_@aeternity/aepp-sdk/es/utils/crypto.decode) ⇒ `Array`
+        * [.isAddressValid(address)](#module_@aeternity/aepp-sdk/es/utils/crypto.isAddressValid) ⇒ `Boolean`
         * [.hash(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.hash) ⇒ `String`
         * [.nameId(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.nameId) ⇒ `String`
         * [.sha256hash(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.sha256hash) ⇒ `String`
@@ -54,6 +55,19 @@ RLP decode
 | Param | Type | Description |
 | --- | --- | --- |
 | data | `Buffer` \| `String` \| `Integer` \| `Array` | Data to decode |
+
+<a id="module_@aeternity/aepp-sdk/es/utils/crypto.isAddressValid"></a>
+
+### @aeternity/aepp-sdk/es/utils/crypto.isAddressValid(address) ⇒ `Boolean`
+Check if address is valid
+
+**Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
+**Returns**: `Boolean` - valid  
+**rtype**: `(input: String) => valid: Boolean`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| address | `String` | Address |
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.hash"></a>
 
