@@ -79,7 +79,6 @@ const RpcClient = stampit(AsyncInit, {
     self.addEventListener('message', receive, false)
 
     this.session = await this.post('hello')
-    this.networkId = await this.post('getNetworkId')
   },
   composers ({ stamp, composables }) {
     // Combine Ae and Contract methods
@@ -88,6 +87,8 @@ const RpcClient = stampit(AsyncInit, {
       ...(R.path(['compose', 'deepConfiguration', 'Contract', 'methods'], stamp) || [])
     ]
     const rpcMethods = R.fromPairs(methods.map(m => [m, post(m)]))
+    // remove signTransaction from AEPP instance, let's go it through RPC
+    if (stamp.compose.methods) delete stamp.compose.methods.signTransaction
     stamp.compose.methods = Object.assign(rpcMethods, stamp.compose.methods)
   }
 })

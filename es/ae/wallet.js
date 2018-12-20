@@ -60,16 +60,6 @@ async function hello () {
   return Promise.resolve(id)
 }
 
-/**
- * Get networkId
- * @instance
- * @category async
- * @return {Promise<String>} Network ID
- */
-async function getNetworkId () {
-  return Promise.resolve(this.networkId)
-}
-
 async function rpc (method, params, session) {
   const { handler, error } = R.find(({ pred }) => pred(method), handlers)
 
@@ -161,8 +151,7 @@ const Wallet = Ae.compose(Accounts, Chain, Tx, EpochContract, Contract, EpochOra
     rpcMethods: {
       sign: rpcSign,
       address: rpcAddress,
-      hello,
-      getNetworkId
+      hello
     }
   }
 })
