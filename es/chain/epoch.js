@@ -25,8 +25,9 @@ async function sendTransaction (tx, options = {}) {
   return waitMined ? this.poll(txHash, options) : txHash
 }
 
-async function balance (address, { height, hash } = {}) {
-  return formatBalance((await this.api.getAccountByPubkey(address, { height, hash })).balance)
+async function balance (address, { height, hash, format = true } = {}) {
+  const { balance } = await this.api.getAccountByPubkey(address, { height, hash })
+  return format ? formatBalance(balance) : balance.toString()
 }
 
 async function tx (hash, info = false) {
