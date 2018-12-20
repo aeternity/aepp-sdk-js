@@ -79,6 +79,7 @@ const RpcClient = stampit(AsyncInit, {
     self.addEventListener('message', receive, false)
 
     this.session = await this.post('hello')
+    this.networkId = await this.post('getNetworkId')
   },
   composers ({ stamp, composables }) {
     // Combine Ae and Contract methods

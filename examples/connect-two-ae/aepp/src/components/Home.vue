@@ -175,7 +175,6 @@ export default {
   },
   created () {
     Aepp().then(ae => {
-      console.log('client: ', ae)
       this.client = ae
       ae.address()
         .then(address => {
