@@ -69,8 +69,8 @@ export default {
     window.addEventListener('message', console.log, false)
 
     Wallet({
-      url: 'http://localhost:3013',
-      internalUrl: 'http://localhost:3113',
+      url: 'https://sdk-mainnet.aepps.com',
+      internalUrl: 'https://sdk-mainnet.aepps.com',
       accounts: [MemoryAccount({keypair: {secretKey: this.priv, publicKey: this.pub}})],
       address: this.pub,
       onTx: this.confirmDialog,
