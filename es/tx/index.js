@@ -46,8 +46,7 @@ const Tx = stampit({
     Ae: {
       methods: [
         'spendTx', 'namePreclaimTx', 'nameClaimTx', 'nameTransferTx',
-        'nameUpdateTx', 'nameRevokeTx', 'contractCreateTx', 'contractCallTx',
-        'commitmentHash'
+        'nameUpdateTx', 'nameRevokeTx', 'contractCreateTx', 'contractCallTx', 'calculateFee'
       ]
     }
   }
@@ -61,7 +60,6 @@ const Tx = stampit({
     nameRevokeTx: required,
     contractCreateTx: required,
     contractCallTx: required,
-    commitmentHash: required,
     calculateFee: required
   }
 }))
@@ -164,18 +162,6 @@ const Tx = stampit({
  * @rtype ({callerId: String, contract: String, callData: String, vmVersion: Number, amount: Number, gas: Number, gasPrice: Number, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]
  * @param {Object} options - The object to extract properties from
  * @return {String} `contract_call_tx` transaction
- */
-
-/**
- * Create a commitment hash for claiming names
- * @function commitmentHash
- * @instance
- * @abstract
- * @category async
- * @rtype (name: String, salt?: String) => hash: Promise[String]
- * @param {String} name - The name to claim
- * @param {String} salt - Random salt
- * @return {String} Commitment hash
  */
 
 export default Tx

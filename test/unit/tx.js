@@ -18,14 +18,13 @@
 import '../'
 import { describe, it } from 'mocha'
 import { salt } from '../../es/utils/crypto'
-import Tx from '../../es/tx/js'
+import { commitmentHash } from '../../es/tx/js'
 
 describe('Tx', function () {
   it('reproducible commitment hashes can be generated', async () => {
-    const tx = Tx()
     const _salt = salt()
-    const hash = await tx.commitmentHash('foobar.aet', _salt)
+    const hash = await commitmentHash('foobar.aet', _salt)
     hash.should.be.a('string')
-    return hash.should.be.equal(await tx.commitmentHash('foobar.aet', _salt))
+    return hash.should.be.equal(await commitmentHash('foobar.aet', _salt))
   })
 })

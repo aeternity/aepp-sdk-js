@@ -22,11 +22,11 @@
  */
 
 import bs58check from 'bs58check'
-import RLP from 'rlp'
+import * as RLP from 'rlp'
 import { blake2b } from 'blakejs'
 import nacl from 'tweetnacl'
 import aesjs from 'aes-js'
-import { leftPad, rightPad } from './bytes'
+import { leftPad, rightPad, toBytes } from './bytes'
 import shajs from 'sha.js'
 
 const Ecb = aesjs.ModeOfOperation.ecb
@@ -45,6 +45,26 @@ export function isAddressValid (address) {
     isValid = false
   }
   return isValid
+}
+
+/**
+ * Convert base58Check address to hex string
+ * @rtype (base58CheckAddress: String) => hexAddress: String
+ * @param {String} base58CheckAddress - Address
+ * @return {String} Hex string
+ */
+export function addressToHex (base58CheckAddress) {
+  return `0x${decodeBase58Check(assertedType(base58CheckAddress, 'ak')).toString('hex')}`
+}
+
+/**
+ * Parse decimal address and return base58Check encoded address with prefix 'ak'
+ * @rtype (input: String) => address: String
+ * @param {String} decimalAddress - Address
+ * @return {String} address
+ */
+export function addressFromDecimal (decimalAddress) {
+  return aeEncodeKey(toBytes(decimalAddress, true))
 }
 
 /**

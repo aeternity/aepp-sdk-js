@@ -26,8 +26,11 @@ import Account from './account'
 import MemoryAccount from './account/memory'
 import Aens from './ae/aens'
 import Contract from './ae/contract'
+import EpochContract from './contract/epoch'
 import Wallet from './ae/wallet'
 import Aepp from './ae/aepp'
+import Oracle from './ae/oracle'
+import EpochOracle from './oracle/epoch'
 import Selector from './account/selector'
 import Universal from './ae/universal'
 
@@ -37,6 +40,8 @@ export {
   Crypto,
   Chain,
   EpochChain,
+  EpochContract,
+  EpochOracle,
   Tx,
   Transaction,
   Account,
@@ -46,5 +51,6 @@ export {
   Wallet,
   JsTx,
   Selector,
-  Universal
+  Universal,
+  Oracle
 }

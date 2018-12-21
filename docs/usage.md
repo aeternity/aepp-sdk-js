@@ -219,7 +219,29 @@ understand the node's operations. Most real-world requirements involves a series
 of chain operations, so the SDK provides abstractions for these. The Javscript
 Promises framework makes this somewhat easy:
 
-Example spend function, using the SDK, talking directly to the API (**purist**):
+### High-level SDK usage, recommended
+Example spend function, using aeternity's SDK abstraction
+```js
+  // Import necessary Modules by simply importing the Wallet module
+  import Wallet from '@aeternity/aepp-sdk/es/ae/wallet' // import from SDK es-modules
+
+  Wallet({
+    url: 'HOST_URL_HERE',
+    internalUrl: 'HOST_URL_HERE',
+    accounts: [MemoryAccount({keypair: {secretKey: 'PRIV_KEY_HERE', publicKey: 'PUB_KEY_HERE'}, networkId: 'NETWORK_ID_HERE'})],
+    address: 'PUB_KEY_HERE',
+    onTx: confirm, // guard returning boolean
+    onChain: confirm, // guard returning boolean
+    onAccount: confirm, // guard returning boolean
+    onContract: confirm, // guard returning boolean
+    networkId: 'aet_ua' // or any other networkId your client should connect to
+  }).then(ae => ae.spend(parseInt(amount), receiver_pub_key))
+```
+
+
+
+### Low-level SDK usage (use API endpoints directly)
+Example spend function, using the SDK, talking directly to the API:
 ```js
   // Import necessary Modules
   import Tx from '@aeternity/aepp-sdk/es/tx/tx.js'
@@ -238,21 +260,3 @@ Example spend function, using the SDK, talking directly to the API (**purist**):
 
   }
 ```
-
-The same code, using the SDK abstraction (**high-level**):
-```js
-  // Import necessary Modules by simply importing the Wallet module
-  import Wallet from '@aeternity/aepp-sdk/es/ae/wallet' // import from SDK es-modules
-
-  Wallet({
-    url: 'HOST_URL_HERE',
-    internalUrl: 'HOST_URL_HERE',
-    accounts: [MemoryAccount({keypair: {secretKey: 'PRIV_KEY_HERE', publicKey: 'PUB_KEY_HERE'}, networkId: 'NETWORK_ID_HERE'})],
-    address: 'PUB_KEY_HERE',
-    onTx: confirm, // guard returning boolean
-    onChain: confirm, // guard returning boolean
-    onAccount: confirm, // guard returning boolean
-    onContract: confirm // guard returning boolean
-  }).then(ae => ae.spend(parseInt(amount), receiver_pub_key))
-```
-
