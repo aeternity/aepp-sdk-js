@@ -17,6 +17,7 @@
 import * as R from 'ramda'
 import Chain from './'
 import Epoch from '../epoch'
+import formatBalance from '../utils/amount-formatter'
 
 async function sendTransaction (tx, options = {}) {
   const { waitMined } = R.merge(this.Chain.defaults, options)
@@ -24,8 +25,9 @@ async function sendTransaction (tx, options = {}) {
   return waitMined ? this.poll(txHash, options) : txHash
 }
 
-async function balance (address, { height, hash } = {}) {
-  return (await this.api.getAccountByPubkey(address, { height, hash })).balance.toString()
+async function balance (address, { height, hash, format = true } = {}) {
+  const { balance } = await this.api.getAccountByPubkey(address, { height, hash })
+  return format ? formatBalance(balance) : balance.toString()
 }
 
 async function tx (hash, info = false) {
