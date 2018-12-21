@@ -47,7 +47,6 @@ contract Identity =
   type state = ()
   function main(x : int) = x
 `
-let bytecode
 let contractId
 const vmVersion = 1
 const deposit = 4
@@ -85,7 +84,7 @@ describe('Native Transaction', function () {
 
   it('native build of name pre-claim tx', async () => {
     const txFromAPI = await client.namePreclaimTx({ accountId: senderId, nonce, commitmentId })
-    const nativeTx = await clientNative.namePreclaimTx( {accountId: senderId, nonce, commitmentId })
+    const nativeTx = await clientNative.namePreclaimTx({ accountId: senderId, nonce, commitmentId })
     txFromAPI.should.be.equal(nativeTx)
   })
 
@@ -94,13 +93,13 @@ describe('Native Transaction', function () {
       accountId: senderId,
       nonce,
       name: nameHash,
-      nameSalt: _salt,
+      nameSalt: _salt
     })
     const nativeTx = await clientNative.nameClaimTx({
       accountId: senderId,
       nonce,
       name: nameHash,
-      nameSalt: _salt,
+      nameSalt: _salt
     })
     txFromAPI.should.be.equal(nativeTx)
   })
@@ -128,7 +127,7 @@ describe('Native Transaction', function () {
     const callData = await client.contractEncodeCall(bytecode, 'sophia', 'init', '()')
     const owner = await client.address()
 
-    const txFromAPI = await client.contractCreateTx({ ownerId: owner, code: bytecode, vmVersion, deposit, amount, gas, gasPrice, callData  })
+    const txFromAPI = await client.contractCreateTx({ ownerId: owner, code: bytecode, vmVersion, deposit, amount, gas, gasPrice, callData })
     const nativeTx = await clientNative.contractCreateTx({ ownerId: owner, code: bytecode, vmVersion, deposit, amount, gas, gasPrice, callData })
 
     txFromAPI.tx.should.be.equal(nativeTx.tx)
@@ -208,7 +207,7 @@ describe('Native Transaction', function () {
 
   it('native build of oracle respond query tx', async () => {
     const callerId = await client.address()
-    const params = { oracleId, callerId, responseTtl, queryId, response: queryResponse}
+    const params = { oracleId, callerId, responseTtl, queryId, response: queryResponse }
 
     const txFromAPI = await client.oracleRespondTx(params)
     const nativeTx = await clientNative.oracleRespondTx(params)
