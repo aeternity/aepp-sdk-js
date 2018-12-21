@@ -4,19 +4,26 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [1.2.0]
 ### Added
-- TODO
+- amount formatter
+- amount format balance `client.balance('AK_PUBLICKEY', { format: true })`
+- Oracle and Contracts API to Aepp stamp
 
 ### Changed
-- TODO
+- Use `prepare` instead of `postinstall-build` (thanks @davidyuk)
+- Fix Import RLP package (thanks @davidyuk)
+- Fix for NetworkId propagation and override
+- TxJS is not a stamp anymore, and instead: it exports helper functions
 
 ### Removed
-- TODO
+- TxJs stamp (not a stamp anymore)
 
 ### Breaking Changes
-- TODO
+- TxJs stamp (not a stamp anymore)
+- balance now answer a formatted string composed of `AMOUNT + ' ' + unit` (eg. `10 exa` for 10 AE)
 
 ### Notes and known Issues
-- TODO
+- `10 exa` should be `10 ae`
+- format shouldn't be a flag, but a request for `unit` eg. `{ format: `ae` }`
 
 
 
