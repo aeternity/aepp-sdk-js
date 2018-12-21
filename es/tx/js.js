@@ -267,11 +267,7 @@ export function spendTxNative ({ senderId, recipientId, amount, payload, fee, tt
  * @param {Boolean} encode encode transaction using Rlp and base64
  * @return {Object} { tx } Unsigned name pre-claim tx hash
  */
-<<<<<<< HEAD
 export function namePreclaimTxNative ({ accountId, nonce, commitmentId, fee, ttl }, encode = true) {
-=======
-function namePreclaimTxNative ({ accountId, nonce, commitmentId, fee, ttl }, encode = true) {
->>>>>>> a97fa061ada626e6c56d879b629295077802cd18
   let tx = [
     _int(OBJECT_TAG_NAME_SERVICE_PRECLAIM_TRANSACTION),
     _int(VSN),
@@ -299,11 +295,7 @@ function namePreclaimTxNative ({ accountId, nonce, commitmentId, fee, ttl }, enc
  * @param {Boolean} encode encode transaction using Rlp and base64
  * @return {Object}  { tx } Unsigned name claim tx hash
  */
-<<<<<<< HEAD
 export function nameClaimTxNative ({ accountId, nonce, name, nameSalt, fee, ttl }, encode = true) {
-=======
-function nameClaimTxNative ({ accountId, nonce, name, nameSalt, fee, ttl }, encode = true) {
->>>>>>> a97fa061ada626e6c56d879b629295077802cd18
   let tx = [
     _int(OBJECT_TAG_NAME_SERVICE_CLAIM_TRANSACTION),
     _int(VSN),
@@ -334,11 +326,7 @@ function nameClaimTxNative ({ accountId, nonce, name, nameSalt, fee, ttl }, enco
  * @param {Boolean} encode encode transaction using Rlp and base64
  * @return {Object} { tx } Unsigned name update tx hash
  */
-<<<<<<< HEAD
 export function nameUpdateTxNative ({ accountId, nonce, nameId, nameTtl, pointers, clientTtl, fee, ttl }, encode = true) {
-=======
-function nameUpdateTxNative ({ accountId, nonce, nameId, nameTtl, pointers, clientTtl, fee, ttl }, encode = true) {
->>>>>>> a97fa061ada626e6c56d879b629295077802cd18
   // Build pointers
   pointers = buildPointers(pointers)
 
@@ -371,11 +359,7 @@ function nameUpdateTxNative ({ accountId, nonce, nameId, nameTtl, pointers, clie
  * @param {Boolean} encode encode transaction using Rlp and base64
  * @return {Object} { tx } Unsigned name transfer tx hash
  */
-<<<<<<< HEAD
 export function nameTransferTxNative ({ accountId, nonce, nameId, recipientId, fee, ttl }, encode = true) {
-=======
-function nameTransferTxNative ({ accountId, nonce, nameId, recipientId, fee, ttl }, encode = true) {
->>>>>>> a97fa061ada626e6c56d879b629295077802cd18
   let tx = [
     _int(OBJECT_TAG_NAME_SERVICE_TRANSFER_TRANSACTION),
     _int(VSN),
@@ -403,11 +387,7 @@ function nameTransferTxNative ({ accountId, nonce, nameId, recipientId, fee, ttl
  * @param {Boolean} encode encode transaction using Rlp and base64
  * @return {Object} { tx } Unsigned name revoke tx hash
  */
-<<<<<<< HEAD
 export function nameRevokeTxNative ({ accountId, nonce, nameId, fee, ttl }, encode = true) {
-=======
-function nameRevokeTxNative ({ accountId, nonce, nameId, fee, ttl }, encode = true) {
->>>>>>> a97fa061ada626e6c56d879b629295077802cd18
   let tx = [
     _int(OBJECT_TAG_NAME_SERVICE_REVOKE_TRANSACTION),
     _int(VSN),
@@ -440,11 +420,7 @@ function nameRevokeTxNative ({ accountId, nonce, nameId, fee, ttl }, encode = tr
  * @param {Boolean} encode encode transaction using Rlp and base64
  * @return {Object} { tx } Encrypted contract create tx hash
  */
-<<<<<<< HEAD
 export function contractCreateTxNative ({ ownerId, nonce, code, vmVersion, deposit, amount, gas, gasPrice, fee, ttl, callData }, encode = true) {
-=======
-function contractCreateTxNative ({ ownerId, nonce, code, vmVersion, deposit, amount, gas, gasPrice, fee, ttl, callData }, encode = true) {
->>>>>>> a97fa061ada626e6c56d879b629295077802cd18
   let tx = [
     _int(OBJECT_TAG_CONTRACT_CREATE_TRANSACTION),
     _int(VSN),
@@ -482,11 +458,7 @@ function contractCreateTxNative ({ ownerId, nonce, code, vmVersion, deposit, amo
  * @param {Boolean} encode encode transaction using Rlp and base64
  * @return {Object} { tx } Encrypted contract call tx hash
  */
-<<<<<<< HEAD
 export function contractCallTxNative ({ callerId, nonce, contractId, vmVersion, fee, ttl, amount, gas, gasPrice, callData }, encode = true) {
-=======
-function contractCallTxNative ({ callerId, nonce, contractId, vmVersion, fee, ttl, amount, gas, gasPrice, callData }, encode = true) {
->>>>>>> a97fa061ada626e6c56d879b629295077802cd18
   let tx = [
     _int(OBJECT_TAG_CONTRACT_CALL_TRANSACTION),
     _int(VSN),
@@ -522,11 +494,7 @@ function contractCallTxNative ({ callerId, nonce, contractId, vmVersion, fee, tt
  * @param {Boolean} encode encode transaction using Rlp and base64
  * @return {Object} { tx } Oracle register tx
  */
-<<<<<<< HEAD
 export function oracleRegisterTxNative ({ accountId, queryFormat, responseFormat, queryFee, oracleTtl, fee, ttl, nonce, vmVersion }, encode = true) {
-=======
-function oracleRegisterTxNative ({ accountId, queryFormat, responseFormat, queryFee, oracleTtl, fee, ttl, nonce, vmVersion }, encode = true) {
->>>>>>> a97fa061ada626e6c56d879b629295077802cd18
   let tx = [
     _int(OBJECT_TAG_ORACLE_REGISTER_TRANSACTION),
     _int(VSN),
@@ -558,11 +526,7 @@ function oracleRegisterTxNative ({ accountId, queryFormat, responseFormat, query
  * @param {Boolean} encode encode transaction using Rlp and base64
  * @return {Object} { tx } Oracle extend tx hash
  */
-<<<<<<< HEAD
 export function oracleExtendTxNative ({ oracleId, oracleTtl, fee, nonce, ttl }, encode = true) {
-=======
-function oracleExtendTxNative ({ oracleId, oracleTtl, fee, nonce, ttl }, encode = true) {
->>>>>>> a97fa061ada626e6c56d879b629295077802cd18
   let tx = [
     _int(OBJECT_TAG_ORACLE_EXTEND_TRANSACTION),
     _int(VSN),
@@ -594,11 +558,7 @@ function oracleExtendTxNative ({ oracleId, oracleTtl, fee, nonce, ttl }, encode 
  * @param {Boolean} encode encode transaction using Rlp and base64
  * @return {Object} { tx } Oracle post query tx hash
  */
-<<<<<<< HEAD
 export function oraclePostQueryTxNative ({ senderId, oracleId, responseTtl, query, queryTtl, fee, queryFee, ttl, nonce }, encode = true) {
-=======
-function oraclePostQueryTxNative ({ senderId, oracleId, responseTtl, query, queryTtl, fee, queryFee, ttl, nonce }, encode = true) {
->>>>>>> a97fa061ada626e6c56d879b629295077802cd18
   let tx = [
     _int(OBJECT_TAG_ORACLE_QUERY_TRANSACTION),
     _int(VSN),
@@ -633,11 +593,7 @@ function oraclePostQueryTxNative ({ senderId, oracleId, responseTtl, query, quer
  * @param {Boolean} encode encode transaction using Rlp and base64
  * @return {Object} { tx } Oracle respond query tx hash
  */
-<<<<<<< HEAD
 export function oracleRespondQueryTxNative ({ oracleId, responseTtl, queryId, response, fee, ttl, nonce }, encode = true) {
-=======
-function oracleRespondQueryTxNative ({ oracleId, responseTtl, queryId, response, fee, ttl, nonce }, encode = true) {
->>>>>>> a97fa061ada626e6c56d879b629295077802cd18
   let tx = [
     _int(OBJECT_TAG_ORACLE_RESPONSE_TRANSACTION),
     _int(VSN),
