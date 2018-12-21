@@ -13,6 +13,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 - Fix Import RLP package (thanks @davidyuk)
 - Fix for NetworkId propagation and override
 - TxJS is not a stamp anymore, and instead: it exports helper functions
+- Refreshed Docs: README.md + docs/usage.md
 
 ### Removed
 - TxJs stamp (not a stamp anymore)

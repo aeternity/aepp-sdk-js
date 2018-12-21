@@ -52,7 +52,7 @@ yarn add @aeternity/aepp-sdk@next
 2. Import the right flavor. For this example with get the `Uninveral` flavor, which contains all the features of the SDK:
 
 ```js
-import Ae from '@aeternity/aepp-sdk/es/ae/universal'
+import Ae from '@aeternity/aepp-sdk/es/ae/universal' // or any other flavor
 import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
 ```
 
@@ -65,11 +65,15 @@ import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
 Ae({
   url: 'https://sdk-testnet.aepps.com',
   internalUrl: 'https://sdk-testnet.aepps.com',
-  accounts: [MemoryAccount({keypair: {secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS'}})],
+  accounts: [
+    MemoryAccount({ keypair: { secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS' }})
+  ],
+  networkId: 'aet_ua' // or any other networkId your client should connect to
 }).then(ae => {
 
   // Interacting with the blockchain client
 
+  // getting the latest block height
   ae.height().then(height => {
     // logs current height
     console.log('height', height)
@@ -78,6 +82,7 @@ Ae({
     console.log(e)
   })
 
+  // getting the balance of a public address
   ae.balance('A_PUB_ADDRESS').then(balance => {
     // logs current balance of "A_PUB_ADDRESS"
     console.log('balance', balance)
@@ -86,12 +91,34 @@ Ae({
     console.log(e)
   })
 })
-
 ```
+
 4. **IMPORTANT:** 🤓 Check out the [Usage Documentation] to avoid common pitfalls!
 
 [Usage Documentation]: docs/usage.md
 
+
+> Remember: you can also "compose" your own flavor by mixing 2 or more flavors likes so:
+
+```js
+import Wallet from '@aeternity/aepp-sdk/es/ae/wallet.js'
+import Contract from '@aeternity/aepp-sdk/es/ae/contract.js'
+import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory.js'
+
+// make a "mixed flavor" containing Wallet and Contracts flavors
+Wallet.compose(Contract)({
+            url: 'https://sdk-testnet.aepps.com',
+            internalUrl: 'https://sdk-testnet.aepps.com',
+            accounts: [MemoryAccount({keypair: {secretKey: account.priv, publicKey: account.pub}})],
+            address: account.pub,
+            onTx: true, // or a function to Guard the Rpc client
+            onChain: true, // or a function to Guard the Rpc client
+            onAccount: true, // or a function to Guard the Rpc client
+            networkId: 'ae_uat'
+          }).then(ae => {
+            // ae is your initialised client now! :)
+            // ...
+```
 ## [Hacking]
 
 For advanced use, development versions and to get a deeper understanding of the
