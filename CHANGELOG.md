@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
-## [1.2.0]
+## [1.2.1]
 ### Added
 - amount formatter
 - amount format balance `client.balance('AK_PUBLICKEY', { format: true })`
@@ -340,4 +340,4 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 [1.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/1.0.0...1.1.0
 [1.1.1]: https://github.com/aeternity/aepp-sdk-js/compare/1.1.0...1.1.1
 [1.1.2]: https://github.com/aeternity/aepp-sdk-js/compare/1.1.1...1.1.2
-[1.2.0]: https://github.com/aeternity/aepp-sdk-js/compare/1.1.2...1.2.0
+[1.2.1]: https://github.com/aeternity/aepp-sdk-js/compare/1.1.2...1.2.1
