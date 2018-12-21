@@ -46,7 +46,7 @@ const Tx = stampit({
     Ae: {
       methods: [
         'spendTx', 'namePreclaimTx', 'nameClaimTx', 'nameTransferTx',
-        'nameUpdateTx', 'nameRevokeTx', 'contractCreateTx', 'contractCallTx'
+        'nameUpdateTx', 'nameRevokeTx', 'contractCreateTx', 'contractCallTx', 'calculateFee'
       ]
     }
   }

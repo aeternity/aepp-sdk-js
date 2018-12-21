@@ -87,6 +87,8 @@ const RpcClient = stampit(AsyncInit, {
       ...(R.path(['compose', 'deepConfiguration', 'Contract', 'methods'], stamp) || [])
     ]
     const rpcMethods = R.fromPairs(methods.map(m => [m, post(m)]))
+    // remove signTransaction from AEPP instance, let's go it through RPC
+    if (stamp.compose.methods) delete stamp.compose.methods.signTransaction
     stamp.compose.methods = Object.assign(rpcMethods, stamp.compose.methods)
   }
 })

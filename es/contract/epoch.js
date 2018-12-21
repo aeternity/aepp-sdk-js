@@ -42,7 +42,7 @@ async function contractEpochEncodeCallData (codeOrAddress, abi, name, arg, call)
   return (await this.api.encodeCalldata({ abi, code, 'function': name, arg })).calldata
 }
 
-// TODO investigate that genration
+// TODO investigate that generation
 // eslint-disable-next-line no-unused-vars
 function generateCallCode (fn, arg, returnType) {
   return `contract CallCode =
