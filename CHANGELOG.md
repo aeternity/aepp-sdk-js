@@ -2,6 +2,32 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [1.2.1]
+### Added
+- amount formatter
+- amount format balance `client.balance('AK_PUBLICKEY', { format: true })`
+- Oracle and Contracts API to Aepp stamp
+
+### Changed
+- Use `prepare` instead of `postinstall-build` (thanks @davidyuk)
+- Fix Import RLP package (thanks @davidyuk)
+- Fix for NetworkId propagation and override
+- TxJS is not a stamp anymore, and instead: it exports helper functions
+- Refreshed Docs: README.md + docs/usage.md
+
+### Removed
+- TxJs stamp (not a stamp anymore)
+
+### Breaking Changes
+- TxJs stamp (not a stamp anymore)
+- balance now answer a formatted string composed of `AMOUNT + ' ' + unit` (eg. `10 exa` for 10 AE)
+
+### Notes and known Issues
+- `10 exa` should be `10 ae`
+- format shouldn't be a flag, but a request for `unit` eg. `{ format: `ae` }`
+
+
+
 ## [1.1.2]
 ### Added
 - isAddressValid check
@@ -314,3 +340,4 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 [1.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/1.0.0...1.1.0
 [1.1.1]: https://github.com/aeternity/aepp-sdk-js/compare/1.1.0...1.1.1
 [1.1.2]: https://github.com/aeternity/aepp-sdk-js/compare/1.1.1...1.1.2
+[1.2.1]: https://github.com/aeternity/aepp-sdk-js/compare/1.1.2...1.2.1

@@ -80,10 +80,13 @@ const EpochContract = ContractBase.compose(Epoch, {
     compileEpochContract,
     getContractByteCode
   },
-  deepProps: { Ae:
-      { defaults: {
+  deepProps: {
+    Ae: {
+      defaults: {
         options: ''
-      }}}
+      }
+    }
+  }
 })
 
 export default EpochContract
