@@ -58,11 +58,7 @@ export function rightPad (length, inputBuffer) {
 function bigNumberToByteArray (x) {
   let hexString = x.toString(16)
   if (hexString.length % 2 > 0) hexString = '0' + hexString
-  let byteArray = []
-  for (let i = 0; i < hexString.length; i += 2) {
-    byteArray.push(parseInt(hexString.slice(i, i + 2), 16))
-  }
-  return Buffer.from(byteArray)
+  return Buffer.from(hexString, 'hex')
 }
 
 export function toBytes (val, big = false) {
