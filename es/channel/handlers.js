@@ -39,6 +39,10 @@ export function awaitingConnection (channel, message, state) {
     }
     return {handler: awaitingConnection}
   }
+  if (message.action === 'error') {
+    emit(channel, 'error', new Error(message.payload.message))
+    return {handler: channelClosed}
+  }
 }
 
 export async function awaitingChannelCreateTx (channel, message, state) {
