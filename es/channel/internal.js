@@ -34,7 +34,7 @@ const actionQueueLocked = new WeakMap()
 
 function channelURL (url, { endpoint = 'channel', ...params }) {
   const paramString = R.join('&', R.values(R.mapObjIndexed((value, key) =>
-    `${pascalToSnake(key)}=${value}`, params)))
+    `${pascalToSnake(key)}=${encodeURIComponent(value)}`, params)))
 
   return `${url}/${endpoint}?${paramString}`
 }
