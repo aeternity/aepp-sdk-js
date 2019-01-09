@@ -28,6 +28,7 @@
 
 import * as R from 'ramda'
 import { encodeBase58Check, salt } from '../utils/crypto'
+import { commitmentHash } from '../tx/js'
 import Ae from './'
 
 /**
@@ -168,7 +169,7 @@ async function preclaim (name, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   const _salt = salt()
   const height = await this.height()
-  const hash = await this.commitmentHash(name, _salt)
+  const hash = await commitmentHash(name, _salt)
 
   const preclaimTx = await this.namePreclaimTx(R.merge(opt, {
     accountId: await this.address(),

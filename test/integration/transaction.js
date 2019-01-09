@@ -16,10 +16,9 @@
  */
 
 import { describe, it, before } from 'mocha'
-import { expect } from 'chai'
-import { configure } from './'
 import { encodeBase58Check, encodeBase64Check, generateKeyPair, salt } from '../../es/utils/crypto'
-import { ready } from './index'
+import { ready, configure } from './index'
+import { commitmentHash } from '../../es/tx/js'
 
 const nonce = 1
 const nameTtl = 1
@@ -48,15 +47,14 @@ contract Identity =
   type state = ()
   function main(x : int) = x
 `
-let bytecode
 let contractId
 const vmVersion = 1
 const deposit = 4
-const gasPrice =  1
-const gas =  1600000 - 21000 // MAX GAS
+const gasPrice = 1
+const gas = 1600000 - 21000 // MAX GAS
 
-let _salt;
-let commitmentId;
+let _salt
+let commitmentId
 
 describe('Native Transaction', function () {
   configure(this)
@@ -75,7 +73,7 @@ describe('Native Transaction', function () {
     clientNative.setKeypair(keyPair)
     oracleId = `ok_${(await client.address()).slice(3)}`
     _salt = salt()
-    commitmentId = await client.commitmentHash(name, _salt)
+    commitmentId = await commitmentHash(name, _salt)
   })
 
   it('native build of spend tx', async () => {
@@ -86,7 +84,7 @@ describe('Native Transaction', function () {
 
   it('native build of name pre-claim tx', async () => {
     const txFromAPI = await client.namePreclaimTx({ accountId: senderId, nonce, commitmentId })
-    const nativeTx = await clientNative.namePreclaimTx( {accountId: senderId, nonce, commitmentId })
+    const nativeTx = await clientNative.namePreclaimTx({ accountId: senderId, nonce, commitmentId })
     txFromAPI.should.be.equal(nativeTx)
   })
 
@@ -95,13 +93,13 @@ describe('Native Transaction', function () {
       accountId: senderId,
       nonce,
       name: nameHash,
-      nameSalt: _salt,
+      nameSalt: _salt
     })
     const nativeTx = await clientNative.nameClaimTx({
       accountId: senderId,
       nonce,
       name: nameHash,
-      nameSalt: _salt,
+      nameSalt: _salt
     })
     txFromAPI.should.be.equal(nativeTx)
   })
@@ -129,7 +127,7 @@ describe('Native Transaction', function () {
     const callData = await client.contractEncodeCall(bytecode, 'sophia', 'init', '()')
     const owner = await client.address()
 
-    const txFromAPI = await client.contractCreateTx({ ownerId: owner, code: bytecode, vmVersion, deposit, amount, gas, gasPrice, callData  })
+    const txFromAPI = await client.contractCreateTx({ ownerId: owner, code: bytecode, vmVersion, deposit, amount, gas, gasPrice, callData })
     const nativeTx = await clientNative.contractCreateTx({ ownerId: owner, code: bytecode, vmVersion, deposit, amount, gas, gasPrice, callData })
 
     txFromAPI.tx.should.be.equal(nativeTx.tx)
@@ -209,7 +207,7 @@ describe('Native Transaction', function () {
 
   it('native build of oracle respond query tx', async () => {
     const callerId = await client.address()
-    const params = { oracleId, callerId, responseTtl, queryId, response: queryResponse}
+    const params = { oracleId, callerId, responseTtl, queryId, response: queryResponse }
 
     const txFromAPI = await client.oracleRespondTx(params)
     const nativeTx = await clientNative.oracleRespondTx(params)

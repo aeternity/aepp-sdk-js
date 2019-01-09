@@ -20,7 +20,6 @@ import Tx from '@aeternity/aepp-sdk/es/tx'
         * *[.nameRevokeTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+nameRevokeTx) ⇒ `String`*
         * *[.contractCreateTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+contractCreateTx) ⇒ `String`*
         * *[.contractCallTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+contractCallTx) ⇒ `String`*
-        * *[.commitmentHash(name, salt)](#module_@aeternity/aepp-sdk/es/tx--Tx+commitmentHash) ⇒ `String`*
 
 <a id="exp_module_@aeternity/aepp-sdk/es/tx--Tx"></a>
 
@@ -173,19 +172,4 @@ Create a `contract_call_tx` transaction
 | Param | Type | Description |
 | --- | --- | --- |
 | options | `Object` | The object to extract properties from |
-
-<a id="module_@aeternity/aepp-sdk/es/tx--Tx+commitmentHash"></a>
-
-#### *tx.commitmentHash(name, salt) ⇒ `String`*
-Create a commitment hash for claiming names
-
-**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)  
-**Returns**: `String` - Commitment hash  
-**Category**: async  
-**rtype**: `(name: String, salt?: String) => hash: Promise[String]`
-
-| Param | Type | Description |
-| --- | --- | --- |
-| name | `String` | The name to claim |
-| salt | `String` | Random salt |
 
