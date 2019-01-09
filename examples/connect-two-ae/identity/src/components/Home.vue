@@ -76,8 +76,7 @@ export default {
       onTx: this.confirmDialog,
       onChain: this.confirmDialog,
       onAccount: this.confirmDialog,
-      onContract: this.confirmDialog,
-      networkId: 'ae_devnet'
+      onContract: this.confirmDialog
     }).then(ae => {
       this.client = ae
       console.log('status', this.client.api.getTopBlock())
