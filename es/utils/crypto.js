@@ -117,10 +117,10 @@ export function salt () {
 }
 
 /**
- * Base64 encode given `input`
+ * Base64check encode given `input`
  * @rtype (input: String|buffer) => Buffer
  * @param {String} input - Data to encode
- * @return {Buffer} Base64 encoded data
+ * @return {Buffer} Base64check encoded data
  */
 export function encodeBase64Check (input) {
   const buffer = Buffer.from(input)
@@ -144,10 +144,10 @@ function decodeRaw (buffer) {
 }
 
 /**
- * Base64 decode given `str`
+ * Base64check decode given `str`
  * @rtype (str: String) => Buffer
  * @param {String} str - Data to decode
- * @return {Buffer} Base64 decoded data
+ * @return {Buffer} Base64check decoded data
  */
 export function decodeBase64Check (str) {
   const buffer = Buffer.from(str, 'base64')

@@ -110,7 +110,7 @@ const base64Types = ['tx', 'st', 'ss', 'pi', 'ov', 'or', 'cb']
  *
  * @param {string} data  An encoded and prefixed string (ex tx_..., sg_..., ak_....)
  * @param {string} type Prefix of Transaction
- * @return {Buffer} Buffer of decoded Base58 or Base64 data
+ * @return {Buffer} Buffer of decoded Base58check or Base64check data
  */
 export function decode (data, type) {
   if (!type) type = data.split('_')[0]
@@ -124,7 +124,7 @@ export function decode (data, type) {
  *
  * @param {Buffer|String} data  An decoded data
  * @param {string} type Prefix of Transaction
- * @return {String} Encoded string Base58 or Base64 data
+ * @return {String} Encoded string Base58check or Base64check data
  */
 export function encode (data, type) {
   return `${type}_${base64Types.includes(type)
@@ -235,7 +235,7 @@ export function oracleQueryId (senderId, nonce, oracleId) {
  * @param {number} fee The fee for the transaction
  * @param {number} ttl The relative ttl of the transaction
  * @param {number} nonce the nonce of the transaction
- * @param {Boolean} encode encode transaction using Rlp and base64
+ * @param {Boolean} encode encode transaction using Rlp and base64check
  * @return {Object}  { tx } Unsigned spend tx hash
  */
 export function spendTxNative ({ senderId, recipientId, amount, payload, fee, ttl, nonce }, encode = true) {
@@ -264,7 +264,7 @@ export function spendTxNative ({ senderId, recipientId, amount, payload, fee, tt
  * @param {number} fee The fee for the transaction
  * @param {number} ttl The relative ttl of the transaction
  * @param {number} nonce the nonce of the transaction
- * @param {Boolean} encode encode transaction using Rlp and base64
+ * @param {Boolean} encode encode transaction using Rlp and base64check
  * @return {Object} { tx } Unsigned name pre-claim tx hash
  */
 export function namePreclaimTxNative ({ accountId, nonce, commitmentId, fee, ttl }, encode = true) {
@@ -292,7 +292,7 @@ export function namePreclaimTxNative ({ accountId, nonce, commitmentId, fee, ttl
  * @param {number} fee The fee for the transaction
  * @param {number} ttl The relative ttl of the transaction
  * @param {number} nonce the nonce of the transaction
- * @param {Boolean} encode encode transaction using Rlp and base64
+ * @param {Boolean} encode encode transaction using Rlp and base64check
  * @return {Object}  { tx } Unsigned name claim tx hash
  */
 export function nameClaimTxNative ({ accountId, nonce, name, nameSalt, fee, ttl }, encode = true) {
@@ -323,7 +323,7 @@ export function nameClaimTxNative ({ accountId, nonce, name, nameSalt, fee, ttl 
  * @param {number} clientTtl The relative ttl of the client
  * @param {Array} pointers Array of pointers
  * @param {number} nonce the nonce of the transaction
- * @param {Boolean} encode encode transaction using Rlp and base64
+ * @param {Boolean} encode encode transaction using Rlp and base64check
  * @return {Object} { tx } Unsigned name update tx hash
  */
 export function nameUpdateTxNative ({ accountId, nonce, nameId, nameTtl, pointers, clientTtl, fee, ttl }, encode = true) {
@@ -356,7 +356,7 @@ export function nameUpdateTxNative ({ accountId, nonce, nameId, nameTtl, pointer
  * @param {number} fee The fee for the transaction
  * @param {number} ttl The relative ttl of the transaction
  * @param {number} nonce the nonce of the transaction
- * @param {Boolean} encode encode transaction using Rlp and base64
+ * @param {Boolean} encode encode transaction using Rlp and base64check
  * @return {Object} { tx } Unsigned name transfer tx hash
  */
 export function nameTransferTxNative ({ accountId, nonce, nameId, recipientId, fee, ttl }, encode = true) {
@@ -384,7 +384,7 @@ export function nameTransferTxNative ({ accountId, nonce, nameId, recipientId, f
  * @param {number} fee The fee for the transaction
  * @param {number} ttl The relative ttl of the transaction
  * @param {number} nonce the nonce of the transaction
- * @param {Boolean} encode encode transaction using Rlp and base64
+ * @param {Boolean} encode encode transaction using Rlp and base64check
  * @return {Object} { tx } Unsigned name revoke tx hash
  */
 export function nameRevokeTxNative ({ accountId, nonce, nameId, fee, ttl }, encode = true) {
@@ -417,7 +417,7 @@ export function nameRevokeTxNative ({ accountId, nonce, nameId, fee, ttl }, enco
  * @param {number} ttl The relative ttl of the transaction
  * @param {number} nonce the nonce of the transaction
  * @param {string} callData Call Data
- * @param {Boolean} encode encode transaction using Rlp and base64
+ * @param {Boolean} encode encode transaction using Rlp and base64check
  * @return {Object} { tx } Encrypted contract create tx hash
  */
 export function contractCreateTxNative ({ ownerId, nonce, code, vmVersion, deposit, amount, gas, gasPrice, fee, ttl, callData }, encode = true) {
@@ -455,7 +455,7 @@ export function contractCreateTxNative ({ ownerId, nonce, code, vmVersion, depos
  * @param {number} ttl The relative ttl of the transaction
  * @param {number} nonce the nonce of the transaction
  * @param {string} callData Call Data
- * @param {Boolean} encode encode transaction using Rlp and base64
+ * @param {Boolean} encode encode transaction using Rlp and base64check
  * @return {Object} { tx } Encrypted contract call tx hash
  */
 export function contractCallTxNative ({ callerId, nonce, contractId, vmVersion, fee, ttl, amount, gas, gasPrice, callData }, encode = true) {
@@ -491,7 +491,7 @@ export function contractCallTxNative ({ callerId, nonce, contractId, vmVersion, 
  * @param {Number|String} ttl The relative ttl of the transaction
  * @param {Number|String} nonce the nonce of the transaction
  * @param {Number} vmVersion VM Version
- * @param {Boolean} encode encode transaction using Rlp and base64
+ * @param {Boolean} encode encode transaction using Rlp and base64check
  * @return {Object} { tx } Oracle register tx
  */
 export function oracleRegisterTxNative ({ accountId, queryFormat, responseFormat, queryFee, oracleTtl, fee, ttl, nonce, vmVersion }, encode = true) {
@@ -523,7 +523,7 @@ export function oracleRegisterTxNative ({ accountId, queryFormat, responseFormat
  * @param {Number|String} fee The fee for the transaction
  * @param {Number|String} ttl The relative ttl of the transaction
  * @param {Number|String} nonce the nonce of the transaction
- * @param {Boolean} encode encode transaction using Rlp and base64
+ * @param {Boolean} encode encode transaction using Rlp and base64check
  * @return {Object} { tx } Oracle extend tx hash
  */
 export function oracleExtendTxNative ({ oracleId, oracleTtl, fee, nonce, ttl }, encode = true) {
@@ -555,7 +555,7 @@ export function oracleExtendTxNative ({ oracleId, oracleTtl, fee, nonce, ttl }, 
  * @param {Number|String} fee The fee for the transaction
  * @param {Number|String} ttl The relative ttl of the transaction
  * @param {Number|String} nonce the nonce of the transaction
- * @param {Boolean} encode encode transaction using Rlp and base64
+ * @param {Boolean} encode encode transaction using Rlp and base64check
  * @return {Object} { tx } Oracle post query tx hash
  */
 export function oraclePostQueryTxNative ({ senderId, oracleId, responseTtl, query, queryTtl, fee, queryFee, ttl, nonce }, encode = true) {
@@ -590,7 +590,7 @@ export function oraclePostQueryTxNative ({ senderId, oracleId, responseTtl, quer
  * @param {Number|String} fee The fee for the transaction
  * @param {Number|String} ttl The relative ttl of the transaction
  * @param {Number|String} nonce the nonce of the transaction
- * @param {Boolean} encode encode transaction using Rlp and base64
+ * @param {Boolean} encode encode transaction using Rlp and base64check
  * @return {Object} { tx } Oracle respond query tx hash
  */
 export function oracleRespondQueryTxNative ({ oracleId, responseTtl, queryId, response, fee, ttl, nonce }, encode = true) {
