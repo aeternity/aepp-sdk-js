@@ -34,6 +34,8 @@ import Ae from './'
 /**
  * Transfer a domain to another account
  * @instance
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @category async
  * @param {String} nameId
  * @param {String} account
@@ -55,6 +57,8 @@ async function transfer (nameId, account, options = {}) {
 /**
  * Revoke a domain
  * @instance
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @category async
  * @param {String} nameId
  * @param {Object} [options={}]
@@ -98,6 +102,9 @@ function classify (s) {
 
 /**
  * Update an aens entry
+ * @instance
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param nameId domain hash
  * @param target new target
  * @param options
@@ -116,6 +123,9 @@ async function update (nameId, target, options = {}) {
 
 /**
  * Query the status of an AENS registration
+ * @instance
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param {string} name
  * @return {Promise<Object>}
  */
@@ -139,6 +149,9 @@ async function query (name) {
 /**
  * Claim a previously preclaimed registration. This can only be done after the
  * preclaim step
+ * @instance
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param {String} name
  * @param {String} salt
  * @param {Number} waitForHeight
@@ -161,6 +174,9 @@ async function claim (name, salt, waitForHeight, options = {}) {
 
 /**
  * Preclaim a name. Sends a hash of the name and a random salt to the node
+ * @instance
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param {string} name
  * @param {Record} [options={}]
  * @return {Promise<Object>}

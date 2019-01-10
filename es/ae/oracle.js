@@ -32,6 +32,9 @@ import { decodeBase64Check } from '../utils/crypto'
 
 /**
  * Constructor for Oracle Object (helper object for using Oracle)
+ * @alias module:@aeternity/aepp-sdk/es/ae/oracle
+ * @instance
+ * @function
  * @category async
  * @param {String} oracleId Oracle public key
  * @return {Promise<Object>} Oracle object
@@ -53,6 +56,9 @@ async function getOracleObject (oracleId) {
 
 /**
  * Constructor for OracleQuery Object (helper object for using OracleQuery)
+ * @alias module:@aeternity/aepp-sdk/es/ae/oracle
+ * @instance
+ * @function
  * @category async
  * @param {String} oracleId Oracle public key
  * @param {String} queryId Oracle Query id
@@ -69,9 +75,10 @@ async function getQueryObject (oracleId, queryId) {
 
 /**
  * Poll for oracle query response
+ * @alias module:@aeternity/aepp-sdk/es/ae/oracle
  * @instance
+ * @function
  * @category async
- * * @category async
  * @param {String} oracleId Oracle public key
  * @param {String} queryId Oracle Query id
  * @param {Object} [options] Options object
@@ -100,7 +107,9 @@ export async function pollForQueryResponse (oracleId, queryId, { attempts = 20, 
 
 /**
  * Register oracle
+ * @alias module:@aeternity/aepp-sdk/es/ae/oracle
  * @instance
+ * @function
  * @category async
  * @param {String} queryFormat Format of query
  * @param {String} responseFormat Format of query response
@@ -127,7 +136,9 @@ async function registerOracle (queryFormat, responseFormat, options = {}) {
 
 /**
  * Post query to oracle
+ * @alias module:@aeternity/aepp-sdk/es/ae/oracle
  * @instance
+ * @function
  * @category async
  * @param {String} oracleId Oracle public key
  * @param {String} query Oracle query object
@@ -154,7 +165,9 @@ async function postQueryToOracle (oracleId, query, options = {}) {
 
 /**
  * Extend oracle ttl
+ * @alias module:@aeternity/aepp-sdk/es/ae/oracle
  * @instance
+ * @function
  * @category async
  * @param {String} oracleId Oracle public key
  * @param {String} oracleTtl Oracle time to leave for extend
@@ -178,7 +191,9 @@ async function extendOracleTtl (oracleId, oracleTtl, options = {}) {
 
 /**
  * Extend oracle ttl
+ * @alias module:@aeternity/aepp-sdk/es/ae/oracle
  * @instance
+ * @function
  * @category async
  * @param {String} oracleId Oracle public key
  * @param {String} queryId Oracle query id

@@ -42,13 +42,6 @@ async function contractEpochEncodeCallData (codeOrAddress, abi, name, arg, call)
   return (await this.api.encodeCalldata({ abi, code, 'function': name, arg })).calldata
 }
 
-// TODO investigate that generation
-// eslint-disable-next-line no-unused-vars
-function generateCallCode (fn, arg, returnType) {
-  return `contract CallCode =
-  function __call() = ${fn}${arg}`
-}
-
 async function contractEpochCall (address, abi = 'sophia-address', name, arg = '()', call) {
   if (call && TYPE_CHECKED_ABI.includes(abi)) return this.api.callContract({ abi, code: address, call })
   return this.api.callContract({ abi, code: address, 'function': name, arg })
