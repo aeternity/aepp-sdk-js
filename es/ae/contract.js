@@ -119,7 +119,7 @@ const Contract = Ae.compose({
     contractDecodeData: decode
   },
   deepProps: { Ae: { defaults: {
-    deposit: 4,
+    deposit: 0,
     vmVersion: 1,
     gasPrice: 1,
     amount: 0,
