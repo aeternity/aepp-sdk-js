@@ -17,6 +17,7 @@
 
 import Ae from './ae'
 import * as Crypto from './utils/crypto'
+import * as KeyStore from './utils/keystore'
 import Chain from './chain'
 import EpochChain from './chain/epoch'
 import Tx from './tx'
@@ -38,6 +39,7 @@ export {
   Ae,
   Aepp,
   Crypto,
+  KeyStore,
   Chain,
   EpochChain,
   EpochContract,
