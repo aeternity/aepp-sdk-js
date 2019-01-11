@@ -23,7 +23,7 @@ const DERIVED_KEY_FUNCTIONS = {
 }
 
 async function deriveKeyUsingArgon2id (password, salt, options) {
-  const { memlimit_kib: memoryCost, parallelism ,  opslimit: timeCost } = options.kdf_params
+  const { memlimit_kib: memoryCost, parallelism, opslimit: timeCost } = options.kdf_params
   return argon2.hash(password, { timeCost, memoryCost, parallelism, type: argon2.argon2id, raw: true, salt })
 }
 
@@ -58,6 +58,7 @@ function isHex (str) {
  */
 function isBase64 (str) {
   let index
+  // eslint-disable-next-line no-useless-escape
   if (str.length % 4 > 0 || str.match(/[^0-9a-z+\/=]/i)) return false
   index = str.indexOf('=')
   return !!(index === -1 || str.slice(index).match(/={1,2}/))
@@ -113,14 +114,17 @@ function decrypt (ciphertext, key, nonce, algo) {
  * @param {Object=} options.kdf_params KDF parameters (default: DEFAULTS.crypto.kdf_params).
  * @return {buffer} Secret key derived from password.
  */
-async function deriveKey (password, nonce, options = { kdf_params: DEFAULTS.crypto.kdf_params, kdf: DEFAULTS.crypto.kdf }) {
+async function deriveKey (password, nonce, options = {
+  kdf_params: DEFAULTS.crypto.kdf_params,
+  kdf: DEFAULTS.crypto.kdf
+}) {
   if (typeof password === 'undefined' || password === null || !nonce) {
     throw new Error('Must provide password and nonce to derive a key')
   }
 
   if (!DERIVED_KEY_FUNCTIONS.hasOwnProperty(options.kdf)) throw new Error('Unsupported kdf type')
 
-  return await DERIVED_KEY_FUNCTIONS[options.kdf](password, nonce, options)
+  return DERIVED_KEY_FUNCTIONS[options.kdf](password, nonce, options)
 }
 
 /**
@@ -140,14 +144,15 @@ function marshal (name, derivedKey, privateKey, nonce, salt, options = {}) {
   const opt = Object.assign({}, DEFAULTS.crypto, options)
   return Object.assign(
     { name, version: 1, public_key: getAddressFromPriv(privateKey), id: uuid.v4() },
-    { crypto: Object.assign(
-      {
-        secret_type: opt.secret_type,
-        symmetric_alg: opt.symmetric_alg,
-        ciphertext: Buffer.from(encrypt(Buffer.from(privateKey), derivedKey, nonce, opt.symmetric_alg)).toString('hex'),
-        cipher_params: { nonce: Buffer.from(nonce).toString('hex') }
-      },
-      { kdf: opt.kdf, kdf_params: { ...opt.kdf_params, salt: Buffer.from(salt).toString('hex') }}
+    {
+      crypto: Object.assign(
+        {
+          secret_type: opt.secret_type,
+          symmetric_alg: opt.symmetric_alg,
+          ciphertext: Buffer.from(encrypt(Buffer.from(privateKey), derivedKey, nonce, opt.symmetric_alg)).toString('hex'),
+          cipher_params: { nonce: Buffer.from(nonce).toString('hex') }
+        },
+        { kdf: opt.kdf, kdf_params: { ...opt.kdf_params, salt: Buffer.from(salt).toString('hex') } }
       )
     }
   )
@@ -169,12 +174,12 @@ export async function recover (password, keyObject) {
   validateKeyObj(keyObject)
   const nonce = Uint8Array.from(str2buf(keyObject.crypto.cipher_params.nonce))
   const salt = Uint8Array.from(str2buf(keyObject.crypto.kdf_params.salt))
-  const kdf_params = keyObject.crypto.kdf_params
+  const kdfParams = keyObject.crypto.kdf_params
   const kdf = keyObject.crypto.kdf
 
   const key = await decrypt(
     Uint8Array.from(str2buf(keyObject.crypto.ciphertext)),
-    await deriveKey(password, salt, { kdf, kdf_params }),
+    await deriveKey(password, salt, { kdf, kdf_params: kdfParams }),
     nonce,
     keyObject.crypto.symmetric_alg
   )
@@ -209,16 +214,13 @@ export async function dump (name, password, privateKey, nonce = nacl.randomBytes
 
 export function validateKeyObj (obj) {
   const root = ['crypto', 'id', 'version', 'public_key']
-  const crypto_keys = ['cipher_params', 'ciphertext', 'symmetric_alg', 'kdf', 'kdf_params']
+  const cryptoKeys = ['cipher_params', 'ciphertext', 'symmetric_alg', 'kdf', 'kdf_params']
 
   const missingRootKeys = root.filter(key => !obj.hasOwnProperty(key))
   if (missingRootKeys.length) throw new Error(`Invalid key file format. Require properties: ${missingRootKeys}`)
 
-  const missingCryptoKeys = crypto_keys.filter(key => !obj['crypto'].hasOwnProperty(key))
+  const missingCryptoKeys = cryptoKeys.filter(key => !obj['crypto'].hasOwnProperty(key))
   if (missingCryptoKeys.length) throw new Error(`Invalid key file format. Require properties: ${missingCryptoKeys}`)
 
   return true
 }
-
-
-
