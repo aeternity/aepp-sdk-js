@@ -125,7 +125,19 @@ const Contract = Ae.compose({
     amount: 1,
     gas: 1600000 - 21000,
     options: ''
-  } } }
+  } } },
+  deepConf: {
+    Contract: {
+      methods: [
+        'contractCompile',
+        'contractCallStatic',
+        'contractDeploy',
+        'contractCall',
+        'contractEncodeCall',
+        'contractDecodeData'
+      ]
+    }
+  }
 })
 
 export default Contract

@@ -38,8 +38,14 @@ import EpochOracle from '../oracle/epoch'
 const contains = R.flip(R.contains)
 const isTxMethod = contains(Tx.compose.deepConfiguration.Ae.methods)
 const isChainMethod = contains(Chain.compose.deepConfiguration.Ae.methods)
-const isAccountMethod = contains(Account.compose.deepConfiguration.Ae.methods)
-const isContractMethod = contains(ContractBase.compose.deepConfiguration.Contract.methods)
+const isAccountMethod = contains([
+  ...Account.compose.deepConfiguration.Ae.methods,
+  ...Ae.compose.deepConfiguration.Ae.methods
+])
+const isContractMethod = contains([
+  ...ContractBase.compose.deepConfiguration.Contract.methods,
+  ...Contract.compose.deepConfiguration.Contract.methods
+])
 const handlers = [
   { pred: isTxMethod, handler: 'onTx', error: 'Creating transaction [{}] rejected' },
   { pred: isChainMethod, handler: 'onChain', error: 'Chain operation [{}] rejected' },

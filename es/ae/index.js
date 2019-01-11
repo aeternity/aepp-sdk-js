@@ -85,7 +85,12 @@ const Ae = stampit(Tx, Account, Chain, Contract, Oracle, {
   deepProperties: { Ae: { defaults: {
     ttl: 0,
     payload: ''
-  } } }
+  } } },
+  deepConf: {
+    Ae: {
+      methods: ['send', 'spend']
+    }
+  }
 })
 
 export default Ae

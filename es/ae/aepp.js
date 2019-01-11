@@ -22,9 +22,9 @@
  * @example import Ae from '@aeternity/aepp-sdk/es/ae/aepp'
  */
 
-import Ae from './'
+import stampit from '@stamp/it'
+import { required } from '@stamp/required'
 import Aens from './aens'
-import Contract from './contract'
 import Rpc from '../rpc/client'
 
 /**
@@ -39,6 +39,33 @@ import Rpc from '../rpc/client'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Aepp instance
  */
-const Aepp = Ae.compose(Contract, Aens, Rpc)
+const Aepp = stampit({
+  deepConf: {
+    Ae: {
+      methods: ['send', 'spend']
+    },
+    Contract: {
+      methods: [
+        'contractCompile',
+        'contractCallStatic',
+        'contractDeploy',
+        'contractCall',
+        'contractEncodeCall',
+        'contractDecodeData'
+      ]
+    }
+  }
+}, required({
+  methods: {
+    send: required,
+    spend: required,
+    contractCompile: required,
+    contractCallStatic: required,
+    contractDeploy: required,
+    contractCall: required,
+    contractEncodeCall: required,
+    contractDecodeData: required
+  }
+})).compose(Aens, Rpc)
 
 export default Aepp
