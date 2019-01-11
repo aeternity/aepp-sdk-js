@@ -42,7 +42,12 @@ async function receive ({ data, origin, source }) {
     this.rpcMethods[method].bind(this) || error,
     { params, session: this.rpcSessions[session], origin }
   ).then(result => {
-    source.postMessage({ jsonrpc: '2.0', id, result: { resolve: result } }, '*')
+    const resolve = typeof result === 'object'
+      ? Object.entries(result)
+        .filter(([key, value]) => typeof value !== 'function')
+        .reduce((p, [key, value]) => ({ ...p, [key]: value }), {})
+      : result
+    source.postMessage({ jsonrpc: '2.0', id, result: { resolve } }, '*')
   }).catch(error => {
     source.postMessage({ jsonrpc: '2.0', id, result: { reject: error.message } }, '*')
   })
