@@ -29,7 +29,7 @@ function hello () {
   return Promise.resolve(this.createSession())
 }
 
-async function receive ({ data, source }) {
+async function receive ({ data, origin, source }) {
   if (typeof data !== 'object' || data.jsonrpc !== '2.0') return
 
   const { id, method, params, session } = data
@@ -38,7 +38,10 @@ async function receive ({ data, source }) {
     return Promise.reject(Error(`Error: No such method ${method}`))
   }
 
-  R.call(this.rpcMethods[method].bind(this) || error, { params, session: this.rpcSessions[session] }).then(result => {
+  R.call(
+    this.rpcMethods[method].bind(this) || error,
+    { params, session: this.rpcSessions[session], origin }
+  ).then(result => {
     source.postMessage({ jsonrpc: '2.0', id, result: { resolve: result } }, '*')
   }).catch(error => {
     source.postMessage({ jsonrpc: '2.0', id, result: { reject: error.message } }, '*')
