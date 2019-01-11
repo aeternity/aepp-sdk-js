@@ -159,8 +159,8 @@ export default {
           this.byteCode = byteCodeObj.bytecode
         })
     },
-    onDeploy (options = {}) {
-      this.deploy(this.byteCode, options)
+    onDeploy () {
+      this.deploy(this.byteCode)
         .then(deployedContract => {
           this.deployInfo = deployedContract
         })
