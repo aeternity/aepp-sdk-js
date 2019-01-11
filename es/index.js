@@ -32,6 +32,7 @@ import Aepp from './ae/aepp'
 import Oracle from './ae/oracle'
 import EpochOracle from './oracle/epoch'
 import Selector from './account/selector'
+import Channel from './channel'
 import Universal from './ae/universal'
 
 export {
@@ -52,5 +53,6 @@ export {
   JsTx,
   Selector,
   Universal,
-  Oracle
+  Oracle,
+  Channel
 }

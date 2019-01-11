@@ -22,8 +22,6 @@ import Swagger from '@aeternity/aepp-sdk/es/utils/swagger'
             * [.debugSwagger(bool)](#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger.debugSwagger) ⇒ `Stamp`
         * _inner_
             * [~conformTypes](#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..conformTypes)
-            * [~snakeToPascal(s)](#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..snakeToPascal) ⇒ `String`
-            * [~pascalToSnake(s)](#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..pascalToSnake) ⇒ `String`
             * [~lookupType(path, spec, types)](#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..lookupType) ⇒ `Object`
             * [~extendingErrorPath(key, fn)](#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..extendingErrorPath) ⇒ `Any`
             * [~TypeError(msg, spec, value)](#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..TypeError) ⇒ `Error`
@@ -168,32 +166,6 @@ Per-type [conform](conform) dispatcher
 
 **Kind**: inner constant of [`Swagger`](#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger)  
 **rtype**: `[(dispatch(value: String, spec: Object, types: Object) => Any, throws: Error)...]`
-<a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..snakeToPascal"></a>
-
-#### Swagger~snakeToPascal(s) ⇒ `String`
-Convert string from snake_case to PascalCase
-
-**Kind**: inner method of [`Swagger`](#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger)  
-**Returns**: `String` - Converted string  
-**rtype**: `(s: String) => String`
-
-| Param | Type | Description |
-| --- | --- | --- |
-| s | `String` | String to convert |
-
-<a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..pascalToSnake"></a>
-
-#### Swagger~pascalToSnake(s) ⇒ `String`
-Convert string from PascalCase to snake_case
-
-**Kind**: inner method of [`Swagger`](#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger)  
-**Returns**: `String` - Converted string  
-**rtype**: `(s: String) => String`
-
-| Param | Type | Description |
-| --- | --- | --- |
-| s | `String` | String to convert |
-
 <a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..lookupType"></a>
 
 #### Swagger~lookupType(path, spec, types) ⇒ `Object`
