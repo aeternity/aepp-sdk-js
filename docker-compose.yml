@@ -17,7 +17,7 @@ services:
   node:
     image: aeternity/epoch:${TAG}
     hostname: node
-    expose: [3013, 3113]
+    expose: [3013, 3113, 3014, 3114]
     environment:
       EPOCH_CONFIG: /home/epoch/epoch.yaml
     command: -aecore expected_mine_rate ${EPOCH_MINE_RATE:-5000}

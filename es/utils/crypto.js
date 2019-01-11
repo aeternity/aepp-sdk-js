@@ -474,11 +474,34 @@ const OBJECT_TAGS = {
   SIGNED_TX: 11,
   CHANNEL_CREATE_TX: 50,
   CHANNEL_CLOSE_MUTUAL_TX: 53,
-  CHANNEL_OFFCHAIN_TX: 57
+  CHANNEL_OFFCHAIN_TX: 57,
+  CHANNEL_OFFCHAIN_UPDATE_TRANSFER: 570
+}
+
+function objectTag (tag, pretty) {
+  if (pretty) {
+    const entry = Object.entries(OBJECT_TAGS).find(([key, value]) => tag === value)
+    return entry ? entry[0] : tag
+  }
+  return tag
 }
 
 function readInt (buf) {
   return buf.readIntBE(0, buf.length)
+}
+
+function readId (buf) {
+  const type = buf.readUIntBE(0, 1)
+  const prefix = {
+    1: 'ak',
+    2: 'nm',
+    3: 'cm',
+    4: 'ok',
+    5: 'ct',
+    6: 'ch'
+  }[type]
+  const hash = encodeBase58Check(buf.slice(1, buf.length))
+  return `${prefix}_${hash}`
 }
 
 function readSignatures (buf) {
@@ -491,16 +514,30 @@ function readSignatures (buf) {
   return signatures
 }
 
-function readOffChainTXUpdates (buf) {
+function deserializeOffChainUpdate (binary, opts) {
+  const tag = readInt(binary[0])
+  const obj = {
+    tag: objectTag(tag, opts.prettyTags),
+    version: readInt(binary[1])
+  }
+
+  switch (tag) {
+    case OBJECT_TAGS.CHANNEL_OFFCHAIN_UPDATE_TRANSFER:
+      return Object.assign(obj, {
+        from: readId(binary[2]),
+        to: readId(binary[3]),
+        amount: readInt(binary[4])
+      })
+  }
+
+  return obj
+}
+
+function readOffChainTXUpdates (buf, opts) {
   const updates = []
 
   for (let i = 0; i < buf.length; i++) {
-    updates.push([
-      readInt(buf[i][0]),
-      'ak_' + encodeBase58Check(buf[i][1]),
-      'ak_' + encodeBase58Check(buf[i][2]),
-      readInt(buf[i][3])
-    ])
+    updates.push(deserializeOffChainUpdate(decode(buf[i]), opts))
   }
 
   return updates
@@ -512,35 +549,35 @@ function readOffChainTXUpdates (buf) {
  * @param {String} binary - Data to deserialize
  * @return {Object} Channel data
  */
-export function deserialize (binary) {
+export function deserialize (binary, opts = {prettyTags: false}) {
+  const tag = readInt(binary[0])
   const obj = {
-    tag: readInt(binary[0]),
+    tag: objectTag(tag, opts.prettyTags),
     version: readInt(binary[1])
   }
 
-  switch (obj.tag) {
+  switch (tag) {
     case OBJECT_TAGS.SIGNED_TX:
       return Object.assign(obj, {
         signatures: readSignatures(binary[2]),
-        tx: deserialize(decode(binary[3]))
+        tx: deserialize(decode(binary[3]), opts)
       })
 
     case OBJECT_TAGS.CHANNEL_CREATE_TX:
       return Object.assign(obj, {
-        initiator: 'ak_' + encodeBase58Check(binary[2]),
+        initiator: readId(binary[2]),
         initiatorAmount: readInt(binary[3]),
-        responder: 'ak_' + encodeBase58Check(binary[4]),
+        responder: readId(binary[4]),
         responderAmount: readInt(binary[5]),
         channelReserve: readInt(binary[6]),
         lockPeriod: readInt(binary[7]),
         ttl: readInt(binary[8]),
-        fee: readInt(binary[9]),
-        nonce: readInt(binary[10])
+        fee: readInt(binary[9])
       })
 
     case OBJECT_TAGS.CHANNEL_CLOSE_MUTUAL_TX:
       return Object.assign(obj, {
-        channelId: encodeBase58Check(binary[2]),
+        channelId: readId(binary[2]),
         initiatorAmount: readInt(binary[3]),
         responderAmount: readInt(binary[4]),
         ttl: readInt(binary[5]),
@@ -550,9 +587,9 @@ export function deserialize (binary) {
 
     case OBJECT_TAGS.CHANNEL_OFFCHAIN_TX:
       return Object.assign(obj, {
-        channelId: encodeBase58Check(binary[2]),
+        channelId: readId(binary[2]),
         round: readInt(binary[3]),
-        updates: readOffChainTXUpdates(binary[4]),
+        updates: readOffChainTXUpdates(binary[4], opts),
         state: encodeBase58Check(binary[5])
       })
   }
