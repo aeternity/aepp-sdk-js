@@ -26,7 +26,6 @@ import * as R from 'ramda'
 
 import Tx from './'
 import * as TxBuilder from './js'
-import Epoch from '../epoch'
 import { encode } from '../utils/crypto'
 
 const ORACLE_VM_VERSION = 0
@@ -279,7 +278,7 @@ function calculateFee (fee, txType, { gas = 0, params } = {}) {
  * @return {Object} Transaction instance
  * @example Transaction({url: 'https://sdk-testnet.aepps.com/'})
  */
-const Transaction = Epoch.compose(Tx, {
+const Transaction = Tx.compose({
   init ({ nativeMode = true }) {
     this.nativeMode = nativeMode
   },
