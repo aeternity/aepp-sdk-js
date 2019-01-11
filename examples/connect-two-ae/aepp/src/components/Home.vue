@@ -165,7 +165,7 @@ export default {
           this.deployInfo = deployedContract
         })
     },
-    onCall (options = {}) {
+    onCall () {
       this.call(this.byteCode)
         .then(callRes => {
           console.log(callRes)
