@@ -30,6 +30,8 @@ function hello () {
 }
 
 async function receive ({ data, source }) {
+  if (typeof data !== 'object' || data.jsonrpc !== '2.0') return
+
   const { id, method, params, session } = data
 
   function error () {
