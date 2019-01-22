@@ -32,7 +32,7 @@ function waitForChannel (channel) {
   )
 }
 
-describe('Channel', function () {
+describe.skip('Channel', function () {
   configure(this)
   this.retries(3)
 
