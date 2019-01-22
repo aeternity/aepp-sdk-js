@@ -1,6 +1,6 @@
+/* eslint-disable no-unused-vars */
 // # RLP version number
 // # https://github.com/aeternity/protocol/blob/epoch-v0.10.1/serializations.md#binary-serialization
-import { _id, _int, decode } from './js'
 
 export const VSN = 1
 
@@ -39,7 +39,7 @@ export const ID_TAG = {
   commitment: ID_TAG_COMMITMENT,
   oracle: ID_TAG_ORACLE,
   contract: ID_TAG_CONTRACT,
-  channel: ID_TAG_CHANNEL,
+  channel: ID_TAG_CHANNEL
 }
 export const TX_TYPE = {
   signed: 'signedTx',
