@@ -76,7 +76,7 @@ describe('Native Transaction', function () {
     commitmentId = await commitmentHash(name, _salt)
   })
 
-  it('native build of spend tx', async () => {
+  it.only('native build of spend tx', async () => {
     const txFromAPI = await client.spendTx({ senderId, recipientId, amount, nonce, payload: 'test' })
     const nativeTx = await clientNative.spendTx({ senderId, recipientId, amount, nonce, payload: 'test' })
     txFromAPI.should.be.equal(nativeTx)

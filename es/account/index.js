@@ -44,8 +44,8 @@ async function signTransaction (tx) {
   // Prepend `NETWORK_ID` to begin of data binary
   const txWithNetworkId = Buffer.concat([Buffer.from(networkId), rlpBinaryTx])
 
-  const signature = await this.sign(txWithNetworkId)
-  return buildTx({ encodedTx: rlpBinaryTx, signature }, TX_TYPE.signed)
+  const signatures = [await this.sign(txWithNetworkId)]
+  return buildTx({ encodedTx: rlpBinaryTx, signatures }, TX_TYPE.signed).tx
 }
 
 /**

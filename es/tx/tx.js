@@ -26,8 +26,10 @@ import * as R from 'ramda'
 
 import Tx from './'
 import * as TxBuilder from './js'
+import * as TxBuilderNew from './tx_builder'
 import Epoch from '../epoch'
 import { encode } from '../utils/crypto'
+import { TX_TYPE } from './schema'
 
 const ORACLE_VM_VERSION = 0
 
@@ -37,7 +39,7 @@ async function spendTx ({ senderId, recipientId, amount, payload = '' }) {
 
   // Build transaction using sdk (if nativeMode) or build on `EPOCH` side
   const { tx } = this.nativeMode
-    ? await TxBuilder.spendTxNative(R.merge(R.head(arguments), { recipientId, senderId, nonce, ttl, fee }))
+    ? await TxBuilderNew.buildTx(R.merge(R.head(arguments), { recipientId, senderId, nonce, ttl, fee }), TX_TYPE.spend)
     : await this.api.postSpend(R.merge(R.head(arguments), { amount: parseInt(amount), recipientId, senderId, nonce, ttl, fee: parseInt(fee) }))
 
   return tx

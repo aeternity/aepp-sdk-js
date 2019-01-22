@@ -34,9 +34,9 @@ const params = {
   nonce: '3',
   payload: ''
 }
-describe.only('Verify TransACTION', function () {
+describe('Verify TransACTION', function () {
   configure(this)
-  it.only('valid tx', async () => {
+  it('valid tx', async () => {
     const unpacked = unpackTx(signedTx)
     console.log(unpacked.tx)
 

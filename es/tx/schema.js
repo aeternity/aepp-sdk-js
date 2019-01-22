@@ -55,10 +55,10 @@ export const FIELD_TYPES = {
   int: 'int',
   binary: 'binary',
   id: 'id',
-  signature: 'signature',
+  signatures: 'signatures',
   rlp: 'rlp',
   string: 'string',
-  rlpBinary: 'rlpBinary',
+  rlpBinary: 'rlpBinary'
 }
 
 const SPEND_TX = [
@@ -76,7 +76,7 @@ const SPEND_TX = [
 const SIGNED_TX = [
   TX_FIELD('tag', FIELD_TYPES.int),
   TX_FIELD('VSN', FIELD_TYPES.int),
-  TX_FIELD('signature', FIELD_TYPES.signature),
+  TX_FIELD('signatures', FIELD_TYPES.signatures),
   TX_FIELD('encodedTx', FIELD_TYPES.rlpBinary)
 ]
 

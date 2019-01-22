@@ -122,6 +122,8 @@ function serializeField (value, type, prefix) {
       return writeId(value)
     case FIELD_TYPES.binary:
       return decode(value, prefix)
+    case FIELD_TYPES.signatures:
+      return value.map(Buffer.from)
     case FIELD_TYPES.string:
       return toBytes(value)
     default:
