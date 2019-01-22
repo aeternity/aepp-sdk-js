@@ -1,5 +1,5 @@
 import { describe, it } from 'mocha'
-import { verifyTx } from '../../es/tx/deserializer'
+import { verifyTx } from '../../es/tx/validator'
 import { configure } from '.'
 import { buildRawTx, buildTx, unpackTx } from '../../es/tx/tx_builder'
 import { encodeTx } from '../../es/utils/crypto'
