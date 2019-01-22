@@ -76,7 +76,7 @@ describe('Native Transaction', function () {
     commitmentId = await commitmentHash(name, _salt)
   })
 
-  it.only('native build of spend tx', async () => {
+  it('native build of spend tx', async () => {
     const txFromAPI = await client.spendTx({ senderId, recipientId, amount, nonce, payload: 'test' })
     const nativeTx = await clientNative.spendTx({ senderId, recipientId, amount, nonce, payload: 'test' })
     txFromAPI.should.be.equal(nativeTx)
@@ -122,7 +122,7 @@ describe('Native Transaction', function () {
     txFromAPI.should.be.equal(nativeTx)
   })
 
-  it('native build of contract create tx', async () => {
+  it.only('native build of contract create tx', async () => {
     const { bytecode } = await client.contractCompile(contractCode)
     const callData = await client.contractEncodeCall(bytecode, 'sophia', 'init', '()')
     const owner = await client.address()
@@ -132,7 +132,6 @@ describe('Native Transaction', function () {
 
     txFromAPI.tx.should.be.equal(nativeTx.tx)
     txFromAPI.contractId.should.be.equal(nativeTx.contractId)
-
     // deploy contract
     await client.send(nativeTx.tx)
     contractId = txFromAPI.contractId
@@ -147,6 +146,7 @@ describe('Native Transaction', function () {
     const nativeTx = await clientNative.contractCallTx({ callerId: owner, contractId, vmVersion, amount, gas, gasPrice, callData })
 
     txFromAPI.should.be.equal(nativeTx)
+
     const { hash } = await client.send(nativeTx)
     const result = await client.getTxInfo(hash)
 

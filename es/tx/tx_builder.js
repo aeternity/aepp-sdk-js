@@ -5,6 +5,7 @@ import {
   decodeBase64Check,
   encodeBase58Check,
   encodeBase64Check,
+  hash,
   rlp
 } from '../utils/crypto'
 import { toBytes } from '../utils/bytes'
@@ -23,6 +24,19 @@ import {
  */
 
 const base64Types = ['tx', 'st', 'ss', 'pi', 'ov', 'or', 'cb']
+
+/**
+ * Build a contract public key
+ *
+ * @param {string} ownerId The public key of the owner account
+ * @param {number} nonce the nonce of the transaction
+ * @return {string} Contract public key
+ */
+export function buildContractId (ownerId, nonce) {
+  const ownerIdAndNonce = Buffer.from([...decode(ownerId, 'ak'), ...toBytes(nonce)])
+  const b2bHash = hash(ownerIdAndNonce)
+  return encode(b2bHash, 'ct')
+}
 
 /**
  * Decode data using the default encoding/decoding algorithm
@@ -96,6 +110,36 @@ function readInt (buf) {
   return BigNumber(buf.toString('hex'), 16).toString(10)
 }
 
+/**
+ * Helper function to build pointers for name update TX
+ *
+ * @param {Array} pointers - Array of pointers ([ { key: 'account_pubkey', id: 'ak_32klj5j23k23j5423l434l2j3423'} ])
+ * @return {Array} Serialized pointers array
+ */
+export function buildPointers (pointers) {
+  return pointers.map(
+    p => [
+      toBytes(p['key']),
+      writeId(p['id'])
+    ]
+  )
+}
+
+/**
+ * Helper function to read pointers from name update TX
+ *
+ * @param {Array} pointers - Array of pointers ([ { key: 'account_pubkey', id: 'ak_32klj5j23k23j5423l434l2j3423'} ])
+ * @return {Array} Serialized pointers array
+ */
+export function readPointers (pointers) {
+  return pointers.map(
+    ([key, id]) => Object.assign({
+      key: key.toString(),
+      id: readId(id)
+    })
+  )
+}
+
 // SERIALIZE AND DESERIALIZE PART
 function deserializeField (value, type, prefix) {
   switch (type) {
@@ -107,6 +151,8 @@ function deserializeField (value, type, prefix) {
       return encode(value, prefix)
     case FIELD_TYPES.string:
       return value.toString()
+    case FIELD_TYPES.pointers:
+      return readPointers(value)
     case FIELD_TYPES.rlpBinary:
       return unpackTx(value, true)
     default:
@@ -126,6 +172,8 @@ function serializeField (value, type, prefix) {
       return value.map(Buffer.from)
     case FIELD_TYPES.string:
       return toBytes(value)
+    case FIELD_TYPES.pointers:
+      return buildPointers(value)
     default:
       return value
   }
