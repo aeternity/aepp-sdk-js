@@ -122,7 +122,7 @@ describe('Native Transaction', function () {
     txFromAPI.should.be.equal(nativeTx)
   })
 
-  it.only('native build of contract create tx', async () => {
+  it('native build of contract create tx', async () => {
     const { bytecode } = await client.contractCompile(contractCode)
     const callData = await client.contractEncodeCall(bytecode, 'sophia', 'init', '()')
     const owner = await client.address()
