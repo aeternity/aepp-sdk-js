@@ -33,7 +33,6 @@ const SPEND_TX = [
 ]
 
 function readInt (buf) {
-  // return buf.readIntBE(0, buf.length)
   return BigNumber(buf.toString('hex'), 16).toString(10)
 }
 

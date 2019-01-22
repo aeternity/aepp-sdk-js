@@ -4,7 +4,7 @@ import { describe, it } from 'mocha'
 import { assert, expect } from 'chai'
 
 const MAGNITUDE = 18
-describe.only('prefixedAmount', () => {
+describe('prefixedAmount', () => {
   it('removes trailing zeros', () => {
     (prefixedAmount(BigNumber('1.0000'))).should.be.equal('1')
   })
