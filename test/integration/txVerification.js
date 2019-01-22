@@ -1,9 +1,6 @@
-import { describe, it } from 'mocha'
-import { verifyTx } from '../../es/tx/validator'
+/* eslint-disable */
+import { describe } from 'mocha'
 import { configure } from '.'
-import { buildRawTx, buildTx, unpackTx } from '../../es/tx/tx_builder'
-import { encodeTx } from '../../es/utils/crypto'
-import { TX_TYPE } from '../../es/tx/schema'
 
 const signedTx = 'tx_+JcLAfhCuEC7Fwdj1SRQbmPj+l5wh3piyyd10AxKVLQWs/Jvx6UJN+2HkE+K5OXlpq3jqTCzMR0v7p3XdgiUWibwRQjz5mYHuE/4TQwBoQErhur1eJn/RBV05rwez1XXy/p0Zlghrxdc1gWlCHrKrqEBHxOjsIvwAUAGYqaLadh194A87EwIZH9u1dhMeJe9UKMKgk4gAAOAy9r6gQ=='
 const notSIgnedTx = 'tx_+E0MAaEBK4bq9XiZ/0QVdOa8Hs9V18v6dGZYIa8XXNYFpQh6yq6hAR8To7CL8AFABmKmi2nYdfeAPOxMCGR/btXYTHiXvVCjCoJOIAADgFcJyZ8='
@@ -34,61 +31,55 @@ const params = {
   nonce: '3',
   payload: ''
 }
-describe('Verify TransACTION', function () {
+describe.skip('Verify TransACTION', function () {
   configure(this)
-  it('valid tx', async () => {
-    const unpacked = unpackTx(signedTx)
-    console.log(unpacked.tx)
-
-    // console.log(buildTx(params, TX_TYPE.spend))
-  })
-  it('valid signed tx', async () => {
-    const unpacked = unpackTx(signedTx)
-    console.log(await verifyTx(unpacked))
-  })
-
-  it('wrong nonce tx', async () => {
-    const unpacked = unpackTx(wrongNonce)
-    console.log(await verifyTx(unpacked))
-  })
-  it('wrong nonce signed tx', async () => {
-    const unpacked = unpackTx(wrongNonceSigned)
-    console.log(await verifyTx(unpacked))
-  })
-
-  it('wrong ttl tx', async () => {
-    const unpacked = unpackTx(wrongTtl)
-    console.log(await verifyTx(unpacked))
-  })
-  it('wrong ttl signed tx', async () => {
-    const unpacked = unpackTx(wrongTtlSigned)
-    console.log(await verifyTx(unpacked))
-  })
-
-  it('not enough balance tx', async () => {
-    const unpacked = unpackTx(insufficientFunds)
-    console.log(await verifyTx(unpacked))
-  })
-  it('not enough balance signed tx', async () => {
-    const unpacked = unpackTx(insufficientFundsSigned)
-    console.log(await verifyTx(unpacked))
-  })
-
-  it('not enough balance tx(amount + fee)', async () => {
-    const unpacked = unpackTx(ErrInsufficientBalanceForAmountFee)
-    console.log(await verifyTx(unpacked))
-  })
-  it('not enough balance signed tx(amount + fee)', async () => {
-    const unpacked = unpackTx(ErrInsufficientBalanceForAmountFeeSigned)
-    console.log(await verifyTx(unpacked))
-  })
-
-  it('invalid signature tx', async () => {
-    const unpacked = unpackTx(invalidSignature)
-    console.log(await verifyTx(unpacked))
-  })
-  it('invalid signature tx 2', async () => {
-    const unpacked = unpackTx(invalidSignature2)
-    console.log(await verifyTx(unpacked))
-  })
+  // it('valid tx', async () => {
+  //   const unpacked = unpackTx(signedTx)
+  //   console.log(unpacked.tx)
+  // })
+  // it('valid signed tx', async () => {
+  //   const unpacked = unpackTx(signedTx)
+  // })
+  //
+  // it('wrong nonce tx', async () => {
+  //   const unpacked = unpackTx(wrongNonce)
+  // })
+  // it('wrong nonce signed tx', async () => {
+  //   const unpacked = unpackTx(wrongNonceSigned)
+  // })
+  //
+  // it('wrong ttl tx', async () => {
+  //   const unpacked = unpackTx(wrongTtl)
+  // })
+  // it('wrong ttl signed tx', async () => {
+  //   const unpacked = unpackTx(wrongTtlSigned)
+  //   console.log(await verifyTx(unpacked))
+  // })
+  //
+  // it('not enough balance tx', async () => {
+  //   const unpacked = unpackTx(insufficientFunds)
+  //   console.log(await verifyTx(unpacked))
+  // })
+  // it('not enough balance signed tx', async () => {
+  //   const unpacked = unpackTx(insufficientFundsSigned)
+  //   console.log(await verifyTx(unpacked))
+  // })
+  //
+  // it('not enough balance tx(amount + fee)', async () => {
+  //   const unpacked = unpackTx(ErrInsufficientBalanceForAmountFee)
+  //   console.log(await verifyTx(unpacked))
+  // })
+  // it('not enough balance signed tx(amount + fee)', async () => {
+  //   const unpacked = unpackTx(ErrInsufficientBalanceForAmountFeeSigned)
+  //   console.log(await verifyTx(unpacked))
+  // })
+  //
+  // it('invalid signature tx', async () => {
+  //   const unpacked = unpackTx(invalidSignature)
+  //   console.log(await verifyTx(unpacked))
+  // })
+  // it('invalid signature tx 2', async () => {
+  //   const unpacked = unpackTx(invalidSignature2)
+  //   console.log(await verifyTx(unpacked))
+  // })
 })
