@@ -17,6 +17,10 @@ import {
   VSN
 } from './schema'
 
+const ORACLE_TTL_TYPES = {
+  delta: 'delta',
+  block: 'block'
+}
 /**
  * JavaScript-based Transaction build function''
  *
@@ -36,6 +40,48 @@ export function buildContractId (ownerId, nonce) {
   const ownerIdAndNonce = Buffer.from([...decode(ownerId, 'ak'), ...toBytes(nonce)])
   const b2bHash = hash(ownerIdAndNonce)
   return encode(b2bHash, 'ct')
+}
+
+/**
+ * Build a oracle query id
+ *
+ * @param {String} senderId The public key of the sender account
+ * @param {Number} nonce the nonce of the transaction
+ * @param {Number} oracleId The oracle public key
+ * @return {string} Contract public key
+ */
+export function oracleQueryId (senderId, nonce, oracleId) {
+  function _int32 (val) {
+    const nonceBE = toBytes(val, true)
+    return Buffer.concat([Buffer.alloc(32 - nonceBE.length), nonceBE])
+  }
+  const b2bHash = hash(Buffer.from([...decode(senderId, 'ak'), ..._int32(nonce), ...decode(oracleId, 'ok')]))
+  return encode(b2bHash, 'oq')
+}
+
+/**
+ * Format the salt into a 64-byte hex string
+ *
+ * @param {number} salt
+ * @return {string} Zero-padded hex string of salt
+ */
+export function formatSalt (salt) {
+  return Buffer.from(salt.toString(16).padStart(64, '0'), 'hex')
+}
+
+/**
+ * Generate the commitment hash by hashing the formatted salt and
+ * name, base 58 encoding the result and prepending 'cm_'
+ *
+ * @function commitmentHash
+ * @category async
+ * @rtype (name: String, salt?: String) => hash: Promise[String]
+ * @param {String} name - Name to be registered
+ * @param {Number} salt Random salt
+ * @return {String} Commitment hash
+ */
+export async function commitmentHash (name, salt = createSalt()) {
+  return `cm_${encodeBase58Check(hash(Buffer.concat([nameId(name), formatSalt(salt)])))}`
 }
 
 /**
@@ -191,7 +237,7 @@ function validateField (value, type, prefix) {
   //   case FIELD_TYPES.string:
   //     // return toBytes(value)
   // }
-  return {}
+  // return {}
 }
 
 function validateParams (params, schema) {
@@ -201,8 +247,24 @@ function validateParams (params, schema) {
   )
 }
 
+function transformParams (params) {
+  return Object
+    .entries(params)
+    .reduce(
+      (acc, [key, value]) => {
+        acc[key] = value
+        if (key === 'oracleTtl') acc = { ...acc, oracleTtlType: value.type === ORACLE_TTL_TYPES.delta ? 0 : 1, oracleTtlValue: value.value }
+        if (key === 'queryTtl') acc = { ...acc, queryTtlType: value.type === ORACLE_TTL_TYPES.delta ? 0 : 1, queryTtlValue: value.value }
+        if (key === 'responseTtl') acc = { ...acc, responseTtlType: value.type === ORACLE_TTL_TYPES.delta ? 0 : 1, responseTtlValue: value.value }
+        return acc
+      },
+      {}
+    )
+}
+
 export function buildRawTx (params, schema) {
   const valid = validateParams(params, schema)
+  params = transformParams(params)
   // Validation
   if (Object.keys(valid).length) throw new Error(valid)
 

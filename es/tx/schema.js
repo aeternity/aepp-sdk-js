@@ -2,9 +2,6 @@
 // # RLP version number
 // # https://github.com/aeternity/protocol/blob/epoch-v0.10.1/serializations.md#binary-serialization
 
-import { toBytes } from '../utils/bytes'
-import { _id, _int, decode } from './js'
-
 export const VSN = 1
 
 // # Tag constant for ids (type uint8)
@@ -174,6 +171,7 @@ const CONTRACT_CALL_TX = [
 ]
 
 const ORACLE_REGISTER_TX = [
+  ...BASE_TX,
   TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
   TX_FIELD('queryFormat', FIELD_TYPES.string),
@@ -187,6 +185,7 @@ const ORACLE_REGISTER_TX = [
 ]
 
 const ORACLE_EXTEND_TX = [
+  ...BASE_TX,
   TX_FIELD('oracleId', FIELD_TYPES.id, 'ok'),
   TX_FIELD('nonce', FIELD_TYPES.int),
   TX_FIELD('oracleTtlType', FIELD_TYPES.int),
@@ -196,6 +195,7 @@ const ORACLE_EXTEND_TX = [
 ]
 
 const ORACLE_QUERY_TX = [
+  ...BASE_TX,
   TX_FIELD('senderId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
   TX_FIELD('oracleId', FIELD_TYPES.id, 'ok'),
@@ -209,6 +209,7 @@ const ORACLE_QUERY_TX = [
   TX_FIELD('ttl', FIELD_TYPES.int)
 ]
 const ORACLE_RESPOND_TX = [
+  ...BASE_TX,
   TX_FIELD('oracleId', FIELD_TYPES.id, 'ok'),
   TX_FIELD('nonce', FIELD_TYPES.int),
   TX_FIELD('queryId', FIELD_TYPES.binary, 'oq'),

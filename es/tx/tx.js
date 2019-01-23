@@ -153,10 +153,9 @@ async function contractCallTx ({ callerId, contractId, vmVersion, amount, gas, g
 async function oracleRegisterTx ({ accountId, queryFormat, responseFormat, queryFee, oracleTtl, vmVersion = ORACLE_VM_VERSION }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
   const { fee, ttl, nonce } = await this.prepareTxParams('oracleRegisterTx', { senderId: accountId, ...R.head(arguments) })
-
   // Build transaction using sdk (if nativeMode) or build on `EPOCH` side
   const { tx } = this.nativeMode
-    ? TxBuilder.oracleRegisterTxNative({
+    ? TxBuilderNew.buildTx({
       accountId,
       queryFee,
       vmVersion,
@@ -166,7 +165,7 @@ async function oracleRegisterTx ({ accountId, queryFormat, responseFormat, query
       ttl,
       queryFormat,
       responseFormat
-    })
+    }, TX_TYPE.oracleRegister)
     : await this.api.postOracleRegister({
       accountId,
       queryFee,
@@ -188,7 +187,7 @@ async function oracleExtendTx ({ oracleId, callerId, oracleTtl }) {
 
   // Build transaction using sdk (if nativeMode) or build on `EPOCH` side
   const { tx } = this.nativeMode
-    ? TxBuilder.oracleExtendTxNative({ oracleId, fee, oracleTtl, nonce, ttl })
+    ? TxBuilderNew.buildTx({ oracleId, fee, oracleTtl, nonce, ttl }, TX_TYPE.oracleExtend)
     : await this.api.postOracleExtend({ oracleId, fee: parseInt(fee), oracleTtl, nonce, ttl })
 
   return tx
@@ -200,7 +199,7 @@ async function oraclePostQueryTx ({ oracleId, responseTtl, query, queryTtl, quer
 
   // Build transaction using sdk (if nativeMode) or build on `EPOCH` side
   const { tx } = this.nativeMode
-    ? TxBuilder.oraclePostQueryTxNative({ oracleId, responseTtl, query, queryTtl, fee, queryFee, ttl, nonce, senderId })
+    ? TxBuilderNew.buildTx({ oracleId, responseTtl, query, queryTtl, fee, queryFee, ttl, nonce, senderId }, TX_TYPE.oracleQuery)
     : await this.api.postOracleQuery({
       oracleId,
       responseTtl,
@@ -213,7 +212,7 @@ async function oraclePostQueryTx ({ oracleId, responseTtl, query, queryTtl, quer
       senderId
     })
 
-  return { tx, queryId: TxBuilder.oracleQueryId(senderId, nonce, oracleId) }
+  return { tx, queryId: TxBuilderNew.oracleQueryId(senderId, nonce, oracleId) }
 }
 
 async function oracleRespondTx ({ oracleId, callerId, responseTtl, queryId, response }) {
@@ -222,7 +221,7 @@ async function oracleRespondTx ({ oracleId, callerId, responseTtl, queryId, resp
 
   // Build transaction using sdk (if nativeMode) or build on `EPOCH` side
   const { tx } = this.nativeMode
-    ? TxBuilder.oracleRespondQueryTxNative({ oracleId, responseTtl, queryId, response, fee, ttl, nonce })
+    ? TxBuilderNew.buildTx({ oracleId, responseTtl, queryId, response, fee, ttl, nonce }, TX_TYPE.oracleResponse)
     : await this.api.postOracleRespond({ oracleId, responseTtl, queryId, response, fee: parseInt(fee), ttl, nonce })
   return tx
 }
@@ -306,7 +305,7 @@ function calculateFee (fee, txType, { gas = 0, params } = {}) {
     // TODO remove that after implement oracle fee calculation
     if (!params) return this.fee
 
-    const txWithOutFee = TxBuilder[`${txType}Native`](params, false).tx.filter(e => e !== undefined)
+    const txWithOutFee = TxBuilderNew(params, TX_TYPE).tx.filter(e => e !== undefined)
     const txSize = encode(txWithOutFee).length
 
     return TX_FEE_FORMULA[txType] ? TX_FEE_FORMULA[txType] + getGasBySize(txSize) : this.fee
