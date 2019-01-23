@@ -5,8 +5,8 @@ import {
   decodeBase64Check,
   encodeBase58Check,
   encodeBase64Check,
-  hash,
-  rlp
+  hash, nameId,
+  rlp, salt
 } from '../utils/crypto'
 import { toBytes } from '../utils/bytes'
 import {
@@ -21,6 +21,8 @@ const ORACLE_TTL_TYPES = {
   delta: 'delta',
   block: 'block'
 }
+export const createSalt = salt
+
 /**
  * JavaScript-based Transaction build function''
  *

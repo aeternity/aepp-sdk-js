@@ -305,7 +305,7 @@ function calculateFee (fee, txType, { gas = 0, params } = {}) {
     // TODO remove that after implement oracle fee calculation
     if (!params) return this.fee
 
-    const txWithOutFee = TxBuilderNew(params, TX_TYPE).tx.filter(e => e !== undefined)
+    const txWithOutFee = TxBuilder[`${txType}Native`](params, false).tx.filter(e => e !== undefined)
     const txSize = encode(txWithOutFee).length
 
     return TX_FEE_FORMULA[txType] ? TX_FEE_FORMULA[txType] + getGasBySize(txSize) : this.fee
