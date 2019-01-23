@@ -8,11 +8,12 @@ http:
   external:
     port: 3013
   internal:
+    debug_endpoints: true
     port: 3113
     listen_address: 0.0.0.0
-  endpoints:
-    debug: true
-  debug: true
+#  endpoints:
+#    debug: true
+#  debug: true
 
 
 websocket:

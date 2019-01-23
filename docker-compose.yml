@@ -15,7 +15,7 @@ services:
       - .:/node_modules/@aeternity/aepp-sdk
 
   node:
-    image: aeternity/epoch:${TAG}
+    image: aeternity/aeternity:${TAG}
     hostname: node
     expose: [3013, 3113, 3014, 3114]
     environment:
