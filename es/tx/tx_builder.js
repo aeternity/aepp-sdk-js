@@ -1,3 +1,4 @@
+/* eslint-disable curly */
 import { BigNumber } from 'bignumber.js'
 import {
   assertedType,
@@ -11,9 +12,9 @@ import {
 import { toBytes } from '../utils/bytes'
 import {
   FIELD_TYPES,
-  ID_TAG,
+  ID_TAG_PREFIX, PREFIX_ID_TAG,
   TX_DESERIALIZATION_SCHEMA,
-  TX_SERIALIZATION_SCHEMA,
+  TX_SERIALIZATION_SCHEMA, VALIDATION_MESSAGE,
   VSN
 } from './schema'
 
@@ -57,6 +58,7 @@ export function oracleQueryId (senderId, nonce, oracleId) {
     const nonceBE = toBytes(val, true)
     return Buffer.concat([Buffer.alloc(32 - nonceBE.length), nonceBE])
   }
+
   const b2bHash = hash(Buffer.from([...decode(senderId, 'ak'), ..._int32(nonce), ...decode(oracleId, 'ok')]))
   return encode(b2bHash, 'oq')
 }
@@ -120,27 +122,15 @@ function encode (data, type) {
  */
 function writeId (hashId) {
   const prefix = hashId.slice(0, 2)
-  const idTag = {
-    'ak': ID_TAG.account,
-    'nm': ID_TAG.name,
-    'cm': ID_TAG.commitment,
-    'ok': ID_TAG.oracle,
-    'ct': ID_TAG.contract,
-    'ch': ID_TAG.channel
-  }[prefix]
+  const idTag = PREFIX_ID_TAG[prefix]
+  if (!idTag) throw new Error(`Id tag for prefix ${prefix} not found.`)
   return Buffer.from([...toBytes(idTag), ...decode(hashId, prefix)])
 }
 
 function readId (buf) {
   const tag = buf.readUIntBE(0, 1)
-  const prefix = {
-    [ID_TAG.account]: 'ak',
-    [ID_TAG.name]: 'nm',
-    [ID_TAG.commitment]: 'cm',
-    [ID_TAG.oracle]: 'ok',
-    [ID_TAG.contract]: 'ct',
-    [ID_TAG.channel]: 'ch'
-  }[tag]
+  const prefix = ID_TAG_PREFIX[tag]
+  if (!prefix) throw new Error(`Prefix for id-tag ${tag} not found.`)
   return encode(buf.slice(1, buf.length), prefix)
 }
 
@@ -228,25 +218,42 @@ function serializeField (value, type, prefix) {
 }
 
 // TODO implement tx params validation
-function validateField (value, type, prefix) {
-  // switch (type) {
-  //   case FIELD_TYPES.int:
-  //     // return writeInt(value)
-  //   case FIELD_TYPES.id:
-  //     // return writeId(value)
-  //   case FIELD_TYPES.binary:
-  //     // return decode(value, prefix)
-  //   case FIELD_TYPES.string:
-  //     // return toBytes(value)
-  // }
-  // return {}
+function validateField (value, key, type, prefix) {
+  const assert = (valid, params) => valid ? {} : { [key]: VALIDATION_MESSAGE[type](params) }
+
+  // All fields are required
+  if (value === undefined || value === null) return { [key]: 'Field is required' }
+
+  // Validate type of value
+  switch (type) {
+    case FIELD_TYPES.int:
+      return assert(!isNaN(value) || BigNumber.isBigNumber(value), { value })
+    case FIELD_TYPES.id:
+      return assert(PREFIX_ID_TAG[value.split('_')[0]], { value })
+    case FIELD_TYPES.binary:
+      return assert(value.split('_')[0] === prefix, { prefix, value })
+    case FIELD_TYPES.string:
+      return assert(true)
+    case FIELD_TYPES.pointers:
+      return assert(Array.isArray(value) && !value.find(e => e === Object(e)))
+    default:
+      return {}
+  }
 }
 
 function validateParams (params, schema) {
-  return schema.reduce(
-    (acc, [key, type, prefix]) => Object.assign(acc, validateField(params[key], type, prefix)),
+  const valid = schema.reduce(
+    (acc, [key, type, prefix]) => Object.assign(acc, validateField(params[key], key, type, prefix)),
     {}
   )
+  if (Object.keys(valid))
+    throw Object({
+      ...(new Error('Validation Error')),
+      errorData: valid,
+      code: 'TX_BUILD_VALIDATION_ERROR'
+    })
+
+  return true
 }
 
 function transformParams (params) {
@@ -255,20 +262,32 @@ function transformParams (params) {
     .reduce(
       (acc, [key, value]) => {
         acc[key] = value
-        if (key === 'oracleTtl') acc = { ...acc, oracleTtlType: value.type === ORACLE_TTL_TYPES.delta ? 0 : 1, oracleTtlValue: value.value }
-        if (key === 'queryTtl') acc = { ...acc, queryTtlType: value.type === ORACLE_TTL_TYPES.delta ? 0 : 1, queryTtlValue: value.value }
-        if (key === 'responseTtl') acc = { ...acc, responseTtlType: value.type === ORACLE_TTL_TYPES.delta ? 0 : 1, responseTtlValue: value.value }
+        if (key === 'oracleTtl') acc = {
+          ...acc,
+          oracleTtlType: value.type === ORACLE_TTL_TYPES.delta ? 0 : 1,
+          oracleTtlValue: value.value
+        }
+        if (key === 'queryTtl') acc = {
+          ...acc,
+          queryTtlType: value.type === ORACLE_TTL_TYPES.delta ? 0 : 1,
+          queryTtlValue: value.value
+        }
+        if (key === 'responseTtl') acc = {
+          ...acc,
+          responseTtlType: value.type === ORACLE_TTL_TYPES.delta ? 0 : 1,
+          responseTtlValue: value.value
+        }
         return acc
       },
       {}
     )
 }
 
-export function buildRawTx (params, schema) {
-  const valid = validateParams(params, schema)
+export function buildRawTx (params, schema, { skipValidation = false }) {
+  // Transform params(reason is for do not break current interface of `tx`)
   params = transformParams(params)
   // Validation
-  if (Object.keys(valid).length) throw new Error(valid)
+  skipValidation || validateParams(params, schema)
 
   return schema.map(([key, fieldType, prefix]) => serializeField(params[key], fieldType, prefix))
 }
@@ -285,7 +304,7 @@ export function unpackRawTx (binary, schema) {
     )
 }
 
-export function buildTx (params, type) {
+export function buildTx (params, type, { skipValidation = false }) {
   const [schema, tag] = TX_SERIALIZATION_SCHEMA[type]
   const binary = buildRawTx({ ...params, VSN, tag }, schema).filter(e => e !== undefined)
 

@@ -33,14 +33,6 @@ const OBJECT_TAG_CONTRACT_CALL_TRANSACTION = 43
 const TX_FIELD = (name, type, prefix) => [name, type, prefix]
 const TX_SCHEMA_FIELD = (schema, objectId) => [schema, objectId]
 
-export const ID_TAG = {
-  account: ID_TAG_ACCOUNT,
-  name: ID_TAG_NAME,
-  commitment: ID_TAG_COMMITMENT,
-  oracle: ID_TAG_ORACLE,
-  contract: ID_TAG_CONTRACT,
-  channel: ID_TAG_CHANNEL
-}
 export const TX_TYPE = {
   signed: 'signedTx',
   spend: 'spendTx',
@@ -67,6 +59,41 @@ export const FIELD_TYPES = {
   rlpBinary: 'rlpBinary',
   signatures: 'signatures',
   pointers: 'pointers'
+}
+
+export const ID_TAG = {
+  account: ID_TAG_ACCOUNT,
+  name: ID_TAG_NAME,
+  commitment: ID_TAG_COMMITMENT,
+  oracle: ID_TAG_ORACLE,
+  contract: ID_TAG_CONTRACT,
+  channel: ID_TAG_CHANNEL
+}
+export const PREFIX_ID_TAG = {
+  'ak': ID_TAG.account,
+  'nm': ID_TAG.name,
+  'cm': ID_TAG.commitment,
+  'ok': ID_TAG.oracle,
+  'ct': ID_TAG.contract,
+  'ch': ID_TAG.channel
+}
+
+export const ID_TAG_PREFIX = {
+  [ID_TAG.account]: 'ak',
+  [ID_TAG.name]: 'nm',
+  [ID_TAG.commitment]: 'cm',
+  [ID_TAG.oracle]: 'ok',
+  [ID_TAG.contract]: 'ct',
+  [ID_TAG.channel]: 'ch'
+}
+const VALIDATION_ERROR = (msg) => msg
+
+export const VALIDATION_MESSAGE = {
+  [FIELD_TYPES.int]: ({ value }) => VALIDATION_ERROR(`${value} is not of type Number or BigNumber`),
+  [FIELD_TYPES.id]: ({ value }) => VALIDATION_ERROR(`${value} prefix doesn't match any Object id`),
+  [FIELD_TYPES.binary]: ({ prefix, value }) => VALIDATION_ERROR(`Value prefix '${value.split('_')[0]}' doesn't match expected prefix '${prefix}'`),
+  [FIELD_TYPES.string]: ({ value }) => VALIDATION_ERROR(`${value} is not of type Number or BigNumber`),
+  [FIELD_TYPES.pointers]: ({ value }) => VALIDATION_ERROR(`Value must be of type Array and contains only object's like '{key: "account_key", id: "ak_lkamsflkalsdalksdlasdlasdlamd"}'`),
 }
 
 const BASE_TX = [
