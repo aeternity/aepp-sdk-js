@@ -135,7 +135,7 @@ function transformParams (params) {
  * @param {Options} options - Options object
  * @param {String|Number} options.gas - Gas amount
  * @param {Object} options.params - Tx params
- * @return {String}
+ * @return {String|Number}
  * @example calculateFee(null, 'spendtx')
  */
 export function calculateFee (fee, txType, { gas = 0, params } = {}) {
@@ -145,7 +145,7 @@ export function calculateFee (fee, txType, { gas = 0, params } = {}) {
 
   if (!fee) {
     // TODO remove that after implement oracle fee calculation
-    if (!params) return this.fee
+    if (!params) return DEFAULT_FEE
 
     const { rlpEncoded: txWithOutFee } = buildTx(params, txType, { skipValidation: true })
     const txSize = txWithOutFee.length
