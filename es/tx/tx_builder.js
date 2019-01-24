@@ -11,9 +11,11 @@ import {
 } from '../utils/crypto'
 import { toBytes } from '../utils/bytes'
 import {
-  FIELD_TYPES,
+  DEFAULT_FEE,
+  FEE_BYTE_SIZE,
+  FIELD_TYPES, GAS_PER_BYTE,
   ID_TAG_PREFIX, PREFIX_ID_TAG,
-  TX_DESERIALIZATION_SCHEMA,
+  TX_DESERIALIZATION_SCHEMA, TX_FEE_FORMULA,
   TX_SERIALIZATION_SCHEMA, VALIDATION_MESSAGE,
   VSN
 } from './schema'
@@ -229,7 +231,7 @@ function validateField (value, key, type, prefix) {
     case FIELD_TYPES.int:
       return assert(!isNaN(value) || BigNumber.isBigNumber(value), { value })
     case FIELD_TYPES.id:
-      return assert(PREFIX_ID_TAG[value.split('_')[0]], { value })
+      return assert(PREFIX_ID_TAG[value.split('_')[0]] && value.split('_')[0] === prefix, { value, prefix })
     case FIELD_TYPES.binary:
       return assert(value.split('_')[0] === prefix, { prefix, value })
     case FIELD_TYPES.string:
@@ -246,12 +248,14 @@ function validateParams (params, schema) {
     (acc, [key, type, prefix]) => Object.assign(acc, validateField(params[key], key, type, prefix)),
     {}
   )
-  if (Object.keys(valid))
+
+  if (Object.keys(valid).length) {
     throw Object({
       ...(new Error('Validation Error')),
       errorData: valid,
       code: 'TX_BUILD_VALIDATION_ERROR'
     })
+  }
 
   return true
 }
@@ -283,7 +287,39 @@ function transformParams (params) {
     )
 }
 
-export function buildRawTx (params, schema, { skipValidation = false }) {
+// INTERFACE
+/**
+ * Calculate fee
+ * @rtype (fee, txType, gas = 0) => String
+ * @param {String|Number} fee - fee
+ * @param {String} txType - Transaction type
+ * @param {Options} options - Options object
+ * @param {String|Number} options.gas - Gas amount
+ * @param {Object} options.params - Tx params
+ * @return {String}
+ * @example calculateFee(null, 'spendtx')
+ */
+export function calculateFee (fee, txType, { gas = 0, params } = {}) {
+  function getGasBySize (size) {
+    return GAS_PER_BYTE * (size + FEE_BYTE_SIZE)
+  }
+
+  if (!fee) {
+    // TODO remove that after implement oracle fee calculation
+    if (!params) return this.fee
+
+    const { rlpEncoded: txWithOutFee } = buildTx(params, txType, { skipValidation: true })
+    const txSize = txWithOutFee.length
+
+    return TX_FEE_FORMULA[txType] ? TX_FEE_FORMULA[txType](gas) + getGasBySize(txSize) : DEFAULT_FEE
+  }
+  return fee
+}
+
+/**
+ * BUILD BINARY TRANSACTION
+* */
+export function buildRawTx (params, schema, { skipValidation = false } = {}) {
   // Transform params(reason is for do not break current interface of `tx`)
   params = transformParams(params)
   // Validation
@@ -292,6 +328,9 @@ export function buildRawTx (params, schema, { skipValidation = false }) {
   return schema.map(([key, fieldType, prefix]) => serializeField(params[key], fieldType, prefix))
 }
 
+/**
+ * UNPACK BINARY TRANSACTION
+ * */
 export function unpackRawTx (binary, schema) {
   return schema
     .reduce(
@@ -304,9 +343,12 @@ export function unpackRawTx (binary, schema) {
     )
 }
 
-export function buildTx (params, type, { skipValidation = false }) {
+/**
+ * BUILD TRANSACTION
+ * */
+export function buildTx (params, type, { skipValidation = false } = {}) {
   const [schema, tag] = TX_SERIALIZATION_SCHEMA[type]
-  const binary = buildRawTx({ ...params, VSN, tag }, schema).filter(e => e !== undefined)
+  const binary = buildRawTx({ ...params, VSN, tag }, schema, { skipValidation }).filter(e => e !== undefined)
 
   const rlpEncoded = rlp.encode(binary)
   const tx = encode(rlpEncoded, 'tx')
@@ -314,6 +356,9 @@ export function buildTx (params, type, { skipValidation = false }) {
   return { tx, rlpEncoded, binary }
 }
 
+/**
+ * UNPACK TRANSACTION
+ * */
 export function unpackTx (encodedTx, fromRlpBinary = false) {
   const rlpEncoded = fromRlpBinary ? encodedTx : decode(encodedTx, 'tx')
   const binary = rlp.decode(rlpEncoded)

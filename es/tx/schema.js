@@ -61,6 +61,24 @@ export const FIELD_TYPES = {
   pointers: 'pointers'
 }
 
+// FEE CALCULATION
+export const BASE_GAS = 15000
+export const GAS_PER_BYTE = 20
+export const FEE_BYTE_SIZE = 8
+export const DEFAULT_FEE = 20000
+
+// MAP WITH FEE CALCULATION https://github.com/aeternity/protocol/blob/epoch-v1.0.0-rc6/consensus/consensus.md#gas
+export const TX_FEE_FORMULA = {
+  [TX_TYPE.spend]: () => BASE_GAS,
+  [TX_TYPE.contractCreate]: (gas) => 5 * BASE_GAS + gas,
+  [TX_TYPE.contractCall]: (gas) => 30 * BASE_GAS + gas,
+  [TX_TYPE.nameTransfer]: () => BASE_GAS,
+  [TX_TYPE.nameUpdate]: () => BASE_GAS,
+  [TX_TYPE.nameClaim]: () => BASE_GAS,
+  [TX_TYPE.namePreClaim]: () => BASE_GAS,
+  [TX_TYPE.nameRevoke]: () => BASE_GAS
+}
+
 export const ID_TAG = {
   account: ID_TAG_ACCOUNT,
   name: ID_TAG_NAME,
@@ -90,9 +108,9 @@ const VALIDATION_ERROR = (msg) => msg
 
 export const VALIDATION_MESSAGE = {
   [FIELD_TYPES.int]: ({ value }) => VALIDATION_ERROR(`${value} is not of type Number or BigNumber`),
-  [FIELD_TYPES.id]: ({ value }) => VALIDATION_ERROR(`${value} prefix doesn't match any Object id`),
-  [FIELD_TYPES.binary]: ({ prefix, value }) => VALIDATION_ERROR(`Value prefix '${value.split('_')[0]}' doesn't match expected prefix '${prefix}'`),
-  [FIELD_TYPES.string]: ({ value }) => VALIDATION_ERROR(`${value} is not of type Number or BigNumber`),
+  [FIELD_TYPES.id]: ({ value, prefix }) => VALIDATION_ERROR(`'${value}' prefix doesn't match expected prefix '${prefix}' or ID_TAG for prefix not found`),
+  [FIELD_TYPES.binary]: ({ prefix, value }) => VALIDATION_ERROR(`'${value}' prefix doesn't match expected prefix '${prefix}'`),
+  [FIELD_TYPES.string]: ({ value }) => VALIDATION_ERROR(`Not a string`),
   [FIELD_TYPES.pointers]: ({ value }) => VALIDATION_ERROR(`Value must be of type Array and contains only object's like '{key: "account_key", id: "ak_lkamsflkalsdalksdlasdlasdlamd"}'`),
 }
 

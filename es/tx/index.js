@@ -46,7 +46,7 @@ const Tx = stampit({
     Ae: {
       methods: [
         'spendTx', 'namePreclaimTx', 'nameClaimTx', 'nameTransferTx',
-        'nameUpdateTx', 'nameRevokeTx', 'contractCreateTx', 'contractCallTx', 'calculateFee'
+        'nameUpdateTx', 'nameRevokeTx', 'contractCreateTx', 'contractCallTx'
       ]
     }
   }
@@ -59,22 +59,9 @@ const Tx = stampit({
     nameUpdateTx: required,
     nameRevokeTx: required,
     contractCreateTx: required,
-    contractCallTx: required,
-    calculateFee: required
+    contractCallTx: required
   }
 }))
-
-/**
- * Select specific account
- * @function calculateFee
- * @instance
- * @category async
- * @rtype (fee, txtype, gas = 0) => String
- * @param {String|Number} fee - fee
- * @param {String} txType - Transaction type
- * @param {String|Number} gas - Gas amount
- * @return {String} fee
- */
 
 /**
  * Create a `spend_tx` transaction
