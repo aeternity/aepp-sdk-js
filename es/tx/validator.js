@@ -7,6 +7,7 @@ import Epoch from '../epoch'
 
 import { BigNumber } from 'bignumber.js'
 
+// Verify transaction
 async function verifyTx ({ txObject, signature, encodedTx }) {
   return signature
     ? {
@@ -16,14 +17,13 @@ async function verifyTx ({ txObject, signature, encodedTx }) {
     : validateBase(txObject, encodedTx)
 }
 
-// -------------------
-
 // Verify signature
 function validateSignature (data, sig, pub, networkId = 'ae_mainnet') {
   const txWithNetworkId = Buffer.concat([Buffer.from(networkId), data])
   return verify(txWithNetworkId, sig, decodeBase58Check(assertedType(pub, 'ak')))
 }
 
+// Verify base staff(balance, ttl, fee, nonce)
 async function validateBase (txObject, encodedTx) {
   const { ttl, nonce, amount, fee, senderId: accountId } = txObject
 

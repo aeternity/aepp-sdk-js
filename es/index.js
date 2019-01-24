@@ -22,7 +22,8 @@ import Chain from './chain'
 import EpochChain from './chain/epoch'
 import Tx from './tx'
 import Transaction from './tx/tx'
-import * as JsTx from './tx/js'
+import * as JsTx from './tx/tx_builder'
+import * as TxValidator from './tx/validator'
 import Account from './account'
 import MemoryAccount from './account/memory'
 import Aens from './ae/aens'
@@ -56,5 +57,6 @@ export {
   Selector,
   Universal,
   Oracle,
-  Channel
+  Channel,
+  TxValidator
 }
