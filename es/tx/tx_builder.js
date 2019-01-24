@@ -237,7 +237,7 @@ function validateField (value, key, type, prefix) {
     case FIELD_TYPES.string:
       return assert(true)
     case FIELD_TYPES.pointers:
-      return assert(Array.isArray(value) && !value.find(e => e === Object(e)))
+      return assert(Array.isArray(value) && !value.find(e => e !== Object(e)), { value })
     default:
       return {}
   }

@@ -111,7 +111,7 @@ export const VALIDATION_MESSAGE = {
   [FIELD_TYPES.id]: ({ value, prefix }) => VALIDATION_ERROR(`'${value}' prefix doesn't match expected prefix '${prefix}' or ID_TAG for prefix not found`),
   [FIELD_TYPES.binary]: ({ prefix, value }) => VALIDATION_ERROR(`'${value}' prefix doesn't match expected prefix '${prefix}'`),
   [FIELD_TYPES.string]: ({ value }) => VALIDATION_ERROR(`Not a string`),
-  [FIELD_TYPES.pointers]: ({ value }) => VALIDATION_ERROR(`Value must be of type Array and contains only object's like '{key: "account_key", id: "ak_lkamsflkalsdalksdlasdlasdlamd"}'`),
+  [FIELD_TYPES.pointers]: ({ value }) => VALIDATION_ERROR(`Value must be of type Array and contains only object's like '{key: "account_pubkey", id: "ak_lkamsflkalsdalksdlasdlasdlamd"}'`)
 }
 
 const BASE_TX = [
