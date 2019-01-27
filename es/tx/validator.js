@@ -41,13 +41,22 @@ const VALIDATORS = {
   }
 }
 
-const resolveDataForBase = async (nodeApi, { encodedTx, ownerPublicKey }) => ({
-  minFee: 1500 + 20 * (encodedTx.length - 2),
-  height: await nodeApi.height(),
-  balance: await nodeApi.balance(ownerPublicKey),
-  accountNonce: await nodeApi.height(ownerPublicKey),
-  ownerPublicKey
-})
+const resolveDataForBase = async (nodeApi, { encodedTx, ownerPublicKey }) => {
+  let accountNonce = 0
+  let accountBalance = 0
+  try {
+    const { nonce, balance } = await nodeApi.getAccountByPubkey(ownerPublicKey)
+    accountNonce = nonce
+    accountBalance = balance
+  } catch (e) {}
+  return {
+    minFee: 1500 + 20 * (encodedTx.length - 2),
+    height: await nodeApi.height(),
+    balance: accountBalance,
+    accountNonce,
+    ownerPublicKey
+  }
+}
 
 // Verification using SCHEMA
 const verifySchema = (schema, data) => {
