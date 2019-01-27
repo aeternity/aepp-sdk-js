@@ -309,7 +309,7 @@ const VALIDATORS = {
   insufficientBalanceForAmountFee: 'insufficientBalanceForAmountFee',
   insufficientBalanceForAmount: 'insufficientBalanceForAmount',
   nonceUsed: 'nonceUsed',
-  nonceHigh: 'nonceHigh',
+  nonceHigh: 'nonceHigh'
 }
 
 const ERRORS = {
