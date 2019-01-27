@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 import {
   verify,
   decodeBase58Check,
@@ -6,39 +7,93 @@ import {
 import Epoch from '../epoch'
 
 import { BigNumber } from 'bignumber.js'
+import { BASE_VERIFICATION_SCHEMA, SIGNATURE_VERIFICATION_SCHEMA } from './schema'
+
+const VALIDATORS = {
+  // VALIDATE SIGNATURE
+  signature ({ encodedTx, signature, ownerPublicKey, networkId = 'ae_mainnet' }) {
+    const txWithNetworkId = Buffer.concat([Buffer.from(networkId), encodedTx])
+    return verify(txWithNetworkId, signature, decodeBase58Check(assertedType(ownerPublicKey, 'ak')))
+  },
+  // VALIDATE IF ENOUGH FEE
+  insufficientFee ({ minFee, fee }) {
+    return minFee <= +fee
+  },
+  // VALIDATE IF TTL VALID
+  expiredTTL ({ ttl, height }) {
+    return +ttl === 0 || ttl >= height
+  },
+  // Insufficient Balance for Amount plus Fee
+  insufficientBalanceForAmountFee ({ balance, amount, fee }) {
+    return BigNumber(balance).gt(BigNumber(amount).plus(fee))
+  },
+  // Insufficient Balance for Amount
+  insufficientBalanceForAmount ({ balance, amount }) {
+    return BigNumber(balance).gt(BigNumber(amount))
+  },
+  // IF NONCE USED
+  nonceUsed ({ accountNonce, nonce }) {
+    return BigNumber(nonce).gt(BigNumber(nonce))
+  },
+  // IF NONCE TO HIGH
+  nonceHigh ({ accountNonce, nonce }) {
+    return !(BigNumber(nonce).gt(BigNumber(accountNonce).plus(1)))
+  }
+}
+
+const resolveDataForBase = async (nodeApi, { encodedTx, ownerPublicKey }) => ({
+  minFee: 1500 + 20 * (encodedTx.length - 2),
+  height: await nodeApi.height(),
+  balance: await nodeApi.balance(ownerPublicKey),
+  accountNonce: await nodeApi.height(ownerPublicKey),
+  ownerPublicKey
+})
+
+// Verification using SCHEMA
+const verifySchema = (schema, data) => {
+  // Verify through schema
+  return schema.reduce(
+    (acc, [msg, validatorKey, { key, type }]) => {
+      if (!VALIDATORS[validatorKey](data)) acc[type][key] = msg(data)
+      return acc
+    },
+    { error: {}, warning: {} }
+  )
+}
+
+// TODO FINISH THIS
+// async function customVerification(nodeApi, { tx, resolvedBaseData }) {
+//    const [schema, resolver] = CUSTOM_VERIFICATION_SCHEMA[+tx.tag]
+//
+//    const resolvedCustomData = await resolver(nodeApi, { ...tx, ...resolvedBaseData })
+//    return verifySchema(schema, { ...tx, ...resolvedBaseData, ...resolvedCustomData})
+// }
 
 // Verify transaction
-async function verifyTx ({ txObject, signature, encodedTx }) {
-  return signature
-    ? {
-      ErrSignatureVerfication: validateSignature(encodedTx, signature[0], txObject.senderId),
-      ...(await validateBase(txObject, encodedTx))
-    }
-    : validateBase(txObject, encodedTx)
-}
+async function verifyTx ({ tx, signature, encodedTx }, networkId) {
+  // Fetch data for verification
+  const ownerPublicKey = tx.senderId // TODO prepare fn for getting publicKey for each of transaction type's
+  const resolvedData = { ...(await resolveDataForBase(this.api, { ownerPublicKey, encodedTx, tx })), ...tx }
 
-// Verify signature
-function validateSignature (data, sig, pub, networkId = 'ae_mainnet') {
-  const txWithNetworkId = Buffer.concat([Buffer.from(networkId), data])
-  return verify(txWithNetworkId, sig, decodeBase58Check(assertedType(pub, 'ak')))
-}
-
-// Verify base staff(balance, ttl, fee, nonce)
-async function validateBase (txObject, encodedTx) {
-  const { ttl, nonce, amount, fee, senderId: accountId } = txObject
-
-  const minFee = 15000 + 20 * (encodedTx.length - 2) // -2 is 2 bytes for 20000 fee
-  const height = await this.height()
-  const balance = await this.balance(accountId, { format: false })
-  const { nonce: accountNonce } = await this.api.getAccountByPubkey(accountId)
+  const signatureVerification = verifySchema(SIGNATURE_VERIFICATION_SCHEMA, {
+    encodedTx,
+    signature: signature[0],
+    ownerPublicKey,
+    networkId
+  })
+  const baseVerification = verifySchema(BASE_VERIFICATION_SCHEMA, resolvedData)
+  // const customVerification = customVerification(this.api, { tx, resolvedBaseData })
 
   return {
-    ErrInsufficientFee: minFee <= +fee ? true : fee,
-    ErrExpiredTTL: +ttl !== 0 ? (height < +ttl ? true : height) : true,
-    ErrInsufficientBalanceForAmountFee: BigNumber(balance).gt(BigNumber(amount).plus(+fee)) ? true : balance,
-    ErrInsufficientBalanceForAmount: BigNumber(balance).gt(BigNumber(amount)) ? true : balance,
-    ErrNonceUsed: +accountNonce <= (+nonce) ? true : (+accountNonce + 1),
-    WarnNonceHigh: +nonce > (+accountNonce + 1) ? (+accountNonce + 1) : true
+    error: {
+      ...baseVerification.error,
+      ...signatureVerification.error
+      // ...customVerification.error
+    },
+    warning: {
+      ...baseVerification.warning
+      // ...customVerification.warning
+    }
   }
 }
 
@@ -47,8 +102,7 @@ async function validateBase (txObject, encodedTx) {
  */
 const TransactionValidator = Epoch.compose({
   methods: {
-    verifyTx,
-    validateSignature
+    verifyTx
   }
 })
 

@@ -296,3 +296,40 @@ export const TX_DESERIALIZATION_SCHEMA = {
   [OBJECT_TAG_ORACLE_QUERY_TRANSACTION]: TX_SCHEMA_FIELD(ORACLE_QUERY_TX, OBJECT_TAG_ORACLE_QUERY_TRANSACTION),
   [OBJECT_TAG_ORACLE_RESPONSE_TRANSACTION]: TX_SCHEMA_FIELD(ORACLE_RESPOND_TX, OBJECT_TAG_ORACLE_RESPONSE_TRANSACTION)
 }
+
+// VERIFICATION SCHEMA
+
+const ERROR_TYPE = { ERROR: 'error', WARNING: 'warning' }
+const VERIFICATION_FIELD = (msg, verificationFn, error) => [msg, verificationFn, error]
+
+const VALIDATORS = {
+  signature: 'signature',
+  insufficientFee: 'insufficientFee',
+  expiredTTL: 'expiredTTL',
+  insufficientBalanceForAmountFee: 'insufficientBalanceForAmountFee',
+  insufficientBalanceForAmount: 'insufficientBalanceForAmount',
+  nonceUsed: 'nonceUsed',
+  nonceHigh: 'nonceHigh',
+}
+
+const ERRORS = {
+  invalidSignature: { key: 'InvalidSignature', type: ERROR_TYPE.ERROR },
+  insufficientFee: { key: 'InsufficientFee', type: ERROR_TYPE.ERROR },
+  expiredTTL: { key: 'ExpiredTTL', type: ERROR_TYPE.ERROR },
+  insufficientBalanceForAmountFee: { key: 'InsufficientBalanceForAmountFee', type: ERROR_TYPE.ERROR },
+  insufficientBalanceForAmount: { key: 'InsufficientBalanceForAmount', type: ERROR_TYPE.ERROR },
+  nonceUsed: { key: 'NonceUsed', type: ERROR_TYPE.ERROR },
+  nonceHigh: { key: 'NonceHigh', type: ERROR_TYPE.WARNING }
+}
+
+export const SIGNATURE_VERIFICATION_SCHEMA = [
+  VERIFICATION_FIELD(() => `Invalid signature`, VALIDATORS.signature, ERRORS.invalidSignature)
+]
+export const BASE_VERIFICATION_SCHEMA = [
+  VERIFICATION_FIELD(({ fee }) => `Insufficient Fee. Fee: ${fee}`, VALIDATORS.insufficientFee, ERRORS.insufficientFee),
+  VERIFICATION_FIELD('expiredTTL', VALIDATORS.expiredTTL, ERRORS.expiredTTL),
+  VERIFICATION_FIELD('insufficientBalanceForAmountFee', VALIDATORS.insufficientBalanceForAmountFee, ERRORS.insufficientBalanceForAmountFee),
+  VERIFICATION_FIELD('insufficientBalanceForAmount', VALIDATORS.insufficientBalanceForAmount, ERRORS.insufficientBalanceForAmount),
+  VERIFICATION_FIELD('nonceUsed', VALIDATORS.nonceUsed, ERRORS.nonceUsed),
+  VERIFICATION_FIELD('nonceHigh', VALIDATORS.nonceHigh, ERRORS.nonceHigh)
+]
