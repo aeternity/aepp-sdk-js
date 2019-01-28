@@ -469,6 +469,7 @@ export function envKeypair (env) {
  */
 export const decode = RLP.decode
 export const encode = RLP.encode
+export const rlp = RLP
 
 const OBJECT_TAGS = {
   SIGNED_TX: 11,
