@@ -27,7 +27,6 @@ describe('Verify TransACTION', function () {
 
 
     const {warning} = { ...(await client.unpackAndVerify(spendTx)), ...(await client.unpackAndVerify(signedTx)) }
-    console.log(warning)
     Object.keys(warning).length.should.be.equals(3)
   })
   it('checkErrors', async () => {
