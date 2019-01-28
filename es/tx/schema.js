@@ -51,6 +51,25 @@ export const TX_TYPE = {
   oracleQuery: 'oracleQuery',
   oracleResponse: 'oracleResponse'
 }
+
+export const OBJECT_ID_TX_TYPE = {
+  [OBJECT_TAG_SPEND_TRANSACTION]: TX_TYPE.spend,
+  // AENS
+  [OBJECT_TAG_NAME_SERVICE_CLAIM_TRANSACTION]: TX_TYPE.nameClaim,
+  [OBJECT_TAG_NAME_SERVICE_PRECLAIM_TRANSACTION]: TX_TYPE.namePreClaim,
+  [OBJECT_TAG_NAME_SERVICE_UPDATE_TRANSACTION]: TX_TYPE.nameUpdate,
+  [OBJECT_TAG_NAME_SERVICE_REVOKE_TRANSACTION]: TX_TYPE.nameRevoke,
+  [OBJECT_TAG_NAME_SERVICE_TRANSFER_TRANSACTION]: TX_TYPE.nameTransfer,
+  // CONTRACT
+  [OBJECT_TAG_CONTRACT_CREATE_TRANSACTION]: TX_TYPE.contractCreate,
+  [OBJECT_TAG_CONTRACT_CALL_TRANSACTION]: TX_TYPE.contractCall,
+  // ORACLE
+  [OBJECT_TAG_ORACLE_REGISTER_TRANSACTION]: TX_TYPE.oracleRegister,
+  [OBJECT_TAG_ORACLE_EXTEND_TRANSACTION]: TX_TYPE.oracleExtend,
+  [OBJECT_TAG_ORACLE_QUERY_TRANSACTION]: TX_TYPE.oracleQuery,
+  [OBJECT_TAG_ORACLE_RESPONSE_TRANSACTION]: TX_TYPE.oracleResponse
+}
+
 export const FIELD_TYPES = {
   int: 'int',
   id: 'id',
@@ -327,9 +346,9 @@ export const SIGNATURE_VERIFICATION_SCHEMA = [
 ]
 export const BASE_VERIFICATION_SCHEMA = [
   VERIFICATION_FIELD(({ fee }) => `Insufficient Fee. Fee: ${fee}`, VALIDATORS.insufficientFee, ERRORS.insufficientFee),
-  VERIFICATION_FIELD('expiredTTL', VALIDATORS.expiredTTL, ERRORS.expiredTTL),
-  VERIFICATION_FIELD('insufficientBalanceForAmountFee', VALIDATORS.insufficientBalanceForAmountFee, ERRORS.insufficientBalanceForAmountFee),
-  VERIFICATION_FIELD('insufficientBalanceForAmount', VALIDATORS.insufficientBalanceForAmount, ERRORS.insufficientBalanceForAmount),
-  VERIFICATION_FIELD('nonceUsed', VALIDATORS.nonceUsed, ERRORS.nonceUsed),
-  VERIFICATION_FIELD('nonceHigh', VALIDATORS.nonceHigh, ERRORS.nonceHigh)
+  VERIFICATION_FIELD(() => 'expiredTTL', VALIDATORS.expiredTTL, ERRORS.expiredTTL),
+  VERIFICATION_FIELD(() => 'insufficientBalanceForAmountFee', VALIDATORS.insufficientBalanceForAmountFee, ERRORS.insufficientBalanceForAmountFee),
+  VERIFICATION_FIELD(() => 'insufficientBalanceForAmount', VALIDATORS.insufficientBalanceForAmount, ERRORS.insufficientBalanceForAmount),
+  VERIFICATION_FIELD(() => 'nonceUsed', VALIDATORS.nonceUsed, ERRORS.nonceUsed),
+  VERIFICATION_FIELD(() => 'nonceHigh', VALIDATORS.nonceHigh, ERRORS.nonceHigh)
 ]

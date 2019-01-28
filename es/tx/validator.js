@@ -4,24 +4,29 @@ import {
   decodeBase58Check,
   assertedType
 } from '../utils/crypto'
-import Epoch from '../epoch'
+import EpochChain from '../chain/epoch'
 
 import { BigNumber } from 'bignumber.js'
-import { BASE_VERIFICATION_SCHEMA, SIGNATURE_VERIFICATION_SCHEMA } from './schema'
+import {
+  BASE_VERIFICATION_SCHEMA, OBJECT_ID_TX_TYPE,
+  OBJECT_TAG_SIGNED_TRANSACTION,
+  SIGNATURE_VERIFICATION_SCHEMA
+} from './schema'
+import { calculateFee, unpackTx } from './builder'
 
 const VALIDATORS = {
   // VALIDATE SIGNATURE
-  signature ({ encodedTx, signature, ownerPublicKey, networkId = 'ae_mainnet' }) {
-    const txWithNetworkId = Buffer.concat([Buffer.from(networkId), encodedTx])
+  signature ({ rlpEncoded, signature, ownerPublicKey, networkId = 'ae_mainnet' }) {
+    const txWithNetworkId = Buffer.concat([Buffer.from(networkId), rlpEncoded])
     return verify(txWithNetworkId, signature, decodeBase58Check(assertedType(ownerPublicKey, 'ak')))
   },
   // VALIDATE IF ENOUGH FEE
   insufficientFee ({ minFee, fee }) {
-    return minFee <= +fee
+    return BigNumber(minFee).lte(BigNumber(fee))
   },
   // VALIDATE IF TTL VALID
   expiredTTL ({ ttl, height }) {
-    return +ttl === 0 || ttl >= height
+    return BigNumber(ttl).eq(0) || BigNumber(ttl).gte(BigNumber(height))
   },
   // Insufficient Balance for Amount plus Fee
   insufficientBalanceForAmountFee ({ balance, amount, fee }) {
@@ -33,7 +38,7 @@ const VALIDATORS = {
   },
   // IF NONCE USED
   nonceUsed ({ accountNonce, nonce }) {
-    return BigNumber(nonce).gt(BigNumber(nonce))
+    return BigNumber(nonce).gt(BigNumber(accountNonce))
   },
   // IF NONCE TO HIGH
   nonceHigh ({ accountNonce, nonce }) {
@@ -41,17 +46,16 @@ const VALIDATORS = {
   }
 }
 
-const resolveDataForBase = async (nodeApi, { encodedTx, ownerPublicKey }) => {
+const resolveDataForBase = async (chain, { rlpEncoded, ownerPublicKey }) => {
   let accountNonce = 0
   let accountBalance = 0
   try {
-    const { nonce, balance } = await nodeApi.getAccountByPubkey(ownerPublicKey)
+    const { nonce, balance } = await chain.api.getAccountByPubkey(ownerPublicKey)
     accountNonce = nonce
     accountBalance = balance
   } catch (e) {}
   return {
-    minFee: 1500 + 20 * (encodedTx.length - 2),
-    height: await nodeApi.height(),
+    height: await chain.height(),
     balance: accountBalance,
     accountNonce,
     ownerPublicKey
@@ -78,18 +82,39 @@ const verifySchema = (schema, data) => {
 //    return verifySchema(schema, { ...tx, ...resolvedBaseData, ...resolvedCustomData})
 // }
 
+function unpackAndVerify (txHash, { networkId } = {}) {
+  const { tx: unpackedTx, rlpEncoded } = unpackTx(txHash)
+
+  if (+unpackedTx.tag === OBJECT_TAG_SIGNED_TRANSACTION) {
+    const tx = unpackedTx.encodedTx.tx
+    const signatures = unpackedTx.signatures
+    const rlpEncodedTx = unpackedTx.encodedTx.rlpEncoded
+
+    return this.verifyTx({ tx, signatures, rlpEncoded: rlpEncodedTx }, networkId)
+  }
+  return this.verifyTx({ tx: unpackedTx, rlpEncoded }, networkId)
+}
+
 // Verify transaction
-async function verifyTx ({ tx, signature, encodedTx }, networkId) {
+async function verifyTx ({ tx, signatures, rlpEncoded }, networkId) {
+  networkId = networkId || this.nodeNetworkId || 'ae_mainnet'
   // Fetch data for verification
   const ownerPublicKey = tx.senderId // TODO prepare fn for getting publicKey for each of transaction type's
-  const resolvedData = { ...(await resolveDataForBase(this.api, { ownerPublicKey, encodedTx, tx })), ...tx }
 
-  const signatureVerification = verifySchema(SIGNATURE_VERIFICATION_SCHEMA, {
-    encodedTx,
-    signature: signature[0],
-    ownerPublicKey,
-    networkId
-  })
+  const resolvedData = {
+    minFee: calculateFee(0, OBJECT_ID_TX_TYPE[+tx.tag], { params: tx }),
+    ...(await resolveDataForBase(this, { ownerPublicKey, rlpEncoded, tx })),
+    ...tx
+  }
+  console.log(networkId)
+  const signatureVerification = signatures && signatures.length
+    ? verifySchema(SIGNATURE_VERIFICATION_SCHEMA, {
+      rlpEncoded,
+      signature: signatures[0],
+      ownerPublicKey,
+      networkId
+    })
+    : { error: {}, warning: {} }
   const baseVerification = verifySchema(BASE_VERIFICATION_SCHEMA, resolvedData)
   // const customVerification = customVerification(this.api, { tx, resolvedBaseData })
 
@@ -109,9 +134,10 @@ async function verifyTx ({ tx, signature, encodedTx }, networkId) {
 /**
  * Transaction Validator Stamp
  */
-const TransactionValidator = Epoch.compose({
+const TransactionValidator = EpochChain.compose({
   methods: {
-    verifyTx
+    verifyTx,
+    unpackAndVerify
   }
 })
 
