@@ -335,20 +335,48 @@ const ERRORS = {
   invalidSignature: { key: 'InvalidSignature', type: ERROR_TYPE.ERROR },
   insufficientFee: { key: 'InsufficientFee', type: ERROR_TYPE.ERROR },
   expiredTTL: { key: 'ExpiredTTL', type: ERROR_TYPE.ERROR },
-  insufficientBalanceForAmountFee: { key: 'InsufficientBalanceForAmountFee', type: ERROR_TYPE.ERROR },
-  insufficientBalanceForAmount: { key: 'InsufficientBalanceForAmount', type: ERROR_TYPE.ERROR },
+  insufficientBalanceForAmountFee: { key: 'InsufficientBalanceForAmountFee', type: ERROR_TYPE.WARNING },
+  insufficientBalanceForAmount: { key: 'InsufficientBalanceForAmount', type: ERROR_TYPE.WARNING },
   nonceUsed: { key: 'NonceUsed', type: ERROR_TYPE.ERROR },
   nonceHigh: { key: 'NonceHigh', type: ERROR_TYPE.WARNING }
 }
 
 export const SIGNATURE_VERIFICATION_SCHEMA = [
-  VERIFICATION_FIELD(() => `Invalid signature`, VALIDATORS.signature, ERRORS.invalidSignature)
+  VERIFICATION_FIELD(
+    () => `The signature cannot be verified, please verify that you used the correct network id and the correct private key for the sender address`,
+    VALIDATORS.signature,
+    ERRORS.invalidSignature
+  )
 ]
 export const BASE_VERIFICATION_SCHEMA = [
-  VERIFICATION_FIELD(({ fee }) => `Insufficient Fee. Fee: ${fee}`, VALIDATORS.insufficientFee, ERRORS.insufficientFee),
-  VERIFICATION_FIELD(() => 'expiredTTL', VALIDATORS.expiredTTL, ERRORS.expiredTTL),
-  VERIFICATION_FIELD(() => 'insufficientBalanceForAmountFee', VALIDATORS.insufficientBalanceForAmountFee, ERRORS.insufficientBalanceForAmountFee),
-  VERIFICATION_FIELD(() => 'insufficientBalanceForAmount', VALIDATORS.insufficientBalanceForAmount, ERRORS.insufficientBalanceForAmount),
-  VERIFICATION_FIELD(() => 'nonceUsed', VALIDATORS.nonceUsed, ERRORS.nonceUsed),
-  VERIFICATION_FIELD(() => 'nonceHigh', VALIDATORS.nonceHigh, ERRORS.nonceHigh)
+  VERIFICATION_FIELD(
+    ({ minFee }) => `The fee for the transaction is too low, the minimum fee for this transaction is ${minFee}`,
+    VALIDATORS.insufficientFee,
+    ERRORS.insufficientFee
+  ),
+  VERIFICATION_FIELD(
+    ({ height }) => `The TTL is already expired, the current height is ${height}`,
+    VALIDATORS.expiredTTL,
+    ERRORS.expiredTTL
+  ),
+  VERIFICATION_FIELD(
+    ({ balance }) => `The account balance ${balance} is not enough to execute the transaction`,
+    VALIDATORS.insufficientBalanceForAmountFee,
+    ERRORS.insufficientBalanceForAmountFee
+  ),
+  VERIFICATION_FIELD(
+    ({balance}) => `The account balance ${balance} is not enough to execute the transaction`,
+    VALIDATORS.insufficientBalanceForAmount,
+    ERRORS.insufficientBalanceForAmount
+  ),
+  VERIFICATION_FIELD(
+    ({ accountNonce }) => `The nonce is invalid(already used). Next valid nonce is ${accountNonce + 1})`,
+    VALIDATORS.nonceUsed,
+    ERRORS.nonceUsed
+  ),
+  VERIFICATION_FIELD(
+    ({accountNonce}) => `The nonce is technically valid but will not be processed immediately by the node (next valid nonce is ${accountNonce + 1})`,
+    VALIDATORS.nonceHigh,
+    ERRORS.nonceHigh
+  )
 ]
