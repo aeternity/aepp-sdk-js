@@ -4,7 +4,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [1.3.0]
 ### Added
-- Add Channel implementation
+- Add support for State Channels
 - New transaction builder going through schema(build, unpack)
 - Add new stamp `TransactionValidator` which can verify your transaction
 ### Changed
