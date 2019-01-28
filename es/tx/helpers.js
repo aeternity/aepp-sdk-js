@@ -133,7 +133,7 @@ export function writeInt (val) {
   return toBytes(val, true)
 }
 
-export function readInt (buf) {
+export function readInt (buf = Buffer.from([])) {
   return BigNumber(buf.toString('hex'), 16).toString(10)
 }
 

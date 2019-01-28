@@ -29,7 +29,7 @@ function deserializeField (value, type, prefix) {
     case FIELD_TYPES.binary:
       return encode(value, prefix)
     case FIELD_TYPES.string:
-      return value.toString()
+      return value ? value.toString() : ''
     case FIELD_TYPES.pointers:
       return readPointers(value)
     case FIELD_TYPES.rlpBinary:
@@ -58,7 +58,6 @@ function serializeField (value, type, prefix) {
   }
 }
 
-// TODO implement tx params validation
 function validateField (value, key, type, prefix) {
   const assert = (valid, params) => valid ? {} : { [key]: VALIDATION_MESSAGE[type](params) }
 

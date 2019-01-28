@@ -53,7 +53,7 @@ const resolveDataForBase = async (chain, { rlpEncoded, ownerPublicKey }) => {
     const { nonce, balance } = await chain.api.getAccountByPubkey(ownerPublicKey)
     accountNonce = nonce
     accountBalance = balance
-  } catch (e) {}
+  } catch (e) { console.log('We can not get info about this publicKey') }
   return {
     height: await chain.height(),
     balance: accountBalance,
@@ -95,18 +95,19 @@ function unpackAndVerify (txHash, { networkId } = {}) {
   return this.verifyTx({ tx: unpackedTx, rlpEncoded }, networkId)
 }
 
+const getOwnerPublicKey = (tx) =>
+  tx[['senderId', 'accountId', 'ownerId', 'callerId', 'oracleId'].find(key => tx[key])].replace('ok_', 'ak_')
+
 // Verify transaction
 async function verifyTx ({ tx, signatures, rlpEncoded }, networkId) {
   networkId = networkId || this.nodeNetworkId || 'ae_mainnet'
   // Fetch data for verification
-  const ownerPublicKey = tx.senderId // TODO prepare fn for getting publicKey for each of transaction type's
-
+  const ownerPublicKey = getOwnerPublicKey(tx)
   const resolvedData = {
     minFee: calculateFee(0, OBJECT_ID_TX_TYPE[+tx.tag], { params: tx }),
     ...(await resolveDataForBase(this, { ownerPublicKey, rlpEncoded, tx })),
     ...tx
   }
-  console.log(networkId)
   const signatureVerification = signatures && signatures.length
     ? verifySchema(SIGNATURE_VERIFICATION_SCHEMA, {
       rlpEncoded,
