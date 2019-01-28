@@ -21,6 +21,7 @@ const ORACLE_TTL_TYPES = {
 
 // SERIALIZE AND DESERIALIZE PART
 function deserializeField (value, type, prefix) {
+  if (!value) return ''
   switch (type) {
     case FIELD_TYPES.int:
       return readInt(value)
@@ -29,7 +30,7 @@ function deserializeField (value, type, prefix) {
     case FIELD_TYPES.binary:
       return encode(value, prefix)
     case FIELD_TYPES.string:
-      return value ? value.toString() : ''
+      return value.toString()
     case FIELD_TYPES.pointers:
       return readPointers(value)
     case FIELD_TYPES.rlpBinary:
@@ -81,21 +82,14 @@ function validateField (value, key, type, prefix) {
   }
 }
 
-function validateParams (params, schema) {
-  const valid = schema.reduce(
-    (acc, [key, type, prefix]) => Object.assign(acc, validateField(params[key], key, type, prefix)),
-    {}
-  )
-
-  if (Object.keys(valid).length) {
-    throw Object({
-      ...(new Error('Validation Error')),
-      errorData: valid,
-      code: 'TX_BUILD_VALIDATION_ERROR'
-    })
-  }
-
-  return true
+function validateParams (params, schema, { excludeKeys }) {
+  const valid = schema
+    .filter(([key]) => !excludeKeys.includes(key) && key !== 'payload')
+    .reduce(
+      (acc, [key, type, prefix]) => Object.assign(acc, validateField(params[key], key, type, prefix)),
+      {}
+    )
+  return valid
 }
 
 function transformParams (params) {
@@ -146,7 +140,7 @@ export function calculateFee (fee, txType, { gas = 0, params } = {}) {
     // TODO remove that after implement oracle fee calculation
     if (!params) return DEFAULT_FEE
 
-    const { rlpEncoded: txWithOutFee } = buildTx(params, txType, { skipValidation: true })
+    const { rlpEncoded: txWithOutFee } = buildTx(params, txType, { excludeKeys: ['fee'] })
     const txSize = txWithOutFee.length
 
     return TX_FEE_FORMULA[txType] ? TX_FEE_FORMULA[txType](gas) + getGasBySize(txSize) : DEFAULT_FEE
@@ -157,11 +151,19 @@ export function calculateFee (fee, txType, { gas = 0, params } = {}) {
 /**
  * BUILD BINARY TRANSACTION
  * */
-export function buildRawTx (params, schema, { skipValidation = false } = {}) {
+export function buildRawTx (params, schema, { excludeKeys = [] } = {}) {
   // Transform params(reason is for do not break current interface of `tx`)
   params = transformParams(params)
   // Validation
-  skipValidation || validateParams(params, schema)
+  const valid = validateParams(params, schema, { excludeKeys })
+  if (Object.keys(valid).length) {
+    throw Object.assign(
+      {
+        msg: 'Validation error',
+        errorData: valid,
+        code: 'TX_BUILD_VALIDATION_ERROR'
+      })
+  }
 
   return schema.map(([key, fieldType, prefix]) => serializeField(params[key], fieldType, prefix))
 }
@@ -184,9 +186,9 @@ export function unpackRawTx (binary, schema) {
 /**
  * BUILD TRANSACTION
  * */
-export function buildTx (params, type, { skipValidation = false } = {}) {
+export function buildTx (params, type, { excludeKeys = [] } = {}) {
   const [schema, tag] = TX_SERIALIZATION_SCHEMA[type]
-  const binary = buildRawTx({ ...params, VSN, tag }, schema, { skipValidation }).filter(e => e !== undefined)
+  const binary = buildRawTx({ ...params, VSN, tag }, schema, { excludeKeys }).filter(e => e !== undefined)
 
   const rlpEncoded = rlp.encode(binary)
   const tx = encode(rlpEncoded, 'tx')

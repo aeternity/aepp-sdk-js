@@ -3,16 +3,21 @@ import { before, describe } from 'mocha'
 import { configure, ready } from '.'
 import { generateKeyPair } from '../../es/utils/crypto'
 
-describe('Verify TransACTION', function () {
+describe('Verify Transaction', function () {
   configure(this)
   let client
 
   before(async () => {
-    // console.log(unpackTx('tx_+E0MAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vOhAWnI9oKhE3auHUzf8n0pGmDsYLFjzEbpqmzaGuQFAAQThLLQYegAH5oDmv4='))
     client = await ready(this)
     await client.spend(1234, 'ak_LAqgfAAjAbpt4hhyrAfHyVg9xfVQWsk1kaHaii6fYXt6AJAGe')
   })
-  it('checkWarnings', async () => {
+  it('validate params', async () => {
+    return client.spendTx({}).should.be.rejectedWith({
+      code: 'TX_BUILD_VALIDATION_ERROR',
+      msg: 'Validation error'
+    })
+  })
+  it('check warnings', async () => {
     const spendTx = await client.spendTx({
       senderId: await client.address(),
       recipientId: await client.address(),
@@ -29,7 +34,7 @@ describe('Verify TransACTION', function () {
     const {warning} = { ...(await client.unpackAndVerify(spendTx)), ...(await client.unpackAndVerify(signedTx)) }
     Object.keys(warning).length.should.be.equals(3)
   })
-  it('checkErrors', async () => {
+  it('check errors', async () => {
     const spendTx = await client.spendTx({
       senderId: await client.address(),
       recipientId: await client.address(),
