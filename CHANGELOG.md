@@ -19,7 +19,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 - none
 
 ### Notes and known Issues
-- Old transaction builder `es/tx/js.js` will be removed in next release.
+- Old transaction builder `es/tx/js.js` will be removed in next major release.
 
 ## [1.2.1]
 ### Added
