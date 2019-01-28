@@ -4,12 +4,14 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [1.3.0]
 ### Added
+- Add Channel implementation
 - New transaction builder going through schema(build, unpack)
 - Add new stamp `TransactionValidator` which can verify your transaction
 ### Changed
 - Rename epoch to aeternity node(docker configs, some docs)
 - Use new tx builder in TX stamp
-
+- Set default values for amount and deposit to 0 for `contract` transaction
+- Improve RPC server
 ### Removed
 - none
 
@@ -17,7 +19,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 - none
 
 ### Notes and known Issues
-- none
+- Old transaction builder `es/tx/js.js` will be removed in next release.
 
 ## [1.2.1]
 ### Added
