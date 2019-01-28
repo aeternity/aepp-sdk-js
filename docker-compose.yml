@@ -15,18 +15,18 @@ services:
       - .:/node_modules/@aeternity/aepp-sdk
 
   node:
-    image: aeternity/epoch:${TAG}
+    image: aeternity/aeternity:${TAG}
     hostname: node
     expose: [3013, 3113, 3014, 3114]
     environment:
-      EPOCH_CONFIG: /home/epoch/epoch.yaml
+      EPOCH_CONFIG: /home/aeternity/aeternity_node.yaml
     command: -aecore expected_mine_rate ${EPOCH_MINE_RATE:-5000}
     volumes:
-      - ${PWD}/docker/epoch_node_mean16.yaml:/home/epoch/epoch.yaml
-      - ${PWD}/docker/keys/node:/home/epoch/node/keys
-      - ${PWD}/docker/accounts_test.json:/home/epoch/node/data/aecore/.genesis/accounts_test.json
-      - node_db:/home/epoch/node/data/mnesia
-      - node_keys:/home/epoch/node/keys
+      - ${PWD}/docker/aeternity_node_mean16.yaml:/home/aeternity/aeternity_node.yaml
+      - ${PWD}/docker/keys/node:/home/aeternity/node/keys
+      - ${PWD}/docker/accounts_test.json:/home/aeternity/node/data/aecore/.genesis/accounts_test.json
+      - node_db:/home/aeternity/node/data/mnesia
+      - node_keys:/home/aeternity/node/keys
 
 volumes:
   node_db:

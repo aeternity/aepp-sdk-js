@@ -132,7 +132,8 @@ async function query (name) {
     transfer: async (account, options) => {
       await this.aensTransfer(nameId, account, options)
       return this.aensQuery(name)
-    }
+    },
+    revoke: async (options) => this.aensRevoke(nameId, options)
   }))
 }
 
