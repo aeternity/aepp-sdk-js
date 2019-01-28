@@ -2,6 +2,23 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [1.3.0]
+### Added
+- New transaction builder going through schema(build, unpack)
+- Add new stamp `TransactionValidator` which can verify your transaction
+### Changed
+- Rename epoch to aeternity node(docker configs, some docs)
+- Use new tx builder in TX stamp
+
+### Removed
+- none
+
+### Breaking Changes
+- none
+
+### Notes and known Issues
+- none
+
 ## [1.2.1]
 ### Added
 - amount formatter
