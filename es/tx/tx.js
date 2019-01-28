@@ -122,7 +122,7 @@ async function nameRevokeTx ({ accountId, nameId }) {
 
 async function contractCreateTx ({ ownerId, code, vmVersion = CONTRACT_VM_VERSION, deposit, amount, gas, gasPrice, callData }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.contractCreate, { senderId: ownerId, ...R.head(arguments) })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.contractCreate, { vmVersion: CONTRACT_VM_VERSION, senderId: ownerId, ...R.head(arguments) })
 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   return this.nativeMode
@@ -152,7 +152,7 @@ async function contractCallTx ({ callerId, contractId, vmVersion, amount, gas, g
 
 async function oracleRegisterTx ({ accountId, queryFormat, responseFormat, queryFee, oracleTtl, vmVersion = ORACLE_VM_VERSION }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.oracleRegister, { senderId: accountId, ...R.head(arguments) })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.oracleRegister, { vmVersion: ORACLE_VM_VERSION, senderId: accountId, ...R.head(arguments) })
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? buildTx({
