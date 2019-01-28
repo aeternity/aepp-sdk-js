@@ -5,7 +5,7 @@
 [![npm](https://img.shields.io/npm/l/@aeternity/aepp-sdk.svg)](https://www.npmjs.com/package/@aeternity/aepp-sdk)
 
 JavaScript SDK for the revolutionary [æternity] blockchain, targeting the
-[Epoch] implementation.
+[æternity node] implementation.
 
 aepp-sdk is [hosted on GitHub].
 
@@ -14,7 +14,7 @@ aepp-sdk is [hosted on GitHub].
 [concept]: concept.png "Concept Drawing of aepp-sdk"
 
 [æternity]: https://aeternity.com/
-[Epoch]: https://github.com/aeternity/epoch
+[æternity node]: https://github.com/aeternity/epoch
 [hosted on GitHub]: https://github.com/aeternity/aepp-sdk-js
 
 #### Disclaimer
