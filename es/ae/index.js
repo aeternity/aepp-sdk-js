@@ -81,11 +81,7 @@ async function spend (amount, recipientId, options = {}) {
  * @return {Object} Ae instance
  */
 const Ae = stampit(Tx, Account, Chain, Contract, Oracle, {
-  methods: { send, spend },
-  deepProperties: { Ae: { defaults: {
-    ttl: 0,
-    payload: ''
-  } } }
+  methods: { send, spend }
 })
 
 export default Ae
