@@ -16,7 +16,6 @@
  */
 
 import * as Crypto from './utils/crypto'
-import * as KeyStore from './utils/keystore'
 import * as TxBuilder from './tx/builder'
 import * as JsTx from './tx/js'
 
@@ -43,7 +42,6 @@ export {
   Ae,
   Aepp,
   Crypto,
-  KeyStore,
   Chain,
   EpochChain,
   EpochContract,
