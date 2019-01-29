@@ -28,7 +28,7 @@
 
 import * as R from 'ramda'
 import { encodeBase58Check, salt } from '../utils/crypto'
-import { commitmentHash } from '../tx/js'
+import { commitmentHash } from '../tx/helpers'
 import Ae from './'
 
 /**
@@ -132,7 +132,8 @@ async function query (name) {
     transfer: async (account, options) => {
       await this.aensTransfer(nameId, account, options)
       return this.aensQuery(name)
-    }
+    },
+    revoke: async (options) => this.aensRevoke(nameId, options)
   }))
 }
 

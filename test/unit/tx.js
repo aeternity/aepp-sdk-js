@@ -18,7 +18,9 @@
 import '../'
 import { describe, it } from 'mocha'
 import { salt } from '../../es/utils/crypto'
-import { commitmentHash } from '../../es/tx/js'
+import { commitmentHash } from '../../es/tx/helpers'
+import { BigNumber } from 'bignumber.js'
+import { toBytes } from '../../es/utils/bytes'
 
 describe('Tx', function () {
   it('reproducible commitment hashes can be generated', async () => {
@@ -26,5 +28,25 @@ describe('Tx', function () {
     const hash = await commitmentHash('foobar.aet', _salt)
     hash.should.be.a('string')
     return hash.should.be.equal(await commitmentHash('foobar.aet', _salt))
+  })
+  it('test from big number to bytes', async () => {
+    // TODO investigate about float numbers serialization
+    const data = [
+      BigNumber('7841237845261982793129837487239459234675231423423453451234'),
+      BigNumber('7841237845261982793129837487239459214234234534523'),
+      BigNumber('7841237845261982793129837412341231231'),
+      BigNumber('78412378452619'),
+      BigNumber('7841237845261982793129837487239459214124563456'),
+      BigNumber('7841237845261982793129837487239459214123')
+    ]
+
+    function bnFromBytes (bn) {
+      const bytes = toBytes(bn, true)
+      return BigNumber(bytes.toString('hex'), 16).toString(10)
+    }
+
+    data.forEach(n => {
+      n.toString(10).should.be.equal(bnFromBytes(n))
+    })
   })
 })

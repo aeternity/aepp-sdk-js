@@ -49,8 +49,8 @@ async function send (tx, options) {
  * Send tokens to another account
  * @instance
  * @category async
- * @rtype (amount: Number, recipientId: String, options?: Object) => Promise[String]
- * @param {Number} amount - Amount to spend
+ * @rtype (amount: Number|String, recipientId: String, options?: Object) => Promise[String]
+ * @param {Number|String} amount - Amount to spend
  * @param {String} recipientId - Address of recipient account
  * @param {Object} options - Options
  * @return {String|String} Transaction or transaction hash
@@ -81,11 +81,7 @@ async function spend (amount, recipientId, options = {}) {
  * @return {Object} Ae instance
  */
 const Ae = stampit(Tx, Account, Chain, Contract, Oracle, {
-  methods: { send, spend },
-  deepProperties: { Ae: { defaults: {
-    ttl: 0,
-    payload: ''
-  } } }
+  methods: { send, spend }
 })
 
 export default Ae

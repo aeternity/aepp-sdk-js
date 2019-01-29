@@ -1,19 +1,13 @@
 ---
 peers: []
-  # - aenode://pp_HdcpgTX2C1aZ5sjGGysFEuup67K9XiFsWqSPJs4RahEcSyF7X@sync.sdk-testnet.aepps.com:3015
-  # - aenode://pp_HdcpgTX2C1aZ5sjGGysFEuup67K9XiFsWqSPJs4RahEcSyF7X@localhost:3016
-#- aenode://pp_HdcpgTX2C1aZ5sjGGysFEuup67K9XiFsWqSPJs4RahEcSyF7X@af5621d1de36f11e8bb0b1215f72bd59-742041481.us-east-1.elb.amazonaws.com:3015
 
 http:
   external:
     port: 3013
   internal:
+    debug_endpoints: true
     port: 3113
     listen_address: 0.0.0.0
-  endpoints:
-    debug: true
-  debug: true
-
 
 websocket:
   channel:
