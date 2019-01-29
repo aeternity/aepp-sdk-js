@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [1.3.1]
+
+### Changed
+- Remove KeyStore from bundle due to build issue(for now you can export it only using tree-shaking `import * as Keystore from '@aeternity/aepp-sdk/utils/keystore'`)
+
+
 ## [1.2.1]
 ### Added
 - amount formatter
