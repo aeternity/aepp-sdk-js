@@ -25,6 +25,8 @@
 import stampit from '@stamp/it'
 import { required } from '@stamp/required'
 import * as Crypto from '../utils/crypto'
+import { buildTx } from '../tx/builder'
+import { TX_TYPE } from '../tx/schema'
 
 const DEFAULT_NETWORK_ID = `ae_mainnet`
 
@@ -38,12 +40,12 @@ const DEFAULT_NETWORK_ID = `ae_mainnet`
  */
 async function signTransaction (tx) {
   const networkId = this.networkId || this.nodeNetworkId || DEFAULT_NETWORK_ID
-  const binaryTx = Crypto.decodeBase64Check(Crypto.assertedType(tx, 'tx'))
+  const rlpBinaryTx = Crypto.decodeBase64Check(Crypto.assertedType(tx, 'tx'))
   // Prepend `NETWORK_ID` to begin of data binary
-  const txWithNetworkId = Buffer.concat([Buffer.from(networkId), binaryTx])
+  const txWithNetworkId = Buffer.concat([Buffer.from(networkId), rlpBinaryTx])
 
-  const sig = await this.sign(txWithNetworkId)
-  return Crypto.encodeTx(Crypto.prepareTx(sig, binaryTx))
+  const signatures = [await this.sign(txWithNetworkId)]
+  return buildTx({ encodedTx: rlpBinaryTx, signatures }, TX_TYPE.signed).tx
 }
 
 /**

@@ -42,7 +42,7 @@ function configure (mocha) {
   mocha.timeout(TIMEOUT)
 }
 
-async function ready (mocha, native = false) {
+async function ready (mocha, native = true) {
   configure(mocha)
 
   const ae = await BaseAe({ networkId })
