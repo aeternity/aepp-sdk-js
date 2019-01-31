@@ -83,13 +83,12 @@ function validateField (value, key, type, prefix) {
 }
 
 function validateParams (params, schema, { excludeKeys }) {
-  const valid = schema
+  return schema
     .filter(([key]) => !excludeKeys.includes(key) && key !== 'payload')
     .reduce(
       (acc, [key, type, prefix]) => Object.assign(acc, validateField(params[key], key, type, prefix)),
       {}
     )
-  return valid
 }
 
 function transformParams (params) {
@@ -165,7 +164,9 @@ export function buildRawTx (params, schema, { excludeKeys = [] } = {}) {
       })
   }
 
-  return schema.map(([key, fieldType, prefix]) => serializeField(params[key], fieldType, prefix))
+  return schema
+    .filter(([key]) => !excludeKeys.includes(key))
+    .map(([key, fieldType, prefix]) => serializeField(params[key], fieldType, prefix))
 }
 
 /**
