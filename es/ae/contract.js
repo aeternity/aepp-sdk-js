@@ -62,7 +62,7 @@ async function callStatic (address, abi = 'sophia-address', name, { args = '()',
 
 async function decode (type, data) {
   const result = await this.contractEpochDecodeData(type, data)
-  if (type === 'address') return addressFromDecimal(data.value)
+  if (type === 'address') return addressFromDecimal(result.value)
   return result
 }
 
