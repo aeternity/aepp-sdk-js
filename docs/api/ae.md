@@ -61,11 +61,11 @@ Send tokens to another account
 **Kind**: instance method of [`Ae`](#exp_module_@aeternity/aepp-sdk/es/ae--Ae)  
 **Returns**: `String` \| `String` - Transaction or transaction hash  
 **Category**: async  
-**rtype**: `(amount: Number, recipientId: String, options?: Object) => Promise[String]`
+**rtype**: `(amount: Number|String, recipientId: String, options?: Object) => Promise[String]`
 
 | Param | Type | Description |
 | --- | --- | --- |
-| amount | `Number` | Amount to spend |
+| amount | `Number` \| `String` | Amount to spend |
 | recipientId | `String` | Address of recipient account |
 | options | `Object` | Options |
 

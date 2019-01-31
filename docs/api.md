@@ -11,7 +11,7 @@
   * [@aeternity/aepp-sdk/es/ae/universal](api/ae/universal.md)
   * [@aeternity/aepp-sdk/es/ae/wallet](api/ae/wallet.md)
   * [@aeternity/aepp-sdk/es/chain](api/chain.md)
-  * [@aeternity/aepp-sdk/es/channel/epoch](api/channel/epoch.md)
+  * [@aeternity/aepp-sdk/es/channel/index](api/channel/index.md)
   * [@aeternity/aepp-sdk/es/contract/epoch](api/contract/epoch.md)
   * [@aeternity/aepp-sdk/es/contract](api/contract.md)
   * [@aeternity/aepp-sdk/es/epoch](api/epoch.md)
