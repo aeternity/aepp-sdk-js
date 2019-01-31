@@ -36,11 +36,27 @@ async function encodeCall (code, abi, name, args, call) {
   return this.contractEpochEncodeCallData(code, abi, name, args, call)
 }
 
-async function callStatic (code, abi, name, { args = '()', call } = {}) {
-  const { out } = await this.contractEpochCall(code, abi, name, args, call)
+async function callStatic (address, abi = 'sophia-address', name, { args = '()', call, options = {} } = {}) {
+  const opt = R.merge(this.Ae.defaults, options)
+
+  // Prepare `call` transaction
+  const tx = await this.contractCallTx(R.merge(opt, {
+    callerId: await this.address(),
+    contractId: address,
+    callData: await this.contractEncodeCall(address, abi, name, args, call)
+  }))
+
+  // Dry-run
+  const [{ result: status, callObj }] = (await this.contractDryRun([tx], [{ amount: 1, pubKey: await this.address() }])).results
+
+  // check response
+  if (status !== 'ok') throw new Error('Dry run error')
+  const { returnType, returnValue } = callObj
+  if (returnType !== 'ok') throw new Error('Dry run error')
+
   return {
-    result: out,
-    decode: (type) => this.contractDecodeData(type, out)
+    result: callObj,
+    decode: (type) => this.contractDecodeData(type, returnValue)
   }
 }
 
@@ -118,14 +134,18 @@ const Contract = Ae.compose({
     contractEncodeCall: encodeCall,
     contractDecodeData: decode
   },
-  deepProps: { Ae: { defaults: {
-    deposit: 0,
-    vmVersion: 1,
-    gasPrice: 1,
-    amount: 0,
-    gas: 1600000 - 21000,
-    options: ''
-  } } }
+  deepProps: {
+    Ae: {
+      defaults: {
+        deposit: 0,
+        vmVersion: 1,
+        gasPrice: 1,
+        amount: 0,
+        gas: 1600000 - 21000,
+        options: ''
+      }
+    }
+  }
 })
 
 export default Contract
