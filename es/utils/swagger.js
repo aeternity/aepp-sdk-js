@@ -27,26 +27,7 @@ import stampit from '@stamp/it'
 import AsyncInit from './async-init'
 import axios from 'axios'
 import * as R from 'ramda'
-
-/**
- * Convert string from snake_case to PascalCase
- * @rtype (s: String) => String
- * @param {String} s - String to convert
- * @return {String} Converted string
- */
-function snakeToPascal (s) {
-  return s.replace(/_./g, match => match[1].toUpperCase())
-}
-
-/**
- * Convert string from PascalCase to snake_case
- * @rtype (s: String) => String
- * @param {String} s - String to convert
- * @return {String} Converted string
- */
-function pascalToSnake (s) {
-  return s.replace(/[A-Z]/g, match => `_${match.toLowerCase()}`)
-}
+import { snakeToPascal, pascalToSnake } from './string'
 
 /**
  * Perform path string interpolation
@@ -211,7 +192,7 @@ function conform (value, spec, types) {
 
 const httpCofig = {
   headers: { 'Content-Type': 'application/json' },
-  transformResponse: [JSONbig({'storeAsString': true}).parse]
+  transformResponse: [JSONbig({ 'storeAsString': true }).parse]
 }
 const httpClients = {
   get: (url) => axios.get(url, httpCofig),
@@ -258,7 +239,11 @@ function pascalizeParameters (parameters) {
  */
 const traverseKeys = R.curry((fn, o) => {
   const dispatch = {
-    Object: o => R.fromPairs(R.toPairs(o).map(([k, v]) => [fn(k), traverseKeys(fn, v)])),
+    Object: o => R.fromPairs(R.toPairs(o).map(function (arr) {
+      const k = arr[0]
+      const v = arr[1]
+      return [fn(k), traverseKeys(fn, v)]
+    })),
     Array: o => o.map(traverseKeys(fn))
   }
 
@@ -462,10 +447,14 @@ const Swagger = stampit(AsyncInit, {
       api: methods
     })
   },
-  deepProps: { Swagger: { defaults: {
-    debug: false,
-    txEncoding: 'json'
-  } } },
+  deepProps: {
+    Swagger: {
+      defaults: {
+        debug: false,
+        txEncoding: 'json'
+      }
+    }
+  },
   statics: { debugSwagger (bool) { return this.deepProps({ Swagger: { defaults: { debug: bool } } }) } }
 })
 

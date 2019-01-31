@@ -18,7 +18,7 @@
 import { describe, it, before } from 'mocha'
 import { encodeBase58Check, encodeBase64Check, generateKeyPair, salt } from '../../es/utils/crypto'
 import { ready, configure } from './index'
-import { commitmentHash } from '../../es/tx/js'
+import { commitmentHash } from '../../es/tx/helpers'
 
 const nonce = 1
 const nameTtl = 1
@@ -132,7 +132,6 @@ describe('Native Transaction', function () {
 
     txFromAPI.tx.should.be.equal(nativeTx.tx)
     txFromAPI.contractId.should.be.equal(nativeTx.contractId)
-
     // deploy contract
     await client.send(nativeTx.tx)
     contractId = txFromAPI.contractId
@@ -147,6 +146,7 @@ describe('Native Transaction', function () {
     const nativeTx = await clientNative.contractCallTx({ callerId: owner, contractId, vmVersion, amount, gas, gasPrice, callData })
 
     txFromAPI.should.be.equal(nativeTx)
+
     const { hash } = await client.send(nativeTx)
     const result = await client.getTxInfo(hash)
 

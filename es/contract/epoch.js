@@ -37,9 +37,10 @@ async function contractEpochEncodeCallData (codeOrAddress, abi, name, arg, call)
     code = (await this.getContractByteCode(code)).bytecode
     abi = 'sophia'
   }
-  if (TYPE_CHECKED_ABI.includes(abi) && call) return (await this.api.encodeCalldata({ abi, code, call })).calldata
 
-  return (await this.api.encodeCalldata({ abi, code, 'function': name, arg })).calldata
+  return (TYPE_CHECKED_ABI.includes(abi) && call)
+    ? (await this.api.encodeCalldata({ abi, code, call })).calldata
+    : (await this.api.encodeCalldata({ abi, code, 'function': name, arg })).calldata
 }
 
 async function contractEpochCall (address, abi = 'sophia-address', name, arg = '()', call) {
@@ -53,6 +54,10 @@ async function contractEpochDecodeData (type, data) {
 
 async function compileEpochContract (code, options = {}) {
   return this.api.compileContract(R.mergeAll([this.Ae.defaults, options, { code }]))
+}
+
+async function contractDryRun (txs, accounts) {
+  return this.api.dryRunTxs({ txs, accounts })
 }
 
 /**
@@ -71,7 +76,8 @@ const EpochContract = ContractBase.compose(Epoch, {
     contractEpochCall,
     contractEpochDecodeData,
     compileEpochContract,
-    getContractByteCode
+    getContractByteCode,
+    contractDryRun
   },
   deepProps: {
     Ae: {

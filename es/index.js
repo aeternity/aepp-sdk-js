@@ -15,13 +15,16 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import Ae from './ae'
 import * as Crypto from './utils/crypto'
+import * as TxBuilder from './tx/builder'
+import * as JsTx from './tx/js'
+
+import Ae from './ae'
 import Chain from './chain'
 import EpochChain from './chain/epoch'
 import Tx from './tx'
 import Transaction from './tx/tx'
-import * as JsTx from './tx/js'
+import TransactionValidator from './tx/validator'
 import Account from './account'
 import MemoryAccount from './account/memory'
 import Aens from './ae/aens'
@@ -32,6 +35,7 @@ import Aepp from './ae/aepp'
 import Oracle from './ae/oracle'
 import EpochOracle from './oracle/epoch'
 import Selector from './account/selector'
+import Channel from './channel'
 import Universal from './ae/universal'
 
 export {
@@ -52,5 +56,8 @@ export {
   JsTx,
   Selector,
   Universal,
-  Oracle
+  Oracle,
+  Channel,
+  TransactionValidator,
+  TxBuilder
 }
