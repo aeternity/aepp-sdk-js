@@ -18,7 +18,7 @@
 import { describe, it, before } from 'mocha'
 import { encodeBase58Check, encodeBase64Check, generateKeyPair, salt } from '../../es/utils/crypto'
 import { ready, configure } from './index'
-import { commitmentHash } from '../../es/tx/helpers'
+import { commitmentHash } from '../../es/tx/builder/helpers'
 
 const nonce = 1
 const nameTtl = 1

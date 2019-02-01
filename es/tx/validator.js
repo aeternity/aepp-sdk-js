@@ -11,8 +11,15 @@ import {
   BASE_VERIFICATION_SCHEMA, OBJECT_ID_TX_TYPE,
   OBJECT_TAG_SIGNED_TRANSACTION,
   SIGNATURE_VERIFICATION_SCHEMA
-} from './schema'
+} from './builder/schema'
 import { calculateFee, unpackTx } from './builder'
+
+/**
+ * Transaction validator
+ * @module @aeternity/aepp-sdk/es/tx/validator
+ * @export TransactionValidator
+ * @example import TransactionValidator from '@aeternity/aepp-sdk/es/tx/validator'
+ */
 
 const VALIDATORS = {
   // VALIDATE SIGNATURE
@@ -82,6 +89,16 @@ const verifySchema = (schema, data) => {
 //    return verifySchema(schema, { ...tx, ...resolvedBaseData, ...resolvedCustomData})
 // }
 
+/**
+ * Unpack and verify transaction (verify nonce, ttl, fee, signature, account balance)
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/tx/validator
+ *
+ * @param {String} txHash Base64Check transaction hash
+ * @param {Object} [options={}] Options
+ * @param {String} [options.networkId] networkId Use in signature verification
+ * @return {Promise<Object>} Object with verification errors and warnings
+ */
 function unpackAndVerify (txHash, { networkId } = {}) {
   const { tx: unpackedTx, rlpEncoded } = unpackTx(txHash)
 
@@ -98,7 +115,18 @@ function unpackAndVerify (txHash, { networkId } = {}) {
 const getOwnerPublicKey = (tx) =>
   tx[['senderId', 'accountId', 'ownerId', 'callerId', 'oracleId'].find(key => tx[key])].replace('ok_', 'ak_')
 
-// Verify transaction
+/**
+ * Verify transaction (verify nonce, ttl, fee, signature, account balance)
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/tx/validator
+ *
+ * @param {Object} [data={}] data TX data object
+ * @param {String} [data.tx] tx Transaction hash
+ * @param {Array} [data.signatures] signatures Transaction signature's
+ * @param {Array} [data.rlpEncoded] rlpEncoded RLP encoded transaction
+ * @param {String} networkId networkId Use in signature verification
+ * @return {Promise<Object>} Object with verification errors and warnings
+ */
 async function verifyTx ({ tx, signatures, rlpEncoded }, networkId) {
   networkId = networkId || this.nodeNetworkId || 'ae_mainnet'
   // Fetch data for verification
@@ -134,6 +162,16 @@ async function verifyTx ({ tx, signatures, rlpEncoded }, networkId) {
 
 /**
  * Transaction Validator Stamp
+ * This stamp give us possibility to unpack and validate some of transaction properties,
+ * to make sure we can post it to the chain
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/tx/validator
+ * @rtype Stamp
+ * @param {Object} [options={}] - Initializer object
+ * @param {Object} [options.url] - Node url
+ * @param {Object} [options.internalUrl] - Node internal url
+ * @return {Object} Transaction Validator instance
+ * @example TransactionValidator({url: 'https://sdk-testnet.aepps.com'})
  */
 const TransactionValidator = EpochChain.compose({
   methods: {

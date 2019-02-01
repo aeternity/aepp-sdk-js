@@ -148,10 +148,10 @@ Generate a random salt (positive integer)
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.encodeBase64Check"></a>
 
 ### @aeternity/aepp-sdk/es/utils/crypto.encodeBase64Check(input) ⇒ `Buffer`
-Base64 encode given `input`
+Base64check encode given `input`
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
-**Returns**: `Buffer` - Base64 encoded data  
+**Returns**: `Buffer` - Base64check encoded data  
 **rtype**: `(input: String|buffer) => Buffer`
 
 | Param | Type | Description |
@@ -161,10 +161,10 @@ Base64 encode given `input`
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.decodeBase64Check"></a>
 
 ### @aeternity/aepp-sdk/es/utils/crypto.decodeBase64Check(str) ⇒ `Buffer`
-Base64 decode given `str`
+Base64check decode given `str`
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
-**Returns**: `Buffer` - Base64 decoded data  
+**Returns**: `Buffer` - Base64check decoded data  
 **rtype**: `(str: String) => Buffer`
 
 | Param | Type | Description |
