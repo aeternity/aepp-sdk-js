@@ -62,6 +62,16 @@ async function spend (amount, recipientId, options = {}) {
 }
 
 /**
+ * Remove all listeners for RPC
+ * @instance
+ * @return {void}
+ */
+function destroyInstance () {
+  const destroyMethods = ['destroyClient', 'destroyServer'] // Array with destroy function's
+  destroyMethods.forEach(m => this[m] && typeof this[m] === 'function' && this[m]())
+}
+
+/**
  * Basic Ae Stamp
  *
  * Attempting to create instances from the Stamp without overwriting all
@@ -81,7 +91,7 @@ async function spend (amount, recipientId, options = {}) {
  * @return {Object} Ae instance
  */
 const Ae = stampit(Tx, Account, Chain, Contract, Oracle, {
-  methods: { send, spend }
+  methods: { send, spend, destroyInstance }
 })
 
 export default Ae
