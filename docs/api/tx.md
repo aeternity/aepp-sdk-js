@@ -11,7 +11,6 @@ import Tx from '@aeternity/aepp-sdk/es/tx'
 
 * [@aeternity/aepp-sdk/es/tx](#module_@aeternity/aepp-sdk/es/tx)
     * [Tx([options])](#exp_module_@aeternity/aepp-sdk/es/tx--Tx) ⇒ `Object` ⏏
-        * [.calculateFee(fee, txType, gas)](#module_@aeternity/aepp-sdk/es/tx--Tx+calculateFee) ⇒ `String`
         * *[.spendTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+spendTx) ⇒ `String`*
         * *[.namePreclaimTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+namePreclaimTx) ⇒ `String`*
         * *[.nameClaimTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+nameClaimTx) ⇒ `String`*
@@ -45,22 +44,6 @@ create aeternity transactions.
 ```js
 Tx()
 ```
-<a id="module_@aeternity/aepp-sdk/es/tx--Tx+calculateFee"></a>
-
-#### tx.calculateFee(fee, txType, gas) ⇒ `String`
-Select specific account
-
-**Kind**: instance method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)  
-**Returns**: `String` - fee  
-**Category**: async  
-**rtype**: `(fee, txtype, gas = 0) => String`
-
-| Param | Type | Description |
-| --- | --- | --- |
-| fee | `String` \| `Number` | fee |
-| txType | `String` | Transaction type |
-| gas | `String` \| `Number` | Gas amount |
-
 <a id="module_@aeternity/aepp-sdk/es/tx--Tx+spendTx"></a>
 
 #### *tx.spendTx(options) ⇒ `String`*
