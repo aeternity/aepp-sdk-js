@@ -26,7 +26,7 @@ import stampit from '@stamp/it'
 import { required } from '@stamp/required'
 import * as Crypto from '../utils/crypto'
 import { buildTx } from '../tx/builder'
-import { TX_TYPE } from '../tx/schema'
+import { TX_TYPE } from '../tx/builder/schema'
 
 const DEFAULT_NETWORK_ID = `ae_mainnet`
 

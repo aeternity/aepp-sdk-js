@@ -1,3 +1,9 @@
+/**
+ * Transaction Schema for TxBuilder
+ * @module @aeternity/aepp-sdk/es/tx/builder/schema
+ * @export TxSchema
+ * @example import TxSchema from '@aeternity/aepp-sdk/es/tx/builder/schema'
+ */
 /* eslint-disable no-unused-vars */
 // # RLP version number
 // # https://github.com/aeternity/protocol/blob/epoch-v0.10.1/serializations.md#binary-serialization
@@ -33,6 +39,24 @@ const OBJECT_TAG_CONTRACT_CALL_TRANSACTION = 43
 const TX_FIELD = (name, type, prefix) => [name, type, prefix]
 const TX_SCHEMA_FIELD = (schema, objectId) => [schema, objectId]
 
+/**
+ * @constant
+ * @description Object with transaction types
+ * @type {Object} TX_TYPE
+ * @property {String} signed
+ * @property {String} spend
+ * @property {String} nameClaim
+ * @property {String} namePreClaim
+ * @property {String} nameUpdate
+ * @property {String} nameRevoke
+ * @property {String} nameTransfer
+ * @property {String} contractCreate
+ * @property {String} contractCall
+ * @property {String} oracleRegister
+ * @property {String} oracleExtend
+ * @property {String} oracleQuery
+ * @property {String} oracleResponse
+ */
 export const TX_TYPE = {
   signed: 'signedTx',
   spend: 'spendTx',

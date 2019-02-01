@@ -28,7 +28,7 @@
 
 import * as R from 'ramda'
 import { encodeBase58Check, salt } from '../utils/crypto'
-import { commitmentHash } from '../tx/helpers'
+import { commitmentHash } from '../tx/builder/helpers'
 import Ae from './'
 
 /**
