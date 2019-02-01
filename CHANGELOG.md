@@ -10,6 +10,9 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 - Add `TxBuilderHelper` to bundle
 ### Changed
 - Adjust doc's for `Contract` and `Aens` stamp's
+- Fix decoding of address from contract call
+- Contract call static now using `dry-run` API
+- Improve test's for Transaction verification
 
 ### Removed
 - none
