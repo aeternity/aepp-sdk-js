@@ -2,6 +2,25 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+
+## [1.3.2]
+### Added
+- Add `destroyInstance` function to `Ae` stamp which remove all listeners for RPC event's
+- Add docs for `TransactionValidator` and `TxBuilder` stamp's
+- Add `TxBuilderHelper` to bundle
+### Changed
+- Adjust doc's for `Contract` and `Aens` stamp's
+
+### Removed
+- none
+
+### Breaking Changes
+- none
+
+### Notes and known Issues
+- none
+
+
 ## [1.3.1]
 
 ### Changed
