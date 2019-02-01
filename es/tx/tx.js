@@ -27,8 +27,8 @@ import * as R from 'ramda'
 import Tx from './'
 import { buildTx, calculateFee } from './builder'
 import Epoch from '../epoch'
-import { TX_TYPE } from './schema'
-import { buildContractId, oracleQueryId } from './helpers'
+import { TX_TYPE } from './builder/schema'
+import { buildContractId, oracleQueryId } from './builder/helpers'
 
 const ORACLE_VM_VERSION = 0
 const CONTRACT_VM_VERSION = 1

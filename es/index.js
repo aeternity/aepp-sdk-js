@@ -17,6 +17,7 @@
 
 import * as Crypto from './utils/crypto'
 import * as TxBuilder from './tx/builder'
+import * as TxBuilderHelper from './tx/builder/helpers'
 import * as JsTx from './tx/js'
 
 import Ae from './ae'
@@ -59,5 +60,6 @@ export {
   Oracle,
   Channel,
   TransactionValidator,
-  TxBuilder
+  TxBuilder,
+  TxBuilderHelper
 }

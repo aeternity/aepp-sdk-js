@@ -18,7 +18,7 @@
 import '../'
 import { describe, it } from 'mocha'
 import { salt } from '../../es/utils/crypto'
-import { commitmentHash } from '../../es/tx/helpers'
+import { commitmentHash } from '../../es/tx/builder/helpers'
 import { BigNumber } from 'bignumber.js'
 import { toBytes } from '../../es/utils/bytes'
 

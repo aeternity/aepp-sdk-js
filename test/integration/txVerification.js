@@ -2,6 +2,10 @@
 import { before, describe } from 'mocha'
 import { configure, ready } from '.'
 import { generateKeyPair } from '../../es/utils/crypto'
+import { BASE_VERIFICATION_SCHEMA, SIGNATURE_VERIFICATION_SCHEMA } from '../../es/tx/builder/schema'
+
+const WARNINGS = [...SIGNATURE_VERIFICATION_SCHEMA, ...BASE_VERIFICATION_SCHEMA].reduce((acc, [msg, v, error]) => error.type === 'warning' ? [...acc, error.key]: acc, [])
+const ERRORS = [...BASE_VERIFICATION_SCHEMA, ...SIGNATURE_VERIFICATION_SCHEMA,].reduce((acc, [msg, v, error]) => error.type === 'error' ? [...acc, error.key]: acc, [])
 
 describe('Verify Transaction', function () {
   configure(this)
@@ -32,7 +36,8 @@ describe('Verify Transaction', function () {
 
 
     const {warning} = { ...(await client.unpackAndVerify(spendTx)), ...(await client.unpackAndVerify(signedTx)) }
-    Object.keys(warning).length.should.be.equals(3)
+
+    JSON.stringify(WARNINGS).should.be.equals(JSON.stringify(Object.keys(warning)))
   })
   it('check errors', async () => {
     const spendTx = await client.spendTx({
@@ -51,6 +56,7 @@ describe('Verify Transaction', function () {
 
 
     const {error} = { ...(await client.unpackAndVerify(spendTx)), ...(await client.unpackAndVerify(signedTx)) }
-    Object.keys(error).length.should.be.equals(4)
+
+    JSON.stringify(ERRORS).should.be.equals(JSON.stringify(Object.keys(error)))
   })
 })

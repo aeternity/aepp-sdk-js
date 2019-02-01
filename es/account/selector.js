@@ -37,6 +37,7 @@ async function address () {
 
 /**
  * Select specific account
+ * @alias module:@aeternity/aepp-sdk/es/account/selector
  * @instance
  * @rtype (address: String) => Void
  * @param {String} address - Address of account to select
