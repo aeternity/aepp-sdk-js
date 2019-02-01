@@ -2,6 +2,28 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+
+## [1.3.2]
+### Added
+- Add `destroyInstance` function to `Ae` stamp which remove all listeners for RPC event's
+- Add docs for `TransactionValidator` and `TxBuilder` stamp's
+- Add `TxBuilderHelper` to bundle
+### Changed
+- Adjust doc's for `Contract` and `Aens` stamp's
+- Fix decoding of address from contract call
+- Contract call static now using `dry-run` API
+- Improve test's for Transaction verification
+
+### Removed
+- none
+
+### Breaking Changes
+- none
+
+### Notes and known Issues
+- none
+
+
 ## [1.3.1]
 
 ### Changed
@@ -368,3 +390,4 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 [1.2.1]: https://github.com/aeternity/aepp-sdk-js/compare/1.1.2...1.2.1
 [1.3.0]: https://github.com/aeternity/aepp-sdk-js/compare/1.2.1...1.3.0
 [1.3.1]: https://github.com/aeternity/aepp-sdk-js/compare/1.3.0...1.3.1
+[1.3.2]: https://github.com/aeternity/aepp-sdk-js/compare/1.3.1...1.3.2
