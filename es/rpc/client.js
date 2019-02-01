@@ -32,6 +32,10 @@ function post (method) {
   }
 }
 
+function destroyClient () {
+  this.self.removeEventListener('message', this.handler, false)
+}
+
 /**
  * RPC client Stamp
  * @function
@@ -75,10 +79,18 @@ const RpcClient = stampit(AsyncInit, {
 
       return ret
     }
+    this.handler = receive
 
-    self.addEventListener('message', receive, false)
-
+    self.addEventListener('message', this.handler, false)
+    this.self = self
     this.session = await this.post('hello')
+  },
+  props: {
+    handler: null,
+    self: null
+  },
+  methods: {
+    destroyClient
   },
   composers ({ stamp, composables }) {
     // Combine Ae and Contract methods
