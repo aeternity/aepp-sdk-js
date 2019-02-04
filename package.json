@@ -1,6 +1,6 @@
 {
   "name": "@aeternity/aepp-sdk",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "SDK for the æternity blockchain",
   "main": "dist/aepp-sdk.js",
   "browser": "dist/aepp-sdk.browser.js",
@@ -14,7 +14,6 @@
     "test": "mocha --recursive --require @babel/register",
     "test:watch": "mocha --recursive --require @babel/register --watch",
     "test-jenkins": "mocha --recursive --require @babel/register --reporter mocha-junit-reporter",
-    "test-aeproject": "mocha './bin/aeproject/test/index.js' --timeout 0 --exit",
     "prepare": "npm run build",
     "prepublishOnly": "npm run docs:docco && npm run docs:api"
   },
@@ -39,11 +38,7 @@
     "chalk": "^2.4.1",
     "commander": "^2.14.1",
     "esm": "^3.0.77",
-    "fs": "0.0.1-security",
-    "fs-extra": "^7.0.0",
     "json-bigint": "^0.3.0",
-    "path": "^0.12.7",
-    "promisify-child-process": "^2.1.2",
     "ramda": "^0.25.0",
     "recursive-rename": "^2.0.0",
     "rlp": "2.1.0",
@@ -53,8 +48,7 @@
     "tweetnacl": "^1.0.0",
     "url": "^0.11.0",
     "uuid": "^3.3.2",
-    "websocket": "^1.0.26",
-    "prompt": "^1.0.0"
+    "websocket": "^1.0.26"
   },
   "repository": {
     "type": "git",
@@ -75,7 +69,6 @@
     "bufferutil": "^3.0.3",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
-    "chai-files": "^1.4.0",
     "docco": "^0.8.0",
     "esdoc": "^1.1.0",
     "esdoc-standard-plugin": "^1.0.0",
