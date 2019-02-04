@@ -57,13 +57,14 @@ async function encodeCall (code, abi, name, args, call) {
  * @param {String} address Contract address
  * @param {String} abi ABI('sophia', 'sophia-address')
  * @param {String} name Name of function to call
- * @param {Object} [options={}] options Options
- * @param {String} [options.args] args Argument's for call function
- * @param {String} [options.call] call Code of `call` contract(Pseudo code with __call => {name}({args}) function)
- * @param {String} [options.options] options Transaction options (fee, ttl, gas, amount, deposit)
+ * @param {Object} options [options={}]  Options
+ * @param {String} top [options.top] Block hash ob which you want to call contract
+ * @param {String} args [options.args] Argument's for call function
+ * @param {String} call [options.call] Code of `call` contract(Pseudo code with __call => {name}({args}) function)
+ * @param {String} options [options.options]  Transaction options (fee, ttl, gas, amount, deposit)
  * @return {Promise<Object>} Result object
  */
-async function callStatic (address, abi = 'sophia-address', name, { args = '()', call, options = {} } = {}) {
+async function callStatic (address, abi = 'sophia-address', name, { top, args = '()', call, options = {} } = {}) {
   const opt = R.merge(this.Ae.defaults, options)
 
   // Prepare `call` transaction
@@ -74,7 +75,7 @@ async function callStatic (address, abi = 'sophia-address', name, { args = '()',
   }))
 
   // Dry-run
-  const [{ result: status, callObj }] = (await this.contractDryRun([tx], [{ amount: opt.amount, pubKey: await this.address() }])).results
+  const [{ result: status, callObj }] = (await this.contractDryRun([tx], [{ amount: opt.amount, pubKey: await this.address() }], top)).results
 
   // check response
   if (status !== 'ok') throw new Error('Dry run error')

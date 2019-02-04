@@ -56,8 +56,8 @@ async function compileEpochContract (code, options = {}) {
   return this.api.compileContract(R.mergeAll([this.Ae.defaults, options, { code }]))
 }
 
-async function contractDryRun (txs, accounts) {
-  return this.api.dryRunTxs({ txs, accounts })
+async function contractDryRun (txs, accounts, top) {
+  return this.api.dryRunTxs({ txs, accounts, top })
 }
 
 /**
