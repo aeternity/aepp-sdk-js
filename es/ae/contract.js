@@ -33,7 +33,6 @@ import { addressFromDecimal } from '../utils/crypto'
 
 /**
  * Encode call data for contract call
- * @instance
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
@@ -50,7 +49,6 @@ async function encodeCall (code, abi, name, args, call) {
 
 /**
  * Static contract call(using dry-run)
- * @instance
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
@@ -74,8 +72,13 @@ async function callStatic (address, abi = 'sophia-address', name, { top, args = 
     callData: await this.contractEncodeCall(address, abi, name, args, call)
   }))
 
+  // Get block hash by height
+  if (top && !isNaN(top)) {
+    top = (await this.getKeyBlock(top)).hash
+  }
+
   // Dry-run
-  const [{ result: status, callObj, reason }] = (await this.contractDryRun([tx], [{ amount: opt.amount, pubKey: await this.address() }], top)).results
+  const [{ result: status, callObj, reason }] = (await this.txDryRun([tx], [{ amount: opt.amount, pubKey: await this.address() }], top)).results
 
   // check response
   if (status !== 'ok') throw new Error('Dry run error, ' + reason)
@@ -90,7 +93,6 @@ async function callStatic (address, abi = 'sophia-address', name, { top, args = 
 
 /**
  * Decode contract call result data
- * @instance
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
@@ -106,7 +108,6 @@ async function decode (type, data) {
 
 /**
  * Call contract function
- * @instance
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
@@ -147,7 +148,6 @@ async function call (code, abi, address, name, { args = '()', options = {}, call
 
 /**
  * Deploy contract to the node
- * @instance
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
@@ -184,7 +184,6 @@ async function deploy (code, abi, { initState = '()', options = {} } = {}) {
 
 /**
  * Compile contract source code
- * @instance
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async

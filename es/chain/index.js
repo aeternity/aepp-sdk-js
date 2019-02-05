@@ -216,4 +216,17 @@ const Chain = stampit({
  * @return {Object} Micro block header
  */
 
+/**
+ * Transaction dry-run
+ * @function getMicroBlockHeader
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype (txs, accounts, hashOrHeight) => result: Object
+ * @param {Array} txs - Array of transaction's
+ * @param {Array} accounts - Array of account's
+ * @param {String|Number} hashOrHeight - hash or height of block on which to make dry-run
+ * @return {Object} Result
+ */
+
 export default Chain

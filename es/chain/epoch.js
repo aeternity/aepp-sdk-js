@@ -124,6 +124,10 @@ async function getMicroBlockHeader (hash) {
   return this.api.getMicroBlockHeaderByHash(hash)
 }
 
+async function txDryRun (txs, accounts, top) {
+  return this.api.dryRunTxs({ txs, accounts, top })
+}
+
 const EpochChain = Chain.compose(Epoch, {
   methods: {
     sendTransaction,
@@ -139,7 +143,8 @@ const EpochChain = Chain.compose(Epoch, {
     getGeneration,
     getMicroBlockHeader,
     getMicroBlockTransactions,
-    getKeyBlock
+    getKeyBlock,
+    txDryRun
   }
 })
 
