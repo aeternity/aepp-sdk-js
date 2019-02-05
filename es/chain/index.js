@@ -218,7 +218,7 @@ const Chain = stampit({
 
 /**
  * Transaction dry-run
- * @function getMicroBlockHeader
+ * @function txDryRun
  * @instance
  * @abstract
  * @category async
