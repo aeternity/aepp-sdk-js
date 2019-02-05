@@ -75,12 +75,12 @@ async function callStatic (address, abi = 'sophia-address', name, { top, args = 
   }))
 
   // Dry-run
-  const [{ result: status, callObj }] = (await this.contractDryRun([tx], [{ amount: opt.amount, pubKey: await this.address() }], top)).results
+  const [{ result: status, callObj, reason }] = (await this.contractDryRun([tx], [{ amount: opt.amount, pubKey: await this.address() }], top)).results
 
   // check response
-  if (status !== 'ok') throw new Error('Dry run error')
+  if (status !== 'ok') throw new Error('Dry run error, ' + reason)
   const { returnType, returnValue } = callObj
-  if (returnType !== 'ok') throw new Error('Dry run error')
+  if (returnType !== 'ok') throw new Error('Dry run error, ' + Buffer.from(returnValue.slice(2)).toString())
 
   return {
     result: callObj,
