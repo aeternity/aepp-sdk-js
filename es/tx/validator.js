@@ -53,7 +53,7 @@ const VALIDATORS = {
   }
 }
 
-const resolveDataForBase = async (chain, { rlpEncoded, ownerPublicKey }) => {
+const resolveDataForBase = async (chain, { ownerPublicKey }) => {
   let accountNonce = 0
   let accountBalance = 0
   try {
@@ -99,7 +99,7 @@ const verifySchema = (schema, data) => {
  * @param {String} [options.networkId] networkId Use in signature verification
  * @return {Promise<Object>} Object with verification errors and warnings
  */
-function unpackAndVerify (txHash, { networkId } = {}) {
+async function unpackAndVerify (txHash, { networkId } = {}) {
   const { tx: unpackedTx, rlpEncoded } = unpackTx(txHash)
 
   if (+unpackedTx.tag === OBJECT_TAG_SIGNED_TRANSACTION) {
@@ -107,9 +107,9 @@ function unpackAndVerify (txHash, { networkId } = {}) {
     const signatures = unpackedTx.signatures
     const rlpEncodedTx = unpackedTx.encodedTx.rlpEncoded
 
-    return this.verifyTx({ tx, signatures, rlpEncoded: rlpEncodedTx }, networkId)
+    return { validation: this.verifyTx({ tx, signatures, rlpEncoded: rlpEncodedTx }, networkId), tx, signatures }
   }
-  return this.verifyTx({ tx: unpackedTx, rlpEncoded }, networkId)
+  return { validation: await this.verifyTx({ tx: unpackedTx, rlpEncoded }, networkId), tx: unpackedTx }
 }
 
 const getOwnerPublicKey = (tx) =>
@@ -133,7 +133,7 @@ async function verifyTx ({ tx, signatures, rlpEncoded }, networkId) {
   const ownerPublicKey = getOwnerPublicKey(tx)
   const resolvedData = {
     minFee: calculateFee(0, OBJECT_ID_TX_TYPE[+tx.tag], { params: tx }),
-    ...(await resolveDataForBase(this, { ownerPublicKey, rlpEncoded, tx })),
+    ...(await resolveDataForBase(this, { ownerPublicKey })),
     ...tx
   }
   const signatureVerification = signatures && signatures.length
