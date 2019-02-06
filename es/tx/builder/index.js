@@ -250,7 +250,7 @@ export function unpackTx (encodedTx, fromRlpBinary = false) {
   const objId = readInt(binary[0])
   const [schema] = TX_DESERIALIZATION_SCHEMA[objId]
 
-  return { tx: { ...unpackRawTx(binary, schema), txType: OBJECT_ID_TX_TYPE[objId] }, rlpEncoded, binary }
+  return { txType: OBJECT_ID_TX_TYPE[objId], tx: unpackRawTx(binary, schema), rlpEncoded, binary }
 }
 
 export default { calculateFee, unpackTx, unpackRawTx, buildTx, buildRawTx, validateParams }
