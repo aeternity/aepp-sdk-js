@@ -31,11 +31,7 @@ describe('Verify Transaction', function () {
       absoluteTtl: true
     })
 
-    // Sign using another account
-    const signedTx = await client.signTransaction(spendTx)
-
-
-    const {warning} = { ...(await client.unpackAndVerify(spendTx)).validation, ...(await client.unpackAndVerify(signedTx)).validation }
+    const {warning} = { ...(await client.unpackAndVerify(spendTx)).validation }
 
     JSON.stringify(WARNINGS).should.be.equals(JSON.stringify(Object.keys(warning)))
   })
@@ -54,8 +50,8 @@ describe('Verify Transaction', function () {
     // Sign using another account
     const signedTx = await client.signTransaction(spendTx)
 
-
-    const {error} = { ...(await client.unpackAndVerify(spendTx)).validation, ...(await client.unpackAndVerify(signedTx)).validation }
+  console.log(await client.unpackAndVerify(signedTx))
+    const {error} = { ...(await client.unpackAndVerify(signedTx)).validation }
 
     JSON.stringify(ERRORS).should.be.equals(JSON.stringify(Object.keys(error)))
   })

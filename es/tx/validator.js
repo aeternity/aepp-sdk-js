@@ -106,7 +106,7 @@ async function unpackAndVerify (txHash, { networkId } = {}) {
     const signatures = unpackedTx.signatures
     const rlpEncodedTx = unpackedTx.encodedTx.rlpEncoded
 
-    return { validation: this.verifyTx({ tx, signatures, rlpEncoded: rlpEncodedTx }, networkId), tx, signatures }
+    return { validation: await this.verifyTx({ tx, signatures, rlpEncoded: rlpEncodedTx }, networkId), tx, signatures }
   }
   return { validation: await this.verifyTx({ tx: unpackedTx, rlpEncoded }, networkId), tx: unpackedTx }
 }
