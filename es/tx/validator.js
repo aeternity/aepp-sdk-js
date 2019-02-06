@@ -4,6 +4,7 @@ import {
   assertedType
 } from '../utils/crypto'
 import EpochChain from '../chain/epoch'
+import { encode } from '../tx/builder/helpers'
 
 import { BigNumber } from 'bignumber.js'
 import {
@@ -72,11 +73,11 @@ const resolveDataForBase = async (chain, { ownerPublicKey }) => {
 const verifySchema = (schema, data) => {
   // Verify through schema
   return schema.reduce(
-    (acc, [msg, validatorKey, { key, type }]) => {
-      if (!VALIDATORS[validatorKey](data)) acc[type][key] = msg(data)
+    (acc, [msg, validatorKey, { key, type, txKey }]) => {
+      if (!VALIDATORS[validatorKey](data)) acc.push({ msg: msg(data), txKey, type })
       return acc
     },
-    { error: {}, warning: {} }
+    []
   )
 }
 
@@ -103,7 +104,7 @@ async function unpackAndVerify (txHash, { networkId } = {}) {
 
   if (+unpackedTx.tag === OBJECT_TAG_SIGNED_TRANSACTION) {
     const tx = unpackedTx.encodedTx.tx
-    const signatures = unpackedTx.signatures
+    const signatures = unpackedTx.signatures.map(raw => ({ raw, hash: encode(raw, 'sg') }))
     const rlpEncodedTx = unpackedTx.encodedTx.rlpEncoded
 
     return { validation: await this.verifyTx({ tx, signatures, rlpEncoded: rlpEncodedTx }, networkId), tx, signatures }
@@ -124,7 +125,7 @@ const getOwnerPublicKey = (tx) =>
  * @param {Array} [data.signatures] signatures Transaction signature's
  * @param {Array} [data.rlpEncoded] rlpEncoded RLP encoded transaction
  * @param {String} networkId networkId Use in signature verification
- * @return {Promise<Object>} Object with verification errors and warnings
+ * @return {Promise<Array>} Object with verification errors and warnings
  */
 async function verifyTx ({ tx, signatures, rlpEncoded }, networkId) {
   networkId = networkId || this.nodeNetworkId || 'ae_mainnet'
@@ -138,25 +139,19 @@ async function verifyTx ({ tx, signatures, rlpEncoded }, networkId) {
   const signatureVerification = signatures && signatures.length
     ? verifySchema(SIGNATURE_VERIFICATION_SCHEMA, {
       rlpEncoded,
-      signature: signatures[0],
+      signature: signatures[0].raw,
       ownerPublicKey,
       networkId
     })
-    : { error: {}, warning: {} }
+    : { error: [], warning: [] }
   const baseVerification = verifySchema(BASE_VERIFICATION_SCHEMA, resolvedData)
   // const customVerification = customVerification(this.api, { tx, resolvedBaseData })
 
-  return {
-    error: {
-      ...baseVerification.error,
-      ...signatureVerification.error
-      // ...customVerification.error
-    },
-    warning: {
-      ...baseVerification.warning
-      // ...customVerification.warning
-    }
-  }
+  return [
+    ...baseVerification,
+    ...signatureVerification
+    // ...customVerification.error
+  ]
 }
 
 /**
