@@ -1,4 +1,3 @@
-/* eslint-disable no-use-before-define */
 import {
   verify,
   decodeBase58Check,

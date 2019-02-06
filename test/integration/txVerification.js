@@ -35,7 +35,7 @@ describe('Verify Transaction', function () {
     const signedTx = await client.signTransaction(spendTx)
 
 
-    const {warning} = { ...(await client.unpackAndVerify(spendTx)), ...(await client.unpackAndVerify(signedTx)) }
+    const {warning} = { ...(await client.unpackAndVerify(spendTx)).validation, ...(await client.unpackAndVerify(signedTx)).validation }
 
     JSON.stringify(WARNINGS).should.be.equals(JSON.stringify(Object.keys(warning)))
   })
@@ -55,7 +55,7 @@ describe('Verify Transaction', function () {
     const signedTx = await client.signTransaction(spendTx)
 
 
-    const {error} = { ...(await client.unpackAndVerify(spendTx)), ...(await client.unpackAndVerify(signedTx)) }
+    const {error} = { ...(await client.unpackAndVerify(spendTx)).validation, ...(await client.unpackAndVerify(signedTx)).validation }
 
     JSON.stringify(ERRORS).should.be.equals(JSON.stringify(Object.keys(error)))
   })
