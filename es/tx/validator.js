@@ -143,7 +143,7 @@ async function verifyTx ({ tx, signatures, rlpEncoded }, networkId) {
       ownerPublicKey,
       networkId
     })
-    : { error: [], warning: [] }
+    : []
   const baseVerification = verifySchema(BASE_VERIFICATION_SCHEMA, resolvedData)
   // const customVerification = customVerification(this.api, { tx, resolvedBaseData })
 
