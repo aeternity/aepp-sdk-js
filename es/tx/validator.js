@@ -100,16 +100,25 @@ const verifySchema = (schema, data) => {
  * @return {Promise<Object>} Object with verification errors and warnings
  */
 async function unpackAndVerify (txHash, { networkId } = {}) {
-  const { tx: unpackedTx, rlpEncoded } = unpackTx(txHash)
+  const { tx: unpackedTx, rlpEncoded, txType } = unpackTx(txHash)
 
   if (+unpackedTx.tag === OBJECT_TAG_SIGNED_TRANSACTION) {
-    const tx = unpackedTx.encodedTx.tx
+    const { txType, tx } = unpackedTx.encodedTx
     const signatures = unpackedTx.signatures.map(raw => ({ raw, hash: encode(raw, 'sg') }))
     const rlpEncodedTx = unpackedTx.encodedTx.rlpEncoded
 
-    return { validation: await this.verifyTx({ tx, signatures, rlpEncoded: rlpEncodedTx }, networkId), tx, signatures }
+    return {
+      validation: await this.verifyTx({ tx, signatures, rlpEncoded: rlpEncodedTx }, networkId),
+      tx,
+      signatures,
+      txType
+    }
   }
-  return { validation: await this.verifyTx({ tx: unpackedTx, rlpEncoded }, networkId), tx: unpackedTx }
+  return {
+    validation: await this.verifyTx({ tx: unpackedTx, rlpEncoded }, networkId),
+    tx: unpackedTx,
+    txType
+  }
 }
 
 const getOwnerPublicKey = (tx) =>
