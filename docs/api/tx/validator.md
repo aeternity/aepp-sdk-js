@@ -3,15 +3,15 @@
 ## @aeternity/aepp-sdk/es/tx/validator
 Transaction validator
 
-**Export**: TxValidator  
+**Export**: TransactionValidator  
 **Example**  
 ```js
-import TxValidator from '@aeternity/aepp-sdk/es/tx/validator'
+import TransactionValidator from '@aeternity/aepp-sdk/es/tx/validator'
 ```
 
 * [@aeternity/aepp-sdk/es/tx/validator](#module_@aeternity/aepp-sdk/es/tx/validator)
     * [unpackAndVerify(txHash, [options])](#exp_module_@aeternity/aepp-sdk/es/tx/validator--unpackAndVerify) ⇒ `Promise.&lt;Object&gt;` ⏏
-    * [verifyTx(txHash, [data], networkId)](#exp_module_@aeternity/aepp-sdk/es/tx/validator--verifyTx) ⇒ `Promise.&lt;Object&gt;` ⏏
+    * [verifyTx([data], networkId)](#exp_module_@aeternity/aepp-sdk/es/tx/validator--verifyTx) ⇒ `Promise.&lt;Object&gt;` ⏏
     * [TransactionValidator([options])](#exp_module_@aeternity/aepp-sdk/es/tx/validator--TransactionValidator) ⇒ `Object` ⏏
 
 <a id="exp_module_@aeternity/aepp-sdk/es/tx/validator--unpackAndVerify"></a>
@@ -30,7 +30,7 @@ Unpack and verify transaction (verify nonce, ttl, fee, signature, account balanc
 
 <a id="exp_module_@aeternity/aepp-sdk/es/tx/validator--verifyTx"></a>
 
-### verifyTx(txHash, [data], networkId) ⇒ `Promise.&lt;Object&gt;` ⏏
+### verifyTx([data], networkId) ⇒ `Promise.&lt;Object&gt;` ⏏
 Verify transaction (verify nonce, ttl, fee, signature, account balance)
 
 **Kind**: Exported function  
@@ -38,7 +38,6 @@ Verify transaction (verify nonce, ttl, fee, signature, account balance)
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| txHash | `String` |  | Base64Check transaction hash |
 | [data] | `Object` | <code>{}</code> | data TX data object |
 | [data.tx] | `String` |  | tx Transaction hash |
 | [data.signatures] | `Array` |  | signatures Transaction signature's |
