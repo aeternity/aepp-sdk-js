@@ -116,6 +116,21 @@ function transformParams (params) {
     )
 }
 
+function getGasBySize (size) {
+  return BigNumber(GAS_PER_BYTE).times(size + FEE_BYTE_SIZE)
+}
+
+function calculateMinFee (txType, { gas = 0, params }) {
+  if (!params) return DEFAULT_FEE
+
+  const { rlpEncoded: txWithOutFee } = buildTx(params, txType, { excludeKeys: ['fee'] })
+  const txSize = txWithOutFee.length
+
+  return TX_FEE_FORMULA[txType]
+    ? BigNumber(TX_FEE_FORMULA[txType](gas)).plus(getGasBySize(txSize)).toString(10)
+    : DEFAULT_FEE
+}
+
 // INTERFACE
 /**
  * Calculate fee
@@ -128,23 +143,15 @@ function transformParams (params) {
  * @param {String|Number} options.gas - Gas amount
  * @param {Object} options.params - Tx params
  * @return {String|Number}
- * @example calculateFee(null, 'spendtx')
+ * @example calculateFee(null, 'spendTx')
  */
-export function calculateFee (fee, txType, { gas = 0, params } = {}) {
-  function getGasBySize (size) {
-    return GAS_PER_BYTE * (size + FEE_BYTE_SIZE)
-  }
+export function calculateFee (fee = 0, txType, { gas = 0, params, showWarning = true } = {}) {
+  if (!TX_FEE_FORMULA[txType] && showWarning) console.warn(`Can't find transaction fee formula for ${txType}, we will use DEFAULT_FEE(${DEFAULT_FEE})`)
 
-  if (!fee) {
-    // TODO remove that after implement oracle fee calculation
-    if (!params) return DEFAULT_FEE
+  const minFee = calculateMinFee(txType, { params, gas })
+  if (fee && BigNumber(minFee).gt(BigNumber(fee)) && showWarning) console.warn('Transaction fee is lower then min fee!')
 
-    const { rlpEncoded: txWithOutFee } = buildTx(params, txType, { excludeKeys: ['fee'] })
-    const txSize = txWithOutFee.length
-
-    return TX_FEE_FORMULA[txType] ? TX_FEE_FORMULA[txType](gas) + getGasBySize(txSize) : DEFAULT_FEE
-  }
-  return fee
+  return fee || minFee
 }
 
 /**
