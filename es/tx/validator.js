@@ -140,8 +140,10 @@ async function verifyTx ({ tx, signatures, rlpEncoded }, networkId) {
   networkId = networkId || this.nodeNetworkId || 'ae_mainnet'
   // Fetch data for verification
   const ownerPublicKey = getOwnerPublicKey(tx)
+  const gas = tx.hasOwnProperty('gas') ? +tx.gas : 0
+  const gasPrice = tx.hasOwnProperty('gasPrice') ? +tx.gas : 1
   const resolvedData = {
-    minFee: calculateFee(0, OBJECT_ID_TX_TYPE[+tx.tag], { params: tx }),
+    minFee: calculateFee(0, OBJECT_ID_TX_TYPE[+tx.tag], { gas, gasPrice, params: tx, showWarning: false }),
     ...(await resolveDataForBase(this, { ownerPublicKey })),
     ...tx
   }

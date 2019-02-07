@@ -35,7 +35,7 @@ Calculate fee
 
 **Example**  
 ```js
-calculateFee(null, 'spendtx')
+calculateFee(null, 'spendTx')
 ```
 <a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/index--exports.validateParams"></a>
 

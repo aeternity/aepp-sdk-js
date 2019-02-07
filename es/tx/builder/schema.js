@@ -8,6 +8,8 @@
 // # RLP version number
 // # https://github.com/aeternity/protocol/blob/epoch-v0.10.1/serializations.md#binary-serialization
 
+import BigNumber from 'bignumber.js'
+
 export const VSN = 1
 
 // # Tag constant for ids (type uint8)
@@ -113,8 +115,8 @@ export const DEFAULT_FEE = 20000
 // MAP WITH FEE CALCULATION https://github.com/aeternity/protocol/blob/epoch-v1.0.0-rc6/consensus/consensus.md#gas
 export const TX_FEE_FORMULA = {
   [TX_TYPE.spend]: () => BASE_GAS,
-  [TX_TYPE.contractCreate]: (gas) => 5 * BASE_GAS + gas,
-  [TX_TYPE.contractCall]: (gas) => 30 * BASE_GAS + gas,
+  [TX_TYPE.contractCreate]: (gas) => BigNumber(5 * BASE_GAS).plus(gas),
+  [TX_TYPE.contractCall]: (gas) => BigNumber(30 * BASE_GAS).plus(gas),
   [TX_TYPE.nameTransfer]: () => BASE_GAS,
   [TX_TYPE.nameUpdate]: () => BASE_GAS,
   [TX_TYPE.nameClaim]: () => BASE_GAS,

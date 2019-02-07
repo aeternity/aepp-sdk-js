@@ -18,14 +18,13 @@ import { Contract } from '@aeternity/aepp-sdk' (Using bundle)
 
 * [@aeternity/aepp-sdk/es/ae/contract](#module_@aeternity/aepp-sdk/es/ae/contract)
     * [Contract([options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--Contract) ⇒ `Object` ⏏
-    * _instance_
-        * _async_
-            * [.encodeCall(code, abi, name, args, call)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--encodeCall) ⇒ `Promise.&lt;Object&gt;` ⏏
-            * [.callStatic(address, abi, name, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--callStatic) ⇒ `Promise.&lt;Object&gt;` ⏏
-            * [.decode(type, data)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--decode) ⇒ `Promise.&lt;String&gt;` ⏏
-            * [.call(code, abi, address, name, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--call) ⇒ `Promise.&lt;Object&gt;` ⏏
-            * [.deploy(code, abi, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--deploy) ⇒ `Promise.&lt;Object&gt;` ⏏
-            * [.compile(code, options)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--compile) ⇒ `Promise.&lt;Object&gt;` ⏏
+    * _async_
+        * [encodeCall(code, abi, name, args, call)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--encodeCall) ⇒ `Promise.&lt;Object&gt;` ⏏
+        * [callStatic(address, abi, name, options, top, args, call, options)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--callStatic) ⇒ `Promise.&lt;Object&gt;` ⏏
+        * [decode(type, data)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--decode) ⇒ `Promise.&lt;String&gt;` ⏏
+        * [call(code, abi, address, name, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--call) ⇒ `Promise.&lt;Object&gt;` ⏏
+        * [deploy(code, abi, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--deploy) ⇒ `Promise.&lt;Object&gt;` ⏏
+        * [compile(code, options)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--compile) ⇒ `Promise.&lt;Object&gt;` ⏏
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--Contract"></a>
 
@@ -45,10 +44,10 @@ Provide contract implementation
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--encodeCall"></a>
 
-### .encodeCall(code, abi, name, args, call) ⇒ `Promise.&lt;Object&gt;` ⏏
+### encodeCall(code, abi, name, args, call) ⇒ `Promise.&lt;Object&gt;` ⏏
 Encode call data for contract call
 
-**Kind**: instance method of [`@aeternity/aepp-sdk/es/ae/contract`](#module_@aeternity/aepp-sdk/es/ae/contract)  
+**Kind**: Exported function  
 **Category**: async  
 
 | Param | Type | Description |
@@ -61,10 +60,10 @@ Encode call data for contract call
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--callStatic"></a>
 
-### .callStatic(address, abi, name, [options]) ⇒ `Promise.&lt;Object&gt;` ⏏
+### callStatic(address, abi, name, options, top, args, call, options) ⇒ `Promise.&lt;Object&gt;` ⏏
 Static contract call(using dry-run)
 
-**Kind**: instance method of [`@aeternity/aepp-sdk/es/ae/contract`](#module_@aeternity/aepp-sdk/es/ae/contract)  
+**Kind**: Exported function  
 **Returns**: `Promise.&lt;Object&gt;` - Result object  
 **Category**: async  
 
@@ -73,17 +72,18 @@ Static contract call(using dry-run)
 | address | `String` |  | Contract address |
 | abi | `String` | <code>sophia-address</code> | ABI('sophia', 'sophia-address') |
 | name | `String` |  | Name of function to call |
-| [options] | `Object` | <code>{}</code> | options Options |
-| [options.args] | `String` |  | args Argument's for call function |
-| [options.call] | `String` |  | call Code of `call` contract(Pseudo code with __call => {name}({args}) function) |
-| [options.options] | `String` |  | options Transaction options (fee, ttl, gas, amount, deposit) |
+| options | `Object` |  | [options={}]  Options |
+| top | `String` |  | [options.top] Block hash ob which you want to call contract |
+| args | `String` |  | [options.args] Argument's for call function |
+| call | `String` |  | [options.call] Code of `call` contract(Pseudo code with __call => {name}({args}) function) |
+| options | `String` |  | [options.options]  Transaction options (fee, ttl, gas, amount, deposit) |
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--decode"></a>
 
-### .decode(type, data) ⇒ `Promise.&lt;String&gt;` ⏏
+### decode(type, data) ⇒ `Promise.&lt;String&gt;` ⏏
 Decode contract call result data
 
-**Kind**: instance method of [`@aeternity/aepp-sdk/es/ae/contract`](#module_@aeternity/aepp-sdk/es/ae/contract)  
+**Kind**: Exported function  
 **Returns**: `Promise.&lt;String&gt;` - Result object  
 **Category**: async  
 
@@ -94,10 +94,10 @@ Decode contract call result data
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--call"></a>
 
-### .call(code, abi, address, name, [options]) ⇒ `Promise.&lt;Object&gt;` ⏏
+### call(code, abi, address, name, [options]) ⇒ `Promise.&lt;Object&gt;` ⏏
 Call contract function
 
-**Kind**: instance method of [`@aeternity/aepp-sdk/es/ae/contract`](#module_@aeternity/aepp-sdk/es/ae/contract)  
+**Kind**: Exported function  
 **Returns**: `Promise.&lt;Object&gt;` - Result object  
 **Category**: async  
 
@@ -114,10 +114,10 @@ Call contract function
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--deploy"></a>
 
-### .deploy(code, abi, [options]) ⇒ `Promise.&lt;Object&gt;` ⏏
+### deploy(code, abi, [options]) ⇒ `Promise.&lt;Object&gt;` ⏏
 Deploy contract to the node
 
-**Kind**: instance method of [`@aeternity/aepp-sdk/es/ae/contract`](#module_@aeternity/aepp-sdk/es/ae/contract)  
+**Kind**: Exported function  
 **Returns**: `Promise.&lt;Object&gt;` - Result object  
 **Category**: async  
 
@@ -131,10 +131,10 @@ Deploy contract to the node
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--compile"></a>
 
-### .compile(code, options) ⇒ `Promise.&lt;Object&gt;` ⏏
+### compile(code, options) ⇒ `Promise.&lt;Object&gt;` ⏏
 Compile contract source code
 
-**Kind**: instance method of [`@aeternity/aepp-sdk/es/ae/contract`](#module_@aeternity/aepp-sdk/es/ae/contract)  
+**Kind**: Exported function  
 **Returns**: `Promise.&lt;Object&gt;` - Result object  
 **Category**: async  
 
