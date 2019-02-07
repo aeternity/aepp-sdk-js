@@ -37,12 +37,23 @@ import TransactionValidator from '../tx/validator'
  * @category async
  * @rtype (tx: String, options: Object) => Promise[String]
  * @param {String} tx - Transaction
- * @param {Object} options - Options
+ * @param {Object} [options={}] options - Options
+ * @param {Object} [options.verify] verify - Verify transaction before broadcast, throw error if not valid
  * @return {String|String} Transaction or transaction hash
  */
 async function send (tx, options) {
   const opt = R.merge(this.Ae.defaults, options)
   const signed = await this.signTransaction(tx)
+  if (opt.verify) {
+    const { validation, tx, txType } = await this.unpackAndVerify(signed)
+    if (validation.length) {
+      throw Object.assign({
+        code: 'TX_VERIFICATION_ERROR',
+        errorData: { validation, tx, txType },
+        txHash: signed
+      })
+    }
+  }
   return this.sendTransaction(signed, opt)
 }
 
