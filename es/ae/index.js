@@ -29,6 +29,7 @@ import Account from '../account'
 import Contract from '../contract'
 import Oracle from '../oracle'
 import * as R from 'ramda'
+import TransactionValidator from '../tx/validator'
 
 /**
  * Sign and post a transaction to the chain
@@ -90,7 +91,7 @@ function destroyInstance () {
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Ae instance
  */
-const Ae = stampit(Tx, Account, Chain, Contract, Oracle, {
+const Ae = stampit(Tx, Account, Chain, Contract, Oracle, TransactionValidator, {
   methods: { send, spend, destroyInstance }
 })
 

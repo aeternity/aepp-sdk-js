@@ -22,7 +22,7 @@ import formatBalance from '../utils/amount-formatter'
 async function sendTransaction (tx, options = {}) {
   const { waitMined } = R.merge(this.Chain.defaults, options)
   const { txHash } = await this.api.postTransaction({ tx })
-  return waitMined ? this.poll(txHash, options) : txHash
+  return waitMined ? { ...(await this.poll(txHash, options)), rawTx: tx } : { hash: txHash, rawTx: tx }
 }
 
 async function balance (address, { height, hash, format = true } = {}) {
