@@ -356,13 +356,13 @@ const VALIDATORS = {
 }
 
 const ERRORS = {
-  invalidSignature: { key: 'InvalidSignature', type: ERROR_TYPE.ERROR },
-  insufficientFee: { key: 'InsufficientFee', type: ERROR_TYPE.ERROR },
-  expiredTTL: { key: 'ExpiredTTL', type: ERROR_TYPE.ERROR },
-  insufficientBalanceForAmountFee: { key: 'InsufficientBalanceForAmountFee', type: ERROR_TYPE.WARNING },
-  insufficientBalanceForAmount: { key: 'InsufficientBalanceForAmount', type: ERROR_TYPE.WARNING },
-  nonceUsed: { key: 'NonceUsed', type: ERROR_TYPE.ERROR },
-  nonceHigh: { key: 'NonceHigh', type: ERROR_TYPE.WARNING }
+  invalidSignature: { key: 'InvalidSignature', type: ERROR_TYPE.ERROR, txKey: 'signature' },
+  insufficientFee: { key: 'InsufficientFee', type: ERROR_TYPE.ERROR, txKey: 'fee' },
+  expiredTTL: { key: 'ExpiredTTL', type: ERROR_TYPE.ERROR, txKey: 'ttl' },
+  insufficientBalanceForAmountFee: { key: 'InsufficientBalanceForAmountFee', type: ERROR_TYPE.WARNING, txKey: 'fee' },
+  insufficientBalanceForAmount: { key: 'InsufficientBalanceForAmount', type: ERROR_TYPE.WARNING, txKey: 'amount' },
+  nonceUsed: { key: 'NonceUsed', type: ERROR_TYPE.ERROR, txKey: 'nonce' },
+  nonceHigh: { key: 'NonceHigh', type: ERROR_TYPE.WARNING, txKey: 'nonce' }
 }
 
 export const SIGNATURE_VERIFICATION_SCHEMA = [

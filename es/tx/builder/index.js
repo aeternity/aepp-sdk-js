@@ -5,7 +5,7 @@ import { rlp } from '../../utils/crypto'
 import {
   DEFAULT_FEE,
   FEE_BYTE_SIZE,
-  FIELD_TYPES, GAS_PER_BYTE,
+  FIELD_TYPES, GAS_PER_BYTE, OBJECT_ID_TX_TYPE,
   PREFIX_ID_TAG,
   TX_DESERIALIZATION_SCHEMA, TX_FEE_FORMULA,
   TX_SERIALIZATION_SCHEMA, VALIDATION_MESSAGE,
@@ -250,7 +250,7 @@ export function unpackTx (encodedTx, fromRlpBinary = false) {
   const objId = readInt(binary[0])
   const [schema] = TX_DESERIALIZATION_SCHEMA[objId]
 
-  return { tx: unpackRawTx(binary, schema), rlpEncoded, binary }
+  return { txType: OBJECT_ID_TX_TYPE[objId], tx: unpackRawTx(binary, schema), rlpEncoded, binary }
 }
 
 export default { calculateFee, unpackTx, unpackRawTx, buildTx, buildRawTx, validateParams }
