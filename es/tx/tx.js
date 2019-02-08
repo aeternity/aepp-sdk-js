@@ -269,10 +269,10 @@ async function calculateNonce (accountId, nonce) {
  * @param {Object} params Object which contains all tx data
  * @return {Object} { ttl, nonce, fee } Object with account nonce, absolute ttl and transaction fee
  */
-async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, gas, gasPrice, absoluteTtl }) {
+async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, gas, absoluteTtl }) {
   const nonce = await (calculateNonce.bind(this)(senderId, n))
   const ttl = await (calculateTtl.bind(this)(t, !absoluteTtl))
-  const fee = calculateFee(f, txType, { showWarning: this.showWarning, gas, gasPrice, params: R.merge(R.last(arguments), { nonce, ttl }) })
+  const fee = calculateFee(f, txType, { showWarning: this.showWarning, gas, params: R.merge(R.last(arguments), { nonce, ttl }) })
   return { fee, ttl, nonce }
 }
 
