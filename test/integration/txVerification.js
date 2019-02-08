@@ -62,6 +62,7 @@ describe('Verify Transaction', function () {
     JSON.stringify(ERRORS).should.be.equals(JSON.stringify(error))
   })
   it('verify transaction before broadcast', async () => {
+    client = await ready(this)
     const spendTx = await client.spendTx({
       senderId: await client.address(),
       recipientId: await client.address(),
@@ -70,9 +71,8 @@ describe('Verify Transaction', function () {
       absoluteTtl: true
     })
 
-    // Sign using another account
     try {
-      const result = await client.send(spendTx, { verify: true })
+      await client.send(spendTx, { verify: true })
     } catch ({ errorData }) {
       const atLeastOneError = !!errorData.validation.length
       atLeastOneError.should.be.equal(true)

@@ -18,9 +18,22 @@ import * as R from 'ramda'
 import Chain from './'
 import Epoch from '../epoch'
 import formatBalance from '../utils/amount-formatter'
+import TransactionValidator from '../tx/validator'
 
 async function sendTransaction (tx, options = {}) {
-  const { waitMined } = R.merge(this.Chain.defaults, options)
+  const { waitMined, verify } = R.merge(this.Chain.defaults, options)
+  // Verify transaction before broadcast
+  if (verify) {
+    const { validation, tx: txObject, txType } = await this.unpackAndVerify(tx)
+    if (validation.length) {
+      throw Object.assign({
+        code: 'TX_VERIFICATION_ERROR',
+        errorData: { validation, tx: txObject, txType },
+        txHash: tx
+      })
+    }
+  }
+
   const { txHash } = await this.api.postTransaction({ tx })
   return waitMined ? { ...(await this.poll(txHash, options)), rawTx: tx } : { hash: txHash, rawTx: tx }
 }
@@ -128,7 +141,7 @@ async function txDryRun (txs, accounts, top) {
   return this.api.dryRunTxs({ txs, accounts, top })
 }
 
-const EpochChain = Chain.compose(Epoch, {
+const EpochChain = Chain.compose(Epoch, TransactionValidator, {
   methods: {
     sendTransaction,
     balance,

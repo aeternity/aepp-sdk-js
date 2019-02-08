@@ -29,7 +29,6 @@ import Account from '../account'
 import Contract from '../contract'
 import Oracle from '../oracle'
 import * as R from 'ramda'
-import TransactionValidator from '../tx/validator'
 
 /**
  * Sign and post a transaction to the chain
@@ -44,16 +43,6 @@ import TransactionValidator from '../tx/validator'
 async function send (tx, options) {
   const opt = R.merge(this.Ae.defaults, options)
   const signed = await this.signTransaction(tx)
-  if (opt.verify) {
-    const { validation, tx, txType } = await this.unpackAndVerify(signed)
-    if (validation.length) {
-      throw Object.assign({
-        code: 'TX_VERIFICATION_ERROR',
-        errorData: { validation, tx, txType },
-        txHash: signed
-      })
-    }
-  }
   return this.sendTransaction(signed, opt)
 }
 
@@ -102,7 +91,7 @@ function destroyInstance () {
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Ae instance
  */
-const Ae = stampit(Tx, Account, Chain, Contract, Oracle, TransactionValidator, {
+const Ae = stampit(Tx, Account, Chain, Contract, Oracle, {
   methods: { send, spend, destroyInstance }
 })
 
