@@ -25,10 +25,6 @@ function createSession () {
   return id
 }
 
-function destroyServer () {
-  this.self.removeEventListener('message', this.handler, false)
-}
-
 function hello () {
   return Promise.resolve(this.createSession())
 }
@@ -59,18 +55,16 @@ async function receive ({ data, origin, source }) {
 
 const RpcServer = stampit({
   init ({ self = window }) {
-    this.self = self
-    this.handler = this.receive.bind(this)
-    this.self.addEventListener('message', this.handler, false)
+    const handler = this.receive.bind(this)
+    self.addEventListener('message', handler, false)
+    this.destroyServer = () =>
+      self.removeEventListener('message', handler, false)
   },
   methods: {
     receive,
-    createSession,
-    destroyServer
+    createSession
   },
   props: {
-    handler: null,
-    self: null,
     rpcSessions: {}
   },
   deepProps: {
