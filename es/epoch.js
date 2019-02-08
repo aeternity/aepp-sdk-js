@@ -84,9 +84,9 @@ const Epoch = stampit({
     nodeNetworkId: null
   }
 }, Swagger, {
-  async init ({ forceCompatibility }) {
+  async init ({ forceCompatibility = false }) {
     const { nodeVersion: version, nodeRevision: revision, genesisKeyBlockHash: genesisHash, networkId } = await this.api.getStatus()
-    if (!semver.satisfies(version, COMPATIBILITY_RANGE)) throw new Error(`Unsupported epoch version ${version}. Supported: ${COMPATIBILITY_RANGE}`)
+    if (!semver.satisfies(version, COMPATIBILITY_RANGE) && !forceCompatibility) throw new Error(`Unsupported epoch version ${version}. Supported: ${COMPATIBILITY_RANGE}`)
     // TODO:
     // We should not get the node version from getStatus
     // but read the version that we get from "URL/api" > info > version

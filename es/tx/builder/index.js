@@ -130,19 +130,18 @@ function getGasBySize (size) {
  * @param {String} txType - Transaction type
  * @param {Options} options - Options object
  * @param {String|Number} options.gas - Gas amount
- * @param {String|Number} options.gasPrice - Gas Price(default: 1)
  * @param {Object} options.params - Tx params
  * @return {String|Number}
- * @example calculateMinFee('spendTx', { gas, gasPrice, params })
+ * @example calculateMinFee('spendTx', { gas, params })
  */
-export function calculateMinFee (txType, { gas = 0, gasPrice = 1, params }) {
+export function calculateMinFee (txType, { gas = 0, params }) {
   if (!params) return DEFAULT_FEE
 
   const { rlpEncoded: txWithOutFee } = buildTx(params, txType, { excludeKeys: ['fee'] })
   const txSize = txWithOutFee.length
 
   return TX_FEE_FORMULA[txType]
-    ? BigNumber(TX_FEE_FORMULA[txType](gas)).plus(getGasBySize(txSize)).times(BigNumber(gasPrice)).toString(10)
+    ? BigNumber(TX_FEE_FORMULA[txType](gas)).plus(getGasBySize(txSize)).toString(10)
     : DEFAULT_FEE
 }
 
@@ -155,15 +154,14 @@ export function calculateMinFee (txType, { gas = 0, gasPrice = 1, params }) {
  * @param {String} txType - Transaction type
  * @param {Options} options - Options object
  * @param {String|Number} options.gas - Gas amount
- * @param {String|Number} options.gasPrice - Gas Price(default: 1)
  * @param {Object} options.params - Tx params
  * @return {String|Number}
- * @example calculateFee(null, 'spendTx', { gas, gasPrice, params })
+ * @example calculateFee(null, 'spendTx', { gas, params })
  */
-export function calculateFee (fee = 0, txType, { gas = 0, gasPrice = 1, params, showWarning = true } = {}) {
+export function calculateFee (fee = 0, txType, { gas = 0, params, showWarning = true } = {}) {
   if (!TX_FEE_FORMULA[txType] && showWarning) console.warn(`Can't find transaction fee formula for ${txType}, we will use DEFAULT_FEE(${DEFAULT_FEE})`)
 
-  const minFee = calculateMinFee(txType, { params, gas, gasPrice })
+  const minFee = calculateMinFee(txType, { params, gas })
   if (fee && BigNumber(minFee).gt(BigNumber(fee)) && showWarning) console.warn('Transaction fee is lower then min fee!')
 
   return fee || minFee
@@ -175,9 +173,10 @@ export function calculateFee (fee = 0, txType, { gas = 0, gasPrice = 1, params, 
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/index
  * @param {Object} params Object with tx params
  * @param {Array} schema Transaction schema
+ * @param {Array} excludeKeys  Array of keys to exclude for validation
  * @return {Object} Object with validation errors
  */
-export function validateParams (params, schema, { excludeKeys }) {
+export function validateParams (params, schema, { excludeKeys = [] }) {
   return schema
     .filter(([key]) => !excludeKeys.includes(key) && key !== 'payload')
     .reduce(

@@ -46,7 +46,8 @@ const Tx = stampit({
     Ae: {
       methods: [
         'spendTx', 'namePreclaimTx', 'nameClaimTx', 'nameTransferTx',
-        'nameUpdateTx', 'nameRevokeTx', 'contractCreateTx', 'contractCallTx'
+        'nameUpdateTx', 'nameRevokeTx', 'contractCreateTx', 'contractCallTx',
+        'oracleRegisterTx', 'oracleExtendTx', 'oraclePostQueryTx', 'oracleRespondTx'
       ]
     }
   }
@@ -59,7 +60,11 @@ const Tx = stampit({
     nameUpdateTx: required,
     nameRevokeTx: required,
     contractCreateTx: required,
-    contractCallTx: required
+    contractCallTx: required,
+    oracleRegisterTx: required,
+    oracleExtendTx: required,
+    oraclePostQueryTx: required,
+    oracleRespondTx: required
   }
 }))
 
