@@ -130,8 +130,10 @@ async function registerOracle (queryFormat, responseFormat, options = {}) {
     queryFormat,
     responseFormat
   }))
-  await this.send(oracleRegisterTx, opt)
-  return getOracleObject.bind(this)(`ok_${accountId.slice(3)}`)
+  return {
+    ...(await this.send(oracleRegisterTx, opt)),
+    ...(await getOracleObject.bind(this)(`ok_${accountId.slice(3)}`))
+  }
 }
 
 /**
@@ -159,8 +161,10 @@ async function postQueryToOracle (oracleId, query, options = {}) {
     senderId,
     query
   }))
-  await this.send(oracleRegisterTx, opt)
-  return (await getOracleObject.bind(this)(oracleId)).getQuery(queryId)
+  return {
+    ...(await this.send(oracleRegisterTx, opt)),
+    ...(await (await getOracleObject.bind(this)(oracleId)).getQuery(queryId))
+  }
 }
 
 /**
@@ -185,8 +189,10 @@ async function extendOracleTtl (oracleId, oracleTtl, options = {}) {
     callerId,
     oracleTtl
   }))
-  await this.send(oracleExtendTx, opt)
-  return getOracleObject.bind(this)(oracleId)
+  return {
+    ...(await this.send(oracleExtendTx, opt)),
+    ...(await getOracleObject.bind(this)(oracleId))
+  }
 }
 
 /**
@@ -214,8 +220,10 @@ async function respondToQuery (oracleId, queryId, response, options = {}) {
     callerId,
     response
   }))
-  await this.send(oracleRespondTx, opt)
-  return getOracleObject.bind(this)(oracleId)
+  return {
+    ...(await this.send(oracleRespondTx, opt)),
+    ...(await getOracleObject.bind(this)(oracleId))
+  }
 }
 
 /**

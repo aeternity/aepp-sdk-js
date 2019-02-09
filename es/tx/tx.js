@@ -35,7 +35,7 @@ const CONTRACT_VM_VERSION = 1
 
 async function spendTx ({ senderId, recipientId, amount, payload = '' }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.spend, { senderId, ...R.head(arguments) })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.spend, { senderId, ...R.head(arguments), payload })
 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
@@ -269,10 +269,10 @@ async function calculateNonce (accountId, nonce) {
  * @param {Object} params Object which contains all tx data
  * @return {Object} { ttl, nonce, fee } Object with account nonce, absolute ttl and transaction fee
  */
-async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, gas, gasPrice, absoluteTtl }) {
+async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, gas, absoluteTtl }) {
   const nonce = await (calculateNonce.bind(this)(senderId, n))
   const ttl = await (calculateTtl.bind(this)(t, !absoluteTtl))
-  const fee = calculateFee(f, txType, { showWarning: this.showWarning, gas, gasPrice, params: R.merge(R.last(arguments), { nonce, ttl }) })
+  const fee = calculateFee(f, txType, { showWarning: this.showWarning, gas, params: R.merge(R.last(arguments), { nonce, ttl }) })
   return { fee, ttl, nonce }
 }
 

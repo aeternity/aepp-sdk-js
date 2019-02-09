@@ -36,7 +36,8 @@ import * as R from 'ramda'
  * @category async
  * @rtype (tx: String, options: Object) => Promise[String]
  * @param {String} tx - Transaction
- * @param {Object} options - Options
+ * @param {Object} [options={}] options - Options
+ * @param {Object} [options.verify] verify - Verify transaction before broadcast, throw error if not valid
  * @return {String|String} Transaction or transaction hash
  */
 async function send (tx, options) {

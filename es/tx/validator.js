@@ -3,7 +3,6 @@ import {
   decodeBase58Check,
   assertedType
 } from '../utils/crypto'
-import EpochChain from '../chain/epoch'
 import { encode } from '../tx/builder/helpers'
 
 import { BigNumber } from 'bignumber.js'
@@ -13,6 +12,7 @@ import {
   SIGNATURE_VERIFICATION_SCHEMA
 } from './builder/schema'
 import { calculateFee, unpackTx } from './builder'
+import Epoch from '../epoch'
 
 /**
  * Transaction validator
@@ -62,7 +62,7 @@ const resolveDataForBase = async (chain, { ownerPublicKey }) => {
     accountBalance = balance
   } catch (e) { console.log('We can not get info about this publicKey') }
   return {
-    height: await chain.height(),
+    height: (await chain.api.getCurrentKeyBlockHeight()).height,
     balance: accountBalance,
     accountNonce,
     ownerPublicKey
@@ -141,9 +141,8 @@ async function verifyTx ({ tx, signatures, rlpEncoded }, networkId) {
   // Fetch data for verification
   const ownerPublicKey = getOwnerPublicKey(tx)
   const gas = tx.hasOwnProperty('gas') ? +tx.gas : 0
-  const gasPrice = tx.hasOwnProperty('gasPrice') ? +tx.gas : 1
   const resolvedData = {
-    minFee: calculateFee(0, OBJECT_ID_TX_TYPE[+tx.tag], { gas, gasPrice, params: tx, showWarning: false }),
+    minFee: calculateFee(0, OBJECT_ID_TX_TYPE[+tx.tag], { gas, params: tx, showWarning: false }),
     ...(await resolveDataForBase(this, { ownerPublicKey })),
     ...tx
   }
@@ -178,7 +177,7 @@ async function verifyTx ({ tx, signatures, rlpEncoded }, networkId) {
  * @return {Object} Transaction Validator instance
  * @example TransactionValidator({url: 'https://sdk-testnet.aepps.com'})
  */
-const TransactionValidator = EpochChain.compose({
+const TransactionValidator = Epoch.compose({
   methods: {
     verifyTx,
     unpackAndVerify

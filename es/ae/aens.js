@@ -136,12 +136,16 @@ async function query (name) {
   return Object.freeze(Object.assign(o, {
     pointers: o.pointers || {},
     update: async (target, options) => {
-      await this.aensUpdate(nameId, target, options)
-      return this.aensQuery(name)
+      return {
+        ...(await this.aensUpdate(nameId, target, options)),
+        ...(await this.aensQuery(name))
+      }
     },
     transfer: async (account, options) => {
-      await this.aensTransfer(nameId, account, options)
-      return this.aensQuery(name)
+      return {
+        ...(await this.aensTransfer(nameId, account, options)),
+        ...(await this.aensQuery(name))
+      }
     },
     revoke: async (options) => this.aensRevoke(nameId, options)
   }))
@@ -169,8 +173,12 @@ async function claim (name, salt, waitForHeight, options = {}) {
     name: `nm_${encodeBase58Check(Buffer.from(name))}`
   }))
 
-  await this.send(claimTx, opt)
-  return this.aensQuery(name)
+  const result = await this.send(claimTx, opt)
+
+  return {
+    ...result,
+    ...(await this.aensQuery(name))
+  }
 }
 
 /**
@@ -193,9 +201,10 @@ async function preclaim (name, options = {}) {
     commitmentId: hash
   }))
 
-  await this.send(preclaimTx, opt)
+  const result = await this.send(preclaimTx, opt)
 
   return Object.freeze({
+    ...result,
     height,
     claim: options => this.aensClaim(name, _salt, (height + 1), options),
     salt: _salt,
