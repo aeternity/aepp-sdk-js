@@ -280,7 +280,7 @@ async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, ga
 /**
  * Transaction Stamp
  *
- * This is implementation of {@link module:@aeternity/aepp-sdk/es/tx--Tx} relays
+ * This is implementation of [Tx](api/tx.md) relays
  * the creation of transactions to {@link module:@aeternity/aepp-sdk/es/Node}.
  * This stamp provide ability to create native transaction's,
  * or transaction's using Node API.
