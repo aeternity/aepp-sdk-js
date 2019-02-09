@@ -16,9 +16,9 @@ import { toBytes } from '../../utils/bytes'
 
 /**
  * JavaScript-based Transaction builder
- * @module @aeternity/aepp-sdk/es/tx/builder/index
+ * @module @aeternity/aepp-sdk/es/tx/builder
  * @export TxBuilder
- * @example import Transaction from '@aeternity/aepp-sdk/es/tx/builder/index'
+ * @example import Transaction from '@aeternity/aepp-sdk/es/tx/builder'
  */
 
 const ORACLE_TTL_TYPES = {

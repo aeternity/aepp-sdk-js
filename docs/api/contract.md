@@ -11,10 +11,11 @@ import ContractBase from '@aeternity/aepp-sdk/es/contract'
 
 * [@aeternity/aepp-sdk/es/contract](#module_@aeternity/aepp-sdk/es/contract)
     * [ContractBase([options])](#exp_module_@aeternity/aepp-sdk/es/contract--ContractBase) ⇒ `Object` ⏏
-        * *[.contractEpochEncodeCallData(code, abu, name, args)](#module_@aeternity/aepp-sdk/es/contract--ContractBase+contractEpochEncodeCallData) ⇒ `String`*
-        * *[.contractEpochCall(code, abu, name, args, call)](#module_@aeternity/aepp-sdk/es/contract--ContractBase+contractEpochCall) ⇒ `Object`*
-        * *[.contractEpochDecodeData(type, data)](#module_@aeternity/aepp-sdk/es/contract--ContractBase+contractEpochDecodeData) ⇒ `String`*
-        * *[.compileEpochContract(code, [options])](#module_@aeternity/aepp-sdk/es/contract--ContractBase+compileEpochContract) ⇒ `Object`*
+        * *[.contractNodeEncodeCallData(code, abu, name, args)](#module_@aeternity/aepp-sdk/es/contract--ContractBase+contractNodeEncodeCallData) ⇒ `String`*
+        * *[.contractNodeCall(code, abu, name, args, call)](#module_@aeternity/aepp-sdk/es/contract--ContractBase+contractNodeCall) ⇒ `Object`*
+        * *[.contractNodeDecodeData(type, data)](#module_@aeternity/aepp-sdk/es/contract--ContractBase+contractNodeDecodeData) ⇒ `String`*
+        * *[.compileNodeContract(code, [options])](#module_@aeternity/aepp-sdk/es/contract--ContractBase+compileNodeContract) ⇒ `Object`*
+        * *[.getContractByteCode(contractId)](#module_@aeternity/aepp-sdk/es/contract--ContractBase+getContractByteCode) ⇒ `String`*
 
 <a id="exp_module_@aeternity/aepp-sdk/es/contract--ContractBase"></a>
 
@@ -33,9 +34,9 @@ abstract methods using composition will result in an exception.
 | --- | --- | --- | --- |
 | [options] | `Object` | <code>{}</code> | Initializer object |
 
-<a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+contractEpochEncodeCallData"></a>
+<a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+contractNodeEncodeCallData"></a>
 
-#### *contractBase.contractEpochEncodeCallData(code, abu, name, args) ⇒ `String`*
+#### *contractBase.contractNodeEncodeCallData(code, abu, name, args) ⇒ `String`*
 Encode contract data
 
 **Kind**: instance abstract method of [`ContractBase`](#exp_module_@aeternity/aepp-sdk/es/contract--ContractBase)  
@@ -48,11 +49,11 @@ Encode contract data
 | code | `String` | Contract code |
 | abu | `String` | Contract compiler name |
 | name | `String` | Function name |
-| args | `String` | Function argument's * @param {String} call - Pseudo contract with `__call()` function which simply call function with params. You can use this parametr only for `abi` one of ['sophia', 'sophia-address'] When you are passing `call` argument `name` and `args` will be ignored Yiu can find additional info here: https://github.com/aeternity/protocol/blob/master/epoch/api/contract_api_usage.md#sophia-calldata-creation |
+| args | `String` | Function argument's * @param {String} call - Pseudo contract with `__call()` function which simply call function with params. You can use this parametr only for `abi` one of ['sophia', 'sophia-address'] When you are passing `call` argument `name` and `args` will be ignored Yiu can find additional info here: https://github.com/aeternity/protocol/blob/master/node/api/contract_api_usage.md#sophia-calldata-creation |
 
-<a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+contractEpochCall"></a>
+<a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+contractNodeCall"></a>
 
-#### *contractBase.contractEpochCall(code, abu, name, args, call) ⇒ `Object`*
+#### *contractBase.contractNodeCall(code, abu, name, args, call) ⇒ `Object`*
 Call the contract
 
 **Kind**: instance abstract method of [`ContractBase`](#exp_module_@aeternity/aepp-sdk/es/contract--ContractBase)  
@@ -66,11 +67,11 @@ Call the contract
 | abu | `String` | Contract compiler name |
 | name | `String` | Function name |
 | args | `String` | Function argument's |
-| call | `String` | Pseudo contract with `__call()` function which simply call function with params. You can use this parametr only for `abi` one of ['sophia', 'sophia-address'] When you are passing `call` argument `name` and `args` will be ignored You can find additional info here: https://github.com/aeternity/protocol/blob/master/epoch/api/contract_api_usage.md#sophia-calldata-creation |
+| call | `String` | Pseudo contract with `__call()` function which simply call function with params. You can use this parametr only for `abi` one of ['sophia', 'sophia-address'] When you are passing `call` argument `name` and `args` will be ignored You can find additional info here: https://github.com/aeternity/protocol/blob/master/node/api/contract_api_usage.md#sophia-calldata-creation |
 
-<a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+contractEpochDecodeData"></a>
+<a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+contractNodeDecodeData"></a>
 
-#### *contractBase.contractEpochDecodeData(type, data) ⇒ `String`*
+#### *contractBase.contractNodeDecodeData(type, data) ⇒ `String`*
 Decode data
 
 **Kind**: instance abstract method of [`ContractBase`](#exp_module_@aeternity/aepp-sdk/es/contract--ContractBase)  
@@ -83,10 +84,10 @@ Decode data
 | type | `String` | Contract call result type |
 | data | `String` | Encoded contract call result |
 
-<a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+compileEpochContract"></a>
+<a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+compileNodeContract"></a>
 
-#### *contractBase.compileEpochContract(code, [options]) ⇒ `Object`*
-Compile epoch contract
+#### *contractBase.compileNodeContract(code, [options]) ⇒ `Object`*
+Compile contract
 
 **Kind**: instance abstract method of [`ContractBase`](#exp_module_@aeternity/aepp-sdk/es/contract--ContractBase)  
 **Returns**: `Object` - Object which contain bytecode of contract  
@@ -97,4 +98,18 @@ Compile epoch contract
 | --- | --- | --- | --- |
 | code | `String` |  | Contract source code |
 | [options] | `Object` | <code>{}</code> | Options |
+
+<a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+getContractByteCode"></a>
+
+#### *contractBase.getContractByteCode(contractId) ⇒ `String`*
+Get bytecode by contract public key
+
+**Kind**: instance abstract method of [`ContractBase`](#exp_module_@aeternity/aepp-sdk/es/contract--ContractBase)  
+**Returns**: `String` - Contract byte code  
+**Category**: async  
+**rtype**: `(contractId: String) => byteCode: String`
+
+| Param | Type |
+| --- | --- |
+| contractId | `String` | 
 

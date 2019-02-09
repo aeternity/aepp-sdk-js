@@ -280,20 +280,21 @@ async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, ga
 /**
  * Transaction Stamp
  *
- * This implementation of {@link module:@aeternity/aepp-sdk/es/tx--Tx} relays
- * the creation of transactions to {@link module:@aeternity/aepp-sdk/es/epoch--Node}.
- * This stamp provide ability to create native spend transaction,
- * all other transaction's using Node API.
- * As there is no built-in security between Node and client communication, it
+ * This is implementation of {@link module:@aeternity/aepp-sdk/es/tx--Tx} relays
+ * the creation of transactions to {@link module:@aeternity/aepp-sdk/es/Node}.
+ * This stamp provide ability to create native transaction's,
+ * or transaction's using Node API.
+ * As there is no built-in security between Node and client communication,
+ * creating transaction using {@link module:@aeternity/aepp-sdk/es/Node} API
  * must never be used for production but can be very useful to verify other
  * implementations.
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/tx
  * @rtype Stamp
  * @param {Object} [options={}] - Initializer object
- * @param {Object} [options.nativeMode] - Use Native build of transaction's
- * @param {Object} [options.url] - Node url
- * @param {Object} [options.internalUrl] - Node internal url
+ * @param {Boolean} [options.nativeMode=true] options.nativeMode - Use Native build of transaction's
+ * @param {String} options.url - Node url
+ * @param {String} options.internalUrl - Node internal url
  * @return {Object} Transaction instance
  * @example Transaction({url: 'https://sdk-testnet.aepps.com/'})
  */

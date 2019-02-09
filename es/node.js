@@ -17,9 +17,9 @@
 
 /**
  * Node module
- * @module @aeternity/aepp-sdk/es/epoch
+ * @module @aeternity/aepp-sdk/es/node
  * @export Node
- * @example import Node from '@aeternity/aepp-sdk/es/epoch'
+ * @example import Node from '@aeternity/aepp-sdk/es/node'
  */
 
 import stampit from '@stamp/it'
@@ -45,7 +45,7 @@ async function remoteSwag (url) {
  * @rtype ({url: String, internalUrl?: String}) => (path: String, definition: Object) => tx: String
  * @param {Object} options
  * @param {String} options.url - Base URL for Node
- * @param {String} [options.internalUrl] - Base URL for internal requests
+ * @param {String} options.internalUrl - Base URL for internal requests
  * @return {Function} Implementation for {@link urlFor}
  */
 const loader = ({ url, internalUrl }) => (path, definition) => {
@@ -63,11 +63,11 @@ const loader = ({ url, internalUrl }) => (path, definition) => {
 /**
  * {@link Swagger} based Node remote API Stamp
  * @function
- * @alias module:@aeternity/aepp-sdk/es/epoch
+ * @alias module:@aeternity/aepp-sdk/es/node
  * @rtype Stamp
- * @param {Object} options
+ * @param {Object} [options={}] - Options
  * @param {String} options.url - Base URL for Node
- * @param {String} [options.internalUrl] - Base URL for internal requests
+ * @param {String} options.internalUrl - Base URL for internal requests
  * @return {Object} Node client
  * @example Node({url: 'https://sdk-testnet.aepps.com'})
  */
@@ -86,7 +86,7 @@ const Node = stampit({
 }, Swagger, {
   async init ({ forceCompatibility = false }) {
     const { nodeVersion: version, nodeRevision: revision, genesisKeyBlockHash: genesisHash, networkId } = await this.api.getStatus()
-    if (!semver.satisfies(version, COMPATIBILITY_RANGE) && !forceCompatibility) throw new Error(`Unsupported epoch version ${version}. Supported: ${COMPATIBILITY_RANGE}`)
+    if (!semver.satisfies(version, COMPATIBILITY_RANGE) && !forceCompatibility) throw new Error(`Unsupported node version ${version}. Supported: ${COMPATIBILITY_RANGE}`)
     // TODO:
     // We should not get the node version from getStatus
     // but read the version that we get from "URL/api" > info > version

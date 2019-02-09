@@ -44,7 +44,7 @@ import { addressFromDecimal } from '../utils/crypto'
  * @return {Promise<Object>}
  */
 async function encodeCall (code, abi, name, args, call) {
-  return this.contractEpochEncodeCallData(code, abi, name, args, call)
+  return this.contractNodeEncodeCallData(code, abi, name, args, call)
 }
 
 /**
@@ -101,7 +101,7 @@ async function callStatic (address, abi = 'sophia-address', name, { top, args = 
  * @return {Promise<String>} Result object
  */
 async function decode (type, data) {
-  const result = await this.contractEpochDecodeData(type, data)
+  const result = await this.contractNodeDecodeData(type, data)
   if (type === 'address') result.value = addressFromDecimal(result.value)
   return result
 }
@@ -192,7 +192,7 @@ async function deploy (code, abi, { initState = '()', options = {} } = {}) {
  * @return {Promise<Object>} Result object
  */
 async function compile (code, options = {}) {
-  const o = await this.compileEpochContract(code, options)
+  const o = await this.compileNodeContract(code, options)
 
   return Object.freeze(Object.assign({
     encodeCall: async (name, args, { call, abi }) => this.contractEncodeCall(o.bytecode, R.defaultTo('sophia', abi), name, args, call),

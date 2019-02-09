@@ -28,10 +28,10 @@ In order to cater to more specific needs, it is recommended to refer to the
 When initialising a client, to test, you can choose from 2 URLs:
 
 ### 1. **Testnet** (https://sdk-testnet.aepps.com)
-You can use this URL with any releasee on [npmjs](https://www.npmjs.com/package/@aeternity/aepp-sdk). It offers the last stable version of [Node](https://github.com/aeternity/epoch), used by all of of Aeternity's Dev Tools.
+You can use this URL with any releasee on [npmjs](https://www.npmjs.com/package/@aeternity/aepp-sdk). It offers the last stable version of [Node](https://github.com/aeternity/aeternity), used by all of of Aeternity's Dev Tools.
 
 ### 2. **Edgenet** (https://sdk-edgened.aepps.com)
-You can use this URL with releases tagged as `alpha`, `beta` or `next` on [npmjs](https://www.npmjs.com/package/@aeternity/aepp-sdk). It offers the latest stable version of [Node](https://github.com/aeternity/epoch), which all of of Aeternity's Dev Tools are going to use in the near future.
+You can use this URL with releases tagged as `alpha`, `beta` or `next` on [npmjs](https://www.npmjs.com/package/@aeternity/aepp-sdk). It offers the latest stable version of [Node](https://github.com/aeternity/aeternity), which all of of Aeternity's Dev Tools are going to use in the near future.
 
 ## ES Modules (enable Tree-Shaking)
 

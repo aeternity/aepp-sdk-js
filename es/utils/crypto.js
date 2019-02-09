@@ -214,7 +214,7 @@ export function generateKeyPairFromSecret (secret) {
  * @return {Object} Key pair
  */
 export function generateKeyPair (raw = false) {
-  // <epoch>/apps/aens/test/aens_test_utils.erl
+  // <node>/apps/aens/test/aens_test_utils.erl
   const keyPair = nacl.sign.keyPair()
 
   const publicBuffer = Buffer.from(keyPair.publicKey)

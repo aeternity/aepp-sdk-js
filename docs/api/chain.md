@@ -60,6 +60,7 @@ Submit a signed transaction for mining
 | --- | --- | --- | --- |
 | tx | `String` |  | Transaction to submit |
 | [options] | `String` | <code>{}</code> | Options to pass to the implementation |
+| [options.verify] | `String` | <code>false</code> | Verify transaction before broadcast. |
 
 <a id="module_@aeternity/aepp-sdk/es/chain--Chain+height"></a>
 
@@ -117,7 +118,7 @@ Request the balance of specified account
 | address | `String` |  | The public account address to obtain the balance for |
 | [options] | `Object` | <code>{}</code> | Options |
 | options.height | `Number` |  | The chain height at which to obtain the balance for (default: top of chain) |
-| options.hash | `String` |  | TODO |
+| options.hash | `String` |  | The block hash on which to obtain the balance for (default: top of chain) |
 
 <a id="module_@aeternity/aepp-sdk/es/chain--Chain+tx"></a>
 

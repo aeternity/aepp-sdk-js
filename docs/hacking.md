@@ -27,7 +27,7 @@ It uses the following Javascript technologies and principles:
   - direct use in browser `<script>` tags through bundling
   - bundling through webpack
 
-[Node's Swagger file]: https://github.com/aeternity/epoch/blob/master/config/swagger.yaml
+[Node's Swagger file]: https://github.com/aeternity/aeternity/blob/master/config/swagger.yaml
 [stampit]: http://stampit.js.org/
 [Stamp Specification]: https://github.com/stampit-org/stamp-specification
 [composition over inheritance]: https://medium.com/front-end-hacking/classless-javascript-composition-over-inheritance-6b27c35893b1

@@ -81,6 +81,7 @@ const Chain = Contract.compose(Oracle, {
  * @rtype (tx: String, options?: Object) => tx: Promise[Object]|txHash: Promise[String]
  * @param {String} tx - Transaction to submit
  * @param {String} [options={}] - Options to pass to the implementation
+ * @param {String} [options.verify = false] - Verify transaction before broadcast.
  * @return {Object|String} Transaction or transaction hash
  */
 
@@ -130,7 +131,7 @@ const Chain = Contract.compose(Oracle, {
  * @param {String} address - The public account address to obtain the balance for
  * @param {Object} [options={}] - Options
  * @param {Number} options.height - The chain height at which to obtain the balance for (default: top of chain)
- * @param {String} options.hash - TODO
+ * @param {String} options.hash - The block hash on which to obtain the balance for (default: top of chain)
  * @return {Object} The transaction as it was mined
  */
 
