@@ -19,7 +19,7 @@ import { describe, it, before } from 'mocha'
 import { configure, ready } from './'
 import { generateKeyPair } from '../../es/utils/crypto'
 
-describe('Epoch Chain', function () {
+describe('Node Chain', function () {
   configure(this)
 
   let client

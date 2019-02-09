@@ -112,7 +112,7 @@ async function rpcAddress ({ params, session }) {
  * @alias module:@aeternity/aepp-sdk/es/ae/wallet
  * @rtype Stamp
  * @param {Object} [options={}] - Initializer object
- * @param {String} options.url - Epoch instance to connect to
+ * @param {String} options.url - Node instance to connect to
  * @param {Account[]} [options.accounts] - Accounts to initialize with
  * @param {String} [options.account] - Public key of account to preselect
  * @param {Function} [options.onTx] - Tx method protector function

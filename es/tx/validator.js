@@ -12,7 +12,7 @@ import {
   SIGNATURE_VERIFICATION_SCHEMA
 } from './builder/schema'
 import { calculateFee, unpackTx } from './builder'
-import Epoch from '../epoch'
+import Node from '../node'
 
 /**
  * Transaction validator
@@ -177,7 +177,7 @@ async function verifyTx ({ tx, signatures, rlpEncoded }, networkId) {
  * @return {Object} Transaction Validator instance
  * @example TransactionValidator({url: 'https://sdk-testnet.aepps.com'})
  */
-const TransactionValidator = Epoch.compose({
+const TransactionValidator = Node.compose({
   methods: {
     verifyTx,
     unpackAndVerify

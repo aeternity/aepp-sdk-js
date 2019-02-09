@@ -26,7 +26,7 @@ Issue tracker is **ONLY** used for reporting bugs. NO NEW FEATURE ACCEPTED! Use 
 
 <!--- Provide a general summary of the issue in the Title above -->
 
-## [Epoch](https://github.com/aeternity/epoch/releases) Version
+## [Node](https://github.com/aeternity/epoch/releases) Version
 
 ## Detailed Description
 <!--- Provide a detailed description of the change or addition you are proposing -->

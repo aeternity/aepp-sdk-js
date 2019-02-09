@@ -106,7 +106,7 @@ const promptSchema = {
 
 
 
-## Key Extraction (from Epoch nodes)
+## Key Extraction (from Node nodes)
 
 
   

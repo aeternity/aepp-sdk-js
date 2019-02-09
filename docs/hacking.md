@@ -3,7 +3,7 @@
 ## Principles
 
 The Javascript SDK wraps the æternity API, as explosed by
-[Epoch's Swagger file]. It aims to abstract the API, while still providing
+[Node's Swagger file]. It aims to abstract the API, while still providing
 low-level access when necessary.
 
 It uses the following Javascript technologies and principles:
@@ -27,7 +27,7 @@ It uses the following Javascript technologies and principles:
   - direct use in browser `<script>` tags through bundling
   - bundling through webpack
 
-[Epoch's Swagger file]: https://github.com/aeternity/epoch/blob/master/config/swagger.yaml
+[Node's Swagger file]: https://github.com/aeternity/epoch/blob/master/config/swagger.yaml
 [stampit]: http://stampit.js.org/
 [Stamp Specification]: https://github.com/stampit-org/stamp-specification
 [composition over inheritance]: https://medium.com/front-end-hacking/classless-javascript-composition-over-inheritance-6b27c35893b1

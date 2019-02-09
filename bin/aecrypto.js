@@ -46,7 +46,7 @@ const promptSchema = {
   }
 }
 
-// ## Key Extraction (from Epoch nodes)
+// ## Key Extraction (from Node nodes)
 function extractReadableKeys (dir, options) {
   const pwd = options.input
   prompt.start()

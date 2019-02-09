@@ -16,10 +16,10 @@
  */
 
 /**
- * Epoch module
+ * Node module
  * @module @aeternity/aepp-sdk/es/epoch
- * @export Epoch
- * @example import Epoch from '@aeternity/aepp-sdk/es/epoch'
+ * @export Node
+ * @example import Node from '@aeternity/aepp-sdk/es/epoch'
  */
 
 import stampit from '@stamp/it'
@@ -30,10 +30,10 @@ import Swagger from './utils/swagger'
 import semver from 'semver'
 
 /**
- * Obtain Swagger configuration from Epoch node
+ * Obtain Swagger configuration from Node node
  * @category async
  * @rtype (url: String) => swagger: Object
- * @param {String} url - Epoch base URL
+ * @param {String} url - Node base URL
  * @return {Object} Swagger configuration
  */
 async function remoteSwag (url) {
@@ -41,10 +41,10 @@ async function remoteSwag (url) {
 }
 
 /**
- * Epoch specific loader for `urlFor`
+ * Node specific loader for `urlFor`
  * @rtype ({url: String, internalUrl?: String}) => (path: String, definition: Object) => tx: String
  * @param {Object} options
- * @param {String} options.url - Base URL for Epoch
+ * @param {String} options.url - Base URL for Node
  * @param {String} [options.internalUrl] - Base URL for internal requests
  * @return {Function} Implementation for {@link urlFor}
  */
@@ -61,17 +61,17 @@ const loader = ({ url, internalUrl }) => (path, definition) => {
 }
 
 /**
- * {@link Swagger} based Epoch remote API Stamp
+ * {@link Swagger} based Node remote API Stamp
  * @function
  * @alias module:@aeternity/aepp-sdk/es/epoch
  * @rtype Stamp
  * @param {Object} options
- * @param {String} options.url - Base URL for Epoch
+ * @param {String} options.url - Base URL for Node
  * @param {String} [options.internalUrl] - Base URL for internal requests
- * @return {Object} Epoch client
- * @example Epoch({url: 'https://sdk-testnet.aepps.com'})
+ * @return {Object} Node client
+ * @example Node({url: 'https://sdk-testnet.aepps.com'})
  */
-const Epoch = stampit({
+const Node = stampit({
   async init ({ url = this.url, internalUrl = this.internalUrl }) {
     url = url.replace(/\/?$/, '/')
 
@@ -98,4 +98,4 @@ const Epoch = stampit({
 // String of compatibility range (see https://www.npmjs.com/package/semver#ranges)
 export const COMPATIBILITY_RANGE = '>= 1.0.0 < 2.0.0'
 
-export default Epoch
+export default Node

@@ -16,7 +16,7 @@
  */
 import * as R from 'ramda'
 import Chain from './'
-import Epoch from '../epoch'
+import Node from '../node'
 import Oracle from '../oracle/epoch'
 import Contract from '../contract/epoch'
 import formatBalance from '../utils/amount-formatter'
@@ -143,7 +143,7 @@ async function txDryRun (txs, accounts, top) {
   return this.api.dryRunTxs({ txs, accounts, top })
 }
 
-const EpochChain = Chain.compose(Epoch, Oracle, Contract, TransactionValidator, {
+const EpochChain = Chain.compose(Node, Oracle, Contract, TransactionValidator, {
   methods: {
     sendTransaction,
     balance,
