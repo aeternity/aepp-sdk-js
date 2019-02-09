@@ -17,8 +17,8 @@
 import * as R from 'ramda'
 import Chain from './'
 import Node from '../node'
-import Oracle from '../oracle/epoch'
-import Contract from '../contract/epoch'
+import Oracle from '../oracle/node'
+import Contract from '../contract/node'
 import formatBalance from '../utils/amount-formatter'
 import TransactionValidator from '../tx/validator'
 
