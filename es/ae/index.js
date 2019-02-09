@@ -26,8 +26,6 @@ import stampit from '@stamp/it'
 import Tx from '../tx'
 import Chain from '../chain'
 import Account from '../account'
-import Contract from '../contract'
-import Oracle from '../oracle'
 import * as R from 'ramda'
 
 /**
@@ -91,7 +89,7 @@ function destroyInstance () {
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Ae instance
  */
-const Ae = stampit(Tx, Account, Chain, Contract, Oracle, {
+const Ae = stampit(Tx, Account, Chain, {
   methods: { send, spend, destroyInstance }
 })
 

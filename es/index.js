@@ -18,7 +18,6 @@
 import * as Crypto from './utils/crypto'
 import * as TxBuilder from './tx/builder'
 import * as TxBuilderHelper from './tx/builder/helpers'
-import * as JsTx from './tx/js'
 
 import Ae from './ae'
 import Chain from './chain'
@@ -54,7 +53,6 @@ export {
   Aens,
   Contract,
   Wallet,
-  JsTx,
   Selector,
   Universal,
   Oracle,
