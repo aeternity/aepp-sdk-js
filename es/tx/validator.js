@@ -1,10 +1,9 @@
-/* eslint-disable no-use-before-define */
 import {
   verify,
   decodeBase58Check,
   assertedType
 } from '../utils/crypto'
-import EpochChain from '../chain/epoch'
+import { encode } from '../tx/builder/helpers'
 
 import { BigNumber } from 'bignumber.js'
 import {
@@ -13,6 +12,7 @@ import {
   SIGNATURE_VERIFICATION_SCHEMA
 } from './builder/schema'
 import { calculateFee, unpackTx } from './builder'
+import Node from '../node'
 
 /**
  * Transaction validator
@@ -53,7 +53,7 @@ const VALIDATORS = {
   }
 }
 
-const resolveDataForBase = async (chain, { rlpEncoded, ownerPublicKey }) => {
+const resolveDataForBase = async (chain, { ownerPublicKey }) => {
   let accountNonce = 0
   let accountBalance = 0
   try {
@@ -62,7 +62,7 @@ const resolveDataForBase = async (chain, { rlpEncoded, ownerPublicKey }) => {
     accountBalance = balance
   } catch (e) { console.log('We can not get info about this publicKey') }
   return {
-    height: await chain.height(),
+    height: (await chain.api.getCurrentKeyBlockHeight()).height,
     balance: accountBalance,
     accountNonce,
     ownerPublicKey
@@ -73,11 +73,11 @@ const resolveDataForBase = async (chain, { rlpEncoded, ownerPublicKey }) => {
 const verifySchema = (schema, data) => {
   // Verify through schema
   return schema.reduce(
-    (acc, [msg, validatorKey, { key, type }]) => {
-      if (!VALIDATORS[validatorKey](data)) acc[type][key] = msg(data)
+    (acc, [msg, validatorKey, { key, type, txKey }]) => {
+      if (!VALIDATORS[validatorKey](data)) acc.push({ msg: msg(data), txKey, type })
       return acc
     },
-    { error: {}, warning: {} }
+    []
   )
 }
 
@@ -99,17 +99,26 @@ const verifySchema = (schema, data) => {
  * @param {String} [options.networkId] networkId Use in signature verification
  * @return {Promise<Object>} Object with verification errors and warnings
  */
-function unpackAndVerify (txHash, { networkId } = {}) {
-  const { tx: unpackedTx, rlpEncoded } = unpackTx(txHash)
+async function unpackAndVerify (txHash, { networkId } = {}) {
+  const { tx: unpackedTx, rlpEncoded, txType } = unpackTx(txHash)
 
   if (+unpackedTx.tag === OBJECT_TAG_SIGNED_TRANSACTION) {
-    const tx = unpackedTx.encodedTx.tx
-    const signatures = unpackedTx.signatures
+    const { txType, tx } = unpackedTx.encodedTx
+    const signatures = unpackedTx.signatures.map(raw => ({ raw, hash: encode(raw, 'sg') }))
     const rlpEncodedTx = unpackedTx.encodedTx.rlpEncoded
 
-    return this.verifyTx({ tx, signatures, rlpEncoded: rlpEncodedTx }, networkId)
+    return {
+      validation: await this.verifyTx({ tx, signatures, rlpEncoded: rlpEncodedTx }, networkId),
+      tx,
+      signatures,
+      txType
+    }
   }
-  return this.verifyTx({ tx: unpackedTx, rlpEncoded }, networkId)
+  return {
+    validation: await this.verifyTx({ tx: unpackedTx, rlpEncoded }, networkId),
+    tx: unpackedTx,
+    txType
+  }
 }
 
 const getOwnerPublicKey = (tx) =>
@@ -125,39 +134,34 @@ const getOwnerPublicKey = (tx) =>
  * @param {Array} [data.signatures] signatures Transaction signature's
  * @param {Array} [data.rlpEncoded] rlpEncoded RLP encoded transaction
  * @param {String} networkId networkId Use in signature verification
- * @return {Promise<Object>} Object with verification errors and warnings
+ * @return {Promise<Array>} Object with verification errors and warnings
  */
 async function verifyTx ({ tx, signatures, rlpEncoded }, networkId) {
   networkId = networkId || this.nodeNetworkId || 'ae_mainnet'
   // Fetch data for verification
   const ownerPublicKey = getOwnerPublicKey(tx)
+  const gas = tx.hasOwnProperty('gas') ? +tx.gas : 0
   const resolvedData = {
-    minFee: calculateFee(0, OBJECT_ID_TX_TYPE[+tx.tag], { params: tx }),
-    ...(await resolveDataForBase(this, { ownerPublicKey, rlpEncoded, tx })),
+    minFee: calculateFee(0, OBJECT_ID_TX_TYPE[+tx.tag], { gas, params: tx, showWarning: false }),
+    ...(await resolveDataForBase(this, { ownerPublicKey })),
     ...tx
   }
   const signatureVerification = signatures && signatures.length
     ? verifySchema(SIGNATURE_VERIFICATION_SCHEMA, {
       rlpEncoded,
-      signature: signatures[0],
+      signature: signatures[0].raw,
       ownerPublicKey,
       networkId
     })
-    : { error: {}, warning: {} }
+    : []
   const baseVerification = verifySchema(BASE_VERIFICATION_SCHEMA, resolvedData)
   // const customVerification = customVerification(this.api, { tx, resolvedBaseData })
 
-  return {
-    error: {
-      ...baseVerification.error,
-      ...signatureVerification.error
-      // ...customVerification.error
-    },
-    warning: {
-      ...baseVerification.warning
-      // ...customVerification.warning
-    }
-  }
+  return [
+    ...baseVerification,
+    ...signatureVerification
+    // ...customVerification.error
+  ]
 }
 
 /**
@@ -173,7 +177,7 @@ async function verifyTx ({ tx, signatures, rlpEncoded }, networkId) {
  * @return {Object} Transaction Validator instance
  * @example TransactionValidator({url: 'https://sdk-testnet.aepps.com'})
  */
-const TransactionValidator = EpochChain.compose({
+const TransactionValidator = Node.compose({
   methods: {
     verifyTx,
     unpackAndVerify

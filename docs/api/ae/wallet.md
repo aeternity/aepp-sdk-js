@@ -20,7 +20,7 @@ Wallet Stamp
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | [options] | `Object` | <code>{}</code> | Initializer object |
-| options.url | `String` |  | Epoch instance to connect to |
+| options.url | `String` |  | Node instance to connect to |
 | [options.accounts] | `Array.&lt;Account&gt;` |  | Accounts to initialize with |
 | [options.account] | `String` |  | Public key of account to preselect |
 | [options.onTx] | `function` |  | Tx method protector function |

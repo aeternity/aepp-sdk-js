@@ -16,10 +16,10 @@
  */
 
 /**
- * Epoch module
- * @module @aeternity/aepp-sdk/es/epoch
- * @export Epoch
- * @example import Epoch from '@aeternity/aepp-sdk/es/epoch'
+ * Node module
+ * @module @aeternity/aepp-sdk/es/node
+ * @export Node
+ * @example import Node from '@aeternity/aepp-sdk/es/node'
  */
 
 import stampit from '@stamp/it'
@@ -30,10 +30,10 @@ import Swagger from './utils/swagger'
 import semver from 'semver'
 
 /**
- * Obtain Swagger configuration from Epoch node
+ * Obtain Swagger configuration from Node node
  * @category async
  * @rtype (url: String) => swagger: Object
- * @param {String} url - Epoch base URL
+ * @param {String} url - Node base URL
  * @return {Object} Swagger configuration
  */
 async function remoteSwag (url) {
@@ -41,11 +41,11 @@ async function remoteSwag (url) {
 }
 
 /**
- * Epoch specific loader for `urlFor`
+ * Node specific loader for `urlFor`
  * @rtype ({url: String, internalUrl?: String}) => (path: String, definition: Object) => tx: String
  * @param {Object} options
- * @param {String} options.url - Base URL for Epoch
- * @param {String} [options.internalUrl] - Base URL for internal requests
+ * @param {String} options.url - Base URL for Node
+ * @param {String} options.internalUrl - Base URL for internal requests
  * @return {Function} Implementation for {@link urlFor}
  */
 const loader = ({ url, internalUrl }) => (path, definition) => {
@@ -61,41 +61,43 @@ const loader = ({ url, internalUrl }) => (path, definition) => {
 }
 
 /**
- * {@link Swagger} based Epoch remote API Stamp
+ * {@link Swagger} based Node remote API Stamp
  * @function
- * @alias module:@aeternity/aepp-sdk/es/epoch
+ * @alias module:@aeternity/aepp-sdk/es/node
  * @rtype Stamp
- * @param {Object} options
- * @param {String} options.url - Base URL for Epoch
- * @param {String} [options.internalUrl] - Base URL for internal requests
- * @return {Object} Epoch client
- * @example Epoch({url: 'https://sdk-testnet.aepps.com'})
+ * @param {Object} [options={}] - Options
+ * @param {String} options.url - Base URL for Node
+ * @param {String} options.internalUrl - Base URL for internal requests
+ * @return {Object} Node client
+ * @example Node({url: 'https://sdk-testnet.aepps.com'})
  */
-const Epoch = stampit({
+const Node = stampit({
   async init ({ url = this.url, internalUrl = this.internalUrl }) {
     url = url.replace(/\/?$/, '/')
 
+    // Get swagger schema
+    const swag = await remoteSwag(url)
+    this.version = swag.info.version
     return Object.assign(this, {
-      swag: await remoteSwag(url),
+      swag: swag,
       urlFor: loader({ url, internalUrl })
     })
   },
   props: {
+    version: null,
     nodeNetworkId: null
   }
 }, Swagger, {
-  async init ({ forceCompatibility }) {
-    const { nodeVersion: version, nodeRevision: revision, genesisKeyBlockHash: genesisHash, networkId } = await this.api.getStatus()
-    if (!semver.satisfies(version, COMPATIBILITY_RANGE)) throw new Error(`Unsupported epoch version ${version}. Supported: ${COMPATIBILITY_RANGE}`)
-    // TODO:
-    // We should not get the node version from getStatus
-    // but read the version that we get from "URL/api" > info > version
+  async init ({ forceCompatibility = false }) {
+    const { nodeRevision: revision, genesisKeyBlockHash: genesisHash, networkId } = await this.api.getStatus()
+    if (!semver.satisfies(this.version, COMPATIBILITY_RANGE) && !forceCompatibility) throw new Error(`Unsupported node version ${this.version}. Supported: ${COMPATIBILITY_RANGE}`)
+
     this.nodeNetworkId = networkId
-    return Object.assign(this, { version, revision, genesisHash })
+    return Object.assign(this, { revision, genesisHash })
   }
 })
 
 // String of compatibility range (see https://www.npmjs.com/package/semver#ranges)
 export const COMPATIBILITY_RANGE = '>= 1.0.0 < 2.0.0'
 
-export default Epoch
+export default Node

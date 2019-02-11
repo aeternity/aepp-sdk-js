@@ -41,7 +41,6 @@ import * as Crypto from '@aeternity/aepp-sdk/es/utils/crypto'
         * [.encodeTx(txData)](#module_@aeternity/aepp-sdk/es/utils/crypto.encodeTx) ⇒ `String`
         * [.isValidKeypair(privateKey, publicKey)](#module_@aeternity/aepp-sdk/es/utils/crypto.isValidKeypair) ⇒ `Boolean`
         * [.envKeypair(env)](#module_@aeternity/aepp-sdk/es/utils/crypto.envKeypair) ⇒ `Object`
-        * [.deserialize(binary)](#module_@aeternity/aepp-sdk/es/utils/crypto.deserialize) ⇒ `Object`
     * _inner_
         * [~Transaction](#module_@aeternity/aepp-sdk/es/utils/crypto..Transaction) : `Array`
 
@@ -459,19 +458,6 @@ Designed to be used with `env` from nodejs. Assumes enviroment variables
 | Param | Type | Description |
 | --- | --- | --- |
 | env | `Object` | Environment |
-
-<a id="module_@aeternity/aepp-sdk/es/utils/crypto.deserialize"></a>
-
-### @aeternity/aepp-sdk/es/utils/crypto.deserialize(binary) ⇒ `Object`
-Deserialize `binary` state channel transaction
-
-**Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
-**Returns**: `Object` - Channel data  
-**rtype**: `(binary: String) => Object`
-
-| Param | Type | Description |
-| --- | --- | --- |
-| binary | `String` | Data to deserialize |
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto..Transaction"></a>
 

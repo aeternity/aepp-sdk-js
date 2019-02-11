@@ -26,6 +26,7 @@ import Chain from '@aeternity/aepp-sdk/es/chain'
                 * *[.getMicroBlockTransactions()](#module_@aeternity/aepp-sdk/es/chain--Chain+getMicroBlockTransactions) ⇒ `Array.&lt;Object&gt;`*
                 * *[.getKeyBlock()](#module_@aeternity/aepp-sdk/es/chain--Chain+getKeyBlock) ⇒ `Object`*
                 * *[.getMicroBlockHeader()](#module_@aeternity/aepp-sdk/es/chain--Chain+getMicroBlockHeader) ⇒ `Object`*
+                * *[.txDryRun(txs, accounts, hashOrHeight)](#module_@aeternity/aepp-sdk/es/chain--Chain+txDryRun) ⇒ `Object`*
         * _static_
             * [.waitMined(bool)](#module_@aeternity/aepp-sdk/es/chain--Chain.waitMined) ⇒ `Stamp`
 
@@ -59,6 +60,7 @@ Submit a signed transaction for mining
 | --- | --- | --- | --- |
 | tx | `String` |  | Transaction to submit |
 | [options] | `String` | <code>{}</code> | Options to pass to the implementation |
+| [options.verify] | `String` | <code>false</code> | Verify transaction before broadcast. |
 
 <a id="module_@aeternity/aepp-sdk/es/chain--Chain+height"></a>
 
@@ -116,7 +118,7 @@ Request the balance of specified account
 | address | `String` |  | The public account address to obtain the balance for |
 | [options] | `Object` | <code>{}</code> | Options |
 | options.height | `Number` |  | The chain height at which to obtain the balance for (default: top of chain) |
-| options.hash | `String` |  | TODO |
+| options.hash | `String` |  | The block hash on which to obtain the balance for (default: top of chain) |
 
 <a id="module_@aeternity/aepp-sdk/es/chain--Chain+tx"></a>
 
@@ -206,6 +208,22 @@ Get micro block header
 **Returns**: `Object` - Micro block header  
 **Category**: async  
 **rtype**: `(hash) => header: Object`
+<a id="module_@aeternity/aepp-sdk/es/chain--Chain+txDryRun"></a>
+
+#### *chain.txDryRun(txs, accounts, hashOrHeight) ⇒ `Object`*
+Transaction dry-run
+
+**Kind**: instance abstract method of [`Chain`](#exp_module_@aeternity/aepp-sdk/es/chain--Chain)  
+**Returns**: `Object` - Result  
+**Category**: async  
+**rtype**: `(txs, accounts, hashOrHeight) => result: Object`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| txs | `Array` | Array of transaction's |
+| accounts | `Array` | Array of account's |
+| hashOrHeight | `String` \| `Number` | hash or height of block on which to make dry-run |
+
 <a id="module_@aeternity/aepp-sdk/es/chain--Chain.waitMined"></a>
 
 #### Chain.waitMined(bool) ⇒ `Stamp`

@@ -46,7 +46,8 @@ const Tx = stampit({
     Ae: {
       methods: [
         'spendTx', 'namePreclaimTx', 'nameClaimTx', 'nameTransferTx',
-        'nameUpdateTx', 'nameRevokeTx', 'contractCreateTx', 'contractCallTx'
+        'nameUpdateTx', 'nameRevokeTx', 'contractCreateTx', 'contractCallTx',
+        'oracleRegisterTx', 'oracleExtendTx', 'oraclePostQueryTx', 'oracleRespondTx'
       ]
     }
   }
@@ -59,7 +60,11 @@ const Tx = stampit({
     nameUpdateTx: required,
     nameRevokeTx: required,
     contractCreateTx: required,
-    contractCallTx: required
+    contractCallTx: required,
+    oracleRegisterTx: required,
+    oracleExtendTx: required,
+    oraclePostQueryTx: required,
+    oracleRespondTx: required
   }
 }))
 
@@ -69,7 +74,7 @@ const Tx = stampit({
  * @instance
  * @abstract
  * @category async
- * @rtype ({sender?: String, recipientId: String, amount: Number, fee: Number, ttl: Number, nonce?: Number, payload?: String}) => tx: Promise[String]
+ * @rtype ({sender?: String, recipientId: String, amount: Number, fee?: Number, ttl?: Number, nonce?: Number, payload?: String}) => tx: Promise[String]
  * @param {Object} options - The object to extract properties from
  * @return {String} `spend_tx` transaction
  */
@@ -80,7 +85,7 @@ const Tx = stampit({
  * @instance
  * @abstract
  * @category async
- * @rtype ({account?: String, commitment: String, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]
+ * @rtype ({account?: String, commitment: String, fee?: Number, ttl?: Number, nonce?: Number}) => tx: Promise[String]
  * @param {Object} options - The object to extract properties from
  * @return {String} `name_preclaim_tx` transaction
  */
@@ -91,7 +96,7 @@ const Tx = stampit({
  * @instance
  * @abstract
  * @category async
- * @rtype ({account?: String, name: String, nameSalt: String, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]
+ * @rtype ({account?: String, name: String, nameSalt: String, fee?: Number, ttl?: Number, nonce?: Number}) => tx: Promise[String]
  * @param {Object} options - The object to extract properties from
  * @return {String} `name_claim_tx` transaction
  */
@@ -102,7 +107,7 @@ const Tx = stampit({
  * @instance
  * @abstract
  * @category async
- * @rtype ({account?: String, nameId: String, recipientId: String, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]
+ * @rtype ({account?: String, nameId: String, recipientId: String, fee?: Number, ttl?: Number, nonce?: Number}) => tx: Promise[String]
  * @param {Object} options - The object to extract properties from
  * @return {String} `name_transfer_tx` transaction
  */
@@ -113,7 +118,7 @@ const Tx = stampit({
  * @instance
  * @abstract
  * @category async
- * @rtype ({account?: String, nameId: String, pointers: Object, nameTtl: Number, clientTtl: Number, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]
+ * @rtype ({account?: String, nameId: String, pointers: Object, nameTtl: Number, clientTtl: Number, fee?: Number, ttl?: Number, nonce?: Number}) => tx: Promise[String]
  * @param {Object} options - The object to extract properties from
  * @return {String} `name_update_tx` transaction
  */
@@ -124,7 +129,7 @@ const Tx = stampit({
  * @instance
  * @abstract
  * @category async
- * @rtype ({account?: String, nameId: String, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]
+ * @rtype ({account?: String, nameId: String, fee?: Number, ttl?: Number, nonce?: Number}) => tx: Promise[String]
  * @param {Object} options - The object to extract properties from
  * @return {String} `name_revoke_tx` transaction
  */
@@ -135,7 +140,7 @@ const Tx = stampit({
  * @instance
  * @abstract
  * @category async
- * @rtype ({owner: String, code: String, callData: String, vmVersion: Number, deposit: Number, amount: Number, gas: Number, gasPrice: Number, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]
+ * @rtype ({owner: String, code: String, callData: String, vmVersion: Number, deposit: Number, amount: Number, gas: Number, gasPrice: Number, fee?: Number, ttl?: Number, nonce?: Number}) => tx: Promise[String]
  * @param {Object} options - The object to extract properties from
  * @return {String} `contract_create_tx` transaction
  */
@@ -146,9 +151,53 @@ const Tx = stampit({
  * @instance
  * @abstract
  * @category async
- * @rtype ({callerId: String, contract: String, callData: String, vmVersion: Number, amount: Number, gas: Number, gasPrice: Number, fee: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]
+ * @rtype ({callerId: String, contract: String, callData: String, vmVersion: Number, amount: Number, gas: Number, gasPrice: Number, fee?: Number, ttl?: Number, nonce?: Number}) => tx: Promise[String]
  * @param {Object} options - The object to extract properties from
  * @return {String} `contract_call_tx` transaction
+ */
+
+/**
+ * Create a `oracle_register_tx` transaction
+ * @function oracleRegisterTx
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype ({ accountId: String, queryFormat: String, responseFormat: String, queryFee: String|Number, oracleTtl: Object, vmVersion: Number = ORACLE_VM_VERSION, fee?: Number, ttl?: Number, nonce?: Number }) => tx: Promise[String]
+ * @param {Object} options - The object to extract properties from
+ * @return {String} `oracle_register_tx` transaction
+ */
+
+/**
+ * Create a `oracle_extend_tx` transaction
+ * @function oracleExtendTx
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype ({ oracleId: String, callerId: String, oracleTtl: Object, fee?: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]
+ * @param {Object} options - The object to extract properties from
+ * @return {String} `oracle_extend_tx` transaction
+ */
+
+/**
+ * Create a `oracle_post_query_tx` transaction
+ * @function oraclePostQuery
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype ({ oracleId: String, responseTtl: Object, query: String, queryTtl: Object, queryFee: String|Number, senderId: String, fee?: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]
+ * @param {Object} options - The object to extract properties from
+ * @return {String} `oracle_post_query_tx` transaction
+ */
+
+/**
+ * Create a `oracle_respond_tx` transaction
+ * @function oracleRespondTx
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype ({ oracleId: String, callerId: String, responseTtl: Object, queryId: String, response: String, fee?: Number, ttl?: Number, nonce?: Number}) => tx: Promise[String]
+ * @param {Object} options - The object to extract properties from
+ * @return {String} `oracle_respond_tx` transaction
  */
 
 export default Tx

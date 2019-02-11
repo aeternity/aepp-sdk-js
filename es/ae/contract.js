@@ -20,8 +20,6 @@
  *
  * High level documentation of the contracts are available at
  * https://github.com/aeternity/protocol/tree/master/contracts and
- * example code which uses this API at
- * https://github.com/aeternity/aepp-sdk-js/blob/develop/bin/aecontract.js
  *
  * @module @aeternity/aepp-sdk/es/ae/contract
  * @export Contract
@@ -35,7 +33,6 @@ import { addressFromDecimal } from '../utils/crypto'
 
 /**
  * Encode call data for contract call
- * @instance
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
@@ -47,25 +44,25 @@ import { addressFromDecimal } from '../utils/crypto'
  * @return {Promise<Object>}
  */
 async function encodeCall (code, abi, name, args, call) {
-  return this.contractEpochEncodeCallData(code, abi, name, args, call)
+  return this.contractNodeEncodeCallData(code, abi, name, args, call)
 }
 
 /**
  * Static contract call(using dry-run)
- * @instance
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
  * @param {String} address Contract address
  * @param {String} abi ABI('sophia', 'sophia-address')
  * @param {String} name Name of function to call
- * @param {Object} [options={}] options Options
- * @param {String} [options.args] args Argument's for call function
- * @param {String} [options.call] call Code of `call` contract(Pseudo code with __call => {name}({args}) function)
- * @param {String} [options.options] options Transaction options (fee, ttl, gas, amount, deposit)
+ * @param {Object} options [options={}]  Options
+ * @param {String} top [options.top] Block hash ob which you want to call contract
+ * @param {String} args [options.args] Argument's for call function
+ * @param {String} call [options.call] Code of `call` contract(Pseudo code with __call => {name}({args}) function)
+ * @param {String} options [options.options]  Transaction options (fee, ttl, gas, amount, deposit)
  * @return {Promise<Object>} Result object
  */
-async function callStatic (address, abi = 'sophia-address', name, { args = '()', call, options = {} } = {}) {
+async function callStatic (address, abi = 'sophia-address', name, { top, args = '()', call, options = {} } = {}) {
   const opt = R.merge(this.Ae.defaults, options)
 
   // Prepare `call` transaction
@@ -75,13 +72,18 @@ async function callStatic (address, abi = 'sophia-address', name, { args = '()',
     callData: await this.contractEncodeCall(address, abi, name, args, call)
   }))
 
+  // Get block hash by height
+  if (top && !isNaN(top)) {
+    top = (await this.getKeyBlock(top)).hash
+  }
+
   // Dry-run
-  const [{ result: status, callObj }] = (await this.contractDryRun([tx], [{ amount: opt.amount, pubKey: await this.address() }])).results
+  const [{ result: status, callObj, reason }] = (await this.txDryRun([tx], [{ amount: opt.amount, pubKey: await this.address() }], top)).results
 
   // check response
-  if (status !== 'ok') throw new Error('Dry run error')
+  if (status !== 'ok') throw new Error('Dry run error, ' + reason)
   const { returnType, returnValue } = callObj
-  if (returnType !== 'ok') throw new Error('Dry run error')
+  if (returnType !== 'ok') throw new Error('Dry run error, ' + Buffer.from(returnValue.slice(2)).toString())
 
   return {
     result: callObj,
@@ -91,7 +93,6 @@ async function callStatic (address, abi = 'sophia-address', name, { args = '()',
 
 /**
  * Decode contract call result data
- * @instance
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
@@ -100,14 +101,13 @@ async function callStatic (address, abi = 'sophia-address', name, { args = '()',
  * @return {Promise<String>} Result object
  */
 async function decode (type, data) {
-  const result = await this.contractEpochDecodeData(type, data)
+  const result = await this.contractNodeDecodeData(type, data)
   if (type === 'address') result.value = addressFromDecimal(result.value)
   return result
 }
 
 /**
  * Call contract function
- * @instance
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
@@ -130,13 +130,13 @@ async function call (code, abi, address, name, { args = '()', options = {}, call
     callData: await this.contractEncodeCall(code, abi, name, args, call)
   }))
 
-  const txFromChain = await this.send(tx, opt)
-  const hash = typeof txFromChain === 'string' ? txFromChain : txFromChain.hash
+  const {hash, rawTx} = await this.send(tx, opt)
   const result = await this.getTxInfo(hash)
 
   if (result.returnType === 'ok') {
     return {
       hash,
+      rawTx,
       result,
       decode: (type) => this.contractDecodeData(type, result.returnValue)
     }
@@ -148,7 +148,6 @@ async function call (code, abi, address, name, { args = '()', options = {}, call
 
 /**
  * Deploy contract to the node
- * @instance
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
@@ -170,12 +169,12 @@ async function deploy (code, abi, { initState = '()', options = {} } = {}) {
     ownerId
   }))
 
-  const txFromChain = await this.send(tx, opt)
-  const hash = typeof txFromChain === 'string' ? txFromChain : txFromChain.hash
+  const {hash, rawTx} = await this.send(tx, opt)
 
   return Object.freeze({
     owner: ownerId,
     transaction: hash,
+    rawTx,
     address: contractId,
     call: async (name, options) => this.contractCall(code, abi, contractId, name, options),
     callStatic: async (name, options) => this.contractCallStatic(contractId, 'sophia-address', name, options),
@@ -185,7 +184,6 @@ async function deploy (code, abi, { initState = '()', options = {} } = {}) {
 
 /**
  * Compile contract source code
- * @instance
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
@@ -194,7 +192,7 @@ async function deploy (code, abi, { initState = '()', options = {} } = {}) {
  * @return {Promise<Object>} Result object
  */
 async function compile (code, options = {}) {
-  const o = await this.compileEpochContract(code, options)
+  const o = await this.compileNodeContract(code, options)
 
   return Object.freeze(Object.assign({
     encodeCall: async (name, args, { call, abi }) => this.contractEncodeCall(o.bytecode, R.defaultTo('sophia', abi), name, args, call),

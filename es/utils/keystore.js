@@ -4,6 +4,13 @@ import uuid from 'uuid'
 
 import { encodeBase58Check } from './crypto'
 
+/**
+ * KeyStore module
+ * !!!Work only in node.js!!!
+ * @module @aeternity/aepp-sdk/es/utils/keystore
+ * @example import * as Crypto from '@aeternity/aepp-sdk/es/utils/keystore'
+ */
+
 const DEFAULTS = {
   crypto: {
     secret_type: 'ed25519',
@@ -166,9 +173,9 @@ export function getAddressFromPriv (secret) {
 
 /**
  * Recover plaintext private key from secret-storage key object.
- * @param {string} password Keystore object password.
+ * @param {String} password Keystore object password.
  * @param {Object} keyObject Keystore object.
- * @return {buffer} Plaintext private key.
+ * @return {Buffer} Plaintext private key.
  */
 export async function recover (password, keyObject) {
   validateKeyObj(keyObject)
@@ -189,14 +196,14 @@ export async function recover (password, keyObject) {
 
 /**
  * Export private key to keystore secret-storage format.
- * @param {string|buffer} name Key name.
- * @param {string|buffer} password User-supplied password.
- * @param {string|buffer} privateKey Private key.
- * @param {buffer|Uint8Array} nonce Randomly generated 24byte nonce.
- * @param {buffer|Uint8Array} salt Randomly generated 16byte salt.
+ * @param {String} name Key name.
+ * @param {String} password User-supplied password.
+ * @param {String} privateKey Private key.
+ * @param {Buffer} nonce Randomly generated 24byte nonce.
+ * @param {Buffer} salt Randomly generated 16byte salt.
  * @param {Object=} options Encryption parameters.
- * @param {string=} options.kdf Key derivation function (default: pbkdf2).
- * @param {string=} options.cipher Symmetric cipher (default: constants.cipher).
+ * @param {String=} options.kdf Key derivation function (default: pbkdf2).
+ * @param {String=} options.cipher Symmetric cipher (default: constants.cipher).
  * @param {Object=} options.kdfparams KDF parameters (default: constants.<kdf>).
  * @return {Object}
  */

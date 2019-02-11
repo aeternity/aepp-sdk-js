@@ -14,7 +14,7 @@ aepp-sdk is [hosted on GitHub].
 [concept]: concept.png "Concept Drawing of aepp-sdk"
 
 [æternity]: https://aeternity.com/
-[æternity node]: https://github.com/aeternity/epoch
+[æternity node]: https://github.com/aeternity/aeternity
 [hosted on GitHub]: https://github.com/aeternity/aepp-sdk-js
 
 #### Disclaimer
@@ -38,7 +38,7 @@ npm i @aeternity/aepp-sdk
 yarn add @aeternity/aepp-sdk
 ```
 
-**Note:** To install a _Pre-Release_ (latest `beta` or `alpha` version) using on the latest Epoch version, you have to install the package appending the `@next` tag reference.
+**Note:** To install a _Pre-Release_ (latest `beta` or `alpha` version) using on the latest Node version, you have to install the package appending the `@next` tag reference.
 ```bash
 pnpm i @aeternity/aepp-sdk@next
 npm i @aeternity/aepp-sdk@next
@@ -53,7 +53,6 @@ yarn add @aeternity/aepp-sdk@next
 
 ```js
 import Ae from '@aeternity/aepp-sdk/es/ae/universal' // or any other flavor
-import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
 ```
 
 3. Create an instance and interact with it
@@ -65,9 +64,7 @@ import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
 Ae({
   url: 'https://sdk-testnet.aepps.com',
   internalUrl: 'https://sdk-testnet.aepps.com',
-  accounts: [
-    MemoryAccount({ keypair: { secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS' }})
-  ],
+  keypair: { secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS' },
   networkId: 'aet_ua' // or any other networkId your client should connect to
 }).then(ae => {
 

@@ -6,7 +6,9 @@
  */
 /* eslint-disable no-unused-vars */
 // # RLP version number
-// # https://github.com/aeternity/protocol/blob/epoch-v0.10.1/serializations.md#binary-serialization
+// # https://github.com/aeternity/protocol/blob/master/serializations.md#binary-serialization
+
+import BigNumber from 'bignumber.js'
 
 export const VSN = 1
 
@@ -43,6 +45,7 @@ const TX_SCHEMA_FIELD = (schema, objectId) => [schema, objectId]
  * @constant
  * @description Object with transaction types
  * @type {Object} TX_TYPE
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder/schema
  * @property {String} signed
  * @property {String} spend
  * @property {String} nameClaim
@@ -110,11 +113,11 @@ export const GAS_PER_BYTE = 20
 export const FEE_BYTE_SIZE = 8
 export const DEFAULT_FEE = 20000
 
-// MAP WITH FEE CALCULATION https://github.com/aeternity/protocol/blob/epoch-v1.0.0-rc6/consensus/consensus.md#gas
+// MAP WITH FEE CALCULATION https://github.com/aeternity/protocol/blob/master/consensus/consensus.md#gas
 export const TX_FEE_FORMULA = {
   [TX_TYPE.spend]: () => BASE_GAS,
-  [TX_TYPE.contractCreate]: (gas) => 5 * BASE_GAS + gas,
-  [TX_TYPE.contractCall]: (gas) => 30 * BASE_GAS + gas,
+  [TX_TYPE.contractCreate]: (gas) => BigNumber(5 * BASE_GAS).plus(gas),
+  [TX_TYPE.contractCall]: (gas) => BigNumber(30 * BASE_GAS).plus(gas),
   [TX_TYPE.nameTransfer]: () => BASE_GAS,
   [TX_TYPE.nameUpdate]: () => BASE_GAS,
   [TX_TYPE.nameClaim]: () => BASE_GAS,
@@ -356,13 +359,13 @@ const VALIDATORS = {
 }
 
 const ERRORS = {
-  invalidSignature: { key: 'InvalidSignature', type: ERROR_TYPE.ERROR },
-  insufficientFee: { key: 'InsufficientFee', type: ERROR_TYPE.ERROR },
-  expiredTTL: { key: 'ExpiredTTL', type: ERROR_TYPE.ERROR },
-  insufficientBalanceForAmountFee: { key: 'InsufficientBalanceForAmountFee', type: ERROR_TYPE.WARNING },
-  insufficientBalanceForAmount: { key: 'InsufficientBalanceForAmount', type: ERROR_TYPE.WARNING },
-  nonceUsed: { key: 'NonceUsed', type: ERROR_TYPE.ERROR },
-  nonceHigh: { key: 'NonceHigh', type: ERROR_TYPE.WARNING }
+  invalidSignature: { key: 'InvalidSignature', type: ERROR_TYPE.ERROR, txKey: 'signature' },
+  insufficientFee: { key: 'InsufficientFee', type: ERROR_TYPE.ERROR, txKey: 'fee' },
+  expiredTTL: { key: 'ExpiredTTL', type: ERROR_TYPE.ERROR, txKey: 'ttl' },
+  insufficientBalanceForAmountFee: { key: 'InsufficientBalanceForAmountFee', type: ERROR_TYPE.WARNING, txKey: 'fee' },
+  insufficientBalanceForAmount: { key: 'InsufficientBalanceForAmount', type: ERROR_TYPE.WARNING, txKey: 'amount' },
+  nonceUsed: { key: 'NonceUsed', type: ERROR_TYPE.ERROR, txKey: 'nonce' },
+  nonceHigh: { key: 'NonceHigh', type: ERROR_TYPE.WARNING, txKey: 'nonce' }
 }
 
 export const SIGNATURE_VERIFICATION_SCHEMA = [

@@ -41,25 +41,27 @@ const ContractBase = stampit({
   deepConf: {
     Contract: {
       methods: [
-        'contractEpochEncodeCallData',
-        'contractEpochCall',
-        'contractEpochDecodeData',
-        'compileEpochContract'
+        'contractNodeEncodeCallData',
+        'contractNodeCall',
+        'contractNodeDecodeData',
+        'compileNodeContract',
+        'getContractByteCode'
       ]
     }
   }
 }, required({
   methods: {
-    contractEpochEncodeCallData: required,
-    contractEpochCall: required,
-    contractEpochDecodeData: required,
-    compileEpochContract: required
+    contractNodeEncodeCallData: required,
+    contractNodeCall: required,
+    contractNodeDecodeData: required,
+    compileNodeContract: required,
+    getContractByteCode: required
   }
 }))
 
 /**
  * Encode contract data
- * @function contractEpochEncodeCallData
+ * @function contractNodeEncodeCallData
  * @instance
  * @abstract
  * @category async
@@ -71,13 +73,13 @@ const ContractBase = stampit({
  * * @param {String} call - Pseudo contract with `__call()` function which simply call function with params.
  * You can use this parametr only for `abi` one of ['sophia', 'sophia-address']
  * When you are passing `call` argument `name` and `args` will be ignored
- * Yiu can find additional info here: https://github.com/aeternity/protocol/blob/master/epoch/api/contract_api_usage.md#sophia-calldata-creation
+ * Yiu can find additional info here: https://github.com/aeternity/protocol/blob/master/node/api/contract_api_usage.md#sophia-calldata-creation
  * @return {String} - Contract encoded data
  */
 
 /**
  * Call the contract
- * @function contractEpochCall
+ * @function contractNodeCall
  * @instance
  * @abstract
  * @category async
@@ -89,13 +91,13 @@ const ContractBase = stampit({
  * @param {String} call - Pseudo contract with `__call()` function which simply call function with params.
  * You can use this parametr only for `abi` one of ['sophia', 'sophia-address']
  * When you are passing `call` argument `name` and `args` will be ignored
- * You can find additional info here: https://github.com/aeternity/protocol/blob/master/epoch/api/contract_api_usage.md#sophia-calldata-creation
+ * You can find additional info here: https://github.com/aeternity/protocol/blob/master/node/api/contract_api_usage.md#sophia-calldata-creation
  * @return {Object} - Contract call result
  */
 
 /**
  * Decode data
- * @function contractEpochDecodeData
+ * @function contractNodeDecodeData
  * @instance
  * @abstract
  * @category async
@@ -106,8 +108,8 @@ const ContractBase = stampit({
  */
 
 /**
- * Compile epoch contract
- * @function compileEpochContract
+ * Compile contract
+ * @function compileNodeContract
  * @instance
  * @abstract
  * @category async
@@ -115,6 +117,17 @@ const ContractBase = stampit({
  * @param {String} code - Contract source code
  * @param {Object} [options={}] - Options
  * @return {Object} Object which contain bytecode of contract
+ */
+
+/**
+ * Get bytecode by contract public key
+ * @function getContractByteCode
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype (contractId: String) => byteCode: String
+ * @param {String} contractId
+ * @return {String} Contract byte code
  */
 
 export default ContractBase

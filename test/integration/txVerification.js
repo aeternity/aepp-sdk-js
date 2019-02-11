@@ -4,8 +4,8 @@ import { configure, ready } from '.'
 import { generateKeyPair } from '../../es/utils/crypto'
 import { BASE_VERIFICATION_SCHEMA, SIGNATURE_VERIFICATION_SCHEMA } from '../../es/tx/builder/schema'
 
-const WARNINGS = [...SIGNATURE_VERIFICATION_SCHEMA, ...BASE_VERIFICATION_SCHEMA].reduce((acc, [msg, v, error]) => error.type === 'warning' ? [...acc, error.key]: acc, [])
-const ERRORS = [...BASE_VERIFICATION_SCHEMA, ...SIGNATURE_VERIFICATION_SCHEMA,].reduce((acc, [msg, v, error]) => error.type === 'error' ? [...acc, error.key]: acc, [])
+const WARNINGS = [...SIGNATURE_VERIFICATION_SCHEMA, ...BASE_VERIFICATION_SCHEMA].reduce((acc, [msg, v, error]) => error.type === 'warning' ? [...acc, error.txKey]: acc, [])
+const ERRORS = [...BASE_VERIFICATION_SCHEMA, ...SIGNATURE_VERIFICATION_SCHEMA,].reduce((acc, [msg, v, error]) => error.type === 'error' ? [...acc, error.txKey]: acc, [])
 
 describe('Verify Transaction', function () {
   configure(this)
@@ -31,13 +31,13 @@ describe('Verify Transaction', function () {
       absoluteTtl: true
     })
 
-    // Sign using another account
-    const signedTx = await client.signTransaction(spendTx)
+    const {validation} = await client.unpackAndVerify(spendTx)
+    const warning = validation
+      .filter(({type}) => type === 'warning')
+      .map(({ txKey }) => txKey)
 
 
-    const {warning} = { ...(await client.unpackAndVerify(spendTx)), ...(await client.unpackAndVerify(signedTx)) }
-
-    JSON.stringify(WARNINGS).should.be.equals(JSON.stringify(Object.keys(warning)))
+    JSON.stringify(WARNINGS).should.be.equals(JSON.stringify(warning))
   })
   it('check errors', async () => {
     const spendTx = await client.spendTx({
@@ -54,9 +54,28 @@ describe('Verify Transaction', function () {
     // Sign using another account
     const signedTx = await client.signTransaction(spendTx)
 
+    const {validation} = await client.unpackAndVerify(signedTx)
+    const error = validation
+      .filter(({type}) => type === 'error')
+      .map(({ txKey }) => txKey)
 
-    const {error} = { ...(await client.unpackAndVerify(spendTx)), ...(await client.unpackAndVerify(signedTx)) }
+    JSON.stringify(ERRORS).should.be.equals(JSON.stringify(error))
+  })
+  it('verify transaction before broadcast', async () => {
+    client = await ready(this)
+    const spendTx = await client.spendTx({
+      senderId: await client.address(),
+      recipientId: await client.address(),
+      amount: 1,
+      ttl: 2,
+      absoluteTtl: true
+    })
 
-    JSON.stringify(ERRORS).should.be.equals(JSON.stringify(Object.keys(error)))
+    try {
+      await client.send(spendTx, { verify: true })
+    } catch ({ errorData }) {
+      const atLeastOneError = !!errorData.validation.length
+      atLeastOneError.should.be.equal(true)
+    }
   })
 })

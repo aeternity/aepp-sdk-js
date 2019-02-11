@@ -3,6 +3,43 @@ All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 
+## [2.0.0]
+### Added
+- Add `unpackedTx`, `txType` and `signature` to `validate` transaction function
+- Add `top` param to contract `static call(dry-run)`
+- Add errors handling for `dry-run`
+- Add `keystore` docs
+- Add `verify` options to `send` function which verify tx before broadcasting and throw error if tx is invalid
+- Add `dryRun` to `RPC` methods
+- Add `Oracle` transaction creation to `Aepp` rpc
+- Add `tx builder` docs
+- Add doc's for `utils/bytes` and tx builder `schema`
+
+### Changed
+- refactor `calculateFee` function in `TxBuilder`(use BigNumber)
+- `RpcServer`: Avoid storing of `window` in `instance` properties
+- Disable `balance formatting` by default
+- Extend response of `Oracle`, `Aens`, `Contrat` with `rawTx`
+- Change response of `send` function now it's and object with transaction data(hash, rawTxHash, ...)
+- Move `verification of transaction` to `chain` stamp
+- Move `Contract` and `Oracle` API wrapper's to `Chain` stamp
+- Rename `epoch` in `CHANGELOG`, `README`, `HACKING`
+- Retrieve `node` version from `/api`
+- Fix unpack tx example in `bin/aecrypto.js`
+
+### Removed
+- Remove unused function's from `crypto.js`
+
+### Breaking Changes
+- Remove old transaction builder `es/tx/js.js` (Please use `es/tx/builder` instead)
+- Rename `es/epoch.js` to `es/node.js`
+- Rename `Oracle`, `Contract`, `Chain` API wrapper files from `epoch` to `node`
+- Rename `Contract` api wrapper method's
+
+### Notes and known Issues
+- none
+
+
 ## [1.3.2]
 ### Added
 - Add `destroyInstance` function to `Ae` stamp which remove all listeners for RPC event's
@@ -80,7 +117,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 - isAddressValid check
 
 ### Changed
-- Compatibility with Epoch >= 1.0.0 and <= 1.1.0
+- Compatibility with Node >= 1.0.0 and <= 1.1.0
 - Fixed networkId propagation (and overriding on init of Flavors)
 - Tx Fee formulas
 - Fixed encodeBase58Check by feeding Buffered input
@@ -132,10 +169,10 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [1.0.1]
 ### Added
-- ability to support Epoch range(s) using semver package (see https://www.npmjs.com/package/semver#ranges)
+- ability to support Node range(s) using semver package (see https://www.npmjs.com/package/semver#ranges)
 
 ### Changed
-- Support for Epoch >= 1.0.0 and < 2.0.0
+- Support for Node >= 1.0.0 and < 2.0.0
 
 ### Removed
 - none
@@ -156,11 +193,11 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 - Rolled back to bignumbers.js for easier fix with axios.get/post
 
 ### Removed
-- Support for Epoch < 1.0.0
+- Support for Node < 1.0.0
 
 ### Breaking Changes
 - New NETWORK_ID (also used in docker/sdk.env for CI tests)
--  Encoding of transaction (and other objects) [changed from base58check to base64check](https://github.com/aeternity/protocol/blob/epoch-v1.0.0/epoch/api/api_encoding.md)
+-  Encoding of transaction (and other objects) [changed from base58check to base64check](https://github.com/aeternity/protocol/blob/master/node/api/api_encoding.md)
 
 ### Notes and known Issues
 - State Channels have been excluded for problems with CI, will be included in next release
@@ -243,7 +280,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [0.24.0-0.1.0]
 ### Added
-- Full support of [Epoch-0.24.0](https://github.com/aeternity/epoch/releases/tag/v0.24.0)
+- Full support of [Node-0.24.0](https://github.com/aeternity/aeternity/releases/tag/v0.24.0)
 - (CLI) Develop `decode base58` address command in `crypto` module
 - (CLI) Add `nonce` param to all tx command's
 - (CLI) Add `gas` param to `deploy` and `call` commands
@@ -253,7 +290,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 ### Changed
 - (CLI) Change `--privateKey` to `flag` on `ACCOUNT ADDRESS` command
 - Change `node version` in `Dockerfile`
-- API endpoints to meet new Epoch specifications
+- API endpoints to meet new Node specifications
 - Update `docco` config and change `rename` package to `recursive-rename`
 - Improved documentation
 
@@ -271,7 +308,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 - nameId function for commitment hash calculations
 
 ### Changed
-- API endpoints to meet new Epoch specifications
+- API endpoints to meet new Node specifications
 - Add Nonce calculation on SDK side
 - Add check for MAX_GAS in call and deploy contract
 - change hash prefix separator from $ to _
@@ -279,7 +316,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 - Link aecli to `./bin/aecli.js` in package.json (After "npm link" you can use CLI globally)
 - Wait until pre-claim transaction block was mined before send claim transaction
 - Updated `webpack`, `webpack-cli` and added new dev deps accordingly
-- Add Epoch Compatibility Check
+- Add Node Compatibility Check
 - Add SDK nonce calculations
 - Fixes commitment hash calculations in naming system, to be `Hash(nameId(name) + name_salt)` instead of `Hash(Hash(name + name_salt))`.
 
@@ -302,7 +339,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [0.18.0-0.1.0]
 ### Added
-- Support for Epoch 0.18.0 (changed endpoints)
+- Support for Node 0.18.0 (changed endpoints)
 - Wallet/Aepp RPC support
 - Contract call result decoding support
 - Per-module API documentation (Markdown based on JSDoc)
@@ -346,7 +383,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 ### Removed
 - Oracle API (for the time being)
 - Legacy API and tests
-- Compatibility with older versions of Epoch which provide the transaction hash
+- Compatibility with older versions of Node which provide the transaction hash
   the old way
 
 ### Fixed
@@ -357,7 +394,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 - This change log file
 
 ### Changed
-- Switch to curve ed25519 (from secp256k1) to align with Epoch protocol changes
+- Switch to curve ed25519 (from secp256k1) to align with Node protocol changes
 - Generate basic API directly from Swagger files, also validate input data
 - Compiled library now self-contained with all dependencies
 - Use Webpack 4 based cross-platform (Node/Web) compilation
@@ -391,3 +428,4 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 [1.3.0]: https://github.com/aeternity/aepp-sdk-js/compare/1.2.1...1.3.0
 [1.3.1]: https://github.com/aeternity/aepp-sdk-js/compare/1.3.0...1.3.1
 [1.3.2]: https://github.com/aeternity/aepp-sdk-js/compare/1.3.1...1.3.2
+[1.3.2]: https://github.com/aeternity/aepp-sdk-js/compare/1.3.2...2.0.0

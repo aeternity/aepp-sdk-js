@@ -5,7 +5,7 @@ import { rlp } from '../../utils/crypto'
 import {
   DEFAULT_FEE,
   FEE_BYTE_SIZE,
-  FIELD_TYPES, GAS_PER_BYTE,
+  FIELD_TYPES, GAS_PER_BYTE, OBJECT_ID_TX_TYPE,
   PREFIX_ID_TAG,
   TX_DESERIALIZATION_SCHEMA, TX_FEE_FORMULA,
   TX_SERIALIZATION_SCHEMA, VALIDATION_MESSAGE,
@@ -16,9 +16,9 @@ import { toBytes } from '../../utils/bytes'
 
 /**
  * JavaScript-based Transaction builder
- * @module @aeternity/aepp-sdk/es/tx/builder/index
+ * @module @aeternity/aepp-sdk/es/tx/builder
  * @export TxBuilder
- * @example import Transaction from '@aeternity/aepp-sdk/es/tx/builder/index'
+ * @example import Transaction from '@aeternity/aepp-sdk/es/tx/builder'
  */
 
 const ORACLE_TTL_TYPES = {
@@ -116,11 +116,39 @@ function transformParams (params) {
     )
 }
 
+function getGasBySize (size) {
+  return BigNumber(GAS_PER_BYTE).times(size + FEE_BYTE_SIZE)
+}
+
 // INTERFACE
+
+/**
+ * Calculate min fee
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder/index
+ * @rtype (txType, { gas = 0, gasPrice = 1, params }) => String
+ * @param {String} txType - Transaction type
+ * @param {Options} options - Options object
+ * @param {String|Number} options.gas - Gas amount
+ * @param {Object} options.params - Tx params
+ * @return {String|Number}
+ * @example calculateMinFee('spendTx', { gas, params })
+ */
+export function calculateMinFee (txType, { gas = 0, params }) {
+  if (!params) return DEFAULT_FEE
+
+  const { rlpEncoded: txWithOutFee } = buildTx(params, txType, { excludeKeys: ['fee'] })
+  const txSize = txWithOutFee.length
+
+  return TX_FEE_FORMULA[txType]
+    ? BigNumber(TX_FEE_FORMULA[txType](gas)).plus(getGasBySize(txSize)).toString(10)
+    : DEFAULT_FEE
+}
+
 /**
  * Calculate fee
  * @function
- * @alias module:@aeternity/aepp-sdk/es/tx/builder/index
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @rtype (fee, txType, gas = 0) => String
  * @param {String|Number} fee - fee
  * @param {String} txType - Transaction type
@@ -128,34 +156,27 @@ function transformParams (params) {
  * @param {String|Number} options.gas - Gas amount
  * @param {Object} options.params - Tx params
  * @return {String|Number}
- * @example calculateFee(null, 'spendtx')
+ * @example calculateFee(null, 'spendTx', { gas, params })
  */
-export function calculateFee (fee, txType, { gas = 0, params } = {}) {
-  function getGasBySize (size) {
-    return GAS_PER_BYTE * (size + FEE_BYTE_SIZE)
-  }
+export function calculateFee (fee = 0, txType, { gas = 0, params, showWarning = true } = {}) {
+  if (!TX_FEE_FORMULA[txType] && showWarning) console.warn(`Can't find transaction fee formula for ${txType}, we will use DEFAULT_FEE(${DEFAULT_FEE})`)
 
-  if (!fee) {
-    // TODO remove that after implement oracle fee calculation
-    if (!params) return DEFAULT_FEE
+  const minFee = calculateMinFee(txType, { params, gas })
+  if (fee && BigNumber(minFee).gt(BigNumber(fee)) && showWarning) console.warn('Transaction fee is lower then min fee!')
 
-    const { rlpEncoded: txWithOutFee } = buildTx(params, txType, { excludeKeys: ['fee'] })
-    const txSize = txWithOutFee.length
-
-    return TX_FEE_FORMULA[txType] ? TX_FEE_FORMULA[txType](gas) + getGasBySize(txSize) : DEFAULT_FEE
-  }
-  return fee
+  return fee || minFee
 }
 
 /**
  * Validate transaction params
  * @function
- * @alias module:@aeternity/aepp-sdk/es/tx/builder/index
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param {Object} params Object with tx params
  * @param {Array} schema Transaction schema
+ * @param {Array} excludeKeys  Array of keys to exclude for validation
  * @return {Object} Object with validation errors
  */
-export function validateParams (params, schema, { excludeKeys }) {
+export function validateParams (params, schema, { excludeKeys = [] }) {
   return schema
     .filter(([key]) => !excludeKeys.includes(key) && key !== 'payload')
     .reduce(
@@ -167,7 +188,7 @@ export function validateParams (params, schema, { excludeKeys }) {
 /**
  * Build binary transaction
  * @function
- * @alias module:@aeternity/aepp-sdk/es/tx/builder/index
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param {Object} params Object with tx params
  * @param {Array} schema Transaction schema
  * @param {Object} [options={}] options
@@ -197,7 +218,7 @@ export function buildRawTx (params, schema, { excludeKeys = [] } = {}) {
 /**
  * Unpack binary transaction
  * @function
- * @alias module:@aeternity/aepp-sdk/es/tx/builder/index
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param {Array} binary Array with binary transaction field's
  * @param {Array} schema Transaction schema
  * @return {Object} Object with transaction field's
@@ -217,7 +238,7 @@ export function unpackRawTx (binary, schema) {
 /**
  * Build transaction hash
  * @function
- * @alias module:@aeternity/aepp-sdk/es/tx/builder/index
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param {Object} params Object with tx params
  * @param {String} type Transaction type
  * @param {Object} [options={}] options
@@ -238,7 +259,7 @@ export function buildTx (params, type, { excludeKeys = [] } = {}) {
 /**
  * Unpack transaction hash
  * @function
- * @alias module:@aeternity/aepp-sdk/es/tx/builder/index
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param {String|Array} encodedTx String or RLP encoded transaction array (if fromRlpBinary flag is true)
  * @param {Boolean} fromRlpBinary Unpack from RLP encoded transaction (default: false)
  * @return {Object} { tx, rlpEncoded, binary } Object with tx -> Object with transaction param's, rlp encoded transaction and binary transaction
@@ -250,7 +271,7 @@ export function unpackTx (encodedTx, fromRlpBinary = false) {
   const objId = readInt(binary[0])
   const [schema] = TX_DESERIALIZATION_SCHEMA[objId]
 
-  return { tx: unpackRawTx(binary, schema), rlpEncoded, binary }
+  return { txType: OBJECT_ID_TX_TYPE[objId], tx: unpackRawTx(binary, schema), rlpEncoded, binary }
 }
 
-export default { calculateFee, unpackTx, unpackRawTx, buildTx, buildRawTx, validateParams }
+export default { calculateMinFee, calculateFee, unpackTx, unpackRawTx, buildTx, buildRawTx, validateParams }

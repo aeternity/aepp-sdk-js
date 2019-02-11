@@ -1,23 +1,23 @@
-<a id="module_@aeternity/aepp-sdk/es/tx/builder/index"></a>
+<a id="module_@aeternity/aepp-sdk/es/tx/builder"></a>
 
-## @aeternity/aepp-sdk/es/tx/builder/index
+## @aeternity/aepp-sdk/es/tx/builder
 JavaScript-based Transaction builder
 
 **Export**: TxBuilder  
 **Example**  
 ```js
-import Transaction from '@aeternity/aepp-sdk/es/tx/builder/index'
+import Transaction from '@aeternity/aepp-sdk/es/tx/builder'
 ```
 
-* [@aeternity/aepp-sdk/es/tx/builder/index](#module_@aeternity/aepp-sdk/es/tx/builder/index)
-    * [exports.calculateFee(fee, txType, options)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/index--exports.calculateFee) ⇒ `String` \| `Number` ⏏
-    * [exports.validateParams(params, schema)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/index--exports.validateParams) ⇒ `Object` ⏏
-    * [exports.buildRawTx(params, schema, [options])](#exp_module_@aeternity/aepp-sdk/es/tx/builder/index--exports.buildRawTx) ⇒ `Array` ⏏
-    * [exports.unpackRawTx(binary, schema)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/index--exports.unpackRawTx) ⇒ `Object` ⏏
-    * [exports.buildTx(params, type, [options])](#exp_module_@aeternity/aepp-sdk/es/tx/builder/index--exports.buildTx) ⇒ `Object` ⏏
-    * [exports.unpackTx(encodedTx, fromRlpBinary)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/index--exports.unpackTx) ⇒ `Object` ⏏
+* [@aeternity/aepp-sdk/es/tx/builder](#module_@aeternity/aepp-sdk/es/tx/builder)
+    * [exports.calculateFee(fee, txType, options)](#exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.calculateFee) ⇒ `String` \| `Number` ⏏
+    * [exports.validateParams(params, schema, excludeKeys)](#exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.validateParams) ⇒ `Object` ⏏
+    * [exports.buildRawTx(params, schema, [options])](#exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.buildRawTx) ⇒ `Array` ⏏
+    * [exports.unpackRawTx(binary, schema)](#exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.unpackRawTx) ⇒ `Object` ⏏
+    * [exports.buildTx(params, type, [options])](#exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.buildTx) ⇒ `Object` ⏏
+    * [exports.unpackTx(encodedTx, fromRlpBinary)](#exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.unpackTx) ⇒ `Object` ⏏
 
-<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/index--exports.calculateFee"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.calculateFee"></a>
 
 ### exports.calculateFee(fee, txType, options) ⇒ `String` \| `Number` ⏏
 Calculate fee
@@ -35,11 +35,11 @@ Calculate fee
 
 **Example**  
 ```js
-calculateFee(null, 'spendtx')
+calculateFee(null, 'spendTx', { gas, params })
 ```
-<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/index--exports.validateParams"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.validateParams"></a>
 
-### exports.validateParams(params, schema) ⇒ `Object` ⏏
+### exports.validateParams(params, schema, excludeKeys) ⇒ `Object` ⏏
 Validate transaction params
 
 **Kind**: Exported function  
@@ -49,8 +49,9 @@ Validate transaction params
 | --- | --- | --- |
 | params | `Object` | Object with tx params |
 | schema | `Array` | Transaction schema |
+| excludeKeys | `Array` | Array of keys to exclude for validation |
 
-<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/index--exports.buildRawTx"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.buildRawTx"></a>
 
 ### exports.buildRawTx(params, schema, [options]) ⇒ `Array` ⏏
 Build binary transaction
@@ -69,7 +70,7 @@ Build binary transaction
 | [options] | `Object` | <code>{}</code> | options |
 | [options.excludeKeys] | `Object` |  | excludeKeys Array of keys to exclude for validation and build |
 
-<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/index--exports.unpackRawTx"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.unpackRawTx"></a>
 
 ### exports.unpackRawTx(binary, schema) ⇒ `Object` ⏏
 Unpack binary transaction
@@ -82,7 +83,7 @@ Unpack binary transaction
 | binary | `Array` | Array with binary transaction field's |
 | schema | `Array` | Transaction schema |
 
-<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/index--exports.buildTx"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.buildTx"></a>
 
 ### exports.buildTx(params, type, [options]) ⇒ `Object` ⏏
 Build transaction hash
@@ -101,7 +102,7 @@ Build transaction hash
 | [options] | `Object` | <code>{}</code> | options |
 | [options.excludeKeys] | `Object` |  | excludeKeys Array of keys to exclude for validation and build |
 
-<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/index--exports.unpackTx"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.unpackTx"></a>
 
 ### exports.unpackTx(encodedTx, fromRlpBinary) ⇒ `Object` ⏏
 Unpack transaction hash

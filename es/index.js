@@ -18,11 +18,10 @@
 import * as Crypto from './utils/crypto'
 import * as TxBuilder from './tx/builder'
 import * as TxBuilderHelper from './tx/builder/helpers'
-import * as JsTx from './tx/js'
 
 import Ae from './ae'
 import Chain from './chain'
-import EpochChain from './chain/epoch'
+import ChainNode from './chain/node'
 import Tx from './tx'
 import Transaction from './tx/tx'
 import TransactionValidator from './tx/validator'
@@ -30,11 +29,11 @@ import Account from './account'
 import MemoryAccount from './account/memory'
 import Aens from './ae/aens'
 import Contract from './ae/contract'
-import EpochContract from './contract/epoch'
+import ContractNodeAPI from './contract/node'
 import Wallet from './ae/wallet'
 import Aepp from './ae/aepp'
 import Oracle from './ae/oracle'
-import EpochOracle from './oracle/epoch'
+import OracleNodeAPI from './oracle/node'
 import Selector from './account/selector'
 import Channel from './channel'
 import Universal from './ae/universal'
@@ -44,9 +43,9 @@ export {
   Aepp,
   Crypto,
   Chain,
-  EpochChain,
-  EpochContract,
-  EpochOracle,
+  ChainNode,
+  ContractNodeAPI,
+  OracleNodeAPI,
   Tx,
   Transaction,
   Account,
@@ -54,7 +53,6 @@ export {
   Aens,
   Contract,
   Wallet,
-  JsTx,
   Selector,
   Universal,
   Oracle,

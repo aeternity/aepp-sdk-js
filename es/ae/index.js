@@ -26,8 +26,6 @@ import stampit from '@stamp/it'
 import Tx from '../tx'
 import Chain from '../chain'
 import Account from '../account'
-import Contract from '../contract'
-import Oracle from '../oracle'
 import * as R from 'ramda'
 
 /**
@@ -36,7 +34,8 @@ import * as R from 'ramda'
  * @category async
  * @rtype (tx: String, options: Object) => Promise[String]
  * @param {String} tx - Transaction
- * @param {Object} options - Options
+ * @param {Object} [options={}] options - Options
+ * @param {Object} [options.verify] verify - Verify transaction before broadcast, throw error if not valid
  * @return {String|String} Transaction or transaction hash
  */
 async function send (tx, options) {
@@ -90,7 +89,7 @@ function destroyInstance () {
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Ae instance
  */
-const Ae = stampit(Tx, Account, Chain, Contract, Oracle, {
+const Ae = stampit(Tx, Account, Chain, {
   methods: { send, spend, destroyInstance }
 })
 
