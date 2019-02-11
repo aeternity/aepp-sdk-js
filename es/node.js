@@ -75,23 +75,25 @@ const Node = stampit({
   async init ({ url = this.url, internalUrl = this.internalUrl }) {
     url = url.replace(/\/?$/, '/')
 
+    // Get swagger schema
+    const swag = await remoteSwag(url)
+    this.version = swag.info.version
     return Object.assign(this, {
-      swag: await remoteSwag(url),
+      swag: swag,
       urlFor: loader({ url, internalUrl })
     })
   },
   props: {
+    version: null,
     nodeNetworkId: null
   }
 }, Swagger, {
   async init ({ forceCompatibility = false }) {
-    const { nodeVersion: version, nodeRevision: revision, genesisKeyBlockHash: genesisHash, networkId } = await this.api.getStatus()
-    if (!semver.satisfies(version, COMPATIBILITY_RANGE) && !forceCompatibility) throw new Error(`Unsupported node version ${version}. Supported: ${COMPATIBILITY_RANGE}`)
-    // TODO:
-    // We should not get the node version from getStatus
-    // but read the version that we get from "URL/api" > info > version
+    const { nodeRevision: revision, genesisKeyBlockHash: genesisHash, networkId } = await this.api.getStatus()
+    if (!semver.satisfies(this.version, COMPATIBILITY_RANGE) && !forceCompatibility) throw new Error(`Unsupported node version ${this.version}. Supported: ${COMPATIBILITY_RANGE}`)
+
     this.nodeNetworkId = networkId
-    return Object.assign(this, { version, revision, genesisHash })
+    return Object.assign(this, { revision, genesisHash })
   }
 })
 
