@@ -16,16 +16,16 @@
  */
 
 /**
- * EpochOracle module
+ * OracleNodeAPI module
  *
  * This is the complement to {@link module:@aeternity/aepp-sdk/es/oracle}.
- * @module @aeternity/aepp-sdk/es/oracle/epoch
- * @export EpochOracle
- * @example import Selector from '@aeternity/aepp-sdk/es/oracle/epoch'
+ * @module @aeternity/aepp-sdk/es/oracle/node
+ * @export OracleNodeAPI
+ * @example import OracleNodeAPI from '@aeternity/aepp-sdk/es/oracle/node'
  */
 
 import OracleBase from './'
-import Epoch from '../epoch'
+import Node from '../node'
 
 async function getOracle (oracleId) {
   return this.api.getOracleByPubkey(oracleId)
@@ -39,7 +39,7 @@ async function getOracleQuery (oracleId, queryId) {
   return this.api.getOracleQueryByPubkeyAndQueryId(oracleId, queryId)
 }
 
-const EpochOracle = OracleBase.compose(Epoch, {
+const OracleNodeAPI = OracleBase.compose(Node, {
   methods: {
     getOracle,
     getOracleQueries,
@@ -47,4 +47,4 @@ const EpochOracle = OracleBase.compose(Epoch, {
   }
 })
 
-export default EpochOracle
+export default OracleNodeAPI

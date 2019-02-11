@@ -13,11 +13,12 @@ import Transaction from '@aeternity/aepp-sdk/es/tx/tx'
 ### Transaction([options]) ⇒ `Object` ⏏
 Transaction Stamp
 
-This implementation of [Tx](#exp_module_@aeternity/aepp-sdk/es/tx--Tx) relays
-the creation of transactions to [Epoch](#exp_module_@aeternity/aepp-sdk/es/epoch--Epoch).
-This stamp provide ability to create native spend transaction,
-all other transaction's using Epoch API.
-As there is no built-in security between Epoch and client communication, it
+This is implementation of [Tx](api/tx.md) relays
+the creation of transactions to [module:@aeternity/aepp-sdk/es/Node](module:@aeternity/aepp-sdk/es/Node).
+This stamp provide ability to create native transaction's,
+or transaction's using Node API.
+As there is no built-in security between Node and client communication,
+creating transaction using [module:@aeternity/aepp-sdk/es/Node](module:@aeternity/aepp-sdk/es/Node) API
 must never be used for production but can be very useful to verify other
 implementations.
 
@@ -28,9 +29,9 @@ implementations.
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | [options] | `Object` | <code>{}</code> | Initializer object |
-| [options.nativeMode] | `Object` |  | Use Native build of transaction's |
-| [options.url] | `Object` |  | Node url |
-| [options.internalUrl] | `Object` |  | Node internal url |
+| [options.nativeMode] | `Boolean` | <code>true</code> | options.nativeMode - Use Native build of transaction's |
+| options.url | `String` |  | Node url |
+| options.internalUrl | `String` |  | Node internal url |
 
 **Example**  
 ```js

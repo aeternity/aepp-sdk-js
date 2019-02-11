@@ -16,22 +16,22 @@
  */
 
 /**
- * EpochContract module
+ * ContractNodeAPI module
  *
  * This is the complement to {@link module:@aeternity/aepp-sdk/es/contract}.
- * @module @aeternity/aepp-sdk/es/contract/epoch
- * @export EpochContract
- * @example import Selector from '@aeternity/aepp-sdk/es/contract/apoch'
+ * @module @aeternity/aepp-sdk/es/contract/node
+ * @export ContractNodeAPI
+ * @example import ContractNodeAPI from '@aeternity/aepp-sdk/es/contract/node'
  */
 
 import * as R from 'ramda'
 import ContractBase from './'
-import Epoch from '../epoch'
+import Node from '../node'
 
 const TYPE_CHECKED_ABI = ['sophia', 'sophia-address']
 
-async function contractEpochEncodeCallData (codeOrAddress, abi, name, arg, call) {
-  // Get contract bytecode from epoch if we want to get callData using { abi: 'sophia-address', code: 'contract address' }
+async function contractNodeEncodeCallData (codeOrAddress, abi, name, arg, call) {
+  // Get contract bytecode from aeternity node if we want to get callData using { abi: 'sophia-address', code: 'contract address' }
   let code = codeOrAddress
   if (abi === 'sophia-address' && codeOrAddress.slice(0, 2) === 'ct') {
     code = (await this.getContractByteCode(code)).bytecode
@@ -43,35 +43,29 @@ async function contractEpochEncodeCallData (codeOrAddress, abi, name, arg, call)
     : (await this.api.encodeCalldata({ abi, code, 'function': name, arg })).calldata
 }
 
-async function contractEpochCall (address, abi = 'sophia-address', name, arg = '()', call) {
+async function contractNodeCall (address, abi = 'sophia-address', name, arg = '()', call) {
   if (call && TYPE_CHECKED_ABI.includes(abi)) return this.api.callContract({ abi, code: address, call })
   return this.api.callContract({ abi, code: address, 'function': name, arg })
 }
 
-async function contractEpochDecodeData (type, data) {
+async function contractNodeDecodeData (type, data) {
   return (await this.api.decodeData({ data, 'sophia-type': type })).data
 }
 
-async function compileEpochContract (code, options = {}) {
+async function compileNodeContract (code, options = {}) {
   return this.api.compileContract(R.mergeAll([this.Ae.defaults, options, { code }]))
 }
 
-/**
- * Get bytecode by contract public key
- *
- * @param {string} contractId
- * @return {number} Contract byte code
- */
 async function getContractByteCode (contractId) {
   return this.api.getContractCode(contractId)
 }
 
-const EpochContract = ContractBase.compose(Epoch, {
+const ContractNodeAPI = ContractBase.compose(Node, {
   methods: {
-    contractEpochEncodeCallData,
-    contractEpochCall,
-    contractEpochDecodeData,
-    compileEpochContract,
+    contractNodeEncodeCallData,
+    contractNodeCall,
+    contractNodeDecodeData,
+    compileNodeContract,
     getContractByteCode
   },
   deepProps: {
@@ -83,4 +77,4 @@ const EpochContract = ContractBase.compose(Epoch, {
   }
 })
 
-export default EpochContract
+export default ContractNodeAPI

@@ -16,9 +16,20 @@
  */
 import * as R from 'ramda'
 import Chain from './'
-import Epoch from '../epoch'
+import Node from '../node'
+import Oracle from '../oracle/node'
+import Contract from '../contract/node'
 import formatBalance from '../utils/amount-formatter'
 import TransactionValidator from '../tx/validator'
+
+/**
+ * ChainNode module
+ *
+ * This is the complement to {@link module:@aeternity/aepp-sdk/es/chain}.
+ * @module @aeternity/aepp-sdk/es/chain/node
+ * @export ChainNode
+ * @example import ChainNode from '@aeternity/aepp-sdk/es/chain/node'
+ */
 
 async function sendTransaction (tx, options = {}) {
   const { waitMined, verify } = R.merge(this.Chain.defaults, options)
@@ -141,7 +152,19 @@ async function txDryRun (txs, accounts, top) {
   return this.api.dryRunTxs({ txs, accounts, top })
 }
 
-const EpochChain = Chain.compose(Epoch, TransactionValidator, {
+/**
+ * ChainNode Stamp
+ *
+ * This is implementation of {@link module:@aeternity/aepp-sdk/es/chain--Chain}
+ * composed with {@link module:@aeternity/aepp-sdk/es/contract/node--ContractNodeAPI} and {@link module:@aeternity/aepp-sdk/es/oracle/node--OracleNodeAPI}
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/chain/node
+ * @rtype Stamp
+ * @param {Object} [options={}] - Initializer object
+ * @return {Object} ChainNode instance
+ * @example ChainNode({url: 'https://sdk-testnet.aepps.com/'})
+ */
+const ChainNode = Chain.compose(Node, Oracle, Contract, TransactionValidator, {
   methods: {
     sendTransaction,
     balance,
@@ -161,4 +184,4 @@ const EpochChain = Chain.compose(Epoch, TransactionValidator, {
   }
 })
 
-export default EpochChain
+export default ChainNode

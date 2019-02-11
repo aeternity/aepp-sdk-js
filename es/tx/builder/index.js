@@ -16,9 +16,9 @@ import { toBytes } from '../../utils/bytes'
 
 /**
  * JavaScript-based Transaction builder
- * @module @aeternity/aepp-sdk/es/tx/builder/index
+ * @module @aeternity/aepp-sdk/es/tx/builder
  * @export TxBuilder
- * @example import Transaction from '@aeternity/aepp-sdk/es/tx/builder/index'
+ * @example import Transaction from '@aeternity/aepp-sdk/es/tx/builder'
  */
 
 const ORACLE_TTL_TYPES = {
@@ -148,7 +148,7 @@ export function calculateMinFee (txType, { gas = 0, params }) {
 /**
  * Calculate fee
  * @function
- * @alias module:@aeternity/aepp-sdk/es/tx/builder/index
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @rtype (fee, txType, gas = 0) => String
  * @param {String|Number} fee - fee
  * @param {String} txType - Transaction type
@@ -170,7 +170,7 @@ export function calculateFee (fee = 0, txType, { gas = 0, params, showWarning = 
 /**
  * Validate transaction params
  * @function
- * @alias module:@aeternity/aepp-sdk/es/tx/builder/index
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param {Object} params Object with tx params
  * @param {Array} schema Transaction schema
  * @param {Array} excludeKeys  Array of keys to exclude for validation
@@ -188,7 +188,7 @@ export function validateParams (params, schema, { excludeKeys = [] }) {
 /**
  * Build binary transaction
  * @function
- * @alias module:@aeternity/aepp-sdk/es/tx/builder/index
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param {Object} params Object with tx params
  * @param {Array} schema Transaction schema
  * @param {Object} [options={}] options
@@ -218,7 +218,7 @@ export function buildRawTx (params, schema, { excludeKeys = [] } = {}) {
 /**
  * Unpack binary transaction
  * @function
- * @alias module:@aeternity/aepp-sdk/es/tx/builder/index
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param {Array} binary Array with binary transaction field's
  * @param {Array} schema Transaction schema
  * @return {Object} Object with transaction field's
@@ -238,7 +238,7 @@ export function unpackRawTx (binary, schema) {
 /**
  * Build transaction hash
  * @function
- * @alias module:@aeternity/aepp-sdk/es/tx/builder/index
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param {Object} params Object with tx params
  * @param {String} type Transaction type
  * @param {Object} [options={}] options
@@ -259,7 +259,7 @@ export function buildTx (params, type, { excludeKeys = [] } = {}) {
 /**
  * Unpack transaction hash
  * @function
- * @alias module:@aeternity/aepp-sdk/es/tx/builder/index
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param {String|Array} encodedTx String or RLP encoded transaction array (if fromRlpBinary flag is true)
  * @param {Boolean} fromRlpBinary Unpack from RLP encoded transaction (default: false)
  * @return {Object} { tx, rlpEncoded, binary } Object with tx -> Object with transaction param's, rlp encoded transaction and binary transaction

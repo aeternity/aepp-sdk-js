@@ -17,6 +17,12 @@
 import {BigNumber} from 'bignumber.js'
 
 /**
+ * Bytes module
+ * @module @aeternity/aepp-sdk/es/utils/bytes
+ * @example import * as Crypto from '@aeternity/aepp-sdk/es/utils/bytes'
+ */
+
+/**
  * Left pad the input data with 0 bytes
  * @param length to pad to
  * @param inputBuffer data to pad
@@ -55,12 +61,11 @@ export function rightPad (length, inputBuffer) {
  * @param x bignumber instance
  * @return Buffer
  */
-function bigNumberToByteArray (x) {
+export function bigNumberToByteArray (x) {
   let hexString = x.toString(16)
   if (hexString.length % 2 > 0) hexString = '0' + hexString
   return Buffer.from(hexString, 'hex')
 }
-
 export function toBytes (val, big = false) {
   // """
   // Encode a value to bytes.

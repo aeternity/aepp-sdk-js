@@ -27,13 +27,11 @@ import Account from '../account'
 import ContractBase from '../contract'
 import Contract from './contract'
 import Accounts from '../accounts'
-import Chain from '../chain/epoch'
+import Chain from '../chain/node'
 import Rpc from '../rpc/server'
 import Selector from '../account/selector'
 import * as R from 'ramda'
 import Tx from '../tx/tx'
-import EpochContract from '../contract/epoch'
-import EpochOracle from '../oracle/epoch'
 
 const contains = R.flip(R.contains)
 const isTxMethod = contains(Tx.compose.deepConfiguration.Ae.methods)
@@ -114,7 +112,7 @@ async function rpcAddress ({ params, session }) {
  * @alias module:@aeternity/aepp-sdk/es/ae/wallet
  * @rtype Stamp
  * @param {Object} [options={}] - Initializer object
- * @param {String} options.url - Epoch instance to connect to
+ * @param {String} options.url - Node instance to connect to
  * @param {Account[]} [options.accounts] - Accounts to initialize with
  * @param {String} [options.account] - Public key of account to preselect
  * @param {Function} [options.onTx] - Tx method protector function
@@ -132,7 +130,7 @@ async function rpcAddress ({ params, session }) {
   onContract: confirm
 })
  */
-const Wallet = Ae.compose(Accounts, Chain, Tx, EpochContract, Contract, EpochOracle, Rpc, Selector, {
+const Wallet = Ae.compose(Accounts, Chain, Tx, Contract, Rpc, Selector, {
   init ({ onTx = this.onTx, onChain = this.onChain, onAccount = this.onAccount, onContract = this.onContract }, { stamp }) {
     this.onTx = onTx
     this.onChain = onChain

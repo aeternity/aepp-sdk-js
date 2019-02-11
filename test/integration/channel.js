@@ -99,7 +99,7 @@ describe.skip('Channel', function () {
     result.state.should.be.a('string')
   })
 
-  // TODO: looks like soft-reject is broken in epoch v0.24.0
+  // TODO: looks like soft-reject is broken in node v0.24.0
   it.skip('can post update and reject', async () => {
     responderShouldRejectUpdate = true
     const result = await initiatorCh.update(

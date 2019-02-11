@@ -6,7 +6,7 @@
  */
 /* eslint-disable no-unused-vars */
 // # RLP version number
-// # https://github.com/aeternity/protocol/blob/epoch-v0.10.1/serializations.md#binary-serialization
+// # https://github.com/aeternity/protocol/blob/master/serializations.md#binary-serialization
 
 import BigNumber from 'bignumber.js'
 
@@ -45,6 +45,7 @@ const TX_SCHEMA_FIELD = (schema, objectId) => [schema, objectId]
  * @constant
  * @description Object with transaction types
  * @type {Object} TX_TYPE
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder/schema
  * @property {String} signed
  * @property {String} spend
  * @property {String} nameClaim
@@ -112,7 +113,7 @@ export const GAS_PER_BYTE = 20
 export const FEE_BYTE_SIZE = 8
 export const DEFAULT_FEE = 20000
 
-// MAP WITH FEE CALCULATION https://github.com/aeternity/protocol/blob/epoch-v1.0.0-rc6/consensus/consensus.md#gas
+// MAP WITH FEE CALCULATION https://github.com/aeternity/protocol/blob/master/consensus/consensus.md#gas
 export const TX_FEE_FORMULA = {
   [TX_TYPE.spend]: () => BASE_GAS,
   [TX_TYPE.contractCreate]: (gas) => BigNumber(5 * BASE_GAS).plus(gas),

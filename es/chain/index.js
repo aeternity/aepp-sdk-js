@@ -22,7 +22,8 @@
  * @example import Chain from '@aeternity/aepp-sdk/es/chain'
  */
 
-import stampit from '@stamp/it'
+import Oracle from '../oracle'
+import Contract from '../contract'
 import { required } from '@stamp/required'
 
 /**
@@ -36,7 +37,7 @@ import { required } from '@stamp/required'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Chain instance
  */
-const Chain = stampit({
+const Chain = Contract.compose(Oracle, {
   deepProps: { Chain: { defaults: { waitMined: true } } },
   statics: { waitMined (bool) { return this.deepProps({ Chain: { defaults: { waitMined: bool } } }) } },
   deepConf: {
@@ -80,6 +81,7 @@ const Chain = stampit({
  * @rtype (tx: String, options?: Object) => tx: Promise[Object]|txHash: Promise[String]
  * @param {String} tx - Transaction to submit
  * @param {String} [options={}] - Options to pass to the implementation
+ * @param {String} [options.verify = false] - Verify transaction before broadcast.
  * @return {Object|String} Transaction or transaction hash
  */
 
@@ -129,7 +131,7 @@ const Chain = stampit({
  * @param {String} address - The public account address to obtain the balance for
  * @param {Object} [options={}] - Options
  * @param {Number} options.height - The chain height at which to obtain the balance for (default: top of chain)
- * @param {String} options.hash - TODO
+ * @param {String} options.hash - The block hash on which to obtain the balance for (default: top of chain)
  * @return {Object} The transaction as it was mined
  */
 

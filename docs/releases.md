@@ -30,13 +30,13 @@ is modelled after that strategy accordingly, with a few additions.
 
 Branch out from `develop` to a dedicated release branch denoting the target
 version number, e.g. `release/0.20.0-0.1.0` for a hypothetical first release
-targeting Epoch 0.20.0.
+targeting Node 0.20.0.
 
 [git-flow strategy]: https://danielkummer.github.io/git-flow-cheatsheet/
 
 ## Preparing the Pre-Release (Edgenet)
 
-If Testnet is not yet targeting the latest Epoch version (but Edgenet is) you can do a pre-release for the latest `beta` or `alpha` or `next` version, tagging the release as `@next` on npmjs.
+If Testnet is not yet targeting the latest Node version (but Edgenet is) you can do a pre-release for the latest `beta` or `alpha` or `next` version, tagging the release as `@next` on npmjs.
 
 To do this, You can follow the steps listed below, while keeping the `alpha` or `beta` or `next` portion in both `CHANGELOG.md` and `package.json` files.
 
