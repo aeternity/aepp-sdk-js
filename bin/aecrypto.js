@@ -24,7 +24,7 @@
 
 // We'll only load the `Crypto` module from the SDK to work with keys and
 // transactions.
-const { Crypto } = require('@aeternity/aepp-sdk')
+const { Crypto, TxBuilder } = require('@aeternity/aepp-sdk')
 const program = require('commander')
 const fs = require('fs')
 const prompt = require('prompt')
@@ -124,7 +124,7 @@ function signTx (tx, privKey) {
 //
 // This helper function deserialized the transaction `tx` and prints the result.
 function unpackTx (tx) {
-  const deserializedTx = Crypto.deserialize(Crypto.decodeTx(tx))
+  const deserializedTx = TxBuilder.unpackTx(tx)
   console.log(JSON.stringify(deserializedTx, undefined, 2))
 }
 
