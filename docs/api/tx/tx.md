@@ -13,7 +13,7 @@ import Transaction from '@aeternity/aepp-sdk/es/tx/tx'
 ### Transaction([options]) ⇒ `Object` ⏏
 Transaction Stamp
 
-This is implementation of [Tx](../tx.md) relays
+This is implementation of [Tx](api/tx.md) relays
 the creation of transactions to [module:@aeternity/aepp-sdk/es/Node](module:@aeternity/aepp-sdk/es/Node).
 This stamp provide ability to create native transaction's,
 or transaction's using Node API.
