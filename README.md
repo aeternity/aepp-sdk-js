@@ -53,7 +53,6 @@ yarn add @aeternity/aepp-sdk@next
 
 ```js
 import Ae from '@aeternity/aepp-sdk/es/ae/universal' // or any other flavor
-import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
 ```
 
 3. Create an instance and interact with it
@@ -65,9 +64,7 @@ import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
 Ae({
   url: 'https://sdk-testnet.aepps.com',
   internalUrl: 'https://sdk-testnet.aepps.com',
-  accounts: [
-    MemoryAccount({ keypair: { secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS' }})
-  ],
+  keypair: { secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS' },
   networkId: 'aet_ua' // or any other networkId your client should connect to
 }).then(ae => {
 
