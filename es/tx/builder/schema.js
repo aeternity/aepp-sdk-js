@@ -45,6 +45,7 @@ const TX_SCHEMA_FIELD = (schema, objectId) => [schema, objectId]
  * @constant
  * @description Object with transaction types
  * @type {Object} TX_TYPE
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder/schema
  * @property {String} signed
  * @property {String} spend
  * @property {String} nameClaim
