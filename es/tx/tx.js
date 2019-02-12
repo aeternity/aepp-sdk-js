@@ -33,6 +33,10 @@ import { buildContractId, oracleQueryId } from './builder/helpers'
 
 const ORACLE_VM_VERSION = 0
 const CONTRACT_VM_VERSION = 1
+// TODO This values using as default for minerva node
+const CONTRACT_MINERVA_VM_ABI = 196609
+const CONTRACT_MINERVA_VM = 3
+const CONTRACT_MINERVA_ABI = 1
 
 async function spendTx ({ senderId, recipientId, amount, payload = '' }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
@@ -121,31 +125,42 @@ async function nameRevokeTx ({ accountId, nameId }) {
   return tx
 }
 
-async function contractCreateTx ({ ownerId, code, vmVersion = CONTRACT_VM_VERSION, deposit, amount, gas, gasPrice, callData }) {
+// TODO remove that and refactor builder after minerva hard fork
+// Get VM_ABI version for minerva
+function getContractVmVersion () {
+  return this.version.split('-')[0] === '2.0.0'
+    ? { splitedVmAbi: CONTRACT_MINERVA_VM_ABI, contractVmVersion: CONTRACT_MINERVA_VM }
+    : { splitedVmAbi: CONTRACT_VM_VERSION, contractVmVersion: CONTRACT_VM_VERSION }
+}
+async function contractCreateTx ({ ownerId, code, vmVersion, abiVersion, deposit, amount, gas, gasPrice, callData }) {
+  // TODO remove that and refactor builder after minerva hard fork
+  // Get VM_ABI version for minerva
+  const { splitedVmAbi, contractVmVersion } = getContractVmVersion.bind(this)()
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.contractCreate, { vmVersion: CONTRACT_VM_VERSION, senderId: ownerId, ...R.head(arguments) })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.contractCreate, { vmVersion: splitedVmAbi, senderId: ownerId, ...R.head(arguments) })
 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   return this.nativeMode
     ? {
-      ...buildTx(R.merge(R.head(arguments), { nonce, ttl, fee }), TX_TYPE.contractCreate),
+      ...buildTx(R.merge(R.head(arguments), { nonce, ttl, fee, vmVersion: splitedVmAbi }), TX_TYPE.contractCreate),
       contractId: buildContractId(ownerId, nonce)
     }
-    : this.api.postContractCreate(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee), gas: parseInt(gas) }))
+    : this.api.postContractCreate(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee), gas: parseInt(gas), vmVersion: contractVmVersion, abiVersion: CONTRACT_MINERVA_ABI }))
 }
 
-async function contractCallTx ({ callerId, contractId, vmVersion, amount, gas, gasPrice, callData }) {
+async function contractCallTx ({ callerId, contractId, vmVersion = CONTRACT_VM_VERSION, amount, gas, gasPrice, callData }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.contractCall, { senderId: callerId, ...R.head(arguments) })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.contractCall, { vmVersion, senderId: callerId, ...R.head(arguments) })
 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
-    ? buildTx(R.merge(R.head(arguments), { nonce, ttl, fee }), TX_TYPE.contractCall)
+    ? buildTx(R.merge(R.head(arguments), { nonce, ttl, fee, vmVersion }), TX_TYPE.contractCall)
     : await this.api.postContractCall(R.merge(R.head(arguments), {
       nonce,
       ttl,
       fee: parseInt(fee),
-      gas: parseInt(gas)
+      gas: parseInt(gas),
+      vmVersion
     }))
 
   return tx
@@ -153,7 +168,7 @@ async function contractCallTx ({ callerId, contractId, vmVersion, amount, gas, g
 
 async function oracleRegisterTx ({ accountId, queryFormat, responseFormat, queryFee, oracleTtl, vmVersion = ORACLE_VM_VERSION }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.oracleRegister, { vmVersion: ORACLE_VM_VERSION, senderId: accountId, ...R.head(arguments) })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.oracleRegister, { vmVersion, senderId: accountId, ...R.head(arguments) })
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? buildTx({

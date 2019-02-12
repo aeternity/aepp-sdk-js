@@ -90,7 +90,7 @@ const Node = stampit({
 }, Swagger, {
   async init ({ forceCompatibility = false }) {
     const { nodeRevision: revision, genesisKeyBlockHash: genesisHash, networkId } = await this.api.getStatus()
-    if (!semver.satisfies(this.version, COMPATIBILITY_RANGE) && !forceCompatibility) throw new Error(`Unsupported node version ${this.version}. Supported: ${COMPATIBILITY_RANGE}`)
+    if (!semver.satisfies(this.version.split('-')[0], COMPATIBILITY_RANGE) && !forceCompatibility) throw new Error(`Unsupported node version ${this.version}. Supported: ${COMPATIBILITY_RANGE}`)
 
     this.nodeNetworkId = networkId
     return Object.assign(this, { revision, genesisHash })
@@ -98,6 +98,6 @@ const Node = stampit({
 })
 
 // String of compatibility range (see https://www.npmjs.com/package/semver#ranges)
-export const COMPATIBILITY_RANGE = '>= 1.0.0 < 2.0.0'
+export const COMPATIBILITY_RANGE = '>= 1.1.0 < 2.1.0'
 
 export default Node

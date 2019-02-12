@@ -48,7 +48,6 @@ contract Identity =
   function main(x : int) = x
 `
 let contractId
-const vmVersion = 1
 const deposit = 4
 const gasPrice = 1
 const gas = 1600000 - 21000 // MAX GAS
@@ -66,8 +65,8 @@ describe('Native Transaction', function () {
 
   before(async () => {
     const keyPair = generateKeyPair()
-    client = await ready(this)
-    clientNative = await ready(this, true)
+    client = await ready(this, false)
+    clientNative = await ready(this)
     await client.spend(100000000, keyPair.publicKey)
     client.setKeypair(keyPair)
     clientNative.setKeypair(keyPair)
@@ -127,8 +126,8 @@ describe('Native Transaction', function () {
     const callData = await client.contractEncodeCall(bytecode, 'sophia', 'init', '()')
     const owner = await client.address()
 
-    const txFromAPI = await client.contractCreateTx({ ownerId: owner, code: bytecode, vmVersion, deposit, amount, gas, gasPrice, callData })
-    const nativeTx = await clientNative.contractCreateTx({ ownerId: owner, code: bytecode, vmVersion, deposit, amount, gas, gasPrice, callData })
+    const txFromAPI = await client.contractCreateTx({ ownerId: owner, code: bytecode, deposit, amount, gas, gasPrice, callData })
+    const nativeTx = await clientNative.contractCreateTx({ ownerId: owner, code: bytecode, deposit, amount, gas, gasPrice, callData })
 
     txFromAPI.tx.should.be.equal(nativeTx.tx)
     txFromAPI.contractId.should.be.equal(nativeTx.contractId)
@@ -142,9 +141,8 @@ describe('Native Transaction', function () {
     const callData = await client.contractEncodeCall(bytecode, 'sophia', 'main', '(2)')
     const owner = await client.address()
 
-    const txFromAPI = await client.contractCallTx({ callerId: owner, contractId, vmVersion, amount, gas, gasPrice, callData })
-    const nativeTx = await clientNative.contractCallTx({ callerId: owner, contractId, vmVersion, amount, gas, gasPrice, callData })
-
+    const txFromAPI = await client.contractCallTx({ callerId: owner, contractId, amount, gas, gasPrice, callData })
+    const nativeTx = await clientNative.contractCallTx({ callerId: owner, contractId, amount, gas, gasPrice, callData })
     txFromAPI.should.be.equal(nativeTx)
 
     const { hash } = await client.send(nativeTx)
