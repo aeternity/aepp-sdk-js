@@ -18,6 +18,7 @@
 import * as Crypto from './utils/crypto'
 import * as TxBuilder from './tx/builder'
 import * as TxBuilderHelper from './tx/builder/helpers'
+import HdWallet from './utils/hd-wallet'
 
 import Ae from './ae'
 import Chain from './chain'
@@ -39,25 +40,26 @@ import Channel from './channel'
 import Universal from './ae/universal'
 
 export {
+  Account,
   Ae,
+  Aens,
   Aepp,
+  Contract,
+  ContractNodeAPI,
+  ChainNode,
+  Channel,
   Crypto,
   Chain,
-  ChainNode,
-  ContractNodeAPI,
-  OracleNodeAPI,
-  Tx,
-  Transaction,
-  Account,
+  HdWallet,
   MemoryAccount,
-  Aens,
-  Contract,
-  Wallet,
-  Selector,
-  Universal,
   Oracle,
-  Channel,
+  OracleNodeAPI,
+  Selector,
+  Transaction,
   TransactionValidator,
+  Tx,
   TxBuilder,
-  TxBuilderHelper
+  TxBuilderHelper,
+  Universal,
+  Wallet,
 }
