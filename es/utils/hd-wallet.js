@@ -9,7 +9,7 @@ const HARDENED_OFFSET = 0x80000000
 
 const toHex = (buffer) => Buffer.from(buffer).toString('hex')
 
-function derivePathFromKey (path, key) {
+export function derivePathFromKey (path, key) {
   const segments = path === '' ? [] : fromString(path).toPathArray()
   segments.forEach((segment, i) => {
     if (segment < HARDENED_OFFSET) {
@@ -20,7 +20,7 @@ function derivePathFromKey (path, key) {
   return segments.reduce((parentKey, segment) => deriveChild(parentKey, segment), key)
 }
 
-function derivePathFromSeed (path, seed) {
+export function derivePathFromSeed (path, seed) {
   if (!['m', 'm/'].includes(path.slice(0, 2))) {
     throw new Error('Invalid path')
   }
@@ -36,7 +36,7 @@ function formatAccount (keys) {
   }
 }
 
-function getKeyPair (secretKey) {
+export function getKeyPair (secretKey) {
   return nacl.sign.keyPair.fromSeed(secretKey)
 }
 
