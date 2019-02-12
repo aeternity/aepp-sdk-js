@@ -61,5 +61,5 @@ export {
   TxBuilder,
   TxBuilderHelper,
   Universal,
-  Wallet,
+  Wallet
 }
