@@ -3,6 +3,43 @@ All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 
+## [2.0.0]
+### Added
+- Add `unpackedTx`, `txType` and `signature` to `validate` transaction function
+- Add `top` param to contract `static call(dry-run)`
+- Add errors handling for `dry-run`
+- Add `keystore` docs
+- Add `verify` options to `send` function which verify tx before broadcasting and throw error if tx is invalid
+- Add `dryRun` to `RPC` methods
+- Add `Oracle` transaction creation to `Aepp` rpc
+- Add `tx builder` docs
+- Add doc's for `utils/bytes` and tx builder `schema`
+
+### Changed
+- refactor `calculateFee` function in `TxBuilder`(use BigNumber)
+- `RpcServer`: Avoid storing of `window` in `instance` properties
+- Disable `balance formatting` by default
+- Extend response of `Oracle`, `Aens`, `Contrat` with `rawTx`
+- Change response of `send` function now it's and object with transaction data(hash, rawTxHash, ...)
+- Move `verification of transaction` to `chain` stamp
+- Move `Contract` and `Oracle` API wrapper's to `Chain` stamp
+- Rename `epoch` in `CHANGELOG`, `README`, `HACKING`
+- Retrieve `node` version from `/api`
+- Fix unpack tx example in `bin/aecrypto.js`
+
+### Removed
+- Remove unused function's from `crypto.js`
+
+### Breaking Changes
+- Remove old transaction builder `es/tx/js.js` (Please use `es/tx/builder` instead)
+- Rename `es/epoch.js` to `es/node.js`
+- Rename `Oracle`, `Contract`, `Chain` API wrapper files from `epoch` to `node`
+- Rename `Contract` api wrapper method's
+
+### Notes and known Issues
+- none
+
+
 ## [1.3.2]
 ### Added
 - Add `destroyInstance` function to `Ae` stamp which remove all listeners for RPC event's
@@ -391,3 +428,4 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 [1.3.0]: https://github.com/aeternity/aepp-sdk-js/compare/1.2.1...1.3.0
 [1.3.1]: https://github.com/aeternity/aepp-sdk-js/compare/1.3.0...1.3.1
 [1.3.2]: https://github.com/aeternity/aepp-sdk-js/compare/1.3.1...1.3.2
+[1.3.2]: https://github.com/aeternity/aepp-sdk-js/compare/1.3.2...2.0.0
