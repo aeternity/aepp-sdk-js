@@ -20,7 +20,7 @@ import { describe, it } from 'mocha'
 import { generateSaveHDWallet, getSaveHDWalletAccounts } from '../../es/utils/hd-wallet'
 import { encodeBase58Check } from '../../es/utils/crypto'
 
-describe.only('hd wallet', () => {
+describe('hd wallet', () => {
   const testMnemonic = 'eye quarter chapter suit cruel scrub verify stuff volume control learn dust'
   const testPassword = 'test-password'
   const testSaveHDWallet = {
