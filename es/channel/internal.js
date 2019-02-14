@@ -15,11 +15,11 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import {w3cwebsocket as W3CWebSocket} from 'websocket'
-import {EventEmitter} from 'events'
+import { w3cwebsocket as W3CWebSocket } from 'websocket'
+import { EventEmitter } from 'events'
 import * as R from 'ramda'
-import {pascalToSnake} from '../utils/string'
-import {awaitingConnection} from './handlers'
+import { pascalToSnake } from '../utils/string'
+import { awaitingConnection } from './handlers'
 
 const options = new WeakMap()
 const status = new WeakMap()
@@ -74,7 +74,7 @@ function send (channel, message) {
 function enqueueAction (channel, guard, action) {
   actionQueue.set(channel, [
     ...actionQueue.get(channel) || [],
-    {guard, action}
+    { guard, action }
   ])
   dequeueAction(channel)
 }
@@ -122,7 +122,7 @@ async function dequeueMessage (channel) {
 }
 
 function sendMessage (channel, info, to) {
-  send(channel, {action: 'message', payload: {info, to}})
+  send(channel, { action: 'message', payload: { info, to } })
 }
 
 function WebSocket (url, callbacks) {
@@ -163,12 +163,12 @@ async function initialize (channel, channelOptions) {
   ], channelOptions)
 
   options.set(channel, channelOptions)
-  fsm.set(channel, {handler: awaitingConnection})
+  fsm.set(channel, { handler: awaitingConnection })
   eventEmitters.set(channel, new EventEmitter())
   websockets.set(channel, await WebSocket(channelURL(channelOptions.url, params), {
     onopen: () => changeStatus(channel, 'connected'),
     onclose: () => changeStatus(channel, 'disconnected'),
-    onmessage: ({data}) => enqueueMessage(channel, data)
+    onmessage: ({ data }) => enqueueMessage(channel, data)
   }))
 }
 
