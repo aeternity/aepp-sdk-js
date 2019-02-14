@@ -41,6 +41,20 @@ const OBJECT_TAG_CONTRACT_CALL_TRANSACTION = 43
 const TX_FIELD = (name, type, prefix) => [name, type, prefix]
 const TX_SCHEMA_FIELD = (schema, objectId) => [schema, objectId]
 
+// # see https://github.com/aeternity/protocol/blob/minerva/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain
+const VM_VERSIONS = {
+  NO_VM: 0,
+  SOPHIA: 1,
+  SOLIDITY: 2,
+  SOPHIA_IMPROVEMENTS: 3
+}
+// # see https://github.com/aeternity/protocol/blob/minerva/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain
+const ABI_VERSIONS = {
+  NO_ABI: 0,
+  SOPHIA: 1,
+  SOLIDITY: 2
+}
+
 /**
  * @constant
  * @description Object with transaction types
@@ -392,7 +406,7 @@ export const BASE_VERIFICATION_SCHEMA = [
     ERRORS.insufficientBalanceForAmountFee
   ),
   VERIFICATION_FIELD(
-    ({balance}) => `The account balance ${balance} is not enough to execute the transaction`,
+    ({ balance }) => `The account balance ${balance} is not enough to execute the transaction`,
     VALIDATORS.insufficientBalanceForAmount,
     ERRORS.insufficientBalanceForAmount
   ),
@@ -402,7 +416,7 @@ export const BASE_VERIFICATION_SCHEMA = [
     ERRORS.nonceUsed
   ),
   VERIFICATION_FIELD(
-    ({accountNonce}) => `The nonce is technically valid but will not be processed immediately by the node (next valid nonce is ${accountNonce + 1})`,
+    ({ accountNonce }) => `The nonce is technically valid but will not be processed immediately by the node (next valid nonce is ${accountNonce + 1})`,
     VALIDATORS.nonceHigh,
     ERRORS.nonceHigh
   )

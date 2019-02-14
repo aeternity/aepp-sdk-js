@@ -78,7 +78,10 @@ async function callStatic (address, abi = 'sophia-address', name, { top, args = 
   }
 
   // Dry-run
-  const [{ result: status, callObj, reason }] = (await this.txDryRun([tx], [{ amount: opt.amount, pubKey: await this.address() }], top)).results
+  const [{ result: status, callObj, reason }] = (await this.txDryRun([tx], [{
+    amount: opt.amount,
+    pubKey: await this.address()
+  }], top)).results
 
   // check response
   if (status !== 'ok') throw new Error('Dry run error, ' + reason)
@@ -130,7 +133,7 @@ async function call (code, abi, address, name, { args = '()', options = {}, call
     callData: await this.contractEncodeCall(code, abi, name, args, call)
   }))
 
-  const {hash, rawTx} = await this.send(tx, opt)
+  const { hash, rawTx } = await this.send(tx, opt)
   const result = await this.getTxInfo(hash)
 
   if (result.returnType === 'ok') {
@@ -169,7 +172,7 @@ async function deploy (code, abi, { initState = '()', options = {} } = {}) {
     ownerId
   }))
 
-  const {hash, rawTx} = await this.send(tx, opt)
+  const { hash, rawTx } = await this.send(tx, opt)
 
   return Object.freeze({
     owner: ownerId,

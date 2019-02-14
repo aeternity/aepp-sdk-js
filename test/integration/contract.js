@@ -23,7 +23,6 @@ contract Identity =
   type state = ()
   function main(x : int) = x
 `
-
 const stateContract = `
 contract StateContract =
   record state = { value: string }
