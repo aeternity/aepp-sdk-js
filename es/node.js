@@ -98,6 +98,6 @@ const Node = stampit({
 })
 
 // String of compatibility range (see https://www.npmjs.com/package/semver#ranges)
-export const COMPATIBILITY_RANGE = '>= 1.1.0 < 3.0.0'
+export const COMPATIBILITY_RANGE = '>= 1.4.0 < 3.0.0'
 
 export default Node

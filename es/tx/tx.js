@@ -23,6 +23,7 @@
  */
 
 import * as R from 'ramda'
+import semver from 'semver'
 
 import Tx from './'
 import Node from '../node'
@@ -128,7 +129,7 @@ async function nameRevokeTx ({ accountId, nameId }) {
 // TODO move this to tx-builder
 // Get VM_ABI version for minerva
 function getContractVmVersion () {
-  return this.version.split('-')[0] === '2.0.0'
+  return semver.satisfies(this.version.split('-')[0], '>= 2.0.0 < 3.0.0') // Minerva
     ? { splitedVmAbi: CONTRACT_MINERVA_VM_ABI, contractVmVersion: CONTRACT_MINERVA_VM }
     : { splitedVmAbi: CONTRACT_VM_VERSION, contractVmVersion: CONTRACT_VM_VERSION }
 }
