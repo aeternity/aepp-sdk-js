@@ -125,7 +125,7 @@ async function nameRevokeTx ({ accountId, nameId }) {
   return tx
 }
 
-// TODO remove that and refactor builder after minerva hard fork
+// TODO move this to tx-builder
 // Get VM_ABI version for minerva
 function getContractVmVersion () {
   return this.version.split('-')[0] === '2.0.0'
@@ -133,7 +133,7 @@ function getContractVmVersion () {
     : { splitedVmAbi: CONTRACT_VM_VERSION, contractVmVersion: CONTRACT_VM_VERSION }
 }
 async function contractCreateTx ({ ownerId, code, vmVersion, abiVersion, deposit, amount, gas, gasPrice, callData }) {
-  // TODO remove that and refactor builder after minerva hard fork
+  // TODO move this to tx-builder
   // Get VM_ABI version for minerva
   const { splitedVmAbi, contractVmVersion } = getContractVmVersion.bind(this)()
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
