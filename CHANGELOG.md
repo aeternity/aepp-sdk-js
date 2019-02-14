@@ -6,6 +6,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 ## [2.1.0]
 ### Added
 - `Minerva` comparability
+- Add `Mnemonic` wallet implementation
 
 ### Changed
 - Change supported node version range to `1.4.0 <= version < 3.0.0`
