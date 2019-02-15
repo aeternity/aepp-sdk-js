@@ -68,7 +68,7 @@ async function getQueryObject (oracleId, queryId) {
   return {
     ...(await this.getOracleQuery(oracleId, queryId)),
     respond: (response, options) => this.respondToQuery(oracleId, queryId, response, options),
-    pollForResponse: ({attempts, interval}) => this.pollForQueryResponse(oracleId, queryId, {attempts, interval}),
+    pollForResponse: ({ attempts, interval }) => this.pollForQueryResponse(oracleId, queryId, { attempts, interval }),
     decode: (data) => decodeBase64Check(data.slice(3))
   }
 }
@@ -250,9 +250,9 @@ const Oracle = Ae.compose({
   deepProps: { Ae: { defaults: {
     oracleVmVersion: 0,
     queryFee: 30000,
-    oracleTtl: {type: 'delta', value: 500},
-    queryTtl: {type: 'delta', value: 10},
-    responseTtl: {type: 'delta', value: 10}
+    oracleTtl: { type: 'delta', value: 500 },
+    queryTtl: { type: 'delta', value: 10 },
+    responseTtl: { type: 'delta', value: 10 }
   } } }
 })
 
