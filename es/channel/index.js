@@ -75,7 +75,7 @@ function state () {
  *   'ak$Gi42jcRm9DcZjk72UWQQBSxi43BG3285C9n4QSvP5JdzDyH2o',
  *   10,
  *   async (tx) => await account.signTransaction(tx)
- * ).then({accepted, state} =>
+ * ).then({ accepted, state } =>
  *   if (accepted) {
  *     console.log('Update has been accepted')
  *   }
@@ -90,7 +90,7 @@ function update (from, to, amount, sign) {
         send(channel, {
           action: 'update',
           tag: 'new',
-          payload: {from, to, amount}
+          payload: { from, to, amount }
         })
         return {
           handler: handlers.awaitingOffChainTx,
@@ -120,7 +120,7 @@ function update (from, to, amount, sign) {
  *   contracts: ['ct_2dCUAWYZdrWfACz3a2faJeKVTVrfDYxCQHCqAt5zM15f3u2UfA']
  * }).then(poi => console.log(poi))
  */
-function poi ({accounts, contracts}) {
+function poi ({ accounts, contracts }) {
   return new Promise((resolve, reject) => {
     enqueueAction(
       this,
@@ -129,11 +129,11 @@ function poi ({accounts, contracts}) {
         send(channel, {
           action: 'get',
           tag: 'poi',
-          payload: {accounts, contracts}
+          payload: { accounts, contracts }
         })
         return {
           handler: handlers.awaitingProofOfInclusion,
-          state: {resolve, reject}
+          state: { resolve, reject }
         }
       }
     )
@@ -162,11 +162,11 @@ function balances (accounts) {
         send(channel, {
           action: 'get',
           tag: 'balances',
-          payload: {accounts}
+          payload: { accounts }
         })
         return {
           handler: handlers.awaitingBalances,
-          state: {resolve, reject}
+          state: { resolve, reject }
         }
       }
     )
@@ -188,10 +188,10 @@ function leave () {
       this,
       (channel, state) => state.handler === handlers.channelOpen,
       (channel, state) => {
-        send(channel, {action: 'leave'})
+        send(channel, { action: 'leave' })
         return {
           handler: handlers.awaitingLeave,
-          state: {resolve}
+          state: { resolve }
         }
       })
   })
@@ -212,7 +212,7 @@ function shutdown (sign) {
       this,
       (channel, state) => true,
       (channel, state) => {
-        send(channel, {action: 'shutdown'})
+        send(channel, { action: 'shutdown' })
         return {
           handler: handlers.awaitingShutdownTx,
           state: {
