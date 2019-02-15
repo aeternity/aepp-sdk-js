@@ -15,9 +15,9 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import {describe, it, before} from 'mocha'
-import {configure, ready, plan, BaseAe} from './'
-import {generateKeyPair} from '../../es/utils/crypto'
+import { describe, it, before } from 'mocha'
+import { configure, ready, plan, BaseAe, networkId } from './'
+import { generateKeyPair } from '../../es/utils/crypto'
 import Channel from '../../es/channel'
 
 plan(1000000)
@@ -57,7 +57,7 @@ describe('Channel', function () {
 
   before(async function () {
     initiator = await ready(this)
-    responder = await BaseAe()
+    responder = await BaseAe({ nativeMode: true, networkId })
     responder.setKeypair(generateKeyPair())
     sharedParams.initiatorId = await initiator.address()
     sharedParams.responderId = await responder.address()
@@ -99,8 +99,7 @@ describe('Channel', function () {
     result.state.should.be.a('string')
   })
 
-  // TODO: looks like soft-reject is broken in node v0.24.0
-  it.skip('can post update and reject', async () => {
+  it('can post update and reject', async () => {
     responderShouldRejectUpdate = true
     const result = await initiatorCh.update(
       await responder.address(),
@@ -114,7 +113,7 @@ describe('Channel', function () {
   it('can get proof of inclusion', async () => {
     const initiatorAddr = await initiator.address()
     const responderAddr = await responder.address()
-    const params = {addresses: [initiatorAddr, responderAddr]}
+    const params = { accounts: [initiatorAddr, responderAddr] }
     const initiatorPoi = await initiatorCh.poi(params)
     const responderPoi = await responderCh.poi(params)
     initiatorPoi.should.be.a('string')

@@ -31,7 +31,7 @@ import {
   initialize,
   enqueueAction,
   send,
-  sendMessage as channelSendMessage
+  messageId
 } from './internal'
 
 /**
@@ -88,9 +88,9 @@ function update (from, to, amount, sign) {
       (channel, state) => state.handler === handlers.channelOpen,
       (channel, state) => {
         send(channel, {
-          action: 'update',
-          tag: 'new',
-          payload: { from, to, amount }
+          jsonrpc: '2.0',
+          method: 'channels.update.new',
+          params: { from, to, amount }
         })
         return {
           handler: handlers.awaitingOffChainTx,
@@ -126,14 +126,16 @@ function poi ({ accounts, contracts }) {
       this,
       (channel, state) => state.handler === handlers.channelOpen,
       (channel, state) => {
+        const id = messageId(channel)
         send(channel, {
-          action: 'get',
-          tag: 'poi',
-          payload: { accounts, contracts }
+          jsonrpc: '2.0',
+          id,
+          method: 'channels.get.poi',
+          params: { accounts, contracts }
         })
         return {
           handler: handlers.awaitingProofOfInclusion,
-          state: { resolve, reject }
+          state: { resolve, reject, messageId: id }
         }
       }
     )
@@ -159,14 +161,16 @@ function balances (accounts) {
       this,
       (channel, state) => state.handler === handlers.channelOpen,
       (channel, state) => {
+        const id = messageId(channel)
         send(channel, {
-          action: 'get',
-          tag: 'balances',
-          payload: { accounts }
+          jsonrpc: '2.0',
+          id,
+          method: 'channels.get.balances',
+          params: { accounts }
         })
         return {
           handler: handlers.awaitingBalances,
-          state: { resolve, reject }
+          state: { resolve, reject, messageId: id }
         }
       }
     )
@@ -188,7 +192,7 @@ function leave () {
       this,
       (channel, state) => state.handler === handlers.channelOpen,
       (channel, state) => {
-        send(channel, { action: 'leave' })
+        send(channel, { jsonrpc: '2.0', method: 'channels.leave', params: {} })
         return {
           handler: handlers.awaitingLeave,
           state: { resolve }
@@ -212,7 +216,7 @@ function shutdown (sign) {
       this,
       (channel, state) => true,
       (channel, state) => {
-        send(channel, { action: 'shutdown' })
+        send(channel, { jsonrpc: '2.0', method: 'channels.shutdown', params: {} })
         return {
           handler: handlers.awaitingShutdownTx,
           state: {
@@ -249,7 +253,7 @@ function sendMessage (message, recipient) {
     this,
     (channel, state) => state.handler === handlers.channelOpen,
     (channel, state) => {
-      channelSendMessage(channel, info, recipient)
+      send(channel, { jsonrpc: '2.0', method: 'channels.message', params: { info, to: recipient } })
       return state
     }
   )

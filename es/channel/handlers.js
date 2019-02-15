@@ -26,41 +26,45 @@ import {
 import * as R from 'ramda'
 
 export function awaitingConnection (channel, message, state) {
-  if (message.action === 'info') {
-    if (['channel_accept', 'funding_created'].includes(message.payload.event)) {
+  if (message.method === 'channels.info') {
+    if (['channel_accept', 'funding_created'].includes(message.params.data.event)) {
       changeStatus(channel, {
         channel_accept: 'accepted',
         funding_created: 'halfSigned'
-      }[message.payload.event])
+      }[message.params.data.event])
       return { handler: awaitingChannelCreateTx }
     }
-    if (message.payload.event === 'channel_reestablished') {
+    if (message.params.data.event === 'channel_reestablished') {
       return { handler: awaitingOpenConfirmation }
     }
     return { handler: awaitingConnection }
   }
-  if (message.action === 'error') {
+  if (message.method === 'channels.error') {
     emit(channel, 'error', new Error(message.payload.message))
     return { handler: channelClosed }
   }
 }
 
 export async function awaitingChannelCreateTx (channel, message, state) {
-  if (message.action === 'sign') {
-    const signedTx = await options.get(channel).sign(message.tag, message.payload.tx)
-    send(channel, { action: message.tag, payload: { tx: signedTx } })
+  const tag = {
+    initiator: 'initiator_sign',
+    responder: 'responder_sign'
+  }[options.get(channel).role]
+  if (message.method === `channels.sign.${tag}`) {
+    const signedTx = await options.get(channel).sign(message.tag, message.params.data.tx)
+    send(channel, { jsonrpc: '2.0', method: `channels.${tag}`, params: { tx: signedTx } })
     return { handler: awaitingOnChainTx }
   }
 }
 
 export function awaitingOnChainTx (channel, message, state) {
-  if (message.action === 'on_chain_tx') {
-    emit(channel, 'onChainTx', message.payload.tx)
+  if (message.method === 'channels.on_chain_tx') {
+    emit(channel, 'onChainTx', message.params.data.tx)
     return { handler: awaitingBlockInclusion }
   }
   if (
-    message.action === 'info' &&
-    message.payload.event === 'funding_signed' &&
+    message.method === 'channels.info' &&
+    message.params.data.event === 'funding_signed' &&
     options.get(channel).role === 'initiator'
   ) {
     changeStatus(channel, 'signed')
@@ -69,11 +73,11 @@ export function awaitingOnChainTx (channel, message, state) {
 }
 
 export function awaitingBlockInclusion (channel, message, state) {
-  if (message.action === 'info') {
+  if (message.method === 'channels.info') {
     const handler = {
       own_funding_locked: awaitingBlockInclusion,
       funding_locked: awaitingOpenConfirmation
-    }[message.payload.event]
+    }[message.params.data.event]
     if (handler) {
       return { handler }
     }
@@ -81,47 +85,47 @@ export function awaitingBlockInclusion (channel, message, state) {
 }
 
 export function awaitingOpenConfirmation (channel, message, state) {
-  if (message.action === 'info' && message.payload.event === 'open') {
+  if (message.method === 'channels.info' && message.params.data.event === 'open') {
     return { handler: awaitingInitialState }
   }
 }
 
 export function awaitingInitialState (channel, message, state) {
-  if (message.action === 'update') {
-    changeState(channel, message.payload.state)
+  if (message.method === 'channels.update') {
+    changeState(channel, message.params.data.state)
     return { handler: channelOpen }
   }
 }
 
 export async function channelOpen (channel, message, state) {
-  if (message.action === 'info') {
-    if (message.payload.event === 'died') {
+  if (message.method === 'channels.info') {
+    if (message.params.data.event === 'died') {
       changeStatus(channel, 'died')
     }
     const handler = {
       update: awaitingUpdateTxSignRequest,
       close_mutual: channelOpen,
       died: channelClosed
-    }[message.payload.event]
+    }[message.params.data.event]
     if (handler) {
       return { handler }
     }
   }
-  if (message.action === 'sign' && message.tag === 'shutdown_sign_ack') {
-    const signedTx = await Promise.resolve(options.get(channel).sign(message.tag, message.payload.tx))
-    send(channel, { action: message.tag, payload: { tx: signedTx } })
+  if (message.method === 'channels.sign.shutdown_sign_ack') {
+    const signedTx = await Promise.resolve(options.get(channel).sign(message.tag, message.params.data.tx))
+    send(channel, { jsonrpc: '2.0', method: 'channels.shutdown_sign_ack', params: { tx: signedTx } })
     return { handler: channelOpen }
   }
-  if (message.action === 'on_chain_tx') {
-    emit(channel, 'onChainTx', message.payload.tx)
+  if (message.method === 'channels.on_chain_tx') {
+    emit(channel, 'onChainTx', message.params.data.tx)
     return { handler: channelOpen }
   }
-  if (message.action === 'leave') {
+  if (message.method === 'channels.leave') {
     // TODO: emit event
     return { handler: channelOpen }
   }
-  if (message.action === 'message') {
-    emit(channel, 'message', message.payload.message)
+  if (message.method === 'channels.message') {
+    emit(channel, 'message', message.params.data.message)
     return { handler: channelOpen }
   }
 }
@@ -130,44 +134,44 @@ channelOpen.enter = (channel) => {
 }
 
 export async function awaitingOffChainTx (channel, message, state) {
-  if (message.action === 'sign' && message.tag === 'update') {
+  if (message.method === 'channels.sign.update') {
     const { sign } = state
-    const signedTx = await sign(message.payload.tx)
-    send(channel, { action: message.tag, payload: { tx: signedTx } })
+    const signedTx = await sign(message.params.data.tx)
+    send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { tx: signedTx } })
     return { handler: awaitingOffChainUpdate, state }
   }
-  if (message.action === 'error') {
-    state.reject(new Error(JSON.stringify(message.payload)))
+  if (message.method === 'channels.error') {
+    state.reject(new Error(message.data.message))
     return { handler: channelOpen }
   }
 }
 
 export function awaitingOffChainUpdate (channel, message, state) {
-  if (message.action === 'update') {
-    changeState(channel, message.payload.state)
-    state.resolve({ accepted: true, state: message.payload.state })
+  if (message.method === 'channels.update') {
+    changeState(channel, message.params.data.state)
+    state.resolve({ accepted: true, state: message.params.data.state })
     return { handler: channelOpen }
   }
-  if (message.action === 'conflict') {
+  if (message.method === 'channels.conflict') {
     state.resolve({ accepted: false })
     return { handler: channelOpen }
   }
 }
 
 export async function awaitingUpdateTxSignRequest (channel, message, state) {
-  if (message.action === 'sign' && message.tag === 'update_ack') {
-    const signedTx = await options.get(channel).sign(message.tag, message.payload.tx)
+  if (message.method === 'channels.sign.update_ack') {
+    const signedTx = await options.get(channel).sign(message.tag, message.params.data.tx)
     if (signedTx) {
-      send(channel, { action: message.tag, payload: { tx: signedTx } })
+      send(channel, { jsonrpc: '2.0', method: 'channels.update_ack', params: { tx: signedTx } })
       return { handler: awaitingUpdateTx }
     }
     // soft-reject via competing update
     send(channel, {
-      action: 'update',
-      tag: 'new',
-      payload: {
-        from: generateKeyPair().pub,
-        to: generateKeyPair().pub,
+      jsonrpc: '2.0',
+      method: 'channels.update.new',
+      params: {
+        from: generateKeyPair().publicKey,
+        to: generateKeyPair().publicKey,
         amount: 1
       }
     })
@@ -176,63 +180,70 @@ export async function awaitingUpdateTxSignRequest (channel, message, state) {
 }
 
 export function awaitingUpdateTx (channel, message, state) {
-  if (message.action === 'update') {
+  if (message.method === 'channels.update') {
+    // TODO: change state to `message.params.data.state`
     return { handler: channelOpen }
   }
 }
 
 export function awaitingUpdateConflict (channel, message, state) {
-  if (message.action === 'error' && message.payload.reason === 'conflict') {
+  if (message.error) {
     return { handler: awaitingUpdateConflict }
   }
-  if (message.action === 'conflict') {
+  if (message.method === 'channels.conflict') {
     return { handler: channelOpen }
   }
 }
 
 export function awaitingProofOfInclusion (channel, message, state) {
-  if (message.action === 'get' && message.tag === 'poi') {
-    state.resolve(message.payload.poi)
+  if (message.id === state.messageId) {
+    state.resolve(message.result.poi)
     return { handler: channelOpen }
   }
-  if (message.action === 'error') {
-    state.reject(new Error(message.payload.reason))
+  if (message.method === 'channels.error') {
+    state.reject(new Error(message.data.message))
     return { handler: channelOpen }
   }
 }
 
 export function awaitingBalances (channel, message, state) {
-  if (message.action === 'get' && message.tag === 'balances') {
+  if (message.id === state.messageId) {
     state.resolve(R.reduce((acc, item) => ({
       ...acc,
       [item.account]: item.balance
-    }), {}, message.payload))
+    }), {}, message.result))
     return { handler: channelOpen }
   }
-  if (message.action === 'error') {
-    state.reject(new Error(message.payload.reason))
+  if (message.method === 'channels.error') {
+    state.reject(new Error(message.data.message))
     return { handler: channelOpen }
   }
 }
 
 export async function awaitingShutdownTx (channel, message, state) {
-  if (message.action === 'sign' && message.tag === 'shutdown_sign') {
-    const signedTx = await Promise.resolve(state.sign(message.payload.tx))
-    send(channel, { action: message.tag, payload: { tx: signedTx } })
+  if (message.method === 'channels.sign.shutdown_sign') {
+    const signedTx = await Promise.resolve(state.sign(message.params.data.tx))
+    send(channel, { jsonrpc: '2.0', method: 'channels.shutdown_sign', params: { tx: signedTx } })
     return { handler: awaitingShutdownOnChainTx, state }
   }
 }
 
 export function awaitingShutdownOnChainTx (channel, message, state) {
-  if (message.action === 'on_chain_tx') {
-    state.resolveShutdownPromise(message.payload.tx)
+  if (message.method === 'channels.on_chain_tx') {
+    state.resolveShutdownPromise(message.params.data.tx)
     return { handler: channelClosed }
   }
 }
 
 export function awaitingLeave (channel, message, state) {
-  state.resolve({ channelId: message.channel_id, state: message.payload.state })
-  return { handler: channelClosed }
+  if (message.method === 'channels.leave') {
+    state.resolve({ channelId: message.params.channel_id, state: message.params.data.state })
+    return { handler: channelClosed }
+  }
+  if (message.method === 'channels.error') {
+    state.reject(new Error(message.data.message))
+    return { handler: channelOpen }
+  }
 }
 
 export function channelClosed (channel, message, state) {
