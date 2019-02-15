@@ -2,6 +2,21 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [2.1.1-0.1.0-next]
+### Added
+- none
+
+### Changed
+- Fix linter errors
+
+### Removed
+- none
+
+### Breaking Changes
+- none
+
+### Notes and known Issues
+- none
 
 ## [2.1.0]
 ### Added
@@ -18,7 +33,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 - none
 
 ### Notes and known Issues
-- none
+- Broken build(linter errors) - fixed in next release
 
 
 ## [2.0.0]
@@ -448,3 +463,4 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 [1.3.2]: https://github.com/aeternity/aepp-sdk-js/compare/1.3.1...1.3.2
 [2.0.0]: https://github.com/aeternity/aepp-sdk-js/compare/1.3.2...2.0.0
 [2.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/2.0.0...2.1.0
+[2.1.1-0.1.0-next]: https://github.com/aeternity/aepp-sdk-js/compare/2.1.0...2.1.1-0.1.0-next
