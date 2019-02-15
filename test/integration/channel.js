@@ -20,7 +20,7 @@ import {configure, ready, plan, BaseAe} from './'
 import {generateKeyPair} from '../../es/utils/crypto'
 import Channel from '../../es/channel'
 
-plan(1000)
+plan(1000000)
 
 function waitForChannel (channel) {
   return new Promise(resolve =>
@@ -32,7 +32,7 @@ function waitForChannel (channel) {
   )
 }
 
-describe.skip('Channel', function () {
+describe('Channel', function () {
   configure(this)
   this.retries(3)
 
@@ -46,9 +46,9 @@ describe.skip('Channel', function () {
   const sharedParams = {
     url: 'ws://node:3014',
     pushAmount: 3,
-    initiatorAmount: 10,
-    responderAmount: 10,
-    channelReserve: 2,
+    initiatorAmount: 100000,
+    responderAmount: 100000,
+    channelReserve: 20000,
     ttl: 10000,
     host: 'localhost',
     port: 3001,
@@ -61,7 +61,7 @@ describe.skip('Channel', function () {
     responder.setKeypair(generateKeyPair())
     sharedParams.initiatorId = await initiator.address()
     sharedParams.responderId = await responder.address()
-    await initiator.spend(100, await responder.address())
+    await initiator.spend(200000, await responder.address())
   })
 
   beforeEach(() => {
