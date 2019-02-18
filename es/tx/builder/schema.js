@@ -361,7 +361,7 @@ const CHANNEL_CREATE_TX = [
   TX_FIELD('ttl', FIELD_TYPES.int),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('delegateIds', FIELD_TYPES.string),
-  TX_FIELD('stateHash', FIELD_TYPES.binary, 'sh'),
+  TX_FIELD('stateHash', FIELD_TYPES.binary, 'st'),
   TX_FIELD('nonce', FIELD_TYPES.int)
 ]
 
@@ -372,7 +372,7 @@ const CHANNEL_DEPOSIT_TX = [
   TX_FIELD('amount', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int),
   TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('stateHash', FIELD_TYPES.binary, 'sh'),
+  TX_FIELD('stateHash', FIELD_TYPES.binary, 'st'),
   TX_FIELD('round', FIELD_TYPES.int),
   TX_FIELD('nonce', FIELD_TYPES.int)
 ]
@@ -384,7 +384,7 @@ const CHANNEL_WITHDRAW_TX = [
   TX_FIELD('amount', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int),
   TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('stateHash', FIELD_TYPES.binary, 'sh'),
+  TX_FIELD('stateHash', FIELD_TYPES.binary, 'st'),
   TX_FIELD('round', FIELD_TYPES.int),
   TX_FIELD('nonce', FIELD_TYPES.int)
 ]
