@@ -347,8 +347,6 @@ const CHANNEL_CREATE_TX = [
   TX_FIELD('lockPeriod', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int),
   TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('delegateIds', FIELD_TYPES.string),
   TX_FIELD('stateHash', FIELD_TYPES.binary, 'sh'),
   TX_FIELD('nonce', FIELD_TYPES.int)
