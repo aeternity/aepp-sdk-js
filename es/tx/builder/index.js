@@ -123,7 +123,7 @@ function getGasBySize (size) {
 }
 
 function getGasPrice (gasPrice = 1) {
-  return BigNumber(gasPrice).time(BigNumber('1000000000')) // gasPrice(1)*10^9
+  return BigNumber(gasPrice).times(BigNumber('1000000000')) // gasPrice(1)*10^9
 }
 
 // INTERFACE
