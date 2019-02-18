@@ -137,7 +137,8 @@ export const FIELD_TYPES = {
   binary: 'binary',
   rlpBinary: 'rlpBinary',
   signatures: 'signatures',
-  pointers: 'pointers'
+  pointers: 'pointers',
+  offChainUpdates: 'offChainUpdates'
 }
 
 // FEE CALCULATION
