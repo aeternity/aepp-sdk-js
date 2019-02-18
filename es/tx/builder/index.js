@@ -122,10 +122,6 @@ function getGasBySize (size) {
   return BigNumber(GAS_PER_BYTE).times(size + FEE_BYTE_SIZE)
 }
 
-function getGasPrice (gasPrice = 1) {
-  return BigNumber(gasPrice).times(BigNumber('1000000000')) // gasPrice(1)*10^9
-}
-
 // INTERFACE
 
 /**
@@ -149,7 +145,7 @@ export function calculateMinFee (txType, { gas = 0, params }) {
   return TX_FEE_FORMULA[txType]
     ? BigNumber(TX_FEE_FORMULA[txType](gas))
       .plus(
-        getGasBySize(txSize).times(getGasPrice())
+        getGasBySize(txSize)
       ).toString(10)
     : DEFAULT_FEE
 }
