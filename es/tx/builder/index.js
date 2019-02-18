@@ -137,17 +137,22 @@ function getGasBySize (size) {
  * @example calculateMinFee('spendTx', { gas, params })
  */
 export function calculateMinFee (txType, { gas = 0, params }) {
-  if (!params) return DEFAULT_FEE
+  const multiplier = BigNumber(1e9) // 10^9
+  if (!params) return BigNumber(DEFAULT_FEE).times(multiplier).toString(10)
 
   const { rlpEncoded: txWithOutFee } = buildTx(params, txType, { excludeKeys: ['fee'] })
   const txSize = txWithOutFee.length
 
-  return TX_FEE_FORMULA[txType]
-    ? BigNumber(TX_FEE_FORMULA[txType](gas))
-      .plus(
-        getGasBySize(txSize)
-      ).toString(10)
-    : DEFAULT_FEE
+  return BigNumber(
+    TX_FEE_FORMULA[txType]
+      ? BigNumber(TX_FEE_FORMULA[txType](gas))
+        .plus(
+          getGasBySize(txSize)
+        ).toString(10)
+      : DEFAULT_FEE
+  )
+    .times(multiplier)
+    .toString(10)
 }
 
 /**
