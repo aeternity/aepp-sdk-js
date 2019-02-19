@@ -42,6 +42,8 @@ function deserializeField (value, type, prefix) {
       return readPointers(value)
     case FIELD_TYPES.rlpBinary:
       return unpackTx(value, true)
+    case FIELD_TYPES.offChainUpdates:
+      return value.map(v => unpackTx(v, true))
     default:
       return value
   }
@@ -135,14 +137,22 @@ function getGasBySize (size) {
  * @example calculateMinFee('spendTx', { gas, params })
  */
 export function calculateMinFee (txType, { gas = 0, params }) {
-  if (!params) return DEFAULT_FEE
+  const multiplier = BigNumber(1e9) // 10^9
+  if (!params) return BigNumber(DEFAULT_FEE).times(multiplier).toString(10)
 
   const { rlpEncoded: txWithOutFee } = buildTx(params, txType, { excludeKeys: ['fee'] })
   const txSize = txWithOutFee.length
 
-  return TX_FEE_FORMULA[txType]
-    ? BigNumber(TX_FEE_FORMULA[txType](gas)).plus(getGasBySize(txSize)).toString(10)
-    : DEFAULT_FEE
+  return BigNumber(
+    TX_FEE_FORMULA[txType]
+      ? BigNumber(TX_FEE_FORMULA[txType](gas))
+        .plus(
+          getGasBySize(txSize)
+        ).toString(10)
+      : DEFAULT_FEE
+  )
+    .times(multiplier)
+    .toString(10)
 }
 
 /**
@@ -247,6 +257,7 @@ export function unpackRawTx (binary, schema) {
  * @return {Object} { tx, rlpEncoded, binary } Object with tx -> Base64Check transaction hash with 'tx_' prefix, rlp encoded transaction and binary transaction
  */
 export function buildTx (params, type, { excludeKeys = [] } = {}) {
+  if (!TX_SERIALIZATION_SCHEMA[type]) throw new Error('Transaction not yet implemented.')
   const [schema, tag] = TX_SERIALIZATION_SCHEMA[type]
   const binary = buildRawTx({ ...params, VSN, tag }, schema, { excludeKeys }).filter(e => e !== undefined)
 
@@ -269,6 +280,7 @@ export function unpackTx (encodedTx, fromRlpBinary = false) {
   const binary = rlp.decode(rlpEncoded)
 
   const objId = readInt(binary[0])
+  if (!TX_DESERIALIZATION_SCHEMA[objId]) throw new Error('Transaction not yet implemented.')
   const [schema] = TX_DESERIALIZATION_SCHEMA[objId]
 
   return { txType: OBJECT_ID_TX_TYPE[objId], tx: unpackRawTx(binary, schema), rlpEncoded, binary }

@@ -36,11 +36,11 @@ const VALIDATORS = {
     return BigNumber(ttl).eq(0) || BigNumber(ttl).gte(BigNumber(height))
   },
   // Insufficient Balance for Amount plus Fee
-  insufficientBalanceForAmountFee ({ balance, amount, fee }) {
+  insufficientBalanceForAmountFee ({ balance, amount = 0, fee }) {
     return BigNumber(balance).gt(BigNumber(amount).plus(fee))
   },
   // Insufficient Balance for Amount
-  insufficientBalanceForAmount ({ balance, amount }) {
+  insufficientBalanceForAmount ({ balance, amount = 0 }) {
     return BigNumber(balance).gt(BigNumber(amount))
   },
   // IF NONCE USED

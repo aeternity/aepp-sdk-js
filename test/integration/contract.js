@@ -36,7 +36,7 @@ contract StateContract =
   function __call() = main(42)
 `
 
-plan(1000000000)
+plan('10000000000000000')
 
 describe('Contract', function () {
   configure(this)
