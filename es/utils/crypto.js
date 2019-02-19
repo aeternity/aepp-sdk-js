@@ -548,9 +548,10 @@ function readOffChainTXUpdates (buf, opts) {
  * Deserialize `binary` state channel transaction
  * @rtype (binary: String) => Object
  * @param {String} binary - Data to deserialize
+ * @param {Object} opts - Options
  * @return {Object} Channel data
  */
-export function deserialize (binary, opts = {prettyTags: false}) {
+export function deserialize (binary, opts = { prettyTags: false }) {
   const tag = readInt(binary[0])
   const obj = {
     tag: objectTag(tag, opts.prettyTags),
