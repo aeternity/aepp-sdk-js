@@ -39,6 +39,10 @@ import Rpc from '../rpc/client'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Aepp instance
  */
-const Aepp = Ae.compose(Contract, Aens, Rpc)
+const Aepp = Ae.compose(Contract, Aens, Rpc, {
+  init () {
+    this.rpcChannel = 'wallet'
+  }
+})
 
 export default Aepp

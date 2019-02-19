@@ -143,6 +143,7 @@ const Wallet = Ae.compose(Accounts, Chain, Tx, Contract, Rpc, Selector, {
       ...stamp.compose.deepConfiguration.Contract.methods
     ]
     this.rpcMethods = Object.assign(R.fromPairs(methods.map(m => [m, ({ params, session }) => this.rpc(m, params, session)])), this.rpcMethods)
+    this.rpcChannel = 'wallet'
   },
   methods: { rpc, onTx, onChain, onAccount, onContract },
   deepProps: {

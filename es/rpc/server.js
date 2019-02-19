@@ -30,16 +30,18 @@ function hello () {
 }
 
 async function receive ({ data, origin, source }) {
-  if (typeof data !== 'object' || data.jsonrpc !== '2.0') return
+  if (typeof data !== 'object' || data.jsonrpc !== '2.0' || !data.method) return
 
-  const { id, method, params, session } = data
+  const { id, method, params, session, channel } = data
+
+  if (channel !== this.rpcChannel) return
 
   function error () {
     return Promise.reject(Error(`Error: No such method ${method}`))
   }
 
   R.call(
-    this.rpcMethods[method].bind(this) || error,
+    (this.rpcMethods[method] || error).bind(this),
     { params, session: this.rpcSessions[session], origin }
   ).then(result => {
     const resolve = typeof result === 'object'
@@ -47,9 +49,9 @@ async function receive ({ data, origin, source }) {
         .filter(([key, value]) => typeof value !== 'function')
         .reduce((p, [key, value]) => ({ ...p, [key]: value }), {})
       : result
-    source.postMessage({ jsonrpc: '2.0', id, result: { resolve } }, '*')
+    source.postMessage({ jsonrpc: '2.0', id, result: { resolve }, channel: this.rpcChannel }, '*')
   }).catch(error => {
-    source.postMessage({ jsonrpc: '2.0', id, result: { reject: error.message } }, '*')
+    source.postMessage({ jsonrpc: '2.0', id, result: { reject: error.message }, channel: this.rpcChannel }, '*')
   })
 }
 

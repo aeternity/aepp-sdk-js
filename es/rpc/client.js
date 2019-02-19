@@ -32,6 +32,10 @@ function post (method) {
   }
 }
 
+async function connectRpc () {
+  this.session = await this.post('hello')
+}
+
 /**
  * RPC client Stamp
  * @function
@@ -49,11 +53,13 @@ const RpcClient = stampit(AsyncInit, {
     const callbacks = {}
 
     function receive ({ data }) {
-      if (typeof data !== 'object' || data.type === 'webpackOk') {
+      if (typeof data !== 'object' || data.type === 'webpackOk' || !data.result) {
         return
       }
 
-      const { result: { resolve, reject }, id } = data
+      const { result: { resolve, reject }, id, channel } = data
+
+      if (channel !== this.rpcChannel) return
 
       if (callbacks[id]) {
         if (resolve) {
@@ -70,23 +76,23 @@ const RpcClient = stampit(AsyncInit, {
         callbacks[sequence] = { resolve, reject }
       })
 
-      parent.postMessage({ jsonrpc: '2.0', id: sequence, method, params, session: this.session }, '*')
+      parent.postMessage({ jsonrpc: '2.0', id: sequence, method, params, session: this.session, channel: this.rpcChannel }, '*')
       sequence++
 
       return ret
     }
 
-    const handler = receive
+    const handler = receive.bind(this)
     self.addEventListener('message', handler, false)
     this.destroyClient = () =>
       self.removeEventListener('message', handler, false)
-
-    this.session = await this.post('hello')
   },
   props: {
     handler: null
   },
-  methods: {},
+  methods: {
+    connectRpc
+  },
   composers ({ stamp, composables }) {
     // Combine Ae and Contract methods
     const methods = [
