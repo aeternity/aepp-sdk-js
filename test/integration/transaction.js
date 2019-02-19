@@ -67,7 +67,7 @@ describe('Native Transaction', function () {
     const keyPair = generateKeyPair()
     client = await ready(this, false)
     clientNative = await ready(this)
-    await client.spend(100000000, keyPair.publicKey)
+    await client.spend('16774200000000000000', keyPair.publicKey)
     client.setKeypair(keyPair)
     clientNative.setKeypair(keyPair)
     oracleId = `ok_${(await client.address()).slice(3)}`
@@ -165,7 +165,7 @@ describe('Native Transaction', function () {
     const nativeTx = await clientNative.oracleRegisterTx(params)
 
     txFromAPI.should.be.equal(nativeTx)
-    await client.send(nativeTx)
+    await clientNative.send(nativeTx, { verify: true })
 
     const oId = (await client.getOracle(oracleId)).id
     oId.should.be.equal(oracleId)

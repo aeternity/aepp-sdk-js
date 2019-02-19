@@ -19,8 +19,7 @@ import { describe, it, before } from 'mocha'
 import { configure, plan, ready } from './'
 import { encodeBase64Check } from '../../es/utils/crypto'
 
-
-plan(1000000000)
+plan('100000000000000000000')
 
 describe('Oracle', function () {
   configure(this)

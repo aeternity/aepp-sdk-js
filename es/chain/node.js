@@ -34,7 +34,7 @@ import TransactionValidator from '../tx/validator'
 async function sendTransaction (tx, options = {}) {
   const { waitMined, verify } = R.merge(this.Chain.defaults, options)
   // Verify transaction before broadcast
-  if (verify) {
+  if (this.verifyTxBeforeSend || verify) {
     const { validation, tx: txObject, txType } = await this.unpackAndVerify(tx)
     if (validation.length) {
       throw Object.assign({
@@ -165,6 +165,9 @@ async function txDryRun (txs, accounts, top) {
  * @example ChainNode({url: 'https://sdk-testnet.aepps.com/'})
  */
 const ChainNode = Chain.compose(Node, Oracle, Contract, TransactionValidator, {
+  init ({ verifyTx = false }) {
+    this.verifyTxBeforeSend = verifyTx
+  },
   methods: {
     sendTransaction,
     balance,
