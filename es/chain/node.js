@@ -110,7 +110,12 @@ async function poll (th, { blocks = 10, interval = 5000 } = {}, raw) {
       await pause(interval)
       return probe()
     }
-    throw Error(`Giving up after ${blocks} blocks mined. Raw TX -> ${raw}`)
+    throw Object.assign(
+      (new Error(`Giving up after ${blocks} blocks mined.`)),
+      {
+        verifyTx: () => instance.unpackAndVerify(raw)
+      }
+    )
   }
 
   return probe()
