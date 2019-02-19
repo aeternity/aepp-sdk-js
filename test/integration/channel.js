@@ -15,12 +15,12 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import {describe, it, before} from 'mocha'
-import {configure, ready, plan, BaseAe} from './'
-import {generateKeyPair} from '../../es/utils/crypto'
+import { describe, it, before } from 'mocha'
+import { configure, ready, plan, BaseAe, networkId } from './'
+import { generateKeyPair } from '../../es/utils/crypto'
 import Channel from '../../es/channel'
 
-plan(1000)
+plan(1000000)
 
 function waitForChannel (channel) {
   return new Promise(resolve =>
@@ -32,7 +32,7 @@ function waitForChannel (channel) {
   )
 }
 
-describe.skip('Channel', function () {
+describe('Channel', function () {
   configure(this)
   this.retries(3)
 
@@ -46,9 +46,9 @@ describe.skip('Channel', function () {
   const sharedParams = {
     url: 'ws://node:3014',
     pushAmount: 3,
-    initiatorAmount: 10,
-    responderAmount: 10,
-    channelReserve: 2,
+    initiatorAmount: 100000,
+    responderAmount: 100000,
+    channelReserve: 20000,
     ttl: 10000,
     host: 'localhost',
     port: 3001,
@@ -57,11 +57,11 @@ describe.skip('Channel', function () {
 
   before(async function () {
     initiator = await ready(this)
-    responder = await BaseAe()
+    responder = await BaseAe({ nativeMode: true, networkId })
     responder.setKeypair(generateKeyPair())
     sharedParams.initiatorId = await initiator.address()
     sharedParams.responderId = await responder.address()
-    await initiator.spend(100, await responder.address())
+    await initiator.spend(200000, await responder.address())
   })
 
   beforeEach(() => {
@@ -99,8 +99,7 @@ describe.skip('Channel', function () {
     result.state.should.be.a('string')
   })
 
-  // TODO: looks like soft-reject is broken in node v0.24.0
-  it.skip('can post update and reject', async () => {
+  it('can post update and reject', async () => {
     responderShouldRejectUpdate = true
     const result = await initiatorCh.update(
       await responder.address(),
@@ -114,7 +113,7 @@ describe.skip('Channel', function () {
   it('can get proof of inclusion', async () => {
     const initiatorAddr = await initiator.address()
     const responderAddr = await responder.address()
-    const params = {addresses: [initiatorAddr, responderAddr]}
+    const params = { accounts: [initiatorAddr, responderAddr] }
     const initiatorPoi = await initiatorCh.poi(params)
     const responderPoi = await responderCh.poi(params)
     initiatorPoi.should.be.a('string')
