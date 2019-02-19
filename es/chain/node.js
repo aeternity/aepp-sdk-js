@@ -34,7 +34,7 @@ import TransactionValidator from '../tx/validator'
 async function sendTransaction (tx, options = {}) {
   const { waitMined, verify } = R.merge(this.Chain.defaults, options)
   // Verify transaction before broadcast
-  if (verify) {
+  if (this.verifyTxBeforeSend || verify) {
     const { validation, tx: txObject, txType } = await this.unpackAndVerify(tx)
     if (validation.length) {
       throw Object.assign({
@@ -46,7 +46,7 @@ async function sendTransaction (tx, options = {}) {
   }
 
   const { txHash } = await this.api.postTransaction({ tx })
-  return waitMined ? { ...(await this.poll(txHash, options)), rawTx: tx } : { hash: txHash, rawTx: tx }
+  return waitMined ? { ...(await this.poll(txHash, options, tx)), rawTx: tx } : { hash: txHash, rawTx: tx }
 }
 
 async function balance (address, { height, hash, format = false } = {}) {
@@ -97,7 +97,7 @@ async function topBlock () {
   return top[R.head(R.keys(top))]
 }
 
-async function poll (th, { blocks = 10, interval = 5000 } = {}) {
+async function poll (th, { blocks = 10, interval = 5000 } = {}, raw) {
   const instance = this
   const max = await this.height() + blocks
 
@@ -110,7 +110,12 @@ async function poll (th, { blocks = 10, interval = 5000 } = {}) {
       await pause(interval)
       return probe()
     }
-    throw Error(`Giving up after ${blocks} blocks mined`)
+    throw Object.assign(
+      (new Error(`Giving up after ${blocks} blocks mined.`)),
+      {
+        verifyTx: () => instance.unpackAndVerify(raw)
+      }
+    )
   }
 
   return probe()
@@ -165,6 +170,9 @@ async function txDryRun (txs, accounts, top) {
  * @example ChainNode({url: 'https://sdk-testnet.aepps.com/'})
  */
 const ChainNode = Chain.compose(Node, Oracle, Contract, TransactionValidator, {
+  init ({ verifyTx = false }) {
+    this.verifyTxBeforeSend = verifyTx
+  },
   methods: {
     sendTransaction,
     balance,

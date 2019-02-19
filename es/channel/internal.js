@@ -31,6 +31,7 @@ const messageQueue = new WeakMap()
 const messageQueueLocked = new WeakMap()
 const actionQueue = new WeakMap()
 const actionQueueLocked = new WeakMap()
+const sequence = new WeakMap()
 
 function channelURL (url, { endpoint = 'channel', ...params }) {
   const paramString = R.join('&', R.values(R.mapObjIndexed((value, key) =>
@@ -121,8 +122,8 @@ async function dequeueMessage (channel) {
   dequeueMessage(channel)
 }
 
-function sendMessage (channel, info, to) {
-  send(channel, { action: 'message', payload: { info, to } })
+function messageId (channel) {
+  return sequence.set(channel, sequence.get(channel) + 1).get(channel)
 }
 
 function WebSocket (url, callbacks) {
@@ -165,7 +166,8 @@ async function initialize (channel, channelOptions) {
   options.set(channel, channelOptions)
   fsm.set(channel, { handler: awaitingConnection })
   eventEmitters.set(channel, new EventEmitter())
-  websockets.set(channel, await WebSocket(channelURL(channelOptions.url, params), {
+  sequence.set(channel, 0)
+  websockets.set(channel, await WebSocket(channelURL(channelOptions.url, { ...params, protocol: 'json-rpc' }), {
     onopen: () => changeStatus(channel, 'connected'),
     onclose: () => changeStatus(channel, 'disconnected'),
     onmessage: ({ data }) => enqueueMessage(channel, data)
@@ -183,5 +185,5 @@ export {
   changeState,
   send,
   enqueueAction,
-  sendMessage
+  messageId
 }

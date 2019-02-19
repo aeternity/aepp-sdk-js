@@ -1,6 +1,6 @@
 {
   "name": "@aeternity/aepp-sdk",
-  "version": "2.1.1-0.1.0-next",
+  "version": "2.2.1-next",
   "description": "SDK for the æternity blockchain",
   "main": "dist/aepp-sdk.js",
   "browser": "dist/aepp-sdk.browser.js",
@@ -25,7 +25,7 @@
     "SDK"
   ],
   "dependencies": {
-    "@aeternity/bip39": "git+https://github.com/aeternity/bip39.git",
+    "@aeternity/bip39": "^0.1.0",
     "@babel/runtime": "^7.0.0-beta.46",
     "@stamp/it": "^1.0.3",
     "@stamp/required": "^1.0.1",
