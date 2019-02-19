@@ -4,7 +4,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [2.2.1-next]
 ### Added
-- Add `deserialization` schema for `Channel` transaction's(`channelCreate`, `channelCloseMutual`, `channelDeposit`, `channelWithdraw`, `channelSettle`) 
+- Add `deserialization` schema for `Channel` transactions(`channelCreate`, `channelCloseMutual`, `channelDeposit`, `channelWithdraw`, `channelSettle`) 
 - Add `rawTx` and `verifyTx` to error from poll function(when you wait for transaction will mined)
 
 ### Changed
