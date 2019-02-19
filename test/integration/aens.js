@@ -35,7 +35,7 @@ describe('Aens', function () {
 
   before(async function () {
     aens = await ready(this)
-    await aens.spend('124245235', account.publicKey)
+    await aens.spend('10000000000000', account.publicKey)
   })
 
   describe('fails on', () => {
