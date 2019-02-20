@@ -45,8 +45,18 @@ async function sendTransaction (tx, options = {}) {
     }
   }
 
-  const { txHash } = await this.api.postTransaction({ tx })
-  return waitMined ? { ...(await this.poll(txHash, options, tx)), rawTx: tx } : { hash: txHash, rawTx: tx }
+  try {
+    const { txHash } = await this.api.postTransaction({ tx })
+    return waitMined ? { ...(await this.poll(txHash, options)), rawTx: tx } : { hash: txHash, rawTx: tx }
+  } catch (e) {
+    throw Object.assign(
+      (new Error(e.message)),
+      {
+        rawTx: tx,
+        verifyTx: () => this.unpackAndVerify(tx)
+      }
+    )
+  }
 }
 
 async function balance (address, { height, hash, format = false } = {}) {
@@ -97,7 +107,7 @@ async function topBlock () {
   return top[R.head(R.keys(top))]
 }
 
-async function poll (th, { blocks = 10, interval = 5000 } = {}, raw) {
+async function poll (th, { blocks = 10, interval = 5000 } = {}) {
   const instance = this
   const max = await this.height() + blocks
 
@@ -110,12 +120,7 @@ async function poll (th, { blocks = 10, interval = 5000 } = {}, raw) {
       await pause(interval)
       return probe()
     }
-    throw Object.assign(
-      (new Error(`Giving up after ${blocks} blocks mined.`)),
-      {
-        verifyTx: () => instance.unpackAndVerify(raw)
-      }
-    )
+    throw new Error(`Giving up after ${blocks} blocks mined.`)
   }
 
   return probe()
