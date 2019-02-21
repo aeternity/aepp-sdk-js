@@ -16,11 +16,12 @@
  */
 
 import { describe, it, before } from 'mocha'
+import { spy } from 'sinon'
 import { configure, ready, plan, BaseAe, networkId } from './'
 import { generateKeyPair } from '../../es/utils/crypto'
 import Channel from '../../es/channel'
 
-plan(1000000)
+plan('10000000000000000')
 
 function waitForChannel (channel) {
   return new Promise(resolve =>
@@ -43,12 +44,18 @@ describe('Channel', function () {
   let responderShouldRejectUpdate
   let existingChannelId
   let offchainTx
+  const responderSign = async (tag, tx) => {
+    if (!responderShouldRejectUpdate) {
+      return await responder.signTransaction(tx)
+    }
+    return null
+  }
   const sharedParams = {
     url: 'ws://node:3014',
     pushAmount: 3,
-    initiatorAmount: 100000,
-    responderAmount: 100000,
-    channelReserve: 20000,
+    initiatorAmount: 1000000000000000,
+    responderAmount: 1000000000000000,
+    channelReserve: 20000000000,
     ttl: 10000,
     host: 'localhost',
     port: 3001,
@@ -61,7 +68,7 @@ describe('Channel', function () {
     responder.setKeypair(generateKeyPair())
     sharedParams.initiatorId = await initiator.address()
     sharedParams.responderId = await responder.address()
-    await initiator.spend(200000, await responder.address())
+    await initiator.spend('2000000000000000', await responder.address())
   })
 
   beforeEach(() => {
@@ -77,12 +84,7 @@ describe('Channel', function () {
     responderCh = await Channel({
       ...sharedParams,
       role: 'responder',
-      sign: async (tag, tx) => {
-        if (!responderShouldRejectUpdate) {
-          return await responder.signTransaction(tx)
-        }
-        return null
-      }
+      sign: responderSign
     })
     return Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
   })
@@ -149,6 +151,72 @@ describe('Channel', function () {
     })
   })
 
+  it('can request a withdraw and accept', async () => {
+    const onOnChainTx = spy()
+    const onOwnWithdrawLocked = spy()
+    const onWithdrawLocked = spy()
+    responderShouldRejectUpdate = false
+    const result = await initiatorCh.withdraw(
+      2,
+      async (tx) => initiator.signTransaction(tx),
+      { onOnChainTx, onOwnWithdrawLocked, onWithdrawLocked }
+    )
+    result.should.eql({ accepted: true, state: initiatorCh.state() })
+    onOnChainTx.callCount.should.equal(1)
+    onOnChainTx.getCall(0).args[0].should.be.a('string')
+    onOwnWithdrawLocked.callCount.should.equal(1)
+    onWithdrawLocked.callCount.should.equal(1)
+  })
+
+  it('can request a withdraw and reject', async () => {
+    const onOnChainTx = spy()
+    const onOwnWithdrawLocked = spy()
+    const onWithdrawLocked = spy()
+    responderShouldRejectUpdate = true
+    const result = await initiatorCh.withdraw(
+      2,
+      async (tx) => initiator.signTransaction(tx),
+      { onOnChainTx, onOwnWithdrawLocked, onWithdrawLocked }
+    )
+    result.should.eql({ accepted: false })
+    onOnChainTx.callCount.should.equal(0)
+    onOwnWithdrawLocked.callCount.should.equal(0)
+    onWithdrawLocked.callCount.should.equal(0)
+  })
+
+  it('can request a deposit and accept', async () => {
+    const onOnChainTx = spy()
+    const onOwnDepositLocked = spy()
+    const onDepositLocked = spy()
+    responderShouldRejectUpdate = false
+    const result = await initiatorCh.deposit(
+      2,
+      async (tx) => initiator.signTransaction(tx),
+      { onOnChainTx, onOwnDepositLocked, onDepositLocked }
+    )
+    result.should.eql({ accepted: true, state: initiatorCh.state() })
+    onOnChainTx.callCount.should.equal(1)
+    onOnChainTx.getCall(0).args[0].should.be.a('string')
+    onOwnDepositLocked.callCount.should.equal(1)
+    onDepositLocked.callCount.should.equal(1)
+  })
+
+  it('can request a deposit and reject', async () => {
+    const onOnChainTx = spy()
+    const onOwnDepositLocked = spy()
+    const onDepositLocked = spy()
+    responderShouldRejectUpdate = true
+    const result = await initiatorCh.deposit(
+      2,
+      async (tx) => initiator.signTransaction(tx),
+      { onOnChainTx, onOwnDepositLocked, onDepositLocked }
+    )
+    result.should.eql({ accepted: false })
+    onOnChainTx.callCount.should.equal(0)
+    onOwnDepositLocked.callCount.should.equal(0)
+    onDepositLocked.callCount.should.equal(0)
+  })
+
   it('can close a channel', async () => {
     const tx = await initiatorCh.shutdown(async (tx) => await initiator.signTransaction(tx))
     tx.should.be.a('string')
@@ -163,7 +231,7 @@ describe('Channel', function () {
     responderCh = await Channel({
       ...sharedParams,
       role: 'responder',
-      sign: async (tag, tx) => await responder.signTransaction(tx)
+      sign: responderSign
     })
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
     const result = await initiatorCh.leave()
@@ -189,6 +257,5 @@ describe('Channel', function () {
       sign: async (tag, tx) => await responder.signTransaction(tx)
     })
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
-    await initiatorCh.leave()
   })
 })
