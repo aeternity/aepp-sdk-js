@@ -2,6 +2,24 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [2.3.0-next]
+### Added
+- Add `deserialization` schema for `Channel` transactions(`channelCreate`, `channelCloseMutual`, `channelDeposit`, `channelWithdraw`, `channelSettle`) 
+- Add `rawTx` and `verifyTx` to error from poll function(when you wait for transaction will mined)
+
+### Changed
+- Change Channel `legacy` API to `JSON RPC`
+- Change `minFee` calculation, multiply min fee by 10^9
+
+### Removed
+- none
+
+### Breaking Changes
+- none
+
+### Notes and known Issues
+- Depend on `bip39` from npm instead of git repo 
+
 ## [2.2.1-next]
 ### Added
 - Add `deserialization` schema for `Channel` transactions(`channelCreate`, `channelCloseMutual`, `channelDeposit`, `channelWithdraw`, `channelSettle`) 
