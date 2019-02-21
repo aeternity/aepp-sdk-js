@@ -139,6 +139,7 @@ async function contractCreateTx ({ ownerId, code, vmVersion, abiVersion, deposit
   // Get VM_ABI version for minerva
   const { splitedVmAbi, contractVmVersion } = getContractVmVersion.bind(this)()
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
+
   const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.contractCreate, { senderId: ownerId, ...R.head(arguments), vmVersion: splitedVmAbi, gasPrice })
 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
