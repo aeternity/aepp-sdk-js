@@ -285,39 +285,39 @@ function withdraw (amount, sign, { onOnChainTx, onOwnWithdrawLocked, onWithdrawL
  * @param {function} [callbacks.onDepositLocked]
  * @return {Promise<object>}
  * @example channel.deposit(
-  *   100,
-  *   async (tx) => await account.signTransaction(tx),
-  *   { onOnChainTx: (tx) => console.log('on_chain_tx', tx) }
-  * ).then(({ accepted, state }) => {
-  *   if (accepted) {
-  *     console.log('Deposit has been accepted')
-  *     console.log('The new state is:', state)
-  *   } else {
-  *     console.log('Deposit has been rejected')
-  *   }
-  * })
-  */
- function deposit (amount, sign, { onOnChainTx, onOwnDepositLocked, onDepositLocked } = {}) {
-   return new Promise((resolve) => {
-     enqueueAction(
-       this,
-       (channel, state) => state.handler === handlers.channelOpen,
-       (channel, state) => {
-         send(channel, { jsonrpc: '2.0', method: 'channels.deposit', params: { amount } })
-         return {
-           handler: handlers.awaitingDepositTx,
-           state: {
-             sign,
-             resolve,
-             onOnChainTx,
-             onOwnDepositLocked,
-             onDepositLocked
-           }
-         }
-       }
-     )
-   })
- }
+ *   100,
+ *   async (tx) => await account.signTransaction(tx),
+ *   { onOnChainTx: (tx) => console.log('on_chain_tx', tx) }
+ * ).then(({ accepted, state }) => {
+ *   if (accepted) {
+ *     console.log('Deposit has been accepted')
+ *     console.log('The new state is:', state)
+ *   } else {
+ *     console.log('Deposit has been rejected')
+ *   }
+ * })
+ */
+function deposit (amount, sign, { onOnChainTx, onOwnDepositLocked, onDepositLocked } = {}) {
+  return new Promise((resolve) => {
+    enqueueAction(
+      this,
+      (channel, state) => state.handler === handlers.channelOpen,
+      (channel, state) => {
+        send(channel, { jsonrpc: '2.0', method: 'channels.deposit', params: { amount } })
+        return {
+          handler: handlers.awaitingDepositTx,
+          state: {
+            sign,
+            resolve,
+            onOnChainTx,
+            onOwnDepositLocked,
+            onDepositLocked
+          }
+        }
+      }
+    )
+  })
+}
 
 /**
  * Send generic message

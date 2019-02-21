@@ -117,6 +117,7 @@ export async function channelOpen (channel, message, state) {
           changeStatus(channel, 'died')
           return { handler: channelClosed }
       }
+      break
     case 'channels.on_chain_tx':
       emit(channel, 'onChainTx', message.params.data.tx)
       return { handler: channelOpen }
@@ -163,7 +164,8 @@ export function awaitingOffChainUpdate (channel, message, state) {
 }
 
 export async function awaitingTxSignRequest (channel, message, state) {
-  const [_, tag] = message.method.match(/^channels\.sign\.([^\.]+)$/) || []
+  // eslint-disable-next-line no-useless-escape
+  const [, tag] = message.method.match(/^channels\.sign\.([^\.]+)$/) || []
   if (tag) {
     const signedTx = await options.get(channel).sign(tag, message.params.data.tx)
     if (signedTx) {
