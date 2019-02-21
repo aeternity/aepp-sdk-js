@@ -49,7 +49,7 @@ contract Identity =
 `
 let contractId
 const deposit = 4
-const gasPrice = 1
+const gasPrice = 1000000000
 const gas = 1600000 - 21000 // MAX GAS
 
 let _salt
