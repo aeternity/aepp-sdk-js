@@ -50,7 +50,7 @@ function on (event, callback) {
  * @return {string}
  */
 function status () {
-  channelStatus.get(this)
+  return channelStatus.get(this)
 }
 
 /**
@@ -59,7 +59,7 @@ function status () {
  * @return {object}
  */
 function state () {
-  channelState.get(this)
+  return channelState.get(this)
 }
 
 /**
@@ -230,6 +230,96 @@ function shutdown (sign) {
 }
 
 /**
+ * Withdraw tokens from the channel
+ *
+ * @param {number} amount - Amount of tokens to withdraw
+ * @param {function} sign - Function which verifies and signs withdraw transaction
+ * @param {object} [callbacks]
+ * @param {function} [callbacks.onOnChainTx] - Called when withdraw transaction has been posted on chain
+ * @param {function} [callbacks.onOwnWithdrawLocked]
+ * @param {function} [callbacks.onWithdrawLocked]
+ * @return {Promise<object>}
+ * @example channel.withdraw(
+ *   100,
+ *   async (tx) => await account.signTransaction(tx),
+ *   { onOnChainTx: (tx) => console.log('on_chain_tx', tx) }
+ * ).then(({ accepted, state }) => {
+ *   if (accepted) {
+ *     console.log('Withdrawal has been accepted')
+ *     console.log('The new state is:', state)
+ *   } else {
+ *     console.log('Withdrawal has been rejected')
+ *   }
+ * })
+ */
+function withdraw (amount, sign, { onOnChainTx, onOwnWithdrawLocked, onWithdrawLocked } = {}) {
+  return new Promise((resolve) => {
+    enqueueAction(
+      this,
+      (channel, state) => state.handler === handlers.channelOpen,
+      (channel, state) => {
+        send(channel, { jsonrpc: '2.0', method: 'channels.withdraw', params: { amount } })
+        return {
+          handler: handlers.awaitingWithdrawTx,
+          state: {
+            sign,
+            resolve,
+            onOnChainTx,
+            onOwnWithdrawLocked,
+            onWithdrawLocked
+          }
+        }
+      }
+    )
+  })
+}
+
+/**
+ * Deposit tokens into the channel
+ *
+ * @param {number} amount - Amount of tokens to deposit
+ * @param {function} sign - Function which verifies and signs deposit transaction
+ * @param {object} [callbacks]
+ * @param {function} [callbacks.onOnChainTx] - Called when deposit transaction has been posted on chain
+ * @param {function} [callbacks.onOwnDepositLocked]
+ * @param {function} [callbacks.onDepositLocked]
+ * @return {Promise<object>}
+ * @example channel.deposit(
+  *   100,
+  *   async (tx) => await account.signTransaction(tx),
+  *   { onOnChainTx: (tx) => console.log('on_chain_tx', tx) }
+  * ).then(({ accepted, state }) => {
+  *   if (accepted) {
+  *     console.log('Deposit has been accepted')
+  *     console.log('The new state is:', state)
+  *   } else {
+  *     console.log('Deposit has been rejected')
+  *   }
+  * })
+  */
+ function deposit (amount, sign, { onOnChainTx, onOwnDepositLocked, onDepositLocked } = {}) {
+   return new Promise((resolve) => {
+     enqueueAction(
+       this,
+       (channel, state) => state.handler === handlers.channelOpen,
+       (channel, state) => {
+         send(channel, { jsonrpc: '2.0', method: 'channels.deposit', params: { amount } })
+         return {
+           handler: handlers.awaitingDepositTx,
+           state: {
+             sign,
+             resolve,
+             onOnChainTx,
+             onOwnDepositLocked,
+             onDepositLocked
+           }
+         }
+       }
+     )
+   })
+ }
+
+/**
  * Send generic message
  *
  * If message is an object it will be serialized into JSON string
@@ -311,7 +401,9 @@ const Channel = AsyncInit.compose({
     balances,
     leave,
     shutdown,
-    sendMessage
+    sendMessage,
+    withdraw,
+    deposit
   }
 })
 
