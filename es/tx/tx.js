@@ -34,6 +34,7 @@ import { buildContractId, oracleQueryId } from './builder/helpers'
 
 const ORACLE_VM_VERSION = 0
 const CONTRACT_VM_VERSION = 1
+const MIN_GAS_PRICE = 1000000 // min gasPrice 1e6
 // TODO This values using as default for minerva node
 const CONTRACT_MINERVA_VM_ABI = 196609
 const CONTRACT_MINERVA_VM = 3
@@ -133,34 +134,36 @@ function getContractVmVersion () {
     ? { splitedVmAbi: CONTRACT_MINERVA_VM_ABI, contractVmVersion: CONTRACT_MINERVA_VM }
     : { splitedVmAbi: CONTRACT_VM_VERSION, contractVmVersion: CONTRACT_VM_VERSION }
 }
-async function contractCreateTx ({ ownerId, code, vmVersion, abiVersion, deposit, amount, gas, gasPrice, callData }) {
+async function contractCreateTx ({ ownerId, code, vmVersion, abiVersion, deposit, amount, gas, gasPrice = MIN_GAS_PRICE, callData }) {
   // TODO move this to tx-builder
   // Get VM_ABI version for minerva
   const { splitedVmAbi, contractVmVersion } = getContractVmVersion.bind(this)()
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.contractCreate, { vmVersion: splitedVmAbi, senderId: ownerId, ...R.head(arguments) })
+
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.contractCreate, { senderId: ownerId, ...R.head(arguments), vmVersion: splitedVmAbi, gasPrice })
 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   return this.nativeMode
     ? {
-      ...buildTx(R.merge(R.head(arguments), { nonce, ttl, fee, vmVersion: splitedVmAbi }), TX_TYPE.contractCreate),
+      ...buildTx(R.merge(R.head(arguments), { nonce, ttl, fee, vmVersion: splitedVmAbi, gasPrice }), TX_TYPE.contractCreate),
       contractId: buildContractId(ownerId, nonce)
     }
-    : this.api.postContractCreate(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee), gas: parseInt(gas), vmVersion: contractVmVersion, abiVersion: CONTRACT_MINERVA_ABI }))
+    : this.api.postContractCreate(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee), gas: parseInt(gas), gasPrice, vmVersion: contractVmVersion, abiVersion: CONTRACT_MINERVA_ABI }))
 }
 
-async function contractCallTx ({ callerId, contractId, vmVersion = CONTRACT_VM_VERSION, amount, gas, gasPrice, callData }) {
+async function contractCallTx ({ callerId, contractId, vmVersion = CONTRACT_VM_VERSION, amount, gas, gasPrice = MIN_GAS_PRICE, callData }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.contractCall, { vmVersion, senderId: callerId, ...R.head(arguments) })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.contractCall, { senderId: callerId, ...R.head(arguments), gasPrice, vmVersion })
 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
-    ? buildTx(R.merge(R.head(arguments), { nonce, ttl, fee, vmVersion }), TX_TYPE.contractCall)
+    ? buildTx(R.merge(R.head(arguments), { nonce, ttl, fee, vmVersion, gasPrice }), TX_TYPE.contractCall)
     : await this.api.postContractCall(R.merge(R.head(arguments), {
       nonce,
       ttl,
       fee: parseInt(fee),
       gas: parseInt(gas),
+      gasPrice,
       vmVersion
     }))
 
@@ -169,7 +172,7 @@ async function contractCallTx ({ callerId, contractId, vmVersion = CONTRACT_VM_V
 
 async function oracleRegisterTx ({ accountId, queryFormat, responseFormat, queryFee, oracleTtl, vmVersion = ORACLE_VM_VERSION }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.oracleRegister, { vmVersion, senderId: accountId, ...R.head(arguments) })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.oracleRegister, { senderId: accountId, ...R.head(arguments), vmVersion })
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? buildTx({

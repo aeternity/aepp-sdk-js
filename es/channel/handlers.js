@@ -98,35 +98,40 @@ export function awaitingInitialState (channel, message, state) {
 }
 
 export async function channelOpen (channel, message, state) {
-  if (message.method === 'channels.info') {
-    if (message.params.data.event === 'died') {
-      changeStatus(channel, 'died')
-    }
-    const handler = {
-      update: awaitingUpdateTxSignRequest,
-      close_mutual: channelOpen,
-      died: channelClosed
-    }[message.params.data.event]
-    if (handler) {
-      return { handler }
-    }
-  }
-  if (message.method === 'channels.sign.shutdown_sign_ack') {
-    const signedTx = await Promise.resolve(options.get(channel).sign(message.tag, message.params.data.tx))
-    send(channel, { jsonrpc: '2.0', method: 'channels.shutdown_sign_ack', params: { tx: signedTx } })
-    return { handler: channelOpen }
-  }
-  if (message.method === 'channels.on_chain_tx') {
-    emit(channel, 'onChainTx', message.params.data.tx)
-    return { handler: channelOpen }
-  }
-  if (message.method === 'channels.leave') {
-    // TODO: emit event
-    return { handler: channelOpen }
-  }
-  if (message.method === 'channels.message') {
-    emit(channel, 'message', message.params.data.message)
-    return { handler: channelOpen }
+  switch (message.method) {
+    case 'channels.info':
+      switch (message.params.data.event) {
+        case 'update':
+        case 'withdraw_created':
+        case 'deposit_created':
+          return { handler: awaitingTxSignRequest }
+        case 'own_withdraw_locked':
+        case 'withdraw_locked':
+        case 'own_deposit_locked':
+        case 'deposit_locked':
+          emit(channel, message.params.data.event)
+          return { handler: channelOpen }
+        case 'close_mutual':
+          return { handler: channelOpen }
+        case 'died':
+          changeStatus(channel, 'died')
+          return { handler: channelClosed }
+      }
+      break
+    case 'channels.on_chain_tx':
+      emit(channel, 'onChainTx', message.params.data.tx)
+      return { handler: channelOpen }
+    case 'channels.leave':
+      // TODO: emit event
+      return { handler: channelOpen }
+    case 'channels.message':
+      emit(channel, 'message', message.params.data.message)
+      return { handler: channelOpen }
+    case 'channels.update':
+      changeState(channel, message.params.data.state)
+      return { handler: channelOpen }
+    case 'channels.sign.shutdown_sign_ack':
+      return awaitingTxSignRequest(channel, message, state)
   }
 }
 channelOpen.enter = (channel) => {
@@ -158,12 +163,14 @@ export function awaitingOffChainUpdate (channel, message, state) {
   }
 }
 
-export async function awaitingUpdateTxSignRequest (channel, message, state) {
-  if (message.method === 'channels.sign.update_ack') {
-    const signedTx = await options.get(channel).sign(message.tag, message.params.data.tx)
+export async function awaitingTxSignRequest (channel, message, state) {
+  // eslint-disable-next-line no-useless-escape
+  const [, tag] = message.method.match(/^channels\.sign\.([^\.]+)$/) || []
+  if (tag) {
+    const signedTx = await options.get(channel).sign(tag, message.params.data.tx)
     if (signedTx) {
-      send(channel, { jsonrpc: '2.0', method: 'channels.update_ack', params: { tx: signedTx } })
-      return { handler: awaitingUpdateTx }
+      send(channel, { jsonrpc: '2.0', method: `channels.${tag}`, params: { tx: signedTx } })
+      return { handler: channelOpen }
     }
     // soft-reject via competing update
     send(channel, {
@@ -176,13 +183,6 @@ export async function awaitingUpdateTxSignRequest (channel, message, state) {
       }
     })
     return { handler: awaitingUpdateConflict }
-  }
-}
-
-export function awaitingUpdateTx (channel, message, state) {
-  if (message.method === 'channels.update') {
-    // TODO: change state to `message.params.data.state`
-    return { handler: channelOpen }
   }
 }
 
@@ -242,6 +242,82 @@ export function awaitingLeave (channel, message, state) {
   }
   if (message.method === 'channels.error') {
     state.reject(new Error(message.data.message))
+    return { handler: channelOpen }
+  }
+}
+
+export async function awaitingWithdrawTx (channel, message, state) {
+  if (message.method === 'channels.sign.withdraw_tx') {
+    const signedTx = await Promise.resolve(state.sign(message.params.data.tx))
+    send(channel, { jsonrpc: '2.0', method: 'channels.withdraw_tx', params: { tx: signedTx } })
+    return { handler: awaitingWithdrawCompletion, state }
+  }
+}
+
+export function awaitingWithdrawCompletion (channel, message, state) {
+  if (message.method === 'channels.on_chain_tx') {
+    if (state.onOnChainTx) {
+      state.onOnChainTx(message.params.data.tx)
+    }
+    return { handler: awaitingWithdrawCompletion, state }
+  }
+  if (message.method === 'channels.info') {
+    if (['own_withdraw_locked', 'withdraw_locked'].includes(message.params.data.event)) {
+      const callback = {
+        own_withdraw_locked: state.onOwnWithdrawLocked,
+        withdraw_locked: state.onWithdrawLocked
+      }[message.params.data.event]
+      if (callback) {
+        callback()
+      }
+      return { handler: awaitingWithdrawCompletion, state }
+    }
+  }
+  if (message.method === 'channels.update') {
+    changeState(channel, message.params.data.state)
+    state.resolve({ accepted: true, state: message.params.data.state })
+    return { handler: channelOpen }
+  }
+  if (message.method === 'channels.conflict') {
+    state.resolve({ accepted: false })
+    return { handler: channelOpen }
+  }
+}
+
+export async function awaitingDepositTx (channel, message, state) {
+  if (message.method === 'channels.sign.deposit_tx') {
+    const signedTx = await Promise.resolve(state.sign(message.params.data.tx))
+    send(channel, { jsonrpc: '2.0', method: 'channels.deposit_tx', params: { tx: signedTx } })
+    return { handler: awaitingDepositCompletion, state }
+  }
+}
+
+export function awaitingDepositCompletion (channel, message, state) {
+  if (message.method === 'channels.on_chain_tx') {
+    if (state.onOnChainTx) {
+      state.onOnChainTx(message.params.data.tx)
+    }
+    return { handler: awaitingDepositCompletion, state }
+  }
+  if (message.method === 'channels.info') {
+    if (['own_deposit_locked', 'deposit_locked'].includes(message.params.data.event)) {
+      const callback = {
+        own_deposit_locked: state.onOwnDepositLocked,
+        deposit_locked: state.onDepositLocked
+      }[message.params.data.event]
+      if (callback) {
+        callback()
+      }
+      return { handler: awaitingDepositCompletion, state }
+    }
+  }
+  if (message.method === 'channels.update') {
+    changeState(channel, message.params.data.state)
+    state.resolve({ accepted: true, state: message.params.data.state })
+    return { handler: channelOpen }
+  }
+  if (message.method === 'channels.conflict') {
+    state.resolve({ accepted: false })
     return { handler: channelOpen }
   }
 }

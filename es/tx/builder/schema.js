@@ -144,7 +144,7 @@ export const FIELD_TYPES = {
 // FEE CALCULATION
 export const BASE_GAS = 15000
 export const GAS_PER_BYTE = 20
-export const FEE_BYTE_SIZE = 8
+export const FEE_BYTE_SIZE = 1
 export const DEFAULT_FEE = 20000
 
 // MAP WITH FEE CALCULATION https://github.com/aeternity/protocol/blob/master/consensus/consensus.md#gas

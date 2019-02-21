@@ -229,7 +229,7 @@ const Contract = Ae.compose({
       defaults: {
         deposit: 0,
         vmVersion: 1,
-        gasPrice: 1,
+        gasPrice: 1000000, // min gasPrice 1e6
         amount: 0,
         gas: 1600000 - 21000,
         options: ''

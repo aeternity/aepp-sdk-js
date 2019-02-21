@@ -2,6 +2,27 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [2.3.0-next]
+### Added
+- Add `channel` `withdraw` and `deposit` methods
+
+### Changed
+- Change default `gasPrice` in `Contract` stamp and `Tx` stamp to `1e9`
+- Fix `contract` tx `fee` calculation
+- Refactor error handling in `sendTransaction` function
+- Change default `gasPrice` to `1e9`
+- Change `Fee` byte_size to 1
+
+### Removed
+- none
+
+### Breaking Changes
+- none
+
+### Notes and known Issues
+- none
+
+
 ## [2.2.1-next]
 ### Added
 - Add `deserialization` schema for `Channel` transactions(`channelCreate`, `channelCloseMutual`, `channelDeposit`, `channelWithdraw`, `channelSettle`) 
@@ -484,3 +505,4 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 [2.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/2.0.0...2.1.0
 [2.1.1-0.1.0-next]: https://github.com/aeternity/aepp-sdk-js/compare/2.1.0...2.1.1-0.1.0-next
 [2.2.1-next]: https://github.com/aeternity/aepp-sdk-js/compare/2.1.1-0.1.0-next...2.2.1-next
+[2.3.0-next]: https://github.com/aeternity/aepp-sdk-js/compare/2.2.1-next...2.3.0-next

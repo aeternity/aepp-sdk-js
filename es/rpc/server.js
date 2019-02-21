@@ -39,7 +39,7 @@ async function receive ({ data, origin, source }) {
   }
 
   R.call(
-    this.rpcMethods[method].bind(this) || error,
+    (this.rpcMethods[method] || error).bind(this),
     { params, session: this.rpcSessions[session], origin }
   ).then(result => {
     const resolve = typeof result === 'object'
