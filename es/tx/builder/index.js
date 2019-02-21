@@ -128,7 +128,7 @@ function getGasBySize (size) {
  * Calculate min fee
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/index
- * @rtype (txType, { gas = 0, gasPrice = 1, params }) => String
+ * @rtype (txType, { gas = 0, params }) => String
  * @param {String} txType - Transaction type
  * @param {Options} options - Options object
  * @param {String|Number} options.gas - Gas amount
