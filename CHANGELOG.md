@@ -4,12 +4,14 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [2.3.0-next]
 ### Added
-- Add `deserialization` schema for `Channel` transactions(`channelCreate`, `channelCloseMutual`, `channelDeposit`, `channelWithdraw`, `channelSettle`) 
-- Add `rawTx` and `verifyTx` to error from poll function(when you wait for transaction will mined)
+- Add `channel` `withdraw` and `deposit` methods
 
 ### Changed
-- Change Channel `legacy` API to `JSON RPC`
-- Change `minFee` calculation, multiply min fee by 10^9
+- Change default `gasPrice` in `Contract` stamp and `Tx` stamp to `1e9`
+- Fix `contract` tx `fee` calculation
+- Refactor error handling in `sendTransaction` function
+- Change default `gasPrice` to `1e9`
+- Change `Fee` byte_size to 1
 
 ### Removed
 - none
@@ -18,7 +20,8 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 - none
 
 ### Notes and known Issues
-- Depend on `bip39` from npm instead of git repo 
+- none
+
 
 ## [2.2.1-next]
 ### Added
@@ -502,3 +505,4 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 [2.1.0]: https://github.com/aeternity/aepp-sdk-js/compare/2.0.0...2.1.0
 [2.1.1-0.1.0-next]: https://github.com/aeternity/aepp-sdk-js/compare/2.1.0...2.1.1-0.1.0-next
 [2.2.1-next]: https://github.com/aeternity/aepp-sdk-js/compare/2.1.1-0.1.0-next...2.2.1-next
+[2.3.0-next]: https://github.com/aeternity/aepp-sdk-js/compare/2.2.1-next...2.3.0-next
