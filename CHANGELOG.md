@@ -4,6 +4,26 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [2.3.0-next]
 ### Added
+- `Minerva` comparability
+- Add `Mnemonic` wallet implementation `es/utils/hd-wallet`
+
+### Changed
+- Change Channel `legacy` API to `JSON RPC`
+- Change default `gasPrice` to `1e6`
+- Change `minFee` calculation, multiply min fee by `1e9`
+
+### Removed
+- none
+
+### Breaking Changes
+- none
+
+### Notes and known Issues
+- Change supported node version range to `1.4.0 <= version < 3.0.0`
+- This release contain changes from: [2.3.0-next](), [2.2.1-next](), [2.1.1-0.1.0-next](), [2.1.0]()
+
+## [2.3.0-next]
+### Added
 - Add `channel` `withdraw` and `deposit` methods
 
 ### Changed
