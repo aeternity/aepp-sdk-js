@@ -20,7 +20,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ### Notes and known Issues
 - Change supported node version range to `1.4.0 <= version < 3.0.0`
-- This release contain changes from: [2.3.0-next](), [2.2.1-next](), [2.1.1-0.1.0-next](), [2.1.0]()
+- This release contain changes from: [2.3.0-next](https://github.com/aeternity/aepp-sdk-js/releases/tag/2.3.0-next), [2.2.1-next](https://github.com/aeternity/aepp-sdk-js/releases/tag/2.2.1-next), [2.1.1-0.1.0-next](https://github.com/aeternity/aepp-sdk-js/releases/tag/2.1.1-0.1.0-next), [2.1.0](https://github.com/aeternity/aepp-sdk-js/releases/tag/2.1.0)
 
 ## [2.3.0-next]
 ### Added
@@ -526,3 +526,4 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 [2.1.1-0.1.0-next]: https://github.com/aeternity/aepp-sdk-js/compare/2.1.0...2.1.1-0.1.0-next
 [2.2.1-next]: https://github.com/aeternity/aepp-sdk-js/compare/2.1.1-0.1.0-next...2.2.1-next
 [2.3.0-next]: https://github.com/aeternity/aepp-sdk-js/compare/2.2.1-next...2.3.0-next
+[2.3.0]: https://github.com/aeternity/aepp-sdk-js/compare/2.3.0-next...2.3.0
