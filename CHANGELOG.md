@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
-## [2.3.0-next]
+## [2.3.0]
 ### Added
 - `Minerva` comparability
 - Add `Mnemonic` wallet implementation `es/utils/hd-wallet`
