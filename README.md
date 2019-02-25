@@ -49,7 +49,7 @@ yarn add @aeternity/aepp-sdk@next
 > adding `#` and a branch name at the end, for example
 > `pnpm i aeternity/aepp-sdk#develop`.
 
-2. Import the right flavor. For this example with get the `Uninveral` flavor, which contains all the features of the SDK:
+2. Import the right flavor. For this example with get the `Universal` flavor, which contains all the features of the SDK:
 
 ```js
 import Ae from '@aeternity/aepp-sdk/es/ae/universal' // or any other flavor
