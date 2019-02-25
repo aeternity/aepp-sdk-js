@@ -272,7 +272,7 @@ async function calculateTtl (ttl = 0, relative = true) {
  * @return {number} Next Nonce
  */
 async function calculateNonce (accountId, nonce) {
-  return nonce || this.getAccountNonce(accountId)
+  return nonce || (await this.getAccountNonce(accountId)) + 1
 }
 
 /**
