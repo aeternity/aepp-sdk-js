@@ -272,14 +272,7 @@ async function calculateTtl (ttl = 0, relative = true) {
  * @return {number} Next Nonce
  */
 async function calculateNonce (accountId, nonce) {
-  if (!nonce) {
-    try {
-      return +(await this.api.getAccountByPubkey(accountId)).nonce + 1
-    } catch (e) {
-      return 0
-    }
-  }
-  return nonce
+  return nonce || this.getAccountNonce(accountId)
 }
 
 /**

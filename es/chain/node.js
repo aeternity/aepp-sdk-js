@@ -64,6 +64,11 @@ async function balance (address, { height, hash, format = false } = {}) {
   return format ? formatBalance(balance) : balance.toString()
 }
 
+async function getAccountNonce (address) {
+  const { nonce } = await this.api.getAccountByPubkey(address).catch(() => ({ nonce: 0 }))
+  return nonce
+}
+
 async function tx (hash, info = false) {
   const tx = await this.api.getTransactionByHash(hash)
   if (['ContractCreateTx', 'ContractCallTx'].includes(tx.tx.type) && info) {
@@ -193,7 +198,8 @@ const ChainNode = Chain.compose(Node, Oracle, Contract, TransactionValidator, {
     getMicroBlockHeader,
     getMicroBlockTransactions,
     getKeyBlock,
-    txDryRun
+    txDryRun,
+    getAccountNonce
   }
 })
 

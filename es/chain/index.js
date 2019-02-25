@@ -44,7 +44,7 @@ const Chain = Contract.compose(Oracle, {
     Ae: {
       methods: [
         'sendTransaction', 'height', 'awaitHeight', 'poll', 'balance', 'tx',
-        'mempool', 'topBlock', 'getTxInfo', 'txDryRun'
+        'mempool', 'topBlock', 'getTxInfo', 'txDryRun', 'getAccountNonce'
       ]
     }
   }
@@ -59,7 +59,8 @@ const Chain = Contract.compose(Oracle, {
     tx: required,
     getTxInfo: required,
     mempool: required,
-    txDryRun: required
+    txDryRun: required,
+    getAccountNonce: required
   }
 }))
 
@@ -230,6 +231,17 @@ const Chain = Contract.compose(Oracle, {
  * @param {Array} accounts - Array of account's
  * @param {String|Number} hashOrHeight - hash or height of block on which to make dry-run
  * @return {Object} Result
+ */
+
+/**
+ * Get Account Nonce
+ * @function getAccountNonce
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype (address) => result: Number
+ * @param {String} address - Account public key
+ * @return {Number} Result
  */
 
 export default Chain

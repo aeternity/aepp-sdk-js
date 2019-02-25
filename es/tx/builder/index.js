@@ -264,7 +264,7 @@ export function buildTx (params, type, { excludeKeys = [] } = {}) {
   const rlpEncoded = rlp.encode(binary)
   const tx = encode(rlpEncoded, 'tx')
 
-  return { tx, rlpEncoded, binary }
+  return { tx, rlpEncoded, binary, txObject: unpackRawTx(binary, schema) }
 }
 
 /**
