@@ -149,34 +149,30 @@ export const DEFAULT_FEE = 20000
 export const KEY_BLOCK_INTERVAL = 3
 
 // MAP WITH FEE CALCULATION https://github.com/aeternity/protocol/blob/master/consensus/consensus.md#gas
-export const TX_FEE_BASE_GAS = (txType) => {
-  return (gas) => {
-    switch (txType) {
-      case TX_TYPE.contractCreate:
-        return BigNumber(5 * BASE_GAS).plus(gas)
-      case TX_TYPE.contractCall:
-        return BigNumber(30 * BASE_GAS).plus(gas)
-      default:
-        return BigNumber(BASE_GAS)
-    }
+export const TX_FEE_BASE_GAS = (txType) => (gas) => {
+  switch (txType) {
+    case TX_TYPE.contractCreate:
+      return BigNumber(5 * BASE_GAS).plus(gas)
+    case TX_TYPE.contractCall:
+      return BigNumber(30 * BASE_GAS).plus(gas)
+    default:
+      return BigNumber(BASE_GAS)
   }
 }
 
-export const TX_FEE_OTHER_GAS = (txType) => {
-  return ({ txSize, relativeTtl }) => {
-    switch (txType) {
-      case TX_TYPE.oracleRegister:
-      case TX_TYPE.oracleExtend:
-      case TX_TYPE.oracleQuery:
-      case TX_TYPE.oracleResponse:
-        return BigNumber(txSize + FEE_BYTE_SIZE)
-          .times(GAS_PER_BYTE)
-          .plus(
-            Math.ceil(32000 * relativeTtl / Math.floor(60 * 24 * 365 / KEY_BLOCK_INTERVAL))
-          )
-      default:
-        return BigNumber(txSize + FEE_BYTE_SIZE).times(GAS_PER_BYTE)
-    }
+export const TX_FEE_OTHER_GAS = (txType) => ({ txSize, relativeTtl }) => {
+  switch (txType) {
+    case TX_TYPE.oracleRegister:
+    case TX_TYPE.oracleExtend:
+    case TX_TYPE.oracleQuery:
+    case TX_TYPE.oracleResponse:
+      return BigNumber(txSize + FEE_BYTE_SIZE)
+        .times(GAS_PER_BYTE)
+        .plus(
+          Math.ceil(32000 * relativeTtl / Math.floor(60 * 24 * 365 / KEY_BLOCK_INTERVAL))
+        )
+    default:
+      return BigNumber(txSize + FEE_BYTE_SIZE).times(GAS_PER_BYTE)
   }
 }
 
