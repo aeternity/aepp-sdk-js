@@ -124,8 +124,10 @@ function transformParams (params) {
 // INTERFACE
 
 function getOracleRelativeTtl (params) {
-  const ttl = Object.entries(params).find(([key]) => ['oracleTtl', 'queryTtl', 'responseTtl'].includes(key))
-  return ttl ? +ttl.value : 500 // TODO investigate this
+  // eslint-disable-next-line no-unused-vars
+  const [_, { value = 500 }] = Object.entries(params).find(([key]) => ['oracleTtl', 'queryTtl', 'responseTtl'].includes(key)) || ['', {}]
+  console.log(value)
+  return value // TODO investigate this
 }
 
 /**
