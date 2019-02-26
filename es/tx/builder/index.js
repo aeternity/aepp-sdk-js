@@ -126,7 +126,6 @@ function transformParams (params) {
 function getOracleRelativeTtl (params) {
   // eslint-disable-next-line no-unused-vars
   const [_, { value = 500 }] = Object.entries(params).find(([key]) => ['oracleTtl', 'queryTtl', 'responseTtl'].includes(key)) || ['', {}]
-  console.log(value)
   return value // TODO investigate this
 }
 
