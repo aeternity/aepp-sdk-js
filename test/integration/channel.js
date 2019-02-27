@@ -21,6 +21,8 @@ import { configure, ready, plan, BaseAe, networkId } from './'
 import { generateKeyPair } from '../../es/utils/crypto'
 import Channel from '../../es/channel'
 
+const wsUlr = process.env.WS_URL || 'ws://node:3014'
+
 plan('10000000000000000')
 
 function waitForChannel (channel) {
@@ -51,7 +53,7 @@ describe('Channel', function () {
     return null
   }
   const sharedParams = {
-    url: 'ws://node:3014',
+    url: wsUlr,
     pushAmount: 3,
     initiatorAmount: 1000000000000000,
     responderAmount: 1000000000000000,
