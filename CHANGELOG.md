@@ -4,10 +4,12 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [2.3.1]
 ### Added
-- none
+- `Oracle` fee calculation
+- `getAccountNonce` function to `tx` stamp
 
- ### Changed
-- none
+### Changed
+- Change `FEE_BYTE_SIZE` from 1 to 8 bytes in `fee` calculation
+- Improve error handling in `tx` builder
 
  ### Removed
 - none
