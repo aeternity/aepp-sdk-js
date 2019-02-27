@@ -258,7 +258,7 @@ export function unpackRawTx (binary, schema) {
  */
 export function buildTx (params, type, { excludeKeys = [] } = {}) {
   if (!TX_SERIALIZATION_SCHEMA[type]) {
-    throw Object.assign(new Error('Transaction not yet implemented.'), { type, params, schema: TX_SERIALIZATION_SCHEMA[type] })
+    throw Object.assign({ type, params, schema: TX_SERIALIZATION_SCHEMA[type] })
   }
   const [schema, tag] = TX_SERIALIZATION_SCHEMA[type]
   const binary = buildRawTx({ ...params, VSN, tag }, schema, { excludeKeys }).filter(e => e !== undefined)
@@ -283,7 +283,7 @@ export function unpackTx (encodedTx, fromRlpBinary = false) {
 
   const objId = readInt(binary[0])
   if (!TX_DESERIALIZATION_SCHEMA[objId]) {
-    throw Object.assign(new Error('Transaction not yet implemented.'), { objId, binary, schema: TX_DESERIALIZATION_SCHEMA[objId] })
+    throw Object.assign({ objId, binary, schema: TX_DESERIALIZATION_SCHEMA[objId] })
   }
   const [schema] = TX_DESERIALIZATION_SCHEMA[objId]
 
