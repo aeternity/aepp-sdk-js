@@ -320,6 +320,111 @@ function deposit (amount, sign, { onOnChainTx, onOwnDepositLocked, onDepositLock
 }
 
 /**
+ * Create a contract
+ *
+ * @param {object} options
+ * @param {string} [options.code] - Api encoded compiled AEVM byte code
+ * @param {string} [options.callData] - Api encoded compiled AEVM call data for the code
+ * @param {number} [options.deposit] - Initial amount the owner of the contract commits to it
+ * @param {number} [options.vmVersion] - Version of the AEVM
+ * @param {number} [options.abiVersion] - Version of the ABI
+ * @param {function} sign - Function which verifies and signs create contract transaction
+ * @return {Promise<object>}
+ * @example channel.createContract({
+ *   code: 'cb_HKtpipK4aCgYb17wZ...',
+ *   callData: 'cb_1111111111111111...',
+ *   deposit: 10,
+ *   vmVersion: 3,
+ *   abiVersion: 1
+ * }).then(({ accepted, state, address }) => {
+ *   if (accepted) {
+ *     console.log('New contract has been created')
+ *     console.log('Contract address:', address)
+ *   } else {
+ *     console.log('New contract has been rejected')
+ *   }
+ * })
+ */
+function createContract ({ code, callData, deposit, vmVersion, abiVersion }, sign) {
+  return new Promise((resolve) => {
+    enqueueAction(
+      this,
+      (channel, state) => state.handler === handlers.channelOpen,
+      (channel, state) => {
+        send(channel, {
+          jsonrpc: '2.0',
+          method: 'channels.update.new_contract',
+          params: {
+            code,
+            call_data: callData,
+            deposit,
+            vm_version: vmVersion || 1,
+            abi_version: abiVersion || 1
+          }
+        })
+        return {
+          handler: handlers.awaitingNewContractTx,
+          state: {
+            sign,
+            resolve
+          }
+        }
+      }
+    )
+  })
+}
+
+
+/**
+ * Call a contract
+ *
+ * @param {object} options
+ * @param {string} [options.amount] - Amount the caller of the contract commits to it
+ * @param {string} [options.callData] - ABI encoded compiled AEVM call data for the code
+ * @param {number} [options.contract] - Address of the contract to call
+ * @param {number} [options.abiVersion] - Version of the ABI
+ * @param {function} sign - Function which verifies and signs contract call transaction
+ * @return {Promise<object>}
+ * @example channel.callContract({
+ *   contract: 'ct_9sRA9AVE4BYTAkh5RNfJYmwQe1NZ4MErasQLXZkFWG43TPBqa',
+ *   callData: 'cb_1111111111111111...',
+ *   amount: 0,
+ *   abiVersion: 1
+ * }).then(({ accepted, state }) => {
+ *   if (accepted) {
+ *     console.log('Contract called succesfully')
+ *     console.log('The new state is:', state)
+ *   } else {
+ *     console.log('Contract call has been rejected')
+ *   }
+ * })
+ */
+function callContract({ amount, callData, contract, abiVersion }, sign) {
+  return new Promise((resolve) => {
+    enqueueAction(
+      this,
+      (channel, state) => state.handler === handlers.channelOpen,
+      (channel, state) => {
+        send(channel, {
+          jsonrpc: '2.0',
+          method: 'channels.update.call_contract',
+          params: {
+            amount,
+            call_data: callData,
+            contract,
+            abi_version: abiVersion
+          }
+        })
+        return {
+          handler: handlers.awaitingCallContractUpdateTx,
+          state: { resolve, sign }
+        }
+      }
+    )
+  })
+}
+
+/**
  * Send generic message
  *
  * If message is an object it will be serialized into JSON string
@@ -403,7 +508,9 @@ const Channel = AsyncInit.compose({
     shutdown,
     sendMessage,
     withdraw,
-    deposit
+    deposit,
+    createContract,
+    callContract
   }
 })
 
