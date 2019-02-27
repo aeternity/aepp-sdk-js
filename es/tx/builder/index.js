@@ -282,7 +282,7 @@ export function unpackTx (encodedTx, fromRlpBinary = false) {
 
   const objId = readInt(binary[0])
   if (!TX_DESERIALIZATION_SCHEMA[objId]) {
-    throw new Error('Transaction deserialization not implemented for' + OBJECT_ID_TX_TYPE[objId])
+    return { message: 'Transaction deserialization not implemented for tag ' + objId }
   }
   const [schema] = TX_DESERIALIZATION_SCHEMA[objId]
 
