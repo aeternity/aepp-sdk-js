@@ -282,7 +282,9 @@ export function unpackTx (encodedTx, fromRlpBinary = false) {
   const binary = rlp.decode(rlpEncoded)
 
   const objId = readInt(binary[0])
-  if (!TX_DESERIALIZATION_SCHEMA[objId]) throw new Error('Transaction not yet implemented.')
+  if (!TX_DESERIALIZATION_SCHEMA[objId]) {
+    throw Object.assign(new Error('Transaction not yet implemented.'), { objId, binary, schema: TX_DESERIALIZATION_SCHEMA[objId] })
+  }
   const [schema] = TX_DESERIALIZATION_SCHEMA[objId]
 
   return { txType: OBJECT_ID_TX_TYPE[objId], tx: unpackRawTx(binary, schema), rlpEncoded, binary }
