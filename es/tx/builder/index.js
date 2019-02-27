@@ -257,7 +257,9 @@ export function unpackRawTx (binary, schema) {
  * @return {Object} { tx, rlpEncoded, binary } Object with tx -> Base64Check transaction hash with 'tx_' prefix, rlp encoded transaction and binary transaction
  */
 export function buildTx (params, type, { excludeKeys = [] } = {}) {
-  if (!TX_SERIALIZATION_SCHEMA[type]) throw new Error('Transaction not yet implemented.')
+  if (!TX_SERIALIZATION_SCHEMA[type]) {
+    throw Object.assign(new Error('Transaction not yet implemented.'), { type, params, schema: TX_SERIALIZATION_SCHEMA[type] })
+  }
   const [schema, tag] = TX_SERIALIZATION_SCHEMA[type]
   const binary = buildRawTx({ ...params, VSN, tag }, schema, { excludeKeys }).filter(e => e !== undefined)
 
