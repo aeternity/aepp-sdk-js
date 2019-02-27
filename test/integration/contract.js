@@ -59,22 +59,6 @@ describe('Contract', function () {
     return bytecode.should.have.property('bytecode')
   })
 
-  it.skip('invokes function against compiled code', async () => {
-    const result = await bytecode.call('main', { args: '42' })
-    return result.decode('int').should.eventually.become({
-      type: 'word',
-      value: 42
-    })
-  })
-
-  it.skip('invokes function with type-check against compiled code', async () => {
-    const result = await bytecode.call('main', { call: callIdentityExample })
-    return result.decode('int').should.eventually.become({
-      type: 'word',
-      value: 42
-    })
-  })
-
   it('deploys compiled contracts', async () => {
     deployed = await bytecode.deploy()
     return deployed.should.have.property('address')
