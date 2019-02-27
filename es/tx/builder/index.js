@@ -4,11 +4,14 @@ import { rlp } from '../../utils/crypto'
 
 import {
   DEFAULT_FEE,
-  FEE_BYTE_SIZE,
-  FIELD_TYPES, GAS_PER_BYTE, OBJECT_ID_TX_TYPE,
+  FIELD_TYPES,
+  OBJECT_ID_TX_TYPE,
   PREFIX_ID_TAG,
-  TX_DESERIALIZATION_SCHEMA, TX_FEE_FORMULA,
-  TX_SERIALIZATION_SCHEMA, VALIDATION_MESSAGE,
+  TX_DESERIALIZATION_SCHEMA,
+  TX_FEE_BASE_GAS,
+  TX_FEE_OTHER_GAS,
+  TX_SERIALIZATION_SCHEMA,
+  VALIDATION_MESSAGE,
   VSN
 } from './schema'
 import { readInt, readId, readPointers, writeId, writeInt, buildPointers, encode, decode } from './helpers'
@@ -118,11 +121,13 @@ function transformParams (params) {
     )
 }
 
-function getGasBySize (size) {
-  return BigNumber(GAS_PER_BYTE).times(size + FEE_BYTE_SIZE)
-}
-
 // INTERFACE
+
+function getOracleRelativeTtl (params) {
+  // eslint-disable-next-line no-unused-vars
+  const [_, { value = 500 }] = Object.entries(params).find(([key]) => ['oracleTtl', 'queryTtl', 'responseTtl'].includes(key)) || ['', {}]
+  return value // TODO investigate this
+}
 
 /**
  * Calculate min fee
@@ -137,20 +142,14 @@ function getGasBySize (size) {
  * @example calculateMinFee('spendTx', { gas, params })
  */
 export function calculateMinFee (txType, { gas = 0, params }) {
-  const multiplier = BigNumber(1e9) // 10^9
+  const multiplier = BigNumber(1e9) // 10^9 GAS_PRICE
   if (!params) return BigNumber(DEFAULT_FEE).times(multiplier).toString(10)
 
   const { rlpEncoded: txWithOutFee } = buildTx(params, txType, { excludeKeys: ['fee'] })
   const txSize = txWithOutFee.length
 
-  return BigNumber(
-    TX_FEE_FORMULA[txType]
-      ? BigNumber(TX_FEE_FORMULA[txType](gas))
-        .plus(
-          getGasBySize(txSize)
-        ).toString(10)
-      : DEFAULT_FEE
-  )
+  return TX_FEE_BASE_GAS(txType)(gas)
+    .plus(TX_FEE_OTHER_GAS(txType)({ txSize, relativeTtl: getOracleRelativeTtl(params) }))
     .times(multiplier)
     .toString(10)
 }
@@ -169,10 +168,10 @@ export function calculateMinFee (txType, { gas = 0, params }) {
  * @example calculateFee(null, 'spendTx', { gas, params })
  */
 export function calculateFee (fee = 0, txType, { gas = 0, params, showWarning = true } = {}) {
-  if (!TX_FEE_FORMULA[txType] && showWarning) console.warn(`Can't find transaction fee formula for ${txType}, we will use DEFAULT_FEE(${DEFAULT_FEE})`)
+  if (!params && showWarning) console.warn(`Can't build transaction fee, we will use DEFAULT_FEE(${DEFAULT_FEE})`)
 
   const minFee = calculateMinFee(txType, { params, gas })
-  if (fee && BigNumber(minFee).gt(BigNumber(fee)) && showWarning) console.warn('Transaction fee is lower then min fee!')
+  if (fee && BigNumber(minFee).gt(BigNumber(fee)) && showWarning) console.warn(`Transaction fee is lower then min fee! Min fee: ${minFee}`)
 
   return fee || minFee
 }
@@ -257,14 +256,16 @@ export function unpackRawTx (binary, schema) {
  * @return {Object} { tx, rlpEncoded, binary } Object with tx -> Base64Check transaction hash with 'tx_' prefix, rlp encoded transaction and binary transaction
  */
 export function buildTx (params, type, { excludeKeys = [] } = {}) {
-  if (!TX_SERIALIZATION_SCHEMA[type]) throw new Error('Transaction not yet implemented.')
+  if (!TX_SERIALIZATION_SCHEMA[type]) {
+    throw new Error('Transaction serialization not implemented for ' + type)
+  }
   const [schema, tag] = TX_SERIALIZATION_SCHEMA[type]
   const binary = buildRawTx({ ...params, VSN, tag }, schema, { excludeKeys }).filter(e => e !== undefined)
 
   const rlpEncoded = rlp.encode(binary)
   const tx = encode(rlpEncoded, 'tx')
 
-  return { tx, rlpEncoded, binary }
+  return { tx, rlpEncoded, binary, txObject: unpackRawTx(binary, schema) }
 }
 
 /**
@@ -280,7 +281,9 @@ export function unpackTx (encodedTx, fromRlpBinary = false) {
   const binary = rlp.decode(rlpEncoded)
 
   const objId = readInt(binary[0])
-  if (!TX_DESERIALIZATION_SCHEMA[objId]) throw new Error('Transaction not yet implemented.')
+  if (!TX_DESERIALIZATION_SCHEMA[objId]) {
+    return { message: 'Transaction deserialization not implemented for tag ' + objId }
+  }
   const [schema] = TX_DESERIALIZATION_SCHEMA[objId]
 
   return { txType: OBJECT_ID_TX_TYPE[objId], tx: unpackRawTx(binary, schema), rlpEncoded, binary }

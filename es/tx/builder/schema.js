@@ -144,24 +144,36 @@ export const FIELD_TYPES = {
 // FEE CALCULATION
 export const BASE_GAS = 15000
 export const GAS_PER_BYTE = 20
-export const FEE_BYTE_SIZE = 1
+export const FEE_BYTE_SIZE = 8
 export const DEFAULT_FEE = 20000
+export const KEY_BLOCK_INTERVAL = 3
 
 // MAP WITH FEE CALCULATION https://github.com/aeternity/protocol/blob/master/consensus/consensus.md#gas
-export const TX_FEE_FORMULA = {
-  [TX_TYPE.spend]: () => BASE_GAS,
-  [TX_TYPE.contractCreate]: (gas) => BigNumber(5 * BASE_GAS).plus(gas),
-  [TX_TYPE.contractCall]: (gas) => BigNumber(30 * BASE_GAS).plus(gas),
-  [TX_TYPE.nameTransfer]: () => BASE_GAS,
-  [TX_TYPE.nameUpdate]: () => BASE_GAS,
-  [TX_TYPE.nameClaim]: () => BASE_GAS,
-  [TX_TYPE.namePreClaim]: () => BASE_GAS,
-  [TX_TYPE.nameRevoke]: () => BASE_GAS,
-  [TX_TYPE.channelCreate]: () => BASE_GAS,
-  [TX_TYPE.channelCloseMutual]: () => BASE_GAS,
-  [TX_TYPE.channelDeposit]: () => BASE_GAS,
-  [TX_TYPE.channelWithdraw]: () => BASE_GAS,
-  [TX_TYPE.channelSettle]: () => BASE_GAS
+export const TX_FEE_BASE_GAS = (txType) => (gas) => {
+  switch (txType) {
+    case TX_TYPE.contractCreate:
+      return BigNumber(5 * BASE_GAS).plus(gas)
+    case TX_TYPE.contractCall:
+      return BigNumber(30 * BASE_GAS).plus(gas)
+    default:
+      return BigNumber(BASE_GAS)
+  }
+}
+
+export const TX_FEE_OTHER_GAS = (txType) => ({ txSize, relativeTtl }) => {
+  switch (txType) {
+    case TX_TYPE.oracleRegister:
+    case TX_TYPE.oracleExtend:
+    case TX_TYPE.oracleQuery:
+    case TX_TYPE.oracleResponse:
+      return BigNumber(txSize + FEE_BYTE_SIZE)
+        .times(GAS_PER_BYTE)
+        .plus(
+          Math.ceil(32000 * relativeTtl / Math.floor(60 * 24 * 365 / KEY_BLOCK_INTERVAL))
+        )
+    default:
+      return BigNumber(txSize + FEE_BYTE_SIZE).times(GAS_PER_BYTE)
+  }
 }
 
 export const ID_TAG = {
@@ -180,7 +192,6 @@ export const PREFIX_ID_TAG = {
   'ct': ID_TAG.contract,
   'ch': ID_TAG.channel
 }
-
 export const ID_TAG_PREFIX = {
   [ID_TAG.account]: 'ak',
   [ID_TAG.name]: 'nm',
