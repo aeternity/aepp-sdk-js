@@ -19,6 +19,8 @@ import Channel from '@aeternity/aepp-sdk/es/channel/index'
         * [~balances(accounts)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..balances) ⇒ `Promise.&lt;object&gt;`
         * [~leave()](#module_@aeternity/aepp-sdk/es/channel/index--Channel..leave) ⇒ `Promise.&lt;object&gt;`
         * [~shutdown(sign)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..shutdown) ⇒ `Promise.&lt;string&gt;`
+        * [~withdraw(amount, sign, [callbacks])](#module_@aeternity/aepp-sdk/es/channel/index--Channel..withdraw) ⇒ `Promise.&lt;object&gt;`
+        * [~deposit(amount, sign, [callbacks])](#module_@aeternity/aepp-sdk/es/channel/index--Channel..deposit) ⇒ `Promise.&lt;object&gt;`
         * [~sendMessage(message, recipient)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..sendMessage)
 
 <a id="exp_module_@aeternity/aepp-sdk/es/channel/index--Channel"></a>
@@ -112,7 +114,7 @@ channel.update(
   'ak$Gi42jcRm9DcZjk72UWQQBSxi43BG3285C9n4QSvP5JdzDyH2o',
   10,
   async (tx) => await account.signTransaction(tx)
-).then({accepted, state} =>
+).then({ accepted, state } =>
   if (accepted) {
     console.log('Update has been accepted')
   }
@@ -191,6 +193,68 @@ Trigger a channel shutdown
 channel.shutdown(
   async (tx) => await account.signTransaction(tx)
 ).then(tx => console.log('on_chain_tx', tx))
+```
+<a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..withdraw"></a>
+
+#### Channel~withdraw(amount, sign, [callbacks]) ⇒ `Promise.&lt;object&gt;`
+Withdraw tokens from the channel
+
+**Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| amount | `number` | Amount of tokens to withdraw |
+| sign | `function` | Function which verifies and signs withdraw transaction |
+| [callbacks] | `object` |  |
+| [callbacks.onOnChainTx] | `function` | Called when withdraw transaction has been posted on chain |
+| [callbacks.onOwnWithdrawLocked] | `function` |  |
+| [callbacks.onWithdrawLocked] | `function` |  |
+
+**Example**  
+```js
+channel.withdraw(
+  100,
+  async (tx) => await account.signTransaction(tx),
+  { onOnChainTx: (tx) => console.log('on_chain_tx', tx) }
+).then(({ accepted, state }) => {
+  if (accepted) {
+    console.log('Withdrawal has been accepted')
+    console.log('The new state is:', state)
+  } else {
+    console.log('Withdrawal has been rejected')
+  }
+})
+```
+<a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..deposit"></a>
+
+#### Channel~deposit(amount, sign, [callbacks]) ⇒ `Promise.&lt;object&gt;`
+Deposit tokens into the channel
+
+**Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| amount | `number` | Amount of tokens to deposit |
+| sign | `function` | Function which verifies and signs deposit transaction |
+| [callbacks] | `object` |  |
+| [callbacks.onOnChainTx] | `function` | Called when deposit transaction has been posted on chain |
+| [callbacks.onOwnDepositLocked] | `function` |  |
+| [callbacks.onDepositLocked] | `function` |  |
+
+**Example**  
+```js
+channel.deposit(
+  100,
+  async (tx) => await account.signTransaction(tx),
+  { onOnChainTx: (tx) => console.log('on_chain_tx', tx) }
+).then(({ accepted, state }) => {
+  if (accepted) {
+    console.log('Deposit has been accepted')
+    console.log('The new state is:', state)
+  } else {
+    console.log('Deposit has been rejected')
+  }
+})
 ```
 <a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..sendMessage"></a>
 
