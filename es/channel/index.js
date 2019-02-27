@@ -374,7 +374,6 @@ function createContract ({ code, callData, deposit, vmVersion, abiVersion }, sig
   })
 }
 
-
 /**
  * Call a contract
  *
@@ -399,7 +398,7 @@ function createContract ({ code, callData, deposit, vmVersion, abiVersion }, sig
  *   }
  * })
  */
-function callContract({ amount, callData, contract, abiVersion }, sign) {
+function callContract ({ amount, callData, contract, abiVersion }, sign) {
   return new Promise((resolve) => {
     enqueueAction(
       this,

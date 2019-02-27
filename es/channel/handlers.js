@@ -334,6 +334,7 @@ export async function awaitingNewContractTx (channel, message, state) {
 export function awaitingNewContractCompletion (channel, message, state) {
   if (message.method === 'channels.update') {
     const { round } = unpackTx(message.params.data.state).tx.encodedTx.tx
+    // eslint-disable-next-line standard/computed-property-even-spacing
     const owner = options.get(channel)[{
       initiator: 'initiatorId',
       responder: 'responderId'
