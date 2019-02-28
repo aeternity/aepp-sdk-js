@@ -358,8 +358,8 @@ function createContract ({ code, callData, deposit, vmVersion, abiVersion }, sig
             code,
             call_data: callData,
             deposit,
-            vm_version: vmVersion || 1,
-            abi_version: abiVersion || 1
+            vm_version: vmVersion,
+            abi_version: abiVersion
           }
         })
         return {
