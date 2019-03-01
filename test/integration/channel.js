@@ -19,6 +19,7 @@ import { describe, it, before } from 'mocha'
 import { spy } from 'sinon'
 import { configure, ready, plan, BaseAe, networkId } from './'
 import { generateKeyPair } from '../../es/utils/crypto'
+import { unpackTx } from '../../es/tx/builder'
 import Channel from '../../es/channel'
 
 const wsUrl = process.env.WS_URL || 'ws://node:3014'
@@ -54,6 +55,7 @@ describe('Channel', function () {
   let offchainTx
   let contractAddress
   let contractEncodeCall
+  let callerNonce
   const responderSign = async (tag, tx) => {
     if (!responderShouldRejectUpdate) {
       return await responder.signTransaction(tx)
@@ -257,6 +259,7 @@ describe('Channel', function () {
   })
 
   it('can call a contract and accept', async () => {
+    callerNonce = Number(unpackTx(initiatorCh.state()).tx.encodedTx.tx.round)
     const result = await initiatorCh.callContract({
       amount: 0,
       callData: await contractEncodeCall('main', '(42)', {}),
@@ -275,6 +278,25 @@ describe('Channel', function () {
       abiVersion: 1
     }, async (tx) => await initiator.signTransaction(tx))
     result.should.eql({ accepted: false })
+  })
+
+  it('can get contract call', async () => {
+    const result = await initiatorCh.getContractCall({
+      caller: await initiator.address(),
+      contract: contractAddress,
+      round: callerNonce
+    })
+    result.should.eql({
+      callerId: await initiator.address(),
+      callerNonce,
+      contractId: contractAddress,
+      gasPrice: result.gasPrice,
+      gasUsed: result.gasUsed,
+      height: result.height,
+      log: result.log,
+      returnType: 'ok',
+      returnValue: result.returnValue
+    })
   })
 
   it('can close a channel', async () => {

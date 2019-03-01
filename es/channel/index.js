@@ -424,6 +424,48 @@ function callContract ({ amount, callData, contract, abiVersion }, sign) {
 }
 
 /**
+ * Get contract call result
+ *
+ * @param {object} options
+ * @param {string} [options.caller] - Address of contract caller
+ * @param {string} [options.contract] - Address of the contract
+ * @param {number} [options.round] - Round when contract was called
+ * @return {Promise<object>}
+ * @example channel.getContractCall({
+ *   caller: 'ak_Y1NRjHuoc3CGMYMvCmdHSBpJsMDR6Ra2t5zjhRcbtMeXXLpLH',
+ *   contract: 'ct_9sRA9AVE4BYTAkh5RNfJYmwQe1NZ4MErasQLXZkFWG43TPBqa',
+ *   round: 3
+ * }).then(({ returnType, returnValue }) => {
+ *   if (returnType === 'ok') console.log(returnValue)
+ * })
+ */
+function getContractCall ({ caller, contract, round }) {
+  return new Promise((resolve, reject) => {
+    enqueueAction(
+      this,
+      (channel, state) => state.handler === handlers.channelOpen,
+      (channel, state) => {
+        const id = messageId(channel)
+        send(channel, {
+          jsonrpc: '2.0',
+          id,
+          method: 'channels.get.contract_call',
+          params: {
+            caller,
+            contract,
+            round
+          }
+        })
+        return {
+          handler: handlers.awaitingContractCall,
+          state: { resolve, reject, messageId: id }
+        }
+      }
+    )
+  })
+}
+
+/**
  * Send generic message
  *
  * If message is an object it will be serialized into JSON string
@@ -509,7 +551,8 @@ const Channel = AsyncInit.compose({
     withdraw,
     deposit,
     createContract,
-    callContract
+    callContract,
+    getContractCall
   }
 })
 

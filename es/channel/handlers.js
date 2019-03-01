@@ -16,6 +16,7 @@
  */
 
 import { generateKeyPair, encodeContractAddress } from '../utils/crypto'
+import { snakeToPascal } from '../utils/string'
 import {
   options,
   changeStatus,
@@ -369,6 +370,21 @@ export function awaitingCallContractCompletion (channel, message, state) {
   }
   if (message.method === 'channels.conflict') {
     state.resolve({ accepted: false })
+    return { handler: channelOpen }
+  }
+}
+
+export function awaitingContractCall (channel, message, state) {
+  if (message.id === state.messageId) {
+    state.resolve(
+      R.fromPairs(
+        R.map(([key, value]) => ([snakeToPascal(key), value]), R.toPairs(message.result))
+      )
+    )
+    return { handler: channelOpen }
+  }
+  if (message.method === 'channels.error') {
+    state.reject(new Error(message.data.message))
     return { handler: channelOpen }
   }
 }
