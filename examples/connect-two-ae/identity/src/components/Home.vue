@@ -48,12 +48,14 @@ export default {
   components: {},
   data () {
     return {
-      pub: 'ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU',
-      priv: 'a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61',
+      pub: 'ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU', // Your public key
+      priv: 'a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61', // Your private key
       client: null,
       wallet: null,
       balance: null,
       height: null,
+      url: 'https://sdk-mainnet.aepps.com',
+      internalUrl: 'https://sdk-mainnet.aepps.com',
       aeppUrl: '//0.0.0.0:9001'
     }
   },
@@ -69,15 +71,14 @@ export default {
     window.addEventListener('message', console.log, false)
 
     Wallet({
-      url: 'https://sdk-mainnet.aepps.com',
-      internalUrl: 'https://sdk-mainnet.aepps.com',
+      url: this.url,
+      internalUrl: this.internalUrl,
       accounts: [MemoryAccount({keypair: {secretKey: this.priv, publicKey: this.pub}})],
       address: this.pub,
       onTx: this.confirmDialog,
       onChain: this.confirmDialog,
       onAccount: this.confirmDialog,
-      onContract: this.confirmDialog,
-      networkId: 'ae_mainnet'
+      onContract: this.confirmDialog
     }).then(ae => {
       this.client = ae
       console.log('status', this.client.api.getTopBlock())
