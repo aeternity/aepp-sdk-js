@@ -457,7 +457,7 @@ const CHANNEL_OFFCHAIN_CALL_CONTRACT_TX = [
   TX_FIELD('callData', FIELD_TYPES.binary, 'cb'),
   TX_FIELD('callStack', FIELD_TYPES.callStack),
   TX_FIELD('gasPrice', FIELD_TYPES.int),
-  TX_FIELD('gasLimit', FIELD_TYPES.int),
+  TX_FIELD('gasLimit', FIELD_TYPES.int)
 ]
 
 export const TX_SERIALIZATION_SCHEMA = {
