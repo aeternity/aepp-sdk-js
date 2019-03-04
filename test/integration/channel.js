@@ -229,76 +229,6 @@ describe('Channel', function () {
     onDepositLocked.callCount.should.equal(0)
   })
 
-  it('can create a contract and accept', async () => {
-    const { bytecode, encodeCall } = await initiator.contractCompile(identityContract)
-    const callData = await encodeCall('init', '()', {})
-    const result = await initiatorCh.createContract({
-      code: bytecode,
-      callData,
-      deposit: 1000,
-      vmVersion: 3,
-      abiVersion: 1
-    }, async (tx) => await initiator.signTransaction(tx))
-    result.should.eql({ accepted: true, address: result.address, state: initiatorCh.state() })
-    contractAddress = result.address
-    contractEncodeCall = encodeCall
-  })
-
-  it('can create a contract and reject', async () => {
-    responderShouldRejectUpdate = true
-    const { bytecode, encodeCall } = await initiator.contractCompile(identityContract)
-    const callData = await encodeCall('init', '()', {})
-    const result = await initiatorCh.createContract({
-      code: bytecode,
-      callData,
-      deposit: 1000,
-      vmVersion: 3,
-      abiVersion: 1
-    }, async (tx) => await initiator.signTransaction(tx))
-    result.should.eql({ accepted: false })
-  })
-
-  it('can call a contract and accept', async () => {
-    callerNonce = Number(unpackTx(initiatorCh.state()).tx.encodedTx.tx.round)
-    const result = await initiatorCh.callContract({
-      amount: 0,
-      callData: await contractEncodeCall('main', '(42)', {}),
-      contract: contractAddress,
-      abiVersion: 1
-    }, async (tx) => await initiator.signTransaction(tx))
-    result.should.eql({ accepted: true, state: initiatorCh.state() })
-  })
-
-  it('can call a contract and reject', async () => {
-    responderShouldRejectUpdate = true
-    const result = await initiatorCh.callContract({
-      amount: 0,
-      callData: await contractEncodeCall('main', '(42)', {}),
-      contract: contractAddress,
-      abiVersion: 1
-    }, async (tx) => await initiator.signTransaction(tx))
-    result.should.eql({ accepted: false })
-  })
-
-  it('can get contract call', async () => {
-    const result = await initiatorCh.getContractCall({
-      caller: await initiator.address(),
-      contract: contractAddress,
-      round: callerNonce
-    })
-    result.should.eql({
-      callerId: await initiator.address(),
-      callerNonce,
-      contractId: contractAddress,
-      gasPrice: result.gasPrice,
-      gasUsed: result.gasUsed,
-      height: result.height,
-      log: result.log,
-      returnType: 'ok',
-      returnValue: result.returnValue
-    })
-  })
-
   it('can close a channel', async () => {
     const tx = await initiatorCh.shutdown(async (tx) => await initiator.signTransaction(tx))
     tx.should.be.a('string')
@@ -339,5 +269,93 @@ describe('Channel', function () {
       sign: async (tag, tx) => await responder.signTransaction(tx)
     })
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
+    await initiatorCh.leave()
+  })
+
+  it('can create a contract and accept', async () => {
+    initiatorCh = await Channel({
+      ...sharedParams,
+      role: 'initiator',
+      existingChannelId,
+      offchainTx,
+      sign: async (tag, tx) => await initiator.signTransaction(tx)
+    })
+    responderCh = await Channel({
+      ...sharedParams,
+      role: 'responder',
+      existingChannelId,
+      offchainTx,
+      sign: responderSign
+    })
+    await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
+    const { bytecode, encodeCall } = await initiator.contractCompile(identityContract)
+    const callData = await encodeCall('init', '()', {})
+    const result = await initiatorCh.createContract({
+      code: bytecode,
+      callData,
+      deposit: 1000,
+      vmVersion: 3,
+      abiVersion: 1
+    }, async (tx) => await initiator.signTransaction(tx))
+    result.should.eql({ accepted: true, address: result.address, state: initiatorCh.state() })
+    contractAddress = result.address
+    contractEncodeCall = encodeCall
+  })
+
+  it('can create a contract and reject', async () => {
+    responderShouldRejectUpdate = true
+    const { bytecode, encodeCall } = await initiator.contractCompile(identityContract)
+    const callData = await encodeCall('init', '()', {})
+    const result = await initiatorCh.createContract({
+      code: bytecode,
+      callData,
+      deposit: 1000,
+      vmVersion: 3,
+      abiVersion: 1
+    }, async (tx) => await initiator.signTransaction(tx))
+    result.should.eql({ accepted: false })
+  })
+
+  it('can call a contract and accept', async () => {
+    const result = await initiatorCh.callContract({
+      amount: 0,
+      callData: await contractEncodeCall('main', '(42)', {}),
+      contract: contractAddress,
+      abiVersion: 1
+    }, async (tx) => await initiator.signTransaction(tx))
+    result.should.eql({ accepted: true, state: initiatorCh.state() })
+    callerNonce = Number(unpackTx(initiatorCh.state()).tx.encodedTx.tx.round)
+  })
+
+  it('can call a contract and reject', async () => {
+    responderShouldRejectUpdate = true
+    const result = await initiatorCh.callContract({
+      amount: 0,
+      callData: await contractEncodeCall('main', '(42)', {}),
+      contract: contractAddress,
+      abiVersion: 1
+    }, async (tx) => await initiator.signTransaction(tx))
+    result.should.eql({ accepted: false })
+  })
+
+  it('can get contract call', async () => {
+    const result = await initiatorCh.getContractCall({
+      caller: await initiator.address(),
+      contract: contractAddress,
+      round: callerNonce
+    })
+    result.should.eql({
+      callerId: await initiator.address(),
+      callerNonce,
+      contractId: contractAddress,
+      gasPrice: result.gasPrice,
+      gasUsed: result.gasUsed,
+      height: result.height,
+      log: result.log,
+      returnType: 'ok',
+      returnValue: result.returnValue
+    })
+    const value = await initiator.contractNodeDecodeData('int', result.returnValue)
+    value.should.eql({ type: 'word', value: 42 })
   })
 })
