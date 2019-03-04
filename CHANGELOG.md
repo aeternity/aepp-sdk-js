@@ -2,6 +2,24 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [2.3.1]
+### Added
+- `Oracle` fee calculation
+- `getAccountNonce` function to `tx` stamp
+
+### Changed
+- Change `FEE_BYTE_SIZE` from 1 to 8 bytes in `fee` calculation
+- Improve error handling in `tx` builder
+
+ ### Removed
+- none
+
+ ### Breaking Changes
+- none
+
+ ### Notes and known Issues
+- none
+
 ## [2.3.0]
 ### Added
 - `Minerva` comparability
@@ -526,3 +544,5 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 [2.2.1-next]: https://github.com/aeternity/aepp-sdk-js/compare/2.1.1-0.1.0-next...2.2.1-next
 [2.3.0-next]: https://github.com/aeternity/aepp-sdk-js/compare/2.2.1-next...2.3.0-next
 [2.3.0]: https://github.com/aeternity/aepp-sdk-js/compare/2.3.0-next...2.3.0
+[2.3.0]: https://github.com/aeternity/aepp-sdk-js/compare/2.3.0...2.3.1
+

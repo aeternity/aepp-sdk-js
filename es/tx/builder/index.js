@@ -256,14 +256,16 @@ export function unpackRawTx (binary, schema) {
  * @return {Object} { tx, rlpEncoded, binary } Object with tx -> Base64Check transaction hash with 'tx_' prefix, rlp encoded transaction and binary transaction
  */
 export function buildTx (params, type, { excludeKeys = [] } = {}) {
-  if (!TX_SERIALIZATION_SCHEMA[type]) throw new Error('Transaction not yet implemented.')
+  if (!TX_SERIALIZATION_SCHEMA[type]) {
+    throw new Error('Transaction serialization not implemented for ' + type)
+  }
   const [schema, tag] = TX_SERIALIZATION_SCHEMA[type]
   const binary = buildRawTx({ ...params, VSN, tag }, schema, { excludeKeys }).filter(e => e !== undefined)
 
   const rlpEncoded = rlp.encode(binary)
   const tx = encode(rlpEncoded, 'tx')
 
-  return { tx, rlpEncoded, binary }
+  return { tx, rlpEncoded, binary, txObject: unpackRawTx(binary, schema) }
 }
 
 /**
@@ -279,7 +281,9 @@ export function unpackTx (encodedTx, fromRlpBinary = false) {
   const binary = rlp.decode(rlpEncoded)
 
   const objId = readInt(binary[0])
-  if (!TX_DESERIALIZATION_SCHEMA[objId]) throw new Error('Transaction not yet implemented.')
+  if (!TX_DESERIALIZATION_SCHEMA[objId]) {
+    return { message: 'Transaction deserialization not implemented for tag ' + objId }
+  }
   const [schema] = TX_DESERIALIZATION_SCHEMA[objId]
 
   return { txType: OBJECT_ID_TX_TYPE[objId], tx: unpackRawTx(binary, schema), rlpEncoded, binary }

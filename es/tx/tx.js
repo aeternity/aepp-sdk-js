@@ -34,7 +34,7 @@ import { buildContractId, oracleQueryId } from './builder/helpers'
 
 const ORACLE_VM_VERSION = 0
 const CONTRACT_VM_VERSION = 1
-const MIN_GAS_PRICE = 1000000 // min gasPrice 1e6
+const MIN_GAS_PRICE = 1000000000 // min gasPrice 1e9
 // TODO This values using as default for minerva node
 const CONTRACT_MINERVA_VM_ABI = 196609
 const CONTRACT_MINERVA_VM = 3
@@ -271,15 +271,10 @@ async function calculateTtl (ttl = 0, relative = true) {
  * @param {number} nonce
  * @return {number} Next Nonce
  */
-async function calculateNonce (accountId, nonce) {
-  if (!nonce) {
-    try {
-      return +(await this.api.getAccountByPubkey(accountId)).nonce + 1
-    } catch (e) {
-      return 0
-    }
-  }
-  return nonce
+async function getAccountNonce (accountId, nonce) {
+  if (nonce) return nonce
+  const { nonce: accountNonce } = await this.api.getAccountByPubkey(accountId).catch(() => ({ nonce: 0 }))
+  return accountNonce + 1
 }
 
 /**
@@ -290,7 +285,7 @@ async function calculateNonce (accountId, nonce) {
  * @return {Object} { ttl, nonce, fee } Object with account nonce, absolute ttl and transaction fee
  */
 async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, gas, absoluteTtl }) {
-  const nonce = await (calculateNonce.bind(this)(senderId, n))
+  const nonce = await this.getAccountNonce(senderId, n)
   const ttl = await (calculateTtl.bind(this)(t, !absoluteTtl))
   const fee = calculateFee(f, txType, { showWarning: this.showWarning, gas, params: R.merge(R.last(arguments), { nonce, ttl }) })
   return { fee, ttl, nonce }
@@ -339,7 +334,8 @@ const Transaction = Node.compose(Tx, {
     oracleRegisterTx,
     oracleExtendTx,
     oraclePostQueryTx,
-    oracleRespondTx
+    oracleRespondTx,
+    getAccountNonce
   }
 })
 

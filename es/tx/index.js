@@ -47,7 +47,7 @@ const Tx = stampit({
       methods: [
         'spendTx', 'namePreclaimTx', 'nameClaimTx', 'nameTransferTx',
         'nameUpdateTx', 'nameRevokeTx', 'contractCreateTx', 'contractCallTx',
-        'oracleRegisterTx', 'oracleExtendTx', 'oraclePostQueryTx', 'oracleRespondTx'
+        'oracleRegisterTx', 'oracleExtendTx', 'oraclePostQueryTx', 'oracleRespondTx', 'getAccountNonce'
       ]
     }
   }
@@ -64,7 +64,8 @@ const Tx = stampit({
     oracleRegisterTx: required,
     oracleExtendTx: required,
     oraclePostQueryTx: required,
-    oracleRespondTx: required
+    oracleRespondTx: required,
+    getAccountNonce: required
   }
 }))
 
@@ -198,6 +199,17 @@ const Tx = stampit({
  * @rtype ({ oracleId: String, callerId: String, responseTtl: Object, queryId: String, response: String, fee?: Number, ttl?: Number, nonce?: Number}) => tx: Promise[String]
  * @param {Object} options - The object to extract properties from
  * @return {String} `oracle_respond_tx` transaction
+ */
+
+/**
+ * Get Account Nonce
+ * @function getAccountNonce
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype (address) => result: Number
+ * @param {String} address - Account public key
+ * @return {Number} Result
  */
 
 export default Tx
