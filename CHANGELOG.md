@@ -9,6 +9,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 ### Changed
 - Change default `gasPrice` from `1e6` to `1e9z
 - Fix `AEPP` example app
+- Force `image` pull before `builds`
 
  ### Removed
 - none
