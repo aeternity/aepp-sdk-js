@@ -23,7 +23,6 @@ import {
   send,
   emit
 } from './internal'
-import * as R from 'ramda'
 
 export function awaitingConnection (channel, message, state) {
   if (message.method === 'channels.info') {
@@ -191,31 +190,6 @@ export function awaitingUpdateConflict (channel, message, state) {
     return { handler: awaitingUpdateConflict }
   }
   if (message.method === 'channels.conflict') {
-    return { handler: channelOpen }
-  }
-}
-
-export function awaitingProofOfInclusion (channel, message, state) {
-  if (message.id === state.messageId) {
-    state.resolve(message.result.poi)
-    return { handler: channelOpen }
-  }
-  if (message.method === 'channels.error') {
-    state.reject(new Error(message.data.message))
-    return { handler: channelOpen }
-  }
-}
-
-export function awaitingBalances (channel, message, state) {
-  if (message.id === state.messageId) {
-    state.resolve(R.reduce((acc, item) => ({
-      ...acc,
-      [item.account]: item.balance
-    }), {}, message.result))
-    return { handler: channelOpen }
-  }
-  if (message.method === 'channels.error') {
-    state.reject(new Error(message.data.message))
     return { handler: channelOpen }
   }
 }
