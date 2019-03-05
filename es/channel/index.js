@@ -214,7 +214,7 @@ function shutdown (sign) {
   return new Promise((resolve) => {
     enqueueAction(
       this,
-      (channel, state) => true,
+      (channel, state) => state.handler === handlers.channelOpen,
       (channel, state) => {
         send(channel, { jsonrpc: '2.0', method: 'channels.shutdown', params: {} })
         return {
