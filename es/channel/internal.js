@@ -117,7 +117,6 @@ async function dequeueMessage (channel) {
   dequeueMessage(channel)
 }
 
-
 function onMessage (channel, data) {
   const message = JSON.parse(data)
   if (message.id) {
