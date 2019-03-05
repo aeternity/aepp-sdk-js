@@ -123,9 +123,6 @@ export async function channelOpen (channel, message, state) {
     case 'channels.leave':
       // TODO: emit event
       return { handler: channelOpen }
-    case 'channels.message':
-      emit(channel, 'message', message.params.data.message)
-      return { handler: channelOpen }
     case 'channels.update':
       changeState(channel, message.params.data.state)
       return { handler: channelOpen }
