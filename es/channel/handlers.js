@@ -51,7 +51,7 @@ export async function awaitingChannelCreateTx (channel, message, state) {
     responder: 'responder_sign'
   }[options.get(channel).role]
   if (message.method === `channels.sign.${tag}`) {
-    const signedTx = await options.get(channel).sign(message.tag, message.params.data.tx)
+    const signedTx = await options.get(channel).sign(tag, message.params.data.tx)
     send(channel, { jsonrpc: '2.0', method: `channels.${tag}`, params: { tx: signedTx } })
     return { handler: awaitingOnChainTx }
   }
