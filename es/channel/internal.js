@@ -167,7 +167,6 @@ async function initialize (channel, channelOptions) {
   fsm.set(channel, { handler: awaitingConnection })
   eventEmitters.set(channel, new EventEmitter())
   sequence.set(channel, 0)
-  console.log(channelURL(channelOptions.url, { ...params, protocol: 'json-rpc' }))
   websockets.set(channel, await WebSocket(channelURL(channelOptions.url, { ...params, protocol: 'json-rpc' }), {
     onopen: () => changeStatus(channel, 'connected'),
     onclose: () => changeStatus(channel, 'disconnected'),
