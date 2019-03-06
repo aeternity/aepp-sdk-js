@@ -69,6 +69,8 @@ function changeState (channel, newState) {
 }
 
 function send (channel, message) {
+  console.log(`\n${options.get(channel).role} ---> (${new Date().toISOString()})`)
+  console.log(JSON.stringify(message, undefined, 2))
   websockets.get(channel).send(JSON.stringify(message, undefined, 2))
 }
 
@@ -104,6 +106,8 @@ async function handleMessage (channel, message) {
 }
 
 async function enqueueMessage (channel, message) {
+  console.log(`\n${options.get(channel).role} <--- (${new Date().toISOString()})`)
+  console.log(JSON.stringify(JSON.parse(message), undefined, 2))
   const queue = messageQueue.get(channel) || []
   messageQueue.set(channel, [...queue, JSON.parse(message)])
   dequeueMessage(channel)
@@ -167,6 +171,7 @@ async function initialize (channel, channelOptions) {
   fsm.set(channel, { handler: awaitingConnection })
   eventEmitters.set(channel, new EventEmitter())
   sequence.set(channel, 0)
+  console.log(channelURL(channelOptions.url, { ...params, protocol: 'json-rpc' }))
   websockets.set(channel, await WebSocket(channelURL(channelOptions.url, { ...params, protocol: 'json-rpc' }), {
     onopen: () => changeStatus(channel, 'connected'),
     onclose: () => changeStatus(channel, 'disconnected'),

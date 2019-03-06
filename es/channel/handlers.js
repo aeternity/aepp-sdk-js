@@ -15,7 +15,8 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { generateKeyPair } from '../utils/crypto'
+import { generateKeyPair, encodeContractAddress } from '../utils/crypto'
+import { snakeToPascal } from '../utils/string'
 import {
   options,
   changeStatus,
@@ -23,6 +24,7 @@ import {
   send,
   emit
 } from './internal'
+import { unpackTx } from '../tx/builder'
 import * as R from 'ramda'
 
 export function awaitingConnection (channel, message, state) {
@@ -318,6 +320,71 @@ export function awaitingDepositCompletion (channel, message, state) {
   }
   if (message.method === 'channels.conflict') {
     state.resolve({ accepted: false })
+    return { handler: channelOpen }
+  }
+}
+
+export async function awaitingNewContractTx (channel, message, state) {
+  if (message.method === 'channels.sign.update') {
+    const signedTx = await Promise.resolve(state.sign(message.params.data.tx))
+    send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { tx: signedTx } })
+    return { handler: awaitingNewContractCompletion, state }
+  }
+}
+
+export function awaitingNewContractCompletion (channel, message, state) {
+  if (message.method === 'channels.update') {
+    const { round } = unpackTx(message.params.data.state).tx.encodedTx.tx
+    // eslint-disable-next-line standard/computed-property-even-spacing
+    const owner = options.get(channel)[{
+      initiator: 'initiatorId',
+      responder: 'responderId'
+    }[options.get(channel).role]]
+    changeState(channel, message.params.data.state)
+    state.resolve({
+      accepted: true,
+      address: encodeContractAddress(owner, round),
+      state: message.params.data.state
+    })
+    return { handler: channelOpen }
+  }
+  if (message.method === 'channels.conflict') {
+    state.resolve({ accepted: false })
+    return { handler: channelOpen }
+  }
+}
+
+export async function awaitingCallContractUpdateTx (channel, message, state) {
+  if (message.method === 'channels.sign.update') {
+    const signedTx = await Promise.resolve(state.sign(message.params.data.tx))
+    send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { tx: signedTx } })
+    return { handler: awaitingCallContractCompletion, state }
+  }
+}
+
+export function awaitingCallContractCompletion (channel, message, state) {
+  if (message.method === 'channels.update') {
+    changeState(channel, message.params.data.state)
+    state.resolve({ accepted: true, state: message.params.data.state })
+    return { handler: channelOpen }
+  }
+  if (message.method === 'channels.conflict') {
+    state.resolve({ accepted: false })
+    return { handler: channelOpen }
+  }
+}
+
+export function awaitingContractCall (channel, message, state) {
+  if (message.id === state.messageId) {
+    state.resolve(
+      R.fromPairs(
+        R.map(([key, value]) => ([snakeToPascal(key), value]), R.toPairs(message.result))
+      )
+    )
+    return { handler: channelOpen }
+  }
+  if (message.method === 'channels.error') {
+    state.reject(new Error(message.data.message))
     return { handler: channelOpen }
   }
 }
