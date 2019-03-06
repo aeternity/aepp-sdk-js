@@ -149,6 +149,17 @@ export async function awaitingOffChainTx (channel, message, state) {
     state.reject(new Error(message.data.message))
     return { handler: channelOpen }
   }
+  if (message.error) {
+    const { data = [] } = message.error
+    if (data.find(i => i.code === 1001)) {
+      state.reject(new Error('Insufficient balance'))
+    } else if (data.find(i => i.code === 1002)) {
+      state.reject(new Error('Amount cannot be negative'))
+    } else {
+      state.reject(new Error(message.error.message))
+    }
+    return { handler: channelOpen }
+  }
 }
 
 export function awaitingOffChainUpdate (channel, message, state) {
@@ -159,6 +170,10 @@ export function awaitingOffChainUpdate (channel, message, state) {
   }
   if (message.method === 'channels.conflict') {
     state.resolve({ accepted: false })
+    return { handler: channelOpen }
+  }
+  if (message.error) {
+    state.reject(new Error(message.error.message))
     return { handler: channelOpen }
   }
 }

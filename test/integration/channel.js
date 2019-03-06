@@ -293,4 +293,35 @@ describe('Channel', function () {
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.notCalled(responderSign)
   })
+
+  describe('throws errors', function () {
+    async function update ({ from, to, amount, sign }) {
+      return initiatorCh.update(
+        from || await initiator.address(),
+        to || await responder.address(),
+        amount || 1,
+        sign || initiator.signTransaction
+      )
+    }
+
+    it('when posting an update with negative amount', async () => {
+      return update({ amount: -10 }).should.eventually.be.rejectedWith('Amount cannot be negative')
+    })
+
+    it('when posting an update with insufficient balance', async () => {
+      return update({ amount: 2000000000000000 }).should.eventually.be.rejectedWith('Insufficient balance')
+    })
+
+    it('when posting an update with incorrect address', async () => {
+      return update({ from: 'ak_123' }).should.eventually.be.rejectedWith('Rejected')
+    })
+
+    it('when posting an update with incorrect amount', async () => {
+      return update({ amount: '1' }).should.eventually.be.rejectedWith('Internal error')
+    })
+
+    it('when posting incorrect update tx', async () => {
+      return update({ sign: () => 'abcdefg' }).should.eventually.be.rejectedWith('Internal error')
+    })
+  })
 })
