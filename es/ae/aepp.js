@@ -25,7 +25,10 @@
 import Ae from './'
 import Aens from './aens'
 import Contract from './contract'
-import Rpc from '../rpc/client'
+import RemoteAccount from '../rpc/provider.sdk'
+import Oracle from './oracle'
+import Chain from '../chain/node'
+import Transaction from '../tx/tx'
 
 /**
  * Aepp Stamp
@@ -39,6 +42,6 @@ import Rpc from '../rpc/client'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Aepp instance
  */
-const Aepp = Ae.compose(Contract, Aens, Rpc)
+const Aepp = Ae.compose(Chain, Transaction, Contract, Aens, Oracle, RemoteAccount)
 
 export default Aepp

@@ -174,7 +174,7 @@ export default {
     }
   },
   created () {
-    Aepp().then(ae => {
+    Aepp({ url: 'http://localhost:3013', internalUrl: 'http://localhost:3113'}).then(ae => {
       this.client = ae
       ae.address()
         .then(address => {
