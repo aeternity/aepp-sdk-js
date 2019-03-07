@@ -26,8 +26,8 @@ check out the [develop branch].
 ## Table of Content
 1. [Quick Start](#quick-start)
    1. [Install](#1-Install-the-SDK)
-   2. [Import](#2-Import-(a-chosen-Flavor))
-   3. [Interact](#3-Start-interacting-with-aeternity's-blockchain)
+   2. [Import](#2-Import-a-chosen-Flavor)
+   3. [Interact](#3-Start-interacting-with-aeternitys-blockchain)
 2. [Learn More](docs/usage.md)
 3. [Contribute](docs/contributing.md)
 
