@@ -47,18 +47,6 @@ const METHODS = {
 
 const sdkID = '1KGVZ2AFqAybJkpdKCzP/0W4W/0BQZaDH6en8g7VstQ='
 
-const RPC_METHOD = (encrypted = true, hasCallback = false) => [encrypted, hasCallback]
-
-const RPC = {
-  [METHODS.sign]: RPC_METHOD(true, METHODS.broadcast),
-  [METHODS.ready]: RPC_METHOD(false),
-  [METHODS.registerProvider]: RPC_METHOD(false),
-  [METHODS.deregisterProvider]: RPC_METHOD(false),
-  [METHODS.walletDetail]: RPC_METHOD(true),
-  [METHODS.registerRequest]: RPC_METHOD(false),
-  [METHODS.broadcast]: RPC_METHOD(false, true)
-}
-
 const HANDLERS = {
   [IDENTITY_METHODS.walletDetail]: ({ params: [sdkId, address, meta] }) => {
     const [providerId] = Object.keys(providers)
