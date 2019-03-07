@@ -25,8 +25,11 @@ check out the [develop branch].
 
 ## Table of Content
 1. [Quick Start](#quick-start)
-2.
-
+   1. [Install](#1.-Install-the-SDK)
+   2. [Import](#2.-Import-(a-chosen-Flavor))
+   3. [Interact](#3.-Start-interacting-with-aeternity's-blockchain)
+2. [Learn More](docs/usage.md)
+3. [Contribute](docs/contributing.md)
 
 ## Quick Start
 
@@ -100,10 +103,6 @@ Ae({
 For advanced use, to contribute to development of new versions and to get a deeper understanding of the SDK, it is advised to read the [Contributing] section.
 
 [Contributing]: docs/contributing.md
-
-## [API]
-
-[API]: docs/api.md
 
 ## [Change Log]
 

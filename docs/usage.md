@@ -239,10 +239,8 @@ Example spend function, using aeternity's SDK abstraction
   }).then(ae => ae.spend(parseInt(amount), receiver_pub_key))
 ```
 
-
-
-### Low-level SDK usage (use API endpoints directly)
-Example spend function, using the SDK, talking directly to the API:
+### Low-level SDK usage (use [API](../docs/api.md) endpoints directly)
+Example spend function, using the SDK, talking directly to the [**API**](../docs/api.md):
 ```js
   // Import necessary Modules
   import Tx from '@aeternity/aepp-sdk/es/tx/tx.js'
