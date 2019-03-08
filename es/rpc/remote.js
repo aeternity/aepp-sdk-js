@@ -102,14 +102,13 @@ function encryptMsg ({ params }) {
   return params
 }
 
+// INTERFACE
 function postMessage (method, params) {
   const handler = HANDLERS[method].bind(this)
   if (handler) return handler(params)
 
   console.warn('Unknown message method')
 }
-
-// INTERFACE
 
 function processMessage (msg) {
   if (HANDLERS[msg.method]) return HANDLERS[msg.method].bind(this)(msg)
