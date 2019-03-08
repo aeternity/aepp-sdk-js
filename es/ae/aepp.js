@@ -22,10 +22,10 @@
  * @example import Ae from '@aeternity/aepp-sdk/es/ae/aepp'
  */
 
+import RemoteAccount from '../rpc/remote'
 import Ae from './'
 import Aens from './aens'
 import Contract from './contract'
-import RemoteAccount from '../rpc/remote'
 import Oracle from './oracle'
 import Chain from '../chain/node'
 import Transaction from '../tx/tx'
