@@ -47,8 +47,20 @@ const METHODS = {
 
 const sdkID = '1KGVZ2AFqAybJkpdKCzP/0W4W/0BQZaDH6en8g7VstQ='
 
-const HANDLERS = {
-  [IDENTITY_METHODS.walletDetail]: ({ params: [sdkId, address, meta] }) => {
+const SEND_HANDLERS = {
+  [SDK_METHODS.sign]: ([unsignedTx, tx]) => {
+    const [providerId] = getActiveProvider()
+    const params = [providerId, unsignedTx, tx]
+    return new Promise((resolve, reject) => {
+      providers[providerId].callbacks[tx] = { meta: { unsignedTx }, resolve, reject }
+      post(SDK_METHODS.sign, params)
+    })
+  },
+  [SDK_METHODS.ready]: (params) => post(SDK_METHODS.ready, params, false)
+}
+
+const RECEIVE_HANDLERS = {
+  [IDENTITY_METHODS.walletDetail]: ({ params: [sdkId, address, meta] }) => { // TODO check if sdkId is own ID
     const [providerId] = Object.keys(providers)
     providers[providerId] = { meta, address, active: true, callbacks: {} }
     // @TODO call callback that notify dapp about change
@@ -58,7 +70,7 @@ const HANDLERS = {
     providers[providerId] = {}
     post(METHODS.registerProvider, [providerId, sdkID], false)
   },
-  [IDENTITY_METHODS.broadcast]: (msg) => {
+  [IDENTITY_METHODS.broadcast]: (msg) => { // TODO check if sdkId is own ID
     const message = { ...msg, params: decryptMsg(msg) }
     const { error, params: [_, rawTx, signedTx] } = message
     const [providerId] = getActiveProvider()
@@ -71,16 +83,7 @@ const HANDLERS = {
       }
       delete providers[providerId].callbacks[rawTx]
     }
-  },
-  [SDK_METHODS.sign]: ([unsignedTx, tx]) => {
-    const [providerId] = getActiveProvider()
-    const params = [providerId, unsignedTx, tx]
-    return new Promise((resolve, reject) => {
-      providers[providerId].callbacks[tx] = { meta: { unsignedTx }, resolve, reject }
-      post(SDK_METHODS.sign, params)
-    })
-  },
-  [SDK_METHODS.ready]: (params) => post(SDK_METHODS.ready, params, false)
+  }
 }
 
 const post = (method, params, encrypted = true) => window.postMessage({
@@ -104,21 +107,38 @@ function encryptMsg ({ params }) {
 
 // INTERFACE
 function postMessage (method, params) {
-  const handler = HANDLERS[method].bind(this)
+  const handler = SEND_HANDLERS[method].bind(this)
   if (handler) return handler(params)
-
   console.warn('Unknown message method')
 }
 
 function processMessage (msg) {
-  if (HANDLERS[msg.method]) return HANDLERS[msg.method].bind(this)(msg)
+  if (RECEIVE_HANDLERS[msg.method]) return RECEIVE_HANDLERS[msg.method].bind(this)(msg)
   console.warn('Unknown message method')
 }
 
+/**
+ * Sign the transaction
+ * @async
+ * @function sing
+ * @rtype (unsignedTx: Buffer, options: Object) => Promise<Buffer>
+ * @param unsignedTx Buffer like [...networkId, ...unsignedTx]
+ * @param tx [options.tx] Unsigned transaction base64c string
+ * @return Promise<Buffer> Signature
+ */
 async function sign (unsignedTx, { tx }) {
   return this.postMessage(METHODS.sign, [unsignedTx, tx])
 }
 
+/**
+ * Get Account Public key
+ * @async
+ * @function address
+ * @rtype () => Promise<String>
+ * @throws Error('Provider not found')
+ * @return String address Account public key
+ * Send `ready` message that notify that sdk is initialized
+ */
 async function address () {
   const [_, provider] = this.getActiveProvider()
   return provider.address
@@ -126,20 +146,24 @@ async function address () {
     : Promise.reject(new Error('Provider not found'))
 }
 
+/**
+ * Send `ready` message that notify that sdk is initialized
+ * @rtype () => void
+ * @return void
+ */
 function ready () {
   this.postMessage(METHODS.ready, [true])
 }
 
 /**
- * RPC client Stamp
+ * RemoteAccount client Stamp
  * @function
- * @alias module:@aeternity/aepp-sdk/es/rpc/client
+ * @alias module:@aeternity/aepp-sdk/es/rpc/remote
  * @rtype Stamp
  * @param {Object} [options={}] - Initializer object
- * @param {Object} [options.parent=window.parent] - IFrame parent window
- * @param {Object} [options.self=window] - IFrame window
- * @return {Object} RPC client
- * @example RpcClient()
+ * @param {Object} [options.self=window] - Window object
+ * @return {Object} Remote Account Client
+ * @example RemoteAccount({ self = window }).then(async account => console.log(await account.address())
  */
 const RemoteAccount = stampit({
   async init ({ self = window }) {
