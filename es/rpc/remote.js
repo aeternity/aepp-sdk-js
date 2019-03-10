@@ -40,17 +40,14 @@ const SDK_METHODS = {
   deregisterProvider: 'ae:deregister'
 }
 
-const METHODS = {
-  ...SDK_METHODS,
-  ...IDENTITY_METHODS
-}
-
 const sdkID = '1KGVZ2AFqAybJkpdKCzP/0W4W/0BQZaDH6en8g7VstQ='
 
 const SEND_HANDLERS = {
   [SDK_METHODS.sign]: ([unsignedTx, tx]) => {
     const [providerId] = getActiveProvider()
+    if (!providerId) return Promise.reject(new Error('Active provider not found'))
     const params = [providerId, unsignedTx, tx]
+
     return new Promise((resolve, reject) => {
       providers[providerId].callbacks[tx] = { meta: { unsignedTx }, resolve, reject }
       post(SDK_METHODS.sign, params)
@@ -60,19 +57,24 @@ const SEND_HANDLERS = {
 }
 
 const RECEIVE_HANDLERS = {
-  [IDENTITY_METHODS.walletDetail]: ({ params: [sdkId, address, meta] }) => { // TODO check if sdkId is own ID
+  [IDENTITY_METHODS.walletDetail]: (msg) => {
+    const message = { ...msg, params: decryptMsg(msg) } // TODO check if sdkId is own sdkID
+    const { params: [_, address, meta] } = message
+
     const [providerId] = Object.keys(providers)
-    providers[providerId] = { meta, address, active: true, callbacks: {} }
+
+    providers[providerId] = { meta, address, active: true, callbacks: {}, status: 'REGISTERED' }
     // @TODO call callback that notify dapp about change
   },
-  [IDENTITY_METHODS.registerRequest]: ({ params: [providerId] }) => {
-    if (Object.keys(providers).length) return
-    providers[providerId] = {}
-    post(METHODS.registerProvider, [providerId, sdkID], false)
+  [IDENTITY_METHODS.registerRequest]: ({ params: [providerId] }) => { // TODO Think about multiple provider registration
+    if (this.getActiveProvider().length) return // TODO Allow only one active provider
+    providers[providerId] = { status: 'WAIT_FOR_REGISTER' }
+    post(SDK_METHODS.registerProvider, [providerId, sdkID], false) // Register provider
   },
-  [IDENTITY_METHODS.broadcast]: (msg) => { // TODO check if sdkId is own ID
-    const message = { ...msg, params: decryptMsg(msg) }
+  [IDENTITY_METHODS.broadcast]: (msg) => {
+    const message = { ...msg, params: decryptMsg(msg) } // TODO check if sdkId is own ID
     const { error, params: [_, rawTx, signedTx] } = message
+
     const [providerId] = getActiveProvider()
 
     if (providers[providerId].callbacks[rawTx]) {
@@ -107,8 +109,7 @@ function encryptMsg ({ params }) {
 
 // INTERFACE
 function postMessage (method, params) {
-  const handler = SEND_HANDLERS[method].bind(this)
-  if (handler) return handler(params)
+  if (SEND_HANDLERS[method]) return SEND_HANDLERS[method].bind(this)(params)
   console.warn('Unknown message method')
 }
 
@@ -127,7 +128,7 @@ function processMessage (msg) {
  * @return Promise<Buffer> Signature
  */
 async function sign (unsignedTx, { tx }) {
-  return this.postMessage(METHODS.sign, [unsignedTx, tx])
+  return this.postMessage(SDK_METHODS.sign, [unsignedTx, tx])
 }
 
 /**
@@ -143,7 +144,7 @@ async function address () {
   const [_, provider] = this.getActiveProvider()
   return provider.address
     ? Promise.resolve(provider.address)
-    : Promise.reject(new Error('Provider not found'))
+    : Promise.reject(new Error('Active provider not found'))
 }
 
 /**
@@ -152,7 +153,7 @@ async function address () {
  * @return void
  */
 function ready () {
-  this.postMessage(METHODS.ready, [true])
+  this.postMessage(SDK_METHODS.ready, [true])
 }
 
 /**
