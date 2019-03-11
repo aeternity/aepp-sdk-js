@@ -64,7 +64,7 @@ const RECEIVE_HANDLERS = {
     const [providerId] = Object.keys(providers)
 
     providers[providerId] = { meta, address, active: true, callbacks: {}, status: 'REGISTERED' }
-    // @TODO call callback that notify dapp about change
+    this.onWalletChange(providers[providerId])
   },
   [IDENTITY_METHODS.registerRequest]: ({ params: [providerId] }) => { // TODO Think about multiple provider registration
     if (this.getActiveProvider().length) return // TODO Allow only one active provider
@@ -156,6 +156,10 @@ function ready () {
   this.postMessage(SDK_METHODS.ready, [true])
 }
 
+function onWalletChange () {
+  return true
+}
+
 /**
  * RemoteAccount client Stamp
  * @function
@@ -167,7 +171,8 @@ function ready () {
  * @example RemoteAccount({ self = window }).then(async account => console.log(await account.address())
  */
 const RemoteAccount = stampit({
-  async init ({ self = window }) {
+  async init ({ self = window, onWalletChange = this.onWalletChange }) {
+    this.onWalletChange = onWalletChange
     function receive ({ data }) {
       if (typeof data !== 'object' || data.type === 'webpackOk' || Object.values(SDK_METHODS).includes(data.method)) {
         return
@@ -185,8 +190,8 @@ const RemoteAccount = stampit({
     // SEND READY
     this.ready()
   },
-  props: {},
   methods: {
+    onWalletChange,
     postMessage,
     processMessage,
     getActiveProvider,
