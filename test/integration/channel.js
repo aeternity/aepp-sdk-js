@@ -17,6 +17,7 @@
 
 import { describe, it, before } from 'mocha'
 import * as sinon from 'sinon'
+import { BigNumber } from 'bignumber.js'
 import { configure, ready, plan, BaseAe, networkId } from './'
 import { generateKeyPair } from '../../es/utils/crypto'
 import { unpackTx } from '../../es/tx/builder'
@@ -38,7 +39,6 @@ function waitForChannel (channel) {
 
 describe('Channel', function () {
   configure(this)
-  this.retries(3)
 
   let initiator
   let responder
@@ -63,7 +63,7 @@ describe('Channel', function () {
     ttl: 10000,
     host: 'localhost',
     port: 3001,
-    lockPeriod: 10
+    lockPeriod: 1
   }
 
   before(async function () {
@@ -390,7 +390,51 @@ describe('Channel', function () {
     sinon.assert.notCalled(responderSign)
   })
 
+  it('can solo close a channel', async () => {
+    const initiatorAddr = await initiator.address()
+    const responderAddr = await responder.address()
+    const poi = await initiatorCh.poi({
+      accounts: [initiatorAddr, responderAddr]
+    })
+    const balances = await initiatorCh.balances([initiatorAddr, responderAddr])
+    const balanceBeforeClose = await initiator.balance(initiatorAddr)
+    const closeSoloTx = await initiator.channelCloseSoloTx({
+      channelId: await initiatorCh.id(),
+      fromId: initiatorAddr,
+      poi
+    })
+    const closeSoloTxFee = unpackTx(closeSoloTx).tx.fee
+    await initiator.sendTransaction(await initiator.signTransaction(closeSoloTx), { waitMined: true })
+    const settleTx = await initiator.channelSettleTx({
+      channelId: await initiatorCh.id(),
+      fromId: initiatorAddr,
+      initiatorAmountFinal: balances[initiatorAddr],
+      responderAmountFinal: balances[responderAddr]
+    })
+    const settleTxFee = new unpackTx(settleTx).tx.fee
+    await initiator.sendTransaction(await initiator.signTransaction(settleTx), { waitMined: true })
+    const balanceAfterClose = await initiator.balance(initiatorAddr)
+    new BigNumber(balanceAfterClose).minus(balanceBeforeClose).plus(closeSoloTxFee).plus(settleTxFee).isEqualTo(
+      new BigNumber(balances[initiatorAddr])
+    ).should.be.equal(true)
+    await initiatorCh.leave()
+  })
+
   describe('throws errors', function () {
+    before(async function () {
+      initiatorCh = await Channel({
+        ...sharedParams,
+        role: 'initiator',
+        sign: initiatorSign
+      })
+      responderCh = await Channel({
+        ...sharedParams,
+        role: 'responder',
+        sign: responderSign
+      })
+      await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
+    })
+
     async function update ({ from, to, amount, sign }) {
       return initiatorCh.update(
         from || await initiator.address(),

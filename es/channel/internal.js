@@ -32,6 +32,7 @@ const messageQueueLocked = new WeakMap()
 const actionQueue = new WeakMap()
 const actionQueueLocked = new WeakMap()
 const sequence = new WeakMap()
+const channelId = new WeakMap()
 
 function channelURL (url, { endpoint = 'channel', ...params }) {
   const paramString = R.join('&', R.values(R.mapObjIndexed((value, key) =>
@@ -185,5 +186,6 @@ export {
   changeState,
   send,
   enqueueAction,
-  messageId
+  messageId,
+  channelId
 }

@@ -246,6 +246,62 @@ async function oracleRespondTx ({ oracleId, callerId, responseTtl, queryId, resp
   return tx
 }
 
+async function channelCloseSoloTx ({ channelId, fromId, payload = '', poi }) {
+  // Calculate fee, get absolute ttl (ttl + height), get account nonce
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.channelCloseSolo, { senderId: fromId, ...R.head(arguments), payload })
+
+  // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
+  const { tx } = this.nativeMode
+    ? buildTx(R.merge(R.head(arguments), {
+      channelId,
+      fromId,
+      payload,
+      poi,
+      ttl,
+      fee,
+      nonce
+    }), TX_TYPE.channelCloseSolo)
+    : await this.api.postChannelCloseSolo(R.merge(R.head(arguments), {
+      channelId,
+      fromId,
+      payload,
+      poi,
+      ttl,
+      fee: parseInt(fee),
+      nonce
+    }))
+
+  return tx
+}
+
+async function channelSettleTx ({ channelId, fromId, initiatorAmountFinal, responderAmountFinal }) {
+  // Calculate fee, get absolute ttl (ttl + height), get account nonce
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.channelSettle, { senderId: fromId, ...R.head(arguments) })
+
+  // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
+  const { tx } = this.nativeMode
+    ? buildTx(R.merge(R.head(arguments), {
+      channelId,
+      fromId,
+      initiatorAmountFinal,
+      responderAmountFinal,
+      ttl,
+      fee,
+      nonce
+    }), TX_TYPE.channelSettle)
+    : await this.api.postChannelSettle(R.merge(R.head(arguments), {
+      channelId,
+      fromId,
+      initiatorAmountFinal: parseInt(initiatorAmountFinal),
+      responderAmountFinal: parseInt(responderAmountFinal),
+      ttl,
+      fee: parseInt(fee),
+      nonce
+    }))
+
+  return tx
+}
+
 /**
  * Compute the absolute ttl by adding the ttl to the current height of the chain
  *
@@ -335,6 +391,8 @@ const Transaction = Node.compose(Tx, {
     oracleExtendTx,
     oraclePostQueryTx,
     oracleRespondTx,
+    channelCloseSoloTx,
+    channelSettleTx,
     getAccountNonce
   }
 })

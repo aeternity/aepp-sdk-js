@@ -31,7 +31,8 @@ import {
   initialize,
   enqueueAction,
   send,
-  messageId
+  messageId,
+  channelId
 } from './internal'
 
 /**
@@ -60,6 +61,15 @@ function status () {
  */
 function state () {
   return channelState.get(this)
+}
+
+/**
+ * Get channel id
+ *
+ * @return {string}
+ */
+function id () {
+  return channelId.get(this)
 }
 
 /**
@@ -396,6 +406,7 @@ const Channel = AsyncInit.compose({
     on,
     status,
     state,
+    id,
     update,
     poi,
     balances,
