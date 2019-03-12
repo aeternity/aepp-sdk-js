@@ -38,6 +38,7 @@ import OracleNodeAPI from './oracle/node'
 import Selector from './account/selector'
 import Channel from './channel'
 import Universal from './ae/universal'
+import RemoteAccount from './provider/remote'
 
 export {
   Account,
@@ -54,6 +55,7 @@ export {
   MemoryAccount,
   Oracle,
   OracleNodeAPI,
+  RemoteAccount,
   Selector,
   Transaction,
   TransactionValidator,
