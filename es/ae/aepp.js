@@ -22,7 +22,7 @@
  * @example import Ae from '@aeternity/aepp-sdk/es/ae/aepp'
  */
 
-import RemoteAccount from '../rpc/remote'
+import RemoteAccount from '../provider/remote'
 import Ae from './'
 import Aens from './aens'
 import Contract from './contract'

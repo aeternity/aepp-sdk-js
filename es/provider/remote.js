@@ -24,22 +24,9 @@
  */
 
 import stampit from '@stamp/it'
+import { decryptMsg, encryptMsg, IDENTITY_METHODS, SDK_METHODS } from './helper'
 
 const providers = {}
-
-const IDENTITY_METHODS = {
-  broadcast: 'ae:broadcast',
-  walletDetail: 'ae:walletDetail',
-  registerRequest: 'ae:registerProvider'
-}
-
-const SDK_METHODS = {
-  sign: 'ae:sign',
-  ready: 'ae:sdkReady',
-  registerProvider: 'ae:registrationComplete',
-  deregisterProvider: 'ae:deregister'
-}
-
 const sdkID = '1KGVZ2AFqAybJkpdKCzP/0W4W/0BQZaDH6en8g7VstQ='
 
 const SEND_HANDLERS = {
@@ -97,16 +84,6 @@ const post = (method, params, encrypted = true) => window.postMessage({
 
 const getActiveProvider = () => Object.entries(providers).find(([_, { active }]) => active) || []
 
-const decryptMsg = ({ params }) => {
-  // @TODO Implement encryption
-  return params
-}
-
-function encryptMsg ({ params }) {
-  // @TODO Implement encryption
-  return params
-}
-
 // INTERFACE
 function postMessage (method, params) {
   if (SEND_HANDLERS[method]) return SEND_HANDLERS[method].bind(this)(params)
@@ -156,7 +133,7 @@ function ready () {
   this.postMessage(SDK_METHODS.ready, [true])
 }
 
-function onWalletChange () {
+function onWalletChange (params) {
   return true
 }
 
