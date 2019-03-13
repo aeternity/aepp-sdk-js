@@ -36,6 +36,7 @@ const RECEIVE_HANDLERS = {
     const [sdkId, unsignedTx, tx] = message
 
     sdks[sdkId].signCallbacks[tx] = { unsignedTx, meta: {} }
+    this.onSign(message)
     // TODO show confirm
     this.postMessage(IDENTITY_METHODS.broadcast, [sdkId, tx, unsignedTx])
   },
@@ -132,6 +133,10 @@ function onSdkRegister (params) {
   return true
 }
 
+function onSign (params) {
+  return true
+}
+
 /**
  * ExtensionProvider client Stamp
  * @function
@@ -143,8 +148,9 @@ function onSdkRegister (params) {
  * @example RemoteAccount({ self = window }).then(async account => console.log(await account.address())
  */
 const ExtensionProvider = AsyncInit.compose({
-  async init ({ self = window, accounts = [], onSdkRegister = this.onSdkRegister }) {
+  async init ({ self = window, accounts = [], onSdkRegister = this.onSdkRegister, onSign = this.onSign }) {
     this.onSdkRegister = onSdkRegister
+    this.onSign = onSign
     this.accounts = await Promise.all(accounts.map(async acc => [await acc.address(), acc]))
     this.account = this.accounts[0]
 
@@ -161,6 +167,7 @@ const ExtensionProvider = AsyncInit.compose({
     processMessage,
     selectAccount,
     onSdkRegister,
+    onSign,
     sign,
     address,
     sendAccountDetails
