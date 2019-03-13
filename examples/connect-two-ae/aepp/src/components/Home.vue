@@ -5,7 +5,7 @@
     <div class="border">
       <div class="bg-green w-full flex flex-row font-mono border border-b">
         <div class="p-2 w-1/4">
-          Public Key <small>(from Identity Aepp)</small>
+          Public Key <small>(from extension Identity)</small>
         </div>
         <div v-if="pub" class="p-2 w-3/4 bg-grey-lightest break-words">
           {{pub}}

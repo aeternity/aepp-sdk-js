@@ -33,16 +33,18 @@ const indentityID = 'bobS3qRvWfDxCpmedQYzp3xrK5jVUS4MSto99QrCdySSMjYnd'
 const RECEIVE_HANDLERS = {
   [SDK_METHODS.sign]: async function (msg) {
     const message = decryptMsg(msg)
-    const [providerId, unsignedTx, tx] = message
+    const [sdkId, unsignedTx, tx] = message
+
+    sdks[sdkId].signCallbacks[tx] = { unsignedTx, meta: {} }
     // TODO show confirm
-    post(IDENTITY_METHODS.broadcast, [providerId, tx, await this.sign(unsignedTx)])
+    this.postMessage(IDENTITY_METHODS.broadcast, [sdkId, tx, unsignedTx])
   },
   [SDK_METHODS.ready]: () => post(IDENTITY_METHODS.registerRequest, [indentityID], false),
   [SDK_METHODS.registerProvider]: function ({ params: [identityId, sdkId] }) {
     if (!sdks[sdkId]) sdks[sdkId] = { signCallbacks: {} }
-    this.onSdkRegister(sdks[sdkId])
 
-    post(IDENTITY_METHODS.walletDetail, [sdkId, this.account[0], {}])
+    // TODO share detail without asking
+    this.postMessage(IDENTITY_METHODS.walletDetail, [sdkId])
   },
   [SDK_METHODS.deregisterProvider]: function (msg) {
     const message = decryptMsg(msg)
@@ -53,9 +55,19 @@ const RECEIVE_HANDLERS = {
 }
 
 const SEND_HANDLERS = {
-  [IDENTITY_METHODS.walletDetail]: (params) => post(IDENTITY_METHODS.walletDetail, params),
+  [IDENTITY_METHODS.walletDetail]: function (params) {
+    const [sdkId] = params
+    this.onSdkRegister(sdks[sdkId])
+
+    post(IDENTITY_METHODS.walletDetail, [sdkId, this.account[0], {}])
+  },
   [IDENTITY_METHODS.registerRequest]: () => post(IDENTITY_METHODS.registerRequest, [indentityID], false),
-  [IDENTITY_METHODS.broadcast]: (params) => post(IDENTITY_METHODS.broadcast, params)
+  [IDENTITY_METHODS.broadcast]: async function (params) {
+    const [sdkId, tx, unsignedTx] = params
+    post(IDENTITY_METHODS.broadcast, [sdkId, tx, await this.sign(unsignedTx)])
+    // Remove from callBacks
+    delete sdks[sdkId].signCallbacks[tx]
+  }
 }
 
 const post = (method, params, encrypted = true) => window.postMessage({
