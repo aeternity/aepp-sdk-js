@@ -174,11 +174,17 @@ export default {
     }
   },
   created () {
-    Aepp({ url: 'http://localhost:3013', internalUrl: 'http://localhost:3113'}).then(ae => {
+    Aepp({
+      url: 'http://localhost:3013',
+      internalUrl: 'http://localhost:3113',
+      onWalletChange: (params) => {
+        this.pub = params.address
+      }
+    }).then(ae => {
       this.client = ae
       ae.address()
         .then(address => {
-          this.pub = address
+          // this.pub = address
         })
         .catch(e => { this.pub = `Rejected: ${e}` })
     })

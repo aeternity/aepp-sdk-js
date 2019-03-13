@@ -1,4 +1,4 @@
-/* eslint-disable no-return-assign */
+/* eslint-disable no-return-assign,no-unused-vars */
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
@@ -30,21 +30,21 @@ const providers = {}
 const sdkID = '1KGVZ2AFqAybJkpdKCzP/0W4W/0BQZaDH6en8g7VstQ='
 
 const SEND_HANDLERS = {
-  [SDK_METHODS.sign]: ([unsignedTx, tx]) => {
+  [SDK_METHODS.sign]: function ([unsignedTx, tx]) {
     const [providerId] = getActiveProvider()
     if (!providerId) return Promise.reject(new Error('Active provider not found'))
     const params = [providerId, unsignedTx, tx]
 
     return new Promise((resolve, reject) => {
       providers[providerId].callbacks[tx] = { meta: { unsignedTx }, resolve, reject }
-      post(SDK_METHODS.sign, params)
+      post(this.self)(SDK_METHODS.sign, params)
     })
   },
-  [SDK_METHODS.ready]: (params) => post(SDK_METHODS.ready, params, false)
+  [SDK_METHODS.ready]: function (params) { post(this.self)(SDK_METHODS.ready, params, false) }
 }
 
 const RECEIVE_HANDLERS = {
-  [IDENTITY_METHODS.walletDetail]: (msg) => {
+  [IDENTITY_METHODS.walletDetail]: function (msg) {
     const message = { ...msg, params: decryptMsg(msg) } // TODO check if sdkId is own sdkID
     const { params: [_, address, meta] } = message
 
@@ -53,12 +53,12 @@ const RECEIVE_HANDLERS = {
     providers[providerId] = { meta, address, active: true, callbacks: {}, status: 'REGISTERED' }
     this.onWalletChange(providers[providerId])
   },
-  [IDENTITY_METHODS.registerRequest]: ({ params: [providerId] }) => { // TODO Think about multiple provider registration
-    if (this.getActiveProvider().length) return // TODO Allow only one active provider
+  [IDENTITY_METHODS.registerRequest]: function ({ params: [providerId] }) { // TODO Think about multiple provider registration
+    if (getActiveProvider().length) return // TODO Allow only one active provider
     providers[providerId] = { status: 'WAIT_FOR_REGISTER' }
-    post(SDK_METHODS.registerProvider, [providerId, sdkID], false) // Register provider
+    post(this.self)(SDK_METHODS.registerProvider, [providerId, sdkID], false) // Register provider
   },
-  [IDENTITY_METHODS.broadcast]: (msg) => {
+  [IDENTITY_METHODS.broadcast]: function (msg) {
     const message = { ...msg, params: decryptMsg(msg) } // TODO check if sdkId is own ID
     const { error, params: [_, rawTx, signedTx] } = message
 
@@ -75,7 +75,7 @@ const RECEIVE_HANDLERS = {
   }
 }
 
-const post = (method, params, encrypted = true) => window.postMessage({
+const post = (self) => (method, params, encrypted = true) => self.postMessage({
   jsonrpc: '2.0',
   id: 1,
   method,
@@ -149,6 +149,7 @@ function onWalletChange (params) {
  */
 const RemoteAccount = stampit({
   async init ({ self = window, onWalletChange = this.onWalletChange }) {
+    this.self = self
     this.onWalletChange = onWalletChange
     function receive ({ data }) {
       if (typeof data !== 'object' || data.type === 'webpackOk' || Object.values(SDK_METHODS).includes(data.method)) {

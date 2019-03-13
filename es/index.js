@@ -39,6 +39,7 @@ import Selector from './account/selector'
 import Channel from './channel'
 import Universal from './ae/universal'
 import RemoteAccount from './provider/remote'
+import ExtensionProvider from './provider/extension'
 
 export {
   Account,
@@ -51,6 +52,7 @@ export {
   Channel,
   Crypto,
   Chain,
+  ExtensionProvider,
   HdWallet,
   MemoryAccount,
   Oracle,

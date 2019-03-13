@@ -1,4 +1,4 @@
-/* eslint-disable no-return-assign */
+/* eslint-disable no-return-assign,no-unused-vars */
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
@@ -23,28 +23,28 @@
  * @example import RpcClient from '@aeternity/aepp-sdk/provider/extension'
  */
 
-import stampit from '@stamp/it'
 import { decryptMsg, encryptMsg, IDENTITY_METHODS, SDK_METHODS } from './helper'
+import AsyncInit from '../utils/async-init'
 
 const sdks = {}
 
-const indentityID = '1KGVZ2AFqAybJkpdKCzP/0W4W/0BQZaDH6en8g7VstQ='
+const indentityID = 'bobS3qRvWfDxCpmedQYzp3xrK5jVUS4MSto99QrCdySSMjYnd'
 
 const RECEIVE_HANDLERS = {
-  [SDK_METHODS.sign]: (msg) => {
+  [SDK_METHODS.sign]: async function (msg) {
     const message = decryptMsg(msg)
     const [providerId, unsignedTx, tx] = message
     // TODO show confirm
-    if (true) post(IDENTITY_METHODS.broadcast, [providerId, tx, this.sign(unsignedTx)])
+    post(IDENTITY_METHODS.broadcast, [providerId, tx, await this.sign(unsignedTx)])
   },
   [SDK_METHODS.ready]: () => post(IDENTITY_METHODS.registerRequest, [indentityID], false),
-  [SDK_METHODS.registerProvider]: async ([identityId, sdkId]) => {
+  [SDK_METHODS.registerProvider]: function ({ params: [identityId, sdkId] }) {
     if (!sdks[sdkId]) sdks[sdkId] = { signCallbacks: {} }
     this.onSdkRegister(sdks[sdkId])
 
-    post(IDENTITY_METHODS.walletDetail, [sdkId, await this.address(), {}])
+    post(IDENTITY_METHODS.walletDetail, [sdkId, this.account[0], {}])
   },
-  [SDK_METHODS.deregisterProvider]: (msg) => {
+  [SDK_METHODS.deregisterProvider]: function (msg) {
     const message = decryptMsg(msg)
     const [_, sdkId] = message
 
@@ -71,7 +71,7 @@ function postMessage (method, params) {
   console.warn('Unknown message method')
 }
 
-function processMessage ({ data }) {
+async function processMessage ({ data }) {
   if (typeof data !== 'object' || data.type === 'webpackOk' || Object.values(IDENTITY_METHODS).includes(data.method)) {
     return
   }
@@ -89,7 +89,7 @@ function processMessage ({ data }) {
  * @param tx [options.tx] Unsigned transaction base64c string
  * @return Promise<Buffer> Signature
  */
-async function sign (unsignedTx, { tx }) {
+async function sign (unsignedTx, { tx } = {}) {
   return this.account[1].sign(unsignedTx)
 }
 
@@ -112,6 +112,10 @@ function selectAccount (address) {
   this.account = acc
 }
 
+async function sendAccountDetails (sdkId, meta) {
+  post(IDENTITY_METHODS.walletDetail, [sdkId, await this.address(), {}])
+}
+
 function onSdkRegister (params) {
   return true
 }
@@ -126,15 +130,15 @@ function onSdkRegister (params) {
  * @return {Object} Remote Account Client
  * @example RemoteAccount({ self = window }).then(async account => console.log(await account.address())
  */
-const ExtensionProvider = stampit({
+const ExtensionProvider = AsyncInit.compose({
   async init ({ self = window, accounts = [], onSdkRegister = this.onSdkRegister }) {
     this.onSdkRegister = onSdkRegister
-    this.accounts = Promise.all(accounts.map(async acc => [await acc.address(), acc]))
+    this.accounts = await Promise.all(accounts.map(async acc => [await acc.address(), acc]))
     this.account = this.accounts[0]
 
     if (!this.account) throw new Error('You need to provider at least one account')
     // REGISTER PROVIDER
-    this.post(IDENTITY_METHODS.registerRequest)
+    this.postMessage(IDENTITY_METHODS.registerRequest)
   },
   props: {
     accounts: [],
@@ -146,7 +150,8 @@ const ExtensionProvider = stampit({
     selectAccount,
     onSdkRegister,
     sign,
-    address
+    address,
+    sendAccountDetails
   }
 })
 
