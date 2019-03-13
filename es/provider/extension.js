@@ -35,15 +35,16 @@ const RECEIVE_HANDLERS = {
     const message = decryptMsg(msg)
     const [sdkId, unsignedTx, tx] = message
 
-    sdks[sdkId].signCallbacks[tx] = { unsignedTx, meta: {} }
-    this.onSign(message)
+    sdks[sdkId].signCallbacks[tx] = { unsignedTx, meta: { tx } }
+    this.onSign({ sdkId, meta: { tx } })
     // TODO show confirm
     this.postMessage(IDENTITY_METHODS.broadcast, [sdkId, tx, unsignedTx])
   },
   [SDK_METHODS.ready]: () => post(IDENTITY_METHODS.registerRequest, [indentityID], false),
   [SDK_METHODS.registerProvider]: function ({ params: [identityId, sdkId] }) {
-    if (!sdks[sdkId]) sdks[sdkId] = { signCallbacks: {} }
+    if (!sdks[sdkId]) sdks[sdkId] = { signCallbacks: {}, sdkId }
 
+    this.onSdkRegister(sdks[sdkId])
     // TODO share detail without asking
     this.postMessage(IDENTITY_METHODS.walletDetail, [sdkId])
   },
@@ -58,7 +59,6 @@ const RECEIVE_HANDLERS = {
 const SEND_HANDLERS = {
   [IDENTITY_METHODS.walletDetail]: function (params) {
     const [sdkId] = params
-    this.onSdkRegister(sdks[sdkId])
 
     post(IDENTITY_METHODS.walletDetail, [sdkId, this.account[0], {}])
   },

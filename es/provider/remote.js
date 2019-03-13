@@ -33,7 +33,7 @@ const SEND_HANDLERS = {
   [SDK_METHODS.sign]: function ([unsignedTx, tx]) {
     const [providerId] = getActiveProvider()
     if (!providerId) return Promise.reject(new Error('Active provider not found'))
-    const params = [providerId, unsignedTx, tx]
+    const params = [sdkID, unsignedTx, tx]
 
     return new Promise((resolve, reject) => {
       providers[providerId].callbacks[tx] = { meta: { unsignedTx }, resolve, reject }
