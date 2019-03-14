@@ -36,13 +36,14 @@ const RECEIVE_HANDLERS = {
     const [sdkId, unsignedTx, tx] = message
 
     sdks[sdkId].signCallbacks[tx] = { unsignedTx, meta: { tx } }
-    this.onSign({ sdkId, meta: { tx } })
     // TODO show confirm
-    this.postMessage(IDENTITY_METHODS.broadcast, [sdkId, tx, unsignedTx])
+    if (sdks[sdkId].autoSign) this.postMessage(IDENTITY_METHODS.broadcast, [sdkId, tx, unsignedTx])
+    this.onSign({ sdkId, meta: { tx, autoSign: sdks[sdkId].autoSign } })
+
   },
   [SDK_METHODS.ready]: () => post(IDENTITY_METHODS.registerRequest, [indentityID], false),
   [SDK_METHODS.registerProvider]: function ({ params: [identityId, sdkId] }) {
-    if (!sdks[sdkId]) sdks[sdkId] = { signCallbacks: {}, sdkId }
+    if (!sdks[sdkId]) sdks[sdkId] = { signCallbacks: {}, sdkId, autoSign: true }
 
     this.onSdkRegister(sdks[sdkId])
     // TODO share detail without asking
@@ -66,8 +67,8 @@ const SEND_HANDLERS = {
   [IDENTITY_METHODS.broadcast]: async function (params) {
     const [sdkId, tx, unsignedTx] = params
     post(IDENTITY_METHODS.broadcast, [sdkId, tx, await this.sign(unsignedTx)])
-    // Remove from callBacks
-    delete sdks[sdkId].signCallbacks[tx]
+    // mark as signed
+    sdks[sdkId].signCallbacks[tx].status = 'Signed'
   }
 }
 
@@ -137,6 +138,14 @@ function onSign (params) {
   return true
 }
 
+function setAutoSign (sdkId, value) {
+  sdks[sdkId].autoSign = !!value
+}
+
+function getSdks () {
+  return sdks
+}
+
 /**
  * ExtensionProvider client Stamp
  * @function
@@ -170,6 +179,8 @@ const ExtensionProvider = AsyncInit.compose({
     onSign,
     sign,
     address,
+    getSdks,
+    setAutoSign,
     sendAccountDetails
   }
 })
