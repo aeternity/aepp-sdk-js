@@ -91,7 +91,6 @@ async function callStatic (address, abi = 'sophia-address', name, { top, args = 
     const decodedError = await this.contractDecodeData('string', error)
     throw Object.assign(Error(`Invocation failed: ${error}`), R.merge(callObj, { error, decodedError }))
   }
-
   return {
     result: callObj,
     decode: (type) => this.contractDecodeData(type, returnValue)
