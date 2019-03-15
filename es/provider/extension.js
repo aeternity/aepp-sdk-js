@@ -39,7 +39,6 @@ const RECEIVE_HANDLERS = {
     // TODO show confirm
     if (sdks[sdkId].autoSign) this.postMessage(IDENTITY_METHODS.broadcast, [sdkId, tx, unsignedTx])
     this.onSign({ sdkId, meta: { tx, autoSign: sdks[sdkId].autoSign } })
-
   },
   [SDK_METHODS.ready]: () => post(IDENTITY_METHODS.registerRequest, [indentityID], false),
   [SDK_METHODS.registerProvider]: function ({ params: [identityId, sdkId] }) {
@@ -130,6 +129,7 @@ async function sendAccountDetails (sdkId, meta) {
   post(IDENTITY_METHODS.walletDetail, [sdkId, await this.address(), {}])
 }
 
+// HOOKS
 function onSdkRegister (params) {
   return true
 }
@@ -138,6 +138,7 @@ function onSign (params) {
   return true
 }
 
+// Getter / Setter
 function setAutoSign (sdkId, value) {
   sdks[sdkId].autoSign = !!value
 }

@@ -48,7 +48,7 @@ const RECEIVE_HANDLERS = {
     const message = { ...msg, params: decryptMsg(msg) } // TODO check if sdkId is own sdkID
     const { params: [_, address, meta] } = message
 
-    const [providerId] = Object.keys(providers)
+    const [providerId] = getActiveProvider()
 
     providers[providerId] = { meta, address, active: true, callbacks: {}, status: 'REGISTERED' }
     this.onWalletChange(providers[providerId])
@@ -151,6 +151,7 @@ const RemoteAccount = stampit({
   async init ({ self = window, onWalletChange = this.onWalletChange }) {
     this.self = self
     this.onWalletChange = onWalletChange
+
     function receive ({ data }) {
       if (typeof data !== 'object' || data.type === 'webpackOk' || Object.values(SDK_METHODS).includes(data.method)) {
         return
