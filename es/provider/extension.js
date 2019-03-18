@@ -79,19 +79,23 @@ const SEND_HANDLERS = {
   [IDENTITY_METHODS.registerRequest]: function () { post(this.postFunction)(IDENTITY_METHODS.registerRequest, [indentityID], false) },
   [IDENTITY_METHODS.broadcast]: async function (params) {
     const [sdkId, tx, unsignedTx] = params
-    post(this.postFunction)(IDENTITY_METHODS.broadcast, [sdkId, tx, await this.sign(unsignedTx)])
+    const data = [sdkId, tx, Array.from(await this.sign(unsignedTx))]
+
+    post(this.postFunction)(IDENTITY_METHODS.broadcast, data)
     // mark as signed
     sdks[sdkId].signCallbacks[tx].status = 'SIGNED'
   }
 }
 
-const post = (postFunction) => (method, params, encrypted = true) => postFunction({
-  jsonrpc: '2.0',
-  id: 1,
-  method,
-  providerId: indentityID,
-  params: encrypted ? encryptMsg({ params }) : params
-}, '*')
+const post = (postFunction) => (method, params, encrypted = true, options = []) => {
+  postFunction({
+    jsonrpc: '2.0',
+    id: 1,
+    method,
+    providerId: indentityID,
+    params: encrypted ? encryptMsg({ params }) : params
+  }, ...options)
+}
 
 // INTERFACE
 async function postMessage (method, params) {

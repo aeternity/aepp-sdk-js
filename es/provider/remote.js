@@ -33,7 +33,7 @@ const SEND_HANDLERS = {
   [SDK_METHODS.sign]: function ([unsignedTx, tx]) {
     const [providerId] = getActiveProvider()
     if (!providerId) return Promise.reject(new Error('Active provider not found'))
-    const params = [sdkID, unsignedTx, tx]
+    const params = [sdkID, Array.from(unsignedTx), tx]
 
     return new Promise((resolve, reject) => {
       providers[providerId].callbacks[tx] = { meta: { unsignedTx }, resolve, reject }
@@ -66,6 +66,7 @@ const RECEIVE_HANDLERS = {
     this.onWalletChange(providers[providerId])
   },
   [IDENTITY_METHODS.registerRequest]: function ({ params: [providerId] }) {
+    if (providers[providerId]) return
     providers[providerId] = {
       status: 'WAIT_FOR_REGISTER',
       providerId,
