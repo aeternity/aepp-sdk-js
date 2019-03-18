@@ -37,16 +37,22 @@ const RECEIVE_HANDLERS = {
 
     sdks[sdkId].signCallbacks[tx] = { unsignedTx, meta: { tx } }
     // TODO show confirm
-    if (sdks[sdkId].autoSign) this.postMessage(IDENTITY_METHODS.broadcast, [sdkId, tx, unsignedTx])
+    if (sdks[sdkId].autoSign) await this.postMessage(IDENTITY_METHODS.broadcast, [sdkId, tx, unsignedTx])
     this.onSign({ sdkId, meta: { tx, autoSign: sdks[sdkId].autoSign } })
   },
-  [SDK_METHODS.ready]: () => post(IDENTITY_METHODS.registerRequest, [indentityID], false),
+  [SDK_METHODS.ready]: function () { this.postMessage(IDENTITY_METHODS.registerRequest) },
   [SDK_METHODS.registerProvider]: function ({ params: [identityId, sdkId] }) {
-    if (!sdks[sdkId]) sdks[sdkId] = { signCallbacks: {}, sdkId, autoSign: true }
+    if (!sdks[sdkId]) {
+      sdks[sdkId] = {
+        signCallbacks: {},
+        sdkId,
+        autoSign: true,
+        status: 'WAIT_FOR_ACCOUNT_DETAILS',
+        shareWallet: () => this.postMessage(IDENTITY_METHODS.walletDetail, [sdkId])
+      }
+    }
 
     this.onSdkRegister(sdks[sdkId])
-    // TODO share detail without asking
-    this.postMessage(IDENTITY_METHODS.walletDetail, [sdkId])
   },
   [SDK_METHODS.deregisterProvider]: function (msg) {
     const message = decryptMsg(msg)
@@ -61,6 +67,7 @@ const SEND_HANDLERS = {
     const [sdkId] = params
 
     post(IDENTITY_METHODS.walletDetail, [sdkId, this.account[0], {}])
+    sdks[sdkId].status = 'ACTIVE'
   },
   [IDENTITY_METHODS.registerRequest]: () => post(IDENTITY_METHODS.registerRequest, [indentityID], false),
   [IDENTITY_METHODS.broadcast]: async function (params) {
@@ -125,13 +132,14 @@ function selectAccount (address) {
   this.account = acc
 }
 
-async function sendAccountDetails (sdkId, meta) {
-  post(IDENTITY_METHODS.walletDetail, [sdkId, await this.address(), {}])
+async function sendAccountDetails (sdkId) {
+  if (!sdks[sdkId]) throw new Error('Sdk with id ' + sdkId + ' not found!')
+  this.postMessage(IDENTITY_METHODS.walletDetail, [sdkId])
 }
 
 // HOOKS
-function onSdkRegister (params) {
-  return true
+function onSdkRegister (sdk) {
+  sdk.shareWallet() // Share wallet detail
 }
 
 function onSign (params) {

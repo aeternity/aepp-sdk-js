@@ -40,7 +40,9 @@ const SEND_HANDLERS = {
       post(this.self)(SDK_METHODS.sign, params)
     })
   },
-  [SDK_METHODS.ready]: function (params) { post(this.self)(SDK_METHODS.ready, params, false) }
+  [SDK_METHODS.ready]: function (params) { post(this.self)(SDK_METHODS.ready, params, false) },
+  [SDK_METHODS.deregisterProvider]: function (params) { post(this.self)(SDK_METHODS.deregisterProvider, params) },
+  [SDK_METHODS.registerProvider]: function ([providerId]) { post(this.self)(SDK_METHODS.registerProvider, [providerId, sdkID], false) }
 }
 
 const RECEIVE_HANDLERS = {
@@ -55,8 +57,11 @@ const RECEIVE_HANDLERS = {
   },
   [IDENTITY_METHODS.registerRequest]: function ({ params: [providerId] }) { // TODO Think about multiple provider registration
     if (getActiveProvider().length) return // TODO Allow only one active provider
-    providers[providerId] = { status: 'WAIT_FOR_REGISTER' }
-    post(this.self)(SDK_METHODS.registerProvider, [providerId, sdkID], false) // Register provider
+    providers[providerId] = {
+      status: 'WAIT_FOR_REGISTER',
+      registerProvider: () => this.postMessage(SDK_METHODS.registerProvider, [providerId])
+    }
+    this.onRegister(providers[providerId])
   },
   [IDENTITY_METHODS.broadcast]: function (msg) {
     const message = { ...msg, params: decryptMsg(msg) } // TODO check if sdkId is own ID
@@ -133,8 +138,12 @@ function ready () {
   this.postMessage(SDK_METHODS.ready, [true])
 }
 
-function onWalletChange (params) {
+function onWalletChange (provider) {
   return true
+}
+
+function onRegister (provider) {
+  return provider.registerProvider() // Register provider
 }
 
 /**
@@ -148,9 +157,10 @@ function onWalletChange (params) {
  * @example RemoteAccount({ self = window }).then(async account => console.log(await account.address())
  */
 const RemoteAccount = stampit({
-  async init ({ self = window, onWalletChange = this.onWalletChange }) {
+  async init ({ self = window, onWalletChange = this.onWalletChange, onRegister = this.onRegister }) {
     this.self = self
     this.onWalletChange = onWalletChange
+    this.onRegister = onRegister
 
     function receive ({ data }) {
       if (typeof data !== 'object' || data.type === 'webpackOk' || Object.values(SDK_METHODS).includes(data.method)) {
@@ -171,6 +181,7 @@ const RemoteAccount = stampit({
   },
   methods: {
     onWalletChange,
+    onRegister,
     postMessage,
     processMessage,
     getActiveProvider,
