@@ -59,6 +59,7 @@ const RECEIVE_HANDLERS = {
     if (getActiveProvider().length) return // TODO Allow only one active provider
     providers[providerId] = {
       status: 'WAIT_FOR_REGISTER',
+      providerId,
       registerProvider: () => this.postMessage(SDK_METHODS.registerProvider, [providerId])
     }
     this.onRegister(providers[providerId])

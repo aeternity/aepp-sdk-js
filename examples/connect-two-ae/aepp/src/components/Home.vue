@@ -179,6 +179,11 @@ export default {
       internalUrl: 'http://localhost:3113',
       onWalletChange: (params) => {
         this.pub = params.address
+      },
+      onRegister: (identity) => {
+        if (confirm(`Do you want to register this identity provider ${identity.providerId}???`)) {
+          identity.registerProvider() // REGISTER PROVIDER
+        }
       }
     }).then(ae => {
       this.client = ae
