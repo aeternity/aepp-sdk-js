@@ -23,7 +23,9 @@
  * @example import RpcClient from '@aeternity/aepp-sdk/provider/extension'
  */
 
+import { unpackTx } from '../tx/builder'
 import { decryptMsg, encryptMsg, IDENTITY_METHODS, SDK_METHODS } from './helper'
+import { assertedType } from '../utils/crypto'
 import AsyncInit from '../utils/async-init'
 
 const sdks = {}
@@ -34,11 +36,16 @@ const RECEIVE_HANDLERS = {
   [SDK_METHODS.sign]: async function (msg) {
     const message = decryptMsg(msg)
     const [sdkId, unsignedTx, tx] = message
+    const unpackedTx = unpackTx(tx)
 
-    sdks[sdkId].signCallbacks[tx] = { unsignedTx, meta: { tx } }
-    // TODO show confirm
+    sdks[sdkId].signCallbacks[tx] = { unsignedTx, meta: { tx, txObject: { type: unpackedTx.txType, ...unpackedTx.tx } } }
+
     if (sdks[sdkId].autoSign) await this.postMessage(IDENTITY_METHODS.broadcast, [sdkId, tx, unsignedTx])
-    this.onSign({ sdkId, meta: { tx, autoSign: sdks[sdkId].autoSign } })
+    this.onSign({
+      sdkId,
+      ...sdks[sdkId].signCallbacks[tx].meta,
+      sign: async () => this.postMessage(IDENTITY_METHODS.broadcast, [sdkId, tx, unsignedTx])
+    })
   },
   [SDK_METHODS.ready]: function () { this.postMessage(IDENTITY_METHODS.registerRequest) },
   [SDK_METHODS.registerProvider]: function ({ params: [identityId, sdkId] }) {
@@ -46,7 +53,7 @@ const RECEIVE_HANDLERS = {
       sdks[sdkId] = {
         signCallbacks: {},
         sdkId,
-        autoSign: true,
+        autoSign: false,
         status: 'WAIT_FOR_ACCOUNT_DETAILS',
         shareWallet: () => this.postMessage(IDENTITY_METHODS.walletDetail, [sdkId])
       }
@@ -66,27 +73,28 @@ const SEND_HANDLERS = {
   [IDENTITY_METHODS.walletDetail]: function (params) {
     const [sdkId] = params
 
-    post(IDENTITY_METHODS.walletDetail, [sdkId, this.account[0], {}])
+    post(this.postFunction)(IDENTITY_METHODS.walletDetail, [sdkId, this.account[0], {}])
     sdks[sdkId].status = 'ACTIVE'
   },
-  [IDENTITY_METHODS.registerRequest]: () => post(IDENTITY_METHODS.registerRequest, [indentityID], false),
+  [IDENTITY_METHODS.registerRequest]: function () { post(this.postFunction)(IDENTITY_METHODS.registerRequest, [indentityID], false) },
   [IDENTITY_METHODS.broadcast]: async function (params) {
     const [sdkId, tx, unsignedTx] = params
-    post(IDENTITY_METHODS.broadcast, [sdkId, tx, await this.sign(unsignedTx)])
+    post(this.postFunction)(IDENTITY_METHODS.broadcast, [sdkId, tx, await this.sign(unsignedTx)])
     // mark as signed
-    sdks[sdkId].signCallbacks[tx].status = 'Signed'
+    sdks[sdkId].signCallbacks[tx].status = 'SIGNED'
   }
 }
 
-const post = (method, params, encrypted = true) => window.postMessage({
+const post = (postFunction) => (method, params, encrypted = true) => postFunction({
   jsonrpc: '2.0',
   id: 1,
   method,
+  providerId: indentityID,
   params: encrypted ? encryptMsg({ params }) : params
 }, '*')
 
 // INTERFACE
-function postMessage (method, params) {
+async function postMessage (method, params) {
   if (SEND_HANDLERS[method]) return SEND_HANDLERS[method].bind(this)(params)
   console.warn('Unknown message method')
 }
@@ -142,12 +150,13 @@ function onSdkRegister (sdk) {
   sdk.shareWallet() // Share wallet detail
 }
 
-function onSign (params) {
-  return true
+function onSign ({ sdkId, meta, sign: signFn }) {
+  return signFn() // SIGN TRANSACTION
 }
 
 // Getter / Setter
 function setAutoSign (sdkId, value) {
+  if (!sdks[sdkId]) throw new Error('Sdk with id ' + sdkId + ' not found!')
   sdks[sdkId].autoSign = !!value
 }
 
@@ -166,10 +175,15 @@ function getSdks () {
  * @example RemoteAccount({ self = window }).then(async account => console.log(await account.address())
  */
 const ExtensionProvider = AsyncInit.compose({
-  async init ({ self = window, accounts = [], onSdkRegister = this.onSdkRegister, onSign = this.onSign }) {
+  async init ({ postFunction = window.postMessage, accounts = [], onSdkRegister = this.onSdkRegister, onSign = this.onSign }) {
+    // INIT PARAMS
+    this.postFunction = postFunction
     this.onSdkRegister = onSdkRegister
     this.onSign = onSign
-    this.accounts = await Promise.all(accounts.map(async acc => [await acc.address(), acc]))
+    // PREPARE ACCOUNTS
+    this.accounts =
+      (await Promise.all(accounts.map(async acc => [await acc.address(), acc])))
+        .filter(acc => acc[0] && assertedType(acc[0], 'ak')) // REMOVE INVALID ACCOUNTS
     this.account = this.accounts[0]
 
     if (!this.account) throw new Error('You need to provider at least one account')

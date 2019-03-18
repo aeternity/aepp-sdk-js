@@ -42,21 +42,30 @@ const SEND_HANDLERS = {
   },
   [SDK_METHODS.ready]: function (params) { post(this.self)(SDK_METHODS.ready, params, false) },
   [SDK_METHODS.deregisterProvider]: function (params) { post(this.self)(SDK_METHODS.deregisterProvider, params) },
-  [SDK_METHODS.registerProvider]: function ([providerId]) { post(this.self)(SDK_METHODS.registerProvider, [providerId, sdkID], false) }
+  [SDK_METHODS.registerProvider]: function ([providerId]) {
+    post(this.self)(SDK_METHODS.registerProvider, [providerId, sdkID], false)
+    providers[providerId] = { status: 'REGISTERED_WAIT_FOR_ACCOUNT' }
+  }
 }
 
 const RECEIVE_HANDLERS = {
   [IDENTITY_METHODS.walletDetail]: function (msg) {
     const message = { ...msg, params: decryptMsg(msg) } // TODO check if sdkId is own sdkID
-    const { params: [_, address, meta] } = message
+    const { params: [_, address, meta], providerId } = message
 
-    const [providerId] = getActiveProvider()
+    // const [providerId] = getActiveProvider()
 
-    providers[providerId] = { meta, address, active: true, callbacks: {}, status: 'REGISTERED' }
+    providers[providerId] = {
+      meta,
+      address,
+      callbacks: {},
+      status: 'REGISTRATION_COMPLETE',
+      active: !getActiveProvider().length,
+      deregisterProvider: () => this.postMessage(SDK_METHODS.deregisterProvider, [providerId])
+    }
     this.onWalletChange(providers[providerId])
   },
-  [IDENTITY_METHODS.registerRequest]: function ({ params: [providerId] }) { // TODO Think about multiple provider registration
-    if (getActiveProvider().length) return // TODO Allow only one active provider
+  [IDENTITY_METHODS.registerRequest]: function ({ params: [providerId] }) {
     providers[providerId] = {
       status: 'WAIT_FOR_REGISTER',
       providerId,
@@ -85,6 +94,7 @@ const post = (self) => (method, params, encrypted = true) => self.postMessage({
   jsonrpc: '2.0',
   id: 1,
   method,
+  sdkId: sdkID,
   params: encrypted ? encryptMsg({ params }) : params
 }, '*')
 
@@ -125,9 +135,10 @@ async function sign (unsignedTx, { tx }) {
  */
 async function address () {
   const [_, provider] = this.getActiveProvider()
-  return provider.address
+  if (!provider) throw new Error('Active provider not found')
+  return provider && provider.address
     ? Promise.resolve(provider.address)
-    : Promise.reject(new Error('Active provider not found'))
+    : Promise.reject(new Error('Invalid address or address not defined'))
 }
 
 /**
