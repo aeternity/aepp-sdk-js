@@ -27,7 +27,7 @@ import stampit from '@stamp/it'
 import { decryptMsg, encryptMsg, IDENTITY_METHODS, SDK_METHODS } from './helper'
 
 const providers = {}
-const sdkID = '1KGVZ2AFqAybJkpdKCzP/0W4W/0BQZaDH6en8g7VstQ='
+const sdkID = Math.random().toString(36).substring(7)
 
 const SEND_HANDLERS = {
   [SDK_METHODS.sign]: function ([unsignedTx, tx]) {
@@ -43,6 +43,7 @@ const SEND_HANDLERS = {
   [SDK_METHODS.ready]: function (params) { post(this.self)(SDK_METHODS.ready, params, false) },
   [SDK_METHODS.deregisterProvider]: function (params) { post(this.self)(SDK_METHODS.deregisterProvider, params) },
   [SDK_METHODS.registerProvider]: function ([providerId]) {
+    if (providers[providerId].status !== 'WAIT_FOR_REGISTER') return
     post(this.self)(SDK_METHODS.registerProvider, [providerId, sdkID], false)
     providers[providerId] = { status: 'REGISTERED_WAIT_FOR_ACCOUNT' }
   }
@@ -53,7 +54,7 @@ const RECEIVE_HANDLERS = {
     const message = { ...msg, params: decryptMsg(msg) } // TODO check if sdkId is own sdkID
     const { params: [_, address, meta], providerId } = message
 
-    // const [providerId] = getActiveProvider()
+    if (providers[providerId].status !== 'REGISTERED_WAIT_FOR_ACCOUNT') return
 
     providers[providerId] = {
       meta,
