@@ -187,11 +187,6 @@ export default {
       }
     }).then(ae => {
       this.client = ae
-      ae.address()
-        .then(address => {
-          // this.pub = address
-        })
-        .catch(e => { this.pub = `Rejected: ${e}` })
     })
   }
 }
