@@ -25,44 +25,33 @@
  */
 
 import * as R from 'ramda'
-import ContractBase from './'
 import Http from '../utils/http'
+import AsyncInit from '../utils/async-init'
 
 const TYPE_CHECKED_ABI = ['sophia', 'sophia-address']
 
-async function contractNodeEncodeCallData (codeOrAddress, abi, name, arg, call) {
-  // Get contract bytecode from aeternity node if we want to get callData using { abi: 'sophia-address', code: 'contract address' }
-  let code = codeOrAddress
-  if (abi === 'sophia-address' && codeOrAddress.slice(0, 2) === 'ct') {
-    code = (await this.getContractByteCode(code)).bytecode
-    abi = 'sophia'
-  }
-
+async function contractAPIEncodeCallData (code, abi, name, arg, call) {
   return (TYPE_CHECKED_ABI.includes(abi) && call)
     ? (await this.api.encodeCalldata({ abi, code, call })).calldata
     : (await this.api.encodeCalldata({ abi, code, 'function': name, arg })).calldata
 }
 
-async function contractNodeDecodeData (type, data) {
+async function contractAPIDecodeData (type, data) {
   return (await this.api.decodeData({ data, 'sophia-type': type })).data
 }
 
-async function compileNodeContract (code, options = {}) {
+async function compileAPIContract (code, options = {}) {
   return this.api.compileContract(R.mergeAll([this.Ae.defaults, options, { code }]))
 }
 
-const ContractCompilerAPI = ContractBase.compose(Http, {
-  methods: {
-    contractNodeEncodeCallData,
-    contractNodeDecodeData,
-    compileNodeContract
+const ContractCompilerAPI = AsyncInit.compose({
+  init ({ compilerUrl }) {
+    this.http = Http({ baseUrl: compilerUrl })
   },
-  deepProps: {
-    Ae: {
-      defaults: {
-        options: ''
-      }
-    }
+  methods: {
+    contractAPIEncodeCallData,
+    contractAPIDecodeData,
+    compileAPIContract
   }
 })
 

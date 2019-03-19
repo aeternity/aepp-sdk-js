@@ -1,7 +1,8 @@
-import AsyncInit from './async-init'
+
 import axios from 'axios'
 import JSONbig from 'json-bigint'
 import * as R from 'ramda'
+import stampit from '@stamp/it'
 
 async function get (url, options) {
   return axios.get(`${this.baseUrl}${url}`, R.merge(this.httpConfig, options))
@@ -23,16 +24,16 @@ function changeBaseUrl (newUrl) {
   this.baseUrl = newUrl
 }
 
-const Http = AsyncInit.compose({
+const Http = stampit({
   init ({ baseUrl }) {
     if (!baseUrl) throw new Error('You need to provider base url.')
     this.baseUrl = baseUrl
   },
   methods: {
     changeBaseUrl,
-    get,
-    post,
-    put,
+    getRequest: get,
+    postRequest: post,
+    putRequest: put,
     'delete': _delete
   },
   props: {

@@ -36,15 +36,24 @@ import { addressFromDecimal } from '../utils/crypto'
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
- * @param {String} code Contract source code or Contract address
+ * @param {String} codeOrAddress Contract source code or Contract address
  * @param {String} abi ABI('sophia', 'sophia-address')
  * @param {String} name Name of function to call
  * @param {String} args Argument's for call ('()')
  * @param {String} call Code of `call` contract(Pseudo code with __call => {name}({args}) function)
  * @return {Promise<Object>}
  */
-async function encodeCall (code, abi, name, args, call) {
-  return this.contractNodeEncodeCallData(code, abi, name, args, call)
+async function encodeCall (codeOrAddress, abi, name, args, call) {
+  // Get contract bytecode from aeternity node if we want to get callData using { abi: 'sophia-address', code: 'contract address' }
+  return abi === 'sophia-address' && codeOrAddress.slice(0, 2) === 'ct'
+    ? this.contractNodeEncodeCallData(
+      (await this.getContractByteCode(codeOrAddress)).bytecode,
+      'sophia',
+      name,
+      args,
+      call
+    )
+    : this.contractNodeEncodeCallData(codeOrAddress, abi, name, args, call)
 }
 
 /**

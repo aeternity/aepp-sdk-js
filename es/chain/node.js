@@ -162,6 +162,10 @@ async function txDryRun (txs, accounts, top) {
   return this.api.dryRunTxs({ txs, accounts, top })
 }
 
+async function getContractByteCode (contractId) {
+  return this.api.getContractCode(contractId)
+}
+
 /**
  * ChainNode Stamp
  *
@@ -193,7 +197,8 @@ const ChainNode = Chain.compose(Node, Oracle, Contract, TransactionValidator, {
     getMicroBlockHeader,
     getMicroBlockTransactions,
     getKeyBlock,
-    txDryRun
+    txDryRun,
+    getContractByteCode
   }
 })
 

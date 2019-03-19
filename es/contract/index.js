@@ -44,8 +44,7 @@ const ContractBase = stampit({
         'contractNodeEncodeCallData',
         'contractNodeCall',
         'contractNodeDecodeData',
-        'compileNodeContract',
-        'getContractByteCode'
+        'compileNodeContract'
       ]
     }
   }
@@ -54,8 +53,7 @@ const ContractBase = stampit({
     contractNodeEncodeCallData: required,
     contractNodeCall: required,
     contractNodeDecodeData: required,
-    compileNodeContract: required,
-    getContractByteCode: required
+    compileNodeContract: required
   }
 }))
 
