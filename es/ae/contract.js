@@ -30,30 +30,20 @@
 import Ae from './'
 import * as R from 'ramda'
 import { addressFromDecimal } from '../utils/crypto'
+import ContractCompilerAPI from '../contract/compiler'
 
 /**
  * Encode call data for contract call
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
- * @param {String} codeOrAddress Contract source code or Contract address
- * @param {String} abi ABI('sophia', 'sophia-address')
+ * @param {String} source Contract source code
  * @param {String} name Name of function to call
- * @param {String} args Argument's for call ('()')
- * @param {String} call Code of `call` contract(Pseudo code with __call => {name}({args}) function)
- * @return {Promise<Object>}
+ * @param {Array|String} args Argument's for call ('()')
+ * @return {Promise<String>}
  */
-async function encodeCall (codeOrAddress, abi, name, args, call) {
-  // Get contract bytecode from aeternity node if we want to get callData using { abi: 'sophia-address', code: 'contract address' }
-  return abi === 'sophia-address' && codeOrAddress.slice(0, 2) === 'ct'
-    ? this.contractNodeEncodeCallData(
-      (await this.getContractByteCode(codeOrAddress)).bytecode,
-      'sophia',
-      name,
-      args,
-      call
-    )
-    : this.contractNodeEncodeCallData(codeOrAddress, abi, name, args, call)
+async function encodeCall (source, name, args) {
+  return this.contractEncodeCallDataAPI(source, name, args)
 }
 
 /**
@@ -61,24 +51,24 @@ async function encodeCall (codeOrAddress, abi, name, args, call) {
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
+ * @param {String} source Contract source code
  * @param {String} address Contract address
  * @param {String} abi ABI('sophia', 'sophia-address')
  * @param {String} name Name of function to call
  * @param {Object} options [options={}]  Options
  * @param {String} top [options.top] Block hash ob which you want to call contract
  * @param {String} args [options.args] Argument's for call function
- * @param {String} call [options.call] Code of `call` contract(Pseudo code with __call => {name}({args}) function)
  * @param {String} options [options.options]  Transaction options (fee, ttl, gas, amount, deposit)
  * @return {Promise<Object>} Result object
  */
-async function callStatic (address, abi = 'sophia-address', name, { top, args = '()', call, options = {} } = {}) {
+async function callStatic (source, address, name, args = [], { top, options = {} } = {}) {
   const opt = R.merge(this.Ae.defaults, options)
 
   // Prepare `call` transaction
   const tx = await this.contractCallTx(R.merge(opt, {
     callerId: await this.address(),
     contractId: address,
-    callData: await this.contractEncodeCall(address, abi, name, args, call)
+    callData: await this.contractEncodeCall(source, name, args)
   }))
 
   // Get block hash by height
@@ -113,7 +103,7 @@ async function callStatic (address, abi = 'sophia-address', name, { top, args = 
  * @return {Promise<String>} Result object
  */
 async function decode (type, data) {
-  const result = await this.contractNodeDecodeData(type, data)
+  const result = await this.contractDecodeDataAPI(type, data)
   if (type === 'address') result.value = addressFromDecimal(result.value)
   return result
 }
@@ -123,8 +113,7 @@ async function decode (type, data) {
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
- * @param {String} code Contract source code
- * @param {String} abi ABI('sophia', 'sophia-address')
+ * @param {String} source Contract source code
  * @param {String} address Contract address
  * @param {String} name Name of function to call
  * @param {Object} [options={}] options Options
@@ -133,13 +122,13 @@ async function decode (type, data) {
  * @param {String} [options.options] options Transaction options (fee, ttl, gas, amount, deposit)
  * @return {Promise<Object>} Result object
  */
-async function call (code, abi, address, name, { args = '()', options = {}, call } = {}) {
+async function call (source, address, name, args = [], options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
 
   const tx = await this.contractCallTx(R.merge(opt, {
     callerId: await this.address(),
     contractId: address,
-    callData: await this.contractEncodeCall(code, abi, name, args, call)
+    callData: await this.contractEncodeCall(source, name, args)
   }))
 
   const { hash, rawTx } = await this.send(tx, opt)
@@ -163,18 +152,17 @@ async function call (code, abi, address, name, { args = '()', options = {}, call
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
- * @param {String} code Contract source code
- * @param {String} abi ABI('sophia', 'sophia-address')
+ * @param {String} code Compiled contract
+ * @param {String} source Contract source code
  * @param {Object} [options={}] options Options
- * @param {String} [options.initState] initState Argument's for contract init function
+ * @param {Array} [options.initState=[]] initState Argument's for contract init function
  * @param {String} [options.options] options Transaction options (fee, ttl, gas, amount, deposit)
  * @return {Promise<Object>} Result object
  */
-async function deploy (code, abi, { initState = '()', options = {} } = {}) {
+async function deploy (code, source, { initState = [], options = {} } = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const callData = await this.contractEncodeCall(code, abi, 'init', initState)
+  const callData = await this.contractEncodeCall(source, 'init', initState)
   const ownerId = await this.address()
-
   const { tx, contractId } = await this.contractCreateTx(R.merge(opt, {
     callData,
     code,
@@ -188,8 +176,8 @@ async function deploy (code, abi, { initState = '()', options = {} } = {}) {
     transaction: hash,
     rawTx,
     address: contractId,
-    call: async (name, options) => this.contractCall(code, abi, contractId, name, options),
-    callStatic: async (name, options) => this.contractCallStatic(contractId, 'sophia-address', name, options),
+    call: async (name, args = [], options) => this.contractCall(source, contractId, name, args, options),
+    callStatic: async (name, args = [], options) => this.contractCallStatic(source, contractId, name, args, options),
     createdAt: new Date()
   })
 }
@@ -199,18 +187,16 @@ async function deploy (code, abi, { initState = '()', options = {} } = {}) {
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
- * @param {String} code Contract code
+ * @param {String} source Contract sourece code
  * @param {Object} options Transaction options (fee, ttl, gas, amount, deposit)
  * @return {Promise<Object>} Result object
  */
-async function compile (code, options = {}) {
-  const o = await this.compileNodeContract(code, options)
-
+async function compile (source, options = {}) {
+  const bytecode = await this.compileContractAPI(source, options)
   return Object.freeze(Object.assign({
-    encodeCall: async (name, args, { call, abi }) => this.contractEncodeCall(o.bytecode, R.defaultTo('sophia', abi), name, args, call),
-    // call: async (name, options = {}) => this.contractCallStatic(o.bytecode, R.defaultTo('sophia', options.abi), name, options),
-    deploy: async (options = {}) => this.contractDeploy(o.bytecode, R.defaultTo('sophia', options.abi), options)
-  }, o))
+    encodeCall: async (name, args) => this.contractEncodeCall(source, name, args),
+    deploy: async (options = {}) => this.contractDeploy(bytecode, source, options)
+  }, { bytecode }))
 }
 
 /**
@@ -224,7 +210,7 @@ async function compile (code, options = {}) {
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Contract instance
  */
-const Contract = Ae.compose({
+const Contract = Ae.compose(ContractCompilerAPI, {
   methods: {
     contractCompile: compile,
     contractCallStatic: callStatic,

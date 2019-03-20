@@ -41,19 +41,17 @@ const ContractBase = stampit({
   deepConf: {
     Contract: {
       methods: [
-        'contractNodeEncodeCallData',
-        'contractNodeCall',
-        'contractNodeDecodeData',
-        'compileNodeContract'
+        'contractEncodeCallDataAPI',
+        'contractDecodeDataAPI',
+        'compileContractAPI'
       ]
     }
   }
 }, required({
   methods: {
-    contractNodeEncodeCallData: required,
-    contractNodeCall: required,
-    contractNodeDecodeData: required,
-    compileNodeContract: required
+    contractEncodeCallDataAPI: required,
+    contractDecodeDataAPI: required,
+    compileContractAPI: required
   }
 }))
 

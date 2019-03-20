@@ -30,7 +30,6 @@ import Account from './account'
 import MemoryAccount from './account/memory'
 import Aens from './ae/aens'
 import Contract from './ae/contract'
-import ContractNodeAPI from './contract/node'
 import Wallet from './ae/wallet'
 import Aepp from './ae/aepp'
 import Oracle from './ae/oracle'
@@ -45,7 +44,6 @@ export {
   Aens,
   Aepp,
   Contract,
-  ContractNodeAPI,
   ChainNode,
   Channel,
   Crypto,

@@ -21,7 +21,7 @@ import { configure, plan, ready } from './'
 const identityContract = `
 contract Identity =
   type state = ()
-  function main(x : int) = x
+  function main(x : int, y: int) = x + y
 `
 const stateContract = `
 contract StateContract =
@@ -49,9 +49,14 @@ describe('Contract', function () {
     contract = await ready(this)
   })
 
-  it('precompiled bytecode can be deployed', async () => {
-    const { bytecode } = await contract.contractCompile(identityContract)
-    return contract.contractDeploy(bytecode, 'sophia').should.eventually.have.property('address')
+  it.only('precompiled bytecode can be deployed', async () => {
+    const code = await contract.contractCompile(identityContract)
+    const deployed = await code.deploy()
+    const staticCallRes = await deployed.callStatic('main', [2, 3])
+    const callRes = await deployed.call('main', [2, 3])
+    console.log(await callRes.decode('int'))
+    console.log(await staticCallRes.decode('int'))
+    // return contract.contractDeploy(code.bytecode, identityContract).should.eventually.have.property('address')
   })
 
   it('compiles Sophia code', async () => {

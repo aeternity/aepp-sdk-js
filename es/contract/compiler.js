@@ -16,7 +16,7 @@
  */
 
 /**
- * ContractNodeAPI module
+ * ContractCompilerAPI module
  *
  * This is the complement to {@link module:@aeternity/aepp-sdk/es/contract}.
  * @module @aeternity/aepp-sdk/es/contract/compiler
@@ -24,34 +24,49 @@
  * @example import ContractCompilerAPI from '@aeternity/aepp-sdk/es/contract/compiler'
  */
 
-import * as R from 'ramda'
 import Http from '../utils/http'
-import AsyncInit from '../utils/async-init'
+import ContractBase from './index'
 
-const TYPE_CHECKED_ABI = ['sophia', 'sophia-address']
-
-async function contractAPIEncodeCallData (code, abi, name, arg, call) {
-  return (TYPE_CHECKED_ABI.includes(abi) && call)
-    ? (await this.api.encodeCalldata({ abi, code, call })).calldata
-    : (await this.api.encodeCalldata({ abi, code, 'function': name, arg })).calldata
+// Convert old style arguments to array of arguments
+const convertArgToArray = (arg) => {
+  if (Array.isArray(arg)) return arg.map(v => typeof v !== 'string' ? JSON.stringify(v) : v)
+  if (!arg.length) return [] // if arg empty string
+  if (arg[0] === '(') { // if arg like '(1,2)'
+    return arg.slice(1).slice(0, -1).split(',')
+  }
+  return arg.split(',') // if arg like '1,2'
 }
 
-async function contractAPIDecodeData (type, data) {
-  return (await this.api.decodeData({ data, 'sophia-type': type })).data
+async function contractEncodeCallDataAPI (source, name, args) {
+  console.log(args)
+  return this.http
+    .post('/encode-calldata', { source, 'function': name, arguments: convertArgToArray(args) })
+    .then(({ calldata }) => calldata)
 }
 
-async function compileAPIContract (code, options = {}) {
-  return this.api.compileContract(R.mergeAll([this.Ae.defaults, options, { code }]))
+async function contractDecodeDataAPI (type, data) {
+  return this.http
+    .post('/decode-data', { data, 'sophia-type': type })
+    .then(({ data }) => data)
 }
 
-const ContractCompilerAPI = AsyncInit.compose({
-  init ({ compilerUrl }) {
+async function compileContractAPI (code, options = {}) {
+  return this.http.post('/compile', { code, options }).then(({ bytecode }) => bytecode)
+}
+
+async function contractGetACI (code, options = {}) {
+  return this.http.post('/aci', { code, options })
+}
+
+const ContractCompilerAPI = ContractBase.compose({
+  init ({ compilerUrl = this.compilerUrl }) {
     this.http = Http({ baseUrl: compilerUrl })
   },
   methods: {
-    contractAPIEncodeCallData,
-    contractAPIDecodeData,
-    compileAPIContract
+    contractEncodeCallDataAPI,
+    contractDecodeDataAPI,
+    compileContractAPI,
+    contractGetACI
   }
 })
 

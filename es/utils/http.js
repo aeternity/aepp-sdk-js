@@ -1,45 +1,76 @@
-
-import axios from 'axios'
+import ax from 'axios'
+import https from 'https'
 import JSONbig from 'json-bigint'
 import * as R from 'ramda'
 import stampit from '@stamp/it'
 
+const axios = ax.create({
+  httpsAgent: new https.Agent({
+    rejectUnauthorized: false
+  })
+})
+
 async function get (url, options) {
-  return axios.get(`${this.baseUrl}${url}`, R.merge(this.httpConfig, options))
+  return processResponse(
+    axios.get(`${this.baseUrl}${url}`, R.merge(this.httpConfig, options))
+  )
 }
 
 async function post (url, body, options) {
-  return axios.post(`${this.baseUrl}${url}`, body, R.merge(this.httpConfig, options))
+  return processResponse(
+    axios.post(`${this.baseUrl}${url}`, body, R.merge(this.httpConfig, options))
+  )
 }
 
 async function put (url, body, options) {
-  return axios.put(`${this.baseUrl}${url}`, body, R.merge(this.httpConfig, options))
+  return processResponse(
+    axios.put(`${this.baseUrl}${url}`, body, R.merge(this.httpConfig, options))
+  )
 }
 
 async function _delete (url, options) {
-  return axios.delete(`${this.baseUrl}${url}`, R.merge(this.httpConfig, options))
+  return processResponse(
+    axios.delete(`${this.baseUrl}${url}`, R.merge(this.httpConfig, options))
+  )
 }
 
 function changeBaseUrl (newUrl) {
   this.baseUrl = newUrl
 }
 
+const processResponse = async (res) => {
+  try {
+    return (await res).data
+  } catch (e) {
+    throw Object.assign(
+      Error(`Http request failed with status code ${e.response.status}. Status: ${e.response.statusText}. \nError data: ${JSON.stringify(e.response.data)}`),
+      { data: e.response.data }
+    )
+  }
+}
+
 const Http = stampit({
   init ({ baseUrl }) {
-    if (!baseUrl) throw new Error('You need to provider base url.')
+    if (!baseUrl) console.warn('You need to provider base url.')
     this.baseUrl = baseUrl
   },
   methods: {
     changeBaseUrl,
-    getRequest: get,
-    postRequest: post,
-    putRequest: put,
+    get,
+    post,
+    put,
     'delete': _delete
   },
   props: {
     httpConfig: {
       headers: { 'Content-Type': 'application/json' },
-      transformResponse: [JSONbig({ 'storeAsString': true }).parse]
+      transformResponse: [(data) => {
+        try {
+          return JSONbig({ 'storeAsString': true }).parse(data)
+        } catch (e) {
+          return data
+        }
+      }]
     }
   }
 })
