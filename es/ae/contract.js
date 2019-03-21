@@ -84,7 +84,8 @@ async function callStatic (source, address, name, args = [], { top, options = {}
   // check response
   if (status !== 'ok') throw new Error('Dry run error, ' + reason)
   const { returnType, returnValue } = callObj
-  if (returnType !== 'ok') throw new Error('Dry run error, ' + Buffer.from(returnValue.slice(2)).toString())
+
+  if (returnType !== 'ok') throw Object.assign({}, { data: await this.contractDecodeData('string', returnValue) })
 
   return {
     result: callObj,
@@ -140,7 +141,7 @@ async function call (source, address, name, args = [], options = {}) {
     }
   } else {
     const error = Buffer.from(result.returnValue.slice(2)).toString()
-    throw Object.assign(Error(`Invocation failed: ${error}`), R.merge(result, { error }))
+    throw Object.assign(Error(`Invocation failed: ${error}`), R.merge(result, { error, decodedError: await this.contractDecodeData('string', result.returnValue) }))
   }
 }
 
