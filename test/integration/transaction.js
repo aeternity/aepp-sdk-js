@@ -32,14 +32,14 @@ const nameId = 'nm_2sFnPHi5ziAqhdApSpRBsYdomCahtmk3YGNZKYUTtUNpVSMccC'
 const pointers = [{ key: 'account_pubkey', id: senderId }]
 
 // Oracle
-const queryFormat = "{'city': str}"
-const responseFormat = "{'tmp': num}"
+const queryFormat = '{\'city\': str}'
+const responseFormat = '{\'tmp\': num}'
 const queryFee = 30000
-const oracleTtl = {type: 'delta', value: 500}
-const responseTtl = {type: 'delta', value: 10}
-const queryTtl = {type: 'delta', value: 10}
-const query = "{'city': 'Berlin'}"
-const queryResponse = "{'tmp': 101}"
+const oracleTtl = { type: 'delta', value: 500 }
+const responseTtl = { type: 'delta', value: 10 }
+const queryTtl = { type: 'delta', value: 10 }
+const query = '{\'city\': \'Berlin\'}'
+const queryResponse = '{\'tmp\': 101}'
 
 // Contract test data
 const contractCode = `
@@ -104,7 +104,14 @@ describe('Native Transaction', function () {
   })
 
   it('native build of update tx', async () => {
-    const nativeTx = await clientNative.nameUpdateTx({ accountId: senderId, nonce, nameId, nameTtl, pointers, clientTtl })
+    const nativeTx = await clientNative.nameUpdateTx({
+      accountId: senderId,
+      nonce,
+      nameId,
+      nameTtl,
+      pointers,
+      clientTtl
+    })
     const txFromAPI = await client.nameUpdateTx({ accountId: senderId, nonce, nameId, nameTtl, pointers, clientTtl })
     txFromAPI.should.be.equal(nativeTx)
   })
@@ -123,11 +130,27 @@ describe('Native Transaction', function () {
 
   it('native build of contract create tx', async () => {
     const { bytecode } = await client.contractCompile(contractCode)
-    const callData = await client.contractEncodeCall(bytecode, 'sophia', 'init', '()')
+    const callData = await client.contractEncodeCall(contractCode, 'init')
     const owner = await client.address()
 
-    const txFromAPI = await client.contractCreateTx({ ownerId: owner, code: bytecode, deposit, amount, gas, gasPrice, callData })
-    const nativeTx = await clientNative.contractCreateTx({ ownerId: owner, code: bytecode, deposit, amount, gas, gasPrice, callData })
+    const txFromAPI = await client.contractCreateTx({
+      ownerId: owner,
+      code: bytecode,
+      deposit,
+      amount,
+      gas,
+      gasPrice,
+      callData
+    })
+    const nativeTx = await clientNative.contractCreateTx({
+      ownerId: owner,
+      code: bytecode,
+      deposit,
+      amount,
+      gas,
+      gasPrice,
+      callData
+    })
 
     txFromAPI.tx.should.be.equal(nativeTx.tx)
     txFromAPI.contractId.should.be.equal(nativeTx.contractId)
@@ -137,8 +160,7 @@ describe('Native Transaction', function () {
   })
 
   it('native build of contract call tx', async () => {
-    const { bytecode } = await client.contractCompile(contractCode)
-    const callData = await client.contractEncodeCall(bytecode, 'sophia', 'main', '(2)')
+    const callData = await client.contractEncodeCall(contractCode, 'main', [2])
     const owner = await client.address()
 
     const txFromAPI = await client.contractCallTx({ callerId: owner, contractId, amount, gas, gasPrice, callData })

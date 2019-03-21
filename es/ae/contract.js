@@ -53,11 +53,10 @@ async function encodeCall (source, name, args) {
  * @category async
  * @param {String} source Contract source code
  * @param {String} address Contract address
- * @param {String} abi ABI('sophia', 'sophia-address')
  * @param {String} name Name of function to call
+ * @param {Array|String} args  Argument's for call function
  * @param {Object} options [options={}]  Options
- * @param {String} top [options.top] Block hash ob which you want to call contract
- * @param {String} args [options.args] Argument's for call function
+ * @param {String} top [options.top] Block hash on which you want to call contract
  * @param {String} options [options.options]  Transaction options (fee, ttl, gas, amount, deposit)
  * @return {Promise<Object>} Result object
  */
@@ -116,10 +115,8 @@ async function decode (type, data) {
  * @param {String} source Contract source code
  * @param {String} address Contract address
  * @param {String} name Name of function to call
+ * @param {String|Array} args Argument's for call function
  * @param {Object} [options={}] options Options
- * @param {String} [options.args] args Argument's for call function
- * @param {String} [options.call] call Code of `call` contract(Pseudo code with __call => {name}({args}) function)
- * @param {String} [options.options] options Transaction options (fee, ttl, gas, amount, deposit)
  * @return {Promise<Object>} Result object
  */
 async function call (source, address, name, args = [], options = {}) {
@@ -155,14 +152,15 @@ async function call (source, address, name, args = [], options = {}) {
  * @param {String} code Compiled contract
  * @param {String} source Contract source code
  * @param {Object} [options={}] options Options
- * @param {Array} [options.initState=[]] initState Argument's for contract init function
- * @param {String} [options.options] options Transaction options (fee, ttl, gas, amount, deposit)
+ * @param {Array} [options.initState=[]] Argument's for contract init function
+ * @param {Object} [options.options] options Transaction options (fee, ttl, gas, amount, deposit)
  * @return {Promise<Object>} Result object
  */
 async function deploy (code, source, { initState = [], options = {} } = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   const callData = await this.contractEncodeCall(source, 'init', initState)
   const ownerId = await this.address()
+
   const { tx, contractId } = await this.contractCreateTx(R.merge(opt, {
     callData,
     code,

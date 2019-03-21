@@ -37,8 +37,7 @@ const convertArgToArray = (arg) => {
   return arg.split(',') // if arg like '1,2'
 }
 
-async function contractEncodeCallDataAPI (source, name, args) {
-  console.log(args)
+async function contractEncodeCallDataAPI (source, name, args = []) {
   return this.http
     .post('/encode-calldata', { source, 'function': name, arguments: convertArgToArray(args) })
     .then(({ calldata }) => calldata)
@@ -51,13 +50,26 @@ async function contractDecodeDataAPI (type, data) {
 }
 
 async function compileContractAPI (code, options = {}) {
-  return this.http.post('/compile', { code, options }).then(({ bytecode }) => bytecode)
+  return this.http.post('/compile', { code, options })
+    .then(({ bytecode }) => bytecode)
 }
 
 async function contractGetACI (code, options = {}) {
   return this.http.post('/aci', { code, options })
 }
 
+/**
+ * Contract Compiler Stamp
+ *
+ * This stamp include api call's related to contract compiler functionality.
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/contract/compiler
+ * @rtype Stamp
+ * @param {Object} [options={}] - Initializer object
+ * @param {String} [options.compilerUrl] compilerUrl - Url for compiler API
+ * @return {Object} Contract compiler instance
+ * @example ContractCompilerAPI({ compilerUrl: 'COMPILER_URL' })
+ */
 const ContractCompilerAPI = ContractBase.compose({
   init ({ compilerUrl = this.compilerUrl }) {
     this.http = Http({ baseUrl: compilerUrl })
