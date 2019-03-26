@@ -246,7 +246,7 @@ async function oracleRespondTx ({ oracleId, callerId, responseTtl, queryId, resp
   return tx
 }
 
-async function channelCloseSoloTx ({ channelId, fromId, payload = '', poi }) {
+async function channelCloseSoloTx ({ channelId, fromId, payload, poi }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
   const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.channelCloseSolo, { senderId: fromId, ...R.head(arguments), payload })
 
@@ -262,6 +262,34 @@ async function channelCloseSoloTx ({ channelId, fromId, payload = '', poi }) {
       nonce
     }), TX_TYPE.channelCloseSolo)
     : await this.api.postChannelCloseSolo(R.merge(R.head(arguments), {
+      channelId,
+      fromId,
+      payload,
+      poi,
+      ttl,
+      fee: parseInt(fee),
+      nonce
+    }))
+
+  return tx
+}
+
+async function channelSlashTx ({ channelId, fromId, payload, poi }) {
+  // Calculate fee, get absolute ttl (ttl + height), get account nonce
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.channelSlash, { senderId: fromId, ...R.head(arguments), payload })
+
+  // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
+  const { tx } = this.nativeMode
+    ? buildTx(R.merge(R.head(arguments), {
+      channelId,
+      fromId,
+      payload,
+      poi,
+      ttl,
+      fee,
+      nonce
+    }), TX_TYPE.channelSlash)
+    : await this.api.postChannelSlash(R.merge(R.head(arguments), {
       channelId,
       fromId,
       payload,
@@ -392,6 +420,7 @@ const Transaction = Node.compose(Tx, {
     oraclePostQueryTx,
     oracleRespondTx,
     channelCloseSoloTx,
+    channelSlashTx,
     channelSettleTx,
     getAccountNonce
   }
