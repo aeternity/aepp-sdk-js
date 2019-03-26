@@ -115,4 +115,16 @@ describe.only('Contract', function () {
       })
     })
   })
+
+  describe('Contract ACI Interface', function () {
+    it('Generate ACI object', async () => {})
+    it('Compile contract', async () => {})
+    it('Deploy contract before compile', async () => {})
+    it('Deploy contract with wrong arguments', async () => {})
+    it('Deploy contract', async () => {})
+    it('Call contract with wrong arguments', async () => {})
+    it('Static Call contract with wrong arguments', async () => {})
+    it('Call contract with wrong arguments', async () => {})
+    it('Static Call contract with wrong arguments', async () => {})
+  })
 })
