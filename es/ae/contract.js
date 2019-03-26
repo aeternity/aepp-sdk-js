@@ -176,7 +176,7 @@ async function call (source, address, name, args = [], options = {}) {
  * @param {Object} [options.options] options Transaction options (fee, ttl, gas, amount, deposit)
  * @return {Promise<Object>} Result object
  */
-async function deploy (code, source, { initState = [], options = {} } = {}) {
+async function deploy (code, source, initState = [], options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   const callData = await this.contractEncodeCall(source, 'init', initState)
   const ownerId = await this.address()
