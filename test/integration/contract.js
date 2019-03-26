@@ -30,15 +30,11 @@ contract StateContract =
   public function retrieve() = state.value
 `
 
-const callIdentityExample = `
-contract StateContract =
-  function main : int => int
-  function __call() = main(42)
-`
+const encodedNumberSix = 'cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaKNdnK'
 
 plan('10000000000000000')
 
-describe('Contract', function () {
+describe.only('Contract', function () {
   configure(this)
 
   let contract
@@ -72,24 +68,8 @@ describe('Contract', function () {
     })
   })
 
-  it.skip('type-check call deployed contracts', async () => {
-    const result = await deployed.call('main', { call: callIdentityExample })
-    return result.decode('int').should.eventually.become({
-      type: 'word',
-      value: 42
-    })
-  })
-
   it('calls deployed contracts static', async () => {
     const result = await deployed.callStatic('main', [42])
-    return result.decode('int').should.eventually.become({
-      type: 'word',
-      value: 42
-    })
-  })
-
-  it.skip('type-check call deployed contracts static', async () => {
-    const result = await deployed.callStatic('main', { call: callIdentityExample })
     return result.decode('int').should.eventually.become({
       type: 'word',
       value: 42
@@ -99,7 +79,7 @@ describe('Contract', function () {
   it('initializes contract state', async () => {
     const data = `"Hello World!"`
     return contract.contractCompile(stateContract)
-      .then(bytecode => bytecode.deploy({ initState: [data] }))
+      .then(bytecode => bytecode.deploy([data]))
       .then(deployed => deployed.call('retrieve'))
       .then(result => result.decode('string'))
       .catch(e => { console.log(e); throw e })
@@ -107,5 +87,32 @@ describe('Contract', function () {
         type: 'string',
         value: 'Hello World!'
       })
+  })
+
+  describe('Sophia Compiler', function () {
+    it('compile', async () => {
+      const code = await contract.compileContractAPI(identityContract)
+      const prefix = code.slice(0, 2)
+      const isString = typeof code === 'string'
+      prefix.should.be.equal('cb')
+      isString.should.be.equal(true)
+    })
+    it('get contract ACI', async () => {
+      const aci = await contract.contractGetACI(identityContract)
+      aci.should.have.property('interface')
+    })
+    it('encode call-data', async () => {
+      const encoded = await contract.contractEncodeCallDataAPI(identityContract, 'init', [])
+      const prefix = encoded.slice(0, 2)
+      const isString = typeof encoded === 'string'
+      prefix.should.be.equal('cb')
+      isString.should.be.equal(true)
+    })
+    it('decode call-data', async () => {
+      return contract.contractDecodeDataAPI('int', encodedNumberSix).should.eventually.become({
+        type: 'word',
+        value: 6
+      })
+    })
   })
 })

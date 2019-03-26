@@ -216,7 +216,7 @@ async function compile (source, options = {}) {
   const bytecode = await this.compileContractAPI(source, options)
   return Object.freeze(Object.assign({
     encodeCall: async (name, args) => this.contractEncodeCall(source, name, args),
-    deploy: async (options = {}) => this.contractDeploy(bytecode, source, options)
+    deploy: async (init, options = {}) => this.contractDeploy(bytecode, source, init, options)
   }, { bytecode }))
 }
 
