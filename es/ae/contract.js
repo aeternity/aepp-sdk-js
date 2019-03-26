@@ -29,8 +29,28 @@
 
 import Ae from './'
 import * as R from 'ramda'
-import { addressFromDecimal } from '../utils/crypto'
+import { addressFromDecimal, isBase64 } from '../utils/crypto'
 import ContractCompilerAPI from '../contract/compiler'
+
+/**
+ * Handle contract call error
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/contract
+ * @category async
+ * @param {Object} result call result object
+ * @throws Error Decoded error
+ * @return {Promise<void>}
+ */
+async function handleCallError (result) {
+  const error = Buffer.from(result.returnValue).toString()
+  if (!isBase64(error.slice(3))) {
+    const decodedError = Buffer.from(error.slice(3), 'base64').toString()
+    throw Object.assign(Error(`Invocation failed: ${error}. Decoded: ${decodedError}`), R.merge(result, { error, decodedError }))
+  }
+
+  const decodedError = await this.contractDecodeData('string', error)
+  throw Object.assign(Error(`Invocation failed: ${error}. Decoded: ${decodedError}`), R.merge(result, { error, decodedError }))
+}
 
 /**
  * Encode call data for contract call
@@ -44,6 +64,21 @@ import ContractCompilerAPI from '../contract/compiler'
  */
 async function encodeCall (source, name, args) {
   return this.contractEncodeCallDataAPI(source, name, args)
+}
+
+/**
+ * Decode contract call result data
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/contract
+ * @category async
+ * @param {String} type Data type (int, string, list,...)
+ * @param {String} data call result data (cb_iwer89fjsdf2j93fjews_(ssdffsdfsdf...)
+ * @return {Promise<String>} Result object
+ */
+async function decode (type, data) {
+  const result = await this.contractDecodeDataAPI(type, data)
+  if (type === 'address') result.value = addressFromDecimal(result.value)
+  return result
 }
 
 /**
@@ -85,29 +120,12 @@ async function callStatic (source, address, name, args = [], { top, options = {}
   if (status !== 'ok') throw new Error('Dry run error, ' + reason)
   const { returnType, returnValue } = callObj
   if (returnType !== 'ok') {
-    const error = Buffer.from(returnValue).toString()
-    const decodedError = await this.contractDecodeData('string', error)
-    throw Object.assign(Error(`Invocation failed: ${error}`), R.merge(callObj, { error, decodedError }))
+    await this.handleCallError(callObj)
   }
   return {
     result: callObj,
     decode: (type) => this.contractDecodeData(type, returnValue)
   }
-}
-
-/**
- * Decode contract call result data
- * @function
- * @alias module:@aeternity/aepp-sdk/es/ae/contract
- * @category async
- * @param {String} type Data type (int, string, list,...)
- * @param {String} data call result data (cb_iwer89fjsdf2j93fjews_(ssdffsdfsdf...)
- * @return {Promise<String>} Result object
- */
-async function decode (type, data) {
-  const result = await this.contractDecodeDataAPI(type, data)
-  if (type === 'address') result.value = addressFromDecimal(result.value)
-  return result
 }
 
 /**
@@ -142,9 +160,7 @@ async function call (source, address, name, args = [], options = {}) {
       decode: (type) => this.contractDecodeData(type, result.returnValue)
     }
   } else {
-    const error = Buffer.from(result.returnValue).toString()
-    const decodedError = await this.contractDecodeData('string', error)
-    throw Object.assign(Error(`Invocation failed: ${error}`), R.merge(result, { error, decodedError }))
+    await this.handleCallError(result)
   }
 }
 
@@ -219,7 +235,8 @@ const Contract = Ae.compose(ContractCompilerAPI, {
     contractDeploy: deploy,
     contractCall: call,
     contractEncodeCall: encodeCall,
-    contractDecodeData: decode
+    contractDecodeData: decode,
+    handleCallError
   },
   deepProps: {
     Ae: {
