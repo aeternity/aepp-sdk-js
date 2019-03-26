@@ -31,6 +31,7 @@ import Ae from './'
 import * as R from 'ramda'
 import { addressFromDecimal, isBase64 } from '../utils/crypto'
 import ContractCompilerAPI from '../contract/compiler'
+import ContractACI from '../contract/aci'
 
 /**
  * Handle contract call error
@@ -43,7 +44,7 @@ import ContractCompilerAPI from '../contract/compiler'
  */
 async function handleCallError (result) {
   const error = Buffer.from(result.returnValue).toString()
-  if (!isBase64(error.slice(3))) {
+  if (isBase64(error.slice(3))) {
     const decodedError = Buffer.from(error.slice(3), 'base64').toString()
     throw Object.assign(Error(`Invocation failed: ${error}. Decoded: ${decodedError}`), R.merge(result, { error, decodedError }))
   }
@@ -188,8 +189,10 @@ async function deploy (code, source, initState = [], options = {}) {
   }))
 
   const { hash, rawTx } = await this.send(tx, opt)
+  const result = await this.getTxInfo(hash)
 
   return Object.freeze({
+    result,
     owner: ownerId,
     transaction: hash,
     rawTx,
@@ -228,7 +231,7 @@ async function compile (source, options = {}) {
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Contract instance
  */
-const Contract = Ae.compose(ContractCompilerAPI, {
+const Contract = Ae.compose(ContractACI, ContractCompilerAPI, {
   methods: {
     contractCompile: compile,
     contractCallStatic: callStatic,
