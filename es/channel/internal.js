@@ -33,6 +33,7 @@ const actionQueue = new WeakMap()
 const actionQueueLocked = new WeakMap()
 const sequence = new WeakMap()
 const channelId = new WeakMap()
+const rpcCallbacks = new WeakMap()
 
 function channelURL (url, { endpoint = 'channel', ...params }) {
   const paramString = R.join('&', R.values(R.mapObjIndexed((value, key) =>
@@ -104,12 +105,6 @@ async function handleMessage (channel, message) {
   enterState(channel, await Promise.resolve(handler(channel, message, state)))
 }
 
-async function enqueueMessage (channel, message) {
-  const queue = messageQueue.get(channel) || []
-  messageQueue.set(channel, [...queue, JSON.parse(message)])
-  dequeueMessage(channel)
-}
-
 async function dequeueMessage (channel) {
   const queue = messageQueue.get(channel)
   if (messageQueueLocked.get(channel) || !queue.length) {
@@ -123,8 +118,34 @@ async function dequeueMessage (channel) {
   dequeueMessage(channel)
 }
 
-function messageId (channel) {
-  return sequence.set(channel, sequence.get(channel) + 1).get(channel)
+function onMessage (channel, data) {
+  const message = JSON.parse(data)
+  if (message.id) {
+    const callback = rpcCallbacks.get(channel).get(message.id)
+    try {
+      callback(message)
+    } catch (error) {
+      emit(channel, 'error', error)
+    } finally {
+      rpcCallbacks.get(channel).delete(message.id)
+    }
+  } else if (message.method === 'channels.message') {
+    emit(channel, 'message', message.params.data.message)
+  } else {
+    messageQueue.set(channel, [...(messageQueue.get(channel) || []), message])
+    dequeueMessage(channel)
+  }
+}
+
+function call (channel, method, params) {
+  return new Promise((resolve, reject) => {
+    const id = sequence.set(channel, sequence.get(channel) + 1).get(channel)
+    rpcCallbacks.get(channel).set(id, (message) => {
+      if (message.result) return resolve(message.result)
+      if (message.error) return reject(new Error(message.error.message))
+    })
+    send(channel, { jsonrpc: '2.0', method, id, params })
+  })
 }
 
 function WebSocket (url, callbacks) {
@@ -168,10 +189,11 @@ async function initialize (channel, channelOptions) {
   fsm.set(channel, { handler: awaitingConnection })
   eventEmitters.set(channel, new EventEmitter())
   sequence.set(channel, 0)
+  rpcCallbacks.set(channel, new Map())
   websockets.set(channel, await WebSocket(channelURL(channelOptions.url, { ...params, protocol: 'json-rpc' }), {
     onopen: () => changeStatus(channel, 'connected'),
     onclose: () => changeStatus(channel, 'disconnected'),
-    onmessage: ({ data }) => enqueueMessage(channel, data)
+    onmessage: ({ data }) => onMessage(channel, data)
   }))
 }
 
@@ -186,6 +208,6 @@ export {
   changeState,
   send,
   enqueueAction,
-  messageId,
-  channelId
+  channelId,
+  call
 }
