@@ -23,6 +23,89 @@
  * @example import ContractACI from '@aeternity/aepp-sdk/es/contract/aci'
  */
 import AsyncInit from '../utils/async-init'
+import { addressFromDecimal } from '../utils/crypto'
+import { decode } from '../tx/builder/helpers'
+
+const SOPHIA_TYPES = [
+  'int',
+  'string',
+  'address',
+  'bool',
+  'list',
+  'map'
+].reduce((acc, type, i) => {
+  acc[type] = type
+  return acc
+}, {})
+
+function transform (type, value) {
+  const { t, generic } = readType(type)
+
+  switch (t) {
+    case SOPHIA_TYPES.string:
+      return `"${value}"`
+    case SOPHIA_TYPES.list:
+      return `[${value.map(el => transform(generic, el))}]`
+    case SOPHIA_TYPES.address:
+      return `0x${decode(value, 'ak').toString('hex')}`
+  }
+  return `${value}`
+}
+
+function readType (type) {
+  const i = type.indexOf('(')
+
+  if (i === -1) return { t: type }
+
+  const baseType = type.split('(')[0]
+  const generic = type.slice(i + 1, type.length - 1)
+
+  // Corner case for tuples and list -> '()' and '[1, 2]'
+  // if (!Object.keys(SOPHIA_TYPES).includes(generic)) {
+  //
+  // }
+
+  return { t: baseType, generic }
+}
+
+function validate (type, value) {
+  const { t, generic } = readType(type)
+  if (value === undefined || value === null) return { require: true }
+
+  switch (t) {
+    case SOPHIA_TYPES.int:
+      return isNaN(value)
+    case SOPHIA_TYPES.bool:
+      return typeof value !== 'boolean'
+    case SOPHIA_TYPES.list:
+      // if (!Array.isArray(value)) return 'Not and Array'
+      // return value.map(el => {
+      //   const res = validate(generic, el)
+      //   if (Array.isArray(res)) return res.includes(true)
+      //   return res
+      // })
+      return false
+    case SOPHIA_TYPES.address:
+      return !(value[2] === '_' && ['ak', 'ct'].includes(value.slice(0, 2)))
+    default:
+      return false
+  }
+}
+
+function transformDecodedData (aci, result) {
+  const { t, generic } = readType(aci.type)
+  console.log(t + '   |    ' + generic)
+
+  switch (t) {
+    case SOPHIA_TYPES.bool:
+      return !!result.value
+    case SOPHIA_TYPES.list:
+      return result.value.map(({ value }) => transformDecodedData({ type: generic }, { value }))
+    case SOPHIA_TYPES.address:
+      return addressFromDecimal(result.value)
+  }
+  return result.value
+}
 
 /**
  * Validated contract call arguments using contract ACI
@@ -30,44 +113,15 @@ import AsyncInit from '../utils/async-init'
  * @rtype (aci: Object, params: Array) => Object
  * @param {Object} aci Contract ACI
  * @param {Array} params Contract call arguments
- * @return {Object} Object with validation errors
+ * @return {Array} Object with validation errors
  */
-function validateCallParams (aci, params) {
-  return true
-}
+function prepareArgsForEncode (aci, params) {
+  // Validation
+  const validation = aci.arguments.map(({ type }, i) => validate(type, params[i])).filter(e => e)
+  if (validation.length) throw new Error('Validation error: ' + validation)
 
-/**
- * Transform contract call arguments
- * @function prepareCallParams
- * @rtype (aci: Object, params: Array) => Array
- * @param {Object} aci Contract ACI
- * @param {Array} params Contract call arguments
- * @return {Array} Object with call arguments
- */
-function prepareCallParams (aci, params) {
-  return params
+  return aci.arguments.map(({ type }, i) => transform(type, params[i]))
 }
-
-// /**
-//  * Genrate JS contract call functions using ACI
-//  * @function generateContractJS
-//  * @rtype (aci: Object) => Object
-//  * @param {Object} aci Contract ACI
-//  * @return {Array} Object with contract call functions
-//  */
-// function generateContractJS (aci) {
-//   // return aci.functions
-//   //   .reduce(
-//   //     (acc, el) => {
-//   //       const { fn } = el
-//   //       acc[fn] = async (args = [], options = {}) => {
-//   //         return call.bind(this)(this.source, this.deployInfo.address, fn, args, options)
-//   //       }
-//   //     },
-//   //     {}
-//   //   )
-//   return {}
-// }
 
 /**
  * Get function schema from contract ACI object
@@ -90,25 +144,28 @@ function getFunctionACI (aci, name) {
  */
 function call (self) {
   return async function (fn, params = [], options = {}) {
-    const fnACI = getFunctionACI(this.aci, 'init')
+    const fnACI = getFunctionACI(this.aci, fn)
     if (!fn) throw new Error('Function name is required')
     if (!this.deployInfo.address) throw new Error('You need to deploy contract before calling!')
 
-    validateCallParams(fnACI, params)
-
+    params = prepareArgsForEncode(fnACI, params)
+    // console.log(params)
     const result = options.callStatic
-      ? self.contractCallStatic(this.interface, this.deployInfo.address, fn, prepareCallParams(params), { top: options.top, options })
-      : self.contractCall(this.interface, this.deployInfo.address, fn, prepareCallParams(params), options)
+      ? await self.contractCallStatic(this.interface, this.deployInfo.address, fn, params, {
+        top: options.top,
+        options
+      })
+      : await self.contractCall(this.interface, this.deployInfo.address, fn, params, options)
 
     return {
       ...result,
-      decode: () => self.contractDecodeData(fnACI.returnType, result.result.returnValue)
+      decode: async () => transformDecodedData(fnACI, await self.contractDecodeData(fnACI.type, result.result.returnValue))
     }
   }
 }
 
 /**
- * Get function schema from contract ACI object
+ * Deploy Contract
  * @param {Object} aci Contract ACI object
  * @param {String} name Function name
  * @return {Object} function ACI
@@ -116,9 +173,9 @@ function call (self) {
 function deploy (self) {
   return async function (init = [], options = {}) {
     const fnACI = getFunctionACI(this.aci, 'init')
-    if (!this.compiled) await this.compiled
+    if (!this.compiled) await self.compile()
 
-    validateCallParams(fnACI, init)
+    init = prepareArgsForEncode(fnACI, init)
 
     const { owner, transaction, address, createdAt, result } = await self.contractDeploy(this.compiled, this.source, init, options)
     this.deployInfo = { owner, transaction, address, createdAt, result }
@@ -126,9 +183,7 @@ function deploy (self) {
 }
 
 /**
- * Get function schema from contract ACI object
- * @param {Object} aci Contract ACI object
- * @param {String} name Function name
+ * Compile contract
  * @return {Object} function ACI
  */
 function compile (self) {
@@ -141,19 +196,20 @@ function compile (self) {
 
 /**
  * Generate contract ACI object with predefined js methods for contract usage
- * @param {Object} aci Contract ACI
+ * @alias module:@aeternity/aepp-sdk/es/contract/aci
  * @param {String} source Contract source code
- * @param {Object} options Options object
+ * @param {Object} [options] Options object
+ * @param {Object} [options.aci] Contract ACI
  * @return {Object} JS Contract API
  */
-async function getInstance (source, { aci } = {}) {
+async function getInstance (source, { aci, contractAddress } = {}) {
   aci = aci || await this.contractGetACI(source)
   const instance = {
     interface: aci.interface,
     aci: aci.encoded_aci.contract,
     source,
     compiled: null,
-    deployInfo: {}
+    deployInfo: { address: contractAddress }
   }
   instance.compile = compile(this).bind(instance)
   instance.deploy = deploy(this).bind(instance)

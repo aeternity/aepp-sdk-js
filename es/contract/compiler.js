@@ -27,35 +27,26 @@
 import Http from '../utils/http'
 import ContractBase from './index'
 
-// Convert old style arguments to array of arguments
-const convertArgToArray = (arg) => {
-  if (Array.isArray(arg)) return arg.map(v => typeof v !== 'string' ? JSON.stringify(v) : v)
-  if (!arg.length) return [] // if arg empty string
-  if (arg[0] === '(') { // if arg like '(1,2)'
-    return arg.slice(1).slice(0, -1).split(',')
-  }
-  return arg.split(',') // if arg like '1,2'
-}
 
-async function contractEncodeCallDataAPI (source, name, args = []) {
+async function contractEncodeCallDataAPI (source, name, args = [], options = {}) {
   return this.http
-    .post('/encode-calldata', { source, 'function': name, arguments: convertArgToArray(args) })
+    .post('/encode-calldata', { source, 'function': name, arguments: args }, options)
     .then(({ calldata }) => calldata)
 }
 
-async function contractDecodeDataAPI (type, data) {
+async function contractDecodeDataAPI (type, data, options = {}) {
   return this.http
-    .post('/decode-data', { data, 'sophia-type': type })
+    .post('/decode-data', { data, 'sophia-type': type }, options)
     .then(({ data }) => data)
 }
 
 async function compileContractAPI (code, options = {}) {
-  return this.http.post('/compile', { code, options })
+  return this.http.post('/compile', { code, options }, options)
     .then(({ bytecode }) => bytecode)
 }
 
 async function contractGetACI (code, options = {}) {
-  return this.http.post('/aci', { code, options })
+  return this.http.post('/aci', { code, options }, options)
 }
 
 /**

@@ -60,7 +60,7 @@ async function handleCallError (result) {
  * @category async
  * @param {String} source Contract source code
  * @param {String} name Name of function to call
- * @param {Array|String} args Argument's for call ('()')
+ * @param {Array} args Argument's for call
  * @return {Promise<String>}
  */
 async function encodeCall (source, name, args) {
@@ -77,6 +77,7 @@ async function encodeCall (source, name, args) {
  * @return {Promise<String>} Result object
  */
 async function decode (type, data) {
+  
   const result = await this.contractDecodeDataAPI(type, data)
   if (type === 'address') result.value = addressFromDecimal(result.value)
   return result
@@ -138,7 +139,7 @@ async function callStatic (source, address, name, args = [], { top, options = {}
  * @param {String} address Contract address
  * @param {String} name Name of function to call
  * @param {String|Array} args Argument's for call function
- * @param {Object} [options={}] options Options
+ * @param {Object} options Transaction options (fee, ttl, gas, amount, deposit)
  * @return {Promise<Object>} Result object
  */
 async function call (source, address, name, args = [], options = {}) {
@@ -172,9 +173,8 @@ async function call (source, address, name, args = [], options = {}) {
  * @category async
  * @param {String} code Compiled contract
  * @param {String} source Contract source code
- * @param {Object} [options={}] options Options
- * @param {Array} [options.initState=[]] Argument's for contract init function
- * @param {Object} [options.options] options Transaction options (fee, ttl, gas, amount, deposit)
+ * @param {Array} initState Arguments of contract constructor(init) function
+ * @param {Object} options Transaction options (fee, ttl, gas, amount, deposit)
  * @return {Promise<Object>} Result object
  */
 async function deploy (code, source, initState = [], options = {}) {
