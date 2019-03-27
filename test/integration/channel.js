@@ -20,7 +20,8 @@ import * as sinon from 'sinon'
 import { BigNumber } from 'bignumber.js'
 import { configure, ready, plan, BaseAe, networkId } from './'
 import { generateKeyPair } from '../../es/utils/crypto'
-import { unpackTx } from '../../es/tx/builder'
+import { unpackTx, buildTx } from '../../es/tx/builder'
+import { decode } from '../../es/tx/builder/helpers'
 import Channel from '../../es/channel'
 
 const wsUrl = process.env.WS_URL || 'ws://node:3014'
@@ -181,7 +182,10 @@ describe('Channel', function () {
     const responderPoi = await responderCh.poi(params)
     initiatorPoi.should.be.a('string')
     responderPoi.should.be.a('string')
-    // TODO: proof of inclusion deserialization
+    const unpackedInitiatorPoi = unpackTx(decode(initiatorPoi, 'pi'), true)
+    const unpackedResponderPoi = unpackTx(decode(responderPoi, 'pi'), true)
+    buildTx(unpackedInitiatorPoi.tx, unpackedInitiatorPoi.txType, { prefix: 'pi' }).tx.should.equal(initiatorPoi)
+    buildTx(unpackedResponderPoi.tx, unpackedResponderPoi.txType, { prefix: 'pi' }).tx.should.equal(responderPoi)
   })
 
   it('can get balances', async () => {

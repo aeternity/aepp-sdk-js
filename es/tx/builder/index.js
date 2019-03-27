@@ -50,6 +50,16 @@ function deserializeField (value, type, prefix) {
     case FIELD_TYPES.callStack:
       // TODO: fix this
       return [readInt(value)]
+    case FIELD_TYPES.mptree:
+      return value.map(v => ({
+        rootHash: v[0].toString('hex'),
+        nodes: v[1].map(v => deserializeField(v, FIELD_TYPES.mptreeNode))
+      }))
+    case FIELD_TYPES.mptreeNode:
+      return {
+        mptHash: value[0].toString('hex'),
+        mptValue: value[1]
+      }
     default:
       return value
   }
@@ -69,6 +79,16 @@ function serializeField (value, type, prefix) {
       return toBytes(value)
     case FIELD_TYPES.pointers:
       return buildPointers(value)
+    case FIELD_TYPES.mptree:
+      return value.map(v => ([
+        Buffer.from(v.rootHash, 'hex'),
+        v.nodes.map(v => serializeField(v, FIELD_TYPES.mptreeNode))
+      ]))
+    case FIELD_TYPES.mptreeNode:
+      return [
+        Buffer.from(value.mptHash, 'hex'),
+        value.mptValue
+      ]
     default:
       return value
   }
@@ -255,10 +275,11 @@ export function unpackRawTx (binary, schema) {
  * @param {String} type Transaction type
  * @param {Object} [options={}] options
  * @param {Object} [options.excludeKeys] excludeKeys Array of keys to exclude for validation and build
+ * @param {String} [options.prefix] Prefix of transaction
  * @throws {Error} Validation error
  * @return {Object} { tx, rlpEncoded, binary } Object with tx -> Base64Check transaction hash with 'tx_' prefix, rlp encoded transaction and binary transaction
  */
-export function buildTx (params, type, { excludeKeys = [] } = {}) {
+export function buildTx (params, type, { excludeKeys = [], prefix = 'tx' } = {}) {
   if (!TX_SERIALIZATION_SCHEMA[type]) {
     throw new Error('Transaction serialization not implemented for ' + type)
   }
@@ -266,7 +287,7 @@ export function buildTx (params, type, { excludeKeys = [] } = {}) {
   const binary = buildRawTx({ ...params, VSN, tag }, schema, { excludeKeys }).filter(e => e !== undefined)
 
   const rlpEncoded = rlp.encode(binary)
-  const tx = encode(rlpEncoded, 'tx')
+  const tx = encode(rlpEncoded, prefix)
 
   return { tx, rlpEncoded, binary, txObject: unpackRawTx(binary, schema) }
 }
