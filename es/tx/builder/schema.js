@@ -171,8 +171,7 @@ export const FIELD_TYPES = {
   offChainUpdates: 'offChainUpdates',
   callStack: 'callStack',
   proofOfInclusion: 'proofOfInclusion',
-  mptree: 'mptree',
-  mptreeNode: 'mptreeNode'
+  mptree: 'mptree'
 }
 
 // FEE CALCULATION

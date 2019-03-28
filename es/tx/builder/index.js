@@ -16,6 +16,7 @@ import {
 } from './schema'
 import { readInt, readId, readPointers, writeId, writeInt, buildPointers, encode, decode } from './helpers'
 import { toBytes } from '../../utils/bytes'
+import * as mpt from '../../utils/mptree'
 
 /**
  * JavaScript-based Transaction builder
@@ -51,15 +52,7 @@ function deserializeField (value, type, prefix) {
       // TODO: fix this
       return [readInt(value)]
     case FIELD_TYPES.mptree:
-      return value.map(v => ({
-        rootHash: v[0].toString('hex'),
-        nodes: v[1].map(v => deserializeField(v, FIELD_TYPES.mptreeNode))
-      }))
-    case FIELD_TYPES.mptreeNode:
-      return {
-        mptHash: value[0].toString('hex'),
-        mptValue: value[1]
-      }
+      return value.map(mpt.deserialize)
     default:
       return value
   }
@@ -80,15 +73,7 @@ function serializeField (value, type, prefix) {
     case FIELD_TYPES.pointers:
       return buildPointers(value)
     case FIELD_TYPES.mptree:
-      return value.map(v => ([
-        Buffer.from(v.rootHash, 'hex'),
-        v.nodes.map(v => serializeField(v, FIELD_TYPES.mptreeNode))
-      ]))
-    case FIELD_TYPES.mptreeNode:
-      return [
-        Buffer.from(value.mptHash, 'hex'),
-        value.mptValue
-      ]
+      return value.map(mpt.serialize)
     default:
       return value
   }
