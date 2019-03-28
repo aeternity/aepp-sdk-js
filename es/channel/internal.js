@@ -33,7 +33,7 @@ const actionQueue = new WeakMap()
 const actionQueueLocked = new WeakMap()
 const sequence = new WeakMap()
 
-function channelURL (url, { endpoint = 'channel', ...params }) {
+function channelURL (url, params, endpoint = 'channel') {
   const paramString = R.join('&', R.values(R.mapObjIndexed((value, key) =>
     `${pascalToSnake(key)}=${encodeURIComponent(value)}`, params)))
 
@@ -147,27 +147,16 @@ function WebSocket (url, callbacks) {
 }
 
 async function initialize (channel, channelOptions) {
-  const params = R.pick([
-    'initiatorId',
-    'responderId',
-    'pushAmount',
-    'initiatorAmount',
-    'responderAmount',
-    'channelReserve',
-    'ttl',
-    'host',
-    'port',
-    'lockPeriod',
-    'role',
-    'existingChannelId',
-    'offchainTx'
-  ], channelOptions)
+  const optionsKeys = ['sign', 'endpoint', 'url']
+  const params = R.pickBy(key => !optionsKeys.includes(key), channelOptions)
+  const { endpoint, url } = channelOptions
+  const wsUrl = channelURL(url, { ...params, protocol: 'json-rpc' }, endpoint)
 
   options.set(channel, channelOptions)
   fsm.set(channel, { handler: awaitingConnection })
   eventEmitters.set(channel, new EventEmitter())
   sequence.set(channel, 0)
-  websockets.set(channel, await WebSocket(channelURL(channelOptions.url, { ...params, protocol: 'json-rpc' }), {
+  websockets.set(channel, await WebSocket(wsUrl, {
     onopen: () => changeStatus(channel, 'connected'),
     onclose: () => changeStatus(channel, 'disconnected'),
     onmessage: ({ data }) => enqueueMessage(channel, data)
