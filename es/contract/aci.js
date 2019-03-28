@@ -94,11 +94,23 @@ function validate (type, value) {
 
 function transformDecodedData (aci, result) {
   const { t, generic } = readType(aci.type)
-  console.log(t + '   |    ' + generic)
+  // console.log(t + '   |    ' + generic)
 
   switch (t) {
     case SOPHIA_TYPES.bool:
       return !!result.value
+    case SOPHIA_TYPES.map:
+      const [keyT, ...valueT] = generic.split(',')
+      return result.value
+        .reduce(
+          (acc, { key, val }, i) => {
+            key = transformDecodedData({ type: keyT.toString() }, { value: key.value })
+            val = transformDecodedData({ type: valueT.toString() }, { value: val.value })
+            acc[i] = { key, val }
+            return acc
+          },
+          {}
+        )
     case SOPHIA_TYPES.list:
       return result.value.map(({ value }) => transformDecodedData({ type: generic }, { value }))
     case SOPHIA_TYPES.address:
