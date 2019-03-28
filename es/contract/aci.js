@@ -29,6 +29,7 @@ import { decode } from '../tx/builder/helpers'
 const SOPHIA_TYPES = [
   'int',
   'string',
+  'tuple',
   'address',
   'bool',
   'list',
@@ -38,6 +39,12 @@ const SOPHIA_TYPES = [
   return acc
 }, {})
 
+/**
+ * Transform JS type to Sophia-type
+ * @param type
+ * @param value
+ * @return {string}
+ */
 function transform (type, value) {
   const { t, generic } = readType(type)
 
@@ -52,39 +59,42 @@ function transform (type, value) {
   return `${value}`
 }
 
+/**
+ * Parse sophia type
+ * @param type
+ * @return {*}
+ */
 function readType (type) {
   const i = type.indexOf('(')
 
   if (i === -1) return { t: type }
 
+  // Tuple
+  if (type[0] === '(') {
+    return { t: SOPHIA_TYPES.tuple, generic: type.slice(1).slice(0, -1).split(',').map(e => e.trim()) }
+  }
+
   const baseType = type.split('(')[0]
   const generic = type.slice(i + 1, type.length - 1)
-
-  // Corner case for tuples and list -> '()' and '[1, 2]'
-  // if (!Object.keys(SOPHIA_TYPES).includes(generic)) {
-  //
-  // }
 
   return { t: baseType, generic }
 }
 
+/**
+ * Validate argument sophia-type
+ * @param type
+ * @param value
+ * @return {*}
+ */
 function validate (type, value) {
-  const { t, generic } = readType(type)
+  const { t } = readType(type)
   if (value === undefined || value === null) return { require: true }
 
   switch (t) {
     case SOPHIA_TYPES.int:
-      return isNaN(value)
+      return isNaN(value) || ['boolean'].includes(typeof value)
     case SOPHIA_TYPES.bool:
       return typeof value !== 'boolean'
-    case SOPHIA_TYPES.list:
-      // if (!Array.isArray(value)) return 'Not and Array'
-      // return value.map(el => {
-      //   const res = validate(generic, el)
-      //   if (Array.isArray(res)) return res.includes(true)
-      //   return res
-      // })
-      return false
     case SOPHIA_TYPES.address:
       return !(value[2] === '_' && ['ak', 'ct'].includes(value.slice(0, 2)))
     default:
@@ -92,9 +102,16 @@ function validate (type, value) {
   }
 }
 
-function transformDecodedData (aci, result) {
+/**
+ * Transform decoded data to JS type
+ * @param aci
+ * @param result
+ * @param transformDecodedData
+ * @return {*}
+ */
+function transformDecodedData (aci, result, { transformDecoded = true } = {}) {
+  if (!transformDecoded) return result
   const { t, generic } = readType(aci.type)
-  // console.log(t + '   |    ' + generic)
 
   switch (t) {
     case SOPHIA_TYPES.bool:
@@ -113,6 +130,8 @@ function transformDecodedData (aci, result) {
         )
     case SOPHIA_TYPES.list:
       return result.value.map(({ value }) => transformDecodedData({ type: generic }, { value }))
+    case SOPHIA_TYPES.tuple:
+      return result.value.map(({ value }, i) => { return transformDecodedData({ type: generic[i] }, { value }) })
     case SOPHIA_TYPES.address:
       return addressFromDecimal(result.value)
   }
@@ -129,8 +148,13 @@ function transformDecodedData (aci, result) {
  */
 function prepareArgsForEncode (aci, params) {
   // Validation
-  const validation = aci.arguments.map(({ type }, i) => validate(type, params[i])).filter(e => e)
-  if (validation.length) throw new Error('Validation error: ' + validation)
+  const validation = aci.arguments
+    .map(
+      ({ type }, i) => {
+        return validate(type, params[i]) ? `Argument index: ${i}, value: [${params[i]}] must be of type [${type}]` : false
+      }
+    ).filter(e => e)
+  if (validation.length) throw new Error('Validation error: ' + JSON.stringify(validation))
 
   return aci.arguments.map(({ type }, i) => transform(type, params[i]))
 }
@@ -155,13 +179,12 @@ function getFunctionACI (aci, name) {
  * @return {Object} function ACI
  */
 function call (self) {
-  return async function (fn, params = [], options = {}) {
+  return async function (fn, params = [], options = { skipTransformAndValidateParams: false, transformDecoded: true }) {
     const fnACI = getFunctionACI(this.aci, fn)
     if (!fn) throw new Error('Function name is required')
     if (!this.deployInfo.address) throw new Error('You need to deploy contract before calling!')
 
-    params = prepareArgsForEncode(fnACI, params)
-    // console.log(params)
+    params = !options.skipTransformAndValidateParams ? prepareArgsForEncode(fnACI, params) : params
     const result = options.callStatic
       ? await self.contractCallStatic(this.interface, this.deployInfo.address, fn, params, {
         top: options.top,
@@ -171,7 +194,7 @@ function call (self) {
 
     return {
       ...result,
-      decode: async () => transformDecodedData(fnACI, await self.contractDecodeData(fnACI.type, result.result.returnValue))
+      decode: async () => transformDecodedData(fnACI, await self.contractDecodeData(fnACI.type, result.result.returnValue), options)
     }
   }
 }
@@ -183,11 +206,11 @@ function call (self) {
  * @return {Object} function ACI
  */
 function deploy (self) {
-  return async function (init = [], options = {}) {
+  return async function (init = [], options = { transformAndValidate: true }) {
     const fnACI = getFunctionACI(this.aci, 'init')
-    if (!this.compiled) await self.compile()
+    if (!this.compiled) await this.compile()
 
-    init = prepareArgsForEncode(fnACI, init)
+    init = options.transformAndValidate ? prepareArgsForEncode(fnACI, init) : init
 
     const { owner, transaction, address, createdAt, result } = await self.contractDeploy(this.compiled, this.source, init, options)
     this.deployInfo = { owner, transaction, address, createdAt, result }

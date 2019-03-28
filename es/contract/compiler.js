@@ -27,7 +27,6 @@
 import Http from '../utils/http'
 import ContractBase from './index'
 
-
 async function contractEncodeCallDataAPI (source, name, args = [], options = {}) {
   return this.http
     .post('/encode-calldata', { source, 'function': name, arguments: args }, options)

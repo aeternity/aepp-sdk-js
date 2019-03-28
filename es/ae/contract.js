@@ -77,7 +77,6 @@ async function encodeCall (source, name, args) {
  * @return {Promise<String>} Result object
  */
 async function decode (type, data) {
-
   const result = await this.contractDecodeDataAPI(type, data)
   if (type === 'address') result.value = addressFromDecimal(result.value)
   return result

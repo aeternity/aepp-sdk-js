@@ -160,7 +160,7 @@ describe('Native Transaction', function () {
   })
 
   it('native build of contract call tx', async () => {
-    const callData = await client.contractEncodeCall(contractCode, 'main', [2])
+    const callData = await client.contractEncodeCall(contractCode, 'main', ['2'])
     const owner = await client.address()
 
     const txFromAPI = await client.contractCallTx({ callerId: owner, contractId, amount, gas, gasPrice, callData })
