@@ -11,6 +11,7 @@ import * as Crypto from '@aeternity/aepp-sdk/es/utils/crypto'
 * [@aeternity/aepp-sdk/es/utils/crypto](#module_@aeternity/aepp-sdk/es/utils/crypto)
     * _static_
         * [.decode](#module_@aeternity/aepp-sdk/es/utils/crypto.decode) ⇒ `Array`
+        * [.isBase64(str)](#module_@aeternity/aepp-sdk/es/utils/crypto.isBase64) ⇒ `boolean`
         * [.isAddressValid(address)](#module_@aeternity/aepp-sdk/es/utils/crypto.isAddressValid) ⇒ `Boolean`
         * [.addressToHex(base58CheckAddress)](#module_@aeternity/aepp-sdk/es/utils/crypto.addressToHex) ⇒ `String`
         * [.addressFromDecimal(decimalAddress)](#module_@aeternity/aepp-sdk/es/utils/crypto.addressFromDecimal) ⇒ `String`
@@ -57,6 +58,18 @@ RLP decode
 | Param | Type | Description |
 | --- | --- | --- |
 | data | `Buffer` \| `String` \| `Integer` \| `Array` | Data to decode |
+
+<a id="module_@aeternity/aepp-sdk/es/utils/crypto.isBase64"></a>
+
+### @aeternity/aepp-sdk/es/utils/crypto.isBase64(str) ⇒ `boolean`
+Check whether a string is valid base-64.
+
+**Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
+**Returns**: `boolean` - True if the string is valid base-64, false otherwise.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| str | `string` | String to validate. |
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.isAddressValid"></a>
 
@@ -304,7 +317,7 @@ Generate signature
 | Param | Type | Description |
 | --- | --- | --- |
 | data | `String` \| `Buffer` | Data to sign |
-| privateKey | `Buffer` | Key to sign with |
+| privateKey | `String` \| `Buffer` | Key to sign with |
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.verify"></a>
 

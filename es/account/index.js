@@ -27,9 +27,15 @@ import { required } from '@stamp/required'
 import * as Crypto from '../utils/crypto'
 import { buildTx } from '../tx/builder'
 import { TX_TYPE } from '../tx/builder/schema'
+import { decode } from '../tx/builder/helpers'
 
 const DEFAULT_NETWORK_ID = `ae_mainnet`
 
+export const ADDRESS_FORMAT = {
+  sophia: 1,
+  api: 2,
+  raw: 3
+}
 /**
  * Sign encoded transaction
  * @instance
@@ -46,6 +52,24 @@ async function signTransaction (tx) {
 
   const signatures = [await this.sign(txWithNetworkId)]
   return buildTx({ encodedTx: rlpBinaryTx, signatures }, TX_TYPE.signed).tx
+}
+
+/**
+ * Format account address
+ * @instance
+ * @category async
+ * @rtype (format: String, address: String) => tx: Promise[String]
+ * @param {String} format - Format type
+ * @param {String} address - Base58check account address
+ * @return {String} Formatted address
+ */
+async function formatAddress (format = ADDRESS_FORMAT.api, address) {
+  switch (format) {
+    case ADDRESS_FORMAT.api:
+      return address
+    case ADDRESS_FORMAT.sophia:
+      return `0x${decode(address, 'ak').toString('hex')}`
+  }
 }
 
 /**
@@ -68,6 +92,11 @@ const Account = stampit({
   init ({ networkId }) { // NETWORK_ID using for signing transaction's
     if (!this.networkId && networkId) {
       this.networkId = networkId
+    }
+    // Add address formatter
+    this.getAddress = this.address
+    this.address = async function (format) {
+      return formatAddress(format, await this.getAddress())
     }
   },
   methods: { signTransaction },
