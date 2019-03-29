@@ -301,11 +301,11 @@ export function decryptKey (password, encrypted) {
  * Generate signature
  * @rtype (data: String|Buffer, privateKey: Buffer) => Buffer
  * @param {String|Buffer} data - Data to sign
- * @param {Buffer} privateKey - Key to sign with
+ * @param {String|Buffer} privateKey - Key to sign with
  * @return {Buffer} Signature
  */
 export function sign (data, privateKey) {
-  return nacl.sign.detached(new Uint8Array(data), privateKey)
+  return nacl.sign.detached(Buffer.from(data), Buffer.from(privateKey))
 }
 
 /**
