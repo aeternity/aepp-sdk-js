@@ -171,7 +171,7 @@ describe('Contract', function () {
     })
     describe('Call contract', function () {
       it('Call contract using using sophia type arguments', async () => {
-        const res = await contractObject.call('listFn', ['[ 1, 2 ]'], { skipTransformAndValidateParams: true })
+        const res = await contractObject.call('listFn', ['[ 1, 2 ]'], { skipArgsConvert: true })
         return res.decode().should.eventually.become([1, 2])
       })
       it('Call contract using using js type arguments', async () => {
@@ -179,7 +179,7 @@ describe('Contract', function () {
         return res.decode().should.eventually.become([1, 2])
       })
       it('Call contract using using js type arguments and skip result transform', async () => {
-        const res = await contractObject.call('listFn', [[ 1, 2 ]], { transformDecoded: false })
+        const res = await contractObject.call('listFn', [[ 1, 2 ]], { skipTransformDecoded: true })
         const decoded = await res.decode()
         const decodedJSON = '{"type":"list","value":[{"type":"word","value":1},{"type":"word","value":2}]}'
         JSON.stringify(decoded).should.be.equal(decodedJSON)

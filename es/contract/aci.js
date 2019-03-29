@@ -109,8 +109,8 @@ function validate (type, value) {
  * @param transformDecodedData
  * @return {*}
  */
-function transformDecodedData (aci, result, { transformDecoded = true } = {}) {
-  if (!transformDecoded) return result
+function transformDecodedData (aci, result, { skipTransformDecoded = false } = {}) {
+  if (skipTransformDecoded) return result
   const { t, generic } = readType(aci.type)
 
   switch (t) {
@@ -205,7 +205,7 @@ async function getInstance (source, { aci, contractAddress } = {}) {
    * @rtype (init: Array, options: Object = { fromJsType: true }) => ContractInstance: Object
    * @param {Array} init Contract init function arguments array
    * @param {Object} [options={}] options Options object
-   * @param {Boolean} [options.fromJsType=true] Validate and Transform arguments before prepare call-data
+   * @param {Boolean} [options.skipArgsConvert=false] Skip Validation and Transforming arguments before prepare call-data
    * @return {ContractInstance} Contract ACI object with predefined js methods for contract usage
    */
   instance.deploy = deploy(this).bind(instance)
@@ -216,8 +216,8 @@ async function getInstance (source, { aci, contractAddress } = {}) {
    * @param {String} fn Function name
    * @param {Array} params Array of function arguments
    * @param {Object} [options={}] Array of function arguments
-   * @param {Boolean} [options.fromJsType=true] Validate and Transform arguments before prepare call-data
-   * @param {Boolean} [options.transformDecoded=true] Transform decoded data to JS type
+   * @param {Boolean} [options.skipArgsConvert=false] Skip Validation and Transforming arguments before prepare call-data
+   * @param {Boolean} [options.skipTransformDecoded=false] Skip Transform decoded data to JS type
    * @return {Object} CallResult
    */
   instance.call = call(this).bind(instance)
@@ -226,12 +226,12 @@ async function getInstance (source, { aci, contractAddress } = {}) {
 }
 
 function call (self) {
-  return async function (fn, params = [], options = { fromJsTypes: true, transformDecoded: true }) {
+  return async function (fn, params = [], options = { skipArgsConvert: false, skipTransformDecoded: false }) {
     const fnACI = getFunctionACI(this.aci, fn)
     if (!fn) throw new Error('Function name is required')
     if (!this.deployInfo.address) throw new Error('You need to deploy contract before calling!')
 
-    params = options.fromJsTypes ? prepareArgsForEncode(fnACI, params) : params
+    params = !options.skipArgsConvert ? prepareArgsForEncode(fnACI, params) : params
     const result = options.callStatic
       ? await self.contractCallStatic(this.interface, this.deployInfo.address, fn, params, {
         top: options.top,
@@ -247,11 +247,11 @@ function call (self) {
 }
 
 function deploy (self) {
-  return async function (init = [], options = { fromJsTypes: true }) {
+  return async function (init = [], options = { skipArgsConvert: false }) {
     const fnACI = getFunctionACI(this.aci, 'init')
     if (!this.compiled) await this.compile()
 
-    init = options.fromJsTypes ? prepareArgsForEncode(fnACI, init) : init
+    init = !options.skipArgsConvert ? prepareArgsForEncode(fnACI, init) : init
 
     const { owner, transaction, address, createdAt, result } = await self.contractDeploy(this.compiled, this.source, init, options)
     this.deployInfo = { owner, transaction, address, createdAt, result }
