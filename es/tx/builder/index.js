@@ -38,6 +38,10 @@ function deserializeField (value, type, prefix) {
       return readInt(value)
     case FIELD_TYPES.id:
       return readId(value)
+    case FIELD_TYPES.ids:
+      return value.map(readId)
+    case FIELD_TYPES.bool:
+      return value[0] === 1
     case FIELD_TYPES.binary:
       return encode(value, prefix)
     case FIELD_TYPES.string:
@@ -46,6 +50,12 @@ function deserializeField (value, type, prefix) {
       return readPointers(value)
     case FIELD_TYPES.rlpBinary:
       return unpackTx(value, true)
+    case FIELD_TYPES.rlpBinaries:
+      return value.map(v => unpackTx(v, true))
+    case FIELD_TYPES.rawBinary:
+      return value
+    case FIELD_TYPES.hex:
+      return value.toString('hex')
     case FIELD_TYPES.offChainUpdates:
       return value.map(v => unpackTx(v, true))
     case FIELD_TYPES.callStack:
@@ -64,6 +74,10 @@ function serializeField (value, type, prefix) {
       return writeInt(value)
     case FIELD_TYPES.id:
       return writeId(value)
+    case FIELD_TYPES.ids:
+      return value.map(writeId)
+    case FIELD_TYPES.bool:
+      return Buffer.from([value ? 1 : 0])
     case FIELD_TYPES.binary:
       return decode(value, prefix)
     case FIELD_TYPES.signatures:

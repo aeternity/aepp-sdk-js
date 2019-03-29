@@ -15,25 +15,35 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+import { rlp, hash } from './crypto'
+
 const NODE_TYPES = {
   branch: 1,
   extension: 2,
   leaf: 3
 }
 
-function nodeType (node, remainingPath) {
+function nodeType (node) {
   if (node.length === 17) {
     return NODE_TYPES.branch
   }
   if (node.length === 2) {
-    const isOdd = remainingPath.length % 2
     const nibble = node[0].toString('hex')[0]
-    if ((!isOdd && nibble === '0') || (isOdd && nibble === '1')) {
+    if (nibble === '0' || nibble === '1') {
       return NODE_TYPES.extension
     }
-    if ((!isOdd && nibble === '2') || (isOdd && nibble === '3')) {
+    if (nibble === '2' || nibble === '3') {
       return NODE_TYPES.leaf
     }
+  }
+}
+
+function decodePath (path) {
+  if (path[0] === '0' || path[0] === '2') {
+    return path.slice(2)
+  }
+  if (path[0] === '1' || path[0] === '3') {
+    return path.slice(1)
   }
 }
 
@@ -78,15 +88,59 @@ export function serialize (tree) {
  */
 export function get (tree, key, hash) {
   const node = hash ? tree.nodes[hash] : tree.nodes[tree.rootHash]
-  const type = nodeType(node, key)
+  const type = nodeType(node)
   if (type === NODE_TYPES.branch) {
-    const nextHash = node[parseInt(key[0], 16)].toString('hex')
-    return get(tree, key.substr(1), nextHash)
+    if (key.length) {
+      const nextHash = node[parseInt(key[0], 16)].toString('hex')
+      return get(tree, key.substr(1), nextHash)
+    }
+    return node[16]
   }
-  // TODO: handle NODE_TYPES.extension
+  if (type === NODE_TYPES.extension) {
+    const path = decodePath(node[0].toString('hex'))
+    if (key.substr(0, path.length) === path) {
+      return get(tree, key.substr(path.length), node[1].toString('hex'))
+    }
+  }
   if (type === NODE_TYPES.leaf) {
     if (node[0].toString('hex').substr(1) === key) {
       return node[1]
     }
   }
+}
+
+function nodeHash (node) {
+  return Buffer.from(hash(rlp.encode(node))).toString('hex')
+}
+
+/**
+ * Verify if rootHash of Merkle Patricia Tree is correct
+ * @rtype (tree: Object) => Boolean
+ * @param {Object} tree - Merkle Patricia Tree
+ * @return {Boolean} Boolean indicating whether or not rootHash is correct
+ */
+export function verify (tree, key, verified = []) {
+  const hash = key || tree.rootHash
+  if (verified.includes(hash)) {
+    return true
+  }
+  const node = tree.nodes[hash]
+  const type = nodeType(node)
+  if (nodeHash(node) !== hash) {
+    return false
+  }
+  verified.push(hash)
+  if (type === NODE_TYPES.branch) {
+    return !node.some((n, i) => {
+      const nextKey = n.toString('hex')
+      if (i < 16) {
+        return !verify(tree, nextKey, verified)
+      }
+      return false
+    })
+  }
+  if (type === NODE_TYPES.extension) {
+    return verify(tree, node[1].toString('hex'), verified)
+  }
+  return true
 }
