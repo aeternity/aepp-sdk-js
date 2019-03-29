@@ -317,7 +317,7 @@ Generate signature
 | Param | Type | Description |
 | --- | --- | --- |
 | data | `String` \| `Buffer` | Data to sign |
-| privateKey | `Buffer` | Key to sign with |
+| privateKey | `String` \| `Buffer` | Key to sign with |
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.verify"></a>
 
