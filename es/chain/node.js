@@ -18,7 +18,6 @@ import * as R from 'ramda'
 import Chain from './'
 import Node from '../node'
 import Oracle from '../oracle/node'
-import Contract from '../contract/node'
 import formatBalance from '../utils/amount-formatter'
 import TransactionValidator from '../tx/validator'
 
@@ -162,6 +161,10 @@ async function txDryRun (txs, accounts, top) {
   return this.api.dryRunTxs({ txs, accounts, top })
 }
 
+async function getContractByteCode (contractId) {
+  return this.api.getContractCode(contractId)
+}
+
 /**
  * ChainNode Stamp
  *
@@ -174,7 +177,7 @@ async function txDryRun (txs, accounts, top) {
  * @return {Object} ChainNode instance
  * @example ChainNode({url: 'https://sdk-testnet.aepps.com/'})
  */
-const ChainNode = Chain.compose(Node, Oracle, Contract, TransactionValidator, {
+const ChainNode = Chain.compose(Node, Oracle, TransactionValidator, {
   init ({ verifyTx = false }) {
     this.verifyTxBeforeSend = verifyTx
   },
@@ -193,7 +196,8 @@ const ChainNode = Chain.compose(Node, Oracle, Contract, TransactionValidator, {
     getMicroBlockHeader,
     getMicroBlockTransactions,
     getKeyBlock,
-    txDryRun
+    txDryRun,
+    getContractByteCode
   }
 })
 
