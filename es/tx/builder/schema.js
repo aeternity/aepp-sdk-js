@@ -176,7 +176,7 @@ export const OBJECT_ID_TX_TYPE = {
   [OBJECT_TAG_MERKLE_PATRICIA_TREE]: TX_TYPE.merklePatriciaTree,
   [OBJECT_TAG_MERKLE_PATRICIA_TREE_VALUE]: TX_TYPE.merklePatriciaTreeValue,
   [OBJECT_TAG_CONTRACTS_TREE]: TX_TYPE.contractsTree,
-  [OBJECT_TAG_CONTRACT_CALLS_TREE]: TX_TYPE.contractCallsTree,
+  [OBJECT_TAG_CONTRACT_CALLS_TREE]: TX_TYPE.contractCallsTree
 }
 
 export const FIELD_TYPES = {
@@ -195,7 +195,7 @@ export const FIELD_TYPES = {
   offChainUpdates: 'offChainUpdates',
   callStack: 'callStack',
   proofOfInclusion: 'proofOfInclusion',
-  mptree: 'mptree',
+  mptree: 'mptree'
 }
 
 // FEE CALCULATION
