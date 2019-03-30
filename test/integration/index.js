@@ -20,13 +20,13 @@ import { BigNumber } from 'bignumber.js'
 
 const url = process.env.TEST_URL || 'http://localhost:3013'
 const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
+const compilerUrl = 'https://compiler.aepps.com'
 const networkId = process.env.TEST_NETWORK_ID || 'ae_devnet'
 const account = Crypto.generateKeyPair()
-// Array(3).fill().map(() => Crypto.generateKeyPair())
 
 const BaseAe = (params) => Ae.compose({
   deepProps: { Swagger: { defaults: { debug: !!process.env['DEBUG'] } } },
-  props: { url, internalUrl, process }
+  props: { url, internalUrl, process, compilerUrl }
 })({ ...params })
 
 let planned = BigNumber(0)

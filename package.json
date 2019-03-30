@@ -72,6 +72,7 @@
     "bufferutil": "^3.0.3",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
+    "cz-conventional-changelog": "^2.1.0",
     "docco": "^0.8.0",
     "esdoc": "^1.1.0",
     "esdoc-standard-plugin": "^1.0.0",
@@ -97,5 +98,10 @@
     "webpack": "^4.20.1",
     "webpack-cli": "^3.1.2",
     "worker-farm": "^1.6.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }

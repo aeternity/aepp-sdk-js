@@ -64,6 +64,8 @@ const ABI_VERSIONS = {
   SOLIDITY: 2
 }
 
+const revertObject = (obj) => Object.entries(obj).reduce((acc, [key, v]) => (acc[v] = key) && acc, {})
+
 /**
  * @constant
  * @description Object with transaction types
@@ -201,14 +203,7 @@ export const PREFIX_ID_TAG = {
   'ct': ID_TAG.contract,
   'ch': ID_TAG.channel
 }
-export const ID_TAG_PREFIX = {
-  [ID_TAG.account]: 'ak',
-  [ID_TAG.name]: 'nm',
-  [ID_TAG.commitment]: 'cm',
-  [ID_TAG.oracle]: 'ok',
-  [ID_TAG.contract]: 'ct',
-  [ID_TAG.channel]: 'ch'
-}
+export const ID_TAG_PREFIX = revertObject(PREFIX_ID_TAG)
 const VALIDATION_ERROR = (msg) => msg
 
 export const VALIDATION_MESSAGE = {

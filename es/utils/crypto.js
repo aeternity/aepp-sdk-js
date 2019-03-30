@@ -32,6 +32,19 @@ import shajs from 'sha.js'
 const Ecb = aesjs.ModeOfOperation.ecb
 
 /**
+ * Check whether a string is valid base-64.
+ * @param {string} str String to validate.
+ * @return {boolean} True if the string is valid base-64, false otherwise.
+ */
+export function isBase64 (str) {
+  let index
+  // eslint-disable-next-line no-useless-escape
+  if (str.length % 4 > 0 || str.match(/[^0-9a-z+\/=]/i)) return false
+  index = str.indexOf('=')
+  return !!(index === -1 || str.slice(index).match(/={1,2}/))
+}
+
+/**
  * Check if address is valid
  * @rtype (input: String) => valid: Boolean
  * @param {String} address - Address
@@ -314,11 +327,11 @@ export function decryptKey (password, encrypted) {
  * Generate signature
  * @rtype (data: String|Buffer, privateKey: Buffer) => Buffer
  * @param {String|Buffer} data - Data to sign
- * @param {Buffer} privateKey - Key to sign with
+ * @param {String|Buffer} privateKey - Key to sign with
  * @return {Buffer} Signature
  */
 export function sign (data, privateKey) {
-  return nacl.sign.detached(new Uint8Array(data), privateKey)
+  return nacl.sign.detached(Buffer.from(data), Buffer.from(privateKey))
 }
 
 /**
