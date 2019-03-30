@@ -2,7 +2,7 @@ import nacl from 'tweetnacl'
 import * as argon2 from 'argon2'
 import uuid from 'uuid'
 
-import { encodeBase58Check } from './crypto'
+import { encodeBase58Check, isBase64 } from './crypto'
 
 /**
  * KeyStore module
@@ -56,19 +56,6 @@ function decryptXsalsa20Poly1305 ({ ciphertext, key, nonce }) {
  */
 function isHex (str) {
   return !!(str.length % 2 === 0 && str.match(/^[0-9a-f]+$/i))
-}
-
-/**
- * Check whether a string is valid base-64.
- * @param {string} str String to validate.
- * @return {boolean} True if the string is valid base-64, false otherwise.
- */
-function isBase64 (str) {
-  let index
-  // eslint-disable-next-line no-useless-escape
-  if (str.length % 4 > 0 || str.match(/[^0-9a-z+\/=]/i)) return false
-  index = str.indexOf('=')
-  return !!(index === -1 || str.slice(index).match(/={1,2}/))
 }
 
 /**
