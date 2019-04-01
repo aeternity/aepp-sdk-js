@@ -48,6 +48,10 @@ async function contractGetACI (code, options = {}) {
   return this.http.post('/aci', { code, options }, options)
 }
 
+function setCompilerUrl (url) {
+  this.http.changeBaseUrl(url)
+}
+
 /**
  * Contract Compiler Stamp
  *
@@ -68,7 +72,8 @@ const ContractCompilerAPI = ContractBase.compose({
     contractEncodeCallDataAPI,
     contractDecodeDataAPI,
     compileContractAPI,
-    contractGetACI
+    contractGetACI,
+    setCompilerUrl
   }
 })
 

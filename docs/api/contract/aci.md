@@ -37,7 +37,7 @@ Deploy contract
 | --- | --- | --- | --- |
 | init | `Array` |  | Contract init function arguments array |
 | [options] | `Object` | <code>{}</code> | options Options object |
-| [options.fromJsType] | `Boolean` | <code>true</code> | Validate and Transform arguments before prepare call-data |
+| [options.skipArgsConvert] | `Boolean` | <code>false</code> | Skip Validation and Transforming arguments before prepare call-data |
 
 <a id="exp_module_@aeternity/aepp-sdk/es/contract/aci--instance.call"></a>
 
@@ -53,8 +53,8 @@ Call contract function
 | fn | `String` |  | Function name |
 | params | `Array` |  | Array of function arguments |
 | [options] | `Object` | <code>{}</code> | Array of function arguments |
-| [options.fromJsType] | `Boolean` | <code>true</code> | Validate and Transform arguments before prepare call-data |
-| [options.transformDecoded] | `Boolean` | <code>true</code> | Transform decoded data to JS type |
+| [options.skipArgsConvert] | `Boolean` | <code>false</code> | Skip Validation and Transforming arguments before prepare call-data |
+| [options.skipTransformDecoded] | `Boolean` | <code>false</code> | Skip Transform decoded data to JS type |
 
 <a id="exp_module_@aeternity/aepp-sdk/es/contract/aci--getInstance"></a>
 
