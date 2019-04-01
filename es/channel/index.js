@@ -23,6 +23,7 @@
  */
 
 import AsyncInit from '../utils/async-init'
+import { snakeToPascal } from '../utils/string'
 import * as handlers from './handlers'
 import {
   eventEmitters,
@@ -407,30 +408,14 @@ function callContract ({ amount, callData, contract, abiVersion }, sign) {
  *   if (returnType === 'ok') console.log(returnValue)
  * })
  */
-function getContractCall ({ caller, contract, round }) {
-  return new Promise((resolve, reject) => {
-    enqueueAction(
-      this,
-      (channel, state) => state.handler === handlers.channelOpen,
-      (channel, state) => {
-        const id = messageId(channel)
-        send(channel, {
-          jsonrpc: '2.0',
-          id,
-          method: 'channels.get.contract_call',
-          params: {
-            caller,
-            contract,
-            round
-          }
-        })
-        return {
-          handler: handlers.awaitingContractCall,
-          state: { resolve, reject, messageId: id }
-        }
-      }
+async function getContractCall ({ caller, contract, round }) {
+  const result = await call(this, 'channels.get.contract_call', { caller, contract, round })
+  return R.fromPairs(
+    R.map(
+      ([key, value]) => ([snakeToPascal(key), value]),
+      R.toPairs(result)
     )
-  })
+  )
 }
 
 /**

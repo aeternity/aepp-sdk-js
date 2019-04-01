@@ -44,7 +44,6 @@ function waitForChannel (channel) {
 
 describe('Channel', function () {
   configure(this)
-  this.retries(3)
 
   let initiator
   let responder
@@ -81,7 +80,7 @@ describe('Channel', function () {
     responder.setKeypair(generateKeyPair())
     sharedParams.initiatorId = await initiator.address()
     sharedParams.responderId = await responder.address()
-    await initiator.spend('2000000000000000', await responder.address())
+    await initiator.spend('6000000000000000', await responder.address())
   })
 
   beforeEach(() => {
@@ -309,22 +308,20 @@ describe('Channel', function () {
     initiatorCh = await Channel({
       ...sharedParams,
       role: 'initiator',
-      existingChannelId,
-      offchainTx,
-      sign: async (tag, tx) => await initiator.signTransaction(tx)
+      port: 3003,
+      sign: initiatorSign
     })
     responderCh = await Channel({
       ...sharedParams,
       role: 'responder',
-      existingChannelId,
-      offchainTx,
+      port: 3003,
       sign: responderSign
     })
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
-    const { bytecode, encodeCall } = await initiator.contractCompile(identityContract)
-    const callData = await encodeCall('init', '()', {})
+    const code = await initiator.compileContractAPI(identityContract)
+    const callData = await initiator.contractEncodeCallDataAPI(identityContract, 'init', [])
     const result = await initiatorCh.createContract({
-      code: bytecode,
+      code,
       callData,
       deposit: 1000,
       vmVersion: 3,
@@ -332,15 +329,15 @@ describe('Channel', function () {
     }, async (tx) => await initiator.signTransaction(tx))
     result.should.eql({ accepted: true, address: result.address, state: initiatorCh.state() })
     contractAddress = result.address
-    contractEncodeCall = encodeCall
+    contractEncodeCall = (method, args) => initiator.contractEncodeCallDataAPI(identityContract, method, args)
   })
 
   it('can create a contract and reject', async () => {
     responderShouldRejectUpdate = true
-    const { bytecode, encodeCall } = await initiator.contractCompile(identityContract)
-    const callData = await encodeCall('init', '()', {})
+    const code = await initiator.compileContractAPI(identityContract)
+    const callData = await initiator.contractEncodeCallDataAPI(identityContract, 'init', [])
     const result = await initiatorCh.createContract({
-      code: bytecode,
+      code,
       callData,
       deposit: 1000,
       vmVersion: 3,
@@ -352,7 +349,7 @@ describe('Channel', function () {
   it('can call a contract and accept', async () => {
     const result = await initiatorCh.callContract({
       amount: 0,
-      callData: await contractEncodeCall('main', '(42)', {}),
+      callData: await contractEncodeCall('main', ['42']),
       contract: contractAddress,
       abiVersion: 1
     }, async (tx) => await initiator.signTransaction(tx))
@@ -364,7 +361,7 @@ describe('Channel', function () {
     responderShouldRejectUpdate = true
     const result = await initiatorCh.callContract({
       amount: 0,
-      callData: await contractEncodeCall('main', '(42)', {}),
+      callData: await contractEncodeCall('main', ['42']),
       contract: contractAddress,
       abiVersion: 1
     }, async (tx) => await initiator.signTransaction(tx))
@@ -388,7 +385,7 @@ describe('Channel', function () {
       returnType: 'ok',
       returnValue: result.returnValue
     })
-    const value = await initiator.contractNodeDecodeData('int', result.returnValue)
+    const value = await initiator.contractDecodeDataAPI('int', result.returnValue)
     value.should.eql({ type: 'word', value: 42 })
   })
 

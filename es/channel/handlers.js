@@ -16,7 +16,6 @@
  */
 
 import { generateKeyPair, encodeContractAddress } from '../utils/crypto'
-import { snakeToPascal } from '../utils/string'
 import {
   options,
   changeStatus,
@@ -24,11 +23,7 @@ import {
   send,
   emit
 } from './internal'
-<<<<<<< HEAD
 import { unpackTx } from '../tx/builder'
-import * as R from 'ramda'
-=======
->>>>>>> Improve channel rpc usage (#275)
 
 export function awaitingConnection (channel, message, state) {
   if (message.method === 'channels.info') {
@@ -360,21 +355,6 @@ export function awaitingCallContractCompletion (channel, message, state) {
   }
   if (message.method === 'channels.conflict') {
     state.resolve({ accepted: false })
-    return { handler: channelOpen }
-  }
-}
-
-export function awaitingContractCall (channel, message, state) {
-  if (message.id === state.messageId) {
-    state.resolve(
-      R.fromPairs(
-        R.map(([key, value]) => ([snakeToPascal(key), value]), R.toPairs(message.result))
-      )
-    )
-    return { handler: channelOpen }
-  }
-  if (message.method === 'channels.error') {
-    state.reject(new Error(message.data.message))
     return { handler: channelOpen }
   }
 }
