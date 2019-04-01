@@ -23,7 +23,6 @@ import {
   send,
   emit
 } from './internal'
-import * as R from 'ramda'
 
 export function awaitingConnection (channel, message, state) {
   if (message.method === 'channels.info') {
@@ -51,7 +50,7 @@ export async function awaitingChannelCreateTx (channel, message, state) {
     responder: 'responder_sign'
   }[options.get(channel).role]
   if (message.method === `channels.sign.${tag}`) {
-    const signedTx = await options.get(channel).sign(message.tag, message.params.data.tx)
+    const signedTx = await options.get(channel).sign(tag, message.params.data.tx)
     send(channel, { jsonrpc: '2.0', method: `channels.${tag}`, params: { tx: signedTx } })
     return { handler: awaitingOnChainTx }
   }
@@ -124,9 +123,6 @@ export async function channelOpen (channel, message, state) {
     case 'channels.leave':
       // TODO: emit event
       return { handler: channelOpen }
-    case 'channels.message':
-      emit(channel, 'message', message.params.data.message)
-      return { handler: channelOpen }
     case 'channels.update':
       changeState(channel, message.params.data.state)
       return { handler: channelOpen }
@@ -149,6 +145,17 @@ export async function awaitingOffChainTx (channel, message, state) {
     state.reject(new Error(message.data.message))
     return { handler: channelOpen }
   }
+  if (message.error) {
+    const { data = [] } = message.error
+    if (data.find(i => i.code === 1001)) {
+      state.reject(new Error('Insufficient balance'))
+    } else if (data.find(i => i.code === 1002)) {
+      state.reject(new Error('Amount cannot be negative'))
+    } else {
+      state.reject(new Error(message.error.message))
+    }
+    return { handler: channelOpen }
+  }
 }
 
 export function awaitingOffChainUpdate (channel, message, state) {
@@ -159,6 +166,10 @@ export function awaitingOffChainUpdate (channel, message, state) {
   }
   if (message.method === 'channels.conflict') {
     state.resolve({ accepted: false })
+    return { handler: channelOpen }
+  }
+  if (message.error) {
+    state.reject(new Error(message.error.message))
     return { handler: channelOpen }
   }
 }
@@ -191,31 +202,6 @@ export function awaitingUpdateConflict (channel, message, state) {
     return { handler: awaitingUpdateConflict }
   }
   if (message.method === 'channels.conflict') {
-    return { handler: channelOpen }
-  }
-}
-
-export function awaitingProofOfInclusion (channel, message, state) {
-  if (message.id === state.messageId) {
-    state.resolve(message.result.poi)
-    return { handler: channelOpen }
-  }
-  if (message.method === 'channels.error') {
-    state.reject(new Error(message.data.message))
-    return { handler: channelOpen }
-  }
-}
-
-export function awaitingBalances (channel, message, state) {
-  if (message.id === state.messageId) {
-    state.resolve(R.reduce((acc, item) => ({
-      ...acc,
-      [item.account]: item.balance
-    }), {}, message.result))
-    return { handler: channelOpen }
-  }
-  if (message.method === 'channels.error') {
-    state.reject(new Error(message.data.message))
     return { handler: channelOpen }
   }
 }
