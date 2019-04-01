@@ -27,7 +27,6 @@ import { required } from '@stamp/required'
 import * as Crypto from '../utils/crypto'
 import { buildTx } from '../tx/builder'
 import { TX_TYPE } from '../tx/builder/schema'
-import { decode } from '../tx/builder/helpers'
 
 const DEFAULT_NETWORK_ID = `ae_mainnet`
 
@@ -52,24 +51,6 @@ async function signTransaction (tx) {
 
   const signatures = [await this.sign(txWithNetworkId)]
   return buildTx({ encodedTx: rlpBinaryTx, signatures }, TX_TYPE.signed).tx
-}
-
-/**
- * Format account address
- * @instance
- * @category async
- * @rtype (format: String, address: String) => tx: Promise[String]
- * @param {String} format - Format type
- * @param {String} address - Base58check account address
- * @return {String} Formatted address
- */
-async function formatAddress (format = ADDRESS_FORMAT.api, address) {
-  switch (format) {
-    case ADDRESS_FORMAT.api:
-      return address
-    case ADDRESS_FORMAT.sophia:
-      return `0x${decode(address, 'ak').toString('hex')}`
-  }
 }
 
 /**
