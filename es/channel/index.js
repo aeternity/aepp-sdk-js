@@ -31,8 +31,9 @@ import {
   initialize,
   enqueueAction,
   send,
-  messageId
+  call
 } from './internal'
+import * as R from 'ramda'
 
 /**
  * Register event listener function
@@ -120,26 +121,8 @@ function update (from, to, amount, sign) {
  *   contracts: ['ct_2dCUAWYZdrWfACz3a2faJeKVTVrfDYxCQHCqAt5zM15f3u2UfA']
  * }).then(poi => console.log(poi))
  */
-function poi ({ accounts, contracts }) {
-  return new Promise((resolve, reject) => {
-    enqueueAction(
-      this,
-      (channel, state) => state.handler === handlers.channelOpen,
-      (channel, state) => {
-        const id = messageId(channel)
-        send(channel, {
-          jsonrpc: '2.0',
-          id,
-          method: 'channels.get.poi',
-          params: { accounts, contracts }
-        })
-        return {
-          handler: handlers.awaitingProofOfInclusion,
-          state: { resolve, reject, messageId: id }
-        }
-      }
-    )
-  })
+async function poi ({ accounts, contracts }) {
+  return (await call(this, 'channels.get.poi', { accounts, contracts })).poi
 }
 
 /**
@@ -155,26 +138,11 @@ function poi ({ accounts, contracts }) {
  *   console.log(balances['ak_Y1NRjHuoc3CGMYMvCmdHSBpJsMDR6Ra2t5zjhRcbtMeXXLpLH'])
  * )
  */
-function balances (accounts) {
-  return new Promise((resolve, reject) => {
-    enqueueAction(
-      this,
-      (channel, state) => state.handler === handlers.channelOpen,
-      (channel, state) => {
-        const id = messageId(channel)
-        send(channel, {
-          jsonrpc: '2.0',
-          id,
-          method: 'channels.get.balances',
-          params: { accounts }
-        })
-        return {
-          handler: handlers.awaitingBalances,
-          state: { resolve, reject, messageId: id }
-        }
-      }
-    )
-  })
+async function balances (accounts) {
+  return R.reduce((acc, item) => ({
+    ...acc,
+    [item.account]: item.balance
+  }), {}, await call(this, 'channels.get.balances', { accounts }))
 }
 
 /**
