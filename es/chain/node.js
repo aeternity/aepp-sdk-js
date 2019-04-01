@@ -58,8 +58,15 @@ async function sendTransaction (tx, options = {}) {
   }
 }
 
+async function getAccount (address, { height, hash }) {
+  if (height) return this.api.getAccountByPubkeyAndHeight(address, height)
+  if (hash) return this.api.getAccountByPubkeyAndHash(address, hash)
+  return this.api.getAccountByPubkey(address)
+}
+
 async function balance (address, { height, hash, format = false } = {}) {
-  const { balance } = await this.api.getAccountByPubkey(address, { height, hash })
+  const { balance } = await this.getAccount(address, { hash, height })
+
   return format ? formatBalance(balance) : balance.toString()
 }
 
@@ -184,6 +191,7 @@ const ChainNode = Chain.compose(Node, Oracle, TransactionValidator, {
   methods: {
     sendTransaction,
     balance,
+    getAccount,
     topBlock,
     tx,
     height,
