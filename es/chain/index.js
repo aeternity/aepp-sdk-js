@@ -219,6 +219,20 @@ const Chain = Oracle.compose({
  */
 
 /**
+ * Get account by account public key
+ * @function getAccount
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype (address, { hash, height }) => account: Object
+ * @param {String} address - Account public key
+ * @param {Object} [options={}] - Options
+ * @param {Number} [options.height] - Get account on specific block by block height
+ * @param {String} [options.hash] - Get account on specific block by block hash
+ * @return {Object} Account
+ */
+
+/**
  * Transaction dry-run
  * @function txDryRun
  * @instance
