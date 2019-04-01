@@ -26,6 +26,7 @@ import Chain from '@aeternity/aepp-sdk/es/chain'
                 * *[.getMicroBlockTransactions()](#module_@aeternity/aepp-sdk/es/chain--Chain+getMicroBlockTransactions) ⇒ `Array.&lt;Object&gt;`*
                 * *[.getKeyBlock()](#module_@aeternity/aepp-sdk/es/chain--Chain+getKeyBlock) ⇒ `Object`*
                 * *[.getMicroBlockHeader()](#module_@aeternity/aepp-sdk/es/chain--Chain+getMicroBlockHeader) ⇒ `Object`*
+                * *[.getAccount(address, [options])](#module_@aeternity/aepp-sdk/es/chain--Chain+getAccount) ⇒ `Object`*
                 * *[.txDryRun(txs, accounts, hashOrHeight)](#module_@aeternity/aepp-sdk/es/chain--Chain+txDryRun) ⇒ `Object`*
         * _static_
             * [.waitMined(bool)](#module_@aeternity/aepp-sdk/es/chain--Chain.waitMined) ⇒ `Stamp`
@@ -208,6 +209,23 @@ Get micro block header
 **Returns**: `Object` - Micro block header  
 **Category**: async  
 **rtype**: `(hash) => header: Object`
+<a id="module_@aeternity/aepp-sdk/es/chain--Chain+getAccount"></a>
+
+#### *chain.getAccount(address, [options]) ⇒ `Object`*
+Get account by account public key
+
+**Kind**: instance abstract method of [`Chain`](#exp_module_@aeternity/aepp-sdk/es/chain--Chain)  
+**Returns**: `Object` - Account  
+**Category**: async  
+**rtype**: `(address, { hash, height }) => account: Object`
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| address | `String` |  | Account public key |
+| [options] | `Object` | <code>{}</code> | Options |
+| [options.height] | `Number` |  | Get account on specific block by block height |
+| [options.hash] | `String` |  | Get account on specific block by block hash |
+
 <a id="module_@aeternity/aepp-sdk/es/chain--Chain+txDryRun"></a>
 
 #### *chain.txDryRun(txs, accounts, hashOrHeight) ⇒ `Object`*

@@ -23,7 +23,6 @@
  */
 
 import Oracle from '../oracle'
-import Contract from '../contract'
 import { required } from '@stamp/required'
 
 /**
@@ -37,7 +36,7 @@ import { required } from '@stamp/required'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Chain instance
  */
-const Chain = Contract.compose(Oracle, {
+const Chain = Oracle.compose({
   deepProps: { Chain: { defaults: { waitMined: true } } },
   statics: { waitMined (bool) { return this.deepProps({ Chain: { defaults: { waitMined: bool } } }) } },
   deepConf: {
@@ -217,6 +216,20 @@ const Chain = Contract.compose(Oracle, {
  * @category async
  * @rtype (hash) => header: Object
  * @return {Object} Micro block header
+ */
+
+/**
+ * Get account by account public key
+ * @function getAccount
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype (address, { hash, height }) => account: Object
+ * @param {String} address - Account public key
+ * @param {Object} [options={}] - Options
+ * @param {Number} [options.height] - Get account on specific block by block height
+ * @param {String} [options.hash] - Get account on specific block by block hash
+ * @return {Object} Account
  */
 
 /**

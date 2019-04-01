@@ -15,7 +15,6 @@ import * as Crypto from '@aeternity/aepp-sdk/es/utils/keystore'
         * [.dump(name, password, privateKey, nonce, salt, [options])](#module_@aeternity/aepp-sdk/es/utils/keystore.dump) ⇒ `Object`
     * _inner_
         * [~isHex(str)](#module_@aeternity/aepp-sdk/es/utils/keystore..isHex) ⇒ `boolean`
-        * [~isBase64(str)](#module_@aeternity/aepp-sdk/es/utils/keystore..isBase64) ⇒ `boolean`
         * [~str2buf(str, [enc])](#module_@aeternity/aepp-sdk/es/utils/keystore..str2buf) ⇒ `buffer`
         * [~encrypt(plaintext, key, nonce, [algo])](#module_@aeternity/aepp-sdk/es/utils/keystore..encrypt) ⇒ `buffer`
         * [~decrypt(ciphertext, key, nonce, [algo])](#module_@aeternity/aepp-sdk/es/utils/keystore..decrypt) ⇒ `buffer`
@@ -61,18 +60,6 @@ Check whether a string is valid hex.
 
 **Kind**: inner method of [`@aeternity/aepp-sdk/es/utils/keystore`](#module_@aeternity/aepp-sdk/es/utils/keystore)  
 **Returns**: `boolean` - True if the string is valid hex, false otherwise.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| str | `string` | String to validate. |
-
-<a id="module_@aeternity/aepp-sdk/es/utils/keystore..isBase64"></a>
-
-### @aeternity/aepp-sdk/es/utils/keystore~isBase64(str) ⇒ `boolean`
-Check whether a string is valid base-64.
-
-**Kind**: inner method of [`@aeternity/aepp-sdk/es/utils/keystore`](#module_@aeternity/aepp-sdk/es/utils/keystore)  
-**Returns**: `boolean` - True if the string is valid base-64, false otherwise.  
 
 | Param | Type | Description |
 | --- | --- | --- |

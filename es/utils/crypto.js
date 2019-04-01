@@ -32,6 +32,19 @@ import shajs from 'sha.js'
 const Ecb = aesjs.ModeOfOperation.ecb
 
 /**
+ * Check whether a string is valid base-64.
+ * @param {string} str String to validate.
+ * @return {boolean} True if the string is valid base-64, false otherwise.
+ */
+export function isBase64 (str) {
+  let index
+  // eslint-disable-next-line no-useless-escape
+  if (str.length % 4 > 0 || str.match(/[^0-9a-z+\/=]/i)) return false
+  index = str.indexOf('=')
+  return !!(index === -1 || str.slice(index).match(/={1,2}/))
+}
+
+/**
  * Check if address is valid
  * @rtype (input: String) => valid: Boolean
  * @param {String} address - Address
@@ -71,10 +84,10 @@ export function addressFromDecimal (decimalAddress) {
  * Calculate 256bits Blake2b hash of `input`
  * @rtype (input: String) => hash: String
  * @param {String} input - Data to hash
- * @return {String} Hash
+ * @return {Buffer} Hash
  */
 export function hash (input) {
-  return blake2b(input, null, 32) // 256 bits
+  return Buffer.from(blake2b(input, null, 32)) // 256 bits
 }
 
 /**
@@ -82,7 +95,7 @@ export function hash (input) {
  * as defined in https://github.com/aeternity/protocol/blob/master/AENS.md#hashing
  * @rtype (input: String) => hash: String
  * @param {String} input - Data to hash
- * @return {String} Hash
+ * @return {Buffer} Hash
  */
 export function nameId (input) {
   let buf = Buffer.allocUnsafe(32).fill(0)

@@ -12,6 +12,7 @@ import Account from '@aeternity/aepp-sdk/es/account'
 * [@aeternity/aepp-sdk/es/account](#module_@aeternity/aepp-sdk/es/account)
     * [Account([options])](#exp_module_@aeternity/aepp-sdk/es/account--Account) ⇒ `Object` ⏏
         * [.signTransaction(tx)](#module_@aeternity/aepp-sdk/es/account--Account+signTransaction) ⇒ `String`
+        * [.formatAddress(format, address)](#module_@aeternity/aepp-sdk/es/account--Account+formatAddress) ⇒ `String`
         * *[.sign(data)](#module_@aeternity/aepp-sdk/es/account--Account+sign) ⇒ `String`*
         * *[.address()](#module_@aeternity/aepp-sdk/es/account--Account+address) ⇒ `String`*
 
@@ -49,6 +50,21 @@ Sign encoded transaction
 | Param | Type | Description |
 | --- | --- | --- |
 | tx | `String` | Transaction to sign |
+
+<a id="module_@aeternity/aepp-sdk/es/account--Account+formatAddress"></a>
+
+#### account.formatAddress(format, address) ⇒ `String`
+Format account address
+
+**Kind**: instance method of [`Account`](#exp_module_@aeternity/aepp-sdk/es/account--Account)  
+**Returns**: `String` - Formatted address  
+**Category**: async  
+**rtype**: `(format: String, address: String) => tx: Promise[String]`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| format | `String` | Format type |
+| address | `String` | Base58check account address |
 
 <a id="module_@aeternity/aepp-sdk/es/account--Account+sign"></a>
 
