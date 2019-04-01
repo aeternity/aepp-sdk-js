@@ -183,7 +183,7 @@ function getFunctionACI (aci, name) {
  * @return {ContractInstance} JS Contract API
  *
  */
-async function getInstance (source, { aci, contractAddress } = {}) {
+async function getContractInstance (source, { aci, contractAddress } = {}) {
   aci = aci || await this.contractGetACI(source)
   const instance = {
     interface: aci.interface,
@@ -278,7 +278,7 @@ function compile (self) {
  */
 const ContractACI = AsyncInit.compose({
   methods: {
-    getInstance
+    getContractInstance
   }
 })
 

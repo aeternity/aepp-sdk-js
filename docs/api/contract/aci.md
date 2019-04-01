@@ -13,7 +13,7 @@ import ContractACI from '@aeternity/aepp-sdk/es/contract/aci'
     * [instance.compile](#exp_module_@aeternity/aepp-sdk/es/contract/aci--instance.compile) ⇒ `ContractInstance` ⏏
     * [instance.deploy](#exp_module_@aeternity/aepp-sdk/es/contract/aci--instance.deploy) ⇒ `ContractInstance` ⏏
     * [instance.call](#exp_module_@aeternity/aepp-sdk/es/contract/aci--instance.call) ⇒ `Object` ⏏
-    * [getInstance(source, [options])](#exp_module_@aeternity/aepp-sdk/es/contract/aci--getInstance) ⇒ `ContractInstance` ⏏
+    * [getContractInstance(source, [options])](#exp_module_@aeternity/aepp-sdk/es/contract/aci--getInstance) ⇒ `ContractInstance` ⏏
     * [ContractACI()](#exp_module_@aeternity/aepp-sdk/es/contract/aci--ContractACI) ⇒ `Object` ⏏
 
 <a id="exp_module_@aeternity/aepp-sdk/es/contract/aci--instance.compile"></a>
@@ -56,9 +56,9 @@ Call contract function
 | [options.skipArgsConvert] | `Boolean` | <code>false</code> | Skip Validation and Transforming arguments before prepare call-data |
 | [options.skipTransformDecoded] | `Boolean` | <code>false</code> | Skip Transform decoded data to JS type |
 
-<a id="exp_module_@aeternity/aepp-sdk/es/contract/aci--getInstance"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/contract/aci--getContractInstance"></a>
 
-### getInstance(source, [options]) ⇒ `ContractInstance` ⏏
+### getContractInstance(source, [options]) ⇒ `ContractInstance` ⏏
 Generate contract ACI object with predefined js methods for contract usage
 
 **Kind**: Exported function  
