@@ -29,7 +29,7 @@ import aesjs from 'aes-js'
 import { leftPad, rightPad, toBytes } from './bytes'
 import shajs from 'sha.js'
 import { ADDRESS_FORMAT } from '../account'
-import { decode } from '../tx/builder/helpers'
+import { decode as decodeNode } from '../tx/builder/helpers'
 
 const Ecb = aesjs.ModeOfOperation.ecb
 
@@ -58,7 +58,7 @@ export function formatAddress (format = ADDRESS_FORMAT.api, address) {
     case ADDRESS_FORMAT.api:
       return address
     case ADDRESS_FORMAT.sophia:
-      return `0x${decode(address, 'ak').toString('hex')}`
+      return `0x${decodeNode(address, 'ak').toString('hex')}`
   }
 }
 

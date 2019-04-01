@@ -77,7 +77,7 @@ const Account = stampit({
     // Add address formatter
     this.getAddress = this.address
     this.address = async function (format) {
-      return formatAddress(format, await this.getAddress())
+      return Crypto.formatAddress(format, await this.getAddress())
     }
   },
   methods: { signTransaction },
