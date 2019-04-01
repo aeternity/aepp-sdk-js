@@ -28,6 +28,12 @@ const wsUrl = process.env.WS_URL || 'ws://node:3014'
 
 plan('10000000000000000')
 
+const identityContract = `
+contract Identity =
+  type state = ()
+  public function main(x : int) = x
+`
+
 function waitForChannel (channel) {
   return new Promise(resolve =>
     channel.on('statusChanged', (status) => {
@@ -38,7 +44,7 @@ function waitForChannel (channel) {
   )
 }
 
-describe('Channel', function () {
+describe.only('Channel', function () {
   configure(this)
 
   let initiator
@@ -48,6 +54,9 @@ describe('Channel', function () {
   let responderShouldRejectUpdate
   let existingChannelId
   let offchainTx
+  let contractAddress
+  let contractEncodeCall
+  let callerNonce
   const initiatorSign = sinon.spy((tag, tx) => initiator.signTransaction(tx))
   const responderSign = sinon.spy((tag, tx) => {
     if (responderShouldRejectUpdate) {
@@ -73,7 +82,7 @@ describe('Channel', function () {
     responder.setKeypair(generateKeyPair())
     sharedParams.initiatorId = await initiator.address()
     sharedParams.responderId = await responder.address()
-    await initiator.spend('2000000000000000', await responder.address())
+    await initiator.spend('6000000000000000', await responder.address())
   })
 
   beforeEach(() => {
@@ -378,6 +387,7 @@ describe('Channel', function () {
     initiatorCh = await Channel({
       ...sharedParams,
       role: 'initiator',
+      port: 3002,
       existingChannelId,
       offchainTx,
       sign: initiatorSign
@@ -385,6 +395,7 @@ describe('Channel', function () {
     responderCh = await Channel({
       ...sharedParams,
       role: 'responder',
+      port: 3002,
       existingChannelId,
       offchainTx,
       sign: responderSign
@@ -443,14 +454,14 @@ describe('Channel', function () {
       lockPeriod: 5,
       role: 'initiator',
       sign: initiatorSign,
-      port: 3002
+      port: 3003
     })
     responderCh = await Channel({
       ...sharedParams,
       lockPeriod: 5,
       role: 'responder',
       sign: responderSign,
-      port: 3002
+      port: 3003
     })
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
     const initiatorBalanceBeforeClose = await initiator.balance(initiatorAddr)
@@ -459,7 +470,6 @@ describe('Channel', function () {
     const oldPoi = await initiatorCh.poi({
       accounts: [initiatorAddr, responderAddr]
     })
-    const oldBalances = await initiatorCh.balances([initiatorAddr, responderAddr])
     const recentUpdate = await initiatorCh.update(initiatorAddr, responderAddr, 100, (tx) => initiator.signTransaction(tx))
     const recentPoi = await responderCh.poi({
       accounts: [initiatorAddr, responderAddr]
@@ -499,18 +509,103 @@ describe('Channel', function () {
     ).should.be.equal(true)
   })
 
+  it('can create a contract and accept', async () => {
+    initiatorCh = await Channel({
+      ...sharedParams,
+      role: 'initiator',
+      port: 3004,
+      sign: initiatorSign
+    })
+    responderCh = await Channel({
+      ...sharedParams,
+      role: 'responder',
+      port: 3004,
+      sign: responderSign
+    })
+    await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
+    const code = await initiator.compileContractAPI(identityContract)
+    const callData = await initiator.contractEncodeCallDataAPI(identityContract, 'init', [])
+    const result = await initiatorCh.createContract({
+      code,
+      callData,
+      deposit: 1000,
+      vmVersion: 3,
+      abiVersion: 1
+    }, async (tx) => await initiator.signTransaction(tx))
+    result.should.eql({ accepted: true, address: result.address, state: initiatorCh.state() })
+    contractAddress = result.address
+    contractEncodeCall = (method, args) => initiator.contractEncodeCallDataAPI(identityContract, method, args)
+  })
+
+  it('can create a contract and reject', async () => {
+    responderShouldRejectUpdate = true
+    const code = await initiator.compileContractAPI(identityContract)
+    const callData = await initiator.contractEncodeCallDataAPI(identityContract, 'init', [])
+    const result = await initiatorCh.createContract({
+      code,
+      callData,
+      deposit: 1000,
+      vmVersion: 3,
+      abiVersion: 1
+    }, async (tx) => await initiator.signTransaction(tx))
+    result.should.eql({ accepted: false })
+  })
+
+  it('can call a contract and accept', async () => {
+    const result = await initiatorCh.callContract({
+      amount: 0,
+      callData: await contractEncodeCall('main', ['42']),
+      contract: contractAddress,
+      abiVersion: 1
+    }, async (tx) => await initiator.signTransaction(tx))
+    result.should.eql({ accepted: true, state: initiatorCh.state() })
+    callerNonce = Number(unpackTx(initiatorCh.state()).tx.encodedTx.tx.round)
+  })
+
+  it('can call a contract and reject', async () => {
+    responderShouldRejectUpdate = true
+    const result = await initiatorCh.callContract({
+      amount: 0,
+      callData: await contractEncodeCall('main', ['42']),
+      contract: contractAddress,
+      abiVersion: 1
+    }, async (tx) => await initiator.signTransaction(tx))
+    result.should.eql({ accepted: false })
+  })
+
+  it('can get contract call', async () => {
+    const result = await initiatorCh.getContractCall({
+      caller: await initiator.address(),
+      contract: contractAddress,
+      round: callerNonce
+    })
+    result.should.eql({
+      callerId: await initiator.address(),
+      callerNonce,
+      contractId: contractAddress,
+      gasPrice: result.gasPrice,
+      gasUsed: result.gasUsed,
+      height: result.height,
+      log: result.log,
+      returnType: 'ok',
+      returnValue: result.returnValue
+    })
+    const value = await initiator.contractDecodeDataAPI('int', result.returnValue)
+    value.should.eql({ type: 'word', value: 42 })
+  })
+
   describe('throws errors', function () {
     before(async function () {
       initiatorCh = await Channel({
         ...sharedParams,
         role: 'initiator',
-        port: 3003,
+        port: 3005,
         sign: initiatorSign
       })
       responderCh = await Channel({
         ...sharedParams,
         role: 'responder',
-        port: 3003,
+        port: 3005,
         sign: responderSign
       })
       await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
