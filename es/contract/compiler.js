@@ -48,7 +48,7 @@ async function contractGetACI (code, options = {}) {
   return this.http.post('/aci', { code, options }, options)
 }
 
-async function setCompilerUrl (url) {
+function setCompilerUrl (url) {
   this.http.changeBaseUrl(url)
 }
 
