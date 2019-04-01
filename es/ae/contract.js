@@ -90,7 +90,7 @@ async function decode (type, data) {
  * @param {String} source Contract source code
  * @param {String} address Contract address
  * @param {String} name Name of function to call
- * @param {Array|String} args  Argument's for call function
+ * @param {Array} args  Argument's for call function
  * @param {Object} options [options={}]  Options
  * @param {String} top [options.top] Block hash on which you want to call contract
  * @param {String} options [options.options]  Transaction options (fee, ttl, gas, amount, deposit)
@@ -137,7 +137,7 @@ async function callStatic (source, address, name, args = [], { top, options = {}
  * @param {String} source Contract source code
  * @param {String} address Contract address
  * @param {String} name Name of function to call
- * @param {String|Array} args Argument's for call function
+ * @param {Array} args Argument's for call function
  * @param {Object} options Transaction options (fee, ttl, gas, amount, deposit)
  * @return {Promise<Object>} Result object
  */
