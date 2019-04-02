@@ -43,7 +43,7 @@ const Chain = Oracle.compose({
     Ae: {
       methods: [
         'sendTransaction', 'height', 'awaitHeight', 'poll', 'balance', 'tx',
-        'mempool', 'topBlock', 'getTxInfo', 'txDryRun'
+        'mempool', 'topBlock', 'getTxInfo', 'txDryRun', 'getName'
       ]
     }
   }
