@@ -8,7 +8,23 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 - Add `formatAddress` function to `Crypto`
 - Add Contract Compiler API stamp to `es/contract` (now using instead contract node API)
 - Add basic `http` client stamp (`es/utils/http`)
-- ACI stamp
+- ACI stamp (New Contract interface base on contract ACI schema)
+Usage:
+```
+const contractIns = await client.getContractInstance(contractSourceCode)
+console.log(contract)
+ {
+   interface: String, // Contract interface source code
+   aci: String, // Contract interface json schema
+   source: String, // Contract source code
+   compiled: String, // Compiled contract code
+   deployInfo: { address: contractAddress } // Object with deploy transaction,
+   // Function
+   compile: () => this, // Compile contract,
+   deploy: (init = [], options = { skipArgsConvert: false }) => this, // Deploy contract (compile before if needed)
+   call: (fn, params = [], options = { skipArgsConvert: false, skipTransformDecoded: false, callStatic: false } => CallRersult: Object // Call contract function
+ }
+```
 
 ### Changed
 - Extend  `Account.address()` with `accountFormatter` now you can do

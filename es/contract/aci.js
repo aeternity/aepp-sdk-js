@@ -218,6 +218,7 @@ async function getContractInstance (source, { aci, contractAddress } = {}) {
    * @param {Object} [options={}] Array of function arguments
    * @param {Boolean} [options.skipArgsConvert=false] Skip Validation and Transforming arguments before prepare call-data
    * @param {Boolean} [options.skipTransformDecoded=false] Skip Transform decoded data to JS type
+   * @param {Boolean} [options.callStatic=false] Static function call
    * @return {Object} CallResult
    */
   instance.call = call(this).bind(instance)
@@ -226,7 +227,7 @@ async function getContractInstance (source, { aci, contractAddress } = {}) {
 }
 
 function call (self) {
-  return async function (fn, params = [], options = { skipArgsConvert: false, skipTransformDecoded: false }) {
+  return async function (fn, params = [], options = { skipArgsConvert: false, skipTransformDecoded: false, callStatic: false }) {
     const fnACI = getFunctionACI(this.aci, fn)
     if (!fn) throw new Error('Function name is required')
     if (!this.deployInfo.address) throw new Error('You need to deploy contract before calling!')
