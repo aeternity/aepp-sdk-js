@@ -28,13 +28,19 @@ import * as handlers from './handlers'
 import {
   eventEmitters,
   status as channelStatus,
-  state as channelState,
   initialize,
   enqueueAction,
   send,
   call
 } from './internal'
 import * as R from 'ramda'
+
+function snakeToPascalObjKeys (obj) {
+  return Object.entries(obj).reduce((result, [key, val]) => ({
+    ...result,
+    [snakeToPascal(key)]: val
+  }))
+}
 
 /**
  * Register event listener function
@@ -60,8 +66,8 @@ function status () {
  *
  * @return {object}
  */
-function state () {
-  return channelState.get(this)
+async function state () {
+  return snakeToPascalObjKeys(await call(this, 'channels.get.offchain_state', {}))
 }
 
 /**
@@ -77,7 +83,7 @@ function state () {
  *   'ak$Gi42jcRm9DcZjk72UWQQBSxi43BG3285C9n4QSvP5JdzDyH2o',
  *   10,
  *   async (tx) => await account.signTransaction(tx)
- * ).then({ accepted, state } =>
+ * ).then({ accepted, signedTx } =>
  *   if (accepted) {
  *     console.log('Update has been accepted')
  *   }
@@ -150,7 +156,7 @@ async function balances (accounts) {
  * Leave channel
  *
  * @return {Promise<object>}
- * @example channel.leave().then(({channelId, state}) =>
+ * @example channel.leave().then(({ channelId, signedTx }) =>
  *   console.log(channelId)
  *   console.log(state)
  * )
@@ -212,10 +218,9 @@ function shutdown (sign) {
  *   100,
  *   async (tx) => await account.signTransaction(tx),
  *   { onOnChainTx: (tx) => console.log('on_chain_tx', tx) }
- * ).then(({ accepted, state }) => {
+ * ).then(({ accepted, signedTx }) => {
  *   if (accepted) {
  *     console.log('Withdrawal has been accepted')
- *     console.log('The new state is:', state)
  *   } else {
  *     console.log('Withdrawal has been rejected')
  *   }
@@ -305,7 +310,7 @@ function deposit (amount, sign, { onOnChainTx, onOwnDepositLocked, onDepositLock
  *   deposit: 10,
  *   vmVersion: 3,
  *   abiVersion: 1
- * }).then(({ accepted, state, address }) => {
+ * }).then(({ accepted, signedTx, address }) => {
  *   if (accepted) {
  *     console.log('New contract has been created')
  *     console.log('Contract address:', address)
@@ -358,10 +363,9 @@ function createContract ({ code, callData, deposit, vmVersion, abiVersion }, sig
  *   callData: 'cb_1111111111111111...',
  *   amount: 0,
  *   abiVersion: 1
- * }).then(({ accepted, state }) => {
+ * }).then(({ accepted, signedTx }) => {
  *   if (accepted) {
  *     console.log('Contract called succesfully')
- *     console.log('The new state is:', state)
  *   } else {
  *     console.log('Contract call has been rejected')
  *   }
