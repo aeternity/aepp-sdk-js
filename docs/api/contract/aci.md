@@ -13,7 +13,7 @@ import ContractACI from '@aeternity/aepp-sdk/es/contract/aci'
     * [instance.compile](#exp_module_@aeternity/aepp-sdk/es/contract/aci--instance.compile) ⇒ `ContractInstance` ⏏
     * [instance.deploy](#exp_module_@aeternity/aepp-sdk/es/contract/aci--instance.deploy) ⇒ `ContractInstance` ⏏
     * [instance.call](#exp_module_@aeternity/aepp-sdk/es/contract/aci--instance.call) ⇒ `Object` ⏏
-    * [getContractInstance(source, [options])](#exp_module_@aeternity/aepp-sdk/es/contract/aci--getInstance) ⇒ `ContractInstance` ⏏
+    * [getContractInstance(source, [options])](#exp_module_@aeternity/aepp-sdk/es/contract/aci--getContractInstance) ⇒ `ContractInstance` ⏏
     * [ContractACI()](#exp_module_@aeternity/aepp-sdk/es/contract/aci--ContractACI) ⇒ `Object` ⏏
 
 <a id="exp_module_@aeternity/aepp-sdk/es/contract/aci--instance.compile"></a>
@@ -55,6 +55,7 @@ Call contract function
 | [options] | `Object` | <code>{}</code> | Array of function arguments |
 | [options.skipArgsConvert] | `Boolean` | <code>false</code> | Skip Validation and Transforming arguments before prepare call-data |
 | [options.skipTransformDecoded] | `Boolean` | <code>false</code> | Skip Transform decoded data to JS type |
+| [options.callStatic] | `Boolean` | <code>false</code> | Static function call |
 
 <a id="exp_module_@aeternity/aepp-sdk/es/contract/aci--getContractInstance"></a>
 
