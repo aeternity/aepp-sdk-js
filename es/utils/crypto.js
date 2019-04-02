@@ -208,6 +208,32 @@ export function hexStringToByte (str) {
   return new Uint8Array(a)
 }
 
+/**
+ * Converts a positive integer to the smallest possible
+ * representation in a binary digit representation
+ * @rtype (value: Number) => Buffer
+ * @param {Number} value - Value to encode
+ * @return {Buffer} - Encoded data
+ */
+export function encodeUnsigned (value) {
+  const binary = Buffer.allocUnsafe(4)
+  binary.writeUInt32BE(value)
+  return binary.slice(binary.findIndex(i => i !== 0))
+}
+
+/**
+ * Compute contract address
+ * @rtype (owner: String, nonce: Number) => String
+ * @param {String} owner - Address of contract owner
+ * @param {Number} nonce - Round when contract was created
+ * @return {String} - Contract address
+ */
+export function encodeContractAddress (owner, nonce) {
+  const publicKey = decodeBase58Check(assertedType(owner, 'ak'))
+  const binary = Buffer.concat([publicKey, encodeUnsigned(nonce)])
+  return `ct_${encodeBase58Check(hash(binary))}`
+}
+
 // KEY-PAIR HELPERS
 
 /**
