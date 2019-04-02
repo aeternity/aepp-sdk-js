@@ -44,7 +44,7 @@ function waitForChannel (channel) {
   )
 }
 
-describe.only('Channel', function () {
+describe('Channel', function () {
   configure(this)
 
   let initiator
@@ -403,6 +403,92 @@ describe.only('Channel', function () {
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.notCalled(responderSign)
+    await initiatorCh.leave()
+  })
+
+  it('can create a contract and accept', async () => {
+    initiatorCh = await Channel({
+      ...sharedParams,
+      role: 'initiator',
+      port: 3003,
+      sign: initiatorSign
+    })
+    responderCh = await Channel({
+      ...sharedParams,
+      role: 'responder',
+      port: 3003,
+      sign: responderSign
+    })
+    await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
+    const code = await initiator.compileContractAPI(identityContract)
+    const callData = await initiator.contractEncodeCallDataAPI(identityContract, 'init', [])
+    const result = await initiatorCh.createContract({
+      code,
+      callData,
+      deposit: 1000,
+      vmVersion: 3,
+      abiVersion: 1
+    }, async (tx) => await initiator.signTransaction(tx))
+    result.should.eql({ accepted: true, address: result.address, state: initiatorCh.state() })
+    contractAddress = result.address
+    contractEncodeCall = (method, args) => initiator.contractEncodeCallDataAPI(identityContract, method, args)
+  })
+
+  it('can create a contract and reject', async () => {
+    responderShouldRejectUpdate = true
+    const code = await initiator.compileContractAPI(identityContract)
+    const callData = await initiator.contractEncodeCallDataAPI(identityContract, 'init', [])
+    const result = await initiatorCh.createContract({
+      code,
+      callData,
+      deposit: 1000,
+      vmVersion: 3,
+      abiVersion: 1
+    }, async (tx) => await initiator.signTransaction(tx))
+    result.should.eql({ accepted: false })
+  })
+
+  it('can call a contract and accept', async () => {
+    const result = await initiatorCh.callContract({
+      amount: 0,
+      callData: await contractEncodeCall('main', ['42']),
+      contract: contractAddress,
+      abiVersion: 1
+    }, async (tx) => await initiator.signTransaction(tx))
+    result.should.eql({ accepted: true, state: initiatorCh.state() })
+    callerNonce = Number(unpackTx(initiatorCh.state()).tx.encodedTx.tx.round)
+  })
+
+  it('can call a contract and reject', async () => {
+    responderShouldRejectUpdate = true
+    const result = await initiatorCh.callContract({
+      amount: 0,
+      callData: await contractEncodeCall('main', ['42']),
+      contract: contractAddress,
+      abiVersion: 1
+    }, async (tx) => await initiator.signTransaction(tx))
+    result.should.eql({ accepted: false })
+  })
+
+  it('can get contract call', async () => {
+    const result = await initiatorCh.getContractCall({
+      caller: await initiator.address(),
+      contract: contractAddress,
+      round: callerNonce
+    })
+    result.should.eql({
+      callerId: await initiator.address(),
+      callerNonce,
+      contractId: contractAddress,
+      gasPrice: result.gasPrice,
+      gasUsed: result.gasUsed,
+      height: result.height,
+      log: result.log,
+      returnType: 'ok',
+      returnValue: result.returnValue
+    })
+    const value = await initiator.contractDecodeDataAPI('int', result.returnValue)
+    value.should.eql({ type: 'word', value: 42 })
   })
 
   it('can solo close a channel', async () => {
