@@ -28,8 +28,39 @@ import nacl from 'tweetnacl'
 import aesjs from 'aes-js'
 import { leftPad, rightPad, toBytes } from './bytes'
 import shajs from 'sha.js'
+import { ADDRESS_FORMAT } from '../account'
+import { decode as decodeNode } from '../tx/builder/helpers'
 
 const Ecb = aesjs.ModeOfOperation.ecb
+
+/**
+ * Check whether a string is valid base-64.
+ * @param {string} str String to validate.
+ * @return {boolean} True if the string is valid base-64, false otherwise.
+ */
+export function isBase64 (str) {
+  let index
+  // eslint-disable-next-line no-useless-escape
+  if (str.length % 4 > 0 || str.match(/[^0-9a-z+\/=]/i)) return false
+  index = str.indexOf('=')
+  return !!(index === -1 || str.slice(index).match(/={1,2}/))
+}
+
+/**
+ * Format account address
+ * @rtype (format: String, address: String) => tx: Promise[String]
+ * @param {String} format - Format type
+ * @param {String} address - Base58check account address
+ * @return {String} Formatted address
+ */
+export function formatAddress (format = ADDRESS_FORMAT.api, address) {
+  switch (format) {
+    case ADDRESS_FORMAT.api:
+      return address
+    case ADDRESS_FORMAT.sophia:
+      return `0x${decodeNode(address, 'ak').toString('hex')}`
+  }
+}
 
 /**
  * Check if address is valid
@@ -71,10 +102,10 @@ export function addressFromDecimal (decimalAddress) {
  * Calculate 256bits Blake2b hash of `input`
  * @rtype (input: String) => hash: String
  * @param {String} input - Data to hash
- * @return {String} Hash
+ * @return {Buffer} Hash
  */
 export function hash (input) {
-  return blake2b(input, null, 32) // 256 bits
+  return Buffer.from(blake2b(input, null, 32)) // 256 bits
 }
 
 /**
@@ -82,7 +113,7 @@ export function hash (input) {
  * as defined in https://github.com/aeternity/protocol/blob/master/AENS.md#hashing
  * @rtype (input: String) => hash: String
  * @param {String} input - Data to hash
- * @return {String} Hash
+ * @return {Buffer} Hash
  */
 export function nameId (input) {
   let buf = Buffer.allocUnsafe(32).fill(0)
@@ -195,6 +226,32 @@ export function hexStringToByte (str) {
   return new Uint8Array(a)
 }
 
+/**
+ * Converts a positive integer to the smallest possible
+ * representation in a binary digit representation
+ * @rtype (value: Number) => Buffer
+ * @param {Number} value - Value to encode
+ * @return {Buffer} - Encoded data
+ */
+export function encodeUnsigned (value) {
+  const binary = Buffer.allocUnsafe(4)
+  binary.writeUInt32BE(value)
+  return binary.slice(binary.findIndex(i => i !== 0))
+}
+
+/**
+ * Compute contract address
+ * @rtype (owner: String, nonce: Number) => String
+ * @param {String} owner - Address of contract owner
+ * @param {Number} nonce - Round when contract was created
+ * @return {String} - Contract address
+ */
+export function encodeContractAddress (owner, nonce) {
+  const publicKey = decodeBase58Check(assertedType(owner, 'ak'))
+  const binary = Buffer.concat([publicKey, encodeUnsigned(nonce)])
+  return `ct_${encodeBase58Check(hash(binary))}`
+}
+
 // KEY-PAIR HELPERS
 
 /**
@@ -288,11 +345,11 @@ export function decryptKey (password, encrypted) {
  * Generate signature
  * @rtype (data: String|Buffer, privateKey: Buffer) => Buffer
  * @param {String|Buffer} data - Data to sign
- * @param {Buffer} privateKey - Key to sign with
+ * @param {String|Buffer} privateKey - Key to sign with
  * @return {Buffer} Signature
  */
 export function sign (data, privateKey) {
-  return nacl.sign.detached(new Uint8Array(data), privateKey)
+  return nacl.sign.detached(Buffer.from(data), Buffer.from(privateKey))
 }
 
 /**

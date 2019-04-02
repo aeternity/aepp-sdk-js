@@ -30,6 +30,11 @@ import { TX_TYPE } from '../tx/builder/schema'
 
 const DEFAULT_NETWORK_ID = `ae_mainnet`
 
+export const ADDRESS_FORMAT = {
+  sophia: 1,
+  api: 2,
+  raw: 3
+}
 /**
  * Sign encoded transaction
  * @instance
@@ -68,6 +73,11 @@ const Account = stampit({
   init ({ networkId }) { // NETWORK_ID using for signing transaction's
     if (!this.networkId && networkId) {
       this.networkId = networkId
+    }
+    // Add address formatter
+    this.getAddress = this.address
+    this.address = async function (format) {
+      return Crypto.formatAddress(format, await this.getAddress())
     }
   },
   methods: { signTransaction },

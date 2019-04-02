@@ -11,11 +11,13 @@ import * as Crypto from '@aeternity/aepp-sdk/es/utils/crypto'
 * [@aeternity/aepp-sdk/es/utils/crypto](#module_@aeternity/aepp-sdk/es/utils/crypto)
     * _static_
         * [.decode](#module_@aeternity/aepp-sdk/es/utils/crypto.decode) ⇒ `Array`
+        * [.isBase64(str)](#module_@aeternity/aepp-sdk/es/utils/crypto.isBase64) ⇒ `boolean`
+        * [.formatAddress(format, address)](#module_@aeternity/aepp-sdk/es/utils/crypto.formatAddress) ⇒ `String`
         * [.isAddressValid(address)](#module_@aeternity/aepp-sdk/es/utils/crypto.isAddressValid) ⇒ `Boolean`
         * [.addressToHex(base58CheckAddress)](#module_@aeternity/aepp-sdk/es/utils/crypto.addressToHex) ⇒ `String`
         * [.addressFromDecimal(decimalAddress)](#module_@aeternity/aepp-sdk/es/utils/crypto.addressFromDecimal) ⇒ `String`
-        * [.hash(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.hash) ⇒ `String`
-        * [.nameId(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.nameId) ⇒ `String`
+        * [.hash(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.hash) ⇒ `Buffer`
+        * [.nameId(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.nameId) ⇒ `Buffer`
         * [.sha256hash(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.sha256hash) ⇒ `String`
         * [.salt()](#module_@aeternity/aepp-sdk/es/utils/crypto.salt) ⇒ `Number`
         * [.encodeBase64Check(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.encodeBase64Check) ⇒ `Buffer`
@@ -58,6 +60,32 @@ RLP decode
 | --- | --- | --- |
 | data | `Buffer` \| `String` \| `Integer` \| `Array` | Data to decode |
 
+<a id="module_@aeternity/aepp-sdk/es/utils/crypto.isBase64"></a>
+
+### @aeternity/aepp-sdk/es/utils/crypto.isBase64(str) ⇒ `boolean`
+Check whether a string is valid base-64.
+
+**Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
+**Returns**: `boolean` - True if the string is valid base-64, false otherwise.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| str | `string` | String to validate. |
+
+<a id="module_@aeternity/aepp-sdk/es/utils/crypto.formatAddress"></a>
+
+### @aeternity/aepp-sdk/es/utils/crypto.formatAddress(format, address) ⇒ `String`
+Format account address
+
+**Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
+**Returns**: `String` - Formatted address  
+**rtype**: `(format: String, address: String) => tx: Promise[String]`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| format | `String` | Format type |
+| address | `String` | Base58check account address |
+
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.isAddressValid"></a>
 
 ### @aeternity/aepp-sdk/es/utils/crypto.isAddressValid(address) ⇒ `Boolean`
@@ -99,11 +127,11 @@ Parse decimal address and return base58Check encoded address with prefix 'ak'
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.hash"></a>
 
-### @aeternity/aepp-sdk/es/utils/crypto.hash(input) ⇒ `String`
+### @aeternity/aepp-sdk/es/utils/crypto.hash(input) ⇒ `Buffer`
 Calculate 256bits Blake2b hash of `input`
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
-**Returns**: `String` - Hash  
+**Returns**: `Buffer` - Hash  
 **rtype**: `(input: String) => hash: String`
 
 | Param | Type | Description |
@@ -112,12 +140,12 @@ Calculate 256bits Blake2b hash of `input`
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.nameId"></a>
 
-### @aeternity/aepp-sdk/es/utils/crypto.nameId(input) ⇒ `String`
+### @aeternity/aepp-sdk/es/utils/crypto.nameId(input) ⇒ `Buffer`
 Calculate 256bits Blake2b nameId of `input`
 as defined in https://github.com/aeternity/protocol/blob/master/AENS.md#hashing
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
-**Returns**: `String` - Hash  
+**Returns**: `Buffer` - Hash  
 **rtype**: `(input: String) => hash: String`
 
 | Param | Type | Description |
@@ -304,7 +332,7 @@ Generate signature
 | Param | Type | Description |
 | --- | --- | --- |
 | data | `String` \| `Buffer` | Data to sign |
-| privateKey | `Buffer` | Key to sign with |
+| privateKey | `String` \| `Buffer` | Key to sign with |
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.verify"></a>
 

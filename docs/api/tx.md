@@ -23,6 +23,7 @@ import Tx from '@aeternity/aepp-sdk/es/tx'
         * *[.oracleExtendTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+oracleExtendTx) ⇒ `String`*
         * *[.oraclePostQuery(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+oraclePostQuery) ⇒ `String`*
         * *[.oracleRespondTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+oracleRespondTx) ⇒ `String`*
+        * *[.getAccountNonce(address)](#module_@aeternity/aepp-sdk/es/tx--Tx+getAccountNonce) ⇒ `Number`*
 
 <a id="exp_module_@aeternity/aepp-sdk/es/tx--Tx"></a>
 
@@ -215,4 +216,18 @@ Create a `oracle_respond_tx` transaction
 | Param | Type | Description |
 | --- | --- | --- |
 | options | `Object` | The object to extract properties from |
+
+<a id="module_@aeternity/aepp-sdk/es/tx--Tx+getAccountNonce"></a>
+
+#### *tx.getAccountNonce(address) ⇒ `Number`*
+Get Account Nonce
+
+**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)  
+**Returns**: `Number` - Result  
+**Category**: async  
+**rtype**: `(address) => result: Number`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| address | `String` | Account public key |
 

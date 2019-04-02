@@ -130,7 +130,7 @@ async function update (nameId, target, options = {}) {
  * @return {Promise<Object>}
  */
 async function query (name) {
-  const o = await this.api.getNameEntryByName(name)
+  const o = await this.getName(name)
   const nameId = o.id
 
   return Object.freeze(Object.assign(o, {

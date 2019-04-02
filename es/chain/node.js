@@ -18,7 +18,6 @@ import * as R from 'ramda'
 import Chain from './'
 import Node from '../node'
 import Oracle from '../oracle/node'
-import Contract from '../contract/node'
 import formatBalance from '../utils/amount-formatter'
 import TransactionValidator from '../tx/validator'
 
@@ -37,7 +36,7 @@ async function sendTransaction (tx, options = {}) {
   if (this.verifyTxBeforeSend || verify) {
     const { validation, tx: txObject, txType } = await this.unpackAndVerify(tx)
     if (validation.length) {
-      throw Object.assign({
+      throw Object.assign(Error('Transaction verification error'), {
         code: 'TX_VERIFICATION_ERROR',
         errorData: { validation, tx: txObject, txType },
         txHash: tx
@@ -59,8 +58,15 @@ async function sendTransaction (tx, options = {}) {
   }
 }
 
+async function getAccount (address, { height, hash } = {}) {
+  if (height) return this.api.getAccountByPubkeyAndHeight(address, height)
+  if (hash) return this.api.getAccountByPubkeyAndHash(address, hash)
+  return this.api.getAccountByPubkey(address)
+}
+
 async function balance (address, { height, hash, format = false } = {}) {
-  const { balance } = await this.api.getAccountByPubkey(address, { height, hash })
+  const { balance } = await this.getAccount(address, { hash, height })
+
   return format ? formatBalance(balance) : balance.toString()
 }
 
@@ -162,6 +168,14 @@ async function txDryRun (txs, accounts, top) {
   return this.api.dryRunTxs({ txs, accounts, top })
 }
 
+async function getContractByteCode (contractId) {
+  return this.api.getContractCode(contractId)
+}
+
+async function getName (name) {
+  return this.api.getNameEntryByName(name)
+}
+
 /**
  * ChainNode Stamp
  *
@@ -174,13 +188,14 @@ async function txDryRun (txs, accounts, top) {
  * @return {Object} ChainNode instance
  * @example ChainNode({url: 'https://sdk-testnet.aepps.com/'})
  */
-const ChainNode = Chain.compose(Node, Oracle, Contract, TransactionValidator, {
+const ChainNode = Chain.compose(Node, Oracle, TransactionValidator, {
   init ({ verifyTx = false }) {
     this.verifyTxBeforeSend = verifyTx
   },
   methods: {
     sendTransaction,
     balance,
+    getAccount,
     topBlock,
     tx,
     height,
@@ -193,7 +208,9 @@ const ChainNode = Chain.compose(Node, Oracle, Contract, TransactionValidator, {
     getMicroBlockHeader,
     getMicroBlockTransactions,
     getKeyBlock,
-    txDryRun
+    txDryRun,
+    getContractByteCode,
+    getName
   }
 })
 

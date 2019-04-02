@@ -47,6 +47,9 @@ function deserializeField (value, type, prefix) {
       return unpackTx(value, true)
     case FIELD_TYPES.offChainUpdates:
       return value.map(v => unpackTx(v, true))
+    case FIELD_TYPES.callStack:
+      // TODO: fix this
+      return [readInt(value)]
     default:
       return value
   }
@@ -211,12 +214,7 @@ export function buildRawTx (params, schema, { excludeKeys = [] } = {}) {
   // Validation
   const valid = validateParams(params, schema, { excludeKeys })
   if (Object.keys(valid).length) {
-    throw Object.assign(
-      {
-        msg: 'Validation error',
-        errorData: valid,
-        code: 'TX_BUILD_VALIDATION_ERROR'
-      })
+    throw new Error('Transaction build error. ' + JSON.stringify(valid))
   }
 
   return schema
