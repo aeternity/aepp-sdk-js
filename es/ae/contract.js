@@ -29,7 +29,7 @@
 
 import Ae from './'
 import * as R from 'ramda'
-import { addressFromDecimal, isBase64 } from '../utils/crypto'
+import { isBase64 } from '../utils/crypto'
 import ContractCompilerAPI from '../contract/compiler'
 import ContractACI from '../contract/aci'
 
@@ -78,7 +78,6 @@ async function encodeCall (source, name, args) {
  */
 async function decode (type, data) {
   const result = await this.contractDecodeDataAPI(type, data)
-  if (type === 'address') result.value = addressFromDecimal(result.value)
   return result
 }
 

@@ -23,7 +23,6 @@
  * @example import ContractACI from '@aeternity/aepp-sdk/es/contract/aci'
  */
 import AsyncInit from '../utils/async-init'
-import { addressFromDecimal } from '../utils/crypto'
 import { decode } from '../tx/builder/helpers'
 
 const SOPHIA_TYPES = [
@@ -54,7 +53,7 @@ function transform (type, value) {
     case SOPHIA_TYPES.list:
       return `[${value.map(el => transform(generic, el))}]`
     case SOPHIA_TYPES.address:
-      return `0x${decode(value, 'ak').toString('hex')}`
+      return `#${decode(value, 'ak').toString('hex')}`
   }
   return `${value}`
 }
@@ -132,8 +131,6 @@ function transformDecodedData (aci, result, { skipTransformDecoded = false } = {
       return result.value.map(({ value }) => transformDecodedData({ type: generic }, { value }))
     case SOPHIA_TYPES.tuple:
       return result.value.map(({ value }, i) => { return transformDecodedData({ type: generic[i] }, { value }) })
-    case SOPHIA_TYPES.address:
-      return addressFromDecimal(result.value)
   }
   return result.value
 }
