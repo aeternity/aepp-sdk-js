@@ -52,7 +52,7 @@ await account.address(format: ADDRESS_FORMAT) // default ADDRESS_FORMAT.api
  ### Breaking Changes
 - Contract stamp API
 ```
-1) Use Compiler isntead of node API for encode/decode call-data and compile.
+1) Use Compiler instead of node API for encode/decode call-data and compile.
 2) Change Contract interface:
  - contractCallStatic (address, abi = 'sophia-address', name, { top, args = '()', call, options = {} } = {}) -> (source, address, name, args = [], { top, options = {} } = {}))
  - contractCall (code, abi, address, name, { args = '()', options = {}, call } = {}) -> (source, address, name, args = [], options = {})
