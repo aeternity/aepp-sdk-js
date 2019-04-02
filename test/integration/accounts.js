@@ -75,6 +75,20 @@ describe('Accounts', function () {
     })
   })
 
+  it('Get Account by block height/hash', async () => {
+    const h = await wallet.height()
+    await wallet.awaitHeight(h + 3)
+    const spend = await wallet.spend(123, 'ak_DMNCzsVoZnpV5fe8FTQnNsTfQ48YM5C3WbHPsJyHjAuTXebFi')
+    await wallet.awaitHeight(spend.blockHeight + 2)
+    const accountAfterSpend = await wallet.getAccount(await wallet.address())
+    const accountBeforeSpendByHash = await wallet.getAccount(await wallet.address(), { height: spend.blockHeight - 1 })
+    BigNumber(accountBeforeSpendByHash.balance)
+      .minus(BigNumber(accountAfterSpend.balance))
+      .toString()
+      .should.be
+      .equal(`${spend.tx.fee + spend.tx.amount}`)
+  })
+
   describe('can be configured to return th', () => {
     it('on creation', async () => {
       const wallet = await ready(this)

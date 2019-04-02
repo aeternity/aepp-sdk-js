@@ -84,10 +84,10 @@ export function addressFromDecimal (decimalAddress) {
  * Calculate 256bits Blake2b hash of `input`
  * @rtype (input: String) => hash: String
  * @param {String} input - Data to hash
- * @return {String} Hash
+ * @return {Buffer} Hash
  */
 export function hash (input) {
-  return blake2b(input, null, 32) // 256 bits
+  return Buffer.from(blake2b(input, null, 32)) // 256 bits
 }
 
 /**
@@ -95,7 +95,7 @@ export function hash (input) {
  * as defined in https://github.com/aeternity/protocol/blob/master/AENS.md#hashing
  * @rtype (input: String) => hash: String
  * @param {String} input - Data to hash
- * @return {String} Hash
+ * @return {Buffer} Hash
  */
 export function nameId (input) {
   let buf = Buffer.allocUnsafe(32).fill(0)

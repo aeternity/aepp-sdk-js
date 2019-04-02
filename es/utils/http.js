@@ -6,7 +6,7 @@ import stampit from '@stamp/it'
 
 const axios = ax.create({
   httpsAgent: new https.Agent({
-    rejectUnauthorized: false
+    rejectUnauthorized: true // For develop
   })
 })
 
