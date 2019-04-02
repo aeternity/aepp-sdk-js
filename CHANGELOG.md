@@ -45,6 +45,9 @@ await account.address(format: ADDRESS_FORMAT) // default ADDRESS_FORMAT.api
 - Add `{ compilerUrl }` to `Universal, Contract, Wallet` stamp initialization
 - Add ability to get `account/balance` on specific block `hash/height`
 - Fix `name hash` function arguments parsing in `Crypto`
+- Improve channel rpc usage
+- Improve channel tests and error handling
+- Improve state channel params handling
 
  ### Removed
 - `ContractNodeAPI` stamp
