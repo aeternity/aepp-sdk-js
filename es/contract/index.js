@@ -43,7 +43,8 @@ const ContractBase = stampit({
       methods: [
         'contractEncodeCallDataAPI',
         'contractDecodeDataAPI',
-        'compileContractAPI'
+        'compileContractAPI',
+        'contractGetACI'
       ]
     }
   }
@@ -51,7 +52,8 @@ const ContractBase = stampit({
   methods: {
     contractEncodeCallDataAPI: required,
     contractDecodeDataAPI: required,
-    compileContractAPI: required
+    compileContractAPI: required,
+    contractGetACI: required
   }
 }))
 
