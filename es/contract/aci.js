@@ -23,7 +23,6 @@
  * @example import ContractACI from '@aeternity/aepp-sdk/es/contract/aci'
  */
 import AsyncInit from '../utils/async-init'
-import { addressFromDecimal } from '../utils/crypto'
 import { decode } from '../tx/builder/helpers'
 
 const SOPHIA_TYPES = [
@@ -54,7 +53,7 @@ function transform (type, value) {
     case SOPHIA_TYPES.list:
       return `[${value.map(el => transform(generic, el))}]`
     case SOPHIA_TYPES.address:
-      return `0x${decode(value, 'ak').toString('hex')}`
+      return `#${decode(value, 'ak').toString('hex')}`
   }
   return `${value}`
 }
@@ -132,8 +131,6 @@ function transformDecodedData (aci, result, { skipTransformDecoded = false } = {
       return result.value.map(({ value }) => transformDecodedData({ type: generic }, { value }))
     case SOPHIA_TYPES.tuple:
       return result.value.map(({ value }, i) => { return transformDecodedData({ type: generic[i] }, { value }) })
-    case SOPHIA_TYPES.address:
-      return addressFromDecimal(result.value)
   }
   return result.value
 }
@@ -183,7 +180,7 @@ function getFunctionACI (aci, name) {
  * @return {ContractInstance} JS Contract API
  *
  */
-async function getInstance (source, { aci, contractAddress } = {}) {
+async function getContractInstance (source, { aci, contractAddress } = {}) {
   aci = aci || await this.contractGetACI(source)
   const instance = {
     interface: aci.interface,
@@ -218,6 +215,7 @@ async function getInstance (source, { aci, contractAddress } = {}) {
    * @param {Object} [options={}] Array of function arguments
    * @param {Boolean} [options.skipArgsConvert=false] Skip Validation and Transforming arguments before prepare call-data
    * @param {Boolean} [options.skipTransformDecoded=false] Skip Transform decoded data to JS type
+   * @param {Boolean} [options.callStatic=false] Static function call
    * @return {Object} CallResult
    */
   instance.call = call(this).bind(instance)
@@ -226,7 +224,7 @@ async function getInstance (source, { aci, contractAddress } = {}) {
 }
 
 function call (self) {
-  return async function (fn, params = [], options = { skipArgsConvert: false, skipTransformDecoded: false }) {
+  return async function (fn, params = [], options = { skipArgsConvert: false, skipTransformDecoded: false, callStatic: false }) {
     const fnACI = getFunctionACI(this.aci, fn)
     if (!fn) throw new Error('Function name is required')
     if (!this.deployInfo.address) throw new Error('You need to deploy contract before calling!')
@@ -278,7 +276,7 @@ function compile (self) {
  */
 const ContractACI = AsyncInit.compose({
   methods: {
-    getInstance
+    getContractInstance
   }
 })
 

@@ -101,7 +101,7 @@ Static contract call(using dry-run)
 | source | `String` | Contract source code |
 | address | `String` | Contract address |
 | name | `String` | Name of function to call |
-| args | `Array` \| `String` | Argument's for call function |
+| args | `Array` | Argument's for call function |
 | options | `Object` | [options={}]  Options |
 | top | `String` | [options.top] Block hash on which you want to call contract |
 | options | `String` | [options.options]  Transaction options (fee, ttl, gas, amount, deposit) |
@@ -120,7 +120,7 @@ Call contract function
 | source | `String` | Contract source code |
 | address | `String` | Contract address |
 | name | `String` | Name of function to call |
-| args | `String` \| `Array` | Argument's for call function |
+| args | `Array` | Argument's for call function |
 | options | `Object` | Transaction options (fee, ttl, gas, amount, deposit) |
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--deploy"></a>

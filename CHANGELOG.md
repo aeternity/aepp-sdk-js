@@ -2,6 +2,70 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [2.4.0]
+### Added
+- Install and configure `commitizen`
+- Add `formatAddress` function to `Crypto`
+- Add Contract Compiler API stamp to `es/contract` (now using instead contract node API)
+- Add basic `http` client stamp (`es/utils/http`)
+- ACI stamp (New Contract interface base on contract ACI schema)
+Usage:
+```
+const contractIns = await client.getContractInstance(contractSourceCode)
+console.log(contract)
+ {
+   interface: String, // Contract interface source code
+   aci: String, // Contract interface json schema
+   source: String, // Contract source code
+   compiled: String, // Compiled contract code
+   deployInfo: { address: contractAddress } // Object with deploy transaction,
+   // Function
+   compile: () => this, // Compile contract,
+   deploy: (init = [], options = { skipArgsConvert: false }) => this, // Deploy contract (compile before if needed)
+   call: (fn, params = [], options = { skipArgsConvert: false, skipTransformDecoded: false, callStatic: false } => CallRersult: Object // Call contract function
+ }
+```
+
+### Changed
+- Extend  `Account.address()` with `accountFormatter` now you can do
+```
+export const ADDRESS_FORMAT = {
+  sophia: 1, // return address like `0xHEX_ADDRESS`
+  api: 2, // return address like `ak_9LJ8ne9tks78hTD2Tp571f7w2MJmzQMRsiZxKCkMA2d2Sbrc4`
+}
+
+//
+
+export { ADDRESS_FORMAT } from 'es/account'
+await account.address(format: ADDRESS_FORMAT) // default ADDRESS_FORMAT.api
+```
+- decode node error coming from contract `call` and `callStatic`
+- Throw native error instead of object in chain `chain.sendTransaction`
+- fix arguments parsing in `Crypto.sing`
+- Add `{ compilerUrl }` to `Universal, Contract, Wallet` stamp initialization
+- Add ability to get `account/balance` on specific block `hash/height`
+- Fix `name hash` function arguments parsing in `Crypto`
+- Improve channel rpc usage
+- Improve channel tests and error handling
+- Improve state channel params handling
+
+ ### Removed
+- `ContractNodeAPI` stamp
+
+ ### Breaking Changes
+- Contract stamp API
+```
+1) Use Compiler instead of node API for encode/decode call-data and compile.
+2) Change Contract interface:
+ - contractCallStatic (address, abi = 'sophia-address', name, { top, args = '()', call, options = {} } = {}) -> (source, address, name, args = [], { top, options = {} } = {}))
+ - contractCall (code, abi, address, name, { args = '()', options = {}, call } = {}) -> (source, address, name, args = [], options = {})
+ - contractDeploy (code, abi, { initState = '()', options = {} } = {}) -> (code, source, initState = [], options = {})
+ - contractEncodeCall (code, abi, name, args, call) -> (source, name, args) // 'source' is -> Contract source code or ACI interface source
+```
+
+ ### Notes and known Issues
+- none
+
 ## [2.3.2]
 ### Added
 - none
@@ -564,3 +628,4 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 [2.3.0]: https://github.com/aeternity/aepp-sdk-js/compare/2.3.0-next...2.3.0
 [2.3.1]: https://github.com/aeternity/aepp-sdk-js/compare/2.3.0...2.3.1
 [2.3.2]: https://github.com/aeternity/aepp-sdk-js/compare/2.3.1...2.3.2
+[2.4.0.]: https://github.com/aeternity/aepp-sdk-js/compare/2.3.2...2.4.0
