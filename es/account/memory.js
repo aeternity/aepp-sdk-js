@@ -27,12 +27,18 @@ import * as Crypto from '../utils/crypto'
 
 const secrets = new WeakMap()
 
+export const ADDRESS_FORMAT = {
+  sophia: 1,
+  api: 2,
+  raw: 3
+}
+
 async function sign (data) {
   return Promise.resolve(Crypto.sign(data, secrets.get(this).secretKey))
 }
 
-async function address () {
-  return Promise.resolve(secrets.get(this).publicKey)
+async function address (format = ADDRESS_FORMAT.api) {
+  return Promise.resolve(Crypto.formatAddress(format, secrets.get(this).publicKey))
 }
 
 /**
