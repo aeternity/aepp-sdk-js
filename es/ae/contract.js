@@ -29,7 +29,7 @@
 
 import Ae from './'
 import * as R from 'ramda'
-import { addressFromDecimal, isBase64 } from '../utils/crypto'
+import { isBase64 } from '../utils/crypto'
 import ContractCompilerAPI from '../contract/compiler'
 import ContractACI from '../contract/aci'
 
@@ -78,7 +78,6 @@ async function encodeCall (source, name, args) {
  */
 async function decode (type, data) {
   const result = await this.contractDecodeDataAPI(type, data)
-  if (type === 'address') result.value = addressFromDecimal(result.value)
   return result
 }
 
@@ -90,7 +89,7 @@ async function decode (type, data) {
  * @param {String} source Contract source code
  * @param {String} address Contract address
  * @param {String} name Name of function to call
- * @param {Array|String} args  Argument's for call function
+ * @param {Array} args  Argument's for call function
  * @param {Object} options [options={}]  Options
  * @param {String} top [options.top] Block hash on which you want to call contract
  * @param {String} options [options.options]  Transaction options (fee, ttl, gas, amount, deposit)
@@ -137,7 +136,7 @@ async function callStatic (source, address, name, args = [], { top, options = {}
  * @param {String} source Contract source code
  * @param {String} address Contract address
  * @param {String} name Name of function to call
- * @param {String|Array} args Argument's for call function
+ * @param {Array} args Argument's for call function
  * @param {Object} options Transaction options (fee, ttl, gas, amount, deposit)
  * @return {Promise<Object>} Result object
  */

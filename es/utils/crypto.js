@@ -28,6 +28,8 @@ import nacl from 'tweetnacl'
 import aesjs from 'aes-js'
 import { leftPad, rightPad, toBytes } from './bytes'
 import shajs from 'sha.js'
+import { ADDRESS_FORMAT } from '../account'
+import { decode as decodeNode } from '../tx/builder/helpers'
 
 const Ecb = aesjs.ModeOfOperation.ecb
 
@@ -42,6 +44,22 @@ export function isBase64 (str) {
   if (str.length % 4 > 0 || str.match(/[^0-9a-z+\/=]/i)) return false
   index = str.indexOf('=')
   return !!(index === -1 || str.slice(index).match(/={1,2}/))
+}
+
+/**
+ * Format account address
+ * @rtype (format: String, address: String) => tx: Promise[String]
+ * @param {String} format - Format type
+ * @param {String} address - Base58check account address
+ * @return {String} Formatted address
+ */
+export function formatAddress (format = ADDRESS_FORMAT.api, address) {
+  switch (format) {
+    case ADDRESS_FORMAT.api:
+      return address
+    case ADDRESS_FORMAT.sophia:
+      return `0x${decodeNode(address, 'ak').toString('hex')}`
+  }
 }
 
 /**

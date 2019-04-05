@@ -133,7 +133,7 @@ describe('Contract', function () {
     let contractObject
 
     it('Generate ACI object', async () => {
-      contractObject = await contract.getInstance(testContract)
+      contractObject = await contract.getContractInstance(testContract)
       contractObject.should.have.property('interface')
       contractObject.should.have.property('aci')
       contractObject.should.have.property('source')

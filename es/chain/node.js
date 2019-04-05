@@ -172,6 +172,10 @@ async function getContractByteCode (contractId) {
   return this.api.getContractCode(contractId)
 }
 
+async function getName (name) {
+  return this.api.getNameEntryByName(name)
+}
+
 /**
  * ChainNode Stamp
  *
@@ -205,7 +209,8 @@ const ChainNode = Chain.compose(Node, Oracle, TransactionValidator, {
     getMicroBlockTransactions,
     getKeyBlock,
     txDryRun,
-    getContractByteCode
+    getContractByteCode,
+    getName
   }
 })
 
