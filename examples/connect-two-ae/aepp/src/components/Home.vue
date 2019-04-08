@@ -187,6 +187,17 @@ export default {
       }
     }).then(ae => {
       this.client = ae
+      ae.address()
+        .then(address => {
+          this.pub = address
+        })
+        .catch(e => { this.pub = `Rejected: ${e}` })
+      // // AENS
+      // ae.aensPreclaim(`test${Math.floor(Math.random() * 101)}.test`)
+      //   .then(name => { return name.claim() })
+      //   .then(name => { return name.update('ak_bAxmQLxXv8UnVEKfHpvDwp8qEsrVE3tnezBffLdtVMVKP6GC2') })
+      //   .then(name => { return name.revoke() })
+      //   .catch(e => {debugger})
     })
   }
 }

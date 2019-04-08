@@ -28,6 +28,8 @@ import nacl from 'tweetnacl'
 import aesjs from 'aes-js'
 import { leftPad, rightPad, toBytes } from './bytes'
 import shajs from 'sha.js'
+import { ADDRESS_FORMAT } from '../account'
+import { decode as decodeNode } from '../tx/builder/helpers'
 
 const Ecb = aesjs.ModeOfOperation.ecb
 
@@ -42,6 +44,22 @@ export function isBase64 (str) {
   if (str.length % 4 > 0 || str.match(/[^0-9a-z+\/=]/i)) return false
   index = str.indexOf('=')
   return !!(index === -1 || str.slice(index).match(/={1,2}/))
+}
+
+/**
+ * Format account address
+ * @rtype (format: String, address: String) => tx: Promise[String]
+ * @param {String} format - Format type
+ * @param {String} address - Base58check account address
+ * @return {String} Formatted address
+ */
+export function formatAddress (format = ADDRESS_FORMAT.api, address) {
+  switch (format) {
+    case ADDRESS_FORMAT.api:
+      return address
+    case ADDRESS_FORMAT.sophia:
+      return `0x${decodeNode(address, 'ak').toString('hex')}`
+  }
 }
 
 /**
@@ -206,6 +224,32 @@ export function hexStringToByte (str) {
   }
 
   return new Uint8Array(a)
+}
+
+/**
+ * Converts a positive integer to the smallest possible
+ * representation in a binary digit representation
+ * @rtype (value: Number) => Buffer
+ * @param {Number} value - Value to encode
+ * @return {Buffer} - Encoded data
+ */
+export function encodeUnsigned (value) {
+  const binary = Buffer.allocUnsafe(4)
+  binary.writeUInt32BE(value)
+  return binary.slice(binary.findIndex(i => i !== 0))
+}
+
+/**
+ * Compute contract address
+ * @rtype (owner: String, nonce: Number) => String
+ * @param {String} owner - Address of contract owner
+ * @param {Number} nonce - Round when contract was created
+ * @return {String} - Contract address
+ */
+export function encodeContractAddress (owner, nonce) {
+  const publicKey = decodeBase58Check(assertedType(owner, 'ak'))
+  const binary = Buffer.concat([publicKey, encodeUnsigned(nonce)])
+  return `ct_${encodeBase58Check(hash(binary))}`
 }
 
 // KEY-PAIR HELPERS

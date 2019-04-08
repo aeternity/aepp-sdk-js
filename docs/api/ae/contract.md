@@ -20,12 +20,12 @@ import { Contract } from '@aeternity/aepp-sdk' (Using bundle)
     * [Contract([options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--Contract) ⇒ `Object` ⏏
     * _async_
         * [handleCallError(result)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--handleCallError) ⇒ `Promise.&lt;void&gt;` ⏏
-        * [encodeCall(source, name, args)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--encodeCall) ⇒ `Promise.&lt;String&gt;` ⏏
-        * [decode(type, data)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--decode) ⇒ `Promise.&lt;String&gt;` ⏏
-        * [callStatic(source, address, name, args, options, top, options)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--callStatic) ⇒ `Promise.&lt;Object&gt;` ⏏
-        * [call(source, address, name, args, options)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--call) ⇒ `Promise.&lt;Object&gt;` ⏏
-        * [deploy(code, source, initState, options)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--deploy) ⇒ `Promise.&lt;Object&gt;` ⏏
-        * [compile(source, options)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--compile) ⇒ `Promise.&lt;Object&gt;` ⏏
+        * [contractEncodeCall(source, name, args)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractEncodeCall) ⇒ `Promise.&lt;String&gt;` ⏏
+        * [contractDecodeData(type, data)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractDecodeData) ⇒ `Promise.&lt;String&gt;` ⏏
+        * [contractCallStatic(source, address, name, args, options, top, options)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCallStatic) ⇒ `Promise.&lt;Object&gt;` ⏏
+        * [contractCall(source, address, name, args, options)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCall) ⇒ `Promise.&lt;Object&gt;` ⏏
+        * [contractDeploy(code, source, initState, options)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractDeploy) ⇒ `Promise.&lt;Object&gt;` ⏏
+        * [contractCompile(source, options)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCompile) ⇒ `Promise.&lt;Object&gt;` ⏏
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--Contract"></a>
 
@@ -59,9 +59,9 @@ Handle contract call error
 | --- | --- | --- |
 | result | `Object` | call result object |
 
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--encodeCall"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--contractEncodeCall"></a>
 
-### encodeCall(source, name, args) ⇒ `Promise.&lt;String&gt;` ⏏
+### contractEncodeCall(source, name, args) ⇒ `Promise.&lt;String&gt;` ⏏
 Encode call data for contract call
 
 **Kind**: Exported function  
@@ -73,9 +73,9 @@ Encode call data for contract call
 | name | `String` | Name of function to call |
 | args | `Array` | Argument's for call |
 
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--decode"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--contractDecodeData"></a>
 
-### decode(type, data) ⇒ `Promise.&lt;String&gt;` ⏏
+### contractDecodeData(type, data) ⇒ `Promise.&lt;String&gt;` ⏏
 Decode contract call result data
 
 **Kind**: Exported function  
@@ -87,9 +87,9 @@ Decode contract call result data
 | type | `String` | Data type (int, string, list,...) |
 | data | `String` | call result data (cb_iwer89fjsdf2j93fjews_(ssdffsdfsdf...) |
 
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--callStatic"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCallStatic"></a>
 
-### callStatic(source, address, name, args, options, top, options) ⇒ `Promise.&lt;Object&gt;` ⏏
+### contractCallStatic(source, address, name, args, options, top, options) ⇒ `Promise.&lt;Object&gt;` ⏏
 Static contract call(using dry-run)
 
 **Kind**: Exported function  
@@ -101,14 +101,14 @@ Static contract call(using dry-run)
 | source | `String` | Contract source code |
 | address | `String` | Contract address |
 | name | `String` | Name of function to call |
-| args | `Array` \| `String` | Argument's for call function |
+| args | `Array` | Argument's for call function |
 | options | `Object` | [options={}]  Options |
 | top | `String` | [options.top] Block hash on which you want to call contract |
 | options | `String` | [options.options]  Transaction options (fee, ttl, gas, amount, deposit) |
 
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--call"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCall"></a>
 
-### call(source, address, name, args, options) ⇒ `Promise.&lt;Object&gt;` ⏏
+### contractCall(source, address, name, args, options) ⇒ `Promise.&lt;Object&gt;` ⏏
 Call contract function
 
 **Kind**: Exported function  
@@ -120,12 +120,12 @@ Call contract function
 | source | `String` | Contract source code |
 | address | `String` | Contract address |
 | name | `String` | Name of function to call |
-| args | `String` \| `Array` | Argument's for call function |
+| args | `Array` | Argument's for call function |
 | options | `Object` | Transaction options (fee, ttl, gas, amount, deposit) |
 
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--deploy"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--contractDeploy"></a>
 
-### deploy(code, source, initState, options) ⇒ `Promise.&lt;Object&gt;` ⏏
+### contractDeploy(code, source, initState, options) ⇒ `Promise.&lt;Object&gt;` ⏏
 Deploy contract to the node
 
 **Kind**: Exported function  
@@ -139,9 +139,9 @@ Deploy contract to the node
 | initState | `Array` | Arguments of contract constructor(init) function |
 | options | `Object` | Transaction options (fee, ttl, gas, amount, deposit) |
 
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--compile"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCompile"></a>
 
-### compile(source, options) ⇒ `Promise.&lt;Object&gt;` ⏏
+### contractCompile(source, options) ⇒ `Promise.&lt;Object&gt;` ⏏
 Compile contract source code
 
 **Kind**: Exported function  

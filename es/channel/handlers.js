@@ -15,7 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { generateKeyPair } from '../utils/crypto'
+import { generateKeyPair, encodeContractAddress } from '../utils/crypto'
 import {
   options,
   changeStatus,
@@ -23,6 +23,7 @@ import {
   send,
   emit
 } from './internal'
+import { unpackTx } from '../tx/builder'
 
 export function awaitingConnection (channel, message, state) {
   if (message.method === 'channels.info') {
@@ -297,6 +298,56 @@ export function awaitingDepositCompletion (channel, message, state) {
       return { handler: awaitingDepositCompletion, state }
     }
   }
+  if (message.method === 'channels.update') {
+    changeState(channel, message.params.data.state)
+    state.resolve({ accepted: true, state: message.params.data.state })
+    return { handler: channelOpen }
+  }
+  if (message.method === 'channels.conflict') {
+    state.resolve({ accepted: false })
+    return { handler: channelOpen }
+  }
+}
+
+export async function awaitingNewContractTx (channel, message, state) {
+  if (message.method === 'channels.sign.update') {
+    const signedTx = await Promise.resolve(state.sign(message.params.data.tx))
+    send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { tx: signedTx } })
+    return { handler: awaitingNewContractCompletion, state }
+  }
+}
+
+export function awaitingNewContractCompletion (channel, message, state) {
+  if (message.method === 'channels.update') {
+    const { round } = unpackTx(message.params.data.state).tx.encodedTx.tx
+    // eslint-disable-next-line standard/computed-property-even-spacing
+    const owner = options.get(channel)[{
+      initiator: 'initiatorId',
+      responder: 'responderId'
+    }[options.get(channel).role]]
+    changeState(channel, message.params.data.state)
+    state.resolve({
+      accepted: true,
+      address: encodeContractAddress(owner, round),
+      state: message.params.data.state
+    })
+    return { handler: channelOpen }
+  }
+  if (message.method === 'channels.conflict') {
+    state.resolve({ accepted: false })
+    return { handler: channelOpen }
+  }
+}
+
+export async function awaitingCallContractUpdateTx (channel, message, state) {
+  if (message.method === 'channels.sign.update') {
+    const signedTx = await Promise.resolve(state.sign(message.params.data.tx))
+    send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { tx: signedTx } })
+    return { handler: awaitingCallContractCompletion, state }
+  }
+}
+
+export function awaitingCallContractCompletion (channel, message, state) {
   if (message.method === 'channels.update') {
     changeState(channel, message.params.data.state)
     state.resolve({ accepted: true, state: message.params.data.state })
