@@ -28,7 +28,6 @@ import nacl from 'tweetnacl'
 import aesjs from 'aes-js'
 import { leftPad, rightPad, toBytes } from './bytes'
 import shajs from 'sha.js'
-import { ADDRESS_FORMAT } from '../account'
 import { decode as decodeNode } from '../tx/builder/helpers'
 
 const Ecb = aesjs.ModeOfOperation.ecb
@@ -44,6 +43,12 @@ export function isBase64 (str) {
   if (str.length % 4 > 0 || str.match(/[^0-9a-z+\/=]/i)) return false
   index = str.indexOf('=')
   return !!(index === -1 || str.slice(index).match(/={1,2}/))
+}
+
+export const ADDRESS_FORMAT = {
+  sophia: 1,
+  api: 2,
+  raw: 3
 }
 
 /**
