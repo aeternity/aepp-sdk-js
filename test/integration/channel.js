@@ -411,6 +411,23 @@ describe('Channel', function () {
     value.should.eql({ type: 'word', value: 42 })
   })
 
+  it('can get contract state', async () => {
+    const result = await initiatorCh.getContractState(contractAddress)
+    result.should.eql({
+      contract: {
+        abiVersion: 1,
+        active: true,
+        deposit: 1000,
+        id: contractAddress,
+        ownerId: await initiator.address(),
+        referrerIds: [],
+        vmVersion: 3,
+      },
+      contractState: result.contractState
+    })
+    // TODO: contractState deserialization
+  })
+
   describe('throws errors', function () {
     async function update ({ from, to, amount, sign }) {
       return initiatorCh.update(

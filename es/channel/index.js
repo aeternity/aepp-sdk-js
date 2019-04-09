@@ -454,6 +454,25 @@ async function getContractCall ({ caller, contract, round }) {
 }
 
 /**
+ * Get contract latest state
+ *
+ * @param {string} contract - Address of the contract
+ * @return {Promise<object>}
+ * @example channel.getContractState(
+  *   'ct_9sRA9AVE4BYTAkh5RNfJYmwQe1NZ4MErasQLXZkFWG43TPBqa',
+  * ).then(({ contract }) => {
+  *   console.log('deposit:', contract.deposit)
+  * })
+  */
+async function getContractState (contract) {
+  const result = await call(this, 'channels.get.contract', { pubkey: contract })
+  return snakeToPascalObjKeys({
+    ...result,
+    contract: snakeToPascalObjKeys(result.contract)
+  })
+}
+
+/**
  * Send generic message
  *
  * If message is an object it will be serialized into JSON string
@@ -541,7 +560,8 @@ const Channel = AsyncInit.compose({
     createContract,
     callContract,
     callContractStatic,
-    getContractCall
+    getContractCall,
+    getContractState
   }
 })
 
