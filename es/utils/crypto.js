@@ -28,7 +28,7 @@ import nacl from 'tweetnacl'
 import aesjs from 'aes-js'
 import { leftPad, rightPad, toBytes } from './bytes'
 import shajs from 'sha.js'
-import { ADDRESS_FORMAT } from '../account'
+import { ADDRESS_FORMAT } from '../account/memory'
 import { decode as decodeNode } from '../tx/builder/helpers'
 
 const Ecb = aesjs.ModeOfOperation.ecb
