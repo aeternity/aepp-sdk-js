@@ -28,7 +28,6 @@ import * as handlers from './handlers'
 import {
   eventEmitters,
   status as channelStatus,
-  state as channelState,
   initialize,
   enqueueAction,
   send,
@@ -36,6 +35,13 @@ import {
   call
 } from './internal'
 import * as R from 'ramda'
+
+function snakeToPascalObjKeys (obj) {
+  return Object.entries(obj).reduce((result, [key, val]) => ({
+    ...result,
+    [snakeToPascal(key)]: val
+  }), {})
+}
 
 /**
  * Register event listener function
@@ -61,8 +67,8 @@ function status () {
  *
  * @return {object}
  */
-function state () {
-  return channelState.get(this)
+async function state () {
+  return snakeToPascalObjKeys(await call(this, 'channels.get.offchain_state', {}))
 }
 
 /**
@@ -87,7 +93,7 @@ function id () {
  *   'ak$Gi42jcRm9DcZjk72UWQQBSxi43BG3285C9n4QSvP5JdzDyH2o',
  *   10,
  *   async (tx) => await account.signTransaction(tx)
- * ).then({ accepted, state } =>
+ * ).then({ accepted, signedTx } =>
  *   if (accepted) {
  *     console.log('Update has been accepted')
  *   }
@@ -160,7 +166,7 @@ async function balances (accounts) {
  * Leave channel
  *
  * @return {Promise<object>}
- * @example channel.leave().then(({channelId, state}) =>
+ * @example channel.leave().then(({ channelId, signedTx }) =>
  *   console.log(channelId)
  *   console.log(state)
  * )
@@ -222,10 +228,9 @@ function shutdown (sign) {
  *   100,
  *   async (tx) => await account.signTransaction(tx),
  *   { onOnChainTx: (tx) => console.log('on_chain_tx', tx) }
- * ).then(({ accepted, state }) => {
+ * ).then(({ accepted, signedTx }) => {
  *   if (accepted) {
  *     console.log('Withdrawal has been accepted')
- *     console.log('The new state is:', state)
  *   } else {
  *     console.log('Withdrawal has been rejected')
  *   }
@@ -315,7 +320,7 @@ function deposit (amount, sign, { onOnChainTx, onOwnDepositLocked, onDepositLock
  *   deposit: 10,
  *   vmVersion: 3,
  *   abiVersion: 1
- * }).then(({ accepted, state, address }) => {
+ * }).then(({ accepted, signedTx, address }) => {
  *   if (accepted) {
  *     console.log('New contract has been created')
  *     console.log('Contract address:', address)
@@ -368,10 +373,9 @@ function createContract ({ code, callData, deposit, vmVersion, abiVersion }, sig
  *   callData: 'cb_1111111111111111...',
  *   amount: 0,
  *   abiVersion: 1
- * }).then(({ accepted, state }) => {
+ * }).then(({ accepted, signedTx }) => {
  *   if (accepted) {
  *     console.log('Contract called succesfully')
- *     console.log('The new state is:', state)
  *   } else {
  *     console.log('Contract call has been rejected')
  *   }
@@ -403,6 +407,34 @@ function callContract ({ amount, callData, contract, abiVersion }, sign) {
 }
 
 /**
+ * Call contract using dry-run
+ *
+ * @param {object} options
+ * @param {string} [options.amount] - Amount the caller of the contract commits to it
+ * @param {string} [options.callData] - ABI encoded compiled AEVM call data for the code
+ * @param {number} [options.contract] - Address of the contract to call
+ * @param {number} [options.abiVersion] - Version of the ABI
+ * @return {Promise<object>}
+ * @example channel.callContractStatic({
+  *   contract: 'ct_9sRA9AVE4BYTAkh5RNfJYmwQe1NZ4MErasQLXZkFWG43TPBqa',
+  *   callData: 'cb_1111111111111111...',
+  *   amount: 0,
+  *   abiVersion: 1
+  * }).then(({ returnValue, gasUsed }) => {
+  *   console.log('Returned value:', returnValue)
+  *   console.log('Gas used:', gasUsed)
+  * })
+  */
+async function callContractStatic ({ amount, callData, contract, abiVersion }) {
+  return snakeToPascalObjKeys(await call(this, 'channels.dry_run.call_contract', {
+    amount,
+    call_data: callData,
+    contract,
+    abi_version: abiVersion
+  }))
+}
+
+/**
  * Get contract call result
  *
  * @param {object} options
@@ -426,6 +458,25 @@ async function getContractCall ({ caller, contract, round }) {
       R.toPairs(result)
     )
   )
+}
+
+/**
+ * Get contract latest state
+ *
+ * @param {string} contract - Address of the contract
+ * @return {Promise<object>}
+ * @example channel.getContractState(
+  *   'ct_9sRA9AVE4BYTAkh5RNfJYmwQe1NZ4MErasQLXZkFWG43TPBqa',
+  * ).then(({ contract }) => {
+  *   console.log('deposit:', contract.deposit)
+  * })
+  */
+async function getContractState (contract) {
+  const result = await call(this, 'channels.get.contract', { pubkey: contract })
+  return snakeToPascalObjKeys({
+    ...result,
+    contract: snakeToPascalObjKeys(result.contract)
+  })
 }
 
 /**
@@ -516,7 +567,9 @@ const Channel = AsyncInit.compose({
     deposit,
     createContract,
     callContract,
-    getContractCall
+    callContractStatic,
+    getContractCall,
+    getContractState
   }
 })
 

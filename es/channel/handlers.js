@@ -164,7 +164,7 @@ export async function awaitingOffChainTx (channel, message, state) {
 export function awaitingOffChainUpdate (channel, message, state) {
   if (message.method === 'channels.update') {
     changeState(channel, message.params.data.state)
-    state.resolve({ accepted: true, state: message.params.data.state })
+    state.resolve({ accepted: true, signedTx: message.params.data.state })
     return { handler: channelOpen }
   }
   if (message.method === 'channels.conflict') {
@@ -226,7 +226,7 @@ export function awaitingShutdownOnChainTx (channel, message, state) {
 
 export function awaitingLeave (channel, message, state) {
   if (message.method === 'channels.leave') {
-    state.resolve({ channelId: message.params.channel_id, state: message.params.data.state })
+    state.resolve({ channelId: message.params.channel_id, signedTx: message.params.data.state })
     return { handler: channelClosed }
   }
   if (message.method === 'channels.error') {
@@ -264,7 +264,7 @@ export function awaitingWithdrawCompletion (channel, message, state) {
   }
   if (message.method === 'channels.update') {
     changeState(channel, message.params.data.state)
-    state.resolve({ accepted: true, state: message.params.data.state })
+    state.resolve({ accepted: true, signedTx: message.params.data.state })
     return { handler: channelOpen }
   }
   if (message.method === 'channels.conflict') {
@@ -302,7 +302,7 @@ export function awaitingDepositCompletion (channel, message, state) {
   }
   if (message.method === 'channels.update') {
     changeState(channel, message.params.data.state)
-    state.resolve({ accepted: true, state: message.params.data.state })
+    state.resolve({ accepted: true, signedTx: message.params.data.state })
     return { handler: channelOpen }
   }
   if (message.method === 'channels.conflict') {
@@ -331,7 +331,7 @@ export function awaitingNewContractCompletion (channel, message, state) {
     state.resolve({
       accepted: true,
       address: encodeContractAddress(owner, round),
-      state: message.params.data.state
+      signedTx: message.params.data.state
     })
     return { handler: channelOpen }
   }
@@ -352,7 +352,7 @@ export async function awaitingCallContractUpdateTx (channel, message, state) {
 export function awaitingCallContractCompletion (channel, message, state) {
   if (message.method === 'channels.update') {
     changeState(channel, message.params.data.state)
-    state.resolve({ accepted: true, state: message.params.data.state })
+    state.resolve({ accepted: true, signedTx: message.params.data.state })
     return { handler: channelOpen }
   }
   if (message.method === 'channels.conflict') {

@@ -139,7 +139,7 @@ describe('Channel', function () {
       sign
     )
     result.accepted.should.equal(true)
-    result.state.should.be.a('string')
+    result.signedTx.should.be.a('string')
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.calledOnce(responderSign)
     sinon.assert.calledWithExactly(responderSign, sinon.match('update_ack'), sinon.match.string)
@@ -238,7 +238,7 @@ describe('Channel', function () {
       sign,
       { onOnChainTx, onOwnWithdrawLocked, onWithdrawLocked }
     )
-    result.should.eql({ accepted: true, state: initiatorCh.state() })
+    result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx })
     sinon.assert.calledOnce(onOnChainTx)
     sinon.assert.calledWithExactly(onOnChainTx, sinon.match.string)
     sinon.assert.calledOnce(onOwnWithdrawLocked)
@@ -299,7 +299,7 @@ describe('Channel', function () {
       sign,
       { onOnChainTx, onOwnDepositLocked, onDepositLocked }
     )
-    result.should.eql({ accepted: true, state: initiatorCh.state() })
+    result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx })
     sinon.assert.calledOnce(onOnChainTx)
     sinon.assert.calledWithExactly(onOnChainTx, sinon.match.string)
     sinon.assert.calledOnce(onOwnDepositLocked)
@@ -378,9 +378,9 @@ describe('Channel', function () {
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
     const result = await initiatorCh.leave()
     result.channelId.should.be.a('string')
-    result.state.should.be.a('string')
+    result.signedTx.should.be.a('string')
     existingChannelId = result.channelId
-    offchainTx = result.state
+    offchainTx = result.signedTx
   })
 
   it('can reestablish a channel', async () => {
@@ -429,7 +429,7 @@ describe('Channel', function () {
       vmVersion: 3,
       abiVersion: 1
     }, async (tx) => await initiator.signTransaction(tx))
-    result.should.eql({ accepted: true, address: result.address, state: initiatorCh.state() })
+    result.should.eql({ accepted: true, address: result.address, signedTx: (await initiatorCh.state()).signedTx })
     contractAddress = result.address
     contractEncodeCall = (method, args) => initiator.contractEncodeCallDataAPI(identityContract, method, args)
   })
@@ -455,8 +455,8 @@ describe('Channel', function () {
       contract: contractAddress,
       abiVersion: 1
     }, async (tx) => await initiator.signTransaction(tx))
-    result.should.eql({ accepted: true, state: initiatorCh.state() })
-    callerNonce = Number(unpackTx(initiatorCh.state()).tx.encodedTx.tx.round)
+    result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx })
+    callerNonce = Number(unpackTx((await initiatorCh.state()).signedTx).tx.encodedTx.tx.round)
   })
 
   it('can call a contract and reject', async () => {
@@ -468,6 +468,28 @@ describe('Channel', function () {
       abiVersion: 1
     }, async (tx) => await initiator.signTransaction(tx))
     result.should.eql({ accepted: false })
+  })
+
+  it('can call a contract using dry-run', async () => {
+    const result = await initiatorCh.callContractStatic({
+      amount: 0,
+      callData: await contractEncodeCall('main', ['42']),
+      contract: contractAddress,
+      abiVersion: 1
+    })
+    result.should.eql({
+      callerId: await initiator.address(),
+      callerNonce: result.callerNonce,
+      contractId: contractAddress,
+      gasPrice: result.gasPrice,
+      gasUsed: result.gasUsed,
+      height: result.height,
+      log: result.log,
+      returnType: 'ok',
+      returnValue: result.returnValue
+    })
+    const value = await initiator.contractDecodeDataAPI('int', result.returnValue)
+    value.should.eql({ type: 'word', value: 42 })
   })
 
   it('can get contract call', async () => {
@@ -490,7 +512,6 @@ describe('Channel', function () {
     const value = await initiator.contractDecodeDataAPI('int', result.returnValue)
     value.should.eql({ type: 'word', value: 42 })
   })
-
   it('can solo close a channel', async () => {
     const initiatorAddr = await initiator.address()
     const responderAddr = await responder.address()
@@ -678,6 +699,23 @@ describe('Channel', function () {
     })
     const value = await initiator.contractDecodeDataAPI('int', result.returnValue)
     value.should.eql({ type: 'word', value: 42 })
+  })
+  
+  it('can get contract state', async () => {
+    const result = await initiatorCh.getContractState(contractAddress)
+    result.should.eql({
+      contract: {
+        abiVersion: 1,
+        active: true,
+        deposit: 1000,
+        id: contractAddress,
+        ownerId: await initiator.address(),
+        referrerIds: [],
+        vmVersion: 3,
+      },
+      contractState: result.contractState
+    })
+    // TODO: contractState deserialization
   })
 
   describe('throws errors', function () {
