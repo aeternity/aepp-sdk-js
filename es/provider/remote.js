@@ -25,6 +25,7 @@
 
 import stampit from '@stamp/it'
 import { decryptMsg, encryptMsg, IDENTITY_METHODS, SDK_METHODS } from './helper'
+import * as R from 'ramda'
 
 const providers = {}
 const sdkID = Math.random().toString(36).substring(7)
@@ -46,6 +47,10 @@ const SEND_HANDLERS = {
     if (providers[providerId].status !== 'WAIT_FOR_REGISTER') return
     post(this.self)(SDK_METHODS.registerProvider, [providerId, sdkID], false)
     providers[providerId] = { status: 'REGISTERED_WAIT_FOR_ACCOUNT' }
+  },
+  [SDK_METHODS.broadcastResponse]: function (res) {
+    if (res instanceof Error) return post(this.self)(SDK_METHODS.broadcastResponse, res)
+    return post(this.self)(SDK_METHODS.broadcastResponse, res)
   }
 }
 
@@ -143,6 +148,18 @@ async function address () {
     : Promise.reject(new Error('Invalid address or address not defined'))
 }
 
+async function send (tx, options = {}) {
+  const opt = R.merge(this.Ae.defaults, options)
+  const signed = await this.signTransaction(tx)
+  try {
+    const response = await this.sendTransaction(signed, opt)
+    this.postMessage(SDK_METHODS, [tx, response])
+    return response
+  } catch (e) {
+    throw e
+  }
+}
+
 /**
  * Send `ready` message that notify that sdk is initialized
  * @rtype () => void
@@ -201,7 +218,8 @@ const RemoteAccount = stampit({
     getActiveProvider,
     ready,
     sign,
-    address
+    address,
+    send
   }
 })
 

@@ -177,6 +177,7 @@ function getFunctionACI (aci, name) {
  * @param {String} source Contract source code
  * @param {Object} [options] Options object
  * @param {Object} [options.aci] Contract ACI
+ * @param {Object} [options.contractAddress] Contract ACI
  * @return {ContractInstance} JS Contract API
  *
  */

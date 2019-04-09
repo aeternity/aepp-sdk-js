@@ -8,7 +8,8 @@ export const SDK_METHODS = {
   sign: 'ae:sign',
   ready: 'ae:sdkReady',
   registerProvider: 'ae:registrationComplete',
-  deregisterProvider: 'ae:deregister'
+  deregisterProvider: 'ae:deregister',
+  broadcastResponse: 'ae:broadcastResponse'
 }
 
 export const decryptMsg = ({ params }) => {
