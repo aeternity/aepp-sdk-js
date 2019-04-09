@@ -52,7 +52,6 @@ const processResponse = async (res) => {
 
 const Http = stampit({
   init ({ baseUrl }) {
-    if (!baseUrl) console.warn('You need to provider base url.')
     this.baseUrl = baseUrl
   },
   methods: {

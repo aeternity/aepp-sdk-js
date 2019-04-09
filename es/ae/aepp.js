@@ -24,7 +24,7 @@
 
 import Ae from './'
 import Aens from './aens'
-import Contract from './contract'
+import { Contract } from './contract'
 import Rpc from '../rpc/client'
 
 /**
