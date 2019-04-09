@@ -48,9 +48,10 @@ const SEND_HANDLERS = {
     post(this.self)(SDK_METHODS.registerProvider, [providerId, sdkID], false)
     providers[providerId] = { status: 'REGISTERED_WAIT_FOR_ACCOUNT' }
   },
-  [SDK_METHODS.broadcastResponse]: function (res) {
-    if (res instanceof Error) return post(this.self)(SDK_METHODS.broadcastResponse, res)
-    return post(this.self)(SDK_METHODS.broadcastResponse, res)
+  [SDK_METHODS.broadcastResponse]: function ([tx, res]) {
+    const params = [sdkID, tx, { status: res instanceof Error ? 'FAIL' : 'OK', data: res }]
+
+    post(this.self)(SDK_METHODS.broadcastResponse, params)
   }
 }
 
@@ -101,7 +102,6 @@ const post = (self) => (method, params, encrypted = true) => self.postMessage({
   jsonrpc: '2.0',
   id: 1,
   method,
-  sdkId: sdkID,
   params: encrypted ? encryptMsg({ params }) : params
 }, '*')
 
@@ -153,9 +153,10 @@ async function send (tx, options = {}) {
   const signed = await this.signTransaction(tx)
   try {
     const response = await this.sendTransaction(signed, opt)
-    this.postMessage(SDK_METHODS, [tx, response])
+    this.postMessage(SDK_METHODS.broadcastResponse, [tx, response])
     return response
   } catch (e) {
+    this.postMessage(SDK_METHODS.broadcastResponse, [tx, e])
     throw e
   }
 }

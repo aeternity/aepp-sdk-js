@@ -38,12 +38,12 @@ const RECEIVE_HANDLERS = {
     const [sdkId, unsignedTx, tx] = message
     const unpackedTx = unpackTx(tx)
 
-    sdks[sdkId].signCallbacks[tx] = { unsignedTx, meta: { tx, txObject: { type: unpackedTx.txType, ...unpackedTx.tx } } }
+    sdks[sdkId].txCallbacks[tx] = { unsignedTx, meta: { tx, txObject: { type: unpackedTx.txType, ...unpackedTx.tx } } }
 
     if (sdks[sdkId].autoSign) await this.postMessage(IDENTITY_METHODS.broadcast, [sdkId, tx, unsignedTx])
     this.onSign({
       sdkId,
-      ...sdks[sdkId].signCallbacks[tx].meta,
+      ...sdks[sdkId].txCallbacks[tx].meta,
       sign: async () => this.postMessage(IDENTITY_METHODS.broadcast, [sdkId, tx, unsignedTx])
     })
   },
@@ -51,7 +51,7 @@ const RECEIVE_HANDLERS = {
   [SDK_METHODS.registerProvider]: function ({ params: [identityId, sdkId] }) {
     if (!sdks[sdkId]) {
       sdks[sdkId] = {
-        signCallbacks: {},
+        txCallbacks: {},
         sdkId,
         autoSign: false,
         status: 'WAIT_FOR_ACCOUNT_DETAILS',
@@ -66,6 +66,15 @@ const RECEIVE_HANDLERS = {
     const [_, sdkId] = message
 
     delete sdks[sdkId]
+  },
+  [SDK_METHODS.broadcastResponse]: function (msg) {
+    const message = decryptMsg(msg)
+    const [sdkId, tx, result] = message
+
+    if (sdks[sdkId] && sdks[sdkId].txCallbacks[tx]) {
+      sdks[sdkId].txCallbacks[tx].result = result
+      sdks[sdkId].txCallbacks[tx].status = 'BROADCASTED'
+    }
   }
 }
 
@@ -83,7 +92,7 @@ const SEND_HANDLERS = {
 
     post(this.postFunction)(IDENTITY_METHODS.broadcast, data)
     // mark as signed
-    sdks[sdkId].signCallbacks[tx].status = 'SIGNED'
+    sdks[sdkId].txCallbacks[tx].status = 'SIGNED'
   }
 }
 
