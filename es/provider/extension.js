@@ -75,6 +75,8 @@ const RECEIVE_HANDLERS = {
       sdks[sdkId].txCallbacks[tx].result = result
       sdks[sdkId].txCallbacks[tx].status = 'BROADCASTED'
     }
+
+    this.onBroadcast(sdks[sdkId])
   }
 }
 
@@ -167,6 +169,10 @@ function onSign ({ sdkId, meta, sign: signFn }) {
   return signFn() // SIGN TRANSACTION
 }
 
+function onBroadcast (sdk) {
+  console.log(sdk)
+}
+
 // Getter / Setter
 function setAutoSign (sdkId, value) {
   if (!sdks[sdkId]) throw new Error('Sdk with id ' + sdkId + ' not found!')
@@ -188,11 +194,12 @@ function getSdks () {
  * @example RemoteAccount({ self = window }).then(async account => console.log(await account.address())
  */
 const ExtensionProvider = AsyncInit.compose({
-  async init ({ postFunction = window.postMessage, accounts = [], onSdkRegister = this.onSdkRegister, onSign = this.onSign }) {
+  async init ({ postFunction = window.postMessage, accounts = [], onSdkRegister = this.onSdkRegister, onSign = this.onSign, onBroadcast = this.onBroadcast }) {
     // INIT PARAMS
     this.postFunction = postFunction
     this.onSdkRegister = onSdkRegister
     this.onSign = onSign
+    this.onBroadcast = onBroadcast
     // PREPARE ACCOUNTS
     this.accounts =
       (await Promise.all(accounts.map(async acc => [await acc.address(), acc])))
@@ -212,6 +219,7 @@ const ExtensionProvider = AsyncInit.compose({
     processMessage,
     selectAccount,
     onSdkRegister,
+    onBroadcast,
     onSign,
     sign,
     address,
