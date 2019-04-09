@@ -368,6 +368,28 @@ describe('Channel', function () {
     result.should.eql({ accepted: false })
   })
 
+  it('can call a contract using dry-run', async () => {
+    const result = await initiatorCh.callContractStatic({
+      amount: 0,
+      callData: await contractEncodeCall('main', ['42']),
+      contract: contractAddress,
+      abiVersion: 1
+    })
+    result.should.eql({
+      callerId: await initiator.address(),
+      callerNonce: result.callerNonce,
+      contractId: contractAddress,
+      gasPrice: result.gasPrice,
+      gasUsed: result.gasUsed,
+      height: result.height,
+      log: result.log,
+      returnType: 'ok',
+      returnValue: result.returnValue
+    })
+    const value = await initiator.contractDecodeDataAPI('int', result.returnValue)
+    value.should.eql({ type: 'word', value: 42 })
+  })
+
   it('can get contract call', async () => {
     const result = await initiatorCh.getContractCall({
       caller: await initiator.address(),
@@ -387,6 +409,23 @@ describe('Channel', function () {
     })
     const value = await initiator.contractDecodeDataAPI('int', result.returnValue)
     value.should.eql({ type: 'word', value: 42 })
+  })
+
+  it('can get contract state', async () => {
+    const result = await initiatorCh.getContractState(contractAddress)
+    result.should.eql({
+      contract: {
+        abiVersion: 1,
+        active: true,
+        deposit: 1000,
+        id: contractAddress,
+        ownerId: await initiator.address(),
+        referrerIds: [],
+        vmVersion: 3,
+      },
+      contractState: result.contractState
+    })
+    // TODO: contractState deserialization
   })
 
   describe('throws errors', function () {
