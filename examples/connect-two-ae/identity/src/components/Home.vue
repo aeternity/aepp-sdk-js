@@ -54,8 +54,9 @@ export default {
       wallet: null,
       balance: null,
       height: null,
-      url: 'https://sdk-mainnet.aepps.com',
-      internalUrl: 'https://sdk-mainnet.aepps.com',
+      url: 'http://localhost:3013',
+      internalUrl: 'http://localhost:3113',
+      compilerUrl: 'https://compiler.aepps.com',
       aeppUrl: '//0.0.0.0:9001'
     }
   },
@@ -73,6 +74,7 @@ export default {
     Wallet({
       url: this.url,
       internalUrl: this.internalUrl,
+      compilerUrl: this.compilerUrl,
       accounts: [MemoryAccount({keypair: {secretKey: this.priv, publicKey: this.pub}})],
       address: this.pub,
       onTx: this.confirmDialog,
