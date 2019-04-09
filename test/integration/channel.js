@@ -119,7 +119,7 @@ describe('Channel', function () {
       async (tx) => await initiator.signTransaction(tx)
     )
     result.accepted.should.equal(true)
-    result.state.should.be.a('string')
+    result.signedTx.should.be.a('string')
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.calledOnce(responderSign)
     sinon.assert.calledWithExactly(responderSign, sinon.match('update_ack'), sinon.match.string)
@@ -188,7 +188,7 @@ describe('Channel', function () {
       async (tx) => initiator.signTransaction(tx),
       { onOnChainTx, onOwnWithdrawLocked, onWithdrawLocked }
     )
-    result.should.eql({ accepted: true, state: initiatorCh.state() })
+    result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx })
     sinon.assert.calledOnce(onOnChainTx)
     sinon.assert.calledWithExactly(onOnChainTx, sinon.match.string)
     sinon.assert.calledOnce(onOwnWithdrawLocked)
@@ -227,7 +227,7 @@ describe('Channel', function () {
       async (tx) => initiator.signTransaction(tx),
       { onOnChainTx, onOwnDepositLocked, onDepositLocked }
     )
-    result.should.eql({ accepted: true, state: initiatorCh.state() })
+    result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx })
     sinon.assert.calledOnce(onOnChainTx)
     sinon.assert.calledWithExactly(onOnChainTx, sinon.match.string)
     sinon.assert.calledOnce(onOwnDepositLocked)
@@ -278,9 +278,9 @@ describe('Channel', function () {
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
     const result = await initiatorCh.leave()
     result.channelId.should.be.a('string')
-    result.state.should.be.a('string')
+    result.signedTx.should.be.a('string')
     existingChannelId = result.channelId
-    offchainTx = result.state
+    offchainTx = result.signedTx
   })
 
   it('can reestablish a channel', async () => {
@@ -327,7 +327,7 @@ describe('Channel', function () {
       vmVersion: 3,
       abiVersion: 1
     }, async (tx) => await initiator.signTransaction(tx))
-    result.should.eql({ accepted: true, address: result.address, state: initiatorCh.state() })
+    result.should.eql({ accepted: true, address: result.address, signedTx: (await initiatorCh.state()).signedTx })
     contractAddress = result.address
     contractEncodeCall = (method, args) => initiator.contractEncodeCallDataAPI(identityContract, method, args)
   })
@@ -353,8 +353,8 @@ describe('Channel', function () {
       contract: contractAddress,
       abiVersion: 1
     }, async (tx) => await initiator.signTransaction(tx))
-    result.should.eql({ accepted: true, state: initiatorCh.state() })
-    callerNonce = Number(unpackTx(initiatorCh.state()).tx.encodedTx.tx.round)
+    result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx })
+    callerNonce = Number(unpackTx((await initiatorCh.state()).signedTx).tx.encodedTx.tx.round)
   })
 
   it('can call a contract and reject', async () => {
