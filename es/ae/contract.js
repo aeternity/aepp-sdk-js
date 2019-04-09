@@ -63,7 +63,7 @@ async function handleCallError (result) {
  * @param {Array} args Argument's for call
  * @return {Promise<String>}
  */
-async function encodeCall (source, name, args) {
+async function contractEncodeCall (source, name, args) {
   return this.contractEncodeCallDataAPI(source, name, args)
 }
 
@@ -76,9 +76,8 @@ async function encodeCall (source, name, args) {
  * @param {String} data call result data (cb_iwer89fjsdf2j93fjews_(ssdffsdfsdf...)
  * @return {Promise<String>} Result object
  */
-async function decode (type, data) {
-  const result = await this.contractDecodeDataAPI(type, data)
-  return result
+async function contractDecodeData (type, data) {
+  return this.contractDecodeDataAPI(type, data)
 }
 
 /**
@@ -95,7 +94,7 @@ async function decode (type, data) {
  * @param {String} options [options.options]  Transaction options (fee, ttl, gas, amount, deposit)
  * @return {Promise<Object>} Result object
  */
-async function callStatic (source, address, name, args = [], { top, options = {} } = {}) {
+async function contractCallStatic (source, address, name, args = [], { top, options = {} } = {}) {
   const opt = R.merge(this.Ae.defaults, options)
 
   // Prepare `call` transaction
@@ -140,7 +139,7 @@ async function callStatic (source, address, name, args = [], { top, options = {}
  * @param {Object} options Transaction options (fee, ttl, gas, amount, deposit)
  * @return {Promise<Object>} Result object
  */
-async function call (source, address, name, args = [], options = {}) {
+async function contractCall (source, address, name, args = [], options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
 
   const tx = await this.contractCallTx(R.merge(opt, {
@@ -175,7 +174,7 @@ async function call (source, address, name, args = [], options = {}) {
  * @param {Object} options Transaction options (fee, ttl, gas, amount, deposit)
  * @return {Promise<Object>} Result object
  */
-async function deploy (code, source, initState = [], options = {}) {
+async function contractDeploy (code, source, initState = [], options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   const callData = await this.contractEncodeCall(source, 'init', initState)
   const ownerId = await this.address()
@@ -210,7 +209,7 @@ async function deploy (code, source, initState = [], options = {}) {
  * @param {Object} options Transaction options (fee, ttl, gas, amount, deposit)
  * @return {Promise<Object>} Result object
  */
-async function compile (source, options = {}) {
+async function contractCompile (source, options = {}) {
   const bytecode = await this.compileContractAPI(source, options)
   return Object.freeze(Object.assign({
     encodeCall: async (name, args) => this.contractEncodeCall(source, name, args),
@@ -231,12 +230,12 @@ async function compile (source, options = {}) {
  */
 const Contract = Ae.compose(ContractACI, ContractCompilerAPI, {
   methods: {
-    contractCompile: compile,
-    contractCallStatic: callStatic,
-    contractDeploy: deploy,
-    contractCall: call,
-    contractEncodeCall: encodeCall,
-    contractDecodeData: decode,
+    contractCompile,
+    contractCallStatic,
+    contractDeploy,
+    contractCall,
+    contractEncodeCall,
+    contractDecodeData,
     handleCallError
   },
   deepProps: {
