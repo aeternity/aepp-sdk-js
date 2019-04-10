@@ -17,7 +17,7 @@ import { Contract } from '@aeternity/aepp-sdk' (Using bundle)
 ```
 
 * [@aeternity/aepp-sdk/es/ae/contract](#module_@aeternity/aepp-sdk/es/ae/contract)
-    * [Contract([options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--Contract) ⇒ `Object` ⏏
+    * [exports.Contract([options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--exports.Contract) ⇒ `Object` ⏏
     * _async_
         * [handleCallError(result)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--handleCallError) ⇒ `Promise.&lt;void&gt;` ⏏
         * [contractEncodeCall(source, name, args)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractEncodeCall) ⇒ `Promise.&lt;String&gt;` ⏏
@@ -27,9 +27,9 @@ import { Contract } from '@aeternity/aepp-sdk' (Using bundle)
         * [contractDeploy(code, source, initState, options)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractDeploy) ⇒ `Promise.&lt;Object&gt;` ⏏
         * [contractCompile(source, options)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCompile) ⇒ `Promise.&lt;Object&gt;` ⏏
 
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--Contract"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--exports.Contract"></a>
 
-### Contract([options]) ⇒ `Object` ⏏
+### exports.Contract([options]) ⇒ `Object` ⏏
 Contract Stamp
 
 Provide contract implementation
@@ -43,6 +43,25 @@ Provide contract implementation
 | --- | --- | --- | --- |
 | [options] | `Object` | <code>{}</code> | Initializer object |
 
+**Example**  
+```js
+import Transaction from '@aeternity/aepp-sdk/es/tx/tx
+import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory
+import ChainNode from '@aeternity/aepp-sdk/es/chain/node
+import ContractCompilerAPI from '@aeternity/aepp-sdk/es/contract/compiler
+// or using bundle
+import {
+  Transaction,
+  MemoryAccount,
+  ChainNode,
+  ContractCompilerAPI
+} from '@aeternity/aepp-sdk
+
+const ContractWithAE = await Contract
+   .compose(Transaction, MemoryAccount, ChainNode) // AE implementation
+   .compose(ContractCompilerAPI) // ContractBase implementation
+const client = await ContractWithAe({ url, internalUrl, compilerUrl, keypair, ... })
+```
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--handleCallError"></a>
 
 ### handleCallError(result) ⇒ `Promise.&lt;void&gt;` ⏏
@@ -87,6 +106,10 @@ Decode contract call result data
 | type | `String` | Data type (int, string, list,...) |
 | data | `String` | call result data (cb_iwer89fjsdf2j93fjews_(ssdffsdfsdf...) |
 
+**Example**  
+```js
+const decodedData = await client.contractDecodeData('string' ,'cb_sf;ls43fsdfsdf...')
+```
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCallStatic"></a>
 
 ### contractCallStatic(source, address, name, args, options, top, options) ⇒ `Promise.&lt;Object&gt;` ⏏
@@ -106,6 +129,14 @@ Static contract call(using dry-run)
 | top | `String` | [options.top] Block hash on which you want to call contract |
 | options | `String` | [options.options]  Transaction options (fee, ttl, gas, amount, deposit) |
 
+**Example**  
+```js
+const callResult = await client.contractCallStatic(source, address, fnName, args = [], { top, options = {} })
+{
+  result: TX_DATA,
+  decode: (type) => Decode call result
+}
+```
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCall"></a>
 
 ### contractCall(source, address, name, args, options) ⇒ `Promise.&lt;Object&gt;` ⏏
@@ -123,6 +154,15 @@ Call contract function
 | args | `Array` | Argument's for call function |
 | options | `Object` | Transaction options (fee, ttl, gas, amount, deposit) |
 
+**Example**  
+```js
+const callResult = await client.contractCall(source, address, fnName, args = [], options)
+{
+  hash: TX_HASH,
+  result: TX_DATA,
+  decode: (type) => Decode call result
+}
+```
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--contractDeploy"></a>
 
 ### contractDeploy(code, source, initState, options) ⇒ `Promise.&lt;Object&gt;` ⏏
@@ -139,6 +179,19 @@ Deploy contract to the node
 | initState | `Array` | Arguments of contract constructor(init) function |
 | options | `Object` | Transaction options (fee, ttl, gas, amount, deposit) |
 
+**Example**  
+```js
+const deployed = await client.contractDeploy(bytecode, source, init = [], options)
+{
+  owner: OWNER_PUB_KEY,
+  transaction: TX_HASH,
+  address: CONTRACT_ADDRESS,
+  createdAt: Date,
+  result: DEPLOY_TX_DATA,
+  call: (fnName, args = [], options) => Call contract function,
+  callStatic: (fnName, args = [], options) => Static all contract function
+}
+```
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCompile"></a>
 
 ### contractCompile(source, options) ⇒ `Promise.&lt;Object&gt;` ⏏
@@ -153,3 +206,12 @@ Compile contract source code
 | source | `String` | Contract sourece code |
 | options | `Object` | Transaction options (fee, ttl, gas, amount, deposit) |
 
+**Example**  
+```js
+const compiled = await client.contractCompile(SOURCE_CODE)
+{
+  bytecode: CONTRACT_BYTE_CODE,
+  deploy: (init = [], options = {}) => Deploy Contract,
+  encodeCall: (fnName, args = []) => Prepare callData
+}
+```

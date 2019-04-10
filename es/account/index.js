@@ -73,7 +73,7 @@ const Account = stampit({
   methods: { signTransaction },
   deepConf: {
     Ae: {
-      methods: ['sign', 'address', 'signTransaction', 'getNetworkId']
+      methods: ['sign', 'address', 'signTransaction']
     }
   }
 }, required({ methods: {

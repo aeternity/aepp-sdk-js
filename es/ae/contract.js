@@ -76,6 +76,8 @@ async function contractEncodeCall (source, name, args) {
  * @param {String} type Data type (int, string, list,...)
  * @param {String} data call result data (cb_iwer89fjsdf2j93fjews_(ssdffsdfsdf...)
  * @return {Promise<String>} Result object
+ * @example
+ * const decodedData = await client.contractDecodeData('string' ,'cb_sf;ls43fsdfsdf...')
  */
 async function contractDecodeData (type, data) {
   return this.contractDecodeDataAPI(type, data)
@@ -94,6 +96,12 @@ async function contractDecodeData (type, data) {
  * @param {String} top [options.top] Block hash on which you want to call contract
  * @param {String} options [options.options]  Transaction options (fee, ttl, gas, amount, deposit)
  * @return {Promise<Object>} Result object
+ * @example
+ * const callResult = await client.contractCallStatic(source, address, fnName, args = [], { top, options = {} })
+ * {
+ *   result: TX_DATA,
+ *   decode: (type) => Decode call result
+ * }
  */
 async function contractCallStatic (source, address, name, args = [], { top, options = {} } = {}) {
   const opt = R.merge(this.Ae.defaults, options)
@@ -139,6 +147,13 @@ async function contractCallStatic (source, address, name, args = [], { top, opti
  * @param {Array} args Argument's for call function
  * @param {Object} options Transaction options (fee, ttl, gas, amount, deposit)
  * @return {Promise<Object>} Result object
+ * @example
+ * const callResult = await client.contractCall(source, address, fnName, args = [], options)
+ * {
+ *   hash: TX_HASH,
+ *   result: TX_DATA,
+ *   decode: (type) => Decode call result
+ * }
  */
 async function contractCall (source, address, name, args = [], options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
@@ -174,6 +189,17 @@ async function contractCall (source, address, name, args = [], options = {}) {
  * @param {Array} initState Arguments of contract constructor(init) function
  * @param {Object} options Transaction options (fee, ttl, gas, amount, deposit)
  * @return {Promise<Object>} Result object
+ * @example
+ * const deployed = await client.contractDeploy(bytecode, source, init = [], options)
+ * {
+ *   owner: OWNER_PUB_KEY,
+ *   transaction: TX_HASH,
+ *   address: CONTRACT_ADDRESS,
+ *   createdAt: Date,
+ *   result: DEPLOY_TX_DATA,
+ *   call: (fnName, args = [], options) => Call contract function,
+ *   callStatic: (fnName, args = [], options) => Static all contract function
+ * }
  */
 async function contractDeploy (code, source, initState = [], options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
@@ -209,6 +235,13 @@ async function contractDeploy (code, source, initState = [], options = {}) {
  * @param {String} source Contract sourece code
  * @param {Object} options Transaction options (fee, ttl, gas, amount, deposit)
  * @return {Promise<Object>} Result object
+ * @example
+ * const compiled = await client.contractCompile(SOURCE_CODE)
+ * {
+ *   bytecode: CONTRACT_BYTE_CODE,
+ *   deploy: (init = [], options = {}) => Deploy Contract,
+ *   encodeCall: (fnName, args = []) => Prepare callData
+ * }
  */
 async function contractCompile (source, options = {}) {
   const bytecode = await this.compileContractAPI(source, options)
@@ -228,6 +261,24 @@ async function contractCompile (source, options = {}) {
  * @rtype Stamp
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Contract instance
+ * @example
+ * import Transaction from '@aeternity/aepp-sdk/es/tx/tx
+ * import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory
+ * import ChainNode from '@aeternity/aepp-sdk/es/chain/node
+ * import ContractCompilerAPI from '@aeternity/aepp-sdk/es/contract/compiler
+ * // or using bundle
+ * import {
+ *   Transaction,
+ *   MemoryAccount,
+ *   ChainNode,
+ *   ContractCompilerAPI
+ * } from '@aeternity/aepp-sdk
+ *
+ * const ContractWithAE = await Contract
+ *    .compose(Transaction, MemoryAccount, ChainNode) // AE implementation
+ *    .compose(ContractCompilerAPI) // ContractBase implementation
+ * const client = await ContractWithAe({ url, internalUrl, compilerUrl, keypair, ... })
+ *
  */
 export const Contract = Ae.compose(ContractBase, ContractACI, {
   methods: {
