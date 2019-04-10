@@ -144,7 +144,7 @@ code, such as the ones provided in the `bin/` directory of the project.
 ```js
 const {Universal: Ae} = require('@aeternity/aepp-sdk')
 
-Ae({ url: 'https://sdk-testnet.aepps.com', internalUrl: 'https://sdk-testnet.aepps.com' }).then(ae => {
+Ae({ url: 'https://sdk-testnet.aepps.com', internalUrl: 'https://sdk-testnet.aepps.com', compilerUrl: 'COMPILER_URL', keypair: 'YOUR_KEYPAIR_OBJECT' }).then(ae => {
   ae.height().then(height => {
     console.log('Current Block', height)
   })
@@ -152,7 +152,7 @@ Ae({ url: 'https://sdk-testnet.aepps.com', internalUrl: 'https://sdk-testnet.aep
 
 // same with async
 const main = async () => {
-  const client = await Ae({url: 'https://sdk-testnet.aepps.com', internalUrl: 'https://sdk-testnet.aepps.com'})
+  const client = await Ae({url: 'https://sdk-testnet.aepps.com', internalUrl: 'https://sdk-testnet.aepps.com', compilerUrl: 'COMPILER_URL', keypair: 'YOUR_KEYPAIR_OBJECT'})
   const height = await client.height()
   console.log('Current Block', height)
 }
@@ -228,6 +228,7 @@ Example spend function, using aeternity's SDK abstraction
   Wallet({
     url: 'HOST_URL_HERE',
     internalUrl: 'HOST_URL_HERE',
+    compilerUrl: 'COMPILER_URL_HERE',
     accounts: [MemoryAccount({keypair: {secretKey: 'PRIV_KEY_HERE', publicKey: 'PUB_KEY_HERE'}, networkId: 'NETWORK_ID_HERE'})],
     address: 'PUB_KEY_HERE',
     onTx: confirm, // guard returning boolean
