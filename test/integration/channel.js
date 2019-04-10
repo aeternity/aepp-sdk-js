@@ -406,7 +406,7 @@ describe('Channel', function () {
     await initiatorCh.leave()
   })
 
-  it('can create a contract and accept', async () => {
+  it('can solo close a channel', async () => {
     initiatorCh = await Channel({
       ...sharedParams,
       role: 'initiator',
@@ -417,6 +417,124 @@ describe('Channel', function () {
       ...sharedParams,
       role: 'responder',
       port: 3003,
+      sign: responderSign
+    })
+    await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
+
+    const initiatorAddr = await initiator.address()
+    const responderAddr = await responder.address()
+    const { signedTx } = await initiatorCh.update(
+      await initiator.address(),
+      await responder.address(),
+      100,
+      tx => initiator.signTransaction(tx)
+    )
+    const poi = await initiatorCh.poi({
+      accounts: [initiatorAddr, responderAddr],
+    })
+    const balances = await initiatorCh.balances([initiatorAddr, responderAddr])
+    const initiatorBalanceBeforeClose = await initiator.balance(initiatorAddr)
+    const responderBalanceBeforeClose = await responder.balance(responderAddr)
+    const closeSoloTx = await initiator.channelCloseSoloTx({
+      channelId: await initiatorCh.id(),
+      fromId: initiatorAddr,
+      poi,
+      payload: signedTx
+    })
+    const closeSoloTxFee = unpackTx(closeSoloTx).tx.fee
+    await initiator.sendTransaction(await initiator.signTransaction(closeSoloTx), { waitMined: true })
+    const settleTx = await initiator.channelSettleTx({
+      channelId: await initiatorCh.id(),
+      fromId: initiatorAddr,
+      initiatorAmountFinal: balances[initiatorAddr],
+      responderAmountFinal: balances[responderAddr]
+    })
+    const settleTxFee = unpackTx(settleTx).tx.fee
+    await initiator.sendTransaction(await initiator.signTransaction(settleTx), { waitMined: true })
+    const initiatorBalanceAfterClose = await initiator.balance(initiatorAddr)
+    const responderBalanceAfterClose = await responder.balance(responderAddr)
+    new BigNumber(initiatorBalanceAfterClose).minus(initiatorBalanceBeforeClose).plus(closeSoloTxFee).plus(settleTxFee).isEqualTo(
+      new BigNumber(balances[initiatorAddr])
+    ).should.be.equal(true)
+    new BigNumber(responderBalanceAfterClose).minus(responderBalanceBeforeClose).isEqualTo(
+      new BigNumber(balances[responderAddr])
+    ).should.be.equal(true)
+  })
+
+  it('can dispute via slash tx', async () => {
+    const initiatorAddr = await initiator.address()
+    const responderAddr = await responder.address()
+    initiatorCh = await Channel({
+      ...sharedParams,
+      lockPeriod: 5,
+      role: 'initiator',
+      sign: initiatorSign,
+      port: 3004
+    })
+    responderCh = await Channel({
+      ...sharedParams,
+      lockPeriod: 5,
+      role: 'responder',
+      sign: responderSign,
+      port: 3004
+    })
+    await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
+    const initiatorBalanceBeforeClose = await initiator.balance(initiatorAddr)
+    const responderBalanceBeforeClose = await responder.balance(responderAddr)
+    const oldUpdate = await initiatorCh.update(initiatorAddr, responderAddr, 100, (tx) => initiator.signTransaction(tx))
+    const oldPoi = await initiatorCh.poi({
+      accounts: [initiatorAddr, responderAddr]
+    })
+    const recentUpdate = await initiatorCh.update(initiatorAddr, responderAddr, 100, (tx) => initiator.signTransaction(tx))
+    const recentPoi = await responderCh.poi({
+      accounts: [initiatorAddr, responderAddr]
+    })
+    const recentBalances = await responderCh.balances([initiatorAddr, responderAddr])
+    const closeSoloTx = await initiator.channelCloseSoloTx({
+      channelId: initiatorCh.id(),
+      fromId: initiatorAddr,
+      poi: oldPoi,
+      payload: oldUpdate.signedTx
+    })
+    const closeSoloTxFee = unpackTx(closeSoloTx).tx.fee
+    await initiator.sendTransaction(await initiator.signTransaction(closeSoloTx), { waitMined: true })
+    const slashTx = await responder.channelSlashTx({
+      channelId: responderCh.id(),
+      fromId: responderAddr,
+      poi: recentPoi,
+      payload: recentUpdate.signedTx
+    })
+    const slashTxFee = unpackTx(slashTx).tx.fee
+    await responder.sendTransaction(await responder.signTransaction(slashTx), { waitMined: true })
+    const settleTx = await responder.channelSettleTx({
+      channelId: responderCh.id(),
+      fromId: responderAddr,
+      initiatorAmountFinal: recentBalances[initiatorAddr],
+      responderAmountFinal: recentBalances[responderAddr]
+    })
+    const settleTxFee = unpackTx(settleTx).tx.fee
+    await responder.sendTransaction(await responder.signTransaction(settleTx), { waitMined: true })
+    const initiatorBalanceAfterClose = await initiator.balance(initiatorAddr)
+    const responderBalanceAfterClose = await responder.balance(responderAddr)
+    new BigNumber(initiatorBalanceAfterClose).minus(initiatorBalanceBeforeClose).plus(closeSoloTxFee).isEqualTo(
+      new BigNumber(recentBalances[initiatorAddr])
+    ).should.be.equal(true)
+    new BigNumber(responderBalanceAfterClose).minus(responderBalanceBeforeClose).plus(slashTxFee).plus(settleTxFee).isEqualTo(
+      new BigNumber(recentBalances[responderAddr])
+    ).should.be.equal(true)
+  })
+
+  it('can create a contract and accept', async () => {
+    initiatorCh = await Channel({
+      ...sharedParams,
+      role: 'initiator',
+      port: 3005,
+      sign: initiatorSign
+    })
+    responderCh = await Channel({
+      ...sharedParams,
+      role: 'responder',
+      port: 3005,
       sign: responderSign
     })
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
@@ -470,6 +588,27 @@ describe('Channel', function () {
     result.should.eql({ accepted: false })
   })
 
+  it('can get contract call', async () => {
+    const result = await initiatorCh.getContractCall({
+      caller: await initiator.address(),
+      contract: contractAddress,
+      round: callerNonce
+    })
+    result.should.eql({
+      callerId: await initiator.address(),
+      callerNonce,
+      contractId: contractAddress,
+      gasPrice: result.gasPrice,
+      gasUsed: result.gasUsed,
+      height: result.height,
+      log: result.log,
+      returnType: 'ok',
+      returnValue: result.returnValue
+    })
+    const value = await initiator.contractDecodeDataAPI('int', result.returnValue)
+    value.should.eql({ type: 'word', value: 42 })
+  })
+
   it('can call a contract using dry-run', async () => {
     const result = await initiatorCh.callContractStatic({
       amount: 0,
@@ -480,215 +619,6 @@ describe('Channel', function () {
     result.should.eql({
       callerId: await initiator.address(),
       callerNonce: result.callerNonce,
-      contractId: contractAddress,
-      gasPrice: result.gasPrice,
-      gasUsed: result.gasUsed,
-      height: result.height,
-      log: result.log,
-      returnType: 'ok',
-      returnValue: result.returnValue
-    })
-    const value = await initiator.contractDecodeDataAPI('int', result.returnValue)
-    value.should.eql({ type: 'word', value: 42 })
-  })
-
-  it('can get contract call', async () => {
-    const result = await initiatorCh.getContractCall({
-      caller: await initiator.address(),
-      contract: contractAddress,
-      round: callerNonce
-    })
-    result.should.eql({
-      callerId: await initiator.address(),
-      callerNonce,
-      contractId: contractAddress,
-      gasPrice: result.gasPrice,
-      gasUsed: result.gasUsed,
-      height: result.height,
-      log: result.log,
-      returnType: 'ok',
-      returnValue: result.returnValue
-    })
-    const value = await initiator.contractDecodeDataAPI('int', result.returnValue)
-    value.should.eql({ type: 'word', value: 42 })
-  })
-  it('can solo close a channel', async () => {
-    const initiatorAddr = await initiator.address()
-    const responderAddr = await responder.address()
-    const { state } = await initiatorCh.update(
-      await initiator.address(),
-      await responder.address(),
-      100,
-      tx => initiator.signTransaction(tx)
-    )
-    const poi = await initiatorCh.poi({
-      accounts: [initiatorAddr, responderAddr]
-    })
-    const balances = await initiatorCh.balances([initiatorAddr, responderAddr])
-    const initiatorBalanceBeforeClose = await initiator.balance(initiatorAddr)
-    const responderBalanceBeforeClose = await responder.balance(responderAddr)
-    const closeSoloTx = await initiator.channelCloseSoloTx({
-      channelId: await initiatorCh.id(),
-      fromId: initiatorAddr,
-      poi,
-      payload: state
-    })
-    const closeSoloTxFee = unpackTx(closeSoloTx).tx.fee
-    await initiator.sendTransaction(await initiator.signTransaction(closeSoloTx), { waitMined: true })
-    const settleTx = await initiator.channelSettleTx({
-      channelId: await initiatorCh.id(),
-      fromId: initiatorAddr,
-      initiatorAmountFinal: balances[initiatorAddr],
-      responderAmountFinal: balances[responderAddr]
-    })
-    const settleTxFee = unpackTx(settleTx).tx.fee
-    await initiator.sendTransaction(await initiator.signTransaction(settleTx), { waitMined: true })
-    const initiatorBalanceAfterClose = await initiator.balance(initiatorAddr)
-    const responderBalanceAfterClose = await responder.balance(responderAddr)
-    new BigNumber(initiatorBalanceAfterClose).minus(initiatorBalanceBeforeClose).plus(closeSoloTxFee).plus(settleTxFee).isEqualTo(
-      new BigNumber(balances[initiatorAddr])
-    ).should.be.equal(true)
-    new BigNumber(responderBalanceAfterClose).minus(responderBalanceBeforeClose).isEqualTo(
-      new BigNumber(balances[responderAddr])
-    ).should.be.equal(true)
-  })
-
-  it('can dispute via slash tx', async () => {
-    const initiatorAddr = await initiator.address()
-    const responderAddr = await responder.address()
-    initiatorCh = await Channel({
-      ...sharedParams,
-      lockPeriod: 5,
-      role: 'initiator',
-      sign: initiatorSign,
-      port: 3003
-    })
-    responderCh = await Channel({
-      ...sharedParams,
-      lockPeriod: 5,
-      role: 'responder',
-      sign: responderSign,
-      port: 3003
-    })
-    await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
-    const initiatorBalanceBeforeClose = await initiator.balance(initiatorAddr)
-    const responderBalanceBeforeClose = await responder.balance(responderAddr)
-    const oldUpdate = await initiatorCh.update(initiatorAddr, responderAddr, 100, (tx) => initiator.signTransaction(tx))
-    const oldPoi = await initiatorCh.poi({
-      accounts: [initiatorAddr, responderAddr]
-    })
-    const recentUpdate = await initiatorCh.update(initiatorAddr, responderAddr, 100, (tx) => initiator.signTransaction(tx))
-    const recentPoi = await responderCh.poi({
-      accounts: [initiatorAddr, responderAddr]
-    })
-    const recentBalances = await responderCh.balances([initiatorAddr, responderAddr])
-    const closeSoloTx = await initiator.channelCloseSoloTx({
-      channelId: initiatorCh.id(),
-      fromId: initiatorAddr,
-      poi: oldPoi,
-      payload: oldUpdate.state
-    })
-    const closeSoloTxFee = unpackTx(closeSoloTx).tx.fee
-    await initiator.sendTransaction(await initiator.signTransaction(closeSoloTx), { waitMined: true })
-    const slashTx = await responder.channelSlashTx({
-      channelId: responderCh.id(),
-      fromId: responderAddr,
-      poi: recentPoi,
-      payload: recentUpdate.state
-    })
-    const slashTxFee = unpackTx(slashTx).tx.fee
-    await responder.sendTransaction(await responder.signTransaction(slashTx), { waitMined: true })
-    const settleTx = await responder.channelSettleTx({
-      channelId: responderCh.id(),
-      fromId: responderAddr,
-      initiatorAmountFinal: recentBalances[initiatorAddr],
-      responderAmountFinal: recentBalances[responderAddr]
-    })
-    const settleTxFee = unpackTx(settleTx).tx.fee
-    await responder.sendTransaction(await responder.signTransaction(settleTx), { waitMined: true })
-    const initiatorBalanceAfterClose = await initiator.balance(initiatorAddr)
-    const responderBalanceAfterClose = await responder.balance(responderAddr)
-    new BigNumber(initiatorBalanceAfterClose).minus(initiatorBalanceBeforeClose).plus(closeSoloTxFee).isEqualTo(
-      new BigNumber(recentBalances[initiatorAddr])
-    ).should.be.equal(true)
-    new BigNumber(responderBalanceAfterClose).minus(responderBalanceBeforeClose).plus(slashTxFee).plus(settleTxFee).isEqualTo(
-      new BigNumber(recentBalances[responderAddr])
-    ).should.be.equal(true)
-  })
-
-  it('can create a contract and accept', async () => {
-    initiatorCh = await Channel({
-      ...sharedParams,
-      role: 'initiator',
-      port: 3004,
-      sign: initiatorSign
-    })
-    responderCh = await Channel({
-      ...sharedParams,
-      role: 'responder',
-      port: 3004,
-      sign: responderSign
-    })
-    await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
-    const code = await initiator.compileContractAPI(identityContract)
-    const callData = await initiator.contractEncodeCallDataAPI(identityContract, 'init', [])
-    const result = await initiatorCh.createContract({
-      code,
-      callData,
-      deposit: 1000,
-      vmVersion: 3,
-      abiVersion: 1
-    }, async (tx) => await initiator.signTransaction(tx))
-    result.should.eql({ accepted: true, address: result.address, state: initiatorCh.state() })
-    contractAddress = result.address
-    contractEncodeCall = (method, args) => initiator.contractEncodeCallDataAPI(identityContract, method, args)
-  })
-
-  it('can create a contract and reject', async () => {
-    responderShouldRejectUpdate = true
-    const code = await initiator.compileContractAPI(identityContract)
-    const callData = await initiator.contractEncodeCallDataAPI(identityContract, 'init', [])
-    const result = await initiatorCh.createContract({
-      code,
-      callData,
-      deposit: 1000,
-      vmVersion: 3,
-      abiVersion: 1
-    }, async (tx) => await initiator.signTransaction(tx))
-    result.should.eql({ accepted: false })
-  })
-
-  it('can call a contract and accept', async () => {
-    const result = await initiatorCh.callContract({
-      amount: 0,
-      callData: await contractEncodeCall('main', ['42']),
-      contract: contractAddress,
-      abiVersion: 1
-    }, async (tx) => await initiator.signTransaction(tx))
-    result.should.eql({ accepted: true, state: initiatorCh.state() })
-    callerNonce = Number(unpackTx(initiatorCh.state()).tx.encodedTx.tx.round)
-  })
-
-  it('can call a contract and reject', async () => {
-    responderShouldRejectUpdate = true
-    const result = await initiatorCh.callContract({
-      amount: 0,
-      callData: await contractEncodeCall('main', ['42']),
-      contract: contractAddress,
-      abiVersion: 1
-    }, async (tx) => await initiator.signTransaction(tx))
-    result.should.eql({ accepted: false })
-  })
-
-  it('can get contract call', async () => {
-    const result = await initiatorCh.getContractCall({
-      caller: await initiator.address(),
-      contract: contractAddress,
-      round: callerNonce
-    })
-    result.should.eql({
-      callerId: await initiator.address(),
-      callerNonce,
       contractId: contractAddress,
       gasPrice: result.gasPrice,
       gasUsed: result.gasUsed,
@@ -723,13 +653,13 @@ describe('Channel', function () {
       initiatorCh = await Channel({
         ...sharedParams,
         role: 'initiator',
-        port: 3005,
+        port: 3006,
         sign: initiatorSign
       })
       responderCh = await Channel({
         ...sharedParams,
         role: 'responder',
-        port: 3005,
+        port: 3006,
         sign: responderSign
       })
       await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
