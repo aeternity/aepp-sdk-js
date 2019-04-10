@@ -71,6 +71,14 @@ Generate contract ACI object with predefined js methods for contract usage
 | [options] | `Object` | Options object |
 | [options.aci] | `Object` | Contract ACI |
 
+**Example**  
+```js
+const contractIns = await client.getContractInstance(sourceCode)
+await contractIns.compile()
+await contractIns.deploy([321])
+const callResult = await contractIns.call('setState', [123])
+const staticCallResult = await contractIns.call('setState', [123], { callStatic: true })
+```
 <a id="exp_module_@aeternity/aepp-sdk/es/contract/aci--ContractACI"></a>
 
 ### ContractACI() ⇒ `Object` ⏏
