@@ -83,6 +83,11 @@ describe('Channel', function () {
     await initiator.spend('6000000000000000', await responder.address())
   })
 
+  after(() => {
+    initiatorCh.disconnect()
+    responderCh.disconnect()
+  })
+
   beforeEach(() => {
     responderShouldRejectUpdate = false
   })
@@ -301,7 +306,8 @@ describe('Channel', function () {
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.notCalled(responderSign)
-    await initiatorCh.leave()
+    initiatorCh.disconnect()
+    responderCh.disconnect()
   })
 
   it('can create a contract and accept', async () => {

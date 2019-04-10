@@ -21,6 +21,9 @@ import * as R from 'ramda'
 import { pascalToSnake } from '../utils/string'
 import { awaitingConnection } from './handlers'
 
+const PING_TIMEOUT_MS = 10000
+const PONG_TIMEOUT_MS = 5000
+
 const options = new WeakMap()
 const status = new WeakMap()
 const state = new WeakMap()
@@ -33,6 +36,8 @@ const actionQueue = new WeakMap()
 const actionQueueLocked = new WeakMap()
 const sequence = new WeakMap()
 const rpcCallbacks = new WeakMap()
+const pingTimeoutId = new WeakMap()
+const pongTimeoutId = new WeakMap()
 
 function channelURL (url, params, endpoint = 'channel') {
   const paramString = R.join('&', R.values(R.mapObjIndexed((value, key) =>
@@ -147,6 +152,22 @@ function call (channel, method, params) {
   })
 }
 
+function ping (channel) {
+  const ws = websockets.get(channel)
+  if (ws.readyState === ws.OPEN) {
+    ws._connection.ping()
+  }
+}
+
+function disconnect (channel) {
+  const ws = websockets.get(channel)
+  if (ws.readyState === ws.OPEN) {
+    ws._connection.close()
+    clearTimeout(pongTimeoutId.get(channel))
+    clearTimeout(pingTimeoutId.get(channel))
+  }
+}
+
 function WebSocket (url, callbacks) {
   function fireOnce (target, key, always) {
     target[key] = (...args) => {
@@ -178,11 +199,19 @@ async function initialize (channel, channelOptions) {
   eventEmitters.set(channel, new EventEmitter())
   sequence.set(channel, 0)
   rpcCallbacks.set(channel, new Map())
-  websockets.set(channel, await WebSocket(wsUrl, {
+  const ws = await WebSocket(wsUrl, {
     onopen: () => changeStatus(channel, 'connected'),
     onclose: () => changeStatus(channel, 'disconnected'),
     onmessage: ({ data }) => onMessage(channel, data)
-  }))
+  })
+  ws._connection.on('pong', () => {
+    clearTimeout(pongTimeoutId.get(channel))
+    clearTimeout(pingTimeoutId.get(channel))
+    pongTimeoutId.set(channel, setTimeout(() => ws._connection.drop(), PONG_TIMEOUT_MS))
+    pingTimeoutId.set(channel, setTimeout(() => ping(channel), PING_TIMEOUT_MS))
+  })
+  pingTimeoutId.set(channel, setTimeout(() => ping(channel), PING_TIMEOUT_MS))
+  websockets.set(channel, ws)
 }
 
 export {
@@ -196,5 +225,6 @@ export {
   changeState,
   send,
   enqueueAction,
-  call
+  call,
+  disconnect
 }
