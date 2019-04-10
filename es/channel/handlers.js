@@ -22,7 +22,8 @@ import {
   changeState,
   send,
   emit,
-  channelId
+  channelId,
+  disconnect
 } from './internal'
 import { unpackTx } from '../tx/builder'
 
@@ -227,6 +228,7 @@ export function awaitingShutdownOnChainTx (channel, message, state) {
 export function awaitingLeave (channel, message, state) {
   if (message.method === 'channels.leave') {
     state.resolve({ channelId: message.params.channel_id, signedTx: message.params.data.state })
+    disconnect(channel)
     return { handler: channelClosed }
   }
   if (message.method === 'channels.error') {

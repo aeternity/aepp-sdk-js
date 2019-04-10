@@ -32,7 +32,8 @@ import {
   enqueueAction,
   send,
   channelId,
-  call
+  call,
+  disconnect as channelDisconnect
 } from './internal'
 import * as R from 'ramda'
 
@@ -51,6 +52,13 @@ function snakeToPascalObjKeys (obj) {
  */
 function on (event, callback) {
   eventEmitters.get(this).on(event, callback)
+}
+
+/**
+ * Close the connection
+ */
+function disconnect () {
+  return channelDisconnect(this)
 }
 
 /**
@@ -569,7 +577,8 @@ const Channel = AsyncInit.compose({
     callContract,
     callContractStatic,
     getContractCall,
-    getContractState
+    getContractState,
+    disconnect
   }
 })
 
