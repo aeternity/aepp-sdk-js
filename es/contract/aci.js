@@ -206,7 +206,7 @@ async function getContractInstance (source, { aci, contractAddress } = {}) {
   /**
    * Deploy contract
    * @alias module:@aeternity/aepp-sdk/es/contract/aci
-   * @rtype (init: Array, options: Object = { fromJsType: true }) => ContractInstance: Object
+   * @rtype (init: Array, options: Object = { skipArgsConvert: false }) => ContractInstance: Object
    * @param {Array} init Contract init function arguments array
    * @param {Object} [options={}] options Options object
    * @param {Boolean} [options.skipArgsConvert=false] Skip Validation and Transforming arguments before prepare call-data
@@ -216,7 +216,7 @@ async function getContractInstance (source, { aci, contractAddress } = {}) {
   /**
    * Call contract function
    * @alias module:@aeternity/aepp-sdk/es/contract/aci
-   * @rtype (init: Array, options: Object = { fromJsType: true, transformDecoded: true }) => CallResult: Object
+   * @rtype (init: Array, options: Object = { skipArgsConvert: false, skipTransformDecoded: false, callStatic: false }) => CallResult: Object
    * @param {String} fn Function name
    * @param {Array} params Array of function arguments
    * @param {Object} [options={}] Array of function arguments
