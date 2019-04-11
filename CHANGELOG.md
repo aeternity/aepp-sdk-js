@@ -6,7 +6,6 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 ### Added
 - feat(ACI): Add transform decoded data for 'address' type
 - feat(Aepp): Add Compiler to Aepp rpc methods. Update example app
-- Add getContractState method
 - feat(Channel): Add call contract static support
 - feat(Channel): Add get contract state support
 - feat(Channel): Get full channel state support
