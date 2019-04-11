@@ -114,7 +114,7 @@ export default {
   type state = ()
   function main(x : int) = x`,
       byteCode: null,
-      contractInitState: '()',
+      contractInitState: [],
       deployInfo: null
     }
   },
@@ -134,19 +134,19 @@ export default {
     async deploy (code, options = {}) {
       console.log(`Deploying contract...`)
       try {
-        return await this.client.contractDeploy(this.byteCode, this.abi, { initState: this.contractInitState, options })
+        return await this.client.contractDeploy(this.byteCode, this.contractCode, this.contractInitState, options)
       } catch (err) {
         this.deployErr = err
         console.error(err)
       }
     },
-    async call (code, abi, contractAddress, method = 'main', returnType = 'int', args = '(5)', options = {}) {
+    async call (code, abi, contractAddress, method = 'main', returnType = 'int', args = ['5'], options = {}) {
       console.log(`Deploying contract...`)
       try {
-        const { result } = await this.client.contractCall(this.byteCode, this.abi, this.deployInfo.address, method, { args: args, options })
+        const result = await this.client.contractCall(this.contractCode, this.deployInfo.address, method,  args, options)
         return Object.assign(
           result,
-          { decodedRes: await this.client.contractDecodeData(returnType, result.returnValue) }
+          { decodedRes: await result.decode(returnType) }
         )
       } catch (err) {
         this.deployErr = err
@@ -181,12 +181,6 @@ export default {
           this.pub = address
         })
         .catch(e => { this.pub = `Rejected: ${e}` })
-      // // AENS
-      // ae.aensPreclaim(`test${Math.floor(Math.random() * 101)}.test`)
-      //   .then(name => { return name.claim() })
-      //   .then(name => { return name.update('ak_bAxmQLxXv8UnVEKfHpvDwp8qEsrVE3tnezBffLdtVMVKP6GC2') })
-      //   .then(name => { return name.revoke() })
-      //   .catch(e => {debugger})
     })
   }
 }

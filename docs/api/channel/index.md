@@ -21,6 +21,11 @@ import Channel from '@aeternity/aepp-sdk/es/channel/index'
         * [~shutdown(sign)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..shutdown) ⇒ `Promise.&lt;string&gt;`
         * [~withdraw(amount, sign, [callbacks])](#module_@aeternity/aepp-sdk/es/channel/index--Channel..withdraw) ⇒ `Promise.&lt;object&gt;`
         * [~deposit(amount, sign, [callbacks])](#module_@aeternity/aepp-sdk/es/channel/index--Channel..deposit) ⇒ `Promise.&lt;object&gt;`
+        * [~createContract(options, sign)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..createContract) ⇒ `Promise.&lt;object&gt;`
+        * [~callContract(options, sign)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..callContract) ⇒ `Promise.&lt;object&gt;`
+        * [~callContractStatic(options)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..callContractStatic) ⇒ `Promise.&lt;object&gt;`
+        * [~getContractCall(options)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..getContractCall) ⇒ `Promise.&lt;object&gt;`
+        * [~getContractState(contract)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..getContractState) ⇒ `Promise.&lt;object&gt;`
         * [~sendMessage(message, recipient)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..sendMessage)
 
 <a id="exp_module_@aeternity/aepp-sdk/es/channel/index--Channel"></a>
@@ -114,7 +119,7 @@ channel.update(
   'ak$Gi42jcRm9DcZjk72UWQQBSxi43BG3285C9n4QSvP5JdzDyH2o',
   10,
   async (tx) => await account.signTransaction(tx)
-).then({ accepted, state } =>
+).then({ accepted, signedTx } =>
   if (accepted) {
     console.log('Update has been accepted')
   }
@@ -172,7 +177,7 @@ Leave channel
 **Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
 **Example**  
 ```js
-channel.leave().then(({channelId, state}) =>
+channel.leave().then(({ channelId, signedTx }) =>
   console.log(channelId)
   console.log(state)
 )
@@ -216,10 +221,9 @@ channel.withdraw(
   100,
   async (tx) => await account.signTransaction(tx),
   { onOnChainTx: (tx) => console.log('on_chain_tx', tx) }
-).then(({ accepted, state }) => {
+).then(({ accepted, signedTx }) => {
   if (accepted) {
     console.log('Withdrawal has been accepted')
-    console.log('The new state is:', state)
   } else {
     console.log('Withdrawal has been rejected')
   }
@@ -254,6 +258,141 @@ channel.deposit(
   } else {
     console.log('Deposit has been rejected')
   }
+})
+```
+<a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..createContract"></a>
+
+#### Channel~createContract(options, sign) ⇒ `Promise.&lt;object&gt;`
+Create a contract
+
+**Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| options | `object` |  |
+| [options.code] | `string` | Api encoded compiled AEVM byte code |
+| [options.callData] | `string` | Api encoded compiled AEVM call data for the code |
+| [options.deposit] | `number` | Initial amount the owner of the contract commits to it |
+| [options.vmVersion] | `number` | Version of the AEVM |
+| [options.abiVersion] | `number` | Version of the ABI |
+| sign | `function` | Function which verifies and signs create contract transaction |
+
+**Example**  
+```js
+channel.createContract({
+  code: 'cb_HKtpipK4aCgYb17wZ...',
+  callData: 'cb_1111111111111111...',
+  deposit: 10,
+  vmVersion: 3,
+  abiVersion: 1
+}).then(({ accepted, signedTx, address }) => {
+  if (accepted) {
+    console.log('New contract has been created')
+    console.log('Contract address:', address)
+  } else {
+    console.log('New contract has been rejected')
+  }
+})
+```
+<a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..callContract"></a>
+
+#### Channel~callContract(options, sign) ⇒ `Promise.&lt;object&gt;`
+Call a contract
+
+**Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| options | `object` |  |
+| [options.amount] | `string` | Amount the caller of the contract commits to it |
+| [options.callData] | `string` | ABI encoded compiled AEVM call data for the code |
+| [options.contract] | `number` | Address of the contract to call |
+| [options.abiVersion] | `number` | Version of the ABI |
+| sign | `function` | Function which verifies and signs contract call transaction |
+
+**Example**  
+```js
+channel.callContract({
+  contract: 'ct_9sRA9AVE4BYTAkh5RNfJYmwQe1NZ4MErasQLXZkFWG43TPBqa',
+  callData: 'cb_1111111111111111...',
+  amount: 0,
+  abiVersion: 1
+}).then(({ accepted, signedTx }) => {
+  if (accepted) {
+    console.log('Contract called succesfully')
+  } else {
+    console.log('Contract call has been rejected')
+  }
+})
+```
+<a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..callContractStatic"></a>
+
+#### Channel~callContractStatic(options) ⇒ `Promise.&lt;object&gt;`
+Call contract using dry-run
+
+**Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| options | `object` |  |
+| [options.amount] | `string` | Amount the caller of the contract commits to it |
+| [options.callData] | `string` | ABI encoded compiled AEVM call data for the code |
+| [options.contract] | `number` | Address of the contract to call |
+| [options.abiVersion] | `number` | Version of the ABI |
+
+**Example**  
+```js
+channel.callContractStatic({
+  contract: 'ct_9sRA9AVE4BYTAkh5RNfJYmwQe1NZ4MErasQLXZkFWG43TPBqa',
+  callData: 'cb_1111111111111111...',
+  amount: 0,
+  abiVersion: 1
+}).then(({ returnValue, gasUsed }) => {
+  console.log('Returned value:', returnValue)
+  console.log('Gas used:', gasUsed)
+})
+```
+<a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..getContractCall"></a>
+
+#### Channel~getContractCall(options) ⇒ `Promise.&lt;object&gt;`
+Get contract call result
+
+**Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| options | `object` |  |
+| [options.caller] | `string` | Address of contract caller |
+| [options.contract] | `string` | Address of the contract |
+| [options.round] | `number` | Round when contract was called |
+
+**Example**  
+```js
+channel.getContractCall({
+  caller: 'ak_Y1NRjHuoc3CGMYMvCmdHSBpJsMDR6Ra2t5zjhRcbtMeXXLpLH',
+  contract: 'ct_9sRA9AVE4BYTAkh5RNfJYmwQe1NZ4MErasQLXZkFWG43TPBqa',
+  round: 3
+}).then(({ returnType, returnValue }) => {
+  if (returnType === 'ok') console.log(returnValue)
+})
+```
+<a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..getContractState"></a>
+
+#### Channel~getContractState(contract) ⇒ `Promise.&lt;object&gt;`
+Get contract latest state
+
+**Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| contract | `string` | Address of the contract |
+
+**Example**  
+```js
+channel.getContractState(
+  'ct_9sRA9AVE4BYTAkh5RNfJYmwQe1NZ4MErasQLXZkFWG43TPBqa',
+).then(({ contract }) => {
+  console.log('deposit:', contract.deposit)
 })
 ```
 <a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..sendMessage"></a>

@@ -25,6 +25,8 @@ import * as Crypto from '@aeternity/aepp-sdk/es/utils/crypto'
         * [.encodeBase58Check(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.encodeBase58Check) ⇒ `Buffer`
         * [.decodeBase58Check(str)](#module_@aeternity/aepp-sdk/es/utils/crypto.decodeBase58Check) ⇒ `Buffer`
         * [.hexStringToByte(str)](#module_@aeternity/aepp-sdk/es/utils/crypto.hexStringToByte) ⇒ `Uint8Array`
+        * [.encodeUnsigned(value)](#module_@aeternity/aepp-sdk/es/utils/crypto.encodeUnsigned) ⇒ `Buffer`
+        * [.encodeContractAddress(owner, nonce)](#module_@aeternity/aepp-sdk/es/utils/crypto.encodeContractAddress) ⇒ `String`
         * [.generateKeyPairFromSecret(secret)](#module_@aeternity/aepp-sdk/es/utils/crypto.generateKeyPairFromSecret) ⇒ `Object`
         * [.generateKeyPair(raw)](#module_@aeternity/aepp-sdk/es/utils/crypto.generateKeyPair) ⇒ `Object`
         * [.encryptPublicKey(password, binaryKey)](#module_@aeternity/aepp-sdk/es/utils/crypto.encryptPublicKey) ⇒ `Uint8Array`
@@ -237,6 +239,34 @@ Conver hex string to Uint8Array
 | Param | Type | Description |
 | --- | --- | --- |
 | str | `String` | Data to conver |
+
+<a id="module_@aeternity/aepp-sdk/es/utils/crypto.encodeUnsigned"></a>
+
+### @aeternity/aepp-sdk/es/utils/crypto.encodeUnsigned(value) ⇒ `Buffer`
+Converts a positive integer to the smallest possible
+representation in a binary digit representation
+
+**Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
+**Returns**: `Buffer` - - Encoded data  
+**rtype**: `(value: Number) => Buffer`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| value | `Number` | Value to encode |
+
+<a id="module_@aeternity/aepp-sdk/es/utils/crypto.encodeContractAddress"></a>
+
+### @aeternity/aepp-sdk/es/utils/crypto.encodeContractAddress(owner, nonce) ⇒ `String`
+Compute contract address
+
+**Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
+**Returns**: `String` - - Contract address  
+**rtype**: `(owner: String, nonce: Number) => String`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| owner | `String` | Address of contract owner |
+| nonce | `Number` | Round when contract was created |
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.generateKeyPairFromSecret"></a>
 

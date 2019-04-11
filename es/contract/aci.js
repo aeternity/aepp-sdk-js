@@ -23,7 +23,7 @@
  * @example import ContractACI from '@aeternity/aepp-sdk/es/contract/aci'
  */
 import AsyncInit from '../utils/async-init'
-import { decode } from '../tx/builder/helpers'
+import { decode, encode } from '../tx/builder/helpers'
 
 const SOPHIA_TYPES = [
   'int',
@@ -115,6 +115,8 @@ function transformDecodedData (aci, result, { skipTransformDecoded = false } = {
   switch (t) {
     case SOPHIA_TYPES.bool:
       return !!result.value
+    case SOPHIA_TYPES.address:
+      return encode(Buffer.from(result.value, 'hex'), 'ak')
     case SOPHIA_TYPES.map:
       const [keyT, ...valueT] = generic.split(',')
       return result.value
@@ -178,7 +180,12 @@ function getFunctionACI (aci, name) {
  * @param {Object} [options] Options object
  * @param {Object} [options.aci] Contract ACI
  * @return {ContractInstance} JS Contract API
- *
+ * @example
+ * const contractIns = await client.getContractInstance(sourceCode)
+ * await contractIns.compile()
+ * await contractIns.deploy([321])
+ * const callResult = await contractIns.call('setState', [123])
+ * const staticCallResult = await contractIns.call('setState', [123], { callStatic: true })
  */
 async function getContractInstance (source, { aci, contractAddress } = {}) {
   aci = aci || await this.contractGetACI(source)
@@ -231,11 +238,11 @@ function call (self) {
 
     params = !options.skipArgsConvert ? prepareArgsForEncode(fnACI, params) : params
     const result = options.callStatic
-      ? await self.contractCallStatic(this.interface, this.deployInfo.address, fn, params, {
+      ? await self.contractCallStatic(this.source, this.deployInfo.address, fn, params, {
         top: options.top,
         options
       })
-      : await self.contractCall(this.interface, this.deployInfo.address, fn, params, options)
+      : await self.contractCall(this.source, this.deployInfo.address, fn, params, options)
 
     return {
       ...result,
