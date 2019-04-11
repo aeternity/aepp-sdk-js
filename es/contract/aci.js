@@ -110,7 +110,7 @@ function validate (type, value) {
  */
 function transformDecodedData (aci, result, { skipTransformDecoded = false } = {}) {
   if (skipTransformDecoded) return result
-  const { t, generic } = readType(aci.type)
+  const { t, generic } = readType(aci.returns)
 
   switch (t) {
     case SOPHIA_TYPES.bool:
@@ -246,7 +246,7 @@ function call (self) {
 
     return {
       ...result,
-      decode: async () => transformDecodedData(fnACI, await self.contractDecodeData(fnACI.type, result.result.returnValue), options)
+      decode: async () => transformDecodedData(fnACI, await self.contractDecodeData(fnACI.returns, result.result.returnValue), options)
     }
   }
 }
