@@ -235,7 +235,7 @@ Example spend function, using aeternity's SDK abstraction
     onChain: confirm, // guard returning boolean
     onAccount: confirm, // guard returning boolean
     onContract: confirm, // guard returning boolean
-    networkId: 'aet_ua' // or any other networkId your client should connect to
+    networkId: 'ae_uat' // or any other networkId your client should connect to
   }).then(ae => ae.spend(parseInt(amount), receiver_pub_key))
 ```
 
