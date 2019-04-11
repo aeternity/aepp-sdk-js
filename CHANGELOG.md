@@ -9,7 +9,7 @@ log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 - feat(Channel): Add call contract static support
 - feat(Channel): Add get contract state support
 - feat(Channel): Get full channel state support
-- docs(*): Adjust ACI, Contract nad Usage
+- docs(*): Adjust ACI, Contract and Usage
 ### Changed
 - refactor(Http): Handle no response in http stamp error handler
 - fix(Crypto): Fix crypto `formatAddress`
