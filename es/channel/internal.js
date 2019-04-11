@@ -156,6 +156,8 @@ function ping (channel) {
   const ws = websockets.get(channel)
   if (ws.readyState === ws.OPEN) {
     ws._connection.ping()
+    clearTimeout(pongTimeoutId.get(channel))
+    pongTimeoutId.set(channel, setTimeout(() => ws._connection.drop(), PONG_TIMEOUT_MS))
   }
 }
 
@@ -207,7 +209,6 @@ async function initialize (channel, channelOptions) {
   ws._connection.on('pong', () => {
     clearTimeout(pongTimeoutId.get(channel))
     clearTimeout(pingTimeoutId.get(channel))
-    pongTimeoutId.set(channel, setTimeout(() => ws._connection.drop(), PONG_TIMEOUT_MS))
     pingTimeoutId.set(channel, setTimeout(() => ping(channel), PING_TIMEOUT_MS))
   })
   pingTimeoutId.set(channel, setTimeout(() => ping(channel), PING_TIMEOUT_MS))
