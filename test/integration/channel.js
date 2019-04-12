@@ -648,6 +648,15 @@ describe('Channel', function () {
     // TODO: contractState deserialization
   })
 
+  it('can post snapshot solo transaction', async () => {
+    const snapshotSoloTx = await initiator.channelSnapshotSoloTx({
+      channelId: initiatorCh.id(),
+      fromId: await initiator.address(),
+      payload: (await initiatorCh.state()).signedTx
+    })
+    await initiator.sendTransaction(await initiator.signTransaction(snapshotSoloTx), { waitMined: true })
+  })
+
   describe('throws errors', function () {
     before(async function () {
       initiatorCh = await Channel({

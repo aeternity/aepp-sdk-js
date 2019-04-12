@@ -330,6 +330,32 @@ async function channelSettleTx ({ channelId, fromId, initiatorAmountFinal, respo
   return tx
 }
 
+async function channelSnapshotSoloTx ({ channelId, fromId, payload }) {
+  // Calculate fee, get absolute ttl (ttl + height), get account nonce
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.channelSnapshotSolo, { senderId: fromId, ...R.head(arguments), payload })
+
+  // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
+  const { tx } = this.nativeMode
+    ? buildTx(R.merge(R.head(arguments), {
+      channelId,
+      fromId,
+      payload,
+      ttl,
+      fee,
+      nonce
+    }), TX_TYPE.channelSnapshotSolo)
+    : await this.api.postChannelSnapshotSolo(R.merge(R.head(arguments), {
+      channelId,
+      fromId,
+      payload,
+      ttl,
+      fee: parseInt(fee),
+      nonce
+    }))
+
+  return tx
+}
+
 /**
  * Compute the absolute ttl by adding the ttl to the current height of the chain
  *
@@ -422,6 +448,7 @@ const Transaction = Node.compose(Tx, {
     channelCloseSoloTx,
     channelSlashTx,
     channelSettleTx,
+    channelSnapshotSoloTx,
     getAccountNonce
   }
 })
