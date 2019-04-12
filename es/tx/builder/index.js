@@ -68,6 +68,7 @@ function deserializeField (value, type, prefix) {
         case '0': return 'ok'
         case '1': return 'error'
         case '2': return 'revert'
+        default: return value
       }
     default:
       return value
@@ -86,6 +87,8 @@ function serializeField (value, type, prefix) {
       return Buffer.from([value ? 1 : 0])
     case FIELD_TYPES.binary:
       return decode(value, prefix)
+    case FIELD_TYPES.hex:
+      return Buffer.from(value, 'hex')
     case FIELD_TYPES.signatures:
       return value.map(Buffer.from)
     case FIELD_TYPES.string:
@@ -99,6 +102,7 @@ function serializeField (value, type, prefix) {
         case 'ok': return writeInt(0)
         case 'error': return writeInt(1)
         case 'revert': return writeInt(2)
+        default: return value
       }
     default:
       return value
