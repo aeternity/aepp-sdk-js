@@ -63,6 +63,12 @@ function deserializeField (value, type, prefix) {
       return [readInt(value)]
     case FIELD_TYPES.mptree:
       return value.map(mpt.deserialize)
+    case FIELD_TYPES.callReturnType:
+      switch (readInt(value)) {
+        case '0': return 'ok'
+        case '1': return 'error'
+        case '2': return 'revert'
+      }
     default:
       return value
   }
@@ -88,6 +94,12 @@ function serializeField (value, type, prefix) {
       return buildPointers(value)
     case FIELD_TYPES.mptree:
       return value.map(mpt.serialize)
+    case FIELD_TYPES.callReturnType:
+      switch (value) {
+        case 'ok': return writeInt(0)
+        case 'error': return writeInt(1)
+        case 'revert': return writeInt(2)
+      }
     default:
       return value
   }
