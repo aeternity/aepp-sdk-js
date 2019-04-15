@@ -46,12 +46,13 @@ const SOPHIA_TYPES = [
  */
 function transform (type, value) {
   const { t, generic } = readType(type)
-
   switch (t) {
     case SOPHIA_TYPES.string:
       return `"${value}"`
     case SOPHIA_TYPES.list:
       return `[${value.map(el => transform(generic, el))}]`
+    case SOPHIA_TYPES.tuple:
+      return `(${value.map((el, i) => transform(generic[i], el))})`
     case SOPHIA_TYPES.address:
       return `#${decode(value, 'ak').toString('hex')}`
   }
@@ -61,22 +62,19 @@ function transform (type, value) {
 /**
  * Parse sophia type
  * @param type
+ * @param returnType
  * @return {*}
  */
-function readType (type) {
-  const i = type.indexOf('(')
+function readType (type, returnType = false) {
+  const [t] = Array.isArray(type) ? type : [type]
+  // Base types
+  if (typeof t === 'string') return { t }
 
-  if (i === -1) return { t: type }
-
-  // Tuple
-  if (type[0] === '(') {
-    return { t: SOPHIA_TYPES.tuple, generic: type.slice(1).slice(0, -1).split(',').map(e => e.trim()) }
+  // Map, Tuple, List
+  if (typeof t === 'object') {
+    const [[baseType, generic]] = Object.entries(t)
+    return { t: baseType, generic }
   }
-
-  const baseType = type.split('(')[0]
-  const generic = type.slice(i + 1, type.length - 1)
-
-  return { t: baseType, generic }
 }
 
 /**
@@ -110,29 +108,28 @@ function validate (type, value) {
  */
 function transformDecodedData (aci, result, { skipTransformDecoded = false } = {}) {
   if (skipTransformDecoded) return result
-  const { t, generic } = readType(aci.returns)
-
+  const { t, generic } = readType(aci, true)
   switch (t) {
     case SOPHIA_TYPES.bool:
       return !!result.value
     case SOPHIA_TYPES.address:
       return encode(Buffer.from(result.value, 'hex'), 'ak')
     case SOPHIA_TYPES.map:
-      const [keyT, ...valueT] = generic.split(',')
+      const [keyT, valueT] = generic
       return result.value
         .reduce(
           (acc, { key, val }, i) => {
-            key = transformDecodedData({ type: keyT.toString() }, { value: key.value })
-            val = transformDecodedData({ type: valueT.toString() }, { value: val.value })
+            key = transformDecodedData(keyT, { value: key.value })
+            val = transformDecodedData(valueT, { value: val.value })
             acc[i] = { key, val }
             return acc
           },
           {}
         )
     case SOPHIA_TYPES.list:
-      return result.value.map(({ value }) => transformDecodedData({ type: generic }, { value }))
+      return result.value.map(({ value }) => transformDecodedData(generic, { value }))
     case SOPHIA_TYPES.tuple:
-      return result.value.map(({ value }, i) => { return transformDecodedData({ type: generic[i] }, { value }) })
+      return result.value.map(({ value }, i) => { return transformDecodedData(generic[i], { value }) })
   }
   return result.value
 }
@@ -230,6 +227,22 @@ async function getContractInstance (source, { aci, contractAddress } = {}) {
   return instance
 }
 
+function transformReturnType (returns) {
+  if (typeof returns === 'string') return returns
+  if (typeof returns === 'object') {
+    const [[key, value]] = Object.entries(returns)
+    return `${key !== 'tuple' ? key : ''}(${value
+      .reduce(
+        (acc, el, i) => {
+          if (i !== 0) acc += ','
+          acc += transformReturnType(el)
+          return acc
+        },
+        '')
+    })`
+  }
+}
+
 function call (self) {
   return async function (fn, params = [], options = { skipArgsConvert: false, skipTransformDecoded: false, callStatic: false }) {
     const fnACI = getFunctionACI(this.aci, fn)
@@ -243,10 +256,10 @@ function call (self) {
         options
       })
       : await self.contractCall(this.source, this.deployInfo.address, fn, params, options)
-
+    const returnType = await transformReturnType(fnACI.returns)
     return {
       ...result,
-      decode: async () => transformDecodedData(fnACI, await self.contractDecodeData(fnACI.returns, result.result.returnValue), options)
+      decode: async () => transformDecodedData(fnACI.returns, await self.contractDecodeData(returnType, result.result.returnValue), options)
     }
   }
 }
@@ -255,7 +268,6 @@ function deploy (self) {
   return async function (init = [], options = { skipArgsConvert: false }) {
     const fnACI = getFunctionACI(this.aci, 'init')
     if (!this.compiled) await this.compile()
-
     init = !options.skipArgsConvert ? prepareArgsForEncode(fnACI, init) : init
 
     const { owner, transaction, address, createdAt, result } = await self.contractDeploy(this.compiled, this.source, init, options)
