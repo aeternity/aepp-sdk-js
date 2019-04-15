@@ -2,6 +2,36 @@
 All notable changes to this project will be documented in this file. This change
 log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [2.4.1]
+### Added
+- feat(ACI): Add transform decoded data for 'address' type
+- feat(Aepp): Add Compiler to Aepp rpc methods. Update example app
+- feat(Channel): Add call contract static support
+- feat(Channel): Add get contract state support
+- feat(Channel): Get full channel state support
+- docs(*): Adjust ACI, Contract and Usage
+### Changed
+- refactor(Http): Handle no response in http stamp error handler
+- fix(Crypto): Fix crypto `formatAddress`
+- fix(Crypto): Move ADDRESS_FORMAT to crypto
+
+ ### Removed
+- none
+
+ ### Breaking Changes
+- State Channel:
+  - `channel.state()` now returns offchain state instead of last co-signed offchain transaction
+  - `channel.update(...).state` has been renamed to `signedTx`
+  - `channel.withdraw(...).state` has been renamed to `signedTx`
+  - `channel.deposit(...).state` has been renamed to `signedTx`
+  - `channel.leave().state` has been renamed to `signedTx`
+  - `channel.createContract(...).state` has been renamed to `signedTx`
+  - `channel.callContract(...).state` has been renamed to `signedTx`
+
+ ### Notes and known Issues
+- none
+
+
 ## [2.4.0]
 ### Added
 - Install and configure `commitizen`
@@ -628,4 +658,5 @@ await account.address(format: ADDRESS_FORMAT) // default ADDRESS_FORMAT.api
 [2.3.0]: https://github.com/aeternity/aepp-sdk-js/compare/2.3.0-next...2.3.0
 [2.3.1]: https://github.com/aeternity/aepp-sdk-js/compare/2.3.0...2.3.1
 [2.3.2]: https://github.com/aeternity/aepp-sdk-js/compare/2.3.1...2.3.2
-[2.4.0.]: https://github.com/aeternity/aepp-sdk-js/compare/2.3.2...2.4.0
+[2.4.0]: https://github.com/aeternity/aepp-sdk-js/compare/2.3.2...2.4.0
+[2.4.1]: https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...2.4.1
