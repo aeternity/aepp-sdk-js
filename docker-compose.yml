@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.ci
-    depends_on: [node]
+    depends_on: [node, compiler]
     entrypoint: docker/wait-for-it.sh node:3013 --
     env_file: [./docker/sdk.env]
     environment:
@@ -27,6 +27,12 @@ services:
       - ${PWD}/docker/accounts_test.json:/home/aeternity/node/data/aecore/.genesis/accounts_test.json
       - node_db:/home/aeternity/node/data/mnesia
       - node_keys:/home/aeternity/node/keys
+
+
+  compiler:
+    image: aeternity/aesophia_http:${COMPILER_TAG}
+    hostname: compiler
+    expose: [3080]
 
 volumes:
   node_db:
