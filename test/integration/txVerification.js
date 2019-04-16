@@ -59,7 +59,7 @@ describe('Verify Transaction', function () {
       .filter(({type}) => type === 'error')
       .map(({ txKey }) => txKey)
 
-    JSON.stringify(ERRORS).should.be.equals(JSON.stringify(error))
+    JSON.stringify(ERRORS.filter(e => e !== 'gasPrice')).should.be.equals(JSON.stringify(error))
   })
   it('verify transaction before broadcast', async () => {
     client = await ready(this)

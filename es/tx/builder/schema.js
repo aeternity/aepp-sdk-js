@@ -50,6 +50,8 @@ const OBJECT_TAG_CHANNEL_OFFCHAIN_CALL_CONTRACT_TX = 574
 const TX_FIELD = (name, type, prefix) => [name, type, prefix]
 const TX_SCHEMA_FIELD = (schema, objectId) => [schema, objectId]
 
+export const MIN_GAS_PRICE = 1000000000 // min gasPrice 1e9
+
 // # see https://github.com/aeternity/protocol/blob/minerva/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain
 const VM_VERSIONS = {
   NO_VM: 0,
@@ -515,7 +517,8 @@ const VALIDATORS = {
   insufficientBalanceForAmountFee: 'insufficientBalanceForAmountFee',
   insufficientBalanceForAmount: 'insufficientBalanceForAmount',
   nonceUsed: 'nonceUsed',
-  nonceHigh: 'nonceHigh'
+  nonceHigh: 'nonceHigh',
+  minGasPrice: 'minGasPrice'
 }
 
 const ERRORS = {
@@ -525,7 +528,8 @@ const ERRORS = {
   insufficientBalanceForAmountFee: { key: 'InsufficientBalanceForAmountFee', type: ERROR_TYPE.WARNING, txKey: 'fee' },
   insufficientBalanceForAmount: { key: 'InsufficientBalanceForAmount', type: ERROR_TYPE.WARNING, txKey: 'amount' },
   nonceUsed: { key: 'NonceUsed', type: ERROR_TYPE.ERROR, txKey: 'nonce' },
-  nonceHigh: { key: 'NonceHigh', type: ERROR_TYPE.WARNING, txKey: 'nonce' }
+  nonceHigh: { key: 'NonceHigh', type: ERROR_TYPE.WARNING, txKey: 'nonce' },
+  minGasPrice: { key: 'minGasPrice', type: ERROR_TYPE.ERROR, txKey: 'gasPrice' }
 }
 
 export const SIGNATURE_VERIFICATION_SCHEMA = [
@@ -565,5 +569,10 @@ export const BASE_VERIFICATION_SCHEMA = [
     ({ accountNonce }) => `The nonce is technically valid but will not be processed immediately by the node (next valid nonce is ${accountNonce + 1})`,
     VALIDATORS.nonceHigh,
     ERRORS.nonceHigh
+  ),
+  VERIFICATION_FIELD(
+    () => `The gasPrice must be bigger then ${MIN_GAS_PRICE}`,
+    VALIDATORS.minGasPrice,
+    ERRORS.minGasPrice
   )
 ]

@@ -31,7 +31,7 @@ Deploy contract
 
 **Kind**: Exported member  
 **Returns**: `ContractInstance` - Contract ACI object with predefined js methods for contract usage  
-**rtype**: `(init: Array, options: Object = { fromJsType: true }) => ContractInstance: Object`
+**rtype**: `(init: Array, options: Object = { skipArgsConvert: false }) => ContractInstance: Object`
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -46,7 +46,7 @@ Call contract function
 
 **Kind**: Exported member  
 **Returns**: `Object` - CallResult  
-**rtype**: `(init: Array, options: Object = { fromJsType: true, transformDecoded: true }) => CallResult: Object`
+**rtype**: `(init: Array, options: Object = { skipArgsConvert: false, skipTransformDecoded: false, callStatic: false }) => CallResult: Object`
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
