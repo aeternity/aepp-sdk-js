@@ -17,9 +17,11 @@
 
 import { describe, it, before } from 'mocha'
 import * as sinon from 'sinon'
+import { BigNumber } from 'bignumber.js'
 import { configure, ready, plan, BaseAe, networkId } from './'
 import { generateKeyPair } from '../../es/utils/crypto'
-import { unpackTx } from '../../es/tx/builder'
+import { unpackTx, buildTx } from '../../es/tx/builder'
+import { decode } from '../../es/tx/builder/helpers'
 import Channel from '../../es/channel'
 
 const wsUrl = process.env.WS_URL || 'ws://node:3014'
@@ -71,7 +73,7 @@ describe('Channel', function () {
     ttl: 10000,
     host: 'localhost',
     port: 3001,
-    lockPeriod: 10
+    lockPeriod: 1
   }
 
   before(async function () {
@@ -108,35 +110,77 @@ describe('Channel', function () {
     sinon.assert.calledWithExactly(initiatorSign, sinon.match('initiator_sign'), sinon.match.string)
     sinon.assert.calledOnce(responderSign)
     sinon.assert.calledWithExactly(responderSign, sinon.match('responder_sign'), sinon.match.string)
+    const expectedTxParams = {
+      initiator: await initiator.address(),
+      responder: await responder.address(),
+      initiatorAmount: sharedParams.initiatorAmount.toString(),
+      responderAmount: sharedParams.responderAmount.toString(),
+      channelReserve: sharedParams.channelReserve.toString(),
+      // TODO: investigate why ttl is "0"
+      // ttl: sharedParams.ttl.toString(),
+      lockPeriod: sharedParams.lockPeriod.toString()
+    }
+    const { txType: initiatorTxType, tx: initiatorTx } = unpackTx(initiatorSign.firstCall.args[1])
+    const { txType: responderTxType, tx: responderTx } = unpackTx(responderSign.firstCall.args[1])
+    initiatorTxType.should.equal('channelCreate')
+    initiatorTx.should.eql({ ...initiatorTx, ...expectedTxParams })
+    responderTxType.should.equal('channelCreate')
+    responderTx.should.eql({ ...responderTx, ...expectedTxParams })
   })
 
   it('can post update and accept', async () => {
     responderShouldRejectUpdate = false
+    const sign = sinon.spy(initiator.signTransaction.bind(initiator))
+    const amount = 1
     const result = await initiatorCh.update(
       await initiator.address(),
       await responder.address(),
-      1,
-      async (tx) => await initiator.signTransaction(tx)
+      amount,
+      sign
     )
     result.accepted.should.equal(true)
     result.signedTx.should.be.a('string')
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.calledOnce(responderSign)
     sinon.assert.calledWithExactly(responderSign, sinon.match('update_ack'), sinon.match.string)
+    sinon.assert.calledOnce(sign)
+    sinon.assert.calledWithExactly(sign, sinon.match.string)
+    const { txType, tx: { updates } } = unpackTx(sign.firstCall.args[0])
+    txType.should.equal('channelOffChain')
+    updates[0].txType.should.equal('channelOffChainUpdateTransfer')
+    updates[0].tx.should.eql({
+      ...updates[0].tx,
+      from: await initiator.address(),
+      to: await responder.address(),
+      amount: amount.toString()
+    })
   })
 
   it('can post update and reject', async () => {
     responderShouldRejectUpdate = true
+    const sign = sinon.spy(initiator.signTransaction.bind(initiator))
+    const amount = 1
     const result = await initiatorCh.update(
       await responder.address(),
       await initiator.address(),
-      1,
-      async (tx) => await initiator.signTransaction(tx)
+      amount,
+      sign
     )
     result.accepted.should.equal(false)
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.calledOnce(responderSign)
     sinon.assert.calledWithExactly(responderSign, sinon.match('update_ack'), sinon.match.string)
+    sinon.assert.calledOnce(sign)
+    sinon.assert.calledWithExactly(sign, sinon.match.string)
+    const { txType, tx: { updates } } = unpackTx(sign.firstCall.args[0])
+    txType.should.equal('channelOffChain')
+    updates[0].txType.should.equal('channelOffChainUpdateTransfer')
+    updates[0].tx.should.eql({
+      ...updates[0].tx,
+      from: await responder.address(),
+      to: await initiator.address(),
+      amount: amount.toString()
+    })
   })
 
   it('can get proof of inclusion', async () => {
@@ -147,6 +191,10 @@ describe('Channel', function () {
     const responderPoi = await responderCh.poi(params)
     initiatorPoi.should.be.a('string')
     responderPoi.should.be.a('string')
+    const unpackedInitiatorPoi = unpackTx(decode(initiatorPoi, 'pi'), true)
+    const unpackedResponderPoi = unpackTx(decode(responderPoi, 'pi'), true)
+    buildTx(unpackedInitiatorPoi.tx, unpackedInitiatorPoi.txType, { prefix: 'pi' }).tx.should.equal(initiatorPoi)
+    buildTx(unpackedResponderPoi.tx, unpackedResponderPoi.txType, { prefix: 'pi' }).tx.should.equal(responderPoi)
   })
 
   it('can get balances', async () => {
@@ -179,13 +227,15 @@ describe('Channel', function () {
   })
 
   it('can request a withdraw and accept', async () => {
+    const sign = sinon.spy(initiator.signTransaction.bind(initiator))
+    const amount = 2
     const onOnChainTx = sinon.spy()
     const onOwnWithdrawLocked = sinon.spy()
     const onWithdrawLocked = sinon.spy()
     responderShouldRejectUpdate = false
     const result = await initiatorCh.withdraw(
-      2,
-      async (tx) => initiator.signTransaction(tx),
+      amount,
+      sign,
       { onOnChainTx, onOwnWithdrawLocked, onWithdrawLocked }
     )
     result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx })
@@ -196,16 +246,27 @@ describe('Channel', function () {
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.calledOnce(responderSign)
     sinon.assert.calledWithExactly(responderSign, sinon.match('withdraw_ack'), sinon.match.string)
+    sinon.assert.calledOnce(sign)
+    sinon.assert.calledWithExactly(sign, sinon.match.string)
+    const { txType, tx } = unpackTx(sign.firstCall.args[0])
+    txType.should.equal('channelWithdraw')
+    tx.should.eql({
+      ...tx,
+      toId: await initiator.address(),
+      amount: amount.toString()
+    })
   })
 
   it('can request a withdraw and reject', async () => {
+    const sign = sinon.spy(initiator.signTransaction.bind(initiator))
+    const amount = 2
     const onOnChainTx = sinon.spy()
     const onOwnWithdrawLocked = sinon.spy()
     const onWithdrawLocked = sinon.spy()
     responderShouldRejectUpdate = true
     const result = await initiatorCh.withdraw(
-      2,
-      async (tx) => initiator.signTransaction(tx),
+      amount,
+      sign,
       { onOnChainTx, onOwnWithdrawLocked, onWithdrawLocked }
     )
     result.should.eql({ accepted: false })
@@ -215,16 +276,27 @@ describe('Channel', function () {
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.calledOnce(responderSign)
     sinon.assert.calledWithExactly(responderSign, sinon.match('withdraw_ack'), sinon.match.string)
+    sinon.assert.calledOnce(sign)
+    sinon.assert.calledWithExactly(sign, sinon.match.string)
+    const { txType, tx } = unpackTx(sign.firstCall.args[0])
+    txType.should.equal('channelWithdraw')
+    tx.should.eql({
+      ...tx,
+      toId: await initiator.address(),
+      amount: amount.toString()
+    })
   })
 
   it('can request a deposit and accept', async () => {
+    const sign = sinon.spy(initiator.signTransaction.bind(initiator))
+    const amount = 2
     const onOnChainTx = sinon.spy()
     const onOwnDepositLocked = sinon.spy()
     const onDepositLocked = sinon.spy()
     responderShouldRejectUpdate = false
     const result = await initiatorCh.deposit(
-      2,
-      async (tx) => initiator.signTransaction(tx),
+      amount,
+      sign,
       { onOnChainTx, onOwnDepositLocked, onDepositLocked }
     )
     result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx })
@@ -235,16 +307,27 @@ describe('Channel', function () {
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.calledOnce(responderSign)
     sinon.assert.calledWithExactly(responderSign, sinon.match('deposit_ack'), sinon.match.string)
+    sinon.assert.calledOnce(sign)
+    sinon.assert.calledWithExactly(sign, sinon.match.string)
+    const { txType, tx } = unpackTx(sign.firstCall.args[0])
+    txType.should.equal('channelDeposit')
+    tx.should.eql({
+      ...tx,
+      fromId: await initiator.address(),
+      amount: amount.toString()
+    })
   })
 
   it('can request a deposit and reject', async () => {
+    const sign = sinon.spy(initiator.signTransaction.bind(initiator))
+    const amount = 2
     const onOnChainTx = sinon.spy()
     const onOwnDepositLocked = sinon.spy()
     const onDepositLocked = sinon.spy()
     responderShouldRejectUpdate = true
     const result = await initiatorCh.deposit(
-      2,
-      async (tx) => initiator.signTransaction(tx),
+      amount,
+      sign,
       { onOnChainTx, onOwnDepositLocked, onDepositLocked }
     )
     result.should.eql({ accepted: false })
@@ -254,14 +337,31 @@ describe('Channel', function () {
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.calledOnce(responderSign)
     sinon.assert.calledWithExactly(responderSign, sinon.match('deposit_ack'), sinon.match.string)
+    const { txType, tx } = unpackTx(sign.firstCall.args[0])
+    txType.should.equal('channelDeposit')
+    tx.should.eql({
+      ...tx,
+      fromId: await initiator.address(),
+      amount: amount.toString()
+    })
   })
 
   it('can close a channel', async () => {
-    const tx = await initiatorCh.shutdown(async (tx) => await initiator.signTransaction(tx))
-    tx.should.be.a('string')
+    const sign = sinon.spy(initiator.signTransaction.bind(initiator))
+    const result = await initiatorCh.shutdown(sign)
+    result.should.be.a('string')
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.calledOnce(responderSign)
     sinon.assert.calledWithExactly(responderSign, sinon.match('shutdown_sign_ack'), sinon.match.string)
+    sinon.assert.calledOnce(sign)
+    sinon.assert.calledWithExactly(sign, sinon.match.string)
+    const { txType, tx } = unpackTx(sign.firstCall.args[0])
+    txType.should.equal('channelCloseMutual')
+    tx.should.eql({
+      ...tx,
+      fromId: await initiator.address(),
+      // TODO: check `initiatorAmountFinal` and `responderAmountFinal`
+    })
   })
 
   it('can leave a channel', async () => {
@@ -287,6 +387,7 @@ describe('Channel', function () {
     initiatorCh = await Channel({
       ...sharedParams,
       role: 'initiator',
+      port: 3002,
       existingChannelId,
       offchainTx,
       sign: initiatorSign
@@ -294,6 +395,7 @@ describe('Channel', function () {
     responderCh = await Channel({
       ...sharedParams,
       role: 'responder',
+      port: 3002,
       existingChannelId,
       offchainTx,
       sign: responderSign
@@ -304,7 +406,7 @@ describe('Channel', function () {
     await initiatorCh.leave()
   })
 
-  it('can create a contract and accept', async () => {
+  it('can solo close a channel', async () => {
     initiatorCh = await Channel({
       ...sharedParams,
       role: 'initiator',
@@ -315,6 +417,124 @@ describe('Channel', function () {
       ...sharedParams,
       role: 'responder',
       port: 3003,
+      sign: responderSign
+    })
+    await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
+
+    const initiatorAddr = await initiator.address()
+    const responderAddr = await responder.address()
+    const { signedTx } = await initiatorCh.update(
+      await initiator.address(),
+      await responder.address(),
+      100,
+      tx => initiator.signTransaction(tx)
+    )
+    const poi = await initiatorCh.poi({
+      accounts: [initiatorAddr, responderAddr],
+    })
+    const balances = await initiatorCh.balances([initiatorAddr, responderAddr])
+    const initiatorBalanceBeforeClose = await initiator.balance(initiatorAddr)
+    const responderBalanceBeforeClose = await responder.balance(responderAddr)
+    const closeSoloTx = await initiator.channelCloseSoloTx({
+      channelId: await initiatorCh.id(),
+      fromId: initiatorAddr,
+      poi,
+      payload: signedTx
+    })
+    const closeSoloTxFee = unpackTx(closeSoloTx).tx.fee
+    await initiator.sendTransaction(await initiator.signTransaction(closeSoloTx), { waitMined: true })
+    const settleTx = await initiator.channelSettleTx({
+      channelId: await initiatorCh.id(),
+      fromId: initiatorAddr,
+      initiatorAmountFinal: balances[initiatorAddr],
+      responderAmountFinal: balances[responderAddr]
+    })
+    const settleTxFee = unpackTx(settleTx).tx.fee
+    await initiator.sendTransaction(await initiator.signTransaction(settleTx), { waitMined: true })
+    const initiatorBalanceAfterClose = await initiator.balance(initiatorAddr)
+    const responderBalanceAfterClose = await responder.balance(responderAddr)
+    new BigNumber(initiatorBalanceAfterClose).minus(initiatorBalanceBeforeClose).plus(closeSoloTxFee).plus(settleTxFee).isEqualTo(
+      new BigNumber(balances[initiatorAddr])
+    ).should.be.equal(true)
+    new BigNumber(responderBalanceAfterClose).minus(responderBalanceBeforeClose).isEqualTo(
+      new BigNumber(balances[responderAddr])
+    ).should.be.equal(true)
+  })
+
+  it('can dispute via slash tx', async () => {
+    const initiatorAddr = await initiator.address()
+    const responderAddr = await responder.address()
+    initiatorCh = await Channel({
+      ...sharedParams,
+      lockPeriod: 5,
+      role: 'initiator',
+      sign: initiatorSign,
+      port: 3004
+    })
+    responderCh = await Channel({
+      ...sharedParams,
+      lockPeriod: 5,
+      role: 'responder',
+      sign: responderSign,
+      port: 3004
+    })
+    await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
+    const initiatorBalanceBeforeClose = await initiator.balance(initiatorAddr)
+    const responderBalanceBeforeClose = await responder.balance(responderAddr)
+    const oldUpdate = await initiatorCh.update(initiatorAddr, responderAddr, 100, (tx) => initiator.signTransaction(tx))
+    const oldPoi = await initiatorCh.poi({
+      accounts: [initiatorAddr, responderAddr]
+    })
+    const recentUpdate = await initiatorCh.update(initiatorAddr, responderAddr, 100, (tx) => initiator.signTransaction(tx))
+    const recentPoi = await responderCh.poi({
+      accounts: [initiatorAddr, responderAddr]
+    })
+    const recentBalances = await responderCh.balances([initiatorAddr, responderAddr])
+    const closeSoloTx = await initiator.channelCloseSoloTx({
+      channelId: initiatorCh.id(),
+      fromId: initiatorAddr,
+      poi: oldPoi,
+      payload: oldUpdate.signedTx
+    })
+    const closeSoloTxFee = unpackTx(closeSoloTx).tx.fee
+    await initiator.sendTransaction(await initiator.signTransaction(closeSoloTx), { waitMined: true })
+    const slashTx = await responder.channelSlashTx({
+      channelId: responderCh.id(),
+      fromId: responderAddr,
+      poi: recentPoi,
+      payload: recentUpdate.signedTx
+    })
+    const slashTxFee = unpackTx(slashTx).tx.fee
+    await responder.sendTransaction(await responder.signTransaction(slashTx), { waitMined: true })
+    const settleTx = await responder.channelSettleTx({
+      channelId: responderCh.id(),
+      fromId: responderAddr,
+      initiatorAmountFinal: recentBalances[initiatorAddr],
+      responderAmountFinal: recentBalances[responderAddr]
+    })
+    const settleTxFee = unpackTx(settleTx).tx.fee
+    await responder.sendTransaction(await responder.signTransaction(settleTx), { waitMined: true })
+    const initiatorBalanceAfterClose = await initiator.balance(initiatorAddr)
+    const responderBalanceAfterClose = await responder.balance(responderAddr)
+    new BigNumber(initiatorBalanceAfterClose).minus(initiatorBalanceBeforeClose).plus(closeSoloTxFee).isEqualTo(
+      new BigNumber(recentBalances[initiatorAddr])
+    ).should.be.equal(true)
+    new BigNumber(responderBalanceAfterClose).minus(responderBalanceBeforeClose).plus(slashTxFee).plus(settleTxFee).isEqualTo(
+      new BigNumber(recentBalances[responderAddr])
+    ).should.be.equal(true)
+  })
+
+  it('can create a contract and accept', async () => {
+    initiatorCh = await Channel({
+      ...sharedParams,
+      role: 'initiator',
+      port: 3005,
+      sign: initiatorSign
+    })
+    responderCh = await Channel({
+      ...sharedParams,
+      role: 'responder',
+      port: 3005,
       sign: responderSign
     })
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
@@ -368,16 +588,15 @@ describe('Channel', function () {
     result.should.eql({ accepted: false })
   })
 
-  it('can call a contract using dry-run', async () => {
-    const result = await initiatorCh.callContractStatic({
-      amount: 0,
-      callData: await contractEncodeCall('main', ['42']),
+  it('can get contract call', async () => {
+    const result = await initiatorCh.getContractCall({
+      caller: await initiator.address(),
       contract: contractAddress,
-      abiVersion: 1
+      round: callerNonce
     })
     result.should.eql({
       callerId: await initiator.address(),
-      callerNonce: result.callerNonce,
+      callerNonce,
       contractId: contractAddress,
       gasPrice: result.gasPrice,
       gasUsed: result.gasUsed,
@@ -390,15 +609,16 @@ describe('Channel', function () {
     value.should.eql({ type: 'word', value: 42 })
   })
 
-  it('can get contract call', async () => {
-    const result = await initiatorCh.getContractCall({
-      caller: await initiator.address(),
+  it('can call a contract using dry-run', async () => {
+    const result = await initiatorCh.callContractStatic({
+      amount: 0,
+      callData: await contractEncodeCall('main', ['42']),
       contract: contractAddress,
-      round: callerNonce
+      abiVersion: 1
     })
     result.should.eql({
       callerId: await initiator.address(),
-      callerNonce,
+      callerNonce: result.callerNonce,
       contractId: contractAddress,
       gasPrice: result.gasPrice,
       gasUsed: result.gasUsed,
@@ -437,7 +657,32 @@ describe('Channel', function () {
     // TODO: contractState deserialization
   })
 
+  it('can post snapshot solo transaction', async () => {
+    const snapshotSoloTx = await initiator.channelSnapshotSoloTx({
+      channelId: initiatorCh.id(),
+      fromId: await initiator.address(),
+      payload: (await initiatorCh.state()).signedTx
+    })
+    await initiator.sendTransaction(await initiator.signTransaction(snapshotSoloTx), { waitMined: true })
+  })
+
   describe('throws errors', function () {
+    before(async function () {
+      initiatorCh = await Channel({
+        ...sharedParams,
+        role: 'initiator',
+        port: 3006,
+        sign: initiatorSign
+      })
+      responderCh = await Channel({
+        ...sharedParams,
+        role: 'responder',
+        port: 3006,
+        sign: responderSign
+      })
+      await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
+    })
+
     async function update ({ from, to, amount, sign }) {
       return initiatorCh.update(
         from || await initiator.address(),

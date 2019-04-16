@@ -20,7 +20,7 @@ import { BigNumber } from 'bignumber.js'
 
 export const createSalt = salt
 
-const base64Types = ['tx', 'st', 'ss', 'pi', 'ov', 'or', 'cb']
+const base64Types = ['tx', 'st', 'ss', 'pi', 'ov', 'or', 'cb', 'cs']
 
 /**
  * Build a contract public key

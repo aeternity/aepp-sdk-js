@@ -31,6 +31,7 @@ import {
   initialize,
   enqueueAction,
   send,
+  channelId,
   call
 } from './internal'
 import * as R from 'ramda'
@@ -68,6 +69,15 @@ function status () {
  */
 async function state () {
   return snakeToPascalObjKeys(await call(this, 'channels.get.offchain_state', {}))
+}
+
+/**
+ * Get channel id
+ *
+ * @return {string}
+ */
+function id () {
+  return channelId.get(this)
 }
 
 /**
@@ -560,6 +570,7 @@ const Channel = AsyncInit.compose({
     on,
     status,
     state,
+    id,
     update,
     poi,
     balances,

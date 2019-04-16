@@ -7,7 +7,7 @@ import { encode } from '../tx/builder/helpers'
 
 import { BigNumber } from 'bignumber.js'
 import {
-  BASE_VERIFICATION_SCHEMA, OBJECT_ID_TX_TYPE,
+  BASE_VERIFICATION_SCHEMA, MIN_GAS_PRICE, OBJECT_ID_TX_TYPE,
   OBJECT_TAG_SIGNED_TRANSACTION,
   SIGNATURE_VERIFICATION_SCHEMA
 } from './builder/schema'
@@ -50,6 +50,9 @@ const VALIDATORS = {
   // IF NONCE TO HIGH
   nonceHigh ({ accountNonce, nonce }) {
     return !(BigNumber(nonce).gt(BigNumber(accountNonce).plus(1)))
+  },
+  minGasPrice ({ gasPrice }) {
+    return isNaN(gasPrice) || BigNumber(gasPrice).gte(BigNumber(MIN_GAS_PRICE))
   }
 }
 

@@ -21,7 +21,8 @@ import {
   changeStatus,
   changeState,
   send,
-  emit
+  emit,
+  channelId
 } from './internal'
 import { unpackTx } from '../tx/builder'
 
@@ -86,6 +87,7 @@ export function awaitingBlockInclusion (channel, message, state) {
 
 export function awaitingOpenConfirmation (channel, message, state) {
   if (message.method === 'channels.info' && message.params.data.event === 'open') {
+    channelId.set(channel, message.params.channel_id)
     return { handler: awaitingInitialState }
   }
 }
