@@ -52,7 +52,7 @@ const VALIDATORS = {
     return !(BigNumber(nonce).gt(BigNumber(accountNonce).plus(1)))
   },
   minGasPrice ({ gasPrice }) {
-    return !isNaN(gasPrice) && gasPrice < MIN_GAS_PRICE
+    return isNaN(gasPrice) || BigNumber(gasPrice).gte(BigNumber(MIN_GAS_PRICE))
   }
 }
 

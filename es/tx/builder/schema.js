@@ -571,7 +571,7 @@ export const BASE_VERIFICATION_SCHEMA = [
     ERRORS.nonceHigh
   ),
   VERIFICATION_FIELD(
-    ({ minGas }) => `The gasPrice must be bigger then ${minGas}`,
+    () => `The gasPrice must be bigger then ${MIN_GAS_PRICE}`,
     VALIDATORS.minGasPrice,
     ERRORS.minGasPrice
   )
