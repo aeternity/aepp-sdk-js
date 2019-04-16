@@ -124,8 +124,6 @@ function onMessage (channel, data) {
     const callback = rpcCallbacks.get(channel).get(message.id)
     try {
       callback(message)
-    } catch (error) {
-      emit(channel, 'error', error)
     } finally {
       rpcCallbacks.get(channel).delete(message.id)
     }
@@ -137,12 +135,20 @@ function onMessage (channel, data) {
   }
 }
 
+function wrapCallErrorMessage (message) {
+  const [{ message: details } = {}] = message.error.data || []
+  if (details) {
+    return Error(`${message.error.message}: ${details}`)
+  }
+  return Error(message.error.message)
+}
+
 function call (channel, method, params) {
   return new Promise((resolve, reject) => {
     const id = sequence.set(channel, sequence.get(channel) + 1).get(channel)
     rpcCallbacks.get(channel).set(id, (message) => {
       if (message.result) return resolve(message.result)
-      if (message.error) return reject(new Error(message.error.message))
+      if (message.error) return reject(wrapCallErrorMessage(message))
     })
     send(channel, { jsonrpc: '2.0', method, id, params })
   })
