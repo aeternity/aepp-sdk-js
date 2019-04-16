@@ -441,13 +441,7 @@ async function callContractStatic ({ amount, callData, contract, abiVersion }) {
  * })
  */
 async function getContractCall ({ caller, contract, round }) {
-  const result = await call(this, 'channels.get.contract_call', { caller, contract, round })
-  return R.fromPairs(
-    R.map(
-      ([key, value]) => ([snakeToPascal(key), value]),
-      R.toPairs(result)
-    )
-  )
+  return snakeToPascalObjKeys(await call(this, 'channels.get.contract_call', { caller, contract, round }))
 }
 
 /**
@@ -466,6 +460,26 @@ async function getContractState (contract) {
   return snakeToPascalObjKeys({
     ...result,
     contract: snakeToPascalObjKeys(result.contract)
+  })
+}
+
+function cleanContractCalls () {
+  return new Promise((resolve, reject) => {
+    enqueueAction(
+      this,
+      (channel, state) => state.handler === handlers.channelOpen,
+      (channel, state) => {
+        send(channel, {
+          jsonrpc: '2.0',
+          method: 'channels.clean_contract_calls',
+          params: {}
+        })
+        return {
+          handler: handlers.awaitingCallsPruned,
+          state: { resolve, reject }
+        }
+      }
+    )
   })
 }
 
@@ -558,7 +572,8 @@ const Channel = AsyncInit.compose({
     callContract,
     callContractStatic,
     getContractCall,
-    getContractState
+    getContractState,
+    cleanContractCalls
   }
 })
 

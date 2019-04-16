@@ -411,6 +411,15 @@ describe('Channel', function () {
     value.should.eql({ type: 'word', value: 42 })
   })
 
+  it('can clean contract calls', async () => {
+    await initiatorCh.cleanContractCalls()
+    initiatorCh.getContractCall({
+      caller: await initiator.address(),
+      contract: contractAddress,
+      round: callerNonce
+    }).should.eventually.be.rejectedWith('Rejected: Call not found')
+  })
+
   it('can get contract state', async () => {
     const result = await initiatorCh.getContractState(contractAddress)
     result.should.eql({
