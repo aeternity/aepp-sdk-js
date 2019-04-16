@@ -23,6 +23,7 @@ pipeline {
         withCredentials([usernamePassword(credentialsId: 'genesis-wallet',
                                           usernameVariable: 'WALLET_PUB',
                                           passwordVariable: 'WALLET_PRIV')]) {
+          sh 'docker run -p 3007:3080 aeternity/aesophia_http'
           sh 'docker-compose -H localhost:2376 pull node'
           sh 'docker-compose -H localhost:2376 build'
           sh 'docker-compose -H localhost:2376 run sdk pnpm run test-jenkins'
