@@ -26,6 +26,16 @@ import {
 } from './internal'
 import { unpackTx } from '../tx/builder'
 
+function handleUnexpectedMessage (channel, message, state) {
+  if (state.reject) {
+    state.reject(Object.assign(
+      Error(`Unexpected message received:\n\n${JSON.stringify(message)}`,
+      { wsMessage: message }
+    )))
+  }
+  return { handler: channelOpen }
+}
+
 export function awaitingConnection (channel, message, state) {
   if (message.method === 'channels.info') {
     if (['channel_accept', 'funding_created'].includes(message.params.data.event)) {
@@ -159,6 +169,7 @@ export async function awaitingOffChainTx (channel, message, state) {
     }
     return { handler: channelOpen }
   }
+  return handleUnexpectedMessage(channel, message, state)
 }
 
 export function awaitingOffChainUpdate (channel, message, state) {
@@ -175,6 +186,7 @@ export function awaitingOffChainUpdate (channel, message, state) {
     state.reject(new Error(message.error.message))
     return { handler: channelOpen }
   }
+  return handleUnexpectedMessage(channel, message, state)
 }
 
 export async function awaitingTxSignRequest (channel, message, state) {
@@ -198,6 +210,7 @@ export async function awaitingTxSignRequest (channel, message, state) {
     })
     return { handler: awaitingUpdateConflict }
   }
+  return handleUnexpectedMessage(channel, message, state)
 }
 
 export function awaitingUpdateConflict (channel, message, state) {
@@ -207,6 +220,7 @@ export function awaitingUpdateConflict (channel, message, state) {
   if (message.method === 'channels.conflict') {
     return { handler: channelOpen }
   }
+  return handleUnexpectedMessage(channel, message, state)
 }
 
 export async function awaitingShutdownTx (channel, message, state) {
@@ -215,13 +229,15 @@ export async function awaitingShutdownTx (channel, message, state) {
     send(channel, { jsonrpc: '2.0', method: 'channels.shutdown_sign', params: { tx: signedTx } })
     return { handler: awaitingShutdownOnChainTx, state }
   }
+  return handleUnexpectedMessage(channel, message, state)
 }
 
 export function awaitingShutdownOnChainTx (channel, message, state) {
   if (message.method === 'channels.on_chain_tx') {
-    state.resolveShutdownPromise(message.params.data.tx)
+    state.resolve(message.params.data.tx)
     return { handler: channelClosed }
   }
+  return handleUnexpectedMessage(channel, message, state)
 }
 
 export function awaitingLeave (channel, message, state) {
@@ -233,6 +249,7 @@ export function awaitingLeave (channel, message, state) {
     state.reject(new Error(message.data.message))
     return { handler: channelOpen }
   }
+  return handleUnexpectedMessage(channel, message, state)
 }
 
 export async function awaitingWithdrawTx (channel, message, state) {
@@ -241,6 +258,7 @@ export async function awaitingWithdrawTx (channel, message, state) {
     send(channel, { jsonrpc: '2.0', method: 'channels.withdraw_tx', params: { tx: signedTx } })
     return { handler: awaitingWithdrawCompletion, state }
   }
+  return handleUnexpectedMessage(channel, message, state)
 }
 
 export function awaitingWithdrawCompletion (channel, message, state) {
@@ -271,6 +289,7 @@ export function awaitingWithdrawCompletion (channel, message, state) {
     state.resolve({ accepted: false })
     return { handler: channelOpen }
   }
+  return handleUnexpectedMessage(channel, message, state)
 }
 
 export async function awaitingDepositTx (channel, message, state) {
@@ -279,6 +298,7 @@ export async function awaitingDepositTx (channel, message, state) {
     send(channel, { jsonrpc: '2.0', method: 'channels.deposit_tx', params: { tx: signedTx } })
     return { handler: awaitingDepositCompletion, state }
   }
+  return handleUnexpectedMessage(channel, message, state)
 }
 
 export function awaitingDepositCompletion (channel, message, state) {
@@ -309,6 +329,7 @@ export function awaitingDepositCompletion (channel, message, state) {
     state.resolve({ accepted: false })
     return { handler: channelOpen }
   }
+  return handleUnexpectedMessage(channel, message, state)
 }
 
 export async function awaitingNewContractTx (channel, message, state) {
@@ -317,6 +338,7 @@ export async function awaitingNewContractTx (channel, message, state) {
     send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { tx: signedTx } })
     return { handler: awaitingNewContractCompletion, state }
   }
+  return handleUnexpectedMessage(channel, message, state)
 }
 
 export function awaitingNewContractCompletion (channel, message, state) {
@@ -339,6 +361,7 @@ export function awaitingNewContractCompletion (channel, message, state) {
     state.resolve({ accepted: false })
     return { handler: channelOpen }
   }
+  return handleUnexpectedMessage(channel, message, state)
 }
 
 export async function awaitingCallContractUpdateTx (channel, message, state) {
@@ -347,6 +370,7 @@ export async function awaitingCallContractUpdateTx (channel, message, state) {
     send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { tx: signedTx } })
     return { handler: awaitingCallContractCompletion, state }
   }
+  return handleUnexpectedMessage(channel, message, state)
 }
 
 export function awaitingCallContractCompletion (channel, message, state) {
@@ -359,6 +383,7 @@ export function awaitingCallContractCompletion (channel, message, state) {
     state.resolve({ accepted: false })
     return { handler: channelOpen }
   }
+  return handleUnexpectedMessage(channel, message, state)
 }
 
 export function channelClosed (channel, message, state) {
