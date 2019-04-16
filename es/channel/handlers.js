@@ -29,9 +29,9 @@ import { unpackTx } from '../tx/builder'
 function handleUnexpectedMessage (channel, message, state) {
   if (state.reject) {
     state.reject(Object.assign(
-      Error(`Unexpected message received:\n\n${JSON.stringify(message)}`,
+      Error(`Unexpected message received:\n\n${JSON.stringify(message)}`),
       { wsMessage: message }
-    )))
+    ))
   }
   return { handler: channelOpen }
 }
