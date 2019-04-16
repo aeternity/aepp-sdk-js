@@ -473,6 +473,16 @@ async function getContractState (contract) {
   })
 }
 
+/**
+ * Clean up all locally stored contract calls
+ *
+ * Contract calls are kept locally in order for the participant to be able to look them up.
+ * They consume memory and in order for the participant to free it - one can prune all messages.
+ * This cleans up all locally stored contract calls and those will no longer be available for
+ * fetching and inspection.
+ *
+ * @return {Promise}
+ */
 function cleanContractCalls () {
   return new Promise((resolve, reject) => {
     enqueueAction(
