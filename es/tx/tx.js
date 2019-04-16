@@ -29,12 +29,11 @@ import Tx from './'
 import Node from '../node'
 
 import { buildTx, calculateFee } from './builder'
-import { TX_TYPE } from './builder/schema'
+import { MIN_GAS_PRICE, TX_TYPE } from './builder/schema'
 import { buildContractId, oracleQueryId } from './builder/helpers'
 
 const ORACLE_VM_VERSION = 0
 const CONTRACT_VM_VERSION = 1
-const MIN_GAS_PRICE = 1000000000 // min gasPrice 1e9
 // TODO This values using as default for minerva node
 const CONTRACT_MINERVA_VM_ABI = 196609
 const CONTRACT_MINERVA_VM = 3
