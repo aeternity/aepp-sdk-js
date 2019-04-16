@@ -14,7 +14,7 @@ JavaScript SDK for the revolutionary [æternity] blockchain, targeting the
 
 #### Disclaimer
 
-This SDK is in continuos development where things can easily break. We aim to make all our
+This SDK is in continuos development where things can easily break, especially if you're not an officially released version. We aim to make all our
  releases as stable as possible, neverless it should not be taken as
 production-ready.
 
@@ -58,21 +58,24 @@ Import the right [flavor](docs/usage.md). For this example with get the `Univers
 import Ae from '@aeternity/aepp-sdk/es/ae/universal' // or other flavor
 ```
 
-### 3. Start interacting with aeternity's blockchain
+## Examples
+
+### 1. Universal Example:
+> interact with aeternity's blockchain's [**Universal flavor**](docs/usage.md)
 
 ```js
-
-// Start the instance
+// Start the instance using Universal flavor
+import Ae from '@aeternity/aepp-sdk/es/ae/universal'
 
 Ae({
   url: 'https://sdk-testnet.aepps.com',
   internalUrl: 'https://sdk-testnet.aepps.com',
+  compilerUrl: 'https://compiler.aepps.com',
   keypair: { secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS' },
   networkId: 'aet_ua' // or any other networkId your client should connect to
 }).then(ae => {
 
   // Interacting with the blockchain client
-
   // getting the latest block height
   ae.height().then(height => {
     // logs current height
@@ -93,7 +96,75 @@ Ae({
 })
 ```
 
-### 4. Check out the [Usage Documentation] to avoid common pitfalls.
+### 2. Wallet Example:
+> interact with aeternity's blockchain's [**Wallet flavor**](docs/usage.md) – For _Wallet_ development
+> You can find a more [complete example using VueJS here](examples/connect-two-ae)
+
+
+```js
+// Start the instance using Wallet flavor
+import Wallet from '@aeternity/aepp-sdk/es/ae/wallet'
+const walletBalance
+
+// Simple function to Guard SDK actions
+const confirmDialog = function (method, params, {id}) {
+  return Promise.resolve(window.confirm(`User ${id} wants to run ${method} ${params}`))
+}
+
+Wallet({
+  url: 'https://sdk-testnet.aepps.com',
+  internalUrl: 'https://sdk-testnet.aepps.com',
+  compilerUrl: 'https://compiler.aepps.com',
+  accounts: [
+    MemoryAccount({
+      keypair: {
+                  secretKey: 'secr3tKeYh3RE',
+                  publicKey: 'ak_pUbL1cH4sHHer3'
+                }
+    })
+  ],
+  address: 'ak_pUbL1cH4sHHer3',
+  onTx: confirmDialog,
+  onChain: confirmDialog,
+  onAccount: confirmDialog,
+  onContract: confirmDialog,
+  networkId: 'aet_ua' // or any other networkId your client should connect to
+}).then(ae => {
+
+  // Interact with the blockchain!
+  ae.balance(this.pub).then(balance => {
+    walletBalance = balance
+  }).catch(e => {
+    walletBalance = 0
+  })
+})
+```
+
+### 3. Aepp Example:
+> interact with aeternity's blockchain's [**Aepp flavor**](docs/usage.md) – For _Aepps_ development AKA DApp development
+> You can find a more [complete example using VueJS here](examples/connect-two-ae)
+
+
+```js
+// Start the instance using Aepp flavor
+import Aepp from '@aeternity/aepp-sdk/es/ae/aepp'
+const pubKey
+
+// Here, we're not initialising anything, assuming that this is an Aepp (DApp)
+// working inside an Iframe of a "Wallet flavored" JS App
+Aepp().then(ae => {
+
+  // Interact with the blockchain!
+  ae.address()
+    .then(address => {
+      //get address of the Wallet used by this Aepp
+      pubKey = address
+    })
+    .catch(e => { console.log(`Rejected: ${e}`) })
+})
+```
+
+## More? Check out the [Usage Documentation] to avoid common pitfalls.
 
 [Usage Documentation]: docs/usage.md
 
