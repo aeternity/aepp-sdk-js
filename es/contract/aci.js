@@ -23,7 +23,9 @@
  * @example import ContractACI from '@aeternity/aepp-sdk/es/contract/aci'
  */
 import AsyncInit from '../utils/async-init'
-import { decode, encode } from '../tx/builder/helpers'
+import { decode } from '../tx/builder/helpers'
+import { aeEncodeKey } from '../utils/crypto'
+import { toBytes } from '../utils/bytes'
 
 const SOPHIA_TYPES = [
   'int',
@@ -116,7 +118,7 @@ function transformDecodedData (aci, result, { skipTransformDecoded = false } = {
     case SOPHIA_TYPES.bool:
       return !!result.value
     case SOPHIA_TYPES.address:
-      return encode(Buffer.from(result.value, 'hex'), 'ak')
+      return aeEncodeKey(toBytes(result.value, true))
     case SOPHIA_TYPES.map:
       const [keyT, ...valueT] = generic.split(',')
       return result.value
