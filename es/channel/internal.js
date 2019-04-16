@@ -32,6 +32,7 @@ const messageQueueLocked = new WeakMap()
 const actionQueue = new WeakMap()
 const actionQueueLocked = new WeakMap()
 const sequence = new WeakMap()
+const channelId = new WeakMap()
 const rpcCallbacks = new WeakMap()
 
 function channelURL (url, params, endpoint = 'channel') {
@@ -196,5 +197,6 @@ export {
   changeState,
   send,
   enqueueAction,
+  channelId,
   call
 }
