@@ -1,14 +1,7 @@
-import ax from 'axios'
-import https from 'https'
+import axios from 'axios'
 import JSONbig from 'json-bigint'
 import * as R from 'ramda'
 import stampit from '@stamp/it'
-
-const axios = ax.create({
-  httpsAgent: new https.Agent({
-    rejectUnauthorized: true // For develop
-  })
-})
 
 async function get (url, options) {
   return processResponse(
