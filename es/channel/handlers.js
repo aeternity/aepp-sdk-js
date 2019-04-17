@@ -363,6 +363,15 @@ export function awaitingCallContractCompletion (channel, message, state) {
   }
 }
 
+export function awaitingCallsPruned (channels, message, state) {
+  if (message.method === 'channels.calls_pruned.reply') {
+    state.resolve()
+    return { handler: channelOpen }
+  }
+  state.reject(new Error('Unexpected message received'))
+  return { handler: channelClosed }
+}
+
 export function channelClosed (channel, message, state) {
   return { handler: channelClosed }
 }
