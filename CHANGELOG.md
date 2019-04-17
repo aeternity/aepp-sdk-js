@@ -1,4 +1,4 @@
-# [3.0.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.1...3.0.0) (2019-04-17)
+# [3.0.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...3.0.0) (2019-04-17)
 
 
 ### Bug Fixes
@@ -8,6 +8,8 @@
 
 ### Features
 
+* **TX_BUILDER:** Channel tx serializations 
+* **TxValidator:** Add minGasPrice validation to contract transactions
 * **ACI:** Update due to compiler API changes ([#331](https://github.com/aeternity/aepp-sdk-js/issues/331)) ([e047f3b](https://github.com/aeternity/aepp-sdk-js/commit/e047f3b))
 * **Aepp:** Add Compiler to Aepp rpc methods. Update example app ([#312](https://github.com/aeternity/aepp-sdk-js/issues/312)) ([9c72521](https://github.com/aeternity/aepp-sdk-js/commit/9c72521))
 * **State Channels:** Add cleanContractCalls method ([#338](https://github.com/aeternity/aepp-sdk-js/issues/338)) ([778159a](https://github.com/aeternity/aepp-sdk-js/commit/778159a))
