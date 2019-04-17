@@ -1,3 +1,20 @@
+# [3.0.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.1...3.0.0) (2019-04-17)
+
+
+### Bug Fixes
+
+* **ACI:** Fix address type transformation when decoding data ([#335](https://github.com/aeternity/aepp-sdk-js/issues/335)) ([e37cdfc](https://github.com/aeternity/aepp-sdk-js/commit/e37cdfc))
+* **Channel:** Fix failing test on 2.3.0 node ([55a2891](https://github.com/aeternity/aepp-sdk-js/commit/55a2891))
+
+
+### Features
+
+* **ACI:** Update due to compiler API changes ([#331](https://github.com/aeternity/aepp-sdk-js/issues/331)) ([e047f3b](https://github.com/aeternity/aepp-sdk-js/commit/e047f3b))
+* **npm:** Add script for auto-generating changelog ([97c2a3c](https://github.com/aeternity/aepp-sdk-js/commit/97c2a3c))
+* **State Channels:** Add cleanContractCalls method ([#338](https://github.com/aeternity/aepp-sdk-js/issues/338)) ([778159a](https://github.com/aeternity/aepp-sdk-js/commit/778159a))
+
+
+
 # [3.0.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...3.0.0) (2019-04-17)
 
 
