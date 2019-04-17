@@ -701,7 +701,7 @@ describe('Channel', function () {
     })
 
     it('when posting an update with incorrect address', async () => {
-      return update({ from: 'ak_123' }).should.eventually.be.rejectedWith('Internal error')
+      return update({ from: 'ak_123' }).should.eventually.be.rejectedWith('Rejected')
     })
 
     it('when posting an update with incorrect amount', async () => {
