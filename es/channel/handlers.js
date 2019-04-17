@@ -21,7 +21,8 @@ import {
   changeStatus,
   changeState,
   send,
-  emit
+  emit,
+  channelId
 } from './internal'
 import { unpackTx } from '../tx/builder'
 
@@ -86,6 +87,7 @@ export function awaitingBlockInclusion (channel, message, state) {
 
 export function awaitingOpenConfirmation (channel, message, state) {
   if (message.method === 'channels.info' && message.params.data.event === 'open') {
+    channelId.set(channel, message.params.channel_id)
     return { handler: awaitingInitialState }
   }
 }
@@ -357,6 +359,15 @@ export function awaitingCallContractCompletion (channel, message, state) {
     state.resolve({ accepted: false })
     return { handler: channelOpen }
   }
+}
+
+export function awaitingCallsPruned (channels, message, state) {
+  if (message.method === 'channels.calls_pruned.reply') {
+    state.resolve()
+    return { handler: channelOpen }
+  }
+  state.reject(new Error('Unexpected message received'))
+  return { handler: channelClosed }
 }
 
 export function channelClosed (channel, message, state) {

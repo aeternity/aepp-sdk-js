@@ -16,6 +16,7 @@ import {
 } from './schema'
 import { readInt, readId, readPointers, writeId, writeInt, buildPointers, encode, decode } from './helpers'
 import { toBytes } from '../../utils/bytes'
+import * as mpt from '../../utils/mptree'
 
 /**
  * JavaScript-based Transaction builder
@@ -37,6 +38,10 @@ function deserializeField (value, type, prefix) {
       return readInt(value)
     case FIELD_TYPES.id:
       return readId(value)
+    case FIELD_TYPES.ids:
+      return value.map(readId)
+    case FIELD_TYPES.bool:
+      return value[0] === 1
     case FIELD_TYPES.binary:
       return encode(value, prefix)
     case FIELD_TYPES.string:
@@ -45,11 +50,26 @@ function deserializeField (value, type, prefix) {
       return readPointers(value)
     case FIELD_TYPES.rlpBinary:
       return unpackTx(value, true)
+    case FIELD_TYPES.rlpBinaries:
+      return value.map(v => unpackTx(v, true))
+    case FIELD_TYPES.rawBinary:
+      return value
+    case FIELD_TYPES.hex:
+      return value.toString('hex')
     case FIELD_TYPES.offChainUpdates:
       return value.map(v => unpackTx(v, true))
     case FIELD_TYPES.callStack:
       // TODO: fix this
       return [readInt(value)]
+    case FIELD_TYPES.mptree:
+      return value.map(mpt.deserialize)
+    case FIELD_TYPES.callReturnType:
+      switch (readInt(value)) {
+        case '0': return 'ok'
+        case '1': return 'error'
+        case '2': return 'revert'
+        default: return value
+      }
     default:
       return value
   }
@@ -61,14 +81,29 @@ function serializeField (value, type, prefix) {
       return writeInt(value)
     case FIELD_TYPES.id:
       return writeId(value)
+    case FIELD_TYPES.ids:
+      return value.map(writeId)
+    case FIELD_TYPES.bool:
+      return Buffer.from([value ? 1 : 0])
     case FIELD_TYPES.binary:
       return decode(value, prefix)
+    case FIELD_TYPES.hex:
+      return Buffer.from(value, 'hex')
     case FIELD_TYPES.signatures:
       return value.map(Buffer.from)
     case FIELD_TYPES.string:
       return toBytes(value)
     case FIELD_TYPES.pointers:
       return buildPointers(value)
+    case FIELD_TYPES.mptree:
+      return value.map(mpt.serialize)
+    case FIELD_TYPES.callReturnType:
+      switch (value) {
+        case 'ok': return writeInt(0)
+        case 'error': return writeInt(1)
+        case 'revert': return writeInt(2)
+        default: return value
+      }
     default:
       return value
   }
@@ -250,10 +285,11 @@ export function unpackRawTx (binary, schema) {
  * @param {String} type Transaction type
  * @param {Object} [options={}] options
  * @param {Object} [options.excludeKeys] excludeKeys Array of keys to exclude for validation and build
+ * @param {String} [options.prefix] Prefix of transaction
  * @throws {Error} Validation error
  * @return {Object} { tx, rlpEncoded, binary } Object with tx -> Base64Check transaction hash with 'tx_' prefix, rlp encoded transaction and binary transaction
  */
-export function buildTx (params, type, { excludeKeys = [] } = {}) {
+export function buildTx (params, type, { excludeKeys = [], prefix = 'tx' } = {}) {
   if (!TX_SERIALIZATION_SCHEMA[type]) {
     throw new Error('Transaction serialization not implemented for ' + type)
   }
@@ -261,7 +297,7 @@ export function buildTx (params, type, { excludeKeys = [] } = {}) {
   const binary = buildRawTx({ ...params, VSN, tag }, schema, { excludeKeys }).filter(e => e !== undefined)
 
   const rlpEncoded = rlp.encode(binary)
-  const tx = encode(rlpEncoded, 'tx')
+  const tx = encode(rlpEncoded, prefix)
 
   return { tx, rlpEncoded, binary, txObject: unpackRawTx(binary, schema) }
 }

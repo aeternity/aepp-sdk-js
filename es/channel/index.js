@@ -31,6 +31,7 @@ import {
   initialize,
   enqueueAction,
   send,
+  channelId,
   call
 } from './internal'
 import * as R from 'ramda'
@@ -68,6 +69,15 @@ function status () {
  */
 async function state () {
   return snakeToPascalObjKeys(await call(this, 'channels.get.offchain_state', {}))
+}
+
+/**
+ * Get channel id
+ *
+ * @return {string}
+ */
+function id () {
+  return channelId.get(this)
 }
 
 /**
@@ -441,13 +451,7 @@ async function callContractStatic ({ amount, callData, contract, abiVersion }) {
  * })
  */
 async function getContractCall ({ caller, contract, round }) {
-  const result = await call(this, 'channels.get.contract_call', { caller, contract, round })
-  return R.fromPairs(
-    R.map(
-      ([key, value]) => ([snakeToPascal(key), value]),
-      R.toPairs(result)
-    )
-  )
+  return snakeToPascalObjKeys(await call(this, 'channels.get.contract_call', { caller, contract, round }))
 }
 
 /**
@@ -466,6 +470,36 @@ async function getContractState (contract) {
   return snakeToPascalObjKeys({
     ...result,
     contract: snakeToPascalObjKeys(result.contract)
+  })
+}
+
+/**
+ * Clean up all locally stored contract calls
+ *
+ * Contract calls are kept locally in order for the participant to be able to look them up.
+ * They consume memory and in order for the participant to free it - one can prune all messages.
+ * This cleans up all locally stored contract calls and those will no longer be available for
+ * fetching and inspection.
+ *
+ * @return {Promise}
+ */
+function cleanContractCalls () {
+  return new Promise((resolve, reject) => {
+    enqueueAction(
+      this,
+      (channel, state) => state.handler === handlers.channelOpen,
+      (channel, state) => {
+        send(channel, {
+          jsonrpc: '2.0',
+          method: 'channels.clean_contract_calls',
+          params: {}
+        })
+        return {
+          handler: handlers.awaitingCallsPruned,
+          state: { resolve, reject }
+        }
+      }
+    )
   })
 }
 
@@ -546,6 +580,7 @@ const Channel = AsyncInit.compose({
     on,
     status,
     state,
+    id,
     update,
     poi,
     balances,
@@ -558,7 +593,8 @@ const Channel = AsyncInit.compose({
     callContract,
     callContractStatic,
     getContractCall,
-    getContractState
+    getContractState,
+    cleanContractCalls
   }
 })
 
