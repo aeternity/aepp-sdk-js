@@ -14,6 +14,7 @@ import Channel from '@aeternity/aepp-sdk/es/channel/index'
         * [~on(event, callback)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..on)
         * [~status()](#module_@aeternity/aepp-sdk/es/channel/index--Channel..status) ⇒ `string`
         * [~state()](#module_@aeternity/aepp-sdk/es/channel/index--Channel..state) ⇒ `object`
+        * [~id()](#module_@aeternity/aepp-sdk/es/channel/index--Channel..id) ⇒ `string`
         * [~update(from, to, amount, sign)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..update) ⇒ `Promise.&lt;object&gt;`
         * [~poi(addresses)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..poi) ⇒ `Promise.&lt;string&gt;`
         * [~balances(accounts)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..balances) ⇒ `Promise.&lt;object&gt;`
@@ -26,6 +27,7 @@ import Channel from '@aeternity/aepp-sdk/es/channel/index'
         * [~callContractStatic(options)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..callContractStatic) ⇒ `Promise.&lt;object&gt;`
         * [~getContractCall(options)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..getContractCall) ⇒ `Promise.&lt;object&gt;`
         * [~getContractState(contract)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..getContractState) ⇒ `Promise.&lt;object&gt;`
+        * [~cleanContractCalls()](#module_@aeternity/aepp-sdk/es/channel/index--Channel..cleanContractCalls) ⇒ `Promise`
         * [~sendMessage(message, recipient)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..sendMessage)
 
 <a id="exp_module_@aeternity/aepp-sdk/es/channel/index--Channel"></a>
@@ -96,6 +98,12 @@ Get current status
 
 #### Channel~state() ⇒ `object`
 Get current state
+
+**Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
+<a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..id"></a>
+
+#### Channel~id() ⇒ `string`
+Get channel id
 
 **Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
 <a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..update"></a>
@@ -395,6 +403,17 @@ channel.getContractState(
   console.log('deposit:', contract.deposit)
 })
 ```
+<a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..cleanContractCalls"></a>
+
+#### Channel~cleanContractCalls() ⇒ `Promise`
+Clean up all locally stored contract calls
+
+Contract calls are kept locally in order for the participant to be able to look them up.
+They consume memory and in order for the participant to free it - one can prune all messages.
+This cleans up all locally stored contract calls and those will no longer be available for
+fetching and inspection.
+
+**Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
 <a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..sendMessage"></a>
 
 #### Channel~sendMessage(message, recipient)

@@ -1,6 +1,6 @@
 {
   "name": "@aeternity/aepp-sdk",
-  "version": "2.4.1",
+  "version": "3.0.0",
   "description": "SDK for the æternity blockchain",
   "main": "dist/aepp-sdk.js",
   "browser": "dist/aepp-sdk.browser.js",
@@ -15,6 +15,7 @@
     "test:watch": "mocha --recursive --require @babel/register --watch",
     "test-jenkins": "mocha --recursive --require @babel/register --reporter mocha-junit-reporter",
     "prepare": "npm run build",
+    "genChangelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
     "prepublishOnly": "npm run docs:docco && npm run docs:api"
   },
   "license": "ISC",
