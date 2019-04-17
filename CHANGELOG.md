@@ -15,6 +15,11 @@
 * **State Channels:** Add cleanContractCalls method ([#338](https://github.com/aeternity/aepp-sdk-js/issues/338)) ([778159a](https://github.com/aeternity/aepp-sdk-js/commit/778159a))
 
 
+### BREAKING CHANGES
+
+* **ACI** Remove 2.0.0 compiler compatibility
+
+
 
 # [2.4.1](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...2.4.1) (2019-04-17)
 
