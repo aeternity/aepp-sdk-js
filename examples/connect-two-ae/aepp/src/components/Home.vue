@@ -71,9 +71,10 @@
         <div class="p-2 w-1/4">
           Deployed Contract
         </div>
-        <div v-if="pub" class="p-2 w-3/4 bg-grey-lightest break-words">
-          {{ deployInfo || deployError }}
-        </div>
+        <div
+          v-if="pub"
+          class="p-2 w-3/4 bg-grey-lightest break-words whitespace-pre-wrap"
+        >{{ deployInfo ? JSON.stringify(deployInfo, null, 4) : deployError }}</div>
       </div>
     </div>
 
@@ -86,9 +87,10 @@
         <div class="p-2 w-1/4">
           Call Result
         </div>
-        <div v-if="pub" class="p-2 w-3/4 bg-grey-lightest break-words">
-          {{ callResult || callError }}
-        </div>
+        <div
+          v-if="pub"
+          class="p-2 w-3/4 bg-grey-lightest break-words whitespace-pre-wrap"
+        >{{ callResult ? JSON.stringify(callResult, null, 4) : callError }}</div>
       </div>
     </div>
   </div>
