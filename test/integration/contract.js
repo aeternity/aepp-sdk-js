@@ -30,6 +30,9 @@ contract StateContract =
   public function retrieve() : string = state.value
 `
 const testContract = `
+contract Voting =
+  public function test() : int = 1
+
 contract StateContract =
   record state = { value: string, key: int }
   public function init(value: string, key: int) : state = { value = value, key = key }
@@ -38,6 +41,12 @@ contract StateContract =
   public function boolFn(a: bool) : bool = a
   public function listFn(a: list(int)) : list(int) = a
   public function testFn(a: list(int), b: bool) : (list(int), bool) = (a, b)
+  public function approve(tx_id: int, voting_contract: Voting) : int = tx_id
+  public function getRecord() : state = state
+  public function setRecord(s: state) : state = s
+  public function emptyAddress() : address = #0
+  public function contractAddress (ct: address) : address = ct
+  public function accountAddress (ak: address) : address = ak
 `
 
 const encodedNumberSix = 'cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaKNdnK'
@@ -197,6 +206,34 @@ describe('Contract', function () {
         } catch (e) {
           e.message.should.be.equal('Validation error: ["Argument index: 1, value: [1234] must be of type [bool]"]')
         }
+      })
+      it('Call contract with contract type argument', async () => {
+        const result = await contractObject.call('approve', [0, 'ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh'])
+        return result.decode().should.eventually.become(0)
+      })
+      it('Call contract with return of record type', async () => {
+        const result = await contractObject.call('getRecord', [])
+        return result.decode().should.eventually.become({ value: 'blabla', key: 100 })
+      })
+      it('Call contract with argument of record type', async () => {
+        const result = await contractObject.call('setRecord', [{ value: 'qwe', key: 1234 }])
+        return result.decode().should.eventually.become({ value: 'qwe', key: 1234 })
+      })
+      it('Function return #0 as address', async () => {
+        const result = await contractObject.call('emptyAddress')
+        return result.decode().should.eventually.become(0)
+      })
+      it('Function return address', async () => {
+        const contractAddress = await (await contractObject
+          .call('contractAddress', ['ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh']))
+          .decode(null, { addressPrefix: 'ct' })
+
+        const accountAddress = await (await contractObject
+          .call('accountAddress', [await contract.address()]))
+          .decode(null, { addressPrefix: 'ak' })
+
+        contractAddress.should.be.equal('ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh')
+        accountAddress.should.be.equal(await contract.address())
       })
     })
   })
