@@ -44,6 +44,9 @@ contract StateContract =
   public function approve(tx_id: int, voting_contract: Voting) : int = tx_id
   public function getRecord() : state = state
   public function setRecord(s: state) : state = s
+  public function emptyAddress() : address = #0
+  public function contractAddress (ct: address) : address = ct
+  public function accountAddress (ak: address) : address = ak
 `
 
 const encodedNumberSix = 'cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaKNdnK'
@@ -215,6 +218,22 @@ describe('Contract', function () {
       it('Call contract with argument of record type', async () => {
         const result = await contractObject.call('setRecord', [{ value: 'qwe', key: 1234 }])
         return result.decode().should.eventually.become({ value: 'qwe', key: 1234 })
+      })
+      it('Function return #0 as address', async () => {
+        const result = await contractObject.call('emptyAddress')
+        return result.decode().should.eventually.become(0)
+      })
+      it('Function return address', async () => {
+        const contractAddress = await (await contractObject
+          .call('contractAddress', ['ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh']))
+          .decode(null, { addressPrefix: 'ct' })
+
+        const accountAddress = await (await contractObject
+          .call('accountAddress', [await contract.address()]))
+          .decode(null, { addressPrefix: 'ak' })
+
+        contractAddress.should.be.equal('ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh')
+        accountAddress.should.be.equal(await contract.address())
       })
     })
   })

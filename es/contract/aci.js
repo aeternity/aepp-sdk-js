@@ -24,7 +24,7 @@
  */
 import AsyncInit from '../utils/async-init'
 import { decode } from '../tx/builder/helpers'
-import { aeEncodeKey } from '../utils/crypto'
+import { encodeBase58Check } from '../utils/crypto'
 import { toBytes } from '../utils/bytes'
 
 const SOPHIA_TYPES = [
@@ -117,6 +117,11 @@ function validate (type, value) {
   }
 }
 
+function encodeAddress (address, prefix = 'ak') {
+  const addressBuffer = Buffer.from(address, 'hex')
+  const encodedAddress = encodeBase58Check(addressBuffer)
+  return `${prefix}_${encodedAddress}`
+}
 /**
  * Transform decoded data to JS type
  * @param aci
@@ -124,7 +129,7 @@ function validate (type, value) {
  * @param transformDecodedData
  * @return {*}
  */
-function transformDecodedData (aci, result, { skipTransformDecoded = false } = {}) {
+function transformDecodedData (aci, result, { skipTransformDecoded = false, addressPrefix = 'ak' } = {}) {
   if (skipTransformDecoded) return result
   const { t, generic } = readType(aci, true)
 
@@ -132,7 +137,9 @@ function transformDecodedData (aci, result, { skipTransformDecoded = false } = {
     case SOPHIA_TYPES.bool:
       return !!result.value
     case SOPHIA_TYPES.address:
-      return aeEncodeKey(toBytes(result.value, true))
+      return result.value === 0
+        ? 0
+        : encodeAddress(toBytes(result.value, true), addressPrefix)
     case SOPHIA_TYPES.map:
       const [keyT, valueT] = generic
       return result.value
@@ -151,7 +158,11 @@ function transformDecodedData (aci, result, { skipTransformDecoded = false } = {
       return result.value.map(({ value }, i) => { return transformDecodedData(generic[i], { value }) })
     case SOPHIA_TYPES.record:
       return result.value.reduce(
-        (acc, { name, value }, i) => ({ ...acc, [generic[i].name]: transformDecodedData(generic[i].type, { value }) }),
+        (acc, { name, value }, i) =>
+          ({
+            ...acc,
+            [generic[i].name]: transformDecodedData(generic[i].type, { value })
+          }),
         {}
       )
   }
@@ -251,6 +262,7 @@ async function getContractInstance (source, { aci, contractAddress } = {}) {
   return instance
 }
 
+// @TODO Remove after compiler can decode using type from ACI
 function transformReturnType (returns) {
   try {
     if (typeof returns === 'string') return returns
@@ -287,10 +299,14 @@ function call (self) {
         options
       })
       : await self.contractCall(this.source, this.deployInfo.address, fn, params, options)
-    const returnType = transformReturnType(fnACI.returns)
     return {
       ...result,
-      decode: async (type = returnType) => transformDecodedData(fnACI.returns, await self.contractDecodeData(type, result.result.returnValue), options)
+      decode: async (type, opt = {}) =>
+        transformDecodedData(
+          fnACI.returns,
+          await self.contractDecodeData(type || transformReturnType(fnACI.returns), result.result.returnValue),
+          { ...options, ...opt }
+        )
     }
   }
 }
