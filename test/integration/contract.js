@@ -135,7 +135,7 @@ describe('Contract', function () {
     })
   })
 
-  describe.only('Contract ACI Interface', function () {
+  describe('Contract ACI Interface', function () {
     let contractObject
 
     it('Generate ACI object', async () => {
@@ -210,12 +210,12 @@ describe('Contract', function () {
       })
       it('Call contract with return of record type', async () => {
         const result = await contractObject.call('getRecord', [])
+        console.log(await result.decode())
         return result.decode().should.eventually.become({ value: 'blabla', key: 100 })
       })
-      it.skip('Call contract with argument of record type', async () => {
-        const result = await contractObject.call('setRecord', [['lala', 1]])
-        console.log(await result.decode)
-        return result.decode().should.eventually.become('lala')
+      it('Call contract with argument of record type', async () => {
+        const result = await contractObject.call('setRecord', [{ value: 'qwe', key: 1234 }])
+        return result.decode().should.eventually.become({ value: 'qwe', key: 1234 })
       })
     })
   })

@@ -63,13 +63,15 @@ function transform (type, value) {
       return `(${value.map((el, i) => transform(generic[i], el))})`
     case SOPHIA_TYPES.address:
       return `#${decode(value).toString('hex')}`
-    // case SOPHIA_TYPES.record:
-    //   console.log('-----------')
-    //   console.log(t)
-    //   console.log(generic)
-    //   console.log(value)
-    //   console.log('-----------')
-    //   return `(${value.map((el, i) => transform(generic[i].type, el))})`
+    case SOPHIA_TYPES.record:
+      return `{${generic.reduce(
+        (acc, { name, type }, i) => {
+          if (i !== 0) acc += ','
+          acc += `${name} = ${transform(type[0], value[name])}`
+          return acc
+        },
+        ''
+      )}}`
   }
 
   return `${value}`
@@ -269,13 +271,16 @@ function transformReturnType (returns) {
 }
 
 function call (self) {
-  return async function (fn, params = [], options = { skipArgsConvert: false, skipTransformDecoded: false, callStatic: false }) {
+  return async function (fn, params = [], options = {
+    skipArgsConvert: false,
+    skipTransformDecoded: false,
+    callStatic: false
+  }) {
     const fnACI = getFunctionACI(this.aci, fn)
     if (!fn) throw new Error('Function name is required')
     if (!this.deployInfo.address) throw new Error('You need to deploy contract before calling!')
 
     params = !options.skipArgsConvert ? prepareArgsForEncode(fnACI, params) : params
-    console.log(params)
     const result = options.callStatic
       ? await self.contractCallStatic(this.source, this.deployInfo.address, fn, params, {
         top: options.top,
@@ -283,7 +288,6 @@ function call (self) {
       })
       : await self.contractCall(this.source, this.deployInfo.address, fn, params, options)
     const returnType = transformReturnType(fnACI.returns)
-    console.log(returnType)
     return {
       ...result,
       decode: async (type = returnType) => transformDecodedData(fnACI.returns, await self.contractDecodeData(type, result.result.returnValue), options)
