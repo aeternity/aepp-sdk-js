@@ -34,7 +34,8 @@ const SOPHIA_TYPES = [
   'address',
   'bool',
   'list',
-  'map'
+  'map',
+  'record'
 ].reduce((acc, type, i) => {
   acc[type] = type
   return acc
@@ -62,6 +63,13 @@ function transform (type, value) {
       return `(${value.map((el, i) => transform(generic[i], el))})`
     case SOPHIA_TYPES.address:
       return `#${decode(value).toString('hex')}`
+    // case SOPHIA_TYPES.record:
+    //   console.log('-----------')
+    //   console.log(t)
+    //   console.log(generic)
+    //   console.log(value)
+    //   console.log('-----------')
+    //   return `(${value.map((el, i) => transform(generic[i].type, el))})`
   }
 
   return `${value}`
@@ -117,6 +125,7 @@ function validate (type, value) {
 function transformDecodedData (aci, result, { skipTransformDecoded = false } = {}) {
   if (skipTransformDecoded) return result
   const { t, generic } = readType(aci, true)
+
   switch (t) {
     case SOPHIA_TYPES.bool:
       return !!result.value
@@ -138,6 +147,8 @@ function transformDecodedData (aci, result, { skipTransformDecoded = false } = {
       return result.value.map(({ value }) => transformDecodedData(generic, { value }))
     case SOPHIA_TYPES.tuple:
       return result.value.map(({ value }, i) => { return transformDecodedData(generic[i], { value }) })
+    case SOPHIA_TYPES.record:
+      return result.value.map(({ value }, i) => { return transformDecodedData(generic[i].type, { value }) })
   }
   return result.value
 }
@@ -239,11 +250,11 @@ function transformReturnType (returns) {
   if (typeof returns === 'string') return returns
   if (typeof returns === 'object') {
     const [[key, value]] = Object.entries(returns)
-    return `${key !== 'tuple' ? key : ''}(${value
+    return `${key !== 'tuple' && key !== 'record' ? key : ''}(${value
       .reduce(
         (acc, el, i) => {
           if (i !== 0) acc += ','
-          acc += transformReturnType(el)
+          acc += transformReturnType(key !== 'record' ? el : el.type[0])
           return acc
         },
         '')
