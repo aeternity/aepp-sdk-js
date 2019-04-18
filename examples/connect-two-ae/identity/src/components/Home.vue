@@ -50,8 +50,8 @@ export default {
       client: null,
       balance: null,
       height: null,
-      url: 'http://localhost:3013',
-      internalUrl: 'http://localhost:3113',
+      url: 'https://sdk-testnet.aepps.com',
+      internalUrl: 'https://sdk-testnet.aepps.com',
       compilerUrl: 'https://compiler.aepps.com',
       aeppUrl: '//0.0.0.0:9001'
     }
