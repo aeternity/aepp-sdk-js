@@ -210,7 +210,6 @@ describe('Contract', function () {
       })
       it('Call contract with return of record type', async () => {
         const result = await contractObject.call('getRecord', [])
-        console.log(await result.decode())
         return result.decode().should.eventually.become({ value: 'blabla', key: 100 })
       })
       it('Call contract with argument of record type', async () => {
