@@ -5,7 +5,7 @@
     <div class="border">
       <div class="bg-green w-full flex flex-row font-mono border border-b">
         <div class="p-2 w-1/4">
-          Public Key <small>(from Identity Aepp)</small>
+          Public Key <small>(from Wallet Aepp)</small>
         </div>
         <div v-if="pub" class="p-2 w-3/4 bg-grey-lightest break-words">
           {{pub}}
@@ -43,54 +43,54 @@
           Contract Code
         </div>
         <div class="p-2 w-3/4 bg-white">
-          <textarea class="bg-black text-white border-b border-black p-2 w-full h-64" v-model='contractCode' placeholder="contact code"/>
+          <textarea class="bg-black text-white border-b border-black p-2 w-full h-64" v-model="contractCode" placeholder="contact code"/>
         </div>
       </div>
-      <button v-if="client" class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 text-xs" @click='onCompile'>
+      <button v-if="client" class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 text-xs" @click="compile">
         Compile
       </button>
     </div>
 
-    <div v-if="byteCode" class="border mt-4 mb-8 rounded">
+    <div v-if="byteCode || compileError" class="border mt-4 mb-8 rounded">
       <div class="bg-green w-full flex flex-row font-mono border border-b">
         <div class="p-2 w-1/4">
           Compiled Code
         </div>
         <div v-if="pub" class="p-2 w-3/4 bg-grey-lightest break-words">
-          {{byteCode}}
+          {{ byteCode || compileError }}
         </div>
       </div>
     </div>
-    <button v-if="byteCode" class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 text-xs" @click='onDeploy'>
+
+    <button v-if="byteCode" class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 text-xs" @click="deploy">
       Deploy
     </button>
 
-    <div v-if="deployInfo" class="border mt-4 mb-8 rounded">
+    <div v-if="deployInfo || deployError" class="border mt-4 mb-8 rounded">
       <div class="bg-green w-full flex flex-row font-mono border border-b">
         <div class="p-2 w-1/4">
           Deployed Contract
         </div>
         <div v-if="pub" class="p-2 w-3/4 bg-grey-lightest break-words">
-          {{ deployInfo }}
+          {{ deployInfo || deployError }}
         </div>
       </div>
     </div>
-    <button v-if="deployInfo" class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 text-xs" @click='onCall'>
+
+    <button v-if="deployInfo" class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 text-xs" @click="call">
       Call
     </button>
 
-    <div v-if="callResult" class="border mt-4 mb-8 rounded">
+    <div v-if="callResult || callError" class="border mt-4 mb-8 rounded">
       <div class="bg-green w-full flex flex-row font-mono border border-b">
         <div class="p-2 w-1/4">
-          Deployed Contract
+          Call Result
         </div>
         <div v-if="pub" class="p-2 w-3/4 bg-grey-lightest break-words">
-          {{ callResult }}
+          {{ callResult || callError }}
         </div>
       </div>
     </div>
-
-
   </div>
 </template>
 
@@ -99,92 +99,57 @@
 import Aepp from 'AE_SDK_MODULES/ae/aepp'
 
 export default {
-  name: 'Home',
-  components: {},
   data () {
     return {
       client: null,
-      abi: 'sophia',
-      to: null,
-      amount: null,
       height: null,
       pub: null,
-      callResult: null,
       contractCode: `contract Identity =
   type state = ()
   function main(x : int) = x`,
       byteCode: null,
+      compileError: null,
       contractInitState: [],
-      deployInfo: null
+      deployInfo: null,
+      deployError: null,
+      callResult: null,
+      callError: null
     }
   },
-  computed: {
-  },
   methods: {
-    send () {},
-    async compile (code) {
-      console.log(`Compiling contract...`)
+    async compile () {
+      this.byteCode = this.compileError = null
       try {
-        return await this.client.contractCompile(code)
+        this.byteCode = (await this.client.contractCompile(this.contractCode)).bytecode
       } catch (err) {
         this.compileError = err
-        console.error(err)
       }
     },
-    async deploy (code, options = {}) {
-      console.log(`Deploying contract...`)
+    async deploy () {
+      this.deployInfo = this.deployError = null
       try {
-        return await this.client.contractDeploy(this.byteCode, this.contractCode, this.contractInitState, options)
+        this.deployInfo = await this.client.contractDeploy(this.byteCode, this.contractCode, this.contractInitState)
       } catch (err) {
-        this.deployErr = err
-        console.error(err)
+        this.deployError = err
       }
     },
-    async call (code, abi, contractAddress, method = 'main', returnType = 'int', args = ['5'], options = {}) {
-      console.log(`Deploying contract...`)
+    async call (code, method = 'main', returnType = 'int', args = ['5']) {
+      this.callResult = this.callError = null
       try {
-        const result = await this.client.contractCall(this.contractCode, this.deployInfo.address, method,  args, options)
-        return Object.assign(
-          result,
+        this.callResult = await this.client.contractCall(this.contractCode, this.deployInfo.address, method,  args)
+        Object.assign(
+          this.callResult,
           { decodedRes: await result.decode(returnType) }
         )
       } catch (err) {
-        this.deployErr = err
-        console.error(err)
+        this.callError = err
       }
-    },
-    onCompile () {
-      this.compile(this.contractCode)
-        .then(byteCodeObj => {
-          this.byteCode = byteCodeObj.bytecode
-        })
-    },
-    onDeploy () {
-      this.deploy(this.byteCode)
-        .then(deployedContract => {
-          this.deployInfo = deployedContract
-        })
-    },
-    onCall () {
-      this.call(this.byteCode)
-        .then(callRes => {
-          console.log(callRes)
-          this.callResult = callRes
-        })
     }
   },
-  created () {
-    Aepp().then(ae => {
-      this.client = ae
-      ae.address()
-        .then(address => {
-          this.pub = address
-        })
-        .catch(e => { this.pub = `Rejected: ${e}` })
-    })
+  async created () {
+    this.client = await Aepp()
+    this.pub = await this.client.address().catch(e => `Rejected: ${e}`)
+    this.height = await this.client.height()
   }
 }
 </script>
-
-<style scoped lang="css">
-</style>
