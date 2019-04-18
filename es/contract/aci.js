@@ -148,7 +148,10 @@ function transformDecodedData (aci, result, { skipTransformDecoded = false } = {
     case SOPHIA_TYPES.tuple:
       return result.value.map(({ value }, i) => { return transformDecodedData(generic[i], { value }) })
     case SOPHIA_TYPES.record:
-      return result.value.map(({ value }, i) => { return transformDecodedData(generic[i].type, { value }) })
+      return result.value.reduce(
+        (acc, { name, value }, i) => ({ ...acc, [generic[i].name]: transformDecodedData(generic[i].type, { value }) }),
+        {}
+      )
   }
   return result.value
 }
@@ -247,18 +250,21 @@ async function getContractInstance (source, { aci, contractAddress } = {}) {
 }
 
 function transformReturnType (returns) {
-  if (typeof returns === 'string') return returns
-  if (typeof returns === 'object') {
-    const [[key, value]] = Object.entries(returns)
-    return `${key !== 'tuple' && key !== 'record' ? key : ''}(${value
-      .reduce(
-        (acc, el, i) => {
-          if (i !== 0) acc += ','
-          acc += transformReturnType(key !== 'record' ? el : el.type[0])
-          return acc
-        },
-        '')
-    })`
+  try {
+    if (typeof returns === 'string') return returns
+    if (typeof returns === 'object') {
+      const [[key, value]] = Object.entries(returns)
+      return `${key !== 'tuple' && key !== 'record' ? key : ''}(${value
+        .reduce(
+          (acc, el, i) => {
+            if (i !== 0) acc += ','
+            acc += transformReturnType(key !== 'record' ? el : el.type[0])
+            return acc
+          },
+          '')})`
+    }
+  } catch (e) {
+    return null
   }
 }
 
@@ -269,16 +275,18 @@ function call (self) {
     if (!this.deployInfo.address) throw new Error('You need to deploy contract before calling!')
 
     params = !options.skipArgsConvert ? prepareArgsForEncode(fnACI, params) : params
+    console.log(params)
     const result = options.callStatic
       ? await self.contractCallStatic(this.source, this.deployInfo.address, fn, params, {
         top: options.top,
         options
       })
       : await self.contractCall(this.source, this.deployInfo.address, fn, params, options)
-    const returnType = await transformReturnType(fnACI.returns)
+    const returnType = transformReturnType(fnACI.returns)
+    console.log(returnType)
     return {
       ...result,
-      decode: async () => transformDecodedData(fnACI.returns, await self.contractDecodeData(returnType, result.result.returnValue), options)
+      decode: async (type = returnType) => transformDecodedData(fnACI.returns, await self.contractDecodeData(type, result.result.returnValue), options)
     }
   }
 }
