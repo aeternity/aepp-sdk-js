@@ -30,6 +30,9 @@ contract StateContract =
   public function retrieve() : string = state.value
 `
 const testContract = `
+contract Voting =
+  public function test() : int = 1
+
 contract StateContract =
   record state = { value: string, key: int }
   public function init(value: string, key: int) : state = { value = value, key = key }
@@ -38,6 +41,7 @@ contract StateContract =
   public function boolFn(a: bool) : bool = a
   public function listFn(a: list(int)) : list(int) = a
   public function testFn(a: list(int), b: bool) : (list(int), bool) = (a, b)
+  public function approve(tx_id: int, voting_contract: Voting) : int = tx_id
 `
 
 const encodedNumberSix = 'cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaKNdnK'
@@ -197,6 +201,10 @@ describe('Contract', function () {
         } catch (e) {
           e.message.should.be.equal('Validation error: ["Argument index: 1, value: [1234] must be of type [bool]"]')
         }
+      })
+      it('Call contract with with contract type argument', async () => {
+        const result = await contractObject.call('approve', [0, 'ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh'])
+        return result.decode().should.eventually.become(0)
       })
     })
   })

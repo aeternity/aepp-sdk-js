@@ -47,7 +47,12 @@ const SOPHIA_TYPES = [
  * @return {string}
  */
 function transform (type, value) {
-  const { t, generic } = readType(type)
+  let { t, generic } = readType(type)
+
+  // contract TestContract = ...
+  // fn(ct: TestContract)
+  if (typeof value === 'string' && value.slice(0, 2) === 'ct') t = SOPHIA_TYPES.address // Handle Contract address transformation
+
   switch (t) {
     case SOPHIA_TYPES.string:
       return `"${value}"`
@@ -56,8 +61,9 @@ function transform (type, value) {
     case SOPHIA_TYPES.tuple:
       return `(${value.map((el, i) => transform(generic[i], el))})`
     case SOPHIA_TYPES.address:
-      return `#${decode(value, 'ak').toString('hex')}`
+      return `#${decode(value).toString('hex')}`
   }
+
   return `${value}`
 }
 
