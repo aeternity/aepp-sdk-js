@@ -711,7 +711,7 @@ describe('Channel', function () {
     })
 
     it('when posting an update with incorrect amount', async () => {
-      return update({ amount: '1' }).should.eventually.be.rejectedWith('Internal error')
+      return update({ amount: '1' }).should.eventually.be.rejectedWith('Rejected')
     })
 
     it('when posting incorrect update tx', async () => {
