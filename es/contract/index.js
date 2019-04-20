@@ -44,6 +44,8 @@ const ContractBase = stampit({
         'contractEncodeCallDataAPI',
         'contractDecodeDataAPI',
         'compileContractAPI',
+        'contractDecodeCallDataBySourceAPI',
+        'contractDecodeCallDataByCodeAPI',
         'contractGetACI'
       ]
     }
@@ -80,6 +82,31 @@ const ContractBase = stampit({
  * @param {String} type - Contract call result type
  * @param {String} data - Encoded contract call result
  * @return {String} - Decoded contract call result
+ */
+
+/**
+ * Decode call data by source
+ * @function contractDecodeCallDataBySourceAPI
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype (source: String, function: String, callData: String) => decodedResult: Promise[String]
+ * @param {String} source - contract source
+ * @param {String} function - function name
+ * @param {String} callData - Encoded contract call data
+ * @return {String} - Decoded contract call data
+ */
+
+/**
+ * Decode call data by bytecode
+ * @function contractDecodeCallDataByCodeAPI
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype (code: String, callData: String) => decodedResult: Promise[String]
+ * @param {String} code - contract byte code
+ * @param {String} callData - Encoded contract call data
+ * @return {String} - Decoded contract call data
  */
 
 /**
