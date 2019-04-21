@@ -33,14 +33,14 @@ async function contractEncodeCallDataAPI (source, name, args = [], options = {})
     .then(({ calldata }) => calldata)
 }
 
-async function contractDecodeCallDataByCodeAPI (bytecode, callData, options = {}) {
+async function contractDecodeCallDataByCodeAPI (bytecode, calldata, options = {}) {
   return this.http
-    .post('/decode-calldata/bytecode', { bytecode, callData }, options)
+    .post('/decode-calldata/bytecode', { bytecode, calldata }, options)
 }
 
 async function contractDecodeCallDataBySourceAPI (source, fn, callData, options = {}) {
   return this.http
-    .post('/decode-calldata/source', { 'function': fn, source, callData }, options)
+    .post('/decode-calldata/source', { 'function': fn, source, calldata: callData }, options)
 }
 
 async function contractDecodeDataAPI (type, data, options = {}) {
