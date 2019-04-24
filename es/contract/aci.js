@@ -24,7 +24,7 @@
  */
 import AsyncInit from '../utils/async-init'
 import { decode } from '../tx/builder/helpers'
-import { aeEncodeKey } from '../utils/crypto'
+import { encodeBase58Check } from '../utils/crypto'
 import { toBytes } from '../utils/bytes'
 
 const SOPHIA_TYPES = [
@@ -34,7 +34,8 @@ const SOPHIA_TYPES = [
   'address',
   'bool',
   'list',
-  'map'
+  'map',
+  'record'
 ].reduce((acc, type, i) => {
   acc[type] = type
   return acc
@@ -47,7 +48,12 @@ const SOPHIA_TYPES = [
  * @return {string}
  */
 function transform (type, value) {
-  const { t, generic } = readType(type)
+  let { t, generic } = readType(type)
+
+  // contract TestContract = ...
+  // fn(ct: TestContract)
+  if (typeof value === 'string' && value.slice(0, 2) === 'ct') t = SOPHIA_TYPES.address // Handle Contract address transformation
+
   switch (t) {
     case SOPHIA_TYPES.string:
       return `"${value}"`
@@ -56,8 +62,18 @@ function transform (type, value) {
     case SOPHIA_TYPES.tuple:
       return `(${value.map((el, i) => transform(generic[i], el))})`
     case SOPHIA_TYPES.address:
-      return `#${decode(value, 'ak').toString('hex')}`
+      return `#${decode(value).toString('hex')}`
+    case SOPHIA_TYPES.record:
+      return `{${generic.reduce(
+        (acc, { name, type }, i) => {
+          if (i !== 0) acc += ','
+          acc += `${name} = ${transform(type[0], value[name])}`
+          return acc
+        },
+        ''
+      )}}`
   }
+
   return `${value}`
 }
 
@@ -101,6 +117,11 @@ function validate (type, value) {
   }
 }
 
+function encodeAddress (address, prefix = 'ak') {
+  const addressBuffer = Buffer.from(address, 'hex')
+  const encodedAddress = encodeBase58Check(addressBuffer)
+  return `${prefix}_${encodedAddress}`
+}
 /**
  * Transform decoded data to JS type
  * @param aci
@@ -108,14 +129,17 @@ function validate (type, value) {
  * @param transformDecodedData
  * @return {*}
  */
-function transformDecodedData (aci, result, { skipTransformDecoded = false } = {}) {
+function transformDecodedData (aci, result, { skipTransformDecoded = false, addressPrefix = 'ak' } = {}) {
   if (skipTransformDecoded) return result
   const { t, generic } = readType(aci, true)
+
   switch (t) {
     case SOPHIA_TYPES.bool:
       return !!result.value
     case SOPHIA_TYPES.address:
-      return aeEncodeKey(toBytes(result.value, true))
+      return result.value === 0
+        ? 0
+        : encodeAddress(toBytes(result.value, true), addressPrefix)
     case SOPHIA_TYPES.map:
       const [keyT, valueT] = generic
       return result.value
@@ -132,6 +156,15 @@ function transformDecodedData (aci, result, { skipTransformDecoded = false } = {
       return result.value.map(({ value }) => transformDecodedData(generic, { value }))
     case SOPHIA_TYPES.tuple:
       return result.value.map(({ value }, i) => { return transformDecodedData(generic[i], { value }) })
+    case SOPHIA_TYPES.record:
+      return result.value.reduce(
+        (acc, { name, value }, i) =>
+          ({
+            ...acc,
+            [generic[i].name]: transformDecodedData(generic[i].type, { value })
+          }),
+        {}
+      )
   }
   return result.value
 }
@@ -229,24 +262,32 @@ async function getContractInstance (source, { aci, contractAddress } = {}) {
   return instance
 }
 
+// @TODO Remove after compiler can decode using type from ACI
 function transformReturnType (returns) {
-  if (typeof returns === 'string') return returns
-  if (typeof returns === 'object') {
-    const [[key, value]] = Object.entries(returns)
-    return `${key !== 'tuple' ? key : ''}(${value
-      .reduce(
-        (acc, el, i) => {
-          if (i !== 0) acc += ','
-          acc += transformReturnType(el)
-          return acc
-        },
-        '')
-    })`
+  try {
+    if (typeof returns === 'string') return returns
+    if (typeof returns === 'object') {
+      const [[key, value]] = Object.entries(returns)
+      return `${key !== 'tuple' && key !== 'record' ? key : ''}(${value
+        .reduce(
+          (acc, el, i) => {
+            if (i !== 0) acc += ','
+            acc += transformReturnType(key !== 'record' ? el : el.type[0])
+            return acc
+          },
+          '')})`
+    }
+  } catch (e) {
+    return null
   }
 }
 
 function call (self) {
-  return async function (fn, params = [], options = { skipArgsConvert: false, skipTransformDecoded: false, callStatic: false }) {
+  return async function (fn, params = [], options = {
+    skipArgsConvert: false,
+    skipTransformDecoded: false,
+    callStatic: false
+  }) {
     const fnACI = getFunctionACI(this.aci, fn)
     if (!fn) throw new Error('Function name is required')
     if (!this.deployInfo.address) throw new Error('You need to deploy contract before calling!')
@@ -258,10 +299,14 @@ function call (self) {
         options
       })
       : await self.contractCall(this.source, this.deployInfo.address, fn, params, options)
-    const returnType = await transformReturnType(fnACI.returns)
     return {
       ...result,
-      decode: async () => transformDecodedData(fnACI.returns, await self.contractDecodeData(returnType, result.result.returnValue), options)
+      decode: async (type, opt = {}) =>
+        transformDecodedData(
+          fnACI.returns,
+          await self.contractDecodeData(type || transformReturnType(fnACI.returns), result.result.returnValue),
+          { ...options, ...opt }
+        )
     }
   }
 }

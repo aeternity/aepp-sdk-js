@@ -126,7 +126,7 @@ async function poll (th, { blocks = 10, interval = 5000 } = {}) {
       await pause(interval)
       return probe()
     }
-    throw new Error(`Giving up after ${blocks} blocks mined.`)
+    throw new Error(`Giving up after ${blocks} blocks mined. TxHash ${th}`)
   }
 
   return probe()

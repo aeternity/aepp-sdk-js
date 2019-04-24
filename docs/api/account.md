@@ -12,6 +12,7 @@ import Account from '@aeternity/aepp-sdk/es/account'
 * [@aeternity/aepp-sdk/es/account](#module_@aeternity/aepp-sdk/es/account)
     * [Account([options])](#exp_module_@aeternity/aepp-sdk/es/account--Account) ⇒ `Object` ⏏
         * [.signTransaction(tx)](#module_@aeternity/aepp-sdk/es/account--Account+signTransaction) ⇒ `String`
+        * [.getNetworkId()](#module_@aeternity/aepp-sdk/es/account--Account+getNetworkId) ⇒ `String`
         * *[.sign(data)](#module_@aeternity/aepp-sdk/es/account--Account+sign) ⇒ `String`*
         * *[.address()](#module_@aeternity/aepp-sdk/es/account--Account+address) ⇒ `String`*
 
@@ -50,6 +51,15 @@ Sign encoded transaction
 | --- | --- | --- |
 | tx | `String` | Transaction to sign |
 
+<a id="module_@aeternity/aepp-sdk/es/account--Account+getNetworkId"></a>
+
+#### account.getNetworkId() ⇒ `String`
+Obtain networkId for signing
+
+**Kind**: instance method of [`Account`](#exp_module_@aeternity/aepp-sdk/es/account--Account)  
+**Returns**: `String` - NetworkId  
+**Category**: async  
+**rtype**: `() => networkId: String`
 <a id="module_@aeternity/aepp-sdk/es/account--Account+sign"></a>
 
 #### *account.sign(data) ⇒ `String`*

@@ -10,65 +10,74 @@ import Channel from '@aeternity/aepp-sdk/es/channel/index'
 ```
 
 * [@aeternity/aepp-sdk/es/channel/index](#module_@aeternity/aepp-sdk/es/channel/index)
-    * [Channel([options])](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel) ⇒ `Object` ⏏
+    * [Channel(options)](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel) ⇒ `Promise.&lt;Object&gt;` ⏏
         * [~on(event, callback)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..on)
-        * [~status()](#module_@aeternity/aepp-sdk/es/channel/index--Channel..status) ⇒ `string`
-        * [~state()](#module_@aeternity/aepp-sdk/es/channel/index--Channel..state) ⇒ `object`
-        * [~id()](#module_@aeternity/aepp-sdk/es/channel/index--Channel..id) ⇒ `string`
-        * [~update(from, to, amount, sign)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..update) ⇒ `Promise.&lt;object&gt;`
-        * [~poi(addresses)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..poi) ⇒ `Promise.&lt;string&gt;`
-        * [~balances(accounts)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..balances) ⇒ `Promise.&lt;object&gt;`
-        * [~leave()](#module_@aeternity/aepp-sdk/es/channel/index--Channel..leave) ⇒ `Promise.&lt;object&gt;`
-        * [~shutdown(sign)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..shutdown) ⇒ `Promise.&lt;string&gt;`
-        * [~withdraw(amount, sign, [callbacks])](#module_@aeternity/aepp-sdk/es/channel/index--Channel..withdraw) ⇒ `Promise.&lt;object&gt;`
-        * [~deposit(amount, sign, [callbacks])](#module_@aeternity/aepp-sdk/es/channel/index--Channel..deposit) ⇒ `Promise.&lt;object&gt;`
-        * [~createContract(options, sign)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..createContract) ⇒ `Promise.&lt;object&gt;`
-        * [~callContract(options, sign)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..callContract) ⇒ `Promise.&lt;object&gt;`
-        * [~callContractStatic(options)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..callContractStatic) ⇒ `Promise.&lt;object&gt;`
-        * [~getContractCall(options)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..getContractCall) ⇒ `Promise.&lt;object&gt;`
-        * [~getContractState(contract)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..getContractState) ⇒ `Promise.&lt;object&gt;`
+        * [~disconnect()](#module_@aeternity/aepp-sdk/es/channel/index--Channel..disconnect)
+        * [~status()](#module_@aeternity/aepp-sdk/es/channel/index--Channel..status) ⇒ `String`
+        * [~state()](#module_@aeternity/aepp-sdk/es/channel/index--Channel..state) ⇒ `Promise.&lt;Object&gt;`
+        * [~id()](#module_@aeternity/aepp-sdk/es/channel/index--Channel..id) ⇒ `String`
+        * [~update(from, to, amount, sign)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..update) ⇒ `Promise.&lt;Object&gt;`
+        * [~poi(addresses)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..poi) ⇒ `Promise.&lt;String&gt;`
+        * [~balances(accounts)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..balances) ⇒ `Promise.&lt;Object&gt;`
+        * [~leave()](#module_@aeternity/aepp-sdk/es/channel/index--Channel..leave) ⇒ `Promise.&lt;Object&gt;`
+        * [~shutdown(sign)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..shutdown) ⇒ `Promise.&lt;String&gt;`
+        * [~withdraw(amount, sign, [callbacks])](#module_@aeternity/aepp-sdk/es/channel/index--Channel..withdraw) ⇒ `Promise.&lt;Object&gt;`
+        * [~deposit(amount, sign, [callbacks])](#module_@aeternity/aepp-sdk/es/channel/index--Channel..deposit) ⇒ `Promise.&lt;Object&gt;`
+        * [~createContract(options, sign)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..createContract) ⇒ `Promise.&lt;Object&gt;`
+        * [~callContract(options, sign)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..callContract) ⇒ `Promise.&lt;Object&gt;`
+        * [~callContractStatic(options)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..callContractStatic) ⇒ `Promise.&lt;Object&gt;`
+        * [~getContractCall(options)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..getContractCall) ⇒ `Promise.&lt;Object&gt;`
+        * [~getContractState(contract)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..getContractState) ⇒ `Promise.&lt;Object&gt;`
         * [~cleanContractCalls()](#module_@aeternity/aepp-sdk/es/channel/index--Channel..cleanContractCalls) ⇒ `Promise`
         * [~sendMessage(message, recipient)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..sendMessage)
 
 <a id="exp_module_@aeternity/aepp-sdk/es/channel/index--Channel"></a>
 
-### Channel([options]) ⇒ `Object` ⏏
+### Channel(options) ⇒ `Promise.&lt;Object&gt;` ⏏
 Channel
 
 **Kind**: Exported function  
-**Returns**: `Object` - Channel instance  
+**Returns**: `Promise.&lt;Object&gt;` - Channel instance  
 **rtype**: `Channel`
 
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| [options] | `Object` | <code>{}</code> | Initializer object |
-| options.url | `String` |  | Channel url (for example: "ws://localhost:3001/channel") |
-| options.role | `String` |  | Participant role ("initiator" or "responder") |
-| options.initiatorId | `String` |  | Initiator's public key |
-| options.responderId | `String` |  | Responder's public key |
-| options.pushAmount | `Number` |  | Initial deposit in favour of the responder by the initiator |
-| options.initiatorAmount | `Number` |  | Amount of tokens the initiator has committed to the channel |
-| options.responderAmount | `Number` |  | Amount of tokens the responder has committed to the channel |
-| options.channelReserve | `Number` |  | The minimum amount both peers need to maintain |
-| [options.ttl] | `Number` |  | Minimum block height to include the channel_create_tx |
-| options.host | `String` |  | Host of the responder's node |
-| options.port | `Number` |  | The port of the responders node |
-| options.lockPeriod | `Number` |  | Amount of blocks for disputing a solo close |
-| [options.existingChannelId] | `Number` |  | Existing channel id (required if reestablishing a channel) |
-| [options.offchainTx] | `Number` |  | Offchain transaction (required if reestablishing a channel) |
-| options.sign | `function` |  | Function which verifies and signs transactions |
+| Param | Type | Description |
+| --- | --- | --- |
+| options | `Object` | Channel params |
+| options.url | `String` | Channel url (for example: "ws://localhost:3001") |
+| options.role | `String` | Participant role ("initiator" or "responder") |
+| options.initiatorId | `String` | Initiator's public key |
+| options.responderId | `String` | Responder's public key |
+| options.pushAmount | `Number` | Initial deposit in favour of the responder by the initiator |
+| options.initiatorAmount | `Number` | Amount of tokens the initiator has committed to the channel |
+| options.responderAmount | `Number` | Amount of tokens the responder has committed to the channel |
+| options.channelReserve | `Number` | The minimum amount both peers need to maintain |
+| [options.ttl] | `Number` | Minimum block height to include the channel_create_tx |
+| options.host | `String` | Host of the responder's node |
+| options.port | `Number` | The port of the responders node |
+| options.lockPeriod | `Number` | Amount of blocks for disputing a solo close |
+| [options.existingChannelId] | `Number` | Existing channel id (required if reestablishing a channel) |
+| [options.offchainTx] | `Number` | Offchain transaction (required if reestablishing a channel) |
+| [options.timeoutIdle] | `Number` | The time waiting for a new event to be initiated (default: 600000) |
+| [options.timeoutFundingCreate] | `Number` | The time waiting for the initiator to produce the create channel transaction after the noise session had been established (default: 120000) |
+| [options.timeoutFundingSign] | `Number` | The time frame the other client has to sign an off-chain update after our client had initiated and signed it. This applies only for double signed on-chain intended updates: channel create transaction, deposit, withdrawal and etc. (default: 120000) |
+| [options.timeoutFundingLock] | `Number` | The time frame the other client has to confirm an on-chain transaction reaching maturity (passing minimum depth) after the local node has detected this. This applies only for double signed on-chain intended updates: channel create transaction, deposit, withdrawal and etc. (default: 360000) |
+| [options.timeoutSign] | `Number` | The time frame the client has to return a signed off-chain update or to decline it. This applies for all off-chain updates (default: 500000) |
+| [options.timeoutAccept] | `Number` | The time frame the other client has to react to an event. This applies for all off-chain updates that are not meant to land on-chain, as well as some special cases: opening a noise connection, mutual closing acknowledgement and reestablishing an existing channel (default: 120000) |
+| [options.timeoutInitialized] | `Number` | the time frame the responder has to accept an incoming noise session. Applicable only for initiator (default: timeout_accept's value) |
+| [options.timeoutAwaitingOpen] | `Number` | The time frame the initiator has to start an outgoing noise session to the responder's node. Applicable only for responder (default: timeout_idle's value) |
+| options.sign | `function` | Function which verifies and signs transactions |
 
 **Example**  
 ```js
 Channel({
   url: 'ws://localhost:3001',
   role: 'initiator'
-  initiatorId: 'ak$2QC98ahNHSrZLWKrpQyv91eQfCDA3aFVSNoYKdQ1ViYWVF8Z9d',
-  responderId: 'ak$Gi42jcRm9DcZjk72UWQQBSxi43BG3285C9n4QSvP5JdzDyH2o',
-  pushAmount: 3,
-  initiatorAmount: 10,
-  responderAmount: 10,
-  channelReserve: 2,
+  initiatorId: 'ak_Y1NRjHuoc3CGMYMvCmdHSBpJsMDR6Ra2t5zjhRcbtMeXXLpLH',
+  responderId: 'ak_V6an1xhec1xVaAhLuak7QoEbi6t7w5hEtYWp9bMKaJ19i6A9E',
+  initiatorAmount: 1e18,
+  responderAmount: 1e18,
+  pushAmount: 0,
+  channelReserve: 0,
   ttl: 1000,
   host: 'localhost',
   port: 3002,
@@ -81,53 +90,74 @@ Channel({
 #### Channel~on(event, callback)
 Register event listener function
 
+Possible events:
+
+  - "error"
+  - "onChainTx"
+  - "ownWithdrawLocked"
+  - "withdrawLocked"
+  - "ownDepositLocked"
+  - "depositLocked"
+
 **Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| event | `string` | Event name |
+| event | `String` | Event name |
 | callback | `function` | Callback function |
 
+<a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..disconnect"></a>
+
+#### Channel~disconnect()
+Close the connection
+
+**Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
 <a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..status"></a>
 
-#### Channel~status() ⇒ `string`
+#### Channel~status() ⇒ `String`
 Get current status
 
 **Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
 <a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..state"></a>
 
-#### Channel~state() ⇒ `object`
+#### Channel~state() ⇒ `Promise.&lt;Object&gt;`
 Get current state
 
 **Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
 <a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..id"></a>
 
-#### Channel~id() ⇒ `string`
+#### Channel~id() ⇒ `String`
 Get channel id
 
 **Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
 <a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..update"></a>
 
-#### Channel~update(from, to, amount, sign) ⇒ `Promise.&lt;object&gt;`
-Trigger an update
+#### Channel~update(from, to, amount, sign) ⇒ `Promise.&lt;Object&gt;`
+Trigger a transfer update
+
+The transfer update is moving tokens from one channel account to another.
+The update is a change to be applied on top of the latest state.
+
+Sender and receiver are the channel parties. Both the initiator and responder
+can take those roles. Any public key outside of the channel is considered invalid.
 
 **Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| from | `string` | Sender's public address |
-| to | `string` | Receiver's public address |
-| amount | `number` | Transaction amount |
-| sign | `function` | Function which verifies and signs transaction |
+| from | `String` | Sender's public address |
+| to | `String` | Receiver's public address |
+| amount | `Number` | Transaction amount |
+| sign | `function` | Function which verifies and signs offchain transaction |
 
 **Example**  
 ```js
 channel.update(
-  'ak$2QC98ahNHSrZLWKrpQyv91eQfCDA3aFVSNoYKdQ1ViYWVF8Z9d',
-  'ak$Gi42jcRm9DcZjk72UWQQBSxi43BG3285C9n4QSvP5JdzDyH2o',
+  'ak_Y1NRjHuoc3CGMYMvCmdHSBpJsMDR6Ra2t5zjhRcbtMeXXLpLH',
+  'ak_V6an1xhec1xVaAhLuak7QoEbi6t7w5hEtYWp9bMKaJ19i6A9E',
   10,
   async (tx) => await account.signTransaction(tx)
-).then({ accepted, signedTx } =>
+).then(({ accepted, signedTx }) =>
   if (accepted) {
     console.log('Update has been accepted')
   }
@@ -135,16 +165,19 @@ channel.update(
 ```
 <a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..poi"></a>
 
-#### Channel~poi(addresses) ⇒ `Promise.&lt;string&gt;`
+#### Channel~poi(addresses) ⇒ `Promise.&lt;String&gt;`
 Get proof of inclusion
+
+If a certain address of an account or a contract is not found
+in the state tree - the response is an error.
 
 **Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| addresses | `object` |  |
-| [addresses.accounts] | `array.&lt;string&gt;` | List of account addresses to include in poi |
-| [addresses.contracts] | `array.&lt;string&gt;` | List of contract addresses to include in poi |
+| addresses | `Object` |  |
+| [addresses.accounts] | `Array.&lt;String&gt;` | List of account addresses to include in poi |
+| [addresses.contracts] | `Array.&lt;String&gt;` | List of contract addresses to include in poi |
 
 **Example**  
 ```js
@@ -158,14 +191,20 @@ channel.poi({
 ```
 <a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..balances"></a>
 
-#### Channel~balances(accounts) ⇒ `Promise.&lt;object&gt;`
+#### Channel~balances(accounts) ⇒ `Promise.&lt;Object&gt;`
 Get balances
+
+The accounts paramcontains a list of addresses to fetch balances of.
+Those can be either account balances or a contract ones, encoded as an account addresses.
+
+If a certain account address had not being found in the state tree - it is simply
+skipped in the response.
 
 **Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| accounts | `array.&lt;string&gt;` | List of addresses to fetch balances from |
+| accounts | `Array.&lt;String&gt;` | List of addresses to fetch balances from |
 
 **Example**  
 ```js
@@ -179,27 +218,39 @@ channel.balances([
 ```
 <a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..leave"></a>
 
-#### Channel~leave() ⇒ `Promise.&lt;object&gt;`
+#### Channel~leave() ⇒ `Promise.&lt;Object&gt;`
 Leave channel
+
+It is possible to leave a channel and then later reestablish the channel
+off-chain state and continue operation. When a leave method is called,
+the channel fsm passes it on to the peer fsm, reports the current mutually
+signed state and then terminates.
+
+The channel can be reestablished by instantiating another Channel instance
+with two extra params: existingChannelId and offchainTx (returned from leave
+method as channelId and signedTx respectively).
 
 **Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
 **Example**  
 ```js
-channel.leave().then(({ channelId, signedTx }) =>
+channel.leave().then(({ channelId, signedTx }) => {
   console.log(channelId)
-  console.log(state)
-)
+  console.log(signedTx)
+})
 ```
 <a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..shutdown"></a>
 
-#### Channel~shutdown(sign) ⇒ `Promise.&lt;string&gt;`
-Trigger a channel shutdown
+#### Channel~shutdown(sign) ⇒ `Promise.&lt;String&gt;`
+Trigger mutual close
+
+At any moment after the channel is opened, a closing procedure can be triggered.
+This can be done by either of the parties. The process is similar to the off-chain updates.
 
 **Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| sign | `function` | Function which verifies and signs transaction |
+| sign | `function` | Function which verifies and signs mutual close transaction |
 
 **Example**  
 ```js
@@ -209,16 +260,40 @@ channel.shutdown(
 ```
 <a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..withdraw"></a>
 
-#### Channel~withdraw(amount, sign, [callbacks]) ⇒ `Promise.&lt;object&gt;`
+#### Channel~withdraw(amount, sign, [callbacks]) ⇒ `Promise.&lt;Object&gt;`
 Withdraw tokens from the channel
+
+After the channel had been opened any of the participants can initiate a withdrawal.
+The process closely resembles the update. The most notable difference is that the
+transaction has been co-signed: it is channel_withdraw_tx and after the procedure
+is finished - it is being posted on-chain.
+
+Any of the participants can initiate a withdrawal. The only requirements are:
+
+  - Channel is already opened
+  - No off-chain update/deposit/withdrawal is currently being performed
+  - Channel is not being closed or in a solo closing state
+  - The withdrawal amount must be equal to or greater than zero, and cannot exceed
+    the available balance on the channel (minus the channel_reserve)
+
+After the other party had signed the withdraw transaction, the transaction is posted
+on-chain and onOnChainTx callback is called with on-chain transaction as first argument.
+After computing transaction hash it can be tracked on the chain: entering the mempool,
+block inclusion and a number of confirmations.
+
+After the minimum_depth block confirmations onOwnWithdrawLocked callback is called
+(without any arguments).
+
+When the other party had confirmed that the block height needed is reached
+onWithdrawLocked callback is called (without any arguments).
 
 **Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| amount | `number` | Amount of tokens to withdraw |
+| amount | `Number` | Amount of tokens to withdraw |
 | sign | `function` | Function which verifies and signs withdraw transaction |
-| [callbacks] | `object` |  |
+| [callbacks] | `Object` |  |
 | [callbacks.onOnChainTx] | `function` | Called when withdraw transaction has been posted on chain |
 | [callbacks.onOwnWithdrawLocked] | `function` |  |
 | [callbacks.onWithdrawLocked] | `function` |  |
@@ -239,16 +314,40 @@ channel.withdraw(
 ```
 <a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..deposit"></a>
 
-#### Channel~deposit(amount, sign, [callbacks]) ⇒ `Promise.&lt;object&gt;`
+#### Channel~deposit(amount, sign, [callbacks]) ⇒ `Promise.&lt;Object&gt;`
 Deposit tokens into the channel
+
+After the channel had been opened any of the participants can initiate a deposit.
+The process closely resembles the update. The most notable difference is that the
+transaction has been co-signed: it is channel_deposit_tx and after the procedure
+is finished - it is being posted on-chain.
+
+Any of the participants can initiate a deposit. The only requirements are:
+
+  - Channel is already opened
+  - No off-chain update/deposit/withdrawal is currently being performed
+  - Channel is not being closed or in a solo closing state
+  - The deposit amount must be equal to or greater than zero, and cannot exceed
+    the available balance on the channel (minus the channel_reserve)
+
+After the other party had signed the deposit transaction, the transaction is posted
+on-chain and onOnChainTx callback is called with on-chain transaction as first argument.
+After computing transaction hash it can be tracked on the chain: entering the mempool,
+block inclusion and a number of confirmations.
+
+After the minimum_depth block confirmations onOwnDepositLocked callback is called
+(without any arguments).
+
+When the other party had confirmed that the block height needed is reached
+onDepositLocked callback is called (without any arguments).
 
 **Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| amount | `number` | Amount of tokens to deposit |
+| amount | `Number` | Amount of tokens to deposit |
 | sign | `function` | Function which verifies and signs deposit transaction |
-| [callbacks] | `object` |  |
+| [callbacks] | `Object` |  |
 | [callbacks.onOnChainTx] | `function` | Called when deposit transaction has been posted on chain |
 | [callbacks.onOwnDepositLocked] | `function` |  |
 | [callbacks.onDepositLocked] | `function` |  |
@@ -270,19 +369,25 @@ channel.deposit(
 ```
 <a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..createContract"></a>
 
-#### Channel~createContract(options, sign) ⇒ `Promise.&lt;object&gt;`
-Create a contract
+#### Channel~createContract(options, sign) ⇒ `Promise.&lt;Object&gt;`
+Trigger create contract update
+
+The create contract update is creating a contract inside the channel's internal state tree.
+The update is a change to be applied on top of the latest state.
+
+That would create a contract with the poster being the owner of it. Poster commits initially
+a deposit amount of tokens to the new contract.
 
 **Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | `object` |  |
-| [options.code] | `string` | Api encoded compiled AEVM byte code |
-| [options.callData] | `string` | Api encoded compiled AEVM call data for the code |
-| [options.deposit] | `number` | Initial amount the owner of the contract commits to it |
-| [options.vmVersion] | `number` | Version of the AEVM |
-| [options.abiVersion] | `number` | Version of the ABI |
+| options | `Object` |  |
+| options.code | `String` | Api encoded compiled AEVM byte code |
+| options.callData | `String` | Api encoded compiled AEVM call data for the code |
+| options.deposit | `Number` | Initial amount the owner of the contract commits to it |
+| options.vmVersion | `Number` | Version of the AEVM |
+| options.abiVersion | `Number` | Version of the ABI |
 | sign | `function` | Function which verifies and signs create contract transaction |
 
 **Example**  
@@ -304,18 +409,31 @@ channel.createContract({
 ```
 <a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..callContract"></a>
 
-#### Channel~callContract(options, sign) ⇒ `Promise.&lt;object&gt;`
-Call a contract
+#### Channel~callContract(options, sign) ⇒ `Promise.&lt;Object&gt;`
+Trigger call a contract update
+
+The call contract update is calling a preexisting contract inside the channel's
+internal state tree. The update is a change to be applied on top of the latest state.
+
+That would call a contract with the poster being the caller of it. Poster commits
+an amount of tokens to the contract.
+
+The call would also create a call object inside the channel state tree. It contains
+the result of the contract call.
+
+It is worth mentioning that the gas is not consumed, because this is an off-chain
+contract call. It would be consumed if it were a on-chain one. This could happen
+if a call with a similar computation amount is to be forced on-chain.
 
 **Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | `object` |  |
-| [options.amount] | `string` | Amount the caller of the contract commits to it |
-| [options.callData] | `string` | ABI encoded compiled AEVM call data for the code |
-| [options.contract] | `number` | Address of the contract to call |
-| [options.abiVersion] | `number` | Version of the ABI |
+| options | `Object` |  |
+| [options.amount] | `String` | Amount the caller of the contract commits to it |
+| [options.callData] | `String` | ABI encoded compiled AEVM call data for the code |
+| [options.contract] | `Number` | Address of the contract to call |
+| [options.abiVersion] | `Number` | Version of the ABI |
 | sign | `function` | Function which verifies and signs contract call transaction |
 
 **Example**  
@@ -335,18 +453,26 @@ channel.callContract({
 ```
 <a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..callContractStatic"></a>
 
-#### Channel~callContractStatic(options) ⇒ `Promise.&lt;object&gt;`
+#### Channel~callContractStatic(options) ⇒ `Promise.&lt;Object&gt;`
 Call contract using dry-run
+
+In order to get the result of a potential contract call, one might need to
+dry-run a contract call. It takes the exact same arguments as a call would
+and returns the call object.
+
+The call is executed in the channel's state but it does not impact the state
+whatsoever. It uses as an environment the latest channel's state and the current
+top of the blockchain as seen by the node.
 
 **Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | `object` |  |
-| [options.amount] | `string` | Amount the caller of the contract commits to it |
-| [options.callData] | `string` | ABI encoded compiled AEVM call data for the code |
-| [options.contract] | `number` | Address of the contract to call |
-| [options.abiVersion] | `number` | Version of the ABI |
+| options | `Object` |  |
+| [options.amount] | `String` | Amount the caller of the contract commits to it |
+| [options.callData] | `String` | ABI encoded compiled AEVM call data for the code |
+| [options.contract] | `Number` | Address of the contract to call |
+| [options.abiVersion] | `Number` | Version of the ABI |
 
 **Example**  
 ```js
@@ -362,17 +488,20 @@ channel.callContractStatic({
 ```
 <a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..getContractCall"></a>
 
-#### Channel~getContractCall(options) ⇒ `Promise.&lt;object&gt;`
+#### Channel~getContractCall(options) ⇒ `Promise.&lt;Object&gt;`
 Get contract call result
+
+The combination of a caller, contract and a round of execution determines the
+contract call. Providing an incorrect set of those results in an error response.
 
 **Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | `object` |  |
-| [options.caller] | `string` | Address of contract caller |
-| [options.contract] | `string` | Address of the contract |
-| [options.round] | `number` | Round when contract was called |
+| options | `Object` |  |
+| [options.caller] | `String` | Address of contract caller |
+| [options.contract] | `String` | Address of the contract |
+| [options.round] | `Number` | Round when contract was called |
 
 **Example**  
 ```js
@@ -386,19 +515,19 @@ channel.getContractCall({
 ```
 <a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..getContractState"></a>
 
-#### Channel~getContractState(contract) ⇒ `Promise.&lt;object&gt;`
+#### Channel~getContractState(contract) ⇒ `Promise.&lt;Object&gt;`
 Get contract latest state
 
 **Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| contract | `string` | Address of the contract |
+| contract | `String` | Address of the contract |
 
 **Example**  
 ```js
 channel.getContractState(
-  'ct_9sRA9AVE4BYTAkh5RNfJYmwQe1NZ4MErasQLXZkFWG43TPBqa',
+  'ct_9sRA9AVE4BYTAkh5RNfJYmwQe1NZ4MErasQLXZkFWG43TPBqa'
 ).then(({ contract }) => {
   console.log('deposit:', contract.deposit)
 })
@@ -422,12 +551,15 @@ Send generic message
 If message is an object it will be serialized into JSON string
 before sending.
 
+If there is ongoing update that has not yet been finished the message
+will be sent after that update is finalized.
+
 **Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| message | `string` \| `object` |  |
-| recipient | `string` | Address of the recipient |
+| message | `String` \| `Object` |  |
+| recipient | `String` | Address of the recipient |
 
 **Example**  
 ```js

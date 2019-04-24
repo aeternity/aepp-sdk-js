@@ -85,6 +85,11 @@ describe('Channel', function () {
     await initiator.spend('6000000000000000', await responder.address())
   })
 
+  after(() => {
+    initiatorCh.disconnect()
+    responderCh.disconnect()
+  })
+
   beforeEach(() => {
     responderShouldRejectUpdate = false
   })
@@ -403,7 +408,8 @@ describe('Channel', function () {
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.notCalled(responderSign)
-    await initiatorCh.leave()
+    initiatorCh.disconnect()
+    responderCh.disconnect()
   })
 
   it('can solo close a channel', async () => {
@@ -705,7 +711,7 @@ describe('Channel', function () {
     })
 
     it('when posting an update with incorrect amount', async () => {
-      return update({ amount: '1' }).should.eventually.be.rejectedWith('Internal error')
+      return update({ amount: '1' }).should.eventually.be.rejectedWith('Rejected')
     })
 
     it('when posting incorrect update tx', async () => {
