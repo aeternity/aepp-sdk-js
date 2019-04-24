@@ -32,7 +32,8 @@ import {
   enqueueAction,
   send,
   channelId,
-  call
+  call,
+  disconnect as channelDisconnect
 } from './internal'
 import * as R from 'ramda'
 
@@ -60,6 +61,13 @@ function snakeToPascalObjKeys (obj) {
  */
 function on (event, callback) {
   eventEmitters.get(this).on(event, callback)
+}
+
+/**
+ * Close the connection
+ */
+function disconnect () {
+  return channelDisconnect(this)
 }
 
 /**
@@ -205,7 +213,7 @@ async function balances (accounts) {
  * })
  */
 function leave () {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     enqueueAction(
       this,
       (channel, state) => state.handler === handlers.channelOpen,
@@ -213,7 +221,7 @@ function leave () {
         send(channel, { jsonrpc: '2.0', method: 'channels.leave', params: {} })
         return {
           handler: handlers.awaitingLeave,
-          state: { resolve }
+          state: { resolve, reject }
         }
       })
   })
@@ -232,7 +240,7 @@ function leave () {
  * ).then(tx => console.log('on_chain_tx', tx))
  */
 function shutdown (sign) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     enqueueAction(
       this,
       (channel, state) => state.handler === handlers.channelOpen,
@@ -242,7 +250,8 @@ function shutdown (sign) {
           handler: handlers.awaitingShutdownTx,
           state: {
             sign,
-            resolveShutdownPromise: resolve
+            resolve,
+            reject
           }
         }
       }
@@ -297,7 +306,7 @@ function shutdown (sign) {
  * })
  */
 function withdraw (amount, sign, { onOnChainTx, onOwnWithdrawLocked, onWithdrawLocked } = {}) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     enqueueAction(
       this,
       (channel, state) => state.handler === handlers.channelOpen,
@@ -308,6 +317,7 @@ function withdraw (amount, sign, { onOnChainTx, onOwnWithdrawLocked, onWithdrawL
           state: {
             sign,
             resolve,
+            reject,
             onOnChainTx,
             onOwnWithdrawLocked,
             onWithdrawLocked
@@ -366,7 +376,7 @@ function withdraw (amount, sign, { onOnChainTx, onOwnWithdrawLocked, onWithdrawL
  * })
  */
 function deposit (amount, sign, { onOnChainTx, onOwnDepositLocked, onDepositLocked } = {}) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     enqueueAction(
       this,
       (channel, state) => state.handler === handlers.channelOpen,
@@ -377,6 +387,7 @@ function deposit (amount, sign, { onOnChainTx, onOwnDepositLocked, onDepositLock
           state: {
             sign,
             resolve,
+            reject,
             onOnChainTx,
             onOwnDepositLocked,
             onDepositLocked
@@ -420,7 +431,7 @@ function deposit (amount, sign, { onOnChainTx, onOwnDepositLocked, onDepositLock
  * })
  */
 function createContract ({ code, callData, deposit, vmVersion, abiVersion }, sign) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     enqueueAction(
       this,
       (channel, state) => state.handler === handlers.channelOpen,
@@ -440,7 +451,8 @@ function createContract ({ code, callData, deposit, vmVersion, abiVersion }, sig
           handler: handlers.awaitingNewContractTx,
           state: {
             sign,
-            resolve
+            resolve,
+            reject
           }
         }
       }
@@ -485,7 +497,7 @@ function createContract ({ code, callData, deposit, vmVersion, abiVersion }, sig
  * })
  */
 function callContract ({ amount, callData, contract, abiVersion }, sign) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     enqueueAction(
       this,
       (channel, state) => state.handler === handlers.channelOpen,
@@ -502,7 +514,7 @@ function callContract ({ amount, callData, contract, abiVersion }, sign) {
         })
         return {
           handler: handlers.awaitingCallContractUpdateTx,
-          state: { resolve, sign }
+          state: { resolve, reject, sign }
         }
       }
     )
@@ -717,6 +729,7 @@ const Channel = AsyncInit.compose({
     callContractStatic,
     getContractCall,
     getContractState,
+    disconnect,
     cleanContractCalls
   }
 })
