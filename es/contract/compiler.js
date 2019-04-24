@@ -33,6 +33,16 @@ async function contractEncodeCallDataAPI (source, name, args = [], options = {})
     .then(({ calldata }) => calldata)
 }
 
+async function contractDecodeCallDataByCodeAPI (bytecode, calldata, options = {}) {
+  return this.http
+    .post('/decode-calldata/bytecode', { bytecode, calldata }, options)
+}
+
+async function contractDecodeCallDataBySourceAPI (source, fn, callData, options = {}) {
+  return this.http
+    .post('/decode-calldata/source', { 'function': fn, source, calldata: callData }, options)
+}
+
 async function contractDecodeDataAPI (type, data, options = {}) {
   return this.http
     .post('/decode-data', { data, 'sophia-type': type }, options)
@@ -73,6 +83,8 @@ const ContractCompilerAPI = ContractBase.compose({
     contractDecodeDataAPI,
     compileContractAPI,
     contractGetACI,
+    contractDecodeCallDataByCodeAPI,
+    contractDecodeCallDataBySourceAPI,
     setCompilerUrl
   }
 })
