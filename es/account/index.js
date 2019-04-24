@@ -39,13 +39,24 @@ const DEFAULT_NETWORK_ID = `ae_mainnet`
  * @return {String} Signed transaction
  */
 async function signTransaction (tx) {
-  const networkId = this.networkId || this.nodeNetworkId || DEFAULT_NETWORK_ID
+  const networkId = this.getNetworkId()
   const rlpBinaryTx = Crypto.decodeBase64Check(Crypto.assertedType(tx, 'tx'))
   // Prepend `NETWORK_ID` to begin of data binary
   const txWithNetworkId = Buffer.concat([Buffer.from(networkId), rlpBinaryTx])
 
   const signatures = [await this.sign(txWithNetworkId)]
   return buildTx({ encodedTx: rlpBinaryTx, signatures }, TX_TYPE.signed).tx
+}
+
+/**
+ * Obtain networkId for signing
+ * @instance
+ * @category async
+ * @rtype () => networkId: String
+ * @return {String} NetworkId
+ */
+function getNetworkId () {
+  return this.networkId || this.nodeNetworkId || DEFAULT_NETWORK_ID
 }
 
 /**
@@ -70,12 +81,12 @@ const Account = stampit({
       this.networkId = networkId
     }
   },
-  methods: { signTransaction },
+  methods: { signTransaction, getNetworkId },
   deepConf: {
     Ae: {
-      methods: ['sign', 'address', 'signTransaction']
+      methods: ['sign', 'address', 'getNetworkId']
     }
-  }
+  },
 }, required({ methods: {
   sign: required,
   address: required
