@@ -43,7 +43,7 @@ const Chain = Oracle.compose({
     Ae: {
       methods: [
         'sendTransaction', 'height', 'awaitHeight', 'poll', 'balance', 'tx',
-        'mempool', 'topBlock', 'getTxInfo', 'txDryRun', 'getName'
+        'mempool', 'topBlock', 'getTxInfo', 'txDryRun', 'getName', 'getNodeInfo'
       ]
     }
   }
@@ -242,6 +242,16 @@ const Chain = Oracle.compose({
  * @param {Array} txs - Array of transaction's
  * @param {Array} accounts - Array of account's
  * @param {String|Number} hashOrHeight - hash or height of block on which to make dry-run
+ * @return {Object} Result
+ */
+
+/**
+ * Get Node Info
+ * @function getInfo
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype () => result: Object
  * @return {Object} Result
  */
 
