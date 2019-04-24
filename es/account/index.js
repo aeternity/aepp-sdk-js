@@ -86,7 +86,7 @@ const Account = stampit({
     Ae: {
       methods: ['sign', 'address', 'signTransaction', 'getNetworkId']
     }
-  },
+  }
 }, required({ methods: {
   sign: required,
   address: required
