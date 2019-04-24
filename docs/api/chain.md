@@ -28,6 +28,7 @@ import Chain from '@aeternity/aepp-sdk/es/chain'
                 * *[.getMicroBlockHeader()](#module_@aeternity/aepp-sdk/es/chain--Chain+getMicroBlockHeader) ⇒ `Object`*
                 * *[.getAccount(address, [options])](#module_@aeternity/aepp-sdk/es/chain--Chain+getAccount) ⇒ `Object`*
                 * *[.txDryRun(txs, accounts, hashOrHeight)](#module_@aeternity/aepp-sdk/es/chain--Chain+txDryRun) ⇒ `Object`*
+                * *[.getInfo()](#module_@aeternity/aepp-sdk/es/chain--Chain+getInfo) ⇒ `Object`*
         * _static_
             * [.waitMined(bool)](#module_@aeternity/aepp-sdk/es/chain--Chain.waitMined) ⇒ `Stamp`
 
@@ -242,6 +243,15 @@ Transaction dry-run
 | accounts | `Array` | Array of account's |
 | hashOrHeight | `String` \| `Number` | hash or height of block on which to make dry-run |
 
+<a id="module_@aeternity/aepp-sdk/es/chain--Chain+getInfo"></a>
+
+#### *chain.getInfo() ⇒ `Object`*
+Get Node Info
+
+**Kind**: instance abstract method of [`Chain`](#exp_module_@aeternity/aepp-sdk/es/chain--Chain)  
+**Returns**: `Object` - Result  
+**Category**: async  
+**rtype**: `() => result: Object`
 <a id="module_@aeternity/aepp-sdk/es/chain--Chain.waitMined"></a>
 
 #### Chain.waitMined(bool) ⇒ `Stamp`
