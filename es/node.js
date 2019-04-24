@@ -74,14 +74,25 @@ const loader = ({ url, internalUrl }) => (path, definition) => {
 const Node = stampit({
   async init ({ url = this.url, internalUrl = this.internalUrl }) {
     url = url.replace(/\/?$/, '/')
-
     // Get swagger schema
     const swag = await remoteSwag(url)
     this.version = swag.info.version
     return Object.assign(this, {
+      url,
+      internalUrl,
       swag: swag,
       urlFor: loader({ url, internalUrl })
     })
+  },
+  methods: {
+    getNodeInfo () {
+      return {
+        url: this.url,
+        internalUrl: this.internalUrl,
+        nodeNetworkId: this.nodeNetworkId,
+        version: this.version
+      }
+    }
   },
   props: {
     version: null,
