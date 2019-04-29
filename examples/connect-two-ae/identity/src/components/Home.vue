@@ -42,6 +42,8 @@
 // AE_SDK_MODULES is a webpack alias present in webpack.config.js
 import Wallet from 'AE_SDK_MODULES/ae/wallet'
 import MemoryAccount from 'AE_SDK_MODULES/account/memory'
+import { generateKeyPair } from 'AE_SDK_MODULES/utils/crypto'
+import {getAddressFromPriv, dump} from 'AE_SDK_MODULES/utils/keystore'
 
 export default {
   name: 'Wallet',
@@ -69,37 +71,43 @@ export default {
     }
   },
   created () {
-    window.addEventListener('message', console.log, false)
+    debugger
+    const { secretKey } = generateKeyPair(true)
+    const publicKey = getAddressFromPriv(secretKey)
+    debugger
 
-    Wallet({
-      url: this.url,
-      internalUrl: this.internalUrl,
-      compilerUrl: this.compilerUrl,
-      accounts: [MemoryAccount({keypair: {secretKey: this.priv, publicKey: this.pub}})],
-      address: this.pub,
-      onTx: this.confirmDialog,
-      onChain: this.confirmDialog,
-      onAccount: this.confirmDialog,
-      onContract: this.confirmDialog
-    }).then(ae => {
-      this.client = ae
-      console.log('status', this.client.api.getTopBlock())
-      console.log('version', this.client.api.getStatus())
-      this.$refs.aepp.src = this.aeppUrl
-
-      ae.height().then(height => {
-        console.log('height', height)
-        this.height = height
-      })
-      console.log(ae)
-
-      ae.balance(this.pub).then(balance => {
-        console.log('balance', balance)
-        this.balance = balance
-      }).catch(e => {
-        this.balance = 0
-      })
-    })
+    dump('test', 'asdasd', secretKey).then(res => { debugger }).catch(e => { debugger })
+    // window.addEventListener('message', console.log, false)
+    //
+    // Wallet({
+    //   url: this.url,
+    //   internalUrl: this.internalUrl,
+    //   compilerUrl: this.compilerUrl,
+    //   accounts: [MemoryAccount({keypair: {secretKey: this.priv, publicKey: this.pub}})],
+    //   address: this.pub,
+    //   onTx: this.confirmDialog,
+    //   onChain: this.confirmDialog,
+    //   onAccount: this.confirmDialog,
+    //   onContract: this.confirmDialog
+    // }).then(ae => {
+    //   this.client = ae
+    //   console.log('status', this.client.api.getTopBlock())
+    //   console.log('version', this.client.api.getStatus())
+    //   this.$refs.aepp.src = this.aeppUrl
+    //
+    //   ae.height().then(height => {
+    //     console.log('height', height)
+    //     this.height = height
+    //   })
+    //   console.log(ae)
+    //
+    //   ae.balance(this.pub).then(balance => {
+    //     console.log('balance', balance)
+    //     this.balance = balance
+    //   }).catch(e => {
+    //     this.balance = 0
+    //   })
+    // })
   }
 }
 </script>

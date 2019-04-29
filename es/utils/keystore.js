@@ -1,9 +1,15 @@
 import nacl from 'tweetnacl'
-import * as argon2 from 'argon2'
+// import * as argon2 from 'argon2'
 import uuid from 'uuid'
 
 import { encodeBase58Check, isBase64 } from './crypto'
 
+let argon2 = require('./argon2')
+// if (typeof window === 'undefined') {
+//   argon2 = require('argon2')
+// } else {
+//   argon2 = require('./argon2')
+// }
 /**
  * KeyStore module
  * !!!Work only in node.js!!!
