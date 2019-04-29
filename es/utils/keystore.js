@@ -1,15 +1,8 @@
 import nacl from 'tweetnacl'
-// import * as argon2 from 'argon2'
 import uuid from 'uuid'
 
 import { encodeBase58Check, isBase64 } from './crypto'
 
-let argon2 = require('./argon2')
-// if (typeof window === 'undefined') {
-//   argon2 = require('argon2')
-// } else {
-//   argon2 = require('./argon2')
-// }
 /**
  * KeyStore module
  * !!!Work only in node.js!!!
@@ -37,7 +30,16 @@ const DERIVED_KEY_FUNCTIONS = {
 
 async function deriveKeyUsingArgon2id (password, salt, options) {
   const { memlimit_kib: memoryCost, parallelism, opslimit: timeCost } = options.kdf_params
-  return argon2.hash(password, { timeCost, memoryCost, parallelism, type: argon2.argon2id, raw: true, salt })
+  const isBrowser = !(typeof module !== 'undefined' && module.exports)
+
+  if (isBrowser) {
+    const argon2 = require('./argon2browser')
+    const res = await argon2.hash({ pass: password, time: timeCost, mem: memoryCost, parallelism, type: argon2.ArgonType.Argon2id, salt, hashLen: 32 });
+    return res.hash
+  } else {
+    const argon2 = require('argon2')
+    return argon2.hash(password, { timeCost, memoryCost, parallelism, type: argon2.argon2id, raw: true, salt })
+  }
 }
 
 // CRYPTO PART
