@@ -23,13 +23,23 @@ check out the [develop branch].
 
 [develop branch]: https://github.com/aeternity/aepp-sdk-js/tree/develop
 
-## Table of Content
-1. [Quick Start](#quick-start)
-   1. [Install](#1-Install-the-SDK)
-   2. [Import](#2-Import-a-chosen-Flavor)
-   3. [Interact](#3-Start-interacting-with-aeternitys-blockchain)
-2. [Learn More](docs/usage.md)
-3. [Contribute](docs/contributing.md)
+## Table of content
+- [Æternity's Javascript SDK](#%C3%A6ternitys-javascript-sdk)
+      - [Disclaimer](#disclaimer)
+  - [Table of content](#table-of-content)
+  - [Quick Start](#quick-start)
+    - [1. Install the SDK](#1-install-the-sdk)
+    - [2. Import (a chosen Flavor)](#2-import-a-chosen-flavor)
+  - [Examples](#examples)
+    - [VueJS (maintained) Examples](#vuejs-maintained-examples)
+    - [1. Universal Example (_all_ SDK's functionalities)](#1-universal-example-all-sdks-functionalities)
+    - [2. Wallet Example (_only_ Wallet's functionalities)](#2-wallet-example-only-wallets-functionalities)
+    - [3. Aepp Example (Aepp <--> Wallet via RPC)](#3-aepp-example-aepp----wallet-via-rpc)
+  - [CLI - Command Line Client](#cli---command-line-client)
+  - [Usage Documentation](#usage-documentation)
+  - [Contributing](#contributing)
+  - [Change Log](#change-log)
+  - [License](#license)
 
 ## Quick Start
 
@@ -60,7 +70,12 @@ import Ae from '@aeternity/aepp-sdk/es/ae/universal' // or other flavor
 
 ## Examples
 
-### 1. Universal Example:
+### VueJS (maintained) Examples
+
+1. [Wallet + Aepp RPC setup](/examples/connect-two-ae)
+2. [Suggest another example](/issues/new)
+
+### 1. Universal Example (_all_ SDK's functionalities)
 > interact with aeternity's blockchain's [**Universal flavor**](docs/usage.md)
 
 ```js
@@ -96,7 +111,7 @@ Ae({
 })
 ```
 
-### 2. Wallet Example:
+### 2. Wallet Example (_only_ Wallet's functionalities)
 > interact with aeternity's blockchain's [**Wallet flavor**](docs/usage.md) – For _Wallet_ development
 > You can find a more [complete example using VueJS here](examples/connect-two-ae)
 
@@ -140,7 +155,7 @@ Wallet({
 })
 ```
 
-### 3. Aepp Example:
+### 3. Aepp Example (Aepp <--> Wallet via RPC)
 > interact with aeternity's blockchain's [**Aepp flavor**](docs/usage.md) – For _Aepps_ development AKA DApp development
 > You can find a more [complete example using VueJS here](examples/connect-two-ae)
 
@@ -164,20 +179,25 @@ Aepp().then(ae => {
 })
 ```
 
-## More? Check out the [Usage Documentation] to avoid common pitfalls.
+## CLI - Command Line Client
 
-[Usage Documentation]: docs/usage.md
+Install and use our **NodeJS [CLI](https://github.com/aeternity/aepp-cli-js)**.
+
+## Usage Documentation
+
+Generic [Usage Documentation](docs/usage.md).
 
 
-## [Contributing]
+## Contributing
 
-For advanced use, to contribute to development of new versions and to get a deeper understanding of the SDK, it is advised to read the [Contributing] section.
+For advanced use, to contribute to development of new versions and to get a deeper understanding of the SDK, it is advised to read the [Contributing](docs/contributing.md) section.
 
-[Contributing]: docs/contributing.md
+1. [Contribute](docs/contributing.md)
+2. [Release](docs/releases.md)
 
-## [Change Log]
+## Change Log
 
-[Change Log]: CHANGELOG.md
+We keep our [Changelog](CHANGELOG.md) up to date.
 
 ## License
 
@@ -195,3 +215,4 @@ INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS
 OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
 TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
 THIS SOFTWARE.
+
