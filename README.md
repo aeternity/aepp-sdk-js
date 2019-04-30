@@ -73,7 +73,7 @@ import Ae from '@aeternity/aepp-sdk/es/ae/universal' // or other flavor
 ### VueJS (maintained) Examples
 
 1. [Wallet + Aepp RPC setup](/examples/connect-two-ae)
-2. [Suggest another example](/issues/new)
+2. [Suggest another example](https://github.com/aeternity/aepp-sdk-js/issues/new)
 
 ### 1. Universal Example (_all_ SDK's functionalities)
 > interact with aeternity's blockchain's [**Universal flavor**](docs/usage.md)
