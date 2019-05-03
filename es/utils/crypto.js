@@ -194,9 +194,9 @@ export function decodeBase64Check (str) {
 
 /**
  * Base58 encode given `input`
- * @rtype (input: String) => Buffer
+ * @rtype (input: String) => String
  * @param {String} input - Data to encode
- * @return {Buffer} Base58 encoded data
+ * @return {String} Base58 encoded data
  */
 export function encodeBase58Check (input) {
   return bs58check.encode(Buffer.from(input))
