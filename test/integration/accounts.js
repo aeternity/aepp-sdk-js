@@ -52,6 +52,14 @@ describe('Accounts', function () {
     return wallet.balance(await wallet.address()).should.eventually.be.a('string')
   })
 
+  it('Spend 50% of balance', async () => {
+    const balance = await wallet.balance(await wallet.address())
+
+    await wallet.transferFunds(0.5, 'ak_DMNCzsVoZnpV5fe8FTQnNsTfQ48YM5C3WbHPsJyHjAuTXebFi')
+    const balanceAfter = await wallet.balance(await wallet.address())
+    BigNumber(balance).div(balanceAfter).toNumber().should.be.equal(2)
+  })
+
   it('spends tokens', async () => {
     const ret = await wallet.spend(1, receiver)
     ret.should.have.property('tx')
