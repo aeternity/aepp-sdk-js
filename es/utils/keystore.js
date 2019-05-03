@@ -28,14 +28,32 @@ const DERIVED_KEY_FUNCTIONS = {
   'argon2id': deriveKeyUsingArgon2id
 }
 
-async function deriveKeyUsingArgon2id (password, salt, options) {
+export async function deriveKeyUsingArgon2id (password, salt, options) {
   const { memlimit_kib: memoryCost, parallelism, opslimit: timeCost } = options.kdf_params
   const isBrowser = !(typeof module !== 'undefined' && module.exports)
 
-  if (isBrowser) {
-    const argon2 = require('./argon2browser')
-    const res = await argon2.hash({ pass: password, time: timeCost, mem: memoryCost, parallelism, type: argon2.ArgonType.Argon2id, salt, hashLen: 32 });
-    return res.hash
+  if (!isBrowser) {
+    const _sodium = require('libsodium-wrappers-sumo')
+    const argon2 = require('argon2')
+
+    return _sodium.ready.then(async () => {
+      // tslint:disable-next-line:typedef
+      const sodium = _sodium
+
+      const passwordHashed = sodium.crypto_hash_sha256(password, 'hex')
+      debugger
+      const result = sodium.crypto_pwhash(
+        32,
+        passwordHashed,
+        salt,
+        timeCost,
+        memoryCost,
+        sodium.crypto_pwhash_ALG_ARGON2ID13,
+        'hex'
+      )
+
+      return { result: Buffer.from(result, 'hex'), nodeVer: await argon2.hash(password, { timeCost, memoryCost, parallelism, type: argon2.argon2id, raw: true, salt }) }
+    })
   } else {
     const argon2 = require('argon2')
     return argon2.hash(password, { timeCost, memoryCost, parallelism, type: argon2.argon2id, raw: true, salt })
@@ -143,6 +161,10 @@ async function deriveKey (password, nonce, options = {
  * @return {Object}
  */
 function marshal (name, derivedKey, privateKey, nonce, salt, options = {}) {
+  console.log(derivedKey.result.length)
+  console.log(derivedKey.result)
+  console.log(derivedKey.nodeVer.length)
+  console.log(derivedKey.nodeVer)
   const opt = Object.assign({}, DEFAULTS.crypto, options)
   return Object.assign(
     { name, version: 1, public_key: getAddressFromPriv(privateKey), id: uuid.v4() },

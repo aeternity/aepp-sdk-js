@@ -48,7 +48,7 @@ describe('Keystore', function () {
   const publicKey = getAddressFromPriv(secretKey)
   let keystore
 
-  it('dump account to keystore object', async () => {
+  it.only('dump account to keystore object', async () => {
     keystore = await dump('test', password, secretKey)
     validateKeyObj(keystore).should.be.equal(true)
   })

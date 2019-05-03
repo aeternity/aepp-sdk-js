@@ -37,6 +37,9 @@ module.exports = {
   output: {
     filename: 'bundle.js?[hash]'
   },
+  node: {
+    fs: 'empty'
+  },
   devServer: {
     contentBase: path.join(__dirname, 'dist'),
     port: 9001
