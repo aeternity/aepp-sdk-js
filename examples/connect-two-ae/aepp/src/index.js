@@ -9,7 +9,6 @@ import store from './store'
 Vue.config.productionTip = false
 Vue.use(VueRouter)
 
-console.info('about to render Vue App')
 new Vue({
   router: getRouter(store),
   store,
