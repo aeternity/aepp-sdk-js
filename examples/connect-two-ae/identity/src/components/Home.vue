@@ -1,5 +1,8 @@
 <template>
-  <div class="w-full p-4 flex justify-center flex-col bg-grey h-screen">
+  <div
+    v-if="!runningInFrame"
+    class="w-full p-4 flex justify-center flex-col bg-grey h-screen"
+  >
     <h1 class="mb-4">Wallet Aepp</h1>
 
     <div class="border">
@@ -45,6 +48,7 @@ import MemoryAccount from 'AE_SDK_MODULES/account/memory'
 export default {
   data () {
     return {
+      runningInFrame: window.parent !== window,
       pub: 'ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU', // Your public key
       priv: 'a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61', // Your private key
       client: null,
@@ -74,7 +78,8 @@ export default {
       onContract: this.confirmDialog
     })
 
-    this.$refs.aepp.src = this.aeppUrl
+    if (!this.runningInFrame) this.$refs.aepp.src = this.aeppUrl
+    else window.parent.postMessage({ jsonrpc: '2.0', method: 'ready' }, '*')
 
     this.height = await this.client.height()
     this.balance = await this.client.balance(this.pub).catch(() => 0)

@@ -147,6 +147,7 @@ import Aepp from 'AE_SDK_MODULES/ae/aepp'
 export default {
   data () {
     return {
+      runningInFrame: window.parent !== window,
       client: null,
       height: null,
       pub: null,
@@ -207,10 +208,27 @@ export default {
       } catch (err) {
         this.callError = err
       }
+    },
+    async getReverseWindow() {
+      const iframe = document.createElement('iframe')
+      iframe.src = prompt('Enter wallet URL', 'http://localhost:9000')
+      iframe.style.display = 'none'
+      document.body.appendChild(iframe)
+      await new Promise(resolve => {
+        const handler = ({ data }) => {
+          if (data.method !== 'ready') return
+          window.removeEventListener('message', handler)
+          resolve()
+        }
+        window.addEventListener('message', handler)
+      })
+      return iframe.contentWindow
     }
   },
   async created () {
-    this.client = await Aepp()
+    this.client = await Aepp({
+      parent: this.runningInFrame ? window.parent : await this.getReverseWindow()
+    })
     this.pub = await this.client.address().catch(e => `Rejected: ${e}`)
     this.height = await this.client.height()
   }
