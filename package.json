@@ -37,7 +37,6 @@
     "bip32-path": "^0.4.2",
     "blakejs": "^1.1.0",
     "bs58check": "^2.1.1",
-    "chalk": "^2.4.1",
     "commander": "^2.14.1",
     "esm": "^3.0.77",
     "json-bigint": "^0.3.0",
