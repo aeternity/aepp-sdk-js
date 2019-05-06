@@ -102,20 +102,25 @@ function readType (type, returnType = false) {
  * @return {*}
  */
 function validate (type, value) {
-  const { t } = readType(type)
-  if (value === undefined || value === null) return { require: true }
+  const { t, generic } = readType(type)
+  if (value === undefined || value === null) return false
 
   switch (t) {
     case SOPHIA_TYPES.int:
-      return isNaN(value) || ['boolean'].includes(typeof value)
+      return { valid: !isNaN(value), value, type: t }
     case SOPHIA_TYPES.bool:
-      return typeof value !== 'boolean'
+      return { valid: typeof value === 'boolean', value, type: t }
     case SOPHIA_TYPES.address:
-      return !(value[2] === '_' && ['ak', 'ct'].includes(value.slice(0, 2)))
+      return { valid: (value[2] === '_' && ['ak', 'ct'].includes(value.slice(0, 2))), value, type: t }
+    case SOPHIA_TYPES.list:
+      if (!Array.isArray(value)) return { value, type: { t, generic }, valid: false, msg: 'Not an array' }
+      const validationArray = value.map(el => validate(generic, el))
+      return { value, type: { t, generic }, valid: validationArray }
     default:
-      return false
+      return true
   }
 }
+
 
 function encodeAddress (address, prefix = 'ak') {
   const addressBuffer = Buffer.from(address, 'hex')
@@ -184,10 +189,18 @@ function prepareArgsForEncode (aci, params) {
     .map(
       ({ type }, i) =>
         validate(type, params[i])
-          ? `Argument index: ${i}, value: [${params[i]}] must be of type [${type}]`
-          : false
-    ).filter(e => e)
-  if (validation.length) throw new Error('Validation error: ' + JSON.stringify(validation))
+          // ? `Argument index: ${i}, value: [${params[i]}] must be of type [${type}]`
+          // : false
+    )
+  const check = (val) => {
+    // console.log(val)
+    if (typeof val.valid === 'boolean') return !val.valid
+    if (Array.isArray(val.valid)) return val.valid.filter(v => check(v)).length
+    return false
+  }
+
+  console.log(validation.filter(val => check(val)))
+  // if (validation.length) throw new Error('Validation error: ' + JSON.stringify(validation))
 
   return aci.arguments.map(({ type }, i) => transform(type, params[i]))
 }
