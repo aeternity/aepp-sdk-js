@@ -44,8 +44,6 @@
 // AE_SDK_MODULES is a webpack alias present in webpack.config.js
 import Wallet from 'AE_SDK_MODULES/ae/wallet'
 import MemoryAccount from 'AE_SDK_MODULES/account/memory'
-import { generateKeyPair } from 'AE_SDK_MODULES/utils/crypto'
-import {getAddressFromPriv, dump} from 'AE_SDK_MODULES/utils/keystore'
 
 export default {
   data () {

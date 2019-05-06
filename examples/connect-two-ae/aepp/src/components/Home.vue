@@ -176,7 +176,6 @@ export default {
   created () {
     Aepp().then(ae => {
       this.client = ae
-      ae.getNodeInfo().then(s => { debugger }).catch(e => { debugger })
       ae.address()
         .then(address => {
           this.pub = address
