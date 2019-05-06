@@ -14,7 +14,7 @@ pipeline {
     stage('Build') {
       steps {
         sh 'ln -sf /node_modules ./'
-        sh 'pnpm run build'
+        sh 'npm run build'
       }
     }
 
@@ -25,7 +25,7 @@ pipeline {
                                           passwordVariable: 'WALLET_PRIV')]) {
           sh 'docker-compose -H localhost:2376 pull node'
           sh 'docker-compose -H localhost:2376 build'
-          sh 'docker-compose -H localhost:2376 run sdk pnpm run test-jenkins'
+          sh 'docker-compose -H localhost:2376 run sdk npm run test-jenkins'
         }
       }
     }
