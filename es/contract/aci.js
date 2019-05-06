@@ -101,8 +101,9 @@ function readType (type, returnType = false) {
  * @param value
  * @return {*}
  */
-function validate (type, value) {
+function validate (type, value, parent = []) {
   const { t, generic } = readType(type)
+  if (!parent.length) parent.push({ t, generic })
   if (value === undefined || value === null) return false
 
   switch (t) {
@@ -114,13 +115,12 @@ function validate (type, value) {
       return { valid: (value[2] === '_' && ['ak', 'ct'].includes(value.slice(0, 2))), value, type: t }
     case SOPHIA_TYPES.list:
       if (!Array.isArray(value)) return { value, type: { t, generic }, valid: false, msg: 'Not an array' }
-      const validationArray = value.map(el => validate(generic, el))
+      const validationArray = value.map((el, index) => ({ index, ...validate(generic, el, [...parent, t]), parent }))
       return { value, type: { t, generic }, valid: validationArray }
     default:
-      return true
+      return { valid: true, type: t }
   }
 }
-
 
 function encodeAddress (address, prefix = 'ak') {
   const addressBuffer = Buffer.from(address, 'hex')
@@ -187,19 +187,30 @@ function prepareArgsForEncode (aci, params) {
   // Validation
   const validation = aci.arguments
     .map(
-      ({ type }, i) =>
-        validate(type, params[i])
-          // ? `Argument index: ${i}, value: [${params[i]}] must be of type [${type}]`
-          // : false
-    )
-  const check = (val) => {
+      ({ type }, i) => validate(type, params[i]))
+
+  const filterErrors = (val) => {
     // console.log(val)
     if (typeof val.valid === 'boolean') return !val.valid
-    if (Array.isArray(val.valid)) return val.valid.filter(v => check(v)).length
+    if (Array.isArray(val.valid)) return val.valid.filter((v) => filterErrors(v)).length
     return false
   }
+  const filteredErrors = validation.filter((val) => filterErrors(val))
+  console.log(JSON.stringify(filteredErrors))
 
-  console.log(validation.filter(val => check(val)))
+  // const getError = (filtered) => {
+  //   let errors = []
+  //   const check = (val) => val.forEach((v) => {
+  //     if (typeof v.valid === 'boolean') errors.push({ index, ...v })
+  //     if (Array.isArray(v.valid)) {
+  //       check(v.valid)
+  //     }
+  //   })
+  //   check(filtered)
+  //   return errors
+  // }
+  // console.log(getError(filteredErrors))
+
   // if (validation.length) throw new Error('Validation error: ' + JSON.stringify(validation))
 
   return aci.arguments.map(({ type }, i) => transform(type, params[i]))
