@@ -7,7 +7,6 @@ const {VueLoaderPlugin} = require('vue-loader')
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 const PurgecssPlugin = require('purgecss-webpack-plugin')
 let glob = require('glob-all')
-const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 const distFolder = path.resolve(__dirname, 'dist')
 const jsLoader = 'babel-loader!standard-loader?error=true'
@@ -44,7 +43,6 @@ module.exports = {
   },
   devtool: process.env.NODE_ENV === 'prod' ? '' : 'eval-source-map',
   plugins: [
-    new CopyWebpackPlugin([{ from: './node_modules/argon2-browser', to: 'argon2' }]),
     new HtmlWebpackPlugin({
       inject: true,
       // chunks: ['wallet'],
