@@ -97,8 +97,6 @@
 <script>
 //  is a webpack alias present in webpack.config.js
 import Aepp from 'AE_SDK_MODULES/ae/aepp'
-import * as Keystore from 'AE_SDK_MODULES/utils/keystore'
-import { generateKeyPair } from 'AE_SDK_MODULES/utils/crypto'
 
 export default {
   name: 'Home',
@@ -176,11 +174,6 @@ export default {
     }
   },
   created () {
-    const dump = Keystore.dump
-    const { secretKey } = generateKeyPair(true)
-    dump('test', 'test', secretKey).then(res => { debugger }).catch(e => { debugger})
-
-    debugger
     Aepp().then(ae => {
       this.client = ae
       ae.getNodeInfo().then(s => { debugger }).catch(e => { debugger })
