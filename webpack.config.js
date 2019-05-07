@@ -1,5 +1,6 @@
 const path = require('path')
 const R = require('ramda')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 function configure (filename, opts = {}) {
   return (env, argv) => R.mergeDeepLeft({
@@ -24,6 +25,13 @@ function configure (filename, opts = {}) {
         }
       ]
     },
+    plugins: argv.report ? [
+      new BundleAnalyzerPlugin({
+        analyzerMode: 'static',
+        reportFilename: filename + '.html',
+        openAnalyzer: false
+      })
+    ] : [],
     output: {
       path: path.resolve(__dirname, 'dist'),
       filename,
