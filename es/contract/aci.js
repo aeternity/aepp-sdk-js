@@ -179,27 +179,38 @@ function prepareSchema (type) {
   if (!Object.keys(SOPHIA_TYPES).includes(t)) t = SOPHIA_TYPES.address // Handle Contract address transformation
   switch (t) {
     case SOPHIA_TYPES.int:
-      return Joi.number()
+      return Joi.number().error(getJoiErrorMsg)
     case SOPHIA_TYPES.string:
-      return Joi.string()
+      return Joi.string().error(getJoiErrorMsg)
     case SOPHIA_TYPES.address:
-      return Joi.string().regex(/^(ak_|ct_)/)
+      return Joi.string().regex(/^(ak_|ct_)/).error(getJoiErrorMsg)
     case SOPHIA_TYPES.bool:
-      return Joi.boolean()
+      return Joi.boolean().error(getJoiErrorMsg)
     case SOPHIA_TYPES.list:
-      return Joi.array().items(prepareSchema(generic))
+      return Joi.array().items(prepareSchema(generic)).error(getJoiErrorMsg)
     case SOPHIA_TYPES.tuple:
-      return Joi.array().ordered(generic.map(type => prepareSchema(type)))
+      return Joi.array().ordered(generic.map(type => prepareSchema(type))).error(getJoiErrorMsg)
     case SOPHIA_TYPES.record:
       return Joi.object(
         generic.reduce((acc, { name, type }) => ({ ...acc, [name]: prepareSchema(type) }), {})
-      )
+      ).error(getJoiErrorMsg)
     // @Todo Need to transform Map to Array of arrays before validating it
     // case SOPHIA_TYPES.map:
     //   return Joi.array().items(Joi.array().ordered(generic.map(type => prepareSchema(type))))
     default:
       return Joi.any()
   }
+}
+
+function getJoiErrorMsg (errors) {
+  // console.log('eerere')
+  // console.log(errors)
+  return errors
+  // const [err] = errors
+  // switch (err.type) {
+  //   case 'array.base':
+  //     return `${err.context.value} must be of type array, Path to argument: [${err.path}]`
+  // }
 }
 
 /**
@@ -219,7 +230,7 @@ function prepareArgsForEncode (aci, params) {
   )
   const { error } = Joi.validate(params, validationSchema, { abortEarly: false })
   if (error) {
-    throw new Error('Validation error: ' + JSON.stringify(error.isJoi ? error.details : error, null, 2))
+    throw error
   }
 
   return aci.arguments.map(({ type }, i) => transform(type, params[i]))
