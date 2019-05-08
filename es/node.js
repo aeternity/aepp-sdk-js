@@ -25,9 +25,12 @@
 import stampit from '@stamp/it'
 import axios from 'axios'
 import * as R from 'ramda'
-import urlparse from 'url'
 import Swagger from './utils/swagger'
 import semverSatisfies from './utils/semver-satisfies'
+
+function resolveUrl (url, baseUrl) {
+  return new URL(url, baseUrl).toString()
+}
 
 /**
  * Obtain Swagger configuration from Node node
@@ -37,7 +40,7 @@ import semverSatisfies from './utils/semver-satisfies'
  * @return {Object} Swagger configuration
  */
 async function remoteSwag (url) {
-  return (await axios.get(urlparse.resolve(url, 'api'))).data
+  return (await axios.get(resolveUrl('api', url))).data
 }
 
 /**
@@ -52,9 +55,9 @@ const loader = ({ url, internalUrl }) => (path, definition) => {
   const { tags, operationId } = definition
 
   if (R.contains('external', tags)) {
-    return urlparse.resolve(url, path)
+    return resolveUrl(path, url)
   } else if (!R.isNil(internalUrl) && R.contains('internal', tags)) {
-    return urlparse.resolve(internalUrl.replace(/\/?$/, '/'), path)
+    return resolveUrl(path, internalUrl)
   } else {
     throw Error(`Method ${operationId} is unsupported. No interface for ${R.toString(tags)}`)
   }
