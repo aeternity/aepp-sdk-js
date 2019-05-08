@@ -72,7 +72,7 @@ function transformDecodedData (aci, result, { skipTransformDecoded = false, addr
           (acc, { key, val }, i) => {
             key = transformDecodedData(keyT, { value: key.value })
             val = transformDecodedData(valueT, { value: val.value })
-            acc[i] = { key, val }
+            acc[i] = [key, val]
             return acc
           },
           {}
@@ -125,9 +125,30 @@ function transform (type, value) {
         },
         ''
       )}}`
+    case SOPHIA_TYPES.map:
+      return transformMap(value, generic)
   }
 
   return `${value}`
+}
+
+function transformMap (value, generic) {
+  if (value instanceof Map) {
+    value = Array.from(value.entries())
+  }
+  if (!Array.isArray(value) && value instanceof Object) {
+    value = Object.entries(value)
+  }
+  return `{${value
+    .reduce(
+      (acc, [key, value], i) => {
+        if (i !== 0) acc += ','
+        acc += `[${transform(generic[0], key)}] = ${transform(generic[1], value)}`
+        return acc
+      },
+      ``
+    )
+  }}`
 }
 
 /**
@@ -148,6 +169,11 @@ function readType (type, returnType = false) {
   }
 }
 
+/**
+ * Prepare Joi validation schema for sophia types
+ * @param type
+ * @return {Object} JoiSchema
+ */
 function prepareSchema (type) {
   let { t, generic } = readType(type)
   if (!Object.keys(SOPHIA_TYPES).includes(t)) t = SOPHIA_TYPES.address // Handle Contract address transformation
@@ -165,10 +191,14 @@ function prepareSchema (type) {
     case SOPHIA_TYPES.tuple:
       return Joi.array().ordered(generic.map(type => prepareSchema(type)))
     case SOPHIA_TYPES.record:
-      console.log(generic)
       return Joi.object(
         generic.reduce((acc, { name, type }) => ({ ...acc, [name]: prepareSchema(type) }), {})
       )
+    // @Todo Need to transform Map to Array of arrays before validating it
+    // case SOPHIA_TYPES.map:
+    //   return Joi.array().items(Joi.array().ordered(generic.map(type => prepareSchema(type))))
+    default:
+      return Joi.any()
   }
 }
 
@@ -187,8 +217,10 @@ function prepareArgsForEncode (aci, params) {
     aci.arguments
       .map(({ type }, i) => prepareSchema(type).required())
   )
-  // const validation = Joi.validate(params, validationSchema, { abortEarly: false })
-  // if (validation.length) throw new Error('Validation error: ' + JSON.stringify(validation))
+  const { error } = Joi.validate(params, validationSchema, { abortEarly: false })
+  if (error) {
+    throw new Error('Validation error: ' + JSON.stringify(error.isJoi ? error.details : error, null, 2))
+  }
 
   return aci.arguments.map(({ type }, i) => transform(type, params[i]))
 }
