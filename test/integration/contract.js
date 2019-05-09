@@ -53,6 +53,8 @@ contract StateContract =
   public function listFn(a: list(int)) : list(int) = a
   public function listInListFn(a: list(list(int))) : list(list(int)) = a
   
+  public function mapFn(a: map(address, (string, int))) : map(address, (string, int)) = a
+  
   public function testFn(a: list(int), b: bool) : (list(int), bool) = (a, b)
   public function approve(tx_id: int, voting_contract: Voting) : int = tx_id
   public function getRecord() : state = state
@@ -176,9 +178,9 @@ describe('Contract', function () {
         isCompiled.should.be.equal(true)
       })
       it('Deploy contract with state', async () => {
-        await contractObject.deploy(['blabla', 100])
+        await contractObject.deploy(['123', 1])
         const state = await contractObject.call('retrieve')
-        return state.decode().should.eventually.become(['blabla', 100])
+        return state.decode().should.eventually.become(['123', 1])
       })
     })
     describe('Arguments Validation and Casting', function () {
@@ -304,6 +306,38 @@ describe('Contract', function () {
           }
         })
       })
+      describe('MAP', function () {
+        it('Valid', async () => {
+          const address = await contract.address()
+          const mapArg = new Map(
+            [
+              [address, ['someStringV', 324]]
+            ]
+          )
+          const result = await contractObject.call('mapFn', [mapArg])
+          return result.decode().should.eventually.become(Array.from(mapArg.entries()))
+        })
+        it('Cast from string to int', async () => {
+          const address = await contract.address()
+          const mapArg = new Map(
+            [
+              [address, ['someStringV', '324']]
+            ]
+          )
+          const result = await contractObject.call('mapFn', [mapArg])
+          mapArg.set(address, ['someStringV', 324])
+          return result.decode().should.eventually.become(Array.from(mapArg.entries()))
+        })
+        it('Cast from array to map', async () => {
+          const address = await contract.address()
+          const mapArg =
+            [
+              [address, ['someStringV', 324]]
+            ]
+          const result = await contractObject.call('mapFn', [mapArg])
+          return result.decode().should.eventually.become(mapArg)
+        })
+      })
     })
     describe('Call contract', function () {
       it('Call contract using using sophia type arguments', async () => {
@@ -326,7 +360,7 @@ describe('Contract', function () {
       })
       it('Call contract with return of record type', async () => {
         const result = await contractObject.call('getRecord', [])
-        return result.decode().should.eventually.become({ value: 'blabla', key: 100 })
+        return result.decode().should.eventually.become({ value: '123', key: 1 })
       })
       it('Call contract with argument of record type', async () => {
         const result = await contractObject.call('setRecord', [{ value: 'qwe', key: 1234 }])

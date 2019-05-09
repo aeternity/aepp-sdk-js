@@ -72,10 +72,10 @@ function transformDecodedData (aci, result, { skipTransformDecoded = false, addr
           (acc, { key, val }, i) => {
             key = transformDecodedData(keyT, { value: key.value })
             val = transformDecodedData(valueT, { value: val.value })
-            acc[i] = [key, val]
+            acc.push([key, val])
             return acc
           },
-          {}
+          []
         )
     case SOPHIA_TYPES.list:
       return result.value.map(({ value }) => transformDecodedData(generic, { value }))
