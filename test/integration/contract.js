@@ -63,7 +63,7 @@ const encodedNumberSix = 'cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaKNdnK'
 
 plan('10000000000000000')
 
-describe.only('Contract', function () {
+describe('Contract', function () {
   configure(this)
 
   let contract
@@ -148,7 +148,7 @@ describe.only('Contract', function () {
     })
   })
 
-  describe.only('Contract ACI Interface', function () {
+  describe('Contract ACI Interface', function () {
     let contractObject
 
     it('Generate ACI object', async () => {
@@ -175,18 +175,13 @@ describe.only('Contract', function () {
         const isCompiled = contractObject.compiled.length && contractObject.compiled.slice(0, 3) === 'cb_'
         isCompiled.should.be.equal(true)
       })
-      it.skip('Deploy contract with state', async () => {
+      it('Deploy contract with state', async () => {
         await contractObject.deploy(['blabla', 100])
         const state = await contractObject.call('retrieve')
         return state.decode().should.eventually.become(['blabla', 100])
       })
-      it.skip('Deploy contract with wrong arguments', async () => {
-        try {
-          await contractObject.deploy(['blabla', true])
-        } catch (e) {
-          e.message.should.be.equal('Validation error: ["Argument index: 1, value: [true] must be of type [int]"]')
-        }
-      })
+    })
+    describe('Arguments Validation and Casting', function () {
       describe('INT', function () {
         it('Invalid', async () => {
           try {
@@ -310,7 +305,7 @@ describe.only('Contract', function () {
         })
       })
     })
-    describe.skip('Call contract', function () {
+    describe('Call contract', function () {
       it('Call contract using using sophia type arguments', async () => {
         const res = await contractObject.call('listFn', ['[ 1, 2 ]'], { skipArgsConvert: true })
         return res.decode().should.eventually.become([1, 2])
@@ -324,20 +319,6 @@ describe.only('Contract', function () {
         const decoded = await res.decode()
         const decodedJSON = '{"type":"list","value":[{"type":"word","value":1},{"type":"word","value":2}]}'
         JSON.stringify(decoded).should.be.equal(decodedJSON)
-      })
-      it('Call contract with wrong arguments (pass not all args)', async () => {
-        try {
-          await contractObject.call('testFn', [[1, 2]])
-        } catch (e) {
-          e.message.should.be.equal('Validation error: ["Argument index: 1, value: [undefined] must be of type [bool]"]')
-        }
-      })
-      it('Call contract with wrong arguments (wrong arg type)', async () => {
-        try {
-          await contractObject.call('testFn', [[1, 2], 1234]) // Second arg must be of type bool
-        } catch (e) {
-          e.message.should.be.equal('Validation error: ["Argument index: 1, value: [1234] must be of type [bool]"]')
-        }
       })
       it('Call contract with contract type argument', async () => {
         const result = await contractObject.call('approve', [0, 'ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh'])
