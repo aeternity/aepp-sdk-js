@@ -189,7 +189,7 @@ function prepareSchema (type) {
     case SOPHIA_TYPES.list:
       return Joi.array().items(prepareSchema(generic)).error(getJoiErrorMsg)
     case SOPHIA_TYPES.tuple:
-      return Joi.array().ordered(generic.map(type => prepareSchema(type))).error(getJoiErrorMsg)
+      return Joi.array().ordered(generic.map(type => prepareSchema(type).required())).label('Tuple argument').error(getJoiErrorMsg)
     case SOPHIA_TYPES.record:
       return Joi.object(
         generic.reduce((acc, { name, type }) => ({ ...acc, [name]: prepareSchema(type) }), {})
@@ -203,14 +203,34 @@ function prepareSchema (type) {
 }
 
 function getJoiErrorMsg (errors) {
-  // console.log('eerere')
-  // console.log(errors)
-  return errors
-  // const [err] = errors
-  // switch (err.type) {
-  //   case 'array.base':
-  //     return `${err.context.value} must be of type array, Path to argument: [${err.path}]`
-  // }
+  return errors.map(err => {
+    const { path, type, context } = err
+    let value = context.hasOwnProperty('value') ? context.value : context.label
+    value = typeof value === 'object' ? JSON.stringify(value).slice(1).slice(0, -1) : value
+    switch (type) {
+      case 'string.base':
+        return ({ ...err, message: `Value "${value}" at path: [${path}] not a string` })
+      case 'number.base':
+        return ({ ...err, message: `Value "${value}" at path: [${path}] not a number` })
+      case 'boolean.base':
+        return ({ ...err, message: `Value "${value}" at path: [${path}] not a boolean` })
+      case 'array.base':
+        return ({ ...err, message: `Value "${value}" at path: [${path}] not a array` })
+      default:
+        return err
+    }
+  })
+}
+
+function validateArguments (aci, params) {
+  const validationSchema = Joi.array().ordered(
+    aci.arguments
+      .map(({ type }, i) => prepareSchema(type).label(`[${params[i]}]`))
+  ).label('Argument')
+  const { error } = Joi.validate(params, validationSchema, { abortEarly: false })
+  if (error) {
+    throw error
+  }
 }
 
 /**
@@ -224,15 +244,8 @@ function getJoiErrorMsg (errors) {
 function prepareArgsForEncode (aci, params) {
   if (!aci) return params
   // Validation
-  const validationSchema = Joi.array().ordered(
-    aci.arguments
-      .map(({ type }, i) => prepareSchema(type).required())
-  )
-  const { error } = Joi.validate(params, validationSchema, { abortEarly: false })
-  if (error) {
-    throw error
-  }
-
+  validateArguments(aci, params)
+  // Cast argument from JS to Sophia type
   return aci.arguments.map(({ type }, i) => transform(type, params[i]))
 }
 

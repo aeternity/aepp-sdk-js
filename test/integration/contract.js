@@ -51,6 +51,7 @@ contract StateContract =
   public function tupleWithList (a: (list(int), int)) : (list(int), int) = a
   
   public function listFn(a: list(int)) : list(int) = a
+  public function listInListFn(a: list(list(int))) : list(list(int)) = a
   
   public function testFn(a: list(int), b: bool) : (list(int), bool) = (a, b)
   public function approve(tx_id: int, voting_contract: Voting) : int = tx_id
@@ -186,43 +187,43 @@ describe.only('Contract', function () {
           e.message.should.be.equal('Validation error: ["Argument index: 1, value: [true] must be of type [int]"]')
         }
       })
-      describe.skip('INT', function () {
+      describe('INT', function () {
         it('Invalid', async () => {
           try {
             await contractObject.call('intFn', ['asd'])
           } catch (e) {
-            e.message.should.be.equal('"value" at position 0 fails because ["0" must be a number]')
+            e.message.should.be.equal('"Argument" at position 0 fails because [Value "asd" at path: [0] not a number]')
           }
         })
         it('Valid', async () => {
           await contractObject.call('intFn', [1])
         })
       })
-      describe.skip('STRING', function () {
+      describe('STRING', function () {
         it('Invalid', async () => {
           try {
             await contractObject.call('stringFn', [123])
           } catch (e) {
-            e.message.should.be.equal('"value" at position 0 fails because ["0" must be a string]')
+            e.message.should.be.equal('"Argument" at position 0 fails because [Value "123" at path: [0] not a string]')
           }
         })
         it('Valid', async () => {
           await contractObject.call('stringFn', ['string'])
         })
       })
-      describe.skip('ADDRESS', function () {
+      describe('ADDRESS', function () {
         it('Invalid address', async () => {
           try {
             await contractObject.call('addressFn', ['asdasasd'])
           } catch (e) {
-            e.message.should.be.equal('"value" at position 0 fails because ["0" with value "asdasasd" fails to match the required pattern: /^(ak_|ct_)/]')
+            e.message.should.be.equal('"Argument" at position 0 fails because ["[asdasasd]" with value "asdasasd" fails to match the required pattern: /^(ak_|ct_)/]')
           }
         })
         it('Invalid address type', async () => {
           try {
             await contractObject.call('addressFn', [333])
           } catch (e) {
-            e.message.should.be.equal('"value" at position 0 fails because ["0" must be a string]')
+            e.message.should.be.equal('"Argument" at position 0 fails because [Value "333" at path: [0] not a string]')
           }
         })
         it('Empty address', async () => {
@@ -245,40 +246,40 @@ describe.only('Contract', function () {
           await contractObject.call('addressFn', ['ak_2ct6nMwmRnyGX6jPhraFPedZ5bYp1GXqpvnAq5LXeL5TTPfFif'])
         })
       })
-      describe.skip('TUPLE', function () {
+      describe('TUPLE', function () {
         it('Invalid type', async () => {
           try {
             await contractObject.call('tupleFn', ['asdasasd'])
           } catch (e) {
-            e.message.should.be.equal('"value" at position 0 fails because ["0" must be an array]')
+            e.message.should.be.equal('"Argument" at position 0 fails because [Value "[asdasasd]" at path: [0] not a array]')
           }
         })
         it('Invalid tuple prop type', async () => {
           try {
             await contractObject.call('tupleFn', [[1, 'string']])
           } catch (e) {
-            e.message.should.be.equal('"value" at position 0 fails because ["0" at position 0 fails because ["0" must be a string], "0" at position 1 fails because ["1" must be a number]]')
+            e.message.should.be.equal('"Argument" at position 0 fails because ["[1,string]" at position 0 fails because [Value "1" at path: [0,0] not a string], "[1,string]" at position 1 fails because [Value "string" at path: [0,1] not a number]]')
           }
         })
         it('Required tuple prop', async () => {
           try {
             await contractObject.call('tupleFn', [[1]])
           } catch (e) {
-            e.message.should.be.equal('"value" at position 0 fails because ["0" at position 0 fails because ["0" must be a string]]')
+            e.message.should.be.equal('"Argument" at position 0 fails because ["[1]" at position 0 fails because [Value "1" at path: [0,0] not a string], "[1]" does not contain 1 required value(s)]')
           }
         })
         it('Wrong type in list inside tuple', async () => {
           try {
             await contractObject.call('tupleWithList', [[[true], 1]])
           } catch (e) {
-            e.message.should.be.equal('"value" at position 0 fails because ["0" at position 0 fails because ["0" at position 0 fails because ["0" must be a number]]]')
+            e.message.should.be.equal('"Argument" at position 0 fails because ["[true,1]" at position 0 fails because ["0" at position 0 fails because [Value "true" at path: [0,0,0] not a number]]]')
           }
         })
         it('Wrong type in tuple inside tuple', async () => {
           try {
             await contractObject.call('tupleInTupleFn', [[['str', 1], 1]])
           } catch (e) {
-            e.message.should.be.equal('"value" at position 0 fails because ["0" at position 0 fails because ["0" at position 0 fails because ["0" must be a number]]]')
+            e.message.should.be.equal('"Argument" at position 0 fails because ["[str,1,1]" at position 0 fails because ["Tuple argument" at position 1 fails because [Value "1" at path: [0,0,1] not a string]]]')
           }
         })
         it('Valid', async () => {
@@ -288,27 +289,24 @@ describe.only('Contract', function () {
       describe('LIST', function () {
         it('Invalid type', async () => {
           try {
-            await contractObject.call('tupleFn', ['asdasasd'])
+            await contractObject.call('listFn', ['asdasasd'])
           } catch (e) {
-            e.message.should.be.equal('"value" at position 0 fails because ["0" must be an array]')
+            e.message.should.be.equal('"Argument" at position 0 fails because [Value "[asdasasd]" at path: [0] not a array]')
           }
         })
-        it('Invalid tuple prop type', async () => {
+        it('Invalid list element type', async () => {
           try {
-            await contractObject.call('tupleFn', [[1, 'string']])
+            await contractObject.call('listFn', [[1, 'string']])
           } catch (e) {
-            e.message.should.be.equal('"value" at position 0 fails because ["0" at position 0 fails because ["0" must be a string], "0" at position 1 fails because ["1" must be a number]]')
+            e.message.should.be.equal('"Argument" at position 0 fails because ["[1,string]" at position 1 fails because [Value "string" at path: [0,1] not a number]]')
           }
         })
-        it('Required tuple prop', async () => {
+        it('Invalid list element type nested', async () => {
           try {
-            await contractObject.call('tupleFn', [[1]])
+            await contractObject.call('listInListFn', [[['childListWronmgElement'], 'parentListWrongElement']])
           } catch (e) {
-            e.message.should.be.equal('"value" at position 0 fails because ["0" at position 0 fails because ["0" must be a string]]')
+            e.message.should.be.equal('"Argument" at position 0 fails because ["[childListWronmgElement,parentListWrongElement]" at position 0 fails because ["0" at position 0 fails because [Value "childListWronmgElement" at path: [0,0,0] not a number]], "[childListWronmgElement,parentListWrongElement]" at position 1 fails because [Value "1" at path: [0,1] not a array]]')
           }
-        })
-        it('Valid', async () => {
-          await contractObject.call('tupleFn', [['test', 1]])
         })
       })
     })
