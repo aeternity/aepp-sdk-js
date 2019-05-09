@@ -26,6 +26,7 @@ import AsyncInit from '../utils/async-init'
 import { decode } from '../tx/builder/helpers'
 import { encodeBase58Check } from '../utils/crypto'
 import { toBytes } from '../utils/bytes'
+import Joi from '@hapi/joi'
 
 const SOPHIA_TYPES = [
   'int',
@@ -37,79 +38,6 @@ const SOPHIA_TYPES = [
   'map',
   'record'
 ].reduce((acc, type) => ({ ...acc, [type]: type }), {})
-
-/**
- * Transform JS type to Sophia-type
- * @param type
- * @param value
- * @return {string}
- */
-function transform (type, value) {
-  let { t, generic } = readType(type)
-
-  // contract TestContract = ...
-  // fn(ct: TestContract)
-  if (typeof value === 'string' && value.slice(0, 2) === 'ct') t = SOPHIA_TYPES.address // Handle Contract address transformation
-
-  switch (t) {
-    case SOPHIA_TYPES.string:
-      return `"${value}"`
-    case SOPHIA_TYPES.list:
-      return `[${value.map(el => transform(generic, el))}]`
-    case SOPHIA_TYPES.tuple:
-      return `(${value.map((el, i) => transform(generic[i], el))})`
-    case SOPHIA_TYPES.address:
-      return `#${decode(value).toString('hex')}`
-    case SOPHIA_TYPES.record:
-      return `{${generic.reduce(
-        (acc, { name, type }, i) =>
-          (acc += `${i !== 0 ? ',' : ''}${name} = ${transform(type[0], value[name])}`),
-        ''
-      )}}`
-  }
-
-  return `${value}`
-}
-
-/**
- * Parse sophia type
- * @param type
- * @param returnType
- * @return {*}
- */
-function readType (type, returnType = false) {
-  const [t] = Array.isArray(type) ? type : [type]
-  // Base types
-  if (typeof t === 'string') return { t }
-
-  // Map, Tuple, List, Record
-  if (typeof t === 'object') {
-    const [[baseType, generic]] = Object.entries(t)
-    return { t: baseType, generic }
-  }
-}
-
-/**
- * Validate argument sophia-type
- * @param type
- * @param value
- * @return {*}
- */
-function validate (type, value) {
-  const { t } = readType(type)
-  if (value === undefined || value === null) return { require: true }
-
-  switch (t) {
-    case SOPHIA_TYPES.int:
-      return isNaN(value) || ['boolean'].includes(typeof value)
-    case SOPHIA_TYPES.bool:
-      return typeof value !== 'boolean'
-    case SOPHIA_TYPES.address:
-      return !(value[2] === '_' && ['ak', 'ct'].includes(value.slice(0, 2)))
-    default:
-      return false
-  }
-}
 
 function encodeAddress (address, prefix = 'ak') {
   const addressBuffer = Buffer.from(address, 'hex')
@@ -141,10 +69,10 @@ function transformDecodedData (aci, result, { skipTransformDecoded = false, addr
           (acc, { key, val }, i) => {
             key = transformDecodedData(keyT, { value: key.value })
             val = transformDecodedData(valueT, { value: val.value })
-            acc[i] = { key, val }
+            acc.push([key, val])
             return acc
           },
-          {}
+          []
         )
     case SOPHIA_TYPES.list:
       return result.value.map(({ value }) => transformDecodedData(generic, { value }))
@@ -164,6 +92,142 @@ function transformDecodedData (aci, result, { skipTransformDecoded = false, addr
 }
 
 /**
+ * Transform JS type to Sophia-type
+ * @param type
+ * @param value
+ * @return {string}
+ */
+function transform (type, value) {
+  let { t, generic } = readType(type)
+
+  // contract TestContract = ...
+  // fn(ct: TestContract)
+  if (typeof value === 'string' && value.slice(0, 2) === 'ct') t = SOPHIA_TYPES.address // Handle Contract address transformation
+
+  switch (t) {
+    case SOPHIA_TYPES.string:
+      return `"${value}"`
+    case SOPHIA_TYPES.list:
+      return `[${value.map(el => transform(generic, el))}]`
+    case SOPHIA_TYPES.tuple:
+      return `(${value.map((el, i) => transform(generic[i], el))})`
+    case SOPHIA_TYPES.address:
+      return `#${decode(value).toString('hex')}`
+    case SOPHIA_TYPES.record:
+      return `{${generic.reduce(
+        (acc, { name, type }, i) =>
+          (acc += `${i !== 0 ? ',' : ''}${name} = ${transform(type[0], value[name])}`),
+        ''
+      )}}`
+    case SOPHIA_TYPES.map:
+      return transformMap(value, generic)
+  }
+
+  return `${value}`
+}
+
+function transformMap (value, generic) {
+  if (value instanceof Map) {
+    value = Array.from(value.entries())
+  }
+  if (!Array.isArray(value) && value instanceof Object) {
+    value = Object.entries(value)
+  }
+  return `{${value
+    .reduce(
+      (acc, [key, value], i) => {
+        if (i !== 0) acc += ','
+        acc += `[${transform(generic[0], key)}] = ${transform(generic[1], value)}`
+        return acc
+      },
+      ``
+    )
+  }}`
+}
+
+/**
+ * Parse sophia type
+ * @param type
+ * @param returnType
+ * @return {*}
+ */
+function readType (type, returnType = false) {
+  const [t] = Array.isArray(type) ? type : [type]
+  // Base types
+  if (typeof t === 'string') return { t }
+
+  // Map, Tuple, List, Record
+  if (typeof t === 'object') {
+    const [[baseType, generic]] = Object.entries(t)
+    return { t: baseType, generic }
+  }
+}
+
+/**
+ * Prepare Joi validation schema for sophia types
+ * @param type
+ * @return {Object} JoiSchema
+ */
+function prepareSchema (type) {
+  let { t, generic } = readType(type)
+  if (!Object.keys(SOPHIA_TYPES).includes(t)) t = SOPHIA_TYPES.address // Handle Contract address transformation
+  switch (t) {
+    case SOPHIA_TYPES.int:
+      return Joi.number().error(getJoiErrorMsg)
+    case SOPHIA_TYPES.string:
+      return Joi.string().error(getJoiErrorMsg)
+    case SOPHIA_TYPES.address:
+      return Joi.string().regex(/^(ak_|ct_)/).error(getJoiErrorMsg)
+    case SOPHIA_TYPES.bool:
+      return Joi.boolean().error(getJoiErrorMsg)
+    case SOPHIA_TYPES.list:
+      return Joi.array().items(prepareSchema(generic)).error(getJoiErrorMsg)
+    case SOPHIA_TYPES.tuple:
+      return Joi.array().ordered(generic.map(type => prepareSchema(type).required())).label('Tuple argument').error(getJoiErrorMsg)
+    case SOPHIA_TYPES.record:
+      return Joi.object(
+        generic.reduce((acc, { name, type }) => ({ ...acc, [name]: prepareSchema(type) }), {})
+      ).error(getJoiErrorMsg)
+    // @Todo Need to transform Map to Array of arrays before validating it
+    // case SOPHIA_TYPES.map:
+    //   return Joi.array().items(Joi.array().ordered(generic.map(type => prepareSchema(type))))
+    default:
+      return Joi.any()
+  }
+}
+
+function getJoiErrorMsg (errors) {
+  return errors.map(err => {
+    const { path, type, context } = err
+    let value = context.hasOwnProperty('value') ? context.value : context.label
+    value = typeof value === 'object' ? JSON.stringify(value).slice(1).slice(0, -1) : value
+    switch (type) {
+      case 'string.base':
+        return ({ ...err, message: `Value "${value}" at path: [${path}] not a string` })
+      case 'number.base':
+        return ({ ...err, message: `Value "${value}" at path: [${path}] not a number` })
+      case 'boolean.base':
+        return ({ ...err, message: `Value "${value}" at path: [${path}] not a boolean` })
+      case 'array.base':
+        return ({ ...err, message: `Value "${value}" at path: [${path}] not a array` })
+      default:
+        return err
+    }
+  })
+}
+
+function validateArguments (aci, params) {
+  const validationSchema = Joi.array().ordered(
+    aci.arguments
+      .map(({ type }, i) => prepareSchema(type).label(`[${params[i]}]`))
+  ).label('Argument')
+  const { error } = Joi.validate(params, validationSchema, { abortEarly: false })
+  if (error) {
+    throw error
+  }
+}
+
+/**
  * Validated contract call arguments using contract ACI
  * @function validateCallParams
  * @rtype (aci: Object, params: Array) => Object
@@ -174,15 +238,8 @@ function transformDecodedData (aci, result, { skipTransformDecoded = false, addr
 function prepareArgsForEncode (aci, params) {
   if (!aci) return params
   // Validation
-  const validation = aci.arguments
-    .map(
-      ({ type }, i) =>
-        validate(type, params[i])
-          ? `Argument index: ${i}, value: [${params[i]}] must be of type [${type}]`
-          : false
-    ).filter(e => e)
-  if (validation.length) throw new Error('Validation error: ' + JSON.stringify(validation))
-
+  validateArguments(aci, params)
+  // Cast argument from JS to Sophia type
   return aci.arguments.map(({ type }, i) => transform(type, params[i]))
 }
 
