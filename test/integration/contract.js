@@ -37,16 +37,28 @@ contract StateContract =
   record state = { value: string, key: int }
   public function init(value: string, key: int) : state = { value = value, key = key }
   public function retrieve() : (string, int) = (state.value, state.key)
+
   public function intFn(a: int) : int = a
+  public function stringFn(a: string) : string = a
   public function boolFn(a: bool) : bool = a
+  public function addressFn(a: address) : address = a
+  public function emptyAddress() : address = #0
+  public function contractAddress (ct: address) : address = ct
+  public function accountAddress (ak: address) : address = ak
+
+  public function tupleFn (a: (string, int)) : (string, int) = a
+  public function tupleInTupleFn (a: ((string, string), int)) : ((string, string), int) = a
+  public function tupleWithList (a: (list(int), int)) : (list(int), int) = a
+  
   public function listFn(a: list(int)) : list(int) = a
+  public function listInListFn(a: list(list(int))) : list(list(int)) = a
+  
+  public function mapFn(a: map(address, (string, int))) : map(address, (string, int)) = a
+  
   public function testFn(a: list(int), b: bool) : (list(int), bool) = (a, b)
   public function approve(tx_id: int, voting_contract: Voting) : int = tx_id
   public function getRecord() : state = state
   public function setRecord(s: state) : state = s
-  public function emptyAddress() : address = #0
-  public function contractAddress (ct: address) : address = ct
-  public function accountAddress (ak: address) : address = ak
 `
 
 const encodedNumberSix = 'cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaKNdnK'
@@ -166,16 +178,165 @@ describe('Contract', function () {
         isCompiled.should.be.equal(true)
       })
       it('Deploy contract with state', async () => {
-        await contractObject.deploy(['blabla', 100])
+        await contractObject.deploy(['123', 1])
         const state = await contractObject.call('retrieve')
-        return state.decode().should.eventually.become(['blabla', 100])
+        return state.decode().should.eventually.become(['123', 1])
       })
-      it('Deploy contract with wrong arguments', async () => {
-        try {
-          await contractObject.deploy(['blabla', true])
-        } catch (e) {
-          e.message.should.be.equal('Validation error: ["Argument index: 1, value: [true] must be of type [int]"]')
-        }
+    })
+    describe('Arguments Validation and Casting', function () {
+      describe('INT', function () {
+        it('Invalid', async () => {
+          try {
+            await contractObject.call('intFn', ['asd'])
+          } catch (e) {
+            e.message.should.be.equal('"Argument" at position 0 fails because [Value "asd" at path: [0] not a number]')
+          }
+        })
+        it('Valid', async () => {
+          await contractObject.call('intFn', [1])
+        })
+      })
+      describe('STRING', function () {
+        it('Invalid', async () => {
+          try {
+            await contractObject.call('stringFn', [123])
+          } catch (e) {
+            e.message.should.be.equal('"Argument" at position 0 fails because [Value "123" at path: [0] not a string]')
+          }
+        })
+        it('Valid', async () => {
+          await contractObject.call('stringFn', ['string'])
+        })
+      })
+      describe('ADDRESS', function () {
+        it('Invalid address', async () => {
+          try {
+            await contractObject.call('addressFn', ['asdasasd'])
+          } catch (e) {
+            e.message.should.be.equal('"Argument" at position 0 fails because ["[asdasasd]" with value "asdasasd" fails to match the required pattern: /^(ak_|ct_)/]')
+          }
+        })
+        it('Invalid address type', async () => {
+          try {
+            await contractObject.call('addressFn', [333])
+          } catch (e) {
+            e.message.should.be.equal('"Argument" at position 0 fails because [Value "333" at path: [0] not a string]')
+          }
+        })
+        it('Empty address', async () => {
+          const result = await contractObject.call('emptyAddress')
+          return result.decode().should.eventually.become(0)
+        })
+        it('Return address', async () => {
+          const contractAddress = await (await contractObject
+            .call('contractAddress', ['ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh']))
+            .decode(null, { addressPrefix: 'ct' })
+
+          const accountAddress = await (await contractObject
+            .call('accountAddress', [await contract.address()]))
+            .decode(null, { addressPrefix: 'ak' })
+
+          contractAddress.should.be.equal('ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh')
+          accountAddress.should.be.equal(await contract.address())
+        })
+        it('Valid', async () => {
+          await contractObject.call('addressFn', ['ak_2ct6nMwmRnyGX6jPhraFPedZ5bYp1GXqpvnAq5LXeL5TTPfFif'])
+        })
+      })
+      describe('TUPLE', function () {
+        it('Invalid type', async () => {
+          try {
+            await contractObject.call('tupleFn', ['asdasasd'])
+          } catch (e) {
+            e.message.should.be.equal('"Argument" at position 0 fails because [Value "[asdasasd]" at path: [0] not a array]')
+          }
+        })
+        it('Invalid tuple prop type', async () => {
+          try {
+            await contractObject.call('tupleFn', [[1, 'string']])
+          } catch (e) {
+            e.message.should.be.equal('"Argument" at position 0 fails because ["[1,string]" at position 0 fails because [Value "1" at path: [0,0] not a string], "[1,string]" at position 1 fails because [Value "string" at path: [0,1] not a number]]')
+          }
+        })
+        it('Required tuple prop', async () => {
+          try {
+            await contractObject.call('tupleFn', [[1]])
+          } catch (e) {
+            e.message.should.be.equal('"Argument" at position 0 fails because ["[1]" at position 0 fails because [Value "1" at path: [0,0] not a string], "[1]" does not contain 1 required value(s)]')
+          }
+        })
+        it('Wrong type in list inside tuple', async () => {
+          try {
+            await contractObject.call('tupleWithList', [[[true], 1]])
+          } catch (e) {
+            e.message.should.be.equal('"Argument" at position 0 fails because ["[true,1]" at position 0 fails because ["0" at position 0 fails because [Value "true" at path: [0,0,0] not a number]]]')
+          }
+        })
+        it('Wrong type in tuple inside tuple', async () => {
+          try {
+            await contractObject.call('tupleInTupleFn', [[['str', 1], 1]])
+          } catch (e) {
+            e.message.should.be.equal('"Argument" at position 0 fails because ["[str,1,1]" at position 0 fails because ["Tuple argument" at position 1 fails because [Value "1" at path: [0,0,1] not a string]]]')
+          }
+        })
+        it('Valid', async () => {
+          await contractObject.call('tupleFn', [['test', 1]])
+        })
+      })
+      describe('LIST', function () {
+        it('Invalid type', async () => {
+          try {
+            await contractObject.call('listFn', ['asdasasd'])
+          } catch (e) {
+            e.message.should.be.equal('"Argument" at position 0 fails because [Value "[asdasasd]" at path: [0] not a array]')
+          }
+        })
+        it('Invalid list element type', async () => {
+          try {
+            await contractObject.call('listFn', [[1, 'string']])
+          } catch (e) {
+            e.message.should.be.equal('"Argument" at position 0 fails because ["[1,string]" at position 1 fails because [Value "string" at path: [0,1] not a number]]')
+          }
+        })
+        it('Invalid list element type nested', async () => {
+          try {
+            await contractObject.call('listInListFn', [[['childListWronmgElement'], 'parentListWrongElement']])
+          } catch (e) {
+            e.message.should.be.equal('"Argument" at position 0 fails because ["[childListWronmgElement,parentListWrongElement]" at position 0 fails because ["0" at position 0 fails because [Value "childListWronmgElement" at path: [0,0,0] not a number]], "[childListWronmgElement,parentListWrongElement]" at position 1 fails because [Value "1" at path: [0,1] not a array]]')
+          }
+        })
+      })
+      describe('MAP', function () {
+        it('Valid', async () => {
+          const address = await contract.address()
+          const mapArg = new Map(
+            [
+              [address, ['someStringV', 324]]
+            ]
+          )
+          const result = await contractObject.call('mapFn', [mapArg])
+          return result.decode().should.eventually.become(Array.from(mapArg.entries()))
+        })
+        it('Cast from string to int', async () => {
+          const address = await contract.address()
+          const mapArg = new Map(
+            [
+              [address, ['someStringV', '324']]
+            ]
+          )
+          const result = await contractObject.call('mapFn', [mapArg])
+          mapArg.set(address, ['someStringV', 324])
+          return result.decode().should.eventually.become(Array.from(mapArg.entries()))
+        })
+        it('Cast from array to map', async () => {
+          const address = await contract.address()
+          const mapArg =
+            [
+              [address, ['someStringV', 324]]
+            ]
+          const result = await contractObject.call('mapFn', [mapArg])
+          return result.decode().should.eventually.become(mapArg)
+        })
       })
     })
     describe('Call contract', function () {
@@ -193,47 +354,17 @@ describe('Contract', function () {
         const decodedJSON = '{"type":"list","value":[{"type":"word","value":1},{"type":"word","value":2}]}'
         JSON.stringify(decoded).should.be.equal(decodedJSON)
       })
-      it('Call contract with wrong arguments (pass not all args)', async () => {
-        try {
-          await contractObject.call('testFn', [[1, 2]])
-        } catch (e) {
-          e.message.should.be.equal('Validation error: ["Argument index: 1, value: [undefined] must be of type [bool]"]')
-        }
-      })
-      it('Call contract with wrong arguments (wrong arg type)', async () => {
-        try {
-          await contractObject.call('testFn', [[1, 2], 1234]) // Second arg must be of type bool
-        } catch (e) {
-          e.message.should.be.equal('Validation error: ["Argument index: 1, value: [1234] must be of type [bool]"]')
-        }
-      })
       it('Call contract with contract type argument', async () => {
         const result = await contractObject.call('approve', [0, 'ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh'])
         return result.decode().should.eventually.become(0)
       })
       it('Call contract with return of record type', async () => {
         const result = await contractObject.call('getRecord', [])
-        return result.decode().should.eventually.become({ value: 'blabla', key: 100 })
+        return result.decode().should.eventually.become({ value: '123', key: 1 })
       })
       it('Call contract with argument of record type', async () => {
         const result = await contractObject.call('setRecord', [{ value: 'qwe', key: 1234 }])
         return result.decode().should.eventually.become({ value: 'qwe', key: 1234 })
-      })
-      it('Function return #0 as address', async () => {
-        const result = await contractObject.call('emptyAddress')
-        return result.decode().should.eventually.become(0)
-      })
-      it('Function return address', async () => {
-        const contractAddress = await (await contractObject
-          .call('contractAddress', ['ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh']))
-          .decode(null, { addressPrefix: 'ct' })
-
-        const accountAddress = await (await contractObject
-          .call('accountAddress', [await contract.address()]))
-          .decode(null, { addressPrefix: 'ak' })
-
-        contractAddress.should.be.equal('ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh')
-        accountAddress.should.be.equal(await contract.address())
       })
     })
   })
