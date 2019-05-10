@@ -37,10 +37,7 @@ const SOPHIA_TYPES = [
   'list',
   'map',
   'record'
-].reduce((acc, type, i) => {
-  acc[type] = type
-  return acc
-}, {})
+].reduce((acc, type) => ({ ...acc, [type]: type }), {})
 
 function encodeAddress (address, prefix = 'ak') {
   const addressBuffer = Buffer.from(address, 'hex')
@@ -118,11 +115,8 @@ function transform (type, value) {
       return `#${decode(value).toString('hex')}`
     case SOPHIA_TYPES.record:
       return `{${generic.reduce(
-        (acc, { name, type }, i) => {
-          if (i !== 0) acc += ','
-          acc += `${name} = ${transform(type[0], value[name])}`
-          return acc
-        },
+        (acc, { name, type }, i) =>
+          (acc += `${i !== 0 ? ',' : ''}${name} = ${transform(type[0], value[name])}`),
         ''
       )}}`
     case SOPHIA_TYPES.map:
@@ -162,7 +156,7 @@ function readType (type, returnType = false) {
   // Base types
   if (typeof t === 'string') return { t }
 
-  // Map, Tuple, List
+  // Map, Tuple, List, Record
   if (typeof t === 'object') {
     const [[baseType, generic]] = Object.entries(t)
     return { t: baseType, generic }

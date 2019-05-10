@@ -1,5 +1,4 @@
 import nacl from 'tweetnacl'
-import * as argon2 from 'argon2'
 import uuid from 'uuid'
 
 import { encodeBase58Check, isBase64 } from './crypto'
@@ -29,9 +28,31 @@ const DERIVED_KEY_FUNCTIONS = {
   'argon2id': deriveKeyUsingArgon2id
 }
 
-async function deriveKeyUsingArgon2id (password, salt, options) {
+export async function deriveKeyUsingArgon2id (password, salt, options) {
   const { memlimit_kib: memoryCost, parallelism, opslimit: timeCost } = options.kdf_params
-  return argon2.hash(password, { timeCost, memoryCost, parallelism, type: argon2.argon2id, raw: true, salt })
+  const isBrowser = !(typeof module !== 'undefined' && module.exports)
+
+  if (isBrowser) {
+    const _sodium = require('libsodium-wrappers-sumo')
+
+    return _sodium.ready.then(async () => {
+      // tslint:disable-next-line:typedef
+      const sodium = _sodium
+
+      const result = sodium.crypto_pwhash(
+        32,
+        password,
+        salt,
+        timeCost,
+        memoryCost * 1024,
+        sodium.crypto_pwhash_ALG_ARGON2ID13
+      )
+      return Buffer.from(result)
+    })
+  } else {
+    const argon2 = require('argon2')
+    return argon2.hash(password, { timeCost, memoryCost, parallelism, type: argon2.argon2id, raw: true, salt })
+  }
 }
 
 // CRYPTO PART

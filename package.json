@@ -40,6 +40,7 @@
     "bs58check": "^2.1.1",
     "commander": "^2.14.1",
     "esm": "^3.0.77",
+    "libsodium-wrappers-sumo": "0.7.3",
     "json-bigint": "github:davidyuk/json-bigint",
     "ramda": "^0.25.0",
     "rlp": "2.1.0",
