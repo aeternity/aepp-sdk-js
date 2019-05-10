@@ -42,6 +42,7 @@
     "chalk": "^2.4.1",
     "commander": "^2.14.1",
     "esm": "^3.0.77",
+    "libsodium-wrappers-sumo": "0.7.3",
     "json-bigint": "github:davidyuk/json-bigint",
     "ramda": "^0.25.0",
     "recursive-rename": "^2.0.0",

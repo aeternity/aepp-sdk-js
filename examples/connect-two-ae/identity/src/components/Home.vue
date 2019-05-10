@@ -41,48 +41,48 @@
 </template>
 
 <script>
-// AE_SDK_MODULES is a webpack alias present in webpack.config.js
-import Wallet from 'AE_SDK_MODULES/ae/wallet'
-import MemoryAccount from 'AE_SDK_MODULES/account/memory'
+  // AE_SDK_MODULES is a webpack alias present in webpack.config.js
+  import Wallet from 'AE_SDK_MODULES/ae/wallet'
+  import MemoryAccount from 'AE_SDK_MODULES/account/memory'
 
-export default {
-  data () {
-    return {
-      runningInFrame: window.parent !== window,
-      pub: 'ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU', // Your public key
-      priv: 'a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61', // Your private key
-      client: null,
-      balance: null,
-      height: null,
-      url: 'https://sdk-testnet.aepps.com',
-      internalUrl: 'https://sdk-testnet.aepps.com',
-      compilerUrl: 'https://compiler.aepps.com',
-      aeppUrl: '//0.0.0.0:9001'
+  export default {
+    data () {
+      return {
+        runningInFrame: window.parent !== window,
+        pub: 'ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU', // Your public key
+        priv: 'a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61', // Your private key
+        client: null,
+        balance: null,
+        height: null,
+        url: 'https://sdk-testnet.aepps.com',
+        internalUrl: 'https://sdk-testnet.aepps.com',
+        compilerUrl: 'https://compiler.aepps.com',
+        aeppUrl: '//0.0.0.0:9001'
+      }
+    },
+    methods: {
+      confirmDialog (method, params, {id}) {
+        return Promise.resolve(window.confirm(`User ${id} wants to run ${method} ${params}`))
+      }
+    },
+    async created () {
+      this.client = await Wallet({
+        url: this.url,
+        internalUrl: this.internalUrl,
+        compilerUrl: this.compilerUrl,
+        accounts: [MemoryAccount({keypair: {secretKey: this.priv, publicKey: this.pub}})],
+        address: this.pub,
+        onTx: this.confirmDialog,
+        onChain: this.confirmDialog,
+        onAccount: this.confirmDialog,
+        onContract: this.confirmDialog
+      })
+
+      if (!this.runningInFrame) this.$refs.aepp.src = this.aeppUrl
+      else window.parent.postMessage({ jsonrpc: '2.0', method: 'ready' }, '*')
+
+      this.height = await this.client.height()
+      this.balance = await this.client.balance(this.pub).catch(() => 0)
     }
-  },
-  methods: {
-    confirmDialog (method, params, {id}) {
-      return Promise.resolve(window.confirm(`User ${id} wants to run ${method} ${params}`))
-    }
-  },
-  async created () {
-    this.client = await Wallet({
-      url: this.url,
-      internalUrl: this.internalUrl,
-      compilerUrl: this.compilerUrl,
-      accounts: [MemoryAccount({keypair: {secretKey: this.priv, publicKey: this.pub}})],
-      address: this.pub,
-      onTx: this.confirmDialog,
-      onChain: this.confirmDialog,
-      onAccount: this.confirmDialog,
-      onContract: this.confirmDialog
-    })
-
-    if (!this.runningInFrame) this.$refs.aepp.src = this.aeppUrl
-    else window.parent.postMessage({ jsonrpc: '2.0', method: 'ready' }, '*')
-
-    this.height = await this.client.height()
-    this.balance = await this.client.balance(this.pub).catch(() => 0)
   }
-}
 </script>

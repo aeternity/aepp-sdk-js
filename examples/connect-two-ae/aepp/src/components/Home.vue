@@ -141,96 +141,96 @@
 </template>
 
 <script>
-//  is a webpack alias present in webpack.config.js
-import Aepp from 'AE_SDK_MODULES/ae/aepp'
+  //  is a webpack alias present in webpack.config.js
+  import Aepp from 'AE_SDK_MODULES/ae/aepp'
 
-export default {
-  data () {
-    return {
-      runningInFrame: window.parent !== window,
-      client: null,
-      height: null,
-      pub: null,
-      spendTo: null,
-      spendAmount: null,
-      spendPayload: null,
-      spendResult: null,
-      spendError: null,
-      contractCode: `contract Identity =
+  export default {
+    data () {
+      return {
+        runningInFrame: window.parent !== window,
+        client: null,
+        height: null,
+        pub: null,
+        spendTo: null,
+        spendAmount: null,
+        spendPayload: null,
+        spendResult: null,
+        spendError: null,
+        contractCode: `contract Identity =
   type state = ()
   function main(x : int) = x`,
-      byteCode: null,
-      compileError: null,
-      contractInitState: [],
-      deployInfo: null,
-      deployError: null,
-      callResult: null,
-      callError: null
-    }
-  },
-  methods: {
-    async spend () {
-      try {
-        this.spendResult = await this.client.spend(
-          this.spendAmount,
-          this.spendTo, {
-            payload: this.spendPayload,
-          }
-        )
-      } catch (err) {
-        this.spendError = err
+        byteCode: null,
+        compileError: null,
+        contractInitState: [],
+        deployInfo: null,
+        deployError: null,
+        callResult: null,
+        callError: null
       }
     },
-    async compile () {
-      this.byteCode = this.compileError = null
-      try {
-        this.byteCode = (await this.client.contractCompile(this.contractCode)).bytecode
-      } catch (err) {
-        this.compileError = err
-      }
-    },
-    async deploy () {
-      this.deployInfo = this.deployError = null
-      try {
-        this.deployInfo = await this.client.contractDeploy(this.byteCode, this.contractCode, this.contractInitState)
-      } catch (err) {
-        this.deployError = err
-      }
-    },
-    async call (code, method = 'main', returnType = 'int', args = ['5']) {
-      this.callResult = this.callError = null
-      try {
-        this.callResult = await this.client.contractCall(this.contractCode, this.deployInfo.address, method,  args)
-        Object.assign(
-          this.callResult,
-          { decodedRes: await result.decode(returnType) }
-        )
-      } catch (err) {
-        this.callError = err
-      }
-    },
-    async getReverseWindow() {
-      const iframe = document.createElement('iframe')
-      iframe.src = prompt('Enter wallet URL', 'http://localhost:9000')
-      iframe.style.display = 'none'
-      document.body.appendChild(iframe)
-      await new Promise(resolve => {
-        const handler = ({ data }) => {
-          if (data.method !== 'ready') return
-          window.removeEventListener('message', handler)
-          resolve()
+    methods: {
+      async spend () {
+        try {
+          this.spendResult = await this.client.spend(
+            this.spendAmount,
+            this.spendTo, {
+              payload: this.spendPayload,
+            }
+          )
+        } catch (err) {
+          this.spendError = err
         }
-        window.addEventListener('message', handler)
+      },
+      async compile () {
+        this.byteCode = this.compileError = null
+        try {
+          this.byteCode = (await this.client.contractCompile(this.contractCode)).bytecode
+        } catch (err) {
+          this.compileError = err
+        }
+      },
+      async deploy () {
+        this.deployInfo = this.deployError = null
+        try {
+          this.deployInfo = await this.client.contractDeploy(this.byteCode, this.contractCode, this.contractInitState)
+        } catch (err) {
+          this.deployError = err
+        }
+      },
+      async call (code, method = 'main', returnType = 'int', args = ['5']) {
+        this.callResult = this.callError = null
+        try {
+          this.callResult = await this.client.contractCall(this.contractCode, this.deployInfo.address, method,  args)
+          Object.assign(
+            this.callResult,
+            { decodedRes: await result.decode(returnType) }
+          )
+        } catch (err) {
+          this.callError = err
+        }
+      },
+      async getReverseWindow() {
+        const iframe = document.createElement('iframe')
+        iframe.src = prompt('Enter wallet URL', 'http://localhost:9000')
+        iframe.style.display = 'none'
+        document.body.appendChild(iframe)
+        await new Promise(resolve => {
+          const handler = ({ data }) => {
+            if (data.method !== 'ready') return
+            window.removeEventListener('message', handler)
+            resolve()
+          }
+          window.addEventListener('message', handler)
+        })
+        return iframe.contentWindow
+      }
+    },
+    async created () {
+      this.client = await Aepp({
+        parent: this.runningInFrame ? window.parent : await this.getReverseWindow()
       })
-      return iframe.contentWindow
+      this.pub = await this.client.address().catch(e => `Rejected: ${e}`)
+      this.height = await this.client.height()
     }
-  },
-  async created () {
-    this.client = await Aepp({
-      parent: this.runningInFrame ? window.parent : await this.getReverseWindow()
-    })
-    this.pub = await this.client.address().catch(e => `Rejected: ${e}`)
-    this.height = await this.client.height()
   }
-}
 </script>
