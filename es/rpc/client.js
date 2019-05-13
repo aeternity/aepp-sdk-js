@@ -46,7 +46,7 @@ function post (method) {
 const RpcClient = stampit(AsyncInit, {
   async init ({ parent = window.parent, self = window }, { stamp }) {
     if (parent === self) {
-      throw new Error('rpc client: Can\'t send messages to itself');
+      throw new Error('rpc client: Can\'t send messages to itself')
     }
 
     let sequence = 0
