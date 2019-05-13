@@ -34,10 +34,9 @@ contract Voting =
   public function test() : int = 1
 
 contract StateContract =
-  record state = { value: string, key: int }
-  record testOption = { value: option(string) }
+  record state = { value: string, key: int, testOption: option(string) }
 
-  public function init(value: string, key: int) : state = { value = value, key = key }
+  public function init(value: string, key: int, testOption: option(string)) : state = { value = value, key = key, testOption = testOption }
   public function retrieve() : (string, int) = (state.value, state.key)
 
   public function intFn(a: int) : int = a
@@ -60,7 +59,6 @@ contract StateContract =
   
   public function getRecord() : state = state
   public stateful function setRecord(s: state) = put(s)
-  public stateful function testRecord(s: testOption) = s
   
   public function intOption(s: option(int)) : option(int) = s
   public function listOption(s: option(list((int, string)))) : option(list((int ,string))) = s
@@ -181,7 +179,7 @@ describe('Contract', function () {
     describe('Deploy contract', function () {
       it('Deploy contract before compile', async () => {
         contractObject.compiled = null
-        await contractObject.deploy(['123', 1])
+        await contractObject.deploy(['123', 1, Promise.resolve('hahahaha')])
         const isCompiled = contractObject.compiled.length && contractObject.compiled.slice(0, 3) === 'cb_'
         isCompiled.should.be.equal(true)
       })
@@ -345,9 +343,9 @@ describe('Contract', function () {
           const resultWithSome = await contractObject.call('mapOptionFn', [mapArgWithSomeValue])
           const resultWithNone = await contractObject.call('mapOptionFn', [mapArgWithNoneValue])
 
-          const decodedSome = await resultWithSome.decode()
+          const decodedSome = resultWithSome.decode()
 
-          decodedSome.decode().should.eventually.become(Array.from(returnArgWithSomeValue.entries()))
+          decodedSome.should.eventually.become(Array.from(returnArgWithSomeValue.entries()))
           return resultWithNone.decode().should.eventually.become(Array.from(returnArgWithNoneValue.entries()))
         })
         it('Cast from string to int', async () => {
@@ -373,18 +371,19 @@ describe('Contract', function () {
       })
       describe('RECORD/STATE', function () {
         it('Valid Set Record (Cast from JS object)', async () => {
-          await contractObject.call('setRecord', [{ value: 'qwe', key: 1234 }])
+          await contractObject.call('setRecord', [{ value: 'qwe', key: 1234, testOption: Promise.resolve('test') }])
           const state = await contractObject.call('getRecord', [])
 
-          return state.decode().should.eventually.become({ value: 'qwe', key: 1234 })
+          return state.decode().should.eventually.become({ value: 'qwe', key: 1234, testOption: 'test' })
         })
         it('Get Record(Convert to JS object)', async () => {
           const result = await contractObject.call('getRecord', [])
-          return result.decode().should.eventually.become({ value: 'qwe', key: 1234 })
+          return result.decode().should.eventually.become({ value: 'qwe', key: 1234, testOption: 'test' })
         })
         it('Get Record With Option (Convert to JS object)', async () => {
-          const result = await contractObject.call('testRecord', [{ value: Promise.resolve('some text') }])
-          return result.decode().should.eventually.become({ value: 'some text' })
+          await contractObject.call('setRecord', [{ key: 1234, value: 'qwe', testOption: Promise.resolve('resolved string') }])
+          const result = await contractObject.call('getRecord', [])
+          return result.decode().should.eventually.become({ value: 'qwe', key: 1234, testOption: 'resolved string' })
         })
         it('Invalid value type', async () => {
           try {
@@ -412,9 +411,9 @@ describe('Contract', function () {
         })
         it('Invalid option type', async () => {
           try {
-            await contractObject.call('intOption', [1])
+            await contractObject.call('intOption', [{ s: 2 }])
           } catch (e) {
-            e.message.should.be.equal('"Argument" at position 0 fails because ["[1]" must be an object]')
+            e.message.should.be.equal('"Argument" at position 0 fails because [Value \'"s":2\' at path: [0] not a Promise]')
           }
         })
       })

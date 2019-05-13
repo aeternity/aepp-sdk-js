@@ -200,7 +200,7 @@ function prepareSchema (type) {
         generic.reduce((acc, { name, type }) => ({ ...acc, [name]: prepareSchema(type) }), {})
       ).error(getJoiErrorMsg)
     case SOPHIA_TYPES.option:
-      return Joi.object().type(Promise)
+      return Joi.object().type(Promise).error(getJoiErrorMsg)
     // @Todo Need to transform Map to Array of arrays before validating it
     // case SOPHIA_TYPES.map:
     //   return Joi.array().items(Joi.array().ordered(generic.map(type => prepareSchema(type))))
@@ -223,6 +223,10 @@ function getJoiErrorMsg (errors) {
         return ({ ...err, message: `Value "${value}" at path: [${path}] not a boolean` })
       case 'array.base':
         return ({ ...err, message: `Value "${value}" at path: [${path}] not a array` })
+      case 'object.base':
+        return ({ ...err, message: `Value '${value}' at path: [${path}] not a object` })
+      case 'object.type':
+        return ({ ...err, message: `Value '${value}' at path: [${path}] not a ${context.type}` })
       default:
         return err
     }
