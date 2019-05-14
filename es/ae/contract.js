@@ -215,16 +215,20 @@ async function contractDeploy (code, source, initState = [], options = {}) {
   const { hash, rawTx } = await this.send(tx, opt)
   const result = await this.getTxInfo(hash)
 
-  return Object.freeze({
-    result,
-    owner: ownerId,
-    transaction: hash,
-    rawTx,
-    address: contractId,
-    call: async (name, args = [], options) => this.contractCall(source, contractId, name, args, options),
-    callStatic: async (name, args = [], options) => this.contractCallStatic(source, contractId, name, args, options),
-    createdAt: new Date()
-  })
+  if (result.returnType === 'ok') {
+    return Object.freeze({
+      result,
+      owner: ownerId,
+      transaction: hash,
+      rawTx,
+      address: contractId,
+      call: async (name, args = [], options) => this.contractCall(source, contractId, name, args, options),
+      callStatic: async (name, args = [], options) => this.contractCallStatic(source, contractId, name, args, options),
+      createdAt: new Date()
+    })
+  } else {
+    await this.handleCallError(result)
+  }
 }
 
 /**

@@ -26,7 +26,7 @@ import stampit from '@stamp/it'
 import axios from 'axios'
 import * as R from 'ramda'
 import Swagger from './utils/swagger'
-import semver from 'semver'
+import semverSatisfies from './utils/semver-satisfies'
 
 function resolveUrl (url, baseUrl) {
   return new URL(url, baseUrl).toString()
@@ -104,14 +104,22 @@ const Node = stampit({
 }, Swagger, {
   async init ({ forceCompatibility = false }) {
     const { nodeRevision: revision, genesisKeyBlockHash: genesisHash, networkId } = await this.api.getStatus()
-    if (!semver.satisfies(this.version.split('-')[0], COMPATIBILITY_RANGE) && !forceCompatibility) throw new Error(`Unsupported node version ${this.version}. Supported: ${COMPATIBILITY_RANGE}`)
+    if (
+      !semverSatisfies(this.version.split('-')[0], NODE_GE_VERSION, NODE_LT_VERSION) &&
+      !forceCompatibility
+    ) {
+      throw new Error(
+        `Unsupported node version ${this.version}. ` +
+        `Supported: >= ${NODE_GE_VERSION} < ${NODE_LT_VERSION}`
+      )
+    }
 
     this.nodeNetworkId = networkId
     return Object.assign(this, { revision, genesisHash })
   }
 })
 
-// String of compatibility range (see https://www.npmjs.com/package/semver#ranges)
-export const COMPATIBILITY_RANGE = '>= 1.4.0 < 3.0.0'
+const NODE_GE_VERSION = '1.4.0'
+const NODE_LT_VERSION = '3.0.0'
 
 export default Node
