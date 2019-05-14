@@ -36,7 +36,8 @@ const SOPHIA_TYPES = [
   'bool',
   'list',
   'map',
-  'record'
+  'record',
+  'option'
 ].reduce((acc, type) => ({ ...acc, [type]: type }), {})
 
 function encodeAddress (address, prefix = 'ak') {
@@ -54,7 +55,6 @@ function encodeAddress (address, prefix = 'ak') {
 function transformDecodedData (aci, result, { skipTransformDecoded = false, addressPrefix = 'ak' } = {}) {
   if (skipTransformDecoded) return result
   const { t, generic } = readType(aci, true)
-
   switch (t) {
     case SOPHIA_TYPES.bool:
       return !!result.value
@@ -74,6 +74,9 @@ function transformDecodedData (aci, result, { skipTransformDecoded = false, addr
           },
           []
         )
+    case SOPHIA_TYPES.option:
+      const [variantType, value] = result.value
+      return variantType === 1 ? transformDecodedData(generic, value) : undefined
     case SOPHIA_TYPES.list:
       return result.value.map(({ value }) => transformDecodedData(generic, { value }))
     case SOPHIA_TYPES.tuple:
@@ -97,7 +100,7 @@ function transformDecodedData (aci, result, { skipTransformDecoded = false, addr
  * @param value
  * @return {string}
  */
-function transform (type, value) {
+async function transform (type, value) {
   let { t, generic } = readType(type)
 
   // contract TestContract = ...
@@ -108,15 +111,21 @@ function transform (type, value) {
     case SOPHIA_TYPES.string:
       return `"${value}"`
     case SOPHIA_TYPES.list:
-      return `[${value.map(el => transform(generic, el))}]`
+      return `[${await Promise.all(value.map(async el => transform(generic, el)))}]`
     case SOPHIA_TYPES.tuple:
-      return `(${value.map((el, i) => transform(generic[i], el))})`
+      return `(${await Promise.all(value.map(async (el, i) => transform(generic[i], el)))})`
+    case SOPHIA_TYPES.option:
+      const optionV = await value.catch(e => undefined)
+      return optionV === undefined ? 'None' : `Some(${await transform(generic, optionV)})`
     case SOPHIA_TYPES.address:
       return `#${decode(value).toString('hex')}`
     case SOPHIA_TYPES.record:
-      return `{${generic.reduce(
-        (acc, { name, type }, i) =>
-          (acc += `${i !== 0 ? ',' : ''}${name} = ${transform(type[0], value[name])}`),
+      return `{${await generic.reduce(
+        async (acc, { name, type }, i) => {
+          acc = await acc
+          acc += `${i !== 0 ? ',' : ''}${name} = ${await transform(type[0], value[name])}`
+          return acc
+        },
         ''
       )}}`
     case SOPHIA_TYPES.map:
@@ -126,18 +135,20 @@ function transform (type, value) {
   return `${value}`
 }
 
-function transformMap (value, generic) {
+async function transformMap (value, generic) {
   if (value instanceof Map) {
     value = Array.from(value.entries())
   }
   if (!Array.isArray(value) && value instanceof Object) {
     value = Object.entries(value)
   }
-  return `{${value
+
+  return `{${await value
     .reduce(
-      (acc, [key, value], i) => {
+      async (acc, [key, value], i) => {
+        acc = await acc
         if (i !== 0) acc += ','
-        acc += `[${transform(generic[0], key)}] = ${transform(generic[1], value)}`
+        acc += `[${await transform(generic[0], key)}] = ${await transform(generic[1], value)}`
         return acc
       },
       ``
@@ -177,7 +188,7 @@ function prepareSchema (type) {
     case SOPHIA_TYPES.string:
       return Joi.string().error(getJoiErrorMsg)
     case SOPHIA_TYPES.address:
-      return Joi.string().regex(/^(ak_|ct_)/).error(getJoiErrorMsg)
+      return Joi.string().regex(/^(ak_|ct_|ok_|oq_)/).error(getJoiErrorMsg)
     case SOPHIA_TYPES.bool:
       return Joi.boolean().error(getJoiErrorMsg)
     case SOPHIA_TYPES.list:
@@ -188,6 +199,8 @@ function prepareSchema (type) {
       return Joi.object(
         generic.reduce((acc, { name, type }) => ({ ...acc, [name]: prepareSchema(type) }), {})
       ).error(getJoiErrorMsg)
+    case SOPHIA_TYPES.option:
+      return Joi.object().type(Promise).error(getJoiErrorMsg)
     // @Todo Need to transform Map to Array of arrays before validating it
     // case SOPHIA_TYPES.map:
     //   return Joi.array().items(Joi.array().ordered(generic.map(type => prepareSchema(type))))
@@ -210,6 +223,10 @@ function getJoiErrorMsg (errors) {
         return ({ ...err, message: `Value "${value}" at path: [${path}] not a boolean` })
       case 'array.base':
         return ({ ...err, message: `Value "${value}" at path: [${path}] not a array` })
+      case 'object.base':
+        return ({ ...err, message: `Value '${value}' at path: [${path}] not a object` })
+      case 'object.type':
+        return ({ ...err, message: `Value '${value}' at path: [${path}] not a ${context.type}` })
       default:
         return err
     }
@@ -233,14 +250,14 @@ function validateArguments (aci, params) {
  * @rtype (aci: Object, params: Array) => Object
  * @param {Object} aci Contract ACI
  * @param {Array} params Contract call arguments
- * @return {Array} Object with validation errors
+ * @return Promise{Array} Object with validation errors
  */
-function prepareArgsForEncode (aci, params) {
+async function prepareArgsForEncode (aci, params) {
   if (!aci) return params
   // Validation
   validateArguments(aci, params)
   // Cast argument from JS to Sophia type
-  return aci.arguments.map(({ type }, i) => transform(type, params[i]))
+  return Promise.all(aci.arguments.map(async ({ type }, i) => transform(type, params[i])))
 }
 
 /**
@@ -343,7 +360,7 @@ function call (self) {
     if (!fn) throw new Error('Function name is required')
     if (!this.deployInfo.address) throw new Error('You need to deploy contract before calling!')
 
-    params = !options.skipArgsConvert ? prepareArgsForEncode(fnACI, params) : params
+    params = !options.skipArgsConvert ? await prepareArgsForEncode(fnACI, params) : params
     const result = options.callStatic
       ? await self.contractCallStatic(this.source, this.deployInfo.address, fn, params, {
         top: options.top,
@@ -366,7 +383,7 @@ function deploy (self) {
   return async function (init = [], options = { skipArgsConvert: false }) {
     const fnACI = getFunctionACI(this.aci, 'init')
     if (!this.compiled) await this.compile()
-    init = !options.skipArgsConvert ? prepareArgsForEncode(fnACI, init) : init
+    init = !options.skipArgsConvert ? await prepareArgsForEncode(fnACI, init) : init
 
     const { owner, transaction, address, createdAt, result } = await self.contractDeploy(this.compiled, this.source, init, options)
     this.deployInfo = { owner, transaction, address, createdAt, result }
