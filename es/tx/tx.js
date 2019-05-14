@@ -149,7 +149,7 @@ async function contractCreateTx ({ ownerId, code, vmVersion, abiVersion, deposit
     : this.api.postContractCreate(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee), gas: parseInt(gas), gasPrice, vmVersion: contractVmVersion, abiVersion: CONTRACT_MINERVA_ABI }))
 }
 
-async function contractCallTx ({ callerId, contractId, vmVersion = CONTRACT_VM_VERSION, amount, gas, gasPrice = MIN_GAS_PRICE, callData }) {
+async function contractCallTx ({ callerId, contractId, vmVersion = CONTRACT_VM_VERSION, abiVersion = 1, amount, gas, gasPrice = MIN_GAS_PRICE, callData }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
   const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.contractCall, { senderId: callerId, ...R.head(arguments), gasPrice, vmVersion })
 
@@ -162,7 +162,8 @@ async function contractCallTx ({ callerId, contractId, vmVersion = CONTRACT_VM_V
       fee: parseInt(fee),
       gas: parseInt(gas),
       gasPrice,
-      vmVersion
+      vmVersion,
+      abiVersion
     }))
 
   return tx

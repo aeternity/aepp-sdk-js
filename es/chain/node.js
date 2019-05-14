@@ -133,7 +133,7 @@ async function poll (th, { blocks = 10, interval = 5000 } = {}) {
 }
 
 async function getTxInfo (hash) {
-  return this.api.getTransactionInfoByHash(hash)
+  return this.api.getTransactionInfoByHash(hash).then(res => res.callInfo ? res.callInfo : res)
 }
 
 async function mempool () {
