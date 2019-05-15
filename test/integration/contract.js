@@ -69,7 +69,7 @@ contract StateContract =
 
 const encodedNumberSix = 'cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaKNdnK'
 
-plan('10000000000000000')
+plan('1000000000000000000000')
 
 describe('Contract', function () {
   configure(this)

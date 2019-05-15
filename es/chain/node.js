@@ -113,7 +113,7 @@ async function topBlock () {
   return top[R.head(R.keys(top))]
 }
 
-async function poll (th, { blocks = 10, interval = 5000 } = {}) {
+async function poll (th, { blocks = 20, interval = 5000 } = {}) {
   const instance = this
   const max = await this.height() + blocks
 
