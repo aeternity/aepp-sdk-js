@@ -347,7 +347,7 @@ async function channelSnapshotSoloTx ({ channelId, fromId, payload }) {
  * @return {object} Object with vm/abi version ({ vmVersion: number, abiVersion: number })
  */
 function getVmVersion (txType, { vmVersion, abiVersion } = {}) {
-  const isMinerva = semverSatisfies(this.version, '2.5.0', '3.0.0')
+  const isMinerva = semverSatisfies(this.version.split('-')[0], '2.5.0', '3.0.0')
   const supported = isMinerva ? VM_ABI_MAP_MINERVA[txType] : VM_ABI_MAP_FORTUNA[txType]
   if (!supported) throw new Error('Not supported tx type')
 

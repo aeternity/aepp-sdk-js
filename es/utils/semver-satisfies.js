@@ -1,5 +1,5 @@
 export default function (version, geVersion, ltVersion) {
-  const versionComponents = version.split('-')[0].split('.')
+  const versionComponents = version.split('.')
   const geComponents = geVersion.split('.')
   const ltComponents = ltVersion.split('.')
   const base = Math.max(...versionComponents, ...geComponents, ...ltComponents) + 1
