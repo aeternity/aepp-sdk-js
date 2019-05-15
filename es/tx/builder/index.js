@@ -35,6 +35,7 @@ function deserializeField (value, type, prefix) {
   if (!value) return ''
   switch (type) {
     case FIELD_TYPES.ctVersion:
+      // eslint-disable-next-line no-unused-vars
       const [vm, _, abi] = value
       return { vmVersion: readInt(Buffer.from([vm])), abiVersion: readInt(Buffer.from([abi])) }
     case FIELD_TYPES.int:
