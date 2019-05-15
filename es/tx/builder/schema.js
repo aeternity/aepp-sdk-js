@@ -71,20 +71,6 @@ const TX_SCHEMA_FIELD = (schema, objectId) => [schema, objectId]
 
 export const MIN_GAS_PRICE = 1000000000 // min gasPrice 1e9
 
-// # see https://github.com/aeternity/protocol/blob/minerva/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain
-const VM_VERSIONS = {
-  NO_VM: 0,
-  SOPHIA: 1,
-  SOLIDITY: 2,
-  SOPHIA_IMPROVEMENTS: 3
-}
-// # see https://github.com/aeternity/protocol/blob/minerva/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain
-const ABI_VERSIONS = {
-  NO_ABI: 0,
-  SOPHIA: 1,
-  SOLIDITY: 2
-}
-
 const revertObject = (obj) => Object.entries(obj).reduce((acc, [key, v]) => (acc[v] = key) && acc, {})
 
 /**
@@ -154,6 +140,33 @@ export const TX_TYPE = {
   accountsTree: 'accountsTree'
 }
 
+// # see https://github.com/aeternity/protocol/blob/minerva/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain
+export const VM_VERSIONS = {
+  NO_VM: 0,
+  SOPHIA: 1,
+  SOLIDITY: 2,
+  SOPHIA_IMPROVEMENTS_MINERVA: 3,
+  SOPHIA_IMPROVEMENTS_FORTUNA: 4
+}
+// # see https://github.com/aeternity/protocol/blob/minerva/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain
+export const ABI_VERSIONS = {
+  NO_ABI: 0,
+  SOPHIA: 1,
+  SOLIDITY: 2
+}
+
+export const VM_ABI_MAP_MINERVA = {
+  [TX_TYPE.contractCreate]: { vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA], abiVersion: [ABI_VERSIONS.SOPHIA] },
+  [TX_TYPE.contractCall]: { vmVersion: [VM_VERSIONS.SOPHIA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA], abiVersion: [ABI_VERSIONS.SOPHIA] },
+  [TX_TYPE.oracleRegister]: { vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA] }
+}
+
+export const VM_ABI_MAP_FORTUNA = {
+  [TX_TYPE.contractCreate]: { vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA], abiVersion: [ABI_VERSIONS.SOPHIA] }, // vmVersion 0x4 do not work with fortuna
+  [TX_TYPE.contractCall]: { vmVersion: [VM_VERSIONS.SOPHIA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA], abiVersion: [ABI_VERSIONS.SOPHIA] },
+  [TX_TYPE.oracleRegister]: { vmVersion: [], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA] }
+}
+
 export const OBJECT_ID_TX_TYPE = {
   [OBJECT_TAG_ACCOUNT]: TX_TYPE.account,
   [OBJECT_TAG_SIGNED_TRANSACTION]: TX_TYPE.signed,
@@ -219,7 +232,8 @@ export const FIELD_TYPES = {
   callStack: 'callStack',
   proofOfInclusion: 'proofOfInclusion',
   mptree: 'mptree',
-  callReturnType: 'callReturnType'
+  callReturnType: 'callReturnType',
+  ctVersion: 'ctVersion'
 }
 
 // FEE CALCULATION
@@ -281,7 +295,8 @@ export const VALIDATION_MESSAGE = {
   [FIELD_TYPES.id]: ({ value, prefix }) => VALIDATION_ERROR(`'${value}' prefix doesn't match expected prefix '${prefix}' or ID_TAG for prefix not found`),
   [FIELD_TYPES.binary]: ({ prefix, value }) => VALIDATION_ERROR(`'${value}' prefix doesn't match expected prefix '${prefix}'`),
   [FIELD_TYPES.string]: ({ value }) => VALIDATION_ERROR(`Not a string`),
-  [FIELD_TYPES.pointers]: ({ value }) => VALIDATION_ERROR(`Value must be of type Array and contains only object's like '{key: "account_pubkey", id: "ak_lkamsflkalsdalksdlasdlasdlamd"}'`)
+  [FIELD_TYPES.pointers]: ({ value }) => VALIDATION_ERROR(`Value must be of type Array and contains only object's like '{key: "account_pubkey", id: "ak_lkamsflkalsdalksdlasdlasdlamd"}'`),
+  [FIELD_TYPES.ctVersion]: ({ value }) => VALIDATION_ERROR(`Value must be an object with "vmVersion" and "abiVersion" fields`)
 }
 
 const BASE_TX = [
@@ -378,7 +393,7 @@ const CONTRACT_CREATE_TX = [
   TX_FIELD('ownerId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
   TX_FIELD('code', FIELD_TYPES.binary, 'cb'),
-  TX_FIELD('vmVersion', FIELD_TYPES.int),
+  TX_FIELD('ctVersion', FIELD_TYPES.ctVersion),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int),
   TX_FIELD('deposit', FIELD_TYPES.int),
@@ -393,7 +408,7 @@ const CONTRACT_CALL_TX = [
   TX_FIELD('callerId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
   TX_FIELD('contractId', FIELD_TYPES.id, 'ct'),
-  TX_FIELD('vmVersion', FIELD_TYPES.int),
+  TX_FIELD('abiVersion', FIELD_TYPES.int),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int),
   TX_FIELD('amount', FIELD_TYPES.int),
@@ -427,7 +442,7 @@ const ORACLE_REGISTER_TX = [
   TX_FIELD('oracleTtlValue', FIELD_TYPES.int),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int),
-  TX_FIELD('vmVersion', FIELD_TYPES.int)
+  TX_FIELD('abiVersion', FIELD_TYPES.int)
 ]
 
 const ORACLE_EXTEND_TX = [

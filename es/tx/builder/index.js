@@ -34,6 +34,9 @@ const ORACLE_TTL_TYPES = {
 function deserializeField (value, type, prefix) {
   if (!value) return ''
   switch (type) {
+    case FIELD_TYPES.ctVersion:
+      const [vm, _, abi] = value
+      return { vmVersion: readInt(Buffer.from([vm])), abiVersion: readInt(Buffer.from([abi])) }
     case FIELD_TYPES.int:
       return readInt(value)
     case FIELD_TYPES.id:
@@ -97,6 +100,8 @@ function serializeField (value, type, prefix) {
       return buildPointers(value)
     case FIELD_TYPES.mptree:
       return value.map(mpt.serialize)
+    case FIELD_TYPES.ctVersion:
+      return Buffer.from([...toBytes(value.vmVersion), 0, ...toBytes(value.abiVersion)])
     case FIELD_TYPES.callReturnType:
       switch (value) {
         case 'ok': return writeInt(0)
@@ -125,6 +130,8 @@ function validateField (value, key, type, prefix) {
       return assert(value.split('_')[0] === prefix, { prefix, value })
     case FIELD_TYPES.string:
       return assert(true)
+    case FIELD_TYPES.ctVersion:
+      return assert(typeof value === 'object' && value.hasOwnProperty('abiVersion') && value.hasOwnProperty('vmVersion'))
     case FIELD_TYPES.pointers:
       return assert(Array.isArray(value) && !value.find(e => e !== Object(e)), { value })
     default:
