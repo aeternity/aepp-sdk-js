@@ -105,7 +105,7 @@ const Node = stampit({
   async init ({ forceCompatibility = false }) {
     const { nodeRevision: revision, genesisKeyBlockHash: genesisHash, networkId } = await this.api.getStatus()
     if (
-      !semverSatisfies(this.version.split('-')[0], NODE_GE_VERSION, NODE_LT_VERSION) &&
+      !semverSatisfies(this.version, NODE_GE_VERSION, NODE_LT_VERSION) &&
       !forceCompatibility
     ) {
       throw new Error(
@@ -119,7 +119,7 @@ const Node = stampit({
   }
 })
 
-const NODE_GE_VERSION = '1.4.0'
-const NODE_LT_VERSION = '3.0.0'
+const NODE_GE_VERSION = '2.5.0'
+const NODE_LT_VERSION = '4.0.0'
 
 export default Node
