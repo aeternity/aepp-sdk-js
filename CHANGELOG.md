@@ -10,6 +10,7 @@
 * **Dependencies:** Use custom version of json-bigint 
 * **Dependencies:** Avoid usage of semver package and cleanup deps 
 * **RPC:** rpc client: Handle case if aepp opened without wallet
+* **Channels:** Fix state channel test's
 
 ### Features
 
@@ -36,8 +37,6 @@
 
 * **State Channels:** Endpoint param is removed and no longer defaults to "/channel". This means that
 "/channel" (or other path) must be appendend to url para
-
-* Fix channel test
 
 
 
