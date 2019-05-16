@@ -118,7 +118,7 @@ async function transform (type, value) {
       const optionV = await value.catch(e => undefined)
       return optionV === undefined ? 'None' : `Some(${await transform(generic, optionV)})`
     case SOPHIA_TYPES.address:
-      return `#${decode(value).toString('hex')}`
+      return parseInt(value) === 0 ? '#0' : `#${decode(value).toString('hex')}`
     case SOPHIA_TYPES.record:
       return `{${await generic.reduce(
         async (acc, { name, type }, i) => {
@@ -188,7 +188,7 @@ function prepareSchema (type) {
     case SOPHIA_TYPES.string:
       return Joi.string().error(getJoiErrorMsg)
     case SOPHIA_TYPES.address:
-      return Joi.string().regex(/^(ak_|ct_|ok_|oq_)/).error(getJoiErrorMsg)
+      return Joi.alternatives([Joi.number().min(0).max(0), Joi.string().regex(/^(ak_|ct_|ok_|oq_)/).error(getJoiErrorMsg)])
     case SOPHIA_TYPES.bool:
       return Joi.boolean().error(getJoiErrorMsg)
     case SOPHIA_TYPES.list:
