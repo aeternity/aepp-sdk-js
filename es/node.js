@@ -122,8 +122,6 @@ const Node = stampit({
   async init ({ forceCompatibility = false }) {
     const { nodeRevision: revision, genesisKeyBlockHash: genesisHash, networkId, protocols } = await this.api.getStatus()
     this.consensusProtocolVersion = await this.getConsensusProtocolVersion(protocols)
-    console.log(this.consensusProtocolVersion)
-    console.log(this.version)
     if (
       !semverSatisfies(this.version.split('-')[0], NODE_GE_VERSION, NODE_LT_VERSION) &&
       !forceCompatibility
