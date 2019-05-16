@@ -215,16 +215,20 @@ async function contractDeploy (code, source, initState = [], options = {}) {
   const { hash, rawTx } = await this.send(tx, opt)
   const result = await this.getTxInfo(hash)
 
-  return Object.freeze({
-    result,
-    owner: ownerId,
-    transaction: hash,
-    rawTx,
-    address: contractId,
-    call: async (name, args = [], options) => this.contractCall(source, contractId, name, args, options),
-    callStatic: async (name, args = [], options) => this.contractCallStatic(source, contractId, name, args, options),
-    createdAt: new Date()
-  })
+  if (result.returnType === 'ok') {
+    return Object.freeze({
+      result,
+      owner: ownerId,
+      transaction: hash,
+      rawTx,
+      address: contractId,
+      call: async (name, args = [], options) => this.contractCall(source, contractId, name, args, options),
+      callStatic: async (name, args = [], options) => this.contractCallStatic(source, contractId, name, args, options),
+      createdAt: new Date()
+    })
+  } else {
+    await this.handleCallError(result)
+  }
 }
 
 /**
@@ -294,7 +298,6 @@ export const Contract = Ae.compose(ContractBase, ContractACI, {
     Ae: {
       defaults: {
         deposit: 0,
-        vmVersion: 1,
         gasPrice: 1000000000, // min gasPrice 1e9
         amount: 0,
         gas: 1600000 - 21000,

@@ -122,7 +122,7 @@ export async function pollForQueryResponse (oracleId, queryId, { attempts = 20, 
  * @return {Promise<Object>} Oracle object
  */
 async function registerOracle (queryFormat, responseFormat, options = {}) {
-  const opt = R.merge(R.merge(this.Ae.defaults, { vmVersion: this.Ae.defaults.oracleVmVersion }), options) // Preset VmVersion for oracle
+  const opt = R.merge(this.Ae.defaults, options) // Preset VmVersion for oracle
   const accountId = await this.address()
 
   const oracleRegisterTx = await this.oracleRegisterTx(R.merge(opt, {
@@ -248,7 +248,6 @@ const Oracle = Ae.compose({
     getQueryObject
   },
   deepProps: { Ae: { defaults: {
-    oracleVmVersion: 0,
     queryFee: 30000,
     oracleTtl: { type: 'delta', value: 500 },
     queryTtl: { type: 'delta', value: 10 },

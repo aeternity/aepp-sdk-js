@@ -40,11 +40,11 @@ const rpcCallbacks = new WeakMap()
 const pingTimeoutId = new WeakMap()
 const pongTimeoutId = new WeakMap()
 
-function channelURL (url, params, endpoint = 'channel') {
+function channelURL (url, params) {
   const paramString = R.join('&', R.values(R.mapObjIndexed((value, key) =>
     `${pascalToSnake(key)}=${encodeURIComponent(value)}`, params)))
 
-  return `${url}/${endpoint}?${paramString}`
+  return `${url}?${paramString}`
 }
 
 function emit (channel, ...args) {
@@ -198,10 +198,10 @@ function WebSocket (url, callbacks) {
 }
 
 async function initialize (channel, channelOptions) {
-  const optionsKeys = ['sign', 'endpoint', 'url']
+  const optionsKeys = ['sign', 'url']
   const params = R.pickBy(key => !optionsKeys.includes(key), channelOptions)
-  const { endpoint, url } = channelOptions
-  const wsUrl = channelURL(url, { ...params, protocol: 'json-rpc' }, endpoint)
+  const { url } = channelOptions
+  const wsUrl = channelURL(url, { ...params, protocol: 'json-rpc' })
 
   options.set(channel, channelOptions)
   fsm.set(channel, { handler: awaitingConnection })
