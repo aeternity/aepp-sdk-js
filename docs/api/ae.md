@@ -15,6 +15,7 @@ import Ae from '@aeternity/aepp-sdk/es/ae'
         * _async_
             * [.send(tx, [options])](#module_@aeternity/aepp-sdk/es/ae--Ae+send) ⇒ `String` \| `String`
             * [.spend(amount, recipientId, options)](#module_@aeternity/aepp-sdk/es/ae--Ae+spend) ⇒ `String` \| `String`
+            * [.transferFunds(percentage, recipientId, options)](#module_@aeternity/aepp-sdk/es/ae--Ae+transferFunds) ⇒ `String` \| `String`
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae--Ae"></a>
 
@@ -75,6 +76,22 @@ Send tokens to another account
 | Param | Type | Description |
 | --- | --- | --- |
 | amount | `Number` \| `String` | Amount to spend |
+| recipientId | `String` | Address of recipient account |
+| options | `Object` | Options |
+
+<a id="module_@aeternity/aepp-sdk/es/ae--Ae+transferFunds"></a>
+
+#### ae.transferFunds(percentage, recipientId, options) ⇒ `String` \| `String`
+Send a percentage of funds to another account
+
+**Kind**: instance method of [`Ae`](#exp_module_@aeternity/aepp-sdk/es/ae--Ae)  
+**Returns**: `String` \| `String` - Transaction or transaction hash  
+**Category**: async  
+**rtype**: `(percentage: Number|String, recipientId: String, options?: Object) => Promise[String]`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| percentage | `Number` \| `String` | Percentage of amount to spend |
 | recipientId | `String` | Address of recipient account |
 | options | `Object` | Options |
 

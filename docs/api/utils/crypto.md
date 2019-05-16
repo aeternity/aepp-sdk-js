@@ -22,7 +22,7 @@ import * as Crypto from '@aeternity/aepp-sdk/es/utils/crypto'
         * [.salt()](#module_@aeternity/aepp-sdk/es/utils/crypto.salt) ⇒ `Number`
         * [.encodeBase64Check(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.encodeBase64Check) ⇒ `Buffer`
         * [.decodeBase64Check(str)](#module_@aeternity/aepp-sdk/es/utils/crypto.decodeBase64Check) ⇒ `Buffer`
-        * [.encodeBase58Check(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.encodeBase58Check) ⇒ `Buffer`
+        * [.encodeBase58Check(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.encodeBase58Check) ⇒ `String`
         * [.decodeBase58Check(str)](#module_@aeternity/aepp-sdk/es/utils/crypto.decodeBase58Check) ⇒ `Buffer`
         * [.hexStringToByte(str)](#module_@aeternity/aepp-sdk/es/utils/crypto.hexStringToByte) ⇒ `Uint8Array`
         * [.encodeUnsigned(value)](#module_@aeternity/aepp-sdk/es/utils/crypto.encodeUnsigned) ⇒ `Buffer`
@@ -203,12 +203,12 @@ Base64check decode given `str`
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.encodeBase58Check"></a>
 
-### @aeternity/aepp-sdk/es/utils/crypto.encodeBase58Check(input) ⇒ `Buffer`
+### @aeternity/aepp-sdk/es/utils/crypto.encodeBase58Check(input) ⇒ `String`
 Base58 encode given `input`
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
-**Returns**: `Buffer` - Base58 encoded data  
-**rtype**: `(input: String) => Buffer`
+**Returns**: `String` - Base58 encoded data  
+**rtype**: `(input: String) => String`
 
 | Param | Type | Description |
 | --- | --- | --- |
