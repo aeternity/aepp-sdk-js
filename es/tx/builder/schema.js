@@ -155,16 +155,31 @@ export const ABI_VERSIONS = {
   SOLIDITY: 2
 }
 
+export const VM_ABI_MAP_ROMA = {
+  [TX_TYPE.contractCreate]: { vmVersion: [VM_VERSIONS.SOPHIA], abiVersion: [ABI_VERSIONS.SOPHIA] },
+  [TX_TYPE.contractCall]: { vmVersion: [VM_VERSIONS.SOPHIA], abiVersion: [ABI_VERSIONS.SOPHIA] },
+  [TX_TYPE.oracleRegister]: { vmVersion: [VM_VERSIONS.SOPHIA], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA] }
+}
+
 export const VM_ABI_MAP_MINERVA = {
   [TX_TYPE.contractCreate]: { vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA], abiVersion: [ABI_VERSIONS.SOPHIA] },
-  [TX_TYPE.contractCall]: { vmVersion: [VM_VERSIONS.SOPHIA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA], abiVersion: [ABI_VERSIONS.SOPHIA] },
+  [TX_TYPE.contractCall]: { vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA, VM_VERSIONS.SOPHIA], abiVersion: [ABI_VERSIONS.SOPHIA] },
   [TX_TYPE.oracleRegister]: { vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA] }
 }
 
 export const VM_ABI_MAP_FORTUNA = {
-  [TX_TYPE.contractCreate]: { vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA], abiVersion: [ABI_VERSIONS.SOPHIA] }, // vmVersion 0x4 do not work with fortuna
-  [TX_TYPE.contractCall]: { vmVersion: [VM_VERSIONS.SOPHIA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA], abiVersion: [ABI_VERSIONS.SOPHIA] },
+  [TX_TYPE.contractCreate]: { vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA], abiVersion: [ABI_VERSIONS.SOPHIA] },
+  [TX_TYPE.contractCall]: { vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA, VM_VERSIONS.SOPHIA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA], abiVersion: [ABI_VERSIONS.SOPHIA] },
   [TX_TYPE.oracleRegister]: { vmVersion: [], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA] }
+}
+
+export const PROTOCOL_VM_ABI = {
+  // Roma
+  '1': VM_ABI_MAP_ROMA,
+  // Minerva
+  '2': VM_ABI_MAP_MINERVA,
+  // Fortuna
+  '3': VM_ABI_MAP_FORTUNA
 }
 
 export const OBJECT_ID_TX_TYPE = {
