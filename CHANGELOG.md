@@ -14,6 +14,7 @@
 ### Features
 
 * **KEYSTORE:** Add browser compatibility
+* **TX:** Handle VM/ABI fields serialization and validation basaed on tx type and node version
 * **ACI:** Add `contract`, `address`, `record` types argument/result transformation ([#349](https://github.com/aeternity/aepp-sdk-js/issues/349)) ([0599d7d](https://github.com/aeternity/aepp-sdk-js/commit/0599d7d))
 * **WEBPACK:** webpack configs: Mark all dependencies as external
 * **WEBPACK:** Setup webpack-bundle-analyzer plugin
