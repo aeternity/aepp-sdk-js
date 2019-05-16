@@ -1,3 +1,13 @@
+# [3.2.1](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...3.2.1) (2019-05-16)
+
+
+### Bug Fixes
+
+* **Joi:** Add `JOI` browser comparability
+
+
+
+
 # [3.2.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...3.2.0) (2019-05-16)
 
 
