@@ -28,15 +28,8 @@ import Tx from './'
 import Node from '../node'
 
 import { buildTx, calculateFee } from './builder'
-import { MIN_GAS_PRICE, TX_TYPE } from './builder/schema'
+import { MIN_GAS_PRICE, TX_TYPE, VM_ABI_MAP_FORTUNA, VM_ABI_MAP_MINERVA } from './builder/schema'
 import { buildContractId, oracleQueryId } from './builder/helpers'
-
-const ORACLE_VM_VERSION = 0
-const CONTRACT_VM_VERSION = 1
-// TODO This values using as default for minerva node
-const CONTRACT_MINERVA_VM_ABI = 196609
-const CONTRACT_MINERVA_VM = 3
-const CONTRACT_MINERVA_ABI = 1
 
 async function spendTx ({ senderId, recipientId, amount, payload = '' }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
@@ -125,58 +118,50 @@ async function nameRevokeTx ({ accountId, nameId }) {
   return tx
 }
 
-// TODO move this to tx-builder
-// Get VM_ABI version for minerva
-function getContractVmVersion () {
-  return semverSatisfies(this.version.split('-')[0], '2.0.0', '3.0.0') // Minerva
-    ? { splitedVmAbi: CONTRACT_MINERVA_VM_ABI, contractVmVersion: CONTRACT_MINERVA_VM }
-    : { splitedVmAbi: CONTRACT_VM_VERSION, contractVmVersion: CONTRACT_VM_VERSION }
-}
 async function contractCreateTx ({ ownerId, code, vmVersion, abiVersion, deposit, amount, gas, gasPrice = MIN_GAS_PRICE, callData }) {
-  // TODO move this to tx-builder
-  // Get VM_ABI version for minerva
-  const { splitedVmAbi, contractVmVersion } = getContractVmVersion.bind(this)()
+  // Get VM_ABI version
+  const ctVersion = this.getVmVersion(TX_TYPE.contractCreate, R.head(arguments))
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.contractCreate, { senderId: ownerId, ...R.head(arguments), vmVersion: splitedVmAbi, gasPrice })
-
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.contractCreate, { senderId: ownerId, ...R.head(arguments), ctVersion, gasPrice })
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   return this.nativeMode
     ? {
-      ...buildTx(R.merge(R.head(arguments), { nonce, ttl, fee, vmVersion: splitedVmAbi, gasPrice }), TX_TYPE.contractCreate),
+      ...buildTx(R.merge(R.head(arguments), { nonce, ttl, fee, ctVersion, gasPrice }), TX_TYPE.contractCreate),
       contractId: buildContractId(ownerId, nonce)
     }
-    : this.api.postContractCreate(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee), gas: parseInt(gas), gasPrice, vmVersion: contractVmVersion, abiVersion: CONTRACT_MINERVA_ABI }))
+    : this.api.postContractCreate(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee), gas: parseInt(gas), gasPrice, vmVersion: ctVersion.vmVersion, abiVersion: ctVersion.abiVersion }))
 }
 
-async function contractCallTx ({ callerId, contractId, vmVersion = CONTRACT_VM_VERSION, amount, gas, gasPrice = MIN_GAS_PRICE, callData }) {
+async function contractCallTx ({ callerId, contractId, abiVersion, amount, gas, gasPrice = MIN_GAS_PRICE, callData }) {
+  const ctVersion = this.getVmVersion(TX_TYPE.contractCall, R.head(arguments))
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.contractCall, { senderId: callerId, ...R.head(arguments), gasPrice, vmVersion })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.contractCall, { senderId: callerId, ...R.head(arguments), gasPrice, abiVersion: ctVersion.abiVersion })
 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
-    ? buildTx(R.merge(R.head(arguments), { nonce, ttl, fee, vmVersion, gasPrice }), TX_TYPE.contractCall)
+    ? buildTx(R.merge(R.head(arguments), { nonce, ttl, fee, abiVersion: ctVersion.abiVersion, gasPrice }), TX_TYPE.contractCall)
     : await this.api.postContractCall(R.merge(R.head(arguments), {
       nonce,
       ttl,
       fee: parseInt(fee),
       gas: parseInt(gas),
       gasPrice,
-      vmVersion
+      abiVersion: ctVersion.vmVersion
     }))
 
   return tx
 }
 
-async function oracleRegisterTx ({ accountId, queryFormat, responseFormat, queryFee, oracleTtl, vmVersion = ORACLE_VM_VERSION }) {
+async function oracleRegisterTx ({ accountId, queryFormat, responseFormat, queryFee, oracleTtl, abiVersion }) {
+  const { abiVersion: abi } = this.getVmVersion(TX_TYPE.oracleRegister, R.head(arguments))
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.oracleRegister, { senderId: accountId, ...R.head(arguments), vmVersion })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.oracleRegister, { senderId: accountId, ...R.head(arguments), abiVersion: abi })
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? buildTx({
       accountId,
       queryFee,
-      vmVersion,
+      abiVersion: abi,
       fee,
       oracleTtl,
       nonce,
@@ -187,7 +172,7 @@ async function oracleRegisterTx ({ accountId, queryFormat, responseFormat, query
     : await this.api.postOracleRegister({
       accountId,
       queryFee,
-      vmVersion,
+      abiVersion: abi,
       fee: parseInt(fee),
       oracleTtl,
       nonce,
@@ -355,6 +340,28 @@ async function channelSnapshotSoloTx ({ channelId, fromId, payload }) {
 }
 
 /**
+ * Validated vm/abi version or get default based on transaction type and NODE version
+ *
+ * @param {string} txType Type of transaction
+ * @param {object} vmAbi Object with vm and abi version fields
+ * @return {object} Object with vm/abi version ({ vmVersion: number, abiVersion: number })
+ */
+function getVmVersion (txType, { vmVersion, abiVersion } = {}) {
+  const isMinerva = semverSatisfies(this.version.split('-')[0], '2.5.0', '3.0.0')
+  const supported = isMinerva ? VM_ABI_MAP_MINERVA[txType] : VM_ABI_MAP_FORTUNA[txType]
+  if (!supported) throw new Error('Not supported tx type')
+
+  const ctVersion = {
+    abiVersion: abiVersion !== undefined ? abiVersion : supported.abiVersion[0],
+    vmVersion: vmVersion !== undefined ? vmVersion : supported.vmVersion[0]
+  }
+  if (supported.vmVersion.length && !R.contains(ctVersion.vmVersion, supported.vmVersion)) throw new Error(`VM VERSION ${ctVersion.vmVersion} do not support by this node. Supported: [${supported.vmVersion}]`)
+  if (!R.contains(ctVersion.abiVersion, supported.abiVersion)) throw new Error(`ABI VERSION ${ctVersion.abiVersion} do not support by this node. Supported: [${supported.abiVersion}]`)
+
+  return ctVersion
+}
+
+/**
  * Compute the absolute ttl by adding the ttl to the current height of the chain
  *
  * @param {number} ttl
@@ -447,7 +454,8 @@ const Transaction = Node.compose(Tx, {
     channelSlashTx,
     channelSettleTx,
     channelSnapshotSoloTx,
-    getAccountNonce
+    getAccountNonce,
+    getVmVersion
   }
 })
 
