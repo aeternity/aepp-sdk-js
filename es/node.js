@@ -63,6 +63,12 @@ const loader = ({ url, internalUrl }) => (path, definition) => {
   }
 }
 
+/**
+ * get consensus protocol version
+ * @param {Array} protocols Array of protocols
+ * @param {Number} height Geigh
+ * @return {Number} version Protocol version
+ */
 async function getConsensusProtocolVersion (protocols = [], height) {
   if (!protocols) throw new Error('Protocols must be an array')
   if (!height) height = (await this.api.getCurrentKeyBlock()).height
