@@ -530,7 +530,7 @@ describe('Channel', function () {
     ).should.be.equal(true)
   })
 
-  it('can create a contract and accept', async () => {
+  it.skip('can create a contract and accept', async () => {
     initiatorCh = await Channel({
       ...sharedParams,
       role: 'initiator',
@@ -558,7 +558,7 @@ describe('Channel', function () {
     contractEncodeCall = (method, args) => initiator.contractEncodeCallDataAPI(identityContract, method, args)
   })
 
-  it('can create a contract and reject', async () => {
+  it.skip('can create a contract and reject', async () => {
     responderShouldRejectUpdate = true
     const code = await initiator.compileContractAPI(identityContract)
     const callData = await initiator.contractEncodeCallDataAPI(identityContract, 'init', [])
@@ -646,7 +646,7 @@ describe('Channel', function () {
     }).should.eventually.be.rejectedWith('Rejected: Call not found')
   })
 
-  it('can get contract state', async () => {
+  it.skip('can get contract state', async () => {
     const result = await initiatorCh.getContractState(contractAddress)
     result.should.eql({
       contract: {
