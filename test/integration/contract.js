@@ -214,14 +214,14 @@ describe('Contract', function () {
           try {
             await contractObject.call('addressFn', ['asdasasd'])
           } catch (e) {
-            e.message.should.be.equal('"Argument" at position 0 fails because ["[asdasasd]" with value "asdasasd" fails to match the required pattern: /^(ak_|ct_|ok_|oq_)/]')
+            e.message.should.be.equal('"Argument" at position 0 fails because ["[asdasasd]" must be a number, "[asdasasd]" with value "asdasasd" fails to match the required pattern: /^(ak_|ct_|ok_|oq_)/]')
           }
         })
         it('Invalid address type', async () => {
           try {
             await contractObject.call('addressFn', [333])
           } catch (e) {
-            e.message.should.be.equal('"Argument" at position 0 fails because [Value "333" at path: [0] not a string]')
+            e.message.should.be.equal('"Argument" at position 0 fails because ["[333]" must be less than or equal to 0, Value "333" at path: [0] not a string]')
           }
         })
         it('Empty address', async () => {
