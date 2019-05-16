@@ -44,7 +44,7 @@ function waitForChannel (channel) {
   )
 }
 
-describe.skip('Channel', function () {
+describe('Channel', function () {
   configure(this)
 
   let initiator
@@ -550,7 +550,7 @@ describe.skip('Channel', function () {
       code,
       callData,
       deposit: 1000,
-      vmVersion: 3,
+      vmVersion: 4,
       abiVersion: 1
     }, async (tx) => await initiator.signTransaction(tx))
     result.should.eql({ accepted: true, address: result.address, signedTx: (await initiatorCh.state()).signedTx })
@@ -566,7 +566,7 @@ describe.skip('Channel', function () {
       code,
       callData,
       deposit: 1000,
-      vmVersion: 3,
+      vmVersion: 4,
       abiVersion: 1
     }, async (tx) => await initiator.signTransaction(tx))
     result.should.eql({ accepted: false })
@@ -656,7 +656,7 @@ describe.skip('Channel', function () {
         id: contractAddress,
         ownerId: await initiator.address(),
         referrerIds: [],
-        vmVersion: 3,
+        vmVersion: 4,
       },
       contractState: result.contractState
     })
