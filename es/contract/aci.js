@@ -26,7 +26,7 @@ import AsyncInit from '../utils/async-init'
 import { decode } from '../tx/builder/helpers'
 import { encodeBase58Check } from '../utils/crypto'
 import { toBytes } from '../utils/bytes'
-import Joi from '@hapi/joi'
+import Joi from 'joi-browser'
 
 const SOPHIA_TYPES = [
   'int',
