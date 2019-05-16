@@ -41,7 +41,6 @@
     "joi-browser": "^13.4.0",
     "libsodium-wrappers-sumo": "0.7.3",
     "json-bigint": "github:davidyuk/json-bigint",
-    "libsodium-wrappers-sumo": "0.7.3",
     "ramda": "^0.25.0",
     "rlp": "2.1.0",
     "serialize-javascript": "^1.5.0",
