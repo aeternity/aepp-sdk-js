@@ -306,7 +306,7 @@ export const ID_TAG_PREFIX = revertObject(PREFIX_ID_TAG)
 const VALIDATION_ERROR = (msg) => msg
 
 export const VALIDATION_MESSAGE = {
-  [FIELD_TYPES.int]: ({ value }) => VALIDATION_ERROR(`${value} is not of type Number or BigNumber`),
+  [FIELD_TYPES.int]: ({ value, isMinusValue }) => isMinusValue ? VALIDATION_ERROR(`${value} must be >= 0`) : VALIDATION_ERROR(`${value} is not of type Number or BigNumber`),
   [FIELD_TYPES.id]: ({ value, prefix }) => VALIDATION_ERROR(`'${value}' prefix doesn't match expected prefix '${prefix}' or ID_TAG for prefix not found`),
   [FIELD_TYPES.binary]: ({ prefix, value }) => VALIDATION_ERROR(`'${value}' prefix doesn't match expected prefix '${prefix}'`),
   [FIELD_TYPES.string]: ({ value }) => VALIDATION_ERROR(`Not a string`),
