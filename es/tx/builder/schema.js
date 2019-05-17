@@ -155,16 +155,31 @@ export const ABI_VERSIONS = {
   SOLIDITY: 2
 }
 
+export const VM_ABI_MAP_ROMA = {
+  [TX_TYPE.contractCreate]: { vmVersion: [VM_VERSIONS.SOPHIA], abiVersion: [ABI_VERSIONS.SOPHIA] },
+  [TX_TYPE.contractCall]: { vmVersion: [VM_VERSIONS.SOPHIA], abiVersion: [ABI_VERSIONS.SOPHIA] },
+  [TX_TYPE.oracleRegister]: { vmVersion: [VM_VERSIONS.SOPHIA], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA] }
+}
+
 export const VM_ABI_MAP_MINERVA = {
   [TX_TYPE.contractCreate]: { vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA], abiVersion: [ABI_VERSIONS.SOPHIA] },
-  [TX_TYPE.contractCall]: { vmVersion: [VM_VERSIONS.SOPHIA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA], abiVersion: [ABI_VERSIONS.SOPHIA] },
+  [TX_TYPE.contractCall]: { vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA, VM_VERSIONS.SOPHIA], abiVersion: [ABI_VERSIONS.SOPHIA] },
   [TX_TYPE.oracleRegister]: { vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA] }
 }
 
 export const VM_ABI_MAP_FORTUNA = {
-  [TX_TYPE.contractCreate]: { vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA], abiVersion: [ABI_VERSIONS.SOPHIA] }, // vmVersion 0x4 do not work with fortuna
-  [TX_TYPE.contractCall]: { vmVersion: [VM_VERSIONS.SOPHIA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA], abiVersion: [ABI_VERSIONS.SOPHIA] },
+  [TX_TYPE.contractCreate]: { vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA], abiVersion: [ABI_VERSIONS.SOPHIA] },
+  [TX_TYPE.contractCall]: { vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA, VM_VERSIONS.SOPHIA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA], abiVersion: [ABI_VERSIONS.SOPHIA] },
   [TX_TYPE.oracleRegister]: { vmVersion: [], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA] }
+}
+
+export const PROTOCOL_VM_ABI = {
+  // Roma
+  '1': VM_ABI_MAP_ROMA,
+  // Minerva
+  '2': VM_ABI_MAP_MINERVA,
+  // Fortuna
+  '3': VM_ABI_MAP_FORTUNA
 }
 
 export const OBJECT_ID_TX_TYPE = {
@@ -291,7 +306,7 @@ export const ID_TAG_PREFIX = revertObject(PREFIX_ID_TAG)
 const VALIDATION_ERROR = (msg) => msg
 
 export const VALIDATION_MESSAGE = {
-  [FIELD_TYPES.int]: ({ value }) => VALIDATION_ERROR(`${value} is not of type Number or BigNumber`),
+  [FIELD_TYPES.int]: ({ value, isMinusValue }) => isMinusValue ? VALIDATION_ERROR(`${value} must be >= 0`) : VALIDATION_ERROR(`${value} is not of type Number or BigNumber`),
   [FIELD_TYPES.id]: ({ value, prefix }) => VALIDATION_ERROR(`'${value}' prefix doesn't match expected prefix '${prefix}' or ID_TAG for prefix not found`),
   [FIELD_TYPES.binary]: ({ prefix, value }) => VALIDATION_ERROR(`'${value}' prefix doesn't match expected prefix '${prefix}'`),
   [FIELD_TYPES.string]: ({ value }) => VALIDATION_ERROR(`Not a string`),

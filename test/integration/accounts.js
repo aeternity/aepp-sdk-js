@@ -46,6 +46,14 @@ describe('Accounts', function () {
     it('spending tokens', async () => {
       return wallet.spend(1, receiver).should.be.rejectedWith(Error)
     })
+
+    it('spending minus amount of tokens', async () => {
+      try {
+        await wallet.spend(-1, receiver)
+      } catch (e) {
+        e.message.should.be.equal('Transaction build error. {"amount":"-1 must be >= 0"}')
+      }
+    })
   })
 
   it('determines the balance', async () => {
