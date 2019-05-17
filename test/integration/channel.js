@@ -147,17 +147,43 @@ describe.skip('Channel', function () {
     result.signedTx.should.be.a('string')
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.calledOnce(responderSign)
-    sinon.assert.calledWithExactly(responderSign, sinon.match('update_ack'), sinon.match.string)
+    sinon.assert.calledWithExactly(
+      responderSign,
+      sinon.match('update_ack'),
+      sinon.match.string,
+      sinon.match({
+        updates: sinon.match([{
+          amount: sinon.match(amount),
+          from: sinon.match(await initiator.address()),
+          to: sinon.match(await responder.address()),
+          op: sinon.match('OffChainTransfer')
+        }])
+      })
+    )
     sinon.assert.calledOnce(sign)
-    sinon.assert.calledWithExactly(sign, sinon.match.string)
-    const { txType, tx: { updates } } = unpackTx(sign.firstCall.args[0])
+    sinon.assert.calledWithExactly(
+      sign,
+      sinon.match.string,
+      sinon.match({
+        updates: sinon.match([{
+          amount: sinon.match(amount),
+          from: sinon.match(await initiator.address()),
+          to: sinon.match(await responder.address()),
+          op: sinon.match('OffChainTransfer')
+        }])
+      })
+    )
+    const { txType } = unpackTx(sign.firstCall.args[0])
     txType.should.equal('channelOffChain')
-    updates[0].txType.should.equal('channelOffChainUpdateTransfer')
-    updates[0].tx.should.eql({
-      ...updates[0].tx,
-      from: await initiator.address(),
-      to: await responder.address(),
-      amount: amount.toString()
+    sign.firstCall.args[1].should.eql({
+      updates: [
+        {
+          amount,
+          from: await initiator.address(),
+          to: await responder.address(),
+          op: 'OffChainTransfer'
+        }
+      ]
     })
   })
 
@@ -174,17 +200,43 @@ describe.skip('Channel', function () {
     result.accepted.should.equal(false)
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.calledOnce(responderSign)
-    sinon.assert.calledWithExactly(responderSign, sinon.match('update_ack'), sinon.match.string)
+    sinon.assert.calledWithExactly(
+      responderSign,
+      sinon.match('update_ack'),
+      sinon.match.string,
+      sinon.match({
+        updates: sinon.match([{
+          amount: sinon.match(amount),
+          from: sinon.match(await responder.address()),
+          to: sinon.match(await initiator.address()),
+          op: sinon.match('OffChainTransfer')
+        }])
+      })
+    )
     sinon.assert.calledOnce(sign)
-    sinon.assert.calledWithExactly(sign, sinon.match.string)
-    const { txType, tx: { updates } } = unpackTx(sign.firstCall.args[0])
+    sinon.assert.calledWithExactly(
+      sign,
+      sinon.match.string,
+      sinon.match({
+        updates: sinon.match([{
+          amount: sinon.match(amount),
+          from: sinon.match(await responder.address()),
+          to: sinon.match(await initiator.address()),
+          op: sinon.match('OffChainTransfer')
+        }])
+      })
+    )
+    const { txType } = unpackTx(sign.firstCall.args[0])
     txType.should.equal('channelOffChain')
-    updates[0].txType.should.equal('channelOffChainUpdateTransfer')
-    updates[0].tx.should.eql({
-      ...updates[0].tx,
-      from: await responder.address(),
-      to: await initiator.address(),
-      amount: amount.toString()
+    sign.firstCall.args[1].should.eql({
+      updates: [
+        {
+          amount,
+          from: await responder.address(),
+          to: await initiator.address(),
+          op: 'OffChainTransfer'
+        }
+      ]
     })
   })
 
@@ -250,9 +302,30 @@ describe.skip('Channel', function () {
     sinon.assert.calledOnce(onWithdrawLocked)
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.calledOnce(responderSign)
-    sinon.assert.calledWithExactly(responderSign, sinon.match('withdraw_ack'), sinon.match.string)
+    sinon.assert.calledWithExactly(
+      responderSign,
+      sinon.match('withdraw_ack'),
+      sinon.match.string,
+      sinon.match({
+        updates: [{
+          amount,
+          op: 'OffChainWithdrawal',
+          to: await initiator.address()
+        }]
+      })
+    )
     sinon.assert.calledOnce(sign)
-    sinon.assert.calledWithExactly(sign, sinon.match.string)
+    sinon.assert.calledWithExactly(
+      sign,
+      sinon.match.string,
+      sinon.match({
+        updates: [{
+          amount,
+          op: 'OffChainWithdrawal',
+          to: await initiator.address()
+        }]
+      })
+    )
     const { txType, tx } = unpackTx(sign.firstCall.args[0])
     txType.should.equal('channelWithdraw')
     tx.should.eql({
@@ -280,9 +353,30 @@ describe.skip('Channel', function () {
     sinon.assert.notCalled(onWithdrawLocked)
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.calledOnce(responderSign)
-    sinon.assert.calledWithExactly(responderSign, sinon.match('withdraw_ack'), sinon.match.string)
+    sinon.assert.calledWithExactly(
+      responderSign,
+      sinon.match('withdraw_ack'),
+      sinon.match.string,
+      sinon.match({
+        updates: [{
+          amount,
+          op: 'OffChainWithdrawal',
+          to: await initiator.address()
+        }]
+      })
+    )
     sinon.assert.calledOnce(sign)
-    sinon.assert.calledWithExactly(sign, sinon.match.string)
+    sinon.assert.calledWithExactly(
+      sign,
+      sinon.match.string,
+      sinon.match({
+        updates: [{
+          amount,
+          op: 'OffChainWithdrawal',
+          to: await initiator.address()
+        }]
+      })
+    )
     const { txType, tx } = unpackTx(sign.firstCall.args[0])
     txType.should.equal('channelWithdraw')
     tx.should.eql({
@@ -311,9 +405,30 @@ describe.skip('Channel', function () {
     sinon.assert.calledOnce(onDepositLocked)
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.calledOnce(responderSign)
-    sinon.assert.calledWithExactly(responderSign, sinon.match('deposit_ack'), sinon.match.string)
+    sinon.assert.calledWithExactly(
+      responderSign,
+      sinon.match('deposit_ack'),
+      sinon.match.string,
+      sinon.match({
+        updates: sinon.match([{
+          amount,
+          op: 'OffChainDeposit',
+          from: await initiator.address()
+        }])
+      })
+    )
     sinon.assert.calledOnce(sign)
-    sinon.assert.calledWithExactly(sign, sinon.match.string)
+    sinon.assert.calledWithExactly(
+      sign,
+      sinon.match.string,
+      sinon.match({
+        updates: sinon.match([{
+          amount,
+          op: 'OffChainDeposit',
+          from: await initiator.address()
+        }])
+      })
+    )
     const { txType, tx } = unpackTx(sign.firstCall.args[0])
     txType.should.equal('channelDeposit')
     tx.should.eql({
@@ -341,7 +456,18 @@ describe.skip('Channel', function () {
     sinon.assert.notCalled(onDepositLocked)
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.calledOnce(responderSign)
-    sinon.assert.calledWithExactly(responderSign, sinon.match('deposit_ack'), sinon.match.string)
+    sinon.assert.calledWithExactly(
+      responderSign,
+      sinon.match('deposit_ack'),
+      sinon.match.string,
+      sinon.match({
+        updates: [{
+          amount,
+          op: 'OffChainDeposit',
+          from: await initiator.address()
+        }]
+      })
+    )
     const { txType, tx } = unpackTx(sign.firstCall.args[0])
     txType.should.equal('channelDeposit')
     tx.should.eql({
@@ -357,7 +483,12 @@ describe.skip('Channel', function () {
     result.should.be.a('string')
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.calledOnce(responderSign)
-    sinon.assert.calledWithExactly(responderSign, sinon.match('shutdown_sign_ack'), sinon.match.string)
+    sinon.assert.calledWithExactly(
+      responderSign,
+      sinon.match('shutdown_sign_ack'),
+      sinon.match.string,
+      sinon.match.any
+    )
     sinon.assert.calledOnce(sign)
     sinon.assert.calledWithExactly(sign, sinon.match.string)
     const { txType, tx } = unpackTx(sign.firstCall.args[0])
@@ -715,7 +846,7 @@ describe.skip('Channel', function () {
     })
 
     it('when posting incorrect update tx', async () => {
-      return update({ sign: () => 'abcdefg' }).should.eventually.be.rejectedWith('Internal error')
+      return update({ sign: () => 'abcdefg' }).should.eventually.be.rejectedWith('Rejected')
     })
   })
 })

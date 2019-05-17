@@ -302,7 +302,10 @@ export function buildTx (params, type, { excludeKeys = [], prefix = 'tx' } = {})
   if (!TX_SERIALIZATION_SCHEMA[type]) {
     throw new Error('Transaction serialization not implemented for ' + type)
   }
-  const [schema, tag] = TX_SERIALIZATION_SCHEMA[type]
+  if (!TX_SERIALIZATION_SCHEMA[type][VSN]) {
+    throw new Error('Transaction serialization not implemented for ' + type + ' version ' + VSN)
+  }
+  const [schema, tag] = TX_SERIALIZATION_SCHEMA[type][VSN]
   const binary = buildRawTx({ ...params, VSN, tag }, schema, { excludeKeys }).filter(e => e !== undefined)
 
   const rlpEncoded = rlp.encode(binary)
@@ -327,7 +330,11 @@ export function unpackTx (encodedTx, fromRlpBinary = false) {
   if (!TX_DESERIALIZATION_SCHEMA[objId]) {
     return { message: 'Transaction deserialization not implemented for tag ' + objId }
   }
-  const [schema] = TX_DESERIALIZATION_SCHEMA[objId]
+  const vsn = readInt(binary[1])
+  if (!TX_DESERIALIZATION_SCHEMA[objId][vsn]) {
+    return { message: 'Transaction deserialization not implemented for tag ' + objId + ' version ' + vsn }
+  }
+  const [schema] = TX_DESERIALIZATION_SCHEMA[objId][vsn]
 
   return { txType: OBJECT_ID_TX_TYPE[objId], tx: unpackRawTx(binary, schema), rlpEncoded, binary }
 }
