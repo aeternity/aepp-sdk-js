@@ -23,12 +23,11 @@
  */
 
 import * as R from 'ramda'
-import semverSatisfies from '../utils/semver-satisfies'
 import Tx from './'
 import Node from '../node'
 
 import { buildTx, calculateFee } from './builder'
-import { MIN_GAS_PRICE, TX_TYPE, VM_ABI_MAP_FORTUNA, VM_ABI_MAP_MINERVA } from './builder/schema'
+import { MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE } from './builder/schema'
 import { buildContractId, oracleQueryId } from './builder/helpers'
 
 async function spendTx ({ senderId, recipientId, amount, payload = '' }) {
@@ -146,7 +145,7 @@ async function contractCallTx ({ callerId, contractId, abiVersion, amount, gas, 
       fee: parseInt(fee),
       gas: parseInt(gas),
       gasPrice,
-      abiVersion: ctVersion.vmVersion
+      abiVersion: ctVersion.abiVersion
     }))
 
   return tx
@@ -347,16 +346,18 @@ async function channelSnapshotSoloTx ({ channelId, fromId, payload }) {
  * @return {object} Object with vm/abi version ({ vmVersion: number, abiVersion: number })
  */
 function getVmVersion (txType, { vmVersion, abiVersion } = {}) {
-  const isMinerva = semverSatisfies(this.version.split('-')[0], '2.0.0', '3.0.0')
-  const supported = isMinerva ? VM_ABI_MAP_MINERVA[txType] : VM_ABI_MAP_FORTUNA[txType]
-  if (!supported) throw new Error('Not supported tx type')
+  const version = this.consensusProtocolVersion
+  const supportedProtocol = PROTOCOL_VM_ABI[version]
+  if (!supportedProtocol) throw new Error('Not supported consensus protocol version')
+  const protocolForTX = supportedProtocol[txType]
+  if (!protocolForTX) throw new Error('Not supported tx type')
 
   const ctVersion = {
-    abiVersion: abiVersion !== undefined ? abiVersion : supported.abiVersion[0],
-    vmVersion: vmVersion !== undefined ? vmVersion : supported.vmVersion[0]
+    abiVersion: abiVersion !== undefined ? abiVersion : protocolForTX.abiVersion[0],
+    vmVersion: vmVersion !== undefined ? vmVersion : protocolForTX.vmVersion[0]
   }
-  if (supported.vmVersion.length && !R.contains(ctVersion.vmVersion, supported.vmVersion)) throw new Error(`VM VERSION ${ctVersion.vmVersion} do not support by this node. Supported: [${supported.vmVersion}]`)
-  if (!R.contains(ctVersion.abiVersion, supported.abiVersion)) throw new Error(`ABI VERSION ${ctVersion.abiVersion} do not support by this node. Supported: [${supported.abiVersion}]`)
+  if (protocolForTX.vmVersion.length && !R.contains(ctVersion.vmVersion, protocolForTX.vmVersion)) throw new Error(`VM VERSION ${ctVersion.vmVersion} do not support by this node. Supported: [${protocolForTX.vmVersion}]`)
+  if (!R.contains(ctVersion.abiVersion, protocolForTX.abiVersion)) throw new Error(`ABI VERSION ${ctVersion.abiVersion} do not support by this node. Supported: [${protocolForTX.abiVersion}]`)
 
   return ctVersion
 }

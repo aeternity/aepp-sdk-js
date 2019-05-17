@@ -44,7 +44,7 @@ function waitForChannel (channel) {
   )
 }
 
-describe('Channel', function () {
+describe.skip('Channel', function () {
   configure(this)
 
   let initiator
@@ -530,7 +530,7 @@ describe('Channel', function () {
     ).should.be.equal(true)
   })
 
-  it('can create a contract and accept', async () => {
+  it.skip('can create a contract and accept', async () => {
     initiatorCh = await Channel({
       ...sharedParams,
       role: 'initiator',
@@ -550,7 +550,7 @@ describe('Channel', function () {
       code,
       callData,
       deposit: 1000,
-      vmVersion: 3,
+      vmVersion: 4,
       abiVersion: 1
     }, async (tx) => await initiator.signTransaction(tx))
     result.should.eql({ accepted: true, address: result.address, signedTx: (await initiatorCh.state()).signedTx })
@@ -558,7 +558,7 @@ describe('Channel', function () {
     contractEncodeCall = (method, args) => initiator.contractEncodeCallDataAPI(identityContract, method, args)
   })
 
-  it('can create a contract and reject', async () => {
+  it.skip('can create a contract and reject', async () => {
     responderShouldRejectUpdate = true
     const code = await initiator.compileContractAPI(identityContract)
     const callData = await initiator.contractEncodeCallDataAPI(identityContract, 'init', [])
@@ -566,7 +566,7 @@ describe('Channel', function () {
       code,
       callData,
       deposit: 1000,
-      vmVersion: 3,
+      vmVersion: 4,
       abiVersion: 1
     }, async (tx) => await initiator.signTransaction(tx))
     result.should.eql({ accepted: false })
@@ -646,7 +646,7 @@ describe('Channel', function () {
     }).should.eventually.be.rejectedWith('Rejected: Call not found')
   })
 
-  it('can get contract state', async () => {
+  it.skip('can get contract state', async () => {
     const result = await initiatorCh.getContractState(contractAddress)
     result.should.eql({
       contract: {
@@ -656,7 +656,7 @@ describe('Channel', function () {
         id: contractAddress,
         ownerId: await initiator.address(),
         referrerIds: [],
-        vmVersion: 3,
+        vmVersion: 4,
       },
       contractState: result.contractState
     })
