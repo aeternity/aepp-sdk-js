@@ -3,7 +3,6 @@
 ## @aeternity/aepp-sdk/es/node
 Node module
 
-**Export**: Node  
 **Example**  
 ```js
 import Node from '@aeternity/aepp-sdk/es/node'
@@ -12,6 +11,7 @@ import Node from '@aeternity/aepp-sdk/es/node'
 * [@aeternity/aepp-sdk/es/node](#module_@aeternity/aepp-sdk/es/node)
     * [Node([options])](#exp_module_@aeternity/aepp-sdk/es/node--Node) ⇒ `Object` ⏏
         * [~loader(options)](#module_@aeternity/aepp-sdk/es/node--Node..loader) ⇒ `function`
+        * [~getConsensusProtocolVersion(protocols, height)](#module_@aeternity/aepp-sdk/es/node--Node..getConsensusProtocolVersion) ⇒ `Number`
         * _async_
             * [~remoteSwag(url)](#module_@aeternity/aepp-sdk/es/node--Node..remoteSwag) ⇒ `Object`
 
@@ -48,6 +48,19 @@ Node specific loader for `urlFor`
 | options | `Object` |  |
 | options.url | `String` | Base URL for Node |
 | options.internalUrl | `String` | Base URL for internal requests |
+
+<a id="module_@aeternity/aepp-sdk/es/node--Node..getConsensusProtocolVersion"></a>
+
+#### Node~getConsensusProtocolVersion(protocols, height) ⇒ `Number`
+get consensus protocol version
+
+**Kind**: inner method of [`Node`](#exp_module_@aeternity/aepp-sdk/es/node--Node)  
+**Returns**: `Number` - version Protocol version  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| protocols | `Array` | Array of protocols |
+| height | `Number` | Geigh |
 
 <a id="module_@aeternity/aepp-sdk/es/node--Node..remoteSwag"></a>
 
