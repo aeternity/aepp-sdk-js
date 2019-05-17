@@ -27,21 +27,22 @@ check out the [develop branch].
 - [Æternity's Javascript SDK](#%C3%A6ternitys-javascript-sdk)
       - [Disclaimer](#disclaimer)
   - [Table of content](#table-of-content)
-  - [Quick Start](#quick-start)
+  - [⚡ Quick Start](#%E2%9A%A1-quick-start)
     - [1. Install the SDK](#1-install-the-sdk)
     - [2. Import (a chosen Flavor)](#2-import-a-chosen-flavor)
-  - [Examples](#examples)
+    - [3. Create an Account and get some _AEs_](#3-create-an-account-and-get-some-aes)
+  - [⚡ Examples](#%E2%9A%A1-examples)
     - [VueJS (maintained) Examples](#vuejs-maintained-examples)
     - [1. Universal Example (_all_ SDK's functionalities)](#1-universal-example-all-sdks-functionalities)
     - [2. Wallet Example (_only_ Wallet's functionalities)](#2-wallet-example-only-wallets-functionalities)
     - [3. Aepp Example (Aepp <--> Wallet via RPC)](#3-aepp-example-aepp----wallet-via-rpc)
-  - [CLI - Command Line Client](#cli---command-line-client)
   - [Usage Documentation](#usage-documentation)
+  - [CLI - Command Line Client](#cli---command-line-client)
   - [Contributing](#contributing)
   - [Change Log](#change-log)
   - [License](#license)
 
-## Quick Start
+## ⚡ Quick Start
 
 ### 1. Install the SDK
 Add the latest `@aeternity/aepp-sdk` release from npmjs.com to your project using one of these commands
@@ -68,7 +69,14 @@ Import the right [flavor](docs/usage.md). For this example with get the `Univers
 import Ae from '@aeternity/aepp-sdk/es/ae/universal' // or other flavor
 ```
 
-## Examples
+### 3. Create an Account and get some _AEs_
+You can do many more things now, but you'll probably have to start by:
+
+1. Create an account using the [💻 CLI](#cli---command-line-client)
+2. Give yourself some initial _AEs_ using the [🚰 Faucet Aepp](https://faucet.aepps.com/)
+3. Enjoy building Aepps 🤓
+
+## ⚡ Examples
 
 ### VueJS (maintained) Examples
 
@@ -179,21 +187,25 @@ Aepp().then(ae => {
 })
 ```
 
-## CLI - Command Line Client
-
-Install and use our **NodeJS [CLI](https://github.com/aeternity/aepp-cli-js)**.
-
 ## Usage Documentation
 
 Generic [Usage Documentation](docs/usage.md).
 
+## CLI - Command Line Client
+
+To quickly test _all_ of Aeternity's blockchain features from your Terminal, you can Install and use our **NodeJS [CLI](https://github.com/aeternity/aepp-cli-js)** by running:
+
+1. `npm i -g @aeternity/aepp-cli` to globally install the CLI
+2. `aecly --help` to get a list of possible commands
+
+_eg._ Create an Account:
+
+`aecli account create testWhateverAccountName`
+
 
 ## Contributing
 
-For advanced use, to contribute to development of new versions and to get a deeper understanding of the SDK, it is advised to read the [Contributing](docs/contributing.md) section.
-
-1. [Contribute](docs/contributing.md)
-2. [Release](docs/releases.md)
+For advanced use, to get a deeper understanding of the SDK or to contribute to its development, it is advised to read the [Contributing Guidelines](docs/contributing.md) section.
 
 ## Change Log
 

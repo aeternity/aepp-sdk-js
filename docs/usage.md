@@ -16,10 +16,11 @@ The recommended approach to using aepp-sdk is to import one of the following _Ae
 Factories_ based on the specific use case:
 
 * [@aeternity/aepp-sdk/es/ae/aepp](api/ae/aepp.md): **Web Aepp** development
+* * [@aeternity/aepp-sdk/es/ae/aens](api/ae/aens.md): **AENs** development
 * [@aeternity/aepp-sdk/es/ae/wallet](api/ae/wallet.md): **Wallet** development
 * [@aeternity/aepp-sdk/es/ae/oracle](api/ae/oracle.md): **Oracle** development
 * [@aeternity/aepp-sdk/es/ae/contract](api/ae/contract.md): **Contract** development
-* [@aeternity/aepp-sdk/es/ae/universal](api/ae/universal.md): **Universal** development (include all SDK features)
+* [@aeternity/aepp-sdk/es/ae/universal](api/ae/universal.md): **Universal** development (includes all SDK features)
 
 In order to cater to more specific needs, it is recommended to refer to the
 [hacking documentation](hacking.md).
@@ -27,11 +28,8 @@ In order to cater to more specific needs, it is recommended to refer to the
 ## Testing Networks
 When initialising a client, to test, you can choose from 2 URLs:
 
-### 1. **Testnet** (https://sdk-testnet.aepps.com)
+### **Testnet** (https://sdk-testnet.aepps.com)
 You can use this URL with any releasee on [npmjs](https://www.npmjs.com/package/@aeternity/aepp-sdk). It offers the last stable version of [Node](https://github.com/aeternity/aeternity), used by all of of Aeternity's Dev Tools.
-
-### 2. **Edgenet** (https://sdk-edgened.aepps.com)
-You can use this URL with releases tagged as `alpha`, `beta` or `next` on [npmjs](https://www.npmjs.com/package/@aeternity/aepp-sdk). It offers the latest stable version of [Node](https://github.com/aeternity/aeternity), which all of of Aeternity's Dev Tools are going to use in the near future.
 
 ## ES Modules (enable Tree-Shaking)
 

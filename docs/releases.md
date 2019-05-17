@@ -34,13 +34,13 @@ targeting Node 0.20.0.
 
 [git-flow strategy]: https://danielkummer.github.io/git-flow-cheatsheet/
 
-## Preparing the Pre-Release (Edgenet)
+## Preparing a Pre-Release
 
 If Testnet is not yet targeting the latest Node version (but Edgenet is) you can do a pre-release for the latest `beta` or `alpha` or `next` version, tagging the release as `@next` on npmjs.
 
 To do this, You can follow the steps listed below, while keeping the `alpha` or `beta` or `next` portion in both `CHANGELOG.md` and `package.json` files.
 
-## Preparing the Release (Testnet)
+## Preparing a Release (Testnet)
 
 On the release branch, remove the `alpha` (or `beta` or `next`) portion of the `version`
 string in `package.json`. Replace the `[Unreleased]` header in the
