@@ -157,8 +157,8 @@
         spendResult: null,
         spendError: null,
         contractCode: `contract Identity =
-  type state = ()
-  function main(x : int) = x`,
+      type state = ()
+      function main(x : int) = x`,
         byteCode: null,
         compileError: null,
         contractInitState: [],
