@@ -13,7 +13,6 @@ aepp-sdk is [hosted on GitHub].
 ![Concept Drawing of aepp-sdk][concept]
 
 [concept]: concept.png "Concept Drawing of aepp-sdk"
-
 [æternity]: https://aeternity.com/
 [æternity node]: https://github.com/aeternity/aeternity
 [hosted on GitHub]: https://github.com/aeternity/aepp-sdk-js

@@ -3,7 +3,6 @@
 ## @aeternity/aepp-sdk/es/rpc/client
 RPC client module
 
-**Export**: RpcClient  
 **Example**  
 ```js
 import RpcClient from '@aeternity/aepp-sdk/es/rpc/client'

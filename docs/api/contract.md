@@ -3,7 +3,6 @@
 ## @aeternity/aepp-sdk/es/contract
 Contract Base module
 
-**Export**: Contract  
 **Example**  
 ```js
 import ContractBase from '@aeternity/aepp-sdk/es/contract'

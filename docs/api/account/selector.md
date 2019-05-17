@@ -5,7 +5,6 @@ Accounts Selector module
 
 This is the complement to [@aeternity/aepp-sdk/es/accounts](#module_@aeternity/aepp-sdk/es/accounts).
 
-**Export**: Account  
 **Example**  
 ```js
 import Selector from '@aeternity/aepp-sdk/es/account/selector'
