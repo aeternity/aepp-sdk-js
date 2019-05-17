@@ -151,7 +151,7 @@ channelOpen.enter = (channel) => {
 export async function awaitingOffChainTx (channel, message, state) {
   if (message.method === 'channels.sign.update') {
     const { sign } = state
-    const signedTx = await sign(message.params.data.tx)
+    const signedTx = await sign(message.params.data.tx, { updates: message.params.data.updates })
     send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { tx: signedTx } })
     return { handler: awaitingOffChainUpdate, state }
   }
@@ -194,7 +194,11 @@ export async function awaitingTxSignRequest (channel, message, state) {
   // eslint-disable-next-line no-useless-escape
   const [, tag] = message.method.match(/^channels\.sign\.([^\.]+)$/) || []
   if (tag) {
-    const signedTx = await options.get(channel).sign(tag, message.params.data.tx)
+    const signedTx = await options.get(channel).sign(
+      tag,
+      message.params.data.tx,
+      { updates: message.params.data.updates }
+    )
     if (signedTx) {
       send(channel, { jsonrpc: '2.0', method: `channels.${tag}`, params: { tx: signedTx } })
       return { handler: channelOpen }
@@ -256,7 +260,10 @@ export function awaitingLeave (channel, message, state) {
 
 export async function awaitingWithdrawTx (channel, message, state) {
   if (message.method === 'channels.sign.withdraw_tx') {
-    const signedTx = await Promise.resolve(state.sign(message.params.data.tx))
+    const signedTx = await Promise.resolve(state.sign(
+      message.params.data.tx,
+      { updates: message.params.data.updates }
+    ))
     send(channel, { jsonrpc: '2.0', method: 'channels.withdraw_tx', params: { tx: signedTx } })
     return { handler: awaitingWithdrawCompletion, state }
   }
@@ -296,7 +303,10 @@ export function awaitingWithdrawCompletion (channel, message, state) {
 
 export async function awaitingDepositTx (channel, message, state) {
   if (message.method === 'channels.sign.deposit_tx') {
-    const signedTx = await Promise.resolve(state.sign(message.params.data.tx))
+    const signedTx = await Promise.resolve(state.sign(
+      message.params.data.tx,
+      { updates: message.params.data.updates }
+    ))
     send(channel, { jsonrpc: '2.0', method: 'channels.deposit_tx', params: { tx: signedTx } })
     return { handler: awaitingDepositCompletion, state }
   }
