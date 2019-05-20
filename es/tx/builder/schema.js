@@ -254,7 +254,6 @@ export const FIELD_TYPES = {
 // FEE CALCULATION
 export const BASE_GAS = 15000
 export const GAS_PER_BYTE = 20
-export const FEE_BYTE_SIZE = 8
 export const DEFAULT_FEE = 20000
 export const KEY_BLOCK_INTERVAL = 3
 
@@ -276,13 +275,13 @@ export const TX_FEE_OTHER_GAS = (txType) => ({ txSize, relativeTtl }) => {
     case TX_TYPE.oracleExtend:
     case TX_TYPE.oracleQuery:
     case TX_TYPE.oracleResponse:
-      return BigNumber(txSize + FEE_BYTE_SIZE)
+      return BigNumber(txSize)
         .times(GAS_PER_BYTE)
         .plus(
           Math.ceil(32000 * relativeTtl / Math.floor(60 * 24 * 365 / KEY_BLOCK_INTERVAL))
         )
     default:
-      return BigNumber(txSize + FEE_BYTE_SIZE).times(GAS_PER_BYTE)
+      return BigNumber(txSize).times(GAS_PER_BYTE)
   }
 }
 
