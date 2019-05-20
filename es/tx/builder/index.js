@@ -192,13 +192,30 @@ export function calculateMinFee (txType, { gas = 0, params }) {
   const multiplier = BigNumber(1e9) // 10^9 GAS_PRICE
   if (!params) return BigNumber(DEFAULT_FEE).times(multiplier).toString(10)
 
-  const { rlpEncoded: txWithOutFee } = buildTx(params, txType, { excludeKeys: ['fee'] })
-  const txSize = txWithOutFee.length
+  let actualFee = buildFee(txType, { params: { ...params, fee: 0 }, multiplier, gas })
+  let expected = BigNumber(0)
 
+  while (!actualFee.eq(expected)) {
+    actualFee = buildFee(txType, { params: { ...params, fee: actualFee }, multiplier, gas })
+    expected = actualFee
+  }
+  return expected.toString(10)
+}
+
+/**
+ * Calculate fee based on tx type and params
+ * @param txType
+ * @param params
+ * @param gas
+ * @param multiplier
+ * @return {BigNumber}
+ */
+function buildFee (txType, { params, gas = 0, multiplier }) {
+  const { rlpEncoded: txWithOutFee } = buildTx({ ...params }, txType)
+  const txSize = txWithOutFee.length
   return TX_FEE_BASE_GAS(txType)(gas)
     .plus(TX_FEE_OTHER_GAS(txType)({ txSize, relativeTtl: getOracleRelativeTtl(params) }))
     .times(multiplier)
-    .toString(10)
 }
 
 /**
