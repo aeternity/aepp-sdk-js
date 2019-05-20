@@ -4,8 +4,8 @@ import { configure, ready } from '.'
 import { generateKeyPair } from '../../es/utils/crypto'
 import { BASE_VERIFICATION_SCHEMA, SIGNATURE_VERIFICATION_SCHEMA } from '../../es/tx/builder/schema'
 
-const WARNINGS = [...SIGNATURE_VERIFICATION_SCHEMA, ...BASE_VERIFICATION_SCHEMA].reduce((acc, [msg, v, error]) => error.type === 'warning' ? [...acc, error.txKey]: acc, [])
-const ERRORS = [...BASE_VERIFICATION_SCHEMA, ...SIGNATURE_VERIFICATION_SCHEMA,].reduce((acc, [msg, v, error]) => error.type === 'error' ? [...acc, error.txKey]: acc, [])
+const WARNINGS = [...SIGNATURE_VERIFICATION_SCHEMA, ...BASE_VERIFICATION_SCHEMA].reduce((acc, [msg, v, error]) => error.type === 'warning' ? [...acc, error.txKey] : acc, [])
+const ERRORS = [...BASE_VERIFICATION_SCHEMA, ...SIGNATURE_VERIFICATION_SCHEMA,].reduce((acc, [msg, v, error]) => error.type === 'error' ? [...acc, error.txKey] : acc, [])
 
 describe('Verify Transaction', function () {
   configure(this)
@@ -31,11 +31,10 @@ describe('Verify Transaction', function () {
       absoluteTtl: true
     })
 
-    const {validation} = await client.unpackAndVerify(spendTx)
+    const { validation } = await client.unpackAndVerify(spendTx)
     const warning = validation
-      .filter(({type}) => type === 'warning')
+      .filter(({ type }) => type === 'warning')
       .map(({ txKey }) => txKey)
-
 
     JSON.stringify(WARNINGS).should.be.equals(JSON.stringify(warning))
   })
@@ -54,12 +53,12 @@ describe('Verify Transaction', function () {
     // Sign using another account
     const signedTx = await client.signTransaction(spendTx)
 
-    const {validation} = await client.unpackAndVerify(signedTx)
+    const { validation } = await client.unpackAndVerify(signedTx)
     const error = validation
-      .filter(({type}) => type === 'error')
+      .filter(({ type, txKey }) => type === 'error') // exclude contract vm/abi, has separated test for it
       .map(({ txKey }) => txKey)
 
-    JSON.stringify(ERRORS.filter(e => e !== 'gasPrice')).should.be.equals(JSON.stringify(error))
+    JSON.stringify(ERRORS.filter(e => e !== 'gasPrice' && e !== 'ctVersion')).should.be.equals(JSON.stringify(error))
   })
   it('verify transaction before broadcast', async () => {
     client = await ready(this)
@@ -77,5 +76,12 @@ describe('Verify Transaction', function () {
       const atLeastOneError = !!errorData.validation.length
       atLeastOneError.should.be.equal(true)
     }
+  })
+  it('Verify vmVersion/abiVersion for contract transactions', async () => {
+    // Contract create transaction with wrong abi/vm version (vm: 3, abi: 0)
+    const contractCreateTx = 'tx_+QSaKgGhASLDuRmSBJZv91HE219uqXb2L0adh+bilzBWUi93m5blArkD+PkD9UYCoI2tdssfNdXZOclcaOwkTNB2S/SXIVsLDi7KUoxJ3Jki+QL7+QEqoGjyZ2M4/1CIOaukd0nv+ovofvKE8gf7PZmYcBzVOIfFhG1haW64wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACg//////////////////////////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALhAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPkBy6C5yVbyizFJqfWYeqUF89obIgnMVzkjQAYrtsG9n5+Z6oRpbml0uGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//////////////////////////////////////////+5AUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAP//////////////////////////////////////////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//////////////////////////////////////////7jMYgAAZGIAAISRgICAUX+5yVbyizFJqfWYeqUF89obIgnMVzkjQAYrtsG9n5+Z6hRiAADAV1CAUX9o8mdjOP9QiDmrpHdJ7/qL6H7yhPIH+z2ZmHAc1TiHxRRiAACvV1BgARlRAFtgABlZYCABkIFSYCCQA2ADgVKQWWAAUVlSYABSYADzW2AAgFJgAPNbWVlgIAGQgVJgIJADYAAZWWAgAZCBUmAgkANgA4FSgVKQVltgIAFRUVlQgJFQUICQUJBWW1BQgpFQUGIAAIxWhTIuMS4wgwMAAIcF9clYKwgAAAAAgxgX+IQ7msoAuGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAILnJVvKLMUmp9Zh6pQXz2hsiCcxXOSNABiu2wb2fn5nqAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABkansY'
+    const { validation } = await client.unpackAndVerify(contractCreateTx)
+    const vmAbiError = validation.find(el => el.txKey === 'ctVersion')
+    vmAbiError.msg.split(',')[0].should.be.equal('Wrong abi/vm version')
   })
 })
