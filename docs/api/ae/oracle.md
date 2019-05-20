@@ -7,7 +7,6 @@ The high-level description of the oracle system is
 https://github.com/aeternity/protocol/blob/master/ORACLE.md in the protocol
 repository.
 
-**Export**: Oracle  
 **Example**  
 ```js
 import Oracle from '@aeternity/aepp-sdk/es/ae/oracle'

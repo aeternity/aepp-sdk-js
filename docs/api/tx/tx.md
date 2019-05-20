@@ -3,7 +3,6 @@
 ## @aeternity/aepp-sdk/es/tx/tx
 Transaction module
 
-**Export**: Transaction  
 **Example**  
 ```js
 import Transaction from '@aeternity/aepp-sdk/es/tx/tx'

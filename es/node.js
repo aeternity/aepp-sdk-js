@@ -27,6 +27,7 @@ import axios from 'axios'
 import * as R from 'ramda'
 import Swagger from './utils/swagger'
 import semverSatisfies from './utils/semver-satisfies'
+import { URL } from 'universal-url'
 
 function resolveUrl (url, baseUrl) {
   return new URL(url, baseUrl).toString()
