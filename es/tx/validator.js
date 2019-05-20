@@ -8,7 +8,7 @@ import { encode } from '../tx/builder/helpers'
 import { BigNumber } from 'bignumber.js'
 import {
   BASE_VERIFICATION_SCHEMA, MIN_GAS_PRICE, OBJECT_ID_TX_TYPE,
-  OBJECT_TAG_SIGNED_TRANSACTION,
+  OBJECT_TAG_SIGNED_TRANSACTION, PROTOCOL_VM_ABI,
   SIGNATURE_VERIFICATION_SCHEMA
 } from './builder/schema'
 import { calculateFee, unpackTx } from './builder'
@@ -53,6 +53,21 @@ const VALIDATORS = {
   },
   minGasPrice ({ gasPrice }) {
     return isNaN(gasPrice) || BigNumber(gasPrice).gte(BigNumber(MIN_GAS_PRICE))
+  },
+  // VM/ABI version validation based on consensus protocol version
+  vmAndAbiVersion ({ ctVersion, consensusProtocolVersion, txType }) {
+    // If not contract tx
+    if (!ctVersion) return true
+    const supportedProtocol = PROTOCOL_VM_ABI[consensusProtocolVersion]
+    // If protocol not implemented
+    if (!supportedProtocol) return true
+    // If protocol for tx type not implemented
+    const txProtocol = supportedProtocol[txType]
+
+    return !Object.entries(ctVersion)
+      .reduce((acc, [key, value]) =>
+        [...acc, value === undefined ? true : txProtocol[key].includes(parseInt(value))],
+      []).includes(false)
   }
 }
 
@@ -68,7 +83,8 @@ const resolveDataForBase = async (chain, { ownerPublicKey }) => {
     height: (await chain.api.getCurrentKeyBlockHeight()).height,
     balance: accountBalance,
     accountNonce,
-    ownerPublicKey
+    ownerPublicKey,
+    consensusProtocolVersion: chain.consensusProtocolVersion
   }
 }
 
@@ -147,7 +163,8 @@ async function verifyTx ({ tx, signatures, rlpEncoded }, networkId) {
   const resolvedData = {
     minFee: calculateFee(0, OBJECT_ID_TX_TYPE[+tx.tag], { gas, params: tx, showWarning: false }),
     ...(await resolveDataForBase(this, { ownerPublicKey })),
-    ...tx
+    ...tx,
+    txType: OBJECT_ID_TX_TYPE[+tx.tag]
   }
   const signatureVerification = signatures && signatures.length
     ? verifySchema(SIGNATURE_VERIFICATION_SCHEMA, {

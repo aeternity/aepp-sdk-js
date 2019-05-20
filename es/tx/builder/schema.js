@@ -1019,7 +1019,8 @@ const VALIDATORS = {
   insufficientBalanceForAmount: 'insufficientBalanceForAmount',
   nonceUsed: 'nonceUsed',
   nonceHigh: 'nonceHigh',
-  minGasPrice: 'minGasPrice'
+  minGasPrice: 'minGasPrice',
+  vmAndAbiVersion: 'vmAndAbiVersion'
 }
 
 const ERRORS = {
@@ -1030,7 +1031,8 @@ const ERRORS = {
   insufficientBalanceForAmount: { key: 'InsufficientBalanceForAmount', type: ERROR_TYPE.WARNING, txKey: 'amount' },
   nonceUsed: { key: 'NonceUsed', type: ERROR_TYPE.ERROR, txKey: 'nonce' },
   nonceHigh: { key: 'NonceHigh', type: ERROR_TYPE.WARNING, txKey: 'nonce' },
-  minGasPrice: { key: 'minGasPrice', type: ERROR_TYPE.ERROR, txKey: 'gasPrice' }
+  minGasPrice: { key: 'minGasPrice', type: ERROR_TYPE.ERROR, txKey: 'gasPrice' },
+  vmAndAbiVersion: { key: 'vmAndAbiVersion', type: ERROR_TYPE.ERROR, txKey: 'ctVersion' }
 }
 
 export const SIGNATURE_VERIFICATION_SCHEMA = [
@@ -1075,5 +1077,10 @@ export const BASE_VERIFICATION_SCHEMA = [
     () => `The gasPrice must be bigger then ${MIN_GAS_PRICE}`,
     VALIDATORS.minGasPrice,
     ERRORS.minGasPrice
-  )
+  ),
+  VERIFICATION_FIELD(
+    ({ ctVersion, consensusProtocolVersion, txType }) => `Wrong abi/vm version, Supported is: ${PROTOCOL_VM_ABI[consensusProtocolVersion] ? JSON.stringify(PROTOCOL_VM_ABI[consensusProtocolVersion][txType]) : ' None for this protocol ' + consensusProtocolVersion}`,
+    VALIDATORS.vmAndAbiVersion,
+    ERRORS.vmAndAbiVersion
+  ),
 ]
