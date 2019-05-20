@@ -1082,5 +1082,5 @@ export const BASE_VERIFICATION_SCHEMA = [
     ({ ctVersion, consensusProtocolVersion, txType }) => `Wrong abi/vm version, Supported is: ${PROTOCOL_VM_ABI[consensusProtocolVersion] ? JSON.stringify(PROTOCOL_VM_ABI[consensusProtocolVersion][txType]) : ' None for this protocol ' + consensusProtocolVersion}`,
     VALIDATORS.vmAndAbiVersion,
     ERRORS.vmAndAbiVersion
-  ),
+  )
 ]
