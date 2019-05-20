@@ -55,8 +55,9 @@ const VALIDATORS = {
     return isNaN(gasPrice) || BigNumber(gasPrice).gte(BigNumber(MIN_GAS_PRICE))
   },
   // VM/ABI version validation based on consensus protocol version
-  vmAndAbiVersion ({ ctVersion, consensusProtocolVersion, txType }) {
+  vmAndAbiVersion ({ ctVersion, abiVersion, consensusProtocolVersion, txType }) {
     // If not contract tx
+    if (!ctVersion) ctVersion = { abiVersion }
     const supportedProtocol = PROTOCOL_VM_ABI[consensusProtocolVersion]
     // If protocol not implemented
     if (!supportedProtocol) return true
