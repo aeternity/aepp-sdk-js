@@ -1041,6 +1041,18 @@ export const SIGNATURE_VERIFICATION_SCHEMA = [
     ERRORS.invalidSignature
   )
 ]
+export const CONTRACT_VERIFICATION_SCHEMA = [
+  VERIFICATION_FIELD(
+    ({ ctVersion, consensusProtocolVersion, txType }) => `Wrong abi/vm version, Supported is: ${PROTOCOL_VM_ABI[consensusProtocolVersion] ? JSON.stringify(PROTOCOL_VM_ABI[consensusProtocolVersion][txType]) : ' None for this protocol ' + consensusProtocolVersion}`,
+    VALIDATORS.vmAndAbiVersion,
+    ERRORS.vmAndAbiVersion
+  ),
+  VERIFICATION_FIELD(
+    () => `The gasPrice must be bigger then ${MIN_GAS_PRICE}`,
+    VALIDATORS.minGasPrice,
+    ERRORS.minGasPrice
+  )
+]
 export const BASE_VERIFICATION_SCHEMA = [
   VERIFICATION_FIELD(
     ({ minFee }) => `The fee for the transaction is too low, the minimum fee for this transaction is ${minFee}`,
@@ -1071,15 +1083,5 @@ export const BASE_VERIFICATION_SCHEMA = [
     ({ accountNonce }) => `The nonce is technically valid but will not be processed immediately by the node (next valid nonce is ${accountNonce + 1})`,
     VALIDATORS.nonceHigh,
     ERRORS.nonceHigh
-  ),
-  VERIFICATION_FIELD(
-    () => `The gasPrice must be bigger then ${MIN_GAS_PRICE}`,
-    VALIDATORS.minGasPrice,
-    ERRORS.minGasPrice
-  ),
-  VERIFICATION_FIELD(
-    ({ ctVersion, consensusProtocolVersion, txType }) => `Wrong abi/vm version, Supported is: ${PROTOCOL_VM_ABI[consensusProtocolVersion] ? JSON.stringify(PROTOCOL_VM_ABI[consensusProtocolVersion][txType]) : ' None for this protocol ' + consensusProtocolVersion}`,
-    VALIDATORS.vmAndAbiVersion,
-    ERRORS.vmAndAbiVersion
   )
 ]
