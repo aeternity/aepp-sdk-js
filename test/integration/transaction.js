@@ -16,16 +16,13 @@
  */
 
 import { describe, it, before } from 'mocha'
-import { expect } from 'chai'
-import { configure } from './'
 import { encodeBase58Check, encodeBase64Check, generateKeyPair, salt } from '../../es/utils/crypto'
-import { ready } from './index'
+import { ready, configure } from './index'
+import { commitmentHash } from '../../es/tx/builder/helpers'
 
 const nonce = 1
-const ttl = 500
 const nameTtl = 1
 const clientTtl = 1
-const fee = 20000
 const amount = 1
 const senderId = 'ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688'
 const recipientId = 'ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688'
@@ -35,14 +32,14 @@ const nameId = 'nm_2sFnPHi5ziAqhdApSpRBsYdomCahtmk3YGNZKYUTtUNpVSMccC'
 const pointers = [{ key: 'account_pubkey', id: senderId }]
 
 // Oracle
-const queryFormat = "{'city': str}"
-const responseFormat = "{'tmp': num}"
+const queryFormat = '{\'city\': str}'
+const responseFormat = '{\'tmp\': num}'
 const queryFee = 30000
-const oracleTtl = {type: 'delta', value: 500}
-const responseTtl = {type: 'delta', value: 10}
-const queryTtl = {type: 'delta', value: 10}
-const query = "{'city': 'Berlin'}"
-const queryResponse = "{'tmp': 101}"
+const oracleTtl = { type: 'delta', value: 500 }
+const responseTtl = { type: 'delta', value: 10 }
+const queryTtl = { type: 'delta', value: 10 }
+const query = '{\'city\': \'Berlin\'}'
+const queryResponse = '{\'tmp\': 101}'
 
 // Contract test data
 const contractCode = `
@@ -50,15 +47,13 @@ contract Identity =
   type state = ()
   function main(x : int) = x
 `
-let bytecode
 let contractId
-const vmVersion = 1
 const deposit = 4
-const gasPrice =  1
-const gas =  1600000 - 21000 // MAX GAS
+const gasPrice = 1000000000
+const gas = 1600000 - 21000 // MAX GAS
 
-let _salt;
-let commitmentId;
+let _salt
+let commitmentId
 
 describe('Native Transaction', function () {
   configure(this)
@@ -70,25 +65,25 @@ describe('Native Transaction', function () {
 
   before(async () => {
     const keyPair = generateKeyPair()
-    client = await ready(this)
-    clientNative = await ready(this, true)
-    await client.spend(100000000, keyPair.publicKey)
+    client = await ready(this, false)
+    clientNative = await ready(this)
+    await client.spend('16774200000000000000', keyPair.publicKey)
     client.setKeypair(keyPair)
     clientNative.setKeypair(keyPair)
     oracleId = `ok_${(await client.address()).slice(3)}`
     _salt = salt()
-    commitmentId = await client.commitmentHash(name, _salt)
+    commitmentId = await commitmentHash(name, _salt)
   })
 
   it('native build of spend tx', async () => {
-    const txFromAPI = await client.spendTx({ senderId, recipientId, amount, fee, ttl, nonce, payload: 'test' })
-    const nativeTx = await clientNative.spendTx({ senderId, recipientId, amount, fee, ttl, nonce, payload: 'test' })
+    const txFromAPI = await client.spendTx({ senderId, recipientId, amount, nonce, payload: 'test' })
+    const nativeTx = await clientNative.spendTx({ senderId, recipientId, amount, nonce, payload: 'test' })
     txFromAPI.should.be.equal(nativeTx)
   })
 
   it('native build of name pre-claim tx', async () => {
-    const txFromAPI = await client.namePreclaimTx({ accountId: senderId, nonce, fee, ttl, commitmentId })
-    const nativeTx = await clientNative.namePreclaimTx( {accountId: senderId, nonce, fee, ttl, commitmentId })
+    const txFromAPI = await client.namePreclaimTx({ accountId: senderId, nonce, commitmentId })
+    const nativeTx = await clientNative.namePreclaimTx({ accountId: senderId, nonce, commitmentId })
     txFromAPI.should.be.equal(nativeTx)
   })
 
@@ -97,64 +92,81 @@ describe('Native Transaction', function () {
       accountId: senderId,
       nonce,
       name: nameHash,
-      nameSalt: _salt,
-      fee,
-      ttl
+      nameSalt: _salt
     })
     const nativeTx = await clientNative.nameClaimTx({
       accountId: senderId,
       nonce,
       name: nameHash,
-      nameSalt: _salt,
-      fee,
-      ttl
+      nameSalt: _salt
     })
     txFromAPI.should.be.equal(nativeTx)
   })
 
   it('native build of update tx', async () => {
-    const nativeTx = await clientNative.nameUpdateTx({ accountId: senderId, nonce, nameId, nameTtl, pointers, clientTtl, fee, ttl })
-    const txFromAPI = await client.nameUpdateTx({ accountId: senderId, nonce, nameId, nameTtl, pointers, clientTtl, fee, ttl })
+    const nativeTx = await clientNative.nameUpdateTx({
+      accountId: senderId,
+      nonce,
+      nameId,
+      nameTtl,
+      pointers,
+      clientTtl
+    })
+    const txFromAPI = await client.nameUpdateTx({ accountId: senderId, nonce, nameId, nameTtl, pointers, clientTtl })
     txFromAPI.should.be.equal(nativeTx)
   })
 
   it('native build of revoke tx', async () => {
-    const txFromAPI = await client.nameRevokeTx({ accountId: senderId, nonce, nameId, fee, ttl })
-    const nativeTx = await clientNative.nameRevokeTx({ accountId: senderId, nonce, nameId, fee, ttl })
+    const txFromAPI = await client.nameRevokeTx({ accountId: senderId, nonce, nameId })
+    const nativeTx = await clientNative.nameRevokeTx({ accountId: senderId, nonce, nameId })
     txFromAPI.should.be.equal(nativeTx)
   })
 
   it('native build of transfer tx', async () => {
-    const txFromAPI = await client.nameTransferTx({ accountId: senderId, nonce, nameId, recipientId, fee, ttl })
-    const nativeTx = await clientNative.nameTransferTx({ accountId: senderId, nonce, nameId, recipientId, fee, ttl })
+    const txFromAPI = await client.nameTransferTx({ accountId: senderId, nonce, nameId, recipientId })
+    const nativeTx = await clientNative.nameTransferTx({ accountId: senderId, nonce, nameId, recipientId })
     txFromAPI.should.be.equal(nativeTx)
   })
 
   it('native build of contract create tx', async () => {
     const { bytecode } = await client.contractCompile(contractCode)
-    const callData = await client.contractEncodeCall(bytecode, 'sophia', 'init', '()')
+    const callData = await client.contractEncodeCall(contractCode, 'init')
     const owner = await client.address()
 
-    const txFromAPI = await client.contractCreateTx({ ownerId: owner, code: bytecode, vmVersion, deposit, amount, gas, gasPrice, ttl, callData  })
-    const nativeTx = await clientNative.contractCreateTx({ ownerId: owner, code: bytecode, vmVersion, deposit, amount, gas, gasPrice, ttl, callData })
+    const txFromAPI = await client.contractCreateTx({
+      ownerId: owner,
+      code: bytecode,
+      deposit,
+      amount,
+      gas,
+      gasPrice,
+      callData
+    })
+    const nativeTx = await clientNative.contractCreateTx({
+      ownerId: owner,
+      code: bytecode,
+      deposit,
+      amount,
+      gas,
+      gasPrice,
+      callData
+    })
 
     txFromAPI.tx.should.be.equal(nativeTx.tx)
     txFromAPI.contractId.should.be.equal(nativeTx.contractId)
-
     // deploy contract
     await client.send(nativeTx.tx)
     contractId = txFromAPI.contractId
   })
 
   it('native build of contract call tx', async () => {
-    const { bytecode } = await client.contractCompile(contractCode)
-    const callData = await client.contractEncodeCall(bytecode, 'sophia', 'main', '(2)')
+    const callData = await client.contractEncodeCall(contractCode, 'main', ['2'])
     const owner = await client.address()
 
-    const txFromAPI = await client.contractCallTx({ callerId: owner, contractId, vmVersion, amount, gas, gasPrice, ttl, callData })
-    const nativeTx = await clientNative.contractCallTx({ callerId: owner, contractId, vmVersion, amount, gas, gasPrice, ttl, callData })
-
+    const txFromAPI = await client.contractCallTx({ callerId: owner, contractId, amount, gas, gasPrice, callData })
+    const nativeTx = await clientNative.contractCallTx({ callerId: owner, contractId, amount, gas, gasPrice, callData })
     txFromAPI.should.be.equal(nativeTx)
+
     const { hash } = await client.send(nativeTx)
     const result = await client.getTxInfo(hash)
 
@@ -168,15 +180,14 @@ describe('Native Transaction', function () {
       queryFormat,
       responseFormat,
       queryFee,
-      oracleTtl,
-      ttl,
+      oracleTtl
     }
 
     const txFromAPI = await client.oracleRegisterTx(params)
     const nativeTx = await clientNative.oracleRegisterTx(params)
 
     txFromAPI.should.be.equal(nativeTx)
-    await client.send(nativeTx)
+    await clientNative.send(nativeTx, { verify: true })
 
     const oId = (await client.getOracle(oracleId)).id
     oId.should.be.equal(oracleId)
@@ -184,7 +195,7 @@ describe('Native Transaction', function () {
 
   it('native build of oracle extends tx', async () => {
     const callerId = await client.address()
-    const params = { oracleId, callerId, oracleTtl, ttl }
+    const params = { oracleId, callerId, oracleTtl }
     const orTtl = (await client.getOracle(oracleId)).ttl
 
     const txFromAPI = await client.oracleExtendTx(params)
@@ -200,7 +211,7 @@ describe('Native Transaction', function () {
   it('native build of oracle post query tx', async () => {
     const senderId = await client.address()
 
-    const params = { oracleId, responseTtl, query, queryTtl, queryFee, ttl, senderId, fee }
+    const params = { oracleId, responseTtl, query, queryTtl, queryFee, senderId }
 
     const { tx: txFromAPI, queryId: oracleQueryId } = await client.oraclePostQueryTx(params)
     const { tx: nativeTx } = await clientNative.oraclePostQueryTx(params)
@@ -216,7 +227,7 @@ describe('Native Transaction', function () {
 
   it('native build of oracle respond query tx', async () => {
     const callerId = await client.address()
-    const params = { oracleId, callerId, responseTtl, queryId, response: queryResponse, ttl, fee}
+    const params = { oracleId, callerId, responseTtl, queryId, response: queryResponse }
 
     const txFromAPI = await client.oracleRespondTx(params)
     const nativeTx = await clientNative.oracleRespondTx(params)

@@ -31,12 +31,14 @@ async function sign (data) {
   return Promise.resolve(Crypto.sign(data, secrets.get(this).secretKey))
 }
 
-async function address () {
-  return Promise.resolve(secrets.get(this).publicKey)
+async function address (format = Crypto.ADDRESS_FORMAT.api) {
+  return Promise.resolve(Crypto.formatAddress(format, secrets.get(this).publicKey))
 }
 
 /**
  * Select specific account
+ * @alias module:@aeternity/aepp-sdk/es/account/memory
+ * @function
  * @instance
  * @rtype (keypair: {publicKey: String, secretKey: String}) => Void
  * @param {Object} keypair - Key pair to use

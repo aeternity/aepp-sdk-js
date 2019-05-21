@@ -15,19 +15,20 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+import Node from '../../es/node'
+import { configure, url, internalUrl } from './'
+
 import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
-import { configure, url, internalUrl } from './'
-import Epoch from '../../es/epoch'
 import * as R from 'ramda'
 
-describe('Epoch client', function () {
+describe('Node client', function () {
   configure(this)
 
   let client
 
   before(async function () {
-    client = await Epoch({ url, internalUrl })
+    client = await Node({ url, internalUrl })
   })
 
   it('determines remote version', () => {

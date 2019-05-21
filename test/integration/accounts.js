@@ -16,9 +16,8 @@
  */
 
 import { describe, it, before } from 'mocha'
-import { configure, ready, BaseAe } from './'
+import { configure, ready, BaseAe, networkId } from './'
 import { generateKeyPair } from '../../es/utils/crypto'
-import { networkId } from './index'
 import { BigNumber } from 'bignumber.js'
 
 describe('Accounts', function () {
@@ -47,10 +46,26 @@ describe('Accounts', function () {
     it('spending tokens', async () => {
       return wallet.spend(1, receiver).should.be.rejectedWith(Error)
     })
+
+    it('spending minus amount of tokens', async () => {
+      try {
+        await wallet.spend(-1, receiver)
+      } catch (e) {
+        e.message.should.be.equal('Transaction build error. {"amount":"-1 must be >= 0"}')
+      }
+    })
   })
 
   it('determines the balance', async () => {
     return wallet.balance(await wallet.address()).should.eventually.be.a('string')
+  })
+
+  it('Spend 50% of balance', async () => {
+    const balance = await wallet.balance(await wallet.address())
+
+    await wallet.transferFunds(0.5, 'ak_DMNCzsVoZnpV5fe8FTQnNsTfQ48YM5C3WbHPsJyHjAuTXebFi')
+    const balanceAfter = await wallet.balance(await wallet.address())
+    BigNumber(balance).div(balanceAfter).toNumber().should.be.equal(2)
   })
 
   it('spends tokens', async () => {
@@ -62,18 +77,32 @@ describe('Accounts', function () {
   })
 
   it('spends big amount of tokens', async () => {
-    const bigAmount = '2702702702700000000123'
+    const bigAmount = '10000000000000100000000000000000'
     const genesis = await BaseAe({ networkId })
-    const balanceBefore = await wallet.balance(await wallet.address())
+    const balanceBefore = await wallet.balance(await wallet.address(), { format: false })
     const receiverId = await wallet.address()
     const ret = await genesis.spend(bigAmount, receiverId)
 
-    const balanceAfter = await wallet.balance(await wallet.address())
+    const balanceAfter = await wallet.balance(await wallet.address(), { format: false })
     balanceAfter.should.be.equal(BigNumber(bigAmount).plus(balanceBefore).toString(10))
     ret.should.have.property('tx')
     ret.tx.should.include({
       amount: bigAmount, recipientId: receiverId
     })
+  })
+
+  it('Get Account by block height/hash', async () => {
+    const h = await wallet.height()
+    await wallet.awaitHeight(h + 3)
+    const spend = await wallet.spend(123, 'ak_DMNCzsVoZnpV5fe8FTQnNsTfQ48YM5C3WbHPsJyHjAuTXebFi')
+    await wallet.awaitHeight(spend.blockHeight + 2)
+    const accountAfterSpend = await wallet.getAccount(await wallet.address())
+    const accountBeforeSpendByHash = await wallet.getAccount(await wallet.address(), { height: spend.blockHeight - 1 })
+    BigNumber(accountBeforeSpendByHash.balance)
+      .minus(BigNumber(accountAfterSpend.balance))
+      .toString()
+      .should.be
+      .equal(`${spend.tx.fee + spend.tx.amount}`)
   })
 
   describe('can be configured to return th', () => {

@@ -28,11 +28,14 @@
 
 import * as R from 'ramda'
 import { encodeBase58Check, salt } from '../utils/crypto'
+import { commitmentHash } from '../tx/builder/helpers'
 import Ae from './'
 
 /**
  * Transfer a domain to another account
  * @instance
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @category async
  * @param {String} nameId
  * @param {String} account
@@ -54,6 +57,8 @@ async function transfer (nameId, account, options = {}) {
 /**
  * Revoke a domain
  * @instance
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @category async
  * @param {String} nameId
  * @param {Object} [options={}]
@@ -97,6 +102,9 @@ function classify (s) {
 
 /**
  * Update an aens entry
+ * @instance
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param nameId domain hash
  * @param target new target
  * @param options
@@ -115,29 +123,40 @@ async function update (nameId, target, options = {}) {
 
 /**
  * Query the status of an AENS registration
+ * @instance
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param {string} name
  * @return {Promise<Object>}
  */
 async function query (name) {
-  const o = await this.api.getNameEntryByName(name)
+  const o = await this.getName(name)
   const nameId = o.id
 
   return Object.freeze(Object.assign(o, {
     pointers: o.pointers || {},
     update: async (target, options) => {
-      await this.aensUpdate(nameId, target, options)
-      return this.aensQuery(name)
+      return {
+        ...(await this.aensUpdate(nameId, target, options)),
+        ...(await this.aensQuery(name))
+      }
     },
     transfer: async (account, options) => {
-      await this.aensTransfer(nameId, account, options)
-      return this.aensQuery(name)
-    }
+      return {
+        ...(await this.aensTransfer(nameId, account, options)),
+        ...(await this.aensQuery(name))
+      }
+    },
+    revoke: async (options) => this.aensRevoke(nameId, options)
   }))
 }
 
 /**
  * Claim a previously preclaimed registration. This can only be done after the
  * preclaim step
+ * @instance
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param {String} name
  * @param {String} salt
  * @param {Number} waitForHeight
@@ -154,12 +173,19 @@ async function claim (name, salt, waitForHeight, options = {}) {
     name: `nm_${encodeBase58Check(Buffer.from(name))}`
   }))
 
-  await this.send(claimTx, opt)
-  return this.aensQuery(name)
+  const result = await this.send(claimTx, opt)
+
+  return {
+    ...result,
+    ...(await this.aensQuery(name))
+  }
 }
 
 /**
  * Preclaim a name. Sends a hash of the name and a random salt to the node
+ * @instance
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param {string} name
  * @param {Record} [options={}]
  * @return {Promise<Object>}
@@ -168,16 +194,17 @@ async function preclaim (name, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   const _salt = salt()
   const height = await this.height()
-  const hash = await this.commitmentHash(name, _salt)
+  const hash = await commitmentHash(name, _salt)
 
   const preclaimTx = await this.namePreclaimTx(R.merge(opt, {
     accountId: await this.address(),
     commitmentId: hash
   }))
 
-  await this.send(preclaimTx, opt)
+  const result = await this.send(preclaimTx, opt)
 
   return Object.freeze({
+    ...result,
     height,
     claim: options => this.aensClaim(name, _salt, (height + 1), options),
     salt: _salt,

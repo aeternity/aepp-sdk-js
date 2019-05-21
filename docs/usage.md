@@ -28,10 +28,10 @@ In order to cater to more specific needs, it is recommended to refer to the
 When initialising a client, to test, you can choose from 2 URLs:
 
 ### 1. **Testnet** (https://sdk-testnet.aepps.com)
-You can use this URL with any releasee on [npmjs](https://www.npmjs.com/package/@aeternity/aepp-sdk). It offers the last stable version of [Epoch](https://github.com/aeternity/epoch), used by all of of Aeternity's Dev Tools.
+You can use this URL with any releasee on [npmjs](https://www.npmjs.com/package/@aeternity/aepp-sdk). It offers the last stable version of [Node](https://github.com/aeternity/aeternity), used by all of of Aeternity's Dev Tools.
 
 ### 2. **Edgenet** (https://sdk-edgened.aepps.com)
-You can use this URL with releases tagged as `alpha`, `beta` or `next` on [npmjs](https://www.npmjs.com/package/@aeternity/aepp-sdk). It offers the latest stable version of [Epoch](https://github.com/aeternity/epoch), which all of of Aeternity's Dev Tools are going to use in the near future.
+You can use this URL with releases tagged as `alpha`, `beta` or `next` on [npmjs](https://www.npmjs.com/package/@aeternity/aepp-sdk). It offers the latest stable version of [Node](https://github.com/aeternity/aeternity), which all of of Aeternity's Dev Tools are going to use in the near future.
 
 ## ES Modules (enable Tree-Shaking)
 
@@ -47,10 +47,12 @@ which translates the subset of ES used by aepp-sdk will have to be used**, such 
 
 1. **Dev Dependencies**: Make sure to do not forget to double check the `devDependencies` of the `package.json` of this SDK, looking for `@babel`/packages that might be helping you to correctly transpile the SDK code `import`ed into your project, as modules.
 
-2. **ES Modules Transpilation**: Include all the need babel package and additional plugins to the `.babelrc` (or `babel.config.js`) of your project, as explained above.
+2. **ES Modules Transpilation**: Include all the babel packages and plugins needed to transpile _your_ code to the `.babelrc` (or `babel.config.js`) of your project.
 
-3. **Bundlers Setup**: Do not forget to allow your bundler (eg. **_webpack_**) to scan the needed files that needs transpilation. This is, for example, what needs to be added, in case you're using babel+webpack:
+3. **Bundlers Setup**: Do not forget to **allow your bundler (eg. _webpack_) to scan the SDK files** that needs transpilation. This will allow your bundler to transpile the SDK `import`ed modules correctly.
 
+
+##### Webpack Example:
 ```js
  // ... webpack config
  entry: {
@@ -142,7 +144,7 @@ code, such as the ones provided in the `bin/` directory of the project.
 ```js
 const {Universal: Ae} = require('@aeternity/aepp-sdk')
 
-Ae({ url: 'https://sdk-testnet.aepps.com', internalUrl: 'https://sdk-testnet.aepps.com' }).then(ae => {
+Ae({ url: 'https://sdk-testnet.aepps.com', internalUrl: 'https://sdk-testnet.aepps.com', compilerUrl: 'COMPILER_URL', keypair: 'YOUR_KEYPAIR_OBJECT' }).then(ae => {
   ae.height().then(height => {
     console.log('Current Block', height)
   })
@@ -150,7 +152,7 @@ Ae({ url: 'https://sdk-testnet.aepps.com', internalUrl: 'https://sdk-testnet.aep
 
 // same with async
 const main = async () => {
-  const client = await Ae({url: 'https://sdk-testnet.aepps.com', internalUrl: 'https://sdk-testnet.aepps.com'})
+  const client = await Ae({url: 'https://sdk-testnet.aepps.com', internalUrl: 'https://sdk-testnet.aepps.com', compilerUrl: 'COMPILER_URL', keypair: 'YOUR_KEYPAIR_OBJECT'})
   const height = await client.height()
   console.log('Current Block', height)
 }
@@ -217,11 +219,34 @@ understand the node's operations. Most real-world requirements involves a series
 of chain operations, so the SDK provides abstractions for these. The Javscript
 Promises framework makes this somewhat easy:
 
-Example spend function, using the SDK, talking directly to the API (**purist**):
+### High-level SDK usage, recommended
+Example spend function, using aeternity's SDK abstraction
+```js
+  // Import necessary Modules by simply importing the Wallet module
+  import Wallet from '@aeternity/aepp-sdk/es/ae/wallet' // import from SDK es-modules
+
+  Wallet({
+    url: 'HOST_URL_HERE',
+    internalUrl: 'HOST_URL_HERE',
+    compilerUrl: 'COMPILER_URL_HERE',
+    accounts: [MemoryAccount({keypair: {secretKey: 'PRIV_KEY_HERE', publicKey: 'PUB_KEY_HERE'}, networkId: 'NETWORK_ID_HERE'})],
+    address: 'PUB_KEY_HERE',
+    onTx: confirm, // guard returning boolean
+    onChain: confirm, // guard returning boolean
+    onAccount: confirm, // guard returning boolean
+    onContract: confirm, // guard returning boolean
+    networkId: 'ae_uat' // or any other networkId your client should connect to
+  }).then(ae => ae.spend(parseInt(amount), receiver_pub_key))
+```
+
+
+
+### Low-level SDK usage (use API endpoints directly)
+Example spend function, using the SDK, talking directly to the API:
 ```js
   // Import necessary Modules
   import Tx from '@aeternity/aepp-sdk/es/tx/tx.js'
-  import Chain from '@aeternity/aepp-sdk/es/chain/epoch.js'
+  import Chain from '@aeternity/aepp-sdk/es/chain/node.js'
   import Account from '@aeternity/aepp-sdk/es/account/memory.js'
 
   async function spend (amount, receiver_pub_key) {
@@ -236,21 +261,3 @@ Example spend function, using the SDK, talking directly to the API (**purist**):
 
   }
 ```
-
-The same code, using the SDK abstraction (**high-level**):
-```js
-  // Import necessary Modules by simply importing the Wallet module
-  import Wallet from '@aeternity/aepp-sdk/es/ae/wallet' // import from SDK es-modules
-
-  Wallet({
-    url: 'HOST_URL_HERE',
-    internalUrl: 'HOST_URL_HERE',
-    accounts: [MemoryAccount({keypair: {secretKey: 'PRIV_KEY_HERE', publicKey: 'PUB_KEY_HERE'}, networkId: 'NETWORK_ID_HERE'})],
-    address: 'PUB_KEY_HERE',
-    onTx: confirm, // guard returning boolean
-    onChain: confirm, // guard returning boolean
-    onAccount: confirm, // guard returning boolean
-    onContract: confirm // guard returning boolean
-  }).then(ae => ae.spend(parseInt(amount), receiver_pub_key))
-```
-

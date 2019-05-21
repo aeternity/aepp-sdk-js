@@ -20,6 +20,8 @@ import { describe, it } from 'mocha'
 import { assert, expect } from 'chai'
 import * as Crypto from '../../es/utils/crypto'
 
+import { addressToHex, encodeBase58Check } from '../../es/utils/crypto'
+
 // These keys are fixations for the encryption lifecycle tests and will
 // not be used for signing
 const privateKeyAsHex = '4d881dd1917036cc231f9881a0db978c8899dd76a817252418606b02bf6ab9d22378f892b7cc82c2d2739e994ec9953aa36461f1eb5a4a49a5b0de17b3d23ae8'
@@ -133,5 +135,11 @@ describe('crypto', () => {
     salt1.should.be.a('Number')
     salt2.should.be.a('Number')
     salt1.should.not.be.equal(salt2)
+  })
+  it('Convert base58Check address to hex', () => {
+    const address = 'ak_Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm'
+    const hex = addressToHex(address)
+    const fromHexAddress = 'ak_' + encodeBase58Check(Buffer.from(hex.slice(2), 'hex'))
+    fromHexAddress.should.be.equal(address)
   })
 })

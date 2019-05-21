@@ -32,6 +32,9 @@ import { decodeBase64Check } from '../utils/crypto'
 
 /**
  * Constructor for Oracle Object (helper object for using Oracle)
+ * @alias module:@aeternity/aepp-sdk/es/ae/oracle
+ * @instance
+ * @function
  * @category async
  * @param {String} oracleId Oracle public key
  * @return {Promise<Object>} Oracle object
@@ -53,6 +56,9 @@ async function getOracleObject (oracleId) {
 
 /**
  * Constructor for OracleQuery Object (helper object for using OracleQuery)
+ * @alias module:@aeternity/aepp-sdk/es/ae/oracle
+ * @instance
+ * @function
  * @category async
  * @param {String} oracleId Oracle public key
  * @param {String} queryId Oracle Query id
@@ -62,16 +68,17 @@ async function getQueryObject (oracleId, queryId) {
   return {
     ...(await this.getOracleQuery(oracleId, queryId)),
     respond: (response, options) => this.respondToQuery(oracleId, queryId, response, options),
-    pollForResponse: ({attempts, interval}) => this.pollForQueryResponse(oracleId, queryId, {attempts, interval}),
+    pollForResponse: ({ attempts, interval }) => this.pollForQueryResponse(oracleId, queryId, { attempts, interval }),
     decode: (data) => decodeBase64Check(data.slice(3))
   }
 }
 
 /**
  * Poll for oracle query response
+ * @alias module:@aeternity/aepp-sdk/es/ae/oracle
  * @instance
+ * @function
  * @category async
- * * @category async
  * @param {String} oracleId Oracle public key
  * @param {String} queryId Oracle Query id
  * @param {Object} [options] Options object
@@ -100,7 +107,9 @@ export async function pollForQueryResponse (oracleId, queryId, { attempts = 20, 
 
 /**
  * Register oracle
+ * @alias module:@aeternity/aepp-sdk/es/ae/oracle
  * @instance
+ * @function
  * @category async
  * @param {String} queryFormat Format of query
  * @param {String} responseFormat Format of query response
@@ -113,7 +122,7 @@ export async function pollForQueryResponse (oracleId, queryId, { attempts = 20, 
  * @return {Promise<Object>} Oracle object
  */
 async function registerOracle (queryFormat, responseFormat, options = {}) {
-  const opt = R.merge(R.merge(this.Ae.defaults, { vmVersion: this.Ae.defaults.oracleVmVersion }), options) // Preset VmVersion for oracle
+  const opt = R.merge(this.Ae.defaults, options) // Preset VmVersion for oracle
   const accountId = await this.address()
 
   const oracleRegisterTx = await this.oracleRegisterTx(R.merge(opt, {
@@ -121,13 +130,17 @@ async function registerOracle (queryFormat, responseFormat, options = {}) {
     queryFormat,
     responseFormat
   }))
-  await this.send(oracleRegisterTx, opt)
-  return getOracleObject.bind(this)(`ok_${accountId.slice(3)}`)
+  return {
+    ...(await this.send(oracleRegisterTx, opt)),
+    ...(await getOracleObject.bind(this)(`ok_${accountId.slice(3)}`))
+  }
 }
 
 /**
  * Post query to oracle
+ * @alias module:@aeternity/aepp-sdk/es/ae/oracle
  * @instance
+ * @function
  * @category async
  * @param {String} oracleId Oracle public key
  * @param {String} query Oracle query object
@@ -148,13 +161,17 @@ async function postQueryToOracle (oracleId, query, options = {}) {
     senderId,
     query
   }))
-  await this.send(oracleRegisterTx, opt)
-  return (await getOracleObject.bind(this)(oracleId)).getQuery(queryId)
+  return {
+    ...(await this.send(oracleRegisterTx, opt)),
+    ...(await (await getOracleObject.bind(this)(oracleId)).getQuery(queryId))
+  }
 }
 
 /**
  * Extend oracle ttl
+ * @alias module:@aeternity/aepp-sdk/es/ae/oracle
  * @instance
+ * @function
  * @category async
  * @param {String} oracleId Oracle public key
  * @param {String} oracleTtl Oracle time to leave for extend
@@ -172,13 +189,17 @@ async function extendOracleTtl (oracleId, oracleTtl, options = {}) {
     callerId,
     oracleTtl
   }))
-  await this.send(oracleExtendTx, opt)
-  return getOracleObject.bind(this)(oracleId)
+  return {
+    ...(await this.send(oracleExtendTx, opt)),
+    ...(await getOracleObject.bind(this)(oracleId))
+  }
 }
 
 /**
  * Extend oracle ttl
+ * @alias module:@aeternity/aepp-sdk/es/ae/oracle
  * @instance
+ * @function
  * @category async
  * @param {String} oracleId Oracle public key
  * @param {String} queryId Oracle query id
@@ -199,8 +220,10 @@ async function respondToQuery (oracleId, queryId, response, options = {}) {
     callerId,
     response
   }))
-  await this.send(oracleRespondTx, opt)
-  return getOracleObject.bind(this)(oracleId)
+  return {
+    ...(await this.send(oracleRespondTx, opt)),
+    ...(await getOracleObject.bind(this)(oracleId))
+  }
 }
 
 /**
@@ -225,11 +248,10 @@ const Oracle = Ae.compose({
     getQueryObject
   },
   deepProps: { Ae: { defaults: {
-    oracleVmVersion: 0,
     queryFee: 30000,
-    oracleTtl: {type: 'delta', value: 500},
-    queryTtl: {type: 'delta', value: 10},
-    responseTtl: {type: 'delta', value: 10}
+    oracleTtl: { type: 'delta', value: 500 },
+    queryTtl: { type: 'delta', value: 10 },
+    responseTtl: { type: 'delta', value: 10 }
   } } }
 })
 

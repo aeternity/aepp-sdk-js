@@ -22,23 +22,95 @@
  */
 
 import bs58check from 'bs58check'
-import RLP from 'rlp'
+import * as RLP from 'rlp'
 import { blake2b } from 'blakejs'
 import nacl from 'tweetnacl'
 import aesjs from 'aes-js'
-import { leftPad, rightPad } from './bytes'
+import { leftPad, rightPad, toBytes } from './bytes'
 import shajs from 'sha.js'
+import { decode as decodeNode } from '../tx/builder/helpers'
 
 const Ecb = aesjs.ModeOfOperation.ecb
+
+/**
+ * Check whether a string is valid base-64.
+ * @param {string} str String to validate.
+ * @return {boolean} True if the string is valid base-64, false otherwise.
+ */
+export function isBase64 (str) {
+  let index
+  // eslint-disable-next-line no-useless-escape
+  if (str.length % 4 > 0 || str.match(/[^0-9a-z+\/=]/i)) return false
+  index = str.indexOf('=')
+  return !!(index === -1 || str.slice(index).match(/={1,2}/))
+}
+
+export const ADDRESS_FORMAT = {
+  sophia: 1,
+  api: 2,
+  raw: 3
+}
+
+/**
+ * Format account address
+ * @rtype (format: String, address: String) => tx: Promise[String]
+ * @param {String} format - Format type
+ * @param {String} address - Base58check account address
+ * @return {String} Formatted address
+ */
+export function formatAddress (format = ADDRESS_FORMAT.api, address) {
+  switch (format) {
+    case ADDRESS_FORMAT.api:
+      return address
+    case ADDRESS_FORMAT.sophia:
+      return `0x${decodeNode(address, 'ak').toString('hex')}`
+  }
+}
+
+/**
+ * Check if address is valid
+ * @rtype (input: String) => valid: Boolean
+ * @param {String} address - Address
+ * @return {Boolean} valid
+ */
+export function isAddressValid (address) {
+  let isValid
+  try {
+    isValid = decodeBase58Check(assertedType(address, 'ak')).length === 32
+  } catch (e) {
+    isValid = false
+  }
+  return isValid
+}
+
+/**
+ * Convert base58Check address to hex string
+ * @rtype (base58CheckAddress: String) => hexAddress: String
+ * @param {String} base58CheckAddress - Address
+ * @return {String} Hex string
+ */
+export function addressToHex (base58CheckAddress) {
+  return `0x${decodeBase58Check(assertedType(base58CheckAddress, 'ak')).toString('hex')}`
+}
+
+/**
+ * Parse decimal address and return base58Check encoded address with prefix 'ak'
+ * @rtype (input: String) => address: String
+ * @param {String} decimalAddress - Address
+ * @return {String} address
+ */
+export function addressFromDecimal (decimalAddress) {
+  return aeEncodeKey(toBytes(decimalAddress, true))
+}
 
 /**
  * Calculate 256bits Blake2b hash of `input`
  * @rtype (input: String) => hash: String
  * @param {String} input - Data to hash
- * @return {String} Hash
+ * @return {Buffer} Hash
  */
 export function hash (input) {
-  return blake2b(input, null, 32) // 256 bits
+  return Buffer.from(blake2b(input, null, 32)) // 256 bits
 }
 
 /**
@@ -46,7 +118,7 @@ export function hash (input) {
  * as defined in https://github.com/aeternity/protocol/blob/master/AENS.md#hashing
  * @rtype (input: String) => hash: String
  * @param {String} input - Data to hash
- * @return {String} Hash
+ * @return {Buffer} Hash
  */
 export function nameId (input) {
   let buf = Buffer.allocUnsafe(32).fill(0)
@@ -81,10 +153,10 @@ export function salt () {
 }
 
 /**
- * Base64 encode given `input`
+ * Base64check encode given `input`
  * @rtype (input: String|buffer) => Buffer
  * @param {String} input - Data to encode
- * @return {Buffer} Base64 encoded data
+ * @return {Buffer} Base64check encoded data
  */
 export function encodeBase64Check (input) {
   const buffer = Buffer.from(input)
@@ -108,10 +180,10 @@ function decodeRaw (buffer) {
 }
 
 /**
- * Base64 decode given `str`
+ * Base64check decode given `str`
  * @rtype (str: String) => Buffer
  * @param {String} str - Data to decode
- * @return {Buffer} Base64 decoded data
+ * @return {Buffer} Base64check decoded data
  */
 export function decodeBase64Check (str) {
   const buffer = Buffer.from(str, 'base64')
@@ -122,12 +194,12 @@ export function decodeBase64Check (str) {
 
 /**
  * Base58 encode given `input`
- * @rtype (input: String) => Buffer
+ * @rtype (input: String) => String
  * @param {String} input - Data to encode
- * @return {Buffer} Base58 encoded data
+ * @return {String} Base58 encoded data
  */
 export function encodeBase58Check (input) {
-  return bs58check.encode(input)
+  return bs58check.encode(Buffer.from(input))
 }
 
 /**
@@ -159,6 +231,32 @@ export function hexStringToByte (str) {
   return new Uint8Array(a)
 }
 
+/**
+ * Converts a positive integer to the smallest possible
+ * representation in a binary digit representation
+ * @rtype (value: Number) => Buffer
+ * @param {Number} value - Value to encode
+ * @return {Buffer} - Encoded data
+ */
+export function encodeUnsigned (value) {
+  const binary = Buffer.allocUnsafe(4)
+  binary.writeUInt32BE(value)
+  return binary.slice(binary.findIndex(i => i !== 0))
+}
+
+/**
+ * Compute contract address
+ * @rtype (owner: String, nonce: Number) => String
+ * @param {String} owner - Address of contract owner
+ * @param {Number} nonce - Round when contract was created
+ * @return {String} - Contract address
+ */
+export function encodeContractAddress (owner, nonce) {
+  const publicKey = decodeBase58Check(assertedType(owner, 'ak'))
+  const binary = Buffer.concat([publicKey, encodeUnsigned(nonce)])
+  return `ct_${encodeBase58Check(hash(binary))}`
+}
+
 // KEY-PAIR HELPERS
 
 /**
@@ -178,7 +276,7 @@ export function generateKeyPairFromSecret (secret) {
  * @return {Object} Key pair
  */
 export function generateKeyPair (raw = false) {
-  // <epoch>/apps/aens/test/aens_test_utils.erl
+  // <node>/apps/aens/test/aens_test_utils.erl
   const keyPair = nacl.sign.keyPair()
 
   const publicBuffer = Buffer.from(keyPair.publicKey)
@@ -252,11 +350,11 @@ export function decryptKey (password, encrypted) {
  * Generate signature
  * @rtype (data: String|Buffer, privateKey: Buffer) => Buffer
  * @param {String|Buffer} data - Data to sign
- * @param {Buffer} privateKey - Key to sign with
+ * @param {String|Buffer} privateKey - Key to sign with
  * @return {Buffer} Signature
  */
 export function sign (data, privateKey) {
-  return nacl.sign.detached(new Uint8Array(data), privateKey)
+  return nacl.sign.detached(Buffer.from(data), Buffer.from(privateKey))
 }
 
 /**
@@ -432,16 +530,41 @@ export function envKeypair (env) {
  * @return {Array} Array of Buffers containing the original message
  */
 export const decode = RLP.decode
+export const encode = RLP.encode
+export const rlp = RLP
 
 const OBJECT_TAGS = {
   SIGNED_TX: 11,
   CHANNEL_CREATE_TX: 50,
   CHANNEL_CLOSE_MUTUAL_TX: 53,
-  CHANNEL_OFFCHAIN_TX: 57
+  CHANNEL_OFFCHAIN_TX: 57,
+  CHANNEL_OFFCHAIN_UPDATE_TRANSFER: 570
+}
+
+function objectTag (tag, pretty) {
+  if (pretty) {
+    const entry = Object.entries(OBJECT_TAGS).find(([key, value]) => tag === value)
+    return entry ? entry[0] : tag
+  }
+  return tag
 }
 
 function readInt (buf) {
   return buf.readIntBE(0, buf.length)
+}
+
+function readId (buf) {
+  const type = buf.readUIntBE(0, 1)
+  const prefix = {
+    1: 'ak',
+    2: 'nm',
+    3: 'cm',
+    4: 'ok',
+    5: 'ct',
+    6: 'ch'
+  }[type]
+  const hash = encodeBase58Check(buf.slice(1, buf.length))
+  return `${prefix}_${hash}`
 }
 
 function readSignatures (buf) {
@@ -454,16 +577,30 @@ function readSignatures (buf) {
   return signatures
 }
 
-function readOffChainTXUpdates (buf) {
+function deserializeOffChainUpdate (binary, opts) {
+  const tag = readInt(binary[0])
+  const obj = {
+    tag: objectTag(tag, opts.prettyTags),
+    version: readInt(binary[1])
+  }
+
+  switch (tag) {
+    case OBJECT_TAGS.CHANNEL_OFFCHAIN_UPDATE_TRANSFER:
+      return Object.assign(obj, {
+        from: readId(binary[2]),
+        to: readId(binary[3]),
+        amount: readInt(binary[4])
+      })
+  }
+
+  return obj
+}
+
+function readOffChainTXUpdates (buf, opts) {
   const updates = []
 
   for (let i = 0; i < buf.length; i++) {
-    updates.push([
-      readInt(buf[i][0]),
-      'ak_' + encodeBase58Check(buf[i][1]),
-      'ak_' + encodeBase58Check(buf[i][2]),
-      readInt(buf[i][3])
-    ])
+    updates.push(deserializeOffChainUpdate(decode(buf[i]), opts))
   }
 
   return updates
@@ -473,37 +610,38 @@ function readOffChainTXUpdates (buf) {
  * Deserialize `binary` state channel transaction
  * @rtype (binary: String) => Object
  * @param {String} binary - Data to deserialize
+ * @param {Object} opts - Options
  * @return {Object} Channel data
  */
-export function deserialize (binary) {
+export function deserialize (binary, opts = { prettyTags: false }) {
+  const tag = readInt(binary[0])
   const obj = {
-    tag: readInt(binary[0]),
+    tag: objectTag(tag, opts.prettyTags),
     version: readInt(binary[1])
   }
 
-  switch (obj.tag) {
+  switch (tag) {
     case OBJECT_TAGS.SIGNED_TX:
       return Object.assign(obj, {
         signatures: readSignatures(binary[2]),
-        tx: deserialize(decode(binary[3]))
+        tx: deserialize(decode(binary[3]), opts)
       })
 
     case OBJECT_TAGS.CHANNEL_CREATE_TX:
       return Object.assign(obj, {
-        initiator: 'ak_' + encodeBase58Check(binary[2]),
+        initiator: readId(binary[2]),
         initiatorAmount: readInt(binary[3]),
-        responder: 'ak_' + encodeBase58Check(binary[4]),
+        responder: readId(binary[4]),
         responderAmount: readInt(binary[5]),
         channelReserve: readInt(binary[6]),
         lockPeriod: readInt(binary[7]),
         ttl: readInt(binary[8]),
-        fee: readInt(binary[9]),
-        nonce: readInt(binary[10])
+        fee: readInt(binary[9])
       })
 
     case OBJECT_TAGS.CHANNEL_CLOSE_MUTUAL_TX:
       return Object.assign(obj, {
-        channelId: encodeBase58Check(binary[2]),
+        channelId: readId(binary[2]),
         initiatorAmount: readInt(binary[3]),
         responderAmount: readInt(binary[4]),
         ttl: readInt(binary[5]),
@@ -513,9 +651,9 @@ export function deserialize (binary) {
 
     case OBJECT_TAGS.CHANNEL_OFFCHAIN_TX:
       return Object.assign(obj, {
-        channelId: encodeBase58Check(binary[2]),
+        channelId: readId(binary[2]),
         round: readInt(binary[3]),
-        updates: readOffChainTXUpdates(binary[4]),
+        updates: readOffChainTXUpdates(binary[4], opts),
         state: encodeBase58Check(binary[5])
       })
   }

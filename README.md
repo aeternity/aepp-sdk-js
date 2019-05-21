@@ -1,20 +1,20 @@
 # aepp-sdk
 
+[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 [![Build Status](https://ci.aepps.com/buildStatus/icon?job=aepp-sdk-js/develop)](https://ci.aepps.com/job/aepp-sdk-js/job/develop/)
 [![npm](https://img.shields.io/npm/v/@aeternity/aepp-sdk.svg)](https://www.npmjs.com/package/@aeternity/aepp-sdk)
 [![npm](https://img.shields.io/npm/l/@aeternity/aepp-sdk.svg)](https://www.npmjs.com/package/@aeternity/aepp-sdk)
 
 JavaScript SDK for the revolutionary [æternity] blockchain, targeting the
-[Epoch] implementation.
+[æternity node] implementation.
 
 aepp-sdk is [hosted on GitHub].
 
 ![Concept Drawing of aepp-sdk][concept]
 
 [concept]: concept.png "Concept Drawing of aepp-sdk"
-
 [æternity]: https://aeternity.com/
-[Epoch]: https://github.com/aeternity/epoch
+[æternity node]: https://github.com/aeternity/aeternity
 [hosted on GitHub]: https://github.com/aeternity/aepp-sdk-js
 
 #### Disclaimer
@@ -38,7 +38,7 @@ npm i @aeternity/aepp-sdk
 yarn add @aeternity/aepp-sdk
 ```
 
-**Note:** To install a _Pre-Release_ (latest `beta` or `alpha` version) using on the latest Epoch version, you have to install the package appending the `@next` tag reference.
+**Note:** To install a _Pre-Release_ (latest `beta` or `alpha` version) using on the latest Node version, you have to install the package appending the `@next` tag reference.
 ```bash
 pnpm i @aeternity/aepp-sdk@next
 npm i @aeternity/aepp-sdk@next
@@ -49,28 +49,73 @@ yarn add @aeternity/aepp-sdk@next
 > adding `#` and a branch name at the end, for example
 > `pnpm i aeternity/aepp-sdk#develop`.
 
-2. Import the right flavor
+2. Import the right flavor. For this example with get the `Universal` flavor, which contains all the features of the SDK:
 
 ```js
-import Aepp from '@aeternity/aepp-sdk/es/ae/aepp'
+import Ae from '@aeternity/aepp-sdk/es/ae/universal' // or any other flavor
 ```
 
-3. Create an instance
+3. Create an instance and interact with it
 
 ```js
-const ae = Aepp()
+
+// Start the instance
+
+Ae({
+  url: 'https://sdk-testnet.aepps.com',
+  internalUrl: 'https://sdk-testnet.aepps.com',
+  keypair: { secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS' },
+  networkId: 'aet_ua' // or any other networkId your client should connect to
+}).then(ae => {
+
+  // Interacting with the blockchain client
+
+  // getting the latest block height
+  ae.height().then(height => {
+    // logs current height
+    console.log('height', height)
+  }).catch(e => {
+    // logs error
+    console.log(e)
+  })
+
+  // getting the balance of a public address
+  ae.balance('A_PUB_ADDRESS').then(balance => {
+    // logs current balance of "A_PUB_ADDRESS"
+    console.log('balance', balance)
+  }).catch(e => {
+    // logs error
+    console.log(e)
+  })
+})
 ```
 
-4. Start interacting with the blockchain
-
-```js
-ae.then(ae => ae.height()).then(h => console.log(h))
-```
-
-5. **IMPORTANT:** 🤓 Check out the [Usage Documentation] to avoid common pitfalls!
+4. **IMPORTANT:** 🤓 Check out the [Usage Documentation] to avoid common pitfalls!
 
 [Usage Documentation]: docs/usage.md
 
+
+> Remember: you can also "compose" your own flavor by mixing 2 or more flavors likes so:
+
+```js
+import Wallet from '@aeternity/aepp-sdk/es/ae/wallet.js'
+import Contract from '@aeternity/aepp-sdk/es/ae/contract.js'
+import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory.js'
+
+// make a "mixed flavor" containing Wallet and Contracts flavors
+Wallet.compose(Contract)({
+            url: 'https://sdk-testnet.aepps.com',
+            internalUrl: 'https://sdk-testnet.aepps.com',
+            accounts: [MemoryAccount({keypair: {secretKey: account.priv, publicKey: account.pub}})],
+            address: account.pub,
+            onTx: true, // or a function to Guard the Rpc client
+            onChain: true, // or a function to Guard the Rpc client
+            onAccount: true, // or a function to Guard the Rpc client
+            networkId: 'ae_uat'
+          }).then(ae => {
+            // ae is your initialised client now! :)
+            // ...
+```
 ## [Hacking]
 
 For advanced use, development versions and to get a deeper understanding of the

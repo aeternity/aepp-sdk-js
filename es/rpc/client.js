@@ -45,6 +45,10 @@ function post (method) {
  */
 const RpcClient = stampit(AsyncInit, {
   async init ({ parent = window.parent, self = window }, { stamp }) {
+    if (parent === self) {
+      throw new Error('rpc client: Can\'t send messages to itself')
+    }
+
     let sequence = 0
     const callbacks = {}
 
@@ -76,10 +80,17 @@ const RpcClient = stampit(AsyncInit, {
       return ret
     }
 
-    self.addEventListener('message', receive, false)
+    const handler = receive
+    self.addEventListener('message', handler, false)
+    this.destroyClient = () =>
+      self.removeEventListener('message', handler, false)
 
     this.session = await this.post('hello')
   },
+  props: {
+    handler: null
+  },
+  methods: {},
   composers ({ stamp, composables }) {
     // Combine Ae and Contract methods
     const methods = [
@@ -87,6 +98,10 @@ const RpcClient = stampit(AsyncInit, {
       ...(R.path(['compose', 'deepConfiguration', 'Contract', 'methods'], stamp) || [])
     ]
     const rpcMethods = R.fromPairs(methods.map(m => [m, post(m)]))
+    if (stamp.compose.methods) {
+      // remove signTransaction and getNetworkId from AEPP instance, let's go it through RPC
+      ['signTransaction', 'getNetworkId'].forEach(m => delete stamp.compose.methods[m])
+    }
     stamp.compose.methods = Object.assign(rpcMethods, stamp.compose.methods)
   }
 })

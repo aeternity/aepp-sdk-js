@@ -22,7 +22,7 @@
  * @example import Chain from '@aeternity/aepp-sdk/es/chain'
  */
 
-import stampit from '@stamp/it'
+import Oracle from '../oracle'
 import { required } from '@stamp/required'
 
 /**
@@ -36,14 +36,14 @@ import { required } from '@stamp/required'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Chain instance
  */
-const Chain = stampit({
+const Chain = Oracle.compose({
   deepProps: { Chain: { defaults: { waitMined: true } } },
   statics: { waitMined (bool) { return this.deepProps({ Chain: { defaults: { waitMined: bool } } }) } },
   deepConf: {
     Ae: {
       methods: [
         'sendTransaction', 'height', 'awaitHeight', 'poll', 'balance', 'tx',
-        'mempool', 'topBlock', 'getTxInfo'
+        'mempool', 'topBlock', 'getTxInfo', 'txDryRun', 'getName', 'getNodeInfo'
       ]
     }
   }
@@ -57,7 +57,8 @@ const Chain = stampit({
     balance: required,
     tx: required,
     getTxInfo: required,
-    mempool: required
+    mempool: required,
+    txDryRun: required
   }
 }))
 
@@ -76,10 +77,11 @@ const Chain = stampit({
  * @instance
  * @abstract
  * @category async
- * @rtype (tx: String, options?: Object) => tx: Promise[String]|txHash: Promise[String]
+ * @rtype (tx: String, options?: Object) => tx: Promise[Object]|txHash: Promise[String]
  * @param {String} tx - Transaction to submit
  * @param {String} [options={}] - Options to pass to the implementation
- * @return {String|String} Transaction or transaction hash
+ * @param {String} [options.verify = false] - Verify transaction before broadcast.
+ * @return {Object|String} Transaction or transaction hash
  */
 
 /**
@@ -111,11 +113,11 @@ const Chain = stampit({
  * @instance
  * @abstract
  * @category async
- * @rtype (th: String, options?: Object) => tx: String
+ * @rtype (th: String, options?: Object) => tx: Object
  * @param {Object} [options={}] - Options
  * @param {Number} options.interval - Interval (in ms) at which to poll the chain
  * @param {Number} options.blocks - Number of blocks mined after which to fail
- * @return {String} The transaction as it was mined
+ * @return {Object} The transaction as it was mined
  */
 
 /**
@@ -128,8 +130,8 @@ const Chain = stampit({
  * @param {String} address - The public account address to obtain the balance for
  * @param {Object} [options={}] - Options
  * @param {Number} options.height - The chain height at which to obtain the balance for (default: top of chain)
- * @param {String} options.hash - TODO
- * @return {String} The transaction as it was mined
+ * @param {String} options.hash - The block hash on which to obtain the balance for (default: top of chain)
+ * @return {Object} The transaction as it was mined
  */
 
 /**
@@ -138,9 +140,10 @@ const Chain = stampit({
  * @instance
  * @abstract
  * @category async
- * @rtype (hash: String) => tx: String
+ * @rtype (hash: String, info = false) => tx: Object
  * @param {String} hash - Transaction hash
- * @return {String} Transaction
+ * @param {Boolean} info - Retrieve additional transaction date. Works only for (ContractCreate and ContractCall transaction's)
+ * @return {Object} Transaction
  */
 
 /**
@@ -149,9 +152,9 @@ const Chain = stampit({
  * @instance
  * @abstract
  * @category async
- * @rtype (hash: String) => tx: String
+ * @rtype (hash: String) => tx: Object
  * @param {String} hash - Transaction hash
- * @return {String} Transaction
+ * @return {Object} Transaction
  */
 
 /**
@@ -160,8 +163,96 @@ const Chain = stampit({
  * @instance
  * @abstract
  * @category async
- * @rtype () => txs: [...String]
- * @return {String[]} Transactions
+ * @rtype () => txs: [...Object]
+ * @return {Object[]} Transactions
+ */
+
+/**
+ * Obtain current generation
+ * @function getCurrentGeneration
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype () => generation: Object
+ * @return {Object} Current Generation
+ */
+
+/**
+ * Get generation by hash or height
+ * @function getGeneration
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype (hashOrHeight) => generation: Object
+ * @param {String|Number} hashOrHeight - Generation hash or height
+ * @return {Object} Generation
+ */
+
+/**
+ * Get micro block transactions
+ * @function getMicroBlockTransactions
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype (hash) => txs: [...Object]
+ * @return {Object[]} Transactions
+ */
+
+/**
+ * Get key block
+ * @function getKeyBlock
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype (hashOrHeight) => keyBlock: Object
+ * @return {Object} Key Block
+ */
+
+/**
+ * Get micro block header
+ * @function getMicroBlockHeader
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype (hash) => header: Object
+ * @return {Object} Micro block header
+ */
+
+/**
+ * Get account by account public key
+ * @function getAccount
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype (address, { hash, height }) => account: Object
+ * @param {String} address - Account public key
+ * @param {Object} [options={}] - Options
+ * @param {Number} [options.height] - Get account on specific block by block height
+ * @param {String} [options.hash] - Get account on specific block by block hash
+ * @return {Object} Account
+ */
+
+/**
+ * Transaction dry-run
+ * @function txDryRun
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype (txs, accounts, hashOrHeight) => result: Object
+ * @param {Array} txs - Array of transaction's
+ * @param {Array} accounts - Array of account's
+ * @param {String|Number} hashOrHeight - hash or height of block on which to make dry-run
+ * @return {Object} Result
+ */
+
+/**
+ * Get Node Info
+ * @function getInfo
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype () => result: Object
+ * @return {Object} Result
  */
 
 export default Chain

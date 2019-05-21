@@ -1,8 +1,14 @@
 import nacl from 'tweetnacl'
-import * as argon2 from 'argon2'
 import uuid from 'uuid'
 
-import { encodeBase58Check } from './crypto'
+import { encodeBase58Check, isBase64 } from './crypto'
+
+/**
+ * KeyStore module
+ * !!!Work only in node.js!!!
+ * @module @aeternity/aepp-sdk/es/utils/keystore
+ * @example import * as Crypto from '@aeternity/aepp-sdk/es/utils/keystore'
+ */
 
 const DEFAULTS = {
   crypto: {
@@ -22,9 +28,31 @@ const DERIVED_KEY_FUNCTIONS = {
   'argon2id': deriveKeyUsingArgon2id
 }
 
-async function deriveKeyUsingArgon2id (password, salt, options) {
-  const { memlimit_kib: memoryCost, parallelism ,  opslimit: timeCost } = options.kdf_params
-  return argon2.hash(password, { timeCost, memoryCost, parallelism, type: argon2.argon2id, raw: true, salt })
+export async function deriveKeyUsingArgon2id (password, salt, options) {
+  const { memlimit_kib: memoryCost, parallelism, opslimit: timeCost } = options.kdf_params
+  const isBrowser = !(typeof module !== 'undefined' && module.exports)
+
+  if (isBrowser) {
+    const _sodium = require('libsodium-wrappers-sumo')
+
+    return _sodium.ready.then(async () => {
+      // tslint:disable-next-line:typedef
+      const sodium = _sodium
+
+      const result = sodium.crypto_pwhash(
+        32,
+        password,
+        salt,
+        timeCost,
+        memoryCost * 1024,
+        sodium.crypto_pwhash_ALG_ARGON2ID13
+      )
+      return Buffer.from(result)
+    })
+  } else {
+    const argon2 = require('argon2')
+    return argon2.hash(password, { timeCost, memoryCost, parallelism, type: argon2.argon2id, raw: true, salt })
+  }
 }
 
 // CRYPTO PART
@@ -49,18 +77,6 @@ function decryptXsalsa20Poly1305 ({ ciphertext, key, nonce }) {
  */
 function isHex (str) {
   return !!(str.length % 2 === 0 && str.match(/^[0-9a-f]+$/i))
-}
-
-/**
- * Check whether a string is valid base-64.
- * @param {string} str String to validate.
- * @return {boolean} True if the string is valid base-64, false otherwise.
- */
-function isBase64 (str) {
-  let index
-  if (str.length % 4 > 0 || str.match(/[^0-9a-z+\/=]/i)) return false
-  index = str.indexOf('=')
-  return !!(index === -1 || str.slice(index).match(/={1,2}/))
 }
 
 /**
@@ -113,14 +129,17 @@ function decrypt (ciphertext, key, nonce, algo) {
  * @param {Object=} options.kdf_params KDF parameters (default: DEFAULTS.crypto.kdf_params).
  * @return {buffer} Secret key derived from password.
  */
-async function deriveKey (password, nonce, options = { kdf_params: DEFAULTS.crypto.kdf_params, kdf: DEFAULTS.crypto.kdf }) {
+async function deriveKey (password, nonce, options = {
+  kdf_params: DEFAULTS.crypto.kdf_params,
+  kdf: DEFAULTS.crypto.kdf
+}) {
   if (typeof password === 'undefined' || password === null || !nonce) {
     throw new Error('Must provide password and nonce to derive a key')
   }
 
   if (!DERIVED_KEY_FUNCTIONS.hasOwnProperty(options.kdf)) throw new Error('Unsupported kdf type')
 
-  return await DERIVED_KEY_FUNCTIONS[options.kdf](password, nonce, options)
+  return DERIVED_KEY_FUNCTIONS[options.kdf](password, nonce, options)
 }
 
 /**
@@ -140,14 +159,15 @@ function marshal (name, derivedKey, privateKey, nonce, salt, options = {}) {
   const opt = Object.assign({}, DEFAULTS.crypto, options)
   return Object.assign(
     { name, version: 1, public_key: getAddressFromPriv(privateKey), id: uuid.v4() },
-    { crypto: Object.assign(
-      {
-        secret_type: opt.secret_type,
-        symmetric_alg: opt.symmetric_alg,
-        ciphertext: Buffer.from(encrypt(Buffer.from(privateKey), derivedKey, nonce, opt.symmetric_alg)).toString('hex'),
-        cipher_params: { nonce: Buffer.from(nonce).toString('hex') }
-      },
-      { kdf: opt.kdf, kdf_params: { ...opt.kdf_params, salt: Buffer.from(salt).toString('hex') }}
+    {
+      crypto: Object.assign(
+        {
+          secret_type: opt.secret_type,
+          symmetric_alg: opt.symmetric_alg,
+          ciphertext: Buffer.from(encrypt(Buffer.from(privateKey), derivedKey, nonce, opt.symmetric_alg)).toString('hex'),
+          cipher_params: { nonce: Buffer.from(nonce).toString('hex') }
+        },
+        { kdf: opt.kdf, kdf_params: { ...opt.kdf_params, salt: Buffer.from(salt).toString('hex') } }
       )
     }
   )
@@ -161,20 +181,20 @@ export function getAddressFromPriv (secret) {
 
 /**
  * Recover plaintext private key from secret-storage key object.
- * @param {string} password Keystore object password.
+ * @param {String} password Keystore object password.
  * @param {Object} keyObject Keystore object.
- * @return {buffer} Plaintext private key.
+ * @return {Buffer} Plaintext private key.
  */
 export async function recover (password, keyObject) {
   validateKeyObj(keyObject)
   const nonce = Uint8Array.from(str2buf(keyObject.crypto.cipher_params.nonce))
   const salt = Uint8Array.from(str2buf(keyObject.crypto.kdf_params.salt))
-  const kdf_params = keyObject.crypto.kdf_params
+  const kdfParams = keyObject.crypto.kdf_params
   const kdf = keyObject.crypto.kdf
 
   const key = await decrypt(
     Uint8Array.from(str2buf(keyObject.crypto.ciphertext)),
-    await deriveKey(password, salt, { kdf, kdf_params }),
+    await deriveKey(password, salt, { kdf, kdf_params: kdfParams }),
     nonce,
     keyObject.crypto.symmetric_alg
   )
@@ -184,14 +204,14 @@ export async function recover (password, keyObject) {
 
 /**
  * Export private key to keystore secret-storage format.
- * @param {string|buffer} name Key name.
- * @param {string|buffer} password User-supplied password.
- * @param {string|buffer} privateKey Private key.
- * @param {buffer|Uint8Array} nonce Randomly generated 24byte nonce.
- * @param {buffer|Uint8Array} salt Randomly generated 16byte salt.
+ * @param {String} name Key name.
+ * @param {String} password User-supplied password.
+ * @param {String} privateKey Private key.
+ * @param {Buffer} nonce Randomly generated 24byte nonce.
+ * @param {Buffer} salt Randomly generated 16byte salt.
  * @param {Object=} options Encryption parameters.
- * @param {string=} options.kdf Key derivation function (default: pbkdf2).
- * @param {string=} options.cipher Symmetric cipher (default: constants.cipher).
+ * @param {String=} options.kdf Key derivation function (default: pbkdf2).
+ * @param {String=} options.cipher Symmetric cipher (default: constants.cipher).
  * @param {Object=} options.kdfparams KDF parameters (default: constants.<kdf>).
  * @return {Object}
  */
@@ -209,16 +229,13 @@ export async function dump (name, password, privateKey, nonce = nacl.randomBytes
 
 export function validateKeyObj (obj) {
   const root = ['crypto', 'id', 'version', 'public_key']
-  const crypto_keys = ['cipher_params', 'ciphertext', 'symmetric_alg', 'kdf', 'kdf_params']
+  const cryptoKeys = ['cipher_params', 'ciphertext', 'symmetric_alg', 'kdf', 'kdf_params']
 
   const missingRootKeys = root.filter(key => !obj.hasOwnProperty(key))
   if (missingRootKeys.length) throw new Error(`Invalid key file format. Require properties: ${missingRootKeys}`)
 
-  const missingCryptoKeys = crypto_keys.filter(key => !obj['crypto'].hasOwnProperty(key))
+  const missingCryptoKeys = cryptoKeys.filter(key => !obj['crypto'].hasOwnProperty(key))
   if (missingCryptoKeys.length) throw new Error(`Invalid key file format. Require properties: ${missingCryptoKeys}`)
 
   return true
 }
-
-
-

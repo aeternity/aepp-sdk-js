@@ -20,70 +20,191 @@
  *
  * High level documentation of the contracts are available at
  * https://github.com/aeternity/protocol/tree/master/contracts and
- * example code which uses this API at
- * https://github.com/aeternity/aepp-sdk-js/blob/develop/bin/aecontract.js
  *
  * @module @aeternity/aepp-sdk/es/ae/contract
  * @export Contract
- * @example import Contract from '@aeternity/aepp-sdk/es/ae/contract'
+ * @example import Contract from '@aeternity/aepp-sdk/es/ae/contract' (Using tree-shaking)
+ * @example import { Contract } from '@aeternity/aepp-sdk' (Using bundle)
  */
 
 import Ae from './'
 import * as R from 'ramda'
+import { isBase64 } from '../utils/crypto'
+import ContractCompilerAPI from '../contract/compiler'
+import ContractACI from '../contract/aci'
+import ContractBase from '../contract'
 
-async function encodeCall (code, abi, name, args, call) {
-  return this.contractEpochEncodeCallData(code, abi, name, args, call)
-}
-
-async function callStatic (code, abi, name, { args = '()', call } = {}) {
-  const { out } = await this.contractEpochCall(code, abi, name, args, call)
-  return {
-    result: out,
-    decode: (type) => this.contractDecodeData(type, out)
+/**
+ * Handle contract call error
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/contract
+ * @category async
+ * @param {Object} result call result object
+ * @throws Error Decoded error
+ * @return {Promise<void>}
+ */
+async function handleCallError (result) {
+  const error = Buffer.from(result.returnValue).toString()
+  if (isBase64(error.slice(3))) {
+    const decodedError = Buffer.from(error.slice(3), 'base64').toString()
+    throw Object.assign(Error(`Invocation failed: ${error}. Decoded: ${decodedError}`), R.merge(result, { error, decodedError }))
   }
+
+  const decodedError = await this.contractDecodeData('string', error)
+  throw Object.assign(Error(`Invocation failed: ${error}. Decoded: ${decodedError}`), R.merge(result, { error, decodedError }))
 }
 
-async function decode (type, data) {
-  return this.contractEpochDecodeData(type, data)
+/**
+ * Encode call data for contract call
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/contract
+ * @category async
+ * @param {String} source Contract source code
+ * @param {String} name Name of function to call
+ * @param {Array} args Argument's for call
+ * @return {Promise<String>}
+ */
+async function contractEncodeCall (source, name, args) {
+  return this.contractEncodeCallDataAPI(source, name, args)
 }
 
-async function call (code, abi, address, name, { args = '()', options = {}, call } = {}) {
+/**
+ * Decode contract call result data
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/contract
+ * @category async
+ * @param {String} type Data type (int, string, list,...)
+ * @param {String} data call result data (cb_iwer89fjsdf2j93fjews_(ssdffsdfsdf...)
+ * @return {Promise<String>} Result object
+ * @example
+ * const decodedData = await client.contractDecodeData('string' ,'cb_sf;ls43fsdfsdf...')
+ */
+async function contractDecodeData (type, data) {
+  return this.contractDecodeDataAPI(type, data)
+}
+
+/**
+ * Static contract call(using dry-run)
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/contract
+ * @category async
+ * @param {String} source Contract source code
+ * @param {String} address Contract address
+ * @param {String} name Name of function to call
+ * @param {Array} args  Argument's for call function
+ * @param {Object} options [options={}]  Options
+ * @param {String} top [options.top] Block hash on which you want to call contract
+ * @param {String} options [options.options]  Transaction options (fee, ttl, gas, amount, deposit)
+ * @return {Promise<Object>} Result object
+ * @example
+ * const callResult = await client.contractCallStatic(source, address, fnName, args = [], { top, options = {} })
+ * {
+ *   result: TX_DATA,
+ *   decode: (type) => Decode call result
+ * }
+ */
+async function contractCallStatic (source, address, name, args = [], { top, options = {} } = {}) {
   const opt = R.merge(this.Ae.defaults, options)
 
-  // Check for MAX_GAS
-  if (opt.gas > this.Ae.defaults.gas) {
-    opt.gas = this.Ae.defaults.gas
+  // Prepare `call` transaction
+  const tx = await this.contractCallTx(R.merge(opt, {
+    callerId: await this.address(),
+    contractId: address,
+    callData: await this.contractEncodeCall(source, name, args)
+  }))
+
+  // Get block hash by height
+  if (top && !isNaN(top)) {
+    top = (await this.getKeyBlock(top)).hash
   }
+
+  // Dry-run
+  const [{ result: status, callObj, reason }] = (await this.txDryRun([tx], [{
+    amount: opt.amount,
+    pubKey: await this.address()
+  }], top)).results
+
+  // check response
+  if (status !== 'ok') throw new Error('Dry run error, ' + reason)
+  const { returnType, returnValue } = callObj
+  if (returnType !== 'ok') {
+    await this.handleCallError(callObj)
+  }
+  return {
+    result: callObj,
+    decode: (type) => this.contractDecodeData(type, returnValue)
+  }
+}
+
+/**
+ * Call contract function
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/contract
+ * @category async
+ * @param {String} source Contract source code
+ * @param {String} address Contract address
+ * @param {String} name Name of function to call
+ * @param {Array} args Argument's for call function
+ * @param {Object} options Transaction options (fee, ttl, gas, amount, deposit)
+ * @return {Promise<Object>} Result object
+ * @example
+ * const callResult = await client.contractCall(source, address, fnName, args = [], options)
+ * {
+ *   hash: TX_HASH,
+ *   result: TX_DATA,
+ *   decode: (type) => Decode call result
+ * }
+ */
+async function contractCall (source, address, name, args = [], options = {}) {
+  const opt = R.merge(this.Ae.defaults, options)
 
   const tx = await this.contractCallTx(R.merge(opt, {
     callerId: await this.address(),
     contractId: address,
-    callData: await this.contractEncodeCall(code, abi, name, args, call)
+    callData: await this.contractEncodeCall(source, name, args)
   }))
 
-  const { hash } = await this.send(tx, opt)
+  const { hash, rawTx } = await this.send(tx, opt)
   const result = await this.getTxInfo(hash)
 
   if (result.returnType === 'ok') {
     return {
+      hash,
+      rawTx,
       result,
       decode: (type) => this.contractDecodeData(type, result.returnValue)
     }
   } else {
-    const error = Buffer.from(result.returnValue.slice(2)).toString()
-    throw Object.assign(Error(`Invocation failed: ${error}`), R.merge(result, { error }))
+    await this.handleCallError(result)
   }
 }
 
-async function deploy (code, abi, { initState = '()', options = {} } = {}) {
+/**
+ * Deploy contract to the node
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/contract
+ * @category async
+ * @param {String} code Compiled contract
+ * @param {String} source Contract source code
+ * @param {Array} initState Arguments of contract constructor(init) function
+ * @param {Object} options Transaction options (fee, ttl, gas, amount, deposit)
+ * @return {Promise<Object>} Result object
+ * @example
+ * const deployed = await client.contractDeploy(bytecode, source, init = [], options)
+ * {
+ *   owner: OWNER_PUB_KEY,
+ *   transaction: TX_HASH,
+ *   address: CONTRACT_ADDRESS,
+ *   createdAt: Date,
+ *   result: DEPLOY_TX_DATA,
+ *   call: (fnName, args = [], options) => Call contract function,
+ *   callStatic: (fnName, args = [], options) => Static all contract function
+ * }
+ */
+async function contractDeploy (code, source, initState = [], options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const callData = await this.contractEncodeCall(code, abi, 'init', initState)
+  const callData = await this.contractEncodeCall(source, 'init', initState)
   const ownerId = await this.address()
-
-  // // Check for MAX_GAS
-  // if (opt.gas > this.Ae.defaults.gas) {
-  //   opt.gas = this.Ae.defaults.gas
-  // }
 
   const { tx, contractId } = await this.contractCreateTx(R.merge(opt, {
     callData,
@@ -91,44 +212,101 @@ async function deploy (code, abi, { initState = '()', options = {} } = {}) {
     ownerId
   }))
 
-  const { hash } = await this.send(tx, opt)
-  return Object.freeze({
-    owner: ownerId,
-    transaction: hash,
-    address: contractId,
-    call: async (name, options) => this.contractCall(code, abi, contractId, name, options),
-    callStatic: async (name, options) => this.contractCallStatic(contractId, 'sophia-address', name, options),
-    createdAt: new Date()
-  })
+  const { hash, rawTx } = await this.send(tx, opt)
+  const result = await this.getTxInfo(hash)
+
+  if (result.returnType === 'ok') {
+    return Object.freeze({
+      result,
+      owner: ownerId,
+      transaction: hash,
+      rawTx,
+      address: contractId,
+      call: async (name, args = [], options) => this.contractCall(source, contractId, name, args, options),
+      callStatic: async (name, args = [], options) => this.contractCallStatic(source, contractId, name, args, options),
+      createdAt: new Date()
+    })
+  } else {
+    await this.handleCallError(result)
+  }
 }
 
-async function compile (code, options = {}) {
-  const o = await this.compileEpochContract(code, options)
-
+/**
+ * Compile contract source code
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/contract
+ * @category async
+ * @param {String} source Contract sourece code
+ * @param {Object} options Transaction options (fee, ttl, gas, amount, deposit)
+ * @return {Promise<Object>} Result object
+ * @example
+ * const compiled = await client.contractCompile(SOURCE_CODE)
+ * {
+ *   bytecode: CONTRACT_BYTE_CODE,
+ *   deploy: (init = [], options = {}) => Deploy Contract,
+ *   encodeCall: (fnName, args = []) => Prepare callData
+ * }
+ */
+async function contractCompile (source, options = {}) {
+  const bytecode = await this.compileContractAPI(source, options)
   return Object.freeze(Object.assign({
-    encodeCall: async (name, args, { call, abi }) => this.contractEncodeCall(o.bytecode, R.defaultTo('sophia', abi), name, args, call),
-    // call: async (name, options = {}) => this.contractCallStatic(o.bytecode, R.defaultTo('sophia', options.abi), name, options),
-    deploy: async (options = {}) => this.contractDeploy(o.bytecode, R.defaultTo('sophia', options.abi), options)
-  }, o))
+    encodeCall: async (name, args) => this.contractEncodeCall(source, name, args),
+    deploy: async (init, options = {}) => this.contractDeploy(bytecode, source, init, options)
+  }, { bytecode }))
 }
 
-const Contract = Ae.compose({
+/**
+ * Contract Stamp
+ *
+ * Provide contract implementation
+ * {@link module:@aeternity/aepp-sdk/es/ae--Ae} clients.
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/contract
+ * @rtype Stamp
+ * @param {Object} [options={}] - Initializer object
+ * @return {Object} Contract instance
+ * @example
+ * import Transaction from '@aeternity/aepp-sdk/es/tx/tx
+ * import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory
+ * import ChainNode from '@aeternity/aepp-sdk/es/chain/node
+ * import ContractCompilerAPI from '@aeternity/aepp-sdk/es/contract/compiler
+ * // or using bundle
+ * import {
+ *   Transaction,
+ *   MemoryAccount,
+ *   ChainNode,
+ *   ContractCompilerAPI
+ * } from '@aeternity/aepp-sdk
+ *
+ * const ContractWithAE = await Contract
+ *    .compose(Transaction, MemoryAccount, ChainNode) // AE implementation
+ *    .compose(ContractCompilerAPI) // ContractBase implementation
+ * const client = await ContractWithAe({ url, internalUrl, compilerUrl, keypair, ... })
+ *
+ */
+export const Contract = Ae.compose(ContractBase, ContractACI, {
   methods: {
-    contractCompile: compile,
-    contractCallStatic: callStatic,
-    contractDeploy: deploy,
-    contractCall: call,
-    contractEncodeCall: encodeCall,
-    contractDecodeData: decode
+    contractCompile,
+    contractCallStatic,
+    contractDeploy,
+    contractCall,
+    contractEncodeCall,
+    contractDecodeData,
+    handleCallError
   },
-  deepProps: { Ae: { defaults: {
-    deposit: 4,
-    vmVersion: 1,
-    gasPrice: 1,
-    amount: 1,
-    gas: 1600000 - 21000, // MAX GAS
-    options: ''
-  } } }
+  deepProps: {
+    Ae: {
+      defaults: {
+        deposit: 0,
+        gasPrice: 1000000000, // min gasPrice 1e9
+        amount: 0,
+        gas: 1600000 - 21000,
+        options: ''
+      }
+    }
+  }
 })
 
-export default Contract
+export const ContractWithCompiler = Contract.compose(ContractCompilerAPI)
+
+export default ContractWithCompiler

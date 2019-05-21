@@ -24,7 +24,7 @@ function randomName () {
   return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString(36) + '.test'
 }
 
-plan(1000000000)
+plan('10000000000000000')
 
 describe('Aens', function () {
   configure(this)
@@ -35,6 +35,7 @@ describe('Aens', function () {
 
   before(async function () {
     aens = await ready(this)
+    await aens.spend('1000000000000000', account.publicKey)
   })
 
   describe('fails on', () => {
@@ -73,16 +74,28 @@ describe('Aens', function () {
     })
   })
 
-  // TODO re-enable after release; no idea why it doesn't work
-  it.skip('transfers names', async () => {
+  it('transfers names', async () => {
     const claim = await aens.aensQuery(name)
-    const address = await aens.address()
-    await claim.transfer(address)
+
+    await claim.transfer(account.publicKey)
+
     const aens2 = await BaseAe()
     aens2.setKeypair(account)
     const claim2 = await aens2.aensQuery(name)
-    return claim2.update(address).should.eventually.deep.include({
-      pointers: [R.fromPairs([['key', 'account_pubkey'], ['id', address]])]
+
+    return claim2.update(account.publicKey).should.eventually.deep.include({
+      pointers: [R.fromPairs([['key', 'account_pubkey'], ['id', account.publicKey]])]
     })
+  })
+
+  it('revoke names', async () => {
+    const aens2 = await BaseAe()
+    aens2.setKeypair(account)
+
+    const aensName = await aens2.aensQuery(name)
+
+    await aensName.revoke()
+
+    return aens2.aensQuery(name).should.be.rejectedWith(Error)
   })
 })

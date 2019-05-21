@@ -25,6 +25,10 @@
 import stampit from '@stamp/it'
 import { required } from '@stamp/required'
 import * as Crypto from '../utils/crypto'
+import { buildTx } from '../tx/builder'
+import { TX_TYPE } from '../tx/builder/schema'
+
+const DEFAULT_NETWORK_ID = `ae_mainnet`
 
 /**
  * Sign encoded transaction
@@ -35,12 +39,24 @@ import * as Crypto from '../utils/crypto'
  * @return {String} Signed transaction
  */
 async function signTransaction (tx) {
-  const binaryTx = Crypto.decodeBase64Check(Crypto.assertedType(tx, 'tx'))
+  const networkId = this.getNetworkId()
+  const rlpBinaryTx = Crypto.decodeBase64Check(Crypto.assertedType(tx, 'tx'))
   // Prepend `NETWORK_ID` to begin of data binary
-  const txWithNetworkId = Buffer.concat([Buffer.from(this.networkId), binaryTx])
+  const txWithNetworkId = Buffer.concat([Buffer.from(networkId), rlpBinaryTx])
 
-  const sig = await this.sign(txWithNetworkId)
-  return Crypto.encodeTx(Crypto.prepareTx(sig, binaryTx))
+  const signatures = [await this.sign(txWithNetworkId)]
+  return buildTx({ encodedTx: rlpBinaryTx, signatures }, TX_TYPE.signed).tx
+}
+
+/**
+ * Obtain networkId for signing
+ * @instance
+ * @category async
+ * @rtype () => networkId: String
+ * @return {String} NetworkId
+ */
+function getNetworkId () {
+  return this.networkId || this.nodeNetworkId || DEFAULT_NETWORK_ID
 }
 
 /**
@@ -60,13 +76,15 @@ async function signTransaction (tx) {
  * @return {Object} Account instance
  */
 const Account = stampit({
-  init ({ networkId = 'ae_mainnet' }) { // NETWORK_ID using for signing transaction's
-    this.networkId = networkId
+  init ({ networkId }) { // NETWORK_ID using for signing transaction's
+    if (!this.networkId && networkId) {
+      this.networkId = networkId
+    }
   },
-  methods: { signTransaction },
+  methods: { signTransaction, getNetworkId },
   deepConf: {
     Ae: {
-      methods: ['sign', 'address', 'signTransaction']
+      methods: ['sign', 'address', 'signTransaction', 'getNetworkId']
     }
   }
 }, required({ methods: {

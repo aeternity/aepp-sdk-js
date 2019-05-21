@@ -17,23 +17,24 @@
 
 import Ae from '../../es/ae/universal'
 import * as Crypto from '../../es/utils/crypto'
+import { BigNumber } from 'bignumber.js'
 
 const url = process.env.TEST_URL || 'http://localhost:3013'
 const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
+const compilerUrl = process.env.COMPILER_URL || 'http://localhost:3080'
 const networkId = process.env.TEST_NETWORK_ID || 'ae_devnet'
 const account = Crypto.generateKeyPair()
-// Array(3).fill().map(() => Crypto.generateKeyPair())
 
-const BaseAe = Ae.compose({
+const BaseAe = (params) => Ae.compose({
   deepProps: { Swagger: { defaults: { debug: !!process.env['DEBUG'] } } },
-  props: { url, internalUrl, process }
-})
+  props: { url, internalUrl, process, compilerUrl }
+})({ ...params })
 
-let planned = 0
+let planned = BigNumber(0)
 let charged = false
 
 function plan (amount) {
-  planned += amount
+  planned = planned.plus(amount)
 }
 
 const TIMEOUT = 18000000
@@ -42,7 +43,7 @@ function configure (mocha) {
   mocha.timeout(TIMEOUT)
 }
 
-async function ready (mocha, native = false) {
+async function ready (mocha, native = true) {
   configure(mocha)
 
   const ae = await BaseAe({ networkId })
@@ -50,7 +51,7 @@ async function ready (mocha, native = false) {
 
   if (!charged && planned > 0) {
     console.log(`Charging new wallet ${account.publicKey} with ${planned}`)
-    await ae.spend(planned, account.publicKey)
+    await ae.spend(planned.toString(10), account.publicKey)
     charged = true
   }
 

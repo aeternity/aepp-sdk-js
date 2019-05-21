@@ -14,7 +14,13 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-import {BigNumber} from 'bignumber.js'
+import { BigNumber } from 'bignumber.js'
+
+/**
+ * Bytes module
+ * @module @aeternity/aepp-sdk/es/utils/bytes
+ * @example import * as Crypto from '@aeternity/aepp-sdk/es/utils/bytes'
+ */
 
 /**
  * Left pad the input data with 0 bytes
@@ -55,22 +61,18 @@ export function rightPad (length, inputBuffer) {
  * @param x bignumber instance
  * @return Buffer
  */
-function bigNumberToByteArray (x) {
+export function bigNumberToByteArray (x) {
   let hexString = x.toString(16)
   if (hexString.length % 2 > 0) hexString = '0' + hexString
-  let byteArray = []
-  for (let i = 0; i < hexString.length; i += 2) {
-    byteArray.push(parseInt(hexString.slice(i, i + 2), 16))
-  }
-  return Buffer.from(byteArray)
+  return Buffer.from(hexString, 'hex')
 }
-
 export function toBytes (val, big = false) {
   // """
   // Encode a value to bytes.
   // If the value is an int it will be encoded as bytes big endian
   // Raises ValueError if the input is not an int or string
 
+  if (val === undefined) return undefined
   if (Number.isInteger(val) || BigNumber.isBigNumber(val) || big) {
     if (!BigNumber.isBigNumber(val)) val = BigNumber(val)
     return bigNumberToByteArray(val)
