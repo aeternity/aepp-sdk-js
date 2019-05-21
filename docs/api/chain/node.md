@@ -5,7 +5,6 @@ ChainNode module
 
 This is the complement to [@aeternity/aepp-sdk/es/chain](#module_@aeternity/aepp-sdk/es/chain).
 
-**Export**: ChainNode  
 **Example**  
 ```js
 import ChainNode from '@aeternity/aepp-sdk/es/chain/node'

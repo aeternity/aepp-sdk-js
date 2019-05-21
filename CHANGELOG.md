@@ -1,3 +1,23 @@
+# [3.3.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...3.3.0) (2019-05-17)
+
+
+### Bug Fixes
+
+* **AEP exampe:** Fix contract in AEPP example ([e2fec19](https://github.com/aeternity/aepp-sdk-js/commit/e2fec19))
+fix(AEP exampe): Fix contract in AEPP example
+
+### Features
+
+* **Consensus:** Add function to get consensus version.  ([#413](https://github.com/aeternity/aepp-sdk-js/issues/413)) ([46027cd](https://github.com/aeternity/aepp-sdk-js/commit/46027cd))
+* **State Channels:** Make state channels compatible with aeternity 3.0.0 ([#415](https://github.com/aeternity/aepp-sdk-js/issues/415)) ([668e7f1](https://github.com/aeternity/aepp-sdk-js/commit/668e7f1))
+* **Transaction Builder:** Add serializations for transactions introd… ([#416](https://github.com/aeternity/aepp-sdk-js/issues/416)) ([fd7b8ce](https://github.com/aeternity/aepp-sdk-js/commit/fd7b8ce))
+
+
+### BREAKING CHANGES
+
+* **NODE** Change compatibility from `2.3.0` to `3.0.0`
+
+
 # [3.2.1](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...3.2.1) (2019-05-16)
 
 

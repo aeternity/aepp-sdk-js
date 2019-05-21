@@ -3,7 +3,6 @@
 ## @aeternity/aepp-sdk/es/utils/swagger
 Swagger module
 
-**Export**: Swagger  
 **Example**  
 ```js
 import Swagger from '@aeternity/aepp-sdk/es/utils/swagger'

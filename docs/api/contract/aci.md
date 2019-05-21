@@ -3,7 +3,6 @@
 ## @aeternity/aepp-sdk/es/contract/aci
 ContractACI module
 
-**Export**: ContractACI  
 **Example**  
 ```js
 import ContractACI from '@aeternity/aepp-sdk/es/contract/aci'
