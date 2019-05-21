@@ -86,6 +86,13 @@ async function getConsensusProtocolVersion (protocols = [], height) {
   return version
 }
 
+function axiosError (handler) {
+  return (error) => {
+    if (!handler || typeof handler !== 'function') throw error
+    return handler(error)
+  }
+}
+
 /**
  * {@link Swagger} based Node remote API Stamp
  * @function
@@ -94,14 +101,16 @@ async function getConsensusProtocolVersion (protocols = [], height) {
  * @param {Object} [options={}] - Options
  * @param {String} options.url - Base URL for Node
  * @param {String} options.internalUrl - Base URL for internal requests
+ * @param {String} options.axiosConfig - Object with axios configuration. Example { config: {}, errorHandler: (err) => throw err }
  * @return {Object} Node client
  * @example Node({url: 'https://sdk-testnet.aepps.com'})
  */
 const Node = stampit({
-  async init ({ url = this.url, internalUrl = this.internalUrl, axiosConfig = {} }) {
+  async init ({ url = this.url, internalUrl = this.internalUrl, axiosConfig: { config, errorHandler } = {} }) {
     url = url.replace(/\/?$/, '/')
     // Get swagger schema
-    const swag = await remoteSwag(url, axiosConfig)
+    console.log(errorHandler)
+    const swag = await remoteSwag(url, config).catch(this.axiosError(errorHandler))
     this.version = swag.info.version
     return Object.assign(this, {
       url,
@@ -111,6 +120,7 @@ const Node = stampit({
     })
   },
   methods: {
+    axiosError,
     getNodeInfo () {
       return {
         url: this.url,

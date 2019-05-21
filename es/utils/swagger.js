@@ -336,8 +336,9 @@ function destructureClientError (error) {
  * @param {Object} types - Swagger types
  * @return {Function}
  */
-const operation = R.memoize((path, method, definition, types, { axiosConfig } = {}) => {
-  delete axiosConfig.transformResponse // Prevent of overwriting transform response
+const operation = R.memoize((path, method, definition, types, { config, errorHandler } = {}) => {
+  config = config || {}
+  delete config.transformResponse // Prevent of overwriting transform response
   const { operationId, description } = definition
   let { parameters } = definition
   const name = `${R.head(operationId).toLowerCase()}${R.drop(1, operationId)}`
@@ -348,7 +349,7 @@ const operation = R.memoize((path, method, definition, types, { axiosConfig } = 
   const indexedParameters = R.indexBy(R.prop('name'), pascalized)
 
   const signature = operationSignature(name, req, opts)
-  const client = httpClients[method](axiosConfig)
+  const client = httpClients[method](config)
 
   return (instance, url) => {
     const fn = async function () {
@@ -398,7 +399,7 @@ const operation = R.memoize((path, method, definition, types, { axiosConfig } = 
         }
 
         try {
-          const response = await client(`${url}${expandedPath}`, params)
+          const response = await client(`${url}${expandedPath}`, params).catch(this.axiosError(errorHandler))
           // return opt.fullResponse ? response : conform(pascalizeKeys(response.data), responses['200'], types)
           return opt.fullResponse ? response : pascalizeKeys(response.data)
         } catch (e) {
@@ -438,15 +439,16 @@ const operation = R.memoize((path, method, definition, types, { axiosConfig } = 
  * @rtype Stamp
  * @param {Object} options - Initializer object
  * @param {Object} options.swag - Swagger definition
+ * @param {Object} options.axiosConfig - Object with axios configuration. Example { config: {}, errorHandler: (err) => throw err }
  * @return {Object} Account instance
  * @example Swagger({swag})
  */
 const Swagger = stampit(AsyncInit, {
-  async init ({ swag = this.swag, axiosConfig = {} }, { stamp }) {
+  async init ({ swag = this.swag, axiosConfig }, { stamp }) {
     const { paths, definitions } = swag
     const basePath = swag.basePath.replace(/^\//, '')
     const methods = R.indexBy(R.prop('name'), R.flatten(R.values(R.mapObjIndexed((methods, path) => R.values(R.mapObjIndexed((definition, method) => {
-      const op = operation(path, method, definition, definitions, { axiosConfig })
+      const op = operation(path, method, definition, definitions, axiosConfig)
       return op(this, this.urlFor(basePath, definition))
     }, methods)), paths))))
 
