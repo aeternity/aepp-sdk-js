@@ -38,10 +38,11 @@ function resolveUrl (url, baseUrl) {
  * @category async
  * @rtype (url: String) => swagger: Object
  * @param {String} url - Node base URL
+ * @param {Object} axiosConfig Axios configuration object
  * @return {Object} Swagger configuration
  */
-async function remoteSwag (url) {
-  return (await axios.get(resolveUrl('api', url))).data
+async function remoteSwag (url, axiosConfig) {
+  return (await axios.get(resolveUrl('api', url), axiosConfig)).data
 }
 
 /**
@@ -67,7 +68,7 @@ const loader = ({ url, internalUrl }) => (path, definition) => {
 /**
  * get consensus protocol version
  * @param {Array} protocols Array of protocols
- * @param {Number} height Geigh
+ * @param {Number} height Heigh
  * @return {Number} version Protocol version
  */
 async function getConsensusProtocolVersion (protocols = [], height) {
@@ -97,10 +98,10 @@ async function getConsensusProtocolVersion (protocols = [], height) {
  * @example Node({url: 'https://sdk-testnet.aepps.com'})
  */
 const Node = stampit({
-  async init ({ url = this.url, internalUrl = this.internalUrl }) {
+  async init ({ url = this.url, internalUrl = this.internalUrl, axiosConfig = {} }) {
     url = url.replace(/\/?$/, '/')
     // Get swagger schema
-    const swag = await remoteSwag(url)
+    const swag = await remoteSwag(url, axiosConfig)
     this.version = swag.info.version
     return Object.assign(this, {
       url,

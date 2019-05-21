@@ -190,7 +190,7 @@ function conform (value, spec, types) {
   }))(value, spec, types)
 }
 
-const httpCofig = {
+const httpConfig = {
   headers: { 'Content-Type': 'application/json' },
   transformResponse: [(data) => {
     try {
@@ -202,8 +202,8 @@ const httpCofig = {
 }
 
 const httpClients = {
-  get: (url) => axios.get(url, httpCofig),
-  post: (url, params) => axios.post(url, params, httpCofig)
+  get: (config) => (url) => axios.get(url, R.mergeDeepRight(httpConfig, config)),
+  post: (config) => (url, params) => axios.post(url, params, R.mergeDeepRight(httpConfig, config))
 }
 
 /**
@@ -336,7 +336,8 @@ function destructureClientError (error) {
  * @param {Object} types - Swagger types
  * @return {Function}
  */
-const operation = R.memoize((path, method, definition, types) => {
+const operation = R.memoize((path, method, definition, types, { axiosConfig } = {}) => {
+  delete axiosConfig.transformResponse // Prevent of overwriting transform response
   const { operationId, description } = definition
   let { parameters } = definition
   const name = `${R.head(operationId).toLowerCase()}${R.drop(1, operationId)}`
@@ -347,7 +348,7 @@ const operation = R.memoize((path, method, definition, types) => {
   const indexedParameters = R.indexBy(R.prop('name'), pascalized)
 
   const signature = operationSignature(name, req, opts)
-  const client = httpClients[method]
+  const client = httpClients[method](axiosConfig)
 
   return (instance, url) => {
     const fn = async function () {
@@ -441,11 +442,11 @@ const operation = R.memoize((path, method, definition, types) => {
  * @example Swagger({swag})
  */
 const Swagger = stampit(AsyncInit, {
-  async init ({ swag = this.swag }, { stamp }) {
+  async init ({ swag = this.swag, axiosConfig = {} }, { stamp }) {
     const { paths, definitions } = swag
     const basePath = swag.basePath.replace(/^\//, '')
     const methods = R.indexBy(R.prop('name'), R.flatten(R.values(R.mapObjIndexed((methods, path) => R.values(R.mapObjIndexed((definition, method) => {
-      const op = operation(path, method, definition, definitions)
+      const op = operation(path, method, definition, definitions, { axiosConfig })
       return op(this, this.urlFor(basePath, definition))
     }, methods)), paths))))
 
