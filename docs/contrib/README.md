@@ -135,4 +135,4 @@ In order to add a local development version of aepp-sdk to a project, `npm link`
 
 ## Releasing
 
-[How to release a new version](contrib/releases.md)
+[How to release a new version](releases.md)

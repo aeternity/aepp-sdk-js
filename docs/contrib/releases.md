@@ -36,17 +36,18 @@ targeting Node 0.20.0.
 
 ## Preparing a Pre-Release
 
-If Testnet is not yet targeting the latest Node version (but Edgenet is) you can do a pre-release for the latest `beta` or `alpha` or `next` version, tagging the release as `@next` on npmjs.
+If Testnet is not yet targeting the latest Node version, but you're "ready to release", you can do a pre-release for the latest version, tagging the release as `@next` on npmjs.
 
-To do this, You can follow the steps listed below, while keeping the `alpha` or `beta` or `next` portion in both `CHANGELOG.md` and `package.json` files.
+To do this, You can follow the steps listed below, while keeping the `next` portion in both `CHANGELOG.md` and `package.json` files.
 
-## Preparing a Release (Testnet)
+## Preparing a Release
 
-On the release branch, remove the `alpha` (or `beta` or `next`) portion of the `version`
+On the release branch, remove the `next` portion of the `version`
 string in `package.json`. Replace the `[Unreleased]` header in the
-[change log file] with the new version string. Next, `git diff` the release
-branch against `master` and validate that all changes are covered in the change
-log. Also, make sure to add a new link at the bottom of the file that will
+[change log file], if you have that, with the new version string.
+Next, `git diff` the release, branch a `release/X.X.X` (where `X.X.X` is your latest release) against `master` and validate that all changes are covered in the changelog. You can find more instructions on how to maintain a CHANGELOG: [here](http://keepachangelog.com).
+
+Also, make sure to add a new link at the bottom of the file that will
 provide a diff between the last released version and the to-be released
 version.
 
@@ -65,9 +66,7 @@ separately.
 ## Merging
 
 Once the integration build has succesfully completed (with or without additional
-fixes), *squash merge* the branch into `master`. This allows `master` to be
-comprised of release commits exclusively, so every commit on master correponds
-to exactly one released (or at least, tagged) version of aepp-sdk, respectively.
+fixes), *merge* (without squash) the branch into `master`. This allows `master` to be comprised of release commits exclusively, so every commit on master correponds to exactly one released (or at least, tagged) version of aepp-sdk, respectively.
 
 ## Build, Release and Tag
 
@@ -85,7 +84,7 @@ releasing, perform a full clean and build in order to release to npmjs.com!
    users will actual download from npmjs.com once the release is completed!
 3. Execute `npm publish` and follow the on-screen instructions
 
-**Important:** If you are releasing a Pre-Release (`beta` or `alpha` or `next`), make sure to tag the release as `next` using the command `npm publish --tag next`.
+**Important:** If you are releasing a Pre-Release (AKA `next`), make sure to tag the release as `next` using the command `npm publish --tag next`.
 
 At this point, the release should already be in npmjs.com. The final step is to
 also tag the release on GitHub and push the tag, *which requires direct write
@@ -97,12 +96,9 @@ access*.
 > Recommendation: Use signed tags using the -s option to increase community's
 > trust in the project!
 
-## Merging Back
+## Merging Back into `develop`
 
 At this point, it is important to synchronize `develop` with any changes that
-have happened after branching out to the release branch. Manually merge `master`
-into `develop` and resolve conflicts from post-branch changes using the
-_their stage_ strategy, i.e. have `master` take precedence. Push the merge
-commit directly back to `develop`.
+have happened after branching out to the release branch. Create a new branch called `realign/X.X.X` from `master` (where `X.X.X` is your latest release) and open a Pull Request towards `develop` and resolve conflicts, if needed.
 
 This concludes the release process and the development cycle.
