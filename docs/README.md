@@ -16,7 +16,7 @@ The recommended approach to using aepp-sdk is to import one of the following _Ae
 Factories_ based on the specific use case:
 
 * [@aeternity/aepp-sdk/es/ae/aepp](api/ae/aepp.md): **Web Aepp** development
-* * [@aeternity/aepp-sdk/es/ae/aens](api/ae/aens.md): **AENs** development
+* [@aeternity/aepp-sdk/es/ae/aens](api/ae/aens.md): **AENs** development
 * [@aeternity/aepp-sdk/es/ae/wallet](api/ae/wallet.md): **Wallet** development
 * [@aeternity/aepp-sdk/es/ae/oracle](api/ae/oracle.md): **Oracle** development
 * [@aeternity/aepp-sdk/es/ae/contract](api/ae/contract.md): **Contract** development
