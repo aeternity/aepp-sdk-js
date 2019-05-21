@@ -68,7 +68,7 @@ const loader = ({ url, internalUrl }) => (path, definition) => {
 /**
  * get consensus protocol version
  * @param {Array} protocols Array of protocols
- * @param {Number} height Heigh
+ * @param {Number} height Height
  * @return {Number} version Protocol version
  */
 async function getConsensusProtocolVersion (protocols = [], height) {
