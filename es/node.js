@@ -109,7 +109,6 @@ const Node = stampit({
   async init ({ url = this.url, internalUrl = this.internalUrl, axiosConfig: { config, errorHandler } = {} }) {
     url = url.replace(/\/?$/, '/')
     // Get swagger schema
-    console.log(errorHandler)
     const swag = await remoteSwag(url, config).catch(this.axiosError(errorHandler))
     this.version = swag.info.version
     return Object.assign(this, {
