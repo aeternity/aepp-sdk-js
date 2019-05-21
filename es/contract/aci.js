@@ -362,11 +362,11 @@ function call (self) {
 
     params = !options.skipArgsConvert ? await prepareArgsForEncode(fnACI, params) : params
     const result = options.callStatic
-      ? await self.contractCallStatic(this.source, this.deployInfo.address, fn, params, {
+      ? await self.contractCallStatic(this.interface, this.deployInfo.address, fn, params, {
         top: options.top,
         options
       })
-      : await self.contractCall(this.source, this.deployInfo.address, fn, params, options)
+      : await self.contractCall(this.interface, this.deployInfo.address, fn, params, options)
     return {
       ...result,
       decode: async (type, opt = {}) =>
@@ -385,7 +385,7 @@ function deploy (self) {
     if (!this.compiled) await this.compile()
     init = !options.skipArgsConvert ? await prepareArgsForEncode(fnACI, init) : init
 
-    const { owner, transaction, address, createdAt, result } = await self.contractDeploy(this.compiled, this.source, init, options)
+    const { owner, transaction, address, createdAt, result } = await self.contractDeploy(this.compiled, this.interface, init, options)
     this.deployInfo = { owner, transaction, address, createdAt, result }
     return this
   }
