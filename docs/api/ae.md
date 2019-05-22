@@ -3,7 +3,6 @@
 ## @aeternity/aepp-sdk/es/ae
 Ae module
 
-**Export**: Ae  
 **Example**  
 ```js
 import Ae from '@aeternity/aepp-sdk/es/ae'

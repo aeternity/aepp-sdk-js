@@ -1,3 +1,22 @@
+# [3.4.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...3.4.0) (2019-05-22)
+
+
+### Bug Fixes
+
+* **State Channels:** Remove automatic pinging to fix browser compatibility ([#432](https://github.com/aeternity/aepp-sdk-js/issues/432)) ([0700f3a](https://github.com/aeternity/aepp-sdk-js/commit/0700f3a))
+
+
+### Features
+
+* **Transaction Builder:** Improve min fee calculation(Reduce the fee) ([#424](https://github.com/aeternity/aepp-sdk-js/pull/424))
+* **AXIOS:** Add ability to intercept error from axios ([#431](https://github.com/aeternity/aepp-sdk-js/pull/431))
+  > Added additional param to sdk initialization `axiosConfig`
+
+  > Example: `Universal({ axiosConfig: { config: { // axios config object }, errorHandler: (err) => throw err }})`
+* **Transaction Builder:** Implement vm/abi validation for contract/oracle tx based on consensus protocol version. Add custom verification based on transaction type ([#425](https://github.com/aeternity/aepp-sdk-js/pull/425)) ([#426](https://github.com/aeternity/aepp-sdk-js/pull/426))
+
+
+
 # [3.3.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...3.3.0) (2019-05-17)
 
 

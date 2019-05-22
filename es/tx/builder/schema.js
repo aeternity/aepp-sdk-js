@@ -254,7 +254,6 @@ export const FIELD_TYPES = {
 // FEE CALCULATION
 export const BASE_GAS = 15000
 export const GAS_PER_BYTE = 20
-export const FEE_BYTE_SIZE = 8
 export const DEFAULT_FEE = 20000
 export const KEY_BLOCK_INTERVAL = 3
 
@@ -276,13 +275,13 @@ export const TX_FEE_OTHER_GAS = (txType) => ({ txSize, relativeTtl }) => {
     case TX_TYPE.oracleExtend:
     case TX_TYPE.oracleQuery:
     case TX_TYPE.oracleResponse:
-      return BigNumber(txSize + FEE_BYTE_SIZE)
+      return BigNumber(txSize)
         .times(GAS_PER_BYTE)
         .plus(
           Math.ceil(32000 * relativeTtl / Math.floor(60 * 24 * 365 / KEY_BLOCK_INTERVAL))
         )
     default:
-      return BigNumber(txSize + FEE_BYTE_SIZE).times(GAS_PER_BYTE)
+      return BigNumber(txSize).times(GAS_PER_BYTE)
   }
 }
 
@@ -1019,7 +1018,8 @@ const VALIDATORS = {
   insufficientBalanceForAmount: 'insufficientBalanceForAmount',
   nonceUsed: 'nonceUsed',
   nonceHigh: 'nonceHigh',
-  minGasPrice: 'minGasPrice'
+  minGasPrice: 'minGasPrice',
+  vmAndAbiVersion: 'vmAndAbiVersion'
 }
 
 const ERRORS = {
@@ -1030,7 +1030,8 @@ const ERRORS = {
   insufficientBalanceForAmount: { key: 'InsufficientBalanceForAmount', type: ERROR_TYPE.WARNING, txKey: 'amount' },
   nonceUsed: { key: 'NonceUsed', type: ERROR_TYPE.ERROR, txKey: 'nonce' },
   nonceHigh: { key: 'NonceHigh', type: ERROR_TYPE.WARNING, txKey: 'nonce' },
-  minGasPrice: { key: 'minGasPrice', type: ERROR_TYPE.ERROR, txKey: 'gasPrice' }
+  minGasPrice: { key: 'minGasPrice', type: ERROR_TYPE.ERROR, txKey: 'gasPrice' },
+  vmAndAbiVersion: { key: 'vmAndAbiVersion', type: ERROR_TYPE.ERROR, txKey: 'ctVersion' }
 }
 
 export const SIGNATURE_VERIFICATION_SCHEMA = [
@@ -1038,6 +1039,18 @@ export const SIGNATURE_VERIFICATION_SCHEMA = [
     () => `The signature cannot be verified, please verify that you used the correct network id and the correct private key for the sender address`,
     VALIDATORS.signature,
     ERRORS.invalidSignature
+  )
+]
+export const CONTRACT_VERIFICATION_SCHEMA = [
+  VERIFICATION_FIELD(
+    ({ ctVersion, consensusProtocolVersion, txType }) => `Wrong abi/vm version, Supported is: ${PROTOCOL_VM_ABI[consensusProtocolVersion] ? JSON.stringify(PROTOCOL_VM_ABI[consensusProtocolVersion][txType]) : ' None for this protocol ' + consensusProtocolVersion}`,
+    VALIDATORS.vmAndAbiVersion,
+    ERRORS.vmAndAbiVersion
+  ),
+  VERIFICATION_FIELD(
+    () => `The gasPrice must be bigger then ${MIN_GAS_PRICE}`,
+    VALIDATORS.minGasPrice,
+    ERRORS.minGasPrice
   )
 ]
 export const BASE_VERIFICATION_SCHEMA = [
@@ -1070,10 +1083,5 @@ export const BASE_VERIFICATION_SCHEMA = [
     ({ accountNonce }) => `The nonce is technically valid but will not be processed immediately by the node (next valid nonce is ${accountNonce + 1})`,
     VALIDATORS.nonceHigh,
     ERRORS.nonceHigh
-  ),
-  VERIFICATION_FIELD(
-    () => `The gasPrice must be bigger then ${MIN_GAS_PRICE}`,
-    VALIDATORS.minGasPrice,
-    ERRORS.minGasPrice
   )
 ]

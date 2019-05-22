@@ -3,7 +3,6 @@
 ## @aeternity/aepp-sdk/es/node
 Node module
 
-**Export**: Node  
 **Example**  
 ```js
 import Node from '@aeternity/aepp-sdk/es/node'
@@ -12,8 +11,9 @@ import Node from '@aeternity/aepp-sdk/es/node'
 * [@aeternity/aepp-sdk/es/node](#module_@aeternity/aepp-sdk/es/node)
     * [Node([options])](#exp_module_@aeternity/aepp-sdk/es/node--Node) ⇒ `Object` ⏏
         * [~loader(options)](#module_@aeternity/aepp-sdk/es/node--Node..loader) ⇒ `function`
+        * [~getConsensusProtocolVersion(protocols, height)](#module_@aeternity/aepp-sdk/es/node--Node..getConsensusProtocolVersion) ⇒ `Number`
         * _async_
-            * [~remoteSwag(url)](#module_@aeternity/aepp-sdk/es/node--Node..remoteSwag) ⇒ `Object`
+            * [~remoteSwag(url, axiosConfig)](#module_@aeternity/aepp-sdk/es/node--Node..remoteSwag) ⇒ `Object`
 
 <a id="exp_module_@aeternity/aepp-sdk/es/node--Node"></a>
 
@@ -29,6 +29,7 @@ import Node from '@aeternity/aepp-sdk/es/node'
 | [options] | `Object` | <code>{}</code> | Options |
 | options.url | `String` |  | Base URL for Node |
 | options.internalUrl | `String` |  | Base URL for internal requests |
+| options.axiosConfig | `String` |  | Object with axios configuration. Example { config: {}, errorHandler: (err) => throw err } |
 
 **Example**  
 ```js
@@ -49,9 +50,22 @@ Node specific loader for `urlFor`
 | options.url | `String` | Base URL for Node |
 | options.internalUrl | `String` | Base URL for internal requests |
 
+<a id="module_@aeternity/aepp-sdk/es/node--Node..getConsensusProtocolVersion"></a>
+
+#### Node~getConsensusProtocolVersion(protocols, height) ⇒ `Number`
+get consensus protocol version
+
+**Kind**: inner method of [`Node`](#exp_module_@aeternity/aepp-sdk/es/node--Node)  
+**Returns**: `Number` - version Protocol version  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| protocols | `Array` | Array of protocols |
+| height | `Number` | Height |
+
 <a id="module_@aeternity/aepp-sdk/es/node--Node..remoteSwag"></a>
 
-#### Node~remoteSwag(url) ⇒ `Object`
+#### Node~remoteSwag(url, axiosConfig) ⇒ `Object`
 Obtain Swagger configuration from Node node
 
 **Kind**: inner method of [`Node`](#exp_module_@aeternity/aepp-sdk/es/node--Node)  
@@ -62,4 +76,5 @@ Obtain Swagger configuration from Node node
 | Param | Type | Description |
 | --- | --- | --- |
 | url | `String` | Node base URL |
+| axiosConfig | `Object` | Axios configuration object |
 
