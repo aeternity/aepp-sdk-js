@@ -43,6 +43,7 @@ Swagger Stamp
 | --- | --- | --- |
 | options | `Object` | Initializer object |
 | options.swag | `Object` | Swagger definition |
+| options.axiosConfig | `Object` | Object with axios configuration. Example { config: {}, errorHandler: (err) => throw err } |
 
 **Example**  
 ```js
