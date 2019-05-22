@@ -327,6 +327,14 @@ async function getContractInstance (source, { aci, contractAddress } = {}) {
    */
   instance.call = call(this).bind(instance)
 
+  instance.methods = instance
+    .aci
+    .functions
+    .reduce(
+      (acc, { name }) => ({ ...acc, [name]: (params, options) => instance.call(name, params, options) }),
+      {}
+    )
+
   return instance
 }
 
@@ -385,8 +393,8 @@ function deploy (self) {
     if (!this.compiled) await this.compile()
     init = !options.skipArgsConvert ? await prepareArgsForEncode(fnACI, init) : init
 
-    const { owner, transaction, address, createdAt, result } = await self.contractDeploy(this.compiled, this.source, init, options)
-    this.deployInfo = { owner, transaction, address, createdAt, result }
+    const { owner, transaction, address, createdAt, result, rawTx } = await self.contractDeploy(this.compiled, this.source, init, options)
+    this.deployInfo = { owner, transaction, address, createdAt, result, rawTx }
     return this
   }
 }

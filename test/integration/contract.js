@@ -17,6 +17,7 @@
 
 import { describe, it, before } from 'mocha'
 import { configure, plan, ready } from './'
+import * as R from 'ramda'
 
 const identityContract = `
 contract Identity =
@@ -169,6 +170,9 @@ describe('Contract', function () {
       contractObject.should.have.property('compile')
       contractObject.should.have.property('call')
       contractObject.should.have.property('deploy')
+      const functionsFromACI = contractObject.aci.functions.map(({ name }) => name)
+      const methods = Object.keys(contractObject.methods)
+      R.equals(methods, functionsFromACI).should.be.equal(true)
     })
     it('Compile contract', async () => {
       await contractObject.compile()
@@ -188,120 +192,120 @@ describe('Contract', function () {
       describe('INT', function () {
         it('Invalid', async () => {
           try {
-            await contractObject.call('intFn', ['asd'])
+            await contractObject.methods.intFn(['asd'])
           } catch (e) {
             e.message.should.be.equal('"Argument" at position 0 fails because [Value "[asd]" at path: [0] not a number]')
           }
         })
         it('Valid', async () => {
-          await contractObject.call('intFn', [1])
+          await contractObject.methods.intFn([1])
         })
       })
       describe('STRING', function () {
         it('Invalid', async () => {
           try {
-            await contractObject.call('stringFn', [123])
+            await contractObject.methods.stringFn([123])
           } catch (e) {
             e.message.should.be.equal('"Argument" at position 0 fails because [Value "123" at path: [0] not a string]')
           }
         })
         it('Valid', async () => {
-          await contractObject.call('stringFn', ['string'])
+          await contractObject.methods.stringFn(['string'])
         })
       })
       describe('ADDRESS', function () {
         it('Invalid address', async () => {
           try {
-            await contractObject.call('addressFn', ['asdasasd'])
+            await contractObject.methods.addressFn(['asdasasd'])
           } catch (e) {
             e.message.should.be.equal('"Argument" at position 0 fails because ["0" must be a number, "0" with value "asdasasd" fails to match the required pattern: /^(ak_|ct_|ok_|oq_)/]')
           }
         })
         it('Invalid address type', async () => {
           try {
-            await contractObject.call('addressFn', [333])
+            await contractObject.methods.addressFn([333])
           } catch (e) {
             e.message.should.be.equal('"Argument" at position 0 fails because ["0" must be less than or equal to 0, Value "333" at path: [0] not a string]')
           }
         })
         it('Empty address', async () => {
-          const result = await contractObject.call('emptyAddress')
+          const result = await contractObject.methods.emptyAddress()
           return result.decode().should.eventually.become(0)
         })
         it('Return address', async () => {
-          const contractAddress = await (await contractObject
-            .call('contractAddress', ['ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh']))
+          const contractAddress = await (await contractObject.methods
+            .contractAddress(['ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh']))
             .decode(null, { addressPrefix: 'ct' })
 
-          const accountAddress = await (await contractObject
-            .call('accountAddress', [await contract.address()]))
+          const accountAddress = await (await contractObject.methods
+            .accountAddress([await contract.address()]))
             .decode(null, { addressPrefix: 'ak' })
 
           contractAddress.should.be.equal('ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh')
           accountAddress.should.be.equal(await contract.address())
         })
         it('Valid', async () => {
-          await contractObject.call('addressFn', ['ak_2ct6nMwmRnyGX6jPhraFPedZ5bYp1GXqpvnAq5LXeL5TTPfFif'])
+          await contractObject.methods.addressFn(['ak_2ct6nMwmRnyGX6jPhraFPedZ5bYp1GXqpvnAq5LXeL5TTPfFif'])
         })
       })
       describe('TUPLE', function () {
         it('Invalid type', async () => {
           try {
-            await contractObject.call('tupleFn', ['asdasasd'])
+            await contractObject.methods.tupleFn(['asdasasd'])
           } catch (e) {
             e.message.should.be.equal('"Argument" at position 0 fails because [Value "[asdasasd]" at path: [0] not a array]')
           }
         })
         it('Invalid tuple prop type', async () => {
           try {
-            await contractObject.call('tupleFn', [[1, 'string']])
+            await contractObject.methods.tupleFn([[1, 'string']])
           } catch (e) {
             e.message.should.be.equal('"Argument" at position 0 fails because ["[1,string]" at position 0 fails because [Value "1" at path: [0,0] not a string], "[1,string]" at position 1 fails because [Value "1" at path: [0,1] not a number]]')
           }
         })
         it('Required tuple prop', async () => {
           try {
-            await contractObject.call('tupleFn', [[1]])
+            await contractObject.methods.tupleFn([[1]])
           } catch (e) {
             e.message.should.be.equal('"Argument" at position 0 fails because ["[1]" at position 0 fails because [Value "1" at path: [0,0] not a string], "[1]" does not contain 1 required value(s)]')
           }
         })
         it('Wrong type in list inside tuple', async () => {
           try {
-            await contractObject.call('tupleWithList', [[[true], 1]])
+            await contractObject.methods.tupleWithList([[[true], 1]])
           } catch (e) {
             e.message.should.be.equal('"Argument" at position 0 fails because ["[true,1]" at position 0 fails because ["0" at position 0 fails because [Value "0" at path: [0,0,0] not a number]]]')
           }
         })
         it('Wrong type in tuple inside tuple', async () => {
           try {
-            await contractObject.call('tupleInTupleFn', [[['str', 1], 1]])
+            await contractObject.methods.tupleInTupleFn([[['str', 1], 1]])
           } catch (e) {
             e.message.should.be.equal('"Argument" at position 0 fails because ["[str,1,1]" at position 0 fails because ["Tuple argument" at position 1 fails because [Value "1" at path: [0,0,1] not a string]]]')
           }
         })
         it('Valid', async () => {
-          await contractObject.call('tupleFn', [['test', 1]])
+          await contractObject.methods.tupleFn([['test', 1]])
         })
       })
       describe('LIST', function () {
         it('Invalid type', async () => {
           try {
-            await contractObject.call('listFn', ['asdasasd'])
+            await contractObject.methods.listFn(['asdasasd'])
           } catch (e) {
             e.message.should.be.equal('"Argument" at position 0 fails because [Value "[asdasasd]" at path: [0] not a array]')
           }
         })
         it('Invalid list element type', async () => {
           try {
-            await contractObject.call('listFn', [[1, 'string']])
+            await contractObject.methods.listFn([[1, 'string']])
           } catch (e) {
             e.message.should.be.equal('"Argument" at position 0 fails because ["[1,string]" at position 1 fails because [Value "1" at path: [0,1] not a number]]')
           }
         })
         it('Invalid list element type nested', async () => {
           try {
-            await contractObject.call('listInListFn', [[['childListWronmgElement'], 'parentListWrongElement']])
+            await contractObject.methods.listInListFn([[['childListWronmgElement'], 'parentListWrongElement']])
           } catch (e) {
             e.message.should.be.equal('"Argument" at position 0 fails because ["[childListWronmgElement,parentListWrongElement]" at position 0 fails because ["0" at position 0 fails because [Value "0" at path: [0,0,0] not a number]], "[childListWronmgElement,parentListWrongElement]" at position 1 fails because [Value "1" at path: [0,1] not a array]]')
           }
@@ -315,7 +319,7 @@ describe('Contract', function () {
               [address, ['someStringV', 324]]
             ]
           )
-          const result = await contractObject.call('mapFn', [mapArg])
+          const result = await contractObject.methods.mapFn([mapArg])
           return result.decode().should.eventually.become(Array.from(mapArg.entries()))
         })
         it('Map With Option Value', async () => {
@@ -340,8 +344,8 @@ describe('Contract', function () {
               [address, ['someStringV', undefined]]
             ]
           )
-          const resultWithSome = await contractObject.call('mapOptionFn', [mapArgWithSomeValue])
-          const resultWithNone = await contractObject.call('mapOptionFn', [mapArgWithNoneValue])
+          const resultWithSome = await contractObject.methods.mapOptionFn([mapArgWithSomeValue])
+          const resultWithNone = await contractObject.methods.mapOptionFn([mapArgWithNoneValue])
 
           const decodedSome = resultWithSome.decode()
 
@@ -355,7 +359,7 @@ describe('Contract', function () {
               [address, ['someStringV', '324']]
             ]
           )
-          const result = await contractObject.call('mapFn', [mapArg])
+          const result = await contractObject.methods.mapFn([mapArg])
           mapArg.set(address, ['someStringV', 324])
           return result.decode().should.eventually.become(Array.from(mapArg.entries()))
         })
@@ -365,29 +369,29 @@ describe('Contract', function () {
             [
               [address, ['someStringV', 324]]
             ]
-          const result = await contractObject.call('mapFn', [mapArg])
+          const result = await contractObject.methods.mapFn([mapArg])
           return result.decode().should.eventually.become(mapArg)
         })
       })
       describe('RECORD/STATE', function () {
         it('Valid Set Record (Cast from JS object)', async () => {
-          await contractObject.call('setRecord', [{ value: 'qwe', key: 1234, testOption: Promise.resolve('test') }])
-          const state = await contractObject.call('getRecord', [])
+          await contractObject.methods.setRecord([{ value: 'qwe', key: 1234, testOption: Promise.resolve('test') }])
+          const state = await contractObject.methods.getRecord([])
 
           return state.decode().should.eventually.become({ value: 'qwe', key: 1234, testOption: 'test' })
         })
         it('Get Record(Convert to JS object)', async () => {
-          const result = await contractObject.call('getRecord', [])
+          const result = await contractObject.methods.getRecord([])
           return result.decode().should.eventually.become({ value: 'qwe', key: 1234, testOption: 'test' })
         })
         it('Get Record With Option (Convert to JS object)', async () => {
           await contractObject.call('setRecord', [{ key: 1234, value: 'qwe', testOption: Promise.resolve('resolved string') }])
-          const result = await contractObject.call('getRecord', [])
+          const result = await contractObject.methods.getRecord([])
           return result.decode().should.eventually.become({ value: 'qwe', key: 1234, testOption: 'resolved string' })
         })
         it('Invalid value type', async () => {
           try {
-            await contractObject.call('setRecord', [{ value: 123, key: 'test' }])
+            await contractObject.methods.setRecord([{ value: 123, key: 'test' }])
           } catch (e) {
             e.message.should.be.equal('"Argument" at position 0 fails because [child "value" fails because [Value "123" at path: [0,value] not a string], child "key" fails because [Value "key" at path: [0,key] not a number]]')
           }
@@ -395,23 +399,23 @@ describe('Contract', function () {
       })
       describe('OPTION', function () {
         it('Set Some Option Value(Cast from JS value/Convert result to JS)', async () => {
-          const optionRes = await contractObject.call('intOption', [Promise.resolve(123)])
+          const optionRes = await contractObject.methods.intOption([Promise.resolve(123)])
 
           return optionRes.decode().should.eventually.become(123)
         })
         it('Set Some Option List Value(Cast from JS value/Convert result to JS)', async () => {
-          const optionRes = await contractObject.call('listOption', [Promise.resolve([[1, 'testString']])])
+          const optionRes = await contractObject.methods.listOption([Promise.resolve([[1, 'testString']])])
 
           return optionRes.decode().should.eventually.become([[1, 'testString']])
         })
         it('Set None Option Value(Cast from JS value/Convert to JS)', async () => {
-          const optionRes = await contractObject.call('intOption', [Promise.reject(Error())])
+          const optionRes = await contractObject.methods.intOption([Promise.reject(Error())])
 
           return optionRes.decode().should.eventually.become(undefined)
         })
         it('Invalid option type', async () => {
           try {
-            await contractObject.call('intOption', [{ s: 2 }])
+            await contractObject.methods.intOption([{ s: 2 }])
           } catch (e) {
             e.message.should.be.equal('"Argument" at position 0 fails because [Value \'[[object Object]]\' at path: [0] not a Promise]')
           }
@@ -420,21 +424,21 @@ describe('Contract', function () {
     })
     describe('Call contract', function () {
       it('Call contract using using sophia type arguments', async () => {
-        const res = await contractObject.call('listFn', ['[ 1, 2 ]'], { skipArgsConvert: true })
+        const res = await contractObject.methods.listFn(['[ 1, 2 ]'], { skipArgsConvert: true })
         return res.decode().should.eventually.become([1, 2])
       })
       it('Call contract using using js type arguments', async () => {
-        const res = await contractObject.call('listFn', [[ 1, 2 ]])
+        const res = await contractObject.methods.listFn([[ 1, 2 ]])
         return res.decode().should.eventually.become([1, 2])
       })
       it('Call contract using using js type arguments and skip result transform', async () => {
-        const res = await contractObject.call('listFn', [[ 1, 2 ]], { skipTransformDecoded: true })
+        const res = await contractObject.methods.listFn([[ 1, 2 ]], { skipTransformDecoded: true })
         const decoded = await res.decode()
         const decodedJSON = '{"type":"list","value":[{"type":"word","value":1},{"type":"word","value":2}]}'
         JSON.stringify(decoded).should.be.equal(decodedJSON)
       })
       it('Call contract with contract type argument', async () => {
-        const result = await contractObject.call('approve', [0, 'ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh'])
+        const result = await contractObject.methods.approve([0, 'ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh'])
         return result.decode().should.eventually.become(0)
       })
     })
