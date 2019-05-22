@@ -1,3 +1,12 @@
+# [3.4.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...3.4.0) (2019-05-22)
+
+
+### Bug Fixes
+
+* **State Channels:** Remove automatic pinging to fix browser compatibility ([#432](https://github.com/aeternity/aepp-sdk-js/issues/432)) ([0700f3a](https://github.com/aeternity/aepp-sdk-js/commit/0700f3a))
+
+
+
 # [3.3.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...3.3.0) (2019-05-17)
 
 
