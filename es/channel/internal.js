@@ -21,9 +21,6 @@ import * as R from 'ramda'
 import { pascalToSnake } from '../utils/string'
 import { awaitingConnection } from './handlers'
 
-const PING_TIMEOUT_MS = 10000
-const PONG_TIMEOUT_MS = 5000
-
 const options = new WeakMap()
 const status = new WeakMap()
 const state = new WeakMap()
@@ -37,8 +34,6 @@ const actionQueueLocked = new WeakMap()
 const sequence = new WeakMap()
 const channelId = new WeakMap()
 const rpcCallbacks = new WeakMap()
-const pingTimeoutId = new WeakMap()
-const pongTimeoutId = new WeakMap()
 
 function channelURL (url, params) {
   const paramString = R.join('&', R.values(R.mapObjIndexed((value, key) =>
@@ -159,21 +154,10 @@ function call (channel, method, params) {
   })
 }
 
-function ping (channel) {
-  const ws = websockets.get(channel)
-  if (ws.readyState === ws.OPEN) {
-    ws._connection.ping()
-    clearTimeout(pongTimeoutId.get(channel))
-    pongTimeoutId.set(channel, setTimeout(() => ws._connection.drop(), PONG_TIMEOUT_MS))
-  }
-}
-
 function disconnect (channel) {
   const ws = websockets.get(channel)
   if (ws.readyState === ws.OPEN) {
     ws._connection.close()
-    clearTimeout(pongTimeoutId.get(channel))
-    clearTimeout(pingTimeoutId.get(channel))
   }
 }
 
@@ -213,12 +197,6 @@ async function initialize (channel, channelOptions) {
     onclose: () => changeStatus(channel, 'disconnected'),
     onmessage: ({ data }) => onMessage(channel, data)
   })
-  ws._connection.on('pong', () => {
-    clearTimeout(pongTimeoutId.get(channel))
-    clearTimeout(pingTimeoutId.get(channel))
-    pingTimeoutId.set(channel, setTimeout(() => ping(channel), PING_TIMEOUT_MS))
-  })
-  pingTimeoutId.set(channel, setTimeout(() => ping(channel), PING_TIMEOUT_MS))
   websockets.set(channel, ws)
 }
 

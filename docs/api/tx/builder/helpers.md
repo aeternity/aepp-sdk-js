@@ -3,7 +3,6 @@
 ## @aeternity/aepp-sdk/es/tx/builder/helpers
 JavaScript-based Transaction builder helper function's
 
-**Export**: TxBuilderHelper  
 **Example**  
 ```js
 import TxBuilderHelper from '@aeternity/aepp-sdk/es/tx/builder/helpers'

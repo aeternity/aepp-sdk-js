@@ -7,9 +7,9 @@ import { encode } from '../tx/builder/helpers'
 
 import { BigNumber } from 'bignumber.js'
 import {
-  BASE_VERIFICATION_SCHEMA, MIN_GAS_PRICE, OBJECT_ID_TX_TYPE,
-  OBJECT_TAG_SIGNED_TRANSACTION,
-  SIGNATURE_VERIFICATION_SCHEMA
+  BASE_VERIFICATION_SCHEMA, CONTRACT_VERIFICATION_SCHEMA, MIN_GAS_PRICE, OBJECT_ID_TX_TYPE,
+  OBJECT_TAG_SIGNED_TRANSACTION, PROTOCOL_VM_ABI,
+  SIGNATURE_VERIFICATION_SCHEMA, TX_TYPE
 } from './builder/schema'
 import { calculateFee, unpackTx } from './builder'
 import Node from '../node'
@@ -53,6 +53,21 @@ const VALIDATORS = {
   },
   minGasPrice ({ gasPrice }) {
     return isNaN(gasPrice) || BigNumber(gasPrice).gte(BigNumber(MIN_GAS_PRICE))
+  },
+  // VM/ABI version validation based on consensus protocol version
+  vmAndAbiVersion ({ ctVersion, abiVersion, consensusProtocolVersion, txType }) {
+    // If not contract tx
+    if (!ctVersion) ctVersion = { abiVersion }
+    const supportedProtocol = PROTOCOL_VM_ABI[consensusProtocolVersion]
+    // If protocol not implemented
+    if (!supportedProtocol) return true
+    // If protocol for tx type not implemented
+    const txProtocol = supportedProtocol[txType]
+
+    return !Object.entries(ctVersion)
+      .reduce((acc, [key, value]) =>
+        [...acc, value === undefined ? true : txProtocol[key].includes(parseInt(value))],
+      []).includes(false)
   }
 }
 
@@ -68,7 +83,8 @@ const resolveDataForBase = async (chain, { ownerPublicKey }) => {
     height: (await chain.api.getCurrentKeyBlockHeight()).height,
     balance: accountBalance,
     accountNonce,
-    ownerPublicKey
+    ownerPublicKey,
+    consensusProtocolVersion: chain.consensusProtocolVersion
   }
 }
 
@@ -83,14 +99,6 @@ const verifySchema = (schema, data) => {
     []
   )
 }
-
-// TODO FINISH THIS
-// async function customVerification(nodeApi, { tx, resolvedBaseData }) {
-//    const [schema, resolver] = CUSTOM_VERIFICATION_SCHEMA[+tx.tag]
-//
-//    const resolvedCustomData = await resolver(nodeApi, { ...tx, ...resolvedBaseData })
-//    return verifySchema(schema, { ...tx, ...resolvedBaseData, ...resolvedCustomData})
-// }
 
 /**
  * Unpack and verify transaction (verify nonce, ttl, fee, signature, account balance)
@@ -144,10 +152,12 @@ async function verifyTx ({ tx, signatures, rlpEncoded }, networkId) {
   // Fetch data for verification
   const ownerPublicKey = getOwnerPublicKey(tx)
   const gas = tx.hasOwnProperty('gas') ? +tx.gas : 0
+  const txType = OBJECT_ID_TX_TYPE[+tx.tag]
   const resolvedData = {
-    minFee: calculateFee(0, OBJECT_ID_TX_TYPE[+tx.tag], { gas, params: tx, showWarning: false }),
+    minFee: calculateFee(0, txType, { gas, params: tx, showWarning: false }),
     ...(await resolveDataForBase(this, { ownerPublicKey })),
-    ...tx
+    ...tx,
+    txType
   }
   const signatureVerification = signatures && signatures.length
     ? verifySchema(SIGNATURE_VERIFICATION_SCHEMA, {
@@ -158,13 +168,29 @@ async function verifyTx ({ tx, signatures, rlpEncoded }, networkId) {
     })
     : []
   const baseVerification = verifySchema(BASE_VERIFICATION_SCHEMA, resolvedData)
-  // const customVerification = customVerification(this.api, { tx, resolvedBaseData })
 
   return [
     ...baseVerification,
-    ...signatureVerification
-    // ...customVerification.error
+    ...signatureVerification,
+    ...customVerification(txType, resolvedData)
   ]
+}
+
+/**
+ * Verification for speciific txType
+ * @param txType
+ * @param data
+ * @return {Array}
+ */
+function customVerification (txType, data) {
+  switch (txType) {
+    case TX_TYPE.contractCreate:
+    case TX_TYPE.contractCall:
+    case TX_TYPE.oracleRegister:
+      return verifySchema(CONTRACT_VERIFICATION_SCHEMA, data)
+    default:
+      return []
+  }
 }
 
 /**

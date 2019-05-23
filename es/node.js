@@ -27,6 +27,7 @@ import axios from 'axios'
 import * as R from 'ramda'
 import Swagger from './utils/swagger'
 import semverSatisfies from './utils/semver-satisfies'
+import { URL } from 'universal-url'
 
 function resolveUrl (url, baseUrl) {
   return new URL(url, baseUrl).toString()
@@ -37,10 +38,11 @@ function resolveUrl (url, baseUrl) {
  * @category async
  * @rtype (url: String) => swagger: Object
  * @param {String} url - Node base URL
+ * @param {Object} axiosConfig Axios configuration object
  * @return {Object} Swagger configuration
  */
-async function remoteSwag (url) {
-  return (await axios.get(resolveUrl('api', url))).data
+async function remoteSwag (url, axiosConfig) {
+  return (await axios.get(resolveUrl('api', url), axiosConfig)).data
 }
 
 /**
@@ -66,7 +68,7 @@ const loader = ({ url, internalUrl }) => (path, definition) => {
 /**
  * get consensus protocol version
  * @param {Array} protocols Array of protocols
- * @param {Number} height Geigh
+ * @param {Number} height Height
  * @return {Number} version Protocol version
  */
 async function getConsensusProtocolVersion (protocols = [], height) {
@@ -84,6 +86,13 @@ async function getConsensusProtocolVersion (protocols = [], height) {
   return version
 }
 
+function axiosError (handler) {
+  return (error) => {
+    if (!handler || typeof handler !== 'function') throw error
+    return handler(error)
+  }
+}
+
 /**
  * {@link Swagger} based Node remote API Stamp
  * @function
@@ -92,14 +101,15 @@ async function getConsensusProtocolVersion (protocols = [], height) {
  * @param {Object} [options={}] - Options
  * @param {String} options.url - Base URL for Node
  * @param {String} options.internalUrl - Base URL for internal requests
+ * @param {String} options.axiosConfig - Object with axios configuration. Example { config: {}, errorHandler: (err) => throw err }
  * @return {Object} Node client
  * @example Node({url: 'https://sdk-testnet.aepps.com'})
  */
 const Node = stampit({
-  async init ({ url = this.url, internalUrl = this.internalUrl }) {
+  async init ({ url = this.url, internalUrl = this.internalUrl, axiosConfig: { config, errorHandler } = {} }) {
     url = url.replace(/\/?$/, '/')
     // Get swagger schema
-    const swag = await remoteSwag(url)
+    const swag = await remoteSwag(url, config).catch(this.axiosError(errorHandler))
     this.version = swag.info.version
     return Object.assign(this, {
       url,
@@ -109,6 +119,7 @@ const Node = stampit({
     })
   },
   methods: {
+    axiosError,
     getNodeInfo () {
       return {
         url: this.url,

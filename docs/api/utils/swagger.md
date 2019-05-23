@@ -3,7 +3,6 @@
 ## @aeternity/aepp-sdk/es/utils/swagger
 Swagger module
 
-**Export**: Swagger  
 **Example**  
 ```js
 import Swagger from '@aeternity/aepp-sdk/es/utils/swagger'
@@ -44,6 +43,7 @@ Swagger Stamp
 | --- | --- | --- |
 | options | `Object` | Initializer object |
 | options.swag | `Object` | Swagger definition |
+| options.axiosConfig | `Object` | Object with axios configuration. Example { config: {}, errorHandler: (err) => throw err } |
 
 **Example**  
 ```js

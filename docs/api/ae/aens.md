@@ -7,7 +7,6 @@ The high-level description of the naming system is
 https://github.com/aeternity/protocol/blob/master/AENS.md in the protocol
 repository.
 
-**Export**: Aens  
 **Example**  
 ```js
 import Aens from '@aeternity/aepp-sdk/es/ae/aens'
