@@ -27,6 +27,12 @@
 import Http from '../utils/http'
 import ContractBase from './index'
 
+async function getCompilerVersion (options = {}) {
+  return this.http
+    .get('/version', options)
+    .then(({ version }) => version)
+}
+
 async function contractEncodeCallDataAPI (source, name, args = [], options = {}) {
   return this.http
     .post('/encode-calldata', { source, 'function': name, arguments: args }, options)
@@ -75,8 +81,9 @@ function setCompilerUrl (url) {
  * @example ContractCompilerAPI({ compilerUrl: 'COMPILER_URL' })
  */
 const ContractCompilerAPI = ContractBase.compose({
-  init ({ compilerUrl = this.compilerUrl }) {
+  async init ({ compilerUrl = this.compilerUrl }) {
     this.http = Http({ baseUrl: compilerUrl })
+    this.compilerVersion = await this.getCompilerVersion()
   },
   methods: {
     contractEncodeCallDataAPI,
@@ -85,7 +92,11 @@ const ContractCompilerAPI = ContractBase.compose({
     contractGetACI,
     contractDecodeCallDataByCodeAPI,
     contractDecodeCallDataBySourceAPI,
-    setCompilerUrl
+    setCompilerUrl,
+    getCompilerVersion
+  },
+  props: {
+    compilerVersion: null
   }
 })
 

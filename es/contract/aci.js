@@ -29,6 +29,7 @@ import { decode } from '../tx/builder/helpers'
 import { encodeBase58Check } from '../utils/crypto'
 import { toBytes } from '../utils/bytes'
 import * as R from 'ramda'
+import semverSatisfies from '../utils/semver-satisfies'
 
 const SOPHIA_TYPES = [
   'int',
@@ -39,7 +40,9 @@ const SOPHIA_TYPES = [
   'list',
   'map',
   'record',
-  'option'
+  'option',
+  'oracle',
+  'oracleQuery'
 ].reduce((acc, type) => ({ ...acc, [type]: type }), {})
 
 function encodeAddress (address, prefix = 'ak') {
@@ -103,7 +106,7 @@ function transformDecodedData (aci, result, { skipTransformDecoded = false, addr
  * @param value
  * @return {string}
  */
-async function transform (type, value) {
+async function transform (type, value, { compilerVersion } = {}) {
   let { t, generic } = readType(type)
 
   // contract TestContract = ...
@@ -114,31 +117,33 @@ async function transform (type, value) {
     case SOPHIA_TYPES.string:
       return `"${value}"`
     case SOPHIA_TYPES.list:
-      return `[${await Promise.all(value.map(async el => transform(generic, el)))}]`
+      return `[${await Promise.all(value.map(async el => transform(generic, el, { compilerVersion })))}]`
     case SOPHIA_TYPES.tuple:
-      return `(${await Promise.all(value.map(async (el, i) => transform(generic[i], el)))})`
+      return `(${await Promise.all(value.map(async (el, i) => transform(generic[i], el, { compilerVersion })))})`
     case SOPHIA_TYPES.option:
       const optionV = await value.catch(e => undefined)
-      return optionV === undefined ? 'None' : `Some(${await transform(generic, optionV)})`
+      return optionV === undefined ? 'None' : `Some(${await transform(generic, optionV, { compilerVersion })})`
     case SOPHIA_TYPES.address:
-      return parseInt(value) === 0 ? '#0' : `#${decode(value).toString('hex')}`
+      return semverSatisfies(compilerVersion.split('-')[0], '1.0.0', '3.0.0')
+        ? parseInt(value) === 0 ? '#0' : `#${decode(value).toString('hex')}`
+        : value
     case SOPHIA_TYPES.record:
       return `{${await generic.reduce(
         async (acc, { name, type }, i) => {
           acc = await acc
-          acc += `${i !== 0 ? ',' : ''}${name} = ${await transform(type[0], value[name])}`
+          acc += `${i !== 0 ? ',' : ''}${name} = ${await transform(type[0], value[name], { compilerVersion })}`
           return acc
         },
         ''
       )}}`
     case SOPHIA_TYPES.map:
-      return transformMap(value, generic)
+      return transformMap(value, generic, { compilerVersion })
   }
 
   return `${value}`
 }
 
-async function transformMap (value, generic) {
+async function transformMap (value, generic, { compilerVersion }) {
   if (value instanceof Map) {
     value = Array.from(value.entries())
   }
@@ -151,7 +156,7 @@ async function transformMap (value, generic) {
       async (acc, [key, value], i) => {
         acc = await acc
         if (i !== 0) acc += ','
-        acc += `[${await transform(generic[0], key)}] = ${await transform(generic[1], value)}`
+        acc += `[${await transform(generic[0], key, { compilerVersion })}] = ${await transform(generic[1], value, { compilerVersion })}`
         return acc
       },
       ``
@@ -253,14 +258,15 @@ function validateArguments (aci, params) {
  * @rtype (aci: Object, params: Array) => Object
  * @param {Object} aci Contract ACI
  * @param {Array} params Contract call arguments
+ * @param compilerVersion
  * @return Promise{Array} Object with validation errors
  */
-async function prepareArgsForEncode (aci, params) {
+async function prepareArgsForEncode (aci, params, { compilerVersion } = {}) {
   if (!aci) return params
   // Validation
   validateArguments(aci, params)
   // Cast argument from JS to Sophia type
-  return Promise.all(aci.arguments.map(async ({ type }, i) => transform(type, params[i])))
+  return Promise.all(aci.arguments.map(async ({ type }, i) => transform(type, params[i], { compilerVersion })))
 }
 
 /**
@@ -304,7 +310,7 @@ async function getContractInstance (source, { aci, contractAddress, opt } = {}) 
     gas: 1600000 - 21000,
     top: null, // using for contract call static
     waitMined: true,
-    verify: false
+    verify: false,
   }
   const instance = {
     interface: aci.interface,
@@ -313,6 +319,7 @@ async function getContractInstance (source, { aci, contractAddress, opt } = {}) 
     compiled: null,
     deployInfo: { address: contractAddress },
     options: R.merge(defaultOptions, opt),
+    compilerVersion: this.compilerVersion,
     setOptions (opt) {
       this.options = R.merge(this.options, opt)
     }
@@ -393,7 +400,7 @@ function call (self) {
     if (!fn) throw new Error('Function name is required')
     if (!this.deployInfo.address) throw new Error('You need to deploy contract before calling!')
 
-    params = !opt.skipArgsConvert ? await prepareArgsForEncode(fnACI, params) : params
+    params = !opt.skipArgsConvert ? await prepareArgsForEncode(fnACI, params, { compilerVersion: this.compilerVersion }) : params
     const result = opt.callStatic
       ? await self.contractCallStatic(opt.source || this.source, this.deployInfo.address, fn, params, {
         top: opt.top,
@@ -406,7 +413,7 @@ function call (self) {
         transformDecodedData(
           fnACI.returns,
           await self.contractDecodeData(type || transformReturnType(fnACI.returns), result.result.returnValue),
-          { ...opt, ...decodeOptions }
+          { ...opt, ...decodeOptions, compilerVersion: this.compilerVersion }
         )
     }
   }
@@ -417,7 +424,7 @@ function deploy (self) {
     const opt = R.merge(this.options, options)
     const fnACI = getFunctionACI(this.aci, 'init')
     if (!this.compiled) await this.compile()
-    init = !opt.skipArgsConvert ? await prepareArgsForEncode(fnACI, init) : init
+    init = !opt.skipArgsConvert ? await prepareArgsForEncode(fnACI, init, { compilerVersion: this.compilerVersion }) : init
 
     const { owner, transaction, address, createdAt, result, rawTx } = await self.contractDeploy(this.compiled, opt.source || this.source, init, opt)
     this.deployInfo = { owner, transaction, address, createdAt, result, rawTx }

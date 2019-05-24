@@ -46,7 +46,9 @@ const ContractBase = stampit({
         'compileContractAPI',
         'contractDecodeCallDataBySourceAPI',
         'contractDecodeCallDataByCodeAPI',
-        'contractGetACI'
+        'contractGetACI',
+        'setCompilerUrl',
+        'getCompilerVersion'
       ]
     }
   }
@@ -55,7 +57,9 @@ const ContractBase = stampit({
     contractEncodeCallDataAPI: required,
     contractDecodeDataAPI: required,
     compileContractAPI: required,
-    contractGetACI: required
+    contractGetACI: required,
+    setCompilerUrl: required,
+    getCompilerVersion: required
   }
 }))
 
@@ -119,6 +123,27 @@ const ContractBase = stampit({
  * @param {String} code - Contract source code
  * @param {Object} [options={}] - Options
  * @return {Object} Object which contain bytecode of contract
+ */
+
+/**
+ * Set compiler url
+ * @function setCompilerUrl
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype (url: String) => void
+ * @param {String} url - Compiler url
+ * @return {void}
+ */
+
+/**
+ * Get Compiler Version
+ * @function getCompilerVersion
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype () => String
+ * @return {String} Compiler version
  */
 
 export default ContractBase
