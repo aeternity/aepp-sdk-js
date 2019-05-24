@@ -310,7 +310,7 @@ async function getContractInstance (source, { aci, contractAddress, opt } = {}) 
     gas: 1600000 - 21000,
     top: null, // using for contract call static
     waitMined: true,
-    verify: false,
+    verify: false
   }
   const instance = {
     interface: aci.interface,
