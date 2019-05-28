@@ -35,7 +35,7 @@ You can use this URL with any releasee on [npmjs](https://www.npmjs.com/package/
 ## Guides
 ### Browser
   - [**SDK usage** Understanding low vs high level](guides/low-vs-high-usage.md)
-  - [Import SDK bundle withing **`<script>`** tag](guides/import-script-tag.md)
+  - [Import SDK bundle with **`<script>`** tag](guides/import-script-tag.md)
   - [Import SDK **ES Modules** (enabling Tree-Shaking)](guides/import-tree-shaking.md)
   - [Import SDK in **VueJS**](guides/import-vuejs.md)
 ### NodeJS Environment
