@@ -133,6 +133,12 @@ In order to add a local development version of aepp-sdk to a project, `npm link`
 
 [1]: https://docs.npmjs.com/cli/link
 
+
 ## Releasing
 
 [How to release a new version](releases.md)
+
+
+## Guides
+
+If you're interested in getting sample code/guide, you can check out the [Guides](../README.md)

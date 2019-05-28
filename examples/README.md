@@ -1,12 +1,20 @@
 ## ⚡ Examples
 
-### 2. VueJS (maintained) Examples
+This folder contains examples of maintained code samples that you can run autonomously.
 
-1. [Wallet + Aepp RPC setup](/examples/connect-two-ae)
+## VueJS (maintained) Examples to run in the `browser`
+
+1. VueJS [Wallet + Aepp RPC setup](browser/vuejs/connect-two-ae)
 2. [Suggest another example](https://github.com/aeternity/aepp-sdk-js/issues/new)
 
-### 1. Universal Example (_all_ SDK's functionalities)
-> interact with aeternity's blockchain's [**Universal flavor**](docs/usage.md)
+## NodeJS (maintained and tested) Examples to run in the `terminal`
+
+1. [Simple Contract](node/aecontracts.js)
+2. [Wallet](node/aewallet.js)
+3. [Suggest another example](https://github.com/aeternity/aepp-sdk-js/issues/new)
+
+## Quick Standalone _Browser_ Example
+> This example interacts with aeternity's blockchain's [**Universal flavor**](docs/usage.md) (_all_ SDK's functionalities, in the Browser)
 
 ```js
 // Start the instance using Universal flavor
@@ -17,7 +25,7 @@ Ae({
   internalUrl: 'https://sdk-testnet.aepps.com',
   compilerUrl: 'https://compiler.aepps.com',
   keypair: { secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS' },
-  networkId: 'aet_ua' // or any other networkId your client should connect to
+  networkId: 'ae_uat' // or any other networkId your client should connect to
 }).then(ae => {
 
   // Interacting with the blockchain client
@@ -40,10 +48,10 @@ Ae({
   })
 })
 ```
-
-### 3. Wallet Example (_only_ Wallet's functionalities)
+## Quick _Browser_ Examples for:
+### 1. Wallet Example (_only_ Wallet's functionalities)
 > interact with aeternity's blockchain's [**Wallet flavor**](docs/usage.md) – For _Wallet_ development
-> You can find a more [complete example using VueJS here](examples/connect-two-ae)
+> You can find a more [complete example using VueJS here](browser/connect-two-ae)
 
 
 ```js
@@ -73,7 +81,7 @@ Wallet({
   onChain: confirmDialog,
   onAccount: confirmDialog,
   onContract: confirmDialog,
-  networkId: 'aet_ua' // or any other networkId your client should connect to
+  networkId: 'ae_uat' // or any other networkId your client should connect to
 }).then(ae => {
 
   // Interact with the blockchain!
@@ -85,9 +93,9 @@ Wallet({
 })
 ```
 
-### 3. Aepp Example (Aepp <--> Wallet via RPC)
+### 2. Aepp Example (Aepp <--> Wallet via RPC)
 > interact with aeternity's blockchain's [**Aepp flavor**](docs/usage.md) – For _Aepps_ development AKA DApp development
-> You can find a more [complete example using VueJS here](examples/connect-two-ae)
+> You can find a more [complete example using VueJS here](browser/connect-two-ae)
 
 
 ```js

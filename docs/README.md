@@ -1,5 +1,6 @@
-# Using the Javascript SDK
+# Guides
 
+## Intro
 There are three different ways of incorporating aepp-sdk-js into your project, depending on the particular scenario:
 * ES Modules at `es/` (recommended)
 * Node.js bundle at `dist/aepp-sdk.js`
@@ -23,12 +24,12 @@ Factories_ based on the specific use case:
 * [@aeternity/aepp-sdk/es/ae/universal](api/ae/universal.md): **Universal** development (includes all SDK features)
 
 In order to cater to more specific needs, it is recommended to refer to the
-[hacking documentation](hacking.md).
+[contributing Docs](contrib/README.md).
 
-## Testing Networks
-When initialising a client, to test, you can choose from 2 URLs:
+### Testing Networks
+When initialising a client, to test, you can use Aeternity's Test Nework URLs:
 
-### **Testnet** (https://sdk-testnet.aepps.com)
+### Testnet (https://sdk-testnet.aepps.com)
 You can use this URL with any releasee on [npmjs](https://www.npmjs.com/package/@aeternity/aepp-sdk). It offers the last stable version of [Node](https://github.com/aeternity/aeternity), used by all of of Aeternity's Dev Tools.
 
 ## ES Modules (enable Tree-Shaking)
@@ -109,7 +110,7 @@ The bundle will assign the SDK to a global `var` called `Ae`.
 <body>
   <script src="aepp-sdk.browser.js"></script>
   <script type="text/javascript">
-    Ae.Aepp.default().then(ae => {
+    Ae.Wallet.default().then(ae => {
       ae.height().then(height => {
         console.log('Current Block', height)
       })
@@ -125,9 +126,9 @@ The bundle is wrapped in UMD format, which is understood by webpack and
 automatically used if no `/src` suffix is given.
 
 ```js
-import Aepp from '@aeternity/aepp-sdk/es/ae/aepp'
+import Wallet from '@aeternity/aepp-sdk/es/ae/wallet'
 
-Aepp().then(ae => {
+Wallet().then(ae => {
   ae.height().then(height => {
     console.log('Current Block', height)
   })
@@ -137,10 +138,10 @@ Aepp().then(ae => {
 ## Node.js bundle
 
 The Node.js bundle is primarily interesting for scripts which use non-transpiled
-code, such as the ones provided in the `bin/` directory of the project.
+code, such as the ones provided in the [`examples/node` directory](../examples/node) of the project.
 
 ```js
-const {Universal: Ae} = require('@aeternity/aepp-sdk')
+const { Universal: Ae } = require('@aeternity/aepp-sdk')
 
 Ae({ url: 'https://sdk-testnet.aepps.com', internalUrl: 'https://sdk-testnet.aepps.com', compilerUrl: 'COMPILER_URL', keypair: 'YOUR_KEYPAIR_OBJECT' }).then(ae => {
   ae.height().then(height => {
@@ -166,7 +167,7 @@ noted that `Ae.create` is asynchronous which needs to be taken into account.
 ```bash
 vue init webpack my-project
 cd my-project
-yarn add @aeternity/aepp-sdk
+npm add @aeternity/aepp-sdk
 ```
 
 ```html
@@ -198,7 +199,7 @@ export default {
 
 [Vue.js]: https://vuejs.org/
 
-## Basic structure of an æpp
+## Basic structure of a browser æpp
 
 ### Interactions
 
@@ -217,7 +218,7 @@ understand the node's operations. Most real-world requirements involves a series
 of chain operations, so the SDK provides abstractions for these. The Javscript
 Promises framework makes this somewhat easy:
 
-### High-level SDK usage, recommended
+### (**Recommended**) High-level SDK usage
 Example spend function, using aeternity's SDK abstraction
 ```js
   // Import necessary Modules by simply importing the Wallet module
@@ -250,10 +251,13 @@ Example spend function, using the SDK, talking directly to the [**API**](../docs
     const tx = await Tx({url: 'HOST_URL_HERE', internalUrl: 'HOST_URL_HERE'})
     const chain = await Chain({url: 'HOST_URL_HERE', internalUrl: 'HOST_URL_HERE'})
     const account = Account({keypair: {secretKey: 'PRIV_KEY_HERE', publicKey: 'PUB_KEY_HERE'}, networkId: 'NETWORK_ID_HERE'})
-    const spendTx = await tx.spendTx({sender: 'PUB_KEY_HERE', receiver_pub_key, amount})
+    const spendTx = await tx.spendTx({ sender: 'PUB_KEY_HERE', receiver_pub_key, amount })
 
     const signed = await account.signTransaction(spendTx)
     return chain.sendTransaction(signed, opt)
 
   }
 ```
+
+## Examples
+Check out our [Examples](../examples/README.md) for more.

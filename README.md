@@ -33,6 +33,7 @@ check out the [develop branch].
     - [3. Create an Account and get some _AEs_](#3-create-an-account-and-get-some-aes)
   - [Usage Documentation](#usage-documentation)
   - [CLI - Command Line Client](#cli---command-line-client)
+  - [Guides](#guides)
   - [Contributing](#contributing)
   - [Change Log](#change-log)
   - [License](#license)
@@ -86,6 +87,8 @@ _eg._ Create an Account:
 
 `aecli account create testWhateverAccountName`
 
+## Guides
+Check out our [Guides](docs/README.md)
 
 ## Contributing
 
