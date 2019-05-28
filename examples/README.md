@@ -9,7 +9,7 @@ This folder contains examples of maintained code samples that you can run autono
 
 ## NodeJS (maintained and tested) Examples to run in the `terminal`
 
-1. [Simple Contract](node/aecontracts.js)
+1. [Simple Contract](node/aecontract.js)
 2. [Wallet](node/aewallet.js)
 3. [Suggest another example](https://github.com/aeternity/aepp-sdk-js/issues/new)
 
