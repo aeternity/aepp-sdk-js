@@ -3,6 +3,7 @@
 ## @aeternity/aepp-sdk/es/chain
 Chain module
 
+**Export**: Chain  
 **Example**  
 ```js
 import Chain from '@aeternity/aepp-sdk/es/chain'
