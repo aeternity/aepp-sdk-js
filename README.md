@@ -31,9 +31,8 @@ check out the [develop branch].
     - [1. Install the SDK](#1-install-the-sdk)
     - [2. Import (a chosen Flavor)](#2-import-a-chosen-flavor)
     - [3. Create an Account and get some _AEs_](#3-create-an-account-and-get-some-aes)
-  - [Usage Documentation](#usage-documentation)
+  - [⚡ Guides & Examples](#%E2%9A%A1-guides--examples)
   - [CLI - Command Line Client](#cli---command-line-client)
-  - [Guides](#guides)
   - [Contributing](#contributing)
   - [Change Log](#change-log)
   - [License](#license)
@@ -72,9 +71,9 @@ You can do many more things now, but you'll probably have to start by:
 2. Give yourself some initial _AEs_ using the [🚰 Faucet Aepp](https://faucet.aepps.com/)
 3. Enjoy building Aepps 🤓
 
-## Usage Documentation
+## ⚡ Guides & Examples
 
-Generic [Usage Documentation](docs/usage.md).
+Check out our [Guides](docs/README.md) and [Examples](examples/README.md).
 
 ## CLI - Command Line Client
 
@@ -87,12 +86,9 @@ _eg._ Create an Account:
 
 `aecli account create testWhateverAccountName`
 
-## Guides
-Check out our [Guides](docs/README.md)
-
 ## Contributing
 
-For advanced use, to get a deeper understanding of the SDK or to contribute to its development, it is advised to read the [Contributing Guidelines](docs/contributing.md) section.
+For advanced use, to get a deeper understanding of the SDK or to contribute to its development, it is advised to read the [Contributing Guidelines](docs/contrib/README.md) section.
 
 ## Change Log
 

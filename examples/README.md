@@ -1,4 +1,4 @@
-## ⚡ Examples
+# ⚡ Examples
 
 This folder contains examples of maintained code samples that you can run autonomously.
 
