@@ -27,17 +27,17 @@ check out the [develop branch].
 - [Æternity's Javascript SDK](#%C3%A6ternitys-javascript-sdk)
       - [Disclaimer](#disclaimer)
   - [Table of content](#table-of-content)
-  - [⚡ Quick Start](#%E2%9A%A1-quick-start)
+  - [Quick Start](#quick-start)
     - [1. Install the SDK](#1-install-the-sdk)
     - [2. Import (a chosen Flavor)](#2-import-a-chosen-flavor)
     - [3. Create an Account and get some _AEs_](#3-create-an-account-and-get-some-aes)
-  - [⚡ Guides & Examples](#%E2%9A%A1-guides--examples)
+  - [Guides & Examples](#guides--examples)
   - [CLI - Command Line Client](#cli---command-line-client)
   - [Contributing](#contributing)
   - [Change Log](#change-log)
   - [License](#license)
 
-## ⚡ Quick Start
+## Quick Start
 
 ### 1. Install the SDK
 Add the latest `@aeternity/aepp-sdk` release from npmjs.com to your project using one of these commands
@@ -71,7 +71,7 @@ You can do many more things now, but you'll probably have to start by:
 2. Give yourself some initial _AEs_ using the [🚰 Faucet Aepp](https://faucet.aepps.com/)
 3. Enjoy building Aepps 🤓
 
-## ⚡ Guides & Examples
+## Guides & Examples
 
 Check out our [Guides](docs/README.md) and [Examples](examples/README.md).
 
