@@ -55,11 +55,9 @@ async function ready (mocha, native = true) {
     charged = true
   }
 
-  const client = await BaseAe({ nativeMode: false, networkId })
-  const clientNative = await BaseAe({ nativeMode: true, networkId })
+  const client = await BaseAe({ nativeMode: native, networkId })
   client.setKeypair(account)
-  clientNative.setKeypair(account)
-  return native ? clientNative : client
+  return client
 }
 
 export {
