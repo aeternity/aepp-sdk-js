@@ -30,313 +30,137 @@ import { buildTx, calculateFee } from './builder'
 import { MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE } from './builder/schema'
 import { buildContractId, oracleQueryId } from './builder/helpers'
 
-async function spendTx ({ senderId, recipientId, amount, payload = '' }) {
-  // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.spend, { senderId, ...R.head(arguments), payload })
-
-  // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
-  const { tx } = this.nativeMode
-    ? buildTx(R.merge(R.head(arguments), {
-      recipientId,
-      senderId,
-      nonce,
-      ttl,
-      fee,
-      payload
-    }), TX_TYPE.spend)
-    : await this.api.postSpend(R.merge(R.head(arguments), {
-      amount: parseInt(amount),
-      recipientId,
-      senderId,
-      nonce,
-      ttl,
-      fee: parseInt(fee),
-      payload
-    }))
-
-  return tx
+const NODE_METHOD_NAME = {
+  [TX_TYPE.spend]: 'postSpend',
+  [TX_TYPE.namePreClaim]: 'postNamePreclaim',
+  [TX_TYPE.nameClaim]: 'postNameClaim',
+  [TX_TYPE.nameTransfer]: 'postNameTransfer',
+  [TX_TYPE.nameUpdate]: 'postNameUpdate',
+  [TX_TYPE.nameRevoke]: 'postNameRevoke',
+  [TX_TYPE.contractCreate]: 'postContractCreate',
+  [TX_TYPE.contractCall]: 'postContractCall',
+  [TX_TYPE.oracleRegister]: 'postOracleRegister',
+  [TX_TYPE.oracleExtend]: 'postOracleExtend',
+  [TX_TYPE.oracleQuery]: 'postOracleQuery',
+  [TX_TYPE.oracleResponse]: 'postOracleRespond',
+  [TX_TYPE.channelCloseSolo]: 'postChannelCloseSolo',
+  [TX_TYPE.channelSlash]: 'postChannelSlash',
+  [TX_TYPE.channelSettle]: 'postChannelSettle',
+  [TX_TYPE.channelSnapshotSolo]: 'postChannelSnapshotSolo'
 }
 
-async function namePreclaimTx ({ accountId, commitmentId }) {
-  // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.namePreClaim, { senderId: accountId, ...R.head(arguments) })
-
-  // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
-  const { tx } = this.nativeMode
-    ? buildTx(R.merge(R.head(arguments), { nonce, ttl, fee }), TX_TYPE.namePreClaim)
-    : await this.api.postNamePreclaim(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
-
-  return tx
+const ACCOUNT_ID_FIELD_NAME = {
+  [TX_TYPE.spend]: 'senderId',
+  [TX_TYPE.namePreClaim]: 'accountId',
+  [TX_TYPE.nameClaim]: 'accountId',
+  [TX_TYPE.nameTransfer]: 'accountId',
+  [TX_TYPE.nameUpdate]: 'accountId',
+  [TX_TYPE.nameRevoke]: 'accountId',
+  [TX_TYPE.contractCreate]: 'ownerId',
+  [TX_TYPE.contractCall]: 'callerId',
+  [TX_TYPE.oracleRegister]: 'accountId',
+  [TX_TYPE.oracleExtend]: 'callerId',
+  [TX_TYPE.oracleQuery]: 'senderId',
+  [TX_TYPE.oracleResponse]: 'callerId',
+  [TX_TYPE.channelCloseSolo]: 'fromId',
+  [TX_TYPE.channelSlash]: 'fromId',
+  [TX_TYPE.channelSettle]: 'fromId',
+  [TX_TYPE.channelSnapshotSolo]: 'fromId'
 }
 
-async function nameClaimTx ({ accountId, name, nameSalt }) {
-  // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.nameClaim, { senderId: accountId, ...R.head(arguments) })
+function getTxBuilder (txType, fieldsMapper = a => a) {
+  return async function (options) {
+    let fields = await Promise.resolve(fieldsMapper.call(this, options))
+    // Calculate fee, get absolute ttl (ttl + height), get account nonce
+    const { fee, ttl, nonce } = await this.prepareTxParams(txType, fields)
 
-  // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
-  const { tx } = this.nativeMode
-    ? buildTx(R.merge(R.head(arguments), { nonce, ttl, fee }), TX_TYPE.nameClaim)
-    : await this.api.postNameClaim(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
+    fields = { ...fields, nonce, ttl, fee }
+    // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
+    const { tx } = this.nativeMode
+      ? buildTx(fields, txType)
+      : await this.api[NODE_METHOD_NAME[txType]]({
+        ...fields,
+        ...fields.amount && { amount: parseInt(fields.amount) },
+        ...fields.fee && { fee: parseInt(fields.fee) },
+        ...fields.gas && { gas: parseInt(fields.gas) },
+        ...fields.initiatorAmountFinal && { initiatorAmountFinal: parseInt(fields.initiatorAmountFinal) },
+        ...fields.responderAmountFinal && { responderAmountFinal: parseInt(fields.responderAmountFinal) }
+      })
 
-  return tx
+    return tx
+  }
 }
 
-async function nameTransferTx ({ accountId, nameId, recipientId }) {
-  // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.nameTransfer, { senderId: accountId, ...R.head(arguments) })
+const spendTx = getTxBuilder(
+  TX_TYPE.spend,
+  ({ payload = '', ...otherFields }) => ({ payload, ...otherFields })
+)
 
-  // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
-  const { tx } = this.nativeMode
-    ? buildTx(R.merge(R.head(arguments), { recipientId, nonce, ttl, fee }), TX_TYPE.nameTransfer)
-    : await this.api.postNameTransfer(R.merge(R.head(arguments), { recipientId, nonce, ttl, fee: parseInt(fee) }))
+const namePreclaimTx = getTxBuilder(TX_TYPE.namePreClaim)
+const nameClaimTx = getTxBuilder(TX_TYPE.nameClaim)
+const nameTransferTx = getTxBuilder(TX_TYPE.nameTransfer)
+const nameUpdateTx = getTxBuilder(TX_TYPE.nameUpdate)
+const nameRevokeTx = getTxBuilder(TX_TYPE.nameRevoke)
 
-  return tx
-}
-
-async function nameUpdateTx ({ accountId, nameId, nameTtl, pointers, clientTtl }) {
-  // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.nameUpdate, { senderId: accountId, ...R.head(arguments) })
-
-  // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
-  const { tx } = this.nativeMode
-    ? buildTx(R.merge(R.head(arguments), { nonce, ttl, fee }), TX_TYPE.nameUpdate)
-    : await this.api.postNameUpdate(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
-
-  return tx
-}
-
-async function nameRevokeTx ({ accountId, nameId }) {
-  // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.nameRevoke, { senderId: accountId, ...R.head(arguments) })
-
-  // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
-  const { tx } = this.nativeMode
-    ? buildTx(R.merge(R.head(arguments), { nonce, ttl, fee }), TX_TYPE.nameRevoke)
-    : await this.api.postNameRevoke(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
-
-  return tx
-}
-
-async function contractCreateTx ({ ownerId, code, vmVersion, abiVersion, deposit, amount, gas, gasPrice = MIN_GAS_PRICE, callData }) {
-  // Get VM_ABI version
-  const ctVersion = this.getVmVersion(TX_TYPE.contractCreate, R.head(arguments))
-  // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.contractCreate, { senderId: ownerId, ...R.head(arguments), ctVersion, gasPrice })
-  // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
-  return this.nativeMode
-    ? {
-      ...buildTx(R.merge(R.head(arguments), { nonce, ttl, fee, ctVersion, gasPrice }), TX_TYPE.contractCreate),
-      contractId: buildContractId(ownerId, nonce)
-    }
-    : this.api.postContractCreate(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee), gas: parseInt(gas), gasPrice, vmVersion: ctVersion.vmVersion, abiVersion: ctVersion.abiVersion }))
-}
-
-async function contractCallTx ({ callerId, contractId, abiVersion, amount, gas, gasPrice = MIN_GAS_PRICE, callData }) {
-  const ctVersion = this.getVmVersion(TX_TYPE.contractCall, R.head(arguments))
-  // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.contractCall, { senderId: callerId, ...R.head(arguments), gasPrice, abiVersion: ctVersion.abiVersion })
-
-  // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
-  const { tx } = this.nativeMode
-    ? buildTx(R.merge(R.head(arguments), { nonce, ttl, fee, abiVersion: ctVersion.abiVersion, gasPrice }), TX_TYPE.contractCall)
-    : await this.api.postContractCall(R.merge(R.head(arguments), {
-      nonce,
-      ttl,
-      fee: parseInt(fee),
-      gas: parseInt(gas),
+const contractCreateTx = getTxBuilder(
+  TX_TYPE.contractCreate,
+  async function ({ ownerId, gasPrice = MIN_GAS_PRICE, ...otherFields }) {
+    const ctVersion = this.getVmVersion(TX_TYPE.contractCreate, arguments[0])
+    return ({
+      ownerId,
       gasPrice,
+      ...otherFields,
+      ctVersion,
+      vmVersion: ctVersion.vmVersion,
+      abiVersion: ctVersion.abiVersion,
+      contractId: buildContractId(
+        ownerId,
+        (await this.prepareTxParams(TX_TYPE.oracleQuery, arguments[0])).nonce
+      )
+    })
+  }
+)
+
+const contractCallTx = getTxBuilder(
+  TX_TYPE.contractCall,
+  function ({ gasPrice = MIN_GAS_PRICE, ...otherFields }) {
+    const ctVersion = this.getVmVersion(TX_TYPE.contractCreate, arguments[0])
+    return ({
+      gasPrice,
+      ...otherFields,
       abiVersion: ctVersion.abiVersion
-    }))
-
-  return tx
-}
-
-async function oracleRegisterTx ({ accountId, queryFormat, responseFormat, queryFee, oracleTtl, abiVersion }) {
-  const { abiVersion: abi } = this.getVmVersion(TX_TYPE.oracleRegister, R.head(arguments))
-  // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.oracleRegister, { senderId: accountId, ...R.head(arguments), abiVersion: abi })
-  // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
-  const { tx } = this.nativeMode
-    ? buildTx({
-      accountId,
-      queryFee,
-      abiVersion: abi,
-      fee,
-      oracleTtl,
-      nonce,
-      ttl,
-      queryFormat,
-      responseFormat
-    }, TX_TYPE.oracleRegister)
-    : await this.api.postOracleRegister({
-      accountId,
-      queryFee,
-      abiVersion: abi,
-      fee: parseInt(fee),
-      oracleTtl,
-      nonce,
-      ttl,
-      queryFormat,
-      responseFormat
     })
+  }
+)
 
-  return tx
-}
-
-async function oracleExtendTx ({ oracleId, callerId, oracleTtl }) {
-  // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.oracleExtend, { senderId: callerId, ...R.head(arguments) })
-
-  // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
-  const { tx } = this.nativeMode
-    ? buildTx({ oracleId, fee, oracleTtl, nonce, ttl }, TX_TYPE.oracleExtend)
-    : await this.api.postOracleExtend({ oracleId, fee: parseInt(fee), oracleTtl, nonce, ttl })
-
-  return tx
-}
-
-async function oraclePostQueryTx ({ oracleId, responseTtl, query, queryTtl, queryFee, senderId }) {
-  // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.oracleQuery, { senderId, ...R.head(arguments) })
-
-  // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
-  const { tx } = this.nativeMode
-    ? buildTx({ oracleId, responseTtl, query, queryTtl, fee, queryFee, ttl, nonce, senderId }, TX_TYPE.oracleQuery)
-    : await this.api.postOracleQuery({
-      oracleId,
-      responseTtl,
-      query,
-      queryTtl,
-      fee: parseInt(fee),
-      queryFee,
-      ttl,
-      nonce,
-      senderId
+const oracleRegisterTx = getTxBuilder(
+  TX_TYPE.oracleRegister,
+  function (fields) {
+    const ctVersion = this.getVmVersion(TX_TYPE.oracleRegister, arguments[0])
+    return ({
+      ...fields,
+      abiVersion: ctVersion.abiVersion
     })
+  }
+)
 
-  return { tx, queryId: oracleQueryId(senderId, nonce, oracleId) }
+const oracleExtendTx = getTxBuilder(TX_TYPE.oracleExtend)
+async function oraclePostQueryTx ({ senderId, oracleId, ...otherFields }) {
+  return {
+    tx: await getTxBuilder(TX_TYPE.oracleQuery).call(this, arguments[0]),
+    queryId: oracleQueryId(
+      senderId,
+      (await this.prepareTxParams(TX_TYPE.oracleQuery, arguments[0])).nonce,
+      oracleId
+    )
+  }
 }
+const oracleRespondTx = getTxBuilder(TX_TYPE.oracleResponse)
 
-async function oracleRespondTx ({ oracleId, callerId, responseTtl, queryId, response }) {
-  // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.oracleResponse, { senderId: callerId, ...R.head(arguments) })
-
-  // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
-  const { tx } = this.nativeMode
-    ? buildTx({ oracleId, responseTtl, queryId, response, fee, ttl, nonce }, TX_TYPE.oracleResponse)
-    : await this.api.postOracleRespond({ oracleId, responseTtl, queryId, response, fee: parseInt(fee), ttl, nonce })
-  return tx
-}
-
-async function channelCloseSoloTx ({ channelId, fromId, payload, poi }) {
-  // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.channelCloseSolo, { senderId: fromId, ...R.head(arguments), payload })
-
-  // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
-  const { tx } = this.nativeMode
-    ? buildTx(R.merge(R.head(arguments), {
-      channelId,
-      fromId,
-      payload,
-      poi,
-      ttl,
-      fee,
-      nonce
-    }), TX_TYPE.channelCloseSolo)
-    : await this.api.postChannelCloseSolo(R.merge(R.head(arguments), {
-      channelId,
-      fromId,
-      payload,
-      poi,
-      ttl,
-      fee: parseInt(fee),
-      nonce
-    }))
-
-  return tx
-}
-
-async function channelSlashTx ({ channelId, fromId, payload, poi }) {
-  // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.channelSlash, { senderId: fromId, ...R.head(arguments), payload })
-
-  // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
-  const { tx } = this.nativeMode
-    ? buildTx(R.merge(R.head(arguments), {
-      channelId,
-      fromId,
-      payload,
-      poi,
-      ttl,
-      fee,
-      nonce
-    }), TX_TYPE.channelSlash)
-    : await this.api.postChannelSlash(R.merge(R.head(arguments), {
-      channelId,
-      fromId,
-      payload,
-      poi,
-      ttl,
-      fee: parseInt(fee),
-      nonce
-    }))
-
-  return tx
-}
-
-async function channelSettleTx ({ channelId, fromId, initiatorAmountFinal, responderAmountFinal }) {
-  // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.channelSettle, { senderId: fromId, ...R.head(arguments) })
-
-  // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
-  const { tx } = this.nativeMode
-    ? buildTx(R.merge(R.head(arguments), {
-      channelId,
-      fromId,
-      initiatorAmountFinal,
-      responderAmountFinal,
-      ttl,
-      fee,
-      nonce
-    }), TX_TYPE.channelSettle)
-    : await this.api.postChannelSettle(R.merge(R.head(arguments), {
-      channelId,
-      fromId,
-      initiatorAmountFinal: parseInt(initiatorAmountFinal),
-      responderAmountFinal: parseInt(responderAmountFinal),
-      ttl,
-      fee: parseInt(fee),
-      nonce
-    }))
-
-  return tx
-}
-
-async function channelSnapshotSoloTx ({ channelId, fromId, payload }) {
-  // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.channelSnapshotSolo, { senderId: fromId, ...R.head(arguments), payload })
-
-  // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
-  const { tx } = this.nativeMode
-    ? buildTx(R.merge(R.head(arguments), {
-      channelId,
-      fromId,
-      payload,
-      ttl,
-      fee,
-      nonce
-    }), TX_TYPE.channelSnapshotSolo)
-    : await this.api.postChannelSnapshotSolo(R.merge(R.head(arguments), {
-      channelId,
-      fromId,
-      payload,
-      ttl,
-      fee: parseInt(fee),
-      nonce
-    }))
-
-  return tx
-}
+const channelCloseSoloTx = getTxBuilder(TX_TYPE.channelCloseSolo)
+const channelSlashTx = getTxBuilder(TX_TYPE.channelSlash)
+const channelSettleTx = getTxBuilder(TX_TYPE.channelSettle)
+const channelSnapshotSoloTx = getTxBuilder(TX_TYPE.channelSnapshotSolo)
 
 /**
  * Validated vm/abi version or get default based on transaction type and NODE version
@@ -400,10 +224,10 @@ async function getAccountNonce (accountId, nonce) {
  * @param {Object} params Object which contains all tx data
  * @return {Object} { ttl, nonce, fee } Object with account nonce, absolute ttl and transaction fee
  */
-async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, gas, absoluteTtl }) {
-  const nonce = await this.getAccountNonce(senderId, n)
+async function prepareTxParams (txType, { nonce: n, ttl: t, fee: f, gas, absoluteTtl }) {
+  const nonce = await this.getAccountNonce(arguments[1][ACCOUNT_ID_FIELD_NAME[txType]], n)
   const ttl = await (calculateTtl.bind(this)(t, !absoluteTtl))
-  const fee = calculateFee(f, txType, { showWarning: this.showWarning, gas, params: R.merge(R.last(arguments), { nonce, ttl }) })
+  const fee = calculateFee(f, txType, { showWarning: this.showWarning, gas, params: { ...arguments[1], nonce, ttl } })
   return { fee, ttl, nonce }
 }
 
