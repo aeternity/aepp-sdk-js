@@ -65,6 +65,8 @@ const OBJECT_TAG_CHANNELS_TREE = 623
 const OBJECT_TAG_NAMESERVICE_TREE = 624
 const OBJECT_TAG_ORACLES_TREE = 625
 const OBJECT_TAG_ACCOUNTS_TREE = 626
+const OBJECT_TAG_GA_ATTACH = 80
+const OBJECT_TAG_GA_META = 81
 
 const TX_FIELD = (name, type, prefix) => [name, type, prefix]
 const TX_SCHEMA_FIELD = (schema, objectId) => [schema, objectId]
@@ -137,7 +139,10 @@ export const TX_TYPE = {
   channelsTree: 'channelsTree',
   nameserviceTree: 'nameserviceTree',
   oraclesTree: 'oraclesTree',
-  accountsTree: 'accountsTree'
+  accountsTree: 'accountsTree',
+  // GA ACCOUNTS
+  gaAttach: 'gaAttach',
+  gaMeta: 'gaMeta'
 }
 
 // # see https://github.com/aeternity/protocol/blob/minerva/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain
@@ -227,7 +232,10 @@ export const OBJECT_ID_TX_TYPE = {
   [OBJECT_TAG_CHANNELS_TREE]: TX_TYPE.channelsTree,
   [OBJECT_TAG_NAMESERVICE_TREE]: TX_TYPE.nameserviceTree,
   [OBJECT_TAG_ORACLES_TREE]: TX_TYPE.oraclesTree,
-  [OBJECT_TAG_ACCOUNTS_TREE]: TX_TYPE.accountsTree
+  [OBJECT_TAG_ACCOUNTS_TREE]: TX_TYPE.accountsTree,
+  // GA Accounts
+  [OBJECT_TAG_GA_ATTACH]: TX_TYPE.gaAttach,
+  [OBJECT_TAG_GA_META]: TX_TYPE.gaMeta
 }
 
 export const FIELD_TYPES = {
@@ -409,6 +417,32 @@ const CONTRACT_TX = [
   TX_FIELD('active', FIELD_TYPES.bool),
   TX_FIELD('referers', FIELD_TYPES.ids, 'ak'),
   TX_FIELD('deposit', FIELD_TYPES.int)
+]
+
+const GA_ATTACH_TX = [
+  ...BASE_TX,
+  TX_FIELD('ownerId', FIELD_TYPES.id, 'ak'),
+  TX_FIELD('nonce', FIELD_TYPES.int),
+  TX_FIELD('code', FIELD_TYPES.binary, 'cb'),
+  TX_FIELD('authFun', FIELD_TYPES.binary, 'cb'),
+  TX_FIELD('ctVersion', FIELD_TYPES.ctVersion),
+  TX_FIELD('fee', FIELD_TYPES.int),
+  TX_FIELD('ttl', FIELD_TYPES.int),
+  TX_FIELD('gas', FIELD_TYPES.int),
+  TX_FIELD('gasPrice', FIELD_TYPES.int),
+  TX_FIELD('callData', FIELD_TYPES.binary, 'cb')
+]
+
+const GA_META_TX = [
+  ...BASE_TX,
+  TX_FIELD('gaId', FIELD_TYPES.id, 'ct'),
+  TX_FIELD('authData', FIELD_TYPES.binary, 'cb'),
+  TX_FIELD('abiVersion', FIELD_TYPES.int),
+  TX_FIELD('fee', FIELD_TYPES.int),
+  TX_FIELD('gas', FIELD_TYPES.int),
+  TX_FIELD('gasPrice', FIELD_TYPES.int),
+  TX_FIELD('ttl', FIELD_TYPES.int),
+  TX_FIELD('tx', FIELD_TYPES.binary)
 ]
 
 const CONTRACT_CREATE_TX = [
@@ -873,6 +907,12 @@ export const TX_SERIALIZATION_SCHEMA = {
   },
   [TX_TYPE.accountsTree]: {
     1: TX_SCHEMA_FIELD(ACCOUNTS_TREE_TX, OBJECT_TAG_ACCOUNTS_TREE)
+  },
+  [TX_TYPE.gaAttach]: {
+    1: TX_SCHEMA_FIELD(GA_ATTACH_TX, OBJECT_TAG_GA_ATTACH)
+  },
+  [TX_TYPE.gaMeta]: {
+    1: TX_SCHEMA_FIELD(GA_META_TX, OBJECT_TAG_GA_META)
   }
 }
 
@@ -1002,6 +1042,12 @@ export const TX_DESERIALIZATION_SCHEMA = {
   },
   [OBJECT_TAG_ACCOUNTS_TREE]: {
     1: TX_SCHEMA_FIELD(ACCOUNTS_TREE_TX, OBJECT_TAG_ACCOUNTS_TREE)
+  },
+  [OBJECT_TAG_GA_ATTACH]: {
+    1: TX_SCHEMA_FIELD(GA_ATTACH_TX, OBJECT_TAG_GA_ATTACH)
+  },
+  [OBJECT_TAG_GA_META]: {
+    1: TX_SCHEMA_FIELD(GA_META_TX, OBJECT_TAG_GA_META)
   }
 }
 
