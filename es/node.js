@@ -27,11 +27,6 @@ import axios from 'axios'
 import * as R from 'ramda'
 import Swagger from './utils/swagger'
 import semverSatisfies from './utils/semver-satisfies'
-import { URL } from 'universal-url'
-
-function resolveUrl (url, baseUrl) {
-  return new URL(url, baseUrl).toString()
-}
 
 /**
  * Obtain Swagger configuration from Node node
@@ -42,7 +37,7 @@ function resolveUrl (url, baseUrl) {
  * @return {Object} Swagger configuration
  */
 async function remoteSwag (url, axiosConfig) {
-  return (await axios.get(resolveUrl('api', url), axiosConfig)).data
+  return (await axios.get(`${url}/api`, axiosConfig)).data
 }
 
 /**
@@ -57,9 +52,9 @@ const loader = ({ url, internalUrl }) => (path, definition) => {
   const { tags, operationId } = definition
 
   if (R.contains('external', tags)) {
-    return resolveUrl(path, url)
+    return `${url}${path}`
   } else if (!R.isNil(internalUrl) && R.contains('internal', tags)) {
-    return resolveUrl(path, internalUrl)
+    return `${internalUrl}${path}`
   } else {
     throw Error(`Method ${operationId} is unsupported. No interface for ${R.toString(tags)}`)
   }
@@ -107,7 +102,8 @@ function axiosError (handler) {
  */
 const Node = stampit({
   async init ({ url = this.url, internalUrl = this.internalUrl, axiosConfig: { config, errorHandler } = {} }) {
-    url = url.replace(/\/?$/, '/')
+    url = url.replace(/\/?$/, '')
+    internalUrl = internalUrl.replace(/\/?$/, '')
     // Get swagger schema
     const swag = await remoteSwag(url, config).catch(this.axiosError(errorHandler))
     this.version = swag.info.version
