@@ -44,7 +44,6 @@ contract StateContract =
   public function stringFn(a: string) : string = a
   public function boolFn(a: bool) : bool = a
   public function addressFn(a: address) : address = a
-  public function emptyAddress() : address = #0
   public function contractAddress (ct: address) : address = ct
   public function accountAddress (ak: address) : address = ak
 
@@ -229,20 +228,15 @@ describe('Contract', function () {
             e.message.should.be.equal('"Argument" at position 0 fails because ["0" must be less than or equal to 0, Value "333" at path: [0] not a string]')
           }
         })
-        it('Empty address', async () => {
+        it.skip('Empty address', async () => {
           const result = await contractObject.methods.emptyAddress()
           return result.decode().should.eventually.become(0)
         })
         it('Return address', async () => {
-          const contractAddress = await (await contractObject.methods
-            .contractAddress('ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh'))
-            .decode(null, { addressPrefix: 'ct' })
-
           const accountAddress = await (await contractObject.methods
             .accountAddress(await contract.address()))
             .decode(null, { addressPrefix: 'ak' })
 
-          contractAddress.should.be.equal('ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh')
           accountAddress.should.be.equal(await contract.address())
         })
         it('Valid', async () => {
