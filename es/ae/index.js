@@ -124,7 +124,8 @@ function destroyInstance () {
  * @return {Object} Ae instance
  */
 const Ae = stampit(Tx, Account, Chain, {
-  methods: { send, spend, transferFunds, destroyInstance }
+  methods: { send, spend, transferFunds, destroyInstance },
+  deepProps: { Ae: { defaults: {} } }
 })
 
 export default Ae

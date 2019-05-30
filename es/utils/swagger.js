@@ -446,11 +446,21 @@ const operation = R.memoize((path, method, definition, types, { config, errorHan
 const Swagger = stampit(AsyncInit, {
   async init ({ swag = this.swag, axiosConfig }, { stamp }) {
     const { paths, definitions } = swag
-    const basePath = swag.basePath.replace(/^\//, '')
-    const methods = R.indexBy(R.prop('name'), R.flatten(R.values(R.mapObjIndexed((methods, path) => R.values(R.mapObjIndexed((definition, method) => {
-      const op = operation(path, method, definition, definitions, axiosConfig)
-      return op(this, this.urlFor(basePath, definition))
-    }, methods)), paths))))
+    const methods = R.indexBy(
+      R.prop('name'),
+      R.flatten(
+        R.values(
+          R.mapObjIndexed(
+            (methods, path) => R.values(
+              R.mapObjIndexed((definition, method) => {
+                const op = operation(path, method, definition, definitions, axiosConfig)
+                return op(this, this.urlFor(swag.basePath, definition))
+              }, methods)),
+            paths
+          )
+        )
+      )
+    )
 
     return Object.assign(this, {
       methods: R.keys(methods),
