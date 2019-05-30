@@ -67,6 +67,7 @@ const OBJECT_TAG_ORACLES_TREE = 625
 const OBJECT_TAG_ACCOUNTS_TREE = 626
 const OBJECT_TAG_GA_ATTACH = 80
 const OBJECT_TAG_GA_META = 81
+const OBJECT_TAG_SOPHIA_BYTE_CODE = 70
 
 const TX_FIELD = (name, type, prefix) => [name, type, prefix]
 const TX_SCHEMA_FIELD = (schema, objectId) => [schema, objectId]
@@ -142,7 +143,8 @@ export const TX_TYPE = {
   accountsTree: 'accountsTree',
   // GA ACCOUNTS
   gaAttach: 'gaAttach',
-  gaMeta: 'gaMeta'
+  gaMeta: 'gaMeta',
+  sophiaByteCode: 'sophiaByteCode'
 }
 
 // # see https://github.com/aeternity/protocol/blob/minerva/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain
@@ -235,7 +237,8 @@ export const OBJECT_ID_TX_TYPE = {
   [OBJECT_TAG_ACCOUNTS_TREE]: TX_TYPE.accountsTree,
   // GA Accounts
   [OBJECT_TAG_GA_ATTACH]: TX_TYPE.gaAttach,
-  [OBJECT_TAG_GA_META]: TX_TYPE.gaMeta
+  [OBJECT_TAG_GA_META]: TX_TYPE.gaMeta,
+  [OBJECT_TAG_SOPHIA_BYTE_CODE]: TX_TYPE.sophiaByteCode
 }
 
 export const FIELD_TYPES = {
@@ -256,7 +259,8 @@ export const FIELD_TYPES = {
   proofOfInclusion: 'proofOfInclusion',
   mptree: 'mptree',
   callReturnType: 'callReturnType',
-  ctVersion: 'ctVersion'
+  ctVersion: 'ctVersion',
+  sophiaCodeTypeInfo: 'sophiaCodeTypeInfo'
 }
 
 // FEE CALCULATION
@@ -332,6 +336,21 @@ const ACCOUNT_TX = [
   ...BASE_TX,
   TX_FIELD('nonce', FIELD_TYPES.int),
   TX_FIELD('balance', FIELD_TYPES.int)
+]
+
+export const CONTRACT_BYTE_CODE_MINERVA = [
+  ...BASE_TX,
+  TX_FIELD('sourceCodeHash', FIELD_TYPES.rawBinary),
+  TX_FIELD('typeInfo', FIELD_TYPES.sophiaCodeTypeInfo),
+  TX_FIELD('byteCode', FIELD_TYPES.rawBinary),
+  TX_FIELD('compilerVersion', FIELD_TYPES.string)
+]
+
+export const CONTRACT_BYTE_CODE_ROMA = [
+  ...BASE_TX,
+  TX_FIELD('sourceCodeHash', FIELD_TYPES.rawBinary),
+  TX_FIELD('typeInfo', FIELD_TYPES.sophiaCodeTypeInfo),
+  TX_FIELD('byteCode', FIELD_TYPES.rawBinary)
 ]
 
 const ACCOUNT_TX_2 = [
@@ -426,7 +445,7 @@ const GA_ATTACH_TX = [
   TX_FIELD('ownerId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
   TX_FIELD('code', FIELD_TYPES.binary, 'cb'),
-  TX_FIELD('authFun', FIELD_TYPES.binary, 'cb'),
+  TX_FIELD('authFun', FIELD_TYPES.rawBinary),
   TX_FIELD('ctVersion', FIELD_TYPES.ctVersion),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int),
@@ -1050,6 +1069,10 @@ export const TX_DESERIALIZATION_SCHEMA = {
   },
   [OBJECT_TAG_GA_META]: {
     1: TX_SCHEMA_FIELD(GA_META_TX, OBJECT_TAG_GA_META)
+  },
+  [OBJECT_TAG_SOPHIA_BYTE_CODE]: {
+    1: TX_SCHEMA_FIELD(CONTRACT_BYTE_CODE_ROMA, OBJECT_TAG_SOPHIA_BYTE_CODE),
+    2: TX_SCHEMA_FIELD(CONTRACT_BYTE_CODE_MINERVA, OBJECT_TAG_SOPHIA_BYTE_CODE)
   }
 }
 

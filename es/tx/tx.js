@@ -338,6 +338,18 @@ async function channelSnapshotSoloTx ({ channelId, fromId, payload }) {
   return tx
 }
 
+async function gaAttachTx ({ ownerId, code, vmVersion, abiVersion, authFan, gas, gasPrice = MIN_GAS_PRICE, callData }) {
+  // Get VM_ABI version
+  const ctVersion = this.getVmVersion(TX_TYPE.contractCreate, R.head(arguments))
+  // Calculate fee, get absolute ttl (ttl + height), get account nonce
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.contractCreate, { senderId: ownerId, ...R.head(arguments), ctVersion, gasPrice })
+  // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
+  return {
+    ...buildTx(R.merge(R.head(arguments), { nonce, ttl, fee, ctVersion, gasPrice }), TX_TYPE.gaAttach),
+    contractId: buildContractId(ownerId, nonce)
+  }
+}
+
 /**
  * Validated vm/abi version or get default based on transaction type and NODE version
  *
@@ -455,6 +467,7 @@ const Transaction = Node.compose(Tx, {
     channelSlashTx,
     channelSettleTx,
     channelSnapshotSoloTx,
+    gaAttachTx,
     getAccountNonce,
     getVmVersion
   }
