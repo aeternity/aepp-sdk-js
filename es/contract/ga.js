@@ -92,5 +92,5 @@ async function createGeneralizeAccount (authFnName, source, args, options) {
   }
 }
 
-async function sendMetaTx(gaId, rawTransaction) { /* @TODO Not yet implemented */ }
+async function sendMetaTx (gaId, rawTransaction) { /* @TODO Not yet implemented */ }
 async function prepareAuthData (txHash, nonce) { /* @TODO Not yet implemented */ }
