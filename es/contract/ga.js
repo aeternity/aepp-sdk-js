@@ -44,28 +44,33 @@ export const GeneralizeAccount = Contract.compose({
   methods: {
     createGeneralizeAccount,
     getContractAuthFan,
-    sendMetaTx
+    sendMetaTx,
+    prepareAuthData
   }
 })
 export default GeneralizeAccount
 
-async function getContractAuthFan (source) {
+async function getContractAuthFan (source, fnName) {
   const { bytecode } = await this.contractCompile(source)
-  const { tx: { typeInfo: { authorize: { funHash: authFan } } } } = await unpackTx(bytecode, false, 'cb')
+  const { tx: { typeInfo } } = await unpackTx(bytecode, false, 'cb')
+  if (!typeInfo[fnName]) throw new Error(`Can't find authFan for function "${fnName}"`)
+  const { funHash: authFan } = typeInfo[fnName]
+
   return { bytecode, authFan }
 }
 
 /**
  * Create a gaAttach transaction and broadcast it to the chain
- * @param source - Auth contract source code
- * @param args - init arguments
- * @param options - Options
+ * @param {String} authFnName - Authorization function name
+ * @param {String} source - Auth contract source code
+ * @param {Array} args - init arguments
+ * @param {Object} options - Options
  * @return {Promise<Readonly<{result: *, owner: *, createdAt: Date, address, rawTx: *, transaction: *}>>}
  */
-async function createGeneralizeAccount (source, args, options) {
+async function createGeneralizeAccount (authFnName, source, args, options) {
   const ownerId = await this.address()
   const opt = R.merge(this.Ae.defaults, options)
-  const { authFan, bytecode } = await this.getContractInstance(source)
+  const { authFan, bytecode } = await this.getContractAuthFan(source, authFnName)
   const callData = await this.contractEncodeCall(source, 'init', args)
 
   const { tx, contractId } = await this.gaAttachTx(R.merge(opt, { ownerId, code: bytecode, callData, authFan }))
@@ -87,4 +92,5 @@ async function createGeneralizeAccount (source, args, options) {
   }
 }
 
-async function sendMetaTx(gaId, rawTransaction) { // @TODO Not yet implemented }
+async function sendMetaTx(gaId, rawTransaction) { /* @TODO Not yet implemented */ }
+async function prepareAuthData (txHash, nonce) { /* @TODO Not yet implemented */ }
