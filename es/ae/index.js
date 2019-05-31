@@ -42,8 +42,19 @@ import { BigNumber } from 'bignumber.js'
  */
 async function send (tx, options) {
   const opt = R.merge(this.Ae.defaults, options)
+  return opt.useGA
+    ? sendUsingGA(tx, options)
+    : sendUsingPOA(tx, options)
+}
+
+async function sendUsingPOA (tx, options) {
   const signed = await this.signTransaction(tx)
-  return this.sendTransaction(signed, opt)
+  return this.sendTransaction(signed, options)
+}
+
+async function sendUsingGA (tx, options) {
+  const signed = await this.signTransaction(tx)
+  return this.sendTransaction(signed, options)
 }
 
 /**
@@ -124,7 +135,7 @@ function destroyInstance () {
  * @return {Object} Ae instance
  */
 const Ae = stampit(Tx, Account, Chain, {
-  methods: { send, spend, transferFunds, destroyInstance },
+  methods: { send, spend, transferFunds, destroyInstance, sendUsingPOA, sendUsingGA },
   deepProps: { Ae: { defaults: {} } }
 })
 
