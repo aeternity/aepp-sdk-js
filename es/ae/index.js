@@ -43,8 +43,8 @@ import { BigNumber } from 'bignumber.js'
 async function send (tx, options) {
   const opt = R.merge(this.Ae.defaults, options)
   return opt.useGA
-    ? sendUsingGA(tx, options)
-    : sendUsingPOA(tx, options)
+    ? this.sendUsingGA(tx, options)
+    : this.sendUsingPOA(tx, options)
 }
 
 async function sendUsingPOA (tx, options) {
