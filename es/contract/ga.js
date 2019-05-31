@@ -23,9 +23,11 @@
  * @example import GeneralizeAccount from '@aeternity/aepp-sdk/es/contract/ga' (Using tree-shaking)
  * @example import { GeneralizeAccount } from '@aeternity/aepp-sdk' (Using bundle)
  */
-import { unpackTx } from '../tx/builder'
+import { buildTx, unpackTx } from '../tx/builder'
 import * as R from 'ramda'
 import { Contract } from '../ae/contract'
+import * as Crypto from '../utils/crypto'
+import { TX_TYPE } from '../tx/builder/schema'
 
 /**
  * GeneralizeAccount Stamp
@@ -40,6 +42,9 @@ import { Contract } from '../ae/contract'
  */
 export const GeneralizeAccount = Contract.compose({
   async init () {
+    // Get Account and check if it's a GA account
+    const { gaId } = await this.getAccount(await this.address())
+    if (gaId) this.gaId = gaId
   },
   methods: {
     createGeneralizeAccount,
@@ -54,9 +59,8 @@ async function getContractAuthFan (source, fnName) {
   const { bytecode } = await this.contractCompile(source)
   const { tx: { typeInfo } } = await unpackTx(bytecode, false, 'cb')
   if (!typeInfo[fnName]) throw new Error(`Can't find authFan for function "${fnName}"`)
-  const { funHash: authFan } = typeInfo[fnName]
-
-  return { bytecode, authFan }
+  const { funHash: authFun } = typeInfo[fnName]
+  return { bytecode, authFun }
 }
 
 /**
@@ -67,30 +71,37 @@ async function getContractAuthFan (source, fnName) {
  * @param {Object} options - Options
  * @return {Promise<Readonly<{result: *, owner: *, createdAt: Date, address, rawTx: *, transaction: *}>>}
  */
-async function createGeneralizeAccount (authFnName, source, args, options) {
-  const ownerId = await this.address()
+async function createGeneralizeAccount (authFnName, source, args, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const { authFan, bytecode } = await this.getContractAuthFan(source, authFnName)
+  const ownerId = await this.address()
+  const { authFun, bytecode } = await this.getContractAuthFan(source, authFnName)
   const callData = await this.contractEncodeCall(source, 'init', args)
-
-  const { tx, contractId } = await this.gaAttachTx(R.merge(opt, { ownerId, code: bytecode, callData, authFan }))
+  const { tx, contractId } = await this.gaAttachTx(R.merge(opt, { ownerId, code: bytecode, callData, authFun }))
 
   const { hash, rawTx } = await this.send(tx, opt)
-  const result = await this.getTxInfo(hash)
 
-  if (result.returnType === 'ok') {
-    return Object.freeze({
-      result,
-      owner: ownerId,
-      transaction: hash,
-      rawTx,
-      address: contractId,
-      createdAt: new Date()
-    })
-  } else {
-    await this.handleCallError(result)
-  }
+  this.gaId = contractId
+  this.authFnName = authFnName
+
+  return Object.freeze({
+    owner: ownerId,
+    transaction: hash,
+    rawTx,
+    address: contractId,
+    createdAt: new Date()
+  })
 }
 
-async function sendMetaTx (gaId, rawTransaction) { /* @TODO Not yet implemented */ }
+async function sendMetaTx (gaId, rawTransaction, authData, options = {}) {
+  const opt = R.merge(this.Ae.defaults, options)
+  const rlpBinaryTx = Crypto.decodeBase64Check(Crypto.assertedType(rawTransaction, 'tx'))
+  // Get VM_ABI version
+  const ctVersion = this.getVmVersion(TX_TYPE.contractCall, R.head(arguments))
+  const params = { tx: rlpBinaryTx, ...opt, gaId: this.gaId, abiVersion: ctVersion.abiVersion, authData }
+  // Calculate fee, get absolute ttl (ttl + height), get account nonce
+  const { fee, ttl } = await this.prepareTxParams(TX_TYPE.gaMeta, params)
+  const tx = buildTx({ ...params, fee, ttl }, TX_TYPE.gaMeta).tx
+  const { tx: unpacked } = await unpackTx(tx)
+  return this.sendTransaction(tx, opt)
+}
 async function prepareAuthData (txHash, nonce) { /* @TODO Not yet implemented */ }

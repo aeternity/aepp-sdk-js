@@ -124,7 +124,6 @@ function serializeField (value, type, prefix) {
 
 function validateField (value, key, type, prefix) {
   const assert = (valid, params) => valid ? {} : { [key]: VALIDATION_MESSAGE[type](params) }
-
   // All fields are required
   if (value === undefined || value === null) return { [key]: 'Field is required' }
 

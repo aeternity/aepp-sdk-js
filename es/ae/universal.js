@@ -29,6 +29,7 @@ import Aens from './aens'
 import Contract from './contract'
 import Transaction from '../tx/tx'
 import Oracle from './oracle'
+import GeneralizeAccount from '../contract/ga'
 
 /**
  * Universal Stamp
@@ -41,7 +42,7 @@ import Oracle from './oracle'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Universal instance
  */
-const Universal = Ae.compose(Account, Chain, Transaction, Aens, Contract, Oracle, {
+const Universal = Ae.compose(Account, Chain, Transaction, Aens, Contract, Oracle, GeneralizeAccount, {
   init () {},
   props: { process: {} }
 })

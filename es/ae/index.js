@@ -42,7 +42,7 @@ import { BigNumber } from 'bignumber.js'
  */
 async function send (tx, options) {
   const opt = R.merge(this.Ae.defaults, options)
-  return opt.useGA
+  return opt.useGa
     ? this.sendUsingGA(tx, options)
     : this.sendUsingPOA(tx, options)
 }
@@ -52,9 +52,8 @@ async function sendUsingPOA (tx, options) {
   return this.sendTransaction(signed, options)
 }
 
-async function sendUsingGA (tx, options) {
-  const signed = await this.signTransaction(tx)
-  return this.sendTransaction(signed, options)
+async function sendUsingGA (tx, { authData }) {
+  return this.sendMetaTx(this.gaId, tx, authData)
 }
 
 /**

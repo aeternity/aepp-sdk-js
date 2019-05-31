@@ -273,7 +273,7 @@ export const KEY_BLOCK_INTERVAL = 3
 export const TX_FEE_BASE_GAS = (txType) => (gas) => {
   switch (txType) {
     case TX_TYPE.gaAttach:
-    case TX_TYPE.gaMeta:
+    // case TX_TYPE.gaMeta: // TODO investigate MetaTx calculation
     case TX_TYPE.contractCreate:
       return BigNumber(5 * BASE_GAS).plus(gas)
     case TX_TYPE.contractCall:
