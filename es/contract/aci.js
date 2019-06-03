@@ -58,9 +58,9 @@ function encodeAddress (address, prefix = 'ak') {
  * @param transformDecodedData
  * @return {*}
  */
-function transformDecodedData (aci, result, { skipTransformDecoded = false, addressPrefix = 'ak' } = {}) {
+function transformDecodedData (aci, result, { skipTransformDecoded = false, addressPrefix = 'ak', bindings } = {}) {
   if (skipTransformDecoded) return result
-  const { t, generic } = readType(aci, true)
+  const { t, generic } = readType(aci, { bindings })
   switch (t) {
     case SOPHIA_TYPES.bool:
       return !!result.value
@@ -73,8 +73,8 @@ function transformDecodedData (aci, result, { skipTransformDecoded = false, addr
       return result.value
         .reduce(
           (acc, { key, val }, i) => {
-            key = transformDecodedData(keyT, { value: key.value })
-            val = transformDecodedData(valueT, { value: val.value })
+            key = transformDecodedData(keyT, { value: key.value }, { bindings })
+            val = transformDecodedData(valueT, { value: val.value }, { bindings })
             acc.push([key, val])
             return acc
           },
@@ -82,17 +82,17 @@ function transformDecodedData (aci, result, { skipTransformDecoded = false, addr
         )
     case SOPHIA_TYPES.option:
       const [variantType, value] = result.value
-      return variantType === 1 ? transformDecodedData(generic, value) : undefined
+      return variantType === 1 ? transformDecodedData(generic, value, { bindings }) : undefined
     case SOPHIA_TYPES.list:
-      return result.value.map(({ value }) => transformDecodedData(generic, { value }))
+      return result.value.map(({ value }) => transformDecodedData(generic, { value }, { bindings }))
     case SOPHIA_TYPES.tuple:
-      return result.value.map(({ value }, i) => { return transformDecodedData(generic[i], { value }) })
+      return result.value.map(({ value }, i) => { return transformDecodedData(generic[i], { value }, { bindings }) })
     case SOPHIA_TYPES.record:
       return result.value.reduce(
         (acc, { name, value }, i) =>
           ({
             ...acc,
-            [generic[i].name]: transformDecodedData(generic[i].type, { value })
+            [generic[i].name]: transformDecodedData(generic[i].type, { value }, { bindings })
           }),
         {}
       )
@@ -104,10 +104,12 @@ function transformDecodedData (aci, result, { skipTransformDecoded = false, addr
  * Transform JS type to Sophia-type
  * @param type
  * @param value
+ * @param compilerVersion
+ * @param bindings
  * @return {string}
  */
-async function transform (type, value, { compilerVersion } = {}) {
-  let { t, generic } = readType(type)
+async function transform (type, value, { compilerVersion, bindings } = {}) {
+  let { t, generic } = readType(type, { bindings })
 
   // contract TestContract = ...
   // fn(ct: TestContract)
@@ -117,12 +119,18 @@ async function transform (type, value, { compilerVersion } = {}) {
     case SOPHIA_TYPES.string:
       return `"${value}"`
     case SOPHIA_TYPES.list:
-      return `[${await Promise.all(value.map(async el => transform(generic, el, { compilerVersion })))}]`
+      return `[${await Promise.all(value.map(async el => transform(generic, el, { compilerVersion, bindings })))}]`
     case SOPHIA_TYPES.tuple:
-      return `(${await Promise.all(value.map(async (el, i) => transform(generic[i], el, { compilerVersion })))})`
+      return `(${await Promise.all(value.map(async (el, i) => transform(generic[i], el, {
+        compilerVersion,
+        bindings
+      })))})`
     case SOPHIA_TYPES.option:
       const optionV = await value.catch(e => undefined)
-      return optionV === undefined ? 'None' : `Some(${await transform(generic, optionV, { compilerVersion })})`
+      return optionV === undefined ? 'None' : `Some(${await transform(generic, optionV, {
+        compilerVersion,
+        bindings
+      })})`
     case SOPHIA_TYPES.address:
       return semverSatisfies(compilerVersion.split('-')[0], '1.0.0', '3.0.0')
         ? parseInt(value) === 0 ? '#0' : `#${decode(value).toString('hex')}`
@@ -131,19 +139,22 @@ async function transform (type, value, { compilerVersion } = {}) {
       return `{${await generic.reduce(
         async (acc, { name, type }, i) => {
           acc = await acc
-          acc += `${i !== 0 ? ',' : ''}${name} = ${await transform(type[0], value[name], { compilerVersion })}`
+          acc += `${i !== 0 ? ',' : ''}${name} = ${await transform(type, value[name], {
+            compilerVersion,
+            bindings
+          })}`
           return acc
         },
         ''
       )}}`
     case SOPHIA_TYPES.map:
-      return transformMap(value, generic, { compilerVersion })
+      return transformMap(value, generic, { compilerVersion, bindings })
   }
 
   return `${value}`
 }
 
-async function transformMap (value, generic, { compilerVersion }) {
+async function transformMap (value, generic, { compilerVersion, bindings }) {
   if (value instanceof Map) {
     value = Array.from(value.entries())
   }
@@ -156,7 +167,10 @@ async function transformMap (value, generic, { compilerVersion }) {
       async (acc, [key, value], i) => {
         acc = await acc
         if (i !== 0) acc += ','
-        acc += `[${await transform(generic[0], key, { compilerVersion })}] = ${await transform(generic[1], value, { compilerVersion })}`
+        acc += `[${await transform(generic[0], key, {
+          compilerVersion,
+          bindings
+        })}] = ${await transform(generic[1], value, { compilerVersion, bindings })}`
         return acc
       },
       ``
@@ -170,25 +184,37 @@ async function transformMap (value, generic, { compilerVersion }) {
  * @param returnType
  * @return {*}
  */
-function readType (type, returnType = false) {
-  const [t] = Array.isArray(type) ? type : [type]
-  // Base types
-  if (typeof t === 'string') return { t }
-
-  // Map, Tuple, List, Record
+function readType (type, { bindings } = {}) {
+  let [t] = Array.isArray(type) ? type : [type]
+  if (typeof t === 'string' && t.indexOf(bindings.contractName) !== -1) {
+    // console.log(t)
+    const [_, typeDef] = t.split('.')
+    const aciType = [
+      ...bindings.typedef,
+      { name: 'state', typedef: bindings.state }
+    ].find(({ name }) => name === typeDef)
+    t = aciType.typedef
+    // console.log('-------------------------')
+    // console.log(t)
+  }
+  // Map, Tuple, List, Record, Bytes
   if (typeof t === 'object') {
     const [[baseType, generic]] = Object.entries(t)
     return { t: baseType, generic }
   }
+
+  // Base types
+  if (typeof t === 'string') return { t }
 }
 
 /**
  * Prepare Joi validation schema for sophia types
  * @param type
+ * @param bindings
  * @return {Object} JoiSchema
  */
-function prepareSchema (type) {
-  let { t, generic } = readType(type)
+function prepareSchema (type, { bindings } = {}) {
+  let { t, generic } = readType(type, { bindings })
   if (!Object.keys(SOPHIA_TYPES).includes(t)) t = SOPHIA_TYPES.address // Handle Contract address transformation
   switch (t) {
     case SOPHIA_TYPES.int:
@@ -200,12 +226,12 @@ function prepareSchema (type) {
     case SOPHIA_TYPES.bool:
       return Joi.boolean().error(getJoiErrorMsg)
     case SOPHIA_TYPES.list:
-      return Joi.array().items(prepareSchema(generic)).error(getJoiErrorMsg)
+      return Joi.array().items(prepareSchema(generic, { bindings })).error(getJoiErrorMsg)
     case SOPHIA_TYPES.tuple:
-      return Joi.array().ordered(generic.map(type => prepareSchema(type).required())).label('Tuple argument').error(getJoiErrorMsg)
+      return Joi.array().ordered(generic.map(type => prepareSchema(type, { bindings }).required())).label('Tuple argument').error(getJoiErrorMsg)
     case SOPHIA_TYPES.record:
       return Joi.object(
-        generic.reduce((acc, { name, type }) => ({ ...acc, [name]: prepareSchema(type) }), {})
+        generic.reduce((acc, { name, type }) => ({ ...acc, [name]: prepareSchema(type, { bindings }) }), {})
       ).error(getJoiErrorMsg)
     case SOPHIA_TYPES.option:
       return Joi.object().type(Promise).error(getJoiErrorMsg)
@@ -244,7 +270,7 @@ function getJoiErrorMsg (errors) {
 function validateArguments (aci, params) {
   const validationSchema = Joi.array().ordered(
     aci.arguments
-      .map(({ type }, i) => prepareSchema(type).label(`[${params[i]}]`))
+      .map(({ type }, i) => prepareSchema(type, { bindings: aci.bindings }).label(`[${params[i]}]`))
   ).label('Argument')
   const { error } = Joi.validate(params, validationSchema, { abortEarly: false })
   if (error) {
@@ -265,8 +291,12 @@ async function prepareArgsForEncode (aci, params, { compilerVersion } = {}) {
   if (!aci) return params
   // Validation
   validateArguments(aci, params)
+  const bindings = aci.bindings
   // Cast argument from JS to Sophia type
-  return Promise.all(aci.arguments.map(async ({ type }, i) => transform(type, params[i], { compilerVersion })))
+  return Promise.all(aci.arguments.map(async ({ type }, i) => transform(type, params[i], {
+    compilerVersion,
+    bindings
+  })))
 }
 
 /**
@@ -279,7 +309,14 @@ function getFunctionACI (aci, name) {
   const fn = aci.functions.find(f => f.name === name)
   if (!fn && name !== 'init') throw new Error(`Function ${name} doesn't exist in contract`)
 
-  return fn
+  return {
+    ...fn,
+    bindings: {
+      state: aci.state,
+      typedef: aci.type_defs,
+      contractName: aci.name
+    }
+  }
 }
 
 /**
@@ -413,7 +450,7 @@ function call (self) {
         transformDecodedData(
           fnACI.returns,
           await self.contractDecodeData(type || transformReturnType(fnACI.returns), result.result.returnValue),
-          { ...opt, ...decodeOptions, compilerVersion: this.compilerVersion }
+          { ...opt, ...decodeOptions, compilerVersion: this.compilerVersion, bindings: fnACI.bindings }
         )
     }
   }
