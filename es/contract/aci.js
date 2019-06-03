@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
