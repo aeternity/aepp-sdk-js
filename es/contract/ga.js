@@ -101,7 +101,6 @@ async function sendMetaTx (gaId, rawTransaction, authData, options = {}) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
   const { fee, ttl } = await this.prepareTxParams(TX_TYPE.gaMeta, params)
   const tx = buildTx({ ...params, fee, ttl }, TX_TYPE.gaMeta).tx
-  const { tx: unpacked } = await unpackTx(tx)
   return this.sendTransaction(tx, opt)
 }
 async function prepareAuthData (txHash, nonce) { /* @TODO Not yet implemented */ }
