@@ -191,7 +191,7 @@ describe('Contract', function () {
       })
     })
     describe('Arguments Validation and Casting', function () {
-      describe.skip('INT', function () {
+      describe('INT', function () {
         it('Invalid', async () => {
           try {
             await contractObject.methods.intFn('asd')
@@ -203,7 +203,7 @@ describe('Contract', function () {
           await contractObject.methods.intFn(1)
         })
       })
-      describe.skip('STRING', function () {
+      describe('STRING', function () {
         it('Invalid', async () => {
           try {
             await contractObject.methods.stringFn(123)
@@ -215,7 +215,7 @@ describe('Contract', function () {
           await contractObject.methods.stringFn('string')
         })
       })
-      describe.skip('ADDRESS', function () {
+      describe('ADDRESS', function () {
         it('Invalid address', async () => {
           try {
             await contractObject.methods.addressFn('asdasasd')
@@ -245,7 +245,7 @@ describe('Contract', function () {
           await contractObject.methods.addressFn('ak_2ct6nMwmRnyGX6jPhraFPedZ5bYp1GXqpvnAq5LXeL5TTPfFif')
         })
       })
-      describe.skip('TUPLE', function () {
+      describe('TUPLE', function () {
         it('Invalid type', async () => {
           try {
             await contractObject.methods.tupleFn('asdasasd')
@@ -285,7 +285,7 @@ describe('Contract', function () {
           await contractObject.methods.tupleFn(['test', 1])
         })
       })
-      describe.skip('LIST', function () {
+      describe('LIST', function () {
         it('Invalid type', async () => {
           try {
             await contractObject.methods.listFn('asdasasd')
@@ -308,7 +308,7 @@ describe('Contract', function () {
           }
         })
       })
-      describe.skip('MAP', function () {
+      describe('MAP', function () {
         it('Valid', async () => {
           const address = await contract.address()
           const mapArg = new Map(
@@ -381,7 +381,7 @@ describe('Contract', function () {
           const result = await contractObject.methods.getRecord()
           return result.decode().should.eventually.become({ value: 'qwe', key: 1234, testOption: 'test' })
         })
-        it.skip('Get Record With Option (Convert to JS object)', async () => {
+        it('Get Record With Option (Convert to JS object)', async () => {
           await contractObject.methods.setRecord({ key: 1234, value: 'qwe', testOption: Promise.resolve('resolved string') })
           const result = await contractObject.methods.getRecord()
           return result.decode().should.eventually.become({ value: 'qwe', key: 1234, testOption: 'resolved string' })
@@ -394,7 +394,7 @@ describe('Contract', function () {
           }
         })
       })
-      describe.skip('OPTION', function () {
+      describe('OPTION', function () {
         it('Set Some Option Value(Cast from JS value/Convert result to JS)', async () => {
           const optionRes = await contractObject.methods.intOption(Promise.resolve(123))
 
@@ -419,7 +419,7 @@ describe('Contract', function () {
         })
       })
     })
-    describe.skip('Call contract', function () {
+    describe('Call contract', function () {
       it('Call contract using using sophia type arguments', async () => {
         contractObject.setOptions({ skipArgsConvert: true })
         const res = await contractObject.methods.listFn('[ 1, 2 ]')

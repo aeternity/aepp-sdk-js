@@ -178,6 +178,14 @@ async function transformMap (value, generic, { compilerVersion, bindings }) {
   }}`
 }
 
+function linkTypeDefs (t, bindings) {
+  const [_, typeDef] = t.split('.')
+  const aciType = [
+    ...bindings.typedef,
+    { name: 'state', typedef: bindings.state }
+  ].find(({ name }) => name === typeDef)
+  return aciType.typedef
+}
 /**
  * Parse sophia type
  * @param type
@@ -186,16 +194,10 @@ async function transformMap (value, generic, { compilerVersion, bindings }) {
  */
 function readType (type, { bindings } = {}) {
   let [t] = Array.isArray(type) ? type : [type]
+
+  // Link State and typeDef
   if (typeof t === 'string' && t.indexOf(bindings.contractName) !== -1) {
-    // console.log(t)
-    const [_, typeDef] = t.split('.')
-    const aciType = [
-      ...bindings.typedef,
-      { name: 'state', typedef: bindings.state }
-    ].find(({ name }) => name === typeDef)
-    t = aciType.typedef
-    // console.log('-------------------------')
-    // console.log(t)
+    t = linkTypeDefs(t, bindings)
   }
   // Map, Tuple, List, Record, Bytes
   if (typeof t === 'object') {
@@ -411,7 +413,10 @@ async function getContractInstance (source, { aci, contractAddress, opt } = {}) 
 }
 
 // @TODO Remove after compiler can decode using type from ACI
-function transformReturnType (returns) {
+function transformReturnType (returns, { bindings } = {}) {
+  if (typeof returns === 'string' && returns.indexOf(bindings.contractName) !== -1) {
+    returns = linkTypeDefs(returns, bindings)
+  }
   try {
     if (typeof returns === 'string') return returns
     if (typeof returns === 'object') {
@@ -420,7 +425,7 @@ function transformReturnType (returns) {
         .reduce(
           (acc, el, i) => {
             if (i !== 0) acc += ','
-            acc += transformReturnType(key !== 'record' ? el : el.type[0])
+            acc += transformReturnType(key !== 'record' ? el : el.type, { bindings })
             return acc
           },
           '')})`
@@ -449,7 +454,7 @@ function call (self) {
       decode: async (type, decodeOptions = {}) =>
         transformDecodedData(
           fnACI.returns,
-          await self.contractDecodeData(type || transformReturnType(fnACI.returns), result.result.returnValue),
+          await self.contractDecodeData(type || transformReturnType(fnACI.returns, fnACI), result.result.returnValue),
           { ...opt, ...decodeOptions, compilerVersion: this.compilerVersion, bindings: fnACI.bindings }
         )
     }
