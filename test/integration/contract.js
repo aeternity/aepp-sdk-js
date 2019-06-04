@@ -17,6 +17,7 @@
 
 import { describe, it, before } from 'mocha'
 import { configure, plan, ready } from './'
+import { decode } from '../../es/tx/builder/helpers'
 import * as R from 'ramda'
 
 const identityContract = `
@@ -67,6 +68,10 @@ contract StateContract =
   
   public function testFn(a: list(int), b: bool) : (list(int), bool) = (a, b)
   public function approve(tx_id: int, voting_contract: Voting) : int = tx_id
+  
+  public function hashFn(s: hash): hash = s
+  public function signatureFn(s: signature): signature = s
+  public function bytesFn(s: bytes(32)): bytes(32) = s
 `
 
 const encodedNumberSix = 'cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaKNdnK'
@@ -406,6 +411,61 @@ describe('Contract', function () {
           } catch (e) {
             e.message.should.be.equal('"Argument" at position 0 fails because [Value \'[[object Object]]\' at path: [0] not a Promise]')
           }
+        })
+      })
+      describe('Hash', function () {
+        it('Invalid type', async () => {
+          try {
+            await contractObject.methods.hashFn({})
+          } catch (e) {
+            e.message.should.be.equal('The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object. Received type object')
+          }
+        })
+        it('Invalid length', async () => {
+          const address = await contract.address()
+          const decoded = Buffer.from(decode(address, 'ak').slice(1))
+          try {
+            await contractObject.methods.hashFn(decoded)
+          } catch (e) {
+            const isSizeCheck = e.message.indexOf('not a 32 bytes') !== -1
+            isSizeCheck.should.be.equal(true)
+          }
+        })
+        it('Valid', async () => {
+          const address = await contract.address()
+          const decoded = decode(address, 'ak')
+          const hashAsBuffer = await contractObject.methods.hashFn(decoded)
+          const hashAsHex = await contractObject.methods.hashFn(decoded.toString('hex'))
+          hashAsBuffer.decodedResult.should.be.equal(decoded.toString('hex'))
+          hashAsHex.decodedResult.should.be.equal(decoded.toString('hex'))
+        })
+      })
+      describe('Signature', function () {
+        it('Invalid type', async () => {
+          try {
+            await contractObject.methods.signatureFn({})
+          } catch (e) {
+            e.message.should.be.equal('The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object. Received type object')
+          }
+        })
+        it('Invalid length', async () => {
+          const address = await contract.address()
+          const decoded = decode(address, 'ak')
+          try {
+            await contractObject.methods.signatureFn(decoded)
+          } catch (e) {
+            const isSizeCheck = e.message.indexOf('not a 64 bytes') !== -1
+            isSizeCheck.should.be.equal(true)
+          }
+        })
+        it('Valid', async () => {
+          const address = await contract.address()
+          const decoded = decode(address, 'ak')
+          const fakeSignature = Buffer.from(await contract.sign(decoded))
+          const hashAsBuffer = await contractObject.methods.signatureFn(fakeSignature)
+          const hashAsHex = await contractObject.methods.signatureFn(fakeSignature.toString('hex'))
+          hashAsBuffer.decodedResult.should.be.equal(fakeSignature.toString('hex'))
+          hashAsHex.decodedResult.should.be.equal(fakeSignature.toString('hex'))
         })
       })
     })

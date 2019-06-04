@@ -73,6 +73,10 @@ function transformDecodedData (aci, result, { skipTransformDecoded = false, addr
       return result === 0
         ? 0
         : result
+    case SOPHIA_TYPES.hash:
+    case SOPHIA_TYPES.bytes:
+    case SOPHIA_TYPES.signature:
+      return result.split('#')[1]
     case SOPHIA_TYPES.map:
       const [keyT, valueT] = generic
       return result
@@ -138,10 +142,10 @@ async function transform (type, value, { compilerVersion, bindings } = {}) {
         compilerVersion,
         bindings
       })})`
-    case SOPHIA_TYPES.address:
-      return semverSatisfies(compilerVersion.split('-')[0], '1.0.0', '3.0.0')
-        ? parseInt(value) === 0 ? '#0' : `#${decode(value).toString('hex')}`
-        : value
+    case SOPHIA_TYPES.hash:
+    case SOPHIA_TYPES.bytes:
+    case SOPHIA_TYPES.signature:
+      return `#${typeof value === 'string' ? value : Buffer.from(value).toString('hex')}`
     case SOPHIA_TYPES.record:
       return `{${await generic.reduce(
         async (acc, { name, type }, i) => {
@@ -215,7 +219,38 @@ function readType (type, { bindings } = {}) {
   // Base types
   if (typeof t === 'string') return { t }
 }
+const customJoi = Joi.extend((joi) => ({
+  name: 'binary',
+  base: joi.any(),
+  pre (value, state, options) {
+    if (options.convert && typeof value === 'string') {
+      try {
+        return Buffer.from(value, 'hex')
+      } catch (e) { return undefined }
+    }
 
+    return Buffer.from(value)
+  },
+  rules: [
+    {
+      name: 'bufferCheck',
+      params: {
+        size: joi.number().required()
+      },
+      validate (params, value, state, options) {
+        value = value === 'string' ? Buffer.from(value, 'hex') : Buffer.from(value)
+        if (!Buffer.isBuffer(value)) {
+          return this.createError('binary.base', { value }, state, options)
+        }
+        if (value.length !== params.size) {
+          return this.createError('binary.bufferCheck', { value, size: params.size }, state, options)
+        }
+
+        return value
+      }
+    }
+  ]
+}))
 /**
  * Prepare Joi validation schema for sophia types
  * @param type
@@ -231,7 +266,7 @@ function prepareSchema (type, { bindings } = {}) {
     case SOPHIA_TYPES.string:
       return Joi.string().error(getJoiErrorMsg)
     case SOPHIA_TYPES.address:
-      return Joi.alternatives([Joi.number().min(0).max(0), Joi.string().regex(/^(ak_|ct_|ok_|oq_)/).error(getJoiErrorMsg)])
+      return Joi.string().regex(/^(ak_|ct_|ok_|oq_)/).error(getJoiErrorMsg)
     case SOPHIA_TYPES.bool:
       return Joi.boolean().error(getJoiErrorMsg)
     case SOPHIA_TYPES.list:
@@ -242,6 +277,12 @@ function prepareSchema (type, { bindings } = {}) {
       return Joi.object(
         generic.reduce((acc, { name, type }) => ({ ...acc, [name]: prepareSchema(type, { bindings }) }), {})
       ).error(getJoiErrorMsg)
+    case SOPHIA_TYPES.hash:
+      return customJoi.binary().bufferCheck(32).error(getJoiErrorMsg)
+    case SOPHIA_TYPES.bytes:
+      return customJoi.binary().bufferCheck(generic).error(getJoiErrorMsg)
+    case SOPHIA_TYPES.signature:
+      return customJoi.binary().bufferCheck(64).error(getJoiErrorMsg)
     case SOPHIA_TYPES.option:
       return Joi.object().type(Promise).error(getJoiErrorMsg)
     // @Todo Need to transform Map to Array of arrays before validating it
@@ -270,6 +311,8 @@ function getJoiErrorMsg (errors) {
         return ({ ...err, message: `Value '${value}' at path: [${path}] not a object` })
       case 'object.type':
         return ({ ...err, message: `Value '${value}' at path: [${path}] not a ${context.type}` })
+      case 'binary.bufferCheck':
+        return ({ ...err, message: `Value '${Buffer.from(value).toString('hex')}' at path: [${path}] not a ${context.size} bytes` })
       default:
         return err
     }
