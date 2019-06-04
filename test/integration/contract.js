@@ -78,7 +78,7 @@ const encodedNumberSix = 'cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaKNdnK'
 
 plan('1000000000000000000000')
 
-describe.only('Contract', function () {
+describe('Contract', function () {
   configure(this)
 
   let contract
