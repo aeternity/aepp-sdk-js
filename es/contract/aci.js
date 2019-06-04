@@ -43,7 +43,10 @@ const SOPHIA_TYPES = [
   'record',
   'option',
   'oracle',
-  'oracleQuery'
+  'oracleQuery',
+  'hash',
+  'signature',
+  'bytes'
 ].reduce((acc, type) => ({ ...acc, [type]: type }), {})
 
 function encodeAddress (address, prefix = 'ak') {
@@ -62,43 +65,46 @@ function encodeAddress (address, prefix = 'ak') {
 function transformDecodedData (aci, result, { skipTransformDecoded = false, addressPrefix = 'ak', bindings } = {}) {
   if (skipTransformDecoded) return result
   const { t, generic } = readType(aci, { bindings })
+
   switch (t) {
     case SOPHIA_TYPES.bool:
-      return !!result.value
+      return !!result
     case SOPHIA_TYPES.address:
-      return result.value === 0
+      return result === 0
         ? 0
-        : encodeAddress(toBytes(result.value, true), addressPrefix)
+        : result
     case SOPHIA_TYPES.map:
       const [keyT, valueT] = generic
-      return result.value
+      return result
         .reduce(
-          (acc, { key, val }, i) => {
-            key = transformDecodedData(keyT, { value: key.value }, { bindings })
-            val = transformDecodedData(valueT, { value: val.value }, { bindings })
+          (acc, [key, val]) => {
+            key = transformDecodedData(keyT, key, { bindings })
+            val = transformDecodedData(valueT, val, { bindings })
             acc.push([key, val])
             return acc
           },
           []
         )
     case SOPHIA_TYPES.option:
-      const [variantType, value] = result.value
-      return variantType === 1 ? transformDecodedData(generic, value, { bindings }) : undefined
+      if (result === 'None') return undefined
+      const [[variantType, [value]]] = Object.entries(result)
+      return variantType === 'Some' ? transformDecodedData(generic, value, { bindings }) : undefined
     case SOPHIA_TYPES.list:
-      return result.value.map(({ value }) => transformDecodedData(generic, { value }, { bindings }))
+      return result.map((value) => transformDecodedData(generic, value, { bindings }))
     case SOPHIA_TYPES.tuple:
-      return result.value.map(({ value }, i) => { return transformDecodedData(generic[i], { value }, { bindings }) })
+      return result.map((value, i) => { return transformDecodedData(generic[i], value, { bindings }) })
     case SOPHIA_TYPES.record:
-      return result.value.reduce(
-        (acc, { name, value }, i) =>
+      const genericMap = generic.reduce((acc, val) => ({ ...acc, [val.name]: { type: val.type } }), {})
+      return Object.entries(result).reduce(
+        (acc, [name, value]) =>
           ({
             ...acc,
-            [generic[i].name]: transformDecodedData(generic[i].type, { value }, { bindings })
+            [name]: transformDecodedData(genericMap[name].type, value, { bindings })
           }),
         {}
       )
   }
-  return result.value
+  return result
 }
 
 /**
@@ -440,24 +446,24 @@ function call (self) {
   return async function (fn, params = [], options = {}) {
     const opt = R.merge(this.options, options)
     const fnACI = getFunctionACI(this.aci, fn)
+    const source = opt.source || this.source
     if (!fn) throw new Error('Function name is required')
     if (!this.deployInfo.address) throw new Error('You need to deploy contract before calling!')
 
     params = !opt.skipArgsConvert ? await prepareArgsForEncode(fnACI, params, { compilerVersion: this.compilerVersion }) : params
     const result = opt.callStatic
-      ? await self.contractCallStatic(opt.source || this.source, this.deployInfo.address, fn, params, {
+      ? await self.contractCallStatic(source, this.deployInfo.address, fn, params, {
         top: opt.top,
         opt
       })
-      : await self.contractCall(opt.source || this.source, this.deployInfo.address, fn, params, opt)
+      : await self.contractCall(source, this.deployInfo.address, fn, params, opt)
     return {
       ...result,
-      decode: async (type, decodeOptions = {}) =>
-        transformDecodedData(
-          fnACI.returns,
-          await self.contractDecodeData(type || transformReturnType(fnACI.returns, fnACI), result.result.returnValue),
-          { ...opt, ...decodeOptions, compilerVersion: this.compilerVersion, bindings: fnACI.bindings }
-        )
+      decodedResult: await transformDecodedData(
+        fnACI.returns,
+        await result.decode(),
+        { ...opt, compilerVersion: this.compilerVersion, bindings: fnACI.bindings }
+      )
     }
   }
 }

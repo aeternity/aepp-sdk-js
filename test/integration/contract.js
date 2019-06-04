@@ -101,18 +101,12 @@ describe('Contract', function () {
 
   it('calls deployed contracts', async () => {
     const result = await deployed.call('main', ['42'])
-    return result.decode('int').should.eventually.become({
-      type: 'word',
-      value: 42
-    })
+    return result.decode().should.eventually.become(42)
   })
 
   it('calls deployed contracts static', async () => {
     const result = await deployed.callStatic('main', ['42'])
-    return result.decode('int').should.eventually.become({
-      type: 'word',
-      value: 42
-    })
+    return result.decode().should.eventually.become(42)
   })
 
   it('initializes contract state', async () => {
@@ -120,15 +114,12 @@ describe('Contract', function () {
     return contract.contractCompile(stateContract)
       .then(bytecode => bytecode.deploy([data]))
       .then(deployed => deployed.call('retrieve'))
-      .then(result => result.decode('string'))
+      .then(result => result.decode())
       .catch(e => {
         console.log(e)
         throw e
       })
-      .should.eventually.become({
-        type: 'string',
-        value: 'Hello World!'
-      })
+      .should.eventually.become('Hello World!')
   })
 
   describe('Sophia Compiler', function () {
@@ -151,14 +142,11 @@ describe('Contract', function () {
       isString.should.be.equal(true)
     })
     it('decode call-data', async () => {
-      return contract.contractDecodeDataAPI('int', encodedNumberSix).should.eventually.become({
-        type: 'word',
-        value: 6
-      })
+      return contract.contractDecodeCallResultAPI(identityContract, 'main', encodedNumberSix, 'ok').should.eventually.become(6)
     })
   })
 
-  describe.only('Contract ACI Interface', function () {
+  describe('Contract ACI Interface', function () {
     let contractObject
 
     it('Generate ACI object', async () => {
@@ -200,7 +188,8 @@ describe('Contract', function () {
           }
         })
         it('Valid', async () => {
-          await contractObject.methods.intFn(1)
+          const { decodedResult } = await contractObject.methods.intFn(1)
+          decodedResult.toString().should.be.equal('1')
         })
       })
       describe('STRING', function () {
@@ -212,7 +201,8 @@ describe('Contract', function () {
           }
         })
         it('Valid', async () => {
-          await contractObject.methods.stringFn('string')
+          const { decodedResult } = await contractObject.methods.stringFn('string')
+          decodedResult.should.be.equal('string')
         })
       })
       describe('ADDRESS', function () {
@@ -230,19 +220,13 @@ describe('Contract', function () {
             e.message.should.be.equal('"Argument" at position 0 fails because ["0" must be less than or equal to 0, Value "333" at path: [0] not a string]')
           }
         })
-        it.skip('Empty address', async () => {
-          const result = await contractObject.methods.emptyAddress()
-          return result.decode().should.eventually.become(0)
-        })
         it('Return address', async () => {
-          const accountAddress = await (await contractObject.methods
-            .accountAddress(await contract.address()))
-            .decode(null, { addressPrefix: 'ak' })
-
-          accountAddress.should.be.equal(await contract.address())
+          const { decodedResult } = await contractObject.methods.accountAddress(await contract.address())
+          decodedResult.should.be.equal(await contract.address())
         })
         it('Valid', async () => {
-          await contractObject.methods.addressFn('ak_2ct6nMwmRnyGX6jPhraFPedZ5bYp1GXqpvnAq5LXeL5TTPfFif')
+          const { decodedResult } = await contractObject.methods.addressFn('ak_2ct6nMwmRnyGX6jPhraFPedZ5bYp1GXqpvnAq5LXeL5TTPfFif')
+          decodedResult.should.be.equal('ak_2ct6nMwmRnyGX6jPhraFPedZ5bYp1GXqpvnAq5LXeL5TTPfFif')
         })
       })
       describe('TUPLE', function () {
@@ -282,7 +266,8 @@ describe('Contract', function () {
           }
         })
         it('Valid', async () => {
-          await contractObject.methods.tupleFn(['test', 1])
+          const { decodedResult } = await contractObject.methods.tupleFn(['test', 1])
+          JSON.stringify(decodedResult).should.be.equal(JSON.stringify(['test', 1]))
         })
       })
       describe('LIST', function () {
@@ -307,6 +292,10 @@ describe('Contract', function () {
             e.message.should.be.equal('"Argument" at position 0 fails because ["[childListWronmgElement,parentListWrongElement]" at position 0 fails because ["0" at position 0 fails because [Value "0" at path: [0,0,0] not a number]], "[childListWronmgElement,parentListWrongElement]" at position 1 fails because [Value "1" at path: [0,1] not a array]]')
           }
         })
+        it('Valid', async () => {
+          const { decodedResult } = await contractObject.methods.listInListFn([[1, 2], [3, 4]])
+          JSON.stringify(decodedResult).should.be.equal(JSON.stringify([[1, 2], [3, 4]]))
+        })
       })
       describe('MAP', function () {
         it('Valid', async () => {
@@ -316,8 +305,8 @@ describe('Contract', function () {
               [address, ['someStringV', 324]]
             ]
           )
-          const result = await contractObject.methods.mapFn(mapArg)
-          return result.decode().should.eventually.become(Array.from(mapArg.entries()))
+          const { decodedResult } = await contractObject.methods.mapFn(mapArg)
+          JSON.stringify(decodedResult).should.be.equal(JSON.stringify(Array.from(mapArg.entries())))
         })
         it('Map With Option Value', async () => {
           const address = await contract.address()
@@ -344,10 +333,10 @@ describe('Contract', function () {
           const resultWithSome = await contractObject.methods.mapOptionFn(mapArgWithSomeValue)
           const resultWithNone = await contractObject.methods.mapOptionFn(mapArgWithNoneValue)
 
-          const decodedSome = resultWithSome.decode()
+          const decodedSome = resultWithSome.decodedResult
 
-          decodedSome.should.eventually.become(Array.from(returnArgWithSomeValue.entries()))
-          return resultWithNone.decode().should.eventually.become(Array.from(returnArgWithNoneValue.entries()))
+          JSON.stringify(decodedSome).should.be.equal(JSON.stringify(Array.from(returnArgWithSomeValue.entries())))
+          JSON.stringify(resultWithNone.decodedResult).should.be.equal(JSON.stringify(Array.from(returnArgWithNoneValue.entries())))
         })
         it('Cast from string to int', async () => {
           const address = await contract.address()
@@ -358,7 +347,7 @@ describe('Contract', function () {
           )
           const result = await contractObject.methods.mapFn(mapArg)
           mapArg.set(address, ['someStringV', 324])
-          return result.decode().should.eventually.become(Array.from(mapArg.entries()))
+          JSON.stringify(result.decodedResult).should.be.equal(JSON.stringify(Array.from(mapArg.entries())))
         })
         it('Cast from array to map', async () => {
           const address = await contract.address()
@@ -366,25 +355,26 @@ describe('Contract', function () {
             [
               [address, ['someStringV', 324]]
             ]
-          const result = await contractObject.methods.mapFn(mapArg)
-          return result.decode().should.eventually.become(mapArg)
+          const { decodedResult } = await contractObject.methods.mapFn(mapArg)
+          JSON.stringify(decodedResult).should.be.equal(JSON.stringify(mapArg))
         })
       })
       describe('RECORD/STATE', function () {
+        const objEq = (obj, obj2) => !Object.entries(obj).find(([key, val]) => JSON.stringify(obj2[key]) !== JSON.stringify(val))
         it('Valid Set Record (Cast from JS object)', async () => {
           await contractObject.methods.setRecord({ value: 'qwe', key: 1234, testOption: Promise.resolve('test') })
           const state = await contractObject.methods.getRecord()
 
-          return state.decode().should.eventually.become({ value: 'qwe', key: 1234, testOption: 'test' })
+          objEq(state.decodedResult, { value: 'qwe', key: 1234, testOption: 'test' }).should.be.equal(true)
         })
         it('Get Record(Convert to JS object)', async () => {
           const result = await contractObject.methods.getRecord()
-          return result.decode().should.eventually.become({ value: 'qwe', key: 1234, testOption: 'test' })
+          objEq(result.decodedResult, { value: 'qwe', key: 1234, testOption: 'test' }).should.be.equal(true)
         })
         it('Get Record With Option (Convert to JS object)', async () => {
           await contractObject.methods.setRecord({ key: 1234, value: 'qwe', testOption: Promise.resolve('resolved string') })
           const result = await contractObject.methods.getRecord()
-          return result.decode().should.eventually.become({ value: 'qwe', key: 1234, testOption: 'resolved string' })
+          objEq(result.decodedResult, { value: 'qwe', key: 1234, testOption: 'resolved string' }).should.be.equal(true)
         })
         it('Invalid value type', async () => {
           try {
@@ -398,17 +388,17 @@ describe('Contract', function () {
         it('Set Some Option Value(Cast from JS value/Convert result to JS)', async () => {
           const optionRes = await contractObject.methods.intOption(Promise.resolve(123))
 
-          return optionRes.decode().should.eventually.become(123)
+          optionRes.decodedResult.should.be.equal(123)
         })
         it('Set Some Option List Value(Cast from JS value/Convert result to JS)', async () => {
           const optionRes = await contractObject.methods.listOption(Promise.resolve([[1, 'testString']]))
 
-          return optionRes.decode().should.eventually.become([[1, 'testString']])
+          JSON.stringify(optionRes.decodedResult).should.be.equal(JSON.stringify([[1, 'testString']]))
         })
         it('Set None Option Value(Cast from JS value/Convert to JS)', async () => {
           const optionRes = await contractObject.methods.intOption(Promise.reject(Error()))
-
-          return optionRes.decode().should.eventually.become(undefined)
+          const isUndefined = optionRes.decodedResult === undefined
+          isUndefined.should.be.equal(true)
         })
         it('Invalid option type', async () => {
           try {
@@ -434,7 +424,7 @@ describe('Contract', function () {
         contractObject.setOptions({ skipTransformDecoded: true })
         const res = await contractObject.methods.listFn([ 1, 2 ])
         const decoded = await res.decode()
-        const decodedJSON = '{"type":"list","value":[{"type":"word","value":1},{"type":"word","value":2}]}'
+        const decodedJSON = JSON.stringify([ 1, 2 ])
         contractObject.setOptions({ skipTransformDecoded: false })
         JSON.stringify(decoded).should.be.equal(decodedJSON)
       })
