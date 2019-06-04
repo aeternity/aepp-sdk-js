@@ -26,11 +26,7 @@
 import Joi from 'joi-browser'
 
 import AsyncInit from '../utils/async-init'
-import { decode } from '../tx/builder/helpers'
-import { encodeBase58Check } from '../utils/crypto'
-import { toBytes } from '../utils/bytes'
 import * as R from 'ramda'
-import semverSatisfies from '../utils/semver-satisfies'
 
 const SOPHIA_TYPES = [
   'int',
@@ -48,12 +44,6 @@ const SOPHIA_TYPES = [
   'signature',
   'bytes'
 ].reduce((acc, type) => ({ ...acc, [type]: type }), {})
-
-function encodeAddress (address, prefix = 'ak') {
-  const addressBuffer = Buffer.from(address, 'hex')
-  const encodedAddress = encodeBase58Check(addressBuffer)
-  return `${prefix}_${encodedAddress}`
-}
 
 /**
  * Transform decoded data to JS type

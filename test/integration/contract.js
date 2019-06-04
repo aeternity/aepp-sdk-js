@@ -78,7 +78,7 @@ const encodedNumberSix = 'cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaKNdnK'
 
 plan('1000000000000000000000')
 
-describe('Contract', function () {
+describe.only('Contract', function () {
   configure(this)
 
   let contract
@@ -215,14 +215,14 @@ describe('Contract', function () {
           try {
             await contractObject.methods.addressFn('asdasasd')
           } catch (e) {
-            e.message.should.be.equal('"Argument" at position 0 fails because ["0" must be a number, "0" with value "asdasasd" fails to match the required pattern: /^(ak_|ct_|ok_|oq_)/]')
+            e.message.should.be.equal('"Argument" at position 0 fails because ["[asdasasd]" with value "asdasasd" fails to match the required pattern: /^(ak_|ct_|ok_|oq_)/]')
           }
         })
         it('Invalid address type', async () => {
           try {
             await contractObject.methods.addressFn(333)
           } catch (e) {
-            e.message.should.be.equal('"Argument" at position 0 fails because ["0" must be less than or equal to 0, Value "333" at path: [0] not a string]')
+            e.message.should.be.equal('"Argument" at position 0 fails because [Value "333" at path: [0] not a string]')
           }
         })
         it('Return address', async () => {
@@ -466,6 +466,33 @@ describe('Contract', function () {
           const hashAsHex = await contractObject.methods.signatureFn(fakeSignature.toString('hex'))
           hashAsBuffer.decodedResult.should.be.equal(fakeSignature.toString('hex'))
           hashAsHex.decodedResult.should.be.equal(fakeSignature.toString('hex'))
+        })
+      })
+      describe('Bytes', function () {
+        it('Invalid type', async () => {
+          try {
+            await contractObject.methods.bytesFn({})
+          } catch (e) {
+            e.message.should.be.equal('The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object. Received type object')
+          }
+        })
+        it('Invalid length', async () => {
+          const address = await contract.address()
+          const decoded = decode(address, 'ak')
+          try {
+            await contractObject.methods.bytesFn(Buffer.from([...decoded, 2]))
+          } catch (e) {
+            const isSizeCheck = e.message.indexOf('not a 32 bytes') !== -1
+            isSizeCheck.should.be.equal(true)
+          }
+        })
+        it('Valid', async () => {
+          const address = await contract.address()
+          const decoded = decode(address, 'ak')
+          const hashAsBuffer = await contractObject.methods.bytesFn(decoded)
+          const hashAsHex = await contractObject.methods.bytesFn(decoded.toString('hex'))
+          hashAsBuffer.decodedResult.should.be.equal(decoded.toString('hex'))
+          hashAsHex.decodedResult.should.be.equal(decoded.toString('hex'))
         })
       })
     })
