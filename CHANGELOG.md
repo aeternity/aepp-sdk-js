@@ -1,3 +1,12 @@
+## [3.4.1](https://github.com/aeternity/aepp-sdk-js/compare/3.4.0...3.4.1) (2019-06-05)
+
+
+### Bug Fixes
+
+* **Deps:** Update axios lib to 0.19.0 ([f951765](https://github.com/aeternity/aepp-sdk-js/commit/f951765))
+
+
+
 # [3.4.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...3.4.0) (2019-05-22)
 
 
