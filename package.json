@@ -32,7 +32,7 @@
     "@stamp/required": "^1.0.1",
     "aes-js": "^3.1.1",
     "argon2": "^0.19.3",
-    "axios": "^0.18.0",
+    "axios": "^0.19.0",
     "bignumber.js": "^8.0.1",
     "bip32-path": "^0.4.2",
     "blakejs": "^1.1.0",
