@@ -3,7 +3,7 @@
 
 ### Bug Fixes
 
-* **Deps:** Update axios lib to 0.19.0 ([f951765](https://github.com/aeternity/aepp-sdk-js/commit/f951765))
+* **Deps:** Update axios lib to 0.19.0 due to security issue ([f951765](https://github.com/aeternity/aepp-sdk-js/commit/f951765))
 
 
 
