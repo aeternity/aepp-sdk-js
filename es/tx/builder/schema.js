@@ -261,6 +261,7 @@ export const FIELD_TYPES = {
   callReturnType: 'callReturnType',
   ctVersion: 'ctVersion',
   sophiaCodeTypeInfo: 'sophiaCodeTypeInfo'
+  payload: 'payload'
 }
 
 // FEE CALCULATION
@@ -370,7 +371,7 @@ const SPEND_TX = [
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int),
   TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('payload', FIELD_TYPES.string)
+  TX_FIELD('payload', FIELD_TYPES.payload)
 ]
 
 const SIGNED_TX = [

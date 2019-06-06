@@ -50,6 +50,8 @@ function deserializeField (value, type, prefix) {
       return encode(value, prefix)
     case FIELD_TYPES.string:
       return value.toString()
+    case FIELD_TYPES.payload:
+      return encode(value, 'ba')
     case FIELD_TYPES.pointers:
       return readPointers(value)
     case FIELD_TYPES.rlpBinary:
@@ -102,6 +104,7 @@ function serializeField (value, type, prefix) {
       return Buffer.from(value, 'hex')
     case FIELD_TYPES.signatures:
       return value.map(Buffer.from)
+    case FIELD_TYPES.payload:
     case FIELD_TYPES.string:
       return toBytes(value)
     case FIELD_TYPES.pointers:
