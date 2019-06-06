@@ -260,7 +260,7 @@ export const FIELD_TYPES = {
   mptree: 'mptree',
   callReturnType: 'callReturnType',
   ctVersion: 'ctVersion',
-  sophiaCodeTypeInfo: 'sophiaCodeTypeInfo'
+  sophiaCodeTypeInfo: 'sophiaCodeTypeInfo',
   payload: 'payload'
 }
 
