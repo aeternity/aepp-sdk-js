@@ -51,7 +51,7 @@ Ae({
 ## Quick _Browser_ Examples for:
 ### 1. Wallet Example (_only_ Wallet's functionalities)
 > interact with aeternity's blockchain's [**Wallet flavor**](docs/usage.md) – For _Wallet_ development
-> You can find a more [complete example using VueJS here](browser/connect-two-ae)
+> You can find a more [complete example using VueJS here](browser/vuejs/connect-two-ae/README.md)
 
 
 ```js
