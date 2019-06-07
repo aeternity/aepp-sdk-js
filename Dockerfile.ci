@@ -1,7 +1,7 @@
 # Heads-Up: This Dockerfile is *exclusively* used for CI. It is referenced by
 # Jenkinsfile and should not be used by any other means.
 
-FROM node:12-slim
+FROM node:11-slim
 
 USER root
 
