@@ -24,10 +24,12 @@
 import bs58check from 'bs58check'
 import * as RLP from 'rlp'
 import { blake2b } from 'blakejs'
+import ed2curve from 'ed2curve'
 import nacl from 'tweetnacl'
 import aesjs from 'aes-js'
-import { leftPad, rightPad, toBytes } from './bytes'
 import shajs from 'sha.js'
+
+import { leftPad, rightPad, toBytes } from './bytes'
 import { decode as decodeNode } from '../tx/builder/helpers'
 
 const Ecb = aesjs.ModeOfOperation.ecb
@@ -664,30 +666,22 @@ export function deserialize (binary, opts = { prettyTags: false }) {
  * publicKey such that only the corresponding secretKey will
  * be able to decrypt
  * @rtype (msg: String, publicKey: String) => Object
- * @param {String} msg - Data to encode
+ * @param {Buffer} msg - Data to encode
  * @param {String} publicKey - Public key
  * @return {Object}
  */
-export function encryptData (msg, {publicKey, secretKey}) {
+export function encryptData (msg, publicKey) {
   const ephemeralKeyPair = nacl.box.keyPair()
-  const pubKeyUInt8Array = Buffer.from(decodeBase58Check(assertedType(publicKey, 'ak')))
-  const msgParamsUInt8Array = Buffer.from(new TextEncoder().encode(msg))
-  const nonce = Buffer.from(nacl.randomBytes(nacl.box.nonceLength))
+  const pubKeyUInt8Array = decodeBase58Check(assertedType(publicKey, 'ak'))
+  const nonce = nacl.randomBytes(nacl.box.nonceLength)
 
   const encryptedMessage = nacl.box(
-    msgParamsUInt8Array,
+    Buffer.from(msg),
     nonce,
-    pubKeyUInt8Array,
-    Buffer.from(ephemeralKeyPair.secretKey)
+    ed2curve.convertPublicKey(pubKeyUInt8Array),
+    ephemeralKeyPair.secretKey
   )
-  console.log(ephemeralKeyPair.secretKey.length)
-  console.log()
-  console.log(nacl.box.open(
-    encryptedMessage,
-    nonce,
-    ephemeralKeyPair.publicKey,
-    Buffer.from(secretKey, 'hex')
-  ))
+
   return {
     ciphertext: Buffer.from(encryptedMessage).toString('hex'),
     ephemPubKey: Buffer.from(ephemeralKeyPair.publicKey).toString('hex'),
@@ -697,31 +691,22 @@ export function encryptData (msg, {publicKey, secretKey}) {
 }
 
 /**
- * This function encrypts a message using base58check encoded and 'ak' prefixed
- * publicKey such that only the corresponding secretKey will
- * be able to decrypt
- * @rtype (secretKey: String, publicKey: String) => Object
+ * This function decrypt a message using secret key
+ * @rtype (secretKey: String, encryptedData: Object) => Buffer|null
  * @param {String} secretKey - Secret key
  * @param {Object} encryptedData - Encrypted data
- * @return {Object}
+ * @return {Buffer|null}
  */
 export function decryptData (secretKey, encryptedData) {
-  const receiverSecretKeyUint8Array = Buffer.from(secretKey, 'hex').slice(0, 32)
+  const receiverSecretKeyUint8Array = ed2curve.convertSecretKey(Buffer.from(secretKey, 'hex'))
   const nonce = Buffer.from(encryptedData.nonce, 'hex')
   const ciphertext = Buffer.from(encryptedData.ciphertext, 'hex')
   const ephemPubKey = Buffer.from(encryptedData.ephemPubKey, 'hex')
-
-  console.log(Buffer.from(secretKey, 'hex'))
-  console.log(receiverSecretKeyUint8Array.length)
-  console.log(nonce)
-  console.log(ciphertext)
-  console.log(ephemPubKey)
-
-  const decryptedMessage = nacl.box.open(
+  const decrypted = nacl.box.open(
     ciphertext,
     nonce,
     ephemPubKey,
     receiverSecretKeyUint8Array
   )
-  return decryptedMessage
+  return decrypted ? Buffer.from(decrypted) : decrypted
 }

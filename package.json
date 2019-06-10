@@ -38,6 +38,7 @@
     "blakejs": "^1.1.0",
     "bs58check": "^2.1.1",
     "commander": "^2.14.1",
+    "ed2curve": "^0.2.1",
     "joi-browser": "^13.4.0",
     "json-bigint": "github:davidyuk/json-bigint",
     "libsodium-wrappers-sumo": "0.7.3",

@@ -144,12 +144,30 @@ describe('crypto', () => {
     const fromHexAddress = 'ak_' + encodeBase58Check(Buffer.from(hex.slice(2), 'hex'))
     fromHexAddress.should.be.equal(address)
   })
-  it.only('Encrypt data using nacl box asymmetric encryption', () => {
-    const msg = 'Test string asasassasaasasasasas'
+  describe('Encrypt data using nacl box asymmetric encryption', async () => {
     const { publicKey, secretKey } = Crypto.generateKeyPair()
-    const encrypted = encryptData(msg, {publicKey, secretKey})
-    console.log(encrypted)
-    // console.log('////////////////////')
-    // console.log(decryptData(secretKey, encrypted))
+    const msgString = 'Test string'
+    const msgBuffer = Buffer.from(msgString)
+
+    it('Encrypt String/Buffer and decrypt', () => {
+      const encryptedString = encryptData(msgString, publicKey)
+      const encryptedBuffer = encryptData(msgBuffer, publicKey)
+
+      const decryptedString = decryptData(secretKey, encryptedString)
+      const decryptedBuffer = decryptData(secretKey, encryptedBuffer)
+      Buffer.from(decryptedString).toString().should.be.equal(msgString)
+      decryptedBuffer.equals(msgBuffer).should.be.equal(true)
+    })
+    it('Decrypt with wrong secret', () => {
+      const keyPair = Crypto.generateKeyPair()
+
+      const encryptedString = encryptData(msgString, keyPair.publicKey)
+      const encryptedBuffer = encryptData(msgBuffer, keyPair.publicKey)
+
+      const decryptedString = decryptData(secretKey, encryptedString)
+      const decryptedBuffer = decryptData(secretKey, encryptedBuffer)
+      const isNull = decryptedBuffer === null && decryptedString === null
+      isNull.should.be.equal(true)
+    })
   })
 })
