@@ -21,6 +21,8 @@ import { assert, expect } from 'chai'
 import * as Crypto from '../../es/utils/crypto'
 
 import { addressToHex, encodeBase58Check } from '../../es/utils/crypto'
+import { encryptData } from '../../es/utils/crypto'
+import { decryptData } from '../../es/utils/crypto'
 
 // These keys are fixations for the encryption lifecycle tests and will
 // not be used for signing
@@ -141,5 +143,13 @@ describe('crypto', () => {
     const hex = addressToHex(address)
     const fromHexAddress = 'ak_' + encodeBase58Check(Buffer.from(hex.slice(2), 'hex'))
     fromHexAddress.should.be.equal(address)
+  })
+  it.only('Encrypt data using nacl box asymmetric encryption', () => {
+    const msg = 'Test string asasassasaasasasasas'
+    const { publicKey, secretKey } = Crypto.generateKeyPair()
+    const encrypted = encryptData(msg, {publicKey, secretKey})
+    console.log(encrypted)
+    // console.log('////////////////////')
+    // console.log(decryptData(secretKey, encrypted))
   })
 })

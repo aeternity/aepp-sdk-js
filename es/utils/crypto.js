@@ -658,3 +658,70 @@ export function deserialize (binary, opts = { prettyTags: false }) {
       })
   }
 }
+
+/**
+ * This function encrypts a message using base58check encoded and 'ak' prefixed
+ * publicKey such that only the corresponding secretKey will
+ * be able to decrypt
+ * @rtype (msg: String, publicKey: String) => Object
+ * @param {String} msg - Data to encode
+ * @param {String} publicKey - Public key
+ * @return {Object}
+ */
+export function encryptData (msg, {publicKey, secretKey}) {
+  const ephemeralKeyPair = nacl.box.keyPair()
+  const pubKeyUInt8Array = Buffer.from(decodeBase58Check(assertedType(publicKey, 'ak')))
+  const msgParamsUInt8Array = Buffer.from(new TextEncoder().encode(msg))
+  const nonce = Buffer.from(nacl.randomBytes(nacl.box.nonceLength))
+
+  const encryptedMessage = nacl.box(
+    msgParamsUInt8Array,
+    nonce,
+    pubKeyUInt8Array,
+    Buffer.from(ephemeralKeyPair.secretKey)
+  )
+  console.log(ephemeralKeyPair.secretKey.length)
+  console.log()
+  console.log(nacl.box.open(
+    encryptedMessage,
+    nonce,
+    ephemeralKeyPair.publicKey,
+    Buffer.from(secretKey, 'hex')
+  ))
+  return {
+    ciphertext: Buffer.from(encryptedMessage).toString('hex'),
+    ephemPubKey: Buffer.from(ephemeralKeyPair.publicKey).toString('hex'),
+    nonce: Buffer.from(nonce).toString('hex'),
+    version: 'x25519-xsalsa20-poly1305'
+  }
+}
+
+/**
+ * This function encrypts a message using base58check encoded and 'ak' prefixed
+ * publicKey such that only the corresponding secretKey will
+ * be able to decrypt
+ * @rtype (secretKey: String, publicKey: String) => Object
+ * @param {String} secretKey - Secret key
+ * @param {Object} encryptedData - Encrypted data
+ * @return {Object}
+ */
+export function decryptData (secretKey, encryptedData) {
+  const receiverSecretKeyUint8Array = Buffer.from(secretKey, 'hex').slice(0, 32)
+  const nonce = Buffer.from(encryptedData.nonce, 'hex')
+  const ciphertext = Buffer.from(encryptedData.ciphertext, 'hex')
+  const ephemPubKey = Buffer.from(encryptedData.ephemPubKey, 'hex')
+
+  console.log(Buffer.from(secretKey, 'hex'))
+  console.log(receiverSecretKeyUint8Array.length)
+  console.log(nonce)
+  console.log(ciphertext)
+  console.log(ephemPubKey)
+
+  const decryptedMessage = nacl.box.open(
+    ciphertext,
+    nonce,
+    ephemPubKey,
+    receiverSecretKeyUint8Array
+  )
+  return decryptedMessage
+}
