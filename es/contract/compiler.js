@@ -90,7 +90,6 @@ const ContractCompilerAPI = ContractBase.compose({
   async init ({ compilerUrl = this.compilerUrl }) {
     this.http = Http({ baseUrl: compilerUrl })
     this.compilerVersion = await this.getCompilerVersion()
-    console.log(this.compilerVersion)
     if (!semverSatisfies(this.compilerVersion.split('-')[0], COMPILER_GE_VERSION, COMPILER_LT_VERSION)) {
       throw new Error(`Unsupported compiler version ${this.compilerVersion}. ` +
         `Supported: >= ${COMPILER_GE_VERSION} < ${COMPILER_LT_VERSION}`)
