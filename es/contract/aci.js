@@ -24,8 +24,6 @@
  * @example import ContractACI from '@aeternity/aepp-sdk/es/contract/aci'
  */
 import Joi from 'joi-browser'
-
-import AsyncInit from '../utils/async-init'
 import * as R from 'ramda'
 
 const SOPHIA_TYPES = [
@@ -407,8 +405,8 @@ export async function getContractInstance (source, { client, aci, contractAddres
     setClient (client) {
       clients[0] = client
     },
-    async addAccount (account) {
-      await clients[0].addAccount(account)
+    async addAccount (account, { select } = {}) {
+      await clients[0].addAccount(account, { select })
     },
     getClient () {
       return clients[0]
@@ -445,7 +443,9 @@ export async function getContractInstance (source, { client, aci, contractAddres
    */
   instance.call = call.bind(instance)
 
-  console.log(instance.aci.functions[0])
+  /**
+   * Generate proto function based on contract function using Contract ACI schema
+   */
   instance.methods = instance
     .aci
     .functions
@@ -506,18 +506,4 @@ async function compile () {
   return this
 }
 
-/**
- * Contract ACI Stamp
- *
- * @function
- * @alias module:@aeternity/aepp-sdk/es/contract/aci
- * @rtype Stamp
- * @return {Object} Contract compiler instance
- * @example ContractACI()
- */
-const ContractACI = AsyncInit.compose({
-  methods: {
-    getContractInstance
-  }
-})
-export default ContractACI
+export default { getContractInstance }

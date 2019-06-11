@@ -36,15 +36,16 @@ const DEFAULT_NETWORK_ID = `ae_mainnet`
  * @category async
  * @rtype (tx: String) => tx: Promise[String], throws: Error
  * @param {String} tx - Transaction to sign
+ * @param {String} forAccount - Sign with specific account if we have Accounts and Selector stamp in composition
  * @return {String} Signed transaction
  */
-async function signTransaction (tx) {
+async function signTransaction (tx, { forAccount } = {}) {
   const networkId = this.getNetworkId()
   const rlpBinaryTx = Crypto.decodeBase64Check(Crypto.assertedType(tx, 'tx'))
   // Prepend `NETWORK_ID` to begin of data binary
   const txWithNetworkId = Buffer.concat([Buffer.from(networkId), rlpBinaryTx])
 
-  const signatures = [await this.sign(txWithNetworkId)]
+  const signatures = [await this.sign(txWithNetworkId, { forAccount })]
   return buildTx({ encodedTx: rlpBinaryTx, signatures }, TX_TYPE.signed).tx
 }
 
