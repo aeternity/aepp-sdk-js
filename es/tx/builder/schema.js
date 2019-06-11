@@ -259,12 +259,12 @@ export const DEFAULT_FEE = 20000
 export const KEY_BLOCK_INTERVAL = 3
 
 // MAP WITH FEE CALCULATION https://github.com/aeternity/protocol/blob/master/consensus/consensus.md#gas
-export const TX_FEE_BASE_GAS = (txType) => (gas) => {
+export const TX_FEE_BASE_GAS = (txType) => {
   switch (txType) {
     case TX_TYPE.contractCreate:
-      return BigNumber(5 * BASE_GAS).plus(gas)
+      return BigNumber(5 * BASE_GAS)
     case TX_TYPE.contractCall:
-      return BigNumber(30 * BASE_GAS).plus(gas)
+      return BigNumber(30 * BASE_GAS)
     default:
       return BigNumber(BASE_GAS)
   }
