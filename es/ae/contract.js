@@ -31,7 +31,6 @@ import Ae from './'
 import * as R from 'ramda'
 import { isBase64 } from '../utils/crypto'
 import ContractCompilerAPI from '../contract/compiler'
-import ContractACI from '../contract/aci'
 import ContractBase from '../contract'
 
 /**
@@ -111,7 +110,7 @@ async function contractCallStatic (source, address, name, args = [], { top, opti
 
   // Prepare `call` transaction
   const tx = await this.contractCallTx(R.merge(opt, {
-    callerId: await this.address(),
+    callerId: await this.address(opt),
     contractId: address,
     callData: await this.contractEncodeCall(source, name, args)
   }))
@@ -124,7 +123,7 @@ async function contractCallStatic (source, address, name, args = [], { top, opti
   // Dry-run
   const [{ result: status, callObj, reason }] = (await this.txDryRun([tx], [{
     amount: opt.amount,
-    pubKey: await this.address()
+    pubKey: await this.address(opt)
   }], top)).results
 
   // check response
@@ -162,7 +161,7 @@ async function contractCall (source, address, name, args = [], options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
 
   const tx = await this.contractCallTx(R.merge(opt, {
-    callerId: await this.address(),
+    callerId: await this.address(opt),
     contractId: address,
     callData: await this.contractEncodeCall(source, name, args)
   }))
@@ -207,7 +206,7 @@ async function contractCall (source, address, name, args = [], options = {}) {
 async function contractDeploy (code, source, initState = [], options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   const callData = await this.contractEncodeCall(source, 'init', initState)
-  const ownerId = await this.address()
+  const ownerId = await this.address(opt)
 
   const { tx, contractId } = await this.contractCreateTx(R.merge(opt, {
     callData,
@@ -287,7 +286,7 @@ async function contractCompile (source, options = {}) {
  * const client = await ContractWithAe({ url, internalUrl, compilerUrl, keypair, ... })
  *
  */
-export const Contract = Ae.compose(ContractBase, ContractACI, {
+export const Contract = Ae.compose(ContractBase, {
   methods: {
     contractCompile,
     contractCallStatic,

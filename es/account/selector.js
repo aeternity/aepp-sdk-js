@@ -27,12 +27,12 @@
 import Account from './'
 import required from '@stamp/required'
 
-async function sign (data) {
-  return this.signWith(this.Selector.address, data)
+async function sign (data, { forAccount } = {}) {
+  return this.signWith(forAccount || this.Selector.address, data)
 }
 
-async function address () {
-  return Promise.resolve(this.Selector.address)
+async function address ({ forAccount } = {}) {
+  return Promise.resolve(forAccount || this.Selector.address)
 }
 
 /**

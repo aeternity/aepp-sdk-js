@@ -1,12 +1,21 @@
 /* eslint-disable */
 import { before, describe } from 'mocha'
-import { configure, ready } from '.'
+import { configure, internalUrl, ready, url } from '.'
 import { generateKeyPair } from '../../es/utils/crypto'
 import { BASE_VERIFICATION_SCHEMA, SIGNATURE_VERIFICATION_SCHEMA } from '../../es/tx/builder/schema'
+import { getContractInstance } from '../../es/contract/aci'
+import { account } from './index'
+import { UniversalWithAccounts } from '../../es/ae/universal'
+import MemoryAccount from '../../es/account/memory'
 
 const WARNINGS = [...SIGNATURE_VERIFICATION_SCHEMA, ...BASE_VERIFICATION_SCHEMA].reduce((acc, [msg, v, error]) => error.type === 'warning' ? [...acc, error.txKey] : acc, [])
 const ERRORS = [...BASE_VERIFICATION_SCHEMA, ...SIGNATURE_VERIFICATION_SCHEMA,].reduce((acc, [msg, v, error]) => error.type === 'error' ? [...acc, error.txKey] : acc, [])
-
+const stateContract = `
+contract StateContract =
+  record state = { value: string }
+  public function init(value) : state = { value = value }
+  public function retrieve() : string = state.value
+`
 describe('Verify Transaction', function () {
   configure(this)
   let client
@@ -83,5 +92,23 @@ describe('Verify Transaction', function () {
     const { validation } = await client.unpackAndVerify(contractCreateTx)
     const vmAbiError = validation.find(el => el.txKey === 'ctVersion')
     vmAbiError.msg.split(',')[0].should.be.equal('Wrong abi/vm version')
+  })
+  it.only('test', async () => {
+    const url = process.env.TEST_URL || 'http://localhost:3013'
+    const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
+    const compilerUrl = process.env.COMPILER_URL || 'http://localhost:3080'
+    const client = await UniversalWithAccounts({
+      url, internalUrl, process, compilerUrl,
+      accounts: [MemoryAccount({ keypair: account })], address: account.publicKey
+    })
+    const contractInstance = await getContractInstance(stateContract, { client })
+    contractInstance.addAccount(MemoryAccount({
+      keypair: {
+        publicKey: 'ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi',
+        secretKey: 'e6a91d633c77cf5771329d3354b3bcef1bc5e032c43d70b6d35af923ce1eb74dcea7ade470c9f99d9d4e400880a86f1d49bb444b62f11a9ebb64bbcfeb73fef3'
+      }
+    }))
+    await contractInstance.methods.init('Test')
+    console.log(await contractInstance.methods.retrieve())
   })
 })
