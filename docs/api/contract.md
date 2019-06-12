@@ -16,6 +16,8 @@ import ContractBase from '@aeternity/aepp-sdk/es/contract'
         * *[.contractDecodeCallDataBySourceAPI(source, function, callData)](#module_@aeternity/aepp-sdk/es/contract--ContractBase+contractDecodeCallDataBySourceAPI) ⇒ `String`*
         * *[.contractDecodeCallDataByCodeAPI(code, callData)](#module_@aeternity/aepp-sdk/es/contract--ContractBase+contractDecodeCallDataByCodeAPI) ⇒ `String`*
         * *[.compileContractAPI(code, [options])](#module_@aeternity/aepp-sdk/es/contract--ContractBase+compileContractAPI) ⇒ `Object`*
+        * *[.setCompilerUrl(url)](#module_@aeternity/aepp-sdk/es/contract--ContractBase+setCompilerUrl) ⇒ `void`*
+        * *[.getCompilerVersion()](#module_@aeternity/aepp-sdk/es/contract--ContractBase+getCompilerVersion) ⇒ `String`*
 
 <a id="exp_module_@aeternity/aepp-sdk/es/contract--ContractBase"></a>
 
@@ -111,3 +113,25 @@ Compile contract
 | code | `String` |  | Contract source code |
 | [options] | `Object` | <code>{}</code> | Options |
 
+<a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+setCompilerUrl"></a>
+
+#### *contractBase.setCompilerUrl(url) ⇒ `void`*
+Set compiler url
+
+**Kind**: instance abstract method of [`ContractBase`](#exp_module_@aeternity/aepp-sdk/es/contract--ContractBase)  
+**Category**: async  
+**rtype**: `(url: String) => void`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| url | `String` | Compiler url |
+
+<a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+getCompilerVersion"></a>
+
+#### *contractBase.getCompilerVersion() ⇒ `String`*
+Get Compiler Version
+
+**Kind**: instance abstract method of [`ContractBase`](#exp_module_@aeternity/aepp-sdk/es/contract--ContractBase)  
+**Returns**: `String` - Compiler version  
+**Category**: async  
+**rtype**: `() => String`
