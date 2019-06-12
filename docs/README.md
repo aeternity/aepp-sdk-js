@@ -23,7 +23,7 @@ Factories_ based on the specific use case:
 * [@aeternity/aepp-sdk/es/ae/oracle](api/ae/oracle.md): for **Oracle**'s focused development
 * [@aeternity/aepp-sdk/es/ae/universal](api/ae/universal.md): for **Universal** development (includes all SDK features)
 
-In order to cater to more specific needs, it is recommended to refer to the
+In order to cater more specific needs, it is recommended to refer to the
 [contributing Docs](contrib/README.md).
 
 ### Testing Networks
