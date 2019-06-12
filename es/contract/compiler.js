@@ -26,6 +26,7 @@
 
 import Http from '../utils/http'
 import ContractBase from './index'
+import semverSatisfies from '../utils/semver-satisfies'
 
 async function getCompilerVersion (options = {}) {
   return this.http
@@ -89,6 +90,10 @@ const ContractCompilerAPI = ContractBase.compose({
   async init ({ compilerUrl = this.compilerUrl }) {
     this.http = Http({ baseUrl: compilerUrl })
     this.compilerVersion = await this.getCompilerVersion()
+    if (!semverSatisfies(this.compilerVersion.split('-')[0], COMPILER_GE_VERSION, COMPILER_LT_VERSION)) {
+      throw new Error(`Unsupported compiler version ${this.compilerVersion}. ` +
+        `Supported: >= ${COMPILER_GE_VERSION} < ${COMPILER_LT_VERSION}`)
+    }
   },
   methods: {
     contractEncodeCallDataAPI,
@@ -105,5 +110,8 @@ const ContractCompilerAPI = ContractBase.compose({
     compilerVersion: null
   }
 })
+
+const COMPILER_GE_VERSION = '3.1.0'
+const COMPILER_LT_VERSION = '4.0.0'
 
 export default ContractCompilerAPI
