@@ -6,11 +6,12 @@
 
 ### Code Refactoring
 
-* **SCM:** Update compatibility range for node: 3.0.1 - 4 ([#474](https://github.com/aeternity/aepp-sdk-js/issues/474)) ([a1494fd](https://github.com/aeternity/aepp-sdk-js/commit/a1494fd))
+* **SCM:** Update compatibility range for node: 3.0.1 - 4 and compiler 3.1.0 - 4 ([#474](https://github.com/aeternity/aepp-sdk-js/issues/474)) ([a1494fd](https://github.com/aeternity/aepp-sdk-js/commit/a1494fd))
 * **Test:** Simplify client creation
 
 ### Features
 
+* **Compiler:** Add `getCompilerVersion` to compiler stamp
 * **ACI:** Make compatible with compiler 3.1.0 ([#457](https://github.com/aeternity/aepp-sdk-js/issues/457)) ([d92f2c7](https://github.com/aeternity/aepp-sdk-js/commit/d92f2c7)), closes [#458](https://github.com/aeternity/aepp-sdk-js/issues/458)
 * **ACI:** Generate JS function proto for each of contract function ([#439](https://github.com/aeternity/aepp-sdk-js/issues/439)) ([2f47b4d](https://github.com/aeternity/aepp-sdk-js/commit/2f47b4d))
 * **Compiler/ACI:** Make ACI compatible with compiler 3.0.0 ([#441](https://github.com/aeternity/aepp-sdk-js/issues/441)) ([2a8eb1a](https://github.com/aeternity/aepp-sdk-js/commit/2a8eb1a))
@@ -23,9 +24,10 @@
 
 * **SCM:** This change will make the release not compatible with older version of the node and
 compiler
-* **ACI:** Change Contract low lvl API: change `contractDecodeData` interface from `(type:
-String, data: String) => Any` to `(source: String, fn: String, callValue: String, callResult:
-String) => Any`. * `callResult` is `callType` from call result, be `ok`, `revert`, ...
+* **ACI:** Change Contract low lvl API: 
+  - change `contractDecodeData` interface from:
+    - `(type:String, data: String) => Any` to `(source: String, fn: String, callValue: String, callResult:String) => Any`.
+    (`callResult` is `callType` from call result, can be `ok`, `revert`, ...)
 
 
 
