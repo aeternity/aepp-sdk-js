@@ -3,6 +3,7 @@
 ## @aeternity/aepp-sdk/es/tx/validator
 Transaction validator
 
+**Export**: TransactionValidator  
 **Example**  
 ```js
 import TransactionValidator from '@aeternity/aepp-sdk/es/tx/validator'

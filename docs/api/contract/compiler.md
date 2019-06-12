@@ -5,6 +5,7 @@ ContractCompilerAPI module
 
 This is the complement to [@aeternity/aepp-sdk/es/contract](#module_@aeternity/aepp-sdk/es/contract).
 
+**Export**: ContractCompilerAPI  
 **Example**  
 ```js
 import ContractCompilerAPI from '@aeternity/aepp-sdk/es/contract/compiler'

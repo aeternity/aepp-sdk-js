@@ -142,7 +142,7 @@
 
 <script>
   //  is a webpack alias present in webpack.config.js
-  import Aepp from 'AE_SDK_MODULES/ae/aepp'
+  import Aepp from '@aeternity/aepp-sdk/es/ae/aepp'
 
   export default {
     data () {

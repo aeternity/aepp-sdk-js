@@ -3,6 +3,7 @@
 ## @aeternity/aepp-sdk/es/ae/wallet
 Wallet module
 
+**Export**: Wallet  
 **Example**  
 ```js
 import Wallet from '@aeternity/aepp-sdk/es/ae/wallet'

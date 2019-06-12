@@ -6,6 +6,7 @@ Contract module - routines to interact with the æternity contract
 High level documentation of the contracts are available at
 https://github.com/aeternity/protocol/tree/master/contracts and
 
+**Export**: Contract  
 **Example**  
 ```js
 import Contract from '@aeternity/aepp-sdk/es/ae/contract' (Using tree-shaking)
