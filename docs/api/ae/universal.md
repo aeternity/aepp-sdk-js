@@ -3,6 +3,7 @@
 ## @aeternity/aepp-sdk/es/ae/universal
 Universal module
 
+**Export**: Universal  
 **Example**  
 ```js
 import Ae from '@aeternity/aepp-sdk/es/ae/universal'

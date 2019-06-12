@@ -3,6 +3,7 @@
 ## @aeternity/aepp-sdk/es/contract/aci
 ContractACI module
 
+**Export**: ContractACI  
 **Example**  
 ```js
 import ContractACI from '@aeternity/aepp-sdk/es/contract/aci'
@@ -69,6 +70,8 @@ Generate contract ACI object with predefined js methods for contract usage
 | source | `String` | Contract source code |
 | [options] | `Object` | Options object |
 | [options.aci] | `Object` | Contract ACI |
+| [options.contractAddress] | `Object` | Contract address |
+| [options.opt] | `Object` | Contract options |
 
 **Example**  
 ```js

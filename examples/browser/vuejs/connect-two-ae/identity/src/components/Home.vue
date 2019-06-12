@@ -42,8 +42,8 @@
 
 <script>
   // AE_SDK_MODULES is a webpack alias present in webpack.config.js
-  import Wallet from 'AE_SDK_MODULES/ae/wallet'
-  import MemoryAccount from 'AE_SDK_MODULES/account/memory'
+  import Wallet from '@aeternity/aepp-sdk/es/ae/wallet'
+  import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
 
   export default {
     data () {
