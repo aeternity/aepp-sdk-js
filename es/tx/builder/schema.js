@@ -248,7 +248,8 @@ export const FIELD_TYPES = {
   proofOfInclusion: 'proofOfInclusion',
   mptree: 'mptree',
   callReturnType: 'callReturnType',
-  ctVersion: 'ctVersion'
+  ctVersion: 'ctVersion',
+  payload: 'payload'
 }
 
 // FEE CALCULATION
@@ -258,12 +259,12 @@ export const DEFAULT_FEE = 20000
 export const KEY_BLOCK_INTERVAL = 3
 
 // MAP WITH FEE CALCULATION https://github.com/aeternity/protocol/blob/master/consensus/consensus.md#gas
-export const TX_FEE_BASE_GAS = (txType) => (gas) => {
+export const TX_FEE_BASE_GAS = (txType) => {
   switch (txType) {
     case TX_TYPE.contractCreate:
-      return BigNumber(5 * BASE_GAS).plus(gas)
+      return BigNumber(5 * BASE_GAS)
     case TX_TYPE.contractCall:
-      return BigNumber(30 * BASE_GAS).plus(gas)
+      return BigNumber(30 * BASE_GAS)
     default:
       return BigNumber(BASE_GAS)
   }
@@ -341,7 +342,7 @@ const SPEND_TX = [
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int),
   TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('payload', FIELD_TYPES.string)
+  TX_FIELD('payload', FIELD_TYPES.payload)
 ]
 
 const SIGNED_TX = [

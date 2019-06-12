@@ -50,6 +50,8 @@ function deserializeField (value, type, prefix) {
       return encode(value, prefix)
     case FIELD_TYPES.string:
       return value.toString()
+    case FIELD_TYPES.payload:
+      return encode(value, 'ba')
     case FIELD_TYPES.pointers:
       return readPointers(value)
     case FIELD_TYPES.rlpBinary:
@@ -95,6 +97,7 @@ function serializeField (value, type, prefix) {
       return Buffer.from(value, 'hex')
     case FIELD_TYPES.signatures:
       return value.map(Buffer.from)
+    case FIELD_TYPES.payload:
     case FIELD_TYPES.string:
       return toBytes(value)
     case FIELD_TYPES.pointers:
@@ -213,7 +216,7 @@ export function calculateMinFee (txType, { gas = 0, params }) {
 function buildFee (txType, { params, gas = 0, multiplier }) {
   const { rlpEncoded: txWithOutFee } = buildTx({ ...params }, txType)
   const txSize = txWithOutFee.length
-  return TX_FEE_BASE_GAS(txType)(gas)
+  return TX_FEE_BASE_GAS(txType)
     .plus(TX_FEE_OTHER_GAS(txType)({ txSize, relativeTtl: getOracleRelativeTtl(params) }))
     .times(multiplier)
 }

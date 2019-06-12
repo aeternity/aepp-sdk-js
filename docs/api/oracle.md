@@ -3,6 +3,7 @@
 ## @aeternity/aepp-sdk/es/oracle
 Oracle Base module
 
+**Export**: Contract  
 **Example**  
 ```js
 import ContractBase from '@aeternity/aepp-sdk/es/oracle'
