@@ -83,8 +83,9 @@ async function setCompilerUrl (url) {
   await this.checkCompatibility()
 }
 
-async function checkCompatibility () {
+async function checkCompatibility (force = false) {
   this.compilerVersion = await this.getCompilerVersion().catch(e => null)
+  if (!this.compilerVersion && !force) throw new Error('Compiler do not respond')
   if (this.compilerVersion && !semverSatisfies(this.compilerVersion.split('-')[0], COMPILER_GE_VERSION, COMPILER_LT_VERSION)) {
     const version = this.compilerVersion
     this.compilerVersion = null
@@ -113,7 +114,7 @@ function isInit () {
 const ContractCompilerAPI = ContractBase.compose({
   async init ({ compilerUrl = this.compilerUrl }) {
     this.http = Http({ baseUrl: compilerUrl })
-    await this.checkCompatibility()
+    await this.checkCompatibility(true)
   },
   methods: {
     contractEncodeCallDataAPI,
