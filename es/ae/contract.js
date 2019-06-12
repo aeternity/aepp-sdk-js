@@ -50,7 +50,7 @@ async function handleCallError (result) {
     throw Object.assign(Error(`Invocation failed: ${error}. Decoded: ${decodedError}`), R.merge(result, { error, decodedError }))
   }
 
-  const decodedError = await this.contractDecodeData('string', error)
+  const decodedError = await this.contractDecodeDataAPI('string', error)
   throw Object.assign(Error(`Invocation failed: ${error}. Decoded: ${decodedError}`), R.merge(result, { error, decodedError }))
 }
 
@@ -73,14 +73,17 @@ async function contractEncodeCall (source, name, args) {
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
- * @param {String} type Data type (int, string, list,...)
- * @param {String} data call result data (cb_iwer89fjsdf2j93fjews_(ssdffsdfsdf...)
+ * @param {String} source - source code
+ * @param {String } fn - function name
+ * @param {String} callValue - result call data
+ * @param {String} callResult - result status
  * @return {Promise<String>} Result object
  * @example
- * const decodedData = await client.contractDecodeData('string' ,'cb_sf;ls43fsdfsdf...')
+ * const decodedData = await client.contractDecodeData(SourceCode ,'functionName', 'cb_asdasdasd...', 'ok|revert')lt
+ * @param options
  */
-async function contractDecodeData (type, data) {
-  return this.contractDecodeDataAPI(type, data)
+async function contractDecodeData (source, fn, callValue, callResult, options) {
+  return this.contractDecodeCallResultAPI(source, fn, callValue, callResult, options)
 }
 
 /**
@@ -132,7 +135,7 @@ async function contractCallStatic (source, address, name, args = [], { top, opti
   }
   return {
     result: callObj,
-    decode: (type) => this.contractDecodeData(type, returnValue)
+    decode: () => this.contractDecodeData(source, name, returnValue, returnType, options)
   }
 }
 
@@ -172,7 +175,7 @@ async function contractCall (source, address, name, args = [], options = {}) {
       hash,
       rawTx,
       result,
-      decode: (type) => this.contractDecodeData(type, result.returnValue)
+      decode: () => this.contractDecodeData(source, name, result.returnValue, result.returnType)
     }
   } else {
     await this.handleCallError(result)
