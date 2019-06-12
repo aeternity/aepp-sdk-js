@@ -26,6 +26,7 @@
 
 import Http from '../utils/http'
 import ContractBase from './index'
+import semverSatisfies from '../utils/semver-satisfies'
 
 async function getCompilerVersion (options = {}) {
   return this.http
@@ -47,6 +48,11 @@ async function contractDecodeCallDataByCodeAPI (bytecode, calldata, options = {}
 async function contractDecodeCallDataBySourceAPI (source, fn, callData, options = {}) {
   return this.http
     .post('/decode-calldata/source', { 'function': fn, source, calldata: callData }, options)
+}
+
+async function contractDecodeCallResultAPI (source, fn, callValue, callResult, options = {}) {
+  return this.http
+    .post('/decode-call-result', { 'function': fn, source, 'call-result': callResult, 'call-value': callValue }, options)
 }
 
 async function contractDecodeDataAPI (type, data, options = {}) {
@@ -84,6 +90,10 @@ const ContractCompilerAPI = ContractBase.compose({
   async init ({ compilerUrl = this.compilerUrl }) {
     this.http = Http({ baseUrl: compilerUrl })
     this.compilerVersion = await this.getCompilerVersion()
+    if (!semverSatisfies(this.compilerVersion.split('-')[0], COMPILER_GE_VERSION, COMPILER_LT_VERSION)) {
+      throw new Error(`Unsupported compiler version ${this.compilerVersion}. ` +
+        `Supported: >= ${COMPILER_GE_VERSION} < ${COMPILER_LT_VERSION}`)
+    }
   },
   methods: {
     contractEncodeCallDataAPI,
@@ -92,6 +102,7 @@ const ContractCompilerAPI = ContractBase.compose({
     contractGetACI,
     contractDecodeCallDataByCodeAPI,
     contractDecodeCallDataBySourceAPI,
+    contractDecodeCallResultAPI,
     setCompilerUrl,
     getCompilerVersion
   },
@@ -99,5 +110,8 @@ const ContractCompilerAPI = ContractBase.compose({
     compilerVersion: null
   }
 })
+
+const COMPILER_GE_VERSION = '3.1.0'
+const COMPILER_LT_VERSION = '4.0.0'
 
 export default ContractCompilerAPI
