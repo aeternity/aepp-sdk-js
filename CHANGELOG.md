@@ -11,6 +11,7 @@
 
 ### Features
 
+* **Docs** chore(Docs): new docs ([#370](https://github.com/aeternity/aepp-sdk-js/pull/370))
 * **Compiler:** Add `getCompilerVersion` to compiler stamp
 * **ACI:** Make compatible with compiler 3.1.0 ([#457](https://github.com/aeternity/aepp-sdk-js/issues/457)) ([d92f2c7](https://github.com/aeternity/aepp-sdk-js/commit/d92f2c7)), closes [#458](https://github.com/aeternity/aepp-sdk-js/issues/458)
 * **ACI:** Generate JS function proto for each of contract function ([#439](https://github.com/aeternity/aepp-sdk-js/issues/439)) ([2f47b4d](https://github.com/aeternity/aepp-sdk-js/commit/2f47b4d))
@@ -22,6 +23,7 @@
 
 ### BREAKING CHANGES
 
+* **DOCS** Restructure and rework sdk documentation
 * **SCM:** This change will make the release not compatible with older version of the node and
 compiler
 * **ACI:** Change Contract low lvl API: 
