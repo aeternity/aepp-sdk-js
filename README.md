@@ -65,7 +65,7 @@ import Ae from '@aeternity/aepp-sdk/es/ae/universal' // or other flavor
 ```
 
 ### 3. Create an Account and get some _AEs_
-You can do many more things now, but you'll probably have to start by:
+You can do many more things now, but you'll probably have to start with:
 
 1. Create an account using the [💻 CLI](#cli---command-line-client)
 2. Give yourself some initial _AEs_ using the [🚰 Faucet Aepp](https://faucet.aepps.com/)
@@ -80,7 +80,7 @@ Check out our [Guides](docs/README.md) and [Examples](examples/README.md).
 To quickly test _all_ of Aeternity's blockchain features from your Terminal, you can Install and use our **NodeJS [CLI](https://github.com/aeternity/aepp-cli-js)** by running:
 
 1. `npm i -g @aeternity/aepp-cli` to globally install the CLI
-2. `aecly --help` to get a list of possible commands
+2. `aecli --help` to get a list of possible commands
 
 _eg._ Create an Account:
 
