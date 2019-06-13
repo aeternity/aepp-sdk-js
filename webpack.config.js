@@ -37,16 +37,7 @@ function configure (filename, opts = {}) {
       filename,
       library: 'Ae',
       libraryTarget: 'umd'
-    },
-    externals: Object
-      .keys(require('./package').dependencies)
-      .reduce((p, dependency) => ({
-        ...p,
-        [dependency]: {
-          commonjs: dependency,
-          commonjs2: dependency
-        }
-      }), {}),
+    }
   }, opts)
 }
 
