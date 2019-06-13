@@ -151,7 +151,7 @@ describe('Contract', function () {
     })
     it('Use invalid compiler url', async () => {
       try {
-        const cloned = Object.assign({}, contract)
+        const cloned = R.clone(contract)
         await cloned.setCompilerUrl('https://compiler.aepps.comas')
       } catch (e) {
         e.message.should.be.equal('Compiler do not respond')
