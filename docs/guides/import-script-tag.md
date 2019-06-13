@@ -17,7 +17,7 @@ The bundle will assign the SDK to a global `var` called `Ae`.
 <body>
   <script src="aepp-sdk.browser-script.js"></script>
   <script type="text/javascript">
-    Ae.Wallet.default().then(ae => {
+    Ae.Wallet().then(ae => {
       ae.height().then(height => {
         console.log('Current Block', height)
       })
