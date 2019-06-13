@@ -56,20 +56,18 @@ npm i @aeternity/aepp-sdk@next
 npm i https://github.com/aeternity/aepp-sdk-js#develop
 ```
 
-### 2. Import (a chosen Flavor)
+### 2. Create a Keypair
 
-Import the right [flavor](docs/usage.md). For this example with get the `Universal` flavor, which contains all the features of the SDK:
-
-```js
-import Ae from '@aeternity/aepp-sdk/es/ae/universal' // or other flavor
+```javascript
+import { Crypto } from '@aeternity/aepp-sdk/es'
+const keypair = Crypto.generateKeyPair()
+console.log(`Secret key: ${keypair.secretKey}`)
+console.log(`Public key: ${keypair.publicKey}`)
 ```
 
-### 3. Create an Account and get some _AEs_
-You can do many more things now, but you'll probably have to start with:
+### 3. Give yourself some _AEs_
 
-1. Create an account using the [💻 CLI](#cli---command-line-client)
-2. Give yourself some initial _AEs_ using the [🚰 Faucet Aepp](https://faucet.aepps.com/)
-3. Enjoy building Aepps 🤓
+Paste your public key in the [🚰 Faucet Aepp](https://faucet.aepps.com/) and enjoy some initial _AEs_ for testing!
 
 ## Guides & Examples
 
