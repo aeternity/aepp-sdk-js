@@ -1,3 +1,23 @@
+## [4.0.1](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.0.1) (2019-06-13)
+
+
+### Bug Fixes
+
+* **Compiler:** Fix compiler compatibility mechanism ([#479](https://github.com/aeternity/aepp-sdk-js/issues/479)) ([78cc990](https://github.com/aeternity/aepp-sdk-js/commit/78cc990))
+* **RPC:** Add contract contractDecodeCallResultAPI to RPC ([#482](https://github.com/aeternity/aepp-sdk-js/issues/482)) ([7eb6bd8](https://github.com/aeternity/aepp-sdk-js/commit/7eb6bd8))
+
+
+### Code Refactoring
+
+* **SCM:** Update compatibility range for node: 3.0.1 - 4 ([#474](https://github.com/aeternity/aepp-sdk-js/issues/474)) ([a1494fd](https://github.com/aeternity/aepp-sdk-js/commit/a1494fd))
+
+
+### Features
+
+* **Utils:** Move json-bigint implementation to `utils` ([#486](https://github.com/aeternity/aepp-sdk-js/issues/486)) ([1538867](https://github.com/aeternity/aepp-sdk-js/commit/1538867))
+
+
+
 # [4.0.0](https://github.com/aeternity/aepp-sdk-js/compare/3.4.1...4.0.0) (2019-06-12)
 
 ### Bug Fixes
