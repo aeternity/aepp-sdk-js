@@ -22,7 +22,7 @@
  * @example import Swagger from '@aeternity/aepp-sdk/es/utils/swagger'
  */
 
-import JSONbig from 'json-bigint'
+import JsonBig from './json-big'
 import stampit from '@stamp/it'
 import AsyncInit from './async-init'
 import axios from 'axios'
@@ -194,7 +194,7 @@ const httpConfig = {
   headers: { 'Content-Type': 'application/json' },
   transformResponse: [(data) => {
     try {
-      return JSONbig({ 'storeAsString': true }).parse(data)
+      return JsonBig.parse(data)
     } catch (e) {
       return data
     }
