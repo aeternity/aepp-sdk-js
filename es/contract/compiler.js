@@ -27,6 +27,7 @@
 import Http from '../utils/http'
 import ContractBase from './index'
 import semverSatisfies from '../utils/semver-satisfies'
+import AsyncInit from '../utils/async-init'
 
 async function getCompilerVersion (options = {}) {
   return this.http
@@ -111,7 +112,7 @@ function isInit () {
  * @return {Object} Contract compiler instance
  * @example ContractCompilerAPI({ compilerUrl: 'COMPILER_URL' })
  */
-const ContractCompilerAPI = ContractBase.compose({
+const ContractCompilerAPI = AsyncInit.compose(ContractBase, {
   async init ({ compilerUrl = this.compilerUrl }) {
     this.http = Http({ baseUrl: compilerUrl })
     await this.checkCompatibility(true)
