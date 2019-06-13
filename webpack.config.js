@@ -3,7 +3,7 @@ const R = require('ramda')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 function configure (filename, opts = {}) {
-  return (env, argv) => R.mergeDeepLeft({
+  return (env, argv) => R.mergeDeepRight({
     entry: './es/index.js',
     mode: 'development', // automatically overriden by production flag
     devtool: argv.mode === 'production' ? 'source-map' : 'eval-source-map',
@@ -37,11 +37,21 @@ function configure (filename, opts = {}) {
       filename,
       library: 'Ae',
       libraryTarget: 'umd'
-    }
+    },
+    externals: Object
+      .keys(require('./package').dependencies)
+      .reduce((p, dependency) => ({
+        ...p,
+        [dependency]: {
+          commonjs: dependency,
+          commonjs2: dependency
+        }
+      }), {}),
   }, opts)
 }
 
 module.exports = [
   configure('aepp-sdk.js', { target: 'node' }),
-  configure('aepp-sdk.browser.js')
+  configure('aepp-sdk.browser.js'),
+  configure('aepp-sdk.browser-script.js', { externals: undefined })
 ]
