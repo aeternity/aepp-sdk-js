@@ -24,6 +24,7 @@
 
 # [4.0.0](https://github.com/aeternity/aepp-sdk-js/compare/3.4.1...4.0.0) (2019-06-12)
 
+
 ### Bug Fixes
 
 * **Ae:** Fix exception when it used without Contract stamp
