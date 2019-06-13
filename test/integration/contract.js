@@ -149,6 +149,14 @@ describe('Contract', function () {
     it('decode call-data', async () => {
       return contract.contractDecodeCallResultAPI(identityContract, 'main', encodedNumberSix, 'ok').should.eventually.become(6)
     })
+    it('Use invalid compiler url', async () => {
+      try {
+        const cloned = R.clone(contract)
+        await cloned.setCompilerUrl('https://compiler.aepps.comas')
+      } catch (e) {
+        e.message.should.be.equal('Compiler do not respond')
+      }
+    })
   })
 
   describe('Contract ACI Interface', function () {
