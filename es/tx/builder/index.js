@@ -98,6 +98,7 @@ function serializeField (value, type, prefix) {
     case FIELD_TYPES.signatures:
       return value.map(Buffer.from)
     case FIELD_TYPES.payload:
+      return decode(value, 'ba')
     case FIELD_TYPES.string:
       return toBytes(value)
     case FIELD_TYPES.pointers:
