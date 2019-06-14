@@ -222,7 +222,7 @@ export function calculateMinFee (txType, { gas = 0, params }) {
 function buildFee (txType, { params, gas = 0, multiplier }) {
   const { rlpEncoded: txWithOutFee } = buildTx({ ...params }, txType)
   const txSize = txWithOutFee.length
-  return TX_FEE_BASE_GAS(txType)(gas)
+  return TX_FEE_BASE_GAS(txType)
     .plus(TX_FEE_OTHER_GAS(txType)({ txSize, relativeTtl: getOracleRelativeTtl(params) }))
     .times(multiplier)
 }

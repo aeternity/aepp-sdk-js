@@ -3,6 +3,7 @@
 ## @aeternity/aepp-sdk/es/tx
 Tx module
 
+**Export**: Tx  
 **Example**  
 ```js
 import Tx from '@aeternity/aepp-sdk/es/tx'

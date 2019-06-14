@@ -3,6 +3,7 @@
 ## @aeternity/aepp-sdk/es/channel/index
 Channel module
 
+**Export**: Channel  
 **Example**  
 ```js
 import Channel from '@aeternity/aepp-sdk/es/channel/index'

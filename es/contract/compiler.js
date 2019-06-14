@@ -26,6 +26,8 @@
 
 import Http from '../utils/http'
 import ContractBase from './index'
+import semverSatisfies from '../utils/semver-satisfies'
+import AsyncInit from '../utils/async-init'
 
 async function getCompilerVersion (options = {}) {
   return this.http
@@ -34,38 +36,68 @@ async function getCompilerVersion (options = {}) {
 }
 
 async function contractEncodeCallDataAPI (source, name, args = [], options = {}) {
+  this.isInit()
   return this.http
     .post('/encode-calldata', { source, 'function': name, arguments: args }, options)
     .then(({ calldata }) => calldata)
 }
 
 async function contractDecodeCallDataByCodeAPI (bytecode, calldata, options = {}) {
+  this.isInit()
   return this.http
     .post('/decode-calldata/bytecode', { bytecode, calldata }, options)
 }
 
 async function contractDecodeCallDataBySourceAPI (source, fn, callData, options = {}) {
+  this.isInit()
   return this.http
     .post('/decode-calldata/source', { 'function': fn, source, calldata: callData }, options)
 }
 
+async function contractDecodeCallResultAPI (source, fn, callValue, callResult, options = {}) {
+  this.isInit()
+  return this.http
+    .post('/decode-call-result', { 'function': fn, source, 'call-result': callResult, 'call-value': callValue }, options)
+}
+
 async function contractDecodeDataAPI (type, data, options = {}) {
+  this.isInit()
   return this.http
     .post('/decode-data', { data, 'sophia-type': type }, options)
     .then(({ data }) => data)
 }
 
 async function compileContractAPI (code, options = {}) {
+  this.isInit()
   return this.http.post('/compile', { code, options }, options)
     .then(({ bytecode }) => bytecode)
 }
 
 async function contractGetACI (code, options = {}) {
+  this.isInit()
   return this.http.post('/aci', { code, options }, options)
 }
 
-function setCompilerUrl (url) {
+async function setCompilerUrl (url) {
   this.http.changeBaseUrl(url)
+  this.compilerVersion = null
+  await this.checkCompatibility()
+}
+
+async function checkCompatibility (force = false) {
+  this.compilerVersion = await this.getCompilerVersion().catch(e => null)
+  if (!this.compilerVersion && !force) throw new Error('Compiler do not respond')
+  if (this.compilerVersion && !semverSatisfies(this.compilerVersion.split('-')[0], COMPILER_GE_VERSION, COMPILER_LT_VERSION)) {
+    const version = this.compilerVersion
+    this.compilerVersion = null
+    throw new Error(`Unsupported compiler version ${version}. ` +
+      `Supported: >= ${COMPILER_GE_VERSION} < ${COMPILER_LT_VERSION}`)
+  }
+}
+
+function isInit () {
+  if (this.compilerVersion === null) throw Error('Compiler not defined')
+  return true
 }
 
 /**
@@ -80,10 +112,10 @@ function setCompilerUrl (url) {
  * @return {Object} Contract compiler instance
  * @example ContractCompilerAPI({ compilerUrl: 'COMPILER_URL' })
  */
-const ContractCompilerAPI = ContractBase.compose({
+const ContractCompilerAPI = AsyncInit.compose(ContractBase, {
   async init ({ compilerUrl = this.compilerUrl }) {
     this.http = Http({ baseUrl: compilerUrl })
-    this.compilerVersion = await this.getCompilerVersion()
+    await this.checkCompatibility(true)
   },
   methods: {
     contractEncodeCallDataAPI,
@@ -92,12 +124,18 @@ const ContractCompilerAPI = ContractBase.compose({
     contractGetACI,
     contractDecodeCallDataByCodeAPI,
     contractDecodeCallDataBySourceAPI,
+    contractDecodeCallResultAPI,
     setCompilerUrl,
-    getCompilerVersion
+    getCompilerVersion,
+    isInit,
+    checkCompatibility
   },
   props: {
     compilerVersion: null
   }
 })
+
+const COMPILER_GE_VERSION = '3.1.0'
+const COMPILER_LT_VERSION = '4.0.0'
 
 export default ContractCompilerAPI
