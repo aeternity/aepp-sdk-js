@@ -58,7 +58,7 @@ npm i https://github.com/aeternity/aepp-sdk-js#develop
 
 ### 2. Import (a chosen Flavor)
 
-Import the right [flavor](docs/usage.md). For this example with get the `Universal` flavor, which contains all the features of the SDK:
+Import the right [flavor](docs/README.md#flavors--entry-points). For this example with get the `Universal` flavor, which contains all the features of the SDK:
 
 ```js
 import Ae from '@aeternity/aepp-sdk/es/ae/universal' // or other flavor

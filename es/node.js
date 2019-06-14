@@ -102,6 +102,7 @@ function axiosError (handler) {
  */
 const Node = stampit({
   async init ({ url = this.url, internalUrl = this.internalUrl, axiosConfig: { config, errorHandler } = {} }) {
+    if (!url || !internalUrl) throw new Error('"url" and "internalUrl" required')
     url = url.replace(/\/?$/, '')
     internalUrl = internalUrl.replace(/\/?$/, '')
     // Get swagger schema

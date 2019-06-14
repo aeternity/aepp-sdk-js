@@ -5,6 +5,7 @@ There are three different ways of incorporating aepp-sdk-js into your project, d
 * ES Modules at `es/` (recommended)
 * Node.js bundle at `dist/aepp-sdk.js`
 * Browser bundle at `dist/aepp-sdk.browser.js`
+* Browser bundle for using through \<script\> tag at `dist/aepp-sdk.browser-script.js`
 
 Also, please be aware that using `require` instead of module loader syntax
 (`import`) means that the default export automatically becomes exposed as
