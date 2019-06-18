@@ -22,9 +22,9 @@ const authContract = `contract EdDSAAuth =
 
   function init(poa : address) = { owner = poa }
 
-  public function authorize() : bool = true
+  public function authorize(auth: bool) : bool = auth
 `
-describe.skip('Generalize Account', function () {
+describe.only('Generalize Account', function () {
   configure(this)
 
   let client
@@ -34,11 +34,11 @@ describe.skip('Generalize Account', function () {
   })
 
   it.only('Attach GA to POA', async () => {
-    const res = await client.createGeneralizeAccount('authorize', authContract, [await client.address()])
-    console.log(res)
+    await client.createGeneralizeAccount('authorize', authContract, [await client.address()])
+    client.isGA().should.be.equal(true)
   })
   it.only('TEst Meta Tx', async () => {
-    const authData = await client.contractEncodeCall(authContract, 'authorize', [])
+    const authData = await client.contractEncodeCall(authContract, 'authorize', ['true'])
     await client.spend(1000000, 'ak_eFH33ENmUzYJz94y53iBebKxefeHcoHYYWLde8jDkzRQSkwbx', { useGa: true, authData })
   })
 })

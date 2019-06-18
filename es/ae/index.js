@@ -42,6 +42,7 @@ import { BigNumber } from 'bignumber.js'
  */
 async function send (tx, options) {
   const opt = R.merge(this.Ae.defaults, options)
+  // @Todo check if account is "GA" if yes check if we have all required params for GA authorization
   return opt.useGa
     ? this.sendUsingGA(tx, options)
     : this.sendUsingPOA(tx, options)

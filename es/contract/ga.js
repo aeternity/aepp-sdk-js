@@ -27,7 +27,7 @@ import { buildTx, unpackTx } from '../tx/builder'
 import * as R from 'ramda'
 import { Contract } from '../ae/contract'
 import * as Crypto from '../utils/crypto'
-import { TX_TYPE } from '../tx/builder/schema'
+import { ABI_VERSIONS, TX_TYPE } from '../tx/builder/schema'
 
 /**
  * GeneralizeAccount Stamp
@@ -42,18 +42,32 @@ import { TX_TYPE } from '../tx/builder/schema'
  */
 export const GeneralizeAccount = Contract.compose({
   async init () {
-    // Get Account and check if it's a GA account
-    const { gaId } = await this.getAccount(await this.address())
-    if (gaId) this.gaId = gaId
+    await this.initAccount()
   },
   methods: {
+    initAccount,
     createGeneralizeAccount,
     getContractAuthFan,
     sendMetaTx,
-    prepareAuthData
+    prepareAuthData,
+    isGA
   }
 })
 export default GeneralizeAccount
+
+function isGA () {
+  return !!this.gaId
+}
+
+async function initAccount () {
+  this.gaId = null
+  // Get Account and check if it's a GA account
+  const { contractId: gaId, authFun } = await this.getAccount(await this.address())
+  if (gaId) {
+    this.gaId = gaId
+    this.authFnName = authFun
+  }
+}
 
 async function getContractAuthFan (source, fnName) {
   const { bytecode } = await this.contractCompile(source)
@@ -72,16 +86,16 @@ async function getContractAuthFan (source, fnName) {
  * @return {Promise<Readonly<{result: *, owner: *, createdAt: Date, address, rawTx: *, transaction: *}>>}
  */
 async function createGeneralizeAccount (authFnName, source, args, options = {}) {
+  const address = await this.address()
+  if (this.isGA()) throw new Error(`Account ${address} is already GA.`)
   const opt = R.merge(this.Ae.defaults, options)
-  const ownerId = await this.address()
+  const ownerId = address
   const { authFun, bytecode } = await this.getContractAuthFan(source, authFnName)
   const callData = await this.contractEncodeCall(source, 'init', args)
   const { tx, contractId } = await this.gaAttachTx(R.merge(opt, { ownerId, code: bytecode, callData, authFun }))
 
   const { hash, rawTx } = await this.send(tx, opt)
-
-  this.gaId = contractId
-  this.authFnName = authFnName
+  await this.initAccount()
 
   return Object.freeze({
     owner: ownerId,
@@ -92,15 +106,25 @@ async function createGeneralizeAccount (authFnName, source, args, options = {}) 
   })
 }
 
+function wrapInEmptySigneTx (rlp) {
+  return buildTx({ encodedTx: rlp, signatures: Buffer.from([]) }, TX_TYPE.signed)
+}
+
 async function sendMetaTx (gaId, rawTransaction, authData, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   const rlpBinaryTx = Crypto.decodeBase64Check(Crypto.assertedType(rawTransaction, 'tx'))
-  // Get VM_ABI version
-  const ctVersion = this.getVmVersion(TX_TYPE.contractCall, R.head(arguments))
-  const params = { tx: rlpBinaryTx, ...opt, gaId: this.gaId, abiVersion: ctVersion.abiVersion, authData }
+  // Wrap in SIGNED tx with empty signatures
+  const { rlpEncoded } = wrapInEmptySigneTx(rlpBinaryTx)
+  // Prepare params for META tx
+  const params = { tx: rlpEncoded, ...opt, gaId: this.gaId, abiVersion: ABI_VERSIONS.SOPHIA, authData }
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
   const { fee, ttl } = await this.prepareTxParams(TX_TYPE.gaMeta, params)
-  const tx = buildTx({ ...params, fee, ttl }, TX_TYPE.gaMeta).tx
+  // Build META tx
+  const { rlpEncoded: metaTxRlp } = buildTx({ ...params, fee, ttl }, TX_TYPE.gaMeta)
+  // Wrap in empty signed tx
+  const { tx } = wrapInEmptySigneTx(metaTxRlp)
+  console.log((await unpackTx(tx)).tx.encodedTx.tx.tx.tx.encodedTx.tx)
+  // Send tx to the chain
   return this.sendTransaction(tx, opt)
 }
 async function prepareAuthData (txHash, nonce) { /* @TODO Not yet implemented */ }
