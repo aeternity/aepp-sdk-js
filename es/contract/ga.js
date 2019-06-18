@@ -101,30 +101,42 @@ async function createGeneralizeAccount (authFnName, source, args, options = {}) 
     owner: ownerId,
     transaction: hash,
     rawTx,
-    address: contractId,
-    createdAt: new Date()
+    address: contractId
   })
 }
 
-function wrapInEmptySigneTx (rlp) {
+function wrapInEmptySignedTx (rlp) {
   return buildTx({ encodedTx: rlp, signatures: Buffer.from([]) }, TX_TYPE.signed)
 }
 
 async function sendMetaTx (gaId, rawTransaction, authData, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
+  // Check if authData is callData or if it's an object prepare a callData from source and args
+  const authCallData = await this.prepareAuthData(authData)
+  // Get transaction rlp binary
   const rlpBinaryTx = Crypto.decodeBase64Check(Crypto.assertedType(rawTransaction, 'tx'))
   // Wrap in SIGNED tx with empty signatures
-  const { rlpEncoded } = wrapInEmptySigneTx(rlpBinaryTx)
+  const { rlpEncoded } = wrapInEmptySignedTx(rlpBinaryTx)
   // Prepare params for META tx
-  const params = { tx: rlpEncoded, ...opt, gaId: this.gaId, abiVersion: ABI_VERSIONS.SOPHIA, authData }
+  const params = { tx: rlpEncoded, ...opt, gaId: this.gaId, abiVersion: ABI_VERSIONS.SOPHIA, authData: authCallData }
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
   const { fee, ttl } = await this.prepareTxParams(TX_TYPE.gaMeta, params)
   // Build META tx
   const { rlpEncoded: metaTxRlp } = buildTx({ ...params, fee, ttl }, TX_TYPE.gaMeta)
   // Wrap in empty signed tx
-  const { tx } = wrapInEmptySigneTx(metaTxRlp)
+  const { tx } = wrapInEmptySignedTx(metaTxRlp)
   console.log((await unpackTx(tx)).tx.encodedTx.tx.tx.tx.encodedTx.tx)
   // Send tx to the chain
   return this.sendTransaction(tx, opt)
 }
-async function prepareAuthData (txHash, nonce) { /* @TODO Not yet implemented */ }
+
+async function prepareAuthData (authData) {
+  if (typeof authData === 'object') {
+    if (!authData.source || !authData.args) throw new Error('Auth data must contain source code and arguments.')
+    return this.contractEncodeCall(authData.source, this.authFnName, authData.args)
+  }
+  if (typeof authData === 'string') {
+    if (authData.split('_')[0] !== 'cb') throw new Error('Auth data must be a string with "cb" prefix.')
+    return authData
+  }
+}
