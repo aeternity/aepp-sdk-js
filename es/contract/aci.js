@@ -103,11 +103,10 @@ function transformDecodedData (aci, result, { skipTransformDecoded = false, addr
  * Transform JS type to Sophia-type
  * @param type
  * @param value
- * @param compilerVersion
  * @param bindings
  * @return {string}
  */
-async function transform (type, value, { compilerVersion, bindings } = {}) {
+async function transform (type, value, { bindings } = {}) {
   let { t, generic } = readType(type, { bindings })
 
   // contract TestContract = ...
@@ -118,16 +117,14 @@ async function transform (type, value, { compilerVersion, bindings } = {}) {
     case SOPHIA_TYPES.string:
       return `"${value}"`
     case SOPHIA_TYPES.list:
-      return `[${await Promise.all(value.map(async el => transform(generic, el, { compilerVersion, bindings })))}]`
+      return `[${await Promise.all(value.map(async el => transform(generic, el, { bindings })))}]`
     case SOPHIA_TYPES.tuple:
       return `(${await Promise.all(value.map(async (el, i) => transform(generic[i], el, {
-        compilerVersion,
         bindings
       })))})`
     case SOPHIA_TYPES.option:
       const optionV = await value.catch(e => undefined)
       return optionV === undefined ? 'None' : `Some(${await transform(generic, optionV, {
-        compilerVersion,
         bindings
       })})`
     case SOPHIA_TYPES.hash:
@@ -139,7 +136,6 @@ async function transform (type, value, { compilerVersion, bindings } = {}) {
         async (acc, { name, type }, i) => {
           acc = await acc
           acc += `${i !== 0 ? ',' : ''}${name} = ${await transform(type, value[name], {
-            compilerVersion,
             bindings
           })}`
           return acc
@@ -147,13 +143,13 @@ async function transform (type, value, { compilerVersion, bindings } = {}) {
         ''
       )}}`
     case SOPHIA_TYPES.map:
-      return transformMap(value, generic, { compilerVersion, bindings })
+      return transformMap(value, generic, { bindings })
   }
 
   return `${value}`
 }
 
-async function transformMap (value, generic, { compilerVersion, bindings }) {
+async function transformMap (value, generic, { bindings }) {
   if (value instanceof Map) {
     value = Array.from(value.entries())
   }
@@ -167,9 +163,8 @@ async function transformMap (value, generic, { compilerVersion, bindings }) {
         acc = await acc
         if (i !== 0) acc += ','
         acc += `[${await transform(generic[0], key, {
-          compilerVersion,
           bindings
-        })}] = ${await transform(generic[1], value, { compilerVersion, bindings })}`
+        })}] = ${await transform(generic[1], value, { bindings })}`
         return acc
       },
       ``
@@ -185,6 +180,7 @@ function linkTypeDefs (t, bindings) {
   ].find(({ name }) => name === typeDef)
   return aciType.typedef
 }
+
 /**
  * Parse sophia type
  * @param type
@@ -207,6 +203,7 @@ function readType (type, { bindings } = {}) {
   // Base types
   if (typeof t === 'string') return { t }
 }
+
 const customJoi = Joi.extend((joi) => ({
   name: 'binary',
   base: joi.any(),
@@ -239,6 +236,7 @@ const customJoi = Joi.extend((joi) => ({
     }
   ]
 }))
+
 /**
  * Prepare Joi validation schema for sophia types
  * @param type
@@ -300,7 +298,10 @@ function getJoiErrorMsg (errors) {
       case 'object.type':
         return ({ ...err, message: `Value '${value}' at path: [${path}] not a ${context.type}` })
       case 'binary.bufferCheck':
-        return ({ ...err, message: `Value '${Buffer.from(value).toString('hex')}' at path: [${path}] not a ${context.size} bytes` })
+        return ({
+          ...err,
+          message: `Value '${Buffer.from(value).toString('hex')}' at path: [${path}] not a ${context.size} bytes`
+        })
       default:
         return err
     }
@@ -324,17 +325,15 @@ function validateArguments (aci, params) {
  * @rtype (aci: Object, params: Array) => Object
  * @param {Object} aci Contract ACI
  * @param {Array} params Contract call arguments
- * @param compilerVersion
  * @return Promise{Array} Object with validation errors
  */
-async function prepareArgsForEncode (aci, params, { compilerVersion } = {}) {
+async function prepareArgsForEncode (aci, params) {
   if (!aci) return params
   // Validation
   validateArguments(aci, params)
   const bindings = aci.bindings
   // Cast argument from JS to Sophia type
   return Promise.all(aci.arguments.map(async ({ type }, i) => transform(type, params[i], {
-    compilerVersion,
     bindings
   })))
 }
@@ -450,14 +449,27 @@ export async function getContractInstance (source, { client, aci, contractAddres
     .aci
     .functions
     .reduce(
-      (acc, { name, arguments: args }) => ({
+      (acc, { name, arguments: args, stateful }) => ({
         ...acc,
-        [name]: function () {
-          const opt = arguments.length > args.length ? R.last(arguments) : {}
-          return name !== 'init'
-            ? instance.call(name, Object.values(arguments), opt)
-            : instance.deploy(Object.values(arguments), opt)
-        }
+        [name]: Object.assign(
+          function () {
+            const opt = arguments.length > args.length ? R.last(arguments) : {}
+            if (name === 'init') return instance.deploy(Object.values(arguments), opt)
+            return instance.call(name, Object.values(arguments), { ...opt, callStatic: !stateful })
+          },
+          {
+            get: function () {
+              const opt = arguments.length > args.length ? R.last(arguments) : {}
+              console.log(opt)
+              return instance.call(name, Object.values(arguments), { ...opt, callStatic: true })
+            },
+            send: function () {
+              const opt = arguments.length > args.length ? R.last(arguments) : {}
+              console.log(opt)
+              return instance.call(name, Object.values(arguments), opt)
+            }
+          }
+        )
       }),
       {}
     )
@@ -476,7 +488,7 @@ async function call (fn, params = [], options = {}) {
   const result = opt.callStatic
     ? await this.getClient().contractCallStatic(source, this.deployInfo.address, fn, params, {
       top: opt.top,
-      opt
+      options: opt
     })
     : await this.getClient().contractCall(source, this.deployInfo.address, fn, params, opt)
   return {
@@ -497,13 +509,13 @@ async function deploy (init = [], options = {}) {
 
   const { owner, transaction, address, createdAt, result, rawTx } = await this.getClient().contractDeploy(this.compiled, opt.source || this.source, init, opt)
   this.deployInfo = { owner, transaction, address, createdAt, result, rawTx }
-  return this
+  return this.deployInfo
 }
 
 async function compile () {
   const { bytecode } = await this.getClient().contractCompile(this.source)
   this.compiled = bytecode
-  return this
+  return this.compiled
 }
 
 export default { getContractInstance }

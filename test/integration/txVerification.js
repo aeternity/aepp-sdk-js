@@ -108,9 +108,12 @@ describe('Verify Transaction', function () {
         secretKey: 'e6a91d633c77cf5771329d3354b3bcef1bc5e032c43d70b6d35af923ce1eb74dcea7ade470c9f99d9d4e400880a86f1d49bb444b62f11a9ebb64bbcfeb73fef3'
       }
     }))
-    await contractInstance.methods.init('Test')
+    console.log(await contractInstance.methods.init('Test'))
 
-    console.log(await contractInstance.methods.retrieve())
-    console.log(await contractInstance.methods.retrieve({ forAccount: 'ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi' }))
+    // console.log(await contractInstance.methods.retrieve())
+    // console.log('--------------------------------')
+    // console.log(await contractInstance.methods.retrieve.send({ forAccount: 'ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi' }))
+    // console.log('--------------------------------')
+    console.log(await contractInstance.methods.retrieve.get({ forAccount: 'ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi', top: 26226 }))
   })
 })
