@@ -23,11 +23,12 @@
  * @example import GeneralizeAccount from '@aeternity/aepp-sdk/es/contract/ga' (Using tree-shaking)
  * @example import { GeneralizeAccount } from '@aeternity/aepp-sdk' (Using bundle)
  */
-import { buildTx, unpackTx } from '../tx/builder'
 import * as R from 'ramda'
+
 import { Contract } from '../ae/contract'
-import * as Crypto from '../utils/crypto'
 import { ABI_VERSIONS, TX_TYPE } from '../tx/builder/schema'
+import { buildTx, unpackTx } from '../tx/builder'
+import * as Crypto from '../utils/crypto'
 
 /**
  * GeneralizeAccount Stamp
@@ -86,15 +87,18 @@ async function getContractAuthFan (source, fnName) {
  * @return {Promise<Readonly<{result: *, owner: *, createdAt: Date, address, rawTx: *, transaction: *}>>}
  */
 async function createGeneralizeAccount (authFnName, source, args, options = {}) {
-  const address = await this.address()
-  if (this.isGA()) throw new Error(`Account ${address} is already GA.`)
   const opt = R.merge(this.Ae.defaults, options)
-  const ownerId = address
+  const ownerId = await this.address()
+
+  if (this.isGA()) throw new Error(`Account ${ownerId} is already GA.`)
+
   const { authFun, bytecode } = await this.getContractAuthFan(source, authFnName)
   const callData = await this.contractEncodeCall(source, 'init', args)
+
   const { tx, contractId } = await this.gaAttachTx(R.merge(opt, { ownerId, code: bytecode, callData, authFun }))
 
   const { hash, rawTx } = await this.send(tx, opt)
+
   await this.initAccount()
 
   return Object.freeze({
@@ -106,7 +110,7 @@ async function createGeneralizeAccount (authFnName, source, args, options = {}) 
 }
 
 function wrapInEmptySignedTx (rlp) {
-  return buildTx({ encodedTx: rlp, signatures: Buffer.from([]) }, TX_TYPE.signed)
+  return buildTx({ encodedTx: rlp, signatures: [Buffer.from([])] }, TX_TYPE.signed)
 }
 
 async function sendMetaTx (gaId, rawTransaction, authData, options = {}) {
@@ -125,7 +129,7 @@ async function sendMetaTx (gaId, rawTransaction, authData, options = {}) {
   const { rlpEncoded: metaTxRlp } = buildTx({ ...params, fee, ttl }, TX_TYPE.gaMeta)
   // Wrap in empty signed tx
   const { tx } = wrapInEmptySignedTx(metaTxRlp)
-  console.log((await unpackTx(tx)).tx.encodedTx.tx.tx.tx.encodedTx.tx)
+  console.log((await unpackTx(tx)).tx)
   // Send tx to the chain
   return this.sendTransaction(tx, opt)
 }
