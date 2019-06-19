@@ -93,7 +93,7 @@ describe('Verify Transaction', function () {
     const vmAbiError = validation.find(el => el.txKey === 'ctVersion')
     vmAbiError.msg.split(',')[0].should.be.equal('Wrong abi/vm version')
   })
-  it('test', async () => {
+  it.skip('test', async () => {
     const url = process.env.TEST_URL || 'http://localhost:3013'
     const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
     const compilerUrl = process.env.COMPILER_URL || 'http://localhost:3080'

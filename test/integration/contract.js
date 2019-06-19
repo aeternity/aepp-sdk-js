@@ -88,7 +88,7 @@ describe('Contract', function () {
   let deployed
 
   before(async function () {
-    contract = await ready(this)
+    contract = await ready(this, true, true)
   })
 
   it('precompiled bytecode can be deployed', async () => {
@@ -377,7 +377,7 @@ describe('Contract', function () {
       describe('RECORD/STATE', function () {
         const objEq = (obj, obj2) => !Object.entries(obj).find(([key, val]) => JSON.stringify(obj2[key]) !== JSON.stringify(val))
         it('Valid Set Record (Cast from JS object)', async () => {
-          console.log(await contractObject.methods.setRecord({ value: 'qwe', key: 1234, testOption: Promise.resolve('test') }))
+          await contractObject.methods.setRecord({ value: 'qwe', key: 1234, testOption: Promise.resolve('test') })
           const state = await contractObject.methods.getRecord()
 
           objEq(state.decodedResult, { value: 'qwe', key: 1234, testOption: 'test' }).should.be.equal(true)
