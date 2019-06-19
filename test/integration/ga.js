@@ -17,6 +17,7 @@
 
 import { describe, it, before } from 'mocha'
 import { configure, ready } from './'
+import { unpackTx } from '../../es/tx/builder'
 const authContract = `contract EdDSAAuth =
   record state = { owner : address }
 
@@ -39,6 +40,9 @@ describe.only('Generalize Account', function () {
   })
   it.only('TEst Meta Tx', async () => {
     const authData = await client.contractEncodeCall(authContract, 'authorize', ['true'])
-    await client.spend(1000000, 'ak_eFH33ENmUzYJz94y53iBebKxefeHcoHYYWLde8jDkzRQSkwbx', { useGa: true, authData })
+    await client.awaitHeight(+(await client.height()) + 3)
+    await client.spend(100, 'ak_eFH33ENmUzYJz94y53iBebKxefeHcoHYYWLde8jDkzRQSkwbx', { useGa: true, authData })
+    console.log('-----------------')
+    console.log(await unpackTx('tx_+QEaCwHAuQEU+QERUQGhAXypmozYJLKj78PGxdUAWFcTQwV11M5pmbICyyD4YBnYuIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIJ0iAR/Yvd/T/9rv6SrByOkjhyMOTn84lnvZzFYh2gd3AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGGWvMQekAAgsNQgw9CQAC4WfhXCwHAuFL4UAwBoQF8qZqM2CSyo+/DxsXVAFhXE0MFddTOaZmyAssg+GAZ2KEBC7TteSf5e1HhvLXhNA0SM1sqKxLIvFIh1jxLyznUHmFkhQPZ3F8AAACAC7r2GA==').tx.encodedTx.tx.tx.tx.encodedTx.tx)
   })
 })

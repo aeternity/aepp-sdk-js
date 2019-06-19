@@ -110,10 +110,10 @@ async function createGeneralizeAccount (authFnName, source, args, options = {}) 
 }
 
 function wrapInEmptySignedTx (rlp) {
-  return buildTx({ encodedTx: rlp, signatures: [Buffer.from([])] }, TX_TYPE.signed)
+  return buildTx({ encodedTx: rlp, signatures: [] }, TX_TYPE.signed)
 }
 
-async function sendMetaTx (gaId, rawTransaction, authData, options = {}) {
+async function sendMetaTx (rawTransaction, authData, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   // Check if authData is callData or if it's an object prepare a callData from source and args
   const authCallData = await this.prepareAuthData(authData)
@@ -122,14 +122,14 @@ async function sendMetaTx (gaId, rawTransaction, authData, options = {}) {
   // Wrap in SIGNED tx with empty signatures
   const { rlpEncoded } = wrapInEmptySignedTx(rlpBinaryTx)
   // Prepare params for META tx
-  const params = { tx: rlpEncoded, ...opt, gaId: this.gaId, abiVersion: ABI_VERSIONS.SOPHIA, authData: authCallData }
+  const params = { tx: rlpEncoded, ...opt, gaId: await this.address(), abiVersion: ABI_VERSIONS.SOPHIA, authData: authCallData }
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
   const { fee, ttl } = await this.prepareTxParams(TX_TYPE.gaMeta, params)
   // Build META tx
   const { rlpEncoded: metaTxRlp } = buildTx({ ...params, fee, ttl }, TX_TYPE.gaMeta)
   // Wrap in empty signed tx
   const { tx } = wrapInEmptySignedTx(metaTxRlp)
-  console.log((await unpackTx(tx)).tx)
+  // console.log((await unpackTx(tx)).tx.encodedTx.tx.tx.tx.encodedTx.tx)
   // Send tx to the chain
   return this.sendTransaction(tx, opt)
 }

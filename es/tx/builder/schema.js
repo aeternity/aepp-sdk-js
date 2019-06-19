@@ -457,7 +457,7 @@ const GA_ATTACH_TX = [
 
 const GA_META_TX = [
   ...BASE_TX,
-  TX_FIELD('gaId', FIELD_TYPES.id, 'ct'),
+  TX_FIELD('gaId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('authData', FIELD_TYPES.binary, 'cb'),
   TX_FIELD('abiVersion', FIELD_TYPES.int),
   TX_FIELD('fee', FIELD_TYPES.int),

@@ -54,7 +54,7 @@ async function sendUsingPOA (tx, options) {
 }
 
 async function sendUsingGA (tx, { authData }) {
-  return this.sendMetaTx(this.gaId, tx, authData)
+  return this.sendMetaTx(tx, authData)
 }
 
 /**
