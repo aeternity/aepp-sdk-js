@@ -58,6 +58,7 @@ async function selectAccount (address) {
  */
 const Selector = Account.compose({
   async init ({ address }) {
+    if (!address) address = Object.keys(this.accounts)[0]
     this.Selector.address = address
   },
   methods: { sign, address, selectAccount },
