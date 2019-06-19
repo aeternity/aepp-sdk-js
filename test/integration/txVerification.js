@@ -93,13 +93,14 @@ describe('Verify Transaction', function () {
     const vmAbiError = validation.find(el => el.txKey === 'ctVersion')
     vmAbiError.msg.split(',')[0].should.be.equal('Wrong abi/vm version')
   })
-  it.only('test', async () => {
+  it('test', async () => {
     const url = process.env.TEST_URL || 'http://localhost:3013'
     const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
     const compilerUrl = process.env.COMPILER_URL || 'http://localhost:3080'
     const client = await UniversalWithAccounts({
       url, internalUrl, process, compilerUrl,
-      accounts: [MemoryAccount({ keypair: account })], address: account.publicKey
+      accounts: [MemoryAccount({ keypair: account })],
+      address: account.publicKey
     })
     const contractInstance = await getContractInstance(stateContract, { client })
     await contractInstance.addAccount(MemoryAccount({

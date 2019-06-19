@@ -18,6 +18,8 @@
 import { describe, it, before } from 'mocha'
 import { configure, plan, ready } from './'
 import { decode } from '../../es/tx/builder/helpers'
+import { getContractInstance } from '../../es/contract/aci'
+
 import * as R from 'ramda'
 
 const identityContract = `
@@ -163,7 +165,7 @@ describe('Contract', function () {
     let contractObject
 
     it('Generate ACI object', async () => {
-      contractObject = await contract.getContractInstance(testContract, { opt: { amount: 10000, ttl: 10 } })
+      contractObject = await getContractInstance(testContract, { opt: { amount: 10000, ttl: 10 }, client: contract })
       contractObject.should.have.property('interface')
       contractObject.should.have.property('aci')
       contractObject.should.have.property('source')
@@ -375,7 +377,7 @@ describe('Contract', function () {
       describe('RECORD/STATE', function () {
         const objEq = (obj, obj2) => !Object.entries(obj).find(([key, val]) => JSON.stringify(obj2[key]) !== JSON.stringify(val))
         it('Valid Set Record (Cast from JS object)', async () => {
-          await contractObject.methods.setRecord({ value: 'qwe', key: 1234, testOption: Promise.resolve('test') })
+          console.log(await contractObject.methods.setRecord({ value: 'qwe', key: 1234, testOption: Promise.resolve('test') }))
           const state = await contractObject.methods.getRecord()
 
           objEq(state.decodedResult, { value: 'qwe', key: 1234, testOption: 'test' }).should.be.equal(true)
