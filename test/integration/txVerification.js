@@ -99,7 +99,7 @@ describe('Verify Transaction', function () {
 
 
 
-  it.only('test', async () => {
+  it.skip('test', async () => {
 
     const c = `contract ExampleContract =
    type state = ()
