@@ -1,4 +1,24 @@
+## [4.0.1](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.0.1) (2019-06-13)
+
+
+### Bug Fixes
+
+* **RPC:** Add contract contractDecodeCallResultAPI to RPC ([#482](https://github.com/aeternity/aepp-sdk-js/issues/482)) ([7eb6bd8](https://github.com/aeternity/aepp-sdk-js/commit/7eb6bd8))
+* **README:** Fix flavor link ([#480](https://github.com/aeternity/aepp-sdk-js/pull/480))
+
+### Code Refactoring
+
+* **Compiler:** Fix compiler compatibility mechanism ([#479](https://github.com/aeternity/aepp-sdk-js/issues/479)) ([78cc990](https://github.com/aeternity/aepp-sdk-js/commit/78cc990))
+* **Utils:** Move json-bigint implementation to `utils` ([#486](https://github.com/aeternity/aepp-sdk-js/issues/486)) ([1538867](https://github.com/aeternity/aepp-sdk-js/commit/1538867))
+
+### Build
+
+* **webpack:** Add another bundle(`dist/aepp-sdk.browser-script.js`) for using in `<script>` tag ([#485](https://github.com/aeternity/aepp-sdk-js/pull/485))
+
+
+
 # [4.0.0](https://github.com/aeternity/aepp-sdk-js/compare/3.4.1...4.0.0) (2019-06-12)
+
 
 ### Bug Fixes
 

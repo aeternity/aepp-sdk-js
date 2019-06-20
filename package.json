@@ -1,6 +1,6 @@
 {
   "name": "@aeternity/aepp-sdk",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "SDK for the æternity blockchain",
   "main": "dist/aepp-sdk.js",
   "browser": "dist/aepp-sdk.browser.js",
@@ -39,7 +39,6 @@
     "bs58check": "^2.1.1",
     "commander": "^2.14.1",
     "joi-browser": "^13.4.0",
-    "json-bigint": "davidyuk/json-bigint",
     "libsodium-wrappers-sumo": "0.7.3",
     "ramda": "^0.25.0",
     "rlp": "2.1.0",
