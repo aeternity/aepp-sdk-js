@@ -13,7 +13,6 @@ const ERRORS = [...BASE_VERIFICATION_SCHEMA, ...SIGNATURE_VERIFICATION_SCHEMA,].
 const stateContract = `
 contract StateContract =
   record state = { value: string }
-  public function init(value) : state = { value = value }
   public function retrieve() : string = state.value
 `
 describe('Verify Transaction', function () {
@@ -93,28 +92,25 @@ describe('Verify Transaction', function () {
     const vmAbiError = validation.find(el => el.txKey === 'ctVersion')
     vmAbiError.msg.split(',')[0].should.be.equal('Wrong abi/vm version')
   })
-  it.skip('test', async () => {
-    const url = process.env.TEST_URL || 'http://localhost:3013'
-    const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
-    const compilerUrl = process.env.COMPILER_URL || 'http://localhost:3080'
-    const client = await UniversalWithAccounts({
-      url, internalUrl, process, compilerUrl,
-      accounts: [MemoryAccount({ keypair: account })],
-      address: account.publicKey
-    })
-    const contractInstance = await getContractInstance(stateContract, { client })
+  it.only('test', async () => {
+    const client = await ready(this, true, true)
+
+    const contractInstance = await getContractInstance(stateContract)
+    await contractInstance.setClient(client)
+
     await contractInstance.addAccount(MemoryAccount({
       keypair: {
         publicKey: 'ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi',
         secretKey: 'e6a91d633c77cf5771329d3354b3bcef1bc5e032c43d70b6d35af923ce1eb74dcea7ade470c9f99d9d4e400880a86f1d49bb444b62f11a9ebb64bbcfeb73fef3'
       }
     }))
-    console.log(await contractInstance.methods.init('Test'))
+    console.log(await contractInstance.deploy())
+    // console.log(await contractInstance.methods.init())
 
     // console.log(await contractInstance.methods.retrieve())
     // console.log('--------------------------------')
     // console.log(await contractInstance.methods.retrieve.send({ forAccount: 'ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi' }))
     // console.log('--------------------------------')
-    console.log(await contractInstance.methods.retrieve.get({ forAccount: 'ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi', top: 26226 }))
+    // console.log(await contractInstance.methods.retrieve.get({ forAccount: 'ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi' }))
   })
 })

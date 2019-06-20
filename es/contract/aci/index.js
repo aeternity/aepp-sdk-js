@@ -26,7 +26,7 @@
 import * as R from 'ramda'
 
 import { validateArguments, transform, transformDecodedData } from './transformation'
-import { getFunctionACI } from './helpers'
+import { buildContractMethods, getFunctionACI } from './helpers'
 
 /**
  * Validated contract call arguments using contract ACI
@@ -65,8 +65,7 @@ async function prepareArgsForEncode (aci, params) {
  */
 export async function getContractInstance (source, { client, aci, contractAddress, opt } = {}) {
   const clients = []
-  if (client) clients[0] = client
-  aci = aci || await client.contractGetACI(source)
+
   const defaultOptions = {
     skipArgsConvert: false,
     skipTransformDecoded: false,
@@ -80,8 +79,8 @@ export async function getContractInstance (source, { client, aci, contractAddres
     verify: false
   }
   const instance = {
-    interface: aci.interface,
-    aci: aci.encoded_aci.contract,
+    interface: R.defaultTo(null, R.prop('interface', aci)),
+    aci: R.defaultTo(null, R.path('encoded_aci.contract', aci)),
     source,
     compiled: null,
     deployInfo: { address: contractAddress },
@@ -90,11 +89,23 @@ export async function getContractInstance (source, { client, aci, contractAddres
     setOptions (opt) {
       this.options = R.merge(this.options, opt)
     },
-    setClient (client) {
+    async setClient (client, { forceMethods = false } = {}) {
+      if (!client) throw new Error('ACI: Client required')
+      // @Todo Verify if client have valid interface
       clients[0] = client
+      if (!this.aci) {
+        const aci = await client.contractGetACI(source)
+        // Prepend aci and interface to contract instance
+        Object.assign(this, {
+          aci: aci.encoded_aci.contract,
+          interface: aci.interface
+        })
+        // Generate methods
+        !forceMethods && Object.assign(this, { methods: buildContractMethods(this)() })
+      }
     },
     async addAccount (account, { select } = {}) {
-      await clients[0].addAccount(account, { select })
+      await this.getClient().addAccount(account, { select })
     },
     getClient () {
       if (!clients[0]) throw new Error('ACI: Client is required')
@@ -102,6 +113,12 @@ export async function getContractInstance (source, { client, aci, contractAddres
       return clients[0]
     }
   }
+
+  /**
+   * Set client if exist
+   */
+  client && await instance.setClient(client, { forceMethods: true })
+
   /**
    * Compile contract
    * @alias module:@aeternity/aepp-sdk/es/contract/aci
@@ -141,35 +158,7 @@ export async function getContractInstance (source, { client, aci, contractAddres
    * `await contract.methods.testFunction.get()` -> use call-static(dry-run)
    * `await contract.methods.testFunction.send()` -> send tx on-chain
    */
-  instance.methods = instance
-    .aci
-    .functions
-    .reduce(
-      (acc, { name, arguments: args, stateful }) => ({
-        ...acc,
-        [name]: Object.assign(
-          function () {
-            const opt = arguments.length > args.length ? R.last(arguments) : {}
-            if (name === 'init') return instance.deploy(Object.values(arguments), opt)
-            return instance.call(name, Object.values(arguments), { ...opt, callStatic: !stateful })
-          },
-          {
-            get () {
-              const opt = arguments.length > args.length ? R.last(arguments) : {}
-              console.log(opt)
-              return instance.call(name, Object.values(arguments), { ...opt, callStatic: true })
-            },
-            send () {
-              const opt = arguments.length > args.length ? R.last(arguments) : {}
-              console.log(opt)
-              return instance.call(name, Object.values(arguments), opt)
-            }
-          }
-        )
-      }),
-      {}
-    )
-
+  instance.methods = buildContractMethods(instance)()
   return instance
 }
 
