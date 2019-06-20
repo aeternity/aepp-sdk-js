@@ -92,25 +92,44 @@ describe('Verify Transaction', function () {
     const vmAbiError = validation.find(el => el.txKey === 'ctVersion')
     vmAbiError.msg.split(',')[0].should.be.equal('Wrong abi/vm version')
   })
+
+
+
+
+
+
+
   it.only('test', async () => {
+
+    const c = `contract ExampleContract =
+   type state = ()
+   function main(x : int) = x`
     const client = await ready(this, true, true)
 
-    const contractInstance = await getContractInstance(stateContract)
+    const contractInstance = await getContractInstance(c)
+
     await contractInstance.setClient(client)
 
-    await contractInstance.addAccount(MemoryAccount({
-      keypair: {
-        publicKey: 'ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi',
-        secretKey: 'e6a91d633c77cf5771329d3354b3bcef1bc5e032c43d70b6d35af923ce1eb74dcea7ade470c9f99d9d4e400880a86f1d49bb444b62f11a9ebb64bbcfeb73fef3'
-      }
-    }))
-    console.log(await contractInstance.deploy())
-    // console.log(await contractInstance.methods.init())
+    // await contractInstance.addAccount(MemoryAccount({
+    //   keypair: {
+    //     publicKey: 'ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi',
+    //     secretKey: 'e6a91d633c77cf5771329d3354b3bcef1bc5e032c43d70b6d35af923ce1eb74dcea7ade470c9f99d9d4e400880a86f1d49bb444b62f11a9ebb64bbcfeb73fef3'
+    //   }
+    // }))
+    // console.log(await contractInstance.deploy([]))
+    console.log(await contractInstance.methods.init({ dfs: 1 }))
+    console.log(contractInstance.methods)
 
     // console.log(await contractInstance.methods.retrieve())
     // console.log('--------------------------------')
     // console.log(await contractInstance.methods.retrieve.send({ forAccount: 'ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi' }))
     // console.log('--------------------------------')
     // console.log(await contractInstance.methods.retrieve.get({ forAccount: 'ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi' }))
+
+
   })
+
+
+
+
 })

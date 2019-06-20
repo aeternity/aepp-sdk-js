@@ -37,7 +37,7 @@ import { buildContractMethods, getFunctionACI } from './helpers'
  * @return Promise{Array} Object with validation errors
  */
 async function prepareArgsForEncode (aci, params) {
-  if (!aci) return params
+  if (!aci || !aci.arguments) return params
   // Validation
   validateArguments(aci, params)
   const bindings = aci.bindings
