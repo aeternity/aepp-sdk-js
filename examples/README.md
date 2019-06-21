@@ -22,7 +22,7 @@ import Ae from '@aeternity/aepp-sdk/es/ae/universal'
 
 Ae({
   url: 'https://sdk-testnet.aepps.com',
-  internalUrl: 'https://sdk-testnet.aepps.com',
+  // internalUrl: 'https://sdk-testnet.aepps.com',
   compilerUrl: 'https://compiler.aepps.com',
   keypair: { secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS' },
   networkId: 'ae_uat' // or any other networkId your client should connect to
