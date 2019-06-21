@@ -1,12 +1,21 @@
 ## Browser bundle
 
-The browser bundle is relevant in two seperate cases: Either the SDK is to be
-loaded traditionally through a `<script>` tag, or the bundler / compiliation is
-not sufficient to use and compile the SDK's ES Modules.
+In case you're not using any JS bundling/compilation technnique, the SDK can also be loaded with the traditional `<script>` tag, as follows:
+
+### Latest SDK version
+
+```html
+<script src="https://unpkg.com/@aeternity/aepp-sdk/dist/aepp-sdk.browser-script.js"></script>
+```
+
+### Specific SDK version
+```html
+<script src="https://unpkg.com/@aeternity/aepp-sdk@VERSION/dist/aepp-sdk.browser-script.js"></script>
+```
+...where `VERSION` is the version number of the SDK you want to use (eg. `4.0.1`).
 
 ### Browser `<script>` tag
-
-The bundle will assign the SDK to a global `var` called `Ae`.
+The bundle will assign the SDK to a global `var` called `Ae`, and you can use it like so:
 
 ```html
 <!doctype html>
@@ -15,14 +24,21 @@ The bundle will assign the SDK to a global `var` called `Ae`.
   <meta charset="utf-8">
 </head>
 <body>
-  <script src="aepp-sdk.browser-script.js"></script>
+  <!-- include latest SDK version -->
+  <script src="https://unpkg.com/@aeternity/aepp-sdk/dist/aepp-sdk.browser-script.js"></script>
   <script type="text/javascript">
-    Ae.Wallet().then(ae => {
-      ae.height().then(height => {
-        console.log('Current Block', height)
+    Ae.Wallet({
+      url: 'https://sdk-testnet.aepps.com',
+      internalUrl: 'https://sdk-testnet.aepps.com'
+    }).then(aeInstance => {
+      aeInstance.height().then(height => {
+        console.log("Current Block Height:" + height)
       })
     })
   </script>
 </body>
 </html>
 ```
+
+### CodePen Example
+Immediately [**START**](https://codepen.io/ricricucit/pen/JQWRNb) playing with our latest SDK release in Codepen.
