@@ -43,7 +43,7 @@ export const buildContractMethods = (instance) => () => ({
             function () {
               const { opt, args } = parseArguments(aciArgs)(arguments)
               if (name === 'init') return instance.deploy(args, opt)
-              return instance.call(name, args, { ...opt, callStatic: !stateful })
+              return instance.call(name, args, { callStatic: !stateful, ...opt })
             },
             {
               get () {
@@ -53,7 +53,7 @@ export const buildContractMethods = (instance) => () => ({
               send () {
                 const { opt, args } = parseArguments(aciArgs)(arguments)
                 if (name === 'init') return instance.deploy(args, opt)
-                return instance.call(name, args, opt)
+                return instance.call(name, args, { ...opt, callStatic: false })
               }
             }
           )
