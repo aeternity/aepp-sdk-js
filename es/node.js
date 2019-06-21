@@ -102,9 +102,9 @@ function axiosError (handler) {
  */
 const Node = stampit({
   async init ({ url = this.url, internalUrl = this.internalUrl, axiosConfig: { config, errorHandler } = {} }) {
-    if (!url || !internalUrl) throw new Error('"url" and "internalUrl" required')
+    if (!url) throw new Error('"url" required')
     url = url.replace(/\/?$/, '')
-    internalUrl = internalUrl.replace(/\/?$/, '')
+    internalUrl = internalUrl ? internalUrl.replace(/\/?$/, '') : url
     // Get swagger schema
     const swag = await remoteSwag(url, config).catch(this.axiosError(errorHandler))
     this.version = swag.info.version
