@@ -25,7 +25,8 @@
 import Ae from './'
 import Aens from './aens'
 import Rpc from '../rpc/client'
-import ContractACI from '../contract/aci'
+import { ContractACI } from '../contract/aci'
+import { Contract } from './contract'
 
 /**
  * Aepp Stamp
@@ -39,6 +40,6 @@ import ContractACI from '../contract/aci'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Aepp instance
  */
-const Aepp = Ae.compose(ContractACI, Aens, Rpc)
+const Aepp = Ae.compose(Contract, ContractACI, Aens, Rpc)
 
 export default Aepp
