@@ -56,6 +56,17 @@ npm i @aeternity/aepp-sdk@next
 npm i https://github.com/aeternity/aepp-sdk-js#develop
 ```
 
+**Note #2:** To include the SDK directly in an html page you can use the `<script>` tag with as follows:
+
+```html
+<script src="https://unpkg.com/@aeternity/aepp-sdk/dist/aepp-sdk.browser-script.js"></script>
+```
+That will use the latest available release, to lock the project to a specific release you can use 
+```html
+<script src="https://unpkg.com/@aeternity/aepp-sdk@VERSION/dist/aepp-sdk.browser-script.js"></script>
+```
+where `VERSION` is the version number of the SDK you want to use.
+
 ### 2. Import (a chosen Flavor)
 
 Import the right [flavor](docs/README.md#flavors--entry-points). For this example with get the `Universal` flavor, which contains all the features of the SDK:
