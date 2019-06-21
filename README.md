@@ -34,7 +34,7 @@ check out the [develop branch].
     - [2. Create an Account](#2-Create-an-Account)
       - [A) Using the Command Line](#A-Using-the-Command-Line)
       - [B) Using the SDK](#B-Using-the-SDK)
-    - [3. Give yourself some "testnet tokens"](#3-Give-yourself-some-%22testnet-tokens%22)
+    - [3. Give yourself some _AE_ tokens](#3-Give-yourself-some-AE-tokens)
     - [4. Import (a chosen Flavor)](#4-Import-a-chosen-Flavor)
     - [5. Play with Aetenity's blockchain features](#5-Play-with-Aetenitys-blockchain-features)
   - [More: Guides & Examples](#More-Guides--Examples)
@@ -83,7 +83,7 @@ Create an account using the [💻 CLI](#cli---command-line-client)
   console.log(`Public key: ${keypair.publicKey}`)
 ```
 
-### 3. Give yourself some "testnet tokens"
+### 3. Give yourself some _AE_ tokens
 To get yourself some _AEs_ you can use the [🚰 Faucet Aepp](https://faucet.aepps.com/). Just add your publicKey, and you'll immediately get some test tokens.
 
 
@@ -102,7 +102,7 @@ import Ae from '@aeternity/aepp-sdk/es/ae/universal' // or other flavor
 // Use Flavor
 Ae({
   url: 'https://sdk-testnet.aepps.com',
-  internalUrl: 'https://sdk-testnet.aepps.com',
+  // internalUrl: 'https://sdk-testnet.aepps.com',
   compilerUrl: 'https://compiler.aepps.com',
   keypair: { secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS' },
   networkId: 'ae_uat' // or any other networkId your client should connect to
