@@ -51,7 +51,6 @@ export function readType (type, { bindings } = {}) {
     const [[baseType, generic]] = Object.entries(t)
     return { t: baseType, generic }
   }
-
   // Base types
   if (typeof t === 'string') return { t }
 }
@@ -67,10 +66,6 @@ export function readType (type, { bindings } = {}) {
  */
 export async function transform (type, value, { bindings } = {}) {
   let { t, generic } = readType(type, { bindings })
-
-  // contract TestContract = ...
-  // fn(ct: TestContract)
-  if (typeof value === 'string' && value.slice(0, 2) === 'ct') t = SOPHIA_TYPES.address // Handle Contract address transformation
 
   switch (t) {
     case SOPHIA_TYPES.string:

@@ -86,9 +86,6 @@ export async function getContractInstance (source, { client, aci, contractAddres
     deployInfo: { address: contractAddress },
     options: R.merge(defaultOptions, opt),
     compilerVersion: this.compilerVersion,
-    setOptions (opt) {
-      this.options = R.merge(this.options, opt)
-    },
     async setClient (client, { forceMethods = false } = {}) {
       if (!client) throw new Error('ACI: Client required')
       // @Todo Verify if client have valid interface
@@ -111,6 +108,9 @@ export async function getContractInstance (source, { client, aci, contractAddres
       if (!clients[0]) throw new Error('ACI: Client is required')
       if (typeof clients[0] !== 'object') throw new Error('ACI: Invalid Client')
       return clients[0]
+    },
+    setOptions (opt) {
+      this.options = R.merge(this.options, opt)
     }
   }
 
