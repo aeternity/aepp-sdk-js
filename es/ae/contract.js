@@ -107,7 +107,7 @@ async function contractDecodeData (source, fn, callValue, callResult, options) {
  */
 async function contractCallStatic (source, address, name, args = [], { top, options = {} } = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const callerId = await this.address(opt)
+  const callerId = await this.address()
 
   // Get block hash by height
   if (top && !isNaN(top)) {
@@ -163,7 +163,7 @@ async function contractCall (source, address, name, args = [], options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
 
   const tx = await this.contractCallTx(R.merge(opt, {
-    callerId: await this.address(opt),
+    callerId: await this.address(),
     contractId: address,
     callData: await this.contractEncodeCall(source, name, args)
   }))
@@ -208,7 +208,7 @@ async function contractCall (source, address, name, args = [], options = {}) {
 async function contractDeploy (code, source, initState = [], options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   const callData = await this.contractEncodeCall(source, 'init', initState)
-  const ownerId = await this.address(opt)
+  const ownerId = await this.address()
 
   const { tx, contractId } = await this.contractCreateTx(R.merge(opt, {
     callData,

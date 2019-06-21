@@ -1,20 +1,13 @@
 /* eslint-disable */
 import { before, describe } from 'mocha'
-import { configure, internalUrl, ready, url } from '.'
+import { configure, ready } from '.'
 import { generateKeyPair } from '../../es/utils/crypto'
 import { BASE_VERIFICATION_SCHEMA, SIGNATURE_VERIFICATION_SCHEMA } from '../../es/tx/builder/schema'
 import { getContractInstance } from '../../es/contract/aci'
-import { account } from './index'
-import { UniversalWithAccounts } from '../../es/ae/universal'
-import MemoryAccount from '../../es/account/memory'
 
 const WARNINGS = [...SIGNATURE_VERIFICATION_SCHEMA, ...BASE_VERIFICATION_SCHEMA].reduce((acc, [msg, v, error]) => error.type === 'warning' ? [...acc, error.txKey] : acc, [])
 const ERRORS = [...BASE_VERIFICATION_SCHEMA, ...SIGNATURE_VERIFICATION_SCHEMA,].reduce((acc, [msg, v, error]) => error.type === 'error' ? [...acc, error.txKey] : acc, [])
-const stateContract = `
-contract StateContract =
-  record state = { value: string }
-  public function retrieve() : string = state.value
-`
+
 describe('Verify Transaction', function () {
   configure(this)
   let client
@@ -92,44 +85,4 @@ describe('Verify Transaction', function () {
     const vmAbiError = validation.find(el => el.txKey === 'ctVersion')
     vmAbiError.msg.split(',')[0].should.be.equal('Wrong abi/vm version')
   })
-
-
-
-
-
-
-
-  it.skip('test', async () => {
-
-    const c = `contract ExampleContract =
-   type state = ()
-   function main(x : int) = x`
-    const client = await ready(this, true, true)
-
-    const contractInstance = await getContractInstance(c)
-
-    await contractInstance.setClient(client)
-
-    // await contractInstance.addAccount(MemoryAccount({
-    //   keypair: {
-    //     publicKey: 'ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi',
-    //     secretKey: 'e6a91d633c77cf5771329d3354b3bcef1bc5e032c43d70b6d35af923ce1eb74dcea7ade470c9f99d9d4e400880a86f1d49bb444b62f11a9ebb64bbcfeb73fef3'
-    //   }
-    // }))
-    // console.log(await contractInstance.deploy([]))
-    console.log(await contractInstance.methods.init({ dfs: 1 }))
-    console.log(contractInstance.methods)
-
-    // console.log(await contractInstance.methods.retrieve())
-    // console.log('--------------------------------')
-    // console.log(await contractInstance.methods.retrieve.send({ forAccount: 'ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi' }))
-    // console.log('--------------------------------')
-    // console.log(await contractInstance.methods.retrieve.get({ forAccount: 'ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi' }))
-
-
-  })
-
-
-
-
 })

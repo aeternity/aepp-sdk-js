@@ -25,8 +25,11 @@
 
 import * as R from 'ramda'
 
+import { ContractWithCompiler } from '../../ae/contract'
+
 import { validateArguments, transform, transformDecodedData } from './transformation'
 import { buildContractMethods, getFunctionACI } from './helpers'
+import AsyncInit from '../../utils/async-init'
 
 /**
  * Validated contract call arguments using contract ACI
@@ -63,9 +66,8 @@ async function prepareArgsForEncode (aci, params) {
  * const callResult = await contractIns.call('setState', [123])
  * const staticCallResult = await contractIns.call('setState', [123], { callStatic: true })
  */
-export async function getContractInstance (source, { client, aci, contractAddress, opt } = {}) {
-  const clients = []
-
+async function getContractInstance (source, { aci, contractAddress, opt } = {}) {
+  aci = aci || await this.contractGetACI(source)
   const defaultOptions = {
     skipArgsConvert: false,
     skipTransformDecoded: false,
@@ -80,44 +82,16 @@ export async function getContractInstance (source, { client, aci, contractAddres
   }
   const instance = {
     interface: R.defaultTo(null, R.prop('interface', aci)),
-    aci: R.defaultTo(null, R.path('encoded_aci.contract', aci)),
+    aci: R.defaultTo(null, R.path(['encoded_aci', 'contract'], aci)),
     source,
     compiled: null,
     deployInfo: { address: contractAddress },
     options: R.merge(defaultOptions, opt),
     compilerVersion: this.compilerVersion,
-    async setClient (client, { forceMethods = false } = {}) {
-      if (!client) throw new Error('ACI: Client required')
-      // @Todo Verify if client have valid interface
-      clients[0] = client
-      if (!this.aci) {
-        const aci = await client.contractGetACI(source)
-        // Prepend aci and interface to contract instance
-        Object.assign(this, {
-          aci: aci.encoded_aci.contract,
-          interface: aci.interface
-        })
-        // Generate methods
-        !forceMethods && Object.assign(this, { methods: buildContractMethods(this)() })
-      }
-    },
-    async addAccount (account, { select } = {}) {
-      await this.getClient().addAccount(account, { select })
-    },
-    getClient () {
-      if (!clients[0]) throw new Error('ACI: Client is required')
-      if (typeof clients[0] !== 'object') throw new Error('ACI: Invalid Client')
-      return clients[0]
-    },
     setOptions (opt) {
       this.options = R.merge(this.options, opt)
     }
   }
-
-  /**
-   * Set client if exist
-   */
-  client && await instance.setClient(client, { forceMethods: true })
 
   /**
    * Compile contract
@@ -125,7 +99,7 @@ export async function getContractInstance (source, { client, aci, contractAddres
    * @rtype () => ContractInstance: Object
    * @return {ContractInstance} Contract ACI object with predefined js methods for contract usage
    */
-  instance.compile = compile.bind(instance)
+  instance.compile = compile({ client: this, instance })
   /**
    * Deploy contract
    * @alias module:@aeternity/aepp-sdk/es/contract/aci
@@ -135,7 +109,7 @@ export async function getContractInstance (source, { client, aci, contractAddres
    * @param {Boolean} [options.skipArgsConvert=false] Skip Validation and Transforming arguments before prepare call-data
    * @return {ContractInstance} Contract ACI object with predefined js methods for contract usage
    */
-  instance.deploy = deploy.bind(instance)
+  instance.deploy = deploy({ client: this, instance })
   /**
    * Call contract function
    * @alias module:@aeternity/aepp-sdk/es/contract/aci
@@ -148,7 +122,7 @@ export async function getContractInstance (source, { client, aci, contractAddres
    * @param {Boolean} [options.callStatic=false] Static function call
    * @return {Object} CallResult
    */
-  instance.call = call.bind(instance)
+  instance.call = call({ client: this, instance })
 
   /**
    * Generate proto function based on contract function using Contract ACI schema
@@ -162,47 +136,62 @@ export async function getContractInstance (source, { client, aci, contractAddres
   return instance
 }
 
-async function call (fn, params = [], options = {}) {
-  const opt = R.merge(this.options, options)
-  const fnACI = getFunctionACI(this.aci, fn)
-  const source = opt.source || this.source
+const call = ({ client, instance }) => async (fn, params = [], options = {}) => {
+  const opt = R.merge(instance.options, options)
+  const fnACI = getFunctionACI(instance.aci, fn)
+  const source = opt.source || instance.source
 
   if (!fn) throw new Error('Function name is required')
-  if (!this.deployInfo.address) throw new Error('You need to deploy contract before calling!')
+  if (!instance.deployInfo.address) throw new Error('You need to deploy contract before calling!')
 
   params = !opt.skipArgsConvert ? await prepareArgsForEncode(fnACI, params) : params
   const result = opt.callStatic
-    ? await this.getClient().contractCallStatic(source, this.deployInfo.address, fn, params, {
+    ? await client.contractCallStatic(source, instance.deployInfo.address, fn, params, {
       top: opt.top,
       options: opt
     })
-    : await this.getClient().contractCall(source, this.deployInfo.address, fn, params, opt)
+    : await client.contractCall(source, instance.deployInfo.address, fn, params, opt)
   return {
     ...result,
     decodedResult: await transformDecodedData(
       fnACI.returns,
       await result.decode(),
-      { ...opt, compilerVersion: this.compilerVersion, bindings: fnACI.bindings }
+      { ...opt, compilerVersion: instance.compilerVersion, bindings: fnACI.bindings }
     )
   }
 }
 
-async function deploy (init = [], options = {}) {
-  const opt = R.merge(this.options, options)
-  const fnACI = getFunctionACI(this.aci, 'init')
+const deploy = ({ client, instance }) => async (init = [], options = {}) => {
+  const opt = R.merge(instance.options, options)
+  const fnACI = getFunctionACI(instance.aci, 'init')
 
-  if (!this.compiled) await this.compile()
+  if (!instance.compiled) await instance.compile()
   init = !opt.skipArgsConvert ? await prepareArgsForEncode(fnACI, init) : init
 
-  const { owner, transaction, address, createdAt, result, rawTx } = await this.getClient().contractDeploy(this.compiled, opt.source || this.source, init, opt)
-  this.deployInfo = { owner, transaction, address, createdAt, result, rawTx }
-  return this.deployInfo
+  const { owner, transaction, address, createdAt, result, rawTx } = await client.contractDeploy(instance.compiled, opt.source || instance.source, init, opt)
+  instance.deployInfo = { owner, transaction, address, createdAt, result, rawTx }
+  return instance.deployInfo
 }
 
-async function compile () {
-  const { bytecode } = await this.getClient().contractCompile(this.source)
-  this.compiled = bytecode
-  return this.compiled
+const compile = ({ client, instance }) => async () => {
+  const { bytecode } = await client.contractCompile(instance.source)
+  instance.compiled = bytecode
+  return instance.compiled
 }
 
-export default { getContractInstance }
+/**
+ * Contract ACI Stamp
+ *
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/contract/aci
+ * @rtype Stamp
+ * @return {Object} Contract compiler instance
+ * @example ContractACI()
+ */
+const ContractACI = AsyncInit.compose(ContractWithCompiler, {
+  methods: {
+    getContractInstance
+  }
+})
+
+export default ContractACI

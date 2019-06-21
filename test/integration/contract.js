@@ -18,7 +18,6 @@
 import { describe, it, before } from 'mocha'
 import { configure, plan, ready } from './'
 import { decode } from '../../es/tx/builder/helpers'
-import { getContractInstance } from '../../es/contract/aci'
 
 import * as R from 'ramda'
 
@@ -165,7 +164,7 @@ describe('Contract', function () {
     let contractObject
 
     it('Generate ACI object', async () => {
-      contractObject = await getContractInstance(testContract, { opt: { amount: 10000, ttl: 10 }, client: contract })
+      contractObject = await contract.getContractInstance(testContract, { opt: { amount: 10000, ttl: 10 } })
       contractObject.should.have.property('interface')
       contractObject.should.have.property('aci')
       contractObject.should.have.property('source')
