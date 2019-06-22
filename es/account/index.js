@@ -36,15 +36,16 @@ const DEFAULT_NETWORK_ID = `ae_mainnet`
  * @category async
  * @rtype (tx: String) => tx: Promise[String], throws: Error
  * @param {String} tx - Transaction to sign
+ * @param {Object} opt - Options
  * @return {String} Signed transaction
  */
-async function signTransaction (tx) {
+async function signTransaction (tx, opt = {}) {
   const networkId = this.getNetworkId()
   const rlpBinaryTx = Crypto.decodeBase64Check(Crypto.assertedType(tx, 'tx'))
   // Prepend `NETWORK_ID` to begin of data binary
   const txWithNetworkId = Buffer.concat([Buffer.from(networkId), rlpBinaryTx])
 
-  const signatures = [await this.sign(txWithNetworkId)]
+  const signatures = [await this.sign(txWithNetworkId, opt)]
   return buildTx({ encodedTx: rlpBinaryTx, signatures }, TX_TYPE.signed).tx
 }
 
