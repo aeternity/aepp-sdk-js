@@ -25,8 +25,6 @@
 
 import * as R from 'ramda'
 
-import { ContractWithCompiler } from '../../ae/contract'
-
 import { validateArguments, transform, transformDecodedData } from './transformation'
 import { buildContractMethods, getFunctionACI } from './helpers'
 import AsyncInit from '../../utils/async-init'
