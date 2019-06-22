@@ -32,6 +32,7 @@ import * as R from 'ramda'
 import { isBase64 } from '../utils/crypto'
 import ContractCompilerAPI from '../contract/compiler'
 import ContractBase from '../contract'
+import ContractACI from '../contract/aci'
 
 /**
  * Handle contract call error
@@ -288,7 +289,7 @@ async function contractCompile (source, options = {}) {
  * const client = await ContractWithAe({ url, internalUrl, compilerUrl, keypair, ... })
  *
  */
-export const Contract = Ae.compose(ContractBase, {
+export const Contract = Ae.compose(ContractBase, ContractACI, {
   methods: {
     contractCompile,
     contractCallStatic,

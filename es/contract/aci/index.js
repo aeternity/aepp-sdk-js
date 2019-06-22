@@ -189,10 +189,8 @@ const compile = ({ client, instance }) => async () => {
  * @return {Object} Contract compiler instance
  * @example ContractACI()
  */
-export const ContractACI = AsyncInit.compose({
+export default AsyncInit.compose({
   methods: {
     getContractInstance
   }
 })
-
-export default ContractACI.compose(ContractWithCompiler)
