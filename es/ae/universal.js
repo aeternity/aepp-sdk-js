@@ -30,7 +30,7 @@ import Transaction from '../tx/tx'
 import Oracle from './oracle'
 import Selector from '../account/selector'
 import Accounts from '../accounts'
-import ContractACI from '../contract/aci'
+import Contract from './contract'
 
 /**
  * Universal Stamp
@@ -43,12 +43,12 @@ import ContractACI from '../contract/aci'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Universal instance
  */
-export const Universal = Ae.compose(Account, Chain, Transaction, Aens, ContractACI, Oracle, {
+export const Universal = Ae.compose(Account, Chain, Transaction, Aens, Contract, Oracle, {
   init () {},
   props: { process: {} }
 })
 
-export const UniversalWithAccounts = Ae.compose(Accounts, Chain, Transaction, Aens, ContractACI, Oracle, Selector, {
+export const UniversalWithAccounts = Ae.compose(Accounts, Chain, Transaction, Aens, Contract, Oracle, Selector, {
   init () {},
   props: { process: {} }
 })
