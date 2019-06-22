@@ -10,11 +10,9 @@ import MemoryAccount from '../../es/account/memory'
 
 const WARNINGS = [...SIGNATURE_VERIFICATION_SCHEMA, ...BASE_VERIFICATION_SCHEMA].reduce((acc, [msg, v, error]) => error.type === 'warning' ? [...acc, error.txKey] : acc, [])
 const ERRORS = [...BASE_VERIFICATION_SCHEMA, ...SIGNATURE_VERIFICATION_SCHEMA,].reduce((acc, [msg, v, error]) => error.type === 'error' ? [...acc, error.txKey] : acc, [])
-const stateContract = `
-contract StateContract =
-  record state = { value: string }
-  public function retrieve() : string = state.value
-`
+
+const channelCreate = 'tx_+NkLAfhCuECIIeWttRUiZ32uriBdmM1t+dCg90KuG2ABxOiuXqzpAul6uTWvsyfx3EFJDah6trudrityh+6XSX3mkPEimhgGuJH4jzIBoQELtO15J/l7UeG8teE0DRIzWyorEsi8UiHWPEvLOdQeYYgbwW1nTsgAAKEB6bv2BOYRtUYKOzmZ6Xcbb2BBfXPOfFUZ4S9+EnoSJcqIG8FtZ07IAACIAWNFeF2KAAAKAIYSMJzlQADAoDBrIcoop8JfZ4HOD9p3nDTiNthj7jjl+ArdHwEMUrvQgitwOr/v3Q=='
+
 describe('Verify Transaction', function () {
   configure(this)
   let client
@@ -92,44 +90,8 @@ describe('Verify Transaction', function () {
     const vmAbiError = validation.find(el => el.txKey === 'ctVersion')
     vmAbiError.msg.split(',')[0].should.be.equal('Wrong abi/vm version')
   })
-
-
-
-
-
-
-
-  it.skip('test', async () => {
-
-    const c = `contract ExampleContract =
-   type state = ()
-   function main(x : int) = x`
-    const client = await ready(this, true, true)
-
-    const contractInstance = await getContractInstance(c)
-
-    await contractInstance.setClient(client)
-
-    // await contractInstance.addAccount(MemoryAccount({
-    //   keypair: {
-    //     publicKey: 'ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi',
-    //     secretKey: 'e6a91d633c77cf5771329d3354b3bcef1bc5e032c43d70b6d35af923ce1eb74dcea7ade470c9f99d9d4e400880a86f1d49bb444b62f11a9ebb64bbcfeb73fef3'
-    //   }
-    // }))
-    // console.log(await contractInstance.deploy([]))
-    console.log(await contractInstance.methods.init({ dfs: 1 }))
-    console.log(contractInstance.methods)
-
-    // console.log(await contractInstance.methods.retrieve())
-    // console.log('--------------------------------')
-    // console.log(await contractInstance.methods.retrieve.send({ forAccount: 'ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi' }))
-    // console.log('--------------------------------')
-    // console.log(await contractInstance.methods.retrieve.get({ forAccount: 'ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi' }))
-
-
+  it('Verify channel create tx', async () => {
+    const res = await client.unpackAndVerify(channelCreate)
+    Array.isArray(res.validation).should.be.equal(true)
   })
-
-
-
-
 })
