@@ -43,7 +43,7 @@ async function address () {
  * @param {String} address - Address of account to select
  * @example selectAccount('ak_xxxxxxxx')
  */
-async function selectAccount (address) {
+function selectAccount (address) {
   this.Selector.address = address
 }
 
@@ -58,6 +58,7 @@ async function selectAccount (address) {
  */
 const Selector = Account.compose({
   async init ({ address }) {
+    if (!address) address = Object.keys(this.accounts)[0]
     this.Selector.address = address
   },
   methods: { sign, address, selectAccount },

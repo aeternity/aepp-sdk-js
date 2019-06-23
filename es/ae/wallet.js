@@ -25,13 +25,13 @@
 import Ae from './'
 import Account from '../account'
 import ContractBase from '../contract'
-import Contract from './contract'
 import Accounts from '../accounts'
 import Chain from '../chain/node'
 import Rpc from '../rpc/server'
 import Selector from '../account/selector'
 import * as R from 'ramda'
 import Tx from '../tx/tx'
+import Contract from './contract'
 
 const contains = R.flip(R.contains)
 const isTxMethod = contains(Tx.compose.deepConfiguration.Ae.methods)

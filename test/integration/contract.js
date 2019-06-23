@@ -18,6 +18,7 @@
 import { describe, it, before } from 'mocha'
 import { configure, plan, ready } from './'
 import { decode } from '../../es/tx/builder/helpers'
+
 import * as R from 'ramda'
 
 const identityContract = `
@@ -86,7 +87,7 @@ describe('Contract', function () {
   let deployed
 
   before(async function () {
-    contract = await ready(this)
+    contract = await ready(this, true, true)
   })
 
   it('precompiled bytecode can be deployed', async () => {
@@ -148,6 +149,14 @@ describe('Contract', function () {
     })
     it('decode call-data', async () => {
       return contract.contractDecodeCallResultAPI(identityContract, 'main', encodedNumberSix, 'ok').should.eventually.become(6)
+    })
+    it('Use invalid compiler url', async () => {
+      try {
+        const cloned = R.clone(contract)
+        await cloned.setCompilerUrl('https://compiler.aepps.comas')
+      } catch (e) {
+        e.message.should.be.equal('Compiler do not respond')
+      }
     })
   })
 

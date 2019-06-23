@@ -1,5 +1,5 @@
 import axios from 'axios'
-import JSONbig from 'json-bigint'
+import JsonBig from './json-big'
 import * as R from 'ramda'
 import stampit from '@stamp/it'
 
@@ -59,7 +59,7 @@ const Http = stampit({
       headers: { 'Content-Type': 'application/json' },
       transformResponse: [(data) => {
         try {
-          return JSONbig({ 'storeAsString': true }).parse(data)
+          return JsonBig.parse(data)
         } catch (e) {
           return data
         }

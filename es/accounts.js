@@ -36,9 +36,10 @@ async function signWith (address, data) {
   return account.sign(data)
 }
 
-async function addAccount (account) {
+async function addAccount (account, { select } = {}) {
   const address = await account.address()
   this.accounts[address] = account
+  if (select) this.selectAccount(address)
 }
 
 /**

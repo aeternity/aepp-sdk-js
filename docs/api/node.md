@@ -3,6 +3,7 @@
 ## @aeternity/aepp-sdk/es/node
 Node module
 
+**Export**: Node  
 **Example**  
 ```js
 import Node from '@aeternity/aepp-sdk/es/node'

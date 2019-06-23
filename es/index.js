@@ -38,6 +38,7 @@ import OracleNodeAPI from './oracle/node'
 import Selector from './account/selector'
 import Channel from './channel'
 import Universal from './ae/universal'
+import ContractACI from './contract/aci'
 
 export {
   Account,
@@ -46,6 +47,7 @@ export {
   Aepp,
   Contract,
   ContractCompilerAPI,
+  ContractACI,
   ChainNode,
   Channel,
   Crypto,

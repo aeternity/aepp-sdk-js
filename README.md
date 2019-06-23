@@ -1,4 +1,4 @@
-# aepp-sdk
+# [Æternity](https://aeternity.com/)'s Javascript SDK
 
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 [![Build Status](https://ci.aepps.com/buildStatus/icon?job=aepp-sdk-js/develop)](https://ci.aepps.com/job/aepp-sdk-js/job/develop/)
@@ -6,130 +6,142 @@
 [![npm](https://img.shields.io/npm/l/@aeternity/aepp-sdk.svg)](https://www.npmjs.com/package/@aeternity/aepp-sdk)
 
 JavaScript SDK for the revolutionary [æternity] blockchain, targeting the
-[æternity node] implementation.
+[æternity node] implementation. Aepp-sdk is [hosted on GitHub].
 
-aepp-sdk is [hosted on GitHub].
-
-![Concept Drawing of aepp-sdk][concept]
-
-[concept]: concept.png "Concept Drawing of aepp-sdk"
 [æternity]: https://aeternity.com/
 [æternity node]: https://github.com/aeternity/aeternity
 [hosted on GitHub]: https://github.com/aeternity/aepp-sdk-js
 
 #### Disclaimer
 
-This SDK is at an alpha stage where things easily can break. We aim to make our
-alpha releases as stable as possible. Neverless it should not be taken as
-production-ready. To catch up with the more edgy state of development please
+This SDK is in continuos development where things can easily break, especially if you're not an officially released version. We aim to make all our
+ releases as stable as possible, neverless it should not be taken as
+production-ready.
+
+To catch up with the more edgy state of development please
 check out the [develop branch].
 
 [develop branch]: https://github.com/aeternity/aepp-sdk-js/tree/develop
 
-## [Usage Documentation]
+## Table of content
+- [Æternity's Javascript SDK](#%C3%86ternitys-Javascript-SDK)
+      - [Disclaimer](#Disclaimer)
+  - [Table of content](#Table-of-content)
+  - [Quick Start](#Quick-Start)
+    - [1. Install SDK](#1-Install-SDK)
+      - [A) Simple Usage: with `<script>` tag](#A-Simple-Usage-with-script-tag)
+      - [B) Advanced Usage: with `npm` or similar](#B-Advanced-Usage-with-npm-or-similar)
+    - [2. Create an Account](#2-Create-an-Account)
+      - [A) Using the Command Line](#A-Using-the-Command-Line)
+      - [B) Using the SDK](#B-Using-the-SDK)
+    - [3. Give yourself some _AE_ tokens](#3-Give-yourself-some-AE-tokens)
+    - [4. Import (a chosen Flavor)](#4-Import-a-chosen-Flavor)
+    - [5. Play with Aetenity's blockchain features](#5-Play-with-Aetenitys-blockchain-features)
+  - [More: Guides & Examples](#More-Guides--Examples)
+  - [CLI - Command Line Client](#CLI---Command-Line-Client)
+  - [Contributing](#Contributing)
+  - [Change Log](#Change-Log)
+  - [License](#License)
 
-1. Add the latest `@aeternity/aepp-sdk` release from npmjs.com to your project using one of these commands
+## Quick Start
+
+### 1. Install SDK
+#### A) Simple Usage: with `<script>` tag
+For those not using any JS bundling/complilation or compilation technique or tools like [_Codepen_](https://codepen.io/pen/) or similar online Editors, please check our [**Import SDK bundle with `<script>` tag**](docs/guides/import-script-tag.md).
+
+If you're using bundling/compilation techniques (eg. `webpack`), please continue reading.
+
+#### B) Advanced Usage: with `npm` or similar
+Add the latest `@aeternity/aepp-sdk` release from npmjs.com to your project using one of these commands
 
 ```bash
-pnpm i @aeternity/aepp-sdk
-# or
+# install using npm...or yarn or pnpm
 npm i @aeternity/aepp-sdk
-# or
-yarn add @aeternity/aepp-sdk
 ```
 
-**Note:** To install a _Pre-Release_ (latest `beta` or `alpha` version) using on the latest Node version, you have to install the package appending the `@next` tag reference.
+**Note:** To install a _Pre-Release_ (latest `beta` or `alpha` version) using on the latest Node version, you have to install the package appending the `@next` tag reference, or even use the `#` symbol and the Repo URL to install a version coming from a specific branch.
 ```bash
-pnpm i @aeternity/aepp-sdk@next
+# install the @next version of the SDK
 npm i @aeternity/aepp-sdk@next
-yarn add @aeternity/aepp-sdk@next
+
+# install the #develop version of the SDK
+npm i https://github.com/aeternity/aepp-sdk-js#develop
 ```
 
-> Hint: You can also add a development version from GitHub by dropping the `@` and
-> adding `#` and a branch name at the end, for example
-> `pnpm i aeternity/aepp-sdk#develop`.
+### 2. Create an Account
+You can do many more things now, but you'll probably have to start with:
 
-2. Import the right flavor. For this example with get the `Universal` flavor, which contains all the features of the SDK:
+#### A) Using the Command Line
+Create an account using the [💻 CLI](#cli---command-line-client)
 
-```js
-import Ae from '@aeternity/aepp-sdk/es/ae/universal' // or any other flavor
+#### B) Using the SDK
+
+```javascript
+  import { Crypto } from '@aeternity/aepp-sdk/es'
+  const keypair = Crypto.generateKeyPair()
+  console.log(`Secret key: ${keypair.secretKey}`)
+  console.log(`Public key: ${keypair.publicKey}`)
 ```
 
-3. Create an instance and interact with it
+### 3. Give yourself some _AE_ tokens
+To get yourself some _AEs_ you can use the [🚰 Faucet Aepp](https://faucet.aepps.com/). Just add your publicKey, and you'll immediately get some test tokens.
+
+
+### 4. Import (a chosen Flavor)
+
+Import the right [flavor](docs/README.md#flavors--entry-points). For this example with get the `Universal` flavor, which contains all the features of the SDK:
 
 ```js
+// Import Flavor
+import Ae from '@aeternity/aepp-sdk/es/ae/universal' // or other flavor
+```
 
-// Start the instance
+### 5. Play with Aetenity's blockchain features
 
+```js
+// Use Flavor
 Ae({
   url: 'https://sdk-testnet.aepps.com',
-  internalUrl: 'https://sdk-testnet.aepps.com',
+  // internalUrl: 'https://sdk-testnet.aepps.com',
+  compilerUrl: 'https://compiler.aepps.com',
   keypair: { secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS' },
-  networkId: 'aet_ua' // or any other networkId your client should connect to
+  networkId: 'ae_uat' // or any other networkId your client should connect to
 }).then(ae => {
-
   // Interacting with the blockchain client
-
   // getting the latest block height
   ae.height().then(height => {
     // logs current height
-    console.log('height', height)
-  }).catch(e => {
-    // logs error
-    console.log(e)
-  })
-
-  // getting the balance of a public address
-  ae.balance('A_PUB_ADDRESS').then(balance => {
-    // logs current balance of "A_PUB_ADDRESS"
-    console.log('balance', balance)
+    console.log('Current Block Height:', height)
   }).catch(e => {
     // logs error
     console.log(e)
   })
 })
+
 ```
 
-4. **IMPORTANT:** 🤓 Check out the [Usage Documentation] to avoid common pitfalls!
+## More: Guides & Examples
 
-[Usage Documentation]: docs/usage.md
+Check out our [Guides](docs/README.md) and [Examples](examples/README.md).
 
+## CLI - Command Line Client
 
-> Remember: you can also "compose" your own flavor by mixing 2 or more flavors likes so:
+To quickly test _all_ of Aeternity's blockchain features from your Terminal, you can Install and use our **NodeJS [CLI](https://github.com/aeternity/aepp-cli-js)** by running:
 
-```js
-import Wallet from '@aeternity/aepp-sdk/es/ae/wallet.js'
-import Contract from '@aeternity/aepp-sdk/es/ae/contract.js'
-import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory.js'
+1. `npm i -g @aeternity/aepp-cli` to globally install the CLI
+2. `aecli --help` to get a list of possible commands
 
-// make a "mixed flavor" containing Wallet and Contracts flavors
-Wallet.compose(Contract)({
-            url: 'https://sdk-testnet.aepps.com',
-            internalUrl: 'https://sdk-testnet.aepps.com',
-            accounts: [MemoryAccount({keypair: {secretKey: account.priv, publicKey: account.pub}})],
-            address: account.pub,
-            onTx: true, // or a function to Guard the Rpc client
-            onChain: true, // or a function to Guard the Rpc client
-            onAccount: true, // or a function to Guard the Rpc client
-            networkId: 'ae_uat'
-          }).then(ae => {
-            // ae is your initialised client now! :)
-            // ...
-```
-## [Hacking]
+_eg._ Create an Account:
 
-For advanced use, development versions and to get a deeper understanding of the
-SDK, it is advised to read the [Hacking] documentation.
+`aecli account create testWhateverAccountName`
 
-[Hacking]: docs/hacking.md
+## Contributing
 
-## [API]
+For advanced use, to get a deeper understanding of the SDK or to contribute to its development, it is advised to read the [Contributing Guidelines](docs/contrib/README.md) section.
 
-[API]: docs/api.md
+## Change Log
 
-## [Change Log]
-
-[Change Log]: CHANGELOG.md
+We keep our [Changelog](CHANGELOG.md) up to date.
 
 ## License
 
@@ -147,3 +159,4 @@ INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS
 OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
 TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
 THIS SOFTWARE.
+
