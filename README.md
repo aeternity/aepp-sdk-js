@@ -24,22 +24,34 @@ check out the [develop branch].
 [develop branch]: https://github.com/aeternity/aepp-sdk-js/tree/develop
 
 ## Table of content
-- [Æternity's Javascript SDK](#%C3%A6ternitys-javascript-sdk)
-      - [Disclaimer](#disclaimer)
-  - [Table of content](#table-of-content)
-  - [Quick Start](#quick-start)
-    - [1. Install the SDK](#1-install-the-sdk)
-    - [2. Import (a chosen Flavor)](#2-import-a-chosen-flavor)
-    - [3. Create an Account and get some _AEs_](#3-create-an-account-and-get-some-aes)
-  - [Guides & Examples](#guides--examples)
-  - [CLI - Command Line Client](#cli---command-line-client)
-  - [Contributing](#contributing)
-  - [Change Log](#change-log)
-  - [License](#license)
+- [Æternity's Javascript SDK](#%C3%86ternitys-Javascript-SDK)
+      - [Disclaimer](#Disclaimer)
+  - [Table of content](#Table-of-content)
+  - [Quick Start](#Quick-Start)
+    - [1. Install SDK](#1-Install-SDK)
+      - [A) Simple Usage: with `<script>` tag](#A-Simple-Usage-with-script-tag)
+      - [B) Advanced Usage: with `npm` or similar](#B-Advanced-Usage-with-npm-or-similar)
+    - [2. Create an Account](#2-Create-an-Account)
+      - [A) Using the Command Line](#A-Using-the-Command-Line)
+      - [B) Using the SDK](#B-Using-the-SDK)
+    - [3. Give yourself some _AE_ tokens](#3-Give-yourself-some-AE-tokens)
+    - [4. Import (a chosen Flavor)](#4-Import-a-chosen-Flavor)
+    - [5. Play with Aetenity's blockchain features](#5-Play-with-Aetenitys-blockchain-features)
+  - [More: Guides & Examples](#More-Guides--Examples)
+  - [CLI - Command Line Client](#CLI---Command-Line-Client)
+  - [Contributing](#Contributing)
+  - [Change Log](#Change-Log)
+  - [License](#License)
 
 ## Quick Start
 
-### 1. Install the SDK
+### 1. Install SDK
+#### A) Simple Usage: with `<script>` tag
+For those not using any JS bundling/complilation or compilation technique or tools like [_Codepen_](https://codepen.io/pen/) or similar online Editors, please check our [**Import SDK bundle with `<script>` tag**](docs/guides/import-script-tag.md).
+
+If you're using bundling/compilation techniques (eg. `webpack`), please continue reading.
+
+#### B) Advanced Usage: with `npm` or similar
 Add the latest `@aeternity/aepp-sdk` release from npmjs.com to your project using one of these commands
 
 ```bash
@@ -56,22 +68,59 @@ npm i @aeternity/aepp-sdk@next
 npm i https://github.com/aeternity/aepp-sdk-js#develop
 ```
 
-### 2. Import (a chosen Flavor)
+### 2. Create an Account
+You can do many more things now, but you'll probably have to start with:
+
+#### A) Using the Command Line
+Create an account using the [💻 CLI](#cli---command-line-client)
+
+#### B) Using the SDK
+
+```javascript
+  import { Crypto } from '@aeternity/aepp-sdk/es'
+  const keypair = Crypto.generateKeyPair()
+  console.log(`Secret key: ${keypair.secretKey}`)
+  console.log(`Public key: ${keypair.publicKey}`)
+```
+
+### 3. Give yourself some _AE_ tokens
+To get yourself some _AEs_ you can use the [🚰 Faucet Aepp](https://faucet.aepps.com/). Just add your publicKey, and you'll immediately get some test tokens.
+
+
+### 4. Import (a chosen Flavor)
 
 Import the right [flavor](docs/README.md#flavors--entry-points). For this example with get the `Universal` flavor, which contains all the features of the SDK:
 
 ```js
+// Import Flavor
 import Ae from '@aeternity/aepp-sdk/es/ae/universal' // or other flavor
 ```
 
-### 3. Create an Account and get some _AEs_
-You can do many more things now, but you'll probably have to start with:
+### 5. Play with Aetenity's blockchain features
 
-1. Create an account using the [💻 CLI](#cli---command-line-client)
-2. Give yourself some initial _AEs_ using the [🚰 Faucet Aepp](https://faucet.aepps.com/)
-3. Enjoy building Aepps 🤓
+```js
+// Use Flavor
+Ae({
+  url: 'https://sdk-testnet.aepps.com',
+  // internalUrl: 'https://sdk-testnet.aepps.com',
+  compilerUrl: 'https://compiler.aepps.com',
+  keypair: { secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS' },
+  networkId: 'ae_uat' // or any other networkId your client should connect to
+}).then(ae => {
+  // Interacting with the blockchain client
+  // getting the latest block height
+  ae.height().then(height => {
+    // logs current height
+    console.log('Current Block Height:', height)
+  }).catch(e => {
+    // logs error
+    console.log(e)
+  })
+})
 
-## Guides & Examples
+```
+
+## More: Guides & Examples
 
 Check out our [Guides](docs/README.md) and [Examples](examples/README.md).
 

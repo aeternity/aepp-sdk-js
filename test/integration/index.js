@@ -15,17 +15,23 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import Ae from '../../es/ae/universal'
+import { UniversalWithAccounts, Universal as Ae } from '../../es/ae/universal'
 import * as Crypto from '../../es/utils/crypto'
 import { BigNumber } from 'bignumber.js'
+import MemoryAccount from '../../es/account/memory'
 
 const url = process.env.TEST_URL || 'http://localhost:3013'
 const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
 const compilerUrl = process.env.COMPILER_URL || 'http://localhost:3080'
 const networkId = process.env.TEST_NETWORK_ID || 'ae_devnet'
-const account = Crypto.generateKeyPair()
+export const account = Crypto.generateKeyPair()
 
 const BaseAe = (params) => Ae.compose({
+  deepProps: { Swagger: { defaults: { debug: !!process.env['DEBUG'] } } },
+  props: { url, internalUrl, process, compilerUrl }
+})({ ...params })
+
+const BaseAeWithAccounts = (params) => UniversalWithAccounts.compose({
   deepProps: { Swagger: { defaults: { debug: !!process.env['DEBUG'] } } },
   props: { url, internalUrl, process, compilerUrl }
 })({ ...params })
@@ -43,7 +49,7 @@ function configure (mocha) {
   mocha.timeout(TIMEOUT)
 }
 
-async function ready (mocha, native = true) {
+async function ready (mocha, native = true, withAccounts = false) {
   configure(mocha)
 
   const ae = await BaseAe({ networkId })
@@ -55,9 +61,14 @@ async function ready (mocha, native = true) {
     charged = true
   }
 
-  const client = await BaseAe({ nativeMode: native, networkId })
-  client.setKeypair(account)
-  return client
+  return withAccounts
+    ? BaseAeWithAccounts({
+      accounts: [MemoryAccount({ keypair: account })],
+      address: account.publicKey,
+      nativeMode: native,
+      networkId
+    })
+    : BaseAe({ keypair: account, nativeMode: native, networkId })
 }
 
 export {

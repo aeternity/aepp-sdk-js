@@ -42,7 +42,7 @@ import { BigNumber } from 'bignumber.js'
  */
 async function send (tx, options) {
   const opt = R.merge(this.Ae.defaults, options)
-  const signed = await this.signTransaction(tx)
+  const signed = await this.signTransaction(tx, opt)
   return this.sendTransaction(signed, opt)
 }
 

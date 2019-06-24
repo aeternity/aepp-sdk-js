@@ -24,8 +24,8 @@
 
 import Ae from './'
 import Aens from './aens'
-import { Contract } from './contract'
 import Rpc from '../rpc/client'
+import { Contract } from './contract'
 
 /**
  * Aepp Stamp
