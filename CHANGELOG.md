@@ -4,7 +4,7 @@
 ### Bug Fixes
 
 * **Node:** Do not throw error if `internalUrl` not provided. Instead use `url` ([#503](https://github.com/aeternity/aepp-sdk-js/issues/503)) ([053faae](https://github.com/aeternity/aepp-sdk-js/commit/053faae))
-* **TXBuilder:** Fix payload serialization if you try to unpackpack and pack tx. ([#498](https://github.com/aeternity/aepp-sdk-js/issues/498)) ([73552e5](https://github.com/aeternity/aepp-sdk-js/commit/73552e5))
+* **TXBuilder:** Fix payload serialization if you try to unpack and pack tx. ([#498](https://github.com/aeternity/aepp-sdk-js/issues/498)) ([73552e5](https://github.com/aeternity/aepp-sdk-js/commit/73552e5))
 * **TxValidator:** Fix validation of state channel open transaction ([#496](https://github.com/aeternity/aepp-sdk-js/issues/496)) ([325cc90](https://github.com/aeternity/aepp-sdk-js/commit/325cc90))
 
 
@@ -26,9 +26,9 @@ Add `options` object like last arguments of generate fn under `instance.methods`
   //
     // Automatically decide to send tx on-chain or call-static(dry-run) base on if function stateful or not
     const result = await instance.methods.sum(2, 5, options)
-    // Mannualy make on-chain
+    // Manually make on-chain
     const result = await instance.methods.sum.send(2, 5, options)
-    // Mannualy make call-static
+    // Manually make call-static
     const result = await instance.methods.sum.get(2, 5, options)
   //
   ```
