@@ -24,7 +24,7 @@ import { unpackTx, buildTx } from '../../es/tx/builder'
 import { decode } from '../../es/tx/builder/helpers'
 import Channel from '../../es/channel'
 
-const wsUrl = process.env.WS_URL || 'ws://node:3014/channel'
+const wsUrl = process.env.TEST_WS_URL || 'ws://localhost:3014/channel'
 
 plan('10000000000000000')
 
