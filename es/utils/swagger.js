@@ -336,7 +336,7 @@ function destructureClientError (error) {
  * @param {Object} types - Swagger types
  * @return {Function}
  */
-const operation = R.memoize((path, method, definition, types, { config, errorHandler } = {}) => {
+const operation = (path, method, definition, types, { config, errorHandler } = {}) => {
   config = config || {}
   delete config.transformResponse // Prevent of overwriting transform response
   const { operationId, description } = definition
@@ -430,7 +430,7 @@ const operation = R.memoize((path, method, definition, types, { config, errorHan
       }
     })
   }
-})
+}
 
 /**
  * Swagger Stamp
