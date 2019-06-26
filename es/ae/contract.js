@@ -31,8 +31,8 @@ import Ae from './'
 import * as R from 'ramda'
 import { isBase64 } from '../utils/crypto'
 import ContractCompilerAPI from '../contract/compiler'
-import ContractACI from '../contract/aci'
 import ContractBase from '../contract'
+import ContractACI from '../contract/aci'
 
 /**
  * Handle contract call error
@@ -108,23 +108,25 @@ async function contractDecodeData (source, fn, callValue, callResult, options) {
  */
 async function contractCallStatic (source, address, name, args = [], { top, options = {} } = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-
-  // Prepare `call` transaction
-  const tx = await this.contractCallTx(R.merge(opt, {
-    callerId: await this.address(),
-    contractId: address,
-    callData: await this.contractEncodeCall(source, name, args)
-  }))
+  const callerId = await this.address()
 
   // Get block hash by height
   if (top && !isNaN(top)) {
     top = (await this.getKeyBlock(top)).hash
   }
 
+  // Prepare `call` transaction
+  const tx = await this.contractCallTx(R.merge(opt, {
+    callerId,
+    contractId: address,
+    callData: await this.contractEncodeCall(source, name, args),
+    nonce: top ? (await this.getAccount(callerId, { hash: top })).nonce + 1 : undefined
+  }))
+
   // Dry-run
   const [{ result: status, callObj, reason }] = (await this.txDryRun([tx], [{
     amount: opt.amount,
-    pubKey: await this.address()
+    pubKey: callerId
   }], top)).results
 
   // check response

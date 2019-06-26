@@ -3,7 +3,6 @@
 ## @aeternity/aepp-sdk/es/contract
 Contract Base module
 
-**Export**: Contract  
 **Example**  
 ```js
 import ContractBase from '@aeternity/aepp-sdk/es/contract'
@@ -13,6 +12,7 @@ import ContractBase from '@aeternity/aepp-sdk/es/contract'
     * [ContractBase([options])](#exp_module_@aeternity/aepp-sdk/es/contract--ContractBase) ⇒ `Object` ⏏
         * *[.contractEncodeCallDataAPI(source, name, args)](#module_@aeternity/aepp-sdk/es/contract--ContractBase+contractEncodeCallDataAPI) ⇒ `String`*
         * *[.contractDecodeDataAPI(type, data)](#module_@aeternity/aepp-sdk/es/contract--ContractBase+contractDecodeDataAPI) ⇒ `String`*
+        * *[.contractDecodeCallResultAPI(source, fn, callValue, callResult)](#module_@aeternity/aepp-sdk/es/contract--ContractBase+contractDecodeCallResultAPI) ⇒ `String`*
         * *[.contractDecodeCallDataBySourceAPI(source, function, callData)](#module_@aeternity/aepp-sdk/es/contract--ContractBase+contractDecodeCallDataBySourceAPI) ⇒ `String`*
         * *[.contractDecodeCallDataByCodeAPI(code, callData)](#module_@aeternity/aepp-sdk/es/contract--ContractBase+contractDecodeCallDataByCodeAPI) ⇒ `String`*
         * *[.compileContractAPI(code, [options])](#module_@aeternity/aepp-sdk/es/contract--ContractBase+compileContractAPI) ⇒ `Object`*
@@ -66,6 +66,23 @@ Decode data
 | --- | --- | --- |
 | type | `String` | Contract call result type |
 | data | `String` | Encoded contract call result |
+
+<a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+contractDecodeCallResultAPI"></a>
+
+#### *contractBase.contractDecodeCallResultAPI(source, fn, callValue, callResult) ⇒ `String`*
+Decode contract call result data
+
+**Kind**: instance abstract method of [`ContractBase`](#exp_module_@aeternity/aepp-sdk/es/contract--ContractBase)  
+**Returns**: `String` - - Decoded contract call result  
+**Category**: async  
+**rtype**: `(source: String, fn: String, callValue: String, callResult: String) => decodedResult: Promise[String]`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| source | `String` | Contract source |
+| fn | `String` | Fn name |
+| callValue | `String` | result data (cb_das...) |
+| callResult | `String` | contract call result status('ok', 'revert', ...) |
 
 <a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+contractDecodeCallDataBySourceAPI"></a>
 
