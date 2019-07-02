@@ -24,14 +24,9 @@
  * @export BrowserRuntimeConnection
  * @example import BrowserRuntimeConnection from '@aeternity/aepp-sdk/es/utils/wallet-connection/browser-runtime'
  */
-import WalletConnection from './index'
-import AsyncInit from '../async-init'
-
-const getBrowserAPI = () => {
-  if (chrome && chrome.runtime) return chrome
-  if (browser && browser.runtime) return browser
-  throw new Error('Browser is not detected')
-}
+import WalletConnection from '.'
+import AsyncInit from '../../async-init'
+import { getBrowserAPI } from '../helpers'
 
 function connect (onMessage, onDisconnect) {
   if (this.port) throw new Error('You already connected')

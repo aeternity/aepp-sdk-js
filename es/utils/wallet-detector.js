@@ -25,7 +25,7 @@
  * @example import BrowserRuntimeConnection from '@aeternity/aepp-sdk/es/utils/wallet-connection/browser-runtime'
  */
 import AsyncInit from './async-init'
-import BrowserRuntimeConnection from './wallet-connection/browser-runtime'
+import BrowserRuntimeConnection from './aepp-wallet-communication/wallet-connection/browser-runtime'
 
 const wallets = {}
 
@@ -51,12 +51,12 @@ const handleDetection = (onDetected) => (msg) => {
 }
 
 function scan (onDetected) {
-  this.handleWalletDetection = handleDetection(onDetected)
-  getWindow().addEventListener('message', this.handleWalletDetection, false)
+  this.walletDetectionHandler = handleDetection(onDetected)
+  getWindow().addEventListener('message', this.walletDetectionHandler, false)
 }
 
 function stopScan () {
-  getWindow().removeEventListener('message', this.handleWalletDetection, false)
+  getWindow().removeEventListener('message', this.walletDetectionHandler, false)
 }
 
 /**
