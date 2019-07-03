@@ -21,7 +21,7 @@ export const SUBSCRIPTION_TYPES = asEnum([
   'connected'
 ])
 
-const METHODS = {
+export const METHODS = {
   wallet: {
     [NOTIFICATIONS.readyToConnect]: 'wallet.await.connection',
     [NOTIFICATIONS.updateAddress]: 'wallet.update.address',
@@ -37,27 +37,5 @@ const METHODS = {
   [NOTIFICATIONS.closeConnection]: 'peer.connection.close'
 }
 
-const getMethod = (type) => R.pick([type], { ...METHODS, ...METHODS.wallet, ...METHODS.aepp })
-
-const message = (method, params) => ({ method, params })
-
-export const WALLET_HANDLRES = {
-  // NOTIFICATIONS
-  //
-  //  Send {
-  //    name: 'WAELLET',
-  //    network: 'ae_devnet',
-  //    id: 'asdasdasdasdasd',
-  //    icons: []
-  //  }
-  [NOTIFICATIONS.readyToConnect]: (instance) =>
-    () => instance.sendMessage(message(getMethod(NOTIFICATIONS.readyToConnect), instance.getWalletInfo()), true),
-  //  Send {
-  //    current: {
-  //      'ak_7a6sd8gyasdhasasfaash: { name: 'MyWhiteThingsAccount' }
-  //    },
-  //    connected: { // Same structure as for 'current' }
-  //  }
-  [NOTIFICATIONS.updateAddress]: (instance) =>
-    () => instance.sendMessage(message(getMethod(NOTIFICATIONS.updateAddress), instance.getAddresses()), true)
-}
+export const message = (method, params) => ({ method, params })
+export const responseMessage = (id, { error, result } = {}) => ({ id, ...(error || result ? error || result : {}) })

@@ -24,43 +24,34 @@
  * @export BrowserRuntimeConnection
  * @example import BrowserRuntimeConnection from '@aeternity/aepp-sdk/es/utils/wallet-connection/browser-runtime'
  */
-import AsyncInit from './async-init'
-import BrowserRuntimeConnection from './aepp-wallet-communication/wallet-connection/browser-runtime'
+import WalletConnection from '.'
+import AsyncInit from '../../async-init'
 
-const wallets = {}
-
-const getWindow = () => {
-  if (!window) throw new Error('Browser is not detected')
-  return window
+function connect (onMessage, onDisconnect) {
+  if (this.listener) throw new Error('You already connected')
+  this.listener = onMessage
+  self.addEventListener('message', this.listener, false)
+  this.onDisconnectCallback = onDisconnect
 }
 
-const handleDetection = (onDetected) => (msg) => {
-  if (!msg || !msg.data || msg.data.type === 'webpackOk') return undefined
-  const { data } = msg.data
-  const ifExist = wallets.hasOwnProperty(data.id)
-  if (msg && !ifExist) {
-    const w = {
-      ...data,
-      async getConnection () {
-        return BrowserRuntimeConnection({ connectionInfo: { extensionId: this.id } })
-      }
-    }
-    onDetected({ wallets, newWallet: w })
-    wallets[data.id] = w
-  }
+function disconnect () {
+  if (!this.listener) throw new Error('You dont have connection. Please connect before')
+  self.removeEventListener('message', this.listener, false)
+  this.onDisconnectCallback()
 }
 
-function scan (onDetected) {
-  this.walletDetectionHandler = handleDetection(onDetected)
-  getWindow().addEventListener('message', this.walletDetectionHandler, false)
+function onDisconnect (onDisconnect) {
+  if (!this.listener) throw new Error('You dont have connection. Please connect before')
+  this.onDisconnectCallback = onDisconnect
 }
 
-function stopScan () {
-  getWindow().removeEventListener('message', this.walletDetectionHandler, false)
+function sendMessage (msg) {
+  if (!this.listener) throw new Error('You dont have connection. Please connect before')
+  parent.postMessage(msg, '*')
 }
 
 /**
- * RemoteAccount
+ * BrowserWindowMessageConnection
  * @function
  * @alias module:@aeternity/aepp-sdk/es/account/remote
  * @rtype Stamp
@@ -70,10 +61,12 @@ function stopScan () {
  * @param {String} options.keypair.secretKey - Private key
  * @return {Account}
  */
-export const ExtWalletDetector = AsyncInit.compose({
-  async init () {
+export const BrowserWindowMessageConnection = AsyncInit.compose(WalletConnection, {
+  async init ({ connectionInfo = {}, parent = window.parent, self = window }) {
+    this.connectionInfo = connectionInfo
+    if (!connectionInfo.extensionId) throw new Error('Extension ID required.')
   },
-  methods: { scan, stopScan }
+  methods: { connect, sendMessage, disconnect, onDisconnect }
 })
 
-export default ExtWalletDetector
+export default BrowserWindowMessageConnection
