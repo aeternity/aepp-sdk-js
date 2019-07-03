@@ -12,15 +12,6 @@ JavaScript SDK for the revolutionary [æternity] blockchain, targeting the
 [æternity node]: https://github.com/aeternity/aeternity
 [hosted on GitHub]: https://github.com/aeternity/aepp-sdk-js
 
-#### Disclaimer
-
-This SDK is in continuos development where things can easily break, especially if you're not an officially released version. We aim to make all our
- releases as stable as possible, neverless it should not be taken as
-production-ready.
-
-To catch up with the more edgy state of development please
-check out the [develop branch].
-
 [develop branch]: https://github.com/aeternity/aepp-sdk-js/tree/develop
 
 ## Table of content
