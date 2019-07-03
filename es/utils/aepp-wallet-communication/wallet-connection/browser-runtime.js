@@ -29,26 +29,21 @@ import AsyncInit from '../../async-init'
 import { getBrowserAPI } from '../helpers'
 
 function connect (onMessage, onDisconnect) {
-  if (this.port) throw new Error('You already connected')
-  this.port = getBrowserAPI().runtime.connect(this.connectionInfo.id)
+  if (this.port.onMessage.hasListeners()) throw new Error('You already connected')
   this.onDisconnect(onDisconnect)
   this.port.onMessage.addListener(onMessage)
 }
 
 function disconnect () {
-  if (!this.port) throw new Error('You dont have connection. Please connect before')
   this.port.onDisconnect.dispatch()
-  this.port.disconnect()
 }
 
 function onDisconnect (onDisconnect) {
   if (!this.port) throw new Error('You dont have connection. Please connect before')
-  if (this.port) {
-    this.port.onDisconnect.addListener((walletConnection) => {
-      this.port = null
-      onDisconnect(walletConnection)
-    })
-  }
+  this.port.onDisconnect.addListener(() => {
+    typeof onDisconnect !== 'function' || onDisconnect(this)
+    this.port.disconnect()
+  })
 }
 
 function sendMessage (msg) {
@@ -68,9 +63,10 @@ function sendMessage (msg) {
  * @return {Account}
  */
 export const BrowserRuntimeConnection = AsyncInit.compose(WalletConnection, {
-  async init ({ connectionInfo = {} }) {
+  async init ({ connectionInfo = {}, port }) {
     this.connectionInfo = connectionInfo
-    if (!connectionInfo.id) throw new Error('Extension ID required.')
+    if (connectionInfo.id === undefined) throw new Error('ID required.')
+    this.port = port || getBrowserAPI().runtime.connect(connectionInfo.id)
   },
   methods: { connect, sendMessage, disconnect, onDisconnect }
 })

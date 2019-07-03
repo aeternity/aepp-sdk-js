@@ -26,33 +26,32 @@
  */
 import AsyncInit from '../async-init'
 import BrowserRuntimeConnection from './wallet-connection/browser-runtime'
-import { getWindow } from './helpers'
+import { METHODS } from './schema'
 
 const wallets = {}
 
 const handleDetection = (onDetected) => (msg) => {
   if (!msg || !msg.data || msg.data.type === 'webpackOk') return undefined
-  const { data } = msg
-  const ifExist = wallets.hasOwnProperty(data.id)
-  if (msg && !ifExist) {
+  const { data: { method, params } } = msg
+  const ifExist = wallets.hasOwnProperty(params.id)
+  if (method === METHODS.wallet.readyToConnect && !ifExist) {
     const w = {
-      ...data,
+      ...params,
       async getConnection () {
-        return BrowserRuntimeConnection({ connectionInfo: { extensionId: this.id } })
+        return BrowserRuntimeConnection({ connectionInfo: this })
       }
     }
+    wallets[w.id] = w
     onDetected({ wallets, newWallet: w })
-    wallets[data.id] = w
   }
 }
 
 function scan (onDetected) {
-  this.walletDetectionHandler = handleDetection(onDetected)
-  getWindow().addEventListener('message', this.walletDetectionHandler, false)
+  this.connection.connect(handleDetection(onDetected))
 }
 
 function stopScan () {
-  getWindow().removeEventListener('message', this.walletDetectionHandler, false)
+  this.connection.disconnect()
 }
 
 /**
@@ -67,7 +66,8 @@ function stopScan () {
  * @return {Account}
  */
 export const ExtWalletDetector = AsyncInit.compose({
-  async init () {
+  async init ({ connection }) {
+    this.connection = connection
   },
   methods: { scan, stopScan }
 })

@@ -30,24 +30,24 @@ import AsyncInit from '../../async-init'
 function connect (onMessage, onDisconnect) {
   if (this.listener) throw new Error('You already connected')
   this.listener = onMessage
-  self.addEventListener('message', this.listener, false)
-  this.onDisconnectCallback = onDisconnect
+  this.subscribeFn(this.listener)
+  this.onDisconnect(onDisconnect)
 }
 
 function disconnect () {
   if (!this.listener) throw new Error('You dont have connection. Please connect before')
-  self.removeEventListener('message', this.listener, false)
+  this.unsubscribeFn(this.listener)
   this.onDisconnectCallback()
 }
 
 function onDisconnect (onDisconnect) {
   if (!this.listener) throw new Error('You dont have connection. Please connect before')
-  this.onDisconnectCallback = onDisconnect
+  this.onDisconnectCallback = typeof onDisconnect === 'function' ? onDisconnect : () => true
 }
 
 function sendMessage (msg) {
   if (!this.listener) throw new Error('You dont have connection. Please connect before')
-  parent.postMessage(msg, '*')
+  this.postFn(msg)
 }
 
 /**
@@ -64,6 +64,9 @@ function sendMessage (msg) {
 export const BrowserWindowMessageConnection = AsyncInit.compose(WalletConnection, {
   async init ({ connectionInfo = {}, parent = window.parent, self = window }) {
     this.connectionInfo = connectionInfo
+    this.subscribeFn = (listener) => self.addEventListener('message', listener, false)
+    this.unsubscribeFn = (listener) => self.removeEventListener('message', listener, false)
+    this.postFn = (msg) => (parent || self).postMessage(msg, '*')
     if (!connectionInfo.id) throw new Error('Extension ID required.')
   },
   methods: { connect, sendMessage, disconnect, onDisconnect }
