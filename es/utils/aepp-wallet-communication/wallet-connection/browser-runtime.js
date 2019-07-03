@@ -30,7 +30,7 @@ import { getBrowserAPI } from '../helpers'
 
 function connect (onMessage, onDisconnect) {
   if (this.port) throw new Error('You already connected')
-  this.port = getBrowserAPI().runtime.connect(this.connectionInfo.extensionId)
+  this.port = getBrowserAPI().runtime.connect(this.connectionInfo.id)
   this.onDisconnect(onDisconnect)
   this.port.onMessage.addListener(onMessage)
 }
@@ -70,7 +70,7 @@ function sendMessage (msg) {
 export const BrowserRuntimeConnection = AsyncInit.compose(WalletConnection, {
   async init ({ connectionInfo = {} }) {
     this.connectionInfo = connectionInfo
-    if (!connectionInfo.extensionId) throw new Error('Extension ID required.')
+    if (!connectionInfo.id) throw new Error('Extension ID required.')
   },
   methods: { connect, sendMessage, disconnect, onDisconnect }
 })

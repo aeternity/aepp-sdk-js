@@ -1,6 +1,5 @@
 import * as R from 'ramda'
 
-import { METHODS, responseMessage, message } from '../utils/aepp-wallet-communication/schema'
 import { WalletClients } from './wallet-clients'
 
 import Ae from '../ae'
@@ -9,7 +8,8 @@ import Chain from '../chain/node'
 import Tx from '../tx/tx'
 import Contract from '../ae/contract'
 import Selector from '../account/selector'
-import { getBrowserAPI } from '../utils/aepp-wallet-communication/helpers'
+import { getBrowserAPI, sendWalletInfo, responseMessage, message } from '../utils/aepp-wallet-communication/helpers'
+import { METHODS } from '../utils/aepp-wallet-communication/schema'
 
 const clients = WalletClients()
 
@@ -22,8 +22,7 @@ const WALLET_HANDLERS = {
   //    id: 'asdasdasdasdasd',
   //    icons: []
   //  }
-  [METHODS.wallet.readyToConnect]: (instance) =>
-    (postFn) => postFn(message(METHODS.wallet.readyToConnect, instance.getWalletInfo())),
+  [METHODS.wallet.readyToConnect]: (instance) => (postFn) => sendWalletInfo(postFn, instance.getWalletInfo()),
   //  Send {
   //    current: {
   //      'ak_7a6sd8gyasdhasasfaash: { name: 'MyWhiteThingsAccount' }
@@ -61,7 +60,11 @@ const handleMessage = (instance, client) => async (msg) => {
   await WALLET_HANDLERS[msg.methods](instance, { client })(msg)
 }
 
-const sendWalletInfo = (postFn) => WALLET_HANDLERS[METHODS.wallet.readyToConnect](this)(postFn)
+const addClient = (connection) => {
+  connection.connect(handleMessage(this, connection), on)
+}
+
+const shareWalletInfo = (postFn) => WALLET_HANDLERS[METHODS.wallet.readyToConnect](this)(postFn)
 
 const getWalletInfo = () => ({
   id: getBrowserAPI().runtime.id,
@@ -84,7 +87,7 @@ export const Wallet = Ae.compose(Accounts, Chain, Tx, Contract, Selector, {
    //    })
    // })
   },
-  methods: { sendWalletInfo, getWalletInfo }
+  methods: { shareWalletInfo, getWalletInfo }
 })
 
 export default Wallet

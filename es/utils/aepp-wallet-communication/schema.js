@@ -36,6 +36,3 @@ export const METHODS = {
   [NOTIFICATIONS.updateNetwork]: 'peer.update.network',
   [NOTIFICATIONS.closeConnection]: 'peer.connection.close'
 }
-
-export const message = (method, params) => ({ method, params })
-export const responseMessage = (id, { error, result } = {}) => ({ id, ...(error || result ? error || result : {}) })

@@ -64,7 +64,7 @@ function sendMessage (msg) {
 export const BrowserWindowMessageConnection = AsyncInit.compose(WalletConnection, {
   async init ({ connectionInfo = {}, parent = window.parent, self = window }) {
     this.connectionInfo = connectionInfo
-    if (!connectionInfo.extensionId) throw new Error('Extension ID required.')
+    if (!connectionInfo.id) throw new Error('Extension ID required.')
   },
   methods: { connect, sendMessage, disconnect, onDisconnect }
 })
