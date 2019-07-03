@@ -16,7 +16,6 @@ JavaScript SDK for the revolutionary [æternity] blockchain, targeting the
 
 ## Table of content
 - [Æternity's Javascript SDK](#%C3%86ternitys-Javascript-SDK)
-      - [Disclaimer](#Disclaimer)
   - [Table of content](#Table-of-content)
   - [Quick Start](#Quick-Start)
     - [1. Install SDK](#1-Install-SDK)
