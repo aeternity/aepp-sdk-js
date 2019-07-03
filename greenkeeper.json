@@ -1,0 +1,11 @@
+{
+  "groups": {
+    "default": {
+      "packages": [
+        "examples/browser/vuejs/connect-two-ae/aepp/package.json",
+        "examples/browser/vuejs/connect-two-ae/identity/package.json",
+        "package.json"
+      ]
+    }
+  }
+}

@@ -3,7 +3,7 @@
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 [![Build Status](https://ci.aepps.com/buildStatus/icon?job=aepp-sdk-js/develop)](https://ci.aepps.com/job/aepp-sdk-js/job/develop/)
 [![npm](https://img.shields.io/npm/v/@aeternity/aepp-sdk.svg)](https://www.npmjs.com/package/@aeternity/aepp-sdk)
-[![npm](https://img.shields.io/npm/l/@aeternity/aepp-sdk.svg)](https://www.npmjs.com/package/@aeternity/aepp-sdk)
+[![npm](https://img.shields.io/npm/l/@aeternity/aepp-sdk.svg)](https://www.npmjs.com/package/@aeternity/aepp-sdk) [![Greenkeeper badge](https://badges.greenkeeper.io/aeternity/aepp-sdk-js.svg)](https://greenkeeper.io/)
 
 JavaScript SDK for the revolutionary [æternity] blockchain, targeting the
 [æternity node] implementation. Aepp-sdk is [hosted on GitHub].
@@ -12,20 +12,10 @@ JavaScript SDK for the revolutionary [æternity] blockchain, targeting the
 [æternity node]: https://github.com/aeternity/aeternity
 [hosted on GitHub]: https://github.com/aeternity/aepp-sdk-js
 
-#### Disclaimer
-
-This SDK is in continuos development where things can easily break, especially if you're not an officially released version. We aim to make all our
- releases as stable as possible, neverless it should not be taken as
-production-ready.
-
-To catch up with the more edgy state of development please
-check out the [develop branch].
-
 [develop branch]: https://github.com/aeternity/aepp-sdk-js/tree/develop
 
 ## Table of content
 - [Æternity's Javascript SDK](#%C3%86ternitys-Javascript-SDK)
-      - [Disclaimer](#Disclaimer)
   - [Table of content](#Table-of-content)
   - [Quick Start](#Quick-Start)
     - [1. Install SDK](#1-Install-SDK)
