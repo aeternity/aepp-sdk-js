@@ -32,7 +32,7 @@ const wallets = {}
 
 const handleDetection = (onDetected) => (msg) => {
   if (!msg || !msg.data || msg.data.type === 'webpackOk') return undefined
-  const { data } = msg.data
+  const { data } = msg
   const ifExist = wallets.hasOwnProperty(data.id)
   if (msg && !ifExist) {
     const w = {
