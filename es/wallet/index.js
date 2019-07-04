@@ -29,23 +29,22 @@ const WALLET_HANDLERS = {
   //    },
   //    connected: { // Same structure as for 'current' }
   //  }
-  [METHODS.wallet.updateAddress]: (instance, { client }) =>
+  [METHODS.wallet.updateAddress]: (instance, { id }) =>
     () => client.sendMessage(message(METHODS.wallet.updateAddress, instance.getAddresses()), true),
   //
   // RESPONSES
   //
   // Store client info and prepare two fn for each client `connect` and `denyConnection`
   // which automatically prepare and send response for that client
-  [METHODS.wallet.connect]: (instance, { client }) =>
+  [METHODS.wallet.connect]: (instance, { id }) =>
     (msg) => {
+    const client = clients.getClient(id)
       // Store new AEPP and wait for connection approve
-      clients.addClient({
-        id: msg.clientId,
-        status: 'WAITING_FOR_CONNECT',
+      clients.updateClient(client.id, {
+        status: 'WAITING_FOR_CONNECTION_APPROVE',
         name: msg.name,
         network: msg.network,
         icons: msg.icons,
-        port: client,
         acceptConnection: () => client.sendMessage(responseMessage(msg.id, { result: instance.getWalletInfo() }), true),
         denyConnection: (error) => client.sendMessage(responseMessage(msg.id, { error }), true)
       })
@@ -60,11 +59,16 @@ const handleMessage = (instance, client) => async (msg) => {
   await WALLET_HANDLERS[msg.methods](instance, { client })(msg)
 }
 
-const addClient = (connection) => {
-  connection.connect(handleMessage(this, connection), on)
+const addRpcClient = (clientConnection) => {
+  clientConnection.connect(handleMessage(this, clientConnection.connectionInfo.id), on)
+  clients.addClient({
+    id: clientConnection.connectionInfo.id,
+    status: 'WAITING_FOR_CONNECT',
+    connection: clientConnection
+  })
 }
 
-const shareWalletInfo = (postFn) => WALLET_HANDLERS[METHODS.wallet.readyToConnect](this)(postFn)
+const shareWalletInfo = (postFn) => sendWalletInfo(postFn, this.getWalletInfo())
 
 const getWalletInfo = () => ({
   id: getBrowserAPI().runtime.id,
@@ -87,7 +91,7 @@ export const Wallet = Ae.compose(Accounts, Chain, Tx, Contract, Selector, {
    //    })
    // })
   },
-  methods: { shareWalletInfo, getWalletInfo }
+  methods: { shareWalletInfo, getWalletInfo, addRpcClient }
 })
 
 export default Wallet
