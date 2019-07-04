@@ -1,5 +1,6 @@
 import stampit from '@stamp/it'
 import * as R from 'ramda'
+import { responseMessage } from '../utils/aepp-wallet-communication/helpers'
 
 
 export const WalletClients = stampit({
@@ -10,47 +11,61 @@ export const WalletClients = stampit({
     hasClient ({ id }) {
       return this.clients.has(id)
     },
-    addClient (client) {
-      if (this.hasClient(client.id)) throw new Error('Client already exist')
-      this.clients.set(client.id, WalletClient(client))
+    addClient (id, client) {
+      if (this.hasClient(id)) throw new Error('Client already exist')
+      this.clients.set(id, WalletClient({ ...client, id }))
     },
     getClient (id) {
       return this.clients.get(id)
+    },
+    updateClientInfo (id, info) {
+      const client = this.getClient(id)
+      client.info = { ...client.info, ...info }
+      this.clients.set(id, client)
     }
   }
 })
 
 
-const addCallback = (msgId, callback) => {
+function addCallback (msgId, callback) {
   if (this.callbacks.hasOwnProperty(msgId)) throw new Error('Callback Already exist')
   this.callbacks[msgId] = callback
 }
 
-const sendMessage = ({ id, method, params }, isNotificationOrResponse = false) => {
+function sendMessage ({ id, method, params, result, error }, isNotificationOrResponse = false) {
   isNotificationOrResponse || (this.messageId += 1)
-  id = R.ifElse(isNotificationOrResponse, id || null, this.messageId)
-
+  id = isNotificationOrResponse ? (id || null) : this.messageId
+  const msgData = params
+    ? { params }
+    : result
+      ? { result }
+      : { error }
   this.connection.sendMessage({
     jsonrpc: '2.0',
-    ...R.ifElse(id, { id }, {}),
+    ...id ? { id } : {},
     method,
-    params,
+    ...msgData,
   })
+}
+
+const receive = (handler, ins) => (msg) => {
+  // Increment id for each request
+  if (msg.id && +msg.id > ins.messageId) ins.messageId += 1
+  handler(msg)
 }
 
 
 export const WalletClient = stampit({
-  init ({ id, name, network, icons, connection }) {
+  init ({ id, name, network, icons, connection, handlers: [onMessage, onDisconnect] }) {
     this.id = id
-    this.name = name
-    this.network = network
-    this.icons = icons
     this.connection = connection
+    this.info = { name, network, icons }
     this.messageId = 0
     // {
     //    [msg.id]: { resolve, reject }
     // }
     this.callbacks = {}
+    connection.connect(receive(onMessage, this), onDisconnect)
   },
   methods: {
     addCallback,

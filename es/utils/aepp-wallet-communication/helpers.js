@@ -14,6 +14,6 @@ export const getWindow = () => {
 
 export const message = (method, params) => ({ method, params })
 
-export const responseMessage = (id, { error, result } = {}) => ({ id, ...(error || result ? error || result : {}) })
+export const responseMessage = (id, method, { error, result } = {}) => ({ id, method, ...(error ? { error } : { result }) })
 
 export const sendWalletInfo = (postFn, walletInfo) => postFn(message(METHODS.wallet.readyToConnect, walletInfo))
