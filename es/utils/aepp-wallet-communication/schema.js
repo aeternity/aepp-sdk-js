@@ -46,6 +46,6 @@ export const ERRORS = {
   subscriptionDeny: (error = {}) => ({
     code: 5,
     data: error,
-    message: "Subscription denied"
+    message: 'Subscription denied'
   })
 }

@@ -23,7 +23,7 @@ const WALLET_HANDLERS = {
   // Store client info and prepare two fn for each client `connect` and `denyConnection`
   // which automatically prepare and send response for that client
   [METHODS.aepp.connect]: (instance, { client }) =>
-    ({ id, method, params: { name, network, version, icons }}) => {
+    ({ id, method, params: { name, network, version, icons } }) => {
       // @Todo Add network and protocol compatibility check
 
       const accept = (id) => () => {
@@ -49,14 +49,20 @@ const WALLET_HANDLERS = {
   [METHODS.aepp.subscribeAddress]: (instance, { client }) =>
     ({ id, method, params: { type, value } }) => {
       const accept = (id) =>
-        () => { client.sendMessage(responseMessage(id, method, { result: { subscription: client.updateSubscription(type, value), addresses: instance.getAccounts() } }), true) }
+        () => {
+          client.sendMessage(responseMessage(id, method, {
+            result: {
+              subscription: client.updateSubscription(type, value),
+              addresses: instance.getAccounts()
+            }
+          }), true)
+        }
       const deny = (id) => (error) => client.sendMessage(responseMessage(id, METHODS.aepp.connect, { error: ERRORS.subscriptionDeny(error) }), true)
 
       rpcClients.updateClientInfo(client.id, { status: 'WAITING_FOR_SUBSCRIPTION' })
       instance.onSubscription({ ...client, allowSubscription: accept(id), denySubscription: deny(id) })
     }
 }
-
 
 const handleMessage = (instance, id) => async (msg) => {
   await WALLET_HANDLERS[msg.method](instance, { client: rpcClients.getClient(id) })(msg)
@@ -82,8 +88,7 @@ function getWalletInfo () {
   }
 }
 
-function getAccounts() {
-  debugger
+function getAccounts () {
   return {
     current: this.Selector.address ? { [this.Selector.address]: this.accounts[this.Selector.address].meta } : {},
     connected: Object

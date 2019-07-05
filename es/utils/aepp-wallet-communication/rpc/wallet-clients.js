@@ -24,7 +24,6 @@ export const WalletClients = stampit({
   }
 })
 
-
 function addCallback (msgId, callback) {
   if (this.callbacks.hasOwnProperty(msgId)) throw new Error('Callback Already exist')
   this.callbacks[msgId] = callback
@@ -42,7 +41,7 @@ const sendMessage = (messageId, connection) => ({ id, method, params, result, er
     jsonrpc: '2.0',
     ...id ? { id } : {},
     method,
-    ...msgData,
+    ...msgData
   })
 }
 
@@ -51,7 +50,6 @@ const receive = (handler, ins) => (msg) => {
   if (msg.id && +msg.id > ins.messageId) ins.messageId += 1
   handler(msg)
 }
-
 
 export const WalletClient = stampit({
   init ({ id, name, network, icons, connection, handlers: [onMessage, onDisconnect] }) {
