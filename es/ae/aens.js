@@ -159,14 +159,11 @@ async function query (name) {
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param {String} name
  * @param {String} salt
- * @param {Number} waitForHeight
  * @param {Record} [options={}]
  * @return {Promise<Object>} the result of the claim
  */
-async function claim (name, salt, waitForHeight, options = {}) {
+async function claim (name, salt, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  // wait until block was mined before send claim transaction
-  // if (waitForHeight) await this.awaitHeight(waitForHeight, { attempts: 200 })
   const claimTx = await this.nameClaimTx(R.merge(opt, {
     accountId: await this.address(),
     nameSalt: salt,
