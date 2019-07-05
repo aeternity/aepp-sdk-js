@@ -16,9 +16,14 @@ export const REQUESTS = asEnum([
   'broadcast'
 ])
 
-export const SUBSCRIPTION_TYPES = asEnum([
+export const SUBSCRIPTION_VALUES = asEnum([
   'current',
   'connected'
+])
+
+export const SUBSCRIPTION_TYPES = asEnum([
+  'subscribe',
+  'unsubscribe'
 ])
 
 export const METHODS = {
@@ -31,8 +36,16 @@ export const METHODS = {
   aepp: {
     [REQUESTS.connect]: 'aepp.request.connect',
     [REQUESTS.sign]: 'aepp.subscribe.address',
-    [REQUESTS.subscribeAddress]: 'aepp.request.sign'
+    [REQUESTS.subscribeAddress]: 'aepp.subscribe.address'
   },
   [NOTIFICATIONS.updateNetwork]: 'peer.update.network',
   [NOTIFICATIONS.closeConnection]: 'peer.connection.close'
+}
+
+export const ERRORS = {
+  subscriptionDeny: (error = {}) => ({
+    code: 5,
+    data: error,
+    message: "Subscription denied"
+  })
 }

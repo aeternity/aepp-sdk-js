@@ -27,7 +27,7 @@ import AsyncInit from './utils/async-init'
 import * as R from 'ramda'
 
 async function signWith (address, data) {
-  const account = this.accounts[address]
+  const { account } = this.accounts[address]
 
   if (account === undefined) {
     throw Error(`Account for ${address} not available`)
@@ -36,9 +36,9 @@ async function signWith (address, data) {
   return account.sign(data)
 }
 
-async function addAccount (account, { select } = {}) {
+async function addAccount (account, { select, meta } = {}) {
   const address = await account.address()
-  this.accounts[address] = account
+  this.accounts[address] = { account, meta }
   if (select) this.selectAccount(address)
 }
 
@@ -58,7 +58,7 @@ async function addAccount (account, { select } = {}) {
  */
 const Accounts = stampit(AsyncInit, {
   async init ({ accounts = [] }) {
-    this.accounts = R.fromPairs(await Promise.all(accounts.map(async a => [await a.address(), a])))
+    this.accounts = R.fromPairs(await Promise.all(accounts.map(async a => [await a.address(), { account: a, meta: a.meta || {} }])))
   },
   props: {
     accounts: {}

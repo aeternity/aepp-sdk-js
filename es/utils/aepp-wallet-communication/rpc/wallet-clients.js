@@ -1,7 +1,5 @@
 import stampit from '@stamp/it'
-import * as R from 'ramda'
-import { responseMessage } from '../utils/aepp-wallet-communication/helpers'
-
+import { SUBSCRIPTION_TYPES } from '../schema'
 
 export const WalletClients = stampit({
   init () {
@@ -32,15 +30,15 @@ function addCallback (msgId, callback) {
   this.callbacks[msgId] = callback
 }
 
-function sendMessage ({ id, method, params, result, error }, isNotificationOrResponse = false) {
-  isNotificationOrResponse || (this.messageId += 1)
-  id = isNotificationOrResponse ? (id || null) : this.messageId
+const sendMessage = (messageId, connection) => ({ id, method, params, result, error }, isNotificationOrResponse = false) => {
+  isNotificationOrResponse || (messageId += 1)
+  id = isNotificationOrResponse ? (id || null) : messageId
   const msgData = params
     ? { params }
     : result
       ? { result }
       : { error }
-  this.connection.sendMessage({
+  connection.sendMessage({
     jsonrpc: '2.0',
     ...id ? { id } : {},
     method,
@@ -57,18 +55,28 @@ const receive = (handler, ins) => (msg) => {
 
 export const WalletClient = stampit({
   init ({ id, name, network, icons, connection, handlers: [onMessage, onDisconnect] }) {
+    let messageId = 0
     this.id = id
     this.connection = connection
     this.info = { name, network, icons }
-    this.messageId = 0
     // {
     //    [msg.id]: { resolve, reject }
     // }
     this.callbacks = {}
+    this.addressSubscription = []
+    this.sendMessage = sendMessage(messageId, this.connection)
+
     connection.connect(receive(onMessage, this), onDisconnect)
   },
   methods: {
-    addCallback,
-    sendMessage
+    updateSubscription (type, value) {
+      if (type === SUBSCRIPTION_TYPES.subscribe && !this.addressSubscription.includes(value)) {
+        this.addressSubscription.push(value)
+      }
+      if (type === SUBSCRIPTION_TYPES.unsubscribe && this.addressSubscription.includes(value)) {
+        this.addressSubscription = this.addressSubscription.filter(s => s !== value)
+      }
+    },
+    addCallback
   }
 })

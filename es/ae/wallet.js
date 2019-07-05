@@ -32,6 +32,7 @@ import Selector from '../account/selector'
 import * as R from 'ramda'
 import Tx from '../tx/tx'
 import Contract from './contract'
+import { WalletRpc } from '../utils/aepp-wallet-communication/rpc/wallet-rpc'
 
 const contains = R.flip(R.contains)
 const isTxMethod = contains(Tx.compose.deepConfiguration.Ae.methods)
@@ -153,5 +154,7 @@ const Wallet = Ae.compose(Accounts, Chain, Tx, Contract, Rpc, Selector, {
     }
   }
 })
+
+export const RpcWallet = Ae.compose(Chain, Tx, Contract, WalletRpc)
 
 export default Wallet
