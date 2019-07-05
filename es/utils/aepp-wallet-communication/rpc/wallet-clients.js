@@ -59,9 +59,9 @@ const sendMessage = (messageId, connection) => ({ id, method, params, result, er
   return id
 }
 
-const receive = (handler, ins) => (msg) => {
+const receive = (handler, msgId) => (msg) => {
   // Increment id for each request
-  if (msg.id && +msg.id > ins.messageId) ins.messageId += 1
+  if (msg.id && +msg.id > msgId) msgId += 1
   handler(msg)
 }
 
@@ -78,7 +78,7 @@ export const WalletClient = stampit({
     this.addressSubscription = []
     this.sendMessage = sendMessage(messageId, this.connection)
 
-    connection.connect(receive(onMessage, this), onDisconnect)
+    connection.connect(receive(onMessage, messageId), onDisconnect)
   },
   methods: {
     updateSubscription (type, value) {
