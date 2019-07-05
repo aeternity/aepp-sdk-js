@@ -31,13 +31,12 @@ function addCallback (msgId) {
   })
 }
 
-function resolveCallback(msgId, args = []) {
+function resolveCallback (msgId, args = []) {
   if (!this.callbacks[msgId]) throw new Error(`Can't find callback for this messageId ${msgId}`)
   this.callbacks[msgId].resolve(...args)
 }
 
-
-function rejectCallback(msgId, args = []) {
+function rejectCallback (msgId, args = []) {
   if (!this.callbacks[msgId]) throw new Error(`Can't find callback for this messageId ${msgId}`)
   return this.callbacks[msgId].reject(...args)
 }
