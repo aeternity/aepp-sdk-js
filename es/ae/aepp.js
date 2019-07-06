@@ -25,7 +25,10 @@
 import Ae from './'
 import Aens from './aens'
 import Rpc from '../rpc/client'
-import { Contract } from './contract'
+import Contract from './contract'
+import AeppRpc from '../utils/aepp-wallet-communication/rpc/aepp-rpc'
+import Chain from '../chain/node'
+import Tx from '../tx/tx'
 
 /**
  * Aepp Stamp
@@ -40,5 +43,6 @@ import { Contract } from './contract'
  * @return {Object} Aepp instance
  */
 const Aepp = Ae.compose(Contract, Aens, Rpc)
+export const RpcAepp = Ae.compose(Chain, Tx, Contract, Aens, AeppRpc)
 
 export default Aepp

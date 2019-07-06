@@ -35,7 +35,7 @@ export const METHODS = {
   },
   aepp: {
     [REQUESTS.connect]: 'aepp.request.connect',
-    [REQUESTS.sign]: 'aepp.subscribe.address',
+    [REQUESTS.sign]: 'aepp.sign.tx',
     [REQUESTS.subscribeAddress]: 'aepp.subscribe.address'
   },
   [NOTIFICATIONS.updateNetwork]: 'peer.update.network',

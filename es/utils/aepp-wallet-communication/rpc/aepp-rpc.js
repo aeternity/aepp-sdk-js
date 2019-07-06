@@ -29,8 +29,13 @@ const AEPP_RESPONSES = {
       result ? instance.rpcClient.resolveCallback(id) : instance.rpcClient.rejectCallback(id, error)
     },
   [METHODS.aepp.subscribeAddress]: (instance) =>
-    (msg) => {
-      result ? instance.rpcClient.resolveCallback(id) : instance.rpcClient.rejectCallback(id, error)
+    ({ id, result, error }) => {
+      if (result) {
+        this.accounts = result.addresses
+        instance.rpcClient.resolveCallback(id, [result])
+      } else {
+        instance.rpcClient.rejectCallback(id, [error])
+      }
     },
   [METHODS.aepp.sign]: (instance) =>
     (msg) => {
@@ -49,7 +54,7 @@ const AEPP_REQUEST = {
 
 const sendConnectRequest = (instance) =>
   () => instance.rpcClient.addCallback(
-    instance.rpcClient.sendMessage(message(METHODS.aepp.connect, { name, version, network: instance.nodeNetworkId }))
+    instance.rpcClient.sendMessage(message(METHODS.aepp.connect, { name: instance.name, version: 1, network: instance.nodeNetworkId }))
   )
 
 const subscribeAddress = (instance) =>
@@ -93,13 +98,17 @@ export const AeppRpc = Ae.compose(Account, {
     // METHODS
     this.sendConnectRequest = sendConnectRequest(this)
     this.subscribeAddress = subscribeAddress(this)
-    this.address = address(this)
-    this.sign = sign(instance)
   },
   methods: {
     getAddress() {
       if (!this.accounts.current || !Object.keys(this.accounts.current).length) throw new Error('You do not subscribed for any accounts.')
       return Object.keys(this.accounts.current)[0]
+    },
+    sign (tx) {
+      return sign(this)(tx)
+    },
+    address () {
+      return address(this)()
     }
   }
 })
