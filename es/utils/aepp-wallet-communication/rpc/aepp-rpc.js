@@ -1,10 +1,9 @@
 import Ae from '../../../ae'
 
-import { WalletClient, } from './wallet-clients'
+import { WalletClient } from './wallet-clients'
 import { message } from '../helpers'
-import { ERRORS, METHODS } from '../schema'
+import { METHODS } from '../schema'
 import Account from '../../../account'
-
 
 const AEPP_NOTIFICATION = {
   [METHODS.wallet.updateAddress]: (instance) =>
@@ -14,18 +13,16 @@ const AEPP_NOTIFICATION = {
   [METHODS.wallet.updateNetwork]: (instance) =>
     (msg) => {
       instance.onNetworkChange(msg.params)
-
     },
   [METHODS.wallet.closeConnection]: (instance) =>
     (msg) => {
       instance.onDisconnect(msg.params)
-
-    },
+    }
 }
 
 const AEPP_RESPONSES = {
   [METHODS.aepp.connect]: (instance) =>
-    ({id, result, error}) => {
+    ({ id, result, error }) => {
       result ? instance.rpcClient.resolveCallback(id) : instance.rpcClient.rejectCallback(id, error)
     },
   [METHODS.aepp.subscribeAddress]: (instance) =>
@@ -39,7 +36,7 @@ const AEPP_RESPONSES = {
     },
   [METHODS.aepp.sign]: (instance) =>
     (msg) => {
-      result ? instance.rpcClient.resolveCallback(id) : instance.rpcClient.rejectCallback(id, error)
+      // result ? instance.rpcClient.resolveCallback(id) : instance.rpcClient.rejectCallback(id, error)
     }
 }
 
@@ -50,25 +47,26 @@ const AEPP_REQUEST = {
     }
 }
 
-
-
 const sendConnectRequest = (instance) =>
   () => instance.rpcClient.addCallback(
-    instance.rpcClient.sendMessage(message(METHODS.aepp.connect, { name: instance.name, version: 1, network: instance.nodeNetworkId }))
+    instance.rpcClient.sendMessage(message(METHODS.aepp.connect, {
+      name: instance.name,
+      version: 1,
+      network: instance.nodeNetworkId
+    }))
   )
 
 const subscribeAddress = (instance) =>
   (type, value) => instance.rpcClient.addCallback(
-    instance.rpcClient.sendMessage(message(METHODS.aepp.subscribeAddress, { type, value  }))
+    instance.rpcClient.sendMessage(message(METHODS.aepp.subscribeAddress, { type, value }))
   )
 
 const address = (instance) => instance.getAddress()
 
 const sign = (instance) =>
   (tx) => instance.rpcClient.addCallback(
-   instance.rpcClient.sendMessage(message(METHODS.aepp.subscribeAddress, { tx  }))
+    instance.rpcClient.sendMessage(message(METHODS.aepp.subscribeAddress, { tx }))
   )
-
 
 const handleMessage = (instance) => async (msg) => {
   if (!msg.id) {
@@ -88,7 +86,12 @@ export const AeppRpc = Ae.compose(Account, {
     this.account = {}
 
     // Init RPCClient
-    this.rpcClient = WalletClient({ connection, network: this.nodeNetworkId, name, handlers: [handleMessage(this), this.onDisconnect]})
+    this.rpcClient = WalletClient({
+      connection,
+      network: this.nodeNetworkId,
+      name,
+      handlers: [handleMessage(this), this.onDisconnect]
+    })
 
     // Event callbacks
     this.onDisconnect = onDisconnect
@@ -100,7 +103,7 @@ export const AeppRpc = Ae.compose(Account, {
     this.subscribeAddress = subscribeAddress(this)
   },
   methods: {
-    getAddress() {
+    getAddress () {
       if (!this.accounts.current || !Object.keys(this.accounts.current).length) throw new Error('You do not subscribed for any accounts.')
       return Object.keys(this.accounts.current)[0]
     },
