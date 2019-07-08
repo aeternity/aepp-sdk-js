@@ -8,12 +8,22 @@ import { ERRORS, METHODS } from '../schema'
 
 const rpcClients = WalletClients()
 
-const WALLET_HANDLERS = {
-  [METHODS.wallet.updateAddress]: (instance, { client }) =>
-    () => client.sendMessage(message(METHODS.wallet.updateAddress, instance.getAccounts()), true),
-  //
-  // RESPONSES
-  //
+const NOTIFICATIONS = {
+  [METHODS.wallet.updateNetwork]: (instance) =>
+    (msg) => {
+      instance.onNetworkChange(msg.params)
+    },
+  [METHODS.wallet.closeConnection]: (instance) =>
+    (msg) => {
+      instance.onDisconnect(msg.params)
+    }
+}
+
+const RESPONSES = {
+
+}
+
+const REQUESTS = {
   // Store client info and prepare two fn for each client `connect` and `denyConnection`
   // which automatically prepare and send response for that client
   [METHODS.aepp.connect]: (instance, { client }) =>
@@ -38,7 +48,7 @@ const WALLET_HANDLERS = {
         version
       })
       // Call onConnection callBack top notice extension about new AEPP
-      instance.onConnection({ ...client, ...{ acceptConnection: accept(id), denyConnection: deny(id) } })
+      instance.onConnection(client, client.addAction({ id, method, params: { name, network, version } }, [accept(id), deny(id)]))
     },
   [METHODS.aepp.subscribeAddress]: (instance, { client }) =>
     ({ id, method, params: { type, value } }) => {
@@ -54,26 +64,33 @@ const WALLET_HANDLERS = {
       const deny = (id) => (error) => client.sendMessage(responseMessage(id, METHODS.aepp.connect, { error: ERRORS.subscriptionDeny(error) }), true)
 
       rpcClients.updateClientInfo(client.id, { status: 'WAITING_FOR_SUBSCRIPTION', resolver: { accept: accept(id), deny: deny(id) } })
-      instance.onSubscription({ ...client, allowSubscription: accept(id), denySubscription: deny(id) })
+      instance.onSubscription(client, client.addAction({ id, method, params: { type, value } }, [accept(id), deny(id)]))
     },
   [METHODS.aepp.sign]: (instance, { client }) =>
     ({ id, method, params: { tx } }) => {
-      const accept = (id) => async () => client.sendMessage(responseMessage(id, method, { result: { signedTransaction: await instance.signTransaction(tx) } }), true)
+      const accept = (id) => async () => client.sendMessage(responseMessage(id, method, { result: { signedTransaction: Buffer.from(await instance.sign(tx)) } }), true)
       const deny = (id) => (error) => client.sendMessage(responseMessage(id, method, { error: ERRORS.signDeny(error) }), true)
 
       instance.onSign(client, client.addAction({ id, method, params: { tx } }, [accept(id), deny(id)]))
     }
 }
 
-const handleMessage = (instance, id) => async (msg) => {
-  await WALLET_HANDLERS[msg.method](instance, { client: rpcClients.getClient(id) })(msg)
+const handleMessage = (instance, client) => async (msg) => {
+  if (!msg.id) {
+    return NOTIFICATIONS[msg.method](instance, { client })(msg)
+  }
+  if (client.callbacks.hasOwnProperty(msg.id)) {
+    return RESPONSES[msg.method](instance, { client })(msg)
+  } else {
+    return REQUESTS[msg.method](instance, { client })(msg)
+  }
 }
 
 function addRpcClient (clientConnection) {
   rpcClients.addClient(clientConnection.connectionInfo.id, {
     info: { status: 'WAITING_FOR_CONNECT' },
     connection: clientConnection,
-    handlers: [handleMessage(this, clientConnection.connectionInfo.id), this.onDisconnect]
+    handlers: [handleMessage(this, rpcClients.getClient(clientConnection.connectionInfo.id)), this.onDisconnect]
   })
 }
 
@@ -100,11 +117,14 @@ function getAccounts () {
 }
 
 export const WalletRpc = Ae.compose(Accounts, Selector, {
-  init ({ icons, name, onConnection, onSubscription, onSign, onDisconnect }) {
+  init ({ icons, name, onConnection, onSubscription, onSign, onDisconnect, onNetworkChange }) {
+    // CallBacks for events
     this.onConnection = onConnection
     this.onSubscription = onSubscription
     this.onSign = onSign
     this.onDisconnect = onDisconnect
+    this.onNetworkChange = onNetworkChange
+    //
     this.name = name
   },
   methods: { shareWalletInfo, getWalletInfo, addRpcClient, getAccounts }

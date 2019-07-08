@@ -2,10 +2,10 @@ import Ae from '../../../ae'
 
 import { WalletClient } from './wallet-clients'
 import { message } from '../helpers'
-import { METHODS } from '../schema'
+import { METHODS, REQUESTS } from '../schema'
 import Account from '../../../account'
 
-const WALLET_NOTIFICATION = {
+const NOTIFICATIONS = {
   [METHODS.wallet.updateAddress]: (instance) =>
     (msg) => {
       instance.onAddressChange(msg.params)
@@ -20,7 +20,7 @@ const WALLET_NOTIFICATION = {
     }
 }
 
-const AEPP_RESPONSES = {
+const RESPONSES = {
   [METHODS.aepp.connect]: (instance) =>
     ({ id, result, error }) => {
       result ? instance.rpcClient.resolveCallback(id) : instance.rpcClient.rejectCallback(id, [error])
@@ -70,10 +70,11 @@ const sign = (instance) =>
 
 const handleMessage = (instance) => async (msg) => {
   if (!msg.id) {
-    return WALLET_NOTIFICATION[msg.method](instance)(msg)
-  }
-  if (instance.rpcClient.callbacks.hasOwnProperty(msg.id)) {
-    return AEPP_RESPONSES[msg.method](instance)(msg)
+    return NOTIFICATIONS[msg.method](instance)(msg)
+  } else if (instance.rpcClient.callbacks.hasOwnProperty(msg.id)) {
+    return RESPONSES[msg.method](instance)(msg)
+  } else {
+    return REQUESTS[msg.method](instance)(msg)
   }
 }
 
@@ -105,8 +106,7 @@ export const AeppRpc = Ae.compose(Account, {
       if (!this.accounts.current || !Object.keys(this.accounts.current).length) throw new Error('You do not subscribed for any accounts.')
       return Object.keys(this.accounts.current)[0]
     },
-    sign (tx) {},
-    signTransaction (tx) {
+    sign (tx) {
       return sign(this)(tx)
     },
     address () {
