@@ -17,3 +17,5 @@ export const message = (method, params) => ({ method, params })
 export const responseMessage = (id, method, { error, result } = {}) => ({ id, method, ...(error ? { error } : { result }) })
 
 export const sendWalletInfo = (postFn, walletInfo) => postFn(message(METHODS.wallet.readyToConnect, walletInfo))
+
+export const sendResponseMessage = (client) => (id, method, data) => client.sendMessage(responseMessage(id, method, data), true)

@@ -3,7 +3,7 @@ import Accounts from '../../../accounts'
 import Selector from '../../../account/selector'
 
 import { WalletClients } from './wallet-clients'
-import { getBrowserAPI, sendWalletInfo, responseMessage, message } from '../helpers'
+import { getBrowserAPI, message, sendResponseMessage } from '../helpers'
 import { ERRORS, METHODS } from '../schema'
 
 const rpcClients = WalletClients()
@@ -26,14 +26,13 @@ const REQUESTS = {
   // which automatically prepare and send response for that client
   [METHODS.aepp.connect]: (instance, { client }) =>
     ({ id, method, params: { name, network, version, icons } }) => {
-
       const accept = (id) => () => {
         rpcClients.updateClientInfo(client.id, { status: 'CONNECTED' })
-        client.sendMessage(responseMessage(id, METHODS.aepp.connect, { result: instance.getWalletInfo() }), true)
+        sendResponseMessage(client)(id, method, { result: instance.getWalletInfo() })
       }
       const deny = (id) => (error) => {
         rpcClients.updateClientInfo(client.id, { status: 'CONNECTION_REJECTED' })
-        client.sendMessage(responseMessage(id, METHODS.aepp.connect, { error }), true)
+        sendResponseMessage(client)(id, METHODS.aepp.connect, { error })
       }
 
       // Store new AEPP and wait for connection approve
@@ -55,23 +54,24 @@ const REQUESTS = {
   [METHODS.aepp.subscribeAddress]: (instance, { client }) =>
     ({ id, method, params: { type, value } }) => {
       const accept = (id) =>
-        () => {
-          client.sendMessage(responseMessage(id, method, {
+        () => sendResponseMessage(client)(
+          id,
+          method,
+          {
             result: {
               subscription: client.updateSubscription(type, value),
               addresses: instance.getAccounts()
             }
-          }), true)
-        }
-      const deny = (id) => (error) => client.sendMessage(responseMessage(id, methods, { error: ERRORS.subscriptionDeny(error) }), true)
+          })
+      const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.subscriptionDeny(error) })
 
       rpcClients.updateClientInfo(client.id, { status: 'WAITING_FOR_SUBSCRIPTION' })
       instance.onSubscription(client, client.addAction({ id, method, params: { type, value } }, [accept(id), deny(id)]))
     },
   [METHODS.aepp.sign]: (instance, { client }) =>
     ({ id, method, params: { tx } }) => {
-      const accept = (id) => async () => client.sendMessage(responseMessage(id, method, { result: { signedTransaction: Buffer.from(await instance.sign(tx)) } }), true)
-      const deny = (id) => (error) => client.sendMessage(responseMessage(id, method, { error: ERRORS.signDeny(error) }), true)
+      const accept = (id) => async () => sendResponseMessage(client)(id, method, { result: { signedTransaction: Buffer.from(await instance.sign(tx)) } })
+      const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.signDeny(error) })
 
       instance.onSign(client, client.addAction({ id, method, params: { tx } }, [accept(id), deny(id)]))
     }
@@ -129,6 +129,14 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
           .filter(a => a[0] !== this.Selector.address)
           .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {})
       }
+    },
+    selectAccount (address) {
+      this.Selector.address = address
+      // Send notification 'update.address' to all Aepp which are subscribed for account update
+      rpcClients.sentNotificationByCondition(
+        message(METHODS.wallet.updateAddress, this.getAccounts()),
+        (client) => client.addressSubscription.includes(this.Selector.address)
+      )
     }
   }
 })
