@@ -102,9 +102,9 @@ export const AeppRpc = Ae.compose(Account, {
     },
     sendConnectRequest () {
       return this.rpcClient.sendMessage(message(METHODS.aepp.connect, {
-        name: instance.name,
+        name: this.name,
         version: 1,
-        network: instance.nodeNetworkId
+        network: this.nodeNetworkId
       }))
     }
   }
