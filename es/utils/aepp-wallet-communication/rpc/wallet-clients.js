@@ -31,9 +31,20 @@ function addCallback (msgId) {
   })
 }
 
-function addAction (action, [accept, deny]) {
+function addAction (action, [r, j]) {
+  const removeAction = ((ins) => (id) => delete ins[id])(this.actions)
   if (this.callbacks.hasOwnProperty(action.id)) throw new Error('Action for this request already exist')
-  this.actions[action.id] = { ...action, accept, deny }
+  this.actions[action.id] = {
+    ...action,
+    accept () {
+      removeAction(action.id)
+      r()
+    },
+    deny () {
+      removeAction(action.id)
+      j()
+    }
+  }
   return this.actions[action.id]
 }
 

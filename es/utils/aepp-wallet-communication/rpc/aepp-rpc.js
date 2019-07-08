@@ -7,8 +7,9 @@ import Account from '../../../account'
 
 const NOTIFICATIONS = {
   [METHODS.wallet.updateAddress]: (instance) =>
-    (msg) => {
-      instance.onAddressChange(msg.params)
+    ({ params }) => {
+      instance.accounts = params.addresses
+      instance.onAddressChange(params)
     },
   [METHODS.wallet.updateNetwork]: (instance) =>
     (msg) => {
@@ -22,67 +23,54 @@ const NOTIFICATIONS = {
 
 const RESPONSES = {
   [METHODS.aepp.connect]: (instance) =>
-    ({ id, result, error }) => {
-      result ? instance.rpcClient.resolveCallback(id) : instance.rpcClient.rejectCallback(id, [error])
+    (msg) => {
+      processResponse(instance)(msg)
     },
   [METHODS.aepp.subscribeAddress]: (instance) =>
-    ({ id, result, error }) => {
-      if (result) {
-        instance.accounts = result.addresses
-        instance.rpcClient.resolveCallback(id, [result])
-      } else {
-        instance.rpcClient.rejectCallback(id, [error])
-      }
+    (msg) => {
+      processResponse(instance)(
+        msg,
+        ({ id, result }) => {
+          instance.accounts = result.addresses
+          return [result]
+        }
+      )
     },
   [METHODS.aepp.sign]: (instance) =>
-    ({ id, result, error }) => {
-      if (result) {
-        const { signedTransaction, transactionHash } = result
-        instance.rpcClient.resolveCallback(id, [signedTransaction || transactionHash])
-      } else if (error) {
-        instance.rpcClient.rejectCallback(id, [error])
-      }
+    (msg) => {
+      processResponse(instance)(msg, ({ id, result }) => [result.signedTransaction || result.transactionHash])
     }
 }
 
-const sendConnectRequest = (instance) =>
-  () => instance.rpcClient.addCallback(
-    instance.rpcClient.sendMessage(message(METHODS.aepp.connect, {
-      name: instance.name,
-      version: 1,
-      network: instance.nodeNetworkId
-    }))
-  )
-
-const subscribeAddress = (instance) =>
-  (type, value) => instance.rpcClient.addCallback(
-    instance.rpcClient.sendMessage(message(METHODS.aepp.subscribeAddress, { type, value }))
-  )
-
-const address = (instance) => instance.getAddress()
-
-const sign = (instance) =>
-  (tx) => instance.rpcClient.addCallback(
-    instance.rpcClient.sendMessage(message(METHODS.aepp.sign, { tx }))
-  )
-
-//
+const processResponse = (instance) => ({ id, error, result }, fn) => {
+  if (result) {
+    instance.rpcClient.resolveCallback(id, fn({ id, result, error }))
+  } else if (error) {
+    instance.rpcClient.rejectCallback(id, [error])
+  }
+}
 
 const handleMessage = (instance) => async (msg) => {
   if (!msg.id) {
-    return NOTIFICATIONS[msg.method](instance)(msg)
+    return getHandler(NOTIFICATIONS, msg)(instance)(msg)
   } else if (instance.rpcClient.callbacks.hasOwnProperty(msg.id)) {
-    return RESPONSES[msg.method](instance)(msg)
+    return getHandler(RESPONSES, msg)(instance)(msg)
   } else {
-    return REQUESTS[msg.method](instance)(msg)
+    return getHandler(REQUESTS, msg)(instance)(msg)
   }
+}
+
+const getHandler = (schema, msg) => {
+  const handler = schema[msg.method]
+  if (!handler || typeof handler !== 'function') console.warning(`Unknown message method ${msg.method}`)
+  return handler
 }
 
 export const AeppRpc = Ae.compose(Account, {
   init ({ icons, name, onAddressChange, onDisconnect, onNetworkChange, connection }) {
     this.connection = connection
     this.name = name
-    this.account = {}
+    this.accounts = {}
 
     // Init RPCClient
     this.rpcClient = WalletClient({
@@ -96,21 +84,28 @@ export const AeppRpc = Ae.compose(Account, {
     this.onDisconnect = onDisconnect
     this.onAddressChange = onAddressChange
     this.onNetworkChange = onNetworkChange
-
-    // METHODS
-    this.sendConnectRequest = sendConnectRequest(this)
-    this.subscribeAddress = subscribeAddress(this)
   },
   methods: {
-    getAddress () {
-      if (!this.accounts.current || !Object.keys(this.accounts.current).length) throw new Error('You do not subscribed for any accounts.')
+    address () {
+      if (!this.accounts.current || !Object.keys(this.accounts.current).length) throw new Error('You do not subscribed for account.')
       return Object.keys(this.accounts.current)[0]
     },
     sign (tx) {
-      return sign(this)(tx)
+      return this.rpcClient.addCallback(
+        this.rpcClient.sendMessage(message(METHODS.aepp.sign, { tx }))
+      )
     },
-    address () {
-      return address(this)
+    subscribeAddress (type, value) {
+      return this.rpcClient.addCallback(
+        this.rpcClient.sendMessage(message(METHODS.aepp.subscribeAddress, { type, value }))
+      )
+    },
+    sendConnectRequest () {
+      return this.rpcClient.sendMessage(message(METHODS.aepp.connect, {
+        name: instance.name,
+        version: 1,
+        network: instance.nodeNetworkId
+      }))
     }
   }
 })

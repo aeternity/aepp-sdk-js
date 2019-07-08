@@ -19,16 +19,13 @@ const NOTIFICATIONS = {
     }
 }
 
-const RESPONSES = {
-
-}
+const RESPONSES = {}
 
 const REQUESTS = {
   // Store client info and prepare two fn for each client `connect` and `denyConnection`
   // which automatically prepare and send response for that client
   [METHODS.aepp.connect]: (instance, { client }) =>
     ({ id, method, params: { name, network, version, icons } }) => {
-      // @Todo Add network and protocol compatibility check
 
       const accept = (id) => () => {
         rpcClients.updateClientInfo(client.id, { status: 'CONNECTED' })
@@ -47,8 +44,13 @@ const REQUESTS = {
         icons,
         version
       })
+
       // Call onConnection callBack top notice extension about new AEPP
-      instance.onConnection(client, client.addAction({ id, method, params: { name, network, version } }, [accept(id), deny(id)]))
+      instance.onConnection(client, client.addAction({
+        id,
+        method,
+        params: { name, network, version }
+      }, [accept(id), deny(id)]))
     },
   [METHODS.aepp.subscribeAddress]: (instance, { client }) =>
     ({ id, method, params: { type, value } }) => {
@@ -61,9 +63,9 @@ const REQUESTS = {
             }
           }), true)
         }
-      const deny = (id) => (error) => client.sendMessage(responseMessage(id, METHODS.aepp.connect, { error: ERRORS.subscriptionDeny(error) }), true)
+      const deny = (id) => (error) => client.sendMessage(responseMessage(id, methods, { error: ERRORS.subscriptionDeny(error) }), true)
 
-      rpcClients.updateClientInfo(client.id, { status: 'WAITING_FOR_SUBSCRIPTION', resolver: { accept: accept(id), deny: deny(id) } })
+      rpcClients.updateClientInfo(client.id, { status: 'WAITING_FOR_SUBSCRIPTION' })
       instance.onSubscription(client, client.addAction({ id, method, params: { type, value } }, [accept(id), deny(id)]))
     },
   [METHODS.aepp.sign]: (instance, { client }) =>
@@ -75,7 +77,8 @@ const REQUESTS = {
     }
 }
 
-const handleMessage = (instance, client) => async (msg) => {
+const handleMessage = (instance, id) => async (msg) => {
+  const client = rpcClients.getClient(id)
   if (!msg.id) {
     return NOTIFICATIONS[msg.method](instance, { client })(msg)
   }
@@ -83,36 +86,6 @@ const handleMessage = (instance, client) => async (msg) => {
     return RESPONSES[msg.method](instance, { client })(msg)
   } else {
     return REQUESTS[msg.method](instance, { client })(msg)
-  }
-}
-
-function addRpcClient (clientConnection) {
-  rpcClients.addClient(clientConnection.connectionInfo.id, {
-    info: { status: 'WAITING_FOR_CONNECT' },
-    connection: clientConnection,
-    handlers: [handleMessage(this, rpcClients.getClient(clientConnection.connectionInfo.id)), this.onDisconnect]
-  })
-}
-
-function shareWalletInfo (postFn) {
-  sendWalletInfo(postFn, this.getWalletInfo())
-}
-
-function getWalletInfo () {
-  return {
-    id: getBrowserAPI().runtime.id,
-    name: this.name,
-    network: this.nodeNetworkId
-  }
-}
-
-function getAccounts () {
-  return {
-    current: this.Selector.address ? { [this.Selector.address]: this.accounts[this.Selector.address].meta } : {},
-    connected: Object
-      .entries(this.address)
-      .filter(a => a[0] !== this.Selector.address)
-      .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {})
   }
 }
 
@@ -127,7 +100,37 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
     //
     this.name = name
   },
-  methods: { shareWalletInfo, getWalletInfo, addRpcClient, getAccounts }
+  methods: {
+    addRpcClient (clientConnection) {
+      rpcClients.addClient(
+        clientConnection.connectionInfo.id,
+        {
+          info: { status: 'WAITING_FOR_CONNECT' },
+          connection: clientConnection,
+          handlers: [handleMessage(this, clientConnection.connectionInfo.id), this.onDisconnect]
+        }
+      )
+    },
+    shareWalletInfo (postFn) {
+      postFn(message(METHODS.wallet.readyToConnect, this.getWalletInfo()))
+    },
+    getWalletInfo () {
+      return {
+        id: getBrowserAPI().runtime.id,
+        name: this.name,
+        network: this.nodeNetworkId
+      }
+    },
+    getAccounts () {
+      return {
+        current: this.Selector.address ? { [this.Selector.address]: this.accounts[this.Selector.address].meta } : {},
+        connected: Object
+          .entries(this.address)
+          .filter(a => a[0] !== this.Selector.address)
+          .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {})
+      }
+    }
+  }
 })
 
 export default WalletRpc
