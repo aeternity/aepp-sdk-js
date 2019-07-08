@@ -174,7 +174,7 @@ async function claim (name, salt, options = {}) {
 
   return {
     ...result,
-    ...(await this.aensQuery(name))
+    ...opt.waitMined && await this.aensQuery(name)
   }
 }
 
