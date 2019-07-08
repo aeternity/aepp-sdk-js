@@ -31,6 +31,12 @@ function addCallback (msgId) {
   })
 }
 
+function addAction (action, [accept, deny]) {
+  if (this.callbacks.hasOwnProperty(action.id)) throw new Error('Action for this request already exist')
+  this.actions[action.id] = { ...action, accept, deny }
+  return this.actions[action.id]
+}
+
 function resolveCallback (msgId, args = []) {
   if (!this.callbacks[msgId]) throw new Error(`Can't find callback for this messageId ${msgId}`)
   this.callbacks[msgId].resolve(...args)
@@ -74,6 +80,7 @@ export const WalletClient = stampit({
     //    [msg.id]: { resolve, reject }
     // }
     this.callbacks = {}
+    this.actions = {}
     this.addressSubscription = []
     this.sendMessage = sendMessage(messageId, this.connection)
 
@@ -88,6 +95,7 @@ export const WalletClient = stampit({
         this.addressSubscription = this.addressSubscription.filter(s => s !== value)
       }
     },
+    addAction,
     addCallback,
     resolveCallback,
     rejectCallback

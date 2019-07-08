@@ -9,12 +9,6 @@ import { ERRORS, METHODS } from '../schema'
 const rpcClients = WalletClients()
 
 const WALLET_HANDLERS = {
-  //  Send {
-  //    current: {
-  //      'ak_7a6sd8gyasdhasasfaash: { name: 'MyWhiteThingsAccount' }
-  //    },
-  //    connected: { // Same structure as for 'current' }
-  //  }
   [METHODS.wallet.updateAddress]: (instance, { client }) =>
     () => client.sendMessage(message(METHODS.wallet.updateAddress, instance.getAccounts()), true),
   //
@@ -59,8 +53,15 @@ const WALLET_HANDLERS = {
         }
       const deny = (id) => (error) => client.sendMessage(responseMessage(id, METHODS.aepp.connect, { error: ERRORS.subscriptionDeny(error) }), true)
 
-      rpcClients.updateClientInfo(client.id, { status: 'WAITING_FOR_SUBSCRIPTION' })
+      rpcClients.updateClientInfo(client.id, { status: 'WAITING_FOR_SUBSCRIPTION', resolver: { accept: accept(id), deny: deny(id) } })
       instance.onSubscription({ ...client, allowSubscription: accept(id), denySubscription: deny(id) })
+    },
+  [METHODS.aepp.sign]: (instance, { client }) =>
+    ({ id, method, params: { tx } }) => {
+      const accept = (id) => async () => client.sendMessage(responseMessage(id, method, { result: { signedTransaction: await instance.signTransaction(tx) } }), true)
+      const deny = (id) => (error) => client.sendMessage(responseMessage(id, method, { error: ERRORS.signDeny(error) }), true)
+
+      instance.onSign(client, client.addAction({ id, method, params: { tx } }, [accept(id), deny(id)]))
     }
 }
 
