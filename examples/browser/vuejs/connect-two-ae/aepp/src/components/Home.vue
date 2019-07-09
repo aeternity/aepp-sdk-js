@@ -142,7 +142,14 @@
 
 <script>
   //  is a webpack alias present in webpack.config.js
-  import { Aepp } from '@aeternity/aepp-sdk/es'
+  import { RpcAepp } from '@aeternity/aepp-sdk/es'
+  import Detector from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector'
+  import BrowserWindowMessageConnection from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-connection/browser-window-message'
+
+  // Send wallet connection info to Aepp throug content script
+  const NODE_URL = 'http://localhost:3013'
+  const NODE_INTERNAL_URL = 'http://localhost:3113'
+  const COMPILER_URL = 'https://compiler.aepps.com'
 
   export default {
     data () {
@@ -226,11 +233,41 @@
       }
     },
     async created () {
-      this.client = await Aepp({
-        parent: this.runningInFrame ? window.parent : await this.getReverseWindow()
+      const detector = await Detector({ connection: await BrowserWindowMessageConnection({ connectionInfo: { id: 'spy' }}) })
+      detector.scan(async ({ wallets, newWallet }) => {
+          const connection = await newWallet.getConnection()
+          if (confirm(`Do you want to connect to wallet ${newWallet}`)) {
+            detector.stopScan()
+
+            const name = 'MyAepp'
+            this.client = await RpcAepp({
+              url: NODE_URL,
+              internalUrl: NODE_INTERNAL_URL,
+              compilerUrl: COMPILER_URL,
+              connection,
+              name,
+              onAddressChange (a) {
+                debugger
+              },
+              onDisconnect (a) {
+                debugger
+
+              },
+              onNetworkChange (a) {
+                debugger
+              }
+            })
+            // Send connection request
+            await this.client.sendConnectRequest()
+            // Send subscribe address request
+            const adresses = await this.client.subscribeAddress('subscribe', 'current')
+            // Make spend tx
+            let a = this.client
+            debugger
+            this.pub = await this.client.address().catch(e => `Rejected: ${e}`)
+            this.height = await this.client.height()
+          }
       })
-      this.pub = await this.client.address().catch(e => `Rejected: ${e}`)
-      this.height = await this.client.height()
     }
   }
 </script>

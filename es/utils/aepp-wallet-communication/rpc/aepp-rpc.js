@@ -31,10 +31,10 @@ const RESPONSES = {
       processResponse(instance)(
         msg,
         ({ id, result }) => {
-          instance.accounts = result.addresses
           return [result]
         }
       )
+      if (msg.result && msg.result.hasOwnProperty('addresses')) instance.accounts = msg.result.addresses
     },
   [METHODS.aepp.sign]: (instance) =>
     (msg) => {
@@ -44,7 +44,7 @@ const RESPONSES = {
 
 const processResponse = (instance) => ({ id, error, result }, transformResult) => {
   if (result) {
-    instance.rpcClient.resolveCallback(id, typeof fn === 'function' ? transformResult({ id, result }) : result)
+    instance.rpcClient.resolveCallback(id, typeof transformResult === 'function' ? transformResult({ id, result }) : [result])
   } else if (error) {
     instance.rpcClient.rejectCallback(id, [error])
   }
@@ -62,7 +62,10 @@ const handleMessage = (instance) => async (msg) => {
 
 const getHandler = (schema, msg) => {
   const handler = schema[msg.method]
-  if (!handler || typeof handler !== 'function') console.warning(`Unknown message method ${msg.method}`)
+  if (!handler || typeof handler !== 'function') {
+    console.log(`Unknown message method ${msg.method}`)
+    return () => () => true
+  }
   return handler
 }
 
@@ -86,26 +89,28 @@ export const AeppRpc = Ae.compose(Account, {
     this.onNetworkChange = onNetworkChange
   },
   methods: {
-    address () {
+    async address () {
       if (!this.accounts.current || !Object.keys(this.accounts.current).length) throw new Error('You do not subscribed for account.')
       return Object.keys(this.accounts.current)[0]
     },
-    sign (tx) {
+    async sign (tx) {
       return this.rpcClient.addCallback(
         this.rpcClient.sendMessage(message(METHODS.aepp.sign, { tx }))
       )
     },
-    subscribeAddress (type, value) {
+    async subscribeAddress (type, value) {
       return this.rpcClient.addCallback(
         this.rpcClient.sendMessage(message(METHODS.aepp.subscribeAddress, { type, value }))
       )
     },
-    sendConnectRequest () {
-      return this.rpcClient.sendMessage(message(METHODS.aepp.connect, {
-        name: this.name,
-        version: 1,
-        network: this.nodeNetworkId
-      }))
+    async sendConnectRequest () {
+      return this.rpcClient.addCallback(
+        this.rpcClient.sendMessage(message(METHODS.aepp.connect, {
+          name: this.name,
+          version: 1,
+          network: this.nodeNetworkId
+        }))
+      )
     }
   }
 })

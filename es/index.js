@@ -33,6 +33,7 @@ import Contract from './ae/contract'
 import ContractCompilerAPI from './contract/compiler'
 import Wallet from './ae/wallet'
 import Aepp from './ae/aepp'
+import { RpcAepp } from './ae/aepp'
 import Oracle from './ae/oracle'
 import OracleNodeAPI from './oracle/node'
 import Selector from './account/selector'
@@ -49,6 +50,7 @@ export {
   ContractCompilerAPI,
   ContractACI,
   ChainNode,
+  RpcAepp,
   Channel,
   Crypto,
   Chain,
