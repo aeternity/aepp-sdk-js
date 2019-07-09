@@ -42,9 +42,9 @@ const RESPONSES = {
     }
 }
 
-const processResponse = (instance) => ({ id, error, result }, fn) => {
+const processResponse = (instance) => ({ id, error, result }, transformResult) => {
   if (result) {
-    instance.rpcClient.resolveCallback(id, fn({ id, result, error }))
+    instance.rpcClient.resolveCallback(id, typeof fn === 'function' ? transformResult({ id, result }) : result)
   } else if (error) {
     instance.rpcClient.rejectCallback(id, [error])
   }
