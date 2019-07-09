@@ -27,6 +27,7 @@ import Tx from '../tx'
 import Chain from '../chain'
 import Account from '../account'
 import TxBuilder from '../tx/builder'
+import Node from '../node'
 import * as R from 'ramda'
 import { BigNumber } from 'bignumber.js'
 
@@ -104,6 +105,11 @@ function destroyInstance () {
   destroyMethods.forEach(m => this[m] && typeof this[m] === 'function' && this[m]())
 }
 
+function setNode (node) {
+  const isNodeInstance = node instanceof Node
+  Object.assign(this, node)
+}
+
 /**
  * Basic Ae Stamp
  *
@@ -124,7 +130,7 @@ function destroyInstance () {
  * @return {Object} Ae instance
  */
 const Ae = stampit(Tx, Account, Chain, {
-  methods: { send, spend, transferFunds, destroyInstance },
+  methods: { send, spend, transferFunds, destroyInstance, setNode },
   deepProps: { Ae: { defaults: {} } }
 })
 
