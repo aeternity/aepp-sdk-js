@@ -80,13 +80,22 @@ const REQUESTS = {
 const handleMessage = (instance, id) => async (msg) => {
   const client = rpcClients.getClient(id)
   if (!msg.id) {
-    return NOTIFICATIONS[msg.method](instance, { client })(msg)
+    return getHandler(NOTIFICATIONS, msg)(instance, { client })(msg)
   }
   if (client.callbacks.hasOwnProperty(msg.id)) {
-    return RESPONSES[msg.method](instance, { client })(msg)
+    return getHandler(RESPONSES, msg)(instance, { client })(msg)
   } else {
-    return REQUESTS[msg.method](instance, { client })(msg)
+    return getHandler(REQUESTS, msg)(instance, { client })(msg)
   }
+}
+
+const getHandler = (schema, msg) => {
+  const handler = schema[msg.method]
+  if (!handler || typeof handler !== 'function') {
+    console.log(`Unknown message method ${msg.method}`)
+    return () => () => true
+  }
+  return handler
 }
 
 export const WalletRpc = Ae.compose(Accounts, Selector, {

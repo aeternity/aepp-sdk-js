@@ -233,40 +233,26 @@
       }
     },
     async created () {
-      const detector = await Detector({ connection: await BrowserWindowMessageConnection({ connectionInfo: { id: 'spy' }}) })
-      detector.scan(async ({ wallets, newWallet }) => {
-          const connection = await newWallet.getConnection()
-          if (confirm(`Do you want to connect to wallet ${newWallet}`)) {
-            detector.stopScan()
-
-            const name = 'MyAepp'
-            this.client = await RpcAepp({
-              url: NODE_URL,
-              internalUrl: NODE_INTERNAL_URL,
-              compilerUrl: COMPILER_URL,
-              connection,
-              name,
-              onAddressChange (a) {
-                debugger
-              },
-              onDisconnect (a) {
-                debugger
-
-              },
-              onNetworkChange (a) {
-                debugger
-              }
-            })
-            // Send connection request
-            await this.client.sendConnectRequest()
-            // Send subscribe address request
-            const adresses = await this.client.subscribeAddress('subscribe', 'current')
-            // Make spend tx
-            let a = this.client
-            debugger
-            this.pub = await this.client.address().catch(e => `Rejected: ${e}`)
-            this.height = await this.client.height()
-          }
+      const connection = await BrowserWindowMessageConnection({
+        connectionInfo: { id: 'spy' },
+        target: window.parent
+      })
+      const detector = await Detector({connection})
+      detector.scan(async (wallets, wallet) => {
+        detector.stopScan()
+        const client = await RpcAepp({
+          name: 'AEPP',
+          connection: await BrowserWindowMessageConnection({
+            target: window.parent,
+            name: 'Wallet'
+          }),
+          url: NODE_URL,
+          internalUrl: NODE_INTERNAL_URL,
+          compilerUrl: COMPILER_URL
+        })
+        await client.sendConnectRequest()
+        await client.subscribeAddress('subscribe', 'current')
+        console.log(await client.address())
       })
     }
   }

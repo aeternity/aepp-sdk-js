@@ -36,13 +36,14 @@
       Loading Aepp...
     </div>
     <!-- external app -->
-    <iframe v-show="aeppUrl" ref="aepp" class="w-full h-screen border border-black border-dashed bg-grey-light mx-auto mt-4 shadow" src="about:blank" frameborder="1"></iframe>
+    <iframe v-show="aeppUrl" ref="aepp" class="w-full h-screen border border-black border-dashed bg-grey-light mx-auto mt-4 shadow" name="aepp" src="http://localhost:9001" frameborder="1"></iframe>
   </div>
 </template>
 
 <script>
   // AE_SDK_MODULES is a webpack alias present in webpack.config.js
-  import { Wallet, MemoryAccount } from '@aeternity/aepp-sdk/es'
+  import { Wallet, MemoryAccount, RpcWallet } from '@aeternity/aepp-sdk/es'
+  import BrowserWindowMessageConnection from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-connection/browser-window-message'
 
   export default {
     data () {
@@ -65,23 +66,36 @@
       }
     },
     async created () {
-      this.client = await Wallet({
+      this.client = await RpcWallet({
         url: this.url,
         internalUrl: this.internalUrl,
         compilerUrl: this.compilerUrl,
         accounts: [MemoryAccount({keypair: {secretKey: this.priv, publicKey: this.pub}})],
         address: this.pub,
-        onTx: this.confirmDialog,
-        onChain: this.confirmDialog,
-        onAccount: this.confirmDialog,
-        onContract: this.confirmDialog
+        onConnection (aepp ,{ accept, deny }) {
+          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to connect`)) {
+            accept()
+          }
+        },
+        onSubscription(aepp ,{ accept, deny }) {
+          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to subscribe address`)) {
+            accept()
+          }
+        },
+        onSign(aepp ,{ accept, deny, params }) {
+          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to sign ${JSON.stringify(params.tx)}`)) {
+            accept()
+          }
+        },
+        onDisconnect(a ,b) {
+        }
       })
-
-      if (!this.runningInFrame) this.$refs.aepp.src = this.aeppUrl
-      else window.parent.postMessage({ jsonrpc: '2.0', method: 'ready' }, '*')
-
-      this.height = await this.client.height()
-      this.balance = await this.client.balance(this.pub).catch(() => 0)
+      const connection = await BrowserWindowMessageConnection({
+        connectionInfo: { id: 'Aepp' },
+        target: window.frames.aepp,
+      })
+      this.client.addRpcClient(connection)
+      this.client.shareWalletInfo(connection.sendMessage.bind(connection))
     }
   }
 </script>

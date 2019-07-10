@@ -30,14 +30,15 @@ import { METHODS } from './schema'
 
 const wallets = {}
 
-const handleDetection = (onDetected) => (msg) => {
-  if (!msg || !msg.data || !msg.data.method || msg.data.type === 'webpackOk') return undefined
-  const { data: { method, params = {} } } = msg
+const handleDetection = (onDetected) => ({ method, params }) => {
+  if (!method || !params) return
   const ifExist = wallets.hasOwnProperty(params.id)
   if (method === METHODS.wallet.readyToConnect && !ifExist) {
     const w = {
       ...params,
       async getConnection () {
+        // Todo if detect wallet in iframe
+        // if detect extension wallet
         return BrowserRuntimeConnection({ connectionInfo: this })
       }
     }

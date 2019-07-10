@@ -26,10 +26,14 @@
  */
 import WalletConnection from '.'
 import AsyncInit from '../../async-init'
+import uuid from 'uuid/v4'
 
 function connect (onMessage, onDisconnect) {
   if (this.listener) throw new Error('You already connected')
-  this.listener = onMessage
+  this.listener = (msg) => {
+    if (!msg || typeof msg.data !== 'object') return
+    onMessage(msg.data)
+  }
   this.subscribeFn(this.listener)
   this.onDisconnect(onDisconnect)
 }
@@ -38,6 +42,7 @@ function disconnect () {
   if (!this.listener) throw new Error('You dont have connection. Please connect before')
   this.unsubscribeFn(this.listener)
   this.onDisconnectCallback()
+  this.listener = null
 }
 
 function onDisconnect (onDisconnect) {
@@ -62,12 +67,13 @@ function sendMessage (msg) {
  * @return {Account}
  */
 export const BrowserWindowMessageConnection = AsyncInit.compose(WalletConnection, {
-  async init ({ connectionInfo = {}, parent = window.parent, self = window }) {
-    this.connectionInfo = connectionInfo
+  async init ({ connectionInfo = {}, target, self = window }) {
+    this.connectionInfo = { ...{ id: uuid() }, ...connectionInfo }
+
     this.subscribeFn = (listener) => self.addEventListener('message', listener, false)
     this.unsubscribeFn = (listener) => self.removeEventListener('message', listener, false)
-    this.postFn = (msg) => (parent || self).postMessage(msg, '*')
-    if (!connectionInfo.id) throw new Error('Extension ID required.')
+    this.postFn = (msg) => (target).postMessage(msg, '*')
+    if (!this.connectionInfo.id) throw new Error('Extension ID required.')
   },
   methods: { connect, sendMessage, disconnect, onDisconnect }
 })
