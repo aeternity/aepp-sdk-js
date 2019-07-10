@@ -27,7 +27,6 @@ import Tx from '../tx'
 import Chain from '../chain'
 import Account from '../account'
 import TxBuilder from '../tx/builder'
-import Node from '../node'
 import * as R from 'ramda'
 import { BigNumber } from 'bignumber.js'
 
@@ -106,7 +105,6 @@ function destroyInstance () {
 }
 
 function setNode (node) {
-  const isNodeInstance = node instanceof Node
   Object.assign(this, node)
 }
 

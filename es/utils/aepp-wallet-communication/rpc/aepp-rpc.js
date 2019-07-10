@@ -24,17 +24,19 @@ const NOTIFICATIONS = {
 const RESPONSES = {
   [METHODS.aepp.connect]: (instance) =>
     (msg) => {
+      if (msg.result) instance.rpcClient.info.status = 'CONNECTED'
       processResponse(instance)(msg)
     },
   [METHODS.aepp.subscribeAddress]: (instance) =>
     (msg) => {
+      if (msg.result && msg.result.hasOwnProperty('addresses')) instance.accounts = msg.result.addresses
+
       processResponse(instance)(
         msg,
         ({ id, result }) => {
           return [result]
         }
       )
-      if (msg.result && msg.result.hasOwnProperty('addresses')) instance.accounts = msg.result.addresses
     },
   [METHODS.aepp.sign]: (instance) =>
     (msg) => {

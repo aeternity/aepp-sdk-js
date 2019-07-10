@@ -42,7 +42,7 @@ import Tx from '../tx/tx'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Aepp instance
  */
-const Aepp = Ae.compose(Contract, Aens, Rpc)
+export const Aepp = Ae.compose(Contract, Aens, Rpc)
 export const RpcAepp = Ae.compose(Chain, Tx, Contract, Aens, AeppRpc)
 
 export default Aepp
