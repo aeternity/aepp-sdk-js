@@ -31,8 +31,8 @@ import { METHODS } from './schema'
 const wallets = {}
 
 const handleDetection = (onDetected) => (msg) => {
-  if (!msg || !msg.data || msg.data.type === 'webpackOk') return undefined
-  const { data: { method, params } } = msg
+  if (!msg || !msg.data || !msg.data.method || msg.data.type === 'webpackOk') return undefined
+  const { data: { method, params = {} } } = msg
   const ifExist = wallets.hasOwnProperty(params.id)
   if (method === METHODS.wallet.readyToConnect && !ifExist) {
     const w = {
