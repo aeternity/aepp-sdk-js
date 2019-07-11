@@ -14,7 +14,7 @@ const NOTIFICATIONS = {
     (msg) => {
       instance.onNetworkChange(msg.params)
     },
-  [METHODS.wallet.closeConnection]: (instance) =>
+  [METHODS.closeConnection]: (instance) =>
     (msg) => {
       instance.onDisconnect(msg.params)
     }
@@ -112,12 +112,14 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
   },
   methods: {
     addRpcClient (clientConnection) {
+      const id = uuid()
       rpcClients.addClient(
-        clientConnection.connectionInfo.id,
+        id,
         {
+          id,
           info: { status: 'WAITING_FOR_CONNECT' },
           connection: clientConnection,
-          handlers: [handleMessage(this, clientConnection.connectionInfo.id), this.onDisconnect]
+          handlers: [handleMessage(this, id), this.onDisconnect]
         }
       )
     },

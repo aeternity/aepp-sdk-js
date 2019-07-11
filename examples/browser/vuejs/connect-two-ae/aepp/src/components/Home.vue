@@ -22,6 +22,23 @@
           {{height}}
         </div>
       </div>
+      <div v-if="balance" class="bg-green w-full flex flex-row font-mono border border-b">
+        <div class="p-2 w-1/4">
+          Balance
+        </div>
+        <div class="p-2 w-3/4 bg-grey-lightest">
+          {{balance}}
+        </div>
+      </div>
+      <div v-if="walletName" class="bg-green w-full flex flex-row font-mono border border-b">
+        <div class="p-2 w-1/4">
+          Wallet
+        </div>
+        <div class="p-2 w-3/4 bg-grey-lightest">
+          {{walletName}}
+        </div>
+      </div>
+      <button v-if="walletName" class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 text-xs" @click="disconnect">Disconnect</button>
     </div>
 
     <h2 class="mt-4">Spend tokens</h2>
@@ -163,6 +180,7 @@
         spendPayload: null,
         spendResult: null,
         spendError: null,
+        balance: null,
         contractCode: `contract Identity =
       type state = ()
       function main(x : int) = x`,
@@ -172,7 +190,8 @@
         deployInfo: null,
         deployError: null,
         callResult: null,
-        callError: null
+        callError: null,
+        walletName: null
       }
     },
     methods: {
@@ -216,51 +235,51 @@
           this.callError = err
         }
       },
+      async disconnect() {
+        await this.client.disconnectWallet()
+        this.walletName = null
+        this.pub = null
+        this.balance = null
+        await this.scanForWallets()
+      },
       async getReverseWindow() {
         const iframe = document.createElement('iframe')
         iframe.src = prompt('Enter wallet URL', 'http://localhost:9000')
         iframe.style.display = 'none'
         document.body.appendChild(iframe)
-        // await new Promise(resolve => {
-        //   const handler = ({ data }) => {
-        //     if (data.method !== 'ready') return
-        //     window.removeEventListener('message', handler)
-        //     resolve()
-        //   }
-        //   window.addEventListener('message', handler)
-        // })
         return iframe.contentWindow
+      },
+      async scanForWallets () {
+        const scannerConnection = await BrowserWindowMessageConnection({
+          connectionInfo: { id: 'spy' }
+        })
+        const detector = await Detector({ connection: scannerConnection })
+        const handleWallets = async function ({ wallets, newWallet }) {
+          if (confirm(`Do you want to connect to wallet ${newWallet.name}`)) {
+            detector.stopScan()
+
+            await this.client.connectToWallet(await newWallet.getConnection())
+            await this.client.subscribeAddress('subscribe', 'current')
+            this.pub = await this.client.address()
+            this.balance = await this.client.balance(this.pub)
+            this.walletName = this.client.rpcClient.info.name
+          }
+        }
+        detector.scan(handleWallets.bind(this))
       }
     },
     async created () {
-      // window.addEventListener('message', (msg) => {
-      //   debugger
-      // }, false)
-      const target = window === window.parent ? await this.getReverseWindow() : window.parent
+      // Open iframe with Wallet if run in top window
+      window !== window.parent || await this.getReverseWindow()
       //
-      const scannerConnection = await BrowserWindowMessageConnection({
-        connectionInfo: { id: 'spy' }
+      this.client = await RpcAepp({
+        name: 'AEPP',
+        url: NODE_URL,
+        internalUrl: NODE_INTERNAL_URL,
+        compilerUrl: COMPILER_URL
       })
-      const detector = await Detector({ connection: scannerConnection })
-      //
-      detector.scan(async ({ wallets, newWallet }) => {
-        // detector.stopScan()
-        const connection = await newWallet.getConnection()
-        debugger
-        // const client = await RpcAepp({
-        //   name: 'AEPP',
-        //   connection: await BrowserWindowMessageConnection({
-        //     target,
-        //     name: 'Wallet'
-        //   }),
-        //   url: NODE_URL,
-        //   internalUrl: NODE_INTERNAL_URL,
-        //   compilerUrl: COMPILER_URL
-        // })
-        // await client.sendConnectRequest()
-        // await client.subscribeAddress('subscribe', 'current')
-        // console.log(await client.address())
-      })
+      this.height = await this.client.height()
+      await this.scanForWallets()
     }
   }
 </script>

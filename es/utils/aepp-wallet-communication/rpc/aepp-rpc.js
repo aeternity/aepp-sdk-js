@@ -4,6 +4,7 @@ import { WalletClient } from './wallet-clients'
 import { message } from '../helpers'
 import { METHODS, REQUESTS } from '../schema'
 import Account from '../../../account'
+import uuid from 'uuid/v4'
 
 const NOTIFICATIONS = {
   [METHODS.wallet.updateAddress]: (instance) =>
@@ -98,13 +99,15 @@ export const AeppRpc = Ae.compose(Account, {
       this.rpcClient = WalletClient({
         connection,
         network: this.nodeNetworkId,
-        name,
+        ...connection.connectionInfo,
+        id: uuid(),
         handlers: [handleMessage(this), this.onDisconnect]
       })
       return this.sendConnectRequest()
     },
-    async disconnect () {
+    async disconnectWallet () {
       if (!this.rpcClient || !this.rpcClient.connection.isConnected()) throw new Error('You are not connected')
+      this.rpcClient.sendMessage(message(METHODS.closeConnection, { reason: 'bye' }), true)
       this.rpcClient.connection.disconnect()
       this.rpcClient = null
     },

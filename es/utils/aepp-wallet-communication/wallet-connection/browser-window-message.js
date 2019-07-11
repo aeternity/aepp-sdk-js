@@ -28,7 +28,7 @@ import WalletConnection from '.'
 import AsyncInit from '../../async-init'
 import uuid from 'uuid/v4'
 
-function connect (onMessage, onDisconnect) {
+function connect (onMessage) {
   const origin = this.origin
   if (this.listener) throw new Error('You already connected')
   this.listener = (msg) => {
@@ -37,13 +37,11 @@ function connect (onMessage, onDisconnect) {
     onMessage(msg.data, msg.source)
   }
   this.subscribeFn(this.listener)
-  this.onDisconnect(onDisconnect)
 }
 
 function disconnect () {
   if (!this.listener) throw new Error('You dont have connection. Please connect before')
   this.unsubscribeFn(this.listener)
-  this.onDisconnectCallback()
   this.listener = null
 }
 
@@ -71,12 +69,13 @@ export const BrowserWindowMessageConnection = AsyncInit.compose(WalletConnection
   async init ({ connectionInfo = {}, target = window.parent, self = window, origin }) {
     this.connectionInfo = { ...{ id: uuid() }, ...connectionInfo }
 
+    this.origin = origin
     this.subscribeFn = (listener) => self.addEventListener('message', listener, false)
     this.unsubscribeFn = (listener) => self.removeEventListener('message', listener, false)
     this.postFn = (msg) => (target).postMessage(msg, origin || '*')
     if (!this.connectionInfo.id) throw new Error('ID required.')
   },
-  methods: { connect, sendMessage, disconnect, onDisconnect, isConnected () { return this.listener} }
+  methods: { connect, sendMessage, disconnect, isConnected () { return this.listener} }
 })
 
 export default BrowserWindowMessageConnection

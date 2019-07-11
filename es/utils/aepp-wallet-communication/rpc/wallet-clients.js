@@ -28,7 +28,7 @@ const receive = (handler, msgId) => (msg) => {
 export const WalletClient = stampit({
   init ({ id, name, network, icons, connection, handlers: [onMessage, onDisconnect] }) {
     let messageId = 0
-    this.id = connection.id
+    this.id = id
     this.connection = connection
     this.info = { name, network, icons }
     // {
@@ -97,9 +97,9 @@ export const WalletClients = stampit({
     hasClient ({ id }) {
       return this.clients.has(id)
     },
-    addClient (id, client) {
+    addClient (id, info) {
       if (this.hasClient(id)) console.warn(`Wallet RpcClient with id ${id} already exist`)
-      this.clients.set(id, WalletClient({ ...client, id }))
+      this.clients.set(id, WalletClient({ id, ...info }))
     },
     getClient (id) {
       return this.clients.get(id)

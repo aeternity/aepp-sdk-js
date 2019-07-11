@@ -30,12 +30,15 @@ import { getBrowserAPI } from '../helpers'
 
 function connect (onMessage, onDisconnect) {
   if (this.port.onMessage.hasListeners()) throw new Error('You already connected')
-  this.onDisconnect(onDisconnect)
   this.port.onMessage.addListener(onMessage)
+  this.port.onDisconnect.addListener(() => {
+    onDisconnect()
+    this.port.disconnect()
+  })
 }
 
 function disconnect () {
-  this.port.onDisconnect.dispatch()
+  this.port.disconnect()
 }
 
 function onDisconnect (onDisconnect) {
@@ -68,7 +71,7 @@ export const BrowserRuntimeConnection = AsyncInit.compose(WalletConnection, {
     if (connectionInfo.id === undefined) throw new Error('ID required.')
     this.port = port || getBrowserAPI().runtime.connect(connectionInfo.id)
   },
-  methods: { connect, sendMessage, disconnect, onDisconnect, isConnected () { return this.port.onMessage.hasListeners() } }
+  methods: { connect, sendMessage, disconnect, isConnected () { return this.port.onMessage.hasListeners() } }
 })
 
 export default BrowserRuntimeConnection

@@ -49,8 +49,8 @@
     data () {
       return {
         runningInFrame: window.parent !== window,
-        pub: 'PROVIDE_YOUR_PUB', // Your public key
-        priv: 'PROVIDE_YOUR_PPRIV', // Your private key
+        pub: 'ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi', // Your public key
+        priv: 'e6a91d633c77cf5771329d3354b3bcef1bc5e032c43d70b6d35af923ce1eb74dcea7ade470c9f99d9d4e400880a86f1d49bb444b62f11a9ebb64bbcfeb73fef3', // Your private key
         client: null,
         balance: null,
         height: null,
@@ -89,13 +89,14 @@
           }
         },
         onDisconnect(a ,b) {
+          debugger
         }
       })
       const target = !this.runningInFrame ? window.frames.aepp : window.parent
       const connection = await BrowserWindowMessageConnection({
         target
       })
-      // this.client.addRpcClient(connection)
+      this.client.addRpcClient(connection)
       this.client.shareWalletInfo(connection.sendMessage.bind(connection))
     }
   }

@@ -41,7 +41,6 @@ export const WalletConnection = required({
     connect: required,
     disconnect: required,
     sendMessage: required,
-    onDisconnect: required
   }
 })
 
