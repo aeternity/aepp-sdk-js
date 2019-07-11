@@ -1,6 +1,4 @@
 /* eslint-disable no-undef */
-import { METHODS } from './schema'
-
 export const getBrowserAPI = () => {
   if (chrome && chrome.runtime) return chrome
   if (browser && browser.runtime) return browser
