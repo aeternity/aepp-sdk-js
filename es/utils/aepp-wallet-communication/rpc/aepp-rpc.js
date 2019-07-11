@@ -77,13 +77,15 @@ export const AeppRpc = Ae.compose(Account, {
     this.name = name
     this.accounts = {}
 
-    // Init RPCClient
-    this.rpcClient = WalletClient({
-      connection,
-      network: this.nodeNetworkId,
-      name,
-      handlers: [handleMessage(this), this.onDisconnect]
-    })
+    if (connection) {
+      // Init RPCClient
+      this.rpcClient = WalletClient({
+        connection,
+        network: this.nodeNetworkId,
+        name,
+        handlers: [handleMessage(this), this.onDisconnect]
+      })
+    }
 
     // Event callbacks
     this.onDisconnect = onDisconnect
@@ -91,6 +93,21 @@ export const AeppRpc = Ae.compose(Account, {
     this.onNetworkChange = onNetworkChange
   },
   methods: {
+    async connectToWallet (connection) {
+      if (this.rpcClient && this.rpcClient.isConnected()) throw new Error('You are already connected to wallet ' + this.rpcClient)
+      this.rpcClient = WalletClient({
+        connection,
+        network: this.nodeNetworkId,
+        name,
+        handlers: [handleMessage(this), this.onDisconnect]
+      })
+      return this.sendConnectRequest()
+    },
+    async disconnect () {
+      if (!this.rpcClient || !this.rpcClient.connection.isConnected()) throw new Error('You are not connected')
+      this.rpcClient.connection.disconnect()
+      this.rpcClient = null
+    },
     async address () {
       if (!this.accounts.current || !Object.keys(this.accounts.current).length) throw new Error('You do not subscribed for account.')
       return Object.keys(this.accounts.current)[0]

@@ -26,20 +26,24 @@
  */
 import AsyncInit from '../async-init'
 import BrowserRuntimeConnection from './wallet-connection/browser-runtime'
+import BrowserWindowMessageConnection from './wallet-connection/browser-window-message'
 import { METHODS } from './schema'
 
 const wallets = {}
 
-const handleDetection = (onDetected) => ({ method, params }) => {
+const isInIframe = () => window !== window.parent
+
+const handleDetection = (onDetected) => ({ method, params }, source) => {
   if (!method || !params) return
   const ifExist = wallets.hasOwnProperty(params.id)
   if (method === METHODS.wallet.readyToConnect && !ifExist) {
     const w = {
       ...params,
       async getConnection () {
-        // Todo if detect wallet in iframe
-        // if detect extension wallet
-        return BrowserRuntimeConnection({ connectionInfo: this })
+        // if detect extension wallet or page wallet
+        return this.type === 'extension'
+          ? BrowserRuntimeConnection({ connectionInfo: this })
+          : BrowserWindowMessageConnection({ connectionInfo: this, origin: this.origin, target: isInIframe() ? window.parent : source })
       }
     }
     wallets[w.id] = w
@@ -68,6 +72,7 @@ function stopScan () {
  */
 export const ExtWalletDetector = AsyncInit.compose({
   async init ({ connection }) {
+    if (!window) throw new Error('Window object not found, you can run wallet detector only in browser')
     this.connection = connection
   },
   methods: { scan, stopScan }

@@ -68,7 +68,7 @@ export const BrowserRuntimeConnection = AsyncInit.compose(WalletConnection, {
     if (connectionInfo.id === undefined) throw new Error('ID required.')
     this.port = port || getBrowserAPI().runtime.connect(connectionInfo.id)
   },
-  methods: { connect, sendMessage, disconnect, onDisconnect }
+  methods: { connect, sendMessage, disconnect, onDisconnect, isConnected () { return this.port.onMessage.hasListeners() } }
 })
 
 export default BrowserRuntimeConnection

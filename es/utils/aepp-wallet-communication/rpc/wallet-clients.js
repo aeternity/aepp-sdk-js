@@ -28,7 +28,7 @@ const receive = (handler, msgId) => (msg) => {
 export const WalletClient = stampit({
   init ({ id, name, network, icons, connection, handlers: [onMessage, onDisconnect] }) {
     let messageId = 0
-    this.id = id
+    this.id = connection.id
     this.connection = connection
     this.info = { name, network, icons }
     // {

@@ -5,6 +5,7 @@ import Selector from '../../../account/selector'
 import { WalletClients } from './wallet-clients'
 import { getBrowserAPI, message, sendResponseMessage } from '../helpers'
 import { ERRORS, METHODS } from '../schema'
+import uuid from 'uuid/v4'
 
 const rpcClients = WalletClients()
 
@@ -125,9 +126,11 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
     },
     getWalletInfo () {
       return {
-        id: getBrowserAPI().runtime.id,
+        id: getBrowserAPI().runtime.id || uuid(),
         name: this.name,
-        network: this.nodeNetworkId
+        network: this.nodeNetworkId,
+        origin: window.location.origin,
+        type: getBrowserAPI().runtime.id ? 'extension' : 'window'
       }
     },
     getAccounts () {

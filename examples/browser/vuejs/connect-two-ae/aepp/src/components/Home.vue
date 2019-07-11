@@ -221,38 +221,45 @@
         iframe.src = prompt('Enter wallet URL', 'http://localhost:9000')
         iframe.style.display = 'none'
         document.body.appendChild(iframe)
-        await new Promise(resolve => {
-          const handler = ({ data }) => {
-            if (data.method !== 'ready') return
-            window.removeEventListener('message', handler)
-            resolve()
-          }
-          window.addEventListener('message', handler)
-        })
+        // await new Promise(resolve => {
+        //   const handler = ({ data }) => {
+        //     if (data.method !== 'ready') return
+        //     window.removeEventListener('message', handler)
+        //     resolve()
+        //   }
+        //   window.addEventListener('message', handler)
+        // })
         return iframe.contentWindow
       }
     },
     async created () {
-      const connection = await BrowserWindowMessageConnection({
-        connectionInfo: { id: 'spy' },
-        target: window.parent
+      // window.addEventListener('message', (msg) => {
+      //   debugger
+      // }, false)
+      const target = window === window.parent ? await this.getReverseWindow() : window.parent
+      //
+      const scannerConnection = await BrowserWindowMessageConnection({
+        connectionInfo: { id: 'spy' }
       })
-      const detector = await Detector({connection})
-      detector.scan(async (wallets, wallet) => {
-        detector.stopScan()
-        const client = await RpcAepp({
-          name: 'AEPP',
-          connection: await BrowserWindowMessageConnection({
-            target: window.parent,
-            name: 'Wallet'
-          }),
-          url: NODE_URL,
-          internalUrl: NODE_INTERNAL_URL,
-          compilerUrl: COMPILER_URL
-        })
-        await client.sendConnectRequest()
-        await client.subscribeAddress('subscribe', 'current')
-        console.log(await client.address())
+      const detector = await Detector({ connection: scannerConnection })
+      //
+      detector.scan(async ({ wallets, newWallet }) => {
+        // detector.stopScan()
+        const connection = await newWallet.getConnection()
+        debugger
+        // const client = await RpcAepp({
+        //   name: 'AEPP',
+        //   connection: await BrowserWindowMessageConnection({
+        //     target,
+        //     name: 'Wallet'
+        //   }),
+        //   url: NODE_URL,
+        //   internalUrl: NODE_INTERNAL_URL,
+        //   compilerUrl: COMPILER_URL
+        // })
+        // await client.sendConnectRequest()
+        // await client.subscribeAddress('subscribe', 'current')
+        // console.log(await client.address())
       })
     }
   }

@@ -72,6 +72,7 @@
         compilerUrl: this.compilerUrl,
         accounts: [MemoryAccount({keypair: {secretKey: this.priv, publicKey: this.pub}})],
         address: this.pub,
+        name: 'Wallet',
         onConnection (aepp ,{ accept, deny }) {
           if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to connect`)) {
             accept()
@@ -90,11 +91,11 @@
         onDisconnect(a ,b) {
         }
       })
+      const target = !this.runningInFrame ? window.frames.aepp : window.parent
       const connection = await BrowserWindowMessageConnection({
-        connectionInfo: { id: 'Aepp' },
-        target: window.frames.aepp,
+        target
       })
-      this.client.addRpcClient(connection)
+      // this.client.addRpcClient(connection)
       this.client.shareWalletInfo(connection.sendMessage.bind(connection))
     }
   }
