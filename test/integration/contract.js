@@ -62,7 +62,7 @@ contract StateContract =
   entrypoint mapOptionFn(a: map(address, (string, option(int)))) : map(address, (string, option(int))) = a
   
   entrypoint getRecord() : state = state
-  entrypoint function setRecord(s: state) = put(s)
+  entrypoint setRecord(s: state) = put(s)
   
   entrypoint intOption(s: option(int)) : option(int) = s
   entrypoint listOption(s: option(list((int, string)))) : option(list((int ,string))) = s
