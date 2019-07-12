@@ -49,8 +49,8 @@
     data () {
       return {
         runningInFrame: window.parent !== window,
-        pub: 'ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi', // Your public key
-        priv: 'e6a91d633c77cf5771329d3354b3bcef1bc5e032c43d70b6d35af923ce1eb74dcea7ade470c9f99d9d4e400880a86f1d49bb444b62f11a9ebb64bbcfeb73fef3', // Your private key
+        pub: 'YOUR_PUB', // Your public key
+        priv: 'YOUR_PRIV', // Your private key
         client: null,
         balance: null,
         height: null,
