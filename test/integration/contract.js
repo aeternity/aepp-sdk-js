@@ -160,7 +160,7 @@ describe('Contract', function () {
     })
   })
 
-  describe.only('Contract ACI Interface', function () {
+  describe('Contract ACI Interface', function () {
     let contractObject
 
     it('Generate ACI object', async () => {
@@ -190,20 +190,9 @@ describe('Contract', function () {
         await contractObject.methods.init('123', 1, Promise.resolve('hahahaha'))
         const isCompiled = contractObject.compiled.length && contractObject.compiled.slice(0, 3) === 'cb_'
         isCompiled.should.be.equal(true)
-
-        let human = new Map();
-        let person = {
-          name: "Bob",
-          age: 20
-        }
-        human.set(42, person);
-        console.log(human)
-        const res = await contractObject.methods.add_human(human)
-        console.log(res)
-
       })
     })
-    describe.skip('Arguments Validation and Casting', function () {
+    describe('Arguments Validation and Casting', function () {
       describe('INT', function () {
         it('Invalid', async () => {
           try {
@@ -516,7 +505,7 @@ describe('Contract', function () {
         })
       })
     })
-    describe.skip('Call contract', function () {
+    describe('Call contract', function () {
       it('Call contract using using sophia type arguments', async () => {
         contractObject.setOptions({ skipArgsConvert: true })
         const res = await contractObject.methods.listFn('[ 1, 2 ]')
