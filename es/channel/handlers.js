@@ -35,11 +35,11 @@ async function appendSignature (tx, signFn) {
   const { signatures, encodedTx } = unpackTx(tx).tx
   const result = await signFn(encodeRlpTx(encodedTx.rlpEncoded))
   if (result) {
-    const signedTx = unpackTx(result).tx
+    const { tx: signedTx, txType } = unpackTx(result)
     return encodeRlpTx(buildTx({
       signatures: signatures.concat(signedTx.signatures),
       encodedTx: signedTx.encodedTx.rlpEncoded
-    }, 'signedTx').rlpEncoded)
+    }, txType).rlpEncoded)
   }
 }
 
