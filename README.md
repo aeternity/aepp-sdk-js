@@ -58,7 +58,22 @@ npm i @aeternity/aepp-sdk@next
 npm i https://github.com/aeternity/aepp-sdk-js#develop
 ```
 
-**Note for Windows Users** : If you experience errors during the installation, you might need to install [Build Tools](https://www.npmjs.com/package/windows-build-tools)
+**Note** : If you experience errors during the installation, you might need to install build tools for your OS.
+
+Windows: Windows Build Tools
+```
+npm install -g windows-build-tools
+```
+Ubuntu / Debian: Build Essential
+```
+sudo apt-get update
+sudo apt-get install build-essential
+```
+Mac:
+Download [Xcode](https://apps.apple.com/de/app/xcode/id497799835?mt=12) from AppStore, then run
+```
+xcode-select --install
+```
 
 ### 2. Create an Account
 You can do many more things now, but you'll probably have to start with:
