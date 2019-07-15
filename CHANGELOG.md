@@ -1,3 +1,24 @@
+# [4.2.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.2.0) (2019-07-15)
+
+
+### Bug Fixes
+
+* **package:** update libsodium-wrappers-sumo to version 0.7.5 ([#541](https://github.com/aeternity/aepp-sdk-js/issues/541)) ([956ed75](https://github.com/aeternity/aepp-sdk-js/commit/956ed75))
+* **rpc-server:** Fix type 'object' check ([#526](https://github.com/aeternity/aepp-sdk-js/issues/526)) ([48c42e4](https://github.com/aeternity/aepp-sdk-js/commit/48c42e4))
+
+
+### Code Refactoring
+
+* **swagger:** Speedup initialisation
+* **AENS:** Remove unused param from claim method
+* **AENS:** Fix exception if not waiting for mining(claim)
+* **Test:** Add test for contract namespaces
+
+### Features
+
+* **Compiler:** Add compatibility with compiler 3.2.0
+* **Channel:** Implement GA awareness of State Channels
+
 # [4.1.0](https://github.com/aeternity/aepp-sdk-js/compare/4.0.1...4.1.0) (2019-06-22)
 
 
