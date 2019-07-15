@@ -33,6 +33,10 @@ contract StateContract =
   entrypoint retrieve() : string = state.value
 `
 const testContract = `
+namespace Test =
+  function double(x: int): int = x*2
+
+
 contract Voting =
   entrypoint test() : int = 1
 
@@ -73,6 +77,8 @@ contract StateContract =
   entrypoint hashFn(s: hash): hash = s
   entrypoint signatureFn(s: signature): signature = s
   entrypoint bytesFn(s: bytes(32)): bytes(32) = s
+  
+  entrypoint usingExternalLib(s: int): int = Test.double(s)
 `
 
 const encodedNumberSix = 'cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaKNdnK'
@@ -420,6 +426,13 @@ describe('Contract', function () {
           } catch (e) {
             e.message.should.be.equal('"Argument" at position 0 fails because [Value \'[[object Object]]\' at path: [0] not a Promise]')
           }
+        })
+      })
+      describe('NAMESPACES', function () {
+        it('Use namespace in function body', async () => {
+          const res = await contractObject.methods.usingExternalLib(2)
+
+          res.decodedResult.should.be.equal(4)
         })
       })
       describe('Hash', function () {

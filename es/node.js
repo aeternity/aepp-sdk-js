@@ -152,6 +152,6 @@ const Node = stampit({
 })
 
 const NODE_GE_VERSION = '3.0.1'
-const NODE_LT_VERSION = '4.0.0'
+const NODE_LT_VERSION = '5.0.0'
 
 export default Node
