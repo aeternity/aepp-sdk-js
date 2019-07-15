@@ -58,7 +58,7 @@ npm i @aeternity/aepp-sdk@next
 npm i https://github.com/aeternity/aepp-sdk-js#develop
 ```
 
-**Note for Windows Users** : If you experience errors during the installation, you might need to install [Build Tools for Visual Studio](https://visualstudio.microsoft.com/de/downloads/)
+**Note for Windows Users** : If you experience errors during the installation, you might need to install [Build Tools](https://www.npmjs.com/package/windows-build-tools)
 
 ### 2. Create an Account
 You can do many more things now, but you'll probably have to start with:
