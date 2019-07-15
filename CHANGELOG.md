@@ -16,8 +16,11 @@
 
 ### Features
 
+* **Node:** Add 4.0.0 node compatibility
 * **Compiler:** Add compatibility with compiler 3.2.0
 * **Channel:** Implement GA awareness of State Channels
+
+
 
 # [4.1.0](https://github.com/aeternity/aepp-sdk-js/compare/4.0.1...4.1.0) (2019-06-22)
 
