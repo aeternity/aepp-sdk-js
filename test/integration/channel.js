@@ -31,7 +31,7 @@ plan('10000000000000000')
 const identityContract = `
 contract Identity =
   type state = ()
-  public function main(x : int) = x
+  entrypoint main(x : int) = x
 `
 
 function waitForChannel (channel) {

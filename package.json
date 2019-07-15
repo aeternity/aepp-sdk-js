@@ -39,7 +39,7 @@
     "bs58check": "^2.1.1",
     "commander": "^2.14.1",
     "joi-browser": "^13.4.0",
-    "libsodium-wrappers-sumo": "0.7.4",
+    "libsodium-wrappers-sumo": "0.7.5",
     "ramda": "^0.26.1",
     "rlp": "2.2.3",
     "serialize-javascript": "^1.5.0",
@@ -95,7 +95,7 @@
     "uglify-es": "^3.3.9",
     "webpack": "^4.20.1",
     "webpack-bundle-analyzer": "^3.3.2",
-    "webpack-cli": "3.3.5",
+    "webpack-cli": "3.3.6",
     "worker-farm": "^1.6.0"
   },
   "config": {
