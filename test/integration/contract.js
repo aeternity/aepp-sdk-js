@@ -24,55 +24,61 @@ import * as R from 'ramda'
 const identityContract = `
 contract Identity =
   type state = ()
-  function main(x : int) = x
+  entrypoint main(x : int) = x
 `
 const stateContract = `
 contract StateContract =
   record state = { value: string }
-  public function init(value) : state = { value = value }
-  public function retrieve() : string = state.value
+  entrypoint init(value) : state = { value = value }
+  entrypoint retrieve() : string = state.value
 `
 const testContract = `
+namespace Test =
+  function double(x: int): int = x*2
+
+
 contract Voting =
-  public function test() : int = 1
+  entrypoint test() : int = 1
 
 contract StateContract =
   type number = int
   record state = { value: string, key: number, testOption: option(string) }
   record yesEr = { t: number}
   
-  public function init(value: string, key: int, testOption: option(string)) : state = { value = value, key = key, testOption = testOption }
-  public function retrieve() : (string, int) = (state.value, state.key)
+  entrypoint init(value: string, key: int, testOption: option(string)) : state = { value = value, key = key, testOption = testOption }
+  entrypoint retrieve() : (string, int) = (state.value, state.key)
 
-  public function intFn(a: int) : int = a
-  public function stringFn(a: string) : string = a
-  public function boolFn(a: bool) : bool = a
-  public function addressFn(a: address) : address = a
-  public function contractAddress (ct: address) : address = ct
-  public function accountAddress (ak: address) : address = ak
+  entrypoint intFn(a: int) : int = a
+  entrypoint stringFn(a: string) : string = a
+  entrypoint boolFn(a: bool) : bool = a
+  entrypoint addressFn(a: address) : address = a
+  entrypoint contractAddress (ct: address) : address = ct
+  entrypoint accountAddress (ak: address) : address = ak
 
-  public function tupleFn (a: (string, int)) : (string, int) = a
-  public function tupleInTupleFn (a: ((string, string), int)) : ((string, string), int) = a
-  public function tupleWithList (a: (list(int), int)) : (list(int), int) = a
+  entrypoint tupleFn (a: (string, int)) : (string, int) = a
+  entrypoint tupleInTupleFn (a: ((string, string), int)) : ((string, string), int) = a
+  entrypoint tupleWithList (a: (list(int), int)) : (list(int), int) = a
   
-  public function listFn(a: list(int)) : list(int) = a
-  public function listInListFn(a: list(list(int))) : list(list(int)) = a
+  entrypoint listFn(a: list(int)) : list(int) = a
+  entrypoint listInListFn(a: list(list(int))) : list(list(int)) = a
   
-  public function mapFn(a: map(address, (string, int))) : map(address, (string, int)) = a
-  public function mapOptionFn(a: map(address, (string, option(int)))) : map(address, (string, option(int))) = a
+  entrypoint mapFn(a: map(address, (string, int))) : map(address, (string, int)) = a
+  entrypoint mapOptionFn(a: map(address, (string, option(int)))) : map(address, (string, option(int))) = a
   
-  public function getRecord() : state = state
-  public stateful function setRecord(s: state) = put(s)
+  entrypoint getRecord() : state = state
+  stateful entrypoint setRecord(s: state) = put(s)
   
-  public function intOption(s: option(int)) : option(int) = s
-  public function listOption(s: option(list((int, string)))) : option(list((int ,string))) = s
+  entrypoint intOption(s: option(int)) : option(int) = s
+  entrypoint listOption(s: option(list((int, string)))) : option(list((int ,string))) = s
   
-  public function testFn(a: list(int), b: bool) : (list(int), bool) = (a, b)
-  public function approve(tx_id: int, voting_contract: Voting) : int = tx_id
+  entrypoint testFn(a: list(int), b: bool) : (list(int), bool) = (a, b)
+  entrypoint approve(tx_id: int, voting_contract: Voting) : int = tx_id
   
-  public function hashFn(s: hash): hash = s
-  public function signatureFn(s: signature): signature = s
-  public function bytesFn(s: bytes(32)): bytes(32) = s
+  entrypoint hashFn(s: hash): hash = s
+  entrypoint signatureFn(s: signature): signature = s
+  entrypoint bytesFn(s: bytes(32)): bytes(32) = s
+  
+  entrypoint usingExternalLib(s: int): int = Test.double(s)
 `
 
 const encodedNumberSix = 'cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaKNdnK'
@@ -420,6 +426,13 @@ describe('Contract', function () {
           } catch (e) {
             e.message.should.be.equal('"Argument" at position 0 fails because [Value \'[[object Object]]\' at path: [0] not a Promise]')
           }
+        })
+      })
+      describe('NAMESPACES', function () {
+        it('Use namespace in function body', async () => {
+          const res = await contractObject.methods.usingExternalLib(2)
+
+          res.decodedResult.should.be.equal(4)
         })
       })
       describe('Hash', function () {

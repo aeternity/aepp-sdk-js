@@ -45,7 +45,7 @@ const queryResponse = '{\'tmp\': 101}'
 const contractCode = `
 contract Identity =
   type state = ()
-  function main(x : int) = x
+  entrypoint main(x : int) = x
 `
 let contractId
 const deposit = 4
