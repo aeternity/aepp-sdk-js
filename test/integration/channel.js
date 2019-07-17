@@ -31,7 +31,7 @@ plan('10000000000000000')
 const identityContract = `
 contract Identity =
   type state = ()
-  public function main(x : int) = x
+  entrypoint main(x : int) = x
 `
 
 function waitForChannel (channel) {
@@ -296,8 +296,7 @@ describe('Channel', function () {
       { onOnChainTx, onOwnWithdrawLocked, onWithdrawLocked }
     )
     result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx })
-    sinon.assert.calledOnce(onOnChainTx)
-    sinon.assert.calledWithExactly(onOnChainTx, sinon.match.string)
+    sinon.assert.called(onOnChainTx)
     sinon.assert.calledOnce(onOwnWithdrawLocked)
     sinon.assert.calledOnce(onWithdrawLocked)
     sinon.assert.notCalled(initiatorSign)
@@ -399,8 +398,7 @@ describe('Channel', function () {
       { onOnChainTx, onOwnDepositLocked, onDepositLocked }
     )
     result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx })
-    sinon.assert.calledOnce(onOnChainTx)
-    sinon.assert.calledWithExactly(onOnChainTx, sinon.match.string)
+    sinon.assert.called(onOnChainTx)
     sinon.assert.calledOnce(onOwnDepositLocked)
     sinon.assert.calledOnce(onDepositLocked)
     sinon.assert.notCalled(initiatorSign)
@@ -843,10 +841,6 @@ describe('Channel', function () {
 
     it('when posting an update with incorrect amount', async () => {
       return update({ amount: '1' }).should.eventually.be.rejectedWith('Rejected')
-    })
-
-    it('when posting incorrect update tx', async () => {
-      return update({ sign: () => 'abcdefg' }).should.eventually.be.rejectedWith('Rejected')
     })
   })
 })
