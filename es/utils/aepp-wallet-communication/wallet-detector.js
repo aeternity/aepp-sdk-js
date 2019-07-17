@@ -53,6 +53,7 @@ const handleDetection = (onDetected) => ({ method, params }, source) => {
 
 function scan (onDetected) {
   this.connection.connect(handleDetection(onDetected))
+  !Object.keys(wallets).length || onDetected({ wallets })
 }
 
 function stopScan () {
@@ -75,7 +76,7 @@ export const ExtWalletDetector = AsyncInit.compose({
     if (!window) throw new Error('Window object not found, you can run wallet detector only in browser')
     this.connection = connection
   },
-  methods: { scan, stopScan }
+  methods: { scan, stopScan, getWallets () { return wallets } }
 })
 
 export default ExtWalletDetector

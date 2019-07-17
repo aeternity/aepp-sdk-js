@@ -63,6 +63,23 @@
     methods: {
       confirmDialog (method, params, {id}) {
         return Promise.resolve(window.confirm(`User ${id} wants to run ${method} ${params}`))
+      },
+      async shareWalletInfo (postFn, { interval = 5000, attemps = 5 } = {}) {
+        const ins = this.client
+        const pause = async (duration) => {
+          await new Promise(resolve => setTimeout(resolve, duration))
+        }
+        async function prob (left) {
+          ins.shareWalletInfo(postFn)
+          if (left > 0) {
+            await pause(interval)
+            return prob(attemps - 1)
+          } else {
+            console.log('Finish sharing wallet info')
+            return
+          }
+        }
+        return await prob(attemps)
       }
     },
     async created () {
@@ -89,7 +106,7 @@
           }
         },
         onDisconnect(a ,b) {
-          debugger
+          this.shareWalletInfo(connection.sendMessage.bind(connection))
         }
       })
       const target = !this.runningInFrame ? window.frames.aepp : window.parent
@@ -97,7 +114,7 @@
         target
       })
       this.client.addRpcClient(connection)
-      this.client.shareWalletInfo(connection.sendMessage.bind(connection))
+      await this.shareWalletInfo(connection.sendMessage.bind(connection))
     }
   }
 </script>

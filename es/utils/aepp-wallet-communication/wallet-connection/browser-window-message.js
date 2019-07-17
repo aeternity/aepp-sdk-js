@@ -72,7 +72,7 @@ export const BrowserWindowMessageConnection = AsyncInit.compose(WalletConnection
     this.origin = origin
     this.subscribeFn = (listener) => self.addEventListener('message', listener, false)
     this.unsubscribeFn = (listener) => self.removeEventListener('message', listener, false)
-    this.postFn = (msg) => (target).postMessage(msg, origin || '*')
+    this.postFn = (msg) => target.postMessage(msg, origin || '*')
     if (!this.connectionInfo.id) throw new Error('ID required.')
   },
   methods: { connect, sendMessage, disconnect, isConnected () { return this.listener} }

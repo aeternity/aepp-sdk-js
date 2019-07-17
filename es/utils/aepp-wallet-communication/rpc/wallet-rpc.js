@@ -10,7 +10,7 @@ import uuid from 'uuid/v4'
 const rpcClients = WalletClients()
 
 const NOTIFICATIONS = {
-  [METHODS.wallet.updateNetwork]: (instance) =>
+  [METHODS.updateNetwork]: (instance) =>
     (msg) => {
       instance.onNetworkChange(msg.params)
     },
@@ -109,6 +109,7 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
     this.onNetworkChange = onNetworkChange
     //
     this.name = name
+    this.id = uuid()
   },
   methods: {
     addRpcClient (clientConnection) {
@@ -124,11 +125,11 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
       )
     },
     shareWalletInfo (postFn) {
-      postFn(message(METHODS.wallet.readyToConnect, this.getWalletInfo()))
+      postFn(message(METHODS.wallet.readyToConnect, { ...this.getWalletInfo(), jsonrpc: '2.0' }))
     },
     getWalletInfo () {
       return {
-        id: getBrowserAPI().runtime.id || uuid(),
+        id: getBrowserAPI().runtime.id || this.id,
         name: this.name,
         network: this.nodeNetworkId,
         origin: window.location.origin,

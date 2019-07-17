@@ -240,7 +240,7 @@
         this.walletName = null
         this.pub = null
         this.balance = null
-        await this.scanForWallets()
+        this.scanForWallets()
       },
       async getReverseWindow() {
         const iframe = document.createElement('iframe')
@@ -249,23 +249,23 @@
         document.body.appendChild(iframe)
         return iframe.contentWindow
       },
+      async connectToWallet (wallet) {
+        await this.client.connectToWallet(await wallet.getConnection())
+        await this.client.subscribeAddress('subscribe', 'current')
+        this.pub = await this.client.address()
+        this.balance = await this.client.balance(this.pub).catch(console.log)
+        this.walletName = this.client.rpcClient.info.name
+      },
       async scanForWallets () {
-        const scannerConnection = await BrowserWindowMessageConnection({
-          connectionInfo: { id: 'spy' }
-        })
-        const detector = await Detector({ connection: scannerConnection })
         const handleWallets = async function ({ wallets, newWallet }) {
+          newWallet = newWallet || Object.values(wallets)[0]
           if (confirm(`Do you want to connect to wallet ${newWallet.name}`)) {
-            detector.stopScan()
+            this.detector.stopScan()
 
-            await this.client.connectToWallet(await newWallet.getConnection())
-            await this.client.subscribeAddress('subscribe', 'current')
-            this.pub = await this.client.address()
-            this.balance = await this.client.balance(this.pub)
-            this.walletName = this.client.rpcClient.info.name
+            this.connectToWallet(newWallet)
           }
         }
-        detector.scan(handleWallets.bind(this))
+        this.detector.scan(handleWallets.bind(this))
       }
     },
     async created () {
@@ -279,6 +279,10 @@
         compilerUrl: COMPILER_URL
       })
       this.height = await this.client.height()
+      const scannerConnection = await BrowserWindowMessageConnection({
+        connectionInfo: { id: 'spy' }
+      })
+      this.detector = await Detector({ connection: scannerConnection })
       await this.scanForWallets()
     }
   }
