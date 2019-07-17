@@ -75,8 +75,8 @@ RpcWallet({
             action.accept()
         }
     },
-    onDisconnect (port) {
-        debugger
+    onDisconnect (masg, client) {
+      client.disconnect()
     },
     onSubscription (aepp, action) {
         if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} want to subscribe for accounts`)) {

@@ -4,7 +4,7 @@ import Selector from '../../../account/selector'
 
 import { WalletClients } from './wallet-clients'
 import { getBrowserAPI, message, sendResponseMessage } from '../helpers'
-import { ERRORS, METHODS } from '../schema'
+import { ERRORS, METHODS, RPC_STATUS, VERSION } from '../schema'
 import uuid from 'uuid/v4'
 
 const rpcClients = WalletClients()
@@ -14,9 +14,10 @@ const NOTIFICATIONS = {
     (msg) => {
       instance.onNetworkChange(msg.params)
     },
-  [METHODS.closeConnection]: (instance) =>
+  [METHODS.closeConnection]: (instance, { client }) =>
     (msg) => {
-      instance.onDisconnect(msg.params)
+      client.info.status = RPC_STATUS.DISCONNECTED
+      instance.onDisconnect(msg.params, client)
     }
 }
 
@@ -26,19 +27,24 @@ const REQUESTS = {
   // Store client info and prepare two fn for each client `connect` and `denyConnection`
   // which automatically prepare and send response for that client
   [METHODS.aepp.connect]: (instance, { client }) =>
-    ({ id, method, params: { name, network, version, icons } }) => {
+    ({ id, method, params: { name, network, version, icons, version } }) => {
+      // Check if protocol and network is compatible with wallet
+      if (version !== VERSION) sendResponseMessage(client)(id, method, { error: ERRORS.unsupportedProtocol() })
+      if (network !== this.nodeNetworkId) sendResponseMessage(client)(id, method, { error: ERRORS.unsupportedNetwork() })
+
+      // Action methods
       const accept = (id) => () => {
-        rpcClients.updateClientInfo(client.id, { status: 'CONNECTED' })
+        rpcClients.updateClientInfo(client.id, { status: RPC_STATUS.CONNECTED })
         sendResponseMessage(client)(id, method, { result: instance.getWalletInfo() })
       }
       const deny = (id) => (error) => {
-        rpcClients.updateClientInfo(client.id, { status: 'CONNECTION_REJECTED' })
+        rpcClients.updateClientInfo(client.id, { status: RPC_STATUS.CONNECTION_REJECTED })
         sendResponseMessage(client)(id, METHODS.aepp.connect, { error })
       }
 
       // Store new AEPP and wait for connection approve
       rpcClients.updateClientInfo(client.id, {
-        status: 'WAITING_FOR_CONNECTION_APPROVE',
+        status: RPC_STATUS.WAITING_FOR_CONNECTION_APPROVE,
         name,
         network,
         icons,
@@ -54,6 +60,9 @@ const REQUESTS = {
     },
   [METHODS.aepp.subscribeAddress]: (instance, { client }) =>
     ({ id, method, params: { type, value } }) => {
+      // Authorization check
+      if (!client.isConnected()) return sendResponseMessage(client)(id, method, { error: ERRORS.notAuthorize() })
+
       const accept = (id) =>
         () => sendResponseMessage(client)(
           id,
@@ -66,11 +75,14 @@ const REQUESTS = {
           })
       const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.subscriptionDeny(error) })
 
-      rpcClients.updateClientInfo(client.id, { status: 'WAITING_FOR_SUBSCRIPTION' })
+      rpcClients.updateClientInfo(client.id, { status: RPC_STATUS.WAITING_FOR_SUBSCRIPTION })
       instance.onSubscription(client, client.addAction({ id, method, params: { type, value } }, [accept(id), deny(id)]))
     },
   [METHODS.aepp.sign]: (instance, { client }) =>
     ({ id, method, params: { tx } }) => {
+      // Authorization check
+      if (!client.isConnected()) return sendResponseMessage(client)(id, method, { error: ERRORS.notAuthorize() })
+
       const accept = (id) => async () => sendResponseMessage(client)(id, method, { result: { signedTransaction: Buffer.from(await instance.sign(tx)) } })
       const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.signDeny(error) })
 
@@ -113,12 +125,13 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
   },
   methods: {
     addRpcClient (clientConnection) {
+      // @TODO  detect if aepp has some history based on origin????: if yes use this instance for connection
       const id = uuid()
       rpcClients.addClient(
         id,
         {
           id,
-          info: { status: 'WAITING_FOR_CONNECT' },
+          info: { status: RPC_STATUS.WAITING_FOR_CONNECTION_REQUEST },
           connection: clientConnection,
           handlers: [handleMessage(this, id), this.onDisconnect]
         }

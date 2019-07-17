@@ -1,5 +1,5 @@
 import stampit from '@stamp/it'
-import { SUBSCRIPTION_TYPES } from '../schema'
+import { RPC_STATUS, SUBSCRIPTION_TYPES } from '../schema'
 
 const sendMessage = (messageId, connection) => ({ id, method, params, result, error }, isNotificationOrResponse = false) => {
   isNotificationOrResponse || (messageId += 1)
@@ -43,6 +43,9 @@ export const WalletClient = stampit({
     connection.connect(receive(onMessage, messageId), onDisconnect)
   },
   methods: {
+    isConnected () {
+      return this.info.status === RPC_STATUS.CONNECTED
+    },
     disconnect () {
       this.connection.disconnect()
     },

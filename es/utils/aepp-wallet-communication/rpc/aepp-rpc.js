@@ -2,7 +2,7 @@ import Ae from '../../../ae'
 
 import { WalletClient } from './wallet-clients'
 import { message } from '../helpers'
-import { METHODS, REQUESTS } from '../schema'
+import { METHODS, REQUESTS, VERSION } from '../schema'
 import Account from '../../../account'
 import uuid from 'uuid/v4'
 
@@ -129,7 +129,7 @@ export const AeppRpc = Ae.compose(Account, {
       return this.rpcClient.addCallback(
         this.rpcClient.sendMessage(message(METHODS.aepp.connect, {
           name: this.name,
-          version: 1,
+          version: VERSION,
           network: this.nodeNetworkId
         }))
       )
