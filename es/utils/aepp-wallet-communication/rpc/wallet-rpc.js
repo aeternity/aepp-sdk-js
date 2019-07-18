@@ -33,7 +33,7 @@ const REQUESTS = {
       if (network !== instance.getNetworkId()) return sendResponseMessage(client)(id, method, { error: ERRORS.unsupportedNetwork() })
 
       // Action methods
-      const accept = (id) => (error) => {
+      const accept = (id) => () => {
         rpcClients.updateClientInfo(client.id, { status: RPC_STATUS.CONNECTED })
         sendResponseMessage(client)(id, method, { result: instance.getWalletInfo() })
       }
