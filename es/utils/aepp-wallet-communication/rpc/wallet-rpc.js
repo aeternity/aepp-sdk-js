@@ -4,7 +4,7 @@ import Selector from '../../../account/selector'
 
 import { WalletClients } from './wallet-clients'
 import { getBrowserAPI, message, sendResponseMessage } from '../helpers'
-import { ERRORS, METHODS, RPC_STATUS, VERSION } from '../schema'
+import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE } from '../schema'
 import uuid from 'uuid/v4'
 
 const rpcClients = WalletClients()
@@ -27,10 +27,10 @@ const REQUESTS = {
   // Store client info and prepare two fn for each client `connect` and `denyConnection`
   // which automatically prepare and send response for that client
   [METHODS.aepp.connect]: (instance, { client }) =>
-    ({ id, method, params: { name, network, version, icons, version } }) => {
+    ({ id, method, params: { name, network, version, icons } }) => {
       // Check if protocol and network is compatible with wallet
-      if (version !== VERSION) sendResponseMessage(client)(id, method, { error: ERRORS.unsupportedProtocol() })
-      if (network !== this.nodeNetworkId) sendResponseMessage(client)(id, method, { error: ERRORS.unsupportedNetwork() })
+      if (version !== VERSION) return sendResponseMessage(client)(id, method, { error: ERRORS.unsupportedProtocol() })
+      if (network !== instance.getNetworkId()) return sendResponseMessage(client)(id, method, { error: ERRORS.unsupportedNetwork() })
 
       // Action methods
       const accept = (id) => () => {
@@ -75,13 +75,15 @@ const REQUESTS = {
           })
       const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.subscriptionDeny(error) })
 
-      rpcClients.updateClientInfo(client.id, { status: RPC_STATUS.WAITING_FOR_SUBSCRIPTION })
       instance.onSubscription(client, client.addAction({ id, method, params: { type, value } }, [accept(id), deny(id)]))
     },
   [METHODS.aepp.sign]: (instance, { client }) =>
     ({ id, method, params: { tx } }) => {
       // Authorization check
       if (!client.isConnected()) return sendResponseMessage(client)(id, method, { error: ERRORS.notAuthorize() })
+      // NetworkId check
+      if (client.info.network !== instance.getNetworkId()) return sendResponseMessage(client)(id, method, { error: ERRORS.unsupportedNetwork() })
+
 
       const accept = (id) => async () => sendResponseMessage(client)(id, method, { result: { signedTransaction: Buffer.from(await instance.sign(tx)) } })
       const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.signDeny(error) })
@@ -144,9 +146,9 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
       return {
         id: getBrowserAPI().runtime.id || this.id,
         name: this.name,
-        network: this.nodeNetworkId,
+        network: this.getNetworkId(),
         origin: window.location.origin,
-        type: getBrowserAPI().runtime.id ? 'extension' : 'window'
+        type: getBrowserAPI().runtime.id ? WALLET_TYPE.extension : WALLET_TYPE.window
       }
     },
     getAccounts () {
@@ -163,7 +165,15 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
       // Send notification 'update.address' to all Aepp which are subscribed for account update
       rpcClients.sentNotificationByCondition(
         message(METHODS.wallet.updateAddress, this.getAccounts()),
-        (client) => client.addressSubscription.includes(this.Selector.address)
+        (client) => client.addressSubscription.includes(this.Selector.address) && client.isConnected()
+      )
+    },
+    setNode (node) {
+      Object.assign(this, node)
+      // Send notification 'update.network' to all Aepp which connected
+      rpcClients.sentNotificationByCondition(
+        message(METHODS.updateNetwork, { network: this.getNetworkId() }),
+        (client) => client.isConnected()
       )
     }
   }

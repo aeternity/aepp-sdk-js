@@ -39,15 +39,10 @@ function connect (onMessage) {
   this.subscribeFn(this.listener)
 }
 
-function disconnect () {
+async function disconnect () {
   if (!this.listener) throw new Error('You dont have connection. Please connect before')
   this.unsubscribeFn(this.listener)
   this.listener = null
-}
-
-function onDisconnect (onDisconnect) {
-  if (!this.listener) throw new Error('You dont have connection. Please connect before')
-  this.onDisconnectCallback = typeof onDisconnect === 'function' ? onDisconnect : () => true
 }
 
 function sendMessage (msg) {

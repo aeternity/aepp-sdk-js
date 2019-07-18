@@ -2,7 +2,7 @@ import Ae from '../../../ae'
 
 import { WalletClient } from './wallet-clients'
 import { message } from '../helpers'
-import { METHODS, REQUESTS, VERSION } from '../schema'
+import { METHODS, REQUESTS, RPC_STATUS, VERSION } from '../schema'
 import Account from '../../../account'
 import uuid from 'uuid/v4'
 
@@ -12,12 +12,13 @@ const NOTIFICATIONS = {
       instance.accounts = params.addresses
       instance.onAddressChange(params)
     },
-  [METHODS.wallet.updateNetwork]: (instance) =>
+  [METHODS.updateNetwork]: (instance) =>
     (msg) => {
       instance.onNetworkChange(msg.params)
     },
-  [METHODS.wallet.closeConnection]: (instance) =>
+  [METHODS.closeConnection]: (instance) =>
     (msg) => {
+      instance.disconnectWallet()
       instance.onDisconnect(msg.params)
     }
 }
@@ -25,7 +26,7 @@ const NOTIFICATIONS = {
 const RESPONSES = {
   [METHODS.aepp.connect]: (instance) =>
     (msg) => {
-      if (msg.result) instance.rpcClient.info.status = 'CONNECTED'
+      if (msg.result) instance.rpcClient.info.status = RPC_STATUS.CONNECTED
       processResponse(instance)(msg)
     },
   [METHODS.aepp.subscribeAddress]: (instance) =>
@@ -105,22 +106,26 @@ export const AeppRpc = Ae.compose(Account, {
       })
       return this.sendConnectRequest()
     },
-    async disconnectWallet () {
+    async disconnectWallet (force = false) {
       if (!this.rpcClient || !this.rpcClient.connection.isConnected()) throw new Error('You are not connected')
-      this.rpcClient.sendMessage(message(METHODS.closeConnection, { reason: 'bye' }), true)
-      this.rpcClient.connection.disconnect()
+      force || this.rpcClient.sendMessage(message(METHODS.closeConnection, { reason: 'bye' }), true)
+      await this.rpcClient.disconnect().catch(e => console.error(e))
       this.rpcClient = null
+      this.accounts = {}
     },
     async address () {
+      if (!this.rpcClient || !this.rpcClient.connection.isConnected()) throw new Error('You are not connected')
       if (!this.accounts.current || !Object.keys(this.accounts.current).length) throw new Error('You do not subscribed for account.')
       return Object.keys(this.accounts.current)[0]
     },
     async sign (tx) {
+      if (!this.rpcClient || !this.rpcClient.connection.isConnected()) throw new Error('You are not connected')
       return this.rpcClient.addCallback(
         this.rpcClient.sendMessage(message(METHODS.aepp.sign, { tx }))
       )
     },
     async subscribeAddress (type, value) {
+      if (!this.rpcClient || !this.rpcClient.connection.isConnected()) throw new Error('You are not connected')
       return this.rpcClient.addCallback(
         this.rpcClient.sendMessage(message(METHODS.aepp.subscribeAddress, { type, value }))
       )

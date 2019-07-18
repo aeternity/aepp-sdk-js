@@ -70,13 +70,5 @@ export const WalletConnection = required({
  * @param {Object} msg - Message
  */
 
-/**
- * On disconnect handler
- * @function onDisconnect
- * @instance
- * @abstract
- * @rtype (handler: Function) => void
- * @param {Function} handler - On disconnect callback fnh
- */
 
 export default WalletConnection

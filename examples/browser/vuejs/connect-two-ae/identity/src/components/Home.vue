@@ -36,14 +36,18 @@
       Loading Aepp...
     </div>
     <!-- external app -->
-    <iframe v-show="aeppUrl" ref="aepp" class="w-full h-screen border border-black border-dashed bg-grey-light mx-auto mt-4 shadow" name="aepp" src="http://localhost:9001" frameborder="1"></iframe>
+    <iframe v-show="aeppUrl" ref="aepp"
+            class="w-full h-screen border border-black border-dashed bg-grey-light mx-auto mt-4 shadow" name="aepp"
+            src="http://localhost:9001" frameborder="1"></iframe>
   </div>
 </template>
 
 <script>
   // AE_SDK_MODULES is a webpack alias present in webpack.config.js
   import { Wallet, MemoryAccount, RpcWallet } from '@aeternity/aepp-sdk/es'
-  import BrowserWindowMessageConnection from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-connection/browser-window-message'
+  import Node from '@aeternity/aepp-sdk/es/node'
+  import BrowserWindowMessageConnection
+    from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-connection/browser-window-message'
 
   export default {
     data () {
@@ -54,14 +58,14 @@
         client: null,
         balance: null,
         height: null,
-        url: 'https://sdk-testnet.aepps.com',
-        internalUrl: 'https://sdk-testnet.aepps.com',
-        compilerUrl: 'https://compiler.aepps.com',
+        url: 'http://localhost:3013',
+        internalUrl: 'http://localhost:3113',
+        compilerUrl: 'http://localhost:3080',
         aeppUrl: '//0.0.0.0:9001'
       }
     },
     methods: {
-      confirmDialog (method, params, {id}) {
+      confirmDialog (method, params, { id }) {
         return Promise.resolve(window.confirm(`User ${id} wants to run ${method} ${params}`))
       },
       async shareWalletInfo (postFn, { interval = 5000, attemps = 5 } = {}) {
@@ -69,6 +73,7 @@
         const pause = async (duration) => {
           await new Promise(resolve => setTimeout(resolve, duration))
         }
+
         async function prob (left) {
           ins.shareWalletInfo(postFn)
           if (left > 0) {
@@ -79,6 +84,7 @@
             return
           }
         }
+
         return await prob(attemps)
       }
     },
@@ -87,25 +93,27 @@
         url: this.url,
         internalUrl: this.internalUrl,
         compilerUrl: this.compilerUrl,
-        accounts: [MemoryAccount({keypair: {secretKey: this.priv, publicKey: this.pub}})],
+        accounts: [MemoryAccount({ keypair: { secretKey: this.priv, publicKey: this.pub } })],
         address: this.pub,
         name: 'Wallet',
-        onConnection (aepp ,{ accept, deny }) {
+        onConnection (aepp, { accept, deny }) {
           if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to connect`)) {
             accept()
           }
         },
-        onSubscription(aepp ,{ accept, deny }) {
+        async onSubscription (aepp, { accept, deny }) {
           if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to subscribe address`)) {
             accept()
+            const node = await Node({ url: 'http://localhost:3013', internalUrl: 'http://localhost:3013' })
+            this.setNode(node)
           }
         },
-        onSign(aepp ,{ accept, deny, params }) {
+        onSign (aepp, { accept, deny, params }) {
           if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to sign ${JSON.stringify(params.tx)}`)) {
             accept()
           }
         },
-        onDisconnect(a ,b) {
+        onDisconnect (a, b) {
           this.shareWalletInfo(connection.sendMessage.bind(connection))
         }
       })

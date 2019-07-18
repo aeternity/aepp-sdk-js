@@ -276,7 +276,17 @@
         name: 'AEPP',
         url: NODE_URL,
         internalUrl: NODE_INTERNAL_URL,
-        compilerUrl: COMPILER_URL
+        compilerUrl: COMPILER_URL,
+        onNetworkChange (params) {
+          debugger
+
+        },
+        onAddressChange (a,b) {
+          debugger
+        },
+        onDisconnect () {
+          debugger
+        }
       })
       this.height = await this.client.height()
       const scannerConnection = await BrowserWindowMessageConnection({

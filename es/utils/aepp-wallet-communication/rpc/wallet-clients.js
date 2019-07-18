@@ -46,8 +46,8 @@ export const WalletClient = stampit({
     isConnected () {
       return this.info.status === RPC_STATUS.CONNECTED
     },
-    disconnect () {
-      this.connection.disconnect()
+    async disconnect () {
+      return this.connection.disconnect()
     },
     updateSubscription (type, value) {
       if (type === SUBSCRIPTION_TYPES.subscribe && !this.addressSubscription.includes(value)) {
@@ -114,8 +114,9 @@ export const WalletClients = stampit({
     },
     sentNotificationByCondition (msg, condition) {
       if (typeof condition !== 'function') throw new Error('Condition arguments must be a function which return boolean')
-      this.clients
-        .values()
+      Array.from(
+        this.clients.values()
+      )
         .filter(condition)
         .forEach(client => client.sendMessage(msg, true))
     }
