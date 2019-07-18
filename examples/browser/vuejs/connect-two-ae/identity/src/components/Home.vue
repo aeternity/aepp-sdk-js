@@ -48,13 +48,14 @@
   import Node from '@aeternity/aepp-sdk/es/node'
   import BrowserWindowMessageConnection
     from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-connection/browser-window-message'
+  import { generateKeyPair } from '../../../../../../../es/utils/crypto'
 
   export default {
     data () {
       return {
         runningInFrame: window.parent !== window,
-        pub: 'YOUR_PUB', // Your public key
-        priv: 'YOUR_PRIV', // Your private key
+        pub: '', // Your public key
+        priv: '', // Your private key
         client: null,
         balance: null,
         height: null,
@@ -89,11 +90,12 @@
       }
     },
     async created () {
+      const { publicKey, secretKey } = generateKeyPair()
       this.client = await RpcWallet({
         url: this.url,
         internalUrl: this.internalUrl,
         compilerUrl: this.compilerUrl,
-        accounts: [MemoryAccount({ keypair: { secretKey: this.priv, publicKey: this.pub } })],
+        accounts: [MemoryAccount({ keypair: { secretKey: this.priv || secretKey, publicKey: this.pub || publicKey } })],
         address: this.pub,
         name: 'Wallet',
         onConnection (aepp, { accept, deny }) {

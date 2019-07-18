@@ -127,6 +127,7 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
   },
   methods: {
     addRpcClient (clientConnection) {
+      debugger
       // @TODO  detect if aepp has some history based on origin????: if yes use this instance for connection
       const id = uuid()
       rpcClients.addClient(
