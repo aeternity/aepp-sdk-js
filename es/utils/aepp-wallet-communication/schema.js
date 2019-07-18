@@ -49,7 +49,7 @@ export const METHODS = {
   [NOTIFICATIONS.closeConnection]: 'peer.connection.close'
 }
 
-export const RPC_STATUS =  {
+export const RPC_STATUS = {
   CONNECTED: 'CONNECTED',
   DISCONNECTED: 'DISCONNECTED',
   CONNECTION_REJECTED: 'CONNECTION_REJECTED',
