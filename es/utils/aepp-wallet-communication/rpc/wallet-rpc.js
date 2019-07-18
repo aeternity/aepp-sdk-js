@@ -84,7 +84,6 @@ const REQUESTS = {
       // NetworkId check
       if (client.info.network !== instance.getNetworkId()) return sendResponseMessage(client)(id, method, { error: ERRORS.unsupportedNetwork() })
 
-
       const accept = (id) => async () => sendResponseMessage(client)(id, method, { result: { signedTransaction: Buffer.from(await instance.sign(tx)) } })
       const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.signDeny(error) })
 
@@ -164,6 +163,7 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
       const address = await account.address()
       this.accounts[address] = { account, meta }
       if (select) return this.selectAccount(address)
+      // Send notification 'update.address' to all Aepp which are subscribed for connected accounts
       rpcClients.sentNotificationByCondition(
         message(METHODS.updateNetwork, { network: this.getNetworkId() }),
         (client) => client.isConnected() && client.addressSubscription.includes(SUBSCRIPTION_VALUES.connected)
@@ -171,7 +171,7 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
     },
     selectAccount (address) {
       this.Selector.address = address
-      // Send notification 'update.address' to all Aepp which are subscribed for account update
+      // Send notification 'update.address' to all Aepp which are subscribed for current account update
       rpcClients.sentNotificationByCondition(
         message(METHODS.wallet.updateAddress, this.getAccounts()),
         (client) => client.addressSubscription.includes(SUBSCRIPTION_VALUES.current) && client.isConnected())
