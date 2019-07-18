@@ -33,13 +33,13 @@ const REQUESTS = {
       if (network !== instance.getNetworkId()) return sendResponseMessage(client)(id, method, { error: ERRORS.unsupportedNetwork() })
 
       // Action methods
-      const accept = (id) => () => {
+      const accept = (id) => (error) => {
         rpcClients.updateClientInfo(client.id, { status: RPC_STATUS.CONNECTED })
         sendResponseMessage(client)(id, method, { result: instance.getWalletInfo() })
       }
       const deny = (id) => (error) => {
         rpcClients.updateClientInfo(client.id, { status: RPC_STATUS.CONNECTION_REJECTED })
-        sendResponseMessage(client)(id, METHODS.aepp.connect, { error })
+        sendResponseMessage(client)(id, METHODS.aepp.connect, { error: ERRORS.connectionDeny(error) })
       }
 
       // Store new AEPP and wait for connection approve

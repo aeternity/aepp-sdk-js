@@ -69,8 +69,13 @@ export const ERRORS = {
     data: error,
     message: 'Sign request denied'
   }),
+  connectionDeny: (error = {}) => ({
+    code: 9,
+    data: error,
+    message: 'Wallet deny your connection request'
+  }),
   notAuthorize: (error = {}) => ({
-    code: 11,
+    code: 10,
     data: error,
     message: 'You are not connected to the wallet'
   }),

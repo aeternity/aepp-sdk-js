@@ -111,25 +111,25 @@ export const AeppRpc = Ae.compose(Account, {
       return this.sendConnectRequest()
     },
     async disconnectWallet (force = false) {
-      if (!this.rpcClient || !this.rpcClient.connection.isConnected() || this.rpcClient.isConnected()) throw new Error('You are not connected')
+      if (!this.rpcClient || !this.rpcClient.connection.isConnected() || this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
       force || this.rpcClient.sendMessage(message(METHODS.closeConnection, { reason: 'bye' }), true)
       await this.rpcClient.disconnect().catch(e => console.error(e))
       this.rpcClient = null
     },
     async address () {
-      if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected')
+      if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
       if (!this.rpcClient.getCurrentAccount()) throw new Error('You do not subscribed for account.')
       return this.rpcClient.getCurrentAccount()
     },
     async sign (tx) {
-      if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected')
+      if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
       if (!this.rpcClient.getCurrentAccount()) throw new Error('You do not subscribed for account.')
       return this.rpcClient.addCallback(
         this.rpcClient.sendMessage(message(METHODS.aepp.sign, { tx }))
       )
     },
     async subscribeAddress (type, value) {
-      if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected')
+      if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
       return this.rpcClient.addCallback(
         this.rpcClient.sendMessage(message(METHODS.aepp.subscribeAddress, { type, value }))
       )
