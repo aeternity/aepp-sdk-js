@@ -278,13 +278,14 @@
         internalUrl: NODE_INTERNAL_URL,
         compilerUrl: COMPILER_URL,
         onNetworkChange (params) {
-          debugger
+          if (this.getNetworkId() !== params.network) alert(`Connected network ${this.getNetworkId()} is not supported with wallet network ${params.netwok}`)
 
         },
-        onAddressChange (a,b) {
-          debugger
+        async onAddressChange (addresses) {
+          this.pub = await this.address()
+          this.balance = await this.client.balance(this.pub).catch(console.log)
         },
-        onDisconnect () {
+        onDisconnect (a) {
           debugger
         }
       })

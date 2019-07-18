@@ -4,7 +4,7 @@ import Selector from '../../../account/selector'
 
 import { WalletClients } from './wallet-clients'
 import { getBrowserAPI, message, sendResponseMessage } from '../helpers'
-import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE } from '../schema'
+import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE, SUBSCRIPTION_VALUES } from '../schema'
 import uuid from 'uuid/v4'
 
 const rpcClients = WalletClients()
@@ -127,7 +127,6 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
   },
   methods: {
     addRpcClient (clientConnection) {
-      debugger
       // @TODO  detect if aepp has some history based on origin????: if yes use this instance for connection
       const id = uuid()
       rpcClients.addClient(
@@ -161,13 +160,21 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
           .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {})
       }
     },
+    async addAccount (account, { select, meta }) {
+      const address = await account.address()
+      this.accounts[address] = { account, meta }
+      if (select) return this.selectAccount(address)
+      rpcClients.sentNotificationByCondition(
+        message(METHODS.updateNetwork, { network: this.getNetworkId() }),
+        (client) => client.isConnected() && client.addressSubscription.includes(SUBSCRIPTION_VALUES.connected)
+      )
+    },
     selectAccount (address) {
       this.Selector.address = address
       // Send notification 'update.address' to all Aepp which are subscribed for account update
       rpcClients.sentNotificationByCondition(
         message(METHODS.wallet.updateAddress, this.getAccounts()),
-        (client) => client.addressSubscription.includes(this.Selector.address) && client.isConnected()
-      )
+        (client) => client.addressSubscription.includes(SUBSCRIPTION_VALUES.current) && client.isConnected())
     },
     setNode (node) {
       Object.assign(this, node)

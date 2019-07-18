@@ -37,6 +37,7 @@ export const WalletClient = stampit({
     this.callbacks = {}
     this.actions = {}
     this.addressSubscription = []
+    this.accounts = {}
 
     this.sendMessage = sendMessage(messageId, this.connection)
 
@@ -45,6 +46,10 @@ export const WalletClient = stampit({
   methods: {
     isConnected () {
       return this.info.status === RPC_STATUS.CONNECTED
+    },
+    getCurrentAccount () {
+      if (!this.accounts.current || Object.keys(this.accounts.current).length) throw new Error('You do not subscribed for account.')
+      return Object.keys(this.accounts.current)[0]
     },
     async disconnect () {
       return this.connection.disconnect()
@@ -114,11 +119,11 @@ export const WalletClients = stampit({
     },
     sentNotificationByCondition (msg, condition) {
       if (typeof condition !== 'function') throw new Error('Condition arguments must be a function which return boolean')
-      Array.from(
+      const clients = Array.from(
         this.clients.values()
       )
         .filter(condition)
-        .forEach(client => client.sendMessage(msg, true))
+      clients.forEach(client => client.sendMessage(msg, true))
     }
   }
 })

@@ -91,11 +91,12 @@
     },
     async created () {
       const { publicKey, secretKey } = generateKeyPair()
+      const account2 = MemoryAccount({ keypair: generateKeyPair() })
       this.client = await RpcWallet({
         url: this.url,
         internalUrl: this.internalUrl,
         compilerUrl: this.compilerUrl,
-        accounts: [MemoryAccount({ keypair: { secretKey: this.priv || secretKey, publicKey: this.pub || publicKey } })],
+        accounts: [MemoryAccount({ keypair: { secretKey: this.priv || secretKey, publicKey: this.pub || publicKey } }), account2],
         address: this.pub,
         name: 'Wallet',
         onConnection (aepp, { accept, deny }) {
@@ -106,11 +107,11 @@
         async onSubscription (aepp, { accept, deny }) {
           if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to subscribe address`)) {
             accept()
-            const node = await Node({ url: 'http://localhost:3013', internalUrl: 'http://localhost:3013' })
-            this.setNode(node)
+            // const node = await Node({ url: 'http://localhost:3013', internalUrl: 'http://localhost:3013' })
+            // this.setNode(node)
           }
         },
-        onSign (aepp, { accept, deny, params }) {
+        async onSign (aepp, { accept, deny, params }) {
           if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to sign ${JSON.stringify(params.tx)}`)) {
             accept()
           }
