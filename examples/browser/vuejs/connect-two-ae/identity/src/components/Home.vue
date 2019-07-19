@@ -66,9 +66,6 @@
       }
     },
     methods: {
-      confirmDialog (method, params, { id }) {
-        return Promise.resolve(window.confirm(`User ${id} wants to run ${method} ${params}`))
-      },
       async shareWalletInfo (postFn, { interval = 5000, attemps = 5 } = {}) {
         const ins = this.client
         const pause = async (duration) => {
