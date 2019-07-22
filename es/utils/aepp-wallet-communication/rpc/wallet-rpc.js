@@ -84,18 +84,27 @@ const REQUESTS = {
       // NetworkId check
       if (client.info.network !== instance.getNetworkId()) return sendResponseMessage(client)(id, method, { error: ERRORS.unsupportedNetwork() })
 
-      const accept = (id) => async (rawTx) =>
-        sendResponseMessage(client)(
-          id,
-          method,
-          {
-            result: {
-              ...returnSigned
-                ? { signedTransaction: await instance.signTransaction(locked ? tx : rawTx || tx, {}) }
-                : { transactionHash: await instance.send(locked ? tx : rawTx || tx, {}) }
+      const accept = (id) => async (rawTx) => {
+        try {
+          sendResponseMessage(client)(
+            id,
+            method,
+            {
+              result: {
+                ...returnSigned
+                  ? { signedTransaction: await instance.signTransaction(locked ? tx : rawTx || tx, {}) }
+                  : { transactionHash: await instance.send(locked ? tx : rawTx || tx, {}) }
+              }
             }
+          )
+        } catch (e) {
+          if (!returnSigned) {
+            // Send broadcast failed error to aepp
+            sendResponseMessage(client)(id, method, { error: ERRORS.broadcastFailde(error) })
           }
-        )
+        }
+      }
+
       const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.signDeny(error) })
 
       instance.onSign(client, client.addAction({ id, method, params: { tx, returnSigned, locked } }, [accept(id), deny(id)]))
