@@ -71,7 +71,7 @@ function changeState (channel, newState) {
 }
 
 function send (channel, message) {
-  websockets.get(channel).send(JSON.stringify(message, undefined, 2))
+  websockets.get(channel).send(JSON.stringify(message))
 }
 
 function enqueueAction (channel, guard, action) {
