@@ -71,7 +71,7 @@ function changeState (channel, newState) {
 }
 
 function send (channel, message) {
-  websockets.get(channel).send(JSON.stringify(message, undefined, 2))
+  websockets.get(channel).send(JSON.stringify(message))
 }
 
 function enqueueAction (channel, guard, action) {
@@ -183,7 +183,7 @@ function WebSocket (url, callbacks) {
 
 async function initialize (channel, channelOptions) {
   const optionsKeys = ['sign', 'url']
-  const params = R.pickBy(key => !optionsKeys.includes(key), channelOptions)
+  const params = R.pickBy((_, key) => !optionsKeys.includes(key), channelOptions)
   const { url } = channelOptions
   const wsUrl = channelURL(url, { ...params, protocol: 'json-rpc' })
 
