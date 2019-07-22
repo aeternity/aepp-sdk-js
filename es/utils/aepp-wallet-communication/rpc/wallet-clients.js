@@ -48,7 +48,7 @@ export const WalletClient = stampit({
       return this.info.status === RPC_STATUS.CONNECTED
     },
     getCurrentAccount () {
-      if (!this.accounts.current || Object.keys(this.accounts.current).length) throw new Error('You do not subscribed for account.')
+      if (!this.accounts.current || !Object.keys(this.accounts.current).length) throw new Error('You do not subscribed for account.')
       return Object.keys(this.accounts.current)[0]
     },
     async disconnect () {
