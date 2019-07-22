@@ -100,7 +100,7 @@ const REQUESTS = {
         } catch (e) {
           if (!returnSigned) {
             // Send broadcast failed error to aepp
-            sendResponseMessage(client)(id, method, { error: ERRORS.broadcastFailde(error) })
+            sendResponseMessage(client)(id, method, { error: ERRORS.broadcastFailde(e) })
           }
         }
       }
