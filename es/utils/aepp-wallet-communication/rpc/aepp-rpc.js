@@ -5,6 +5,7 @@ import { message } from '../helpers'
 import { METHODS, REQUESTS, RPC_STATUS, VERSION } from '../schema'
 import Account from '../../../account'
 import uuid from 'uuid/v4'
+import * as R from 'ramda'
 
 const NOTIFICATIONS = {
   [METHODS.wallet.updateAddress]: (instance) =>
@@ -121,11 +122,11 @@ export const AeppRpc = Ae.compose(Account, {
       if (!this.rpcClient.getCurrentAccount()) throw new Error('You do not subscribed for account.')
       return this.rpcClient.getCurrentAccount()
     },
-    async sign (tx) {
+    async signTransaction (tx, opt = {}) {
       if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
       if (!this.rpcClient.getCurrentAccount()) throw new Error('You do not subscribed for account.')
       return this.rpcClient.addCallback(
-        this.rpcClient.sendMessage(message(METHODS.aepp.sign, { tx }))
+        this.rpcClient.sendMessage(message(METHODS.aepp.sign, { ...opt, tx, returnSigned: true }))
       )
     },
     async subscribeAddress (type, value) {
@@ -141,6 +142,17 @@ export const AeppRpc = Ae.compose(Account, {
           version: VERSION,
           network: this.nodeNetworkId
         }))
+      )
+    },
+    async send (tx, options) {
+      if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
+      if (!this.rpcClient.getCurrentAccount()) throw new Error('You do not subscribed for account.')const opt = R.merge(this.Ae.defaults, options = { walletBroadcast: true })
+      if (!options.walletBroadcast) {
+        const signed = await this.signTransaction(tx, opt)
+        return this.sendTransaction(signed, opt)
+      }
+      return this.rpcClient.addCallback(
+        this.rpcClient.sendMessage(message(message(METHODS.aepp.sign, { ...opt, tx, returnSigned: false })))
       )
     }
   }

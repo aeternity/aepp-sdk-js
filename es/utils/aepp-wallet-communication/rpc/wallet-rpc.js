@@ -78,13 +78,24 @@ const REQUESTS = {
       instance.onSubscription(client, client.addAction({ id, method, params: { type, value } }, [accept(id), deny(id)]))
     },
   [METHODS.aepp.sign]: (instance, { client }) =>
-    ({ id, method, params: { tx } }) => {
+    ({ id, method, params: { tx, opt, locked = false, returnSigned = false } }) => {
       // Authorization check
       if (!client.isConnected()) return sendResponseMessage(client)(id, method, { error: ERRORS.notAuthorize() })
       // NetworkId check
       if (client.info.network !== instance.getNetworkId()) return sendResponseMessage(client)(id, method, { error: ERRORS.unsupportedNetwork() })
 
-      const accept = (id) => async () => sendResponseMessage(client)(id, method, { result: { signedTransaction: Buffer.from(await instance.sign(tx)) } })
+      const accept = (id) => async (rawTx) =>
+        sendResponseMessage(client)(
+          id,
+          method,
+          {
+            result: {
+              ...returnSigned
+                ? { signedTransaction: await instance.signTransaction(locked ? tx : rawTx || tx, {}) }
+                : { transactionHash: await instance.send(locked ? tx : rawTx || tx, {}) }
+            }
+          }
+        )
       const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.signDeny(error) })
 
       instance.onSign(client, client.addAction({ id, method, params: { tx } }, [accept(id), deny(id)]))
