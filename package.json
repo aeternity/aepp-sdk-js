@@ -68,7 +68,7 @@
     "bufferutil": "^4.0.1",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
-    "cz-conventional-changelog": "^2.1.0",
+    "cz-conventional-changelog": "^3.0.0",
     "docco": "^0.8.0",
     "esdoc": "^1.1.0",
     "esdoc-standard-plugin": "^1.0.0",
