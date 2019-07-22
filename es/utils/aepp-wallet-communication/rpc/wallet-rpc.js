@@ -86,21 +86,22 @@ const REQUESTS = {
 
       const accept = (id) => async (rawTx) => {
         try {
+          const result = {
+            result: {
+              ...returnSigned
+                ? { signedTransaction: await instance.signTransaction(locked ? tx : rawTx || tx, {}) }
+                : { transactionHash: await instance.send(locked ? tx : rawTx || tx, {}) }
+            }
+          }
           sendResponseMessage(client)(
             id,
             method,
-            {
-              result: {
-                ...returnSigned
-                  ? { signedTransaction: await instance.signTransaction(locked ? tx : rawTx || tx, {}) }
-                  : { transactionHash: await instance.send(locked ? tx : rawTx || tx, {}) }
-              }
-            }
+            result
           )
         } catch (e) {
           if (!returnSigned) {
             // Send broadcast failed error to aepp
-            sendResponseMessage(client)(id, method, { error: ERRORS.broadcastFailde(e) })
+            sendResponseMessage(client)(id, method, { error: ERRORS.broadcastFailde(e.message) })
           }
         }
       }
