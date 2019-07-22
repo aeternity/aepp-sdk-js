@@ -183,7 +183,7 @@ function WebSocket (url, callbacks) {
 
 async function initialize (channel, channelOptions) {
   const optionsKeys = ['sign', 'url']
-  const params = R.pickBy(key => !optionsKeys.includes(key), channelOptions)
+  const params = R.pickBy((_, key) => !optionsKeys.includes(key), channelOptions)
   const { url } = channelOptions
   const wsUrl = channelURL(url, { ...params, protocol: 'json-rpc' })
 
