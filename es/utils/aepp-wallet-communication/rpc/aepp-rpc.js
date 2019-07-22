@@ -100,6 +100,7 @@ export const AeppRpc = Ae.compose(Account, {
     this.onNetworkChange = onNetworkChange
   },
   methods: {
+    sign () {},
     async connectToWallet (connection) {
       if (this.rpcClient && this.rpcClient.isConnected()) throw new Error('You are already connected to wallet ' + this.rpcClient)
       this.rpcClient = WalletClient({
@@ -146,13 +147,14 @@ export const AeppRpc = Ae.compose(Account, {
     },
     async send (tx, options) {
       if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
-      if (!this.rpcClient.getCurrentAccount()) throw new Error('You do not subscribed for account.')const opt = R.merge(this.Ae.defaults, options = { walletBroadcast: true })
-      if (!options.walletBroadcast) {
+      if (!this.rpcClient.getCurrentAccount()) throw new Error('You do not subscribed for account.')
+      const opt = R.merge(this.Ae.defaults, { walletBroadcast: true, ...options })
+      if (!opt.walletBroadcast) {
         const signed = await this.signTransaction(tx, opt)
         return this.sendTransaction(signed, opt)
       }
       return this.rpcClient.addCallback(
-        this.rpcClient.sendMessage(message(message(METHODS.aepp.sign, { ...opt, tx, returnSigned: false })))
+        this.rpcClient.sendMessage(message(METHODS.aepp.sign, { ...opt, tx, returnSigned: false }))
       )
     }
   }

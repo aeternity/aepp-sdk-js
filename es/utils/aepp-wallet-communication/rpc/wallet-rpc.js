@@ -98,7 +98,7 @@ const REQUESTS = {
         )
       const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.signDeny(error) })
 
-      instance.onSign(client, client.addAction({ id, method, params: { tx } }, [accept(id), deny(id)]))
+      instance.onSign(client, client.addAction({ id, method, params: { tx, returnSigned, locked } }, [accept(id), deny(id)]))
     }
 }
 

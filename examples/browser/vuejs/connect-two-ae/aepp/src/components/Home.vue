@@ -200,7 +200,7 @@
           this.spendResult = await this.client.spend(
             this.spendAmount,
             this.spendTo, {
-              payload: this.spendPayload,
+              payload: this.spendPayload
             }
           )
         } catch (err) {

@@ -109,9 +109,11 @@
           } else { deny() }
         },
         async onSign (aepp, { accept, deny, params }) {
-          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to sign ${JSON.stringify(params.tx)}`)) {
+          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to ${params.returnSigned ? 'sign' : 'sign and broadcast'} ${JSON.stringify(params.tx)}`)) {
             accept()
-          } else { deny() }
+          } else {
+            deny()
+          }
         },
         onDisconnect (a, b) {
           this.shareWalletInfo(connection.sendMessage.bind(connection))
