@@ -6,6 +6,7 @@ import { WalletClients } from './wallet-clients'
 import { getBrowserAPI, message, sendResponseMessage } from '../helpers'
 import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE, SUBSCRIPTION_VALUES } from '../schema'
 import uuid from 'uuid/v4'
+import { unpackTx } from '../../../tx/builder'
 
 const rpcClients = WalletClients()
 
@@ -70,7 +71,7 @@ const REQUESTS = {
           {
             result: {
               subscription: client.updateSubscription(type, value),
-              addresses: instance.getAccounts()
+              address: instance.getAccounts()
             }
           })
       const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.subscriptionDeny(error) })
@@ -101,14 +102,15 @@ const REQUESTS = {
         } catch (e) {
           if (!returnSigned) {
             // Send broadcast failed error to aepp
-            sendResponseMessage(client)(id, method, { error: ERRORS.broadcastFailde(e.message) })
+            return sendResponseMessage(client)(id, method, { error: ERRORS.broadcastFailde(e.message) })
           }
+          throw error
         }
       }
 
       const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.signDeny(error) })
 
-      instance.onSign(client, client.addAction({ id, method, params: { tx, returnSigned, locked } }, [accept(id), deny(id)]))
+      instance.onSign(client, client.addAction({ id, method, params: { tx, returnSigned, locked }, meta: unpackTx(tx) }, [accept(id), deny(id)]))
     }
 }
 

@@ -33,7 +33,7 @@ const RESPONSES = {
     },
   [METHODS.aepp.subscribeAddress]: (instance) =>
     (msg) => {
-      if (msg.result && msg.result.hasOwnProperty('addresses')) instance.rpcClient.accounts = msg.result.addresses
+      if (msg.result && msg.result.hasOwnProperty('address')) instance.rpcClient.accounts = msg.result.address
 
       processResponse(instance)(
         msg,
