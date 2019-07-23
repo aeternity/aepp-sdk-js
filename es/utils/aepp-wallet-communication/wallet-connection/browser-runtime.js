@@ -32,21 +32,13 @@ function connect (onMessage, onDisconnect) {
   if (this.port.onMessage.hasListeners()) throw new Error('You already connected')
   this.port.onMessage.addListener(onMessage)
   this.port.onDisconnect.addListener(() => {
-    onDisconnect()
+    onDisconnect({}, this)
     this.port.disconnect()
   })
 }
 
 async function disconnect () {
   this.port.disconnect()
-}
-
-function onDisconnect (onDisconnect) {
-  if (!this.port) throw new Error('You dont have connection. Please connect before')
-  this.port.onDisconnect.addListener(() => {
-    typeof onDisconnect !== 'function' || onDisconnect(this)
-    this.port.disconnect()
-  })
 }
 
 function sendMessage (msg) {

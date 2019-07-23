@@ -81,12 +81,12 @@ RpcWallet({
     onSubscription (aepp, action) {
         if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} want to subscribe for accounts`)) {
             action.accept()
-        }
+        } else { action.deny() }
     },
     onSign (aepp, action) {
         if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} want to sign tx ${action.params.tx}`)) {
             action.accept()
-        }
+        } else { action.deny() }
     }
 }).then(wallet => {
     // Subscribe for runtime connection
