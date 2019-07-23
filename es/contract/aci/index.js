@@ -49,7 +49,7 @@ async function prepareArgsForEncode (aci, params) {
 }
 
 /**
- * Generate contract ACI object with predefined js methods for contract usage
+ * Generate contract ACI object with predefined js methods for contract usage - can be used for creating a reference to already deployed contracts
  * @alias module:@aeternity/aepp-sdk/es/contract/aci
  * @param {String} source Contract source code
  * @param {Object} [options] Options object
