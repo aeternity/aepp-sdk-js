@@ -88,6 +88,7 @@
     },
     async created () {
       const { publicKey, secretKey } = generateKeyPair()
+      this.pub = publicKey
       const account2 = MemoryAccount({ keypair: generateKeyPair() })
       this.client = await RpcWallet({
         url: this.url,
