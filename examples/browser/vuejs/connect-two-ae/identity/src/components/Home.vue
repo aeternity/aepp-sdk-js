@@ -105,8 +105,8 @@
         async onSubscription (aepp, { accept, deny }) {
           if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to subscribe address`)) {
             accept()
-            // const node = await Node({ url: 'http://localhost:3013', internalUrl: 'http://localhost:3013' })
-            // this.setNode(node)
+            const node = await Node({ url: 'http://localhost:3013', internalUrl: 'http://localhost:3013' })
+            this.setNode(node)
           } else { deny() }
         },
         async onSign (aepp, { accept, deny, params }) {

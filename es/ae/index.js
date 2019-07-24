@@ -106,8 +106,9 @@ function destroyInstance () {
 
 function setNode (node) {
   const nodeProps = ['Swagger', 'api', 'consensusProtocolVersion', 'genesisHash', 'methods']
-  if (!node || typeof node !== 'object' || nodeProps.find(prop => !node.hasOwnProperty(prop)))
+  if (!node || typeof node !== 'object' || nodeProps.find(prop => !node.hasOwnProperty(prop))) {
     throw new Error('Invalid node object')
+  }
   Object.assign(this, node)
 }
 
