@@ -25,14 +25,14 @@
 import Account from './'
 import * as Crypto from '../utils/crypto'
 
-const secrets = new WeakMap()
+const secret = {}
 
 async function sign (data) {
-  return Promise.resolve(Crypto.sign(data, secrets.get(this).secretKey))
+  return Promise.resolve(Crypto.sign(data, secret.secretKey))
 }
 
 async function address (format = Crypto.ADDRESS_FORMAT.api) {
-  return Promise.resolve(Crypto.formatAddress(format, secrets.get(this).publicKey))
+  return Promise.resolve(Crypto.formatAddress(format, secret.publicKey))
 }
 
 /**
@@ -52,10 +52,8 @@ function setKeypair (keypair) {
     keypair = { secretKey: keypair.priv, publicKey: keypair.pub }
     console.warn('pub/priv naming for accounts has been deprecated, please use secretKey/publicKey')
   }
-  secrets.set(this, {
-    secretKey: Buffer.from(keypair.secretKey, 'hex'),
-    publicKey: keypair.publicKey
-  })
+  secret.secretKey = Buffer.from(keypair.secretKey, 'hex')
+  secret.publicKey = keypair.publicKey
 }
 
 /**
