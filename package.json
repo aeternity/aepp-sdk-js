@@ -93,7 +93,7 @@
     "standard-loader": "^7.0.0",
     "supports-color": "^7.0.0",
     "uglify-es": "^3.3.9",
-    "webpack": "^4.20.1",
+    "webpack": "^4.36.1",
     "webpack-bundle-analyzer": "^3.3.2",
     "webpack-cli": "3.3.6",
     "worker-farm": "^1.6.0"
