@@ -79,15 +79,14 @@ describe('Accounts', function () {
   it('spends big amount of tokens', async () => {
     const bigAmount = '10000000000000100000000000000000'
     const genesis = await BaseAe({ networkId })
-    const balanceBefore = await wallet.balance(await wallet.address(), { format: false })
-    const receiverId = await wallet.address()
-    const ret = await genesis.spend(bigAmount, receiverId)
+    const receiverWallet = generateKeyPair()
+    const ret = await genesis.spend(bigAmount, receiverWallet.publicKey)
 
-    const balanceAfter = await wallet.balance(await wallet.address(), { format: false })
-    balanceAfter.should.be.equal(BigNumber(bigAmount).plus(balanceBefore).toString(10))
+    const balanceAfter = await wallet.balance(receiverWallet.publicKey)
+    balanceAfter.should.be.equal(bigAmount)
     ret.should.have.property('tx')
     ret.tx.should.include({
-      amount: bigAmount, recipientId: receiverId
+      amount: bigAmount, recipientId: receiverWallet.publicKey
     })
   })
 
