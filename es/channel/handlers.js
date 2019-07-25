@@ -104,7 +104,7 @@ export function awaitingOnChainTx (channel, message, state) {
     ) {
       return { handler: awaitingOnChainTx }
     }
-    emit(channel, 'onChainTx', message.params.data.signed_tx, {
+    emit(channel, 'onChainTx', message.params.data.tx, {
       info: message.params.data.info,
       type: message.params.data.type
     })
@@ -174,7 +174,7 @@ export async function channelOpen (channel, message, state) {
       }
       break
     case 'channels.on_chain_tx':
-      emit(channel, 'onChainTx', message.params.data.signed_tx, {
+      emit(channel, 'onChainTx', message.params.data.tx, {
         info: message.params.data.info,
         type: message.params.data.type
       })
