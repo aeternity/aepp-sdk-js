@@ -15,7 +15,8 @@ export const SOPHIA_TYPES = [
   'oracleQuery',
   'hash',
   'signature',
-  'bytes'
+  'bytes',
+  'variant'
 ].reduce((acc, type) => ({ ...acc, [type]: type }), {})
 
 /**
@@ -98,9 +99,22 @@ export async function transform (type, value, { bindings } = {}) {
       )}}`
     case SOPHIA_TYPES.map:
       return transformMap(value, generic, { bindings })
+    case SOPHIA_TYPES.variant:
+      return transformVariant(value, generic, { bindings })
   }
 
   return `${value}`
+}
+
+async function transformVariant (value, generic, { bindings }) {
+  const [[variant, variantArgs]] = Object.entries(value)
+  const [[v, type]] = Object.entries(generic.find(o => Object.keys(o)[0].toLowerCase() === variant.toLowerCase()))
+  return `${v}${!type.length
+    ? ''
+    : `(${await Promise.all(variantArgs.slice(0, type.length).map(async (el, i) => transform(type[i], el, {
+      bindings
+    })))})`
+  }`
 }
 
 export async function transformMap (value, generic, { bindings }) {
@@ -195,9 +209,12 @@ export function transformDecodedData (aci, result, { skipTransformDecoded = fals
 export function prepareSchema (type, { bindings } = {}) {
   let { t, generic } = readType(type, { bindings })
   if (!Object.keys(SOPHIA_TYPES).includes(t)) t = SOPHIA_TYPES.address // Handle Contract address transformation
+
   switch (t) {
     case SOPHIA_TYPES.int:
       return Joi.number().error(getJoiErrorMsg)
+    case SOPHIA_TYPES.variant:
+      return Joi.object().error(getJoiErrorMsg)
     case SOPHIA_TYPES.string:
       return Joi.string().error(getJoiErrorMsg)
     case SOPHIA_TYPES.address:
