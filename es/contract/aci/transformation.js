@@ -38,8 +38,8 @@ export function injectVars (t, aciType) {
         })
       }
   }
-
 }
+
 /**
  * Ling Type Defs
  * @param t
@@ -70,8 +70,8 @@ export function readType (type, { bindings } = {}) {
 
   // Link State and typeDef
   if (
-    (typeof t === 'string' && t.indexOf(bindings.contractName) !== -1)
-    || (typeof t === 'object' && Object.keys(t)[0].indexOf(bindings.contractName) !== -1)
+    (typeof t === 'string' && t.indexOf(bindings.contractName) !== -1) ||
+    (typeof t === 'object' && Object.keys(t)[0].indexOf(bindings.contractName) !== -1)
   ) {
     t = linkTypeDefs(t, bindings)
   }
