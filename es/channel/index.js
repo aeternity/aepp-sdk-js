@@ -508,7 +508,7 @@ function callContract ({ amount, callData, contract, abiVersion }, sign) {
           params: {
             amount,
             call_data: callData,
-            contract,
+            contract_id: contract,
             abi_version: abiVersion
           }
         })
@@ -552,7 +552,7 @@ async function callContractStatic ({ amount, callData, contract, abiVersion }) {
   return snakeToPascalObjKeys(await call(this, 'channels.dry_run.call_contract', {
     amount,
     call_data: callData,
-    contract,
+    contract_id: contract,
     abi_version: abiVersion
   }))
 }
@@ -577,7 +577,13 @@ async function callContractStatic ({ amount, callData, contract, abiVersion }) {
  * })
  */
 async function getContractCall ({ caller, contract, round }) {
-  return snakeToPascalObjKeys(await call(this, 'channels.get.contract_call', { caller, contract, round }))
+  return snakeToPascalObjKeys(
+    await call(this, 'channels.get.contract_call', {
+      caller_id: caller,
+      contract_id: contract,
+      round
+    })
+  )
 }
 
 /**
