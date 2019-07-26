@@ -19,6 +19,27 @@ export const SOPHIA_TYPES = [
   'variant'
 ].reduce((acc, type) => ({ ...acc, [type]: type }), {})
 
+export function injectVars (t, aciType) {
+  const [[baseType, generic]] = Object.entries(aciType.typedef)
+  const [[_, varianValue]] = Object.entries(t)
+  switch (baseType) {
+    case SOPHIA_TYPES.variant:
+      return {
+        [baseType]: generic.map(el => {
+          const [tag, gen] = Object.entries(el)[0]
+          return {
+            [tag]: gen.map(type => {
+              const index = aciType.vars.map(e => e.name).indexOf(type)
+              return index === -1
+                ? type
+                : varianValue[index]
+            })
+          }
+        })
+      }
+  }
+
+}
 /**
  * Ling Type Defs
  * @param t
@@ -26,11 +47,15 @@ export const SOPHIA_TYPES = [
  * @return {Object}
  */
 export function linkTypeDefs (t, bindings) {
-  const [_, typeDef] = t.split('.')
+  const [_, typeDef] = typeof t === 'object' ? Object.keys(t)[0].split('.') : t.split('.')
   const aciType = [
     ...bindings.typedef,
     { name: 'state', typedef: bindings.state }
   ].find(({ name }) => name === typeDef)
+  if (aciType.vars.length) {
+    aciType.typedef = injectVars(t, aciType)
+  }
+
   return aciType.typedef
 }
 
@@ -44,9 +69,13 @@ export function readType (type, { bindings } = {}) {
   let [t] = Array.isArray(type) ? type : [type]
 
   // Link State and typeDef
-  if (typeof t === 'string' && t.indexOf(bindings.contractName) !== -1) {
+  if (
+    (typeof t === 'string' && t.indexOf(bindings.contractName) !== -1)
+    || (typeof t === 'object' && Object.keys(t)[0].indexOf(bindings.contractName) !== -1)
+  ) {
     t = linkTypeDefs(t, bindings)
   }
+
   // Map, Tuple, List, Record, Bytes
   if (typeof t === 'object') {
     const [[baseType, generic]] = Object.entries(t)
@@ -208,8 +237,8 @@ export function transformDecodedData (aci, result, { skipTransformDecoded = fals
  */
 export function prepareSchema (type, { bindings } = {}) {
   let { t, generic } = readType(type, { bindings })
-  if (!Object.keys(SOPHIA_TYPES).includes(t)) t = SOPHIA_TYPES.address // Handle Contract address transformation
 
+  if (!Object.keys(SOPHIA_TYPES).includes(t)) t = SOPHIA_TYPES.address // Handle Contract address transformation
   switch (t) {
     case SOPHIA_TYPES.int:
       return Joi.number().error(getJoiErrorMsg)
