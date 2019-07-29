@@ -50,7 +50,7 @@ export function linkTypeDefs (t, bindings) {
   const [_, typeDef] = typeof t === 'object' ? Object.keys(t)[0].split('.') : t.split('.')
   const aciType = [
     ...bindings.typedef,
-    { name: 'state', typedef: bindings.state }
+    { name: 'state', typedef: bindings.state, vars: [] }
   ].find(({ name }) => name === typeDef)
   if (aciType.vars.length) {
     aciType.typedef = injectVars(t, aciType)
@@ -71,7 +71,7 @@ export function readType (type, { bindings } = {}) {
   // Link State and typeDef
   if (
     (typeof t === 'string' && t.indexOf(bindings.contractName) !== -1) ||
-    (typeof t === 'object' && Object.keys(t)[0].indexOf(bindings.contractName) !== -1)
+    (typeof t === 'object' && Object.keys(t)[0] && Object.keys(t)[0].indexOf(bindings.contractName) !== -1)
   ) {
     t = linkTypeDefs(t, bindings)
   }
@@ -243,7 +243,23 @@ export function prepareSchema (type, { bindings } = {}) {
     case SOPHIA_TYPES.int:
       return Joi.number().error(getJoiErrorMsg)
     case SOPHIA_TYPES.variant:
-      return Joi.object().error(getJoiErrorMsg)
+      return Joi.alternatives().try([
+        Joi.string().valid(
+          ...generic.reduce((acc, el) => {
+            const [[t, g]] = Object.entries(el)
+            if (!g || !g.length) acc.push(t)
+            return acc
+          }, [])
+        ),
+        Joi.object(generic
+          .reduce(
+            (acc, el) => {
+              const variant = Object.keys(el)[0]
+              return { ...acc, [variant]: Joi.array() }
+            },
+            {})
+        ).or(...generic.map(e => Object.keys(e)[0]))
+      ])
     case SOPHIA_TYPES.string:
       return Joi.string().error(getJoiErrorMsg)
     case SOPHIA_TYPES.address:
