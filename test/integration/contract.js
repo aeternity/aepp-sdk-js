@@ -45,6 +45,8 @@ contract StateContract =
   record state = { value: string, key: number, testOption: option(string) }
   record yesEr = { t: number}
   
+  datatype dateUnit = Year | Month | Day
+  
   entrypoint init(value: string, key: int, testOption: option(string)) : state = { value = value, key = key, testOption = testOption }
   entrypoint retrieve() : (string, int) = (state.value, state.key)
 
@@ -79,6 +81,8 @@ contract StateContract =
   entrypoint bytesFn(s: bytes(32)): bytes(32) = s
   
   entrypoint usingExternalLib(s: int): int = Test.double(s)
+  
+  entrypoint datTypeFn(s: dateUnit): dateUnit = s
 `
 
 const encodedNumberSix = 'cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaKNdnK'
@@ -433,6 +437,26 @@ describe('Contract', function () {
           const res = await contractObject.methods.usingExternalLib(2)
 
           res.decodedResult.should.be.equal(4)
+        })
+      })
+      describe('DATATYPE', function () {
+        it('Invalid type', async () => {
+          try {
+            await contractObject.methods.datTypeFn({})
+          } catch (e) {
+            e.message.should.be.equal('"Argument" at position 0 fails because ["0" must be a string, "value" must contain at least one of [Year, Month, Day]]')
+          }
+        })
+        it('Invalid variant', async () => {
+          try {
+            await contractObject.methods.datTypeFn("asdcxz")
+          } catch (e) {
+            e.message.should.be.equal('"Argument" at position 0 fails because ["0" must be one of [Year, Month, Day], "0" must be an object]')
+          }
+        })
+        it('Valid', async () => {
+          const res = await contractObject.methods.datTypeFn("Year" || { Year: []})
+          JSON.stringify(res.decodedResult).should.be.equal(JSON.stringify({ Year: [] }))
         })
       })
       describe('Hash', function () {

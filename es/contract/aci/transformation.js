@@ -136,7 +136,7 @@ export async function transform (type, value, { bindings } = {}) {
 }
 
 async function transformVariant (value, generic, { bindings }) {
-  const [[variant, variantArgs]] = Object.entries(value)
+  const [[variant, variantArgs]] = typeof value === 'string' ? [[value, []]] : Object.entries(value)
   const [[v, type]] = Object.entries(generic.find(o => Object.keys(o)[0].toLowerCase() === variant.toLowerCase()))
   return `${v}${!type.length
     ? ''
