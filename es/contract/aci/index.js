@@ -40,6 +40,10 @@ import AsyncInit from '../../utils/async-init'
 async function prepareArgsForEncode (aci, params) {
   if (!aci || !aci.arguments) return params
   // Validation
+  if (aci.arguments.length > params.length) {
+    throw new Error(`Function "${aci.name}" require ${aci.arguments.length} arguments of types [${aci.arguments.map(a => JSON.stringify(a.type))}] but get [${params.map(JSON.stringify)}]`)
+  }
+
   validateArguments(aci, params)
   const bindings = aci.bindings
   // Cast argument from JS to Sophia type
