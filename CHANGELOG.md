@@ -1,3 +1,68 @@
+# [4.2.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.2.0) (2019-07-15)
+
+
+### Bug Fixes
+
+* **package:** update libsodium-wrappers-sumo to version 0.7.5 ([#541](https://github.com/aeternity/aepp-sdk-js/issues/541)) ([956ed75](https://github.com/aeternity/aepp-sdk-js/commit/956ed75))
+* **rpc-server:** Fix type 'object' check ([#526](https://github.com/aeternity/aepp-sdk-js/issues/526)) ([48c42e4](https://github.com/aeternity/aepp-sdk-js/commit/48c42e4))
+
+
+### Code Refactoring
+
+* **swagger:** Speedup initialisation
+* **AENS:** Remove unused param from claim method
+* **AENS:** Fix exception if not waiting for mining(claim)
+* **Test:** Add test for contract namespaces
+
+### Features
+
+* **Node:** Add 4.0.0 node compatibility
+* **Compiler:** Add compatibility with compiler 3.2.0
+* **Channel:** Implement GA awareness of State Channels
+
+
+
+# [4.1.0](https://github.com/aeternity/aepp-sdk-js/compare/4.0.1...4.1.0) (2019-06-22)
+
+
+### Bug Fixes
+
+* **Node:** Do not throw error if `internalUrl` not provided. Instead use `url` ([#503](https://github.com/aeternity/aepp-sdk-js/issues/503)) ([053faae](https://github.com/aeternity/aepp-sdk-js/commit/053faae))
+* **TXBuilder:** Fix payload serialization if you try to unpack and pack tx. ([#498](https://github.com/aeternity/aepp-sdk-js/issues/498)) ([73552e5](https://github.com/aeternity/aepp-sdk-js/commit/73552e5))
+* **TxValidator:** Fix validation of state channel open transaction ([#496](https://github.com/aeternity/aepp-sdk-js/issues/496)) ([325cc90](https://github.com/aeternity/aepp-sdk-js/commit/325cc90))
+
+
+### Features
+
+* **ACI:** Refactor ACI module. Split to separated files. ([#505](https://github.com/aeternity/aepp-sdk-js/issues/505)) ([fb7bc00](https://github.com/aeternity/aepp-sdk-js/commit/fb7bc00))
+* **Selector:** If default account `address` not provided use the first
+* **ACI:** Handle ACI without init function
+* **ACI:** Automatically decide to send transaction on-chai or call-static.
+Add `options` object like last arguments of generate fn under `instance.methods`
+  ```
+  const instance = await client.getContractInstance(source)
+  // Deploy contract
+  await.contract.init(100, 'test', options)
+  //or
+  await.contract.deploy([100, 'test], options)
+  // Call function
+  const result = await instance.call('sum', [2, 5], options)
+  //
+    // Automatically decide to send tx on-chain or call-static(dry-run) base on if function stateful or not
+    const result = await instance.methods.sum(2, 5, options)
+    // Manually make on-chain
+    const result = await instance.methods.sum.send(2, 5, options)
+    // Manually make call-static
+    const result = await instance.methods.sum.get(2, 5, options)
+  //
+  ```
+
+### Docs
+
+* **Usage:**: Add instructions about how to include directly the `SDK` in a `html page`
+
+
+
 ## [4.0.1](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.0.1) (2019-06-13)
 
 

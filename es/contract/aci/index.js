@@ -27,6 +27,7 @@ import * as R from 'ramda'
 
 import { validateArguments, transform, transformDecodedData } from './transformation'
 import { buildContractMethods, getFunctionACI } from './helpers'
+import AsyncInit from '../../utils/async-init'
 
 /**
  * Validated contract call arguments using contract ACI
@@ -39,6 +40,10 @@ import { buildContractMethods, getFunctionACI } from './helpers'
 async function prepareArgsForEncode (aci, params) {
   if (!aci || !aci.arguments) return params
   // Validation
+  if (aci.arguments.length > params.length) {
+    throw new Error(`Function "${aci.name}" require ${aci.arguments.length} arguments of types [${aci.arguments.map(a => JSON.stringify(a.type))}] but get [${params.map(JSON.stringify)}]`)
+  }
+
   validateArguments(aci, params)
   const bindings = aci.bindings
   // Cast argument from JS to Sophia type
@@ -48,7 +53,7 @@ async function prepareArgsForEncode (aci, params) {
 }
 
 /**
- * Generate contract ACI object with predefined js methods for contract usage
+ * Generate contract ACI object with predefined js methods for contract usage - can be used for creating a reference to already deployed contracts
  * @alias module:@aeternity/aepp-sdk/es/contract/aci
  * @param {String} source Contract source code
  * @param {Object} [options] Options object
@@ -58,14 +63,14 @@ async function prepareArgsForEncode (aci, params) {
  * @return {ContractInstance} JS Contract API
  * @example
  * const contractIns = await client.getContractInstance(sourceCode)
- * await contractIns.compile()
- * await contractIns.deploy([321])
- * const callResult = await contractIns.call('setState', [123])
- * const staticCallResult = await contractIns.call('setState', [123], { callStatic: true })
+ * await contractIns.deploy([321]) or await contractIns.methods.init(321)
+ * const callResult = await contractIns.call('setState', [123]) or await contractIns.methods.setState.send(123, options)
+ * const staticCallResult = await contractIns.call('setState', [123], { callStatic: true }) or await contractIns.methods.setState.get(123, options)
+ * Also you can call contract like: await contractIns.methods.setState(123, options)
+ * Then sdk decide to make on-chain or static call(dry-run API) transaction based on function is stateful or not
  */
-export async function getContractInstance (source, { client, aci, contractAddress, opt } = {}) {
-  const clients = []
-
+async function getContractInstance (source, { aci, contractAddress, opt } = {}) {
+  aci = aci || await this.contractGetACI(source)
   const defaultOptions = {
     skipArgsConvert: false,
     skipTransformDecoded: false,
@@ -80,7 +85,7 @@ export async function getContractInstance (source, { client, aci, contractAddres
   }
   const instance = {
     interface: R.defaultTo(null, R.prop('interface', aci)),
-    aci: R.defaultTo(null, R.path('encoded_aci.contract', aci)),
+    aci: R.defaultTo(null, R.path(['encoded_aci', 'contract'], aci)),
     source,
     compiled: null,
     deployInfo: { address: contractAddress },
@@ -125,7 +130,7 @@ export async function getContractInstance (source, { client, aci, contractAddres
    * @rtype () => ContractInstance: Object
    * @return {ContractInstance} Contract ACI object with predefined js methods for contract usage
    */
-  instance.compile = compile.bind(instance)
+  instance.compile = compile({ client: this, instance })
   /**
    * Deploy contract
    * @alias module:@aeternity/aepp-sdk/es/contract/aci
@@ -135,7 +140,7 @@ export async function getContractInstance (source, { client, aci, contractAddres
    * @param {Boolean} [options.skipArgsConvert=false] Skip Validation and Transforming arguments before prepare call-data
    * @return {ContractInstance} Contract ACI object with predefined js methods for contract usage
    */
-  instance.deploy = deploy.bind(instance)
+  instance.deploy = deploy({ client: this, instance })
   /**
    * Call contract function
    * @alias module:@aeternity/aepp-sdk/es/contract/aci
@@ -148,7 +153,7 @@ export async function getContractInstance (source, { client, aci, contractAddres
    * @param {Boolean} [options.callStatic=false] Static function call
    * @return {Object} CallResult
    */
-  instance.call = call.bind(instance)
+  instance.call = call({ client: this, instance })
 
   /**
    * Generate proto function based on contract function using Contract ACI schema
@@ -162,47 +167,60 @@ export async function getContractInstance (source, { client, aci, contractAddres
   return instance
 }
 
-async function call (fn, params = [], options = {}) {
-  const opt = R.merge(this.options, options)
-  const fnACI = getFunctionACI(this.aci, fn)
-  const source = opt.source || this.source
+const call = ({ client, instance }) => async (fn, params = [], options = {}) => {
+  const opt = R.merge(instance.options, options)
+  const fnACI = getFunctionACI(instance.aci, fn)
+  const source = opt.source || instance.source
 
   if (!fn) throw new Error('Function name is required')
-  if (!this.deployInfo.address) throw new Error('You need to deploy contract before calling!')
+  if (!instance.deployInfo.address) throw new Error('You need to deploy contract before calling!')
 
   params = !opt.skipArgsConvert ? await prepareArgsForEncode(fnACI, params) : params
   const result = opt.callStatic
-    ? await this.getClient().contractCallStatic(source, this.deployInfo.address, fn, params, {
+    ? await client.contractCallStatic(source, instance.deployInfo.address, fn, params, {
       top: opt.top,
       options: opt
     })
-    : await this.getClient().contractCall(source, this.deployInfo.address, fn, params, opt)
+    : await client.contractCall(source, instance.deployInfo.address, fn, params, opt)
   return {
     ...result,
     decodedResult: await transformDecodedData(
       fnACI.returns,
       await result.decode(),
-      { ...opt, compilerVersion: this.compilerVersion, bindings: fnACI.bindings }
+      { ...opt, compilerVersion: instance.compilerVersion, bindings: fnACI.bindings }
     )
   }
 }
 
-async function deploy (init = [], options = {}) {
-  const opt = R.merge(this.options, options)
-  const fnACI = getFunctionACI(this.aci, 'init')
+const deploy = ({ client, instance }) => async (init = [], options = {}) => {
+  const opt = R.merge(instance.options, options)
+  const fnACI = getFunctionACI(instance.aci, 'init')
 
-  if (!this.compiled) await this.compile()
+  if (!instance.compiled) await instance.compile()
   init = !opt.skipArgsConvert ? await prepareArgsForEncode(fnACI, init) : init
 
-  const { owner, transaction, address, createdAt, result, rawTx } = await this.getClient().contractDeploy(this.compiled, opt.source || this.source, init, opt)
-  this.deployInfo = { owner, transaction, address, createdAt, result, rawTx }
-  return this.deployInfo
+  const { owner, transaction, address, createdAt, result, rawTx } = await client.contractDeploy(instance.compiled, opt.source || instance.source, init, opt)
+  instance.deployInfo = { owner, transaction, address, createdAt, result, rawTx }
+  return instance.deployInfo
 }
 
-async function compile () {
-  const { bytecode } = await this.getClient().contractCompile(this.source)
-  this.compiled = bytecode
-  return this.compiled
+const compile = ({ client, instance }) => async () => {
+  const { bytecode } = await client.contractCompile(instance.source)
+  instance.compiled = bytecode
+  return instance.compiled
 }
 
-export default { getContractInstance }
+/**
+ * Contract ACI Stamp
+ *
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/contract/aci
+ * @rtype Stamp
+ * @return {Object} Contract compiler instance
+ * @example ContractACI()
+ */
+export default AsyncInit.compose({
+  methods: {
+    getContractInstance
+  }
+})

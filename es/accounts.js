@@ -39,7 +39,7 @@ async function signWith (address, data) {
 async function addAccount (account, { select } = {}) {
   const address = await account.address()
   this.accounts[address] = account
-  if (select) await this.selectAccount(address)
+  if (select) this.selectAccount(address)
 }
 
 /**

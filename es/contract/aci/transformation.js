@@ -15,8 +15,30 @@ export const SOPHIA_TYPES = [
   'oracleQuery',
   'hash',
   'signature',
-  'bytes'
+  'bytes',
+  'variant'
 ].reduce((acc, type) => ({ ...acc, [type]: type }), {})
+
+export function injectVars (t, aciType) {
+  const [[baseType, generic]] = Object.entries(aciType.typedef)
+  const [[_, varianValue]] = Object.entries(t)
+  switch (baseType) {
+    case SOPHIA_TYPES.variant:
+      return {
+        [baseType]: generic.map(el => {
+          const [tag, gen] = Object.entries(el)[0]
+          return {
+            [tag]: gen.map(type => {
+              const index = aciType.vars.map(e => e.name).indexOf(type)
+              return index === -1
+                ? type
+                : varianValue[index]
+            })
+          }
+        })
+      }
+  }
+}
 
 /**
  * Ling Type Defs
@@ -25,11 +47,15 @@ export const SOPHIA_TYPES = [
  * @return {Object}
  */
 export function linkTypeDefs (t, bindings) {
-  const [_, typeDef] = t.split('.')
+  const [_, typeDef] = typeof t === 'object' ? Object.keys(t)[0].split('.') : t.split('.')
   const aciType = [
     ...bindings.typedef,
-    { name: 'state', typedef: bindings.state }
+    { name: 'state', typedef: bindings.state, vars: [] }
   ].find(({ name }) => name === typeDef)
+  if (aciType.vars.length) {
+    aciType.typedef = injectVars(t, aciType)
+  }
+
   return aciType.typedef
 }
 
@@ -43,9 +69,13 @@ export function readType (type, { bindings } = {}) {
   let [t] = Array.isArray(type) ? type : [type]
 
   // Link State and typeDef
-  if (typeof t === 'string' && t.indexOf(bindings.contractName) !== -1) {
+  if (
+    (typeof t === 'string' && t.indexOf(bindings.contractName) !== -1) ||
+    (typeof t === 'object' && Object.keys(t)[0] && Object.keys(t)[0].indexOf(bindings.contractName) !== -1)
+  ) {
     t = linkTypeDefs(t, bindings)
   }
+
   // Map, Tuple, List, Record, Bytes
   if (typeof t === 'object') {
     const [[baseType, generic]] = Object.entries(t)
@@ -98,9 +128,22 @@ export async function transform (type, value, { bindings } = {}) {
       )}}`
     case SOPHIA_TYPES.map:
       return transformMap(value, generic, { bindings })
+    case SOPHIA_TYPES.variant:
+      return transformVariant(value, generic, { bindings })
   }
 
   return `${value}`
+}
+
+async function transformVariant (value, generic, { bindings }) {
+  const [[variant, variantArgs]] = typeof value === 'string' ? [[value, []]] : Object.entries(value)
+  const [[v, type]] = Object.entries(generic.find(o => Object.keys(o)[0].toLowerCase() === variant.toLowerCase()))
+  return `${v}${!type.length
+    ? ''
+    : `(${await Promise.all(variantArgs.slice(0, type.length).map(async (el, i) => transform(type[i], el, {
+      bindings
+    })))})`
+  }`
 }
 
 export async function transformMap (value, generic, { bindings }) {
@@ -194,10 +237,29 @@ export function transformDecodedData (aci, result, { skipTransformDecoded = fals
  */
 export function prepareSchema (type, { bindings } = {}) {
   let { t, generic } = readType(type, { bindings })
+
   if (!Object.keys(SOPHIA_TYPES).includes(t)) t = SOPHIA_TYPES.address // Handle Contract address transformation
   switch (t) {
     case SOPHIA_TYPES.int:
       return Joi.number().error(getJoiErrorMsg)
+    case SOPHIA_TYPES.variant:
+      return Joi.alternatives().try([
+        Joi.string().valid(
+          ...generic.reduce((acc, el) => {
+            const [[t, g]] = Object.entries(el)
+            if (!g || !g.length) acc.push(t)
+            return acc
+          }, [])
+        ),
+        Joi.object(generic
+          .reduce(
+            (acc, el) => {
+              const variant = Object.keys(el)[0]
+              return { ...acc, [variant]: Joi.array() }
+            },
+            {})
+        ).or(...generic.map(e => Object.keys(e)[0]))
+      ])
     case SOPHIA_TYPES.string:
       return Joi.string().error(getJoiErrorMsg)
     case SOPHIA_TYPES.address:

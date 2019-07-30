@@ -43,7 +43,7 @@ async function address ({ forAccount } = {}) {
  * @param {String} address - Address of account to select
  * @example selectAccount('ak_xxxxxxxx')
  */
-async function selectAccount (address) {
+function selectAccount (address) {
   this.Selector.address = address
 }
 

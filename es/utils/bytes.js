@@ -29,9 +29,9 @@ import { BigNumber } from 'bignumber.js'
  * @return the padded data
  */
 export function leftPad (length, inputBuffer) {
-  let fill = length - inputBuffer.length
+  const fill = length - inputBuffer.length
   if (fill > 0) {
-    let fillArray = new Uint8Array(fill)
+    const fillArray = new Uint8Array(fill)
     fillArray.fill(0, fill)
     return Buffer.concat([fillArray, inputBuffer])
   } else {
@@ -46,9 +46,9 @@ export function leftPad (length, inputBuffer) {
  * @return the padded data
  */
 export function rightPad (length, inputBuffer) {
-  let fill = length - inputBuffer.length
+  const fill = length - inputBuffer.length
   if (fill > 0) {
-    let fillArray = new Uint8Array(fill)
+    const fillArray = new Uint8Array(fill)
     fillArray.fill(0, fill)
     return Buffer.concat([inputBuffer, fillArray])
   } else {
