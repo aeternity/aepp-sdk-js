@@ -24,7 +24,6 @@
 
 import JsonBig from './json-big'
 import stampit from '@stamp/it'
-import AsyncInit from './async-init'
 import axios from 'axios'
 import * as R from 'ramda'
 import { snakeToPascal, pascalToSnake } from './string'
@@ -443,8 +442,8 @@ const operation = (path, method, definition, types, { config, errorHandler } = {
  * @return {Object} Account instance
  * @example Swagger({swag})
  */
-const Swagger = stampit(AsyncInit, {
-  async init ({ swag = this.swag, axiosConfig }, { stamp }) {
+const Swagger = stampit({
+  init ({ swag = this.swag, axiosConfig }, { stamp }) {
     const { paths, definitions } = swag
     const methods = R.indexBy(
       R.prop('name'),
