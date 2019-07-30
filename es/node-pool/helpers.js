@@ -4,7 +4,7 @@ export const getterForCurrentNode = (currentNode) => (obj, prop) => {
   if (typeof prop !== 'string' || prop.indexOf('_') !== -1) return
 
   if (!currentNode || !currentNode.instance) throw new Error(`You can't call ${prop} API. Node is not connected!`)
-  if (!prop in currentNode.instance.api) throw new Error(`API method ${prop} not found`)
+  if (!(prop in currentNode.instance.api)) throw new Error(`API method ${prop} not found`)
 
   return currentNode.instance.api[prop]
 }

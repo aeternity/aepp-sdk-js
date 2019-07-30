@@ -346,7 +346,6 @@ async function channelSnapshotSoloTx ({ channelId, fromId, payload }) {
  * @return {object} Object with vm/abi version ({ vmVersion: number, abiVersion: number })
  */
 function getVmVersion (txType, { vmVersion, abiVersion } = {}) {
-  debugger
   const version = this.getNodeInfo().consensusProtocolVersion
   const supportedProtocol = PROTOCOL_VM_ABI[version]
   if (!supportedProtocol) throw new Error('Not supported consensus protocol version')

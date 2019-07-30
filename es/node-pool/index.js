@@ -1,5 +1,4 @@
 import stampit from '@stamp/it'
-import Swagger from '../utils/swagger'
 import Node from '../node'
 import { DEFAULT_NETWORK_ID, getterForCurrentNode, prepareNodeObject } from './helpers'
 
@@ -66,13 +65,13 @@ export const NodePool = stampit({
       const nodeProps = ['Swagger', 'api', 'consensusProtocolVersion', 'genesisHash', 'methods']
       nodes.forEach((node, index) => {
         if (['name', 'instance'].find(k => !node[k])) throw new Error(`Node object on index ${index} must contain node "name" and "ins"`)
-        if (!node.instance || typeof node.instance !== 'object' || nodeProps.find(prop => !prop in node.instance)) {
+        if (!node.instance || typeof node.instance !== 'object' || nodeProps.find(prop => !(prop in node.instance))) {
           throw new Error('Invalid node instance object')
         }
       })
     }
   },
   props: {
-    selectedNode: {},
+    selectedNode: {}
   }
 })

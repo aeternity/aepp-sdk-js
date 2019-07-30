@@ -12,7 +12,6 @@ import {
   SIGNATURE_VERIFICATION_SCHEMA, TX_TYPE
 } from './builder/schema'
 import { calculateFee, unpackTx } from './builder'
-import Node from '../node'
 import { NodePool } from '../node-pool'
 
 /**
