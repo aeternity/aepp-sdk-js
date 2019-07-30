@@ -29,7 +29,6 @@ import Account from '../account'
 import TxBuilder from '../tx/builder'
 import * as R from 'ramda'
 import { BigNumber } from 'bignumber.js'
-import { NodePool } from '../node-pool'
 
 /**
  * Sign and post a transaction to the chain

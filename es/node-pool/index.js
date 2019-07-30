@@ -42,13 +42,12 @@ export const NodePool = stampit({
       const node = this.pool.get(name)
 
       this.selectedNode = node
-      this.selectedNodeNetworkId = node.networkId
       this.api = new Proxy({}, {
         get: getterForCurrentNode(node)
       })
     },
     getNetworkId () {
-      return this.networkId || this.selectedNode.selectedNodeNetworkId || DEFAULT_NETWORK_ID
+      return this.networkId || this.selectedNode.networkId || DEFAULT_NETWORK_ID
     },
     isNodeConnected () {
       return this.selectedNode.instance
@@ -75,6 +74,5 @@ export const NodePool = stampit({
   },
   props: {
     selectedNode: {},
-    selectedNodeNetworkId: null
   }
 })

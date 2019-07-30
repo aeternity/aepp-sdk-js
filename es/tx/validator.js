@@ -85,7 +85,7 @@ const resolveDataForBase = async (chain, { ownerPublicKey }) => {
     balance: accountBalance,
     accountNonce,
     ownerPublicKey,
-    consensusProtocolVersion: chain.consensusProtocolVersion
+    ...chain.getNodeInfo()
   }
 }
 
