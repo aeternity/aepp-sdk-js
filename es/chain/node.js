@@ -20,6 +20,7 @@ import Node from '../node'
 import Oracle from '../oracle/node'
 import formatBalance from '../utils/amount-formatter'
 import TransactionValidator from '../tx/validator'
+import { NodePool } from '../node-pool'
 
 /**
  * ChainNode module
@@ -188,7 +189,7 @@ async function getName (name) {
  * @return {Object} ChainNode instance
  * @example ChainNode({url: 'https://sdk-testnet.aepps.com/'})
  */
-const ChainNode = Chain.compose(Node, Oracle, TransactionValidator, {
+const ChainNode = Chain.compose(Oracle, TransactionValidator, {
   init ({ verifyTx = false }) {
     this.verifyTxBeforeSend = verifyTx
   },

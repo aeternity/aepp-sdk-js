@@ -122,7 +122,8 @@ const Node = stampit({
         url: this.url,
         internalUrl: this.internalUrl,
         nodeNetworkId: this.nodeNetworkId,
-        version: this.version
+        version: this.version,
+        consensusProtocolVersion: this.consensusProtocolVersion
       }
     },
     getConsensusProtocolVersion

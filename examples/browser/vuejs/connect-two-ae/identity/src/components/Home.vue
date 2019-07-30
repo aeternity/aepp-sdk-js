@@ -50,12 +50,15 @@
     from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-connection/browser-window-message'
   import { generateKeyPair } from '../../../../../../../es/utils/crypto'
 
+  const { publicKey, secretKey } = generateKeyPair()
+  const account2 = MemoryAccount({ keypair: generateKeyPair() })
+
   export default {
     data () {
       return {
         runningInFrame: window.parent !== window,
-        pub: '', // Your public key
-        priv: '', // Your private key
+        pub: 'ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi', // Your public key
+        priv: 'e6a91d633c77cf5771329d3354b3bcef1bc5e032c43d70b6d35af923ce1eb74dcea7ade470c9f99d9d4e400880a86f1d49bb444b62f11a9ebb64bbcfeb73fef3', // Your private key
         client: null,
         balance: null,
         height: null,
@@ -87,13 +90,9 @@
       }
     },
     async created () {
-      const { publicKey, secretKey } = generateKeyPair()
-      this.pub = publicKey
-      const account2 = MemoryAccount({ keypair: generateKeyPair() })
       this.client = await RpcWallet({
-        url: this.url,
-        internalUrl: this.internalUrl,
         compilerUrl: this.compilerUrl,
+        nodes: [{ name: 'local', instance: await Node({ url: this.url, internalUrl: this.intercal, compilerUrl: this.compilerUrl }) }],
         accounts: [MemoryAccount({ keypair: { secretKey: this.priv || secretKey, publicKey: this.pub || publicKey } }), account2],
         address: this.pub,
         name: 'Wallet',
@@ -120,12 +119,14 @@
           this.shareWalletInfo(connection.sendMessage.bind(connection))
         }
       })
+      // this.client.addNode()
+      await this.client.spend(100, 'ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi')
       const target = !this.runningInFrame ? window.frames.aepp : window.parent
       const connection = await BrowserWindowMessageConnection({
         target
       })
       this.client.addRpcClient(connection)
-      await this.shareWalletInfo(connection.sendMessage.bind(connection))
+      this.shareWalletInfo(connection.sendMessage.bind(connection))
     }
   }
 </script>

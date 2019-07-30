@@ -29,6 +29,7 @@ import Node from '../node'
 import { buildTx, calculateFee } from './builder'
 import { MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE } from './builder/schema'
 import { buildContractId, oracleQueryId } from './builder/helpers'
+import { NodePool } from '../node-pool'
 
 async function spendTx ({ senderId, recipientId, amount, payload = '' }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
@@ -346,6 +347,7 @@ async function channelSnapshotSoloTx ({ channelId, fromId, payload }) {
  * @return {object} Object with vm/abi version ({ vmVersion: number, abiVersion: number })
  */
 function getVmVersion (txType, { vmVersion, abiVersion } = {}) {
+  debugger
   const version = this.consensusProtocolVersion
   const supportedProtocol = PROTOCOL_VM_ABI[version]
   if (!supportedProtocol) throw new Error('Not supported consensus protocol version')
@@ -428,7 +430,7 @@ async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, ga
  * @return {Object} Transaction instance
  * @example Transaction({url: 'https://sdk-testnet.aepps.com/'})
  */
-const Transaction = Node.compose(Tx, {
+const Transaction = NodePool.compose(Tx, {
   init ({ nativeMode = true, showWarning = false }) {
     this.nativeMode = nativeMode
     this.showWarning = showWarning
