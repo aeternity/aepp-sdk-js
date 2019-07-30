@@ -201,7 +201,7 @@ const httpConfig = {
 }
 
 const httpClients = {
-  get: (config) => (url) => axios.get(url, R.mergeDeepRight(httpConfig, config)),
+  get: (config) => (url, params) => axios.get(url, [httpConfig, config, params].reduce(R.mergeDeepRight)),
   post: (config) => (url, params) => axios.post(url, params, R.mergeDeepRight(httpConfig, config))
 }
 
