@@ -24,7 +24,7 @@
 
 import Oracle from '../oracle'
 import { required } from '@stamp/required'
-import * as NodePool from '@stamp/it'
+import { NodePool } from '../node-pool'
 
 /**
  * Basic Chain Stamp
