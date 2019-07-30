@@ -1,25 +1,16 @@
 import stampit from '@stamp/it'
 import Swagger from '../utils/swagger'
-
-const DEFAULT_NETWORK_ID = 'ae_mainnet'
-const pool = new Map()
-const getterForCurrentNode = (currentNode) => (obj, prop) => {
-  if (typeof prop !== 'string' || prop.indexOf('_') !== -1) return
-
-
-  if (!currentNode) throw new Error(`You can't call ${prop} API. Node is not connected!`)
-  if (!prop in currentNode.instance.api) throw new Error(`API method ${prop} not found`)
-
-  return currentNode.instance.api[prop]
-}
+import Node from '../node'
+import { DEFAULT_NETWORK_ID, getterForCurrentNode, prepareNodeObject } from './helpers'
 
 export const NodePool = stampit({
-  async init ({ nodes = [] } = {}) {
+  async init ({ nodes = [], url = this.url, internalUrl = this.internalUrl } = {}) {
+    this.pool = new Map()
     this.validateNodes(nodes)
 
     nodes.forEach(node => {
       const { name, instance } = node
-      pool.set(name, { name, instance: instance, networkId: instance.nodeNetworkId, url: instance.url })
+      this.pool.set(name, prepareNodeObject(name, instance))
     })
     if (nodes.length) {
       this.selectNode(nodes[0].name)
@@ -30,24 +21,25 @@ export const NodePool = stampit({
         get: getterForCurrentNode(this.selectedNode)
       })
     }
+    // Prevent BREAKING CHANGES. Support for init params `url`, `internalUrl`
+    if (url) {
+      this.addNode('default', await Node({ url, internalUrl }), true)
+    }
   },
   methods: {
     addNode (name, nodeInstance, select = false) {
-      if (pool.has(name)) throw new Error(`Node with name ${name} already exist`)
+      if (this.pool.has(name)) throw new Error(`Node with name ${name} already exist`)
 
-      const nodeProps = ['Swagger', 'api', 'consensusProtocolVersion', 'genesisHash', 'methods']
-      if (!nodeInstance || typeof nodeInstance !== 'object' || nodeProps.find(prop => !prop in nodeInstance)) {
-        throw new Error('Invalid node object')
-      }
+      this.validateNodes([{ name, instance: nodeInstance }])
 
-      pool.set(name, { name, instance: nodeInstance, networkId: nodeInstance.nodeNetworkId, url: nodeInstance.url })
+      this.pool.set(name, prepareNodeObject(name, nodeInstance))
       if (select || !this.selectedNode) {
         this.selectNode(name)
       }
     },
     selectNode (name) {
-      if (!pool.has(name)) throw new Error(`Node with name ${name} not in pool`)
-      const node = pool.get(name)
+      if (!this.pool.has(name)) throw new Error(`Node with name ${name} not in pool`)
+      const node = this.pool.get(name)
 
       this.selectedNode = node
       this.selectedNodeNetworkId = node.networkId
@@ -56,11 +48,28 @@ export const NodePool = stampit({
       })
     },
     getNetworkId () {
-      return this.networkId || this.selectedNodeNetworkId || DEFAULT_NETWORK_ID
+      return this.networkId || this.selectedNode.selectedNodeNetworkId || DEFAULT_NETWORK_ID
+    },
+    isNodeConnected () {
+      return this.selectedNode.instance
+    },
+    getNodeInfo () {
+      if (!this.isNodeConnected()) throw new Error('Can not get node info. Node is not connected')
+      return {
+        url: this.selectedNode.url,
+        internalUrl: this.selectedNode.internalUrl,
+        nodeNetworkId: this.selectedNode.networkId,
+        version: this.selectedNode.version,
+        consensusProtocolVersion: this.selectedNode.consensusProtocolVersion
+      }
     },
     validateNodes (nodes) {
+      const nodeProps = ['Swagger', 'api', 'consensusProtocolVersion', 'genesisHash', 'methods']
       nodes.forEach((node, index) => {
         if (['name', 'instance'].find(k => !node[k])) throw new Error(`Node object on index ${index} must contain node "name" and "ins"`)
+        if (!node.instance || typeof node.instance !== 'object' || nodeProps.find(prop => !prop in node.instance)) {
+          throw new Error('Invalid node instance object')
+        }
       })
     }
   },

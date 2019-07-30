@@ -203,7 +203,7 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
         (client) => client.addressSubscription.includes(SUBSCRIPTION_VALUES.current) && client.isConnected())
     },
     setNode (node) {
-      Object.assign(this, node)
+      this.addNode('test', node)
       // Send notification 'update.network' to all Aepp which connected
       rpcClients.sentNotificationByCondition(
         message(METHODS.updateNetwork, { network: this.getNetworkId() }),

@@ -24,7 +24,6 @@
 
 import * as R from 'ramda'
 import Tx from './'
-import Node from '../node'
 
 import { buildTx, calculateFee } from './builder'
 import { MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE } from './builder/schema'
@@ -348,7 +347,7 @@ async function channelSnapshotSoloTx ({ channelId, fromId, payload }) {
  */
 function getVmVersion (txType, { vmVersion, abiVersion } = {}) {
   debugger
-  const version = this.consensusProtocolVersion
+  const version = this.getNodeInfo().consensusProtocolVersion
   const supportedProtocol = PROTOCOL_VM_ABI[version]
   if (!supportedProtocol) throw new Error('Not supported consensus protocol version')
   const protocolForTX = supportedProtocol[txType]

@@ -16,11 +16,9 @@
  */
 import * as R from 'ramda'
 import Chain from './'
-import Node from '../node'
 import Oracle from '../oracle/node'
 import formatBalance from '../utils/amount-formatter'
 import TransactionValidator from '../tx/validator'
-import { NodePool } from '../node-pool'
 
 /**
  * ChainNode module
