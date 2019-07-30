@@ -12,7 +12,7 @@ import {
   SIGNATURE_VERIFICATION_SCHEMA, TX_TYPE
 } from './builder/schema'
 import { calculateFee, unpackTx } from './builder'
-import Node from '../node'
+import { NodePool } from '../node-pool'
 
 /**
  * Transaction validator
@@ -84,7 +84,7 @@ const resolveDataForBase = async (chain, { ownerPublicKey }) => {
     balance: accountBalance,
     accountNonce,
     ownerPublicKey,
-    consensusProtocolVersion: chain.consensusProtocolVersion
+    ...chain.getNodeInfo()
   }
 }
 
@@ -148,7 +148,7 @@ const getOwnerPublicKey = (tx) =>
  * @return {Promise<Array>} Object with verification errors and warnings
  */
 async function verifyTx ({ tx, signatures, rlpEncoded }, networkId) {
-  networkId = networkId || this.nodeNetworkId || 'ae_mainnet'
+  networkId = networkId || this.getNetworkId() || 'ae_mainnet'
   // Fetch data for verification
   const ownerPublicKey = getOwnerPublicKey(tx)
   const gas = tx.hasOwnProperty('gas') ? +tx.gas : 0
@@ -206,7 +206,7 @@ function customVerification (txType, data) {
  * @return {Object} Transaction Validator instance
  * @example TransactionValidator({url: 'https://sdk-testnet.aepps.com'})
  */
-const TransactionValidator = Node.compose({
+const TransactionValidator = NodePool.compose({
   methods: {
     verifyTx,
     unpackAndVerify

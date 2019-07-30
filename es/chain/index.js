@@ -24,6 +24,7 @@
 
 import Oracle from '../oracle'
 import { required } from '@stamp/required'
+import * as NodePool from '@stamp/it'
 
 /**
  * Basic Chain Stamp
@@ -36,7 +37,7 @@ import { required } from '@stamp/required'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Chain instance
  */
-const Chain = Oracle.compose({
+const Chain = NodePool.compose(Oracle, {
   deepProps: { Chain: { defaults: { waitMined: true } } },
   statics: { waitMined (bool) { return this.deepProps({ Chain: { defaults: { waitMined: bool } } }) } },
   deepConf: {
