@@ -36,7 +36,9 @@
       Loading Aepp...
     </div>
     <!-- external app -->
-    <iframe v-show="aeppUrl" ref="aepp" class="w-full h-screen border border-black border-dashed bg-grey-light mx-auto mt-4 shadow" src="about:blank" frameborder="1"></iframe>
+    <iframe v-show="aeppUrl" ref="aepp"
+            class="w-full h-screen border border-black border-dashed bg-grey-light mx-auto mt-4 shadow" name="aepp"
+            src="http://localhost:9001" frameborder="1"></iframe>
   </div>
 </template>
 
@@ -53,9 +55,9 @@
         client: null,
         balance: null,
         height: null,
-        url: 'https://sdk-testnet.aepps.com',
-        internalUrl: 'https://sdk-testnet.aepps.com',
-        compilerUrl: 'https://compiler.aepps.com',
+        url: 'http://localhost:3013',
+        internalUrl: 'http://localhost:3113',
+        compilerUrl: 'http://localhost:3080',
         aeppUrl: '//0.0.0.0:9001'
       }
     },
