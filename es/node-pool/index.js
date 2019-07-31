@@ -70,6 +70,6 @@ export const NodePool = stampit({
     }
   },
   props: {
-    selectedNode: {},
+    selectedNode: {}
   }
 })
