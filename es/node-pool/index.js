@@ -11,18 +11,20 @@ export const NodePool = stampit({
       const { name, instance } = node
       this.pool.set(name, prepareNodeObject(name, instance))
     })
-    if (nodes.length) {
-      this.selectNode(nodes[0].name)
-    } else {
-      // Add proxy object here to prevent BREAKING CHANGES
-      // Proxy will check if method key exist in `this.currentNode`, throw error if not
-      this.api = new Proxy({}, {
-        get: getterForCurrentNode(this.selectedNode)
-      })
-    }
+    if (nodes.length) this.selectNode(nodes[0].name)
+
     // Prevent BREAKING CHANGES. Support for init params `url`, `internalUrl`
     if (url) {
       this.addNode('default', await Node({ url, internalUrl }), true)
+    }
+  },
+  propertyDescriptors: {
+    api: {
+      enumerable: true,
+      configurable: false,
+      get () {
+        return getterForCurrentNode(this.selectedNode)
+      }
     }
   },
   methods: {
@@ -38,12 +40,8 @@ export const NodePool = stampit({
     },
     selectNode (name) {
       if (!this.pool.has(name)) throw new Error(`Node with name ${name} not in pool`)
-      const node = this.pool.get(name)
 
-      this.selectedNode = node
-      this.api = new Proxy({}, {
-        get: getterForCurrentNode(node)
-      })
+      this.selectedNode = this.pool.get(name)
     },
     getNetworkId () {
       return this.networkId || this.selectedNode.networkId || DEFAULT_NETWORK_ID
@@ -72,6 +70,6 @@ export const NodePool = stampit({
     }
   },
   props: {
-    selectedNode: {}
+    selectedNode: {},
   }
 })
