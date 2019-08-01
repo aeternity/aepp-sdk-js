@@ -108,7 +108,7 @@ async function contractDecodeData (source, fn, callValue, callResult, options) {
  */
 async function contractCallStatic (source, address, name, args = [], { top, options = {} } = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const callerId = await this.address()
+  const callerId = await this.address() || opt.dryRunAccount.pub
 
   // Get block hash by height
   if (top && !isNaN(top)) {
@@ -125,7 +125,7 @@ async function contractCallStatic (source, address, name, args = [], { top, opti
 
   // Dry-run
   const [{ result: status, callObj, reason }] = (await this.txDryRun([tx], [{
-    amount: opt.amount,
+    amount: opt.amount || opt.dryRunAccount.amount,
     pubKey: callerId
   }], top)).results
 
@@ -306,7 +306,8 @@ export const Contract = Ae.compose(ContractBase, ContractACI, {
         gasPrice: 1000000000, // min gasPrice 1e9
         amount: 0,
         gas: 1600000 - 21000,
-        options: ''
+        options: '',
+        dryRunAccount: { pub: 'ak_11111111111111111111111111111111273Yts', amount: '10000000000000000000000000000000000000000' }
       }
     }
   }
