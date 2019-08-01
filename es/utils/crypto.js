@@ -106,7 +106,7 @@ export function addressFromDecimal (decimalAddress) {
 /**
  * Calculate 256bits Blake2b hash of `input`
  * @rtype (input: String) => hash: String
- * @param {String} input - Data to hash
+ * @param {String|Buffer} input - Data to hash
  * @return {Buffer} Hash
  */
 export function hash (input) {
