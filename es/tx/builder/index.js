@@ -1,6 +1,6 @@
 /* eslint-disable curly */
 import { BigNumber } from 'bignumber.js'
-import { rlp } from '../../utils/crypto'
+import { assertedType, rlp } from '../../utils/crypto'
 
 import {
   DEFAULT_FEE,
@@ -133,7 +133,7 @@ function validateField (value, key, type, prefix) {
       const isMinusValue = (!isNaN(value) || BigNumber.isBigNumber(value)) && BigNumber(value).lt(0)
       return assert((!isNaN(value) || BigNumber.isBigNumber(value)) && BigNumber(value).gte(0), { value, isMinusValue })
     case FIELD_TYPES.id:
-      return assert(PREFIX_ID_TAG[value.split('_')[0]] && value.split('_')[0] === prefix, { value, prefix })
+      return assert(assertedType(value, prefix) && PREFIX_ID_TAG[value.split('_')[0]] && value.split('_')[0] === prefix, { value, prefix })
     case FIELD_TYPES.binary:
       return assert(value.split('_')[0] === prefix, { prefix, value })
     case FIELD_TYPES.string:
