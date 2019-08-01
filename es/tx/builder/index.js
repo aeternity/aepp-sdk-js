@@ -14,7 +14,7 @@ import {
   VALIDATION_MESSAGE,
   VSN
 } from './schema'
-import { readInt, readId, readPointers, writeId, writeInt, buildPointers, encode, decode } from './helpers'
+import { readInt, readId, readPointers, writeId, writeInt, buildPointers, encode, decode, buildHash } from './helpers'
 import { toBytes } from '../../utils/bytes'
 import * as mpt from '../../utils/mptree'
 
@@ -362,4 +362,16 @@ export function unpackTx (encodedTx, fromRlpBinary = false) {
   return { txType: OBJECT_ID_TX_TYPE[objId], tx: unpackRawTx(binary, schema), rlpEncoded, binary }
 }
 
-export default { calculateMinFee, calculateFee, unpackTx, unpackRawTx, buildTx, buildRawTx, validateParams }
+/**
+ * Build a transaction hash
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
+ * @param {String | Buffer} rawTx base64 or rlp encoded transaction
+ * @return {String} Transaction hash
+ */
+export function buildTxHash (rawTx) {
+  if (typeof rawTx === 'string' && rawTx.indexOf('tx_') !== -1) return buildHash('th', unpackTx(rawTx).rlpEncoded)
+  return buildHash('th', rawTx)
+}
+
+export default { calculateMinFee, calculateFee, unpackTx, unpackRawTx, buildTx, buildRawTx, validateParams, buildTxHash }
