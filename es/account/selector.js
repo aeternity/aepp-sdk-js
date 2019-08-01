@@ -26,7 +26,7 @@
 
 import Account from './'
 import required from '@stamp/required'
-import { assertedType } from "../utils/crypto";
+import { assertedType } from '../utils/crypto'
 
 async function sign (data) {
   return this.signWith(this.Selector.address, data)
