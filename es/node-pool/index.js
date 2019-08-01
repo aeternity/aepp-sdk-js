@@ -1,8 +1,8 @@
-import stampit from '@stamp/it'
 import Node from '../node'
 import { DEFAULT_NETWORK_ID, getterForCurrentNode, prepareNodeObject } from './helpers'
+import AsyncInit from '../utils/async-init'
 
-export const NodePool = stampit({
+export const NodePool = AsyncInit.compose({
   async init ({ nodes = [], url = this.url, internalUrl = this.internalUrl } = {}) {
     this.pool = new Map()
     this.validateNodes(nodes)
@@ -52,16 +52,20 @@ export const NodePool = stampit({
     getNodeInfo () {
       if (!this.isNodeConnected()) throw new Error('Can not get node info. Node is not connected')
       return {
-        url: this.selectedNode.url,
-        internalUrl: this.selectedNode.internalUrl,
-        nodeNetworkId: this.selectedNode.networkId,
-        version: this.selectedNode.version,
-        consensusProtocolVersion: this.selectedNode.consensusProtocolVersion
+        name: this.selectedNode.name,
+        ...this.selectedNode.instance.getNodeInfo()
       }
+    },
+    getNodesInPool () {
+      return Array.from(this.pool.entries()).map(([name, node]) => ({
+        name,
+        ...node.instance.getNodeInfo()
+      }))
     },
     validateNodes (nodes) {
       const nodeProps = ['Swagger', 'api', 'consensusProtocolVersion', 'genesisHash', 'methods']
       nodes.forEach((node, index) => {
+        if (typeof node !== 'object') throw new Error('Node must be an object with "name" and "instance" props')
         if (['name', 'instance'].find(k => !node[k])) throw new Error(`Node object on index ${index} must contain node "name" and "ins"`)
         if (!node.instance || typeof node.instance !== 'object' || nodeProps.find(prop => !(prop in node.instance))) {
           throw new Error('Invalid node instance object')
