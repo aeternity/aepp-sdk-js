@@ -456,11 +456,11 @@ export function decryptPubKey (password, encrypted) {
  * @param {String} type - Prefix
  * @return {String} Payload
  */
-export function assertedType (data, type) {
+export function assertedType (data, type, forceError = false) {
   if (RegExp(`^${type}_.+$`).test(data)) {
     return data.split('_')[1]
   } else {
-    throw Error(`Data doesn't match expected type ${type}`)
+    if (!forceError) throw Error(`Data doesn't match expected type ${type}`)
   }
 }
 

@@ -26,6 +26,7 @@
 
 import Account from './'
 import required from '@stamp/required'
+import { assertedType } from "../utils/crypto";
 
 async function sign (data) {
   return this.signWith(this.Selector.address, data)
@@ -44,6 +45,7 @@ async function address () {
  * @example selectAccount('ak_xxxxxxxx')
  */
 function selectAccount (address) {
+  if (address && !assertedType(address, 'ak', true)) throw new Error(`Invalid account address`)
   this.Selector.address = address
 }
 
@@ -59,6 +61,7 @@ function selectAccount (address) {
 const Selector = Account.compose({
   async init ({ address }) {
     if (!address) address = Object.keys(this.accounts)[0]
+    if (address && !assertedType(address, 'ak', true)) throw new Error(`Invalid account address`)
     this.Selector.address = address
   },
   methods: { sign, address, selectAccount },
