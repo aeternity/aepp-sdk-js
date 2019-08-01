@@ -53,7 +53,6 @@ async function handleCallError (result) {
   const decodedError = await this.contractDecodeDataAPI('string', error)
   throw Object.assign(Error(`Invocation failed: ${error}. Decoded: ${decodedError}`), R.merge(result, { error, decodedError }))
 }
-
 /**
  * Encode call data for contract call
  * @function
@@ -125,7 +124,7 @@ async function contractCallStatic (source, address, name, args = [], { top, opti
 
   // Dry-run
   const [{ result: status, callObj, reason }] = (await this.txDryRun([tx], [{
-    amount: opt.amount || opt.dryRunAccount.amount,
+    amount: (opt.amount || 0) <= opt.dryRunAccount.amount ? opt.amount : opt.dryRunAccount.amount,
     pubKey: callerId
   }], top)).results
 
@@ -307,7 +306,7 @@ export const Contract = Ae.compose(ContractBase, ContractACI, {
         amount: 0,
         gas: 1600000 - 21000,
         options: '',
-        dryRunAccount: { pub: 'ak_11111111111111111111111111111111273Yts', amount: '10000000000000000000000000000000000000000' }
+        dryRunAccount: { pub: 'ak_11111111111111111111111111111111273Yts', amount: '100000000000000000000000000000000000000000' }
       }
     }
   }
