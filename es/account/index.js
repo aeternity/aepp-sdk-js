@@ -57,7 +57,7 @@ async function signTransaction (tx, opt = {}) {
  * @return {String} NetworkId
  */
 function getNetworkId () {
-  return this.networkId || this.nodeNetworkId || DEFAULT_NETWORK_ID
+  return this.networkId || (this.selectedNode ? this.selectedNode.networkId : false) || DEFAULT_NETWORK_ID
 }
 
 /**

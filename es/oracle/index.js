@@ -22,8 +22,8 @@
  * @example import ContractBase from '@aeternity/aepp-sdk/es/oracle'
  */
 
-import stampit from '@stamp/it'
 import { required } from '@stamp/required'
+import { NodePool } from '../node-pool'
 
 /**
  * Basic Oracle Stamp
@@ -37,7 +37,7 @@ import { required } from '@stamp/required'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Oracle instance
  */
-const OracleBase = stampit({
+const OracleBase = NodePool.compose({
   deepConf: {
     Contract: {
       methods: [
