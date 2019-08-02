@@ -64,9 +64,6 @@ function validateKeyPair (keyPair) {
  */
 const MemoryAccount = Account.compose({
   init ({ keypair }) {
-    console.log(Crypto.envKeypair(process.env))
-    keypair = keypair || Crypto.envKeypair(process.env)
-    console.log(keypair)
     validateKeyPair(keypair)
     if (keypair.hasOwnProperty('priv') && keypair.hasOwnProperty('pub')) {
       keypair = { secretKey: keypair.priv, publicKey: keypair.pub }

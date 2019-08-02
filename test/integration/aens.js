@@ -26,7 +26,7 @@ function randomName () {
 
 plan('10000000000000000')
 
-describe.skip('Aens', function () {
+describe('Aens', function () {
   configure(this)
 
   let aens

@@ -46,9 +46,4 @@ export const Universal = Ae.compose(Accounts, Chain, Transaction, Aens, Contract
   props: { process: {} }
 })
 
-export const UniversalWithAccounts = Ae.compose(Accounts, Chain, Transaction, Aens, Contract, Oracle, {
-  init () {},
-  props: { process: {} }
-})
-
 export default Universal

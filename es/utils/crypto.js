@@ -510,7 +510,7 @@ export function isValidKeypair (privateKey, publicKey) {
  * @param {Object} env - Environment
  * @return {Object} Key pair
  */
-export function envKeypair (env) {
+export function envKeypair (env, force = false) {
   const keypair = {
     secretKey: env['WALLET_PRIV'],
     publicKey: env['WALLET_PUB']
@@ -519,7 +519,7 @@ export function envKeypair (env) {
   if (keypair.publicKey && keypair.secretKey) {
     return keypair
   } else {
-    throw Error('Environment variables WALLET_PRIV and WALLET_PUB need to be set')
+    if (!force) throw Error('Environment variables WALLET_PRIV and WALLET_PUB need to be set')
   }
 }
 

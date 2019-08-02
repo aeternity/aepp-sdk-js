@@ -28,7 +28,6 @@ import * as R from 'ramda'
 import * as Crypto from './utils/crypto'
 import MemoryAccount from './account/memory'
 import Selector from './account/selector'
-import { getterForCurrentNode } from './node-pool/helpers'
 
 async function signWith (address, data) {
   const account = this.accounts[address]
@@ -64,7 +63,6 @@ function setKeypair (keypair) {
     keypair = { secretKey: keypair.priv, publicKey: keypair.pub }
     console.warn('pub/priv naming for accounts has been deprecated, please use secretKey/publicKey')
   }
-  debugger
   acc.setSecret(keypair)
   this.accounts[keypair.publicKey] = acc
   this.selectAccount(keypair.publicKey)
@@ -92,8 +90,9 @@ function removeAccount (address) {
  * @example Accounts()
  */
 const Accounts = stampit(AsyncInit, Selector, {
-  async init ({ accounts = [], keypair = {} }) {
+  async init ({ accounts = [], keypair }) {
     this.accounts = R.fromPairs(await Promise.all(accounts.map(async a => [await a.address(), a])))
+    keypair = keypair || Crypto.envKeypair(process.env, false)
     if (keypair) {
       await this.addAccount(await MemoryAccount({ keypair }), { select: !this.Selector.address })
     }
