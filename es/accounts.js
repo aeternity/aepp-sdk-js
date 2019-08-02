@@ -25,9 +25,9 @@
 import stampit from '@stamp/it'
 import AsyncInit from './utils/async-init'
 import * as R from 'ramda'
-import * as Crypto from './utils/crypto'
 import MemoryAccount from './account/memory'
 import Selector from './account/selector'
+import { envKeypair, generateKeyPair } from './utils/crypto'
 
 async function signWith (address, data) {
   const account = this.accounts[address]
@@ -47,9 +47,9 @@ async function addAccount (account, { select } = {}) {
 
 /**
  * Select specific account
+ * @deprecated
  * @alias module:@aeternity/aepp-sdk/es/account/memory
  * @function
- * @instance
  * @rtype (keypair: {publicKey: String, secretKey: String}) => Void
  * @param {Object} keypair - Key pair to use
  * @param {String} keypair.publicKey - Public key
@@ -58,15 +58,15 @@ async function addAccount (account, { select } = {}) {
  * @example setKeypair(keypair)
  */
 function setKeypair (keypair) {
-  const acc = this.accounts[this.Selector.address]
+  const acc = this.accounts[this.Selector.address] || this._acc
   if (keypair.hasOwnProperty('priv') && keypair.hasOwnProperty('pub')) {
     keypair = { secretKey: keypair.priv, publicKey: keypair.pub }
     console.warn('pub/priv naming for accounts has been deprecated, please use secretKey/publicKey')
   }
   acc.setSecret(keypair)
   this.accounts[keypair.publicKey] = acc
-  this.selectAccount(keypair.publicKey)
   delete this.accounts[this.Selector.address]
+  this.selectAccount(keypair.publicKey)
 }
 
 function removeAccount (address) {
@@ -90,12 +90,16 @@ function removeAccount (address) {
  * @example Accounts()
  */
 const Accounts = stampit(AsyncInit, Selector, {
-  async init ({ accounts = [], keypair }) {
+  async init ({ accounts = [], keypair }) { // Deprecated. TODO Remove `keypair` param
     this.accounts = R.fromPairs(await Promise.all(accounts.map(async a => [await a.address(), a])))
-    keypair = keypair || Crypto.envKeypair(process.env, false)
+    keypair = keypair || envKeypair(process.env, false)
     if (keypair) {
       await this.addAccount(await MemoryAccount({ keypair }), { select: !this.Selector.address })
     }
+    // @Todo Remove after removing depricated `setKeypair` fn.
+    //  Prevent BREAKING CHANGES
+    //  Pre-init memoryAccount object to prevent async operation in `setKeypair` function
+    this._acc = await MemoryAccount({ keypair: generateKeyPair() })
   },
   props: {
     accounts: {}
