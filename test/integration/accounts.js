@@ -20,7 +20,7 @@ import { configure, ready, BaseAe, networkId } from './'
 import { generateKeyPair } from '../../es/utils/crypto'
 import { BigNumber } from 'bignumber.js'
 
-describe('Accounts', function () {
+describe.only('Accounts', function () {
   configure(this)
 
   let wallet

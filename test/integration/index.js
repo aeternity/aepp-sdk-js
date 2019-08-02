@@ -52,6 +52,7 @@ function configure (mocha) {
 async function ready (mocha, native = true, withAccounts = false) {
   configure(mocha)
 
+  console.log('here')
   const ae = await BaseAe({ networkId })
   await ae.awaitHeight(2)
 

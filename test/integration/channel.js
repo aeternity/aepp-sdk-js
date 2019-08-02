@@ -44,7 +44,7 @@ function waitForChannel (channel) {
   )
 }
 
-describe('Channel', function () {
+describe.skip('Channel', function () {
   configure(this)
 
   let initiator

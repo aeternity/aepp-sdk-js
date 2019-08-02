@@ -25,6 +25,10 @@
 import stampit from '@stamp/it'
 import AsyncInit from './utils/async-init'
 import * as R from 'ramda'
+import * as Crypto from './utils/crypto'
+import MemoryAccount from './account/memory'
+import Selector from './account/selector'
+import { getterForCurrentNode } from './node-pool/helpers'
 
 async function signWith (address, data) {
   const account = this.accounts[address]
@@ -43,6 +47,37 @@ async function addAccount (account, { select } = {}) {
 }
 
 /**
+ * Select specific account
+ * @alias module:@aeternity/aepp-sdk/es/account/memory
+ * @function
+ * @instance
+ * @rtype (keypair: {publicKey: String, secretKey: String}) => Void
+ * @param {Object} keypair - Key pair to use
+ * @param {String} keypair.publicKey - Public key
+ * @param {String} keypair.secretKey - Private key
+ * @return {Void}
+ * @example setKeypair(keypair)
+ */
+function setKeypair (keypair) {
+  const acc = this.accounts[this.Selector.address]
+  if (keypair.hasOwnProperty('priv') && keypair.hasOwnProperty('pub')) {
+    keypair = { secretKey: keypair.priv, publicKey: keypair.pub }
+    console.warn('pub/priv naming for accounts has been deprecated, please use secretKey/publicKey')
+  }
+  debugger
+  acc.setSecret(keypair)
+  this.accounts[keypair.publicKey] = acc
+  this.selectAccount(keypair.publicKey)
+  delete this.accounts[this.Selector.address]
+}
+
+function removeAccount (address) {
+  if (!this.accounts[address]) return false
+  delete this.accounts[address]
+  return false
+}
+
+/**
  * Accounts Stamp
  *
  * The purpose of the Accounts Stamp is to wrap up
@@ -56,14 +91,26 @@ async function addAccount (account, { select } = {}) {
  * @return {Object} Accounts instance
  * @example Accounts()
  */
-const Accounts = stampit(AsyncInit, {
-  async init ({ accounts = [] }) {
+const Accounts = stampit(AsyncInit, Selector, {
+  async init ({ accounts = [], keypair = {} }) {
     this.accounts = R.fromPairs(await Promise.all(accounts.map(async a => [await a.address(), a])))
+    if (keypair) {
+      await this.addAccount(await MemoryAccount({ keypair }), { select: !this.Selector.address })
+    }
   },
   props: {
     accounts: {}
   },
-  methods: { signWith, addAccount }
+  propertyDescriptors: {
+    addresses: {
+      enumerable: true,
+      configurable: false,
+      get () {
+        return Object.keys(this.accounts)
+      }
+    }
+  },
+  methods: { signWith, addAccount, removeAccount, setKeypair }
 })
 
 /**

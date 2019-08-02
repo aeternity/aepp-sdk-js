@@ -11,7 +11,7 @@
           Public Key
         </div>
         <div class="p-2 w-3/4 bg-grey-lightest break-words">
-          {{pub}}
+          {{publicKey}}
         </div>
       </div>
       <div v-if="height" class="bg-green w-full flex flex-row font-mono border border-b">
@@ -45,13 +45,16 @@
 <script>
   // AE_SDK_MODULES is a webpack alias present in webpack.config.js
   import { Wallet, MemoryAccount } from '@aeternity/aepp-sdk/es'
+  import { generateKeyPair } from '../../../../../../../es/utils/crypto'
+  import Accounts from '../../../../../../../es/accounts'
 
+  const account = generateKeyPair()
   export default {
     data () {
       return {
         runningInFrame: window.parent !== window,
-        pub: 'PROVIDE_YOUR_PUB', // Your public key
-        priv: 'PROVIDE_YOUR_PPRIV', // Your private key
+        publicKey: account.publicKey, // Your public key
+        secretKey: account.secretKey, // Your private key
         client: null,
         balance: null,
         height: null,
@@ -67,23 +70,30 @@
       }
     },
     async created () {
-      this.client = await Wallet({
-        url: this.url,
-        internalUrl: this.internalUrl,
-        compilerUrl: this.compilerUrl,
-        accounts: [MemoryAccount({keypair: {secretKey: this.priv, publicKey: this.pub}})],
-        address: this.pub,
-        onTx: this.confirmDialog,
-        onChain: this.confirmDialog,
-        onAccount: this.confirmDialog,
-        onContract: this.confirmDialog
-      })
-
-      if (!this.runningInFrame) this.$refs.aepp.src = this.aeppUrl
-      else window.parent.postMessage({ jsonrpc: '2.0', method: 'ready' }, '*')
-
-      this.height = await this.client.height()
-      this.balance = await this.client.balance(this.pub).catch(() => 0)
+      const acc = await MemoryAccount({ keypair: { publicKey: this.publicKey, secretKey: this.secretKey } })
+      const acc2 = await MemoryAccount({ keypair: generateKeyPair() })
+      const acc3 = await MemoryAccount({ keypair: generateKeyPair() })
+      const accounts = await Accounts({ keypair: generateKeyPair(), accounts: [acc, acc2, acc3] })
+      const add = await accounts.address()
+      accounts.setKeypair(generateKeyPair())
+      const add2 = await accounts.address()
+      // this.client = await Wallet({
+      //   url: this.url,
+      //   internalUrl: this.internalUrl,
+      //   compilerUrl: this.compilerUrl,
+      //   accounts: [MemoryAccount({keypair: {secretKey: this.priv, publicKey: this.pub}})],
+      //   address: this.pub,
+      //   onTx: this.confirmDialog,
+      //   onChain: this.confirmDialog,
+      //   onAccount: this.confirmDialog,
+      //   onContract: this.confirmDialog
+      // })
+      //
+      // if (!this.runningInFrame) this.$refs.aepp.src = this.aeppUrl
+      // else window.parent.postMessage({ jsonrpc: '2.0', method: 'ready' }, '*')
+      //
+      // this.height = await this.client.height()
+      // this.balance = await this.client.balance(this.pub).catch(() => 0)
     }
   }
 </script>
