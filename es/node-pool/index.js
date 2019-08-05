@@ -1,7 +1,23 @@
+/**
+ * NodePool module
+ * @module @aeternity/aepp-sdk/es/node-pool
+ * @export NodePool
+ * @example import NodePool from '@aeternity/aepp-sdk/es/node-pool'
+ */
 import Node from '../node'
 import { DEFAULT_NETWORK_ID, getterForCurrentNode, prepareNodeObject } from './helpers'
 import AsyncInit from '../utils/async-init'
 
+/**
+ * Node Pool Stamp
+ * This stamp allow you to make basic manipulation(add, remove, select) on list of nodes
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/node-pool
+ * @rtype Stamp
+ * @param {Object} [options={}] - Initializer object
+ * @param {Array} [options.nodes] - Array with Node instances
+ * @return {Object} NodePool instance
+ */
 export const NodePool = AsyncInit.compose({
   async init ({ nodes = [], url = this.url, internalUrl = this.internalUrl } = {}) {
     this.pool = new Map()
@@ -78,3 +94,5 @@ export const NodePool = AsyncInit.compose({
     selectedNode: {}
   }
 })
+
+export default NodePool
