@@ -18,7 +18,7 @@ Ae({
   internalUrl: 'https://sdk-testnet.aepps.com',
   // instead use
   nodes: [
-    node1,
+    { name: 'someNode', instance: node1 },
     // mode2
   ],
   compilerUrl: 'COMPILER_URL',
@@ -44,12 +44,12 @@ const main = async () => {
   // const acc2 = ...  
 
   const client = await Ae({
-    // This two params deprecated and will be remove in next major release
+     // This two params deprecated and will be remove in next major release
       url: 'https://sdk-testnet.aepps.com',
       internalUrl: 'https://sdk-testnet.aepps.com',
       // instead use
       nodes: [
-        node1,
+        { name: 'someNode', instance: node1 },
         // mode2
       ],
       compilerUrl: 'COMPILER_URL',
