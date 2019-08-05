@@ -37,6 +37,18 @@ export function buildContractId (ownerId, nonce) {
 }
 
 /**
+ * Build hash
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
+ * @param {String} prefix Transaction hash prefix
+ * @param {Buffer} data Rlp encoded transaction buffer
+ * @return {String} Transaction hash
+ */
+export function buildHash (prefix, data) {
+  return encode(hash(data), prefix)
+}
+
+/**
  * Build a oracle query id
  * @function
  * @function* @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
@@ -206,5 +218,6 @@ export default {
   commitmentHash,
   formatSalt,
   oracleQueryId,
-  createSalt
+  createSalt,
+  buildHash
 }

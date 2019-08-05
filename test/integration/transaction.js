@@ -36,8 +36,8 @@ const queryFormat = '{\'city\': str}'
 const responseFormat = '{\'tmp\': num}'
 const queryFee = 30000
 const oracleTtl = { type: 'delta', value: 500 }
-const responseTtl = { type: 'delta', value: 10 }
-const queryTtl = { type: 'delta', value: 10 }
+const responseTtl = { type: 'delta', value: 100 }
+const queryTtl = { type: 'delta', value: 100 }
 const query = '{\'city\': \'Berlin\'}'
 const queryResponse = '{\'tmp\': 101}'
 

@@ -25,7 +25,6 @@
  */
 
 import OracleBase from './'
-import Node from '../node'
 
 async function getOracle (oracleId) {
   return this.api.getOracleByPubkey(oracleId)
@@ -39,7 +38,7 @@ async function getOracleQuery (oracleId, queryId) {
   return this.api.getOracleQueryByPubkeyAndQueryId(oracleId, queryId)
 }
 
-const OracleNodeAPI = OracleBase.compose(Node, {
+const OracleNodeAPI = OracleBase.compose({
   methods: {
     getOracle,
     getOracleQueries,

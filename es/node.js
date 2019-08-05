@@ -25,6 +25,7 @@
 import stampit from '@stamp/it'
 import axios from 'axios'
 import * as R from 'ramda'
+import AsyncInit from './utils/async-init'
 import Swagger from './utils/swagger'
 import semverSatisfies from './utils/semver-satisfies'
 
@@ -100,8 +101,8 @@ function axiosError (handler) {
  * @return {Object} Node client
  * @example Node({url: 'https://sdk-testnet.aepps.com'})
  */
-const Node = stampit({
-  async init ({ url = this.url, internalUrl = this.internalUrl, axiosConfig: { config, errorHandler } = {} }) {
+const Node = stampit(AsyncInit, {
+  async init ({ name, url = this.url, internalUrl = this.internalUrl, axiosConfig: { config, errorHandler } = {} }) {
     if (!url) throw new Error('"url" required')
     url = url.replace(/\/?$/, '')
     internalUrl = internalUrl ? internalUrl.replace(/\/?$/, '') : url
@@ -122,7 +123,8 @@ const Node = stampit({
         url: this.url,
         internalUrl: this.internalUrl,
         nodeNetworkId: this.nodeNetworkId,
-        version: this.version
+        version: this.version,
+        consensusProtocolVersion: this.consensusProtocolVersion
       }
     },
     getConsensusProtocolVersion

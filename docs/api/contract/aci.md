@@ -60,7 +60,7 @@ Call contract function
 <a id="exp_module_@aeternity/aepp-sdk/es/contract/aci--getContractInstance"></a>
 
 ### getContractInstance(source, [options]) ⇒ `ContractInstance` ⏏
-Generate contract ACI object with predefined js methods for contract usage
+Generate contract ACI object with predefined js methods for contract usage - can be used for creating a reference to already deployed contracts
 
 **Kind**: Exported function  
 **Returns**: `ContractInstance` - JS Contract API  
