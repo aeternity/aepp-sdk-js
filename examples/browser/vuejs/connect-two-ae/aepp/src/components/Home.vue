@@ -158,7 +158,7 @@
         spendError: null,
         contractCode: `contract Identity =
       type state = ()
-      function main(x : int) = x`,
+      entrypoint main(x : int) = x`,
         byteCode: null,
         compileError: null,
         contractInitState: [],
@@ -229,7 +229,7 @@
       this.client = await Aepp({
         parent: this.runningInFrame ? window.parent : await this.getReverseWindow()
       })
-      this.pub = await this.client.address().catch(e => `Rejected: ${e}`)
+      this.pub = await this.client.address()
       this.height = await this.client.height()
     }
   }
