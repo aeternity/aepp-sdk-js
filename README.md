@@ -107,22 +107,43 @@ import Ae from '@aeternity/aepp-sdk/es/ae/universal' // or other flavor
 
 ```js
 // Use Flavor
-Ae({
-  url: 'https://sdk-testnet.aepps.com',
-  // internalUrl: 'https://sdk-testnet.aepps.com',
-  compilerUrl: 'https://compiler.aepps.com',
-  keypair: { secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS' },
-  networkId: 'ae_uat' // or any other networkId your client should connect to
-}).then(ae => {
-  // Interacting with the blockchain client
-  // getting the latest block height
-  ae.height().then(height => {
-    // logs current height
-    console.log('Current Block Height:', height)
-  }).catch(e => {
-    // logs error
-    console.log(e)
-  })
+import Ae from '@aeternity/aepp-sdk/es/ae/universal' // or other flavor
+import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory' // or other flavor
+import Node from '@aeternity/aepp-sdk/es/node' // or other flavor
+
+Promise.all([
+  Node({ url, internalUrl })
+]).then(nodes => {
+    Ae({
+        // This two params deprecated and will be remove in next major release
+        url: 'https://sdk-testnet.aepps.com',
+        internalUrl: 'https://sdk-testnet.aepps.com',
+        // instead use
+        nodes: [
+          { name: 'someNode', instance: nodes[0] },
+        // mode2
+        ],
+        compilerUrl: 'COMPILER_URL',
+        // `keypair` param deprecated and will be removed in next major release
+        keypair: { secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS' },
+        // instead use
+        accounts: [
+          MemoryAccount({ keypair: { secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS' } }),
+        // acc2
+        ],
+        address: 'SELECTED_ACCOUNT_PUB',
+        networkId: 'ae_uat' // or any other networkId your client should connect to
+    }).then(ae => {
+      // Interacting with the blockchain client
+      // getting the latest block height
+      ae.height().then(height => {
+        // logs current height
+        console.log('Current Block Height:', height)
+      }).catch(e => {
+        // logs error
+        console.log(e)
+      })
+    })
 })
 
 ```
