@@ -23,6 +23,7 @@ import HdWallet from './utils/hd-wallet'
 import Ae from './ae'
 import Chain from './chain'
 import ChainNode from './chain/node'
+import Node from './node'
 import Tx from './tx'
 import Transaction from './tx/tx'
 import TransactionValidator from './tx/validator'
@@ -54,6 +55,7 @@ export {
   Chain,
   HdWallet,
   MemoryAccount,
+  Node,
   Oracle,
   OracleNodeAPI,
   Selector,

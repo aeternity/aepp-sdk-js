@@ -4,9 +4,9 @@ The Node.js bundle is primarily interesting for scripts which use non-transpiled
 code, such as the ones provided in the [`examples/node` directory](../examples/node) of the project.
 
 ```js
-const { Universal: Ae, MemoryAccount, ChainNode } = require('@aeternity/aepp-sdk')
+const { Universal: Ae, MemoryAccount, Node } = require('@aeternity/aepp-sdk')
 
-// const node1 = await ChainNode({ url: 'https://sdk-testnet.aepps.com', internalUrl: 'https://sdk-testnet.aepps.com' })
+// const node1 = await Node({ url: 'https://sdk-testnet.aepps.com', internalUrl: 'https://sdk-testnet.aepps.com' })
 // const node2 = ...
 
 // const acc1 = MemoryAccount({ keypair: 'YOUR_KEYPAIR_OBJECT' })
@@ -37,7 +37,7 @@ Ae({
 
 // same with async
 const main = async () => {
-  const node1 = await ChainNode({ url: 'https://sdk-testnet.aepps.com', internalUrl: 'https://sdk-testnet.aepps.com' })
+  const node1 = await Node({ url: 'https://sdk-testnet.aepps.com', internalUrl: 'https://sdk-testnet.aepps.com' })
   // const node2 = ...
 
   const acc1 = MemoryAccount({ keypair: 'YOUR_KEYPAIR_OBJECT' })

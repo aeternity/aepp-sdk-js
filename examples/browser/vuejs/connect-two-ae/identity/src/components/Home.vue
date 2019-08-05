@@ -44,7 +44,7 @@
 
 <script>
   // AE_SDK_MODULES is a webpack alias present in webpack.config.js
-  import { Wallet, MemoryAccount } from '@aeternity/aepp-sdk/es'
+  import { Wallet, MemoryAccount, Node } from '@aeternity/aepp-sdk/es'
 
   const account = generateKeyPair()
   export default {
@@ -69,8 +69,7 @@
     },
     async created () {
       this.client = await Wallet({
-        url: this.url,
-        internalUrl: this.internalUrl,
+        nodes: [await Node({ url: this.url, internalUrl: this.internalUrl })],
         compilerUrl: this.compilerUrl,
         accounts: [MemoryAccount({keypair: {secretKey: this.priv, publicKey: this.pub}})],
         address: this.pub,
