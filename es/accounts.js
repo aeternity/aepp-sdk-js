@@ -136,10 +136,10 @@ function addresses () {
  * accounts.selectAccount(address) // Select account
  * accounts.addresses() // Get available accounts
  */
-const Accounts = stampit(AsyncInit, Selector, {
+const Accounts = stampit(AsyncInit, {
   async init ({ accounts = [], keypair }) { // Deprecated. TODO Remove `keypair` param
     this.accounts = R.fromPairs(await Promise.all(accounts.map(async a => [await a.address(), a])))
-    keypair = keypair || envKeypair(process.env, false)
+    keypair = keypair || envKeypair(process.env, true)
     if (keypair) {
       await this.addAccount(await MemoryAccount({ keypair }), { select: !this.Selector.address })
     }
@@ -152,6 +152,6 @@ const Accounts = stampit(AsyncInit, Selector, {
     accounts: {}
   },
   methods: { signWith, addAccount, removeAccount, setKeypair, addresses }
-})
+}, Selector)
 
 export default Accounts

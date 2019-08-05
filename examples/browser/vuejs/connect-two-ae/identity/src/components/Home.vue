@@ -56,9 +56,9 @@
         client: null,
         balance: null,
         height: null,
-        url: 'http://localhost:3013',
-        internalUrl: 'http://localhost:3113',
-        compilerUrl: 'http://localhost:3080',
+        url: 'https://sdk-testnet.aepps.com',
+        internalUrl: 'https://sdk-testnet.aepps.com',
+        compilerUrl: 'https://compiler.aepps.com',
         aeppUrl: '//0.0.0.0:9001'
       }
     },
@@ -71,7 +71,7 @@
       this.client = await Wallet({
         nodes: [{ name: 'localNode', instance: await Node({ url: this.url, internalUrl: this.internalUrl }) }],
         compilerUrl: this.compilerUrl,
-        accounts: [MemoryAccount({keypair: {secretKey: this.priv, publicKey: this.pub}})],
+        accounts: [MemoryAccount({keypair: {secretKey: this.secretKey, publicKey: this.publicKey}})],
         address: this.pub,
         onTx: this.confirmDialog,
         onChain: this.confirmDialog,

@@ -33,7 +33,8 @@ async function sign (data) {
 }
 
 async function address () {
-  return Promise.resolve(this.Selector.address)
+  if (this.Selector.address) return Promise.resolve(this.Selector.address)
+  throw new Error('You don\'t have selected account')
 }
 
 /**
