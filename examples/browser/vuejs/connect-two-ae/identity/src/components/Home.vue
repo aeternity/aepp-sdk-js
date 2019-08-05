@@ -11,7 +11,7 @@
           Public Key
         </div>
         <div class="p-2 w-3/4 bg-grey-lightest break-words">
-          {{pub}}
+          {{publicKey}}
         </div>
       </div>
       <div v-if="height" class="bg-green w-full flex flex-row font-mono border border-b">
@@ -46,12 +46,13 @@
   // AE_SDK_MODULES is a webpack alias present in webpack.config.js
   import { Wallet, MemoryAccount } from '@aeternity/aepp-sdk/es'
 
+  const account = generateKeyPair()
   export default {
     data () {
       return {
         runningInFrame: window.parent !== window,
-        pub: 'PROVIDE_YOUR_PUB', // Your public key
-        priv: 'PROVIDE_YOUR_PPRIV', // Your private key
+        publicKey: account.publicKey, // Your public key
+        secretKey: account.secretKey, // Your private key
         client: null,
         balance: null,
         height: null,

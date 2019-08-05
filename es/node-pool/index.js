@@ -13,6 +13,7 @@ export const NodePool = AsyncInit.compose({
     })
     if (nodes.length) this.selectNode(nodes[0].name)
 
+    // DEPRECATED. TODO Remove deprecated param
     // Prevent BREAKING CHANGES. Support for init params `url`, `internalUrl`
     if (url) {
       this.addNode('default', await Node({ url, internalUrl }), true)
