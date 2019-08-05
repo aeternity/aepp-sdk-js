@@ -1,3 +1,78 @@
+# [4.3.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.3.0) (2019-08-05)
+
+
+### Bug Fixes
+
+* **ACI:** Add ability to pass zero address as number. ([#396](https://github.com/aeternity/aepp-sdk-js/issues/396)) ([b5b5c61](https://github.com/aeternity/aepp-sdk-js/commit/b5b5c61))
+* **ACI:** Fix address type transformation when decoding data ([#335](https://github.com/aeternity/aepp-sdk-js/issues/335)) ([e37cdfc](https://github.com/aeternity/aepp-sdk-js/commit/e37cdfc))
+* **Compiler:** Fix compiler compatibility mechanism ([#479](https://github.com/aeternity/aepp-sdk-js/issues/479)) ([78cc990](https://github.com/aeternity/aepp-sdk-js/commit/78cc990))
+* **Contract:** Add error handlinc(decoding) in low lvl contract API ([#386](https://github.com/aeternity/aepp-sdk-js/issues/386)) ([e1fdce0](https://github.com/aeternity/aepp-sdk-js/commit/e1fdce0))
+* **Node:** Do not throw error if `internalUrl` not provided. Instead use `url` ([#503](https://github.com/aeternity/aepp-sdk-js/issues/503)) ([053faae](https://github.com/aeternity/aepp-sdk-js/commit/053faae))
+* **package:** update libsodium-wrappers-sumo to version 0.7.5 ([#541](https://github.com/aeternity/aepp-sdk-js/issues/541)) ([956ed75](https://github.com/aeternity/aepp-sdk-js/commit/956ed75))
+* **RPC:** Add contract contractDecodeCallResultAPI to RPC ([#482](https://github.com/aeternity/aepp-sdk-js/issues/482)) ([7eb6bd8](https://github.com/aeternity/aepp-sdk-js/commit/7eb6bd8))
+* **rpc-server:** Fix type 'object' check ([#526](https://github.com/aeternity/aepp-sdk-js/issues/526)) ([48c42e4](https://github.com/aeternity/aepp-sdk-js/commit/48c42e4))
+* **state channels:** fix onChainTx event params ([#566](https://github.com/aeternity/aepp-sdk-js/issues/566)) ([11c85eb](https://github.com/aeternity/aepp-sdk-js/commit/11c85eb))
+* **State Channels:** Fix websocket url ([#558](https://github.com/aeternity/aepp-sdk-js/issues/558)) ([33c1fd8](https://github.com/aeternity/aepp-sdk-js/commit/33c1fd8))
+* **State Channels:** Remove automatic pinging to fix browser compatibility ([#432](https://github.com/aeternity/aepp-sdk-js/issues/432)) ([0700f3a](https://github.com/aeternity/aepp-sdk-js/commit/0700f3a))
+* **swagger:** Pass query params in case of get request ([#570](https://github.com/aeternity/aepp-sdk-js/issues/570)) ([93f0c51](https://github.com/aeternity/aepp-sdk-js/commit/93f0c51))
+* **TXBuilder:** Fix payload serialization if you try to pack unpacked tx. ([#498](https://github.com/aeternity/aepp-sdk-js/issues/498)) ([73552e5](https://github.com/aeternity/aepp-sdk-js/commit/73552e5))
+* **TxValidator:** Fix validation of state channel open transaction ([#496](https://github.com/aeternity/aepp-sdk-js/issues/496)) ([325cc90](https://github.com/aeternity/aepp-sdk-js/commit/325cc90))
+
+
+### Code Refactoring
+
+* **SCM:** Update compatibility range for node: 3.0.1 - 4 ([#474](https://github.com/aeternity/aepp-sdk-js/issues/474)) ([a1494fd](https://github.com/aeternity/aepp-sdk-js/commit/a1494fd))
+
+
+### Features
+
+* **ACi:** Make compatible with compiler 3.1.0 ([#457](https://github.com/aeternity/aepp-sdk-js/issues/457)) ([d92f2c7](https://github.com/aeternity/aepp-sdk-js/commit/d92f2c7)), closes [#458](https://github.com/aeternity/aepp-sdk-js/issues/458)
+* **ACI:** Add `contract`, `address`, `record` types argument/result transformation ([#349](https://github.com/aeternity/aepp-sdk-js/issues/349)) ([0599d7d](https://github.com/aeternity/aepp-sdk-js/commit/0599d7d))
+* **ACI:** Add `Option` sophia type to ACI ([#390](https://github.com/aeternity/aepp-sdk-js/issues/390)) ([83f5279](https://github.com/aeternity/aepp-sdk-js/commit/83f5279))
+* **ACI:** Generate JS function proto for each of contract function ([#439](https://github.com/aeternity/aepp-sdk-js/issues/439)) ([2f47b4d](https://github.com/aeternity/aepp-sdk-js/commit/2f47b4d))
+* **ACI:** Implement arguments validation for generic sophia types(list, map, tuple, record) ([#384](https://github.com/aeternity/aepp-sdk-js/issues/384)) ([956e59e](https://github.com/aeternity/aepp-sdk-js/commit/956e59e))
+* **ACI:** Implement sophia `variant` type ([#567](https://github.com/aeternity/aepp-sdk-js/issues/567)) ([8505dcf](https://github.com/aeternity/aepp-sdk-js/commit/8505dcf))
+* **ACI:** Refactor ACI module ([#505](https://github.com/aeternity/aepp-sdk-js/issues/505)) ([fb7bc00](https://github.com/aeternity/aepp-sdk-js/commit/fb7bc00))
+* **ACI:** Update due to compiler API changes ([#331](https://github.com/aeternity/aepp-sdk-js/issues/331)) ([e047f3b](https://github.com/aeternity/aepp-sdk-js/commit/e047f3b))
+* **AE:** Allow to spend % of balance. ([#371](https://github.com/aeternity/aepp-sdk-js/issues/371)) ([f97a2ae](https://github.com/aeternity/aepp-sdk-js/commit/f97a2ae)), closes [#336](https://github.com/aeternity/aepp-sdk-js/issues/336)
+* **Aepp:** Add Compiler to Aepp rpc methods. Update example app ([#312](https://github.com/aeternity/aepp-sdk-js/issues/312)) ([9c72521](https://github.com/aeternity/aepp-sdk-js/commit/9c72521))
+* **Compiler:** Add decode CallData by source/bytecode ([#354](https://github.com/aeternity/aepp-sdk-js/issues/354)) ([761f36b](https://github.com/aeternity/aepp-sdk-js/commit/761f36b))
+* **Compiler/ACI:** Make ACI compatible with compiler 3.0.0 ([#441](https://github.com/aeternity/aepp-sdk-js/issues/441)) ([2a8eb1a](https://github.com/aeternity/aepp-sdk-js/commit/2a8eb1a))
+* **Consensus:** Add function to get consensus version.  ([#413](https://github.com/aeternity/aepp-sdk-js/issues/413)) ([46027cd](https://github.com/aeternity/aepp-sdk-js/commit/46027cd))
+* **contract:** add ability to use call-static/dry-run without keyPair ([#577](https://github.com/aeternity/aepp-sdk-js/issues/577)) ([c38edd9](https://github.com/aeternity/aepp-sdk-js/commit/c38edd9))
+* **Fortuna:** Node 3.0.0 compatibility ([#397](https://github.com/aeternity/aepp-sdk-js/issues/397)) ([17b78d5](https://github.com/aeternity/aepp-sdk-js/commit/17b78d5))
+* **Joi:** Browser Support ([#406](https://github.com/aeternity/aepp-sdk-js/issues/406)) ([bdc0bad](https://github.com/aeternity/aepp-sdk-js/commit/bdc0bad))
+* **Node:** Avoid usage of "universal-url" package ([#434](https://github.com/aeternity/aepp-sdk-js/issues/434)) ([a8268d5](https://github.com/aeternity/aepp-sdk-js/commit/a8268d5))
+* **NodePool:** Implement NodePool stamp ([#574](https://github.com/aeternity/aepp-sdk-js/issues/574)) ([674166c](https://github.com/aeternity/aepp-sdk-js/commit/674166c))
+* **RPC:** Add getNodeInfo and getNetworkId to AEPP stamp through RPC ([#359](https://github.com/aeternity/aepp-sdk-js/issues/359)) ([2ddeea8](https://github.com/aeternity/aepp-sdk-js/commit/2ddeea8))
+* **state channel:** make state channel compatible with aeternity@4.0.0 ([#568](https://github.com/aeternity/aepp-sdk-js/issues/568)) ([0d0e09b](https://github.com/aeternity/aepp-sdk-js/commit/0d0e09b))
+* **State Channels:** Add cleanContractCalls method ([#338](https://github.com/aeternity/aepp-sdk-js/issues/338)) ([778159a](https://github.com/aeternity/aepp-sdk-js/commit/778159a))
+* **State Channels:** Make state channels compatible with aeternity v… ([#415](https://github.com/aeternity/aepp-sdk-js/issues/415)) ([668e7f1](https://github.com/aeternity/aepp-sdk-js/commit/668e7f1))
+* **State Channels:** Ping every 10 seconds to persist connection ([#324](https://github.com/aeternity/aepp-sdk-js/issues/324)) ([6d0e156](https://github.com/aeternity/aepp-sdk-js/commit/6d0e156)), closes [#276](https://github.com/aeternity/aepp-sdk-js/issues/276) [#299](https://github.com/aeternity/aepp-sdk-js/issues/299) [#300](https://github.com/aeternity/aepp-sdk-js/issues/300) [#303](https://github.com/aeternity/aepp-sdk-js/issues/303) [#302](https://github.com/aeternity/aepp-sdk-js/issues/302) [#279](https://github.com/aeternity/aepp-sdk-js/issues/279) [#275](https://github.com/aeternity/aepp-sdk-js/issues/275) [#276](https://github.com/aeternity/aepp-sdk-js/issues/276) [#299](https://github.com/aeternity/aepp-sdk-js/issues/299) [#300](https://github.com/aeternity/aepp-sdk-js/issues/300)
+* **State Channels:** Remove endpoint param ([#391](https://github.com/aeternity/aepp-sdk-js/issues/391)) ([8d9ea7e](https://github.com/aeternity/aepp-sdk-js/commit/8d9ea7e))
+* **Transaction Builder:** Add serializations for transactions introd… ([#416](https://github.com/aeternity/aepp-sdk-js/issues/416)) ([fd7b8ce](https://github.com/aeternity/aepp-sdk-js/commit/fd7b8ce))
+* **TX:** encode payload as base64 ([#460](https://github.com/aeternity/aepp-sdk-js/issues/460)) ([ad490af](https://github.com/aeternity/aepp-sdk-js/commit/ad490af))
+* **TX_BUILDER:** Fix buf related to contract fee calculation. ([#472](https://github.com/aeternity/aepp-sdk-js/issues/472)) ([7214cfb](https://github.com/aeternity/aepp-sdk-js/commit/7214cfb))
+* **TxBuilder:** Add helper for producing tx hash ([#579](https://github.com/aeternity/aepp-sdk-js/issues/579)) ([e1b405e](https://github.com/aeternity/aepp-sdk-js/commit/e1b405e))
+* **Utils:** Move json-bigint implementation to `utils` ([#486](https://github.com/aeternity/aepp-sdk-js/issues/486)) ([1538867](https://github.com/aeternity/aepp-sdk-js/commit/1538867))
+
+
+### BREAKING CHANGES
+
+* **SCM:** This change will make the release not compatible with older version of the node and
+compiler
+
+* chore(Compiler): Remove logs
+* **ACi:** Change Contract low lvl API: change `contractDecodeData` interface from `(type:
+String, data: String) => Any` to `(source: String, fn: String, callValue: String, callResult:
+String) => Any`. * `callResult` is `callType` from call result, be `ok`, `revert`, ...
+* **State Channels:** Endpoint param is removed and no longer defaults to "/channel". This means that
+"/channel" (or other path) must be appendend to url para
+
+* Fix channel test
+
+
+
 # [4.2.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.2.0) (2019-07-15)
 
 
