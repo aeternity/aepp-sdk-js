@@ -155,7 +155,11 @@ function onMessage (channel, data) {
   } else if (message.method === 'channels.message') {
     emit(channel, 'message', message.params.data.message)
   } else if (message.method === 'channels.system.pong') {
-    if (message.params.channel_id === channelId.get(channel)) {
+    if (
+      (message.params.channel_id === channelId.get(channel)) ||
+      // Skip channelId check if channelId is not known yet
+      (channelId.get(channel) == null)
+     ) {
       ping(channel)
     }
   } else {
