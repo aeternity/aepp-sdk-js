@@ -365,7 +365,7 @@ export function unpackTx (encodedTx, fromRlpBinary = false) {
 /**
  * Build a transaction hash
  * @function
- * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param {String | Buffer} rawTx base64 or rlp encoded transaction
  * @return {String} Transaction hash
  */

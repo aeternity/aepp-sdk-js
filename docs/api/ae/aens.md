@@ -18,7 +18,7 @@ import Aens from '@aeternity/aepp-sdk/es/ae/aens'
     * _instance_
         * [.update(nameId, target, options)](#exp_module_@aeternity/aepp-sdk/es/ae/aens--update) ⇒ `Object` ⏏
         * [.query(name)](#exp_module_@aeternity/aepp-sdk/es/ae/aens--query) ⇒ `Promise.&lt;Object&gt;` ⏏
-        * [.claim(name, salt, waitForHeight, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/aens--claim) ⇒ `Promise.&lt;Object&gt;` ⏏
+        * [.claim(name, salt, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/aens--claim) ⇒ `Promise.&lt;Object&gt;` ⏏
         * [.preclaim(name, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/aens--preclaim) ⇒ `Promise.&lt;Object&gt;` ⏏
         * _async_
             * [.transfer(nameId, account, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/aens--transfer) ⇒ `Promise.&lt;Object&gt;` ⏏
@@ -66,7 +66,7 @@ Query the status of an AENS registration
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/aens--claim"></a>
 
-### .claim(name, salt, waitForHeight, [options]) ⇒ `Promise.&lt;Object&gt;` ⏏
+### .claim(name, salt, [options]) ⇒ `Promise.&lt;Object&gt;` ⏏
 Claim a previously preclaimed registration. This can only be done after the
 preclaim step
 
@@ -77,7 +77,6 @@ preclaim step
 | --- | --- | --- |
 | name | `String` |  | 
 | salt | `String` |  | 
-| waitForHeight | `Number` |  | 
 | [options] | `Record` | <code>{}</code> | 
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/aens--preclaim"></a>

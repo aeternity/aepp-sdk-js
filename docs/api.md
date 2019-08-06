@@ -16,6 +16,7 @@
   * [@aeternity/aepp-sdk/es/contract/aci](api/contract/aci.md)
   * [@aeternity/aepp-sdk/es/contract/compiler](api/contract/compiler.md)
   * [@aeternity/aepp-sdk/es/contract](api/contract.md)
+  * [@aeternity/aepp-sdk/es/node-pool](api/node-pool.md)
   * [@aeternity/aepp-sdk/es/node](api/node.md)
   * [@aeternity/aepp-sdk/es/oracle](api/oracle.md)
   * [@aeternity/aepp-sdk/es/oracle/node](api/oracle/node.md)

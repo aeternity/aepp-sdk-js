@@ -22,10 +22,19 @@ Example spend function, using aeternity's SDK abstraction
 ```js
   // Import necessary Modules by simply importing the Wallet module
   import Wallet from '@aeternity/aepp-sdk/es/ae/wallet' // import from SDK es-modules
+  import Node from '@aeternity/aepp-sdk/es/node' // import from SDK es-modules
+  
+  // const node1 = await Node({ url, internalUrl })
 
   Wallet({
-    url: 'HOST_URL_HERE',
-    internalUrl: 'HOST_URL_HERE',
+    // This two params deprecated and will be remove in next major release
+    url: 'https://sdk-testnet.aepps.com',
+    internalUrl: 'https://sdk-testnet.aepps.com',
+    // instead use
+    nodes: [
+        // { name: 'someNode', instance: node1 },
+        // mode2
+    ],    
     compilerUrl: 'COMPILER_URL_HERE',
     accounts: [MemoryAccount({keypair: {secretKey: 'PRIV_KEY_HERE', publicKey: 'PUB_KEY_HERE'}, networkId: 'NETWORK_ID_HERE'})],
     address: 'PUB_KEY_HERE',
