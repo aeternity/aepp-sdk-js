@@ -159,7 +159,7 @@ function onMessage (channel, data) {
       (message.params.channel_id === channelId.get(channel)) ||
       // Skip channelId check if channelId is not known yet
       (channelId.get(channel) == null)
-     ) {
+    ) {
       ping(channel)
     }
   } else {
