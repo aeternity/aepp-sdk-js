@@ -133,7 +133,7 @@ async function contractCallStatic (source, address, name, args = [], { top, opti
   }))
 
   // Dry-run
-  const dryRunAmount = Number.MAX_SAFE_INTEGER
+  const dryRunAmount = BigNumber(opt.dryRunAccount.amount).gt(BigNumber(opt.amount || 0)) ? opt.dryRunAccount.amount : opt.amount
   const dryRunAccount = {
     amount: dryRunAmount,
     pubKey: callerId
@@ -318,7 +318,7 @@ export const Contract = Ae.compose(ContractBase, ContractACI, {
         amount: 0,
         gas: 1600000 - 21000,
         options: '',
-        dryRunAccount: { pub: 'ak_11111111111111111111111111111111273Yts', amount: '100000000000000000000000000000000' }
+        dryRunAccount: { pub: 'ak_11111111111111111111111111111111273Yts', amount: '100000000000000000000000000000000000' }
       }
     }
   }

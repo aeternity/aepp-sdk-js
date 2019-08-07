@@ -27,6 +27,7 @@ import stampit from '@stamp/it'
 import axios from 'axios'
 import * as R from 'ramda'
 import { snakeToPascal, pascalToSnake } from './string'
+import BigNumber from 'bignumber.js'
 
 /**
  * Perform path string interpolation
@@ -98,8 +99,8 @@ function TypeError (msg, spec, value) {
  */
 const conformTypes = {
   integer (value, spec, types) {
-    if (R.type(value) === 'Number') {
-      return Math.floor(value)
+    if (R.type(value) === 'Number' || BigNumber(value).toString(10) === value) {
+      return R.type(value) === 'Number' ? Math.floor(value) : value
     } else {
       throw TypeError('Not an integer', spec, value)
     }
@@ -194,6 +195,13 @@ const httpConfig = {
   transformResponse: [(data) => {
     try {
       return JsonBig.parse(data)
+    } catch (e) {
+      return data
+    }
+  }],
+  transformRequest:[(data) => {
+    try {
+      return JsonBig.stringify(data)
     } catch (e) {
       return data
     }
