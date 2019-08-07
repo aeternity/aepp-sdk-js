@@ -1,6 +1,5 @@
 import BigNumber from 'bignumber.js'
 
-
 /* eslint-disable */
 export default {
   stringify: (function () {

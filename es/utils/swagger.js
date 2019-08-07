@@ -199,7 +199,7 @@ const httpConfig = {
       return data
     }
   }],
-  transformRequest:[(data) => {
+  transformRequest: [(data) => {
     try {
       return JsonBig.stringify(data)
     } catch (e) {
