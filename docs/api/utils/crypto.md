@@ -138,7 +138,7 @@ Calculate 256bits Blake2b hash of `input`
 
 | Param | Type | Description |
 | --- | --- | --- |
-| input | `String` | Data to hash |
+| input | `String` \| `Buffer` | Data to hash |
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.nameId"></a>
 

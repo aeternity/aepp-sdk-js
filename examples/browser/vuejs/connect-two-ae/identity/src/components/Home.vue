@@ -11,7 +11,7 @@
           Public Key
         </div>
         <div class="p-2 w-3/4 bg-grey-lightest break-words">
-          {{pub}}
+          {{publicKey}}
         </div>
       </div>
       <div v-if="height" class="bg-green w-full flex flex-row font-mono border border-b">
@@ -36,20 +36,23 @@
       Loading Aepp...
     </div>
     <!-- external app -->
-    <iframe v-show="aeppUrl" ref="aepp" class="w-full h-screen border border-black border-dashed bg-grey-light mx-auto mt-4 shadow" src="about:blank" frameborder="1"></iframe>
+    <iframe v-show="aeppUrl" ref="aepp"
+            class="w-full h-screen border border-black border-dashed bg-grey-light mx-auto mt-4 shadow" name="aepp"
+            src="http://localhost:9001" frameborder="1"></iframe>
   </div>
 </template>
 
 <script>
   // AE_SDK_MODULES is a webpack alias present in webpack.config.js
-  import { Wallet, MemoryAccount } from '@aeternity/aepp-sdk/es'
+  import { Wallet, MemoryAccount, Node, Crypto } from '@aeternity/aepp-sdk/es'
 
+  const account = Crypto.generateKeyPair()
   export default {
     data () {
       return {
         runningInFrame: window.parent !== window,
-        pub: 'PROVIDE_YOUR_PUB', // Your public key
-        priv: 'PROVIDE_YOUR_PPRIV', // Your private key
+        publicKey: account.publicKey, // Your public key
+        secretKey: account.secretKey, // Your private key
         client: null,
         balance: null,
         height: null,
@@ -66,10 +69,9 @@
     },
     async created () {
       this.client = await Wallet({
-        url: this.url,
-        internalUrl: this.internalUrl,
+        nodes: [{ name: 'localNode', instance: await Node({ url: this.url, internalUrl: this.internalUrl }) }],
         compilerUrl: this.compilerUrl,
-        accounts: [MemoryAccount({keypair: {secretKey: this.priv, publicKey: this.pub}})],
+        accounts: [MemoryAccount({keypair: {secretKey: this.secretKey, publicKey: this.publicKey}})],
         address: this.pub,
         onTx: this.confirmDialog,
         onChain: this.confirmDialog,

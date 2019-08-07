@@ -15,7 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { UniversalWithAccounts, Universal as Ae } from '../../es/ae/universal'
+import { Universal as Ae } from '../../es/ae/universal'
 import * as Crypto from '../../es/utils/crypto'
 import { BigNumber } from 'bignumber.js'
 import MemoryAccount from '../../es/account/memory'
@@ -31,10 +31,7 @@ const BaseAe = (params) => Ae.compose({
   props: { url, internalUrl, process, compilerUrl }
 })({ ...params })
 
-const BaseAeWithAccounts = (params) => UniversalWithAccounts.compose({
-  deepProps: { Swagger: { defaults: { debug: !!process.env['DEBUG'] } } },
-  props: { url, internalUrl, process, compilerUrl }
-})({ ...params })
+const BaseAeWithAccounts = BaseAe
 
 let planned = BigNumber(0)
 let charged = false
