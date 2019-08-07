@@ -102,6 +102,7 @@ async function addAccount (account, { select } = {}) {
  */
 function removeAccount (address) {
   if (this.accounts[address]) delete this.accounts[address]
+  if (this.Selector.address === address) this.Selector.address = undefined
 }
 
 /**

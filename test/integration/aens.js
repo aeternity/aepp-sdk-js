@@ -32,6 +32,7 @@ describe('Aens', function () {
   let aens
   const account = generateKeyPair()
   const name = randomName()
+  const name2 = randomName()
 
   before(async function () {
     aens = await ready(this)
@@ -60,6 +61,19 @@ describe('Aens', function () {
     const preclaim = await aens.aensPreclaim(name)
     preclaim.should.be.an('object')
     return preclaim.claim().should.eventually.be.an('object')
+  })
+
+  it('Claim name using specific account', async () => {
+    const current = await aens.address()
+    const onAccount = aens.addresses().find(acc => acc !== current)
+
+    const preclaim = await aens.aensPreclaim(name, { onAccount })
+    preclaim.should.be.an('object')
+    preclaim.tx.accountId.should.be.equal(onAccount)
+
+    const claimed = await preclaim.claim()
+    claimed.should.be.an('object')
+    claimed.tx.accountId.should.be.equal(onAccount)
   })
 
   it('queries names', async () => {
