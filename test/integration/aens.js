@@ -63,19 +63,6 @@ describe('Aens', function () {
     return preclaim.claim().should.eventually.be.an('object')
   })
 
-  it('Claim name using specific account', async () => {
-    const current = await aens.address()
-    const onAccount = aens.addresses().find(acc => acc !== current)
-
-    const preclaim = await aens.aensPreclaim(name, { onAccount })
-    preclaim.should.be.an('object')
-    preclaim.tx.accountId.should.be.equal(onAccount)
-
-    const claimed = await preclaim.claim()
-    claimed.should.be.an('object')
-    claimed.tx.accountId.should.be.equal(onAccount)
-  })
-
   it('queries names', async () => {
     return aens.aensQuery(name).should.eventually.be.an('object')
   })
@@ -111,5 +98,14 @@ describe('Aens', function () {
     await aensName.revoke()
 
     return aens2.aensQuery(name).should.be.rejectedWith(Error)
+  })
+
+  it('PreClaim name using specific account', async () => {
+    const current = await aens.address()
+    const onAccount = aens.addresses().find(acc => acc !== current)
+
+    const preclaim = await aens.aensPreclaim(name, { onAccount })
+    preclaim.should.be.an('object')
+    preclaim.tx.accountId.should.be.equal(onAccount)
   })
 })
