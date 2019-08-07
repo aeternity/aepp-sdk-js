@@ -25,6 +25,7 @@ const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
 const compilerUrl = process.env.COMPILER_URL || 'http://localhost:3080'
 const networkId = process.env.TEST_NETWORK_ID || 'ae_devnet'
 export const account = Crypto.generateKeyPair()
+export const account2 = Crypto.generateKeyPair()
 
 const BaseAe = (params) => Ae.compose({
   deepProps: { Swagger: { defaults: { debug: !!process.env['DEBUG'] } } },
@@ -55,17 +56,17 @@ async function ready (mocha, native = true, withAccounts = false) {
   if (!charged && planned > 0) {
     console.log(`Charging new wallet ${account.publicKey} with ${planned}`)
     await ae.spend(planned.toString(10), account.publicKey)
+    console.log(`Charging new wallet ${account2.publicKey} with ${planned}`)
+    await ae.spend(planned.toString(10), account2.publicKey)
     charged = true
   }
 
-  return withAccounts
-    ? BaseAeWithAccounts({
-      accounts: [MemoryAccount({ keypair: account })],
+  return BaseAeWithAccounts({
+      accounts: [MemoryAccount({ keypair: account }), MemoryAccount({ keypair: account2 })],
       address: account.publicKey,
       nativeMode: native,
       networkId
     })
-    : BaseAe({ keypair: account, nativeMode: native, networkId })
 }
 
 export {

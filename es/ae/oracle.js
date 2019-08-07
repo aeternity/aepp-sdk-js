@@ -123,7 +123,7 @@ export async function pollForQueryResponse (oracleId, queryId, { attempts = 20, 
  */
 async function registerOracle (queryFormat, responseFormat, options = {}) {
   const opt = R.merge(this.Ae.defaults, options) // Preset VmVersion for oracle
-  const accountId = await this.address()
+  const accountId = await this.address(opt)
 
   const oracleRegisterTx = await this.oracleRegisterTx(R.merge(opt, {
     accountId,
@@ -154,7 +154,7 @@ async function registerOracle (queryFormat, responseFormat, options = {}) {
  */
 async function postQueryToOracle (oracleId, query, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const senderId = await this.address()
+  const senderId = await this.address(opt)
 
   const { tx: oracleRegisterTx, queryId } = await this.oraclePostQueryTx(R.merge(opt, {
     oracleId,
@@ -182,7 +182,7 @@ async function postQueryToOracle (oracleId, query, options = {}) {
  */
 async function extendOracleTtl (oracleId, oracleTtl, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const callerId = await this.address()
+  const callerId = await this.address(opt)
 
   const oracleExtendTx = await this.oracleExtendTx(R.merge(opt, {
     oracleId,
@@ -212,7 +212,7 @@ async function extendOracleTtl (oracleId, oracleTtl, options = {}) {
  */
 async function respondToQuery (oracleId, queryId, response, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const callerId = await this.address()
+  const callerId = await this.address(opt)
 
   const oracleRespondTx = await this.oracleRespondTx(R.merge(opt, {
     oracleId,

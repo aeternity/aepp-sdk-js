@@ -33,6 +33,7 @@ import { isBase64 } from '../utils/crypto'
 import ContractCompilerAPI from '../contract/compiler'
 import ContractBase from '../contract'
 import ContractACI from '../contract/aci'
+import BigNumber from 'bignumber.js'
 
 /**
  * Handle contract call error
@@ -107,7 +108,16 @@ async function contractDecodeData (source, fn, callValue, callResult, options) {
  */
 async function contractCallStatic (source, address, name, args = [], { top, options = {} } = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const callerId = await this.address() || opt.dryRunAccount.pub
+  let callerId
+  try {
+    callerId = await this.address(opt)
+  } catch (e) {
+    if (!opt.onAccount) {
+      callerId = opt.dryRunAccount.pub
+    } else {
+      throw e
+    }
+  }
 
   // Get block hash by height
   if (top && !isNaN(top)) {
@@ -123,10 +133,12 @@ async function contractCallStatic (source, address, name, args = [], { top, opti
   }))
 
   // Dry-run
-  const [{ result: status, callObj, reason }] = (await this.txDryRun([tx], [{
-    amount: (opt.amount || 0) <= opt.dryRunAccount.amount ? opt.amount : opt.dryRunAccount.amount,
+  const dryRunAmount = BigNumber(opt.dryRunAccount.amount).gt(BigNumber(opt.amount || 0)) ? opt.dryRunAccount.amount : opt.amount
+  const dryRunAccount = {
+    amount: dryRunAmount,
     pubKey: callerId
-  }], top)).results
+  }
+  const [{ result: status, callObj, reason }] = (await this.txDryRun([tx], [dryRunAccount], top)).results
 
   // check response
   if (status !== 'ok') throw new Error('Dry run error, ' + reason)
@@ -163,7 +175,7 @@ async function contractCall (source, address, name, args = [], options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
 
   const tx = await this.contractCallTx(R.merge(opt, {
-    callerId: await this.address(),
+    callerId: await this.address(opt),
     contractId: address,
     callData: await this.contractEncodeCall(source, name, args)
   }))
@@ -208,7 +220,7 @@ async function contractCall (source, address, name, args = [], options = {}) {
 async function contractDeploy (code, source, initState = [], options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   const callData = await this.contractEncodeCall(source, 'init', initState)
-  const ownerId = await this.address()
+  const ownerId = await this.address(opt)
 
   const { tx, contractId } = await this.contractCreateTx(R.merge(opt, {
     callData,
@@ -226,8 +238,8 @@ async function contractDeploy (code, source, initState = [], options = {}) {
       transaction: hash,
       rawTx,
       address: contractId,
-      call: async (name, args = [], options) => this.contractCall(source, contractId, name, args, options),
-      callStatic: async (name, args = [], options) => this.contractCallStatic(source, contractId, name, args, options),
+      call: async (name, args = [], options) => this.contractCall(source, contractId, name, args, R.merge(opt, options)),
+      callStatic: async (name, args = [], options = {}) => this.contractCallStatic(source, contractId, name, args, { ...options, options: { onAccount: opt.onAccount, ...options.options } }),
       createdAt: new Date()
     })
   } else {
@@ -306,7 +318,7 @@ export const Contract = Ae.compose(ContractBase, ContractACI, {
         amount: 0,
         gas: 1600000 - 21000,
         options: '',
-        dryRunAccount: { pub: 'ak_11111111111111111111111111111111273Yts', amount: '100000000000000000000000000000000000000000' }
+        dryRunAccount: { pub: 'ak_11111111111111111111111111111111273Yts', amount: '100000000000000000000000000000000000' }
       }
     }
   }
