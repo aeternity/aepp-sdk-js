@@ -44,7 +44,7 @@
 
 <script>
   // AE_SDK_MODULES is a webpack alias present in webpack.config.js
-  import { Wallet, MemoryAccount, RpcWallet } from '@aeternity/aepp-sdk/es'
+  import { MemoryAccount, RpcWallet } from '@aeternity/aepp-sdk/es'
   import Node from '@aeternity/aepp-sdk/es/node'
   import BrowserWindowMessageConnection
     from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-connection/browser-window-message'
@@ -106,7 +106,7 @@
           if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to subscribe address`)) {
             accept()
             const node = await Node({ url: 'http://localhost:3013', internalUrl: 'http://localhost:3013' })
-            this.setNode(node)
+            this.addNode('second Node', node, true)
           } else { deny() }
         },
         async onSign (aepp, { accept, deny, params }) {

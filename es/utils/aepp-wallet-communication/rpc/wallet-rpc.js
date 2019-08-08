@@ -7,6 +7,7 @@ import { getBrowserAPI, message, sendResponseMessage } from '../helpers'
 import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE, SUBSCRIPTION_VALUES } from '../schema'
 import uuid from 'uuid/v4'
 import { unpackTx } from '../../../tx/builder'
+import * as R from 'ramda'
 
 const rpcClients = WalletClients()
 
@@ -146,6 +147,34 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
     //
     this.name = name
     this.id = uuid()
+
+    const _selectAccount = this.selectAccount.bind(this)
+    const _addAccount = this.addAccount.bind(this)
+    const _selectNode = this.selectNode.bind(this)
+
+    // Overwrite AE methods
+    this.selectAccount = (address) => {
+      _selectAccount(address)
+      rpcClients.sentNotificationByCondition(
+        message(METHODS.wallet.updateAddress, this.getAccounts()),
+        (client) => client.addressSubscription.includes(SUBSCRIPTION_VALUES.current) && client.isConnected())
+    }
+    this.addAccount = async (account, { select, meta }) => {
+      await _addAccount(account, { select })
+      // Send notification 'update.address' to all Aepp which are subscribed for connected accounts
+      rpcClients.sentNotificationByCondition(
+        message(METHODS.updateNetwork, { network: this.getNetworkId() }),
+        (client) => client.isConnected() && client.addressSubscription.includes(SUBSCRIPTION_VALUES.connected)
+      )
+    }
+    this.selectNode = (name) => {
+      _selectNode(name)
+      // Send notification 'update.network' to all Aepp which connected
+      rpcClients.sentNotificationByCondition(
+        message(METHODS.updateNetwork, { network: this.getNetworkId() }),
+        (client) => client.isConnected()
+      )
+    }
   },
   methods: {
     getClients () {
@@ -178,37 +207,12 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
     },
     getAccounts () {
       return {
-        current: this.Selector.address ? { [this.Selector.address]: this.accounts[this.Selector.address].meta } : {},
+        current: this.Selector.address ? { [this.Selector.address]: {} } : {},
         connected: Object
           .entries(this.address)
           .filter(a => a[0] !== this.Selector.address)
           .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {})
       }
-    },
-    async addAccount (account, { select, meta }) {
-      const address = await account.address()
-      this.accounts[address] = { account, meta }
-      if (select) return this.selectAccount(address)
-      // Send notification 'update.address' to all Aepp which are subscribed for connected accounts
-      rpcClients.sentNotificationByCondition(
-        message(METHODS.updateNetwork, { network: this.getNetworkId() }),
-        (client) => client.isConnected() && client.addressSubscription.includes(SUBSCRIPTION_VALUES.connected)
-      )
-    },
-    selectAccount (address) {
-      this.Selector.address = address
-      // Send notification 'update.address' to all Aepp which are subscribed for current account update
-      rpcClients.sentNotificationByCondition(
-        message(METHODS.wallet.updateAddress, this.getAccounts()),
-        (client) => client.addressSubscription.includes(SUBSCRIPTION_VALUES.current) && client.isConnected())
-    },
-    setNode (node) {
-      Object.assign(this, node)
-      // Send notification 'update.network' to all Aepp which connected
-      rpcClients.sentNotificationByCondition(
-        message(METHODS.updateNetwork, { network: this.getNetworkId() }),
-        (client) => client.isConnected()
-      )
     }
   }
 })

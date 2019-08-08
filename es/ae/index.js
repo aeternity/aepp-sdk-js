@@ -104,14 +104,6 @@ function destroyInstance () {
   destroyMethods.forEach(m => this[m] && typeof this[m] === 'function' && this[m]())
 }
 
-function setNode (node) {
-  const nodeProps = ['Swagger', 'api', 'consensusProtocolVersion', 'genesisHash', 'methods']
-  if (!node || typeof node !== 'object' || nodeProps.find(prop => !node.hasOwnProperty(prop))) {
-    throw new Error('Invalid node object')
-  }
-  Object.assign(this, node)
-}
-
 /**
  * Basic Ae Stamp
  *
@@ -132,7 +124,7 @@ function setNode (node) {
  * @return {Object} Ae instance
  */
 const Ae = stampit(Tx, Account, Chain, {
-  methods: { send, spend, transferFunds, destroyInstance, setNode },
+  methods: { send, spend, transferFunds, destroyInstance },
   deepProps: { Ae: { defaults: {} } }
 })
 
