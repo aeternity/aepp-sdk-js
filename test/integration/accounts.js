@@ -104,6 +104,39 @@ describe('Accounts', function () {
       .equal(`${spend.tx.fee + spend.tx.amount}`)
   })
 
+  describe('Make operation on specific account without changing of current account', () => {
+    it('Can make spend on specific account', async () => {
+      const current = await wallet.address()
+      const accounts = wallet.addresses()
+      const onAccount = accounts.find(acc => acc !== current)
+      // SPEND
+      const { tx } = await wallet.spend(1, await wallet.address(), { onAccount })
+      tx.senderId.should.be.equal(onAccount)
+      current.should.be.equal(current)
+
+    })
+
+    it('Fail on invalid account', async () => {
+      const current = await wallet.address()
+      // SPEND
+      try {
+        await wallet.spend(1, await wallet.address(), { onAccount: 1 })
+      } catch (e) {
+        e.message.should.be.equal('Invalid account address, check "onAccount" value')
+      }
+    })
+
+    it('Fail on non exist account', async () => {
+      const current = await wallet.address()
+      // SPEND
+      try {
+        await wallet.spend(1, await wallet.address(), { onAccount: 'ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk' })
+      } catch (e) {
+        e.message.should.be.equal('Account for ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk not available')
+      }
+    })
+  })
+
   describe('can be configured to return th', () => {
     it('on creation', async () => {
       const wallet = await ready(this)

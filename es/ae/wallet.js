@@ -31,6 +31,7 @@ import Accounts from '../accounts'
 import Chain from '../chain/node'
 import Rpc from '../rpc/server'
 import Selector from '../account/selector'
+import * as R from 'ramda'
 import Tx from '../tx/tx'
 import Contract from './contract'
 import { WalletRpc } from '../utils/aepp-wallet-communication/rpc/wallet-rpc'
@@ -132,7 +133,7 @@ async function rpcAddress ({ params, session }) {
   onContract: confirm
 })
  */
-export const Wallet = Ae.compose(Accounts, Chain, Tx, Contract, Rpc, Selector, {
+const Wallet = Ae.compose(Accounts, Chain, Tx, Contract, Rpc, {
   init ({ onTx = this.onTx, onChain = this.onChain, onAccount = this.onAccount, onContract = this.onContract }, { stamp }) {
     this.onTx = onTx
     this.onChain = onChain

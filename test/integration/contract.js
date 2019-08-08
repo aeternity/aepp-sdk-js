@@ -16,7 +16,7 @@
  */
 
 import { describe, it, before } from 'mocha'
-import { configure, plan, ready } from './'
+import { BaseAe, configure, plan, ready } from './'
 import { decode } from '../../es/tx/builder/helpers'
 
 import * as R from 'ramda'
@@ -115,6 +115,26 @@ describe('Contract', function () {
     return deployed.should.have.property('address')
   })
 
+  it('Deploy and call contract on specific account', async () => {
+    const current = await contract.address()
+    const onAccount = contract.addresses().find(acc => acc !== current)
+
+    const deployed = await bytecode.deploy([], { onAccount })
+    deployed.result.callerId.should.be.equal(onAccount)
+    const callRes = await deployed.call('main', ['42'])
+    callRes.result.callerId.should.be.equal(onAccount)
+    const callStaticRes = await deployed.callStatic('main', ['42'])
+    callStaticRes.result.callerId.should.be.equal(onAccount)
+  })
+
+  it('Dry-run without accounts', async () => {
+    const client = await BaseAe()
+    client.removeAccount('ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi')
+    client.addresses().length.should.be.equal(0)
+    const { result } = await client.contractCallStatic(identityContract, deployed.address, 'main', ['42'])
+    result.callerId.should.be.equal(client.Ae.defaults.dryRunAccount.pub)
+  })
+
   it('calls deployed contracts', async () => {
     const result = await deployed.call('main', ['42'])
     return result.decode().should.eventually.become(42)
@@ -194,13 +214,17 @@ describe('Contract', function () {
       isCompiled.should.be.equal(true)
     })
 
-    describe('Deploy contract', function () {
-      it('Deploy contract before compile', async () => {
-        contractObject.compiled = null
-        await contractObject.methods.init('123', 1, Promise.resolve('hahahaha'))
-        const isCompiled = contractObject.compiled.length && contractObject.compiled.slice(0, 3) === 'cb_'
-        isCompiled.should.be.equal(true)
-      })
+    it('Deploy contract before compile', async () => {
+      contractObject.compiled = null
+      await contractObject.methods.init('123', 1, Promise.resolve('hahahaha'))
+      const isCompiled = contractObject.compiled.length && contractObject.compiled.slice(0, 3) === 'cb_'
+      isCompiled.should.be.equal(true)
+    })
+    it('Call contract on specific account', async () => {
+      const current = await contract.address()
+      const onAccount = contract.addresses().find(acc => acc !== current)
+      const { result } = await contractObject.methods.intFn('123', { onAccount })
+      result.callerId.should.be.equal(onAccount)
     })
     describe('Arguments Validation and Casting', function () {
       describe('INT', function () {
