@@ -7,7 +7,6 @@ import { getBrowserAPI, message, sendResponseMessage } from '../helpers'
 import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE, SUBSCRIPTION_VALUES } from '../schema'
 import uuid from 'uuid/v4'
 import { unpackTx } from '../../../tx/builder'
-import * as R from 'ramda'
 
 const rpcClients = WalletClients()
 
