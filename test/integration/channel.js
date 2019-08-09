@@ -46,6 +46,7 @@ function waitForChannel (channel) {
 
 describe('Channel', function () {
   configure(this)
+  this.timeout(120000)
 
   let initiator
   let responder
@@ -499,6 +500,8 @@ describe('Channel', function () {
   })
 
   it('can leave a channel', async () => {
+    initiatorCh.disconnect()
+    responderCh.disconnect()
     initiatorCh = await Channel({
       ...sharedParams,
       role: 'initiator',
@@ -537,11 +540,11 @@ describe('Channel', function () {
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.notCalled(responderSign)
-    initiatorCh.disconnect()
-    responderCh.disconnect()
   })
 
   it('can solo close a channel', async () => {
+    initiatorCh.disconnect()
+    responderCh.disconnect()
     initiatorCh = await Channel({
       ...sharedParams,
       role: 'initiator',
@@ -599,6 +602,8 @@ describe('Channel', function () {
   it('can dispute via slash tx', async () => {
     const initiatorAddr = await initiator.address()
     const responderAddr = await responder.address()
+    initiatorCh.disconnect()
+    responderCh.disconnect()
     initiatorCh = await Channel({
       ...sharedParams,
       lockPeriod: 5,
@@ -660,6 +665,8 @@ describe('Channel', function () {
   })
 
   it('can create a contract and accept', async () => {
+    initiatorCh.disconnect()
+    responderCh.disconnect()
     initiatorCh = await Channel({
       ...sharedParams,
       role: 'initiator',
@@ -803,6 +810,8 @@ describe('Channel', function () {
 
   describe('throws errors', function () {
     before(async function () {
+      initiatorCh.disconnect()
+      responderCh.disconnect()
       initiatorCh = await Channel({
         ...sharedParams,
         role: 'initiator',
@@ -816,6 +825,11 @@ describe('Channel', function () {
         sign: responderSign
       })
       await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
+    })
+
+    after(() => {
+      initiatorCh.disconnect()
+      responderCh.disconnect()
     })
 
     async function update ({ from, to, amount, sign }) {

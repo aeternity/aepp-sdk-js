@@ -1,6 +1,6 @@
 {
   "name": "@aeternity/aepp-sdk",
-  "version": "4.3.0",
+  "version": "4.4.0",
   "description": "SDK for the æternity blockchain",
   "main": "dist/aepp-sdk.js",
   "browser": "dist/aepp-sdk.browser.js",
@@ -37,7 +37,7 @@
     "bip32-path": "^0.4.2",
     "blakejs": "^1.1.0",
     "bs58check": "^2.1.1",
-    "commander": "^2.14.1",
+    "commander": "^3.0.0",
     "joi-browser": "^13.4.0",
     "libsodium-wrappers-sumo": "0.7.5",
     "ramda": "^0.26.1",
