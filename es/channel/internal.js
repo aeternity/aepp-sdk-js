@@ -18,7 +18,7 @@
 import { w3cwebsocket as W3CWebSocket } from 'websocket'
 import { EventEmitter } from 'events'
 import * as R from 'ramda'
-import JSONBig from 'json-bigint'
+import JSONBig from '../utils/json-big'
 import { pascalToSnake } from '../utils/string'
 import { awaitingConnection } from './handlers'
 

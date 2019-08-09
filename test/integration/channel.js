@@ -261,7 +261,7 @@ describe('Channel', function () {
       sinon.match.string,
       sinon.match({
         updates: sinon.match([{
-          amount: sinon.match(amount),
+          amount: sinon.match(amount.toString()),
           from: sinon.match(await initiator.address()),
           to: sinon.match(await responder.address()),
           op: sinon.match('OffChainTransfer')
@@ -274,7 +274,7 @@ describe('Channel', function () {
       sinon.match.string,
       sinon.match({
         updates: sinon.match([{
-          amount: sinon.match(amount),
+          amount: sinon.match(amount.toString()),
           from: sinon.match(await initiator.address()),
           to: sinon.match(await responder.address()),
           op: sinon.match('OffChainTransfer')
@@ -283,13 +283,16 @@ describe('Channel', function () {
     )
     const { txType } = unpackTx(sign.firstCall.args[0])
     txType.should.equal('channelOffChain')
-    const { updates } = sign.firstCall.args[1]
-    updates.length.should.equal(1)
-    updates[0].from.should.equal(await initiator.address())
-    updates[0].to.should.equal(await responder.address())
-    updates[0].op.should.equal('OffChainTransfer')
-    BigNumber.isBigNumber(updates[0].amount).should.be.true
-    updates[0].amount.isEqualTo(amount).should.be.true
+    sign.firstCall.args[1].should.eql({
+      updates: [
+        {
+          amount: amount.toString(),
+          from: await initiator.address(),
+          to: await responder.address(),
+          op: 'OffChainTransfer'
+        }
+      ]
+    })
   })
 
   it('can get proof of inclusion', async () => {

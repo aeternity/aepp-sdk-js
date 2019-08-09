@@ -39,7 +39,6 @@
     "bs58check": "^2.1.1",
     "commander": "^2.14.1",
     "joi-browser": "^13.4.0",
-    "json-bigint": "^0.3.0",
     "libsodium-wrappers-sumo": "0.7.5",
     "ramda": "^0.26.1",
     "rlp": "2.2.3",
