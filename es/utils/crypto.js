@@ -454,6 +454,7 @@ export function decryptPubKey (password, encrypted) {
  * @rtype (data: String, type: String) => String, throws: Error
  * @param {String} data - ae data
  * @param {String} type - Prefix
+ * @param forceError
  * @return {String} Payload
  */
 export function assertedType (data, type, forceError = false) {
@@ -461,6 +462,7 @@ export function assertedType (data, type, forceError = false) {
     return data.split('_')[1]
   } else {
     if (!forceError) throw Error(`Data doesn't match expected type ${type}`)
+    return false
   }
 }
 

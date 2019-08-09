@@ -2,6 +2,7 @@ import nacl from 'tweetnacl'
 import uuid from 'uuid'
 
 import { encodeBase58Check, isBase64 } from './crypto'
+import { isHex } from './string'
 
 /**
  * KeyStore module
@@ -68,15 +69,6 @@ function decryptXsalsa20Poly1305 ({ ciphertext, key, nonce }) {
   const res = nacl.secretbox.open(ciphertext, nonce, key)
   if (!res) throw new Error('Invalid password or nonce')
   return res
-}
-
-/**
- * Check whether a string is valid hex.
- * @param {string} str String to validate.
- * @return {boolean} True if the string is valid hex, false otherwise.
- */
-function isHex (str) {
-  return !!(str.length % 2 === 0 && str.match(/^[0-9a-f]+$/i))
 }
 
 /**
