@@ -49,7 +49,7 @@ async function address ({ onAccount } = {}) {
  * @example selectAccount('ak_xxxxxxxx')
  */
 function selectAccount (address) {
-  if (address && !assertedType(address, 'ak', true)) throw new Error(`Invalid account address`)
+  if (!address || !assertedType(address, 'ak', true)) throw new Error(`Invalid account address`)
   this.Selector.address = address
 }
 
