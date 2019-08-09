@@ -455,7 +455,7 @@ export function decryptPubKey (password, encrypted) {
  * @param {String} data - ae data
  * @param {String} type - Prefix
  * @param forceError
- * @return {String} Payload
+ * @return {String|Boolean} Payload
  */
 export function assertedType (data, type, forceError = false) {
   if (RegExp(`^${type}_.+$`).test(data)) {
