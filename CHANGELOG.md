@@ -4,15 +4,18 @@
 ### Bug Fixes
 
 * **Package:** update commander to version 3.0.0 ([#597](https://github.com/aeternity/aepp-sdk-js/issues/597)) ([9aaa05c](https://github.com/aeternity/aepp-sdk-js/commit/9aaa05c))
-* **Contract** Fix dry-run without account ([227fc5c](https://github.com/aeternity/aepp-sdk-js/pull/599/commits/227fc5c9d8369e1c3a3fbba2cf62f0495bcf08ae))
+* **Contract:** Fix dry-run without account ([227fc5c](https://github.com/aeternity/aepp-sdk-js/pull/599/commits/227fc5c9d8369e1c3a3fbba2cf62f0495bcf08ae))
 
 ### Features
 
 * **Contract:** add ability to use call-static/dry-run without keyPair ([#577](https://github.com/aeternity/aepp-sdk-js/issues/577)) ([c38edd9](https://github.com/aeternity/aepp-sdk-js/commit/c38edd9))
-* **AE** Add ability to make operation on specific account using `onAccount` option.
-    > Add `onAccount` to `AENS`, `Contract`, `Oracle`.
+* **AE:** Add ability to make operation on specific account using `onAccount` option.
+   ``` 
+    Exm: await client.spend(1, receiver, { onAccount: 'PUBLIC_KEY' })
+    Add `onAccount` to `AENS`, `Contract`, `Oracle`.
     Add tests for using specific account to Contract, ACI, Account.
-* **JSON**: Add serialization to JSON for bigNumbers
+  ```
+* **JSON:**: Add serialization to JSON for bigNumbers
 * **MemoryAccount:** Add validation of `keypair`  ([#594](https://github.com/aeternity/aepp-sdk-js/issues/594)) ([b8c2b20](https://github.com/aeternity/aepp-sdk-js/commit/b8c2b20))
 * **State Channels:** persist connection by pinging every 10 seconds ([#571](https://github.com/aeternity/aepp-sdk-js/issues/571)) ([a70f919](https://github.com/aeternity/aepp-sdk-js/commit/a70f919))
 
