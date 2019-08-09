@@ -317,10 +317,10 @@ describe('Channel', function () {
     const responderBalances = await responderCh.balances(addresses)
     initiatorBalances.should.be.an('object')
     responderBalances.should.be.an('object')
-    BigNumber.isBigNumber(initiatorBalances[initiatorAddr]).should.be.true
-    BigNumber.isBigNumber(initiatorBalances[responderAddr]).should.be.true
-    BigNumber.isBigNumber(responderBalances[initiatorAddr]).should.be.true
-    BigNumber.isBigNumber(responderBalances[responderAddr]).should.be.true
+    initiatorBalances[initiatorAddr].should.be.a('string')
+    initiatorBalances[responderAddr].should.be.a('string')
+    responderBalances[initiatorAddr].should.be.a('string')
+    responderBalances[responderAddr].should.be.a('string')
   })
 
   it('can send a message', async () => {
@@ -362,7 +362,7 @@ describe('Channel', function () {
       sinon.match.string,
       sinon.match({
         updates: [{
-          amount,
+          amount: amount.toString(),
           op: 'OffChainWithdrawal',
           to: await initiator.address()
         }]
@@ -374,7 +374,7 @@ describe('Channel', function () {
       sinon.match.string,
       sinon.match({
         updates: [{
-          amount,
+          amount: amount.toString(),
           op: 'OffChainWithdrawal',
           to: await initiator.address()
         }]
@@ -413,7 +413,7 @@ describe('Channel', function () {
       sinon.match.string,
       sinon.match({
         updates: [{
-          amount,
+          amount: amount.toString(),
           op: 'OffChainWithdrawal',
           to: await initiator.address()
         }]
@@ -425,7 +425,7 @@ describe('Channel', function () {
       sinon.match.string,
       sinon.match({
         updates: [{
-          amount,
+          amount: amount.toString(),
           op: 'OffChainWithdrawal',
           to: await initiator.address()
         }]
@@ -464,7 +464,7 @@ describe('Channel', function () {
       sinon.match.string,
       sinon.match({
         updates: sinon.match([{
-          amount,
+          amount: amount.toString(),
           op: 'OffChainDeposit',
           from: await initiator.address()
         }])
@@ -476,7 +476,7 @@ describe('Channel', function () {
       sinon.match.string,
       sinon.match({
         updates: sinon.match([{
-          amount,
+          amount: amount.toString(),
           op: 'OffChainDeposit',
           from: await initiator.address()
         }])
@@ -515,7 +515,7 @@ describe('Channel', function () {
       sinon.match.string,
       sinon.match({
         updates: [{
-          amount,
+          amount: amount.toString(),
           op: 'OffChainDeposit',
           from: await initiator.address()
         }]
@@ -905,10 +905,6 @@ describe('Channel', function () {
 
     it('when posting an update with incorrect address', async () => {
       return update({ from: 'ak_123' }).should.eventually.be.rejectedWith('Rejected')
-    })
-
-    it('when posting an update with incorrect amount', async () => {
-      return update({ amount: '1' }).should.eventually.be.rejectedWith('Rejected')
     })
   })
 })
