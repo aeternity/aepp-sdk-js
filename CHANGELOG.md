@@ -1,3 +1,26 @@
+# [4.4.0](https://github.com/aeternity/aepp-sdk-js/compare/4.3.0...4.4.0) (2019-08-09)
+
+
+### Bug Fixes
+
+* **package:** update commander to version 3.0.0 ([#597](https://github.com/aeternity/aepp-sdk-js/issues/597)) ([9aaa05c](https://github.com/aeternity/aepp-sdk-js/commit/9aaa05c))
+* **state channels:** fix onChainTx event params ([#566](https://github.com/aeternity/aepp-sdk-js/issues/566)) ([11c85eb](https://github.com/aeternity/aepp-sdk-js/commit/11c85eb))
+* **State Channels:** Fix websocket url ([#558](https://github.com/aeternity/aepp-sdk-js/issues/558)) ([33c1fd8](https://github.com/aeternity/aepp-sdk-js/commit/33c1fd8))
+* **swagger:** Pass query params in case of get request ([#570](https://github.com/aeternity/aepp-sdk-js/issues/570)) ([93f0c51](https://github.com/aeternity/aepp-sdk-js/commit/93f0c51))
+
+
+### Features
+
+* **ACI:** Implement sophia `variant` type ([#567](https://github.com/aeternity/aepp-sdk-js/issues/567)) ([8505dcf](https://github.com/aeternity/aepp-sdk-js/commit/8505dcf))
+* **contract:** add ability to use call-static/dry-run without keyPair ([#577](https://github.com/aeternity/aepp-sdk-js/issues/577)) ([c38edd9](https://github.com/aeternity/aepp-sdk-js/commit/c38edd9))
+* **MemoryAccount:** Add validation of keypair ([#594](https://github.com/aeternity/aepp-sdk-js/issues/594)) ([b8c2b20](https://github.com/aeternity/aepp-sdk-js/commit/b8c2b20))
+* **NodePool:** Implement NodePool stamp ([#574](https://github.com/aeternity/aepp-sdk-js/issues/574)) ([674166c](https://github.com/aeternity/aepp-sdk-js/commit/674166c))
+* **state channel:** make state channel compatible with aeternity@4.0.0 ([#568](https://github.com/aeternity/aepp-sdk-js/issues/568)) ([0d0e09b](https://github.com/aeternity/aepp-sdk-js/commit/0d0e09b))
+* **state channels:** persist connection by pinging every 10 seconds ([#571](https://github.com/aeternity/aepp-sdk-js/issues/571)) ([a70f919](https://github.com/aeternity/aepp-sdk-js/commit/a70f919))
+* **TxBuilder:** Add helper for producing tx hash ([#579](https://github.com/aeternity/aepp-sdk-js/issues/579)) ([e1b405e](https://github.com/aeternity/aepp-sdk-js/commit/e1b405e))
+
+
+
 # [4.3.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.3.0) (2019-08-05)
 
 
