@@ -108,16 +108,9 @@ async function contractDecodeData (source, fn, callValue, callResult, options) {
  */
 async function contractCallStatic (source, address, name, args = [], { top, options = {} } = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  let callerId
-  try {
-    callerId = await this.address(opt)
-  } catch (e) {
-    if (!opt.onAccount) {
-      callerId = opt.dryRunAccount.pub
-    } else {
-      throw e
-    }
-  }
+  const callerId = opt.onAccount
+    ? await this.address(opt)
+    : await this.address().catch(e => opt.dryRunAccount.pub)
 
   // Get block hash by height
   if (top && !isNaN(top)) {
