@@ -18,6 +18,7 @@
 import { w3cwebsocket as W3CWebSocket } from 'websocket'
 import { EventEmitter } from 'events'
 import * as R from 'ramda'
+import JSONBig from '../utils/json-big'
 import { pascalToSnake } from '../utils/string'
 import { awaitingConnection } from './handlers'
 
@@ -78,7 +79,7 @@ function changeState (channel, newState) {
 }
 
 function send (channel, message) {
-  websockets.get(channel).send(JSON.stringify(message))
+  websockets.get(channel).send(JSONBig.stringify(message))
 }
 
 function enqueueAction (channel, guard, action) {
@@ -144,7 +145,7 @@ function ping (channel) {
 }
 
 function onMessage (channel, data) {
-  const message = JSON.parse(data)
+  const message = JSONBig.parse(data)
   if (message.id) {
     const callback = rpcCallbacks.get(channel).get(message.id)
     try {
