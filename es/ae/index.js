@@ -29,6 +29,7 @@ import Account from '../account'
 import TxBuilder from '../tx/builder'
 import * as R from 'ramda'
 import { BigNumber } from 'bignumber.js'
+import { options } from '../channel/internal'
 
 /**
  * Sign and post a transaction to the chain
@@ -43,8 +44,9 @@ import { BigNumber } from 'bignumber.js'
 async function send (tx, options) {
   const opt = R.merge(this.Ae.defaults, options)
   // @Todo check if account is "GA" if yes check if we have all required params for GA authorization
-  return opt.useGa
-    ? this.sendUsingGA(tx, options)
+  const { contractId: gaId, authFun } = await this.getAccount(await this.address())
+  return gaId
+    ? this.sendUsingGA(tx, { ...opt, authFun })
     : this.sendUsingPOA(tx, options)
 }
 
@@ -53,8 +55,10 @@ async function sendUsingPOA (tx, options) {
   return this.sendTransaction(signed, options)
 }
 
-async function sendUsingGA (tx, { authData }) {
-  return this.sendMetaTx(tx, authData)
+async function sendUsingGA (tx, options = {}) {
+  const { authData, authFn } = options
+  if (!authData) throw new Error('authData is required')
+  return this.sendMetaTx(tx, authData, authFn, options)
 }
 
 /**

@@ -411,8 +411,8 @@ async function getAccountNonce (accountId, nonce) {
  * @param {Object} params Object which contains all tx data
  * @return {Object} { ttl, nonce, fee } Object with account nonce, absolute ttl and transaction fee
  */
-async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, gas, absoluteTtl, useGa = false }) {
-  const nonce = useGa ? 0 : await this.getAccountNonce(senderId, n)
+async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, gas, absoluteTtl, authData }) {
+  const nonce = authData ? 0 : await this.getAccountNonce(senderId, n)
   const ttl = await (calculateTtl.bind(this)(t, !absoluteTtl))
   const fee = calculateFee(f, txType, { showWarning: this.showWarning, gas, params: R.merge(R.last(arguments), { nonce, ttl }) })
   return { fee, ttl, nonce }

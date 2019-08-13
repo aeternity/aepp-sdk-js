@@ -18,12 +18,14 @@
 import { describe, it, before } from 'mocha'
 import { configure, ready } from './'
 import { unpackTx } from '../../es/tx/builder'
-const authContract = `contract EdDSAAuth =
-  record state = { owner : address }
-
-  function init(poa : address) = { owner = poa }
-
-  public function authorize(auth: bool) : bool = auth
+const authContract = `contract BlindAuth =
+    record state = { owner : address }
+    entrypoint init(owner' : address) = { owner = owner' }
+    stateful entrypoint authorize(r: int) : bool =
+        // r is a random number only used to make tx hashes unique
+        switch(Auth.tx_hash)
+            None          => abort("Not in Auth context")
+            Some(tx_hash) => true
 `
 describe.only('Generalize Account', function () {
   configure(this)
@@ -35,14 +37,18 @@ describe.only('Generalize Account', function () {
   })
 
   it.only('Attach GA to POA', async () => {
-    await client.createGeneralizeAccount('authorize', authContract, [await client.address()])
-    client.isGA().should.be.equal(true)
+    const result = await client.createGeneralizeAccount('authorize', authContract, [await client.address()])
+    console.log(result)
+    const isGa = await client.isGA(await client.address())
+    isGa.should.be.equal(true)
   })
   it.only('TEst Meta Tx', async () => {
-    const authData = await client.contractEncodeCall(authContract, 'authorize', ['true'])
-    await client.awaitHeight(+(await client.height()) + 3)
-    await client.spend(100, 'ak_eFH33ENmUzYJz94y53iBebKxefeHcoHYYWLde8jDkzRQSkwbx', { useGa: true, authData })
+    const r = Math.floor(Math.random() * 20)
+    console.log(r)
+    const authData = await client.contractEncodeCall(authContract, 'authorize', [`${r}`])
+
+    await client.spend(100, 'ak_eFH33ENmUzYJz94y53iBebKxefeHcoHYYWLde8jDkzRQSkwbx', { authData })
+    console.log(await client.balance('ak_eFH33ENmUzYJz94y53iBebKxefeHcoHYYWLde8jDkzRQSkwbx'))
     console.log('-----------------')
-    console.log(await unpackTx('tx_+QEaCwHAuQEU+QERUQGhAXypmozYJLKj78PGxdUAWFcTQwV11M5pmbICyyD4YBnYuIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIJ0iAR/Yvd/T/9rv6SrByOkjhyMOTn84lnvZzFYh2gd3AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGGWvMQekAAgsNQgw9CQAC4WfhXCwHAuFL4UAwBoQF8qZqM2CSyo+/DxsXVAFhXE0MFddTOaZmyAssg+GAZ2KEBC7TteSf5e1HhvLXhNA0SM1sqKxLIvFIh1jxLyznUHmFkhQPZ3F8AAACAC7r2GA==').tx.encodedTx.tx.tx.tx.encodedTx.tx)
   })
 })
