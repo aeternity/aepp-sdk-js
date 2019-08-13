@@ -17,7 +17,8 @@
 
 import { describe, it, before } from 'mocha'
 import { configure, ready } from './'
-import { unpackTx } from '../../es/tx/builder'
+import { generateKeyPair } from '../../es/utils/crypto'
+
 const authContract = `contract BlindAuth =
     record state = { owner : address }
     entrypoint init(owner' : address) = { owner = owner' }
@@ -27,7 +28,7 @@ const authContract = `contract BlindAuth =
             None          => abort("Not in Auth context")
             Some(tx_hash) => true
 `
-describe.only('Generalize Account', function () {
+describe('Generalize Account', function () {
   configure(this)
 
   let client
@@ -36,19 +37,21 @@ describe.only('Generalize Account', function () {
     client = await ready(this)
   })
 
-  it.only('Attach GA to POA', async () => {
+  it('Attach GA to POA', async () => {
     const result = await client.createGeneralizeAccount('authorize', authContract, [await client.address()])
-    console.log(result)
     const isGa = await client.isGA(await client.address())
     isGa.should.be.equal(true)
   })
-  it.only('TEst Meta Tx', async () => {
+  it('Spend Using Meta Tx', async () => {
     const r = Math.floor(Math.random() * 20)
-    console.log(r)
-    const authData = await client.contractEncodeCall(authContract, 'authorize', [`${r}`])
+    const r2 = Math.floor(Math.random() * 20)
+    const callData = await client.contractEncodeCall(authContract, 'authorize', [`${r}`])
 
-    await client.spend(100, 'ak_eFH33ENmUzYJz94y53iBebKxefeHcoHYYWLde8jDkzRQSkwbx', { authData })
-    console.log(await client.balance('ak_eFH33ENmUzYJz94y53iBebKxefeHcoHYYWLde8jDkzRQSkwbx'))
-    console.log('-----------------')
+    const { publicKey } = generateKeyPair()
+    await client.spend(10000, publicKey, { authData: { callData } })
+    await client.spend(10000, publicKey, { authData: { source: authContract, args: [`${r2}`] } })
+    const balanceAfter = await client.balance(publicKey)
+    balanceAfter.should.be.equal(`20000`)
+
   })
 })

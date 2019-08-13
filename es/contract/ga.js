@@ -26,9 +26,10 @@
 import * as R from 'ramda'
 
 import { Contract } from '../ae/contract'
-import { ABI_VERSIONS, TX_TYPE } from '../tx/builder/schema'
+import { ABI_VERSIONS, MAX_AUTH_FAN_GAS_PRICE, TX_TYPE } from '../tx/builder/schema'
 import { buildTx, unpackTx } from '../tx/builder'
 import * as Crypto from '../utils/crypto'
+import BigNumber from 'bignumber.js'
 
 /**
  * GeneralizeAccount Stamp
@@ -49,7 +50,7 @@ export const GeneralizeAccount = Contract.compose({
     createGeneralizeAccount,
     getContractAuthFan,
     sendMetaTx,
-    prepareAuthData,
+    prepareGaParams,
     isGA
   }
 })
@@ -102,35 +103,36 @@ function wrapInEmptySignedTx (rlp) {
 }
 
 async function sendMetaTx (rawTransaction, authData, authFnName, options = {}) {
-  const opt = R.merge(this.Ae.defaults, options)
+  if (!authData) throw new Error('authData is required')
   // Check if authData is callData or if it's an object prepare a callData from source and args
-  const authCallData = await this.prepareAuthData(authData, authFnName)
+  const { authCallData, gas } = await this.prepareGaParams(authData, authFnName)
+
+  const opt = R.merge(this.Ae.defaults, options)
   // Get transaction rlp binary
   const rlpBinaryTx = Crypto.decodeBase64Check(Crypto.assertedType(rawTransaction, 'tx'))
   // Wrap in SIGNED tx with empty signatures
   const { rlpEncoded } = wrapInEmptySignedTx(rlpBinaryTx)
   // Prepare params for META tx
-  const params = { tx: rlpEncoded, ...opt, gaId: await this.address(), abiVersion: ABI_VERSIONS.SOPHIA, authData: authCallData, gas: 45000 }
+  const params = { ...opt, tx: rlpEncoded, gaId: await this.address(), abiVersion: ABI_VERSIONS.SOPHIA, authData: authCallData, gas }
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
   const { fee, ttl } = await this.prepareTxParams(TX_TYPE.gaMeta, params)
   // Build META tx
-  const { rlpEncoded: metaTxRlp } = buildTx({ ...params, fee: `${fee}0`, ttl }, TX_TYPE.gaMeta)
+  const { rlpEncoded: metaTxRlp } = buildTx({ ...params, fee: `${fee}00`, ttl }, TX_TYPE.gaMeta)
   // Wrap in empty signed tx
   const { tx } = wrapInEmptySignedTx(metaTxRlp)
-  // console.log((await unpackTx(tx)).tx)
-  // console.log((await unpackTx(tx)).tx.encodedTx.tx)
-  // console.log((await unpackTx(tx)).tx.encodedTx.tx.tx.tx.encodedTx.tx)
   // Send tx to the chain
   return this.sendTransaction(tx, opt)
 }
 
-async function prepareAuthData (authData, authFnName) {
-  if (typeof authData === 'object') {
+async function prepareGaParams (authData, authFnName) {
+  if (typeof authData !== 'object') throw new Error('AuthData must be an object')
+  if (authData.gas && BigNumber(authData.gas).gt(MAX_AUTH_FAN_GAS_PRICE)) throw new Error(`the maximum gas value for ga authFun is ${MAX_AUTH_FAN_GAS_PRICE}, got ${authData.gas}`)
+  const gas = authData.gas || MAX_AUTH_FAN_GAS_PRICE
+  if (authData.callData) {
+    if (authData.callData.split('_')[0] !== 'cb') throw new Error('Auth data must be a string with "cb" prefix.')
+    return { authCallData: authData.callData, gas }
+  } else {
     if (!authData.source || !authData.args) throw new Error('Auth data must contain source code and arguments.')
-    return this.contractEncodeCall(authData.source, authFnName, authData.args)
-  }
-  if (typeof authData === 'string') {
-    if (authData.split('_')[0] !== 'cb') throw new Error('Auth data must be a string with "cb" prefix.')
-    return authData
+    return { authCallData: await this.contractEncodeCall(authData.source, authFnName, authData.args), gas }
   }
 }

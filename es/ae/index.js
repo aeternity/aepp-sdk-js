@@ -29,7 +29,6 @@ import Account from '../account'
 import TxBuilder from '../tx/builder'
 import * as R from 'ramda'
 import { BigNumber } from 'bignumber.js'
-import { options } from '../channel/internal'
 
 /**
  * Sign and post a transaction to the chain
@@ -41,24 +40,22 @@ import { options } from '../channel/internal'
  * @param {Object} [options.verify] verify - Verify transaction before broadcast, throw error if not valid
  * @return {String|String} Transaction or transaction hash
  */
-async function send (tx, options) {
+async function send (tx, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  // @Todo check if account is "GA" if yes check if we have all required params for GA authorization
   const { contractId: gaId, authFun } = await this.getAccount(await this.address())
   return gaId
     ? this.sendUsingGA(tx, { ...opt, authFun })
     : this.sendUsingPOA(tx, options)
 }
 
-async function sendUsingPOA (tx, options) {
+async function sendUsingPOA (tx, options = {}) {
   const signed = await this.signTransaction(tx)
   return this.sendTransaction(signed, options)
 }
 
 async function sendUsingGA (tx, options = {}) {
-  const { authData, authFn } = options
-  if (!authData) throw new Error('authData is required')
-  return this.sendMetaTx(tx, authData, authFn, options)
+  const { authData, authFun } = options
+  return this.sendMetaTx(tx, authData, authFun, options)
 }
 
 /**
@@ -140,7 +137,7 @@ function destroyInstance () {
  */
 const Ae = stampit(Tx, Account, Chain, {
   methods: { send, spend, transferFunds, destroyInstance, sendUsingPOA, sendUsingGA },
-  deepProps: { Ae: { defaults: {} } }
+  deepProps: { Ae: { defaults: {}, methods: [ 'sendUsingGA' ] } }
 })
 
 export default Ae
