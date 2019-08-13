@@ -24,6 +24,7 @@
 
 import Account from './'
 import * as Crypto from '../utils/crypto'
+import { isHex } from '../utils/string'
 
 const secrets = new WeakMap()
 
@@ -35,27 +36,24 @@ async function address (format = Crypto.ADDRESS_FORMAT.api) {
   return Promise.resolve(Crypto.formatAddress(format, secrets.get(this).publicKey))
 }
 
-/**
- * Select specific account
- * @alias module:@aeternity/aepp-sdk/es/account/memory
- * @function
- * @instance
- * @rtype (keypair: {publicKey: String, secretKey: String}) => Void
- * @param {Object} keypair - Key pair to use
- * @param {String} keypair.publicKey - Public key
- * @param {String} keypair.secretKey - Private key
- * @return {Void}
- * @example setKeypair(keypair)
- */
-function setKeypair (keypair) {
-  if (keypair.hasOwnProperty('priv') && keypair.hasOwnProperty('pub')) {
-    keypair = { secretKey: keypair.priv, publicKey: keypair.pub }
-    console.warn('pub/priv naming for accounts has been deprecated, please use secretKey/publicKey')
-  }
+function setSecret (keyPair) {
   secrets.set(this, {
-    secretKey: Buffer.from(keypair.secretKey, 'hex'),
-    publicKey: keypair.publicKey
+    secretKey: Buffer.isBuffer(keyPair.secretKey) ? keyPair.secretKey : Buffer.from(keyPair.secretKey, 'hex'),
+    publicKey: keyPair.publicKey
   })
+}
+
+function validateKeyPair (keyPair) {
+  if (!keyPair || typeof keyPair !== 'object') throw new Error('KeyPair must be an object')
+  if (keyPair.pub && keyPair.priv) {
+    keyPair = { publicKey: keyPair.pub, secretKey: keyPair.priv }
+  }
+  if (!keyPair.secretKey || !keyPair.publicKey) throw new Error('KeyPair must must have "secretKey", "publicKey" properties')
+  if (typeof keyPair.publicKey !== 'string' || keyPair.publicKey.indexOf('ak_') === -1) throw new Error('Public Key must be a base58c string with "ak_" prefix')
+  if (
+    !Buffer.isBuffer(keyPair.secretKey) &&
+    (typeof keyPair.secretKey === 'string' && !isHex(keyPair.secretKey))
+  ) throw new Error('Secret key must be hex string or Buffer')
 }
 
 /**
@@ -71,15 +69,15 @@ function setKeypair (keypair) {
  */
 const MemoryAccount = Account.compose({
   init ({ keypair }) {
-    try {
-      this.setKeypair(keypair || Crypto.envKeypair(process.env))
-    } catch (e) {
-      // Instead of throw error and crash show warning that you do not set `KEYPAIR`
-      // and can not sign transaction
-      console.log('Please provide KEY_PAIR for sign transaction')
+    validateKeyPair(keypair)
+    if (keypair.hasOwnProperty('priv') && keypair.hasOwnProperty('pub')) {
+      keypair = { secretKey: keypair.priv, publicKey: keypair.pub }
+      console.warn('pub/priv naming for accounts has been deprecated, please use secretKey/publicKey')
     }
+
+    this.setSecret(keypair)
   },
-  methods: { sign, address, setKeypair }
+  methods: { sign, address, setSecret }
 })
 
 export default MemoryAccount

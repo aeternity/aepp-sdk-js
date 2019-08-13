@@ -40,7 +40,7 @@ import * as Crypto from '@aeternity/aepp-sdk/es/utils/crypto'
         * [.generateSaveWallet(password)](#module_@aeternity/aepp-sdk/es/utils/crypto.generateSaveWallet) ⇒ `Object`
         * [.decryptPrivateKey(password)](#module_@aeternity/aepp-sdk/es/utils/crypto.decryptPrivateKey) ⇒ `Buffer`
         * [.decryptPubKey(password)](#module_@aeternity/aepp-sdk/es/utils/crypto.decryptPubKey) ⇒ `Buffer`
-        * [.assertedType(data, type)](#module_@aeternity/aepp-sdk/es/utils/crypto.assertedType) ⇒ `String`
+        * [.assertedType(data, type, forceError)](#module_@aeternity/aepp-sdk/es/utils/crypto.assertedType) ⇒ `String` \| `Boolean`
         * [.decodeTx(password)](#module_@aeternity/aepp-sdk/es/utils/crypto.decodeTx) ⇒ `Array`
         * [.encodeTx(txData)](#module_@aeternity/aepp-sdk/es/utils/crypto.encodeTx) ⇒ `String`
         * [.isValidKeypair(privateKey, publicKey)](#module_@aeternity/aepp-sdk/es/utils/crypto.isValidKeypair) ⇒ `Boolean`
@@ -138,7 +138,7 @@ Calculate 256bits Blake2b hash of `input`
 
 | Param | Type | Description |
 | --- | --- | --- |
-| input | `String` | Data to hash |
+| input | `String` \| `Buffer` | Data to hash |
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.nameId"></a>
 
@@ -448,17 +448,18 @@ Decrypt an encrypted public key
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.assertedType"></a>
 
-### @aeternity/aepp-sdk/es/utils/crypto.assertedType(data, type) ⇒ `String`
+### @aeternity/aepp-sdk/es/utils/crypto.assertedType(data, type, forceError) ⇒ `String` \| `Boolean`
 Assert base58 encoded type and return its payload
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
-**Returns**: `String` - Payload  
+**Returns**: `String` \| `Boolean` - Payload  
 **rtype**: `(data: String, type: String) => String, throws: Error`
 
 | Param | Type | Description |
 | --- | --- | --- |
 | data | `String` | ae data |
 | type | `String` | Prefix |
+| forceError |  |  |
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.decodeTx"></a>
 

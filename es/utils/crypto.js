@@ -106,7 +106,7 @@ export function addressFromDecimal (decimalAddress) {
 /**
  * Calculate 256bits Blake2b hash of `input`
  * @rtype (input: String) => hash: String
- * @param {String} input - Data to hash
+ * @param {String|Buffer} input - Data to hash
  * @return {Buffer} Hash
  */
 export function hash (input) {
@@ -454,13 +454,15 @@ export function decryptPubKey (password, encrypted) {
  * @rtype (data: String, type: String) => String, throws: Error
  * @param {String} data - ae data
  * @param {String} type - Prefix
- * @return {String} Payload
+ * @param forceError
+ * @return {String|Boolean} Payload
  */
-export function assertedType (data, type) {
+export function assertedType (data, type, forceError = false) {
   if (RegExp(`^${type}_.+$`).test(data)) {
     return data.split('_')[1]
   } else {
-    throw Error(`Data doesn't match expected type ${type}`)
+    if (!forceError) throw Error(`Data doesn't match expected type ${type}`)
+    return false
   }
 }
 
@@ -510,7 +512,7 @@ export function isValidKeypair (privateKey, publicKey) {
  * @param {Object} env - Environment
  * @return {Object} Key pair
  */
-export function envKeypair (env) {
+export function envKeypair (env, force = false) {
   const keypair = {
     secretKey: env['WALLET_PRIV'],
     publicKey: env['WALLET_PUB']
@@ -519,7 +521,7 @@ export function envKeypair (env) {
   if (keypair.publicKey && keypair.secretKey) {
     return keypair
   } else {
-    throw Error('Environment variables WALLET_PRIV and WALLET_PUB need to be set')
+    if (!force) throw Error('Environment variables WALLET_PRIV and WALLET_PUB need to be set')
   }
 }
 

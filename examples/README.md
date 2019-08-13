@@ -19,13 +19,29 @@ This folder contains examples of maintained code samples that you can run autono
 ```js
 // Start the instance using Universal flavor
 import Ae from '@aeternity/aepp-sdk/es/ae/universal'
+import Node from '@aeternity/aepp-sdk/es/node'
+
+// const node1 = await Node({ url })
 
 Ae({
-  url: 'https://sdk-testnet.aepps.com',
-  // internalUrl: 'https://sdk-testnet.aepps.com',
-  compilerUrl: 'https://compiler.aepps.com',
-  keypair: { secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS' },
-  networkId: 'ae_uat' // or any other networkId your client should connect to
+    // This two params deprecated and will be remove in next major release
+    url: 'https://sdk-testnet.aepps.com',
+    internalUrl: 'https://sdk-testnet.aepps.com',
+    // instead use
+    nodes: [
+    // { name: 'someNode', instance: node1 },
+    // mode2
+    ],
+    compilerUrl: 'https://compiler.aepps.com',
+    // `keypair` param deprecated and will be removed in next major release
+    keypair: { secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS' },
+    // instead use
+    accounts: [
+      MemoryAccount({ keypair: { secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS' } }),
+    // acc2
+    ],
+    address: 'SELECTED_ACCOUNT_PUB'
+    networkId: 'ae_uat' // or any other networkId your client should connect to
 }).then(ae => {
 
   // Interacting with the blockchain client
@@ -65,8 +81,14 @@ const confirmDialog = function (method, params, {id}) {
 }
 
 Wallet({
+  // This two params deprecated and will be remove in next major release
   url: 'https://sdk-testnet.aepps.com',
   internalUrl: 'https://sdk-testnet.aepps.com',
+  // instead use
+  nodes: [
+  // { name: 'someNode', instance: node1 },
+  // mode2
+  ],
   compilerUrl: 'https://compiler.aepps.com',
   accounts: [
     MemoryAccount({

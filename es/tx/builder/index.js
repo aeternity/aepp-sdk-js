@@ -1,6 +1,6 @@
 /* eslint-disable curly */
 import { BigNumber } from 'bignumber.js'
-import { rlp } from '../../utils/crypto'
+import { assertedType, rlp } from '../../utils/crypto'
 
 import {
   DEFAULT_FEE,
@@ -14,7 +14,7 @@ import {
   VALIDATION_MESSAGE,
   VSN
 } from './schema'
-import { readInt, readId, readPointers, writeId, writeInt, buildPointers, encode, decode } from './helpers'
+import { readInt, readId, readPointers, writeId, writeInt, buildPointers, encode, decode, buildHash } from './helpers'
 import { toBytes } from '../../utils/bytes'
 import * as mpt from '../../utils/mptree'
 
@@ -139,7 +139,7 @@ function validateField (value, key, type, prefix) {
       const isMinusValue = (!isNaN(value) || BigNumber.isBigNumber(value)) && BigNumber(value).lt(0)
       return assert((!isNaN(value) || BigNumber.isBigNumber(value)) && BigNumber(value).gte(0), { value, isMinusValue })
     case FIELD_TYPES.id:
-      return assert(PREFIX_ID_TAG[value.split('_')[0]] && value.split('_')[0] === prefix, { value, prefix })
+      return assert(assertedType(value, prefix) && PREFIX_ID_TAG[value.split('_')[0]] && value.split('_')[0] === prefix, { value, prefix })
     case FIELD_TYPES.binary:
       return assert(value.split('_')[0] === prefix, { prefix, value })
     case FIELD_TYPES.string:
@@ -369,4 +369,16 @@ export function unpackTx (encodedTx, fromRlpBinary = false, prefix = 'tx') {
   return { txType: OBJECT_ID_TX_TYPE[objId], tx: unpackRawTx(binary, schema), rlpEncoded, binary }
 }
 
-export default { calculateMinFee, calculateFee, unpackTx, unpackRawTx, buildTx, buildRawTx, validateParams }
+/**
+ * Build a transaction hash
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder
+ * @param {String | Buffer} rawTx base64 or rlp encoded transaction
+ * @return {String} Transaction hash
+ */
+export function buildTxHash (rawTx) {
+  if (typeof rawTx === 'string' && rawTx.indexOf('tx_') !== -1) return buildHash('th', unpackTx(rawTx).rlpEncoded)
+  return buildHash('th', rawTx)
+}
+
+export default { calculateMinFee, calculateFee, unpackTx, unpackRawTx, buildTx, buildRawTx, validateParams, buildTxHash }

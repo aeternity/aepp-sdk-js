@@ -36,8 +36,8 @@ const queryFormat = '{\'city\': str}'
 const responseFormat = '{\'tmp\': num}'
 const queryFee = 30000
 const oracleTtl = { type: 'delta', value: 500 }
-const responseTtl = { type: 'delta', value: 10 }
-const queryTtl = { type: 'delta', value: 10 }
+const responseTtl = { type: 'delta', value: 100 }
+const queryTtl = { type: 'delta', value: 100 }
 const query = '{\'city\': \'Berlin\'}'
 const queryResponse = '{\'tmp\': 101}'
 
@@ -45,7 +45,7 @@ const queryResponse = '{\'tmp\': 101}'
 const contractCode = `
 contract Identity =
   type state = ()
-  function main(x : int) = x
+  entrypoint main(x : int) = x
 `
 let contractId
 const deposit = 4

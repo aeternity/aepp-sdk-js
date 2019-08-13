@@ -23,10 +23,13 @@ import HdWallet from './utils/hd-wallet'
 import Ae from './ae'
 import Chain from './chain'
 import ChainNode from './chain/node'
+import Node from './node'
+import NodePool from './node-pool'
 import Tx from './tx'
 import Transaction from './tx/tx'
 import TransactionValidator from './tx/validator'
 import Account from './account'
+import Accounts from './accounts'
 import MemoryAccount from './account/memory'
 import Aens from './ae/aens'
 import Contract from './ae/contract'
@@ -43,6 +46,7 @@ import ContractACI from './contract/aci'
 
 export {
   Account,
+  Accounts,
   Ae,
   Aens,
   Aepp,
@@ -56,6 +60,8 @@ export {
   GeneralizeAccount,
   HdWallet,
   MemoryAccount,
+  Node,
+  NodePool,
   Oracle,
   OracleNodeAPI,
   Selector,

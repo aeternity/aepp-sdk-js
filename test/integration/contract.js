@@ -16,7 +16,7 @@
  */
 
 import { describe, it, before } from 'mocha'
-import { configure, plan, ready } from './'
+import { BaseAe, configure, plan, ready } from './'
 import { decode } from '../../es/tx/builder/helpers'
 
 import * as R from 'ramda'
@@ -24,55 +24,65 @@ import * as R from 'ramda'
 const identityContract = `
 contract Identity =
   type state = ()
-  function main(x : int) = x
+  entrypoint main(x : int) = x
 `
 const stateContract = `
 contract StateContract =
   record state = { value: string }
-  public function init(value) : state = { value = value }
-  public function retrieve() : string = state.value
+  entrypoint init(value) : state = { value = value }
+  entrypoint retrieve() : string = state.value
 `
 const testContract = `
+namespace Test =
+  function double(x: int): int = x*2
+
+
 contract Voting =
-  public function test() : int = 1
+  entrypoint test() : int = 1
 
 contract StateContract =
   type number = int
   record state = { value: string, key: number, testOption: option(string) }
   record yesEr = { t: number}
   
-  public function init(value: string, key: int, testOption: option(string)) : state = { value = value, key = key, testOption = testOption }
-  public function retrieve() : (string, int) = (state.value, state.key)
+  datatype dateUnit = Year | Month | Day
+  
+  entrypoint init(value: string, key: int, testOption: option(string)) : state = { value = value, key = key, testOption = testOption }
+  entrypoint retrieve() : (string, int) = (state.value, state.key)
 
-  public function intFn(a: int) : int = a
-  public function stringFn(a: string) : string = a
-  public function boolFn(a: bool) : bool = a
-  public function addressFn(a: address) : address = a
-  public function contractAddress (ct: address) : address = ct
-  public function accountAddress (ak: address) : address = ak
+  entrypoint intFn(a: int) : int = a
+  entrypoint stringFn(a: string) : string = a
+  entrypoint boolFn(a: bool) : bool = a
+  entrypoint addressFn(a: address) : address = a
+  entrypoint contractAddress (ct: address) : address = ct
+  entrypoint accountAddress (ak: address) : address = ak
 
-  public function tupleFn (a: (string, int)) : (string, int) = a
-  public function tupleInTupleFn (a: ((string, string), int)) : ((string, string), int) = a
-  public function tupleWithList (a: (list(int), int)) : (list(int), int) = a
+  entrypoint tupleFn (a: (string, int)) : (string, int) = a
+  entrypoint tupleInTupleFn (a: ((string, string), int)) : ((string, string), int) = a
+  entrypoint tupleWithList (a: (list(int), int)) : (list(int), int) = a
   
-  public function listFn(a: list(int)) : list(int) = a
-  public function listInListFn(a: list(list(int))) : list(list(int)) = a
+  entrypoint listFn(a: list(int)) : list(int) = a
+  entrypoint listInListFn(a: list(list(int))) : list(list(int)) = a
   
-  public function mapFn(a: map(address, (string, int))) : map(address, (string, int)) = a
-  public function mapOptionFn(a: map(address, (string, option(int)))) : map(address, (string, option(int))) = a
+  entrypoint mapFn(a: map(address, (string, int))) : map(address, (string, int)) = a
+  entrypoint mapOptionFn(a: map(address, (string, option(int)))) : map(address, (string, option(int))) = a
   
-  public function getRecord() : state = state
-  public stateful function setRecord(s: state) = put(s)
+  entrypoint getRecord() : state = state
+  stateful entrypoint setRecord(s: state) = put(s)
   
-  public function intOption(s: option(int)) : option(int) = s
-  public function listOption(s: option(list((int, string)))) : option(list((int ,string))) = s
+  entrypoint intOption(s: option(int)) : option(int) = s
+  entrypoint listOption(s: option(list((int, string)))) : option(list((int ,string))) = s
   
-  public function testFn(a: list(int), b: bool) : (list(int), bool) = (a, b)
-  public function approve(tx_id: int, voting_contract: Voting) : int = tx_id
+  entrypoint testFn(a: list(int), b: bool) : (list(int), bool) = (a, b)
+  entrypoint approve(tx_id: int, voting_contract: Voting) : int = tx_id
   
-  public function hashFn(s: hash): hash = s
-  public function signatureFn(s: signature): signature = s
-  public function bytesFn(s: bytes(32)): bytes(32) = s
+  entrypoint hashFn(s: hash): hash = s
+  entrypoint signatureFn(s: signature): signature = s
+  entrypoint bytesFn(s: bytes(32)): bytes(32) = s
+  
+  entrypoint usingExternalLib(s: int): int = Test.double(s)
+  
+  entrypoint datTypeFn(s: dateUnit): dateUnit = s
 `
 
 const encodedNumberSix = 'cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaKNdnK'
@@ -103,6 +113,26 @@ describe('Contract', function () {
   it('deploys compiled contracts', async () => {
     deployed = await bytecode.deploy()
     return deployed.should.have.property('address')
+  })
+
+  it('Deploy and call contract on specific account', async () => {
+    const current = await contract.address()
+    const onAccount = contract.addresses().find(acc => acc !== current)
+
+    const deployed = await bytecode.deploy([], { onAccount })
+    deployed.result.callerId.should.be.equal(onAccount)
+    const callRes = await deployed.call('main', ['42'])
+    callRes.result.callerId.should.be.equal(onAccount)
+    const callStaticRes = await deployed.callStatic('main', ['42'])
+    callStaticRes.result.callerId.should.be.equal(onAccount)
+  })
+
+  it('Dry-run without accounts', async () => {
+    const client = await BaseAe()
+    client.removeAccount('ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi')
+    client.addresses().length.should.be.equal(0)
+    const { result } = await client.contractCallStatic(identityContract, deployed.address, 'main', ['42'])
+    result.callerId.should.be.equal(client.Ae.defaults.dryRunAccount.pub)
   })
 
   it('calls deployed contracts', async () => {
@@ -184,13 +214,17 @@ describe('Contract', function () {
       isCompiled.should.be.equal(true)
     })
 
-    describe('Deploy contract', function () {
-      it('Deploy contract before compile', async () => {
-        contractObject.compiled = null
-        await contractObject.methods.init('123', 1, Promise.resolve('hahahaha'))
-        const isCompiled = contractObject.compiled.length && contractObject.compiled.slice(0, 3) === 'cb_'
-        isCompiled.should.be.equal(true)
-      })
+    it('Deploy contract before compile', async () => {
+      contractObject.compiled = null
+      await contractObject.methods.init('123', 1, Promise.resolve('hahahaha'))
+      const isCompiled = contractObject.compiled.length && contractObject.compiled.slice(0, 3) === 'cb_'
+      isCompiled.should.be.equal(true)
+    })
+    it('Call contract on specific account', async () => {
+      const current = await contract.address()
+      const onAccount = contract.addresses().find(acc => acc !== current)
+      const { result } = await contractObject.methods.intFn('123', { onAccount })
+      result.callerId.should.be.equal(onAccount)
     })
     describe('Arguments Validation and Casting', function () {
       describe('INT', function () {
@@ -420,6 +454,33 @@ describe('Contract', function () {
           } catch (e) {
             e.message.should.be.equal('"Argument" at position 0 fails because [Value \'[[object Object]]\' at path: [0] not a Promise]')
           }
+        })
+      })
+      describe('NAMESPACES', function () {
+        it('Use namespace in function body', async () => {
+          const res = await contractObject.methods.usingExternalLib(2)
+
+          res.decodedResult.should.be.equal(4)
+        })
+      })
+      describe('DATATYPE', function () {
+        it('Invalid type', async () => {
+          try {
+            await contractObject.methods.datTypeFn({})
+          } catch (e) {
+            e.message.should.be.equal('"Argument" at position 0 fails because ["0" must be a string, "value" must contain at least one of [Year, Month, Day]]')
+          }
+        })
+        it('Invalid variant', async () => {
+          try {
+            await contractObject.methods.datTypeFn("asdcxz")
+          } catch (e) {
+            e.message.should.be.equal('"Argument" at position 0 fails because ["0" must be one of [Year, Month, Day], "0" must be an object]')
+          }
+        })
+        it('Valid', async () => {
+          const res = await contractObject.methods.datTypeFn("Year" || { Year: []})
+          JSON.stringify(res.decodedResult).should.be.equal(JSON.stringify({ Year: [] }))
         })
       })
       describe('Hash', function () {

@@ -40,6 +40,10 @@ import AsyncInit from '../../utils/async-init'
 async function prepareArgsForEncode (aci, params) {
   if (!aci || !aci.arguments) return params
   // Validation
+  if (aci.arguments.length > params.length) {
+    throw new Error(`Function "${aci.name}" require ${aci.arguments.length} arguments of types [${aci.arguments.map(a => JSON.stringify(a.type))}] but get [${params.map(JSON.stringify)}]`)
+  }
+
   validateArguments(aci, params)
   const bindings = aci.bindings
   // Cast argument from JS to Sophia type
@@ -49,7 +53,7 @@ async function prepareArgsForEncode (aci, params) {
 }
 
 /**
- * Generate contract ACI object with predefined js methods for contract usage
+ * Generate contract ACI object with predefined js methods for contract usage - can be used for creating a reference to already deployed contracts
  * @alias module:@aeternity/aepp-sdk/es/contract/aci
  * @param {String} source Contract source code
  * @param {Object} [options] Options object

@@ -69,7 +69,7 @@ async function sendUsingGA (tx, { authData }) {
  */
 async function spend (amount, recipientId, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const spendTx = await this.spendTx(R.merge(opt, { senderId: await this.address(), recipientId, amount: amount }))
+  const spendTx = await this.spendTx(R.merge(opt, { senderId: await this.address(opt), recipientId, amount: amount }))
   return this.send(spendTx, opt)
 }
 

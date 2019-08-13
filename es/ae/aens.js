@@ -47,7 +47,7 @@ async function transfer (nameId, account, options = {}) {
 
   const nameTransferTx = await this.nameTransferTx(R.merge(opt, {
     nameId,
-    accountId: await this.address(),
+    accountId: await this.address(opt),
     recipientId: account
   }))
 
@@ -69,7 +69,7 @@ async function revoke (nameId, options = {}) {
 
   const nameRevokeTx = await this.nameRevokeTx(R.merge(opt, {
     nameId,
-    accountId: await this.address()
+    accountId: await this.address(opt)
   }))
 
   return this.send(nameRevokeTx, opt)
@@ -114,7 +114,7 @@ async function update (nameId, target, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   const nameUpdateTx = await this.nameUpdateTx(R.merge(opt, {
     nameId: nameId,
-    accountId: await this.address(),
+    accountId: await this.address(opt),
     pointers: [R.fromPairs([['id', target], ['key', classify(target)]])]
   }))
 
@@ -129,7 +129,7 @@ async function update (nameId, target, options = {}) {
  * @param {string} name
  * @return {Promise<Object>}
  */
-async function query (name) {
+async function query (name, opt = {}) {
   const o = await this.getName(name)
   const nameId = o.id
 
@@ -137,17 +137,17 @@ async function query (name) {
     pointers: o.pointers || {},
     update: async (target, options) => {
       return {
-        ...(await this.aensUpdate(nameId, target, options)),
+        ...(await this.aensUpdate(nameId, target, R.merge(opt, options))),
         ...(await this.aensQuery(name))
       }
     },
     transfer: async (account, options) => {
       return {
-        ...(await this.aensTransfer(nameId, account, options)),
+        ...(await this.aensTransfer(nameId, account, R.merge(opt, options))),
         ...(await this.aensQuery(name))
       }
     },
-    revoke: async (options) => this.aensRevoke(nameId, options)
+    revoke: async (options) => this.aensRevoke(nameId, R.merge(opt, options))
   }))
 }
 
@@ -159,16 +159,13 @@ async function query (name) {
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param {String} name
  * @param {String} salt
- * @param {Number} waitForHeight
  * @param {Record} [options={}]
  * @return {Promise<Object>} the result of the claim
  */
-async function claim (name, salt, waitForHeight, options = {}) {
+async function claim (name, salt, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  // wait until block was mined before send claim transaction
-  // if (waitForHeight) await this.awaitHeight(waitForHeight, { attempts: 200 })
   const claimTx = await this.nameClaimTx(R.merge(opt, {
-    accountId: await this.address(),
+    accountId: await this.address(opt),
     nameSalt: salt,
     name: `nm_${encodeBase58Check(Buffer.from(name))}`
   }))
@@ -177,7 +174,7 @@ async function claim (name, salt, waitForHeight, options = {}) {
 
   return {
     ...result,
-    ...(await this.aensQuery(name))
+    ...opt.waitMined && await this.aensQuery(name, opt)
   }
 }
 
@@ -197,7 +194,7 @@ async function preclaim (name, options = {}) {
   const hash = await commitmentHash(name, _salt)
 
   const preclaimTx = await this.namePreclaimTx(R.merge(opt, {
-    accountId: await this.address(),
+    accountId: await this.address(opt),
     commitmentId: hash
   }))
 
@@ -206,7 +203,7 @@ async function preclaim (name, options = {}) {
   return Object.freeze({
     ...result,
     height,
-    claim: options => this.aensClaim(name, _salt, (height + 1), options),
+    claim: options => this.aensClaim(name, _salt, { ...options, onAccount: opt.onAccount }),
     salt: _salt,
     commitmentId: hash
   })

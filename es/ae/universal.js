@@ -44,13 +44,7 @@ import Contract from './contract'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Universal instance
  */
-const Universal = Ae.compose(Account, Chain, Transaction, Aens, Contract, Oracle, GeneralizeAccount, {
-export const Universal = Ae.compose(Account, Chain, Transaction, Aens, Contract, Oracle, GeneralizeAccount, {
-  init () {},
-  props: { process: {} }
-})
-
-export const UniversalWithAccounts = Ae.compose(Accounts, Chain, Transaction, Aens, Contract, Oracle, Selector, GeneralizeAccount, {
+export const Universal = Ae.compose(Accounts, Chain, Transaction, Aens, Contract, Oracle, GeneralizeAccount, {
   init () {},
   props: { process: {} }
 })

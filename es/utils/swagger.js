@@ -24,10 +24,10 @@
 
 import JsonBig from './json-big'
 import stampit from '@stamp/it'
-import AsyncInit from './async-init'
 import axios from 'axios'
 import * as R from 'ramda'
 import { snakeToPascal, pascalToSnake } from './string'
+import BigNumber from 'bignumber.js'
 
 /**
  * Perform path string interpolation
@@ -99,8 +99,8 @@ function TypeError (msg, spec, value) {
  */
 const conformTypes = {
   integer (value, spec, types) {
-    if (R.type(value) === 'Number') {
-      return Math.floor(value)
+    if (R.type(value) === 'Number' || BigNumber(value).toString(10) === value) {
+      return R.type(value) === 'Number' ? Math.floor(value) : value
     } else {
       throw TypeError('Not an integer', spec, value)
     }
@@ -198,11 +198,18 @@ const httpConfig = {
     } catch (e) {
       return data
     }
+  }],
+  transformRequest: [(data) => {
+    try {
+      return JsonBig.stringify(data)
+    } catch (e) {
+      return data
+    }
   }]
 }
 
 const httpClients = {
-  get: (config) => (url) => axios.get(url, R.mergeDeepRight(httpConfig, config)),
+  get: (config) => (url, params) => axios.get(url, [httpConfig, config, params].reduce(R.mergeDeepRight)),
   post: (config) => (url, params) => axios.post(url, params, R.mergeDeepRight(httpConfig, config))
 }
 
@@ -336,7 +343,7 @@ function destructureClientError (error) {
  * @param {Object} types - Swagger types
  * @return {Function}
  */
-const operation = R.memoize((path, method, definition, types, { config, errorHandler } = {}) => {
+const operation = (path, method, definition, types, { config, errorHandler } = {}) => {
   config = config || {}
   delete config.transformResponse // Prevent of overwriting transform response
   const { operationId, description } = definition
@@ -430,7 +437,7 @@ const operation = R.memoize((path, method, definition, types, { config, errorHan
       }
     })
   }
-})
+}
 
 /**
  * Swagger Stamp
@@ -443,8 +450,8 @@ const operation = R.memoize((path, method, definition, types, { config, errorHan
  * @return {Object} Account instance
  * @example Swagger({swag})
  */
-const Swagger = stampit(AsyncInit, {
-  async init ({ swag = this.swag, axiosConfig }, { stamp }) {
+const Swagger = stampit({
+  init ({ swag = this.swag, axiosConfig }, { stamp }) {
     const { paths, definitions } = swag
     const methods = R.indexBy(
       R.prop('name'),

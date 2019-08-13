@@ -22,6 +22,7 @@ import * as internal from '../../es/utils/swagger'
 import * as R from 'ramda'
 import op from './sample-operation.json'
 import def from './sample-definition.json'
+import JsonBig from '../../es/utils/json-big'
 
 describe('Swagger', function () {
   it('walks through deep structures', () => {
@@ -124,5 +125,13 @@ describe('Swagger', function () {
     const [method, operation] = R.head(R.toPairs(data))
     const fn = internal.operation(path, method, operation, def)(this, `//v2`)
     assert.equal(fn.length, 2)
+  })
+  it('Serialize BigNumber to JSON', () => {
+    const obj = { amount: '124324142354523423523452342352352345234542342342342342342352345345' }
+    const stringified = JsonBig.stringify(obj)
+    const parsed = JsonBig.parse(stringified)
+    console.log(stringified)
+    console.log(parsed)
+    parsed.amount.should.be.equal(obj.amount)
   })
 })
