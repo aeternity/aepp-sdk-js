@@ -343,7 +343,7 @@ export async function awaitingWithdrawTx (channel, message, state) {
 export function awaitingWithdrawCompletion (channel, message, state) {
   if (message.method === 'channels.on_chain_tx') {
     if (state.onOnChainTx) {
-      state.onOnChainTx(message.params.data.signed_tx)
+      state.onOnChainTx(message.params.data.tx)
     }
     return { handler: awaitingWithdrawCompletion, state }
   }
@@ -391,7 +391,7 @@ export async function awaitingDepositTx (channel, message, state) {
 export function awaitingDepositCompletion (channel, message, state) {
   if (message.method === 'channels.on_chain_tx') {
     if (state.onOnChainTx) {
-      state.onOnChainTx(message.params.data.signed_tx)
+      state.onOnChainTx(message.params.data.tx)
     }
     return { handler: awaitingDepositCompletion, state }
   }
