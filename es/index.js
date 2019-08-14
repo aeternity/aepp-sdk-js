@@ -16,6 +16,7 @@
  */
 
 import * as Crypto from './utils/crypto'
+import * as Bytes from './utils/bytes'
 import * as TxBuilder from './tx/builder'
 import * as TxBuilderHelper from './tx/builder/helpers'
 import HdWallet from './utils/hd-wallet'
@@ -50,6 +51,7 @@ export {
   Ae,
   Aens,
   Aepp,
+  Bytes,
   Contract,
   ContractCompilerAPI,
   ContractACI,
