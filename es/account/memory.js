@@ -25,7 +25,6 @@
 import Account from './'
 import * as Crypto from '../utils/crypto'
 import { isHex } from '../utils/string'
-import { encodeBase58Check } from '../utils/crypto'
 import { decode } from '../tx/builder/helpers'
 import { isValidKeypair } from '../utils/crypto'
 
