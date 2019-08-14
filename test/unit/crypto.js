@@ -48,7 +48,16 @@ describe('crypto', () => {
       assert.isAtMost(keyPair.publicKey.length, 53)
     })
   })
-
+  
+  describe('isValidKeypair', () => {
+    it('verify the generated key pair', () => {
+      const keyPair = Crypto.generateKeyPair(true)
+      assert.ok(keyPair)
+      const verifyResult = Crypto.isValidKeypair(keyPair.secretKey, keyPair.publicKey)
+      assert.isTrue(verifyResult)
+    })
+  })
+  
   describe('encryptPassword', () => {
     describe('generate a password encrypted key pair', () => {
       const keyPair = Crypto.generateKeyPair(true)
