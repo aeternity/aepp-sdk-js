@@ -34,6 +34,7 @@ describe('Generalize Account', function () {
 
   let client
   const gaAccount = generateKeyPair()
+
   before(async function () {
     client = await ready(this)
     await client.spend('100000000000000000000', gaAccount.publicKey)
@@ -49,7 +50,7 @@ describe('Generalize Account', function () {
     try {
       await client.createGeneralizeAccount('authorize', authContract, [gaAccount.publicKey], { onAccount: gaAccount.publicKey })
     } catch (e) {
-      e.message.should.be.equal('Account ak_2gqecVbdXV38nBecfujteJm1YrWxUPAzdMVscwrbpX46sWVM6a is already GA')
+      e.message.should.be.equal(`Account ${gaAccount.publicKey} is already GA`)
     }
   })
   it('Spend Using Meta Tx', async () => {

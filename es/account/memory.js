@@ -53,7 +53,7 @@ function validateKeyPair (keyPair) {
   if (typeof keyPair.publicKey !== 'string' || keyPair.publicKey.indexOf('ak_') === -1) throw new Error('Public Key must be a base58c string with "ak_" prefix')
   if (
     !Buffer.isBuffer(keyPair.secretKey) &&
-    (typeof keyPair.secretKey !== 'string' && !isHex(keyPair.secretKey))
+    (typeof keyPair.secretKey === 'string' && !isHex(keyPair.secretKey))
   ) throw new Error('Secret key must be hex string or Buffer')
 
   const pubBuffer = Buffer.from(decode(keyPair.publicKey, 'ak'))
