@@ -42,14 +42,14 @@ import { BigNumber } from 'bignumber.js'
  */
 async function send (tx, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const { contractId: gaId, authFun } = await this.getAccount(await this.address())
+  const { contractId: gaId, authFun } = await this.getAccount(await this.address(opt))
   return gaId
     ? this.sendUsingGA(tx, { ...opt, authFun })
     : this.sendUsingPOA(tx, options)
 }
 
 async function sendUsingPOA (tx, options = {}) {
-  const signed = await this.signTransaction(tx)
+  const signed = await this.signTransaction(tx, options)
   return this.sendTransaction(signed, options)
 }
 
