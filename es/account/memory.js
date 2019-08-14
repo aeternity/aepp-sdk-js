@@ -26,7 +26,6 @@ import Account from './'
 import * as Crypto from '../utils/crypto'
 import { isHex } from '../utils/string'
 import { decode } from '../tx/builder/helpers'
-import { isValidKeypair } from '../utils/crypto'
 
 const secrets = new WeakMap()
 
@@ -58,7 +57,7 @@ function validateKeyPair (keyPair) {
   ) throw new Error('Secret key must be hex string or Buffer')
 
   const pubBuffer = Buffer.from(decode(keyPair.publicKey, 'ak'))
-  if (!isValidKeypair(Buffer.from(keyPair.secretKey, 'hex'), pubBuffer)) throw new Error('Invalid Key Pair')
+  if (!Crypto.isValidKeypair(Buffer.from(keyPair.secretKey, 'hex'), pubBuffer)) throw new Error('Invalid Key Pair')
 }
 
 /**
