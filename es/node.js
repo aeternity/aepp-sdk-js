@@ -84,8 +84,8 @@ async function getConsensusProtocolVersion (protocols = [], height) {
 
 function axiosError (handler) {
   return (error) => {
-    if (!handler || typeof handler !== 'function') throw error
-    return handler(error)
+    handler && typeof handler === 'function' && handler(error)
+    throw error
   }
 }
 
