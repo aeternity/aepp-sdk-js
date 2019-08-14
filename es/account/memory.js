@@ -25,6 +25,9 @@
 import Account from './'
 import * as Crypto from '../utils/crypto'
 import { isHex } from '../utils/string'
+import { encodeBase58Check } from '../utils/crypto'
+import { decode } from '../tx/builder/helpers'
+import { isValidKeypair } from '../utils/crypto'
 
 const secrets = new WeakMap()
 
@@ -52,8 +55,11 @@ function validateKeyPair (keyPair) {
   if (typeof keyPair.publicKey !== 'string' || keyPair.publicKey.indexOf('ak_') === -1) throw new Error('Public Key must be a base58c string with "ak_" prefix')
   if (
     !Buffer.isBuffer(keyPair.secretKey) &&
-    (typeof keyPair.secretKey === 'string' && !isHex(keyPair.secretKey))
+    (typeof keyPair.secretKey !== 'string' && !isHex(keyPair.secretKey))
   ) throw new Error('Secret key must be hex string or Buffer')
+
+  const pubBuffer = Buffer.from(decode(keyPair.publicKey, 'ak'))
+  if (!isValidKeypair(Buffer.from(keyPair.secretKey, 'hex'), pubBuffer)) throw new Error('Invalid Key Pair')
 }
 
 /**
