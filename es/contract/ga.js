@@ -43,9 +43,6 @@ import BigNumber from 'bignumber.js'
  * @return {Object} GeneralizeAccount instance
  */
 export const GeneralizeAccount = Contract.compose({
-  async init () {
-    // await this.initAccount()
-  },
   methods: {
     createGeneralizeAccount,
     getContractAuthFan,
@@ -79,9 +76,9 @@ async function getContractAuthFan (source, fnName) {
  */
 async function createGeneralizeAccount (authFnName, source, args, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const ownerId = await this.address()
+  const ownerId = await this.address(opt)
 
-  if (await this.isGA(ownerId)) throw new Error(`Account ${ownerId} is already GA.`)
+  if (await this.isGA(ownerId)) throw new Error(`Account ${ownerId} is already GA`)
 
   const { authFun, bytecode } = await this.getContractAuthFan(source, authFnName)
   const callData = await this.contractEncodeCall(source, 'init', args)
@@ -106,18 +103,17 @@ async function sendMetaTx (rawTransaction, authData, authFnName, options = {}) {
   if (!authData) throw new Error('authData is required')
   // Check if authData is callData or if it's an object prepare a callData from source and args
   const { authCallData, gas } = await this.prepareGaParams(authData, authFnName)
-
   const opt = R.merge(this.Ae.defaults, options)
   // Get transaction rlp binary
   const rlpBinaryTx = Crypto.decodeBase64Check(Crypto.assertedType(rawTransaction, 'tx'))
   // Wrap in SIGNED tx with empty signatures
   const { rlpEncoded } = wrapInEmptySignedTx(rlpBinaryTx)
   // Prepare params for META tx
-  const params = { ...opt, tx: rlpEncoded, gaId: await this.address(), abiVersion: ABI_VERSIONS.SOPHIA, authData: authCallData, gas }
+  const params = { ...opt, tx: rlpEncoded, gaId: await this.address(opt), abiVersion: ABI_VERSIONS.SOPHIA, authData: authCallData, gas }
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
   const { fee, ttl } = await this.prepareTxParams(TX_TYPE.gaMeta, params)
   // Build META tx
-  const { rlpEncoded: metaTxRlp } = buildTx({ ...params, fee: `${fee}00`, ttl }, TX_TYPE.gaMeta)
+  const { rlpEncoded: metaTxRlp } = buildTx({ ...params, fee: `${fee}0`, ttl }, TX_TYPE.gaMeta)
   // Wrap in empty signed tx
   const { tx } = wrapInEmptySignedTx(metaTxRlp)
   // Send tx to the chain
