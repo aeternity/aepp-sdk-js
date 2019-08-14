@@ -115,8 +115,8 @@ export async function pollForQueryResponse (oracleId, queryId, { attempts = 20, 
  * @param {String} responseFormat Format of query response
  * @param {Object} [options={}] Options
  * @param {String|Number} [options.queryFee] queryFee Oracle query Fee
- * @param {String|Number} [options.oracleTtl] oracleTtl OracleTtl object {type: 'delta|block', value: 'number'}
- * @param {Number} [options.vmVersion] vmVersion Always 0 (do not use virtual machine)
+ * @param {Object} [options.oracleTtl] oracleTtl OracleTtl object {type: 'delta|block', value: 'number'}
+ * @param {Number} [options.abiVersion] abiVersion Always 0 (do not use virtual machine)
  * @param {Number} [options.fee] fee Transaction fee
  * @param {Number} [options.ttl] Transaction time to leave
  * @return {Promise<Object>} Oracle object
