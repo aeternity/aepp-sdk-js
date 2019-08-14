@@ -498,7 +498,7 @@ export function encodeTx (txData) {
  * @return {Boolean} Valid?
  */
 export function isValidKeypair (privateKey, publicKey) {
-  const message = 'TheMessage'
+  const message = Buffer.from('TheMessage')
   const signature = sign(message, privateKey)
   return verify(message, signature, publicKey)
 }
