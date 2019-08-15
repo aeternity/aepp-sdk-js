@@ -25,11 +25,11 @@
  */
 import * as R from 'ramda'
 
-import { Contract } from '../ae/contract'
-import { ABI_VERSIONS, MAX_AUTH_FAN_GAS_PRICE, TX_TYPE } from '../tx/builder/schema'
-import { buildTx, unpackTx } from '../tx/builder'
-import * as Crypto from '../utils/crypto'
-import BigNumber from 'bignumber.js'
+import { Contract } from '../../ae/contract'
+import { ABI_VERSIONS, TX_TYPE } from '../../tx/builder/schema'
+import { buildTx } from '../../tx/builder'
+import { getContractAuthFan, prepareGaParams } from './helpers'
+import { assertedType, decodeBase64Check } from '../../utils/crypto'
 
 /**
  * GeneralizeAccount Stamp
@@ -45,9 +45,7 @@ import BigNumber from 'bignumber.js'
 export const GeneralizeAccount = Contract.compose({
   methods: {
     createGeneralizeAccount,
-    getContractAuthFan,
     sendMetaTx,
-    prepareGaParams,
     isGA
   }
 })
@@ -56,14 +54,6 @@ export default GeneralizeAccount
 async function isGA (address) {
   const { contractId } = await this.getAccount(address)
   return !!contractId
-}
-
-async function getContractAuthFan (source, fnName) {
-  const { bytecode } = await this.contractCompile(source)
-  const { tx: { typeInfo } } = await unpackTx(bytecode, false, 'cb')
-  if (!typeInfo[fnName]) throw new Error(`Can't find authFan for function "${fnName}"`)
-  const { funHash: authFun } = typeInfo[fnName]
-  return { bytecode, authFun }
 }
 
 /**
@@ -80,7 +70,7 @@ async function createGeneralizeAccount (authFnName, source, args, options = {}) 
 
   if (await this.isGA(ownerId)) throw new Error(`Account ${ownerId} is already GA`)
 
-  const { authFun, bytecode } = await this.getContractAuthFan(source, authFnName)
+  const { authFun, bytecode } = await getContractAuthFan(source, authFnName)
   const callData = await this.contractEncodeCall(source, 'init', args)
 
   const { tx, contractId } = await this.gaAttachTx(R.merge(opt, { ownerId, code: bytecode, callData, authFun }))
@@ -95,17 +85,23 @@ async function createGeneralizeAccount (authFnName, source, args, options = {}) 
   })
 }
 
-function wrapInEmptySignedTx (rlp) {
-  return buildTx({ encodedTx: rlp, signatures: [] }, TX_TYPE.signed)
-}
 
+
+/**
+ * Create a gaAttach transaction and broadcast it to the chain
+ * @param {String} authFnName - Authorization function name
+ * @param {String} source - Auth contract source code
+ * @param {Array} args - init arguments
+ * @param {Object} options - Options
+ * @return {Promise<Readonly<{result: *, owner: *, createdAt: Date, address, rawTx: *, transaction: *}>>}
+ */
 async function sendMetaTx (rawTransaction, authData, authFnName, options = {}) {
   if (!authData) throw new Error('authData is required')
   // Check if authData is callData or if it's an object prepare a callData from source and args
-  const { authCallData, gas } = await this.prepareGaParams(authData, authFnName)
+  const { authCallData, gas } = await prepareGaParams(this)(authData, authFnName)
   const opt = R.merge(this.Ae.defaults, options)
   // Get transaction rlp binary
-  const rlpBinaryTx = Crypto.decodeBase64Check(Crypto.assertedType(rawTransaction, 'tx'))
+  const rlpBinaryTx = decodeBase64Check(assertedType(rawTransaction, 'tx'))
   // Wrap in SIGNED tx with empty signatures
   const { rlpEncoded } = wrapInEmptySignedTx(rlpBinaryTx)
   // Prepare params for META tx
@@ -118,17 +114,4 @@ async function sendMetaTx (rawTransaction, authData, authFnName, options = {}) {
   const { tx } = wrapInEmptySignedTx(metaTxRlp)
   // Send tx to the chain
   return this.sendTransaction(tx, opt)
-}
-
-async function prepareGaParams (authData, authFnName) {
-  if (typeof authData !== 'object') throw new Error('AuthData must be an object')
-  if (authData.gas && BigNumber(authData.gas).gt(MAX_AUTH_FAN_GAS_PRICE)) throw new Error(`the maximum gas value for ga authFun is ${MAX_AUTH_FAN_GAS_PRICE}, got ${authData.gas}`)
-  const gas = authData.gas || MAX_AUTH_FAN_GAS_PRICE
-  if (authData.callData) {
-    if (authData.callData.split('_')[0] !== 'cb') throw new Error('Auth data must be a string with "cb" prefix.')
-    return { authCallData: authData.callData, gas }
-  } else {
-    if (!authData.source || !authData.args) throw new Error('Auth data must contain source code and arguments.')
-    return { authCallData: await this.contractEncodeCall(authData.source, authFnName, authData.args), gas }
-  }
 }
