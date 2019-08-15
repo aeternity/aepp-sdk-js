@@ -35,12 +35,20 @@ import { assertedType, decodeBase64Check } from '../../utils/crypto'
  * GeneralizeAccount Stamp
  *
  * Provide Generalize Account implementation
- * {@link module:@aeternity/aepp-sdk/es/ae/contract} clients.
+ * {@link module:@aeternity/aepp-sdk/es/contract/ga} clients.
  * @function
  * @alias module:@aeternity/aepp-sdk/es/contract/ga
  * @rtype Stamp
  * @param {Object} [options={}] - Initializer object
  * @return {Object} GeneralizeAccount instance
+ * @example
+ * const authContract = ``
+ * await client.createGeneralizeAccount(authFnName, authContract, [...authFnArguments]
+ * // Make spend using GA
+ * const callData = 'cb_...' // encoded call data for auth contract
+ * await client.spend(10000, receiverPub, { authData: { callData } })
+ * // or
+ * await client.spend(10000, receiverPub, { authData: { source: authContract, args: [...authContractArgs] } }) // sdk will prepare callData itself
  */
 export const GeneralizeAccount = Contract.compose({
   methods: {
@@ -52,6 +60,8 @@ export const GeneralizeAccount = Contract.compose({
 export default GeneralizeAccount
 
 /**
+ * @alias module:@aeternity/aepp-sdk/es/contract/ga
+ * @function
  * Check if account is GA account
  * @param {String} address - Account address
  * @return {Boolean}
@@ -62,7 +72,9 @@ async function isGA (address) {
 }
 
 /**
- * Create a gaAttach transaction and broadcast it to the chain
+ * Convert current account to GA account
+ * @alias module:@aeternity/aepp-sdk/es/contract/ga
+ * @function
  * @param {String} authFnName - Authorization function name
  * @param {String} source - Auth contract source code
  * @param {Array} args - init arguments
@@ -91,12 +103,14 @@ async function createGeneralizeAccount (authFnName, source, args, options = {}) 
 }
 
 /**
- * Create a gaAttach transaction and broadcast it to the chain
+ * Create a metaTx transaction
+ * @alias module:@aeternity/aepp-sdk/es/contract/ga
+ * @function
+ * @param {String} rawTransaction Inner transaction
+ * @param {Object} authData Object with gaMeta params
  * @param {String} authFnName - Authorization function name
- * @param {String} source - Auth contract source code
- * @param {Array} args - init arguments
  * @param {Object} options - Options
- * @return {Promise<Readonly<{result: *, owner: *, createdAt: Date, address, rawTx: *, transaction: *}>>}
+ * @return {String}
  */
 async function createMetaTx (rawTransaction, authData, authFnName, options = {}) {
   if (!authData) throw new Error('authData is required')
