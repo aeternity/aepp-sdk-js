@@ -96,19 +96,14 @@ export function awaitingOnChainTx (channel, message, state) {
       message.params.data.info === 'funding_signed' &&
       options.get(channel).role === 'initiator'
     ) {
-      return { handler: awaitingOnChainTx }
+      return { handler: awaitingBlockInclusion }
     }
     if (
       message.params.data.info === 'funding_created' &&
       options.get(channel).role === 'responder'
     ) {
-      return { handler: awaitingOnChainTx }
+      return { handler: awaitingBlockInclusion }
     }
-    emit(channel, 'onChainTx', message.params.data.tx, {
-      info: message.params.data.info,
-      type: message.params.data.type
-    })
-    return { handler: awaitingBlockInclusion }
   }
   if (
     message.method === 'channels.info' &&
@@ -123,12 +118,20 @@ export function awaitingOnChainTx (channel, message, state) {
 export function awaitingBlockInclusion (channel, message, state) {
   if (message.method === 'channels.info') {
     const handler = {
+      funding_created: awaitingBlockInclusion,
       own_funding_locked: awaitingBlockInclusion,
       funding_locked: awaitingOpenConfirmation
     }[message.params.data.event]
     if (handler) {
       return { handler }
     }
+  }
+  if (message.method === 'channels.on_chain_tx') {
+    emit(channel, 'onChainTx', message.params.data.tx, {
+      info: message.params.data.info,
+      type: message.params.data.type
+    })
+    return { handler: awaitingBlockInclusion }
   }
 }
 
@@ -343,7 +346,7 @@ export async function awaitingWithdrawTx (channel, message, state) {
 export function awaitingWithdrawCompletion (channel, message, state) {
   if (message.method === 'channels.on_chain_tx') {
     if (state.onOnChainTx) {
-      state.onOnChainTx(message.params.data.signed_tx)
+      state.onOnChainTx(message.params.data.tx)
     }
     return { handler: awaitingWithdrawCompletion, state }
   }
@@ -391,7 +394,7 @@ export async function awaitingDepositTx (channel, message, state) {
 export function awaitingDepositCompletion (channel, message, state) {
   if (message.method === 'channels.on_chain_tx') {
     if (state.onOnChainTx) {
-      state.onOnChainTx(message.params.data.signed_tx)
+      state.onOnChainTx(message.params.data.tx)
     }
     return { handler: awaitingDepositCompletion, state }
   }
