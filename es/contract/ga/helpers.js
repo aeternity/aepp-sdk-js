@@ -2,7 +2,6 @@ import BigNumber from 'bignumber.js'
 import { MAX_AUTH_FAN_GAS_PRICE, TX_TYPE } from '../../tx/builder/schema'
 import { buildTx, unpackTx } from '../../tx/builder'
 
-
 export const prepareGaParams = (ins) => async (authData, authFnName) => {
   if (typeof authData !== 'object') throw new Error('AuthData must be an object')
   if (authData.gas && BigNumber(authData.gas).gt(MAX_AUTH_FAN_GAS_PRICE)) throw new Error(`the maximum gas value for ga authFun is ${MAX_AUTH_FAN_GAS_PRICE}, got ${authData.gas}`)
@@ -24,4 +23,4 @@ export const getContractAuthFan = (ins) => async (source, fnName) => {
   return { bytecode, authFun }
 }
 
-export const  wrapInEmptySignedTx = (rlp) => buildTx({ encodedTx: rlp, signatures: [] }, TX_TYPE.signed)
+export const wrapInEmptySignedTx = (rlp) => buildTx({ encodedTx: rlp, signatures: [] }, TX_TYPE.signed)
