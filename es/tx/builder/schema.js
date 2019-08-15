@@ -278,6 +278,8 @@ export const TX_FEE_BASE_GAS = (txType) => {
     case TX_TYPE.gaAttach:
     case TX_TYPE.contractCreate:
       return BigNumber(5 * BASE_GAS)
+    // Todo Implement meta tx fee calculation
+    case TX_TYPE.gaMeta:
     case TX_TYPE.contractCall:
       return BigNumber(30 * BASE_GAS)
     default:

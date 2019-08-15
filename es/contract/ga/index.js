@@ -28,7 +28,7 @@ import * as R from 'ramda'
 import { Contract } from '../../ae/contract'
 import { ABI_VERSIONS, TX_TYPE } from '../../tx/builder/schema'
 import { buildTx } from '../../tx/builder'
-import { getContractAuthFan, prepareGaParams } from './helpers'
+import { getContractAuthFan, prepareGaParams, wrapInEmptySignedTx } from './helpers'
 import { assertedType, decodeBase64Check } from '../../utils/crypto'
 
 /**
@@ -45,12 +45,17 @@ import { assertedType, decodeBase64Check } from '../../utils/crypto'
 export const GeneralizeAccount = Contract.compose({
   methods: {
     createGeneralizeAccount,
-    sendMetaTx,
+    createMetaTx,
     isGA
   }
 })
 export default GeneralizeAccount
 
+/**
+ * Check if account is GA account
+ * @param {String} address - Account address
+ * @return {Boolean}
+ */
 async function isGA (address) {
   const { contractId } = await this.getAccount(address)
   return !!contractId
@@ -70,7 +75,7 @@ async function createGeneralizeAccount (authFnName, source, args, options = {}) 
 
   if (await this.isGA(ownerId)) throw new Error(`Account ${ownerId} is already GA`)
 
-  const { authFun, bytecode } = await getContractAuthFan(source, authFnName)
+  const { authFun, bytecode } = await getContractAuthFan(this)(source, authFnName)
   const callData = await this.contractEncodeCall(source, 'init', args)
 
   const { tx, contractId } = await this.gaAttachTx(R.merge(opt, { ownerId, code: bytecode, callData, authFun }))
@@ -85,8 +90,6 @@ async function createGeneralizeAccount (authFnName, source, args, options = {}) 
   })
 }
 
-
-
 /**
  * Create a gaAttach transaction and broadcast it to the chain
  * @param {String} authFnName - Authorization function name
@@ -95,7 +98,7 @@ async function createGeneralizeAccount (authFnName, source, args, options = {}) 
  * @param {Object} options - Options
  * @return {Promise<Readonly<{result: *, owner: *, createdAt: Date, address, rawTx: *, transaction: *}>>}
  */
-async function sendMetaTx (rawTransaction, authData, authFnName, options = {}) {
+async function createMetaTx (rawTransaction, authData, authFnName, options = {}) {
   if (!authData) throw new Error('authData is required')
   // Check if authData is callData or if it's an object prepare a callData from source and args
   const { authCallData, gas } = await prepareGaParams(this)(authData, authFnName)
@@ -109,9 +112,9 @@ async function sendMetaTx (rawTransaction, authData, authFnName, options = {}) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
   const { fee, ttl } = await this.prepareTxParams(TX_TYPE.gaMeta, params)
   // Build META tx
-  const { rlpEncoded: metaTxRlp } = buildTx({ ...params, fee: `${fee}0`, ttl }, TX_TYPE.gaMeta)
+  const { rlpEncoded: metaTxRlp } = buildTx({ ...params, fee: `${fee}`, ttl }, TX_TYPE.gaMeta)
   // Wrap in empty signed tx
   const { tx } = wrapInEmptySignedTx(metaTxRlp)
   // Send tx to the chain
-  return this.sendTransaction(tx, opt)
+  return tx
 }
