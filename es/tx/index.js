@@ -47,7 +47,7 @@ const Tx = stampit({
       methods: [
         'spendTx', 'namePreclaimTx', 'nameClaimTx', 'nameTransferTx',
         'nameUpdateTx', 'nameRevokeTx', 'contractCreateTx', 'contractCallTx',
-        'oracleRegisterTx', 'oracleExtendTx', 'oraclePostQueryTx', 'oracleRespondTx', 'getAccountNonce'
+        'oracleRegisterTx', 'oracleExtendTx', 'oraclePostQueryTx', 'oracleRespondTx', 'getAccountNonce', 'getVmVersion'
       ]
     }
   }
@@ -65,7 +65,8 @@ const Tx = stampit({
     oracleExtendTx: required,
     oraclePostQueryTx: required,
     oracleRespondTx: required,
-    getAccountNonce: required
+    getAccountNonce: required,
+    getVmVersion: required
   }
 }))
 

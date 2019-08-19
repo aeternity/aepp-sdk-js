@@ -34,6 +34,7 @@ import ContractCompilerAPI from '../contract/compiler'
 import ContractBase from '../contract'
 import ContractACI from '../contract/aci'
 import BigNumber from 'bignumber.js'
+import NodePool from '../node-pool'
 
 /**
  * Handle contract call error
@@ -293,7 +294,7 @@ async function contractCompile (source, options = {}) {
  * const client = await ContractWithAe({ url, internalUrl, compilerUrl, keypair, ... })
  *
  */
-export const Contract = Ae.compose(ContractBase, ContractACI, {
+export const ContractAPI = Ae.compose(ContractBase, ContractACI, {
   methods: {
     contractCompile,
     contractCallStatic,
@@ -317,6 +318,6 @@ export const Contract = Ae.compose(ContractBase, ContractACI, {
   }
 })
 
+export const Contract = ContractAPI.compose(NodePool)
 export const ContractWithCompiler = Contract.compose(ContractCompilerAPI)
-
 export default ContractWithCompiler

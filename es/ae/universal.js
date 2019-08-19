@@ -29,6 +29,7 @@ import Transaction from '../tx/tx'
 import Oracle from './oracle'
 import Accounts from '../accounts'
 import Contract from './contract'
+import NodePool from '../node-pool'
 
 /**
  * Universal Stamp
@@ -41,7 +42,7 @@ import Contract from './contract'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Universal instance
  */
-export const Universal = Ae.compose(Accounts, Chain, Transaction, Aens, Contract, Oracle, {
+export const Universal = Ae.compose(Accounts, Chain, NodePool, Transaction, Aens, Contract, Oracle, {
   init () {},
   props: { process: {} }
 })
