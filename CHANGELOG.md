@@ -15,8 +15,23 @@
 * **MemoryAccount:** Add validation of keypair ([#594](https://github.com/aeternity/aepp-sdk-js/issues/594)) ([b8c2b20](https://github.com/aeternity/aepp-sdk-js/commit/b8c2b20))
 * **state channels:** handle BigNumbers with json-bigint ([#596](https://github.com/aeternity/aepp-sdk-js/issues/596)) ([14eaa3d](https://github.com/aeternity/aepp-sdk-js/commit/14eaa3d))
 * **state channels:** send generic messages immediately ([#600](https://github.com/aeternity/aepp-sdk-js/issues/600)) ([8ad7583](https://github.com/aeternity/aepp-sdk-js/commit/8ad7583))
+* **Generalize Account**  Implement Generalized account support ([#449](https://github.com/aeternity/aepp-sdk-js/pull/449))
+    ```js
+    const authContract = `YOUR_AUTH_CONTRACT`
 
-
+    // Make current account Generalized
+    await client.createGeneralizeAccount(authFnName, authContract, [...authFnArguments]
+    
+    // Make spend transaction using GA
+    // One Way
+        // encoded call data for auth contract
+        const callData = 'cb_...'
+        await client.spend(10000, receiverPub, { authData: { callData } })
+    
+    // or
+        // sdk will prepare callData itself
+        await client.spend(10000, receiverPub, { authData: { source: authContract, args: [...authContractArgs] } })
+    ```
 
 # [4.4.0](https://github.com/aeternity/aepp-sdk-js/compare/4.3.0...4.4.0) (2019-08-09)
 
