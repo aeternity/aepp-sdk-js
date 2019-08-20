@@ -15,7 +15,7 @@ import Transaction from '@aeternity/aepp-sdk/es/tx/builder'
     * [exports.buildRawTx(params, schema, [options])](#exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.buildRawTx) ⇒ `Array` ⏏
     * [exports.unpackRawTx(binary, schema)](#exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.unpackRawTx) ⇒ `Object` ⏏
     * [exports.buildTx(params, type, [options])](#exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.buildTx) ⇒ `Object` ⏏
-    * [exports.unpackTx(encodedTx, fromRlpBinary)](#exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.unpackTx) ⇒ `Object` ⏏
+    * [exports.unpackTx(encodedTx, fromRlpBinary, prefix)](#exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.unpackTx) ⇒ `Object` ⏏
     * [exports.buildTxHash(rawTx)](#exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.buildTxHash) ⇒ `String` ⏏
 
 <a id="exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.calculateFee"></a>
@@ -106,7 +106,7 @@ Build transaction hash
 
 <a id="exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.unpackTx"></a>
 
-### exports.unpackTx(encodedTx, fromRlpBinary) ⇒ `Object` ⏏
+### exports.unpackTx(encodedTx, fromRlpBinary, prefix) ⇒ `Object` ⏏
 Unpack transaction hash
 
 **Kind**: Exported function  
@@ -116,6 +116,7 @@ Unpack transaction hash
 | --- | --- | --- |
 | encodedTx | `String` \| `Array` | String or RLP encoded transaction array (if fromRlpBinary flag is true) |
 | fromRlpBinary | `Boolean` | Unpack from RLP encoded transaction (default: false) |
+| prefix | `String` | Prefix of data |
 
 <a id="exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.buildTxHash"></a>
 

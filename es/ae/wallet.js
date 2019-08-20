@@ -31,6 +31,7 @@ import Rpc from '../rpc/server'
 import * as R from 'ramda'
 import Tx from '../tx/tx'
 import Contract from './contract'
+import GeneralizeAccount from '../contract/ga'
 
 const contains = R.flip(R.contains)
 const isTxMethod = contains(Tx.compose.deepConfiguration.Ae.methods)
@@ -129,7 +130,7 @@ async function rpcAddress ({ params, session }) {
   onContract: confirm
 })
  */
-const Wallet = Ae.compose(Accounts, Chain, Tx, Contract, Rpc, {
+const Wallet = Ae.compose(Accounts, Chain, Tx, Contract, GeneralizeAccount, Rpc, {
   init ({ onTx = this.onTx, onChain = this.onChain, onAccount = this.onAccount, onContract = this.onContract }, { stamp }) {
     this.onTx = onTx
     this.onChain = onChain

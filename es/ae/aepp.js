@@ -25,6 +25,7 @@
 import Ae from './'
 import Aens from './aens'
 import Rpc from '../rpc/client'
+import GeneralizeAccount from '../contract/ga'
 import { Contract } from './contract'
 
 /**
@@ -39,6 +40,6 @@ import { Contract } from './contract'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Aepp instance
  */
-const Aepp = Ae.compose(Contract, Aens, Rpc)
+const Aepp = Ae.compose(Contract, Aens, GeneralizeAccount, Rpc)
 
 export default Aepp

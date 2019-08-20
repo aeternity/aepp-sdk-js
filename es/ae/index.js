@@ -40,10 +40,18 @@ import { BigNumber } from 'bignumber.js'
  * @param {Object} [options.verify] verify - Verify transaction before broadcast, throw error if not valid
  * @return {String|String} Transaction or transaction hash
  */
-async function send (tx, options) {
+async function send (tx, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const signed = await this.signTransaction(tx, opt)
-  return this.sendTransaction(signed, opt)
+  const { contractId: gaId, authFun } = await this.getAccount(await this.address(opt))
+  const signed = gaId
+    ? await this.signUsingGA(tx, { ...opt, authFun })
+    : await this.signTransaction(tx, options)
+  return this.sendTransaction(signed, options)
+}
+
+async function signUsingGA (tx, options = {}) {
+  const { authData, authFun } = options
+  return this.createMetaTx(tx, authData, authFun, options)
 }
 
 /**
@@ -124,8 +132,9 @@ function destroyInstance () {
  * @return {Object} Ae instance
  */
 const Ae = stampit(Tx, Account, Chain, {
-  methods: { send, spend, transferFunds, destroyInstance },
-  deepProps: { Ae: { defaults: {} } }
+  methods: { send, spend, transferFunds, destroyInstance, signUsingGA },
+  deepProps: { Ae: { defaults: {} } },
+  deepConfiguration: { Ae: { methods: ['signUsingGA'] } }
 })
 
 export default Ae
