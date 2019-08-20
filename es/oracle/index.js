@@ -23,7 +23,7 @@
  */
 
 import { required } from '@stamp/required'
-import { NodePool } from '../node-pool'
+import stampit from '@stamp/it'
 
 /**
  * Basic Oracle Stamp
@@ -37,7 +37,7 @@ import { NodePool } from '../node-pool'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Oracle instance
  */
-const OracleBase = NodePool.compose({
+const OracleBase = stampit({
   deepConf: {
     Contract: {
       methods: [

@@ -33,7 +33,6 @@ import { NodePool } from '../node-pool'
 async function spendTx ({ senderId, recipientId, amount, payload = '' }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
   const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.spend, { senderId, ...R.head(arguments), payload })
-
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? buildTx(R.merge(R.head(arguments), {
@@ -338,6 +337,18 @@ async function channelSnapshotSoloTx ({ channelId, fromId, payload }) {
   return tx
 }
 
+async function gaAttachTx ({ ownerId, code, vmVersion, abiVersion, authFun, gas, gasPrice = MIN_GAS_PRICE, callData }) {
+  // Get VM_ABI version
+  const ctVersion = this.getVmVersion(TX_TYPE.contractCreate, R.head(arguments))
+  // Calculate fee, get absolute ttl (ttl + height), get account nonce
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.gaAttach, { senderId: ownerId, ...R.head(arguments), ctVersion, gasPrice })
+  // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
+  return {
+    ...buildTx(R.merge(R.head(arguments), { nonce, ttl, fee, ctVersion, gasPrice }), TX_TYPE.gaAttach),
+    contractId: buildContractId(ownerId, nonce)
+  }
+}
+
 /**
  * Validated vm/abi version or get default based on transaction type and NODE version
  *
@@ -401,10 +412,16 @@ async function getAccountNonce (accountId, nonce) {
  * @return {Object} { ttl, nonce, fee } Object with account nonce, absolute ttl and transaction fee
  */
 async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, gas, absoluteTtl }) {
-  const nonce = await this.getAccountNonce(senderId, n)
+  const account = await this.getAccount(senderId).catch(e => ({ nonce: 0 }))
+  // Is GA account
+  if (account.contractId) {
+    n = 0
+  } else {
+    n = n || (account.nonce + 1)
+  }
   const ttl = await (calculateTtl.bind(this)(t, !absoluteTtl))
-  const fee = calculateFee(f, txType, { showWarning: this.showWarning, gas, params: R.merge(R.last(arguments), { nonce, ttl }) })
-  return { fee, ttl, nonce }
+  const fee = calculateFee(f, txType, { showWarning: this.showWarning, gas, params: R.merge(R.last(arguments), { nonce: n, ttl }) })
+  return { fee, ttl, nonce: n }
 }
 
 /**
@@ -455,6 +472,7 @@ const Transaction = NodePool.compose(Tx, {
     channelSlashTx,
     channelSettleTx,
     channelSnapshotSoloTx,
+    gaAttachTx,
     getAccountNonce,
     getVmVersion
   }
