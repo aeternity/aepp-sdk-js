@@ -62,6 +62,18 @@ describe('MemoryAccount', function () {
         e.message.should.be.equal('Public Key must be a base58c string with "ak_" prefix')
       }
     })
+    it('Fail on invalid publicKey', async () => {
+      try {
+        MemoryAccount({
+          keypair: {
+            publicKey: generateKeyPair().publicKey,
+            secretKey: testAcc.secretKey
+          }
+        })
+      } catch (e) {
+        e.message.should.be.equal('Invalid Key Pair')
+      }
+    })
   })
   it('Init with secretKey as hex string', async () => {
     const acc = MemoryAccount({
