@@ -76,6 +76,13 @@ function deserializeField (value, type, prefix) {
         case '2': return 'revert'
         default: return value
       }
+    case FIELD_TYPES.sophiaCodeTypeInfo:
+      return value
+        .reduce(
+          (acc, [funHash, fnName, argType, outType]) =>
+            ({ ...acc, [fnName.toString()]: { funHash, argType, outType } }),
+          {}
+        )
     default:
       return value
   }
@@ -123,7 +130,6 @@ function serializeField (value, type, prefix) {
 
 function validateField (value, key, type, prefix) {
   const assert = (valid, params) => valid ? {} : { [key]: VALIDATION_MESSAGE[type](params) }
-
   // All fields are required
   if (value === undefined || value === null) return { [key]: 'Field is required' }
 
@@ -343,10 +349,11 @@ export function buildTx (params, type, { excludeKeys = [], prefix = 'tx' } = {})
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param {String|Array} encodedTx String or RLP encoded transaction array (if fromRlpBinary flag is true)
  * @param {Boolean} fromRlpBinary Unpack from RLP encoded transaction (default: false)
+ * @param {String} prefix - Prefix of data
  * @return {Object} { tx, rlpEncoded, binary } Object with tx -> Object with transaction param's, rlp encoded transaction and binary transaction
  */
-export function unpackTx (encodedTx, fromRlpBinary = false) {
-  const rlpEncoded = fromRlpBinary ? encodedTx : decode(encodedTx, 'tx')
+export function unpackTx (encodedTx, fromRlpBinary = false, prefix = 'tx') {
+  const rlpEncoded = fromRlpBinary ? encodedTx : decode(encodedTx, prefix)
   const binary = rlp.decode(rlpEncoded)
 
   const objId = readInt(binary[0])
