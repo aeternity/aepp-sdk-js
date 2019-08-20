@@ -44,7 +44,7 @@ const Chain = NodePool.compose(Oracle, {
     Ae: {
       methods: [
         'sendTransaction', 'height', 'awaitHeight', 'poll', 'balance', 'tx',
-        'mempool', 'topBlock', 'getTxInfo', 'txDryRun', 'getName', 'getNodeInfo'
+        'mempool', 'topBlock', 'getTxInfo', 'txDryRun', 'getName', 'getNodeInfo', 'getAccount'
       ]
     }
   }
@@ -59,7 +59,8 @@ const Chain = NodePool.compose(Oracle, {
     tx: required,
     getTxInfo: required,
     mempool: required,
-    txDryRun: required
+    txDryRun: required,
+    getAccount: required
   }
 }))
 

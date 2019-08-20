@@ -100,8 +100,8 @@ Register oracle
 | responseFormat | `String` |  | Format of query response |
 | [options] | `Object` | <code>{}</code> | Options |
 | [options.queryFee] | `String` \| `Number` |  | queryFee Oracle query Fee |
-| [options.oracleTtl] | `String` \| `Number` |  | oracleTtl OracleTtl object {type: 'delta|block', value: 'number'} |
-| [options.vmVersion] | `Number` |  | vmVersion Always 0 (do not use virtual machine) |
+| [options.oracleTtl] | `Object` |  | oracleTtl OracleTtl object {type: 'delta|block', value: 'number'} |
+| [options.abiVersion] | `Number` |  | abiVersion Always 0 (do not use virtual machine) |
 | [options.fee] | `Number` |  | fee Transaction fee |
 | [options.ttl] | `Number` |  | Transaction time to leave |
 
