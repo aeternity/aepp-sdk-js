@@ -25,7 +25,7 @@
  */
 import * as R from 'ramda'
 
-import { Contract } from '../../ae/contract'
+import { ContractAPI } from '../../ae/contract'
 import { ABI_VERSIONS, TX_TYPE } from '../../tx/builder/schema'
 import { buildTx } from '../../tx/builder'
 import { getContractAuthFan, prepareGaParams, wrapInEmptySignedTx } from './helpers'
@@ -50,7 +50,7 @@ import { assertedType, decodeBase64Check } from '../../utils/crypto'
  * // or
  * await client.spend(10000, receiverPub, { authData: { source: authContract, args: [...authContractArgs] } }) // sdk will prepare callData itself
  */
-export const GeneralizeAccount = Contract.compose({
+export const GeneralizeAccount = ContractAPI.compose({
   methods: {
     createGeneralizeAccount,
     createMetaTx,
