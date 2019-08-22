@@ -89,7 +89,7 @@
     "safe-buffer": "^5.1.2",
     "sinon": "^7.3.2",
     "source-map": "^0.7.3",
-    "standard": "^12.0.1",
+    "standard": "^14.0.1",
     "standard-loader": "^7.0.0",
     "supports-color": "^7.0.0",
     "uglify-es": "^3.3.9",
