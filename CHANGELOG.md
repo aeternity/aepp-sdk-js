@@ -1,3 +1,17 @@
+## [4.5.1](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.5.1) (2019-08-22)
+
+
+
+### Refactor
+* **Example**  Add node info to AEPP (#620)
+
+
+### Bug Fixes
+
+* **GA** Fix GA account composition
+
+
+
 # [4.5.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.5.0) (2019-08-20)
 
 

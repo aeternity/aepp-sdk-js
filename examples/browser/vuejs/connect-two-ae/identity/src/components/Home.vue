@@ -56,8 +56,8 @@
         client: null,
         balance: null,
         height: null,
-        url: 'https://sdk-testnet.aepps.com',
-        internalUrl: 'https://sdk-testnet.aepps.com',
+        url: 'http://localhost:3013',
+        internalUrl: 'http://localhost:3113',
         compilerUrl: 'https://compiler.aepps.com',
         aeppUrl: '//0.0.0.0:9001'
       }
