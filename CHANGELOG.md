@@ -1,3 +1,38 @@
+# [4.5.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.5.0) (2019-08-20)
+
+
+### Bug Fixes
+
+* **Crypto:** Fix `keypair` verification ([#605](https://github.com/aeternity/aepp-sdk-js/issues/605)) ([83a52fb](https://github.com/aeternity/aepp-sdk-js/commit/83a52fb))
+* **RPC:** Remove NodePool stamp from AE composition ([#612](https://github.com/aeternity/aepp-sdk-js/issues/612)) ([21af2eb](https://github.com/aeternity/aepp-sdk-js/commit/21af2eb))
+* **state channels:** add missing argument in onOnChainTx callback ([#604](https://github.com/aeternity/aepp-sdk-js/issues/604)) ([165cfe8](https://github.com/aeternity/aepp-sdk-js/commit/165cfe8))
+* **state channels:** fix awaitingOnChainTx state handler ([#608](https://github.com/aeternity/aepp-sdk-js/issues/608)) ([8b7b65a](https://github.com/aeternity/aepp-sdk-js/commit/8b7b65a))
+* **Swagger:** Always throw error from `axios` error handler ([#607](https://github.com/aeternity/aepp-sdk-js/issues/607)) ([0e5cf61](https://github.com/aeternity/aepp-sdk-js/commit/0e5cf61))
+
+
+### Features
+
+* **MemoryAccount:** Add validation of keypair ([#594](https://github.com/aeternity/aepp-sdk-js/issues/594)) ([b8c2b20](https://github.com/aeternity/aepp-sdk-js/commit/b8c2b20))
+* **state channels:** handle BigNumbers with json-bigint ([#596](https://github.com/aeternity/aepp-sdk-js/issues/596)) ([14eaa3d](https://github.com/aeternity/aepp-sdk-js/commit/14eaa3d))
+* **state channels:** send generic messages immediately ([#600](https://github.com/aeternity/aepp-sdk-js/issues/600)) ([8ad7583](https://github.com/aeternity/aepp-sdk-js/commit/8ad7583))
+* **Generalize Account**  Implement Generalized account support ([#449](https://github.com/aeternity/aepp-sdk-js/pull/449))
+    ```js
+    const authContract = `YOUR_AUTH_CONTRACT`
+
+    // Make current account Generalized
+    await client.createGeneralizeAccount(authFnName, authContract, [...authFnArguments]
+    
+    // Make spend transaction using GA
+    // One Way
+        // encoded call data for auth contract
+        const callData = 'cb_...'
+        await client.spend(10000, receiverPub, { authData: { callData } })
+    
+    // or
+        // sdk will prepare callData itself
+        await client.spend(10000, receiverPub, { authData: { source: authContract, args: [...authContractArgs] } })
+    ```
+
 # [4.4.0](https://github.com/aeternity/aepp-sdk-js/compare/4.3.0...4.4.0) (2019-08-09)
 
 
