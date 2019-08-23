@@ -25,13 +25,6 @@ export function getFunctionACI (aci, name) {
  * @return {Object} Contract instance methods
  */
 export const buildContractMethods = (instance) => () => ({
-  ...instance.aci ? {
-    init () {
-      const { arguments: aciArgs } = getFunctionACI(instance.aci, 'init')
-      const { opt, args } = parseArguments(aciArgs)(arguments)
-      return instance.deploy(args, opt)
-    }
-  } : {},
   ...instance.aci
     ? instance
       .aci
@@ -60,7 +53,28 @@ export const buildContractMethods = (instance) => () => ({
         }),
         {}
       )
-    : {}
+    : {},
+  ...instance.aci ? {
+    init: Object.assign(
+      function () {
+        const { arguments: aciArgs } = getFunctionACI(instance.aci, 'init')
+        const { opt, args } = parseArguments(aciArgs)(arguments)
+        return instance.deploy(args, opt)
+      },
+      {
+        get () {
+          const { arguments: aciArgs } = getFunctionACI(instance.aci, 'init')
+          const { opt, args } = parseArguments(aciArgs)(arguments)
+          return instance.deploy(args, { ...opt, callStatic: true })
+        },
+        send () {
+          const { arguments: aciArgs } = getFunctionACI(instance.aci, 'init')
+          const { opt, args } = parseArguments(aciArgs)(arguments)
+          return instance.deploy(args, { ...opt, callStatic: false })
+        }
+      }
+    )
+  } : {},
 })
 
 const parseArguments = (aciArgs = []) => (args) => ({

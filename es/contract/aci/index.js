@@ -167,13 +167,22 @@ const call = ({ client, instance }) => async (fn, params = [], options = {}) => 
 const deploy = ({ client, instance }) => async (init = [], options = {}) => {
   const opt = R.merge(instance.options, options)
   const fnACI = getFunctionACI(instance.aci, 'init')
+  const source = opt.source || instance.source
 
   if (!instance.compiled) await instance.compile()
   init = !opt.skipArgsConvert ? await prepareArgsForEncode(fnACI, init) : init
 
-  const { owner, transaction, address, createdAt, result, rawTx } = await client.contractDeploy(instance.compiled, opt.source || instance.source, init, opt)
-  instance.deployInfo = { owner, transaction, address, createdAt, result, rawTx }
-  return instance.deployInfo
+  if (opt.callStatic) {
+    return client.contractCallStatic(source, null, 'init', init, {
+      top: opt.top,
+      options: opt,
+      bytecode: instance.compiled
+    })
+  } else {
+    const { owner, transaction, address, createdAt, result, rawTx } = await client.contractDeploy(instance.compiled, opt.source || instance.source, init, opt)
+    instance.deployInfo = { owner, transaction, address, createdAt, result, rawTx }
+    return instance.deployInfo
+  }
 }
 
 const compile = ({ client, instance }) => async () => {
