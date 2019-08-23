@@ -23,8 +23,6 @@ import * as R from 'ramda'
 
 const identityContract = `
 contract Identity =
-  record state = { value: string }
-  entrypoint init(value) : state = { value = value }
   entrypoint main(x : int) = x
 `
 const stateContract = `
@@ -112,13 +110,13 @@ describe('Contract', function () {
   })
 
   it('deploy static compiled contract', async () => {
-    const res = await bytecode.deployStatic(['"test"'])
+    const res = await bytecode.deployStatic()
     res.result.should.have.property('gasUsed')
     res.result.should.have.property('returnType')
   })
 
   it('deploys compiled contracts', async () => {
-    deployed = await bytecode.deploy()
+    deployed = await bytecode.deploy([])
     return deployed.should.have.property('address')
   })
 
@@ -136,7 +134,7 @@ describe('Contract', function () {
 
   it('Call-Static deploy transaction', async () => {
     const compiled = bytecode.bytecode
-    const res = await contract.contractCallStatic(identityContract, null, 'init', ['"test"'], { bytecode: compiled })
+    const res = await contract.contractCallStatic(identityContract, null, 'init', [], { bytecode: compiled })
     res.result.should.have.property('gasUsed')
     res.result.should.have.property('returnType')
   })
