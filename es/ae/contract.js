@@ -126,7 +126,7 @@ async function contractCallStatic (source, address, name, args = [], { top, opti
 
   if (name === 'init') {
     // Prepare deploy transaction
-    const { tx, contractId } = await this.contractCreateTx(R.merge(opt, {
+    const { tx } = await this.contractCreateTx(R.merge(opt, {
       callData,
       code: bytecode,
       ownerId: callerId,

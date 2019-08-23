@@ -74,7 +74,7 @@ export const buildContractMethods = (instance) => () => ({
         }
       }
     )
-  } : {},
+  } : {}
 })
 
 const parseArguments = (aciArgs = []) => (args) => ({
