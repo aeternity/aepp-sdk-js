@@ -46,10 +46,11 @@ async function send (tx, options = {}) {
   // const { contractId: gaId, authFun } = await this.getAccount(await this.address(opt))
   // const signed = gaId
   //   ? await this.signUsingGA(tx, { ...opt, authFun })
-  const signed = await this.signTransaction(tx, options)
-  return this.sendTransaction(signed, options)
+  const signed = await this.signTransaction(tx, opt)
+  return this.sendTransaction(signed, opt)
 }
 
+// eslint-disable-next-line no-unused-vars
 async function signUsingGA (tx, options = {}) {
   const { authData, authFun } = options
   return this.createMetaTx(tx, authData, authFun, options)
