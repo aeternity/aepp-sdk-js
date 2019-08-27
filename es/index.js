@@ -16,6 +16,7 @@
  */
 
 import * as Crypto from './utils/crypto'
+import * as Bytes from './utils/bytes'
 import * as TxBuilder from './tx/builder'
 import * as TxBuilderHelper from './tx/builder/helpers'
 import HdWallet from './utils/hd-wallet'
@@ -33,6 +34,7 @@ import Accounts from './accounts'
 import MemoryAccount from './account/memory'
 import Aens from './ae/aens'
 import Contract from './ae/contract'
+import GeneralizeAccount from './contract/ga'
 import ContractCompilerAPI from './contract/compiler'
 import Wallet from './ae/wallet'
 import Aepp from './ae/aepp'
@@ -49,6 +51,7 @@ export {
   Ae,
   Aens,
   Aepp,
+  Bytes,
   Contract,
   ContractCompilerAPI,
   ContractACI,
@@ -56,6 +59,7 @@ export {
   Channel,
   Crypto,
   Chain,
+  GeneralizeAccount,
   HdWallet,
   MemoryAccount,
   Node,

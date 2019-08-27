@@ -65,11 +65,15 @@ const OBJECT_TAG_CHANNELS_TREE = 623
 const OBJECT_TAG_NAMESERVICE_TREE = 624
 const OBJECT_TAG_ORACLES_TREE = 625
 const OBJECT_TAG_ACCOUNTS_TREE = 626
+const OBJECT_TAG_GA_ATTACH = 80
+const OBJECT_TAG_GA_META = 81
+const OBJECT_TAG_SOPHIA_BYTE_CODE = 70
 
 const TX_FIELD = (name, type, prefix) => [name, type, prefix]
 const TX_SCHEMA_FIELD = (schema, objectId) => [schema, objectId]
 
 export const MIN_GAS_PRICE = 1000000000 // min gasPrice 1e9
+export const MAX_AUTH_FUN_GAS = 50000 // min gasPrice 1e9
 
 const revertObject = (obj) => Object.entries(obj).reduce((acc, [key, v]) => (acc[v] = key) && acc, {})
 
@@ -137,7 +141,11 @@ export const TX_TYPE = {
   channelsTree: 'channelsTree',
   nameserviceTree: 'nameserviceTree',
   oraclesTree: 'oraclesTree',
-  accountsTree: 'accountsTree'
+  accountsTree: 'accountsTree',
+  // GA ACCOUNTS
+  gaAttach: 'gaAttach',
+  gaMeta: 'gaMeta',
+  sophiaByteCode: 'sophiaByteCode'
 }
 
 // # see https://github.com/aeternity/protocol/blob/minerva/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain
@@ -146,7 +154,8 @@ export const VM_VERSIONS = {
   SOPHIA: 1,
   SOLIDITY: 2,
   SOPHIA_IMPROVEMENTS_MINERVA: 3,
-  SOPHIA_IMPROVEMENTS_FORTUNA: 4
+  SOPHIA_IMPROVEMENTS_FORTUNA: 4,
+  SOPHIA_IMPROVEMENTS_LIMA: 5
 }
 // # see https://github.com/aeternity/protocol/blob/minerva/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain
 export const ABI_VERSIONS = {
@@ -173,13 +182,21 @@ export const VM_ABI_MAP_FORTUNA = {
   [TX_TYPE.oracleRegister]: { vmVersion: [], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA] }
 }
 
+export const VM_ABI_MAP_LIMA = {
+  [TX_TYPE.contractCreate]: { vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_LIMA], abiVersion: [ABI_VERSIONS.SOPHIA] },
+  [TX_TYPE.contractCall]: { vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_LIMA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA, VM_VERSIONS.SOPHIA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA], abiVersion: [ABI_VERSIONS.SOPHIA] },
+  [TX_TYPE.oracleRegister]: { vmVersion: [], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA] }
+}
+
 export const PROTOCOL_VM_ABI = {
   // Roma
   '1': VM_ABI_MAP_ROMA,
   // Minerva
   '2': VM_ABI_MAP_MINERVA,
   // Fortuna
-  '3': VM_ABI_MAP_FORTUNA
+  '3': VM_ABI_MAP_FORTUNA,
+  // Lima
+  '4': VM_ABI_MAP_LIMA
 }
 
 export const OBJECT_ID_TX_TYPE = {
@@ -227,7 +244,11 @@ export const OBJECT_ID_TX_TYPE = {
   [OBJECT_TAG_CHANNELS_TREE]: TX_TYPE.channelsTree,
   [OBJECT_TAG_NAMESERVICE_TREE]: TX_TYPE.nameserviceTree,
   [OBJECT_TAG_ORACLES_TREE]: TX_TYPE.oraclesTree,
-  [OBJECT_TAG_ACCOUNTS_TREE]: TX_TYPE.accountsTree
+  [OBJECT_TAG_ACCOUNTS_TREE]: TX_TYPE.accountsTree,
+  // GA Accounts
+  [OBJECT_TAG_GA_ATTACH]: TX_TYPE.gaAttach,
+  [OBJECT_TAG_GA_META]: TX_TYPE.gaMeta,
+  [OBJECT_TAG_SOPHIA_BYTE_CODE]: TX_TYPE.sophiaByteCode
 }
 
 export const FIELD_TYPES = {
@@ -249,6 +270,7 @@ export const FIELD_TYPES = {
   mptree: 'mptree',
   callReturnType: 'callReturnType',
   ctVersion: 'ctVersion',
+  sophiaCodeTypeInfo: 'sophiaCodeTypeInfo',
   payload: 'payload'
 }
 
@@ -261,8 +283,12 @@ export const KEY_BLOCK_INTERVAL = 3
 // MAP WITH FEE CALCULATION https://github.com/aeternity/protocol/blob/master/consensus/consensus.md#gas
 export const TX_FEE_BASE_GAS = (txType) => {
   switch (txType) {
+    // case TX_TYPE.gaMeta: // TODO investigate MetaTx calculation
+    case TX_TYPE.gaAttach:
     case TX_TYPE.contractCreate:
       return BigNumber(5 * BASE_GAS)
+    // Todo Implement meta tx fee calculation
+    case TX_TYPE.gaMeta:
     case TX_TYPE.contractCall:
       return BigNumber(30 * BASE_GAS)
     default:
@@ -323,6 +349,21 @@ const ACCOUNT_TX = [
   ...BASE_TX,
   TX_FIELD('nonce', FIELD_TYPES.int),
   TX_FIELD('balance', FIELD_TYPES.int)
+]
+
+export const CONTRACT_BYTE_CODE_MINERVA = [
+  ...BASE_TX,
+  TX_FIELD('sourceCodeHash', FIELD_TYPES.rawBinary),
+  TX_FIELD('typeInfo', FIELD_TYPES.sophiaCodeTypeInfo),
+  TX_FIELD('byteCode', FIELD_TYPES.rawBinary),
+  TX_FIELD('compilerVersion', FIELD_TYPES.string)
+]
+
+export const CONTRACT_BYTE_CODE_ROMA = [
+  ...BASE_TX,
+  TX_FIELD('sourceCodeHash', FIELD_TYPES.rawBinary),
+  TX_FIELD('typeInfo', FIELD_TYPES.sophiaCodeTypeInfo),
+  TX_FIELD('byteCode', FIELD_TYPES.rawBinary)
 ]
 
 const ACCOUNT_TX_2 = [
@@ -410,6 +451,32 @@ const CONTRACT_TX = [
   TX_FIELD('active', FIELD_TYPES.bool),
   TX_FIELD('referers', FIELD_TYPES.ids, 'ak'),
   TX_FIELD('deposit', FIELD_TYPES.int)
+]
+
+const GA_ATTACH_TX = [
+  ...BASE_TX,
+  TX_FIELD('ownerId', FIELD_TYPES.id, 'ak'),
+  TX_FIELD('nonce', FIELD_TYPES.int),
+  TX_FIELD('code', FIELD_TYPES.binary, 'cb'),
+  TX_FIELD('authFun', FIELD_TYPES.rawBinary),
+  TX_FIELD('ctVersion', FIELD_TYPES.ctVersion),
+  TX_FIELD('fee', FIELD_TYPES.int),
+  TX_FIELD('ttl', FIELD_TYPES.int),
+  TX_FIELD('gas', FIELD_TYPES.int),
+  TX_FIELD('gasPrice', FIELD_TYPES.int),
+  TX_FIELD('callData', FIELD_TYPES.binary, 'cb')
+]
+
+const GA_META_TX = [
+  ...BASE_TX,
+  TX_FIELD('gaId', FIELD_TYPES.id, 'ak'),
+  TX_FIELD('authData', FIELD_TYPES.binary, 'cb'),
+  TX_FIELD('abiVersion', FIELD_TYPES.int),
+  TX_FIELD('fee', FIELD_TYPES.int),
+  TX_FIELD('gas', FIELD_TYPES.int),
+  TX_FIELD('gasPrice', FIELD_TYPES.int),
+  TX_FIELD('ttl', FIELD_TYPES.int),
+  TX_FIELD('tx', FIELD_TYPES.rlpBinary)
 ]
 
 const CONTRACT_CREATE_TX = [
@@ -874,6 +941,12 @@ export const TX_SERIALIZATION_SCHEMA = {
   },
   [TX_TYPE.accountsTree]: {
     1: TX_SCHEMA_FIELD(ACCOUNTS_TREE_TX, OBJECT_TAG_ACCOUNTS_TREE)
+  },
+  [TX_TYPE.gaAttach]: {
+    1: TX_SCHEMA_FIELD(GA_ATTACH_TX, OBJECT_TAG_GA_ATTACH)
+  },
+  [TX_TYPE.gaMeta]: {
+    1: TX_SCHEMA_FIELD(GA_META_TX, OBJECT_TAG_GA_META)
   }
 }
 
@@ -1003,6 +1076,16 @@ export const TX_DESERIALIZATION_SCHEMA = {
   },
   [OBJECT_TAG_ACCOUNTS_TREE]: {
     1: TX_SCHEMA_FIELD(ACCOUNTS_TREE_TX, OBJECT_TAG_ACCOUNTS_TREE)
+  },
+  [OBJECT_TAG_GA_ATTACH]: {
+    1: TX_SCHEMA_FIELD(GA_ATTACH_TX, OBJECT_TAG_GA_ATTACH)
+  },
+  [OBJECT_TAG_GA_META]: {
+    1: TX_SCHEMA_FIELD(GA_META_TX, OBJECT_TAG_GA_META)
+  },
+  [OBJECT_TAG_SOPHIA_BYTE_CODE]: {
+    1: TX_SCHEMA_FIELD(CONTRACT_BYTE_CODE_ROMA, OBJECT_TAG_SOPHIA_BYTE_CODE),
+    2: TX_SCHEMA_FIELD(CONTRACT_BYTE_CODE_MINERVA, OBJECT_TAG_SOPHIA_BYTE_CODE)
   }
 }
 

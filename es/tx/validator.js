@@ -133,7 +133,7 @@ async function unpackAndVerify (txHash, { networkId } = {}) {
 }
 
 const getOwnerPublicKey = (tx) =>
-  tx[['senderId', 'accountId', 'ownerId', 'callerId', 'oracleId', 'fromId', 'initiator'].find(key => tx[key])].replace('ok_', 'ak_')
+  tx[['senderId', 'accountId', 'ownerId', 'callerId', 'oracleId', 'fromId', 'initiator', 'gaId'].find(key => tx[key])].replace('ok_', 'ak_')
 
 /**
  * Verify transaction (verify nonce, ttl, fee, signature, account balance)

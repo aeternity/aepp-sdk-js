@@ -22,6 +22,39 @@
           {{height}}
         </div>
       </div>
+
+      <div v-if="nodeInfo" class="bg-green w-full flex flex-row font-mono border border-b">
+        <div class="p-2 w-1/4">
+          Url
+        </div>
+        <div class="p-2 w-3/4 bg-grey-lightest">
+          {{nodeInfo.url}}
+        </div>
+      </div>
+      <div v-if="nodeInfo" class="bg-green w-full flex flex-row font-mono border border-b">
+        <div class="p-2 w-1/4">
+          Name
+        </div>
+        <div class="p-2 w-3/4 bg-grey-lightest">
+          {{nodeInfo.name}}
+        </div>
+      </div>
+      <div v-if="nodeInfo" class="bg-green w-full flex flex-row font-mono border border-b">
+        <div class="p-2 w-1/4">
+          NetworkId
+        </div>
+        <div class="p-2 w-3/4 bg-grey-lightest">
+          {{nodeInfo.nodeNetworkId}}
+        </div>
+      </div>
+      <div v-if="nodeInfo" class="bg-green w-full flex flex-row font-mono border border-b">
+        <div class="p-2 w-1/4">
+          Version
+        </div>
+        <div class="p-2 w-3/4 bg-grey-lightest">
+          {{nodeInfo.version}}
+        </div>
+      </div>
     </div>
 
     <h2 class="mt-4">Spend tokens</h2>
@@ -156,6 +189,7 @@
         spendPayload: null,
         spendResult: null,
         spendError: null,
+        nodeInfo: null,
         contractCode: `contract Identity =
       type state = ()
       entrypoint main(x : int) = x`,
@@ -231,6 +265,7 @@
       })
       this.pub = await this.client.address()
       this.height = await this.client.height()
+      this.nodeInfo = await this.client.getNodeInfo()
     }
   }
 </script>
