@@ -48,7 +48,8 @@ const Tx = stampit({
         'spendTx', 'namePreclaimTx', 'nameClaimTx', 'nameTransferTx',
         'nameUpdateTx', 'nameRevokeTx', 'contractCreateTx', 'contractCallTx',
         'oracleRegisterTx', 'oracleExtendTx', 'oraclePostQueryTx', 'oracleRespondTx', 'getAccountNonce',
-        'channelCloseSoloTx', 'channelSlashTx', 'channelSettleTx', 'channelSnapshotSoloTx', 'gaAttachTx', 'getVmVersion', 'prepareTxParams'
+        'channelCloseSoloTx', 'channelSlashTx', 'channelSettleTx', 'channelSnapshotSoloTx', 'getVmVersion', 'prepareTxParams'
+        // 'gaAttachTx',
       ]
     }
   }
@@ -71,7 +72,7 @@ const Tx = stampit({
     channelSlashTx: required,
     channelSettleTx: required,
     channelSnapshotSoloTx: required,
-    gaAttachTx: required,
+    // gaAttachTx: required,
     getVmVersion: required,
     prepareTxParams: required
   }
