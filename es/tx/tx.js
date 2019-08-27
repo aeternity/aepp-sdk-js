@@ -473,7 +473,8 @@ const Transaction = ChainNode.compose(Tx, {
     channelSlashTx,
     channelSettleTx,
     channelSnapshotSoloTx,
-    gaAttachTx,
+    // GA
+    // gaAttachTx,
     getAccountNonce,
     getVmVersion
   }

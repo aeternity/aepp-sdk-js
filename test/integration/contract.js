@@ -23,7 +23,6 @@ import * as R from 'ramda'
 
 const identityContract = `
 contract Identity =
-  type state = ()
   entrypoint main(x : int) = x
 `
 const stateContract = `

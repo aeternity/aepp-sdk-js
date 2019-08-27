@@ -27,7 +27,6 @@ import Chain from '../chain/node'
 import Aens from './aens'
 import Transaction from '../tx/tx'
 import Oracle from './oracle'
-import GeneralizeAccount from '../contract/ga'
 import Accounts from '../accounts'
 import Contract from './contract'
 import NodePool from '../node-pool'
@@ -43,7 +42,7 @@ import NodePool from '../node-pool'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Universal instance
  */
-export const Universal = Ae.compose(Accounts, Chain, NodePool, Transaction, Aens, Contract, Oracle, GeneralizeAccount, {
+export const Universal = Ae.compose(Accounts, Chain, NodePool, Transaction, Aens, Contract, Oracle, {
   init () {},
   props: { process: {} }
 })
