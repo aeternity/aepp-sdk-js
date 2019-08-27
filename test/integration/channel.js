@@ -30,8 +30,7 @@ plan(BigNumber('1000e18').toString())
 
 const identityContract = `
 contract Identity =
-  type state = ()
-  entrypoint main(x : int) = x
+  entrypoint main(x : int): int = x
 `
 
 function waitForChannel (channel) {
