@@ -78,7 +78,7 @@ async function compileContractAPI (code, options = {}) {
 
 async function contractGetACI (code, options = {}) {
   this.isInit()
- options = { ...this.compilerOptions, ...options }
+  options = { ...this.compilerOptions, ...options }
   return this.http.post('/aci', { code, options }, options)
 }
 

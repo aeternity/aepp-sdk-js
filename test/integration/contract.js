@@ -23,7 +23,6 @@ import * as R from 'ramda'
 
 const identityContract = `
 contract Identity =
-  type state = ()
   entrypoint main(x : int) = x
 `
 const stateContract = `
@@ -89,7 +88,7 @@ const encodedNumberSix = 'cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaKNdnK'
 
 plan('1000000000000000000000')
 
-describe('Contract', function () {
+describe.only('Contract', function () {
   configure(this)
 
   let contract
