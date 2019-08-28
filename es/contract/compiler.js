@@ -78,13 +78,13 @@ async function contractGetACI (code, options = {}) {
   return this.http.post('/aci', { code, options }, options)
 }
 
-async function setCompilerUrl (url, { forceCompatibility }) {
+async function setCompilerUrl (url, { forceCompatibility } = {}) {
   this.http.changeBaseUrl(url)
   this.compilerVersion = null
   await this.checkCompatibility({ forceCompatibility })
 }
 
-async function checkCompatibility ({ force = false, forceCompatibility = false }) {
+async function checkCompatibility ({ force = false, forceCompatibility = false } = {}) {
   this.compilerVersion = await this.getCompilerVersion().catch(e => null)
   if (!this.compilerVersion && !force) throw new Error('Compiler do not respond')
   if (!forceCompatibility && this.compilerVersion && !semverSatisfies(this.compilerVersion.split('-')[0], COMPILER_GE_VERSION, COMPILER_LT_VERSION)) {
