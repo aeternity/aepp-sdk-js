@@ -29,7 +29,8 @@ const authContract = `contract BlindAuth =
             None          => abort("Not in Auth context")
             Some(tx_hash) => true
 `
-describe('Generalize Account', function () {
+// Todo Enable GA
+describe.skip('Generalize Account', function () {
   configure(this)
 
   let client
