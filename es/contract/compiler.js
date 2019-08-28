@@ -78,16 +78,16 @@ async function contractGetACI (code, options = {}) {
   return this.http.post('/aci', { code, options }, options)
 }
 
-async function setCompilerUrl (url) {
+async function setCompilerUrl (url, { forceCompatibility }) {
   this.http.changeBaseUrl(url)
   this.compilerVersion = null
-  await this.checkCompatibility()
+  await this.checkCompatibility({ forceCompatibility })
 }
 
-async function checkCompatibility (force = false) {
+async function checkCompatibility ({ force = false, forceCompatibility = false }) {
   this.compilerVersion = await this.getCompilerVersion().catch(e => null)
   if (!this.compilerVersion && !force) throw new Error('Compiler do not respond')
-  if (this.compilerVersion && !semverSatisfies(this.compilerVersion.split('-')[0], COMPILER_GE_VERSION, COMPILER_LT_VERSION)) {
+  if (!forceCompatibility && this.compilerVersion && !semverSatisfies(this.compilerVersion.split('-')[0], COMPILER_GE_VERSION, COMPILER_LT_VERSION)) {
     const version = this.compilerVersion
     this.compilerVersion = null
     throw new Error(`Unsupported compiler version ${version}. ` +
@@ -113,9 +113,9 @@ function isInit () {
  * @example ContractCompilerAPI({ compilerUrl: 'COMPILER_URL' })
  */
 const ContractCompilerAPI = AsyncInit.compose(ContractBase, {
-  async init ({ compilerUrl = this.compilerUrl }) {
+  async init ({ compilerUrl = this.compilerUrl, forceCompatibility = false }) {
     this.http = Http({ baseUrl: compilerUrl })
-    await this.checkCompatibility(true)
+    await this.checkCompatibility({ force: true, forceCompatibility })
   },
   methods: {
     contractEncodeCallDataAPI,
