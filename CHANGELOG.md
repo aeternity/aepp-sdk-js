@@ -1,19 +1,21 @@
 # [4.6.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.6.0) (2019-08-28)
 
-### Bug Fixes
-* **Compiler:** Fix `forceCompatibility` option ([26beba8](https://github.com/aeternity/aepp-sdk-js/commit/26beba8))
-* **GA:** Disable GA ([#631](https://github.com/aeternity/aepp-sdk-js/issues/631)) ([26beba8](https://github.com/aeternity/aepp-sdk-js/commit/26beba8))
 
+
+### Bug Fixes
+
+* **Compiler:** Fix `forceCompatibility` option ([26beba8](https://github.com/aeternity/aepp-sdk-js/commit/26beba8))
 
 
 ### Features
 
 * **Lima**: add preliminary support for lima
 * **ACI/Contract:** Implement static-call for deploy transaction for ACI methods/Contract low lvl API ([#630](https://github.com/aeternity/aepp-sdk-js/issues/630)) ([5b7eeb4](https://github.com/aeternity/aepp-sdk-js/commit/5b7eeb4))
-* **GA:** Disable GA ([#631](https://github.com/aeternity/aepp-sdk-js/issues/631)) ([26beba8](https://github.com/aeternity/aepp-sdk-js/commit/26beba8))
+
 
 ### Notes
 
+**GA support has been disabled until further notice due to node compatibility issues**
 **This version support aeternity node up to 5.0.0-rc.1**
 
 
