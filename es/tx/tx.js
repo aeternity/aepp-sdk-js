@@ -474,7 +474,7 @@ const Transaction = ChainNode.compose(Tx, {
     channelSlashTx,
     channelSettleTx,
     channelSnapshotSoloTx,
-    // GA
+    // Todo Enable GA
     // gaAttachTx,
     getAccountNonce,
     getVmVersion

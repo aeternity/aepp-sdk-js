@@ -27,6 +27,8 @@ import Aens from './aens'
 import Rpc from '../rpc/client'
 import { ContractAPI } from './contract'
 import Oracle from './oracle'
+// Todo Enable GA
+// import GeneralizeAccount from '../contract/ga'
 
 /**
  * Aepp Stamp

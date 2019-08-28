@@ -27,6 +27,8 @@ import Chain from '../chain/node'
 import Aens from './aens'
 import Transaction from '../tx/tx'
 import Oracle from './oracle'
+// Todo Enable GA
+// import GeneralizeAccount from '../contract/ga'
 import Accounts from '../accounts'
 import Contract from './contract'
 import NodePool from '../node-pool'

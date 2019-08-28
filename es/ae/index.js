@@ -42,7 +42,7 @@ import { BigNumber } from 'bignumber.js'
  */
 async function send (tx, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  // GA
+  // Todo Enable GA
   // const { contractId: gaId, authFun } = await this.getAccount(await this.address(opt))
   // const signed = gaId
   //   ? await this.signUsingGA(tx, { ...opt, authFun })
@@ -50,6 +50,7 @@ async function send (tx, options = {}) {
   return this.sendTransaction(signed, opt)
 }
 
+// Todo Enable GA
 // eslint-disable-next-line no-unused-vars
 async function signUsingGA (tx, options = {}) {
   const { authData, authFun } = options
@@ -136,7 +137,7 @@ function destroyInstance () {
 const Ae = stampit(Tx, Account, Chain, {
   methods: { send, spend, transferFunds, destroyInstance },
   deepProps: { Ae: { defaults: {} } }
-  // GA
+  // Todo Enable GA
   // deepConfiguration: { Ae: { methods: ['signUsingGA'] } }
 })
 
