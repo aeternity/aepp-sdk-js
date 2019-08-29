@@ -7,8 +7,8 @@
         <div class="p-2 w-1/4">
           Public Key <small>(from Wallet Aepp)</small>
         </div>
-        <div v-if="pub" class="p-2 w-3/4 bg-grey-lightest break-words">
-          {{pub}}
+        <div v-if="address" class="p-2 w-3/4 bg-grey-lightest break-words">
+          {{address | responseToString}}
         </div>
         <div v-else class="p-2 w-3/4 bg-grey-lightest break-words text-grey">
           Requesting Public Key from AE Wallet...
@@ -19,13 +19,21 @@
           Height
         </div>
         <div class="p-2 w-3/4 bg-grey-lightest">
-          {{height}}
+          {{height | responseToString}}
         </div>
       </div>
 
       <template v-if="nodeInfo">
+        <div v-if="nodeInfo.error" class="bg-green w-full flex flex-row font-mono border border-b">
+          <div class="p-2 w-1/4">
+            NodeInfo error
+          </div>
+          <div class="p-2 w-3/4 bg-grey-lightest break-words">
+            {{nodeInfo.error}}
+          </div>
+        </div>
         <div
-          v-for="(value, name) in nodeInfo"
+          v-for="(value, name) in nodeInfo.result"
           v-if="['url', 'name', 'nodeNetworkId', 'version'].includes(name)"
           class="bg-green w-full flex flex-row font-mono border border-b"
         >
@@ -159,13 +167,21 @@
   //  is a webpack alias present in webpack.config.js
   import { Aepp } from '@aeternity/aepp-sdk/es'
 
+  const errorAsField = async fn => {
+    try {
+      return { result: await fn }
+    } catch (error) {
+      return { error }
+    }
+  }
+
   export default {
     data () {
       return {
         runningInFrame: window.parent !== window,
         client: null,
         height: null,
-        pub: null,
+        address: null,
         spendTo: null,
         spendAmount: null,
         spendPayload: null,
@@ -183,6 +199,9 @@
         callResult: null,
         callError: null
       }
+    },
+    filters: {
+      responseToString: response => `${response.error ? 'Error: ' : ''}${response.result || response.error}`,
     },
     methods: {
       async spend () {
@@ -245,9 +264,9 @@
       this.client = await Aepp({
         parent: this.runningInFrame ? window.parent : await this.getReverseWindow()
       })
-      this.pub = await this.client.address()
-      this.height = await this.client.height()
-      this.nodeInfo = await this.client.getNodeInfo()
+      this.address = await errorAsField(this.client.address())
+      this.height = await errorAsField(this.client.height())
+      this.nodeInfo = await errorAsField(this.client.getNodeInfo())
     }
   }
 </script>
