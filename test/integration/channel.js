@@ -813,19 +813,6 @@ describe('Channel', function () {
       contract: contractAddress,
       abiVersion: 1
     })
-    console.log(result)
-    console.log('----------------')
-    console.log({
-      callerId: await initiator.address(),
-      callerNonce: result.callerNonce,
-      contractId: contractAddress,
-      gasPrice: result.gasPrice,
-      gasUsed: result.gasUsed,
-      height: result.height,
-      log: result.log,
-      returnType: 'ok',
-      returnValue: result.returnValue
-    })
     result.should.eql({
       callerId: await initiator.address(),
       callerNonce: result.callerNonce,
