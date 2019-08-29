@@ -154,7 +154,8 @@ export const VM_VERSIONS = {
   SOPHIA: 1,
   SOLIDITY: 2,
   SOPHIA_IMPROVEMENTS_MINERVA: 3,
-  SOPHIA_IMPROVEMENTS_FORTUNA: 4
+  SOPHIA_IMPROVEMENTS_FORTUNA: 4,
+  SOPHIA_IMPROVEMENTS_LIMA: 6
 }
 // # see https://github.com/aeternity/protocol/blob/minerva/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain
 export const ABI_VERSIONS = {
@@ -181,13 +182,21 @@ export const VM_ABI_MAP_FORTUNA = {
   [TX_TYPE.oracleRegister]: { vmVersion: [], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA] }
 }
 
+export const VM_ABI_MAP_LIMA = {
+  [TX_TYPE.contractCreate]: { vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_LIMA], abiVersion: [ABI_VERSIONS.SOPHIA] },
+  [TX_TYPE.contractCall]: { vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_LIMA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA, VM_VERSIONS.SOPHIA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA], abiVersion: [ABI_VERSIONS.SOPHIA] },
+  [TX_TYPE.oracleRegister]: { vmVersion: [], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA] }
+}
+
 export const PROTOCOL_VM_ABI = {
   // Roma
   1: VM_ABI_MAP_ROMA,
   // Minerva
   2: VM_ABI_MAP_MINERVA,
   // Fortuna
-  3: VM_ABI_MAP_FORTUNA
+  3: VM_ABI_MAP_FORTUNA,
+  // Lima
+  4: VM_ABI_MAP_LIMA
 }
 
 export const OBJECT_ID_TX_TYPE = {
