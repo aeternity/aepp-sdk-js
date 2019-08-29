@@ -23,38 +23,20 @@
         </div>
       </div>
 
-      <div v-if="nodeInfo" class="bg-green w-full flex flex-row font-mono border border-b">
-        <div class="p-2 w-1/4">
-          Url
+      <template v-if="nodeInfo">
+        <div
+          v-for="(value, name) in nodeInfo"
+          v-if="['url', 'name', 'nodeNetworkId', 'version'].includes(name)"
+          class="bg-green w-full flex flex-row font-mono border border-b"
+        >
+          <div class="p-2 w-1/4 capitalize">
+            {{name.replace('nodeNetworkId', 'NetworkId')}}
+          </div>
+          <div class="p-2 w-3/4 bg-grey-lightest">
+            {{value}}
+          </div>
         </div>
-        <div class="p-2 w-3/4 bg-grey-lightest">
-          {{nodeInfo.url}}
-        </div>
-      </div>
-      <div v-if="nodeInfo" class="bg-green w-full flex flex-row font-mono border border-b">
-        <div class="p-2 w-1/4">
-          Name
-        </div>
-        <div class="p-2 w-3/4 bg-grey-lightest">
-          {{nodeInfo.name}}
-        </div>
-      </div>
-      <div v-if="nodeInfo" class="bg-green w-full flex flex-row font-mono border border-b">
-        <div class="p-2 w-1/4">
-          NetworkId
-        </div>
-        <div class="p-2 w-3/4 bg-grey-lightest">
-          {{nodeInfo.nodeNetworkId}}
-        </div>
-      </div>
-      <div v-if="nodeInfo" class="bg-green w-full flex flex-row font-mono border border-b">
-        <div class="p-2 w-1/4">
-          Version
-        </div>
-        <div class="p-2 w-3/4 bg-grey-lightest">
-          {{nodeInfo.version}}
-        </div>
-      </div>
+      </template>
     </div>
 
     <h2 class="mt-4">Spend tokens</h2>
