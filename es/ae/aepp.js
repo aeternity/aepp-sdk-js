@@ -27,7 +27,8 @@ import Aens from './aens'
 import Rpc from '../rpc/client'
 import { ContractAPI } from './contract'
 import Oracle from './oracle'
-import GeneralizeAccount from '../contract/ga'
+// Todo Enable GA
+// import GeneralizeAccount from '../contract/ga'
 
 /**
  * Aepp Stamp
@@ -41,6 +42,6 @@ import GeneralizeAccount from '../contract/ga'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Aepp instance
  */
-const Aepp = Ae.compose(ContractAPI, Aens, Oracle, GeneralizeAccount, Rpc)
+const Aepp = Ae.compose(ContractAPI, Aens, Oracle, Rpc)
 
 export default Aepp

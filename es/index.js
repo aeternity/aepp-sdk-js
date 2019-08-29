@@ -34,7 +34,8 @@ import Accounts from './accounts'
 import MemoryAccount from './account/memory'
 import Aens from './ae/aens'
 import Contract from './ae/contract'
-import GeneralizeAccount from './contract/ga'
+// Todo Enable GA
+// import GeneralizeAccount from './contract/ga'
 import ContractCompilerAPI from './contract/compiler'
 import Wallet from './ae/wallet'
 import Aepp from './ae/aepp'
@@ -59,7 +60,8 @@ export {
   Channel,
   Crypto,
   Chain,
-  GeneralizeAccount,
+  // Todo Enable GA
+  // GeneralizeAccount,
   HdWallet,
   MemoryAccount,
   Node,
