@@ -23,10 +23,10 @@ plan('100000000000000000000')
 
 describe('Oracle', function () {
   configure(this)
-  let client;
-  let oracle;
-  let query;
-  let queryResponse = "{'tmp': 30}";
+  let client
+  let oracle
+  let query
+  let queryResponse = "{'tmp': 30}"
 
   before(async function () {
     client = await ready(this)
@@ -51,7 +51,7 @@ describe('Oracle', function () {
   })
 
   it('Poll for response for query without response', async () => {
-    return await query.pollForResponse({ attempts: 2, interval: 1000 }).should.be.rejectedWith(Error)
+    return query.pollForResponse({ attempts: 2, interval: 1000 }).should.be.rejectedWith(Error)
   })
 
   it('Respond to query', async () => {

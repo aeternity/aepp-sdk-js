@@ -10,6 +10,6 @@ export default (store) => {
       props: route => ({ query: route.query })
     }
   ]
-  const router = new Router({mode: 'history', routes: routes})
+  const router = new Router({ mode: 'history', routes: routes })
   return router
 }

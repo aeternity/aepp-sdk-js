@@ -51,6 +51,7 @@ function expandPath (path, replacements) {
 function lookupType (path, spec, types) {
   const type = (() => {
     const match = R.path(path, spec).match(/^#\/definitions\/(.+)/)
+    // eslint-disable-next-line no-void
     if (match !== void 0) {
       return match[1]
     } else {
@@ -117,7 +118,7 @@ const conformTypes = {
     if (R.type(value) === 'String') {
       return value
     } else {
-      throw TypeError(`Not a string`, spec, value)
+      throw TypeError('Not a string', spec, value)
     }
   },
   object (value, spec, types) {
@@ -132,14 +133,14 @@ const conformTypes = {
         return R.mapObjIndexed((value, key) => extendingErrorPath(key, () => conform(value, properties[key], types)), R.reject(R.isNil, R.pick(R.keys(properties), value)))
       }
     } else {
-      throw TypeError(`Not an object`, spec, value)
+      throw TypeError('Not an object', spec, value)
     }
   },
   array (value, spec, types) {
     if (R.type(value) === 'Array') {
       return value.map(o => conform(o, spec.items, types))
     } else {
-      throw TypeError(`Not an array`, spec, value)
+      throw TypeError('Not an array', spec, value)
     }
   },
   schema (value, spec, types) {
@@ -347,7 +348,7 @@ const operation = (path, method, definition, types, { config, errorHandler } = {
   config = config || {}
   delete config.transformResponse // Prevent of overwriting transform response
   const { operationId, description } = definition
-  let { parameters } = definition
+  const { parameters } = definition
   const name = `${R.head(operationId).toLowerCase()}${R.drop(1, operationId)}`
   const pascalized = pascalizeParameters(parameters)
 
