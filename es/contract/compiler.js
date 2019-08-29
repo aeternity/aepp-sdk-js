@@ -88,7 +88,7 @@ async function setCompilerUrl (url, { forceCompatibility = false } = {}) {
   await this.checkCompatibility({ forceCompatibility })
 }
 
-async function checkCompatibility ({ forceCompatibility = false, force = false }) {
+async function checkCompatibility ({ force = false, forceCompatibility = false } = {}) {
   this.compilerVersion = await this.getCompilerVersion().catch(e => null)
   if (!this.compilerVersion && !force) throw new Error('Compiler do not respond')
   if (!forceCompatibility && this.compilerVersion && !semverSatisfies(this.compilerVersion.split('-')[0], COMPILER_GE_VERSION, COMPILER_LT_VERSION)) {
@@ -119,7 +119,7 @@ const VM_TYPE = { FATE: 'fate', AEVM: 'aevm' }
  * @example ContractCompilerAPI({ compilerUrl: 'COMPILER_URL' })
  */
 const ContractCompilerAPI = AsyncInit.compose(ContractBase, {
-  async init ({ compilerUrl = this.compilerUrl, forceCompatibility }) {
+  async init ({ compilerUrl = this.compilerUrl, forceCompatibility = false }) {
     this.http = Http({ baseUrl: compilerUrl })
     await this.checkCompatibility({ force: true, forceCompatibility })
   },
