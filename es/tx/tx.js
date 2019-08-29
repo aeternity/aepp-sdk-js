@@ -23,12 +23,13 @@
  */
 
 import * as R from 'ramda'
+
+import ChainNode from '../chain/node'
 import Tx from './'
 
 import { buildTx, calculateFee } from './builder'
 import { MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE } from './builder/schema'
 import { buildContractId, oracleQueryId } from './builder/helpers'
-import { NodePool } from '../node-pool'
 
 async function spendTx ({ senderId, recipientId, amount, payload = '' }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
@@ -337,6 +338,7 @@ async function channelSnapshotSoloTx ({ channelId, fromId, payload }) {
   return tx
 }
 
+// eslint-disable-next-line no-unused-vars
 async function gaAttachTx ({ ownerId, code, vmVersion, abiVersion, authFun, gas, gasPrice = MIN_GAS_PRICE, callData }) {
   // Get VM_ABI version
   const ctVersion = this.getVmVersion(TX_TYPE.contractCreate, R.head(arguments))
@@ -445,7 +447,7 @@ async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, ga
  * @return {Object} Transaction instance
  * @example Transaction({url: 'https://sdk-testnet.aepps.com/'})
  */
-const Transaction = NodePool.compose(Tx, {
+const Transaction = ChainNode.compose(Tx, {
   init ({ nativeMode = true, showWarning = false }) {
     this.nativeMode = nativeMode
     this.showWarning = showWarning
@@ -472,7 +474,8 @@ const Transaction = NodePool.compose(Tx, {
     channelSlashTx,
     channelSettleTx,
     channelSnapshotSoloTx,
-    gaAttachTx,
+    // Todo Enable GA
+    // gaAttachTx,
     getAccountNonce,
     getVmVersion
   }

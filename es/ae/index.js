@@ -42,13 +42,16 @@ import { BigNumber } from 'bignumber.js'
  */
 async function send (tx, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const { contractId: gaId, authFun } = await this.getAccount(await this.address(opt))
-  const signed = gaId
-    ? await this.signUsingGA(tx, { ...opt, authFun })
-    : await this.signTransaction(tx, options)
-  return this.sendTransaction(signed, options)
+  // Todo Enable GA
+  // const { contractId: gaId, authFun } = await this.getAccount(await this.address(opt))
+  // const signed = gaId
+  //   ? await this.signUsingGA(tx, { ...opt, authFun })
+  const signed = await this.signTransaction(tx, opt)
+  return this.sendTransaction(signed, opt)
 }
 
+// Todo Enable GA
+// eslint-disable-next-line no-unused-vars
 async function signUsingGA (tx, options = {}) {
   const { authData, authFun } = options
   return this.createMetaTx(tx, authData, authFun, options)
@@ -132,9 +135,10 @@ function destroyInstance () {
  * @return {Object} Ae instance
  */
 const Ae = stampit(Tx, Account, Chain, {
-  methods: { send, spend, transferFunds, destroyInstance, signUsingGA },
-  deepProps: { Ae: { defaults: {} } },
-  deepConfiguration: { Ae: { methods: ['signUsingGA'] } }
+  methods: { send, spend, transferFunds, destroyInstance },
+  deepProps: { Ae: { defaults: {} } }
+  // Todo Enable GA
+  // deepConfiguration: { Ae: { methods: ['signUsingGA'] } }
 })
 
 export default Ae
