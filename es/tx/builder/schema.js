@@ -155,7 +155,6 @@ export const VM_VERSIONS = {
   SOLIDITY: 2,
   SOPHIA_IMPROVEMENTS_MINERVA: 3,
   SOPHIA_IMPROVEMENTS_FORTUNA: 4,
-  SOPHIA_FATE_LIMA: 5,
   SOPHIA_IMPROVEMENTS_LIMA: 6
 }
 // # see https://github.com/aeternity/protocol/blob/minerva/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain

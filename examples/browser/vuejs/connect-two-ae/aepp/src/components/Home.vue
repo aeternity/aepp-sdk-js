@@ -7,54 +7,44 @@
         <div class="p-2 w-1/4">
           Public Key <small>(from Wallet Aepp)</small>
         </div>
-        <div v-if="pub" class="p-2 w-3/4 bg-grey-lightest break-words">
-          {{pub}}
+        <div v-if="addressResponse" class="p-2 w-3/4 bg-grey-lightest break-words">
+          {{addressResponse | responseToString}}
         </div>
         <div v-else class="p-2 w-3/4 bg-grey-lightest break-words text-grey">
           Requesting Public Key from AE Wallet...
         </div>
       </div>
-      <div v-if="height" class="bg-green w-full flex flex-row font-mono border border-b">
+      <div v-if="heightResponse" class="bg-green w-full flex flex-row font-mono border border-b">
         <div class="p-2 w-1/4">
           Height
         </div>
         <div class="p-2 w-3/4 bg-grey-lightest">
-          {{height}}
+          {{heightResponse | responseToString}}
         </div>
       </div>
 
-      <div v-if="nodeInfo" class="bg-green w-full flex flex-row font-mono border border-b">
-        <div class="p-2 w-1/4">
-          Url
+      <template v-if="nodeInfoResponse">
+        <div v-if="nodeInfoResponse.error" class="bg-green w-full flex flex-row font-mono border border-b">
+          <div class="p-2 w-1/4">
+            NodeInfo error
+          </div>
+          <div class="p-2 w-3/4 bg-grey-lightest break-words">
+            {{nodeInfoResponse.error}}
+          </div>
         </div>
-        <div class="p-2 w-3/4 bg-grey-lightest">
-          {{nodeInfo.url}}
+        <div
+          v-for="(value, name) in nodeInfoResponse.result"
+          v-if="['url', 'name', 'nodeNetworkId', 'version'].includes(name)"
+          class="bg-green w-full flex flex-row font-mono border border-b"
+        >
+          <div class="p-2 w-1/4 capitalize">
+            {{name.replace('nodeNetworkId', 'NetworkId')}}
+          </div>
+          <div class="p-2 w-3/4 bg-grey-lightest">
+            {{value}}
+          </div>
         </div>
-      </div>
-      <div v-if="nodeInfo" class="bg-green w-full flex flex-row font-mono border border-b">
-        <div class="p-2 w-1/4">
-          Name
-        </div>
-        <div class="p-2 w-3/4 bg-grey-lightest">
-          {{nodeInfo.name}}
-        </div>
-      </div>
-      <div v-if="nodeInfo" class="bg-green w-full flex flex-row font-mono border border-b">
-        <div class="p-2 w-1/4">
-          NetworkId
-        </div>
-        <div class="p-2 w-3/4 bg-grey-lightest">
-          {{nodeInfo.nodeNetworkId}}
-        </div>
-      </div>
-      <div v-if="nodeInfo" class="bg-green w-full flex flex-row font-mono border border-b">
-        <div class="p-2 w-1/4">
-          Version
-        </div>
-        <div class="p-2 w-3/4 bg-grey-lightest">
-          {{nodeInfo.version}}
-        </div>
-      </div>
+      </template>
     </div>
 
     <h2 class="mt-4">Spend tokens</h2>
@@ -103,14 +93,14 @@
       </button>
     </div>
 
-    <div v-if="spendResult || spendError" class="border mt-4 mb-8 rounded">
+    <div v-if="spendResponse" class="border mt-4 mb-8 rounded">
       <div class="bg-green w-full flex flex-row font-mono border border-b">
         <div class="p-2 w-1/4">
           Send result
         </div>
         <div
           class="p-2 w-3/4 bg-grey-lightest break-words whitespace-pre-wrap"
-        >{{ spendResult ? JSON.stringify(spendResult, null, 4) : spendError }}</div>
+        >{{ spendResponse | responseToFormattedJSON }}</div>
       </div>
     </div>
 
@@ -130,44 +120,52 @@
       </button>
     </div>
 
-    <div v-if="byteCode || compileError" class="border mt-4 mb-8 rounded">
+    <div v-if="compileBytecodeResponse" class="border mt-4 mb-8 rounded">
       <div class="bg-green w-full flex flex-row font-mono border border-b">
         <div class="p-2 w-1/4">
           Compiled Code
         </div>
         <div class="p-2 w-3/4 bg-grey-lightest break-words">
-          {{ byteCode || compileError }}
+          {{ compileBytecodeResponse | responseToString }}
         </div>
       </div>
     </div>
 
-    <button v-if="byteCode" class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 text-xs" @click="deploy">
+    <button
+      v-if="compileBytecodeResponse && compileBytecodeResponse.result"
+      class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 text-xs"
+      @click="deploy"
+    >
       Deploy
     </button>
 
-    <div v-if="deployInfo || deployError" class="border mt-4 mb-8 rounded">
+    <div v-if="deployResponse" class="border mt-4 mb-8 rounded">
       <div class="bg-green w-full flex flex-row font-mono border border-b">
         <div class="p-2 w-1/4">
           Deployed Contract
         </div>
         <div
           class="p-2 w-3/4 bg-grey-lightest break-words whitespace-pre-wrap"
-        >{{ deployInfo ? JSON.stringify(deployInfo, null, 4) : deployError }}</div>
+        >{{ deployResponse | responseToFormattedJSON }}</div>
       </div>
     </div>
 
-    <button v-if="deployInfo" class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 text-xs" @click="call">
+    <button
+      v-if="deployResponse && deployResponse.result"
+      class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 text-xs"
+      @click="call"
+    >
       Call
     </button>
 
-    <div v-if="callResult || callError" class="border mt-4 mb-8 rounded">
+    <div v-if="callResponse" class="border mt-4 mb-8 rounded">
       <div class="bg-green w-full flex flex-row font-mono border border-b">
         <div class="p-2 w-1/4">
           Call Result
         </div>
         <div
           class="p-2 w-3/4 bg-grey-lightest break-words whitespace-pre-wrap"
-        >{{ callResult ? JSON.stringify(callResult, null, 4) : callError }}</div>
+        >{{ callResponse | responseToFormattedJSON }}</div>
       </div>
     </div>
   </div>
@@ -177,71 +175,70 @@
   //  is a webpack alias present in webpack.config.js
   import { Aepp } from '@aeternity/aepp-sdk/es'
 
+  const errorAsField = async fn => {
+    try {
+      return { result: await fn }
+    } catch (error) {
+      return { error }
+    }
+  }
+
   export default {
     data () {
       return {
         runningInFrame: window.parent !== window,
         client: null,
-        height: null,
-        pub: null,
+        addressResponse: null,
+        heightResponse: null,
+        nodeInfoResponse: null,
         spendTo: null,
         spendAmount: null,
         spendPayload: null,
-        spendResult: null,
-        spendError: null,
-        nodeInfo: null,
+        spendResponse: null,
         contractCode: `contract Identity =
       type state = ()
       entrypoint main(x : int) = x`,
-        byteCode: null,
-        compileError: null,
+        compileBytecodeResponse: null,
         contractInitState: [],
-        deployInfo: null,
-        deployError: null,
-        callResult: null,
-        callError: null
+        deployResponse: null,
+        callResponse: null
       }
+    },
+    filters: {
+      responseToString: response => `${response.error ? 'Error: ' : ''}${response.result || response.error}`,
+      responseToFormattedJSON: response => response.error
+        ? `Error: ${response.error}`
+        : JSON.stringify(response.result, null, 4),
     },
     methods: {
       async spend () {
-        try {
-          this.spendResult = await this.client.spend(
-            this.spendAmount,
-            this.spendTo, {
-              payload: this.spendPayload,
-            }
-          )
-        } catch (err) {
-          this.spendError = err
-        }
+        this.spendResponse = await errorAsField(this.client.spend(
+          this.spendAmount,
+          this.spendTo, {
+            payload: this.spendPayload
+          }
+        ));
       },
       async compile () {
-        this.byteCode = this.compileError = null
-        try {
-          this.byteCode = (await this.client.contractCompile(this.contractCode)).bytecode
-        } catch (err) {
-          this.compileError = err
-        }
+        this.compileBytecodeResponse = await errorAsField(
+          (await this.client.contractCompile(this.contractCode)).bytecode
+        );
       },
       async deploy () {
-        this.deployInfo = this.deployError = null
-        try {
-          this.deployInfo = await this.client.contractDeploy(this.byteCode, this.contractCode, this.contractInitState)
-        } catch (err) {
-          this.deployError = err
-        }
+        this.deployResponse = await errorAsField(this.client.contractDeploy(
+          this.compileBytecodeResponse.result, this.contractCode, this.contractInitState
+        ));
       },
       async call (code, method = 'main', returnType = 'int', args = ['5']) {
-        this.callResult = this.callError = null
-        try {
-          this.callResult = await this.client.contractCall(this.contractCode, this.deployInfo.address, method,  args)
-          Object.assign(
-            this.callResult,
+        this.callResponse = await errorAsField((async () => {
+          const result = await this.client.contractCall(
+            this.contractCode, this.deployResponse.result.address, method,  args
+          )
+          return Object.assign(
+            result,
             { decodedRes: await result.decode(returnType) }
           )
-        } catch (err) {
-          this.callError = err
-        }
+        })());
       },
       async getReverseWindow() {
         const iframe = document.createElement('iframe')
@@ -263,9 +260,9 @@
       this.client = await Aepp({
         parent: this.runningInFrame ? window.parent : await this.getReverseWindow()
       })
-      this.pub = await this.client.address()
-      this.height = await this.client.height()
-      this.nodeInfo = await this.client.getNodeInfo()
+      this.addressResponse = await errorAsField(this.client.address())
+      this.heightResponse = await errorAsField(this.client.height())
+      this.nodeInfoResponse = await errorAsField(this.client.getNodeInfo())
     }
   }
 </script>
