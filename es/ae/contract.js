@@ -30,11 +30,11 @@
 import Ae from './'
 import * as R from 'ramda'
 import { isBase64 } from '../utils/crypto'
-import ContractCompilerAPI from '../contract/compiler'
-import ContractBase from '../contract'
 import ContractACI from '../contract/aci'
 import BigNumber from 'bignumber.js'
 import NodePool from '../node-pool'
+import CompilerPool from '../contract/compiler-pool'
+import { DEFAULT_GAS, MIN_GAS_PRICE } from '../tx/builder/schema'
 
 /**
  * Handle contract call error
@@ -316,7 +316,7 @@ async function contractCompile (source, options = {}) {
  * const client = await ContractWithAe({ url, internalUrl, compilerUrl, keypair, ... })
  *
  */
-export const ContractAPI = Ae.compose(ContractBase, ContractACI, {
+export const ContractAPI = Ae.compose(ContractACI, {
   methods: {
     contractCompile,
     contractCallStatic,
@@ -331,16 +331,31 @@ export const ContractAPI = Ae.compose(ContractBase, ContractACI, {
     Ae: {
       defaults: {
         deposit: 0,
-        gasPrice: 1000000000, // min gasPrice 1e9
+        gasPrice: MIN_GAS_PRICE, // min gasPrice 1e9
         amount: 0,
-        gas: 1600000 - 21000,
+        gas: DEFAULT_GAS,
         options: '',
         dryRunAccount: { pub: 'ak_11111111111111111111111111111111273Yts', amount: '100000000000000000000000000000000000' }
       }
+    }
+  },
+  deepConf: {
+    Contract: {
+      methods: [
+        'contractEncodeCallDataAPI',
+        'contractDecodeDataAPI',
+        'compileContractAPI',
+        'contractDecodeCallDataBySourceAPI',
+        'contractDecodeCallDataByCodeAPI',
+        'contractGetACI',
+        'setCompilerUrl',
+        'getCompilerInfo',
+        'contractDecodeCallResultAPI'
+      ]
     }
   }
 })
 
 export const Contract = ContractAPI.compose(NodePool)
-export const ContractWithCompiler = Contract.compose(ContractCompilerAPI)
+export const ContractWithCompiler = Contract.compose(CompilerPool)
 export default ContractWithCompiler

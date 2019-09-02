@@ -74,6 +74,7 @@ const TX_SCHEMA_FIELD = (schema, objectId) => [schema, objectId]
 
 export const MIN_GAS_PRICE = 1000000000 // min gasPrice 1e9
 export const MAX_AUTH_FUN_GAS = 50000 // min gasPrice 1e9
+export const DEFAULT_GAS = 1600000 - 21000
 
 const revertObject = (obj) => Object.entries(obj).reduce((acc, [key, v]) => (acc[v] = key) && acc, {})
 

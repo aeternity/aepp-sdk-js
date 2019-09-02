@@ -24,14 +24,13 @@
 
 import Ae from './'
 import Account from '../account'
-import ContractBase from '../contract'
 import Accounts from '../accounts'
 import Chain from '../chain/node'
 import Rpc from '../rpc/server'
 import * as R from 'ramda'
 import Tx from '../tx/tx'
 import Contract from './contract'
-import NodePool from '../node-pool'
+import CompilerBase from '../contract/compiler/index'
 // Todo Enable GA
 // import GeneralizeAccount from '../contract/ga'
 
@@ -39,7 +38,7 @@ const contains = R.flip(R.contains)
 const isTxMethod = contains(Tx.compose.deepConfiguration.Ae.methods)
 const isChainMethod = contains(Chain.compose.deepConfiguration.Ae.methods)
 const isAccountMethod = contains(Account.compose.deepConfiguration.Ae.methods)
-const isContractMethod = contains(ContractBase.compose.deepConfiguration.Contract.methods)
+const isContractMethod = contains(CompilerBase.compose.deepConfiguration.Contract.methods)
 const handlers = [
   { pred: isTxMethod, handler: 'onTx', error: 'Creating transaction [{}] rejected' },
   { pred: isChainMethod, handler: 'onChain', error: 'Chain operation [{}] rejected' },
@@ -61,7 +60,7 @@ async function hello () {
 }
 
 async function rpc (method, params, session) {
-  const { handler, error } = R.find(({ pred }) => pred(method), handlers)
+  const { handler, error } = R.find(({ pred }) => pred(method), handlers) || {}
 
   if (handler === undefined) {
     return Promise.reject(Error(`Unknown method ${method}`))
@@ -132,7 +131,7 @@ async function rpcAddress ({ params, session }) {
   onContract: confirm
 })
  */
-const Wallet = Ae.compose(Accounts, Chain, NodePool, Tx, Contract, Rpc, {
+const Wallet = Ae.compose(Accounts, Chain, Tx, Contract, Rpc, {
   init ({ onTx = this.onTx, onChain = this.onChain, onAccount = this.onAccount, onContract = this.onContract }, { stamp }) {
     this.onTx = onTx
     this.onChain = onChain

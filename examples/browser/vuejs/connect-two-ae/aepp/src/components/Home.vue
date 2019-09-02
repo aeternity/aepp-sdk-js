@@ -3,6 +3,7 @@
     <h1 class="mb-4">Your Aepp</h1>
 
     <div class="border">
+      <h2 class="mt-4">Account</h2>
       <div class="bg-green w-full flex flex-row font-mono border border-b">
         <div class="p-2 w-1/4">
           Public Key <small>(from Wallet Aepp)</small>
@@ -14,6 +15,10 @@
           Requesting Public Key from AE Wallet...
         </div>
       </div>
+    </div>
+
+    <div class="border">
+      <h2 class="mt-4">Node</h2>
       <div v-if="heightResponse" class="bg-green w-full flex flex-row font-mono border border-b">
         <div class="p-2 w-1/4">
           Height
@@ -35,6 +40,32 @@
         <div
           v-for="(value, name) in nodeInfoResponse.result"
           v-if="['url', 'name', 'nodeNetworkId', 'version'].includes(name)"
+          class="bg-green w-full flex flex-row font-mono border border-b"
+        >
+          <div class="p-2 w-1/4 capitalize">
+            {{name.replace('nodeNetworkId', 'NetworkId')}}
+          </div>
+          <div class="p-2 w-3/4 bg-grey-lightest">
+            {{value}}
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <div class="border">
+      <h2 class="mt-4">Compiler</h2>
+      <template v-if="compilerInfoResponse">
+        <div v-if="compilerInfoResponse.error" class="bg-green w-full flex flex-row font-mono border border-b">
+          <div class="p-2 w-1/4">
+            NodeInfo error
+          </div>
+          <div class="p-2 w-3/4 bg-grey-lightest break-words">
+            {{compilerInfoResponse.error}}
+          </div>
+        </div>
+        <div
+          v-for="(value, name) in compilerInfoResponse.result"
+          v-if="['compilerUrl', 'name', 'version'].includes(name)"
           class="bg-green w-full flex flex-row font-mono border border-b"
         >
           <div class="p-2 w-1/4 capitalize">
@@ -100,7 +131,8 @@
         </div>
         <div
           class="p-2 w-3/4 bg-grey-lightest break-words whitespace-pre-wrap"
-        >{{ spendResponse | responseToFormattedJSON }}</div>
+        >{{ spendResponse | responseToFormattedJSON }}
+        </div>
       </div>
     </div>
 
@@ -112,10 +144,12 @@
           Contract Code
         </div>
         <div class="p-2 w-3/4 bg-white">
-          <textarea class="bg-black text-white border-b border-black p-2 w-full h-64" v-model="contractCode" placeholder="contact code"/>
+          <textarea class="bg-black text-white border-b border-black p-2 w-full h-64" v-model="contractCode"
+                    placeholder="contact code"/>
         </div>
       </div>
-      <button v-if="client" class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 text-xs" @click="compile">
+      <button v-if="client" class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 text-xs"
+              @click="compile">
         Compile
       </button>
     </div>
@@ -146,7 +180,8 @@
         </div>
         <div
           class="p-2 w-3/4 bg-grey-lightest break-words whitespace-pre-wrap"
-        >{{ deployResponse | responseToFormattedJSON }}</div>
+        >{{ deployResponse | responseToFormattedJSON }}
+        </div>
       </div>
     </div>
 
@@ -165,7 +200,8 @@
         </div>
         <div
           class="p-2 w-3/4 bg-grey-lightest break-words whitespace-pre-wrap"
-        >{{ callResponse | responseToFormattedJSON }}</div>
+        >{{ callResponse | responseToFormattedJSON }}
+        </div>
       </div>
     </div>
   </div>
@@ -174,6 +210,7 @@
 <script>
   //  is a webpack alias present in webpack.config.js
   import { Aepp } from '@aeternity/aepp-sdk/es'
+
 
   const errorAsField = async fn => {
     try {
@@ -191,6 +228,7 @@
         addressResponse: null,
         heightResponse: null,
         nodeInfoResponse: null,
+        compilerInfoResponse: null,
         spendTo: null,
         spendAmount: null,
         spendPayload: null,
@@ -208,7 +246,7 @@
       responseToString: response => `${response.error ? 'Error: ' : ''}${response.result || response.error}`,
       responseToFormattedJSON: response => response.error
         ? `Error: ${response.error}`
-        : JSON.stringify(response.result, null, 4),
+        : JSON.stringify(response.result, null, 4)
     },
     methods: {
       async spend () {
@@ -217,30 +255,30 @@
           this.spendTo, {
             payload: this.spendPayload
           }
-        ));
+        ))
       },
       async compile () {
         this.compileBytecodeResponse = await errorAsField(
           (await this.client.contractCompile(this.contractCode)).bytecode
-        );
+        )
       },
       async deploy () {
         this.deployResponse = await errorAsField(this.client.contractDeploy(
           this.compileBytecodeResponse.result, this.contractCode, this.contractInitState
-        ));
+        ))
       },
       async call (code, method = 'main', returnType = 'int', args = ['5']) {
         this.callResponse = await errorAsField((async () => {
           const result = await this.client.contractCall(
-            this.contractCode, this.deployResponse.result.address, method,  args
+            this.contractCode, this.deployResponse.result.address, method, args
           )
           return Object.assign(
             result,
             { decodedRes: await result.decode(returnType) }
           )
-        })());
+        })())
       },
-      async getReverseWindow() {
+      async getReverseWindow () {
         const iframe = document.createElement('iframe')
         iframe.src = prompt('Enter wallet URL', 'http://localhost:9000')
         iframe.style.display = 'none'
@@ -263,6 +301,7 @@
       this.addressResponse = await errorAsField(this.client.address())
       this.heightResponse = await errorAsField(this.client.height())
       this.nodeInfoResponse = await errorAsField(this.client.getNodeInfo())
+      this.compilerInfoResponse = await errorAsField(this.client.getCompilerInfo())
     }
   }
 </script>

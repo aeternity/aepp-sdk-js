@@ -36,7 +36,7 @@ import Aens from './ae/aens'
 import Contract from './ae/contract'
 // Todo Enable GA
 // import GeneralizeAccount from './contract/ga'
-import ContractCompilerAPI from './contract/compiler'
+import ContractCompilerAPI from './contract/compiler/compiler'
 import Wallet from './ae/wallet'
 import Aepp from './ae/aepp'
 import Oracle from './ae/oracle'

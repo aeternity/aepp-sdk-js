@@ -16,17 +16,17 @@
  */
 
 /**
- * Contract Base module
- * @module @aeternity/aepp-sdk/es/contract
- * @export Contract
- * @example import ContractBase from '@aeternity/aepp-sdk/es/contract'
+ * Compiler Base module
+ * @module @aeternity/aepp-sdk/es/Compiler
+ * @export Compiler
+ * @example import CompilerBase from '@aeternity/aepp-sdk/es/Compiler'
  */
 
 import stampit from '@stamp/it'
 import { required } from '@stamp/required'
 
 /**
- * Basic Contract Stamp
+ * Basic Compiler Stamp
  *
  * This stamp include compiler api call's related to contract functionality.
  * Attempting to create instances from the Stamp without overwriting all
@@ -35,9 +35,26 @@ import { required } from '@stamp/required'
  * @alias module:@aeternity/aepp-sdk/es/contract
  * @rtype Stamp
  * @param {Object} [options={}] - Initializer object
- * @return {Object} Contract instance
+ * @return {Object} Compiler instance
  */
-const ContractBase = stampit(required({
+const CompilerBase = stampit({
+  deepConf: {
+    Contract: {
+      methods: [
+        'contractEncodeCallDataAPI',
+        'contractDecodeDataAPI',
+        'compileContractAPI',
+        'contractDecodeCallDataBySourceAPI',
+        'contractDecodeCallDataByCodeAPI',
+        'contractGetACI',
+        'setCompilerUrl',
+        'getCompilerInfo',
+        'getCompilerVersion',
+        'contractDecodeCallResultAPI'
+      ]
+    }
+  }
+}, required({
   methods: {
     contractEncodeCallDataAPI: required,
     contractDecodeDataAPI: required,
@@ -146,4 +163,4 @@ const ContractBase = stampit(required({
  * @return {String} Compiler version
  */
 
-export default ContractBase
+export default CompilerBase
