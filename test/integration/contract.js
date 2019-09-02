@@ -245,6 +245,14 @@ describe('Contract', function () {
       const isCompiled = contractObject.compiled.length && contractObject.compiled.slice(0, 3) === 'cb_'
       isCompiled.should.be.equal(true)
     })
+    it('Fail on paying to not payable function', async () => {
+      const amount = 100
+      try {
+        await contractObject.methods.intFn.send(1, { amount })
+      } catch (e) {
+        e.message.should.be.equal(`You try to pay "${amount}" to function "intFn" which is not payable. Only payable function can accept tokens`)
+      }
+    })
     it('Call contract on specific account', async () => {
       const current = await contract.address()
       const onAccount = contract.addresses().find(acc => acc !== current)
