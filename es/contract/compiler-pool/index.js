@@ -36,9 +36,7 @@ export const CompilerPool = AsyncInit.compose({
       this.addCompiler('default', await Compiler({ compilerUrl, forceCompatibility }), true)
     }
     COMPILER_METHODS.forEach(m => {
-      this[m] = () => {
-        this.selectedCompiler.instance[m](...arguments)
-      }
+      this[m] = (...args) => this.selectedCompiler.instance[m](...args)
     })
   },
   methods: {
