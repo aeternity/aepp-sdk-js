@@ -66,7 +66,7 @@ describe('Compiler', function () {
       }
     })
   })
-  describe('Compiler Pool', async () => {
+  describe.only('Compiler Pool', async () => {
     let compilers
     let pool
     before(async () => {
@@ -83,10 +83,11 @@ describe('Compiler', function () {
       pool.getCompilersInPool().length.should.be.equal(3)
     })
     it('Can get current compiler info', async () => {
+      console.log(pool.getCompilerInfo())
       return pool.getCompilerInfo().should.be.deep.equal({
         name: 'default',
         version: '3.2.0',
-        compilerUrl: 'http://localhost:3080'
+        compilerUrl: compilerUrl
       })
     })
     it('Can change compiler', async () => {
