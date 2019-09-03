@@ -168,6 +168,38 @@
         >{{ callResponse | responseToFormattedJSON }}</div>
       </div>
     </div>
+
+    <h2 class="mt-4">Scan QR code</h2>
+
+    <div class="border mt-4 rounded">
+      <div class="bg-grey-lightest w-full flex flex-row font-mono">
+        <div class="p-2 w-1/4">
+          Scanner title
+        </div>
+        <div class="p-2 w-3/4 bg-white break-words">
+          <input
+            class="bg-black text-white border-b border-black p-2 w-full"
+            v-model="readQrCodeTitle"
+          />
+        </div>
+      </div>
+      <button
+        v-if="client"
+        class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 text-xs"
+        @click="readQrCode"
+      >
+        Scan
+      </button>
+    </div>
+
+    <div v-if="readQrCodeResponse" class="border mt-4 mb-8 rounded">
+      <div class="bg-green w-full flex flex-row font-mono border border-b">
+        <div class="p-2 w-1/4">Scanned data</div>
+        <div class="p-2 w-3/4 bg-grey-lightest break-words">
+          {{ readQrCodeResponse | responseToString }}
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -201,7 +233,9 @@
         compileBytecodeResponse: null,
         contractInitState: [],
         deployResponse: null,
-        callResponse: null
+        callResponse: null,
+        readQrCodeTitle: '',
+        readQrCodeResponse: null
       }
     },
     filters: {
@@ -240,6 +274,11 @@
           )
         })());
       },
+      async readQrCode() {
+        this.readQrCodeResponse = await errorAsField(this.client.readQrCode({
+          title: this.readQrCodeTitle,
+        }));
+      },
       async getReverseWindow() {
         const iframe = document.createElement('iframe')
         iframe.src = prompt('Enter wallet URL', 'http://localhost:9000')
@@ -257,7 +296,9 @@
       }
     },
     async created () {
-      this.client = await Aepp({
+      this.client = await Aepp.compose({
+        deepConfiguration: { Ae: { methods: ['readQrCode'] } },
+      })({
         parent: this.runningInFrame ? window.parent : await this.getReverseWindow()
       })
       this.addressResponse = await errorAsField(this.client.address())
