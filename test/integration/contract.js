@@ -170,38 +170,6 @@ describe('Contract', function () {
       .should.eventually.become('Hello World!')
   })
 
-  describe('Sophia Compiler', function () {
-    it('compile', async () => {
-      const code = await contract.compileContractAPI(identityContract)
-      const prefix = code.slice(0, 2)
-      const isString = typeof code === 'string'
-      prefix.should.be.equal('cb')
-      isString.should.be.equal(true)
-    })
-    it('get contract ACI', async () => {
-      const aci = await contract.contractGetACI(identityContract)
-      aci.should.have.property('interface')
-    })
-    it('encode call-data', async () => {
-      const encoded = await contract.contractEncodeCallDataAPI(identityContract, 'init', [])
-      const prefix = encoded.slice(0, 2)
-      const isString = typeof encoded === 'string'
-      prefix.should.be.equal('cb')
-      isString.should.be.equal(true)
-    })
-    it('decode call-data', async () => {
-      return contract.contractDecodeCallResultAPI(identityContract, 'main', encodedNumberSix, 'ok').should.eventually.become(6)
-    })
-    it('Use invalid compiler url', async () => {
-      try {
-        const cloned = R.clone(contract)
-        await cloned.setCompilerUrl('https://compiler.aepps.comas')
-      } catch (e) {
-        e.message.should.be.equal('Compiler do not respond')
-      }
-    })
-  })
-
   describe('Contract ACI Interface', function () {
     let contractObject
 
