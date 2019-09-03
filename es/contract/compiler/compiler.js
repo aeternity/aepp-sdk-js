@@ -37,7 +37,7 @@ async function getCompilerVersion (options = {}) {
 
 async function contractEncodeCallDataAPI (source, name, args = [], options = {}) {
   return this.http
-    .post('/encode-calldata', { source, 'function': name, arguments: args }, options)
+    .post('/encode-calldata', { source, function: name, arguments: args }, options)
     .then(({ calldata }) => calldata)
 }
 
@@ -48,12 +48,12 @@ async function contractDecodeCallDataByCodeAPI (bytecode, calldata, options = {}
 
 async function contractDecodeCallDataBySourceAPI (source, fn, callData, options = {}) {
   return this.http
-    .post('/decode-calldata/source', { 'function': fn, source, calldata: callData }, options)
+    .post('/decode-calldata/source', { function: fn, source, calldata: callData }, options)
 }
 
 async function contractDecodeCallResultAPI (source, fn, callValue, callResult, options = {}) {
   return this.http
-    .post('/decode-call-result', { 'function': fn, source, 'call-result': callResult, 'call-value': callValue }, options)
+    .post('/decode-call-result', { function: fn, source, 'call-result': callResult, 'call-value': callValue }, options)
 }
 
 async function contractDecodeDataAPI (type, data, options = {}) {

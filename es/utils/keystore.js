@@ -26,7 +26,7 @@ const DEFAULTS = {
 
 // DERIVED KEY PART
 const DERIVED_KEY_FUNCTIONS = {
-  'argon2id': deriveKeyUsingArgon2id
+  argon2id: deriveKeyUsingArgon2id
 }
 
 export async function deriveKeyUsingArgon2id (password, salt, options) {
@@ -129,7 +129,7 @@ async function deriveKey (password, nonce, options = {
     throw new Error('Must provide password and nonce to derive a key')
   }
 
-  if (!DERIVED_KEY_FUNCTIONS.hasOwnProperty(options.kdf)) throw new Error('Unsupported kdf type')
+  if (!Object.prototype.hasOwnProperty.call(DERIVED_KEY_FUNCTIONS, options.kdf)) throw new Error('Unsupported kdf type')
 
   return DERIVED_KEY_FUNCTIONS[options.kdf](password, nonce, options)
 }
@@ -223,10 +223,10 @@ export function validateKeyObj (obj) {
   const root = ['crypto', 'id', 'version', 'public_key']
   const cryptoKeys = ['cipher_params', 'ciphertext', 'symmetric_alg', 'kdf', 'kdf_params']
 
-  const missingRootKeys = root.filter(key => !obj.hasOwnProperty(key))
+  const missingRootKeys = root.filter(key => !Object.prototype.hasOwnProperty.call(obj, key))
   if (missingRootKeys.length) throw new Error(`Invalid key file format. Require properties: ${missingRootKeys}`)
 
-  const missingCryptoKeys = cryptoKeys.filter(key => !obj['crypto'].hasOwnProperty(key))
+  const missingCryptoKeys = cryptoKeys.filter(key => !Object.prototype.hasOwnProperty.call(obj.crypto, key))
   if (missingCryptoKeys.length) throw new Error(`Invalid key file format. Require properties: ${missingCryptoKeys}`)
 
   return true
