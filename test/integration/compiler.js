@@ -83,9 +83,9 @@ describe('Compiler', function () {
       pool.getCompilersInPool().length.should.be.equal(3)
     })
     it('Can get current compiler info', async () => {
+      console.log(pool.getCompilersInPool())
       console.log(pool.getCompilerInfo())
       return pool.getCompilerInfo().should.be.deep.equal({
-        name: 'default',
         version: '3.2.0',
         compilerUrl: compilerUrl
       })
