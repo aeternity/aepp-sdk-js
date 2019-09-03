@@ -66,7 +66,7 @@ describe('Compiler', function () {
       }
     })
   })
-  describe.only('Compiler Pool', async () => {
+  describe('Compiler Pool', async () => {
     let compilers
     let pool
     before(async () => {
