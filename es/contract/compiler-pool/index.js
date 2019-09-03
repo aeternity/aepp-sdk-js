@@ -36,6 +36,8 @@ export const CompilerPool = AsyncInit.compose({
       this.addCompiler('default', await Compiler({ compilerUrl, forceCompatibility }), true)
     }
     COMPILER_METHODS.forEach(m => {
+      // Leave ability to overwrite compiler methods by stampit
+      if (typeof this[m] === 'function') return
       this[m] = (...args) => {
         if (!this.isCompilerConnected()) throw new Error('Compiler is not connected')
         return this.selectedCompiler.instance[m](...args)
