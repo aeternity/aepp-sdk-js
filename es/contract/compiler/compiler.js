@@ -104,7 +104,7 @@ function getCompilerInfo () {
  * @return {Object} Contract compiler instance
  * @example ContractCompilerAPI({ compilerUrl: 'COMPILER_URL' })
  */
-const ContractCompilerAPI = AsyncInit.compose(CompilerBase, {
+const SophiaCompilerAPI = AsyncInit.compose(CompilerBase, {
   async init ({ compilerUrl = this.compilerUrl, forceCompatibility = false }) {
     this.compilerUrl = compilerUrl
     this.http = Http({ baseUrl: compilerUrl })
@@ -131,4 +131,4 @@ const ContractCompilerAPI = AsyncInit.compose(CompilerBase, {
 const COMPILER_GE_VERSION = '3.1.0'
 const COMPILER_LT_VERSION = '4.0.0'
 
-export default ContractCompilerAPI
+export default SophiaCompilerAPI

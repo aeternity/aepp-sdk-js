@@ -22,7 +22,7 @@ import { COMPILER_METHODS, prepareCompilerObject } from './helper'
 export const CompilerPool = AsyncInit.compose({
   async init ({ compilers = [], compilerUrl = this.compilerUrl, forceCompatibility = false } = {}) {
     this.compilerPool = new Map()
-    this.validateNodes(compilers)
+    this.validateCompilers(compilers)
 
     compilers.forEach(node => {
       const { name, instance } = node
@@ -36,7 +36,10 @@ export const CompilerPool = AsyncInit.compose({
       this.addCompiler('default', await Compiler({ compilerUrl, forceCompatibility }), true)
     }
     COMPILER_METHODS.forEach(m => {
-      this[m] = (...args) => this.selectedCompiler.instance[m](...args)
+      this[m] = (...args) => {
+        if (!this.isCompilerConnected()) throw new Error('Compiler is not connected')
+        return this.selectedCompiler.instance[m](...args)
+      }
     })
   },
   methods: {

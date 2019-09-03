@@ -348,8 +348,8 @@ export const ContractAPI = Ae.compose(ContractACI, {
         'contractDecodeCallDataBySourceAPI',
         'contractDecodeCallDataByCodeAPI',
         'contractGetACI',
-        'setCompilerUrl',
         'getCompilerInfo',
+        'getCompilerVersion',
         'contractDecodeCallResultAPI'
       ]
     }

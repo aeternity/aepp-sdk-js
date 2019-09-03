@@ -22,7 +22,7 @@ import MemoryAccount from '../../es/account/memory'
 
 const url = process.env.TEST_URL || 'http://localhost:3013'
 const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
-const compilerUrl = process.env.COMPILER_URL || 'http://localhost:3080'
+export const compilerUrl = process.env.COMPILER_URL || 'http://localhost:3080'
 const networkId = process.env.TEST_NETWORK_ID || 'ae_devnet'
 export const account = Crypto.generateKeyPair()
 export const account2 = Crypto.generateKeyPair()

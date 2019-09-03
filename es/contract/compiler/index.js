@@ -59,8 +59,11 @@ const CompilerBase = stampit({
     contractEncodeCallDataAPI: required,
     contractDecodeDataAPI: required,
     compileContractAPI: required,
+    contractDecodeCallDataBySourceAPI: required,
+    contractDecodeCallDataByCodeAPI: required,
     contractGetACI: required,
     setCompilerUrl: required,
+    getCompilerInfo: required,
     getCompilerVersion: required,
     contractDecodeCallResultAPI: required
   }
