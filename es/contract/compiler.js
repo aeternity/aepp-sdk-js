@@ -39,7 +39,7 @@ async function contractEncodeCallDataAPI (source, name, args = [], options = {})
   this.isInit()
   options = { ...this.compilerOptions, ...options }
   return this.http
-    .post('/encode-calldata', { source, 'function': name, arguments: args, options }, options)
+    .post('/encode-calldata', { source, function: name, arguments: args, options }, options)
     .then(({ calldata }) => calldata)
 }
 
@@ -59,7 +59,7 @@ async function contractDecodeCallResultAPI (source, fn, callValue, callResult, o
   this.isInit()
   options = { ...this.compilerOptions, ...options }
   return this.http
-    .post('/decode-call-result', { 'function': fn, source, 'call-result': callResult, 'call-value': callValue, options }, options)
+    .post('/decode-call-result', { function: fn, source, 'call-result': callResult, 'call-value': callValue, options }, options)
 }
 
 async function contractDecodeDataAPI (type, data, options = {}) {
