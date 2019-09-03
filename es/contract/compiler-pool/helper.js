@@ -9,10 +9,11 @@ export const COMPILER_METHODS = [
   'contractEncodeCallDataAPI',
   'contractDecodeDataAPI',
   'compileContractAPI',
-  'contractGetACI',
-  'contractDecodeCallDataByCodeAPI',
   'contractDecodeCallDataBySourceAPI',
-  'contractDecodeCallResultAPI',
+  'contractDecodeCallDataByCodeAPI',
+  'contractGetACI',
+  'setCompilerUrl',
+  'getCompilerInfo',
   'getCompilerVersion',
-  'setCompilerUrl'
+  'contractDecodeCallResultAPI'
 ]

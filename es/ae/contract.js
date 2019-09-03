@@ -35,6 +35,7 @@ import BigNumber from 'bignumber.js'
 import NodePool from '../node-pool'
 import CompilerPool from '../contract/compiler-pool'
 import { DEFAULT_GAS, MIN_GAS_PRICE } from '../tx/builder/schema'
+import { COMPILER_METHODS } from '../contract/compiler-pool/helper'
 
 /**
  * Handle contract call error
@@ -341,17 +342,7 @@ export const ContractAPI = Ae.compose(ContractACI, {
   },
   deepConf: {
     Contract: {
-      methods: [
-        'contractEncodeCallDataAPI',
-        'contractDecodeDataAPI',
-        'compileContractAPI',
-        'contractDecodeCallDataBySourceAPI',
-        'contractDecodeCallDataByCodeAPI',
-        'contractGetACI',
-        'getCompilerInfo',
-        'getCompilerVersion',
-        'contractDecodeCallResultAPI'
-      ]
+      methods: COMPILER_METHODS
     }
   }
 })

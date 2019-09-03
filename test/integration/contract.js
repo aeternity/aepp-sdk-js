@@ -84,8 +84,6 @@ contract StateContract =
   entrypoint datTypeFn(s: dateUnit): dateUnit = s
 `
 
-const encodedNumberSix = 'cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaKNdnK'
-
 plan('1000000000000000000000')
 
 describe('Contract', function () {
