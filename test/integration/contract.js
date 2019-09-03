@@ -156,7 +156,7 @@ describe('Contract', function () {
   })
 
   it('initializes contract state', async () => {
-    const data = `"Hello World!"`
+    const data = '"Hello World!"'
     return contract.contractCompile(stateContract)
       .then(bytecode => bytecode.deploy([data]))
       .then(deployed => deployed.call('retrieve'))
@@ -349,22 +349,22 @@ describe('Contract', function () {
         })
         it('Map With Option Value', async () => {
           const address = await contract.address()
-          let mapArgWithSomeValue = new Map(
+          const mapArgWithSomeValue = new Map(
             [
               [address, ['someStringV', Promise.resolve(123)]]
             ]
           )
-          let mapArgWithNoneValue = new Map(
+          const mapArgWithNoneValue = new Map(
             [
               [address, ['someStringV', Promise.reject(Error()).catch(e => undefined)]]
             ]
           )
-          let returnArgWithSomeValue = new Map(
+          const returnArgWithSomeValue = new Map(
             [
               [address, ['someStringV', 123]]
             ]
           )
-          let returnArgWithNoneValue = new Map(
+          const returnArgWithNoneValue = new Map(
             [
               [address, ['someStringV', undefined]]
             ]
@@ -565,14 +565,14 @@ describe('Contract', function () {
         return res.decode().should.eventually.become([1, 2])
       })
       it('Call contract using using js type arguments', async () => {
-        const res = await contractObject.methods.listFn([ 1, 2 ])
+        const res = await contractObject.methods.listFn([1, 2])
         return res.decode().should.eventually.become([1, 2])
       })
       it('Call contract using using js type arguments and skip result transform', async () => {
         contractObject.setOptions({ skipTransformDecoded: true })
-        const res = await contractObject.methods.listFn([ 1, 2 ])
+        const res = await contractObject.methods.listFn([1, 2])
         const decoded = await res.decode()
-        const decodedJSON = JSON.stringify([ 1, 2 ])
+        const decodedJSON = JSON.stringify([1, 2])
         contractObject.setOptions({ skipTransformDecoded: false })
         JSON.stringify(decoded).should.be.equal(decodedJSON)
       })

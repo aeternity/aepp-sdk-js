@@ -96,12 +96,14 @@ describe('Swagger', function () {
     })
 
     it('objects', () => {
-      const spec = { type: 'object',
+      const spec = {
+        type: 'object',
         required: ['foo'],
         properties: {
           foo: { type: 'integer' },
           bar: { type: 'string' }
-        } }
+        }
+      }
       expect(internal.conform({ foo: 5 }, spec)).to.deep.equal({ foo: 5 })
       expect(internal.conform({ foo: 5, bar: 'xxx' }, spec)).to.deep.equal({ foo: 5, bar: 'xxx' })
       expect(internal.conform({ foo: 5, baz: 'yyy' }, spec)).to.deep.equal({ foo: 5 })
@@ -123,7 +125,7 @@ describe('Swagger', function () {
   it('maps operations', async () => {
     const [path, data] = R.head(R.toPairs(op))
     const [method, operation] = R.head(R.toPairs(data))
-    const fn = internal.operation(path, method, operation, def)(this, `//v2`)
+    const fn = internal.operation(path, method, operation, def)(this, '//v2')
     assert.equal(fn.length, 2)
   })
   it('Serialize BigNumber to JSON', () => {

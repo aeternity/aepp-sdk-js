@@ -28,7 +28,7 @@ export const account = Crypto.generateKeyPair()
 export const account2 = Crypto.generateKeyPair()
 
 const BaseAe = (params) => Ae.compose({
-  deepProps: { Swagger: { defaults: { debug: !!process.env['DEBUG'] } } },
+  deepProps: { Swagger: { defaults: { debug: !!process.env.DEBUG } } },
   props: { url, internalUrl, process, compilerUrl }
 })({ ...params })
 

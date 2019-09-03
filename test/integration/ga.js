@@ -63,6 +63,6 @@ describe.skip('Generalize Account', function () {
     await client.spend(10000, publicKey, { authData: { callData }, onAccount: gaAccount.publicKey })
     await client.spend(10000, publicKey, { authData: { source: authContract, args: [`${r2}`] }, onAccount: gaAccount.publicKey })
     const balanceAfter = await client.balance(publicKey)
-    balanceAfter.should.be.equal(`20000`)
+    balanceAfter.should.be.equal('20000')
   })
 })

@@ -21,20 +21,20 @@ import { dump, recover, getAddressFromPriv, validateKeyObj } from '../../es/util
 import { generateKeyPair } from '../../es/utils/crypto'
 
 const invalidKeystore = {
-  'name': 'test',
-  'version': 1,
-  'public_key': 'ak_2wc5GeyFTxYEqusWH8UizUQDj6i53ow7fF9WXEPtYVvSHT45xd',
-  'id': 'ea6b7079-924e-456c-8100-6305e7235d65',
-  'crypto': {
-    'secret_type': 'ed25519',
-    'cipher_params': {
-      'nonce': 'fecd060551378963f5d4d1aa264b665225360775fcd5fa5a'
+  name: 'test',
+  version: 1,
+  public_key: 'ak_2wc5GeyFTxYEqusWH8UizUQDj6i53ow7fF9WXEPtYVvSHT45xd',
+  id: 'ea6b7079-924e-456c-8100-6305e7235d65',
+  crypto: {
+    secret_type: 'ed25519',
+    cipher_params: {
+      nonce: 'fecd060551378963f5d4d1aa264b665225360775fcd5fa5a'
     },
-    'kdf': 'argon2id',
-    'kdf_params': {
-      'memlimit': 1024,
-      'opslimit': 3,
-      'salt': 'aa0885ba58e497ea83cd663d1dd4d002'
+    kdf: 'argon2id',
+    kdf_params: {
+      memlimit: 1024,
+      opslimit: 3,
+      salt: 'aa0885ba58e497ea83cd663d1dd4d002'
     }
   }
 }

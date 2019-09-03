@@ -26,7 +26,7 @@ describe('Oracle', function () {
   let client
   let oracle
   let query
-  let queryResponse = "{'tmp': 30}"
+  const queryResponse = "{'tmp': 30}"
 
   before(async function () {
     client = await ready(this)
