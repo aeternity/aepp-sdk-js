@@ -81,7 +81,7 @@ describe('Node client', function () {
     it('Can change Node', async () => {
       const nodes = await NodePool({
         nodes: [
-          { name: 'first', instance: await Node({ url, internalUrl}) },
+          { name: 'first', instance: await Node({ url, internalUrl }) },
           { name: 'second', instance: client }
         ]
       })
@@ -94,7 +94,7 @@ describe('Node client', function () {
     it('Fail on undefined node', async () => {
       const nodes = await NodePool({
         nodes: [
-          { name: 'first', instance: await Node({ url, internalUrl}) },
+          { name: 'first', instance: await Node({ url, internalUrl }) },
           { name: 'second', instance: client }
         ]
       })
@@ -115,6 +115,5 @@ describe('Node client', function () {
       nodesList[0].url.should.be.equal(url)
       nodesList[0].internalUrl.should.be.equal(internalUrl)
     })
-
   })
 })

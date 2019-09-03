@@ -52,7 +52,7 @@ async function contractDecodeCallDataByCodeAPI (bytecode, calldata, options = {}
 async function contractDecodeCallDataBySourceAPI (source, fn, callData, options = {}) {
   this.isInit()
   return this.http
-    .post('/decode-calldata/source', { 'function': fn, source, calldata: callData }, options)
+    .post('/decode-calldata/source', { function: fn, source, calldata: callData }, options)
 }
 
 async function contractDecodeCallResultAPI (source, fn, callValue, callResult, options = {}) {

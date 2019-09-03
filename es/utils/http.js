@@ -52,7 +52,7 @@ const Http = stampit({
     get,
     post,
     put,
-    'delete': _delete
+    delete: _delete
   },
   props: {
     httpConfig: {

@@ -512,13 +512,13 @@ describe('Contract', function () {
         })
         it('Invalid variant', async () => {
           try {
-            await contractObject.methods.datTypeFn("asdcxz")
+            await contractObject.methods.datTypeFn('asdcxz')
           } catch (e) {
             e.message.should.be.equal('"Argument" at position 0 fails because ["0" must be one of [Year, Month, Day], "0" must be an object]')
           }
         })
         it('Valid', async () => {
-          const res = await contractObject.methods.datTypeFn("Year" || { Year: []})
+          const res = await contractObject.methods.datTypeFn('Year' || { Year: [] })
           JSON.stringify(res.decodedResult).should.be.equal(JSON.stringify({ Year: [] }))
         })
       })
