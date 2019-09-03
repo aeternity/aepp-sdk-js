@@ -38,10 +38,9 @@ const Ecb = aesjs.ModeOfOperation.ecb
  * @return {boolean} True if the string is valid base-64, false otherwise.
  */
 export function isBase64 (str) {
-  let index
   // eslint-disable-next-line no-useless-escape
   if (str.length % 4 > 0 || str.match(/[^0-9a-z+\/=]/i)) return false
-  index = str.indexOf('=')
+  const index = str.indexOf('=')
   return !!(index === -1 || str.slice(index).match(/={1,2}/))
 }
 
@@ -325,8 +324,8 @@ export function encryptPrivateKey (password, binaryKey) {
  * @return {Uint8Array} Encrypted data
  */
 export function encryptKey (password, binaryData) {
-  let hashedPasswordBytes = sha256hash(password)
-  let aesEcb = new Ecb(hashedPasswordBytes)
+  const hashedPasswordBytes = sha256hash(password)
+  const aesEcb = new Ecb(hashedPasswordBytes)
   return aesEcb.encrypt(binaryData)
 }
 
@@ -339,8 +338,8 @@ export function encryptKey (password, binaryData) {
  */
 export function decryptKey (password, encrypted) {
   const encryptedBytes = Buffer.from(encrypted)
-  let hashedPasswordBytes = sha256hash(password)
-  let aesEcb = new Ecb(hashedPasswordBytes)
+  const hashedPasswordBytes = sha256hash(password)
+  const aesEcb = new Ecb(hashedPasswordBytes)
   return Buffer.from(aesEcb.decrypt(encryptedBytes))
 }
 
@@ -422,7 +421,7 @@ export function aeEncodeKey (binaryKey) {
  * @return {Object} Encrypted key pair
  */
 export function generateSaveWallet (password) {
-  let keys = generateKeyPair(true)
+  const keys = generateKeyPair(true)
   return {
     publicKey: encryptPublicKey(password, keys.publicKey),
     secretKey: encryptPrivateKey(password, keys.secretKey)
@@ -514,8 +513,8 @@ export function isValidKeypair (privateKey, publicKey) {
  */
 export function envKeypair (env, force = false) {
   const keypair = {
-    secretKey: env['WALLET_PRIV'],
-    publicKey: env['WALLET_PUB']
+    secretKey: env.WALLET_PRIV,
+    publicKey: env.WALLET_PUB
   }
 
   if (keypair.publicKey && keypair.secretKey) {

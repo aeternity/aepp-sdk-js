@@ -28,7 +28,7 @@ import * as Crypto from '../utils/crypto'
 import { buildTx } from '../tx/builder'
 import { TX_TYPE } from '../tx/builder/schema'
 
-const DEFAULT_NETWORK_ID = `ae_mainnet`
+const DEFAULT_NETWORK_ID = 'ae_mainnet'
 
 /**
  * Sign encoded transaction
@@ -88,10 +88,12 @@ const Account = stampit({
       methods: ['sign', 'address', 'signTransaction', 'getNetworkId']
     }
   }
-}, required({ methods: {
-  sign: required,
-  address: required
-} }))
+}, required({
+  methods: {
+    sign: required,
+    address: required
+  }
+}))
 
 /**
  * Sign data blob

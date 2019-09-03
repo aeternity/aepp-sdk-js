@@ -74,7 +74,7 @@ function validateKeyPair (keyPair) {
 const MemoryAccount = Account.compose({
   init ({ keypair }) {
     validateKeyPair(keypair)
-    if (keypair.hasOwnProperty('priv') && keypair.hasOwnProperty('pub')) {
+    if (Object.prototype.hasOwnProperty.call(keypair, 'priv') && Object.prototype.hasOwnProperty.call(keypair, 'pub')) {
       keypair = { secretKey: keypair.priv, publicKey: keypair.pub }
       console.warn('pub/priv naming for accounts has been deprecated, please use secretKey/publicKey')
     }

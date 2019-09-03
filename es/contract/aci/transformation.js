@@ -95,7 +95,7 @@ export function readType (type, { bindings } = {}) {
  * @return {string}
  */
 export async function transform (type, value, { bindings } = {}) {
-  let { t, generic } = readType(type, { bindings })
+  const { t, generic } = readType(type, { bindings })
 
   switch (t) {
     case SOPHIA_TYPES.string:
@@ -106,11 +106,12 @@ export async function transform (type, value, { bindings } = {}) {
       return `(${await Promise.all(value.map(async (el, i) => transform(generic[i], el, {
         bindings
       })))})`
-    case SOPHIA_TYPES.option:
+    case SOPHIA_TYPES.option: {
       const optionV = await value.catch(e => undefined)
       return optionV === undefined ? 'None' : `Some(${await transform(generic, optionV, {
         bindings
       })})`
+    }
     case SOPHIA_TYPES.hash:
     case SOPHIA_TYPES.bytes:
     case SOPHIA_TYPES.signature:
@@ -164,7 +165,7 @@ export async function transformMap (value, generic, { bindings }) {
         })}] = ${await transform(generic[1], value, { bindings })}`
         return acc
       },
-      ``
+      ''
     )
   }}`
 }
@@ -193,7 +194,7 @@ export function transformDecodedData (aci, result, { skipTransformDecoded = fals
     case SOPHIA_TYPES.bytes:
     case SOPHIA_TYPES.signature:
       return result.split('#')[1]
-    case SOPHIA_TYPES.map:
+    case SOPHIA_TYPES.map: {
       const [keyT, valueT] = generic
       return result
         .reduce(
@@ -205,15 +206,17 @@ export function transformDecodedData (aci, result, { skipTransformDecoded = fals
           },
           []
         )
-    case SOPHIA_TYPES.option:
+    }
+    case SOPHIA_TYPES.option: {
       if (result === 'None') return undefined
       const [[variantType, [value]]] = Object.entries(result)
       return variantType === 'Some' ? transformDecodedData(generic, value, { bindings }) : undefined
+    }
     case SOPHIA_TYPES.list:
       return result.map((value) => transformDecodedData(generic, value, { bindings }))
     case SOPHIA_TYPES.tuple:
       return result.map((value, i) => { return transformDecodedData(generic[i], value, { bindings }) })
-    case SOPHIA_TYPES.record:
+    case SOPHIA_TYPES.record: {
       const genericMap = generic.reduce((acc, val) => ({ ...acc, [val.name]: { type: val.type } }), {})
       return Object.entries(result).reduce(
         (acc, [name, value]) =>
@@ -223,6 +226,7 @@ export function transformDecodedData (aci, result, { skipTransformDecoded = fals
           }),
         {}
       )
+    }
   }
   return result
 }
@@ -298,7 +302,7 @@ export function prepareSchema (type, { bindings } = {}) {
 export function getJoiErrorMsg (errors) {
   return errors.map(err => {
     const { path, type, context } = err
-    let value = context.hasOwnProperty('value') ? context.value : context.label
+    let value = Object.prototype.hasOwnProperty.call(context, 'value') ? context.value : context.label
     value = typeof value === 'object' ? JSON.stringify(value).slice(1).slice(0, -1) : value
     switch (type) {
       case 'string.base':
