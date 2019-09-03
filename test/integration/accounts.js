@@ -114,11 +114,9 @@ describe('Accounts', function () {
       const { tx } = await wallet.spend(1, await wallet.address(), { onAccount })
       tx.senderId.should.be.equal(onAccount)
       current.should.be.equal(current)
-
     })
 
     it('Fail on invalid account', async () => {
-      const current = await wallet.address()
       // SPEND
       try {
         await wallet.spend(1, await wallet.address(), { onAccount: 1 })
@@ -128,7 +126,6 @@ describe('Accounts', function () {
     })
 
     it('Fail on non exist account', async () => {
-      const current = await wallet.address()
       // SPEND
       try {
         await wallet.spend(1, await wallet.address(), { onAccount: 'ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk' })

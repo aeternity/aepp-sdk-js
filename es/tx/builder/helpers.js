@@ -183,8 +183,8 @@ export function readInt (buf = Buffer.from([])) {
 export function buildPointers (pointers) {
   return pointers.map(
     p => [
-      toBytes(p['key']),
-      writeId(p['id'])
+      toBytes(p.key),
+      writeId(p.id)
     ]
   )
 }

@@ -32,7 +32,6 @@ describe('Aens', function () {
   let aens
   const account = generateKeyPair()
   const name = randomName()
-  const name2 = randomName()
 
   before(async function () {
     aens = await ready(this)

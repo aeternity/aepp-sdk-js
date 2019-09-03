@@ -229,10 +229,14 @@ const Aens = Ae.compose({
     aensTransfer: transfer,
     aensRevoke: revoke
   },
-  deepProps: { Ae: { defaults: {
-    clientTtl: 1,
-    nameTtl: 50000 // aec_governance:name_claim_max_expiration() => 50000
-  } } }
+  deepProps: {
+    Ae: {
+      defaults: {
+        clientTtl: 1,
+        nameTtl: 50000 // aec_governance:name_claim_max_expiration() => 50000
+      }
+    }
+  }
 })
 
 export default Aens
