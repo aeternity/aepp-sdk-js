@@ -52,7 +52,7 @@ async function address ({ onAccount } = {}) {
  * @example selectAccount('ak_xxxxxxxx')
  */
 function selectAccount (address) {
-  if (!address || !assertedType(address, 'ak', true)) throw new Error(`Invalid account address`)
+  if (!address || !assertedType(address, 'ak', true)) throw new Error('Invalid account address')
   if (!this.accounts[address]) throw Error(`Account for ${address} not available`)
   this.Selector.address = address
 }
@@ -69,7 +69,7 @@ function selectAccount (address) {
 const Selector = Account.compose({
   async init ({ address }) {
     if (!address) address = Object.keys(this.accounts)[0]
-    if (address && !assertedType(address, 'ak', true)) throw new Error(`Invalid account address`)
+    if (address && !assertedType(address, 'ak', true)) throw new Error('Invalid account address')
     this.Selector.address = address
   },
   methods: { sign, address, selectAccount },

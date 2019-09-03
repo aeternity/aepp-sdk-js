@@ -17,7 +17,6 @@
 
 import '../'
 import { describe, it } from 'mocha'
-import { expect } from 'chai'
 import { dump, recover, getAddressFromPriv, validateKeyObj } from '../../es/utils/keystore'
 import { generateKeyPair } from '../../es/utils/crypto'
 

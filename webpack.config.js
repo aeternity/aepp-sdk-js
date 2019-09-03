@@ -46,7 +46,7 @@ function configure (filename, opts = {}) {
           commonjs: dependency,
           commonjs2: dependency
         }
-      }), {}),
+      }), {})
   }, opts)
 }
 

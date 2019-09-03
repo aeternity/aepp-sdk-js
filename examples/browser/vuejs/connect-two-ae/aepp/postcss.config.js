@@ -4,11 +4,11 @@ module.exports = {
     'postcss-import': {},
     'tailwindcss': './tailwind.js',
     // 'postcss-cssnext': {},
-    'autoprefixer': {'browsers': 'last 2 versions'},
+    'autoprefixer': { 'browsers': 'last 2 versions' },
     'cssnano': {
       'preset': [
         'default',
-        {'discardComments': {'removeAll': true}}
+        { 'discardComments': { 'removeAll': true } }
       ]
     }
     // 'postcss-cssnext': options.cssnext ? options.cssnext : false,

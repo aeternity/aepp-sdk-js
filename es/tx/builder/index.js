@@ -34,10 +34,11 @@ const ORACLE_TTL_TYPES = {
 function deserializeField (value, type, prefix) {
   if (!value) return ''
   switch (type) {
-    case FIELD_TYPES.ctVersion:
+    case FIELD_TYPES.ctVersion: {
       // eslint-disable-next-line no-unused-vars
       const [vm, _, abi] = value
       return { vmVersion: readInt(Buffer.from([vm])), abiVersion: readInt(Buffer.from([abi])) }
+    }
     case FIELD_TYPES.int:
       return readInt(value)
     case FIELD_TYPES.id:
@@ -135,9 +136,10 @@ function validateField (value, key, type, prefix) {
 
   // Validate type of value
   switch (type) {
-    case FIELD_TYPES.int:
+    case FIELD_TYPES.int: {
       const isMinusValue = (!isNaN(value) || BigNumber.isBigNumber(value)) && BigNumber(value).lt(0)
       return assert((!isNaN(value) || BigNumber.isBigNumber(value)) && BigNumber(value).gte(0), { value, isMinusValue })
+    }
     case FIELD_TYPES.id:
       return assert(assertedType(value, prefix) && PREFIX_ID_TAG[value.split('_')[0]] && value.split('_')[0] === prefix, { value, prefix })
     case FIELD_TYPES.binary:
@@ -145,7 +147,7 @@ function validateField (value, key, type, prefix) {
     case FIELD_TYPES.string:
       return assert(true)
     case FIELD_TYPES.ctVersion:
-      return assert(typeof value === 'object' && value.hasOwnProperty('abiVersion') && value.hasOwnProperty('vmVersion'))
+      return assert(typeof value === 'object' && Object.prototype.hasOwnProperty.call(value, 'abiVersion') && Object.prototype.hasOwnProperty.call(value, 'vmVersion'))
     case FIELD_TYPES.pointers:
       return assert(Array.isArray(value) && !value.find(e => e !== Object(e)), { value })
     default:

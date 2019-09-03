@@ -15,7 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { describe, it, before } from 'mocha'
+import { describe, it, before, after, beforeEach, afterEach } from 'mocha'
 import * as sinon from 'sinon'
 import { BigNumber } from 'bignumber.js'
 import { configure, ready, plan, BaseAe, networkId } from './'
@@ -550,7 +550,7 @@ describe('Channel', function () {
     txType.should.equal('channelCloseMutual')
     tx.should.eql({
       ...tx,
-      fromId: await initiator.address(),
+      fromId: await initiator.address()
       // TODO: check `initiatorAmountFinal` and `responderAmountFinal`
     })
   })
@@ -624,7 +624,7 @@ describe('Channel', function () {
       tx => initiator.signTransaction(tx)
     )
     const poi = await initiatorCh.poi({
-      accounts: [initiatorAddr, responderAddr],
+      accounts: [initiatorAddr, responderAddr]
     })
     const balances = await initiatorCh.balances([initiatorAddr, responderAddr])
     const initiatorBalanceBeforeClose = await initiator.balance(initiatorAddr)
@@ -744,7 +744,7 @@ describe('Channel', function () {
       deposit: 1000,
       vmVersion: 4,
       abiVersion: 1
-    }, async (tx) => await initiator.signTransaction(tx))
+    }, async (tx) => initiator.signTransaction(tx))
     result.should.eql({ accepted: true, address: result.address, signedTx: (await initiatorCh.state()).signedTx })
     contractAddress = result.address
     contractEncodeCall = (method, args) => initiator.contractEncodeCallDataAPI(identityContract, method, args)
@@ -760,7 +760,7 @@ describe('Channel', function () {
       deposit: BigNumber('10e18'),
       vmVersion: 4,
       abiVersion: 1
-    }, async (tx) => await initiator.signTransaction(tx))
+    }, async (tx) => initiator.signTransaction(tx))
     result.should.eql({ accepted: false })
   })
 
@@ -770,7 +770,7 @@ describe('Channel', function () {
       callData: await contractEncodeCall('main', ['42']),
       contract: contractAddress,
       abiVersion: 1
-    }, async (tx) => await initiator.signTransaction(tx))
+    }, async (tx) => initiator.signTransaction(tx))
     result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx })
     callerNonce = Number(unpackTx((await initiatorCh.state()).signedTx).tx.encodedTx.tx.round)
   })
@@ -782,7 +782,7 @@ describe('Channel', function () {
       callData: await contractEncodeCall('main', ['42']),
       contract: contractAddress,
       abiVersion: 1
-    }, async (tx) => await initiator.signTransaction(tx))
+    }, async (tx) => initiator.signTransaction(tx))
     result.should.eql({ accepted: false })
   })
 
@@ -848,7 +848,7 @@ describe('Channel', function () {
         id: contractAddress,
         ownerId: await initiator.address(),
         referrerIds: [],
-        vmVersion: 4,
+        vmVersion: 4
       },
       contractState: result.contractState
     })
