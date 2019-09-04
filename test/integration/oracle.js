@@ -26,7 +26,7 @@ describe('Oracle', function () {
   let client
   let oracle
   let query
-  let queryResponse = "{'tmp': 30}"
+  const queryResponse = "{'tmp': 30}"
 
   before(async function () {
     client = await ready(this)
@@ -48,6 +48,18 @@ describe('Oracle', function () {
   it('Post Oracle Query(Ask for weather in Berlin)', async () => {
     query = await oracle.postQuery("{'city': 'Berlin'}")
     query.decode(query.query).toString().should.be.equal("{'city': 'Berlin'}")
+  })
+
+  it('Pool for queries', async () => {
+    let queries = []
+    const stopPolling = await oracle.pollQueries((q) => {
+      queries = [...q.map(a => a.id), ...queries]
+    }, { interval: 100 })
+    await oracle.postQuery("{'city': 'Berlin2'}")
+    await oracle.postQuery("{'city': 'Berlin3'}")
+    await oracle.postQuery("{'city': 'Berlin4'}")
+    setTimeout(() => stopPolling(), 500)
+    queries.length.should.be.equal(4)
   })
 
   it('Poll for response for query without response', async () => {
