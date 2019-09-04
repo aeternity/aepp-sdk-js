@@ -50,6 +50,18 @@ describe('Oracle', function () {
     query.decode(query.query).toString().should.be.equal("{'city': 'Berlin'}")
   })
 
+  it('Pool for queries', async () => {
+    let queries = []
+    const stopPolling = await oracle.pollQueries((q) => {
+      queries = [...q.map(a => a.id), ...queries]
+    }, { interval: 100 })
+    await oracle.postQuery("{'city': 'Berlin2'}")
+    await oracle.postQuery("{'city': 'Berlin3'}")
+    await oracle.postQuery("{'city': 'Berlin4'}")
+    setTimeout(() => stopPolling(), 500)
+    queries.length.should.be.equal(4)
+  })
+
   it('Poll for response for query without response', async () => {
     return query.pollForResponse({ attempts: 2, interval: 1000 }).should.be.rejectedWith(Error)
   })

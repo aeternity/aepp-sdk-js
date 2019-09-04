@@ -45,6 +45,7 @@ async function getOracleObject (oracleId) {
   return {
     ...oracle,
     queries,
+    pollQueries: (onQuery, { interval } = {}) => this.pollForQueries(oracleId, onQuery, { interval }),
     postQuery: (query, options) => this.postQueryToOracle(oracleId, query, options),
     respondToQuery: (queryId, response, options) => this.respondToQuery(oracleId, queryId, response, options),
     extendOracle: (oracleTtl, options) => this.extendOracleTtl(oracleId, oracleTtl, options),
@@ -52,6 +53,35 @@ async function getOracleObject (oracleId) {
       return getQueryObject.bind(this)(oracleId, queryId)
     }
   }
+}
+
+/**
+ * Poll for oracle queries
+ * @alias module:@aeternity/aepp-sdk/es/ae/oracle
+ * @instance
+ * @function
+ * @category async
+ * @param {String} oracleId Oracle public key
+ * @param {Function} onQuery OnQuery callback
+ * @param {Object} [options] Options object
+ * @param {Object} [options.interval] Poll interval(default: 5000)
+ * @return {Function} stopPolling - Stop polling function
+ */
+export async function pollForQueries (oracleId, onQuery, { interval = 5000 } = {}) {
+  const queries = (await this.getOracleQueries(oracleId)).oracleQueries || []
+  let quriesIds = queries.map(q => q.id)
+  onQuery(queries)
+
+  async function pollQueries () {
+    const { oracleQueries: q } = await this.getOracleQueries(oracleId)
+    const newQueries = q.filter(({ id }) => !quriesIds.includes(id))
+    if (newQueries.length) {
+      quriesIds = [...quriesIds, ...newQueries.map(a => a.id)]
+      onQuery(newQueries)
+    }
+  }
+  const intervalId = setInterval(pollQueries.bind(this), interval)
+  return () => clearInterval(intervalId)
 }
 
 /**
@@ -244,6 +274,7 @@ const Oracle = Ae.compose({
     extendOracleTtl,
     postQueryToOracle,
     pollForQueryResponse,
+    pollForQueries,
     getOracleObject,
     getQueryObject
   },
