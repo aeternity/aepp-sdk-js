@@ -147,7 +147,10 @@ const call = ({ client, instance }) => async (fn, params = [], options = {}) => 
 
   if (!fn) throw new Error('Function name is required')
   if (!instance.deployInfo.address) throw new Error('You need to deploy contract before calling!')
-  if (BigNumber(opt.amount).gt(0) && !fnACI.payable) throw new Error(`You try to pay "${opt.amount}" to function "${fn}" which is not payable. Only payable function can accept tokens`)
+  if (
+    BigNumber(opt.amount).gt(0) &&
+    (Object.prototype.hasOwnProperty.call(fnACI, 'payable') && !fnACI.payable)
+  ) throw new Error(`You try to pay "${opt.amount}" to function "${fn}" which is not payable. Only payable function can accept tokens`)
   params = !opt.skipArgsConvert ? await prepareArgsForEncode(fnACI, params) : params
   const result = opt.callStatic
     ? await client.contractCallStatic(source, instance.deployInfo.address, fn, params, {
