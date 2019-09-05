@@ -78,7 +78,7 @@ export const CompilerPool = AsyncInit.compose({
      * nodePool.selectNode('testNode')
      */
     selectCompiler (name) {
-      if (!this.compilerPool.has(name)) throw new Error(`Node with name ${name} not in pool`)
+      if (!this.compilerPool.has(name)) throw new Error(`Compiler with name ${name} not in pool`)
 
       this.selectedCompiler = this.compilerPool.get(name)
     },
@@ -120,10 +120,12 @@ export const CompilerPool = AsyncInit.compose({
      * nodePool.getNodesInPool()
      */
     getCompilersInPool () {
-      return Array.from(this.compilerPool.entries()).map(([name, compiler]) => ({
-        name,
-        ...compiler.instance.getCompilerInfo()
-      }))
+      return Array
+        .from(this.compilerPool.entries())
+        .map(([name, compiler]) => ({
+          name,
+          ...compiler.instance.getCompilerInfo()
+        }))
     },
     validateCompilers (compilers) {
       // const nodeProps = ['Swagger', 'api', 'consensusProtocolVersion', 'genesisHash', 'methods']

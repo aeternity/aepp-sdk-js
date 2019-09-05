@@ -141,7 +141,7 @@ export const NodePool = AsyncInit.compose({
       const nodeProps = ['Swagger', 'api', 'consensusProtocolVersion', 'genesisHash', 'methods']
       nodes.forEach((node, index) => {
         if (typeof node !== 'object') throw new Error('Node must be an object with "name" and "instance" props')
-        if (['name', 'instance'].find(k => !node[k])) throw new Error(`Node object on index ${index} must contain node "name" and "ins"`)
+        if (['name', 'instance'].find(k => !node[k])) throw new Error(`Node object on index ${index} must contain node "name" and "instance"`)
         if (!node.instance || typeof node.instance !== 'object' || nodeProps.find(prop => !(prop in node.instance))) {
           throw new Error('Invalid node instance object')
         }
