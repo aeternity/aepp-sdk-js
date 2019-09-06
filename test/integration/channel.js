@@ -29,8 +29,8 @@ const wsUrl = process.env.TEST_WS_URL || 'ws://localhost:3014/channel'
 plan(BigNumber('1000e18').toString())
 
 const identityContract = `
-contract Identity =
-  entrypoint main(x : int): int = x
+payable contract Identity =
+  payable entrypoint main(x : int): int = x
 `
 
 function waitForChannel (channel) {
