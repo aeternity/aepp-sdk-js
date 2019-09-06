@@ -50,7 +50,7 @@ contract StateContract =
   entrypoint retrieve() : string*int = (state.value, state.key)
 
   entrypoint intFn(a: int) : int = a
-  entrypoint stringFn(a: string) : string = a
+  payable entrypoint stringFn(a: string) : string = a
   entrypoint boolFn(a: bool) : bool = a
   entrypoint addressFn(a: address) : address = a
   entrypoint contractAddress (ct: address) : address = ct
@@ -88,7 +88,7 @@ const encodedNumberSix = 'cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaKNdnK'
 
 plan('1000000000000000000000')
 
-describe('Contract', function () {
+describe.only('Contract', function () {
   configure(this)
 
   let contract
@@ -245,7 +245,7 @@ describe('Contract', function () {
       const isCompiled = contractObject.compiled.length && contractObject.compiled.slice(0, 3) === 'cb_'
       isCompiled.should.be.equal(true)
     })
-    it.skip('Fail on paying to not payable function', async () => {
+    it('Fail on paying to not payable function', async () => {
       const amount = 100
       try {
         await contractObject.methods.intFn.send(1, { amount })
@@ -253,7 +253,7 @@ describe('Contract', function () {
         e.message.should.be.equal(`You try to pay "${amount}" to function "intFn" which is not payable. Only payable function can accept tokens`)
       }
     })
-    it.skip('Can pay to payable function', async () => {
+    it('Can pay to payable function', async () => {
       const contractBalance = await contract.balance(contractObject.deployInfo.address)
       await contractObject.methods.stringFn.send('1', { amount: 100 })
       const balanceAfter = await contract.balance(contractObject.deployInfo.address)
