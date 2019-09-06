@@ -60,6 +60,7 @@ async function prepareArgsForEncode (aci, params) {
  * @param {Object} [options] Options object
  * @param {Object} [options.aci] Contract ACI
  * @param {Object} [options.contractAddress] Contract address
+ * @param {Object} [options.filesystem] Contact source external deps
  * @param {Object} [options.opt] Contract options
  * @return {ContractInstance} JS Contract API
  * @example
@@ -70,8 +71,8 @@ async function prepareArgsForEncode (aci, params) {
  * Also you can call contract like: await contractIns.methods.setState(123, options)
  * Then sdk decide to make on-chain or static call(dry-run API) transaction based on function is stateful or not
  */
-async function getContractInstance (source, { aci, contractAddress, opt } = {}) {
-  aci = aci || await this.contractGetACI(source)
+async function getContractInstance (source, { aci, contractAddress, filesystem = {}, opt } = {}) {
+  aci = aci || await this.contractGetACI(source, { filesystem })
   const defaultOptions = {
     skipArgsConvert: false,
     skipTransformDecoded: false,
@@ -82,7 +83,8 @@ async function getContractInstance (source, { aci, contractAddress, opt } = {}) 
     gas: 1600000 - 21000,
     top: null, // using for contract call static
     waitMined: true,
-    verify: false
+    verify: false,
+    filesystem
   }
   const instance = {
     interface: R.defaultTo(null, R.prop('interface', aci)),
@@ -163,7 +165,7 @@ const call = ({ client, instance }) => async (fn, params = [], options = {}) => 
     decodedResult: await transformDecodedData(
       fnACI.returns,
       await result.decode(),
-      { ...opt, compilerVersion: instance.compilerVersion, bindings: fnACI.bindings }
+      { ...opt, bindings: fnACI.bindings }
     )
   }
 }
@@ -190,7 +192,7 @@ const deploy = ({ client, instance }) => async (init = [], options = {}) => {
 }
 
 const compile = ({ client, instance }) => async () => {
-  const { bytecode } = await client.contractCompile(instance.source)
+  const { bytecode } = await client.contractCompile(instance.source, instance.options)
   instance.compiled = bytecode
   return instance.compiled
 }
