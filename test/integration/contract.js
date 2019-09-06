@@ -23,7 +23,7 @@ import * as R from 'ramda'
 
 const identityContract = `
 contract Identity =
-  entrypoint main(x : int) = x
+ entrypoint main(x : int) = x
 `
 const stateContract = `
 contract StateContract =
@@ -47,32 +47,32 @@ contract StateContract =
   datatype dateUnit = Year | Month | Day
   
   entrypoint init(value: string, key: int, testOption: option(string)) : state = { value = value, key = key, testOption = testOption }
-  entrypoint retrieve() : (string, int) = (state.value, state.key)
+  entrypoint retrieve() : string*int = (state.value, state.key)
 
   entrypoint intFn(a: int) : int = a
-  entrypoint stringFn(a: string) : string = a
+  payable entrypoint stringFn(a: string) : string = a
   entrypoint boolFn(a: bool) : bool = a
   entrypoint addressFn(a: address) : address = a
   entrypoint contractAddress (ct: address) : address = ct
   entrypoint accountAddress (ak: address) : address = ak
 
-  entrypoint tupleFn (a: (string, int)) : (string, int) = a
-  entrypoint tupleInTupleFn (a: ((string, string), int)) : ((string, string), int) = a
-  entrypoint tupleWithList (a: (list(int), int)) : (list(int), int) = a
+  entrypoint tupleFn (a: string*int) : string*int = a
+  entrypoint tupleInTupleFn (a: (string*string)*int) : (string*string)*int = a
+  entrypoint tupleWithList (a: list(int)*int) : list(int)*int = a
   
   entrypoint listFn(a: list(int)) : list(int) = a
   entrypoint listInListFn(a: list(list(int))) : list(list(int)) = a
   
-  entrypoint mapFn(a: map(address, (string, int))) : map(address, (string, int)) = a
-  entrypoint mapOptionFn(a: map(address, (string, option(int)))) : map(address, (string, option(int))) = a
+  entrypoint mapFn(a: map(address, string*int)) : map(address, string*int) = a
+  entrypoint mapOptionFn(a: map(address, string*option(int))) : map(address, string*option(int)) = a
   
   entrypoint getRecord() : state = state
   stateful entrypoint setRecord(s: state) = put(s)
   
   entrypoint intOption(s: option(int)) : option(int) = s
-  entrypoint listOption(s: option(list((int, string)))) : option(list((int ,string))) = s
+  entrypoint listOption(s: option(list(int*string))) : option(list(int*string)) = s
   
-  entrypoint testFn(a: list(int), b: bool) : (list(int), bool) = (a, b)
+  entrypoint testFn(a: list(int), b: bool) : list(int)*bool = (a, b)
   entrypoint approve(tx_id: int, voting_contract: Voting) : int = tx_id
   
   entrypoint hashFn(s: hash): hash = s
@@ -116,7 +116,7 @@ describe('Contract', function () {
   })
 
   it('deploys compiled contracts', async () => {
-    deployed = await bytecode.deploy([])
+    deployed = await bytecode.deploy([]).catch(async e => console.log(await e.verifyTx()))
     return deployed.should.have.property('address')
   })
 
@@ -206,7 +206,7 @@ describe('Contract', function () {
     let contractObject
 
     it('Generate ACI object', async () => {
-      contractObject = await contract.getContractInstance(testContract, { opt: { amount: 10000, ttl: 10 } })
+      contractObject = await contract.getContractInstance(testContract, { opt: { ttl: 10 } })
       contractObject.should.have.property('interface')
       contractObject.should.have.property('aci')
       contractObject.should.have.property('source')
@@ -215,7 +215,7 @@ describe('Contract', function () {
       contractObject.should.have.property('compile')
       contractObject.should.have.property('call')
       contractObject.should.have.property('deploy')
-      contractObject.options.amount.should.be.equal(10000)
+      contractObject.options.ttl.should.be.equal(10)
       const functionsFromACI = contractObject.aci.functions.map(({ name }) => name)
       const methods = Object.keys(contractObject.methods)
       R.equals(methods, functionsFromACI).should.be.equal(true)
@@ -241,9 +241,23 @@ describe('Contract', function () {
 
     it('Deploy contract before compile', async () => {
       contractObject.compiled = null
-      await contractObject.methods.init('123', 1, Promise.resolve('hahahaha'))
+      await contractObject.methods.init('123', 1, Promise.resolve('hahahaha'), { })
       const isCompiled = contractObject.compiled.length && contractObject.compiled.slice(0, 3) === 'cb_'
       isCompiled.should.be.equal(true)
+    })
+    it('Fail on paying to not payable function', async () => {
+      const amount = 100
+      try {
+        await contractObject.methods.intFn.send(1, { amount })
+      } catch (e) {
+        e.message.should.be.equal(`You try to pay "${amount}" to function "intFn" which is not payable. Only payable function can accept tokens`)
+      }
+    })
+    it('Can pay to payable function', async () => {
+      const contractBalance = await contract.balance(contractObject.deployInfo.address)
+      await contractObject.methods.stringFn.send('1', { amount: 100 })
+      const balanceAfter = await contract.balance(contractObject.deployInfo.address)
+      balanceAfter.should.be.equal(`${+contractBalance + 100}`)
     })
     it('Call contract on specific account', async () => {
       const current = await contract.address()

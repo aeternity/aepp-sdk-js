@@ -23,7 +23,7 @@ import { commitmentHash } from '../../es/tx/builder/helpers'
 const nonce = 1
 const nameTtl = 1
 const clientTtl = 1
-const amount = 1
+const amount = 0
 const senderId = 'ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688'
 const recipientId = 'ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688'
 const name = 'test123test.test'
@@ -44,7 +44,6 @@ const queryResponse = '{\'tmp\': 101}'
 // Contract test data
 const contractCode = `
 contract Identity =
-  type state = ()
   entrypoint main(x : int) = x
 `
 let contractId
