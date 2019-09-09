@@ -64,8 +64,18 @@ async function getAccount (address, { height, hash } = {}) {
   return this.api.getAccountByPubkey(address)
 }
 
+/**
+ * @function
+ * @deprecated
+ */
 async function balance (address, { height, hash, format = false } = {}) {
   const { balance } = await this.getAccount(address, { hash, height })
+
+  return format ? formatBalance(balance) : balance.toString()
+}
+
+async function getBalance (address, { height, hash, format = false } = {}) {
+  const { balance } = await this.getAccount(address, { hash, height }).catch(_ => ({ balance: 0 }))
 
   return format ? formatBalance(balance) : balance.toString()
 }
@@ -195,6 +205,7 @@ const ChainNode = Chain.compose(Oracle, TransactionValidator, NodePool, {
   methods: {
     sendTransaction,
     balance,
+    getBalance,
     getAccount,
     topBlock,
     tx,
