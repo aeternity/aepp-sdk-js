@@ -39,8 +39,12 @@ describe('Accounts', function () {
       wallet.setKeypair(generateKeyPair())
     })
 
-    it('determining the balance', async () => {
+    it('determining the balance using deprecated `balance` method', async () => {
       return wallet.balance(await wallet.address()).should.be.rejectedWith(Error)
+    })
+
+    it('determining the balance', async () => {
+      return wallet.getBalance(await wallet.address()).should.eventually.be.equal('0')
     })
 
     it('spending tokens', async () => {
@@ -56,7 +60,7 @@ describe('Accounts', function () {
     })
   })
 
-  it('determines the balance', async () => {
+  it('determines the balance using `balance`', async () => {
     return wallet.balance(await wallet.address()).should.eventually.be.a('string')
   })
 
