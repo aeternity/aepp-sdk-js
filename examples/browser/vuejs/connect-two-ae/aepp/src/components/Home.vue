@@ -253,7 +253,7 @@
         await this.client.connectToWallet(await wallet.getConnection())
         await this.client.subscribeAddress('subscribe', 'current')
         this.pub = await this.client.address()
-        this.balance = await this.client.balance(this.pub).catch(console.log)
+        this.balance = await this.client.getBalance(this.pub)
         this.walletName = this.client.rpcClient.info.name
       },
       async scanForWallets () {
