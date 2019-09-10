@@ -119,7 +119,7 @@ const handleMessage = (instance, id) => async (msg) => {
   if (!msg.id) {
     return getHandler(NOTIFICATIONS, msg)(instance, { client })(msg)
   }
-  if (client.callbacks.hasOwnProperty(msg.id)) {
+  if (Object.prototype.hasOwnProperty.call(client.callbacks, msg.id)) {
     return getHandler(RESPONSES, msg)(instance, { client })(msg)
   } else {
     return getHandler(REQUESTS, msg)(instance, { client })(msg)

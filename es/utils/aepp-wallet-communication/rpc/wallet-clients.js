@@ -27,7 +27,7 @@ const receive = (handler, msgId) => (msg) => {
 
 export const WalletClient = stampit({
   init ({ id, name, network, icons, connection, handlers: [onMessage, onDisconnect] }) {
-    let messageId = 0
+    const messageId = 0
     this.id = id
     this.connection = connection
     this.info = { name, network, icons }
@@ -64,7 +64,7 @@ export const WalletClient = stampit({
     },
     addAction (action, [r, j]) {
       const removeAction = ((ins) => (id) => delete ins[id])(this.actions)
-      if (this.callbacks.hasOwnProperty(action.id)) throw new Error('Action for this request already exist')
+      if (Object.prototype.hasOwnProperty.call(this.callbacks, action.id)) throw new Error('Action for this request already exist')
       this.actions[action.id] = {
         ...action,
         accept () {
@@ -79,7 +79,7 @@ export const WalletClient = stampit({
       return this.actions[action.id]
     },
     addCallback (msgId) {
-      if (this.callbacks.hasOwnProperty(msgId)) throw new Error('Callback Already exist')
+      if (Object.prototype.hasOwnProperty.call(this.callbacks, msgId)) throw new Error('Callback Already exist')
       return new Promise((resolve, reject) => {
         this.callbacks[msgId] = { resolve, reject }
       })

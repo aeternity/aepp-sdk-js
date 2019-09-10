@@ -33,7 +33,10 @@ const RESPONSES = {
     },
   [METHODS.aepp.subscribeAddress]: (instance) =>
     (msg) => {
-      if (msg.result && msg.result.hasOwnProperty('address')) instance.rpcClient.accounts = msg.result.address
+      if (
+        msg.result &&
+        Object.prototype.hasOwnProperty.call(msg.result, 'address')
+      ) instance.rpcClient.accounts = msg.result.address
 
       processResponse(instance)(
         msg,
@@ -62,7 +65,7 @@ const processResponse = (instance) => ({ id, error, result }, transformResult) =
 const handleMessage = (instance) => async (msg) => {
   if (!msg.id) {
     return getHandler(NOTIFICATIONS, msg)(instance)(msg)
-  } else if (instance.rpcClient.callbacks.hasOwnProperty(msg.id)) {
+  } else if (Object.prototype.hasOwnProperty.call(instance.rpcClient.callbacks, msg.id)) {
     return getHandler(RESPONSES, msg)(instance)(msg)
   } else {
     return getHandler(REQUESTS, msg)(instance)(msg)
