@@ -23,7 +23,6 @@ import * as R from 'ramda'
 
 const identityContract = `
 contract Identity =
-  type state = ()
   entrypoint main(x : int) = x
 `
 const stateContract = `
@@ -110,8 +109,14 @@ describe('Contract', function () {
     return bytecode.should.have.property('bytecode')
   })
 
+  it('deploy static compiled contract', async () => {
+    const res = await bytecode.deployStatic()
+    res.result.should.have.property('gasUsed')
+    res.result.should.have.property('returnType')
+  })
+
   it('deploys compiled contracts', async () => {
-    deployed = await bytecode.deploy()
+    deployed = await bytecode.deploy([])
     return deployed.should.have.property('address')
   })
 
@@ -125,6 +130,13 @@ describe('Contract', function () {
     callRes.result.callerId.should.be.equal(onAccount)
     const callStaticRes = await deployed.callStatic('main', ['42'])
     callStaticRes.result.callerId.should.be.equal(onAccount)
+  })
+
+  it('Call-Static deploy transaction', async () => {
+    const compiled = bytecode.bytecode
+    const res = await contract.contractCallStatic(identityContract, null, 'init', [], { bytecode: compiled })
+    res.result.should.have.property('gasUsed')
+    res.result.should.have.property('returnType')
   })
 
   it('Dry-run without accounts', async () => {
@@ -212,6 +224,19 @@ describe('Contract', function () {
       await contractObject.compile()
       const isCompiled = contractObject.compiled.length && contractObject.compiled.slice(0, 3) === 'cb_'
       isCompiled.should.be.equal(true)
+    })
+    it('Dry-run deploy fn', async () => {
+      const res = await contractObject.methods.init.get('123', 1, Promise.resolve('hahahaha'))
+      res.result.should.have.property('gasUsed')
+      res.result.should.have.property('returnType')
+    })
+    it('Dry-run deploy fn on specific account', async () => {
+      const current = await contract.address()
+      const onAccount = contract.addresses().find(acc => acc !== current)
+      const { result } = await contractObject.methods.init.get('123', 1, Promise.resolve('hahahaha'), { onAccount })
+      result.should.have.property('gasUsed')
+      result.should.have.property('returnType')
+      result.callerId.should.be.equal(onAccount)
     })
 
     it('Deploy contract before compile', async () => {
@@ -473,13 +498,13 @@ describe('Contract', function () {
         })
         it('Invalid variant', async () => {
           try {
-            await contractObject.methods.datTypeFn("asdcxz")
+            await contractObject.methods.datTypeFn('asdcxz')
           } catch (e) {
             e.message.should.be.equal('"Argument" at position 0 fails because ["0" must be one of [Year, Month, Day], "0" must be an object]')
           }
         })
         it('Valid', async () => {
-          const res = await contractObject.methods.datTypeFn("Year" || { Year: []})
+          const res = await contractObject.methods.datTypeFn('Year' || { Year: [] })
           JSON.stringify(res.decodedResult).should.be.equal(JSON.stringify({ Year: [] }))
         })
       })

@@ -24,6 +24,8 @@
 
 import Account from './'
 import * as Crypto from '../utils/crypto'
+import { isHex } from '../utils/string'
+import { decode } from '../tx/builder/helpers'
 
 const secrets = new WeakMap()
 
@@ -37,7 +39,7 @@ async function address (format = Crypto.ADDRESS_FORMAT.api) {
 
 function setSecret (keyPair) {
   secrets.set(this, {
-    secretKey: Buffer.from(keyPair.secretKey, 'hex'),
+    secretKey: Buffer.isBuffer(keyPair.secretKey) ? keyPair.secretKey : Buffer.from(keyPair.secretKey, 'hex'),
     publicKey: keyPair.publicKey
   })
 }
@@ -48,7 +50,14 @@ function validateKeyPair (keyPair) {
     keyPair = { publicKey: keyPair.pub, secretKey: keyPair.priv }
   }
   if (!keyPair.secretKey || !keyPair.publicKey) throw new Error('KeyPair must must have "secretKey", "publicKey" properties')
-  if (typeof keyPair.publicKey !== 'string' || keyPair.publicKey.indexOf('ak_') === -1) throw new Error('Public Key must be a string with "ak_" prefix')
+  if (typeof keyPair.publicKey !== 'string' || keyPair.publicKey.indexOf('ak_') === -1) throw new Error('Public Key must be a base58c string with "ak_" prefix')
+  if (
+    !Buffer.isBuffer(keyPair.secretKey) &&
+    (typeof keyPair.secretKey === 'string' && !isHex(keyPair.secretKey))
+  ) throw new Error('Secret key must be hex string or Buffer')
+
+  const pubBuffer = Buffer.from(decode(keyPair.publicKey, 'ak'))
+  if (!Crypto.isValidKeypair(Buffer.from(keyPair.secretKey, 'hex'), pubBuffer)) throw new Error('Invalid Key Pair')
 }
 
 /**
@@ -65,7 +74,7 @@ function validateKeyPair (keyPair) {
 const MemoryAccount = Account.compose({
   init ({ keypair }) {
     validateKeyPair(keypair)
-    if (keypair.hasOwnProperty('priv') && keypair.hasOwnProperty('pub')) {
+    if (Object.prototype.hasOwnProperty.call(keypair, 'priv') && Object.prototype.hasOwnProperty.call(keypair, 'pub')) {
       keypair = { secretKey: keypair.priv, publicKey: keypair.pub }
       console.warn('pub/priv naming for accounts has been deprecated, please use secretKey/publicKey')
     }

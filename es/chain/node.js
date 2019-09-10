@@ -19,6 +19,7 @@ import Chain from './'
 import Oracle from '../oracle/node'
 import formatBalance from '../utils/amount-formatter'
 import TransactionValidator from '../tx/validator'
+import NodePool from '../node-pool'
 
 /**
  * ChainNode module
@@ -63,8 +64,18 @@ async function getAccount (address, { height, hash } = {}) {
   return this.api.getAccountByPubkey(address)
 }
 
+/**
+ * @function
+ * @deprecated
+ */
 async function balance (address, { height, hash, format = false } = {}) {
   const { balance } = await this.getAccount(address, { hash, height })
+
+  return format ? formatBalance(balance) : balance.toString()
+}
+
+async function getBalance (address, { height, hash, format = false } = {}) {
+  const { balance } = await this.getAccount(address, { hash, height }).catch(_ => ({ balance: 0 }))
 
   return format ? formatBalance(balance) : balance.toString()
 }
@@ -187,13 +198,14 @@ async function getName (name) {
  * @return {Object} ChainNode instance
  * @example ChainNode({url: 'https://sdk-testnet.aepps.com/'})
  */
-const ChainNode = Chain.compose(Oracle, TransactionValidator, {
+const ChainNode = Chain.compose(Oracle, TransactionValidator, NodePool, {
   init ({ verifyTx = false }) {
     this.verifyTxBeforeSend = verifyTx
   },
   methods: {
     sendTransaction,
     balance,
+    getBalance,
     getAccount,
     topBlock,
     tx,

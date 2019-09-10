@@ -84,8 +84,8 @@ async function getConsensusProtocolVersion (protocols = [], height) {
 
 function axiosError (handler) {
   return (error) => {
-    if (!handler || typeof handler !== 'function') throw error
-    return handler(error)
+    handler && typeof handler === 'function' && handler(error)
+    throw error
   }
 }
 
@@ -139,7 +139,8 @@ const Node = stampit(AsyncInit, {
     const { nodeRevision: revision, genesisKeyBlockHash: genesisHash, networkId, protocols } = await this.api.getStatus()
     this.consensusProtocolVersion = await this.getConsensusProtocolVersion(protocols)
     if (
-      !semverSatisfies(this.version.split('-')[0], NODE_GE_VERSION, NODE_LT_VERSION) &&
+      !(this.version === '5.0.0-rc.1' || semverSatisfies(this.version.split('-')[0], NODE_GE_VERSION, NODE_LT_VERSION)) &&
+      // Todo implement 'rc' version comparision in semverSatisfies
       !forceCompatibility
     ) {
       throw new Error(
@@ -154,6 +155,6 @@ const Node = stampit(AsyncInit, {
 })
 
 const NODE_GE_VERSION = '3.0.1'
-const NODE_LT_VERSION = '5.0.0'
+const NODE_LT_VERSION = '5.0.0-rc.2'
 
 export default Node

@@ -656,14 +656,7 @@ function sendMessage (message, recipient) {
   if (typeof message === 'object') {
     info = JSON.stringify(message)
   }
-  enqueueAction(
-    this,
-    (channel, state) => state.handler === handlers.channelOpen,
-    (channel, state) => {
-      send(channel, { jsonrpc: '2.0', method: 'channels.message', params: { info, to: recipient } })
-      return state
-    }
-  )
+  send(this, { jsonrpc: '2.0', method: 'channels.message', params: { info, to: recipient } })
 }
 
 /**

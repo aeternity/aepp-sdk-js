@@ -133,7 +133,7 @@ async function unpackAndVerify (txHash, { networkId } = {}) {
 }
 
 const getOwnerPublicKey = (tx) =>
-  tx[['senderId', 'accountId', 'ownerId', 'callerId', 'oracleId', 'fromId', 'initiator'].find(key => tx[key])].replace('ok_', 'ak_')
+  tx[['senderId', 'accountId', 'ownerId', 'callerId', 'oracleId', 'fromId', 'initiator', 'gaId'].find(key => tx[key])].replace('ok_', 'ak_')
 
 /**
  * Verify transaction (verify nonce, ttl, fee, signature, account balance)
@@ -151,7 +151,7 @@ async function verifyTx ({ tx, signatures, rlpEncoded }, networkId) {
   networkId = networkId || this.getNetworkId() || 'ae_mainnet'
   // Fetch data for verification
   const ownerPublicKey = getOwnerPublicKey(tx)
-  const gas = tx.hasOwnProperty('gas') ? +tx.gas : 0
+  const gas = Object.prototype.hasOwnProperty.call(tx, 'gas') ? +tx.gas : 0
   const txType = OBJECT_ID_TX_TYPE[+tx.tag]
   const resolvedData = {
     minFee: calculateFee(0, txType, { gas, params: tx, showWarning: false }),

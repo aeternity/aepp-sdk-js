@@ -18,8 +18,14 @@
 import { w3cwebsocket as W3CWebSocket } from 'websocket'
 import { EventEmitter } from 'events'
 import * as R from 'ramda'
+import JSONBig from '../utils/json-big'
 import { pascalToSnake } from '../utils/string'
 import { awaitingConnection } from './handlers'
+
+// Send ping message every 10 seconds
+const PING_TIMEOUT_MS = 10000
+// Close connection if pong message is not received within 5 seconds
+const PONG_TIMEOUT_MS = 5000
 
 const options = new WeakMap()
 const status = new WeakMap()
@@ -34,6 +40,8 @@ const actionQueueLocked = new WeakMap()
 const sequence = new WeakMap()
 const channelId = new WeakMap()
 const rpcCallbacks = new WeakMap()
+const pingTimeoutId = new WeakMap()
+const pongTimeoutId = new WeakMap()
 
 function channelURL (url, params) {
   const paramString = R.join('&', R.values(R.mapObjIndexed((value, key) =>
@@ -71,7 +79,7 @@ function changeState (channel, newState) {
 }
 
 function send (channel, message) {
-  websockets.get(channel).send(JSON.stringify(message))
+  websockets.get(channel).send(JSONBig.stringify(message))
 }
 
 function enqueueAction (channel, guard, action) {
@@ -118,8 +126,26 @@ async function dequeueMessage (channel) {
   dequeueMessage(channel)
 }
 
+function ping (channel) {
+  clearTimeout(pingTimeoutId.get(channel))
+  clearTimeout(pongTimeoutId.get(channel))
+  pingTimeoutId.set(channel, setTimeout(() => {
+    send(channel, {
+      jsonrpc: '2.0',
+      method: 'channels.system',
+      params: {
+        action: 'ping'
+      }
+    })
+    pongTimeoutId.set(channel, setTimeout(() => {
+      disconnect(channel)
+      emit(channel, 'error', Error('Server pong timed out'))
+    }, PONG_TIMEOUT_MS))
+  }, PING_TIMEOUT_MS))
+}
+
 function onMessage (channel, data) {
-  const message = JSON.parse(data)
+  const message = JSONBig.parse(data)
   if (message.id) {
     const callback = rpcCallbacks.get(channel).get(message.id)
     try {
@@ -129,6 +155,14 @@ function onMessage (channel, data) {
     }
   } else if (message.method === 'channels.message') {
     emit(channel, 'message', message.params.data.message)
+  } else if (message.method === 'channels.system.pong') {
+    if (
+      (message.params.channel_id === channelId.get(channel)) ||
+      // Skip channelId check if channelId is not known yet
+      (channelId.get(channel) == null)
+    ) {
+      ping(channel)
+    }
   } else {
     messageQueue.set(channel, [...(messageQueue.get(channel) || []), message])
     dequeueMessage(channel)
@@ -155,19 +189,19 @@ function call (channel, method, params) {
 }
 
 function disconnect (channel) {
-  const ws = websockets.get(channel)
-  if (ws.readyState === ws.OPEN) {
-    ws._connection.close()
-  }
+  websockets.get(channel).close()
+  clearTimeout(pingTimeoutId.get(channel))
+  clearTimeout(pongTimeoutId.get(channel))
 }
 
 function WebSocket (url, callbacks) {
-  function fireOnce (target, key, always) {
+  function fireOnce (target, key, fn) {
+    const once = R.once(fn)
+    const original = target[key]
     target[key] = (...args) => {
-      always(...args)
-      target[key] = callbacks[key]
-      if (typeof target === 'function') {
-        target(...args)
+      once(...args)
+      if (typeof original === 'function') {
+        original(...args)
       }
     }
   }
@@ -193,8 +227,15 @@ async function initialize (channel, channelOptions) {
   sequence.set(channel, 0)
   rpcCallbacks.set(channel, new Map())
   const ws = await WebSocket(wsUrl, {
-    onopen: () => changeStatus(channel, 'connected'),
-    onclose: () => changeStatus(channel, 'disconnected'),
+    onopen: () => {
+      changeStatus(channel, 'connected')
+      ping(channel)
+    },
+    onclose: () => {
+      changeStatus(channel, 'disconnected')
+      clearTimeout(pingTimeoutId.get(channel))
+      clearTimeout(pongTimeoutId.get(channel))
+    },
     onmessage: ({ data }) => onMessage(channel, data)
   })
   websockets.set(channel, ws)

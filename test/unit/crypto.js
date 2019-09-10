@@ -20,7 +20,6 @@ import { describe, it } from 'mocha'
 import { assert, expect } from 'chai'
 import * as Crypto from '../../es/utils/crypto'
 
-import { addressToHex, encodeBase58Check } from '../../es/utils/crypto'
 import { buildTxHash, unpackTx } from '../../es/tx/builder'
 
 // These keys are fixations for the encryption lifecycle tests and will
@@ -46,6 +45,15 @@ describe('crypto', () => {
       assert.isTrue(keyPair.publicKey.startsWith('ak_'))
       assert.isAtLeast(keyPair.publicKey.length, 51)
       assert.isAtMost(keyPair.publicKey.length, 53)
+    })
+  })
+
+  describe('isValidKeypair', () => {
+    it('verify the generated key pair', () => {
+      const keyPair = Crypto.generateKeyPair(true)
+      assert.ok(keyPair)
+      const verifyResult = Crypto.isValidKeypair(keyPair.secretKey, keyPair.publicKey)
+      assert.isTrue(verifyResult)
     })
   })
 
@@ -142,8 +150,8 @@ describe('crypto', () => {
   })
   it('Convert base58Check address to hex', () => {
     const address = 'ak_Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm'
-    const hex = addressToHex(address)
-    const fromHexAddress = 'ak_' + encodeBase58Check(Buffer.from(hex.slice(2), 'hex'))
+    const hex = Crypto.addressToHex(address)
+    const fromHexAddress = 'ak_' + Crypto.encodeBase58Check(Buffer.from(hex.slice(2), 'hex'))
     fromHexAddress.should.be.equal(address)
   })
   it('Can produce tx hash', () => {

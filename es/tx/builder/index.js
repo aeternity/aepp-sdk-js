@@ -34,10 +34,11 @@ const ORACLE_TTL_TYPES = {
 function deserializeField (value, type, prefix) {
   if (!value) return ''
   switch (type) {
-    case FIELD_TYPES.ctVersion:
+    case FIELD_TYPES.ctVersion: {
       // eslint-disable-next-line no-unused-vars
       const [vm, _, abi] = value
       return { vmVersion: readInt(Buffer.from([vm])), abiVersion: readInt(Buffer.from([abi])) }
+    }
     case FIELD_TYPES.int:
       return readInt(value)
     case FIELD_TYPES.id:
@@ -76,6 +77,13 @@ function deserializeField (value, type, prefix) {
         case '2': return 'revert'
         default: return value
       }
+    case FIELD_TYPES.sophiaCodeTypeInfo:
+      return value
+        .reduce(
+          (acc, [funHash, fnName, argType, outType]) =>
+            ({ ...acc, [fnName.toString()]: { funHash, argType, outType } }),
+          {}
+        )
     default:
       return value
   }
@@ -123,15 +131,15 @@ function serializeField (value, type, prefix) {
 
 function validateField (value, key, type, prefix) {
   const assert = (valid, params) => valid ? {} : { [key]: VALIDATION_MESSAGE[type](params) }
-
   // All fields are required
   if (value === undefined || value === null) return { [key]: 'Field is required' }
 
   // Validate type of value
   switch (type) {
-    case FIELD_TYPES.int:
+    case FIELD_TYPES.int: {
       const isMinusValue = (!isNaN(value) || BigNumber.isBigNumber(value)) && BigNumber(value).lt(0)
       return assert((!isNaN(value) || BigNumber.isBigNumber(value)) && BigNumber(value).gte(0), { value, isMinusValue })
+    }
     case FIELD_TYPES.id:
       return assert(assertedType(value, prefix) && PREFIX_ID_TAG[value.split('_')[0]] && value.split('_')[0] === prefix, { value, prefix })
     case FIELD_TYPES.binary:
@@ -139,7 +147,7 @@ function validateField (value, key, type, prefix) {
     case FIELD_TYPES.string:
       return assert(true)
     case FIELD_TYPES.ctVersion:
-      return assert(typeof value === 'object' && value.hasOwnProperty('abiVersion') && value.hasOwnProperty('vmVersion'))
+      return assert(typeof value === 'object' && Object.prototype.hasOwnProperty.call(value, 'abiVersion') && Object.prototype.hasOwnProperty.call(value, 'vmVersion'))
     case FIELD_TYPES.pointers:
       return assert(Array.isArray(value) && !value.find(e => e !== Object(e)), { value })
     default:
@@ -343,10 +351,11 @@ export function buildTx (params, type, { excludeKeys = [], prefix = 'tx' } = {})
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param {String|Array} encodedTx String or RLP encoded transaction array (if fromRlpBinary flag is true)
  * @param {Boolean} fromRlpBinary Unpack from RLP encoded transaction (default: false)
+ * @param {String} prefix - Prefix of data
  * @return {Object} { tx, rlpEncoded, binary } Object with tx -> Object with transaction param's, rlp encoded transaction and binary transaction
  */
-export function unpackTx (encodedTx, fromRlpBinary = false) {
-  const rlpEncoded = fromRlpBinary ? encodedTx : decode(encodedTx, 'tx')
+export function unpackTx (encodedTx, fromRlpBinary = false, prefix = 'tx') {
+  const rlpEncoded = fromRlpBinary ? encodedTx : decode(encodedTx, prefix)
   const binary = rlp.decode(rlpEncoded)
 
   const objId = readInt(binary[0])
