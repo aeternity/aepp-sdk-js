@@ -66,15 +66,32 @@ const ContractBase = stampit({
 }))
 
 /**
+ * Get contract ACI
+ * @function contractGetACI
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype (source: String, options: Array) => aciObject: Promise[Object]
+ * @param {String} source - Contract source code
+ * @param {Object} [options={}]  Options
+ * @param {Object} [options.filesystem]  Contract external namespaces map
+ * @param {Object} [options.backend]  Contract vm(default: aevm)
+ * @return {Object} - Contract aci object
+ */
+
+/**
  * Encode contract data
  * @function contractEncodeCallDataAPI
  * @instance
  * @abstract
  * @category async
- * @rtype (source: String, name: String, args: Array) => callData: Promise[String]
+ * @rtype (source: String, name: String, args: Array, options: Array) => callData: Promise[String]
  * @param {String} source - Contract source code
  * @param {String} name - Function name
  * @param {Array} args - Function argument's
+ * @param {Object} [options={}]  Options
+ * @param {Object} [options.filesystem]  Contract external namespaces map
+ * @param {Object} [options.backend]  Contract vm(default: aevm)
  * @return {String} - Contract encoded data
  */
 
@@ -96,11 +113,14 @@ const ContractBase = stampit({
  * @instance
  * @abstract
  * @category async
- * @rtype (source: String, fn: String, callValue: String, callResult: String) => decodedResult: Promise[String]
+ * @rtype (source: String, fn: String, callValue: String, callResult: String, options: Array) => decodedResult: Promise[String]
  * @param {String} source - Contract source
  * @param {String} fn - Fn name
  * @param {String} callValue - result data (cb_das...)
  * @param {String} callResult - contract call result status('ok', 'revert', ...)
+ * @param {Object} [options={}]  Options
+ * @param {Object} [options.filesystem]  Contract external namespaces map
+ * @param {Object} [options.backend]  Contract vm(default: aevm)
  * @return {String} - Decoded contract call result
  */
 
@@ -110,10 +130,13 @@ const ContractBase = stampit({
  * @instance
  * @abstract
  * @category async
- * @rtype (source: String, function: String, callData: String) => decodedResult: Promise[String]
+ * @rtype (source: String, function: String, callData: String, options: Array) => decodedResult: Promise[String]
  * @param {String} source - contract source
  * @param {String} function - function name
  * @param {String} callData - Encoded contract call data
+ * @param {Object} [options={}]  Options
+ * @param {Object} [options.filesystem]  Contract external namespaces map
+ * @param {Object} [options.backend]  Contract vm(default: aevm)
  * @return {String} - Decoded contract call data
  */
 
@@ -126,6 +149,7 @@ const ContractBase = stampit({
  * @rtype (code: String, callData: String) => decodedResult: Promise[String]
  * @param {String} code - contract byte code
  * @param {String} callData - Encoded contract call data
+ * @param {String} backend - Contract vm(default: aevm)
  * @return {String} - Decoded contract call data
  */
 
@@ -137,7 +161,9 @@ const ContractBase = stampit({
  * @category async
  * @rtype (code: String, options?: Object) => compiledContract: Object
  * @param {String} code - Contract source code
- * @param {Object} [options={}] - Options
+ * @param {Object} [options={}]  Options
+ * @param {Object} [options.filesystem]  Contract external namespaces map
+ * @param {Object} [options.backend]  Contract vm(default: aevm)
  * @return {Object} Object which contain bytecode of contract
  */
 

@@ -63,6 +63,8 @@ async function handleCallError (result) {
  * @param {String} source Contract source code
  * @param {String} name Name of function to call
  * @param {Array} args Argument's for call
+ * @param {Object} [options={}]  Options
+ * @param {Object} [options.filesystem={}] Contract external namespaces map
  * @return {Promise<String>}
  */
 async function contractEncodeCall (source, name, args, options) {
@@ -78,10 +80,11 @@ async function contractEncodeCall (source, name, args, options) {
  * @param {String } fn - function name
  * @param {String} callValue - result call data
  * @param {String} callResult - result status
+ * @param {Object} [options={}]  Options
+ * @param {Object} [options.filesystem={}] Contract external namespaces map
  * @return {Promise<String>} Result object
  * @example
  * const decodedData = await client.contractDecodeData(SourceCode ,'functionName', 'cb_asdasdasd...', 'ok|revert')lt
- * @param options
  */
 async function contractDecodeData (source, fn, callValue, callResult, options) {
   return this.contractDecodeCallResultAPI(source, fn, callValue, callResult, options)
@@ -96,10 +99,11 @@ async function contractDecodeData (source, fn, callValue, callResult, options) {
  * @param {String} address Contract address
  * @param {String} name Name of function to call
  * @param {Array} args  Argument's for call function
- * @param {Object} options [options={}]  Options
- * @param {String} top [options.top] Block hash on which you want to call contract
+ * @param {Object} [options={}]  Options
+ * @param {String} [options.top] Block hash on which you want to call contract
  * @param bytecode
  * @param {String} options [options.options]  Transaction options (fee, ttl, gas, amount, deposit)
+ * @param {Object} filesystem [options.options.filesystem] Contract external namespaces map
  * @return {Promise<Object>} Result object
  * @example
  * const callResult = await client.contractCallStatic(source, address, fnName, args = [], { top, options = {} })
@@ -176,8 +180,8 @@ async function dryRunContractTx (tx, callerId, source, name, opt = {}) {
  * @param {String} address Contract address
  * @param {String} name Name of function to call
  * @param {Array} args Argument's for call function
- * @param {Object} options Transaction options (fee, ttl, gas, amount, deposit)
- * @return {Promise<Object>} Result object
+ * @param {Object} [options={}] Transaction options (fee, ttl, gas, amount, deposit)
+ * @param {Object} [options.filesystem={}] Contract external namespaces map* @return {Promise<Object>} Result object
  * @example
  * const callResult = await client.contractCall(source, address, fnName, args = [], options)
  * {
@@ -218,7 +222,8 @@ async function contractCall (source, address, name, args = [], options = {}) {
  * @param {String} code Compiled contract
  * @param {String} source Contract source code
  * @param {Array} initState Arguments of contract constructor(init) function
- * @param {Object} options Transaction options (fee, ttl, gas, amount, deposit)
+ * @param {Object} [options={}] Transaction options (fee, ttl, gas, amount, deposit)
+ * @param {Object} [options.filesystem={}] Contract external namespaces map* @return {Promise<Object>} Result object
  * @return {Promise<Object>} Result object
  * @example
  * const deployed = await client.contractDeploy(bytecode, source, init = [], options)
@@ -268,7 +273,8 @@ async function contractDeploy (code, source, initState = [], options = {}) {
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
  * @param {String} source Contract sourece code
- * @param {Object} options Transaction options (fee, ttl, gas, amount, deposit)
+ * @param {Object} [options={}] Transaction options (fee, ttl, gas, amount, deposit)
+ * @param {Object} [options.filesystem={}] Contract external namespaces map* @return {Promise<Object>} Result object
  * @return {Promise<Object>} Result object
  * @example
  * const compiled = await client.contractCompile(SOURCE_CODE)
