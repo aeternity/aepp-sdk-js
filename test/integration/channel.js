@@ -864,6 +864,40 @@ describe('Channel', function () {
     await initiator.sendTransaction(await initiator.signTransaction(snapshotSoloTx), { waitMined: true })
   })
 
+  it('can reconnect', async () => {
+    initiatorCh.disconnect()
+    responderCh.disconnect()
+    initiatorCh = await Channel({
+      ...sharedParams,
+      role: 'initiator',
+      port: 3006,
+      sign: initiatorSign
+    })
+    responderCh = await Channel({
+      ...sharedParams,
+      role: 'responder',
+      port: 3006,
+      sign: responderSign
+    })
+    await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
+    const channelId = await initiatorCh.id()
+    const round = Number(unpackTx((await initiatorCh.state()).signedTx).tx.encodedTx.tx.nonce)
+    initiatorCh.disconnect()
+    const ch = await Channel.reconnect({
+      ...sharedParams,
+      role: 'initiator',
+      port: 3006,
+      sign: initiatorSign
+    }, {
+      channelId,
+      round,
+      role: 'initiator',
+      pubkey: await initiator.address()
+    })
+    await waitForChannel(ch)
+    ch.state().should.eventually.be.fulfilled
+  })
+
   it('can post backchannel update', async () => {
     async function appendSignature (target, source) {
       const { txType, tx: { signatures, encodedTx: { rlpEncoded } } } = unpackTx(target)
