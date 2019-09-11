@@ -19,7 +19,7 @@ import { describe, it, before, after, beforeEach, afterEach } from 'mocha'
 import * as sinon from 'sinon'
 import { BigNumber } from 'bignumber.js'
 import { configure, ready, plan, BaseAe, networkId } from './'
-import { generateKeyPair } from '../../es/utils/crypto'
+import { generateKeyPair, encodeBase64Check } from '../../es/utils/crypto'
 import { unpackTx, buildTx } from '../../es/tx/builder'
 import { decode } from '../../es/tx/builder/helpers'
 import Channel from '../../es/channel'
@@ -862,6 +862,52 @@ describe('Channel', function () {
       payload: (await initiatorCh.state()).signedTx
     })
     await initiator.sendTransaction(await initiator.signTransaction(snapshotSoloTx), { waitMined: true })
+  })
+
+  it('can post backchannel update', async () => {
+    async function appendSignature (target, source) {
+      const { txType, tx: { signatures, encodedTx: { rlpEncoded } } } = unpackTx(target)
+      const tx = buildTx({
+        signatures: signatures.concat(unpackTx(source).tx.signatures),
+        encodedTx: rlpEncoded
+      }, txType)
+      return `tx_${encodeBase64Check(tx.rlpEncoded)}`
+    }
+
+    initiatorCh.disconnect()
+    responderCh.disconnect()
+    initiatorCh = await Channel({
+      ...sharedParams,
+      role: 'initiator',
+      port: 3006,
+      sign: initiatorSign
+    })
+    responderCh = await Channel({
+      ...sharedParams,
+      role: 'responder',
+      port: 3006,
+      sign: responderSign
+    })
+    await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
+    initiatorCh.disconnect()
+    const { accepted } = await responderCh.update(
+      await initiator.address(),
+      await responder.address(),
+      100,
+      tx => responder.signTransaction(tx)
+    )
+    accepted.should.be.false
+    const result = await responderCh.update(
+      await initiator.address(),
+      await responder.address(),
+      100,
+      async (tx) => appendSignature(
+        await responder.signTransaction(tx),
+        await initiator.signTransaction(tx)
+      )
+    )
+    result.accepted.should.equal(true)
+    result.signedTx.should.be.a('string')
   })
 
   describe('throws errors', function () {
