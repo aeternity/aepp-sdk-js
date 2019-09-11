@@ -72,7 +72,7 @@
         nodes: [{ name: 'localNode', instance: await Node({ url: this.url, internalUrl: this.internalUrl }) }],
         compilerUrl: this.compilerUrl,
         accounts: [MemoryAccount({keypair: {secretKey: this.secretKey, publicKey: this.publicKey}})],
-        address: this.pub,
+        address: this.publicKey,
         onTx: this.confirmDialog,
         onChain: this.confirmDialog,
         onAccount: this.confirmDialog,
@@ -83,7 +83,7 @@
       else window.parent.postMessage({ jsonrpc: '2.0', method: 'ready' }, '*')
 
       this.height = await this.client.height()
-      this.balance = await this.client.balance(this.pub).catch(() => 0)
+      this.balance = await this.client.balance(this.publicKey).catch(() => 0)
     }
   }
 </script>
