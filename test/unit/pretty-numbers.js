@@ -1,7 +1,6 @@
 import BigNumber from 'bignumber.js'
 import prefixedAmount from '../../es/utils/amount-formatter'
 import { describe, it } from 'mocha'
-import { assert, expect } from 'chai'
 
 const MAGNITUDE = 18
 describe('prefixedAmount', () => {
@@ -57,7 +56,7 @@ describe('prefixedAmount', () => {
       '12345678.9 giga',
       '123456789 giga',
       '1.23456789 exa',
-      '12.3456789 exa',
+      '12.3456789 exa'
     ].forEach((res, idx) => (prefixedAmount(t.shiftedBy(idx))).should.be.equal(res))
   })
 })

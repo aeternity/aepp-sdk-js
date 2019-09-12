@@ -24,6 +24,8 @@
 
 import AsyncInit from '../utils/async-init'
 import { snakeToPascal } from '../utils/string'
+import { buildTx } from '../tx/builder'
+import { TX_TYPE } from '../tx/builder/schema'
 import * as handlers from './handlers'
 import {
   eventEmitters,
@@ -659,6 +661,15 @@ function sendMessage (message, recipient) {
   send(this, { jsonrpc: '2.0', method: 'channels.message', params: { info, to: recipient } })
 }
 
+async function reconnect (options, txParams) {
+  const { sign } = options
+
+  return Channel({
+    ...options,
+    reconnectTx: await sign('reconnect', buildTx(txParams, TX_TYPE.channelReconnect).tx)
+  })
+}
+
 /**
  * Channel
  *
@@ -730,6 +741,9 @@ const Channel = AsyncInit.compose({
     getContractState,
     disconnect,
     cleanContractCalls
+  },
+  statics: {
+    reconnect
   }
 })
 

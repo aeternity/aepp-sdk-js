@@ -39,8 +39,12 @@ describe('Accounts', function () {
       wallet.setKeypair(generateKeyPair())
     })
 
-    it('determining the balance', async () => {
+    it('determining the balance using deprecated `balance` method', async () => {
       return wallet.balance(await wallet.address()).should.be.rejectedWith(Error)
+    })
+
+    it('determining the balance', async () => {
+      return wallet.getBalance(await wallet.address()).should.eventually.be.equal('0')
     })
 
     it('spending tokens', async () => {
@@ -56,7 +60,7 @@ describe('Accounts', function () {
     })
   })
 
-  it('determines the balance', async () => {
+  it('determines the balance using `balance`', async () => {
     return wallet.balance(await wallet.address()).should.eventually.be.a('string')
   })
 
@@ -114,11 +118,9 @@ describe('Accounts', function () {
       const { tx } = await wallet.spend(1, await wallet.address(), { onAccount })
       tx.senderId.should.be.equal(onAccount)
       current.should.be.equal(current)
-
     })
 
     it('Fail on invalid account', async () => {
-      const current = await wallet.address()
       // SPEND
       try {
         await wallet.spend(1, await wallet.address(), { onAccount: 1 })
@@ -128,7 +130,6 @@ describe('Accounts', function () {
     })
 
     it('Fail on non exist account', async () => {
-      const current = await wallet.address()
       // SPEND
       try {
         await wallet.spend(1, await wallet.address(), { onAccount: 'ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk' })

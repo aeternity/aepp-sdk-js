@@ -55,6 +55,7 @@ const OBJECT_TAG_CHANNEL_OFFCHAIN_UPDATE_DEPOSIT_TX = 571
 const OBJECT_TAG_CHANNEL_OFFCHAIN_UPDATE_WITHDRAWAL_TX = 572
 const OBJECT_TAG_CHANNEL_OFFCHAIN_CREATE_CONTRACT_TX = 573
 const OBJECT_TAG_CHANNEL_OFFCHAIN_CALL_CONTRACT_TX = 574
+const OBJECT_TAG_CHANNEL_RECONNECT_TX = 575
 const OBJECT_TAG_PROOF_OF_INCLUSION = 60
 const OBJECT_TAG_STATE_TREES = 62
 const OBJECT_TAG_MERKLE_PATRICIA_TREE = 63
@@ -132,6 +133,7 @@ export const TX_TYPE = {
   channelOffChainUpdateWithdrawal: 'channelOffChainUpdateWithdrawal',
   channelOffChainCreateContract: 'channelOffChainCreateContract',
   channelOffChainCallContract: 'channelOffChainCallContract',
+  channelReconnect: 'channelReconnect',
   proofOfInclusion: 'proofOfInclusion',
   stateTrees: 'stateTrees',
   merklePatriciaTree: 'merklePatriciaTree',
@@ -190,13 +192,13 @@ export const VM_ABI_MAP_LIMA = {
 
 export const PROTOCOL_VM_ABI = {
   // Roma
-  '1': VM_ABI_MAP_ROMA,
+  1: VM_ABI_MAP_ROMA,
   // Minerva
-  '2': VM_ABI_MAP_MINERVA,
+  2: VM_ABI_MAP_MINERVA,
   // Fortuna
-  '3': VM_ABI_MAP_FORTUNA,
+  3: VM_ABI_MAP_FORTUNA,
   // Lima
-  '4': VM_ABI_MAP_LIMA
+  4: VM_ABI_MAP_LIMA
 }
 
 export const OBJECT_ID_TX_TYPE = {
@@ -235,6 +237,7 @@ export const OBJECT_ID_TX_TYPE = {
   [OBJECT_TAG_CHANNEL_OFFCHAIN_UPDATE_WITHDRAWAL_TX]: TX_TYPE.channelOffChainUpdateWithdrawal,
   [OBJECT_TAG_CHANNEL_OFFCHAIN_CREATE_CONTRACT_TX]: TX_TYPE.channelOffChainCreateContract,
   [OBJECT_TAG_CHANNEL_OFFCHAIN_CALL_CONTRACT_TX]: TX_TYPE.channelOffChainCallContract,
+  [OBJECT_TAG_CHANNEL_RECONNECT_TX]: TX_TYPE.channelReconnect,
   [OBJECT_TAG_PROOF_OF_INCLUSION]: TX_TYPE.proofOfInclusion,
   [OBJECT_TAG_STATE_TREES]: TX_TYPE.stateTrees,
   [OBJECT_TAG_MERKLE_PATRICIA_TREE]: TX_TYPE.merklePatriciaTree,
@@ -321,12 +324,12 @@ export const ID_TAG = {
   channel: ID_TAG_CHANNEL
 }
 export const PREFIX_ID_TAG = {
-  'ak': ID_TAG.account,
-  'nm': ID_TAG.name,
-  'cm': ID_TAG.commitment,
-  'ok': ID_TAG.oracle,
-  'ct': ID_TAG.contract,
-  'ch': ID_TAG.channel
+  ak: ID_TAG.account,
+  nm: ID_TAG.name,
+  cm: ID_TAG.commitment,
+  ok: ID_TAG.oracle,
+  ct: ID_TAG.contract,
+  ch: ID_TAG.channel
 }
 export const ID_TAG_PREFIX = revertObject(PREFIX_ID_TAG)
 const VALIDATION_ERROR = (msg) => msg
@@ -335,9 +338,9 @@ export const VALIDATION_MESSAGE = {
   [FIELD_TYPES.int]: ({ value, isMinusValue }) => isMinusValue ? VALIDATION_ERROR(`${value} must be >= 0`) : VALIDATION_ERROR(`${value} is not of type Number or BigNumber`),
   [FIELD_TYPES.id]: ({ value, prefix }) => VALIDATION_ERROR(`'${value}' prefix doesn't match expected prefix '${prefix}' or ID_TAG for prefix not found`),
   [FIELD_TYPES.binary]: ({ prefix, value }) => VALIDATION_ERROR(`'${value}' prefix doesn't match expected prefix '${prefix}'`),
-  [FIELD_TYPES.string]: ({ value }) => VALIDATION_ERROR(`Not a string`),
-  [FIELD_TYPES.pointers]: ({ value }) => VALIDATION_ERROR(`Value must be of type Array and contains only object's like '{key: "account_pubkey", id: "ak_lkamsflkalsdalksdlasdlasdlamd"}'`),
-  [FIELD_TYPES.ctVersion]: ({ value }) => VALIDATION_ERROR(`Value must be an object with "vmVersion" and "abiVersion" fields`)
+  [FIELD_TYPES.string]: ({ value }) => VALIDATION_ERROR('Not a string'),
+  [FIELD_TYPES.pointers]: ({ value }) => VALIDATION_ERROR('Value must be of type Array and contains only object\'s like \'{key: "account_pubkey", id: "ak_lkamsflkalsdalksdlasdlasdlamd"}\''),
+  [FIELD_TYPES.ctVersion]: ({ value }) => VALIDATION_ERROR('Value must be an object with "vmVersion" and "abiVersion" fields')
 }
 
 const BASE_TX = [
@@ -735,6 +738,14 @@ const CHANNEL_OFFCHAIN_CALL_CONTRACT_TX = [
   TX_FIELD('gasLimit', FIELD_TYPES.int)
 ]
 
+const CHANNEL_RECONNECT_TX = [
+  ...BASE_TX,
+  TX_FIELD('channelId', FIELD_TYPES.id, 'ch'),
+  TX_FIELD('round', FIELD_TYPES.int),
+  TX_FIELD('role', FIELD_TYPES.string),
+  TX_FIELD('pubkey', FIELD_TYPES.id, 'ak')
+]
+
 const CHANNEL_OFFCHAIN_UPDATE_TRANSFER_TX = [
   ...BASE_TX,
   TX_FIELD('from', FIELD_TYPES.id, 'ak'),
@@ -912,6 +923,9 @@ export const TX_SERIALIZATION_SCHEMA = {
   [TX_TYPE.channelOffChainCallContract]: {
     1: TX_SCHEMA_FIELD(CHANNEL_OFFCHAIN_CALL_CONTRACT_TX, OBJECT_TAG_CHANNEL_OFFCHAIN_CALL_CONTRACT_TX)
   },
+  [TX_TYPE.channelReconnect]: {
+    1: TX_SCHEMA_FIELD(CHANNEL_RECONNECT_TX, OBJECT_TAG_CHANNEL_RECONNECT_TX)
+  },
   [TX_TYPE.proofOfInclusion]: {
     1: TX_SCHEMA_FIELD(PROOF_OF_INCLUSION_TX, OBJECT_TAG_PROOF_OF_INCLUSION)
   },
@@ -1047,6 +1061,9 @@ export const TX_DESERIALIZATION_SCHEMA = {
   [OBJECT_TAG_CHANNEL_OFFCHAIN_CALL_CONTRACT_TX]: {
     1: TX_SCHEMA_FIELD(CHANNEL_OFFCHAIN_CALL_CONTRACT_TX, OBJECT_TAG_CHANNEL_OFFCHAIN_CALL_CONTRACT_TX)
   },
+  [OBJECT_TAG_CHANNEL_RECONNECT_TX]: {
+    1: TX_SCHEMA_FIELD(CHANNEL_RECONNECT_TX, OBJECT_TAG_CHANNEL_RECONNECT_TX)
+  },
   [OBJECT_TAG_PROOF_OF_INCLUSION]: {
     1: TX_SCHEMA_FIELD(PROOF_OF_INCLUSION_TX, OBJECT_TAG_PROOF_OF_INCLUSION)
   },
@@ -1120,7 +1137,7 @@ const ERRORS = {
 
 export const SIGNATURE_VERIFICATION_SCHEMA = [
   VERIFICATION_FIELD(
-    () => `The signature cannot be verified, please verify that you used the correct network id and the correct private key for the sender address`,
+    () => 'The signature cannot be verified, please verify that you used the correct network id and the correct private key for the sender address',
     VALIDATORS.signature,
     ERRORS.invalidSignature
   )

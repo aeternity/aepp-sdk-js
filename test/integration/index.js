@@ -62,11 +62,11 @@ async function ready (mocha, native = true, withAccounts = false) {
   }
 
   return BaseAeWithAccounts({
-      accounts: [MemoryAccount({ keypair: account }), MemoryAccount({ keypair: account2 })],
-      address: account.publicKey,
-      nativeMode: native,
-      networkId
-    })
+    accounts: [MemoryAccount({ keypair: account }), MemoryAccount({ keypair: account2 })],
+    address: account.publicKey,
+    nativeMode: native,
+    networkId
+  })
 }
 
 export {
