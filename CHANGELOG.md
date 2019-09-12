@@ -1,3 +1,17 @@
+# [4.7.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.7.0) (2019-09-11)
+
+
+
+### Features
+
+* **Oracle:** Add methods for polling queries [#637](https://github.com/aeternity/aepp-sdk-js/pull/637)
+* **Chain:** Add `getBalance` method ([#655](https://github.com/aeternity/aepp-sdk-js/issues/655)) ([15147af](https://github.com/aeternity/aepp-sdk-js/commit/15147af))
+* **state channels:** add reconnect method ([#662](https://github.com/aeternity/aepp-sdk-js/issues/662)) ([9d8d1e8](https://github.com/aeternity/aepp-sdk-js/commit/9d8d1e8))
+* **state channels:** add backchannel updates test[#664](https://github.com/aeternity/aepp-sdk-js/pull/664)
+
+
+
+
 # [4.6.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.6.0) (2019-08-28)
 
 
