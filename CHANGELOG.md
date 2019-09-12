@@ -1,6 +1,7 @@
 # [4.7.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.7.0) (2019-09-11)
 
 
+
 ### Features
 
 * **Oracle:** Add methods for polling queries [#637](https://github.com/aeternity/aepp-sdk-js/pull/637)
