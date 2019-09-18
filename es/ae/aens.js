@@ -85,7 +85,9 @@ async function revoke (nameId, options = {}) {
 function classify (s) {
   const keys = {
     ak: 'account_pubkey',
-    ok: 'oracle_pubkey'
+    ok: 'oracle_pubkey',
+    ct: 'contract_pubkey',
+    ch: 'channel'
   }
 
   if (!s.match(/^[a-z]{2}_.+/)) {
