@@ -60,7 +60,7 @@ const RpcClient = stampit(AsyncInit, {
       const { result: { resolve, reject }, id } = data
 
       if (callbacks[id]) {
-        if (resolve) {
+        if (resolve !== undefined) {
           callbacks[id].resolve(resolve)
         } else if (reject) {
           callbacks[id].reject(reject)
