@@ -1,35 +1,29 @@
-Issue tracker is **ONLY** used for reporting bugs. NO NEW FEATURE ACCEPTED! Use [stackoverflow](https://stackoverflow.com/tags/aeternity) for supporting issues.
+**Note: for support questions, please use the [forum](https://forum.aeternity.com)**. This repository's issues are reserved for feature requests and bug reports.
 
-<!--- Provide a general summary of the issue in the Title above -->
+* **I'm submitting a ...**
+  - [ ] bug report
+  - [ ] feature request
+  - [ ] support request => Please do not submit support request here, see note at the top of this template.
 
-## Expected Behavior
-<!--- Tell us what should happen -->
 
-## Current Behavior
-<!--- Tell us what happens instead of the expected behavior -->
+* **Do you want to request a *feature* or report a *bug*?**
 
-## Possible Solution
-<!--- Not obligatory, but suggest a fix/reason for the bug, -->
+* **What is the current behavior?**
 
-## Steps to Reproduce
-<!--- Provide a link to a live example, or an unambiguous set of steps to -->
-<!--- reproduce this bug. Include code to reproduce, if relevant -->
-1.
-2.
-3.
-4.
+* **If the current behavior is a bug, please provide the steps to reproduce and if possible a minimal demo of the problem**
 
-## Environment / Context
-<!--- Client Side? Server Side? -->
-<!--- How has this issue affected you? What are you trying to accomplish? -->
-<!--- Providing context helps us come up with a solution that is most useful in the real world -->
+* **What is the expected behavior?**
 
-<!--- Provide a general summary of the issue in the Title above -->
+* **What is the motivation / use case for changing the behavior?**
 
-## [Node](https://github.com/aeternity/aeternity/releases) Version
+* **Please tell us about your environment:**
+  
+  - Node Version: v0.0.0
+  - Protocol Version: 1
+  - Compiler version: v0.0.0
+  - VM Version: aevm | fate
+  - SDK Version: v0.0.0
+  - Environment: browser | nodejs
 
-## Detailed Description
-<!--- Provide a detailed description of the change or addition you are proposing -->
 
-## Possible Implementation
-<!--- Not obligatory, but suggest an idea for implementing addition or change -->
+* **Other information** (e.g. detailed explanation, stacktraces, related issues, suggestions how to fix, links for us to have context, eg. forum, telegram, etc)
