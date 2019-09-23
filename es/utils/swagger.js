@@ -334,6 +334,26 @@ function destructureClientError (error) {
 }
 
 /**
+ * Resolve reference
+ * @rtype (ref: String, swag: Object) => Object
+ * @param {String} ref - Reference to resolve
+ * @param {Object} swag
+ * @return {Object} Resolved reference definition
+ */
+function resolveRef (ref, swag) {
+  const match = ref.match(/^#\/(.+)$/)
+  // eslint-disable-next-line no-void
+  if (match !== void 0) {
+    const value = R.path(match[1].split('/'), swag)
+    if (value != null) {
+      return value
+    }
+  }
+
+  throw Error(`Could not resolve reference: ${ref}`)
+}
+
+/**
  * Generate callable operation
  * @function
  * @static
@@ -344,11 +364,13 @@ function destructureClientError (error) {
  * @param {Object} types - Swagger types
  * @return {Function}
  */
-const operation = (path, method, definition, types, { config, errorHandler } = {}) => {
+const operation = (path, method, definition, swag, { config, errorHandler } = {}) => {
   config = config || {}
   delete config.transformResponse // Prevent of overwriting transform response
   const { operationId, description } = definition
-  const { parameters } = definition
+  const parameters = (definition.parameters || []).map(param =>
+    param.$ref ? resolveRef(param.$ref, swag) : param
+  )
   const name = `${R.head(operationId).toLowerCase()}${R.drop(1, operationId)}`
   const pascalized = pascalizeParameters(parameters)
 
@@ -381,7 +403,7 @@ const operation = (path, method, definition, types, { config, errorHandler } = {
         const values = R.merge(R.reject(R.isNil, R.pick(optNames, opt)), R.zipObj(R.pluck('name', req), arg))
         const conformed = R.mapObjIndexed((val, key) => {
           try {
-            return conform(val, indexedParameters[key], types)
+            return conform(val, indexedParameters[key], swag.definitions)
           } catch (e) {
             const path = [key].concat(e.path || [])
             throw Object.assign(e, {
@@ -408,7 +430,7 @@ const operation = (path, method, definition, types, { config, errorHandler } = {
 
         try {
           const response = await client(`${url}${expandedPath}`, params).catch(this.axiosError(errorHandler))
-          // return opt.fullResponse ? response : conform(pascalizeKeys(response.data), responses['200'], types)
+          // return opt.fullResponse ? response : conform(pascalizeKeys(response.data), responses['200'], swag.definitions)
           return opt.fullResponse ? response : pascalizeKeys(response.data)
         } catch (e) {
           if (R.path(['response', 'data'], e)) {
@@ -453,7 +475,7 @@ const operation = (path, method, definition, types, { config, errorHandler } = {
  */
 const Swagger = stampit({
   init ({ swag = this.swag, axiosConfig }, { stamp }) {
-    const { paths, definitions } = swag
+    const { paths } = swag
     const methods = R.indexBy(
       R.prop('name'),
       R.flatten(
@@ -461,7 +483,7 @@ const Swagger = stampit({
           R.mapObjIndexed(
             (methods, path) => R.values(
               R.mapObjIndexed((definition, method) => {
-                const op = operation(path, method, definition, definitions, axiosConfig)
+                const op = operation(path, method, definition, swag, axiosConfig)
                 return op(this, this.urlFor(swag.basePath, definition))
               }, methods)),
             paths

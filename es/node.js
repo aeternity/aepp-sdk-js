@@ -139,7 +139,7 @@ const Node = stampit(AsyncInit, {
     const { nodeRevision: revision, genesisKeyBlockHash: genesisHash, networkId, protocols } = await this.api.getStatus()
     this.consensusProtocolVersion = await this.getConsensusProtocolVersion(protocols)
     if (
-      !(this.version === '5.0.0-rc.1' || semverSatisfies(this.version.split('-')[0], NODE_GE_VERSION, NODE_LT_VERSION)) &&
+      !(this.version === '5.0.0-rc.2' || semverSatisfies(this.version.split('-')[0], NODE_GE_VERSION, NODE_LT_VERSION)) &&
       // Todo implement 'rc' version comparision in semverSatisfies
       !forceCompatibility
     ) {
