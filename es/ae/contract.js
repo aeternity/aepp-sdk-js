@@ -153,7 +153,7 @@ async function dryRunContractTx (tx, callerId, source, name, opt = {}) {
     amount: dryRunAmount,
     pubKey: callerId
   }
-  const [{ result: status, callObj, reason }] = (await this.txDryRun([tx], [dryRunAccount], top)).results
+  const [{ result: status, callObj, reason }] = (await this.txDryRun([{ tx }], [dryRunAccount], top)).results
 
   // check response
   if (status !== 'ok') throw new Error('Dry run error, ' + reason)
