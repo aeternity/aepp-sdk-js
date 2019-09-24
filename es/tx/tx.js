@@ -28,7 +28,7 @@ import ChainNode from '../chain/node'
 import Tx from './'
 
 import { buildTx, calculateFee } from './builder'
-import { MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE } from './builder/schema'
+import { MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE, VM_TYPE } from './builder/schema'
 import { buildContractId, oracleQueryId } from './builder/helpers'
 
 async function spendTx ({ senderId, recipientId, amount, payload = '' }) {
@@ -117,7 +117,7 @@ async function nameRevokeTx ({ accountId, nameId }) {
   return tx
 }
 
-async function contractCreateTx ({ ownerId, code, vmVersion, abiVersion, deposit, amount, gas, gasPrice = MIN_GAS_PRICE, callData }) {
+async function contractCreateTx ({ ownerId, code, vmVersion, abiVersion, deposit, amount, gas, gasPrice = MIN_GAS_PRICE, callData, backend }) {
   // Get VM_ABI version
   const ctVersion = this.getVmVersion(TX_TYPE.contractCreate, R.head(arguments))
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
@@ -131,7 +131,7 @@ async function contractCreateTx ({ ownerId, code, vmVersion, abiVersion, deposit
     : this.api.postContractCreate(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee), gas: parseInt(gas), gasPrice, vmVersion: ctVersion.vmVersion, abiVersion: ctVersion.abiVersion }))
 }
 
-async function contractCallTx ({ callerId, contractId, abiVersion, amount, gas, gasPrice = MIN_GAS_PRICE, callData }) {
+async function contractCallTx ({ callerId, contractId, abiVersion, amount, gas, gasPrice = MIN_GAS_PRICE, callData, backend }) {
   const ctVersion = this.getVmVersion(TX_TYPE.contractCall, R.head(arguments))
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
   const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.contractCall, { senderId: callerId, ...R.head(arguments), gasPrice, abiVersion: ctVersion.abiVersion })
@@ -358,7 +358,7 @@ async function gaAttachTx ({ ownerId, code, vmVersion, abiVersion, authFun, gas,
  * @param {object} vmAbi Object with vm and abi version fields
  * @return {object} Object with vm/abi version ({ vmVersion: number, abiVersion: number })
  */
-function getVmVersion (txType, { vmVersion, abiVersion } = {}) {
+function getVmVersion (txType, { vmVersion, abiVersion, backend } = {}) {
   const { consensusProtocolVersion } = this.getNodeInfo()
   const supportedProtocol = PROTOCOL_VM_ABI[consensusProtocolVersion]
   if (!supportedProtocol) throw new Error('Not supported consensus protocol version')
@@ -373,9 +373,10 @@ function getVmVersion (txType, { vmVersion, abiVersion } = {}) {
     if (compilerMajor === '3' && consensusProtocolVersion !== 3) throw new Error(`Compiler ${this.compilerVersion} support only consensus protocol ${consensusProtocolVersion}`)
   }
 
+  if (backend === VM_TYPE.FATE && consensusProtocolVersion < 4) throw new Error('You can use FATE only after Lima HF')
   const ctVersion = {
-    abiVersion: abiVersion !== undefined ? abiVersion : protocolForTX.abiVersion[0],
-    vmVersion: vmVersion !== undefined ? vmVersion : protocolForTX.vmVersion[0]
+    abiVersion: abiVersion !== undefined ? abiVersion : backend === VM_TYPE.AEVM ? protocolForTX.abiVersion[0] : backend === VM_TYPE.FATE ? protocolForTX.abiVersion[1] : protocolForTX.abiVersion[0],
+    vmVersion: vmVersion !== undefined ? vmVersion : backend === VM_TYPE.AEVM ? protocolForTX.vmVersion[0] : backend === VM_TYPE.FATE ? protocolForTX.vmVersion[1] : protocolForTX.vmVersion[0]
   }
   if (protocolForTX.vmVersion.length && !R.contains(ctVersion.vmVersion, protocolForTX.vmVersion)) throw new Error(`VM VERSION ${ctVersion.vmVersion} do not support by this node. Supported: [${protocolForTX.vmVersion}]`)
   if (protocolForTX.vmVersion.length && !R.contains(ctVersion.abiVersion, protocolForTX.abiVersion)) throw new Error(`ABI VERSION ${ctVersion.abiVersion} do not support by this node. Supported: [${protocolForTX.abiVersion}]`)
