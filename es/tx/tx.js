@@ -359,18 +359,26 @@ async function gaAttachTx ({ ownerId, code, vmVersion, abiVersion, authFun, gas,
  * @return {object} Object with vm/abi version ({ vmVersion: number, abiVersion: number })
  */
 function getVmVersion (txType, { vmVersion, abiVersion } = {}) {
-  const version = this.getNodeInfo().consensusProtocolVersion
-  const supportedProtocol = PROTOCOL_VM_ABI[version]
+  const { consensusProtocolVersion } = this.getNodeInfo()
+  const supportedProtocol = PROTOCOL_VM_ABI[consensusProtocolVersion]
   if (!supportedProtocol) throw new Error('Not supported consensus protocol version')
   const protocolForTX = supportedProtocol[txType]
   if (!protocolForTX) throw new Error('Not supported tx type')
+
+  // TODO remove
+  // Cross node/compiler compatibility
+  if (this.compilerVersion) {
+    const [compilerMajor] = this.compilerVersion.split(',')
+    if (compilerMajor === '4' && consensusProtocolVersion !== 4) throw new Error(`Compiler ${this.compilerVersion} support only consensus protocol ${consensusProtocolVersion}`)
+    if (compilerMajor === '3' && consensusProtocolVersion !== 3) throw new Error(`Compiler ${this.compilerVersion} support only consensus protocol ${consensusProtocolVersion}`)
+  }
 
   const ctVersion = {
     abiVersion: abiVersion !== undefined ? abiVersion : protocolForTX.abiVersion[0],
     vmVersion: vmVersion !== undefined ? vmVersion : protocolForTX.vmVersion[0]
   }
   if (protocolForTX.vmVersion.length && !R.contains(ctVersion.vmVersion, protocolForTX.vmVersion)) throw new Error(`VM VERSION ${ctVersion.vmVersion} do not support by this node. Supported: [${protocolForTX.vmVersion}]`)
-  if (!R.contains(ctVersion.abiVersion, protocolForTX.abiVersion)) throw new Error(`ABI VERSION ${ctVersion.abiVersion} do not support by this node. Supported: [${protocolForTX.abiVersion}]`)
+  if (protocolForTX.vmVersion.length && !R.contains(ctVersion.abiVersion, protocolForTX.abiVersion)) throw new Error(`ABI VERSION ${ctVersion.abiVersion} do not support by this node. Supported: [${protocolForTX.abiVersion}]`)
 
   return ctVersion
 }
