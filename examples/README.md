@@ -117,7 +117,7 @@ Wallet({
 
 ### 2. Aepp Example (Aepp <--> Wallet via RPC)
 > interact with aeternity's blockchain's [**Aepp flavor**](docs/usage.md) – For _Aepps_ development AKA DApp development
-> You can find a more [complete example using VueJS here](browser/connect-two-ae)
+> You can find a more [complete example using VueJS here](browser/vuejs/connect-two-ae/README.md)
 
 
 ```js
