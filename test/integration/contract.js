@@ -23,13 +23,22 @@ import * as R from 'ramda'
 
 const identityContract = `
 contract Identity =
-  entrypoint main(x : int) = x
+ entrypoint main(x : int) = x
 `
 const stateContract = `
 contract StateContract =
   record state = { value: string }
   entrypoint init(value) : state = { value = value }
   entrypoint retrieve() : string = state.value
+`
+const libContract = `
+namespace TestLib =
+  function sum(x: int, y: int) : int = x + y
+`
+const contractWithLib = `
+include "testLib"
+contract Voting =
+  entrypoint sumNumbers(x: int, y: int) : int = TestLib.sum(x, y)
 `
 const testContract = `
 namespace Test =
@@ -39,6 +48,7 @@ namespace Test =
 contract Voting =
   entrypoint test() : int = 1
 
+include "testLib"
 contract StateContract =
   type number = int
   record state = { value: string, key: number, testOption: option(string) }
@@ -47,32 +57,32 @@ contract StateContract =
   datatype dateUnit = Year | Month | Day
   
   entrypoint init(value: string, key: int, testOption: option(string)) : state = { value = value, key = key, testOption = testOption }
-  entrypoint retrieve() : (string, int) = (state.value, state.key)
+  entrypoint retrieve() : string*int = (state.value, state.key)
 
   entrypoint intFn(a: int) : int = a
-  entrypoint stringFn(a: string) : string = a
+  payable entrypoint stringFn(a: string) : string = a
   entrypoint boolFn(a: bool) : bool = a
   entrypoint addressFn(a: address) : address = a
   entrypoint contractAddress (ct: address) : address = ct
   entrypoint accountAddress (ak: address) : address = ak
 
-  entrypoint tupleFn (a: (string, int)) : (string, int) = a
-  entrypoint tupleInTupleFn (a: ((string, string), int)) : ((string, string), int) = a
-  entrypoint tupleWithList (a: (list(int), int)) : (list(int), int) = a
+  entrypoint tupleFn (a: string*int) : string*int = a
+  entrypoint tupleInTupleFn (a: (string*string)*int) : (string*string)*int = a
+  entrypoint tupleWithList (a: list(int)*int) : list(int)*int = a
   
   entrypoint listFn(a: list(int)) : list(int) = a
   entrypoint listInListFn(a: list(list(int))) : list(list(int)) = a
   
-  entrypoint mapFn(a: map(address, (string, int))) : map(address, (string, int)) = a
-  entrypoint mapOptionFn(a: map(address, (string, option(int)))) : map(address, (string, option(int))) = a
+  entrypoint mapFn(a: map(address, string*int)) : map(address, string*int) = a
+  entrypoint mapOptionFn(a: map(address, string*option(int))) : map(address, string*option(int)) = a
   
   entrypoint getRecord() : state = state
   stateful entrypoint setRecord(s: state) = put(s)
   
   entrypoint intOption(s: option(int)) : option(int) = s
-  entrypoint listOption(s: option(list((int, string)))) : option(list((int ,string))) = s
+  entrypoint listOption(s: option(list(int*string))) : option(list(int*string)) = s
   
-  entrypoint testFn(a: list(int), b: bool) : (list(int), bool) = (a, b)
+  entrypoint testFn(a: list(int), b: bool) : list(int)*bool = (a, b)
   entrypoint approve(tx_id: int, voting_contract: Voting) : int = tx_id
   
   entrypoint hashFn(s: hash): hash = s
@@ -116,7 +126,7 @@ describe('Contract', function () {
   })
 
   it('deploys compiled contracts', async () => {
-    deployed = await bytecode.deploy([])
+    deployed = await bytecode.deploy([]).catch(async e => console.log(await e.verifyTx()))
     return deployed.should.have.property('address')
   })
 
@@ -169,6 +179,47 @@ describe('Contract', function () {
       })
       .should.eventually.become('Hello World!')
   })
+  describe('Namespaces', () => {
+    let deployed
+    it('Can compiler contract with external deps', async () => {
+      const filesystem = {
+        testLib: libContract
+      }
+      const compiled = await contract.contractCompile(contractWithLib, { filesystem })
+      compiled.should.have.property('bytecode')
+    })
+    it('Throw error when try to compile contract without providing external deps', async () => {
+      try {
+        await contract.contractCompile(contractWithLib)
+      } catch (e) {
+        e.message.indexOf('could not find include file').should.not.be.equal(-1)
+      }
+    })
+    it('Can deploy contract with external deps', async () => {
+      const filesystem = {
+        testLib: libContract
+      }
+      const compiled = await contract.contractCompile(contractWithLib, { filesystem })
+      deployed = await compiled.deploy()
+      deployed.should.have.property('address')
+
+      const deployedStatic = await compiled.deployStatic([])
+      deployedStatic.result.should.have.property('gasUsed')
+      deployedStatic.result.should.have.property('returnType')
+
+      const encodedCallData = await compiled.encodeCall('sumNumbers', ['1', '2'])
+      encodedCallData.indexOf('cb_').should.not.be.equal(-1)
+    })
+    it('Can call contract with external deps', async () => {
+      const callResult = await deployed.call('sumNumbers', ['1', '2'])
+      const decoded = await callResult.decode()
+      decoded.should.be.equal(3)
+
+      const callStaticResult = await deployed.callStatic('sumNumbers', ['1', '2'])
+      const decoded2 = await callStaticResult.decode()
+      decoded2.should.be.equal(3)
+    })
+  })
 
   describe('Sophia Compiler', function () {
     it('compile', async () => {
@@ -206,7 +257,10 @@ describe('Contract', function () {
     let contractObject
 
     it('Generate ACI object', async () => {
-      contractObject = await contract.getContractInstance(testContract, { opt: { amount: 10000, ttl: 10 } })
+      const filesystem = {
+        testLib: libContract
+      }
+      contractObject = await contract.getContractInstance(testContract, { filesystem, opt: { ttl: 10 } })
       contractObject.should.have.property('interface')
       contractObject.should.have.property('aci')
       contractObject.should.have.property('source')
@@ -215,7 +269,9 @@ describe('Contract', function () {
       contractObject.should.have.property('compile')
       contractObject.should.have.property('call')
       contractObject.should.have.property('deploy')
-      contractObject.options.amount.should.be.equal(10000)
+      contractObject.options.ttl.should.be.equal(10)
+      contractObject.options.should.have.property('filesystem')
+      contractObject.options.filesystem.should.have.property('testLib')
       const functionsFromACI = contractObject.aci.functions.map(({ name }) => name)
       const methods = Object.keys(contractObject.methods)
       R.equals(methods, functionsFromACI).should.be.equal(true)
@@ -241,9 +297,23 @@ describe('Contract', function () {
 
     it('Deploy contract before compile', async () => {
       contractObject.compiled = null
-      await contractObject.methods.init('123', 1, Promise.resolve('hahahaha'))
+      await contractObject.methods.init('123', 1, Promise.resolve('hahahaha'), {})
       const isCompiled = contractObject.compiled.length && contractObject.compiled.slice(0, 3) === 'cb_'
       isCompiled.should.be.equal(true)
+    })
+    it('Fail on paying to not payable function', async () => {
+      const amount = 100
+      try {
+        await contractObject.methods.intFn.send(1, { amount })
+      } catch (e) {
+        e.message.should.be.equal(`You try to pay "${amount}" to function "intFn" which is not payable. Only payable function can accept tokens`)
+      }
+    })
+    it('Can pay to payable function', async () => {
+      const contractBalance = await contract.balance(contractObject.deployInfo.address)
+      await contractObject.methods.stringFn.send('1', { amount: 100 })
+      const balanceAfter = await contract.balance(contractObject.deployInfo.address)
+      balanceAfter.should.be.equal(`${+contractBalance + 100}`)
     })
     it('Call contract on specific account', async () => {
       const current = await contract.address()
@@ -445,7 +515,11 @@ describe('Contract', function () {
           objEq(result.decodedResult, { value: 'qwe', key: 1234, testOption: 'test' }).should.be.equal(true)
         })
         it('Get Record With Option (Convert to JS object)', async () => {
-          await contractObject.methods.setRecord({ key: 1234, value: 'qwe', testOption: Promise.resolve('resolved string') })
+          await contractObject.methods.setRecord({
+            key: 1234,
+            value: 'qwe',
+            testOption: Promise.resolve('resolved string')
+          })
           const result = await contractObject.methods.getRecord()
           objEq(result.decodedResult, { value: 'qwe', key: 1234, testOption: 'resolved string' }).should.be.equal(true)
         })
@@ -599,14 +673,14 @@ describe('Contract', function () {
         return res.decode().should.eventually.become([1, 2])
       })
       it('Call contract using using js type arguments', async () => {
-        const res = await contractObject.methods.listFn([ 1, 2 ])
+        const res = await contractObject.methods.listFn([1, 2])
         return res.decode().should.eventually.become([1, 2])
       })
       it('Call contract using using js type arguments and skip result transform', async () => {
         contractObject.setOptions({ skipTransformDecoded: true })
-        const res = await contractObject.methods.listFn([ 1, 2 ])
+        const res = await contractObject.methods.listFn([1, 2])
         const decoded = await res.decode()
-        const decodedJSON = JSON.stringify([ 1, 2 ])
+        const decodedJSON = JSON.stringify([1, 2])
         contractObject.setOptions({ skipTransformDecoded: false })
         JSON.stringify(decoded).should.be.equal(decodedJSON)
       })
