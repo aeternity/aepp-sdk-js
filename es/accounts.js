@@ -142,12 +142,12 @@ const Accounts = stampit(AsyncInit, {
     this.accounts = R.fromPairs(await Promise.all(accounts.map(async a => [await a.address(), a])))
     keypair = keypair || envKeypair(process.env, true)
     if (keypair) {
-      await this.addAccount(await MemoryAccount({ keypair }), { select: !this.Selector.address })
+      await this.addAccount(MemoryAccount({ keypair }), { select: !this.Selector.address })
     }
     // @Todo Remove after removing depricated `setKeypair` fn.
     //  Prevent BREAKING CHANGES
     //  Pre-init memoryAccount object to prevent async operation in `setKeypair` function
-    this._acc = await MemoryAccount({ keypair: generateKeyPair() })
+    this._acc = MemoryAccount({ keypair: generateKeyPair() })
   },
   props: {
     accounts: {}
