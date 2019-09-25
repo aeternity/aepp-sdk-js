@@ -79,7 +79,7 @@ describe('Aens', function () {
   it('Spend by name', async () => {
     const current = await aens.address()
     const onAccount = aens.addresses().find(acc => acc !== current)
-    await aens.spend(100, nameHash, { onAccount }).catch(async e => console.log(await e.verifyTx()))
+    await aens.spend(100, name, { onAccount }).catch(async e => console.log(await e.verifyTx()))
   })
 
   it('transfers names', async () => {

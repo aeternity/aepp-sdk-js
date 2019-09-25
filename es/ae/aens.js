@@ -28,8 +28,9 @@
 
 import * as R from 'ramda'
 import { encodeBase58Check, salt } from '../utils/crypto'
-import { commitmentHash } from '../tx/builder/helpers'
+import { commitmentHash, isNameValid } from '../tx/builder/helpers'
 import Ae from './'
+import { CLIENT_TTL, NAME_TTL } from '../tx/builder/schema'
 
 /**
  * Transfer a domain to another account
@@ -132,6 +133,7 @@ async function update (nameId, target, options = {}) {
  * @return {Promise<Object>}
  */
 async function query (name, opt = {}) {
+  isNameValid(name)
   const o = await this.getName(name)
   const nameId = o.id
 
@@ -165,6 +167,7 @@ async function query (name, opt = {}) {
  * @return {Promise<Object>} the result of the claim
  */
 async function claim (name, salt, options = {}) {
+  isNameValid(name)
   const opt = R.merge(this.Ae.defaults, options)
   const claimTx = await this.nameClaimTx(R.merge(opt, {
     accountId: await this.address(opt),
@@ -187,6 +190,7 @@ async function claim (name, salt, options = {}) {
  * @return {Promise<Object>}
  */
 async function preclaim (name, options = {}) {
+  isNameValid(name)
   const opt = R.merge(this.Ae.defaults, options)
   const _salt = salt()
   const height = await this.height()
@@ -231,8 +235,8 @@ const Aens = Ae.compose({
   deepProps: {
     Ae: {
       defaults: {
-        clientTtl: 1,
-        nameTtl: 50000 // aec_governance:name_claim_max_expiration() => 50000
+        clientTtl: CLIENT_TTL,
+        nameTtl: NAME_TTL // aec_governance:name_claim_max_expiration() => 50000
       }
     }
   }

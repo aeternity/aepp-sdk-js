@@ -29,6 +29,8 @@ import Account from '../account'
 import TxBuilder from '../tx/builder'
 import * as R from 'ramda'
 import { BigNumber } from 'bignumber.js'
+import { isAddressValid } from '../utils/crypto'
+import { isNameValid } from '../tx/builder/helpers'
 
 /**
  * Sign and post a transaction to the chain
@@ -69,8 +71,24 @@ async function signUsingGA (tx, options = {}) {
  */
 async function spend (amount, recipientId, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const spendTx = await this.spendTx(R.merge(opt, { senderId: await this.address(opt), recipientId, amount: amount }))
+  const senderId = resolveSenderName(await this.address(opt), 'ak')
+  const spendTx = await this.spendTx(R.merge(opt, { senderId, recipientId, amount }))
   return this.send(spendTx, opt)
+}
+
+/**
+ * Get the next nonce to be used for a transaction for an account
+ *
+ * @param {String} nameOrAddress
+ * @param {String} pointerPrefix
+ * @return {Address} Address or AENS name hash
+ */
+async function resolveSenderName (nameOrAddress, pointerPrefix = 'ak') {
+  if (isAddressValid(nameOrAddress) || isNameValid(nameOrAddress)) return nameOrAddress
+  // Validation
+  // const { id: nameHash, pointers } = await this.getName(nameOrAddress)
+  // if (pointers.find(({ id }) => id.split('_')[0] === pointerPrefix)) return nameHash
+  // throw new Error(`Can't find pointers with prefix ${pointerPrefix} for name ${nameOrAddress}`)
 }
 
 /**
@@ -135,7 +153,7 @@ function destroyInstance () {
  * @return {Object} Ae instance
  */
 const Ae = stampit(Tx, Account, Chain, {
-  methods: { send, spend, transferFunds, destroyInstance },
+  methods: { send, spend, transferFunds, destroyInstance, resolveSenderName },
   deepProps: { Ae: { defaults: {} } }
   // Todo Enable GA
   // deepConfiguration: { Ae: { methods: ['signUsingGA'] } }

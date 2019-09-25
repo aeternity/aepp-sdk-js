@@ -11,6 +11,12 @@
 import BigNumber from 'bignumber.js'
 
 export const VSN = 1
+export const VSN_2 = 2
+
+// # AENS
+export const AENS_NAME_DOMAINS = ['aet', 'test']
+export const CLIENT_TTL = 1
+export const NAME_TTL = 50000
 
 // # Tag constant for ids (type uint8)
 // # see https://github.com/aeternity/protocol/blob/master/serializations.md#the-id-type
