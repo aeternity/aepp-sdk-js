@@ -71,20 +71,24 @@ async function signUsingGA (tx, options = {}) {
  */
 async function spend (amount, recipientId, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const senderId = resolveSenderName(await this.address(opt), 'ak')
-  const spendTx = await this.spendTx(R.merge(opt, { senderId, recipientId, amount }))
+  recipientId = await this.resolveRecipientName(recipientId, 'ak')
+  const spendTx = await this.spendTx(R.merge(opt, { senderId: await this.address(opt), recipientId, amount }))
   return this.send(spendTx, opt)
 }
 
 /**
- * Get the next nonce to be used for a transaction for an account
+ * Resolve AENS name and return name hash
  *
  * @param {String} nameOrAddress
  * @param {String} pointerPrefix
- * @return {Address} Address or AENS name hash
+ * @return {String} Address or AENS name hash
  */
-async function resolveSenderName (nameOrAddress, pointerPrefix = 'ak') {
-  if (isAddressValid(nameOrAddress) || isNameValid(nameOrAddress)) return nameOrAddress
+async function resolveRecipientName (nameOrAddress, pointerPrefix = 'ak') {
+  if (isAddressValid(nameOrAddress)) return nameOrAddress
+  if (isNameValid(nameOrAddress)) {
+    const { id } = this.getName(nameOrAddress)
+    return id
+  }
   // Validation
   // const { id: nameHash, pointers } = await this.getName(nameOrAddress)
   // if (pointers.find(({ id }) => id.split('_')[0] === pointerPrefix)) return nameHash
@@ -153,7 +157,7 @@ function destroyInstance () {
  * @return {Object} Ae instance
  */
 const Ae = stampit(Tx, Account, Chain, {
-  methods: { send, spend, transferFunds, destroyInstance, resolveSenderName },
+  methods: { send, spend, transferFunds, destroyInstance, resolveRecipientName },
   deepProps: { Ae: { defaults: {} } }
   // Todo Enable GA
   // deepConfiguration: { Ae: { methods: ['signUsingGA'] } }
