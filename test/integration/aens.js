@@ -30,6 +30,7 @@ describe('Aens', function () {
   configure(this)
 
   let aens
+  let nameHash
   const account = generateKeyPair()
   const name = randomName()
 
@@ -68,10 +69,17 @@ describe('Aens', function () {
 
   it('updates names', async () => {
     const claim = await aens.aensQuery(name)
+    nameHash = claim.id
     const address = await aens.address()
     return claim.update(address).should.eventually.deep.include({
       pointers: [R.fromPairs([['key', 'account_pubkey'], ['id', address]])]
     })
+  })
+
+  it('Spend by name', async () => {
+    const current = await aens.address()
+    const onAccount = aens.addresses().find(acc => acc !== current)
+    await aens.spend(100, nameHash, { onAccount }).catch(async e => console.log(await e.verifyTx()))
   })
 
   it('transfers names', async () => {

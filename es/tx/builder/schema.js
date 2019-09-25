@@ -374,14 +374,14 @@ const ACCOUNT_TX_2 = [
   TX_FIELD('flags', FIELD_TYPES.int),
   TX_FIELD('nonce', FIELD_TYPES.int),
   TX_FIELD('balance', FIELD_TYPES.int),
-  TX_FIELD('gaContract', FIELD_TYPES.id, 'ct'),
+  TX_FIELD('gaContract', FIELD_TYPES.id, ['ct', 'nm']),
   TX_FIELD('gaAuthFun', FIELD_TYPES.binary, 'cb')
 ]
 
 const SPEND_TX = [
   ...BASE_TX,
   TX_FIELD('senderId', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('recipientId', FIELD_TYPES.id, 'ak'),
+  TX_FIELD('recipientId', FIELD_TYPES.id, ['ak', 'nm']),
   TX_FIELD('amount', FIELD_TYPES.int),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int),
@@ -431,7 +431,7 @@ const NAME_TRANSFER_TX = [
   TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
   TX_FIELD('nameId', FIELD_TYPES.id, 'nm'),
-  TX_FIELD('recipientId', FIELD_TYPES.id, 'ak'),
+  TX_FIELD('recipientId', FIELD_TYPES.id, ['ak', 'nm']),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int)
 ]
@@ -501,7 +501,7 @@ const CONTRACT_CALL_TX = [
   ...BASE_TX,
   TX_FIELD('callerId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('contractId', FIELD_TYPES.id, 'ct'),
+  TX_FIELD('contractId', FIELD_TYPES.id, ['ct', 'nm']),
   TX_FIELD('abiVersion', FIELD_TYPES.int),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int),
@@ -541,7 +541,7 @@ const ORACLE_REGISTER_TX = [
 
 const ORACLE_EXTEND_TX = [
   ...BASE_TX,
-  TX_FIELD('oracleId', FIELD_TYPES.id, 'ok'),
+  TX_FIELD('oracleId', FIELD_TYPES.id, ['ok', 'nm']),
   TX_FIELD('nonce', FIELD_TYPES.int),
   TX_FIELD('oracleTtlType', FIELD_TYPES.int),
   TX_FIELD('oracleTtlValue', FIELD_TYPES.int),
@@ -553,7 +553,7 @@ const ORACLE_QUERY_TX = [
   ...BASE_TX,
   TX_FIELD('senderId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('oracleId', FIELD_TYPES.id, 'ok'),
+  TX_FIELD('oracleId', FIELD_TYPES.id, ['ok', 'nm']),
   TX_FIELD('query', FIELD_TYPES.string),
   TX_FIELD('queryFee', FIELD_TYPES.int),
   TX_FIELD('queryTtlType', FIELD_TYPES.int),

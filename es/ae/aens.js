@@ -173,11 +173,8 @@ async function claim (name, salt, options = {}) {
   }))
 
   const result = await this.send(claimTx, opt)
-
-  return {
-    ...result,
-    ...opt.waitMined && await this.aensQuery(name, opt)
-  }
+  const nameInter = this.Chain.defaults.waitMined ? await this.aensQuery(name, opt) : {}
+  return Object.assign(result, nameInter)
 }
 
 /**
