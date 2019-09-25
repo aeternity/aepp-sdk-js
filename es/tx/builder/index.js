@@ -294,6 +294,7 @@ export function validateParams (params, schema, { excludeKeys = [] }) {
 export function buildRawTx (params, schema, { excludeKeys = [] } = {}) {
   // Transform params(reason is for do not break current interface of `tx`)
   params = transformParams(params)
+  console.log(schema)
   // Validation
   const valid = validateParams(params, schema, { excludeKeys })
   if (Object.keys(valid).length) {
