@@ -211,12 +211,13 @@ export function readPointers (pointers) {
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param {string} name
- * @return void
+ * @return Boolean
  * @throws Error
  */
 export function isNameValid (name) {
   if (typeof name !== 'string') throw new Error('AENS: Name must be a string')
   if (!AENS_NAME_DOMAINS.includes(R.last(name.split('.')))) throw new Error(`AENS: Invalid name domain. Possible domains [${AENS_NAME_DOMAINS}]`)
+  return true
 }
 
 export default {

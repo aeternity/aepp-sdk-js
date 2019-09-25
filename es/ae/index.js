@@ -65,13 +65,13 @@ async function signUsingGA (tx, options = {}) {
  * @category async
  * @rtype (amount: Number|String, recipientId: String, options?: Object) => Promise[String]
  * @param {Number|String} amount - Amount to spend
- * @param {String} recipientId - Address of recipient account
+ * @param {String} recipientId - Address or Name of recipient account
  * @param {Object} options - Options
  * @return {String|String} Transaction or transaction hash
  */
 async function spend (amount, recipientId, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  recipientId = await this.resolveRecipientName(recipientId, 'ak')
+  recipientId = await this.resolveRecipientName(recipientId)
   const spendTx = await this.spendTx(R.merge(opt, { senderId: await this.address(opt), recipientId, amount }))
   return this.send(spendTx, opt)
 }
@@ -83,10 +83,10 @@ async function spend (amount, recipientId, options = {}) {
  * @param {String} pointerPrefix
  * @return {String} Address or AENS name hash
  */
-async function resolveRecipientName (nameOrAddress, pointerPrefix = 'ak') {
+async function resolveRecipientName (nameOrAddress) {
   if (isAddressValid(nameOrAddress)) return nameOrAddress
   if (isNameValid(nameOrAddress)) {
-    const { id } = this.getName(nameOrAddress)
+    const { id } = await this.getName(nameOrAddress)
     return id
   }
   // Validation
