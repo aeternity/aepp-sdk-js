@@ -71,8 +71,8 @@ async function signUsingGA (tx, options = {}) {
  */
 async function spend (amount, recipientId, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const senderId = resolveSenderName(await this.address(opt), 'ak')
-  const spendTx = await this.spendTx(R.merge(opt, { senderId, recipientId, amount }))
+  recipientId = this.resolveRecipientName(recipientId, 'ak')
+  const spendTx = await this.spendTx(R.merge(opt, { senderId: await this.address(opt), recipientId, amount }))
   return this.send(spendTx, opt)
 }
 
@@ -81,9 +81,9 @@ async function spend (amount, recipientId, options = {}) {
  *
  * @param {String} nameOrAddress
  * @param {String} pointerPrefix
- * @return {Address} Address or AENS name hash
+ * @return {String} Address or AENS name hash
  */
-async function resolveSenderName (nameOrAddress, pointerPrefix = 'ak') {
+async function resolveRecipientName (nameOrAddress, pointerPrefix = 'ak') {
   if (isAddressValid(nameOrAddress) || isNameValid(nameOrAddress)) return nameOrAddress
   // Validation
   // const { id: nameHash, pointers } = await this.getName(nameOrAddress)
@@ -153,7 +153,7 @@ function destroyInstance () {
  * @return {Object} Ae instance
  */
 const Ae = stampit(Tx, Account, Chain, {
-  methods: { send, spend, transferFunds, destroyInstance, resolveSenderName },
+  methods: { send, spend, transferFunds, destroyInstance, resolveRecipientName },
   deepProps: { Ae: { defaults: {} } }
   // Todo Enable GA
   // deepConfiguration: { Ae: { methods: ['signUsingGA'] } }
