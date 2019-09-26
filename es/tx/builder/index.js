@@ -141,6 +141,10 @@ function validateField (value, key, type, prefix) {
       return assert((!isNaN(value) || BigNumber.isBigNumber(value)) && BigNumber(value).gte(0), { value, isMinusValue })
     }
     case FIELD_TYPES.id:
+      if (Array.isArray(prefix)) {
+        const p = prefix.find(p => p === value.split('_')[0])
+        return assert(p && PREFIX_ID_TAG[value.split('_')[0]], { value, prefix })
+      }
       return assert(assertedType(value, prefix) && PREFIX_ID_TAG[value.split('_')[0]] && value.split('_')[0] === prefix, { value, prefix })
     case FIELD_TYPES.binary:
       return assert(value.split('_')[0] === prefix, { prefix, value })

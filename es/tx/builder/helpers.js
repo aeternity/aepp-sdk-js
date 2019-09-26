@@ -1,3 +1,4 @@
+import * as R from 'ramda'
 import {
   assertedType,
   decodeBase58Check,
@@ -8,7 +9,7 @@ import {
   salt
 } from '../../utils/crypto'
 import { toBytes } from '../../utils/bytes'
-import { ID_TAG_PREFIX, PREFIX_ID_TAG } from './schema'
+import { ID_TAG_PREFIX, PREFIX_ID_TAG, AENS_NAME_DOMAINS } from './schema'
 import { BigNumber } from 'bignumber.js'
 
 /**
@@ -205,6 +206,20 @@ export function readPointers (pointers) {
   )
 }
 
+/**
+ * Is name valid
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/aens
+ * @param {string} name
+ * @return Boolean
+ * @throws Error
+ */
+export function isNameValid (name) {
+  if (typeof name !== 'string') throw new Error('AENS: Name must be a string')
+  if (!AENS_NAME_DOMAINS.includes(R.last(name.split('.')))) throw new Error(`AENS: Invalid name domain. Possible domains [${AENS_NAME_DOMAINS}]`)
+  return true
+}
+
 export default {
   readPointers,
   buildPointers,
@@ -219,5 +234,6 @@ export default {
   formatSalt,
   oracleQueryId,
   createSalt,
-  buildHash
+  buildHash,
+  isNameValid
 }
