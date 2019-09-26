@@ -28,7 +28,7 @@ import ChainNode from '../chain/node'
 import Tx from './'
 
 import { buildTx, calculateFee } from './builder'
-import { MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE, VM_TYPE } from './builder/schema'
+import { ABI_VERSIONS, MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE, VM_TYPE } from './builder/schema'
 import { buildContractId, oracleQueryId } from './builder/helpers'
 
 async function spendTx ({ senderId, recipientId, amount, payload = '' }) {
@@ -151,16 +151,16 @@ async function contractCallTx ({ callerId, contractId, abiVersion, amount, gas, 
   return tx
 }
 
-async function oracleRegisterTx ({ accountId, queryFormat, responseFormat, queryFee, oracleTtl, abiVersion }) {
-  const { abiVersion: abi } = this.getVmVersion(TX_TYPE.oracleRegister, R.head(arguments))
+async function oracleRegisterTx ({ accountId, queryFormat, responseFormat, queryFee, oracleTtl, abiVersion = ABI_VERSIONS.NO_ABI }) {
+  // const { abiVersion: abi } = this.getVmVersion(TX_TYPE.oracleRegister, R.head(arguments))
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.oracleRegister, { senderId: accountId, ...R.head(arguments), abiVersion: abi })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.oracleRegister, { senderId: accountId, ...R.head(arguments), abiVersion })
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? buildTx({
       accountId,
       queryFee,
-      abiVersion: abi,
+      abiVersion,
       fee,
       oracleTtl,
       nonce,
@@ -171,7 +171,7 @@ async function oracleRegisterTx ({ accountId, queryFormat, responseFormat, query
     : await this.api.postOracleRegister({
       accountId,
       queryFee,
-      abiVersion: abi,
+      abiVersion,
       fee: parseInt(fee),
       oracleTtl,
       nonce,
