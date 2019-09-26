@@ -197,7 +197,7 @@ describe('Contract', function () {
       })
       .should.eventually.become('Hello World!')
   })
-  describe.skip('Namespaces', () => {
+  describe('Namespaces', () => {
     let deployed
     it('Can compiler contract with external deps', async () => {
       const filesystem = {
@@ -239,7 +239,7 @@ describe('Contract', function () {
     })
   })
 
-  describe.skip('Sophia Compiler', function () {
+  describe('Sophia Compiler', function () {
     it('compile', async () => {
       const code = await contract.compileContractAPI(identityContract)
       const prefix = code.slice(0, 2)
@@ -271,7 +271,7 @@ describe('Contract', function () {
     })
   })
 
-  describe.skip('Contract ACI Interface', function () {
+  describe('Contract ACI Interface', function () {
     let contractObject
 
     it('Generate ACI object', async () => {
