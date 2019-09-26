@@ -165,6 +165,12 @@ async function getMicroBlockHeader (hash) {
 }
 
 async function txDryRun (txs, accounts, top) {
+  // TODO remove cross compatibility
+  const { version } = this.getNodeInfo()
+  const [majorVersion] = version.split('.')
+  if (+majorVersion === 5 && version !== '5.0.0-rc.1') {
+    txs = txs.map(tx => ({ tx }))
+  }
   return this.api.dryRunTxs({ txs, accounts, top })
 }
 
