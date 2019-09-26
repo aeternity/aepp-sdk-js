@@ -166,6 +166,8 @@ export const ABI_VERSIONS = {
   FATE: 3
 }
 
+export const VM_TYPE = { FATE: 'fate', AEVM: 'aevm' }
+
 // First abi/vm by default
 export const VM_ABI_MAP_ROMA = {
   [TX_TYPE.contractCreate]: { vmVersion: [VM_VERSIONS.SOPHIA], abiVersion: [ABI_VERSIONS.SOPHIA] },

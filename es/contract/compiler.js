@@ -28,6 +28,7 @@ import Http from '../utils/http'
 import ContractBase from './index'
 import semverSatisfies from '../utils/semver-satisfies'
 import AsyncInit from '../utils/async-init'
+import { VM_TYPE } from '../tx/builder/schema'
 
 async function getCompilerVersion (options = {}) {
   return this.http
@@ -107,8 +108,6 @@ function isInit () {
   if (this.compilerVersion === null) throw Error('Compiler not defined')
   return true
 }
-
-const VM_TYPE = { FATE: 'fate', AEVM: 'aevm' }
 
 /**
  * Contract Compiler Stamp

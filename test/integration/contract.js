@@ -110,23 +110,39 @@ describe('Contract', function () {
   })
 
   it('precompiled bytecode can be deployed', async () => {
+    console.log(contract.getNodeInfo())
     const code = await contract.contractCompile(identityContract)
     return contract.contractDeploy(code.bytecode, identityContract).should.eventually.have.property('address')
   })
 
+  it('Fate: Deploy', async () => {
+    bytecode = await contract.contractCompile(identityContract, { backend: 'fate' })
+    const res = await bytecode.deployStatic([])
+    res.result.should.have.property('gasUsed')
+    res.result.should.have.property('returnType')
+    deployed = await bytecode.deploy([])
+  })
+  it('Fate: Call', async () => {
+    const result = await deployed.callStatic('main', ['42'])
+    const decoded = await result.decode()
+    decoded.should.be.equal(42)
+    const result2 = await deployed.call('main', ['42'])
+    const decoded2 = await result2.decode()
+    decoded2.should.be.equal(42)
+  })
   it('compiles Sophia code', async () => {
     bytecode = await contract.contractCompile(identityContract)
     return bytecode.should.have.property('bytecode')
   })
 
   it('deploy static compiled contract', async () => {
-    const res = await bytecode.deployStatic()
+    const res = await bytecode.deployStatic([])
     res.result.should.have.property('gasUsed')
     res.result.should.have.property('returnType')
   })
 
   it('deploys compiled contracts', async () => {
-    deployed = await bytecode.deploy([]).catch(async e => console.log(await e.verifyTx()))
+    deployed = await bytecode.deploy([], { blocks: 2 })
     return deployed.should.have.property('address')
   })
 
@@ -153,6 +169,8 @@ describe('Contract', function () {
     const client = await BaseAe()
     client.removeAccount('ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi')
     client.addresses().length.should.be.equal(0)
+    const address = await client.address().catch(e => false)
+    address.should.be.equal(false)
     const { result } = await client.contractCallStatic(identityContract, deployed.address, 'main', ['42'])
     result.callerId.should.be.equal(client.Ae.defaults.dryRunAccount.pub)
   })
@@ -168,7 +186,7 @@ describe('Contract', function () {
   })
 
   it('initializes contract state', async () => {
-    const data = `"Hello World!"`
+    const data = '"Hello World!"'
     return contract.contractCompile(stateContract)
       .then(bytecode => bytecode.deploy([data]))
       .then(deployed => deployed.call('retrieve'))
@@ -453,22 +471,22 @@ describe('Contract', function () {
         })
         it('Map With Option Value', async () => {
           const address = await contract.address()
-          let mapArgWithSomeValue = new Map(
+          const mapArgWithSomeValue = new Map(
             [
               [address, ['someStringV', Promise.resolve(123)]]
             ]
           )
-          let mapArgWithNoneValue = new Map(
+          const mapArgWithNoneValue = new Map(
             [
               [address, ['someStringV', Promise.reject(Error()).catch(e => undefined)]]
             ]
           )
-          let returnArgWithSomeValue = new Map(
+          const returnArgWithSomeValue = new Map(
             [
               [address, ['someStringV', 123]]
             ]
           )
-          let returnArgWithNoneValue = new Map(
+          const returnArgWithNoneValue = new Map(
             [
               [address, ['someStringV', undefined]]
             ]
