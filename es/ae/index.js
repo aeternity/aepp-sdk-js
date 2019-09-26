@@ -29,6 +29,8 @@ import Account from '../account'
 import TxBuilder from '../tx/builder'
 import * as R from 'ramda'
 import { BigNumber } from 'bignumber.js'
+import { isAddressValid } from '../utils/crypto'
+import { isNameValid } from '../tx/builder/helpers'
 
 /**
  * Sign and post a transaction to the chain
@@ -63,14 +65,34 @@ async function signUsingGA (tx, options = {}) {
  * @category async
  * @rtype (amount: Number|String, recipientId: String, options?: Object) => Promise[String]
  * @param {Number|String} amount - Amount to spend
- * @param {String} recipientId - Address of recipient account
+ * @param {String} recipientId - Address or Name of recipient account
  * @param {Object} options - Options
  * @return {String|String} Transaction or transaction hash
  */
 async function spend (amount, recipientId, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const spendTx = await this.spendTx(R.merge(opt, { senderId: await this.address(opt), recipientId, amount: amount }))
+  recipientId = await this.resolveRecipientName(recipientId)
+  const spendTx = await this.spendTx(R.merge(opt, { senderId: await this.address(opt), recipientId, amount }))
   return this.send(spendTx, opt)
+}
+
+/**
+ * Resolve AENS name and return name hash
+ *
+ * @param {String} nameOrAddress
+ * @param {String} pointerPrefix
+ * @return {String} Address or AENS name hash
+ */
+async function resolveRecipientName (nameOrAddress) {
+  if (isAddressValid(nameOrAddress)) return nameOrAddress
+  if (isNameValid(nameOrAddress)) {
+    const { id } = await this.getName(nameOrAddress)
+    return id
+  }
+  // Validation
+  // const { id: nameHash, pointers } = await this.getName(nameOrAddress)
+  // if (pointers.find(({ id }) => id.split('_')[0] === pointerPrefix)) return nameHash
+  // throw new Error(`Can't find pointers with prefix ${pointerPrefix} for name ${nameOrAddress}`)
 }
 
 /**
@@ -135,7 +157,7 @@ function destroyInstance () {
  * @return {Object} Ae instance
  */
 const Ae = stampit(Tx, Account, Chain, {
-  methods: { send, spend, transferFunds, destroyInstance },
+  methods: { send, spend, transferFunds, destroyInstance, resolveRecipientName },
   deepProps: { Ae: { defaults: {} } }
   // Todo Enable GA
   // deepConfiguration: { Ae: { methods: ['signUsingGA'] } }

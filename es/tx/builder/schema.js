@@ -11,6 +11,12 @@
 import BigNumber from 'bignumber.js'
 
 export const VSN = 1
+export const VSN_2 = 2
+
+// # AENS
+export const AENS_NAME_DOMAINS = ['aet', 'test']
+export const CLIENT_TTL = 1
+export const NAME_TTL = 50000
 
 // # Tag constant for ids (type uint8)
 // # see https://github.com/aeternity/protocol/blob/master/serializations.md#the-id-type
@@ -55,6 +61,7 @@ const OBJECT_TAG_CHANNEL_OFFCHAIN_UPDATE_DEPOSIT_TX = 571
 const OBJECT_TAG_CHANNEL_OFFCHAIN_UPDATE_WITHDRAWAL_TX = 572
 const OBJECT_TAG_CHANNEL_OFFCHAIN_CREATE_CONTRACT_TX = 573
 const OBJECT_TAG_CHANNEL_OFFCHAIN_CALL_CONTRACT_TX = 574
+const OBJECT_TAG_CHANNEL_RECONNECT_TX = 575
 const OBJECT_TAG_PROOF_OF_INCLUSION = 60
 const OBJECT_TAG_STATE_TREES = 62
 const OBJECT_TAG_MERKLE_PATRICIA_TREE = 63
@@ -132,6 +139,7 @@ export const TX_TYPE = {
   channelOffChainUpdateWithdrawal: 'channelOffChainUpdateWithdrawal',
   channelOffChainCreateContract: 'channelOffChainCreateContract',
   channelOffChainCallContract: 'channelOffChainCallContract',
+  channelReconnect: 'channelReconnect',
   proofOfInclusion: 'proofOfInclusion',
   stateTrees: 'stateTrees',
   merklePatriciaTree: 'merklePatriciaTree',
@@ -240,6 +248,7 @@ export const OBJECT_ID_TX_TYPE = {
   [OBJECT_TAG_CHANNEL_OFFCHAIN_UPDATE_WITHDRAWAL_TX]: TX_TYPE.channelOffChainUpdateWithdrawal,
   [OBJECT_TAG_CHANNEL_OFFCHAIN_CREATE_CONTRACT_TX]: TX_TYPE.channelOffChainCreateContract,
   [OBJECT_TAG_CHANNEL_OFFCHAIN_CALL_CONTRACT_TX]: TX_TYPE.channelOffChainCallContract,
+  [OBJECT_TAG_CHANNEL_RECONNECT_TX]: TX_TYPE.channelReconnect,
   [OBJECT_TAG_PROOF_OF_INCLUSION]: TX_TYPE.proofOfInclusion,
   [OBJECT_TAG_STATE_TREES]: TX_TYPE.stateTrees,
   [OBJECT_TAG_MERKLE_PATRICIA_TREE]: TX_TYPE.merklePatriciaTree,
@@ -376,14 +385,14 @@ const ACCOUNT_TX_2 = [
   TX_FIELD('flags', FIELD_TYPES.int),
   TX_FIELD('nonce', FIELD_TYPES.int),
   TX_FIELD('balance', FIELD_TYPES.int),
-  TX_FIELD('gaContract', FIELD_TYPES.id, 'ct'),
+  TX_FIELD('gaContract', FIELD_TYPES.id, ['ct', 'nm']),
   TX_FIELD('gaAuthFun', FIELD_TYPES.binary, 'cb')
 ]
 
 const SPEND_TX = [
   ...BASE_TX,
   TX_FIELD('senderId', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('recipientId', FIELD_TYPES.id, 'ak'),
+  TX_FIELD('recipientId', FIELD_TYPES.id, ['ak', 'nm']),
   TX_FIELD('amount', FIELD_TYPES.int),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int),
@@ -433,7 +442,7 @@ const NAME_TRANSFER_TX = [
   TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
   TX_FIELD('nameId', FIELD_TYPES.id, 'nm'),
-  TX_FIELD('recipientId', FIELD_TYPES.id, 'ak'),
+  TX_FIELD('recipientId', FIELD_TYPES.id, ['ak', 'nm']),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int)
 ]
@@ -503,7 +512,7 @@ const CONTRACT_CALL_TX = [
   ...BASE_TX,
   TX_FIELD('callerId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('contractId', FIELD_TYPES.id, 'ct'),
+  TX_FIELD('contractId', FIELD_TYPES.id, ['ct', 'nm']),
   TX_FIELD('abiVersion', FIELD_TYPES.int),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int),
@@ -543,7 +552,7 @@ const ORACLE_REGISTER_TX = [
 
 const ORACLE_EXTEND_TX = [
   ...BASE_TX,
-  TX_FIELD('oracleId', FIELD_TYPES.id, 'ok'),
+  TX_FIELD('oracleId', FIELD_TYPES.id, ['ok', 'nm']),
   TX_FIELD('nonce', FIELD_TYPES.int),
   TX_FIELD('oracleTtlType', FIELD_TYPES.int),
   TX_FIELD('oracleTtlValue', FIELD_TYPES.int),
@@ -555,7 +564,7 @@ const ORACLE_QUERY_TX = [
   ...BASE_TX,
   TX_FIELD('senderId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('oracleId', FIELD_TYPES.id, 'ok'),
+  TX_FIELD('oracleId', FIELD_TYPES.id, ['ok', 'nm']),
   TX_FIELD('query', FIELD_TYPES.string),
   TX_FIELD('queryFee', FIELD_TYPES.int),
   TX_FIELD('queryTtlType', FIELD_TYPES.int),
@@ -740,6 +749,14 @@ const CHANNEL_OFFCHAIN_CALL_CONTRACT_TX = [
   TX_FIELD('gasLimit', FIELD_TYPES.int)
 ]
 
+const CHANNEL_RECONNECT_TX = [
+  ...BASE_TX,
+  TX_FIELD('channelId', FIELD_TYPES.id, 'ch'),
+  TX_FIELD('round', FIELD_TYPES.int),
+  TX_FIELD('role', FIELD_TYPES.string),
+  TX_FIELD('pubkey', FIELD_TYPES.id, 'ak')
+]
+
 const CHANNEL_OFFCHAIN_UPDATE_TRANSFER_TX = [
   ...BASE_TX,
   TX_FIELD('from', FIELD_TYPES.id, 'ak'),
@@ -917,6 +934,9 @@ export const TX_SERIALIZATION_SCHEMA = {
   [TX_TYPE.channelOffChainCallContract]: {
     1: TX_SCHEMA_FIELD(CHANNEL_OFFCHAIN_CALL_CONTRACT_TX, OBJECT_TAG_CHANNEL_OFFCHAIN_CALL_CONTRACT_TX)
   },
+  [TX_TYPE.channelReconnect]: {
+    1: TX_SCHEMA_FIELD(CHANNEL_RECONNECT_TX, OBJECT_TAG_CHANNEL_RECONNECT_TX)
+  },
   [TX_TYPE.proofOfInclusion]: {
     1: TX_SCHEMA_FIELD(PROOF_OF_INCLUSION_TX, OBJECT_TAG_PROOF_OF_INCLUSION)
   },
@@ -1051,6 +1071,9 @@ export const TX_DESERIALIZATION_SCHEMA = {
   },
   [OBJECT_TAG_CHANNEL_OFFCHAIN_CALL_CONTRACT_TX]: {
     1: TX_SCHEMA_FIELD(CHANNEL_OFFCHAIN_CALL_CONTRACT_TX, OBJECT_TAG_CHANNEL_OFFCHAIN_CALL_CONTRACT_TX)
+  },
+  [OBJECT_TAG_CHANNEL_RECONNECT_TX]: {
+    1: TX_SCHEMA_FIELD(CHANNEL_RECONNECT_TX, OBJECT_TAG_CHANNEL_RECONNECT_TX)
   },
   [OBJECT_TAG_PROOF_OF_INCLUSION]: {
     1: TX_SCHEMA_FIELD(PROOF_OF_INCLUSION_TX, OBJECT_TAG_PROOF_OF_INCLUSION)
