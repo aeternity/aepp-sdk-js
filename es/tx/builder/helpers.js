@@ -84,6 +84,22 @@ export function formatSalt (salt) {
  * name, base 58 encoding the result and prepending 'cm_'
  *
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
+ * @function prelimaCommitmentHash
+ * @category async
+ * @rtype (name: String, salt?: String) => hash: Promise[String]
+ * @param {String} name - Name to be registered
+ * @param {Number} salt Random salt
+ * @return {String} Commitment hash
+ */
+export async function prelimaCommitmentHash (name, salt = createSalt()) {
+  return `cm_${encodeBase58Check(hash(Buffer.concat([nameId(name), formatSalt(salt)])))}`
+}
+
+/**
+ * Generate the commitment hash by hashing the formatted salt and
+ * name, base 58 encoding the result and prepending 'cm_'
+ *
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @function commitmentHash
  * @category async
  * @rtype (name: String, salt?: String) => hash: Promise[String]
@@ -92,7 +108,7 @@ export function formatSalt (salt) {
  * @return {String} Commitment hash
  */
 export async function commitmentHash (name, salt = createSalt()) {
-  return `cm_${encodeBase58Check(hash(Buffer.concat([nameId(name), formatSalt(salt)])))}`
+  return `cm_${encodeBase58Check(hash(Buffer.concat([Buffer.from(name), formatSalt(salt)])))}`
 }
 
 /**

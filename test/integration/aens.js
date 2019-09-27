@@ -21,12 +21,14 @@ import * as R from 'ramda'
 import { generateKeyPair } from '../../es/utils/crypto'
 
 function randomName () {
-  return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString(36) + '.test'
+  return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString(36) + '.aet'
 }
+
+const nameFee = '1000000000000000000000'
 
 plan('10000000000000000')
 
-describe.skip('Aens', function () {
+describe('Aens', function () {
   configure(this)
 
   let aens
@@ -48,7 +50,7 @@ describe.skip('Aens', function () {
 
     it('updating names not owned by the account', async () => {
       const preclaim = await aens.aensPreclaim(name)
-      const claim = await preclaim.claim()
+      const claim = await preclaim.claim({ nameFee })
       const newAccount = generateKeyPair()
 
       const aens2 = await BaseAe()
@@ -60,7 +62,7 @@ describe.skip('Aens', function () {
   it('claims names', async () => {
     const preclaim = await aens.aensPreclaim(name)
     preclaim.should.be.an('object')
-    return preclaim.claim().should.eventually.be.an('object')
+    return preclaim.claim({ nameFee }).should.eventually.be.an('object')
   })
 
   it('queries names', async () => {

@@ -71,11 +71,11 @@ async function namePreclaimTx ({ accountId, commitmentId }) {
 
 async function nameClaimTx ({ accountId, name, nameSalt }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.nameClaim, { senderId: accountId, ...R.head(arguments) })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.nameClaim, { senderId: accountId, ...R.head(arguments), vsn: 2 })
 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
-    ? buildTx(R.merge(R.head(arguments), { nonce, ttl, fee }), TX_TYPE.nameClaim)
+    ? buildTx(R.merge(R.head(arguments), { nonce, ttl, fee }), TX_TYPE.nameClaim, { vsn: 2 })
     : await this.api.postNameClaim(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
 
   return tx
@@ -422,7 +422,7 @@ async function getAccountNonce (accountId, nonce) {
  * @param {Object} params Object which contains all tx data
  * @return {Object} { ttl, nonce, fee } Object with account nonce, absolute ttl and transaction fee
  */
-async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, gas, absoluteTtl }) {
+async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, gas, absoluteTtl, vsn }) {
   const account = await this.getAccount(senderId).catch(e => ({ nonce: 0 }))
   // Is GA account
   if (account.contractId) {
@@ -431,7 +431,7 @@ async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, ga
     n = n || (account.nonce + 1)
   }
   const ttl = await (calculateTtl.bind(this)(t, !absoluteTtl))
-  const fee = calculateFee(f, txType, { showWarning: this.showWarning, gas, params: R.merge(R.last(arguments), { nonce: n, ttl }) })
+  const fee = calculateFee(f, txType, { showWarning: this.showWarning, gas, params: R.merge(R.last(arguments), { nonce: n, ttl }), vsn })
   return { fee, ttl, nonce: n }
 }
 
