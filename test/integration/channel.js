@@ -43,7 +43,7 @@ function waitForChannel (channel) {
   )
 }
 
-describe.skip('Channel', function () {
+describe('Channel', function () {
   configure(this)
   this.timeout(120000)
 
@@ -73,7 +73,8 @@ describe.skip('Channel', function () {
     ttl: 10000,
     host: 'localhost',
     port: 3001,
-    lockPeriod: 1
+    lockPeriod: 1,
+    statePassword: 'correct horse battery staple'
   }
 
   before(async function () {
