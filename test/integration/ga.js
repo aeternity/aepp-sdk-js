@@ -64,7 +64,7 @@ describe('Generalize Account', function () {
     const balanceAfter = await client.balance(publicKey)
     balanceAfter.should.be.equal('20000')
   })
-  it('Init MemoryAccount for GA and Spend usig GA', async () => {
+  it('Init MemoryAccount for GA and Spend using GA', async () => {
     const r = Math.floor(Math.random() * 20)
     const r2 = Math.floor(Math.random() * 20)
     const callData = await client.contractEncodeCall(authContract, 'authorize', [`${r}`])
