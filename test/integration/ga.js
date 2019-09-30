@@ -71,7 +71,7 @@ describe('Generalize Account', function () {
 
     const { publicKey } = generateKeyPair()
     client.removeAccount(gaAccount.publicKey)
-    client.addAccount(MemoryAccount({ gaId: gaAccount.publicKey }))
+    await client.addAccount(MemoryAccount({ gaId: gaAccount.publicKey }))
     await client.spend(10000, publicKey, { authData: { callData }, onAccount: gaAccount.publicKey })
     await client.spend(10000, publicKey, { authData: { source: authContract, args: [`${r2}`] }, onAccount: gaAccount.publicKey })
     const balanceAfter = await client.balance(publicKey)
