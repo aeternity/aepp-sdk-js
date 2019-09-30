@@ -53,17 +53,6 @@ describe('Generalize Account', function () {
       e.message.should.be.equal(`Account ${gaAccount.publicKey} is already GA`)
     }
   })
-  it('Spend Using Meta Tx', async () => {
-    const r = Math.floor(Math.random() * 20)
-    const r2 = Math.floor(Math.random() * 20)
-    const callData = await client.contractEncodeCall(authContract, 'authorize', [`${r}`])
-
-    const { publicKey } = generateKeyPair()
-    await client.spend(10000, publicKey, { authData: { callData }, onAccount: gaAccount.publicKey })
-    await client.spend(10000, publicKey, { authData: { source: authContract, args: [`${r2}`] }, onAccount: gaAccount.publicKey })
-    const balanceAfter = await client.balance(publicKey)
-    balanceAfter.should.be.equal('20000')
-  })
   it('Init MemoryAccount for GA and Spend using GA', async () => {
     const r = Math.floor(Math.random() * 20)
     const r2 = Math.floor(Math.random() * 20)
