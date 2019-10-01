@@ -119,7 +119,7 @@ async function contractCallStatic (source, address, name, args = [], { top, opti
     : await this.address().catch(e => opt.dryRunAccount.pub)
 
   // Prepare call-data
-  const callData = await this.contractEncodeCall(source, name, args, options)
+  const callData = await this.contractEncodeCall(source, name, args, opt)
 
   // Get block hash by height
   if (top && !isNaN(top)) {
@@ -127,7 +127,6 @@ async function contractCallStatic (source, address, name, args = [], { top, opti
   }
   // Prepare nonce
   const nonce = top ? (await this.getAccount(callerId, { hash: top })).nonce + 1 : undefined
-
   if (name === 'init') {
     // Prepare deploy transaction
     const { tx } = await this.contractCreateTx(R.merge(opt, {
@@ -135,7 +134,7 @@ async function contractCallStatic (source, address, name, args = [], { top, opti
       code: bytecode,
       ownerId: callerId,
       nonce,
-      backend: opt.backend || this.compilerOptions
+      backend: opt.backend || this.compilerOptions.backend
     }))
     return this.dryRunContractTx(tx, callerId, source, name, { ...opt, top })
   } else {
@@ -145,7 +144,7 @@ async function contractCallStatic (source, address, name, args = [], { top, opti
       contractId: address,
       callData,
       nonce,
-      backend: opt.backend || this.compilerOptions
+      backend: opt.backend || this.compilerOptions.backend
     }))
     return this.dryRunContractTx(tx, callerId, source, name, { ...opt, top })
   }
