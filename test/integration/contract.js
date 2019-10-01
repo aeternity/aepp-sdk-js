@@ -23,6 +23,8 @@ import * as R from 'ramda'
 
 const identityContract = `
 contract Identity =
+ record state = { a: int }
+ entrypoint init() = { a = 1 }
  entrypoint main(x : int) = x
 `
 const stateContract = `
@@ -46,7 +48,7 @@ namespace Test =
 
 
 contract Voting =
-  entrypoint test() : int = 1
+  entrypoint test : () => int
 
 include "testLib"
 contract StateContract =
@@ -94,8 +96,10 @@ contract StateContract =
   entrypoint datTypeFn(s: dateUnit): dateUnit = s
 `
 
-const encodedNumberSix = 'cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaKNdnK'
-
+const encodedNumberSix = 'cb_DA6sWJo='
+const filesystem = {
+  testLib: libContract
+}
 plan('1000000000000000000000')
 
 describe('Contract', function () {
@@ -110,26 +114,12 @@ describe('Contract', function () {
   })
 
   it('precompiled bytecode can be deployed', async () => {
-    console.log(contract.getNodeInfo())
+    const { version, consensusProtocolVersion } = contract.getNodeInfo()
+    console.log(`Node => ${version}, consensus => ${consensusProtocolVersion}, compiler => ${contract.compilerVersion}`)
     const code = await contract.contractCompile(identityContract)
     return contract.contractDeploy(code.bytecode, identityContract).should.eventually.have.property('address')
   })
 
-  it('Fate: Deploy', async () => {
-    bytecode = await contract.contractCompile(identityContract, { backend: 'fate' })
-    const res = await bytecode.deployStatic([])
-    res.result.should.have.property('gasUsed')
-    res.result.should.have.property('returnType')
-    deployed = await bytecode.deploy([])
-  })
-  it('Fate: Call', async () => {
-    const result = await deployed.callStatic('main', ['42'])
-    const decoded = await result.decode()
-    decoded.should.be.equal(42)
-    const result2 = await deployed.call('main', ['42'])
-    const decoded2 = await result2.decode()
-    decoded2.should.be.equal(42)
-  })
   it('compiles Sophia code', async () => {
     bytecode = await contract.contractCompile(identityContract)
     return bytecode.should.have.property('bytecode')
@@ -142,7 +132,7 @@ describe('Contract', function () {
   })
 
   it('deploys compiled contracts', async () => {
-    deployed = await bytecode.deploy([], { blocks: 2 })
+    deployed = await bytecode.deploy([])
     return deployed.should.have.property('address')
   })
 
@@ -210,7 +200,7 @@ describe('Contract', function () {
       try {
         await contract.contractCompile(contractWithLib)
       } catch (e) {
-        e.message.indexOf('could not find include file').should.not.be.equal(-1)
+        e.message.indexOf('Couldn\'t find include file').should.not.be.equal(-1)
       }
     })
     it('Can deploy contract with external deps', async () => {
@@ -259,7 +249,7 @@ describe('Contract', function () {
       isString.should.be.equal(true)
     })
     it('decode call-data', async () => {
-      return contract.contractDecodeCallResultAPI(identityContract, 'main', encodedNumberSix, 'ok').should.eventually.become(6)
+      return contract.contractDecodeCallResultAPI(identityContract, 'main', encodedNumberSix, 'ok', { backend: 'fate' }).should.eventually.become(6)
     })
     it('Use invalid compiler url', async () => {
       try {
@@ -275,10 +265,7 @@ describe('Contract', function () {
     let contractObject
 
     it('Generate ACI object', async () => {
-      const filesystem = {
-        testLib: libContract
-      }
-      contractObject = await contract.getContractInstance(testContract, { filesystem, opt: { ttl: 10 } })
+      contractObject = await contract.getContractInstance(testContract, { filesystem, opt: { ttl: 0 } })
       contractObject.should.have.property('interface')
       contractObject.should.have.property('aci')
       contractObject.should.have.property('source')
@@ -287,7 +274,7 @@ describe('Contract', function () {
       contractObject.should.have.property('compile')
       contractObject.should.have.property('call')
       contractObject.should.have.property('deploy')
-      contractObject.options.ttl.should.be.equal(10)
+      contractObject.options.ttl.should.be.equal(0)
       contractObject.options.should.have.property('filesystem')
       contractObject.options.filesystem.should.have.property('testLib')
       const functionsFromACI = contractObject.aci.functions.map(({ name }) => name)
@@ -312,6 +299,24 @@ describe('Contract', function () {
       result.should.have.property('returnType')
       result.callerId.should.be.equal(onAccount)
     })
+
+    it.skip('Can deploy using AEVM', async () => {
+      console.log(contract.compilerVersion)
+      const deployStatic = await contractObject.methods.init.get('123', 1, Promise.resolve('hahahaha')).catch(e => console.log(e))
+      console.log(deployStatic)
+      // deployStatic.result.should.have.property('gasUsed')
+      // deployStatic.result.should.have.property('returnType')
+      deployed = await contractObject.methods.init('123', 1, Promise.resolve('hahahaha')).catch(async e => console.log(await e.verifyTx()))
+      console.log(deployed)
+    })
+    // it('Can call using AEVM', async () => {
+    //   const result = await deployed.callStatic('main', ['42'])
+    //   const decoded = await result.decode()
+    //   decoded.should.be.equal(42)
+    //   const result2 = await deployed.call('main', ['42'])
+    //   const decoded2 = await result2.decode()
+    //   decoded2.should.be.equal(42)
+    // })
 
     it('Deploy contract before compile', async () => {
       contractObject.compiled = null

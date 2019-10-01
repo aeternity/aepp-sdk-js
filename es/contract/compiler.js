@@ -143,7 +143,7 @@ const ContractCompilerAPI = AsyncInit.compose(ContractBase, {
   props: {
     compilerVersion: null,
     compilerOptions: {
-      backend: VM_TYPE.AEVM
+      backend: VM_TYPE.FATE
     }
   }
 })

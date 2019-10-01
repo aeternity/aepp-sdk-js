@@ -356,9 +356,9 @@ async function gaAttachTx ({ ownerId, code, vmVersion, abiVersion, authFun, gas,
  *
  * @param {string} txType Type of transaction
  * @param {object} vmAbi Object with vm and abi version fields
- * @return {object} Object with vm/abi version ({ vmVersion: number, abiVersion: number })
+ * @return {object} Object with vm/abi version ({ vmVersion: number, abiVersion: number, backend: string })
  */
-function getVmVersion (txType, { vmVersion, abiVersion, backend } = {}) {
+function getVmVersion (txType, { vmVersion, abiVersion, backend = VM_TYPE.FATE } = {}) {
   const { consensusProtocolVersion } = this.getNodeInfo()
   const supportedProtocol = PROTOCOL_VM_ABI[consensusProtocolVersion]
   if (!supportedProtocol) throw new Error('Not supported consensus protocol version')
