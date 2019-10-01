@@ -24,6 +24,7 @@ import * as R from 'ramda'
 const identityContract = `
 contract Identity =
  record state = { a: int }
+ entrypoint init() = { a = 1 }
  entrypoint main(x : int) = x
 `
 const stateContract = `
@@ -95,13 +96,13 @@ contract StateContract =
   entrypoint datTypeFn(s: dateUnit): dateUnit = s
 `
 
-const encodedNumberSix = 'cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaKNdnK'
+const encodedNumberSix = 'cb_DA6sWJo='
 const filesystem = {
   testLib: libContract
 }
 plan('1000000000000000000000')
 
-describe.only('Contract', function () {
+describe('Contract', function () {
   configure(this)
 
   let contract
@@ -113,7 +114,8 @@ describe.only('Contract', function () {
   })
 
   it('precompiled bytecode can be deployed', async () => {
-    console.log(contract.getNodeInfo())
+    const { version, consensusProtocolVersion } = contract.getNodeInfo()
+    console.log(`Node => ${version}, consensus => ${consensusProtocolVersion}, compiler => ${contract.compilerVersion}`)
     const code = await contract.contractCompile(identityContract)
     return contract.contractDeploy(code.bytecode, identityContract).should.eventually.have.property('address')
   })
@@ -198,7 +200,7 @@ describe.only('Contract', function () {
       try {
         await contract.contractCompile(contractWithLib)
       } catch (e) {
-        e.message.indexOf('could not find include file').should.not.be.equal(-1)
+        e.message.indexOf('Couldn\'t find include file').should.not.be.equal(-1)
       }
     })
     it('Can deploy contract with external deps', async () => {
@@ -247,7 +249,7 @@ describe.only('Contract', function () {
       isString.should.be.equal(true)
     })
     it('decode call-data', async () => {
-      return contract.contractDecodeCallResultAPI(identityContract, 'main', encodedNumberSix, 'ok').should.eventually.become(6)
+      return contract.contractDecodeCallResultAPI(identityContract, 'main', encodedNumberSix, 'ok', { backend: 'fate' }).should.eventually.become(6)
     })
     it('Use invalid compiler url', async () => {
       try {
