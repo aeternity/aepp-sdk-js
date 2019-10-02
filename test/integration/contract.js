@@ -287,14 +287,14 @@ describe('Contract', function () {
       isCompiled.should.be.equal(true)
     })
     it('Dry-run deploy fn', async () => {
-      const res = await contractObject.methods.init.get('123', 1, Promise.resolve('hahahaha'))
+      const res = await contractObject.methods.init.get('123', 1, 'hahahaha')
       res.result.should.have.property('gasUsed')
       res.result.should.have.property('returnType')
     })
     it('Dry-run deploy fn on specific account', async () => {
       const current = await contract.address()
       const onAccount = contract.addresses().find(acc => acc !== current)
-      const { result } = await contractObject.methods.init.get('123', 1, Promise.resolve('hahahaha'), { onAccount })
+      const { result } = await contractObject.methods.init.get('123', 1, 'hahahaha', { onAccount })
       result.should.have.property('gasUsed')
       result.should.have.property('returnType')
       result.callerId.should.be.equal(onAccount)
@@ -320,7 +320,7 @@ describe('Contract', function () {
 
     it('Deploy contract before compile', async () => {
       contractObject.compiled = null
-      await contractObject.methods.init('123', 1, Promise.resolve('hahahaha'), {})
+      await contractObject.methods.init('123', 1, 'hahahaha')
       const isCompiled = contractObject.compiled.length && contractObject.compiled.slice(0, 3) === 'cb_'
       isCompiled.should.be.equal(true)
     })
@@ -478,12 +478,12 @@ describe('Contract', function () {
           const address = await contract.address()
           const mapArgWithSomeValue = new Map(
             [
-              [address, ['someStringV', Promise.resolve(123)]]
+              [address, ['someStringV', 123]]
             ]
           )
           const mapArgWithNoneValue = new Map(
             [
-              [address, ['someStringV', Promise.reject(Error()).catch(e => undefined)]]
+              [address, ['someStringV', undefined]]
             ]
           )
           const returnArgWithSomeValue = new Map(
@@ -528,7 +528,7 @@ describe('Contract', function () {
       describe('RECORD/STATE', function () {
         const objEq = (obj, obj2) => !Object.entries(obj).find(([key, val]) => JSON.stringify(obj2[key]) !== JSON.stringify(val))
         it('Valid Set Record (Cast from JS object)', async () => {
-          await contractObject.methods.setRecord({ value: 'qwe', key: 1234, testOption: Promise.resolve('test') })
+          await contractObject.methods.setRecord({ value: 'qwe', key: 1234, testOption: 'test' })
           const state = await contractObject.methods.getRecord()
 
           objEq(state.decodedResult, { value: 'qwe', key: 1234, testOption: 'test' }).should.be.equal(true)
@@ -538,11 +538,7 @@ describe('Contract', function () {
           objEq(result.decodedResult, { value: 'qwe', key: 1234, testOption: 'test' }).should.be.equal(true)
         })
         it('Get Record With Option (Convert to JS object)', async () => {
-          await contractObject.methods.setRecord({
-            key: 1234,
-            value: 'qwe',
-            testOption: Promise.resolve('resolved string')
-          })
+          await contractObject.methods.setRecord({ key: 1234, value: 'qwe', testOption: 'resolved string' })
           const result = await contractObject.methods.getRecord()
           objEq(result.decodedResult, { value: 'qwe', key: 1234, testOption: 'resolved string' }).should.be.equal(true)
         })
@@ -556,25 +552,25 @@ describe('Contract', function () {
       })
       describe('OPTION', function () {
         it('Set Some Option Value(Cast from JS value/Convert result to JS)', async () => {
-          const optionRes = await contractObject.methods.intOption(Promise.resolve(123))
+          const optionRes = await contractObject.methods.intOption(123)
 
           optionRes.decodedResult.should.be.equal(123)
         })
         it('Set Some Option List Value(Cast from JS value/Convert result to JS)', async () => {
-          const optionRes = await contractObject.methods.listOption(Promise.resolve([[1, 'testString']]))
+          const optionRes = await contractObject.methods.listOption([[1, 'testString']])
 
           JSON.stringify(optionRes.decodedResult).should.be.equal(JSON.stringify([[1, 'testString']]))
         })
         it('Set None Option Value(Cast from JS value/Convert to JS)', async () => {
-          const optionRes = await contractObject.methods.intOption(Promise.reject(Error()))
+          const optionRes = await contractObject.methods.intOption(undefined)
           const isUndefined = optionRes.decodedResult === undefined
           isUndefined.should.be.equal(true)
         })
         it('Invalid option type', async () => {
           try {
-            await contractObject.methods.intOption({ s: 2 })
+            await contractObject.methods.intOption('string')
           } catch (e) {
-            e.message.should.be.equal('"Argument" at position 0 fails because [Value \'[[object Object]]\' at path: [0] not a Promise]')
+            e.message.should.be.equal('"Argument" at position 0 fails because [Value "[string]" at path: [0] not a number]')
           }
         })
       })
