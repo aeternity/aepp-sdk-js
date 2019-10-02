@@ -175,7 +175,7 @@ export async function channelOpen (channel, message, state) {
           changeStatus(channel, 'died')
           return { handler: channelClosed }
         case 'shutdown':
-            return { handler: channelOpen }
+          return { handler: channelOpen }
       }
       break
     case 'channels.on_chain_tx':
