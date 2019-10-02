@@ -26,7 +26,7 @@ function randomName () {
 
 plan('9000000000000000000000')
 
-describe.only('Aens', function () {
+describe('Aens', function () {
   configure(this)
 
   let aens
