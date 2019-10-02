@@ -298,23 +298,12 @@ describe('Contract', function () {
       result.callerId.should.be.equal(onAccount)
     })
 
-    it.skip('Can deploy using AEVM', async () => {
-      console.log(contract.compilerVersion)
-      const deployStatic = await contractObject.methods.init.get('123', 1, Promise.resolve('hahahaha')).catch(e => console.log(e))
-      console.log(deployStatic)
-      // deployStatic.result.should.have.property('gasUsed')
-      // deployStatic.result.should.have.property('returnType')
-      deployed = await contractObject.methods.init('123', 1, Promise.resolve('hahahaha')).catch(async e => console.log(await e.verifyTx()))
-      console.log(deployed)
+    it('Can deploy using AEVM', async () => {
+      const deployStatic = await contractObject.methods.init.get('123', 1, 'hahahaha', { backend: 'fate' }).catch(e => console.log(e))
+      deployStatic.should.be.an('object')
+      deployed = await contractObject.methods.init('123', 1, 'hahahaha', { backend: 'fate' }).catch(async e => console.log(await e.verifyTx()))
+      deployed.should.be.an('object')
     })
-    // it('Can call using AEVM', async () => {
-    //   const result = await deployed.callStatic('main', ['42'])
-    //   const decoded = await result.decode()
-    //   decoded.should.be.equal(42)
-    //   const result2 = await deployed.call('main', ['42'])
-    //   const decoded2 = await result2.decode()
-    //   decoded2.should.be.equal(42)
-    // })
 
     it('Deploy contract before compile', async () => {
       contractObject.compiled = null

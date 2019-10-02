@@ -134,8 +134,7 @@ async function contractCallStatic (source, address, name, args = [], { top, opti
       callData,
       code: bytecode,
       ownerId: callerId,
-      nonce,
-      backend: opt.backend || this.compilerOptions.backend
+      nonce
     }))
     return this.dryRunContractTx(tx, callerId, source, name, { ...opt, top })
   } else {
@@ -144,8 +143,7 @@ async function contractCallStatic (source, address, name, args = [], { top, opti
       callerId,
       contractId: address,
       callData,
-      nonce,
-      backend: opt.backend || this.compilerOptions.backend
+      nonce
     }))
     return this.dryRunContractTx(tx, callerId, source, name, { ...opt, top })
   }
@@ -198,8 +196,7 @@ async function contractCall (source, address, name, args = [], options = {}) {
   const tx = await this.contractCallTx(R.merge(opt, {
     callerId: await this.address(opt),
     contractId: address,
-    callData: await this.contractEncodeCall(source, name, args, opt),
-    backend: opt.backend || this.compilerOptions.backend
+    callData: await this.contractEncodeCall(source, name, args, opt)
   }))
 
   const { hash, rawTx } = await this.send(tx, opt)
@@ -248,8 +245,7 @@ async function contractDeploy (code, source, initState = [], options = {}) {
   const { tx, contractId } = await this.contractCreateTx(R.merge(opt, {
     callData,
     code,
-    ownerId,
-    backend: opt.backend || this.compilerOptions.backend
+    ownerId
   }))
 
   const { hash, rawTx } = await this.send(tx, opt)

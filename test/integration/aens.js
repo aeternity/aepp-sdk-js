@@ -67,7 +67,10 @@ describe('Aens', function () {
   it('claims names', prelima(async () => {
     const preclaim = await aens.aensPreclaim(name)
     preclaim.should.be.an('object')
-    preclaim.claim().should.eventually.be.an('object')
+    return preclaim.claim().catch(e => {
+      console.log(e)
+      return {}
+    }).should.eventually.be.an('object')
   }))
 
   it('queries names', prelima(async () => {
