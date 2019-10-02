@@ -23,8 +23,6 @@ import * as R from 'ramda'
 
 const identityContract = `
 contract Identity =
- record state = { a: int }
- entrypoint init() = { a = 1 }
  entrypoint main(x : int) = x
 `
 const stateContract = `

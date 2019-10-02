@@ -339,7 +339,7 @@ async function channelSnapshotSoloTx ({ channelId, fromId, payload }) {
 }
 
 // eslint-disable-next-line no-unused-vars
-async function gaAttachTx ({ ownerId, code, vmVersion, abiVersion, authFun, gas, gasPrice = MIN_GAS_PRICE, callData }) {
+async function gaAttachTx ({ ownerId, code, vmVersion, abiVersion, authFun, gas, gasPrice = MIN_GAS_PRICE, callData, backend }) {
   // Get VM_ABI version
   const ctVersion = this.getVmVersion(TX_TYPE.contractCreate, R.head(arguments))
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
@@ -358,7 +358,7 @@ async function gaAttachTx ({ ownerId, code, vmVersion, abiVersion, authFun, gas,
  * @param {object} vmAbi Object with vm and abi version fields
  * @return {object} Object with vm/abi version ({ vmVersion: number, abiVersion: number, backend: string })
  */
-function getVmVersion (txType, { vmVersion, abiVersion, backend = VM_TYPE.FATE } = {}) {
+function getVmVersion (txType, { vmVersion, abiVersion, backend } = {}) {
   const { consensusProtocolVersion } = this.getNodeInfo()
   const supportedProtocol = PROTOCOL_VM_ABI[consensusProtocolVersion]
   if (!supportedProtocol) throw new Error('Not supported consensus protocol version')
@@ -371,12 +371,13 @@ function getVmVersion (txType, { vmVersion, abiVersion, backend = VM_TYPE.FATE }
     const [compilerMajor] = this.compilerVersion.split('.')
     if (+compilerMajor === 4 && consensusProtocolVersion !== 4) throw new Error(`Compiler ${this.compilerVersion} support only consensus protocol 4(Lima)`)
     if (+compilerMajor <= 3 && consensusProtocolVersion > 3) throw new Error(`Compiler ${this.compilerVersion} support only consensus protocol less then 3(Fortuna)`)
+    backend = backend || this.compilerOptions.backend
   }
 
   if (backend === VM_TYPE.FATE && consensusProtocolVersion < 4) throw new Error('You can use FATE only after Lima HF')
   const ctVersion = {
-    abiVersion: abiVersion !== undefined ? abiVersion : backend === VM_TYPE.AEVM ? protocolForTX.abiVersion[0] : backend === VM_TYPE.FATE ? protocolForTX.abiVersion[1] : protocolForTX.abiVersion[0],
-    vmVersion: vmVersion !== undefined ? vmVersion : backend === VM_TYPE.AEVM ? protocolForTX.vmVersion[0] : backend === VM_TYPE.FATE ? protocolForTX.vmVersion[1] : protocolForTX.vmVersion[0]
+    abiVersion: abiVersion !== undefined ? abiVersion : backend === VM_TYPE.AEVM ? protocolForTX.abiVersion[1] : backend === VM_TYPE.FATE ? protocolForTX.abiVersion[0] : protocolForTX.abiVersion[0],
+    vmVersion: vmVersion !== undefined ? vmVersion : backend === VM_TYPE.AEVM ? protocolForTX.vmVersion[1] : backend === VM_TYPE.FATE ? protocolForTX.vmVersion[0] : protocolForTX.vmVersion[0]
   }
   if (protocolForTX.vmVersion.length && !R.contains(ctVersion.vmVersion, protocolForTX.vmVersion)) throw new Error(`VM VERSION ${ctVersion.vmVersion} do not support by this node. Supported: [${protocolForTX.vmVersion}]`)
   if (protocolForTX.abiVersion.length && !R.contains(ctVersion.abiVersion, protocolForTX.abiVersion)) throw new Error(`ABI VERSION ${ctVersion.abiVersion} do not support by this node. Supported: [${protocolForTX.abiVersion}]`)

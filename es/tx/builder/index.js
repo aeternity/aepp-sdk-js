@@ -364,11 +364,11 @@ export function unpackTx (encodedTx, fromRlpBinary = false, prefix = 'tx') {
 
   const objId = readInt(binary[0])
   if (!TX_DESERIALIZATION_SCHEMA[objId]) {
-    return { message: 'Transaction deserialization not implemented for tag ' + objId }
+    throw new Error('Transaction deserialization not implemented for tag ' + objId)
   }
   const vsn = readInt(binary[1])
   if (!TX_DESERIALIZATION_SCHEMA[objId][vsn]) {
-    return { message: 'Transaction deserialization not implemented for tag ' + objId + ' version ' + vsn }
+    throw new Error('Transaction deserialization not implemented for tag ' + objId + ' version ' + vsn)
   }
   const [schema] = TX_DESERIALIZATION_SCHEMA[objId][vsn]
 

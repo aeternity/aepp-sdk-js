@@ -65,6 +65,7 @@ async function handleCallError (result) {
  * @param {Array} args Argument's for call
  * @param {Object} [options={}]  Options
  * @param {Object} [options.filesystem={}] Contract external namespaces map
+ * @param {Object} [options.backend='fate'] Compiler backend
  * @return {Promise<String>}
  */
 async function contractEncodeCall (source, name, args, options) {
