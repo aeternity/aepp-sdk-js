@@ -69,13 +69,13 @@ async function namePreclaimTx ({ accountId, commitmentId }) {
   return tx
 }
 
-async function nameClaimTx ({ accountId, name, nameSalt }) {
+async function nameClaimTx ({ accountId, name, nameSalt, vsn = 2 }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.nameClaim, { senderId: accountId, ...R.head(arguments), vsn: 2 })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.nameClaim, { senderId: accountId, ...R.head(arguments), vsn })
 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
-    ? buildTx(R.merge(R.head(arguments), { nonce, ttl, fee }), TX_TYPE.nameClaim, { vsn: 2 })
+    ? buildTx(R.merge(R.head(arguments), { nonce, ttl, fee }), TX_TYPE.nameClaim, { vsn })
     : await this.api.postNameClaim(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
 
   return tx
