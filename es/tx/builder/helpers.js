@@ -227,12 +227,16 @@ export function readPointers (pointers) {
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param {string} name
+ * @param {boolean} [throwError=true] Throw error on invalid
  * @return Boolean
  * @throws Error
  */
-export function isNameValid (name) {
-  if (typeof name !== 'string') throw new Error('AENS: Name must be a string')
-  if (!AENS_NAME_DOMAINS.includes(R.last(name.split('.')))) throw new Error(`AENS: Invalid name domain. Possible domains [${AENS_NAME_DOMAINS}]`)
+export function isNameValid (name, throwError = true) {
+  if ((!name || typeof name !== 'string') && throwError) throw new Error('AENS: Name must be a string')
+  if (!AENS_NAME_DOMAINS.includes(R.last(name.split('.')))) {
+    if (throwError) throw new Error(`AENS: Invalid name domain. Possible domains [${AENS_NAME_DOMAINS}]`)
+    return false
+  }
   return true
 }
 
