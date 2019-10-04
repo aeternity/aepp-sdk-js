@@ -3,7 +3,6 @@
 ## @aeternity/aepp-sdk/es/ae
 Ae module
 
-**Export**: Ae  
 **Example**  
 ```js
 import Ae from '@aeternity/aepp-sdk/es/ae'
@@ -11,11 +10,14 @@ import Ae from '@aeternity/aepp-sdk/es/ae'
 
 * [@aeternity/aepp-sdk/es/ae](#module_@aeternity/aepp-sdk/es/ae)
     * [Ae([options])](#exp_module_@aeternity/aepp-sdk/es/ae--Ae) ⇒ `Object` ⏏
-        * [.destroyInstance()](#module_@aeternity/aepp-sdk/es/ae--Ae+destroyInstance) ⇒ `void`
-        * _async_
-            * [.send(tx, [options])](#module_@aeternity/aepp-sdk/es/ae--Ae+send) ⇒ `String` \| `String`
-            * [.spend(amount, recipientId, options)](#module_@aeternity/aepp-sdk/es/ae--Ae+spend) ⇒ `String` \| `String`
-            * [.transferFunds(percentage, recipientId, options)](#module_@aeternity/aepp-sdk/es/ae--Ae+transferFunds) ⇒ `String` \| `String`
+        * _instance_
+            * [.destroyInstance()](#module_@aeternity/aepp-sdk/es/ae--Ae+destroyInstance) ⇒ `void`
+            * _async_
+                * [.send(tx, [options])](#module_@aeternity/aepp-sdk/es/ae--Ae+send) ⇒ `String` \| `String`
+                * [.spend(amount, recipientId, options)](#module_@aeternity/aepp-sdk/es/ae--Ae+spend) ⇒ `String` \| `String`
+                * [.transferFunds(percentage, recipientId, options)](#module_@aeternity/aepp-sdk/es/ae--Ae+transferFunds) ⇒ `String` \| `String`
+        * _inner_
+            * [~resolveRecipientName(nameOrAddress, verify)](#module_@aeternity/aepp-sdk/es/ae--Ae..resolveRecipientName) ⇒ `String`
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae--Ae"></a>
 
@@ -76,7 +78,7 @@ Send tokens to another account
 | Param | Type | Description |
 | --- | --- | --- |
 | amount | `Number` \| `String` | Amount to spend |
-| recipientId | `String` | Address of recipient account |
+| recipientId | `String` | Address or Name of recipient account |
 | options | `Object` | Options |
 
 <a id="module_@aeternity/aepp-sdk/es/ae--Ae+transferFunds"></a>
@@ -94,4 +96,17 @@ Send a percentage of funds to another account
 | percentage | `Number` \| `String` | Percentage of amount to spend |
 | recipientId | `String` | Address of recipient account |
 | options | `Object` | Options |
+
+<a id="module_@aeternity/aepp-sdk/es/ae--Ae..resolveRecipientName"></a>
+
+#### Ae~resolveRecipientName(nameOrAddress, verify) ⇒ `String`
+Resolve AENS name and return name hash
+
+**Kind**: inner method of [`Ae`](#exp_module_@aeternity/aepp-sdk/es/ae--Ae)  
+**Returns**: `String` - Address or AENS name hash  
+
+| Param | Type |
+| --- | --- |
+| nameOrAddress | `String` | 
+| verify |  | 
 
