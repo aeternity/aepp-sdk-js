@@ -69,7 +69,7 @@ async function signUsingGA (tx, options = {}) {
  */
 async function spend (amount, recipientId, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  recipientId = await this.resolveRecipientName(recipientId)
+  recipientId = await this.resolveRecipientName(recipientId, options)
   const spendTx = await this.spendTx(R.merge(opt, { senderId: await this.address(opt), recipientId, amount }))
   return this.send(spendTx, opt)
 }
@@ -78,19 +78,17 @@ async function spend (amount, recipientId, options = {}) {
  * Resolve AENS name and return name hash
  *
  * @param {String} nameOrAddress
- * @param {String} pointerPrefix
+ * @param verify
  * @return {String} Address or AENS name hash
  */
-async function resolveRecipientName (nameOrAddress) {
+async function resolveRecipientName (nameOrAddress, { verify = false }) {
   if (isAddressValid(nameOrAddress)) return nameOrAddress
   if (isNameValid(nameOrAddress)) {
-    const { id } = await this.getName(nameOrAddress)
+    const { id, pointers } = await this.getName(nameOrAddress)
+    // Validation
+    if (verify && !pointers.find(({ id }) => id.split('_')[0] === 'ak')) throw new Error(`Name ${nameOrAddress} do not have pointers for account`)
     return id
   }
-  // Validation
-  // const { id: nameHash, pointers } = await this.getName(nameOrAddress)
-  // if (pointers.find(({ id }) => id.split('_')[0] === pointerPrefix)) return nameHash
-  // throw new Error(`Can't find pointers with prefix ${pointerPrefix} for name ${nameOrAddress}`)
 }
 
 /**
