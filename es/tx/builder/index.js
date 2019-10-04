@@ -206,15 +206,15 @@ function getOracleRelativeTtl (params) {
  * @return {String|Number}
  * @example calculateMinFee('spendTx', { gas, params })
  */
-export function calculateMinFee (txType, { gas = 0, params }) {
+export function calculateMinFee (txType, { gas = 0, params, vsn }) {
   const multiplier = BigNumber(1e9) // 10^9 GAS_PRICE
   if (!params) return BigNumber(DEFAULT_FEE).times(multiplier).toString(10)
 
-  let actualFee = buildFee(txType, { params: { ...params, fee: 0 }, multiplier, gas })
+  let actualFee = buildFee(txType, { params: { ...params, fee: 0 }, multiplier, gas, vsn })
   let expected = BigNumber(0)
 
   while (!actualFee.eq(expected)) {
-    actualFee = buildFee(txType, { params: { ...params, fee: actualFee }, multiplier, gas })
+    actualFee = buildFee(txType, { params: { ...params, fee: actualFee }, multiplier, gas, vsn })
     expected = actualFee
   }
   return expected.toString(10)
@@ -228,8 +228,8 @@ export function calculateMinFee (txType, { gas = 0, params }) {
  * @param multiplier
  * @return {BigNumber}
  */
-function buildFee (txType, { params, gas = 0, multiplier }) {
-  const { rlpEncoded: txWithOutFee } = buildTx({ ...params }, txType)
+function buildFee (txType, { params, gas = 0, multiplier, vsn }) {
+  const { rlpEncoded: txWithOutFee } = buildTx({ ...params }, txType, { vsn })
   const txSize = txWithOutFee.length
   return TX_FEE_BASE_GAS(txType)
     .plus(TX_FEE_OTHER_GAS(txType)({ txSize, relativeTtl: getOracleRelativeTtl(params) }))
@@ -249,10 +249,10 @@ function buildFee (txType, { params, gas = 0, multiplier }) {
  * @return {String|Number}
  * @example calculateFee(null, 'spendTx', { gas, params })
  */
-export function calculateFee (fee = 0, txType, { gas = 0, params, showWarning = true } = {}) {
+export function calculateFee (fee = 0, txType, { gas = 0, params, showWarning = true, vsn } = {}) {
   if (!params && showWarning) console.warn(`Can't build transaction fee, we will use DEFAULT_FEE(${DEFAULT_FEE})`)
 
-  const minFee = calculateMinFee(txType, { params, gas })
+  const minFee = calculateMinFee(txType, { params, gas, vsn })
   if (fee && BigNumber(minFee).gt(BigNumber(fee)) && showWarning) console.warn(`Transaction fee is lower then min fee! Min fee: ${minFee}`)
 
   return fee || minFee
@@ -333,15 +333,15 @@ export function unpackRawTx (binary, schema) {
  * @throws {Error} Validation error
  * @return {Object} { tx, rlpEncoded, binary } Object with tx -> Base64Check transaction hash with 'tx_' prefix, rlp encoded transaction and binary transaction
  */
-export function buildTx (params, type, { excludeKeys = [], prefix = 'tx' } = {}) {
+export function buildTx (params, type, { excludeKeys = [], prefix = 'tx', vsn = VSN } = {}) {
   if (!TX_SERIALIZATION_SCHEMA[type]) {
     throw new Error('Transaction serialization not implemented for ' + type)
   }
-  if (!TX_SERIALIZATION_SCHEMA[type][VSN]) {
-    throw new Error('Transaction serialization not implemented for ' + type + ' version ' + VSN)
+  if (!TX_SERIALIZATION_SCHEMA[type][vsn]) {
+    throw new Error('Transaction serialization not implemented for ' + type + ' version ' + vsn)
   }
-  const [schema, tag] = TX_SERIALIZATION_SCHEMA[type][VSN]
-  const binary = buildRawTx({ ...params, VSN, tag }, schema, { excludeKeys }).filter(e => e !== undefined)
+  const [schema, tag] = TX_SERIALIZATION_SCHEMA[type][vsn]
+  const binary = buildRawTx({ ...params, VSN: vsn, tag }, schema, { excludeKeys }).filter(e => e !== undefined)
 
   const rlpEncoded = rlp.encode(binary)
   const tx = encode(rlpEncoded, prefix)
@@ -364,11 +364,11 @@ export function unpackTx (encodedTx, fromRlpBinary = false, prefix = 'tx') {
 
   const objId = readInt(binary[0])
   if (!TX_DESERIALIZATION_SCHEMA[objId]) {
-    return { message: 'Transaction deserialization not implemented for tag ' + objId }
+    throw new Error('Transaction deserialization not implemented for tag ' + objId)
   }
   const vsn = readInt(binary[1])
   if (!TX_DESERIALIZATION_SCHEMA[objId][vsn]) {
-    return { message: 'Transaction deserialization not implemented for tag ' + objId + ' version ' + vsn }
+    throw new Error('Transaction deserialization not implemented for tag ' + objId + ' version ' + vsn)
   }
   const [schema] = TX_DESERIALIZATION_SCHEMA[objId][vsn]
 

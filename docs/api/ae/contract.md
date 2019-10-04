@@ -17,19 +17,19 @@ import { Contract } from '@aeternity/aepp-sdk' (Using bundle)
 ```
 
 * [@aeternity/aepp-sdk/es/ae/contract](#module_@aeternity/aepp-sdk/es/ae/contract)
-    * [exports.Contract([options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--exports.Contract) ⇒ `Object` ⏏
+    * [exports.ContractAPI([options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--exports.ContractAPI) ⇒ `Object` ⏏
     * _async_
         * [handleCallError(result)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--handleCallError) ⇒ `Promise.&lt;void&gt;` ⏏
-        * [contractEncodeCall(source, name, args)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractEncodeCall) ⇒ `Promise.&lt;String&gt;` ⏏
-        * [contractDecodeData(source, fn, callValue, callResult, options)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractDecodeData) ⇒ `Promise.&lt;String&gt;` ⏏
-        * [contractCallStatic(source, address, name, args, options, top, options)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCallStatic) ⇒ `Promise.&lt;Object&gt;` ⏏
-        * [contractCall(source, address, name, args, options)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCall) ⇒ `Promise.&lt;Object&gt;` ⏏
-        * [contractDeploy(code, source, initState, options)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractDeploy) ⇒ `Promise.&lt;Object&gt;` ⏏
-        * [contractCompile(source, options)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCompile) ⇒ `Promise.&lt;Object&gt;` ⏏
+        * [contractEncodeCall(source, name, args, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractEncodeCall) ⇒ `Promise.&lt;String&gt;` ⏏
+        * [contractDecodeData(source, fn, callValue, callResult, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractDecodeData) ⇒ `Promise.&lt;String&gt;` ⏏
+        * [contractCallStatic(source, address, name, args, [options], bytecode, options, filesystem)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCallStatic) ⇒ `Promise.&lt;Object&gt;` ⏏
+        * [contractCall(source, address, name, args, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCall) ⏏
+        * [contractDeploy(code, source, initState, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractDeploy) ⇒ `Promise.&lt;Object&gt;` ⏏
+        * [contractCompile(source, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCompile) ⇒ `Promise.&lt;Object&gt;` ⏏
 
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--exports.Contract"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--exports.ContractAPI"></a>
 
-### exports.Contract([options]) ⇒ `Object` ⏏
+### exports.ContractAPI([options]) ⇒ `Object` ⏏
 Contract Stamp
 
 Provide contract implementation
@@ -80,34 +80,37 @@ Handle contract call error
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--contractEncodeCall"></a>
 
-### contractEncodeCall(source, name, args) ⇒ `Promise.&lt;String&gt;` ⏏
+### contractEncodeCall(source, name, args, [options]) ⇒ `Promise.&lt;String&gt;` ⏏
 Encode call data for contract call
 
 **Kind**: Exported function  
 **Category**: async  
 
-| Param | Type | Description |
-| --- | --- | --- |
-| source | `String` | Contract source code |
-| name | `String` | Name of function to call |
-| args | `Array` | Argument's for call |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| source | `String` |  | Contract source code |
+| name | `String` |  | Name of function to call |
+| args | `Array` |  | Argument's for call |
+| [options] | `Object` | <code>{}</code> | Options |
+| [options.filesystem] | `Object` | <code>{}</code> | Contract external namespaces map |
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--contractDecodeData"></a>
 
-### contractDecodeData(source, fn, callValue, callResult, options) ⇒ `Promise.&lt;String&gt;` ⏏
+### contractDecodeData(source, fn, callValue, callResult, [options]) ⇒ `Promise.&lt;String&gt;` ⏏
 Decode contract call result data
 
 **Kind**: Exported function  
 **Returns**: `Promise.&lt;String&gt;` - Result object  
 **Category**: async  
 
-| Param | Type | Description |
-| --- | --- | --- |
-| source | `String` | source code |
-| fn | `String` | function name |
-| callValue | `String` | result call data |
-| callResult | `String` | result status |
-| options |  |  |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| source | `String` |  | source code |
+| fn | `String` |  | function name |
+| callValue | `String` |  | result call data |
+| callResult | `String` |  | result status |
+| [options] | `Object` | <code>{}</code> | Options |
+| [options.filesystem] | `Object` | <code>{}</code> | Contract external namespaces map |
 
 **Example**  
 ```js
@@ -115,22 +118,24 @@ const decodedData = await client.contractDecodeData(SourceCode ,'functionName', 
 ```
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCallStatic"></a>
 
-### contractCallStatic(source, address, name, args, options, top, options) ⇒ `Promise.&lt;Object&gt;` ⏏
+### contractCallStatic(source, address, name, args, [options], bytecode, options, filesystem) ⇒ `Promise.&lt;Object&gt;` ⏏
 Static contract call(using dry-run)
 
 **Kind**: Exported function  
 **Returns**: `Promise.&lt;Object&gt;` - Result object  
 **Category**: async  
 
-| Param | Type | Description |
-| --- | --- | --- |
-| source | `String` | Contract source code |
-| address | `String` | Contract address |
-| name | `String` | Name of function to call |
-| args | `Array` | Argument's for call function |
-| options | `Object` | [options={}]  Options |
-| top | `String` | [options.top] Block hash on which you want to call contract |
-| options | `String` | [options.options]  Transaction options (fee, ttl, gas, amount, deposit) |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| source | `String` |  | Contract source code |
+| address | `String` |  | Contract address |
+| name | `String` |  | Name of function to call |
+| args | `Array` |  | Argument's for call function |
+| [options] | `Object` | <code>{}</code> | Options |
+| [options.top] | `String` |  | Block hash on which you want to call contract |
+| bytecode |  |  |  |
+| options | `String` |  | [options.options]  Transaction options (fee, ttl, gas, amount, deposit) |
+| filesystem | `Object` |  | [options.options.filesystem] Contract external namespaces map |
 
 **Example**  
 ```js
@@ -142,20 +147,20 @@ const callResult = await client.contractCallStatic(source, address, fnName, args
 ```
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCall"></a>
 
-### contractCall(source, address, name, args, options) ⇒ `Promise.&lt;Object&gt;` ⏏
+### contractCall(source, address, name, args, [options]) ⏏
 Call contract function
 
 **Kind**: Exported function  
-**Returns**: `Promise.&lt;Object&gt;` - Result object  
 **Category**: async  
 
-| Param | Type | Description |
-| --- | --- | --- |
-| source | `String` | Contract source code |
-| address | `String` | Contract address |
-| name | `String` | Name of function to call |
-| args | `Array` | Argument's for call function |
-| options | `Object` | Transaction options (fee, ttl, gas, amount, deposit) |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| source | `String` |  | Contract source code |
+| address | `String` |  | Contract address |
+| name | `String` |  | Name of function to call |
+| args | `Array` |  | Argument's for call function |
+| [options] | `Object` | <code>{}</code> | Transaction options (fee, ttl, gas, amount, deposit) |
+| [options.filesystem] | `Object` | <code>{}</code> | Contract external namespaces map* @return {Promise<Object>} Result object |
 
 **Example**  
 ```js
@@ -168,19 +173,20 @@ const callResult = await client.contractCall(source, address, fnName, args = [],
 ```
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--contractDeploy"></a>
 
-### contractDeploy(code, source, initState, options) ⇒ `Promise.&lt;Object&gt;` ⏏
+### contractDeploy(code, source, initState, [options]) ⇒ `Promise.&lt;Object&gt;` ⏏
 Deploy contract to the node
 
 **Kind**: Exported function  
 **Returns**: `Promise.&lt;Object&gt;` - Result object  
 **Category**: async  
 
-| Param | Type | Description |
-| --- | --- | --- |
-| code | `String` | Compiled contract |
-| source | `String` | Contract source code |
-| initState | `Array` | Arguments of contract constructor(init) function |
-| options | `Object` | Transaction options (fee, ttl, gas, amount, deposit) |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| code | `String` |  | Compiled contract |
+| source | `String` |  | Contract source code |
+| initState | `Array` |  | Arguments of contract constructor(init) function |
+| [options] | `Object` | <code>{}</code> | Transaction options (fee, ttl, gas, amount, deposit) |
+| [options.filesystem] | `Object` | <code>{}</code> | Contract external namespaces map* @return {Promise<Object>} Result object |
 
 **Example**  
 ```js
@@ -197,17 +203,18 @@ const deployed = await client.contractDeploy(bytecode, source, init = [], option
 ```
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCompile"></a>
 
-### contractCompile(source, options) ⇒ `Promise.&lt;Object&gt;` ⏏
+### contractCompile(source, [options]) ⇒ `Promise.&lt;Object&gt;` ⏏
 Compile contract source code
 
 **Kind**: Exported function  
 **Returns**: `Promise.&lt;Object&gt;` - Result object  
 **Category**: async  
 
-| Param | Type | Description |
-| --- | --- | --- |
-| source | `String` | Contract sourece code |
-| options | `Object` | Transaction options (fee, ttl, gas, amount, deposit) |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| source | `String` |  | Contract sourece code |
+| [options] | `Object` | <code>{}</code> | Transaction options (fee, ttl, gas, amount, deposit) |
+| [options.filesystem] | `Object` | <code>{}</code> | Contract external namespaces map* @return {Promise<Object>} Result object |
 
 **Example**  
 ```js
