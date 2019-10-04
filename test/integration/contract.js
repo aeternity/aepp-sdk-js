@@ -299,10 +299,12 @@ describe('Contract', function () {
     })
 
     it('Can deploy using AEVM', async () => {
-      const deployStatic = await contractObject.methods.init.get('123', 1, 'hahahaha', { backend: 'fate' }).catch(e => console.log(e))
+      await contractObject.compile({ backend: 'aevm' })
+      const deployStatic = await contractObject.methods.init.get('123', 1, 'hahahaha', { backend: 'aevm' })
       deployStatic.should.be.an('object')
-      deployed = await contractObject.methods.init('123', 1, 'hahahaha', { backend: 'fate' }).catch(async e => console.log(await e.verifyTx()))
+      deployed = await contractObject.methods.init('123', 1, 'hahahaha', { backend: 'aevm' })
       deployed.should.be.an('object')
+      await contractObject.compile()
     })
 
     it('Deploy contract before compile', async () => {
