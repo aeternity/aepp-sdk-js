@@ -19,7 +19,7 @@ import AsyncInit from '../utils/async-init'
  * @return {Object} NodePool instance
  */
 export const NodePool = AsyncInit.compose({
-  async init ({ nodes = [], url = this.url, internalUrl = this.internalUrl, forceCompatibility = false } = {}) {
+  async init ({ nodes = [], forceCompatibility = false } = {}) {
     this.pool = new Map()
     this.validateNodes(nodes)
 
@@ -28,12 +28,6 @@ export const NodePool = AsyncInit.compose({
       this.pool.set(name, prepareNodeObject(name, instance))
     })
     if (nodes.length) this.selectNode(nodes[0].name)
-
-    // DEPRECATED. TODO Remove deprecated param
-    // Prevent BREAKING CHANGES. Support for init params `url`, `internalUrl`
-    if (url) {
-      this.addNode('default', await Node({ url, internalUrl, forceCompatibility }), true)
-    }
   },
   propertyDescriptors: {
     api: {

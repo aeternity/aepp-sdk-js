@@ -18,7 +18,7 @@ export const prepareGaParams = (ins) => async (authData, authFnName) => {
 
 export const getContractAuthFan = (ins) => async (source, fnName) => {
   const { bytecode } = await ins.contractCompile(source)
-  // TODO remove
+  // TODO remove cross compatibility
   // Compiler backend cross compatibility
   const { tx: { typeInfo } } = await unpackTx(bytecode, false, 'cb')
   if (!typeInfo[fnName]) {

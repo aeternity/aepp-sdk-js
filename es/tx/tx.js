@@ -365,7 +365,7 @@ function getVmVersion (txType, { vmVersion, abiVersion, backend } = {}) {
   const protocolForTX = supportedProtocol[txType]
   if (!protocolForTX) throw new Error('Not supported tx type')
 
-  // TODO remove
+  // TODO remove cross compatibility
   // Cross node/compiler compatibility
   if (this.compilerVersion) {
     const [compilerMajor] = this.compilerVersion.split('.')

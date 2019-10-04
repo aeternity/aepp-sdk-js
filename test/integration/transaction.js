@@ -19,6 +19,7 @@ import { describe, it, before } from 'mocha'
 import { encodeBase58Check, encodeBase64Check, generateKeyPair, salt } from '../../es/utils/crypto'
 import { ready, configure } from './index'
 import { commitmentHash } from '../../es/tx/builder/helpers'
+import { MemoryAccount } from '../../es'
 
 const nonce = 1
 const nameTtl = 1
@@ -68,8 +69,8 @@ describe('Native Transaction', function () {
     client = await ready(this, false)
     clientNative = await ready(this)
     await client.spend('16774200000000000000', keyPair.publicKey)
-    client.setKeypair(keyPair)
-    clientNative.setKeypair(keyPair)
+    await client.addAccount(MemoryAccount({ keypair: keyPair }), { select: true })
+    await clientNative.addAccount(MemoryAccount({ keypair: keyPair }), { select: true })
     oracleId = `ok_${(await client.address()).slice(3)}`
     _salt = salt()
     commitmentId = await commitmentHash(name, _salt)

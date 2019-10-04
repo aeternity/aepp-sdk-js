@@ -19,6 +19,7 @@ import { describe, it, before } from 'mocha'
 import { configure, plan, ready, BaseAe } from './'
 import * as R from 'ramda'
 import { generateKeyPair } from '../../es/utils/crypto'
+import MemoryAccount from '../../es/account/memory'
 
 function randomName (length, namespace = '.aet') {
   return randomString(length).toLowerCase() + namespace
@@ -69,7 +70,7 @@ describe('Aens', function () {
       const newAccount = generateKeyPair()
 
       const aens2 = await BaseAe()
-      aens2.setKeypair(newAccount)
+      await aens2.addAccount(MemoryAccount({ keypair: newAccount }), { select: true })
       return aens2.aensUpdate(claim.id, newAccount.publicKey, { blocks: 1 }).should.eventually.be.rejected
     })
   })
@@ -122,7 +123,7 @@ describe('Aens', function () {
     await claim.transfer(account.publicKey)
 
     const aens2 = await BaseAe()
-    aens2.setKeypair(account)
+    await aens2.addAccount(MemoryAccount({ keypair: account }), { select: true })
     const claim2 = await aens2.aensQuery(name)
 
     return claim2.update(account.publicKey).should.eventually.deep.include({
@@ -132,7 +133,7 @@ describe('Aens', function () {
 
   it('revoke names', async () => {
     const aens2 = await BaseAe()
-    aens2.setKeypair(account)
+    await aens2.addAccount(MemoryAccount({ keypair: account }), { select: true })
 
     const aensName = await aens2.aensQuery(name)
 

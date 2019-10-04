@@ -19,6 +19,7 @@ import { Universal as Ae } from '../../es/ae/universal'
 import * as Crypto from '../../es/utils/crypto'
 import { BigNumber } from 'bignumber.js'
 import MemoryAccount from '../../es/account/memory'
+import Node from '../../es/node'
 
 const url = process.env.TEST_URL || 'http://localhost:3013'
 const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
@@ -27,10 +28,10 @@ const networkId = process.env.TEST_NETWORK_ID || 'ae_devnet'
 export const account = Crypto.generateKeyPair()
 export const account2 = Crypto.generateKeyPair()
 
-const BaseAe = (params) => Ae.compose({
+const BaseAe = async (params) => Ae.compose({
   deepProps: { Swagger: { defaults: { debug: !!process.env['DEBUG'] } } },
-  props: { url, internalUrl, process, compilerUrl }
-})({ ...params })
+  props: { process, compilerUrl }
+})({ ...params, nodes: [{ name: 'test', instance: await Node({ url, internalUrl }) }] })
 
 const BaseAeWithAccounts = BaseAe
 

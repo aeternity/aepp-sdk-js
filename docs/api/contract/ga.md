@@ -23,7 +23,7 @@ import { GeneralizeAccount } from '@aeternity/aepp-sdk' (Using bundle)
 GeneralizeAccount Stamp
 
 Provide Generalize Account implementation
-[module:@aeternity/aepp-sdk/es/contract.ga](module:@aeternity/aepp-sdk/es/contract.ga) clients.
+[@aeternity/aepp-sdk/es/contract/ga](#module_@aeternity/aepp-sdk/es/contract/ga) clients.
 
 **Kind**: Exported function  
 **Returns**: `Object` - GeneralizeAccount instance  
