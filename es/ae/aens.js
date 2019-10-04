@@ -28,8 +28,9 @@
 
 import * as R from 'ramda'
 import { encodeBase58Check, salt } from '../utils/crypto'
-import { commitmentHash } from '../tx/builder/helpers'
+import { commitmentHash, prelimaCommitmentHash, isNameValid } from '../tx/builder/helpers'
 import Ae from './'
+import { CLIENT_TTL, NAME_TTL } from '../tx/builder/schema'
 
 /**
  * Transfer a domain to another account
@@ -85,7 +86,9 @@ async function revoke (nameId, options = {}) {
 function classify (s) {
   const keys = {
     ak: 'account_pubkey',
-    ok: 'oracle_pubkey'
+    ok: 'oracle_pubkey',
+    ct: 'contract_pubkey',
+    ch: 'channel'
   }
 
   if (!s.match(/^[a-z]{2}_.+/)) {
@@ -130,6 +133,7 @@ async function update (nameId, target, options = {}) {
  * @return {Promise<Object>}
  */
 async function query (name, opt = {}) {
+  isNameValid(name)
   const o = await this.getName(name)
   const nameId = o.id
 
@@ -163,6 +167,7 @@ async function query (name, opt = {}) {
  * @return {Promise<Object>} the result of the claim
  */
 async function claim (name, salt, options = {}) {
+  isNameValid(name)
   const opt = R.merge(this.Ae.defaults, options)
   const claimTx = await this.nameClaimTx(R.merge(opt, {
     accountId: await this.address(opt),
@@ -171,11 +176,11 @@ async function claim (name, salt, options = {}) {
   }))
 
   const result = await this.send(claimTx, opt)
-
-  return {
-    ...result,
-    ...opt.waitMined && await this.aensQuery(name, opt)
+  if (opt.vsn === 1) {
+    const nameInter = this.Chain.defaults.waitMined ? await this.aensQuery(name, opt) : {}
+    return Object.assign(result, nameInter)
   }
+  return result
 }
 
 /**
@@ -188,10 +193,18 @@ async function claim (name, salt, options = {}) {
  * @return {Promise<Object>}
  */
 async function preclaim (name, options = {}) {
+  // TODO remove cross compatibility
+  const { version } = this.getNodeInfo()
+  const [majorVersion] = version.split('.')
+  const vsn = +majorVersion === 5 && version !== '5.0.0-rc.1' ? 2 : 1
+
+  isNameValid(name)
   const opt = R.merge(this.Ae.defaults, options)
   const _salt = salt()
   const height = await this.height()
-  const hash = await commitmentHash(name, _salt)
+  const hash = vsn === 1
+    ? await prelimaCommitmentHash(name, _salt)
+    : await commitmentHash(name, _salt)
 
   const preclaimTx = await this.namePreclaimTx(R.merge(opt, {
     accountId: await this.address(opt),
@@ -203,7 +216,7 @@ async function preclaim (name, options = {}) {
   return Object.freeze({
     ...result,
     height,
-    claim: options => this.aensClaim(name, _salt, { ...options, onAccount: opt.onAccount }),
+    claim: options => this.aensClaim(name, _salt, { ...options, onAccount: opt.onAccount, vsn }),
     salt: _salt,
     commitmentId: hash
   })
@@ -232,8 +245,8 @@ const Aens = Ae.compose({
   deepProps: {
     Ae: {
       defaults: {
-        clientTtl: 1,
-        nameTtl: 50000 // aec_governance:name_claim_max_expiration() => 50000
+        clientTtl: CLIENT_TTL,
+        nameTtl: NAME_TTL // aec_governance:name_claim_max_expiration() => 50000
       }
     }
   }
