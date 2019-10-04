@@ -52,8 +52,8 @@ describe('Aens', function () {
     const { version } = aens.getNodeInfo()
     const [majorVersion] = version.split('.')
     nameAuctionsSupported = +majorVersion === 5 && version !== '5.0.0-rc.1'
-    name = nameAuctionsSupported ? randomName(33) : randomName(11, '.test')
-    name2 = nameAuctionsSupported ? randomName(33) : randomName(11, '.test')
+    name = randomName(13, nameAuctionsSupported ? '.aet' : '.test') // 13 name length doesn't trigger auction
+    name2 = randomName(13, nameAuctionsSupported ? '.aet' : '.test')
   })
 
   const lima = fn => async () => nameAuctionsSupported ? fn() : undefined
