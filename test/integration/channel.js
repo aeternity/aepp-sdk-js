@@ -835,7 +835,7 @@ describe('Channel', function () {
       caller: await initiator.address(),
       contract: contractAddress,
       round: callerNonce
-    }).should.eventually.be.rejectedWith('Rejected: Call not found')
+    }).should.eventually.be.rejected
   })
 
   it('can get contract state', async () => {
