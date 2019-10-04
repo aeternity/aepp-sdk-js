@@ -65,6 +65,7 @@ async function handleCallError (result) {
  * @param {Array} args Argument's for call
  * @param {Object} [options={}]  Options
  * @param {Object} [options.filesystem={}] Contract external namespaces map
+ * @param {Object} [options.backend='fate'] Compiler backend
  * @return {Promise<String>}
  */
 async function contractEncodeCall (source, name, args, options) {
@@ -119,7 +120,7 @@ async function contractCallStatic (source, address, name, args = [], { top, opti
     : await this.address().catch(e => opt.dryRunAccount.pub)
 
   // Prepare call-data
-  const callData = await this.contractEncodeCall(source, name, args, options)
+  const callData = await this.contractEncodeCall(source, name, args, opt)
 
   // Get block hash by height
   if (top && !isNaN(top)) {
@@ -127,15 +128,13 @@ async function contractCallStatic (source, address, name, args = [], { top, opti
   }
   // Prepare nonce
   const nonce = top ? (await this.getAccount(callerId, { hash: top })).nonce + 1 : undefined
-
   if (name === 'init') {
     // Prepare deploy transaction
     const { tx } = await this.contractCreateTx(R.merge(opt, {
       callData,
       code: bytecode,
       ownerId: callerId,
-      nonce,
-      backend: opt.backend || this.compilerOptions
+      nonce
     }))
     return this.dryRunContractTx(tx, callerId, source, name, { ...opt, top })
   } else {
@@ -144,8 +143,7 @@ async function contractCallStatic (source, address, name, args = [], { top, opti
       callerId,
       contractId: address,
       callData,
-      nonce,
-      backend: opt.backend || this.compilerOptions
+      nonce
     }))
     return this.dryRunContractTx(tx, callerId, source, name, { ...opt, top })
   }
@@ -198,8 +196,7 @@ async function contractCall (source, address, name, args = [], options = {}) {
   const tx = await this.contractCallTx(R.merge(opt, {
     callerId: await this.address(opt),
     contractId: address,
-    callData: await this.contractEncodeCall(source, name, args, opt),
-    backend: opt.backend || this.compilerOptions.backend
+    callData: await this.contractEncodeCall(source, name, args, opt)
   }))
 
   const { hash, rawTx } = await this.send(tx, opt)
@@ -248,8 +245,7 @@ async function contractDeploy (code, source, initState = [], options = {}) {
   const { tx, contractId } = await this.contractCreateTx(R.merge(opt, {
     callData,
     code,
-    ownerId,
-    backend: opt.backend || this.compilerOptions.backend
+    ownerId
   }))
 
   const { hash, rawTx } = await this.send(tx, opt)

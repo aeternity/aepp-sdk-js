@@ -327,8 +327,8 @@ function assertOne (coll) {
  */
 function destructureClientError (error) {
   const { method, url } = error.config
-  const { status, data } = error.response
-  const reason = R.has('reason', data) ? data.reason : R.toString(data)
+  const { status, data, statusText } = error.response
+  const reason = R.has('reason', data) ? data.reason : data ? R.toString(data) : statusText
 
   return `${method.toUpperCase()} to ${url} failed with ${status}: ${reason}`
 }
