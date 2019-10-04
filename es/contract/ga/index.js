@@ -26,7 +26,7 @@
 import * as R from 'ramda'
 
 import { ContractAPI } from '../../ae/contract'
-import { ABI_VERSIONS, TX_TYPE } from '../../tx/builder/schema'
+import { TX_TYPE } from '../../tx/builder/schema'
 import { buildTx } from '../../tx/builder'
 import { getContractAuthFan, prepareGaParams, wrapInEmptySignedTx } from './helpers'
 import { assertedType, decodeBase64Check } from '../../utils/crypto'
@@ -121,8 +121,10 @@ async function createMetaTx (rawTransaction, authData, authFnName, options = {})
   const rlpBinaryTx = decodeBase64Check(assertedType(rawTransaction, 'tx'))
   // Wrap in SIGNED tx with empty signatures
   const { rlpEncoded } = wrapInEmptySignedTx(rlpBinaryTx)
+  // Get abi
+  const { abiVersion } = await this.getVmVersion(TX_TYPE.contractCall)
   // Prepare params for META tx
-  const params = { ...opt, tx: rlpEncoded, gaId: await this.address(opt), abiVersion: ABI_VERSIONS.SOPHIA, authData: authCallData, gas }
+  const params = { ...opt, tx: rlpEncoded, gaId: await this.address(opt), abiVersion: abiVersion, authData: authCallData, gas }
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
   const { fee, ttl } = await this.prepareTxParams(TX_TYPE.gaMeta, params)
   // Build META tx

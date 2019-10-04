@@ -94,21 +94,20 @@ export function readType (type, { bindings } = {}) {
  * @param bindings
  * @return {string}
  */
-export async function transform (type, value, { bindings } = {}) {
+export function transform (type, value, { bindings } = {}) {
   const { t, generic } = readType(type, { bindings })
 
   switch (t) {
     case SOPHIA_TYPES.string:
       return `"${value}"`
     case SOPHIA_TYPES.list:
-      return `[${await Promise.all(value.map(async el => transform(generic, el, { bindings })))}]`
+      return `[${value.map(el => transform(generic, el, { bindings }))}]`
     case SOPHIA_TYPES.tuple:
-      return `(${await Promise.all(value.map(async (el, i) => transform(generic[i], el, {
+      return `(${value.map((el, i) => transform(generic[i], el, {
         bindings
-      })))})`
+      }))})`
     case SOPHIA_TYPES.option: {
-      const optionV = await value.catch(e => undefined)
-      return optionV === undefined ? 'None' : `Some(${await transform(generic, optionV, {
+      return value === undefined ? 'None' : `Some(${transform(generic, value, {
         bindings
       })})`
     }
@@ -117,10 +116,9 @@ export async function transform (type, value, { bindings } = {}) {
     case SOPHIA_TYPES.signature:
       return `#${typeof value === 'string' ? value : Buffer.from(value).toString('hex')}`
     case SOPHIA_TYPES.record:
-      return `{${await generic.reduce(
-        async (acc, { name, type }, i) => {
-          acc = await acc
-          acc += `${i !== 0 ? ',' : ''}${name} = ${await transform(type, value[name], {
+      return `{${generic.reduce(
+        (acc, { name, type }, i) => {
+          acc += `${i !== 0 ? ',' : ''}${name} = ${transform(type, value[name], {
             bindings
           })}`
           return acc
@@ -136,18 +134,18 @@ export async function transform (type, value, { bindings } = {}) {
   return `${value}`
 }
 
-async function transformVariant (value, generic, { bindings }) {
+function transformVariant (value, generic, { bindings }) {
   const [[variant, variantArgs]] = typeof value === 'string' ? [[value, []]] : Object.entries(value)
   const [[v, type]] = Object.entries(generic.find(o => Object.keys(o)[0].toLowerCase() === variant.toLowerCase()))
   return `${v}${!type.length
     ? ''
-    : `(${await Promise.all(variantArgs.slice(0, type.length).map(async (el, i) => transform(type[i], el, {
+    : `(${variantArgs.slice(0, type.length).map((el, i) => transform(type[i], el, {
       bindings
-    })))})`
+    }))})`
   }`
 }
 
-export async function transformMap (value, generic, { bindings }) {
+export function transformMap (value, generic, { bindings }) {
   if (value instanceof Map) {
     value = Array.from(value.entries())
   }
@@ -155,14 +153,13 @@ export async function transformMap (value, generic, { bindings }) {
     value = Object.entries(value)
   }
 
-  return `{${await value
+  return `{${value
     .reduce(
-      async (acc, [key, value], i) => {
-        acc = await acc
+      (acc, [key, value], i) => {
         if (i !== 0) acc += ','
-        acc += `[${await transform(generic[0], key, {
+        acc += `[${transform(generic[0], key, {
           bindings
-        })}] = ${await transform(generic[1], value, { bindings })}`
+        })}] = ${transform(generic[1], value, { bindings })}`
         return acc
       },
       ''
@@ -285,7 +282,7 @@ export function prepareSchema (type, { bindings } = {}) {
     case SOPHIA_TYPES.signature:
       return JoiBinary.binary().bufferCheck(64).error(getJoiErrorMsg)
     case SOPHIA_TYPES.option:
-      return Joi.object().type(Promise).error(getJoiErrorMsg)
+      return prepareSchema(generic, { bindings }).optional().error(getJoiErrorMsg)
     // @Todo Need to transform Map to Array of arrays before validating it
     // case SOPHIA_TYPES.map:
     //   return Joi.array().items(Joi.array().ordered(generic.map(type => prepareSchema(type))))
@@ -373,7 +370,7 @@ export function validateArguments (aci, params) {
   const validationSchema = Joi.array().ordered(
     aci.arguments
       .map(({ type }, i) => prepareSchema(type, { bindings: aci.bindings }).label(`[${params[i]}]`))
-  ).label('Argument')
+  ).sparse(true).label('Argument')
   const { error } = Joi.validate(params, validationSchema, { abortEarly: false })
   if (error) {
     throw error

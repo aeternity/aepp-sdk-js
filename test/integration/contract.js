@@ -46,7 +46,7 @@ namespace Test =
 
 
 contract Voting =
-  entrypoint test() : int = 1
+  entrypoint test : () => int
 
 include "testLib"
 contract StateContract =
@@ -94,8 +94,10 @@ contract StateContract =
   entrypoint datTypeFn(s: dateUnit): dateUnit = s
 `
 
-const encodedNumberSix = 'cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaKNdnK'
-
+const encodedNumberSix = 'cb_DA6sWJo='
+const filesystem = {
+  testLib: libContract
+}
 plan('1000000000000000000000')
 
 describe('Contract', function () {
@@ -110,26 +112,12 @@ describe('Contract', function () {
   })
 
   it('precompiled bytecode can be deployed', async () => {
-    console.log(contract.getNodeInfo())
+    const { version, consensusProtocolVersion } = contract.getNodeInfo()
+    console.log(`Node => ${version}, consensus => ${consensusProtocolVersion}, compiler => ${contract.compilerVersion}`)
     const code = await contract.contractCompile(identityContract)
     return contract.contractDeploy(code.bytecode, identityContract).should.eventually.have.property('address')
   })
 
-  it('Fate: Deploy', async () => {
-    bytecode = await contract.contractCompile(identityContract, { backend: 'fate' })
-    const res = await bytecode.deployStatic([])
-    res.result.should.have.property('gasUsed')
-    res.result.should.have.property('returnType')
-    deployed = await bytecode.deploy([])
-  })
-  it('Fate: Call', async () => {
-    const result = await deployed.callStatic('main', ['42'])
-    const decoded = await result.decode()
-    decoded.should.be.equal(42)
-    const result2 = await deployed.call('main', ['42'])
-    const decoded2 = await result2.decode()
-    decoded2.should.be.equal(42)
-  })
   it('compiles Sophia code', async () => {
     bytecode = await contract.contractCompile(identityContract)
     return bytecode.should.have.property('bytecode')
@@ -142,7 +130,7 @@ describe('Contract', function () {
   })
 
   it('deploys compiled contracts', async () => {
-    deployed = await bytecode.deploy([], { blocks: 2 })
+    deployed = await bytecode.deploy([])
     return deployed.should.have.property('address')
   })
 
@@ -210,7 +198,7 @@ describe('Contract', function () {
       try {
         await contract.contractCompile(contractWithLib)
       } catch (e) {
-        e.message.indexOf('could not find include file').should.not.be.equal(-1)
+        e.message.indexOf('Couldn\'t find include file').should.not.be.equal(-1)
       }
     })
     it('Can deploy contract with external deps', async () => {
@@ -259,7 +247,7 @@ describe('Contract', function () {
       isString.should.be.equal(true)
     })
     it('decode call-data', async () => {
-      return contract.contractDecodeCallResultAPI(identityContract, 'main', encodedNumberSix, 'ok').should.eventually.become(6)
+      return contract.contractDecodeCallResultAPI(identityContract, 'main', encodedNumberSix, 'ok', { backend: 'fate' }).should.eventually.become(6)
     })
     it('Use invalid compiler url', async () => {
       try {
@@ -275,10 +263,7 @@ describe('Contract', function () {
     let contractObject
 
     it('Generate ACI object', async () => {
-      const filesystem = {
-        testLib: libContract
-      }
-      contractObject = await contract.getContractInstance(testContract, { filesystem, opt: { ttl: 10 } })
+      contractObject = await contract.getContractInstance(testContract, { filesystem, opt: { ttl: 0 } })
       contractObject.should.have.property('interface')
       contractObject.should.have.property('aci')
       contractObject.should.have.property('source')
@@ -287,7 +272,7 @@ describe('Contract', function () {
       contractObject.should.have.property('compile')
       contractObject.should.have.property('call')
       contractObject.should.have.property('deploy')
-      contractObject.options.ttl.should.be.equal(10)
+      contractObject.options.ttl.should.be.equal(0)
       contractObject.options.should.have.property('filesystem')
       contractObject.options.filesystem.should.have.property('testLib')
       const functionsFromACI = contractObject.aci.functions.map(({ name }) => name)
@@ -300,22 +285,29 @@ describe('Contract', function () {
       isCompiled.should.be.equal(true)
     })
     it('Dry-run deploy fn', async () => {
-      const res = await contractObject.methods.init.get('123', 1, Promise.resolve('hahahaha'))
+      const res = await contractObject.methods.init.get('123', 1, 'hahahaha')
       res.result.should.have.property('gasUsed')
       res.result.should.have.property('returnType')
     })
     it('Dry-run deploy fn on specific account', async () => {
       const current = await contract.address()
       const onAccount = contract.addresses().find(acc => acc !== current)
-      const { result } = await contractObject.methods.init.get('123', 1, Promise.resolve('hahahaha'), { onAccount })
+      const { result } = await contractObject.methods.init.get('123', 1, 'hahahaha', { onAccount })
       result.should.have.property('gasUsed')
       result.should.have.property('returnType')
       result.callerId.should.be.equal(onAccount)
     })
 
+    it('Can deploy using AEVM', async () => {
+      const deployStatic = await contractObject.methods.init.get('123', 1, 'hahahaha', { backend: 'fate' }).catch(e => console.log(e))
+      deployStatic.should.be.an('object')
+      deployed = await contractObject.methods.init('123', 1, 'hahahaha', { backend: 'fate' }).catch(async e => console.log(await e.verifyTx()))
+      deployed.should.be.an('object')
+    })
+
     it('Deploy contract before compile', async () => {
       contractObject.compiled = null
-      await contractObject.methods.init('123', 1, Promise.resolve('hahahaha'), {})
+      await contractObject.methods.init('123', 1, 'hahahaha')
       const isCompiled = contractObject.compiled.length && contractObject.compiled.slice(0, 3) === 'cb_'
       isCompiled.should.be.equal(true)
     })
@@ -473,12 +465,12 @@ describe('Contract', function () {
           const address = await contract.address()
           const mapArgWithSomeValue = new Map(
             [
-              [address, ['someStringV', Promise.resolve(123)]]
+              [address, ['someStringV', 123]]
             ]
           )
           const mapArgWithNoneValue = new Map(
             [
-              [address, ['someStringV', Promise.reject(Error()).catch(e => undefined)]]
+              [address, ['someStringV', undefined]]
             ]
           )
           const returnArgWithSomeValue = new Map(
@@ -523,7 +515,7 @@ describe('Contract', function () {
       describe('RECORD/STATE', function () {
         const objEq = (obj, obj2) => !Object.entries(obj).find(([key, val]) => JSON.stringify(obj2[key]) !== JSON.stringify(val))
         it('Valid Set Record (Cast from JS object)', async () => {
-          await contractObject.methods.setRecord({ value: 'qwe', key: 1234, testOption: Promise.resolve('test') })
+          await contractObject.methods.setRecord({ value: 'qwe', key: 1234, testOption: 'test' })
           const state = await contractObject.methods.getRecord()
 
           objEq(state.decodedResult, { value: 'qwe', key: 1234, testOption: 'test' }).should.be.equal(true)
@@ -533,11 +525,7 @@ describe('Contract', function () {
           objEq(result.decodedResult, { value: 'qwe', key: 1234, testOption: 'test' }).should.be.equal(true)
         })
         it('Get Record With Option (Convert to JS object)', async () => {
-          await contractObject.methods.setRecord({
-            key: 1234,
-            value: 'qwe',
-            testOption: Promise.resolve('resolved string')
-          })
+          await contractObject.methods.setRecord({ key: 1234, value: 'qwe', testOption: 'resolved string' })
           const result = await contractObject.methods.getRecord()
           objEq(result.decodedResult, { value: 'qwe', key: 1234, testOption: 'resolved string' }).should.be.equal(true)
         })
@@ -551,25 +539,25 @@ describe('Contract', function () {
       })
       describe('OPTION', function () {
         it('Set Some Option Value(Cast from JS value/Convert result to JS)', async () => {
-          const optionRes = await contractObject.methods.intOption(Promise.resolve(123))
+          const optionRes = await contractObject.methods.intOption(123)
 
           optionRes.decodedResult.should.be.equal(123)
         })
         it('Set Some Option List Value(Cast from JS value/Convert result to JS)', async () => {
-          const optionRes = await contractObject.methods.listOption(Promise.resolve([[1, 'testString']]))
+          const optionRes = await contractObject.methods.listOption([[1, 'testString']])
 
           JSON.stringify(optionRes.decodedResult).should.be.equal(JSON.stringify([[1, 'testString']]))
         })
         it('Set None Option Value(Cast from JS value/Convert to JS)', async () => {
-          const optionRes = await contractObject.methods.intOption(Promise.reject(Error()))
+          const optionRes = await contractObject.methods.intOption(undefined)
           const isUndefined = optionRes.decodedResult === undefined
           isUndefined.should.be.equal(true)
         })
         it('Invalid option type', async () => {
           try {
-            await contractObject.methods.intOption({ s: 2 })
+            await contractObject.methods.intOption('string')
           } catch (e) {
-            e.message.should.be.equal('"Argument" at position 0 fails because [Value \'[[object Object]]\' at path: [0] not a Promise]')
+            e.message.should.be.equal('"Argument" at position 0 fails because [Value "[string]" at path: [0] not a number]')
           }
         })
       })
