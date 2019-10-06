@@ -121,7 +121,7 @@ Promise.all([
         // instead use
         nodes: [
           { name: 'someNode', instance: nodes[0] },
-        // mode2
+        // node2, node3..
         ],
         compilerUrl: 'COMPILER_URL',
         // `keypair` param deprecated and will be removed in next major release
