@@ -3,7 +3,6 @@
 ## @aeternity/aepp-sdk/es/account/memory
 Memory Account module
 
-**Export**: MemoryAccount  
 **Example**  
 ```js
 import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'

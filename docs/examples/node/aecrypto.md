@@ -115,7 +115,7 @@ const promptSchema = {
 function extractReadableKeys (dir, options) {
   const pwd = options.input
   prompt.start()
-  prompt.get(promptSchema, (err, { password }) => {
+  prompt.get(promptSchema, (_, { password }) => {
     const key = fs.readFileSync(path.join(pwd, dir, 'sign_key'))
     const pubKey = fs.readFileSync(path.join(pwd, dir, 'sign_key.pub'))
 
@@ -178,6 +178,21 @@ transaction and turn it into an RLP-encoded tuple ready for mining
 
 ```js
 function signTx (tx, privKey) {
+
+```
+
+
+
+
+
+
+
+eslint-disable-next-line no-useless-escape
+
+
+  
+
+```js
   if (!tx.match(/^tx\_.+/)) {
     throw Error('Not a valid transaction')
   }

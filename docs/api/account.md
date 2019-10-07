@@ -3,7 +3,6 @@
 ## @aeternity/aepp-sdk/es/account
 Account module
 
-**Export**: Account  
 **Example**  
 ```js
 import Account from '@aeternity/aepp-sdk/es/account'
