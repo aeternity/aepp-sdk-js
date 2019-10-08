@@ -28,9 +28,9 @@
 
 import * as R from 'ramda'
 import { encodeBase58Check, salt } from '../utils/crypto'
-import { commitmentHash, prelimaCommitmentHash, isNameValid } from '../tx/builder/helpers'
+import { commitmentHash, prelimaCommitmentHash, isNameValid, getMinimumNameFee } from '../tx/builder/helpers'
 import Ae from './'
-import { CLIENT_TTL, NAME_TTL } from '../tx/builder/schema'
+import { CLIENT_TTL, NAME_FEE, NAME_TTL } from '../tx/builder/schema'
 
 /**
  * Transfer a domain to another account
@@ -162,13 +162,23 @@ async function query (name, opt = {}) {
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param {String} name
- * @param {String} salt
+ * @param {Number} salt
  * @param {Record} [options={}]
+ * @param {Number|String} [options.nameFee] Name Fee
  * @return {Promise<Object>} the result of the claim
  */
 async function claim (name, salt, options = {}) {
   isNameValid(name)
   const opt = R.merge(this.Ae.defaults, options)
+
+  // TODO remove cross compatibility
+  if (opt.vsn === 2) {
+    const minNameFee = getMinimumNameFee(name)
+    if (opt.nameFee !== this.Ae.defaults.nameFee && minNameFee.gt(opt.nameFee)) {
+      throw new Error(`the provided fee ${opt.nameFee} is not enough to execute the claim, required: ${minNameFee}`)
+    }
+    opt.nameFee = opt.nameFee !== this.Ae.defaults.nameFee ? opt.nameFee : minNameFee
+  }
   const claimTx = await this.nameClaimTx(R.merge(opt, {
     accountId: await this.address(opt),
     nameSalt: salt,
@@ -222,6 +232,10 @@ async function preclaim (name, options = {}) {
   })
 }
 
+async function bid (name, nameFee, options = {}) {
+  return this.aensClaim(name, 0, { nameFee, vsn: 2 })
+}
+
 /**
  * Aens Stamp
  *
@@ -240,13 +254,15 @@ const Aens = Ae.compose({
     aensClaim: claim,
     aensUpdate: update,
     aensTransfer: transfer,
-    aensRevoke: revoke
+    aensRevoke: revoke,
+    aensBid: bid
   },
   deepProps: {
     Ae: {
       defaults: {
         clientTtl: CLIENT_TTL,
-        nameTtl: NAME_TTL // aec_governance:name_claim_max_expiration() => 50000
+        nameTtl: NAME_TTL, // aec_governance:name_claim_max_expiration() => 50000
+        nameFee: NAME_FEE
       }
     }
   }

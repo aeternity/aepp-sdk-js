@@ -15,7 +15,6 @@ export const VSN_2 = 2
 
 // # AENS
 export const AENS_NAME_DOMAINS = ['aet', 'test']
-export const CLIENT_TTL = 1
 export const NAME_TTL = 500
 // # Aens
 // # max number of block into the future that the name is going to be available
@@ -23,7 +22,7 @@ export const NAME_TTL = 500
 // # https://github.com/aeternity/protocol/blob/44a93d3aab957ca820183c3520b9daf6b0fedff4/AENS.md#aens-entry
 export const NAME_MAX_TTL = 36000
 export const NAME_MAX_CLIENT_TTL = 84600
-export const NAME_CLIENT_TTL = NAME_MAX_CLIENT_TTL
+export const CLIENT_TTL = NAME_MAX_CLIENT_TTL
 export const NAME_FEE = 0
 // # see https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L67
 export const NAME_FEE_MULTIPLIER = 100000000000000

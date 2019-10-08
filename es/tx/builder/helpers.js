@@ -101,7 +101,7 @@ export function formatSalt (salt) {
  * @return {String} Commitment hash
  */
 export async function prelimaCommitmentHash (name, salt = createSalt()) {
-  return `cm_${encodeBase58Check(hash(Buffer.concat([nameId(name), formatSalt(salt)])))}`
+  return `cm_${encodeBase58Check(hash(Buffer.concat([nameId(name.toLowerCase()), formatSalt(salt)])))}`
 }
 
 /**
