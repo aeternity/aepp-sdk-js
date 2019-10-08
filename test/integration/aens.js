@@ -16,9 +16,10 @@
  */
 
 import { describe, it, before } from 'mocha'
-import { configure, plan, ready, BaseAe } from './'
+import { configure, plan, ready } from './'
 import * as R from 'ramda'
 import { generateKeyPair } from '../../es/utils/crypto'
+import { computeAuctionEndBlock, computeBidFee } from '../../es/tx/builder/helpers'
 
 function randomName (length, namespace = '.aet') {
   return randomString(length).toLowerCase() + namespace
@@ -44,7 +45,6 @@ describe('Aens', function () {
   const account = generateKeyPair()
   let name
   let name2
-  const nameFee = '1000000000000000000000'
 
   before(async function () {
     aens = await ready(this)
@@ -65,19 +65,18 @@ describe('Aens', function () {
 
     it('updating names not owned by the account', async () => {
       const preclaim = await aens.aensPreclaim(name2)
-      const claim = await preclaim.claim({ nameFee })
-      const newAccount = generateKeyPair()
-
-      const aens2 = await BaseAe()
-      aens2.setKeypair(newAccount)
-      return aens2.aensUpdate(claim.id, newAccount.publicKey, { blocks: 1 }).should.eventually.be.rejected
+      await preclaim.claim()
+      const current = await aens.address()
+      const onAccount = aens.addresses().find(acc => acc !== current)
+      const { id: nameId } = await aens.getName(name2)
+      return aens.aensUpdate(nameId, onAccount, { onAccount, blocks: 1 }).should.eventually.be.rejected
     })
   })
 
   it('claims names', async () => {
     const preclaim = await aens.aensPreclaim(name)
     preclaim.should.be.an('object')
-    return preclaim.claim({ nameFee }).catch(e => {
+    return preclaim.claim().catch(e => {
       console.log(e)
       return {}
     }).should.eventually.be.an('object')
@@ -118,27 +117,27 @@ describe('Aens', function () {
 
   it('transfers names', async () => {
     const claim = await aens.aensQuery(name)
+    const current = await aens.address()
+    const onAccount = aens.addresses().find(acc => acc !== current)
+    await claim.transfer(onAccount)
 
-    await claim.transfer(account.publicKey)
+    const claim2 = await aens.aensQuery(name)
 
-    const aens2 = await BaseAe()
-    aens2.setKeypair(account)
-    const claim2 = await aens2.aensQuery(name)
-
-    return claim2.update(account.publicKey).should.eventually.deep.include({
-      pointers: [R.fromPairs([['key', 'account_pubkey'], ['id', account.publicKey]])]
+    return claim2.update(onAccount, { onAccount }).should.eventually.deep.include({
+      pointers: [R.fromPairs([['key', 'account_pubkey'], ['id', onAccount]])]
     })
   })
 
   it('revoke names', async () => {
-    const aens2 = await BaseAe()
-    aens2.setKeypair(account)
+    const current = await aens.address()
+    const onAccount = aens.addresses().find(acc => acc !== current)
+    const aensName = await aens.aensQuery(name)
 
-    const aensName = await aens2.aensQuery(name)
+    const revoke = await aensName.revoke({ onAccount })
+    console.log(revoke)
+    revoke.should.be.an('object')
 
-    await aensName.revoke()
-
-    return aens2.aensQuery(name).should.be.rejectedWith(Error)
+    return aens.aensQuery(name).should.be.rejectedWith(Error)
   })
 
   it('PreClaim name using specific account', async () => {
@@ -152,15 +151,25 @@ describe('Aens', function () {
 
   describe('name auctions', function () {
     it('claims names', lima(async () => {
-      const name = randomName(11, '.aet')
+      const current = await aens.address()
+      const onAccount = aens.addresses().find(acc => acc !== current)
+      const name = randomName(12, '.aet')
+
       const preclaim = await aens.aensPreclaim(name)
       preclaim.should.be.an('object')
-      const claim = await preclaim.claim({ nameFee: '1000000000000000000000' })
+
+      const claim = await preclaim.claim()
       claim.should.be.an('object')
-      const bid = await aens.aensClaim(name, 0, { nameFee: '2000000000000000000000' })
+
+      const bidFee = computeBidFee(name)
+      const bid = await aens.aensBid(name, bidFee, { onAccount })
       bid.should.be.an('object')
+
       const isAuctionFinished = await aens.getName(name).catch(e => false)
       isAuctionFinished.should.be.equal(false)
+
+      const auctionEndBlock = computeAuctionEndBlock(name, bid.blockHeight)
+      console.log(`BID STARTED AT ${bid.blockHeight} WILL END AT ${auctionEndBlock}"`)
     }))
   })
 })

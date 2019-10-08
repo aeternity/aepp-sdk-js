@@ -130,6 +130,7 @@ async function update (nameId, target, options = {}) {
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param {string} name
+ * @param {Object} opt Options
  * @return {Promise<Object>}
  */
 async function query (name, opt = {}) {
@@ -232,8 +233,8 @@ async function preclaim (name, options = {}) {
   })
 }
 
-async function bid (name, nameFee, options = {}) {
-  return this.aensClaim(name, 0, { nameFee, vsn: 2 })
+async function bid (name, nameFee = NAME_FEE, options = {}) {
+  return this.aensClaim(name, 0, { ...options, nameFee, vsn: 2 })
 }
 
 /**
