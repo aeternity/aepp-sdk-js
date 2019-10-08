@@ -29,7 +29,7 @@ export const NAME_FEE_MULTIPLIER = 100000000000000
 export const NAME_FEE_BID_INCREMENT = 0.05 // # the increment is in percentage
 // # see https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L272
 export const NAME_BID_TIMEOUT_BLOCKS = 480 // # ~1 day
-export const NAME_BID_MAX_LENGTH = 31 // # this is the max length for a domain to be part of a bid
+export const NAME_BID_MAX_LENGTH = 12 // # this is the max length for a domain to be part of a bid
 // # ref: https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L290
 // # bid ranges:
 export const NAME_BID_RANGES = {
@@ -69,7 +69,7 @@ export const NAME_BID_RANGES = {
 // # ref: https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L273
 // # name bid timeouts
 export const NAME_BID_TIMEOUTS = {
-  31: 0,
+  13: 0,
   8: NAME_BID_TIMEOUT_BLOCKS, // # 480 blocks
   4: 31 * NAME_BID_TIMEOUT_BLOCKS, // # 14880 blocks
   1: 62 * NAME_BID_TIMEOUT_BLOCKS // # 29760 blocks

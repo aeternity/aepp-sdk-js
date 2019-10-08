@@ -273,7 +273,7 @@ export function computeAuctionEndBlock (domain, claimHeight) {
   return R.cond([
     [R.lt(4), R.always(NAME_BID_TIMEOUTS[1] + claimHeight)],
     [R.lt(8), R.always(NAME_BID_TIMEOUTS[4] + claimHeight)],
-    [R.lt(31), R.always(NAME_BID_TIMEOUTS[8] + claimHeight)],
+    [R.lte(NAME_BID_MAX_LENGTH), R.always(NAME_BID_TIMEOUTS[8] + claimHeight)],
     [R.T, R.always(claimHeight)]
   ])(domain.replace('.aet', '').length)
 }
