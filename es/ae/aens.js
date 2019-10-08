@@ -33,6 +33,29 @@ import Ae from './'
 import { CLIENT_TTL, NAME_FEE, NAME_TTL } from '../tx/builder/schema'
 
 /**
+ * Transfer a domain to another account
+ * @instance
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/aens
+ * @category async
+ * @param {String} nameId
+ * @param {String} account
+ * @param {Object} [options={}]
+ * @return {Promise<Object>}
+ */
+async function transfer (nameId, account, options = {}) {
+  const opt = R.merge(this.Ae.defaults, options)
+
+  const nameTransferTx = await this.nameTransferTx(R.merge(opt, {
+    nameId,
+    accountId: await this.address(opt),
+    recipientId: account
+  }))
+
+  return this.send(nameTransferTx, opt)
+}
+
+/**
  * Revoke a domain
  * @instance
  * @function
@@ -208,6 +231,10 @@ async function preclaim (name, options = {}) {
     salt: _salt,
     commitmentId: hash
   })
+}
+
+async function bid (name, nameFee = NAME_FEE, options = {}) {
+  return this.aensClaim(name, 0, { ...options, nameFee, vsn: 2 })
 }
 
 /**
