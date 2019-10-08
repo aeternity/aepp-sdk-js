@@ -134,7 +134,6 @@ describe('Aens', function () {
     const aensName = await aens.aensQuery(name)
 
     const revoke = await aensName.revoke({ onAccount })
-    console.log(revoke)
     revoke.should.be.an('object')
 
     return aens.aensQuery(name).should.be.rejectedWith(Error)
@@ -169,7 +168,7 @@ describe('Aens', function () {
       isAuctionFinished.should.be.equal(false)
 
       const auctionEndBlock = computeAuctionEndBlock(name, bid.blockHeight)
-      console.log(`BID STARTED AT ${bid.blockHeight} WILL END AT ${auctionEndBlock}"`)
+      console.log(`BID STARTED AT ${bid.blockHeight} WILL END AT ${auctionEndBlock}`)
     }))
   })
 })
