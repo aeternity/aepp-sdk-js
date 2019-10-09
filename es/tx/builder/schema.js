@@ -13,10 +13,12 @@ import BigNumber from 'bignumber.js'
 export const VSN = 1
 export const VSN_2 = 2
 
+// # TRANSACTION DEFAULT TTL
+export const TX_TTL = 0
+
 // # AENS
 export const AENS_NAME_DOMAINS = ['aet', 'test']
 export const NAME_TTL = 500
-// # Aens
 // # max number of block into the future that the name is going to be available
 // # https://github.com/aeternity/protocol/blob/epoch-v0.22.0/AENS.md#update
 // # https://github.com/aeternity/protocol/blob/44a93d3aab957ca820183c3520b9daf6b0fedff4/AENS.md#aens-entry
