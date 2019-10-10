@@ -7,7 +7,7 @@ import {
   decodeBase64Check,
   encodeBase58Check, encodeBase64Check,
   hash,
-  nameId,
+  nameId as nameHash,
   salt
 } from '../../utils/crypto'
 import { toBytes } from '../../utils/bytes'
@@ -89,19 +89,16 @@ export function formatSalt (salt) {
 }
 
 /**
- * Generate the commitment hash by hashing the formatted salt and
- * name, base 58 encoding the result and prepending 'cm_'
- *
+ * Encode a domain name
+ * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @function prelimaCommitmentHash
- * @category async
- * @rtype (name: String, salt?: String) => hash: Promise[String]
- * @param {String} name - Name to be registered
- * @param {Number} salt Random salt
- * @return {String} Commitment hash
+ * @param {String} name Name to encode
+ * @return {String} `nm_` prefixed encoded domain name
  */
-export async function prelimaCommitmentHash (name, salt = createSalt()) {
-  return `cm_${encodeBase58Check(hash(Buffer.concat([nameId(name.toLowerCase()), formatSalt(salt)])))}`
+export function produceNameId (name) {
+  const namespace = R.last(name.split('.'))
+  if (namespace === 'aet') return encode(hash(name.toLowerCase()), 'nm')
+  return encode(nameHash(name), 'nm')
 }
 
 /**
@@ -116,8 +113,10 @@ export async function prelimaCommitmentHash (name, salt = createSalt()) {
  * @param {Number} salt Random salt
  * @return {String} Commitment hash
  */
-export async function commitmentHash (name, salt = createSalt()) {
-  return `cm_${encodeBase58Check(hash(Buffer.concat([Buffer.from(name), formatSalt(salt)])))}`
+export function commitmentHash (name, salt = createSalt()) {
+  const namespace = R.last(name.split('.'))
+  if (namespace === 'aet') return `cm_${encodeBase58Check(hash(Buffer.concat([Buffer.from(name), formatSalt(salt)])))}`
+  return `cm_${encodeBase58Check(hash(Buffer.concat([nameHash(name.toLowerCase()), formatSalt(salt)])))}`
 }
 
 /**
@@ -293,5 +292,6 @@ export default {
   oracleQueryId,
   createSalt,
   buildHash,
-  isNameValid
+  isNameValid,
+  produceNameId
 }
