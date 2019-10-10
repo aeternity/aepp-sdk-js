@@ -70,12 +70,13 @@ export function formatAddress (format = ADDRESS_FORMAT.api, address) {
  * Check if address is valid
  * @rtype (input: String) => valid: Boolean
  * @param {String} address - Address
+ * @param {String} prefix Transaction prefix. Default: 'ak'
  * @return {Boolean} valid
  */
-export function isAddressValid (address) {
+export function isAddressValid (address, prefix = 'ak') {
   let isValid
   try {
-    isValid = decodeBase58Check(assertedType(address, 'ak')).length === 32
+    isValid = decodeBase58Check(assertedType(address, prefix)).length === 32
   } catch (e) {
     isValid = false
   }
