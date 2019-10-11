@@ -28,7 +28,7 @@
 
 import * as R from 'ramda'
 import { encodeBase58Check, salt } from '../utils/crypto'
-import { commitmentHash, prelimaCommitmentHash, isNameValid, getMinimumNameFee } from '../tx/builder/helpers'
+import { commitmentHash, isNameValid, getMinimumNameFee } from '../tx/builder/helpers'
 import Ae from './'
 import { CLIENT_TTL, NAME_FEE, NAME_TTL } from '../tx/builder/schema'
 
@@ -169,6 +169,12 @@ async function query (name, opt = {}) {
  * @return {Promise<Object>} the result of the claim
  */
 async function claim (name, salt, options = {}) {
+  // Todo remove cross compatibility
+  const { version } = this.getNodeInfo()
+  const [majorVersion] = version.split('.')
+  const vsn = +majorVersion === 5 && version !== '5.0.0-rc.1' ? 2 : 1
+  options.vsn = options.vsn || vsn
+
   isNameValid(name)
   const opt = R.merge(this.Ae.defaults, options)
 
@@ -187,7 +193,8 @@ async function claim (name, salt, options = {}) {
   }))
 
   const result = await this.send(claimTx, opt)
-  if (opt.vsn === 1) {
+  if (opt.vsn === 1 || name.length - 4 > 12) {
+    delete opt.vsn
     const nameInter = this.Chain.defaults.waitMined ? await this.aensQuery(name, opt) : {}
     return Object.assign(result, nameInter)
   }
@@ -204,18 +211,11 @@ async function claim (name, salt, options = {}) {
  * @return {Promise<Object>}
  */
 async function preclaim (name, options = {}) {
-  // TODO remove cross compatibility
-  const { version } = this.getNodeInfo()
-  const [majorVersion] = version.split('.')
-  const vsn = +majorVersion === 5 && version !== '5.0.0-rc.1' ? 2 : 1
-
   isNameValid(name)
   const opt = R.merge(this.Ae.defaults, options)
   const _salt = salt()
   const height = await this.height()
-  const hash = vsn === 1
-    ? await prelimaCommitmentHash(name, _salt)
-    : await commitmentHash(name, _salt)
+  const hash = commitmentHash(name, _salt)
 
   const preclaimTx = await this.namePreclaimTx(R.merge(opt, {
     accountId: await this.address(opt),
@@ -227,7 +227,7 @@ async function preclaim (name, options = {}) {
   return Object.freeze({
     ...result,
     height,
-    claim: options => this.aensClaim(name, _salt, { ...options, onAccount: opt.onAccount, vsn }),
+    claim: options => this.aensClaim(name, _salt, { ...options, onAccount: opt.onAccount }),
     salt: _salt,
     commitmentId: hash
   })

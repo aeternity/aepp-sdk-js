@@ -28,7 +28,7 @@ import ChainNode from '../chain/node'
 import Tx from './'
 
 import { buildTx, calculateFee } from './builder'
-import { ABI_VERSIONS, MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE, VM_TYPE } from './builder/schema'
+import { ABI_VERSIONS, MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE, VM_TYPE, TX_TTL } from './builder/schema'
 import { buildContractId, oracleQueryId } from './builder/helpers'
 
 async function spendTx ({ senderId, recipientId, amount, payload = '' }) {
@@ -392,7 +392,7 @@ function getVmVersion (txType, { vmVersion, abiVersion, backend } = {}) {
  * @param {boolean} relative ttl is absolute or relative(default: true(relative))
  * @return {number} Absolute Ttl
  */
-async function calculateTtl (ttl = 0, relative = true) {
+async function calculateTtl (ttl = TX_TTL, relative = true) {
   if (ttl === 0) return 0
   if (ttl < 0) throw new Error('ttl must be greater than 0')
 
