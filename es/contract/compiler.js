@@ -102,11 +102,9 @@ async function checkCompatibility ({ force = false, forceCompatibility = false }
 }
 
 function prepareCompilerOption (options = {}) {
-  const opt = { ...this.compilerOptions, ...options, file_system: options.filesystem || {} }
-  // TODO remove cross compiler compatibility
-  if (this.compilerVersion === '3.2.0') delete opt.file_system
-  return opt
+  return { ...this.compilerOptions, ...options, file_system: options.filesystem || {} }
 }
+
 function isInit () {
   if (this.compilerVersion === null) throw Error('Compiler not defined')
   return true
