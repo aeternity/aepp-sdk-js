@@ -196,7 +196,6 @@
         spendPayload: null,
         spendResponse: null,
         contractCode: `contract Identity =
-      type state = ()
       entrypoint main(x : int) = x`,
         compileBytecodeResponse: null,
         contractInitState: [],
