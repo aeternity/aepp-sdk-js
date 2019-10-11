@@ -248,7 +248,7 @@
             result,
             { decodedRes: await result.decode(returnType) }
           )
-        })());
+        })())
       },
       async getReverseWindow() {
         const iframe = document.createElement('iframe')
