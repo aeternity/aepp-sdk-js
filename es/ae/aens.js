@@ -166,7 +166,7 @@ async function claim (name, salt, options = {}) {
   }))
 
   const result = await this.send(claimTx, opt)
-  if (opt.vsn === 1 || name.length - 4 > 12) {
+  if (opt.vsn === 1 || name.split('.')[0].length > 12) {
     delete opt.vsn
     const nameInter = this.Chain.defaults.waitMined ? await this.aensQuery(name, opt) : {}
     return Object.assign(result, nameInter)
