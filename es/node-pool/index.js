@@ -4,7 +4,6 @@
  * @export NodePool
  * @example import NodePool from '@aeternity/aepp-sdk/es/node-pool'
  */
-import Node from '../node'
 import { DEFAULT_NETWORK_ID, getterForCurrentNode, prepareNodeObject } from './helpers'
 import AsyncInit from '../utils/async-init'
 
@@ -19,7 +18,7 @@ import AsyncInit from '../utils/async-init'
  * @return {Object} NodePool instance
  */
 export const NodePool = AsyncInit.compose({
-  async init ({ nodes = [], forceCompatibility = false } = {}) {
+  async init ({ nodes = [] } = {}) {
     this.pool = new Map()
     this.validateNodes(nodes)
 

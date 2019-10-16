@@ -27,7 +27,7 @@ import AsyncInit from './utils/async-init'
 import * as R from 'ramda'
 import MemoryAccount from './account/memory'
 import Selector from './account/selector'
-import { envKeypair, generateKeyPair } from './utils/crypto'
+import { envKeypair } from './utils/crypto'
 
 /**
  * Sign data blob with specific key
