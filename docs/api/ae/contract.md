@@ -215,10 +215,7 @@ Compile contract source code
 | source | `String` |  | Contract sourece code |
 | [options] | `Object` | <code>{}</code> | Transaction options (fee, ttl, gas, amount, deposit) |
 | [options.filesystem] | `Object` | <code>{}</code> | Contract external namespaces map* @return {Promise<Object>} Result object |
-<<<<<<< HEAD
-=======
 | [options.backend] | `Object` | <code>&#x27;aevm&#x27;</code> | Contract backend version (aevm|fate) |
->>>>>>> develop
 
 **Example**  
 ```js
