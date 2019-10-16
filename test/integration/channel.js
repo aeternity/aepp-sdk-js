@@ -29,8 +29,8 @@ const wsUrl = process.env.TEST_WS_URL || 'ws://localhost:3014/channel'
 plan(BigNumber('1000e18').toString())
 
 const identityContract = `
-payable contract Identity =
-  payable entrypoint main(x : int): int = x
+contract Identity =
+  entrypoint main(x : int) : int = x
 `
 
 function waitForChannel (channel) {
@@ -73,7 +73,8 @@ describe.skip('Channel', function () {
     ttl: 10000,
     host: 'localhost',
     port: 3001,
-    lockPeriod: 1
+    lockPeriod: 1,
+    statePassword: 'correct horse battery staple'
   }
 
   before(async function () {
@@ -735,24 +736,24 @@ describe.skip('Channel', function () {
       sign: responderSign
     })
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
-    const code = await initiator.compileContractAPI(identityContract)
-    const callData = await initiator.contractEncodeCallDataAPI(identityContract, 'init', [])
+    const code = await initiator.compileContractAPI(identityContract, { backend: 'aevm' })
+    const callData = await initiator.contractEncodeCallDataAPI(identityContract, 'init', [], { backend: 'aevm' })
     const result = await initiatorCh.createContract({
       code,
       callData,
       deposit: 1000,
-      vmVersion: 4,
+      vmVersion: 6,
       abiVersion: 1
     }, async (tx) => initiator.signTransaction(tx))
     result.should.eql({ accepted: true, address: result.address, signedTx: (await initiatorCh.state()).signedTx })
     contractAddress = result.address
-    contractEncodeCall = (method, args) => initiator.contractEncodeCallDataAPI(identityContract, method, args)
+    contractEncodeCall = (method, args) => initiator.contractEncodeCallDataAPI(identityContract, method, args, { backend: 'aevm' })
   })
 
   it('can create a contract and reject', async () => {
     responderShouldRejectUpdate = true
-    const code = await initiator.compileContractAPI(identityContract)
-    const callData = await initiator.contractEncodeCallDataAPI(identityContract, 'init', [])
+    const code = await initiator.compileContractAPI(identityContract, { backend: 'aevm' })
+    const callData = await initiator.contractEncodeCallDataAPI(identityContract, 'init', [], { backend: 'aevm' })
     const result = await initiatorCh.createContract({
       code,
       callData,
@@ -808,7 +809,7 @@ describe.skip('Channel', function () {
 
   it('can call a contract using dry-run', async () => {
     const result = await initiatorCh.callContractStatic({
-      amount: BigNumber('2e18'),
+      amount: 0,
       callData: await contractEncodeCall('main', ['42']),
       contract: contractAddress,
       abiVersion: 1
@@ -834,7 +835,7 @@ describe.skip('Channel', function () {
       caller: await initiator.address(),
       contract: contractAddress,
       round: callerNonce
-    }).should.eventually.be.rejectedWith('Rejected: Call not found')
+    }).should.eventually.be.rejected
   })
 
   it('can get contract state', async () => {
@@ -847,7 +848,7 @@ describe.skip('Channel', function () {
         id: contractAddress,
         ownerId: await initiator.address(),
         referrerIds: [],
-        vmVersion: 4
+        vmVersion: 6
       },
       contractState: result.contractState
     })
