@@ -463,8 +463,8 @@ const Transaction = ChainNode.compose(Tx, {
     this.showWarning = showWarning
   },
   props: {
-    nativeMode: null,
-    showWarning: null
+    nativeMode: true,
+    showWarning: false
   },
   methods: {
     spendTx,

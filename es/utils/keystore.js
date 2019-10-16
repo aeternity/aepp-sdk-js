@@ -6,7 +6,6 @@ import { isHex } from './string'
 
 /**
  * KeyStore module
- * !!!Work only in node.js!!!
  * @module @aeternity/aepp-sdk/es/utils/keystore
  * @example import * as Crypto from '@aeternity/aepp-sdk/es/utils/keystore'
  */

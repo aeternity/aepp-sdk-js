@@ -47,5 +47,4 @@ export const Universal = Ae.compose(Accounts, Chain, NodePool, Transaction, Aens
   init () {},
   props: { process: {} }
 })
-export const UniversalWithAccounts = Universal
 export default Universal

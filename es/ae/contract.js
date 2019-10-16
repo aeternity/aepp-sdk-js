@@ -35,6 +35,7 @@ import ContractBase from '../contract'
 import ContractACI from '../contract/aci'
 import BigNumber from 'bignumber.js'
 import NodePool from '../node-pool'
+import { AMOUNT, DEPOSIT, DRY_RUN_ACCOUNT, GAS, MIN_GAS_PRICE } from '../tx/builder/schema'
 
 /**
  * Handle contract call error
@@ -338,12 +339,12 @@ export const ContractAPI = Ae.compose(ContractBase, ContractACI, {
   deepProps: {
     Ae: {
       defaults: {
-        deposit: 0,
-        gasPrice: 1000000000, // min gasPrice 1e9
-        amount: 0,
-        gas: 1600000 - 21000,
+        deposit: DEPOSIT,
+        gasPrice: MIN_GAS_PRICE, // min gasPrice 1e9
+        amount: AMOUNT,
+        gas: GAS,
         options: '',
-        dryRunAccount: { pub: 'ak_11111111111111111111111111111111273Yts', amount: '100000000000000000000000000000000000' }
+        dryRunAccount: DRY_RUN_ACCOUNT
       }
     }
   }

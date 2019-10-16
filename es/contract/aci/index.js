@@ -29,6 +29,7 @@ import { validateArguments, transform, transformDecodedData } from './transforma
 import { buildContractMethods, getFunctionACI } from './helpers'
 import AsyncInit from '../../utils/async-init'
 import { BigNumber } from 'bignumber.js'
+import { AMOUNT, DEPOSIT, GAS, MIN_GAS_PRICE } from '../../tx/builder/schema'
 
 /**
  * Validated contract call arguments using contract ACI
@@ -77,10 +78,10 @@ async function getContractInstance (source, { aci, contractAddress, filesystem =
     skipArgsConvert: false,
     skipTransformDecoded: false,
     callStatic: false,
-    deposit: 0,
-    gasPrice: 1000000000, // min gasPrice 1e9
-    amount: 0,
-    gas: 1600000 - 21000,
+    deposit: DEPOSIT,
+    gasPrice: MIN_GAS_PRICE, // min gasPrice 1e9
+    amount: AMOUNT,
+    gas: GAS,
     top: null, // using for contract call static
     waitMined: true,
     verify: false,
