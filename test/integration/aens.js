@@ -52,8 +52,8 @@ describe('Aens', function () {
     const { version } = aens.getNodeInfo()
     const [majorVersion] = version.split('.')
     nameAuctionsSupported = +majorVersion === 5 && version !== '5.0.0-rc.1'
-    name = randomName(13, nameAuctionsSupported ? '.aet' : '.test') // 13 name length doesn't trigger auction
-    name2 = randomName(13, nameAuctionsSupported ? '.aet' : '.test')
+    name = randomName(13, nameAuctionsSupported ? '.chain' : '.test') // 13 name length doesn't trigger auction
+    name2 = randomName(13, nameAuctionsSupported ? '.chain' : '.test')
   })
 
   const lima = fn => async () => nameAuctionsSupported ? fn() : undefined
@@ -152,7 +152,7 @@ describe('Aens', function () {
     it('claims names', lima(async () => {
       const current = await aens.address()
       const onAccount = aens.addresses().find(acc => acc !== current)
-      const name = randomName(12, '.aet')
+      const name = randomName(12, '.chain')
 
       const preclaim = await aens.aensPreclaim(name)
       preclaim.should.be.an('object')

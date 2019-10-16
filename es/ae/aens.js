@@ -28,7 +28,7 @@
 
 import * as R from 'ramda'
 import { encodeBase58Check, salt } from '../utils/crypto'
-import { commitmentHash, isNameValid, getMinimumNameFee } from '../tx/builder/helpers'
+import { commitmentHash, isNameValid, getMinimumNameFee, classify } from '../tx/builder/helpers'
 import Ae from './'
 import { CLIENT_TTL, NAME_FEE, NAME_TTL } from '../tx/builder/schema'
 
@@ -74,33 +74,6 @@ async function revoke (nameId, options = {}) {
   }))
 
   return this.send(nameRevokeTx, opt)
-}
-
-/**
- * What kind of a hash is this? If it begins with 'ak_' it is an
- * account key, if with 'ok_' it's an oracle key.
- *
- * @param s - the hash.
- * returns the type, or throws an exception if type not found.
- */
-function classify (s) {
-  const keys = {
-    ak: 'account_pubkey',
-    ok: 'oracle_pubkey',
-    ct: 'contract_pubkey',
-    ch: 'channel'
-  }
-
-  if (!s.match(/^[a-z]{2}_.+/)) {
-    throw Error('Not a valid hash')
-  }
-
-  const klass = s.substr(0, 2)
-  if (klass in keys) {
-    return keys[klass]
-  } else {
-    throw Error(`Unknown class ${klass}`)
-  }
 }
 
 /**
@@ -193,7 +166,7 @@ async function claim (name, salt, options = {}) {
   }))
 
   const result = await this.send(claimTx, opt)
-  if (opt.vsn === 1 || name.length - 4 > 12) {
+  if (opt.vsn === 1 || name.split('.')[0].length > 12) {
     delete opt.vsn
     const nameInter = this.Chain.defaults.waitMined ? await this.aensQuery(name, opt) : {}
     return Object.assign(result, nameInter)
