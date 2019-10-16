@@ -30,7 +30,7 @@ import TxBuilder from '../tx/builder'
 import * as R from 'ramda'
 import { BigNumber } from 'bignumber.js'
 import { isAddressValid } from '../utils/crypto'
-import { isNameValid } from '../tx/builder/helpers'
+import { isNameValid, produceNameId } from '../tx/builder/helpers'
 
 /**
  * Sign and post a transaction to the chain
@@ -84,11 +84,14 @@ async function spend (amount, recipientId, options = {}) {
 async function resolveRecipientName (nameOrAddress, { verify = false }) {
   if (isAddressValid(nameOrAddress)) return nameOrAddress
   if (isNameValid(nameOrAddress)) {
-    const { id, pointers } = await this.getName(nameOrAddress)
     // Validation
-    if (verify && !pointers.find(({ id }) => id.split('_')[0] === 'ak')) throw new Error(`Name ${nameOrAddress} do not have pointers for account`)
-    return id
+    if (verify) {
+      const { pointers } = await this.getName(nameOrAddress)
+      if (!pointers.find(({ id }) => id.split('_')[0] === 'ak')) throw new Error(`Name ${nameOrAddress} do not have pointers for account`)
+    }
+    return produceNameId(nameOrAddress)
   }
+  throw new Error('Invalid recipient name or address: ' + nameOrAddress)
 }
 
 /**

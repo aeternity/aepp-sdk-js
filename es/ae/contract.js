@@ -287,7 +287,7 @@ async function contractDeploy (code, source, initState = [], options = {}) {
  */
 async function contractCompile (source, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const bytecode = await this.compileContractAPI(source, opt)
+  const bytecode = await this.compileContractAPI(source, options)
   return Object.freeze(Object.assign({
     encodeCall: async (name, args) => this.contractEncodeCall(source, name, args, R.merge(opt, options)),
     deploy: async (init, options = {}) => this.contractDeploy(bytecode, source, init, R.merge(opt, options)),

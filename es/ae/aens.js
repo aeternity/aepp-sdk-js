@@ -28,9 +28,9 @@
 
 import * as R from 'ramda'
 import { encodeBase58Check, salt } from '../utils/crypto'
-import { commitmentHash, prelimaCommitmentHash, isNameValid } from '../tx/builder/helpers'
+import { commitmentHash, isNameValid, getMinimumNameFee, classify } from '../tx/builder/helpers'
 import Ae from './'
-import { CLIENT_TTL, NAME_TTL } from '../tx/builder/schema'
+import { CLIENT_TTL, NAME_FEE, NAME_TTL } from '../tx/builder/schema'
 
 /**
  * Transfer a domain to another account
@@ -77,33 +77,6 @@ async function revoke (nameId, options = {}) {
 }
 
 /**
- * What kind of a hash is this? If it begins with 'ak_' it is an
- * account key, if with 'ok_' it's an oracle key.
- *
- * @param s - the hash.
- * returns the type, or throws an exception if type not found.
- */
-function classify (s) {
-  const keys = {
-    ak: 'account_pubkey',
-    ok: 'oracle_pubkey',
-    ct: 'contract_pubkey',
-    ch: 'channel'
-  }
-
-  if (!s.match(/^[a-z]{2}_.+/)) {
-    throw Error('Not a valid hash')
-  }
-
-  const klass = s.substr(0, 2)
-  if (klass in keys) {
-    return keys[klass]
-  } else {
-    throw Error(`Unknown class ${klass}`)
-  }
-}
-
-/**
  * Update an aens entry
  * @instance
  * @function
@@ -130,6 +103,7 @@ async function update (nameId, target, options = {}) {
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param {string} name
+ * @param {Object} opt Options
  * @return {Promise<Object>}
  */
 async function query (name, opt = {}) {
@@ -162,13 +136,29 @@ async function query (name, opt = {}) {
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param {String} name
- * @param {String} salt
+ * @param {Number} salt
  * @param {Record} [options={}]
+ * @param {Number|String} [options.nameFee] Name Fee
  * @return {Promise<Object>} the result of the claim
  */
 async function claim (name, salt, options = {}) {
+  // Todo remove cross compatibility
+  const { version } = this.getNodeInfo()
+  const [majorVersion] = version.split('.')
+  const vsn = +majorVersion === 5 && version !== '5.0.0-rc.1' ? 2 : 1
+  options.vsn = options.vsn || vsn
+
   isNameValid(name)
   const opt = R.merge(this.Ae.defaults, options)
+
+  // TODO remove cross compatibility
+  if (opt.vsn === 2) {
+    const minNameFee = getMinimumNameFee(name)
+    if (opt.nameFee !== this.Ae.defaults.nameFee && minNameFee.gt(opt.nameFee)) {
+      throw new Error(`the provided fee ${opt.nameFee} is not enough to execute the claim, required: ${minNameFee}`)
+    }
+    opt.nameFee = opt.nameFee !== this.Ae.defaults.nameFee ? opt.nameFee : minNameFee
+  }
   const claimTx = await this.nameClaimTx(R.merge(opt, {
     accountId: await this.address(opt),
     nameSalt: salt,
@@ -176,7 +166,8 @@ async function claim (name, salt, options = {}) {
   }))
 
   const result = await this.send(claimTx, opt)
-  if (opt.vsn === 1) {
+  if (opt.vsn === 1 || name.split('.')[0].length > 12) {
+    delete opt.vsn
     const nameInter = this.Chain.defaults.waitMined ? await this.aensQuery(name, opt) : {}
     return Object.assign(result, nameInter)
   }
@@ -193,18 +184,11 @@ async function claim (name, salt, options = {}) {
  * @return {Promise<Object>}
  */
 async function preclaim (name, options = {}) {
-  // TODO remove cross compatibility
-  const { version } = this.getNodeInfo()
-  const [majorVersion] = version.split('.')
-  const vsn = +majorVersion === 5 && version !== '5.0.0-rc.1' ? 2 : 1
-
   isNameValid(name)
   const opt = R.merge(this.Ae.defaults, options)
   const _salt = salt()
   const height = await this.height()
-  const hash = vsn === 1
-    ? await prelimaCommitmentHash(name, _salt)
-    : await commitmentHash(name, _salt)
+  const hash = commitmentHash(name, _salt)
 
   const preclaimTx = await this.namePreclaimTx(R.merge(opt, {
     accountId: await this.address(opt),
@@ -216,10 +200,14 @@ async function preclaim (name, options = {}) {
   return Object.freeze({
     ...result,
     height,
-    claim: options => this.aensClaim(name, _salt, { ...options, onAccount: opt.onAccount, vsn }),
+    claim: options => this.aensClaim(name, _salt, { ...options, onAccount: opt.onAccount }),
     salt: _salt,
     commitmentId: hash
   })
+}
+
+async function bid (name, nameFee = NAME_FEE, options = {}) {
+  return this.aensClaim(name, 0, { ...options, nameFee, vsn: 2 })
 }
 
 /**
@@ -240,13 +228,15 @@ const Aens = Ae.compose({
     aensClaim: claim,
     aensUpdate: update,
     aensTransfer: transfer,
-    aensRevoke: revoke
+    aensRevoke: revoke,
+    aensBid: bid
   },
   deepProps: {
     Ae: {
       defaults: {
         clientTtl: CLIENT_TTL,
-        nameTtl: NAME_TTL // aec_governance:name_claim_max_expiration() => 50000
+        nameTtl: NAME_TTL, // aec_governance:name_claim_max_expiration() => 50000
+        nameFee: NAME_FEE
       }
     }
   }

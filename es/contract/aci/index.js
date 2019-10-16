@@ -175,7 +175,7 @@ const deploy = ({ client, instance }) => async (init = [], options = {}) => {
   const fnACI = getFunctionACI(instance.aci, 'init')
   const source = opt.source || instance.source
 
-  if (!instance.compiled) await instance.compile()
+  if (!instance.compiled) await instance.compile(opt)
   init = !opt.skipArgsConvert ? await prepareArgsForEncode(fnACI, init) : init
 
   if (opt.callStatic) {
@@ -191,8 +191,8 @@ const deploy = ({ client, instance }) => async (init = [], options = {}) => {
   }
 }
 
-const compile = ({ client, instance }) => async () => {
-  const { bytecode } = await client.contractCompile(instance.source, instance.options)
+const compile = ({ client, instance }) => async (options = {}) => {
+  const { bytecode } = await client.contractCompile(instance.source, { ...instance.options, ...options })
   instance.compiled = bytecode
   return instance.compiled
 }

@@ -1,3 +1,40 @@
+# [5.0.0](https://github.com/aeternity/aepp-sdk-js/compare/4.7.0...5.0.0) (2019-10-04)
+
+
+### Bug Fixes
+
+* **rpc:** fix resolution rpc ops ([#669](https://github.com/aeternity/aepp-sdk-js/issues/669)) ([abd7c56](https://github.com/aeternity/aepp-sdk-js/commit/abd7c56))
+
+
+### Code Refactoring
+
+* **ACI:** rework Sophia Option type representation ([#691](https://github.com/aeternity/aepp-sdk-js/issues/691)) ([0dbb2fe](https://github.com/aeternity/aepp-sdk-js/commit/0dbb2fe))
+
+
+### Features
+
+* **AENS:** Add ability to spend by name ([#682](https://github.com/aeternity/aepp-sdk-js/issues/682)) ([0d43804](https://github.com/aeternity/aepp-sdk-js/commit/0d43804))
+* **AENS:** Add ability to claim contract, oracle, SC ([#671](https://github.com/aeternity/aepp-sdk-js/issues/671)) ([49fd0fd](https://github.com/aeternity/aepp-sdk-js/commit/49fd0fd))
+* **GA:** enbale GA ([#692](https://github.com/aeternity/aepp-sdk-js/issues/692)) ([eded912](https://github.com/aeternity/aepp-sdk-js/commit/eded912))
+* **Lima:** Lima compatibility ([#683](https://github.com/aeternity/aepp-sdk-js/issues/683)) ([a88042e](https://github.com/aeternity/aepp-sdk-js/commit/a88042e)), closes [#632](https://github.com/aeternity/aepp-sdk-js/issues/632) [#653](https://github.com/aeternity/aepp-sdk-js/issues/653) [#658](https://github.com/aeternity/aepp-sdk-js/issues/658) [#660](https://github.com/aeternity/aepp-sdk-js/issues/660) [#680](https://github.com/aeternity/aepp-sdk-js/issues/680) [#693](https://github.com/aeternity/aepp-sdk-js/issues/693) [#687](https://github.com/aeternity/aepp-sdk-js/issues/687)
+    - AENS auction support
+    - compiler 4.0.0 support
+    - node 5.0.0 support
+    - SDK use `FATE` for contract by default
+* **AE**: Add pointers verification for spend by name   
+
+### BREAKING CHANGES
+
+* **aci:** Change Sophia option type representation in ACI
+```js
+// from
+await contract.methods.optionFn(Promise.resolve(1) || Promise.reject())
+// to
+await contract.methods.optionFn(1 || undefined)
+```
+
+
+
 # [5.0.0-next.1](https://github.com/aeternity/aepp-sdk-js/compare/4.6.0...4.7.0-next.1) (2019-09-10)
 
 
