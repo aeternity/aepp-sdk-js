@@ -17,7 +17,7 @@ export const VSN_2 = 2
 export const TX_TTL = 0
 
 // # AENS
-export const AENS_NAME_DOMAINS = ['aet', 'test']
+export const AENS_NAME_DOMAINS = ['chain', 'test']
 export const NAME_TTL = 500
 // # max number of block into the future that the name is going to be available
 // # https://github.com/aeternity/protocol/blob/epoch-v0.22.0/AENS.md#update

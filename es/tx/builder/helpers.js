@@ -97,7 +97,7 @@ export function formatSalt (salt) {
  */
 export function produceNameId (name) {
   const namespace = R.last(name.split('.'))
-  if (namespace === 'aet') return encode(hash(name.toLowerCase()), 'nm')
+  if (namespace === 'chain') return encode(hash(name.toLowerCase()), 'nm')
   return encode(nameHash(name), 'nm')
 }
 
@@ -115,7 +115,7 @@ export function produceNameId (name) {
  */
 export function commitmentHash (name, salt = createSalt()) {
   const namespace = R.last(name.split('.'))
-  if (namespace === 'aet') return `cm_${encodeBase58Check(hash(Buffer.concat([Buffer.from(name), formatSalt(salt)])))}`
+  if (namespace === 'chain') return `cm_${encodeBase58Check(hash(Buffer.concat([Buffer.from(name), formatSalt(salt)])))}`
   return `cm_${encodeBase58Check(hash(Buffer.concat([nameHash(name.toLowerCase()), formatSalt(salt)])))}`
 }
 
@@ -249,6 +249,33 @@ export function isNameValid (name, throwError = true) {
 }
 
 /**
+ * What kind of a hash is this? If it begins with 'ak_' it is an
+ * account key, if with 'ok_' it's an oracle key.
+ *
+ * @param s - the hash.
+ * returns the type, or throws an exception if type not found.
+ */
+export function classify (s) {
+  const keys = {
+    ak: 'account_pubkey',
+    ok: 'oracle_pubkey',
+    ct: 'contract_pubkey',
+    ch: 'channel'
+  }
+
+  if (!s.match(/^[a-z]{2}_.+/)) {
+    throw Error('Not a valid hash')
+  }
+
+  const klass = s.substr(0, 2)
+  if (klass in keys) {
+    return keys[klass]
+  } else {
+    throw Error(`Unknown class ${klass}`)
+  }
+}
+
+/**
  * Get the minimum name fee for a domain
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
@@ -293,5 +320,6 @@ export default {
   createSalt,
   buildHash,
   isNameValid,
-  produceNameId
+  produceNameId,
+  classify
 }
