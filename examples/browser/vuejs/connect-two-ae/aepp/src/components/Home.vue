@@ -45,6 +45,16 @@
           </div>
         </div>
       </template>
+
+      <div v-if="compilerVersionResponse" class="bg-green w-full flex flex-row font-mono border border-b">
+        <div class="p-2 w-1/4">
+          Compiler version
+        </div>
+        <div class="p-2 w-3/4 bg-grey-lightest">
+          {{compilerVersionResponse | responseToString}}
+        </div>
+      </div>
+
     </div>
 
     <h2 class="mt-4">Spend tokens</h2>
@@ -190,13 +200,13 @@
         client: null,
         addressResponse: null,
         heightResponse: null,
+        compilerVersionResponse: null,
         nodeInfoResponse: null,
         spendTo: null,
         spendAmount: null,
         spendPayload: null,
         spendResponse: null,
         contractCode: `contract Identity =
-      type state = ()
       entrypoint main(x : int) = x`,
         compileBytecodeResponse: null,
         contractInitState: [],
@@ -238,7 +248,7 @@
             result,
             { decodedRes: await result.decode(returnType) }
           )
-        })());
+        })())
       },
       async getReverseWindow() {
         const iframe = document.createElement('iframe')
@@ -263,6 +273,7 @@
       this.addressResponse = await errorAsField(this.client.address())
       this.heightResponse = await errorAsField(this.client.height())
       this.nodeInfoResponse = await errorAsField(this.client.getNodeInfo())
+      this.compilerVersionResponse = await errorAsField(this.client.getCompilerVersion())
     }
   }
 </script>

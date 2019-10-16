@@ -117,7 +117,7 @@ Promise.all([
     Ae({
         nodes: [
           { name: 'someNode', instance: nodes[0] },
-        // node2
+        // node2, node3..
         ],
         compilerUrl: 'COMPILER_URL',
         accounts: [
