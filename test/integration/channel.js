@@ -43,7 +43,7 @@ function waitForChannel (channel) {
   )
 }
 
-describe.skip('Channel', function () {
+describe('Channel', function () {
   configure(this)
   this.timeout(120000)
 
