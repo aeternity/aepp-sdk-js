@@ -6,6 +6,7 @@ Contract module - routines to interact with the æternity contract
 High level documentation of the contracts are available at
 https://github.com/aeternity/protocol/tree/master/contracts and
 
+**Export**: Contract  
 **Example**  
 ```js
 import Contract from '@aeternity/aepp-sdk/es/ae/contract' (Using tree-shaking)
@@ -215,10 +216,7 @@ Compile contract source code
 | source | `String` |  | Contract sourece code |
 | [options] | `Object` | <code>{}</code> | Transaction options (fee, ttl, gas, amount, deposit) |
 | [options.filesystem] | `Object` | <code>{}</code> | Contract external namespaces map* @return {Promise<Object>} Result object |
-<<<<<<< HEAD
-=======
 | [options.backend] | `Object` | <code>&#x27;aevm&#x27;</code> | Contract backend version (aevm|fate) |
->>>>>>> develop
 
 **Example**  
 ```js
