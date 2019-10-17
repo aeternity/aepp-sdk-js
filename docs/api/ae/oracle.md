@@ -54,9 +54,7 @@ Constructor for Oracle Object (helper object for using Oracle)
 | --- | --- | --- |
 | oracleId | `String` | Oracle public key |
 
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/oracle--exports.pollForQueries"></a>
-
-### .exports.pollForQueries(oracleId, onQuery, [options]) ⇒ `function` ⏏
+### .pollForQueries(oracleId, onQuery, [options]) ⇒ `function` ⏏
 Poll for oracle queries
 
 **Kind**: instance method of [`@aeternity/aepp-sdk/es/ae/oracle`](#module_@aeternity/aepp-sdk/es/ae/oracle)  

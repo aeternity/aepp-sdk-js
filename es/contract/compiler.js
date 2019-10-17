@@ -104,6 +104,7 @@ async function checkCompatibility ({ force = false, forceCompatibility = false }
 function prepareCompilerOption (options = {}) {
   return { ...this.compilerOptions, ...options, file_system: options.filesystem || {} }
 }
+
 function isInit () {
   if (this.compilerVersion === null) throw Error('Compiler not defined')
   return true
