@@ -7,6 +7,7 @@ The high-level description of the oracle system is
 https://github.com/aeternity/protocol/blob/master/ORACLE.md in the protocol
 repository.
 
+**Export**: Oracle  
 **Example**  
 ```js
 import Oracle from '@aeternity/aepp-sdk/es/ae/oracle'
@@ -54,9 +55,7 @@ Constructor for Oracle Object (helper object for using Oracle)
 | --- | --- | --- |
 | oracleId | `String` | Oracle public key |
 
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/oracle--exports.pollForQueries"></a>
-
-### .exports.pollForQueries(oracleId, onQuery, [options]) ⇒ `function` ⏏
+### .pollForQueries(oracleId, onQuery, [options]) ⇒ `function` ⏏
 Poll for oracle queries
 
 **Kind**: instance method of [`@aeternity/aepp-sdk/es/ae/oracle`](#module_@aeternity/aepp-sdk/es/ae/oracle)  
