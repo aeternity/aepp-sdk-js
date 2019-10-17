@@ -17,13 +17,13 @@ import Aens from '@aeternity/aepp-sdk/es/ae/aens'
     * _global_
         * [exports.isNameValid(name, [throwError])](#exp_module_@aeternity/aepp-sdk/es/ae/aens--exports.isNameValid) ⇒ ⏏
     * _instance_
-        * [.update(nameId, target, options)](#exp_module_@aeternity/aepp-sdk/es/ae/aens--update) ⇒ `Object` ⏏
-        * [.query(name)](#exp_module_@aeternity/aepp-sdk/es/ae/aens--query) ⇒ `Promise.&lt;Object&gt;` ⏏
-        * [.claim(name, salt, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/aens--claim) ⇒ `Promise.&lt;Object&gt;` ⏏
-        * [.preclaim(name, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/aens--preclaim) ⇒ `Promise.&lt;Object&gt;` ⏏
         * _async_
+            * [.update(nameId, target, options)](#exp_module_@aeternity/aepp-sdk/es/ae/aens--update) ⇒ `Object` ⏏
             * [.transfer(nameId, account, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/aens--transfer) ⇒ `Promise.&lt;Object&gt;` ⏏
-            * [.revoke(nameId, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/aens--revoke) ⇒ `Promise.&lt;Object&gt;` ⏏
+            * [.query(name, opt)](#exp_module_@aeternity/aepp-sdk/es/ae/aens--query) ⇒ `Promise.&lt;Object&gt;` ⏏
+            * [.claim(name, salt, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/aens--claim) ⇒ `Promise.&lt;Object&gt;` ⏏
+            * [.preclaim(name, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/aens--preclaim) ⇒ `Promise.&lt;Object&gt;` ⏏
+            * [.bid(name, nameFee, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/aens--bid) ⇒ `Promise.&lt;Object&gt;` ⏏
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/aens--Aens"></a>
 
@@ -64,50 +64,13 @@ Is name valid
 Update an aens entry
 
 **Kind**: instance method of [`@aeternity/aepp-sdk/es/ae/aens`](#module_@aeternity/aepp-sdk/es/ae/aens)  
+**Category**: async  
 
 | Param | Description |
 | --- | --- |
 | nameId | domain hash |
 | target | new target |
 | options |  |
-
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/aens--query"></a>
-
-### .query(name) ⇒ `Promise.&lt;Object&gt;` ⏏
-Query the status of an AENS registration
-
-**Kind**: instance method of [`@aeternity/aepp-sdk/es/ae/aens`](#module_@aeternity/aepp-sdk/es/ae/aens)  
-
-| Param | Type |
-| --- | --- |
-| name | `string` | 
-
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/aens--claim"></a>
-
-### .claim(name, salt, [options]) ⇒ `Promise.&lt;Object&gt;` ⏏
-Claim a previously preclaimed registration. This can only be done after the
-preclaim step
-
-**Kind**: instance method of [`@aeternity/aepp-sdk/es/ae/aens`](#module_@aeternity/aepp-sdk/es/ae/aens)  
-**Returns**: `Promise.&lt;Object&gt;` - the result of the claim  
-
-| Param | Type | Default |
-| --- | --- | --- |
-| name | `String` |  | 
-| salt | `String` |  | 
-| [options] | `Record` | <code>{}</code> | 
-
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/aens--preclaim"></a>
-
-### .preclaim(name, [options]) ⇒ `Promise.&lt;Object&gt;` ⏏
-Preclaim a name. Sends a hash of the name and a random salt to the node
-
-**Kind**: instance method of [`@aeternity/aepp-sdk/es/ae/aens`](#module_@aeternity/aepp-sdk/es/ae/aens)  
-
-| Param | Type | Default |
-| --- | --- | --- |
-| name | `string` |  | 
-| [options] | `Record` | <code>{}</code> | 
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/aens--transfer"></a>
 
@@ -123,16 +86,60 @@ Transfer a domain to another account
 | account | `String` |  | 
 | [options] | `Object` | <code>{}</code> | 
 
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/aens--revoke"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/aens--query"></a>
 
-### .revoke(nameId, [options]) ⇒ `Promise.&lt;Object&gt;` ⏏
-Revoke a domain
+### .query(name, opt) ⇒ `Promise.&lt;Object&gt;` ⏏
+Query the status of an AENS registration
+
+**Kind**: instance method of [`@aeternity/aepp-sdk/es/ae/aens`](#module_@aeternity/aepp-sdk/es/ae/aens)  
+**Category**: async  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | `string` |  |
+| opt | `Object` | Options |
+
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/aens--claim"></a>
+
+### .claim(name, salt, [options]) ⇒ `Promise.&lt;Object&gt;` ⏏
+Claim a previously preclaimed registration. This can only be done after the
+preclaim step
+
+**Kind**: instance method of [`@aeternity/aepp-sdk/es/ae/aens`](#module_@aeternity/aepp-sdk/es/ae/aens)  
+**Returns**: `Promise.&lt;Object&gt;` - the result of the claim  
+**Category**: async  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| name | `String` |  |  |
+| salt | `Number` |  |  |
+| [options] | `Record` | <code>{}</code> |  |
+| [options.nameFee] | `Number` \| `String` |  | Name Fee |
+
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/aens--preclaim"></a>
+
+### .preclaim(name, [options]) ⇒ `Promise.&lt;Object&gt;` ⏏
+Preclaim a name. Sends a hash of the name and a random salt to the node
 
 **Kind**: instance method of [`@aeternity/aepp-sdk/es/ae/aens`](#module_@aeternity/aepp-sdk/es/ae/aens)  
 **Category**: async  
 
 | Param | Type | Default |
 | --- | --- | --- |
-| nameId | `String` |  | 
-| [options] | `Object` | <code>{}</code> | 
+| name | `string` |  | 
+| [options] | `Record` | <code>{}</code> | 
+
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/aens--bid"></a>
+
+### .bid(name, nameFee, [options]) ⇒ `Promise.&lt;Object&gt;` ⏏
+Bid to name auction
+
+**Kind**: instance method of [`@aeternity/aepp-sdk/es/ae/aens`](#module_@aeternity/aepp-sdk/es/ae/aens)  
+**Category**: async  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| name | `String` |  | Domain name |
+| nameFee | `String` \| `Number` |  | Name fee amount |
+| [options] | `Record` | <code>{}</code> |  |
 

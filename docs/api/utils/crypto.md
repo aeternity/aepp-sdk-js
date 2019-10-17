@@ -13,7 +13,7 @@ import * as Crypto from '@aeternity/aepp-sdk/es/utils/crypto'
         * [.decode](#module_@aeternity/aepp-sdk/es/utils/crypto.decode) ⇒ `Array`
         * [.isBase64(str)](#module_@aeternity/aepp-sdk/es/utils/crypto.isBase64) ⇒ `boolean`
         * [.formatAddress(format, address)](#module_@aeternity/aepp-sdk/es/utils/crypto.formatAddress) ⇒ `String`
-        * [.isAddressValid(address)](#module_@aeternity/aepp-sdk/es/utils/crypto.isAddressValid) ⇒ `Boolean`
+        * [.isAddressValid(address, prefix)](#module_@aeternity/aepp-sdk/es/utils/crypto.isAddressValid) ⇒ `Boolean`
         * [.addressToHex(base58CheckAddress)](#module_@aeternity/aepp-sdk/es/utils/crypto.addressToHex) ⇒ `String`
         * [.addressFromDecimal(decimalAddress)](#module_@aeternity/aepp-sdk/es/utils/crypto.addressFromDecimal) ⇒ `String`
         * [.hash(input)](#module_@aeternity/aepp-sdk/es/utils/crypto.hash) ⇒ `Buffer`
@@ -90,7 +90,7 @@ Format account address
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.isAddressValid"></a>
 
-### @aeternity/aepp-sdk/es/utils/crypto.isAddressValid(address) ⇒ `Boolean`
+### @aeternity/aepp-sdk/es/utils/crypto.isAddressValid(address, prefix) ⇒ `Boolean`
 Check if address is valid
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
@@ -100,6 +100,7 @@ Check if address is valid
 | Param | Type | Description |
 | --- | --- | --- |
 | address | `String` | Address |
+| prefix | `String` | Transaction prefix. Default: 'ak' |
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.addressToHex"></a>
 

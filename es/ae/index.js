@@ -90,6 +90,7 @@ async function resolveRecipientName (nameOrAddress, { verify = false }) {
     }
     return produceNameId(nameOrAddress)
   }
+  throw new Error('Invalid recipient name or address: ' + nameOrAddress)
 }
 
 /**
