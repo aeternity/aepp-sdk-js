@@ -33,29 +33,6 @@ import Ae from './'
 import { CLIENT_TTL, NAME_FEE, NAME_TTL } from '../tx/builder/schema'
 
 /**
- * Transfer a domain to another account
- * @instance
- * @function
- * @alias module:@aeternity/aepp-sdk/es/ae/aens
- * @category async
- * @param {String} nameId
- * @param {String} account
- * @param {Object} [options={}]
- * @return {Promise<Object>}
- */
-async function transfer (nameId, account, options = {}) {
-  const opt = R.merge(this.Ae.defaults, options)
-
-  const nameTransferTx = await this.nameTransferTx(R.merge(opt, {
-    nameId,
-    accountId: await this.address(opt),
-    recipientId: account
-  }))
-
-  return this.send(nameTransferTx, opt)
-}
-
-/**
  * Revoke a domain
  * @instance
  * @function
@@ -80,6 +57,7 @@ async function revoke (nameId, options = {}) {
  * Update an aens entry
  * @instance
  * @function
+ * @category async
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param nameId domain hash
  * @param target new target
@@ -98,9 +76,33 @@ async function update (nameId, target, options = {}) {
 }
 
 /**
+ * Transfer a domain to another account
+ * @instance
+ * @function
+ * @category async
+ * @alias module:@aeternity/aepp-sdk/es/ae/aens
+ * @param {String} nameId
+ * @param {String} account
+ * @param {Object} [options={}]
+ * @return {Promise<Object>}
+ */
+async function transfer (nameId, account, options = {}) {
+  const opt = R.merge(this.Ae.defaults, options)
+
+  const nameTransferTx = await this.nameTransferTx(R.merge(opt, {
+    nameId,
+    accountId: await this.address(opt),
+    recipientId: account
+  }))
+
+  return this.send(nameTransferTx, opt)
+}
+
+/**
  * Query the status of an AENS registration
  * @instance
  * @function
+ * @category async
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param {string} name
  * @param {Object} opt Options
@@ -134,6 +136,7 @@ async function query (name, opt = {}) {
  * preclaim step
  * @instance
  * @function
+ * @category async
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param {String} name
  * @param {Number} salt
@@ -178,6 +181,7 @@ async function claim (name, salt, options = {}) {
  * Preclaim a name. Sends a hash of the name and a random salt to the node
  * @instance
  * @function
+ * @category async
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param {string} name
  * @param {Record} [options={}]
@@ -206,6 +210,17 @@ async function preclaim (name, options = {}) {
   })
 }
 
+/**
+ * Bid to name auction
+ * @instance
+ * @function
+ * @category async
+ * @alias module:@aeternity/aepp-sdk/es/ae/aens
+ * @param {String} name Domain name
+ * @param {String|Number} nameFee Name fee amount
+ * @param {Record} [options={}]
+ * @return {Promise<Object>}
+ */
 async function bid (name, nameFee = NAME_FEE, options = {}) {
   return this.aensClaim(name, 0, { ...options, nameFee, vsn: 2 })
 }
