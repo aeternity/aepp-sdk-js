@@ -668,7 +668,24 @@ function sendMessage (message, recipient) {
   if (typeof message === 'object') {
     info = JSON.stringify(message)
   }
-  send(this, { jsonrpc: '2.0', method: 'channels.message', params: { info, to: recipient } })
+  const doSend = (channel) => send(channel, {
+    jsonrpc: '2.0',
+    method: 'channels.message',
+    params: { info, to: recipient }
+  })
+  if (this.status() === 'connecting') {
+    const onStatusChanged = (status) => {
+      if (status !== 'connecting') {
+        // For some reason we can't immediately send a message when connection is
+        // established established. Thus we wait 500ms which seems to work.
+        setTimeout(() => doSend(this), 500)
+        this.off('statusChanged', onStatusChanged)
+      }
+    }
+    this.on('statusChanged', onStatusChanged)
+  } else {
+    doSend(this)
+  }
 }
 
 async function reconnect (options, txParams) {
