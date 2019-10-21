@@ -66,6 +66,16 @@ function on (event, callback) {
 }
 
 /**
+ * Remove event listener function
+ *
+ * @param {String} event - Event name
+ * @param {Function} callback - Callback function
+ */
+function off (event, callback) {
+  eventEmitters.get(this).removeListener(event, callback)
+}
+
+/**
  * Close the connection
  */
 function disconnect () {
@@ -723,6 +733,7 @@ const Channel = AsyncInit.compose({
   },
   methods: {
     on,
+    off,
     status,
     state,
     id,
