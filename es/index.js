@@ -16,6 +16,7 @@
  */
 
 import * as Crypto from './utils/crypto'
+import * as Keystore from './utils/keystore'
 import * as Bytes from './utils/bytes'
 import * as TxBuilder from './tx/builder'
 import * as TxBuilderHelper from './tx/builder/helpers'
@@ -58,6 +59,7 @@ export {
   ChainNode,
   Channel,
   Crypto,
+  Keystore,
   Chain,
   GeneralizeAccount,
   HdWallet,
