@@ -9,6 +9,7 @@ import { isHex } from './string'
  * !!!Work only in node.js!!!
  * @module @aeternity/aepp-sdk/es/utils/keystore
  * @example import * as Keystore from '@aeternity/aepp-sdk/es/utils/keystore'
+ * @example const { Keystore } = require('@aeternity/aepp-sdk')
  */
 
 const DEFAULTS = {
