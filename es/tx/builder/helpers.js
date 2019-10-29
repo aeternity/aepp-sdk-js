@@ -283,7 +283,7 @@ export function classify (s) {
  * @return String the minimum fee for the domain auction
  */
 export function getMinimumNameFee (domain) {
-  const nameLength = domain.replace('.aet', '').length
+  const nameLength = domain.replace('.chain', '').length
   return NAME_BID_RANGES[nameLength >= NAME_BID_MAX_LENGTH ? NAME_BID_MAX_LENGTH : nameLength]
 }
 
@@ -301,7 +301,7 @@ export function computeAuctionEndBlock (domain, claimHeight) {
     [R.lt(8), R.always(NAME_BID_TIMEOUTS[4] + claimHeight)],
     [R.lte(NAME_BID_MAX_LENGTH), R.always(NAME_BID_TIMEOUTS[8] + claimHeight)],
     [R.T, R.always(claimHeight)]
-  ])(domain.replace('.aet', '').length)
+  ])(domain.replace('.chain', '').length)
 }
 
 export default {
