@@ -13,7 +13,6 @@ import Ae from '@aeternity/aepp-sdk/es/ae'
         * _instance_
             * [.destroyInstance()](#module_@aeternity/aepp-sdk/es/ae--Ae+destroyInstance) ⇒ `void`
             * _async_
-                * [.send(tx, [options])](#module_@aeternity/aepp-sdk/es/ae--Ae+send) ⇒ `String` \| `String`
                 * [.spend(amount, recipientId, options)](#module_@aeternity/aepp-sdk/es/ae--Ae+spend) ⇒ `String` \| `String`
                 * [.transferFunds(percentage, recipientId, options)](#module_@aeternity/aepp-sdk/es/ae--Ae+transferFunds) ⇒ `String` \| `String`
         * _inner_

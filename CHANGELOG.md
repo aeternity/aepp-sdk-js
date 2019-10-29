@@ -4,30 +4,7 @@
 ### Bug Fixes
 
 * **aens:** added lower case transformation for aens names ([#730](https://github.com/aeternity/aepp-sdk-js/issues/730)) ([f7f9f17](https://github.com/aeternity/aepp-sdk-js/commit/f7f9f17246c727566ce3c8159d30b7de19b027c9)), closes [#728](https://github.com/aeternity/aepp-sdk-js/issues/728) [#728](https://github.com/aeternity/aepp-sdk-js/issues/728)
-* **AENS:** Change tld for Lima from `aet` to `chain` ([#714](https://github.com/aeternity/aepp-sdk-js/issues/714)) ([323ef6a](https://github.com/aeternity/aepp-sdk-js/commit/323ef6aee1518a959c3c24b3671e69184b79babd))
-* **rpc:** fix resolution rpc ops ([#669](https://github.com/aeternity/aepp-sdk-js/issues/669)) ([abd7c56](https://github.com/aeternity/aepp-sdk-js/commit/abd7c56d0fb809ec3d9fef8961840fe0e928e57b))
 
-
-### Code Refactoring
-
-* **aci:** rework Sophia Option type representation ([#691](https://github.com/aeternity/aepp-sdk-js/issues/691)) ([0dbb2fe](https://github.com/aeternity/aepp-sdk-js/commit/0dbb2fec82e1ebbeea4553214463088025d1091b))
-
-
-### Features
-
-* **AENS:** Add ability to spend by name ([#682](https://github.com/aeternity/aepp-sdk-js/issues/682)) ([0d43804](https://github.com/aeternity/aepp-sdk-js/commit/0d43804661c60daf9360203654ac57b6c03693b7))
-* **AENS:** Add ability to use contract ([#671](https://github.com/aeternity/aepp-sdk-js/issues/671)) ([49fd0fd](https://github.com/aeternity/aepp-sdk-js/commit/49fd0fda9e407471b3866521b4a142cd85e49506))
-* **GA:** enbale GA ([#692](https://github.com/aeternity/aepp-sdk-js/issues/692)) ([eded912](https://github.com/aeternity/aepp-sdk-js/commit/eded912031e1bbbe864129580dcdabf10bacdb48))
-* **Lima:** Lima compatibility ([#683](https://github.com/aeternity/aepp-sdk-js/issues/683)) ([a88042e](https://github.com/aeternity/aepp-sdk-js/commit/a88042e7db1277631d420e58ff4265b30354b95f)), closes [#632](https://github.com/aeternity/aepp-sdk-js/issues/632) [#653](https://github.com/aeternity/aepp-sdk-js/issues/653) [#658](https://github.com/aeternity/aepp-sdk-js/issues/658) [#660](https://github.com/aeternity/aepp-sdk-js/issues/660) [#680](https://github.com/aeternity/aepp-sdk-js/issues/680) [#693](https://github.com/aeternity/aepp-sdk-js/issues/693) [#687](https://github.com/aeternity/aepp-sdk-js/issues/687)
-* **SPEND:** Add additional validation for recipient ([#715](https://github.com/aeternity/aepp-sdk-js/issues/715)) ([c1854bf](https://github.com/aeternity/aepp-sdk-js/commit/c1854bfbac7690d0461d9ef029211154d2e2d4ad))
-* **state channels:** make state channels compatible with node v5.0.0… ([#688](https://github.com/aeternity/aepp-sdk-js/issues/688)) ([23936f5](https://github.com/aeternity/aepp-sdk-js/commit/23936f5dfa4c0187bebcda02ffeb743bdeb1b08b)), closes [#632](https://github.com/aeternity/aepp-sdk-js/issues/632) [#653](https://github.com/aeternity/aepp-sdk-js/issues/653) [#658](https://github.com/aeternity/aepp-sdk-js/issues/658) [#660](https://github.com/aeternity/aepp-sdk-js/issues/660) [#680](https://github.com/aeternity/aepp-sdk-js/issues/680) [#693](https://github.com/aeternity/aepp-sdk-js/issues/693) [#687](https://github.com/aeternity/aepp-sdk-js/issues/687)
-
-
-### BREAKING CHANGES
-
-* **aci:** Change Sophia option type representation in ACI
-
-689
 
 
 
