@@ -17,8 +17,7 @@ const jsLoader = 'babel-loader!standard-loader?error=true'
 // https://github.com/FullHuman/purgecss#extractor
 class TailwindExtractor {
   static extract (content) {
-    // eslint-disable-next-line no-useless-escape
-    return content.match(/[A-z0-9-:\/]+/g) || []
+    return content.match(/[A-z0-9-:/]+/g) || []
   }
 }
 

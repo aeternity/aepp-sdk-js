@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { before, describe } from 'mocha'
 import { configure, ready } from '.'
 import { generateKeyPair } from '../../es/utils/crypto'
