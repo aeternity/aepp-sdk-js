@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@aeternity/aepp-sdk@6.0.0":
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/@aeternity/aepp-sdk/-/aepp-sdk-6.0.0.tgz#ea03ebd4334b6380366c66cf428789bc36597007"
-  integrity sha512-lXedsDwCIFClE1tuumVq14EFwOuvQurI1FHVRcCI6nzFEZlYk5Yrsn72aJT0EqoQQp3aT9jRU30fEcQS+V/5PA==
+"@aeternity/aepp-sdk@6.0.1":
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/@aeternity/aepp-sdk/-/aepp-sdk-6.0.1.tgz#593816e2abad8265ab133592632fed215488b250"
+  integrity sha512-ydon6Y0g8MxxKwJaXT1xlGiCRMlGu6Gos6Ab7+CFkOmOr0y7TeR2CunY/YVbpHBpHAOfq+fvyKxsn68F0k3Ubw==
   dependencies:
     "@aeternity/bip39" "^0.1.0"
     "@babel/runtime" "^7.6.2"
@@ -20,7 +20,7 @@
     bs58check "^2.1.1"
     commander "^3.0.0"
     joi-browser "^13.4.0"
-    libsodium-wrappers-sumo "0.7.5"
+    libsodium-wrappers-sumo "0.7.6"
     ramda "^0.26.1"
     rlp "2.2.3"
     serialize-javascript "^2.0.0"
@@ -5262,17 +5262,17 @@ levn@^0.3.0, levn@~0.3.0:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
 
-libsodium-sumo@0.7.5:
-  version "0.7.5"
-  resolved "https://registry.yarnpkg.com/libsodium-sumo/-/libsodium-sumo-0.7.5.tgz#0cd02ff2f59444c98d4bf9c9688b6533e2e41a67"
-  integrity sha512-dMFGn0cPpvwyU8/tpI9xe/6U5U8D/rVcAuc908bpL9e8LH2dPO0n3jNatOLLdmhc2RxmEAQ+3ArkTZI/c9XdCQ==
+libsodium-sumo@0.7.6:
+  version "0.7.6"
+  resolved "https://registry.yarnpkg.com/libsodium-sumo/-/libsodium-sumo-0.7.6.tgz#935a80f95165a2f7d33a77bc8f1cde62130d93dc"
+  integrity sha512-1XM2w00YkufeLVhFbw9aV+NTftzqECkEU1Amw2MxCbYuyy4L6MH5y8MWOg3shN6X/9R3e1pp6RCSXPnbFRTVCA==
 
-libsodium-wrappers-sumo@0.7.5:
-  version "0.7.5"
-  resolved "https://registry.yarnpkg.com/libsodium-wrappers-sumo/-/libsodium-wrappers-sumo-0.7.5.tgz#f3e48e08ee287514a0f30af9c807120357fe50eb"
-  integrity sha512-iKnBoRI6TagVZeD9lThftKRYYruwhNQY1g9AuM04OwA+kEy5LXTQPdy93clpnHp7AhMJ1V09mu57gmKYmgpSFA==
+libsodium-wrappers-sumo@0.7.6:
+  version "0.7.6"
+  resolved "https://registry.yarnpkg.com/libsodium-wrappers-sumo/-/libsodium-wrappers-sumo-0.7.6.tgz#0fc9f422470d192370c4213f3c46e41ebda35e77"
+  integrity sha512-pwYQ1ZR/UwXBMY4tFDcjYZrBFgexkhRykzcE9Jv0l/J41Tp7PqHYfHA17YpOxIXrAIRBPVSlPo2VxHoGZZKwXA==
   dependencies:
-    libsodium-sumo "0.7.5"
+    libsodium-sumo "0.7.6"
 
 liftoff@^3.1.0:
   version "3.1.0"
