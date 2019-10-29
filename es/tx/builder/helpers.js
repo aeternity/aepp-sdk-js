@@ -115,7 +115,7 @@ export function produceNameId (name) {
  */
 export function commitmentHash (name, salt = createSalt()) {
   const namespace = R.last(name.split('.'))
-  if (namespace === 'chain') return `cm_${encodeBase58Check(hash(Buffer.concat([Buffer.from(name), formatSalt(salt)])))}`
+  if (namespace === 'chain') return `cm_${encodeBase58Check(hash(Buffer.concat([Buffer.from(name.toLowerCase()), formatSalt(salt)])))}`
   return `cm_${encodeBase58Check(hash(Buffer.concat([nameHash(name.toLowerCase()), formatSalt(salt)])))}`
 }
 
