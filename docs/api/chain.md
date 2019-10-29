@@ -30,12 +30,26 @@ import Chain from '@aeternity/aepp-sdk/es/chain'
     * _static_
         * [.waitMined(bool)](#module_@aeternity/aepp-sdk/es/chain.waitMined) ⇒ `Stamp`
 
-<a id="module_@aeternity/aepp-sdk/es/chain+sendTransaction"></a>
+### Chain([options]) ⇒ `Object` ⏏
+Basic Chain Stamp
 
-### *@aeternity/aepp-sdk/es/chain.sendTransaction(tx, [options]) ⇒ `Object` \| `String`*
+Attempting to create instances from the Stamp without overwriting all
+abstract methods using composition will result in an exception.
+
+**Kind**: Exported function  
+**Returns**: `Object` - Chain instance  
+**rtype**: `Stamp`
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [options] | `Object` | <code>{}</code> | Initializer object |
+
+<a id="module_@aeternity/aepp-sdk/es/chain--Chain+sendTransaction"></a>
+
+#### *chain.sendTransaction(tx, [options]) ⇒ `Object` \| `String`*
 Submit a signed transaction for mining
 
-**Kind**: instance abstract method of [`@aeternity/aepp-sdk/es/chain`](#module_@aeternity/aepp-sdk/es/chain)  
+**Kind**: instance abstract method of [`Chain`](#exp_module_@aeternity/aepp-sdk/es/chain--Chain)  
 **Returns**: `Object` \| `String` - Transaction or transaction hash  
 **Category**: async  
 **rtype**: `(tx: String, options?: Object) => tx: Promise[Object]|txHash: Promise[String]`
