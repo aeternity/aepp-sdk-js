@@ -58,7 +58,12 @@ describe('Oracle', function () {
     await oracle.postQuery("{'city': 'Berlin2'}")
     await oracle.postQuery("{'city': 'Berlin3'}")
     await oracle.postQuery("{'city': 'Berlin4'}")
-    setTimeout(() => stopPolling(), 500)
+    await (new Promise((resolve) => {
+      setTimeout(() => {
+        stopPolling()
+        resolve()
+      }, 1000)
+    }))
     queries.length.should.be.equal(4)
   })
 
