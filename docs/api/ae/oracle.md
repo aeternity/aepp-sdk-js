@@ -16,8 +16,7 @@ import Oracle from '@aeternity/aepp-sdk/es/ae/oracle'
     * [Oracle([options])](#exp_module_@aeternity/aepp-sdk/es/ae/oracle--Oracle) ⇒ `Object` ⏏
     * _instance_
         * _async_
-            * [.getOracleObject(oracleId)](#exp_module_@aeternity/aepp-sdk/es/ae/oracle--getOracleObject) ⇒ `Promise.&lt;Object&gt;` ⏏
-            * [.exports.pollForQueries(oracleId, onQuery, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/oracle--exports.pollForQueries) ⇒ `function` ⏏
+            * [.pollForQueries(oracleId, onQuery, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/oracle--pollForQueries) ⇒ `function` ⏏
             * [.getQueryObject(oracleId, queryId)](#exp_module_@aeternity/aepp-sdk/es/ae/oracle--getQueryObject) ⇒ `Promise.&lt;Object&gt;` ⏏
             * [.exports.pollForQueryResponse(oracleId, queryId, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/oracle--exports.pollForQueryResponse) ⇒ `Promise.&lt;Object&gt;` ⏏
             * [.registerOracle(queryFormat, responseFormat, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/oracle--registerOracle) ⇒ `Promise.&lt;Object&gt;` ⏏
@@ -42,20 +41,6 @@ Oracle provides oracle-system related methods atop
 | [options] | `Object` | <code>{}</code> | Initializer object |
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/oracle--pollForQueries"></a>
-
-### .pollForQueries(oracleId, onQuery, [options]) ⇒ `function` ⏏
-Poll for oracle queries
-
-**Kind**: instance method of [`@aeternity/aepp-sdk/es/ae/oracle`](#module_@aeternity/aepp-sdk/es/ae/oracle)  
-**Returns**: `function` - stopPolling - Stop polling function  
-**Category**: async  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| oracleId | `String` | Oracle public key |
-| onQuery | `function` | OnQuery callback |
-| [options] | `Object` | Options object |
-| [options.interval] | `Object` | Poll interval(default: 5000) |
 
 ### .pollForQueries(oracleId, onQuery, [options]) ⇒ `function` ⏏
 Poll for oracle queries
