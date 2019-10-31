@@ -1,3 +1,12 @@
+## [6.0.2](https://github.com/aeternity/aepp-sdk-js/compare/6.0.1...6.0.2) (2019-10-31)
+
+
+### Bug Fixes
+
+* **name claim:** Revert ignoring waitMined from user passed options (#727)
+
+
+
 ## [6.0.1](https://github.com/aeternity/aepp-sdk-js/compare/6.0.0...6.0.1) (2019-10-29)
 
 
