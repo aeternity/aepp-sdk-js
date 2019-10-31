@@ -71,6 +71,20 @@ Poll for oracle queries
 | [options] | `Object` | Options object |
 | [options.interval] | `Object` | Poll interval(default: 5000) |
 
+### .pollForQueries(oracleId, onQuery, [options]) ⇒ `function` ⏏
+Poll for oracle queries
+
+**Kind**: instance method of [`@aeternity/aepp-sdk/es/ae/oracle`](#module_@aeternity/aepp-sdk/es/ae/oracle)  
+**Returns**: `function` - stopPolling - Stop polling function  
+**Category**: async  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| oracleId | `String` | Oracle public key |
+| onQuery | `function` | OnQuery callback |
+| [options] | `Object` | Options object |
+| [options.interval] | `Object` | Poll interval(default: 5000) |
+
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/oracle--getQueryObject"></a>
 
 ### .getQueryObject(oracleId, queryId) ⇒ `Promise.&lt;Object&gt;` ⏏
