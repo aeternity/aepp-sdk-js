@@ -10,6 +10,7 @@
 
 
 
+
 # [6.0.0](https://github.com/aeternity/aepp-sdk-js/compare/4.7.0...6.0.0) (2019-10-16)
 
 
