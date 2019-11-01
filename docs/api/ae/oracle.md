@@ -7,7 +7,6 @@ The high-level description of the oracle system is
 https://github.com/aeternity/protocol/blob/master/ORACLE.md in the protocol
 repository.
 
-**Export**: Oracle  
 **Example**  
 ```js
 import Oracle from '@aeternity/aepp-sdk/es/ae/oracle'
@@ -42,18 +41,35 @@ Oracle provides oracle-system related methods atop
 | --- | --- | --- | --- |
 | [options] | `Object` | <code>{}</code> | Initializer object |
 
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/oracle--getOracleObject"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/oracle--pollForQueries"></a>
 
-### .getOracleObject(oracleId) ⇒ `Promise.&lt;Object&gt;` ⏏
-Constructor for Oracle Object (helper object for using Oracle)
+### .pollForQueries(oracleId, onQuery, [options]) ⇒ `function` ⏏
+Poll for oracle queries
 
 **Kind**: instance method of [`@aeternity/aepp-sdk/es/ae/oracle`](#module_@aeternity/aepp-sdk/es/ae/oracle)  
-**Returns**: `Promise.&lt;Object&gt;` - Oracle object  
+**Returns**: `function` - stopPolling - Stop polling function  
 **Category**: async  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | oracleId | `String` | Oracle public key |
+| onQuery | `function` | OnQuery callback |
+| [options] | `Object` | Options object |
+| [options.interval] | `Object` | Poll interval(default: 5000) |
+
+### .pollForQueries(oracleId, onQuery, [options]) ⇒ `function` ⏏
+Poll for oracle queries
+
+**Kind**: instance method of [`@aeternity/aepp-sdk/es/ae/oracle`](#module_@aeternity/aepp-sdk/es/ae/oracle)  
+**Returns**: `function` - stopPolling - Stop polling function  
+**Category**: async  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| oracleId | `String` | Oracle public key |
+| onQuery | `function` | OnQuery callback |
+| [options] | `Object` | Options object |
+| [options.interval] | `Object` | Poll interval(default: 5000) |
 
 ### .pollForQueries(oracleId, onQuery, [options]) ⇒ `function` ⏏
 Poll for oracle queries
