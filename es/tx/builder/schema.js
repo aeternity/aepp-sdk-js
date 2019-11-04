@@ -4,7 +4,6 @@
  * @export TxSchema
  * @example import TxSchema from '@aeternity/aepp-sdk/es/tx/builder/schema'
  */
-/* eslint-disable no-unused-vars */
 // # RLP version number
 // # https://github.com/aeternity/protocol/blob/master/serializations.md#binary-serialization
 

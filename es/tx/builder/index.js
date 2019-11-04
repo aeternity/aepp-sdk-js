@@ -1,4 +1,3 @@
-/* eslint-disable curly */
 import { BigNumber } from 'bignumber.js'
 import { assertedType, rlp } from '../../utils/crypto'
 
@@ -35,8 +34,7 @@ function deserializeField (value, type, prefix) {
   if (!value) return ''
   switch (type) {
     case FIELD_TYPES.ctVersion: {
-      // eslint-disable-next-line no-unused-vars
-      const [vm, _, abi] = value
+      const [vm, , abi] = value
       return { vmVersion: readInt(Buffer.from([vm])), abiVersion: readInt(Buffer.from([abi])) }
     }
     case FIELD_TYPES.int:
@@ -165,20 +163,9 @@ function transformParams (params) {
     .reduce(
       (acc, [key, value]) => {
         acc[key] = value
-        if (key === 'oracleTtl') acc = {
-          ...acc,
-          oracleTtlType: value.type === ORACLE_TTL_TYPES.delta ? 0 : 1,
-          oracleTtlValue: value.value
-        }
-        if (key === 'queryTtl') acc = {
-          ...acc,
-          queryTtlType: value.type === ORACLE_TTL_TYPES.delta ? 0 : 1,
-          queryTtlValue: value.value
-        }
-        if (key === 'responseTtl') acc = {
-          ...acc,
-          responseTtlType: value.type === ORACLE_TTL_TYPES.delta ? 0 : 1,
-          responseTtlValue: value.value
+        if (['oracleTtl', 'queryTtl', 'responseTtl'].includes(key)) {
+          acc[`${key}Type`] = value.type === ORACLE_TTL_TYPES.delta ? 0 : 1
+          acc[`${key}Value`] = value.value
         }
         return acc
       },
@@ -189,8 +176,7 @@ function transformParams (params) {
 // INTERFACE
 
 function getOracleRelativeTtl (params) {
-  // eslint-disable-next-line no-unused-vars
-  const [_, { value = 500 }] = Object.entries(params).find(([key]) => ['oracleTtl', 'queryTtl', 'responseTtl'].includes(key)) || ['', {}]
+  const [, { value = 500 }] = Object.entries(params).find(([key]) => ['oracleTtl', 'queryTtl', 'responseTtl'].includes(key)) || ['', {}]
   return value // TODO investigate this
 }
 

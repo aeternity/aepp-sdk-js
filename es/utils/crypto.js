@@ -38,8 +38,7 @@ const Ecb = aesjs.ModeOfOperation.ecb
  * @return {boolean} True if the string is valid base-64, false otherwise.
  */
 export function isBase64 (str) {
-  // eslint-disable-next-line no-useless-escape
-  if (str.length % 4 > 0 || str.match(/[^0-9a-z+\/=]/i)) return false
+  if (str.length % 4 > 0 || str.match(/[^0-9a-z+/=]/i)) return false
   const index = str.indexOf('=')
   return !!(index === -1 || str.slice(index).match(/={1,2}/))
 }
