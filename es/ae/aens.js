@@ -114,7 +114,7 @@ async function query (name, opt = {}) {
   const nameId = o.id
 
   return Object.freeze(Object.assign(o, {
-    pointers: o.pointers || {},
+    pointers: o.pointers || [],
     update: async (target, options) => {
       return {
         ...(await this.aensUpdate(nameId, target, R.merge(opt, options))),
