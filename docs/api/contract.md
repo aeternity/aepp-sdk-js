@@ -19,24 +19,9 @@ import ContractBase from '@aeternity/aepp-sdk/es/contract'
     * *[.setCompilerUrl(url)](#module_@aeternity/aepp-sdk/es/contract+setCompilerUrl) ⇒ `void`*
     * *[.getCompilerVersion()](#module_@aeternity/aepp-sdk/es/contract+getCompilerVersion) ⇒ `String`*
 
-### ContractBase([options]) ⇒ `Object` ⏏
-Basic Contract Stamp
+<a id="module_@aeternity/aepp-sdk/es/contract+contractGetACI"></a>
 
-This stamp include api call's related to contract functionality.
-Attempting to create instances from the Stamp without overwriting all
-abstract methods using composition will result in an exception.
-
-**Kind**: Exported function  
-**Returns**: `Object` - Contract instance  
-**rtype**: `Stamp`
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| [options] | `Object` | <code>{}</code> | Initializer object |
-
-<a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+contractGetACI"></a>
-
-#### *contractBase.contractGetACI(source, [options]) ⇒ `Object`*
+### *@aeternity/aepp-sdk/es/contract.contractGetACI(source, [options]) ⇒ `Object`*
 Get contract ACI
 
 **Kind**: instance abstract method of [`@aeternity/aepp-sdk/es/contract`](#module_@aeternity/aepp-sdk/es/contract)  
