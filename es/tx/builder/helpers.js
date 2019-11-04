@@ -97,7 +97,7 @@ export function formatSalt (salt) {
  */
 export function produceNameId (name) {
   const namespace = R.last(name.split('.'))
-  if (namespace === 'chain') return encode(hash(name), 'nm')
+  if (namespace === 'chain') return encode(hash(name.toLowerCase()), 'nm')
   return encode(nameHash(name), 'nm')
 }
 

@@ -109,7 +109,7 @@ describe('Aens', function () {
     })
   })
 
-  it.skip('Spend by name', async () => {
+  it('Spend by name', async () => {
     const current = await aens.address()
     const onAccount = aens.addresses().find(acc => acc !== current)
     await aens.spend(100, name, { onAccount, verify: true })
