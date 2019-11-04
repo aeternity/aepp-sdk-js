@@ -338,7 +338,6 @@ async function channelSnapshotSoloTx ({ channelId, fromId, payload }) {
   return tx
 }
 
-// eslint-disable-next-line no-unused-vars
 async function gaAttachTx ({ ownerId, code, vmVersion, abiVersion, authFun, gas, gasPrice = MIN_GAS_PRICE, callData, backend }) {
   // Get VM_ABI version
   const ctVersion = this.getVmVersion(TX_TYPE.contractCreate, R.head(arguments))

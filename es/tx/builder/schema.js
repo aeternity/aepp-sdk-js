@@ -4,7 +4,6 @@
  * @export TxSchema
  * @example import TxSchema from '@aeternity/aepp-sdk/es/tx/builder/schema'
  */
-/* eslint-disable no-unused-vars */
 // # RLP version number
 // # https://github.com/aeternity/protocol/blob/master/serializations.md#binary-serialization
 
@@ -83,9 +82,9 @@ export const NAME_BID_RANGES = {
 // # name bid timeouts
 export const NAME_BID_TIMEOUTS = {
   13: 0,
-  8: NAME_BID_TIMEOUT_BLOCKS, // # 480 blocks
-  4: 31 * NAME_BID_TIMEOUT_BLOCKS, // # 14880 blocks
-  1: 62 * NAME_BID_TIMEOUT_BLOCKS // # 29760 blocks
+  12: NAME_BID_TIMEOUT_BLOCKS, // # 480 blocks
+  8: 31 * NAME_BID_TIMEOUT_BLOCKS, // # 14880 blocks
+  4: 62 * NAME_BID_TIMEOUT_BLOCKS // # 29760 blocks
 }
 
 // # Tag constant for ids (type uint8)

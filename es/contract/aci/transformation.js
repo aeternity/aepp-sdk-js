@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import Joi from 'joi-browser'
 
 export const SOPHIA_TYPES = [
@@ -21,7 +20,7 @@ export const SOPHIA_TYPES = [
 
 export function injectVars (t, aciType) {
   const [[baseType, generic]] = Object.entries(aciType.typedef)
-  const [[_, varianValue]] = Object.entries(t)
+  const [[, varianValue]] = Object.entries(t)
   switch (baseType) {
     case SOPHIA_TYPES.variant:
       return {
@@ -47,7 +46,7 @@ export function injectVars (t, aciType) {
  * @return {Object}
  */
 export function linkTypeDefs (t, bindings) {
-  const [_, typeDef] = typeof t === 'object' ? Object.keys(t)[0].split('.') : t.split('.')
+  const [, typeDef] = typeof t === 'object' ? Object.keys(t)[0].split('.') : t.split('.')
   const aciType = [
     ...bindings.typedef,
     { name: 'state', typedef: bindings.state, vars: [] }

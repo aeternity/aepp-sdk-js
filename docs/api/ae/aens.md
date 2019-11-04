@@ -14,8 +14,6 @@ import Aens from '@aeternity/aepp-sdk/es/ae/aens'
 
 * [@aeternity/aepp-sdk/es/ae/aens](#module_@aeternity/aepp-sdk/es/ae/aens)
     * [Aens([options])](#exp_module_@aeternity/aepp-sdk/es/ae/aens--Aens) ⇒ `Object` ⏏
-    * _global_
-        * [exports.isNameValid(name, [throwError])](#exp_module_@aeternity/aepp-sdk/es/ae/aens--exports.isNameValid) ⇒ ⏏
     * _instance_
         * _async_
             * [.update(nameId, target, options)](#exp_module_@aeternity/aepp-sdk/es/ae/aens--update) ⇒ `Object` ⏏
@@ -40,23 +38,6 @@ Aens provides name-system related methods atop
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | [options] | `Object` | <code>{}</code> | Initializer object |
-
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/aens--exports.isNameValid"></a>
-
-### exports.isNameValid(name, [throwError]) ⇒ ⏏
-Is name valid
-
-**Kind**: global method of [`@aeternity/aepp-sdk/es/ae/aens`](#module_@aeternity/aepp-sdk/es/ae/aens)  
-**Returns**: Boolean  
-**Throws**:
-
-- Error
-
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| name | `string` |  |  |
-| [throwError] | `boolean` | <code>true</code> | Throw error on invalid |
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/aens--update"></a>
 

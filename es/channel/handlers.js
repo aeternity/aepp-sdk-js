@@ -248,8 +248,7 @@ export function awaitingOffChainUpdate (channel, message, state) {
 }
 
 export async function awaitingTxSignRequest (channel, message, state) {
-  // eslint-disable-next-line no-useless-escape
-  const [, tag] = message.method.match(/^channels\.sign\.([^\.]+)$/) || []
+  const [, tag] = message.method.match(/^channels\.sign\.([^.]+)$/) || []
   if (tag) {
     if (message.params.data.tx) {
       const signedTx = await options.get(channel).sign(tag, message.params.data.tx, {
@@ -441,7 +440,6 @@ export async function awaitingNewContractTx (channel, message, state) {
 export function awaitingNewContractCompletion (channel, message, state) {
   if (message.method === 'channels.update') {
     const { round } = unpackTx(message.params.data.state).tx.encodedTx.tx
-    // eslint-disable-next-line standard/computed-property-even-spacing
     const owner = options.get(channel)[{
       initiator: 'initiatorId',
       responder: 'responderId'

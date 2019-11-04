@@ -51,8 +51,7 @@ function expandPath (path, replacements) {
 function lookupType (path, spec, types) {
   const type = (() => {
     const match = R.path(path, spec).match(/^#\/definitions\/(.+)/)
-    // eslint-disable-next-line no-void
-    if (match !== void 0) {
+    if (match !== undefined) {
       return match[1]
     } else {
       throw Error(`Reference path does not meet specification: ${path}`)
@@ -342,8 +341,7 @@ function destructureClientError (error) {
  */
 function resolveRef (ref, swag) {
   const match = ref.match(/^#\/(.+)$/)
-  // eslint-disable-next-line no-void
-  if (match !== void 0) {
+  if (match !== undefined) {
     const value = R.path(match[1].split('/'), swag)
     if (value != null) {
       return value
