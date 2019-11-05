@@ -13,7 +13,7 @@
   "author": "Enrico Icardi <enrico.icardi@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "@aeternity/aepp-sdk": "6.0.0",
+    "@aeternity/aepp-sdk": "6.0.1",
     "purgecss-webpack-plugin": "^1.2.0",
     "vue": "^2.5.16",
     "vue-router": "^3.0.1",
@@ -48,7 +48,7 @@
     "standard-loader": "^7.0.0",
     "style-loader": "^1.0.0",
     "tailwindcss": "^0.5.3",
-    "vue-loader": "15.7.1",
+    "vue-loader": "15.7.2",
     "vue-style-loader": "^4.1.0",
     "webpack": "^4.36.1",
     "webpack-bundle-analyzer": "^3.3.2",

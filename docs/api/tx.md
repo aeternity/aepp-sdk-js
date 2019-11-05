@@ -9,48 +9,23 @@ import Tx from '@aeternity/aepp-sdk/es/tx'
 ```
 
 * [@aeternity/aepp-sdk/es/tx](#module_@aeternity/aepp-sdk/es/tx)
-    * [Tx([options])](#exp_module_@aeternity/aepp-sdk/es/tx--Tx) ⇒ `Object` ⏏
-        * *[.spendTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+spendTx) ⇒ `String`*
-        * *[.namePreclaimTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+namePreclaimTx) ⇒ `String`*
-        * *[.nameClaimTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+nameClaimTx) ⇒ `String`*
-        * *[.nameTransferTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+nameTransferTx) ⇒ `String`*
-        * *[.nameUpdateTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+nameUpdateTx) ⇒ `String`*
-        * *[.nameRevokeTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+nameRevokeTx) ⇒ `String`*
-        * *[.contractCreateTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+contractCreateTx) ⇒ `String`*
-        * *[.contractCallTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+contractCallTx) ⇒ `String`*
-        * *[.oracleRegisterTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+oracleRegisterTx) ⇒ `String`*
-        * *[.oracleExtendTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+oracleExtendTx) ⇒ `String`*
-        * *[.oraclePostQuery(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+oraclePostQuery) ⇒ `String`*
-        * *[.oracleRespondTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+oracleRespondTx) ⇒ `String`*
-        * *[.getAccountNonce(address)](#module_@aeternity/aepp-sdk/es/tx--Tx+getAccountNonce) ⇒ `Number`*
+    * *[.spendTx(options)](#module_@aeternity/aepp-sdk/es/tx+spendTx) ⇒ `String`*
+    * *[.namePreclaimTx(options)](#module_@aeternity/aepp-sdk/es/tx+namePreclaimTx) ⇒ `String`*
+    * *[.nameClaimTx(options)](#module_@aeternity/aepp-sdk/es/tx+nameClaimTx) ⇒ `String`*
+    * *[.nameTransferTx(options)](#module_@aeternity/aepp-sdk/es/tx+nameTransferTx) ⇒ `String`*
+    * *[.nameUpdateTx(options)](#module_@aeternity/aepp-sdk/es/tx+nameUpdateTx) ⇒ `String`*
+    * *[.nameRevokeTx(options)](#module_@aeternity/aepp-sdk/es/tx+nameRevokeTx) ⇒ `String`*
+    * *[.contractCreateTx(options)](#module_@aeternity/aepp-sdk/es/tx+contractCreateTx) ⇒ `String`*
+    * *[.contractCallTx(options)](#module_@aeternity/aepp-sdk/es/tx+contractCallTx) ⇒ `String`*
+    * *[.oracleRegisterTx(options)](#module_@aeternity/aepp-sdk/es/tx+oracleRegisterTx) ⇒ `String`*
+    * *[.oracleExtendTx(options)](#module_@aeternity/aepp-sdk/es/tx+oracleExtendTx) ⇒ `String`*
+    * *[.oraclePostQuery(options)](#module_@aeternity/aepp-sdk/es/tx+oraclePostQuery) ⇒ `String`*
+    * *[.oracleRespondTx(options)](#module_@aeternity/aepp-sdk/es/tx+oracleRespondTx) ⇒ `String`*
+    * *[.getAccountNonce(address)](#module_@aeternity/aepp-sdk/es/tx+getAccountNonce) ⇒ `Number`*
 
-<a id="exp_module_@aeternity/aepp-sdk/es/tx--Tx"></a>
+<a id="module_@aeternity/aepp-sdk/es/tx+spendTx"></a>
 
-### Tx([options]) ⇒ `Object` ⏏
-Basic Tx Stamp
-
-Attempting to create instances from the Stamp without overwriting all
-abstract methods using composition will result in an exception.
-
-Tx is one of the three basic building blocks of an
-[Ae](#exp_module_@aeternity/aepp-sdk/es/ae--Ae) client and provides methods to
-create aeternity transactions.
-
-**Kind**: Exported function  
-**Returns**: `Object` - Tx instance  
-**rtype**: `Stamp`
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| [options] | `Object` | <code>{}</code> | Initializer object |
-
-**Example**  
-```js
-Tx()
-```
-<a id="module_@aeternity/aepp-sdk/es/tx--Tx+spendTx"></a>
-
-#### *tx.spendTx(options) ⇒ `String`*
+### *@aeternity/aepp-sdk/es/tx.spendTx(options) ⇒ `String`*
 Create a `spend_tx` transaction
 
 **Kind**: instance abstract method of [`@aeternity/aepp-sdk/es/tx`](#module_@aeternity/aepp-sdk/es/tx)  

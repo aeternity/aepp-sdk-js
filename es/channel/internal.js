@@ -208,8 +208,7 @@ function WebSocket (url, callbacks) {
 
   return new Promise((resolve, reject) => {
     const ws = new W3CWebSocket(url)
-    // eslint-disable-next-line no-return-assign
-    Object.entries(callbacks).forEach(([key, callback]) => ws[key] = callback)
+    Object.entries(callbacks).forEach(([key, callback]) => { ws[key] = callback })
     fireOnce(ws, 'onopen', () => resolve(ws))
     fireOnce(ws, 'onerror', (err) => reject(err))
   })
