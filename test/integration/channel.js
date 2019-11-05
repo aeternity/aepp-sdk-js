@@ -295,6 +295,27 @@ describe('Channel', function () {
     })
   })
 
+  it('can post update with metadata', async () => {
+    responderShouldRejectUpdate = true
+    const meta = 'meta 1'
+    const sign = sinon.spy(initiator.signTransaction.bind(initiator))
+    await initiatorCh.update(
+      await initiator.address(),
+      await responder.address(),
+      100,
+      sign,
+      [meta]
+    )
+    sign.firstCall.args[1].updates.should.eql([
+      sign.firstCall.args[1].updates[0],
+      { data: meta, op: 'OffChainMeta'}
+    ])
+    responderSign.firstCall.args[2].updates.should.eql([
+      responderSign.firstCall.args[2].updates[0],
+      { data: meta, op: 'OffChainMeta'}
+    ])
+  })
+
   it('can get proof of inclusion', async () => {
     const initiatorAddr = await initiator.address()
     const responderAddr = await responder.address()
