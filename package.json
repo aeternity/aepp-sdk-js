@@ -27,7 +27,7 @@
   ],
   "dependencies": {
     "@aeternity/bip39": "^0.1.0",
-    "@babel/runtime": "^7.6.2",
+    "@babel/runtime": "^7.7.0",
     "@stamp/it": "^1.0.3",
     "@stamp/required": "^1.0.1",
     "aes-js": "^3.1.1",
