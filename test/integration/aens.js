@@ -21,8 +21,8 @@ import * as R from 'ramda'
 import { generateKeyPair } from '../../es/utils/crypto'
 import { computeAuctionEndBlock, computeBidFee } from '../../es/tx/builder/helpers'
 
-function randomName (length, namespace = '.aet') {
-  return randomString(length).toLowerCase() + namespace
+function randomName (length, namespace = '.chain') {
+  return randomString(length) + namespace
 }
 
 function randomString (len, charSet) {
@@ -35,7 +35,7 @@ function randomString (len, charSet) {
   return randomString
 }
 
-plan('9000000000000000000000')
+plan('99000000000000000000000')
 
 describe('Aens', function () {
   configure(this)

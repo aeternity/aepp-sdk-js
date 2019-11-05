@@ -115,7 +115,7 @@ export function produceNameId (name) {
  */
 export function commitmentHash (name, salt = createSalt()) {
   const namespace = R.last(name.split('.'))
-  if (namespace === 'chain') return `cm_${encodeBase58Check(hash(Buffer.concat([Buffer.from(name), formatSalt(salt)])))}`
+  if (namespace === 'chain') return `cm_${encodeBase58Check(hash(Buffer.concat([Buffer.from(name.toLowerCase()), formatSalt(salt)])))}`
   return `cm_${encodeBase58Check(hash(Buffer.concat([nameHash(name.toLowerCase()), formatSalt(salt)])))}`
 }
 
@@ -283,7 +283,7 @@ export function classify (s) {
  * @return String the minimum fee for the domain auction
  */
 export function getMinimumNameFee (domain) {
-  const nameLength = domain.replace('.aet', '').length
+  const nameLength = domain.replace('.chain', '').length
   return NAME_BID_RANGES[nameLength >= NAME_BID_MAX_LENGTH ? NAME_BID_MAX_LENGTH : nameLength]
 }
 
@@ -297,11 +297,11 @@ export function computeBidFee (domain, startFee = NAME_FEE, increment = NAME_FEE
 
 export function computeAuctionEndBlock (domain, claimHeight) {
   return R.cond([
-    [R.lt(4), R.always(NAME_BID_TIMEOUTS[1] + claimHeight)],
-    [R.lt(8), R.always(NAME_BID_TIMEOUTS[4] + claimHeight)],
-    [R.lte(NAME_BID_MAX_LENGTH), R.always(NAME_BID_TIMEOUTS[8] + claimHeight)],
+    [R.lt(5), R.always(NAME_BID_TIMEOUTS[4] + claimHeight)],
+    [R.lt(9), R.always(NAME_BID_TIMEOUTS[8] + claimHeight)],
+    [R.lte(NAME_BID_MAX_LENGTH), R.always(NAME_BID_TIMEOUTS[12] + claimHeight)],
     [R.T, R.always(claimHeight)]
-  ])(domain.replace('.aet', '').length)
+  ])(domain.replace('.chain', '').length)
 }
 
 export default {

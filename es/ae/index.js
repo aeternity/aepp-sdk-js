@@ -51,7 +51,6 @@ async function send (tx, options = {}) {
   return this.sendTransaction(signed, opt)
 }
 
-// eslint-disable-next-line no-unused-vars
 async function signUsingGA (tx, options = {}) {
   const { authData, authFun } = options
   return this.createMetaTx(tx, authData, authFun, options)
@@ -76,7 +75,6 @@ async function spend (amount, recipientId, options = {}) {
 
 /**
  * Resolve AENS name and return name hash
- *
  * @param {String} nameOrAddress
  * @param verify
  * @return {String} Address or AENS name hash
