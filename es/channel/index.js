@@ -24,12 +24,13 @@
 
 import AsyncInit from '../utils/async-init'
 import { snakeToPascal } from '../utils/string'
-import { buildTx } from '../tx/builder'
+import { buildTx, unpackTx } from '../tx/builder'
 import { TX_TYPE } from '../tx/builder/schema'
 import * as handlers from './handlers'
 import {
   eventEmitters,
   status as channelStatus,
+  state as channelState,
   initialize,
   enqueueAction,
   send,
@@ -98,6 +99,32 @@ function status () {
  */
 async function state () {
   return snakeToPascalObjKeys(await call(this, 'channels.get.offchain_state', {}))
+}
+
+/**
+ * Get current round
+ *
+ * If round cannot be determined (for example when channel has not been opened)
+ * it will return `null`.
+ *
+ * @return {Number}
+ */
+function round () {
+  const state = channelState.get(this)
+  if (!state) {
+    return null
+  }
+  const { txType, tx } = unpackTx(channelState.get(this)).tx.encodedTx
+  switch (txType) {
+    case TX_TYPE.channelCreate:
+      return 1
+    case TX_TYPE.channelOffChain:
+    case TX_TYPE.channelWithdraw:
+    case TX_TYPE.channelDeposit:
+      return parseInt(tx.round, 10)
+    default:
+      return null
+  }
 }
 
 /**
@@ -754,6 +781,7 @@ const Channel = AsyncInit.compose({
     off,
     status,
     state,
+    round,
     id,
     update,
     poi,
