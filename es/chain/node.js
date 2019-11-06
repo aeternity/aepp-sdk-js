@@ -188,6 +188,10 @@ async function getContractByteCode (contractId) {
   return this.api.getContractCode(contractId)
 }
 
+async function getContract (contractId) {
+  return this.api.getContract(contractId)
+}
+
 async function getName (name) {
   return this.api.getNameEntryByName(name)
 }
@@ -227,6 +231,7 @@ const ChainNode = Chain.compose(Oracle, TransactionValidator, NodePool, {
     getKeyBlock,
     txDryRun,
     getContractByteCode,
+    getContract,
     getName
   }
 })
