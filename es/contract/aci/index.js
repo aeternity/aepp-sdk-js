@@ -104,11 +104,11 @@ async function getContractInstance (source, { aci, contractAddress, filesystem =
   if (contractAddress) {
     if (!isAddressValid(contractAddress, 'ct')) throw new Error('Invalid contract address')
     const contract = await this.getContract(contractAddress).catch(e => null)
-    if (!contract) throw new Error(`Contract with address ${contractAddress} not found`)
+    if (!contract) throw new Error(`Contract with address ${contractAddress} not found on-chain`)
     if (!forceCodeCheck) {
       const onChanByteCode = (await this.getContractByteCode(contractAddress)).bytecode
       instance.compiled = (await this.contractCompile(source, instance.options)).bytecode
-      if (instance.compile !== onChanByteCode) throw new Error('Contract source fo not correspond to the contract source deploying on the chain(You can skip this by passing "forceCodeCheck")')
+      if (instance.compile !== onChanByteCode) throw new Error('Contract source do not correspond to the contract source deploying on the chain')
     }
   }
 
