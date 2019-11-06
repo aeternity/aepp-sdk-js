@@ -3,7 +3,7 @@
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 [![Build Status](https://ci.aepps.com/buildStatus/icon?job=aepp-sdk-js/develop)](https://ci.aepps.com/job/aepp-sdk-js/job/develop/)
 [![npm](https://img.shields.io/npm/v/@aeternity/aepp-sdk.svg)](https://www.npmjs.com/package/@aeternity/aepp-sdk)
-[![npm](https://img.shields.io/npm/l/@aeternity/aepp-sdk.svg)](https://www.npmjs.com/package/@aeternity/aepp-sdk)
+[![npm](https://img.shields.io/npm/l/@aeternity/aepp-sdk.svg)](https://www.npmjs.com/package/@aeternity/aepp-sdk) [![Greenkeeper badge](https://badges.greenkeeper.io/aeternity/aepp-sdk-js.svg)](https://greenkeeper.io/)
 
 JavaScript SDK for the revolutionary [æternity] blockchain, targeting the
 [æternity node] implementation. Aepp-sdk is [hosted on GitHub].
@@ -12,20 +12,10 @@ JavaScript SDK for the revolutionary [æternity] blockchain, targeting the
 [æternity node]: https://github.com/aeternity/aeternity
 [hosted on GitHub]: https://github.com/aeternity/aepp-sdk-js
 
-#### Disclaimer
-
-This SDK is in continuos development where things can easily break, especially if you're not an officially released version. We aim to make all our
- releases as stable as possible, neverless it should not be taken as
-production-ready.
-
-To catch up with the more edgy state of development please
-check out the [develop branch].
-
 [develop branch]: https://github.com/aeternity/aepp-sdk-js/tree/develop
 
 ## Table of content
 - [Æternity's Javascript SDK](#%C3%86ternitys-Javascript-SDK)
-      - [Disclaimer](#Disclaimer)
   - [Table of content](#Table-of-content)
   - [Quick Start](#Quick-Start)
     - [1. Install SDK](#1-Install-SDK)
@@ -68,6 +58,23 @@ npm i @aeternity/aepp-sdk@next
 npm i https://github.com/aeternity/aepp-sdk-js#develop
 ```
 
+**Note** : If you experience errors during the installation, you might need to install build tools for your OS.
+
+Windows: Windows Build Tools
+```
+npm install -g windows-build-tools
+```
+Ubuntu / Debian: Build Essential
+```
+sudo apt-get update
+sudo apt-get install build-essential
+```
+Mac:
+Download [Xcode](https://apps.apple.com/de/app/xcode/id497799835?mt=12) from AppStore, then run
+```
+xcode-select --install
+```
+
 ### 2. Create an Account
 You can do many more things now, but you'll probably have to start with:
 
@@ -100,22 +107,43 @@ import Ae from '@aeternity/aepp-sdk/es/ae/universal' // or other flavor
 
 ```js
 // Use Flavor
-Ae({
-  url: 'https://sdk-testnet.aepps.com',
-  // internalUrl: 'https://sdk-testnet.aepps.com',
-  compilerUrl: 'https://compiler.aepps.com',
-  keypair: { secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS' },
-  networkId: 'ae_uat' // or any other networkId your client should connect to
-}).then(ae => {
-  // Interacting with the blockchain client
-  // getting the latest block height
-  ae.height().then(height => {
-    // logs current height
-    console.log('Current Block Height:', height)
-  }).catch(e => {
-    // logs error
-    console.log(e)
-  })
+import Ae from '@aeternity/aepp-sdk/es/ae/universal' // or other flavor
+import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory' // or other flavor
+import Node from '@aeternity/aepp-sdk/es/node' // or other flavor
+
+Promise.all([
+  Node({ url, internalUrl })
+]).then(nodes => {
+    Ae({
+        // This two params deprecated and will be remove in next major release
+        url: 'https://sdk-testnet.aepps.com',
+        internalUrl: 'https://sdk-testnet.aepps.com',
+        // instead use
+        nodes: [
+          { name: 'someNode', instance: nodes[0] },
+        // node2, node3..
+        ],
+        compilerUrl: 'COMPILER_URL',
+        // `keypair` param deprecated and will be removed in next major release
+        keypair: { secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS' },
+        // instead use
+        accounts: [
+          MemoryAccount({ keypair: { secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS' } }),
+        // acc2
+        ],
+        address: 'SELECTED_ACCOUNT_PUB',
+        networkId: 'ae_uat' // or any other networkId your client should connect to
+    }).then(ae => {
+      // Interacting with the blockchain client
+      // getting the latest block height
+      ae.height().then(height => {
+        // logs current height
+        console.log('Current Block Height:', height)
+      }).catch(e => {
+        // logs error
+        console.log(e)
+      })
+    })
 })
 
 ```
@@ -159,4 +187,3 @@ INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS
 OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
 TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
 THIS SOFTWARE.
-

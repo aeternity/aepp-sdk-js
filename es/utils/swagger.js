@@ -24,10 +24,10 @@
 
 import JsonBig from './json-big'
 import stampit from '@stamp/it'
-import AsyncInit from './async-init'
 import axios from 'axios'
 import * as R from 'ramda'
 import { snakeToPascal, pascalToSnake } from './string'
+import BigNumber from 'bignumber.js'
 
 /**
  * Perform path string interpolation
@@ -51,7 +51,7 @@ function expandPath (path, replacements) {
 function lookupType (path, spec, types) {
   const type = (() => {
     const match = R.path(path, spec).match(/^#\/definitions\/(.+)/)
-    if (match !== void 0) {
+    if (match !== undefined) {
       return match[1]
     } else {
       throw Error(`Reference path does not meet specification: ${path}`)
@@ -99,8 +99,8 @@ function TypeError (msg, spec, value) {
  */
 const conformTypes = {
   integer (value, spec, types) {
-    if (R.type(value) === 'Number') {
-      return Math.floor(value)
+    if (R.type(value) === 'Number' || BigNumber(value).toString(10) === value) {
+      return R.type(value) === 'Number' ? Math.floor(value) : value
     } else {
       throw TypeError('Not an integer', spec, value)
     }
@@ -117,7 +117,7 @@ const conformTypes = {
     if (R.type(value) === 'String') {
       return value
     } else {
-      throw TypeError(`Not a string`, spec, value)
+      throw TypeError('Not a string', spec, value)
     }
   },
   object (value, spec, types) {
@@ -132,14 +132,14 @@ const conformTypes = {
         return R.mapObjIndexed((value, key) => extendingErrorPath(key, () => conform(value, properties[key], types)), R.reject(R.isNil, R.pick(R.keys(properties), value)))
       }
     } else {
-      throw TypeError(`Not an object`, spec, value)
+      throw TypeError('Not an object', spec, value)
     }
   },
   array (value, spec, types) {
     if (R.type(value) === 'Array') {
       return value.map(o => conform(o, spec.items, types))
     } else {
-      throw TypeError(`Not an array`, spec, value)
+      throw TypeError('Not an array', spec, value)
     }
   },
   schema (value, spec, types) {
@@ -198,11 +198,18 @@ const httpConfig = {
     } catch (e) {
       return data
     }
+  }],
+  transformRequest: [(data) => {
+    try {
+      return JsonBig.stringify(data)
+    } catch (e) {
+      return data
+    }
   }]
 }
 
 const httpClients = {
-  get: (config) => (url) => axios.get(url, R.mergeDeepRight(httpConfig, config)),
+  get: (config) => (url, params) => axios.get(url, [httpConfig, config, params].reduce(R.mergeDeepRight)),
   post: (config) => (url, params) => axios.post(url, params, R.mergeDeepRight(httpConfig, config))
 }
 
@@ -319,10 +326,29 @@ function assertOne (coll) {
  */
 function destructureClientError (error) {
   const { method, url } = error.config
-  const { status, data } = error.response
-  const reason = R.has('reason', data) ? data.reason : R.toString(data)
+  const { status, data, statusText } = error.response
+  const reason = R.has('reason', data) ? data.reason : data ? R.toString(data) : statusText
 
   return `${method.toUpperCase()} to ${url} failed with ${status}: ${reason}`
+}
+
+/**
+ * Resolve reference
+ * @rtype (ref: String, swag: Object) => Object
+ * @param {String} ref - Reference to resolve
+ * @param {Object} swag
+ * @return {Object} Resolved reference definition
+ */
+function resolveRef (ref, swag) {
+  const match = ref.match(/^#\/(.+)$/)
+  if (match !== undefined) {
+    const value = R.path(match[1].split('/'), swag)
+    if (value != null) {
+      return value
+    }
+  }
+
+  throw Error(`Could not resolve reference: ${ref}`)
 }
 
 /**
@@ -336,11 +362,13 @@ function destructureClientError (error) {
  * @param {Object} types - Swagger types
  * @return {Function}
  */
-const operation = R.memoize((path, method, definition, types, { config, errorHandler } = {}) => {
+const operation = (path, method, definition, swag, { config, errorHandler } = {}) => {
   config = config || {}
   delete config.transformResponse // Prevent of overwriting transform response
   const { operationId, description } = definition
-  let { parameters } = definition
+  const parameters = (definition.parameters || []).map(param =>
+    param.$ref ? resolveRef(param.$ref, swag) : param
+  )
   const name = `${R.head(operationId).toLowerCase()}${R.drop(1, operationId)}`
   const pascalized = pascalizeParameters(parameters)
 
@@ -373,7 +401,7 @@ const operation = R.memoize((path, method, definition, types, { config, errorHan
         const values = R.merge(R.reject(R.isNil, R.pick(optNames, opt)), R.zipObj(R.pluck('name', req), arg))
         const conformed = R.mapObjIndexed((val, key) => {
           try {
-            return conform(val, indexedParameters[key], types)
+            return conform(val, indexedParameters[key], swag.definitions)
           } catch (e) {
             const path = [key].concat(e.path || [])
             throw Object.assign(e, {
@@ -400,7 +428,7 @@ const operation = R.memoize((path, method, definition, types, { config, errorHan
 
         try {
           const response = await client(`${url}${expandedPath}`, params).catch(this.axiosError(errorHandler))
-          // return opt.fullResponse ? response : conform(pascalizeKeys(response.data), responses['200'], types)
+          // return opt.fullResponse ? response : conform(pascalizeKeys(response.data), responses['200'], swag.definitions)
           return opt.fullResponse ? response : pascalizeKeys(response.data)
         } catch (e) {
           if (R.path(['response', 'data'], e)) {
@@ -430,7 +458,7 @@ const operation = R.memoize((path, method, definition, types, { config, errorHan
       }
     })
   }
-})
+}
 
 /**
  * Swagger Stamp
@@ -443,9 +471,9 @@ const operation = R.memoize((path, method, definition, types, { config, errorHan
  * @return {Object} Account instance
  * @example Swagger({swag})
  */
-const Swagger = stampit(AsyncInit, {
-  async init ({ swag = this.swag, axiosConfig }, { stamp }) {
-    const { paths, definitions } = swag
+const Swagger = stampit({
+  init ({ swag = this.swag, axiosConfig }, { stamp }) {
+    const { paths } = swag
     const methods = R.indexBy(
       R.prop('name'),
       R.flatten(
@@ -453,7 +481,7 @@ const Swagger = stampit(AsyncInit, {
           R.mapObjIndexed(
             (methods, path) => R.values(
               R.mapObjIndexed((definition, method) => {
-                const op = operation(path, method, definition, definitions, axiosConfig)
+                const op = operation(path, method, definition, swag, axiosConfig)
                 return op(this, this.urlFor(swag.basePath, definition))
               }, methods)),
             paths

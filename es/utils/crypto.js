@@ -40,10 +40,8 @@ const Ecb = aesjs.ModeOfOperation.ecb
  * @return {boolean} True if the string is valid base-64, false otherwise.
  */
 export function isBase64 (str) {
-  let index
-  // eslint-disable-next-line no-useless-escape
-  if (str.length % 4 > 0 || str.match(/[^0-9a-z+\/=]/i)) return false
-  index = str.indexOf('=')
+  if (str.length % 4 > 0 || str.match(/[^0-9a-z+/=]/i)) return false
+  const index = str.indexOf('=')
   return !!(index === -1 || str.slice(index).match(/={1,2}/))
 }
 
@@ -73,12 +71,13 @@ export function formatAddress (format = ADDRESS_FORMAT.api, address) {
  * Check if address is valid
  * @rtype (input: String) => valid: Boolean
  * @param {String} address - Address
+ * @param {String} prefix Transaction prefix. Default: 'ak'
  * @return {Boolean} valid
  */
-export function isAddressValid (address) {
+export function isAddressValid (address, prefix = 'ak') {
   let isValid
   try {
-    isValid = decodeBase58Check(assertedType(address, 'ak')).length === 32
+    isValid = decodeBase58Check(assertedType(address, prefix)).length === 32
   } catch (e) {
     isValid = false
   }
@@ -108,7 +107,7 @@ export function addressFromDecimal (decimalAddress) {
 /**
  * Calculate 256bits Blake2b hash of `input`
  * @rtype (input: String) => hash: String
- * @param {String} input - Data to hash
+ * @param {String|Buffer} input - Data to hash
  * @return {Buffer} Hash
  */
 export function hash (input) {
@@ -327,8 +326,8 @@ export function encryptPrivateKey (password, binaryKey) {
  * @return {Uint8Array} Encrypted data
  */
 export function encryptKey (password, binaryData) {
-  let hashedPasswordBytes = sha256hash(password)
-  let aesEcb = new Ecb(hashedPasswordBytes)
+  const hashedPasswordBytes = sha256hash(password)
+  const aesEcb = new Ecb(hashedPasswordBytes)
   return aesEcb.encrypt(binaryData)
 }
 
@@ -341,8 +340,8 @@ export function encryptKey (password, binaryData) {
  */
 export function decryptKey (password, encrypted) {
   const encryptedBytes = Buffer.from(encrypted)
-  let hashedPasswordBytes = sha256hash(password)
-  let aesEcb = new Ecb(hashedPasswordBytes)
+  const hashedPasswordBytes = sha256hash(password)
+  const aesEcb = new Ecb(hashedPasswordBytes)
   return Buffer.from(aesEcb.decrypt(encryptedBytes))
 }
 
@@ -424,7 +423,7 @@ export function aeEncodeKey (binaryKey) {
  * @return {Object} Encrypted key pair
  */
 export function generateSaveWallet (password) {
-  let keys = generateKeyPair(true)
+  const keys = generateKeyPair(true)
   return {
     publicKey: encryptPublicKey(password, keys.publicKey),
     secretKey: encryptPrivateKey(password, keys.secretKey)
@@ -456,13 +455,15 @@ export function decryptPubKey (password, encrypted) {
  * @rtype (data: String, type: String) => String, throws: Error
  * @param {String} data - ae data
  * @param {String} type - Prefix
- * @return {String} Payload
+ * @param forceError
+ * @return {String|Boolean} Payload
  */
-export function assertedType (data, type) {
+export function assertedType (data, type, forceError = false) {
   if (RegExp(`^${type}_.+$`).test(data)) {
     return data.split('_')[1]
   } else {
-    throw Error(`Data doesn't match expected type ${type}`)
+    if (!forceError) throw Error(`Data doesn't match expected type ${type}`)
+    return false
   }
 }
 
@@ -498,7 +499,7 @@ export function encodeTx (txData) {
  * @return {Boolean} Valid?
  */
 export function isValidKeypair (privateKey, publicKey) {
-  const message = 'TheMessage'
+  const message = Buffer.from('TheMessage')
   const signature = sign(message, privateKey)
   return verify(message, signature, publicKey)
 }
@@ -512,16 +513,16 @@ export function isValidKeypair (privateKey, publicKey) {
  * @param {Object} env - Environment
  * @return {Object} Key pair
  */
-export function envKeypair (env) {
+export function envKeypair (env, force = false) {
   const keypair = {
-    secretKey: env['WALLET_PRIV'],
-    publicKey: env['WALLET_PUB']
+    secretKey: env.WALLET_PRIV,
+    publicKey: env.WALLET_PUB
   }
 
   if (keypair.publicKey && keypair.secretKey) {
     return keypair
   } else {
-    throw Error('Environment variables WALLET_PRIV and WALLET_PUB need to be set')
+    if (!force) throw Error('Environment variables WALLET_PRIV and WALLET_PUB need to be set')
   }
 }
 

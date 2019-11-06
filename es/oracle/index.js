@@ -22,8 +22,8 @@
  * @example import ContractBase from '@aeternity/aepp-sdk/es/oracle'
  */
 
-import stampit from '@stamp/it'
 import { required } from '@stamp/required'
+import stampit from '@stamp/it'
 
 /**
  * Basic Oracle Stamp

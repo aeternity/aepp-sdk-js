@@ -33,6 +33,8 @@ import { isBase64 } from '../utils/crypto'
 import ContractCompilerAPI from '../contract/compiler'
 import ContractBase from '../contract'
 import ContractACI from '../contract/aci'
+import BigNumber from 'bignumber.js'
+import NodePool from '../node-pool'
 
 /**
  * Handle contract call error
@@ -53,7 +55,6 @@ async function handleCallError (result) {
   const decodedError = await this.contractDecodeDataAPI('string', error)
   throw Object.assign(Error(`Invocation failed: ${error}. Decoded: ${decodedError}`), R.merge(result, { error, decodedError }))
 }
-
 /**
  * Encode call data for contract call
  * @function
@@ -62,10 +63,13 @@ async function handleCallError (result) {
  * @param {String} source Contract source code
  * @param {String} name Name of function to call
  * @param {Array} args Argument's for call
+ * @param {Object} [options={}]  Options
+ * @param {Object} [options.filesystem={}] Contract external namespaces map
+ * @param {Object} [options.backend='fate'] Compiler backend
  * @return {Promise<String>}
  */
-async function contractEncodeCall (source, name, args) {
-  return this.contractEncodeCallDataAPI(source, name, args)
+async function contractEncodeCall (source, name, args, options) {
+  return this.contractEncodeCallDataAPI(source, name, args, options)
 }
 
 /**
@@ -77,10 +81,11 @@ async function contractEncodeCall (source, name, args) {
  * @param {String } fn - function name
  * @param {String} callValue - result call data
  * @param {String} callResult - result status
+ * @param {Object} [options={}]  Options
+ * @param {Object} [options.filesystem={}] Contract external namespaces map
  * @return {Promise<String>} Result object
  * @example
  * const decodedData = await client.contractDecodeData(SourceCode ,'functionName', 'cb_asdasdasd...', 'ok|revert')lt
- * @param options
  */
 async function contractDecodeData (source, fn, callValue, callResult, options) {
   return this.contractDecodeCallResultAPI(source, fn, callValue, callResult, options)
@@ -95,9 +100,11 @@ async function contractDecodeData (source, fn, callValue, callResult, options) {
  * @param {String} address Contract address
  * @param {String} name Name of function to call
  * @param {Array} args  Argument's for call function
- * @param {Object} options [options={}]  Options
- * @param {String} top [options.top] Block hash on which you want to call contract
+ * @param {Object} [options={}]  Options
+ * @param {String} [options.top] Block hash on which you want to call contract
+ * @param bytecode
  * @param {String} options [options.options]  Transaction options (fee, ttl, gas, amount, deposit)
+ * @param {Object} filesystem [options.options.filesystem] Contract external namespaces map
  * @return {Promise<Object>} Result object
  * @example
  * const callResult = await client.contractCallStatic(source, address, fnName, args = [], { top, options = {} })
@@ -106,28 +113,51 @@ async function contractDecodeData (source, fn, callValue, callResult, options) {
  *   decode: (type) => Decode call result
  * }
  */
-async function contractCallStatic (source, address, name, args = [], { top, options = {} } = {}) {
+async function contractCallStatic (source, address, name, args = [], { top, options = {}, bytecode } = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const callerId = await this.address()
+  const callerId = opt.onAccount
+    ? await this.address(opt)
+    : await this.address().catch(e => opt.dryRunAccount.pub)
+
+  // Prepare call-data
+  const callData = await this.contractEncodeCall(source, name, args, opt)
 
   // Get block hash by height
   if (top && !isNaN(top)) {
     top = (await this.getKeyBlock(top)).hash
   }
+  // Prepare nonce
+  const nonce = top ? (await this.getAccount(callerId, { hash: top })).nonce + 1 : undefined
+  if (name === 'init') {
+    // Prepare deploy transaction
+    const { tx } = await this.contractCreateTx(R.merge(opt, {
+      callData,
+      code: bytecode,
+      ownerId: callerId,
+      nonce
+    }))
+    return this.dryRunContractTx(tx, callerId, source, name, { ...opt, top })
+  } else {
+    // Prepare `call` transaction
+    const tx = await this.contractCallTx(R.merge(opt, {
+      callerId,
+      contractId: address,
+      callData,
+      nonce
+    }))
+    return this.dryRunContractTx(tx, callerId, source, name, { ...opt, top })
+  }
+}
 
-  // Prepare `call` transaction
-  const tx = await this.contractCallTx(R.merge(opt, {
-    callerId,
-    contractId: address,
-    callData: await this.contractEncodeCall(source, name, args),
-    nonce: top ? (await this.getAccount(callerId, { hash: top })).nonce + 1 : undefined
-  }))
-
+async function dryRunContractTx (tx, callerId, source, name, opt = {}) {
+  const { top } = opt
   // Dry-run
-  const [{ result: status, callObj, reason }] = (await this.txDryRun([tx], [{
-    amount: opt.amount,
+  const dryRunAmount = BigNumber(opt.dryRunAccount.amount).gt(BigNumber(opt.amount || 0)) ? opt.dryRunAccount.amount : opt.amount
+  const dryRunAccount = {
+    amount: dryRunAmount,
     pubKey: callerId
-  }], top)).results
+  }
+  const [{ result: status, callObj, reason }] = (await this.txDryRun([tx], [dryRunAccount], top)).results
 
   // check response
   if (status !== 'ok') throw new Error('Dry run error, ' + reason)
@@ -137,7 +167,7 @@ async function contractCallStatic (source, address, name, args = [], { top, opti
   }
   return {
     result: callObj,
-    decode: () => this.contractDecodeData(source, name, returnValue, returnType, options)
+    decode: () => this.contractDecodeData(source, name, returnValue, returnType, opt)
   }
 }
 
@@ -150,8 +180,8 @@ async function contractCallStatic (source, address, name, args = [], { top, opti
  * @param {String} address Contract address
  * @param {String} name Name of function to call
  * @param {Array} args Argument's for call function
- * @param {Object} options Transaction options (fee, ttl, gas, amount, deposit)
- * @return {Promise<Object>} Result object
+ * @param {Object} [options={}] Transaction options (fee, ttl, gas, amount, deposit)
+ * @param {Object} [options.filesystem={}] Contract external namespaces map* @return {Promise<Object>} Result object
  * @example
  * const callResult = await client.contractCall(source, address, fnName, args = [], options)
  * {
@@ -164,9 +194,9 @@ async function contractCall (source, address, name, args = [], options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
 
   const tx = await this.contractCallTx(R.merge(opt, {
-    callerId: await this.address(),
+    callerId: await this.address(opt),
     contractId: address,
-    callData: await this.contractEncodeCall(source, name, args)
+    callData: await this.contractEncodeCall(source, name, args, opt)
   }))
 
   const { hash, rawTx } = await this.send(tx, opt)
@@ -177,7 +207,7 @@ async function contractCall (source, address, name, args = [], options = {}) {
       hash,
       rawTx,
       result,
-      decode: () => this.contractDecodeData(source, name, result.returnValue, result.returnType)
+      decode: () => this.contractDecodeData(source, name, result.returnValue, result.returnType, opt)
     }
   } else {
     await this.handleCallError(result)
@@ -192,7 +222,8 @@ async function contractCall (source, address, name, args = [], options = {}) {
  * @param {String} code Compiled contract
  * @param {String} source Contract source code
  * @param {Array} initState Arguments of contract constructor(init) function
- * @param {Object} options Transaction options (fee, ttl, gas, amount, deposit)
+ * @param {Object} [options={}] Transaction options (fee, ttl, gas, amount, deposit)
+ * @param {Object} [options.filesystem={}] Contract external namespaces map* @return {Promise<Object>} Result object
  * @return {Promise<Object>} Result object
  * @example
  * const deployed = await client.contractDeploy(bytecode, source, init = [], options)
@@ -208,8 +239,8 @@ async function contractCall (source, address, name, args = [], options = {}) {
  */
 async function contractDeploy (code, source, initState = [], options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const callData = await this.contractEncodeCall(source, 'init', initState)
-  const ownerId = await this.address()
+  const callData = await this.contractEncodeCall(source, 'init', initState, opt)
+  const ownerId = await this.address(opt)
 
   const { tx, contractId } = await this.contractCreateTx(R.merge(opt, {
     callData,
@@ -227,8 +258,8 @@ async function contractDeploy (code, source, initState = [], options = {}) {
       transaction: hash,
       rawTx,
       address: contractId,
-      call: async (name, args = [], options) => this.contractCall(source, contractId, name, args, options),
-      callStatic: async (name, args = [], options) => this.contractCallStatic(source, contractId, name, args, options),
+      call: async (name, args = [], options = {}) => this.contractCall(source, contractId, name, args, R.merge(opt, options)),
+      callStatic: async (name, args = [], options = {}) => this.contractCallStatic(source, contractId, name, args, { ...options, options: { onAccount: opt.onAccount, ...R.merge(opt, options.options) } }),
       createdAt: new Date()
     })
   } else {
@@ -242,7 +273,9 @@ async function contractDeploy (code, source, initState = [], options = {}) {
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
  * @param {String} source Contract sourece code
- * @param {Object} options Transaction options (fee, ttl, gas, amount, deposit)
+ * @param {Object} [options={}] Transaction options (fee, ttl, gas, amount, deposit)
+ * @param {Object} [options.filesystem={}] Contract external namespaces map* @return {Promise<Object>} Result object
+ * @param {Object} [options.backend='aevm'] Contract backend version (aevm|fate)
  * @return {Promise<Object>} Result object
  * @example
  * const compiled = await client.contractCompile(SOURCE_CODE)
@@ -253,10 +286,12 @@ async function contractDeploy (code, source, initState = [], options = {}) {
  * }
  */
 async function contractCompile (source, options = {}) {
+  const opt = R.merge(this.Ae.defaults, options)
   const bytecode = await this.compileContractAPI(source, options)
   return Object.freeze(Object.assign({
-    encodeCall: async (name, args) => this.contractEncodeCall(source, name, args),
-    deploy: async (init, options = {}) => this.contractDeploy(bytecode, source, init, options)
+    encodeCall: async (name, args) => this.contractEncodeCall(source, name, args, R.merge(opt, options)),
+    deploy: async (init, options = {}) => this.contractDeploy(bytecode, source, init, R.merge(opt, options)),
+    deployStatic: async (init, options = {}) => this.contractCallStatic(source, null, 'init', init, { bytecode, top: options.top, options: R.merge(opt, options) })
   }, { bytecode }))
 }
 
@@ -289,7 +324,7 @@ async function contractCompile (source, options = {}) {
  * const client = await ContractWithAe({ url, internalUrl, compilerUrl, keypair, ... })
  *
  */
-export const Contract = Ae.compose(ContractBase, ContractACI, {
+export const ContractAPI = Ae.compose(ContractBase, ContractACI, {
   methods: {
     contractCompile,
     contractCallStatic,
@@ -297,6 +332,7 @@ export const Contract = Ae.compose(ContractBase, ContractACI, {
     contractCall,
     contractEncodeCall,
     contractDecodeData,
+    dryRunContractTx,
     handleCallError
   },
   deepProps: {
@@ -306,12 +342,13 @@ export const Contract = Ae.compose(ContractBase, ContractACI, {
         gasPrice: 1000000000, // min gasPrice 1e9
         amount: 0,
         gas: 1600000 - 21000,
-        options: ''
+        options: '',
+        dryRunAccount: { pub: 'ak_11111111111111111111111111111111273Yts', amount: '100000000000000000000000000000000000' }
       }
     }
   }
 })
 
+export const Contract = ContractAPI.compose(NodePool)
 export const ContractWithCompiler = Contract.compose(ContractCompilerAPI)
-
 export default ContractWithCompiler

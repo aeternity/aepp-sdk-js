@@ -6,7 +6,7 @@ noted that `Ae.create` is asynchronous which needs to be taken into account.
 ```bash
 vue init webpack my-project
 cd my-project
-npm add @aeternity/aepp-sdk
+npm install @aeternity/aepp-sdk
 ```
 
 ```html

@@ -3,7 +3,6 @@
 ## @aeternity/aepp-sdk/es/contract/aci
 ContractACI module
 
-**Export**: ContractACI  
 **Example**  
 ```js
 import ContractACI from '@aeternity/aepp-sdk/es/contract/aci'
@@ -14,7 +13,7 @@ import ContractACI from '@aeternity/aepp-sdk/es/contract/aci'
     * [instance.deploy](#exp_module_@aeternity/aepp-sdk/es/contract/aci--instance.deploy) ⇒ `ContractInstance` ⏏
     * [instance.call](#exp_module_@aeternity/aepp-sdk/es/contract/aci--instance.call) ⇒ `Object` ⏏
     * [getContractInstance(source, [options])](#exp_module_@aeternity/aepp-sdk/es/contract/aci--getContractInstance) ⇒ `ContractInstance` ⏏
-    * [ContractACI()](#exp_module_@aeternity/aepp-sdk/es/contract/aci--ContractACI) ⇒ `Object` ⏏
+    * [module.exports()](#exp_module_@aeternity/aepp-sdk/es/contract/aci--module.exports) ⇒ `Object` ⏏
 
 <a id="exp_module_@aeternity/aepp-sdk/es/contract/aci--instance.compile"></a>
 
@@ -60,30 +59,32 @@ Call contract function
 <a id="exp_module_@aeternity/aepp-sdk/es/contract/aci--getContractInstance"></a>
 
 ### getContractInstance(source, [options]) ⇒ `ContractInstance` ⏏
-Generate contract ACI object with predefined js methods for contract usage
+Generate contract ACI object with predefined js methods for contract usage - can be used for creating a reference to already deployed contracts
 
 **Kind**: Exported function  
 **Returns**: `ContractInstance` - JS Contract API  
 
-| Param | Type | Description |
-| --- | --- | --- |
-| source | `String` | Contract source code |
-| [options] | `Object` | Options object |
-| [options.aci] | `Object` | Contract ACI |
-| [options.contractAddress] | `Object` | Contract address |
-| [options.opt] | `Object` | Contract options |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| source | `String` |  | Contract source code |
+| [options] | `Object` | <code>{}</code> | Options object |
+| [options.aci] | `Object` |  | Contract ACI |
+| [options.contractAddress] | `Object` |  | Contract address |
+| [options.filesystem] | `Object` |  | Contact source external namespaces map |
+| [options.opt] | `Object` |  | Contract options |
 
 **Example**  
 ```js
 const contractIns = await client.getContractInstance(sourceCode)
-await contractIns.compile()
-await contractIns.deploy([321])
-const callResult = await contractIns.call('setState', [123])
-const staticCallResult = await contractIns.call('setState', [123], { callStatic: true })
+await contractIns.deploy([321]) or await contractIns.methods.init(321)
+const callResult = await contractIns.call('setState', [123]) or await contractIns.methods.setState.send(123, options)
+const staticCallResult = await contractIns.call('setState', [123], { callStatic: true }) or await contractIns.methods.setState.get(123, options)
+Also you can call contract like: await contractIns.methods.setState(123, options)
+Then sdk decide to make on-chain or static call(dry-run API) transaction based on function is stateful or not
 ```
-<a id="exp_module_@aeternity/aepp-sdk/es/contract/aci--ContractACI"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/contract/aci--module.exports"></a>
 
-### ContractACI() ⇒ `Object` ⏏
+### module.exports() ⇒ `Object` ⏏
 Contract ACI Stamp
 
 **Kind**: Exported function  

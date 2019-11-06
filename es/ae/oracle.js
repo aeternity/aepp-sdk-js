@@ -45,6 +45,7 @@ async function getOracleObject (oracleId) {
   return {
     ...oracle,
     queries,
+    pollQueries: (onQuery, { interval } = {}) => this.pollForQueries(oracleId, onQuery, { interval }),
     postQuery: (query, options) => this.postQueryToOracle(oracleId, query, options),
     respondToQuery: (queryId, response, options) => this.respondToQuery(oracleId, queryId, response, options),
     extendOracle: (oracleTtl, options) => this.extendOracleTtl(oracleId, oracleTtl, options),
@@ -52,6 +53,35 @@ async function getOracleObject (oracleId) {
       return getQueryObject.bind(this)(oracleId, queryId)
     }
   }
+}
+
+/**
+ * Poll for oracle queries
+ * @alias module:@aeternity/aepp-sdk/es/ae/oracle
+ * @instance
+ * @function
+ * @category async
+ * @param {String} oracleId Oracle public key
+ * @param {Function} onQuery OnQuery callback
+ * @param {Object} [options] Options object
+ * @param {Object} [options.interval] Poll interval(default: 5000)
+ * @return {Function} stopPolling - Stop polling function
+ */
+async function pollForQueries (oracleId, onQuery, { interval = 5000 } = {}) {
+  const queries = (await this.getOracleQueries(oracleId)).oracleQueries || []
+  let quriesIds = queries.map(q => q.id)
+  onQuery(queries)
+
+  async function pollQueries () {
+    const { oracleQueries: q } = await this.getOracleQueries(oracleId)
+    const newQueries = q.filter(({ id }) => !quriesIds.includes(id))
+    if (newQueries.length) {
+      quriesIds = [...quriesIds, ...newQueries.map(a => a.id)]
+      onQuery(newQueries)
+    }
+  }
+  const intervalId = setInterval(pollQueries.bind(this), interval)
+  return () => clearInterval(intervalId)
 }
 
 /**
@@ -115,15 +145,15 @@ export async function pollForQueryResponse (oracleId, queryId, { attempts = 20, 
  * @param {String} responseFormat Format of query response
  * @param {Object} [options={}] Options
  * @param {String|Number} [options.queryFee] queryFee Oracle query Fee
- * @param {String|Number} [options.oracleTtl] oracleTtl OracleTtl object {type: 'delta|block', value: 'number'}
- * @param {Number} [options.vmVersion] vmVersion Always 0 (do not use virtual machine)
+ * @param {Object} [options.oracleTtl] oracleTtl OracleTtl object {type: 'delta|block', value: 'number'}
+ * @param {Number} [options.abiVersion] abiVersion Always 0 (do not use virtual machine)
  * @param {Number} [options.fee] fee Transaction fee
  * @param {Number} [options.ttl] Transaction time to leave
  * @return {Promise<Object>} Oracle object
  */
 async function registerOracle (queryFormat, responseFormat, options = {}) {
   const opt = R.merge(this.Ae.defaults, options) // Preset VmVersion for oracle
-  const accountId = await this.address()
+  const accountId = await this.address(opt)
 
   const oracleRegisterTx = await this.oracleRegisterTx(R.merge(opt, {
     accountId,
@@ -154,7 +184,7 @@ async function registerOracle (queryFormat, responseFormat, options = {}) {
  */
 async function postQueryToOracle (oracleId, query, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const senderId = await this.address()
+  const senderId = await this.address(opt)
 
   const { tx: oracleRegisterTx, queryId } = await this.oraclePostQueryTx(R.merge(opt, {
     oracleId,
@@ -182,7 +212,7 @@ async function postQueryToOracle (oracleId, query, options = {}) {
  */
 async function extendOracleTtl (oracleId, oracleTtl, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const callerId = await this.address()
+  const callerId = await this.address(opt)
 
   const oracleExtendTx = await this.oracleExtendTx(R.merge(opt, {
     oracleId,
@@ -212,7 +242,7 @@ async function extendOracleTtl (oracleId, oracleTtl, options = {}) {
  */
 async function respondToQuery (oracleId, queryId, response, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const callerId = await this.address()
+  const callerId = await this.address(opt)
 
   const oracleRespondTx = await this.oracleRespondTx(R.merge(opt, {
     oracleId,
@@ -244,15 +274,20 @@ const Oracle = Ae.compose({
     extendOracleTtl,
     postQueryToOracle,
     pollForQueryResponse,
+    pollForQueries,
     getOracleObject,
     getQueryObject
   },
-  deepProps: { Ae: { defaults: {
-    queryFee: 30000,
-    oracleTtl: { type: 'delta', value: 500 },
-    queryTtl: { type: 'delta', value: 10 },
-    responseTtl: { type: 'delta', value: 10 }
-  } } }
+  deepProps: {
+    Ae: {
+      defaults: {
+        queryFee: 30000,
+        oracleTtl: { type: 'delta', value: 500 },
+        queryTtl: { type: 'delta', value: 10 },
+        responseTtl: { type: 'delta', value: 10 }
+      }
+    }
+  }
 })
 
 export default Oracle

@@ -20,7 +20,8 @@ import { describe, it } from 'mocha'
 import { assert, expect } from 'chai'
 import * as Crypto from '../../es/utils/crypto'
 
-import { addressToHex, encodeBase58Check } from '../../es/utils/crypto'
+import { buildTxHash, unpackTx } from '../../es/tx/builder'
+import { encryptData, decryptData, addressToHex, encodeBase58Check } from '../../es/utils/crypto'
 import { encryptData } from '../../es/utils/crypto'
 import { decryptData } from '../../es/utils/crypto'
 
@@ -36,6 +37,9 @@ const txBinary = Buffer.from(txBinaryAsArray)
 const signatureAsArray = [95, 146, 31, 37, 95, 194, 36, 76, 58, 49, 167, 156, 127, 131, 142, 248, 25, 121, 139, 109, 59, 243, 203, 205, 16, 172, 115, 143, 254, 236, 33, 4, 43, 46, 16, 190, 46, 46, 140, 166, 76, 39, 249, 54, 38, 27, 93, 159, 58, 148, 67, 198, 81, 206, 106, 237, 91, 131, 27, 14, 143, 178, 130, 2]
 const signature = Buffer.from(signatureAsArray)
 
+const txRaw = `tx_+QTlCwH4QrhA4xEWFIGZUVn0NhnYl9TwGX30YJ9/Y6x6LHU6ALfiupJPORvjbiUowrNgLtKnvt7CvtweY0N/THhwn8WUlPJfDrkEnPkEmSoBoQFj/aG9TnbDDSLtstOaR3E1i0Tcexu1UutStbkmXRBdzAG5A/j5A/VGAqAmKh8Xm79E6zTwogrUezzUmpJlC5Cdjc1KXtWLnJIrbvkC+/kBKqBo8mdjOP9QiDmrpHdJ7/qL6H7yhPIH+z2ZmHAc1TiHxYRtYWluuMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoP//////////////////////////////////////////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD5AcuguclW8osxSan1mHqlBfPaGyIJzFc5I0AGK7bBvZ+fmeqEaW5pdLhgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA///////////////////////////////////////////uQFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQD//////////////////////////////////////////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//////////////////////////////////////////+4zGIAAGRiAACEkYCAgFF/uclW8osxSan1mHqlBfPaGyIJzFc5I0AGK7bBvZ+fmeoUYgAAwFdQgFF/aPJnYzj/UIg5q6R3Se/6i+h+8oTyB/s9mZhwHNU4h8UUYgAAr1dQYAEZUQBbYAAZWWAgAZCBUmAgkANgA4FSkFlgAFFZUmAAUmAA81tgAIBSYADzW1lZYCABkIFSYCCQA2AAGVlgIAGQgVJgIJADYAOBUoFSkFZbYCABUVFZUICRUFCAkFCQVltQUIKRUFBiAACMVoUzLjIuMIMEAAGGWa0Z+ZAAAAQBgxgX+IQ7msoAuGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAILnJVvKLMUmp9Zh6pQXz2hsiCcxXOSNABiu2wb2fn5nqAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB95HF6'`
+const expectedHash = 'th_HZMNgTvEiyKeATpauJjjeWwZcyHapKG8bDgy2S1sCUEUQnbwK'
+
 describe('crypto', () => {
   describe('generateKeyPair', () => {
     it('generates an account key pair', () => {
@@ -44,6 +48,15 @@ describe('crypto', () => {
       assert.isTrue(keyPair.publicKey.startsWith('ak_'))
       assert.isAtLeast(keyPair.publicKey.length, 51)
       assert.isAtMost(keyPair.publicKey.length, 53)
+    })
+  })
+
+  describe('isValidKeypair', () => {
+    it('verify the generated key pair', () => {
+      const keyPair = Crypto.generateKeyPair(true)
+      assert.ok(keyPair)
+      const verifyResult = Crypto.isValidKeypair(keyPair.secretKey, keyPair.publicKey)
+      assert.isTrue(verifyResult)
     })
   })
 
@@ -140,9 +153,14 @@ describe('crypto', () => {
   })
   it('Convert base58Check address to hex', () => {
     const address = 'ak_Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm'
-    const hex = addressToHex(address)
-    const fromHexAddress = 'ak_' + encodeBase58Check(Buffer.from(hex.slice(2), 'hex'))
+    const hex = Crypto.addressToHex(address)
+    const fromHexAddress = 'ak_' + Crypto.encodeBase58Check(Buffer.from(hex.slice(2), 'hex'))
     fromHexAddress.should.be.equal(address)
+  })
+  it('Can produce tx hash', () => {
+    const rlpEncodedTx = unpackTx(txRaw).rlpEncoded
+    buildTxHash(txRaw).should.be.equal(expectedHash)
+    buildTxHash(rlpEncodedTx).should.be.equal(expectedHash)
   })
   describe('Encrypt data using nacl box asymmetric encryption', async () => {
     const { publicKey, secretKey } = Crypto.generateKeyPair()

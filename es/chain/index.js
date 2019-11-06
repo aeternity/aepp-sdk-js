@@ -42,8 +42,8 @@ const Chain = Oracle.compose({
   deepConf: {
     Ae: {
       methods: [
-        'sendTransaction', 'height', 'awaitHeight', 'poll', 'balance', 'tx',
-        'mempool', 'topBlock', 'getTxInfo', 'txDryRun', 'getName', 'getNodeInfo'
+        'sendTransaction', 'height', 'awaitHeight', 'poll', 'balance', 'getBalance', 'tx',
+        'mempool', 'topBlock', 'getTxInfo', 'txDryRun', 'getName', 'getNodeInfo', 'getAccount'
       ]
     }
   }
@@ -55,10 +55,12 @@ const Chain = Oracle.compose({
     topBlock: required,
     poll: required,
     balance: required,
+    getBalance: required,
     tx: required,
     getTxInfo: required,
     mempool: required,
-    txDryRun: required
+    txDryRun: required,
+    getAccount: required
   }
 }))
 

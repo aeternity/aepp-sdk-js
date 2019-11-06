@@ -42,7 +42,7 @@ async function receive ({ data, origin, source }) {
     (this.rpcMethods[method] || error).bind(this),
     { params, session: this.rpcSessions[session], origin }
   ).then(result => {
-    const resolve = typeof result === 'object'
+    const resolve = typeof result === 'object' && Object.prototype.toString.call(result) === '[object Object]'
       ? Object.entries(result)
         .filter(([key, value]) => typeof value !== 'function')
         .reduce((p, [key, value]) => ({ ...p, [key]: value }), {})

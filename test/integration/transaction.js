@@ -23,12 +23,13 @@ import { commitmentHash } from '../../es/tx/builder/helpers'
 const nonce = 1
 const nameTtl = 1
 const clientTtl = 1
-const amount = 1
+const amount = 0
 const senderId = 'ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688'
 const recipientId = 'ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688'
 const name = 'test123test.test'
 const nameHash = `nm_${encodeBase58Check(Buffer.from(name))}`
 const nameId = 'nm_2sFnPHi5ziAqhdApSpRBsYdomCahtmk3YGNZKYUTtUNpVSMccC'
+const nameFee = '1000000000000000000000'
 const pointers = [{ key: 'account_pubkey', id: senderId }]
 
 // Oracle
@@ -36,16 +37,15 @@ const queryFormat = '{\'city\': str}'
 const responseFormat = '{\'tmp\': num}'
 const queryFee = 30000
 const oracleTtl = { type: 'delta', value: 500 }
-const responseTtl = { type: 'delta', value: 10 }
-const queryTtl = { type: 'delta', value: 10 }
+const responseTtl = { type: 'delta', value: 100 }
+const queryTtl = { type: 'delta', value: 100 }
 const query = '{\'city\': \'Berlin\'}'
 const queryResponse = '{\'tmp\': 101}'
 
 // Contract test data
 const contractCode = `
 contract Identity =
-  type state = ()
-  function main(x : int) = x
+  entrypoint main(x : int) = x
 `
 let contractId
 const deposit = 4
@@ -92,13 +92,15 @@ describe('Native Transaction', function () {
       accountId: senderId,
       nonce,
       name: nameHash,
-      nameSalt: _salt
+      nameSalt: _salt,
+      nameFee
     })
     const nativeTx = await clientNative.nameClaimTx({
       accountId: senderId,
       nonce,
       name: nameHash,
-      nameSalt: _salt
+      nameSalt: _salt,
+      nameFee
     })
     txFromAPI.should.be.equal(nativeTx)
   })

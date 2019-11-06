@@ -2,12 +2,14 @@ import nacl from 'tweetnacl'
 import uuid from 'uuid'
 
 import { encodeBase58Check, isBase64 } from './crypto'
+import { isHex } from './string'
 
 /**
  * KeyStore module
  * !!!Work only in node.js!!!
  * @module @aeternity/aepp-sdk/es/utils/keystore
- * @example import * as Crypto from '@aeternity/aepp-sdk/es/utils/keystore'
+ * @example import * as Keystore from '@aeternity/aepp-sdk/es/utils/keystore'
+ * @example const { Keystore } = require('@aeternity/aepp-sdk')
  */
 
 const DEFAULTS = {
@@ -25,7 +27,7 @@ const DEFAULTS = {
 
 // DERIVED KEY PART
 const DERIVED_KEY_FUNCTIONS = {
-  'argon2id': deriveKeyUsingArgon2id
+  argon2id: deriveKeyUsingArgon2id
 }
 
 export async function deriveKeyUsingArgon2id (password, salt, options) {
@@ -68,15 +70,6 @@ function decryptXsalsa20Poly1305 ({ ciphertext, key, nonce }) {
   const res = nacl.secretbox.open(ciphertext, nonce, key)
   if (!res) throw new Error('Invalid password or nonce')
   return res
-}
-
-/**
- * Check whether a string is valid hex.
- * @param {string} str String to validate.
- * @return {boolean} True if the string is valid hex, false otherwise.
- */
-function isHex (str) {
-  return !!(str.length % 2 === 0 && str.match(/^[0-9a-f]+$/i))
 }
 
 /**
@@ -137,7 +130,7 @@ async function deriveKey (password, nonce, options = {
     throw new Error('Must provide password and nonce to derive a key')
   }
 
-  if (!DERIVED_KEY_FUNCTIONS.hasOwnProperty(options.kdf)) throw new Error('Unsupported kdf type')
+  if (!Object.prototype.hasOwnProperty.call(DERIVED_KEY_FUNCTIONS, options.kdf)) throw new Error('Unsupported kdf type')
 
   return DERIVED_KEY_FUNCTIONS[options.kdf](password, nonce, options)
 }
@@ -231,10 +224,10 @@ export function validateKeyObj (obj) {
   const root = ['crypto', 'id', 'version', 'public_key']
   const cryptoKeys = ['cipher_params', 'ciphertext', 'symmetric_alg', 'kdf', 'kdf_params']
 
-  const missingRootKeys = root.filter(key => !obj.hasOwnProperty(key))
+  const missingRootKeys = root.filter(key => !Object.prototype.hasOwnProperty.call(obj, key))
   if (missingRootKeys.length) throw new Error(`Invalid key file format. Require properties: ${missingRootKeys}`)
 
-  const missingCryptoKeys = cryptoKeys.filter(key => !obj['crypto'].hasOwnProperty(key))
+  const missingCryptoKeys = cryptoKeys.filter(key => !Object.prototype.hasOwnProperty.call(obj.crypto, key))
   if (missingCryptoKeys.length) throw new Error(`Invalid key file format. Require properties: ${missingCryptoKeys}`)
 
   return true

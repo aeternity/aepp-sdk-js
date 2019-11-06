@@ -23,10 +23,10 @@ plan('100000000000000000000')
 
 describe('Oracle', function () {
   configure(this)
-  let client;
-  let oracle;
-  let query;
-  let queryResponse = "{'tmp': 30}";
+  let client
+  let oracle
+  let query
+  const queryResponse = "{'tmp': 30}"
 
   before(async function () {
     client = await ready(this)
@@ -50,8 +50,25 @@ describe('Oracle', function () {
     query.decode(query.query).toString().should.be.equal("{'city': 'Berlin'}")
   })
 
+  it('Pool for queries', async () => {
+    let queries = []
+    const stopPolling = await oracle.pollQueries((q) => {
+      queries = [...q.map(a => a.id), ...queries]
+    }, { interval: 100 })
+    await oracle.postQuery("{'city': 'Berlin2'}")
+    await oracle.postQuery("{'city': 'Berlin3'}")
+    await oracle.postQuery("{'city': 'Berlin4'}")
+    await (new Promise((resolve) => {
+      setTimeout(() => {
+        stopPolling()
+        resolve()
+      }, 1000)
+    }))
+    queries.length.should.be.equal(4)
+  })
+
   it('Poll for response for query without response', async () => {
-    return await query.pollForResponse({ attempts: 2, interval: 1000 }).should.be.rejectedWith(Error)
+    return query.pollForResponse({ attempts: 2, interval: 1000 }).should.be.rejectedWith(Error)
   })
 
   it('Respond to query', async () => {

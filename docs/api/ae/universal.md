@@ -3,14 +3,13 @@
 ## @aeternity/aepp-sdk/es/ae/universal
 Universal module
 
-**Export**: Universal  
 **Example**  
 ```js
 import Ae from '@aeternity/aepp-sdk/es/ae/universal'
 ```
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/universal--Universal"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/universal--exports.Universal"></a>
 
-### Universal([options]) ⇒ `Object` ⏏
+### exports.Universal([options]) ⇒ `Object` ⏏
 Universal Stamp
 
 Universal provides Ae base functionality with Contract and Aens

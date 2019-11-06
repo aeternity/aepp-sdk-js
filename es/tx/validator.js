@@ -12,7 +12,7 @@ import {
   SIGNATURE_VERIFICATION_SCHEMA, TX_TYPE
 } from './builder/schema'
 import { calculateFee, unpackTx } from './builder'
-import Node from '../node'
+import { NodePool } from '../node-pool'
 
 /**
  * Transaction validator
@@ -84,7 +84,7 @@ const resolveDataForBase = async (chain, { ownerPublicKey }) => {
     balance: accountBalance,
     accountNonce,
     ownerPublicKey,
-    consensusProtocolVersion: chain.consensusProtocolVersion
+    ...chain.getNodeInfo()
   }
 }
 
@@ -133,7 +133,7 @@ async function unpackAndVerify (txHash, { networkId } = {}) {
 }
 
 const getOwnerPublicKey = (tx) =>
-  tx[['senderId', 'accountId', 'ownerId', 'callerId', 'oracleId', 'fromId', 'initiator'].find(key => tx[key])].replace('ok_', 'ak_')
+  tx[['senderId', 'accountId', 'ownerId', 'callerId', 'oracleId', 'fromId', 'initiator', 'gaId'].find(key => tx[key])].replace('ok_', 'ak_')
 
 /**
  * Verify transaction (verify nonce, ttl, fee, signature, account balance)
@@ -148,10 +148,10 @@ const getOwnerPublicKey = (tx) =>
  * @return {Promise<Array>} Object with verification errors and warnings
  */
 async function verifyTx ({ tx, signatures, rlpEncoded }, networkId) {
-  networkId = networkId || this.nodeNetworkId || 'ae_mainnet'
+  networkId = networkId || this.getNetworkId() || 'ae_mainnet'
   // Fetch data for verification
   const ownerPublicKey = getOwnerPublicKey(tx)
-  const gas = tx.hasOwnProperty('gas') ? +tx.gas : 0
+  const gas = Object.prototype.hasOwnProperty.call(tx, 'gas') ? +tx.gas : 0
   const txType = OBJECT_ID_TX_TYPE[+tx.tag]
   const resolvedData = {
     minFee: calculateFee(0, txType, { gas, params: tx, showWarning: false }),
@@ -206,7 +206,7 @@ function customVerification (txType, data) {
  * @return {Object} Transaction Validator instance
  * @example TransactionValidator({url: 'https://sdk-testnet.aepps.com'})
  */
-const TransactionValidator = Node.compose({
+const TransactionValidator = NodePool.compose({
   methods: {
     verifyTx,
     unpackAndVerify

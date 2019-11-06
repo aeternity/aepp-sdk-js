@@ -9,55 +9,58 @@ import ContractBase from '@aeternity/aepp-sdk/es/contract'
 ```
 
 * [@aeternity/aepp-sdk/es/contract](#module_@aeternity/aepp-sdk/es/contract)
-    * [ContractBase([options])](#exp_module_@aeternity/aepp-sdk/es/contract--ContractBase) ⇒ `Object` ⏏
-        * *[.contractEncodeCallDataAPI(source, name, args)](#module_@aeternity/aepp-sdk/es/contract--ContractBase+contractEncodeCallDataAPI) ⇒ `String`*
-        * *[.contractDecodeDataAPI(type, data)](#module_@aeternity/aepp-sdk/es/contract--ContractBase+contractDecodeDataAPI) ⇒ `String`*
-        * *[.contractDecodeCallResultAPI(source, fn, callValue, callResult)](#module_@aeternity/aepp-sdk/es/contract--ContractBase+contractDecodeCallResultAPI) ⇒ `String`*
-        * *[.contractDecodeCallDataBySourceAPI(source, function, callData)](#module_@aeternity/aepp-sdk/es/contract--ContractBase+contractDecodeCallDataBySourceAPI) ⇒ `String`*
-        * *[.contractDecodeCallDataByCodeAPI(code, callData)](#module_@aeternity/aepp-sdk/es/contract--ContractBase+contractDecodeCallDataByCodeAPI) ⇒ `String`*
-        * *[.compileContractAPI(code, [options])](#module_@aeternity/aepp-sdk/es/contract--ContractBase+compileContractAPI) ⇒ `Object`*
-        * *[.setCompilerUrl(url)](#module_@aeternity/aepp-sdk/es/contract--ContractBase+setCompilerUrl) ⇒ `void`*
-        * *[.getCompilerVersion()](#module_@aeternity/aepp-sdk/es/contract--ContractBase+getCompilerVersion) ⇒ `String`*
+    * *[.contractGetACI(source, [options])](#module_@aeternity/aepp-sdk/es/contract+contractGetACI) ⇒ `Object`*
+    * *[.contractEncodeCallDataAPI(source, name, args, [options])](#module_@aeternity/aepp-sdk/es/contract+contractEncodeCallDataAPI) ⇒ `String`*
+    * *[.contractDecodeDataAPI(type, data)](#module_@aeternity/aepp-sdk/es/contract+contractDecodeDataAPI) ⇒ `String`*
+    * *[.contractDecodeCallResultAPI(source, fn, callValue, callResult, [options])](#module_@aeternity/aepp-sdk/es/contract+contractDecodeCallResultAPI) ⇒ `String`*
+    * *[.contractDecodeCallDataBySourceAPI(source, function, callData, [options])](#module_@aeternity/aepp-sdk/es/contract+contractDecodeCallDataBySourceAPI) ⇒ `String`*
+    * *[.contractDecodeCallDataByCodeAPI(code, callData, backend)](#module_@aeternity/aepp-sdk/es/contract+contractDecodeCallDataByCodeAPI) ⇒ `String`*
+    * *[.compileContractAPI(code, [options])](#module_@aeternity/aepp-sdk/es/contract+compileContractAPI) ⇒ `Object`*
+    * *[.setCompilerUrl(url)](#module_@aeternity/aepp-sdk/es/contract+setCompilerUrl) ⇒ `void`*
+    * *[.getCompilerVersion()](#module_@aeternity/aepp-sdk/es/contract+getCompilerVersion) ⇒ `String`*
 
-<a id="exp_module_@aeternity/aepp-sdk/es/contract--ContractBase"></a>
+<a id="module_@aeternity/aepp-sdk/es/contract+contractGetACI"></a>
 
-### ContractBase([options]) ⇒ `Object` ⏏
-Basic Contract Stamp
+### *@aeternity/aepp-sdk/es/contract.contractGetACI(source, [options]) ⇒ `Object`*
+Get contract ACI
 
-This stamp include api call's related to contract functionality.
-Attempting to create instances from the Stamp without overwriting all
-abstract methods using composition will result in an exception.
-
-**Kind**: Exported function  
-**Returns**: `Object` - Contract instance  
-**rtype**: `Stamp`
+**Kind**: instance abstract method of [`@aeternity/aepp-sdk/es/contract`](#module_@aeternity/aepp-sdk/es/contract)  
+**Returns**: `Object` - - Contract aci object  
+**Category**: async  
+**rtype**: `(source: String, options: Array) => aciObject: Promise[Object]`
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| [options] | `Object` | <code>{}</code> | Initializer object |
+| source | `String` |  | Contract source code |
+| [options] | `Object` | <code>{}</code> | Options |
+| [options.filesystem] | `Object` |  | Contract external namespaces map |
+| [options.backend] | `Object` |  | Contract vm(default: aevm) |
 
-<a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+contractEncodeCallDataAPI"></a>
+<a id="module_@aeternity/aepp-sdk/es/contract+contractEncodeCallDataAPI"></a>
 
-#### *contractBase.contractEncodeCallDataAPI(source, name, args) ⇒ `String`*
+### *@aeternity/aepp-sdk/es/contract.contractEncodeCallDataAPI(source, name, args, [options]) ⇒ `String`*
 Encode contract data
 
-**Kind**: instance abstract method of [`ContractBase`](#exp_module_@aeternity/aepp-sdk/es/contract--ContractBase)  
+**Kind**: instance abstract method of [`@aeternity/aepp-sdk/es/contract`](#module_@aeternity/aepp-sdk/es/contract)  
 **Returns**: `String` - - Contract encoded data  
 **Category**: async  
-**rtype**: `(source: String, name: String, args: Array) => callData: Promise[String]`
+**rtype**: `(source: String, name: String, args: Array, options: Array) => callData: Promise[String]`
 
-| Param | Type | Description |
-| --- | --- | --- |
-| source | `String` | Contract source code |
-| name | `String` | Function name |
-| args | `Array` | Function argument's |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| source | `String` |  | Contract source code |
+| name | `String` |  | Function name |
+| args | `Array` |  | Function argument's |
+| [options] | `Object` | <code>{}</code> | Options |
+| [options.filesystem] | `Object` |  | Contract external namespaces map |
+| [options.backend] | `Object` |  | Contract vm(default: aevm) |
 
-<a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+contractDecodeDataAPI"></a>
+<a id="module_@aeternity/aepp-sdk/es/contract+contractDecodeDataAPI"></a>
 
-#### *contractBase.contractDecodeDataAPI(type, data) ⇒ `String`*
+### *@aeternity/aepp-sdk/es/contract.contractDecodeDataAPI(type, data) ⇒ `String`*
 Decode data
 
-**Kind**: instance abstract method of [`ContractBase`](#exp_module_@aeternity/aepp-sdk/es/contract--ContractBase)  
+**Kind**: instance abstract method of [`@aeternity/aepp-sdk/es/contract`](#module_@aeternity/aepp-sdk/es/contract)  
 **Returns**: `String` - - Decoded contract call result  
 **Category**: async  
 **rtype**: `(type: String, data: String) => decodedResult: Promise[String]`
@@ -67,45 +70,51 @@ Decode data
 | type | `String` | Contract call result type |
 | data | `String` | Encoded contract call result |
 
-<a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+contractDecodeCallResultAPI"></a>
+<a id="module_@aeternity/aepp-sdk/es/contract+contractDecodeCallResultAPI"></a>
 
-#### *contractBase.contractDecodeCallResultAPI(source, fn, callValue, callResult) ⇒ `String`*
+### *@aeternity/aepp-sdk/es/contract.contractDecodeCallResultAPI(source, fn, callValue, callResult, [options]) ⇒ `String`*
 Decode contract call result data
 
-**Kind**: instance abstract method of [`ContractBase`](#exp_module_@aeternity/aepp-sdk/es/contract--ContractBase)  
+**Kind**: instance abstract method of [`@aeternity/aepp-sdk/es/contract`](#module_@aeternity/aepp-sdk/es/contract)  
 **Returns**: `String` - - Decoded contract call result  
 **Category**: async  
-**rtype**: `(source: String, fn: String, callValue: String, callResult: String) => decodedResult: Promise[String]`
+**rtype**: `(source: String, fn: String, callValue: String, callResult: String, options: Array) => decodedResult: Promise[String]`
 
-| Param | Type | Description |
-| --- | --- | --- |
-| source | `String` | Contract source |
-| fn | `String` | Fn name |
-| callValue | `String` | result data (cb_das...) |
-| callResult | `String` | contract call result status('ok', 'revert', ...) |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| source | `String` |  | Contract source |
+| fn | `String` |  | Fn name |
+| callValue | `String` |  | result data (cb_das...) |
+| callResult | `String` |  | contract call result status('ok', 'revert', ...) |
+| [options] | `Object` | <code>{}</code> | Options |
+| [options.filesystem] | `Object` |  | Contract external namespaces map |
+| [options.backend] | `Object` |  | Contract vm(default: aevm) |
 
-<a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+contractDecodeCallDataBySourceAPI"></a>
+<a id="module_@aeternity/aepp-sdk/es/contract+contractDecodeCallDataBySourceAPI"></a>
 
-#### *contractBase.contractDecodeCallDataBySourceAPI(source, function, callData) ⇒ `String`*
+### *@aeternity/aepp-sdk/es/contract.contractDecodeCallDataBySourceAPI(source, function, callData, [options]) ⇒ `String`*
 Decode call data by source
 
-**Kind**: instance abstract method of [`ContractBase`](#exp_module_@aeternity/aepp-sdk/es/contract--ContractBase)  
+**Kind**: instance abstract method of [`@aeternity/aepp-sdk/es/contract`](#module_@aeternity/aepp-sdk/es/contract)  
 **Returns**: `String` - - Decoded contract call data  
 **Category**: async  
-**rtype**: `(source: String, function: String, callData: String) => decodedResult: Promise[String]`
+**rtype**: `(source: String, function: String, callData: String, options: Array) => decodedResult: Promise[String]`
 
-| Param | Type | Description |
-| --- | --- | --- |
-| source | `String` | contract source |
-| function | `String` | function name |
-| callData | `String` | Encoded contract call data |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| source | `String` |  | contract source |
+| function | `String` |  | function name |
+| callData | `String` |  | Encoded contract call data |
+| [options] | `Object` | <code>{}</code> | Options |
+| [options.filesystem] | `Object` |  | Contract external namespaces map |
+| [options.backend] | `Object` |  | Contract vm(default: aevm) |
 
-<a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+contractDecodeCallDataByCodeAPI"></a>
+<a id="module_@aeternity/aepp-sdk/es/contract+contractDecodeCallDataByCodeAPI"></a>
 
-#### *contractBase.contractDecodeCallDataByCodeAPI(code, callData) ⇒ `String`*
+### *@aeternity/aepp-sdk/es/contract.contractDecodeCallDataByCodeAPI(code, callData, backend) ⇒ `String`*
 Decode call data by bytecode
 
-**Kind**: instance abstract method of [`ContractBase`](#exp_module_@aeternity/aepp-sdk/es/contract--ContractBase)  
+**Kind**: instance abstract method of [`@aeternity/aepp-sdk/es/contract`](#module_@aeternity/aepp-sdk/es/contract)  
 **Returns**: `String` - - Decoded contract call data  
 **Category**: async  
 **rtype**: `(code: String, callData: String) => decodedResult: Promise[String]`
@@ -114,13 +123,14 @@ Decode call data by bytecode
 | --- | --- | --- |
 | code | `String` | contract byte code |
 | callData | `String` | Encoded contract call data |
+| backend | `String` | Contract vm(default: aevm) |
 
-<a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+compileContractAPI"></a>
+<a id="module_@aeternity/aepp-sdk/es/contract+compileContractAPI"></a>
 
-#### *contractBase.compileContractAPI(code, [options]) ⇒ `Object`*
+### *@aeternity/aepp-sdk/es/contract.compileContractAPI(code, [options]) ⇒ `Object`*
 Compile contract
 
-**Kind**: instance abstract method of [`ContractBase`](#exp_module_@aeternity/aepp-sdk/es/contract--ContractBase)  
+**Kind**: instance abstract method of [`@aeternity/aepp-sdk/es/contract`](#module_@aeternity/aepp-sdk/es/contract)  
 **Returns**: `Object` - Object which contain bytecode of contract  
 **Category**: async  
 **rtype**: `(code: String, options?: Object) => compiledContract: Object`
@@ -129,13 +139,15 @@ Compile contract
 | --- | --- | --- | --- |
 | code | `String` |  | Contract source code |
 | [options] | `Object` | <code>{}</code> | Options |
+| [options.filesystem] | `Object` |  | Contract external namespaces map |
+| [options.backend] | `Object` |  | Contract vm(default: aevm) |
 
-<a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+setCompilerUrl"></a>
+<a id="module_@aeternity/aepp-sdk/es/contract+setCompilerUrl"></a>
 
-#### *contractBase.setCompilerUrl(url) ⇒ `void`*
+### *@aeternity/aepp-sdk/es/contract.setCompilerUrl(url) ⇒ `void`*
 Set compiler url
 
-**Kind**: instance abstract method of [`ContractBase`](#exp_module_@aeternity/aepp-sdk/es/contract--ContractBase)  
+**Kind**: instance abstract method of [`@aeternity/aepp-sdk/es/contract`](#module_@aeternity/aepp-sdk/es/contract)  
 **Category**: async  
 **rtype**: `(url: String) => void`
 
@@ -143,12 +155,12 @@ Set compiler url
 | --- | --- | --- |
 | url | `String` | Compiler url |
 
-<a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+getCompilerVersion"></a>
+<a id="module_@aeternity/aepp-sdk/es/contract+getCompilerVersion"></a>
 
-#### *contractBase.getCompilerVersion() ⇒ `String`*
+### *@aeternity/aepp-sdk/es/contract.getCompilerVersion() ⇒ `String`*
 Get Compiler Version
 
-**Kind**: instance abstract method of [`ContractBase`](#exp_module_@aeternity/aepp-sdk/es/contract--ContractBase)  
+**Kind**: instance abstract method of [`@aeternity/aepp-sdk/es/contract`](#module_@aeternity/aepp-sdk/es/contract)  
 **Returns**: `String` - Compiler version  
 **Category**: async  
 **rtype**: `() => String`

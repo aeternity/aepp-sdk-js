@@ -3,7 +3,6 @@
 ## @aeternity/aepp-sdk/es/tx/builder/helpers
 JavaScript-based Transaction builder helper function's
 
-**Export**: TxBuilderHelper  
 **Example**  
 ```js
 import TxBuilderHelper from '@aeternity/aepp-sdk/es/tx/builder/helpers'
@@ -11,6 +10,7 @@ import TxBuilderHelper from '@aeternity/aepp-sdk/es/tx/builder/helpers'
 
 * [@aeternity/aepp-sdk/es/tx/builder/helpers](#module_@aeternity/aepp-sdk/es/tx/builder/helpers)
     * [exports.buildContractId(ownerId, nonce)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.buildContractId) ⇒ `string` ⏏
+    * [exports.buildHash(prefix, data)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.buildHash) ⇒ `String` ⏏
     * [exports.formatSalt(salt)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.formatSalt) ⇒ `string` ⏏
     * [exports.decode(data, type)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.decode) ⇒ `Buffer` ⏏
     * [exports.encode(data, type)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.encode) ⇒ `String` ⏏
@@ -33,6 +33,19 @@ Build a contract public key
 | --- | --- | --- |
 | ownerId | `string` | The public key of the owner account |
 | nonce | `number` | the nonce of the transaction |
+
+<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.buildHash"></a>
+
+### exports.buildHash(prefix, data) ⇒ `String` ⏏
+Build hash
+
+**Kind**: Exported function  
+**Returns**: `String` - Transaction hash  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| prefix | `String` | Transaction hash prefix |
+| data | `Buffer` | Rlp encoded transaction buffer |
 
 <a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.formatSalt"></a>
 

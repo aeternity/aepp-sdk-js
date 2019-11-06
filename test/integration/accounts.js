@@ -39,8 +39,12 @@ describe('Accounts', function () {
       wallet.setKeypair(generateKeyPair())
     })
 
-    it('determining the balance', async () => {
+    it('determining the balance using deprecated `balance` method', async () => {
       return wallet.balance(await wallet.address()).should.be.rejectedWith(Error)
+    })
+
+    it('determining the balance', async () => {
+      return wallet.getBalance(await wallet.address()).should.eventually.be.equal('0')
     })
 
     it('spending tokens', async () => {
@@ -56,7 +60,7 @@ describe('Accounts', function () {
     })
   })
 
-  it('determines the balance', async () => {
+  it('determines the balance using `balance`', async () => {
     return wallet.balance(await wallet.address()).should.eventually.be.a('string')
   })
 
@@ -103,6 +107,36 @@ describe('Accounts', function () {
       .toString()
       .should.be
       .equal(`${spend.tx.fee + spend.tx.amount}`)
+  })
+
+  describe('Make operation on specific account without changing of current account', () => {
+    it('Can make spend on specific account', async () => {
+      const current = await wallet.address()
+      const accounts = wallet.addresses()
+      const onAccount = accounts.find(acc => acc !== current)
+      // SPEND
+      const { tx } = await wallet.spend(1, await wallet.address(), { onAccount })
+      tx.senderId.should.be.equal(onAccount)
+      current.should.be.equal(current)
+    })
+
+    it('Fail on invalid account', async () => {
+      // SPEND
+      try {
+        await wallet.spend(1, await wallet.address(), { onAccount: 1 })
+      } catch (e) {
+        e.message.should.be.equal('Invalid account address, check "onAccount" value')
+      }
+    })
+
+    it('Fail on non exist account', async () => {
+      // SPEND
+      try {
+        await wallet.spend(1, await wallet.address(), { onAccount: 'ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk' })
+      } catch (e) {
+        e.message.should.be.equal('Account for ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk not available')
+      }
+    })
   })
 
   describe('can be configured to return th', () => {

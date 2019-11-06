@@ -25,6 +25,7 @@
 import stampit from '@stamp/it'
 import axios from 'axios'
 import * as R from 'ramda'
+import AsyncInit from './utils/async-init'
 import Swagger from './utils/swagger'
 import semverSatisfies from './utils/semver-satisfies'
 
@@ -83,8 +84,8 @@ async function getConsensusProtocolVersion (protocols = [], height) {
 
 function axiosError (handler) {
   return (error) => {
-    if (!handler || typeof handler !== 'function') throw error
-    return handler(error)
+    handler && typeof handler === 'function' && handler(error)
+    throw error
   }
 }
 
@@ -100,8 +101,8 @@ function axiosError (handler) {
  * @return {Object} Node client
  * @example Node({url: 'https://sdk-testnet.aepps.com'})
  */
-const Node = stampit({
-  async init ({ url = this.url, internalUrl = this.internalUrl, axiosConfig: { config, errorHandler } = {} }) {
+const Node = stampit(AsyncInit, {
+  async init ({ name, url = this.url, internalUrl = this.internalUrl, axiosConfig: { config, errorHandler } = {} }) {
     if (!url) throw new Error('"url" required')
     url = url.replace(/\/?$/, '')
     internalUrl = internalUrl ? internalUrl.replace(/\/?$/, '') : url
@@ -122,7 +123,8 @@ const Node = stampit({
         url: this.url,
         internalUrl: this.internalUrl,
         nodeNetworkId: this.nodeNetworkId,
-        version: this.version
+        version: this.version,
+        consensusProtocolVersion: this.consensusProtocolVersion
       }
     },
     getConsensusProtocolVersion
@@ -137,7 +139,8 @@ const Node = stampit({
     const { nodeRevision: revision, genesisKeyBlockHash: genesisHash, networkId, protocols } = await this.api.getStatus()
     this.consensusProtocolVersion = await this.getConsensusProtocolVersion(protocols)
     if (
-      !semverSatisfies(this.version.split('-')[0], NODE_GE_VERSION, NODE_LT_VERSION) &&
+      !(semverSatisfies(this.version.split('-')[0], NODE_GE_VERSION, NODE_LT_VERSION)) &&
+      // Todo implement 'rc' version comparision in semverSatisfies
       !forceCompatibility
     ) {
       throw new Error(
@@ -152,6 +155,6 @@ const Node = stampit({
 })
 
 const NODE_GE_VERSION = '3.0.1'
-const NODE_LT_VERSION = '4.0.0'
+const NODE_LT_VERSION = '6.0.0'
 
 export default Node

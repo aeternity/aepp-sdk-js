@@ -2,8 +2,8 @@ const path = require('path')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin')
-const CleanWebpackPlugin = require('clean-webpack-plugin')
-const {VueLoaderPlugin} = require('vue-loader')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const { VueLoaderPlugin } = require('vue-loader')
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 const PurgecssPlugin = require('purgecss-webpack-plugin')
 let glob = require('glob-all')
@@ -17,7 +17,7 @@ const jsLoader = 'babel-loader!standard-loader?error=true'
 // https://github.com/FullHuman/purgecss#extractor
 class TailwindExtractor {
   static extract (content) {
-    return content.match(/[A-z0-9-:\/]+/g) || [];
+    return content.match(/[A-z0-9-:/]+/g) || []
   }
 }
 
@@ -71,7 +71,7 @@ module.exports = {
     }),
     new HtmlWebpackHarddiskPlugin(),
     new ExtractTextPlugin('style.css?[hash]'),
-    new CleanWebpackPlugin([distFolder]),
+    new CleanWebpackPlugin(),
     new VueLoaderPlugin()
   ],
   module: {

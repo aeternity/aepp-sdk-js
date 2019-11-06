@@ -1,3 +1,306 @@
+## [6.0.2](https://github.com/aeternity/aepp-sdk-js/compare/6.0.1...6.0.2) (2019-10-31)
+
+
+### Bug Fixes
+
+* **name claim:** Revert ignoring waitMined from user passed options (#727)
+
+
+
+## [6.0.1](https://github.com/aeternity/aepp-sdk-js/compare/6.0.0...6.0.1) (2019-10-29)
+
+
+### Bug Fixes
+
+* **aens:** added lower case transformation for aens names ([#730](https://github.com/aeternity/aepp-sdk-js/issues/730)) ([f7f9f17](https://github.com/aeternity/aepp-sdk-js/commit/f7f9f17246c727566ce3c8159d30b7de19b027c9)), closes [#728](https://github.com/aeternity/aepp-sdk-js/issues/728)
+
+
+
+
+
+
+
+# [6.0.0](https://github.com/aeternity/aepp-sdk-js/compare/4.7.0...6.0.0) (2019-10-16)
+
+
+### Code Refactoring
+
+* **SPEND:** Add additional validation for recipient ([#715](https://github.com/aeternity/aepp-sdk-js/issues/715)) ([c1854bf](https://github.com/aeternity/aepp-sdk-js/commit/c1854bf))
+
+
+### Features
+
+* **State Channels:** make state channels compatible with node v5.0.0… ([#688](https://github.com/aeternity/aepp-sdk-js/issues/688)) ([23936f5](https://github.com/aeternity/aepp-sdk-js/commit/23936f5)), closes [#632](https://github.com/aeternity/aepp-sdk-js/issues/632) [#653](https://github.com/aeternity/aepp-sdk-js/issues/653) [#658](https://github.com/aeternity/aepp-sdk-js/issues/658) [#660](https://github.com/aeternity/aepp-sdk-js/issues/660) [#680](https://github.com/aeternity/aepp-sdk-js/issues/680) [#693](https://github.com/aeternity/aepp-sdk-js/issues/693) [#687](https://github.com/aeternity/aepp-sdk-js/issues/687)
+* **AENS:** Change tld for Lima from `aet` to `chain` ([#714](https://github.com/aeternity/aepp-sdk-js/issues/714)) ([323ef6a](https://github.com/aeternity/aepp-sdk-js/commit/323ef6a))
+* **AENS:** Implement name `bid` function ([#706](https://github.com/aeternity/aepp-sdk-js/pull/706)))
+* **AENS:** auction name fee calculation. Name fee validation and calculation in `claim/bid` ([#706](https://github.com/aeternity/aepp-sdk-js/pull/706))
+* **AENS:** Add `nameId` computation function (#709) ([#706](https://github.com/aeternity/aepp-sdk-js/pull/706))
+
+
+### BREAKING CHANGES
+
+* **AENS:** Change `tld` for Lima from `.aet` to `.chain`
+
+
+
+
+# [5.0.0](https://github.com/aeternity/aepp-sdk-js/compare/4.7.0...5.0.0) (2019-10-04)
+
+
+### Bug Fixes
+
+* **rpc:** fix resolution rpc ops ([#669](https://github.com/aeternity/aepp-sdk-js/issues/669)) ([abd7c56](https://github.com/aeternity/aepp-sdk-js/commit/abd7c56))
+
+
+### Code Refactoring
+
+* **ACI:** rework Sophia Option type representation ([#691](https://github.com/aeternity/aepp-sdk-js/issues/691)) ([0dbb2fe](https://github.com/aeternity/aepp-sdk-js/commit/0dbb2fe))
+
+
+### Features
+
+* **AENS:** Add ability to spend by name ([#682](https://github.com/aeternity/aepp-sdk-js/issues/682)) ([0d43804](https://github.com/aeternity/aepp-sdk-js/commit/0d43804))
+* **AENS:** Add ability to claim contract, oracle, SC ([#671](https://github.com/aeternity/aepp-sdk-js/issues/671)) ([49fd0fd](https://github.com/aeternity/aepp-sdk-js/commit/49fd0fd))
+* **GA:** enbale GA ([#692](https://github.com/aeternity/aepp-sdk-js/issues/692)) ([eded912](https://github.com/aeternity/aepp-sdk-js/commit/eded912))
+* **Lima:** Lima compatibility ([#683](https://github.com/aeternity/aepp-sdk-js/issues/683)) ([a88042e](https://github.com/aeternity/aepp-sdk-js/commit/a88042e)), closes [#632](https://github.com/aeternity/aepp-sdk-js/issues/632) [#653](https://github.com/aeternity/aepp-sdk-js/issues/653) [#658](https://github.com/aeternity/aepp-sdk-js/issues/658) [#660](https://github.com/aeternity/aepp-sdk-js/issues/660) [#680](https://github.com/aeternity/aepp-sdk-js/issues/680) [#693](https://github.com/aeternity/aepp-sdk-js/issues/693) [#687](https://github.com/aeternity/aepp-sdk-js/issues/687)
+    - AENS auction support
+    - compiler 4.0.0 support
+    - node 5.0.0 support
+    - SDK use `FATE` for contract by default
+* **AE**: Add pointers verification for spend by name   
+
+### BREAKING CHANGES
+
+* **aci:** Change Sophia option type representation in ACI
+```js
+// from
+await contract.methods.optionFn(Promise.resolve(1) || Promise.reject())
+// to
+await contract.methods.optionFn(1 || undefined)
+```
+
+
+
+# [5.0.0-next.1](https://github.com/aeternity/aepp-sdk-js/compare/4.6.0...4.7.0-next.1) (2019-09-10)
+
+
+### Bug Fixes
+
+* **package:** update serialize-javascript to version 2.0.0 ([#647](https://github.com/aeternity/aepp-sdk-js/issues/647)) ([1ddb392](https://github.com/aeternity/aepp-sdk-js/commit/1ddb392))
+
+
+### Features
+
+* **Contract/ACI** Add `payable` feature
+* **Compiler:** Compiler 4.0.0 compatibility ([#632](https://github.com/aeternity/aepp-sdk-js/issues/632)) ([d5f1632](https://github.com/aeternity/aepp-sdk-js/commit/d5f1632))
+* **Contract/ACI:** Add ability to use contract with external namespaces(`include "someLib"`) ([#653](https://github.com/aeternity/aepp-sdk-js/issues/653)) ([9708b43](https://github.com/aeternity/aepp-sdk-js/commit/9708b43))
+
+
+
+
+# [4.7.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.7.0) (2019-09-11)
+
+
+### Features
+
+* **Oracle:** Add methods for polling queries [#637](https://github.com/aeternity/aepp-sdk-js/pull/637)
+* **Chain:** Add `getBalance` method ([#655](https://github.com/aeternity/aepp-sdk-js/issues/655)) ([15147af](https://github.com/aeternity/aepp-sdk-js/commit/15147af))
+* **state channels:** add reconnect method ([#662](https://github.com/aeternity/aepp-sdk-js/issues/662)) ([9d8d1e8](https://github.com/aeternity/aepp-sdk-js/commit/9d8d1e8))
+* **state channels:** add backchannel updates test[#664](https://github.com/aeternity/aepp-sdk-js/pull/664)
+
+
+
+
+# [4.6.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.6.0) (2019-08-28)
+
+
+
+### Bug Fixes
+
+* **Compiler:** Fix `forceCompatibility` option ([26beba8](https://github.com/aeternity/aepp-sdk-js/commit/26beba8))
+
+
+### Features
+
+* **Lima**: add preliminary support for lima
+* **ACI/Contract:** Implement static-call for deploy transaction for ACI methods/Contract low lvl API ([#630](https://github.com/aeternity/aepp-sdk-js/issues/630)) ([5b7eeb4](https://github.com/aeternity/aepp-sdk-js/commit/5b7eeb4))
+
+
+### Notes
+
+**GA support has been disabled until further notice due to node compatibility issues**
+**This version support aeternity node up to 5.0.0-rc.1**
+
+
+
+## [4.5.1](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.5.1) (2019-08-22)
+
+
+
+### Refactor
+* **Example**  Add node info to AEPP ([#620](https://github.com/aeternity/aepp-sdk-js/pull/620))
+
+
+### Bug Fixes
+
+* **GA** Fix GA account composition ([211e409](https://github.com/aeternity/aepp-sdk-js/pull/620/commits/211e409d785a2962d1220677b0b0bcf00196abc1))
+
+
+
+
+# [4.5.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.5.0) (2019-08-20)
+
+
+### Bug Fixes
+
+* **Crypto:** Fix `keypair` verification ([#605](https://github.com/aeternity/aepp-sdk-js/issues/605)) ([83a52fb](https://github.com/aeternity/aepp-sdk-js/commit/83a52fb))
+* **RPC:** Remove NodePool stamp from AE composition ([#612](https://github.com/aeternity/aepp-sdk-js/issues/612)) ([21af2eb](https://github.com/aeternity/aepp-sdk-js/commit/21af2eb))
+* **state channels:** add missing argument in onOnChainTx callback ([#604](https://github.com/aeternity/aepp-sdk-js/issues/604)) ([165cfe8](https://github.com/aeternity/aepp-sdk-js/commit/165cfe8))
+* **state channels:** fix awaitingOnChainTx state handler ([#608](https://github.com/aeternity/aepp-sdk-js/issues/608)) ([8b7b65a](https://github.com/aeternity/aepp-sdk-js/commit/8b7b65a))
+* **Swagger:** Always throw error from `axios` error handler ([#607](https://github.com/aeternity/aepp-sdk-js/issues/607)) ([0e5cf61](https://github.com/aeternity/aepp-sdk-js/commit/0e5cf61))
+
+
+### Features
+
+* **MemoryAccount:** Add validation of keypair ([#594](https://github.com/aeternity/aepp-sdk-js/issues/594)) ([b8c2b20](https://github.com/aeternity/aepp-sdk-js/commit/b8c2b20))
+* **state channels:** handle BigNumbers with json-bigint ([#596](https://github.com/aeternity/aepp-sdk-js/issues/596)) ([14eaa3d](https://github.com/aeternity/aepp-sdk-js/commit/14eaa3d))
+* **state channels:** send generic messages immediately ([#600](https://github.com/aeternity/aepp-sdk-js/issues/600)) ([8ad7583](https://github.com/aeternity/aepp-sdk-js/commit/8ad7583))
+* **Generalize Account**  Implement Generalized account support ([#449](https://github.com/aeternity/aepp-sdk-js/pull/449))
+    ```js
+    const authContract = `YOUR_AUTH_CONTRACT`
+
+    // Make current account Generalized
+    await client.createGeneralizeAccount(authFnName, authContract, [...authFnArguments]
+    
+    // Make spend transaction using GA
+    // One Way
+        // encoded call data for auth contract
+        const callData = 'cb_...'
+        await client.spend(10000, receiverPub, { authData: { callData } })
+    
+    // or
+        // sdk will prepare callData itself
+        await client.spend(10000, receiverPub, { authData: { source: authContract, args: [...authContractArgs] } })
+    ```
+
+# [4.4.0](https://github.com/aeternity/aepp-sdk-js/compare/4.3.0...4.4.0) (2019-08-09)
+
+
+### Bug Fixes
+
+* **Package:** update commander to version 3.0.0 ([#597](https://github.com/aeternity/aepp-sdk-js/issues/597)) ([9aaa05c](https://github.com/aeternity/aepp-sdk-js/commit/9aaa05c))
+* **Contract:** Fix dry-run without account ([227fc5c](https://github.com/aeternity/aepp-sdk-js/pull/599/commits/227fc5c9d8369e1c3a3fbba2cf62f0495bcf08ae))
+
+### Features
+
+* **Contract:** add ability to use call-static/dry-run without keyPair ([#577](https://github.com/aeternity/aepp-sdk-js/issues/577)) ([c38edd9](https://github.com/aeternity/aepp-sdk-js/commit/c38edd9))
+* **AE:** Add ability to make operation on specific account using `onAccount` option.
+   ``` 
+    Exm: await client.spend(1, receiver, { onAccount: 'PUBLIC_KEY' })
+    Add `onAccount` to `AENS`, `Contract`, `Oracle`.
+    Add tests for using specific account to Contract, ACI, Account.
+  ```
+* **JSON:**: Add serialization to JSON for bigNumbers
+* **MemoryAccount:** Add validation of `keypair`  ([#594](https://github.com/aeternity/aepp-sdk-js/issues/594)) ([b8c2b20](https://github.com/aeternity/aepp-sdk-js/commit/b8c2b20))
+* **State Channels:** persist connection by pinging every 10 seconds ([#571](https://github.com/aeternity/aepp-sdk-js/issues/571)) ([a70f919](https://github.com/aeternity/aepp-sdk-js/commit/a70f919))
+
+
+
+# [4.3.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.3.0) (2019-08-05)
+
+
+### Bug Fixes
+
+* **State Channels:** Fix onChainTx event params ([#566](https://github.com/aeternity/aepp-sdk-js/issues/566)) ([11c85eb](https://github.com/aeternity/aepp-sdk-js/commit/11c85eb))
+* **State Channels:** Fix websocket url ([#558](https://github.com/aeternity/aepp-sdk-js/issues/558)) ([33c1fd8](https://github.com/aeternity/aepp-sdk-js/commit/33c1fd8))
+* **Swagger:** Pass query params in case of get request ([#570](https://github.com/aeternity/aepp-sdk-js/pull/570))
+
+### Code Refactoring
+
+* **State Channel:** Do not include white space for outgoing websocket messages ([#559](https://github.com/aeternity/aepp-sdk-js/pull/559))
+
+
+### Features
+
+* **ACI:** Implement sophia `variant` type ([#567](https://github.com/aeternity/aepp-sdk-js/issues/567)) ([8505dcf](https://github.com/aeternity/aepp-sdk-js/commit/8505dcf))
+* **Contract:** add ability to use call-static/dry-run without keyPair ([#577](https://github.com/aeternity/aepp-sdk-js/issues/577)) ([c38edd9](https://github.com/aeternity/aepp-sdk-js/commit/c38edd9))
+* **NodePool:** Implement NodePool stamp ([#574](https://github.com/aeternity/aepp-sdk-js/issues/574)) ([674166c](https://github.com/aeternity/aepp-sdk-js/commit/674166c))
+* **State Channel:** make state channel compatible with aeternity@4.0.0 ([#568](https://github.com/aeternity/aepp-sdk-js/issues/568)) ([0d0e09b](https://github.com/aeternity/aepp-sdk-js/commit/0d0e09b))
+* **TxBuilder:** Add helper for producing tx hash ([#579](https://github.com/aeternity/aepp-sdk-js/issues/579)) ([e1b405e](https://github.com/aeternity/aepp-sdk-js/commit/e1b405e))
+* **AE** Make all AE stamps composed with Accounts ([#581](https://github.com/aeternity/aepp-sdk-js/pull/581))
+
+
+### Docs
+
+* **ACI** Add some additional clarification to `getContractInstance`
+
+
+
+# [4.2.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.2.0) (2019-07-15)
+
+
+### Bug Fixes
+
+* **package:** update libsodium-wrappers-sumo to version 0.7.5 ([#541](https://github.com/aeternity/aepp-sdk-js/issues/541)) ([956ed75](https://github.com/aeternity/aepp-sdk-js/commit/956ed75))
+* **rpc-server:** Fix type 'object' check ([#526](https://github.com/aeternity/aepp-sdk-js/issues/526)) ([48c42e4](https://github.com/aeternity/aepp-sdk-js/commit/48c42e4))
+
+
+### Code Refactoring
+
+* **swagger:** Speedup initialisation
+* **AENS:** Remove unused param from claim method
+* **AENS:** Fix exception if not waiting for mining(claim)
+* **Test:** Add test for contract namespaces
+
+### Features
+
+* **Node:** Add 4.0.0 node compatibility
+* **Compiler:** Add compatibility with compiler 3.2.0
+* **Channel:** Implement GA awareness of State Channels
+
+
+
+# [4.1.0](https://github.com/aeternity/aepp-sdk-js/compare/4.0.1...4.1.0) (2019-06-22)
+
+
+### Bug Fixes
+
+* **Node:** Do not throw error if `internalUrl` not provided. Instead use `url` ([#503](https://github.com/aeternity/aepp-sdk-js/issues/503)) ([053faae](https://github.com/aeternity/aepp-sdk-js/commit/053faae))
+* **TXBuilder:** Fix payload serialization if you try to unpack and pack tx. ([#498](https://github.com/aeternity/aepp-sdk-js/issues/498)) ([73552e5](https://github.com/aeternity/aepp-sdk-js/commit/73552e5))
+* **TxValidator:** Fix validation of state channel open transaction ([#496](https://github.com/aeternity/aepp-sdk-js/issues/496)) ([325cc90](https://github.com/aeternity/aepp-sdk-js/commit/325cc90))
+
+
+### Features
+
+* **ACI:** Refactor ACI module. Split to separated files. ([#505](https://github.com/aeternity/aepp-sdk-js/issues/505)) ([fb7bc00](https://github.com/aeternity/aepp-sdk-js/commit/fb7bc00))
+* **Selector:** If default account `address` not provided use the first
+* **ACI:** Handle ACI without init function
+* **ACI:** Automatically decide to send transaction on-chai or call-static.
+Add `options` object like last arguments of generate fn under `instance.methods`
+  ```
+  const instance = await client.getContractInstance(source)
+  // Deploy contract
+  await.contract.init(100, 'test', options)
+  //or
+  await.contract.deploy([100, 'test], options)
+  // Call function
+  const result = await instance.call('sum', [2, 5], options)
+  //
+    // Automatically decide to send tx on-chain or call-static(dry-run) base on if function stateful or not
+    const result = await instance.methods.sum(2, 5, options)
+    // Manually make on-chain
+    const result = await instance.methods.sum.send(2, 5, options)
+    // Manually make call-static
+    const result = await instance.methods.sum.get(2, 5, options)
+  //
+  ```
+
+### Docs
+
+* **Usage:**: Add instructions about how to include directly the `SDK` in a `html page`
+
+
+
 ## [4.0.1](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.0.1) (2019-06-13)
 
 

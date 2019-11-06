@@ -1,15 +1,25 @@
+import * as R from 'ramda'
+import BigNumber from 'bignumber.js'
+
 import {
   assertedType,
   decodeBase58Check,
   decodeBase64Check,
   encodeBase58Check, encodeBase64Check,
   hash,
-  nameId,
+  nameId as nameHash,
   salt
 } from '../../utils/crypto'
 import { toBytes } from '../../utils/bytes'
-import { ID_TAG_PREFIX, PREFIX_ID_TAG } from './schema'
-import { BigNumber } from 'bignumber.js'
+import {
+  ID_TAG_PREFIX,
+  PREFIX_ID_TAG,
+  AENS_NAME_DOMAINS,
+  NAME_BID_RANGES,
+  NAME_BID_MAX_LENGTH,
+  NAME_FEE, NAME_FEE_BID_INCREMENT, NAME_BID_TIMEOUTS
+} from './schema'
+import { ceil } from '../../utils/bignumber'
 
 /**
  * JavaScript-based Transaction builder helper function's
@@ -34,6 +44,18 @@ export function buildContractId (ownerId, nonce) {
   const ownerIdAndNonce = Buffer.from([...decode(ownerId, 'ak'), ...toBytes(nonce)])
   const b2bHash = hash(ownerIdAndNonce)
   return encode(b2bHash, 'ct')
+}
+
+/**
+ * Build hash
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
+ * @param {String} prefix Transaction hash prefix
+ * @param {Buffer} data Rlp encoded transaction buffer
+ * @return {String} Transaction hash
+ */
+export function buildHash (prefix, data) {
+  return encode(hash(data), prefix)
 }
 
 /**
@@ -67,6 +89,19 @@ export function formatSalt (salt) {
 }
 
 /**
+ * Encode a domain name
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
+ * @param {String} name Name to encode
+ * @return {String} `nm_` prefixed encoded domain name
+ */
+export function produceNameId (name) {
+  const namespace = R.last(name.split('.'))
+  if (namespace === 'chain') return encode(hash(name.toLowerCase()), 'nm')
+  return encode(nameHash(name), 'nm')
+}
+
+/**
  * Generate the commitment hash by hashing the formatted salt and
  * name, base 58 encoding the result and prepending 'cm_'
  *
@@ -78,8 +113,10 @@ export function formatSalt (salt) {
  * @param {Number} salt Random salt
  * @return {String} Commitment hash
  */
-export async function commitmentHash (name, salt = createSalt()) {
-  return `cm_${encodeBase58Check(hash(Buffer.concat([nameId(name), formatSalt(salt)])))}`
+export function commitmentHash (name, salt = createSalt()) {
+  const namespace = R.last(name.split('.'))
+  if (namespace === 'chain') return `cm_${encodeBase58Check(hash(Buffer.concat([Buffer.from(name.toLowerCase()), formatSalt(salt)])))}`
+  return `cm_${encodeBase58Check(hash(Buffer.concat([nameHash(name.toLowerCase()), formatSalt(salt)])))}`
 }
 
 /**
@@ -171,8 +208,8 @@ export function readInt (buf = Buffer.from([])) {
 export function buildPointers (pointers) {
   return pointers.map(
     p => [
-      toBytes(p['key']),
-      writeId(p['id'])
+      toBytes(p.key),
+      writeId(p.id)
     ]
   )
 }
@@ -193,6 +230,80 @@ export function readPointers (pointers) {
   )
 }
 
+/**
+ * Is name valid
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
+ * @param {string} name
+ * @param {boolean} [throwError=true] Throw error on invalid
+ * @return Boolean
+ * @throws Error
+ */
+export function isNameValid (name, throwError = true) {
+  if ((!name || typeof name !== 'string') && throwError) throw new Error('AENS: Name must be a string')
+  if (!AENS_NAME_DOMAINS.includes(R.last(name.split('.')))) {
+    if (throwError) throw new Error(`AENS: Invalid name domain. Possible domains [${AENS_NAME_DOMAINS}]`)
+    return false
+  }
+  return true
+}
+
+/**
+ * What kind of a hash is this? If it begins with 'ak_' it is an
+ * account key, if with 'ok_' it's an oracle key.
+ *
+ * @param s - the hash.
+ * returns the type, or throws an exception if type not found.
+ */
+export function classify (s) {
+  const keys = {
+    ak: 'account_pubkey',
+    ok: 'oracle_pubkey',
+    ct: 'contract_pubkey',
+    ch: 'channel'
+  }
+
+  if (!s.match(/^[a-z]{2}_.+/)) {
+    throw Error('Not a valid hash')
+  }
+
+  const klass = s.substr(0, 2)
+  if (klass in keys) {
+    return keys[klass]
+  } else {
+    throw Error(`Unknown class ${klass}`)
+  }
+}
+
+/**
+ * Get the minimum name fee for a domain
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
+ * @param {string} domain the domain name to get the fee for
+ * @return String the minimum fee for the domain auction
+ */
+export function getMinimumNameFee (domain) {
+  const nameLength = domain.replace('.chain', '').length
+  return NAME_BID_RANGES[nameLength >= NAME_BID_MAX_LENGTH ? NAME_BID_MAX_LENGTH : nameLength]
+}
+
+export function computeBidFee (domain, startFee = NAME_FEE, increment = NAME_FEE_BID_INCREMENT) {
+  if (!(Number(increment) === increment && increment % 1 !== 0)) throw new Error(`Increment must be float. Current increment ${increment}`)
+  if (increment < NAME_FEE_BID_INCREMENT) throw new Error(`minimum increment percentage is ${NAME_FEE_BID_INCREMENT}`)
+  return ceil(
+    BigNumber(BigNumber(startFee).eq(NAME_FEE) ? getMinimumNameFee(domain) : startFee).times(BigNumber(NAME_FEE_BID_INCREMENT).plus(1))
+  )
+}
+
+export function computeAuctionEndBlock (domain, claimHeight) {
+  return R.cond([
+    [R.lt(5), R.always(NAME_BID_TIMEOUTS[4] + claimHeight)],
+    [R.lt(9), R.always(NAME_BID_TIMEOUTS[8] + claimHeight)],
+    [R.lte(NAME_BID_MAX_LENGTH), R.always(NAME_BID_TIMEOUTS[12] + claimHeight)],
+    [R.T, R.always(claimHeight)]
+  ])(domain.replace('.chain', '').length)
+}
+
 export default {
   readPointers,
   buildPointers,
@@ -206,5 +317,9 @@ export default {
   commitmentHash,
   formatSalt,
   oracleQueryId,
-  createSalt
+  createSalt,
+  buildHash,
+  isNameValid,
+  produceNameId,
+  classify
 }

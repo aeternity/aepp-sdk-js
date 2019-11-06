@@ -16,6 +16,8 @@
  */
 
 import * as Crypto from './utils/crypto'
+import * as Keystore from './utils/keystore'
+import * as Bytes from './utils/bytes'
 import * as TxBuilder from './tx/builder'
 import * as TxBuilderHelper from './tx/builder/helpers'
 import HdWallet from './utils/hd-wallet'
@@ -23,13 +25,17 @@ import HdWallet from './utils/hd-wallet'
 import Ae from './ae'
 import Chain from './chain'
 import ChainNode from './chain/node'
+import Node from './node'
+import NodePool from './node-pool'
 import Tx from './tx'
 import Transaction from './tx/tx'
 import TransactionValidator from './tx/validator'
 import Account from './account'
+import Accounts from './accounts'
 import MemoryAccount from './account/memory'
 import Aens from './ae/aens'
 import Contract from './ae/contract'
+import GeneralizeAccount from './contract/ga'
 import ContractCompilerAPI from './contract/compiler'
 import Wallet from './ae/wallet'
 import Aepp from './ae/aepp'
@@ -42,18 +48,24 @@ import ContractACI from './contract/aci'
 
 export {
   Account,
+  Accounts,
   Ae,
   Aens,
   Aepp,
+  Bytes,
   Contract,
   ContractCompilerAPI,
   ContractACI,
   ChainNode,
   Channel,
   Crypto,
+  Keystore,
   Chain,
+  GeneralizeAccount,
   HdWallet,
   MemoryAccount,
+  Node,
+  NodePool,
   Oracle,
   OracleNodeAPI,
   Selector,

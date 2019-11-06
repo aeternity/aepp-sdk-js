@@ -46,3 +46,12 @@ export function snakeOrKebabToPascal (s) {
 export function pascalToSnake (s) {
   return s.replace(/[A-Z]/g, match => `_${R.toLower(match)}`)
 }
+
+/**
+ * Check whether a string is valid hex.
+ * @param {string} str String to validate.
+ * @return {boolean} True if the string is valid hex, false otherwise.
+ */
+export function isHex (str) {
+  return !!(str.length % 2 === 0 && str.match(/^[0-9a-f]+$/i))
+}

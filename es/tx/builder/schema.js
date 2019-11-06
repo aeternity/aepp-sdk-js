@@ -4,13 +4,77 @@
  * @export TxSchema
  * @example import TxSchema from '@aeternity/aepp-sdk/es/tx/builder/schema'
  */
-/* eslint-disable no-unused-vars */
 // # RLP version number
 // # https://github.com/aeternity/protocol/blob/master/serializations.md#binary-serialization
 
 import BigNumber from 'bignumber.js'
 
 export const VSN = 1
+export const VSN_2 = 2
+
+// # TRANSACTION DEFAULT TTL
+export const TX_TTL = 0
+
+// # AENS
+export const AENS_NAME_DOMAINS = ['chain', 'test']
+export const NAME_TTL = 500
+// # max number of block into the future that the name is going to be available
+// # https://github.com/aeternity/protocol/blob/epoch-v0.22.0/AENS.md#update
+// # https://github.com/aeternity/protocol/blob/44a93d3aab957ca820183c3520b9daf6b0fedff4/AENS.md#aens-entry
+export const NAME_MAX_TTL = 36000
+export const NAME_MAX_CLIENT_TTL = 84600
+export const CLIENT_TTL = NAME_MAX_CLIENT_TTL
+export const NAME_FEE = 0
+// # see https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L67
+export const NAME_FEE_MULTIPLIER = 100000000000000
+export const NAME_FEE_BID_INCREMENT = 0.05 // # the increment is in percentage
+// # see https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L272
+export const NAME_BID_TIMEOUT_BLOCKS = 480 // # ~1 day
+export const NAME_BID_MAX_LENGTH = 12 // # this is the max length for a domain to be part of a bid
+// # ref: https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L290
+// # bid ranges:
+export const NAME_BID_RANGES = {
+  31: BigNumber(3).times(NAME_FEE_MULTIPLIER),
+  30: BigNumber(5).times(NAME_FEE_MULTIPLIER),
+  29: BigNumber(8).times(NAME_FEE_MULTIPLIER),
+  28: BigNumber(13).times(NAME_FEE_MULTIPLIER),
+  27: BigNumber(21).times(NAME_FEE_MULTIPLIER),
+  26: BigNumber(34).times(NAME_FEE_MULTIPLIER),
+  25: BigNumber(55).times(NAME_FEE_MULTIPLIER),
+  24: BigNumber(89).times(NAME_FEE_MULTIPLIER),
+  23: BigNumber(144).times(NAME_FEE_MULTIPLIER),
+  22: BigNumber(233).times(NAME_FEE_MULTIPLIER),
+  21: BigNumber(377).times(NAME_FEE_MULTIPLIER),
+  20: BigNumber(610).times(NAME_FEE_MULTIPLIER),
+  19: BigNumber(987).times(NAME_FEE_MULTIPLIER),
+  18: BigNumber(1597).times(NAME_FEE_MULTIPLIER),
+  17: BigNumber(2584).times(NAME_FEE_MULTIPLIER),
+  16: BigNumber(4181).times(NAME_FEE_MULTIPLIER),
+  15: BigNumber(6765).times(NAME_FEE_MULTIPLIER),
+  14: BigNumber(10946).times(NAME_FEE_MULTIPLIER),
+  13: BigNumber(17711).times(NAME_FEE_MULTIPLIER),
+  12: BigNumber(28657).times(NAME_FEE_MULTIPLIER),
+  11: BigNumber(46368).times(NAME_FEE_MULTIPLIER),
+  10: BigNumber(75025).times(NAME_FEE_MULTIPLIER),
+  9: BigNumber(121393).times(NAME_FEE_MULTIPLIER),
+  8: BigNumber(196418).times(NAME_FEE_MULTIPLIER),
+  7: BigNumber(317811).times(NAME_FEE_MULTIPLIER),
+  6: BigNumber(514229).times(NAME_FEE_MULTIPLIER),
+  5: BigNumber(832040).times(NAME_FEE_MULTIPLIER),
+  4: BigNumber(1346269).times(NAME_FEE_MULTIPLIER),
+  3: BigNumber(2178309).times(NAME_FEE_MULTIPLIER),
+  2: BigNumber(3524578).times(NAME_FEE_MULTIPLIER),
+  1: BigNumber(5702887).times(NAME_FEE_MULTIPLIER)
+}
+
+// # ref: https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L273
+// # name bid timeouts
+export const NAME_BID_TIMEOUTS = {
+  13: 0,
+  12: NAME_BID_TIMEOUT_BLOCKS, // # 480 blocks
+  8: 31 * NAME_BID_TIMEOUT_BLOCKS, // # 14880 blocks
+  4: 62 * NAME_BID_TIMEOUT_BLOCKS // # 29760 blocks
+}
 
 // # Tag constant for ids (type uint8)
 // # see https://github.com/aeternity/protocol/blob/master/serializations.md#the-id-type
@@ -55,6 +119,7 @@ const OBJECT_TAG_CHANNEL_OFFCHAIN_UPDATE_DEPOSIT_TX = 571
 const OBJECT_TAG_CHANNEL_OFFCHAIN_UPDATE_WITHDRAWAL_TX = 572
 const OBJECT_TAG_CHANNEL_OFFCHAIN_CREATE_CONTRACT_TX = 573
 const OBJECT_TAG_CHANNEL_OFFCHAIN_CALL_CONTRACT_TX = 574
+const OBJECT_TAG_CHANNEL_RECONNECT_TX = 575
 const OBJECT_TAG_PROOF_OF_INCLUSION = 60
 const OBJECT_TAG_STATE_TREES = 62
 const OBJECT_TAG_MERKLE_PATRICIA_TREE = 63
@@ -65,11 +130,15 @@ const OBJECT_TAG_CHANNELS_TREE = 623
 const OBJECT_TAG_NAMESERVICE_TREE = 624
 const OBJECT_TAG_ORACLES_TREE = 625
 const OBJECT_TAG_ACCOUNTS_TREE = 626
+const OBJECT_TAG_GA_ATTACH = 80
+const OBJECT_TAG_GA_META = 81
+const OBJECT_TAG_SOPHIA_BYTE_CODE = 70
 
 const TX_FIELD = (name, type, prefix) => [name, type, prefix]
 const TX_SCHEMA_FIELD = (schema, objectId) => [schema, objectId]
 
 export const MIN_GAS_PRICE = 1000000000 // min gasPrice 1e9
+export const MAX_AUTH_FUN_GAS = 50000 // min gasPrice 1e9
 
 const revertObject = (obj) => Object.entries(obj).reduce((acc, [key, v]) => (acc[v] = key) && acc, {})
 
@@ -128,6 +197,7 @@ export const TX_TYPE = {
   channelOffChainUpdateWithdrawal: 'channelOffChainUpdateWithdrawal',
   channelOffChainCreateContract: 'channelOffChainCreateContract',
   channelOffChainCallContract: 'channelOffChainCallContract',
+  channelReconnect: 'channelReconnect',
   proofOfInclusion: 'proofOfInclusion',
   stateTrees: 'stateTrees',
   merklePatriciaTree: 'merklePatriciaTree',
@@ -137,7 +207,11 @@ export const TX_TYPE = {
   channelsTree: 'channelsTree',
   nameserviceTree: 'nameserviceTree',
   oraclesTree: 'oraclesTree',
-  accountsTree: 'accountsTree'
+  accountsTree: 'accountsTree',
+  // GA ACCOUNTS
+  gaAttach: 'gaAttach',
+  gaMeta: 'gaMeta',
+  sophiaByteCode: 'sophiaByteCode'
 }
 
 // # see https://github.com/aeternity/protocol/blob/minerva/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain
@@ -146,15 +220,21 @@ export const VM_VERSIONS = {
   SOPHIA: 1,
   SOLIDITY: 2,
   SOPHIA_IMPROVEMENTS_MINERVA: 3,
-  SOPHIA_IMPROVEMENTS_FORTUNA: 4
+  SOPHIA_IMPROVEMENTS_FORTUNA: 4,
+  FATE: 5,
+  SOPHIA_IMPROVEMENTS_LIMA: 6
 }
 // # see https://github.com/aeternity/protocol/blob/minerva/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain
 export const ABI_VERSIONS = {
   NO_ABI: 0,
   SOPHIA: 1,
-  SOLIDITY: 2
+  SOLIDITY: 2,
+  FATE: 3
 }
 
+export const VM_TYPE = { FATE: 'fate', AEVM: 'aevm' }
+
+// First abi/vm by default
 export const VM_ABI_MAP_ROMA = {
   [TX_TYPE.contractCreate]: { vmVersion: [VM_VERSIONS.SOPHIA], abiVersion: [ABI_VERSIONS.SOPHIA] },
   [TX_TYPE.contractCall]: { vmVersion: [VM_VERSIONS.SOPHIA], abiVersion: [ABI_VERSIONS.SOPHIA] },
@@ -173,13 +253,21 @@ export const VM_ABI_MAP_FORTUNA = {
   [TX_TYPE.oracleRegister]: { vmVersion: [], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA] }
 }
 
+export const VM_ABI_MAP_LIMA = {
+  [TX_TYPE.contractCreate]: { vmVersion: [VM_VERSIONS.FATE, VM_VERSIONS.SOPHIA_IMPROVEMENTS_LIMA], abiVersion: [ABI_VERSIONS.FATE, ABI_VERSIONS.SOPHIA] },
+  [TX_TYPE.contractCall]: { vmVersion: [VM_VERSIONS.FATE, VM_VERSIONS.SOPHIA_IMPROVEMENTS_LIMA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA, VM_VERSIONS.SOPHIA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA], abiVersion: [ABI_VERSIONS.FATE, ABI_VERSIONS.SOPHIA] },
+  [TX_TYPE.oracleRegister]: { vmVersion: [], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA] }
+}
+
 export const PROTOCOL_VM_ABI = {
   // Roma
-  '1': VM_ABI_MAP_ROMA,
+  1: VM_ABI_MAP_ROMA,
   // Minerva
-  '2': VM_ABI_MAP_MINERVA,
+  2: VM_ABI_MAP_MINERVA,
   // Fortuna
-  '3': VM_ABI_MAP_FORTUNA
+  3: VM_ABI_MAP_FORTUNA,
+  // Lima
+  4: VM_ABI_MAP_LIMA
 }
 
 export const OBJECT_ID_TX_TYPE = {
@@ -218,6 +306,7 @@ export const OBJECT_ID_TX_TYPE = {
   [OBJECT_TAG_CHANNEL_OFFCHAIN_UPDATE_WITHDRAWAL_TX]: TX_TYPE.channelOffChainUpdateWithdrawal,
   [OBJECT_TAG_CHANNEL_OFFCHAIN_CREATE_CONTRACT_TX]: TX_TYPE.channelOffChainCreateContract,
   [OBJECT_TAG_CHANNEL_OFFCHAIN_CALL_CONTRACT_TX]: TX_TYPE.channelOffChainCallContract,
+  [OBJECT_TAG_CHANNEL_RECONNECT_TX]: TX_TYPE.channelReconnect,
   [OBJECT_TAG_PROOF_OF_INCLUSION]: TX_TYPE.proofOfInclusion,
   [OBJECT_TAG_STATE_TREES]: TX_TYPE.stateTrees,
   [OBJECT_TAG_MERKLE_PATRICIA_TREE]: TX_TYPE.merklePatriciaTree,
@@ -227,7 +316,11 @@ export const OBJECT_ID_TX_TYPE = {
   [OBJECT_TAG_CHANNELS_TREE]: TX_TYPE.channelsTree,
   [OBJECT_TAG_NAMESERVICE_TREE]: TX_TYPE.nameserviceTree,
   [OBJECT_TAG_ORACLES_TREE]: TX_TYPE.oraclesTree,
-  [OBJECT_TAG_ACCOUNTS_TREE]: TX_TYPE.accountsTree
+  [OBJECT_TAG_ACCOUNTS_TREE]: TX_TYPE.accountsTree,
+  // GA Accounts
+  [OBJECT_TAG_GA_ATTACH]: TX_TYPE.gaAttach,
+  [OBJECT_TAG_GA_META]: TX_TYPE.gaMeta,
+  [OBJECT_TAG_SOPHIA_BYTE_CODE]: TX_TYPE.sophiaByteCode
 }
 
 export const FIELD_TYPES = {
@@ -249,6 +342,7 @@ export const FIELD_TYPES = {
   mptree: 'mptree',
   callReturnType: 'callReturnType',
   ctVersion: 'ctVersion',
+  sophiaCodeTypeInfo: 'sophiaCodeTypeInfo',
   payload: 'payload'
 }
 
@@ -261,8 +355,12 @@ export const KEY_BLOCK_INTERVAL = 3
 // MAP WITH FEE CALCULATION https://github.com/aeternity/protocol/blob/master/consensus/consensus.md#gas
 export const TX_FEE_BASE_GAS = (txType) => {
   switch (txType) {
+    // case TX_TYPE.gaMeta: // TODO investigate MetaTx calculation
+    case TX_TYPE.gaAttach:
     case TX_TYPE.contractCreate:
       return BigNumber(5 * BASE_GAS)
+    // Todo Implement meta tx fee calculation
+    case TX_TYPE.gaMeta:
     case TX_TYPE.contractCall:
       return BigNumber(30 * BASE_GAS)
     default:
@@ -295,12 +393,12 @@ export const ID_TAG = {
   channel: ID_TAG_CHANNEL
 }
 export const PREFIX_ID_TAG = {
-  'ak': ID_TAG.account,
-  'nm': ID_TAG.name,
-  'cm': ID_TAG.commitment,
-  'ok': ID_TAG.oracle,
-  'ct': ID_TAG.contract,
-  'ch': ID_TAG.channel
+  ak: ID_TAG.account,
+  nm: ID_TAG.name,
+  cm: ID_TAG.commitment,
+  ok: ID_TAG.oracle,
+  ct: ID_TAG.contract,
+  ch: ID_TAG.channel
 }
 export const ID_TAG_PREFIX = revertObject(PREFIX_ID_TAG)
 const VALIDATION_ERROR = (msg) => msg
@@ -309,9 +407,9 @@ export const VALIDATION_MESSAGE = {
   [FIELD_TYPES.int]: ({ value, isMinusValue }) => isMinusValue ? VALIDATION_ERROR(`${value} must be >= 0`) : VALIDATION_ERROR(`${value} is not of type Number or BigNumber`),
   [FIELD_TYPES.id]: ({ value, prefix }) => VALIDATION_ERROR(`'${value}' prefix doesn't match expected prefix '${prefix}' or ID_TAG for prefix not found`),
   [FIELD_TYPES.binary]: ({ prefix, value }) => VALIDATION_ERROR(`'${value}' prefix doesn't match expected prefix '${prefix}'`),
-  [FIELD_TYPES.string]: ({ value }) => VALIDATION_ERROR(`Not a string`),
-  [FIELD_TYPES.pointers]: ({ value }) => VALIDATION_ERROR(`Value must be of type Array and contains only object's like '{key: "account_pubkey", id: "ak_lkamsflkalsdalksdlasdlasdlamd"}'`),
-  [FIELD_TYPES.ctVersion]: ({ value }) => VALIDATION_ERROR(`Value must be an object with "vmVersion" and "abiVersion" fields`)
+  [FIELD_TYPES.string]: ({ value }) => VALIDATION_ERROR('Not a string'),
+  [FIELD_TYPES.pointers]: ({ value }) => VALIDATION_ERROR('Value must be of type Array and contains only object\'s like \'{key: "account_pubkey", id: "ak_lkamsflkalsdalksdlasdlasdlamd"}\''),
+  [FIELD_TYPES.ctVersion]: ({ value }) => VALIDATION_ERROR('Value must be an object with "vmVersion" and "abiVersion" fields')
 }
 
 const BASE_TX = [
@@ -325,19 +423,43 @@ const ACCOUNT_TX = [
   TX_FIELD('balance', FIELD_TYPES.int)
 ]
 
+export const CONTRACT_BYTE_CODE_LIMA = [
+  ...BASE_TX,
+  TX_FIELD('sourceCodeHash', FIELD_TYPES.rawBinary),
+  TX_FIELD('typeInfo', FIELD_TYPES.sophiaCodeTypeInfo),
+  TX_FIELD('byteCode', FIELD_TYPES.rawBinary),
+  TX_FIELD('compilerVersion', FIELD_TYPES.string),
+  TX_FIELD('payable', FIELD_TYPES.bool)
+]
+
+export const CONTRACT_BYTE_CODE_MINERVA = [
+  ...BASE_TX,
+  TX_FIELD('sourceCodeHash', FIELD_TYPES.rawBinary),
+  TX_FIELD('typeInfo', FIELD_TYPES.sophiaCodeTypeInfo),
+  TX_FIELD('byteCode', FIELD_TYPES.rawBinary),
+  TX_FIELD('compilerVersion', FIELD_TYPES.string)
+]
+
+export const CONTRACT_BYTE_CODE_ROMA = [
+  ...BASE_TX,
+  TX_FIELD('sourceCodeHash', FIELD_TYPES.rawBinary),
+  TX_FIELD('typeInfo', FIELD_TYPES.sophiaCodeTypeInfo),
+  TX_FIELD('byteCode', FIELD_TYPES.rawBinary)
+]
+
 const ACCOUNT_TX_2 = [
   ...BASE_TX,
   TX_FIELD('flags', FIELD_TYPES.int),
   TX_FIELD('nonce', FIELD_TYPES.int),
   TX_FIELD('balance', FIELD_TYPES.int),
-  TX_FIELD('gaContract', FIELD_TYPES.id, 'ct'),
+  TX_FIELD('gaContract', FIELD_TYPES.id, ['ct', 'nm']),
   TX_FIELD('gaAuthFun', FIELD_TYPES.binary, 'cb')
 ]
 
 const SPEND_TX = [
   ...BASE_TX,
   TX_FIELD('senderId', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('recipientId', FIELD_TYPES.id, 'ak'),
+  TX_FIELD('recipientId', FIELD_TYPES.id, ['ak', 'nm']),
   TX_FIELD('amount', FIELD_TYPES.int),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int),
@@ -370,6 +492,17 @@ const NAME_CLAIM_TX = [
   TX_FIELD('ttl', FIELD_TYPES.int)
 ]
 
+const NAME_CLAIM_TX_2 = [
+  ...BASE_TX,
+  TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
+  TX_FIELD('nonce', FIELD_TYPES.int),
+  TX_FIELD('name', FIELD_TYPES.binary, 'nm'),
+  TX_FIELD('nameSalt', FIELD_TYPES.int),
+  TX_FIELD('nameFee', FIELD_TYPES.int),
+  TX_FIELD('fee', FIELD_TYPES.int),
+  TX_FIELD('ttl', FIELD_TYPES.int)
+]
+
 const NAME_UPDATE_TX = [
   ...BASE_TX,
   TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
@@ -387,7 +520,7 @@ const NAME_TRANSFER_TX = [
   TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
   TX_FIELD('nameId', FIELD_TYPES.id, 'nm'),
-  TX_FIELD('recipientId', FIELD_TYPES.id, 'ak'),
+  TX_FIELD('recipientId', FIELD_TYPES.id, ['ak', 'nm']),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int)
 ]
@@ -412,6 +545,32 @@ const CONTRACT_TX = [
   TX_FIELD('deposit', FIELD_TYPES.int)
 ]
 
+const GA_ATTACH_TX = [
+  ...BASE_TX,
+  TX_FIELD('ownerId', FIELD_TYPES.id, 'ak'),
+  TX_FIELD('nonce', FIELD_TYPES.int),
+  TX_FIELD('code', FIELD_TYPES.binary, 'cb'),
+  TX_FIELD('authFun', FIELD_TYPES.rawBinary),
+  TX_FIELD('ctVersion', FIELD_TYPES.ctVersion),
+  TX_FIELD('fee', FIELD_TYPES.int),
+  TX_FIELD('ttl', FIELD_TYPES.int),
+  TX_FIELD('gas', FIELD_TYPES.int),
+  TX_FIELD('gasPrice', FIELD_TYPES.int),
+  TX_FIELD('callData', FIELD_TYPES.binary, 'cb')
+]
+
+const GA_META_TX = [
+  ...BASE_TX,
+  TX_FIELD('gaId', FIELD_TYPES.id, 'ak'),
+  TX_FIELD('authData', FIELD_TYPES.binary, 'cb'),
+  TX_FIELD('abiVersion', FIELD_TYPES.int),
+  TX_FIELD('fee', FIELD_TYPES.int),
+  TX_FIELD('gas', FIELD_TYPES.int),
+  TX_FIELD('gasPrice', FIELD_TYPES.int),
+  TX_FIELD('ttl', FIELD_TYPES.int),
+  TX_FIELD('tx', FIELD_TYPES.rlpBinary)
+]
+
 const CONTRACT_CREATE_TX = [
   ...BASE_TX,
   TX_FIELD('ownerId', FIELD_TYPES.id, 'ak'),
@@ -431,7 +590,7 @@ const CONTRACT_CALL_TX = [
   ...BASE_TX,
   TX_FIELD('callerId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('contractId', FIELD_TYPES.id, 'ct'),
+  TX_FIELD('contractId', FIELD_TYPES.id, ['ct', 'nm']),
   TX_FIELD('abiVersion', FIELD_TYPES.int),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int),
@@ -471,7 +630,7 @@ const ORACLE_REGISTER_TX = [
 
 const ORACLE_EXTEND_TX = [
   ...BASE_TX,
-  TX_FIELD('oracleId', FIELD_TYPES.id, 'ok'),
+  TX_FIELD('oracleId', FIELD_TYPES.id, ['ok', 'nm']),
   TX_FIELD('nonce', FIELD_TYPES.int),
   TX_FIELD('oracleTtlType', FIELD_TYPES.int),
   TX_FIELD('oracleTtlValue', FIELD_TYPES.int),
@@ -483,7 +642,7 @@ const ORACLE_QUERY_TX = [
   ...BASE_TX,
   TX_FIELD('senderId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('oracleId', FIELD_TYPES.id, 'ok'),
+  TX_FIELD('oracleId', FIELD_TYPES.id, ['ok', 'nm']),
   TX_FIELD('query', FIELD_TYPES.string),
   TX_FIELD('queryFee', FIELD_TYPES.int),
   TX_FIELD('queryTtlType', FIELD_TYPES.int),
@@ -668,6 +827,14 @@ const CHANNEL_OFFCHAIN_CALL_CONTRACT_TX = [
   TX_FIELD('gasLimit', FIELD_TYPES.int)
 ]
 
+const CHANNEL_RECONNECT_TX = [
+  ...BASE_TX,
+  TX_FIELD('channelId', FIELD_TYPES.id, 'ch'),
+  TX_FIELD('round', FIELD_TYPES.int),
+  TX_FIELD('role', FIELD_TYPES.string),
+  TX_FIELD('pubkey', FIELD_TYPES.id, 'ak')
+]
+
 const CHANNEL_OFFCHAIN_UPDATE_TRANSFER_TX = [
   ...BASE_TX,
   TX_FIELD('from', FIELD_TYPES.id, 'ak'),
@@ -763,7 +930,8 @@ export const TX_SERIALIZATION_SCHEMA = {
     1: TX_SCHEMA_FIELD(NAME_PRE_CLAIM_TX, OBJECT_TAG_NAME_SERVICE_PRECLAIM_TRANSACTION)
   },
   [TX_TYPE.nameClaim]: {
-    1: TX_SCHEMA_FIELD(NAME_CLAIM_TX, OBJECT_TAG_NAME_SERVICE_CLAIM_TRANSACTION)
+    1: TX_SCHEMA_FIELD(NAME_CLAIM_TX, OBJECT_TAG_NAME_SERVICE_CLAIM_TRANSACTION),
+    2: TX_SCHEMA_FIELD(NAME_CLAIM_TX_2, OBJECT_TAG_NAME_SERVICE_CLAIM_TRANSACTION)
   },
   [TX_TYPE.nameUpdate]: {
     1: TX_SCHEMA_FIELD(NAME_UPDATE_TX, OBJECT_TAG_NAME_SERVICE_UPDATE_TRANSACTION)
@@ -845,6 +1013,9 @@ export const TX_SERIALIZATION_SCHEMA = {
   [TX_TYPE.channelOffChainCallContract]: {
     1: TX_SCHEMA_FIELD(CHANNEL_OFFCHAIN_CALL_CONTRACT_TX, OBJECT_TAG_CHANNEL_OFFCHAIN_CALL_CONTRACT_TX)
   },
+  [TX_TYPE.channelReconnect]: {
+    1: TX_SCHEMA_FIELD(CHANNEL_RECONNECT_TX, OBJECT_TAG_CHANNEL_RECONNECT_TX)
+  },
   [TX_TYPE.proofOfInclusion]: {
     1: TX_SCHEMA_FIELD(PROOF_OF_INCLUSION_TX, OBJECT_TAG_PROOF_OF_INCLUSION)
   },
@@ -874,6 +1045,12 @@ export const TX_SERIALIZATION_SCHEMA = {
   },
   [TX_TYPE.accountsTree]: {
     1: TX_SCHEMA_FIELD(ACCOUNTS_TREE_TX, OBJECT_TAG_ACCOUNTS_TREE)
+  },
+  [TX_TYPE.gaAttach]: {
+    1: TX_SCHEMA_FIELD(GA_ATTACH_TX, OBJECT_TAG_GA_ATTACH)
+  },
+  [TX_TYPE.gaMeta]: {
+    1: TX_SCHEMA_FIELD(GA_META_TX, OBJECT_TAG_GA_META)
   }
 }
 
@@ -892,7 +1069,8 @@ export const TX_DESERIALIZATION_SCHEMA = {
     1: TX_SCHEMA_FIELD(NAME_PRE_CLAIM_TX, OBJECT_TAG_NAME_SERVICE_PRECLAIM_TRANSACTION)
   },
   [OBJECT_TAG_NAME_SERVICE_CLAIM_TRANSACTION]: {
-    1: TX_SCHEMA_FIELD(NAME_CLAIM_TX, OBJECT_TAG_NAME_SERVICE_CLAIM_TRANSACTION)
+    1: TX_SCHEMA_FIELD(NAME_CLAIM_TX, OBJECT_TAG_NAME_SERVICE_CLAIM_TRANSACTION),
+    2: TX_SCHEMA_FIELD(NAME_CLAIM_TX_2, OBJECT_TAG_NAME_SERVICE_CLAIM_TRANSACTION)
   },
   [OBJECT_TAG_NAME_SERVICE_UPDATE_TRANSACTION]: {
     1: TX_SCHEMA_FIELD(NAME_UPDATE_TX, OBJECT_TAG_NAME_SERVICE_UPDATE_TRANSACTION)
@@ -974,6 +1152,9 @@ export const TX_DESERIALIZATION_SCHEMA = {
   [OBJECT_TAG_CHANNEL_OFFCHAIN_CALL_CONTRACT_TX]: {
     1: TX_SCHEMA_FIELD(CHANNEL_OFFCHAIN_CALL_CONTRACT_TX, OBJECT_TAG_CHANNEL_OFFCHAIN_CALL_CONTRACT_TX)
   },
+  [OBJECT_TAG_CHANNEL_RECONNECT_TX]: {
+    1: TX_SCHEMA_FIELD(CHANNEL_RECONNECT_TX, OBJECT_TAG_CHANNEL_RECONNECT_TX)
+  },
   [OBJECT_TAG_PROOF_OF_INCLUSION]: {
     1: TX_SCHEMA_FIELD(PROOF_OF_INCLUSION_TX, OBJECT_TAG_PROOF_OF_INCLUSION)
   },
@@ -1003,6 +1184,17 @@ export const TX_DESERIALIZATION_SCHEMA = {
   },
   [OBJECT_TAG_ACCOUNTS_TREE]: {
     1: TX_SCHEMA_FIELD(ACCOUNTS_TREE_TX, OBJECT_TAG_ACCOUNTS_TREE)
+  },
+  [OBJECT_TAG_GA_ATTACH]: {
+    1: TX_SCHEMA_FIELD(GA_ATTACH_TX, OBJECT_TAG_GA_ATTACH)
+  },
+  [OBJECT_TAG_GA_META]: {
+    1: TX_SCHEMA_FIELD(GA_META_TX, OBJECT_TAG_GA_META)
+  },
+  [OBJECT_TAG_SOPHIA_BYTE_CODE]: {
+    1: TX_SCHEMA_FIELD(CONTRACT_BYTE_CODE_ROMA, OBJECT_TAG_SOPHIA_BYTE_CODE),
+    2: TX_SCHEMA_FIELD(CONTRACT_BYTE_CODE_MINERVA, OBJECT_TAG_SOPHIA_BYTE_CODE),
+    3: TX_SCHEMA_FIELD(CONTRACT_BYTE_CODE_LIMA, OBJECT_TAG_SOPHIA_BYTE_CODE)
   }
 }
 
@@ -1037,7 +1229,7 @@ const ERRORS = {
 
 export const SIGNATURE_VERIFICATION_SCHEMA = [
   VERIFICATION_FIELD(
-    () => `The signature cannot be verified, please verify that you used the correct network id and the correct private key for the sender address`,
+    () => 'The signature cannot be verified, please verify that you used the correct network id and the correct private key for the sender address',
     VALIDATORS.signature,
     ERRORS.invalidSignature
   )

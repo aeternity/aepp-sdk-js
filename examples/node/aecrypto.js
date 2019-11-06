@@ -50,7 +50,7 @@ const promptSchema = {
 function extractReadableKeys (dir, options) {
   const pwd = options.input
   prompt.start()
-  prompt.get(promptSchema, (err, { password }) => {
+  prompt.get(promptSchema, (_, { password }) => {
     const key = fs.readFileSync(path.join(pwd, dir, 'sign_key'))
     const pubKey = fs.readFileSync(path.join(pwd, dir, 'sign_key.pub'))
 
@@ -85,7 +85,7 @@ function generateKeyPair (name, { output }) {
 // This function shows how to use a compliant private key to sign an æternity
 // transaction and turn it into an RLP-encoded tuple ready for mining
 function signTx (tx, privKey) {
-  if (!tx.match(/^tx\_.+/)) {
+  if (!tx.match(/^tx_.+/)) {
     throw Error('Not a valid transaction')
   }
 

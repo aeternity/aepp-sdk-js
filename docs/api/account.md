@@ -3,7 +3,6 @@
 ## @aeternity/aepp-sdk/es/account
 Account module
 
-**Export**: Account  
 **Example**  
 ```js
 import Account from '@aeternity/aepp-sdk/es/account'
@@ -11,7 +10,7 @@ import Account from '@aeternity/aepp-sdk/es/account'
 
 * [@aeternity/aepp-sdk/es/account](#module_@aeternity/aepp-sdk/es/account)
     * [Account([options])](#exp_module_@aeternity/aepp-sdk/es/account--Account) ⇒ `Object` ⏏
-        * [.signTransaction(tx)](#module_@aeternity/aepp-sdk/es/account--Account+signTransaction) ⇒ `String`
+        * [.signTransaction(tx, opt)](#module_@aeternity/aepp-sdk/es/account--Account+signTransaction) ⇒ `String`
         * [.getNetworkId()](#module_@aeternity/aepp-sdk/es/account--Account+getNetworkId) ⇒ `String`
         * *[.sign(data)](#module_@aeternity/aepp-sdk/es/account--Account+sign) ⇒ `String`*
         * *[.address()](#module_@aeternity/aepp-sdk/es/account--Account+address) ⇒ `String`*
@@ -39,7 +38,7 @@ signing key pair.
 
 <a id="module_@aeternity/aepp-sdk/es/account--Account+signTransaction"></a>
 
-#### account.signTransaction(tx) ⇒ `String`
+#### account.signTransaction(tx, opt) ⇒ `String`
 Sign encoded transaction
 
 **Kind**: instance method of [`Account`](#exp_module_@aeternity/aepp-sdk/es/account--Account)  
@@ -50,6 +49,7 @@ Sign encoded transaction
 | Param | Type | Description |
 | --- | --- | --- |
 | tx | `String` | Transaction to sign |
+| opt | `Object` | Options |
 
 <a id="module_@aeternity/aepp-sdk/es/account--Account+getNetworkId"></a>
 
