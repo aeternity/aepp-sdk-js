@@ -43,7 +43,7 @@ function waitForChannel (channel) {
   )
 }
 
-describe.only('Channel', function () {
+describe('Channel', function () {
   configure(this)
   this.timeout(120000)
 

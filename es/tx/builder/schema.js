@@ -1212,7 +1212,8 @@ const VALIDATORS = {
   nonceUsed: 'nonceUsed',
   nonceHigh: 'nonceHigh',
   minGasPrice: 'minGasPrice',
-  vmAndAbiVersion: 'vmAndAbiVersion'
+  vmAndAbiVersion: 'vmAndAbiVersion',
+  insufficientBalanceForFeeNameFee: 'insufficientBalanceForFeeNameFee'
 }
 
 const ERRORS = {
@@ -1224,7 +1225,8 @@ const ERRORS = {
   nonceUsed: { key: 'NonceUsed', type: ERROR_TYPE.ERROR, txKey: 'nonce' },
   nonceHigh: { key: 'NonceHigh', type: ERROR_TYPE.WARNING, txKey: 'nonce' },
   minGasPrice: { key: 'minGasPrice', type: ERROR_TYPE.ERROR, txKey: 'gasPrice' },
-  vmAndAbiVersion: { key: 'vmAndAbiVersion', type: ERROR_TYPE.ERROR, txKey: 'ctVersion' }
+  vmAndAbiVersion: { key: 'vmAndAbiVersion', type: ERROR_TYPE.ERROR, txKey: 'ctVersion' },
+  insufficientBalanceForFeeNameFee: { key: 'insufficientBalanceForFeeNameFee', type: ERROR_TYPE.ERROR, txKey: 'nameFee' }
 }
 
 export const SIGNATURE_VERIFICATION_SCHEMA = [
@@ -1244,6 +1246,13 @@ export const CONTRACT_VERIFICATION_SCHEMA = [
     () => `The gasPrice must be bigger then ${MIN_GAS_PRICE}`,
     VALIDATORS.minGasPrice,
     ERRORS.minGasPrice
+  )
+]
+export const NAME_CLAIM_VERIFICATION_SCHEMA = [
+  VERIFICATION_FIELD(
+    ({ balance }) => `The account balance ${balance} is not enough to execute the transaction`,
+    VALIDATORS.insufficientBalanceForFeeNameFee,
+    ERRORS.insufficientBalanceForFeeNameFee
   )
 ]
 export const BASE_VERIFICATION_SCHEMA = [
