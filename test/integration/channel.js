@@ -43,7 +43,7 @@ function waitForChannel (channel) {
   )
 }
 
-describe('Channel', function () {
+describe.only('Channel', function () {
   configure(this)
   this.timeout(120000)
 
@@ -60,6 +60,9 @@ describe('Channel', function () {
   let callerNonce
   const initiatorSign = sinon.spy((tag, tx) => initiator.signTransaction(tx))
   const responderSign = sinon.spy((tag, tx) => {
+    if (typeof responderShouldRejectUpdate === 'number') {
+      return responderShouldRejectUpdate
+    }
     if (responderShouldRejectUpdate) {
       return null
     }
@@ -248,6 +251,32 @@ describe('Channel', function () {
     })
   })
 
+  it('can abort update sign request', async () => {
+    const errorCode = 12345
+    const result = await initiatorCh.update(
+      await initiator.address(),
+      await responder.address(),
+      100,
+      () => errorCode
+    )
+    result.should.eql({ accepted: false, errorCode, errorMessage: 'user-defined' })
+  })
+
+  it('can abort update with custom error code', async () => {
+    responderShouldRejectUpdate = 1234
+    const result = await initiatorCh.update(
+      await initiator.address(),
+      await responder.address(),
+      100,
+      tx => initiator.signTransaction(tx)
+    )
+    result.should.eql({
+      accepted: false,
+      errorCode: responderShouldRejectUpdate,
+      errorMessage: 'user-defined'
+    })
+  })
+
   it('can post bignumber update and accept', async () => {
     responderShouldRejectUpdate = false
     const sign = sinon.spy(initiator.signTransaction.bind(initiator))
@@ -300,6 +329,27 @@ describe('Channel', function () {
         }
       ]
     })
+  })
+
+  it('can post update with metadata', async () => {
+    responderShouldRejectUpdate = true
+    const meta = 'meta 1'
+    const sign = sinon.spy(initiator.signTransaction.bind(initiator))
+    await initiatorCh.update(
+      await initiator.address(),
+      await responder.address(),
+      100,
+      sign,
+      [meta]
+    )
+    sign.firstCall.args[1].updates.should.eql([
+      sign.firstCall.args[1].updates[0],
+      { data: meta, op: 'OffChainMeta'}
+    ])
+    responderSign.firstCall.args[2].updates.should.eql([
+      responderSign.firstCall.args[2].updates[0],
+      { data: meta, op: 'OffChainMeta'}
+    ])
   })
 
   it('can get proof of inclusion', async () => {
@@ -412,8 +462,8 @@ describe('Channel', function () {
       sign,
       { onOnChainTx, onOwnWithdrawLocked, onWithdrawLocked }
     )
-    result.should.eql({ accepted: false })
     initiatorCh.round().should.equal(roundBefore)
+    result.should.eql({ ...result, accepted: false })
     sinon.assert.notCalled(onOnChainTx)
     sinon.assert.notCalled(onOwnWithdrawLocked)
     sinon.assert.notCalled(onWithdrawLocked)
@@ -449,6 +499,28 @@ describe('Channel', function () {
       ...tx,
       toId: await initiator.address(),
       amount: amount.toString()
+    })
+  })
+
+  it('can abort withdraw sign request', async () => {
+    const errorCode = 12345
+    const result = await initiatorCh.withdraw(
+      100,
+      () => errorCode
+    )
+    result.should.eql({ accepted: false, errorCode, errorMessage: 'user-defined' })
+  })
+
+  it('can abort withdraw with custom error code', async () => {
+    responderShouldRejectUpdate = 12345
+    const result = await initiatorCh.withdraw(
+      100,
+      tx => initiator.signTransaction(tx)
+    )
+    result.should.eql({
+      accepted: false,
+      errorCode: responderShouldRejectUpdate,
+      errorMessage: 'user-defined'
     })
   })
 
@@ -519,8 +591,8 @@ describe('Channel', function () {
       sign,
       { onOnChainTx, onOwnDepositLocked, onDepositLocked }
     )
-    result.should.eql({ accepted: false })
     initiatorCh.round().should.equal(roundBefore)
+    result.should.eql({ ...result, accepted: false })
     sinon.assert.notCalled(onOnChainTx)
     sinon.assert.notCalled(onOwnDepositLocked)
     sinon.assert.notCalled(onDepositLocked)
@@ -544,6 +616,28 @@ describe('Channel', function () {
       ...tx,
       fromId: await initiator.address(),
       amount: amount.toString()
+    })
+  })
+
+  it('can abort deposit sign request', async () => {
+    const errorCode = 12345
+    const result = await initiatorCh.deposit(
+      100,
+      () => errorCode
+    )
+    result.should.eql({ accepted: false, errorCode, errorMessage: 'user-defined' })
+  })
+
+  it('can abort deposit with custom error code', async () => {
+    responderShouldRejectUpdate = 12345
+    const result = await initiatorCh.deposit(
+      100,
+      tx => initiator.signTransaction(tx)
+    )
+    result.should.eql({
+      accepted: false,
+      errorCode: responderShouldRejectUpdate,
+      errorMessage: 'user-defined'
     })
   })
 
@@ -788,8 +882,40 @@ describe('Channel', function () {
       vmVersion: 4,
       abiVersion: 1
     }, async (tx) => initiator.signTransaction(tx))
-    result.should.eql({ accepted: false })
     initiatorCh.round().should.equal(roundBefore)
+    result.should.eql({ ...result, accepted: false })
+  })
+
+  it('can abort contract sign request', async () => {
+    const errorCode = 12345
+    const code = await initiator.compileContractAPI(identityContract, { backend: 'aevm' })
+    const callData = await initiator.contractEncodeCallDataAPI(identityContract, 'init', [], { backend: 'aevm' })
+    const result = await initiatorCh.createContract({
+      code,
+      callData,
+      deposit: BigNumber('10e18'),
+      vmVersion: 4,
+      abiVersion: 1
+    }, () => errorCode)
+    result.should.eql({ accepted: false, errorCode, errorMessage: 'user-defined' })
+  })
+
+  it('can abort contract with custom error code', async () => {
+    responderShouldRejectUpdate = 12345
+    const code = await initiator.compileContractAPI(identityContract, { backend: 'aevm' })
+    const callData = await initiator.contractEncodeCallDataAPI(identityContract, 'init', [], { backend: 'aevm' })
+    const result = await initiatorCh.createContract({
+      code,
+      callData,
+      deposit: BigNumber('10e18'),
+      vmVersion: 4,
+      abiVersion: 1
+    }, async (tx) => initiator.signTransaction(tx))
+    result.should.eql({
+      accepted: false,
+      errorCode: responderShouldRejectUpdate,
+      errorMessage: 'user-defined'
+    })
   })
 
   it('can call a contract and accept', async () => {
@@ -814,8 +940,34 @@ describe('Channel', function () {
       contract: contractAddress,
       abiVersion: 1
     }, async (tx) => initiator.signTransaction(tx))
-    result.should.eql({ accepted: false })
     initiatorCh.round().should.equal(roundBefore)
+    result.should.eql({ ...result, accepted: false })
+  })
+
+  it('can abort contract call sign request', async () => {
+    const errorCode = 12345
+    const result = await initiatorCh.callContract({
+      amount: 0,
+      callData: await contractEncodeCall('main', ['42']),
+      contract: contractAddress,
+      abiVersion: 1
+    }, () => errorCode)
+    result.should.eql({ accepted: false, errorCode, errorMessage: 'user-defined' })
+  })
+
+  it('can abort contract call with custom error code', async () => {
+    responderShouldRejectUpdate = 12345
+    const result = await initiatorCh.callContract({
+      amount: 0,
+      callData: await contractEncodeCall('main', ['42']),
+      contract: contractAddress,
+      abiVersion: 1
+    }, async (tx) => initiator.signTransaction(tx))
+    result.should.eql({
+      accepted: false,
+      errorCode: responderShouldRejectUpdate,
+      errorMessage: 'user-defined'
+    })
   })
 
   it('can get contract call', async () => {
