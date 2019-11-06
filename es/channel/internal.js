@@ -225,6 +225,7 @@ async function initialize (channel, channelOptions) {
   eventEmitters.set(channel, new EventEmitter())
   sequence.set(channel, 0)
   rpcCallbacks.set(channel, new Map())
+  changeStatus(channel, 'connecting')
   const ws = await WebSocket(wsUrl, {
     onopen: () => {
       changeStatus(channel, 'connected')
