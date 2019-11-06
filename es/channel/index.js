@@ -112,6 +112,7 @@ function id () {
  * @param {String} to - Receiver's public address
  * @param {Number} amount - Transaction amount
  * @param {Function} sign - Function which verifies and signs offchain transaction
+ * @param {Array<String>} metadata
  * @return {Promise<Object>}
  * @example channel.update(
  *   'ak_Y1NRjHuoc3CGMYMvCmdHSBpJsMDR6Ra2t5zjhRcbtMeXXLpLH',
@@ -124,7 +125,7 @@ function id () {
  *   }
  * )
  */
-function update (from, to, amount, sign) {
+function update (from, to, amount, sign, metadata) {
   return new Promise((resolve, reject) => {
     enqueueAction(
       this,
@@ -133,7 +134,7 @@ function update (from, to, amount, sign) {
         send(channel, {
           jsonrpc: '2.0',
           method: 'channels.update.new',
-          params: { from, to, amount }
+          params: { from, to, amount, meta: metadata }
         })
         return {
           handler: handlers.awaitingOffChainTx,
