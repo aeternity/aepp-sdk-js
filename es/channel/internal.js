@@ -231,6 +231,9 @@ async function initialize (channel, channelOptions) {
       changeStatus(channel, 'connected')
       if (params.reconnectTx) {
         enterState(channel, { handler: channelOpen })
+        setTimeout(async () =>
+          changeState(channel, (await call(channel, 'channels.get.offchain_state', {})).signed_tx)
+        , 0)
       }
       ping(channel)
     },
