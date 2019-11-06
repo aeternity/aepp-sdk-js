@@ -21,9 +21,6 @@ import { assert, expect } from 'chai'
 import * as Crypto from '../../es/utils/crypto'
 
 import { buildTxHash, unpackTx } from '../../es/tx/builder'
-import { encryptData, decryptData, addressToHex, encodeBase58Check } from '../../es/utils/crypto'
-import { encryptData } from '../../es/utils/crypto'
-import { decryptData } from '../../es/utils/crypto'
 
 // These keys are fixations for the encryption lifecycle tests and will
 // not be used for signing
@@ -168,22 +165,22 @@ describe('crypto', () => {
     const msgBuffer = Buffer.from(msgString)
 
     it('Encrypt String/Buffer and decrypt', () => {
-      const encryptedString = encryptData(msgString, publicKey)
-      const encryptedBuffer = encryptData(msgBuffer, publicKey)
+      const encryptedString = Crypto.encryptData(msgString, publicKey)
+      const encryptedBuffer = Crypto.encryptData(msgBuffer, publicKey)
 
-      const decryptedString = decryptData(secretKey, encryptedString)
-      const decryptedBuffer = decryptData(secretKey, encryptedBuffer)
+      const decryptedString = Crypto.decryptData(secretKey, encryptedString)
+      const decryptedBuffer = Crypto.decryptData(secretKey, encryptedBuffer)
       Buffer.from(decryptedString).toString().should.be.equal(msgString)
       decryptedBuffer.equals(msgBuffer).should.be.equal(true)
     })
     it('Decrypt with wrong secret', () => {
       const keyPair = Crypto.generateKeyPair()
 
-      const encryptedString = encryptData(msgString, keyPair.publicKey)
-      const encryptedBuffer = encryptData(msgBuffer, keyPair.publicKey)
+      const encryptedString = Crypto.encryptData(msgString, keyPair.publicKey)
+      const encryptedBuffer = Crypto.encryptData(msgBuffer, keyPair.publicKey)
 
-      const decryptedString = decryptData(secretKey, encryptedString)
-      const decryptedBuffer = decryptData(secretKey, encryptedBuffer)
+      const decryptedString = Crypto.decryptData(secretKey, encryptedString)
+      const decryptedBuffer = Crypto.decryptData(secretKey, encryptedBuffer)
       const isNull = decryptedBuffer === null && decryptedString === null
       isNull.should.be.equal(true)
     })
