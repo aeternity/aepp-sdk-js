@@ -225,11 +225,15 @@ async function initialize (channel, channelOptions) {
   eventEmitters.set(channel, new EventEmitter())
   sequence.set(channel, 0)
   rpcCallbacks.set(channel, new Map())
+  changeStatus(channel, 'connecting')
   const ws = await WebSocket(wsUrl, {
     onopen: () => {
       changeStatus(channel, 'connected')
       if (params.reconnectTx) {
         enterState(channel, { handler: channelOpen })
+        setTimeout(async () =>
+          changeState(channel, (await call(channel, 'channels.get.offchain_state', {})).signed_tx)
+        , 0)
       }
       ping(channel)
     },
