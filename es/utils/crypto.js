@@ -24,10 +24,12 @@
 import bs58check from 'bs58check'
 import * as RLP from 'rlp'
 import { blake2b } from 'blakejs'
+import ed2curve from 'ed2curve'
 import nacl from 'tweetnacl'
 import aesjs from 'aes-js'
-import { leftPad, rightPad, toBytes } from './bytes'
 import shajs from 'sha.js'
+
+import { leftPad, rightPad, toBytes } from './bytes'
 import { decode as decodeNode } from '../tx/builder/helpers'
 
 const Ecb = aesjs.ModeOfOperation.ecb
@@ -658,4 +660,54 @@ export function deserialize (binary, opts = { prettyTags: false }) {
         state: encodeBase58Check(binary[5])
       })
   }
+}
+
+/**
+ * This function encrypts a message using base58check encoded and 'ak' prefixed
+ * publicKey such that only the corresponding secretKey will
+ * be able to decrypt
+ * @rtype (msg: String, publicKey: String) => Object
+ * @param {Buffer} msg - Data to encode
+ * @param {String} publicKey - Public key
+ * @return {Object}
+ */
+export function encryptData (msg, publicKey) {
+  const ephemeralKeyPair = nacl.box.keyPair()
+  const pubKeyUInt8Array = decodeBase58Check(assertedType(publicKey, 'ak'))
+  const nonce = nacl.randomBytes(nacl.box.nonceLength)
+
+  const encryptedMessage = nacl.box(
+    Buffer.from(msg),
+    nonce,
+    ed2curve.convertPublicKey(pubKeyUInt8Array),
+    ephemeralKeyPair.secretKey
+  )
+
+  return {
+    ciphertext: Buffer.from(encryptedMessage).toString('hex'),
+    ephemPubKey: Buffer.from(ephemeralKeyPair.publicKey).toString('hex'),
+    nonce: Buffer.from(nonce).toString('hex'),
+    version: 'x25519-xsalsa20-poly1305'
+  }
+}
+
+/**
+ * This function decrypt a message using secret key
+ * @rtype (secretKey: String, encryptedData: Object) => Buffer|null
+ * @param {String} secretKey - Secret key
+ * @param {Object} encryptedData - Encrypted data
+ * @return {Buffer|null}
+ */
+export function decryptData (secretKey, encryptedData) {
+  const receiverSecretKeyUint8Array = ed2curve.convertSecretKey(Buffer.from(secretKey, 'hex'))
+  const nonce = Buffer.from(encryptedData.nonce, 'hex')
+  const ciphertext = Buffer.from(encryptedData.ciphertext, 'hex')
+  const ephemPubKey = Buffer.from(encryptedData.ephemPubKey, 'hex')
+  const decrypted = nacl.box.open(
+    ciphertext,
+    nonce,
+    ephemPubKey,
+    receiverSecretKeyUint8Array
+  )
+  return decrypted ? Buffer.from(decrypted) : decrypted
 }
