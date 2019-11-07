@@ -134,6 +134,34 @@ describe('Contract', function () {
     return deployed.should.have.property('address')
   })
 
+  it('Deploy/Call/Dry-run contract using callData', async () => {
+    const callArg = 1
+    const { bytecode } = await contract.contractCompile(identityContract)
+    const callDataDeploy = await contract.contractEncodeCall(identityContract, 'init', [])
+    const callDataCall = await contract.contractEncodeCall(identityContract, 'main', [callArg.toString()])
+
+    const deployStatic = await contract.contractCallStatic(identityContract, null, 'init', callDataDeploy, { bytecode })
+    deployStatic.result.should.have.property('gasUsed')
+    deployStatic.result.should.have.property('returnType')
+
+    const deployed = await contract.contractDeploy(bytecode, identityContract, callDataDeploy)
+    deployed.result.should.have.property('gasUsed')
+    deployed.result.should.have.property('returnType')
+    deployed.should.have.property('address')
+
+    const callStaticRes = await contract.contractCallStatic(identityContract, deployed.address, 'main', callDataCall)
+    callStaticRes.result.should.have.property('gasUsed')
+    callStaticRes.result.should.have.property('returnType')
+    const decodedCallStaticResult = await callStaticRes.decode()
+    decodedCallStaticResult.should.be.equal(callArg)
+
+    const callRes = await contract.contractCall(identityContract, deployed.address, 'main', callDataCall)
+    callRes.result.should.have.property('gasUsed')
+    callRes.result.should.have.property('returnType')
+    const decodedCallResult = await callRes.decode()
+    decodedCallResult.should.be.equal(callArg)
+  })
+
   it('Deploy and call contract on specific account', async () => {
     const current = await contract.address()
     const onAccount = contract.addresses().find(acc => acc !== current)

@@ -64,7 +64,7 @@ async function getOracleObject (oracleId) {
  * @param {String} oracleId Oracle public key
  * @param {Function} onQuery OnQuery callback
  * @param {Object} [options] Options object
- * @param {Object} [options.interval] Poll interval(default: 5000)
+ * @param {Number} [options.interval] Poll interval(default: 5000)
  * @return {Function} stopPolling - Stop polling function
  */
 async function pollForQueries (oracleId, onQuery, { interval = 5000 } = {}) {
