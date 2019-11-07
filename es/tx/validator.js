@@ -7,9 +7,15 @@ import { encode } from '../tx/builder/helpers'
 
 import { BigNumber } from 'bignumber.js'
 import {
-  BASE_VERIFICATION_SCHEMA, CONTRACT_VERIFICATION_SCHEMA, MIN_GAS_PRICE, OBJECT_ID_TX_TYPE,
-  OBJECT_TAG_SIGNED_TRANSACTION, PROTOCOL_VM_ABI,
-  SIGNATURE_VERIFICATION_SCHEMA, TX_TYPE
+  BASE_VERIFICATION_SCHEMA,
+  CONTRACT_VERIFICATION_SCHEMA,
+  MIN_GAS_PRICE,
+  NAME_CLAIM_VERIFICATION_SCHEMA,
+  OBJECT_ID_TX_TYPE,
+  OBJECT_TAG_SIGNED_TRANSACTION,
+  PROTOCOL_VM_ABI,
+  SIGNATURE_VERIFICATION_SCHEMA,
+  TX_TYPE
 } from './builder/schema'
 import { calculateFee, unpackTx } from './builder'
 import { NodePool } from '../node-pool'
@@ -68,6 +74,9 @@ const VALIDATORS = {
       .reduce((acc, [key, value]) =>
         [...acc, value === undefined ? true : txProtocol[key].includes(parseInt(value))],
       []).includes(false)
+  },
+  insufficientBalanceForFeeNameFee ({ nameFee, fee, balance, VSN }) {
+    return VSN === 1 || BigNumber(balance).gt(BigNumber(nameFee).plus(fee))
   }
 }
 
@@ -188,6 +197,8 @@ function customVerification (txType, data) {
     case TX_TYPE.contractCall:
     case TX_TYPE.oracleRegister:
       return verifySchema(CONTRACT_VERIFICATION_SCHEMA, data)
+    case TX_TYPE.nameClaim:
+      return verifySchema(NAME_CLAIM_VERIFICATION_SCHEMA, data)
     default:
       return []
   }
