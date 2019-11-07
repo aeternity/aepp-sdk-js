@@ -38,7 +38,7 @@ const processResponse = async (res) => {
     if (!e.response) throw e
     throw Object.assign(
       Error(`Http request for ${e.config.url} failed with status code ${e.response.status}. Status: ${e.response.statusText}. \nError data: ${JSON.stringify(e.response.data)}`),
-      { data: e.response.data }
+      { error: e }
     )
   }
 }
