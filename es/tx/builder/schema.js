@@ -17,7 +17,7 @@ export const TX_TTL = 0
 
 // # AENS
 export const AENS_NAME_DOMAINS = ['chain', 'test']
-export const NAME_TTL = 500
+export const NAME_TTL = 50000
 // # max number of block into the future that the name is going to be available
 // # https://github.com/aeternity/protocol/blob/epoch-v0.22.0/AENS.md#update
 // # https://github.com/aeternity/protocol/blob/44a93d3aab957ca820183c3520b9daf6b0fedff4/AENS.md#aens-entry
