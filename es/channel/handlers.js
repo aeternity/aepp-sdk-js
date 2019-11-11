@@ -45,7 +45,7 @@ async function appendSignature (tx, signFn) {
 }
 
 function handleUnexpectedMessage (channel, message, state) {
-  if (state.reject) {
+  if (state && state.reject) {
     state.reject(Object.assign(
       Error(`Unexpected message received:\n\n${JSON.stringify(message)}`),
       { wsMessage: message }
@@ -162,6 +162,13 @@ export async function channelOpen (channel, message, state) {
         case 'withdraw_locked':
         case 'own_deposit_locked':
         case 'deposit_locked':
+        case 'peer_disconnected':
+        case 'channel_reestablished':
+        case 'open':
+          // TODO: Better handling of peer_disconnected event.
+          //
+          //       We should enter intermediate state where offchain transactions
+          //       are blocked until channel is reestablished.
           emit(channel, message.params.data.event)
           return { handler: channelOpen }
         case 'close_mutual':
@@ -242,6 +249,12 @@ export async function awaitingOffChainTx (channel, message, state) {
     })
     return { handler: channelOpen }
   }
+  if (message.method === 'channels.info') {
+    if (message.params.data.event === 'aborted_update') {
+      state.resolve({ accepted: false })
+      return { handler: channelOpen }
+    }
+  }
   return handleUnexpectedMessage(channel, message, state)
 }
 
@@ -258,6 +271,12 @@ export function awaitingOffChainUpdate (channel, message, state) {
       errorMessage: message.params.data.error_msg
     })
     return { handler: channelOpen }
+  }
+  if (message.method === 'channels.info') {
+    if (message.params.data.event === 'aborted_update') {
+      state.resolve({ accepted: false })
+      return { handler: channelOpen }
+    }
   }
   if (message.error) {
     state.reject(new Error(message.error.message))
@@ -287,7 +306,7 @@ export async function awaitingTxSignRequest (channel, message, state) {
       }
       if (typeof signedTx === 'number') {
         send(channel, { jsonrpc: '2.0', method: `channels.${tag}`, params: { error: signedTx } })
-        return { handler: awaitingUpdateConflict }
+        return { handler: awaitingUpdateConflict, state }
       }
     }
     // soft-reject via competing update
@@ -300,14 +319,14 @@ export async function awaitingTxSignRequest (channel, message, state) {
         amount: 1
       }
     })
-    return { handler: awaitingUpdateConflict }
+    return { handler: awaitingUpdateConflict, state }
   }
   return handleUnexpectedMessage(channel, message, state)
 }
 
 export function awaitingUpdateConflict (channel, message, state) {
   if (message.error) {
-    return { handler: awaitingUpdateConflict }
+    return { handler: awaitingUpdateConflict, state }
   }
   if (message.method === 'channels.conflict') {
     return { handler: channelOpen }
@@ -405,6 +424,12 @@ export function awaitingWithdrawCompletion (channel, message, state) {
     })
     return { handler: channelOpen }
   }
+  if (message.method === 'channels.info') {
+    if (message.params.data.event === 'aborted_update') {
+      state.resolve({ accepted: false })
+      return { handler: channelOpen }
+    }
+  }
   return handleUnexpectedMessage(channel, message, state)
 }
 
@@ -463,6 +488,12 @@ export function awaitingDepositCompletion (channel, message, state) {
     })
     return { handler: channelOpen }
   }
+  if (message.method === 'channels.info') {
+    if (message.params.data.event === 'aborted_update') {
+      state.resolve({ accepted: false })
+      return { handler: channelOpen }
+    }
+  }
   return handleUnexpectedMessage(channel, message, state)
 }
 
@@ -509,6 +540,12 @@ export function awaitingNewContractCompletion (channel, message, state) {
     })
     return { handler: channelOpen }
   }
+  if (message.method === 'channels.info') {
+    if (message.params.data.event === 'aborted_update') {
+      state.resolve({ accepted: false })
+      return { handler: channelOpen }
+    }
+  }
   return handleUnexpectedMessage(channel, message, state)
 }
 
@@ -545,6 +582,12 @@ export function awaitingCallContractCompletion (channel, message, state) {
       errorMessage: message.params.data.error_msg
     })
     return { handler: channelOpen }
+  }
+  if (message.method === 'channels.info') {
+    if (message.params.data.event === 'aborted_update') {
+      state.resolve({ accepted: false })
+      return { handler: channelOpen }
+    }
   }
   return handleUnexpectedMessage(channel, message, state)
 }

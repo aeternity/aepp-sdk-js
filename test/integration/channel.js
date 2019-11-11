@@ -259,7 +259,7 @@ describe('Channel', function () {
       100,
       () => errorCode
     )
-    result.should.eql({ accepted: false, errorCode, errorMessage: 'user-defined' })
+    result.should.eql({ accepted: false })
   })
 
   it('can abort update with custom error code', async () => {
@@ -508,7 +508,7 @@ describe('Channel', function () {
       100,
       () => errorCode
     )
-    result.should.eql({ accepted: false, errorCode, errorMessage: 'user-defined' })
+    result.should.eql({ accepted: false })
   })
 
   it('can abort withdraw with custom error code', async () => {
@@ -625,7 +625,7 @@ describe('Channel', function () {
       100,
       () => errorCode
     )
-    result.should.eql({ accepted: false, errorCode, errorMessage: 'user-defined' })
+    result.should.eql({ accepted: false })
   })
 
   it('can abort deposit with custom error code', async () => {
@@ -678,13 +678,6 @@ describe('Channel', function () {
       sign: responderSign
     })
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
-    const { accepted } = await initiatorCh.update(
-      await initiator.address(),
-      await responder.address(),
-      100,
-      tx => initiator.signTransaction(tx)
-    )
-    accepted.should.be.true
     existingChannelRound = initiatorCh.round()
     const result = await initiatorCh.leave()
     result.channelId.should.be.a('string')
@@ -702,15 +695,7 @@ describe('Channel', function () {
       offchainTx,
       sign: initiatorSign
     })
-    responderCh = await Channel({
-      ...sharedParams,
-      role: 'responder',
-      port: 3002,
-      existingChannelId,
-      offchainTx,
-      sign: responderSign
-    })
-    await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
+    await waitForChannel(initiatorCh)
     initiatorCh.round().should.equal(existingChannelRound)
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.notCalled(responderSign)
@@ -897,7 +882,7 @@ describe('Channel', function () {
       vmVersion: 4,
       abiVersion: 1
     }, () => errorCode)
-    result.should.eql({ accepted: false, errorCode, errorMessage: 'user-defined' })
+    result.should.eql({ accepted: false })
   })
 
   it('can abort contract with custom error code', async () => {
@@ -952,7 +937,7 @@ describe('Channel', function () {
       contract: contractAddress,
       abiVersion: 1
     }, () => errorCode)
-    result.should.eql({ accepted: false, errorCode, errorMessage: 'user-defined' })
+    result.should.eql({ accepted: false })
   })
 
   it('can abort contract call with custom error code', async () => {
