@@ -70,10 +70,10 @@ export const NAME_BID_RANGES = {
 // # ref: https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L273
 // # name bid timeouts
 export const NAME_BID_TIMEOUTS = {
-  13: 0,
-  12: NAME_BID_TIMEOUT_BLOCKS, // # 480 blocks
-  8: 31 * NAME_BID_TIMEOUT_BLOCKS, // # 14880 blocks
-  4: 62 * NAME_BID_TIMEOUT_BLOCKS // # 29760 blocks
+  13: BigNumber(0),
+  12: BigNumber(NAME_BID_TIMEOUT_BLOCKS), // # 480 blocks
+  8: BigNumber(31).times(NAME_BID_TIMEOUT_BLOCKS), // # 14880 blocks
+  4: BigNumber(62).times(NAME_BID_TIMEOUT_BLOCKS) // # 29760 blocks
 }
 
 // # Tag constant for ids (type uint8)
