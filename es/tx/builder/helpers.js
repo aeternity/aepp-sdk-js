@@ -297,11 +297,11 @@ export function computeBidFee (domain, startFee = NAME_FEE, increment = NAME_FEE
 
 export function computeAuctionEndBlock (domain, claimHeight) {
   return R.cond([
-    [R.lt(5), R.always(NAME_BID_TIMEOUTS[4] + claimHeight)],
-    [R.lt(9), R.always(NAME_BID_TIMEOUTS[8] + claimHeight)],
-    [R.lte(NAME_BID_MAX_LENGTH), R.always(NAME_BID_TIMEOUTS[12] + claimHeight)],
-    [R.T, R.always(claimHeight)]
-  ])(domain.replace('.chain', '').length)
+    [R.lt(5), R.always(NAME_BID_TIMEOUTS[4].plus(claimHeight))],
+    [R.lt(9), R.always(NAME_BID_TIMEOUTS[8].plus(claimHeight))],
+    [R.lte(NAME_BID_MAX_LENGTH), R.always(NAME_BID_TIMEOUTS[12].plus(claimHeight))],
+    [R.T, R.always(BigNumber(claimHeight))]
+  ])(domain.replace('.chain', '').length).toString(10)
 }
 
 export default {
