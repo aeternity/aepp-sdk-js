@@ -2,13 +2,13 @@
 # yarn lockfile v1
 
 
-"@aeternity/aepp-sdk@6.0.1":
-  version "6.0.1"
-  resolved "https://registry.yarnpkg.com/@aeternity/aepp-sdk/-/aepp-sdk-6.0.1.tgz#593816e2abad8265ab133592632fed215488b250"
-  integrity sha512-ydon6Y0g8MxxKwJaXT1xlGiCRMlGu6Gos6Ab7+CFkOmOr0y7TeR2CunY/YVbpHBpHAOfq+fvyKxsn68F0k3Ubw==
+"@aeternity/aepp-sdk@6.1.0":
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/@aeternity/aepp-sdk/-/aepp-sdk-6.1.0.tgz#a3e59ae928712517cf5a1ed9a7fc31cac7e32f69"
+  integrity sha512-5sKqUtGV3dXGxL0Vj4VBAAGFCY1LDI1FLDH/gyvnK5ATgHHKaXuzskdrIGII+5nuaD2LjHn0hDneACTMR/CVuQ==
   dependencies:
     "@aeternity/bip39" "^0.1.0"
-    "@babel/runtime" "^7.6.2"
+    "@babel/runtime" "^7.7.2"
     "@stamp/it" "^1.0.3"
     "@stamp/required" "^1.0.1"
     aes-js "^3.1.1"
@@ -18,11 +18,12 @@
     bip32-path "^0.4.2"
     blakejs "^1.1.0"
     bs58check "^2.1.1"
-    commander "^3.0.0"
+    commander "^4.0.0"
+    ed2curve "^0.2.1"
     joi-browser "^13.4.0"
     libsodium-wrappers-sumo "0.7.6"
     ramda "^0.26.1"
-    rlp "2.2.3"
+    rlp "2.2.4"
     serialize-javascript "^2.0.0"
     sha.js "^2.4.11"
     tweetnacl "^1.0.0"
@@ -839,17 +840,10 @@
     pirates "^4.0.0"
     source-map-support "^0.5.16"
 
-"@babel/runtime@7.7.2":
+"@babel/runtime@7.7.2", "@babel/runtime@^7.7.2":
   version "7.7.2"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.7.2.tgz#111a78002a5c25fc8e3361bedc9529c696b85a6a"
   integrity sha512-JONRbXbTXc9WQE2mAZd1p0Z3DZ/6vaQIkgYMSTP3KjRCyd7rCZCcfhCyX+YjwcKxcZ82UrxbRD358bpExNgrjw==
-  dependencies:
-    regenerator-runtime "^0.13.2"
-
-"@babel/runtime@^7.6.2":
-  version "7.6.2"
-  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.6.2.tgz#c3d6e41b304ef10dcf13777a33e7694ec4a9a6dd"
-  integrity sha512-EXxN64agfUqqIGeEjI5dL5z0Sw0ZwWo1mLTi4mQowCZ42O59b7DRpZAnTC6OqdF28wMBMFKNb/4uFGrVaigSpg==
   dependencies:
     regenerator-runtime "^0.13.2"
 
@@ -2411,10 +2405,10 @@ commander@^2.11.0, commander@^2.18.0, commander@^2.20.0, commander@^2.8.1:
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.20.0.tgz#d58bb2b5c1ee8f87b0d340027e9e94e222c5a422"
   integrity sha512-7j2y+40w61zy6YC2iRNpUe/NwhNyoXrYpHMrSunaMG64nRnaf96zO/KMQR4OyN/UnE5KLyEBnKHd4aG3rskjpQ==
 
-commander@^3.0.0:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/commander/-/commander-3.0.2.tgz#6837c3fb677ad9933d1cfba42dd14d5117d6b39e"
-  integrity sha512-Gar0ASD4BDyKC4hl4DwHqDrmvjoxWKZigVnAbn5H1owvm4CxCPdb0HQDehwNYMJpla5+M2tPmPARzhtYuwpHow==
+commander@^4.0.0:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-4.0.1.tgz#b67622721785993182e807f4883633e6401ba53c"
+  integrity sha512-IPF4ouhCP+qdlcmCedhxX4xiGBPyigb8v5NeUp+0LyhwLgxMqyp3S0vl7TAPfS/hiP7FC3caI/PB9lTmP8r1NA==
 
 commander@~2.19.0:
   version "2.19.0"
@@ -3233,6 +3227,13 @@ each-props@^1.3.0:
   dependencies:
     is-plain-object "^2.0.1"
     object.defaults "^1.1.0"
+
+ed2curve@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/ed2curve/-/ed2curve-0.2.1.tgz#22e6aaa3569e3c4dbf4eefa29612ec329e58190c"
+  integrity sha1-Iuaqo1aePE2/Tu+ilhLsMp5YGQw=
+  dependencies:
+    tweetnacl "0.x.x"
 
 ee-first@1.1.1:
   version "1.1.1"
@@ -8114,13 +8115,12 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^3.0.0"
     inherits "^2.0.1"
 
-rlp@2.2.3:
-  version "2.2.3"
-  resolved "https://registry.yarnpkg.com/rlp/-/rlp-2.2.3.tgz#7f94aef86cec412df87d5ea1d8cb116a47d45f0e"
-  integrity sha512-l6YVrI7+d2vpW6D6rS05x2Xrmq8oW7v3pieZOJKBEdjuTF4Kz/iwk55Zyh1Zaz+KOB2kC8+2jZlp2u9L4tTzCQ==
+rlp@2.2.4:
+  version "2.2.4"
+  resolved "https://registry.yarnpkg.com/rlp/-/rlp-2.2.4.tgz#d6b0e1659e9285fc509a5d169a9bd06f704951c1"
+  integrity sha512-fdq2yYCWpAQBhwkZv+Z8o/Z4sPmYm1CUq6P7n6lVTOdb949CnqA0sndXal5C1NleSVSZm6q5F3iEbauyVln/iw==
   dependencies:
     bn.js "^4.11.1"
-    safe-buffer "^5.1.1"
 
 run-async@^2.2.0:
   version "2.3.0"
@@ -9082,6 +9082,11 @@ tweetnacl-auth@^1.0.1:
   integrity sha512-Qu2JonS5VUh5oJBnGsFohfel8O4gqN2QwdrsLjaZEZOU/25iIr3zU7jFOFbtOM5Wak5jiIViAqMvRvuxk9Lhmg==
   dependencies:
     tweetnacl "1.x.x"
+
+tweetnacl@0.x.x:
+  version "0.14.5"
+  resolved "https://registry.yarnpkg.com/tweetnacl/-/tweetnacl-0.14.5.tgz#5ae68177f192d4456269d108afa93ff8743f4f64"
+  integrity sha1-WuaBd/GS1EViadEIr6k/+HQ/T2Q=
 
 tweetnacl@1.x.x, tweetnacl@^1.0.0:
   version "1.0.1"
