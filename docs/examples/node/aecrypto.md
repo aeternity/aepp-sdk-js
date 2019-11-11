@@ -178,22 +178,7 @@ transaction and turn it into an RLP-encoded tuple ready for mining
 
 ```js
 function signTx (tx, privKey) {
-
-```
-
-
-
-
-
-
-
-eslint-disable-next-line no-useless-escape
-
-
-  
-
-```js
-  if (!tx.match(/^tx\_.+/)) {
+  if (!tx.match(/^tx_.+/)) {
     throw Error('Not a valid transaction')
   }
 

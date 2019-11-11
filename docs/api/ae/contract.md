@@ -21,7 +21,7 @@ import { Contract } from '@aeternity/aepp-sdk' (Using bundle)
         * [handleCallError(result)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--handleCallError) ⇒ `Promise.&lt;void&gt;` ⏏
         * [contractEncodeCall(source, name, args, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractEncodeCall) ⇒ `Promise.&lt;String&gt;` ⏏
         * [contractDecodeData(source, fn, callValue, callResult, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractDecodeData) ⇒ `Promise.&lt;String&gt;` ⏏
-        * [contractCallStatic(source, address, name, args, [options], bytecode, options, filesystem)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCallStatic) ⇒ `Promise.&lt;Object&gt;` ⏏
+        * [contractCallStatic(source, address, name, args, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCallStatic) ⇒ `Promise.&lt;Object&gt;` ⏏
         * [contractCall(source, address, name, args, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCall) ⏏
         * [contractDeploy(code, source, initState, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractDeploy) ⇒ `Promise.&lt;Object&gt;` ⏏
         * [contractCompile(source, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCompile) ⇒ `Promise.&lt;Object&gt;` ⏏
@@ -118,7 +118,7 @@ const decodedData = await client.contractDecodeData(SourceCode ,'functionName', 
 ```
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCallStatic"></a>
 
-### contractCallStatic(source, address, name, args, [options], bytecode, options, filesystem) ⇒ `Promise.&lt;Object&gt;` ⏏
+### contractCallStatic(source, address, name, args, [options]) ⇒ `Promise.&lt;Object&gt;` ⏏
 Static contract call(using dry-run)
 
 **Kind**: Exported function  
@@ -130,12 +130,12 @@ Static contract call(using dry-run)
 | source | `String` |  | Contract source code |
 | address | `String` |  | Contract address |
 | name | `String` |  | Name of function to call |
-| args | `Array` |  | Argument's for call function |
+| args | `Array` \| `String` |  | Argument's or callData for call/deploy transaction |
 | [options] | `Object` | <code>{}</code> | Options |
 | [options.top] | `String` |  | Block hash on which you want to call contract |
-| bytecode |  |  |  |
-| options | `String` |  | [options.options]  Transaction options (fee, ttl, gas, amount, deposit) |
-| filesystem | `Object` |  | [options.options.filesystem] Contract external namespaces map |
+| [options.bytecode] | `String` |  | Block hash on which you want to call contract |
+| [options.options] | `Object` |  | Transaction options (fee, ttl, gas, amount, deposit) |
+| [options.options.filesystem] | `Object` |  | Contract external namespaces map |
 
 **Example**  
 ```js
@@ -158,7 +158,7 @@ Call contract function
 | source | `String` |  | Contract source code |
 | address | `String` |  | Contract address |
 | name | `String` |  | Name of function to call |
-| args | `Array` |  | Argument's for call function |
+| args | `Array` \| `String` |  | Argument's or callData for call function |
 | [options] | `Object` | <code>{}</code> | Transaction options (fee, ttl, gas, amount, deposit) |
 | [options.filesystem] | `Object` | <code>{}</code> | Contract external namespaces map* @return {Promise<Object>} Result object |
 
@@ -184,7 +184,7 @@ Deploy contract to the node
 | --- | --- | --- | --- |
 | code | `String` |  | Compiled contract |
 | source | `String` |  | Contract source code |
-| initState | `Array` |  | Arguments of contract constructor(init) function |
+| initState | `Array` \| `String` |  | Arguments of contract constructor(init) function. Can be array of arguments or callData string |
 | [options] | `Object` | <code>{}</code> | Transaction options (fee, ttl, gas, amount, deposit) |
 | [options.filesystem] | `Object` | <code>{}</code> | Contract external namespaces map* @return {Promise<Object>} Result object |
 
