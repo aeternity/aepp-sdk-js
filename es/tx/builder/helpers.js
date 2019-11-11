@@ -97,7 +97,7 @@ export function formatSalt (salt) {
  */
 export function produceNameId (name) {
   const namespace = R.last(name.split('.'))
-  if (namespace === 'chain') return encode(hash(name), 'nm')
+  if (namespace === 'chain') return encode(hash(name.toLowerCase()), 'nm')
   return encode(nameHash(name), 'nm')
 }
 
@@ -279,14 +279,23 @@ export function classify (s) {
  * Get the minimum name fee for a domain
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {string} domain the domain name to get the fee for
- * @return String the minimum fee for the domain auction
+ * @param {String} domain the domain name to get the fee for
+ * @return {String} the minimum fee for the domain auction
  */
 export function getMinimumNameFee (domain) {
   const nameLength = domain.replace('.chain', '').length
   return NAME_BID_RANGES[nameLength >= NAME_BID_MAX_LENGTH ? NAME_BID_MAX_LENGTH : nameLength]
 }
 
+/**
+ * Compute bid fee for AENS auction
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
+ * @param {String} domain the domain name to get the fee for
+ * @param {Number|String} startFee Auction start fee
+ * @param {Number} [increment=0.5] Bid multiplier(In percentage, must be between 0 and 1)
+ * @return {String} Bid fee
+ */
 export function computeBidFee (domain, startFee = NAME_FEE, increment = NAME_FEE_BID_INCREMENT) {
   if (!(Number(increment) === increment && increment % 1 !== 0)) throw new Error(`Increment must be float. Current increment ${increment}`)
   if (increment < NAME_FEE_BID_INCREMENT) throw new Error(`minimum increment percentage is ${NAME_FEE_BID_INCREMENT}`)
@@ -295,13 +304,21 @@ export function computeBidFee (domain, startFee = NAME_FEE, increment = NAME_FEE
   )
 }
 
+/**
+ * Compute auction end height
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
+ * @param {String} domain the domain name to get the fee for
+ * @param {Number|String} claimHeight Auction starting height
+ * @return {String} Auction end height
+ */
 export function computeAuctionEndBlock (domain, claimHeight) {
   return R.cond([
-    [R.lt(4), R.always(NAME_BID_TIMEOUTS[1] + claimHeight)],
-    [R.lt(8), R.always(NAME_BID_TIMEOUTS[4] + claimHeight)],
-    [R.lte(NAME_BID_MAX_LENGTH), R.always(NAME_BID_TIMEOUTS[8] + claimHeight)],
-    [R.T, R.always(claimHeight)]
-  ])(domain.replace('.chain', '').length)
+    [R.lt(5), R.always(NAME_BID_TIMEOUTS[4].plus(claimHeight))],
+    [R.lt(9), R.always(NAME_BID_TIMEOUTS[8].plus(claimHeight))],
+    [R.lte(NAME_BID_MAX_LENGTH), R.always(NAME_BID_TIMEOUTS[12].plus(claimHeight))],
+    [R.T, R.always(BigNumber(claimHeight))]
+  ])(domain.replace('.chain', '').length).toString(10)
 }
 
 export default {

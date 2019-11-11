@@ -4,7 +4,6 @@
  * @export TxSchema
  * @example import TxSchema from '@aeternity/aepp-sdk/es/tx/builder/schema'
  */
-/* eslint-disable no-unused-vars */
 // # RLP version number
 // # https://github.com/aeternity/protocol/blob/master/serializations.md#binary-serialization
 
@@ -18,7 +17,7 @@ export const TX_TTL = 0
 
 // # AENS
 export const AENS_NAME_DOMAINS = ['chain', 'test']
-export const NAME_TTL = 500
+export const NAME_TTL = 50000
 // # max number of block into the future that the name is going to be available
 // # https://github.com/aeternity/protocol/blob/epoch-v0.22.0/AENS.md#update
 // # https://github.com/aeternity/protocol/blob/44a93d3aab957ca820183c3520b9daf6b0fedff4/AENS.md#aens-entry
@@ -71,10 +70,10 @@ export const NAME_BID_RANGES = {
 // # ref: https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L273
 // # name bid timeouts
 export const NAME_BID_TIMEOUTS = {
-  13: 0,
-  8: NAME_BID_TIMEOUT_BLOCKS, // # 480 blocks
-  4: 31 * NAME_BID_TIMEOUT_BLOCKS, // # 14880 blocks
-  1: 62 * NAME_BID_TIMEOUT_BLOCKS // # 29760 blocks
+  13: BigNumber(0),
+  12: BigNumber(NAME_BID_TIMEOUT_BLOCKS), // # 480 blocks
+  8: BigNumber(31).times(NAME_BID_TIMEOUT_BLOCKS), // # 14880 blocks
+  4: BigNumber(62).times(NAME_BID_TIMEOUT_BLOCKS) // # 29760 blocks
 }
 
 // # Tag constant for ids (type uint8)
@@ -1213,7 +1212,8 @@ const VALIDATORS = {
   nonceUsed: 'nonceUsed',
   nonceHigh: 'nonceHigh',
   minGasPrice: 'minGasPrice',
-  vmAndAbiVersion: 'vmAndAbiVersion'
+  vmAndAbiVersion: 'vmAndAbiVersion',
+  insufficientBalanceForFeeNameFee: 'insufficientBalanceForFeeNameFee'
 }
 
 const ERRORS = {
@@ -1225,7 +1225,8 @@ const ERRORS = {
   nonceUsed: { key: 'NonceUsed', type: ERROR_TYPE.ERROR, txKey: 'nonce' },
   nonceHigh: { key: 'NonceHigh', type: ERROR_TYPE.WARNING, txKey: 'nonce' },
   minGasPrice: { key: 'minGasPrice', type: ERROR_TYPE.ERROR, txKey: 'gasPrice' },
-  vmAndAbiVersion: { key: 'vmAndAbiVersion', type: ERROR_TYPE.ERROR, txKey: 'ctVersion' }
+  vmAndAbiVersion: { key: 'vmAndAbiVersion', type: ERROR_TYPE.ERROR, txKey: 'ctVersion' },
+  insufficientBalanceForFeeNameFee: { key: 'insufficientBalanceForFeeNameFee', type: ERROR_TYPE.ERROR, txKey: 'nameFee' }
 }
 
 export const SIGNATURE_VERIFICATION_SCHEMA = [
@@ -1245,6 +1246,13 @@ export const CONTRACT_VERIFICATION_SCHEMA = [
     () => `The gasPrice must be bigger then ${MIN_GAS_PRICE}`,
     VALIDATORS.minGasPrice,
     ERRORS.minGasPrice
+  )
+]
+export const NAME_CLAIM_VERIFICATION_SCHEMA = [
+  VERIFICATION_FIELD(
+    ({ balance }) => `The account balance ${balance} is not enough to execute the transaction`,
+    VALIDATORS.insufficientBalanceForFeeNameFee,
+    ERRORS.insufficientBalanceForFeeNameFee
   )
 ]
 export const BASE_VERIFICATION_SCHEMA = [

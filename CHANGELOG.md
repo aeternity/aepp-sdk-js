@@ -1,3 +1,29 @@
+# [6.1.0](https://github.com/aeternity/aepp-sdk-js/compare/6.0.2...6.1.0) (2019-11-11)
+
+
+### Bug Fixes
+
+* **AENS:** auction end block calculation ([#746](https://github.com/aeternity/aepp-sdk-js/issues/746)) ([4c1f5e4](https://github.com/aeternity/aepp-sdk-js/commit/4c1f5e4))
+* **AENS:** Fix `produceNameId` function(Make name lowercase). Enable … ([#750](https://github.com/aeternity/aepp-sdk-js/issues/750)) ([fd14225](https://github.com/aeternity/aepp-sdk-js/commit/fd14225))
+* **state channels:** wait for connection to be established before sending generic message ([#723](https://github.com/aeternity/aepp-sdk-js/issues/723)) ([c5f35d1](https://github.com/aeternity/aepp-sdk-js/commit/c5f35d1))
+* **TxHelpers:** Use BigNumber in auction end block calculation ([777c012](https://github.com/aeternity/aepp-sdk-js/commit/777c012))
+
+
+### Features
+
+* **ACI:** Add validation for contractAddress ([#764](https://github.com/aeternity/aepp-sdk-js/issues/764)) ([07cb0e7](https://github.com/aeternity/aepp-sdk-js/commit/07cb0e7))
+* **AENS:** Add nameFee validation to TxValidator ([#765](https://github.com/aeternity/aepp-sdk-js/issues/765)) ([5250e75](https://github.com/aeternity/aepp-sdk-js/commit/5250e75))
+* **AENS:** Increase default nameTtl ([#775](https://github.com/aeternity/aepp-sdk-js/issues/775)) ([c5f2582](https://github.com/aeternity/aepp-sdk-js/commit/c5f2582))
+* **Contract:** Add ability to pass arguments or callData for contract `deploy/call/callStatic` API ([#768](https://github.com/aeternity/aepp-sdk-js/issues/768)) ([12aaca3](https://github.com/aeternity/aepp-sdk-js/commit/12aaca3))
+* **Http:** Assign error object to http error ([#770](https://github.com/aeternity/aepp-sdk-js/issues/770)) ([87062ea](https://github.com/aeternity/aepp-sdk-js/commit/87062ea))
+* **state channels:** add round method ([#763](https://github.com/aeternity/aepp-sdk-js/issues/763)) ([c950937](https://github.com/aeternity/aepp-sdk-js/commit/c950937))
+* **state channels:** allow off chain updates to be cancelled with custom error code ([#753](https://github.com/aeternity/aepp-sdk-js/issues/753)) ([ae4426e](https://github.com/aeternity/aepp-sdk-js/commit/ae4426e))
+* **state channels:** allow to pass metadata to transfer update ([#755](https://github.com/aeternity/aepp-sdk-js/issues/755)) ([ddc6611](https://github.com/aeternity/aepp-sdk-js/commit/ddc6611))
+* **state channels:** make state channels compatible with node v5.0.0… ([#688](https://github.com/aeternity/aepp-sdk-js/issues/688)) ([deed7fc](https://github.com/aeternity/aepp-sdk-js/commit/deed7fc)), closes [#632](https://github.com/aeternity/aepp-sdk-js/issues/632) [#653](https://github.com/aeternity/aepp-sdk-js/issues/653) [#658](https://github.com/aeternity/aepp-sdk-js/issues/658) [#660](https://github.com/aeternity/aepp-sdk-js/issues/660) [#680](https://github.com/aeternity/aepp-sdk-js/issues/680) [#693](https://github.com/aeternity/aepp-sdk-js/issues/693) [#687](https://github.com/aeternity/aepp-sdk-js/issues/687)
+* **state channels:** make state channels compatible with node v5.1.0… ([#776](https://github.com/aeternity/aepp-sdk-js/issues/776)) ([74952aa](https://github.com/aeternity/aepp-sdk-js/commit/74952aa))
+
+
+
 ## [6.0.2](https://github.com/aeternity/aepp-sdk-js/compare/6.0.1...6.0.2) (2019-10-31)
 
 
@@ -13,6 +39,8 @@
 ### Bug Fixes
 
 * **aens:** added lower case transformation for aens names ([#730](https://github.com/aeternity/aepp-sdk-js/issues/730)) ([f7f9f17](https://github.com/aeternity/aepp-sdk-js/commit/f7f9f17246c727566ce3c8159d30b7de19b027c9)), closes [#728](https://github.com/aeternity/aepp-sdk-js/issues/728)
+
+
 
 
 

@@ -54,7 +54,7 @@ Poll for oracle queries
 | oracleId | `String` | Oracle public key |
 | onQuery | `function` | OnQuery callback |
 | [options] | `Object` | Options object |
-| [options.interval] | `Object` | Poll interval(default: 5000) |
+| [options.interval] | `Number` | Poll interval(default: 5000) |
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/oracle--getQueryObject"></a>
 
