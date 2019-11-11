@@ -115,8 +115,8 @@ async function contractDecodeData (source, fn, callValue, callResult, options) {
  * @param {Object} [options={}]  Options
  * @param {String} [options.top] Block hash on which you want to call contract
  * @param {String} [options.bytecode] Block hash on which you want to call contract
- * @param {Object} options [options.options]  Transaction options (fee, ttl, gas, amount, deposit)
- * @param {Object} filesystem [options.options.filesystem] Contract external namespaces map
+ * @param {Object} [options.options]  Transaction options (fee, ttl, gas, amount, deposit)
+ * @param {Object} [options.options.filesystem] Contract external namespaces map
  * @return {Promise<Object>} Result object
  * @example
  * const callResult = await client.contractCallStatic(source, address, fnName, args = [], { top, options = {} })

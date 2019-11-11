@@ -11,11 +11,13 @@ import Channel from '@aeternity/aepp-sdk/es/channel/index'
 * [@aeternity/aepp-sdk/es/channel/index](#module_@aeternity/aepp-sdk/es/channel/index)
     * [Channel(options)](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel) ⇒ `Promise.&lt;Object&gt;` ⏏
         * [~on(event, callback)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..on)
+        * [~off(event, callback)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..off)
         * [~disconnect()](#module_@aeternity/aepp-sdk/es/channel/index--Channel..disconnect)
         * [~status()](#module_@aeternity/aepp-sdk/es/channel/index--Channel..status) ⇒ `String`
         * [~state()](#module_@aeternity/aepp-sdk/es/channel/index--Channel..state) ⇒ `Promise.&lt;Object&gt;`
+        * [~round()](#module_@aeternity/aepp-sdk/es/channel/index--Channel..round) ⇒ `Number`
         * [~id()](#module_@aeternity/aepp-sdk/es/channel/index--Channel..id) ⇒ `String`
-        * [~update(from, to, amount, sign)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..update) ⇒ `Promise.&lt;Object&gt;`
+        * [~update(from, to, amount, sign, metadata)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..update) ⇒ `Promise.&lt;Object&gt;`
         * [~poi(addresses)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..poi) ⇒ `Promise.&lt;String&gt;`
         * [~balances(accounts)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..balances) ⇒ `Promise.&lt;Object&gt;`
         * [~leave()](#module_@aeternity/aepp-sdk/es/channel/index--Channel..leave) ⇒ `Promise.&lt;Object&gt;`
@@ -105,6 +107,18 @@ Possible events:
 | event | `String` | Event name |
 | callback | `function` | Callback function |
 
+<a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..off"></a>
+
+#### Channel~off(event, callback)
+Remove event listener function
+
+**Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | `String` | Event name |
+| callback | `function` | Callback function |
+
 <a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..disconnect"></a>
 
 #### Channel~disconnect()
@@ -123,6 +137,15 @@ Get current status
 Get current state
 
 **Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
+<a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..round"></a>
+
+#### Channel~round() ⇒ `Number`
+Get current round
+
+If round cannot be determined (for example when channel has not been opened)
+it will return `null`.
+
+**Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
 <a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..id"></a>
 
 #### Channel~id() ⇒ `String`
@@ -131,7 +154,7 @@ Get channel id
 **Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
 <a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..update"></a>
 
-#### Channel~update(from, to, amount, sign) ⇒ `Promise.&lt;Object&gt;`
+#### Channel~update(from, to, amount, sign, metadata) ⇒ `Promise.&lt;Object&gt;`
 Trigger a transfer update
 
 The transfer update is moving tokens from one channel account to another.
@@ -148,6 +171,7 @@ can take those roles. Any public key outside of the channel is considered invali
 | to | `String` | Receiver's public address |
 | amount | `Number` | Transaction amount |
 | sign | `function` | Function which verifies and signs offchain transaction |
+| metadata | `Array.&lt;String&gt;` |  |
 
 **Example**  
 ```js
