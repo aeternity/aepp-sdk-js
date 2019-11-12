@@ -27,4 +27,5 @@
   * [@aeternity/aepp-sdk/es/tx](api/tx.md)
   * [@aeternity/aepp-sdk/es/tx/tx](api/tx/tx.md)
   * [@aeternity/aepp-sdk/es/utils/crypto](api/utils/crypto.md)
+  * [@aeternity/aepp-sdk/es/utils/keystore](api/utils/keystore.md)
   * [@aeternity/aepp-sdk/es/utils/swagger](api/utils/swagger.md)
