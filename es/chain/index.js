@@ -60,7 +60,9 @@ const Chain = Oracle.compose({
     getTxInfo: required,
     mempool: required,
     txDryRun: required,
-    getAccount: required
+    getAccount: required,
+    getContractByteCode: required,
+    getContract: required
   }
 }))
 

@@ -131,7 +131,7 @@ async function rpcAddress ({ params, session }) {
   onContract: confirm
 })
  */
-const Wallet = Ae.compose(Accounts, Chain, NodePool, Tx, Contract, GeneralizeAccount, Rpc, {
+const Wallet = Ae.compose(Accounts, Chain, Tx, Contract, GeneralizeAccount, Rpc, {
   init ({ onTx = this.onTx, onChain = this.onChain, onAccount = this.onAccount, onContract = this.onContract }, { stamp }) {
     this.onTx = onTx
     this.onChain = onChain
