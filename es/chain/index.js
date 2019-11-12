@@ -43,7 +43,7 @@ const Chain = Oracle.compose({
     Ae: {
       methods: [
         'sendTransaction', 'height', 'awaitHeight', 'poll', 'balance', 'getBalance', 'tx',
-        'mempool', 'topBlock', 'getTxInfo', 'txDryRun', 'getName', 'getNodeInfo', 'getAccount', 'getContractByteCode', 'getContract'
+        'mempool', 'topBlock', 'getTxInfo', 'txDryRun', 'getName', 'getNodeInfo', 'getAccount'
       ]
     }
   }
@@ -60,7 +60,9 @@ const Chain = Oracle.compose({
     getTxInfo: required,
     mempool: required,
     txDryRun: required,
-    getAccount: required
+    getAccount: required,
+    getContractByteCode: required,
+    getContract: required
   }
 }))
 
