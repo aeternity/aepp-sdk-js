@@ -197,7 +197,6 @@ program
   .arguments('<infile> <function> [args...]')
   .option('-i, --init [state]', 'Arguments to contructor function')
   .option('-H, --host [hostname]', 'Node to connect to', 'http://localhost:3013')
-  .option('-C, --compilerUrl [compilerUrl]', 'Compiler to connect to', 'http://localhost:3088')
   .option('--debug', 'Switch on debugging')
   .action(exec)
   .parse(process.argv)
