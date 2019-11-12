@@ -31,7 +31,6 @@ import Rpc from '../rpc/server'
 import * as R from 'ramda'
 import Tx from '../tx/tx'
 import Contract from './contract'
-import NodePool from '../node-pool'
 import GeneralizeAccount from '../contract/ga'
 
 const contains = R.flip(R.contains)
