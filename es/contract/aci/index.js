@@ -29,7 +29,6 @@ import { validateArguments, transform, transformDecodedData } from './transforma
 import { buildContractMethods, getFunctionACI } from './helpers'
 import AsyncInit from '../../utils/async-init'
 import { BigNumber } from 'bignumber.js'
-import { isAddressValid } from '../../utils/crypto'
 
 /**
  * Validated contract call arguments using contract ACI
@@ -62,7 +61,6 @@ async function prepareArgsForEncode (aci, params) {
  * @param {String} [options.aci] Contract ACI
  * @param {String} [options.contractAddress] Contract address
  * @param {Object} [options.filesystem] Contact source external namespaces map
- * @param {Boolean} [options.forceCodeCheck = false] Flag to force validation of corresponding on chain bytecode
  * @param {Object} [options.opt] Contract options
  * @return {ContractInstance} JS Contract API
  * @example
@@ -73,7 +71,7 @@ async function prepareArgsForEncode (aci, params) {
  * Also you can call contract like: await contractIns.methods.setState(123, options)
  * Then sdk decide to make on-chain or static call(dry-run API) transaction based on function is stateful or not
  */
-async function getContractInstance (source, { aci, contractAddress, filesystem = {}, forceCodeCheck = false, opt } = {}) {
+async function getContractInstance (source, { aci, contractAddress, filesystem = {}, opt } = {}) {
   aci = aci || await this.contractGetACI(source, { filesystem })
   const defaultOptions = {
     skipArgsConvert: false,
@@ -98,17 +96,6 @@ async function getContractInstance (source, { aci, contractAddress, filesystem =
     compilerVersion: this.compilerVersion,
     setOptions (opt) {
       this.options = R.merge(this.options, opt)
-    }
-  }
-  // Check for valid contract address and contract code
-  if (contractAddress) {
-    if (!isAddressValid(contractAddress, 'ct')) throw new Error('Invalid contract address')
-    const contract = await this.getContract(contractAddress).catch(e => null)
-    if (!contract) throw new Error(`Contract with address ${contractAddress} not found on-chain`)
-    if (!forceCodeCheck) {
-      const onChanByteCode = (await this.getContractByteCode(contractAddress)).bytecode
-      instance.compiled = (await this.contractCompile(source, instance.options)).bytecode
-      if (instance.compile !== onChanByteCode) throw new Error('Contract source do not correspond to the contract source deploying on the chain')
     }
   }
 

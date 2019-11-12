@@ -107,7 +107,7 @@ implementation directly in the SDK.
   
 
 ```js
-  Ae({ url: program.host, debug: program.debug, process }).then(ae => {
+  Ae({ url: program.host, debug: program.debug, compilerUrl: program.compilerUrl,  process }).then(ae => {
     return ae.contractCompile(code)
 
 ```
