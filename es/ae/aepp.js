@@ -30,8 +30,7 @@ import AeppRpc from '../utils/aepp-wallet-communication/rpc/aepp-rpc'
 import Chain from '../chain/node'
 import Tx from '../tx/tx'
 import Oracle from './oracle'
-// Todo Enable GA
-// import GeneralizeAccount from '../contract/ga'
+import GeneralizeAccount from '../contract/ga'
 
 /**
  * Aepp Stamp
@@ -45,7 +44,6 @@ import Oracle from './oracle'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Aepp instance
  */
-export const Aepp = Ae.compose(ContractAPI, Aens, Oracle, Rpc)
+const Aepp = Ae.compose(ContractAPI, Aens, Oracle, GeneralizeAccount, Rpc)
 export const RpcAepp = Ae.compose(Chain, Tx, Contract, Aens, AeppRpc)
-
 export default Aepp

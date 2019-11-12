@@ -24,10 +24,12 @@
 import bs58check from 'bs58check'
 import * as RLP from 'rlp'
 import { blake2b } from 'blakejs'
+import ed2curve from 'ed2curve'
 import nacl from 'tweetnacl'
 import aesjs from 'aes-js'
-import { leftPad, rightPad, toBytes } from './bytes'
 import shajs from 'sha.js'
+
+import { leftPad, rightPad, toBytes } from './bytes'
 import { decode as decodeNode } from '../tx/builder/helpers'
 
 const Ecb = aesjs.ModeOfOperation.ecb
@@ -38,8 +40,7 @@ const Ecb = aesjs.ModeOfOperation.ecb
  * @return {boolean} True if the string is valid base-64, false otherwise.
  */
 export function isBase64 (str) {
-  // eslint-disable-next-line no-useless-escape
-  if (str.length % 4 > 0 || str.match(/[^0-9a-z+\/=]/i)) return false
+  if (str.length % 4 > 0 || str.match(/[^0-9a-z+/=]/i)) return false
   const index = str.indexOf('=')
   return !!(index === -1 || str.slice(index).match(/={1,2}/))
 }
@@ -70,12 +71,13 @@ export function formatAddress (format = ADDRESS_FORMAT.api, address) {
  * Check if address is valid
  * @rtype (input: String) => valid: Boolean
  * @param {String} address - Address
+ * @param {String} prefix Transaction prefix. Default: 'ak'
  * @return {Boolean} valid
  */
-export function isAddressValid (address) {
+export function isAddressValid (address, prefix = 'ak') {
   let isValid
   try {
-    isValid = decodeBase58Check(assertedType(address, 'ak')).length === 32
+    isValid = decodeBase58Check(assertedType(address, prefix)).length === 32
   } catch (e) {
     isValid = false
   }
@@ -194,7 +196,7 @@ export function decodeBase64Check (str) {
 /**
  * Base58 encode given `input`
  * @rtype (input: String) => String
- * @param {String} input - Data to encode
+ * @param {String|Buffer} input - Data to encode
  * @return {String} Base58 encoded data
  */
 export function encodeBase58Check (input) {
@@ -658,4 +660,54 @@ export function deserialize (binary, opts = { prettyTags: false }) {
         state: encodeBase58Check(binary[5])
       })
   }
+}
+
+/**
+ * This function encrypts a message using base58check encoded and 'ak' prefixed
+ * publicKey such that only the corresponding secretKey will
+ * be able to decrypt
+ * @rtype (msg: String, publicKey: String) => Object
+ * @param {Buffer} msg - Data to encode
+ * @param {String} publicKey - Public key
+ * @return {Object}
+ */
+export function encryptData (msg, publicKey) {
+  const ephemeralKeyPair = nacl.box.keyPair()
+  const pubKeyUInt8Array = decodeBase58Check(assertedType(publicKey, 'ak'))
+  const nonce = nacl.randomBytes(nacl.box.nonceLength)
+
+  const encryptedMessage = nacl.box(
+    Buffer.from(msg),
+    nonce,
+    ed2curve.convertPublicKey(pubKeyUInt8Array),
+    ephemeralKeyPair.secretKey
+  )
+
+  return {
+    ciphertext: Buffer.from(encryptedMessage).toString('hex'),
+    ephemPubKey: Buffer.from(ephemeralKeyPair.publicKey).toString('hex'),
+    nonce: Buffer.from(nonce).toString('hex'),
+    version: 'x25519-xsalsa20-poly1305'
+  }
+}
+
+/**
+ * This function decrypt a message using secret key
+ * @rtype (secretKey: String, encryptedData: Object) => Buffer|null
+ * @param {String} secretKey - Secret key
+ * @param {Object} encryptedData - Encrypted data
+ * @return {Buffer|null}
+ */
+export function decryptData (secretKey, encryptedData) {
+  const receiverSecretKeyUint8Array = ed2curve.convertSecretKey(Buffer.from(secretKey, 'hex'))
+  const nonce = Buffer.from(encryptedData.nonce, 'hex')
+  const ciphertext = Buffer.from(encryptedData.ciphertext, 'hex')
+  const ephemPubKey = Buffer.from(encryptedData.ephemPubKey, 'hex')
+  const decrypted = nacl.box.open(
+    ciphertext,
+    nonce,
+    ephemPubKey,
+    receiverSecretKeyUint8Array
+  )
+  return decrypted ? Buffer.from(decrypted) : decrypted
 }

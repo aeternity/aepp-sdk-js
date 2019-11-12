@@ -34,17 +34,18 @@ function encodeRlpTx (rlpBinary) {
 async function appendSignature (tx, signFn) {
   const { signatures, encodedTx } = unpackTx(tx).tx
   const result = await signFn(encodeRlpTx(encodedTx.rlpEncoded))
-  if (result) {
+  if (typeof result === 'string') {
     const { tx: signedTx, txType } = unpackTx(result)
     return encodeRlpTx(buildTx({
       signatures: signatures.concat(signedTx.signatures),
       encodedTx: signedTx.encodedTx.rlpEncoded
     }, txType).rlpEncoded)
   }
+  return result
 }
 
 function handleUnexpectedMessage (channel, message, state) {
-  if (state.reject) {
+  if (state && state.reject) {
     state.reject(Object.assign(
       Error(`Unexpected message received:\n\n${JSON.stringify(message)}`),
       { wsMessage: message }
@@ -161,6 +162,13 @@ export async function channelOpen (channel, message, state) {
         case 'withdraw_locked':
         case 'own_deposit_locked':
         case 'deposit_locked':
+        case 'peer_disconnected':
+        case 'channel_reestablished':
+        case 'open':
+          // TODO: Better handling of peer_disconnected event.
+          //
+          //       We should enter intermediate state where offchain transactions
+          //       are blocked until channel is reestablished.
           emit(channel, message.params.data.event)
           return { handler: channelOpen }
         case 'close_mutual':
@@ -174,6 +182,8 @@ export async function channelOpen (channel, message, state) {
         case 'died':
           changeStatus(channel, 'died')
           return { handler: channelClosed }
+        case 'shutdown':
+          return { handler: channelOpen }
       }
       break
     case 'channels.on_chain_tx':
@@ -207,8 +217,14 @@ export async function awaitingOffChainTx (channel, message, state) {
     const signedTx = await appendSignature(message.params.data.signed_tx, tx =>
       sign(tx, { updates: message.params.data.updates })
     )
-    send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { signed_tx: signedTx } })
-    return { handler: awaitingOffChainUpdate, state }
+    if (typeof signedTx === 'string') {
+      send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { signed_tx: signedTx } })
+      return { handler: awaitingOffChainUpdate, state }
+    }
+    if (typeof signedTx === 'number') {
+      send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { error: signedTx } })
+      return { handler: awaitingOffChainTx, state }
+    }
   }
   if (message.method === 'channels.error') {
     state.reject(new Error(message.data.message))
@@ -225,6 +241,20 @@ export async function awaitingOffChainTx (channel, message, state) {
     }
     return { handler: channelOpen }
   }
+  if (message.method === 'channels.conflict') {
+    state.resolve({
+      accepted: false,
+      errorCode: message.params.data.error_code,
+      errorMessage: message.params.data.error_msg
+    })
+    return { handler: channelOpen }
+  }
+  if (message.method === 'channels.info') {
+    if (message.params.data.event === 'aborted_update') {
+      state.resolve({ accepted: false })
+      return { handler: channelOpen }
+    }
+  }
   return handleUnexpectedMessage(channel, message, state)
 }
 
@@ -235,8 +265,18 @@ export function awaitingOffChainUpdate (channel, message, state) {
     return { handler: channelOpen }
   }
   if (message.method === 'channels.conflict') {
-    state.resolve({ accepted: false })
+    state.resolve({
+      accepted: false,
+      errorCode: message.params.data.error_code,
+      errorMessage: message.params.data.error_msg
+    })
     return { handler: channelOpen }
+  }
+  if (message.method === 'channels.info') {
+    if (message.params.data.event === 'aborted_update') {
+      state.resolve({ accepted: false })
+      return { handler: channelOpen }
+    }
   }
   if (message.error) {
     state.reject(new Error(message.error.message))
@@ -246,8 +286,7 @@ export function awaitingOffChainUpdate (channel, message, state) {
 }
 
 export async function awaitingTxSignRequest (channel, message, state) {
-  // eslint-disable-next-line no-useless-escape
-  const [, tag] = message.method.match(/^channels\.sign\.([^\.]+)$/) || []
+  const [, tag] = message.method.match(/^channels\.sign\.([^.]+)$/) || []
   if (tag) {
     if (message.params.data.tx) {
       const signedTx = await options.get(channel).sign(tag, message.params.data.tx, {
@@ -261,9 +300,13 @@ export async function awaitingTxSignRequest (channel, message, state) {
       const signedTx = await appendSignature(message.params.data.signed_tx, tx =>
         options.get(channel).sign(tag, tx, { updates: message.params.data.updates })
       )
-      if (signedTx) {
+      if (typeof signedTx === 'string') {
         send(channel, { jsonrpc: '2.0', method: `channels.${tag}`, params: { signed_tx: signedTx } })
         return { handler: channelOpen }
+      }
+      if (typeof signedTx === 'number') {
+        send(channel, { jsonrpc: '2.0', method: `channels.${tag}`, params: { error: signedTx } })
+        return { handler: awaitingUpdateConflict, state }
       }
     }
     // soft-reject via competing update
@@ -276,14 +319,14 @@ export async function awaitingTxSignRequest (channel, message, state) {
         amount: 1
       }
     })
-    return { handler: awaitingUpdateConflict }
+    return { handler: awaitingUpdateConflict, state }
   }
   return handleUnexpectedMessage(channel, message, state)
 }
 
 export function awaitingUpdateConflict (channel, message, state) {
   if (message.error) {
-    return { handler: awaitingUpdateConflict }
+    return { handler: awaitingUpdateConflict, state }
   }
   if (message.method === 'channels.conflict') {
     return { handler: channelOpen }
@@ -337,8 +380,14 @@ export async function awaitingWithdrawTx (channel, message, state) {
     const signedTx = await appendSignature(message.params.data.signed_tx, tx =>
       sign(tx, { updates: message.params.data.updates })
     )
-    send(channel, { jsonrpc: '2.0', method: 'channels.withdraw_tx', params: { signed_tx: signedTx } })
-    return { handler: awaitingWithdrawCompletion, state }
+    if (typeof signedTx === 'string') {
+      send(channel, { jsonrpc: '2.0', method: 'channels.withdraw_tx', params: { signed_tx: signedTx } })
+      return { handler: awaitingWithdrawCompletion, state }
+    }
+    if (typeof signedTx === 'number') {
+      send(channel, { jsonrpc: '2.0', method: 'channels.withdraw_tx', params: { error: signedTx } })
+      return { handler: awaitingWithdrawCompletion, state }
+    }
   }
   return handleUnexpectedMessage(channel, message, state)
 }
@@ -368,8 +417,18 @@ export function awaitingWithdrawCompletion (channel, message, state) {
     return { handler: channelOpen }
   }
   if (message.method === 'channels.conflict') {
-    state.resolve({ accepted: false })
+    state.resolve({
+      accepted: false,
+      errorCode: message.params.data.error_code,
+      errorMessage: message.params.data.error_msg
+    })
     return { handler: channelOpen }
+  }
+  if (message.method === 'channels.info') {
+    if (message.params.data.event === 'aborted_update') {
+      state.resolve({ accepted: false })
+      return { handler: channelOpen }
+    }
   }
   return handleUnexpectedMessage(channel, message, state)
 }
@@ -385,8 +444,14 @@ export async function awaitingDepositTx (channel, message, state) {
     const signedTx = await appendSignature(message.params.data.signed_tx, tx =>
       sign(tx, { updates: message.params.data.updates })
     )
-    send(channel, { jsonrpc: '2.0', method: 'channels.deposit_tx', params: { signed_tx: signedTx } })
-    return { handler: awaitingDepositCompletion, state }
+    if (typeof signedTx === 'string') {
+      send(channel, { jsonrpc: '2.0', method: 'channels.deposit_tx', params: { signed_tx: signedTx } })
+      return { handler: awaitingDepositCompletion, state }
+    }
+    if (typeof signedTx === 'number') {
+      send(channel, { jsonrpc: '2.0', method: 'channels.deposit_tx', params: { error: signedTx } })
+      return { handler: awaitingDepositCompletion, state }
+    }
   }
   return handleUnexpectedMessage(channel, message, state)
 }
@@ -416,8 +481,18 @@ export function awaitingDepositCompletion (channel, message, state) {
     return { handler: channelOpen }
   }
   if (message.method === 'channels.conflict') {
-    state.resolve({ accepted: false })
+    state.resolve({
+      accepted: false,
+      errorCode: message.params.data.error_code,
+      errorMessage: message.params.data.error_msg
+    })
     return { handler: channelOpen }
+  }
+  if (message.method === 'channels.info') {
+    if (message.params.data.event === 'aborted_update') {
+      state.resolve({ accepted: false })
+      return { handler: channelOpen }
+    }
   }
   return handleUnexpectedMessage(channel, message, state)
 }
@@ -430,8 +505,14 @@ export async function awaitingNewContractTx (channel, message, state) {
       return { handler: awaitingNewContractCompletion, state }
     }
     const signedTx = await appendSignature(message.params.data.signed_tx, tx => state.sign(tx))
-    send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { signed_tx: signedTx } })
-    return { handler: awaitingNewContractCompletion, state }
+    if (typeof signedTx === 'string') {
+      send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { signed_tx: signedTx } })
+      return { handler: awaitingNewContractCompletion, state }
+    }
+    if (typeof signedTx === 'number') {
+      send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { error: signedTx } })
+      return { handler: awaitingNewContractCompletion, state }
+    }
   }
   return handleUnexpectedMessage(channel, message, state)
 }
@@ -439,7 +520,6 @@ export async function awaitingNewContractTx (channel, message, state) {
 export function awaitingNewContractCompletion (channel, message, state) {
   if (message.method === 'channels.update') {
     const { round } = unpackTx(message.params.data.state).tx.encodedTx.tx
-    // eslint-disable-next-line standard/computed-property-even-spacing
     const owner = options.get(channel)[{
       initiator: 'initiatorId',
       responder: 'responderId'
@@ -453,8 +533,18 @@ export function awaitingNewContractCompletion (channel, message, state) {
     return { handler: channelOpen }
   }
   if (message.method === 'channels.conflict') {
-    state.resolve({ accepted: false })
+    state.resolve({
+      accepted: false,
+      errorCode: message.params.data.error_code,
+      errorMessage: message.params.data.error_msg
+    })
     return { handler: channelOpen }
+  }
+  if (message.method === 'channels.info') {
+    if (message.params.data.event === 'aborted_update') {
+      state.resolve({ accepted: false })
+      return { handler: channelOpen }
+    }
   }
   return handleUnexpectedMessage(channel, message, state)
 }
@@ -467,8 +557,14 @@ export async function awaitingCallContractUpdateTx (channel, message, state) {
       return { handler: awaitingCallContractCompletion, state }
     }
     const signedTx = await appendSignature(message.params.data.signed_tx, tx => state.sign(tx))
-    send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { signed_tx: signedTx } })
-    return { handler: awaitingCallContractCompletion, state }
+    if (typeof signedTx === 'string') {
+      send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { signed_tx: signedTx } })
+      return { handler: awaitingCallContractCompletion, state }
+    }
+    if (typeof signedTx === 'number') {
+      send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { error: signedTx } })
+      return { handler: awaitingCallContractCompletion, state }
+    }
   }
   return handleUnexpectedMessage(channel, message, state)
 }
@@ -480,8 +576,18 @@ export function awaitingCallContractCompletion (channel, message, state) {
     return { handler: channelOpen }
   }
   if (message.method === 'channels.conflict') {
-    state.resolve({ accepted: false })
+    state.resolve({
+      accepted: false,
+      errorCode: message.params.data.error_code,
+      errorMessage: message.params.data.error_msg
+    })
     return { handler: channelOpen }
+  }
+  if (message.method === 'channels.info') {
+    if (message.params.data.event === 'aborted_update') {
+      state.resolve({ accepted: false })
+      return { handler: channelOpen }
+    }
   }
   return handleUnexpectedMessage(channel, message, state)
 }

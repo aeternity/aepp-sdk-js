@@ -7,7 +7,6 @@ The high-level description of the oracle system is
 https://github.com/aeternity/protocol/blob/master/ORACLE.md in the protocol
 repository.
 
-**Export**: Oracle  
 **Example**  
 ```js
 import Oracle from '@aeternity/aepp-sdk/es/ae/oracle'
@@ -18,6 +17,7 @@ import Oracle from '@aeternity/aepp-sdk/es/ae/oracle'
     * _instance_
         * _async_
             * [.getOracleObject(oracleId)](#exp_module_@aeternity/aepp-sdk/es/ae/oracle--getOracleObject) ⇒ `Promise.&lt;Object&gt;` ⏏
+            * [.pollForQueries(oracleId, onQuery, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/oracle--exports.pollForQueries) ⇒ `function` ⏏
             * [.getQueryObject(oracleId, queryId)](#exp_module_@aeternity/aepp-sdk/es/ae/oracle--getQueryObject) ⇒ `Promise.&lt;Object&gt;` ⏏
             * [.exports.pollForQueryResponse(oracleId, queryId, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/oracle--exports.pollForQueryResponse) ⇒ `Promise.&lt;Object&gt;` ⏏
             * [.registerOracle(queryFormat, responseFormat, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/oracle--registerOracle) ⇒ `Promise.&lt;Object&gt;` ⏏
@@ -41,18 +41,21 @@ Oracle provides oracle-system related methods atop
 | --- | --- | --- | --- |
 | [options] | `Object` | <code>{}</code> | Initializer object |
 
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/oracle--getOracleObject"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/oracle--pollForQueries"></a>
 
-### .getOracleObject(oracleId) ⇒ `Promise.&lt;Object&gt;` ⏏
-Constructor for Oracle Object (helper object for using Oracle)
+### .pollForQueries(oracleId, onQuery, [options]) ⇒ `function` ⏏
+Poll for oracle queries
 
 **Kind**: instance method of [`@aeternity/aepp-sdk/es/ae/oracle`](#module_@aeternity/aepp-sdk/es/ae/oracle)  
-**Returns**: `Promise.&lt;Object&gt;` - Oracle object  
+**Returns**: `function` - stopPolling - Stop polling function  
 **Category**: async  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | oracleId | `String` | Oracle public key |
+| onQuery | `function` | OnQuery callback |
+| [options] | `Object` | Options object |
+| [options.interval] | `Number` | Poll interval(default: 5000) |
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/oracle--getQueryObject"></a>
 

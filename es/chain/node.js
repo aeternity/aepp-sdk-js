@@ -175,11 +175,21 @@ async function getMicroBlockHeader (hash) {
 }
 
 async function txDryRun (txs, accounts, top) {
+  // TODO remove cross compatibility
+  const { version } = this.getNodeInfo()
+  const [majorVersion] = version.split('.')
+  if (+majorVersion === 5 && version !== '5.0.0-rc.1') {
+    txs = txs.map(tx => ({ tx }))
+  }
   return this.api.dryRunTxs({ txs, accounts, top })
 }
 
 async function getContractByteCode (contractId) {
   return this.api.getContractCode(contractId)
+}
+
+async function getContract (contractId) {
+  return this.api.getContract(contractId)
 }
 
 async function getName (name) {
@@ -221,6 +231,7 @@ const ChainNode = Chain.compose(Oracle, TransactionValidator, NodePool, {
     getKeyBlock,
     txDryRun,
     getContractByteCode,
+    getContract,
     getName
   }
 })

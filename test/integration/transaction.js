@@ -23,12 +23,13 @@ import { commitmentHash } from '../../es/tx/builder/helpers'
 const nonce = 1
 const nameTtl = 1
 const clientTtl = 1
-const amount = 1
+const amount = 0
 const senderId = 'ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688'
 const recipientId = 'ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688'
 const name = 'test123test.test'
 const nameHash = `nm_${encodeBase58Check(Buffer.from(name))}`
 const nameId = 'nm_2sFnPHi5ziAqhdApSpRBsYdomCahtmk3YGNZKYUTtUNpVSMccC'
+const nameFee = '1000000000000000000000'
 const pointers = [{ key: 'account_pubkey', id: senderId }]
 
 // Oracle
@@ -44,7 +45,6 @@ const queryResponse = '{\'tmp\': 101}'
 // Contract test data
 const contractCode = `
 contract Identity =
-  type state = ()
   entrypoint main(x : int) = x
 `
 let contractId
@@ -92,13 +92,15 @@ describe('Native Transaction', function () {
       accountId: senderId,
       nonce,
       name: nameHash,
-      nameSalt: _salt
+      nameSalt: _salt,
+      nameFee
     })
     const nativeTx = await clientNative.nameClaimTx({
       accountId: senderId,
       nonce,
       name: nameHash,
-      nameSalt: _salt
+      nameSalt: _salt,
+      nameFee
     })
     txFromAPI.should.be.equal(nativeTx)
   })

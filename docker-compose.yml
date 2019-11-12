@@ -20,7 +20,7 @@ services:
     expose: [3013, 3113, 3014, 3114]
     environment:
       EPOCH_CONFIG: /home/aeternity/aeternity_node.yaml
-    command: -aecore expected_mine_rate ${EPOCH_MINE_RATE:-5000}
+    command: bin/aeternity console -noinput -aecore expected_mine_rate ${EPOCH_MINE_RATE:-5000}
     volumes:
       - ${PWD}/docker/aeternity_node_mean16.yaml:/home/aeternity/aeternity_node.yaml
       - ${PWD}/docker/keys/node:/home/aeternity/node/keys

@@ -4,11 +4,14 @@ import uuid from 'uuid'
 import { encodeBase58Check, isBase64 } from './crypto'
 import { isHex } from './string'
 
+const _sodium = require('libsodium-wrappers-sumo')
+
 /**
  * KeyStore module
  * !!!Work only in node.js!!!
  * @module @aeternity/aepp-sdk/es/utils/keystore
- * @example import * as Crypto from '@aeternity/aepp-sdk/es/utils/keystore'
+ * @example import * as Keystore from '@aeternity/aepp-sdk/es/utils/keystore'
+ * @example const { Keystore } = require('@aeternity/aepp-sdk')
  */
 
 const DEFAULTS = {
@@ -30,30 +33,23 @@ const DERIVED_KEY_FUNCTIONS = {
 }
 
 export async function deriveKeyUsingArgon2id (password, salt, options) {
-  const { memlimit_kib: memoryCost, parallelism, opslimit: timeCost } = options.kdf_params
-  const isBrowser = !(typeof module !== 'undefined' && module.exports)
+  const { memlimit_kib: memoryCost, opslimit: timeCost } = options.kdf_params
+  // const isBrowser = !(typeof module !== 'undefined' && module.exports)
 
-  if (isBrowser) {
-    const _sodium = require('libsodium-wrappers-sumo')
+  return _sodium.ready.then(async () => {
+    // tslint:disable-next-line:typedef
+    const sodium = _sodium
 
-    return _sodium.ready.then(async () => {
-      // tslint:disable-next-line:typedef
-      const sodium = _sodium
-
-      const result = sodium.crypto_pwhash(
-        32,
-        password,
-        salt,
-        timeCost,
-        memoryCost * 1024,
-        sodium.crypto_pwhash_ALG_ARGON2ID13
-      )
-      return Buffer.from(result)
-    })
-  } else {
-    const argon2 = require('argon2')
-    return argon2.hash(password, { timeCost, memoryCost, parallelism, type: argon2.argon2id, raw: true, salt })
-  }
+    const result = sodium.crypto_pwhash(
+      32,
+      password,
+      salt,
+      timeCost,
+      memoryCost * 1024,
+      sodium.crypto_pwhash_ALG_ARGON2ID13
+    )
+    return Buffer.from(result)
+  })
 }
 
 // CRYPTO PART

@@ -3,14 +3,12 @@
 ## @aeternity/aepp-sdk/es/accounts
 Accounts module
 
-**Export**: Accounts  
 **Example**  
 ```js
 import Accounts from '@aeternity/aepp-sdk/es/accounts'
 ```
 
 * [@aeternity/aepp-sdk/es/accounts](#module_@aeternity/aepp-sdk/es/accounts)
-    * ~~[setKeypair(keypair)](#exp_module_@aeternity/aepp-sdk/es/accounts--setKeypair) ⇒ `Void` ⏏~~
     * [removeAccount(address)](#exp_module_@aeternity/aepp-sdk/es/accounts--removeAccount) ⇒ `Void` ⏏
     * [addresses()](#exp_module_@aeternity/aepp-sdk/es/accounts--addresses) ⇒ `Array.&lt;String&gt;` ⏏
     * [Accounts([options])](#exp_module_@aeternity/aepp-sdk/es/accounts--Accounts) ⇒ `Object` ⏏
@@ -18,26 +16,6 @@ import Accounts from '@aeternity/aepp-sdk/es/accounts'
         * [signWith(address, data)](#exp_module_@aeternity/aepp-sdk/es/accounts--signWith) ⇒ `String` ⏏
         * [addAccount(account, [options])](#exp_module_@aeternity/aepp-sdk/es/accounts--addAccount) ⇒ `Void` ⏏
 
-<a id="exp_module_@aeternity/aepp-sdk/es/accounts--setKeypair"></a>
-
-### ~~setKeypair(keypair) ⇒ `Void` ⏏~~
-***Deprecated***
-
-Select specific account
-
-**Kind**: Exported function  
-**rtype**: `(keypair: {publicKey: String, secretKey: String}) => Void`
-
-| Param | Type | Description |
-| --- | --- | --- |
-| keypair | `Object` | Key pair to use |
-| keypair.publicKey | `String` | Public key |
-| keypair.secretKey | `String` | Private key |
-
-**Example**  
-```js
-setKeypair(keypair)
-```
 <a id="exp_module_@aeternity/aepp-sdk/es/accounts--removeAccount"></a>
 
 ### removeAccount(address) ⇒ `Void` ⏏

@@ -28,7 +28,7 @@ import ChainNode from '../chain/node'
 import Tx from './'
 
 import { buildTx, calculateFee } from './builder'
-import { MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE } from './builder/schema'
+import { ABI_VERSIONS, MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE, VM_TYPE, TX_TTL } from './builder/schema'
 import { buildContractId, oracleQueryId } from './builder/helpers'
 
 async function spendTx ({ senderId, recipientId, amount, payload = '' }) {
@@ -69,13 +69,13 @@ async function namePreclaimTx ({ accountId, commitmentId }) {
   return tx
 }
 
-async function nameClaimTx ({ accountId, name, nameSalt }) {
+async function nameClaimTx ({ accountId, name, nameSalt, vsn = 2 }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.nameClaim, { senderId: accountId, ...R.head(arguments) })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.nameClaim, { senderId: accountId, ...R.head(arguments), vsn })
 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
-    ? buildTx(R.merge(R.head(arguments), { nonce, ttl, fee }), TX_TYPE.nameClaim)
+    ? buildTx(R.merge(R.head(arguments), { nonce, ttl, fee }), TX_TYPE.nameClaim, { vsn })
     : await this.api.postNameClaim(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
 
   return tx
@@ -117,7 +117,7 @@ async function nameRevokeTx ({ accountId, nameId }) {
   return tx
 }
 
-async function contractCreateTx ({ ownerId, code, vmVersion, abiVersion, deposit, amount, gas, gasPrice = MIN_GAS_PRICE, callData }) {
+async function contractCreateTx ({ ownerId, code, vmVersion, abiVersion, deposit, amount, gas, gasPrice = MIN_GAS_PRICE, callData, backend }) {
   // Get VM_ABI version
   const ctVersion = this.getVmVersion(TX_TYPE.contractCreate, R.head(arguments))
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
@@ -131,7 +131,7 @@ async function contractCreateTx ({ ownerId, code, vmVersion, abiVersion, deposit
     : this.api.postContractCreate(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee), gas: parseInt(gas), gasPrice, vmVersion: ctVersion.vmVersion, abiVersion: ctVersion.abiVersion }))
 }
 
-async function contractCallTx ({ callerId, contractId, abiVersion, amount, gas, gasPrice = MIN_GAS_PRICE, callData }) {
+async function contractCallTx ({ callerId, contractId, abiVersion, amount, gas, gasPrice = MIN_GAS_PRICE, callData, backend }) {
   const ctVersion = this.getVmVersion(TX_TYPE.contractCall, R.head(arguments))
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
   const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.contractCall, { senderId: callerId, ...R.head(arguments), gasPrice, abiVersion: ctVersion.abiVersion })
@@ -151,16 +151,16 @@ async function contractCallTx ({ callerId, contractId, abiVersion, amount, gas, 
   return tx
 }
 
-async function oracleRegisterTx ({ accountId, queryFormat, responseFormat, queryFee, oracleTtl, abiVersion }) {
-  const { abiVersion: abi } = this.getVmVersion(TX_TYPE.oracleRegister, R.head(arguments))
+async function oracleRegisterTx ({ accountId, queryFormat, responseFormat, queryFee, oracleTtl, abiVersion = ABI_VERSIONS.NO_ABI }) {
+  // const { abiVersion: abi } = this.getVmVersion(TX_TYPE.oracleRegister, R.head(arguments))
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.oracleRegister, { senderId: accountId, ...R.head(arguments), abiVersion: abi })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.oracleRegister, { senderId: accountId, ...R.head(arguments), abiVersion })
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? buildTx({
       accountId,
       queryFee,
-      abiVersion: abi,
+      abiVersion,
       fee,
       oracleTtl,
       nonce,
@@ -171,7 +171,7 @@ async function oracleRegisterTx ({ accountId, queryFormat, responseFormat, query
     : await this.api.postOracleRegister({
       accountId,
       queryFee,
-      abiVersion: abi,
+      abiVersion,
       fee: parseInt(fee),
       oracleTtl,
       nonce,
@@ -338,8 +338,7 @@ async function channelSnapshotSoloTx ({ channelId, fromId, payload }) {
   return tx
 }
 
-// eslint-disable-next-line no-unused-vars
-async function gaAttachTx ({ ownerId, code, vmVersion, abiVersion, authFun, gas, gasPrice = MIN_GAS_PRICE, callData }) {
+async function gaAttachTx ({ ownerId, code, vmVersion, abiVersion, authFun, gas, gasPrice = MIN_GAS_PRICE, callData, backend }) {
   // Get VM_ABI version
   const ctVersion = this.getVmVersion(TX_TYPE.contractCreate, R.head(arguments))
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
@@ -356,21 +355,31 @@ async function gaAttachTx ({ ownerId, code, vmVersion, abiVersion, authFun, gas,
  *
  * @param {string} txType Type of transaction
  * @param {object} vmAbi Object with vm and abi version fields
- * @return {object} Object with vm/abi version ({ vmVersion: number, abiVersion: number })
+ * @return {object} Object with vm/abi version ({ vmVersion: number, abiVersion: number, backend: string })
  */
-function getVmVersion (txType, { vmVersion, abiVersion } = {}) {
-  const version = this.getNodeInfo().consensusProtocolVersion
-  const supportedProtocol = PROTOCOL_VM_ABI[version]
+function getVmVersion (txType, { vmVersion, abiVersion, backend } = {}) {
+  const { consensusProtocolVersion } = this.getNodeInfo()
+  const supportedProtocol = PROTOCOL_VM_ABI[consensusProtocolVersion]
   if (!supportedProtocol) throw new Error('Not supported consensus protocol version')
   const protocolForTX = supportedProtocol[txType]
   if (!protocolForTX) throw new Error('Not supported tx type')
 
+  // TODO remove
+  // Cross node/compiler compatibility
+  if (this.compilerVersion) {
+    const [compilerMajor] = this.compilerVersion.split('.')
+    if (+compilerMajor === 4 && consensusProtocolVersion !== 4) throw new Error(`Compiler ${this.compilerVersion} support only consensus protocol 4(Lima)`)
+    if (+compilerMajor <= 3 && consensusProtocolVersion > 3) throw new Error(`Compiler ${this.compilerVersion} support only consensus protocol less then 3(Fortuna)`)
+    if (backend === VM_TYPE.FATE && consensusProtocolVersion < 4) throw new Error('You can use FATE only after Lima HF')
+    backend = backend || this.compilerOptions.backend
+  }
+
   const ctVersion = {
-    abiVersion: abiVersion !== undefined ? abiVersion : protocolForTX.abiVersion[0],
-    vmVersion: vmVersion !== undefined ? vmVersion : protocolForTX.vmVersion[0]
+    abiVersion: abiVersion !== undefined ? abiVersion : backend === VM_TYPE.AEVM ? protocolForTX.abiVersion[1] : backend === VM_TYPE.FATE ? protocolForTX.abiVersion[0] : protocolForTX.abiVersion[0],
+    vmVersion: vmVersion !== undefined ? vmVersion : backend === VM_TYPE.AEVM ? protocolForTX.vmVersion[1] : backend === VM_TYPE.FATE ? protocolForTX.vmVersion[0] : protocolForTX.vmVersion[0]
   }
   if (protocolForTX.vmVersion.length && !R.contains(ctVersion.vmVersion, protocolForTX.vmVersion)) throw new Error(`VM VERSION ${ctVersion.vmVersion} do not support by this node. Supported: [${protocolForTX.vmVersion}]`)
-  if (!R.contains(ctVersion.abiVersion, protocolForTX.abiVersion)) throw new Error(`ABI VERSION ${ctVersion.abiVersion} do not support by this node. Supported: [${protocolForTX.abiVersion}]`)
+  if (protocolForTX.abiVersion.length && !R.contains(ctVersion.abiVersion, protocolForTX.abiVersion)) throw new Error(`ABI VERSION ${ctVersion.abiVersion} do not support by this node. Supported: [${protocolForTX.abiVersion}]`)
 
   return ctVersion
 }
@@ -382,7 +391,7 @@ function getVmVersion (txType, { vmVersion, abiVersion } = {}) {
  * @param {boolean} relative ttl is absolute or relative(default: true(relative))
  * @return {number} Absolute Ttl
  */
-async function calculateTtl (ttl = 0, relative = true) {
+async function calculateTtl (ttl = TX_TTL, relative = true) {
   if (ttl === 0) return 0
   if (ttl < 0) throw new Error('ttl must be greater than 0')
 
@@ -413,7 +422,7 @@ async function getAccountNonce (accountId, nonce) {
  * @param {Object} params Object which contains all tx data
  * @return {Object} { ttl, nonce, fee } Object with account nonce, absolute ttl and transaction fee
  */
-async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, gas, absoluteTtl }) {
+async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, gas, absoluteTtl, vsn }) {
   const account = await this.getAccount(senderId).catch(e => ({ nonce: 0 }))
   // Is GA account
   if (account.contractId) {
@@ -422,7 +431,7 @@ async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, ga
     n = n || (account.nonce + 1)
   }
   const ttl = await (calculateTtl.bind(this)(t, !absoluteTtl))
-  const fee = calculateFee(f, txType, { showWarning: this.showWarning, gas, params: R.merge(R.last(arguments), { nonce: n, ttl }) })
+  const fee = calculateFee(f, txType, { showWarning: this.showWarning, gas, params: R.merge(R.last(arguments), { nonce: n, ttl }), vsn })
   return { fee, ttl, nonce: n }
 }
 
@@ -474,8 +483,7 @@ const Transaction = ChainNode.compose(Tx, {
     channelSlashTx,
     channelSettleTx,
     channelSnapshotSoloTx,
-    // Todo Enable GA
-    // gaAttachTx,
+    gaAttachTx,
     getAccountNonce,
     getVmVersion
   }

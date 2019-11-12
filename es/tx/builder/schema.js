@@ -4,13 +4,77 @@
  * @export TxSchema
  * @example import TxSchema from '@aeternity/aepp-sdk/es/tx/builder/schema'
  */
-/* eslint-disable no-unused-vars */
 // # RLP version number
 // # https://github.com/aeternity/protocol/blob/master/serializations.md#binary-serialization
 
 import BigNumber from 'bignumber.js'
 
 export const VSN = 1
+export const VSN_2 = 2
+
+// # TRANSACTION DEFAULT TTL
+export const TX_TTL = 0
+
+// # AENS
+export const AENS_NAME_DOMAINS = ['chain', 'test']
+export const NAME_TTL = 50000
+// # max number of block into the future that the name is going to be available
+// # https://github.com/aeternity/protocol/blob/epoch-v0.22.0/AENS.md#update
+// # https://github.com/aeternity/protocol/blob/44a93d3aab957ca820183c3520b9daf6b0fedff4/AENS.md#aens-entry
+export const NAME_MAX_TTL = 36000
+export const NAME_MAX_CLIENT_TTL = 84600
+export const CLIENT_TTL = NAME_MAX_CLIENT_TTL
+export const NAME_FEE = 0
+// # see https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L67
+export const NAME_FEE_MULTIPLIER = 100000000000000
+export const NAME_FEE_BID_INCREMENT = 0.05 // # the increment is in percentage
+// # see https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L272
+export const NAME_BID_TIMEOUT_BLOCKS = 480 // # ~1 day
+export const NAME_BID_MAX_LENGTH = 12 // # this is the max length for a domain to be part of a bid
+// # ref: https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L290
+// # bid ranges:
+export const NAME_BID_RANGES = {
+  31: BigNumber(3).times(NAME_FEE_MULTIPLIER),
+  30: BigNumber(5).times(NAME_FEE_MULTIPLIER),
+  29: BigNumber(8).times(NAME_FEE_MULTIPLIER),
+  28: BigNumber(13).times(NAME_FEE_MULTIPLIER),
+  27: BigNumber(21).times(NAME_FEE_MULTIPLIER),
+  26: BigNumber(34).times(NAME_FEE_MULTIPLIER),
+  25: BigNumber(55).times(NAME_FEE_MULTIPLIER),
+  24: BigNumber(89).times(NAME_FEE_MULTIPLIER),
+  23: BigNumber(144).times(NAME_FEE_MULTIPLIER),
+  22: BigNumber(233).times(NAME_FEE_MULTIPLIER),
+  21: BigNumber(377).times(NAME_FEE_MULTIPLIER),
+  20: BigNumber(610).times(NAME_FEE_MULTIPLIER),
+  19: BigNumber(987).times(NAME_FEE_MULTIPLIER),
+  18: BigNumber(1597).times(NAME_FEE_MULTIPLIER),
+  17: BigNumber(2584).times(NAME_FEE_MULTIPLIER),
+  16: BigNumber(4181).times(NAME_FEE_MULTIPLIER),
+  15: BigNumber(6765).times(NAME_FEE_MULTIPLIER),
+  14: BigNumber(10946).times(NAME_FEE_MULTIPLIER),
+  13: BigNumber(17711).times(NAME_FEE_MULTIPLIER),
+  12: BigNumber(28657).times(NAME_FEE_MULTIPLIER),
+  11: BigNumber(46368).times(NAME_FEE_MULTIPLIER),
+  10: BigNumber(75025).times(NAME_FEE_MULTIPLIER),
+  9: BigNumber(121393).times(NAME_FEE_MULTIPLIER),
+  8: BigNumber(196418).times(NAME_FEE_MULTIPLIER),
+  7: BigNumber(317811).times(NAME_FEE_MULTIPLIER),
+  6: BigNumber(514229).times(NAME_FEE_MULTIPLIER),
+  5: BigNumber(832040).times(NAME_FEE_MULTIPLIER),
+  4: BigNumber(1346269).times(NAME_FEE_MULTIPLIER),
+  3: BigNumber(2178309).times(NAME_FEE_MULTIPLIER),
+  2: BigNumber(3524578).times(NAME_FEE_MULTIPLIER),
+  1: BigNumber(5702887).times(NAME_FEE_MULTIPLIER)
+}
+
+// # ref: https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L273
+// # name bid timeouts
+export const NAME_BID_TIMEOUTS = {
+  13: BigNumber(0),
+  12: BigNumber(NAME_BID_TIMEOUT_BLOCKS), // # 480 blocks
+  8: BigNumber(31).times(NAME_BID_TIMEOUT_BLOCKS), // # 14880 blocks
+  4: BigNumber(62).times(NAME_BID_TIMEOUT_BLOCKS) // # 29760 blocks
+}
 
 // # Tag constant for ids (type uint8)
 // # see https://github.com/aeternity/protocol/blob/master/serializations.md#the-id-type
@@ -157,15 +221,20 @@ export const VM_VERSIONS = {
   SOLIDITY: 2,
   SOPHIA_IMPROVEMENTS_MINERVA: 3,
   SOPHIA_IMPROVEMENTS_FORTUNA: 4,
+  FATE: 5,
   SOPHIA_IMPROVEMENTS_LIMA: 6
 }
 // # see https://github.com/aeternity/protocol/blob/minerva/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain
 export const ABI_VERSIONS = {
   NO_ABI: 0,
   SOPHIA: 1,
-  SOLIDITY: 2
+  SOLIDITY: 2,
+  FATE: 3
 }
 
+export const VM_TYPE = { FATE: 'fate', AEVM: 'aevm' }
+
+// First abi/vm by default
 export const VM_ABI_MAP_ROMA = {
   [TX_TYPE.contractCreate]: { vmVersion: [VM_VERSIONS.SOPHIA], abiVersion: [ABI_VERSIONS.SOPHIA] },
   [TX_TYPE.contractCall]: { vmVersion: [VM_VERSIONS.SOPHIA], abiVersion: [ABI_VERSIONS.SOPHIA] },
@@ -185,8 +254,8 @@ export const VM_ABI_MAP_FORTUNA = {
 }
 
 export const VM_ABI_MAP_LIMA = {
-  [TX_TYPE.contractCreate]: { vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_LIMA], abiVersion: [ABI_VERSIONS.SOPHIA] },
-  [TX_TYPE.contractCall]: { vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_LIMA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA, VM_VERSIONS.SOPHIA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA], abiVersion: [ABI_VERSIONS.SOPHIA] },
+  [TX_TYPE.contractCreate]: { vmVersion: [VM_VERSIONS.FATE, VM_VERSIONS.SOPHIA_IMPROVEMENTS_LIMA], abiVersion: [ABI_VERSIONS.FATE, ABI_VERSIONS.SOPHIA] },
+  [TX_TYPE.contractCall]: { vmVersion: [VM_VERSIONS.FATE, VM_VERSIONS.SOPHIA_IMPROVEMENTS_LIMA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA, VM_VERSIONS.SOPHIA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA], abiVersion: [ABI_VERSIONS.FATE, ABI_VERSIONS.SOPHIA] },
   [TX_TYPE.oracleRegister]: { vmVersion: [], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA] }
 }
 
@@ -354,6 +423,15 @@ const ACCOUNT_TX = [
   TX_FIELD('balance', FIELD_TYPES.int)
 ]
 
+export const CONTRACT_BYTE_CODE_LIMA = [
+  ...BASE_TX,
+  TX_FIELD('sourceCodeHash', FIELD_TYPES.rawBinary),
+  TX_FIELD('typeInfo', FIELD_TYPES.sophiaCodeTypeInfo),
+  TX_FIELD('byteCode', FIELD_TYPES.rawBinary),
+  TX_FIELD('compilerVersion', FIELD_TYPES.string),
+  TX_FIELD('payable', FIELD_TYPES.bool)
+]
+
 export const CONTRACT_BYTE_CODE_MINERVA = [
   ...BASE_TX,
   TX_FIELD('sourceCodeHash', FIELD_TYPES.rawBinary),
@@ -374,14 +452,14 @@ const ACCOUNT_TX_2 = [
   TX_FIELD('flags', FIELD_TYPES.int),
   TX_FIELD('nonce', FIELD_TYPES.int),
   TX_FIELD('balance', FIELD_TYPES.int),
-  TX_FIELD('gaContract', FIELD_TYPES.id, 'ct'),
+  TX_FIELD('gaContract', FIELD_TYPES.id, ['ct', 'nm']),
   TX_FIELD('gaAuthFun', FIELD_TYPES.binary, 'cb')
 ]
 
 const SPEND_TX = [
   ...BASE_TX,
   TX_FIELD('senderId', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('recipientId', FIELD_TYPES.id, 'ak'),
+  TX_FIELD('recipientId', FIELD_TYPES.id, ['ak', 'nm']),
   TX_FIELD('amount', FIELD_TYPES.int),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int),
@@ -414,6 +492,17 @@ const NAME_CLAIM_TX = [
   TX_FIELD('ttl', FIELD_TYPES.int)
 ]
 
+const NAME_CLAIM_TX_2 = [
+  ...BASE_TX,
+  TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
+  TX_FIELD('nonce', FIELD_TYPES.int),
+  TX_FIELD('name', FIELD_TYPES.binary, 'nm'),
+  TX_FIELD('nameSalt', FIELD_TYPES.int),
+  TX_FIELD('nameFee', FIELD_TYPES.int),
+  TX_FIELD('fee', FIELD_TYPES.int),
+  TX_FIELD('ttl', FIELD_TYPES.int)
+]
+
 const NAME_UPDATE_TX = [
   ...BASE_TX,
   TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
@@ -431,7 +520,7 @@ const NAME_TRANSFER_TX = [
   TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
   TX_FIELD('nameId', FIELD_TYPES.id, 'nm'),
-  TX_FIELD('recipientId', FIELD_TYPES.id, 'ak'),
+  TX_FIELD('recipientId', FIELD_TYPES.id, ['ak', 'nm']),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int)
 ]
@@ -501,7 +590,7 @@ const CONTRACT_CALL_TX = [
   ...BASE_TX,
   TX_FIELD('callerId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('contractId', FIELD_TYPES.id, 'ct'),
+  TX_FIELD('contractId', FIELD_TYPES.id, ['ct', 'nm']),
   TX_FIELD('abiVersion', FIELD_TYPES.int),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int),
@@ -541,7 +630,7 @@ const ORACLE_REGISTER_TX = [
 
 const ORACLE_EXTEND_TX = [
   ...BASE_TX,
-  TX_FIELD('oracleId', FIELD_TYPES.id, 'ok'),
+  TX_FIELD('oracleId', FIELD_TYPES.id, ['ok', 'nm']),
   TX_FIELD('nonce', FIELD_TYPES.int),
   TX_FIELD('oracleTtlType', FIELD_TYPES.int),
   TX_FIELD('oracleTtlValue', FIELD_TYPES.int),
@@ -553,7 +642,7 @@ const ORACLE_QUERY_TX = [
   ...BASE_TX,
   TX_FIELD('senderId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('oracleId', FIELD_TYPES.id, 'ok'),
+  TX_FIELD('oracleId', FIELD_TYPES.id, ['ok', 'nm']),
   TX_FIELD('query', FIELD_TYPES.string),
   TX_FIELD('queryFee', FIELD_TYPES.int),
   TX_FIELD('queryTtlType', FIELD_TYPES.int),
@@ -841,7 +930,8 @@ export const TX_SERIALIZATION_SCHEMA = {
     1: TX_SCHEMA_FIELD(NAME_PRE_CLAIM_TX, OBJECT_TAG_NAME_SERVICE_PRECLAIM_TRANSACTION)
   },
   [TX_TYPE.nameClaim]: {
-    1: TX_SCHEMA_FIELD(NAME_CLAIM_TX, OBJECT_TAG_NAME_SERVICE_CLAIM_TRANSACTION)
+    1: TX_SCHEMA_FIELD(NAME_CLAIM_TX, OBJECT_TAG_NAME_SERVICE_CLAIM_TRANSACTION),
+    2: TX_SCHEMA_FIELD(NAME_CLAIM_TX_2, OBJECT_TAG_NAME_SERVICE_CLAIM_TRANSACTION)
   },
   [TX_TYPE.nameUpdate]: {
     1: TX_SCHEMA_FIELD(NAME_UPDATE_TX, OBJECT_TAG_NAME_SERVICE_UPDATE_TRANSACTION)
@@ -979,7 +1069,8 @@ export const TX_DESERIALIZATION_SCHEMA = {
     1: TX_SCHEMA_FIELD(NAME_PRE_CLAIM_TX, OBJECT_TAG_NAME_SERVICE_PRECLAIM_TRANSACTION)
   },
   [OBJECT_TAG_NAME_SERVICE_CLAIM_TRANSACTION]: {
-    1: TX_SCHEMA_FIELD(NAME_CLAIM_TX, OBJECT_TAG_NAME_SERVICE_CLAIM_TRANSACTION)
+    1: TX_SCHEMA_FIELD(NAME_CLAIM_TX, OBJECT_TAG_NAME_SERVICE_CLAIM_TRANSACTION),
+    2: TX_SCHEMA_FIELD(NAME_CLAIM_TX_2, OBJECT_TAG_NAME_SERVICE_CLAIM_TRANSACTION)
   },
   [OBJECT_TAG_NAME_SERVICE_UPDATE_TRANSACTION]: {
     1: TX_SCHEMA_FIELD(NAME_UPDATE_TX, OBJECT_TAG_NAME_SERVICE_UPDATE_TRANSACTION)
@@ -1102,7 +1193,8 @@ export const TX_DESERIALIZATION_SCHEMA = {
   },
   [OBJECT_TAG_SOPHIA_BYTE_CODE]: {
     1: TX_SCHEMA_FIELD(CONTRACT_BYTE_CODE_ROMA, OBJECT_TAG_SOPHIA_BYTE_CODE),
-    2: TX_SCHEMA_FIELD(CONTRACT_BYTE_CODE_MINERVA, OBJECT_TAG_SOPHIA_BYTE_CODE)
+    2: TX_SCHEMA_FIELD(CONTRACT_BYTE_CODE_MINERVA, OBJECT_TAG_SOPHIA_BYTE_CODE),
+    3: TX_SCHEMA_FIELD(CONTRACT_BYTE_CODE_LIMA, OBJECT_TAG_SOPHIA_BYTE_CODE)
   }
 }
 
@@ -1120,7 +1212,8 @@ const VALIDATORS = {
   nonceUsed: 'nonceUsed',
   nonceHigh: 'nonceHigh',
   minGasPrice: 'minGasPrice',
-  vmAndAbiVersion: 'vmAndAbiVersion'
+  vmAndAbiVersion: 'vmAndAbiVersion',
+  insufficientBalanceForFeeNameFee: 'insufficientBalanceForFeeNameFee'
 }
 
 const ERRORS = {
@@ -1132,7 +1225,8 @@ const ERRORS = {
   nonceUsed: { key: 'NonceUsed', type: ERROR_TYPE.ERROR, txKey: 'nonce' },
   nonceHigh: { key: 'NonceHigh', type: ERROR_TYPE.WARNING, txKey: 'nonce' },
   minGasPrice: { key: 'minGasPrice', type: ERROR_TYPE.ERROR, txKey: 'gasPrice' },
-  vmAndAbiVersion: { key: 'vmAndAbiVersion', type: ERROR_TYPE.ERROR, txKey: 'ctVersion' }
+  vmAndAbiVersion: { key: 'vmAndAbiVersion', type: ERROR_TYPE.ERROR, txKey: 'ctVersion' },
+  insufficientBalanceForFeeNameFee: { key: 'insufficientBalanceForFeeNameFee', type: ERROR_TYPE.ERROR, txKey: 'nameFee' }
 }
 
 export const SIGNATURE_VERIFICATION_SCHEMA = [
@@ -1152,6 +1246,13 @@ export const CONTRACT_VERIFICATION_SCHEMA = [
     () => `The gasPrice must be bigger then ${MIN_GAS_PRICE}`,
     VALIDATORS.minGasPrice,
     ERRORS.minGasPrice
+  )
+]
+export const NAME_CLAIM_VERIFICATION_SCHEMA = [
+  VERIFICATION_FIELD(
+    ({ balance }) => `The account balance ${balance} is not enough to execute the transaction`,
+    VALIDATORS.insufficientBalanceForFeeNameFee,
+    ERRORS.insufficientBalanceForFeeNameFee
   )
 ]
 export const BASE_VERIFICATION_SCHEMA = [

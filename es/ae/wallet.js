@@ -32,10 +32,8 @@ import Chain from '../chain/node'
 import Rpc from '../rpc/server'
 import Tx from '../tx/tx'
 import Contract from './contract'
+import GeneralizeAccount from '../contract/ga'
 import { WalletRpc } from '../utils/aepp-wallet-communication/rpc/wallet-rpc'
-import NodePool from '../node-pool'
-// Todo Enable GA
-// import GeneralizeAccount from '../contract/ga'
 
 const contains = R.flip(R.contains)
 const isTxMethod = contains(Tx.compose.deepConfiguration.Ae.methods)
@@ -134,7 +132,7 @@ async function rpcAddress ({ params, session }) {
   onContract: confirm
 })
  */
-export const Wallet = Ae.compose(Accounts, Chain, NodePool, Tx, Contract, Rpc, {
+const Wallet = Ae.compose(Accounts, Chain, Tx, Contract, GeneralizeAccount, Rpc, {
   init ({ onTx = this.onTx, onChain = this.onChain, onAccount = this.onAccount, onContract = this.onContract }, { stamp }) {
     this.onTx = onTx
     this.onChain = onChain
@@ -158,6 +156,6 @@ export const Wallet = Ae.compose(Accounts, Chain, NodePool, Tx, Contract, Rpc, {
   }
 })
 
-export const RpcWallet = Ae.compose(Accounts, Chain, NodePool, Tx, Contract, WalletRpc)
+export const RpcWallet = Ae.compose(Accounts, Chain, Tx, Contract, GeneralizeAccount, WalletRpc)
 
 export default Wallet

@@ -208,8 +208,7 @@ function WebSocket (url, callbacks) {
 
   return new Promise((resolve, reject) => {
     const ws = new W3CWebSocket(url)
-    // eslint-disable-next-line no-return-assign
-    Object.entries(callbacks).forEach(([key, callback]) => ws[key] = callback)
+    Object.entries(callbacks).forEach(([key, callback]) => { ws[key] = callback })
     fireOnce(ws, 'onopen', () => resolve(ws))
     fireOnce(ws, 'onerror', (err) => reject(err))
   })
@@ -226,11 +225,15 @@ async function initialize (channel, channelOptions) {
   eventEmitters.set(channel, new EventEmitter())
   sequence.set(channel, 0)
   rpcCallbacks.set(channel, new Map())
+  changeStatus(channel, 'connecting')
   const ws = await WebSocket(wsUrl, {
     onopen: () => {
       changeStatus(channel, 'connected')
       if (params.reconnectTx) {
         enterState(channel, { handler: channelOpen })
+        setTimeout(async () =>
+          changeState(channel, (await call(channel, 'channels.get.offchain_state', {})).signed_tx)
+        , 0)
       }
       ping(channel)
     },

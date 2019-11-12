@@ -3,58 +3,32 @@
 ## @aeternity/aepp-sdk/es/tx
 Tx module
 
-**Export**: Tx  
 **Example**  
 ```js
 import Tx from '@aeternity/aepp-sdk/es/tx'
 ```
 
 * [@aeternity/aepp-sdk/es/tx](#module_@aeternity/aepp-sdk/es/tx)
-    * [Tx([options])](#exp_module_@aeternity/aepp-sdk/es/tx--Tx) ⇒ `Object` ⏏
-        * *[.spendTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+spendTx) ⇒ `String`*
-        * *[.namePreclaimTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+namePreclaimTx) ⇒ `String`*
-        * *[.nameClaimTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+nameClaimTx) ⇒ `String`*
-        * *[.nameTransferTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+nameTransferTx) ⇒ `String`*
-        * *[.nameUpdateTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+nameUpdateTx) ⇒ `String`*
-        * *[.nameRevokeTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+nameRevokeTx) ⇒ `String`*
-        * *[.contractCreateTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+contractCreateTx) ⇒ `String`*
-        * *[.contractCallTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+contractCallTx) ⇒ `String`*
-        * *[.oracleRegisterTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+oracleRegisterTx) ⇒ `String`*
-        * *[.oracleExtendTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+oracleExtendTx) ⇒ `String`*
-        * *[.oraclePostQuery(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+oraclePostQuery) ⇒ `String`*
-        * *[.oracleRespondTx(options)](#module_@aeternity/aepp-sdk/es/tx--Tx+oracleRespondTx) ⇒ `String`*
-        * *[.getAccountNonce(address)](#module_@aeternity/aepp-sdk/es/tx--Tx+getAccountNonce) ⇒ `Number`*
+    * *[.spendTx(options)](#module_@aeternity/aepp-sdk/es/tx+spendTx) ⇒ `String`*
+    * *[.namePreclaimTx(options)](#module_@aeternity/aepp-sdk/es/tx+namePreclaimTx) ⇒ `String`*
+    * *[.nameClaimTx(options)](#module_@aeternity/aepp-sdk/es/tx+nameClaimTx) ⇒ `String`*
+    * *[.nameTransferTx(options)](#module_@aeternity/aepp-sdk/es/tx+nameTransferTx) ⇒ `String`*
+    * *[.nameUpdateTx(options)](#module_@aeternity/aepp-sdk/es/tx+nameUpdateTx) ⇒ `String`*
+    * *[.nameRevokeTx(options)](#module_@aeternity/aepp-sdk/es/tx+nameRevokeTx) ⇒ `String`*
+    * *[.contractCreateTx(options)](#module_@aeternity/aepp-sdk/es/tx+contractCreateTx) ⇒ `String`*
+    * *[.contractCallTx(options)](#module_@aeternity/aepp-sdk/es/tx+contractCallTx) ⇒ `String`*
+    * *[.oracleRegisterTx(options)](#module_@aeternity/aepp-sdk/es/tx+oracleRegisterTx) ⇒ `String`*
+    * *[.oracleExtendTx(options)](#module_@aeternity/aepp-sdk/es/tx+oracleExtendTx) ⇒ `String`*
+    * *[.oraclePostQuery(options)](#module_@aeternity/aepp-sdk/es/tx+oraclePostQuery) ⇒ `String`*
+    * *[.oracleRespondTx(options)](#module_@aeternity/aepp-sdk/es/tx+oracleRespondTx) ⇒ `String`*
+    * *[.getAccountNonce(address)](#module_@aeternity/aepp-sdk/es/tx+getAccountNonce) ⇒ `Number`*
 
-<a id="exp_module_@aeternity/aepp-sdk/es/tx--Tx"></a>
+<a id="module_@aeternity/aepp-sdk/es/tx+spendTx"></a>
 
-### Tx([options]) ⇒ `Object` ⏏
-Basic Tx Stamp
-
-Attempting to create instances from the Stamp without overwriting all
-abstract methods using composition will result in an exception.
-
-Tx is one of the three basic building blocks of an
-[Ae](#exp_module_@aeternity/aepp-sdk/es/ae--Ae) client and provides methods to
-create aeternity transactions.
-
-**Kind**: Exported function  
-**Returns**: `Object` - Tx instance  
-**rtype**: `Stamp`
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| [options] | `Object` | <code>{}</code> | Initializer object |
-
-**Example**  
-```js
-Tx()
-```
-<a id="module_@aeternity/aepp-sdk/es/tx--Tx+spendTx"></a>
-
-#### *tx.spendTx(options) ⇒ `String`*
+### *@aeternity/aepp-sdk/es/tx.spendTx(options) ⇒ `String`*
 Create a `spend_tx` transaction
 
-**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)  
+**Kind**: instance abstract method of [`@aeternity/aepp-sdk/es/tx`](#module_@aeternity/aepp-sdk/es/tx)  
 **Returns**: `String` - `spend_tx` transaction  
 **Category**: async  
 **rtype**: `({sender?: String, recipientId: String, amount: Number, fee?: Number, ttl?: Number, nonce?: Number, payload?: String}) => tx: Promise[String]`
@@ -63,12 +37,12 @@ Create a `spend_tx` transaction
 | --- | --- | --- |
 | options | `Object` | The object to extract properties from |
 
-<a id="module_@aeternity/aepp-sdk/es/tx--Tx+namePreclaimTx"></a>
+<a id="module_@aeternity/aepp-sdk/es/tx+namePreclaimTx"></a>
 
-#### *tx.namePreclaimTx(options) ⇒ `String`*
+### *@aeternity/aepp-sdk/es/tx.namePreclaimTx(options) ⇒ `String`*
 Create a `name_preclaim_tx` transaction
 
-**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)  
+**Kind**: instance abstract method of [`@aeternity/aepp-sdk/es/tx`](#module_@aeternity/aepp-sdk/es/tx)  
 **Returns**: `String` - `name_preclaim_tx` transaction  
 **Category**: async  
 **rtype**: `({account?: String, commitment: String, fee?: Number, ttl?: Number, nonce?: Number}) => tx: Promise[String]`
@@ -77,12 +51,12 @@ Create a `name_preclaim_tx` transaction
 | --- | --- | --- |
 | options | `Object` | The object to extract properties from |
 
-<a id="module_@aeternity/aepp-sdk/es/tx--Tx+nameClaimTx"></a>
+<a id="module_@aeternity/aepp-sdk/es/tx+nameClaimTx"></a>
 
-#### *tx.nameClaimTx(options) ⇒ `String`*
+### *@aeternity/aepp-sdk/es/tx.nameClaimTx(options) ⇒ `String`*
 Create a `name_claim_tx` transaction
 
-**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)  
+**Kind**: instance abstract method of [`@aeternity/aepp-sdk/es/tx`](#module_@aeternity/aepp-sdk/es/tx)  
 **Returns**: `String` - `name_claim_tx` transaction  
 **Category**: async  
 **rtype**: `({account?: String, name: String, nameSalt: String, fee?: Number, ttl?: Number, nonce?: Number}) => tx: Promise[String]`
@@ -91,12 +65,12 @@ Create a `name_claim_tx` transaction
 | --- | --- | --- |
 | options | `Object` | The object to extract properties from |
 
-<a id="module_@aeternity/aepp-sdk/es/tx--Tx+nameTransferTx"></a>
+<a id="module_@aeternity/aepp-sdk/es/tx+nameTransferTx"></a>
 
-#### *tx.nameTransferTx(options) ⇒ `String`*
+### *@aeternity/aepp-sdk/es/tx.nameTransferTx(options) ⇒ `String`*
 Create a `name_transfer_tx` transaction
 
-**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)  
+**Kind**: instance abstract method of [`@aeternity/aepp-sdk/es/tx`](#module_@aeternity/aepp-sdk/es/tx)  
 **Returns**: `String` - `name_transfer_tx` transaction  
 **Category**: async  
 **rtype**: `({account?: String, nameId: String, recipientId: String, fee?: Number, ttl?: Number, nonce?: Number}) => tx: Promise[String]`
@@ -105,12 +79,12 @@ Create a `name_transfer_tx` transaction
 | --- | --- | --- |
 | options | `Object` | The object to extract properties from |
 
-<a id="module_@aeternity/aepp-sdk/es/tx--Tx+nameUpdateTx"></a>
+<a id="module_@aeternity/aepp-sdk/es/tx+nameUpdateTx"></a>
 
-#### *tx.nameUpdateTx(options) ⇒ `String`*
+### *@aeternity/aepp-sdk/es/tx.nameUpdateTx(options) ⇒ `String`*
 Create a `name_update_tx` transaction
 
-**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)  
+**Kind**: instance abstract method of [`@aeternity/aepp-sdk/es/tx`](#module_@aeternity/aepp-sdk/es/tx)  
 **Returns**: `String` - `name_update_tx` transaction  
 **Category**: async  
 **rtype**: `({account?: String, nameId: String, pointers: Object, nameTtl: Number, clientTtl: Number, fee?: Number, ttl?: Number, nonce?: Number}) => tx: Promise[String]`
@@ -119,12 +93,12 @@ Create a `name_update_tx` transaction
 | --- | --- | --- |
 | options | `Object` | The object to extract properties from |
 
-<a id="module_@aeternity/aepp-sdk/es/tx--Tx+nameRevokeTx"></a>
+<a id="module_@aeternity/aepp-sdk/es/tx+nameRevokeTx"></a>
 
-#### *tx.nameRevokeTx(options) ⇒ `String`*
+### *@aeternity/aepp-sdk/es/tx.nameRevokeTx(options) ⇒ `String`*
 Create a `name_revoke_tx` transaction
 
-**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)  
+**Kind**: instance abstract method of [`@aeternity/aepp-sdk/es/tx`](#module_@aeternity/aepp-sdk/es/tx)  
 **Returns**: `String` - `name_revoke_tx` transaction  
 **Category**: async  
 **rtype**: `({account?: String, nameId: String, fee?: Number, ttl?: Number, nonce?: Number}) => tx: Promise[String]`
@@ -133,12 +107,12 @@ Create a `name_revoke_tx` transaction
 | --- | --- | --- |
 | options | `Object` | The object to extract properties from |
 
-<a id="module_@aeternity/aepp-sdk/es/tx--Tx+contractCreateTx"></a>
+<a id="module_@aeternity/aepp-sdk/es/tx+contractCreateTx"></a>
 
-#### *tx.contractCreateTx(options) ⇒ `String`*
+### *@aeternity/aepp-sdk/es/tx.contractCreateTx(options) ⇒ `String`*
 Create a `contract_create_tx` transaction
 
-**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)  
+**Kind**: instance abstract method of [`@aeternity/aepp-sdk/es/tx`](#module_@aeternity/aepp-sdk/es/tx)  
 **Returns**: `String` - `contract_create_tx` transaction  
 **Category**: async  
 **rtype**: `({owner: String, code: String, callData: String, vmVersion: Number, deposit: Number, amount: Number, gas: Number, gasPrice: Number, fee?: Number, ttl?: Number, nonce?: Number}) => tx: Promise[String]`
@@ -147,12 +121,12 @@ Create a `contract_create_tx` transaction
 | --- | --- | --- |
 | options | `Object` | The object to extract properties from |
 
-<a id="module_@aeternity/aepp-sdk/es/tx--Tx+contractCallTx"></a>
+<a id="module_@aeternity/aepp-sdk/es/tx+contractCallTx"></a>
 
-#### *tx.contractCallTx(options) ⇒ `String`*
+### *@aeternity/aepp-sdk/es/tx.contractCallTx(options) ⇒ `String`*
 Create a `contract_call_tx` transaction
 
-**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)  
+**Kind**: instance abstract method of [`@aeternity/aepp-sdk/es/tx`](#module_@aeternity/aepp-sdk/es/tx)  
 **Returns**: `String` - `contract_call_tx` transaction  
 **Category**: async  
 **rtype**: `({callerId: String, contract: String, callData: String, vmVersion: Number, amount: Number, gas: Number, gasPrice: Number, fee?: Number, ttl?: Number, nonce?: Number}) => tx: Promise[String]`
@@ -161,12 +135,12 @@ Create a `contract_call_tx` transaction
 | --- | --- | --- |
 | options | `Object` | The object to extract properties from |
 
-<a id="module_@aeternity/aepp-sdk/es/tx--Tx+oracleRegisterTx"></a>
+<a id="module_@aeternity/aepp-sdk/es/tx+oracleRegisterTx"></a>
 
-#### *tx.oracleRegisterTx(options) ⇒ `String`*
+### *@aeternity/aepp-sdk/es/tx.oracleRegisterTx(options) ⇒ `String`*
 Create a `oracle_register_tx` transaction
 
-**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)  
+**Kind**: instance abstract method of [`@aeternity/aepp-sdk/es/tx`](#module_@aeternity/aepp-sdk/es/tx)  
 **Returns**: `String` - `oracle_register_tx` transaction  
 **Category**: async  
 **rtype**: `({ accountId: String, queryFormat: String, responseFormat: String, queryFee: String|Number, oracleTtl: Object, vmVersion: Number = ORACLE_VM_VERSION, fee?: Number, ttl?: Number, nonce?: Number }) => tx: Promise[String]`
@@ -175,12 +149,12 @@ Create a `oracle_register_tx` transaction
 | --- | --- | --- |
 | options | `Object` | The object to extract properties from |
 
-<a id="module_@aeternity/aepp-sdk/es/tx--Tx+oracleExtendTx"></a>
+<a id="module_@aeternity/aepp-sdk/es/tx+oracleExtendTx"></a>
 
-#### *tx.oracleExtendTx(options) ⇒ `String`*
+### *@aeternity/aepp-sdk/es/tx.oracleExtendTx(options) ⇒ `String`*
 Create a `oracle_extend_tx` transaction
 
-**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)  
+**Kind**: instance abstract method of [`@aeternity/aepp-sdk/es/tx`](#module_@aeternity/aepp-sdk/es/tx)  
 **Returns**: `String` - `oracle_extend_tx` transaction  
 **Category**: async  
 **rtype**: `({ oracleId: String, callerId: String, oracleTtl: Object, fee?: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]`
@@ -189,12 +163,12 @@ Create a `oracle_extend_tx` transaction
 | --- | --- | --- |
 | options | `Object` | The object to extract properties from |
 
-<a id="module_@aeternity/aepp-sdk/es/tx--Tx+oraclePostQuery"></a>
+<a id="module_@aeternity/aepp-sdk/es/tx+oraclePostQuery"></a>
 
-#### *tx.oraclePostQuery(options) ⇒ `String`*
+### *@aeternity/aepp-sdk/es/tx.oraclePostQuery(options) ⇒ `String`*
 Create a `oracle_post_query_tx` transaction
 
-**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)  
+**Kind**: instance abstract method of [`@aeternity/aepp-sdk/es/tx`](#module_@aeternity/aepp-sdk/es/tx)  
 **Returns**: `String` - `oracle_post_query_tx` transaction  
 **Category**: async  
 **rtype**: `({ oracleId: String, responseTtl: Object, query: String, queryTtl: Object, queryFee: String|Number, senderId: String, fee?: Number, ttl: Number, nonce?: Number}) => tx: Promise[String]`
@@ -203,12 +177,12 @@ Create a `oracle_post_query_tx` transaction
 | --- | --- | --- |
 | options | `Object` | The object to extract properties from |
 
-<a id="module_@aeternity/aepp-sdk/es/tx--Tx+oracleRespondTx"></a>
+<a id="module_@aeternity/aepp-sdk/es/tx+oracleRespondTx"></a>
 
-#### *tx.oracleRespondTx(options) ⇒ `String`*
+### *@aeternity/aepp-sdk/es/tx.oracleRespondTx(options) ⇒ `String`*
 Create a `oracle_respond_tx` transaction
 
-**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)  
+**Kind**: instance abstract method of [`@aeternity/aepp-sdk/es/tx`](#module_@aeternity/aepp-sdk/es/tx)  
 **Returns**: `String` - `oracle_respond_tx` transaction  
 **Category**: async  
 **rtype**: `({ oracleId: String, callerId: String, responseTtl: Object, queryId: String, response: String, fee?: Number, ttl?: Number, nonce?: Number}) => tx: Promise[String]`
@@ -217,12 +191,12 @@ Create a `oracle_respond_tx` transaction
 | --- | --- | --- |
 | options | `Object` | The object to extract properties from |
 
-<a id="module_@aeternity/aepp-sdk/es/tx--Tx+getAccountNonce"></a>
+<a id="module_@aeternity/aepp-sdk/es/tx+getAccountNonce"></a>
 
-#### *tx.getAccountNonce(address) ⇒ `Number`*
+### *@aeternity/aepp-sdk/es/tx.getAccountNonce(address) ⇒ `Number`*
 Get Account Nonce
 
-**Kind**: instance abstract method of [`Tx`](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)  
+**Kind**: instance abstract method of [`@aeternity/aepp-sdk/es/tx`](#module_@aeternity/aepp-sdk/es/tx)  
 **Returns**: `Number` - Result  
 **Category**: async  
 **rtype**: `(address) => result: Number`

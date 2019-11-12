@@ -51,8 +51,7 @@ function expandPath (path, replacements) {
 function lookupType (path, spec, types) {
   const type = (() => {
     const match = R.path(path, spec).match(/^#\/definitions\/(.+)/)
-    // eslint-disable-next-line no-void
-    if (match !== void 0) {
+    if (match !== undefined) {
       return match[1]
     } else {
       throw Error(`Reference path does not meet specification: ${path}`)
@@ -327,10 +326,29 @@ function assertOne (coll) {
  */
 function destructureClientError (error) {
   const { method, url } = error.config
-  const { status, data } = error.response
-  const reason = R.has('reason', data) ? data.reason : R.toString(data)
+  const { status, data, statusText } = error.response
+  const reason = R.has('reason', data) ? data.reason : data ? R.toString(data) : statusText
 
   return `${method.toUpperCase()} to ${url} failed with ${status}: ${reason}`
+}
+
+/**
+ * Resolve reference
+ * @rtype (ref: String, swag: Object) => Object
+ * @param {String} ref - Reference to resolve
+ * @param {Object} swag
+ * @return {Object} Resolved reference definition
+ */
+function resolveRef (ref, swag) {
+  const match = ref.match(/^#\/(.+)$/)
+  if (match !== undefined) {
+    const value = R.path(match[1].split('/'), swag)
+    if (value != null) {
+      return value
+    }
+  }
+
+  throw Error(`Could not resolve reference: ${ref}`)
 }
 
 /**
@@ -344,11 +362,13 @@ function destructureClientError (error) {
  * @param {Object} types - Swagger types
  * @return {Function}
  */
-const operation = (path, method, definition, types, { config, errorHandler } = {}) => {
+const operation = (path, method, definition, swag, { config, errorHandler } = {}) => {
   config = config || {}
   delete config.transformResponse // Prevent of overwriting transform response
   const { operationId, description } = definition
-  const { parameters } = definition
+  const parameters = (definition.parameters || []).map(param =>
+    param.$ref ? resolveRef(param.$ref, swag) : param
+  )
   const name = `${R.head(operationId).toLowerCase()}${R.drop(1, operationId)}`
   const pascalized = pascalizeParameters(parameters)
 
@@ -381,7 +401,7 @@ const operation = (path, method, definition, types, { config, errorHandler } = {
         const values = R.merge(R.reject(R.isNil, R.pick(optNames, opt)), R.zipObj(R.pluck('name', req), arg))
         const conformed = R.mapObjIndexed((val, key) => {
           try {
-            return conform(val, indexedParameters[key], types)
+            return conform(val, indexedParameters[key], swag.definitions)
           } catch (e) {
             const path = [key].concat(e.path || [])
             throw Object.assign(e, {
@@ -408,7 +428,7 @@ const operation = (path, method, definition, types, { config, errorHandler } = {
 
         try {
           const response = await client(`${url}${expandedPath}`, params).catch(this.axiosError(errorHandler))
-          // return opt.fullResponse ? response : conform(pascalizeKeys(response.data), responses['200'], types)
+          // return opt.fullResponse ? response : conform(pascalizeKeys(response.data), responses['200'], swag.definitions)
           return opt.fullResponse ? response : pascalizeKeys(response.data)
         } catch (e) {
           if (R.path(['response', 'data'], e)) {
@@ -453,7 +473,7 @@ const operation = (path, method, definition, types, { config, errorHandler } = {
  */
 const Swagger = stampit({
   init ({ swag = this.swag, axiosConfig }, { stamp }) {
-    const { paths, definitions } = swag
+    const { paths } = swag
     const methods = R.indexBy(
       R.prop('name'),
       R.flatten(
@@ -461,7 +481,7 @@ const Swagger = stampit({
           R.mapObjIndexed(
             (methods, path) => R.values(
               R.mapObjIndexed((definition, method) => {
-                const op = operation(path, method, definition, definitions, axiosConfig)
+                const op = operation(path, method, definition, swag, axiosConfig)
                 return op(this, this.urlFor(swag.basePath, definition))
               }, methods)),
             paths

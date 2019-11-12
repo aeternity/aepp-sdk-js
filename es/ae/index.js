@@ -29,6 +29,8 @@ import Account from '../account'
 import TxBuilder from '../tx/builder'
 import * as R from 'ramda'
 import { BigNumber } from 'bignumber.js'
+import { isAddressValid } from '../utils/crypto'
+import { isNameValid, produceNameId } from '../tx/builder/helpers'
 
 /**
  * Sign and post a transaction to the chain
@@ -42,16 +44,13 @@ import { BigNumber } from 'bignumber.js'
  */
 async function send (tx, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  // Todo Enable GA
-  // const { contractId: gaId, authFun } = await this.getAccount(await this.address(opt))
-  // const signed = gaId
-  //   ? await this.signUsingGA(tx, { ...opt, authFun })
-  const signed = await this.signTransaction(tx, opt)
+  const { contractId: gaId, authFun } = await this.getAccount(await this.address(opt))
+  const signed = gaId
+    ? await this.signUsingGA(tx, { ...opt, authFun })
+    : await this.signTransaction(tx, opt)
   return this.sendTransaction(signed, opt)
 }
 
-// Todo Enable GA
-// eslint-disable-next-line no-unused-vars
 async function signUsingGA (tx, options = {}) {
   const { authData, authFun } = options
   return this.createMetaTx(tx, authData, authFun, options)
@@ -63,14 +62,34 @@ async function signUsingGA (tx, options = {}) {
  * @category async
  * @rtype (amount: Number|String, recipientId: String, options?: Object) => Promise[String]
  * @param {Number|String} amount - Amount to spend
- * @param {String} recipientId - Address of recipient account
+ * @param {String} recipientId - Address or Name of recipient account
  * @param {Object} options - Options
  * @return {String|String} Transaction or transaction hash
  */
 async function spend (amount, recipientId, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const spendTx = await this.spendTx(R.merge(opt, { senderId: await this.address(opt), recipientId, amount: amount }))
+  recipientId = await this.resolveRecipientName(recipientId, options)
+  const spendTx = await this.spendTx(R.merge(opt, { senderId: await this.address(opt), recipientId, amount }))
   return this.send(spendTx, opt)
+}
+
+/**
+ * Resolve AENS name and return name hash
+ * @param {String} nameOrAddress
+ * @param verify
+ * @return {String} Address or AENS name hash
+ */
+async function resolveRecipientName (nameOrAddress, { verify = false }) {
+  if (isAddressValid(nameOrAddress)) return nameOrAddress
+  if (isNameValid(nameOrAddress)) {
+    // Validation
+    if (verify) {
+      const { pointers } = await this.getName(nameOrAddress)
+      if (!pointers.find(({ id }) => id.split('_')[0] === 'ak')) throw new Error(`Name ${nameOrAddress} do not have pointers for account`)
+    }
+    return produceNameId(nameOrAddress)
+  }
+  throw new Error('Invalid recipient name or address: ' + nameOrAddress)
 }
 
 /**
@@ -135,10 +154,9 @@ function destroyInstance () {
  * @return {Object} Ae instance
  */
 const Ae = stampit(Tx, Account, Chain, {
-  methods: { send, spend, transferFunds, destroyInstance },
-  deepProps: { Ae: { defaults: {} } }
-  // Todo Enable GA
-  // deepConfiguration: { Ae: { methods: ['signUsingGA'] } }
+  methods: { send, spend, transferFunds, destroyInstance, resolveRecipientName, signUsingGA },
+  deepProps: { Ae: { defaults: {} } },
+  deepConfiguration: { Ae: { methods: ['signUsingGA'] } }
 })
 
 export default Ae

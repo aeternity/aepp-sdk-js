@@ -3,7 +3,6 @@
 ## @aeternity/aepp-sdk/es/utils/swagger
 Swagger module
 
-**Export**: Swagger  
 **Example**  
 ```js
 import Swagger from '@aeternity/aepp-sdk/es/utils/swagger'
@@ -30,6 +29,7 @@ import Swagger from '@aeternity/aepp-sdk/es/utils/swagger'
             * [~pascalizeParameters(parameters)](#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..pascalizeParameters) ⇒ `Array.&lt;Object&gt;`
             * [~operationSignature(name, req, opts)](#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..operationSignature) ⇒ `String`
             * [~destructureClientError(error)](#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..destructureClientError) ⇒ `String`
+            * [~resolveRef(ref, swag)](#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..resolveRef) ⇒ `Object`
 
 <a id="exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger"></a>
 
@@ -276,4 +276,18 @@ Destructure HTTP client `error`
 | Param | Type |
 | --- | --- |
 | error | `Error` | 
+
+<a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..resolveRef"></a>
+
+#### Swagger~resolveRef(ref, swag) ⇒ `Object`
+Resolve reference
+
+**Kind**: inner method of [`Swagger`](#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger)  
+**Returns**: `Object` - Resolved reference definition  
+**rtype**: `(ref: String, swag: Object) => Object`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ref | `String` | Reference to resolve |
+| swag | `Object` |  |
 
