@@ -356,14 +356,14 @@ describe('Contract', function () {
         e.message.should.be.equal(`Contract with address ${contractAddress} not found on-chain`)
       }
     })
-    it('Throw error on creating contract instance with using a bytecode which is different from one deployed on-chain', async () => {
+    it.skip('Throw error on creating contract instance with using a bytecode which is different from one deployed on-chain', async () => {
       try {
         await contract.getContractInstance(identityContract, { contractAddress: contractObject.deployInfo.address, opt: { ttl: 0 } })
       } catch (e) {
         e.message.should.be.equal('Contract source do not correspond to the contract source deploying on the chain')
       }
     })
-    it('Force throwing error on creating contract instance with using a bytecode which is different from one deployed on-chain', async () => {
+    it.skip('Force throwing error on creating contract instance with using a bytecode which is different from one deployed on-chain', async () => {
       const cInstance = await contract.getContractInstance(identityContract, { forceCodeCheck: true, contractAddress: contractObject.deployInfo.address, opt: { ttl: 0 } })
       cInstance.should.have.property('interface')
       cInstance.should.have.property('aci')

@@ -27,6 +27,7 @@ import * as R from 'ramda'
 
 import { validateArguments, transform, transformDecodedData } from './transformation'
 import { buildContractMethods, getFunctionACI } from './helpers'
+import { isAddressValid } from '../../utils/crypto'
 import AsyncInit from '../../utils/async-init'
 import { BigNumber } from 'bignumber.js'
 
@@ -97,6 +98,19 @@ async function getContractInstance (source, { aci, contractAddress, filesystem =
     setOptions (opt) {
       this.options = R.merge(this.options, opt)
     }
+  }
+
+  // Check for valid contract address and contract code
+  if (contractAddress) {
+    if (!isAddressValid(contractAddress, 'ct')) throw new Error('Invalid contract address')
+    const contract = await this.getContract(contractAddress).catch(e => null)
+    if (!contract) throw new Error(`Contract with address ${contractAddress} not found on-chain`)
+    // @TODO wait until we have a way of comparing bytecodes
+    // if (!forceCodeCheck) {
+    //   const onChanByteCode = (await this.getContractByteCode(contractAddress)).bytecode
+    //   instance.compiled = (await this.contractCompile(source, instance.options)).bytecode
+    //   if (instance.compile !== onChanByteCode) throw new Error('Contract source do not correspond to the contract source deploying on the chain')
+    // }
   }
 
   /**
