@@ -90,8 +90,8 @@ const REQUESTS = {
           const result = {
             result: {
               ...returnSigned
-                ? { signedTransaction: await instance.signTransaction(locked ? tx : rawTx || tx, {}) }
-                : { transactionHash: await instance.send(locked ? tx : rawTx || tx, {}) }
+                ? { signedTransaction: await instance.signTransaction(locked ? tx : rawTx || tx, { onAccount: opt.onAccount }) }
+                : { transactionHash: await instance.send(locked ? tx : rawTx || tx, { onAccount: opt.onAccount }) }
             }
           }
           sendResponseMessage(client)(
