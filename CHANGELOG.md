@@ -1,3 +1,26 @@
+## [6.1.2](https://github.com/aeternity/aepp-sdk-js/compare/6.1.1...6.1.2) (2019-11-12)
+
+
+### Bug Fixes
+
+* **Composition:** Chain composition ([9ac705f](https://github.com/aeternity/aepp-sdk-js/commit/9ac705f))
+
+
+
+# [6.1.1](https://github.com/aeternity/aepp-sdk-js/compare/6.1.0...6.1.1) (2019-11-12)
+
+
+### Bug Fixes
+
+* **ACI:** Disable bytecode check for source and code on-chain. This changes will be included in next major release ([#783](https://github.com/aeternity/aepp-sdk-js/issues/783)) ([fe6021b](https://github.com/aeternity/aepp-sdk-js/commit/fe6021b))
+
+
+### Features
+
+* **KeyStore:** Remove `argon2` package, use `libsodium` for both browser and node ([#782](https://github.com/aeternity/aepp-sdk-js/issues/782)) ([c18047e](https://github.com/aeternity/aepp-sdk-js/commit/c18047e))
+
+
+
 # [6.1.0](https://github.com/aeternity/aepp-sdk-js/compare/6.0.2...6.1.0) (2019-11-11)
 
 
@@ -39,6 +62,13 @@
 ### Bug Fixes
 
 * **aens:** added lower case transformation for aens names ([#730](https://github.com/aeternity/aepp-sdk-js/issues/730)) ([f7f9f17](https://github.com/aeternity/aepp-sdk-js/commit/f7f9f17246c727566ce3c8159d30b7de19b027c9)), closes [#728](https://github.com/aeternity/aepp-sdk-js/issues/728)
+
+
+
+
+
+
+
 
 
 
