@@ -44,6 +44,6 @@ import GeneralizeAccount from '../contract/ga'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Aepp instance
  */
-const Aepp = Ae.compose(ContractAPI, Aens, Oracle, GeneralizeAccount, Rpc)
+export const Aepp = Ae.compose(ContractAPI, Aens, Oracle, GeneralizeAccount, Rpc)
 export const RpcAepp = Ae.compose(Chain, Tx, Contract, Aens, AeppRpc)
 export default Aepp

@@ -79,7 +79,7 @@ const REQUESTS = {
       instance.onSubscription(client, client.addAction({ id, method, params: { type, value } }, [accept(id), deny(id)]))
     },
   [METHODS.aepp.sign]: (instance, { client }) =>
-    ({ id, method, params: { tx, opt, locked = false, returnSigned = false } }) => {
+    ({ id, method, params: { tx, opt = {}, locked = false, returnSigned = false } }) => {
       // Authorization check
       if (!client.isConnected()) return sendResponseMessage(client)(id, method, { error: ERRORS.notAuthorize() })
       // NetworkId check
@@ -156,13 +156,18 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
       _selectAccount(address)
       rpcClients.sentNotificationByCondition(
         message(METHODS.wallet.updateAddress, this.getAccounts()),
-        (client) => client.addressSubscription.includes(SUBSCRIPTION_VALUES.current) && client.isConnected())
+        (client) =>
+          (
+            client.addressSubscription.includes(SUBSCRIPTION_VALUES.current) ||
+            client.addressSubscription.includes(SUBSCRIPTION_VALUES.connected)
+          ) &&
+          client.isConnected())
     }
     this.addAccount = async (account, { select, meta }) => {
       await _addAccount(account, { select })
       // Send notification 'update.address' to all Aepp which are subscribed for connected accounts
       rpcClients.sentNotificationByCondition(
-        message(METHODS.updateNetwork, { network: this.getNetworkId() }),
+        message(METHODS.wallet.updateAddress, this.getAccounts()),
         (client) => client.isConnected() && client.addressSubscription.includes(SUBSCRIPTION_VALUES.connected)
       )
     }

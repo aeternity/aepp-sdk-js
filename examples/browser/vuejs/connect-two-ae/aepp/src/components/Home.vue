@@ -196,6 +196,7 @@
     try {
       return { result: await fn }
     } catch (error) {
+      debugger
       return { error }
     }
   }
@@ -223,7 +224,9 @@
         contractInitState: [],
         deployResponse: null,
         callResponse: null,
-        walletName: null
+        walletName: null,
+        onAccount: null,
+        accounts: []
       }
     },
     filters: {
@@ -237,7 +240,8 @@
         this.spendResponse = await errorAsField(this.client.spend(
           this.spendAmount,
           this.spendTo, {
-            payload: this.spendPayload
+            payload: this.spendPayload,
+            onAccount: this.onAccount
           }
         ));
       },
@@ -278,8 +282,10 @@
       },
       async connectToWallet (wallet) {
         await this.client.connectToWallet(await wallet.getConnection())
-        await this.client.subscribeAddress('subscribe', 'current')
+        this.accounts = await this.client.subscribeAddress('subscribe', 'connected')
+        debugger
         this.pub = await this.client.address()
+        this.onAccount = this.pub
         this.balance = await this.client.getBalance(this.pub)
         this.walletName = this.client.rpcClient.info.name
         this.addressResponse = await errorAsField(this.client.address())
@@ -313,6 +319,7 @@
 
         },
         async onAddressChange (addresses) {
+          debugger
           this.pub = await this.address()
           this.balance = await this.client.balance(this.pub).catch(console.log)
         },
