@@ -16,8 +16,7 @@ import Oracle from '@aeternity/aepp-sdk/es/ae/oracle'
     * [Oracle([options])](#exp_module_@aeternity/aepp-sdk/es/ae/oracle--Oracle) ⇒ `Object` ⏏
     * _instance_
         * _async_
-            * [.getOracleObject(oracleId)](#exp_module_@aeternity/aepp-sdk/es/ae/oracle--getOracleObject) ⇒ `Promise.&lt;Object&gt;` ⏏
-            * [.pollForQueries(oracleId, onQuery, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/oracle--exports.pollForQueries) ⇒ `function` ⏏
+            * [.pollForQueries(oracleId, onQuery, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/oracle--pollForQueries) ⇒ `function` ⏏
             * [.getQueryObject(oracleId, queryId)](#exp_module_@aeternity/aepp-sdk/es/ae/oracle--getQueryObject) ⇒ `Promise.&lt;Object&gt;` ⏏
             * [.exports.pollForQueryResponse(oracleId, queryId, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/oracle--exports.pollForQueryResponse) ⇒ `Promise.&lt;Object&gt;` ⏏
             * [.registerOracle(queryFormat, responseFormat, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/oracle--registerOracle) ⇒ `Promise.&lt;Object&gt;` ⏏
