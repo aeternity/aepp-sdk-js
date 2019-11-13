@@ -117,7 +117,6 @@
           }
         },
         onDisconnect (a, b) {
-          debugger
           this.shareWalletInfo(connection.sendMessage.bind(connection))
         }
       })

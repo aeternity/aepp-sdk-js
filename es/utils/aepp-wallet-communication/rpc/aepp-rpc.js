@@ -121,10 +121,10 @@ export const AeppRpc = Ae.compose(Account, {
       await this.rpcClient.disconnect().catch(e => console.error(e))
       this.rpcClient = null
     },
-    async address () {
+    async address ({ onAccount } = {}) {
       if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
       if (!this.rpcClient.getCurrentAccount()) throw new Error('You do not subscribed for account.')
-      return this.rpcClient.getCurrentAccount()
+      return this.rpcClient.getCurrentAccount({ onAccount })
     },
     async signTransaction (tx, opt = {}) {
       if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')

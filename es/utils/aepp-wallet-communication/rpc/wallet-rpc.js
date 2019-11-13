@@ -79,7 +79,7 @@ const REQUESTS = {
       instance.onSubscription(client, client.addAction({ id, method, params: { type, value } }, [accept(id), deny(id)]))
     },
   [METHODS.aepp.sign]: (instance, { client }) =>
-    ({ id, method, params: { tx, opt = {}, locked = false, returnSigned = false } }) => {
+    ({ id, method, params: { tx, onAccount, locked = false, returnSigned = false } }) => {
       // Authorization check
       if (!client.isConnected()) return sendResponseMessage(client)(id, method, { error: ERRORS.notAuthorize() })
       // NetworkId check
@@ -90,8 +90,8 @@ const REQUESTS = {
           const result = {
             result: {
               ...returnSigned
-                ? { signedTransaction: await instance.signTransaction(locked ? tx : rawTx || tx, { onAccount: opt.onAccount }) }
-                : { transactionHash: await instance.send(locked ? tx : rawTx || tx, { onAccount: opt.onAccount }) }
+                ? { signedTransaction: await instance.signTransaction(locked ? tx : rawTx || tx, { onAccount }) }
+                : { transactionHash: await instance.send(locked ? tx : rawTx || tx, { onAccount }) }
             }
           }
           sendResponseMessage(client)(
@@ -110,7 +110,7 @@ const REQUESTS = {
 
       const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.signDeny(error) })
 
-      instance.onSign(client, client.addAction({ id, method, params: { tx, returnSigned, locked }, meta: unpackTx(tx) }, [accept(id), deny(id)]))
+      instance.onSign(client, client.addAction({ id, method, params: { tx, returnSigned, locked, onAccount }, meta: unpackTx(tx) }, [accept(id), deny(id)]))
     }
 }
 
@@ -212,10 +212,9 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
     getAccounts () {
       return {
         current: this.Selector.address ? { [this.Selector.address]: {} } : {},
-        connected: Object
-          .entries(this.address)
-          .filter(a => a[0] !== this.Selector.address)
-          .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {})
+        connected: this.addresses()
+          .filter(a => a !== this.Selector.address)
+          .reduce((acc, a) => ({ ...acc, [a]: {} }), {})
       }
     }
   }

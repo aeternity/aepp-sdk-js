@@ -47,9 +47,13 @@ export const WalletClient = stampit({
     isConnected () {
       return this.info.status === RPC_STATUS.CONNECTED
     },
-    getCurrentAccount () {
+    getCurrentAccount ({ onAccount } = {}) {
       if (!this.accounts.current || !Object.keys(this.accounts.current).length) throw new Error('You do not subscribed for account.')
-      return Object.keys(this.accounts.current)[0]
+      if (
+        onAccount &&
+        (!this.accounts.connected || !Object.keys(this.accounts.connected).length || !Object.keys(this.accounts.connected).includes(onAccount))
+      ) throw new Error(`You do not subscribed for connected account or ${onAccount} is not connected to the wallet.`)
+      return onAccount || Object.keys(this.accounts.current)[0]
     },
     async disconnect () {
       return this.connection.disconnect()

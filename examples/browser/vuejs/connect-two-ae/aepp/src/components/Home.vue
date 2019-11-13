@@ -196,7 +196,7 @@
     try {
       return { result: await fn }
     } catch (error) {
-      debugger
+      console.log(error)
       return { error }
     }
   }
@@ -237,11 +237,12 @@
     },
     methods: {
       async spend () {
+        const onAccount = Object.keys(this.accounts.address.connected)[0]
         this.spendResponse = await errorAsField(this.client.spend(
           this.spendAmount,
           this.spendTo, {
             payload: this.spendPayload,
-            onAccount: this.onAccount
+            onAccount: onAccount
           }
         ));
       },
@@ -283,7 +284,6 @@
       async connectToWallet (wallet) {
         await this.client.connectToWallet(await wallet.getConnection())
         this.accounts = await this.client.subscribeAddress('subscribe', 'connected')
-        debugger
         this.pub = await this.client.address()
         this.onAccount = this.pub
         this.balance = await this.client.getBalance(this.pub)
@@ -319,12 +319,10 @@
 
         },
         async onAddressChange (addresses) {
-          debugger
           this.pub = await this.address()
           this.balance = await this.client.balance(this.pub).catch(console.log)
         },
         onDisconnect (a) {
-          debugger
         }
       })
       this.height = await this.client.height()
