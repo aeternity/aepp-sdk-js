@@ -71,6 +71,14 @@ async function contractDecodeDataAPI (type, data, options = {}) {
     .then(({ data }) => data)
 }
 
+async function validateByteCodeAPI (bytecode, source, options = {}) {
+  this.isInit()
+  options = this.prepareCompilerOption(options)
+  return this.http
+    .post('/validate-byte-code', { bytecode, source, options }, options)
+    .then(({ data }) => data)
+}
+
 async function compileContractAPI (code, options = {}) {
   this.isInit()
   options = this.prepareCompilerOption(options)
@@ -137,6 +145,7 @@ const ContractCompilerAPI = AsyncInit.compose(ContractBase, {
     contractDecodeCallResultAPI,
     setCompilerUrl,
     getCompilerVersion,
+    validateByteCodeAPI,
     isInit,
     checkCompatibility,
     prepareCompilerOption
