@@ -87,14 +87,6 @@ export default {
           return isFinite(value) ? String(value) : 'null';
 
         case 'boolean':
-        case 'null':
-
-// If the value is a boolean or null, convert it to a string. Note:
-// typeof null does not produce 'null'. The case is included here in
-// the remote chance that this gets fixed someday.
-
-          return String(value);
-
 // If the type is 'object', we might be dealing with an object or an array or
 // null.
 
@@ -245,7 +237,7 @@ export default {
     }
 
     // If there are options, then use them to override the default _options
-    if (options !== undefined && options !== null) {
+    if (options === Object(options) && Object.prototype.toString.call(options) !== '[object Array]') {
       if (options.strict === true) {
         _options.strict = true
       }
