@@ -130,8 +130,6 @@ describe('Swagger', function () {
     const obj = { amount: '124324142354523423523452342352352345234542342342342342342352345345' }
     const stringified = JsonBig.stringify(obj)
     const parsed = JsonBig.parse(stringified)
-    console.log(stringified)
-    console.log(parsed)
     parsed.amount.should.be.equal(obj.amount)
   })
 })
