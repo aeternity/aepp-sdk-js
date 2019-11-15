@@ -17,7 +17,11 @@ import {
   AENS_NAME_DOMAINS,
   NAME_BID_RANGES,
   NAME_BID_MAX_LENGTH,
-  NAME_FEE, NAME_FEE_BID_INCREMENT, NAME_BID_TIMEOUTS
+  NAME_FEE,
+  NAME_FEE_BID_INCREMENT,
+  NAME_BID_TIMEOUTS,
+  FATE_ABI,
+  VM_TYPE
 } from './schema'
 import { ceil } from '../../utils/bignumber'
 
@@ -321,6 +325,12 @@ export function computeAuctionEndBlock (domain, claimHeight) {
   ])(domain.replace('.chain', '').length).toString(10)
 }
 
+export function getContractBackendFromTx ({ abiVersion } = {}) {
+  return FATE_ABI.includes(parseInt(abiVersion))
+    ? VM_TYPE.FATE
+    : VM_TYPE.AEVM
+}
+
 export default {
   readPointers,
   buildPointers,
@@ -334,6 +344,7 @@ export default {
   commitmentHash,
   formatSalt,
   oracleQueryId,
+  getContractBackendFromTx,
   createSalt,
   buildHash,
   isNameValid,
