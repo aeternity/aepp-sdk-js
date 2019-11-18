@@ -37,7 +37,7 @@ function connect (onMessage, onDisconnect) {
   })
 }
 
-async function disconnect () {
+function disconnect () {
   this.port.disconnect()
 }
 

@@ -28,10 +28,9 @@ import AsyncInit from '../async-init'
 import BrowserRuntimeConnection from './wallet-connection/browser-runtime'
 import BrowserWindowMessageConnection from './wallet-connection/browser-window-message'
 import { METHODS } from './schema'
+import { isInIframe } from './helpers'
 
 const wallets = {}
-
-const isInIframe = () => window !== window.parent
 
 const handleDetection = (onDetected) => ({ method, params }, source) => {
   if (!method || !params) return

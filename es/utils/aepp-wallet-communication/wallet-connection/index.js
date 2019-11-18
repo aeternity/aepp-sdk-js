@@ -40,7 +40,7 @@ export const WalletConnection = required({
   methods: {
     connect: required,
     disconnect: required,
-    sendMessage: required,
+    sendMessage: required
   }
 })
 
@@ -69,6 +69,5 @@ export const WalletConnection = required({
  * @rtype (msg: Object) => void
  * @param {Object} msg - Message
  */
-
 
 export default WalletConnection
