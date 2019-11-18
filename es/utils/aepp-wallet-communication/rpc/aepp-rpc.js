@@ -2,7 +2,7 @@ import Ae from '../../../ae'
 
 import { WalletClient } from './wallet-clients'
 import { message } from '../helpers'
-import { METHODS, REQUESTS, RPC_STATUS, VERSION } from '../schema'
+import { METHODS, RPC_STATUS, VERSION } from '../schema'
 import Account from '../../../account'
 import uuid from 'uuid/v4'
 import * as R from 'ramda'
@@ -29,7 +29,7 @@ const RESPONSES = {
   [METHODS.aepp.connect]: (instance) =>
     (msg) => {
       if (msg.result) instance.rpcClient.info.status = RPC_STATUS.CONNECTED
-      processResponse(instance)(msg)
+      instance.rpcClient.processResponse(msg)
     },
   [METHODS.aepp.subscribeAddress]: (instance) =>
     (msg) => {
@@ -38,7 +38,7 @@ const RESPONSES = {
         Object.prototype.hasOwnProperty.call(msg.result, 'address')
       ) instance.rpcClient.accounts = msg.result.address
 
-      processResponse(instance)(
+      instance.rpcClient.processResponse(
         msg,
         ({ id, result }) => {
           return [result]
@@ -47,19 +47,18 @@ const RESPONSES = {
     },
   [METHODS.aepp.sign]: (instance) =>
     (msg) => {
-      processResponse(instance)(msg, ({ id, result }) => [result.signedTransaction || result.transactionHash])
+      instance.rpcClient.processResponse(msg, ({ id, result }) => [result.signedTransaction || result.transactionHash])
     }
 }
 
-const processResponse = (instance) => ({ id, error, result }, transformResult) => {
-  if (result) {
-    instance.rpcClient.resolveCallback(id, typeof transformResult === 'function' ? transformResult({
-      id,
-      result
-    }) : [result])
-  } else if (error) {
-    instance.rpcClient.rejectCallback(id, [error])
-  }
+const REQUESTS = {
+  [METHODS.wallet.broadcast]: (instance) =>
+    ({ id, method, params: { tx, verify } }) => {
+      // @TODO validate params
+      // @TODO Verify tx if needed
+      // @TODO Check if this wallet connected
+      // @TODO broadcast transaction to the chain and send response message or error to wallet
+    }
 }
 
 const handleMessage = (instance) => async (msg) => {

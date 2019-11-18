@@ -88,6 +88,16 @@ export const WalletClient = stampit({
         this.callbacks[msgId] = { resolve, reject }
       })
     },
+    processResponse ({ id, error, result }, transformResult) {
+      if (result) {
+        this.resolveCallback(id, typeof transformResult === 'function' ? transformResult({
+          id,
+          result
+        }) : [result])
+      } else if (error) {
+        this.rejectCallback(id, [error])
+      }
+    },
     resolveCallback (msgId, args = []) {
       if (!this.callbacks[msgId]) throw new Error(`Can't find callback for this messageId ${msgId}`)
       this.callbacks[msgId].resolve(...args)
