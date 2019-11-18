@@ -23,7 +23,10 @@ const NOTIFICATIONS = {
 }
 
 // @TODO Add broadcast method
-const RESPONSES = {}
+const RESPONSES = {
+  [METHODS.wallet.broadcast]: (instance, { client }) =>
+    ({ id, methods, params }) => {}
+}
 
 const REQUESTS = {
   // Store client info and prepare two fn for each client `connect` and `denyConnection`
@@ -80,12 +83,15 @@ const REQUESTS = {
       instance.onSubscription(client, client.addAction({ id, method, params: { type, value } }, [accept(id), deny(id)]))
     },
   [METHODS.aepp.sign]: (instance, { client }) =>
-    ({ id, method, params: { tx, onAccount, returnSigned = false } }) => {
+    async ({ id, method, params: { tx, onAccount, returnSigned = false } }) => {
       // Authorization check
       if (!client.isConnected()) return sendResponseMessage(client)(id, method, { error: ERRORS.notAuthorize() })
       // NetworkId check
       if (client.info.network !== instance.getNetworkId()) return sendResponseMessage(client)(id, method, { error: ERRORS.unsupportedNetwork() })
-      // @TODO add transaction validation, throw error on fail
+      // Validate transaction
+      const validationResult = await instance.unpackAndVerify(tx)
+      if (validationResult.validation.length) return sendResponseMessage(client)(id, method, { error: ERRORS.invalidTransaction(validationResult) })
+
       const accept = (id) => async (rawTx) => {
         try {
           const result = {

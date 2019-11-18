@@ -64,6 +64,11 @@ export const ERRORS = {
     data: error,
     message: 'Broadcast failed'
   }),
+  invalidTransaction: (error = {}) => ({
+    code: 2,
+    data: error,
+    message: 'Invalid transaction'
+  }),
   subscriptionDeny: (error = {}) => ({
     code: 5,
     data: error,
