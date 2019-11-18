@@ -107,9 +107,13 @@
         accounts: [MemoryAccount({ keypair: { secretKey: this.priv || secretKey, publicKey: this.pub || publicKey } }), account2],
         address: this.pub,
         name: 'Wallet',
-        onConnection (aepp, { accept, deny }) {
+        async onConnection (aepp, { accept, deny }) {
           if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to connect`)) {
             accept()
+            debugger
+            const tx = "tx_+JwLAfhCuECkbZTa7XOZh8h4504Nf0l9w9zUf+Gm2uJTYNnKn1kUYy05Ql9ypgibVEvGvZbfeEn8BtMu+bPzgMihsNM5sSEAuFT4UgwBoQHOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+86EBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMBhg8rnXmQAACByICVdwFY"
+            const res = await this.broadcastTransactionByAepp(aepp.id, tx)
+            debugger
           } else { deny() }
         },
         async onSubscription (aepp, { accept, deny }) {

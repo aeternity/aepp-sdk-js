@@ -1,8 +1,8 @@
 import Ae from '../../../ae'
 
 import { WalletClient } from './wallet-clients'
-import { getHandler, message } from '../helpers'
-import { METHODS, RPC_STATUS, VERSION } from '../schema'
+import { getHandler, message, sendResponseMessage } from '../helpers'
+import { ERRORS, METHODS, RPC_STATUS, VERSION } from '../schema'
 import Account from '../../../account'
 import uuid from 'uuid/v4'
 import * as R from 'ramda'
@@ -53,11 +53,21 @@ const RESPONSES = {
 
 const REQUESTS = {
   [METHODS.wallet.broadcast]: (instance) =>
-    ({ id, method, params: { tx, verify } }) => {
-      // @TODO validate params
-      // @TODO Verify tx if needed
-      // @TODO Check if this wallet connected
-      // @TODO broadcast transaction to the chain and send response message or error to wallet
+    async ({ id, method, params: { tx, verify } }) => {
+      if (!tx) throw new Error('Tx field is required')
+      try {
+        if (verify) {
+          const validationResult = await instance.unpackAndVerify(tx)
+          if (validationResult.validation.length) return sendResponseMessage(instance)(id, method, { error: ERRORS.invalidTransaction(validationResult) })
+        }
+        sendResponseMessage(instance)(
+          id,
+          method,
+          await instance.sendTransaction(tx)
+        )
+      } catch (e) {
+        sendResponseMessage(instance)(id, method, { error: ERRORS.broadcastFailde(e.message) })
+      }
     }
 }
 

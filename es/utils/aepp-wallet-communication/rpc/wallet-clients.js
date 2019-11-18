@@ -116,7 +116,7 @@ export const WalletClients = stampit({
     this.clients = new Map()
   },
   methods: {
-    hasClient ({ id }) {
+    hasClient (id) {
       return this.clients.has(id)
     },
     addClient (id, info) {
