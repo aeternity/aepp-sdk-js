@@ -35,18 +35,18 @@ export const SUBSCRIPTION_TYPES = asEnum([
 
 export const METHODS = {
   wallet: {
-    [NOTIFICATIONS.readyToConnect]: 'wallet.await.connection',
-    [NOTIFICATIONS.updateAddress]: 'wallet.update.address',
+    [NOTIFICATIONS.readyToConnect]: 'connection.announcePresence',
+    [NOTIFICATIONS.updateAddress]: 'address.update',
     //
-    [REQUESTS.broadcast]: 'wallet.broadcast.tx'
+    [REQUESTS.broadcast]: 'transaction.broadcast'
   },
   aepp: {
-    [REQUESTS.connect]: 'aepp.request.connect',
-    [REQUESTS.sign]: 'aepp.sign.tx',
-    [REQUESTS.subscribeAddress]: 'aepp.subscribe.address'
+    [REQUESTS.connect]: 'connection.open',
+    [REQUESTS.sign]: 'transaction.sign',
+    [REQUESTS.subscribeAddress]: 'address.subscribe'
   },
-  [NOTIFICATIONS.updateNetwork]: 'peer.update.network',
-  [NOTIFICATIONS.closeConnection]: 'peer.connection.close'
+  [NOTIFICATIONS.updateNetwork]: 'network.update',
+  [NOTIFICATIONS.closeConnection]: 'connection.close'
 }
 
 export const RPC_STATUS = {

@@ -22,6 +22,7 @@ const NOTIFICATIONS = {
     }
 }
 
+// @TODO Add broadcast method
 const RESPONSES = {}
 
 const REQUESTS = {
@@ -79,19 +80,19 @@ const REQUESTS = {
       instance.onSubscription(client, client.addAction({ id, method, params: { type, value } }, [accept(id), deny(id)]))
     },
   [METHODS.aepp.sign]: (instance, { client }) =>
-    ({ id, method, params: { tx, onAccount, locked = false, returnSigned = false } }) => {
+    ({ id, method, params: { tx, onAccount, returnSigned = false } }) => {
       // Authorization check
       if (!client.isConnected()) return sendResponseMessage(client)(id, method, { error: ERRORS.notAuthorize() })
       // NetworkId check
       if (client.info.network !== instance.getNetworkId()) return sendResponseMessage(client)(id, method, { error: ERRORS.unsupportedNetwork() })
-
+      // @TODO add transaction validation, throw error on fail
       const accept = (id) => async (rawTx) => {
         try {
           const result = {
             result: {
               ...returnSigned
-                ? { signedTransaction: await instance.signTransaction(locked ? tx : rawTx || tx, { onAccount }) }
-                : { transactionHash: await instance.send(locked ? tx : rawTx || tx, { onAccount }) }
+                ? { signedTransaction: await instance.signTransaction(rawTx || tx, { onAccount }) }
+                : { transactionHash: await instance.send(rawTx || tx, { onAccount }) }
             }
           }
           sendResponseMessage(client)(
@@ -110,7 +111,7 @@ const REQUESTS = {
 
       const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.signDeny(error) })
 
-      instance.onSign(client, client.addAction({ id, method, params: { tx, returnSigned, locked, onAccount }, meta: unpackTx(tx) }, [accept(id), deny(id)]))
+      instance.onSign(client, client.addAction({ id, method, params: { tx, returnSigned, onAccount }, meta: unpackTx(tx) }, [accept(id), deny(id)]))
     }
 }
 
