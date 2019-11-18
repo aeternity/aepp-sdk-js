@@ -34,7 +34,7 @@ const wallets = {}
 
 const handleDetection = (onDetected) => ({ method, params }, source) => {
   if (!method || !params) return
-  const ifExist = wallets.hasOwnProperty(params.id)
+  const ifExist = Object.prototype.hasOwnProperty.call(wallets, params.id)
   if (method === METHODS.wallet.readyToConnect && !ifExist) {
     const w = {
       ...params,
@@ -59,6 +59,10 @@ function stopScan () {
   this.connection.disconnect()
 }
 
+function getWallets () {
+  return wallets
+}
+
 /**
  * RemoteAccount
  * @function
@@ -75,7 +79,7 @@ export const ExtWalletDetector = AsyncInit.compose({
     if (!window) throw new Error('Window object not found, you can run wallet detector only in browser')
     this.connection = connection
   },
-  methods: { scan, stopScan, getWallets () { return wallets } }
+  methods: { scan, stopScan, getWallets }
 })
 
 export default ExtWalletDetector
