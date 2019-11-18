@@ -60,8 +60,8 @@ const postToContent = (data) => {
 }
 
 // Send wallet connection info to Aepp throug content script
-const NODE_URL = 'http://localhost:3013'
-const NODE_INTERNAL_URL = 'http://localhost:3113'
+const NODE_URL = 'https://sdk-testnet.aepps.com'
+const NODE_INTERNAL_URL = 'https://sdk-testnet.aepps.com'
 const COMPILER_URL = 'https://compiler.aepps.com'
 
 // Init extension stamp from sdk

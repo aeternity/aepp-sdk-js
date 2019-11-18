@@ -14,6 +14,14 @@
           Requesting Public Key from AE Wallet...
         </div>
       </div>
+      <div v-if="balance" class="bg-green w-full flex flex-row font-mono border border-b">
+        <div class="p-2 w-1/4">
+          Balance
+        </div>
+        <div class="p-2 w-3/4 bg-grey-lightest">
+          {{balance}}
+        </div>
+      </div>
       <div v-if="heightResponse" class="bg-green w-full flex flex-row font-mono border border-b">
         <div class="p-2 w-1/4">
           Height
@@ -55,6 +63,11 @@
         </div>
       </div>
 
+      <button
+        v-if="addressResponse"
+        class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 text-xs"
+        @click="disconnect"
+      >Disconnect</button>
     </div>
 
     <h2 class="mt-4">Spend tokens</h2>
@@ -188,8 +201,8 @@
   import BrowserWindowMessageConnection from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-connection/browser-window-message'
 
   // Send wallet connection info to Aepp throug content script
-  const NODE_URL = 'http://localhost:3013'
-  const NODE_INTERNAL_URL = 'http://localhost:3113'
+  const NODE_URL = 'https://sdk-testnet.aepps.com'
+  const NODE_INTERNAL_URL = 'https://sdk-testnet.aepps.com'
   const COMPILER_URL = 'https://compiler.aepps.com'
 
   const errorAsField = async fn => {
@@ -242,7 +255,8 @@
           this.spendAmount,
           this.spendTo, {
             payload: this.spendPayload,
-            onAccount: onAccount
+            // fee: 1
+            // onAccount: onAccount
           }
         ));
       },
@@ -272,6 +286,7 @@
         this.walletName = null
         this.pub = null
         this.balance = null
+        this.addressResponse = null
         this.scanForWallets()
       },
       async getReverseWindow() {
@@ -315,14 +330,15 @@
         internalUrl: NODE_INTERNAL_URL,
         compilerUrl: COMPILER_URL,
         onNetworkChange (params) {
-          if (this.getNetworkId() !== params.network) alert(`Connected network ${this.getNetworkId()} is not supported with wallet network ${params.netwok}`)
-
+          if (this.getNetworkId() !== params.network) alert(`Connected network ${this.getNetworkId()} is not supported with wallet network ${params.network}`)
         },
-        async onAddressChange (addresses) {
-          this.pub = await this.address()
-          this.balance = await this.client.balance(this.pub).catch(console.log)
+        onAddressChange:  async (addresses) => {
+          this.pub = await this.client.address()
+          this.balance = await this.client.balance(this.pub).catch(e => '0')
+          this.addressResponse = await errorAsField(this.client.address())
         },
         onDisconnect (a) {
+          debugger
         }
       })
       this.height = await this.client.height()

@@ -14,15 +14,7 @@
           {{pub}}
         </div>
       </div>
-      <div v-if="height" class="bg-green w-full flex flex-row font-mono border border-b">
-        <div class="p-2 w-1/4">
-          Height
-        </div>
-        <div class="p-2 w-3/4 bg-grey-lightest">
-          {{height}}
-        </div>
-      </div>
-      <div v-if="height" class="bg-green w-full flex flex-row font-mono">
+      <div v-if="balance || balance >= 0" class="bg-green w-full flex flex-row font-mono">
         <div class="p-2 w-1/4">
           Balance
         </div>
@@ -30,6 +22,16 @@
           {{balance}}
         </div>
       </div>
+      <button
+        v-if="client"
+        class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 text-xs"
+        @click="switchAccount"
+      >Switch Account</button>
+      <button
+        v-if="client"
+        class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 text-xs"
+        @click="disconnect"
+      >Disconnect</button>
     </div>
 
     <div v-if="!aeppUrl" class="w-full p-4 h-64 border border-black border-dashed shadow mx-auto mt-4 bg-grey-lighter">
@@ -59,9 +61,9 @@
         client: null,
         balance: null,
         height: null,
-        url: 'http://localhost:3013',
-        internalUrl: 'http://localhost:3113',
-        compilerUrl: 'http://localhost:3080',
+        url: 'https://sdk-testnet.aepps.com',
+        internalUrl: 'https://sdk-testnet.aepps.com',
+        compilerUrl: 'https://compiler.aepps.com',
         aeppUrl: '//0.0.0.0:9001'
       }
     },
@@ -84,12 +86,25 @@
         }
 
         return await prob(attemps)
+      },
+      disconnect () {
+        const { clients: aepps } = this.client.getClients()
+        const aepp = Array.from(aepps.values())[0]
+      debugger
+        aepp.disconnect()
+      },
+      async switchAccount () {
+        const secondAcc = this.client.addresses().find(a => a !== this.pub)
+        this.client.selectAccount(secondAcc)
+        this.pub = await this.client.address()
+        this.balance = await this.client.balance(this.pub).catch(e => 0)
       }
     },
     async created () {
       const { publicKey, secretKey } = generateKeyPair()
       this.pub = this.pub || publicKey
       const account2 = MemoryAccount({ keypair: generateKeyPair() })
+
       this.client = await RpcWallet({
         url: this.url,
         internalUrl: this.internalUrl,
@@ -105,8 +120,8 @@
         async onSubscription (aepp, { accept, deny }) {
           if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to subscribe address`)) {
             accept()
-            const node = await Node({ url: 'http://localhost:3013', internalUrl: 'http://localhost:3013' })
-            this.addNode('second Node', node, true)
+            // const node = await Node({ url: 'http://localhost:3013', internalUrl: 'http://localhost:3013' })
+            // this.addNode('second Node', node, true)
           } else { deny() }
         },
         async onSign (aepp, { accept, deny, params }) {
@@ -116,7 +131,7 @@
             deny()
           }
         },
-        onDisconnect (a, b) {
+        onDisconnect (message, client) {
           this.shareWalletInfo(connection.sendMessage.bind(connection))
         }
       })
@@ -125,7 +140,10 @@
         target
       })
       this.client.addRpcClient(connection)
-      await this.shareWalletInfo(connection.sendMessage.bind(connection))
+      this.shareWalletInfo(connection.sendMessage.bind(connection))
+
+      // Get balance
+      this.balance = await this.client.balance(await this.client.address()).catch(e => 0)
     }
   }
 </script>
