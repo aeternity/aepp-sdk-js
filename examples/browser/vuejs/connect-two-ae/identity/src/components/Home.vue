@@ -27,11 +27,6 @@
         class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 text-xs"
         @click="switchAccount"
       >Switch Account</button>
-      <button
-        v-if="client"
-        class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 text-xs"
-        @click="disconnect"
-      >Disconnect</button>
     </div>
 
     <div v-if="!aeppUrl" class="w-full p-4 h-64 border border-black border-dashed shadow mx-auto mt-4 bg-grey-lighter">
