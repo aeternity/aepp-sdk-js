@@ -17,3 +17,12 @@ export const responseMessage = (id, method, { error, result } = {}) => ({ id, me
 export const sendResponseMessage = (client) => (id, method, data) => client.sendMessage(responseMessage(id, method, data), true)
 
 export const isInIframe = () => window !== window.parent
+
+export const getHandler = (schema, msg) => {
+  const handler = schema[msg.method]
+  if (!handler || typeof handler !== 'function') {
+    console.log(`Unknown message method ${msg.method}`)
+    return () => () => true
+  }
+  return handler
+}

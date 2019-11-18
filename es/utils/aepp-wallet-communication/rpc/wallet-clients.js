@@ -55,8 +55,8 @@ export const WalletClient = stampit({
       ) throw new Error(`You do not subscribed for connected account or ${onAccount} is not connected to the wallet.`)
       return onAccount || Object.keys(this.accounts.current)[0]
     },
-    async disconnect () {
-      return this.connection.disconnect()
+    disconnect () {
+      this.connection.disconnect()
     },
     updateSubscription (type, value) {
       if (type === SUBSCRIPTION_TYPES.subscribe && !this.addressSubscription.includes(value)) {

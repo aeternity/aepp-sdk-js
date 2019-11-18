@@ -1,7 +1,7 @@
 import Ae from '../../../ae'
 
 import { WalletClient } from './wallet-clients'
-import { message } from '../helpers'
+import { getHandler, message } from '../helpers'
 import { METHODS, RPC_STATUS, VERSION } from '../schema'
 import Account from '../../../account'
 import uuid from 'uuid/v4'
@@ -71,29 +71,15 @@ const handleMessage = (instance) => async (msg) => {
   }
 }
 
-const getHandler = (schema, msg) => {
-  const handler = schema[msg.method]
-  if (!handler || typeof handler !== 'function') {
-    console.log(`Unknown message method ${msg.method}`)
-    return () => () => true
-  }
-  return handler
-}
-
 export const AeppRpc = Ae.compose(Account, {
-  init ({ icons, name, onAddressChange, onDisconnect, onNetworkChange, connection }) {
+  async init ({ icons, name, onAddressChange, onDisconnect, onNetworkChange, connection }) {
     this.connection = connection
     this.name = name
     this.accounts = {}
 
     if (connection) {
       // Init RPCClient
-      this.rpcClient = WalletClient({
-        connection,
-        network: this.nodeNetworkId,
-        name,
-        handlers: [handleMessage(this), this.onDisconnect]
-      })
+      await this.connectToWallet(connection)
     }
 
     // Event callbacks

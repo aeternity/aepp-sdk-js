@@ -3,7 +3,7 @@ import Accounts from '../../../accounts'
 import Selector from '../../../account/selector'
 
 import { WalletClients } from './wallet-clients'
-import { getBrowserAPI, message, sendResponseMessage } from '../helpers'
+import { getBrowserAPI, getHandler, message, sendResponseMessage } from '../helpers'
 import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE, SUBSCRIPTION_VALUES } from '../schema'
 import uuid from 'uuid/v4'
 import { unpackTx } from '../../../tx/builder'
@@ -130,15 +130,6 @@ const handleMessage = (instance, id) => async (msg) => {
   } else {
     return getHandler(REQUESTS, msg)(instance, { client })(msg)
   }
-}
-
-const getHandler = (schema, msg) => {
-  const handler = schema[msg.method]
-  if (!handler || typeof handler !== 'function') {
-    console.log(`Unknown message method ${msg.method}`)
-    return () => () => true
-  }
-  return handler
 }
 
 export const WalletRpc = Ae.compose(Accounts, Selector, {
