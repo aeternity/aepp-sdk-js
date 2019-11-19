@@ -9,8 +9,8 @@ import { generateKeyPair } from '../../../../../es/utils/crypto'
 
 const account = MemoryAccount({
   keypair: {
-    secretKey: 'e6a91d633c77cf5771329d3354b3bcef1bc5e032c43d70b6d35af923ce1eb74dcea7ade470c9f99d9d4e400880a86f1d49bb444b62f11a9ebb64bbcfeb73fef3',
-    publicKey: 'ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi'
+    secretKey: 'YOUR_PRIV',
+    publicKey: 'YOUR_PUB'
   }
 })
 
@@ -74,17 +74,16 @@ RpcWallet({
   accounts,
   // Hook for sdk registration
   onConnection (aepp, action) {
-    debugger
     if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to connect`)) {
       action.accept()
+    } else {
+      action.deny()
     }
   },
   onDisconnect (masg, client) {
-  debugger
     client.disconnect()
   },
   onSubscription (aepp, action) {
-  debugger
     if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} want to subscribe for accounts`)) {
       action.accept()
     } else {
@@ -92,11 +91,17 @@ RpcWallet({
     }
   },
   onSign (aepp, action) {
-  debugger
     if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} want to sign tx ${action.params.tx}`)) {
       action.accept()
     } else {
       action.deny()
+    }
+  },
+  onAskAccounts (aepp, { accept, deny }) {
+    if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to get accounts`)) {
+      accept()
+    } else {
+      deny()
     }
   }
 }).then(wallet => {
