@@ -22,10 +22,7 @@ const NOTIFICATIONS = {
     }
 }
 
-const RESPONSES = {
-  [METHODS.wallet.broadcast]: (instance, { client }) =>
-    (msg) => client.processResponse(msg)
-}
+const RESPONSES = {}
 
 const REQUESTS = {
   // Store client info and prepare two fn for each client `connect` and `denyConnection`
@@ -213,13 +210,6 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
           .filter(a => a !== this.Selector.address)
           .reduce((acc, a) => ({ ...acc, [a]: {} }), {})
       }
-    },
-    async broadcastTransactionByAepp (aeppId, tx, verify = false) {
-      if (!rpcClients.hasClient(aeppId)) throw new Error(`Aepp with id ${aeppId} is not connected`)
-      const aeppClient = rpcClients.getClient(aeppId)
-      return aeppClient.addCallback(
-        aeppClient.sendMessage(message(METHODS.wallet.broadcast, { tx, verify }))
-      )
     }
   }
 })
