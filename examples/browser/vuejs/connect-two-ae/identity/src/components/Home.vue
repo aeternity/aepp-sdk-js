@@ -51,8 +51,8 @@
     data () {
       return {
         runningInFrame: window.parent !== window,
-        pub: 'ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi', // Your public key
-        priv: 'e6a91d633c77cf5771329d3354b3bcef1bc5e032c43d70b6d35af923ce1eb74dcea7ade470c9f99d9d4e400880a86f1d49bb444b62f11a9ebb64bbcfeb73fef3', // Your private key
+        pub: 'YOUR_PUB', // Your public key
+        priv: 'YOUR_PRIV', // Your private key
         client: null,
         balance: null,
         height: null,
@@ -85,7 +85,6 @@
       disconnect () {
         const { clients: aepps } = this.client.getClients()
         const aepp = Array.from(aepps.values())[0]
-      debugger
         aepp.disconnect()
       },
       async switchAccount () {
@@ -110,21 +109,22 @@
         async onConnection (aepp, { accept, deny }) {
           if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to connect`)) {
             accept()
-            debugger
-            const tx = "tx_+JwLAfhCuECkbZTa7XOZh8h4504Nf0l9w9zUf+Gm2uJTYNnKn1kUYy05Ql9ypgibVEvGvZbfeEn8BtMu+bPzgMihsNM5sSEAuFT4UgwBoQHOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+86EBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMBhg8rnXmQAACByICVdwFY"
-            const res = await this.broadcastTransactionByAepp(aepp.id, tx)
-            debugger
           } else { deny() }
         },
         async onSubscription (aepp, { accept, deny }) {
           if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to subscribe address`)) {
             accept()
-            // const node = await Node({ url: 'http://localhost:3013', internalUrl: 'http://localhost:3013' })
-            // this.addNode('second Node', node, true)
           } else { deny() }
         },
         async onSign (aepp, { accept, deny, params }) {
           if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to ${params.returnSigned ? 'sign' : 'sign and broadcast'} ${JSON.stringify(params.tx)}`)) {
+            accept()
+          } else {
+            deny()
+          }
+        },
+        onAskAccounts (aepp, { accept, deny }) {
+          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to get accounts`)) {
             accept()
           } else {
             deny()

@@ -317,6 +317,11 @@
             this.connectToWallet(newWallet)
           }
         }
+
+        const scannerConnection = await BrowserWindowMessageConnection({
+          connectionInfo: { id: 'spy' }
+        })
+        this.detector = await Detector({ connection: scannerConnection })
         this.detector.scan(handleWallets.bind(this))
       }
     },
@@ -330,7 +335,7 @@
         internalUrl: NODE_INTERNAL_URL,
         compilerUrl: COMPILER_URL,
         onNetworkChange (params) {
-          if (this.getNetworkId() !== params.network) alert(`Connected network ${this.getNetworkId()} is not supported with wallet network ${params.network}`)
+          if (this.getNetworkId() !== params.networkId) alert(`Connected network ${this.getNetworkId()} is not supported with wallet network ${params.networkId}`)
         },
         onAddressChange:  async (addresses) => {
           this.pub = await this.client.address()
@@ -342,10 +347,8 @@
         }
       })
       this.height = await this.client.height()
-      const scannerConnection = await BrowserWindowMessageConnection({
-        connectionInfo: { id: 'spy' }
-      })
-      this.detector = await Detector({ connection: scannerConnection })
+
+      // Start looking for wallets
       await this.scanForWallets()
     }
   }

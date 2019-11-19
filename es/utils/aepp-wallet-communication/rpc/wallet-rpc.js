@@ -83,9 +83,7 @@ const REQUESTS = {
           id,
           method,
           {
-            result: {
-              addresses: instance.addresses()
-            }
+            result: instance.addresses()
           })
       const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.rejectedByUser(error) })
 
