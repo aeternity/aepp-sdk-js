@@ -26,11 +26,11 @@ const receive = (handler, msgId) => (msg) => {
 }
 
 export const WalletClient = stampit({
-  init ({ id, name, network, icons, connection, handlers: [onMessage, onDisconnect] }) {
+  init ({ id, name, networkId, icons, connection, handlers: [onMessage, onDisconnect] }) {
     const messageId = 0
     this.id = id
     this.connection = connection
-    this.info = { name, network, icons }
+    this.info = { name, networkId, icons }
     // {
     //    [msg.id]: { resolve, reject }
     // }
@@ -52,10 +52,11 @@ export const WalletClient = stampit({
       if (
         onAccount &&
         (!this.accounts.connected || !Object.keys(this.accounts.connected).length || !Object.keys(this.accounts.connected).includes(onAccount))
-      ) throw new Error(`You do not subscribed for connected account or ${onAccount} is not connected to the wallet.`)
+      ) throw new Error(`You do not subscribed for connected account's or account ${onAccount} is not connected to the wallet.`)
       return onAccount || Object.keys(this.accounts.current)[0]
     },
     disconnect () {
+      this.info.status = RPC_STATUS.DISCONNECTED
       this.connection.disconnect()
     },
     updateSubscription (type, value) {
@@ -132,7 +133,7 @@ export const WalletClients = stampit({
       this.clients.set(id, client)
     },
     sentNotificationByCondition (msg, condition) {
-      if (typeof condition !== 'function') throw new Error('Condition arguments must be a function which return boolean')
+      if (typeof condition !== 'function') throw new Error('Condition argument must be a function which return boolean')
       const clients = Array.from(
         this.clients.values()
       )

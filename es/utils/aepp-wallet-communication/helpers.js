@@ -5,18 +5,12 @@ export const getBrowserAPI = () => {
   throw new Error('Browser is not detected')
 }
 
+export const isInIframe = () => window !== window.parent
+
 export const getWindow = () => {
   if (!window) throw new Error('Browser is not detected')
   return window
 }
-
-export const message = (method, params) => ({ method, params })
-
-export const responseMessage = (id, method, { error, result } = {}) => ({ id, method, ...(error ? { error } : { result }) })
-
-export const sendResponseMessage = (client) => (id, method, data) => client.sendMessage(responseMessage(id, method, data), true)
-
-export const isInIframe = () => window !== window.parent
 
 export const getHandler = (schema, msg) => {
   const handler = schema[msg.method]
@@ -26,3 +20,9 @@ export const getHandler = (schema, msg) => {
   }
   return handler
 }
+
+export const message = (method, params = {}) => ({ method, params })
+
+export const responseMessage = (id, method, { error, result } = {}) => ({ id, method, ...(error ? { error } : { result }) })
+
+export const sendResponseMessage = (client) => (id, method, data) => client.sendMessage(responseMessage(id, method, data), true)

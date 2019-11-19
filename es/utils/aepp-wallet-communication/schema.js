@@ -20,7 +20,7 @@ export const REQUESTS = asEnum([
   'connect',
   'subscribeAddress',
   'sign',
-  'broadcast'
+  'address'
 ])
 
 export const SUBSCRIPTION_VALUES = asEnum([
@@ -36,16 +36,15 @@ export const SUBSCRIPTION_TYPES = asEnum([
 export const METHODS = {
   wallet: {
     [NOTIFICATIONS.readyToConnect]: 'connection.announcePresence',
-    [NOTIFICATIONS.updateAddress]: 'address.update',
-    //
-    [REQUESTS.broadcast]: 'transaction.broadcast'
+    [NOTIFICATIONS.updateAddress]: 'address.update'
   },
   aepp: {
+    [REQUESTS.address]: 'address.get',
     [REQUESTS.connect]: 'connection.open',
     [REQUESTS.sign]: 'transaction.sign',
     [REQUESTS.subscribeAddress]: 'address.subscribe'
   },
-  [NOTIFICATIONS.updateNetwork]: 'network.update',
+  [NOTIFICATIONS.updateNetwork]: 'networkId.update',
   [NOTIFICATIONS.closeConnection]: 'connection.close'
 }
 
@@ -69,15 +68,20 @@ export const ERRORS = {
     data: error,
     message: 'Invalid transaction'
   }),
-  subscriptionDeny: (error = {}) => ({
-    code: 5,
-    data: error,
-    message: 'Subscription request denied'
-  }),
-  signDeny: (error = {}) => ({
+  // subscriptionDeny: (error = {}) => ({
+  //   code: 5,
+  //   data: error,
+  //   message: 'Subscription request denied'
+  // }),
+  // signDeny: (error = {}) => ({
+  //   code: 4,
+  //   data: error,
+  //   message: 'Sign request denied'
+  // })
+  rejectedByUser: (error = {}) => ({
     code: 4,
     data: error,
-    message: 'Sign request denied'
+    message: 'Operation rejected by user'
   }),
   connectionDeny: (error = {}) => ({
     code: 9,
@@ -90,7 +94,7 @@ export const ERRORS = {
     message: 'You are not connected to the wallet'
   }),
   unsupportedProtocol: (error = {}) => ({
-    code: 7,
+    code: 5,
     data: error,
     message: 'Unsupported Protocol Version'
   }),

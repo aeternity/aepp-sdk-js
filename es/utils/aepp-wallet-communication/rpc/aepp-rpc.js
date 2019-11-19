@@ -15,7 +15,7 @@ const NOTIFICATIONS = {
     },
   [METHODS.updateNetwork]: (instance) =>
     (msg) => {
-      instance.rpcClient.info.network = msg.params.network
+      instance.rpcClient.info.networkId = msg.params.networkId
       instance.onNetworkChange(msg.params)
     },
   [METHODS.closeConnection]: (instance) =>
@@ -26,6 +26,8 @@ const NOTIFICATIONS = {
 }
 
 const RESPONSES = {
+  [METHODS.aepp.address]: (instance) =>
+    (msg) => instance.rpcClient.processResponse(msg),
   [METHODS.aepp.connect]: (instance) =>
     (msg) => {
       if (msg.result) instance.rpcClient.info.status = RPC_STATUS.CONNECTED
@@ -85,7 +87,7 @@ export const AeppRpc = Ae.compose(Account, {
       if (this.rpcClient && this.rpcClient.isConnected()) throw new Error('You are already connected to wallet ' + this.rpcClient)
       this.rpcClient = WalletClient({
         connection,
-        network: this.getNetworkId(),
+        networkId: this.getNetworkId(),
         ...connection.connectionInfo,
         id: uuid(),
         handlers: [handleMessage(this), this.onDisconnect]
@@ -102,6 +104,13 @@ export const AeppRpc = Ae.compose(Account, {
       if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
       if (!this.rpcClient.getCurrentAccount()) throw new Error('You do not subscribed for account.')
       return this.rpcClient.getCurrentAccount({ onAccount })
+    },
+    async askAddresses () {
+      if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
+      if (!this.rpcClient.getCurrentAccount()) throw new Error('You do not subscribed for account.')
+      return this.rpcClient.addCallback(
+        this.rpcClient.sendMessage(message(METHODS.aepp.address))
+      )
     },
     async signTransaction (tx, opt = {}) {
       if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
@@ -121,7 +130,7 @@ export const AeppRpc = Ae.compose(Account, {
         this.rpcClient.sendMessage(message(METHODS.aepp.connect, {
           name: this.name,
           version: VERSION,
-          network: this.getNetworkId()
+          networkId: this.getNetworkId()
         }))
       )
     },
