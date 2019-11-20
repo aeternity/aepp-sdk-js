@@ -410,9 +410,14 @@ async function calculateTtl (ttl = TX_TTL, relative = true) {
  * @return {number} Next Nonce
  */
 async function getAccountNonce (accountId, nonce) {
-  if (nonce) return nonce
-  const { nonce: accountNonce } = await this.api.getAccountByPubkey(accountId).catch(() => ({ nonce: 0 }))
-  return accountNonce + 1
+  const account = await this.getAccount(accountId).catch(e => ({ nonce: 0 }))
+  // Is GA account
+  if (account.contractId) return 0
+  else {
+    if (nonce) return nonce
+    this.nonces[accountId] = Math.max(this.nonces[accountId] || 0, account.nonce)
+    return ++this.nonces[accountId]
+  }
 }
 
 /**
@@ -423,13 +428,7 @@ async function getAccountNonce (accountId, nonce) {
  * @return {Object} { ttl, nonce, fee } Object with account nonce, absolute ttl and transaction fee
  */
 async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, gas, absoluteTtl, vsn }) {
-  const account = await this.getAccount(senderId).catch(e => ({ nonce: 0 }))
-  // Is GA account
-  if (account.contractId) {
-    n = 0
-  } else {
-    n = n || (account.nonce + 1)
-  }
+  n = await this.getAccountNonce(senderId, n)
   const ttl = await (calculateTtl.bind(this)(t, !absoluteTtl))
   const fee = calculateFee(f, txType, { showWarning: this.showWarning, gas, params: R.merge(R.last(arguments), { nonce: n, ttl }), vsn })
   return { fee, ttl, nonce: n }
@@ -460,6 +459,7 @@ const Transaction = ChainNode.compose(Tx, {
   init ({ nativeMode = true, showWarning = false }) {
     this.nativeMode = nativeMode
     this.showWarning = showWarning
+    this.nonces = {}
   },
   props: {
     nativeMode: null,
