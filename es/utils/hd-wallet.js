@@ -5,7 +5,7 @@ import { validateMnemonic, mnemonicToSeed, generateMnemonic as genMnemonic } fro
 import { decryptKey, encodeBase58Check, encryptKey } from './crypto'
 
 const ED25519_CURVE = Buffer.from('ed25519 seed')
-const HARDENED_OFFSET = 0x80000000
+const HARDENED_OFFSET = 0x800001c9
 
 const toHex = (buffer) => Buffer.from(buffer).toString('hex')
 
