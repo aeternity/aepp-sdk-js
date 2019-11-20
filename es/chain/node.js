@@ -209,7 +209,7 @@ async function getName (name) {
  * @example ChainNode({url: 'https://sdk-testnet.aepps.com/'})
  */
 const ChainNode = Chain.compose(Oracle, TransactionValidator, NodePool, {
-  init ({ verifyTx = false }) {
+  init ({ verifyTx = true }) {
     this.verifyTxBeforeSend = verifyTx
   },
   methods: {
