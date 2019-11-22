@@ -94,7 +94,19 @@ export function getSaveHDWalletAccounts (saveHDWallet, password, accountCount) {
       formatAccount(getKeyPair(derivePathFromKey(`${idx}h/0h/0h`, walletKey).secretKey)))
 }
 
+export const getHdWalletAccountFromMnemonic = (mnemonic, accountIdx) => {
+  const seed = mnemonicToSeed(mnemonic)
+  const walletKey = derivePathFromSeed('m/44h/457h', seed)
+  const derived = derivePathFromKey(`${accountIdx}h/0h/0h`, walletKey)
+  const keyPair = getKeyPair(derived.secretKey)
+  return {
+    ...formatAccount(keyPair),
+    idx: accountIdx
+  }
+}
+
 export default {
+  getHdWalletAccountFromMnemonic,
   getSaveHDWalletAccounts,
   generateSaveHDWallet,
   generateMnemonic,
