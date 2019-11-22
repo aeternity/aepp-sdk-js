@@ -61,7 +61,7 @@ export function deriveChild ({ secretKey, chainCode }, index) {
   const indexBuffer = Buffer.allocUnsafe(4)
   indexBuffer.writeUInt32BE(index, 0)
 
-  const data = Buffer.concat([Buffer.alloc(1, 0), secretKey, indexBuffer])
+  const data = Buffer.concat([Buffer.alloc(1, 0), Buffer.from(secretKey), Buffer.from(indexBuffer)])
 
   const I = hmac(data, chainCode)
   const IL = I.slice(0, 32)
