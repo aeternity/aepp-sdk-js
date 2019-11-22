@@ -2,7 +2,7 @@ import nacl from 'tweetnacl'
 import { full as hmac } from 'tweetnacl-auth'
 import { fromString } from 'bip32-path'
 import { validateMnemonic, mnemonicToSeed, generateMnemonic as genMnemonic } from '@aeternity/bip39'
-import { decryptKey, encodeBase58Check, encryptKey } from './crypto'
+import { decryptKey, encodeBase58Check, encryptKey, aeEncodeKey } from './crypto'
 
 const ED25519_CURVE = Buffer.from('ed25519 seed')
 const HARDENED_OFFSET = 0x80000000
@@ -61,7 +61,7 @@ export function deriveChild ({ secretKey, chainCode }, index) {
   const indexBuffer = Buffer.allocUnsafe(4)
   indexBuffer.writeUInt32BE(index, 0)
 
-  const data = Buffer.concat([Buffer.alloc(1, 0), secretKey, indexBuffer])
+  const data = Buffer.concat([Buffer.alloc(1, 0), Buffer.from(secretKey), Buffer.from(indexBuffer)])
 
   const I = hmac(data, chainCode)
   const IL = I.slice(0, 32)
@@ -94,7 +94,19 @@ export function getSaveHDWalletAccounts (saveHDWallet, password, accountCount) {
       formatAccount(getKeyPair(derivePathFromKey(`${idx}h/0h/0h`, walletKey).secretKey)))
 }
 
+export const getHdWalletAccountFromMnemonic = (mnemonic, accountIdx) => {
+  const seed = mnemonicToSeed(mnemonic)
+  const walletKey = derivePathFromSeed('m/44h/457h', seed)
+  const derived = derivePathFromKey(`${accountIdx}h/0h/0h`, walletKey)
+  const keyPair = getKeyPair(derived.secretKey)
+  return {
+    ...formatAccount(keyPair),
+    idx: accountIdx
+  }
+}
+
 export default {
+  getHdWalletAccountFromMnemonic,
   getSaveHDWalletAccounts,
   generateSaveHDWallet,
   generateMnemonic,
