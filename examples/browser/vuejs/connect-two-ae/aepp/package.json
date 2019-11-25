@@ -47,7 +47,7 @@
     "standard": "^14.0.1",
     "standard-loader": "^7.0.0",
     "style-loader": "^1.0.0",
-    "tailwindcss": "^0.5.3",
+    "tailwindcss": "^1.1.4",
     "vue-loader": "15.7.2",
     "vue-style-loader": "^4.1.0",
     "webpack": "^4.36.1",
