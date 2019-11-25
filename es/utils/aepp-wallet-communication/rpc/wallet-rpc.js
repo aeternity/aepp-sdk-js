@@ -94,10 +94,7 @@ const REQUESTS = {
       // Authorization check
       if (!client.isConnected()) return sendResponseMessage(client)(id, method, { error: ERRORS.notAuthorize() })
       // NetworkId check
-      // if (client.info.networkId !== instance.getNetworkId()) return sendResponseMessage(client)(id, method, { error: ERRORS.unsupportedNetwork() })
-      // Validate transaction
-      const validationResult = await instance.unpackAndVerify(tx)
-      if (validationResult.validation.length) return sendResponseMessage(client)(id, method, { error: ERRORS.invalidTransaction(validationResult) })
+      if (client.info.networkId !== instance.getNetworkId()) return sendResponseMessage(client)(id, method, { error: ERRORS.unsupportedNetwork() })
 
       const accept = (id) => async (rawTx) => {
         try {
@@ -115,6 +112,9 @@ const REQUESTS = {
           )
         } catch (e) {
           if (!returnSigned) {
+            // Validate transaction
+            const validationResult = await instance.unpackAndVerify(tx)
+            if (validationResult.validation.length) return sendResponseMessage(client)(id, method, { error: ERRORS.invalidTransaction(validationResult) })
             // Send broadcast failed error to aepp
             sendResponseMessage(client)(id, method, { error: ERRORS.broadcastFailde(e.message) })
           }
@@ -124,7 +124,7 @@ const REQUESTS = {
 
       const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.rejectedByUser(error) })
 
-      instance.onSign(client, client.addAction({ id, method, params: { tx, returnSigned, onAccount }, meta: validationResult }, [accept(id), deny(id)]))
+      instance.onSign(client, client.addAction({ id, method, params: { tx, returnSigned, onAccount } }, [accept(id), deny(id)]))
     }
 }
 
@@ -208,7 +208,10 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
       )
     },
     shareWalletInfo (postFn) {
-      postFn(message(METHODS.wallet.readyToConnect, { ...this.getWalletInfo(), jsonrpc: '2.0' }))
+      postFn({
+        jsonrpc: '2.0',
+        ...message(METHODS.wallet.readyToConnect, { ...this.getWalletInfo() })
+      })
     },
     getWalletInfo () {
       return {
