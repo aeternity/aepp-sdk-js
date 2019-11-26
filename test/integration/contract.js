@@ -341,6 +341,19 @@ describe('Contract', function () {
       const isCompiled = contractObject.compiled.length && contractObject.compiled.slice(0, 3) === 'cb_'
       isCompiled.should.be.equal(true)
     })
+    it('Generate ACI object with corresponding bytecode', async () => {
+      await contract.getContractInstance(testContract, { contractAddress: contractObject.deployInfo.address, filesystem, opt: { ttl: 0 } })
+    })
+    it('Generate ACI object with not corresponding bytecode', async () => {
+      try {
+        await contract.getContractInstance(identityContract, { contractAddress: contractObject.deployInfo.address, opt: { ttl: 0 } })
+      } catch (e) {
+        e.message.should.be.equal('Contract source do not correspond to the contract bytecode deployed on the chain')
+      }
+    })
+    it('Generate ACI object with not corresponding bytecode and force this check', async () => {
+      await contract.getContractInstance(identityContract, { forceCodeCheck: true, contractAddress: contractObject.deployInfo.address, opt: { ttl: 0 } })
+    })
     it('Throw error on creating contract instance with invalid contractAddress', async () => {
       try {
         await contract.getContractInstance(testContract, { filesystem, contractAddress: 'ct_asdasdasd', opt: { ttl: 0 } })

@@ -76,7 +76,7 @@ async function validateByteCodeAPI (bytecode, source, options = {}) {
   options = this.prepareCompilerOption(options)
   return this.http
     .post('/validate-byte-code', { bytecode, source, options }, options)
-    .then(({ data }) => data)
+    .then(res => typeof res === 'object' ? true : res)
 }
 
 async function compileContractAPI (code, options = {}) {
@@ -159,6 +159,6 @@ const ContractCompilerAPI = AsyncInit.compose(ContractBase, {
 })
 
 const COMPILER_GE_VERSION = '3.1.0'
-const COMPILER_LT_VERSION = '5.0.0'
+export const COMPILER_LT_VERSION = '5.0.0'
 
 export default ContractCompilerAPI

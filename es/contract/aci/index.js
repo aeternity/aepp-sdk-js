@@ -105,10 +105,13 @@ async function getContractInstance (source, { aci, contractAddress, filesystem =
   if (contractAddress) {
     if (!isAddressValid(contractAddress, 'ct')) throw new Error('Invalid contract address')
     const contract = await this.getContract(contractAddress).catch(e => null)
-    if (!contract) throw new Error(`Contract with address ${contractAddress} not found on-chain`)
+    if (!contract || !contract.active) throw new Error(`Contract with address ${contractAddress} not found on-chain or not active`)
+    // Check if we are using compiler version gte then 4.1.0(has comparing bytecode API)
+    // if (!forceCodeCheck && semverSatisfies(this.compilerVersion, '4.1.0', COMPILER_LT_VERSION)) {
     if (!forceCodeCheck) {
       const onChanByteCode = (await this.getContractByteCode(contractAddress)).bytecode
-      if (await this.validateByteCodeAPI(onChanByteCode, instance.source, instance.instance)) throw new Error('Contract source do not correspond to the contract bytecode deployed on the chain')
+      const isCorrespondingBytecode = await this.validateByteCodeAPI(onChanByteCode, instance.source, instance.options)
+      if (isCorrespondingBytecode !== true) throw new Error('Contract source do not correspond to the contract bytecode deployed on the chain')
     }
   }
 
