@@ -364,15 +364,15 @@ describe('Contract', function () {
         e.message.should.be.equal('Invalid contract address')
       }
     })
-    it('Throw error on creating contract instance with contract address which is not found on-chain', async () => {
+    it('Throw error on creating contract instance with contract address which is not found on-chain or not active', async () => {
       const contractAddress = 'ct_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT'
       try {
         await contract.getContractInstance(testContract, { filesystem, contractAddress, opt: { ttl: 0 } })
       } catch (e) {
-        e.message.should.be.equal(`Contract with address ${contractAddress} not found on-chain`)
+        e.message.should.be.equal(`Contract with address ${contractAddress} not found on-chain or not active`)
       }
     })
-    it.skip('Throw error on creating contract instance with using a bytecode which is different from one deployed on-chain', async () => {
+    it.skip('Throw error on creating contract instance with using a bytecode which is different from one deployed on-chain or not active', async () => {
       try {
         await contract.getContractInstance(identityContract, { contractAddress: contractObject.deployInfo.address, opt: { ttl: 0 } })
       } catch (e) {

@@ -32,8 +32,8 @@ import { VM_TYPE } from '../tx/builder/schema'
 
 async function getCompilerVersion (options = {}) {
   return this.http
-    .get('/version', options)
-    .then(({ version }) => version)
+    .get('/api-version', options)
+    .then((res) => res['api-version'])
 }
 
 async function contractEncodeCallDataAPI (source, name, args = [], options = {}) {
@@ -54,7 +54,7 @@ async function contractDecodeCallDataBySourceAPI (source, fn, callData, options 
   this.isInit()
   options = this.prepareCompilerOption(options)
   return this.http
-    .post('/decode-calldata/source', { function: fn, source, calldata: callData }, options)
+    .post('/decode-calldata/source', { function: fn, source, calldata: callData, options }, options)
 }
 
 async function contractDecodeCallResultAPI (source, fn, callValue, callResult, options = {}) {

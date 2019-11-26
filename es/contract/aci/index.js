@@ -30,6 +30,8 @@ import { buildContractMethods, getFunctionACI } from './helpers'
 import { isAddressValid } from '../../utils/crypto'
 import AsyncInit from '../../utils/async-init'
 import { BigNumber } from 'bignumber.js'
+import { COMPILER_LT_VERSION } from '../compiler'
+import semverSatisfies from '../../utils/semver-satisfies'
 
 /**
  * Validated contract call arguments using contract ACI
@@ -107,11 +109,10 @@ async function getContractInstance (source, { aci, contractAddress, filesystem =
     const contract = await this.getContract(contractAddress).catch(e => null)
     if (!contract || !contract.active) throw new Error(`Contract with address ${contractAddress} not found on-chain or not active`)
     // Check if we are using compiler version gte then 4.1.0(has comparing bytecode API)
-    // if (!forceCodeCheck && semverSatisfies(this.compilerVersion, '4.1.0', COMPILER_LT_VERSION)) {
-    if (!forceCodeCheck) {
+    if (!forceCodeCheck && semverSatisfies(this.compilerVersion, '4.1.0', COMPILER_LT_VERSION)) {
       const onChanByteCode = (await this.getContractByteCode(contractAddress)).bytecode
-      const isCorrespondingBytecode = await this.validateByteCodeAPI(onChanByteCode, instance.source, instance.options)
-      if (isCorrespondingBytecode !== true) throw new Error('Contract source do not correspond to the contract bytecode deployed on the chain')
+      const isCorrespondingBytecode = await this.validateByteCodeAPI(onChanByteCode, instance.source, instance.options).catch(e => false)
+      if (!isCorrespondingBytecode) throw new Error('Contract source do not correspond to the contract bytecode deployed on the chain')
     }
   }
 
