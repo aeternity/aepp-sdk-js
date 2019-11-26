@@ -22,16 +22,18 @@
  * @example import Wallet from '@aeternity/aepp-sdk/es/ae/wallet'
  */
 
+import * as R from 'ramda'
+
 import Ae from './'
 import Account from '../account'
 import ContractBase from '../contract'
 import Accounts from '../accounts'
 import Chain from '../chain/node'
 import Rpc from '../rpc/server'
-import * as R from 'ramda'
 import Tx from '../tx/tx'
 import Contract from './contract'
 import GeneralizeAccount from '../contract/ga'
+import { WalletRpc } from '../utils/aepp-wallet-communication/rpc/wallet-rpc'
 
 const contains = R.flip(R.contains)
 const isTxMethod = contains(Tx.compose.deepConfiguration.Ae.methods)
@@ -130,7 +132,7 @@ async function rpcAddress ({ params, session }) {
   onContract: confirm
 })
  */
-const Wallet = Ae.compose(Accounts, Chain, Tx, Contract, GeneralizeAccount, Rpc, {
+export const Wallet = Ae.compose(Accounts, Chain, Tx, Contract, GeneralizeAccount, Rpc, {
   init ({ onTx = this.onTx, onChain = this.onChain, onAccount = this.onAccount, onContract = this.onContract }, { stamp }) {
     this.onTx = onTx
     this.onChain = onChain
@@ -153,5 +155,7 @@ const Wallet = Ae.compose(Accounts, Chain, Tx, Contract, GeneralizeAccount, Rpc,
     }
   }
 })
+
+export const RpcWallet = Ae.compose(Accounts, Chain, Tx, Contract, GeneralizeAccount, WalletRpc)
 
 export default Wallet

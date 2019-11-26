@@ -13,7 +13,18 @@ import {
   VALIDATION_MESSAGE,
   VSN
 } from './schema'
-import { readInt, readId, readPointers, writeId, writeInt, buildPointers, encode, decode, buildHash } from './helpers'
+import {
+  readInt,
+  readId,
+  readPointers,
+  writeId,
+  writeInt,
+  buildPointers,
+  encode,
+  decode,
+  buildHash,
+  getContractBackendFromTx
+} from './helpers'
 import { toBytes } from '../../utils/bytes'
 import * as mpt from '../../utils/mptree'
 
@@ -212,12 +223,13 @@ export function calculateMinFee (txType, { gas = 0, params, vsn }) {
  * @param params
  * @param gas
  * @param multiplier
+ * @param vsn
  * @return {BigNumber}
  */
 function buildFee (txType, { params, gas = 0, multiplier, vsn }) {
   const { rlpEncoded: txWithOutFee } = buildTx({ ...params }, txType, { vsn })
   const txSize = txWithOutFee.length
-  return TX_FEE_BASE_GAS(txType)
+  return TX_FEE_BASE_GAS(txType, { backend: getContractBackendFromTx(params) })
     .plus(TX_FEE_OTHER_GAS(txType)({ txSize, relativeTtl: getOracleRelativeTtl(params) }))
     .times(multiplier)
 }

@@ -233,6 +233,7 @@ export const ABI_VERSIONS = {
 }
 
 export const VM_TYPE = { FATE: 'fate', AEVM: 'aevm' }
+export const FATE_ABI = [3]
 
 // First abi/vm by default
 export const VM_ABI_MAP_ROMA = {
@@ -353,7 +354,7 @@ export const DEFAULT_FEE = 20000
 export const KEY_BLOCK_INTERVAL = 3
 
 // MAP WITH FEE CALCULATION https://github.com/aeternity/protocol/blob/master/consensus/consensus.md#gas
-export const TX_FEE_BASE_GAS = (txType) => {
+export const TX_FEE_BASE_GAS = (txType, { backend = VM_TYPE.FATE }) => {
   switch (txType) {
     // case TX_TYPE.gaMeta: // TODO investigate MetaTx calculation
     case TX_TYPE.gaAttach:
@@ -362,7 +363,7 @@ export const TX_FEE_BASE_GAS = (txType) => {
     // Todo Implement meta tx fee calculation
     case TX_TYPE.gaMeta:
     case TX_TYPE.contractCall:
-      return BigNumber(30 * BASE_GAS)
+      return BigNumber((backend === VM_TYPE.FATE ? 12 : 30) * BASE_GAS)
     default:
       return BigNumber(BASE_GAS)
   }

@@ -326,12 +326,15 @@ describe('Contract', function () {
       result.callerId.should.be.equal(onAccount)
     })
 
-    it('Can deploy using AEVM', async () => {
+    it('Can deploy/call using AEVM', async () => {
       await contractObject.compile({ backend: 'aevm' })
       const deployStatic = await contractObject.methods.init.get('123', 1, 'hahahaha', { backend: 'aevm' })
       deployStatic.should.be.an('object')
       deployed = await contractObject.methods.init('123', 1, 'hahahaha', { backend: 'aevm' })
       deployed.should.be.an('object')
+      const { result } = await contractObject.methods.intFn(123, { backend: 'aevm' })
+      result.should.have.property('gasUsed')
+      result.should.have.property('returnType')
       await contractObject.compile()
     })
 
