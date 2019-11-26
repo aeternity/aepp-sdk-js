@@ -37,8 +37,8 @@ import Aens from './ae/aens'
 import Contract from './ae/contract'
 import GeneralizeAccount from './contract/ga'
 import ContractCompilerAPI from './contract/compiler'
-import Wallet from './ae/wallet'
-import Aepp from './ae/aepp'
+import { Aepp, RpcAepp } from './ae/aepp'
+import { Wallet, RpcWallet } from './ae/wallet'
 import Oracle from './ae/oracle'
 import OracleNodeAPI from './oracle/node'
 import Selector from './account/selector'
@@ -57,6 +57,8 @@ export {
   ContractCompilerAPI,
   ContractACI,
   ChainNode,
+  RpcAepp,
+  RpcWallet,
   Channel,
   Crypto,
   Keystore,
