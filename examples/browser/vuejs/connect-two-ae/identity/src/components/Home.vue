@@ -11,18 +11,10 @@
           Public Key
         </div>
         <div class="p-2 w-3/4 bg-grey-lightest break-words">
-          {{publicKey}}
+          {{pub}}
         </div>
       </div>
-      <div v-if="height" class="bg-green w-full flex flex-row font-mono border border-b">
-        <div class="p-2 w-1/4">
-          Height
-        </div>
-        <div class="p-2 w-3/4 bg-grey-lightest">
-          {{height}}
-        </div>
-      </div>
-      <div v-if="height" class="bg-green w-full flex flex-row font-mono">
+      <div v-if="balance || balance >= 0" class="bg-green w-full flex flex-row font-mono">
         <div class="p-2 w-1/4">
           Balance
         </div>
@@ -30,6 +22,11 @@
           {{balance}}
         </div>
       </div>
+      <button
+        v-if="client"
+        class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 text-xs"
+        @click="switchAccount"
+      >Switch Account</button>
     </div>
 
     <div v-if="!aeppUrl" class="w-full p-4 h-64 border border-black border-dashed shadow mx-auto mt-4 bg-grey-lighter">
@@ -44,14 +41,18 @@
 
 <script>
   // AE_SDK_MODULES is a webpack alias present in webpack.config.js
-  import { Wallet, MemoryAccount, Node } from '@aeternity/aepp-sdk/es'
+  import { MemoryAccount, RpcWallet } from '@aeternity/aepp-sdk/es'
+  import Node from '@aeternity/aepp-sdk/es/node'
+  import BrowserWindowMessageConnection
+    from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-connection/browser-window-message'
+  import { generateKeyPair } from '../../../../../../../es/utils/crypto'
 
   export default {
     data () {
       return {
         runningInFrame: window.parent !== window,
-        publicKey: 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR', // Your public key
-        secretKey: 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b', // Your private key
+        pub: 'YOUR_PUB', // Your public key
+        priv: 'YOUR_PRIV', // Your private key
         client: null,
         balance: null,
         height: null,
@@ -62,27 +63,86 @@
       }
     },
     methods: {
-      confirmDialog (method, params, {id}) {
-        return Promise.resolve(window.confirm(`User ${id} wants to run ${method} ${params}`))
+      async shareWalletInfo (postFn, { interval = 5000, attemps = 5 } = {}) {
+        const ins = this.client
+        const pause = async (duration) => {
+          await new Promise(resolve => setTimeout(resolve, duration))
+        }
+
+        async function prob (left) {
+          ins.shareWalletInfo(postFn)
+          if (left > 0) {
+            await pause(interval)
+            return prob(attemps - 1)
+          } else {
+            console.log('Finish sharing wallet info')
+            return
+          }
+        }
+
+        return await prob(attemps)
+      },
+      disconnect () {
+        const { clients: aepps } = this.client.getClients()
+        const aepp = Array.from(aepps.values())[0]
+        aepp.disconnect()
+      },
+      async switchAccount () {
+        const secondAcc = this.client.addresses().find(a => a !== this.pub)
+        this.client.selectAccount(secondAcc)
+        this.pub = await this.client.address()
+        this.balance = await this.client.balance(this.pub).catch(e => 0)
       }
     },
     async created () {
-      this.client = await Wallet({
-        nodes: [{ name: 'localNode', instance: await Node({ url: this.url, internalUrl: this.internalUrl }) }],
+      const { publicKey, secretKey } = generateKeyPair()
+      this.pub = this.pub || publicKey
+      const account2 = MemoryAccount({ keypair: generateKeyPair() })
+
+      this.client = await RpcWallet({
+        url: this.url,
+        internalUrl: this.internalUrl,
         compilerUrl: this.compilerUrl,
-        accounts: [MemoryAccount({keypair: {secretKey: this.secretKey, publicKey: this.publicKey}})],
-        address: this.publicKey,
-        onTx: this.confirmDialog,
-        onChain: this.confirmDialog,
-        onAccount: this.confirmDialog,
-        onContract: this.confirmDialog
+        accounts: [MemoryAccount({ keypair: { secretKey: this.priv || secretKey, publicKey: this.pub || publicKey } }), account2],
+        address: this.pub,
+        name: 'Wallet',
+        async onConnection (aepp, { accept, deny }) {
+          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to connect`)) {
+            accept()
+          } else { deny() }
+        },
+        async onSubscription (aepp, { accept, deny }) {
+          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to subscribe address`)) {
+            accept()
+          } else { deny() }
+        },
+        async onSign (aepp, { accept, deny, params }) {
+          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to ${params.returnSigned ? 'sign' : 'sign and broadcast'} ${JSON.stringify(params.tx)}`)) {
+            accept()
+          } else {
+            deny()
+          }
+        },
+        onAskAccounts (aepp, { accept, deny }) {
+          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to get accounts`)) {
+            accept()
+          } else {
+            deny()
+          }
+        },
+        onDisconnect (message, client) {
+          this.shareWalletInfo(connection.sendMessage.bind(connection))
+        }
       })
+      const target = !this.runningInFrame ? window.frames.aepp : window.parent
+      const connection = await BrowserWindowMessageConnection({
+        target
+      })
+      this.client.addRpcClient(connection)
+      this.shareWalletInfo(connection.sendMessage.bind(connection))
 
-      if (!this.runningInFrame) this.$refs.aepp.src = this.aeppUrl
-      else window.parent.postMessage({ jsonrpc: '2.0', method: 'ready' }, '*')
-
-      this.height = await this.client.height()
-      this.balance = await this.client.balance(this.publicKey).catch(() => 0)
+      // Get balance
+      this.balance = await this.client.balance(await this.client.address()).catch(e => 0)
     }
   }
 </script>
