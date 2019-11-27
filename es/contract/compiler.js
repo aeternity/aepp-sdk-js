@@ -38,9 +38,8 @@ async function getCompilerVersion (options = {}) {
 
 async function contractEncodeCallDataAPI (source, name, args = [], options = {}) {
   this.isInit()
-  options = this.prepareCompilerOption(options)
   return this.http
-    .post('/encode-calldata', { source, function: name, arguments: args, options }, options)
+    .post('/encode-calldata', { source, function: name, arguments: args, options: this.prepareCompilerOption(options) }, options)
     .then(({ calldata }) => calldata)
 }
 
@@ -52,16 +51,14 @@ async function contractDecodeCallDataByCodeAPI (bytecode, calldata, backend = th
 
 async function contractDecodeCallDataBySourceAPI (source, fn, callData, options = {}) {
   this.isInit()
-  options = this.prepareCompilerOption(options)
   return this.http
-    .post('/decode-calldata/source', { function: fn, source, calldata: callData, options }, options)
+    .post('/decode-calldata/source', { function: fn, source, calldata: callData, options: this.prepareCompilerOption(options) }, options)
 }
 
 async function contractDecodeCallResultAPI (source, fn, callValue, callResult, options = {}) {
   this.isInit()
-  options = this.prepareCompilerOption(options)
   return this.http
-    .post('/decode-call-result', { function: fn, source, 'call-result': callResult, 'call-value': callValue, options }, options)
+    .post('/decode-call-result', { function: fn, source, 'call-result': callResult, 'call-value': callValue, options: this.prepareCompilerOption(options) }, options)
 }
 
 async function contractDecodeDataAPI (type, data, options = {}) {
@@ -73,23 +70,20 @@ async function contractDecodeDataAPI (type, data, options = {}) {
 
 async function validateByteCodeAPI (bytecode, source, options = {}) {
   this.isInit()
-  options = this.prepareCompilerOption(options)
   return this.http
-    .post('/validate-byte-code', { bytecode, source, options }, options)
+    .post('/validate-byte-code', { bytecode, source, options: this.prepareCompilerOption(options) }, options)
     .then(res => typeof res === 'object' ? true : res)
 }
 
 async function compileContractAPI (code, options = {}) {
   this.isInit()
-  options = this.prepareCompilerOption(options)
-  return this.http.post('/compile', { code, options }, options)
+  return this.http.post('/compile', { code, options: this.prepareCompilerOption(options) }, options)
     .then(({ bytecode }) => bytecode)
 }
 
 async function contractGetACI (code, options = {}) {
   this.isInit()
-  options = this.prepareCompilerOption(options)
-  return this.http.post('/aci', { code, options }, options)
+  return this.http.post('/aci', { code, options: this.prepareCompilerOption(options) }, options)
 }
 
 async function setCompilerUrl (url, { forceCompatibility = false } = {}) {
@@ -109,8 +103,8 @@ async function checkCompatibility ({ force = false, forceCompatibility = false }
   }
 }
 
-function prepareCompilerOption (options = {}) {
-  return { ...this.compilerOptions, ...options, file_system: options.filesystem || {} }
+function prepareCompilerOption ({ backend = this.compilerOptions.backend, filesystem = {} } = {}) {
+  return { backend, file_system: filesystem }
 }
 
 function isInit () {
