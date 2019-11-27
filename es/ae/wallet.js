@@ -34,6 +34,8 @@ import Tx from '../tx/tx'
 import Contract from './contract'
 import GeneralizeAccount from '../contract/ga'
 import { WalletRpc } from '../utils/aepp-wallet-communication/rpc/wallet-rpc'
+import Oracle from './oracle'
+import Aens from './aens'
 
 const contains = R.flip(R.contains)
 const isTxMethod = contains(Tx.compose.deepConfiguration.Ae.methods)
@@ -156,6 +158,6 @@ export const Wallet = Ae.compose(Accounts, Chain, Tx, Contract, GeneralizeAccoun
   }
 })
 
-export const RpcWallet = Ae.compose(Accounts, Chain, Tx, Contract, GeneralizeAccount, WalletRpc)
+export const RpcWallet = Ae.compose(Accounts, Chain, Tx, Contract, Oracle, Aens, GeneralizeAccount, WalletRpc)
 
 export default Wallet

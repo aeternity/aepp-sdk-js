@@ -55,7 +55,7 @@ const gas = 1600000 - 21000 // MAX GAS
 let _salt
 let commitmentId
 
-describe.only('Native Transaction', function () {
+describe('Native Transaction', function () {
   configure(this)
 
   let clientNative
@@ -175,7 +175,7 @@ describe.only('Native Transaction', function () {
     result.returnType.should.be.equal('ok')
   })
 
-  it.only('native build of oracle create tx', async () => {
+  it('native build of oracle create tx', async () => {
     const accountId = await client.address()
     const params = {
       accountId,
@@ -195,7 +195,7 @@ describe.only('Native Transaction', function () {
     oId.should.be.equal(oracleId)
   })
 
-  it.only('native build of oracle extends tx', async () => {
+  it('native build of oracle extends tx', async () => {
     const callerId = await client.address()
     const params = { oracleId, callerId, oracleTtl }
     const orTtl = (await client.getOracle(oracleId)).ttl
@@ -210,7 +210,7 @@ describe.only('Native Transaction', function () {
     orNewTtl.should.be.equal(orTtl + oracleTtl.value)
   })
 
-  it.only('native build of oracle post query tx', async () => {
+  it('native build of oracle post query tx', async () => {
     console.log('--------')
     const senderId = await client.address()
 
@@ -232,7 +232,7 @@ describe.only('Native Transaction', function () {
     }
   })
 
-  it.only('native build of oracle respond query tx', async () => {
+  it('native build of oracle respond query tx', async () => {
     const callerId = await client.address()
     const params = { oracleId, callerId, responseTtl, queryId, response: queryResponse }
 

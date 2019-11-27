@@ -187,8 +187,14 @@ function transformParams (params) {
 // INTERFACE
 
 function getOracleRelativeTtl (params) {
-  const [, { value = 500 }] = Object.entries(params).find(([key]) => ['oracleTtl', 'queryTtl', 'responseTtl'].includes(key)) || ['', {}]
-  return value // TODO investigate this
+  // const ORACLE_TTL_KEYS = ['oracleTtl', 'queryTtl', 'responseTtl']
+  // return Object.entries(params).reduce((acc, [key, value]) => {
+  //   if (ORACLE_TTL_KEYS.includes(key)) acc = value.value
+  //   if (ORACLE_TTL_KEYS.map(k => `${k}Value`).includes(key)) acc = value
+  //   return acc
+  // }, 500)
+  // TODO Investigate this
+  return 500
 }
 
 /**
