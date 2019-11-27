@@ -2,7 +2,7 @@ import nacl from 'tweetnacl'
 import { full as hmac } from 'tweetnacl-auth'
 import { fromString } from 'bip32-path'
 import { validateMnemonic, mnemonicToSeed, generateMnemonic as genMnemonic } from '@aeternity/bip39'
-import { decryptKey, encodeBase58Check, encryptKey, aeEncodeKey } from './crypto'
+import { decryptKey, encodeBase58Check, encryptKey } from './crypto'
 
 const ED25519_CURVE = Buffer.from('ed25519 seed')
 const HARDENED_OFFSET = 0x80000000
