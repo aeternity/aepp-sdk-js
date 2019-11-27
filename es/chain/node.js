@@ -33,7 +33,7 @@ import NodePool from '../node-pool'
 async function sendTransaction (tx, options = {}) {
   const { waitMined, verify } = R.merge(this.Chain.defaults, options)
   // Verify transaction before broadcast
-  if (this.verifyTxBeforeSend || verify) {
+  if (verify || (typeof verify !== 'boolean' && this.verifyTxBeforeSend)) {
     const { validation, tx: txObject, txType } = await this.unpackAndVerify(tx)
     if (validation.length) {
       throw Object.assign(Error('Transaction verification error'), {

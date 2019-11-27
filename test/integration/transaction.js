@@ -211,7 +211,6 @@ describe('Native Transaction', function () {
   })
 
   it('native build of oracle post query tx', async () => {
-    console.log('--------')
     const senderId = await client.address()
 
     const params = { oracleId, responseTtl, query, queryTtl, queryFee, senderId }
