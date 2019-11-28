@@ -220,11 +220,15 @@ describe('Native Transaction', function () {
 
     txFromAPI.should.be.equal(nativeTx)
 
-    await client.send(nativeTx)
-
-    const oracleQuery = (await client.getOracleQuery(oracleId, oracleQueryId))
-    oracleQuery.id.should.be.equal(oracleQueryId)
-    queryId = oracleQueryId
+    try {
+      await client.send(nativeTx)
+      const oracleQuery = (await client.getOracleQuery(oracleId, oracleQueryId))
+      oracleQuery.id.should.be.equal(oracleQueryId)
+      queryId = oracleQueryId
+    } catch (e) {
+      console.log(e.errorData.tx)
+      console.log(e.errorData.validation)
+    }
   })
 
   it('native build of oracle respond query tx', async () => {
