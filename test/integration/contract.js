@@ -287,7 +287,7 @@ describe('Contract', function () {
     })
   })
 
-  describe.only('Contract ACI Interface', function () {
+  describe('Contract ACI Interface', function () {
     let contractObject
 
     it('Generate ACI object', async () => {
