@@ -287,7 +287,7 @@ describe('Contract', function () {
     })
   })
 
-  describe('Contract ACI Interface', function () {
+  describe.only('Contract ACI Interface', function () {
     let contractObject
 
     it('Generate ACI object', async () => {
@@ -646,7 +646,7 @@ describe('Contract', function () {
         })
         it('Valid', async () => {
           const res = await contractObject.methods.datTypeFn('Year' || { Year: [] })
-          JSON.stringify(res.decodedResult).should.be.equal('"Year"')
+          JSON.stringify(res.decodedResult).should.be.equal(JSON.stringify({ Year: [] }))
         })
       })
       describe('Hash', function () {
