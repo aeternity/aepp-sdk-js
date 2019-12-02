@@ -1,0 +1,43 @@
+branches:
+  only:
+    - master
+    - develop
+
+dist: xenial
+
+addons:
+  apt:
+    packages:
+      - build-essential
+      - curl
+      - libltdl7
+      - git
+
+services:
+  - docker
+
+language: node_js
+node_js: '10'
+
+cache:
+  timeout: 604800 # 7 days
+  directories:
+    - "$HOME/.npm"
+
+env:
+  global:
+    - TEST_NODE=http://localhost:3013
+    - TEST_URL=http://localhost:3013
+    - TEST_DEBUG_URL=http://localhost:3113
+    - TEST_WS_URL=ws://localhost:3014/channel
+    - TEST_NETWORK_ID=ae_devnet
+    - COMPILER_URL=http://localhost:3080
+
+before_install:
+  - docker-compose up -d node compiler
+
+install:
+  - npm ci
+
+script:
+  - npm run test
