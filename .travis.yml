@@ -39,5 +39,17 @@ before_install:
 install:
   - npm ci
 
-script:
-  - npm run test
+jobs:
+  include:
+    - stage: Tests
+      name: Test AENS
+      script:
+        - npm run test-aens
+    - stage: Tests
+      name: Test Channel
+      script:
+        - npm run test-channel
+    - stage: Tests
+      name: Test Contract, Node, Oracle, Account and else
+      script:
+        - npm run test-else
