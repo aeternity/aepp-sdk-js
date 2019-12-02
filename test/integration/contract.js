@@ -646,7 +646,7 @@ describe('Contract', function () {
         })
         it('Valid', async () => {
           const res = await contractObject.methods.datTypeFn('Year' || { Year: [] })
-          JSON.stringify(res.decodedResult).should.be.equal(JSON.stringify({ Year: [] }))
+          JSON.stringify(res.decodedResult).should.be.equal('"Year"')
         })
       })
       describe('Hash', function () {
