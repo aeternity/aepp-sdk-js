@@ -45,7 +45,7 @@ function waitForChannel (channel) {
 
 describe('Channel', function () {
   configure(this)
-  this.timeout(120000)
+  this.timeout(12000000)
 
   let initiator
   let responder
