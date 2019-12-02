@@ -646,6 +646,7 @@ describe('Contract', function () {
         })
         it('Valid', async () => {
           const res = await contractObject.methods.datTypeFn('Year')
+          console.log(res)
           JSON.stringify(res.decodedResult).should.be.equal('"Year"')
         })
       })
