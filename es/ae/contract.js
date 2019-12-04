@@ -39,11 +39,11 @@ import NodePool from '../node-pool'
 function sendAndProcess (tx, options) {
   return async function (onSuccess, onError) {
     // Send transaction and get transaction info
-    const { hash, rawTx } = await this.send(tx, options)
-    const result = await this.getTxInfo(hash)
+    const txData = await this.send(tx, options)
+    const result = await this.getTxInfo(txData.hash)
 
     return result.returnType === 'ok'
-      ? onSuccess({ hash, rawTx, result })
+      ? onSuccess({ hash: txData.hash, rawTx: txData.rawTx, result, txData })
       : typeof onError === 'function' ? onError(result) : this.handleCallError(result)
   }
 }
@@ -214,10 +214,11 @@ async function contractCall (source, address, name, args = [], options = {}) {
 
   return sendAndProcess(tx, opt).call(
     this,
-    ({ hash, rawTx, result }) => ({
+    ({ hash, rawTx, result, txData }) => ({
       hash,
       rawTx,
       result,
+      txData,
       decode: () => this.contractDecodeData(source, name, result.returnValue, result.returnType, opt)
     })
   )
@@ -259,11 +260,12 @@ async function contractDeploy (code, source, initState = [], options = {}) {
 
   return sendAndProcess(tx, opt).call(
     this,
-    ({ hash, rawTx, result }) => Object.freeze({
+    ({ hash, rawTx, result, txData }) => Object.freeze({
       result,
       owner: ownerId,
       transaction: hash,
       rawTx,
+      txData,
       address: contractId,
       call: async (name, args = [], options = {}) => this.contractCall(source, contractId, name, args, R.merge(opt, options)),
       callStatic: async (name, args = [], options = {}) => this.contractCallStatic(source, contractId, name, args, { ...options, options: { onAccount: opt.onAccount, ...R.merge(opt, options.options) } }),
