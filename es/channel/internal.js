@@ -23,7 +23,6 @@ import { pascalToSnake } from '../utils/string'
 import {
   awaitingConnection,
   awaitingReconnection,
-  channelClosed,
   channelOpen
 } from './handlers'
 
