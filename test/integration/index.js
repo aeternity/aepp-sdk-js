@@ -19,6 +19,10 @@ import { Universal as Ae } from '../../es/ae/universal'
 import * as Crypto from '../../es/utils/crypto'
 import { BigNumber } from 'bignumber.js'
 import MemoryAccount from '../../es/account/memory'
+import chai from 'chai'
+import chaiAsPromised from 'chai-as-promised'
+chai.use(chaiAsPromised)
+chai.should()
 
 const url = process.env.TEST_URL || 'http://localhost:3013'
 const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
