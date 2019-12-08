@@ -22,6 +22,7 @@ const sendMessage = (messageId, connection) => ({ id, method, params, result, er
 const receive = (handler, msgId) => (msg) => {
   if (!msg || !msg.jsonrpc || msg.jsonrpc !== '2.0' || !msg.method) {
     console.warn('Receive invalid message', msg)
+    return
   }
   // Increment id for each request
   if (msg.id && +msg.id > msgId) msgId += 1

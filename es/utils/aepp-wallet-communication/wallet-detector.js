@@ -25,7 +25,6 @@
  * @example import BrowserRuntimeConnection from '@aeternity/aepp-sdk/es/utils/wallet-connection/browser-runtime'
  */
 import AsyncInit from '../async-init'
-import BrowserRuntimeConnection from './wallet-connection/browser-runtime'
 import BrowserWindowMessageConnection from './wallet-connection/browser-window-message'
 import { METHODS } from './schema'
 import { isInIframe } from './helpers'
@@ -40,9 +39,9 @@ const handleDetection = (onDetected) => ({ method, params }, source) => {
       ...params,
       async getConnection () {
         // if detect extension wallet or page wallet
-        return this.type === 'extension'
-          ? BrowserRuntimeConnection({ connectionInfo: this })
-          : BrowserWindowMessageConnection({ connectionInfo: this, origin: this.origin, target: isInIframe() ? window.parent : source })
+        // return this.type === 'extension'
+        //   ? BrowserRuntimeConnection({ connectionInfo: this })
+        return BrowserWindowMessageConnection({ connectionInfo: this, origin: this.origin, target: isInIframe() ? window.parent : source })
       }
     }
     wallets[w.id] = w

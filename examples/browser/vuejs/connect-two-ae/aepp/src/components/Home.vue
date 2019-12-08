@@ -315,7 +315,7 @@
           if (confirm(`Do you want to connect to wallet ${newWallet.name}`)) {
             this.detector.stopScan()
 
-            this.connectToWallet(newWallet)
+            await this.connectToWallet(newWallet)
           }
         }
 
