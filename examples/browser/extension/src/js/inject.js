@@ -1,17 +1,34 @@
+import BrowserRuntimeConnection
+  from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-connection/browser-runtime'
+import BrowserWindowMessageConnection
+  from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-connection/browser-window-message'
+import { getBrowserAPI } from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/helpers'
+import { MESSAGE_DIRECTION } from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/schema'
+import { ContentScriptBridge } from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge'
+
 const readyStateCheckInterval = setInterval(function () {
-  if (document.readyState === "complete") {
+  if (document.readyState === 'complete') {
     clearInterval(readyStateCheckInterval)
 
-    const port = chrome.runtime.connect()
-    port.onMessage.addListener(function (msg) {
-      window.postMessage({ type: 'to_aepp', data: msg }, window.origin)
+    const port = getBrowserAPI().runtime.connect()
+    const extConnection = BrowserRuntimeConnection({
+      connectionInfo: {
+        description: 'Content Script to Extension connection',
+        origin: window.origin
+      },
+      port
+    })
+    const pageConnection = BrowserWindowMessageConnection({
+      connectionInfo: {
+        description: 'Content Script to Page  connection',
+        origin: window.origin
+      },
+      origin: window.origin,
+      sendDirection: MESSAGE_DIRECTION.to_aepp,
+      receiveDirection: MESSAGE_DIRECTION.to_waellet
     })
 
-    window.addEventListener('message', function (event) {
-      // We only accept messages from AEPP and exclude from our self
-      if (event.source !== window) return
-      if (event.data.type !== 'to_wallet') return
-      port.postMessage(event.data.data)
-    }, false)
+    const bridge = ContentScriptBridge({ pageConnection, extConnection })
+    bridge.run()
   }
 }, 10)

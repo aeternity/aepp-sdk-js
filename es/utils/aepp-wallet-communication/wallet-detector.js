@@ -26,7 +26,7 @@
  */
 import AsyncInit from '../async-init'
 import BrowserWindowMessageConnection from './wallet-connection/browser-window-message'
-import { METHODS } from './schema'
+import { MESSAGE_DIRECTION, METHODS } from './schema'
 import { isInIframe } from './helpers'
 
 const wallets = {}
@@ -39,11 +39,12 @@ const handleDetection = (onDetected) => ({ method, params }, source) => {
       ...params,
       async getConnection () {
         // if detect extension wallet or page wallet
-        const toContentScript = this.type === 'extension'
+        const isExtension = this.type === 'extension'
         return BrowserWindowMessageConnection({
           connectionInfo: this,
           origin: isExtension ? window.origin : this.origin,
-          toContentScript,
+          sendDirection: isExtension ? MESSAGE_DIRECTION.to_waellet : undefined,
+          receiveDirection: isExtension ? MESSAGE_DIRECTION.to_aepp : undefined,
           target: isInIframe() ? window.parent : source
         })
       }

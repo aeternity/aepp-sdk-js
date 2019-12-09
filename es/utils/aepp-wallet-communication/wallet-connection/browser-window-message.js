@@ -24,19 +24,23 @@
  * @export BrowserRuntimeConnection
  * @example import BrowserRuntimeConnection from '@aeternity/aepp-sdk/es/utils/wallet-connection/browser-runtime'
  */
+import stampit from '@stamp/it'
 import WalletConnection from '.'
-import AsyncInit from '../../async-init'
 import uuid from 'uuid/v4'
 import { MESSAGE_DIRECTION } from '../schema'
 
-function connect (onMessage, direction = MESSAGE_DIRECTION.to_aepp) {
+function connect (onMessage) {
   const origin = this.origin
+  const receiveDirection = this.receiveDirection
+  const debug = this.debug
   if (this.listener) throw new Error('You already connected')
-  this.listener = (msg) => {
+
+  this.listener = (msg, source) => {
     if (!msg || typeof msg.data !== 'object') return
     if (origin && origin !== msg.origin) return
+    if (debug) console.log('Receive message: ', msg)
     if (msg.data.type) {
-      if (msg.data.type !== direction) return
+      if (msg.data.type !== receiveDirection) return
       onMessage(msg.data.data, msg.source)
     } else {
       onMessage(msg.data, msg.source)
@@ -52,11 +56,10 @@ function disconnect () {
 }
 
 function sendMessage (msg) {
-  if (this.toContentScript) {
-    this.postFn({ type: MESSAGE_DIRECTION.to_waellet, data: msg })
-  } else {
-    this.postFn(msg)
-  }
+  const message = this.sendDirection ? { type: this.sendDirection, data: msg } : msg
+debugger
+  if (this.debug) console.log('Send message: ', message)
+  this.postFn(message)
 }
 
 /**
@@ -70,18 +73,22 @@ function sendMessage (msg) {
  * @param {String} options.keypair.secretKey - Private key
  * @return {Account}
  */
-export const BrowserWindowMessageConnection = AsyncInit.compose(WalletConnection, {
-  async init ({ connectionInfo = {}, target = window.parent, self = window, origin, toContentScript = false }) {
+export const BrowserWindowMessageConnection = stampit({
+  init ({ connectionInfo = {}, target = window.parent, self = window, origin, sendDirection, receiveDirection = MESSAGE_DIRECTION.to_aepp, debug = false }) {
+    if (sendDirection && !Object.keys(MESSAGE_DIRECTION).includes(sendDirection)) throw new Error(`sendDirection must be one of [${Object.keys(MESSAGE_DIRECTION)}]`)
+    if (!Object.keys(MESSAGE_DIRECTION).includes(receiveDirection)) throw new Error(`receiveDirection must be one of [${Object.keys(MESSAGE_DIRECTION)}]`)
     this.connectionInfo = { ...{ id: uuid() }, ...connectionInfo }
 
     this.origin = origin
-    this.toContentScript = toContentScript
+    this.debug = debug
+    this.sendDirection = sendDirection
+    this.receiveDirection = receiveDirection
     this.subscribeFn = (listener) => self.addEventListener('message', listener, false)
     this.unsubscribeFn = (listener) => self.removeEventListener('message', listener, false)
     this.postFn = (msg) => target.postMessage(msg, this.origin || '*')
     if (!this.connectionInfo.id) throw new Error('ID required.')
   },
   methods: { connect, sendMessage, disconnect, isConnected () { return this.listener } }
-})
+}, WalletConnection)
 
 export default BrowserWindowMessageConnection

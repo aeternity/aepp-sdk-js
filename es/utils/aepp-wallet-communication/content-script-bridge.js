@@ -25,33 +25,26 @@
  * @example import BrowserRuntimeConnection from '@aeternity/aepp-sdk/es/utils/wallet-connection/browser-runtime'
  */
 import stampit from '@stamp/it'
-import WalletConnection from '.'
-import { getBrowserAPI } from '../helpers'
 
-function connect (onMessage, onDisconnect) {
-  if (this.port.onMessage.hasListeners()) throw new Error('You already connected')
-  this.port.onMessage.addListener((msg, source) => {
-    if (this.debug) console.log('Receive message: ', msg)
-    onMessage(msg, source)
+function run () {
+  // Connect to extension using runtime
+  this.extConnection.connect((msg) => {
+    this.pageConnection.sendMessage(msg)
   })
-  this.port.onDisconnect.addListener(() => {
-    onDisconnect({}, this)
-    this.port.disconnect()
+  // Connect to page using window.postMessage
+  this.pageConnection.connect((msg, source) => {
+    if (source !== window) return
+    this.extConnection.sendMessage(msg)
   })
 }
 
-function disconnect () {
-  this.port.disconnect()
-}
-
-function sendMessage (msg) {
-  if (!this.port) throw new Error('You dont have connection. Please connect before')
-  if (this.debug) console.log('Send message: ', msg)
-  this.port.postMessage(msg)
+function stop () {
+  this.extConnection.disconnect()
+  this.pageConnection.disconnect()
 }
 
 /**
- * RemoteAccount
+ * ContentScriptBridge
  * @function
  * @alias module:@aeternity/aepp-sdk/es/account/remote
  * @rtype Stamp
@@ -61,14 +54,15 @@ function sendMessage (msg) {
  * @param {String} options.keypair.secretKey - Private key
  * @return {Account}
  */
-
-export const BrowserRuntimeConnection = stampit({
-  init ({ connectionInfo = {}, port, debug = false }) {
-    this.debug = debug
-    this.connectionInfo = connectionInfo
-    this.port = port || getBrowserAPI().runtime.connect(...[connectionInfo.id || undefined])
+export const ContentScriptBridge = stampit({
+  init ({ pageConnection, extConnection }) {
+    if (!window) throw new Error('Window object not found, you can run bridge only in browser')
+    if (!pageConnection) throw new Error('pageConnection required')
+    if (!extConnection) throw new Error('extConnection required')
+    this.pageConnection = pageConnection
+    this.extConnection = extConnection
   },
-  methods: { connect, sendMessage, disconnect, isConnected () { return this.port.onMessage.hasListeners() } }
-}, WalletConnection)
+  methods: { run, stop }
+})
 
-export default BrowserRuntimeConnection
+export default ContentScriptBridge

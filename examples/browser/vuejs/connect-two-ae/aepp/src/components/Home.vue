@@ -344,7 +344,6 @@
           this.addressResponse = await errorAsField(this.client.address())
         },
         onDisconnect (a) {
-          debugger
         }
       })
       this.height = await this.client.height()

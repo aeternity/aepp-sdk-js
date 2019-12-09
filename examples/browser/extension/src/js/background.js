@@ -104,7 +104,7 @@ RpcWallet({
     wallet.addRpcClient(connection)
     //
     wallet.shareWalletInfo(port.postMessage.bind(port))
-    setTimeout(() => wallet.shareWalletInfo(port.postMessage.bind(port)), 10000)
+    setTimeout(() => wallet.shareWalletInfo(port.postMessage.bind(port)), 3000)
   })
 }).catch(err => {
   console.error(err)
