@@ -26,7 +26,7 @@ import Channel from '../../es/channel'
 
 const wsUrl = process.env.TEST_WS_URL || 'ws://localhost:3014/channel'
 
-plan(BigNumber('1000e18').toString())
+plan(BigNumber('10000e18').toString())
 
 const identityContract = `
 contract Identity =
@@ -133,8 +133,6 @@ describe('Channel', function () {
       initiatorAmount: sharedParams.initiatorAmount.toString(),
       responderAmount: sharedParams.responderAmount.toString(),
       channelReserve: sharedParams.channelReserve.toString(),
-      // TODO: investigate why ttl is "0"
-      // ttl: sharedParams.ttl.toString(),
       lockPeriod: sharedParams.lockPeriod.toString()
     }
     const { txType: initiatorTxType, tx: initiatorTx } = unpackTx(initiatorSign.firstCall.args[1])
@@ -392,8 +390,7 @@ describe('Channel', function () {
     initiatorCh.sendMessage(info, recipient)
     const message = await new Promise(resolve => responderCh.on('message', resolve))
     message.should.eql({
-      // TODO: don't ignore `channel_id` equality check
-      channel_id: message.channel_id,
+      channel_id: initiatorCh.id(),
       from: sender,
       to: recipient,
       info
@@ -1138,9 +1135,11 @@ describe('Channel', function () {
     )
     result.accepted.should.equal(true)
     result.signedTx.should.be.a('string')
+    initiatorCh.disconnect()
+    initiatorCh.disconnect()
   })
 
-  describe.skip('throws errors', function () {
+  describe('throws errors', function () {
     before(async function () {
       initiatorCh.disconnect()
       responderCh.disconnect()
