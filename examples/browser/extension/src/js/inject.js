@@ -4,20 +4,14 @@ const readyStateCheckInterval = setInterval(function () {
 
     const port = chrome.runtime.connect()
     port.onMessage.addListener(function (msg) {
-      window.postMessage(msg, window.origin)
+      window.postMessage({ type: 'to_aepp', data: msg }, window.origin)
     })
 
     window.addEventListener('message', function (event) {
-      // We only accept messages from ourselves
-      // if (["connection.announcePresence"].includes(event.data.method)) return
-      if (event.data.result || event.data.error) return
+      // We only accept messages from AEPP and exclude from our self
       if (event.source !== window) return
-      port.postMessage(event.data)
-
-      // Todo Think about how to exclude messages from ourself without changing message structure (page <-> content)
-      // if (event.data.type && (event.data.type == "FROM_PAGE")) {
-      //   console.log("Content script received: " + event.data.text);
-      // }
+      if (event.data.type !== 'to_wallet') return
+      port.postMessage(event.data.data)
     }, false)
   }
 }, 10)

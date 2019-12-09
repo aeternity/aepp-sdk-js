@@ -39,9 +39,11 @@ const handleDetection = (onDetected) => ({ method, params }, source) => {
       ...params,
       async getConnection () {
         // if detect extension wallet or page wallet
+        const isExtension = this.type === 'extension'
         return BrowserWindowMessageConnection({
           connectionInfo: this,
-          origin: this.type === 'extension' ? window.origin : this.origin,
+          origin: isExtension ? window.origin : this.origin,
+          isExtension,
           target: isInIframe() ? window.parent : source
         })
       }

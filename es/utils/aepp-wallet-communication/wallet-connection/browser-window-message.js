@@ -34,7 +34,12 @@ function connect (onMessage) {
   this.listener = (msg) => {
     if (!msg || typeof msg.data !== 'object') return
     if (origin && origin !== msg.origin) return
-    onMessage(msg.data, msg.source)
+    if (msg.data.type) {
+      if (msg.data.type !== 'to_aepp') return
+      onMessage(msg.data.data, msg.source)
+    } else {
+      onMessage(msg.data, msg.source)
+    }
   }
   this.subscribeFn(this.listener)
 }
@@ -46,7 +51,11 @@ function disconnect () {
 }
 
 function sendMessage (msg) {
-  this.postFn(msg)
+  if (this.isExtension) {
+    this.postFn({ type: 'to_wallet', data: msg })
+  } else {
+    this.postFn(msg)
+  }
 }
 
 /**
@@ -61,10 +70,11 @@ function sendMessage (msg) {
  * @return {Account}
  */
 export const BrowserWindowMessageConnection = AsyncInit.compose(WalletConnection, {
-  async init ({ connectionInfo = {}, target = window.parent, self = window, origin }) {
+  async init ({ connectionInfo = {}, target = window.parent, self = window, origin, isExtension = false }) {
     this.connectionInfo = { ...{ id: uuid() }, ...connectionInfo }
 
     this.origin = origin
+    this.isExtension = isExtension
     this.subscribeFn = (listener) => self.addEventListener('message', listener, false)
     this.unsubscribeFn = (listener) => self.removeEventListener('message', listener, false)
     this.postFn = (msg) => target.postMessage(msg, this.origin || '*')
