@@ -51,32 +51,6 @@ const accounts = [
   // account,
   account2
 ]
-//
-const postToContent = (data) => {
-  chrome.tabs.query({}, function (tabs) { // TODO think about direct communication with tab
-    const message = { method: 'pageMessage', data }
-    tabs.forEach(({ id }) => chrome.tabs.sendMessage(id, message)) // Send message to all tabs
-  })
-}
-
-// chrome.runtime.onConnect.addListener(function(port) {
-//   debugger
-//   console.assert(port.name == "knockknock");
-//   port.onMessage.addListener(function(msg) {
-//     if (msg.joke == "Knock knock")
-//       port.postMessage({question: "Who's there?"});
-//     else if (msg.answer == "Madame")
-//       port.postMessage({question: "Madame who?"});
-//     else if (msg.answer == "Madame... Bovary")
-//       port.postMessage({question: "I don't get it."});
-//   });
-// });
-//
-// chrome.runtime.onMessage.addListener(
-//   function (request, sender, sendResponse) {
-//     debugger
-//   })
-
 // Send wallet connection info to Aepp throug content script
 const NODE_URL = 'https://sdk-testnet.aepps.com'
 const NODE_INTERNAL_URL = 'https://sdk-testnet.aepps.com'
@@ -123,26 +97,15 @@ RpcWallet({
     }
   }
 }).then(wallet => {
-  chrome.runtime.onConnect.addListener(async function(port) {
+  chrome.runtime.onConnect.addListener(async function (port) {
     // create Connection
     const connection = await BrowserRuntimeConnection({ connectionInfo: { id: port.sender.frameId }, port })
     // add new aepp to wallet
     wallet.addRpcClient(connection)
     //
     wallet.shareWalletInfo(port.postMessage.bind(port))
-    setTimeout(() => wallet.shareWalletInfo(port.postMessage.bind(port)), 3000)
-  });
-  // Subscribe for runtime connection
-  // chrome.runtime.onConnectExternal.addListener(async (port) => {
-  //   // create Connection
-  //   const connection = await BrowserRuntimeConnection({ connectionInfo: { id: port.sender.frameId }, port })
-  //   // add new aepp to wallet
-  //   wallet.addRpcClient(connection)
-  // })
-  // Share wallet info with extensionId to the page
-  // debugger
-  // Send wallet connection info to Aepp throug content script
-
+    setTimeout(() => wallet.shareWalletInfo(port.postMessage.bind(port)), 10000)
+  })
 }).catch(err => {
   console.error(err)
 })

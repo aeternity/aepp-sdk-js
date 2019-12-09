@@ -27,15 +27,16 @@
 import WalletConnection from '.'
 import AsyncInit from '../../async-init'
 import uuid from 'uuid/v4'
+import { MESSAGE_DIRECTION } from '../schema'
 
-function connect (onMessage) {
+function connect (onMessage, direction = MESSAGE_DIRECTION.to_aepp) {
   const origin = this.origin
   if (this.listener) throw new Error('You already connected')
   this.listener = (msg) => {
     if (!msg || typeof msg.data !== 'object') return
     if (origin && origin !== msg.origin) return
     if (msg.data.type) {
-      if (msg.data.type !== 'to_aepp') return
+      if (msg.data.type !== direction) return
       onMessage(msg.data.data, msg.source)
     } else {
       onMessage(msg.data, msg.source)
@@ -51,8 +52,8 @@ function disconnect () {
 }
 
 function sendMessage (msg) {
-  if (this.isExtension) {
-    this.postFn({ type: 'to_wallet', data: msg })
+  if (this.toContentScript) {
+    this.postFn({ type: MESSAGE_DIRECTION.to_waellet, data: msg })
   } else {
     this.postFn(msg)
   }
@@ -70,11 +71,11 @@ function sendMessage (msg) {
  * @return {Account}
  */
 export const BrowserWindowMessageConnection = AsyncInit.compose(WalletConnection, {
-  async init ({ connectionInfo = {}, target = window.parent, self = window, origin, isExtension = false }) {
+  async init ({ connectionInfo = {}, target = window.parent, self = window, origin, toContentScript = false }) {
     this.connectionInfo = { ...{ id: uuid() }, ...connectionInfo }
 
     this.origin = origin
-    this.isExtension = isExtension
+    this.toContentScript = toContentScript
     this.subscribeFn = (listener) => self.addEventListener('message', listener, false)
     this.unsubscribeFn = (listener) => self.removeEventListener('message', listener, false)
     this.postFn = (msg) => target.postMessage(msg, this.origin || '*')

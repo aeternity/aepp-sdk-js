@@ -4,6 +4,8 @@ const asEnum = (array) => R.zipObj(array, array)
 
 export const VERSION = 1
 
+export const MESSAGE_DIRECTION = asEnum(['to_waellet', 'to_aepp'])
+
 export const WALLET_TYPE = asEnum([
   'window',
   'extension'
