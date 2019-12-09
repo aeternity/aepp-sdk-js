@@ -4,7 +4,7 @@ const readyStateCheckInterval = setInterval(function () {
 
     const port = chrome.runtime.connect()
     port.onMessage.addListener(function (msg) {
-      window.postMessage(msg, '*')
+      window.postMessage(msg, window.origin)
     })
 
     window.addEventListener('message', function (event) {
@@ -21,4 +21,3 @@ const readyStateCheckInterval = setInterval(function () {
     }, false)
   }
 }, 10)
-

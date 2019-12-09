@@ -29,10 +29,11 @@ import AsyncInit from '../../async-init'
 import uuid from 'uuid/v4'
 
 function connect (onMessage) {
+  const origin = this.origin
   if (this.listener) throw new Error('You already connected')
   this.listener = (msg) => {
     if (!msg || typeof msg.data !== 'object') return
-    // if (origin && origin !== msg.origin) return
+    if (origin && origin !== msg.origin) return
     onMessage(msg.data, msg.source)
   }
   this.subscribeFn(this.listener)
@@ -66,10 +67,10 @@ export const BrowserWindowMessageConnection = AsyncInit.compose(WalletConnection
     this.origin = origin
     this.subscribeFn = (listener) => self.addEventListener('message', listener, false)
     this.unsubscribeFn = (listener) => self.removeEventListener('message', listener, false)
-    this.postFn = (msg) => target.postMessage(msg, '*')
+    this.postFn = (msg) => target.postMessage(msg, this.origin || '*')
     if (!this.connectionInfo.id) throw new Error('ID required.')
   },
-  methods: { connect, sendMessage, disconnect, isConnected () { return this.listener} }
+  methods: { connect, sendMessage, disconnect, isConnected () { return this.listener } }
 })
 
 export default BrowserWindowMessageConnection
