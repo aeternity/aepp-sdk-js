@@ -12,7 +12,7 @@
     "docs:docco": "docco -t tooling/docs/markdown.jst -c /dev/null examples/node/*.js && docco -t tooling/docs/markdown.jst -c /dev/null && docco -t tooling/docs/markdown.jst -c /dev/null &&  rm -f docs/null && node rename-to-md.js",
     "docs:api": "node apidoc.js",
     "test": "mocha --recursive --require @babel/register",
-    "test-channel": "mocha \"./test/integration/channel.js\" --require @babel/register",
+    "test-channel": "mocha \"./test/integration/channel.js\" --require @babel/register --exit",
     "test-aens": "mocha \"./test/integration/aens.js\" --require @babel/register",
     "test-else": "mocha \"./test/**/!(aens|channel).js\" --require @babel/register",
     "test:watch": "mocha --recursive --require @babel/register --watch",
