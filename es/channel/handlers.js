@@ -20,6 +20,7 @@ import {
   options,
   changeStatus,
   changeState,
+  call,
   send,
   emit,
   channelId,
@@ -72,6 +73,16 @@ export function awaitingConnection (channel, message, state) {
     emit(channel, 'error', new Error(message.payload.message))
     return { handler: channelClosed }
   }
+}
+
+export async function awaitingReconnection (channel, message, state) {
+  if (message.method === 'channels.info') {
+    if (message.params.data.event === 'fsm_up') {
+      changeState(channel, (await call(channel, 'channels.get.offchain_state', {})).signed_tx)
+      return { handler: channelOpen }
+    }
+  }
+  return handleUnexpectedMessage(channel, message, state)
 }
 
 export async function awaitingChannelCreateTx (channel, message, state) {
@@ -164,6 +175,7 @@ export async function channelOpen (channel, message, state) {
         case 'deposit_locked':
         case 'peer_disconnected':
         case 'channel_reestablished':
+        case 'fsm_up':
         case 'open':
           // TODO: Better handling of peer_disconnected event.
           //
