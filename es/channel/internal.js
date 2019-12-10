@@ -20,7 +20,11 @@ import { EventEmitter } from 'events'
 import * as R from 'ramda'
 import JSONBig from '../utils/json-big'
 import { pascalToSnake } from '../utils/string'
-import { awaitingConnection, channelClosed, channelOpen } from './handlers'
+import {
+  awaitingConnection,
+  awaitingReconnection,
+  channelOpen
+} from './handlers'
 
 // Send ping message every 10 seconds
 const PING_TIMEOUT_MS = 10000
@@ -221,7 +225,11 @@ async function initialize (channel, channelOptions) {
   const wsUrl = channelURL(url, { ...params, protocol: 'json-rpc' })
 
   options.set(channel, channelOptions)
-  fsm.set(channel, { handler: params.reconnectTx ? channelClosed : awaitingConnection })
+  if (params.existingFsmId) {
+    fsm.set(channel, { handler: awaitingReconnection })
+  } else {
+    fsm.set(channel, { handler: awaitingConnection })
+  }
   eventEmitters.set(channel, new EventEmitter())
   sequence.set(channel, 0)
   rpcCallbacks.set(channel, new Map())
