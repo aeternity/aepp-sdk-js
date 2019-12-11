@@ -24,7 +24,8 @@ import {
   send,
   emit,
   channelId,
-  disconnect
+  disconnect,
+  fsmId
 } from './internal'
 import { unpackTx, buildTx } from '../tx/builder'
 
@@ -67,6 +68,10 @@ export function awaitingConnection (channel, message, state) {
     if (message.params.data.event === 'channel_reestablished') {
       return { handler: awaitingOpenConfirmation }
     }
+    if (message.params.data.event === 'fsm_up') {
+      fsmId.set(channel, message.params.data.fsm_id)
+      return { handler: awaitingConnection }
+    }
     return { handler: awaitingConnection }
   }
   if (message.method === 'channels.error') {
@@ -78,6 +83,7 @@ export function awaitingConnection (channel, message, state) {
 export async function awaitingReconnection (channel, message, state) {
   if (message.method === 'channels.info') {
     if (message.params.data.event === 'fsm_up') {
+      fsmId.set(channel, message.params.data.fsm_id)
       changeState(channel, (await call(channel, 'channels.get.offchain_state', {})).signed_tx)
       return { handler: channelOpen }
     }
@@ -175,13 +181,15 @@ export async function channelOpen (channel, message, state) {
         case 'deposit_locked':
         case 'peer_disconnected':
         case 'channel_reestablished':
-        case 'fsm_up':
         case 'open':
           // TODO: Better handling of peer_disconnected event.
           //
           //       We should enter intermediate state where offchain transactions
           //       are blocked until channel is reestablished.
           emit(channel, message.params.data.event)
+          return { handler: channelOpen }
+        case 'fsm_up':
+          fsmId.set(channel, message.params.data.fsm_id)
           return { handler: channelOpen }
         case 'close_mutual':
           return { handler: channelOpen }
