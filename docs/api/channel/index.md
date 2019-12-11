@@ -17,6 +17,7 @@ import Channel from '@aeternity/aepp-sdk/es/channel/index'
         * [~state()](#module_@aeternity/aepp-sdk/es/channel/index--Channel..state) ⇒ `Promise.&lt;Object&gt;`
         * [~round()](#module_@aeternity/aepp-sdk/es/channel/index--Channel..round) ⇒ `Number`
         * [~id()](#module_@aeternity/aepp-sdk/es/channel/index--Channel..id) ⇒ `String`
+        * [~fsmId()](#module_@aeternity/aepp-sdk/es/channel/index--Channel..fsmId) ⇒ `String`
         * [~update(from, to, amount, sign, metadata)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..update) ⇒ `Promise.&lt;Object&gt;`
         * [~poi(addresses)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..poi) ⇒ `Promise.&lt;String&gt;`
         * [~balances(accounts)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..balances) ⇒ `Promise.&lt;Object&gt;`
@@ -150,6 +151,12 @@ it will return `null`.
 
 #### Channel~id() ⇒ `String`
 Get channel id
+
+**Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
+<a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..fsmId"></a>
+
+#### Channel~fsmId() ⇒ `String`
+Get channel's fsm id
 
 **Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
 <a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..update"></a>
