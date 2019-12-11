@@ -1,3 +1,12 @@
+## [6.1.3](https://github.com/aeternity/aepp-sdk-js/compare/6.1.2...6.1.3) (2019-12-11)
+
+
+### Bug Fixes
+
+* **Channel:** 5.2.0 compatibility ([4be8eb8](https://github.com/aeternity/aepp-sdk-js/commit/4be8eb8))
+
+
+
 ## [6.1.2](https://github.com/aeternity/aepp-sdk-js/compare/6.1.1...6.1.2) (2019-11-12)
 
 
