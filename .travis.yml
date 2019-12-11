@@ -2,7 +2,6 @@ branches:
   only:
     - master
     - develop
-    - feature/ci-daily-builds
 
 dist: xenial
 
