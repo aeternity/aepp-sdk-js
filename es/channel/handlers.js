@@ -181,7 +181,6 @@ export async function channelOpen (channel, message, state) {
         case 'deposit_locked':
         case 'peer_disconnected':
         case 'channel_reestablished':
-        case 'fsm_up':
         case 'open':
           // TODO: Better handling of peer_disconnected event.
           //
