@@ -32,6 +32,7 @@ env:
     - TEST_WS_URL=ws://localhost:3014/channel
     - TEST_NETWORK_ID=ae_devnet
     - COMPILER_URL=http://localhost:3080
+    - FORCE_COMPATIBILITY=false
 
 before_install:
   - docker-compose up -d node compiler
@@ -42,14 +43,25 @@ install:
 jobs:
   include:
     - stage: Tests
+      if: type != "cron"
       name: Test AENS
       script:
         - npm run test-aens
     - stage: Tests
+      if: type != "cron"
       name: Test Channel
       script:
         - npm run test-channel
     - stage: Tests
+      if: type != "cron"
       name: Test Contract, Node, Oracle, Account and else
       script:
         - npm run test-else
+    - stage: Tests
+      if: type = "cron"
+      env:
+        - NODE_TAG=master
+        - COMPILER_TAG=latest
+        - FORCE_COMPATIBILITY=true
+      script:
+        - npm run test
