@@ -128,8 +128,8 @@ async function poll (th, { blocks = 10, interval = 5000 } = {}) {
   const max = await this.height() + blocks
 
   async function probe () {
-    const tx = await instance.tx(th)
-    if (tx.blockHeight !== -1) {
+    const tx = await instance.tx(th).catch(_ => null)
+    if (tx && tx.blockHeight !== -1) {
       return tx
     }
     if (await instance.height() < max) {
