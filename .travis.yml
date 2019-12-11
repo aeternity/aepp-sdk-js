@@ -47,16 +47,19 @@ jobs:
       name: Test AENS
       script:
         - npm run test-aens
+        - npm run report-coverage
     - stage: Tests
       if: type != "cron"
       name: Test Channel
       script:
         - npm run test-channel
+        - npm run report-coverage
     - stage: Tests
       if: type != "cron"
       name: Test Contract, Node, Oracle, Account and else
       script:
         - npm run test-else
+        - npm run report-coverage
     - stage: Tests
       if: type = "cron"
       env:
@@ -65,3 +68,4 @@ jobs:
         - FORCE_COMPATIBILITY=true
       script:
         - npm run test
+        - npm run report-coverage
