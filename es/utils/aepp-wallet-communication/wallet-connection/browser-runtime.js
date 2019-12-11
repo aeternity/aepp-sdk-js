@@ -51,15 +51,15 @@ function sendMessage (msg) {
 }
 
 /**
- * RemoteAccount
+ * BrowserRuntimeConnection
  * @function
- * @alias module:@aeternity/aepp-sdk/es/account/remote
+ * @alias module:@aeternity/aepp-sdk/es/utils/wallet-connection/browser-runtime
  * @rtype Stamp
- * @param {Object} [options={}] - Initializer object
- * @param {Object} options.keypair - Key pair to use
- * @param {String} options.keypair.publicKey - Public key
- * @param {String} options.keypair.secretKey - Private key
- * @return {Account}
+ * @param {Object} [params={}] - Initializer object
+ * @param {Object} params.connectionInfo - Connection info object
+ * @param {Object} params.port - Runtime `port` object
+ * @param {Boolean} [params.debug=false] - Debug flag
+ * @return {BrowserRuntimeConnection}
  */
 
 export const BrowserRuntimeConnection = stampit({

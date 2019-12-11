@@ -17,12 +17,12 @@
  */
 
 /**
- * Browser runtime connector module
+ * Browser window Post Message connector module
  *
  * This is the complement to {@link module:@aeternity/aepp-sdk/es/utils/wallet-connection}.
- * @module @aeternity/aepp-sdk/es/utils/wallet-connection/browser-runtime
- * @export BrowserRuntimeConnection
- * @example import BrowserRuntimeConnection from '@aeternity/aepp-sdk/es/utils/wallet-connection/browser-runtime'
+ * @module @aeternity/aepp-sdk/es/utils/wallet-connection/browser-window-message
+ * @export BrowserWindowMessageConnection
+ * @example import BrowserWindowMessageConnection from '@aeternity/aepp-sdk/es/utils/wallet-connection/browser-window-message'
  */
 import stampit from '@stamp/it'
 import WalletConnection from '.'
@@ -65,13 +65,17 @@ debugger
 /**
  * BrowserWindowMessageConnection
  * @function
- * @alias module:@aeternity/aepp-sdk/es/account/remote
+ * @alias module:@aeternity/aepp-sdk/es/utils/wallet-connection/browser-window-message
  * @rtype Stamp
- * @param {Object} [options={}] - Initializer object
- * @param {Object} options.keypair - Key pair to use
- * @param {String} options.keypair.publicKey - Public key
- * @param {String} options.keypair.secretKey - Private key
- * @return {Account}
+ * @param {Object} [params={}] - Initializer object
+ * @param {Object} params.connectionInfo - Connection info object
+ * @param {Object} [params.target=window.parent] - Target window for message
+ * @param {Object} [params.self=window] - Host window for message
+ * @param {Object} [params.origin] - Origin of receiver
+ * @param {Object} params.sendDirection - Optional field for wrapping messages in additional structure({ type: 'to_aepp' || 'to_waellet', data }).Used for handling messages netween content script and page
+ * @param {Object} [params.receiveDirection='to_aepp'] - Optional(default: 'to_aepp') field for unwrapping messages from additional structure({ type: 'to_aepp' || 'to_waellet', data }).Used for handling messages netween content script and page
+ * @param {Boolean} [params.debug=false] - Debug flag
+ * @return {BrowserWindowMessageConnection}
  */
 export const BrowserWindowMessageConnection = stampit({
   init ({ connectionInfo = {}, target = window.parent, self = window, origin, sendDirection, receiveDirection = MESSAGE_DIRECTION.to_aepp, debug = false }) {
