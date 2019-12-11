@@ -46,6 +46,7 @@ const channelId = new WeakMap()
 const rpcCallbacks = new WeakMap()
 const pingTimeoutId = new WeakMap()
 const pongTimeoutId = new WeakMap()
+const fsmId = new WeakMap()
 
 function channelURL (url, params) {
   const paramString = R.join('&', R.values(R.mapObjIndexed((value, key) =>
@@ -268,5 +269,6 @@ export {
   enqueueAction,
   channelId,
   call,
-  disconnect
+  disconnect,
+  fsmId
 }
