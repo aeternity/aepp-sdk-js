@@ -5,7 +5,7 @@
 [![Build Status](https://travis-ci.com/aeternity/aepp-sdk-js.svg?branch=develop)](http://travis-ci.com/aeternity/aepp-sdk-js?branch=develop)
 [![npm](https://img.shields.io/npm/v/@aeternity/aepp-sdk.svg)](https://www.npmjs.com/package/@aeternity/aepp-sdk)
 [![npm](https://img.shields.io/npm/l/@aeternity/aepp-sdk.svg)](https://www.npmjs.com/package/@aeternity/aepp-sdk) [![Greenkeeper badge](https://badges.greenkeeper.io/aeternity/aepp-sdk-js.svg)](https://greenkeeper.io/)
-
+[![codecov](https://codecov.io/gh/aeternity/aepp-sdk-js/branch/master/graph/badge.svg)](https://codecov.io/gh/aeternity/aepp-sdk-js)
 JavaScript SDK for the revolutionary [æternity] blockchain, targeting the
 [æternity node] implementation. Aepp-sdk is [hosted on GitHub].
 
