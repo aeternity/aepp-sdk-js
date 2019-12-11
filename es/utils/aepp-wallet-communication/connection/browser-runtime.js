@@ -19,10 +19,10 @@
 /**
  * Browser runtime connector module
  *
- * This is the complement to {@link module:@aeternity/aepp-sdk/es/utils/wallet-connection}.
- * @module @aeternity/aepp-sdk/es/utils/wallet-connection/browser-runtime
+ * This is the complement to {@link module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection}.
+ * @module @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-runtime
  * @export BrowserRuntimeConnection
- * @example import BrowserRuntimeConnection from '@aeternity/aepp-sdk/es/utils/wallet-connection/browser-runtime'
+ * @example import BrowserRuntimeConnection from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-runtime'
  */
 import stampit from '@stamp/it'
 import WalletConnection from '.'
@@ -53,7 +53,7 @@ function sendMessage (msg) {
 /**
  * BrowserRuntimeConnection
  * @function
- * @alias module:@aeternity/aepp-sdk/es/utils/wallet-connection/browser-runtime
+ * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-runtime
  * @rtype Stamp
  * @param {Object} [params={}] - Initializer object
  * @param {Object} params.connectionInfo - Connection info object

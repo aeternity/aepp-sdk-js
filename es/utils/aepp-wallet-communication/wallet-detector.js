@@ -19,13 +19,13 @@
 /**
  * Browser runtime connector module
  *
- * This is the complement to {@link module:@aeternity/aepp-sdk/es/utils/wallet-connection}.
- * @module @aeternity/aepp-sdk/es/utils/wallet-connection/browser-runtime
+ * This is the complement to {@link module:@aeternity/aepp-sdk/es/utils/connection}.
+ * @module @aeternity/aepp-sdk/es/utils/connection/browser-runtime
  * @export BrowserRuntimeConnection
- * @example import BrowserRuntimeConnection from '@aeternity/aepp-sdk/es/utils/wallet-connection/browser-runtime'
+ * @example import BrowserRuntimeConnection from '@aeternity/aepp-sdk/es/utils/connection/browser-runtime'
  */
 import AsyncInit from '../async-init'
-import BrowserWindowMessageConnection from './wallet-connection/browser-window-message'
+import BrowserWindowMessageConnection from './connection/browser-window-message'
 import { MESSAGE_DIRECTION, METHODS } from './schema'
 import { isInIframe } from './helpers'
 

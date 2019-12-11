@@ -7,6 +7,13 @@ import Account from '../../../account'
 import uuid from 'uuid/v4'
 import * as R from 'ramda'
 
+/**
+ * Content Script Bridge module
+ *
+ * @module @aeternity/aepp-sdk/es/utils/wallet-aepp-wallet-communication/browser-runtime
+ * @export ContentScriptBridge
+ * @example import ContentScriptBridge from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/browser-runtime'
+ */
 const NOTIFICATIONS = {
   [METHODS.wallet.updateAddress]: (instance) =>
     ({ params }) => {

@@ -17,15 +17,20 @@
  */
 
 /**
- * Browser runtime connector module
+ * Content Script Bridge module
  *
- * This is the complement to {@link module:@aeternity/aepp-sdk/es/utils/wallet-connection}.
- * @module @aeternity/aepp-sdk/es/utils/wallet-connection/browser-runtime
- * @export BrowserRuntimeConnection
- * @example import BrowserRuntimeConnection from '@aeternity/aepp-sdk/es/utils/wallet-connection/browser-runtime'
+ * @module @aeternity/aepp-sdk/es/utils/wallet-aepp-wallet-communication/browser-runtime
+ * @export ContentScriptBridge
+ * @example import ContentScriptBridge from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/browser-runtime'
  */
 import stampit from '@stamp/it'
 
+/**
+ * Start message proxy
+ * @function run
+ * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication
+ * @return {void}
+ */
 function run () {
   // Connect to extension using runtime
   this.extConnection.connect((msg) => {
@@ -38,6 +43,12 @@ function run () {
   })
 }
 
+/**
+ * Stop message proxy
+ * @function stop
+ * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication
+ * @return {void}
+ */
 function stop () {
   this.extConnection.disconnect()
   this.pageConnection.disconnect()
@@ -46,13 +57,12 @@ function stop () {
 /**
  * ContentScriptBridge
  * @function
- * @alias module:@aeternity/aepp-sdk/es/account/remote
+ * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication
  * @rtype Stamp
- * @param {Object} [options={}] - Initializer object
- * @param {Object} options.keypair - Key pair to use
- * @param {String} options.keypair.publicKey - Public key
- * @param {String} options.keypair.secretKey - Private key
- * @return {Account}
+ * @param {Object} [params={}] - Initializer object
+ * @param {Object} params.pageConnection - Page connection object(@link module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message)
+ * @param {String} params.extConnection - Extension connection object(module: @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-runtime)
+ * @return {ContentScriptBridge}
  */
 export const ContentScriptBridge = stampit({
   init ({ pageConnection, extConnection }) {

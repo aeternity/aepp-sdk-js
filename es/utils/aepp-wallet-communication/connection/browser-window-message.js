@@ -19,10 +19,10 @@
 /**
  * Browser window Post Message connector module
  *
- * This is the complement to {@link module:@aeternity/aepp-sdk/es/utils/wallet-connection}.
- * @module @aeternity/aepp-sdk/es/utils/wallet-connection/browser-window-message
+ * This is the complement to {@link module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection}.
+ * @module @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message
  * @export BrowserWindowMessageConnection
- * @example import BrowserWindowMessageConnection from '@aeternity/aepp-sdk/es/utils/wallet-connection/browser-window-message'
+ * @example import BrowserWindowMessageConnection from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message'
  */
 import stampit from '@stamp/it'
 import WalletConnection from '.'
@@ -57,7 +57,6 @@ function disconnect () {
 
 function sendMessage (msg) {
   const message = this.sendDirection ? { type: this.sendDirection, data: msg } : msg
-debugger
   if (this.debug) console.log('Send message: ', message)
   this.postFn(message)
 }
@@ -65,7 +64,7 @@ debugger
 /**
  * BrowserWindowMessageConnection
  * @function
- * @alias module:@aeternity/aepp-sdk/es/utils/wallet-connection/browser-window-message
+ * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message
  * @rtype Stamp
  * @param {Object} [params={}] - Initializer object
  * @param {Object} params.connectionInfo - Connection info object
