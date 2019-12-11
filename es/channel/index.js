@@ -36,7 +36,8 @@ import {
   send,
   channelId,
   call,
-  disconnect as channelDisconnect
+  disconnect as channelDisconnect,
+  fsmId as channelFsmId
 } from './internal'
 import * as R from 'ramda'
 
@@ -134,6 +135,15 @@ function round () {
  */
 function id () {
   return channelId.get(this)
+}
+
+/**
+ * Get channel's fsm id
+ *
+ * @return {String}
+ */
+function fsmId () {
+  return channelFsmId.get(this)
 }
 
 /**
@@ -783,6 +793,7 @@ const Channel = AsyncInit.compose({
     state,
     round,
     id,
+    fsmId,
     update,
     poi,
     balances,
