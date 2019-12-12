@@ -3,6 +3,8 @@
 ### Extension wallet
 
 - First we need to create an bridge between our extension and page
+This can be done by subscribing for window `message` event from the `page`
+and redirecting them using chrome|firefox `runtime` connection to the `extension` and back
 
 ```js
 // inject.js file
@@ -46,7 +48,8 @@ const readyStateCheckInterval = setInterval(function () {
 }, 10)
 
 ```
-- then init Wallet stamp in our extension
+- Then we need to initialize `Waellet` stamp in our extension and subscribe for new `runtime` connection's
+After connection will be established we can start to send `announcePresence` message to the `page` to let `Aepp` know about `Waellet` 
 ```js
 // background.js
 
@@ -83,6 +86,7 @@ RpcWallet({
   compilerUrl: COMPILER_URL,
   name: 'ExtensionWallet',
   accounts,
+  // Call-back for new connection request
   onConnection (aepp, action) {
     if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to connect`)) {
       action.accept()
@@ -90,9 +94,11 @@ RpcWallet({
       action.deny()
     }
   },
+  // Call-back for disconnect event
   onDisconnect (msg, client) {
     client.disconnect()
   },
+  // Call-back for account subscription request
   onSubscription (aepp, action) {
     if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} want to subscribe for accounts`)) {
       action.accept()
@@ -100,6 +106,7 @@ RpcWallet({
       action.deny()
     }
   },
+  // Call-back for sign request
   onSign (aepp, action) {
     if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} want to sign tx ${action.params.tx}`)) {
       action.accept()
@@ -107,6 +114,7 @@ RpcWallet({
       action.deny()
     }
   },
+  // Call-back get accounts request
   onAskAccounts (aepp, { accept, deny }) {
     if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to get accounts`)) {
       accept()
