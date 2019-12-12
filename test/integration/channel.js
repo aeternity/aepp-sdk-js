@@ -1065,19 +1065,35 @@ describe('Channel', function () {
     result.accepted.should.be.true
     const channelId = await initiatorCh.id()
     const round = initiatorCh.round()
-    initiatorCh.disconnect()
-    const ch = await Channel.reconnect({
-      ...sharedParams,
-      role: 'initiator',
-      port: 3006,
-      sign: initiatorSign
-    }, {
-      channelId,
-      round,
-      role: 'initiator',
-      pubkey: await initiator.address()
-    })
-    await waitForChannel(ch)
+    let ch
+    if (majorVersion > 5 || (majorVersion === 5 && minorVersion >= 2)) {
+      const fsmId = initiatorCh.fsmId()
+      initiatorCh.disconnect()
+      ch = await Channel({
+        url: sharedParams.url,
+        host: sharedParams.host,
+        port: 3006,
+        role: 'initiator',
+        existingChannelId: channelId,
+        existingFsmId: fsmId
+      })
+      await waitForChannel(ch)
+      ch.fsmId().should.equal(fsmId)
+    } else {
+      initiatorCh.disconnect()
+      ch = await Channel.reconnect({
+        ...sharedParams,
+        role: 'initiator',
+        port: 3006,
+        sign: initiatorSign
+      }, {
+        channelId,
+        round,
+        role: 'initiator',
+        pubkey: await initiator.address()
+      })
+      await waitForChannel(ch)
+    }
     // TODO: why node doesn't return signed_tx when channel is reestablished?
     // await new Promise((resolve) => {
     //   const checkRound = () => {
@@ -1089,6 +1105,7 @@ describe('Channel', function () {
     //   ch.on('stateChanged', checkRound)
     // })
     ch.state().should.eventually.be.fulfilled
+    await new Promise(resolve => setTimeout(resolve, 10 * 1000))
   })
 
   it('can post backchannel update', async () => {
