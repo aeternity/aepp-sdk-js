@@ -198,8 +198,7 @@
   //  is a webpack alias present in webpack.config.js
   import { RpcAepp } from '@aeternity/aepp-sdk/es'
   import Detector from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector'
-  import BrowserWindowMessageConnection from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-connection/browser-window-message'
-  import { isValidKeypair } from '../../../../../../../es/utils/crypto'
+  import BrowserWindowMessageConnection from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message'
 
   // Send wallet connection info to Aepp throug content script
   const NODE_URL = 'https://sdk-testnet.aepps.com'

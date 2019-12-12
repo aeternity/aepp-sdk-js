@@ -163,12 +163,17 @@ const handleMessage = (instance, id) => async (msg) => {
  */
 export const WalletRpc = Ae.compose(Accounts, Selector, {
   init ({ name, onConnection, onSubscription, onSign, onDisconnect, onAskAccounts }) {
+    const eventsHandlers = ['onConnection', 'onSubscription', 'onSign', 'onDisconnect']
     // CallBacks for events
     this.onConnection = onConnection
     this.onSubscription = onSubscription
     this.onSign = onSign
     this.onDisconnect = onDisconnect
     this.onAskAccounts = onAskAccounts
+
+    eventsHandlers.forEach(event => {
+      if (typeof this[event] !== 'function') throw new Error(`Call-back for ${event} must be an function!`)
+    })
     //
     this.name = name
     this.id = uuid()

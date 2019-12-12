@@ -44,8 +44,8 @@
   import { MemoryAccount, RpcWallet } from '@aeternity/aepp-sdk/es'
   import Node from '@aeternity/aepp-sdk/es/node'
   import BrowserWindowMessageConnection
-    from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-connection/browser-window-message'
-  import { generateKeyPair } from '../../../../../../../es/utils/crypto'
+    from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message'
+  import { generateKeyPair } from '@aeternity/aepp-sdk/es/utils/crypto'
 
   export default {
     data () {

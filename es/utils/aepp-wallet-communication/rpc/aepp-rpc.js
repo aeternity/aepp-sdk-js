@@ -87,6 +87,7 @@ const handleMessage = (instance) => async (msg) => {
  */
 export const AeppRpc = Ae.compose(Account, {
   async init ({ name, onAddressChange = voidFn, onDisconnect = voidFn, onNetworkChange = voidFn, connection }) {
+    const eventsHandlers = ['onDisconnect', 'onAddressChange', 'onNetworkChange']
     this.connection = connection
     this.name = name
     this.accounts = {}
@@ -95,19 +96,18 @@ export const AeppRpc = Ae.compose(Account, {
       // Init RPCClient
       await this.connectToWallet(connection)
     }
-
-    // Validate call-back fn's
-    ['onDisconnect', 'onAddressChange', 'onNetworkChange']
-      .forEach(event => {
-        if (typeof this[event] !== 'function') throw new Error(`Call-back for ${event} must be an function!`)
-      })
     // Event callbacks
     this.onDisconnect = onDisconnect
     this.onAddressChange = onAddressChange
     this.onNetworkChange = onNetworkChange
+    // validation
+    eventsHandlers.forEach(event => {
+      if (typeof this[event] !== 'function') throw new Error(`Call-back for ${event} must be an function!`)
+    })
   },
   methods: {
-    sign () {},
+    sign () {
+    },
     /**
      * Connect to wallet
      * @function connectToWallet
