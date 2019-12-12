@@ -29,6 +29,25 @@ import WalletConnection from '.'
 import uuid from 'uuid/v4'
 import { MESSAGE_DIRECTION } from '../schema'
 
+/**
+ * Check if connected
+ * @function isConnected
+ * @instance
+ * @rtype () => Boolean
+ * @return {Boolean} Is connected
+ */
+function isConnected () {
+  return this.listener
+}
+
+/**
+ * Connect
+ * @function connect
+ * @instance
+ * @rtype (onMessage: Function) => void
+ * @param {Function} onMessage - Message handler
+ * @return {void}
+ */
 function connect (onMessage) {
   const origin = this.origin
   const receiveDirection = this.receiveDirection
@@ -49,12 +68,27 @@ function connect (onMessage) {
   this.subscribeFn(this.listener)
 }
 
+/**
+ * Disconnect
+ * @function disconnect
+ * @instance
+ * @rtype () => void
+ * @return {void}
+ */
 function disconnect () {
   if (!this.listener) throw new Error('You dont have connection. Please connect before')
   this.unsubscribeFn(this.listener)
   this.listener = null
 }
 
+/**
+ * Send message
+ * @function sendMessage
+ * @instance
+ * @rtype (msg: Object) => void
+ * @param {Object} msg - Message
+ * @return {void}
+ */
 function sendMessage (msg) {
   const message = this.sendDirection ? { type: this.sendDirection, data: msg } : msg
   if (this.debug) console.log('Send message: ', message)
@@ -67,17 +101,17 @@ function sendMessage (msg) {
  * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message
  * @rtype Stamp
  * @param {Object} [params={}] - Initializer object
- * @param {Object} params.connectionInfo - Connection info object
  * @param {Object} [params.target=window.parent] - Target window for message
  * @param {Object} [params.self=window] - Host window for message
  * @param {Object} [params.origin] - Origin of receiver
- * @param {Object} params.sendDirection - Optional field for wrapping messages in additional structure({ type: 'to_aepp' || 'to_waellet', data }).Used for handling messages netween content script and page
+ * @param {Object} [params.sendDirection] - Optional field for wrapping messages in additional structure({ type: 'to_aepp' || 'to_waellet', data }).Used for handling messages netween content script and page
  * @param {Object} [params.receiveDirection='to_aepp'] - Optional(default: 'to_aepp') field for unwrapping messages from additional structure({ type: 'to_aepp' || 'to_waellet', data }).Used for handling messages netween content script and page
+ * @param {Object} [params.connectionInfo={}] - Connection info object
  * @param {Boolean} [params.debug=false] - Debug flag
- * @return {BrowserWindowMessageConnection}
+ * @return {Object}
  */
 export const BrowserWindowMessageConnection = stampit({
-  init ({ connectionInfo = {}, target = window.parent, self = window, origin, sendDirection, receiveDirection = MESSAGE_DIRECTION.to_aepp, debug = false }) {
+  init ({ connectionInfo = {}, target = window.parent, self = window, origin, sendDirection, receiveDirection = MESSAGE_DIRECTION.to_aepp, debug = false } = {}) {
     if (sendDirection && !Object.keys(MESSAGE_DIRECTION).includes(sendDirection)) throw new Error(`sendDirection must be one of [${Object.keys(MESSAGE_DIRECTION)}]`)
     if (!Object.keys(MESSAGE_DIRECTION).includes(receiveDirection)) throw new Error(`receiveDirection must be one of [${Object.keys(MESSAGE_DIRECTION)}]`)
     this.connectionInfo = { ...{ id: uuid() }, ...connectionInfo }
@@ -91,7 +125,7 @@ export const BrowserWindowMessageConnection = stampit({
     this.postFn = (msg) => target.postMessage(msg, this.origin || '*')
     if (!this.connectionInfo.id) throw new Error('ID required.')
   },
-  methods: { connect, sendMessage, disconnect, isConnected () { return this.listener } }
+  methods: { connect, sendMessage, disconnect, isConnected }
 }, WalletConnection)
 
 export default BrowserWindowMessageConnection

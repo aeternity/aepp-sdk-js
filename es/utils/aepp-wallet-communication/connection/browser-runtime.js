@@ -25,9 +25,30 @@
  * @example import BrowserRuntimeConnection from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-runtime'
  */
 import stampit from '@stamp/it'
+
 import WalletConnection from '.'
 import { getBrowserAPI } from '../helpers'
 
+/**
+ * Disconnect
+ * @function disconnect
+ * @instance
+ * @rtype () => void
+ * @return {void}
+ */
+function disconnect () {
+  this.port.disconnect()
+}
+
+/**
+ * Connect
+ * @function connect
+ * @instance
+ * @rtype (onMessage: Function, onDisconnect: Function) => void
+ * @param {Function} onMessage - Message handler
+ * @param {Function} onDisconnect - trigger when runtime connection in closed
+ * @return {void}
+ */
 function connect (onMessage, onDisconnect) {
   if (this.port.onMessage.hasListeners()) throw new Error('You already connected')
   this.port.onMessage.addListener((msg, source) => {
@@ -40,10 +61,14 @@ function connect (onMessage, onDisconnect) {
   })
 }
 
-function disconnect () {
-  this.port.disconnect()
-}
-
+/**
+ * Send message
+ * @function sendMessage
+ * @instance
+ * @rtype (msg: Object) => void
+ * @param {Object} msg - Message
+ * @return {void}
+ */
 function sendMessage (msg) {
   if (!this.port) throw new Error('You dont have connection. Please connect before')
   if (this.debug) console.log('Send message: ', msg)
@@ -51,15 +76,27 @@ function sendMessage (msg) {
 }
 
 /**
- * BrowserRuntimeConnection
+ * Check if connected
+ * @function isConnected
+ * @instance
+ * @rtype () => Boolean
+ * @return {Boolean} Is connected
+ */
+function isConnected () {
+  return this.port.onMessage.hasListeners()
+}
+
+/**
+ * BrowserRuntimeConnection stamp
+ * Handle browser runtime communication
  * @function
  * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-runtime
  * @rtype Stamp
- * @param {Object} [params={}] - Initializer object
- * @param {Object} params.connectionInfo - Connection info object
+ * @param {Object} params={} - Initializer object
  * @param {Object} params.port - Runtime `port` object
+ * @param {Object} [params.connectionInfo={}] - Connection info object
  * @param {Boolean} [params.debug=false] - Debug flag
- * @return {BrowserRuntimeConnection}
+ * @return {Object}
  */
 
 export const BrowserRuntimeConnection = stampit({
@@ -68,7 +105,7 @@ export const BrowserRuntimeConnection = stampit({
     this.connectionInfo = connectionInfo
     this.port = port || getBrowserAPI().runtime.connect(...[connectionInfo.id || undefined])
   },
-  methods: { connect, sendMessage, disconnect, isConnected () { return this.port.onMessage.hasListeners() } }
+  methods: { connect, sendMessage, disconnect, isConnected }
 }, WalletConnection)
 
 export default BrowserRuntimeConnection

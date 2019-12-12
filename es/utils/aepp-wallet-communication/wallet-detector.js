@@ -19,7 +19,7 @@
 /**
  * Wallet Detector
  *
- * This is the complement to {@link module:@aeternity/aepp-sdk/es/utils/}.
+ * This is the complement to {@link module:@aeternity/aepp-sdk/es/utils}.
  * @module @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector
  * @export WalletDetector
  * @example import WalletDetector from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector'
@@ -57,8 +57,8 @@ const handleDetection = (onDetected) => ({ method, params }, source) => {
 /**
  * Start scanning
  * @function scan
+ * @instance
  * @param {Function} onDetected Call-back function which trigger on new wallet
- * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector
  * @return {void}
  */
 function scan (onDetected) {
@@ -68,8 +68,8 @@ function scan (onDetected) {
 
 /**
  * Stop scanning
- * @function scan
- * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector
+ * @function stopScan
+ * @instance
  * @return {void}
  */
 function stopScan () {
@@ -78,8 +78,8 @@ function stopScan () {
 
 /**
  * Get wallet list
- * @function scan
- * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector
+ * @function getWallets
+ * @instance
  * @return {Array} Available wallets
  */
 function getWallets () {
@@ -87,12 +87,12 @@ function getWallets () {
 }
 
 /**
- * WalletDetector
+ * WalletDetector stamp
  * @function
  * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector
  * @rtype Stamp
- * @param {Object} [params={}] - Initializer object
- * @param {Object} [params.connection] - Connection for listening for wallets(@link module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection)
+ * @param {Object} params={} - Initializer object
+ * @param {WalletConnection} params.connection - Connection for listening for wallets
  * @return {WalletDetector}
  */
 export const WalletDetector = AsyncInit.compose({
