@@ -192,7 +192,7 @@ async function dryRunContractTx (tx, callerId, source, name, opt = {}) {
  * @param {String} source Contract source code
  * @param {String} address Contract address
  * @param {String} name Name of function to call
- * @param {Array|String} args Argument's or callData for call function
+ * @param {Array|String} argsOrCallData Argument's array or callData for call function
  * @param {Object} [options={}] Transaction options (fee, ttl, gas, amount, deposit)
  * @param {Object} [options.filesystem={}] Contract external namespaces map* @return {Promise<Object>} Result object
  * @example
@@ -203,13 +203,13 @@ async function dryRunContractTx (tx, callerId, source, name, opt = {}) {
  *   decode: (type) => Decode call result
  * }
  */
-async function contractCall (source, address, name, args = [], options = {}) {
+async function contractCall (source, address, name, argsOrCallData = [], options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
 
   const tx = await this.contractCallTx(R.merge(opt, {
     callerId: await this.address(opt),
     contractId: address,
-    callData: Array.isArray(args) ? await this.contractEncodeCall(source, name, args, opt) : args
+    callData: Array.isArray(argsOrCallData) ? await this.contractEncodeCall(source, name, argsOrCallData, opt) : argsOrCallData
   }))
 
   return sendAndProcess(tx, opt).call(
