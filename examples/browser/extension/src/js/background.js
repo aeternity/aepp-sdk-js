@@ -4,8 +4,8 @@ import '../img/icon-34.png'
 import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
 import { RpcWallet } from '@aeternity/aepp-sdk/es/ae/wallet'
 import BrowserRuntimeConnection
-  from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-connection/browser-runtime'
-import { generateKeyPair } from '../../../../../es/utils/crypto'
+  from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-runtime'
+import { generateKeyPair } from '@aeternity/aepp-sdk/es/utils/crypto'
 
 // const account = MemoryAccount({
 //   keypair: {
@@ -102,7 +102,7 @@ RpcWallet({
     const connection = await BrowserRuntimeConnection({ connectionInfo: { id: port.sender.frameId }, port })
     // add new aepp to wallet
     wallet.addRpcClient(connection)
-    //
+    // Share wallet details
     wallet.shareWalletInfo(port.postMessage.bind(port))
     setTimeout(() => wallet.shareWalletInfo(port.postMessage.bind(port)), 3000)
   })
