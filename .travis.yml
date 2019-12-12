@@ -73,16 +73,13 @@ jobs:
     - npm run test
     after_success:
     - npm run report-coverage
-  - stage: Deploy Next Release
-    if: type != "cron"
-    before_deploy:
-      - npm run build
-    deploy:
-      provider: npm
-      tag: next
-      on:
-        branch: develop
-        condition: type != "cron"
-      email: $NPM_EMAIL
-      api_key:
-        secure: $NPM_AUTH_TOKEN
+
+deploy:
+  provider: npm
+  tag: next
+  on:
+    branch: develop
+    condition: type != "cron"
+  email: $NPM_EMAIL
+  api_key:
+    secure: $NPM_AUTH_TOKEN
