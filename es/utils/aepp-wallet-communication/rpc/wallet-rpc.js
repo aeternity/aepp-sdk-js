@@ -1,3 +1,10 @@
+/**
+ * RPC handler for WAELLET side
+ *
+ * @module @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc
+ * @export WalletRpc
+ * @example import WalletRpc from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc'
+ */
 import Ae from '../../../ae'
 import Accounts from '../../../accounts'
 import Selector from '../../../account/selector'
@@ -140,8 +147,22 @@ const handleMessage = (instance, id) => async (msg) => {
   }
 }
 
+/**
+ * Contain functionality for aepp interaction and managing multiple aepps
+ * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc
+ * @function
+ * @rtype Stamp
+ * @param {Object} param Init params object
+ * @param {String=} [param.name] Wallet name
+ * @param {Function} onConnection Call-back function for incoming AEPP connection (Second argument contain function for accept/deny request)
+ * @param {Function} onSubscription Call-back function for incoming AEPP account subscription (Second argument contain function for accept/deny request)
+ * @param {Function} onSign Call-back function for incoming AEPP sign request (Second argument contain function for accept/deny request)
+ * @param {Function} onAskAccounts Call-back function for incoming AEPP get address request (Second argument contain function for accept/deny request)
+ * @param {Function} onDisconnect Call-back function for disconnect event
+ * @return {Object}
+ */
 export const WalletRpc = Ae.compose(Accounts, Selector, {
-  init ({ icons, name, onConnection, onSubscription, onSign, onDisconnect, onAskAccounts }) {
+  init ({ name, onConnection, onSubscription, onSign, onDisconnect, onAskAccounts }) {
     // CallBacks for events
     this.onConnection = onConnection
     this.onSubscription = onSubscription
@@ -191,9 +212,24 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
     }
   },
   methods: {
+    /**
+     * Get RpcClients object which contain all connected AEPPS
+     * @function getClients
+     * @instance
+     * @rtype () => Object
+     * @return {Object}
+     */
     getClients () {
       return rpcClients
     },
+    /**
+     * Add new AEPP connection
+     * @function addRpcClient
+     * @instance
+     * @rtype (clientConnection: Object) => Object
+     * @param {Object} clientConnection AEPP connection object
+     * @return {void}
+     */
     addRpcClient (clientConnection) {
       // @TODO  detect if aepp has some history based on origin????: if yes use this instance for connection
       const id = uuid()
@@ -207,12 +243,28 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
         }
       )
     },
+    /**
+     * Share wallet info
+     * Send shareWalletInfo message to notify AEPP about wallet
+     * @function shareWalletInfo
+     * @instance
+     * @rtype (postFn: Function) => void
+     * @param {Function} postFn Send message function like `(msg) => void`
+     * @return {void}
+     */
     shareWalletInfo (postFn) {
       postFn({
         jsonrpc: '2.0',
         ...message(METHODS.wallet.readyToConnect, { ...this.getWalletInfo() })
       })
     },
+    /**
+     * Get Wallet info object
+     * @function getWalletInfo
+     * @instance
+     * @rtype () => Object
+     * @return {Object} Object with wallet information(id, name, network, ...)
+     */
     getWalletInfo () {
       return {
         id: getBrowserAPI().runtime.id || this.id,
@@ -222,6 +274,13 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
         type: getBrowserAPI().runtime.id ? WALLET_TYPE.extension : WALLET_TYPE.window
       }
     },
+    /**
+     * Get Wallet accounts
+     * @function getAccounts
+     * @instance
+     * @rtype () => Object
+     * @return {Object} Object with accounts information({ connected: Object, current: Object })
+     */
     getAccounts () {
       return {
         current: this.Selector.address ? { [this.Selector.address]: {} } : {},

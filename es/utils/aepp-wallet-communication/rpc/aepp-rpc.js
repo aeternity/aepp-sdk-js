@@ -1,11 +1,11 @@
-import Ae from '../../../ae'
-
-import { RpcClient } from './rpc-clients'
-import { getHandler, message } from '../helpers'
-import { METHODS, RPC_STATUS, VERSION } from '../schema'
-import Account from '../../../account'
-import uuid from 'uuid/v4'
 import * as R from 'ramda'
+import uuid from 'uuid/v4'
+
+import Ae from '../../../ae'
+import Account from '../../../account'
+import { RpcClient } from './rpc-clients'
+import { getHandler, message, voidFn } from '../helpers'
+import { METHODS, RPC_STATUS, VERSION } from '../schema'
 
 /**
  * RPC handler for AEPP side
@@ -72,8 +72,6 @@ const handleMessage = (instance) => async (msg) => {
     return getHandler(REQUESTS, msg)(instance)(msg)
   }
 }
-
-const voidFn = () => undefined
 
 /**
  * Contain functionality for wallet interaction and connect it to sdk
@@ -194,6 +192,14 @@ export const AeppRpc = Ae.compose(Account, {
         }))
       )
     },
+    /**
+     * Overwriting of `signTransaction` AE method
+     * All sdk API which use it will be send notifiucation to wallet and wait for callBack
+     * @function signTransaction
+     * @instance
+     * @rtype (tx: String, options = {}) => Promise
+     * @return {Promise<String>} Signed transaction
+     */
     async signTransaction (tx, opt = {}) {
       if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
       if (!this.rpcClient.getCurrentAccount()) throw new Error('You do not subscribed for account.')
@@ -201,7 +207,15 @@ export const AeppRpc = Ae.compose(Account, {
         this.rpcClient.sendMessage(message(METHODS.aepp.sign, { ...opt, tx, returnSigned: true }))
       )
     },
-    async send (tx, options) {
+    /**
+     * Overwriting of `send` AE method
+     * All sdk API which use it will be send notification to wallet and wait for callBack
+     * This method will sign, broadcast and wait until transaction will be accepted using rpc comunication with wallet
+     * @function send
+     * @instance
+     * @rtype (tx: String, options = {}) => Promise
+     * @return {Promise<Object>} Transaction broadcast result
+     */async send (tx, options) {
       if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
       if (!this.rpcClient.getCurrentAccount()) throw new Error('You do not subscribed for account.')
       const opt = R.merge(this.Ae.defaults, { walletBroadcast: true, ...options })
