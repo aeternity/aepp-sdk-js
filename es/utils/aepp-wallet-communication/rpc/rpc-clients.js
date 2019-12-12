@@ -1,35 +1,9 @@
 import stampit from '@stamp/it'
+
 import { RPC_STATUS, SUBSCRIPTION_TYPES } from '../schema'
+import { receive, sendMessage } from '../helpers'
 
-const sendMessage = (messageId, connection) => ({ id, method, params, result, error }, isNotificationOrResponse = false) => {
-  // Increment id for each request
-  isNotificationOrResponse || (messageId += 1)
-  id = isNotificationOrResponse ? (id || null) : messageId
-  const msgData = params
-    ? { params }
-    : result
-      ? { result }
-      : { error }
-  connection.sendMessage({
-    jsonrpc: '2.0',
-    ...id ? { id } : {},
-    method,
-    ...msgData
-  })
-  return id
-}
-
-const receive = (handler, msgId) => (msg) => {
-  if (!msg || !msg.jsonrpc || msg.jsonrpc !== '2.0' || !msg.method) {
-    console.warn('Receive invalid message', msg)
-    return
-  }
-  // Increment id for each request
-  if (msg.id && +msg.id > msgId) msgId += 1
-  handler(msg)
-}
-
-export const WalletClient = stampit({
+export const RpcClient = stampit({
   init ({ id, name, networkId, icons, connection, handlers: [onMessage, onDisconnect] }) {
     const messageId = 0
     this.id = id
@@ -116,7 +90,7 @@ export const WalletClient = stampit({
   }
 })
 
-export const WalletClients = stampit({
+export const RpcClients = stampit({
   init () {
     this.clients = new Map()
   },
@@ -126,7 +100,7 @@ export const WalletClients = stampit({
     },
     addClient (id, info) {
       if (this.hasClient(id)) console.warn(`Wallet RpcClient with id ${id} already exist`)
-      this.clients.set(id, WalletClient({ id, ...info }))
+      this.clients.set(id, RpcClient({ id, ...info }))
     },
     getClient (id) {
       return this.clients.get(id)

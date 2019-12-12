@@ -19,16 +19,16 @@
 /**
  * Content Script Bridge module
  *
- * @module @aeternity/aepp-sdk/es/utils/wallet-aepp-wallet-communication/browser-runtime
+ * @module @aeternity/aepp-sdk/es/utils/wallet-aepp-wallet-communication/content-script-bridge
  * @export ContentScriptBridge
- * @example import ContentScriptBridge from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/browser-runtime'
+ * @example import ContentScriptBridge from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge
  */
 import stampit from '@stamp/it'
 
 /**
  * Start message proxy
  * @function run
- * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication
+ * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge
  * @return {void}
  */
 function run () {
@@ -46,7 +46,7 @@ function run () {
 /**
  * Stop message proxy
  * @function stop
- * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication
+ * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge
  * @return {void}
  */
 function stop () {
@@ -57,11 +57,11 @@ function stop () {
 /**
  * ContentScriptBridge
  * @function
- * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication
+ * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge
  * @rtype Stamp
  * @param {Object} [params={}] - Initializer object
- * @param {Object} params.pageConnection - Page connection object(@link module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message)
- * @param {String} params.extConnection - Extension connection object(module: @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-runtime)
+ * @param {Object} [params.pageConnection] - Page connection object(@link module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message)
+ * @param {String} [params.extConnection] - Extension connection object(module: @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-runtime)
  * @return {ContentScriptBridge}
  */
 export const ContentScriptBridge = stampit({

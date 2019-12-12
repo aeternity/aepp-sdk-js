@@ -2,12 +2,12 @@ import Ae from '../../../ae'
 import Accounts from '../../../accounts'
 import Selector from '../../../account/selector'
 
-import { WalletClients } from './wallet-clients'
+import { RpcClients } from './rpc-clients'
 import { getBrowserAPI, getHandler, message, sendResponseMessage } from '../helpers'
 import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE, SUBSCRIPTION_VALUES } from '../schema'
 import uuid from 'uuid/v4'
 
-const rpcClients = WalletClients()
+const rpcClients = RpcClients()
 
 const NOTIFICATIONS = {
   [METHODS.closeConnection]: (instance, { client }) =>

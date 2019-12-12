@@ -1,6 +1,6 @@
 import Ae from '../../../ae'
 
-import { WalletClient } from './wallet-clients'
+import { RpcClient } from './rpc-clients'
 import { getHandler, message } from '../helpers'
 import { METHODS, RPC_STATUS, VERSION } from '../schema'
 import Account from '../../../account'
@@ -92,7 +92,7 @@ export const AeppRpc = Ae.compose(Account, {
     sign () {},
     async connectToWallet (connection) {
       if (this.rpcClient && this.rpcClient.isConnected()) throw new Error('You are already connected to wallet ' + this.rpcClient)
-      this.rpcClient = WalletClient({
+      this.rpcClient = RpcClient({
         connection,
         networkId: this.getNetworkId(),
         ...connection.connectionInfo,

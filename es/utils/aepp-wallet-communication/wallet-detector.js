@@ -17,12 +17,12 @@
  */
 
 /**
- * Browser runtime connector module
+ * Wallet Detector
  *
- * This is the complement to {@link module:@aeternity/aepp-sdk/es/utils/connection}.
- * @module @aeternity/aepp-sdk/es/utils/connection/browser-runtime
- * @export BrowserRuntimeConnection
- * @example import BrowserRuntimeConnection from '@aeternity/aepp-sdk/es/utils/connection/browser-runtime'
+ * This is the complement to {@link module:@aeternity/aepp-sdk/es/utils/}.
+ * @module @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector
+ * @export WalletDetector
+ * @example import WalletDetector from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector'
  */
 import AsyncInit from '../async-init'
 import BrowserWindowMessageConnection from './connection/browser-window-message'
@@ -54,31 +54,48 @@ const handleDetection = (onDetected) => ({ method, params }, source) => {
   }
 }
 
+/**
+ * Start scanning
+ * @function scan
+ * @param {Function} onDetected Call-back function which trigger on new wallet
+ * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector
+ * @return {void}
+ */
 function scan (onDetected) {
   this.connection.connect(handleDetection(onDetected))
   !Object.keys(wallets).length || onDetected({ wallets })
 }
 
+/**
+ * Stop scanning
+ * @function scan
+ * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector
+ * @return {void}
+ */
 function stopScan () {
   this.connection.disconnect()
 }
 
+/**
+ * Get wallet list
+ * @function scan
+ * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector
+ * @return {Array} Available wallets
+ */
 function getWallets () {
   return wallets
 }
 
 /**
- * RemoteAccount
+ * WalletDetector
  * @function
- * @alias module:@aeternity/aepp-sdk/es/account/remote
+ * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector
  * @rtype Stamp
- * @param {Object} [options={}] - Initializer object
- * @param {Object} options.keypair - Key pair to use
- * @param {String} options.keypair.publicKey - Public key
- * @param {String} options.keypair.secretKey - Private key
- * @return {Account}
+ * @param {Object} [params={}] - Initializer object
+ * @param {Object} [params.connection] - Connection for listening for wallets(@link module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection)
+ * @return {WalletDetector}
  */
-export const ExtWalletDetector = AsyncInit.compose({
+export const WalletDetector = AsyncInit.compose({
   async init ({ connection }) {
     if (!window) throw new Error('Window object not found, you can run wallet detector only in browser')
     this.connection = connection
@@ -86,4 +103,4 @@ export const ExtWalletDetector = AsyncInit.compose({
   methods: { scan, stopScan, getWallets }
 })
 
-export default ExtWalletDetector
+export default WalletDetector
