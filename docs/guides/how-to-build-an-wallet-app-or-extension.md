@@ -1,5 +1,13 @@
 ## How to build an wallet
 
+his guid describing the process of building Waellet using the new Wallet<->Aepp integration API
+The full example of implementation you can find here:
+- [Web Waellet](https://github.com/aeternity/aepp-sdk-js/tree/develop/examples/browser/vuejs/connect-two-ae/identity)
+- [Extension Waellet](https://github.com/aeternity/aepp-sdk-js/tree/develop/examples/browser/extension)
+
+### First we need to initialize our `Aepp` stamp
+
+
 ### Extension wallet
 
 - First we need to create an bridge between our extension and page
@@ -137,4 +145,65 @@ RpcWallet({
   console.error(err)
 })
 
+```
+
+### Web Waellet (Iframe/Reverse Iframe)
+
+- This works the same as extension but without `Content Script bridge` in between
+
+```js
+  import { MemoryAccount, RpcWallet } from '@aeternity/aepp-sdk/es'
+  import BrowserWindowMessageConnection from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message'
+
+  this.client = await RpcWallet({
+        url: 'NODE_URL',
+        internalUrl: 'NODE_INTERNAL_URL', // optional
+        compilerUrl: 'COMPILER_URL', // optional if your wallet don't support contract and all what requred compiler
+        accounts: [MemoryAccount({ keypair: { secretKey: 'YOUR_PRIVATE_KEY', publicKey: 'YOUR_PUBLIC_KEY' } })],
+        address: 'PUBLIC_KEY_OF_CURRENT_ACCOUNT', // default: first account in `accounts` array,
+        name: 'Wallet', // Your wallet name,
+        // call-back for connection request
+        async onConnection (aepp, { accept, deny }) {
+          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to connect`)) {
+            accept()
+          } else { deny() }
+        },
+        // call-back for subscription request
+        async onSubscription (aepp, { accept, deny }) {
+          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to subscribe address`)) {
+            accept()
+          } else { deny() }
+        },
+        // call-back for sign request
+        async onSign (aepp, { accept, deny, params }) {
+          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to ${params.returnSigned ? 'sign' : 'sign and broadcast'} ${JSON.stringify(params.tx)}`)) {
+            accept()
+          } else {
+            deny()
+          }
+        },
+        // call-back for get accounts request
+        onAskAccounts (aepp, { accept, deny }) {
+          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to get accounts`)) {
+            accept()
+          } else {
+            deny()
+          }
+        },
+        // call-back for disconnect event
+        onDisconnect (message, client) {
+          this.shareWalletInfo(connection.sendMessage.bind(connection))
+        }
+      })
+      // Get target. Here we will check if wallet app running in frame or in top window
+      // Get target depending on approach iFrame/Reverse Iframe
+      const target = !this.runningInFrame ? window.frames.aepp : window.parent
+      // Create a connection
+      const connection = await BrowserWindowMessageConnection({
+        target
+      })
+      // Add RPC client to wallet
+      this.client.addRpcClient(connection)
+      // Notifiy AEPP about waellet by sending the `announcePresence` message
+      this.shareWalletInfo(connection.sendMessage.bind(connection))
 ```
