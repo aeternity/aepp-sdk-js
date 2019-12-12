@@ -30,6 +30,7 @@
   * [@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message](api/utils/aepp-wallet-communication/connection/browser-window-message.md)
   * [@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection](api/utils/aepp-wallet-communication/connection.md)
   * [@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge](api/utils/aepp-wallet-communication/content-script-bridge.md)
+  * [@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc](api/utils/aepp-wallet-communication/rpc/aepp-rpc.md)
   * [@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client](api/utils/aepp-wallet-communication/rpc/rpc-client.md)
   * [@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc](api/utils/aepp-wallet-communication/rpc/wallet-rpc.md)
   * [@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector](api/utils/aepp-wallet-communication/wallet-detector.md)
