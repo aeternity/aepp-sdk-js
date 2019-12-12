@@ -42,30 +42,47 @@ install:
 
 jobs:
   include:
-    - stage: Tests
-      if: type != "cron"
-      name: Test AENS
-      script:
-        - npm run test-aens
-        - npm run report-coverage
-    - stage: Tests
-      if: type != "cron"
-      name: Test Channel
-      script:
-        - npm run test-channel
-        - npm run report-coverage
-    - stage: Tests
-      if: type != "cron"
-      name: Test Contract, Node, Oracle, Account and else
-      script:
-        - npm run test-else
-        - npm run report-coverage
-    - stage: Tests
-      if: type = "cron"
-      env:
-        - NODE_TAG=master
-        - COMPILER_TAG=latest
-        - FORCE_COMPATIBILITY=true
-      script:
-        - npm run test
-        - npm run report-coverage
+  - stage: Tests
+    if: type != "cron"
+    name: Test AENS
+    script:
+    - npm run test-aens
+    after_success:
+    - npm run report-coverage
+  - stage: Tests
+    if: type != "cron"
+    name: Test Channel
+    script:
+    - npm run test-channel
+    after_success:
+    - npm run report-coverage
+  - stage: Tests
+    if: type != "cron"
+    name: Test Contract, Node, Oracle, Account and else
+    script:
+    - npm run test-else
+    after_success:
+    - npm run report-coverage
+  - stage: Tests
+    if: type = "cron"
+    env:
+    - NODE_TAG=master
+    - COMPILER_TAG=latest
+    - FORCE_COMPATIBILITY=true
+    script:
+    - npm run test
+    after_success:
+    - npm run report-coverage
+  - stage: Deploy Next Release
+    if: type != "cron"
+    before_deploy:
+      - npm run build
+    deploy:
+      provider: npm
+      tag: next
+      on:
+        branch: develop
+        condition: type != "cron"
+      email: $NPM_EMAIL
+      api_key:
+        secure: $NPM_AUTH_TOKEN
