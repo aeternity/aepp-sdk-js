@@ -81,5 +81,4 @@ deploy:
     branch: develop
     condition: type != "cron"
   email: $NPM_EMAIL
-  api_key:
-    secure: $NPM_AUTH_TOKEN
+  api_key: $NPM_AUTH_TOKEN
