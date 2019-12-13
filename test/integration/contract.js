@@ -204,6 +204,7 @@ describe('Contract', function () {
     const result = await deployed.call('main', ['42'], { waitMined: false, verify: false })
     Boolean(result.result === undefined).should.be.equal(true)
     Boolean(result.txData === undefined).should.be.equal(true)
+    await contract.poll(result.transaction)
   })
 
   it('calls deployed contracts static', async () => {
@@ -362,6 +363,7 @@ describe('Contract', function () {
       const result = await contractObject.methods.intFn.send(2, { waitMined: false })
       Boolean(result.result === undefined).should.be.equal(true)
       Boolean(result.txData === undefined).should.be.equal(true)
+      await contract.poll(result.transaction)
     })
     it('Generate ACI object with corresponding bytecode', async () => {
       await contract.getContractInstance(testContract, { contractAddress: contractObject.deployInfo.address, filesystem, opt: { ttl: 0 } })
