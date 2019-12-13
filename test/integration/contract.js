@@ -341,7 +341,7 @@ describe('Contract', function () {
       await contractObject.compile({ backend: 'aevm' })
       const deployStatic = await contractObject.methods.init.get('123', 1, 'hahahaha', { backend: 'aevm' })
       deployStatic.should.be.an('object')
-      deployed = await contractObject.methods.init('123', 1, 'hahahaha', { backend: 'aevm' })
+      deployed = await contractObject.methods.init.send('123', 1, 'hahahaha', { backend: 'aevm' })
       deployed.should.be.an('object')
       const { result } = await contractObject.methods.intFn(123, { backend: 'aevm' })
       result.should.have.property('gasUsed')
@@ -423,7 +423,7 @@ describe('Contract', function () {
           }
         })
         it('Valid', async () => {
-          const { decodedResult } = await contractObject.methods.intFn(1)
+          const { decodedResult } = await contractObject.methods.intFn.get(1)
           decodedResult.toString().should.be.equal('1')
         })
       })
