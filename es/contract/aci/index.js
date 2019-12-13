@@ -179,11 +179,11 @@ const call = ({ client, instance }) => async (fn, params = [], options = {}) => 
     : await client.contractCall(source, instance.deployInfo.address, fn, params, opt)
   return {
     ...result,
-    decodedResult: await transformDecodedData(
+    decodedResult: opt.waitMined ? await transformDecodedData(
       fnACI.returns,
       await result.decode(),
       { ...opt, bindings: fnACI.bindings }
-    )
+    ) : null
   }
 }
 
