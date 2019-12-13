@@ -259,4 +259,7 @@ describe('Native Transaction', function () {
       e.message.indexOf('AENS: Invalid name domain').should.not.be.equal(-1)
     }
   })
+  it('Destroy instance', () => {
+    client.destroyInstance()
+  })
 })
