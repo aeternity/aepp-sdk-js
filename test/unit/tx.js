@@ -31,7 +31,7 @@ describe('Tx', function () {
     return hash.should.be.equal(await commitmentHash('foobar.aet', _salt))
   })
   it('Parse big number', async () => {
-    parseBigNumber('123123123123').shoudl.be.a('string')
+    parseBigNumber('123123123123').should.be.a('string')
   })
   it('test from big number to bytes', async () => {
     // TODO investigate about float numbers serialization
