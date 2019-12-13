@@ -325,10 +325,31 @@ export function computeAuctionEndBlock (domain, claimHeight) {
   ])(domain.replace('.chain', '').length).toString(10)
 }
 
+/**
+ * Get contract backend by abiVersion
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
+ * @param {Object} { abiVersion } abiVersion Transaction abiVersion
+ * @return {String} Backend
+ */
 export function getContractBackendFromTx ({ abiVersion } = {}) {
   return FATE_ABI.includes(parseInt(abiVersion))
     ? VM_TYPE.FATE
     : VM_TYPE.AEVM
+}
+
+/**
+ * Is name accept going to auction
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
+ * @param {String} name Transaction abiVersion
+ * @return {Boolean}
+ */
+export function isAuctionName (name) {
+  return R.cond([
+    [R.gt(12), R.always(false)],
+    [R.T, R.always(true)]
+  ])
 }
 
 export default {
@@ -349,5 +370,6 @@ export default {
   buildHash,
   isNameValid,
   produceNameId,
-  classify
+  classify,
+  isAuctionName
 }
