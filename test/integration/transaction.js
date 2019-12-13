@@ -261,5 +261,6 @@ describe('Native Transaction', function () {
   })
   it('Destroy instance', () => {
     client.destroyInstance()
+    console.log('Finish without error')
   })
 })
