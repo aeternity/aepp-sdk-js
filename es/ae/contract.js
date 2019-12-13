@@ -40,8 +40,12 @@ function sendAndProcess (tx, options) {
   return async function (onSuccess, onError) {
     // Send transaction and get transaction info
     const txData = await this.send(tx, options)
-    const result = await this.getTxInfo(txData.hash)
 
+    if (typeof options.waitMined === 'boolean' && !options.waitMined) {
+      return onSuccess({ hash: txData.hash, rawTx: txData.rawTx })
+    }
+
+    const result = await this.getTxInfo(txData.hash)
     return result.returnType === 'ok'
       ? onSuccess({ hash: txData.hash, rawTx: txData.rawTx, result, txData })
       : typeof onError === 'function' ? onError(result) : this.handleCallError(result)
@@ -219,7 +223,7 @@ async function contractCall (source, address, name, argsOrCallData = [], options
       rawTx,
       result,
       txData,
-      decode: () => this.contractDecodeData(source, name, result.returnValue, result.returnType, opt)
+      decode: () => result ? this.contractDecodeData(source, name, result.returnValue, result.returnType, opt) : {}
     })
   )
 }

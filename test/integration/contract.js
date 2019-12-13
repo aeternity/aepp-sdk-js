@@ -196,6 +196,16 @@ describe('Contract', function () {
     return result.decode().should.eventually.become(42)
   })
 
+  it('call contract/deploy with `waitMined: false`', async () => {
+    const deployed = await bytecode.deploy([], { waitMined: false })
+    await contract.poll(deployed.transaction)
+    Boolean(deployed.result === undefined).should.be.equal(true)
+    Boolean(deployed.txData === undefined).should.be.equal(true)
+    const result = await deployed.call('main', ['42'], { waitMined: false, verify: false })
+    Boolean(result.result === undefined).should.be.equal(true)
+    Boolean(result.txData === undefined).should.be.equal(true)
+  })
+
   it('calls deployed contracts static', async () => {
     const result = await deployed.callStatic('main', ['42'])
     return result.decode().should.eventually.become(42)
@@ -343,6 +353,15 @@ describe('Contract', function () {
       await contractObject.methods.init('123', 1, 'hahahaha')
       const isCompiled = contractObject.compiled.length && contractObject.compiled.slice(0, 3) === 'cb_'
       isCompiled.should.be.equal(true)
+    })
+    it('Deploy/Call contract with { waitMined: false }', async () => {
+      const deployed = await contractObject.methods.init('123', 1, 'hahahaha', { waitMined: false })
+      await contract.poll(deployed.transaction)
+      Boolean(deployed.result === undefined).should.be.equal(true)
+      Boolean(deployed.txData === undefined).should.be.equal(true)
+      const result = await contractObject.methods.intFn.send(2, { waitMined: false })
+      Boolean(result.result === undefined).should.be.equal(true)
+      Boolean(result.txData === undefined).should.be.equal(true)
     })
     it('Generate ACI object with corresponding bytecode', async () => {
       await contract.getContractInstance(testContract, { contractAddress: contractObject.deployInfo.address, filesystem, opt: { ttl: 0 } })
