@@ -14,7 +14,6 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-
 import { describe, it, before } from 'mocha'
 import { configure, ready } from './'
 import { generateKeyPair } from '../../es/utils/crypto'
@@ -38,7 +37,45 @@ describe('Node Chain', function () {
     await client.awaitHeight(target, { attempts: 120 }).should.eventually.be.at.least(target)
     return client.height().should.eventually.be.at.least(target)
   })
-
+  it('Can verify transaction from broadcast error', async () => {
+    try {
+      await client.spend(0, publicKey, { fee: 100, verify: false })
+    } catch (e) {
+      const validation = await e.verifyTx()
+      validation.should.has.property('validation')
+    }
+  })
+  it('Get top block', async () => {
+    const top = await client.topBlock()
+    top.should.has.property('hash')
+    top.should.has.property('height')
+  })
+  it('Get pending transaction', async () => {
+    const mempool = await client.mempool()
+    mempool.should.has.property('transactions')
+  })
+  it('Get current generation', async () => {
+    const generation = await client.getCurrentGeneration()
+    generation.should.has.property('keyBlock')
+  })
+  it('Get key block', async () => {
+    const { keyBlock } = await client.getCurrentGeneration()
+    const keyBlockByHash = await client.getKeyBlock(keyBlock.hash)
+    const keyBlockByHeight = await client.getKeyBlock(keyBlock.height)
+    const keyBlockError = await client.getKeyBlock(false).catch(e => true)
+    keyBlockByHash.should.be.an('object')
+    keyBlockByHeight.should.be.an('object')
+    keyBlockError.should.be.equal(true)
+  })
+  it('Get generation', async () => {
+    const { keyBlock } = await client.getCurrentGeneration()
+    const genByHash = await client.getGeneration(keyBlock.hash)
+    const genByHeight = await client.getGeneration(keyBlock.height)
+    const genArgsError = await client.getGeneration(true).catch(e => true)
+    genByHash.should.be.an('object')
+    genByHeight.should.be.an('object')
+    genArgsError.should.be.equal(true)
+  })
   it('polls for transactions', async () => {
     const sender = await client.address()
     const receiver = publicKey

@@ -21,6 +21,7 @@ import { salt } from '../../es/utils/crypto'
 import { commitmentHash } from '../../es/tx/builder/helpers'
 import { BigNumber } from 'bignumber.js'
 import { toBytes } from '../../es/utils/bytes'
+import { parseBigNumber } from '../../es/utils/bignumber'
 
 describe('Tx', function () {
   it('reproducible commitment hashes can be generated', async () => {
@@ -28,6 +29,9 @@ describe('Tx', function () {
     const hash = await commitmentHash('foobar.aet', _salt)
     hash.should.be.a('string')
     return hash.should.be.equal(await commitmentHash('foobar.aet', _salt))
+  })
+  it('Parse big number', async () => {
+    parseBigNumber('123123123123').should.be.a('string')
   })
   it('test from big number to bytes', async () => {
     // TODO investigate about float numbers serialization
