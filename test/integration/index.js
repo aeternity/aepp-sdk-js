@@ -33,7 +33,7 @@ const forceCompatibility = process.env.FORCE_COMPATIBILITY || false
 export const account = Crypto.generateKeyPair()
 export const account2 = Crypto.generateKeyPair()
 
-const BaseAe = (params) => Ae.waitMined(true).compose({
+const BaseAe = async (params) => Ae.waitMined(true).compose({
   deepProps: { Swagger: { defaults: { debug: !!process.env['DEBUG'] } } },
   props: { process, compilerUrl }
 })({
