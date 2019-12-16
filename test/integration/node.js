@@ -70,6 +70,10 @@ describe('Node client', function () {
         e.message.should.be.equal('Invalid node instance object')
       }
     })
+    it('Can get network id', async () => {
+      const node = await NodePool()
+      node.getNetworkId().should.be.equal('ae_mainnet')
+    })
     it('Throw error on using API without node', async () => {
       const node = await NodePool()
       try {

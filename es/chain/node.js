@@ -15,6 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 import * as R from 'ramda'
+
 import Chain from './'
 import Oracle from '../oracle/node'
 import formatBalance from '../utils/amount-formatter'
