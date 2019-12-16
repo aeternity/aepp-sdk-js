@@ -25,6 +25,12 @@ const identityContract = `
 contract Identity =
  entrypoint main(x : int) = x
 `
+
+const errorContract = `
+contract Identity =
+ payable stateful entrypoint main(x : address) = Chain.spend(x, 1000000000)
+`
+
 const stateContract = `
 contract StateContract =
   record state = { value: string }
@@ -186,6 +192,23 @@ describe('Contract', function () {
     const res = await contract.contractCallStatic(identityContract, null, 'init', [], { bytecode: compiled })
     res.result.should.have.property('gasUsed')
     res.result.should.have.property('returnType')
+  })
+
+  it('Call-Static deploy transaction on specific hash', async () => {
+    const { hash } = await contract.topBlock()
+    const compiled = bytecode.bytecode
+    const res = await contract.contractCallStatic(identityContract, null, 'init', [], { bytecode: compiled, top: hash })
+    res.result.should.have.property('gasUsed')
+    res.result.should.have.property('returnType')
+  })
+  it('Test handleError(Parse and check contract execution error)', async () => {
+    const code = await contract.contractCompile(errorContract)
+    const deployed = await code.deploy()
+    try {
+      await deployed.call('main', [await contract.address()])
+    } catch (e) {
+      e.message.indexOf('Invocation failed').should.not.be.equal(-1)
+    }
   })
 
   it('Dry-run without accounts', async () => {
