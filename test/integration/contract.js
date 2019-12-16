@@ -55,7 +55,8 @@ contract StateContract =
   record yesEr = { t: number}
   
   datatype dateUnit = Year | Month | Day
-  
+  datatype one_or_both('a, 'b) = Left('a) | Right('b) | Both('a, 'b)
+
   entrypoint init(value: string, key: int, testOption: option(string)) : state = { value = value, key = key, testOption = testOption }
   entrypoint retrieve() : string*int = (state.value, state.key)
 
@@ -92,6 +93,11 @@ contract StateContract =
   entrypoint usingExternalLib(s: int): int = Test.double(s)
   
   entrypoint datTypeFn(s: dateUnit): dateUnit = s
+  entrypoint datTypeGFn(x : one_or_both(int, string)) : int =
+    switch(x)
+      Left(x)    => x
+      Right(_)   => abort("asdasd")
+      Both(x, _) => x
 `
 
 const encodedNumberSix = 'cb_DA6sWJo='
@@ -331,7 +337,7 @@ describe('Contract', function () {
     })
   })
 
-  describe('Contract ACI Interface', function () {
+  describe.only('Contract ACI Interface', function () {
     let contractObject
 
     it('Generate ACI object', async () => {
@@ -369,7 +375,6 @@ describe('Contract', function () {
       result.should.have.property('returnType')
       result.callerId.should.be.equal(onAccount)
     })
-
     it('Can deploy/call using AEVM', async () => {
       await contractObject.compile({ backend: 'aevm' })
       const deployStatic = await contractObject.methods.init.get('123', 1, 'hahahaha', { backend: 'aevm' })
@@ -381,7 +386,6 @@ describe('Contract', function () {
       result.should.have.property('returnType')
       await contractObject.compile()
     })
-
     it('Deploy contract before compile', async () => {
       contractObject.compiled = null
       await contractObject.methods.init('123', 1, 'hahahaha')
@@ -458,6 +462,19 @@ describe('Contract', function () {
         it('Valid', async () => {
           const { decodedResult } = await contractObject.methods.intFn.get(1)
           decodedResult.toString().should.be.equal('1')
+        })
+      })
+      describe('BOOL', function () {
+        it('Invalid', async () => {
+          try {
+            await contractObject.methods.boolFn({})
+          } catch (e) {
+            e.message.should.be.equal('"Argument" at position 0 fails because [Value "[[object Object]]" at path: [0] not a boolean]')
+          }
+        })
+        it('Valid', async () => {
+          const { decodedResult } = await contractObject.methods.boolFn.get(true)
+          decodedResult.should.be.equal(true)
         })
       })
       describe('STRING', function () {
@@ -573,7 +590,8 @@ describe('Contract', function () {
               [address, ['someStringV', 324]]
             ]
           )
-          const { decodedResult } = await contractObject.methods.mapFn(mapArg)
+          const objectFromMap = Array.from(mapArg.entries()).reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {})
+          const { decodedResult } = await contractObject.methods.mapFn(objectFromMap)
           JSON.stringify(decodedResult).should.be.equal(JSON.stringify(Array.from(mapArg.entries())))
         })
         it('Map With Option Value', async () => {
@@ -689,6 +707,17 @@ describe('Contract', function () {
             await contractObject.methods.datTypeFn({})
           } catch (e) {
             e.message.should.be.equal('"Argument" at position 0 fails because ["0" must be a string, "value" must contain at least one of [Year, Month, Day]]')
+          }
+        })
+        it('Call generic datatype', async () => {
+          const res = await contractObject.methods.datTypeGFn({ Left: [2] })
+          res.decodedResult.should.be.equal(2)
+        })
+        it('Invalid arguments length', async () => {
+          try {
+            await contractObject.methods.datTypeGFn()
+          } catch (e) {
+            e.message.should.be.equal('Function "datTypeGFn" require 1 arguments of types [{"StateContract.one_or_both":["int","string"]}] but get []')
           }
         })
         it('Invalid variant', async () => {
