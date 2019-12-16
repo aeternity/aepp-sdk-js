@@ -102,7 +102,7 @@ function axiosError (handler) {
  * @example Node({url: 'https://sdk-testnet.aepps.com'})
  */
 const Node = stampit(AsyncInit, {
-  async init ({ name, url = this.url, internalUrl = this.internalUrl, axiosConfig: { config, errorHandler } = {} }) {
+  async init ({ url = this.url, internalUrl = this.internalUrl, axiosConfig: { config, errorHandler } = {} }) {
     if (!url) throw new Error('"url" required')
     url = url.replace(/\/?$/, '')
     internalUrl = internalUrl ? internalUrl.replace(/\/?$/, '') : url

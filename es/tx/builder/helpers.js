@@ -346,10 +346,7 @@ export function getContractBackendFromTx ({ abiVersion } = {}) {
  * @return {Boolean}
  */
 export function isAuctionName (name) {
-  return R.cond([
-    [R.gt(12), R.always(false)],
-    [R.T, R.always(true)]
-  ])
+  return name.replace('.chain', '').length < 13
 }
 
 export default {
