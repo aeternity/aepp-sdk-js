@@ -14,9 +14,9 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-
+import Compiler from '../../es/contract/compiler'
 import { describe, it, before } from 'mocha'
-import { BaseAe, configure, plan, ready } from './'
+import { BaseAe, configure, plan, ready, compilerUrl } from './'
 import { decode } from '../../es/tx/builder/helpers'
 
 import * as R from 'ramda'
@@ -158,6 +158,7 @@ describe('Contract', function () {
     const callRes = await contract.contractCall(identityContract, deployed.address, 'main', callDataCall)
     callRes.result.should.have.property('gasUsed')
     callRes.result.should.have.property('returnType')
+    callRes.result.should.have.property('returnType')
     const decodedCallResult = await callRes.decode()
     decodedCallResult.should.be.equal(callArg)
   })
@@ -267,10 +268,23 @@ describe('Contract', function () {
   })
 
   describe('Sophia Compiler', function () {
+    let callData
+    let bytecode
+    it('Init un-compatible compiler version', async () => {
+      try {
+        // Init compiler
+        const compiler = await Compiler({ compilerUrl })
+        // Overwrite compiler version
+        compiler.compilerVersion = '1.0.0'
+        await compiler.checkCompatibility()
+      } catch (e) {
+        e.message.indexOf('Unsupported compiler version 1.0.0').should.not.be.equal(-1)
+      }
+    })
     it('compile', async () => {
-      const code = await contract.compileContractAPI(identityContract)
-      const prefix = code.slice(0, 2)
-      const isString = typeof code === 'string'
+      bytecode = await contract.compileContractAPI(identityContract)
+      const prefix = bytecode.slice(0, 2)
+      const isString = typeof bytecode === 'string'
       prefix.should.be.equal('cb')
       isString.should.be.equal(true)
     })
@@ -279,14 +293,33 @@ describe('Contract', function () {
       aci.should.have.property('interface')
     })
     it('encode call-data', async () => {
-      const encoded = await contract.contractEncodeCallDataAPI(identityContract, 'init', [])
-      const prefix = encoded.slice(0, 2)
-      const isString = typeof encoded === 'string'
+      callData = await contract.contractEncodeCallDataAPI(identityContract, 'init', [])
+      const prefix = callData.slice(0, 2)
+      const isString = typeof callData === 'string'
       prefix.should.be.equal('cb')
       isString.should.be.equal(true)
     })
-    it('decode call-data', async () => {
+    it('decode call result', async () => {
       return contract.contractDecodeCallResultAPI(identityContract, 'main', encodedNumberSix, 'ok', { backend: 'fate' }).should.eventually.become(6)
+    })
+    it('Decode call-data using source', async () => {
+      const decodedCallData = await contract.contractDecodeCallDataBySourceAPI(identityContract, 'init', callData)
+      decodedCallData.arguments.should.be.an('array')
+      decodedCallData.arguments.length.should.be.equal(0)
+      decodedCallData.function.should.be.equal('init')
+    })
+    it('Decode call-data using bytecode', async () => {
+      const decodedCallData = await contract.contractDecodeCallDataByCodeAPI(bytecode, callData)
+      decodedCallData.arguments.should.be.an('array')
+      decodedCallData.arguments.length.should.be.equal(0)
+      decodedCallData.function.should.be.equal('init')
+    })
+    it('Decode data API', async () => {
+      const returnData = 'cb_bzvA9Af6'
+      return contract.contractDecodeDataAPI('string', returnData).catch(e => 1).should.eventually.become(1)
+    })
+    it('validate bytecode', async () => {
+      return contract.validateByteCodeAPI(bytecode, identityContract).should.eventually.become(true)
     })
     it('Use invalid compiler url', async () => {
       try {
