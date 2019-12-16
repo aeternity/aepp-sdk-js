@@ -32,15 +32,14 @@ import { VM_TYPE } from '../tx/builder/schema'
 
 async function getCompilerVersion (options = {}) {
   return this.http
-    .get('/version', options)
-    .then(({ version }) => version)
+    .get('/api-version', options)
+    .then((res) => res['api-version'])
 }
 
 async function contractEncodeCallDataAPI (source, name, args = [], options = {}) {
   this.isInit()
-  options = this.prepareCompilerOption(options)
   return this.http
-    .post('/encode-calldata', { source, function: name, arguments: args, options }, options)
+    .post('/encode-calldata', { source, function: name, arguments: args, options: this.prepareCompilerOption(options) }, options)
     .then(({ calldata }) => calldata)
 }
 
@@ -52,16 +51,14 @@ async function contractDecodeCallDataByCodeAPI (bytecode, calldata, backend = th
 
 async function contractDecodeCallDataBySourceAPI (source, fn, callData, options = {}) {
   this.isInit()
-  options = this.prepareCompilerOption(options)
   return this.http
-    .post('/decode-calldata/source', { function: fn, source, calldata: callData }, options)
+    .post('/decode-calldata/source', { function: fn, source, calldata: callData, options: this.prepareCompilerOption(options) }, options)
 }
 
 async function contractDecodeCallResultAPI (source, fn, callValue, callResult, options = {}) {
   this.isInit()
-  options = this.prepareCompilerOption(options)
   return this.http
-    .post('/decode-call-result', { function: fn, source, 'call-result': callResult, 'call-value': callValue, options }, options)
+    .post('/decode-call-result', { function: fn, source, 'call-result': callResult, 'call-value': callValue, options: this.prepareCompilerOption(options) }, options)
 }
 
 async function contractDecodeDataAPI (type, data, options = {}) {
@@ -71,27 +68,31 @@ async function contractDecodeDataAPI (type, data, options = {}) {
     .then(({ data }) => data)
 }
 
+async function validateByteCodeAPI (bytecode, source, options = {}) {
+  this.isInit()
+  return this.http
+    .post('/validate-byte-code', { bytecode, source, options: this.prepareCompilerOption(options) }, options)
+    .then(res => typeof res === 'object' ? true : res)
+}
+
 async function compileContractAPI (code, options = {}) {
   this.isInit()
-  options = this.prepareCompilerOption(options)
-  return this.http.post('/compile', { code, options }, options)
+  return this.http.post('/compile', { code, options: this.prepareCompilerOption(options) }, options)
     .then(({ bytecode }) => bytecode)
 }
 
 async function contractGetACI (code, options = {}) {
   this.isInit()
-  options = this.prepareCompilerOption(options)
-  return this.http.post('/aci', { code, options }, options)
+  return this.http.post('/aci', { code, options: this.prepareCompilerOption(options) }, options)
 }
 
 async function setCompilerUrl (url, { forceCompatibility = false } = {}) {
   this.http.changeBaseUrl(url)
-  this.compilerVersion = null
+  this.compilerVersion = await this.getCompilerVersion().catch(e => null)
   await this.checkCompatibility({ forceCompatibility })
 }
 
 async function checkCompatibility ({ force = false, forceCompatibility = false } = {}) {
-  this.compilerVersion = await this.getCompilerVersion().catch(e => null)
   if (!this.compilerVersion && !force) throw new Error('Compiler do not respond')
   if (!forceCompatibility && this.compilerVersion && !semverSatisfies(this.compilerVersion.split('-')[0], COMPILER_GE_VERSION, COMPILER_LT_VERSION)) {
     const version = this.compilerVersion
@@ -101,8 +102,8 @@ async function checkCompatibility ({ force = false, forceCompatibility = false }
   }
 }
 
-function prepareCompilerOption (options = {}) {
-  return { ...this.compilerOptions, ...options, file_system: options.filesystem || {} }
+function prepareCompilerOption ({ backend = this.compilerOptions.backend, filesystem = {} } = {}) {
+  return { backend, file_system: filesystem }
 }
 
 function isInit () {
@@ -125,6 +126,7 @@ function isInit () {
 const ContractCompilerAPI = AsyncInit.compose(ContractBase, {
   async init ({ compilerUrl = this.compilerUrl, forceCompatibility = false }) {
     this.http = Http({ baseUrl: compilerUrl })
+    this.compilerVersion = await this.getCompilerVersion().catch(e => null)
     await this.checkCompatibility({ force: true, forceCompatibility })
   },
   methods: {
@@ -137,6 +139,7 @@ const ContractCompilerAPI = AsyncInit.compose(ContractBase, {
     contractDecodeCallResultAPI,
     setCompilerUrl,
     getCompilerVersion,
+    validateByteCodeAPI,
     isInit,
     checkCompatibility,
     prepareCompilerOption
@@ -150,6 +153,6 @@ const ContractCompilerAPI = AsyncInit.compose(ContractBase, {
 })
 
 const COMPILER_GE_VERSION = '3.1.0'
-const COMPILER_LT_VERSION = '5.0.0'
+export const COMPILER_LT_VERSION = '5.0.0'
 
 export default ContractCompilerAPI

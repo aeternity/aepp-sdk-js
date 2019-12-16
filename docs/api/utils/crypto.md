@@ -46,6 +46,8 @@ import * as Crypto from '@aeternity/aepp-sdk/es/utils/crypto'
         * [.isValidKeypair(privateKey, publicKey)](#module_@aeternity/aepp-sdk/es/utils/crypto.isValidKeypair) ⇒ `Boolean`
         * [.envKeypair(env)](#module_@aeternity/aepp-sdk/es/utils/crypto.envKeypair) ⇒ `Object`
         * [.deserialize(binary, opts)](#module_@aeternity/aepp-sdk/es/utils/crypto.deserialize) ⇒ `Object`
+        * [.encryptData(msg, publicKey)](#module_@aeternity/aepp-sdk/es/utils/crypto.encryptData) ⇒ `Object`
+        * [.decryptData(secretKey, encryptedData)](#module_@aeternity/aepp-sdk/es/utils/crypto.decryptData) ⇒ `Buffer` \| `null`
     * _inner_
         * [~Transaction](#module_@aeternity/aepp-sdk/es/utils/crypto..Transaction) : `Array`
 
@@ -213,7 +215,7 @@ Base58 encode given `input`
 
 | Param | Type | Description |
 | --- | --- | --- |
-| input | `String` | Data to encode |
+| input | `String` \| `Buffer` | Data to encode |
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.decodeBase58Check"></a>
 
@@ -533,6 +535,34 @@ Deserialize `binary` state channel transaction
 | --- | --- | --- |
 | binary | `String` | Data to deserialize |
 | opts | `Object` | Options |
+
+<a id="module_@aeternity/aepp-sdk/es/utils/crypto.encryptData"></a>
+
+### @aeternity/aepp-sdk/es/utils/crypto.encryptData(msg, publicKey) ⇒ `Object`
+This function encrypts a message using base58check encoded and 'ak' prefixed
+publicKey such that only the corresponding secretKey will
+be able to decrypt
+
+**Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
+**rtype**: `(msg: String, publicKey: String) => Object`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| msg | `Buffer` | Data to encode |
+| publicKey | `String` | Public key |
+
+<a id="module_@aeternity/aepp-sdk/es/utils/crypto.decryptData"></a>
+
+### @aeternity/aepp-sdk/es/utils/crypto.decryptData(secretKey, encryptedData) ⇒ `Buffer` \| `null`
+This function decrypt a message using secret key
+
+**Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
+**rtype**: `(secretKey: String, encryptedData: Object) => Buffer|null`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| secretKey | `String` | Secret key |
+| encryptedData | `Object` | Encrypted data |
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto..Transaction"></a>
 

@@ -62,18 +62,18 @@ We'll need the main client module `Ae` in the `Universal` flavor from the SDK.
   
 
 ```js
-const { Universal: Ae, Node } = require('@aeternity/aepp-sdk')
+const { Universal: Ae } = require('@aeternity/aepp-sdk')
 const program = require('commander')
 const fs = require('fs')
 
-async function exec (infile, fn, args) {
+function exec (infile, fn, args) {
   if (!infile || !fn) {
     program.outputHelp()
     process.exit(1)
   }
 
   const code = fs.readFileSync(infile, 'utf-8')
-  const node = await Node({ url: program.host })
+
 
 ```
 
@@ -107,7 +107,7 @@ implementation directly in the SDK.
   
 
 ```js
-  Ae({ debug: program.debug, process, nodes: [{ name: 'testNode', instance: node }] }).then(ae => {
+  Ae({ url: program.host, debug: program.debug, compilerUrl: program.compilerUrl,  process }).then(ae => {
     return ae.contractCompile(code)
 
 ```
@@ -197,6 +197,7 @@ program
   .arguments('<infile> <function> [args...]')
   .option('-i, --init [state]', 'Arguments to contructor function')
   .option('-H, --host [hostname]', 'Node to connect to', 'http://localhost:3013')
+  .option('-C, --compilerUrl [compilerUrl]', 'Compiler to connect to', 'http://localhost:3088')
   .option('--debug', 'Switch on debugging')
   .action(exec)
   .parse(process.argv)

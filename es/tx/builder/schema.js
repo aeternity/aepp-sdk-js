@@ -28,7 +28,7 @@ export const MAX_AUTH_FUN_GAS = 50000
 export const DRY_RUN_ACCOUNT = { pub: 'ak_11111111111111111111111111111111273Yts', amount: '100000000000000000000000000000000000' }
 // # AENS
 export const AENS_NAME_DOMAINS = ['chain', 'test']
-export const NAME_TTL = 500
+export const NAME_TTL = 50000
 // # max number of block into the future that the name is going to be available
 // # https://github.com/aeternity/protocol/blob/epoch-v0.22.0/AENS.md#update
 // # https://github.com/aeternity/protocol/blob/44a93d3aab957ca820183c3520b9daf6b0fedff4/AENS.md#aens-entry
@@ -81,10 +81,10 @@ export const NAME_BID_RANGES = {
 // # ref: https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L273
 // # name bid timeouts
 export const NAME_BID_TIMEOUTS = {
-  13: 0,
-  12: NAME_BID_TIMEOUT_BLOCKS, // # 480 blocks
-  8: 31 * NAME_BID_TIMEOUT_BLOCKS, // # 14880 blocks
-  4: 62 * NAME_BID_TIMEOUT_BLOCKS // # 29760 blocks
+  13: BigNumber(0),
+  12: BigNumber(NAME_BID_TIMEOUT_BLOCKS), // # 480 blocks
+  8: BigNumber(31).times(NAME_BID_TIMEOUT_BLOCKS), // # 14880 blocks
+  4: BigNumber(62).times(NAME_BID_TIMEOUT_BLOCKS) // # 29760 blocks
 }
 
 // # Tag constant for ids (type uint8)
@@ -241,6 +241,7 @@ export const ABI_VERSIONS = {
 }
 
 export const VM_TYPE = { FATE: 'fate', AEVM: 'aevm' }
+export const FATE_ABI = [3]
 
 // First abi/vm by default
 export const VM_ABI_MAP_ROMA = {
@@ -361,7 +362,7 @@ export const DEFAULT_FEE = 20000
 export const KEY_BLOCK_INTERVAL = 3
 
 // MAP WITH FEE CALCULATION https://github.com/aeternity/protocol/blob/master/consensus/consensus.md#gas
-export const TX_FEE_BASE_GAS = (txType) => {
+export const TX_FEE_BASE_GAS = (txType, { backend = VM_TYPE.FATE }) => {
   switch (txType) {
     // case TX_TYPE.gaMeta: // TODO investigate MetaTx calculation
     case TX_TYPE.gaAttach:
@@ -370,7 +371,7 @@ export const TX_FEE_BASE_GAS = (txType) => {
     // Todo Implement meta tx fee calculation
     case TX_TYPE.gaMeta:
     case TX_TYPE.contractCall:
-      return BigNumber(30 * BASE_GAS)
+      return BigNumber((backend === VM_TYPE.FATE ? 12 : 30) * BASE_GAS)
     default:
       return BigNumber(BASE_GAS)
   }
@@ -1220,7 +1221,8 @@ const VALIDATORS = {
   nonceUsed: 'nonceUsed',
   nonceHigh: 'nonceHigh',
   minGasPrice: 'minGasPrice',
-  vmAndAbiVersion: 'vmAndAbiVersion'
+  vmAndAbiVersion: 'vmAndAbiVersion',
+  insufficientBalanceForFeeNameFee: 'insufficientBalanceForFeeNameFee'
 }
 
 const ERRORS = {
@@ -1232,7 +1234,8 @@ const ERRORS = {
   nonceUsed: { key: 'NonceUsed', type: ERROR_TYPE.ERROR, txKey: 'nonce' },
   nonceHigh: { key: 'NonceHigh', type: ERROR_TYPE.WARNING, txKey: 'nonce' },
   minGasPrice: { key: 'minGasPrice', type: ERROR_TYPE.ERROR, txKey: 'gasPrice' },
-  vmAndAbiVersion: { key: 'vmAndAbiVersion', type: ERROR_TYPE.ERROR, txKey: 'ctVersion' }
+  vmAndAbiVersion: { key: 'vmAndAbiVersion', type: ERROR_TYPE.ERROR, txKey: 'ctVersion' },
+  insufficientBalanceForFeeNameFee: { key: 'insufficientBalanceForFeeNameFee', type: ERROR_TYPE.ERROR, txKey: 'nameFee' }
 }
 
 export const SIGNATURE_VERIFICATION_SCHEMA = [
@@ -1252,6 +1255,13 @@ export const CONTRACT_VERIFICATION_SCHEMA = [
     () => `The gasPrice must be bigger then ${MIN_GAS_PRICE}`,
     VALIDATORS.minGasPrice,
     ERRORS.minGasPrice
+  )
+]
+export const NAME_CLAIM_VERIFICATION_SCHEMA = [
+  VERIFICATION_FIELD(
+    ({ balance }) => `The account balance ${balance} is not enough to execute the transaction`,
+    VALIDATORS.insufficientBalanceForFeeNameFee,
+    ERRORS.insufficientBalanceForFeeNameFee
   )
 ]
 export const BASE_VERIFICATION_SCHEMA = [

@@ -13,7 +13,18 @@ import {
   VALIDATION_MESSAGE,
   VSN
 } from './schema'
-import { readInt, readId, readPointers, writeId, writeInt, buildPointers, encode, decode, buildHash } from './helpers'
+import {
+  readInt,
+  readId,
+  readPointers,
+  writeId,
+  writeInt,
+  buildPointers,
+  encode,
+  decode,
+  buildHash,
+  getContractBackendFromTx
+} from './helpers'
 import { toBytes } from '../../utils/bytes'
 import * as mpt from '../../utils/mptree'
 
@@ -176,8 +187,14 @@ function transformParams (params) {
 // INTERFACE
 
 function getOracleRelativeTtl (params) {
-  const [, { value = 500 }] = Object.entries(params).find(([key]) => ['oracleTtl', 'queryTtl', 'responseTtl'].includes(key)) || ['', {}]
-  return value // TODO investigate this
+  // const ORACLE_TTL_KEYS = ['oracleTtl', 'queryTtl', 'responseTtl']
+  // return Object.entries(params).reduce((acc, [key, value]) => {
+  //   if (ORACLE_TTL_KEYS.includes(key)) acc = value.value
+  //   if (ORACLE_TTL_KEYS.map(k => `${k}Value`).includes(key)) acc = value
+  //   return acc
+  // }, 500)
+  // TODO Investigate this
+  return 500
 }
 
 /**
@@ -212,12 +229,13 @@ export function calculateMinFee (txType, { gas = 0, params, vsn }) {
  * @param params
  * @param gas
  * @param multiplier
+ * @param vsn
  * @return {BigNumber}
  */
 function buildFee (txType, { params, gas = 0, multiplier, vsn }) {
   const { rlpEncoded: txWithOutFee } = buildTx({ ...params }, txType, { vsn })
   const txSize = txWithOutFee.length
-  return TX_FEE_BASE_GAS(txType)
+  return TX_FEE_BASE_GAS(txType, { backend: getContractBackendFromTx(params) })
     .plus(TX_FEE_OTHER_GAS(txType)({ txSize, relativeTtl: getOracleRelativeTtl(params) }))
     .times(multiplier)
 }

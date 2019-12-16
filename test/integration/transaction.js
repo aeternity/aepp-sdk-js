@@ -18,7 +18,7 @@
 import { describe, it, before } from 'mocha'
 import { encodeBase58Check, encodeBase64Check, generateKeyPair, salt } from '../../es/utils/crypto'
 import { ready, configure } from './index'
-import { commitmentHash } from '../../es/tx/builder/helpers'
+import { commitmentHash, isNameValid } from '../../es/tx/builder/helpers'
 import { MemoryAccount } from '../../es'
 
 const nonce = 1
@@ -240,5 +240,24 @@ describe('Native Transaction', function () {
 
     const orQuery = (await client.getOracleQuery(oracleId, queryId))
     orQuery.response.should.be.equal(`or_${encodeBase64Check(queryResponse)}`)
+  })
+  it('Get next account nonce', async () => {
+    const accountId = await client.address()
+    const { nonce: accountNonce } = await client.api.getAccountByPubkey(accountId).catch(() => ({ nonce: 0 }))
+    const nonce = await client.getAccountNonce(await client.address())
+    nonce.should.be.equal(accountNonce + 1)
+    const nonceCustom = await client.getAccountNonce(await client.address(), 1)
+    nonceCustom.should.be.equal(1)
+  })
+  it('Is name valid', () => {
+    try {
+      isNameValid('asdasdasd.testDomain')
+    } catch (e) {
+      e.message.indexOf('AENS: Invalid name domain').should.not.be.equal(-1)
+    }
+  })
+  it('Destroy instance', () => {
+    client.destroyInstance()
+    console.log('Finish without error')
   })
 })

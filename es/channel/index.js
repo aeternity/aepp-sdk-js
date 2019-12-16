@@ -24,18 +24,20 @@
 
 import AsyncInit from '../utils/async-init'
 import { snakeToPascal } from '../utils/string'
-import { buildTx } from '../tx/builder'
+import { buildTx, unpackTx } from '../tx/builder'
 import { TX_TYPE } from '../tx/builder/schema'
 import * as handlers from './handlers'
 import {
   eventEmitters,
   status as channelStatus,
+  state as channelState,
   initialize,
   enqueueAction,
   send,
   channelId,
   call,
-  disconnect as channelDisconnect
+  disconnect as channelDisconnect,
+  fsmId as channelFsmId
 } from './internal'
 import * as R from 'ramda'
 
@@ -66,6 +68,16 @@ function on (event, callback) {
 }
 
 /**
+ * Remove event listener function
+ *
+ * @param {String} event - Event name
+ * @param {Function} callback - Callback function
+ */
+function off (event, callback) {
+  eventEmitters.get(this).removeListener(event, callback)
+}
+
+/**
  * Close the connection
  */
 function disconnect () {
@@ -91,12 +103,47 @@ async function state () {
 }
 
 /**
+ * Get current round
+ *
+ * If round cannot be determined (for example when channel has not been opened)
+ * it will return `null`.
+ *
+ * @return {Number}
+ */
+function round () {
+  const state = channelState.get(this)
+  if (!state) {
+    return null
+  }
+  const { txType, tx } = unpackTx(channelState.get(this)).tx.encodedTx
+  switch (txType) {
+    case TX_TYPE.channelCreate:
+      return 1
+    case TX_TYPE.channelOffChain:
+    case TX_TYPE.channelWithdraw:
+    case TX_TYPE.channelDeposit:
+      return parseInt(tx.round, 10)
+    default:
+      return null
+  }
+}
+
+/**
  * Get channel id
  *
  * @return {String}
  */
 function id () {
   return channelId.get(this)
+}
+
+/**
+ * Get channel's fsm id
+ *
+ * @return {String}
+ */
+function fsmId () {
+  return channelFsmId.get(this)
 }
 
 /**
@@ -112,6 +159,7 @@ function id () {
  * @param {String} to - Receiver's public address
  * @param {Number} amount - Transaction amount
  * @param {Function} sign - Function which verifies and signs offchain transaction
+ * @param {Array<String>} metadata
  * @return {Promise<Object>}
  * @example channel.update(
  *   'ak_Y1NRjHuoc3CGMYMvCmdHSBpJsMDR6Ra2t5zjhRcbtMeXXLpLH',
@@ -124,7 +172,7 @@ function id () {
  *   }
  * )
  */
-function update (from, to, amount, sign) {
+function update (from, to, amount, sign, metadata) {
   return new Promise((resolve, reject) => {
     enqueueAction(
       this,
@@ -133,7 +181,7 @@ function update (from, to, amount, sign) {
         send(channel, {
           jsonrpc: '2.0',
           method: 'channels.update.new',
-          params: { from, to, amount }
+          params: { from, to, amount, meta: metadata }
         })
         return {
           handler: handlers.awaitingOffChainTx,
@@ -658,7 +706,24 @@ function sendMessage (message, recipient) {
   if (typeof message === 'object') {
     info = JSON.stringify(message)
   }
-  send(this, { jsonrpc: '2.0', method: 'channels.message', params: { info, to: recipient } })
+  const doSend = (channel) => send(channel, {
+    jsonrpc: '2.0',
+    method: 'channels.message',
+    params: { info, to: recipient }
+  })
+  if (this.status() === 'connecting') {
+    const onStatusChanged = (status) => {
+      if (status !== 'connecting') {
+        // For some reason we can't immediately send a message when connection is
+        // established established. Thus we wait 500ms which seems to work.
+        setTimeout(() => doSend(this), 500)
+        this.off('statusChanged', onStatusChanged)
+      }
+    }
+    this.on('statusChanged', onStatusChanged)
+  } else {
+    doSend(this)
+  }
 }
 
 async function reconnect (options, txParams) {
@@ -723,9 +788,12 @@ const Channel = AsyncInit.compose({
   },
   methods: {
     on,
+    off,
     status,
     state,
+    round,
     id,
+    fsmId,
     update,
     poi,
     balances,

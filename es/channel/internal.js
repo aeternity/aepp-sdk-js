@@ -20,7 +20,7 @@ import { EventEmitter } from 'events'
 import * as R from 'ramda'
 import JSONBig from '../utils/json-big'
 import { pascalToSnake } from '../utils/string'
-import { awaitingConnection, channelClosed, channelOpen } from './handlers'
+import { awaitingConnection, awaitingReconnection, channelOpen } from './handlers'
 
 // Send ping message every 10 seconds
 const PING_TIMEOUT_MS = 10000
@@ -42,6 +42,7 @@ const channelId = new WeakMap()
 const rpcCallbacks = new WeakMap()
 const pingTimeoutId = new WeakMap()
 const pongTimeoutId = new WeakMap()
+const fsmId = new WeakMap()
 
 function channelURL (url, params) {
   const paramString = R.join('&', R.values(R.mapObjIndexed((value, key) =>
@@ -221,15 +222,23 @@ async function initialize (channel, channelOptions) {
   const wsUrl = channelURL(url, { ...params, protocol: 'json-rpc' })
 
   options.set(channel, channelOptions)
-  fsm.set(channel, { handler: params.reconnectTx ? channelClosed : awaitingConnection })
+  if (params.existingFsmId) {
+    fsm.set(channel, { handler: awaitingReconnection })
+  } else {
+    fsm.set(channel, { handler: awaitingConnection })
+  }
   eventEmitters.set(channel, new EventEmitter())
   sequence.set(channel, 0)
   rpcCallbacks.set(channel, new Map())
+  changeStatus(channel, 'connecting')
   const ws = await WebSocket(wsUrl, {
     onopen: () => {
       changeStatus(channel, 'connected')
       if (params.reconnectTx) {
         enterState(channel, { handler: channelOpen })
+        setTimeout(async () =>
+          changeState(channel, (await call(channel, 'channels.get.offchain_state', {})).signed_tx)
+        , 0)
       }
       ping(channel)
     },
@@ -256,5 +265,6 @@ export {
   enqueueAction,
   channelId,
   call,
-  disconnect
+  disconnect,
+  fsmId
 }
