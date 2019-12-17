@@ -31,7 +31,6 @@ import createHash from 'create-hash/browser'
 
 import { leftPad, rightPad, toBytes } from './bytes'
 import { decode as decodeNode } from '../tx/builder/helpers'
-const Buffer = require('buffer/').Buffer
 const Ecb = aesjs.ModeOfOperation.ecb
 /**
  * Check whether a string is valid base-64.
