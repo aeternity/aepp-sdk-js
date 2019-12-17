@@ -85,6 +85,14 @@ describe('crypto', () => {
       const decoded = Crypto.decodeBase58Check(encoded)
       assert.equal(input, decoded)
     })
+
+    it('can be encoded and decoded 64', () => {
+      const input = 'helloword010101023'
+      const inputBuffer = Buffer.from(input)
+      const encoded = Crypto.encodeBase64Check(inputBuffer)
+      const decoded = Crypto.decodeBase64Check(encoded)
+      assert.equal(input, decoded)
+    })
   })
 
   describe('sign', () => {

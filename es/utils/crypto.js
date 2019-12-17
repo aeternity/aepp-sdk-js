@@ -31,7 +31,7 @@ import createHash from 'create-hash/browser'
 
 import { leftPad, rightPad, toBytes } from './bytes'
 import { decode as decodeNode } from '../tx/builder/helpers'
-
+const Buffer = require('buffer/').Buffer
 const Ecb = aesjs.ModeOfOperation.ecb
 /**
  * Check whether a string is valid base-64.
@@ -161,7 +161,7 @@ export function salt () {
 export function encodeBase64Check (input) {
   const buffer = Buffer.from(input)
   const checksum = checkSumFn(input)
-  const payloadWithChecksum = Buffer.concat([buffer, checksum], buffer.length + 4)
+  const payloadWithChecksum = Buffer.concat([Buffer.from(buffer), Buffer.from(checksum)], buffer.length + 4)
   return payloadWithChecksum.toString('base64')
 }
 
