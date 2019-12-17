@@ -24,7 +24,7 @@ export const NodePool = AsyncInit.compose({
 
     nodes.forEach(node => {
       const { name, instance } = node
-      this.pool.set(name, prepareNodeObject(name, instance))
+      this.addNode(name, instance)
     })
     if (nodes.length) this.selectNode(nodes[0].name)
   },
