@@ -22,9 +22,9 @@ export const NodePool = AsyncInit.compose({
     this.pool = new Map()
     this.validateNodes(nodes)
 
-    nodes.forEach(node => {
+    nodes.forEach((node, i) => {
       const { name, instance } = node
-      this.addNode(name, instance)
+      this.addNode(name, instance, i === 0)
     })
     if (nodes.length) this.selectNode(nodes[0].name)
   },
