@@ -14,7 +14,18 @@ export const VSN_2 = 2
 
 // # TRANSACTION DEFAULT TTL
 export const TX_TTL = 0
-
+// # ORACLE
+export const QUERY_FEE = 30000
+export const ORACLE_TTL = { type: 'delta', value: 500 }
+export const QUERY_TTL = { type: 'delta', value: 10 }
+export const RESPONSE_TTL = { type: 'delta', value: 10 }
+// # CONTRACT
+export const DEPOSIT = 0
+export const AMOUNT = 0
+export const GAS = 1600000 - 21000
+export const MIN_GAS_PRICE = 1000000000 // min gasPrice 1e9
+export const MAX_AUTH_FUN_GAS = 50000
+export const DRY_RUN_ACCOUNT = { pub: 'ak_11111111111111111111111111111111273Yts', amount: '100000000000000000000000000000000000' }
 // # AENS
 export const AENS_NAME_DOMAINS = ['chain', 'test']
 export const NAME_TTL = 50000
@@ -136,9 +147,6 @@ const OBJECT_TAG_SOPHIA_BYTE_CODE = 70
 
 const TX_FIELD = (name, type, prefix) => [name, type, prefix]
 const TX_SCHEMA_FIELD = (schema, objectId) => [schema, objectId]
-
-export const MIN_GAS_PRICE = 1000000000 // min gasPrice 1e9
-export const MAX_AUTH_FUN_GAS = 50000 // min gasPrice 1e9
 
 const revertObject = (obj) => Object.entries(obj).reduce((acc, [key, v]) => (acc[v] = key) && acc, {})
 

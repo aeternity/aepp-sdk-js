@@ -27,10 +27,6 @@ Example spend function, using aeternity's SDK abstraction
   // const node1 = await Node({ url, internalUrl })
 
   Wallet({
-    // This two params deprecated and will be remove in next major release
-    url: 'https://sdk-testnet.aepps.com',
-    internalUrl: 'https://sdk-testnet.aepps.com',
-    // instead use
     nodes: [
         // { name: 'someNode', instance: node1 },
         // mode2

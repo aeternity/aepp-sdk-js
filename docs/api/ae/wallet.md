@@ -7,9 +7,9 @@ Wallet module
 ```js
 import Wallet from '@aeternity/aepp-sdk/es/ae/wallet'
 ```
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/wallet--Wallet"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/wallet--exports.Wallet"></a>
 
-### Wallet([options]) ⇒ `Object` ⏏
+### exports.Wallet([options]) ⇒ `Object` ⏏
 Wallet Stamp
 
 **Kind**: Exported function  

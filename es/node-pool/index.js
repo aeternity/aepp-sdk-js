@@ -4,7 +4,6 @@
  * @export NodePool
  * @example import NodePool from '@aeternity/aepp-sdk/es/node-pool'
  */
-import Node from '../node'
 import { DEFAULT_NETWORK_ID, getterForCurrentNode, prepareNodeObject } from './helpers'
 import AsyncInit from '../utils/async-init'
 
@@ -19,21 +18,15 @@ import AsyncInit from '../utils/async-init'
  * @return {Object} NodePool instance
  */
 export const NodePool = AsyncInit.compose({
-  async init ({ nodes = [], url = this.url, internalUrl = this.internalUrl, forceCompatibility = false } = {}) {
+  async init ({ nodes = [] } = {}) {
     this.pool = new Map()
     this.validateNodes(nodes)
 
-    nodes.forEach(node => {
+    nodes.forEach((node, i) => {
       const { name, instance } = node
-      this.pool.set(name, prepareNodeObject(name, instance))
+      this.addNode(name, instance, i === 0)
     })
     if (nodes.length) this.selectNode(nodes[0].name)
-
-    // DEPRECATED. TODO Remove deprecated param
-    // Prevent BREAKING CHANGES. Support for init params `url`, `internalUrl`
-    if (url) {
-      this.addNode('default', await Node({ url, internalUrl, forceCompatibility }), true)
-    }
   },
   propertyDescriptors: {
     api: {

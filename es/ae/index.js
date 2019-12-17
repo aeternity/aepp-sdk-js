@@ -76,7 +76,7 @@ async function spend (amount, recipientId, options = {}) {
 /**
  * Resolve AENS name and return name hash
  * @param {String} nameOrAddress
- * @param verify
+ * @param {Boolean} verify
  * @return {String} Address or AENS name hash
  */
 async function resolveRecipientName (nameOrAddress, { verify = false }) {

@@ -76,10 +76,10 @@ describe('Aens', function () {
   it('claims names', async () => {
     const preclaim = await aens.aensPreclaim(name)
     preclaim.should.be.an('object')
-    return preclaim.claim().catch(e => {
-      console.log(e)
-      return {}
-    }).should.eventually.be.an('object')
+    const claimed = await preclaim.claim()
+    claimed.should.be.an('object')
+    claimed.id.should.be.a('string')
+    claimed.ttl.should.be.an('number')
   })
 
   it('queries names', async () => {
@@ -122,7 +122,6 @@ describe('Aens', function () {
     await claim.transfer(onAccount)
 
     const claim2 = await aens.aensQuery(name)
-
     return claim2.update(onAccount, { onAccount }).should.eventually.deep.include({
       pointers: [R.fromPairs([['key', 'account_pubkey'], ['id', onAccount]])]
     })

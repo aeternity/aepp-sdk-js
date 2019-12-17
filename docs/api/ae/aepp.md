@@ -7,9 +7,9 @@ Aepp module
 ```js
 import Ae from '@aeternity/aepp-sdk/es/ae/aepp'
 ```
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/aepp--Aepp"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/aepp--exports.Aepp"></a>
 
-### Aepp([options]) ⇒ `Object` ⏏
+### exports.Aepp([options]) ⇒ `Object` ⏏
 Aepp Stamp
 
 Aepp provides Ae base functionality with Contract and Aens.

@@ -23,6 +23,7 @@ import { generateKeyPair, encodeBase64Check } from '../../es/utils/crypto'
 import { unpackTx, buildTx } from '../../es/tx/builder'
 import { decode } from '../../es/tx/builder/helpers'
 import Channel from '../../es/channel'
+import MemoryAccount from '../../es/account/memory'
 
 const wsUrl = process.env.TEST_WS_URL || 'ws://localhost:3014/channel'
 
@@ -85,8 +86,8 @@ describe('Channel', function () {
 
   before(async function () {
     initiator = await ready(this)
-    responder = await BaseAe({ nativeMode: true, networkId })
-    responder.setKeypair(generateKeyPair())
+    responder = await BaseAe({ nativeMode: true, networkId, accounts: [] })
+    await responder.addAccount(MemoryAccount({ keypair: generateKeyPair() }), { select: true })
     sharedParams.initiatorId = await initiator.address()
     sharedParams.responderId = await responder.address()
     await initiator.spend(BigNumber('500e18').toString(), await responder.address())

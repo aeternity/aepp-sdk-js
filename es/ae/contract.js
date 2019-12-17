@@ -35,13 +35,18 @@ import ContractBase from '../contract'
 import ContractACI from '../contract/aci'
 import BigNumber from 'bignumber.js'
 import NodePool from '../node-pool'
+import { AMOUNT, DEPOSIT, DRY_RUN_ACCOUNT, GAS, MIN_GAS_PRICE } from '../tx/builder/schema'
 
 function sendAndProcess (tx, options) {
   return async function (onSuccess, onError) {
     // Send transaction and get transaction info
     const txData = await this.send(tx, options)
-    const result = await this.getTxInfo(txData.hash)
 
+    if (typeof options.waitMined === 'boolean' && !options.waitMined) {
+      return onSuccess({ hash: txData.hash, rawTx: txData.rawTx })
+    }
+
+    const result = await this.getTxInfo(txData.hash)
     return result.returnType === 'ok'
       ? onSuccess({ hash: txData.hash, rawTx: txData.rawTx, result, txData })
       : typeof onError === 'function' ? onError(result) : this.handleCallError(result)
@@ -192,7 +197,7 @@ async function dryRunContractTx (tx, callerId, source, name, opt = {}) {
  * @param {String} source Contract source code
  * @param {String} address Contract address
  * @param {String} name Name of function to call
- * @param {Array|String} args Argument's or callData for call function
+ * @param {Array|String} argsOrCallData Argument's array or callData for call function
  * @param {Object} [options={}] Transaction options (fee, ttl, gas, amount, deposit)
  * @param {Object} [options.filesystem={}] Contract external namespaces map* @return {Promise<Object>} Result object
  * @example
@@ -203,13 +208,13 @@ async function dryRunContractTx (tx, callerId, source, name, opt = {}) {
  *   decode: (type) => Decode call result
  * }
  */
-async function contractCall (source, address, name, args = [], options = {}) {
+async function contractCall (source, address, name, argsOrCallData = [], options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
 
   const tx = await this.contractCallTx(R.merge(opt, {
     callerId: await this.address(opt),
     contractId: address,
-    callData: Array.isArray(args) ? await this.contractEncodeCall(source, name, args, opt) : args
+    callData: Array.isArray(argsOrCallData) ? await this.contractEncodeCall(source, name, argsOrCallData, opt) : argsOrCallData
   }))
 
   return sendAndProcess(tx, opt).call(
@@ -219,7 +224,7 @@ async function contractCall (source, address, name, args = [], options = {}) {
       rawTx,
       result,
       txData,
-      decode: () => this.contractDecodeData(source, name, result.returnValue, result.returnType, opt)
+      decode: () => result ? this.contractDecodeData(source, name, result.returnValue, result.returnType, opt) : {}
     })
   )
 }
@@ -345,12 +350,12 @@ export const ContractAPI = Ae.compose(ContractBase, ContractACI, {
   deepProps: {
     Ae: {
       defaults: {
-        deposit: 0,
-        gasPrice: 1000000000, // min gasPrice 1e9
-        amount: 0,
-        gas: 1600000 - 21000,
+        deposit: DEPOSIT,
+        gasPrice: MIN_GAS_PRICE, // min gasPrice 1e9
+        amount: AMOUNT,
+        gas: GAS,
         options: '',
-        dryRunAccount: { pub: 'ak_11111111111111111111111111111111273Yts', amount: '100000000000000000000000000000000000' }
+        dryRunAccount: DRY_RUN_ACCOUNT
       }
     }
   }
