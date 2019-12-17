@@ -22,7 +22,7 @@ import { Contract } from '@aeternity/aepp-sdk' (Using bundle)
         * [contractEncodeCall(source, name, args, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractEncodeCall) ⇒ `Promise.&lt;String&gt;` ⏏
         * [contractDecodeData(source, fn, callValue, callResult, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractDecodeData) ⇒ `Promise.&lt;String&gt;` ⏏
         * [contractCallStatic(source, address, name, args, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCallStatic) ⇒ `Promise.&lt;Object&gt;` ⏏
-        * [contractCall(source, address, name, args, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCall) ⏏
+        * [contractCall(source, address, name, argsOrCallData, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCall) ⏏
         * [contractDeploy(code, source, initState, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractDeploy) ⇒ `Promise.&lt;Object&gt;` ⏏
         * [contractCompile(source, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCompile) ⇒ `Promise.&lt;Object&gt;` ⏏
 
@@ -147,7 +147,7 @@ const callResult = await client.contractCallStatic(source, address, fnName, args
 ```
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCall"></a>
 
-### contractCall(source, address, name, args, [options]) ⏏
+### contractCall(source, address, name, argsOrCallData, [options]) ⏏
 Call contract function
 
 **Kind**: Exported function  
@@ -158,7 +158,7 @@ Call contract function
 | source | `String` |  | Contract source code |
 | address | `String` |  | Contract address |
 | name | `String` |  | Name of function to call |
-| args | `Array` \| `String` |  | Argument's or callData for call function |
+| argsOrCallData | `Array` \| `String` |  | Argument's array or callData for call function |
 | [options] | `Object` | <code>{}</code> | Transaction options (fee, ttl, gas, amount, deposit) |
 | [options.filesystem] | `Object` | <code>{}</code> | Contract external namespaces map* @return {Promise<Object>} Result object |
 

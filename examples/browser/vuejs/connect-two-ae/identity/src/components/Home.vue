@@ -42,17 +42,16 @@
 <script>
   // AE_SDK_MODULES is a webpack alias present in webpack.config.js
   import { MemoryAccount, RpcWallet } from '@aeternity/aepp-sdk/es'
-  import Node from '@aeternity/aepp-sdk/es/node'
   import BrowserWindowMessageConnection
-    from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-connection/browser-window-message'
-  import { generateKeyPair } from '../../../../../../../es/utils/crypto'
+    from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message'
+  import { generateKeyPair } from '@aeternity/aepp-sdk/es/utils/crypto'
 
   export default {
     data () {
       return {
         runningInFrame: window.parent !== window,
-        pub: 'YOUR_PUB', // Your public key
-        priv: 'YOUR_PRIV', // Your private key
+        publicKey: 'YOUR_PUB', // Your public key
+        secretKey: 'YOUR_PRIV', // Your private key
         client: null,
         balance: null,
         height: null,

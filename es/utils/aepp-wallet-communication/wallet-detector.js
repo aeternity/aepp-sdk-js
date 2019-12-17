@@ -17,17 +17,16 @@
  */
 
 /**
- * Browser runtime connector module
+ * Wallet Detector
  *
- * This is the complement to {@link module:@aeternity/aepp-sdk/es/utils/wallet-connection}.
- * @module @aeternity/aepp-sdk/es/utils/wallet-connection/browser-runtime
- * @export BrowserRuntimeConnection
- * @example import BrowserRuntimeConnection from '@aeternity/aepp-sdk/es/utils/wallet-connection/browser-runtime'
+ * This is the complement to {@link module:@aeternity/aepp-sdk/es/utils}.
+ * @module @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector
+ * @export WalletDetector
+ * @example import WalletDetector from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector'
  */
 import AsyncInit from '../async-init'
-import BrowserRuntimeConnection from './wallet-connection/browser-runtime'
-import BrowserWindowMessageConnection from './wallet-connection/browser-window-message'
-import { METHODS } from './schema'
+import BrowserWindowMessageConnection from './connection/browser-window-message'
+import { MESSAGE_DIRECTION, METHODS } from './schema'
 import { isInIframe } from './helpers'
 
 const wallets = {}
@@ -40,9 +39,14 @@ const handleDetection = (onDetected) => ({ method, params }, source) => {
       ...params,
       async getConnection () {
         // if detect extension wallet or page wallet
-        return this.type === 'extension'
-          ? BrowserRuntimeConnection({ connectionInfo: this })
-          : BrowserWindowMessageConnection({ connectionInfo: this, origin: this.origin, target: isInIframe() ? window.parent : source })
+        const isExtension = this.type === 'extension'
+        return BrowserWindowMessageConnection({
+          connectionInfo: this,
+          origin: isExtension ? window.origin : this.origin,
+          sendDirection: isExtension ? MESSAGE_DIRECTION.to_waellet : undefined,
+          receiveDirection: isExtension ? MESSAGE_DIRECTION.to_aepp : undefined,
+          target: isInIframe() ? window.parent : source
+        })
       }
     }
     wallets[w.id] = w
@@ -50,31 +54,48 @@ const handleDetection = (onDetected) => ({ method, params }, source) => {
   }
 }
 
+/**
+ * Start scanning
+ * @function scan
+ * @instance
+ * @param {Function} onDetected Call-back function which trigger on new wallet
+ * @return {void}
+ */
 function scan (onDetected) {
   this.connection.connect(handleDetection(onDetected))
   !Object.keys(wallets).length || onDetected({ wallets })
 }
 
+/**
+ * Stop scanning
+ * @function stopScan
+ * @instance
+ * @return {void}
+ */
 function stopScan () {
   this.connection.disconnect()
 }
 
+/**
+ * Get wallet list
+ * @function getWallets
+ * @instance
+ * @return {Array} Available wallets
+ */
 function getWallets () {
   return wallets
 }
 
 /**
- * RemoteAccount
+ * WalletDetector stamp
  * @function
- * @alias module:@aeternity/aepp-sdk/es/account/remote
+ * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector
  * @rtype Stamp
- * @param {Object} [options={}] - Initializer object
- * @param {Object} options.keypair - Key pair to use
- * @param {String} options.keypair.publicKey - Public key
- * @param {String} options.keypair.secretKey - Private key
- * @return {Account}
+ * @param {Object} params={} - Initializer object
+ * @param {WalletConnection} params.connection - Connection for listening for wallets
+ * @return {WalletDetector}
  */
-export const ExtWalletDetector = AsyncInit.compose({
+export const WalletDetector = AsyncInit.compose({
   async init ({ connection }) {
     if (!window) throw new Error('Window object not found, you can run wallet detector only in browser')
     this.connection = connection
@@ -82,4 +103,4 @@ export const ExtWalletDetector = AsyncInit.compose({
   methods: { scan, stopScan, getWallets }
 })
 
-export default ExtWalletDetector
+export default WalletDetector

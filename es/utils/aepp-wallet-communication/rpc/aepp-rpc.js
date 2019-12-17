@@ -1,11 +1,18 @@
-import Ae from '../../../ae'
-
-import { WalletClient } from './wallet-clients'
-import { getHandler, message } from '../helpers'
-import { METHODS, RPC_STATUS, VERSION } from '../schema'
-import Account from '../../../account'
-import uuid from 'uuid/v4'
+/**
+ * RPC handler for AEPP side
+ *
+ * @module @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc
+ * @export AeppRpc
+ * @example import ContentScriptBridge from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc'
+ */
 import * as R from 'ramda'
+import uuid from 'uuid/v4'
+
+import Ae from '../../../ae'
+import Account from '../../../account'
+import { RpcClient } from './rpc-clients'
+import { getHandler, message, voidFn } from '../helpers'
+import { METHODS, RPC_STATUS, VERSION } from '../schema'
 
 const NOTIFICATIONS = {
   [METHODS.wallet.updateAddress]: (instance) =>
@@ -65,8 +72,22 @@ const handleMessage = (instance) => async (msg) => {
   }
 }
 
+/**
+ * Contain functionality for wallet interaction and connect it to sdk
+ * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc
+ * @function
+ * @rtype Stamp
+ * @param {Object} param Init params object
+ * @param {String=} [param.name] Aepp name
+ * @param {Function} onAddressChange Call-back function for update address event
+ * @param {Function} onDisconnect Call-back function for disconnect event
+ * @param {Function} onNetworkChange Call-back function for update network event
+ * @param {Object} connection Wallet connection object
+ * @return {Object}
+ */
 export const AeppRpc = Ae.compose(Account, {
-  async init ({ icons, name, onAddressChange, onDisconnect, onNetworkChange, connection }) {
+  async init ({ name, onAddressChange = voidFn, onDisconnect = voidFn, onNetworkChange = voidFn, connection }) {
+    const eventsHandlers = ['onDisconnect', 'onAddressChange', 'onNetworkChange']
     this.connection = connection
     this.name = name
     this.accounts = {}
@@ -75,17 +96,29 @@ export const AeppRpc = Ae.compose(Account, {
       // Init RPCClient
       await this.connectToWallet(connection)
     }
-
     // Event callbacks
     this.onDisconnect = onDisconnect
     this.onAddressChange = onAddressChange
     this.onNetworkChange = onNetworkChange
+    // validation
+    eventsHandlers.forEach(event => {
+      if (typeof this[event] !== 'function') throw new Error(`Call-back for ${event} must be an function!`)
+    })
   },
   methods: {
-    sign () {},
+    sign () {
+    },
+    /**
+     * Connect to wallet
+     * @function connectToWallet
+     * @instance
+     * @rtype (connection: Object) => void
+     * @param {Object} connection Wallet connection object
+     * @return {void}
+     */
     async connectToWallet (connection) {
       if (this.rpcClient && this.rpcClient.isConnected()) throw new Error('You are already connected to wallet ' + this.rpcClient)
-      this.rpcClient = WalletClient({
+      this.rpcClient = RpcClient({
         connection,
         networkId: this.getNetworkId(),
         ...connection.connectionInfo,
@@ -94,6 +127,14 @@ export const AeppRpc = Ae.compose(Account, {
       })
       return this.sendConnectRequest()
     },
+    /**
+     * Disconnect from wallet
+     * @function disconnectWallet
+     * @instance
+     * @rtype (force: Boolean = false) => void
+     * @param {Boolean} force=false Force sending close connection message
+     * @return {void}
+     */
     async disconnectWallet (force = false) {
       if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
       force || this.rpcClient.sendMessage(message(METHODS.closeConnection, { reason: 'bye' }), true)
@@ -105,6 +146,13 @@ export const AeppRpc = Ae.compose(Account, {
       if (!this.rpcClient.getCurrentAccount()) throw new Error('You do not subscribed for account.')
       return this.rpcClient.getCurrentAccount({ onAccount })
     },
+    /**
+     * Ask address from wallet
+     * @function askAddresses
+     * @instance
+     * @rtype () => Promise
+     * @return {Promise} Address from wallet
+     */
     async askAddresses () {
       if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
       if (!this.rpcClient.getCurrentAccount()) throw new Error('You do not subscribed for account.')
@@ -112,6 +160,29 @@ export const AeppRpc = Ae.compose(Account, {
         this.rpcClient.sendMessage(message(METHODS.aepp.address))
       )
     },
+    /**
+     * Subscribe for addresses from wallet
+     * @function subscribeAddress
+     * @instance
+     * @rtype (type: String, value: String) => Promise
+     * @param {String} type Type of subscription can be one of ['current'(just for selected account updates), 'connected(all accounts)']
+     * @param {String} value Subscription action('subscribe'|'unsubscribe')
+     * @return {Promise} Address from wallet
+     */
+    async subscribeAddress (type, value) {
+      if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
+      return this.rpcClient.addCallback(
+        this.rpcClient.sendMessage(message(METHODS.aepp.subscribeAddress, { type, value }))
+      )
+    },
+    /**
+     * Overwriting of `signTransaction` AE method
+     * All sdk API which use it will be send notification to wallet and wait for callBack
+     * @function signTransaction
+     * @instance
+     * @rtype (tx: String, options = {}) => Promise
+     * @return {Promise<String>} Signed transaction
+     */
     async signTransaction (tx, opt = {}) {
       if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
       if (!this.rpcClient.getCurrentAccount()) throw new Error('You do not subscribed for account.')
@@ -119,12 +190,13 @@ export const AeppRpc = Ae.compose(Account, {
         this.rpcClient.sendMessage(message(METHODS.aepp.sign, { ...opt, tx, returnSigned: true }))
       )
     },
-    async subscribeAddress (type, value) {
-      if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
-      return this.rpcClient.addCallback(
-        this.rpcClient.sendMessage(message(METHODS.aepp.subscribeAddress, { type, value }))
-      )
-    },
+    /**
+     * Send connection request to wallet
+     * @function sendConnectRequest
+     * @instance
+     * @rtype () => Promise
+     * @return {Promise} Connection response
+     */
     async sendConnectRequest () {
       return this.rpcClient.addCallback(
         this.rpcClient.sendMessage(message(METHODS.aepp.connect, {
@@ -134,6 +206,15 @@ export const AeppRpc = Ae.compose(Account, {
         }))
       )
     },
+    /**
+     * Overwriting of `send` AE method
+     * All sdk API which use it will be send notification to wallet and wait for callBack
+     * This method will sign, broadcast and wait until transaction will be accepted using rpc communication with wallet
+     * @function send
+     * @instance
+     * @rtype (tx: String, options = {}) => Promise
+     * @return {Promise<Object>} Transaction broadcast result
+     */
     async send (tx, options) {
       if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
       if (!this.rpcClient.getCurrentAccount()) throw new Error('You do not subscribed for account.')
