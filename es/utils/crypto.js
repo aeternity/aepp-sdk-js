@@ -27,13 +27,12 @@ import { blake2b } from 'blakejs'
 import ed2curve from 'ed2curve'
 import nacl from 'tweetnacl'
 import aesjs from 'aes-js'
-import shajs from 'sha.js'
+import createHash from 'create-hash/browser'
 
 import { leftPad, rightPad, toBytes } from './bytes'
 import { decode as decodeNode } from '../tx/builder/helpers'
 
 const Ecb = aesjs.ModeOfOperation.ecb
-
 /**
  * Check whether a string is valid base-64.
  * @param {string} str String to validate.
@@ -141,7 +140,7 @@ export function nameId (input) {
  * @return {String} Hash
  */
 export function sha256hash (input) {
-  return shajs('sha256').update(input).digest()
+  return createHash('sha256').update(input).digest()
 }
 
 /**
@@ -174,8 +173,7 @@ function decodeRaw (buffer) {
   const payload = buffer.slice(0, -4)
   const checksum = buffer.slice(-4)
   const newChecksum = checkSumFn(payload)
-
-  if (!checksum.equals(newChecksum)) return
+  if (!checksum.equals(Buffer.from(newChecksum))) return
 
   return payload
 }
