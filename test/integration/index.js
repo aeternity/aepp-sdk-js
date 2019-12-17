@@ -19,6 +19,7 @@ import { Universal as Ae } from '../../es/ae/universal'
 import * as Crypto from '../../es/utils/crypto'
 import { BigNumber } from 'bignumber.js'
 import MemoryAccount from '../../es/account/memory'
+import Node from '../../es/node'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
@@ -32,10 +33,14 @@ const forceCompatibility = process.env.FORCE_COMPATIBILITY || false
 export const account = Crypto.generateKeyPair()
 export const account2 = Crypto.generateKeyPair()
 
-const BaseAe = (params) => Ae.waitMined(true).compose({
+const BaseAe = async (params) => Ae.waitMined(true).compose({
   deepProps: { Swagger: { defaults: { debug: !!process.env['DEBUG'] } } },
-  props: { url, internalUrl, process, compilerUrl }
-})({ ...params, forceCompatibility })
+  props: { process, compilerUrl }
+})({
+  ...params,
+  forceCompatibility,
+  nodes: [{ name: 'test', instance: await Node({ url, internalUrl }) }]
+})
 
 const BaseAeWithAccounts = BaseAe
 

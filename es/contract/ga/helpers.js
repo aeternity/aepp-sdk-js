@@ -18,6 +18,7 @@ export const prepareGaParams = (ins) => async (authData, authFnName) => {
 
 export const getContractAuthFan = (ins) => async (source, fnName) => {
   const { bytecode } = await ins.contractCompile(source)
+
   return { bytecode, authFun: hash(fnName) }
 }
 
