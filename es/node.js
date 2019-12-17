@@ -102,7 +102,7 @@ function axiosError (handler) {
  * @example Node({url: 'https://sdk-testnet.aepps.com'})
  */
 const Node = stampit(AsyncInit, {
-  async init ({ name, url = this.url, internalUrl = this.internalUrl, axiosConfig: { config, errorHandler } = {} }) {
+  async init ({ url = this.url, internalUrl = this.internalUrl, axiosConfig: { config, errorHandler } = {} }) {
     if (!url) throw new Error('"url" required')
     url = url.replace(/\/?$/, '')
     internalUrl = internalUrl ? internalUrl.replace(/\/?$/, '') : url
@@ -139,7 +139,10 @@ const Node = stampit(AsyncInit, {
     const { nodeRevision: revision, genesisKeyBlockHash: genesisHash, networkId, protocols } = await this.api.getStatus()
     this.consensusProtocolVersion = await this.getConsensusProtocolVersion(protocols)
     if (
-      !(semverSatisfies(this.version.split('-')[0], NODE_GE_VERSION, NODE_LT_VERSION)) &&
+      (
+        !semverSatisfies(this.version.split('-')[0], NODE_GE_VERSION, NODE_LT_VERSION) ||
+        this.version === '5.0.0-rc1'
+      ) &&
       // Todo implement 'rc' version comparision in semverSatisfies
       !forceCompatibility
     ) {
@@ -154,7 +157,7 @@ const Node = stampit(AsyncInit, {
   }
 })
 
-const NODE_GE_VERSION = '3.0.1'
+const NODE_GE_VERSION = '5.0.0'
 const NODE_LT_VERSION = '6.0.0'
 
 export default Node

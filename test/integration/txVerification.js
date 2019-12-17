@@ -2,6 +2,7 @@ import { before, describe, it } from 'mocha'
 import { configure, ready } from '.'
 import { generateKeyPair } from '../../es/utils/crypto'
 import { BASE_VERIFICATION_SCHEMA, SIGNATURE_VERIFICATION_SCHEMA } from '../../es/tx/builder/schema'
+import MemoryAccount from '../../es/account/memory'
 
 const WARNINGS = [...SIGNATURE_VERIFICATION_SCHEMA, ...BASE_VERIFICATION_SCHEMA].reduce((acc, [msg, v, error]) => error.type === 'warning' ? [...acc, error.txKey] : acc, [])
 const ERRORS = [...BASE_VERIFICATION_SCHEMA, ...SIGNATURE_VERIFICATION_SCHEMA].reduce((acc, [msg, v, error]) => error.type === 'error' ? [...acc, error.txKey] : acc, [])
@@ -49,7 +50,7 @@ describe('Verify Transaction', function () {
       absoluteTtl: true
     })
 
-    client.setKeypair(generateKeyPair())
+    await client.addAccount(MemoryAccount({ keypair: generateKeyPair() }), { select: true })
     // Sign using another account
     const signedTx = await client.signTransaction(spendTx)
 

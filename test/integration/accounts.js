@@ -19,6 +19,7 @@ import { describe, it, before } from 'mocha'
 import { configure, ready, BaseAe, networkId } from './'
 import { generateKeyPair } from '../../es/utils/crypto'
 import { BigNumber } from 'bignumber.js'
+import MemoryAccount from '../../es/account/memory'
 
 describe('Accounts', function () {
   configure(this)
@@ -36,7 +37,7 @@ describe('Accounts', function () {
 
     before(async function () {
       wallet = await ready(this)
-      wallet.setKeypair(generateKeyPair())
+      await wallet.addAccount(MemoryAccount({ keypair: generateKeyPair() }), { select: true })
     })
 
     it('determining the balance using deprecated `balance` method', async () => {

@@ -8,7 +8,6 @@ const _sodium = require('libsodium-wrappers-sumo')
 
 /**
  * KeyStore module
- * !!!Work only in node.js!!!
  * @module @aeternity/aepp-sdk/es/utils/keystore
  * @example import * as Keystore from '@aeternity/aepp-sdk/es/utils/keystore'
  * @example const { Keystore } = require('@aeternity/aepp-sdk')
