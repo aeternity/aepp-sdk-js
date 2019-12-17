@@ -152,7 +152,7 @@ const ContractCompilerAPI = AsyncInit.compose(ContractBase, {
   }
 })
 
-const COMPILER_GE_VERSION = '3.1.0'
+const COMPILER_GE_VERSION = '4.0.0'
 export const COMPILER_LT_VERSION = '5.0.0'
 
 export default ContractCompilerAPI

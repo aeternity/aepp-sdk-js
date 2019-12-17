@@ -364,16 +364,6 @@ function getVmVersion (txType, { vmVersion, abiVersion, backend } = {}) {
   const protocolForTX = supportedProtocol[txType]
   if (!protocolForTX) throw new Error('Not supported tx type')
 
-  // TODO remove cross compatibility
-  // Cross node/compiler compatibility
-  if (this.compilerVersion) {
-    const [compilerMajor] = this.compilerVersion.split('.')
-    if (+compilerMajor === 4 && consensusProtocolVersion !== 4) throw new Error(`Compiler ${this.compilerVersion} support only consensus protocol 4(Lima)`)
-    if (+compilerMajor <= 3 && consensusProtocolVersion > 3) throw new Error(`Compiler ${this.compilerVersion} support only consensus protocol less then 3(Fortuna)`)
-    if (backend === VM_TYPE.FATE && consensusProtocolVersion < 4) throw new Error('You can use FATE only after Lima HF')
-    backend = backend || this.compilerOptions.backend
-  }
-
   const ctVersion = {
     abiVersion: abiVersion !== undefined ? abiVersion : backend === VM_TYPE.AEVM ? protocolForTX.abiVersion[1] : backend === VM_TYPE.FATE ? protocolForTX.abiVersion[0] : protocolForTX.abiVersion[0],
     vmVersion: vmVersion !== undefined ? vmVersion : backend === VM_TYPE.AEVM ? protocolForTX.vmVersion[1] : backend === VM_TYPE.FATE ? protocolForTX.vmVersion[0] : protocolForTX.vmVersion[0]
