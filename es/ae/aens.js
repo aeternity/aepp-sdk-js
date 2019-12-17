@@ -28,7 +28,7 @@
 
 import * as R from 'ramda'
 import { encodeBase58Check, salt } from '../utils/crypto'
-import { commitmentHash, isNameValid, getMinimumNameFee, classify } from '../tx/builder/helpers'
+import { commitmentHash, isNameValid, getMinimumNameFee, classify, isAuctionName } from '../tx/builder/helpers'
 import Ae from './'
 import { CLIENT_TTL, NAME_FEE, NAME_TTL } from '../tx/builder/schema'
 
@@ -144,24 +144,15 @@ async function query (name, opt = {}) {
  * @param {Number|String} [options.nameFee] Name Fee
  * @return {Promise<Object>} the result of the claim
  */
-async function claim (name, salt, options = {}) {
-  // Todo remove cross compatibility
-  const { version } = this.getNodeInfo()
-  const [majorVersion] = version.split('.')
-  const vsn = +majorVersion === 5 && version !== '5.0.0-rc.1' ? 2 : 1
-  options.vsn = options.vsn || vsn
-
-  isNameValid(name)
+async function claim (name, salt, options = { vsn: 2 }) {
   const opt = R.merge(this.Ae.defaults, options)
+  isNameValid(name)
 
-  // TODO remove cross compatibility
-  if (opt.vsn === 2) {
-    const minNameFee = getMinimumNameFee(name)
-    if (opt.nameFee !== this.Ae.defaults.nameFee && minNameFee.gt(opt.nameFee)) {
-      throw new Error(`the provided fee ${opt.nameFee} is not enough to execute the claim, required: ${minNameFee}`)
-    }
-    opt.nameFee = opt.nameFee !== this.Ae.defaults.nameFee ? opt.nameFee : minNameFee
+  const minNameFee = getMinimumNameFee(name)
+  if (opt.nameFee !== this.Ae.defaults.nameFee && minNameFee.gt(opt.nameFee)) {
+    throw new Error(`the provided fee ${opt.nameFee} is not enough to execute the claim, required: ${minNameFee}`)
   }
+  opt.nameFee = opt.nameFee !== this.Ae.defaults.nameFee ? opt.nameFee : minNameFee
   const claimTx = await this.nameClaimTx(R.merge(opt, {
     accountId: await this.address(opt),
     nameSalt: salt,
@@ -169,7 +160,7 @@ async function claim (name, salt, options = {}) {
   }))
 
   const result = await this.send(claimTx, opt)
-  if (opt.vsn === 1 || name.split('.')[0].length > 12) {
+  if (!isAuctionName(name)) {
     delete opt.vsn
     const nameInter = opt.waitMined ? await this.aensQuery(name, opt) : {}
     return Object.assign(result, nameInter)
