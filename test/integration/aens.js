@@ -122,7 +122,6 @@ describe('Aens', function () {
     await claim.transfer(onAccount)
 
     const claim2 = await aens.aensQuery(name)
-
     return claim2.update(onAccount, { onAccount }).should.eventually.deep.include({
       pointers: [R.fromPairs([['key', 'account_pubkey'], ['id', onAccount]])]
     })

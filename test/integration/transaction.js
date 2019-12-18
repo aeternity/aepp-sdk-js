@@ -19,6 +19,7 @@ import { describe, it, before } from 'mocha'
 import { encodeBase58Check, encodeBase64Check, generateKeyPair, salt } from '../../es/utils/crypto'
 import { ready, configure } from './index'
 import { commitmentHash, isNameValid } from '../../es/tx/builder/helpers'
+import { MemoryAccount } from '../../es'
 
 const nonce = 1
 const nameTtl = 1
@@ -68,8 +69,8 @@ describe('Native Transaction', function () {
     client = await ready(this, false)
     clientNative = await ready(this)
     await client.spend('16774200000000000000', keyPair.publicKey)
-    client.setKeypair(keyPair)
-    clientNative.setKeypair(keyPair)
+    await client.addAccount(MemoryAccount({ keypair: keyPair }), { select: true })
+    await clientNative.addAccount(MemoryAccount({ keypair: keyPair }), { select: true })
     oracleId = `ok_${(await client.address()).slice(3)}`
     _salt = salt()
     commitmentId = await commitmentHash(name, _salt)
@@ -220,15 +221,11 @@ describe('Native Transaction', function () {
 
     txFromAPI.should.be.equal(nativeTx)
 
-    try {
-      await client.send(nativeTx)
-      const oracleQuery = (await client.getOracleQuery(oracleId, oracleQueryId))
-      oracleQuery.id.should.be.equal(oracleQueryId)
-      queryId = oracleQueryId
-    } catch (e) {
-      console.log(e.errorData.tx)
-      console.log(e.errorData.validation)
-    }
+    await client.send(nativeTx)
+
+    const oracleQuery = (await client.getOracleQuery(oracleId, oracleQueryId))
+    oracleQuery.id.should.be.equal(oracleQueryId)
+    queryId = oracleQueryId
   })
 
   it('native build of oracle respond query tx', async () => {

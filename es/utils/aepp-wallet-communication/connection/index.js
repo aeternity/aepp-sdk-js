@@ -17,9 +17,9 @@
 
 /**
  * Wallet Connection base module
- * @module @aeternity/aepp-sdk/es/utils/wallet-connection
+ * @module @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection
  * @export WalletConnection
- * @example import ContractBase from '@aeternity/aepp-sdk/es/utils/wallet-connection'
+ * @example import WalletConnection from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection'
  */
 
 import { required } from '@stamp/required'
@@ -31,7 +31,7 @@ import { required } from '@stamp/required'
  * Attempting to create instances from the Stamp without overwriting all
  * abstract methods using composition will result in an exception.
  * @function
- * @alias module:@aeternity/aepp-sdk/es/utils/wallet-connection
+ * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection
  * @rtype Stamp
  * @param {Object} [options={}] - Initializer object
  * @return {Object} WalletConnection instance
@@ -40,7 +40,8 @@ export const WalletConnection = required({
   methods: {
     connect: required,
     disconnect: required,
-    sendMessage: required
+    sendMessage: required,
+    isConnected: required
   }
 })
 
@@ -51,6 +52,7 @@ export const WalletConnection = required({
  * @abstract
  * @rtype (onMessage: Function) => void
  * @param {Function} onMessage - Message handler
+ * @return {void}
  */
 
 /**
@@ -59,6 +61,7 @@ export const WalletConnection = required({
  * @instance
  * @abstract
  * @rtype () => void
+ * @return {void}
  */
 
 /**
@@ -68,6 +71,16 @@ export const WalletConnection = required({
  * @abstract
  * @rtype (msg: Object) => void
  * @param {Object} msg - Message
+ * @return {void}
+ */
+
+/**
+ * Check if connected
+ * @function isConnected
+ * @instance
+ * @abstract
+ * @rtype () => Boolean
+ * @return {Boolean} Is connected
  */
 
 export default WalletConnection

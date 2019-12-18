@@ -116,18 +116,11 @@ Promise.all([
   Node({ url, internalUrl })
 ]).then(nodes => {
     Ae({
-        // This two params deprecated and will be remove in next major release
-        url: 'https://sdk-testnet.aepps.com',
-        internalUrl: 'https://sdk-testnet.aepps.com',
-        // instead use
         nodes: [
           { name: 'someNode', instance: nodes[0] },
         // node2, node3..
         ],
         compilerUrl: 'COMPILER_URL',
-        // `keypair` param deprecated and will be removed in next major release
-        keypair: { secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS' },
-        // instead use
         accounts: [
           MemoryAccount({ keypair: { secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS' } }),
         // acc2

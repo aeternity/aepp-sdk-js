@@ -27,12 +27,14 @@ The bundle will assign the SDK to a global `var` called `Ae`, and you can use it
   <!-- include latest SDK version -->
   <script src="https://unpkg.com/@aeternity/aepp-sdk/dist/aepp-sdk.browser-script.js"></script>
   <script type="text/javascript">
-    Ae.Wallet({
-      url: 'https://sdk-testnet.aepps.com'
-    }).then(aeInstance => {
-      aeInstance.height().then(height => {
-        console.log("Current Block Height:" + height)
-      })
+    Ae.Node({ url: 'https://sdk-testnet.aepps.com' }).then(node => {
+        Ae.Wallet({
+              nodes: [{ name: 'local', instance: node }]
+            }).then(aeInstance => {
+              aeInstance.height().then(height => {
+                console.log("Current Block Height:" + height)
+              })
+            })
     })
   </script>
 </body>
