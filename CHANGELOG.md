@@ -14,23 +14,27 @@
 * **Chain:** Handle time until tx is not added to mempool ([#816](https://github.com/aeternity/aepp-sdk-js/pull/816))
 * **Git:** Update issue template([#806](https://github.com/aeternity/aepp-sdk-js/pull/806))
 * **Flavors:** Remove deprecated code ([#697](https://github.com/aeternity/aepp-sdk-js/pull/697))
+* **Test:** Increase code covarage ([#830](https://github.com/aeternity/aepp-sdk-js/issues/830)) ([6f760fb](https://github.com/aeternity/aepp-sdk-js/commit/6f760fb))
 
 ### Features
 
 * **Wallet<->AEPP:** Add new Wallet<->Aepp communication API
-* **CI:** Move to Travis CI ([#809](https://github.com/aeternity/aepp-sdk-js/issues/809)) ([2d77f20](https://github.com/aeternity/aepp-sdk-js/commit/2d77f20))
-* **ACI:** Add check for contract address validity and existence ([#788](https://github.com/aeternity/aepp-sdk-js/issues/788)) ([c0cccc9](https://github.com/aeternity/aepp-sdk-js/commit/c0cccc9))
-* **Tx:** Always verify transaction before send it to the node ([#798](https://github.com/aeternity/aepp-sdk-js/issues/798)) ([170f479](https://github.com/aeternity/aepp-sdk-js/commit/170f479))
-* **CI:** enable daily builds on latest node and compiler and enable codecov ([#820](https://github.com/aeternity/aepp-sdk-js/issues/820)) ([3c52a1e](https://github.com/aeternity/aepp-sdk-js/commit/3c52a1e))
+>Add two new stamps `RpcWallet` and `RpcAepp`
+>Example of usage you can find heere: [Aepp example](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/how-to-build-aepp-using-new-wallet-api.md) and [Wallet example](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/how-to-build-an-wallet-app-or-extension.md) 
 
+* **Wallet:** Use `postMessage` for communication with extension wall… ([#815](https://github.com/aeternity/aepp-sdk-js/issues/815)) ([dc7b4c2](https://github.com/aeternity/aepp-sdk-js/commit/dc7b4c2))
+* **CI:** Move to Travis CI ([#809](https://github.com/aeternity/aepp-sdk-js/issues/809)) ([2d77f20](https://github.com/aeternity/aepp-sdk-js/commit/2d77f20))
+* **CI:** enable daily builds on latest node and compiler and enable codecov ([#820](https://github.com/aeternity/aepp-sdk-js/issues/820)) ([3c52a1e](https://github.com/aeternity/aepp-sdk-js/commit/3c52a1e))
+* **ACI:** Add check for contract address validity and existence. Add `forceCodeCheck` option for bytecode verification skip ([#788](https://github.com/aeternity/aepp-sdk-js/issues/788)) ([c0cccc9](https://github.com/aeternity/aepp-sdk-js/commit/c0cccc9))
 * **Contract:** Add ability to pass arguments or callData for contract `deploy/call/callStatic` API ([#768](https://github.com/aeternity/aepp-sdk-js/issues/768)) ([a828076](https://github.com/aeternity/aepp-sdk-js/commit/a828076))
 * **Contract:** Adjust `fee` calculation for `contractCall` tx using `FATE` backend ([#793](https://github.com/aeternity/aepp-sdk-js/issues/793)) ([7254ac1](https://github.com/aeternity/aepp-sdk-js/commit/7254ac1))
-* **Test:** Increase code covarage ([#830](https://github.com/aeternity/aepp-sdk-js/issues/830)) ([6f760fb](https://github.com/aeternity/aepp-sdk-js/commit/6f760fb))
-* **Wallet:** Use `postMessage` for communication with extension wall… ([#815](https://github.com/aeternity/aepp-sdk-js/issues/815)) ([dc7b4c2](https://github.com/aeternity/aepp-sdk-js/commit/dc7b4c2))
+* **Compiler:** Add new API `validateByteCodeAPI` available on compiler >= 4.1.0 ([#788](https://github.com/aeternity/aepp-sdk-js/issues/788)) ([c0cccc9](https://github.com/aeternity/aepp-sdk-js/commit/c0cccc9))
+* **Tx:** Always verify transaction before send it to the node ([#798](https://github.com/aeternity/aepp-sdk-js/issues/798)) ([170f479](https://github.com/aeternity/aepp-sdk-js/commit/170f479))
 
 
 ### BREAKING CHANGES
 
+* **Tx:** By default `sdk` make a transaction `verification`
 * **Node:** Change node compatibility range to `node >= 5.0.0 && node < 6.0.0`
 * **Compiler:** Drop compiler version to `version >= 4.0.0 && version < 5.0.0`
 * **ACI:** Add additional method to RPC communication. Required sdk update on wallet side
