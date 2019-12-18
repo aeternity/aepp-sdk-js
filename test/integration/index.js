@@ -79,6 +79,22 @@ async function ready (mocha, native = true, withAccounts = false) {
   })
 }
 
+export const WindowPostMessageFake = (name) => ({
+  name,
+  messages: [],
+  listeners: [],
+  addEventListener (onEvent, listener) {
+    this.listeners.push(listener)
+  },
+  removeEventListener (onEvent, listener) {
+    return () => null
+  },
+  postMessage (msg) {
+    this.messages.push(msg)
+    this.listeners.find(l => typeof l === 'function')({ data: msg, origin: 'testOrigin' })
+  }
+})
+
 export {
   BaseAe,
   url,
