@@ -1,8 +1,8 @@
 import nacl from 'tweetnacl'
 import uuid from 'uuid'
 
-import { encodeBase58Check, isBase64 } from './crypto'
-import { isHex } from './string'
+import { encodeBase58Check } from './crypto'
+import { isBase64, isHex } from './string'
 
 const _sodium = require('libsodium-wrappers-sumo')
 
