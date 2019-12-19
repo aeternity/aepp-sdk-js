@@ -5,13 +5,8 @@ export default {
   stringify: (function () {
     'use strict';
 
-    function f(n) {
-      // Format integers to have at least two digits.
-      return n < 10 ? '0' + n : n;
-    }
 
-    var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
-      escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+    var escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
       gap,
       indent,
       meta = {    // table of character substitutions
@@ -87,7 +82,6 @@ export default {
           return isFinite(value) ? String(value) : 'null';
 
         case 'boolean':
-        case 'null':
 
 // If the value is a boolean or null, convert it to a string. Note:
 // typeof null does not produce 'null'. The case is included here in
@@ -218,7 +212,7 @@ export default {
       return str('', {'': value});
     };
   }()),
-  parse: ((options) => {
+  parse: ((options = {}) => {
     // This is a function that can parse a JSON text, producing a JavaScript
     // data structure. It is a simple, recursive descent parser. It does not use
     // eval or regular expressions, so it can be used as a model for implementing
@@ -245,13 +239,11 @@ export default {
     }
 
     // If there are options, then use them to override the default _options
-    if (options !== undefined && options !== null) {
-      if (options.strict === true) {
-        _options.strict = true
-      }
-      if (options.storeAsString === true) {
-        _options.storeAsString = true
-      }
+    if (options.strict === true) {
+      _options.strict = true
+    }
+    if (options.storeAsString === true) {
+      _options.storeAsString = true
     }
 
     let at
@@ -516,7 +508,7 @@ export default {
 
       return typeof reviver === 'function'
         ? (function walk (holder, key) {
-          let k; let v; let value = holder[key]
+          let v; let value = holder[key]
           if (value && typeof value === 'object') {
             Object.keys(value).forEach(function (k) {
               v = walk(value, k)

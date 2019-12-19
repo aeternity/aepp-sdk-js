@@ -27,10 +27,6 @@ Example spend function, using aeternity's SDK abstraction
   // const node1 = await Node({ url, internalUrl })
 
   Wallet({
-    // This two params deprecated and will be remove in next major release
-    url: 'https://sdk-testnet.aepps.com',
-    internalUrl: 'https://sdk-testnet.aepps.com',
-    // instead use
     nodes: [
         // { name: 'someNode', instance: node1 },
         // mode2
@@ -46,8 +42,8 @@ Example spend function, using aeternity's SDK abstraction
   }).then(ae => ae.spend(parseInt(amount), receiver_pub_key))
 ```
 
-### Low-level SDK usage (use [API](../docs/api.md) endpoints directly)
-Example spend function, using the SDK, talking directly to the [**API**](../docs/api.md):
+### Low-level SDK usage (use [API](https://github.com/aeternity/protocol/tree/master/node/api) endpoints directly)
+Example spend function, using the SDK, talking directly to the [**API**](https://github.com/aeternity/protocol/tree/master/node/api):
 ```js
   // Import necessary Modules
   import Tx from '@aeternity/aepp-sdk/es/tx/tx.js'

@@ -91,5 +91,5 @@ Resolve AENS name and return name hash
 | Param | Type |
 | --- | --- |
 | nameOrAddress | `String` | 
-| verify |  | 
+| verify | `Boolean` | 
 

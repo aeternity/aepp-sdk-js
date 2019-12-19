@@ -37,13 +37,13 @@ import { required } from '@stamp/required'
  * @return {Object} Chain instance
  */
 const Chain = Oracle.compose({
-  deepProps: { Chain: { defaults: { waitMined: true } } },
-  statics: { waitMined (bool) { return this.deepProps({ Chain: { defaults: { waitMined: bool } } }) } },
+  deepProps: { Ae: { defaults: { waitMined: true } } },
+  statics: { waitMined (bool) { return this.deepProps({ Ae: { defaults: { waitMined: bool } } }) } },
   deepConf: {
     Ae: {
       methods: [
         'sendTransaction', 'height', 'awaitHeight', 'poll', 'balance', 'getBalance', 'tx',
-        'mempool', 'topBlock', 'getTxInfo', 'txDryRun', 'getName', 'getNodeInfo', 'getAccount'
+        'mempool', 'topBlock', 'getTxInfo', 'txDryRun', 'getName', 'getNodeInfo', 'getAccount', 'getContractByteCode', 'getContract'
       ]
     }
   }

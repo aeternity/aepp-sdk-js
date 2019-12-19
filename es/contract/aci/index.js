@@ -27,8 +27,12 @@ import * as R from 'ramda'
 
 import { validateArguments, transform, transformDecodedData } from './transformation'
 import { buildContractMethods, getFunctionACI } from './helpers'
+import { isAddressValid } from '../../utils/crypto'
 import AsyncInit from '../../utils/async-init'
 import { BigNumber } from 'bignumber.js'
+import { COMPILER_LT_VERSION } from '../compiler'
+import semverSatisfies from '../../utils/semver-satisfies'
+import { AMOUNT, DEPOSIT, GAS, MIN_GAS_PRICE } from '../../tx/builder/schema'
 
 /**
  * Validated contract call arguments using contract ACI
@@ -61,6 +65,7 @@ async function prepareArgsForEncode (aci, params) {
  * @param {String} [options.aci] Contract ACI
  * @param {String} [options.contractAddress] Contract address
  * @param {Object} [options.filesystem] Contact source external namespaces map
+ * @param {Object} [options.forceCodeCheck] Don't check contract code
  * @param {Object} [options.opt] Contract options
  * @return {ContractInstance} JS Contract API
  * @example
@@ -71,16 +76,16 @@ async function prepareArgsForEncode (aci, params) {
  * Also you can call contract like: await contractIns.methods.setState(123, options)
  * Then sdk decide to make on-chain or static call(dry-run API) transaction based on function is stateful or not
  */
-async function getContractInstance (source, { aci, contractAddress, filesystem = {}, opt } = {}) {
+async function getContractInstance (source, { aci, contractAddress, filesystem = {}, forceCodeCheck = false, opt } = {}) {
   aci = aci || await this.contractGetACI(source, { filesystem })
   const defaultOptions = {
     skipArgsConvert: false,
     skipTransformDecoded: false,
     callStatic: false,
-    deposit: 0,
-    gasPrice: 1000000000, // min gasPrice 1e9
-    amount: 0,
-    gas: 1600000 - 21000,
+    deposit: DEPOSIT,
+    gasPrice: MIN_GAS_PRICE, // min gasPrice 1e9
+    amount: AMOUNT,
+    gas: GAS,
     top: null, // using for contract call static
     waitMined: true,
     verify: false,
@@ -96,6 +101,19 @@ async function getContractInstance (source, { aci, contractAddress, filesystem =
     compilerVersion: this.compilerVersion,
     setOptions (opt) {
       this.options = R.merge(this.options, opt)
+    }
+  }
+
+  // Check for valid contract address and contract code
+  if (contractAddress) {
+    if (!isAddressValid(contractAddress, 'ct')) throw new Error('Invalid contract address')
+    const contract = await this.getContract(contractAddress).catch(e => null)
+    if (!contract || !contract.active) throw new Error(`Contract with address ${contractAddress} not found on-chain or not active`)
+    // Check if we are using compiler version gte then 4.1.0(has comparing bytecode API)
+    if (!forceCodeCheck && semverSatisfies(this.compilerVersion, '4.1.0', COMPILER_LT_VERSION)) {
+      const onChanByteCode = (await this.getContractByteCode(contractAddress)).bytecode
+      const isCorrespondingBytecode = await this.validateByteCodeAPI(onChanByteCode, instance.source, instance.options).catch(e => false)
+      if (!isCorrespondingBytecode) throw new Error('Contract source do not correspond to the contract bytecode deployed on the chain')
     }
   }
 
@@ -162,11 +180,11 @@ const call = ({ client, instance }) => async (fn, params = [], options = {}) => 
     : await client.contractCall(source, instance.deployInfo.address, fn, params, opt)
   return {
     ...result,
-    decodedResult: await transformDecodedData(
+    decodedResult: opt.waitMined ? await transformDecodedData(
       fnACI.returns,
       await result.decode(),
       { ...opt, bindings: fnACI.bindings }
-    )
+    ) : null
   }
 }
 

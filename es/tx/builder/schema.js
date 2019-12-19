@@ -14,7 +14,18 @@ export const VSN_2 = 2
 
 // # TRANSACTION DEFAULT TTL
 export const TX_TTL = 0
-
+// # ORACLE
+export const QUERY_FEE = 30000
+export const ORACLE_TTL = { type: 'delta', value: 500 }
+export const QUERY_TTL = { type: 'delta', value: 10 }
+export const RESPONSE_TTL = { type: 'delta', value: 10 }
+// # CONTRACT
+export const DEPOSIT = 0
+export const AMOUNT = 0
+export const GAS = 1600000 - 21000
+export const MIN_GAS_PRICE = 1000000000 // min gasPrice 1e9
+export const MAX_AUTH_FUN_GAS = 50000
+export const DRY_RUN_ACCOUNT = { pub: 'ak_11111111111111111111111111111111273Yts', amount: '100000000000000000000000000000000000' }
 // # AENS
 export const AENS_NAME_DOMAINS = ['chain', 'test']
 export const NAME_TTL = 50000
@@ -137,9 +148,6 @@ const OBJECT_TAG_SOPHIA_BYTE_CODE = 70
 const TX_FIELD = (name, type, prefix) => [name, type, prefix]
 const TX_SCHEMA_FIELD = (schema, objectId) => [schema, objectId]
 
-export const MIN_GAS_PRICE = 1000000000 // min gasPrice 1e9
-export const MAX_AUTH_FUN_GAS = 50000 // min gasPrice 1e9
-
 const revertObject = (obj) => Object.entries(obj).reduce((acc, [key, v]) => (acc[v] = key) && acc, {})
 
 /**
@@ -233,6 +241,7 @@ export const ABI_VERSIONS = {
 }
 
 export const VM_TYPE = { FATE: 'fate', AEVM: 'aevm' }
+export const FATE_ABI = [3]
 
 // First abi/vm by default
 export const VM_ABI_MAP_ROMA = {
@@ -353,7 +362,7 @@ export const DEFAULT_FEE = 20000
 export const KEY_BLOCK_INTERVAL = 3
 
 // MAP WITH FEE CALCULATION https://github.com/aeternity/protocol/blob/master/consensus/consensus.md#gas
-export const TX_FEE_BASE_GAS = (txType) => {
+export const TX_FEE_BASE_GAS = (txType, { backend = VM_TYPE.FATE }) => {
   switch (txType) {
     // case TX_TYPE.gaMeta: // TODO investigate MetaTx calculation
     case TX_TYPE.gaAttach:
@@ -362,7 +371,7 @@ export const TX_FEE_BASE_GAS = (txType) => {
     // Todo Implement meta tx fee calculation
     case TX_TYPE.gaMeta:
     case TX_TYPE.contractCall:
-      return BigNumber(30 * BASE_GAS)
+      return BigNumber((backend === VM_TYPE.FATE ? 12 : 30) * BASE_GAS)
     default:
       return BigNumber(BASE_GAS)
   }

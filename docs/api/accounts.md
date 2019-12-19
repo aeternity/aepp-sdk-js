@@ -51,7 +51,7 @@ Accounts Stamp
 The purpose of the Accounts Stamp is to wrap up
 [Account](#exp_module_@aeternity/aepp-sdk/es/account--Account) objects and provide a
 common interface to all of them. Accounts are a substantial part of
-[Wallet](#exp_module_@aeternity/aepp-sdk/es/ae/wallet--Wallet)s.
+[module:@aeternity/aepp-sdk/es/ae/wallet--Wallet](module:@aeternity/aepp-sdk/es/ae/wallet--Wallet)s.
 
 **Kind**: Exported function  
 **Returns**: `Object` - Accounts instance  

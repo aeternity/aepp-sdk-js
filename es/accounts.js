@@ -27,31 +27,7 @@ import AsyncInit from './utils/async-init'
 import * as R from 'ramda'
 import MemoryAccount from './account/memory'
 import Selector from './account/selector'
-import { envKeypair, generateKeyPair } from './utils/crypto'
-
-/**
- * Select specific account
- * @deprecated
- * @alias module:@aeternity/aepp-sdk/es/accounts
- * @function
- * @rtype (keypair: {publicKey: String, secretKey: String}) => Void
- * @param {Object} keypair - Key pair to use
- * @param {String} keypair.publicKey - Public key
- * @param {String} keypair.secretKey - Private key
- * @return {Void}
- * @example setKeypair(keypair)
- */
-function setKeypair (keypair) {
-  const acc = this.accounts[this.Selector.address] || this._acc
-  if (Object.prototype.hasOwnProperty.call(keypair, 'priv') && Object.prototype.hasOwnProperty.call(keypair, 'pub')) {
-    keypair = { secretKey: keypair.priv, publicKey: keypair.pub }
-    console.warn('pub/priv naming for accounts has been deprecated, please use secretKey/publicKey')
-  }
-  acc.setSecret(keypair)
-  this.accounts[keypair.publicKey] = acc
-  delete this.accounts[this.Selector.address]
-  this.selectAccount(keypair.publicKey)
-}
+import { envKeypair } from './utils/crypto'
 
 /**
  * Sign data blob with specific key
@@ -138,21 +114,17 @@ function addresses () {
  * accounts.addresses() // Get available accounts
  */
 const Accounts = stampit(AsyncInit, {
-  async init ({ accounts = [], keypair }) { // Deprecated. TODO Remove `keypair` param
+  async init ({ accounts = [] }) {
     this.accounts = R.fromPairs(await Promise.all(accounts.map(async a => [await a.address(), a])))
-    keypair = keypair || envKeypair(process.env, true)
+    const keypair = envKeypair(process.env, true)
     if (keypair) {
       await this.addAccount(MemoryAccount({ keypair }), { select: !this.Selector.address })
     }
-    // @Todo Remove after removing depricated `setKeypair` fn.
-    //  Prevent BREAKING CHANGES
-    //  Pre-init memoryAccount object to prevent async operation in `setKeypair` function
-    this._acc = MemoryAccount({ keypair: generateKeyPair() })
   },
   props: {
     accounts: {}
   },
-  methods: { signWith, addAccount, removeAccount, setKeypair, addresses }
+  methods: { signWith, addAccount, removeAccount, addresses }
 }, Selector)
 
 export default Accounts

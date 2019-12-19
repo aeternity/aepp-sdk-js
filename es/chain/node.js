@@ -15,6 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 import * as R from 'ramda'
+
 import Chain from './'
 import Oracle from '../oracle/node'
 import formatBalance from '../utils/amount-formatter'
@@ -31,9 +32,9 @@ import NodePool from '../node-pool'
  */
 
 async function sendTransaction (tx, options = {}) {
-  const { waitMined, verify } = R.merge(this.Chain.defaults, options)
+  const { waitMined, verify } = R.merge(this.Ae.defaults, options)
   // Verify transaction before broadcast
-  if (this.verifyTxBeforeSend || verify) {
+  if (verify || (typeof verify !== 'boolean' && this.verifyTxBeforeSend)) {
     const { validation, tx: txObject, txType } = await this.unpackAndVerify(tx)
     if (validation.length) {
       throw Object.assign(Error('Transaction verification error'), {
@@ -128,8 +129,8 @@ async function poll (th, { blocks = 10, interval = 5000 } = {}) {
   const max = await this.height() + blocks
 
   async function probe () {
-    const tx = await instance.tx(th)
-    if (tx.blockHeight !== -1) {
+    const tx = await instance.tx(th).catch(_ => null)
+    if (tx && tx.blockHeight !== -1) {
       return tx
     }
     if (await instance.height() < max) {
@@ -175,13 +176,7 @@ async function getMicroBlockHeader (hash) {
 }
 
 async function txDryRun (txs, accounts, top) {
-  // TODO remove cross compatibility
-  const { version } = this.getNodeInfo()
-  const [majorVersion] = version.split('.')
-  if (+majorVersion === 5 && version !== '5.0.0-rc.1') {
-    txs = txs.map(tx => ({ tx }))
-  }
-  return this.api.dryRunTxs({ txs, accounts, top })
+  return this.api.dryRunTxs({ txs: txs.map(tx => ({ tx })), accounts, top })
 }
 
 async function getContractByteCode (contractId) {
@@ -209,7 +204,7 @@ async function getName (name) {
  * @example ChainNode({url: 'https://sdk-testnet.aepps.com/'})
  */
 const ChainNode = Chain.compose(Oracle, TransactionValidator, NodePool, {
-  init ({ verifyTx = false }) {
+  init ({ verifyTx = true }) {
     this.verifyTxBeforeSend = verifyTx
   },
   methods: {

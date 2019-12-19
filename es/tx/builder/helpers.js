@@ -17,7 +17,11 @@ import {
   AENS_NAME_DOMAINS,
   NAME_BID_RANGES,
   NAME_BID_MAX_LENGTH,
-  NAME_FEE, NAME_FEE_BID_INCREMENT, NAME_BID_TIMEOUTS
+  NAME_FEE,
+  NAME_FEE_BID_INCREMENT,
+  NAME_BID_TIMEOUTS,
+  FATE_ABI,
+  VM_TYPE
 } from './schema'
 import { ceil } from '../../utils/bignumber'
 
@@ -321,6 +325,30 @@ export function computeAuctionEndBlock (domain, claimHeight) {
   ])(domain.replace('.chain', '').length).toString(10)
 }
 
+/**
+ * Get contract backend by abiVersion
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
+ * @param {Object} { abiVersion } abiVersion Transaction abiVersion
+ * @return {String} Backend
+ */
+export function getContractBackendFromTx ({ abiVersion } = {}) {
+  return FATE_ABI.includes(parseInt(abiVersion))
+    ? VM_TYPE.FATE
+    : VM_TYPE.AEVM
+}
+
+/**
+ * Is name accept going to auction
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
+ * @param {String} name Transaction abiVersion
+ * @return {Boolean}
+ */
+export function isAuctionName (name) {
+  return name.replace('.chain', '').length < 13
+}
+
 export default {
   readPointers,
   buildPointers,
@@ -334,9 +362,11 @@ export default {
   commitmentHash,
   formatSalt,
   oracleQueryId,
+  getContractBackendFromTx,
   createSalt,
   buildHash,
   isNameValid,
   produceNameId,
-  classify
+  classify,
+  isAuctionName
 }

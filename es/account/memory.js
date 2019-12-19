@@ -47,9 +47,6 @@ function setSecret (keyPair) {
 
 function validateKeyPair (keyPair) {
   if (!keyPair || typeof keyPair !== 'object') throw new Error('KeyPair must be an object')
-  if (keyPair.pub && keyPair.priv) {
-    keyPair = { publicKey: keyPair.pub, secretKey: keyPair.priv }
-  }
   if (!keyPair.secretKey || !keyPair.publicKey) throw new Error('KeyPair must must have "secretKey", "publicKey" properties')
   if (typeof keyPair.publicKey !== 'string' || keyPair.publicKey.indexOf('ak_') === -1) throw new Error('Public Key must be a base58c string with "ak_" prefix')
   if (
@@ -80,10 +77,6 @@ const MemoryAccount = Account.compose({
       secrets.set(this, { publicKey: gaId })
     } else {
       validateKeyPair(keypair)
-      if (Object.prototype.hasOwnProperty.call(keypair, 'priv') && Object.prototype.hasOwnProperty.call(keypair, 'pub')) {
-        keypair = { secretKey: keypair.priv, publicKey: keypair.pub }
-        console.warn('pub/priv naming for accounts has been deprecated, please use secretKey/publicKey')
-      }
 
       this.setSecret(keypair)
     }

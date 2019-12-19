@@ -29,6 +29,7 @@
 import Ae from './'
 import * as R from 'ramda'
 import { decodeBase64Check } from '../utils/crypto'
+import { ORACLE_TTL, QUERY_FEE, QUERY_TTL, RESPONSE_TTL } from '../tx/builder/schema'
 
 /**
  * Constructor for Oracle Object (helper object for using Oracle)
@@ -70,7 +71,7 @@ async function getOracleObject (oracleId) {
 async function pollForQueries (oracleId, onQuery, { interval = 5000 } = {}) {
   const queries = (await this.getOracleQueries(oracleId)).oracleQueries || []
   let quriesIds = queries.map(q => q.id)
-  onQuery(queries)
+  await onQuery(queries)
 
   async function pollQueries () {
     const { oracleQueries: q } = await this.getOracleQueries(oracleId)
@@ -281,10 +282,10 @@ const Oracle = Ae.compose({
   deepProps: {
     Ae: {
       defaults: {
-        queryFee: 30000,
-        oracleTtl: { type: 'delta', value: 500 },
-        queryTtl: { type: 'delta', value: 10 },
-        responseTtl: { type: 'delta', value: 10 }
+        queryFee: QUERY_FEE,
+        oracleTtl: ORACLE_TTL,
+        queryTtl: QUERY_TTL,
+        responseTtl: RESPONSE_TTL
       }
     }
   }

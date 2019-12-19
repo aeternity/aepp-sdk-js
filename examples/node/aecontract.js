@@ -25,18 +25,18 @@
 'use strict'
 
 // We'll need the main client module `Ae` in the `Universal` flavor from the SDK.
-const { Universal: Ae } = require('@aeternity/aepp-sdk')
+const { Universal: Ae, Node } = require('@aeternity/aepp-sdk')
 const program = require('commander')
 const fs = require('fs')
 
-function exec (infile, fn, args) {
+async function exec (infile, fn, args) {
   if (!infile || !fn) {
     program.outputHelp()
     process.exit(1)
   }
 
   const code = fs.readFileSync(infile, 'utf-8')
-
+  const node = await Node({ url: program.host })
   // Most methods in the SDK return _Promises_, so the recommended way of
   // dealing with subsequent actions is `then` chaining with a final `catch`
   // callback.
@@ -49,7 +49,7 @@ function exec (infile, fn, args) {
   // off to the node for bytecode compilation. This might in the future be done
   // without talking to the node, but requires a bytecode compiler
   // implementation directly in the SDK.
-  Ae({ url: program.host, debug: program.debug, process }).then(ae => {
+  Ae({ debug: program.debug, process, nodes: [{ name: 'testNode', instance: node }] }).then(ae => {
     return ae.contractCompile(code)
     // Invoking `deploy` on the bytecode object will result in the contract
     // being written to the chain, once the block has been mined.
