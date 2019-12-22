@@ -91,7 +91,7 @@
     "nyc": "^14.1.1",
     "recursive-rename": "^3.0.0",
     "safe-buffer": "^5.1.2",
-    "sinon": "^7.3.2",
+    "sinon": "^8.0.0",
     "source-map": "^0.7.3",
     "standard": "^14.0.1",
     "standard-loader": "^7.0.0",
