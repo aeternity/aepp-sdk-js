@@ -82,26 +82,25 @@ export async function ready (mocha, native = true, withAccounts = false) {
 export const WindowPostMessageFake = (name) => ({
   name,
   messages: [],
-  listeners: [],
   addEventListener (onEvent, listener) {
-    this.listeners.push(listener)
+    this.listener = listener
   },
   removeEventListener (onEvent, listener) {
     return () => null
   },
   postMessage (msg) {
     this.messages.push(msg)
-    this.listeners.find(l => typeof l === 'function')({ data: msg, origin: 'testOrigin' })
+    if (typeof this.listener === 'function') this.listener({ data: msg, origin: 'testOrigin' })
   }
 })
 
 export const getFakeConnections = () => {
   const waelletConnection = WindowPostMessageFake('wallet')
   const aeppConnection = WindowPostMessageFake('aepp')
-  const waelletP = waelletConnection.postMessage
-  const aeppP = aeppConnection.postMessage
-  waelletConnection.postMessage = aeppP.bind(aeppConnection)
-  aeppConnection.postMessage = waelletP.bind(waelletConnection)
+  // const waelletP = waelletConnection.postMessage
+  // const aeppP = aeppConnection.postMessage
+  // waelletConnection.postMessage = aeppP.bind(aeppConnection)
+  // aeppConnection.postMessage = waelletP.bind(waelletConnection)
   return { waelletConnection, aeppConnection }
 }
 

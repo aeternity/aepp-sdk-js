@@ -28,14 +28,15 @@ describe.only('Aepp<->Wallet', function () {
   let node
   let aepp
   let wallet
-  let walletConnection
-  let aeppConnection
+  let connections
+  let connectionW
+  let connectionA
 
   before(async function () {
     node = await Node({ url, internalUrl })
     wallet = await RpcWallet({
       compilerUrl: compilerUrl,
-      nodes: [{ name: 'local', instance: await Node({ url, internalUrl }) }],
+      nodes: [{ name: 'local', instance: node }],
       name: 'Wallet',
       async onConnection (aepp, { accept, deny }) {
         // if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to connect`)) {
@@ -62,25 +63,52 @@ describe.only('Aepp<->Wallet', function () {
         // }
       },
       onDisconnect (message, client) {
-        this.shareWalletInfo(connection.sendMessage.bind(connection))
+        this.shareWalletInfo(connectionW.sendMessage.bind(connectionW))
       }
     })
-    const { waelletConnection, aeppConnection } = getFakeConnections()
-    global.window = { location: { origin: '//test' } }
-    global.chrome = { runtime: {} }
-    aeppConnection.addEventListener('message', (msg) => {
-      console.log('Aepp receive:')
-      console.log(msg)
-      console.log('Aepp receive end --->')
-    })
-    const connection = BrowserWindowMessageConnection({
+    connections = getConnections()
+    connectionW = BrowserWindowMessageConnection({
       connectionInfo: { id: 'waellet' },
-      self: waelletConnection,
-      target: waelletConnection
+      self: connections.waelletConnection,
+      target: connections.aeppConnection
     })
-    wallet.addRpcClient(connection)
-    await wallet.shareWalletInfo(connection.sendMessage.bind(connection))
-
+    connectionA = BrowserWindowMessageConnection({
+      connectionInfo: { id: 'aepp' },
+      self: connections.aeppConnection,
+      target: connections.waelletConnection
+    })
   })
-  it('test1', () => { console.log(1) })
+  it('Should receive announcePresence message from wallet', async () => {
+    const isReceived = new Promise((resolve, reject) => {
+      connections.aeppConnection.addEventListener('message', (msg) => {
+        resolve(msg.data.method === 'connection.announcePresence')
+      })
+    })
+    wallet.addRpcClient(connectionW)
+    await wallet.shareWalletInfo(connectionW.sendMessage.bind(connectionW))
+    const is = await isReceived
+    is.should.be.equal(true)
+  })
+  it('Init AEPP and connect to wallet', async () => {
+    aepp = await RpcAepp({
+      name: 'AEPP',
+      onNetworkChange (params) {
+      },
+      onAddressChange: (addresses) => {
+      },
+      onDisconnect (a) {
+      }
+    })
+    wallet.onConnection = (aepp, actions) => {
+      console.log(aepp)
+      console.log(actions)
+    }
+    await aepp.connectToWallet(connectionA)
+  })
 })
+
+const getConnections = () => {
+  global.chrome = { runtime: {} }
+  global.window = { location: { origin: '//test' } }
+  return getFakeConnections()
+}
