@@ -29,8 +29,8 @@ describe.only('Aepp<->Wallet', function () {
   let aepp
   let wallet
   let connections
-  let connectionW
-  let connectionA
+  let connectionFromWalletToAepp
+  let connectionFromAeppToWallet
 
   before(async function () {
     node = await Node({ url, internalUrl })
@@ -39,59 +39,20 @@ describe.only('Aepp<->Wallet', function () {
       nodes: [{ name: 'local', instance: node }],
       name: 'Wallet',
       async onConnection (aepp, { accept, deny }) {
-        // if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to connect`)) {
-        //   accept()
-        // } else { deny() }
       },
       async onSubscription (aepp, { accept, deny }) {
-        // if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to subscribe address`)) {
-        //   accept()
-        // } else { deny() }
       },
       async onSign (aepp, { accept, deny, params }) {
-        // if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to ${params.returnSigned ? 'sign' : 'sign and broadcast'} ${JSON.stringify(params.tx)}`)) {
-        //   accept()
-        // } else {
-        //   deny()
-        // }
       },
       onAskAccounts (aepp, { accept, deny }) {
-        // if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to get accounts`)) {
-        //   accept()
-        // } else {
-        //   deny()
-        // }
       },
       onDisconnect (message, client) {
-        this.shareWalletInfo(connectionW.sendMessage.bind(connectionW))
+        this.shareWalletInfo(connectionFromWalletToAepp.sendMessage.bind(connectionFromWalletToAepp))
       }
     })
-    connections = getConnections()
-    connectionW = BrowserWindowMessageConnection({
-      connectionInfo: { id: 'waellet' },
-      self: connections.waelletConnection,
-      target: connections.aeppConnection
-    })
-    connectionA = BrowserWindowMessageConnection({
-      connectionInfo: { id: 'aepp' },
-      self: connections.aeppConnection,
-      target: connections.waelletConnection
-    })
-  })
-  it('Should receive announcePresence message from wallet', async () => {
-    const isReceived = new Promise((resolve, reject) => {
-      connections.aeppConnection.addEventListener('message', (msg) => {
-        resolve(msg.data.method === 'connection.announcePresence')
-      })
-    })
-    wallet.addRpcClient(connectionW)
-    await wallet.shareWalletInfo(connectionW.sendMessage.bind(connectionW))
-    const is = await isReceived
-    is.should.be.equal(true)
-  })
-  it('Init AEPP and connect to wallet', async () => {
     aepp = await RpcAepp({
       name: 'AEPP',
+      nodes: [{ name: 'test', instance: node }],
       onNetworkChange (params) {
       },
       onAddressChange: (addresses) => {
@@ -99,11 +60,55 @@ describe.only('Aepp<->Wallet', function () {
       onDisconnect (a) {
       }
     })
+    connections = getConnections()
+    connectionFromWalletToAepp = BrowserWindowMessageConnection({
+      connectionInfo: { id: 'from_wallet_to_aepp' },
+      self: connections.waelletConnection,
+      target: connections.aeppConnection
+    })
+    connectionFromAeppToWallet = BrowserWindowMessageConnection({
+      connectionInfo: { id: 'from_aepp_to_wallet' },
+      self: connections.aeppConnection,
+      target: connections.waelletConnection
+    })
+  })
+  it('Should receive `announcePresence` message from wallet', async () => {
+    const isReceived = new Promise((resolve, reject) => {
+      connections.aeppConnection.addEventListener('message', (msg) => {
+        resolve(msg.data.method === 'connection.announcePresence')
+      })
+    })
+
+    wallet.addRpcClient(connectionFromWalletToAepp)
+    await wallet.shareWalletInfo(connectionFromWalletToAepp.sendMessage.bind(connectionFromWalletToAepp))
+    const is = await isReceived
+    is.should.be.equal(true)
+  })
+  it('AEPP connect to wallet: wallet reject connection', async () => {
     wallet.onConnection = (aepp, actions) => {
-      console.log(aepp)
-      console.log(actions)
+      actions.deny()
     }
-    await aepp.connectToWallet(connectionA)
+    try {
+      await aepp.connectToWallet(connectionFromAeppToWallet)
+    } catch (e) {
+      e.code.should.be.equal(9)
+      e.message.should.be.equal('Wallet deny your connection request')
+    }
+  })
+  it('AEPP connect to wallet: wallet accept connection', async () => {
+    wallet.onConnection = (aepp, actions) => {
+      actions.accept()
+    }
+    connectionFromAeppToWallet.disconnect()
+    const connected = await aepp.connectToWallet(connectionFromAeppToWallet)
+    connected.name.should.be.equal('Wallet')
+  })
+  it('Try to get address from wallet: not subscribed for account', async () => {
+    try {
+      await aepp.address()
+    } catch (e) {
+      e.message.should.be.equal('You do not subscribed for account.')
+    }
   })
 })
 

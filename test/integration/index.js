@@ -90,7 +90,7 @@ export const WindowPostMessageFake = (name) => ({
   },
   postMessage (msg) {
     this.messages.push(msg)
-    if (typeof this.listener === 'function') this.listener({ data: msg, origin: 'testOrigin' })
+    setTimeout(() => { if (typeof this.listener === 'function') this.listener({ data: msg, origin: 'testOrigin' }) }, 100)
   }
 })
 
