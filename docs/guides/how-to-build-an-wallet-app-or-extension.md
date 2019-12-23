@@ -1,4 +1,4 @@
-## How to build an wallet
+## How to build a wallet
 
 his guid describing the process of building Waellet using the new Wallet<->Aepp integration API
 The full example of implementation you can find here:
