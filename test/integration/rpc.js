@@ -16,13 +16,12 @@
  */
 
 import { Node, RpcWallet, RpcAepp } from '../../es'
-import { compilerUrl, getFakeConnections, configure, url, internalUrl } from './'
+import { compilerUrl, getFakeConnections, url, internalUrl } from './'
 
 import { describe, it, before } from 'mocha'
-import { expect } from 'chai'
 import BrowserWindowMessageConnection from '../../es/utils/aepp-wallet-communication/connection/browser-window-message'
 
-describe.only('Aepp<->Wallet', function () {
+describe('Aepp<->Wallet', function () {
   // configure(this)
 
   let node
@@ -72,6 +71,16 @@ describe.only('Aepp<->Wallet', function () {
       target: connections.waelletConnection
     })
   })
+  it('Fail on not connected', async () => {
+    const errors = [
+      await aepp.send().catch(e => e.message === 'You are not connected to Wallet'),
+      await aepp.subscribeAddress().catch(e => e.message === 'You are not connected to Wallet'),
+      await aepp.askAddresses().catch(e => e.message === 'You are not connected to Wallet'),
+      await aepp.address().catch(e => e.message === 'You are not connected to Wallet'),
+      await aepp.disconnectWallet().catch(e => e.message === 'You are not connected to Wallet')
+    ]
+    errors.filter(e => e).length.should.be.equal(5)
+  })
   it('Should receive `announcePresence` message from wallet', async () => {
     const isReceived = new Promise((resolve, reject) => {
       connections.aeppConnection.addEventListener('message', (msg) => {
@@ -109,6 +118,59 @@ describe.only('Aepp<->Wallet', function () {
     } catch (e) {
       e.message.should.be.equal('You do not subscribed for account.')
     }
+  })
+  it('Try to ask for address', async () => {
+    try {
+      await aepp.askAddresses()
+    } catch (e) {
+      e.message.should.be.equal('You do not subscribed for account.')
+    }
+  })
+  it('Subscribe to address: wallet reject', async () => {
+    wallet.onSubscription = (aepp, actions) => {
+      actions.deny()
+    }
+    try {
+      await aepp.subscribeAddress('subscribe', 'connected')
+    } catch (e) {
+      e.code.should.be.equal(4)
+      e.message.should.be.equal('Operation rejected by user')
+    }
+  })
+  it('Subscribe to address: wallet accept', async () => {
+    wallet.onSubscription = (aepp, actions) => {
+      actions.accept()
+    }
+    const subscriptionResponse = await aepp.subscribeAddress('subscribe', 'connected')
+
+    subscriptionResponse.subscription.should.be.an('array')
+    subscriptionResponse.subscription.filter(e => e === 'connected').length.should.be.equal(1)
+    subscriptionResponse.address.current.should.be.an('object')
+    Object.keys(subscriptionResponse.address.current)[0].should.be.equal('ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi')
+    subscriptionResponse.address.connected.should.be.an('object')
+    Object.keys(subscriptionResponse.address.connected).length.should.be.equal(0)
+  })
+  it('Get address: subscribed for accounts', async () => {
+    (await aepp.address()).should.be.equal('ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi')
+  })
+  it('Ask for address: subscribed for accounts -> wallet deny', async () => {
+    wallet.onAskAccounts = (aepp, actions) => {
+      actions.deny()
+    }
+    try {
+      await aepp.askAddresses()
+    } catch (e) {
+      e.code.should.be.equal(4)
+      e.message.should.be.equal('Operation rejected by user')
+    }
+  })
+  it('Ask for address: subscribed for accounts -> wallet deny', async () => {
+    wallet.onAskAccounts = (aepp, actions) => {
+      actions.accept()
+    }
+    const addressees = await aepp.askAddresses()
+    addressees.length.should.be.equal(1)
+    addressees[0].should.be.equal('ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi')
   })
 })
 
