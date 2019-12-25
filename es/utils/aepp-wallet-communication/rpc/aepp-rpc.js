@@ -85,7 +85,6 @@ export const AeppRpc = Ae.compose(Account, {
     const eventsHandlers = ['onDisconnect', 'onAddressChange', 'onNetworkChange']
     this.connection = connection
     this.name = name
-    this.accounts = {}
 
     if (connection) {
       // Init RPCClient
