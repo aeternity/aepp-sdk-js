@@ -16,14 +16,17 @@
  */
 
 import { Node, RpcWallet, RpcAepp } from '../../es'
-import { compilerUrl, getFakeConnections, url, internalUrl } from './'
+import { compilerUrl, getFakeConnections, url, internalUrl, networkId } from './'
 
 import { describe, it, before } from 'mocha'
 import BrowserWindowMessageConnection from '../../es/utils/aepp-wallet-communication/connection/browser-window-message'
+import { verify } from '../../es/utils/crypto'
+import { decode } from '../../es/tx/builder/helpers'
+import { unpackTx } from '../../es/tx/builder'
 
-describe('Aepp<->Wallet', function () {
+describe.only('Aepp<->Wallet', function () {
   // configure(this)
-
+  this.timeout(6000)
   let node
   let aepp
   let wallet
@@ -37,14 +40,10 @@ describe('Aepp<->Wallet', function () {
       compilerUrl: compilerUrl,
       nodes: [{ name: 'local', instance: node }],
       name: 'Wallet',
-      async onConnection (aepp, { accept, deny }) {
-      },
-      async onSubscription (aepp, { accept, deny }) {
-      },
-      async onSign (aepp, { accept, deny, params }) {
-      },
-      onAskAccounts (aepp, { accept, deny }) {
-      },
+      onConnection (aepp, { accept, deny }) {},
+      onSubscription (aepp, { accept, deny }) {},
+      onSign (aepp, { accept, deny, params }) {},
+      onAskAccounts (aepp, { accept, deny }) {},
       onDisconnect (message, client) {
         this.shareWalletInfo(connectionFromWalletToAepp.sendMessage.bind(connectionFromWalletToAepp))
       }
@@ -52,12 +51,9 @@ describe('Aepp<->Wallet', function () {
     aepp = await RpcAepp({
       name: 'AEPP',
       nodes: [{ name: 'test', instance: node }],
-      onNetworkChange (params) {
-      },
-      onAddressChange: (addresses) => {
-      },
-      onDisconnect (a) {
-      }
+      onNetworkChange (params) {},
+      onAddressChange: (addresses) => {},
+      onDisconnect (a) {}
     })
     connections = getConnections()
     connectionFromWalletToAepp = BrowserWindowMessageConnection({
@@ -164,13 +160,73 @@ describe('Aepp<->Wallet', function () {
       e.message.should.be.equal('Operation rejected by user')
     }
   })
-  it('Ask for address: subscribed for accounts -> wallet deny', async () => {
+  it('Ask for address: subscribed for accounts -> wallet accept', async () => {
     wallet.onAskAccounts = (aepp, actions) => {
       actions.accept()
     }
     const addressees = await aepp.askAddresses()
     addressees.length.should.be.equal(1)
     addressees[0].should.be.equal('ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi')
+  })
+  it('Sign transaction: wallet deny', async () => {
+    wallet.onSign = (aepp, action) => {
+      action.deny()
+    }
+    try {
+      const address = await aepp.address()
+      const tx = await aepp.spendTx({
+        senderId: address,
+        recipientId: address,
+        amount: 0,
+        payload: 'zerospend'
+      })
+      await aepp.signTransaction(tx)
+    } catch (e) {
+      e.code.should.be.equal(4)
+      e.message.should.be.equal('Operation rejected by user')
+    }
+  })
+  it('Sign transaction: wallet allow', async () => {
+    wallet.onSign = (aepp, action) => {
+      action.accept()
+    }
+    const address = await aepp.address()
+    const tx = await aepp.spendTx({
+      senderId: address,
+      recipientId: address,
+      amount: 0,
+      payload: 'zerospend'
+    })
+
+    const signedTx = await aepp.signTransaction(tx)
+    const { tx: { signatures: [signature] } } = unpackTx(signedTx)
+    const txWithNetwork = Buffer.concat([Buffer.from(networkId), decode(tx)])
+    const valid = verify(txWithNetwork, signature, decode(address))
+    valid.should.be.equal(true)
+  })
+  it('Sign and broadcast transaction by wallet', async () => {
+    const address = await aepp.address()
+    const tx = await aepp.spendTx({
+      senderId: address,
+      recipientId: address,
+      amount: 0,
+      payload: 'zerospend'
+    })
+
+    const { blockHeight } = await aepp.send(tx)
+    blockHeight.should.be.a('number')
+  })
+  it('Sign by wallet and broadcast transaction by aepp ', async () => {
+    const address = await aepp.address()
+    const tx = await aepp.spendTx({
+      senderId: address,
+      recipientId: address,
+      amount: 0,
+      payload: 'zerospend'
+    })
+
+    const { blockHeight } = await aepp.send(tx, { walletBroadcast: false })
+    blockHeight.should.be.a('number')
   })
 })
 
