@@ -109,7 +109,7 @@ const REQUESTS = {
             result: {
               ...returnSigned
                 ? { signedTransaction: await instance.signTransaction(rawTx || tx, { onAccount }) }
-                : { transactionHash: await instance.send(rawTx || tx, { onAccount }) }
+                : { transactionHash: await instance.send(rawTx || tx, { onAccount, verify: false }) }
             }
           }
           sendResponseMessage(client)(

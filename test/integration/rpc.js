@@ -24,9 +24,16 @@ import { generateKeyPair, verify } from '../../es/utils/crypto'
 import { decode } from '../../es/tx/builder/helpers'
 import { unpackTx } from '../../es/tx/builder'
 import MemoryAccount from '../../es/account/memory'
+import {
+  getBrowserAPI,
+  getHandler,
+  getWindow, isInIframe,
+  message,
+  receive
+} from '../../es/utils/aepp-wallet-communication/helpers'
+import { METHODS } from '../../es/utils/aepp-wallet-communication/schema'
 
 describe('Aepp<->Wallet', function () {
-  // configure(this)
   this.timeout(6000)
   let node
   let aepp
@@ -313,15 +320,141 @@ describe('Aepp<->Wallet', function () {
       e.message.should.be.equal('Can\'t find callback for this messageId 0')
     }
   })
+  it('Try to connect unsupported protocol', async () => {
+    try {
+      await aepp.rpcClient.addCallback(
+        aepp.rpcClient.sendMessage(message(METHODS.aepp.connect, {
+          name: 'test-aepp',
+          version: 2,
+          networkId: aepp.getNetworkId()
+        }))
+      )
+    } catch (e) {
+      e.code.should.be.equal(5)
+      e.message.should.be.equal('Unsupported Protocol Version')
+    }
+  })
+  it('Try to connect unsupported network', async () => {
+    try {
+      await aepp.rpcClient.addCallback(
+        aepp.rpcClient.sendMessage(message(METHODS.aepp.connect, {
+          name: 'test-aepp',
+          version: 1,
+          networkId: 'ae_test'
+        }))
+      )
+    } catch (e) {
+      e.code.should.be.equal(8)
+      e.message.should.be.equal('Unsupported Network')
+    }
+  })
+  it('Try to connect unsupported network', async () => {
+    try {
+      await aepp.rpcClient.addCallback(
+        aepp.rpcClient.sendMessage(message(METHODS.aepp.connect, {
+          name: 'test-aepp',
+          version: 1,
+          networkId: 'ae_test'
+        }))
+      )
+    } catch (e) {
+      e.code.should.be.equal(8)
+      e.message.should.be.equal('Unsupported Network')
+    }
+  })
+  it('Try add already existed callback/action', async () => {
+    try {
+      aepp.rpcClient.callbacks = { 1: {} }
+      await aepp.rpcClient.addCallback(1)
+    } catch (e) {
+      e.message.should.be.equal('Callback Already exist')
+    }
+    try {
+      aepp.rpcClient.addAction({ id: 1 }, [])
+    } catch (e) {
+      e.message.should.be.equal('Action for this request already exist')
+    }
+  })
+  it('Process response ', async () => {
+    try {
+      await aepp.rpcClient.processResponse({ id: 11, error: {} })
+    } catch (e) {
+      e.message.should.be.equal('Can\'t find callback for this messageId ' + 11)
+    }
+  })
+  it('Try to get wallet clients', async () => {
+    const clients = wallet.getClients()
+    clients.should.be.a('Object')
+  })
   it('Disconnect from wallet', async () => {
     const received = await new Promise((resolve, reject) => {
+      let received = false
       wallet.onDisconnect = (msg, from) => {
         msg.reason.should.be.equal('bye')
-        resolve(from.info.status === 'DISCONNECTED')
+        from.info.status.should.be.equal('DISCONNECTED')
+        if (received) resolve(true)
+        received = true
       }
-      aepp.disconnectWallet()
+      aepp.onDisconnect = (msg) => {
+        console.log(msg)
+        if (received) resolve(true)
+        received = true
+      }
+      connectionFromWalletToAepp.sendMessage({ method: METHODS.closeConnection, params: { reason: 'bye' }, jsonrpc: '2.0' })
     })
     received.should.be.equal(true)
+  })
+  describe('Rpc helpres', () => {
+    it('Receive invalid message', () => {
+      (!receive(() => true, 1)(false)).should.be.equal(true)
+    })
+    it('receive unknown method', () => {
+      getHandler({}, { method: 'hey' })()().should.be.equal(true)
+    })
+    it('getBrowserAPI: not in browser', () => {
+      global.chrome = null
+      global.browser = null
+      global.window = null
+      try {
+        getBrowserAPI()
+      } catch (e) {
+        e.message.should.be.equal('Browser is not detected')
+      }
+    })
+    it('getBrowserAPI: chrome', () => {
+      global.chrome = { runtime: {}, chrome: true }
+      getBrowserAPI().chrome.should.be.equal(true)
+    })
+    it('getBrowserAPI: firefox', () => {
+      global.chrome = null
+      global.browser = { runtime: {}, firefox: true }
+      getBrowserAPI().firefox.should.be.equal(true)
+    })
+    it('isInIframe/getWindow', () => {
+      global.window = null
+      try {
+        getWindow()
+      } catch (e) {
+        e.message.should.be.equal('Browser is not detected')
+      }
+      global.window = {}
+      isInIframe().should.be.equal(true)
+      getWindow().should.be.an('Object')
+    })
+    it('Send message from content script', async () => {
+      connectionFromWalletToAepp.disconnect()
+      connectionFromWalletToAepp.debug = true
+      connectionFromAeppToWallet.debug = true
+      connectionFromWalletToAepp.sendDirection = 'to_aepp'
+      const ok = await new Promise((resolve) => {
+        connectionFromAeppToWallet.connect((msg) => {
+          msg.method.should.be.equal('hey')
+          resolve(true)
+        })
+        connectionFromWalletToAepp.sendMessage({ method: 'hey' })
+      })
+      ok.should.be.equal(true)
+    })
   })
 })
 
