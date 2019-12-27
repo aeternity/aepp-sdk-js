@@ -25,15 +25,15 @@ import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 chai.should()
 
-const url = process.env.TEST_URL || 'http://localhost:3013'
-const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
+export const url = process.env.TEST_URL || 'http://localhost:3013'
+export const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
 export const compilerUrl = process.env.COMPILER_URL || 'http://localhost:3080'
-const networkId = process.env.TEST_NETWORK_ID || 'ae_devnet'
-const forceCompatibility = process.env.FORCE_COMPATIBILITY || false
+export const networkId = process.env.TEST_NETWORK_ID || 'ae_devnet'
+export const forceCompatibility = process.env.FORCE_COMPATIBILITY || false
 export const account = Crypto.generateKeyPair()
 export const account2 = Crypto.generateKeyPair()
 
-const BaseAe = async (params) => Ae.waitMined(true).compose({
+export const BaseAe = async (params) => Ae.waitMined(true).compose({
   deepProps: { Swagger: { defaults: { debug: !!process.env['DEBUG'] } } },
   props: { process, compilerUrl }
 })({
@@ -47,17 +47,17 @@ const BaseAeWithAccounts = BaseAe
 let planned = BigNumber(0)
 let charged = false
 
-function plan (amount) {
+export function plan (amount) {
   planned = planned.plus(amount)
 }
 
-const TIMEOUT = 18000000
+export const TIMEOUT = 18000000
 
-function configure (mocha) {
+export function configure (mocha) {
   mocha.timeout(TIMEOUT)
 }
 
-async function ready (mocha, native = true, withAccounts = false) {
+export async function ready (mocha, native = true, withAccounts = false) {
   configure(mocha)
 
   const ae = await BaseAe({ networkId })
@@ -79,12 +79,40 @@ async function ready (mocha, native = true, withAccounts = false) {
   })
 }
 
-export {
+export const WindowPostMessageFake = (name) => ({
+  name,
+  messages: [],
+  addEventListener (onEvent, listener) {
+    this.listener = listener
+  },
+  removeEventListener (onEvent, listener) {
+    return () => null
+  },
+  postMessage (msg) {
+    this.messages.push(msg)
+    setTimeout(() => { if (typeof this.listener === 'function') this.listener({ data: msg, origin: 'testOrigin', source: this }) }, 0)
+  }
+})
+
+export const getFakeConnections = (direct = false) => {
+  const waelletConnection = WindowPostMessageFake('wallet')
+  const aeppConnection = WindowPostMessageFake('aepp')
+  if (direct) {
+    const waelletP = waelletConnection.postMessage
+    const aeppP = aeppConnection.postMessage
+    waelletConnection.postMessage = aeppP.bind(aeppConnection)
+    aeppConnection.postMessage = waelletP.bind(waelletConnection)
+  }
+  return { waelletConnection, aeppConnection }
+}
+
+export default {
   BaseAe,
   url,
   internalUrl,
   networkId,
   configure,
   ready,
-  plan
+  plan,
+  WindowPostMessageFake
 }

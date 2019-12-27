@@ -109,7 +109,7 @@ const REQUESTS = {
             result: {
               ...returnSigned
                 ? { signedTransaction: await instance.signTransaction(rawTx || tx, { onAccount }) }
-                : { transactionHash: await instance.send(rawTx || tx, { onAccount }) }
+                : { transactionHash: await instance.send(rawTx || tx, { onAccount, verify: false }) }
             }
           }
           sendResponseMessage(client)(
@@ -194,7 +194,7 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
           ) &&
           client.isConnected())
     }
-    this.addAccount = async (account, { select, meta }) => {
+    this.addAccount = async (account, { select, meta } = {}) => {
       await _addAccount(account, { select })
       // Send notification 'update.address' to all Aepp which are subscribed for connected accounts
       rpcClients.sentNotificationByCondition(

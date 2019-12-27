@@ -47,12 +47,7 @@ const RESPONSES = {
         Object.prototype.hasOwnProperty.call(msg.result, 'address')
       ) instance.rpcClient.accounts = msg.result.address
 
-      instance.rpcClient.processResponse(
-        msg,
-        ({ id, result }) => {
-          return [result]
-        }
-      )
+      instance.rpcClient.processResponse(msg, ({ id, result }) => [result])
     },
   [METHODS.aepp.sign]: (instance) =>
     (msg) => {
@@ -90,7 +85,6 @@ export const AeppRpc = Ae.compose(Account, {
     const eventsHandlers = ['onDisconnect', 'onAddressChange', 'onNetworkChange']
     this.connection = connection
     this.name = name
-    this.accounts = {}
 
     if (connection) {
       // Init RPCClient
@@ -213,12 +207,15 @@ export const AeppRpc = Ae.compose(Account, {
      * @function send
      * @instance
      * @rtype (tx: String, options = {}) => Promise
+     * @param {String} tx
+     * @param {Object} [options={}]
+     * @param {Object} [options.walletBroadcast={}]
      * @return {Promise<Object>} Transaction broadcast result
      */
-    async send (tx, options) {
+    async send (tx, options = { walletBroadcast: true }) {
       if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
       if (!this.rpcClient.getCurrentAccount()) throw new Error('You do not subscribed for account.')
-      const opt = R.merge(this.Ae.defaults, { walletBroadcast: true, ...options })
+      const opt = R.merge(this.Ae.defaults, options)
       if (!opt.walletBroadcast) {
         const signed = await this.signTransaction(tx, opt)
         return this.sendTransaction(signed, opt)
