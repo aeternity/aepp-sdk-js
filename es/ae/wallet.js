@@ -31,6 +31,7 @@ import Accounts from '../accounts'
 import Chain from '../chain/node'
 import Rpc from '../rpc/server'
 import Tx from '../tx/tx'
+import TxBase from '../tx'
 import Contract from './contract'
 import GeneralizeAccount from '../contract/ga'
 import { WalletRpc } from '../utils/aepp-wallet-communication/rpc/wallet-rpc'
@@ -38,7 +39,7 @@ import Oracle from './oracle'
 import Aens from './aens'
 
 const contains = R.flip(R.contains)
-const isTxMethod = contains(Tx.compose.deepConfiguration.Ae.methods)
+const isTxMethod = contains(TxBase.compose.deepConfiguration.Ae.methods)
 const isChainMethod = contains(Chain.compose.deepConfiguration.Ae.methods)
 const isAccountMethod = contains(Account.compose.deepConfiguration.Ae.methods)
 const isContractMethod = contains(ContractBase.compose.deepConfiguration.Contract.methods)

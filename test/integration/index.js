@@ -90,17 +90,19 @@ export const WindowPostMessageFake = (name) => ({
   },
   postMessage (msg) {
     this.messages.push(msg)
-    setTimeout(() => { if (typeof this.listener === 'function') this.listener({ data: msg, origin: 'testOrigin' }) }, 0)
+    setTimeout(() => { if (typeof this.listener === 'function') this.listener({ data: msg, origin: 'testOrigin', source: this }) }, 0)
   }
 })
 
-export const getFakeConnections = () => {
+export const getFakeConnections = (direct = false) => {
   const waelletConnection = WindowPostMessageFake('wallet')
   const aeppConnection = WindowPostMessageFake('aepp')
-  // const waelletP = waelletConnection.postMessage
-  // const aeppP = aeppConnection.postMessage
-  // waelletConnection.postMessage = aeppP.bind(aeppConnection)
-  // aeppConnection.postMessage = waelletP.bind(waelletConnection)
+  if (direct) {
+    const waelletP = waelletConnection.postMessage
+    const aeppP = aeppConnection.postMessage
+    waelletConnection.postMessage = aeppP.bind(aeppConnection)
+    aeppConnection.postMessage = waelletP.bind(waelletConnection)
+  }
   return { waelletConnection, aeppConnection }
 }
 
