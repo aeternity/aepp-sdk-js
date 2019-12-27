@@ -361,7 +361,7 @@ export function sign (data, privateKey) {
 /**
  * Verify that signature was signed by public key
  * @rtype (str: String, signature: Buffer, publicKey: Buffer) => Boolean
- * @param {String} str - Data to verify
+ * @param {String|Buffer} str - Data to verify
  * @param {Buffer} signature - Signature to verify
  * @param {Buffer} publicKey - Key to verify against
  * @return {Boolean} Valid?
