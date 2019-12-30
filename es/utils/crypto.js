@@ -93,12 +93,6 @@ export function addressFromDecimal (decimalAddress) {
   return aeEncodeKey(toBytes(decimalAddress, true))
 }
 
-
-
-
-
-
-
 /**
  * Calculate 256bits Blake2b hash of `input`
  * @rtype (input: String) => hash: String
