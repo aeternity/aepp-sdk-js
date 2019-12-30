@@ -357,7 +357,7 @@ export function buildTx (params, type, { excludeKeys = [], prefix = 'tx', vsn = 
  * Unpack transaction hash
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
- * @param {String|Array} encodedTx String or RLP encoded transaction array (if fromRlpBinary flag is true)
+ * @param {String|Buffer} encodedTx String or RLP encoded transaction array (if fromRlpBinary flag is true)
  * @param {Boolean} fromRlpBinary Unpack from RLP encoded transaction (default: false)
  * @param {String} prefix - Prefix of data
  * @return {Object} { tx, rlpEncoded, binary } Object with tx -> Object with transaction param's, rlp encoded transaction and binary transaction
