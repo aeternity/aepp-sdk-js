@@ -150,7 +150,7 @@ export function commitmentHash (name, salt = createSalt()) {
  * @param {string} type Prefix of Transaction
  * @return {Buffer} Buffer of decoded Base58check or Base64check data
  */
-export function decode (data, type) {
+export function decode (data, type = '') {
   if (!type) type = data.split('_')[0]
   return base64Types.includes(type)
     ? decodeBase64Check(assertedType(data, type))

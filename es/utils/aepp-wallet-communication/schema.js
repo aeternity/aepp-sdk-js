@@ -70,16 +70,6 @@ export const ERRORS = {
     data: error,
     message: 'Invalid transaction'
   }),
-  // subscriptionDeny: (error = {}) => ({
-  //   code: 5,
-  //   data: error,
-  //   message: 'Subscription request denied'
-  // }),
-  // signDeny: (error = {}) => ({
-  //   code: 4,
-  //   data: error,
-  //   message: 'Sign request denied'
-  // })
   rejectedByUser: (error = {}) => ({
     code: 4,
     data: error,

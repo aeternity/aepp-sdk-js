@@ -35,7 +35,7 @@ function randomString (len, charSet) {
   return randomString
 }
 
-plan('99000000000000000000000')
+plan('99000000000000000000000000')
 
 describe('Aens', function () {
   configure(this)

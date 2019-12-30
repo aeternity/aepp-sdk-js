@@ -168,7 +168,7 @@ export const RpcClient = stampit({
      * @rtype (type: String, value: String) => void
      * @param {String} type Subscription type
      * @param {String} value Subscription value
-     * @return {void}
+     * @return {String[]}
      */
     updateSubscription (type, value) {
       if (type === SUBSCRIPTION_TYPES.subscribe && !this.addressSubscription.includes(value)) {
@@ -177,6 +177,7 @@ export const RpcClient = stampit({
       if (type === SUBSCRIPTION_TYPES.unsubscribe && this.addressSubscription.includes(value)) {
         this.addressSubscription = this.addressSubscription.filter(s => s !== value)
       }
+      return this.addressSubscription
     },
     /**
      * Add new action to actions
