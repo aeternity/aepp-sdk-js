@@ -18,6 +18,7 @@
 import '../'
 import { describe, it } from 'mocha'
 import { leftPad, rightPad, toBytes } from '../../es/utils/bytes'
+import { isBase64, snakeOrKebabToPascal } from '../../es/utils/string'
 
 describe('Bytes', function () {
   it('left/right pad', async () => {
@@ -38,5 +39,10 @@ describe('Bytes', function () {
     } catch (e) {
       e.message.should.be.equal('Byte serialization not supported')
     }
+  })
+  it('Is base64 string', () => {
+    const bs64str = Buffer.from(snakeOrKebabToPascal('hello')).toString('base64')
+    console.log(bs64str)
+    isBase64(bs64str).should.be.equal(true)
   })
 })
