@@ -27,20 +27,46 @@
 import Account from './'
 import required from '@stamp/required'
 import { assertedType } from '../utils/crypto'
+import MemoryAccount from './memory'
+
+const isMemoryAccount = (acc) => !['sign', 'address'].find(f => typeof acc[f] !== 'function')
 
 async function sign (data, { onAccount } = {}) {
-  if (onAccount && !assertedType(onAccount, 'ak', true)) throw new Error('Invalid account address, check "onAccount" value')
-  return this.signWith(onAccount || this.Selector.address, data)
+  if (!onAccount) return this.signWith(this.Selector.address, data)
+  // onAccount can be account address(should exist in sdk instance) or MemoryAccount
+  return this.resolveOnAccount(onAccount, 'sign', data)
 }
 
-async function address ({ onAccount } = {}) {
-  if (onAccount) {
-    if (!assertedType(onAccount, 'ak', true)) throw new Error('Invalid account address, check "onAccount" value')
-    if (!this.accounts[onAccount]) throw Error(`Account for ${onAccount} not available`)
-    return Promise.resolve(onAccount)
+async function resolveOnAccount (onAccount, operation = 'address', data) {
+  switch (typeof onAccount) {
+    case 'string':
+      if (!assertedType(onAccount, 'ak', true)) throw new Error('Invalid account address, check "onAccount" value')
+      if (!this.accounts[onAccount]) throw Error(`Account for ${onAccount} not available`)
+      if (operation === 'sign') return this.signWith(onAccount, data)
+      if (operation === 'address') return onAccount
+      break
+    case 'object':
+      try {
+        const memoryAccount = isMemoryAccount(onAccount)
+          ? onAccount
+          : MemoryAccount({ keypair: onAccount })
+        if (operation === 'sign') return memoryAccount.sign(data)
+        if (operation === 'address') return memoryAccount.address()
+        break
+      } catch (e) {
+        e.message = `Invalid 'onAccount' option: ${e.message}`
+        throw e
+      }
+    default:
+      throw new Error('Invalid `onAccount` option: should be keyPair object or account address')
   }
-  if (this.Selector.address) return Promise.resolve(this.Selector.address)
-  throw new Error('You don\'t have selected account')
+}
+async function address ({ onAccount } = {}) {
+  if (!onAccount) {
+    if (this.Selector.address) return Promise.resolve(this.Selector.address)
+    throw new Error('You don\'t have selected account')
+  }
+  return this.resolveOnAccount(onAccount, 'address')
 }
 
 /**
@@ -72,7 +98,7 @@ const Selector = Account.compose({
     if (address && !assertedType(address, 'ak', true)) throw new Error('Invalid account address')
     this.Selector.address = address
   },
-  methods: { sign, address, selectAccount },
+  methods: { sign, address, selectAccount, resolveOnAccount },
   deepProps: {
     Selector: {}
   }
