@@ -440,8 +440,8 @@ export function assertedType (data, type, forceError = false) {
 /**
  * Decode a transaction
  * @rtype (txHash: String) => Buffer
- * @param {String} password - Password to decrypt with
- * @return {Array} Decoded transaction
+ * @param {String} txHash - Transaction hash
+ * @return {Buffer} Decoded transaction
  */
 export function decodeTx (txHash) {
   return RLP.decode(Buffer.from(decodeBase64Check(assertedType(txHash, 'tx'))))
