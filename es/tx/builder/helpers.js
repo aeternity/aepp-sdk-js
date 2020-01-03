@@ -7,7 +7,6 @@ import {
   decodeBase64Check,
   encodeBase58Check, encodeBase64Check,
   hash,
-  nameId as nameHash,
   salt
 } from '../../utils/crypto'
 import { toBytes } from '../../utils/bytes'
@@ -90,6 +89,26 @@ export function oracleQueryId (senderId, nonce, oracleId) {
  */
 export function formatSalt (salt) {
   return Buffer.from(salt.toString(16).padStart(64, '0'), 'hex')
+}
+
+/**
+ * Calculate 256bits Blake2b nameId of `input`
+ * as defined in https://github.com/aeternity/protocol/blob/master/AENS.md#hashing
+ * @rtype (input: String) => hash: String
+ * @param {String} input - Data to hash
+ * @return {Buffer} Hash
+ */
+export function nameHash (input) {
+  let buf = Buffer.allocUnsafe(32).fill(0)
+  if (!input) {
+    return buf
+  } else {
+    const labels = input.split('.')
+    for (let i = 0; i < labels.length; i++) {
+      buf = hash(Buffer.concat([buf, hash(labels[i])]))
+    }
+    return buf
+  }
 }
 
 /**

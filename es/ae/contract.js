@@ -29,7 +29,7 @@
 
 import Ae from './'
 import * as R from 'ramda'
-import { isBase64 } from '../utils/crypto'
+import { isBase64 } from '../utils/string'
 import ContractCompilerAPI from '../contract/compiler'
 import ContractBase from '../contract'
 import ContractACI from '../contract/aci'
