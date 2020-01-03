@@ -17,8 +17,8 @@
 import { expect } from 'chai'
 import { describe, it } from 'mocha'
 import {
-  deriveChild, derivePathFromKey, derivePathFromSeed,
-  generateSaveHDWallet, getKeyPair,
+  deriveChild, derivePathFromKey, derivePathFromSeed, generateMnemonic,
+  generateSaveHDWallet, getHdWalletAccountFromMnemonic, getKeyPair,
   getMasterKeyFromSeed,
   getSaveHDWalletAccounts
 } from '../../es/utils/hd-wallet'
@@ -169,4 +169,23 @@ describe('hd wallet', () => {
             })))
       })
   )
+  it('Generate mnemonic', () => {
+    const mnemonic = generateMnemonic()
+    const wallet = getHdWalletAccountFromMnemonic(mnemonic, 0)
+    wallet.publicKey.split('_')[0].should.be.equal('ak')
+  })
+  it('Try to get wallet from invalid mnemonic', () => {
+    try {
+      generateSaveHDWallet('asdasdasdasdas')
+    } catch (e) {
+      e.message.should.be.equal('Invalid mnemonic')
+    }
+  })
+  it('Derive child with invalid path', () => {
+    try {
+      derivePathFromSeed('asd')
+    } catch (e) {
+      e.message.should.be.equal('Invalid path')
+    }
+  })
 })

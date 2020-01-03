@@ -17,11 +17,12 @@
 
 import '../'
 import { describe, it } from 'mocha'
-import { salt } from '../../es/utils/crypto'
-import { commitmentHash } from '../../es/tx/builder/helpers'
+import { salt, rlp } from '../../es/utils/crypto'
+import { classify, commitmentHash, isNameValid, nameHash, produceNameId } from '../../es/tx/builder/helpers'
 import { BigNumber } from 'bignumber.js'
 import { toBytes } from '../../es/utils/bytes'
 import { parseBigNumber } from '../../es/utils/bignumber'
+import { buildTx, unpackTx } from '../../es/tx/builder'
 
 describe('Tx', function () {
   it('reproducible commitment hashes can be generated', async () => {
@@ -52,5 +53,58 @@ describe('Tx', function () {
     data.forEach(n => {
       n.toString(10).should.be.equal(bnFromBytes(n))
     })
+  })
+  it('nameHash: Invalid input', () => {
+    nameHash(undefined).equals(Buffer.allocUnsafe(32).fill(0)).should.be.equal(true)
+  })
+  it('Produce name if for `.test`', () => {
+    produceNameId('asdas.test').should.be.equal('nm_KhRggXqN4siPYQtacAncf9v4B4fBrcu4qrDkDi6PhsGpFxS7y')
+  })
+  it('isNameValid: invalid namespace', () => {
+    isNameValid('asdas.eth', false).should.be.equal(false)
+  })
+  it('classify: invalid hash', () => {
+    try {
+      classify('aaaaa')
+    } catch (e) {
+      e.message.should.be.equal('Not a valid hash')
+    }
+  })
+  it('classify: invalid prefix', () => {
+    try {
+      classify('aa_23aaaaa')
+    } catch (e) {
+      e.message.should.be.equal('Unknown class aa')
+    }
+  })
+  it('Deserialize tx: invalid tx type', () => {
+    const tx = rlp.encode([99, 99])
+    try {
+      unpackTx(tx, true)
+    } catch (e) {
+      e.message.should.be.equal('Transaction deserialization not implemented for tag ' + 99)
+    }
+  })
+  it('Deserialize tx: invalid tx VSN', () => {
+    const tx = rlp.encode([10, 99])
+    try {
+      unpackTx(tx, true)
+    } catch (e) {
+      e.message.should.be.equal('Transaction deserialization not implemented for tag ' + 10 + ' version ' + 99)
+    }
+  })
+  it('Serialize tx: invalid tx type', () => {
+    try {
+      buildTx({}, 'someTx')
+    } catch (e) {
+      e.message.should.be.equal('Transaction serialization not implemented for someTx')
+    }
+  })
+  it('Serialize tx: invalid tx VSN', () => {
+    try {
+      buildTx({}, 'spendTx', { vsn: 5 })
+    } catch (e) {
+      e.message.should.be.equal('Transaction serialization not implemented for spendTx version 5')
+    }
   })
 })
