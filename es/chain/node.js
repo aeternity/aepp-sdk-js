@@ -37,7 +37,7 @@ async function sendTransaction (tx, options = {}) {
   if (verify || (typeof verify !== 'boolean' && this.verifyTxBeforeSend)) {
     const { validation, tx: txObject, txType } = await this.unpackAndVerify(tx)
     if (validation.length) {
-      throw Object.assign(Error('Transaction verification error'), {
+      throw Object.assign(Error('Transaction verification error: ' + JSON.stringify(validation)), {
         code: 'TX_VERIFICATION_ERROR',
         errorData: { validation, tx: txObject, txType },
         txHash: tx
