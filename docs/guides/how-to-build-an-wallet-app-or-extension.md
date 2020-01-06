@@ -1,6 +1,6 @@
-## How to build an wallet
+## How to build a wallet
 
-his guid describing the process of building Waellet using the new Wallet<->Aepp integration API
+This guide describing the process of building Waellet using the new Wallet<->Aepp integration API
 The full example of implementation you can find here:
 - [Web Waellet](https://github.com/aeternity/aepp-sdk-js/tree/develop/examples/browser/vuejs/connect-two-ae/identity)
 - [Extension Waellet](https://github.com/aeternity/aepp-sdk-js/tree/develop/examples/browser/extension)
@@ -64,6 +64,7 @@ After connection will be established we can start to send `announcePresence` mes
 import '../img/icon-128.png'
 import '../img/icon-34.png'
 
+import Node from '@aeternity/aepp-sdk/es/node'
 import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
 import { RpcWallet } from '@aeternity/aepp-sdk/es/ae/wallet'
 import BrowserRuntimeConnection
@@ -89,8 +90,9 @@ const COMPILER_URL = 'https://compiler.aepps.com'
 
 // Init extension stamp from sdk
 RpcWallet({
-  url: NODE_URL,
-  internalUrl: NODE_INTERNAL_URL,
+  nodes: [
+    { name: 'test-net', instance: await Node({ url: NODE_URL, internalUrl: NODE_INTERNAL_URL}) }
+  ],
   compilerUrl: COMPILER_URL,
   name: 'ExtensionWallet',
   accounts,
@@ -152,12 +154,13 @@ RpcWallet({
 - This works the same as extension but without `Content Script bridge` in between
 
 ```js
-  import { MemoryAccount, RpcWallet } from '@aeternity/aepp-sdk/es'
+  import { MemoryAccount, RpcWallet, Node } from '@aeternity/aepp-sdk/es'
   import BrowserWindowMessageConnection from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message'
 
   this.client = await RpcWallet({
-        url: 'NODE_URL',
-        internalUrl: 'NODE_INTERNAL_URL', // optional
+        nodes: [
+          { name: 'test-net', instance: await Node({ url: NODE_URL, internalUrl: NODE_INTERNAL_URL}) }
+        ],
         compilerUrl: 'COMPILER_URL', // optional if your wallet don't support contract and all what requred compiler
         accounts: [MemoryAccount({ keypair: { secretKey: 'YOUR_PRIVATE_KEY', publicKey: 'YOUR_PUBLIC_KEY' } })],
         address: 'PUBLIC_KEY_OF_CURRENT_ACCOUNT', // default: first account in `accounts` array,

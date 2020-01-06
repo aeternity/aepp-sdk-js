@@ -7,7 +7,6 @@ import {
   decodeBase64Check,
   encodeBase58Check, encodeBase64Check,
   hash,
-  nameId as nameHash,
   salt
 } from '../../utils/crypto'
 import { toBytes } from '../../utils/bytes'
@@ -93,6 +92,26 @@ export function formatSalt (salt) {
 }
 
 /**
+ * Calculate 256bits Blake2b nameId of `input`
+ * as defined in https://github.com/aeternity/protocol/blob/master/AENS.md#hashing
+ * @rtype (input: String) => hash: String
+ * @param {String} input - Data to hash
+ * @return {Buffer} Hash
+ */
+export function nameHash (input) {
+  let buf = Buffer.allocUnsafe(32).fill(0)
+  if (!input) {
+    return buf
+  } else {
+    const labels = input.split('.')
+    for (let i = 0; i < labels.length; i++) {
+      buf = hash(Buffer.concat([buf, hash(labels[i])]))
+    }
+    return buf
+  }
+}
+
+/**
  * Encode a domain name
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
@@ -131,7 +150,7 @@ export function commitmentHash (name, salt = createSalt()) {
  * @param {string} type Prefix of Transaction
  * @return {Buffer} Buffer of decoded Base58check or Base64check data
  */
-export function decode (data, type) {
+export function decode (data, type = '') {
   if (!type) type = data.split('_')[0]
   return base64Types.includes(type)
     ? decodeBase64Check(assertedType(data, type))

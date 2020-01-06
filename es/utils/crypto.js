@@ -34,17 +34,6 @@ import { decode as decodeNode } from '../tx/builder/helpers'
 
 const Ecb = aesjs.ModeOfOperation.ecb
 
-/**
- * Check whether a string is valid base-64.
- * @param {string} str String to validate.
- * @return {boolean} True if the string is valid base-64, false otherwise.
- */
-export function isBase64 (str) {
-  if (str.length % 4 > 0 || str.match(/[^0-9a-z+/=]/i)) return false
-  const index = str.indexOf('=')
-  return !!(index === -1 || str.slice(index).match(/={1,2}/))
-}
-
 export const ADDRESS_FORMAT = {
   sophia: 1,
   api: 2,
@@ -112,26 +101,6 @@ export function addressFromDecimal (decimalAddress) {
  */
 export function hash (input) {
   return Buffer.from(blake2b(input, null, 32)) // 256 bits
-}
-
-/**
- * Calculate 256bits Blake2b nameId of `input`
- * as defined in https://github.com/aeternity/protocol/blob/master/AENS.md#hashing
- * @rtype (input: String) => hash: String
- * @param {String} input - Data to hash
- * @return {Buffer} Hash
- */
-export function nameId (input) {
-  let buf = Buffer.allocUnsafe(32).fill(0)
-  if (!input) {
-    return buf
-  } else {
-    const labels = input.split('.')
-    for (let i = 0; i < labels.length; i++) {
-      buf = hash(Buffer.concat([buf, hash(labels[i])]))
-    }
-    return buf
-  }
 }
 
 /**
@@ -224,8 +193,8 @@ export function hexStringToByte (str) {
     return new Uint8Array()
   }
 
-  var a = []
-  for (var i = 0, len = str.length; i < len; i += 2) {
+  const a = []
+  for (let i = 0, len = str.length; i < len; i += 2) {
     a.push(parseInt(str.substr(i, 2), 16))
   }
 
@@ -245,6 +214,7 @@ export function encodeUnsigned (value) {
   return binary.slice(binary.findIndex(i => i !== 0))
 }
 
+// Todo Duplicated in tx builder. remove
 /**
  * Compute contract address
  * @rtype (owner: String, nonce: Number) => String
@@ -361,7 +331,7 @@ export function sign (data, privateKey) {
 /**
  * Verify that signature was signed by public key
  * @rtype (str: String, signature: Buffer, publicKey: Buffer) => Boolean
- * @param {String} str - Data to verify
+ * @param {String|Buffer} str - Data to verify
  * @param {Buffer} signature - Signature to verify
  * @param {Buffer} publicKey - Key to verify against
  * @return {Boolean} Valid?
@@ -470,8 +440,8 @@ export function assertedType (data, type, forceError = false) {
 /**
  * Decode a transaction
  * @rtype (txHash: String) => Buffer
- * @param {String} password - Password to decrypt with
- * @return {Array} Decoded transaction
+ * @param {String} txHash - Transaction hash
+ * @return {Buffer} Decoded transaction
  */
 export function decodeTx (txHash) {
   return RLP.decode(Buffer.from(decodeBase64Check(assertedType(txHash, 'tx'))))
@@ -511,6 +481,7 @@ export function isValidKeypair (privateKey, publicKey) {
  * `WALLET_PRIV` and `WALLET_PUB`.
  * @rtype (env: Object) => {publicKey: String, secretKey: String}, throws: Error
  * @param {Object} env - Environment
+ * @param {Boolean} [force=false] Force throwing error
  * @return {Object} Key pair
  */
 export function envKeypair (env, force = false) {
@@ -523,142 +494,6 @@ export function envKeypair (env, force = false) {
     return keypair
   } else {
     if (!force) throw Error('Environment variables WALLET_PRIV and WALLET_PUB need to be set')
-  }
-}
-
-/**
- * RLP decode
- * @rtype (data: Any) => Buffer[]
- * @param {Buffer|String|Integer|Array} data - Data to decode
- * @return {Array} Array of Buffers containing the original message
- */
-export const decode = RLP.decode
-export const encode = RLP.encode
-export const rlp = RLP
-
-const OBJECT_TAGS = {
-  SIGNED_TX: 11,
-  CHANNEL_CREATE_TX: 50,
-  CHANNEL_CLOSE_MUTUAL_TX: 53,
-  CHANNEL_OFFCHAIN_TX: 57,
-  CHANNEL_OFFCHAIN_UPDATE_TRANSFER: 570
-}
-
-function objectTag (tag, pretty) {
-  if (pretty) {
-    const entry = Object.entries(OBJECT_TAGS).find(([key, value]) => tag === value)
-    return entry ? entry[0] : tag
-  }
-  return tag
-}
-
-function readInt (buf) {
-  return buf.readIntBE(0, buf.length)
-}
-
-function readId (buf) {
-  const type = buf.readUIntBE(0, 1)
-  const prefix = {
-    1: 'ak',
-    2: 'nm',
-    3: 'cm',
-    4: 'ok',
-    5: 'ct',
-    6: 'ch'
-  }[type]
-  const hash = encodeBase58Check(buf.slice(1, buf.length))
-  return `${prefix}_${hash}`
-}
-
-function readSignatures (buf) {
-  const signatures = []
-
-  for (let i = 0; i < buf.length; i++) {
-    signatures.push(encodeBase58Check(buf[i]))
-  }
-
-  return signatures
-}
-
-function deserializeOffChainUpdate (binary, opts) {
-  const tag = readInt(binary[0])
-  const obj = {
-    tag: objectTag(tag, opts.prettyTags),
-    version: readInt(binary[1])
-  }
-
-  switch (tag) {
-    case OBJECT_TAGS.CHANNEL_OFFCHAIN_UPDATE_TRANSFER:
-      return Object.assign(obj, {
-        from: readId(binary[2]),
-        to: readId(binary[3]),
-        amount: readInt(binary[4])
-      })
-  }
-
-  return obj
-}
-
-function readOffChainTXUpdates (buf, opts) {
-  const updates = []
-
-  for (let i = 0; i < buf.length; i++) {
-    updates.push(deserializeOffChainUpdate(decode(buf[i]), opts))
-  }
-
-  return updates
-}
-
-/**
- * Deserialize `binary` state channel transaction
- * @rtype (binary: String) => Object
- * @param {String} binary - Data to deserialize
- * @param {Object} opts - Options
- * @return {Object} Channel data
- */
-export function deserialize (binary, opts = { prettyTags: false }) {
-  const tag = readInt(binary[0])
-  const obj = {
-    tag: objectTag(tag, opts.prettyTags),
-    version: readInt(binary[1])
-  }
-
-  switch (tag) {
-    case OBJECT_TAGS.SIGNED_TX:
-      return Object.assign(obj, {
-        signatures: readSignatures(binary[2]),
-        tx: deserialize(decode(binary[3]), opts)
-      })
-
-    case OBJECT_TAGS.CHANNEL_CREATE_TX:
-      return Object.assign(obj, {
-        initiator: readId(binary[2]),
-        initiatorAmount: readInt(binary[3]),
-        responder: readId(binary[4]),
-        responderAmount: readInt(binary[5]),
-        channelReserve: readInt(binary[6]),
-        lockPeriod: readInt(binary[7]),
-        ttl: readInt(binary[8]),
-        fee: readInt(binary[9])
-      })
-
-    case OBJECT_TAGS.CHANNEL_CLOSE_MUTUAL_TX:
-      return Object.assign(obj, {
-        channelId: readId(binary[2]),
-        initiatorAmount: readInt(binary[3]),
-        responderAmount: readInt(binary[4]),
-        ttl: readInt(binary[5]),
-        fee: readInt(binary[6]),
-        nonce: readInt(binary[7])
-      })
-
-    case OBJECT_TAGS.CHANNEL_OFFCHAIN_TX:
-      return Object.assign(obj, {
-        channelId: readId(binary[2]),
-        round: readInt(binary[3]),
-        updates: readOffChainTXUpdates(binary[4], opts),
-        state: encodeBase58Check(binary[5])
-      })
   }
 }
 
@@ -711,3 +546,13 @@ export function decryptData (secretKey, encryptedData) {
   )
   return decrypted ? Buffer.from(decrypted) : decrypted
 }
+
+/**
+ * RLP decode
+ * @rtype (data: Any) => Buffer[]
+ * @param {Buffer|String|Integer|Array} data - Data to decode
+ * @return {Array} Array of Buffers containing the original message
+ */
+export const decode = RLP.decode
+export const encode = RLP.encode
+export const rlp = RLP

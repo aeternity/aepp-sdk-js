@@ -125,7 +125,7 @@ describe('Accounts', function () {
       try {
         await wallet.spend(1, await wallet.address(), { onAccount: 1 })
       } catch (e) {
-        e.message.should.be.equal('Invalid account address, check "onAccount" value')
+        e.message.should.be.equal('Invalid `onAccount` option: should be keyPair object or account address')
       }
     })
 
@@ -137,12 +137,48 @@ describe('Accounts', function () {
         e.message.should.be.equal('Account for ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk not available')
       }
     })
+    it('Invalid on account options', async () => {
+      try {
+        await wallet.sign('tx_Aasdasd', { onAccount: 123 })
+      } catch (e) {
+        e.message.should.be.equal('Invalid `onAccount` option: should be keyPair object or account address')
+      }
+    })
+    it('Make operation on account using keyPair/MemoryAccount', async () => {
+      const keypair = generateKeyPair()
+      const memoryAccount = MemoryAccount({ keypair })
+      const data = 'Hello'
+      const signature = await memoryAccount.sign(data)
+      const sigUsingKeypair = await wallet.sign(data, { onAccount: keypair })
+      const sigUsingMemoryAccount = await wallet.sign(data, { onAccount: memoryAccount })
+      signature.toString('hex').should.be.equal(sigUsingKeypair.toString('hex'))
+      signature.toString('hex').should.be.equal(sigUsingMemoryAccount.toString('hex'))
+      // address
+      const addressFromKeypair = await wallet.address({ onAccount: keypair })
+      const addressFrommemoryAccount = await wallet.address({ onAccount: memoryAccount })
+      addressFromKeypair.should.be.equal(keypair.publicKey)
+      addressFrommemoryAccount.should.be.equal(keypair.publicKey)
+    })
+    it('Make operation on account using keyPair: Invalid keypair', async () => {
+      const keypair = generateKeyPair()
+      keypair.publicKey = 'ak_bev1aPMdAeJTuUiCJ7mHbdQiAizrkRGgoV9FfxHYb6pAxo5WY'
+      const data = 'Hello'
+      try {
+        await wallet.sign(data, { onAccount: keypair })
+      } catch (e) {
+        e.message.should.be.equal('Invalid \'onAccount\' option: Invalid Key Pair')
+      }
+      try {
+        await wallet.address({ onAccount: keypair })
+      } catch (e) {
+        e.message.should.be.equal('Invalid \'onAccount\' option: Invalid Key Pair')
+      }
+    })
   })
 
   describe('can be configured to return th', () => {
     it('on creation', async () => {
       const wallet = await ready(this)
-      // const wallet = await BaseAe.compose({deepProps: {Chain: {defaults: {waitMined: false}}}})()
       const th = await wallet.spend(1, receiver)
       th.should.be.a('object')
       th.hash.slice(0, 3).should.equal('th_')

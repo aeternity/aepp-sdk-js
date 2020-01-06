@@ -142,6 +142,7 @@ describe('Swagger', function () {
         "e": 0.123456789e-12,
         "E": 1.234567890E+34,
         "":  23456789012E666,
+        "bigNumber": '2378562376872638746283764871268736871391236192461742314',
         "zero": 0,
         "one": 1,
         "space": " ",
@@ -185,9 +186,7 @@ describe('Swagger', function () {
       ,"rosebud"]
     const stringified = JsonBig.stringify(obj)
     const parsed = JsonBig.parse(stringified)
-    console.log(obj)
     parsed[8][''] = 23456789012E666
-    console.log(parsed)
     parsed.should.eql(obj)
   })
 })
