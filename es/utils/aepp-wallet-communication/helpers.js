@@ -2,10 +2,11 @@
  * Browser helper functions
  */
 /* eslint-disable no-undef */
-export const getBrowserAPI = () => {
-  if (chrome && chrome.runtime) return chrome
-  if (browser && browser.runtime) return browser
-  throw new Error('Browser is not detected')
+export const getBrowserAPI = (force = false) => {
+  if (typeof chrome !== 'undefined' && chrome.runtime) return chrome
+  if (typeof browser !== 'undefined' && browser.runtime) return browser
+  if (!force) throw new Error('Browser is not detected')
+  return {}
 }
 
 export const isInIframe = () => window !== window.parent
