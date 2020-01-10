@@ -19,6 +19,7 @@
 * **Guide:** Add guide for Contract ACI usage ([#852](https://github.com/aeternity/aepp-sdk-js/pull/852))
 
 
+
 # [7.0.0-next.1](https://github.com/aeternity/aepp-sdk-js/compare/6.0.1...7.0.0-next.1) (2019-12-18)
 
 
