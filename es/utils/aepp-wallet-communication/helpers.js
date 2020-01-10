@@ -3,8 +3,8 @@
  */
 /* eslint-disable no-undef */
 export const getBrowserAPI = (force = false) => {
-  if (typeof chrome !== 'undefined' && chrome.runtime) return chrome
-  if (typeof browser !== 'undefined' && browser.runtime) return browser
+  if (chrome === Object(chrome) && chrome.runtime) return chrome
+  if (browser === Object(browser) && browser.runtime) return browser
   if (!force) throw new Error('Browser is not detected')
   return {}
 }
