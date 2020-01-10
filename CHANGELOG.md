@@ -4,14 +4,19 @@
 ### Bug Fixes
 
 * **codecov:** Adjust codecov badge. Move @babel/runtime to dev-deps ([#848](https://github.com/aeternity/aepp-sdk-js/issues/848)) ([109b851](https://github.com/aeternity/aepp-sdk-js/commit/109b851))
-* **HdWallet:** Fix derive function ([#801](https://github.com/aeternity/aepp-sdk-js/issues/801)) ([6c6177d](https://github.com/aeternity/aepp-sdk-js/commit/6c6177d))
+* **AEX-2:** Fix `getBrowserAPI` function for firefox ([#853](https://github.com/aeternity/aepp-sdk-js/pull/853))
 
 
 ### Features
 
 * **Account:** Add ability to pass `keypair` or `MemoryAccount` as nAccount` option ([#847](https://github.com/aeternity/aepp-sdk-js/issues/847)) ([75d8ad8](https://github.com/aeternity/aepp-sdk-js/commit/75d8ad8))
-* **Test:** Increase code covarage ([#830](https://github.com/aeternity/aepp-sdk-js/issues/830)) ([6f760fb](https://github.com/aeternity/aepp-sdk-js/commit/6f760fb))
+* **Test:** Increase code coverage ([#830](https://github.com/aeternity/aepp-sdk-js/issues/830)) ([6f760fb](https://github.com/aeternity/aepp-sdk-js/commit/6f760fb))
+* **Chain:** Extend transaction verification error ([#849](https://github.com/aeternity/aepp-sdk-js/pull/849))
+* **Aepp<->Wallet:** Add tests for Aepp<->Wallet communication ([#834](https://github.com/aeternity/aepp-sdk-js/pull/834))
 
+### Documentation
+
+* **Guide:** Add guide for Contract ACI usage ([#852](https://github.com/aeternity/aepp-sdk-js/pull/852))
 
 
 # [7.0.0-next.1](https://github.com/aeternity/aepp-sdk-js/compare/6.0.1...7.0.0-next.1) (2019-12-18)
