@@ -2,7 +2,6 @@
 
 ## @aeternity/aepp-sdk/es/utils/keystore
 KeyStore module
-!!!Work only in node.js!!!
 
 **Example**  
 ```js

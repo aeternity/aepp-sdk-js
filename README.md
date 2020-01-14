@@ -1,11 +1,12 @@
 # [Æternity](https://aeternity.com/)'s Javascript SDK
 
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/aeternity/aepp-sdk-js.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/aeternity/aepp-sdk-js/context:javascript)
-[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
+[![codecov](https://codecov.io/gh/aeternity/aepp-sdk-js/branch/develop/graph/badge.svg)](https://codecov.io/gh/aeternity/aepp-sdk-js)
 [![Build Status](https://travis-ci.com/aeternity/aepp-sdk-js.svg?branch=develop)](http://travis-ci.com/aeternity/aepp-sdk-js?branch=develop)
+[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 [![npm](https://img.shields.io/npm/v/@aeternity/aepp-sdk.svg)](https://www.npmjs.com/package/@aeternity/aepp-sdk)
-[![npm](https://img.shields.io/npm/l/@aeternity/aepp-sdk.svg)](https://www.npmjs.com/package/@aeternity/aepp-sdk) [![Greenkeeper badge](https://badges.greenkeeper.io/aeternity/aepp-sdk-js.svg)](https://greenkeeper.io/)
-
+[![npm](https://img.shields.io/npm/l/@aeternity/aepp-sdk.svg)](https://www.npmjs.com/package/@aeternity/aepp-sdk) 
+[![Greenkeeper badge](https://badges.greenkeeper.io/aeternity/aepp-sdk-js.svg)](https://greenkeeper.io/)
 JavaScript SDK for the revolutionary [æternity] blockchain, targeting the
 [æternity node] implementation. Aepp-sdk is [hosted on GitHub].
 

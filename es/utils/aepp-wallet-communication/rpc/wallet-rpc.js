@@ -109,7 +109,7 @@ const REQUESTS = {
             result: {
               ...returnSigned
                 ? { signedTransaction: await instance.signTransaction(rawTx || tx, { onAccount }) }
-                : { transactionHash: await instance.send(rawTx || tx, { onAccount }) }
+                : { transactionHash: await instance.send(rawTx || tx, { onAccount, verify: false }) }
             }
           }
           sendResponseMessage(client)(
@@ -194,7 +194,7 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
           ) &&
           client.isConnected())
     }
-    this.addAccount = async (account, { select, meta }) => {
+    this.addAccount = async (account, { select, meta } = {}) => {
       await _addAccount(account, { select })
       // Send notification 'update.address' to all Aepp which are subscribed for connected accounts
       rpcClients.sentNotificationByCondition(
@@ -271,12 +271,13 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
      * @return {Object} Object with wallet information(id, name, network, ...)
      */
     getWalletInfo () {
+      const runtime = getBrowserAPI(true).runtime
       return {
-        id: getBrowserAPI().runtime.id || this.id,
+        id: runtime ? runtime.id : this.id,
         name: this.name,
         networkId: this.getNetworkId(),
         origin: window.location.origin,
-        type: getBrowserAPI().runtime.id ? WALLET_TYPE.extension : WALLET_TYPE.window
+        type: runtime && runtime.id ? WALLET_TYPE.extension : WALLET_TYPE.window
       }
     },
     /**

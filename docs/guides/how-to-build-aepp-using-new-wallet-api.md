@@ -1,6 +1,6 @@
 ## How to build an Aepp using new Wallet API
 
-This guid describing the process of building Aepp using the new Wallet<->Aepp integration API
+This guide describing the process of building Aepp using the new Wallet<->Aepp integration API
 The full example of implementation you can find here: [AEPP example](https://github.com/aeternity/aepp-sdk-js/tree/develop/examples/browser/vuejs/connect-two-ae/aepp)
 ### First we need to initialize our `Aepp` stamp
 
@@ -11,8 +11,9 @@ The full example of implementation you can find here: [AEPP example](https://git
   //  window !== window.parent || await this.getReverseWindow()
    this.client = await RpcAepp({
      name: 'AEPP',
-     url: NODE_URL,
-     internalUrl: NODE_INTERNAL_URL,
+     nodes: [
+      { name: 'test-net', instance: await Node({ url: NODE_URL, internalUrl: NODE_INTERNAL_URL}) }
+     ],
      compilerUrl: COMPILER_URL,
      // call-back for update network notification
      onNetworkChange (params) {

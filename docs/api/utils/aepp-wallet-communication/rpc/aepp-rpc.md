@@ -16,7 +16,7 @@ import ContentScriptBridge from '@aeternity/aepp-sdk/es/utils/aepp-wallet-commun
         * [.subscribeAddress(type, value)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+subscribeAddress) ⇒ `Promise`
         * [.signTransaction()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+signTransaction) ⇒ `Promise.&lt;String&gt;`
         * [.sendConnectRequest()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+sendConnectRequest) ⇒ `Promise`
-        * [.send()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+send) ⇒ `Promise.&lt;Object&gt;`
+        * [.send(tx, [options])](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+send) ⇒ `Promise.&lt;Object&gt;`
 
 <a id="exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc"></a>
 
@@ -100,7 +100,7 @@ Send connection request to wallet
 **rtype**: `() => Promise`
 <a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+send"></a>
 
-#### exports.AeppRpc.send() ⇒ `Promise.&lt;Object&gt;`
+#### exports.AeppRpc.send(tx, [options]) ⇒ `Promise.&lt;Object&gt;`
 Overwriting of `send` AE method
 All sdk API which use it will be send notification to wallet and wait for callBack
 This method will sign, broadcast and wait until transaction will be accepted using rpc communication with wallet
@@ -108,3 +108,10 @@ This method will sign, broadcast and wait until transaction will be accepted usi
 **Kind**: instance method of [`exports.AeppRpc`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc)  
 **Returns**: `Promise.&lt;Object&gt;` - Transaction broadcast result  
 **rtype**: `(tx: String, options = {}) => Promise`
+
+| Param | Type | Default |
+| --- | --- | --- |
+| tx | `String` |  | 
+| [options] | `Object` | <code>{}</code> | 
+| [options.walletBroadcast] | `Object` | <code>{}</code> | 
+
