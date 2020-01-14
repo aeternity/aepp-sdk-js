@@ -271,12 +271,13 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
      * @return {Object} Object with wallet information(id, name, network, ...)
      */
     getWalletInfo () {
+      const runtime = getBrowserAPI(true).runtime
       return {
-        id: getBrowserAPI().runtime.id || this.id,
+        id: runtime ? runtime.id : this.id,
         name: this.name,
         networkId: this.getNetworkId(),
         origin: window.location.origin,
-        type: getBrowserAPI().runtime.id ? WALLET_TYPE.extension : WALLET_TYPE.window
+        type: runtime && runtime.id ? WALLET_TYPE.extension : WALLET_TYPE.window
       }
     },
     /**
