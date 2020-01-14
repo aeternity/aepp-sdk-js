@@ -499,6 +499,12 @@ describe('Aepp<->Wallet', function () {
         e.message.should.be.equal('Browser is not detected')
       }
     })
+    it('getBrowserAPI: not in browser(force error)', () => {
+      global.chrome = null
+      global.browser = null
+      global.window = null
+      getBrowserAPI(true).should.be.an('object')
+    })
     it('getBrowserAPI: chrome', () => {
       global.chrome = { runtime: {}, chrome: true }
       getBrowserAPI().chrome.should.be.equal(true)
