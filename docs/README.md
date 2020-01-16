@@ -34,13 +34,19 @@ When initialising a client, to test, you can use Aeternity's Test Nework URLs:
 You can use this URL with any releasee on [npmjs](https://www.npmjs.com/package/@aeternity/aepp-sdk). It offers the last stable version of [Node](https://github.com/aeternity/aeternity), used by all of of Aeternity's Dev Tools.
 
 ## Guides
-### Browser
-  - [**SDK usage** Understanding low vs high level](guides/low-vs-high-usage.md)
-  - [Import SDK bundle with **`<script>`** tag](guides/import-script-tag.md)
-  - [Import SDK **ES Modules** (enabling Tree-Shaking)](guides/import-tree-shaking.md)
-  - [Import SDK in **VueJS**](guides/import-vuejs.md)
-### NodeJS Environment
-  - [Import SDK in **NodeJS**](guides/import-nodejs.md)
+### Import SDK
+  - Browser
+    - [Import SDK bundle with **`<script>`** tag](guides/import-script-tag.md)
+    - [Import SDK **ES Modules** (enabling Tree-Shaking)](guides/import-tree-shaking.md)
+    - [Import SDK in **VueJS**](guides/import-vuejs.md)
+  - NodeJS Environment
+    - [Import SDK in **NodeJS**](guides/import-nodejs.md)
+
+### SDK basics
+   - [**SDK usage** Understanding low vs high level](guides/low-vs-high-usage.md)
+
+### Contract Usage
+ - [Contract ACI](guides/contract-aci-usage.md)
 
 
 ## Examples
