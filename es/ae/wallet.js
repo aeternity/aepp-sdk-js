@@ -159,6 +159,6 @@ export const Wallet = Ae.compose(Accounts, Chain, Tx, Contract, GeneralizeAccoun
   }
 })
 
-export const RpcWallet = Ae.compose(Accounts, Chain, Tx, Contract, Oracle, Aens, GeneralizeAccount, WalletRpc)
+export const RpcWallet = Ae.compose(WalletRpc, Tx, Contract, Oracle, Aens, GeneralizeAccount, Chain)
 
 export default Wallet
