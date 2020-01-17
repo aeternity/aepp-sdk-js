@@ -27,14 +27,14 @@
  */
 
 import * as R from 'ramda'
-import { encodeBase58Check, salt } from '../utils/crypto'
+import { salt } from '../utils/crypto'
 import {
   commitmentHash,
   isNameValid,
   getMinimumNameFee,
   classify,
   isAuctionName,
-  validatePointers
+  validatePointers, encode, produceNameId
 } from '../tx/builder/helpers'
 import Ae from './'
 import { CLIENT_TTL, NAME_FEE, NAME_TTL } from '../tx/builder/schema'
@@ -45,7 +45,7 @@ import { CLIENT_TTL, NAME_FEE, NAME_TTL } from '../tx/builder/schema'
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @category async
- * @param {String} nameId Name hash
+ * @param {String} name Name hash
  * @param {Object} [options={}] options
  * @param {(String|Object)} [options.onAccount] onAccount Make operation on specific account from sdk(you pass publickKey) or
  * using provided KeyPair(Can be keypair object or MemoryAccount)
@@ -57,15 +57,16 @@ import { CLIENT_TTL, NAME_FEE, NAME_TTL } from '../tx/builder/schema'
  * const name = 'test.chain'
  * const nameObject = await sdkInstance.aensQuery(name)
  *
- * await sdkInstance.aensRevoke(nameObject.id, { fee, ttl , nonce })
+ * await sdkInstance.aensRevoke(name, { fee, ttl , nonce })
  * // or
  * await nameObject.revoke({ fee, ttl, nonce })
  */
-async function revoke (nameId, options = {}) {
+async function revoke (name, options = {}) {
+  isNameValid(name)
   const opt = R.merge(this.Ae.defaults, options)
 
   const nameRevokeTx = await this.nameRevokeTx(R.merge(opt, {
-    nameId,
+    nameId: produceNameId(name),
     accountId: await this.address(opt)
   }))
 
@@ -78,7 +79,7 @@ async function revoke (nameId, options = {}) {
  * @function
  * @category async
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
- * @param {String} nameId Name hash
+ * @param {String} name AENS name
  * @param {String[]} pointers Array of name pointers. Can be oracle|account|contract|channel public key
  * @param {Object} [options={}]
  * @param {(String|Object)} [options.onAccount] onAccount Make operation on specific account from sdk(you pass publickKey) or
@@ -95,17 +96,18 @@ async function revoke (nameId, options = {}) {
  * const pointersArray = ['ak_asd23dasdas...,' 'ct_asdf34fasdasd...']
  * const nameObject = await sdkInstance.aensQuery(name)
  *
- * await sdkInstance.aensUpdate(nameObject.id, pointersArray, { nameTtl, ttl, fee, nonce, clientTtl })
+ * await sdkInstance.aensUpdate(name, pointersArray, { nameTtl, ttl, fee, nonce, clientTtl })
  * // or
  * await nameObject.update(pointersArray, { nameTtl, ttl, fee, nonce, clientTtl })
  */
-async function update (nameId, pointers = [], options = {}) {
+async function update (name, pointers = [], options = {}) {
+  isNameValid(name)
   const opt = R.merge(this.Ae.defaults, options)
   if (!validatePointers(pointers)) throw new Error('Invalid pointers array')
 
   pointers = pointers.map(p => R.fromPairs([['id', p], ['key', classify(p)]]))
   const nameUpdateTx = await this.nameUpdateTx(R.merge(opt, {
-    nameId: nameId,
+    nameId: produceNameId(name),
     accountId: await this.address(opt),
     pointers
   }))
@@ -119,7 +121,7 @@ async function update (nameId, pointers = [], options = {}) {
  * @function
  * @category async
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
- * @param {String} nameId Name hash
+ * @param {String} name AENS name
  * @param {String} account Recipient account publick key
  * @param {Object} [options={}]
  * @param {(String|Object)} [options.onAccount] onAccount Make operation on specific account from sdk(you pass publickKey) or
@@ -133,15 +135,16 @@ async function update (nameId, pointers = [], options = {}) {
  * const recipientPub = 'ak_asd23dasdas...'
  * const nameObject = await sdkInstance.aensQuery(name)
  *
- * await sdkInstance.aensTransfer(nameObject.id, recipientPub, { ttl, fee, nonce })
+ * await sdkInstance.aensTransfer(name, recipientPub, { ttl, fee, nonce })
  * // or
  * await nameObject.transfer(recipientPub, { ttl, fee, nonce })
  */
-async function transfer (nameId, account, options = {}) {
+async function transfer (name, account, options = {}) {
+  isNameValid(name)
   const opt = R.merge(this.Ae.defaults, options)
 
   const nameTransferTx = await this.nameTransferTx(R.merge(opt, {
-    nameId,
+    nameId: produceNameId(name),
     accountId: await this.address(opt),
     recipientId: account
   }))
@@ -174,28 +177,27 @@ async function transfer (nameId, account, options = {}) {
 async function query (name, opt = {}) {
   isNameValid(name)
   const o = await this.getName(name)
-  const nameId = o.id
 
   return Object.freeze(Object.assign(o, {
     pointers: o.pointers || [],
     update: async (pointers = [], options = {}) => {
       return {
-        ...(await this.aensUpdate(nameId, pointers, R.merge(opt, options))),
+        ...(await this.aensUpdate(name, pointers, R.merge(opt, options))),
         ...(await this.aensQuery(name))
       }
     },
     transfer: async (account, options = {}) => {
       return {
-        ...(await this.aensTransfer(nameId, account, R.merge(opt, options))),
+        ...(await this.aensTransfer(name, account, R.merge(opt, options))),
         ...(await this.aensQuery(name))
       }
     },
-    revoke: async (options = {}) => this.aensRevoke(nameId, R.merge(opt, options)),
+    revoke: async (options = {}) => this.aensRevoke(name, R.merge(opt, options)),
     extendTtl: async (nameTtl = NAME_TTL, options = {}) => {
       if (!nameTtl || typeof nameTtl !== 'number' || nameTtl > NAME_TTL) throw new Error('Ttl must be an number and less then 50000 blocks')
 
       return {
-        ...(await this.aensUpdate(o.id, o.pointers.map(p => p.id), { ...R.merge(opt, options), nameTtl })),
+        ...(await this.aensUpdate(name, o.pointers.map(p => p.id), { ...R.merge(opt, options), nameTtl })),
         ...(await this.aensQuery(name))
       }
     }
@@ -227,8 +229,8 @@ async function query (name, opt = {}) {
  * await sdkInstance.aensClaim(name, salt, { ttl, fee, nonce, nameFee })
  */
 async function claim (name, salt, options = { vsn: 2 }) {
-  const opt = R.merge(this.Ae.defaults, options)
   isNameValid(name)
+  const opt = R.merge(this.Ae.defaults, options)
 
   const minNameFee = getMinimumNameFee(name)
   if (opt.nameFee !== this.Ae.defaults.nameFee && minNameFee.gt(opt.nameFee)) {
@@ -238,7 +240,7 @@ async function claim (name, salt, options = { vsn: 2 }) {
   const claimTx = await this.nameClaimTx(R.merge(opt, {
     accountId: await this.address(opt),
     nameSalt: salt,
-    name: `nm_${encodeBase58Check(Buffer.from(name))}`
+    name: encode(name, 'nm')
   }))
 
   const result = await this.send(claimTx, opt)
@@ -281,11 +283,11 @@ async function preclaim (name, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   const _salt = salt()
   const height = await this.height()
-  const hash = commitmentHash(name, _salt)
+  const commitmentId = commitmentHash(name, _salt)
 
   const preclaimTx = await this.namePreclaimTx(R.merge(opt, {
     accountId: await this.address(opt),
-    commitmentId: hash
+    commitmentId
   }))
 
   const result = await this.send(preclaimTx, opt)
@@ -295,7 +297,7 @@ async function preclaim (name, options = {}) {
     height,
     claim: options => this.aensClaim(name, _salt, { ...options, onAccount: opt.onAccount }),
     salt: _salt,
-    commitmentId: hash
+    commitmentId
   })
 }
 

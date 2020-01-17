@@ -16,9 +16,8 @@ import Aens from '@aeternity/aepp-sdk/es/ae/aens'
     * [Aens([options])](#exp_module_@aeternity/aepp-sdk/es/ae/aens--Aens) ⇒ `Object` ⏏
     * _instance_
         * _async_
-            * [.revoke(nameId, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/aens--revoke) ⇒ `Promise.&lt;Object&gt;` ⏏
-            * [.update(nameId, pointers, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/aens--update) ⇒ `Promise.&lt;Object&gt;` ⏏
-            * [.transfer(nameId, account, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/aens--transfer) ⇒ `Promise.&lt;Object&gt;` ⏏
+            * [.update(name, pointers, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/aens--update) ⇒ `Promise.&lt;Object&gt;` ⏏
+            * [.transfer(name, account, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/aens--transfer) ⇒ `Promise.&lt;Object&gt;` ⏏
             * [.query(name, opt)](#exp_module_@aeternity/aepp-sdk/es/ae/aens--query) ⇒ `Promise.&lt;Object&gt;` ⏏
             * [.claim(name, salt, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/aens--claim) ⇒ `Promise.&lt;Object&gt;` ⏏
             * [.preclaim(name, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/aens--preclaim) ⇒ `Promise.&lt;Object&gt;` ⏏
@@ -40,36 +39,9 @@ Aens provides name-system related methods atop
 | --- | --- | --- | --- |
 | [options] | `Object` | <code>{}</code> | Initializer object |
 
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/aens--revoke"></a>
-
-### .revoke(nameId, [options]) ⇒ `Promise.&lt;Object&gt;` ⏏
-Revoke a name
-
-**Kind**: instance method of [`@aeternity/aepp-sdk/es/ae/aens`](#module_@aeternity/aepp-sdk/es/ae/aens)  
-**Returns**: `Promise.&lt;Object&gt;` - Transaction result  
-**Category**: async  
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| nameId | `String` |  | Name hash |
-| [options] | `Object` | <code>{}</code> | options |
-| [options.onAccount] | `String` \| `Object` |  | onAccount Make operation on specific account from sdk(you pass publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount) |
-| [options.fee] | `Number` \| `String` \| `BigNumber` |  | fee |
-| [options.ttl] | `Number` \| `String` \| `BigNumber` |  | ttl |
-| [options.nonce] | `Number` \| `String` \| `BigNumber` |  | nonce |
-
-**Example**  
-```js
-const name = 'test.chain'
-const nameObject = await sdkInstance.aensQuery(name)
-
-await sdkInstance.aensRevoke(nameObject.id, { fee, ttl , nonce })
-// or
-await nameObject.revoke({ fee, ttl, nonce })
-```
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/aens--update"></a>
 
-### .update(nameId, pointers, [options]) ⇒ `Promise.&lt;Object&gt;` ⏏
+### .update(name, pointers, [options]) ⇒ `Promise.&lt;Object&gt;` ⏏
 Update an name
 
 **Kind**: instance method of [`@aeternity/aepp-sdk/es/ae/aens`](#module_@aeternity/aepp-sdk/es/ae/aens)  
@@ -81,7 +53,7 @@ Update an name
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| nameId | `String` |  | Name hash |
+| name | `String` |  | AENS name |
 | pointers | `Array.&lt;String&gt;` |  | Array of name pointers. Can be oracle|account|contract|channel public key |
 | [options] | `Object` | <code>{}</code> |  |
 | [options.onAccount] | `String` \| `Object` |  | onAccount Make operation on specific account from sdk(you pass publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount) |
@@ -97,13 +69,13 @@ const name = 'test.chain'
 const pointersArray = ['ak_asd23dasdas...,' 'ct_asdf34fasdasd...']
 const nameObject = await sdkInstance.aensQuery(name)
 
-await sdkInstance.aensUpdate(nameObject.id, pointersArray, { nameTtl, ttl, fee, nonce, clientTtl })
+await sdkInstance.aensUpdate(name, pointersArray, { nameTtl, ttl, fee, nonce, clientTtl })
 // or
 await nameObject.update(pointersArray, { nameTtl, ttl, fee, nonce, clientTtl })
 ```
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/aens--transfer"></a>
 
-### .transfer(nameId, account, [options]) ⇒ `Promise.&lt;Object&gt;` ⏏
+### .transfer(name, account, [options]) ⇒ `Promise.&lt;Object&gt;` ⏏
 Transfer a domain to another account
 
 **Kind**: instance method of [`@aeternity/aepp-sdk/es/ae/aens`](#module_@aeternity/aepp-sdk/es/ae/aens)  
@@ -112,7 +84,7 @@ Transfer a domain to another account
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| nameId | `String` |  | Name hash |
+| name | `String` |  | AENS name |
 | account | `String` |  | Recipient account publick key |
 | [options] | `Object` | <code>{}</code> |  |
 | [options.onAccount] | `String` \| `Object` |  | onAccount Make operation on specific account from sdk(you pass publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount) |
@@ -126,7 +98,7 @@ const name = 'test.chain'
 const recipientPub = 'ak_asd23dasdas...'
 const nameObject = await sdkInstance.aensQuery(name)
 
-await sdkInstance.aensTransfer(nameObject.id, recipientPub, { ttl, fee, nonce })
+await sdkInstance.aensTransfer(name, recipientPub, { ttl, fee, nonce })
 // or
 await nameObject.transfer(recipientPub, { ttl, fee, nonce })
 ```

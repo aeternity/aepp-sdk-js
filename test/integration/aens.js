@@ -68,8 +68,7 @@ describe('Aens', function () {
       await preclaim.claim()
       const current = await aens.address()
       const onAccount = aens.addresses().find(acc => acc !== current)
-      const { id: nameId } = await aens.getName(name2)
-      return aens.aensUpdate(nameId, onAccount, { onAccount, blocks: 1 }).should.eventually.be.rejected
+      return aens.aensUpdate(name, onAccount, { onAccount, blocks: 1 }).should.eventually.be.rejected
     })
   })
 
