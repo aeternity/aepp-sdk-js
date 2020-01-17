@@ -298,6 +298,13 @@ export function classify (s) {
   }
 }
 
+/**
+ * Validate name pointers array
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
+ * @param {String[]} pointers Pointers array. Allowed values is: account(ak_), oracle(ok_), contract(ct_), channel(ch_)
+ * @return {Boolean}
+ */
 export function validatePointers (pointers = []) {
   return !pointers
     .find(p => !p || typeof p !== 'string' || !['ak', 'ok', 'ct', 'ch'].includes(p.split('_')[0]))

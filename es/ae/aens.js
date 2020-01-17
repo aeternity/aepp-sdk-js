@@ -40,14 +40,26 @@ import Ae from './'
 import { CLIENT_TTL, NAME_FEE, NAME_TTL } from '../tx/builder/schema'
 
 /**
- * Revoke a domain
+ * Revoke a name
  * @instance
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @category async
- * @param {String} nameId
- * @param {Object} [options={}]
- * @return {Promise<Object>}
+ * @param {String} nameId Name hash
+ * @param {Object} [options={}] options
+ * @param {(String|Object)} [options.onAccount] onAccount Make operation on specific account from sdk(you pass publickKey) or
+ * using provided KeyPair(Can be keypair object or MemoryAccount)
+ * @param {(Number|String|BigNumber)} [options.fee] fee
+ * @param {(Number|String|BigNumber)} [options.ttl] ttl
+ * @param {(Number|String|BigNumber)} [options.nonce] nonce
+ * @return {Promise<Object>} Transaction result
+ * @example
+ * const name = 'test.chain'
+ * const nameObject = await sdkInstance.aensQuery(name)
+ *
+ * await sdkInstance.aensRevoke(nameObject.id, { fee, ttl , nonce })
+ * // or
+ * await nameObject.revoke({ fee, ttl, nonce })
  */
 async function revoke (nameId, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
@@ -61,15 +73,31 @@ async function revoke (nameId, options = {}) {
 }
 
 /**
- * Update an aens entry
+ * Update an name
  * @instance
  * @function
  * @category async
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
- * @param nameId domain hash
- * @param pointers new target
- * @param options
- * @return {Object}
+ * @param {String} nameId Name hash
+ * @param {String[]} pointers Array of name pointers. Can be oracle|account|contract|channel public key
+ * @param {Object} [options={}]
+ * @param {(String|Object)} [options.onAccount] onAccount Make operation on specific account from sdk(you pass publickKey) or
+ * using provided KeyPair(Can be keypair object or MemoryAccount)
+ * @param {(Number|String|BigNumber)} [options.fee] fee
+ * @param {(Number|String|BigNumber)} [options.ttl] ttl
+ * @param {(Number|String|BigNumber)} [options.nonce] nonce
+ * @param {(Number|String|BigNumber)} [options.nameTtl=50000] nameTtl Name ttl represented in number of blocks (Max value is 50000 blocks)
+ * @param {(Number|String|BigNumber)} [options.clientTtl=84600] clientTtl a suggestion as to how long any clients should cache this information
+ * @return {Promise<Object>}
+ * @throws Invalid pointer array error
+ * @example
+ * const name = 'test.chain'
+ * const pointersArray = ['ak_asd23dasdas...,' 'ct_asdf34fasdasd...']
+ * const nameObject = await sdkInstance.aensQuery(name)
+ *
+ * await sdkInstance.aensUpdate(nameObject.id, pointersArray, { nameTtl, ttl, fee, nonce, clientTtl })
+ * // or
+ * await nameObject.update(pointersArray, { nameTtl, ttl, fee, nonce, clientTtl })
  */
 async function update (nameId, pointers = [], options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
@@ -85,24 +113,29 @@ async function update (nameId, pointers = [], options = {}) {
   return this.send(nameUpdateTx, opt)
 }
 
-async function extendTtl (name, nameTtl = NAME_TTL, options = {}) {
-  isNameValid(name)
-  const o = await this.getName(name)
-  if (!nameTtl || typeof nameTtl !== 'number' || nameTtl > NAME_TTL) throw new Error('Ttl must be an number and less then 50000 blocks')
-
-  return this.aensUpdate(o.id, o.pointers.map(p => p.id), { ...options, nameTtl })
-}
-
 /**
  * Transfer a domain to another account
  * @instance
  * @function
  * @category async
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
- * @param {String} nameId
- * @param {String} account
+ * @param {String} nameId Name hash
+ * @param {String} account Recipient account publick key
  * @param {Object} [options={}]
- * @return {Promise<Object>}
+ * @param {(String|Object)} [options.onAccount] onAccount Make operation on specific account from sdk(you pass publickKey) or
+ * using provided KeyPair(Can be keypair object or MemoryAccount)
+ * @param {(Number|String|BigNumber)} [options.fee] fee
+ * @param {(Number|String|BigNumber)} [options.ttl] ttl
+ * @param {(Number|String|BigNumber)} [options.nonce] nonce
+ * @return {Promise<Object>} Transaction result
+ * @example
+ * const name = 'test.chain'
+ * const recipientPub = 'ak_asd23dasdas...'
+ * const nameObject = await sdkInstance.aensQuery(name)
+ *
+ * await sdkInstance.aensTransfer(nameObject.id, recipientPub, { ttl, fee, nonce })
+ * // or
+ * await nameObject.transfer(recipientPub, { ttl, fee, nonce })
  */
 async function transfer (nameId, account, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
@@ -117,14 +150,26 @@ async function transfer (nameId, account, options = {}) {
 }
 
 /**
- * Query the status of an AENS registration
+ * Query the AENS name info from the node
+ * and return the object with info and predefined functions for manipulating name
  * @instance
  * @function
  * @category async
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
- * @param {string} name
+ * @param {String} name
  * @param {Object} opt Options
  * @return {Promise<Object>}
+ * @example
+ * const nameObject = sdkInstance.aensQuery('test.chain')
+ * console.log(nameObject)
+ * {
+ *  id, // name hash
+ *  pointers, // array of pointers
+ *  update, // Update name function
+ *  extendTtl, // Extend Ttl name function
+ *  transfer, // Transfer name function
+ *  revoke // Revoke name function
+ * }
  */
 async function query (name, opt = {}) {
   isNameValid(name)
@@ -146,7 +191,14 @@ async function query (name, opt = {}) {
       }
     },
     revoke: async (options = {}) => this.aensRevoke(nameId, R.merge(opt, options)),
-    extendTtl: async (nameTtl = NAME_TTL, options = {}) => this.aensUpdate(nameId, o.pointers.map(p => p.id), { ...opt, ...options, nameTtl })
+    extendTtl: async (nameTtl = NAME_TTL, options = {}) => {
+      if (!nameTtl || typeof nameTtl !== 'number' || nameTtl > NAME_TTL) throw new Error('Ttl must be an number and less then 50000 blocks')
+
+      return {
+        ...(await this.aensUpdate(o.id, o.pointers.map(p => p.id), { ...R.merge(opt, options), nameTtl })),
+        ...(await this.aensQuery(name))
+      }
+    }
   }))
 }
 
@@ -158,10 +210,21 @@ async function query (name, opt = {}) {
  * @category async
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param {String} name
- * @param {Number} salt
- * @param {Record} [options={}]
- * @param {Number|String} [options.nameFee] Name Fee
+ * @param {Number} salt Salt from pre-claim, or 0 if it's a bid
+ * @param {Object} [options={}] options
+ * @param {String|Object} [options.onAccount] onAccount Make operation on specific account from sdk(you pass publickKey) or
+ * using provided KeyPair(Can be keypair object or MemoryAccount)
+ * @param {Number|String|BigNumber} [options.fee] fee
+ * @param {Number|String|BigNumber} [options.ttl] ttl
+ * @param {Number|String|BigNumber} [options.nonce] nonce
+ * @param {Number|String} [options.nameFee] Name Fee (By default calculated by sdk)
+ * @param {Number|String} [options.vsn = 2] Transaction vsn from Lima is 2
  * @return {Promise<Object>} the result of the claim
+ * @example
+ * const name = 'test.chain'
+ * const salt = preclaimResult.salt // salt from pre-claim transaction
+ *
+ * await sdkInstance.aensClaim(name, salt, { ttl, fee, nonce, nameFee })
  */
 async function claim (name, salt, options = { vsn: 2 }) {
   const opt = R.merge(this.Ae.defaults, options)
@@ -193,9 +256,25 @@ async function claim (name, salt, options = { vsn: 2 }) {
  * @function
  * @category async
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
- * @param {string} name
- * @param {Record} [options={}]
+ * @param {String} name
+ * @param {Object} [options={}]
+ * @param {String|Object} [options.onAccount] onAccount Make operation on specific account from sdk(you pass publickKey) or
+ * using provided KeyPair(Can be keypair object or MemoryAccount)
+ * @param {Number|String|BigNumber} [options.fee] fee
+ * @param {Number|String|BigNumber} [options.ttl] ttl
+ * @param {Number|String|BigNumber} [options.nonce] nonce
  * @return {Promise<Object>}
+ * @example
+ * const name = 'test.chain'
+ * const salt = preclaimResult.salt // salt from pre-claim transaction
+ *
+ * await sdkInstance.aensPreclaim(name, { ttl, fee, nonce })
+ * {
+ *   ...transactionResult,
+ *   claim, // Claim function (options={}) => claimTransactionResult
+ *   salt,
+ *   commitmentId
+ * }
  */
 async function preclaim (name, options = {}) {
   isNameValid(name)
@@ -227,9 +306,19 @@ async function preclaim (name, options = {}) {
  * @category async
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param {String} name Domain name
- * @param {String|Number} nameFee Name fee amount
- * @param {Record} [options={}]
- * @return {Promise<Object>}
+ * @param {String|Number} nameFee Name fee (bid fee)
+ * @param {Object} [options={}]
+ * @param {String|Object} [options.onAccount] onAccount Make operation on specific account from sdk(you pass publickKey) or
+ * using provided KeyPair(Can be keypair object or MemoryAccount)
+ * @param {Number|String|BigNumber} [options.fee] fee
+ * @param {Number|String|BigNumber} [options.ttl] ttl
+ * @param {Number|String|BigNumber} [options.nonce] nonce
+ * @return {Promise<Object>} Transaction result
+ * @example
+ * const name = 'test.chain'
+ * const bidFee = computeBidFee(name, startFee, incrementPercentage)
+ *
+ * await sdkInstance.aensBid(name, 213109412839123, { ttl, fee, nonce })
  */
 async function bid (name, nameFee = NAME_FEE, options = {}) {
   return this.aensClaim(name, 0, { ...options, nameFee, vsn: 2 })
@@ -252,7 +341,6 @@ const Aens = Ae.compose({
     aensPreclaim: preclaim,
     aensClaim: claim,
     aensUpdate: update,
-    aensExtendTtl: extendTtl,
     aensTransfer: transfer,
     aensRevoke: revoke,
     aensBid: bid
