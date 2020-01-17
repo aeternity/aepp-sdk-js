@@ -298,6 +298,11 @@ export function classify (s) {
   }
 }
 
+export function validatePointers (pointers = []) {
+  return !pointers
+    .find(p => !p || typeof p !== 'string' || !['ak', 'ok', 'ct', 'ch'].includes(p.split('_')[0]))
+}
+
 /**
  * Get the minimum name fee for a domain
  * @function
@@ -387,5 +392,6 @@ export default {
   isNameValid,
   produceNameId,
   classify,
-  isAuctionName
+  isAuctionName,
+  validatePointers
 }

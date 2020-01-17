@@ -28,7 +28,14 @@
 
 import * as R from 'ramda'
 import { encodeBase58Check, salt } from '../utils/crypto'
-import { commitmentHash, isNameValid, getMinimumNameFee, classify, isAuctionName } from '../tx/builder/helpers'
+import {
+  commitmentHash,
+  isNameValid,
+  getMinimumNameFee,
+  classify,
+  isAuctionName,
+  validatePointers
+} from '../tx/builder/helpers'
 import Ae from './'
 import { CLIENT_TTL, NAME_FEE, NAME_TTL } from '../tx/builder/schema'
 
@@ -60,19 +67,30 @@ async function revoke (nameId, options = {}) {
  * @category async
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param nameId domain hash
- * @param target new target
+ * @param pointers new target
  * @param options
  * @return {Object}
  */
-async function update (nameId, target, options = {}) {
+async function update (nameId, pointers = [], options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
+  if (!validatePointers(pointers)) throw new Error('Invalid pointers array')
+
+  pointers = pointers.map(p => R.fromPairs([['id', p], ['key', classify(p)]]))
   const nameUpdateTx = await this.nameUpdateTx(R.merge(opt, {
     nameId: nameId,
     accountId: await this.address(opt),
-    pointers: [R.fromPairs([['id', target], ['key', classify(target)]])]
+    pointers
   }))
 
   return this.send(nameUpdateTx, opt)
+}
+
+async function extendTtl (name, nameTtl = NAME_TTL, options = {}) {
+  isNameValid(name)
+  const o = await this.getName(name)
+  if (!nameTtl || typeof nameTtl !== 'number' || nameTtl > NAME_TTL) throw new Error('Ttl must be an number and less then 50000 blocks')
+
+  return this.aensUpdate(o.id, o.pointers.map(p => p.id), { ...options, nameTtl })
 }
 
 /**
@@ -115,19 +133,20 @@ async function query (name, opt = {}) {
 
   return Object.freeze(Object.assign(o, {
     pointers: o.pointers || [],
-    update: async (target, options) => {
+    update: async (pointers = [], options = {}) => {
       return {
-        ...(await this.aensUpdate(nameId, target, R.merge(opt, options))),
+        ...(await this.aensUpdate(nameId, pointers, R.merge(opt, options))),
         ...(await this.aensQuery(name))
       }
     },
-    transfer: async (account, options) => {
+    transfer: async (account, options = {}) => {
       return {
         ...(await this.aensTransfer(nameId, account, R.merge(opt, options))),
         ...(await this.aensQuery(name))
       }
     },
-    revoke: async (options) => this.aensRevoke(nameId, R.merge(opt, options))
+    revoke: async (options = {}) => this.aensRevoke(nameId, R.merge(opt, options)),
+    extendTtl: async (nameTtl = NAME_TTL, options = {}) => this.aensUpdate(nameId, o.pointers.map(p => p.id), { ...opt, ...options, nameTtl })
   }))
 }
 
@@ -233,6 +252,7 @@ const Aens = Ae.compose({
     aensPreclaim: preclaim,
     aensClaim: claim,
     aensUpdate: update,
+    aensExtendTtl: extendTtl,
     aensTransfer: transfer,
     aensRevoke: revoke,
     aensBid: bid

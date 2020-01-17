@@ -104,7 +104,15 @@ describe('Aens', function () {
   it('updates names', async () => {
     const claim = await aens.aensQuery(name)
     const address = await aens.address()
-    return claim.update(address).should.eventually.deep.include({
+    return claim.update([address]).should.eventually.deep.include({
+      pointers: [R.fromPairs([['key', 'account_pubkey'], ['id', address]])]
+    })
+  })
+  it('Extend name ttl', async () => {
+    const address = await aens.address()
+    const updateTx = await aens.aensExtendTtl(name, 10000)
+    return aens.aensQuery(name).should.eventually.deep.include({
+      ttl: updateTx.blockHeight + 10000,
       pointers: [R.fromPairs([['key', 'account_pubkey'], ['id', address]])]
     })
   })
@@ -122,7 +130,7 @@ describe('Aens', function () {
     await claim.transfer(onAccount)
 
     const claim2 = await aens.aensQuery(name)
-    return claim2.update(onAccount, { onAccount }).should.eventually.deep.include({
+    return claim2.update([onAccount], { onAccount }).should.eventually.deep.include({
       pointers: [R.fromPairs([['key', 'account_pubkey'], ['id', onAccount]])]
     })
   })
