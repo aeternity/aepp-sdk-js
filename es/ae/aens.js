@@ -82,6 +82,7 @@ async function revoke (name, options = {}) {
  * @param {String} name AENS name
  * @param {String[]} pointers Array of name pointers. Can be oracle|account|contract|channel public key
  * @param {Object} [options={}]
+ * @param {Boolean} [options.extendPointers=false] extendPointers Get the pointers from the node and merge with provided one. Pointers with the same type will be overwrited
  * @param {(String|Object)} [options.onAccount] onAccount Make operation on specific account from sdk(you pass publickKey) or
  * using provided KeyPair(Can be keypair object or MemoryAccount)
  * @param {(Number|String|BigNumber)} [options.fee] fee
@@ -100,12 +101,17 @@ async function revoke (name, options = {}) {
  * // or
  * await nameObject.update(pointersArray, { nameTtl, ttl, fee, nonce, clientTtl })
  */
-async function update (name, pointers = [], options = {}) {
+async function update (name, pointers = [], options = { extendPointers: false }) {
   isNameValid(name)
   const opt = R.merge(this.Ae.defaults, options)
   if (!validatePointers(pointers)) throw new Error('Invalid pointers array')
 
-  pointers = pointers.map(p => R.fromPairs([['id', p], ['key', classify(p)]]))
+  pointers = [
+    ...options.extendPointers ? (await this.getName(name)).pointers : [],
+    pointers.map(p => R.fromPairs([['id', p], ['key', classify(p)]]))
+  ].reduce((acc, el) => {
+    return [...acc.filter(p => p.key === el.key), el]
+  }, [])
   const nameUpdateTx = await this.nameUpdateTx(R.merge(opt, {
     nameId: produceNameId(name),
     accountId: await this.address(opt),
