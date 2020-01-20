@@ -42,7 +42,7 @@ This guide describe the basic operation on [AENS name](https://github.com/aetern
       const increment = 0.05 // 5%
 
       const nameFee = computeBidFee(name, startFee, increment)
-      const bid = await sdkInstance.bid(name, nameFee, options)
+      const bid = await sdkInstance.aensBid(name, nameFee, options)
     
       console.log(`BID STARTED AT ${bid.blockHeight} WILL END AT ${computeAuctionEndBlock(name, bid.blockHeight)}`)
       ```
@@ -50,13 +50,44 @@ This guide describe the basic operation on [AENS name](https://github.com/aetern
   - Update name  
 Using `aens-update` transaction you can update the name `pointers` and extend name `ttl`
     ```js
+    const options = { ttl, fee, nonce, nameTtl, onAccount } // optional: overriding default
     const pointersArray = ['ak_asd23dasdas...,', 'ct_asdf34fasdasd...']
     const nameObject = await sdkInstance.aensQuery(name)
     
     await sdkInstance.aensUpdate(name, pointersArray, options)
     // or
     await nameObject.update(pointersArray, options)
+    
+    // Extend pointers of name entry
+    // Let's assume that we have name entry with one pointers: ['ak_2314234']
+    // Only one entry for each type is allowed
+    // that mean that merging will overwrite pointers with the same type
+    await sdkInstance.aensUpdate(name, pointersArray, { extendPointers: true })
     ```
    
-  - Transfer
+  - Transfer  
+  Transfer the name `ownership` to another `account`
+     ```js
+    const options = { ttl, fee, nonce, onAccount }
+    const recipientPub = 'ak_asd23dasdas...'
+    const nameObject = await sdkInstance.aensQuery(name)
+    
+    await sdkInstance.aensTransfer(name, recipientPub, options)
+    // or
+    await nameObject.transfer(recipientPub, options)
+     ```
   - Revoke
+  Revoke the name
+     ```js
+      const options = { ttl, fee, nonce, onAccount }
+      const nameObject = await sdkInstance.aensQuery(name)
+     
+      await sdkInstance.aensRevoke(name, options)
+      // or
+      await nameObject.revoke(options)
+     ```
+    
+## Related links
+   - [AENS protocol](https://github.com/aeternity/protocol/blob/master/AENS.md)
+   - [AENS SDK API Docs](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/api/ae/aens.md)
+   
