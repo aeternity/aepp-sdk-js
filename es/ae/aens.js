@@ -165,7 +165,7 @@ async function claim (name, salt, options = { vsn: 2 }) {
     const nameInter = opt.waitMined ? await this.aensQuery(name, opt) : {}
     return Object.assign(result, nameInter)
   }
-  return result
+  return { ...result, nameFee: opt.nameFee }
 }
 
 /**
