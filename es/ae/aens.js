@@ -74,7 +74,7 @@ async function revoke (name, options = {}) {
 }
 
 /**
- * Update an name
+ * Update a name
  * @instance
  * @function
  * @category async
