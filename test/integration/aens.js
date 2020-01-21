@@ -19,7 +19,7 @@ import { describe, it, before } from 'mocha'
 import { configure, plan, ready } from './'
 import * as R from 'ramda'
 import { generateKeyPair } from '../../es/utils/crypto'
-import { computeAuctionEndBlock, computeBidFee } from '../../es/tx/builder/helpers'
+import { buildContractId, classify, computeAuctionEndBlock, computeBidFee } from '../../es/tx/builder/helpers'
 
 function randomName (length, namespace = '.chain') {
   return randomString(length) + namespace
@@ -72,7 +72,7 @@ describe('Aens', function () {
     })
   })
 
-  it('claims names', async () => {
+  it.only('claims names', async () => {
     const preclaim = await aens.aensPreclaim(name)
     preclaim.should.be.an('object')
     const claimed = await preclaim.claim()
@@ -101,10 +101,22 @@ describe('Aens', function () {
   })
 
   it('updates names', async () => {
-    const claim = await aens.aensQuery(name)
+    const nameObject = await aens.aensQuery(name)
     const address = await aens.address()
-    return claim.update([address]).should.eventually.deep.include({
-      pointers: [R.fromPairs([['key', 'account_pubkey'], ['id', address]])]
+    const contract = buildContractId(address, 13)
+    const oracle = address.replace('ak', 'ok')
+    const pointers = [address, contract, oracle]
+    return nameObject.update(pointers).should.eventually.deep.include({
+      pointers: pointers.map(p => R.fromPairs([['key', classify(p)], ['id', p]]))
+    })
+  })
+  it('updates names: extend pointers', async () => {
+    const nameObject = await aens.aensQuery(name)
+    const address = await aens.address()
+    const anotherContract = buildContractId(address, 12)
+    const newPointers = [address, address.replace('ak', 'ok'), anotherContract]
+    return nameObject.update([anotherContract], { extendPointers: true }).should.eventually.deep.include({
+      pointers: newPointers.map(p => R.fromPairs([['key', classify(p)], ['id', p]]))
     })
   })
   it('Extend name ttl', async () => {

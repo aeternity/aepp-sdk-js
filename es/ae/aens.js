@@ -108,10 +108,8 @@ async function update (name, pointers = [], options = { extendPointers: false })
 
   pointers = [
     ...options.extendPointers ? (await this.getName(name)).pointers : [],
-    pointers.map(p => R.fromPairs([['id', p], ['key', classify(p)]]))
-  ].reduce((acc, el) => {
-    return [...acc.filter(p => p.key === el.key), el]
-  }, [])
+    ...pointers.map(p => R.fromPairs([['id', p], ['key', classify(p)]]))
+  ].reduce((acc, el) => [...acc.filter(p => p.key !== el.key), el], [])
   const nameUpdateTx = await this.nameUpdateTx(R.merge(opt, {
     nameId: produceNameId(name),
     accountId: await this.address(opt),
