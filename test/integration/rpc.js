@@ -470,7 +470,8 @@ describe('Aepp<->Wallet', function () {
     it('Call compiler through Wallet', async () => {
       wallet.onContract = () => true
       const compilerVersion = await aepp.getCompilerVersion()
-      compilerVersion.should.be.equal('4.1.0')
+      compilerVersion.should.be.a('string')
+      compilerVersion.split('.').length.should.be.equal(3)
     })
     it('Can spend', async () => {
       wallet.onTx = () => true
