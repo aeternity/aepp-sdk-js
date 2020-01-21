@@ -20,7 +20,6 @@ Promise.all([
         // node2
       ],
       compilerUrl: 'COMPILER_URL',
-      // instead use
       accounts: [
         acc1,
         // acc2
