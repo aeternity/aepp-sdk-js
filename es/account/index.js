@@ -28,8 +28,6 @@ import * as Crypto from '../utils/crypto'
 import { buildTx } from '../tx/builder'
 import { TX_TYPE } from '../tx/builder/schema'
 
-const DEFAULT_NETWORK_ID = 'ae_mainnet'
-
 /**
  * Sign encoded transaction
  * @instance
@@ -57,7 +55,8 @@ async function signTransaction (tx, opt = {}) {
  * @return {String} NetworkId
  */
 function getNetworkId () {
-  return this.networkId || (this.selectedNode ? this.selectedNode.networkId : false) || DEFAULT_NETWORK_ID
+  if (!this.networkId && !this.selectedNode.networkId) throw new Error('networkId is not provided')
+  return this.networkId || this.selectedNode.networkId
 }
 
 /**
