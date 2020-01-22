@@ -72,7 +72,7 @@ describe('Aens', function () {
     })
   })
 
-  it.only('claims names', async () => {
+  it('claims names', async () => {
     const preclaim = await aens.aensPreclaim(name)
     preclaim.should.be.an('object')
     const claimed = await preclaim.claim()
