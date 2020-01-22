@@ -21,6 +21,6 @@
     "write-file-webpack-plugin": "4.5.0"
   },
   "dependencies": {
-    "@aeternity/aepp-sdk": "https://github.com/aeternity/aepp-sdk-js#feat/switch-to-post-message-for-extension"
+    "@aeternity/aepp-sdk": "7.0.0-next.2"
   }
 }

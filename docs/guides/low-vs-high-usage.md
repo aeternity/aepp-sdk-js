@@ -21,25 +21,22 @@ Promises framework makes this somewhat easy:
 Example spend function, using aeternity's SDK abstraction
 ```js
   // Import necessary Modules by simply importing the Wallet module
-  import Wallet from '@aeternity/aepp-sdk/es/ae/wallet' // import from SDK es-modules
+  import Universal from '@aeternity/aepp-sdk/es/ae/wallet' // import from SDK es-modules
   import Node from '@aeternity/aepp-sdk/es/node' // import from SDK es-modules
   
-  // const node1 = await Node({ url, internalUrl })
-
-  Wallet({
-    nodes: [
-        // { name: 'someNode', instance: node1 },
-        // mode2
-    ],    
-    compilerUrl: 'COMPILER_URL_HERE',
-    accounts: [MemoryAccount({keypair: {secretKey: 'PRIV_KEY_HERE', publicKey: 'PUB_KEY_HERE'}, networkId: 'NETWORK_ID_HERE'})],
-    address: 'PUB_KEY_HERE',
-    onTx: confirm, // guard returning boolean
-    onChain: confirm, // guard returning boolean
-    onAccount: confirm, // guard returning boolean
-    onContract: confirm, // guard returning boolean
-    networkId: 'ae_uat' // or any other networkId your client should connect to
-  }).then(ae => ae.spend(parseInt(amount), receiver_pub_key))
+  async function init () {
+    const node = await Node({ url, internalUrl })
+    
+    const sdkInstance = await Universal({
+        nodes: [{ name: 'test-net-node', instance: node }],    
+        compilerUrl: 'COMPILER_URL_HERE',
+        accounts: [MemoryAccount({keypair: {secretKey: 'PRIV_KEY_HERE', publicKey: 'PUB_KEY_HERE'}})],
+        address: 'SELECTED_ACCOUNT_PUB_KEY_HERE',
+      })
+   // Spend transaction info 
+   console.log(await sdkInstance.spend(parseInt(amount), 'RECEIVER_PUB_KEY'))
+  }
+ 
 ```
 
 ### Low-level SDK usage (use [API](https://github.com/aeternity/protocol/tree/master/node/api) endpoints directly)
@@ -49,11 +46,14 @@ Example spend function, using the SDK, talking directly to the [**API**](https:/
   import Tx from '@aeternity/aepp-sdk/es/tx/tx.js'
   import Chain from '@aeternity/aepp-sdk/es/chain/node.js'
   import Account from '@aeternity/aepp-sdk/es/account/memory.js'
+  import Node from '@aeternity/aepp-sdk/es/node' // import from SDK es-modules
 
   async function spend (amount, receiver_pub_key) {
+    const node = await Node({ url, internalUrl })
+    const nodes = [{ name: 'testnet-node', instance: node }]
 
-    const tx = await Tx({url: 'HOST_URL_HERE', internalUrl: 'HOST_URL_HERE'})
-    const chain = await Chain({url: 'HOST_URL_HERE', internalUrl: 'HOST_URL_HERE'})
+    const tx = await Tx({ nodes })
+    const chain = await Chain({ nodes })
     const account = Account({keypair: {secretKey: 'PRIV_KEY_HERE', publicKey: 'PUB_KEY_HERE'}, networkId: 'NETWORK_ID_HERE'})
     const spendTx = await tx.spendTx({ sender: 'PUB_KEY_HERE', receiver_pub_key, amount })
 

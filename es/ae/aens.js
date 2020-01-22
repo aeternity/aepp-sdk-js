@@ -27,26 +27,46 @@
  */
 
 import * as R from 'ramda'
-import { encodeBase58Check, salt } from '../utils/crypto'
-import { commitmentHash, isNameValid, getMinimumNameFee, classify, isAuctionName } from '../tx/builder/helpers'
+import { salt } from '../utils/crypto'
+import {
+  commitmentHash,
+  isNameValid,
+  getMinimumNameFee,
+  classify,
+  isAuctionName,
+  validatePointers, encode, produceNameId
+} from '../tx/builder/helpers'
 import Ae from './'
 import { CLIENT_TTL, NAME_FEE, NAME_TTL } from '../tx/builder/schema'
 
 /**
- * Revoke a domain
+ * Revoke a name
  * @instance
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @category async
- * @param {String} nameId
- * @param {Object} [options={}]
- * @return {Promise<Object>}
+ * @param {String} name Name hash
+ * @param {Object} [options={}] options
+ * @param {(String|Object)} [options.onAccount] onAccount Make operation on specific account from sdk(you pass publickKey) or
+ * using provided KeyPair(Can be keypair object or MemoryAccount)
+ * @param {(Number|String|BigNumber)} [options.fee] fee
+ * @param {(Number|String|BigNumber)} [options.ttl] ttl
+ * @param {(Number|String|BigNumber)} [options.nonce] nonce
+ * @return {Promise<Object>} Transaction result
+ * @example
+ * const name = 'test.chain'
+ * const nameObject = await sdkInstance.aensQuery(name)
+ *
+ * await sdkInstance.aensRevoke(name, { fee, ttl , nonce })
+ * // or
+ * await nameObject.revoke({ fee, ttl, nonce })
  */
-async function revoke (nameId, options = {}) {
+async function revoke (name, options = {}) {
+  isNameValid(name)
   const opt = R.merge(this.Ae.defaults, options)
 
   const nameRevokeTx = await this.nameRevokeTx(R.merge(opt, {
-    nameId,
+    nameId: produceNameId(name),
     accountId: await this.address(opt)
   }))
 
@@ -54,22 +74,46 @@ async function revoke (nameId, options = {}) {
 }
 
 /**
- * Update an aens entry
+ * Update a name
  * @instance
  * @function
  * @category async
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
- * @param nameId domain hash
- * @param target new target
- * @param options
- * @return {Object}
+ * @param {String} name AENS name
+ * @param {String[]} pointers Array of name pointers. Can be oracle|account|contract|channel public key
+ * @param {Object} [options={}]
+ * @param {Boolean} [options.extendPointers=false] extendPointers Get the pointers from the node and merge with provided one. Pointers with the same type will be overwrited
+ * @param {(String|Object)} [options.onAccount] onAccount Make operation on specific account from sdk(you pass publickKey) or
+ * using provided KeyPair(Can be keypair object or MemoryAccount)
+ * @param {(Number|String|BigNumber)} [options.fee] fee
+ * @param {(Number|String|BigNumber)} [options.ttl] ttl
+ * @param {(Number|String|BigNumber)} [options.nonce] nonce
+ * @param {(Number|String|BigNumber)} [options.nameTtl=50000] nameTtl Name ttl represented in number of blocks (Max value is 50000 blocks)
+ * @param {(Number|String|BigNumber)} [options.clientTtl=84600] clientTtl a suggestion as to how long any clients should cache this information
+ * @return {Promise<Object>}
+ * @throws Invalid pointer array error
+ * @example
+ * const name = 'test.chain'
+ * const pointersArray = ['ak_asd23dasdas...,' 'ct_asdf34fasdasd...']
+ * const nameObject = await sdkInstance.aensQuery(name)
+ *
+ * await sdkInstance.aensUpdate(name, pointersArray, { nameTtl, ttl, fee, nonce, clientTtl })
+ * // or
+ * await nameObject.update(pointersArray, { nameTtl, ttl, fee, nonce, clientTtl })
  */
-async function update (nameId, target, options = {}) {
+async function update (name, pointers = [], options = { extendPointers: false }) {
+  isNameValid(name)
   const opt = R.merge(this.Ae.defaults, options)
+  if (!validatePointers(pointers)) throw new Error('Invalid pointers array')
+
+  pointers = [
+    ...options.extendPointers ? (await this.getName(name)).pointers : [],
+    ...pointers.map(p => R.fromPairs([['id', p], ['key', classify(p)]]))
+  ].reduce((acc, el) => [...acc.filter(p => p.key !== el.key), el], [])
   const nameUpdateTx = await this.nameUpdateTx(R.merge(opt, {
-    nameId: nameId,
+    nameId: produceNameId(name),
     accountId: await this.address(opt),
-    pointers: [R.fromPairs([['id', target], ['key', classify(target)]])]
+    pointers
   }))
 
   return this.send(nameUpdateTx, opt)
@@ -81,16 +125,30 @@ async function update (nameId, target, options = {}) {
  * @function
  * @category async
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
- * @param {String} nameId
- * @param {String} account
+ * @param {String} name AENS name
+ * @param {String} account Recipient account publick key
  * @param {Object} [options={}]
- * @return {Promise<Object>}
+ * @param {(String|Object)} [options.onAccount] onAccount Make operation on specific account from sdk(you pass publickKey) or
+ * using provided KeyPair(Can be keypair object or MemoryAccount)
+ * @param {(Number|String|BigNumber)} [options.fee] fee
+ * @param {(Number|String|BigNumber)} [options.ttl] ttl
+ * @param {(Number|String|BigNumber)} [options.nonce] nonce
+ * @return {Promise<Object>} Transaction result
+ * @example
+ * const name = 'test.chain'
+ * const recipientPub = 'ak_asd23dasdas...'
+ * const nameObject = await sdkInstance.aensQuery(name)
+ *
+ * await sdkInstance.aensTransfer(name, recipientPub, { ttl, fee, nonce })
+ * // or
+ * await nameObject.transfer(recipientPub, { ttl, fee, nonce })
  */
-async function transfer (nameId, account, options = {}) {
+async function transfer (name, account, options = {}) {
+  isNameValid(name)
   const opt = R.merge(this.Ae.defaults, options)
 
   const nameTransferTx = await this.nameTransferTx(R.merge(opt, {
-    nameId,
+    nameId: produceNameId(name),
     accountId: await this.address(opt),
     recipientId: account
   }))
@@ -99,35 +157,54 @@ async function transfer (nameId, account, options = {}) {
 }
 
 /**
- * Query the status of an AENS registration
+ * Query the AENS name info from the node
+ * and return the object with info and predefined functions for manipulating name
  * @instance
  * @function
  * @category async
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
- * @param {string} name
+ * @param {String} name
  * @param {Object} opt Options
  * @return {Promise<Object>}
+ * @example
+ * const nameObject = sdkInstance.aensQuery('test.chain')
+ * console.log(nameObject)
+ * {
+ *  id, // name hash
+ *  pointers, // array of pointers
+ *  update, // Update name function
+ *  extendTtl, // Extend Ttl name function
+ *  transfer, // Transfer name function
+ *  revoke // Revoke name function
+ * }
  */
 async function query (name, opt = {}) {
   isNameValid(name)
   const o = await this.getName(name)
-  const nameId = o.id
 
   return Object.freeze(Object.assign(o, {
     pointers: o.pointers || [],
-    update: async (target, options) => {
+    update: async (pointers = [], options = {}) => {
       return {
-        ...(await this.aensUpdate(nameId, target, R.merge(opt, options))),
+        ...(await this.aensUpdate(name, pointers, R.merge(opt, options))),
         ...(await this.aensQuery(name))
       }
     },
-    transfer: async (account, options) => {
+    transfer: async (account, options = {}) => {
       return {
-        ...(await this.aensTransfer(nameId, account, R.merge(opt, options))),
+        ...(await this.aensTransfer(name, account, R.merge(opt, options))),
         ...(await this.aensQuery(name))
       }
     },
-    revoke: async (options) => this.aensRevoke(nameId, R.merge(opt, options))
+    revoke: async (options = {}) => this.aensRevoke(name, R.merge(opt, options)),
+    extendTtl: async (nameTtl = NAME_TTL, options = {}) => {
+      if (!nameTtl || typeof nameTtl !== 'number' || nameTtl > NAME_TTL) throw new Error('Ttl must be an number and less then 50000 blocks')
+
+      return {
+        ...(await this.aensUpdate(name, o.pointers.map(p => p.id), { ...R.merge(opt, options), nameTtl })),
+        ...(await this.aensQuery(name))
+      }
+    }
   }))
 }
 
@@ -139,14 +216,25 @@ async function query (name, opt = {}) {
  * @category async
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param {String} name
- * @param {Number} salt
- * @param {Record} [options={}]
- * @param {Number|String} [options.nameFee] Name Fee
+ * @param {Number} salt Salt from pre-claim, or 0 if it's a bid
+ * @param {Object} [options={}] options
+ * @param {String|Object} [options.onAccount] onAccount Make operation on specific account from sdk(you pass publickKey) or
+ * using provided KeyPair(Can be keypair object or MemoryAccount)
+ * @param {Number|String|BigNumber} [options.fee] fee
+ * @param {Number|String|BigNumber} [options.ttl] ttl
+ * @param {Number|String|BigNumber} [options.nonce] nonce
+ * @param {Number|String} [options.nameFee] Name Fee (By default calculated by sdk)
+ * @param {Number|String} [options.vsn = 2] Transaction vsn from Lima is 2
  * @return {Promise<Object>} the result of the claim
+ * @example
+ * const name = 'test.chain'
+ * const salt = preclaimResult.salt // salt from pre-claim transaction
+ *
+ * await sdkInstance.aensClaim(name, salt, { ttl, fee, nonce, nameFee })
  */
 async function claim (name, salt, options = { vsn: 2 }) {
-  const opt = R.merge(this.Ae.defaults, options)
   isNameValid(name)
+  const opt = R.merge(this.Ae.defaults, options)
 
   const minNameFee = getMinimumNameFee(name)
   if (opt.nameFee !== this.Ae.defaults.nameFee && minNameFee.gt(opt.nameFee)) {
@@ -156,7 +244,7 @@ async function claim (name, salt, options = { vsn: 2 }) {
   const claimTx = await this.nameClaimTx(R.merge(opt, {
     accountId: await this.address(opt),
     nameSalt: salt,
-    name: `nm_${encodeBase58Check(Buffer.from(name))}`
+    name: encode(name, 'nm')
   }))
 
   const result = await this.send(claimTx, opt)
@@ -165,7 +253,7 @@ async function claim (name, salt, options = { vsn: 2 }) {
     const nameInter = opt.waitMined ? await this.aensQuery(name, opt) : {}
     return Object.assign(result, nameInter)
   }
-  return result
+  return { ...result, nameFee: opt.nameFee }
 }
 
 /**
@@ -174,20 +262,36 @@ async function claim (name, salt, options = { vsn: 2 }) {
  * @function
  * @category async
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
- * @param {string} name
- * @param {Record} [options={}]
+ * @param {String} name
+ * @param {Object} [options={}]
+ * @param {String|Object} [options.onAccount] onAccount Make operation on specific account from sdk(you pass publickKey) or
+ * using provided KeyPair(Can be keypair object or MemoryAccount)
+ * @param {Number|String|BigNumber} [options.fee] fee
+ * @param {Number|String|BigNumber} [options.ttl] ttl
+ * @param {Number|String|BigNumber} [options.nonce] nonce
  * @return {Promise<Object>}
+ * @example
+ * const name = 'test.chain'
+ * const salt = preclaimResult.salt // salt from pre-claim transaction
+ *
+ * await sdkInstance.aensPreclaim(name, { ttl, fee, nonce })
+ * {
+ *   ...transactionResult,
+ *   claim, // Claim function (options={}) => claimTransactionResult
+ *   salt,
+ *   commitmentId
+ * }
  */
 async function preclaim (name, options = {}) {
   isNameValid(name)
   const opt = R.merge(this.Ae.defaults, options)
   const _salt = salt()
   const height = await this.height()
-  const hash = commitmentHash(name, _salt)
+  const commitmentId = commitmentHash(name, _salt)
 
   const preclaimTx = await this.namePreclaimTx(R.merge(opt, {
     accountId: await this.address(opt),
-    commitmentId: hash
+    commitmentId
   }))
 
   const result = await this.send(preclaimTx, opt)
@@ -197,7 +301,7 @@ async function preclaim (name, options = {}) {
     height,
     claim: options => this.aensClaim(name, _salt, { ...options, onAccount: opt.onAccount }),
     salt: _salt,
-    commitmentId: hash
+    commitmentId
   })
 }
 
@@ -208,9 +312,19 @@ async function preclaim (name, options = {}) {
  * @category async
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param {String} name Domain name
- * @param {String|Number} nameFee Name fee amount
- * @param {Record} [options={}]
- * @return {Promise<Object>}
+ * @param {String|Number} nameFee Name fee (bid fee)
+ * @param {Object} [options={}]
+ * @param {String|Object} [options.onAccount] onAccount Make operation on specific account from sdk(you pass publickKey) or
+ * using provided KeyPair(Can be keypair object or MemoryAccount)
+ * @param {Number|String|BigNumber} [options.fee] fee
+ * @param {Number|String|BigNumber} [options.ttl] ttl
+ * @param {Number|String|BigNumber} [options.nonce] nonce
+ * @return {Promise<Object>} Transaction result
+ * @example
+ * const name = 'test.chain'
+ * const bidFee = computeBidFee(name, startFee, incrementPercentage)
+ *
+ * await sdkInstance.aensBid(name, 213109412839123, { ttl, fee, nonce })
  */
 async function bid (name, nameFee = NAME_FEE, options = {}) {
   return this.aensClaim(name, 0, { ...options, nameFee, vsn: 2 })
