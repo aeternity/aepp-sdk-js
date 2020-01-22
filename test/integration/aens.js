@@ -120,12 +120,10 @@ describe('Aens', function () {
     })
   })
   it('Extend name ttl', async () => {
-    const address = await aens.address()
     const nameObject = await aens.aensQuery(name)
     const extendResult = await nameObject.extendTtl(10000)
     return extendResult.should.be.deep.include({
-      ttl: extendResult.blockHeight + 10000,
-      pointers: [R.fromPairs([['key', 'account_pubkey'], ['id', address]])]
+      ttl: extendResult.blockHeight + 10000
     })
   })
 

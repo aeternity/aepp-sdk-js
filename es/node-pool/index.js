@@ -4,7 +4,7 @@
  * @export NodePool
  * @example import NodePool from '@aeternity/aepp-sdk/es/node-pool'
  */
-import { DEFAULT_NETWORK_ID, getterForCurrentNode, prepareNodeObject } from './helpers'
+import { getterForCurrentNode, prepareNodeObject } from './helpers'
 import AsyncInit from '../utils/async-init'
 
 /**
@@ -85,7 +85,8 @@ export const NodePool = AsyncInit.compose({
      * nodePool.getNetworkId()
      */
     getNetworkId () {
-      return this.networkId || this.selectedNode.networkId || DEFAULT_NETWORK_ID
+      if (!this.networkId && !this.selectedNode.networkId) throw new Error('networkId is not provided')
+      return this.networkId || this.selectedNode.networkId
     },
     /**
      * Check if you have selected node

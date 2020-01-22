@@ -9,7 +9,6 @@ import * as R from 'ramda'
 import uuid from 'uuid/v4'
 
 import Ae from '../../../ae'
-import Account from '../../../account'
 import { RpcClient } from './rpc-clients'
 import { getHandler, message, voidFn } from '../helpers'
 import { METHODS, RPC_STATUS, VERSION } from '../schema'
@@ -80,7 +79,7 @@ const handleMessage = (instance) => async (msg) => {
  * @param {Object} connection Wallet connection object
  * @return {Object}
  */
-export const AeppRpc = Ae.compose(Account, {
+export const AeppRpc = Ae.compose({
   async init ({ name, onAddressChange = voidFn, onDisconnect = voidFn, onNetworkChange = voidFn, connection }) {
     const eventsHandlers = ['onDisconnect', 'onAddressChange', 'onNetworkChange']
     this.connection = connection
