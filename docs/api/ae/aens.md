@@ -42,7 +42,7 @@ Aens provides name-system related methods atop
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/aens--update"></a>
 
 ### .update(name, pointers, [options]) ⇒ `Promise.&lt;Object&gt;` ⏏
-Update an name
+Update a name
 
 **Kind**: instance method of [`@aeternity/aepp-sdk/es/ae/aens`](#module_@aeternity/aepp-sdk/es/ae/aens)  
 **Category**: async  
@@ -56,6 +56,7 @@ Update an name
 | name | `String` |  | AENS name |
 | pointers | `Array.&lt;String&gt;` |  | Array of name pointers. Can be oracle|account|contract|channel public key |
 | [options] | `Object` | <code>{}</code> |  |
+| [options.extendPointers] | `Boolean` | <code>false</code> | extendPointers Get the pointers from the node and merge with provided one. Pointers with the same type will be overwrited |
 | [options.onAccount] | `String` \| `Object` |  | onAccount Make operation on specific account from sdk(you pass publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount) |
 | [options.fee] | `Number` \| `String` \| `BigNumber` |  | fee |
 | [options.ttl] | `Number` \| `String` \| `BigNumber` |  | ttl |

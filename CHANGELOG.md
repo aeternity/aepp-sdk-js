@@ -1,3 +1,21 @@
+# [7.0.0-next.3](https://github.com/aeternity/aepp-sdk-js/compare/6.0.1...7.0.0-next.3) (2020-01-22)
+
+
+### Features
+
+* **aens:** implement aensExtendTtl function. Refactor aensUpdate ([#866](https://github.com/aeternity/aepp-sdk-js/issues/866)) ([72b073a](https://github.com/aeternity/aepp-sdk-js/commit/72b073a)), closes [#865](https://github.com/aeternity/aepp-sdk-js/issues/865)
+> `aensUpdate` now accept array of pointers
+> `aensUpdate` have new option `extendPointers=false` which retrieve pointers from the node and merge with provided
+* **Build:** update node to `5.4.0` and compiler to `4.2.0`
+* **Guide** Add guide for `AENS` usage
+
+### BREAKING CHANGES
+
+* **AENS:** Change AENS methods arguments
+> Now all of AENS module methods accept `name` as a first argument instead of `nameId`
+
+
+
 # [7.0.0-next.2](https://github.com/aeternity/aepp-sdk-js/compare/6.0.1...7.0.0-next.2) (2020-01-10)
 
 
