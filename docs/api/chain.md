@@ -21,6 +21,7 @@ import Chain from '@aeternity/aepp-sdk/es/chain'
             * *[.mempool()](#module_@aeternity/aepp-sdk/es/chain+mempool) ⇒ `Array.&lt;Object&gt;`*
             * *[.getCurrentGeneration()](#module_@aeternity/aepp-sdk/es/chain+getCurrentGeneration) ⇒ `Object`*
             * *[.getGeneration(hashOrHeight)](#module_@aeternity/aepp-sdk/es/chain+getGeneration) ⇒ `Object`*
+            * *[.waitForTxConfirm(txHash, [options])](#module_@aeternity/aepp-sdk/es/chain+waitForTxConfirm) ⇒ `Promise.&lt;Number&gt;`*
             * *[.getMicroBlockTransactions()](#module_@aeternity/aepp-sdk/es/chain+getMicroBlockTransactions) ⇒ `Array.&lt;Object&gt;`*
             * *[.getKeyBlock()](#module_@aeternity/aepp-sdk/es/chain+getKeyBlock) ⇒ `Object`*
             * *[.getMicroBlockHeader()](#module_@aeternity/aepp-sdk/es/chain+getMicroBlockHeader) ⇒ `Object`*
@@ -164,6 +165,22 @@ Get generation by hash or height
 | Param | Type | Description |
 | --- | --- | --- |
 | hashOrHeight | `String` \| `Number` | Generation hash or height |
+
+<a id="module_@aeternity/aepp-sdk/es/chain+waitForTxConfirm"></a>
+
+### *@aeternity/aepp-sdk/es/chain.waitForTxConfirm(txHash, [options]) ⇒ `Promise.&lt;Number&gt;`*
+Wait for transaction confirmation
+
+**Kind**: instance abstract method of [`@aeternity/aepp-sdk/es/chain`](#module_@aeternity/aepp-sdk/es/chain)  
+**Returns**: `Promise.&lt;Number&gt;` - Current Height  
+**Category**: async  
+**rtype**: `(txHash: String, { confirm: Number | Boolean } = { confirm: 3 }) => Promise<Number>`
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| txHash | `String` |  | Generation hash or height |
+| [options] | `String` | <code>{}</code> | options |
+| [options.confirm] | `String` | <code>3</code> | Block confirmation count |
 
 <a id="module_@aeternity/aepp-sdk/es/chain+getMicroBlockTransactions"></a>
 
