@@ -43,7 +43,7 @@ const Chain = Oracle.compose({
     Ae: {
       methods: [
         'sendTransaction', 'height', 'awaitHeight', 'poll', 'balance', 'getBalance', 'tx',
-        'mempool', 'topBlock', 'getTxInfo', 'txDryRun', 'getName', 'getNodeInfo', 'getAccount', 'getContractByteCode', 'getContract'
+        'mempool', 'topBlock', 'getTxInfo', 'txDryRun', 'getName', 'getNodeInfo', 'getAccount', 'getContractByteCode', 'getContract', 'waitForTxConfirm'
       ]
     }
   }
@@ -188,6 +188,19 @@ const Chain = Oracle.compose({
  * @rtype (hashOrHeight) => generation: Object
  * @param {String|Number} hashOrHeight - Generation hash or height
  * @return {Object} Generation
+ */
+
+/**
+ * Wait for transaction confirmation
+ * @function waitForTxConfirm
+ * @instance
+ * @abstract
+ * @category async
+ * @rtype (txHash: String, { confirm: Number | Boolean } = { confirm: 3 }) => Promise<Number>
+ * @param {String} txHash - Generation hash or height
+ * @param {String} [options={}] - options
+ * @param {String} [options.confirm=3] - Block confirmation count
+ * @return {Promise<Number>} Current Height
  */
 
 /**

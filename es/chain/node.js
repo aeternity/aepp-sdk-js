@@ -47,7 +47,16 @@ async function sendTransaction (tx, options = {}) {
 
   try {
     const { txHash } = await this.api.postTransaction({ tx })
-    return waitMined ? { ...(await this.poll(txHash, options)), rawTx: tx } : { hash: txHash, rawTx: tx }
+
+    if (waitMined) {
+      const txData = { ...(await this.poll(txHash, options)), rawTx: tx }
+      // wait for transaction confirmation
+      if (options.confirm) {
+        return { ...txData, confirmationHeight: await this.waitForTxConfirm(txHash, options) }
+      }
+      return txData
+    }
+    return { hash: txHash, rawTx: tx }
   } catch (e) {
     throw Object.assign(
       (new Error(e.message)),
@@ -57,6 +66,12 @@ async function sendTransaction (tx, options = {}) {
       }
     )
   }
+}
+
+async function waitForTxConfirm (txHash, options = { confirm: 3 }) {
+  options.confirm = typeof options.confirm === 'boolean' && options.confirm ? 3 : options.confirm
+  const { blockHeight } = await this.tx(txHash)
+  return this.awaitHeight(blockHeight + options.confirm, options)
 }
 
 async function getAccount (address, { height, hash } = {}) {
@@ -227,7 +242,8 @@ const ChainNode = Chain.compose(Oracle, TransactionValidator, NodePool, {
     txDryRun,
     getContractByteCode,
     getContract,
-    getName
+    getName,
+    waitForTxConfirm
   }
 })
 
