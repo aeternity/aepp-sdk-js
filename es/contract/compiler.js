@@ -86,6 +86,16 @@ async function contractGetACI (code, options = {}) {
   return this.http.post('/aci', { code, options: this.prepareCompilerOption(options) }, options)
 }
 
+async function getFateAssembler (bytecode, options = {}) {
+  this.isInit()
+  return this.http.post('/fate-assembler', { bytecode, options: this.prepareCompilerOption(options) }, options)
+}
+
+async function getBytecodeCompilerVersion (bytecode, options = {}) {
+  this.isInit()
+  return this.http.post('compiler-version', { bytecode, options: this.prepareCompilerOption(options) }, options)
+}
+
 async function setCompilerUrl (url, { forceCompatibility = false } = {}) {
   this.http.changeBaseUrl(url)
   this.compilerVersion = await this.getCompilerVersion().catch(e => null)
@@ -142,7 +152,9 @@ const ContractCompilerAPI = AsyncInit.compose(ContractBase, {
     validateByteCodeAPI,
     isInit,
     checkCompatibility,
-    prepareCompilerOption
+    prepareCompilerOption,
+    getFateAssembler,
+    getBytecodeCompilerVersion
   },
   props: {
     compilerVersion: null,

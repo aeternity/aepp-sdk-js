@@ -50,7 +50,9 @@ const ContractBase = stampit({
         'setCompilerUrl',
         'getCompilerVersion',
         'contractDecodeCallResultAPI',
-        'validateByteCodeAPI'
+        'validateByteCodeAPI',
+        'getFateAssembler',
+        'getBytecodeCompilerVersion'
       ]
     }
   }
@@ -63,7 +65,9 @@ const ContractBase = stampit({
     setCompilerUrl: required,
     getCompilerVersion: required,
     contractDecodeCallResultAPI: required,
-    validateByteCodeAPI: required
+    validateByteCodeAPI: required,
+    getFateAssembler: required,
+    getBytecodeCompilerVersion: required
   }
 }))
 
