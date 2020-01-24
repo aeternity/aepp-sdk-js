@@ -93,7 +93,7 @@ async function getFateAssembler (bytecode, options = {}) {
 
 async function getBytecodeCompilerVersion (bytecode, options = {}) {
   this.isInit()
-  return this.http.post('compiler-version', { bytecode, options: this.prepareCompilerOption(options) }, options)
+  return this.http.post('/compiler-version', { bytecode, options: this.prepareCompilerOption(options) }, options)
 }
 
 async function setCompilerUrl (url, { forceCompatibility = false } = {}) {

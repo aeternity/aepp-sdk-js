@@ -1,4 +1,5 @@
 import * as R from 'ramda'
+import { unpackTx } from '../../tx/builder'
 
 /**
  * Get function schema from contract ACI object
@@ -81,3 +82,6 @@ const parseArguments = (aciArgs = []) => (args) => ({
   opt: args.length > aciArgs.length ? R.last(args) : {},
   args: Object.values(args).slice(0, aciArgs.length)
 })
+
+export const unpackByteCode = (bytecode) => unpackTx(bytecode, false, 'cb').tx
+
