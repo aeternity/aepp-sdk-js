@@ -84,4 +84,3 @@ const parseArguments = (aciArgs = []) => (args) => ({
 })
 
 export const unpackByteCode = (bytecode) => unpackTx(bytecode, false, 'cb').tx
-
