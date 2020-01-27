@@ -37,7 +37,11 @@ import { getBrowserAPI } from '../helpers'
  * @return {void}
  */
 function disconnect () {
-  this.port.disconnect()
+  try {
+    this.port.disconnect()
+  } catch (e) {
+    console.warning('From BrowserRuntimeConnection: ', e)
+  }
 }
 
 /**
@@ -56,7 +60,7 @@ function connect (onMessage, onDisconnect) {
     onMessage(msg, source)
   })
   this.port.onDisconnect.addListener(() => {
-    onDisconnect({}, this)
+    typeof onDisconnect === 'function' && onDisconnect({}, this)
     this.port.disconnect()
   })
 }

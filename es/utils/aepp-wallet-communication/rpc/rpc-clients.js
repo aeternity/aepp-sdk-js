@@ -120,8 +120,11 @@ export const RpcClient = stampit({
     this.accounts = {}
 
     this.sendMessage = sendMessage(messageId, this.connection)
-
-    connection.connect(receive(onMessage, messageId), onDisconnect)
+    const disconnect = (aepp, connection) => {
+      this.disconnect(true)
+      typeof onDisconnect === 'function' && onDisconnect(connection, this)
+    }
+    connection.connect(receive(onMessage, messageId), disconnect)
   },
   methods: {
     /**
@@ -157,9 +160,11 @@ export const RpcClient = stampit({
      * @rtype () => void
      * @return {void}
      */
-    disconnect () {
+    disconnect (forceConnectionClose = false) {
       this.info.status = RPC_STATUS.DISCONNECTED
-      this.connection.disconnect()
+      this.addressSubscription = []
+      this.accounts = {}
+      forceConnectionClose || this.connection.disconnect()
     },
     /**
      * Update subsription
