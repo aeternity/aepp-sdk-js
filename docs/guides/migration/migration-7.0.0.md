@@ -1,5 +1,5 @@
 # Migration to SDK 7.0.0
-This guide describe the process of migrating to SDK version 7.0.0
+This guide describes the process of migrating to SDK version 7.0.0
 
 ## Step 1
 SDK will not accept `url`, `internalUrl` init arguments anymore:
@@ -33,7 +33,7 @@ Universal({
 ```
 
 ## Step 3
-Change most of `AENS` method's first argument from `nameId` to `name
+Change all of `AENS` method's first argument from `nameId` to `name`
 ### Before
 ```js
 const client = Universal({ ... })
@@ -55,4 +55,4 @@ await client.aensRevoke('testname.chain', ...)
 - Add new compiler `methods` to RPC `communication` (base-app update required)
 - Drop compiler version to `version >= 4.0.0 && version < 5.0.0`
 - Change node compatibility range to `node >= 5.0.0 && node < 6.0.0`
-- Always `verify` transaction before send it to the node (can be forced used options `verify: false`)
+- Always `verify` transactions before sending them to the node (can be disabled using the option `verify: false`)
