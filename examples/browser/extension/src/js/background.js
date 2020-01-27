@@ -2,6 +2,7 @@ import '../img/icon-128.png'
 import '../img/icon-34.png'
 
 import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
+import Node from '@aeternity/aepp-sdk/es/node'
 import { RpcWallet } from '@aeternity/aepp-sdk/es/ae/wallet'
 import BrowserRuntimeConnection
   from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-runtime'
@@ -56,56 +57,59 @@ const NODE_URL = 'https://sdk-testnet.aepps.com'
 const NODE_INTERNAL_URL = 'https://sdk-testnet.aepps.com'
 const COMPILER_URL = 'https://compiler.aepps.com'
 
-// Init extension stamp from sdk
-RpcWallet({
-  url: NODE_URL,
-  internalUrl: NODE_INTERNAL_URL,
-  compilerUrl: COMPILER_URL,
-  name: 'ExtensionWallet',
-  // By default `ExtesionProvider` use first account as default account. You can change active account using `selectAccount (address)` function
-  accounts,
-  // Hook for sdk registration
-  onConnection (aepp, action) {
-    if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to connect`)) {
-      action.accept()
-    } else {
-      action.deny()
+async function init () {
+  // Init extension stamp from sdk
+  RpcWallet({
+    compilerUrl: COMPILER_URL,
+    nodes: [{ name: 'test-net', instance: await Node({ url: NODE_URL, internalUrl: NODE_INTERNAL_URL }) }],
+    name: 'ExtensionWallet',
+    // By default `ExtesionProvider` use first account as default account. You can change active account using `selectAccount (address)` function
+    accounts,
+    // Hook for sdk registration
+    onConnection (aepp, action) {
+      if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to connect`)) {
+        action.accept()
+      } else {
+        action.deny()
+      }
+    },
+    onDisconnect (masg, client) {
+      debugger
+    },
+    onSubscription (aepp, action) {
+      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} want to subscribe for accounts`)) {
+        action.accept()
+      } else {
+        action.deny()
+      }
+    },
+    onSign (aepp, action) {
+      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} want to sign tx ${action.params.tx}`)) {
+        action.accept()
+      } else {
+        action.deny()
+      }
+    },
+    onAskAccounts (aepp, { accept, deny }) {
+      if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to get accounts`)) {
+        accept()
+      } else {
+        deny()
+      }
     }
-  },
-  onDisconnect (masg, client) {
-    client.disconnect()
-  },
-  onSubscription (aepp, action) {
-    if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} want to subscribe for accounts`)) {
-      action.accept()
-    } else {
-      action.deny()
-    }
-  },
-  onSign (aepp, action) {
-    if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} want to sign tx ${action.params.tx}`)) {
-      action.accept()
-    } else {
-      action.deny()
-    }
-  },
-  onAskAccounts (aepp, { accept, deny }) {
-    if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to get accounts`)) {
-      accept()
-    } else {
-      deny()
-    }
-  }
-}).then(wallet => {
-  chrome.runtime.onConnect.addListener(async function (port) {
-    // create Connection
-    const connection = await BrowserRuntimeConnection({ connectionInfo: { id: port.sender.frameId }, port })
-    // add new aepp to wallet
-    wallet.addRpcClient(connection)
-    // Share wallet details
-    wallet.shareWalletInfo(port.postMessage.bind(port))
-    setTimeout(() => wallet.shareWalletInfo(port.postMessage.bind(port)), 3000)
+  }).then(wallet => {
+    chrome.runtime.onConnect.addListener(async function (port) {
+      // create Connection
+      const connection = await BrowserRuntimeConnection({ connectionInfo: { id: port.sender.frameId }, port })
+      // add new aepp to wallet
+      wallet.addRpcClient(connection)
+      // Share wallet details
+      wallet.shareWalletInfo(port.postMessage.bind(port))
+      setTimeout(() => wallet.shareWalletInfo(port.postMessage.bind(port)), 3000)
+    })
+  }).catch(err => {
+    console.error(err)
   })
-}).catch(err => {
-  console.error(err)
-})
+}
+
+init().then(_ => console.log('Started!'))
