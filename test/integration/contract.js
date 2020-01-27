@@ -317,6 +317,16 @@ describe('Contract', function () {
       prefix.should.be.equal('cb')
       isString.should.be.equal(true)
     })
+    it('Get FATE assembler', async () => {
+      const result = await contract.getFateAssembler(bytecode)
+      result.should.be.a('object')
+      const assembler = result['fate-assembler']
+      assembler.should.be.a('string')
+    })
+    it('Get compiler version from bytecode', async () => {
+      const version = await contract.getBytecodeCompilerVersion(bytecode)
+      console.log(version)
+    })
     it('get contract ACI', async () => {
       const aci = await contract.contractGetACI(identityContract)
       aci.should.have.property('interface')
