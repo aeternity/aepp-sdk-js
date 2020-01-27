@@ -125,12 +125,12 @@ export const AeppRpc = Ae.compose({
      * @function disconnectWallet
      * @instance
      * @rtype (force: Boolean = false) => void
-     * @param {Boolean} force=false Force sending close connection message
+     * @param {Boolean} sendDisconnect=false Force sending close connection message
      * @return {void}
      */
-    async disconnectWallet (force = false) {
+    async disconnectWallet (sendDisconnect = true) {
       if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
-      force || this.rpcClient.sendMessage(message(METHODS.closeConnection, { reason: 'bye' }), true)
+      sendDisconnect && this.rpcClient.sendMessage(message(METHODS.closeConnection, { reason: 'bye' }), true)
       this.rpcClient.disconnect()
       this.rpcClient = null
     },

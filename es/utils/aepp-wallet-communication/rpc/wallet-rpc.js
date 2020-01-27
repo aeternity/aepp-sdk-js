@@ -19,7 +19,7 @@ const rpcClients = RpcClients()
 const NOTIFICATIONS = {
   [METHODS.closeConnection]: (instance, { client }) =>
     (msg) => {
-      client.info.status = RPC_STATUS.DISCONNECTED
+      client.disconnect(true)
       instance.onDisconnect(msg.params, client)
     }
 }
