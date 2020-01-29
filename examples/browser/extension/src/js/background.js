@@ -67,35 +67,54 @@ async function init () {
     accounts,
     // Hook for sdk registration
     onConnection (aepp, action) {
-      if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to connect`)) {
-        action.accept()
-      } else {
-        action.deny()
-      }
+      // if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to connect`)) {
+      //   action.accept()
+      // } else {
+      //   action.deny()
+      // }
+      console.log('connection request')
+      console.log(aepp)
+      console.log(action)
+      console.log('------------------------')
+      action.accept()
     },
-    onDisconnect (masg, client) {
-      debugger
+    onDisconnect (msg, client) {
+      console.log('Disconnect client: ', client)
     },
     onSubscription (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} want to subscribe for accounts`)) {
-        action.accept()
-      } else {
-        action.deny()
-      }
+      // if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} want to subscribe for accounts`)) {
+      //   action.accept()
+      // } else {
+      //   action.deny()
+      // }
+      console.log('sign transaction')
+      console.log(aepp)
+      console.log(action)
+      console.log('------------------------')
+      action.accept()
     },
     onSign (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} want to sign tx ${action.params.tx}`)) {
-        action.accept()
-      } else {
-        action.deny()
-      }
+      // if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} want to sign tx ${action.params.tx}`)) {
+      //   action.accept()
+      // } else {
+      //   action.deny()
+      // }
+      console.log('sign transaction')
+      console.log(aepp)
+      console.log(action)
+      console.log('------------------------')
+      action.accept()
     },
-    onAskAccounts (aepp, { accept, deny }) {
-      if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to get accounts`)) {
-        accept()
-      } else {
-        deny()
-      }
+    onAskAccounts (aepp, action) {
+      // if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to get accounts`)) {
+      //   accept()
+      // } else {
+      //   deny()
+      // }
+      console.log(aepp)
+      console.log(action)
+      console.log('------------------------')
+      action.accept()
     }
   }).then(wallet => {
     chrome.runtime.onConnect.addListener(async function (port) {

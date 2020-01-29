@@ -54,7 +54,7 @@ function disconnect () {
  * @return {void}
  */
 function connect (onMessage, onDisconnect) {
-  if (this.port.onMessage.hasListeners()) throw new Error('You already connected')
+  if (typeof this.port.onMessage.hasListeners === 'function' && this.port.onMessage.hasListeners()) throw new Error('You already connected')
   this.port.onMessage.addListener((msg, source) => {
     if (this.debug) console.log('Receive message: ', msg)
     onMessage(msg, source)
