@@ -43,22 +43,24 @@ Example spend function, using aeternity's SDK abstraction
 Example spend function, using the SDK, talking directly to the [**API**](https://github.com/aeternity/protocol/tree/master/node/api):
 ```js
   // Import necessary Modules
-  import Tx from '@aeternity/aepp-sdk/es/tx/tx.js'
-  import Chain from '@aeternity/aepp-sdk/es/chain/node.js'
-  import Account from '@aeternity/aepp-sdk/es/account/memory.js'
-  import Node from '@aeternity/aepp-sdk/es/node' // import from SDK es-modules
+  import Universal from '@aeternity/aepp-sdk/es/ae/universal'
+  import Node from '@aeternity/aepp-sdk/es/node' 
+  import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
 
   async function spend (amount, receiver_pub_key) {
     const node = await Node({ url, internalUrl })
     const nodes = [{ name: 'testnet-node', instance: node }]
+    const account = MemoryAccount({ keypair: { secretKey: 'PRIV_KEY_HERE', publicKey: 'PUB_KEY_HERE'} })
 
-    const tx = await Tx({ nodes })
-    const chain = await Chain({ nodes })
-    const account = Account({keypair: {secretKey: 'PRIV_KEY_HERE', publicKey: 'PUB_KEY_HERE'}, networkId: 'NETWORK_ID_HERE'})
-    const spendTx = await tx.spendTx({ sender: 'PUB_KEY_HERE', receiver_pub_key, amount })
+    const sdkInstance = await Universal({
+      nodes,
+      accounts: [account]
+    })
 
-    const signed = await account.signTransaction(spendTx)
-    return chain.sendTransaction(signed, opt)
+    const spendTx = await sdkInstance.spendTx({ sender: await sdkInstance.address(), receiver_pub_key, amount })
+
+    const signed = await sdkInstance.signTransaction(spendTx)
+    return sdkInstance.sendTransaction(signed, opt)
 
   }
 ```
