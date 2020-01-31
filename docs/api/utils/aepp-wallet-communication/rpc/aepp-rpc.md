@@ -11,7 +11,7 @@ import ContentScriptBridge from '@aeternity/aepp-sdk/es/utils/aepp-wallet-commun
 * [@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc)
     * [exports.AeppRpc(param, onAddressChange, onDisconnect, onNetworkChange, connection)](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc) ⇒ `Object` ⏏
         * [.connectToWallet(connection)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+connectToWallet) ⇒ `void`
-        * [.disconnectWallet(force)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+disconnectWallet) ⇒ `void`
+        * [.disconnectWallet(sendDisconnect)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+disconnectWallet) ⇒ `void`
         * [.askAddresses()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+askAddresses) ⇒ `Promise`
         * [.subscribeAddress(type, value)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+subscribeAddress) ⇒ `Promise`
         * [.signTransaction()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+signTransaction) ⇒ `Promise.&lt;String&gt;`
@@ -49,7 +49,7 @@ Connect to wallet
 
 <a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+disconnectWallet"></a>
 
-#### exports.AeppRpc.disconnectWallet(force) ⇒ `void`
+#### exports.AeppRpc.disconnectWallet(sendDisconnect) ⇒ `void`
 Disconnect from wallet
 
 **Kind**: instance method of [`exports.AeppRpc`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc)  
@@ -57,7 +57,7 @@ Disconnect from wallet
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| force | `Boolean` | <code>false</code> | Force sending close connection message |
+| sendDisconnect | `Boolean` | <code>false</code> | Force sending close connection message |
 
 <a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+askAddresses"></a>
 

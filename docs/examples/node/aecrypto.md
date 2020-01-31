@@ -105,6 +105,40 @@ const promptSchema = {
 
 
 
+
+## Key Extraction (from Node nodes)
+
+
+  
+
+```js
+function extractReadableKeys (dir, options) {
+  const pwd = options.input
+  prompt.start()
+  prompt.get(promptSchema, (_, { password }) => {
+    const key = fs.readFileSync(path.join(pwd, dir, 'sign_key'))
+    const pubKey = fs.readFileSync(path.join(pwd, dir, 'sign_key.pub'))
+
+    const decrypted = Crypto.decryptPrivateKey(password, key)
+
+    const privateHex = Buffer.from(decrypted).toString('hex')
+    const decryptedPub = Crypto.decryptPubKey(password, pubKey)
+
+    console.log(`Private key (hex): ${privateHex}`)
+    console.log(`Public key (base check): ak_${Crypto.encodeBase58Check(decryptedPub)}`)
+    console.log(`Public key (hex): ${decryptedPub.toString('hex')}`)
+  })
+}
+
+
+```
+
+
+
+
+
+
+
 ## Key Pair Generation
 
 
@@ -113,9 +147,19 @@ const promptSchema = {
 ```js
 function generateKeyPair (name, { output }) {
   const { publicKey, secretKey } = Crypto.generateKeyPair()
-  return { publicKey, secretKey }
-  
+
+  const data = [
+    [path.join(output, name), secretKey],
+    [path.join(output, `${name}.pub`), publicKey]
+  ]
+
+  data.forEach(([path, data]) => {
+    fs.writeFileSync(path, data)
+    console.log(`Wrote ${path}`)
+  })
 }
+
+
 ```
 
 
@@ -126,27 +170,94 @@ function generateKeyPair (name, { output }) {
 
 ## Transaction Signing
 
-This function shows how to sign an æternity
+This function shows how to use a compliant private key to sign an æternity
 transaction and turn it into an RLP-encoded tuple ready for mining
 
 
   
 
 ```js
-function signTx (tx, secretKey) {
+function signTx (tx, privKey) {
   if (!tx.match(/^tx_.+/)) {
     throw Error('Not a valid transaction')
   }
-  secretKey = Buffer.from(keyPair.secretKey, 'hex')
-  const rlpBinaryTx = Crypto.decodeBase64Check(Crypto.assertedType(tx, 'tx'))
-  // Prepend `NETWORK_ID` to begin of data binary
-  const txWithNetworkId = Buffer.concat([Buffer.from(program.networkId), rlpBinaryTx])
+
+  const binaryKey = (() => {
+    if (program.file) {
+      return fs.readFileSync(program.file)
+    } else if (privKey) {
+      return Buffer.from(privKey, 'hex')
+    } else {
+      throw Error('Must provide either [privkey] or [file]')
+    }
+  })()
+
+  const decryptedKey = program.password ? Crypto.decryptKey(program.password, binaryKey) : binaryKey
+
+
+```
+
+
+
+
+
+
+
+Split the base58Check part of the transaction
+
+
   
-  const signatures = [Crypto.sign(txWithNetworkId, secretKey)]
-  const { tx } = buildTx({ encodedTx: rlpBinaryTx, signatures }, TX_TYPE.signed)
-  console.log('Signed transaction: ' + tx)
+
+```js
+  const base58CheckTx = tx.split('_')[1]
+
+```
+
+
+
+
+
+
+
+... and sign the binary create_contract transaction
+
+
+  
+
+```js
+  const binaryTx = Crypto.decodeBase58Check(base58CheckTx)
+
+  const signature = Crypto.sign(binaryTx, decryptedKey)
+
+
+```
+
+
+
+
+
+
+
+the signed tx deserializer expects a 4-tuple:
+<tag, version, signatures_array, binary_tx>
+
+
+  
+
+```js
+  const unpackedSignedTx = [
+    Buffer.from([11]),
+    Buffer.from([1]),
+    [Buffer.from(signature)],
+    binaryTx
+  ]
+
+  console.log(Crypto.encodeTx(unpackedSignedTx))
 }
-````
+
+
+```
+
 
 
 
@@ -165,6 +276,8 @@ function unpackTx (tx) {
   const deserializedTx = TxBuilder.unpackTx(tx)
   console.log(JSON.stringify(deserializedTx, undefined, 2))
 }
+
+
 ```
 
 
@@ -183,10 +296,22 @@ The `commander` library provides maximum command line parsing convenience.
 ```js
 program.version('0.1.0')
 
+program
+  .command('decrypt <directory>')
+  .description('Decrypts public and private key to readable formats for testing purposes')
+  .option('-i, --input [directory]', 'Directory where to look for keys', '.')
+  .action(extractReadableKeys)
 
 program
-  .command('sign <tx> <priv>')
-  .option('--networkId [networkId]', 'Network Id')
+  .command('genkey <keyname>')
+  .description('Generate keypair')
+  .option('-o, --output [directory]', 'Output directory for the keys', '.')
+  .action(generateKeyPair)
+
+program
+  .command('sign <tx> [privkey]')
+  .option('-p, --password [password]', 'password of the private key')
+  .option('-f, --file [file]', 'private key file')
   .action(signTx)
 
 program
