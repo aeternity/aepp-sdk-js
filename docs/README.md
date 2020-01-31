@@ -48,6 +48,7 @@ You can use this URL with any releasee on [npmjs](https://www.npmjs.com/package/
 ### Contract Usage
  - [Contract ACI](guides/contract-aci-usage.md)
  - [AENS usage](guides/aens-usage.md)
+ - [AENS usage](guides/racle-usage.md)
 
 
 ## Examples
