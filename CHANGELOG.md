@@ -1,3 +1,32 @@
+# [7.0.0](https://github.com/aeternity/aepp-sdk-js/compare/6.0.1...7.0.0) (2020-01-31)
+
+
+### Bug Fixes
+
+* **AEX-2:** Fix firefox compatibility issue ([#882](https://github.com/aeternity/aepp-sdk-js/issues/882)) ([2e16e10](https://github.com/aeternity/aepp-sdk-js/commit/2e16e10))
+
+
+### Features
+
+* **Chain:** add new method `waitFOrTxConfirm`. Add new option { confirm: 3 } to all of high lvl SDK API. Add tests. Adjust docs ([#874](https://github.com/aeternity/aepp-sdk-js/issues/874)) ([43528f9](https://github.com/aeternity/aepp-sdk-js/commit/43528f9))
+* **Compiler:** Add new compiler methods API ([#875](https://github.com/aeternity/aepp-sdk-js/issues/875)) ([a939395](https://github.com/aeternity/aepp-sdk-js/commit/a939395))
+* **network:** Throw error when can not get networkId ([#863](https://github.com/aeternity/aepp-sdk-js/issues/863)) ([41b7bd1](https://github.com/aeternity/aepp-sdk-js/commit/41b7bd1))
+
+
+### Docs
+
+* **Guide** [Add 7.0.0 migration guide](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/migration/migration-7.0.0.md)
+* **Guide:** Add [Oracle](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/oracle-usage.md), [AENS](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/aens-usage.md) and [Contract](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/contract-aci-usage.md) guides
+
+
+### BREAKING CHANGES
+
+Please check out [7.0.0 migration guide](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/migration/migration-7.0.0.md)
+
+This release include all changes from [7.0.0-next.1](https://github.com/aeternity/aepp-sdk-js/releases/tag/7.0.0-next.1), [7.0.0-next.2](https://github.com/aeternity/aepp-sdk-js/releases/tag/7.0.0-next.2), [7.0.0-next.3](https://github.com/aeternity/aepp-sdk-js/releases/tag/7.0.0-next.3)
+
+
+
 # [7.0.0-next.3](https://github.com/aeternity/aepp-sdk-js/compare/6.0.1...7.0.0-next.3) (2020-01-22)
 
 
