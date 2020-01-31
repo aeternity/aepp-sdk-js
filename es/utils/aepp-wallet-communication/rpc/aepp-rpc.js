@@ -9,7 +9,6 @@ import * as R from 'ramda'
 import uuid from 'uuid/v4'
 
 import Ae from '../../../ae'
-import Account from '../../../account'
 import { RpcClient } from './rpc-clients'
 import { getHandler, message, voidFn } from '../helpers'
 import { METHODS, RPC_STATUS, VERSION } from '../schema'
@@ -80,7 +79,7 @@ const handleMessage = (instance) => async (msg) => {
  * @param {Object} connection Wallet connection object
  * @return {Object}
  */
-export const AeppRpc = Ae.compose(Account, {
+export const AeppRpc = Ae.compose({
   async init ({ name, onAddressChange = voidFn, onDisconnect = voidFn, onNetworkChange = voidFn, connection }) {
     const eventsHandlers = ['onDisconnect', 'onAddressChange', 'onNetworkChange']
     this.connection = connection
@@ -126,12 +125,12 @@ export const AeppRpc = Ae.compose(Account, {
      * @function disconnectWallet
      * @instance
      * @rtype (force: Boolean = false) => void
-     * @param {Boolean} force=false Force sending close connection message
+     * @param {Boolean} sendDisconnect=false Force sending close connection message
      * @return {void}
      */
-    async disconnectWallet (force = false) {
+    async disconnectWallet (sendDisconnect = true) {
       if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
-      force || this.rpcClient.sendMessage(message(METHODS.closeConnection, { reason: 'bye' }), true)
+      sendDisconnect && this.rpcClient.sendMessage(message(METHODS.closeConnection, { reason: 'bye' }), true)
       this.rpcClient.disconnect()
       this.rpcClient = null
     },

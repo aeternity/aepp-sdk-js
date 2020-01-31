@@ -37,7 +37,11 @@ import { getBrowserAPI } from '../helpers'
  * @return {void}
  */
 function disconnect () {
-  this.port.disconnect()
+  try {
+    this.port.disconnect()
+  } catch (e) {
+    console.warning('From BrowserRuntimeConnection: ', e)
+  }
 }
 
 /**
@@ -50,13 +54,13 @@ function disconnect () {
  * @return {void}
  */
 function connect (onMessage, onDisconnect) {
-  if (this.port.onMessage.hasListeners()) throw new Error('You already connected')
+  if (typeof this.port.onMessage.hasListeners === 'function' && this.port.onMessage.hasListeners()) throw new Error('You already connected')
   this.port.onMessage.addListener((msg, source) => {
     if (this.debug) console.log('Receive message: ', msg)
     onMessage(msg, source)
   })
   this.port.onDisconnect.addListener(() => {
-    onDisconnect({}, this)
+    typeof onDisconnect === 'function' && onDisconnect({}, this)
     this.port.disconnect()
   })
 }

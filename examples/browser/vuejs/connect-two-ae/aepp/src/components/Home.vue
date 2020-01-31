@@ -198,6 +198,7 @@
   //  is a webpack alias present in webpack.config.js
   import { RpcAepp } from '@aeternity/aepp-sdk/es'
   import Detector from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector'
+  import Node from '@aeternity/aepp-sdk/es/node'
   import BrowserWindowMessageConnection from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message'
 
   // Send wallet connection info to Aepp throug content script
@@ -282,12 +283,12 @@
         })())
       },
       async disconnect() {
-        await this.client.disconnectWallet()
         this.walletName = null
         this.pub = null
         this.balance = null
         this.addressResponse = null
-        this.scanForWallets()
+        await this.client.disconnectWallet()
+        setTimeout(() => this.scanForWallets(), 1000)
       },
       async getReverseWindow() {
         const iframe = document.createElement('iframe')
@@ -331,8 +332,7 @@
       //
       this.client = await RpcAepp({
         name: 'AEPP',
-        url: NODE_URL,
-        internalUrl: NODE_INTERNAL_URL,
+        nodes: [{ name: 'test-net', instance: await Node({ url: NODE_URL, internalUrl: NODE_INTERNAL_URL }) }],
         compilerUrl: COMPILER_URL,
         onNetworkChange (params) {
           if (this.getNetworkId() !== params.networkId) alert(`Connected network ${this.getNetworkId()} is not supported with wallet network ${params.networkId}`)

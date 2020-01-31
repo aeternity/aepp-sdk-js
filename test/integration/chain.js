@@ -92,4 +92,15 @@ describe('Node Chain', function () {
     await client.poll(txHash).should.eventually.be.fulfilled
     return client.poll('th_xxx', { blocks: 1 }).should.eventually.be.rejected
   })
+
+  it('Wait for transaction confirmation', async () => {
+    const txData = await client.spend(1000, await client.address(), { confirm: true })
+    const isConfirmed = (await client.height()) >= txData.blockHeight + 3
+
+    isConfirmed.should.be.equal(true)
+
+    const txData2 = await client.spend(1000, await client.address(), { confirm: 4 })
+    const isConfirmed2 = (await client.height()) >= txData2.blockHeight + 4
+    isConfirmed2.should.be.equal(true)
+  })
 })
