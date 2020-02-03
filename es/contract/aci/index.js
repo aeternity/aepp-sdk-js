@@ -65,7 +65,7 @@ async function prepareArgsForEncode (aci, params) {
  * @param {String} [options.aci] Contract ACI
  * @param {String} [options.contractAddress] Contract address
  * @param {Object} [options.filesystem] Contact source external namespaces map
- * @param {Object} [options.forceCodeCheck] Don't check contract code
+ * @param {Object} [options.forceCodeCheck=true] Don't check contract code
  * @param {Object} [options.opt] Contract options
  * @return {ContractInstance} JS Contract API
  * @example
