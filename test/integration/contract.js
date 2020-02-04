@@ -60,6 +60,7 @@ contract StateContract =
   record state = { value: string, key: number, testOption: option(string) }
   record yesEr = { t: number}
   
+  datatype event = TheFirstEvent(int) | AnotherEvent(string, address) | AnotherEvent2(string, bool, int)
   datatype dateUnit = Year | Month | Day
   datatype one_or_both('a, 'b) = Left('a) | Right('b) | Both('a, 'b)
 
@@ -104,6 +105,10 @@ contract StateContract =
       Left(x)    => x
       Right(_)   => abort("asdasd")
       Both(x, _) => x
+  entrypoint  emitEvents() : unit =
+    Chain.event(TheFirstEvent(42))
+    Chain.event(AnotherEvent("This is not indexed", Contract.address))
+    Chain.event(AnotherEvent2("This is not indexed", true, 1))
 `
 
 const encodedNumberSix = 'cb_DA6sWJo='
@@ -128,6 +133,11 @@ describe('Contract', function () {
     console.log(`Node => ${version}, consensus => ${consensusProtocolVersion}, compiler => ${contract.compilerVersion}`)
     const code = await contract.contractCompile(identityContract)
     return contract.contractDeploy(code.bytecode, identityContract).should.eventually.have.property('address')
+  })
+  it.skip('Events', async () => {
+    const cInstance = await contract.getContractInstance(testContract, { filesystem })
+    await cInstance.deploy(['test', 1, 'some'])
+    const eventResult = await cInstance.methods.emitEvents()
   })
 
   it('compiles Sophia code', async () => {

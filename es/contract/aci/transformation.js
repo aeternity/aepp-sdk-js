@@ -1,4 +1,7 @@
 import Joi from 'joi-browser'
+import { toBytes } from '../../utils/bytes'
+import { addressFromDecimal, hash } from '../../utils/crypto'
+import { decode } from '../../tx/builder/helpers'
 
 export const SOPHIA_TYPES = [
   'int',
@@ -167,6 +170,58 @@ export function transformMap (value, generic, { bindings }) {
 }
 
 // FUNCTION RETURN VALUE TRANSFORMATION ↓↓↓
+
+/**
+ * Transform decoded event to JS type
+ * @param events
+ * @param fnACI
+ * @return {*}
+ */
+export function transformDecodedEvents (events, fnACI) {
+  if (!events.length) return []
+
+  const eventsSchema = fnACI.event.map(e => {
+    const name = Object.keys(e)[0]
+    return { name, value: e[name], nameHash: hash(name).toString('hex') }
+  })
+
+  return events.map(l => {
+    const [eName, ...eParams] = l.topics
+    const hexHash = toBytes(eName, true).toString('hex')
+    const { schema, isHasNonIndexed } = eventsSchema
+      .reduce(
+        (acc, el) => {
+          if (el.nameHash === hexHash) {
+            return { schema: el.value.filter(e => e !== 'string'), isHasNonIndexed: el.value.includes('string') }
+          }
+          return acc
+        },
+        { schema: [], isHasNonIndexed: false }
+      )
+    return {
+      ...l,
+      decoded: [
+        ...isHasNonIndexed ? [decode(l.data).toString('utf-8')] : [],
+        ...eParams.map((event, i) => transformEvent(event, schema[i]))
+      ]
+    }
+  })
+}
+
+function transformEvent (event, type) {
+  switch (type) {
+    case SOPHIA_TYPES.bool:
+      return !!event
+    case SOPHIA_TYPES.string:
+      return toBytes(event, true).toString()
+    case SOPHIA_TYPES.hash:
+      return toBytes(event, true).toString('hex')
+    case SOPHIA_TYPES.address:
+      return addressFromDecimal(event)
+    default:
+      return event
+  }
+}
 
 /**
  * Transform decoded data to JS type
