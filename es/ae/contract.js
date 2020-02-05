@@ -314,16 +314,17 @@ async function contractCompile (source, options = {}) {
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
  * @param {String[]} ids The list of id's to prepend
+ * @param {Object} [opt={}] options
  * @return {Promise<String>} Signature in hex representation
  */
-const delegateSignatureCommon = async (ids = []) => {
+const delegateSignatureCommon = async (ids = [], opt = {}) => {
   return this.sign(Buffer.concat(
     [
       Buffer.from(this.getNetworkId()),
-      decode(await this.address()),
+      decode(await this.address(opt)),
       ...ids.map(decode)
     ]
-  )).toString('hex')
+  ), opt).toString('hex')
 }
 /**
  * Helper to generate a signature to delegate a name pre-claim to a contract.
@@ -363,7 +364,35 @@ const delegateNameTransferSignature = async ([contractId, name]) => this.delegat
  * @param {String} name The name being revoked
  * @return {Promise<String>} Signature for delegation
  */
-const delegateNameNameRevokeSignature = async ([contractId, name]) => this.delegateSignatureCommon([produceNameId(name), contractId])
+const delegateNameRevokeSignature = async ([contractId, name]) => this.delegateSignatureCommon([produceNameId(name), contractId])
+/**
+ * Helper to generate a signature to delegate a Oracle register to a contract.
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/contract
+ * @category async
+ * @param {String} contractId Contract Id
+ * @return {Promise<String>} Signature for delegation
+ */
+const delegateOracleRegisterSignature = async ([contractId]) => this.delegateSignatureCommon([contractId])
+/**
+ * Helper to generate a signature to delegate a Oracle extend to a contract.
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/contract
+ * @category async
+ * @param {String} contractId Contract Id
+ * @return {Promise<String>} Signature for delegation
+ */
+const delegateOracleExtendSignature = async ([contractId]) => this.delegateSignatureCommon([contractId])
+/**
+ * Helper to generate a signature to delegate a Oracle respond to a contract.
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/contract
+ * @category async
+ * @param {String} queryId Oracle Query Id
+ * @param {String} contractId Contract Id
+ * @return {Promise<String>} Signature for delegation
+ */
+const delegateOracleRespondSignature = async ([queryId, contractId]) => this.delegateSignatureCommon([queryId, contractId])
 
 /**
  * Contract Stamp
@@ -404,11 +433,17 @@ export const ContractAPI = Ae.compose(ContractBase, ContractACI, {
     contractDecodeData,
     dryRunContractTx,
     handleCallError,
+    // Delegation for contract
+    // AENS
     delegateSignatureCommon,
     delegateNamePreclaimSignature,
     delegateNameClaimSignature,
     delegateNameTransferSignature,
-    delegateNameNameRevokeSignature
+    delegateNameRevokeSignature,
+    // Oracle
+    delegateOracleRegisterSignature,
+    delegateOracleExtendSignature,
+    delegateOracleRespondSignature
   },
   deepProps: {
     Ae: {
