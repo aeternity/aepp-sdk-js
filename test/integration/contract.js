@@ -134,12 +134,6 @@ describe('Contract', function () {
     const code = await contract.contractCompile(identityContract)
     return contract.contractDeploy(code.bytecode, identityContract).should.eventually.have.property('address')
   })
-  it.skip('Events', async () => {
-    const cInstance = await contract.getContractInstance(testContract, { filesystem })
-    await cInstance.deploy(['test', 1, 'some'])
-    const eventResult = await cInstance.methods.emitEvents()
-  })
-
   it('compiles Sophia code', async () => {
     bytecode = await contract.contractCompile(identityContract)
     return bytecode.should.have.property('bytecode')
@@ -382,6 +376,43 @@ describe('Contract', function () {
 
   describe('Contract ACI Interface', function () {
     let contractObject
+    describe('Events parsing', async () => {
+      let cInstance
+      let eventResult
+      before(async () => {
+        cInstance = await contract.getContractInstance(testContract, { filesystem })
+        await cInstance.deploy(['test', 1, 'some'])
+        eventResult = await cInstance.methods.emitEvents()
+        console.log(eventResult.decodedEvents)
+      })
+      const events = [
+        { name: 'AnotherEvent2', types: ['string', 'boolean', 'number'] },
+        { name: 'AnotherEvent', types: ['string', 'contractAddress'] },
+        { name: 'TheFirstEvent', types: ['number'] }
+      ]
+      events
+        .forEach((el, i) => {
+          it(`Correct parse of ${el.name}(${el.types})`, () => {
+            console.log('in IT statement')
+            const s = eventResult.decodedEvents[i]
+            el.name.should.be.equal(s.name)
+            el.types.forEach((t, tIndex) => {
+              const value = s.decoded[tIndex]
+              switch (t) {
+                case 'contractAddress':
+                  // console.log('contractAddress check')
+                  s.address.should.be.equal(`ct_${value}`)
+                  break
+                default:
+                  // console.log(`Value -> ${value}`)
+                  // console.log(`Type -> ${t}`)
+                  const v = typeof value === t
+                  v.should.be.equal(true)
+              }
+            })
+          })
+        })
+    })
 
     it('Generate ACI object', async () => {
       contractObject = await contract.getContractInstance(testContract, { filesystem, opt: { ttl: 0 } })

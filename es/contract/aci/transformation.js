@@ -192,7 +192,12 @@ export function transformDecodedEvents (events, fnACI) {
       .reduce(
         (acc, el) => {
           if (el.nameHash === hexHash) {
-            return { schema: el.value.filter(e => e !== 'string'), isHasNonIndexed: el.value.includes('string') }
+            l.name = el.name
+            return {
+              schema: el.value.filter(e => e !== 'string'),
+              isHasNonIndexed: el.value.includes('string'),
+              name: el.name
+            }
           }
           return acc
         },
@@ -217,7 +222,7 @@ function transformEvent (event, type) {
     case SOPHIA_TYPES.hash:
       return toBytes(event, true).toString('hex')
     case SOPHIA_TYPES.address:
-      return addressFromDecimal(event).slice(3)
+      return addressFromDecimal(event).slice(2)
     default:
       return event
   }
