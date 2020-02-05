@@ -224,8 +224,6 @@ function transformEvent (event, type) {
   switch (type) {
     case SOPHIA_TYPES.bool:
       return !!event
-    case SOPHIA_TYPES.string:
-      return toBytes(event, true).toString()
     case SOPHIA_TYPES.hash:
       return toBytes(event, true).toString('hex')
     case SOPHIA_TYPES.address:
