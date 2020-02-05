@@ -338,11 +338,11 @@ async function delegateSignatureCommon (ids = [], opt = {}) {
       [
         Buffer.from(this.getNetworkId()),
         decode(await this.address(opt)),
-        ...ids.map(decode)
+        ...ids.map(e => decode(e))
       ]
     ),
     opt
-  ).toString('hex')
+  ).then(s => Buffer.from(s).toString('hex'))
 }
 
 /**
@@ -353,8 +353,8 @@ async function delegateSignatureCommon (ids = [], opt = {}) {
  * @param {String} contractId Contract Id
  * @return {Promise<String>} Signature for delegation
  */
-async function delegateNamePreclaimSignature (contractId) {
-  return this.delegateSignatureCommon([contractId])
+async function delegateNamePreclaimSignature (contractId, opt) {
+  return this.delegateSignatureCommon([contractId], opt)
 }
 
 /**
@@ -366,8 +366,8 @@ async function delegateNamePreclaimSignature (contractId) {
  * @param {String} contractId Contract Id
  * @return {Promise<String>} Signature for delegation
  */
-async function delegateNameClaimSignature (contractId, name) {
-  return this.delegateSignatureCommon([produceNameId(name), contractId])
+async function delegateNameClaimSignature (contractId, name, opt) {
+  return this.delegateSignatureCommon([produceNameId(name), contractId], opt)
 }
 
 /**
@@ -379,8 +379,8 @@ async function delegateNameClaimSignature (contractId, name) {
  * @param {String} name The name being transferred
  * @return {Promise<String>} Signature for delegation
  */
-async function delegateNameTransferSignature ([contractId, name]) {
-  return this.delegateSignatureCommon([produceNameId(name), contractId])
+async function delegateNameTransferSignature (contractId, name, opt) {
+  return this.delegateSignatureCommon([produceNameId(name), contractId], opt)
 }
 
 /**
@@ -392,8 +392,8 @@ async function delegateNameTransferSignature ([contractId, name]) {
  * @param {String} name The name being revoked
  * @return {Promise<String>} Signature for delegation
  */
-async function delegateNameRevokeSignature ([contractId, name]) {
-  return this.delegateSignatureCommon([produceNameId(name), contractId])
+async function delegateNameRevokeSignature (contractId, name, opt) {
+  return this.delegateSignatureCommon([produceNameId(name), contractId], opt)
 }
 
 /**
@@ -404,8 +404,8 @@ async function delegateNameRevokeSignature ([contractId, name]) {
  * @param {String} contractId Contract Id
  * @return {Promise<String>} Signature for delegation
  */
-async function delegateOracleRegisterSignature ([contractId]) {
-  return this.delegateSignatureCommon([contractId])
+async function delegateOracleRegisterSignature (contractId, opt) {
+  return this.delegateSignatureCommon([contractId], opt)
 }
 
 /**
@@ -416,8 +416,8 @@ async function delegateOracleRegisterSignature ([contractId]) {
  * @param {String} contractId Contract Id
  * @return {Promise<String>} Signature for delegation
  */
-async function delegateOracleExtendSignature ([contractId]) {
-  return this.delegateSignatureCommon([contractId])
+async function delegateOracleExtendSignature (contractId, opt) {
+  return this.delegateSignatureCommon([contractId], opt)
 }
 
 /**
@@ -429,8 +429,8 @@ async function delegateOracleExtendSignature ([contractId]) {
  * @param {String} contractId Contract Id
  * @return {Promise<String>} Signature for delegation
  */
-async function delegateOracleRespondSignature ([queryId, contractId]) {
-  return this.delegateSignatureCommon([queryId, contractId])
+async function delegateOracleRespondSignature (queryId, contractId, opt) {
+  return this.delegateSignatureCommon([queryId, contractId], opt)
 }
 
 /**

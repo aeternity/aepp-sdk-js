@@ -21,7 +21,7 @@ import * as R from 'ramda'
 import { generateKeyPair } from '../../es/utils/crypto'
 import { buildContractId, classify, computeAuctionEndBlock, computeBidFee } from '../../es/tx/builder/helpers'
 
-function randomName (length, namespace = '.chain') {
+export function randomName (length, namespace = '.chain') {
   return randomString(length) + namespace
 }
 

@@ -17,10 +17,10 @@
 import Compiler from '../../es/contract/compiler'
 import { describe, it, before } from 'mocha'
 import { BaseAe, configure, plan, ready, compilerUrl } from './'
-import { commitmentHash, decode } from '../../es/tx/builder/helpers'
+import { decode } from '../../es/tx/builder/helpers'
 
 import * as R from 'ramda'
-import { salt } from '../../es/utils/crypto'
+import { randomName } from './aens'
 
 const identityContract = `
 contract Identity =
@@ -132,8 +132,9 @@ const encodedNumberSix = 'cb_DA6sWJo='
 const filesystem = {
   testLib: libContract
 }
-plan('1000000000000000000000')
 
+plan('1000000000000000000000')
+const pause = async (timeout = 1000) => (new Promise((resolve, reject) => { setTimeout(resolve, timeout) }))
 describe('Contract', function () {
   configure(this)
 
@@ -144,19 +145,51 @@ describe('Contract', function () {
   before(async function () {
     contract = await ready(this, true, true)
   })
-  describe.only('Aens and Oracle operation delegation', () => {
+  describe('Aens and Oracle operation delegation', () => {
     let cInstance
     before(async () => {
       cInstance = await contract.getContractInstance(aensDelegationContract)
       await cInstance.deploy()
     })
     it('Delegate AENS operations', async () => {
-      const name = 'delegatedNameTest.chain'
-      const _salt = salt()
-      const commitmentId = commitmentHash(name, _salt)
-      const sig = await contract.delegateNamePreclaimSignature(cInstance.deployInfo.address)
-      console.log(`Commitment -> ${commitmentId}, sig -> ${sig}`)
-      console.log(await cInstance.signedPreclaim(await contract.address(), commitmentId, sig))
+      const name = randomName(15)
+      const contractAddress = cInstance.deployInfo.address
+      const nameFee = 20 * (10 ** 18) // 20 AE
+      const current = await contract.address()
+
+      // preclaim
+      const { salt: _salt } = await contract.aensPreclaim(name)
+      // @TODO enable after next HF
+      // const commitmentId = commitmentHash(name, _salt)
+      // const preclaimSig = await contract.delegateNamePreclaimSignature(contractAddress)
+      // console.log(`preclaimSig -> ${preclaimSig}`)
+      // const preclaim = await cInstance.methods.signedPreclaim(await contract.address(), commitmentId, preclaimSig)
+      // preclaim.result.returnType.should.be.equal('ok')
+      await pause(1000)
+      // claim
+      const claimSig = await contract.delegateNameClaimSignature(contractAddress, name)
+      const claim = await cInstance.methods.signedClaim(await contract.address(), name, _salt, nameFee, claimSig)
+      claim.result.returnType.should.be.equal('ok')
+      await pause(3000)
+
+      // transfer
+      const transferSig = await contract.delegateNameTransferSignature(contractAddress, name)
+      const onAccount = contract.addresses().find(acc => acc !== current)
+      const transfer = await cInstance.methods.signedTransfer(await contract.address(), onAccount, name, transferSig)
+      transfer.result.returnType.should.be.equal('ok')
+
+      await pause(3000)
+      // revoke
+      const revokeSig = await contract.delegateNameRevokeSignature(contractAddress, name, { onAccount })
+      const revoke = await cInstance.methods.signedRevoke(onAccount, name, revokeSig)
+      revoke.result.returnType.should.be.equal('ok')
+
+      try {
+        await contract.aensQuery(name)
+      } catch (e) {
+        console.log(e.code)
+        e.message.should.be.an('string')
+      }
     })
   })
   it('precompiled bytecode can be deployed', async () => {
