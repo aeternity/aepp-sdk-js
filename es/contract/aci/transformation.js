@@ -114,7 +114,7 @@ export function transform (type, value, { bindings } = {}) {
     case SOPHIA_TYPES.hash:
     case SOPHIA_TYPES.bytes:
     case SOPHIA_TYPES.signature:
-      if (value.split('_')[0].length === 2) return `#${decode(value).toString('hex')}`
+      if (typeof value === 'string' && value.split('_')[0].length === 2) return `#${decode(value).toString('hex')}`
       return `#${typeof value === 'string' ? value : Buffer.from(value).toString('hex')}`
     case SOPHIA_TYPES.record:
       return `{${generic.reduce(
