@@ -38,7 +38,6 @@ import NodePool from '../node-pool'
 import { AMOUNT, DEPOSIT, DRY_RUN_ACCOUNT, GAS, MIN_GAS_PRICE } from '../tx/builder/schema'
 import { decode, produceNameId } from '../tx/builder/helpers'
 
-
 function sendAndProcess (tx, options) {
   return async function (onSuccess, onError) {
     // Send transaction and get transaction info
