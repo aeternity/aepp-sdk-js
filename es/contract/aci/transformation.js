@@ -222,7 +222,7 @@ function transformEvent (event, type) {
     case SOPHIA_TYPES.hash:
       return toBytes(event, true).toString('hex')
     case SOPHIA_TYPES.address:
-      return addressFromDecimal(event).slice(2)
+      return addressFromDecimal(event).split('_')[1]
     default:
       return event
   }
