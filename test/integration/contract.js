@@ -17,9 +17,10 @@
 import Compiler from '../../es/contract/compiler'
 import { describe, it, before } from 'mocha'
 import { BaseAe, configure, plan, ready, compilerUrl } from './'
-import { decode } from '../../es/tx/builder/helpers'
+import { commitmentHash, decode } from '../../es/tx/builder/helpers'
 
 import * as R from 'ramda'
+import { salt } from '../../es/utils/crypto'
 
 const identityContract = `
 contract Identity =
@@ -105,7 +106,28 @@ contract StateContract =
       Right(_)   => abort("asdasd")
       Both(x, _) => x
 `
-
+const aensDelegationContract = `
+contract DelegateTest =
+  // Transactions
+  stateful payable entrypoint signedPreclaim(addr  : address,
+                                             chash : hash,
+                                             sign  : signature) : unit =
+    AENS.preclaim(addr, chash, signature = sign)
+  stateful entrypoint signedClaim(addr : address,
+                                name : string,
+                                salt : int,
+                                name_fee : int,
+                                sign : signature) : unit =
+    AENS.claim(addr, name, salt, name_fee, signature = sign)
+  stateful entrypoint signedTransfer(owner     : address,
+                                   new_owner : address,
+                                   name      : string,
+                                   sign      : signature) : unit =
+    AENS.transfer(owner, new_owner, name, signature = sign)
+  stateful entrypoint signedRevoke(owner     : address,
+                                   name      : string,
+                                   sign      : signature) : unit =
+    AENS.revoke(owner, name, signature = sign)`
 const encodedNumberSix = 'cb_DA6sWJo='
 const filesystem = {
   testLib: libContract
@@ -122,7 +144,21 @@ describe('Contract', function () {
   before(async function () {
     contract = await ready(this, true, true)
   })
-
+  describe.only('Aens and Oracle operation delegation', () => {
+    let cInstance
+    before(async () => {
+      cInstance = await contract.getContractInstance(aensDelegationContract)
+      await cInstance.deploy()
+    })
+    it('Delegate AENS operations', async () => {
+      const name = 'delegatedNameTest.chain'
+      const _salt = salt()
+      const commitmentId = commitmentHash(name, _salt)
+      const sig = await contract.delegateNamePreclaimSignature(cInstance.deployInfo.address)
+      console.log(`Commitment -> ${commitmentId}, sig -> ${sig}`)
+      console.log(await cInstance.signedPreclaim(await contract.address(), commitmentId, sig))
+    })
+  })
   it('precompiled bytecode can be deployed', async () => {
     const { version, consensusProtocolVersion } = contract.getNodeInfo()
     console.log(`Node => ${version}, consensus => ${consensusProtocolVersion}, compiler => ${contract.compilerVersion}`)

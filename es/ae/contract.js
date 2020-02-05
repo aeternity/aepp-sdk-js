@@ -38,6 +38,7 @@ import NodePool from '../node-pool'
 import { AMOUNT, DEPOSIT, DRY_RUN_ACCOUNT, GAS, MIN_GAS_PRICE } from '../tx/builder/schema'
 import { decode, produceNameId } from '../tx/builder/helpers'
 
+
 function sendAndProcess (tx, options) {
   return async function (onSuccess, onError) {
     // Send transaction and get transaction info
@@ -67,12 +68,19 @@ async function handleCallError (result) {
   const error = Buffer.from(result.returnValue).toString()
   if (isBase64(error.slice(3))) {
     const decodedError = Buffer.from(error.slice(3), 'base64').toString()
-    throw Object.assign(Error(`Invocation failed: ${error}. Decoded: ${decodedError}`), R.merge(result, { error, decodedError }))
+    throw Object.assign(Error(`Invocation failed: ${error}. Decoded: ${decodedError}`), R.merge(result, {
+      error,
+      decodedError
+    }))
   }
 
   const decodedError = await this.contractDecodeDataAPI('string', error)
-  throw Object.assign(Error(`Invocation failed: ${error}. Decoded: ${decodedError}`), R.merge(result, { error, decodedError }))
+  throw Object.assign(Error(`Invocation failed: ${error}. Decoded: ${decodedError}`), R.merge(result, {
+    error,
+    decodedError
+  }))
 }
+
 /**
  * Encode call data for contract call
  * @function
@@ -274,7 +282,10 @@ async function contractDeploy (code, source, initState = [], options = {}) {
       txData,
       address: contractId,
       call: async (name, args = [], options = {}) => this.contractCall(source, contractId, name, args, R.merge(opt, options)),
-      callStatic: async (name, args = [], options = {}) => this.contractCallStatic(source, contractId, name, args, { ...options, options: { onAccount: opt.onAccount, ...R.merge(opt, options.options) } }),
+      callStatic: async (name, args = [], options = {}) => this.contractCallStatic(source, contractId, name, args, {
+        ...options,
+        options: { onAccount: opt.onAccount, ...R.merge(opt, options.options) }
+      }),
       createdAt: new Date()
     })
   )
@@ -304,7 +315,11 @@ async function contractCompile (source, options = {}) {
   return Object.freeze(Object.assign({
     encodeCall: async (name, args) => this.contractEncodeCall(source, name, args, R.merge(opt, options)),
     deploy: async (init, options = {}) => this.contractDeploy(bytecode, source, init, R.merge(opt, options)),
-    deployStatic: async (init, options = {}) => this.contractCallStatic(source, null, 'init', init, { bytecode, top: options.top, options: R.merge(opt, options) })
+    deployStatic: async (init, options = {}) => this.contractCallStatic(source, null, 'init', init, {
+      bytecode,
+      top: options.top,
+      options: R.merge(opt, options)
+    })
   }, { bytecode }))
 }
 
@@ -317,15 +332,19 @@ async function contractCompile (source, options = {}) {
  * @param {Object} [opt={}] options
  * @return {Promise<String>} Signature in hex representation
  */
-const delegateSignatureCommon = async (ids = [], opt = {}) => {
-  return this.sign(Buffer.concat(
-    [
-      Buffer.from(this.getNetworkId()),
-      decode(await this.address(opt)),
-      ...ids.map(decode)
-    ]
-  ), opt).toString('hex')
+async function delegateSignatureCommon (ids = [], opt = {}) {
+  return this.sign(
+    Buffer.concat(
+      [
+        Buffer.from(this.getNetworkId()),
+        decode(await this.address(opt)),
+        ...ids.map(decode)
+      ]
+    ),
+    opt
+  ).toString('hex')
 }
+
 /**
  * Helper to generate a signature to delegate a name pre-claim to a contract.
  * @function
@@ -334,7 +353,10 @@ const delegateSignatureCommon = async (ids = [], opt = {}) => {
  * @param {String} contractId Contract Id
  * @return {Promise<String>} Signature for delegation
  */
-const delegateNamePreclaimSignature = async (contractId) => this.delegateSignatureCommon([contractId])
+async function delegateNamePreclaimSignature (contractId) {
+  return this.delegateSignatureCommon([contractId])
+}
+
 /**
  * Helper to generate a signature to delegate a name claim to a contract.
  * @function
@@ -344,7 +366,10 @@ const delegateNamePreclaimSignature = async (contractId) => this.delegateSignatu
  * @param {String} contractId Contract Id
  * @return {Promise<String>} Signature for delegation
  */
-const delegateNameClaimSignature = async (contractId, name) => this.delegateSignatureCommon([produceNameId(name), contractId])
+async function delegateNameClaimSignature (contractId, name) {
+  return this.delegateSignatureCommon([produceNameId(name), contractId])
+}
+
 /**
  * Helper to generate a signature to delegate a name transfer to a contract.
  * @function
@@ -354,7 +379,10 @@ const delegateNameClaimSignature = async (contractId, name) => this.delegateSign
  * @param {String} name The name being transferred
  * @return {Promise<String>} Signature for delegation
  */
-const delegateNameTransferSignature = async ([contractId, name]) => this.delegateSignatureCommon([produceNameId(name), contractId])
+async function delegateNameTransferSignature ([contractId, name]) {
+  return this.delegateSignatureCommon([produceNameId(name), contractId])
+}
+
 /**
  * Helper to generate a signature to delegate a name revoke to a contract.
  * @function
@@ -364,7 +392,10 @@ const delegateNameTransferSignature = async ([contractId, name]) => this.delegat
  * @param {String} name The name being revoked
  * @return {Promise<String>} Signature for delegation
  */
-const delegateNameRevokeSignature = async ([contractId, name]) => this.delegateSignatureCommon([produceNameId(name), contractId])
+async function delegateNameRevokeSignature ([contractId, name]) {
+  return this.delegateSignatureCommon([produceNameId(name), contractId])
+}
+
 /**
  * Helper to generate a signature to delegate a Oracle register to a contract.
  * @function
@@ -373,7 +404,10 @@ const delegateNameRevokeSignature = async ([contractId, name]) => this.delegateS
  * @param {String} contractId Contract Id
  * @return {Promise<String>} Signature for delegation
  */
-const delegateOracleRegisterSignature = async ([contractId]) => this.delegateSignatureCommon([contractId])
+async function delegateOracleRegisterSignature ([contractId]) {
+  return this.delegateSignatureCommon([contractId])
+}
+
 /**
  * Helper to generate a signature to delegate a Oracle extend to a contract.
  * @function
@@ -382,7 +416,10 @@ const delegateOracleRegisterSignature = async ([contractId]) => this.delegateSig
  * @param {String} contractId Contract Id
  * @return {Promise<String>} Signature for delegation
  */
-const delegateOracleExtendSignature = async ([contractId]) => this.delegateSignatureCommon([contractId])
+async function delegateOracleExtendSignature ([contractId]) {
+  return this.delegateSignatureCommon([contractId])
+}
+
 /**
  * Helper to generate a signature to delegate a Oracle respond to a contract.
  * @function
@@ -392,7 +429,9 @@ const delegateOracleExtendSignature = async ([contractId]) => this.delegateSigna
  * @param {String} contractId Contract Id
  * @return {Promise<String>} Signature for delegation
  */
-const delegateOracleRespondSignature = async ([queryId, contractId]) => this.delegateSignatureCommon([queryId, contractId])
+async function delegateOracleRespondSignature ([queryId, contractId]) {
+  return this.delegateSignatureCommon([queryId, contractId])
+}
 
 /**
  * Contract Stamp
