@@ -173,11 +173,12 @@ export function transformMap (value, generic, { bindings }) {
 
 /**
  * Transform decoded event to JS type
- * @param events
- * @param fnACI
- * @return {*}
+ * @param {Object[]} events Array of events
+ * @param {Object} fnACI SC function ACI schema
+ * @param {Object} [options={}] Options
+ * @return {Object}
  */
-export function transformDecodedEvents (events, fnACI) {
+export function transformDecodedEvents (events, fnACI, options = {}) {
   if (!events.length) return []
 
   const eventsSchema = fnACI.event.map(e => {
@@ -213,6 +214,12 @@ export function transformDecodedEvents (events, fnACI) {
   })
 }
 
+/**
+ * Transform Event based on type
+ * @param {String|Number} event Event data
+ * @param {String} type Event type from schema
+ * @return {*}
+ */
 function transformEvent (event, type) {
   switch (type) {
     case SOPHIA_TYPES.bool:
