@@ -36,6 +36,7 @@ import ContractACI from '../contract/aci'
 import BigNumber from 'bignumber.js'
 import NodePool from '../node-pool'
 import { AMOUNT, DEPOSIT, DRY_RUN_ACCOUNT, GAS, MIN_GAS_PRICE } from '../tx/builder/schema'
+import { decode, produceNameId } from '../tx/builder/helpers'
 
 function sendAndProcess (tx, options) {
   return async function (onSuccess, onError) {
@@ -308,6 +309,63 @@ async function contractCompile (source, options = {}) {
 }
 
 /**
+ * Utility method to create a delegate signature for a contract
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/contract
+ * @category async
+ * @param {String[]} ids The list of id's to prepend
+ * @return {Promise<String>} Signature in hex representation
+ */
+const delegateSignatureCommon = async (ids = []) => {
+  return this.sign(Buffer.concat(
+    [
+      Buffer.from(this.getNetworkId()),
+      decode(await this.address()),
+      ...ids.map(decode)
+    ]
+  )).toString('hex')
+}
+/**
+ * Helper to generate a signature to delegate a name pre-claim to a contract.
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/contract
+ * @category async
+ * @param {String} contractId Contract Id
+ * @return {Promise<String>} Signature for delegation
+ */
+const delegateNamePreclaimSignature = async (contractId) => this.delegateSignatureCommon([contractId])
+/**
+ * Helper to generate a signature to delegate a name claim to a contract.
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/contract
+ * @category async
+ * @param {String} name The name being claimed
+ * @param {String} contractId Contract Id
+ * @return {Promise<String>} Signature for delegation
+ */
+const delegateNameClaimSignature = async (contractId, name) => this.delegateSignatureCommon([produceNameId(name), contractId])
+/**
+ * Helper to generate a signature to delegate a name transfer to a contract.
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/contract
+ * @category async
+ * @param {String} contractId Contract Id
+ * @param {String} name The name being transferred
+ * @return {Promise<String>} Signature for delegation
+ */
+const delegateNameTransferSignature = async ([contractId, name]) => this.delegateSignatureCommon([produceNameId(name), contractId])
+/**
+ * Helper to generate a signature to delegate a name revoke to a contract.
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/contract
+ * @category async
+ * @param {String} contractId Contract Id
+ * @param {String} name The name being revoked
+ * @return {Promise<String>} Signature for delegation
+ */
+const delegateNameNameRevokeSignature = async ([contractId, name]) => this.delegateSignatureCommon([produceNameId(name), contractId])
+
+/**
  * Contract Stamp
  *
  * Provide contract implementation
@@ -345,7 +403,12 @@ export const ContractAPI = Ae.compose(ContractBase, ContractACI, {
     contractEncodeCall,
     contractDecodeData,
     dryRunContractTx,
-    handleCallError
+    handleCallError,
+    delegateSignatureCommon,
+    delegateNamePreclaimSignature,
+    delegateNameClaimSignature,
+    delegateNameTransferSignature,
+    delegateNameNameRevokeSignature
   },
   deepProps: {
     Ae: {
