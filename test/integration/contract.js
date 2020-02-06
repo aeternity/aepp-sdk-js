@@ -128,6 +128,30 @@ contract DelegateTest =
                                    name      : string,
                                    sign      : signature) : unit =
     AENS.revoke(owner, name, signature = sign)`
+const oracleContract = `
+contract DelegateTest =
+  type fee = int
+  type ttl = Chain.ttl
+  type query_t  = string
+  type answer_t = int
+  type oracle_id = oracle(query_t, answer_t)
+  type query_id  = oracle_query(query_t, answer_t)
+  stateful payable entrypoint signedRegisterOracle(acct : address,
+                                                   sign : signature,
+                                                   qfee : fee,
+                                                   ttl  : ttl) : oracle_id =
+     Oracle.register(acct, qfee, ttl, signature = sign)
+  stateful payable entrypoint signedExtendOracle(o    : oracle_id,
+                                                 sign : signature,   // Signed oracle address
+                                                 ttl  : ttl) : unit =
+    Oracle.extend(o, signature = sign, ttl)
+  datatype complexQuestion = Why(int) | How(string)
+  datatype complexAnswer   = NoAnswer | Answer(complexQuestion, string, int)
+  stateful entrypoint signedComplexOracle(question, sig) =
+    let o = Oracle.register(signature = sig, Contract.address, 0, FixedTTL(1000)) : oracle(complexQuestion, complexAnswer)
+    let q = Oracle.query(o, question, 0, RelativeTTL(100), RelativeTTL(100))
+    Oracle.respond(o, q, Answer(question, "magic", 1337), signature = sig)
+    Oracle.get_answer(o, q)`
 const encodedNumberSix = 'cb_DA6sWJo='
 const filesystem = {
   testLib: libContract
@@ -146,9 +170,12 @@ describe('Contract', function () {
   })
   describe('Aens and Oracle operation delegation', () => {
     let cInstance
+    let cInstanceOracle
     before(async () => {
       cInstance = await contract.getContractInstance(aensDelegationContract)
-      await cInstance.deploy()
+      cInstanceOracle = await contract.getContractInstance(oracleContract)
+      // await cInstance.deploy()
+      await cInstanceOracle.deploy()
     })
     it('Delegate AENS operations', async () => {
       const name = randomName(15)
@@ -188,6 +215,19 @@ describe('Contract', function () {
       } catch (e) {
         e.message.should.be.an('string')
       }
+    })
+    it('Delegate Oracle operations', async () => {
+      const contractAddress = cInstanceOracle.deployInfo.address
+      const address = await contract.address()
+      const qFee = 10 ** 18
+      const ttl = 'RelativeTTL(50)'
+      const oracleId = `ok_${address.slice(3)}`
+
+      const sig = await contract.delegateOracleRegisterSignature(contractAddress)
+      const queryRegister = await cInstanceOracle.methods.signedRegisterOracle(address, sig, qFee, ttl)
+      queryRegister.result.returnType.should.be.equal('ok')
+      const oracle = await contract.getOracleObject(oracleId)
+      oracle.id.should.be.equal(oracleId)
     })
   })
   it('precompiled bytecode can be deployed', async () => {

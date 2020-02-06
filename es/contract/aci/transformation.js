@@ -18,7 +18,7 @@ export const SOPHIA_TYPES = [
   'signature',
   'bytes',
   'variant'
-].reduce((acc, type) => ({ ...acc, [type]: type }), {})
+].reduce((acc, type) => ({ ...acc, [type]: type }), { ChainTtl: 'Chain.ttl' })
 
 export function injectVars (t, aciType) {
   const [[baseType, generic]] = Object.entries(aciType.typedef)
@@ -99,6 +99,8 @@ export function transform (type, value, { bindings } = {}) {
   const { t, generic } = readType(type, { bindings })
 
   switch (t) {
+    case SOPHIA_TYPES.ChainTtl:
+      return `${value}`
     case SOPHIA_TYPES.string:
       return `"${value}"`
     case SOPHIA_TYPES.list:
@@ -244,7 +246,7 @@ export function transformDecodedData (aci, result, { skipTransformDecoded = fals
 export function prepareSchema (type, { bindings } = {}) {
   let { t, generic } = readType(type, { bindings })
 
-  if (!Object.keys(SOPHIA_TYPES).includes(t)) t = SOPHIA_TYPES.address // Handle Contract address transformation
+  if (!Object.values(SOPHIA_TYPES).includes(t)) t = SOPHIA_TYPES.address // Handle Contract address transformation
   switch (t) {
     case SOPHIA_TYPES.int:
       return Joi.number().error(getJoiErrorMsg)
@@ -266,6 +268,8 @@ export function prepareSchema (type, { bindings } = {}) {
             {})
         ).or(...generic.map(e => Object.keys(e)[0]))
       ])
+    case SOPHIA_TYPES.ChainTtl:
+      return Joi.string().error(getJoiErrorMsg)
     case SOPHIA_TYPES.string:
       return Joi.string().error(getJoiErrorMsg)
     case SOPHIA_TYPES.address:
