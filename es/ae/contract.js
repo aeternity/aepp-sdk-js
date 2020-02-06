@@ -329,6 +329,7 @@ async function contractCompile (source, options = {}) {
  * @category async
  * @param {String[]} ids The list of id's to prepend
  * @param {Object} [opt={}] options
+ * @param {{ onAccount: String | Object }} [opt={}] opt Options
  * @return {Promise<String>} Signature in hex representation
  */
 async function delegateSignatureCommon (ids = [], opt = {}) {
@@ -350,9 +351,10 @@ async function delegateSignatureCommon (ids = [], opt = {}) {
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
  * @param {String} contractId Contract Id
+ * @param {{ onAccount: String | Object }} [opt={}] opt Options
  * @return {Promise<String>} Signature for delegation
  */
-async function delegateNamePreclaimSignature (contractId, opt) {
+async function delegateNamePreclaimSignature (contractId, opt = {}) {
   return this.delegateSignatureCommon([contractId], opt)
 }
 
@@ -363,9 +365,10 @@ async function delegateNamePreclaimSignature (contractId, opt) {
  * @category async
  * @param {String} name The name being claimed
  * @param {String} contractId Contract Id
+ * @param {{ onAccount: String | Object }} [opt={}] opt Options
  * @return {Promise<String>} Signature for delegation
  */
-async function delegateNameClaimSignature (contractId, name, opt) {
+async function delegateNameClaimSignature (contractId, name, opt = {}) {
   return this.delegateSignatureCommon([produceNameId(name), contractId], opt)
 }
 
@@ -376,9 +379,10 @@ async function delegateNameClaimSignature (contractId, name, opt) {
  * @category async
  * @param {String} contractId Contract Id
  * @param {String} name The name being transferred
+ * @param {{ onAccount: String | Object }} [opt={}] opt Options
  * @return {Promise<String>} Signature for delegation
  */
-async function delegateNameTransferSignature (contractId, name, opt) {
+async function delegateNameTransferSignature (contractId, name, opt = {}) {
   return this.delegateSignatureCommon([produceNameId(name), contractId], opt)
 }
 
@@ -389,9 +393,10 @@ async function delegateNameTransferSignature (contractId, name, opt) {
  * @category async
  * @param {String} contractId Contract Id
  * @param {String} name The name being revoked
+ * @param {{ onAccount: String | Object }} [opt={}] opt Options
  * @return {Promise<String>} Signature for delegation
  */
-async function delegateNameRevokeSignature (contractId, name, opt) {
+async function delegateNameRevokeSignature (contractId, name, opt = {}) {
   return this.delegateSignatureCommon([produceNameId(name), contractId], opt)
 }
 
@@ -401,9 +406,10 @@ async function delegateNameRevokeSignature (contractId, name, opt) {
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
  * @param {String} contractId Contract Id
+ * @param {{ onAccount: String | Object }} [opt={}] opt Options
  * @return {Promise<String>} Signature for delegation
  */
-async function delegateOracleRegisterSignature (contractId, opt) {
+async function delegateOracleRegisterSignature (contractId, opt = {}) {
   return this.delegateSignatureCommon([contractId], opt)
 }
 
@@ -413,9 +419,10 @@ async function delegateOracleRegisterSignature (contractId, opt) {
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
  * @param {String} contractId Contract Id
+ * @param {{ onAccount: String | Object }} [opt={}] opt Options
  * @return {Promise<String>} Signature for delegation
  */
-async function delegateOracleExtendSignature (contractId, opt) {
+async function delegateOracleExtendSignature (contractId, opt = {}) {
   return this.delegateSignatureCommon([contractId], opt)
 }
 
@@ -426,9 +433,10 @@ async function delegateOracleExtendSignature (contractId, opt) {
  * @category async
  * @param {String} queryId Oracle Query Id
  * @param {String} contractId Contract Id
+ * @param {{ onAccount: String | Object }} [opt={}] opt Options
  * @return {Promise<String>} Signature for delegation
  */
-async function delegateOracleRespondSignature (queryId, contractId, opt) {
+async function delegateOracleRespondSignature (queryId, contractId, opt = {}) {
   return this.delegateSignatureCommon([queryId, contractId], opt)
 }
 

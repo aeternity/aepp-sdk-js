@@ -160,8 +160,8 @@ describe('Contract', function () {
       const { salt: _salt } = await contract.aensPreclaim(name)
       // @TODO enable after next HF
       // const commitmentId = commitmentHash(name, _salt)
-      // const preclaimSig = await contract.delegateNamePreclaimSignature(contractAddress)
-      // console.log(`preclaimSig -> ${preclaimSig}`)
+      const preclaimSig = await contract.delegateNamePreclaimSignature(contractAddress)
+      console.log(`preclaimSig -> ${preclaimSig}`)
       // const preclaim = await cInstance.methods.signedPreclaim(await contract.address(), commitmentId, preclaimSig)
       // preclaim.result.returnType.should.be.equal('ok')
       await contract.awaitHeight((await contract.height()) + 2)
