@@ -174,7 +174,7 @@ describe('Contract', function () {
     before(async () => {
       cInstance = await contract.getContractInstance(aensDelegationContract)
       cInstanceOracle = await contract.getContractInstance(oracleContract)
-      // await cInstance.deploy()
+      await cInstance.deploy()
       await cInstanceOracle.deploy()
     })
     it('Delegate AENS operations', async () => {
@@ -218,13 +218,14 @@ describe('Contract', function () {
     })
     it('Delegate Oracle operations', async () => {
       const contractAddress = cInstanceOracle.deployInfo.address
-      const address = await contract.address()
+      const current = await contract.address()
+      const onAccount = contract.addresses().find(acc => acc !== current)
       const qFee = 10 ** 18
       const ttl = 'RelativeTTL(50)'
-      const oracleId = `ok_${address.slice(3)}`
+      const oracleId = `ok_${onAccount.slice(3)}`
 
-      const sig = await contract.delegateOracleRegisterSignature(contractAddress)
-      const queryRegister = await cInstanceOracle.methods.signedRegisterOracle(address, sig, qFee, ttl)
+      const sig = await contract.delegateOracleRegisterSignature(contractAddress, { onAccount })
+      const queryRegister = await cInstanceOracle.methods.signedRegisterOracle(onAccount, sig, qFee, ttl, { onAccount })
       queryRegister.result.returnType.should.be.equal('ok')
       const oracle = await contract.getOracleObject(oracleId)
       oracle.id.should.be.equal(oracleId)
