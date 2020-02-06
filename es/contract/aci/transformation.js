@@ -1,5 +1,6 @@
 import Joi from 'joi-browser'
 import { decode } from '../../tx/builder/helpers'
+import { isAeAddress, isHex } from '../../utils/string'
 
 export const SOPHIA_TYPES = [
   'int',
@@ -114,8 +115,11 @@ export function transform (type, value, { bindings } = {}) {
     case SOPHIA_TYPES.hash:
     case SOPHIA_TYPES.bytes:
     case SOPHIA_TYPES.signature:
-      if (typeof value === 'string' && value.split('_')[0].length === 2) return `#${decode(value).toString('hex')}`
-      return `#${typeof value === 'string' ? value : Buffer.from(value).toString('hex')}`
+      if (typeof value === 'string') {
+        if (isHex(value)) return `#${value}`
+        if (isAeAddress(value)) return `#${decode(value).toString('hex')}`
+      }
+      return `#${Buffer.from(value).toString('hex')}`
     case SOPHIA_TYPES.record:
       return `{${generic.reduce(
         (acc, { name, type }, i) => {
@@ -334,7 +338,7 @@ const JoiBinary = Joi.extend((joi) => ({
   base: joi.any(),
   pre (value, state, options) {
     if (options.convert && typeof value === 'string') {
-      if (value.split('_')[0].length === 2) {
+      if (isAeAddress(value)) {
         return decode(value)
       }
       try {

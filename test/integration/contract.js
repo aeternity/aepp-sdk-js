@@ -134,7 +134,6 @@ const filesystem = {
 }
 
 plan('1000000000000000000000')
-const pause = async (timeout = 1000) => (new Promise((resolve, reject) => { setTimeout(resolve, timeout) }))
 describe('Contract', function () {
   configure(this)
 
@@ -165,12 +164,12 @@ describe('Contract', function () {
       // console.log(`preclaimSig -> ${preclaimSig}`)
       // const preclaim = await cInstance.methods.signedPreclaim(await contract.address(), commitmentId, preclaimSig)
       // preclaim.result.returnType.should.be.equal('ok')
-      await pause(1000)
+      await contract.awaitHeight((await contract.height()) + 2)
       // claim
       const claimSig = await contract.delegateNameClaimSignature(contractAddress, name)
       const claim = await cInstance.methods.signedClaim(await contract.address(), name, _salt, nameFee, claimSig)
       claim.result.returnType.should.be.equal('ok')
-      await pause(3000)
+      await contract.awaitHeight((await contract.height()) + 2)
 
       // transfer
       const transferSig = await contract.delegateNameTransferSignature(contractAddress, name)
@@ -178,7 +177,7 @@ describe('Contract', function () {
       const transfer = await cInstance.methods.signedTransfer(await contract.address(), onAccount, name, transferSig)
       transfer.result.returnType.should.be.equal('ok')
 
-      await pause(3000)
+      await contract.awaitHeight((await contract.height()) + 2)
       // revoke
       const revokeSig = await contract.delegateNameRevokeSignature(contractAddress, name, { onAccount })
       const revoke = await cInstance.methods.signedRevoke(onAccount, name, revokeSig)
@@ -187,7 +186,6 @@ describe('Contract', function () {
       try {
         await contract.aensQuery(name)
       } catch (e) {
-        console.log(e.code)
         e.message.should.be.an('string')
       }
     })
