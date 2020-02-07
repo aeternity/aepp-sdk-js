@@ -132,38 +132,33 @@ const oracleContract = `
 contract DelegateTest =
   type fee = int
   type ttl = Chain.ttl
-  type query_t  = string
-  type answer_t = int
-  type oracle_id = oracle(query_t, answer_t)
-  type query_id  = oracle_query(query_t, answer_t)
   stateful payable entrypoint signedRegisterOracle(acct : address,
                                                    sign : signature,
                                                    qfee : fee,
-                                                   ttl  : ttl) : oracle_id =
+                                                   ttl  : ttl) : oracle(string, string) =
      Oracle.register(acct, qfee, ttl, signature = sign)
-  stateful payable entrypoint signedExtendOracle(o    : oracle_id,
+  stateful payable entrypoint signedExtendOracle(o    : oracle(string, string),
                                                  sign : signature,   // Signed oracle address
                                                  ttl  : ttl) : unit =
     Oracle.extend(o, signature = sign, ttl)
   
-  payable stateful entrypoint createQuery(o    : oracle_id,
+  payable stateful entrypoint createQuery(o    : oracle(string, string),
                                           q    : string,
                                           qfee : int,
                                           qttl : Chain.ttl,
-                                          rttl : int) : query_id =
+                                          rttl : Chain.ttl) : oracle_query(string, string) =
     require(qfee =< Call.value, "insufficient value for qfee")
-    Oracle.query(o, q, qfee, qttl, RelativeTTL(rttl))
+    require(Oracle.check(o), "oracle not valid")
+    Oracle.query(o, q, qfee, qttl, rttl)
     
   entrypoint queryFee(o : oracle(string, int)) : int =
     Oracle.query_fee(o)
-
-  datatype complexQuestion = Why(int) | How(string)
-  datatype complexAnswer   = NoAnswer | Answer(complexQuestion, string, int)
-  stateful entrypoint signedComplexOracle(question, sig) =
-    let o = Oracle.register(signature = sig, Contract.address, 0, FixedTTL(1000)) : oracle(complexQuestion, complexAnswer)
-    let q = Oracle.query(o, question, 0, RelativeTTL(100), RelativeTTL(100))
-    Oracle.respond(o, q, Answer(question, "magic", 1337), signature = sig)
-    Oracle.get_answer(o, q)`
+  
+  stateful entrypoint respond(o    : oracle(string, string),
+                              q    : oracle_query(string, string),
+                              sign : signature,        // Signed oracle query id + contract address
+                              r    : string) =
+    Oracle.respond(o, q, signature = sign, r)`
 const encodedNumberSix = 'cb_DA6sWJo='
 const filesystem = {
   testLib: libContract
@@ -232,13 +227,13 @@ describe('Contract', function () {
       const contractAddress = cInstanceOracle.deployInfo.address
       const current = await contract.address()
       const onAccount = contract.addresses().find(acc => acc !== current)
-      const qFee = 100000000
+      const qFee = 500000
       const ttl = 'RelativeTTL(50)'
-      const oracleId = `ok_${onAccount.slice(3)}`
+      const oracleId = `ok_${current.slice(3)}`
 
       const oracleCreateSig = await contract.delegateOracleRegisterSignature(contractAddress, { onAccount })
-      const queryRegister = await cInstanceOracle.methods.signedRegisterOracle(onAccount, oracleCreateSig, qFee, ttl, { onAccount })
-      queryRegister.result.returnType.should.be.equal('ok')
+      const oracleRegister = await cInstanceOracle.methods.signedRegisterOracle(onAccount, oracleCreateSig, qFee, ttl, { onAccount })
+      oracleRegister.result.returnType.should.be.equal('ok')
       const oracle = await contract.getOracleObject(oracleId)
       oracle.id.should.be.equal(oracleId)
 
@@ -251,13 +246,22 @@ describe('Contract', function () {
 
       // // create query
       // const q = 'Hello!'
-      // const { decodedResult: queryFee } = await cInstanceOracle.methods.queryFee(oracleId, { onAccount })
-      // console.log(queryFee)
-      // const query = await cInstanceOracle.methods.createQuery(oracleId, q, 3 * queryFee, ttl, 50, { onAccount, amount: 5 * queryFee })
-      // console.log('create query')
-      // // const query = await contract.postQueryToOracle(oracleId, q, { queryFee: 3 * queryFee, onAccount, amount: 100000 * queryFee })
-      // console.log(query)
-      // // console.log(await contract.getQueryObject(oracleId, ))
+      // const newOracle = await contract.registerOracle('string', 'int', { onAccount, queryFee: qFee })
+      // const query = await cInstanceOracle.methods.createQuery(newOracle.id, q, 1000 + qFee, ttl, ttl, { onAccount, amount: 5 * qFee })
+      // query.should.be.an('object')
+      // const queryObject = await contract.getQueryObject(newOracle.id, query.decodedResult)
+      // queryObject.should.be.an('object')
+      // queryObject.decodedQuery.should.be.equal(q)
+      // console.log(queryObject)
+      //
+      // // respond to query
+      // const r = 'Hi!'
+      // const respondSig = await contract.delegateOracleRespondSignature(newOracle.id, queryObject.id, contractAddress, { onAccount })
+      // const response = await cInstanceOracle.methods.respond(newOracle.id, queryObject.id, respondSig, r, { onAccount })
+      // console.log(response)
+      // const queryObject2 = await contract.getQueryObject(newOracle.id, queryObject.id)
+      // console.log(queryObject2)
+      // queryObject2.decodedResponse.should.be.equal(r)
     })
   })
   it('precompiled bytecode can be deployed', async () => {

@@ -96,8 +96,11 @@ async function pollForQueries (oracleId, onQuery, { interval = 5000 } = {}) {
  * @return {Promise<Object>} OracleQuery object
  */
 async function getQueryObject (oracleId, queryId) {
+  const q = await this.getOracleQuery(oracleId, queryId)
   return {
-    ...(await this.getOracleQuery(oracleId, queryId)),
+    ...q,
+    decodedQuery: decodeBase64Check(q.query.slice(3)).toString(),
+    decodedResponse: decodeBase64Check(q.response.slice(3)).toString(),
     respond: (response, options) => this.respondToQuery(oracleId, queryId, response, options),
     pollForResponse: ({ attempts, interval }) => this.pollForQueryResponse(oracleId, queryId, { attempts, interval }),
     decode: (data) => decodeBase64Check(data.slice(3))
