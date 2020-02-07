@@ -1,5 +1,5 @@
 import { BigNumber } from 'bignumber.js'
-import { assertedType, rlp } from '../../utils/crypto'
+import { addressFromDecimal, assertedType, hash, rlp } from '../../utils/crypto'
 
 import {
   DEFAULT_FEE,
@@ -27,6 +27,7 @@ import {
 } from './helpers'
 import { toBytes } from '../../utils/bytes'
 import * as mpt from '../../utils/mptree'
+import { SOPHIA_TYPES } from '../../contract/aci/transformation'
 
 /**
  * JavaScript-based Transaction builder
@@ -38,6 +39,69 @@ import * as mpt from '../../utils/mptree'
 const ORACLE_TTL_TYPES = {
   delta: 'delta',
   block: 'block'
+}
+
+// Events
+/**
+ * Transform decoded event to JS type
+ * @param {Object[]} events Array of events
+ * @param {Object} fnACI SC function ACI schema
+ * @param {Object} [options={}] Options
+ * @return {Object}
+ */
+export function decodeEvents (events, options = { fnACI: [] }) {
+  if (!events.length) return []
+
+  const eventsSchema = options.fnACI.event.map(e => {
+    const name = Object.keys(e)[0]
+    return { name, value: e[name], nameHash: hash(name).toString('hex') }
+  })
+
+  return events.map(l => {
+    const [eName, ...eParams] = l.topics
+    const hexHash = toBytes(eName, true).toString('hex')
+    const { schema, isHasNonIndexed } = eventsSchema
+      .reduce(
+        (acc, el) => {
+          if (el.nameHash === hexHash) {
+            l.name = el.name
+            return {
+              schema: el.value.filter(e => e !== 'string'),
+              isHasNonIndexed: el.value.includes('string'),
+              name: el.name
+            }
+          }
+          return acc
+        },
+        { schema: [], isHasNonIndexed: true }
+      )
+    return {
+      ...l,
+      decoded: [
+        ...isHasNonIndexed ? [decode(l.data).toString('utf-8')] : [],
+        ...eParams.map((event, i) => transformEvent(event, schema[i]))
+      ]
+    }
+  })
+}
+
+/**
+ * Transform Event based on type
+ * @param {String|Number} event Event data
+ * @param {String} type Event type from schema
+ * @return {*}
+ */
+function transformEvent (event, type) {
+  switch (type) {
+    case SOPHIA_TYPES.bool:
+      return !!event
+    case SOPHIA_TYPES.hash:
+      return toBytes(event, true).toString('hex')
+    case SOPHIA_TYPES.address:
+      return addressFromDecimal(event).split('_')[1]
+    default:
+      return toBytes(event, true)
+  }
 }
 
 // SERIALIZE AND DESERIALIZE PART
@@ -391,4 +455,4 @@ export function buildTxHash (rawTx) {
   return buildHash('th', rawTx)
 }
 
-export default { calculateMinFee, calculateFee, unpackTx, unpackRawTx, buildTx, buildRawTx, validateParams, buildTxHash }
+export default { calculateMinFee, calculateFee, unpackTx, unpackRawTx, buildTx, buildRawTx, validateParams, buildTxHash, transformDecodedEvents: decodeEvents }
