@@ -379,6 +379,7 @@ describe('Contract', function () {
     describe('Events parsing', async () => {
       let cInstance
       let eventResult
+
       before(async () => {
         cInstance = await contract.getContractInstance(testContract, { filesystem })
         await cInstance.deploy(['test', 1, 'some'])
@@ -401,6 +402,10 @@ describe('Contract', function () {
                 case 'contractAddress':
                   // console.log('contractAddress check')
                   s.address.should.be.equal(`ct_${value}`)
+                  break
+                case 'number':
+                  value.should.be.a('string')
+                  Number.isInteger(+value).should.be.equal(true)
                   break
                 default:
                   // console.log(`Value -> ${value}`)
