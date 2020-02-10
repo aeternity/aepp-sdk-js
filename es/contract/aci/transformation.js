@@ -1,4 +1,8 @@
 import Joi from 'joi-browser'
+import { toBytes } from '../../utils/bytes'
+import { decode } from '../../tx/builder/helpers'
+import { parseBigNumber } from '../../utils/bignumber'
+import { addressFromDecimal, hash } from '../../utils/crypto'
 
 export const SOPHIA_TYPES = [
   'int',
@@ -17,6 +21,65 @@ export const SOPHIA_TYPES = [
   'bytes',
   'variant'
 ].reduce((acc, type) => ({ ...acc, [type]: type }), {})
+
+/**
+ * Transform decoded event to JS type
+ * @param {Object[]} events Array of events
+ * @param {Object} [options={}] Options
+ * @param {Object} [options.schema=[]] SC function ACI schema
+ * @return {Object}
+ */
+export function decodeEvents (events, options = { schema: [] }) {
+  if (!events.length) return []
+
+  return events.map(l => {
+    const [eName, ...eParams] = l.topics
+    const hexHash = toBytes(eName, true).toString('hex')
+    const { schema, isHasNonIndexed } = options.schema
+      .reduce(
+        (acc, el) => {
+          if (hash(el.name).toString('hex') === hexHash) {
+            l.name = el.name
+            return {
+              schema: el.types.filter(e => e !== SOPHIA_TYPES.string),
+              isHasNonIndexed: el.types.includes(SOPHIA_TYPES.string),
+              name: el.name
+            }
+          }
+          return acc
+        },
+        { schema: [], isHasNonIndexed: true }
+      )
+    return {
+      ...l,
+      decoded: [
+        ...isHasNonIndexed ? [decode(l.data).toString('utf-8')] : [],
+        ...eParams.map((event, i) => transformEvent(event, schema[i]))
+      ]
+    }
+  })
+}
+
+/**
+ * Transform Event based on type
+ * @param {String|Number} event Event data
+ * @param {String} type Event type from schema
+ * @return {*}
+ */
+function transformEvent (event, type) {
+  switch (type) {
+    case SOPHIA_TYPES.int:
+      return parseBigNumber(event)
+    case SOPHIA_TYPES.bool:
+      return !!event
+    case SOPHIA_TYPES.hash:
+      return toBytes(event, true).toString('hex')
+    case SOPHIA_TYPES.address:
+      return addressFromDecimal(event).split('_')[1]
+    default:
+      return toBytes(event, true)
+  }
+}
 
 export function injectVars (t, aciType) {
   const [[baseType, generic]] = Object.entries(aciType.typedef)

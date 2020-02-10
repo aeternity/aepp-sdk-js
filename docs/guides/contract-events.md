@@ -1,6 +1,6 @@
 # Contract Events
 
-This guide describes the usage of [Sophia Events]() using [Aeternity JS SDK](https://github.com/aeternity/aepp-sdk-js)
+This guide describes the usage of [Sophia Events](https://github.com/aeternity/protocol/blob/master/contracts/sophia.md#events) using [Aeternity JS SDK](https://github.com/aeternity/aepp-sdk-js)
  
 ## Smart Contract
 ```
@@ -52,11 +52,42 @@ contract EventExample =
     */
     ```
   - Decode without ACI
-  ```js
-  import { decodeEvents } from '@aeternity/aepp-sdk/es/tx/builder'    
+    ```js
+    import { decodeEvents, SOPHIA_TYPES } from '@aeternity/aepp-sdk/es/contract/aci/transformation'    
 
-  const txHash = 'tx_asdad2d23...'
-  const tx = await sdkInstance.tx(txHash)
-    
-  const decodedEvent = decodeEvents(tx.result.log)
-  ```
+    const txHash = 'tx_asdad2d23...'
+    const tx = await sdkInstance.tx(txHash)
+   
+    const eventsSchema = [    
+      { name: 'TheFirstEvent', types: [SOPHIA_TYPES.int] },
+      { name: 'AnotherEvent', types: [SOPHIA_TYPES.string, SOPHIA_TYPES.address] },
+    ]
+    const decodedEvents = decodeEvents(tx.result.log, { schema: eventsSchema })
+    console.log(decodedEvents.decoded)
+    /*
+        [
+          { address: 'ct_N9s65ZMz9SUUKx2HDLCtxVNpEYrzzmYEuESdJwmbEsAo5TzxM',
+            data: 'cb_VGhpcyBpcyBub3QgaW5kZXhlZK+w140=',
+            topics:
+             [ '101640830366340000167918459210098337687948756568954742276612796897811614700269',
+               '21724616073664889730503604151713289093967432540957029082538744539361158114576' ],
+            name: 'AnotherEvent',
+            decoded:
+             [ 'This is not indexed',
+               'N9s65ZMz9SUUKx2HDLCtxVNpEYrzzmYEuESdJwmbEsAo5TzxM' ]
+          },
+          { address: 'ct_N9s65ZMz9SUUKx2HDLCtxVNpEYrzzmYEuESdJwmbEsAo5TzxM',
+            data: 'cb_Xfbg4g==',
+            topics:
+             [ '25381774165057387707802602748622431964055296361151037811644748771109370239835',
+               42 ],
+            name: 'TheFirstEvent',
+            decoded: [ '42' ]
+          }
+        ]
+        */
+     ```
+
+# Related Link
+  - [Sophia Events](https://github.com/aeternity/protocol/blob/master/contracts/sophia.md#events)
+  - [Sophia Events Explained](https://github.com/aeternity/protocol/blob/master/contracts/sophia_explained.md)

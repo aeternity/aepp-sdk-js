@@ -28,7 +28,8 @@ import * as R from 'ramda'
 import {
   validateArguments,
   transform,
-  transformDecodedData
+  transformDecodedData,
+  decodeEvents
 } from './transformation'
 import { buildContractMethods, getFunctionACI } from './helpers'
 import { isAddressValid } from '../../utils/crypto'
@@ -37,7 +38,6 @@ import { BigNumber } from 'bignumber.js'
 import { COMPILER_LT_VERSION } from '../compiler'
 import semverSatisfies from '../../utils/semver-satisfies'
 import { AMOUNT, DEPOSIT, GAS, MIN_GAS_PRICE } from '../../tx/builder/schema'
-import { decodeEvents } from '../../tx/builder'
 
 /**
  * Validated contract call arguments using contract ACI
@@ -166,13 +166,18 @@ async function getContractInstance (source, { aci, contractAddress, filesystem =
 }
 
 const decodeCallResult = async (result, fnACI, opt) => {
+  const eventsSchema = fnACI.event.map(e => {
+    const name = Object.keys(e)[0]
+    return { name, value: e[name] }
+  })
+
   return {
     decodedResult: await transformDecodedData(
       fnACI.returns,
       await result.decode(),
       { ...opt, bindings: fnACI.bindings }
     ),
-    decodedEvents: decodeEvents(result.result.log, { ...opt, fnACI })
+    decodedEvents: decodeEvents(result.result.log, { ...opt, schema: eventsSchema })
   }
 }
 const call = ({ client, instance }) => async (fn, params = [], options = {}) => {
