@@ -5,11 +5,11 @@ This guide describes the usage of [Sophia Events]() using [Aeternity JS SDK](htt
 ## Smart Contract
 ```
 contract EventExample =
-  type event = Event(int, string) | Event2(bool, int) 
+  type event = TheFirstEvent(int) | AnotherEvent(bool, int) 
 
   stateful entrypoint emitEvents () =>
-    Chain.emit(Event(10, "Test string"))
-    Chain.emit(Event2(true, 23))
+    Chain.emit(TheFirstEvent(42))
+    Chain.emit(AnotherEvent("This is not indexed", Contract.address))
 ```
 ## SDK usage
   - Init SDK
@@ -24,8 +24,39 @@ contract EventExample =
     
     const contractIns = await sdkInstance.getContractInstance(eventContract)
     ```
-  - Call smart contract
+  - Decode using ACI
     ```js
     const callRes = await contractIns.methods.emitEvents()
-    
+    console.log(callRes.decodedEvents)
+    /*
+    [
+      { address: 'ct_N9s65ZMz9SUUKx2HDLCtxVNpEYrzzmYEuESdJwmbEsAo5TzxM',
+        data: 'cb_VGhpcyBpcyBub3QgaW5kZXhlZK+w140=',
+        topics:
+         [ '101640830366340000167918459210098337687948756568954742276612796897811614700269',
+           '21724616073664889730503604151713289093967432540957029082538744539361158114576' ],
+        name: 'AnotherEvent',
+        decoded:
+         [ 'This is not indexed',
+           'N9s65ZMz9SUUKx2HDLCtxVNpEYrzzmYEuESdJwmbEsAo5TzxM' ]
+      },
+      { address: 'ct_N9s65ZMz9SUUKx2HDLCtxVNpEYrzzmYEuESdJwmbEsAo5TzxM',
+        data: 'cb_Xfbg4g==',
+        topics:
+         [ '25381774165057387707802602748622431964055296361151037811644748771109370239835',
+           42 ],
+        name: 'TheFirstEvent',
+        decoded: [ '42' ]
+      }
+    ]
+    */
     ```
+  - Decode without ACI
+  ```js
+  import { decodeEvents } from '@aeternity/aepp-sdk/es/tx/builder'    
+
+  const txHash = 'tx_asdad2d23...'
+  const tx = await sdkInstance.tx(txHash)
+    
+  const decodedEvent = decodeEvents(tx.result.log)
+  ```
