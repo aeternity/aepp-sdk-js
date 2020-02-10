@@ -391,4 +391,4 @@ export function buildTxHash (rawTx) {
   return buildHash('th', rawTx)
 }
 
-export default { calculateMinFee, calculateFee, unpackTx, unpackRawTx, buildTx, buildRawTx, validateParams, buildTxHash, transformDecodedEvents: decodeEvents }
+export default { calculateMinFee, calculateFee, unpackTx, unpackRawTx, buildTx, buildRawTx, validateParams, buildTxHash }

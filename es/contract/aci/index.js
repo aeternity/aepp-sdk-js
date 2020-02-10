@@ -168,7 +168,7 @@ async function getContractInstance (source, { aci, contractAddress, filesystem =
 const decodeCallResult = async (result, fnACI, opt) => {
   const eventsSchema = fnACI.event.map(e => {
     const name = Object.keys(e)[0]
-    return { name, value: e[name] }
+    return { name, types: e[name] }
   })
 
   return {
