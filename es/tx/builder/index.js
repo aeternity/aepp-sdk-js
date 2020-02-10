@@ -28,6 +28,7 @@ import {
 import { toBytes } from '../../utils/bytes'
 import * as mpt from '../../utils/mptree'
 import { SOPHIA_TYPES } from '../../contract/aci/transformation'
+import { parseBigNumber } from '../../utils/bignumber'
 
 /**
  * JavaScript-based Transaction builder
@@ -93,6 +94,8 @@ export function decodeEvents (events, options = { fnACI: [] }) {
  */
 function transformEvent (event, type) {
   switch (type) {
+    case SOPHIA_TYPES.int:
+      return parseBigNumber(event)
     case SOPHIA_TYPES.bool:
       return !!event
     case SOPHIA_TYPES.hash:

@@ -393,7 +393,6 @@ describe('Contract', function () {
       events
         .forEach((el, i) => {
           it(`Correct parse of ${el.name}(${el.types})`, () => {
-            console.log('in IT statement')
             const s = eventResult.decodedEvents[i]
             el.name.should.be.equal(s.name)
             el.types.forEach((t, tIndex) => {
