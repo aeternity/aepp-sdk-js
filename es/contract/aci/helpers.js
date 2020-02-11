@@ -18,7 +18,7 @@ export function getFunctionACI (aci, name) {
       typedef: aci.type_defs,
       contractName: aci.name
     },
-    event: aci.event.variant
+    event: aci.event ? aci.event.variant : []
   }
 }
 
