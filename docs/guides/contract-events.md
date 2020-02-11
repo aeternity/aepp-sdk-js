@@ -62,8 +62,8 @@ contract EventExample =
       { name: 'TheFirstEvent', types: [SOPHIA_TYPES.int] },
       { name: 'AnotherEvent', types: [SOPHIA_TYPES.string, SOPHIA_TYPES.address] },
     ]
-    const decodedEvents = decodeEvents(tx.result.log, { schema: eventsSchema })
-    console.log(decodedEvents.decoded)
+    const decodedEvents = decodeEvents(tx.log, { schema: eventsSchema })
+    console.log(decodedEvents)
     /*
         [
           { address: 'ct_N9s65ZMz9SUUKx2HDLCtxVNpEYrzzmYEuESdJwmbEsAo5TzxM',

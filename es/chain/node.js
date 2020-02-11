@@ -96,7 +96,7 @@ async function getBalance (address, { height, hash, format = false } = {}) {
   return format ? formatBalance(balance) : balance.toString()
 }
 
-async function tx (hash, info = false) {
+async function tx (hash, info = true) {
   const tx = await this.api.getTransactionByHash(hash)
   if (['ContractCreateTx', 'ContractCallTx'].includes(tx.tx.type) && info) {
     try {
