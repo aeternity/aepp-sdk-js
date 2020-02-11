@@ -229,7 +229,7 @@ describe('Contract', function () {
       const onAccount = contract.addresses().find(acc => acc !== current)
       const qFee = 500000
       const ttl = 'RelativeTTL(50)'
-      const oracleId = `ok_${current.slice(3)}`
+      const oracleId = `ok_${onAccount.slice(3)}`
 
       const oracleCreateSig = await contract.delegateOracleRegisterSignature(contractAddress, { onAccount })
       const oracleRegister = await cInstanceOracle.methods.signedRegisterOracle(onAccount, oracleCreateSig, qFee, ttl, { onAccount })
@@ -244,6 +244,7 @@ describe('Contract', function () {
       console.log(oracleExtended)
       oracleExtended.ttl.should.be.equal(oracle.ttl + 50)
 
+      // TODO ask core about this
       // // create query
       // const q = 'Hello!'
       // const newOracle = await contract.registerOracle('string', 'int', { onAccount, queryFee: qFee })
