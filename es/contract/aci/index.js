@@ -25,7 +25,12 @@
 
 import * as R from 'ramda'
 
-import { validateArguments, transform, transformDecodedData } from './transformation'
+import {
+  validateArguments,
+  transform,
+  transformDecodedData,
+  decodeEvents
+} from './transformation'
 import { buildContractMethods, getFunctionACI } from './helpers'
 import { isAddressValid } from '../../utils/crypto'
 import AsyncInit from '../../utils/async-init'
@@ -65,7 +70,7 @@ async function prepareArgsForEncode (aci, params) {
  * @param {String} [options.aci] Contract ACI
  * @param {String} [options.contractAddress] Contract address
  * @param {Object} [options.filesystem] Contact source external namespaces map
- * @param {Object} [options.forceCodeCheck] Don't check contract code
+ * @param {Object} [options.forceCodeCheck=true] Don't check contract code
  * @param {Object} [options.opt] Contract options
  * @return {ContractInstance} JS Contract API
  * @example
@@ -160,6 +165,21 @@ async function getContractInstance (source, { aci, contractAddress, filesystem =
   return instance
 }
 
+const decodeCallResult = async (result, fnACI, opt) => {
+  const eventsSchema = fnACI.event.map(e => {
+    const name = Object.keys(e)[0]
+    return { name, types: e[name] }
+  })
+
+  return {
+    decodedResult: await transformDecodedData(
+      fnACI.returns,
+      await result.decode(),
+      { ...opt, bindings: fnACI.bindings }
+    ),
+    decodedEvents: decodeEvents(result.result.log, { ...opt, schema: eventsSchema })
+  }
+}
 const call = ({ client, instance }) => async (fn, params = [], options = {}) => {
   const opt = R.merge(instance.options, options)
   const fnACI = getFunctionACI(instance.aci, fn)
@@ -180,11 +200,7 @@ const call = ({ client, instance }) => async (fn, params = [], options = {}) => 
     : await client.contractCall(source, instance.deployInfo.address, fn, params, opt)
   return {
     ...result,
-    decodedResult: opt.waitMined ? await transformDecodedData(
-      fnACI.returns,
-      await result.decode(),
-      { ...opt, bindings: fnACI.bindings }
-    ) : null
+    ...opt.waitMined ? await decodeCallResult(result, fnACI, opt) : {}
   }
 }
 
