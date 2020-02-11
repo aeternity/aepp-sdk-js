@@ -20,6 +20,7 @@ import { BaseAe, configure, plan, ready, compilerUrl } from './'
 import { decode } from '../../es/tx/builder/helpers'
 
 import * as R from 'ramda'
+import { decodeEvents, SOPHIA_TYPES } from '../../es/contract/aci/transformation'
 
 const identityContract = `
 contract Identity =
@@ -60,6 +61,7 @@ contract StateContract =
   record state = { value: string, key: number, testOption: option(string) }
   record yesEr = { t: number}
   
+  datatype event = TheFirstEvent(int) | AnotherEvent(string, address) | AnotherEvent2(string, bool, int)
   datatype dateUnit = Year | Month | Day
   datatype one_or_both('a, 'b) = Left('a) | Right('b) | Both('a, 'b)
 
@@ -104,6 +106,10 @@ contract StateContract =
       Left(x)    => x
       Right(_)   => abort("asdasd")
       Both(x, _) => x
+  stateful entrypoint emitEvents() : unit =
+    Chain.event(TheFirstEvent(42))
+    Chain.event(AnotherEvent("This is not indexed", Contract.address))
+    Chain.event(AnotherEvent2("This is not indexed", true, 1))
 `
 
 const encodedNumberSix = 'cb_DA6sWJo='
@@ -129,7 +135,6 @@ describe('Contract', function () {
     const code = await contract.contractCompile(identityContract)
     return contract.contractDeploy(code.bytecode, identityContract).should.eventually.have.property('address')
   })
-
   it('compiles Sophia code', async () => {
     bytecode = await contract.contractCompile(identityContract)
     return bytecode.should.have.property('bytecode')
@@ -372,6 +377,56 @@ describe('Contract', function () {
 
   describe('Contract ACI Interface', function () {
     let contractObject
+    describe('Events parsing', async () => {
+      let cInstance
+      let eventResult
+      let decodedEventsWithoutACI
+
+      before(async () => {
+        cInstance = await contract.getContractInstance(testContract, { filesystem })
+        await cInstance.deploy(['test', 1, 'some'])
+        eventResult = await cInstance.methods.emitEvents()
+        const { log } = await contract.tx(eventResult.hash)
+        decodedEventsWithoutACI = decodeEvents(log, { schema: events })
+      })
+      const events = [
+        { name: 'AnotherEvent2', types: [SOPHIA_TYPES.string, SOPHIA_TYPES.bool, SOPHIA_TYPES.int] },
+        { name: 'AnotherEvent', types: [SOPHIA_TYPES.string, SOPHIA_TYPES.address] },
+        { name: 'TheFirstEvent', types: [SOPHIA_TYPES.int] }
+      ]
+      const checkEvents = (event, schema) => {
+        schema.name.should.be.equal(event.name)
+        schema.types.forEach((t, tIndex) => {
+          const value = event.decoded[tIndex]
+          const isNumber = typeof value === 'string' || typeof value === 'number'
+          // eslint-disable-next-line valid-typeof
+          const v = typeof value === t
+          switch (t) {
+            case SOPHIA_TYPES.address:
+              // console.log('contractAddress check')
+              event.address.should.be.equal(`ct_${value}`)
+              break
+            case SOPHIA_TYPES.int:
+              isNumber.should.be.equal(true)
+              Number.isInteger(+value).should.be.equal(true)
+              break
+            case SOPHIA_TYPES.bool:
+              value.should.be.a('boolean')
+              break
+            default:
+              v.should.be.equal(true)
+              break
+          }
+        })
+      }
+      events
+        .forEach((el, i) => {
+          describe(`Correct parse of ${el.name}(${el.types})`, () => {
+            it('ACI', () => checkEvents(eventResult.decodedEvents[i], el))
+            it('Without ACI', () => checkEvents(decodedEventsWithoutACI[i], el))
+          })
+        })
+    })
 
     it('Generate ACI object', async () => {
       contractObject = await contract.getContractInstance(testContract, { filesystem, opt: { ttl: 0 } })
