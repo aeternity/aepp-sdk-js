@@ -47,6 +47,7 @@ You can use this URL with any releasee on [npmjs](https://www.npmjs.com/package/
 
 ### Contract Usage
  - [Contract ACI](guides/contract-aci-usage.md)
+ - [Contract Events](guides/contract-events.md)
  - [AENS delegation signature](guides/delegate-signature-to-contract.md)
  - [AENS usage](guides/aens-usage.md)
  - [Oracle usage](guides/oracle-usage.md)
