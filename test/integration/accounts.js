@@ -20,6 +20,7 @@ import { configure, ready, BaseAe, networkId } from './'
 import { generateKeyPair } from '../../es/utils/crypto'
 import { BigNumber } from 'bignumber.js'
 import MemoryAccount from '../../es/account/memory'
+import { AE_AMOUNT_FORMATS } from '../../es/utils/amount-formatter'
 
 describe('Accounts', function () {
   configure(this)
@@ -78,6 +79,14 @@ describe('Accounts', function () {
     ret.should.have.property('tx')
     ret.tx.should.include({
       amount: 1, recipientId: receiver
+    })
+  })
+
+  it('spends tokens in AE format', async () => {
+    const ret = await wallet.spend(1, receiver, { denomination: AE_AMOUNT_FORMATS.AE })
+    ret.should.have.property('tx')
+    ret.tx.should.include({
+      amount: `${1e18}`, recipientId: receiver
     })
   })
 
