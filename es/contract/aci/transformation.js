@@ -1,4 +1,5 @@
 import Joi from 'joi-browser'
+import { isAeAddress, isHex } from '../../utils/string'
 import { toBytes } from '../../utils/bytes'
 import { decode } from '../../tx/builder/helpers'
 import { parseBigNumber } from '../../utils/bignumber'
@@ -20,7 +21,7 @@ export const SOPHIA_TYPES = [
   'signature',
   'bytes',
   'variant'
-].reduce((acc, type) => ({ ...acc, [type]: type }), {})
+].reduce((acc, type) => ({ ...acc, [type]: type }), { ChainTtl: 'Chain.ttl' })
 
 /**
  * Transform decoded event to JS type
@@ -160,6 +161,8 @@ export function transform (type, value, { bindings } = {}) {
   const { t, generic } = readType(type, { bindings })
 
   switch (t) {
+    case SOPHIA_TYPES.ChainTtl:
+      return `${value}`
     case SOPHIA_TYPES.string:
       return `"${value}"`
     case SOPHIA_TYPES.list:
@@ -176,7 +179,11 @@ export function transform (type, value, { bindings } = {}) {
     case SOPHIA_TYPES.hash:
     case SOPHIA_TYPES.bytes:
     case SOPHIA_TYPES.signature:
-      return `#${typeof value === 'string' ? value : Buffer.from(value).toString('hex')}`
+      if (typeof value === 'string') {
+        if (isHex(value)) return `#${value}`
+        if (isAeAddress(value)) return `#${decode(value).toString('hex')}`
+      }
+      return `#${Buffer.from(value).toString('hex')}`
     case SOPHIA_TYPES.record:
       return `{${generic.reduce(
         (acc, { name, type }, i) => {
@@ -301,7 +308,7 @@ export function transformDecodedData (aci, result, { skipTransformDecoded = fals
 export function prepareSchema (type, { bindings } = {}) {
   let { t, generic } = readType(type, { bindings })
 
-  if (!Object.keys(SOPHIA_TYPES).includes(t)) t = SOPHIA_TYPES.address // Handle Contract address transformation
+  if (!Object.values(SOPHIA_TYPES).includes(t)) t = SOPHIA_TYPES.address // Handle Contract address transformation
   switch (t) {
     case SOPHIA_TYPES.int:
       return Joi.number().error(getJoiErrorMsg)
@@ -323,6 +330,8 @@ export function prepareSchema (type, { bindings } = {}) {
             {})
         ).or(...generic.map(e => Object.keys(e)[0]))
       ])
+    case SOPHIA_TYPES.ChainTtl:
+      return Joi.string().error(getJoiErrorMsg)
     case SOPHIA_TYPES.string:
       return Joi.string().error(getJoiErrorMsg)
     case SOPHIA_TYPES.address:
@@ -395,6 +404,9 @@ const JoiBinary = Joi.extend((joi) => ({
   base: joi.any(),
   pre (value, state, options) {
     if (options.convert && typeof value === 'string') {
+      if (isAeAddress(value)) {
+        return decode(value)
+      }
       try {
         return Buffer.from(value, 'hex')
       } catch (e) { return undefined }
@@ -409,7 +421,6 @@ const JoiBinary = Joi.extend((joi) => ({
         size: joi.number().required()
       },
       validate (params, value, state, options) {
-        value = value === 'string' ? Buffer.from(value, 'hex') : Buffer.from(value)
         if (!Buffer.isBuffer(value)) {
           return this.createError('binary.base', { value }, state, options)
         }

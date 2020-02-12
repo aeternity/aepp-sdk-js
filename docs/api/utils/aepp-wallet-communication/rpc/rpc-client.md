@@ -14,19 +14,22 @@ import RpcClients from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/r
 
 * [@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client)
     * [exports.RpcClient(param)](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient) ⇒ `Object` ⏏
-        * [.addClient(id, connectionData)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+addClient) ⇒ `void`
-        * [.getClient(id)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+getClient) ⇒ `Object`
-        * [.updateClientInfo(id, info)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+updateClientInfo) ⇒ `void`
-        * [.sentNotificationByCondition(msg, condition)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+sentNotificationByCondition) ⇒ `void`
-        * [.isConnected()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+isConnected) ⇒ `Boolean`
-        * [.getCurrentAccount(options)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+getCurrentAccount) ⇒ `String`
-        * [.disconnect()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+disconnect) ⇒ `void`
-        * [.updateSubscription(type, value)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+updateSubscription) ⇒ `Array.&lt;String&gt;`
-        * [.addAction(action, resolvers)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+addAction) ⇒ `Object`
-        * [.addCallback(msgId)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+addCallback) ⇒ `Promise`
-        * [.processResponse(msg, [transformResult])](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+processResponse) ⇒ `void`
-        * [.resolveCallback(msgId, args)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+resolveCallback) ⇒ `void`
-        * [.rejectCallback(msgId, args)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+rejectCallback) ⇒ `void`
+        * _instance_
+            * [.addClient(id, connectionData)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+addClient) ⇒ `void`
+            * [.getClient(id)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+getClient) ⇒ `Object`
+            * [.updateClientInfo(id, info)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+updateClientInfo) ⇒ `void`
+            * [.sentNotificationByCondition(msg, condition)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+sentNotificationByCondition) ⇒ `void`
+            * [.isConnected()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+isConnected) ⇒ `Boolean`
+            * [.getCurrentAccount(options)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+getCurrentAccount) ⇒ `String`
+            * [.disconnect()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+disconnect) ⇒ `void`
+            * [.updateSubscription(type, value)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+updateSubscription) ⇒ `Array.&lt;String&gt;`
+            * [.addAction(action, resolvers)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+addAction) ⇒ `Object`
+            * [.addCallback(msgId)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+addCallback) ⇒ `Promise`
+            * [.processResponse(msg, [transformResult])](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+processResponse) ⇒ `void`
+            * [.resolveCallback(msgId, args)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+resolveCallback) ⇒ `void`
+            * [.rejectCallback(msgId, args)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+rejectCallback) ⇒ `void`
+        * _static_
+            * [.RpcClients()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient.RpcClients) ⇒ `Object`
 
 <a id="exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient"></a>
 
@@ -203,3 +206,10 @@ Trigger Promise rejection from `addCallBack` function
 | msgId | `Number` | Message Id |
 | args | `Array` | Arguments array |
 
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient.RpcClients"></a>
+
+#### exports.RpcClient.RpcClients() ⇒ `Object`
+Contain functionality for managing multiple RPC clients (RpcClient stamp)
+
+**Kind**: static method of [`exports.RpcClient`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient)  
+**rtype**: `Stamp`

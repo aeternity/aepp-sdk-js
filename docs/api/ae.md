@@ -13,6 +13,7 @@ import Ae from '@aeternity/aepp-sdk/es/ae'
         * _instance_
             * [.destroyInstance()](#module_@aeternity/aepp-sdk/es/ae--Ae+destroyInstance) ⇒ `void`
             * _async_
+                * [.send(tx, [options])](#module_@aeternity/aepp-sdk/es/ae--Ae+send) ⇒ `String` \| `String`
                 * [.spend(amount, recipientId, options)](#module_@aeternity/aepp-sdk/es/ae--Ae+spend) ⇒ `String` \| `String`
                 * [.transferFunds(percentage, recipientId, options)](#module_@aeternity/aepp-sdk/es/ae--Ae+transferFunds) ⇒ `String` \| `String`
         * _inner_
@@ -27,9 +28,9 @@ Attempting to create instances from the Stamp without overwriting all
 abstract methods using composition will result in an exception.
 
 Ae objects are the composition of three basic building blocks:
-* [module:@aeternity/aepp-sdk/es/tx--Tx](module:@aeternity/aepp-sdk/es/tx--Tx)
+* [Tx](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)
 * [Account](#exp_module_@aeternity/aepp-sdk/es/account--Account)
-* [module:@aeternity/aepp-sdk/es/chain--Chain](module:@aeternity/aepp-sdk/es/chain--Chain)
+* [Chain](#exp_module_@aeternity/aepp-sdk/es/chain--Chain)
 Only by providing the joint functionality of those three, most more advanced
 operations, i.e. the ones with actual use value on the chain, become
 available.
@@ -48,6 +49,22 @@ available.
 Remove all listeners for RPC
 
 **Kind**: instance method of [`Ae`](#exp_module_@aeternity/aepp-sdk/es/ae--Ae)  
+<a id="module_@aeternity/aepp-sdk/es/ae--Ae+send"></a>
+
+#### ae.send(tx, [options]) ⇒ `String` \| `String`
+Sign and post a transaction to the chain
+
+**Kind**: instance method of [`Ae`](#exp_module_@aeternity/aepp-sdk/es/ae--Ae)  
+**Returns**: `String` \| `String` - Transaction or transaction hash  
+**Category**: async  
+**rtype**: `(tx: String, options: Object) => Promise[String]`
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| tx | `String` |  | Transaction |
+| [options] | `Object` | <code>{}</code> | options - Options |
+| [options.verify] | `Object` |  | verify - Verify transaction before broadcast, throw error if not valid |
+
 <a id="module_@aeternity/aepp-sdk/es/ae--Ae+spend"></a>
 
 #### ae.spend(amount, recipientId, options) ⇒ `String` \| `String`
