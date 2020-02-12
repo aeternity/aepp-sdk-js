@@ -16,6 +16,7 @@
  */
 
 import * as R from 'ramda'
+import { isAddressValid } from './crypto'
 
 /**
  * Convert string from snake_case to PascalCase
@@ -63,7 +64,7 @@ export function isHex (str) {
  */
 export function isAeAddress (str) {
   if (typeof str !== 'string') return false
-  return str.split('_')[0].length === 2
+  return str.split('_')[0].length === 2 && isAddressValid(str)
 }
 
 /**
