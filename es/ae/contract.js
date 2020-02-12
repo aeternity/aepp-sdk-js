@@ -36,6 +36,7 @@ import ContractACI from '../contract/aci'
 import BigNumber from 'bignumber.js'
 import NodePool from '../node-pool'
 import { AMOUNT, DEPOSIT, DRY_RUN_ACCOUNT, GAS, MIN_GAS_PRICE } from '../tx/builder/schema'
+import { decode, produceNameId } from '../tx/builder/helpers'
 
 function sendAndProcess (tx, options) {
   return async function (onSuccess, onError) {
@@ -66,12 +67,19 @@ async function handleCallError (result) {
   const error = Buffer.from(result.returnValue).toString()
   if (isBase64(error.slice(3))) {
     const decodedError = Buffer.from(error.slice(3), 'base64').toString()
-    throw Object.assign(Error(`Invocation failed: ${error}. Decoded: ${decodedError}`), R.merge(result, { error, decodedError }))
+    throw Object.assign(Error(`Invocation failed: ${error}. Decoded: ${decodedError}`), R.merge(result, {
+      error,
+      decodedError
+    }))
   }
 
   const decodedError = await this.contractDecodeDataAPI('string', error)
-  throw Object.assign(Error(`Invocation failed: ${error}. Decoded: ${decodedError}`), R.merge(result, { error, decodedError }))
+  throw Object.assign(Error(`Invocation failed: ${error}. Decoded: ${decodedError}`), R.merge(result, {
+    error,
+    decodedError
+  }))
 }
+
 /**
  * Encode call data for contract call
  * @function
@@ -273,7 +281,10 @@ async function contractDeploy (code, source, initState = [], options = {}) {
       txData,
       address: contractId,
       call: async (name, args = [], options = {}) => this.contractCall(source, contractId, name, args, R.merge(opt, options)),
-      callStatic: async (name, args = [], options = {}) => this.contractCallStatic(source, contractId, name, args, { ...options, options: { onAccount: opt.onAccount, ...R.merge(opt, options.options) } }),
+      callStatic: async (name, args = [], options = {}) => this.contractCallStatic(source, contractId, name, args, {
+        ...options,
+        options: { onAccount: opt.onAccount, ...R.merge(opt, options.options) }
+      }),
       createdAt: new Date()
     })
   )
@@ -303,8 +314,130 @@ async function contractCompile (source, options = {}) {
   return Object.freeze(Object.assign({
     encodeCall: async (name, args) => this.contractEncodeCall(source, name, args, R.merge(opt, options)),
     deploy: async (init, options = {}) => this.contractDeploy(bytecode, source, init, R.merge(opt, options)),
-    deployStatic: async (init, options = {}) => this.contractCallStatic(source, null, 'init', init, { bytecode, top: options.top, options: R.merge(opt, options) })
+    deployStatic: async (init, options = {}) => this.contractCallStatic(source, null, 'init', init, {
+      bytecode,
+      top: options.top,
+      options: R.merge(opt, options)
+    })
   }, { bytecode }))
+}
+
+/**
+ * Utility method to create a delegate signature for a contract
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/contract
+ * @category async
+ * @param {String[]} ids The list of id's to prepend
+ * @param {Object} [opt={}] options
+ * @param {{ onAccount: String | Object }} [opt={}] opt Options
+ * @return {Promise<String>} Signature in hex representation
+ */
+async function delegateSignatureCommon (ids = [], opt = {}) {
+  return this.sign(
+    Buffer.concat(
+      [
+        Buffer.from(this.getNetworkId()),
+        decode(await this.address(opt)),
+        ...ids.map(e => decode(e))
+      ]
+    ),
+    opt
+  ).then(s => Buffer.from(s).toString('hex'))
+}
+
+/**
+ * Helper to generate a signature to delegate a name pre-claim to a contract.
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/contract
+ * @category async
+ * @param {String} contractId Contract Id
+ * @param {{ onAccount: String | Object }} [opt={}] opt Options
+ * @return {Promise<String>} Signature for delegation
+ */
+async function delegateNamePreclaimSignature (contractId, opt = {}) {
+  return this.delegateSignatureCommon([contractId], opt)
+}
+
+/**
+ * Helper to generate a signature to delegate a name claim to a contract.
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/contract
+ * @category async
+ * @param {String} name The name being claimed
+ * @param {String} contractId Contract Id
+ * @param {{ onAccount: String | Object }} [opt={}] opt Options
+ * @return {Promise<String>} Signature for delegation
+ */
+async function delegateNameClaimSignature (contractId, name, opt = {}) {
+  return this.delegateSignatureCommon([produceNameId(name), contractId], opt)
+}
+
+/**
+ * Helper to generate a signature to delegate a name transfer to a contract.
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/contract
+ * @category async
+ * @param {String} contractId Contract Id
+ * @param {String} name The name being transferred
+ * @param {{ onAccount: String | Object }} [opt={}] opt Options
+ * @return {Promise<String>} Signature for delegation
+ */
+async function delegateNameTransferSignature (contractId, name, opt = {}) {
+  return this.delegateSignatureCommon([produceNameId(name), contractId], opt)
+}
+
+/**
+ * Helper to generate a signature to delegate a name revoke to a contract.
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/contract
+ * @category async
+ * @param {String} contractId Contract Id
+ * @param {String} name The name being revoked
+ * @param {{ onAccount: String | Object }} [opt={}] opt Options
+ * @return {Promise<String>} Signature for delegation
+ */
+async function delegateNameRevokeSignature (contractId, name, opt = {}) {
+  return this.delegateSignatureCommon([produceNameId(name), contractId], opt)
+}
+
+/**
+ * Helper to generate a signature to delegate a Oracle register to a contract.
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/contract
+ * @category async
+ * @param {String} contractId Contract Id
+ * @param {{ onAccount: String | Object }} [opt={}] opt Options
+ * @return {Promise<String>} Signature for delegation
+ */
+async function delegateOracleRegisterSignature (contractId, opt = {}) {
+  return this.delegateSignatureCommon([contractId], opt)
+}
+
+/**
+ * Helper to generate a signature to delegate a Oracle extend to a contract.
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/contract
+ * @category async
+ * @param {String} contractId Contract Id
+ * @param {{ onAccount: String | Object }} [opt={}] opt Options
+ * @return {Promise<String>} Signature for delegation
+ */
+async function delegateOracleExtendSignature (contractId, opt = {}) {
+  return this.delegateSignatureCommon([contractId], opt)
+}
+
+/**
+ * Helper to generate a signature to delegate a Oracle respond to a contract.
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/ae/contract
+ * @category async
+ * @param {String} queryId Oracle Query Id
+ * @param {String} contractId Contract Id
+ * @param {{ onAccount: String | Object }} [opt={}] opt Options
+ * @return {Promise<String>} Signature for delegation
+ */
+async function delegateOracleRespondSignature (queryId, contractId, opt = {}) {
+  return this.delegateSignatureCommon([queryId, contractId], opt)
 }
 
 /**
@@ -345,7 +478,18 @@ export const ContractAPI = Ae.compose(ContractBase, ContractACI, {
     contractEncodeCall,
     contractDecodeData,
     dryRunContractTx,
-    handleCallError
+    handleCallError,
+    // Delegation for contract
+    // AENS
+    delegateSignatureCommon,
+    delegateNamePreclaimSignature,
+    delegateNameClaimSignature,
+    delegateNameTransferSignature,
+    delegateNameRevokeSignature,
+    // Oracle
+    delegateOracleRegisterSignature,
+    delegateOracleExtendSignature,
+    delegateOracleRespondSignature
   },
   deepProps: {
     Ae: {

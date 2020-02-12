@@ -12,6 +12,7 @@ import TxBuilderHelper from '@aeternity/aepp-sdk/es/tx/builder/helpers'
     * [exports.buildContractId(ownerId, nonce)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.buildContractId) ⇒ `string` ⏏
     * [exports.buildHash(prefix, data)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.buildHash) ⇒ `String` ⏏
     * [exports.formatSalt(salt)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.formatSalt) ⇒ `string` ⏏
+    * [exports.produceNameId(name)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.produceNameId) ⇒ `String` ⏏
     * [exports.decode(data, type)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.decode) ⇒ `Buffer` ⏏
     * [exports.encode(data, type)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.encode) ⇒ `String` ⏏
     * [exports.writeId(hashId)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.writeId) ⇒ `Buffer` ⏏
@@ -20,6 +21,13 @@ import TxBuilderHelper from '@aeternity/aepp-sdk/es/tx/builder/helpers'
     * [exports.readInt(buf)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.readInt) ⇒ `String` ⏏
     * [exports.buildPointers(pointers)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.buildPointers) ⇒ `Array` ⏏
     * [exports.readPointers(pointers)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.readPointers) ⇒ `Array` ⏏
+    * [exports.isNameValid(name, [throwError])](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.isNameValid) ⇒ ⏏
+    * [exports.validatePointers(pointers)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.validatePointers) ⇒ `Boolean` ⏏
+    * [exports.getMinimumNameFee(domain)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.getMinimumNameFee) ⇒ `String` ⏏
+    * [exports.computeBidFee(domain, startFee, [increment])](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.computeBidFee) ⇒ `String` ⏏
+    * [exports.computeAuctionEndBlock(domain, claimHeight)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.computeAuctionEndBlock) ⇒ `String` ⏏
+    * [exports.getContractBackendFromTx({)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.getContractBackendFromTx) ⇒ `String` ⏏
+    * [exports.isAuctionName(name)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.isAuctionName) ⇒ `Boolean` ⏏
 
 <a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.buildContractId"></a>
 
@@ -58,6 +66,18 @@ Format the salt into a 64-byte hex string
 | Param | Type |
 | --- | --- |
 | salt | `number` | 
+
+<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.produceNameId"></a>
+
+### exports.produceNameId(name) ⇒ `String` ⏏
+Encode a domain name
+
+**Kind**: Exported function  
+**Returns**: `String` - `nm_` prefixed encoded domain name  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | `String` | Name to encode |
 
 <a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.decode"></a>
 
@@ -156,4 +176,94 @@ Helper function to read pointers from name update TX
 | Param | Type | Description |
 | --- | --- | --- |
 | pointers | `Array` | Array of pointers ([ { key: 'account_pubkey', id: 'ak_32klj5j23k23j5423l434l2j3423'} ]) |
+
+<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.isNameValid"></a>
+
+### exports.isNameValid(name, [throwError]) ⇒ ⏏
+Is name valid
+
+**Kind**: Exported function  
+**Returns**: Boolean  
+**Throws**:
+
+- Error
+
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| name | `string` |  |  |
+| [throwError] | `boolean` | <code>true</code> | Throw error on invalid |
+
+<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.validatePointers"></a>
+
+### exports.validatePointers(pointers) ⇒ `Boolean` ⏏
+Validate name pointers array
+
+**Kind**: Exported function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| pointers | `Array.&lt;String&gt;` | Pointers array. Allowed values is: account(ak_), oracle(ok_), contract(ct_), channel(ch_) |
+
+<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.getMinimumNameFee"></a>
+
+### exports.getMinimumNameFee(domain) ⇒ `String` ⏏
+Get the minimum name fee for a domain
+
+**Kind**: Exported function  
+**Returns**: `String` - the minimum fee for the domain auction  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| domain | `String` | the domain name to get the fee for |
+
+<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.computeBidFee"></a>
+
+### exports.computeBidFee(domain, startFee, [increment]) ⇒ `String` ⏏
+Compute bid fee for AENS auction
+
+**Kind**: Exported function  
+**Returns**: `String` - Bid fee  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| domain | `String` |  | the domain name to get the fee for |
+| startFee | `Number` \| `String` |  | Auction start fee |
+| [increment] | `Number` | <code>0.5</code> | Bid multiplier(In percentage, must be between 0 and 1) |
+
+<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.computeAuctionEndBlock"></a>
+
+### exports.computeAuctionEndBlock(domain, claimHeight) ⇒ `String` ⏏
+Compute auction end height
+
+**Kind**: Exported function  
+**Returns**: `String` - Auction end height  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| domain | `String` | the domain name to get the fee for |
+| claimHeight | `Number` \| `String` | Auction starting height |
+
+<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.getContractBackendFromTx"></a>
+
+### exports.getContractBackendFromTx({) ⇒ `String` ⏏
+Get contract backend by abiVersion
+
+**Kind**: Exported function  
+**Returns**: `String` - Backend  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| { | `Object` | abiVersion } abiVersion Transaction abiVersion |
+
+<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.isAuctionName"></a>
+
+### exports.isAuctionName(name) ⇒ `Boolean` ⏏
+Is name accept going to auction
+
+**Kind**: Exported function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | `String` | Transaction abiVersion |
 
