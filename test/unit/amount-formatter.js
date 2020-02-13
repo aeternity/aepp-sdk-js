@@ -43,7 +43,7 @@ describe('Amount Formatter', function () {
       ([v, d, e]) => parseBigNumber(e).should.be.equal(toAe(v, { denomination: d }).toString(10))
     )
   })
-  it.only('format', () => {
+  it('format', () => {
     [
       [1, AE_AMOUNT_FORMATS.AE, AE_AMOUNT_FORMATS.AETTOS, asBigNumber(1e18)],
       [10, AE_AMOUNT_FORMATS.AETTOS, AE_AMOUNT_FORMATS.AE, asBigNumber(10).div(1e18)],
