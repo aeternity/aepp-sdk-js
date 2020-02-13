@@ -1,5 +1,5 @@
 import { BigNumber } from 'bignumber.js'
-import { toAettos, AE_AMOUNT_FORMATS } from '../../utils/amount-formatter'
+import { AE_AMOUNT_FORMATS, formatAmount } from '../../utils/amount-formatter'
 import { assertedType, rlp } from '../../utils/crypto'
 
 import {
@@ -178,7 +178,7 @@ function transformParams (params, schema, { denomination } = {}) {
   // console.log(params)
   params = schema
     .filter(([_, t]) => t === FIELD_TYPES.amount)
-    .reduce((acc, [key]) => ({ ...params, [key]: toAettos(params[key], { denomination }) }), params)
+    .reduce((acc, [key]) => ({ ...params, [key]: formatAmount(params[key], { denomination }) }), params)
   return Object
     .entries(params)
     .reduce(
