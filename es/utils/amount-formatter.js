@@ -53,7 +53,7 @@ const DENOMINATION_MAGNITUDE = {
  * @param {String} [options.denomination='aettos'] denomination of amount, can be ['ae', 'aettos']
  * @return {BigNumber}
  */
-export const toAe = (value, { denomination = AE_AMOUNT_FORMATS.AETTOS }) => formatAmount(value, { denomination, targetDenomination: AE_AMOUNT_FORMATS.AE })
+export const toAe = (value, { denomination = AE_AMOUNT_FORMATS.AETTOS } = {}) => formatAmount(value, { denomination, targetDenomination: AE_AMOUNT_FORMATS.AE })
 
 /**
  * Convert amount to aettos
@@ -72,11 +72,10 @@ export const toAettos = (value, { denomination = AE_AMOUNT_FORMATS.AETTOS } = {}
  * @param {String} [options.targetDenomination='aettos'] target denomination, can be ['ae', 'aettos']
  * @return {BigNumber}
  */
-export const formatAmount = (value, { denomination = AE_AMOUNT_FORMATS.AETTOS, targetDenomination = AE_AMOUNT_FORMATS.AETTOS }) => {
+export const formatAmount = (value, { denomination = AE_AMOUNT_FORMATS.AETTOS, targetDenomination = AE_AMOUNT_FORMATS.AETTOS } = {}) => {
   if (!Object.values(AE_AMOUNT_FORMATS).includes(denomination)) throw new Error(`Invalid denomination. Current: ${denomination}, available [${Object.keys(AE_AMOUNT_FORMATS)}]`)
   if (!Object.values(AE_AMOUNT_FORMATS).includes(targetDenomination)) throw new Error(`Invalid target denomination. Current: ${targetDenomination}, available [${Object.keys(AE_AMOUNT_FORMATS)}]`)
   if (!isBigNumber(value)) throw new Error(`Value ${value} is not type of number`)
-  if (asBigNumber(value).lt(0)) throw Error('Value is less then 0')
 
   return asBigNumber(value)
     .shiftedBy(DENOMINATION_MAGNITUDE[denomination] - DENOMINATION_MAGNITUDE[targetDenomination])
@@ -87,7 +86,6 @@ const prefixes = [
   { name: 'exa', magnitude: 18 },
   { name: 'giga', magnitude: 9 },
   { name: '', magnitude: 0 },
-  { name: 'micro', magnitude: -6 },
   { name: 'pico', magnitude: -12 }
 ]
 
