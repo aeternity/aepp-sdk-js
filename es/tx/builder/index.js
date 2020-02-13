@@ -101,7 +101,7 @@ function deserializeField (value, type, prefix) {
   }
 }
 
-function serializeField (value, type, prefix, { denomination } = {}) {
+function serializeField (value, type, prefix) {
   switch (type) {
     case FIELD_TYPES.amount:
     case FIELD_TYPES.int:
@@ -178,9 +178,7 @@ function transformParams (params, schema, { denomination } = {}) {
   // console.log(params)
   params = schema
     .filter(([_, t]) => t === FIELD_TYPES.amount)
-    .reduce((acc, [key]) => {
-      return ({ ...params, [key]: toAettos(params[key], { denomination }) })
-    }, params)
+    .reduce((acc, [key]) => ({ ...params, [key]: toAettos(params[key], { denomination }) }), params)
   return Object
     .entries(params)
     .reduce(
@@ -315,7 +313,7 @@ export function buildRawTx (params, schema, { excludeKeys = [], denomination = A
   }
 
   return filteredSchema
-    .map(([key, fieldType, prefix]) => serializeField(params[key], fieldType, prefix, { denomination }))
+    .map(([key, fieldType, prefix]) => serializeField(params[key], fieldType, prefix))
 }
 
 /**
