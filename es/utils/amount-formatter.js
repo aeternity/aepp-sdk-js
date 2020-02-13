@@ -24,14 +24,23 @@ import { asBigNumber, isBigNumber } from './bignumber'
 import { BigNumber } from 'bignumber.js'
 
 const AE_MULT = 1e18
-
 /**
  * AE amount formats
  * @type {{AE: string, AETTOS: string}}
  */
 export const AE_AMOUNT_FORMATS = {
   AE: 'ae',
-  AETTOS: 'aettos'
+  AETTOS: 'aettos',
+  PICO_AE: 'picoAe',
+  MILI_AE: 'miliAe',
+  MICRO_AE: 'microAe'
+}
+
+const DENOMINATION_MAGNITUDE = {
+  [AE_AMOUNT_FORMATS.AE]: 18,
+  [AE_AMOUNT_FORMATS.AETTOS]: 0,
+  [AE_AMOUNT_FORMATS.MICRO_AE]: -6,
+  [AE_AMOUNT_FORMATS.PICO_AE]: -12
 }
 
 const AMOUNT_TO_AETTOS = {
@@ -51,10 +60,24 @@ const AMOUNT_TO_AE = {
  * @param {String} [options.denomination='aettos'] denomination of amount, can be ['ae', 'aettos']
  * @return {BigNumber}
  */
-export const toAe = (value, { denomination = AE_AMOUNT_FORMATS.AETTOS }) => {
+export const toAe = (value, { denomination = AE_AMOUNT_FORMATS.AETTOS, target = AE_AMOUNT_FORMATS.AETTOS }) => {
   if (!AMOUNT_TO_AETTOS[denomination]) throw new Error(`Invalid denomination. Current: ${denomination}, available [${Object.keys(AE_AMOUNT_FORMATS)}]`)
   if (!isBigNumber(value)) throw new Error(`Value ${value} is not type of number`)
   return AMOUNT_TO_AE[denomination](value)
+}
+
+export const formatAmount = (value, { denomination = AE_AMOUNT_FORMATS.AETTOS, targetDenomination = AE_AMOUNT_FORMATS.AETTOS }) => {
+  if (!Object.values(AE_AMOUNT_FORMATS).includes(denomination)) throw new Error(`Invalid denomination. Current: ${denomination}, available [${Object.keys(AE_AMOUNT_FORMATS)}]`)
+  if (!Object.values(AE_AMOUNT_FORMATS).includes(targetDenomination)) throw new Error(`Invalid target denomination. Current: ${targetDenomination}, available [${Object.keys(AE_AMOUNT_FORMATS)}]`)
+  if (!isBigNumber(value)) throw new Error(`Value ${value} is not type of number`)
+  if (asBigNumber(value).lt(0)) throw Error('Value is less then 0')
+  // transform to aettos
+  value = asBigNumber(value).shiftedBy(DENOMINATION_MAGNITUDE[denomination])
+
+  if (targetDenomination === AE_AMOUNT_FORMATS.AETTOS) return value
+  return value
+    .shiftedBy(-DENOMINATION_MAGNITUDE[targetDenomination])
+    .toFixed()
 }
 
 /**
@@ -74,6 +97,7 @@ const prefixes = [
   { name: 'exa', magnitude: 18 },
   { name: 'giga', magnitude: 9 },
   { name: '', magnitude: 0 },
+  { name: 'micro', magnitude: -6 },
   { name: 'pico', magnitude: -12 }
 ]
 
