@@ -16,6 +16,7 @@
  */
 
 import * as R from 'ramda'
+import { isAddressValid } from './crypto'
 
 /**
  * Convert string from snake_case to PascalCase
@@ -54,6 +55,16 @@ export function pascalToSnake (s) {
  */
 export function isHex (str) {
   return !!(str.length % 2 === 0 && str.match(/^[0-9a-f]+$/i))
+}
+
+/**
+ * Check whether a string is Aeternity address
+ * @param {string} str String to validate.
+ * @return {boolean} True if the string is valid AE address
+ */
+export function isAeAddress (str) {
+  if (typeof str !== 'string') return false
+  return str.split('_')[0].length === 2 && isAddressValid(str)
 }
 
 /**
