@@ -35,8 +35,26 @@ export const AE_AMOUNT_FORMATS = {
 }
 
 const AMOUNT_TO_AETTOS = {
-  [AE_AMOUNT_FORMATS.AE]: v => asBigNumber(v).times(AE_MULT),
+  [AE_AMOUNT_FORMATS.AE]: v => asBigNumber(v).times(AE_MULT).toFixed(7),
   [AE_AMOUNT_FORMATS.AETTOS]: asBigNumber
+}
+
+const AMOUNT_TO_AE = {
+  [AE_AMOUNT_FORMATS.AE]: v => asBigNumber,
+  [AE_AMOUNT_FORMATS.AETTOS]: v => asBigNumber(v).div(AE_MULT).toFixed(7)
+}
+
+/**
+ * Convert amount to AE
+ * @param {String|Number|BigNumber} value amount to convert
+ * @param {Object} [options={}] options
+ * @param {String} [options.denomination='aettos'] denomination of amount, can be ['ae', 'aettos']
+ * @return {BigNumber}
+ */
+export const toAe = (value, { denomination = AE_AMOUNT_FORMATS.AETTOS }) => {
+  if (!AMOUNT_TO_AETTOS[denomination]) throw new Error(`Invalid det. Current: ${denomination}, available [${Object.keys(AE_AMOUNT_FORMATS)}]`)
+  if (!isBigNumber(value)) throw new Error(`Value ${value} is not type of number`)
+  return AMOUNT_TO_AE[denomination](value)
 }
 
 /**
