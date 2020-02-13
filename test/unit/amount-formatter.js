@@ -43,19 +43,21 @@ describe('Amount Formatter', function () {
       ([v, d, e]) => parseBigNumber(e).should.be.equal(toAe(v, { denomination: d }).toString(10))
     )
   })
-  it('format', () => {
+  it.only('format', () => {
     [
       [1, AE_AMOUNT_FORMATS.AE, AE_AMOUNT_FORMATS.AETTOS, asBigNumber(1e18)],
       [10, AE_AMOUNT_FORMATS.AETTOS, AE_AMOUNT_FORMATS.AE, asBigNumber(10).div(1e18)],
       [1e18, AE_AMOUNT_FORMATS.AETTOS, AE_AMOUNT_FORMATS.AE, asBigNumber(1)],
       [10012312, AE_AMOUNT_FORMATS.AETTOS, AE_AMOUNT_FORMATS.AE, asBigNumber(10012312).div(1e18)],
       [1, AE_AMOUNT_FORMATS.AE, AE_AMOUNT_FORMATS.AE, 1],
-      [1, AE_AMOUNT_FORMATS.PICO_AE, AE_AMOUNT_FORMATS.AE, asBigNumber(0.00000000000001)],
-      [1, AE_AMOUNT_FORMATS.PICO_AE, AE_AMOUNT_FORMATS.AETTOS, asBigNumber(10000)],
-      [1e4, AE_AMOUNT_FORMATS.AETTOS, AE_AMOUNT_FORMATS.PICO_AE, asBigNumber(1)],
-      [0.0001, AE_AMOUNT_FORMATS.PICO_AE, AE_AMOUNT_FORMATS.AE, asBigNumber(0.000000000000000001)],
-      [0.00000000000001, AE_AMOUNT_FORMATS.AE, AE_AMOUNT_FORMATS.PICO_AE, asBigNumber(1)],
-      [0.0001, AE_AMOUNT_FORMATS.PICO_AE, AE_AMOUNT_FORMATS.AETTOS, asBigNumber(1)]
+      [1, AE_AMOUNT_FORMATS.PICO_AE, AE_AMOUNT_FORMATS.AE, asBigNumber(0.000000000001)],
+      [1, AE_AMOUNT_FORMATS.PICO_AE, AE_AMOUNT_FORMATS.AETTOS, asBigNumber(1000000)],
+      [1e6, AE_AMOUNT_FORMATS.AETTOS, AE_AMOUNT_FORMATS.PICO_AE, asBigNumber(1)],
+      [0.0001, AE_AMOUNT_FORMATS.PICO_AE, AE_AMOUNT_FORMATS.AE, asBigNumber(0.0000000000000001)],
+      [0.000000000001, AE_AMOUNT_FORMATS.AE, AE_AMOUNT_FORMATS.PICO_AE, asBigNumber(1)],
+      [0.000001, AE_AMOUNT_FORMATS.PICO_AE, AE_AMOUNT_FORMATS.AETTOS, asBigNumber(1)],
+      [0.000000000001, AE_AMOUNT_FORMATS.MICRO_AE, AE_AMOUNT_FORMATS.AETTOS, asBigNumber(1)],
+      [0.000001, AE_AMOUNT_FORMATS.MICRO_AE, AE_AMOUNT_FORMATS.PICO_AE, asBigNumber(1)]
     ].forEach(
       ([v, dF, dT, e]) => parseBigNumber(e).should.be.equal(formatAmount(v, { denomination: dF, targetDenomination: dT }).toString(10))
     )
