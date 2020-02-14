@@ -60,10 +60,10 @@ export const toAe = (value, { denomination = AE_AMOUNT_FORMATS.AETTOS } = {}) =>
  * Convert amount to aettos
  * @param {String|Number|BigNumber} value amount to convert
  * @param {Object} [options={}] options
- * @param {String} [options.denomination='aettos'] denomination of amount, can be ['ae', 'aettos']
+ * @param {String} [options.denomination='ae'] denomination of amount, can be ['ae', 'aettos']
  * @return {BigNumber}
  */
-export const toAettos = (value, { denomination = AE_AMOUNT_FORMATS.AETTOS } = {}) => formatAmount(value, { denomination })
+export const toAettos = (value, { denomination = AE_AMOUNT_FORMATS.AE } = {}) => formatAmount(value, { denomination })
 
 /**
  * Convert amount from one to other denomination
