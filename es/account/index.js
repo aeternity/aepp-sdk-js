@@ -24,6 +24,7 @@
 
 import stampit from '@stamp/it'
 import { required } from '@stamp/required'
+
 import * as Crypto from '../utils/crypto'
 import { buildTx } from '../tx/builder'
 import { TX_TYPE } from '../tx/builder/schema'
@@ -45,6 +46,19 @@ async function signTransaction (tx, opt = {}) {
 
   const signatures = [await this.sign(txWithNetworkId, opt)]
   return buildTx({ encodedTx: rlpBinaryTx, signatures }, TX_TYPE.signed).tx
+}
+
+/**
+ * Sign message
+ * @instance
+ * @category async
+ * @rtype (msg: String) => signature: Promise[String], throws: Error
+ * @param {String} message - Message to sign
+ * @param {Object} opt - Options
+ * @return {String} Signature
+ */
+async function signMessage (message, opt = {}) {
+  return this.sign(Crypto.personalMessageToBinary(message), opt)
 }
 
 /**
@@ -81,10 +95,10 @@ const Account = stampit({
       this.networkId = networkId
     }
   },
-  methods: { signTransaction, getNetworkId },
+  methods: { signTransaction, getNetworkId, signMessage },
   deepConf: {
     Ae: {
-      methods: ['sign', 'address', 'signTransaction', 'getNetworkId']
+      methods: ['sign', 'address', 'signTransaction', 'getNetworkId', 'signMessage']
     }
   }
 }, required({
