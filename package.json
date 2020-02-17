@@ -43,7 +43,7 @@
     "libsodium-wrappers-sumo": "0.7.6",
     "ramda": "^0.27.0",
     "rlp": "2.2.4",
-    "serialize-javascript": "^2.1.2",
+    "serialize-javascript": "^3.0.0",
     "sha.js": "^2.4.11",
     "tweetnacl": "^1.0.0",
     "tweetnacl-auth": "^1.0.1",
