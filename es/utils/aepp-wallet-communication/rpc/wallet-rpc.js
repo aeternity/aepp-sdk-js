@@ -132,6 +132,23 @@ const REQUESTS = {
       const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.rejectedByUser(error) })
 
       instance.onSign(client, client.addAction({ id, method, params: { tx, returnSigned, onAccount } }, [accept(id), deny(id)]))
+    },
+  [METHODS.aepp.signMessage]: (instance, { client }) =>
+    async ({ id, method, params: { message, onAccount } }) => {
+      // Authorization check
+      if (!client.isConnected()) return sendResponseMessage(client)(id, method, { error: ERRORS.notAuthorize() })
+
+      const accept = (id) => async () => sendResponseMessage(client)(
+        id,
+        method,
+        {
+          signature: await instance.signMessage(message, { onAccount })
+        }
+      )
+
+      const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.rejectedByUser(error) })
+
+      instance.onSign(client, client.addAction({ id, method, params: { message, onAccount } }, [accept(id), deny(id)]))
     }
 }
 

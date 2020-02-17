@@ -51,6 +51,10 @@ const RESPONSES = {
   [METHODS.aepp.sign]: (instance) =>
     (msg) => {
       instance.rpcClient.processResponse(msg, ({ id, result }) => [result.signedTransaction || result.transactionHash])
+    },
+  [METHODS.aepp.signMessage]: (instance) =>
+    (msg) => {
+      instance.rpcClient.processResponse(msg, ({ id, result }) => [result.signature])
     }
 }
 
@@ -181,6 +185,21 @@ export const AeppRpc = Ae.compose({
       if (!this.rpcClient.getCurrentAccount()) throw new Error('You do not subscribed for account.')
       return this.rpcClient.addCallback(
         this.rpcClient.sendMessage(message(METHODS.aepp.sign, { ...opt, tx, returnSigned: true }))
+      )
+    },
+    /**
+     * Overwriting of `signMessage` AE method
+     * All sdk API which use it will be send notification to wallet and wait for callBack
+     * @function signMessage
+     * @instance
+     * @rtype (message: String, options = {}) => Promise
+     * @return {Promise<String>} Signed transaction
+     */
+    async signMessage (message, opt = {}) {
+      if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
+      if (!this.rpcClient.getCurrentAccount()) throw new Error('You do not subscribed for account.')
+      return this.rpcClient.addCallback(
+        this.rpcClient.sendMessage(message(METHODS.aepp.signMessage, { ...opt, message }))
       )
     },
     /**
