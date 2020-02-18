@@ -142,7 +142,7 @@ const REQUESTS = {
         id,
         method,
         {
-          signature: await instance.signMessage(message, { onAccount })
+          result: { signature: await instance.signMessage(message, { onAccount }) }
         }
       )
 
@@ -175,6 +175,7 @@ const handleMessage = (instance, id) => async (msg) => {
  * @param {Function} onSubscription Call-back function for incoming AEPP account subscription (Second argument contain function for accept/deny request)
  * @param {Function} onSign Call-back function for incoming AEPP sign request (Second argument contain function for accept/deny request)
  * @param {Function} onAskAccounts Call-back function for incoming AEPP get address request (Second argument contain function for accept/deny request)
+ * @param {Function} onMessageSign Call-back function for incoming AEPP sign message request (Second argument contain function for accept/deny request)
  * @param {Function} onDisconnect Call-back function for disconnect event
  * @return {Object}
  */

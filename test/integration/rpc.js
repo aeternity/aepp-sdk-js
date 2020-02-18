@@ -71,6 +71,8 @@ describe('Aepp<->Wallet', function () {
         },
         onAskAccounts (aepp, { accept, deny }) {
         },
+        onMessageSign (message, { accept }) {
+        },
         onDisconnect (message, client) {
           this.shareWalletInfo(connectionFromWalletToAepp.sendMessage.bind(connectionFromWalletToAepp))
         }
@@ -266,17 +268,37 @@ describe('Aepp<->Wallet', function () {
     })
     it('Sign by wallet and broadcast transaction by aepp ', async () => {
       const address = await aepp.address()
+      wallet.onSign = (aepp, action) => {
+        action.accept(tx2)
+      }
+      const tx2 = await aepp.spendTx({
+        senderId: address,
+        recipientId: address,
+        amount: 0,
+        payload: 'zerospend2'
+      })
       const tx = await aepp.spendTx({
         senderId: address,
         recipientId: address,
         amount: 0,
         payload: 'zerospend'
       })
-
-      const { blockHeight } = await aepp.send(tx, { walletBroadcast: false })
-      blockHeight.should.be.a('number')
+      const res = await aepp.send(tx, { walletBroadcast: false })
+      decode(res.tx.payload).toString().should.be.equal('zerospend2')
+      res.blockHeight.should.be.a('number')
+    })
+    it('Sign message', async () => {
+      wallet.onMessageSign = (aepp, action) => {
+        action.accept()
+      }
+      const messageSig = await aepp.signMessage('test')
+      const isValid = await aepp.verifyMessage('test', messageSig)
+      isValid.should.be.equal(true)
     })
     it('Sign and broadcast invalid transaction', async () => {
+      wallet.onSign = (aepp, action) => {
+        action.accept()
+      }
       const address = await aepp.address()
       const tx = await aepp.spendTx({
         senderId: address,

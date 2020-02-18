@@ -73,7 +73,7 @@ async function signMessage (message, opt = {}) {
  * @return {Boolean}
  */
 async function verifyMessage (message, signature, opt = {}) {
-  return verifyPersonalMessage(hash(personalMessageToBinary(message)), signature, decode(await this.address(opt)))
+  return verifyPersonalMessage(message, signature, decode(await this.address(opt)))
 }
 
 /**

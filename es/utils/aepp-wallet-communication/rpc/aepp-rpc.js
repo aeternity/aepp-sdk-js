@@ -193,14 +193,14 @@ export const AeppRpc = Ae.compose({
      * All sdk API which use it will be send notification to wallet and wait for callBack
      * @function signMessage
      * @instance
-     * @rtype (message: String, options = {}) => Promise
+     * @rtype (msg: String, options = {}) => Promise
      * @return {Promise<String>} Signed transaction
      */
-    async signMessage (message, opt = {}) {
+    async signMessage (msg, opt = {}) {
       if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
       if (!this.rpcClient.getCurrentAccount()) throw new Error('You do not subscribed for account.')
       return this.rpcClient.addCallback(
-        this.rpcClient.sendMessage(message(METHODS.aepp.signMessage, { ...opt, message }))
+        this.rpcClient.sendMessage(message(METHODS.aepp.signMessage, { ...opt, message: msg }))
       )
     },
     /**
@@ -228,19 +228,19 @@ export const AeppRpc = Ae.compose({
      * @rtype (tx: String, options = {}) => Promise
      * @param {String} tx
      * @param {Object} [options={}]
-     * @param {Object} [options.walletBroadcast={}]
+     * @param {Object} [options.walletBroadcast=true]
      * @return {Promise<Object>} Transaction broadcast result
      */
-    async send (tx, options = { walletBroadcast: true }) {
+    async send (tx, options = {}) {
       if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
       if (!this.rpcClient.getCurrentAccount()) throw new Error('You do not subscribed for account.')
       const opt = R.merge(this.Ae.defaults, options)
       if (!opt.walletBroadcast) {
-        const signed = await this.signTransaction(tx, opt)
+        const signed = await this.signTransaction(tx, { onAccount: opt.onAccount })
         return this.sendTransaction(signed, opt)
       }
       return this.rpcClient.addCallback(
-        this.rpcClient.sendMessage(message(METHODS.aepp.sign, { ...opt, tx, returnSigned: false }))
+        this.rpcClient.sendMessage(message(METHODS.aepp.sign, { onAccount: opt.onAccount, tx, returnSigned: false }))
       )
     }
   }
