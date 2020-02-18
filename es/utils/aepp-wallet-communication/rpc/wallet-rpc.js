@@ -120,7 +120,7 @@ const REQUESTS = {
         } catch (e) {
           if (!returnSigned) {
             // Validate transaction
-            const validationResult = await instance.unpackAndVerify(tx)
+            const validationResult = await instance.unpackAndVerify(rawTx || tx)
             if (validationResult.validation.length) return sendResponseMessage(client)(id, method, { error: ERRORS.invalidTransaction(validationResult) })
             // Send broadcast failed error to aepp
             sendResponseMessage(client)(id, method, { error: ERRORS.broadcastFailde(e.message) })
