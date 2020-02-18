@@ -290,7 +290,7 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
     getWalletInfo () {
       const runtime = getBrowserAPI(true).runtime
       return {
-        id: runtime ? runtime.id : this.id,
+        id: runtime && runtime.id ? runtime.id : this.id,
         name: this.name,
         networkId: this.getNetworkId(),
         origin: window.location.origin,

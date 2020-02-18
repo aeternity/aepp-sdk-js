@@ -200,11 +200,11 @@ export const RpcClient = stampit({
         ...action,
         accept (...args) {
           removeAction(action.id)
-          r(args)
+          r(...args)
         },
         deny (...args) {
           removeAction(action.id)
-          j(args)
+          j(...args)
         }
       }
       return this.actions[action.id]

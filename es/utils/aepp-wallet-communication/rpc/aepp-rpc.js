@@ -102,6 +102,7 @@ export const AeppRpc = Ae.compose({
       if (typeof this[event] !== 'function') throw new Error(`Call-back for ${event} must be an function!`)
     })
   },
+  deepProps: { Ae: { defaults: { walletBroadcast: true } } },
   methods: {
     sign () {
     },
