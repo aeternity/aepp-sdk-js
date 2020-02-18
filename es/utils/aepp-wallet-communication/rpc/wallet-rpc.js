@@ -148,7 +148,7 @@ const REQUESTS = {
 
       const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.rejectedByUser(error) })
 
-      instance.onSign(client, client.addAction({ id, method, params: { message, onAccount } }, [accept(id), deny(id)]))
+      instance.onMessageSign(client, client.addAction({ id, method, params: { message, onAccount } }, [accept(id), deny(id)]))
     }
 }
 
@@ -179,14 +179,15 @@ const handleMessage = (instance, id) => async (msg) => {
  * @return {Object}
  */
 export const WalletRpc = Ae.compose(Accounts, Selector, {
-  init ({ name, onConnection, onSubscription, onSign, onDisconnect, onAskAccounts }) {
-    const eventsHandlers = ['onConnection', 'onSubscription', 'onSign', 'onDisconnect']
+  init ({ name, onConnection, onSubscription, onSign, onDisconnect, onAskAccounts, onMessageSign }) {
+    const eventsHandlers = ['onConnection', 'onSubscription', 'onSign', 'onDisconnect', 'onMessageSign']
     // CallBacks for events
     this.onConnection = onConnection
     this.onSubscription = onSubscription
     this.onSign = onSign
     this.onDisconnect = onDisconnect
     this.onAskAccounts = onAskAccounts
+    this.onMessageSign = onMessageSign
 
     eventsHandlers.forEach(event => {
       if (typeof this[event] !== 'function') throw new Error(`Call-back for ${event} must be an function!`)

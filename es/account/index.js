@@ -69,13 +69,11 @@ async function signMessage (message, opt = {}) {
  * @rtype (msg: String, signature: String, publicKey: String) => signature: Promise[String], throws: Error
  * @param {String} message - Message to verify
  * @param {String} signature - Signature
- * @param {String} publicKey - Public Key
  * @param {Object} opt - Options
  * @return {Boolean}
  */
-async function verifyMessage (message, signature, publicKey, opt = {}) {
-  publicKey = publicKey || await this.address(opt)
-  return verifyPersonalMessage(hash(personalMessageToBinary(message)), signature, decode(publicKey))
+async function verifyMessage (message, signature, opt = {}) {
+  return verifyPersonalMessage(hash(personalMessageToBinary(message)), signature, decode(await this.address(opt)))
 }
 
 /**
