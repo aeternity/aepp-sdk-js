@@ -18,7 +18,8 @@
 import '../'
 import { describe, it } from 'mocha'
 import MemoryAccount from '../../es/account/memory'
-import { generateKeyPair } from '../../es/utils/crypto'
+import { generateKeyPair, verifyPersonalMessage } from '../../es/utils/crypto'
+import { decode } from '../../es/tx/builder/helpers'
 
 const testAcc = generateKeyPair()
 
@@ -92,5 +93,11 @@ describe('MemoryAccount', function () {
       }
     })
     return acc.address().should.eventually.be.equal(testAcc.publicKey)
+  })
+  it('Sign message', async () => {
+    const message = 'test'
+    const sig = await MemoryAccount({ keypair: testAcc }).signMessage(message)
+    const isValid = verifyPersonalMessage(message, sig, decode(testAcc.publicKey))
+    isValid.should.be.equal(true)
   })
 })
