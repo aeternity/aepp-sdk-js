@@ -15,6 +15,7 @@ import ContentScriptBridge from '@aeternity/aepp-sdk/es/utils/aepp-wallet-commun
         * [.askAddresses()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+askAddresses) ⇒ `Promise`
         * [.subscribeAddress(type, value)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+subscribeAddress) ⇒ `Promise`
         * [.signTransaction()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+signTransaction) ⇒ `Promise.&lt;String&gt;`
+        * [.signMessage()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+signMessage) ⇒ `Promise.&lt;String&gt;`
         * [.sendConnectRequest()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+sendConnectRequest) ⇒ `Promise`
         * [.send(tx, [options])](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+send) ⇒ `Promise.&lt;Object&gt;`
 
@@ -90,6 +91,15 @@ All sdk API which use it will be send notification to wallet and wait for callBa
 **Kind**: instance method of [`exports.AeppRpc`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc)  
 **Returns**: `Promise.&lt;String&gt;` - Signed transaction  
 **rtype**: `(tx: String, options = {}) => Promise`
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+signMessage"></a>
+
+#### exports.AeppRpc.signMessage() ⇒ `Promise.&lt;String&gt;`
+Overwriting of `signMessage` AE method
+All sdk API which use it will be send notification to wallet and wait for callBack
+
+**Kind**: instance method of [`exports.AeppRpc`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc)  
+**Returns**: `Promise.&lt;String&gt;` - Signed transaction  
+**rtype**: `(msg: String, options = {}) => Promise`
 <a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+sendConnectRequest"></a>
 
 #### exports.AeppRpc.sendConnectRequest() ⇒ `Promise`
@@ -113,5 +123,5 @@ This method will sign, broadcast and wait until transaction will be accepted usi
 | --- | --- | --- |
 | tx | `String` |  | 
 | [options] | `Object` | <code>{}</code> | 
-| [options.walletBroadcast] | `Object` | <code>{}</code> | 
+| [options.walletBroadcast] | `Object` | <code>true</code> | 
 

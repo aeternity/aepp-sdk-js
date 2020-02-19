@@ -198,13 +198,13 @@ export const RpcClient = stampit({
       if (Object.prototype.hasOwnProperty.call(this.callbacks, action.id)) throw new Error('Action for this request already exist')
       this.actions[action.id] = {
         ...action,
-        accept () {
+        accept (...args) {
           removeAction(action.id)
-          r()
+          r(...args)
         },
-        deny () {
+        deny (...args) {
           removeAction(action.id)
-          j()
+          j(...args)
         }
       }
       return this.actions[action.id]

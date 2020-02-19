@@ -103,11 +103,11 @@ describe('crypto', () => {
 
   describe('personal messages', () => {
     const message = 'test'
-    const messageSignatureAsHex = '20f779383f3ce0ab7781b7c8ff848e6d80f7f22d5cdc266763cd74d89c5ee0716758e75f56391711957f506d4993ae7dea62bec0f2806e6de66227f52836160a'
+    const messageSignatureAsHex = 'c910daedceebb658f49ad862b2032e6b455143ebc1d698e9018ac4cf2d76f65fefda254893b0f56203b4cef1ff549f72ef155d58792fd52d0c1b6e210525e207'
     const messageSignature = Buffer.from(messageSignatureAsHex, 'hex')
 
     const messageNonASCII = 'tæst'
-    const messageNonASCIISignatureAsHex = '68d1344c46d9b2ef642490ffade3155c714471dd6d097fc393edc1004031a5492270de77ef8918df7857ea348d8ba4444ed1ff8e84f19e8e685e31174356fa06'
+    const messageNonASCIISignatureAsHex = 'faa1bdb8a88c529be904036382705ed207bbdde00ece3bdb541f5986d57aebe7babe315a4d95f5882165c28bf41f6149430509ded1cc7dcd9b134e0e1d73cd0b'
     const messageNonASCIISignature = Buffer.from(messageNonASCIISignatureAsHex, 'hex')
 
     describe('sign', () => {

@@ -36,6 +36,8 @@
   * [@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client](api/utils/aepp-wallet-communication/rpc/rpc-client.md)
   * [@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc](api/utils/aepp-wallet-communication/rpc/wallet-rpc.md)
   * [@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector](api/utils/aepp-wallet-communication/wallet-detector.md)
+  * [@aeternity/aepp-sdk/es/utils/amount-formatter](api/utils/amount-formatter.md)
+  * [@aeternity/aepp-sdk/es/utils/bignumber](api/utils/bignumber.md)
   * [@aeternity/aepp-sdk/es/utils/bytes](api/utils/bytes.md)
   * [@aeternity/aepp-sdk/es/utils/crypto](api/utils/crypto.md)
   * [@aeternity/aepp-sdk/es/utils/keystore](api/utils/keystore.md)

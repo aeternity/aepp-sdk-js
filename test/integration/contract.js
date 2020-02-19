@@ -22,6 +22,7 @@ import { decode } from '../../es/tx/builder/helpers'
 import * as R from 'ramda'
 import { randomName } from './aens'
 import { decodeEvents, SOPHIA_TYPES } from '../../es/contract/aci/transformation'
+import { hash, personalMessageToBinary } from '../../es/utils/crypto'
 
 const identityContract = `
 contract Identity =
@@ -166,6 +167,11 @@ contract DelegateTest =
                               r    : string) =
     Oracle.respond(o, q, signature = sign, r)`
 const encodedNumberSix = 'cb_DA6sWJo='
+const signSource = `
+contract Sign =
+  entrypoint verify (msg: hash, pub: address, sig: signature): bool =
+    Crypto.verify_sig(msg, pub, sig)
+`
 const filesystem = {
   testLib: libContract
 }
@@ -276,6 +282,15 @@ describe('Contract', function () {
     console.log(`Node => ${version}, consensus => ${consensusProtocolVersion}, compiler => ${contract.compilerVersion}`)
     const code = await contract.contractCompile(identityContract)
     return contract.contractDeploy(code.bytecode, identityContract).should.eventually.have.property('address')
+  })
+  it('Verify message in Sophia', async () => {
+    const msg = personalMessageToBinary('Hello')
+    const msgHash = hash(msg)
+    const signature = await contract.sign(msgHash)
+    const signContract = await contract.getContractInstance(signSource)
+    await signContract.deploy()
+    const { decodedResult } = await signContract.methods.verify(msgHash, await contract.address(), signature)
+    decodedResult.should.be.equal(true)
   })
   it('compiles Sophia code', async () => {
     bytecode = await contract.contractCompile(identityContract)

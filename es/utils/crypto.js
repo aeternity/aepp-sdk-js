@@ -359,18 +359,18 @@ export function prepareTx (signature, data) {
 }
 
 export function personalMessageToBinary (message) {
-  const p = Buffer.from('æternity Signed Message:\n', 'utf8')
+  const p = Buffer.from('aeternity Signed Message:\n', 'utf8')
   const msg = Buffer.from(message, 'utf8')
   if (msg.length >= 0xFD) throw new Error('message too long')
   return Buffer.concat([Buffer.from([p.length]), p, Buffer.from([msg.length]), msg])
 }
 
 export function signPersonalMessage (message, privateKey) {
-  return sign(personalMessageToBinary(message), privateKey)
+  return sign(hash(personalMessageToBinary(message)), privateKey)
 }
 
 export function verifyPersonalMessage (str, signature, publicKey) {
-  return verify(personalMessageToBinary(str), signature, publicKey)
+  return verify(hash(personalMessageToBinary(str)), signature, publicKey)
 }
 
 /**

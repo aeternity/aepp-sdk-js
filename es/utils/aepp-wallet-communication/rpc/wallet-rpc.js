@@ -120,7 +120,7 @@ const REQUESTS = {
         } catch (e) {
           if (!returnSigned) {
             // Validate transaction
-            const validationResult = await instance.unpackAndVerify(tx)
+            const validationResult = await instance.unpackAndVerify(rawTx || tx)
             if (validationResult.validation.length) return sendResponseMessage(client)(id, method, { error: ERRORS.invalidTransaction(validationResult) })
             // Send broadcast failed error to aepp
             sendResponseMessage(client)(id, method, { error: ERRORS.broadcastFailde(e.message) })
@@ -132,6 +132,23 @@ const REQUESTS = {
       const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.rejectedByUser(error) })
 
       instance.onSign(client, client.addAction({ id, method, params: { tx, returnSigned, onAccount } }, [accept(id), deny(id)]))
+    },
+  [METHODS.aepp.signMessage]: (instance, { client }) =>
+    async ({ id, method, params: { message, onAccount } }) => {
+      // Authorization check
+      if (!client.isConnected()) return sendResponseMessage(client)(id, method, { error: ERRORS.notAuthorize() })
+
+      const accept = (id) => async () => sendResponseMessage(client)(
+        id,
+        method,
+        {
+          result: { signature: await instance.signMessage(message, { onAccount }) }
+        }
+      )
+
+      const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.rejectedByUser(error) })
+
+      instance.onMessageSign(client, client.addAction({ id, method, params: { message, onAccount } }, [accept(id), deny(id)]))
     }
 }
 
@@ -158,18 +175,20 @@ const handleMessage = (instance, id) => async (msg) => {
  * @param {Function} onSubscription Call-back function for incoming AEPP account subscription (Second argument contain function for accept/deny request)
  * @param {Function} onSign Call-back function for incoming AEPP sign request (Second argument contain function for accept/deny request)
  * @param {Function} onAskAccounts Call-back function for incoming AEPP get address request (Second argument contain function for accept/deny request)
+ * @param {Function} onMessageSign Call-back function for incoming AEPP sign message request (Second argument contain function for accept/deny request)
  * @param {Function} onDisconnect Call-back function for disconnect event
  * @return {Object}
  */
 export const WalletRpc = Ae.compose(Accounts, Selector, {
-  init ({ name, onConnection, onSubscription, onSign, onDisconnect, onAskAccounts }) {
-    const eventsHandlers = ['onConnection', 'onSubscription', 'onSign', 'onDisconnect']
+  init ({ name, onConnection, onSubscription, onSign, onDisconnect, onAskAccounts, onMessageSign }) {
+    const eventsHandlers = ['onConnection', 'onSubscription', 'onSign', 'onDisconnect', 'onMessageSign']
     // CallBacks for events
     this.onConnection = onConnection
     this.onSubscription = onSubscription
     this.onSign = onSign
     this.onDisconnect = onDisconnect
     this.onAskAccounts = onAskAccounts
+    this.onMessageSign = onMessageSign
 
     eventsHandlers.forEach(event => {
       if (typeof this[event] !== 'function') throw new Error(`Call-back for ${event} must be an function!`)
@@ -273,7 +292,7 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
     getWalletInfo () {
       const runtime = getBrowserAPI(true).runtime
       return {
-        id: runtime ? runtime.id : this.id,
+        id: runtime && runtime.id ? runtime.id : this.id,
         name: this.name,
         networkId: this.getNetworkId(),
         origin: window.location.origin,

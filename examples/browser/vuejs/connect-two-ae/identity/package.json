@@ -14,7 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "@aeternity/aepp-sdk": "https://github.com/aeternity/aepp-sdk-js#feat/switch-to-post-message-for-extension",
-    "purgecss-webpack-plugin": "^2.0.3",
+    "purgecss-webpack-plugin": "^1.2.0",
     "vue": "^2.5.16",
     "vue-router": "^3.0.1",
     "vue-template-compiler": "^2.5.16",
