@@ -1,4 +1,5 @@
 import { BigNumber } from 'bignumber.js'
+import { AE_AMOUNT_FORMATS, formatAmount } from '../../utils/amount-formatter'
 import { assertedType, rlp } from '../../utils/crypto'
 
 import {
@@ -48,6 +49,8 @@ function deserializeField (value, type, prefix) {
       const [vm, , abi] = value
       return { vmVersion: readInt(Buffer.from([vm])), abiVersion: readInt(Buffer.from([abi])) }
     }
+    case FIELD_TYPES.amount:
+      return readInt(value)
     case FIELD_TYPES.int:
       return readInt(value)
     case FIELD_TYPES.id:
@@ -100,6 +103,7 @@ function deserializeField (value, type, prefix) {
 
 function serializeField (value, type, prefix) {
   switch (type) {
+    case FIELD_TYPES.amount:
     case FIELD_TYPES.int:
       return writeInt(value)
     case FIELD_TYPES.id:
@@ -145,6 +149,7 @@ function validateField (value, key, type, prefix) {
 
   // Validate type of value
   switch (type) {
+    case FIELD_TYPES.amount:
     case FIELD_TYPES.int: {
       const isMinusValue = (!isNaN(value) || BigNumber.isBigNumber(value)) && BigNumber(value).lt(0)
       return assert((!isNaN(value) || BigNumber.isBigNumber(value)) && BigNumber(value).gte(0), { value, isMinusValue })
@@ -168,7 +173,12 @@ function validateField (value, key, type, prefix) {
   }
 }
 
-function transformParams (params) {
+function transformParams (params, schema, { denomination } = {}) {
+  // console.log(schema.filter(([_, t]) => t === FIELD_TYPES.amount))
+  // console.log(params)
+  params = schema
+    .filter(([_, t]) => t === FIELD_TYPES.amount)
+    .reduce((acc, [key]) => ({ ...params, [key]: formatAmount(params[key], { denomination }) }), params)
   return Object
     .entries(params)
     .reduce(
@@ -291,17 +301,18 @@ export function validateParams (params, schema, { excludeKeys = [] }) {
  * @throws {Error} Validation error
  * @return {Array} Array with binary fields of transaction
  */
-export function buildRawTx (params, schema, { excludeKeys = [] } = {}) {
-  // Transform params(reason is for do not break current interface of `tx`)
-  params = transformParams(params)
+export function buildRawTx (params, schema, { excludeKeys = [], denomination = AE_AMOUNT_FORMATS.AETTOS } = {}) {
+  const filteredSchema = schema.filter(([key]) => !excludeKeys.includes(key))
+
+  // Transform `amount` type fields to `aettos`
+  params = transformParams(params, filteredSchema, { denomination })
   // Validation
   const valid = validateParams(params, schema, { excludeKeys })
   if (Object.keys(valid).length) {
     throw new Error('Transaction build error. ' + JSON.stringify(valid))
   }
 
-  return schema
-    .filter(([key]) => !excludeKeys.includes(key))
+  return filteredSchema
     .map(([key, fieldType, prefix]) => serializeField(params[key], fieldType, prefix))
 }
 
@@ -337,7 +348,7 @@ export function unpackRawTx (binary, schema) {
  * @throws {Error} Validation error
  * @return {Object} { tx, rlpEncoded, binary } Object with tx -> Base64Check transaction hash with 'tx_' prefix, rlp encoded transaction and binary transaction
  */
-export function buildTx (params, type, { excludeKeys = [], prefix = 'tx', vsn = VSN } = {}) {
+export function buildTx (params, type, { excludeKeys = [], prefix = 'tx', vsn = VSN, denomination = AE_AMOUNT_FORMATS.AETTOS } = {}) {
   if (!TX_SERIALIZATION_SCHEMA[type]) {
     throw new Error('Transaction serialization not implemented for ' + type)
   }
@@ -345,7 +356,7 @@ export function buildTx (params, type, { excludeKeys = [], prefix = 'tx', vsn = 
     throw new Error('Transaction serialization not implemented for ' + type + ' version ' + vsn)
   }
   const [schema, tag] = TX_SERIALIZATION_SCHEMA[type][vsn]
-  const binary = buildRawTx({ ...params, VSN: vsn, tag }, schema, { excludeKeys }).filter(e => e !== undefined)
+  const binary = buildRawTx({ ...params, VSN: vsn, tag }, schema, { excludeKeys, denomination: params.denomination || denomination }).filter(e => e !== undefined)
 
   const rlpEncoded = rlp.encode(binary)
   const tx = encode(rlpEncoded, prefix)

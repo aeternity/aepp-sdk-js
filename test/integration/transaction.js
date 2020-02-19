@@ -20,6 +20,8 @@ import { encodeBase58Check, encodeBase64Check, generateKeyPair, salt } from '../
 import { ready, configure } from './index'
 import { commitmentHash, isNameValid } from '../../es/tx/builder/helpers'
 import { MemoryAccount } from '../../es'
+import { AE_AMOUNT_FORMATS } from '../../es/utils/amount-formatter'
+import { unpackTx } from '../../es/tx/builder'
 
 const nonce = 1
 const nameTtl = 1
@@ -75,10 +77,19 @@ describe('Native Transaction', function () {
     _salt = salt()
     commitmentId = await commitmentHash(name, _salt)
   })
-
+  it('Build tx using denomination amount', async () => {
+    const spendAe = await clientNative.spendTx({ senderId, recipientId, amount: 1, nonce, payload: 'test', denomination: AE_AMOUNT_FORMATS.AE })
+    const spendAettos = await clientNative.spendTx({ senderId, recipientId, amount: 1e18, nonce, payload: 'test' })
+    spendAe.should.be.equal(spendAettos)
+    const { tx: { amount } } = unpackTx(spendAe)
+    const { tx: { amount: amount2 } } = unpackTx(spendAettos)
+    amount.should.be.equal(amount2)
+  })
   it('native build of spend tx', async () => {
-    const txFromAPI = await client.spendTx({ senderId, recipientId, amount, nonce, payload: 'test' })
-    const nativeTx = await clientNative.spendTx({ senderId, recipientId, amount, nonce, payload: 'test' })
+    const aeAmount = 2
+    const aettosAmount = 2e18
+    const txFromAPI = await client.spendTx({ senderId, recipientId, amount: aettosAmount, nonce, payload: 'test' })
+    const nativeTx = await clientNative.spendTx({ senderId, recipientId, amount: aeAmount, nonce, payload: 'test', denomination: AE_AMOUNT_FORMATS.AE })
     txFromAPI.should.be.equal(nativeTx)
   })
 
