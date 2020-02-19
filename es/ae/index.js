@@ -31,6 +31,7 @@ import * as R from 'ramda'
 import { BigNumber } from 'bignumber.js'
 import { isAddressValid } from '../utils/crypto'
 import { isNameValid, produceNameId } from '../tx/builder/helpers'
+import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter'
 
 /**
  * Sign and post a transaction to the chain
@@ -155,7 +156,7 @@ function destroyInstance () {
  */
 const Ae = stampit(Tx, Account, Chain, {
   methods: { send, spend, transferFunds, destroyInstance, resolveRecipientName, signUsingGA },
-  deepProps: { Ae: { defaults: {} } },
+  deepProps: { Ae: { defaults: { denomination: AE_AMOUNT_FORMATS.AETTOS } } },
   deepConfiguration: { Ae: { methods: ['signUsingGA'] } }
 })
 
