@@ -29,21 +29,29 @@ import { BigNumber } from 'bignumber.js'
  */
 export const AE_AMOUNT_FORMATS = {
   AE: 'ae',
-  AETTOS: 'aettos',
-  PICO_AE: 'picoAe',
-  MILI_AE: 'miliAe',
-  MICRO_AE: 'microAe'
+  PETA_AETTOS: 'petaAettos',
+  TERA_AETTOS: 'teraAettos',
+  GIGA_AETTOS: 'gigaAettos',
+  MEGA_AETTOS: 'megaAettos',
+  KILO_AETTOS: 'kiloAettos',
+  HECTO_AETTOS: 'hectoAettos',
+  DECA_AETTOS: 'decaAettos',
+  AETTOS: 'aettos'
 }
 
 /**
  *
- * @type {{[string]: number}}
+ * @type {{[p: string]: number}}
  */
 const DENOMINATION_MAGNITUDE = {
   [AE_AMOUNT_FORMATS.AE]: 18,
-  [AE_AMOUNT_FORMATS.MILI_AE]: 15,
-  [AE_AMOUNT_FORMATS.MICRO_AE]: 12,
-  [AE_AMOUNT_FORMATS.PICO_AE]: 6,
+  [AE_AMOUNT_FORMATS.PETA_AETTOS]: 15,
+  [AE_AMOUNT_FORMATS.TERA_AETTOS]: 12,
+  [AE_AMOUNT_FORMATS.GIGA_AETTOS]: 9,
+  [AE_AMOUNT_FORMATS.MEGA_AETTOS]: 6,
+  [AE_AMOUNT_FORMATS.KILO_AETTOS]: 3,
+  [AE_AMOUNT_FORMATS.HECTO_AETTOS]: 2,
+  [AE_AMOUNT_FORMATS.DECA_AETTOS]: 1,
   [AE_AMOUNT_FORMATS.AETTOS]: 0
 }
 
@@ -52,7 +60,7 @@ const DENOMINATION_MAGNITUDE = {
  * @param {String|Number|BigNumber} value amount to convert
  * @param {Object} [options={}] options
  * @param {String} [options.denomination='aettos'] denomination of amount, can be ['ae', 'aettos']
- * @return {BigNumber}
+ * @return {String}
  */
 export const toAe = (value, { denomination = AE_AMOUNT_FORMATS.AETTOS } = {}) => formatAmount(value, { denomination, targetDenomination: AE_AMOUNT_FORMATS.AE })
 
@@ -61,7 +69,7 @@ export const toAe = (value, { denomination = AE_AMOUNT_FORMATS.AETTOS } = {}) =>
  * @param {String|Number|BigNumber} value amount to convert
  * @param {Object} [options={}] options
  * @param {String} [options.denomination='ae'] denomination of amount, can be ['ae', 'aettos']
- * @return {BigNumber}
+ * @return {String}
  */
 export const toAettos = (value, { denomination = AE_AMOUNT_FORMATS.AE } = {}) => formatAmount(value, { denomination })
 
@@ -71,7 +79,7 @@ export const toAettos = (value, { denomination = AE_AMOUNT_FORMATS.AE } = {}) =>
  * @param {Object} [options={}] options
  * @param {String} [options.denomination='aettos'] denomination of amount, can be ['ae', 'aettos']
  * @param {String} [options.targetDenomination='aettos'] target denomination, can be ['ae', 'aettos']
- * @return {BigNumber}
+ * @return {String}
  */
 export const formatAmount = (value, { denomination = AE_AMOUNT_FORMATS.AETTOS, targetDenomination = AE_AMOUNT_FORMATS.AETTOS } = {}) => {
   if (!Object.values(AE_AMOUNT_FORMATS).includes(denomination)) throw new Error(`Invalid denomination. Current: ${denomination}, available [${Object.keys(AE_AMOUNT_FORMATS)}]`)
