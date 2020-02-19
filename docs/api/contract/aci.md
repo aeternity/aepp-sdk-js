@@ -71,7 +71,7 @@ Generate contract ACI object with predefined js methods for contract usage - can
 | [options.aci] | `String` |  | Contract ACI |
 | [options.contractAddress] | `String` |  | Contract address |
 | [options.filesystem] | `Object` |  | Contact source external namespaces map |
-| [options.forceCodeCheck] | `Object` |  | Don't check contract code |
+| [options.forceCodeCheck] | `Object` | <code>true</code> | Don't check contract code |
 | [options.opt] | `Object` |  | Contract options |
 
 **Example**  

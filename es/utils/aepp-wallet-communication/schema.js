@@ -22,7 +22,8 @@ export const REQUESTS = asEnum([
   'connect',
   'subscribeAddress',
   'sign',
-  'address'
+  'address',
+  'signMessage'
 ])
 
 export const SUBSCRIPTION_VALUES = asEnum([
@@ -44,6 +45,7 @@ export const METHODS = {
     [REQUESTS.address]: 'address.get',
     [REQUESTS.connect]: 'connection.open',
     [REQUESTS.sign]: 'transaction.sign',
+    [REQUESTS.signMessage]: 'message.sign',
     [REQUESTS.subscribeAddress]: 'address.subscribe'
   },
   [NOTIFICATIONS.updateNetwork]: 'networkId.update',

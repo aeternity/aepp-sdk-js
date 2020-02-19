@@ -25,7 +25,6 @@ import { BigNumber } from 'bignumber.js'
 
 /**
  * AE amount formats
- * @type {{AE: string, AETTOS: string}}
  */
 export const AE_AMOUNT_FORMATS = {
   AE: 'ae',
@@ -40,8 +39,7 @@ export const AE_AMOUNT_FORMATS = {
 }
 
 /**
- *
- * @type {{[p: string]: number}}
+ * DENOMINATION_MAGNITUDE
  */
 const DENOMINATION_MAGNITUDE = {
   [AE_AMOUNT_FORMATS.AE]: 18,

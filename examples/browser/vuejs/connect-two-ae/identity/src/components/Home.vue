@@ -41,7 +41,7 @@
 
 <script>
   // AE_SDK_MODULES is a webpack alias present in webpack.config.js
-  import { MemoryAccount, RpcWallet } from '@aeternity/aepp-sdk/es'
+  import { MemoryAccount, RpcWallet, Node } from '@aeternity/aepp-sdk/es'
   import BrowserWindowMessageConnection
     from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message'
   import { generateKeyPair } from '@aeternity/aepp-sdk/es/utils/crypto'
@@ -97,10 +97,10 @@
       const { publicKey, secretKey } = generateKeyPair()
       this.pub = this.pub || publicKey
       const account2 = MemoryAccount({ keypair: generateKeyPair() })
+      const node = await Node({ url: this.url, internalUrl: this.internalUrl })
 
       this.client = await RpcWallet({
-        url: this.url,
-        internalUrl: this.internalUrl,
+        nodes: [{ name: 'test-net', instance: node }],
         compilerUrl: this.compilerUrl,
         accounts: [MemoryAccount({ keypair: { secretKey: this.priv || secretKey, publicKey: this.pub || publicKey } }), account2],
         address: this.pub,
