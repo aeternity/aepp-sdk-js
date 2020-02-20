@@ -29,6 +29,7 @@ import { hash, personalMessageToBinary, decodeBase64Check, assertedType, verifyP
 import { buildTx } from '../tx/builder'
 import { decode } from '../tx/builder/helpers'
 import { TX_TYPE } from '../tx/builder/schema'
+import { getNetworkId } from '../node'
 
 /**
  * Sign encoded transaction
@@ -74,18 +75,6 @@ async function signMessage (message, opt = {}) {
  */
 async function verifyMessage (message, signature, opt = {}) {
   return verifyPersonalMessage(message, signature, decode(await this.address(opt)))
-}
-
-/**
- * Obtain networkId for signing
- * @instance
- * @category async
- * @rtype () => networkId: String
- * @return {String} NetworkId
- */
-function getNetworkId () {
-  if (!this.networkId && !this.selectedNode.networkId) throw new Error('networkId is not provided')
-  return this.networkId || this.selectedNode.networkId
 }
 
 /**
