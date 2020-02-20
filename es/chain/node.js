@@ -18,7 +18,7 @@ import * as R from 'ramda'
 
 import Chain from './'
 import Oracle from '../oracle/node'
-import formatBalance from '../utils/amount-formatter'
+import { AE_AMOUNT_FORMATS, formatAmount } from '../utils/amount-formatter'
 import TransactionValidator from '../tx/validator'
 import NodePool from '../node-pool'
 
@@ -84,16 +84,16 @@ async function getAccount (address, { height, hash } = {}) {
  * @function
  * @deprecated
  */
-async function balance (address, { height, hash, format = false } = {}) {
+async function balance (address, { height, hash, format = AE_AMOUNT_FORMATS.AETTOS } = {}) {
   const { balance } = await this.getAccount(address, { hash, height })
 
-  return format ? formatBalance(balance) : balance.toString()
+  return formatAmount(balance, { targetDenomination: format }).toString()
 }
 
-async function getBalance (address, { height, hash, format = false } = {}) {
+async function getBalance (address, { height, hash, format = AE_AMOUNT_FORMATS.AETTOS } = {}) {
   const { balance } = await this.getAccount(address, { hash, height }).catch(_ => ({ balance: 0 }))
 
-  return format ? formatBalance(balance) : balance.toString()
+  return formatAmount(balance, { targetDenomination: format }).toString()
 }
 
 async function tx (hash, info = true) {
