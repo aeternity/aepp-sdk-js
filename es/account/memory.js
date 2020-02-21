@@ -34,8 +34,8 @@ async function sign (data) {
   return Promise.resolve(Crypto.sign(data, secrets.get(this).secretKey))
 }
 
-async function address (format = Crypto.ADDRESS_FORMAT.api) {
-  return Promise.resolve(Crypto.formatAddress(format, secrets.get(this).publicKey))
+async function address (opt = { format: Crypto.ADDRESS_FORMAT.api }) {
+  return Promise.resolve(Crypto.formatAddress(opt.format, secrets.get(this).publicKey))
 }
 
 function setSecret (keyPair) {
