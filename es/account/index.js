@@ -58,8 +58,9 @@ async function signTransaction (tx, opt = {}) {
  * @param {Object} opt - Options
  * @return {String} Signature
  */
-async function signMessage (message, opt = {}) {
-  return this.sign(hash(personalMessageToBinary(message)), opt)
+async function signMessage (message, opt = { returnHex: false }) {
+  const sig = await this.sign(hash(personalMessageToBinary(message)), opt)
+  return opt.returnHex ? Buffer.from(sig).toString('hex') : sig
 }
 
 /**
@@ -73,7 +74,7 @@ async function signMessage (message, opt = {}) {
  * @return {Boolean}
  */
 async function verifyMessage (message, signature, opt = {}) {
-  return verifyPersonalMessage(message, signature, decode(await this.address(opt)))
+  return verifyPersonalMessage(message, typeof signature === 'string' ? Buffer.from(signature, 'hex') : signature, decode(await this.address(opt)))
 }
 
 /**
