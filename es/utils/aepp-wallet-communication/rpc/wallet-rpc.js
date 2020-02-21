@@ -247,6 +247,18 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
       return rpcClients
     },
     /**
+     * Remove specific RpcClient by id
+     * @function removeClient
+     * @instance
+     * @rtype (id: string) => Boolean
+     * @param {String} id Client id
+     * @param {Object} [opt = {}]
+     * @return {Object}
+     */
+    removeClient (id, opt = { forceConnectionClose: false }) {
+      rpcClients.removeClient(id, opt)
+    },
+    /**
      * Add new AEPP connection
      * @function addRpcClient
      * @instance
