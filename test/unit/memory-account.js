@@ -18,8 +18,7 @@
 import '../'
 import { describe, it } from 'mocha'
 import MemoryAccount from '../../es/account/memory'
-import { generateKeyPair, verifyPersonalMessage } from '../../es/utils/crypto'
-import { decode } from '../../es/tx/builder/helpers'
+import { generateKeyPair } from '../../es/utils/crypto'
 
 const testAcc = generateKeyPair()
 
@@ -96,8 +95,12 @@ describe('MemoryAccount', function () {
   })
   it('Sign message', async () => {
     const message = 'test'
-    const sig = await MemoryAccount({ keypair: testAcc }).signMessage(message)
-    const isValid = verifyPersonalMessage(message, sig, decode(testAcc.publicKey))
+    const acc = MemoryAccount({ keypair: testAcc })
+    const sig = await acc.signMessage(message)
+    const sigHex = await acc.signMessage(message, { returnHex: true })
+    const isValid = await acc.verifyMessage(message, sig)
+    const isValidHex = await acc.verifyMessage(message, sigHex)
     isValid.should.be.equal(true)
+    isValidHex.should.be.equal(true)
   })
 })

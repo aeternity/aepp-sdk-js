@@ -292,6 +292,7 @@ describe('Aepp<->Wallet', function () {
         action.accept()
       }
       const messageSig = await aepp.signMessage('test')
+      messageSig.should.be.a('string')
       const isValid = await aepp.verifyMessage('test', messageSig)
       isValid.should.be.equal(true)
     })
