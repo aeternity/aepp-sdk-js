@@ -441,6 +441,31 @@ describe('Aepp<->Wallet', function () {
       })
       received.should.be.equal(true)
     })
+    it('Remove rpc client', async () => {
+      wallet.onConnection = (aepp, actions) => {
+        actions.accept()
+      }
+      const id = wallet.addRpcClient(BrowserWindowMessageConnection({
+        connectionInfo: { id: 'from_wallet_to_aepp_2' },
+        self: connections.waelletConnection,
+        target: connections.aeppConnection
+      }))
+      await aepp.connectToWallet(BrowserWindowMessageConnection({
+        connectionInfo: { id: 'from_aepp_to_wallet_2' },
+        self: connections.aeppConnection,
+        target: connections.waelletConnection
+      }))
+
+      wallet.removeRpcClient(id).should.be.equal(true)
+      wallet.getClients().clients.size.should.be.equal(1)
+    })
+    it('Remove rpc client: client not found', async () => {
+      try {
+        wallet.removeRpcClient('a1')
+      } catch (e) {
+        e.message.should.be.equal('Wallet RpcClient with id a1 do not exist')
+      }
+    })
   })
   describe('Old RPC Wallet-AEPP', () => {
     let wallet

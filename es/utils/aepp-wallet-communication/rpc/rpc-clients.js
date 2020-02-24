@@ -60,7 +60,7 @@ export const RpcClients = stampit({
       return this.clients.get(id)
     },
     /**
-     * Remove and disiconnect client by id
+     * Remove and disiconnect client by ID
      * @function removeClient
      * @instance
      * @rtype (id: (String|Number), { forceConnectionClose: boolean = false }) => boolean
@@ -71,7 +71,7 @@ export const RpcClients = stampit({
     removeClient (id, { forceConnectionClose = false } = {}) {
       if (!this.hasClient(id)) throw new Error(`Wallet RpcClient with id ${id} do not exist`)
       this.clients.get(id).disconnect(forceConnectionClose)
-      this.client.delete(id)
+      this.clients.delete(id)
       return true
     },
     /**
