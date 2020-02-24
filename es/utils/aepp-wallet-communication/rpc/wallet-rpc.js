@@ -142,7 +142,7 @@ const REQUESTS = {
         id,
         method,
         {
-          result: { signature: await instance.signMessage(message, { onAccount }) }
+          result: { signature: await instance.signMessage(message, { onAccount, returnHex: true }) }
         }
       )
 
