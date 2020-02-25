@@ -1,3 +1,82 @@
+# [7.1.0](https://github.com/aeternity/aepp-sdk-js/compare/6.0.1...7.1.0) (2020-02-25)
+
+
+### Bug Fixes
+
+* **ACI:** Disable bytecode check for source and code on-chain ([#783](https://github.com/aeternity/aepp-sdk-js/issues/783)) ([2b878a6](https://github.com/aeternity/aepp-sdk-js/commit/2b878a6))
+* **aens:** added lower case transformation for aens names ([#730](https://github.com/aeternity/aepp-sdk-js/issues/730)) ([f7f9f17](https://github.com/aeternity/aepp-sdk-js/commit/f7f9f17)), closes [#728](https://github.com/aeternity/aepp-sdk-js/issues/728) [#728](https://github.com/aeternity/aepp-sdk-js/issues/728)
+* **AENS:** auction end block calculation ([#746](https://github.com/aeternity/aepp-sdk-js/issues/746)) ([5709e40](https://github.com/aeternity/aepp-sdk-js/commit/5709e40))
+* **AENS:** Change tld for Lima from `aet` to `chain` ([#714](https://github.com/aeternity/aepp-sdk-js/issues/714)) ([323ef6a](https://github.com/aeternity/aepp-sdk-js/commit/323ef6a))
+* **AENS:** Fix `produceNameId` function(Make name lowercase). Enable … ([#750](https://github.com/aeternity/aepp-sdk-js/issues/750)) ([77d54c3](https://github.com/aeternity/aepp-sdk-js/commit/77d54c3))
+* **AEX-2:** Fix firefox compatibility issue ([#882](https://github.com/aeternity/aepp-sdk-js/issues/882)) ([2e16e10](https://github.com/aeternity/aepp-sdk-js/commit/2e16e10))
+* **codecov:** Adjust codecov badge. Move @babel/runtime to dev-deps ([#848](https://github.com/aeternity/aepp-sdk-js/issues/848)) ([109b851](https://github.com/aeternity/aepp-sdk-js/commit/109b851))
+* **Contract/Chain:** Using { waitMined: false } with Contract high lvl API ([#828](https://github.com/aeternity/aepp-sdk-js/issues/828)) ([475c2aa](https://github.com/aeternity/aepp-sdk-js/commit/475c2aa))
+* **HdWallet:** Fix derive function ([#801](https://github.com/aeternity/aepp-sdk-js/issues/801)) ([6c6177d](https://github.com/aeternity/aepp-sdk-js/commit/6c6177d))
+* **state channels:** wait for connection to be established before sending generic message ([#723](https://github.com/aeternity/aepp-sdk-js/issues/723)) ([e2bf8dd](https://github.com/aeternity/aepp-sdk-js/commit/e2bf8dd))
+
+
+### Code Refactoring
+
+* **Cross-Node:** Remove cross-node compatibility code ([#829](https://github.com/aeternity/aepp-sdk-js/issues/829)) ([b29a162](https://github.com/aeternity/aepp-sdk-js/commit/b29a162))
+
+
+### Features
+
+* **Account:** Add ability to pass `keypair` or `MemoryAccount` as nAccount` option ([#847](https://github.com/aeternity/aepp-sdk-js/issues/847)) ([75d8ad8](https://github.com/aeternity/aepp-sdk-js/commit/75d8ad8))
+* **aci:** add check for contract address validity and existence ([#788](https://github.com/aeternity/aepp-sdk-js/issues/788)) ([c0cccc9](https://github.com/aeternity/aepp-sdk-js/commit/c0cccc9))
+* **ACI:** Add validation for contractAddress ([#764](https://github.com/aeternity/aepp-sdk-js/issues/764)) ([68b03ef](https://github.com/aeternity/aepp-sdk-js/commit/68b03ef))
+* **aens:** implement aensExtendTtl function. Refactor aensUpdate ([#866](https://github.com/aeternity/aepp-sdk-js/issues/866)) ([72b073a](https://github.com/aeternity/aepp-sdk-js/commit/72b073a)), closes [#865](https://github.com/aeternity/aepp-sdk-js/issues/865)
+* **AENS:** Add nameFee validation to TxValidator ([#765](https://github.com/aeternity/aepp-sdk-js/issues/765)) ([1994e9d](https://github.com/aeternity/aepp-sdk-js/commit/1994e9d))
+* **AENS:** Increase default nameTtl ([#775](https://github.com/aeternity/aepp-sdk-js/issues/775)) ([b46982c](https://github.com/aeternity/aepp-sdk-js/commit/b46982c))
+* **AEX-2:** Improve disconnect detection for extension communication ([#880](https://github.com/aeternity/aepp-sdk-js/issues/880)) ([ff32d69](https://github.com/aeternity/aepp-sdk-js/commit/ff32d69))
+* **AEX-2:** Use `hex` string for `signMessage` response ([#911](https://github.com/aeternity/aepp-sdk-js/issues/911)) ([f2d5e6c](https://github.com/aeternity/aepp-sdk-js/commit/f2d5e6c))
+* **AmountFormatter:** Change formatter units naming. Add more units ([#909](https://github.com/aeternity/aepp-sdk-js/issues/909)) ([6970efe](https://github.com/aeternity/aepp-sdk-js/commit/6970efe))
+* **Chain:** add new method `waitFOrTxConfirm`. Add new option { confirm: 3 } to all of high lvl SDK API. Add tests. Adjust docs ([#874](https://github.com/aeternity/aepp-sdk-js/issues/874)) ([43528f9](https://github.com/aeternity/aepp-sdk-js/commit/43528f9))
+* **ci:** enable daily builds on latest node and compiler and enable codecov ([#820](https://github.com/aeternity/aepp-sdk-js/issues/820)) ([3c52a1e](https://github.com/aeternity/aepp-sdk-js/commit/3c52a1e))
+* **CI:** Move to Travis CI ([#809](https://github.com/aeternity/aepp-sdk-js/issues/809)) ([2d77f20](https://github.com/aeternity/aepp-sdk-js/commit/2d77f20))
+* **Compiler:** Add new compiler methods API ([#875](https://github.com/aeternity/aepp-sdk-js/issues/875)) ([a939395](https://github.com/aeternity/aepp-sdk-js/commit/a939395))
+* **Contract:** Add ability to pass arguments or callData for contract `deploy/call/callStatic` API ([#768](https://github.com/aeternity/aepp-sdk-js/issues/768)) ([a828076](https://github.com/aeternity/aepp-sdk-js/commit/a828076))
+* **Contract:** Adjust `fee` calculation for `contractCall` tx using `FATE` backend ([#793](https://github.com/aeternity/aepp-sdk-js/issues/793)) ([7254ac1](https://github.com/aeternity/aepp-sdk-js/commit/7254ac1))
+* **Http:** Assign error object to http error ([#770](https://github.com/aeternity/aepp-sdk-js/issues/770)) ([6872948](https://github.com/aeternity/aepp-sdk-js/commit/6872948))
+* **KeyStore:** Remove `argon2` package, use `libsodium` for both browser and node ([#782](https://github.com/aeternity/aepp-sdk-js/issues/782)) ([28edc8d](https://github.com/aeternity/aepp-sdk-js/commit/28edc8d))
+* **network:** Throw error when can not get networkId ([#863](https://github.com/aeternity/aepp-sdk-js/issues/863)) ([41b7bd1](https://github.com/aeternity/aepp-sdk-js/commit/41b7bd1))
+* **SPEND:** Add additional validation for recipient ([#715](https://github.com/aeternity/aepp-sdk-js/issues/715)) ([c1854bf](https://github.com/aeternity/aepp-sdk-js/commit/c1854bf))
+* **state channels:** add .off method ([#722](https://github.com/aeternity/aepp-sdk-js/issues/722)) ([18ec371](https://github.com/aeternity/aepp-sdk-js/commit/18ec371))
+* **state channels:** add round method ([#763](https://github.com/aeternity/aepp-sdk-js/issues/763)) ([d31a51e](https://github.com/aeternity/aepp-sdk-js/commit/d31a51e))
+* **state channels:** allow off chain updates to be cancelled with custom error code ([#753](https://github.com/aeternity/aepp-sdk-js/issues/753)) ([c78afca](https://github.com/aeternity/aepp-sdk-js/commit/c78afca))
+* **state channels:** allow to pass metadata to transfer update ([#755](https://github.com/aeternity/aepp-sdk-js/issues/755)) ([d7c2ef1](https://github.com/aeternity/aepp-sdk-js/commit/d7c2ef1))
+* **state channels:** make state channels compatible with node v5.0.0… ([#688](https://github.com/aeternity/aepp-sdk-js/issues/688)) ([23936f5](https://github.com/aeternity/aepp-sdk-js/commit/23936f5)), closes [#632](https://github.com/aeternity/aepp-sdk-js/issues/632) [#653](https://github.com/aeternity/aepp-sdk-js/issues/653) [#658](https://github.com/aeternity/aepp-sdk-js/issues/658) [#660](https://github.com/aeternity/aepp-sdk-js/issues/660) [#680](https://github.com/aeternity/aepp-sdk-js/issues/680) [#693](https://github.com/aeternity/aepp-sdk-js/issues/693) [#687](https://github.com/aeternity/aepp-sdk-js/issues/687)
+* **state channels:** make state channels compatible with node v5.1.0… ([#776](https://github.com/aeternity/aepp-sdk-js/issues/776)) ([4bff514](https://github.com/aeternity/aepp-sdk-js/commit/4bff514))
+* **Test:** Increase code covarage ([#830](https://github.com/aeternity/aepp-sdk-js/issues/830)) ([6f760fb](https://github.com/aeternity/aepp-sdk-js/commit/6f760fb))
+* **Tx:** Always verify transaction before send it to the node ([#798](https://github.com/aeternity/aepp-sdk-js/issues/798)) ([170f479](https://github.com/aeternity/aepp-sdk-js/commit/170f479))
+* **TxBuilder:** Integrate amount formatter to transaction builder ([#897](https://github.com/aeternity/aepp-sdk-js/issues/897)) ([a9f4934](https://github.com/aeternity/aepp-sdk-js/commit/a9f4934))
+* **Wallet:** Use `postMessage` for communication with extension wall… ([#815](https://github.com/aeternity/aepp-sdk-js/issues/815)) ([dc7b4c2](https://github.com/aeternity/aepp-sdk-js/commit/dc7b4c2))
+
+
+### BREAKING CHANGES
+
+* **aens:** Change aensUpdate method arguments
+* **Cross-Node:** Change node compatibility range
+
+* fix(Aens): fix isNameAuction helper
+
+* refactor(Compiler): Drop compiler version to version >= 4.0.0 and version < 5.0.0
+* **aci:** Add additional method to RPC communication. Required sdk update on wallet side
+
+* feat(Contract): Add bytecode validation
+
+* feat(ACI): Update compiler version. Add new API for comparing bytecode(works only with FATE). Add check for contract bytecode in ACI
+
+* feat(ACI): Check for bytecoded validity only if compiler version gte 4.1.0
+
+* test(Contract): remove unused test
+
+* feat(Compiler): filter compiler options
+
+* fix(Rpc): Add `validateByteCodeAPI` to rpc
+
+
+
 # [7.0.0](https://github.com/aeternity/aepp-sdk-js/compare/6.0.1...7.0.0) (2020-01-31)
 
 
