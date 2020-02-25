@@ -17,7 +17,7 @@
 
 import stampit from '@stamp/it'
 import * as R from 'ramda'
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 
 function createSession () {
   const id = uuid()
