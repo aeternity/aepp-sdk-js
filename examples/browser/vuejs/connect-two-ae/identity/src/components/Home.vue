@@ -99,36 +99,21 @@
       const account2 = MemoryAccount({ keypair: generateKeyPair() })
       const node = await Node({ url: this.url, internalUrl: this.internalUrl })
 
+      const genConfirmCallback = getActionName => (aepp, { accept, deny, params }) => {
+        if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to ${getActionName(params)}`)) accept()
+        else deny()
+      }
       this.client = await RpcWallet({
         nodes: [{ name: 'test-net', instance: node }],
         compilerUrl: this.compilerUrl,
         accounts: [MemoryAccount({ keypair: { secretKey: this.priv || secretKey, publicKey: this.pub || publicKey } }), account2],
         address: this.pub,
         name: 'Wallet',
-        async onConnection (aepp, { accept, deny }) {
-          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to connect`)) {
-            accept()
-          } else { deny() }
-        },
-        async onSubscription (aepp, { accept, deny }) {
-          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to subscribe address`)) {
-            accept()
-          } else { deny() }
-        },
-        async onSign (aepp, { accept, deny, params }) {
-          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to ${params.returnSigned ? 'sign' : 'sign and broadcast'} ${JSON.stringify(params.tx)}`)) {
-            accept()
-          } else {
-            deny()
-          }
-        },
-        onAskAccounts (aepp, { accept, deny }) {
-          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to get accounts`)) {
-            accept()
-          } else {
-            deny()
-          }
-        },
+        onConnection: genConfirmCallback(() => 'connect'),
+        onSubscription: genConfirmCallback(() => 'subscribe address'),
+        onSign: genConfirmCallback(({ returnSigned, tx }) => `${returnSigned ? 'sign' : 'sign and broadcast'} ${JSON.stringify(tx)}`),
+        onMessageSign: genConfirmCallback(() => 'sign message'),
+        onAskAccounts: genConfirmCallback(() => 'get accounts'),
         onDisconnect (message, client) {
           this.shareWalletInfo(connection.sendMessage.bind(connection))
         }
