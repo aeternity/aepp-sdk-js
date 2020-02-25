@@ -117,9 +117,7 @@
         }
       })
       const target = !this.runningInFrame ? this.$refs.aepp.contentWindow : window.parent
-      const connection = await BrowserWindowMessageConnection({
-        target
-      })
+      const connection = BrowserWindowMessageConnection({ target })
       this.client.addRpcClient(connection)
       this.shareWalletInfo(connection.sendMessage.bind(connection))
 
