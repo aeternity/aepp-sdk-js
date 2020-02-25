@@ -11,7 +11,7 @@
           Public Key
         </div>
         <div class="p-2 w-3/4 bg-grey-lightest break-words">
-          {{pub}}
+          {{publicKey}}
         </div>
       </div>
       <div v-if="balance || balance >= 0" class="bg-green w-full flex flex-row font-mono">
@@ -34,7 +34,7 @@
     </div>
     <!-- external app -->
     <iframe v-show="aeppUrl" ref="aepp"
-            class="w-full h-screen border border-black border-dashed bg-grey-light mx-auto mt-4 shadow" name="aepp"
+            class="w-full h-screen border border-black border-dashed bg-grey-light mx-auto mt-4 shadow"
             src="http://localhost:9001" frameborder="1"></iframe>
   </div>
 </template>
@@ -50,8 +50,8 @@
     data () {
       return {
         runningInFrame: window.parent !== window,
-        publicKey: 'YOUR_PUB', // Your public key
-        secretKey: 'YOUR_PRIV', // Your private key
+        publicKey: 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR', // Your public key
+        secretKey: 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b', // Your private key
         client: null,
         balance: null,
         height: null,
@@ -87,56 +87,37 @@
         aepp.disconnect()
       },
       async switchAccount () {
-        const secondAcc = this.client.addresses().find(a => a !== this.pub)
+        const secondAcc = this.client.addresses().find(a => a !== this.publicKey)
         this.client.selectAccount(secondAcc)
-        this.pub = await this.client.address()
-        this.balance = await this.client.balance(this.pub).catch(e => 0)
+        this.publicKey = await this.client.address()
+        this.balance = await this.client.balance(this.publicKey).catch(() => 0)
       }
     },
     async created () {
-      const { publicKey, secretKey } = generateKeyPair()
-      this.pub = this.pub || publicKey
       const account2 = MemoryAccount({ keypair: generateKeyPair() })
       const node = await Node({ url: this.url, internalUrl: this.internalUrl })
 
+      const genConfirmCallback = getActionName => (aepp, { accept, deny, params }) => {
+        if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to ${getActionName(params)}`)) accept()
+        else deny()
+      }
       this.client = await RpcWallet({
         nodes: [{ name: 'test-net', instance: node }],
         compilerUrl: this.compilerUrl,
-        accounts: [MemoryAccount({ keypair: { secretKey: this.priv || secretKey, publicKey: this.pub || publicKey } }), account2],
-        address: this.pub,
+        accounts: [MemoryAccount({ keypair: { secretKey: this.secretKey, publicKey: this.publicKey } }), account2],
+        address: this.publicKey,
         name: 'Wallet',
-        async onConnection (aepp, { accept, deny }) {
-          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to connect`)) {
-            accept()
-          } else { deny() }
-        },
-        async onSubscription (aepp, { accept, deny }) {
-          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to subscribe address`)) {
-            accept()
-          } else { deny() }
-        },
-        async onSign (aepp, { accept, deny, params }) {
-          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to ${params.returnSigned ? 'sign' : 'sign and broadcast'} ${JSON.stringify(params.tx)}`)) {
-            accept()
-          } else {
-            deny()
-          }
-        },
-        onAskAccounts (aepp, { accept, deny }) {
-          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to get accounts`)) {
-            accept()
-          } else {
-            deny()
-          }
-        },
+        onConnection: genConfirmCallback(() => 'connect'),
+        onSubscription: genConfirmCallback(() => 'subscribe address'),
+        onSign: genConfirmCallback(({ returnSigned, tx }) => `${returnSigned ? 'sign' : 'sign and broadcast'} ${JSON.stringify(tx)}`),
+        onMessageSign: genConfirmCallback(() => 'sign message'),
+        onAskAccounts: genConfirmCallback(() => 'get accounts'),
         onDisconnect (message, client) {
           this.shareWalletInfo(connection.sendMessage.bind(connection))
         }
       })
-      const target = !this.runningInFrame ? window.frames.aepp : window.parent
-      const connection = await BrowserWindowMessageConnection({
-        target
-      })
+      const target = !this.runningInFrame ? this.$refs.aepp.contentWindow : window.parent
+      const connection = BrowserWindowMessageConnection({ target })
       this.client.addRpcClient(connection)
       this.shareWalletInfo(connection.sendMessage.bind(connection))
 

@@ -60,6 +60,21 @@ export const RpcClients = stampit({
       return this.clients.get(id)
     },
     /**
+     * Remove and disiconnect client by ID
+     * @function removeClient
+     * @instance
+     * @rtype (id: (String|Number), { forceConnectionClose: boolean = false }) => boolean
+     * @param {(String|Number)} id Client ID
+     * @param forceConnectionClose
+     * @return {Boolean}
+     */
+    removeClient (id, { forceConnectionClose = false } = {}) {
+      if (!this.hasClient(id)) throw new Error(`Wallet RpcClient with id ${id} do not exist`)
+      this.clients.get(id).disconnect(forceConnectionClose)
+      this.clients.delete(id)
+      return true
+    },
+    /**
      * Update client info by id
      * @function updateClientInfo
      * @instance
@@ -107,7 +122,6 @@ export const RpcClients = stampit({
  */
 export const RpcClient = stampit({
   init ({ id, name, networkId, icons, connection, handlers: [onMessage, onDisconnect] }) {
-    const messageId = 0
     this.id = id
     this.connection = connection
     this.info = { name, networkId, icons }
@@ -119,12 +133,12 @@ export const RpcClient = stampit({
     this.addressSubscription = []
     this.accounts = {}
 
-    this.sendMessage = sendMessage(messageId, this.connection)
+    this.sendMessage = sendMessage(this.connection)
     const disconnect = (aepp, connection) => {
       this.disconnect(true)
       typeof onDisconnect === 'function' && onDisconnect(connection, this)
     }
-    connection.connect(receive(onMessage, messageId), disconnect)
+    connection.connect(receive(onMessage), disconnect)
   },
   methods: {
     /**
