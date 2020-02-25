@@ -267,12 +267,24 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
       return rpcClients
     },
     /**
+     * Remove specific RpcClient by ID
+     * @function removeRpcClient
+     * @instance
+     * @rtype (id: string) => Boolean
+     * @param {String} id Client ID
+     * @param {Object} [opt = {}]
+     * @return {Object}
+     */
+    removeRpcClient (id, opt = { forceConnectionClose: false }) {
+      return rpcClients.removeClient(id, opt)
+    },
+    /**
      * Add new AEPP connection
      * @function addRpcClient
      * @instance
      * @rtype (clientConnection: Object) => Object
      * @param {Object} clientConnection AEPP connection object
-     * @return {void}
+     * @return {String} Client ID
      */
     addRpcClient (clientConnection) {
       // @TODO  detect if aepp has some history based on origin????: if yes use this instance for connection
@@ -286,6 +298,7 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
           handlers: [handleMessage(this, id), this.onDisconnect]
         }
       )
+      return id
     },
     /**
      * Share wallet info

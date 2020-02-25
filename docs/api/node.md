@@ -10,10 +10,14 @@ import Node from '@aeternity/aepp-sdk/es/node'
 
 * [@aeternity/aepp-sdk/es/node](#module_@aeternity/aepp-sdk/es/node)
     * [Node([options])](#exp_module_@aeternity/aepp-sdk/es/node--Node) ⇒ `Object` ⏏
-        * [~loader(options)](#module_@aeternity/aepp-sdk/es/node--Node..loader) ⇒ `function`
-        * [~getConsensusProtocolVersion(protocols, height)](#module_@aeternity/aepp-sdk/es/node--Node..getConsensusProtocolVersion) ⇒ `Number`
-        * _async_
-            * [~remoteSwag(url, axiosConfig)](#module_@aeternity/aepp-sdk/es/node--Node..remoteSwag) ⇒ `Object`
+        * _static_
+            * _async_
+                * [.getNetworkId()](#module_@aeternity/aepp-sdk/es/node--Node.getNetworkId) ⇒ `String`
+        * _inner_
+            * [~loader(options)](#module_@aeternity/aepp-sdk/es/node--Node..loader) ⇒ `function`
+            * [~getConsensusProtocolVersion(protocols, height)](#module_@aeternity/aepp-sdk/es/node--Node..getConsensusProtocolVersion) ⇒ `Number`
+            * _async_
+                * [~remoteSwag(url, axiosConfig)](#module_@aeternity/aepp-sdk/es/node--Node..remoteSwag) ⇒ `Object`
 
 <a id="exp_module_@aeternity/aepp-sdk/es/node--Node"></a>
 
@@ -35,6 +39,15 @@ import Node from '@aeternity/aepp-sdk/es/node'
 ```js
 Node({url: 'https://sdk-testnet.aepps.com'})
 ```
+<a id="module_@aeternity/aepp-sdk/es/node--Node.getNetworkId"></a>
+
+#### Node.getNetworkId() ⇒ `String`
+Obtain networkId from account or node
+
+**Kind**: static method of [`Node`](#exp_module_@aeternity/aepp-sdk/es/node--Node)  
+**Returns**: `String` - NetworkId  
+**Category**: async  
+**rtype**: `() => networkId: String`
 <a id="module_@aeternity/aepp-sdk/es/node--Node..loader"></a>
 
 #### Node~loader(options) ⇒ `function`
