@@ -105,25 +105,25 @@
         accounts: [MemoryAccount({ keypair: { secretKey: this.priv || secretKey, publicKey: this.pub || publicKey } }), account2],
         address: this.pub,
         name: 'Wallet',
-        async onConnection (aepp, { accept, deny }) {
-          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to connect`)) {
+        async onConnection (aepp, { accept, deny }, origin) {
+          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} and origin ${origin} want to connect`)) {
             accept()
           } else { deny() }
         },
-        async onSubscription (aepp, { accept, deny }) {
-          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to subscribe address`)) {
+        async onSubscription (aepp, { accept, deny }, origin) {
+          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} and origin ${origin} want to subscribe address`)) {
             accept()
           } else { deny() }
         },
-        async onSign (aepp, { accept, deny, params }) {
-          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to ${params.returnSigned ? 'sign' : 'sign and broadcast'} ${JSON.stringify(params.tx)}`)) {
+        async onSign (aepp, { accept, deny, params }, origin) {
+          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} and origin ${origin} want to ${params.returnSigned ? 'sign' : 'sign and broadcast'} ${JSON.stringify(params.tx)}`)) {
             accept()
           } else {
             deny()
           }
         },
-        onAskAccounts (aepp, { accept, deny }) {
-          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to get accounts`)) {
+        onAskAccounts (aepp, { accept, deny }, origin) {
+          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} and origin ${origin} want to get accounts`)) {
             accept()
           } else {
             deny()

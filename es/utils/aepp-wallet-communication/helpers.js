@@ -37,14 +37,14 @@ export const sendMessage = (messageId, connection) => ({ id, method, params, res
   return id
 }
 
-export const receive = (handler, msgId) => (msg) => {
+export const receive = (handler, msgId) => (msg, origin) => {
   if (!msg || !msg.jsonrpc || msg.jsonrpc !== '2.0' || !msg.method) {
     console.warn('Receive invalid message', msg)
     return
   }
   // Increment id for each request
   if (msg.id && +msg.id > msgId) msgId += 1
-  handler(msg)
+  handler(msg, origin)
 }
 
 export const getHandler = (schema, msg) => {
