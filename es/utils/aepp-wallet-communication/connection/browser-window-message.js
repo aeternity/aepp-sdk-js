@@ -26,7 +26,7 @@
  */
 import stampit from '@stamp/it'
 import WalletConnection from '.'
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 import { MESSAGE_DIRECTION } from '../schema'
 
 /**

@@ -47,7 +47,7 @@
     "sha.js": "^2.4.11",
     "tweetnacl": "^1.0.0",
     "tweetnacl-auth": "^1.0.1",
-    "uuid": "^3.3.2",
+    "uuid": "^7.0.0",
     "websocket": "^1.0.26"
   },
   "repository": {
