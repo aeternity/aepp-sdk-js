@@ -42,6 +42,18 @@ async function remoteSwag (url, axiosConfig) {
 }
 
 /**
+ * Obtain networkId from account or node
+ * @instance
+ * @category async
+ * @rtype () => networkId: String
+ * @return {String} NetworkId
+ */
+export function getNetworkId () {
+  if (!this.networkId && !this.selectedNode.networkId) throw new Error('networkId is not provided')
+  return this.networkId || this.selectedNode.networkId
+}
+
+/**
  * Node specific loader for `urlFor`
  * @rtype ({url: String, internalUrl?: String}) => (path: String, definition: Object) => tx: String
  * @param {Object} options

@@ -6,6 +6,7 @@
  */
 import { getterForCurrentNode, prepareNodeObject } from './helpers'
 import AsyncInit from '../utils/async-init'
+import { getNetworkId } from '../node'
 
 /**
  * Node Pool Stamp
@@ -84,10 +85,7 @@ export const NodePool = AsyncInit.compose({
      * @example
      * nodePool.getNetworkId()
      */
-    getNetworkId () {
-      if (!this.networkId && !this.selectedNode.networkId) throw new Error('networkId is not provided')
-      return this.networkId || this.selectedNode.networkId
-    },
+    getNetworkId,
     /**
      * Check if you have selected node
      * @function
