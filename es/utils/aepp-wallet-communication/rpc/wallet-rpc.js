@@ -30,7 +30,7 @@ const REQUESTS = {
   // Store client info and prepare two fn for each client `connect` and `denyConnection`
   // which automatically prepare and send response for that client
   [METHODS.aepp.connect]: (instance, { client }) =>
-    ({ id, method, params: { name, networkId, version, icons } }) => {
+    ({ id, method, params: { name, networkId, version, icons } }, origin) => {
       // Check if protocol and network is compatible with wallet
       if (version !== VERSION) return sendResponseMessage(client)(id, method, { error: ERRORS.unsupportedProtocol() })
       if (networkId !== instance.getNetworkId()) return sendResponseMessage(client)(id, method, { error: ERRORS.unsupportedNetwork() })
@@ -55,14 +55,18 @@ const REQUESTS = {
       })
 
       // Call onConnection callBack to notice Wallet about new AEPP
-      instance.onConnection(client, client.addAction({
-        id,
-        method,
-        params: { name, networkId, version }
-      }, [accept(id), deny(id)]))
+      instance.onConnection(
+        client,
+        client.addAction({
+          id,
+          method,
+          params: { name, networkId, version }
+        }, [accept(id), deny(id)]),
+        origin
+      )
     },
   [METHODS.aepp.subscribeAddress]: (instance, { client }) =>
-    ({ id, method, params: { type, value } }) => {
+    ({ id, method, params: { type, value } }, origin) => {
       // Authorization check
       if (!client.isConnected()) return sendResponseMessage(client)(id, method, { error: ERRORS.notAuthorize() })
 
@@ -78,10 +82,14 @@ const REQUESTS = {
           })
       const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.rejectedByUser(error) })
 
-      instance.onSubscription(client, client.addAction({ id, method, params: { type, value } }, [accept(id), deny(id)]))
+      instance.onSubscription(
+        client,
+        client.addAction({ id, method, params: { type, value } }, [accept(id), deny(id)]),
+        origin
+      )
     },
   [METHODS.aepp.address]: (instance, { client }) =>
-    ({ id, method }) => {
+    ({ id, method }, origin) => {
       // Authorization check
       if (!client.isConnected()) return sendResponseMessage(client)(id, method, { error: ERRORS.notAuthorize() })
 
@@ -94,10 +102,14 @@ const REQUESTS = {
           })
       const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.rejectedByUser(error) })
 
-      instance.onAskAccounts(client, client.addAction({ id, method }, [accept(id), deny(id)]))
+      instance.onAskAccounts(
+        client,
+        client.addAction({ id, method }, [accept(id), deny(id)]),
+        origin
+      )
     },
   [METHODS.aepp.sign]: (instance, { client }) =>
-    async ({ id, method, params: { tx, onAccount, returnSigned = false } }) => {
+    async ({ id, method, params: { tx, onAccount, returnSigned = false } }, origin) => {
       // Authorization check
       if (!client.isConnected()) return sendResponseMessage(client)(id, method, { error: ERRORS.notAuthorize() })
       // NetworkId check
@@ -131,10 +143,14 @@ const REQUESTS = {
 
       const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.rejectedByUser(error) })
 
-      instance.onSign(client, client.addAction({ id, method, params: { tx, returnSigned, onAccount } }, [accept(id), deny(id)]))
+      instance.onSign(
+        client,
+        client.addAction({ id, method, params: { tx, returnSigned, onAccount } }, [accept(id), deny(id)]),
+        origin
+      )
     },
   [METHODS.aepp.signMessage]: (instance, { client }) =>
-    async ({ id, method, params: { message, onAccount } }) => {
+    async ({ id, method, params: { message, onAccount } }, origin) => {
       // Authorization check
       if (!client.isConnected()) return sendResponseMessage(client)(id, method, { error: ERRORS.notAuthorize() })
 
@@ -148,19 +164,23 @@ const REQUESTS = {
 
       const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.rejectedByUser(error) })
 
-      instance.onMessageSign(client, client.addAction({ id, method, params: { message, onAccount } }, [accept(id), deny(id)]))
+      instance.onMessageSign(
+        client,
+        client.addAction({ id, method, params: { message, onAccount } }, [accept(id), deny(id)]),
+        origin
+      )
     }
 }
 
-const handleMessage = (instance, id) => async (msg) => {
+const handleMessage = (instance, id) => async (msg, origin) => {
   const client = rpcClients.getClient(id)
   if (!msg.id) {
-    return getHandler(NOTIFICATIONS, msg)(instance, { client })(msg)
+    return getHandler(NOTIFICATIONS, msg)(instance, { client })(msg, origin)
   }
   if (Object.prototype.hasOwnProperty.call(client.callbacks, msg.id)) {
-    return getHandler(RESPONSES, msg)(instance, { client })(msg)
+    return getHandler(RESPONSES, msg)(instance, { client })(msg, origin)
   } else {
-    return getHandler(REQUESTS, msg)(instance, { client })(msg)
+    return getHandler(REQUESTS, msg)(instance, { client })(msg, origin)
   }
 }
 

@@ -60,9 +60,9 @@ function connect (onMessage) {
     if (debug) console.log('Receive message: ', msg)
     if (msg.data.type) {
       if (msg.data.type !== receiveDirection) return
-      onMessage(msg.data.data, msg.source)
+      onMessage(msg.data.data, msg.origin)
     } else {
-      onMessage(msg.data, msg.source)
+      onMessage(msg.data, msg.origin)
     }
   }
   this.subscribeFn(this.listener)

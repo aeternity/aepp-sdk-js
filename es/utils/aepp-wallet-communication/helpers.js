@@ -41,12 +41,12 @@ export const sendMessage = (connection) => {
   }
 }
 
-export const receive = (handler) => (msg) => {
+export const receive = (handler) => (msg, origin) => {
   if (!msg || !msg.jsonrpc || msg.jsonrpc !== '2.0' || !msg.method) {
     console.warn('Receive invalid message', msg)
     return
   }
-  handler(msg)
+  handler(msg, origin)
 }
 
 export const getHandler = (schema, msg) => {
