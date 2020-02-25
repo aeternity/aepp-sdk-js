@@ -6,7 +6,7 @@
  * @example import ContentScriptBridge from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc'
  */
 import * as R from 'ramda'
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 
 import Ae from '../../../ae'
 import { RpcClient } from './rpc-clients'

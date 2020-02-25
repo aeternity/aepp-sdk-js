@@ -12,7 +12,7 @@ import Selector from '../../../account/selector'
 import { RpcClients } from './rpc-clients'
 import { getBrowserAPI, getHandler, message, sendResponseMessage } from '../helpers'
 import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE, SUBSCRIPTION_VALUES } from '../schema'
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 
 const rpcClients = RpcClients()
 
