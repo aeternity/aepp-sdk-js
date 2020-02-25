@@ -71,6 +71,8 @@ describe('Aepp<->Wallet', function () {
         },
         onAskAccounts (aepp, { accept, deny }) {
         },
+        onMessageSign (message, { accept }) {
+        },
         onDisconnect (message, client) {
           this.shareWalletInfo(connectionFromWalletToAepp.sendMessage.bind(connectionFromWalletToAepp))
         }
@@ -266,17 +268,38 @@ describe('Aepp<->Wallet', function () {
     })
     it('Sign by wallet and broadcast transaction by aepp ', async () => {
       const address = await aepp.address()
+      wallet.onSign = (aepp, action) => {
+        action.accept(tx2)
+      }
+      const tx2 = await aepp.spendTx({
+        senderId: address,
+        recipientId: address,
+        amount: 0,
+        payload: 'zerospend2'
+      })
       const tx = await aepp.spendTx({
         senderId: address,
         recipientId: address,
         amount: 0,
         payload: 'zerospend'
       })
-
-      const { blockHeight } = await aepp.send(tx, { walletBroadcast: false })
-      blockHeight.should.be.a('number')
+      const res = await aepp.send(tx, { walletBroadcast: false })
+      decode(res.tx.payload).toString().should.be.equal('zerospend2')
+      res.blockHeight.should.be.a('number')
+    })
+    it('Sign message', async () => {
+      wallet.onMessageSign = (aepp, action) => {
+        action.accept()
+      }
+      const messageSig = await aepp.signMessage('test')
+      messageSig.should.be.a('string')
+      const isValid = await aepp.verifyMessage('test', messageSig)
+      isValid.should.be.equal(true)
     })
     it('Sign and broadcast invalid transaction', async () => {
+      wallet.onSign = (aepp, action) => {
+        action.accept()
+      }
       const address = await aepp.address()
       const tx = await aepp.spendTx({
         senderId: address,
@@ -419,6 +442,31 @@ describe('Aepp<->Wallet', function () {
       })
       received.should.be.equal(true)
     })
+    it('Remove rpc client', async () => {
+      wallet.onConnection = (aepp, actions) => {
+        actions.accept()
+      }
+      const id = wallet.addRpcClient(BrowserWindowMessageConnection({
+        connectionInfo: { id: 'from_wallet_to_aepp_2' },
+        self: connections.waelletConnection,
+        target: connections.aeppConnection
+      }))
+      await aepp.connectToWallet(BrowserWindowMessageConnection({
+        connectionInfo: { id: 'from_aepp_to_wallet_2' },
+        self: connections.aeppConnection,
+        target: connections.waelletConnection
+      }))
+
+      wallet.removeRpcClient(id).should.be.equal(true)
+      wallet.getClients().clients.size.should.be.equal(1)
+    })
+    it('Remove rpc client: client not found', async () => {
+      try {
+        wallet.removeRpcClient('a1')
+      } catch (e) {
+        e.message.should.be.equal('Wallet RpcClient with id a1 do not exist')
+      }
+    })
   })
   describe('Old RPC Wallet-AEPP', () => {
     let wallet
@@ -485,7 +533,7 @@ describe('Aepp<->Wallet', function () {
   })
   describe('Rpc helpers', () => {
     it('Receive invalid message', () => {
-      (!receive(() => true, 1)(false)).should.be.equal(true)
+      (!receive(() => true)(false)).should.be.equal(true)
     })
     it('receive unknown method', () => {
       getHandler({}, { method: 'hey' })()().should.be.equal(true)

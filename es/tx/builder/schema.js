@@ -334,6 +334,7 @@ export const OBJECT_ID_TX_TYPE = {
 
 export const FIELD_TYPES = {
   int: 'int',
+  amount: 'amount',
   id: 'id',
   ids: 'ids',
   string: 'string',
@@ -414,6 +415,7 @@ const VALIDATION_ERROR = (msg) => msg
 
 export const VALIDATION_MESSAGE = {
   [FIELD_TYPES.int]: ({ value, isMinusValue }) => isMinusValue ? VALIDATION_ERROR(`${value} must be >= 0`) : VALIDATION_ERROR(`${value} is not of type Number or BigNumber`),
+  [FIELD_TYPES.amount]: ({ value, isMinusValue }) => isMinusValue ? VALIDATION_ERROR(`${value} must be >= 0`) : VALIDATION_ERROR(`${value} is not of type Number or BigNumber`),
   [FIELD_TYPES.id]: ({ value, prefix }) => VALIDATION_ERROR(`'${value}' prefix doesn't match expected prefix '${prefix}' or ID_TAG for prefix not found`),
   [FIELD_TYPES.binary]: ({ prefix, value }) => VALIDATION_ERROR(`'${value}' prefix doesn't match expected prefix '${prefix}'`),
   [FIELD_TYPES.string]: ({ value }) => VALIDATION_ERROR('Not a string'),
@@ -469,7 +471,7 @@ const SPEND_TX = [
   ...BASE_TX,
   TX_FIELD('senderId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('recipientId', FIELD_TYPES.id, ['ak', 'nm']),
-  TX_FIELD('amount', FIELD_TYPES.int),
+  TX_FIELD('amount', FIELD_TYPES.amount),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int),
   TX_FIELD('nonce', FIELD_TYPES.int),
@@ -507,7 +509,7 @@ const NAME_CLAIM_TX_2 = [
   TX_FIELD('nonce', FIELD_TYPES.int),
   TX_FIELD('name', FIELD_TYPES.binary, 'nm'),
   TX_FIELD('nameSalt', FIELD_TYPES.int),
-  TX_FIELD('nameFee', FIELD_TYPES.int),
+  TX_FIELD('nameFee', FIELD_TYPES.amount),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int)
 ]
@@ -551,7 +553,7 @@ const CONTRACT_TX = [
   TX_FIELD('log', FIELD_TYPES.binary, 'cb'),
   TX_FIELD('active', FIELD_TYPES.bool),
   TX_FIELD('referers', FIELD_TYPES.ids, 'ak'),
-  TX_FIELD('deposit', FIELD_TYPES.int)
+  TX_FIELD('deposit', FIELD_TYPES.amount)
 ]
 
 const GA_ATTACH_TX = [
@@ -588,8 +590,8 @@ const CONTRACT_CREATE_TX = [
   TX_FIELD('ctVersion', FIELD_TYPES.ctVersion),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int),
-  TX_FIELD('deposit', FIELD_TYPES.int),
-  TX_FIELD('amount', FIELD_TYPES.int),
+  TX_FIELD('deposit', FIELD_TYPES.amount),
+  TX_FIELD('amount', FIELD_TYPES.amount),
   TX_FIELD('gas', FIELD_TYPES.int),
   TX_FIELD('gasPrice', FIELD_TYPES.int),
   TX_FIELD('callData', FIELD_TYPES.binary, 'cb')
@@ -603,7 +605,7 @@ const CONTRACT_CALL_TX = [
   TX_FIELD('abiVersion', FIELD_TYPES.int),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int),
-  TX_FIELD('amount', FIELD_TYPES.int),
+  TX_FIELD('amount', FIELD_TYPES.amount),
   TX_FIELD('gas', FIELD_TYPES.int),
   TX_FIELD('gasPrice', FIELD_TYPES.int),
   TX_FIELD('callData', FIELD_TYPES.binary, 'cb')
@@ -629,7 +631,7 @@ const ORACLE_REGISTER_TX = [
   TX_FIELD('nonce', FIELD_TYPES.int),
   TX_FIELD('queryFormat', FIELD_TYPES.string),
   TX_FIELD('responseFormat', FIELD_TYPES.string),
-  TX_FIELD('queryFee', FIELD_TYPES.int),
+  TX_FIELD('queryFee', FIELD_TYPES.amount),
   TX_FIELD('oracleTtlType', FIELD_TYPES.int),
   TX_FIELD('oracleTtlValue', FIELD_TYPES.int),
   TX_FIELD('fee', FIELD_TYPES.int),
@@ -653,7 +655,7 @@ const ORACLE_QUERY_TX = [
   TX_FIELD('nonce', FIELD_TYPES.int),
   TX_FIELD('oracleId', FIELD_TYPES.id, ['ok', 'nm']),
   TX_FIELD('query', FIELD_TYPES.string),
-  TX_FIELD('queryFee', FIELD_TYPES.int),
+  TX_FIELD('queryFee', FIELD_TYPES.amount),
   TX_FIELD('queryTtlType', FIELD_TYPES.int),
   TX_FIELD('queryTtlValue', FIELD_TYPES.int),
   TX_FIELD('responseTtlType', FIELD_TYPES.int),

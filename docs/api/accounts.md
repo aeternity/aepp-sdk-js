@@ -13,6 +13,7 @@ import Accounts from '@aeternity/aepp-sdk/es/accounts'
     * [addresses()](#exp_module_@aeternity/aepp-sdk/es/accounts--addresses) ⇒ `Array.&lt;String&gt;` ⏏
     * [Accounts([options])](#exp_module_@aeternity/aepp-sdk/es/accounts--Accounts) ⇒ `Object` ⏏
     * _async_
+        * [signWith(address, data)](#exp_module_@aeternity/aepp-sdk/es/accounts--signWith) ⇒ `String` ⏏
         * [addAccount(account, [options])](#exp_module_@aeternity/aepp-sdk/es/accounts--addAccount) ⇒ `Void` ⏏
 
 <a id="exp_module_@aeternity/aepp-sdk/es/accounts--removeAccount"></a>
@@ -69,6 +70,21 @@ accounts.removeAccount(address) // Remove account
 accounts.selectAccount(address) // Select account
 accounts.addresses() // Get available accounts
 ```
+<a id="exp_module_@aeternity/aepp-sdk/es/accounts--signWith"></a>
+
+### signWith(address, data) ⇒ `String` ⏏
+Sign data blob with specific key
+
+**Kind**: Exported function  
+**Returns**: `String` - Signed data blob  
+**Category**: async  
+**rtype**: `(address: String, data: String) => data: Promise[String], throws: Error`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| address | `String` | Public key of account to sign with |
+| data | `String` | Data blob to sign |
+
 <a id="exp_module_@aeternity/aepp-sdk/es/accounts--addAccount"></a>
 
 ### addAccount(account, [options]) ⇒ `Void` ⏏

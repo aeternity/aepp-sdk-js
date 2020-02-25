@@ -24,9 +24,12 @@
 
 import stampit from '@stamp/it'
 import { required } from '@stamp/required'
-import * as Crypto from '../utils/crypto'
+
+import { hash, personalMessageToBinary, decodeBase64Check, assertedType, verifyPersonalMessage } from '../utils/crypto'
 import { buildTx } from '../tx/builder'
+import { decode } from '../tx/builder/helpers'
 import { TX_TYPE } from '../tx/builder/schema'
+import { getNetworkId } from '../node'
 
 /**
  * Sign encoded transaction
@@ -39,7 +42,7 @@ import { TX_TYPE } from '../tx/builder/schema'
  */
 async function signTransaction (tx, opt = {}) {
   const networkId = this.getNetworkId()
-  const rlpBinaryTx = Crypto.decodeBase64Check(Crypto.assertedType(tx, 'tx'))
+  const rlpBinaryTx = decodeBase64Check(assertedType(tx, 'tx'))
   // Prepend `NETWORK_ID` to begin of data binary
   const txWithNetworkId = Buffer.concat([Buffer.from(networkId), rlpBinaryTx])
 
@@ -48,15 +51,31 @@ async function signTransaction (tx, opt = {}) {
 }
 
 /**
- * Obtain networkId for signing
+ * Sign message
  * @instance
  * @category async
- * @rtype () => networkId: String
- * @return {String} NetworkId
+ * @rtype (msg: String) => signature: Promise[String], throws: Error
+ * @param {String} message - Message to sign
+ * @param {Object} opt - Options
+ * @return {String} Signature
  */
-function getNetworkId () {
-  if (!this.networkId && !this.selectedNode.networkId) throw new Error('networkId is not provided')
-  return this.networkId || this.selectedNode.networkId
+async function signMessage (message, opt = { returnHex: false }) {
+  const sig = await this.sign(hash(personalMessageToBinary(message)), opt)
+  return opt.returnHex ? Buffer.from(sig).toString('hex') : sig
+}
+
+/**
+ * Verify message
+ * @instance
+ * @category async
+ * @rtype (msg: String, signature: String, publicKey: String) => signature: Promise[String], throws: Error
+ * @param {String} message - Message to verify
+ * @param {String} signature - Signature
+ * @param {Object} opt - Options
+ * @return {Boolean}
+ */
+async function verifyMessage (message, signature, opt = {}) {
+  return verifyPersonalMessage(message, typeof signature === 'string' ? Buffer.from(signature, 'hex') : signature, decode(await this.address(opt)))
 }
 
 /**
@@ -81,10 +100,10 @@ const Account = stampit({
       this.networkId = networkId
     }
   },
-  methods: { signTransaction, getNetworkId },
+  methods: { signTransaction, getNetworkId, signMessage, verifyMessage },
   deepConf: {
     Ae: {
-      methods: ['sign', 'address', 'signTransaction', 'getNetworkId']
+      methods: ['sign', 'address', 'signTransaction', 'getNetworkId', 'signMessage', 'verifyMessage']
     }
   }
 }, required({

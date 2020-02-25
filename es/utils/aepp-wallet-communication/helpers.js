@@ -19,32 +19,34 @@ export const getWindow = () => {
 /**
  * RPC helper functions
  */
-export const sendMessage = (messageId, connection) => ({ id, method, params, result, error }, isNotificationOrResponse = false) => {
-  // Increment id for each request
-  isNotificationOrResponse || (messageId += 1)
-  id = isNotificationOrResponse ? (id || null) : messageId
-  const msgData = params
-    ? { params }
-    : result
-      ? { result }
-      : { error }
-  connection.sendMessage({
-    jsonrpc: '2.0',
-    ...id ? { id } : {},
-    method,
-    ...msgData
-  })
-  return id
+export const sendMessage = (connection) => {
+  let messageId = 0
+
+  return ({ id, method, params, result, error }, isNotificationOrResponse = false) => {
+    // Increment id for each request
+    isNotificationOrResponse || (messageId += 1)
+    id = isNotificationOrResponse ? (id || null) : messageId
+    const msgData = params
+      ? { params }
+      : result
+        ? { result }
+        : { error }
+    connection.sendMessage({
+      jsonrpc: '2.0',
+      ...id ? { id } : {},
+      method,
+      ...msgData
+    })
+    return id
+  }
 }
 
-export const receive = (handler, msgId) => (msg) => {
+export const receive = (handler) => (msg, origin) => {
   if (!msg || !msg.jsonrpc || msg.jsonrpc !== '2.0' || !msg.method) {
     console.warn('Receive invalid message', msg)
     return
   }
-  // Increment id for each request
-  if (msg.id && +msg.id > msgId) msgId += 1
-  handler(msg)
+  handler(msg, origin)
 }
 
 export const getHandler = (schema, msg) => {

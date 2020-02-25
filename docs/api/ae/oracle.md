@@ -16,6 +16,7 @@ import Oracle from '@aeternity/aepp-sdk/es/ae/oracle'
     * [Oracle([options])](#exp_module_@aeternity/aepp-sdk/es/ae/oracle--Oracle) ⇒ `Object` ⏏
     * _instance_
         * _async_
+            * [.getOracleObject(oracleId)](#exp_module_@aeternity/aepp-sdk/es/ae/oracle--getOracleObject) ⇒ `Promise.&lt;Object&gt;` ⏏
             * [.pollForQueries(oracleId, onQuery, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/oracle--pollForQueries) ⇒ `function` ⏏
             * [.getQueryObject(oracleId, queryId)](#exp_module_@aeternity/aepp-sdk/es/ae/oracle--getQueryObject) ⇒ `Promise.&lt;Object&gt;` ⏏
             * [.exports.pollForQueryResponse(oracleId, queryId, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/oracle--exports.pollForQueryResponse) ⇒ `Promise.&lt;Object&gt;` ⏏
@@ -39,6 +40,19 @@ Oracle provides oracle-system related methods atop
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | [options] | `Object` | <code>{}</code> | Initializer object |
+
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/oracle--getOracleObject"></a>
+
+### .getOracleObject(oracleId) ⇒ `Promise.&lt;Object&gt;` ⏏
+Constructor for Oracle Object (helper object for using Oracle)
+
+**Kind**: instance method of [`@aeternity/aepp-sdk/es/ae/oracle`](#module_@aeternity/aepp-sdk/es/ae/oracle)  
+**Returns**: `Promise.&lt;Object&gt;` - Oracle object  
+**Category**: async  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| oracleId | `String` | Oracle public key |
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/oracle--pollForQueries"></a>
 

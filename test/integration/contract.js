@@ -20,6 +20,9 @@ import { BaseAe, configure, plan, ready, compilerUrl } from './'
 import { decode } from '../../es/tx/builder/helpers'
 
 import * as R from 'ramda'
+import { randomName } from './aens'
+import { decodeEvents, SOPHIA_TYPES } from '../../es/contract/aci/transformation'
+import { hash, personalMessageToBinary } from '../../es/utils/crypto'
 
 const identityContract = `
 contract Identity =
@@ -60,6 +63,7 @@ contract StateContract =
   record state = { value: string, key: number, testOption: option(string) }
   record yesEr = { t: number}
   
+  datatype event = TheFirstEvent(int) | AnotherEvent(string, address) | AnotherEvent2(string, bool, int)
   datatype dateUnit = Year | Month | Day
   datatype one_or_both('a, 'b) = Left('a) | Right('b) | Both('a, 'b)
 
@@ -104,14 +108,75 @@ contract StateContract =
       Left(x)    => x
       Right(_)   => abort("asdasd")
       Both(x, _) => x
+  stateful entrypoint emitEvents() : unit =
+    Chain.event(TheFirstEvent(42))
+    Chain.event(AnotherEvent("This is not indexed", Contract.address))
+    Chain.event(AnotherEvent2("This is not indexed", true, 1))
 `
-
+const aensDelegationContract = `
+contract DelegateTest =
+  // Transactions
+  stateful payable entrypoint signedPreclaim(addr  : address,
+                                             chash : hash,
+                                             sign  : signature) : unit =
+    AENS.preclaim(addr, chash, signature = sign)
+  stateful entrypoint signedClaim(addr : address,
+                                name : string,
+                                salt : int,
+                                name_fee : int,
+                                sign : signature) : unit =
+    AENS.claim(addr, name, salt, name_fee, signature = sign)
+  stateful entrypoint signedTransfer(owner     : address,
+                                   new_owner : address,
+                                   name      : string,
+                                   sign      : signature) : unit =
+    AENS.transfer(owner, new_owner, name, signature = sign)
+  stateful entrypoint signedRevoke(owner     : address,
+                                   name      : string,
+                                   sign      : signature) : unit =
+    AENS.revoke(owner, name, signature = sign)`
+const oracleContract = `
+contract DelegateTest =
+  type fee = int
+  type ttl = Chain.ttl
+  stateful payable entrypoint signedRegisterOracle(acct : address,
+                                                   sign : signature,
+                                                   qfee : fee,
+                                                   ttl  : ttl) : oracle(string, string) =
+     Oracle.register(acct, qfee, ttl, signature = sign)
+  stateful payable entrypoint signedExtendOracle(o    : oracle(string, string),
+                                                 sign : signature,   // Signed oracle address
+                                                 ttl  : ttl) : unit =
+    Oracle.extend(o, signature = sign, ttl)
+  
+  payable stateful entrypoint createQuery(o    : oracle(string, string),
+                                          q    : string,
+                                          qfee : int,
+                                          qttl : Chain.ttl,
+                                          rttl : Chain.ttl) : oracle_query(string, string) =
+    require(qfee =< Call.value, "insufficient value for qfee")
+    require(Oracle.check(o), "oracle not valid")
+    Oracle.query(o, q, qfee, qttl, rttl)
+    
+  entrypoint queryFee(o : oracle(string, int)) : int =
+    Oracle.query_fee(o)
+  
+  stateful entrypoint respond(o    : oracle(string, string),
+                              q    : oracle_query(string, string),
+                              sign : signature,        // Signed oracle query id + contract address
+                              r    : string) =
+    Oracle.respond(o, q, signature = sign, r)`
 const encodedNumberSix = 'cb_DA6sWJo='
+const signSource = `
+contract Sign =
+  entrypoint verify (msg: hash, pub: address, sig: signature): bool =
+    Crypto.verify_sig(msg, pub, sig)
+`
 const filesystem = {
   testLib: libContract
 }
-plan('1000000000000000000000')
 
+plan('1000000000000000000000000')
 describe('Contract', function () {
   configure(this)
 
@@ -122,14 +187,111 @@ describe('Contract', function () {
   before(async function () {
     contract = await ready(this, true, true)
   })
+  describe('Aens and Oracle operation delegation', () => {
+    let cInstance
+    let cInstanceOracle
+    before(async () => {
+      cInstance = await contract.getContractInstance(aensDelegationContract)
+      cInstanceOracle = await contract.getContractInstance(oracleContract)
+      await cInstance.deploy()
+      await cInstanceOracle.deploy()
+    })
+    it('Delegate AENS operations', async () => {
+      const name = randomName(15)
+      const contractAddress = cInstance.deployInfo.address
+      const nameFee = 20 * (10 ** 18) // 20 AE
+      const current = await contract.address()
 
+      // preclaim
+      const { salt: _salt } = await contract.aensPreclaim(name)
+      // @TODO enable after next HF
+      // const commitmentId = commitmentHash(name, _salt)
+      const preclaimSig = await contract.delegateNamePreclaimSignature(contractAddress)
+      console.log(`preclaimSig -> ${preclaimSig}`)
+      // const preclaim = await cInstance.methods.signedPreclaim(await contract.address(), commitmentId, preclaimSig)
+      // preclaim.result.returnType.should.be.equal('ok')
+      await contract.awaitHeight((await contract.height()) + 2)
+      // claim
+      const claimSig = await contract.delegateNameClaimSignature(contractAddress, name)
+      const claim = await cInstance.methods.signedClaim(await contract.address(), name, _salt, nameFee, claimSig)
+      claim.result.returnType.should.be.equal('ok')
+      await contract.awaitHeight((await contract.height()) + 2)
+
+      // transfer
+      const transferSig = await contract.delegateNameTransferSignature(contractAddress, name)
+      const onAccount = contract.addresses().find(acc => acc !== current)
+      const transfer = await cInstance.methods.signedTransfer(await contract.address(), onAccount, name, transferSig)
+      transfer.result.returnType.should.be.equal('ok')
+
+      await contract.awaitHeight((await contract.height()) + 2)
+      // revoke
+      const revokeSig = await contract.delegateNameRevokeSignature(contractAddress, name, { onAccount })
+      const revoke = await cInstance.methods.signedRevoke(onAccount, name, revokeSig)
+      revoke.result.returnType.should.be.equal('ok')
+
+      try {
+        await contract.aensQuery(name)
+      } catch (e) {
+        e.message.should.be.an('string')
+      }
+    })
+    it('Delegate Oracle operations', async () => {
+      const contractAddress = cInstanceOracle.deployInfo.address
+      const current = await contract.address()
+      const onAccount = contract.addresses().find(acc => acc !== current)
+      const qFee = 500000
+      const ttl = 'RelativeTTL(50)'
+      const oracleId = `ok_${onAccount.slice(3)}`
+
+      const oracleCreateSig = await contract.delegateOracleRegisterSignature(contractAddress, { onAccount })
+      const oracleRegister = await cInstanceOracle.methods.signedRegisterOracle(onAccount, oracleCreateSig, qFee, ttl, { onAccount })
+      oracleRegister.result.returnType.should.be.equal('ok')
+      const oracle = await contract.getOracleObject(oracleId)
+      oracle.id.should.be.equal(oracleId)
+
+      const oracleExtendSig = await contract.delegateOracleExtendSignature(contractAddress, { onAccount })
+      const queryExtend = await cInstanceOracle.methods.signedExtendOracle(oracleId, oracleExtendSig, ttl, { onAccount })
+      queryExtend.result.returnType.should.be.equal('ok')
+      const oracleExtended = await contract.getOracleObject(oracleId)
+      console.log(oracleExtended)
+      oracleExtended.ttl.should.be.equal(oracle.ttl + 50)
+
+      // TODO ask core about this
+      // // create query
+      // const q = 'Hello!'
+      // const newOracle = await contract.registerOracle('string', 'int', { onAccount, queryFee: qFee })
+      // const query = await cInstanceOracle.methods.createQuery(newOracle.id, q, 1000 + qFee, ttl, ttl, { onAccount, amount: 5 * qFee })
+      // query.should.be.an('object')
+      // const queryObject = await contract.getQueryObject(newOracle.id, query.decodedResult)
+      // queryObject.should.be.an('object')
+      // queryObject.decodedQuery.should.be.equal(q)
+      // console.log(queryObject)
+      //
+      // // respond to query
+      // const r = 'Hi!'
+      // const respondSig = await contract.delegateOracleRespondSignature(newOracle.id, queryObject.id, contractAddress, { onAccount })
+      // const response = await cInstanceOracle.methods.respond(newOracle.id, queryObject.id, respondSig, r, { onAccount })
+      // console.log(response)
+      // const queryObject2 = await contract.getQueryObject(newOracle.id, queryObject.id)
+      // console.log(queryObject2)
+      // queryObject2.decodedResponse.should.be.equal(r)
+    })
+  })
   it('precompiled bytecode can be deployed', async () => {
     const { version, consensusProtocolVersion } = contract.getNodeInfo()
     console.log(`Node => ${version}, consensus => ${consensusProtocolVersion}, compiler => ${contract.compilerVersion}`)
     const code = await contract.contractCompile(identityContract)
     return contract.contractDeploy(code.bytecode, identityContract).should.eventually.have.property('address')
   })
-
+  it('Verify message in Sophia', async () => {
+    const msg = personalMessageToBinary('Hello')
+    const msgHash = hash(msg)
+    const signature = await contract.sign(msgHash)
+    const signContract = await contract.getContractInstance(signSource)
+    await signContract.deploy()
+    const { decodedResult } = await signContract.methods.verify(msgHash, await contract.address(), signature)
+    decodedResult.should.be.equal(true)
+  })
   it('compiles Sophia code', async () => {
     bytecode = await contract.contractCompile(identityContract)
     return bytecode.should.have.property('bytecode')
@@ -372,6 +534,56 @@ describe('Contract', function () {
 
   describe('Contract ACI Interface', function () {
     let contractObject
+    describe('Events parsing', async () => {
+      let cInstance
+      let eventResult
+      let decodedEventsWithoutACI
+
+      before(async () => {
+        cInstance = await contract.getContractInstance(testContract, { filesystem })
+        await cInstance.deploy(['test', 1, 'some'])
+        eventResult = await cInstance.methods.emitEvents()
+        const { log } = await contract.tx(eventResult.hash)
+        decodedEventsWithoutACI = decodeEvents(log, { schema: events })
+      })
+      const events = [
+        { name: 'AnotherEvent2', types: [SOPHIA_TYPES.string, SOPHIA_TYPES.bool, SOPHIA_TYPES.int] },
+        { name: 'AnotherEvent', types: [SOPHIA_TYPES.string, SOPHIA_TYPES.address] },
+        { name: 'TheFirstEvent', types: [SOPHIA_TYPES.int] }
+      ]
+      const checkEvents = (event, schema) => {
+        schema.name.should.be.equal(event.name)
+        schema.types.forEach((t, tIndex) => {
+          const value = event.decoded[tIndex]
+          const isNumber = typeof value === 'string' || typeof value === 'number'
+          // eslint-disable-next-line valid-typeof
+          const v = typeof value === t
+          switch (t) {
+            case SOPHIA_TYPES.address:
+              // console.log('contractAddress check')
+              event.address.should.be.equal(`ct_${value}`)
+              break
+            case SOPHIA_TYPES.int:
+              isNumber.should.be.equal(true)
+              Number.isInteger(+value).should.be.equal(true)
+              break
+            case SOPHIA_TYPES.bool:
+              value.should.be.a('boolean')
+              break
+            default:
+              v.should.be.equal(true)
+              break
+          }
+        })
+      }
+      events
+        .forEach((el, i) => {
+          describe(`Correct parse of ${el.name}(${el.types})`, () => {
+            it('ACI', () => checkEvents(eventResult.decodedEvents[i], el))
+            it('Without ACI', () => checkEvents(decodedEventsWithoutACI[i], el))
+          })
+        })
+    })
 
     it('Generate ACI object', async () => {
       contractObject = await contract.getContractInstance(testContract, { filesystem, opt: { ttl: 0 } })

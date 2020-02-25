@@ -25,6 +25,14 @@ import { Contract } from '@aeternity/aepp-sdk' (Using bundle)
         * [contractCall(source, address, name, argsOrCallData, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCall) ⏏
         * [contractDeploy(code, source, initState, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractDeploy) ⇒ `Promise.&lt;Object&gt;` ⏏
         * [contractCompile(source, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCompile) ⇒ `Promise.&lt;Object&gt;` ⏏
+        * [delegateSignatureCommon(ids, [opt], [opt])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--delegateSignatureCommon) ⇒ `Promise.&lt;String&gt;` ⏏
+        * [delegateNamePreclaimSignature(contractId, [opt])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--delegateNamePreclaimSignature) ⇒ `Promise.&lt;String&gt;` ⏏
+        * [delegateNameClaimSignature(name, contractId, [opt])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--delegateNameClaimSignature) ⇒ `Promise.&lt;String&gt;` ⏏
+        * [delegateNameTransferSignature(contractId, name, [opt])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--delegateNameTransferSignature) ⇒ `Promise.&lt;String&gt;` ⏏
+        * [delegateNameRevokeSignature(contractId, name, [opt])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--delegateNameRevokeSignature) ⇒ `Promise.&lt;String&gt;` ⏏
+        * [delegateOracleRegisterSignature(contractId, [opt])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--delegateOracleRegisterSignature) ⇒ `Promise.&lt;String&gt;` ⏏
+        * [delegateOracleExtendSignature(contractId, [opt])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--delegateOracleExtendSignature) ⇒ `Promise.&lt;String&gt;` ⏏
+        * [delegateOracleRespondSignature(queryId, contractId, [opt])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--delegateOracleRespondSignature) ⇒ `Promise.&lt;String&gt;` ⏏
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--exports.ContractAPI"></a>
 
@@ -226,3 +234,120 @@ const compiled = await client.contractCompile(SOURCE_CODE)
   encodeCall: (fnName, args = []) => Prepare callData
 }
 ```
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--delegateSignatureCommon"></a>
+
+### delegateSignatureCommon(ids, [opt], [opt]) ⇒ `Promise.&lt;String&gt;` ⏏
+Utility method to create a delegate signature for a contract
+
+**Kind**: Exported function  
+**Returns**: `Promise.&lt;String&gt;` - Signature in hex representation  
+**Category**: async  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| ids | `Array.&lt;String&gt;` |  | The list of id's to prepend |
+| [opt] | `Object` | <code>{}</code> | options |
+| [opt] | `Object` | <code>{}</code> | opt Options |
+
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--delegateNamePreclaimSignature"></a>
+
+### delegateNamePreclaimSignature(contractId, [opt]) ⇒ `Promise.&lt;String&gt;` ⏏
+Helper to generate a signature to delegate a name pre-claim to a contract.
+
+**Kind**: Exported function  
+**Returns**: `Promise.&lt;String&gt;` - Signature for delegation  
+**Category**: async  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| contractId | `String` |  | Contract Id |
+| [opt] | `Object` | <code>{}</code> | opt Options |
+
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--delegateNameClaimSignature"></a>
+
+### delegateNameClaimSignature(name, contractId, [opt]) ⇒ `Promise.&lt;String&gt;` ⏏
+Helper to generate a signature to delegate a name claim to a contract.
+
+**Kind**: Exported function  
+**Returns**: `Promise.&lt;String&gt;` - Signature for delegation  
+**Category**: async  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| name | `String` |  | The name being claimed |
+| contractId | `String` |  | Contract Id |
+| [opt] | `Object` | <code>{}</code> | opt Options |
+
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--delegateNameTransferSignature"></a>
+
+### delegateNameTransferSignature(contractId, name, [opt]) ⇒ `Promise.&lt;String&gt;` ⏏
+Helper to generate a signature to delegate a name transfer to a contract.
+
+**Kind**: Exported function  
+**Returns**: `Promise.&lt;String&gt;` - Signature for delegation  
+**Category**: async  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| contractId | `String` |  | Contract Id |
+| name | `String` |  | The name being transferred |
+| [opt] | `Object` | <code>{}</code> | opt Options |
+
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--delegateNameRevokeSignature"></a>
+
+### delegateNameRevokeSignature(contractId, name, [opt]) ⇒ `Promise.&lt;String&gt;` ⏏
+Helper to generate a signature to delegate a name revoke to a contract.
+
+**Kind**: Exported function  
+**Returns**: `Promise.&lt;String&gt;` - Signature for delegation  
+**Category**: async  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| contractId | `String` |  | Contract Id |
+| name | `String` |  | The name being revoked |
+| [opt] | `Object` | <code>{}</code> | opt Options |
+
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--delegateOracleRegisterSignature"></a>
+
+### delegateOracleRegisterSignature(contractId, [opt]) ⇒ `Promise.&lt;String&gt;` ⏏
+Helper to generate a signature to delegate a Oracle register to a contract.
+
+**Kind**: Exported function  
+**Returns**: `Promise.&lt;String&gt;` - Signature for delegation  
+**Category**: async  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| contractId | `String` |  | Contract Id |
+| [opt] | `Object` | <code>{}</code> | opt Options |
+
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--delegateOracleExtendSignature"></a>
+
+### delegateOracleExtendSignature(contractId, [opt]) ⇒ `Promise.&lt;String&gt;` ⏏
+Helper to generate a signature to delegate a Oracle extend to a contract.
+
+**Kind**: Exported function  
+**Returns**: `Promise.&lt;String&gt;` - Signature for delegation  
+**Category**: async  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| contractId | `String` |  | Contract Id |
+| [opt] | `Object` | <code>{}</code> | opt Options |
+
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--delegateOracleRespondSignature"></a>
+
+### delegateOracleRespondSignature(queryId, contractId, [opt]) ⇒ `Promise.&lt;String&gt;` ⏏
+Helper to generate a signature to delegate a Oracle respond to a contract.
+
+**Kind**: Exported function  
+**Returns**: `Promise.&lt;String&gt;` - Signature for delegation  
+**Category**: async  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| queryId | `String` |  | Oracle Query Id |
+| contractId | `String` |  | Contract Id |
+| [opt] | `Object` | <code>{}</code> | opt Options |
+

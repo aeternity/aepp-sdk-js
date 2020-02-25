@@ -6,7 +6,7 @@
  * @example import ContentScriptBridge from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc'
  */
 import * as R from 'ramda'
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 
 import Ae from '../../../ae'
 import { RpcClient } from './rpc-clients'
@@ -51,6 +51,10 @@ const RESPONSES = {
   [METHODS.aepp.sign]: (instance) =>
     (msg) => {
       instance.rpcClient.processResponse(msg, ({ id, result }) => [result.signedTransaction || result.transactionHash])
+    },
+  [METHODS.aepp.signMessage]: (instance) =>
+    (msg) => {
+      instance.rpcClient.processResponse(msg, ({ id, result }) => [result.signature])
     }
 }
 
@@ -98,6 +102,7 @@ export const AeppRpc = Ae.compose({
       if (typeof this[event] !== 'function') throw new Error(`Call-back for ${event} must be an function!`)
     })
   },
+  deepProps: { Ae: { defaults: { walletBroadcast: true } } },
   methods: {
     sign () {
     },
@@ -184,6 +189,21 @@ export const AeppRpc = Ae.compose({
       )
     },
     /**
+     * Overwriting of `signMessage` AE method
+     * All sdk API which use it will be send notification to wallet and wait for callBack
+     * @function signMessage
+     * @instance
+     * @rtype (msg: String, options = {}) => Promise
+     * @return {Promise<String>} Signed transaction
+     */
+    async signMessage (msg, opt = {}) {
+      if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
+      if (!this.rpcClient.getCurrentAccount()) throw new Error('You do not subscribed for account.')
+      return this.rpcClient.addCallback(
+        this.rpcClient.sendMessage(message(METHODS.aepp.signMessage, { ...opt, message: msg }))
+      )
+    },
+    /**
      * Send connection request to wallet
      * @function sendConnectRequest
      * @instance
@@ -208,19 +228,19 @@ export const AeppRpc = Ae.compose({
      * @rtype (tx: String, options = {}) => Promise
      * @param {String} tx
      * @param {Object} [options={}]
-     * @param {Object} [options.walletBroadcast={}]
+     * @param {Object} [options.walletBroadcast=true]
      * @return {Promise<Object>} Transaction broadcast result
      */
-    async send (tx, options = { walletBroadcast: true }) {
+    async send (tx, options = {}) {
       if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
       if (!this.rpcClient.getCurrentAccount()) throw new Error('You do not subscribed for account.')
       const opt = R.merge(this.Ae.defaults, options)
       if (!opt.walletBroadcast) {
-        const signed = await this.signTransaction(tx, opt)
+        const signed = await this.signTransaction(tx, { onAccount: opt.onAccount })
         return this.sendTransaction(signed, opt)
       }
       return this.rpcClient.addCallback(
-        this.rpcClient.sendMessage(message(METHODS.aepp.sign, { ...opt, tx, returnSigned: false }))
+        this.rpcClient.sendMessage(message(METHODS.aepp.sign, { onAccount: opt.onAccount, tx, returnSigned: false }))
       )
     }
   }

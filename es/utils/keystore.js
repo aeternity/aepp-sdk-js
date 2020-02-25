@@ -1,5 +1,5 @@
 import nacl from 'tweetnacl'
-import uuid from 'uuid'
+import { v4 as uuid } from 'uuid'
 
 import { encodeBase58Check } from './crypto'
 import { isBase64, isHex } from './string'
@@ -145,7 +145,7 @@ async function deriveKey (password, nonce, options = {
 function marshal (name, derivedKey, privateKey, nonce, salt, options = {}) {
   const opt = Object.assign({}, DEFAULTS.crypto, options)
   return Object.assign(
-    { name, version: 1, public_key: getAddressFromPriv(privateKey), id: uuid.v4() },
+    { name, version: 1, public_key: getAddressFromPriv(privateKey), id: uuid() },
     {
       crypto: Object.assign(
         {

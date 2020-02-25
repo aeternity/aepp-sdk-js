@@ -93,4 +93,14 @@ describe('MemoryAccount', function () {
     })
     return acc.address().should.eventually.be.equal(testAcc.publicKey)
   })
+  it('Sign message', async () => {
+    const message = 'test'
+    const acc = MemoryAccount({ keypair: testAcc })
+    const sig = await acc.signMessage(message)
+    const sigHex = await acc.signMessage(message, { returnHex: true })
+    const isValid = await acc.verifyMessage(message, sig)
+    const isValidHex = await acc.verifyMessage(message, sigHex)
+    isValid.should.be.equal(true)
+    isValidHex.should.be.equal(true)
+  })
 })
