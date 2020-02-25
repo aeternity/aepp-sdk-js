@@ -34,7 +34,7 @@
     </div>
     <!-- external app -->
     <iframe v-show="aeppUrl" ref="aepp"
-            class="w-full h-screen border border-black border-dashed bg-grey-light mx-auto mt-4 shadow" name="aepp"
+            class="w-full h-screen border border-black border-dashed bg-grey-light mx-auto mt-4 shadow"
             src="http://localhost:9001" frameborder="1"></iframe>
   </div>
 </template>
@@ -116,7 +116,7 @@
           this.shareWalletInfo(connection.sendMessage.bind(connection))
         }
       })
-      const target = !this.runningInFrame ? window.frames.aepp : window.parent
+      const target = !this.runningInFrame ? this.$refs.aepp.contentWindow : window.parent
       const connection = await BrowserWindowMessageConnection({
         target
       })
