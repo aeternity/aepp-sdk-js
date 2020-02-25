@@ -508,7 +508,7 @@ describe('Aepp<->Wallet', function () {
   })
   describe('Rpc helpers', () => {
     it('Receive invalid message', () => {
-      (!receive(() => true, 1)(false)).should.be.equal(true)
+      (!receive(() => true)(false)).should.be.equal(true)
     })
     it('receive unknown method', () => {
       getHandler({}, { method: 'hey' })()().should.be.equal(true)
