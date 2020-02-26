@@ -349,12 +349,7 @@ describe('Aepp<->Wallet', function () {
     })
     it('Resolve/Reject callback for undefined message', async () => {
       try {
-        aepp.rpcClient.resolveCallback(0)
-      } catch (e) {
-        e.message.should.be.equal('Can\'t find callback for this messageId 0')
-      }
-      try {
-        aepp.rpcClient.rejectCallback(0)
+        aepp.rpcClient.processResponse({ id: 0 })
       } catch (e) {
         e.message.should.be.equal('Can\'t find callback for this messageId 0')
       }
