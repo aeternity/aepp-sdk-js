@@ -9,7 +9,7 @@
 import stampit from '@stamp/it'
 
 import { RPC_STATUS, SUBSCRIPTION_TYPES } from '../schema'
-import { receive, sendMessage } from '../helpers'
+import { receive, sendMessage, message } from '../helpers'
 
 /**
  * Contain functionality for managing multiple RPC clients (RpcClient stamp)
@@ -224,14 +224,16 @@ export const RpcClient = stampit({
       return this.actions[action.id]
     },
     /**
-     * Add new callback for request
-     * @function addCallback
+     * Make a request
+     * @function request
      * @instance
-     * @rtype (msgId: (String|Number)) => Object
-     * @param {(String|Number)} msgId Request message id
+     * @rtype (name: String, params: Object) => Promise
+     * @param {String} name Method name
+     * @param {Object} params Method params
      * @return {Promise} Promise which will be resolved after receiving response message
      */
-    addCallback (msgId) {
+    request (name, params) {
+      const msgId = this.sendMessage(message(name, params))
       if (Object.prototype.hasOwnProperty.call(this.callbacks, msgId)) throw new Error('Callback Already exist')
       return new Promise((resolve, reject) => {
         this.callbacks[msgId] = { resolve, reject }
