@@ -36,11 +36,11 @@ const REQUESTS = {
       if (networkId !== instance.getNetworkId()) return sendResponseMessage(client)(id, method, { error: ERRORS.unsupportedNetwork() })
 
       // Action methods
-      const accept = (id) => () => {
+      const accept = () => {
         rpcClients.updateClientInfo(client.id, { status: RPC_STATUS.CONNECTED })
         sendResponseMessage(client)(id, method, { result: instance.getWalletInfo() })
       }
-      const deny = (id) => (error) => {
+      const deny = (error) => {
         rpcClients.updateClientInfo(client.id, { status: RPC_STATUS.CONNECTION_REJECTED })
         sendResponseMessage(client)(id, METHODS.aepp.connect, { error: ERRORS.connectionDeny(error) })
       }
@@ -61,7 +61,7 @@ const REQUESTS = {
           id,
           method,
           params: { name, networkId, version }
-        }, [accept(id), deny(id)]),
+        }, [accept, deny]),
         origin
       )
     },
@@ -70,21 +70,20 @@ const REQUESTS = {
       // Authorization check
       if (!client.isConnected()) return sendResponseMessage(client)(id, method, { error: ERRORS.notAuthorize() })
 
-      const accept = (id) =>
-        () => sendResponseMessage(client)(
-          id,
-          method,
-          {
-            result: {
-              subscription: client.updateSubscription(type, value),
-              address: instance.getAccounts()
-            }
-          })
-      const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.rejectedByUser(error) })
+      const accept = () => sendResponseMessage(client)(
+        id,
+        method,
+        {
+          result: {
+            subscription: client.updateSubscription(type, value),
+            address: instance.getAccounts()
+          }
+        })
+      const deny = (error) => sendResponseMessage(client)(id, method, { error: ERRORS.rejectedByUser(error) })
 
       instance.onSubscription(
         client,
-        client.addAction({ id, method, params: { type, value } }, [accept(id), deny(id)]),
+        client.addAction({ id, method, params: { type, value } }, [accept, deny]),
         origin
       )
     },
@@ -93,18 +92,12 @@ const REQUESTS = {
       // Authorization check
       if (!client.isConnected()) return sendResponseMessage(client)(id, method, { error: ERRORS.notAuthorize() })
 
-      const accept = (id) =>
-        () => sendResponseMessage(client)(
-          id,
-          method,
-          {
-            result: instance.addresses()
-          })
-      const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.rejectedByUser(error) })
+      const accept = () => sendResponseMessage(client)(id, method, { result: instance.addresses() })
+      const deny = (error) => sendResponseMessage(client)(id, method, { error: ERRORS.rejectedByUser(error) })
 
       instance.onAskAccounts(
         client,
-        client.addAction({ id, method }, [accept(id), deny(id)]),
+        client.addAction({ id, method }, [accept, deny]),
         origin
       )
     },
@@ -115,7 +108,7 @@ const REQUESTS = {
       // NetworkId check
       if (client.info.networkId !== instance.getNetworkId()) return sendResponseMessage(client)(id, method, { error: ERRORS.unsupportedNetwork() })
 
-      const accept = (id) => async (rawTx) => {
+      const accept = async (rawTx) => {
         try {
           const result = {
             result: {
@@ -141,11 +134,11 @@ const REQUESTS = {
         }
       }
 
-      const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.rejectedByUser(error) })
+      const deny = (error) => sendResponseMessage(client)(id, method, { error: ERRORS.rejectedByUser(error) })
 
       instance.onSign(
         client,
-        client.addAction({ id, method, params: { tx, returnSigned, onAccount } }, [accept(id), deny(id)]),
+        client.addAction({ id, method, params: { tx, returnSigned, onAccount } }, [accept, deny]),
         origin
       )
     },
@@ -154,7 +147,7 @@ const REQUESTS = {
       // Authorization check
       if (!client.isConnected()) return sendResponseMessage(client)(id, method, { error: ERRORS.notAuthorize() })
 
-      const accept = (id) => async () => sendResponseMessage(client)(
+      const accept = async () => sendResponseMessage(client)(
         id,
         method,
         {
@@ -162,11 +155,11 @@ const REQUESTS = {
         }
       )
 
-      const deny = (id) => (error) => sendResponseMessage(client)(id, method, { error: ERRORS.rejectedByUser(error) })
+      const deny = (error) => sendResponseMessage(client)(id, method, { error: ERRORS.rejectedByUser(error) })
 
       instance.onMessageSign(
         client,
-        client.addAction({ id, method, params: { message, onAccount } }, [accept(id), deny(id)]),
+        client.addAction({ id, method, params: { message, onAccount } }, [accept, deny]),
         origin
       )
     }
