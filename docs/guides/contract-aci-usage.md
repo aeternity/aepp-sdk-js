@@ -12,7 +12,7 @@ const { Universal: Ae, MemoryAccount, Node } = require('@aeternity/aepp-SDK')
 
 // same with async
 const main = async () => {
-  const node1 = await Node({ url: NODE_URL, internalUrl: NODE_INTERNAL_URL })
+  const node = await Node({ url: NODE_URL, internalUrl: NODE_INTERNAL_URL })
   const acc = MemoryAccount({ keypair: KEYPAIR })
 
   const SDKInstance = await Ae({
