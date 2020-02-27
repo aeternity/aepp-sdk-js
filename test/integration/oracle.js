@@ -32,17 +32,9 @@ describe('Oracle', function () {
     client = await ready(this)
   })
 
-  it('Register Oracle', async () => {
-    const expectedOracleId = `ok_${(await client.address()).slice(3)}`
-    oracle = await client.registerOracle("{'city': str}", "{'tmp': num}")
-    oracle.id.should.be.equal(expectedOracleId)
-  })
-
   it('Register Oracle with 5000 TTL', async () => {
-    const current = await client.address()
-    const onAccount = client.addresses().find(acc => acc !== current)
-    const expectedOracleId = `ok_${(await client.address({ onAccount })).slice(3)}`
-    const oracle = await client.registerOracle("{'city': str}", "{'tmp': num}", { oracleTtl: { type: 'delta', value: 5000 }, onAccount })
+    const expectedOracleId = `ok_${(await client.address()).slice(3)}`
+    oracle = await client.registerOracle("{'city': str}", "{'tmp': num}", { oracleTtl: { type: 'delta', value: 5000 } })
     oracle.id.should.be.equal(expectedOracleId)
   })
 
