@@ -53,36 +53,6 @@ Sign encoded transaction
 | tx | `String` | Transaction to sign |
 | opt | `Object` | Options |
 
-<a id="module_@aeternity/aepp-sdk/es/account--Account+signMessage"></a>
-
-#### account.signMessage(message, opt) ⇒ `String`
-Sign message
-
-**Kind**: instance method of [`Account`](#exp_module_@aeternity/aepp-sdk/es/account--Account)  
-**Returns**: `String` - Signature  
-**Category**: async  
-**rtype**: `(msg: String) => signature: Promise[String], throws: Error`
-
-| Param | Type | Description |
-| --- | --- | --- |
-| message | `String` | Message to sign |
-| opt | `Object` | Options |
-
-<a id="module_@aeternity/aepp-sdk/es/account--Account+verifyMessage"></a>
-
-#### account.verifyMessage(message, signature, opt) ⇒ `Boolean`
-Verify message
-
-**Kind**: instance method of [`Account`](#exp_module_@aeternity/aepp-sdk/es/account--Account)  
-**Category**: async  
-**rtype**: `(msg: String, signature: String, publicKey: String) => signature: Promise[String], throws: Error`
-
-| Param | Type | Description |
-| --- | --- | --- |
-| message | `String` | Message to verify |
-| signature | `String` | Signature |
-| opt | `Object` | Options |
-
 <a id="module_@aeternity/aepp-sdk/es/account--Account+getNetworkId"></a>
 
 #### account.getNetworkId() ⇒ `String`
