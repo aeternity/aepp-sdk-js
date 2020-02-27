@@ -17,6 +17,7 @@ import RpcClients from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/r
         * _instance_
             * [.addClient(id, connectionData)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+addClient) ⇒ `void`
             * [.getClient(id)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+getClient) ⇒ `Object`
+            * [.removeClient(id, forceConnectionClose)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+removeClient) ⇒ `Boolean`
             * [.updateClientInfo(id, info)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+updateClientInfo) ⇒ `void`
             * [.sentNotificationByCondition(msg, condition)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+sentNotificationByCondition) ⇒ `void`
             * [.isConnected()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+isConnected) ⇒ `Boolean`
@@ -72,6 +73,19 @@ Get clien by id
 | Param | Type | Description |
 | --- | --- | --- |
 | id | `String` \| `Number` | Client ID |
+
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+removeClient"></a>
+
+#### exports.RpcClient.removeClient(id, forceConnectionClose) ⇒ `Boolean`
+Remove and disiconnect client by ID
+
+**Kind**: instance method of [`exports.RpcClient`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient)  
+**rtype**: `(id: (String|Number), { forceConnectionClose: boolean = false }) => boolean`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| id | `String` \| `Number` | Client ID |
+| forceConnectionClose |  |  |
 
 <a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+updateClientInfo"></a>
 
