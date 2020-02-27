@@ -1,3 +1,13 @@
+## [7.1.1](https://github.com/aeternity/aepp-sdk-js/compare/6.0.1...7.1.1) (2020-02-27)
+
+
+### Bug Fixes
+
+* **TxBuilder:** Fix fee calculation for Oracles ([#924](https://github.com/aeternity/aepp-sdk-js/issues/924)) ([a9d784f](https://github.com/aeternity/aepp-sdk-js/commit/a9d784f))
+* **AEX-2:** Broken wallet detection ([#926](https://github.com/aeternity/aepp-sdk-js/pull/926))
+
+
+
 # [7.1.0](https://github.com/aeternity/aepp-sdk-js/compare/6.0.1...7.1.0) (2020-02-25)
 
 ### Refactor

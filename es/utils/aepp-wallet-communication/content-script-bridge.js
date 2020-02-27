@@ -37,7 +37,7 @@ function run () {
     this.pageConnection.sendMessage(msg)
   })
   // Connect to page using window.postMessage
-  this.pageConnection.connect((msg, source) => {
+  this.pageConnection.connect((msg, origin, source) => {
     if (source !== window) return
     this.extConnection.sendMessage(msg)
   })
