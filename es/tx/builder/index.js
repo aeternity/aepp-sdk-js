@@ -11,6 +11,7 @@ import {
   TX_FEE_BASE_GAS,
   TX_FEE_OTHER_GAS,
   TX_SERIALIZATION_SCHEMA,
+  TX_TYPE,
   VALIDATION_MESSAGE,
   VSN
 } from './schema'
@@ -174,16 +175,15 @@ function validateField (value, key, type, prefix) {
 }
 
 function transformParams (params, schema, { denomination } = {}) {
-  // console.log(schema.filter(([_, t]) => t === FIELD_TYPES.amount))
-  // console.log(params)
   params = schema
     .filter(([_, t]) => t === FIELD_TYPES.amount)
     .reduce((acc, [key]) => ({ ...params, [key]: formatAmount(params[key], { denomination }) }), params)
+  const schemaKeys = schema.map(([k]) => k)
   return Object
     .entries(params)
     .reduce(
       (acc, [key, value]) => {
-        acc[key] = value
+        if (schemaKeys.includes(key)) acc[key] = value
         if (['oracleTtl', 'queryTtl', 'responseTtl'].includes(key)) {
           acc[`${key}Type`] = value.type === ORACLE_TTL_TYPES.delta ? 0 : 1
           acc[`${key}Value`] = value.value
@@ -196,15 +196,18 @@ function transformParams (params, schema, { denomination } = {}) {
 
 // INTERFACE
 
-function getOracleRelativeTtl (params) {
-  // const ORACLE_TTL_KEYS = ['oracleTtl', 'queryTtl', 'responseTtl']
-  // return Object.entries(params).reduce((acc, [key, value]) => {
-  //   if (ORACLE_TTL_KEYS.includes(key)) acc = value.value
-  //   if (ORACLE_TTL_KEYS.map(k => `${k}Value`).includes(key)) acc = value
-  //   return acc
-  // }, 500)
-  // TODO Investigate this
-  return 500
+function getOracleRelativeTtl (params, txType) {
+  const ttlKey = {
+    [TX_TYPE.oracleRegister]: 'oracleTtl',
+    [TX_TYPE.oracleExtend]: 'oracleTtl',
+    [TX_TYPE.oracleQuery]: 'queryTtl',
+    [TX_TYPE.oracleResponse]: 'responseTtl'
+  }[txType]
+
+  if (params[ttlKey] || params[`${ttlKey}Value`]) {
+    return params[`${ttlKey}Value`] || params[ttlKey].value
+  }
+  return 1
 }
 
 /**
@@ -246,7 +249,7 @@ function buildFee (txType, { params, gas = 0, multiplier, vsn }) {
   const { rlpEncoded: txWithOutFee } = buildTx({ ...params }, txType, { vsn })
   const txSize = txWithOutFee.length
   return TX_FEE_BASE_GAS(txType, { backend: getContractBackendFromTx(params) })
-    .plus(TX_FEE_OTHER_GAS(txType)({ txSize, relativeTtl: getOracleRelativeTtl(params) }))
+    .plus(TX_FEE_OTHER_GAS(txType)({ txSize, relativeTtl: getOracleRelativeTtl(params, txType) }))
     .times(multiplier)
 }
 
@@ -297,7 +300,7 @@ export function validateParams (params, schema, { excludeKeys = [] }) {
  * @param {Object} params Object with tx params
  * @param {Array} schema Transaction schema
  * @param {Object} [options={}] options
- * @param {Object} [options.excludeKeys] excludeKeys Array of keys to exclude for validation and build
+ * @param {Array} [options.excludeKeys] excludeKeys Array of keys to exclude for validation and build
  * @throws {Error} Validation error
  * @return {Array} Array with binary fields of transaction
  */
