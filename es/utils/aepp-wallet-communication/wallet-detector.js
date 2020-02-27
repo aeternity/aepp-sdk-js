@@ -31,7 +31,7 @@ import { isInIframe } from './helpers'
 
 const wallets = {}
 
-const handleDetection = (onDetected) => ({ method, params }, source) => {
+const handleDetection = (onDetected) => ({ method, params }, origin, source) => {
   if (!method || !params) return
   const ifExist = Object.prototype.hasOwnProperty.call(wallets, params.id)
   if (method === METHODS.wallet.readyToConnect && !ifExist) {
