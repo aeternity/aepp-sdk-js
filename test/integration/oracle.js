@@ -32,14 +32,14 @@ describe('Oracle', function () {
     client = await ready(this)
   })
 
-  it('Register Oracle', async () => {
+  it('Register Oracle with 5000 TTL', async () => {
     const expectedOracleId = `ok_${(await client.address()).slice(3)}`
-    oracle = await client.registerOracle("{'city': str}", "{'tmp': num}")
+    oracle = await client.registerOracle("{'city': str}", "{'tmp': num}", { oracleTtl: { type: 'delta', value: 5000 } })
     oracle.id.should.be.equal(expectedOracleId)
   })
 
   it('Extend Oracle', async () => {
-    const ttlToExtend = { type: 'delta', value: 123 }
+    const ttlToExtend = { type: 'delta', value: 7450 }
     const extendedOracle = await oracle.extendOracle(ttlToExtend)
     const isExtended = extendedOracle.ttl > oracle.ttl
     isExtended.should.be.equal(true)

@@ -115,6 +115,17 @@ async function init () {
       console.log(action)
       console.log('------------------------')
       action.accept()
+    },
+    onMessageSign (aepp, action) {
+      // if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to get accounts`)) {
+      //   accept()
+      // } else {
+      //   deny()
+      // }
+      console.log(aepp)
+      console.log(action)
+      console.log('------------------------')
+      action.accept()
     }
   }).then(wallet => {
     chrome.runtime.onConnect.addListener(async function (port) {

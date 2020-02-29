@@ -1,3 +1,22 @@
+# [7.1.0](https://github.com/aeternity/aepp-sdk-js/compare/6.0.1...7.1.0) (2020-02-25)
+
+### Refactor
+
+* **AEX:** Simplify message id processing ([#916](https://github.com/aeternity/aepp-sdk-js/pull/916)). Pass AEEP `origin` to Wallet callback ([#918](https://github.com/aeternity/aepp-sdk-js/pull/918))
+* **Node:** Move `getNetworkId` to helpers ([#910](https://github.com/aeternity/aepp-sdk-js/pull/910))
+* **ACI:** Minor ACI validation improvement.
+ Move decoding of events to builder. Add ability to decode events without ACI
+ 
+### Features
+
+* **ACI:** Implement Contract Events for ACI([Contract Event Guide](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/contract-events.md))
+* **Contract:** Helpers for Oracle and AENS signature delegation([Signature delegation guide](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/delegate-signature-to-contract.md))
+* **AmountFormatter:** Rework amount formatter. Change formatter units naming. Add more units ([#909](https://github.com/aeternity/aepp-sdk-js/issues/909)) ([6970efe](https://github.com/aeternity/aepp-sdk-js/commit/6970efe))
+* **TxBuilder:** Integrate amount formatter to transaction builder ([#897](https://github.com/aeternity/aepp-sdk-js/pull/897))
+* **Account:** Implement Message Signing (`singMessage`, `verifyMessage`) ([#903](https://github.com/aeternity/aepp-sdk-js/pull/903))
+* **AEX-2:** Add `removeRpcClient` method to RpcClient/RpcWallet stamp's([#912](https://github.com/aeternity/aepp-sdk-js/pull/912))
+
+
 # [7.0.0](https://github.com/aeternity/aepp-sdk-js/compare/6.0.1...7.0.0) (2020-01-31)
 
 
