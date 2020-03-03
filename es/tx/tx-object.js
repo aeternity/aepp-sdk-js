@@ -9,19 +9,20 @@ const buildTransaction = (type, params, options = {}) => {
   if (typeof type !== 'string' || !Object.values(TX_TYPE).includes(type)) throw new Error(`Unknown transaction type ${type}`)
   return buildTx(params, type, options)
 }
-const unpackTransaction = (tx, options) => {
+
+const unpackTransaction = (tx) => {
   if (!tx) throw new Error(`Invalid transaction: ${tx}`)
   if (typeof tx === 'string') {
-    if (isHex(tx)) return unpackTx(Buffer.from(tx, 'hex'))
-    if (!assertedType(tx, 'tx', true)) throw new Error('Invalid transaction string. Tx should be `ak` prefixed base58c string')
+    if (!assertedType(tx, 'tx', true)) throw new Error('Invalid transaction string. Tx should be `tx` prefixed base58c string')
     return unpackTx(isHex(tx) ? Buffer.from(tx, 'hex') : tx, isHex(tx))
   }
 }
 
 export const TxObject = stampit({
   init ({ tx, params, type }) {
-    if (params && type) return Object.assign(this, buildTransaction(params, type))
+    if (params && type) return Object.assign(this, buildTransaction(type, params))
     if (tx) return Object.assign(this, unpackTransaction(tx))
+    throw new Error('Invalid TxObject arguments. Please provide one of { tx: "tx_asdasd23..." } or { type: "spendTx", params: {...} }')
   },
   methods: {
     recalculateFee: () => true,
