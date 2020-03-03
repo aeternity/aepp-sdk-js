@@ -21,6 +21,7 @@ import { generateKeyPair } from '../../es/utils/crypto'
 
 describe.only('TxObject', () => {
   const keyPair = generateKeyPair()
+  let txObject
   describe('Invalid initialization', () => {
     it('Empty arguments', () => {
       try {
@@ -53,7 +54,7 @@ describe.only('TxObject', () => {
   })
   describe('Init TxObject', () => {
     it('Build transaction', () => {
-      const txObject = TxObject({
+      txObject = TxObject({
         type: TX_TYPE.spend,
         params: { senderId: keyPair.publicKey, recipientId: keyPair.publicKey, amount: 100, ttl: 0, nonce: 1, fee: 100 }
       })
@@ -61,6 +62,14 @@ describe.only('TxObject', () => {
       Buffer.isBuffer(txObject.rlpEncoded).should.be.equal(true)
       txObject.binary.should.be.a('Array')
       txObject.txObject.should.be.a('object')
+    })
+    it('Unpack transaction', () => {
+      const txFromString = TxObject({ tx: txObject.tx })
+      console.log(txFromString)
+      const rtxFromRlpBinary = TxObject({ tx: txObject.rlpEncoded })
+      console.log(rtxFromRlpBinary)
+      const txFromBinary = TxObject({ tx: txObject.binary })
+      console.log(txFromBinary)
     })
   })
 })
