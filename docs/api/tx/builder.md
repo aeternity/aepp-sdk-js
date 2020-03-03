@@ -68,7 +68,7 @@ Build binary transaction
 | params | `Object` |  | Object with tx params |
 | schema | `Array` |  | Transaction schema |
 | [options] | `Object` | <code>{}</code> | options |
-| [options.excludeKeys] | `Object` |  | excludeKeys Array of keys to exclude for validation and build |
+| [options.excludeKeys] | `Array` |  | excludeKeys Array of keys to exclude for validation and build |
 
 <a id="exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.unpackRawTx"></a>
 
