@@ -28,7 +28,6 @@ import {
   getBrowserAPI,
   getHandler,
   getWindow, isInIframe,
-  message,
   receive
 } from '../../es/utils/aepp-wallet-communication/helpers'
 import { METHODS, RPC_STATUS } from '../../es/utils/aepp-wallet-communication/schema'
@@ -349,24 +348,19 @@ describe('Aepp<->Wallet', function () {
     })
     it('Resolve/Reject callback for undefined message', async () => {
       try {
-        aepp.rpcClient.resolveCallback(0)
-      } catch (e) {
-        e.message.should.be.equal('Can\'t find callback for this messageId 0')
-      }
-      try {
-        aepp.rpcClient.rejectCallback(0)
+        aepp.rpcClient.processResponse({ id: 0 })
       } catch (e) {
         e.message.should.be.equal('Can\'t find callback for this messageId 0')
       }
     })
     it('Try to connect unsupported protocol', async () => {
       try {
-        await aepp.rpcClient.addCallback(
-          aepp.rpcClient.sendMessage(message(METHODS.aepp.connect, {
+        await aepp.rpcClient.request(
+          METHODS.aepp.connect, {
             name: 'test-aepp',
             version: 2,
             networkId: aepp.getNetworkId()
-          }))
+          }
         )
       } catch (e) {
         e.code.should.be.equal(5)
@@ -375,12 +369,12 @@ describe('Aepp<->Wallet', function () {
     })
     it('Try to connect unsupported network', async () => {
       try {
-        await aepp.rpcClient.addCallback(
-          aepp.rpcClient.sendMessage(message(METHODS.aepp.connect, {
+        await aepp.rpcClient.request(
+          METHODS.aepp.connect, {
             name: 'test-aepp',
             version: 1,
             networkId: 'ae_test'
-          }))
+          }
         )
       } catch (e) {
         e.code.should.be.equal(8)
@@ -389,25 +383,19 @@ describe('Aepp<->Wallet', function () {
     })
     it('Try to connect unsupported network', async () => {
       try {
-        await aepp.rpcClient.addCallback(
-          aepp.rpcClient.sendMessage(message(METHODS.aepp.connect, {
+        await aepp.rpcClient.request(
+          METHODS.aepp.connect, {
             name: 'test-aepp',
             version: 1,
             networkId: 'ae_test'
-          }))
+          }
         )
       } catch (e) {
         e.code.should.be.equal(8)
         e.message.should.be.equal('Unsupported Network')
       }
     })
-    it('Try add already existed callback/action', async () => {
-      try {
-        aepp.rpcClient.callbacks = { 1: {} }
-        await aepp.rpcClient.addCallback(1)
-      } catch (e) {
-        e.message.should.be.equal('Callback Already exist')
-      }
+    it('Try add already existed action', async () => {
       try {
         aepp.rpcClient.addAction({ id: 1 }, [])
       } catch (e) {
