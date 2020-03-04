@@ -26,6 +26,7 @@ const unpackTransaction = (tx) => {
 
 export const TxObject = stampit({
   init ({ tx, params, type, options = {} } = {}) {
+    this.options = options
     if (params && type) return Object.assign(this, buildTransaction(type, params, options))
     if (tx) return Object.assign(this, unpackTransaction(tx))
     throw new Error('Invalid TxObject arguments. Please provide one of { tx: "tx_asdasd23..." } or { type: "spendTx", params: {...} }')
@@ -35,8 +36,11 @@ export const TxObject = stampit({
     fromRlp: (tx) => TxObject({ tx })
   },
   methods: {
+    setProp (props = {}) {
+      if (typeof props !== 'object') throw new Error('Props should be an object')
+      Object.assign(this, buildTransaction(this.type, { ...this.props, ...props }, this.options))
+    },
     recalculateFee: () => true,
-    setProp: (props = {}) => true,
     validate: () => true,
     type: () => this.type,
     getSignature: () => true,
