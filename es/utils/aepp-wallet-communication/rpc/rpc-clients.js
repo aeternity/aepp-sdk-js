@@ -9,7 +9,7 @@
 import stampit from '@stamp/it'
 
 import { RPC_STATUS, SUBSCRIPTION_TYPES } from '../schema'
-import { receive, sendMessage } from '../helpers'
+import { receive, sendMessage, message } from '../helpers'
 
 /**
  * Contain functionality for managing multiple RPC clients (RpcClient stamp)
@@ -224,14 +224,16 @@ export const RpcClient = stampit({
       return this.actions[action.id]
     },
     /**
-     * Add new callback for request
-     * @function addCallback
+     * Make a request
+     * @function request
      * @instance
-     * @rtype (msgId: (String|Number)) => Object
-     * @param {(String|Number)} msgId Request message id
+     * @rtype (name: String, params: Object) => Promise
+     * @param {String} name Method name
+     * @param {Object} params Method params
      * @return {Promise} Promise which will be resolved after receiving response message
      */
-    addCallback (msgId) {
+    request (name, params) {
+      const msgId = this.sendMessage(message(name, params))
       if (Object.prototype.hasOwnProperty.call(this.callbacks, msgId)) throw new Error('Callback Already exist')
       return new Promise((resolve, reject) => {
         this.callbacks[msgId] = { resolve, reject }
@@ -247,44 +249,15 @@ export const RpcClient = stampit({
      * @return {void}
      */
     processResponse ({ id, error, result }, transformResult) {
+      if (!this.callbacks[id]) throw new Error(`Can't find callback for this messageId ${id}`)
       if (result) {
-        this.resolveCallback(id, typeof transformResult === 'function' ? transformResult({
-          id,
-          result
-        }) : [result])
-      } else if (error) {
-        this.rejectCallback(id, [error])
+        this.callbacks[id].resolve(...typeof transformResult === 'function'
+          ? transformResult({ id, result })
+          : [result])
+      } else {
+        this.callbacks[id].reject(error)
       }
-    },
-    /**
-     * Resolve callback function
-     * Trigger Promise resolution from `addCallBack` function
-     * @function resolveCallback
-     * @instance
-     * @rtype (msgId: Number, args: Array) => void
-     * @param {Number} msgId Message Id
-     * @param {Array} args Arguments array
-     * @return {void}
-     */
-    resolveCallback (msgId, args = []) {
-      if (!this.callbacks[msgId]) throw new Error(`Can't find callback for this messageId ${msgId}`)
-      this.callbacks[msgId].resolve(...args)
-      delete this.callbacks[msgId]
-    },
-    /**
-     * Reject callback function
-     * Trigger Promise rejection from `addCallBack` function
-     * @function rejectCallback
-     * @instance
-     * @rtype (msgId: Number, args: Array) => void
-     * @param {Number} msgId Message Id
-     * @param {Array} args Arguments array
-     * @return {void}
-     */
-    rejectCallback (msgId, args = []) {
-      if (!this.callbacks[msgId]) throw new Error(`Can't find callback for this messageId ${msgId}`)
-      this.callbacks[msgId].reject(...args)
-      delete this.callbacks[msgId]
+      delete this.callbacks[id]
     }
   }
 })
