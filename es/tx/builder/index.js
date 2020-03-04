@@ -348,15 +348,16 @@ export function unpackRawTx (binary, schema) {
  */
 const getSchema = ({ vsn, objId, type }) => {
   const isDeserialize = !!objId
+  const firstKey = isDeserialize ? objId : type
   const schema = isDeserialize ? TX_DESERIALIZATION_SCHEMA : TX_SERIALIZATION_SCHEMA
 
-  if (!schema[isDeserialize ? objId : type]) {
+  if (!schema[firstKey]) {
     throw new Error(`Transaction ${isDeserialize ? 'deserialization' : 'serialization'} not implemented for ${isDeserialize ? 'tag ' + objId : type}`)
   }
-  if (!schema[isDeserialize ? objId : type][vsn]) {
+  if (!schema[firstKey][vsn]) {
     throw new Error(`Transaction ${isDeserialize ? 'deserialization' : 'serialization'} not implemented for ${isDeserialize ? 'tag ' + objId : type} version ${vsn}`)
   }
-  return TX_DESERIALIZATION_SCHEMA[objId][vsn]
+  return schema[firstKey][vsn]
 }
 
 /**
