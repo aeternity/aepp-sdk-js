@@ -154,9 +154,7 @@ export const AeppRpc = Ae.compose({
     async askAddresses () {
       if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
       if (!this.rpcClient.getCurrentAccount()) throw new Error('You do not subscribed for account.')
-      return this.rpcClient.addCallback(
-        this.rpcClient.sendMessage(message(METHODS.aepp.address))
-      )
+      return this.rpcClient.request(METHODS.aepp.address)
     },
     /**
      * Subscribe for addresses from wallet
@@ -169,9 +167,7 @@ export const AeppRpc = Ae.compose({
      */
     async subscribeAddress (type, value) {
       if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
-      return this.rpcClient.addCallback(
-        this.rpcClient.sendMessage(message(METHODS.aepp.subscribeAddress, { type, value }))
-      )
+      return this.rpcClient.request(METHODS.aepp.subscribeAddress, { type, value })
     },
     /**
      * Overwriting of `signTransaction` AE method
@@ -184,9 +180,7 @@ export const AeppRpc = Ae.compose({
     async signTransaction (tx, opt = {}) {
       if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
       if (!this.rpcClient.getCurrentAccount()) throw new Error('You do not subscribed for account.')
-      return this.rpcClient.addCallback(
-        this.rpcClient.sendMessage(message(METHODS.aepp.sign, { ...opt, tx, returnSigned: true }))
-      )
+      return this.rpcClient.request(METHODS.aepp.sign, { ...opt, tx, returnSigned: true })
     },
     /**
      * Overwriting of `signMessage` AE method
@@ -199,9 +193,7 @@ export const AeppRpc = Ae.compose({
     async signMessage (msg, opt = {}) {
       if (!this.rpcClient || !this.rpcClient.connection.isConnected() || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
       if (!this.rpcClient.getCurrentAccount()) throw new Error('You do not subscribed for account.')
-      return this.rpcClient.addCallback(
-        this.rpcClient.sendMessage(message(METHODS.aepp.signMessage, { ...opt, message: msg }))
-      )
+      return this.rpcClient.request(METHODS.aepp.signMessage, { ...opt, message: msg })
     },
     /**
      * Send connection request to wallet
@@ -211,12 +203,12 @@ export const AeppRpc = Ae.compose({
      * @return {Promise} Connection response
      */
     async sendConnectRequest () {
-      return this.rpcClient.addCallback(
-        this.rpcClient.sendMessage(message(METHODS.aepp.connect, {
+      return this.rpcClient.request(
+        METHODS.aepp.connect, {
           name: this.name,
           version: VERSION,
           networkId: this.getNetworkId()
-        }))
+        }
       )
     },
     /**
@@ -239,9 +231,7 @@ export const AeppRpc = Ae.compose({
         const signed = await this.signTransaction(tx, { onAccount: opt.onAccount })
         return this.sendTransaction(signed, opt)
       }
-      return this.rpcClient.addCallback(
-        this.rpcClient.sendMessage(message(METHODS.aepp.sign, { onAccount: opt.onAccount, tx, returnSigned: false }))
-      )
+      return this.rpcClient.request(METHODS.aepp.sign, { onAccount: opt.onAccount, tx, returnSigned: false })
     }
   }
 })
