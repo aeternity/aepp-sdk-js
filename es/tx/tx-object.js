@@ -6,11 +6,11 @@ import { encode } from './builder/helpers'
 
 /**
  * Build transaction from object
- * @param {TX_TYPE} type Transaction type
+ * @param {String} type Transaction type
  * @param {Object} params Transaction params
  * @param {Object} [options={}] Options
  * @throws {Error} Arguments validation error's
- * @return {{ encodedTx: String, binary: Array<Buffer>, rlpEncoded: Buffer, params: Object, type: TX_TYPE }}
+ * @return {{ encodedTx: String, binary: Array<Buffer>, rlpEncoded: Buffer, params: Object, type: String }}
  */
 const buildTransaction = (type, params, options = {}) => {
   if (typeof params !== 'object') throw new Error('"params" should be an object')
@@ -23,7 +23,7 @@ const buildTransaction = (type, params, options = {}) => {
  * Unpack transaction from RLP encoded binary or base64c string
  * @param {Buffer|String} tx RLP encoded binary or base64c(rlpBinary) string
  * @throws {Error} Arguments validation error's
- * @return {{ encodedTx: String, binary: Array<Buffer>, rlpEncoded: Buffer, type: TX_TYPE, params: Object }}
+ * @return {{ encodedTx: String, binary: Array<Buffer>, rlpEncoded: Buffer, type: String, params: Object }}
  */
 const unpackTransaction = (tx) => {
   if (!tx) throw new Error(`Invalid transaction: ${tx}`)
@@ -43,10 +43,10 @@ const unpackTransaction = (tx) => {
  * Need to provide one of arguments: [tx] -> unpack flow or [params, type] -> build flow
  * @param {Buffer|String} [tx] Transaction rlp binary or vase64c string
  * @param {Object} params Transaction params
- * @param {TX_TYPE} type Transaction type
+ * @param {String} type Transaction type
  * @param {Object} [options={}] Options
  * @throws {Error} Arguments validation error's
- * @return {{encodedTx: String, binary: Array<Buffer>, rlpEncoded: Buffer, type: TX_TYPE, params: Object}}
+ * @return {{encodedTx: String, binary: Array<Buffer>, rlpEncoded: Buffer, type: String, params: Object}}
  */
 const initTransaction = ({ tx, params, type, options = {} } = {}) => {
   if (params && type) return buildTransaction(type, params, options)
@@ -64,7 +64,6 @@ export const TxObject = stampit({
       this.signatures = signatures
       this.params = tx
       this.type = txType
-
       this.isSigned = true
     }
   },
@@ -92,8 +91,7 @@ export const TxObject = stampit({
       if (typeof props !== 'object') throw new Error('Props should be an object')
       this.isSigned = false
       this.signatures = []
-      const params = { ...this.params, ...props }
-      const fee = calculateFee(props.fee, this.type, { gas: props.gas, params, vsn: params.vsn })
+      const fee = this.calculateFee(props)
 
       Object.assign(this, buildTransaction(this.type, { ...this.props, ...props, fee }, this.options))
       return this
@@ -114,9 +112,18 @@ export const TxObject = stampit({
     addSignature (signature) {
       if (!this.isSigned) throw new Error('Signature not found, transaction is not signed')
       if (!Buffer.isBuffer(signature)) throw new Error('Invalid signature, signature must be of type Buffer')
-      this.signatures = [...this.signatures, signature]
+      Object.assign(this, buildTransaction(TX_TYPE.signed, { encodedTx: this.rlpEncoded, signatures: [[...this.signatures, signature]] }))
+
+      const { signatures, encodedTx: { txType, tx } } = this.params
+      this.signatures = signatures
+      this.params = tx
+      this.type = txType
+      this.isSigned = true
     },
-    recalculateFee: () => true,
+    calculateFee (props = {}) {
+      const params = { ...this.params, ...props }
+      return calculateFee(params.fee, this.type, { gas: params.gas, params, vsn: params.vsn })
+    },
     validate: () => true,
     type: () => this.type
   }
