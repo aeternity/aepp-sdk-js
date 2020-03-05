@@ -18,10 +18,12 @@ import { describe, it } from 'mocha'
 import TxObject from '../../es/tx/tx-object'
 import { TX_TYPE } from '../../es/tx/builder/schema'
 import { generateKeyPair } from '../../es/utils/crypto'
+import MemoryAccount from '../../es/account/memory'
 
 describe.only('TxObject', () => {
   const keyPair = generateKeyPair()
   let txObject
+  let signedTx
   describe('Invalid initialization', () => {
     it('Empty arguments', () => {
       try {
@@ -52,12 +54,13 @@ describe.only('TxObject', () => {
       }
     })
   })
-  describe('Init TxObject', () => {
-    it('Build transaction', () => {
+  describe.only('Init TxObject', () => {
+    it.only('Build transaction', async () => {
       txObject = TxObject({
         type: TX_TYPE.spend,
         params: { senderId: keyPair.publicKey, recipientId: keyPair.publicKey, amount: 100, ttl: 0, nonce: 1, fee: 100 }
       })
+      signedTx = await MemoryAccount({ keypair: keyPair, networkId: 'ae_mainnet' }).signTransaction(txObject.encodedTx)
       txObject.encodedTx.should.be.a('string')
       Buffer.isBuffer(txObject.rlpEncoded).should.be.equal(true)
       txObject.binary.should.be.a('Array')
@@ -74,6 +77,9 @@ describe.only('TxObject', () => {
       Buffer.from(rtxFromRlpBinary.binary).equals(Buffer.from(txObject.binary)).should.be.equal(true)
       rtxFromRlpBinary.encodedTx.should.be.equal(txObject.encodedTx)
       rtxFromRlpBinary.params.should.be.deep.include(txObject.params)
+    })
+    it.only('Unpack signed transaction', () => {
+      console.log(TxObject.fromString(signedTx))
     })
   })
 })

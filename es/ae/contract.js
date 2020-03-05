@@ -336,7 +336,7 @@ async function delegateSignatureCommon (ids = [], opt = {}) {
   return this.sign(
     Buffer.concat(
       [
-        Buffer.from(this.getNetworkId()),
+        Buffer.from(this.getNetworkId(opt)),
         decode(await this.address(opt)),
         ...ids.map(e => decode(e))
       ]

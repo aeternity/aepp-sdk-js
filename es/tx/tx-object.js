@@ -24,12 +24,25 @@ const unpackTransaction = (tx) => {
   }
 }
 
+const initTransaction = ({ tx, params, type, options = {} } = {}) => {
+  if (params && type) return buildTransaction(type, params, options)
+  if (tx) return unpackTransaction(tx)
+  throw new Error('Invalid TxObject arguments. Please provide one of { tx: "tx_asdasd23..." } or { type: "spendTx", params: {...} }')
+}
+
 export const TxObject = stampit({
   init ({ tx, params, type, options = {} } = {}) {
     this.options = options
-    if (params && type) return Object.assign(this, buildTransaction(type, params, options))
-    if (tx) return Object.assign(this, unpackTransaction(tx))
-    throw new Error('Invalid TxObject arguments. Please provide one of { tx: "tx_asdasd23..." } or { type: "spendTx", params: {...} }')
+    Object.assign(this, initTransaction({ tx, params, type, options }))
+
+    if (this.type === TX_TYPE.signed) {
+      const { signatures, encodedTx: { txType, tx } } = this.params
+      this.signatures = signatures
+      this.params = tx
+      this.type = txType
+
+      this.isSigned = true
+    }
   },
   statics: {
     fromString: (tx) => TxObject({ tx }),
