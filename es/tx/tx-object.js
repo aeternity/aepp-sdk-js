@@ -82,6 +82,7 @@ const initTransaction = ({ tx, params, type, options = {} } = {}) => {
 export const TxObject = stampit({
   init ({ tx, params, type, options = {} } = {}) {
     this.options = options
+    this.signatures = []
     Object.assign(this, initTransaction({ tx, params, type, options }))
 
     if (this.type === TX_TYPE.signed) {
@@ -115,15 +116,14 @@ export const TxObject = stampit({
      * Rebuild transaction with new params and recalculate fee
      * @alias module:@aeternity/aepp-sdk/es/tx/tx-object
      * @param {Object} props Transaction properties for update
+     * @param options
      * @return {TxObject}
      */
-    setProp (props = {}) {
+    setProp (props = {}, options = {}) {
       if (typeof props !== 'object') throw new Error('Props should be an object')
       this.isSigned = false
       this.signatures = []
-      const fee = this.calculateFee(props)
-
-      Object.assign(this, buildTransaction(this.type, { ...this.props, ...props, fee }, this.options))
+      Object.assign(this, buildTransaction(this.type, { ...this.params, ...props, fee: null }, { ...this.options, ...options }))
       return this
     },
     /**
@@ -142,8 +142,7 @@ export const TxObject = stampit({
      * @return {void}
      */
     addSignature (signature) {
-      if (!this.isSigned) throw new Error('Signature not found, transaction is not signed')
-      if (!Buffer.isBuffer(signature)) throw new Error('Invalid signature, signature must be of type Buffer')
+      if (!Buffer.isBuffer(signature) && !(signature instanceof Uint8Array)) throw new Error('Invalid signature, signature must be of type Buffer or Uint8Array')
       Object.assign(this, buildTransaction(TX_TYPE.signed, { encodedTx: this.rlpEncoded, signatures: [[...this.signatures, signature]] }))
 
       const { signatures, encodedTx: { txType, tx } } = this.params

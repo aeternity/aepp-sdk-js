@@ -79,7 +79,46 @@ describe('TxObject', () => {
       rtxFromRlpBinary.params.should.be.deep.include(txObject.params)
     })
     it('Unpack signed transaction', () => {
-      console.log(TxObject.fromString(signedTx))
+      const tx = TxObject.fromString(signedTx)
+      tx.getSignatures().length.should.not.be.equal(0)
+      tx.isSigned.should.be.equal(true)
+    })
+    it('Get signature on unsigned tx', () => {
+      try {
+        txObject.getSignatures()
+      } catch (e) {
+        e.message.should.be.equal('Signature not found, transaction is not signed')
+      }
+    })
+    it('Invalid props', () => {
+      try {
+        txObject.setProp(true)
+      } catch (e) {
+        e.message.should.be.equal('Props should be an object')
+      }
+    })
+    it('Change props of signed transaction', () => {
+      const signedTxObject = TxObject.fromString(signedTx)
+      const fee = signedTxObject.params.fee
+      signedTxObject.setProp({ amount: 10000 })
+      signedTxObject.params.fee.should.not.be.equal(fee)
+      signedTxObject.params.amount.should.be.equal('10000')
+    })
+    it('Add signatures', async () => {
+      const oldTx = txObject.encodedTx
+      const txWithNetworkId = Buffer.concat([Buffer.from('ae_mainnet'), txObject.rlpEncoded])
+      const sig = await MemoryAccount({ keypair: keyPair }).sign(txWithNetworkId)
+      txObject.addSignature(sig)
+      txObject.getSignatures().length.should.be.equal(1)
+      txObject.isSigned.should.be.equal(true)
+      oldTx.should.not.be.equal(txObject.encodedTx)
+    })
+    it('Invalid signature', async () => {
+      try {
+        txObject.addSignature({})
+      } catch (e) {
+        e.message.should.be.equal('Invalid signature, signature must be of type Buffer or Uint8Array')
+      }
     })
   })
 })
