@@ -113,34 +113,24 @@ import Ae from '@aeternity/aepp-sdk/es/ae/universal' // or other flavor
 import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory' // or other flavor
 import Node from '@aeternity/aepp-sdk/es/node' // or other flavor
 
-Promise.all([
-  Node({ url, internalUrl })
-]).then(nodes => {
-    Ae({
-        nodes: [
-          { name: 'someNode', instance: nodes[0] },
-        // node2, node3, ...
-        ],
-        compilerUrl: 'COMPILER_URL',
-        accounts: [
-          MemoryAccount({ keypair: { secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS' } }),
-        // acc2
-        ],
-        address: 'SELECTED_ACCOUNT_PUB',
-        networkId: 'ae_uat' // or any other networkId your client should connect to
-    }).then(ae => {
-      // Interacting with the blockchain client
-      // getting the latest block height
-      ae.height().then(height => {
-        // logs current height
-        console.log('Current Block Height:', height)
-      }).catch(e => {
-        // logs error
-        console.log(e)
-      })
-    })
-})
+const NODE_URL = 'https://sdk-testnet.aepps.com'
+const COMPILER_URL = 'COMPILER_URL' // required for using Contract
+const ACCOUNT = MemoryAccount({ keypair: { secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS' } })
 
+(async function () {
+  const nodeInstance = await Node({ url: NODE_URL })
+  const sdkInstance = await Ae({
+     compilerUrl: COMPILER_URL,
+     nodes: [ { name: 'test-net', instance: nodeInstance } ],
+     accounts: [ ACCOUNT ]
+  })
+
+  await sdkInstance.height() // get top block height
+  console.log('Current Block Height:', height)
+  
+  await sdkInstance.spend(1e18, 'ak_asd23dasdasda...') // spend one AE
+
+})()
 ```
 
 ## More: Guides & Examples
