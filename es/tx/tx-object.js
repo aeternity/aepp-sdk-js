@@ -15,7 +15,8 @@ import { encode } from './builder/helpers'
 const buildTransaction = (type, params, options = {}) => {
   if (typeof params !== 'object') throw new Error('"params" should be an object')
   if (typeof type !== 'string' || !Object.values(TX_TYPE).includes(type)) throw new Error(`Unknown transaction type ${type}`)
-  const { rlpEncoded, binary, tx: encodedTx, txObject } = buildTx(params, type, options)
+  const fee = this.calculateFee(params)
+  const { rlpEncoded, binary, tx: encodedTx, txObject } = buildTx({ ...params, fee }, type, options)
   return { rlpEncoded, binary, encodedTx, params: txObject, type }
 }
 
@@ -123,9 +124,7 @@ export const TxObject = stampit({
     calculateFee (props = {}) {
       const params = { ...this.params, ...props }
       return calculateFee(params.fee, this.type, { gas: params.gas, params, vsn: params.vsn })
-    },
-    validate: () => true,
-    type: () => this.type
+    }
   }
 })
 
