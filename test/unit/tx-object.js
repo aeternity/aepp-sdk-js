@@ -46,11 +46,11 @@ describe('TxObject', () => {
         e.message.should.be.equal('Unknown transaction type 1')
       }
     })
-    it('Empty arguments', () => {
+    it('Not enough arguments', () => {
       try {
         TxObject({ params: { senderId: 'ak_123', amount: 1 }, type: TX_TYPE.spend })
       } catch (e) {
-        e.message.should.be.equal('Transaction build error. {"recipientId":"Field is required","fee":"Field is required","ttl":"Field is required","nonce":"Field is required"}')
+        e.message.indexOf('Transaction build error').should.not.be.equal(-1)
       }
     })
   })
