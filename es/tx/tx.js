@@ -37,16 +37,18 @@ async function spendTx ({ senderId, recipientId, amount, payload = '' }) {
   const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.spend, { senderId, ...R.head(arguments), payload })
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
-    ? TxObject({
-      params: R.merge(R.head(arguments), {
-        recipientId,
-        senderId,
-        nonce,
-        ttl,
-        payload
-      }),
-      type: TX_TYPE.spend
-    }).encodedTx
+    ? {
+      tx: TxObject({
+        params: R.merge(R.head(arguments), {
+          recipientId,
+          senderId,
+          nonce,
+          ttl,
+          payload
+        }),
+        type: TX_TYPE.spend
+      }).encodedTx
+    }
     : await this.api.postSpend(R.merge(R.head(arguments), {
       amount: parseInt(amount),
       recipientId,
