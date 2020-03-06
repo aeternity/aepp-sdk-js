@@ -22,7 +22,7 @@ import { encode } from './builder/helpers'
 const buildTransaction = (type, params, options = {}) => {
   if (typeof params !== 'object') throw new Error('"params" should be an object')
   if (typeof type !== 'string' || !Object.values(TX_TYPE).includes(type)) throw new Error(`Unknown transaction type ${type}`)
-  const fee = this.calculateFee(params)
+  const fee = calculateFee(params.fee, type, { gas: params.gas, params, vsn: params.vsn })
   const { rlpEncoded, binary, tx: encodedTx, txObject } = buildTx({ ...params, fee }, type, options)
   return { rlpEncoded, binary, encodedTx, params: txObject, type }
 }
