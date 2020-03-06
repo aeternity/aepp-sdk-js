@@ -20,7 +20,7 @@ import { TX_TYPE } from '../../es/tx/builder/schema'
 import { generateKeyPair } from '../../es/utils/crypto'
 import MemoryAccount from '../../es/account/memory'
 
-describe.only('TxObject', () => {
+describe('TxObject', () => {
   const keyPair = generateKeyPair()
   let txObject
   let signedTx
@@ -54,8 +54,8 @@ describe.only('TxObject', () => {
       }
     })
   })
-  describe.only('Init TxObject', () => {
-    it.only('Build transaction', async () => {
+  describe('Init TxObject', () => {
+    it('Build transaction', async () => {
       txObject = TxObject({
         type: TX_TYPE.spend,
         params: { senderId: keyPair.publicKey, recipientId: keyPair.publicKey, amount: 100, ttl: 0, nonce: 1, fee: 100 }
@@ -78,7 +78,7 @@ describe.only('TxObject', () => {
       rtxFromRlpBinary.encodedTx.should.be.equal(txObject.encodedTx)
       rtxFromRlpBinary.params.should.be.deep.include(txObject.params)
     })
-    it.only('Unpack signed transaction', () => {
+    it('Unpack signed transaction', () => {
       console.log(TxObject.fromString(signedTx))
     })
   })
