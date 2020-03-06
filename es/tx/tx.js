@@ -30,20 +30,23 @@ import Tx from './'
 import { buildTx, calculateFee } from './builder'
 import { ABI_VERSIONS, MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE, VM_TYPE, TX_TTL } from './builder/schema'
 import { buildContractId, oracleQueryId } from './builder/helpers'
+import { TxObject } from './tx-object'
 
 async function spendTx ({ senderId, recipientId, amount, payload = '' }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
   const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.spend, { senderId, ...R.head(arguments), payload })
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
-    ? buildTx(R.merge(R.head(arguments), {
-      recipientId,
-      senderId,
-      nonce,
-      ttl,
-      fee,
-      payload
-    }), TX_TYPE.spend)
+    ? TxObject({
+      params: R.merge(R.head(arguments), {
+        recipientId,
+        senderId,
+        nonce,
+        ttl,
+        payload
+      }),
+      type: TX_TYPE.spend
+    }).encodedTx
     : await this.api.postSpend(R.merge(R.head(arguments), {
       amount: parseInt(amount),
       recipientId,
