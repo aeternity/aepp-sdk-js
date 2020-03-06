@@ -112,6 +112,7 @@ import Ae from '@aeternity/aepp-sdk/es/ae/universal' // or other flavor
 import Ae from '@aeternity/aepp-sdk/es/ae/universal' // or other flavor
 import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory' // or other flavor
 import Node from '@aeternity/aepp-sdk/es/node' // or other flavor
+import { AE_AMOUNT_FORMATS } from '@aeternity/aepp-sdk/es/utils/amount-formatter'
 
 const NODE_URL = 'https://sdk-testnet.aepps.com'
 const COMPILER_URL = 'COMPILER_URL' // required for using Contract
@@ -128,7 +129,7 @@ const ACCOUNT = MemoryAccount({ keypair: { secretKey: 'A_PRIV_KEY', publicKey: '
   await sdkInstance.height() // get top block height
   console.log('Current Block Height:', height)
   
-  await sdkInstance.spend(1e18, 'ak_asd23dasdasda...') // spend one AE
+  await sdkInstance.spend(1, 'ak_asd23dasdasda...', { denomination: AE_AMOUNT_FORMATS.AE }) // spend one AE
 
 })()
 ```
