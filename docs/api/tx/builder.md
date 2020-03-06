@@ -13,6 +13,7 @@ import Transaction from '@aeternity/aepp-sdk/es/tx/builder'
     * [exports.validateParams(params, schema, excludeKeys)](#exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.validateParams) ⇒ `Object` ⏏
     * [exports.buildRawTx(params, schema, [options])](#exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.buildRawTx) ⇒ `Array` ⏏
     * [exports.unpackRawTx(binary, schema)](#exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.unpackRawTx) ⇒ `Object` ⏏
+    * [getSchema()](#exp_module_@aeternity/aepp-sdk/es/tx/builder--getSchema) ⇒ `Object` ⏏
     * [exports.buildTx(params, type, [options])](#exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.buildTx) ⇒ `Object` ⏏
     * [exports.unpackTx(encodedTx, fromRlpBinary, prefix)](#exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.unpackTx) ⇒ `Object` ⏏
     * [exports.buildTxHash(rawTx)](#exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.buildTxHash) ⇒ `String` ⏏
@@ -82,6 +83,22 @@ Unpack binary transaction
 | --- | --- | --- |
 | binary | `Array` | Array with binary transaction field's |
 | schema | `Array` | Transaction schema |
+
+<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder--getSchema"></a>
+
+### getSchema() ⇒ `Object` ⏏
+Get transaction serialization/deserialization schema
+
+**Kind**: Exported function  
+**Returns**: `Object` - Schema  
+**Throws**:
+
+- `Error` Schema not found error
+
+
+| Type |
+| --- |
+| `Object` | 
 
 <a id="exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.buildTx"></a>
 
