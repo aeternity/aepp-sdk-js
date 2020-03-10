@@ -51,6 +51,9 @@ You can use this URL with any releasee on [npmjs](https://www.npmjs.com/package/
  - [AENS delegation signature](guides/delegate-signature-to-contract.md)
  - [AENS usage](guides/aens-usage.md)
 
+### New Wallet/Aepp API
+ - [How to build Wallet app/extension](guides/how-to-build-an-wallet-app-or-extension.md)
+ - [How to build Aepp](guides/how-to-build-aepp-using-new-wallet-api.md)
 
 ## Examples
 Check out our [Examples](../examples/README.md) for more.
