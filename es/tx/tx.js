@@ -405,7 +405,7 @@ async function gaAttachTx ({ ownerId, code, vmVersion, abiVersion, authFun, gas,
   const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.gaAttach, { senderId: ownerId, ...R.head(arguments), ctVersion, gasPrice })
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   return {
-    ...{ tx: TxObject({ params: R.merge(R.head(arguments), { nonce, ttl, fee, ctVersion, gasPrice }), type: TX_TYPE.gaAttach }) },
+    ...{ tx: TxObject({ params: R.merge(R.head(arguments), { nonce, ttl, fee, ctVersion, gasPrice }), type: TX_TYPE.gaAttach }).encodedTx },
     contractId: buildContractId(ownerId, nonce)
   }
 }
