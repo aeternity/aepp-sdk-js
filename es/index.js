@@ -49,6 +49,7 @@ import Universal from './ae/universal'
 import ContractACI from './contract/aci'
 
 export {
+  AmountFormatter,
   Account,
   Accounts,
   Ae,
