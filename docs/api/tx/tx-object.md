@@ -13,7 +13,7 @@ import TxObject from '@aeternity/aepp-sdk/es/tx/tx-object'
     * [unpackTransaction(tx)](#exp_module_@aeternity/aepp-sdk/es/tx/tx-object--unpackTransaction) ⇒ `Object` ⏏
     * [initTransaction([tx], params, type, [options])](#exp_module_@aeternity/aepp-sdk/es/tx/tx-object--initTransaction) ⇒ `Object` ⏏
     * [exports.TxObject([options])](#exp_module_@aeternity/aepp-sdk/es/tx/tx-object--exports.TxObject) ⇒ `Object` ⏏
-    * [setProp(props)](#exp_module_@aeternity/aepp-sdk/es/tx/tx-object--setProp) ⇒ `TxObject` ⏏
+    * [setProp(props, options)](#exp_module_@aeternity/aepp-sdk/es/tx/tx-object--setProp) ⇒ `TxObject` ⏏
     * [getSignatures()](#exp_module_@aeternity/aepp-sdk/es/tx/tx-object--getSignatures) ⇒ `Array` ⏏
     * [addSignature(signature)](#exp_module_@aeternity/aepp-sdk/es/tx/tx-object--addSignature) ⇒ `void` ⏏
     * [calculateFee(props)](#exp_module_@aeternity/aepp-sdk/es/tx/tx-object--calculateFee) ⇒ `String` ⏏
@@ -97,7 +97,7 @@ TxObject({ params: {...}, type: 'spendTx' })
 ```
 <a id="exp_module_@aeternity/aepp-sdk/es/tx/tx-object--setProp"></a>
 
-### setProp(props) ⇒ `TxObject` ⏏
+### setProp(props, options) ⇒ `TxObject` ⏏
 Rebuild transaction with new params and recalculate fee
 
 **Kind**: Exported function  
@@ -105,6 +105,7 @@ Rebuild transaction with new params and recalculate fee
 | Param | Type | Description |
 | --- | --- | --- |
 | props | `Object` | Transaction properties for update |
+| options |  |  |
 
 <a id="exp_module_@aeternity/aepp-sdk/es/tx/tx-object--getSignatures"></a>
 
