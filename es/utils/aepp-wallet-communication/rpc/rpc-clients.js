@@ -95,15 +95,16 @@ export const RpcClients = stampit({
      * @rtype (msg: Object, condition: Function) => void
      * @param {Object} msg Msg object
      * @param {Function} condition Condition function of (client: RpcClient) => Boolean
+     * @param transformMessage
      * @return {void}
      */
-    sentNotificationByCondition (msg, condition) {
+    sentNotificationByCondition (msg, condition, transformMessage) {
       if (typeof condition !== 'function') throw new Error('Condition argument must be a function which return boolean')
       const clients = Array.from(
         this.clients.values()
       )
         .filter(condition)
-      clients.forEach(client => client.sendMessage(msg, true))
+      clients.forEach(client => client.sendMessage(typeof transformMessage === 'function' ? transformMessage(client, msg) : msg, true))
     }
   }
 })
@@ -142,6 +143,17 @@ export const RpcClient = stampit({
     connection.connect(receive(onMessage), disconnect)
   },
   methods: {
+    /**
+     * Check if aepp has access to account
+     * @function hasAccessToAccount
+     * @instance
+     * @rtype (address: String) => Boolean
+     * @param {String} address Account address
+     * @return {Boolean} is connected
+     */
+    hasAccessToAccount (address) {
+      return address && (!this.whiteListedAccounts || this.whiteListedAccounts.includes(address)) && this.addressSubscription.length
+    },
     /**
      * Check if is connected
      * @function isConnected

@@ -64,10 +64,10 @@ const REQUESTS = {
     return callInstance(
       'onSubscription',
       { type, value },
-      (whiteListedAccounts) => ({
+      (whiteListedAccounts = null) => ({
         result: {
           subscription: client.updateSubscription(type, value, { whiteListedAccounts }),
-          address: instance.getAccounts()
+          address: instance.getAccounts({ whiteListedAccounts })
         }
       }),
       (error) => ({ error: ERRORS.rejectedByUser(error) })
@@ -76,19 +76,23 @@ const REQUESTS = {
   async [METHODS.aepp.address] (callInstance, instance, client) {
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
+    if (!client.hasAccessToAccount(await instance.address())) return { error: ERRORS.notAuthorize({ account: await instance.address() }) }
 
     return callInstance(
       'onAskAccounts',
       {},
-      () => ({ result: instance.addresses() }),
+      () => ({ result: instance.addresses().filter(a => !client.whiteListedAccounts || client.whiteListedAccounts.includes(a)) }),
       (error) => ({ error: ERRORS.rejectedByUser(error) })
     )
   },
   async [METHODS.aepp.sign] (callInstance, instance, client, { tx, onAccount, returnSigned = false }) {
+    const address = onAccount || await instance.address()
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
     // NetworkId check
     if (client.info.networkId !== instance.getNetworkId()) return { error: ERRORS.unsupportedNetwork() }
+    // Account permission check
+    if (!client.hasAccessToAccount(address)) return { error: ERRORS.notAuthorize({ account: address }) }
 
     return callInstance(
       'onSign',
@@ -119,6 +123,8 @@ const REQUESTS = {
   async [METHODS.aepp.signMessage] (callInstance, instance, client, { message, onAccount }) {
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
+    const address = onAccount || await instance.address()
+    if (!client.hasAccessToAccount(address)) return { error: ERRORS.notAuthorize({ account: address }) }
 
     return callInstance(
       'onMessageSign',
@@ -213,7 +219,20 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
           (
             client.addressSubscription.includes(SUBSCRIPTION_VALUES.connected) ||
             (select && client.addressSubscription.includes(SUBSCRIPTION_VALUES.current))
-          )
+          ),
+        (client, message) => {
+          const { whiteListedAccounts } = client
+          if (!whiteListedAccounts) return message
+          return {
+            ...message,
+            params: {
+              connected: Object.keys(message.params.connected)
+                .filter(a => whiteListedAccounts.includes(a))
+                .reduce((acc, a) => ({ ...acc, [a]: {} }), {}),
+              current: whiteListedAccounts.includes(Object.keys(message.params.current)[0]) ? message.params.current : {}
+            }
+          }
+        }
       )
     }
     this.selectNode = (name) => {
@@ -309,11 +328,13 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
      * @rtype () => Object
      * @return {Object} Object with accounts information({ connected: Object, current: Object })
      */
-    getAccounts () {
+    getAccounts ({ whiteListedAccounts } = {}) {
       return {
-        current: this.Selector.address ? { [this.Selector.address]: {} } : {},
+        current: this.Selector.address && (!whiteListedAccounts || whiteListedAccounts.includes(this.Selector.address))
+          ? { [this.Selector.address]: {} }
+          : {},
         connected: this.addresses()
-          .filter(a => a !== this.Selector.address)
+          .filter(a => a !== this.Selector.address && (!whiteListedAccounts || whiteListedAccounts.includes(a)))
           .reduce((acc, a) => ({ ...acc, [a]: {} }), {})
       }
     }
