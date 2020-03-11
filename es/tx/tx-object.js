@@ -157,9 +157,9 @@ export const TxObject = stampit({
      * @param {Object} props
      * @return {String} fee
      */
-    calculateFee (props = {}) {
+    calculateMinFee (props = {}) {
       const params = { ...this.params, ...props }
-      return calculateFee(params.fee, this.type, { gas: params.gas, params, vsn: params.vsn })
+      return calculateFee(0, this.type, { gas: params.gas, params, vsn: params.vsn })
     }
   }
 })
