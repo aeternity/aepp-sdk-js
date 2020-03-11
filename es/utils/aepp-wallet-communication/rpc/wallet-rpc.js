@@ -64,9 +64,9 @@ const REQUESTS = {
     return callInstance(
       'onSubscription',
       { type, value },
-      () => ({
+      (whiteListedAccounts) => ({
         result: {
-          subscription: client.updateSubscription(type, value),
+          subscription: client.updateSubscription(type, value, { whiteListedAccounts }),
           address: instance.getAccounts()
         }
       }),

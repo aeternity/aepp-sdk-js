@@ -131,6 +131,7 @@ export const RpcClient = stampit({
     this.callbacks = {}
     this.actions = {}
     this.addressSubscription = []
+    this.whiteListedAccounts = null
     this.accounts = {}
 
     this.sendMessage = sendMessage(this.connection)
@@ -187,10 +188,12 @@ export const RpcClient = stampit({
      * @rtype (type: String, value: String) => void
      * @param {String} type Subscription type
      * @param {String} value Subscription value
+     * @param whiteListedAccounts
      * @return {String[]}
      */
-    updateSubscription (type, value) {
+    updateSubscription (type, value, { whiteListedAccounts } = {}) {
       if (type === SUBSCRIPTION_TYPES.subscribe && !this.addressSubscription.includes(value)) {
+        this.whiteListedAccounts = whiteListedAccounts
         this.addressSubscription.push(value)
       }
       if (type === SUBSCRIPTION_TYPES.unsubscribe && this.addressSubscription.includes(value)) {
