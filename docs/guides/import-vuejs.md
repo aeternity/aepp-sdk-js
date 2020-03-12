@@ -1,7 +1,7 @@
 ## [Vue.js]
 
 Adding aepp-sdk to a Vue.js project requires nothing special, but it should be
-noted that `Ae.create` is asynchronous which needs to be taken into account.
+noted that `client creation` is asynchronous which needs to be taken into account.
 
 ```bash
 vue init webpack my-project
@@ -13,10 +13,12 @@ npm install @aeternity/aepp-sdk
 # src/components/HelloWorld.vue
 
 <script>
-// import Aepp
-import Aepp from '@aeternity/aepp-sdk/es/ae/aepp'
-// Init Ae Client
-const ae = Aepp()
+// import Universal stamp
+import Universal from '@aeternity/aepp-sdk/es/ae/universal'
+// import Node
+import Node from '@aeternity/aepp-sdk/es/node'
+// import Account
+import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
 
 export default {
   name: 'HelloWorld',
@@ -26,9 +28,15 @@ export default {
     }
   },
   async mounted () {
-    // Wait Ae client
-    const client = await ae
-    // Start Using Ae client
+    const node = await Node({ url: 'https://sdk-testnet.aepps.com' })
+    const account = MemoryAccount({ keypair: 'YOUR_KEYPAIR' })
+
+    // Init client
+    const client = await Universal({
+       nodes: [{ name: 'test-net', instance: node }],
+       accounts: [ account ]
+    })
+    // Start Using client
     const height = await client.height()
     this.msg = 'Current Block: ' + height
   }
