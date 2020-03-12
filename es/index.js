@@ -20,6 +20,8 @@ import * as Keystore from './utils/keystore'
 import * as Bytes from './utils/bytes'
 import * as TxBuilder from './tx/builder'
 import * as TxBuilderHelper from './tx/builder/helpers'
+import * as AmountFormatter from './utils/amount-formatter'
+import * as SCHEMA from './tx/builder/schema'
 import HdWallet from './utils/hd-wallet'
 
 import Ae from './ae'
@@ -47,6 +49,7 @@ import Universal from './ae/universal'
 import ContractACI from './contract/aci'
 
 export {
+  AmountFormatter,
   Account,
   Accounts,
   Ae,
@@ -77,5 +80,6 @@ export {
   TxBuilder,
   TxBuilderHelper,
   Universal,
-  Wallet
+  Wallet,
+  SCHEMA
 }
