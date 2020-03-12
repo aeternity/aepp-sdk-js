@@ -25,10 +25,8 @@ import RpcClients from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/r
             * [.disconnect()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+disconnect) ⇒ `void`
             * [.updateSubscription(type, value)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+updateSubscription) ⇒ `Array.&lt;String&gt;`
             * [.addAction(action, resolvers)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+addAction) ⇒ `Object`
-            * [.addCallback(msgId)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+addCallback) ⇒ `Promise`
+            * [.request(name, params)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+request) ⇒ `Promise`
             * [.processResponse(msg, [transformResult])](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+processResponse) ⇒ `void`
-            * [.resolveCallback(msgId, args)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+resolveCallback) ⇒ `void`
-            * [.rejectCallback(msgId, args)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+rejectCallback) ⇒ `void`
         * _static_
             * [.RpcClients()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient.RpcClients) ⇒ `Object`
 
@@ -166,18 +164,19 @@ Add new action to actions
 | action | `Object` | Action object |
 | resolvers | `Array.&lt;function()&gt;` | Array with two function [resolve, reject] action |
 
-<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+addCallback"></a>
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+request"></a>
 
-#### exports.RpcClient.addCallback(msgId) ⇒ `Promise`
-Add new callback for request
+#### exports.RpcClient.request(name, params) ⇒ `Promise`
+Make a request
 
 **Kind**: instance method of [`exports.RpcClient`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient)  
 **Returns**: `Promise` - Promise which will be resolved after receiving response message  
-**rtype**: `(msgId: (String|Number)) => Object`
+**rtype**: `(name: String, params: Object) => Promise`
 
 | Param | Type | Description |
 | --- | --- | --- |
-| msgId | `String` \| `Number` | Request message id |
+| name | `String` | Method name |
+| params | `Object` | Method params |
 
 <a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+processResponse"></a>
 
@@ -191,34 +190,6 @@ Process response message
 | --- | --- | --- |
 | msg | `Object` | Message object |
 | [transformResult] | `function` | Optional parser function for message |
-
-<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+resolveCallback"></a>
-
-#### exports.RpcClient.resolveCallback(msgId, args) ⇒ `void`
-Resolve callback function
-Trigger Promise resolution from `addCallBack` function
-
-**Kind**: instance method of [`exports.RpcClient`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient)  
-**rtype**: `(msgId: Number, args: Array) => void`
-
-| Param | Type | Description |
-| --- | --- | --- |
-| msgId | `Number` | Message Id |
-| args | `Array` | Arguments array |
-
-<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+rejectCallback"></a>
-
-#### exports.RpcClient.rejectCallback(msgId, args) ⇒ `void`
-Reject callback function
-Trigger Promise rejection from `addCallBack` function
-
-**Kind**: instance method of [`exports.RpcClient`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient)  
-**rtype**: `(msgId: Number, args: Array) => void`
-
-| Param | Type | Description |
-| --- | --- | --- |
-| msgId | `Number` | Message Id |
-| args | `Array` | Arguments array |
 
 <a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient.RpcClients"></a>
 

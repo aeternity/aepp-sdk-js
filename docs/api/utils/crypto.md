@@ -31,7 +31,7 @@ import * as Crypto from '@aeternity/aepp-sdk/es/utils/crypto'
         * [.encryptPrivateKey(password, binaryKey)](#module_@aeternity/aepp-sdk/es/utils/crypto.encryptPrivateKey) ⇒ `Uint8Array`
         * [.encryptKey(password, binaryData)](#module_@aeternity/aepp-sdk/es/utils/crypto.encryptKey) ⇒ `Uint8Array`
         * [.decryptKey(password, encrypted)](#module_@aeternity/aepp-sdk/es/utils/crypto.decryptKey) ⇒ `Buffer`
-        * [.sign(data, privateKey)](#module_@aeternity/aepp-sdk/es/utils/crypto.sign) ⇒ `Buffer`
+        * [.sign(data, privateKey)](#module_@aeternity/aepp-sdk/es/utils/crypto.sign) ⇒ `Buffer` \| `Uint8Array`
         * [.verify(str, signature, publicKey)](#module_@aeternity/aepp-sdk/es/utils/crypto.verify) ⇒ `Boolean`
         * [.prepareTx(signature, data)](#module_@aeternity/aepp-sdk/es/utils/crypto.prepareTx) ⇒ `Transaction`
         * [.aeEncodeKey(binaryKey)](#module_@aeternity/aepp-sdk/es/utils/crypto.aeEncodeKey) ⇒ `String`
@@ -326,11 +326,11 @@ Decrypt given data using `password`
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.sign"></a>
 
-### @aeternity/aepp-sdk/es/utils/crypto.sign(data, privateKey) ⇒ `Buffer`
+### @aeternity/aepp-sdk/es/utils/crypto.sign(data, privateKey) ⇒ `Buffer` \| `Uint8Array`
 Generate signature
 
 **Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
-**Returns**: `Buffer` - Signature  
+**Returns**: `Buffer` \| `Uint8Array` - Signature  
 **rtype**: `(data: String|Buffer, privateKey: Buffer) => Buffer`
 
 | Param | Type | Description |

@@ -26,6 +26,7 @@
   * [@aeternity/aepp-sdk/es/tx/builder](api/tx/builder.md)
   * [@aeternity/aepp-sdk/es/tx/builder/schema](api/tx/builder/schema.md)
   * [@aeternity/aepp-sdk/es/tx](api/tx.md)
+  * [@aeternity/aepp-sdk/es/tx/tx-object](api/tx/tx-object.md)
   * [@aeternity/aepp-sdk/es/tx/tx](api/tx/tx.md)
   * [@aeternity/aepp-sdk/es/tx/validator](api/tx/validator.md)
   * [@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-runtime](api/utils/aepp-wallet-communication/connection/browser-runtime.md)
