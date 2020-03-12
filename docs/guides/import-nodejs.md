@@ -17,12 +17,10 @@ Promise.all([
     Ae({ 
       nodes: [
         { name: 'someNode', instance: nodes[0] },
-        // node2
       ],
       compilerUrl: 'COMPILER_URL',
       accounts: [
         acc1,
-        // acc2
       ]
     }).then(ae => {
       ae.height().then(height => {
@@ -43,12 +41,10 @@ const main = async () => {
   const client = await Ae({
       nodes: [
         { name: 'someNode', instance: node1 },
-        // node2
       ],
       compilerUrl: 'COMPILER_URL',
       accounts: [
         acc1,
-        // acc2
       ],
       address: 'SELECTED_ACCOUNT_PUB'
   })

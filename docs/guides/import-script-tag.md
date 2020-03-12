@@ -28,7 +28,7 @@ The bundle will assign the SDK to a global `var` called `Ae`, and you can use it
   <script src="https://unpkg.com/@aeternity/aepp-sdk/dist/aepp-sdk.browser-script.js"></script>
   <script type="text/javascript">
     Ae.Node({ url: 'https://sdk-testnet.aepps.com' }).then(node => {
-        Ae.Wallet({
+        Ae.Universal({
               nodes: [{ name: 'local', instance: node }]
             }).then(aeInstance => {
               aeInstance.height().then(height => {
