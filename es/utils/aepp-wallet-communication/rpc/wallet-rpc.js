@@ -86,7 +86,7 @@ const REQUESTS = {
     )
   },
   async [METHODS.aepp.sign] (callInstance, instance, client, { tx, onAccount, returnSigned = false }) {
-    const address = onAccount || await instance.address()
+    const address = onAccount || await instance.address({ onAccount })
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
     // NetworkId check
@@ -123,7 +123,7 @@ const REQUESTS = {
   async [METHODS.aepp.signMessage] (callInstance, instance, client, { message, onAccount }) {
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
-    const address = onAccount || await instance.address()
+    const address = onAccount || await instance.address({ onAccount })
     if (!client.hasAccessToAccount(address)) return { error: ERRORS.notAuthorize({ account: address }) }
 
     return callInstance(
