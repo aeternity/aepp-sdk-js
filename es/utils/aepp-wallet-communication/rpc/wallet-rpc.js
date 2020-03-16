@@ -97,13 +97,13 @@ const REQUESTS = {
     return callInstance(
       'onSign',
       { tx, returnSigned, onAccount },
-      async (rawTx) => {
+      async (rawTx, opt = {}) => {
         try {
           return {
             result: {
               ...returnSigned
-                ? { signedTransaction: await instance.signTransaction(rawTx || tx, { onAccount }) }
-                : { transactionHash: await instance.send(rawTx || tx, { onAccount, verify: false }) }
+                ? { signedTransaction: await instance.signTransaction(rawTx || tx, { onAccount: opt.onAccount || onAccount }) }
+                : { transactionHash: await instance.send(rawTx || tx, { onAccount: opt.onAccount || onAccount, verify: false }) }
             }
           }
         } catch (e) {
@@ -129,8 +129,8 @@ const REQUESTS = {
     return callInstance(
       'onMessageSign',
       { message, onAccount },
-      async () => ({
-        result: { signature: await instance.signMessage(message, { onAccount, returnHex: true }) }
+      async (opt = {}) => ({
+        result: { signature: await instance.signMessage(message, { onAccount: opt.onAccount || onAccount, returnHex: true }) }
       }),
       (error) => ({ error: ERRORS.rejectedByUser(error) })
     )
