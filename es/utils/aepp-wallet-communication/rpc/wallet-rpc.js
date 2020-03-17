@@ -107,8 +107,8 @@ const REQUESTS = {
           return {
             result: {
               ...returnSigned
-                ? { signedTransaction: await instance.signTransaction(rawTx || tx, { onAccount: opt.onAccount || onAccount }) }
-                : { transactionHash: await instance.send(rawTx || tx, { onAccount: opt.onAccount || onAccount, verify: false }) }
+                ? { signedTransaction: await instance.signTransaction(rawTx || tx, { onAccount: opt.onAccount || client.getCurrentAccount({ onAccount }) }) }
+                : { transactionHash: await instance.send(rawTx || tx, { onAccount: opt.onAccount || client.getCurrentAccount({ onAccount }), verify: false }) }
             }
           }
         } catch (e) {
@@ -135,7 +135,7 @@ const REQUESTS = {
       'onMessageSign',
       { message, onAccount },
       async (opt = {}) => ({
-        result: { signature: await instance.signMessage(message, { onAccount: opt.onAccount || onAccount, returnHex: true }) }
+        result: { signature: await instance.signMessage(message, { onAccount: opt.onAccount || client.getCurrentAccount({ onAccount }), returnHex: true }) }
       }),
       (error) => ({ error: ERRORS.rejectedByUser(error) })
     )
@@ -333,13 +333,11 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
      * @rtype () => Object
      * @return {Object} Object with accounts information({ connected: Object, current: Object })
      */
-    getAccounts ({ whiteListedAccounts } = {}) {
+    getAccounts () {
       return {
-        current: this.Selector.address && (!whiteListedAccounts || whiteListedAccounts.includes(this.Selector.address))
-          ? { [this.Selector.address]: {} }
-          : {},
+        current: this.Selector.address ? { [this.Selector.address]: {} } : {},
         connected: this.addresses()
-          .filter(a => a !== this.Selector.address && (!whiteListedAccounts || whiteListedAccounts.includes(a)))
+          .filter(a => a !== this.Selector.address)
           .reduce((acc, a) => ({ ...acc, [a]: {} }), {})
       }
     }
