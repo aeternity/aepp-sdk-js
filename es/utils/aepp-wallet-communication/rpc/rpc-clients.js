@@ -8,7 +8,7 @@
  */
 import stampit from '@stamp/it'
 
-import { RPC_STATUS, SUBSCRIPTION_TYPES } from '../schema'
+import { METHODS, RPC_STATUS, SUBSCRIPTION_TYPES } from '../schema'
 import { receive, sendMessage, message } from '../helpers'
 
 /**
@@ -193,7 +193,7 @@ export const RpcClient = stampit({
       this.accounts = {}
       forceConnectionClose || this.connection.disconnect()
     },
-    async setAccounts (accounts) {
+    async setAccounts (accounts, { forceEvent = false } = {}) {
       if (
         ['', 'connected', 'current']
           .find(k => typeof (k ? accounts[k] : accounts) !== 'object')
@@ -201,6 +201,7 @@ export const RpcClient = stampit({
         throw new Error('Invalid accounts object. Should be object like: `{ connected: {}, selected: {} }`')
       }
       this.accounts = accounts
+      if (!forceEvent) this.sendMessage(message(METHODS.wallet.updateAddress, this.accounts))
     },
     /**
      * Update subscription

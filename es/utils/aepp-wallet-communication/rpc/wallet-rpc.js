@@ -64,13 +64,14 @@ const REQUESTS = {
     return callInstance(
       'onSubscription',
       { type, value },
-      (accounts) => {
+      async (accounts) => {
         const subscription = client.updateSubscription(type, value)
-        if (accounts)
+        const clientAccounts = accounts || instance.getAccounts()
+        await client.setAccounts(clientAccounts, { forceEvent: true })
         return {
           result: {
             subscription,
-            address: instance.getAccounts()
+            address: clientAccounts
           }
         }
       },
@@ -85,7 +86,7 @@ const REQUESTS = {
     return callInstance(
       'onAskAccounts',
       {},
-      () => ({ result: instance.addresses().filter(a => !client.whiteListedAccounts || client.whiteListedAccounts.includes(a)) }),
+      ({ accounts }) => ({ result: accounts || client.accounts ? [...Object.keys(client.accounts.current), ...Object.keys(client.accounts.connected)] : instance.addresses() }),
       (error) => ({ error: ERRORS.rejectedByUser(error) })
     )
   },
