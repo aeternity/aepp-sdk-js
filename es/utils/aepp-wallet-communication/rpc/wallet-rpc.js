@@ -205,14 +205,25 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
     // Overwrite AE methods
     this.selectAccount = (address) => {
       _selectAccount(address)
-      rpcClients.sentNotificationByCondition(
-        message(METHODS.wallet.updateAddress, this.getAccounts()),
+      rpcClients.operationByCondition(
         (client) =>
           (
-            client.addressSubscription.includes(SUBSCRIPTION_VALUES.current) ||
-            client.addressSubscription.includes(SUBSCRIPTION_VALUES.connected)
+            (client.addressSubscription.includes(SUBSCRIPTION_VALUES.current) ||
+              client.addressSubscription.includes(SUBSCRIPTION_VALUES.connected)) &&
+            [...Object.keys(client.accounts.current), ...(Object.keys(client.accounts.connected))].includes(address)
           ) &&
-          client.isConnected())
+          client.isConnected(),
+        (client) => {
+          client.setAccounts({
+            current: { [address]: {} },
+            connected: {
+              ...client.accounts.current,
+              ...Object.entries(client.connected)
+                .reduce((acc, [k, v]) => ({ ...acc, ...k !== address ? { [k]: v } : {} }), {})
+            }
+          })
+        }
+      )
     }
     this.addAccount = async (account, { select, meta } = {}) => {
       await _addAccount(account, { select })
