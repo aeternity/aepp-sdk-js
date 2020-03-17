@@ -91,7 +91,7 @@ const REQUESTS = {
     )
   },
   async [METHODS.aepp.sign] (callInstance, instance, client, { tx, onAccount, returnSigned = false }) {
-    const address = onAccount || await instance.address({ onAccount })
+    const address = await instance.address({ onAccount })
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
     // NetworkId check
@@ -211,12 +211,7 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
 
     // Overwrite AE methods
     this.selectAccount = (address) => {
-      try {
-        _selectAccount(address)
-      } catch (e) {
-        // Account not found in sdk Instance
-        // Maybe it's in rpcClient
-      }
+      _selectAccount(address)
       rpcClients.operationByCondition(
         (client) =>
           (

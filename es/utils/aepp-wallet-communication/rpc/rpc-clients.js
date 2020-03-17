@@ -138,9 +138,16 @@ export const RpcClient = stampit({
     //    [msg.id]: { resolve, reject }
     // }
     this.callbacks = {}
+    // {
+    //    [id]: { accept, deny }
+    // }
     this.actions = {}
+    // ['connected', 'current']
     this.addressSubscription = []
-    this.whiteListedAccounts = null
+    // {
+    //    connected: { [pub]: {...meta} },
+    //    current: { [pub]: {...meta} }
+    // }
     this.accounts = {}
 
     this.sendMessage = sendMessage(this.connection)
@@ -204,7 +211,7 @@ export const RpcClient = stampit({
       this.accounts = {}
       forceConnectionClose || this.connection.disconnect()
     },
-    async setAccounts (accounts, { forceEvent = false } = {}) {
+    setAccounts (accounts, { forceEvent = false } = {}) {
       if (
         ['', 'connected', 'current']
           .find(k => typeof (k ? accounts[k] : accounts) !== 'object')
