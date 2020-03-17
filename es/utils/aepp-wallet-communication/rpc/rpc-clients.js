@@ -105,15 +105,15 @@ export const RpcClients = stampit({
       )
         .filter(condition)
       clients.forEach(client => client.sendMessage(typeof transformMessage === 'function' ? transformMessage(client, msg) : msg, true))
+    },
+    operationByCondition (condition, operation) {
+      if (typeof condition !== 'function') throw new Error('Condition argument must be a function which return boolean')
+      if (typeof operation !== 'function') throw new Error('Operation argument must be a function which return boolean')
+      Array
+        .from(this.clients.values())
+        .filter(condition)
+        .forEach(operation)
     }
-  },
-  operationByCondition (condition, operation) {
-    if (typeof condition !== 'function') throw new Error('Condition argument must be a function which return boolean')
-    if (typeof operation !== 'function') throw new Error('Operation argument must be a function which return boolean')
-    Array
-      .from(this.clients.values())
-      .filter(condition)
-      .forEach(operation)
   }
 })
 
@@ -209,7 +209,10 @@ export const RpcClient = stampit({
         throw new Error('Invalid accounts object. Should be object like: `{ connected: {}, selected: {} }`')
       }
       this.accounts = accounts
-      if (!forceEvent) this.sendMessage(message(METHODS.wallet.updateAddress, this.accounts))
+      if (!forceEvent) {
+        // Sent notification about account updates
+        this.sendMessage(message(METHODS.wallet.updateAddress, this.accounts), true)
+      }
     },
     /**
      * Update subscription

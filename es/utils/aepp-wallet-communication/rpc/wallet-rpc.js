@@ -204,7 +204,12 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
 
     // Overwrite AE methods
     this.selectAccount = (address) => {
-      _selectAccount(address)
+      try {
+        _selectAccount(address)
+      } catch (e) {
+        // Account not found in sdk Instance
+        // Maybe it's in rpcClient
+      }
       rpcClients.operationByCondition(
         (client) =>
           (
@@ -218,7 +223,7 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
             current: { [address]: {} },
             connected: {
               ...client.accounts.current,
-              ...Object.entries(client.connected)
+              ...Object.entries(client.accounts.connected)
                 .reduce((acc, [k, v]) => ({ ...acc, ...k !== address ? { [k]: v } : {} }), {})
             }
           })
