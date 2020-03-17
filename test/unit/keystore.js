@@ -45,24 +45,29 @@ describe('Keystore', function () {
 
   const { secretKey } = generateKeyPair(true)
   const publicKey = getAddressFromPriv(secretKey)
-  let keystore
+  let keystoreBuffer
+  let keystoreHex
 
   it('dump account to keystore object', async () => {
-    keystore = await dump('test', password, secretKey)
-    validateKeyObj(keystore).should.be.equal(true)
+    keystoreBuffer = await dump('test', password, secretKey)
+    keystoreHex = await dump('test', password, secretKey.toString('hex'))
+    validateKeyObj(keystoreBuffer).should.be.equal(true)
+    validateKeyObj(keystoreHex).should.be.equal(true)
   })
 
   it('restore account from keystore object', async () => {
-    const priv = await recover(password, keystore)
-    const accAddress = getAddressFromPriv(priv)
+    const privFromBuffer = await recover(password, keystoreBuffer)
+    const privFromHex = await recover(password, keystoreHex)
+    const accAddress = getAddressFromPriv(privFromBuffer)
 
-    secretKey.toString('hex').should.be.equal(priv)
+    secretKey.toString('hex').should.be.equal(privFromBuffer)
+    secretKey.toString('hex').should.be.equal(privFromHex)
     publicKey.should.be.equal(accAddress)
   })
 
   it('use invalid keystore json', async () => {
     try {
-      await await recover(password, invalidKeystore)
+      await recover(password, invalidKeystore)
     } catch (e) {
       e.message.should.be.equal('Invalid key file format. Require properties: ciphertext,symmetric_alg')
     }
@@ -70,7 +75,7 @@ describe('Keystore', function () {
 
   it('use invalid keystore password', async () => {
     try {
-      await await recover(password + 1, keystore)
+      await recover(password + 1, keystoreBuffer)
     } catch (e) {
       e.message.should.be.equal('Invalid password or nonce')
     }
