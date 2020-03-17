@@ -64,12 +64,16 @@ const REQUESTS = {
     return callInstance(
       'onSubscription',
       { type, value },
-      (whiteListedAccounts = null) => ({
-        result: {
-          subscription: client.updateSubscription(type, value, { whiteListedAccounts }),
-          address: instance.getAccounts({ whiteListedAccounts })
+      (accounts) => {
+        const subscription = client.updateSubscription(type, value)
+        if (accounts)
+        return {
+          result: {
+            subscription,
+            address: instance.getAccounts()
+          }
         }
-      }),
+      },
       (error) => ({ error: ERRORS.rejectedByUser(error) })
     )
   },

@@ -193,19 +193,26 @@ export const RpcClient = stampit({
       this.accounts = {}
       forceConnectionClose || this.connection.disconnect()
     },
+    async setAccounts (accounts) {
+      if (
+        ['', 'connected', 'current']
+          .find(k => typeof (k ? accounts[k] : accounts) !== 'object')
+      ) {
+        throw new Error('Invalid accounts object. Should be object like: `{ connected: {}, selected: {} }`')
+      }
+      this.accounts = accounts
+    },
     /**
-     * Update subsription
+     * Update subscription
      * @function updateSubscription
      * @instance
      * @rtype (type: String, value: String) => void
      * @param {String} type Subscription type
      * @param {String} value Subscription value
-     * @param whiteListedAccounts
      * @return {String[]}
      */
-    updateSubscription (type, value, { whiteListedAccounts } = {}) {
+    updateSubscription (type, value) {
       if (type === SUBSCRIPTION_TYPES.subscribe && !this.addressSubscription.includes(value)) {
-        this.whiteListedAccounts = whiteListedAccounts
         this.addressSubscription.push(value)
       }
       if (type === SUBSCRIPTION_TYPES.unsubscribe && this.addressSubscription.includes(value)) {
