@@ -160,7 +160,10 @@ export const RpcClient = stampit({
      * @return {Boolean} is connected
      */
     hasAccessToAccount (address) {
-      return address && (!this.whiteListedAccounts || this.whiteListedAccounts.includes(address)) && this.addressSubscription.length
+      return !!address &&
+        this.addressSubscription.length &&
+        [...Object.keys(this.accounts.current), ...Object.keys(this.accounts.connected)]
+          .find(a => a === address)
     },
     /**
      * Check if is connected

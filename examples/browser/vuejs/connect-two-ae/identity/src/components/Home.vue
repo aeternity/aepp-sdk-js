@@ -101,6 +101,8 @@
         if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to ${getActionName(params)}`)) accept()
         else deny()
       }
+      const keypair = generateKeyPair()
+      const keypair2 = generateKeyPair()
       this.client = await RpcWallet({
         nodes: [{ name: 'test-net', instance: node }],
         compilerUrl: this.compilerUrl,
@@ -108,8 +110,19 @@
         address: this.publicKey,
         name: 'Wallet',
         onConnection: genConfirmCallback(() => 'connect'),
-        onSubscription: genConfirmCallback(() => 'subscribe address'),
-        onSign: genConfirmCallback(({ returnSigned, tx }) => `${returnSigned ? 'sign' : 'sign and broadcast'} ${JSON.stringify(tx)}`),
+        onSubscription (aepp, { accept, deny, params }) {
+          accept({
+            current: { [keypair.publicKey]: {}},
+            connected: { [keypair2.publicKey]: {} }
+          })
+          setTimeout(async () => {debugger
+            await this.selectAccount(keypair2.publicKey)})
+        },
+        onSign (aepp, { accept, deny, params }) {
+          debugger
+          accept()
+          debugger
+        },
         onMessageSign: genConfirmCallback(() => 'sign message'),
         onAskAccounts: genConfirmCallback(() => 'get accounts'),
         onDisconnect (message, client) {

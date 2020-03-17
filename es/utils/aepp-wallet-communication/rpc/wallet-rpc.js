@@ -103,12 +103,19 @@ const REQUESTS = {
       'onSign',
       { tx, returnSigned, onAccount },
       async (rawTx, opt = {}) => {
+        let onAcc = onAccount || client.getCurrentAccount()
+        const instanceAccounts = instance.addresses()
+
+        if (!instanceAccounts.find(a => a === onAcc)) {
+          if (typeof opt.onAccount !== 'object') return { error: ERRORS.permissionDeny('Account not found in SDK instance!') }
+          onAcc = opt.onAccount
+        }
         try {
           return {
             result: {
               ...returnSigned
-                ? { signedTransaction: await instance.signTransaction(rawTx || tx, { onAccount: opt.onAccount || client.getCurrentAccount({ onAccount }) }) }
-                : { transactionHash: await instance.send(rawTx || tx, { onAccount: opt.onAccount || client.getCurrentAccount({ onAccount }), verify: false }) }
+                ? { signedTransaction: await instance.signTransaction(rawTx || tx, { onAccount: onAcc }) }
+                : { transactionHash: await instance.send(rawTx || tx, { onAccount: onAcc, verify: false }) }
             }
           }
         } catch (e) {
