@@ -54,7 +54,7 @@ describe('Aepp<->Wallet', function () {
     })
   })
 
-  describe.only('New RPC Wallet-AEPP', () => {
+  describe('New RPC Wallet-AEPP', () => {
     let aepp
     let wallet
     before(async () => {
