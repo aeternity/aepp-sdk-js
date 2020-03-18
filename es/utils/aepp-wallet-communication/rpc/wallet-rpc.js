@@ -143,7 +143,12 @@ const REQUESTS = {
       'onMessageSign',
       { message, onAccount },
       async (opt = {}) => ({
-        result: { signature: await instance.signMessage(message, { onAccount: opt.onAccount || client.getCurrentAccount({ onAccount }), returnHex: true }) }
+        result: {
+          signature: await instance.signMessage(message, {
+            onAccount: opt.onAccount || client.getCurrentAccount({ onAccount }),
+            returnHex: true
+          })
+        }
       }),
       (error) => ({ error: ERRORS.rejectedByUser(error) })
     )
@@ -211,17 +216,15 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
     const _selectNode = this.selectNode.bind(this)
 
     // Overwrite AE methods
-    this.selectAccount = (address) => {
+    this.selectAccount = (address, { condition = () => true } = {}) => {
       _selectAccount(address)
       rpcClients.operationByCondition(
         (client) =>
-          (
-            (client.addressSubscription.includes(SUBSCRIPTION_VALUES.current) ||
-              client.addressSubscription.includes(SUBSCRIPTION_VALUES.connected)) &&
-            [...Object.keys(client.accounts.current), ...(Object.keys(client.accounts.connected))].includes(address)
-          ) &&
-          client.isConnected(),
-        (client) => {
+          client.isConnected() &&
+          client.isSubscribed() &&
+          client.hasAccessToAccount(address) &&
+          condition(client),
+        (client) =>
           client.setAccounts({
             current: { [address]: {} },
             connected: {
@@ -230,7 +233,6 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
                 .reduce((acc, [k, v]) => ({ ...acc, ...k !== address ? { [k]: v } : {} }), {})
             }
           })
-        }
       )
     }
     this.addAccount = async (account, { select, meta } = {}) => {

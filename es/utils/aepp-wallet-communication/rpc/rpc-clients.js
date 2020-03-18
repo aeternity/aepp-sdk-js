@@ -209,7 +209,7 @@ export const RpcClient = stampit({
      * @return {Boolean} is connected
      */
     isConnected () {
-      return this.info.status === RPC_STATUS.CONNECTED
+      return this.connection.isConnected() && this.info.status === RPC_STATUS.CONNECTED
     },
     /**
      * Get selected account
