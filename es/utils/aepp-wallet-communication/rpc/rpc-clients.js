@@ -106,6 +106,15 @@ export const RpcClients = stampit({
         .filter(condition)
       clients.forEach(client => client.sendMessage(typeof transformMessage === 'function' ? transformMessage(client, msg) : msg, true))
     },
+    /**
+     * Call provided function for each rpc client which by condition
+     * @function operationByCondition
+     * @instance
+     * @rtype (condition: Function, operation: Function) => void
+     * @param {Function} condition Condition function of (client: RpcClient) => Boolean
+     * @param {Function} operation Operation function of (client: RpcClient) => void
+     * @return {void}
+     */
     operationByCondition (condition, operation) {
       if (typeof condition !== 'function') throw new Error('Condition argument must be a function which return boolean')
       if (typeof operation !== 'function') throw new Error('Operation argument must be a function which return boolean')
@@ -157,7 +166,28 @@ export const RpcClient = stampit({
     }
     connection.connect(receive(onMessage), disconnect)
   },
+  propertyDescriptors: {
+    currentAccount: {
+      enumerable: true,
+      configurable: false,
+      get () {
+        return this.isSubscribed() ? Object.keys(this.accounts.current)[0] : undefined
+      }
+    },
+    origin: {
+      enumerable: true,
+      configurable: false,
+      get () {
+        return this.connection
+      }
+    }
+  },
   methods: {
+    isSubscribed () {
+      return this.addressSubscription.length &&
+        ['', 'connected', 'current']
+          .find(k => typeof (k ? this.accounts[k] : this.accounts) !== 'object')
+    },
     /**
      * Check if aepp has access to account
      * @function hasAccessToAccount
@@ -168,7 +198,6 @@ export const RpcClient = stampit({
      */
     hasAccessToAccount (address) {
       return !!address &&
-        this.addressSubscription.length &&
         [...Object.keys(this.accounts.current), ...Object.keys(this.accounts.connected)]
           .find(a => a === address)
     },
@@ -191,11 +220,11 @@ export const RpcClient = stampit({
      * @return {String}
      */
     getCurrentAccount ({ onAccount } = {}) {
-      if (!this.accounts.current || !Object.keys(this.accounts.current).length) throw new Error('You do not subscribed for account.')
-      if (
-        onAccount &&
-        (!this.accounts.connected || !Object.keys(this.accounts.connected).length || !Object.keys(this.accounts.connected).includes(onAccount))
-      ) throw new Error(`You do not subscribed for connected account's or account ${onAccount} is not connected to the wallet.`)
+      // if (!this.accounts.current || !Object.keys(this.accounts.current).length) throw new Error('You do not subscribed for account.')
+      // if (
+      //   onAccount &&
+      //   (!this.accounts.connected || !Object.keys(this.accounts.connected).length || !Object.keys(this.accounts.connected).includes(onAccount))
+      // ) throw new Error(`You do not subscribed for connected account's or account ${onAccount} is not connected to the wallet.`)
       return onAccount || Object.keys(this.accounts.current)[0]
     },
     /**
@@ -211,7 +240,12 @@ export const RpcClient = stampit({
       this.accounts = {}
       forceConnectionClose || this.connection.disconnect()
     },
-    setAccounts (accounts, { forceEvent = false } = {}) {
+    /**
+     * Update accounts and sent `update.address` notification to AEPP
+     * @param {{ current: { [String]: Object }, connected: { [String]: Object} }} accounts Object with current and connected accounts
+     * @param {{ forceNotification: Boolean = false}} [options={}] Don not sent update notification to AEPP
+     */
+    setAccounts (accounts, { forceNotification = false } = {}) {
       if (
         ['', 'connected', 'current']
           .find(k => typeof (k ? accounts[k] : accounts) !== 'object')
@@ -219,7 +253,7 @@ export const RpcClient = stampit({
         throw new Error('Invalid accounts object. Should be object like: `{ connected: {}, selected: {} }`')
       }
       this.accounts = accounts
-      if (!forceEvent) {
+      if (!forceNotification) {
         // Sent notification about account updates
         this.sendMessage(message(METHODS.wallet.updateAddress, this.accounts), true)
       }

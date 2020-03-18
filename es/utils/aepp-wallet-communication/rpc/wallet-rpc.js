@@ -67,7 +67,7 @@ const REQUESTS = {
       async (accounts) => {
         const subscription = client.updateSubscription(type, value)
         const clientAccounts = accounts || instance.getAccounts()
-        await client.setAccounts(clientAccounts, { forceEvent: true })
+        client.setAccounts(clientAccounts, { forceNotification: true })
         return {
           result: {
             subscription,
@@ -81,23 +81,24 @@ const REQUESTS = {
   async [METHODS.aepp.address] (callInstance, instance, client) {
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
-    if (!client.hasAccessToAccount(await instance.address())) return { error: ERRORS.notAuthorize({ account: await instance.address() }) }
+    if (!client.isSubscribed()) return { error: ERRORS.notAuthorize() }
 
     return callInstance(
       'onAskAccounts',
       {},
-      ({ accounts }) => ({ result: accounts || client.accounts ? [...Object.keys(client.accounts.current), ...Object.keys(client.accounts.connected)] : instance.addresses() }),
+      ({ accounts }) => ({ result: accounts || [...Object.keys(client.accounts.current), ...Object.keys(client.accounts.connected)] }),
       (error) => ({ error: ERRORS.rejectedByUser(error) })
     )
   },
   async [METHODS.aepp.sign] (callInstance, instance, client, { tx, onAccount, returnSigned = false }) {
-    const address = await instance.address({ onAccount })
+    const address = onAccount || client.currentAccount
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
+    // Account permission check
+    if (!client.isSubscribed()) return { error: ERRORS.notAuthorize() }
+    if (!client.hasAccessToAccount(address)) return { error: ERRORS.notAuthorize({ account: address }) }
     // NetworkId check
     if (client.info.networkId !== instance.getNetworkId()) return { error: ERRORS.unsupportedNetwork() }
-    // Account permission check
-    if (!client.hasAccessToAccount(address)) return { error: ERRORS.notAuthorize({ account: address }) }
 
     return callInstance(
       'onSign',
