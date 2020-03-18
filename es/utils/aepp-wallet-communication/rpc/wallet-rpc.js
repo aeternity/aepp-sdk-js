@@ -64,7 +64,7 @@ const REQUESTS = {
     return callInstance(
       'onSubscription',
       { type, value },
-      async (accounts) => {
+      async ({ accounts } = {}) => {
         const subscription = client.updateSubscription(type, value)
         const clientAccounts = accounts || instance.getAccounts()
         client.setAccounts(clientAccounts, { forceNotification: true })
@@ -86,7 +86,7 @@ const REQUESTS = {
     return callInstance(
       'onAskAccounts',
       {},
-      ({ accounts }) => ({ result: accounts || [...Object.keys(client.accounts.current), ...Object.keys(client.accounts.connected)] }),
+      ({ accounts } = {}) => ({ result: accounts || [...Object.keys(client.accounts.current), ...Object.keys(client.accounts.connected)] }),
       (error) => ({ error: ERRORS.rejectedByUser(error) })
     )
   },

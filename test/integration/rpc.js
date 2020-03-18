@@ -54,7 +54,7 @@ describe('Aepp<->Wallet', function () {
     })
   })
 
-  describe('New RPC Wallet-AEPP', () => {
+  describe.only('New RPC Wallet-AEPP', () => {
     let aepp
     let wallet
     before(async () => {
@@ -132,7 +132,7 @@ describe('Aepp<->Wallet', function () {
       try {
         await aepp.address()
       } catch (e) {
-        e.message.should.be.equal('You do not subscribed for account.')
+        e.message.should.be.equal('You do not subscribed for accounts.')
       }
     })
     it('Try to ask for address', async () => {
@@ -176,11 +176,11 @@ describe('Aepp<->Wallet', function () {
       Object.keys(subscriptionResponse.address.connected).length.should.be.equal(0)
     })
     it('Try to use `onAccount` for not existent account', async () => {
+      const { publicKey } = generateKeyPair()
       try {
-        const { publicKey } = generateKeyPair()
         await aepp.spend(100, publicKey, { onAccount: publicKey })
       } catch (e) {
-        e.message.indexOf('You do not subscribed for connected account\'s').should.not.be.equal(-1)
+        e.message.indexOf(`You are not have access to account ${publicKey}`).should.not.be.equal(-1)
       }
     })
     it('Get address: subscribed for accounts', async () => {

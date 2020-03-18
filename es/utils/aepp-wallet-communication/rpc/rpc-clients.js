@@ -185,8 +185,9 @@ export const RpcClient = stampit({
   methods: {
     isSubscribed () {
       return this.addressSubscription.length &&
-        ['', 'connected', 'current']
-          .find(k => typeof (k ? this.accounts[k] : this.accounts) !== 'object')
+        typeof this.accounts === 'object' &&
+        typeof this.accounts.connected === 'object' &&
+        typeof this.accounts.current === 'object'
     },
     /**
      * Check if aepp has access to account
