@@ -11,7 +11,7 @@ import Selector from '../../../account/selector'
 
 import { RpcClients } from './rpc-clients'
 import { getBrowserAPI, getHandler, message, sendResponseMessage } from '../helpers'
-import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE, SUBSCRIPTION_VALUES } from '../schema'
+import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE } from '../schema'
 import { v4 as uuid } from 'uuid'
 
 const rpcClients = RpcClients()
@@ -235,30 +235,23 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
           })
       )
     }
-    this.addAccount = async (account, { select, meta } = {}) => {
+    this.addAccount = async (account, { select, meta = {}, condition = () => true } = {}) => {
       await _addAccount(account, { select })
+      const address = await account.address()
       // Send notification 'update.address' to all Aepp which are subscribed for connected accounts
-      rpcClients.sentNotificationByCondition(
-        message(METHODS.wallet.updateAddress, this.getAccounts()),
+      rpcClients.operationByCondition(
         (client) =>
           client.isConnected() &&
-          (
-            client.addressSubscription.includes(SUBSCRIPTION_VALUES.connected) ||
-            (select && client.addressSubscription.includes(SUBSCRIPTION_VALUES.current))
-          ),
-        (client, message) => {
-          const { whiteListedAccounts } = client
-          if (!whiteListedAccounts) return message
-          return {
-            ...message,
-            params: {
-              connected: Object.keys(message.params.connected)
-                .filter(a => whiteListedAccounts.includes(a))
-                .reduce((acc, a) => ({ ...acc, [a]: {} }), {}),
-              current: whiteListedAccounts.includes(Object.keys(message.params.current)[0]) ? message.params.current : {}
+          client.isSubscribed() &&
+          condition(client),
+        (client) =>
+          client.setAccounts({
+            current: { ...select ? { [address]: meta } : client.accounts.current },
+            connected: {
+              ...select ? client.accounts.current : { [address]: meta },
+              ...client.accounts.connected
             }
-          }
-        }
+          })
       )
     }
     this.selectNode = (name) => {
