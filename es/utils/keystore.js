@@ -186,7 +186,9 @@ export async function recover (password, keyObject) {
     keyObject.crypto.symmetric_alg
   )
   if (!key) throw new Error('Invalid password')
-  return Buffer.from(key).toString('hex')
+
+  if (Buffer.from(key).length === 64) return Buffer.from(key).toString('hex')
+  return Buffer.from(key).toString('utf-8')
 }
 
 /**
