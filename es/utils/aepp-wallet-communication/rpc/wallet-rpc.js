@@ -14,7 +14,6 @@ import { getBrowserAPI, getHandler, message, sendResponseMessage } from '../help
 import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE } from '../schema'
 import { v4 as uuid } from 'uuid'
 
-
 const rpcClients = RpcClients()
 
 const NOTIFICATIONS = {
