@@ -41,10 +41,10 @@ const RESPONSES = {
     },
   [METHODS.aepp.subscribeAddress]: (instance) =>
     (msg) => {
-      if (
-        msg.result &&
-        Object.prototype.hasOwnProperty.call(msg.result, 'address')
-      ) instance.rpcClient.accounts = msg.result.address
+      if (msg.result) {
+        msg.result.address && (instance.rpcClient.accounts = msg.result.address)
+        msg.result.subscription && (instance.rpcClient.addressSubscription = msg.result.subscription)
+      }
 
       instance.rpcClient.processResponse(msg, ({ id, result }) => [result])
     },
@@ -173,9 +173,7 @@ export const AeppRpc = Ae.compose({
      */
     async subscribeAddress (type, value) {
       if (!this.rpcClient || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
-      const accountsFromWallet = await this.rpcClient.request(METHODS.aepp.subscribeAddress, { type, value })
-      this.rpcClient.updateSubscription(type, value)
-      return accountsFromWallet
+      return this.rpcClient.request(METHODS.aepp.subscribeAddress, { type, value })
     },
     /**
      * Overwriting of `signTransaction` AE method
