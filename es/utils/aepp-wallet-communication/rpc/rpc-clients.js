@@ -171,7 +171,18 @@ export const RpcClient = stampit({
       enumerable: true,
       configurable: false,
       get () {
-        return this.isSubscribed() ? Object.keys(this.accounts.current)[0] : undefined
+        return this.isSubscribed()
+          ? Object.keys(this.accounts.current)[0]
+          : undefined
+      }
+    },
+    addresses: {
+      enumerable: true,
+      configurable: false,
+      get () {
+        return this.isSubscribed()
+          ? [...Object.keys(this.accounts.current), ...Object.keys(this.accounts.connected)]
+          : undefined
       }
     },
     origin: {
