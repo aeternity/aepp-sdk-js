@@ -14,6 +14,7 @@ import { getBrowserAPI, getHandler, message, sendResponseMessage } from '../help
 import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE } from '../schema'
 import { v4 as uuid } from 'uuid'
 
+
 const rpcClients = RpcClients()
 
 const NOTIFICATIONS = {
@@ -102,13 +103,13 @@ const REQUESTS = {
 
     return callInstance(
       'onSign',
-      { tx, returnSigned, onAccount },
+      { tx, returnSigned, onAccount: address },
       async (rawTx, opt = {}) => {
-        let onAcc = onAccount || client.getCurrentAccount()
+        let onAcc = address
         const instanceAccounts = instance.addresses()
 
         if (!instanceAccounts.find(a => a === onAcc)) {
-          if (typeof opt.onAccount !== 'object') return { error: ERRORS.permissionDeny('Account not found in SDK instance!') }
+          if (typeof opt.onAccount !== 'object') return { error: ERRORS.notAuthorize('Account not found in SDK instance!') }
           onAcc = opt.onAccount
         }
         try {
@@ -136,20 +137,28 @@ const REQUESTS = {
   async [METHODS.aepp.signMessage] (callInstance, instance, client, { message, onAccount }) {
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
-    const address = onAccount || await instance.address({ onAccount })
+    const address = onAccount || client.currentAccount
     if (!client.hasAccessToAccount(address)) return { error: ERRORS.notAuthorize({ account: address }) }
 
     return callInstance(
       'onMessageSign',
       { message, onAccount },
-      async (opt = {}) => ({
-        result: {
-          signature: await instance.signMessage(message, {
-            onAccount: opt.onAccount || client.getCurrentAccount({ onAccount }),
-            returnHex: true
-          })
+      async (opt = {}) => {
+        let onAcc = address
+        const instanceAccounts = instance.addresses()
+        if (!instanceAccounts.find(a => a === address)) {
+          if (typeof opt.onAccount !== 'object') return { error: ERRORS.notAuthorize('Account not found in SDK instance!') }
+          onAcc = opt.onAccount
         }
-      }),
+        return {
+          result: {
+            signature: await instance.signMessage(message, {
+              onAccount: onAcc,
+              returnHex: true
+            })
+          }
+        }
+      },
       (error) => ({ error: ERRORS.rejectedByUser(error) })
     )
   }

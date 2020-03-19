@@ -103,6 +103,7 @@
       }
       const keypair = generateKeyPair()
       const keypair2 = generateKeyPair()
+      const sdkAcc = this.publicKey
       this.client = await RpcWallet({
         nodes: [{ name: 'test-net', instance: node }],
         compilerUrl: this.compilerUrl,
@@ -111,17 +112,23 @@
         name: 'Wallet',
         onConnection: genConfirmCallback(() => 'connect'),
         onSubscription (aepp, { accept, deny, params }) {
+          // Manually return accounts
+          // you can check AEPP accounts using
+          // `aepp.accounts`
           accept({
-            current: { [keypair.publicKey]: {}},
-            connected: { [keypair2.publicKey]: {} }
+            accounts: {
+              current: { [keypair.publicKey]: {}},
+              connected: { [keypair2.publicKey]: {}, [sdkAcc]: {} }
+            }
           })
-          setTimeout(async () => {debugger
-            await this.selectAccount(keypair2.publicKey)})
         },
         onSign (aepp, { accept, deny, params }) {
-          debugger
-          accept()
-          debugger
+          // Get account outside of SDK if needed
+          const onAccount = {
+            [keypair.publicKey]: MemoryAccount({ keypair }),
+            [keypair2.publicKey]: MemoryAccount({ keypair: keypair2 }),
+          }[params.onAccount]
+          accept(null, { onAccount }) // provide this account for signing
         },
         onMessageSign: genConfirmCallback(() => 'sign message'),
         onAskAccounts: genConfirmCallback(() => 'get accounts'),

@@ -338,7 +338,6 @@
           if (this.getNetworkId() !== params.networkId) alert(`Connected network ${this.getNetworkId()} is not supported with wallet network ${params.networkId}`)
         },
         onAddressChange:  async (addresses) => {
-          debugger
           this.pub = await this.client.address()
           this.balance = await this.client.balance(this.pub).catch(e => '0')
           this.addressResponse = await errorAsField(this.client.address())
@@ -347,7 +346,6 @@
         }
       })
       this.height = await this.client.height()
-
       // Start looking for wallets
       await this.scanForWallets()
     }
