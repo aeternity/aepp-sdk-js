@@ -182,7 +182,7 @@ export const RpcClient = stampit({
       get () {
         return this.isSubscribed()
           ? [...Object.keys(this.accounts.current), ...Object.keys(this.accounts.connected)]
-          : undefined
+          : []
       }
     },
     origin: {
@@ -209,9 +209,7 @@ export const RpcClient = stampit({
      * @return {Boolean} is connected
      */
     hasAccessToAccount (address) {
-      return !!address &&
-        [...Object.keys(this.accounts.current), ...Object.keys(this.accounts.connected)]
-          .find(a => a === address)
+      return !!address && this.addresses.find(a => a === address)
     },
     /**
      * Check if is connected
