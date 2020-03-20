@@ -10,7 +10,7 @@ import Accounts from '../../../accounts'
 import Selector from '../../../account/selector'
 
 import { RpcClients } from './rpc-clients'
-import { getBrowserAPI, getHandler, message, sendResponseMessage } from '../helpers'
+import { getBrowserAPI, getHandler, message, resolveOnAccount, sendResponseMessage } from '../helpers'
 import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE } from '../schema'
 import { v4 as uuid } from 'uuid'
 
@@ -95,8 +95,7 @@ const REQUESTS = {
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
     // Account permission check
-    if (!client.isSubscribed()) return { error: ERRORS.notAuthorize() }
-    if (!client.hasAccessToAccount(address)) return { error: ERRORS.notAuthorize({ account: address }) }
+    if (!client.hasAccessToAccount(address)) return { error: ERRORS.permissionDeny({ account: address }) }
     // NetworkId check
     if (client.info.networkId !== instance.getNetworkId()) return { error: ERRORS.unsupportedNetwork() }
 
@@ -104,13 +103,8 @@ const REQUESTS = {
       'onSign',
       { tx, returnSigned, onAccount: address },
       async (rawTx, opt = {}) => {
-        let onAcc = address
-        const instanceAccounts = instance.addresses()
-
-        if (!instanceAccounts.find(a => a === onAcc)) {
-          if (typeof opt.onAccount !== 'object') return { error: ERRORS.notAuthorize('Account not found in SDK instance!') }
-          onAcc = opt.onAccount
-        }
+        const onAcc = resolveOnAccount(instance.addresses(), address, opt)
+        if (!onAcc) return { error: ERRORS.internalError({ msg: 'Account not found in SDK instance!' }) }
         try {
           return {
             result: {
@@ -137,18 +131,14 @@ const REQUESTS = {
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
     const address = onAccount || client.currentAccount
-    if (!client.hasAccessToAccount(address)) return { error: ERRORS.notAuthorize({ account: address }) }
+    if (!client.hasAccessToAccount(address)) return { error: ERRORS.permissionDeny({ account: address }) }
 
     return callInstance(
       'onMessageSign',
-      { message, onAccount },
+      { message, onAccount: address },
       async (opt = {}) => {
-        let onAcc = address
-        const instanceAccounts = instance.addresses()
-        if (!instanceAccounts.find(a => a === address)) {
-          if (typeof opt.onAccount !== 'object') return { error: ERRORS.notAuthorize('Account not found in SDK instance!') }
-          onAcc = opt.onAccount
-        }
+        const onAcc = resolveOnAccount(instance.addresses(), address, opt)
+        if (!onAcc) return { error: ERRORS.internalError({ msg: 'Account not found in SDK instance!' }) }
         return {
           result: {
             signature: await instance.signMessage(message, {

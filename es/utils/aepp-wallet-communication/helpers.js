@@ -65,3 +65,11 @@ export const responseMessage = (id, method, { error, result } = {}) => ({ id, me
 export const sendResponseMessage = (client) => (id, method, data) => client.sendMessage(responseMessage(id, method, data), true)
 
 export const voidFn = () => undefined
+
+export const resolveOnAccount = (addresses, onAccount, opt = {}) => {
+  if (!addresses.find(a => a === onAccount)) {
+    if (typeof opt.onAccount !== 'object') return false
+    onAccount = opt.onAccount
+  }
+  return onAccount
+}

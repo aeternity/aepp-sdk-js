@@ -87,6 +87,11 @@ export const ERRORS = {
     data: error,
     message: `You are not subscribed for account ${error.account}`
   }),
+  internalError: (error = {}) => ({
+    code: 12,
+    data: error,
+    message: error.msg
+  }),
   notAuthorize: (error = {}) => ({
     code: 10,
     data: error,

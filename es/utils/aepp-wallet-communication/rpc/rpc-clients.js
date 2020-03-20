@@ -171,7 +171,7 @@ export const RpcClient = stampit({
       enumerable: true,
       configurable: false,
       get () {
-        return this.isSubscribed()
+        return this.isHasAccounts()
           ? Object.keys(this.accounts.current)[0]
           : undefined
       }
@@ -180,7 +180,7 @@ export const RpcClient = stampit({
       enumerable: true,
       configurable: false,
       get () {
-        return this.isSubscribed()
+        return this.isHasAccounts()
           ? [...Object.keys(this.accounts.current), ...Object.keys(this.accounts.connected)]
           : []
       }
@@ -194,11 +194,13 @@ export const RpcClient = stampit({
     }
   },
   methods: {
-    isSubscribed () {
-      return this.addressSubscription.length &&
-        typeof this.accounts === 'object' &&
+    isHasAccounts () {
+      return typeof this.accounts === 'object' &&
         typeof this.accounts.connected === 'object' &&
         typeof this.accounts.current === 'object'
+    },
+    isSubscribed () {
+      return this.addressSubscription.length && this.isHasAccounts()
     },
     /**
      * Check if aepp has access to account
