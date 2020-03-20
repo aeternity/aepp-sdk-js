@@ -8,6 +8,7 @@
 import Ae from '../../../ae'
 import Accounts from '../../../accounts'
 import Selector from '../../../account/selector'
+import TxObject from '../../../tx/tx-object'
 
 import { RpcClients } from './rpc-clients'
 import { getBrowserAPI, getHandler, message, resolveOnAccount, sendResponseMessage } from '../helpers'
@@ -101,7 +102,7 @@ const REQUESTS = {
 
     return callInstance(
       'onSign',
-      { tx, returnSigned, onAccount: address },
+      { tx, returnSigned, onAccount: address, txObject: TxObject.fromString(tx) },
       async (rawTx, opt = {}) => {
         const onAcc = resolveOnAccount(instance.addresses(), address, opt)
         if (!onAcc) return { error: ERRORS.internalError({ msg: 'Account not found in SDK instance!' }) }
