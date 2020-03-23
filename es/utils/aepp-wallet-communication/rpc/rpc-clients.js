@@ -9,7 +9,7 @@
 import stampit from '@stamp/it'
 
 import { METHODS, RPC_STATUS, SUBSCRIPTION_TYPES } from '../schema'
-import { receive, sendMessage, message } from '../helpers'
+import { receive, sendMessage, message, isValidAccounts } from '../helpers'
 
 /**
  * Contain functionality for managing multiple RPC clients (RpcClient stamp)
@@ -253,10 +253,7 @@ export const RpcClient = stampit({
      * @param {{ forceNotification: Boolean = false}} [options={}] Don not sent update notification to AEPP
      */
     setAccounts (accounts, { forceNotification = false } = {}) {
-      if (
-        ['', 'connected', 'current']
-          .find(k => typeof (k ? accounts[k] : accounts) !== 'object')
-      ) {
+      if (!isValidAccounts(accounts)) {
         throw new Error('Invalid accounts object. Should be object like: `{ connected: {}, selected: {} }`')
       }
       this.accounts = accounts

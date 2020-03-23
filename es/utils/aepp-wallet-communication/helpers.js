@@ -66,6 +66,8 @@ export const sendResponseMessage = (client) => (id, method, data) => client.send
 
 export const voidFn = () => undefined
 
+export const isValidAccounts = (accounts) => !(['', 'connected', 'current'].find(k => typeof (k ? accounts[k] : accounts) !== 'object'))
+
 export const resolveOnAccount = (addresses, onAccount, opt = {}) => {
   if (!addresses.find(a => a === onAccount)) {
     if (typeof opt.onAccount !== 'object') return false

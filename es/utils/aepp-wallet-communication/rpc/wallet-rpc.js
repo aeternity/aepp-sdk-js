@@ -11,7 +11,7 @@ import Selector from '../../../account/selector'
 import TxObject from '../../../tx/tx-object'
 
 import { RpcClients } from './rpc-clients'
-import { getBrowserAPI, getHandler, message, resolveOnAccount, sendResponseMessage } from '../helpers'
+import { getBrowserAPI, getHandler, isValidAccounts, message, resolveOnAccount, sendResponseMessage } from '../helpers'
 import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE } from '../schema'
 import { v4 as uuid } from 'uuid'
 
@@ -66,8 +66,9 @@ const REQUESTS = {
       'onSubscription',
       { type, value },
       async ({ accounts } = {}) => {
-        const subscription = client.updateSubscription(type, value)
         const clientAccounts = accounts || instance.getAccounts()
+        if (!isValidAccounts(clientAccounts)) return { error: ERRORS.internalError('Invalid provided accounts object') }
+        const subscription = client.updateSubscription(type, value)
         client.setAccounts(clientAccounts, { forceNotification: true })
         return {
           result: {
