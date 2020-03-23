@@ -161,6 +161,16 @@ describe('Aepp<->Wallet', function () {
         e.message.should.be.equal('Operation rejected by user')
       }
     })
+    it('Subscribe to address: invalid accounts', async () => {
+      wallet.onSubscription = (aepp, actions) => {
+        actions.accept({ accounts: {} })
+      }
+      try {
+        await aepp.subscribeAddress('subscribe', 'connected')
+      } catch (e) {
+        e.message.should.be.equal('Invalid provided accounts object')
+      }
+    })
     it('Subscribe to address: wallet accept', async () => {
       const accounts = {
         connected: { [keypair.publicKey]: {} },
@@ -240,6 +250,22 @@ describe('Aepp<->Wallet', function () {
         e.message.should.be.equal('Operation rejected by user')
       }
     })
+    it('Sign transaction: invalid account object in action', async () => {
+      wallet.onSign = (aepp, action) => {
+        action.accept(null, { onAccount: {} })
+      }
+      try {
+        const tx = await aepp.spendTx({
+          senderId: keypair.publicKey,
+          recipientId: keypair.publicKey,
+          amount: 0,
+          payload: 'zerospend'
+        })
+        await aepp.signTransaction(tx, { onAccount: keypair.publicKey })
+      } catch (e) {
+        e.message.should.be.equal('Provided onAccount should be a MemoryAccount')
+      }
+    })
     it('Sign transaction: wallet allow', async () => {
       wallet.onSign = (aepp, action) => {
         action.accept()
@@ -302,21 +328,20 @@ describe('Aepp<->Wallet', function () {
     })
     it('Sign message using account not from sdk instance: do not provide account', async () => {
       wallet.onMessageSign = (aepp, action) => {
-        action.accept()
+        action.accept({})
       }
       const onAccount = aepp.addresses()[1]
       try {
         await aepp.signMessage('test', { onAccount })
       } catch (e) {
-        e.message.should.be.equal('Account not found in SDK instance!')
+        e.message.should.be.equal('Provided onAccount should be a MemoryAccount')
       }
     })
     it('Sign message using account not from sdk instance', async () => {
       wallet.onMessageSign = (aepp, action) => {
         if (action.params.onAccount === keypair.publicKey) action.accept({ onAccount: MemoryAccount({ keypair }) })
-        action.accept()
       }
-      const onAccount = aepp.addresses()[1]
+      const onAccount = keypair.publicKey
       const messageSig = await aepp.signMessage('test', { onAccount })
       messageSig.should.be.a('string')
       const isValid = await aepp.verifyMessage('test', messageSig, { onAccount })

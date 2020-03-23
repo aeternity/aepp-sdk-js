@@ -66,15 +66,20 @@ const REQUESTS = {
       'onSubscription',
       { type, value },
       async ({ accounts } = {}) => {
-        const clientAccounts = accounts || instance.getAccounts()
-        if (!isValidAccounts(clientAccounts)) return { error: ERRORS.internalError('Invalid provided accounts object') }
-        const subscription = client.updateSubscription(type, value)
-        client.setAccounts(clientAccounts, { forceNotification: true })
-        return {
-          result: {
-            subscription,
-            address: clientAccounts
+        try {
+          const clientAccounts = accounts || instance.getAccounts()
+          if (!isValidAccounts(clientAccounts)) throw new Error('Invalid provided accounts object')
+          const subscription = client.updateSubscription(type, value)
+          client.setAccounts(clientAccounts, { forceNotification: true })
+          return {
+            result: {
+              subscription,
+              address: clientAccounts
+            }
           }
+        } catch (e) {
+          console.error(e)
+          return { error: ERRORS.internalError({ msg: e.message }) }
         }
       },
       (error) => ({ error: ERRORS.rejectedByUser(error) })
@@ -105,7 +110,13 @@ const REQUESTS = {
       'onSign',
       { tx, returnSigned, onAccount: address, txObject: TxObject.fromString(tx) },
       async (rawTx, opt = {}) => {
-        const onAcc = resolveOnAccount(instance.addresses(), address, opt)
+        let onAcc
+        try {
+          onAcc = resolveOnAccount(instance.addresses(), address, opt)
+        } catch (e) {
+          console.error(e)
+          return { error: ERRORS.internalError({ msg: e.message }) }
+        }
         if (!onAcc) return { error: ERRORS.internalError({ msg: 'Account not found in SDK instance!' }) }
         try {
           return {
@@ -139,15 +150,19 @@ const REQUESTS = {
       'onMessageSign',
       { message, onAccount: address },
       async (opt = {}) => {
-        const onAcc = resolveOnAccount(instance.addresses(), address, opt)
-        if (!onAcc) return { error: ERRORS.internalError({ msg: 'Account not found in SDK instance!' }) }
-        return {
-          result: {
-            signature: await instance.signMessage(message, {
-              onAccount: onAcc,
-              returnHex: true
-            })
+        try {
+          const onAcc = resolveOnAccount(instance.addresses(), address, opt)
+          return {
+            result: {
+              signature: await instance.signMessage(message, {
+                onAccount: onAcc,
+                returnHex: true
+              })
+            }
           }
+        } catch (e) {
+          console.error(e)
+          return { error: ERRORS.internalError({ msg: e.message }) }
         }
       },
       (error) => ({ error: ERRORS.rejectedByUser(error) })
