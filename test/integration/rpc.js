@@ -144,6 +144,7 @@ describe('Aepp<->Wallet', function () {
       }
     })
     it('Try to sign and send transaction to wallet without subscription', async () => {
+      wallet.getAccounts().should.be.an('object')
       const errors = [
         await aepp.signTransaction('tx_asdasd').catch(e => e.message === 'You do not subscribed for account.'),
         await aepp.send('tx_asdasd').catch(e => e.message === 'You do not subscribed for account.')
@@ -317,6 +318,17 @@ describe('Aepp<->Wallet', function () {
       decode(res.tx.payload).toString().should.be.equal('zerospend2')
       res.blockHeight.should.be.a('number')
     })
+    it('Sign message: rejected', async () => {
+      wallet.onMessageSign = (aepp, action) => {
+        action.deny()
+      }
+      try {
+        await aepp.signMessage('test')
+      } catch (e) {
+        e.code.should.be.equal(4)
+        e.message.should.be.equal('Operation rejected by user')
+      }
+    })
     it('Sign message', async () => {
       wallet.onMessageSign = (aepp, action) => {
         action.accept()
@@ -399,6 +411,16 @@ describe('Aepp<->Wallet', function () {
         wallet.addNode('second_node', node, true)
       })
       received.should.be.equal(true)
+    })
+    it('RPC client set invalid account', () => {
+      const current = aepp.rpcClient.getCurrentAccount()
+      current.should.be.equal(aepp.rpcClient.currentAccount)
+      aepp.rpcClient.origin.should.be.an('object')
+      try {
+        aepp.rpcClient.setAccounts(true)
+      } catch (e) {
+        e.message.should.be.equal('Invalid accounts object. Should be object like: `{ connected: {}, selected: {} }`')
+      }
     })
     it('Resolve/Reject callback for undefined message', async () => {
       try {
