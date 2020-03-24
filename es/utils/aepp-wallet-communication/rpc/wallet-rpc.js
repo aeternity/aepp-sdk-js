@@ -117,7 +117,6 @@ const REQUESTS = {
           console.error(e)
           return { error: ERRORS.internalError({ msg: e.message }) }
         }
-        if (!onAcc) return { error: ERRORS.internalError({ msg: 'Account not found in SDK instance!' }) }
         try {
           return {
             result: {

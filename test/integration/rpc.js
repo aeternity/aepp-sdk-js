@@ -285,6 +285,21 @@ describe('Aepp<->Wallet', function () {
       const valid = verify(txWithNetwork, signature, decode(address))
       valid.should.be.equal(true)
     })
+    it('Try to sing using unpermited account', async () => {
+      const { publicKey: pub } = generateKeyPair()
+      try {
+        await aepp.rpcClient.request(
+          METHODS.aepp.sign, {
+            tx: 'tx_+NkLAfhCuECIIeWttRUiZ32uriBdmM1t+dCg90KuG2ABxOiuXqzpAul6uTWvsyfx3EFJDah6trudrityh+6XSX3mkPEimhgGuJH4jzIBoQELtO15J/l7UeG8teE0DRIzWyorEsi8UiHWPEvLOdQeYYgbwW1nTsgAAKEB6bv2BOYRtUYKOzmZ6Xcbb2BBfXPOfFUZ4S9+EnoSJcqIG8FtZ07IAACIAWNFeF2KAAAKAIYSMJzlQADAoDBrIcoop8JfZ4HOD9p3nDTiNthj7jjl+ArdHwEMUrvQgitwOr/v3Q==',
+            onAccount: pub,
+            returnSigned: true
+          }
+        )
+      } catch (e) {
+        e.code.should.be.equal(11)
+        e.message.should.be.equal(`You are not subscribed for account ${pub}`)
+      }
+    })
     it('Sign and broadcast transaction by wallet', async () => {
       const address = await aepp.address()
       const tx = await aepp.spendTx({
@@ -346,6 +361,7 @@ describe('Aepp<->Wallet', function () {
       try {
         await aepp.signMessage('test', { onAccount })
       } catch (e) {
+        e.code.should.be.equal(12)
         e.message.should.be.equal('Provided onAccount should be a MemoryAccount')
       }
     })
