@@ -38,7 +38,7 @@
     "css-loader": "^3.2.0",
     "cssnano": "^4.0.5",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
-    "glob-all": "^3.1.0",
+    "glob-all": "^3.2.1",
     "html-webpack-harddisk-plugin": "^1.0.1",
     "html-webpack-plugin": "^4.0.0",
     "postcss-import": "^11.1.0",
@@ -51,9 +51,9 @@
     "vue-loader": "15.9.1",
     "vue-style-loader": "^4.1.0",
     "webpack": "^4.36.1",
-    "webpack-bundle-analyzer": "^3.3.2",
+    "webpack-bundle-analyzer": "^3.6.1",
     "webpack-cli": "3.3.8",
     "webpack-dev-server": "^3.1.4",
-    "webpack-serve": "^0.2.0"
+    "webpack-serve": "^3.2.0"
   }
 }
