@@ -8,10 +8,11 @@
 import Ae from '../../../ae'
 import Accounts from '../../../accounts'
 import Selector from '../../../account/selector'
+import TxObject from '../../../tx/tx-object'
 
 import { RpcClients } from './rpc-clients'
-import { getBrowserAPI, getHandler, message, sendResponseMessage } from '../helpers'
-import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE, SUBSCRIPTION_VALUES } from '../schema'
+import { getBrowserAPI, getHandler, isValidAccounts, message, resolveOnAccount, sendResponseMessage } from '../helpers'
+import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE } from '../schema'
 import { v4 as uuid } from 'uuid'
 
 const rpcClients = RpcClients()
@@ -64,42 +65,64 @@ const REQUESTS = {
     return callInstance(
       'onSubscription',
       { type, value },
-      () => ({
-        result: {
-          subscription: client.updateSubscription(type, value),
-          address: instance.getAccounts()
+      async ({ accounts } = {}) => {
+        try {
+          const clientAccounts = accounts || instance.getAccounts()
+          if (!isValidAccounts(clientAccounts)) throw new Error('Invalid provided accounts object')
+          const subscription = client.updateSubscription(type, value)
+          client.setAccounts(clientAccounts, { forceNotification: true })
+          return {
+            result: {
+              subscription,
+              address: clientAccounts
+            }
+          }
+        } catch (e) {
+          console.error(e)
+          return { error: ERRORS.internalError({ msg: e.message }) }
         }
-      }),
+      },
       (error) => ({ error: ERRORS.rejectedByUser(error) })
     )
   },
   async [METHODS.aepp.address] (callInstance, instance, client) {
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
+    if (!client.isSubscribed()) return { error: ERRORS.notAuthorize() }
 
     return callInstance(
       'onAskAccounts',
       {},
-      () => ({ result: instance.addresses() }),
+      ({ accounts } = {}) => ({ result: accounts || [...Object.keys(client.accounts.current), ...Object.keys(client.accounts.connected)] }),
       (error) => ({ error: ERRORS.rejectedByUser(error) })
     )
   },
   async [METHODS.aepp.sign] (callInstance, instance, client, { tx, onAccount, returnSigned = false }) {
+    const address = onAccount || client.currentAccount
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
+    // Account permission check
+    if (!client.hasAccessToAccount(address)) return { error: ERRORS.permissionDeny({ account: address }) }
     // NetworkId check
     if (client.info.networkId !== instance.getNetworkId()) return { error: ERRORS.unsupportedNetwork() }
 
     return callInstance(
       'onSign',
-      { tx, returnSigned, onAccount },
-      async (rawTx) => {
+      { tx, returnSigned, onAccount: address, txObject: TxObject.fromString(tx) },
+      async (rawTx, opt = {}) => {
+        let onAcc
+        try {
+          onAcc = resolveOnAccount(instance.addresses(), address, opt)
+        } catch (e) {
+          console.error(e)
+          return { error: ERRORS.internalError({ msg: e.message }) }
+        }
         try {
           return {
             result: {
               ...returnSigned
-                ? { signedTransaction: await instance.signTransaction(rawTx || tx, { onAccount }) }
-                : { transactionHash: await instance.send(rawTx || tx, { onAccount, verify: false }) }
+                ? { signedTransaction: await instance.signTransaction(rawTx || tx, { onAccount: onAcc }) }
+                : { transactionHash: await instance.send(rawTx || tx, { onAccount: onAcc, verify: false }) }
             }
           }
         } catch (e) {
@@ -119,13 +142,28 @@ const REQUESTS = {
   async [METHODS.aepp.signMessage] (callInstance, instance, client, { message, onAccount }) {
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
+    const address = onAccount || client.currentAccount
+    if (!client.hasAccessToAccount(address)) return { error: ERRORS.permissionDeny({ account: address }) }
 
     return callInstance(
       'onMessageSign',
-      { message, onAccount },
-      async () => ({
-        result: { signature: await instance.signMessage(message, { onAccount, returnHex: true }) }
-      }),
+      { message, onAccount: address },
+      async (opt = {}) => {
+        try {
+          const onAcc = resolveOnAccount(instance.addresses(), address, opt)
+          return {
+            result: {
+              signature: await instance.signMessage(message, {
+                onAccount: onAcc,
+                returnHex: true
+              })
+            }
+          }
+        } catch (e) {
+          console.error(e)
+          return { error: ERRORS.internalError({ msg: e.message }) }
+        }
+      },
       (error) => ({ error: ERRORS.rejectedByUser(error) })
     )
   }
@@ -192,28 +230,42 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
     const _selectNode = this.selectNode.bind(this)
 
     // Overwrite AE methods
-    this.selectAccount = (address) => {
+    this.selectAccount = (address, { condition = () => true } = {}) => {
       _selectAccount(address)
-      rpcClients.sentNotificationByCondition(
-        message(METHODS.wallet.updateAddress, this.getAccounts()),
-        (client) =>
-          (
-            client.addressSubscription.includes(SUBSCRIPTION_VALUES.current) ||
-            client.addressSubscription.includes(SUBSCRIPTION_VALUES.connected)
-          ) &&
-          client.isConnected())
-    }
-    this.addAccount = async (account, { select, meta } = {}) => {
-      await _addAccount(account, { select })
-      // Send notification 'update.address' to all Aepp which are subscribed for connected accounts
-      rpcClients.sentNotificationByCondition(
-        message(METHODS.wallet.updateAddress, this.getAccounts()),
+      rpcClients.operationByCondition(
         (client) =>
           client.isConnected() &&
-          (
-            client.addressSubscription.includes(SUBSCRIPTION_VALUES.connected) ||
-            (select && client.addressSubscription.includes(SUBSCRIPTION_VALUES.current))
-          )
+          client.isSubscribed() &&
+          client.hasAccessToAccount(address) &&
+          condition(client),
+        (client) =>
+          client.setAccounts({
+            current: { [address]: {} },
+            connected: {
+              ...client.accounts.current,
+              ...Object.entries(client.accounts.connected)
+                .reduce((acc, [k, v]) => ({ ...acc, ...k !== address ? { [k]: v } : {} }), {})
+            }
+          })
+      )
+    }
+    this.addAccount = async (account, { select, meta = {}, condition = () => true } = {}) => {
+      await _addAccount(account, { select })
+      const address = await account.address()
+      // Send notification 'update.address' to all Aepp which are subscribed for connected accounts
+      rpcClients.operationByCondition(
+        (client) =>
+          client.isConnected() &&
+          client.isSubscribed() &&
+          condition(client),
+        (client) =>
+          client.setAccounts({
+            current: { ...select ? { [address]: meta } : client.accounts.current },
+            connected: {
+              ...select ? client.accounts.current : { [address]: meta },
+              ...client.accounts.connected
+            }
+          })
       )
     }
     this.selectNode = (name) => {

@@ -2,6 +2,8 @@
  * Browser helper functions
  */
 /* eslint-disable no-undef */
+import { isMemoryAccount } from '../../account/selector'
+
 export const getBrowserAPI = (force = false) => {
   if (chrome === Object(chrome) && chrome.runtime) return chrome
   if (browser === Object(browser) && browser.runtime) return browser
@@ -65,3 +67,13 @@ export const responseMessage = (id, method, { error, result } = {}) => ({ id, me
 export const sendResponseMessage = (client) => (id, method, data) => client.sendMessage(responseMessage(id, method, data), true)
 
 export const voidFn = () => undefined
+
+export const isValidAccounts = (accounts) => (['', 'connected', 'current'].filter(k => typeof (k ? accounts[k] : accounts) === 'object')).length === 3
+
+export const resolveOnAccount = (addresses, onAccount, opt = {}) => {
+  if (!addresses.find(a => a === onAccount)) {
+    if (typeof opt.onAccount !== 'object' || !isMemoryAccount(opt.onAccount)) throw new Error('Provided onAccount should be a MemoryAccount')
+    onAccount = opt.onAccount
+  }
+  return onAccount
+}

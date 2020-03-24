@@ -29,7 +29,7 @@ import required from '@stamp/required'
 import { assertedType } from '../utils/crypto'
 import MemoryAccount from './memory'
 
-const isMemoryAccount = (acc) => !['sign', 'address'].find(f => typeof acc[f] !== 'function')
+export const isMemoryAccount = (acc) => !['sign', 'address'].find(f => typeof acc[f] !== 'function')
 
 async function sign (data, { onAccount } = {}) {
   if (!onAccount) return this.signWith(this.Selector.address, data)

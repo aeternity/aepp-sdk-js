@@ -8,8 +8,8 @@
  */
 import stampit from '@stamp/it'
 
-import { RPC_STATUS, SUBSCRIPTION_TYPES } from '../schema'
-import { receive, sendMessage, message } from '../helpers'
+import { METHODS, RPC_STATUS, SUBSCRIPTION_TYPES } from '../schema'
+import { receive, sendMessage, message, isValidAccounts } from '../helpers'
 
 /**
  * Contain functionality for managing multiple RPC clients (RpcClient stamp)
@@ -95,15 +95,33 @@ export const RpcClients = stampit({
      * @rtype (msg: Object, condition: Function) => void
      * @param {Object} msg Msg object
      * @param {Function} condition Condition function of (client: RpcClient) => Boolean
+     * @param transformMessage
      * @return {void}
      */
-    sentNotificationByCondition (msg, condition) {
+    sentNotificationByCondition (msg, condition, transformMessage) {
       if (typeof condition !== 'function') throw new Error('Condition argument must be a function which return boolean')
       const clients = Array.from(
         this.clients.values()
       )
         .filter(condition)
-      clients.forEach(client => client.sendMessage(msg, true))
+      clients.forEach(client => client.sendMessage(typeof transformMessage === 'function' ? transformMessage(client, msg) : msg, true))
+    },
+    /**
+     * Call provided function for each rpc client which by condition
+     * @function operationByCondition
+     * @instance
+     * @rtype (condition: Function, operation: Function) => void
+     * @param {Function} condition Condition function of (client: RpcClient) => Boolean
+     * @param {Function} operation Operation function of (client: RpcClient) => void
+     * @return {void}
+     */
+    operationByCondition (condition, operation) {
+      if (typeof condition !== 'function') throw new Error('Condition argument must be a function which return boolean')
+      if (typeof operation !== 'function') throw new Error('Operation argument must be a function which return boolean')
+      Array
+        .from(this.clients.values())
+        .filter(condition)
+        .forEach(operation)
     }
   }
 })
@@ -129,8 +147,16 @@ export const RpcClient = stampit({
     //    [msg.id]: { resolve, reject }
     // }
     this.callbacks = {}
+    // {
+    //    [id]: { accept, deny }
+    // }
     this.actions = {}
+    // ['connected', 'current']
     this.addressSubscription = []
+    // {
+    //    connected: { [pub]: {...meta} },
+    //    current: { [pub]: {...meta} }
+    // }
     this.accounts = {}
 
     this.sendMessage = sendMessage(this.connection)
@@ -140,7 +166,53 @@ export const RpcClient = stampit({
     }
     connection.connect(receive(onMessage), disconnect)
   },
+  propertyDescriptors: {
+    currentAccount: {
+      enumerable: true,
+      configurable: false,
+      get () {
+        return this.isHasAccounts()
+          ? Object.keys(this.accounts.current)[0]
+          : undefined
+      }
+    },
+    addresses: {
+      enumerable: true,
+      configurable: false,
+      get () {
+        return this.isHasAccounts()
+          ? [...Object.keys(this.accounts.current), ...Object.keys(this.accounts.connected)]
+          : []
+      }
+    },
+    origin: {
+      enumerable: true,
+      configurable: false,
+      get () {
+        return this.connection
+      }
+    }
+  },
   methods: {
+    isHasAccounts () {
+      return typeof this.accounts === 'object' &&
+        typeof this.accounts.connected === 'object' &&
+        typeof this.accounts.current === 'object'
+    },
+    isSubscribed () {
+      return this.addressSubscription.length && this.isHasAccounts()
+    },
+    /**
+     * Check if aepp has access to account
+     * @function hasAccessToAccount
+     * @instance
+     * @rtype (address: String) => Boolean
+     * @param {String} address Account address
+     * @return {Boolean} is connected
+     */
+    hasAccessToAccount (address) {
+      return !!address && this.addresses.find(a => a === address)
+    },
     /**
      * Check if is connected
      * @function isConnected
@@ -149,7 +221,7 @@ export const RpcClient = stampit({
      * @return {Boolean} is connected
      */
     isConnected () {
-      return this.info.status === RPC_STATUS.CONNECTED
+      return this.connection.isConnected() && this.info.status === RPC_STATUS.CONNECTED
     },
     /**
      * Get selected account
@@ -160,11 +232,6 @@ export const RpcClient = stampit({
      * @return {String}
      */
     getCurrentAccount ({ onAccount } = {}) {
-      if (!this.accounts.current || !Object.keys(this.accounts.current).length) throw new Error('You do not subscribed for account.')
-      if (
-        onAccount &&
-        (!this.accounts.connected || !Object.keys(this.accounts.connected).length || !Object.keys(this.accounts.connected).includes(onAccount))
-      ) throw new Error(`You do not subscribed for connected account's or account ${onAccount} is not connected to the wallet.`)
       return onAccount || Object.keys(this.accounts.current)[0]
     },
     /**
@@ -181,7 +248,22 @@ export const RpcClient = stampit({
       forceConnectionClose || this.connection.disconnect()
     },
     /**
-     * Update subsription
+     * Update accounts and sent `update.address` notification to AEPP
+     * @param {{ current: { [String]: Object }, connected: { [String]: Object} }} accounts Object with current and connected accounts
+     * @param {{ forceNotification: Boolean = false}} [options={}] Don not sent update notification to AEPP
+     */
+    setAccounts (accounts, { forceNotification = false } = {}) {
+      if (!isValidAccounts(accounts)) {
+        throw new Error('Invalid accounts object. Should be object like: `{ connected: {}, selected: {} }`')
+      }
+      this.accounts = accounts
+      if (!forceNotification) {
+        // Sent notification about account updates
+        this.sendMessage(message(METHODS.wallet.updateAddress, this.accounts), true)
+      }
+    },
+    /**
+     * Update subscription
      * @function updateSubscription
      * @instance
      * @rtype (type: String, value: String) => void

@@ -346,7 +346,6 @@
         }
       })
       this.height = await this.client.height()
-
       // Start looking for wallets
       await this.scanForWallets()
     }
