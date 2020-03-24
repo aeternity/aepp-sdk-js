@@ -153,7 +153,6 @@ const revertObject = (obj) => Object.entries(obj).reduce((acc, [key, v]) => (acc
 /**
  * @constant
  * @description Object with transaction types
- * @type {Object} TX_TYPE
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/schema
  * @property {String} signed
  * @property {String} spend

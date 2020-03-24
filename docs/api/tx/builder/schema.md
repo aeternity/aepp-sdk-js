@@ -9,7 +9,7 @@ import TxSchema from '@aeternity/aepp-sdk/es/tx/builder/schema'
 ```
 <a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/schema--exports.TX_TYPE"></a>
 
-### exports.TX\_TYPE : `Object` ⏏
+### exports.TX\_TYPE ⏏
 Object with transaction types
 
 **Kind**: Exported constant  

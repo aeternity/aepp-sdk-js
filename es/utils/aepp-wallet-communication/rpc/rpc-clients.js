@@ -249,8 +249,8 @@ export const RpcClient = stampit({
     },
     /**
      * Update accounts and sent `update.address` notification to AEPP
-     * @param {{ current: { [String]: Object }, connected: { [String]: Object} }} accounts Object with current and connected accounts
-     * @param {{ forceNotification: Boolean = false}} [options={}] Don not sent update notification to AEPP
+     * @param {{ current: Object, connected: Object }} accounts Object with current and connected accounts
+     * @param {{ forceNotification: Boolean }} [options={ forceNotification: false }] Don not sent update notification to AEPP
      */
     setAccounts (accounts, { forceNotification = false } = {}) {
       if (!isValidAccounts(accounts)) {
