@@ -134,7 +134,7 @@ RpcWallet({
     if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} want to sign tx ${action.params.tx}`)) {
       // Here we can provide account for signing if it's not stored inside the SDK instance
       // To do that you need to create MemoryAccount instance and provide it as second argument of accept function
-      // if (isInStorage(onAccount)) {
+      // if (isInStorage(params.onAccount)) {
         // First argument is encode transaction which will be using instead of one from AEPP (if provided) 
         // Then this signing request will be signed using the provide MemoryAccount
         // If you do not provide account manually SDK will try to find it inside the instance, else throw error
@@ -216,7 +216,7 @@ RpcWallet({
           if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to ${params.returnSigned ? 'sign' : 'sign and broadcast'} ${JSON.stringify(params.tx)}`)) {
             // Here we can provide account for signing if it's not stored inside the SDK instance
             // To do that you need to create MemoryAccount instance and provide it as second argument of accept function
-            // if (isInStorage(onAccount)) {
+            // if (isInStorage(params.onAccount)) {
               // First argument is encode transaction which will be using instead of one from AEPP (if provided) 
               // Then this signing request will be signed using the provide MemoryAccount
               // If you do not provide account manually SDK will try to find it inside the instance, else throw error

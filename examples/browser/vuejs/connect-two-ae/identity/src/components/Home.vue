@@ -111,18 +111,18 @@
         address: this.publicKey,
         name: 'Wallet',
         onConnection: genConfirmCallback(() => 'connect'),
-        onSubscription (aepp, { accept, deny, params }) {
+        onSubscription (aepp, { accept, deny }, origin) {
           // Manually return accounts
           // you can check AEPP accounts using
           // `aepp.accounts`
           accept({
             accounts: {
               current: { [keypair.publicKey]: {}},
-              connected: { [keypair2.publicKey]: {}, [sdkAcc]: {} }
+              connected: { [keypair2.publicKey]: {}, [sdkAcc]: {}, [account2.publicKey]: {} }
             }
           })
         },
-        onSign (aepp, { accept, deny, params }) {
+        onSign (aepp, { accept, deny, params }, origin) {
           // Get account outside of SDK if needed
           const onAccount = {
             [keypair.publicKey]: MemoryAccount({ keypair }),
