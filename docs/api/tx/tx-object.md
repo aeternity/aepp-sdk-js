@@ -16,7 +16,7 @@ import TxObject from '@aeternity/aepp-sdk/es/tx/tx-object'
     * [setProp(props, options)](#exp_module_@aeternity/aepp-sdk/es/tx/tx-object--setProp) ⇒ `TxObject` ⏏
     * [getSignatures()](#exp_module_@aeternity/aepp-sdk/es/tx/tx-object--getSignatures) ⇒ `Array` ⏏
     * [addSignature(signature)](#exp_module_@aeternity/aepp-sdk/es/tx/tx-object--addSignature) ⇒ `void` ⏏
-    * [calculateFee(props)](#exp_module_@aeternity/aepp-sdk/es/tx/tx-object--calculateFee) ⇒ `String` ⏏
+    * [calculateMinFee(props)](#exp_module_@aeternity/aepp-sdk/es/tx/tx-object--calculateMinFee) ⇒ `String` ⏏
     * _static_
         * [.fromString(tx)](#exp_module_@aeternity/aepp-sdk/es/tx/tx-object--fromString) ⇒ `TxObject` ⏏
         * [.fromRlp(tx)](#exp_module_@aeternity/aepp-sdk/es/tx/tx-object--fromRlp) ⇒ `TxObject` ⏏
@@ -123,11 +123,11 @@ Add signature
 
 | Param | Type | Description |
 | --- | --- | --- |
-| signature | `Buffer` | Signature to add |
+| signature | `Buffer` \| `String` | Signature to add ( Can be: Buffer | Uint8Array | HexString ) |
 
-<a id="exp_module_@aeternity/aepp-sdk/es/tx/tx-object--calculateFee"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/tx/tx-object--calculateMinFee"></a>
 
-### calculateFee(props) ⇒ `String` ⏏
+### calculateMinFee(props) ⇒ `String` ⏏
 Calculate fee
 
 **Kind**: Exported function  
