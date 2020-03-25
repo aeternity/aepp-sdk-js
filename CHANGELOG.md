@@ -1,4 +1,12 @@
-# [7.2.0](https://github.com/aeternity/aepp-sdk-js/compare/6.0.1...7.2.0) (2020-03-24)
+## [7.2.1](https://github.com/aeternity/aepp-sdk-js/compare/7.2.0...7.2.1) (2020-03-25)
+
+### Fix
+
+* **build** Remove resolving of `minimist` using `npx`
+
+
+
+# [7.2.0](https://github.com/aeternity/aepp-sdk-js/compare/7.1.1...7.2.0) (2020-03-24)
 
 ### Docs
 
@@ -18,7 +26,7 @@ This stamp give more flexibility on transaction serialization/deserialization pr
 * **AEX-2:**  Add permission layer for account management ([#937](https://github.com/aeternity/aepp-sdk-js/pull/937))
 
 
-## [7.1.1](https://github.com/aeternity/aepp-sdk-js/compare/6.0.1...7.1.1) (2020-02-27)
+## [7.1.1](https://github.com/aeternity/aepp-sdk-js/compare/7.1.0...7.1.1) (2020-02-27)
 
 
 
@@ -29,7 +37,7 @@ This stamp give more flexibility on transaction serialization/deserialization pr
 
 
 
-# [7.1.0](https://github.com/aeternity/aepp-sdk-js/compare/6.0.1...7.1.0) (2020-02-25)
+# [7.1.0](https://github.com/aeternity/aepp-sdk-js/compare/7.0.0...7.1.0) (2020-02-25)
 
 ### Refactor
 
@@ -48,7 +56,7 @@ This stamp give more flexibility on transaction serialization/deserialization pr
 * **AEX-2:** Add `removeRpcClient` method to RpcClient/RpcWallet stamp's([#912](https://github.com/aeternity/aepp-sdk-js/pull/912))
 
 
-# [7.0.0](https://github.com/aeternity/aepp-sdk-js/compare/6.0.1...7.0.0) (2020-01-31)
+# [7.0.0](https://github.com/aeternity/aepp-sdk-js/compare/7.0.0-next.3...7.0.0) (2020-01-31)
 
 
 ### Bug Fixes
@@ -77,7 +85,7 @@ This release include all changes from [7.0.0-next.1](https://github.com/aeternit
 
 
 
-# [7.0.0-next.3](https://github.com/aeternity/aepp-sdk-js/compare/6.0.1...7.0.0-next.3) (2020-01-22)
+# [7.0.0-next.3](https://github.com/aeternity/aepp-sdk-js/compare/7.0.0-next.2...7.0.0-next.3) (2020-01-22)
 
 
 ### Features
@@ -117,7 +125,7 @@ This release include all changes from [7.0.0-next.1](https://github.com/aeternit
 
 
 
-# [7.0.0-next.1](https://github.com/aeternity/aepp-sdk-js/compare/6.0.1...7.0.0-next.1) (2019-12-18)
+# [7.0.0-next.1](https://github.com/aeternity/aepp-sdk-js/compare/6.1.3...7.0.0-next.1) (2019-12-18)
 
 
 ### Bug Fixes
