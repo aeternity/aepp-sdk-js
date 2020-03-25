@@ -19,7 +19,7 @@ import RpcClients from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/r
             * [.getClient(id)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+getClient) ⇒ `Object`
             * [.removeClient(id, forceConnectionClose)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+removeClient) ⇒ `Boolean`
             * [.updateClientInfo(id, info)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+updateClientInfo) ⇒ `void`
-            * [.sentNotificationByCondition(msg, condition, transformMessage)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+sentNotificationByCondition) ⇒ `void`
+            * [.sendNotificationByCondition(msg, condition, transformMessage)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+sendNotificationByCondition) ⇒ `void`
             * [.operationByCondition(condition, operation)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+operationByCondition) ⇒ `void`
             * [.hasAccessToAccount(address)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+hasAccessToAccount) ⇒ `Boolean`
             * [.isConnected()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+isConnected) ⇒ `Boolean`
@@ -100,9 +100,9 @@ Update client info by id
 | id | `String` \| `Number` | Client ID |
 | info | `Object` | Info to update (will be merged with current info object) |
 
-<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+sentNotificationByCondition"></a>
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+sendNotificationByCondition"></a>
 
-#### exports.RpcClient.sentNotificationByCondition(msg, condition, transformMessage) ⇒ `void`
+#### exports.RpcClient.sendNotificationByCondition(msg, condition, transformMessage) ⇒ `void`
 Send notification to all client passing condition
 
 **Kind**: instance method of [`exports.RpcClient`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient)  

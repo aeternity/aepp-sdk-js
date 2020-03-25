@@ -90,7 +90,7 @@ export const RpcClients = stampit({
     },
     /**
      * Send notification to all client passing condition
-     * @function sentNotificationByCondition
+     * @function sendNotificationByCondition
      * @instance
      * @rtype (msg: Object, condition: Function) => void
      * @param {Object} msg Msg object
@@ -98,7 +98,7 @@ export const RpcClients = stampit({
      * @param transformMessage
      * @return {void}
      */
-    sentNotificationByCondition (msg, condition, transformMessage) {
+    sendNotificationByCondition (msg, condition, transformMessage) {
       if (typeof condition !== 'function') throw new Error('Condition argument must be a function which return boolean')
       const clients = Array.from(
         this.clients.values()

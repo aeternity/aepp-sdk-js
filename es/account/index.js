@@ -51,6 +51,15 @@ async function signTransaction (tx, opt = {}) {
 }
 
 /**
+ * Get network Id
+ * @instance
+ * @function getNetworkId
+ * @category async
+ * @rtype () => networkId: String
+ * @return {String} Network Id
+ */
+
+/**
  * Sign message
  * @instance
  * @category async
