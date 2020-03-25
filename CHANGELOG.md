@@ -1,5 +1,6 @@
 ## [7.2.1](https://github.com/aeternity/aepp-sdk-js/compare/7.2.0...7.2.1) (2020-03-25)
 
+
 ### Fix
 
 * **build** Remove resolving of `minimist` using `npx`
@@ -7,6 +8,7 @@
 
 
 # [7.2.0](https://github.com/aeternity/aepp-sdk-js/compare/7.1.1...7.2.0) (2020-03-24)
+
 
 ### Docs
 
@@ -26,8 +28,8 @@ This stamp give more flexibility on transaction serialization/deserialization pr
 * **AEX-2:**  Add permission layer for account management ([#937](https://github.com/aeternity/aepp-sdk-js/pull/937))
 
 
-## [7.1.1](https://github.com/aeternity/aepp-sdk-js/compare/7.1.0...7.1.1) (2020-02-27)
 
+## [7.1.1](https://github.com/aeternity/aepp-sdk-js/compare/7.1.0...7.1.1) (2020-02-27)
 
 
 ### Bug Fixes
