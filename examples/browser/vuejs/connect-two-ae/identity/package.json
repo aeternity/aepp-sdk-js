@@ -13,7 +13,7 @@
   "author": "Enrico Icardi <enrico.icardi@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "@aeternity/aepp-sdk": "7.1.0",
+    "@aeternity/aepp-sdk": "7.2.0",
     "purgecss-webpack-plugin": "^1.2.0",
     "vue": "^2.5.16",
     "vue-router": "^3.0.1",
