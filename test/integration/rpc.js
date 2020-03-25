@@ -28,7 +28,6 @@ import {
   getBrowserAPI,
   getHandler,
   getWindow, isInIframe,
-  message,
   receive
 } from '../../es/utils/aepp-wallet-communication/helpers'
 import { METHODS, RPC_STATUS } from '../../es/utils/aepp-wallet-communication/schema'
@@ -56,6 +55,7 @@ describe('Aepp<->Wallet', function () {
   })
 
   describe('New RPC Wallet-AEPP', () => {
+    const keypair = generateKeyPair()
     let aepp
     let wallet
     before(async () => {
@@ -133,7 +133,7 @@ describe('Aepp<->Wallet', function () {
       try {
         await aepp.address()
       } catch (e) {
-        e.message.should.be.equal('You do not subscribed for account.')
+        e.message.should.be.equal('You do not subscribed for accounts.')
       }
     })
     it('Try to ask for address', async () => {
@@ -144,6 +144,7 @@ describe('Aepp<->Wallet', function () {
       }
     })
     it('Try to sign and send transaction to wallet without subscription', async () => {
+      wallet.getAccounts().should.be.an('object')
       const errors = [
         await aepp.signTransaction('tx_asdasd').catch(e => e.message === 'You do not subscribed for account.'),
         await aepp.send('tx_asdasd').catch(e => e.message === 'You do not subscribed for account.')
@@ -161,9 +162,23 @@ describe('Aepp<->Wallet', function () {
         e.message.should.be.equal('Operation rejected by user')
       }
     })
-    it('Subscribe to address: wallet accept', async () => {
+    it('Subscribe to address: invalid accounts', async () => {
       wallet.onSubscription = (aepp, actions) => {
-        actions.accept()
+        actions.accept({ accounts: {} })
+      }
+      try {
+        await aepp.subscribeAddress('subscribe', 'connected')
+      } catch (e) {
+        e.message.should.be.equal('Invalid provided accounts object')
+      }
+    })
+    it('Subscribe to address: wallet accept', async () => {
+      const accounts = {
+        connected: { [keypair.publicKey]: {} },
+        current: wallet.addresses().reduce((acc, v) => ({ ...acc, [v]: {} }), {})
+      }
+      wallet.onSubscription = (aepp, actions) => {
+        actions.accept({ accounts })
       }
       await aepp.subscribeAddress('subscribe', 'connected')
       await aepp.subscribeAddress('unsubscribe', 'connected')
@@ -174,14 +189,14 @@ describe('Aepp<->Wallet', function () {
       subscriptionResponse.address.current.should.be.an('object')
       Object.keys(subscriptionResponse.address.current)[0].should.be.equal('ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi')
       subscriptionResponse.address.connected.should.be.an('object')
-      Object.keys(subscriptionResponse.address.connected).length.should.be.equal(0)
+      Object.keys(subscriptionResponse.address.connected).length.should.be.equal(1)
     })
     it('Try to use `onAccount` for not existent account', async () => {
+      const { publicKey } = generateKeyPair()
       try {
-        const { publicKey } = generateKeyPair()
         await aepp.spend(100, publicKey, { onAccount: publicKey })
       } catch (e) {
-        e.message.indexOf('You do not subscribed for connected account\'s').should.not.be.equal(-1)
+        e.message.indexOf(`You are not have access to account ${publicKey}`).should.not.be.equal(-1)
       }
     })
     it('Get address: subscribed for accounts', async () => {
@@ -203,7 +218,7 @@ describe('Aepp<->Wallet', function () {
         actions.accept()
       }
       const addressees = await aepp.askAddresses()
-      addressees.length.should.be.equal(1)
+      addressees.length.should.be.equal(2)
       addressees[0].should.be.equal('ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi')
     })
     it('Not authorize', async () => {
@@ -236,6 +251,22 @@ describe('Aepp<->Wallet', function () {
         e.message.should.be.equal('Operation rejected by user')
       }
     })
+    it('Sign transaction: invalid account object in action', async () => {
+      wallet.onSign = (aepp, action) => {
+        action.accept(null, { onAccount: {} })
+      }
+      try {
+        const tx = await aepp.spendTx({
+          senderId: keypair.publicKey,
+          recipientId: keypair.publicKey,
+          amount: 0,
+          payload: 'zerospend'
+        })
+        await aepp.signTransaction(tx, { onAccount: keypair.publicKey })
+      } catch (e) {
+        e.message.should.be.equal('Provided onAccount should be a MemoryAccount')
+      }
+    })
     it('Sign transaction: wallet allow', async () => {
       wallet.onSign = (aepp, action) => {
         action.accept()
@@ -253,6 +284,21 @@ describe('Aepp<->Wallet', function () {
       const txWithNetwork = Buffer.concat([Buffer.from(networkId), decode(tx)])
       const valid = verify(txWithNetwork, signature, decode(address))
       valid.should.be.equal(true)
+    })
+    it('Try to sing using unpermited account', async () => {
+      const { publicKey: pub } = generateKeyPair()
+      try {
+        await aepp.rpcClient.request(
+          METHODS.aepp.sign, {
+            tx: 'tx_+NkLAfhCuECIIeWttRUiZ32uriBdmM1t+dCg90KuG2ABxOiuXqzpAul6uTWvsyfx3EFJDah6trudrityh+6XSX3mkPEimhgGuJH4jzIBoQELtO15J/l7UeG8teE0DRIzWyorEsi8UiHWPEvLOdQeYYgbwW1nTsgAAKEB6bv2BOYRtUYKOzmZ6Xcbb2BBfXPOfFUZ4S9+EnoSJcqIG8FtZ07IAACIAWNFeF2KAAAKAIYSMJzlQADAoDBrIcoop8JfZ4HOD9p3nDTiNthj7jjl+ArdHwEMUrvQgitwOr/v3Q==',
+            onAccount: pub,
+            returnSigned: true
+          }
+        )
+      } catch (e) {
+        e.code.should.be.equal(11)
+        e.message.should.be.equal(`You are not subscribed for account ${pub}`)
+      }
     })
     it('Sign and broadcast transaction by wallet', async () => {
       const address = await aepp.address()
@@ -287,6 +333,17 @@ describe('Aepp<->Wallet', function () {
       decode(res.tx.payload).toString().should.be.equal('zerospend2')
       res.blockHeight.should.be.a('number')
     })
+    it('Sign message: rejected', async () => {
+      wallet.onMessageSign = (aepp, action) => {
+        action.deny()
+      }
+      try {
+        await aepp.signMessage('test')
+      } catch (e) {
+        e.code.should.be.equal(4)
+        e.message.should.be.equal('Operation rejected by user')
+      }
+    })
     it('Sign message', async () => {
       wallet.onMessageSign = (aepp, action) => {
         action.accept()
@@ -294,6 +351,28 @@ describe('Aepp<->Wallet', function () {
       const messageSig = await aepp.signMessage('test')
       messageSig.should.be.a('string')
       const isValid = await aepp.verifyMessage('test', messageSig)
+      isValid.should.be.equal(true)
+    })
+    it('Sign message using account not from sdk instance: do not provide account', async () => {
+      wallet.onMessageSign = (aepp, action) => {
+        action.accept({})
+      }
+      const onAccount = aepp.addresses()[1]
+      try {
+        await aepp.signMessage('test', { onAccount })
+      } catch (e) {
+        e.code.should.be.equal(12)
+        e.message.should.be.equal('Provided onAccount should be a MemoryAccount')
+      }
+    })
+    it('Sign message using account not from sdk instance', async () => {
+      wallet.onMessageSign = (aepp, action) => {
+        if (action.params.onAccount === keypair.publicKey) action.accept({ onAccount: MemoryAccount({ keypair }) })
+      }
+      const onAccount = keypair.publicKey
+      const messageSig = await aepp.signMessage('test', { onAccount })
+      messageSig.should.be.a('string')
+      const isValid = await aepp.verifyMessage('test', messageSig, { onAccount })
       isValid.should.be.equal(true)
     })
     it('Sign and broadcast invalid transaction', async () => {
@@ -318,9 +397,11 @@ describe('Aepp<->Wallet', function () {
     })
     it('Add new account to wallet: receive notification for update accounts', async () => {
       const keypair = generateKeyPair()
+      const connectedLength = Object.keys(aepp.rpcClient.accounts.connected).length
       const received = await new Promise((resolve, reject) => {
-        aepp.onAddressChange = ({ connected }) => {
-          resolve(Object.keys(connected).length === 1)
+        aepp.onAddressChange = (accounts) => {
+          console.log(accounts)
+          resolve(Object.keys(accounts.connected).length === connectedLength + 1)
         }
         wallet.addAccount(MemoryAccount({ keypair }))
       })
@@ -347,26 +428,31 @@ describe('Aepp<->Wallet', function () {
       })
       received.should.be.equal(true)
     })
+    it('RPC client set invalid account', () => {
+      const current = aepp.rpcClient.getCurrentAccount()
+      current.should.be.equal(aepp.rpcClient.currentAccount)
+      aepp.rpcClient.origin.should.be.an('object')
+      try {
+        aepp.rpcClient.setAccounts(true)
+      } catch (e) {
+        e.message.should.be.equal('Invalid accounts object. Should be object like: `{ connected: {}, selected: {} }`')
+      }
+    })
     it('Resolve/Reject callback for undefined message', async () => {
       try {
-        aepp.rpcClient.resolveCallback(0)
-      } catch (e) {
-        e.message.should.be.equal('Can\'t find callback for this messageId 0')
-      }
-      try {
-        aepp.rpcClient.rejectCallback(0)
+        aepp.rpcClient.processResponse({ id: 0 })
       } catch (e) {
         e.message.should.be.equal('Can\'t find callback for this messageId 0')
       }
     })
     it('Try to connect unsupported protocol', async () => {
       try {
-        await aepp.rpcClient.addCallback(
-          aepp.rpcClient.sendMessage(message(METHODS.aepp.connect, {
+        await aepp.rpcClient.request(
+          METHODS.aepp.connect, {
             name: 'test-aepp',
             version: 2,
             networkId: aepp.getNetworkId()
-          }))
+          }
         )
       } catch (e) {
         e.code.should.be.equal(5)
@@ -375,12 +461,12 @@ describe('Aepp<->Wallet', function () {
     })
     it('Try to connect unsupported network', async () => {
       try {
-        await aepp.rpcClient.addCallback(
-          aepp.rpcClient.sendMessage(message(METHODS.aepp.connect, {
+        await aepp.rpcClient.request(
+          METHODS.aepp.connect, {
             name: 'test-aepp',
             version: 1,
             networkId: 'ae_test'
-          }))
+          }
         )
       } catch (e) {
         e.code.should.be.equal(8)
@@ -389,25 +475,19 @@ describe('Aepp<->Wallet', function () {
     })
     it('Try to connect unsupported network', async () => {
       try {
-        await aepp.rpcClient.addCallback(
-          aepp.rpcClient.sendMessage(message(METHODS.aepp.connect, {
+        await aepp.rpcClient.request(
+          METHODS.aepp.connect, {
             name: 'test-aepp',
             version: 1,
             networkId: 'ae_test'
-          }))
+          }
         )
       } catch (e) {
         e.code.should.be.equal(8)
         e.message.should.be.equal('Unsupported Network')
       }
     })
-    it('Try add already existed callback/action', async () => {
-      try {
-        aepp.rpcClient.callbacks = { 1: {} }
-        await aepp.rpcClient.addCallback(1)
-      } catch (e) {
-        e.message.should.be.equal('Callback Already exist')
-      }
+    it('Try add already existed action', async () => {
       try {
         aepp.rpcClient.addAction({ id: 1 }, [])
       } catch (e) {

@@ -1,6 +1,6 @@
 {
   "name": "@aeternity/aepp-sdk",
-  "version": "7.1.1",
+  "version": "7.2.0",
   "description": "SDK for the æternity blockchain",
   "main": "dist/aepp-sdk.js",
   "browser": "dist/aepp-sdk.browser.js",
@@ -19,6 +19,7 @@
     "test:watch": "mocha --recursive --require @babel/register --watch",
     "prepare": "npm run build",
     "genChangelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
+    "preinstall": "npx npm-force-resolutions",
     "prepublishOnly": "npm run docs:docco && npm run docs:api"
   },
   "license": "ISC",
@@ -55,23 +56,23 @@
     "url": "https://github.com/aeternity/aepp-sdk-js"
   },
   "devDependencies": {
-    "@babel/cli": "7.8.3",
-    "@babel/runtime": "^7.8.3",
-    "@babel/core": "7.8.0",
-    "@babel/node": "7.8.3",
+    "@babel/cli": "7.8.4",
+    "@babel/core": "7.9.0",
+    "@babel/node": "7.8.7",
     "@babel/plugin-proposal-export-default-from": "7.8.3",
-    "@babel/plugin-proposal-object-rest-spread": "7.8.3",
-    "@babel/plugin-transform-runtime": "7.8.3",
-    "@babel/preset-env": "7.8.2",
-    "@babel/register": "7.8.3",
+    "@babel/plugin-proposal-object-rest-spread": "7.9.0",
+    "@babel/plugin-transform-runtime": "7.9.0",
+    "@babel/preset-env": "7.9.0",
+    "@babel/register": "7.9.0",
+    "@babel/runtime": "^7.9.2",
     "babel-core": "6",
     "babel-loader": "^8.0.0-beta.2",
     "babel-plugin-ramda": "^2.0.0",
     "bufferutil": "^4.0.1",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
-    "commander": "^4.0.0",
     "codecov": "^3.6.1",
+    "commander": "^5.0.0",
     "cz-conventional-changelog": "^3.0.0",
     "docco": "^0.8.0",
     "esdoc": "^1.1.0",
@@ -87,7 +88,9 @@
     "eslint-plugin-standard": "^4.0.0",
     "find-cache-dir": "^3.0.0",
     "jsdoc-to-markdown": "^5.0.0",
+    "minimist": "^1.2.5",
     "mocha": "^7.0.1",
+    "npm-force-resolutions": "0.0.3",
     "nyc": "^15.0.0",
     "recursive-rename": "^3.0.0",
     "safe-buffer": "^5.1.2",
@@ -98,9 +101,12 @@
     "supports-color": "^7.0.0",
     "uglify-es": "^3.3.9",
     "webpack": "^4.36.1",
-    "webpack-bundle-analyzer": "^3.3.2",
+    "webpack-bundle-analyzer": "^3.6.1",
     "webpack-cli": "3.3.8",
     "worker-farm": "^1.6.0"
+  },
+  "resolutions": {
+    "minimist": "^1.2.5"
   },
   "config": {
     "commitizen": {

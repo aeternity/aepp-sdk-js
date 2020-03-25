@@ -322,7 +322,7 @@ export function decryptKey (password, encrypted) {
  * @rtype (data: String|Buffer, privateKey: Buffer) => Buffer
  * @param {String|Buffer} data - Data to sign
  * @param {String|Buffer} privateKey - Key to sign with
- * @return {Buffer} Signature
+ * @return {Buffer|Uint8Array} Signature
  */
 export function sign (data, privateKey) {
   return nacl.sign.detached(Buffer.from(data), Buffer.from(privateKey))

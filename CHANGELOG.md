@@ -1,4 +1,25 @@
+# [7.2.0](https://github.com/aeternity/aepp-sdk-js/compare/6.0.1...7.2.0) (2020-03-24)
+
+### Docs
+
+* **Guide:** Adjust guide for RPC Wallet/Aepp usage
+
+### Code Refactoring
+
+* **RPC:** Refactor rpc-related stuff ([#921](https://github.com/aeternity/aepp-sdk-js/pull/921))
+* **Build:** Include amountFormatter and SCHEMA in bundle([#936](https://github.com/aeternity/aepp-sdk-js/pull/936))
+* **Examples** Update examples apps
+ 
+### Features
+
+* **TX:** Introduce new stamp `TxObject`([#933](https://github.com/aeternity/aepp-sdk-js/pull/933))
+This stamp give more flexibility on transaction serialization/deserialization process
+* **Keystore:** Allow to store secret as hex or buffer ([#939](https://github.com/aeternity/aepp-sdk-js/pull/939))
+* **AEX-2:**  Add permission layer for account management ([#937](https://github.com/aeternity/aepp-sdk-js/pull/937))
+
+
 ## [7.1.1](https://github.com/aeternity/aepp-sdk-js/compare/6.0.1...7.1.1) (2020-02-27)
+
 
 
 ### Bug Fixes

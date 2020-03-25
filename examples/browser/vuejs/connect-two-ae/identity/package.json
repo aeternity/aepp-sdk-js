@@ -13,7 +13,7 @@
   "author": "Enrico Icardi <enrico.icardi@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "@aeternity/aepp-sdk": "7.0.0",
+    "@aeternity/aepp-sdk": "7.1.0",
     "purgecss-webpack-plugin": "^1.2.0",
     "vue": "^2.5.16",
     "vue-router": "^3.0.1",
@@ -21,15 +21,15 @@
     "vuex": "^3.0.1"
   },
   "devDependencies": {
-    "@babel/cli": "7.8.3",
-    "@babel/core": "7.8.0",
-    "@babel/node": "7.8.3",
+    "@babel/cli": "7.8.4",
+    "@babel/core": "7.9.0",
+    "@babel/node": "7.8.7",
     "@babel/plugin-proposal-export-default-from": "7.8.3",
-    "@babel/plugin-proposal-object-rest-spread": "7.8.3",
-    "@babel/plugin-transform-runtime": "7.8.3",
-    "@babel/preset-env": "7.8.2",
-    "@babel/register": "7.8.3",
-    "@babel/runtime": "7.8.3",
+    "@babel/plugin-proposal-object-rest-spread": "7.9.0",
+    "@babel/plugin-transform-runtime": "7.9.0",
+    "@babel/preset-env": "7.9.0",
+    "@babel/register": "7.9.0",
+    "@babel/runtime": "7.9.2",
     "autoprefixer": "^9.0.2",
     "babel-core": "^7.0.0-beta.3",
     "babel-loader": "^8.0.0-beta.3",
@@ -38,7 +38,7 @@
     "css-loader": "^3.2.0",
     "cssnano": "^4.0.5",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
-    "glob-all": "^3.1.0",
+    "glob-all": "^3.2.1",
     "html-webpack-harddisk-plugin": "^1.0.1",
     "html-webpack-plugin": "^3.2.0",
     "postcss-import": "^11.1.0",
@@ -48,12 +48,12 @@
     "standard-loader": "^7.0.0",
     "style-loader": "^1.0.0",
     "tailwindcss": "^0.5.3",
-    "vue-loader": "15.9.0",
+    "vue-loader": "15.9.1",
     "vue-style-loader": "^4.1.0",
     "webpack": "^4.36.1",
-    "webpack-bundle-analyzer": "^3.3.2",
+    "webpack-bundle-analyzer": "^3.6.1",
     "webpack-cli": "3.3.8",
     "webpack-dev-server": "^3.1.4",
-    "webpack-serve": "^0.2.0"
+    "webpack-serve": "^3.2.0"
   }
 }

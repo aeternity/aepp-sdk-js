@@ -101,6 +101,9 @@
         if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to ${getActionName(params)}`)) accept()
         else deny()
       }
+      const keypair = generateKeyPair()
+      const keypair2 = generateKeyPair()
+      const sdkAcc = this.publicKey
       this.client = await RpcWallet({
         nodes: [{ name: 'test-net', instance: node }],
         compilerUrl: this.compilerUrl,
@@ -108,8 +111,25 @@
         address: this.publicKey,
         name: 'Wallet',
         onConnection: genConfirmCallback(() => 'connect'),
-        onSubscription: genConfirmCallback(() => 'subscribe address'),
-        onSign: genConfirmCallback(({ returnSigned, tx }) => `${returnSigned ? 'sign' : 'sign and broadcast'} ${JSON.stringify(tx)}`),
+        onSubscription (aepp, { accept, deny }, origin) {
+          // Manually return accounts
+          // you can check AEPP accounts using
+          // `aepp.accounts`
+          accept({
+            accounts: {
+              current: { [keypair.publicKey]: {}},
+              connected: { [keypair2.publicKey]: {}, [sdkAcc]: {}, [account2.publicKey]: {} }
+            }
+          })
+        },
+        onSign (aepp, { accept, deny, params }, origin) {
+          // Get account outside of SDK if needed
+          const onAccount = {
+            [keypair.publicKey]: MemoryAccount({ keypair }),
+            [keypair2.publicKey]: MemoryAccount({ keypair: keypair2 }),
+          }[params.onAccount]
+          accept(null, { onAccount }) // provide this account for signing
+        },
         onMessageSign: genConfirmCallback(() => 'sign message'),
         onAskAccounts: genConfirmCallback(() => 'get accounts'),
         onDisconnect (message, client) {

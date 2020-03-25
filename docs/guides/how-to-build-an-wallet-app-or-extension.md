@@ -111,17 +111,38 @@ RpcWallet({
   // Call-back for account subscription request
   onSubscription (aepp, action) {
     if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} want to subscribe for accounts`)) {
+      // You are able to overwrite access to accounts for specific AEPP
+      // Manually prepare and pass as first argument of `accept` function, object with accounts
+      // Object should contain current and connected accounts
+      // Accounts can be stored outside of sdk(also combined some of accounts store in SDK some of account outside)
+      // action.accept({
+      //   accounts: {
+      //     current: { 'ak_bla23dfas...': {...meta-data} }, // Current account
+      //     connected: {  // Connected accounts
+      //       'ak_1asdasd...': {},
+      //       'ak_1asdasdf23...': {}
+      //     }         
+      //   }     
+      // })
       action.accept()
     } else {
       action.deny()
     }
   },
   // Call-back for sign request
-  onSign (aepp, action) {
+  onSign (aepp, { params, accept, deny, txObject, onAccount }) {
     if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} want to sign tx ${action.params.tx}`)) {
-      action.accept()
+      // Here we can provide account for signing if it's not stored inside the SDK instance
+      // To do that you need to create MemoryAccount instance and provide it as second argument of accept function
+      // if (isInStorage(params.onAccount)) {
+        // First argument is encode transaction which will be using instead of one from AEPP (if provided) 
+        // Then this signing request will be signed using the provide MemoryAccount
+        // If you do not provide account manually SDK will try to find it inside the instance, else throw error
+        // action(null, { onAccount: MemoryAccount({ keypair }) })
+      // }   
+      accept()
     } else {
-      action.deny()
+      deny()
     }
   },
   // Call-back get accounts request
@@ -174,12 +195,33 @@ RpcWallet({
         // call-back for subscription request
         async onSubscription (aepp, { accept, deny }) {
           if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to subscribe address`)) {
+            // You are able to overwrite access to accounts for specific AEPP
+            // Manually prepare and pass as first argument of `accept` function, object with accounts
+            // Object should contain current and connected accounts
+            // Accounts can be stored outside of sdk(also combined some of accounts store in SDK some of account outside)
+            // action.accept({
+            //   accounts: {
+            //     current: { 'ak_bla23dfas...': {...meta-data} }, // Current account
+            //     connected: {  // Connected accounts
+            //       'ak_1asdasd...': {},
+            //       'ak_1asdasdf23...': {}
+            //     }         
+            //   }     
+            // })
             accept()
           } else { deny() }
         },
         // call-back for sign request
         async onSign (aepp, { accept, deny, params }) {
           if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to ${params.returnSigned ? 'sign' : 'sign and broadcast'} ${JSON.stringify(params.tx)}`)) {
+            // Here we can provide account for signing if it's not stored inside the SDK instance
+            // To do that you need to create MemoryAccount instance and provide it as second argument of accept function
+            // if (isInStorage(params.onAccount)) {
+              // First argument is encode transaction which will be using instead of one from AEPP (if provided) 
+              // Then this signing request will be signed using the provide MemoryAccount
+              // If you do not provide account manually SDK will try to find it inside the instance, else throw error
+              // action(null, { onAccount: MemoryAccount({ keypair }) })
+            // }   
             accept()
           } else {
             deny()

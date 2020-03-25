@@ -41,7 +41,7 @@ import { getNetworkId } from '../node'
  * @return {String} Signed transaction
  */
 async function signTransaction (tx, opt = {}) {
-  const networkId = this.getNetworkId()
+  const networkId = this.getNetworkId(opt)
   const rlpBinaryTx = decodeBase64Check(assertedType(tx, 'tx'))
   // Prepend `NETWORK_ID` to begin of data binary
   const txWithNetworkId = Buffer.concat([Buffer.from(networkId), rlpBinaryTx])
@@ -49,6 +49,15 @@ async function signTransaction (tx, opt = {}) {
   const signatures = [await this.sign(txWithNetworkId, opt)]
   return buildTx({ encodedTx: rlpBinaryTx, signatures }, TX_TYPE.signed).tx
 }
+
+/**
+ * Get network Id
+ * @instance
+ * @function getNetworkId
+ * @category async
+ * @rtype () => networkId: String
+ * @return {String} Network Id
+ */
 
 /**
  * Sign message

@@ -118,8 +118,8 @@ Register oracle
 | [options.queryFee] | `String` \| `Number` |  | queryFee Oracle query Fee |
 | [options.oracleTtl] | `Object` |  | oracleTtl OracleTtl object {type: 'delta|block', value: 'number'} |
 | [options.abiVersion] | `Number` |  | abiVersion Always 0 (do not use virtual machine) |
-| [options.fee] | `Number` |  | fee Transaction fee |
-| [options.ttl] | `Number` |  | Transaction time to leave |
+| [options.fee] | `Number` \| `String` |  | fee Transaction fee |
+| [options.ttl] | `Number` \| `String` |  | Transaction time to leave |
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/oracle--postQueryToOracle"></a>
 

@@ -116,13 +116,15 @@ export const BrowserWindowMessageConnection = stampit({
     if (!Object.keys(MESSAGE_DIRECTION).includes(receiveDirection)) throw new Error(`receiveDirection must be one of [${Object.keys(MESSAGE_DIRECTION)}]`)
     this.connectionInfo = { ...{ id: uuid() }, ...connectionInfo }
 
+    const selfP = self
+    const targetP = target
     this.origin = origin
     this.debug = debug
     this.sendDirection = sendDirection
     this.receiveDirection = receiveDirection
-    this.subscribeFn = (listener) => self.addEventListener('message', listener, false)
-    this.unsubscribeFn = (listener) => self.removeEventListener('message', listener, false)
-    this.postFn = (msg) => target.postMessage(msg, this.origin || '*')
+    this.subscribeFn = (listener) => selfP.addEventListener('message', listener, false)
+    this.unsubscribeFn = (listener) => selfP.removeEventListener('message', listener, false)
+    this.postFn = (msg) => targetP.postMessage(msg, this.origin || '*')
     if (!this.connectionInfo.id) throw new Error('ID required.')
   },
   methods: { connect, sendMessage, disconnect, isConnected }

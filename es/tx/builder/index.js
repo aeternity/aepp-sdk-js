@@ -269,10 +269,7 @@ function buildFee (txType, { params, gas = 0, multiplier, vsn }) {
 export function calculateFee (fee = 0, txType, { gas = 0, params, showWarning = true, vsn } = {}) {
   if (!params && showWarning) console.warn(`Can't build transaction fee, we will use DEFAULT_FEE(${DEFAULT_FEE})`)
 
-  const minFee = calculateMinFee(txType, { params, gas, vsn })
-  if (fee && BigNumber(minFee).gt(BigNumber(fee)) && showWarning) console.warn(`Transaction fee is lower then min fee! Min fee: ${minFee}`)
-
-  return fee || minFee
+  return fee || calculateMinFee(txType, { params, gas, vsn })
 }
 
 /**
@@ -340,6 +337,27 @@ export function unpackRawTx (binary, schema) {
 }
 
 /**
+ * Get transaction serialization/deserialization schema
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder
+ * @param {{ vsn: String, objId: Number, type: String }}
+ * @throws {Error} Schema not found error
+ * @return {Object} Schema
+ */
+const getSchema = ({ vsn, objId, type }) => {
+  const isDeserialize = !!objId
+  const firstKey = isDeserialize ? objId : type
+  const schema = isDeserialize ? TX_DESERIALIZATION_SCHEMA : TX_SERIALIZATION_SCHEMA
+
+  if (!schema[firstKey]) {
+    throw new Error(`Transaction ${isDeserialize ? 'deserialization' : 'serialization'} not implemented for ${isDeserialize ? 'tag ' + objId : type}`)
+  }
+  if (!schema[firstKey][vsn]) {
+    throw new Error(`Transaction ${isDeserialize ? 'deserialization' : 'serialization'} not implemented for ${isDeserialize ? 'tag ' + objId : type} version ${vsn}`)
+  }
+  return schema[firstKey][vsn]
+}
+
+/**
  * Build transaction hash
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
@@ -352,13 +370,7 @@ export function unpackRawTx (binary, schema) {
  * @return {Object} { tx, rlpEncoded, binary } Object with tx -> Base64Check transaction hash with 'tx_' prefix, rlp encoded transaction and binary transaction
  */
 export function buildTx (params, type, { excludeKeys = [], prefix = 'tx', vsn = VSN, denomination = AE_AMOUNT_FORMATS.AETTOS } = {}) {
-  if (!TX_SERIALIZATION_SCHEMA[type]) {
-    throw new Error('Transaction serialization not implemented for ' + type)
-  }
-  if (!TX_SERIALIZATION_SCHEMA[type][vsn]) {
-    throw new Error('Transaction serialization not implemented for ' + type + ' version ' + vsn)
-  }
-  const [schema, tag] = TX_SERIALIZATION_SCHEMA[type][vsn]
+  const [schema, tag] = getSchema({ type, vsn })
   const binary = buildRawTx({ ...params, VSN: vsn, tag }, schema, { excludeKeys, denomination: params.denomination || denomination }).filter(e => e !== undefined)
 
   const rlpEncoded = rlp.encode(binary)
@@ -381,14 +393,8 @@ export function unpackTx (encodedTx, fromRlpBinary = false, prefix = 'tx') {
   const binary = rlp.decode(rlpEncoded)
 
   const objId = readInt(binary[0])
-  if (!TX_DESERIALIZATION_SCHEMA[objId]) {
-    throw new Error('Transaction deserialization not implemented for tag ' + objId)
-  }
   const vsn = readInt(binary[1])
-  if (!TX_DESERIALIZATION_SCHEMA[objId][vsn]) {
-    throw new Error('Transaction deserialization not implemented for tag ' + objId + ' version ' + vsn)
-  }
-  const [schema] = TX_DESERIALIZATION_SCHEMA[objId][vsn]
+  const [schema] = getSchema({ objId, vsn })
 
   return { txType: OBJECT_ID_TX_TYPE[objId], tx: unpackRawTx(binary, schema), rlpEncoded, binary }
 }

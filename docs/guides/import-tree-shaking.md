@@ -41,15 +41,26 @@ Using this method also enables the use of [Tree shaking] (dead code
 elimination). In order to ensure that modules are loaded directly, use the following syntax to load your desired part (aka [_flavor_](../README.md)) of aepp-sdk:
 
 ```js
-// import only Wallet flavor
-import Aepp from '@aeternity/aepp-sdk/es/ae/wallet'
+// import Universal stamp
+import Universal from '@aeternity/aepp-sdk/es/ae/universal'
+// import Node
+import Node from '@aeternity/aepp-sdk/es/node'
+// import Account
+import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
 
 // interact with aeternity's blockchain
-Wallet().then(client => {
+(async () => {
+  const node = await Node({ url: 'https://sdk-testnet.aepps.com' })
+  const account = MemoryAccount({ keypair: 'YOUR_KEYPAIR' })
+  // Init client
+  const client = await Universal({
+     nodes: [{ name: 'test-net', instance: node }],
+     accounts: [ account ]
+  })
   client.height().then(height => {
     console.log('Current Block', height)
   })
-})
+})()
 ```
 
 [webpack]: https://webpack.js.org/
