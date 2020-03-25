@@ -19,7 +19,9 @@ import RpcClients from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/r
             * [.getClient(id)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+getClient) ⇒ `Object`
             * [.removeClient(id, forceConnectionClose)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+removeClient) ⇒ `Boolean`
             * [.updateClientInfo(id, info)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+updateClientInfo) ⇒ `void`
-            * [.sentNotificationByCondition(msg, condition)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+sentNotificationByCondition) ⇒ `void`
+            * [.sendNotificationByCondition(msg, condition, transformMessage)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+sendNotificationByCondition) ⇒ `void`
+            * [.operationByCondition(condition, operation)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+operationByCondition) ⇒ `void`
+            * [.hasAccessToAccount(address)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+hasAccessToAccount) ⇒ `Boolean`
             * [.isConnected()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+isConnected) ⇒ `Boolean`
             * [.getCurrentAccount(options)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+getCurrentAccount) ⇒ `String`
             * [.disconnect()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+disconnect) ⇒ `void`
@@ -98,9 +100,9 @@ Update client info by id
 | id | `String` \| `Number` | Client ID |
 | info | `Object` | Info to update (will be merged with current info object) |
 
-<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+sentNotificationByCondition"></a>
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+sendNotificationByCondition"></a>
 
-#### exports.RpcClient.sentNotificationByCondition(msg, condition) ⇒ `void`
+#### exports.RpcClient.sendNotificationByCondition(msg, condition, transformMessage) ⇒ `void`
 Send notification to all client passing condition
 
 **Kind**: instance method of [`exports.RpcClient`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient)  
@@ -110,6 +112,33 @@ Send notification to all client passing condition
 | --- | --- | --- |
 | msg | `Object` | Msg object |
 | condition | `function` | Condition function of (client: RpcClient) => Boolean |
+| transformMessage |  |  |
+
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+operationByCondition"></a>
+
+#### exports.RpcClient.operationByCondition(condition, operation) ⇒ `void`
+Call provided function for each rpc client which by condition
+
+**Kind**: instance method of [`exports.RpcClient`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient)  
+**rtype**: `(condition: Function, operation: Function) => void`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| condition | `function` | Condition function of (client: RpcClient) => Boolean |
+| operation | `function` | Operation function of (client: RpcClient) => void |
+
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+hasAccessToAccount"></a>
+
+#### exports.RpcClient.hasAccessToAccount(address) ⇒ `Boolean`
+Check if aepp has access to account
+
+**Kind**: instance method of [`exports.RpcClient`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient)  
+**Returns**: `Boolean` - is connected  
+**rtype**: `(address: String) => Boolean`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| address | `String` | Account address |
 
 <a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+isConnected"></a>
 
@@ -141,7 +170,7 @@ Disconnect
 <a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+updateSubscription"></a>
 
 #### exports.RpcClient.updateSubscription(type, value) ⇒ `Array.&lt;String&gt;`
-Update subsription
+Update subscription
 
 **Kind**: instance method of [`exports.RpcClient`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient)  
 **rtype**: `(type: String, value: String) => void`
