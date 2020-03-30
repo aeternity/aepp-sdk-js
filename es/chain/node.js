@@ -139,13 +139,13 @@ async function topBlock () {
   return top[R.head(R.keys(top))]
 }
 
-async function poll (th, { blocks = 10, interval = 5000 } = {}) {
+async function poll (th, { blocks = 10, interval = 5000, allowUnsynced = false } = {}) {
   const instance = this
   const max = await this.height() + blocks
 
   async function probe () {
     const tx = await instance.tx(th).catch(_ => null)
-    if (tx && tx.blockHeight !== -1) {
+    if (tx && (tx.blockHeight !== -1 || (allowUnsynced && tx.height))) {
       return tx
     }
     if (await instance.height() < max) {
