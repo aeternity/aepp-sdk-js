@@ -264,7 +264,8 @@ export function readPointers (pointers) {
  */
 export function isNameValid (name, throwError = true) {
   if ((!name || typeof name !== 'string') && throwError) throw new Error('AENS: Name must be a string')
-  if (!AENS_NAME_DOMAINS.includes(R.last(name.split('.')))) {
+  const [, domain] = name.split('.')
+  if (!AENS_NAME_DOMAINS.includes(domain)) {
     if (throwError) throw new Error(`AENS: Invalid name domain. Possible domains [${AENS_NAME_DOMAINS}]`)
     return false
   }
