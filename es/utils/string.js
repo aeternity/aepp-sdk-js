@@ -1,4 +1,4 @@
-  /*
+/*
  * ISC License (ISC)
  * Copyright 2018 aeternity developers
  *
