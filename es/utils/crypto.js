@@ -29,7 +29,7 @@ import nacl from 'tweetnacl'
 import aesjs from 'aes-js'
 import shajs from 'sha.js'
 
-import { leftPad, rightPad, toBytes } from './bytes'
+import { leftPad, rightPad, str2buf, toBytes } from './bytes'
 import { decode as decodeNode } from '../tx/builder/helpers'
 
 const Ecb = aesjs.ModeOfOperation.ecb
@@ -54,6 +54,18 @@ export function formatAddress (format = ADDRESS_FORMAT.api, address) {
     case ADDRESS_FORMAT.sophia:
       return `0x${decodeNode(address, 'ak').toString('hex')}`
   }
+}
+
+/**
+ * Generate address from secret key
+ * @rtype (secret: String) => tx: Promise[String]
+ * @param {String} secret - Private key
+ * @return {String} Public key
+ */
+export function getAddressFromPriv (secret) {
+  const keys = nacl.sign.keyPair.fromSecretKey(str2buf(secret))
+  const publicBuffer = Buffer.from(keys.publicKey)
+  return `ak_${encodeBase58Check(publicBuffer)}`
 }
 
 /**
