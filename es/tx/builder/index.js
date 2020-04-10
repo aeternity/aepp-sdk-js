@@ -297,7 +297,8 @@ export function validateParams (params, schema, { excludeKeys = [] }) {
  * @param {Object} params Object with tx params
  * @param {Array} schema Transaction schema
  * @param {Object} [options={}] options
- * @param {Array} [options.excludeKeys] excludeKeys Array of keys to exclude for validation and build
+ * @param {Array} [options.excludeKeys=[]] excludeKeys Array of keys to exclude for validation and build
+ * @param {String} [options.denomination='aettos'] denomination Denomination of amounts (default: aettos)
  * @throws {Error} Validation error
  * @return {Array} Array with binary fields of transaction
  */
