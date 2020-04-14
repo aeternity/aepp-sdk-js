@@ -15,6 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 import { BigNumber } from 'bignumber.js'
+import { isBase64, isHex } from './string'
 
 /**
  * Bytes module
@@ -81,4 +82,19 @@ export function toBytes (val, big = false) {
     return val.toString('utf-8')
   }
   throw new Error('Byte serialization not supported')
+}
+
+/**
+ * Convert a string to a Buffer.  If encoding is not specified, hex-encoding
+ * will be used if the input is valid hex.  If the input is valid base64 but
+ * not valid hex, base64 will be used.  Otherwise, utf8 will be used.
+ * @param {string} str String to be converted.
+ * @param {string=} enc Encoding of the input string (optional).
+ * @return {buffer} Buffer (bytearray) containing the input data.
+ */
+export function str2buf (str, enc) {
+  if (!str || str.constructor !== String) return str
+  if (!enc && isHex(str)) enc = 'hex'
+  if (!enc && isBase64(str)) enc = 'base64'
+  return Buffer.from(str, enc)
 }

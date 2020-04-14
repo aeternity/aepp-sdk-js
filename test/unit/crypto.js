@@ -21,6 +21,7 @@ import { assert, expect } from 'chai'
 import * as Crypto from '../../es/utils/crypto'
 
 import { buildTxHash, unpackTx } from '../../es/tx/builder'
+import { generateKeyPair, getAddressFromPriv } from '../../es/utils/crypto'
 
 // These keys are fixations for the encryption lifecycle tests and will
 // not be used for signing
@@ -45,6 +46,10 @@ describe('crypto', () => {
       assert.isTrue(keyPair.publicKey.startsWith('ak_'))
       assert.isAtLeast(keyPair.publicKey.length, 51)
       assert.isAtMost(keyPair.publicKey.length, 53)
+    })
+    it('Address from secret', () => {
+      const { secretKey, publicKey } = generateKeyPair()
+      getAddressFromPriv(secretKey).should.be.equal(publicKey)
     })
   })
 
