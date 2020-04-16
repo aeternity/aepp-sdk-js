@@ -589,6 +589,15 @@ export async function awaitingCallContractUpdateTx (channel, message, state) {
   return handleUnexpectedMessage(channel, message, state)
 }
 
+export async function awaitingCallContractForceProgressUpdate (channel, message, state) {
+  if (message.method === 'channels.sign.force_progress_tx') {
+    const signedTx = await state.sign(message.params.data.signed_tx)
+    send(channel, { jsonrpc: '2.0', method: 'channels.force_progress_sign', params: { signedTx: signedTx } })
+    return { handler: awaitingCallContractCompletion, state }
+  }
+  return handleUnexpectedMessage(channel, message, state)
+}
+
 export function awaitingCallContractCompletion (channel, message, state) {
   if (message.method === 'channels.update') {
     changeState(channel, message.params.data.state)
