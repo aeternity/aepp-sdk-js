@@ -20,7 +20,7 @@ import * as sinon from 'sinon'
 import { BigNumber } from 'bignumber.js'
 import { configure, ready, plan, BaseAe, networkId } from './'
 import { generateKeyPair, encodeBase64Check } from '../../es/utils/crypto'
-import { unpackTx, buildTx } from '../../es/tx/builder'
+import { unpackTx, buildTx, buildTxHash } from '../../es/tx/builder'
 import { decode } from '../../es/tx/builder/helpers'
 import Channel from '../../es/channel'
 import MemoryAccount from '../../es/account/memory'
@@ -110,7 +110,7 @@ describe('Channel', function () {
     responderSign.resetHistory()
   })
 
-  it('can open a channel', async () => {
+  it.only('can open a channel', async () => {
     initiatorCh = await Channel({
       ...sharedParams,
       role: 'initiator',
@@ -352,7 +352,7 @@ describe('Channel', function () {
     ])
     responderSign.firstCall.args[2].updates.should.eql([
       responderSign.firstCall.args[2].updates[0],
-      { data: meta, op: 'OffChainMeta'}
+      { data: meta, op: 'OffChainMeta' }
     ])
   })
 
@@ -831,7 +831,7 @@ describe('Channel', function () {
     ).should.be.equal(true)
   })
 
-  it('can create a contract and accept', async () => {
+  it.only('can create a contract and accept', async () => {
     initiatorCh.disconnect()
     responderCh.disconnect()
     initiatorCh = await Channel({
@@ -911,17 +911,37 @@ describe('Channel', function () {
     })
   })
 
-  it('can call a contract and accept', async () => {
-    const roundBefore = initiatorCh.round()
-    const result = await initiatorCh.callContract({
+  it.only('can call a contract and accept', async () => {
+    // const roundBefore = initiatorCh.round()
+    // const result = await initiatorCh.callContract({
+    //   amount: 0,
+    //   callData: await contractEncodeCall('main', ['42']),
+    //   contract: contractAddress,
+    //   abiVersion: 1
+    // }, async (tx) => initiator.signTransaction(tx))
+    // result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx })
+    // initiatorCh.round().should.equal(roundBefore + 1)
+    // callerNonce = initiatorCh.round()
+    console.log('-///////////////////////////////////////////////////////-')
+    const forceTx = await initiatorCh.forceProgress({
       amount: 0,
       callData: await contractEncodeCall('main', ['42']),
       contract: contractAddress,
       abiVersion: 1
     }, async (tx) => initiator.signTransaction(tx))
-    result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx })
-    initiatorCh.round().should.equal(roundBefore + 1)
-    callerNonce = initiatorCh.round()
+    console.log('after done')
+    const hash = buildTxHash(forceTx.tx)
+    const txInfo = await initiator.tx(hash)
+    console.log(txInfo)
+    console.log(txInfo.tx.round)
+    console.log(initiatorCh.round())
+    const cllres = await initiatorCh.getContractCall({
+      caller: await initiator.address(),
+      contract: contractAddress,
+      round: txInfo.tx.round
+    })
+    console.log(cllres)
+    console.log(await initiator.contractDecodeCallResultAPI(identityContract, 'main', 'ok', cllres.returnValue))
   })
 
   it('can call a contract and reject', async () => {

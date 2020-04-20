@@ -591,9 +591,26 @@ export async function awaitingCallContractUpdateTx (channel, message, state) {
 
 export async function awaitingCallContractForceProgressUpdate (channel, message, state) {
   if (message.method === 'channels.sign.force_progress_tx') {
-    const signedTx = await state.sign(message.params.data.signed_tx)
-    send(channel, { jsonrpc: '2.0', method: 'channels.force_progress_sign', params: { signedTx: signedTx } })
-    return { handler: awaitingCallContractCompletion, state }
+    const signedTx = await appendSignature(message.params.data.signed_tx, tx =>
+      state.sign(tx, { updates: message.params.data.updates })
+    )
+    send(channel, { jsonrpc: '2.0', method: 'channels.force_progress_sign', params: { signed_tx: signedTx } })
+    return { handler: awaitingForceProgressCompletion, state }
+  }
+  return handleUnexpectedMessage(channel, message, state)
+}
+
+export function awaitingForceProgressCompletion (channel, message, state) {
+  console.log('From force progress await completion ->', message)
+  if (message.method === 'channels.on_chain_tx') {
+    if (state.onOnChainTx) {
+      state.onOnChainTx(message.params.data)
+    }
+    emit(channel, 'onChainTx', message.params.data.tx, {
+      info: message.params.data.info,
+      type: message.params.data.type
+    })
+    state.resolve({ accepted: true, tx: message.params.data.tx })
   }
   return handleUnexpectedMessage(channel, message, state)
 }

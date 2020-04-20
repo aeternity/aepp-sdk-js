@@ -355,7 +355,9 @@ export const FIELD_TYPES = {
   callReturnType: 'callReturnType',
   ctVersion: 'ctVersion',
   sophiaCodeTypeInfo: 'sophiaCodeTypeInfo',
-  payload: 'payload'
+  payload: 'payload',
+  any: 'any',
+  stateTree: 'stateTree'
 }
 
 // FEE CALCULATION
@@ -768,7 +770,7 @@ const CHANNEL_FORCE_PROGRESS_TX = [
   TX_FIELD('round', FIELD_TYPES.int),
   TX_FIELD('update', FIELD_TYPES.binary),
   TX_FIELD('stateHash', FIELD_TYPES.binary),
-  TX_FIELD('offChainTrees', FIELD_TYPES.mptree),
+  TX_FIELD('offChainTrees', FIELD_TYPES.stateTree),
   TX_FIELD('ttl', FIELD_TYPES.int),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('nonce', FIELD_TYPES.int)

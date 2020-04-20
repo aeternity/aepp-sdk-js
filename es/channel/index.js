@@ -610,7 +610,7 @@ function callContract ({ amount, callData, contract, abiVersion }, sign) {
  *   }
  * })
  */
-function forceProgress ({ amount, callData, contract, abiVersion, gas = 1000000, gasPrice, nonce }, sign) {
+function forceProgress ({ amount, callData, contract, abiVersion, gas = 1000000, gasPrice = 1000000000, nonce }, sign, { onOnChainTx } = {}) {
   return new Promise((resolve, reject) => {
     enqueueAction(
       this,
@@ -630,7 +630,7 @@ function forceProgress ({ amount, callData, contract, abiVersion, gas = 1000000,
         })
         return {
           handler: handlers.awaitingCallContractForceProgressUpdate,
-          state: { resolve, reject, sign }
+          state: { resolve, reject, sign, onOnChainTx }
         }
       }
     )
