@@ -110,7 +110,7 @@ describe('Channel', function () {
     responderSign.resetHistory()
   })
 
-  it.only('can open a channel', async () => {
+  it('can open a channel', async () => {
     initiatorCh = await Channel({
       ...sharedParams,
       role: 'initiator',
@@ -831,7 +831,7 @@ describe('Channel', function () {
     ).should.be.equal(true)
   })
 
-  it.only('can create a contract and accept', async () => {
+  it('can create a contract and accept', async () => {
     initiatorCh.disconnect()
     responderCh.disconnect()
     initiatorCh = await Channel({
@@ -911,18 +911,20 @@ describe('Channel', function () {
     })
   })
 
-  it.only('can call a contract and accept', async () => {
-    // const roundBefore = initiatorCh.round()
-    // const result = await initiatorCh.callContract({
-    //   amount: 0,
-    //   callData: await contractEncodeCall('main', ['42']),
-    //   contract: contractAddress,
-    //   abiVersion: 1
-    // }, async (tx) => initiator.signTransaction(tx))
-    // result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx })
-    // initiatorCh.round().should.equal(roundBefore + 1)
-    // callerNonce = initiatorCh.round()
-    console.log('-///////////////////////////////////////////////////////-')
+  it('can call a contract and accept', async () => {
+    const roundBefore = initiatorCh.round()
+    const result = await initiatorCh.callContract({
+      amount: 0,
+      callData: await contractEncodeCall('main', ['42']),
+      contract: contractAddress,
+      abiVersion: 1
+    }, async (tx) => initiator.signTransaction(tx))
+    result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx })
+    initiatorCh.round().should.equal(roundBefore + 1)
+    callerNonce = initiatorCh.round()
+  })
+
+  it('can call a force progress', async () => {
     const forceTx = await initiatorCh.forceProgress({
       amount: 0,
       callData: await contractEncodeCall('main', ['42']),
@@ -933,15 +935,6 @@ describe('Channel', function () {
     const hash = buildTxHash(forceTx.tx)
     const txInfo = await initiator.tx(hash)
     console.log(txInfo)
-    console.log(txInfo.tx.round)
-    console.log(initiatorCh.round())
-    const cllres = await initiatorCh.getContractCall({
-      caller: await initiator.address(),
-      contract: contractAddress,
-      round: txInfo.tx.round
-    })
-    console.log(cllres)
-    console.log(await initiator.contractDecodeCallResultAPI(identityContract, 'main', 'ok', cllres.returnValue))
   })
 
   it('can call a contract and reject', async () => {
