@@ -67,7 +67,7 @@ export function decodeEvents (events, options = { schema: [] }) {
  * @param {String} type Event type from schema
  * @return {*}
  */
-function transformEvent (event, type) {
+export function transformEvent (event, type) {
   switch (type) {
     case SOPHIA_TYPES.int:
       return parseBigNumber(event)
@@ -203,7 +203,7 @@ export function transform (type, value, { bindings } = {}) {
   return `${value}`
 }
 
-function transformVariant (value, generic, { bindings }) {
+export function transformVariant (value, generic, { bindings }) {
   const [[variant, variantArgs]] = typeof value === 'string' ? [[value, []]] : Object.entries(value)
   const [[v, type]] = Object.entries(generic.find(o => Object.keys(o)[0].toLowerCase() === variant.toLowerCase()))
   return `${v}${!type.length
