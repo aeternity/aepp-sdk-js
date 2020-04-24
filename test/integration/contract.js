@@ -63,7 +63,7 @@ contract StateContract =
   record state = { value: string, key: number, testOption: option(string) }
   record yesEr = { t: number}
   
-  datatype event = TheFirstEvent(int) | AnotherEvent(string, address) | AnotherEvent2(string, bool, int)
+  datatype event = TheFirstEvent(int) | AnotherEvent(string, address) | AnotherEvent2(bool, string, int)
   datatype dateUnit = Year | Month | Day
   datatype one_or_both('a, 'b) = Left('a) | Right('b) | Both('a, 'b)
 
