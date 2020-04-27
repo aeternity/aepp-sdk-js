@@ -572,6 +572,72 @@ function callContract ({ amount, callData, contract, abiVersion }, sign) {
 }
 
 /**
+ * Trigger call a contract update
+ *
+ * The call contract update is calling a preexisting contract inside the channel's
+ * internal state tree. The update is a change to be applied on top of the latest state.
+ *
+ * That would call a contract with the poster being the caller of it. Poster commits
+ * an amount of tokens to the contract.
+ *
+ * The call would also create a call object inside the channel state tree. It contains
+ * the result of the contract call.
+ *
+ * It is worth mentioning that the gas is not consumed, because this is an off-chain
+ * contract call. It would be consumed if it were a on-chain one. This could happen
+ * if a call with a similar computation amount is to be forced on-chain.
+ *
+ * @param {Object} options
+ * @param {String} [options.amount] - Amount the caller of the contract commits to it
+ * @param {String} [options.callData] - ABI encoded compiled AEVM call data for the code
+ * @param {Number} [options.contract] - Address of the contract to call
+ * @param {Number} [options.abiVersion] - Version of the ABI
+ * @param {Number} [options.gasPrice] - Gas price
+ * @param {Number} [options.gas=1000000] - Gas limit
+ * @param {Function} sign - Function which verifies and signs contract force progress transaction
+ * @return {Promise<Object>}
+ * @example channel.forceProgress({
+ *   contract: 'ct_9sRA9AVE4BYTAkh5RNfJYmwQe1NZ4MErasQLXZkFWG43TPBqa',
+ *   callData: 'cb_1111111111111111...',
+ *   amount: 0,
+ *   abiVersion: 1,
+ *   gasPrice: 1000005554
+ * }).then(({ accepted, signedTx }) => {
+ *   if (accepted) {
+ *     console.log('Contract force progress call successful')
+ *   } else {
+ *     console.log('Contract force progress call has been rejected')
+ *   }
+ * })
+ */
+function forceProgress ({ amount, callData, contract, abiVersion, gas = 1000000, gasPrice = 1000000000, nonce }, sign, { onOnChainTx } = {}) {
+  return new Promise((resolve, reject) => {
+    enqueueAction(
+      this,
+      (channel, state) => state.handler === handlers.channelOpen,
+      (channel, state) => {
+        send(channel, {
+          jsonrpc: '2.0',
+          method: 'channels.force_progress',
+          params: {
+            amount,
+            call_data: callData,
+            contract_id: contract,
+            abi_version: abiVersion,
+            gas_price: gasPrice,
+            gas
+          }
+        })
+        return {
+          handler: handlers.awaitingCallContractForceProgressUpdate,
+          state: { resolve, reject, sign, onOnChainTx }
+        }
+      }
+    )
+  })
+}
+
+/**
  * Call contract using dry-run
  *
  * In order to get the result of a potential contract call, one might need to
@@ -809,7 +875,8 @@ const Channel = AsyncInit.compose({
     getContractCall,
     getContractState,
     disconnect,
-    cleanContractCalls
+    cleanContractCalls,
+    forceProgress
   },
   statics: {
     reconnect
