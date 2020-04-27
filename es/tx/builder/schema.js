@@ -122,6 +122,7 @@ const OBJECT_TAG_CHANNEL_CLOSE_MUTUAL_TX = 53
 const OBJECT_TAG_CHANNEL_CLOSE_SOLO_TX = 54
 const OBJECT_TAG_CHANNEL_SLASH_TX = 55
 const OBJECT_TAG_CHANNEL_SETTLE_TX = 56
+const OBJECT_TAG_CHANNEL_FORCE_PROGRESS_TX = 521
 const OBJECT_TAG_CHANNEL_OFFCHAIN_TX = 57
 const OBJECT_TAG_CHANNEL = 58
 const OBJECT_TAG_CHANNEL_SNAPSHOT_SOLO_TX = 59
@@ -197,6 +198,7 @@ export const TX_TYPE = {
   channelWithdraw: 'channelWithdraw',
   channelSettle: 'channelSettle',
   channelOffChain: 'channelOffChain',
+  channelForceProgress: 'channelForceProgress',
   channel: 'channel',
   channelSnapshotSolo: 'channelSnapshotSolo',
   channelOffChainUpdateTransfer: 'channelOffChainUpdateTransfer',
@@ -303,6 +305,7 @@ export const OBJECT_ID_TX_TYPE = {
   [OBJECT_TAG_CHANNEL_CLOSE_MUTUAL_TX]: TX_TYPE.channelCloseMutual,
   [OBJECT_TAG_CHANNEL_CLOSE_SOLO_TX]: TX_TYPE.channelCloseSolo,
   [OBJECT_TAG_CHANNEL_SLASH_TX]: TX_TYPE.channelSlash,
+  [OBJECT_TAG_CHANNEL_FORCE_PROGRESS_TX]: TX_TYPE.channelForceProgress,
   [OBJECT_TAG_CHANNEL_DEPOSIT_TX]: TX_TYPE.channelDeposit,
   [OBJECT_TAG_CHANNEL_WITHRAW_TX]: TX_TYPE.channelWithdraw,
   [OBJECT_TAG_CHANNEL_SETTLE_TX]: TX_TYPE.channelSettle,
@@ -352,7 +355,9 @@ export const FIELD_TYPES = {
   callReturnType: 'callReturnType',
   ctVersion: 'ctVersion',
   sophiaCodeTypeInfo: 'sophiaCodeTypeInfo',
-  payload: 'payload'
+  payload: 'payload',
+  any: 'any',
+  stateTree: 'stateTree'
 }
 
 // FEE CALCULATION
@@ -757,6 +762,20 @@ const CHANNEL_SETTLE_TX = [
   TX_FIELD('nonce', FIELD_TYPES.int)
 ]
 
+const CHANNEL_FORCE_PROGRESS_TX = [
+  ...BASE_TX,
+  TX_FIELD('channelId', FIELD_TYPES.id, 'ch'),
+  TX_FIELD('fromId', FIELD_TYPES.id, 'ak'),
+  TX_FIELD('payload', FIELD_TYPES.binary, 'tx'),
+  TX_FIELD('round', FIELD_TYPES.int),
+  TX_FIELD('update', FIELD_TYPES.binary),
+  TX_FIELD('stateHash', FIELD_TYPES.binary),
+  TX_FIELD('offChainTrees', FIELD_TYPES.stateTree),
+  TX_FIELD('ttl', FIELD_TYPES.int),
+  TX_FIELD('fee', FIELD_TYPES.int),
+  TX_FIELD('nonce', FIELD_TYPES.int)
+]
+
 const CHANNEL_OFFCHAIN_TX = [
   ...BASE_TX,
   TX_FIELD('channelId', FIELD_TYPES.id, 'ch'),
@@ -997,6 +1016,9 @@ export const TX_SERIALIZATION_SCHEMA = {
   [TX_TYPE.channelSettle]: {
     1: TX_SCHEMA_FIELD(CHANNEL_SETTLE_TX, OBJECT_TAG_CHANNEL_SETTLE_TX)
   },
+  [TX_TYPE.channelForceProgress]: {
+    1: TX_SCHEMA_FIELD(CHANNEL_FORCE_PROGRESS_TX, OBJECT_TAG_CHANNEL_FORCE_PROGRESS_TX)
+  },
   [TX_TYPE.channelOffChain]: {
     1: TX_SCHEMA_FIELD(CHANNEL_OFFCHAIN_TX, OBJECT_TAG_CHANNEL_OFFCHAIN_TX),
     2: TX_SCHEMA_FIELD(CHANNEL_OFFCHAIN_TX_2, OBJECT_TAG_CHANNEL_OFFCHAIN_TX)
@@ -1200,6 +1222,9 @@ export const TX_DESERIALIZATION_SCHEMA = {
   },
   [OBJECT_TAG_GA_META]: {
     1: TX_SCHEMA_FIELD(GA_META_TX, OBJECT_TAG_GA_META)
+  },
+  [OBJECT_TAG_CHANNEL_FORCE_PROGRESS_TX]: {
+    1: TX_SCHEMA_FIELD(CHANNEL_FORCE_PROGRESS_TX, OBJECT_TAG_CHANNEL_FORCE_PROGRESS_TX)
   },
   [OBJECT_TAG_SOPHIA_BYTE_CODE]: {
     1: TX_SCHEMA_FIELD(CONTRACT_BYTE_CODE_ROMA, OBJECT_TAG_SOPHIA_BYTE_CODE),
