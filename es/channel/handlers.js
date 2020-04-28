@@ -128,6 +128,7 @@ export function awaitingOnChainTx (channel, message, state) {
     message.params.data.event === 'funding_signed' &&
     options.get(channel).role === 'initiator'
   ) {
+    channelId.set(channel, message.params.channel_id)
     changeStatus(channel, 'signed')
     return { handler: awaitingOnChainTx }
   }
