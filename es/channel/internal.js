@@ -25,7 +25,7 @@ import { awaitingConnection, awaitingReconnection, channelOpen } from './handler
 // Send ping message every 10 seconds
 const PING_TIMEOUT_MS = 10000
 // Close connection if pong message is not received within 5 seconds
-const PONG_TIMEOUT_MS = 5000
+const PONG_TIMEOUT_MS = 10000
 
 const options = new WeakMap()
 const status = new WeakMap()
