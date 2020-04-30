@@ -649,9 +649,14 @@ export function awaitingCallsPruned (channels, message, state) {
 }
 
 export function channelClosed (channel, message, state) {
-  if (message.params.data.event === 'channel_closed') {
-    state.resolve(message.params.data.tx)
+  if (message.params.data.event === 'closing') return { handler: channelClosed, state }
+  if (message.params.data.info === 'channel_closed') {
+    state.closeTx = message.params.data.tx
+    return { handler: channelClosed, state }
+  }
+  if (message.params.data.event === 'closed_confirmed') {
+    state.resolve(state.closeTx)
     return { handler: channelClosed }
   }
-  return { handler: channelClosed }
+  return { handler: channelClosed, state }
 }
