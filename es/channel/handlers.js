@@ -573,7 +573,7 @@ export function awaitingNewContractCompletion (channel, message, state) {
 export async function awaitingCallContractUpdateTx (channel, message, state) {
   if (message.method === 'channels.sign.update') {
     if (message.params.data.tx) {
-      const signedTx = await state.sign(message.params.data.tx)
+      const signedTx = await state.sign(message.params.data.tx, { updates: message.params.data.updates })
       send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { tx: signedTx } })
       return { handler: awaitingCallContractCompletion, state }
     }
