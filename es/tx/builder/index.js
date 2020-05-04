@@ -62,6 +62,8 @@ function deserializeField (value, type, prefix) {
       return value[0] === 1
     case FIELD_TYPES.binary:
       return encode(value, prefix)
+    case FIELD_TYPES.stateTree:
+      return encode(value, 'ss')
     case FIELD_TYPES.string:
       return value.toString()
     case FIELD_TYPES.payload:
@@ -115,6 +117,8 @@ function serializeField (value, type, prefix) {
       return Buffer.from([value ? 1 : 0])
     case FIELD_TYPES.binary:
       return decode(value, prefix)
+    case FIELD_TYPES.stateTree:
+      return decode(value, 'ss')
     case FIELD_TYPES.hex:
       return Buffer.from(value, 'hex')
     case FIELD_TYPES.signatures:

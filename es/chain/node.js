@@ -98,7 +98,7 @@ async function getBalance (address, { height, hash, format = AE_AMOUNT_FORMATS.A
 
 async function tx (hash, info = true) {
   const tx = await this.api.getTransactionByHash(hash)
-  if (['ContractCreateTx', 'ContractCallTx'].includes(tx.tx.type) && info) {
+  if (['ContractCreateTx', 'ContractCallTx', 'ChannelForceProgressTx'].includes(tx.tx.type) && info) {
     try {
       return { ...tx, ...await this.getTxInfo(hash) }
     } catch (e) {

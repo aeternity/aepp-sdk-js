@@ -128,6 +128,7 @@ export function awaitingOnChainTx (channel, message, state) {
     message.params.data.event === 'funding_signed' &&
     options.get(channel).role === 'initiator'
   ) {
+    channelId.set(channel, message.params.channel_id)
     changeStatus(channel, 'signed')
     return { handler: awaitingOnChainTx }
   }
@@ -370,8 +371,8 @@ export async function awaitingShutdownTx (channel, message, state) {
 
 export function awaitingShutdownOnChainTx (channel, message, state) {
   if (message.method === 'channels.on_chain_tx') {
-    state.resolve(message.params.data.tx)
-    return { handler: channelClosed }
+    // state.resolve(message.params.data.tx)
+    return { handler: channelClosed, state }
   }
   return handleUnexpectedMessage(channel, message, state)
 }
@@ -572,11 +573,11 @@ export function awaitingNewContractCompletion (channel, message, state) {
 export async function awaitingCallContractUpdateTx (channel, message, state) {
   if (message.method === 'channels.sign.update') {
     if (message.params.data.tx) {
-      const signedTx = await state.sign(message.params.data.tx)
+      const signedTx = await state.sign(message.params.data.tx, { updates: message.params.data.updates })
       send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { tx: signedTx } })
       return { handler: awaitingCallContractCompletion, state }
     }
-    const signedTx = await appendSignature(message.params.data.signed_tx, tx => state.sign(tx))
+    const signedTx = await appendSignature(message.params.data.signed_tx, tx => state.sign(tx, { updates: message.params.data.updates }))
     if (typeof signedTx === 'string') {
       send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { signed_tx: signedTx } })
       return { handler: awaitingCallContractCompletion, state }
@@ -585,6 +586,32 @@ export async function awaitingCallContractUpdateTx (channel, message, state) {
       send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { error: signedTx } })
       return { handler: awaitingCallContractCompletion, state }
     }
+  }
+  return handleUnexpectedMessage(channel, message, state)
+}
+
+export async function awaitingCallContractForceProgressUpdate (channel, message, state) {
+  if (message.method === 'channels.sign.force_progress_tx') {
+    const signedTx = await appendSignature(message.params.data.signed_tx, tx =>
+      state.sign(tx, { updates: message.params.data.updates })
+    )
+    send(channel, { jsonrpc: '2.0', method: 'channels.force_progress_sign', params: { signed_tx: signedTx } })
+    return { handler: awaitingForceProgressCompletion, state }
+  }
+  return handleUnexpectedMessage(channel, message, state)
+}
+
+export function awaitingForceProgressCompletion (channel, message, state) {
+  console.log('From force progress await completion ->', message)
+  if (message.method === 'channels.on_chain_tx') {
+    if (state.onOnChainTx) {
+      state.onOnChainTx(message.params.data)
+    }
+    emit(channel, 'onChainTx', message.params.data.tx, {
+      info: message.params.data.info,
+      type: message.params.data.type
+    })
+    state.resolve({ accepted: true, tx: message.params.data.tx })
   }
   return handleUnexpectedMessage(channel, message, state)
 }
@@ -622,5 +649,15 @@ export function awaitingCallsPruned (channels, message, state) {
 }
 
 export function channelClosed (channel, message, state) {
-  return { handler: channelClosed }
+  if (!state) return { handler: channelClosed }
+  if (message.params.data.event === 'closing') return { handler: channelClosed, state }
+  if (message.params.data.info === 'channel_closed') {
+    state.closeTx = message.params.data.tx
+    return { handler: channelClosed, state }
+  }
+  if (message.params.data.event === 'closed_confirmed') {
+    state.resolve(state.closeTx)
+    return { handler: channelClosed }
+  }
+  return { handler: channelClosed, state }
 }
