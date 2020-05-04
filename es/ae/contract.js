@@ -37,6 +37,7 @@ import BigNumber from 'bignumber.js'
 import NodePool from '../node-pool'
 import { AMOUNT, DEPOSIT, DRY_RUN_ACCOUNT, GAS, MIN_GAS_PRICE } from '../tx/builder/schema'
 import { decode, produceNameId } from '../tx/builder/helpers'
+import TxObject from '../tx/tx-object'
 
 function sendAndProcess (tx, options) {
   return async function (onSuccess, onError) {
@@ -49,8 +50,8 @@ function sendAndProcess (tx, options) {
 
     const result = await this.getTxInfo(txData.hash)
     return result.returnType === 'ok'
-      ? onSuccess({ hash: txData.hash, rawTx: txData.rawTx, result, txData })
-      : typeof onError === 'function' ? onError(result) : this.handleCallError(result)
+      ? onSuccess({ hash: txData.hash, tx: TxObject({ tx: txData.rawTx }), result, txData })
+      : typeof onError === 'function' ? onError(result) : this.handleCallError({ result, tx: TxObject({ tx: txData.rawTx }) })
   }
 }
 
@@ -60,14 +61,16 @@ function sendAndProcess (tx, options) {
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
  * @param {Object} result call result object
+ * @param {Object} tx Unpacked transaction
  * @throws Error Decoded error
  * @return {Promise<void>}
  */
-async function handleCallError (result) {
+async function handleCallError ({ result, tx }) {
   const error = Buffer.from(result.returnValue).toString()
   if (isBase64(error.slice(3))) {
     const decodedError = Buffer.from(error.slice(3), 'base64').toString()
     throw Object.assign(Error(`Invocation failed: ${error}. Decoded: ${decodedError}`), R.merge(result, {
+      tx,
       error,
       decodedError
     }))
@@ -75,6 +78,7 @@ async function handleCallError (result) {
 
   const decodedError = await this.contractDecodeDataAPI('string', error)
   throw Object.assign(Error(`Invocation failed: ${error}. Decoded: ${decodedError}`), R.merge(result, {
+    tx,
     error,
     decodedError
   }))
