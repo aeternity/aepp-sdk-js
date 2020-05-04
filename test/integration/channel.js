@@ -44,7 +44,7 @@ function waitForChannel (channel) {
   )
 }
 
-describe.only('Channel', function () {
+describe('Channel', function () {
   configure(this)
   this.timeout(12000000)
 
@@ -82,7 +82,7 @@ describe.only('Channel', function () {
     port: 3001,
     lockPeriod: 1,
     statePassword: 'correct horse battery staple',
-    debug: true
+    debug: false
   }
 
   before(async function () {
