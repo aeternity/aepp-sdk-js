@@ -190,12 +190,13 @@ async function dryRunContractTx (tx, callerId, source, name, opt = {}) {
   const [{ result: status, callObj, reason }] = (await this.txDryRun([tx], [dryRunAccount], top)).results
 
   // Process response
-  if (status !== 'ok') throw new Error('Dry run error, ' + reason)
+  if (status !== 'ok') throw Object.assign(new Error('Dry run error, ' + reason), { tx: TxObject({ tx }), dryRunParams: { accounts: [dryRunAccount], top } })
   const { returnType, returnValue } = callObj
   if (returnType !== 'ok') {
-    await this.handleCallError(callObj)
+    await this.handleCallError({ result: callObj, tx: TxObject({ tx }) })
   }
   return {
+    tx: TxObject({ tx }),
     result: callObj,
     decode: () => this.contractDecodeData(source, name, returnValue, returnType, opt)
   }
