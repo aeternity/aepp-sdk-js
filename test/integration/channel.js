@@ -81,7 +81,8 @@ describe('Channel', function () {
     host: 'localhost',
     port: 3001,
     lockPeriod: 1,
-    statePassword: 'correct horse battery staple'
+    statePassword: 'correct horse battery staple',
+    debug: false
   }
 
   before(async function () {

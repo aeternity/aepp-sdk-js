@@ -47,7 +47,7 @@ import { AMOUNT, DEPOSIT, GAS, MIN_GAS_PRICE } from '../../tx/builder/schema'
  * @param {Array} params Contract call arguments
  * @return Promise{Array} Object with validation errors
  */
-async function prepareArgsForEncode (aci, params) {
+export async function prepareArgsForEncode (aci, params) {
   if (!aci || !aci.arguments) return params
   // Validation
   if (aci.arguments.length > params.length) {
