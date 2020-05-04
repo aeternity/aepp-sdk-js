@@ -372,7 +372,7 @@ export async function awaitingShutdownTx (channel, message, state) {
 export function awaitingShutdownOnChainTx (channel, message, state) {
   if (message.method === 'channels.on_chain_tx') {
     // state.resolve(message.params.data.tx)
-    return { handler: channelClosed }
+    return { handler: channelClosed, state }
   }
   return handleUnexpectedMessage(channel, message, state)
 }
@@ -649,6 +649,7 @@ export function awaitingCallsPruned (channels, message, state) {
 }
 
 export function channelClosed (channel, message, state) {
+  if (!state) return { handler: channelClosed }
   if (message.params.data.event === 'closing') return { handler: channelClosed, state }
   if (message.params.data.info === 'channel_closed') {
     state.closeTx = message.params.data.tx
