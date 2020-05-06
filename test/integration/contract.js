@@ -547,7 +547,7 @@ describe('Contract', function () {
         decodedEventsWithoutACI = decodeEvents(log, { schema: events })
       })
       const events = [
-        { name: 'AnotherEvent2', types: [SOPHIA_TYPES.string, SOPHIA_TYPES.bool, SOPHIA_TYPES.int] },
+        { name: 'AnotherEvent2', types: [SOPHIA_TYPES.bool, SOPHIA_TYPES.string, SOPHIA_TYPES.int] },
         { name: 'AnotherEvent', types: [SOPHIA_TYPES.string, SOPHIA_TYPES.address] },
         { name: 'TheFirstEvent', types: [SOPHIA_TYPES.int] }
       ]
