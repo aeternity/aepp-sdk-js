@@ -79,7 +79,7 @@ export const buildContractMethods = (instance) => () => ({
   } : {}
 })
 
-const parseArguments = (aciArgs = []) => (args) => ({
+export const parseArguments = (aciArgs = []) => (args) => ({
   opt: args.length > aciArgs.length ? R.last(args) : {},
   args: Object.values(args).slice(0, aciArgs.length)
 })
