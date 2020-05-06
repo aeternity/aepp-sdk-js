@@ -111,7 +111,7 @@ contract StateContract =
   stateful entrypoint emitEvents() : unit =
     Chain.event(TheFirstEvent(42))
     Chain.event(AnotherEvent("This is not indexed", Contract.address))
-    Chain.event(AnotherEvent2("This is not indexed", true, 1))
+    Chain.event(AnotherEvent2(true, "This is not indexed", 1))
 `
 const aensDelegationContract = `
 contract DelegateTest =
