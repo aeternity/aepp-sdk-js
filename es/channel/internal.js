@@ -80,9 +80,8 @@ function changeState (channel, newState) {
 }
 
 function send (channel, message) {
-  // console.log('ROLE: ', options.get(channel).role)
-  // console.log('Send message: ', message)
-  // console.log('-----------------------')
+  const { debug = false } = options.get(channel)
+  if (debug) console.log('Send message: ', message)
   websockets.get(channel).send(JSONBig.stringify(message))
 }
 
@@ -150,9 +149,8 @@ function ping (channel) {
 
 function onMessage (channel, data) {
   const message = JSONBig.parse(data)
-  // console.log('ROLE: ' + options.get(channel).role)
-  // console.log('Receive message: ', message)
-  // console.log('<-------------------------->')
+  const { debug = false } = options.get(channel)
+  if (debug) console.log('Receive message: ', message)
   if (message.id) {
     const callback = rpcCallbacks.get(channel).get(message.id)
     try {

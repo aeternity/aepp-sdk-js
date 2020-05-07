@@ -830,6 +830,7 @@ async function reconnect (options, txParams) {
  * @param {Number} [options.timeoutAccept] - The time frame the other client has to react to an event. This applies for all off-chain updates that are not meant to land on-chain, as well as some special cases: opening a noise connection, mutual closing acknowledgement and reestablishing an existing channel (default: 120000)
  * @param {Number} [options.timeoutInitialized] - the time frame the responder has to accept an incoming noise session. Applicable only for initiator (default: timeout_accept's value)
  * @param {Number} [options.timeoutAwaitingOpen] - The time frame the initiator has to start an outgoing noise session to the responder's node. Applicable only for responder (default: timeout_idle's value)
+ * @param {Number} [options.debug=false] - Log websocket communication
  * @param {Function} options.sign - Function which verifies and signs transactions
  * @return {Promise<Object>} Channel instance
  * @example Channel({
