@@ -63,7 +63,7 @@ contract StateContract =
   record state = { value: string, key: number, testOption: option(string) }
   record yesEr = { t: number}
   
-  datatype event = TheFirstEvent(int) | AnotherEvent(string, address) | AnotherEvent2(string, bool, int)
+  datatype event = TheFirstEvent(int) | AnotherEvent(string, address) | AnotherEvent2(bool, string, int)
   datatype dateUnit = Year | Month | Day
   datatype one_or_both('a, 'b) = Left('a) | Right('b) | Both('a, 'b)
 
@@ -111,7 +111,7 @@ contract StateContract =
   stateful entrypoint emitEvents() : unit =
     Chain.event(TheFirstEvent(42))
     Chain.event(AnotherEvent("This is not indexed", Contract.address))
-    Chain.event(AnotherEvent2("This is not indexed", true, 1))
+    Chain.event(AnotherEvent2(true, "This is not indexed", 1))
 `
 const aensDelegationContract = `
 contract DelegateTest =
@@ -547,7 +547,7 @@ describe('Contract', function () {
         decodedEventsWithoutACI = decodeEvents(log, { schema: events })
       })
       const events = [
-        { name: 'AnotherEvent2', types: [SOPHIA_TYPES.string, SOPHIA_TYPES.bool, SOPHIA_TYPES.int] },
+        { name: 'AnotherEvent2', types: [SOPHIA_TYPES.bool, SOPHIA_TYPES.string, SOPHIA_TYPES.int] },
         { name: 'AnotherEvent', types: [SOPHIA_TYPES.string, SOPHIA_TYPES.address] },
         { name: 'TheFirstEvent', types: [SOPHIA_TYPES.int] }
       ]
