@@ -192,6 +192,7 @@ export async function channelOpen (channel, message, state) {
         case 'fsm_up':
           fsmId.set(channel, message.params.data.fsm_id)
           return { handler: channelOpen }
+        case 'timeout':
         case 'close_mutual':
           return { handler: channelOpen }
         case 'closing':
