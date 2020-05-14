@@ -33,7 +33,7 @@ const REQUESTS = {
   async [METHODS.aepp.connect] (callInstance, instance, client, { name, networkId, version, icons }) {
     // Check if protocol and network is compatible with wallet
     if (version !== VERSION) return { error: ERRORS.unsupportedProtocol() }
-    if (networkId !== instance.getNetworkId()) return { error: ERRORS.unsupportedNetwork() }
+    // if (networkId !== instance.getNetworkId()) return { error: ERRORS.unsupportedNetwork() }
 
     // Store new AEPP and wait for connection approve
     rpcClients.updateClientInfo(client.id, {

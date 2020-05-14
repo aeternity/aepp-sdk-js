@@ -122,7 +122,7 @@ export const AeppRpc = Ae.compose({
       if (this.rpcClient && this.rpcClient.isConnected()) throw new Error('You are already connected to wallet ' + this.rpcClient)
       this.rpcClient = RpcClient({
         connection,
-        networkId: this.getNetworkId(),
+        networkId: this.getNetworkId({ force: true }),
         ...connection.connectionInfo,
         id: uuid(),
         handlers: [handleMessage(this), this.onDisconnect]
@@ -215,7 +215,7 @@ export const AeppRpc = Ae.compose({
         METHODS.aepp.connect, {
           name: this.name,
           version: VERSION,
-          networkId: this.getNetworkId()
+          networkId: this.getNetworkId({ force: true })
         }
       )
     },
