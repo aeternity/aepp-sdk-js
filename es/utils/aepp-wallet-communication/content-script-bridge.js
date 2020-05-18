@@ -32,13 +32,14 @@ import stampit from '@stamp/it'
  * @return {void}
  */
 function run () {
+  const allowCrossOrigin = this.allowCrossOrigin
   // Connect to extension using runtime
   this.extConnection.connect((msg) => {
     this.pageConnection.sendMessage(msg)
   })
   // Connect to page using window.postMessage
   this.pageConnection.connect((msg, origin, source) => {
-    if (source !== window) return
+    if (!allowCrossOrigin && source !== window) return
     this.extConnection.sendMessage(msg)
   })
 }
@@ -67,10 +68,11 @@ function stop () {
  * @return {ContentScriptBridge}
  */
 export const ContentScriptBridge = stampit({
-  init ({ pageConnection, extConnection }) {
+  init ({ pageConnection, extConnection, allowCrossOrigin = false }) {
     if (!window) throw new Error('Window object not found, you can run bridge only in browser')
     if (!pageConnection) throw new Error('pageConnection required')
     if (!extConnection) throw new Error('extConnection required')
+    this.allowCrossOrigin = allowCrossOrigin
     this.pageConnection = pageConnection
     this.extConnection = extConnection
   },

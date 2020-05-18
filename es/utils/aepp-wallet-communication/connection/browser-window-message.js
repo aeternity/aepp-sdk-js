@@ -52,11 +52,12 @@ function connect (onMessage) {
   const origin = this.origin
   const receiveDirection = this.receiveDirection
   const debug = this.debug
+  const forceOrigin = this.forceOrigin
   if (this.listener) throw new Error('You already connected')
 
   this.listener = (msg, source) => {
     if (!msg || typeof msg.data !== 'object') return
-    if (origin && origin !== msg.origin) return
+    if (!forceOrigin && origin && origin !== msg.origin) return
     if (debug) console.log('Receive message: ', msg)
     if (msg.data.type) {
       if (msg.data.type !== receiveDirection) return
@@ -111,7 +112,7 @@ function sendMessage (msg) {
  * @return {Object}
  */
 export const BrowserWindowMessageConnection = stampit({
-  init ({ connectionInfo = {}, target = window.parent, self = window, origin, sendDirection, receiveDirection = MESSAGE_DIRECTION.to_aepp, debug = false } = {}) {
+  init ({ connectionInfo = {}, target = window.parent, self = window, origin, sendDirection, receiveDirection = MESSAGE_DIRECTION.to_aepp, debug = false, forceOrigin = false } = {}) {
     if (sendDirection && !Object.keys(MESSAGE_DIRECTION).includes(sendDirection)) throw new Error(`sendDirection must be one of [${Object.keys(MESSAGE_DIRECTION)}]`)
     if (!Object.keys(MESSAGE_DIRECTION).includes(receiveDirection)) throw new Error(`receiveDirection must be one of [${Object.keys(MESSAGE_DIRECTION)}]`)
     this.connectionInfo = { ...{ id: uuid() }, ...connectionInfo }
@@ -120,6 +121,7 @@ export const BrowserWindowMessageConnection = stampit({
     const targetP = target
     this.origin = origin
     this.debug = debug
+    this.forceOrigin = forceOrigin
     this.sendDirection = sendDirection
     this.receiveDirection = receiveDirection
     this.subscribeFn = (listener) => selfP.addEventListener('message', listener, false)
