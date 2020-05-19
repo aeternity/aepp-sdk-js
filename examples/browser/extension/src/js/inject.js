@@ -2,7 +2,7 @@ import BrowserRuntimeConnection
   from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-runtime'
 import BrowserWindowMessageConnection
   from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message'
-import { getBrowserAPI } from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/helpers'
+import { getBrowserAPI, isInIframe } from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/helpers'
 import { MESSAGE_DIRECTION } from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/schema'
 import ContentScriptBridge from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge'
 
@@ -24,6 +24,7 @@ const readyStateCheckInterval = setInterval(function () {
         origin: window.origin
       },
       origin: window.origin,
+      ...isInIframe() ? { target: window } : {},
       sendDirection: MESSAGE_DIRECTION.to_aepp,
       receiveDirection: MESSAGE_DIRECTION.to_waellet
     })

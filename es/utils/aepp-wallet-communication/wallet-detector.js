@@ -33,10 +33,16 @@ const wallets = {}
 
 const getOrigin = ({ isExtension, origin }) => {
   if (isExtension) {
-    if (isInIframe()) return '*'
     return window.origin
   }
   return origin
+}
+
+const getTarget = ({ isExtension, source }) => {
+  if (isExtension) {
+    return source
+  }
+  return isInIframe() ? window.parent : source
 }
 
 const handleDetection = (onDetected) => ({ method, params }, origin, source) => {
@@ -49,12 +55,12 @@ const handleDetection = (onDetected) => ({ method, params }, origin, source) => 
         // if detect extension wallet or page wallet
         const isExtension = this.type === 'extension'
         const origin = getOrigin({ isExtension, origin: this.origin })
+        const target = getTarget({ isExtension, source })
         return BrowserWindowMessageConnection({
           connectionInfo: this,
           sendDirection: isExtension ? MESSAGE_DIRECTION.to_waellet : undefined,
           receiveDirection: isExtension ? MESSAGE_DIRECTION.to_aepp : undefined,
-          target: isInIframe() ? window.parent : source,
-          forceOrigin: origin === '*',
+          target,
           origin
         })
       }

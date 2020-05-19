@@ -31,7 +31,8 @@
       ],
       "js": [
         "inject.bundle.js"
-      ]
+      ],
+      "all_frames": true
     }
   ]
 }
