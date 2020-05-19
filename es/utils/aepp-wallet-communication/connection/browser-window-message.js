@@ -103,7 +103,7 @@ const getTarget = () => {
     return window
   }
   // When we is the main page we need to decide the target by our self
-  // Probably can implement some algo for checking DOM for Iframes and somehow decide which Ifarame to tal
+  // Probably can be implemented some algo for checking DOM for Iframes and somehow decide which Iframe to talk
   return isInIframe() ? window.parent : undefined
 }
 

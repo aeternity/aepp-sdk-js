@@ -4,8 +4,7 @@
 /* eslint-disable no-undef */
 import { isMemoryAccount } from '../../account/selector'
 
-const isExtensionContext = typeof chrome === 'object' && chrome && typeof chrome.extension === 'object';
-const isWeb = location.protocol.startsWith('http');
+const isWeb = location && location.protocol && location.protocol.startsWith('http')
 
 export const getBrowserAPI = (force = false) => {
   if (chrome === Object(chrome) && chrome.runtime) return chrome
@@ -14,7 +13,12 @@ export const getBrowserAPI = (force = false) => {
   return {}
 }
 
-export const isContentScript = () => isExtensionContext && isWeb
+const isExtensionContext = () => {
+  const browser = getBrowserAPI()
+  return typeof browser === 'object' && browser && typeof browser.extension === 'object'
+}
+
+export const isContentScript = () => isExtensionContext() && isWeb
 
 export const isInIframe = () => window !== window.parent
 
