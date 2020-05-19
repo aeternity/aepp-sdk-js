@@ -24,7 +24,6 @@ const readyStateCheckInterval = setInterval(function () {
         origin: window.origin
       },
       origin: window.origin,
-      ...isInIframe() ? { target: window } : {},
       sendDirection: MESSAGE_DIRECTION.to_aepp,
       receiveDirection: MESSAGE_DIRECTION.to_waellet
     })

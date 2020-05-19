@@ -4,12 +4,17 @@
 /* eslint-disable no-undef */
 import { isMemoryAccount } from '../../account/selector'
 
+const isExtensionContext = typeof chrome === 'object' && chrome && typeof chrome.extension === 'object';
+const isWeb = location.protocol.startsWith('http');
+
 export const getBrowserAPI = (force = false) => {
   if (chrome === Object(chrome) && chrome.runtime) return chrome
   if (browser === Object(browser) && browser.runtime) return browser
   if (!force) throw new Error('Browser is not detected')
   return {}
 }
+
+export const isContentScript = () => isExtensionContext && isWeb
 
 export const isInIframe = () => window !== window.parent
 

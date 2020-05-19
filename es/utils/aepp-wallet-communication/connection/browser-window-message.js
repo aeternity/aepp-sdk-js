@@ -28,6 +28,7 @@ import stampit from '@stamp/it'
 import WalletConnection from '.'
 import { v4 as uuid } from 'uuid'
 import { MESSAGE_DIRECTION } from '../schema'
+import { isContentScript, isInIframe } from '../helpers'
 
 /**
  * Check if connected
@@ -96,6 +97,16 @@ function sendMessage (msg) {
   this.postFn(message)
 }
 
+const getTarget = () => {
+  const isCS = isContentScript()
+  if (isCS) {
+    return window
+  }
+  // When we is the main page we need to decide the target by our self
+  // Probably can implement some algo for checking DOM for Iframes and somehow decide which Ifarame to tal
+  return isInIframe() ? window.parent : undefined
+}
+
 /**
  * BrowserWindowMessageConnection
  * @function
@@ -112,7 +123,7 @@ function sendMessage (msg) {
  * @return {Object}
  */
 export const BrowserWindowMessageConnection = stampit({
-  init ({ connectionInfo = {}, target = window.parent, self = window, origin, sendDirection, receiveDirection = MESSAGE_DIRECTION.to_aepp, debug = false, forceOrigin = false } = {}) {
+  init ({ connectionInfo = {}, target = getTarget(), self = window, origin, sendDirection, receiveDirection = MESSAGE_DIRECTION.to_aepp, debug = false, forceOrigin = false } = {}) {
     if (sendDirection && !Object.keys(MESSAGE_DIRECTION).includes(sendDirection)) throw new Error(`sendDirection must be one of [${Object.keys(MESSAGE_DIRECTION)}]`)
     if (!Object.keys(MESSAGE_DIRECTION).includes(receiveDirection)) throw new Error(`receiveDirection must be one of [${Object.keys(MESSAGE_DIRECTION)}]`)
     this.connectionInfo = { ...{ id: uuid() }, ...connectionInfo }
