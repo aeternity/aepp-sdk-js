@@ -18,7 +18,7 @@ import { Contract } from '@aeternity/aepp-sdk' (Using bundle)
 * [@aeternity/aepp-sdk/es/ae/contract](#module_@aeternity/aepp-sdk/es/ae/contract)
     * [exports.ContractAPI([options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--exports.ContractAPI) ⇒ `Object` ⏏
     * _async_
-        * [handleCallError(result)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--handleCallError) ⇒ `Promise.&lt;void&gt;` ⏏
+        * [handleCallError(result, tx)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--handleCallError) ⇒ `Promise.&lt;void&gt;` ⏏
         * [contractEncodeCall(source, name, args, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractEncodeCall) ⇒ `Promise.&lt;String&gt;` ⏏
         * [contractDecodeData(source, fn, callValue, callResult, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractDecodeData) ⇒ `Promise.&lt;String&gt;` ⏏
         * [contractCallStatic(source, address, name, args, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCallStatic) ⇒ `Promise.&lt;Object&gt;` ⏏
@@ -71,7 +71,7 @@ const client = await ContractWithAe({ url, internalUrl, compilerUrl, keypair, ..
 ```
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--handleCallError"></a>
 
-### handleCallError(result) ⇒ `Promise.&lt;void&gt;` ⏏
+### handleCallError(result, tx) ⇒ `Promise.&lt;void&gt;` ⏏
 Handle contract call error
 
 **Kind**: Exported function  
@@ -84,6 +84,7 @@ Handle contract call error
 | Param | Type | Description |
 | --- | --- | --- |
 | result | `Object` | call result object |
+| tx | `Object` | Unpacked transaction |
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--contractEncodeCall"></a>
 

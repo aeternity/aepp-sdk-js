@@ -12,6 +12,7 @@ import * as Crypto from '@aeternity/aepp-sdk/es/utils/bytes'
     * [.leftPad(length, inputBuffer)](#module_@aeternity/aepp-sdk/es/utils/bytes.leftPad) ⇒
     * [.rightPad(length, inputBuffer)](#module_@aeternity/aepp-sdk/es/utils/bytes.rightPad) ⇒
     * [.bigNumberToByteArray(x)](#module_@aeternity/aepp-sdk/es/utils/bytes.bigNumberToByteArray) ⇒
+    * [.str2buf(str, [enc])](#module_@aeternity/aepp-sdk/es/utils/bytes.str2buf) ⇒ `buffer`
 
 <a id="module_@aeternity/aepp-sdk/es/utils/bytes.leftPad"></a>
 
@@ -50,4 +51,19 @@ Convert bignumber to byte array
 | Param | Description |
 | --- | --- |
 | x | bignumber instance |
+
+<a id="module_@aeternity/aepp-sdk/es/utils/bytes.str2buf"></a>
+
+### @aeternity/aepp-sdk/es/utils/bytes.str2buf(str, [enc]) ⇒ `buffer`
+Convert a string to a Buffer.  If encoding is not specified, hex-encoding
+will be used if the input is valid hex.  If the input is valid base64 but
+not valid hex, base64 will be used.  Otherwise, utf8 will be used.
+
+**Kind**: static method of [`@aeternity/aepp-sdk/es/utils/bytes`](#module_@aeternity/aepp-sdk/es/utils/bytes)  
+**Returns**: `buffer` - Buffer (bytearray) containing the input data.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| str | `string` | String to be converted. |
+| [enc] | `string` | Encoding of the input string (optional). |
 
