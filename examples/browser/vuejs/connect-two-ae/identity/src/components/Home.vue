@@ -130,7 +130,14 @@
           }[params.onAccount]
           accept(null, { onAccount }) // provide this account for signing
         },
-        onMessageSign: genConfirmCallback(() => 'sign message'),
+        onMessageSign (aepp, { accept, deny, params }, origin) {
+          // Get account outside of SDK if needed
+          const onAccount = {
+            [keypair.publicKey]: MemoryAccount({ keypair }),
+            [keypair2.publicKey]: MemoryAccount({ keypair: keypair2 }),
+          }[params.onAccount]
+          accept({ onAccount }) // provide this account for signing
+        },
         onAskAccounts: genConfirmCallback(() => 'get accounts'),
         onDisconnect (message, client) {
           this.shareWalletInfo(connection.sendMessage.bind(connection))
