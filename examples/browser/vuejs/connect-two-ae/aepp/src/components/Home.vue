@@ -329,7 +329,7 @@
     async created () {
       // Open iframe with Wallet if run in top window
       window !== window.parent || await this.getReverseWindow()
-      //
+
       this.client = await RpcAepp({
         name: 'AEPP',
         nodes: [{ name: 'test-net', instance: await Node({ url: NODE_URL, internalUrl: NODE_INTERNAL_URL }) }],

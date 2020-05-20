@@ -674,5 +674,6 @@ describe('Aepp<->Wallet', function () {
 const getConnections = (direct) => {
   global.chrome = { runtime: {} }
   global.window = { location: { origin: '//test' } }
+  global.location = { protocol: 'http://test.com' }
   return getFakeConnections(direct)
 }
