@@ -27,7 +27,7 @@ import Channel from '@aeternity/aepp-sdk/es/channel/index'
         * [~deposit(amount, sign, [callbacks])](#module_@aeternity/aepp-sdk/es/channel/index--Channel..deposit) ⇒ `Promise.&lt;Object&gt;`
         * [~createContract(options, sign)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..createContract) ⇒ `Promise.&lt;Object&gt;`
         * [~callContract(options, sign)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..callContract) ⇒ `Promise.&lt;Object&gt;`
-        * [~forceProgress(options, sign)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..forceProgress) ⇒ `Promise.&lt;Object&gt;`
+        * [~forceProgress(options, sign, callbacks)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..forceProgress) ⇒ `Promise.&lt;Object&gt;`
         * [~callContractStatic(options)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..callContractStatic) ⇒ `Promise.&lt;Object&gt;`
         * [~getContractCall(options)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..getContractCall) ⇒ `Promise.&lt;Object&gt;`
         * [~getContractState(contract)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..getContractState) ⇒ `Promise.&lt;Object&gt;`
@@ -485,21 +485,9 @@ channel.callContract({
 ```
 <a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..forceProgress"></a>
 
-#### Channel~forceProgress(options, sign) ⇒ `Promise.&lt;Object&gt;`
-Trigger call a contract update
-
-The call contract update is calling a preexisting contract inside the channel's
-internal state tree. The update is a change to be applied on top of the latest state.
-
-That would call a contract with the poster being the caller of it. Poster commits
-an amount of tokens to the contract.
-
-The call would also create a call object inside the channel state tree. It contains
-the result of the contract call.
-
-It is worth mentioning that the gas is not consumed, because this is an off-chain
-contract call. It would be consumed if it were a on-chain one. This could happen
-if a call with a similar computation amount is to be forced on-chain.
+#### Channel~forceProgress(options, sign, callbacks) ⇒ `Promise.&lt;Object&gt;`
+Trigger a force progress contract call
+This call is going on-chain
 
 **Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
 
@@ -510,9 +498,10 @@ if a call with a similar computation amount is to be forced on-chain.
 | [options.callData] | `String` |  | ABI encoded compiled AEVM call data for the code |
 | [options.contract] | `Number` |  | Address of the contract to call |
 | [options.abiVersion] | `Number` |  | Version of the ABI |
-| [options.gasPrice] | `Number` |  | Gas price |
+| [options.gasPrice] | `Number` | <code>1000000000</code> | Gas price |
 | [options.gas] | `Number` | <code>1000000</code> | Gas limit |
 | sign | `function` |  | Function which verifies and signs contract force progress transaction |
+| callbacks | `Object` |  |  |
 
 **Example**  
 ```js
