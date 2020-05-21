@@ -1,6 +1,6 @@
 {
   "name": "@aeternity/aepp-sdk",
-  "version": "7.2.1",
+  "version": "7.3.0",
   "description": "SDK for the æternity blockchain",
   "main": "dist/aepp-sdk.js",
   "browser": "dist/aepp-sdk.browser.js",
@@ -47,7 +47,7 @@
     "sha.js": "^2.4.11",
     "tweetnacl": "^1.0.0",
     "tweetnacl-auth": "^1.0.1",
-    "uuid": "^7.0.0",
+    "uuid": "^8.0.0",
     "websocket": "^1.0.26"
   },
   "repository": {
@@ -59,9 +59,9 @@
     "@babel/core": "7.9.0",
     "@babel/node": "7.8.7",
     "@babel/plugin-proposal-export-default-from": "7.8.3",
-    "@babel/plugin-proposal-object-rest-spread": "7.9.0",
+    "@babel/plugin-proposal-object-rest-spread": "7.9.5",
     "@babel/plugin-transform-runtime": "7.9.0",
-    "@babel/preset-env": "7.9.0",
+    "@babel/preset-env": "7.9.5",
     "@babel/register": "7.9.0",
     "@babel/runtime": "^7.9.2",
     "babel-core": "6",

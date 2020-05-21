@@ -83,8 +83,7 @@ the implementation grab the key pair from the `WALLET_PRIV` and
 
 ```js
   const node = await Node({ url: host })
-  const keypair = { secretKey: 'YOUR_SECRET', publicKey: 'YOUR_PUBLIC_KEY' }
-  Ae({ nodes: [{ name: 'local', instance: node, accounts: [MemoryAccount({ keypair })] }], debug, process })
+  Ae({ nodes: [{ name: 'local', instance: node }], debug, process })
     .then(ae => ae.spend(parseInt(amount), receiver))
     .then(tx => console.log('Transaction mined', tx))
     .catch(e => console.log(e.message))

@@ -36,27 +36,31 @@ export function decodeEvents (events, options = { schema: [] }) {
   return events.map(l => {
     const [eName, ...eParams] = l.topics
     const hexHash = toBytes(eName, true).toString('hex')
-    const { schema, isHasNonIndexed } = options.schema
+    const { schema } = options.schema
       .reduce(
         (acc, el) => {
           if (hash(el.name).toString('hex') === hexHash) {
             l.name = el.name
             return {
-              schema: el.types.filter(e => e !== SOPHIA_TYPES.string),
-              isHasNonIndexed: el.types.includes(SOPHIA_TYPES.string),
+              schema: el.types,
               name: el.name
             }
           }
           return acc
         },
-        { schema: [], isHasNonIndexed: true }
+        { schema: [] }
       )
+    const { decoded } = schema.reduce((acc, el) => {
+      if (el === SOPHIA_TYPES.string) {
+        return { decoded: [...acc.decoded, transformEvent(l.data, el)], params: acc.params }
+      }
+      const [event, ...tail] = acc.params
+      return { decoded: [...acc.decoded, transformEvent(event, el)], params: tail }
+    }, { decoded: [], params: eParams })
+
     return {
       ...l,
-      decoded: [
-        ...isHasNonIndexed ? [decode(l.data).toString('utf-8')] : [],
-        ...eParams.map((event, i) => transformEvent(event, schema[i]))
-      ]
+      decoded
     }
   })
 }
@@ -67,7 +71,7 @@ export function decodeEvents (events, options = { schema: [] }) {
  * @param {String} type Event type from schema
  * @return {*}
  */
-function transformEvent (event, type) {
+export function transformEvent (event, type) {
   switch (type) {
     case SOPHIA_TYPES.int:
       return parseBigNumber(event)
@@ -77,6 +81,8 @@ function transformEvent (event, type) {
       return toBytes(event, true).toString('hex')
     case SOPHIA_TYPES.address:
       return addressFromDecimal(event).split('_')[1]
+    case SOPHIA_TYPES.string:
+      return decode(event).toString('utf-8')
     default:
       return toBytes(event, true)
   }
@@ -203,7 +209,7 @@ export function transform (type, value, { bindings } = {}) {
   return `${value}`
 }
 
-function transformVariant (value, generic, { bindings }) {
+export function transformVariant (value, generic, { bindings }) {
   const [[variant, variantArgs]] = typeof value === 'string' ? [[value, []]] : Object.entries(value)
   const [[v, type]] = Object.entries(generic.find(o => Object.keys(o)[0].toLowerCase() === variant.toLowerCase()))
   return `${v}${!type.length

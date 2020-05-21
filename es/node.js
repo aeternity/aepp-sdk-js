@@ -48,8 +48,9 @@ async function remoteSwag (url, axiosConfig) {
  * @rtype () => networkId: String
  * @return {String} NetworkId
  */
-export function getNetworkId ({ networkId } = {}) {
-  if (!networkId && !this.networkId && (!this.selectedNode || !this.selectedNode.networkId)) throw new Error('networkId is not provided')
+export function getNetworkId ({ networkId, force = false } = {}) {
+  if (!force && !networkId && !this.networkId && (!this.selectedNode || !this.selectedNode.networkId)) throw new Error('networkId is not provided')
+  if (force && !networkId && !this.networkId && (!this.selectedNode || !this.selectedNode.networkId)) return null
   return networkId || this.networkId || this.selectedNode.networkId
 }
 

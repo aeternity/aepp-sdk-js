@@ -31,6 +31,20 @@ import { isInIframe } from './helpers'
 
 const wallets = {}
 
+const getOrigin = ({ isExtension, origin }) => {
+  if (isExtension) {
+    return window.origin
+  }
+  return origin
+}
+
+const getTarget = ({ isExtension, source }) => {
+  if (isExtension) {
+    return source
+  }
+  return isInIframe() ? window.parent : source
+}
+
 const handleDetection = (onDetected) => ({ method, params }, origin, source) => {
   if (!method || !params) return
   const ifExist = Object.prototype.hasOwnProperty.call(wallets, params.id)
@@ -40,12 +54,14 @@ const handleDetection = (onDetected) => ({ method, params }, origin, source) => 
       async getConnection () {
         // if detect extension wallet or page wallet
         const isExtension = this.type === 'extension'
+        const origin = getOrigin({ isExtension, origin: this.origin })
+        const target = getTarget({ isExtension, source })
         return BrowserWindowMessageConnection({
           connectionInfo: this,
-          origin: isExtension ? window.origin : this.origin,
           sendDirection: isExtension ? MESSAGE_DIRECTION.to_waellet : undefined,
           receiveDirection: isExtension ? MESSAGE_DIRECTION.to_aepp : undefined,
-          target: isInIframe() ? window.parent : source
+          target,
+          origin
         })
       }
     }
