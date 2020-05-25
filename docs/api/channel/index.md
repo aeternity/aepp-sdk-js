@@ -27,6 +27,7 @@ import Channel from '@aeternity/aepp-sdk/es/channel/index'
         * [~deposit(amount, sign, [callbacks])](#module_@aeternity/aepp-sdk/es/channel/index--Channel..deposit) ⇒ `Promise.&lt;Object&gt;`
         * [~createContract(options, sign)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..createContract) ⇒ `Promise.&lt;Object&gt;`
         * [~callContract(options, sign)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..callContract) ⇒ `Promise.&lt;Object&gt;`
+        * [~forceProgress(options, sign, callbacks)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..forceProgress) ⇒ `Promise.&lt;Object&gt;`
         * [~callContractStatic(options)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..callContractStatic) ⇒ `Promise.&lt;Object&gt;`
         * [~getContractCall(options)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..getContractCall) ⇒ `Promise.&lt;Object&gt;`
         * [~getContractState(contract)](#module_@aeternity/aepp-sdk/es/channel/index--Channel..getContractState) ⇒ `Promise.&lt;Object&gt;`
@@ -42,32 +43,33 @@ Channel
 **Returns**: `Promise.&lt;Object&gt;` - Channel instance  
 **rtype**: `Channel`
 
-| Param | Type | Description |
-| --- | --- | --- |
-| options | `Object` | Channel params |
-| options.url | `String` | Channel url (for example: "ws://localhost:3001") |
-| options.role | `String` | Participant role ("initiator" or "responder") |
-| options.initiatorId | `String` | Initiator's public key |
-| options.responderId | `String` | Responder's public key |
-| options.pushAmount | `Number` | Initial deposit in favour of the responder by the initiator |
-| options.initiatorAmount | `Number` | Amount of tokens the initiator has committed to the channel |
-| options.responderAmount | `Number` | Amount of tokens the responder has committed to the channel |
-| options.channelReserve | `Number` | The minimum amount both peers need to maintain |
-| [options.ttl] | `Number` | Minimum block height to include the channel_create_tx |
-| options.host | `String` | Host of the responder's node |
-| options.port | `Number` | The port of the responders node |
-| options.lockPeriod | `Number` | Amount of blocks for disputing a solo close |
-| [options.existingChannelId] | `Number` | Existing channel id (required if reestablishing a channel) |
-| [options.offchainTx] | `Number` | Offchain transaction (required if reestablishing a channel) |
-| [options.timeoutIdle] | `Number` | The time waiting for a new event to be initiated (default: 600000) |
-| [options.timeoutFundingCreate] | `Number` | The time waiting for the initiator to produce the create channel transaction after the noise session had been established (default: 120000) |
-| [options.timeoutFundingSign] | `Number` | The time frame the other client has to sign an off-chain update after our client had initiated and signed it. This applies only for double signed on-chain intended updates: channel create transaction, deposit, withdrawal and etc. (default: 120000) |
-| [options.timeoutFundingLock] | `Number` | The time frame the other client has to confirm an on-chain transaction reaching maturity (passing minimum depth) after the local node has detected this. This applies only for double signed on-chain intended updates: channel create transaction, deposit, withdrawal and etc. (default: 360000) |
-| [options.timeoutSign] | `Number` | The time frame the client has to return a signed off-chain update or to decline it. This applies for all off-chain updates (default: 500000) |
-| [options.timeoutAccept] | `Number` | The time frame the other client has to react to an event. This applies for all off-chain updates that are not meant to land on-chain, as well as some special cases: opening a noise connection, mutual closing acknowledgement and reestablishing an existing channel (default: 120000) |
-| [options.timeoutInitialized] | `Number` | the time frame the responder has to accept an incoming noise session. Applicable only for initiator (default: timeout_accept's value) |
-| [options.timeoutAwaitingOpen] | `Number` | The time frame the initiator has to start an outgoing noise session to the responder's node. Applicable only for responder (default: timeout_idle's value) |
-| options.sign | `function` | Function which verifies and signs transactions |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| options | `Object` |  | Channel params |
+| options.url | `String` |  | Channel url (for example: "ws://localhost:3001") |
+| options.role | `String` |  | Participant role ("initiator" or "responder") |
+| options.initiatorId | `String` |  | Initiator's public key |
+| options.responderId | `String` |  | Responder's public key |
+| options.pushAmount | `Number` |  | Initial deposit in favour of the responder by the initiator |
+| options.initiatorAmount | `Number` |  | Amount of tokens the initiator has committed to the channel |
+| options.responderAmount | `Number` |  | Amount of tokens the responder has committed to the channel |
+| options.channelReserve | `Number` |  | The minimum amount both peers need to maintain |
+| [options.ttl] | `Number` |  | Minimum block height to include the channel_create_tx |
+| options.host | `String` |  | Host of the responder's node |
+| options.port | `Number` |  | The port of the responders node |
+| options.lockPeriod | `Number` |  | Amount of blocks for disputing a solo close |
+| [options.existingChannelId] | `Number` |  | Existing channel id (required if reestablishing a channel) |
+| [options.offchainTx] | `Number` |  | Offchain transaction (required if reestablishing a channel) |
+| [options.timeoutIdle] | `Number` |  | The time waiting for a new event to be initiated (default: 600000) |
+| [options.timeoutFundingCreate] | `Number` |  | The time waiting for the initiator to produce the create channel transaction after the noise session had been established (default: 120000) |
+| [options.timeoutFundingSign] | `Number` |  | The time frame the other client has to sign an off-chain update after our client had initiated and signed it. This applies only for double signed on-chain intended updates: channel create transaction, deposit, withdrawal and etc. (default: 120000) |
+| [options.timeoutFundingLock] | `Number` |  | The time frame the other client has to confirm an on-chain transaction reaching maturity (passing minimum depth) after the local node has detected this. This applies only for double signed on-chain intended updates: channel create transaction, deposit, withdrawal and etc. (default: 360000) |
+| [options.timeoutSign] | `Number` |  | The time frame the client has to return a signed off-chain update or to decline it. This applies for all off-chain updates (default: 500000) |
+| [options.timeoutAccept] | `Number` |  | The time frame the other client has to react to an event. This applies for all off-chain updates that are not meant to land on-chain, as well as some special cases: opening a noise connection, mutual closing acknowledgement and reestablishing an existing channel (default: 120000) |
+| [options.timeoutInitialized] | `Number` |  | the time frame the responder has to accept an incoming noise session. Applicable only for initiator (default: timeout_accept's value) |
+| [options.timeoutAwaitingOpen] | `Number` |  | The time frame the initiator has to start an outgoing noise session to the responder's node. Applicable only for responder (default: timeout_idle's value) |
+| [options.debug] | `Number` | <code>false</code> | Log websocket communication |
+| options.sign | `function` |  | Function which verifies and signs transactions |
 
 **Example**  
 ```js
@@ -478,6 +480,42 @@ channel.callContract({
     console.log('Contract called succesfully')
   } else {
     console.log('Contract call has been rejected')
+  }
+})
+```
+<a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..forceProgress"></a>
+
+#### Channel~forceProgress(options, sign, callbacks) ⇒ `Promise.&lt;Object&gt;`
+Trigger a force progress contract call
+This call is going on-chain
+
+**Kind**: inner method of [`Channel`](#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| options | `Object` |  |  |
+| [options.amount] | `String` |  | Amount the caller of the contract commits to it |
+| [options.callData] | `String` |  | ABI encoded compiled AEVM call data for the code |
+| [options.contract] | `Number` |  | Address of the contract to call |
+| [options.abiVersion] | `Number` |  | Version of the ABI |
+| [options.gasPrice] | `Number` | <code>1000000000</code> | Gas price |
+| [options.gas] | `Number` | <code>1000000</code> | Gas limit |
+| sign | `function` |  | Function which verifies and signs contract force progress transaction |
+| callbacks | `Object` |  |  |
+
+**Example**  
+```js
+channel.forceProgress({
+  contract: 'ct_9sRA9AVE4BYTAkh5RNfJYmwQe1NZ4MErasQLXZkFWG43TPBqa',
+  callData: 'cb_1111111111111111...',
+  amount: 0,
+  abiVersion: 1,
+  gasPrice: 1000005554
+}).then(({ accepted, signedTx }) => {
+  if (accepted) {
+    console.log('Contract force progress call successful')
+  } else {
+    console.log('Contract force progress call has been rejected')
   }
 })
 ```

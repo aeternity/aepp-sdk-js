@@ -84,7 +84,7 @@ const handleMessage = (instance) => async (msg) => {
  * @return {Object}
  */
 export const AeppRpc = Ae.compose({
-  async init ({ name, onAddressChange = voidFn, onDisconnect = voidFn, onNetworkChange = voidFn, connection }) {
+  async init ({ name, onAddressChange = voidFn, onDisconnect = voidFn, onNetworkChange = voidFn, connection, forceValidation = false }) {
     const eventsHandlers = ['onDisconnect', 'onAddressChange', 'onNetworkChange']
     this.connection = connection
     this.name = name
@@ -99,7 +99,7 @@ export const AeppRpc = Ae.compose({
     this.onNetworkChange = onNetworkChange
     // validation
     eventsHandlers.forEach(event => {
-      if (typeof this[event] !== 'function') throw new Error(`Call-back for ${event} must be an function!`)
+      if (!forceValidation && typeof this[event] !== 'function') throw new Error(`Call-back for ${event} must be an function!`)
     })
   },
   deepProps: { Ae: { defaults: { walletBroadcast: true } } },

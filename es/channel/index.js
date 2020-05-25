@@ -572,29 +572,17 @@ function callContract ({ amount, callData, contract, abiVersion }, sign) {
 }
 
 /**
- * Trigger call a contract update
- *
- * The call contract update is calling a preexisting contract inside the channel's
- * internal state tree. The update is a change to be applied on top of the latest state.
- *
- * That would call a contract with the poster being the caller of it. Poster commits
- * an amount of tokens to the contract.
- *
- * The call would also create a call object inside the channel state tree. It contains
- * the result of the contract call.
- *
- * It is worth mentioning that the gas is not consumed, because this is an off-chain
- * contract call. It would be consumed if it were a on-chain one. This could happen
- * if a call with a similar computation amount is to be forced on-chain.
- *
+ * Trigger a force progress contract call
+ * This call is going on-chain
  * @param {Object} options
  * @param {String} [options.amount] - Amount the caller of the contract commits to it
  * @param {String} [options.callData] - ABI encoded compiled AEVM call data for the code
  * @param {Number} [options.contract] - Address of the contract to call
  * @param {Number} [options.abiVersion] - Version of the ABI
- * @param {Number} [options.gasPrice] - Gas price
+ * @param {Number} [options.gasPrice=1000000000] - Gas price
  * @param {Number} [options.gas=1000000] - Gas limit
  * @param {Function} sign - Function which verifies and signs contract force progress transaction
+ * @param {{ onOnChainTxL: Function }} callbacks
  * @return {Promise<Object>}
  * @example channel.forceProgress({
  *   contract: 'ct_9sRA9AVE4BYTAkh5RNfJYmwQe1NZ4MErasQLXZkFWG43TPBqa',

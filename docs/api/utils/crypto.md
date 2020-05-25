@@ -12,6 +12,7 @@ import * as Crypto from '@aeternity/aepp-sdk/es/utils/crypto'
     * _static_
         * [.decode](#module_@aeternity/aepp-sdk/es/utils/crypto.decode) ⇒ `Array`
         * [.formatAddress(format, address)](#module_@aeternity/aepp-sdk/es/utils/crypto.formatAddress) ⇒ `String`
+        * [.getAddressFromPriv(secret)](#module_@aeternity/aepp-sdk/es/utils/crypto.getAddressFromPriv) ⇒ `String`
         * [.isAddressValid(address, prefix)](#module_@aeternity/aepp-sdk/es/utils/crypto.isAddressValid) ⇒ `Boolean`
         * [.addressToHex(base58CheckAddress)](#module_@aeternity/aepp-sdk/es/utils/crypto.addressToHex) ⇒ `String`
         * [.addressFromDecimal(decimalAddress)](#module_@aeternity/aepp-sdk/es/utils/crypto.addressFromDecimal) ⇒ `String`
@@ -74,6 +75,19 @@ Format account address
 | --- | --- | --- |
 | format | `String` | Format type |
 | address | `String` | Base58check account address |
+
+<a id="module_@aeternity/aepp-sdk/es/utils/crypto.getAddressFromPriv"></a>
+
+### @aeternity/aepp-sdk/es/utils/crypto.getAddressFromPriv(secret) ⇒ `String`
+Generate address from secret key
+
+**Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
+**Returns**: `String` - Public key  
+**rtype**: `(secret: String) => tx: Promise[String]`
+
+| Param | Type | Description |
+| --- | --- | --- |
+| secret | `String` | Private key |
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.isAddressValid"></a>
 

@@ -69,7 +69,8 @@ Build binary transaction
 | params | `Object` |  | Object with tx params |
 | schema | `Array` |  | Transaction schema |
 | [options] | `Object` | <code>{}</code> | options |
-| [options.excludeKeys] | `Array` |  | excludeKeys Array of keys to exclude for validation and build |
+| [options.excludeKeys] | `Array` | <code>[]</code> | excludeKeys Array of keys to exclude for validation and build |
+| [options.denomination] | `String` | <code>&#x27;aettos&#x27;</code> | denomination Denomination of amounts (default: aettos) |
 
 <a id="exp_module_@aeternity/aepp-sdk/es/tx/builder--exports.unpackRawTx"></a>
 
