@@ -187,7 +187,7 @@ export const AeppRpc = Ae.compose({
       if (!this.rpcClient || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
       if (!this.rpcClient.currentAccount) throw new Error('You do not subscribed for account.')
       if (opt.onAccount && !this.rpcClient.hasAccessToAccount(opt.onAccount)) throw new Error(`You are not have access to account ${opt.onAccount}`)
-      return this.rpcClient.request(METHODS.aepp.sign, { ...opt, tx, returnSigned: true })
+      return this.rpcClient.request(METHODS.aepp.sign, { ...opt, tx, returnSigned: true, networkId: this.getNetworkId() })
     },
     /**
      * Overwriting of `signMessage` AE method
@@ -240,7 +240,7 @@ export const AeppRpc = Ae.compose({
         const signed = await this.signTransaction(tx, { onAccount: opt.onAccount })
         return this.sendTransaction(signed, opt)
       }
-      return this.rpcClient.request(METHODS.aepp.sign, { onAccount: opt.onAccount, tx, returnSigned: false })
+      return this.rpcClient.request(METHODS.aepp.sign, { onAccount: opt.onAccount, tx, returnSigned: false, networkId: this.getNetworkId() })
     }
   }
 })

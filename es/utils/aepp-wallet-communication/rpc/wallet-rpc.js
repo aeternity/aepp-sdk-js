@@ -33,7 +33,6 @@ const REQUESTS = {
   async [METHODS.aepp.connect] (callInstance, instance, client, { name, networkId, version, icons }) {
     // Check if protocol and network is compatible with wallet
     if (version !== VERSION) return { error: ERRORS.unsupportedProtocol() }
-    // if (networkId !== instance.getNetworkId()) return { error: ERRORS.unsupportedNetwork() }
 
     // Store new AEPP and wait for connection approve
     rpcClients.updateClientInfo(client.id, {
@@ -97,14 +96,16 @@ const REQUESTS = {
       (error) => ({ error: ERRORS.rejectedByUser(error) })
     )
   },
-  async [METHODS.aepp.sign] (callInstance, instance, client, { tx, onAccount, returnSigned = false }) {
+  async [METHODS.aepp.sign] (callInstance, instance, client, { tx, onAccount, networkId, returnSigned = false }) {
     const address = onAccount || client.currentAccount
+    // Update client with new networkId
+    networkId && rpcClients.updateClientInfo(client.id, { networkId })
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
     // Account permission check
     if (!client.hasAccessToAccount(address)) return { error: ERRORS.permissionDeny({ account: address }) }
     // NetworkId check
-    if (client.info.networkId !== instance.getNetworkId()) return { error: ERRORS.unsupportedNetwork() }
+    if (!networkId || networkId !== instance.getNetworkId()) return { error: ERRORS.unsupportedNetwork() }
 
     return callInstance(
       'onSign',

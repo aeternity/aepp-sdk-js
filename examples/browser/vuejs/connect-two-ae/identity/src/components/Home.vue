@@ -6,6 +6,29 @@
     <h1 class="mb-4">Wallet Aepp</h1>
 
     <div class="border">
+      <template v-if="nodeInfoResponse">
+        <div v-if="nodeInfoResponse.error" class="bg-green w-full flex flex-row font-mono border border-b">
+          <div class="p-2 w-1/4">
+            NodeInfo error
+          </div>
+          <div class="p-2 w-3/4 bg-grey-lightest break-words">
+            {{nodeInfoResponse.error}}
+          </div>
+        </div>
+        <div
+          v-for="(value, name) in nodeInfoResponse.result"
+          v-if="['url', 'name', 'nodeNetworkId', 'version'].includes(name)"
+          class="bg-green w-full flex flex-row font-mono border border-b"
+        >
+          <div class="p-2 w-1/4 capitalize">
+            {{name.replace('nodeNetworkId', 'NetworkId')}}
+          </div>
+          <div class="p-2 w-3/4 bg-grey-lightest">
+            {{value}}
+          </div>
+        </div>
+      </template>
+
       <div class="bg-green w-full flex flex-row font-mono border border-b">
         <div class="p-2 w-1/4">
           Public Key
@@ -27,6 +50,11 @@
         class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 text-xs"
         @click="switchAccount"
       >Switch Account</button>
+      <button
+        v-if="client"
+        class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 text-xs"
+        @click="switchNode"
+      >Switch Node</button>
     </div>
 
     <div v-if="!aeppUrl" class="w-full p-4 h-64 border border-black border-dashed shadow mx-auto mt-4 bg-grey-lighter">
@@ -46,6 +74,15 @@
     from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message'
   import { generateKeyPair } from '@aeternity/aepp-sdk/es/utils/crypto'
 
+  const errorAsField = async fn => {
+    try {
+      return { result: await fn }
+    } catch (error) {
+      console.log(error)
+      return { error }
+    }
+  }
+
   export default {
     data () {
       return {
@@ -54,9 +91,11 @@
         secretKey: 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b', // Your private key
         client: null,
         balance: null,
+        nodeInfoResponse: null,
         height: null,
         url: 'https://sdk-testnet.aepps.com',
-        internalUrl: 'https://sdk-testnet.aepps.com',
+        mainNetUrl: 'https://mainnet.aeternity.io',
+        internalUrl: 'https://testnet.aeternity.io',
         compilerUrl: 'https://compiler.aepps.com',
         aeppUrl: '//0.0.0.0:9001'
       }
@@ -91,11 +130,17 @@
         this.client.selectAccount(secondAcc)
         this.publicKey = await this.client.address()
         this.balance = await this.client.balance(this.publicKey).catch(() => 0)
+      },
+      async switchNode () {
+        const toNode = this.client.getNodesInPool().find(n => n.name !== this.client.selectedNode.name)
+        this.client.selectNode(toNode.name)
+        this.nodeInfoResponse = await errorAsField(this.client.getNodeInfo())
       }
     },
     async created () {
       const account2 = MemoryAccount({ keypair: generateKeyPair() })
-      const node = await Node({ url: this.url, internalUrl: this.internalUrl })
+      const testNetNode = await Node({ url: this.url })
+      const mainNetNode = await Node({ url: this.mainNetUrl })
 
       const genConfirmCallback = getActionName => (aepp, { accept, deny, params }) => {
         if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to ${getActionName(params)}`)) accept()
@@ -105,7 +150,10 @@
       const keypair2 = generateKeyPair()
       const sdkAcc = this.publicKey
       this.client = await RpcWallet({
-        nodes: [{ name: 'test-net', instance: node }],
+        nodes: [
+          { name: 'ae_uat', instance: testNetNode },
+          { name: 'ae_mainnet', instance: mainNetNode },
+        ],
         compilerUrl: this.compilerUrl,
         accounts: [MemoryAccount({ keypair: { secretKey: this.secretKey, publicKey: this.publicKey } }), account2],
         address: this.publicKey,
@@ -148,6 +196,8 @@
       this.client.addRpcClient(connection)
       this.shareWalletInfo(connection.sendMessage.bind(connection))
 
+      // Get node info
+      this.nodeInfoResponse = await errorAsField(this.client.getNodeInfo())
       // Get balance
       this.balance = await this.client.balance(await this.client.address()).catch(e => 0)
     }

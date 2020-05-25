@@ -105,6 +105,7 @@ function isConnected () {
 
 export const BrowserRuntimeConnection = stampit({
   init ({ connectionInfo = {}, port, debug = false }) {
+    if (!getBrowserAPI().runtime) throw new Error('Runtime is not accessible in your environment')
     this.debug = debug
     this.connectionInfo = connectionInfo
     this.port = port || getBrowserAPI().runtime.connect(...[connectionInfo.id || undefined])
