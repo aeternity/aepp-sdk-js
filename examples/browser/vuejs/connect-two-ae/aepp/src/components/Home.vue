@@ -202,8 +202,8 @@
   import BrowserWindowMessageConnection from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message'
 
   // Send wallet connection info to Aepp throug content script
-  const NODE_URL = 'https://sdk-testnet.aepps.com'
-  const NODE_INTERNAL_URL = 'https://sdk-testnet.aepps.com'
+  const TEST_NET_NODE_URL = 'https://testnet.aeternity.io'
+  const MAIN_NET_NODE_INTERNAL_URL = 'https://mainnet.aeternity.io'
   const COMPILER_URL = 'https://compiler.aepps.com'
 
   const errorAsField = async fn => {
@@ -332,10 +332,14 @@
 
       this.client = await RpcAepp({
         name: 'AEPP',
-        nodes: [{ name: 'test-net', instance: await Node({ url: NODE_URL, internalUrl: NODE_INTERNAL_URL }) }],
+        nodes: [
+          { name: 'ae_uat', instance: await Node({ url: TEST_NET_NODE_URL }) },
+          { name: 'ae_mainnet', instance: await Node({ url: MAIN_NET_NODE_INTERNAL_URL }) }
+        ],
         compilerUrl: COMPILER_URL,
-        onNetworkChange (params) {
-          if (this.getNetworkId() !== params.networkId) alert(`Connected network ${this.getNetworkId()} is not supported with wallet network ${params.networkId}`)
+        onNetworkChange: async (params) => {
+          this.client.selectNode(params.networkId)
+          this.nodeInfoResponse = await errorAsField(this.client.getNodeInfo())
         },
         onAddressChange:  async (addresses) => {
           this.pub = await this.client.address()
