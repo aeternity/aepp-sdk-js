@@ -95,7 +95,7 @@
         height: null,
         url: 'https://sdk-testnet.aepps.com',
         mainNetUrl: 'https://mainnet.aeternity.io',
-        internalUrl: 'https://sdk-testnet.aepps.com',
+        internalUrl: 'https://testnet.aeternity.io',
         compilerUrl: 'https://compiler.aepps.com',
         aeppUrl: '//0.0.0.0:9001'
       }

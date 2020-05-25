@@ -202,7 +202,7 @@
   import BrowserWindowMessageConnection from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message'
 
   // Send wallet connection info to Aepp throug content script
-  const TEST_NET_NODE_URL = 'https://sdk-testnet.aepps.com'
+  const TEST_NET_NODE_URL = 'https://testnet.aeternity.io'
   const MAIN_NET_NODE_INTERNAL_URL = 'https://mainnet.aeternity.io'
   const COMPILER_URL = 'https://compiler.aepps.com'
 
