@@ -1,22 +1,8 @@
 ## [7.3.1](https://github.com/aeternity/aepp-sdk-js/compare/7.2.1...7.3.1) (2020-05-25)
 
+### Improvements
 
-### Bug Fixes
-
-* **example:** Regenerate lock ([#960](https://github.com/aeternity/aepp-sdk-js/issues/960)) ([5b6a30e](https://github.com/aeternity/aepp-sdk-js/commit/5b6a30e))
-
-
-### Features
-
-* **ACI:** expose events decoding through Contract ACI stamp  ([#971](https://github.com/aeternity/aepp-sdk-js/issues/971)) ([4930635](https://github.com/aeternity/aepp-sdk-js/commit/4930635))
-* **AEX_2:** Allow to connect without node ([#991](https://github.com/aeternity/aepp-sdk-js/issues/991)) ([87b9ef9](https://github.com/aeternity/aepp-sdk-js/commit/87b9ef9))
-* **AEX_2:** Connect to extension from iframe ([#992](https://github.com/aeternity/aepp-sdk-js/issues/992)) ([47179f7](https://github.com/aeternity/aepp-sdk-js/commit/47179f7))
-* **Build:** Expose `ACIHelpers` and `ACITransformation` to bundle ([#970](https://github.com/aeternity/aepp-sdk-js/issues/970)) ([8b475e0](https://github.com/aeternity/aepp-sdk-js/commit/8b475e0))
-* **Chain:** Add option `allowUnsynced` for `poll` method which allow to depend on `get tx/info` API ([9c80ce0](https://github.com/aeternity/aepp-sdk-js/commit/9c80ce0))
-* **Channel:** add timeout message handler ([#983](https://github.com/aeternity/aepp-sdk-js/issues/983)) ([1940a15](https://github.com/aeternity/aepp-sdk-js/commit/1940a15))
-* **Channel:** Channel force progress ([#964](https://github.com/aeternity/aepp-sdk-js/issues/964)) ([8f15bef](https://github.com/aeternity/aepp-sdk-js/commit/8f15bef))
-* **Contract:** Add unpacked transaction to contract call with error ([#981](https://github.com/aeternity/aepp-sdk-js/issues/981)) ([4efd341](https://github.com/aeternity/aepp-sdk-js/commit/4efd341))
-* **Node:** Add `debug` option to Channel stamp ([#967](https://github.com/aeternity/aepp-sdk-js/issues/967)) ([68fcba5](https://github.com/aeternity/aepp-sdk-js/commit/68fcba5))
+* **AEX_2:** Handle network switch and update state on both sides. Adjust networkId check for signing request. Add node switcher for example apps ([#996](https://github.com/aeternity/aepp-sdk-js/pull/996))
 
 
 
