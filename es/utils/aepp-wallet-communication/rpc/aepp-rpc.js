@@ -240,7 +240,7 @@ export const AeppRpc = Ae.compose({
         const signed = await this.signTransaction(tx, { onAccount: opt.onAccount })
         return this.sendTransaction(signed, opt)
       }
-      return this.rpcClient.request(METHODS.aepp.sign, { onAccount: opt.onAccount, tx, returnSigned: false })
+      return this.rpcClient.request(METHODS.aepp.sign, { onAccount: opt.onAccount, tx, returnSigned: false, networkId: this.getNetworkId() })
     }
   }
 })
