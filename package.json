@@ -91,7 +91,7 @@
     "mocha": "^7.0.1",
     "npm-force-resolutions": "0.0.3",
     "nyc": "^15.0.0",
-    "recursive-rename": "^3.0.0",
+    "recursive-rename": "^4.0.0",
     "safe-buffer": "^5.1.2",
     "sinon": "^9.0.0",
     "source-map": "^0.7.3",
