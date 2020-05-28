@@ -1,3 +1,11 @@
+## [7.3.1](https://github.com/aeternity/aepp-sdk-js/compare/7.2.1...7.3.1) (2020-05-25)
+
+### Improvements
+
+* **AEX_2:** Handle network switch and update state on both sides. Adjust networkId check for signing request. Add node switcher for example apps ([#996](https://github.com/aeternity/aepp-sdk-js/pull/996))
+
+
+
 # [7.3.0](https://github.com/aeternity/aepp-sdk-js/compare/7.2.1...7.3.0) (2020-05-20)
 
 
