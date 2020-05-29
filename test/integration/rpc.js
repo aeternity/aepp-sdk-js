@@ -636,11 +636,13 @@ describe('Aepp<->Wallet', function () {
     })
     it('getBrowserAPI: chrome', () => {
       global.chrome = { runtime: {}, chrome: true }
+      global.window = { location: { origin: '//test' }, chrome: global.chrome }
       getBrowserAPI().chrome.should.be.equal(true)
     })
     it('getBrowserAPI: firefox', () => {
       global.chrome = null
       global.browser = { runtime: {}, firefox: true }
+      global.window = { location: { origin: '//test' }, browser: global.browser }
       getBrowserAPI().firefox.should.be.equal(true)
     })
     it('isInIframe/getWindow', () => {
@@ -673,7 +675,7 @@ describe('Aepp<->Wallet', function () {
 
 const getConnections = (direct) => {
   global.chrome = { runtime: {} }
-  global.window = { location: { origin: '//test' } }
+  global.window = { location: { origin: '//test' }, chrome: global.chrome }
   global.location = { protocol: 'http://test.com' }
   return getFakeConnections(direct)
 }
