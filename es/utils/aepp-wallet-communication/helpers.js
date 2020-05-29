@@ -7,10 +7,11 @@ import { isMemoryAccount } from '../../account/selector'
 const isWeb = () => location && location.protocol && location.protocol.startsWith('http')
 
 export const getBrowserAPI = (force = false) => {
+  const window = getWindow(force)
   // Chrome, Opera support
-  if (chrome === Object(chrome)) return chrome
+  if (window && window.chrome === Object(window.chrome)) return window.chrome
   // Firefox support
-  if (browser === Object(browser)) return browser
+  if (window && window.browser === Object(window.browser)) return window.browser
   if (!force) throw new Error('Browser is not detected')
   return {}
 }
@@ -24,8 +25,8 @@ export const isContentScript = () => isExtensionContext() && isWeb()
 
 export const isInIframe = () => window !== window.parent
 
-export const getWindow = () => {
-  if (!window) throw new Error('Browser is not detected')
+export const getWindow = (force = false) => {
+  if (!window && !force) throw new Error('Browser is not detected')
   return window
 }
 
