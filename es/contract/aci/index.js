@@ -131,7 +131,7 @@ async function getContractInstance (source, { aci, contractAddress, filesystem =
    * @return {Object} CallResult
    */
   instance.call = call({ client: this, instance })
-/**
+  /**
    * Decode Events
    * @alias module:@aeternity/aepp-sdk/es/contract/aci
    * @rtype (fn: String, events: Array) => DecodedEvents: Array
