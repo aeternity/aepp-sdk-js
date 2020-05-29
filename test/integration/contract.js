@@ -538,6 +538,8 @@ describe('Contract', function () {
       let cInstance
       let eventResult
       let decodedEventsWithoutACI
+      let decodedEventsUsingACI
+      let decodedEventsUsingBuildInMethod
 
       before(async () => {
         cInstance = await contract.getContractInstance(testContract, { filesystem })
@@ -545,6 +547,8 @@ describe('Contract', function () {
         eventResult = await cInstance.methods.emitEvents()
         const { log } = await contract.tx(eventResult.hash)
         decodedEventsWithoutACI = decodeEvents(log, { schema: events })
+        decodedEventsUsingACI = cInstance.decodeEvents('emitEvents', log)
+        decodedEventsUsingBuildInMethod = cInstance.methods.emitEvents.decodeEvents(log)
       })
       const events = [
         { name: 'AnotherEvent2', types: [SOPHIA_TYPES.bool, SOPHIA_TYPES.string, SOPHIA_TYPES.int] },
@@ -579,7 +583,9 @@ describe('Contract', function () {
       events
         .forEach((el, i) => {
           describe(`Correct parse of ${el.name}(${el.types})`, () => {
-            it('ACI', () => checkEvents(eventResult.decodedEvents[i], el))
+            it('ACI call result', () => checkEvents(eventResult.decodedEvents[i], el))
+            it('ACI instance', () => checkEvents(decodedEventsUsingACI[i], el))
+            it('ACI instance methods', () => checkEvents(decodedEventsUsingBuildInMethod[i], el))
             it('Without ACI', () => checkEvents(decodedEventsWithoutACI[i], el))
           })
         })
