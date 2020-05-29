@@ -54,11 +54,12 @@ function disconnect () {
  * @return {void}
  */
 function connect (onMessage, onDisconnect) {
-  if (typeof this.port.onMessage.hasListeners === 'function' && this.port.onMessage.hasListeners()) throw new Error('You already connected')
-  this.port.onMessage.addListener((msg, source) => {
+  if (this.isConnected()) throw new Error('You already connected')
+  this.handler = ((msg, source) => {
     if (this.debug) console.log('Receive message: ', msg)
     onMessage(msg, source)
-  })
+  }).bind(this)
+  this.port.onMessage.addListener(this.handler)
   this.port.onDisconnect.addListener(() => {
     typeof onDisconnect === 'function' && onDisconnect({}, this)
     this.port.disconnect()
@@ -87,7 +88,7 @@ function sendMessage (msg) {
  * @return {Boolean} Is connected
  */
 function isConnected () {
-  return this.port.onMessage.hasListeners()
+  return typeof this.port.onMessage.hasListeners === 'function' ?  this.port.onMessage.hasListeners() : this.port.onMessage.hasListener(this.handler)
 }
 
 /**
