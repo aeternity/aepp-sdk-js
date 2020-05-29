@@ -8,9 +8,9 @@ const isWeb = () => location && location.protocol && location.protocol.startsWit
 
 export const getBrowserAPI = (force = false) => {
   // Chrome, Opera support
-  if (chrome === Object(chrome)) return chrome
+  if (typeof chrome !== 'undefined' && chrome === Object(chrome)) return chrome
   // Firefox support
-  if (browser === Object(browser)) return browser
+  if (typeof browser !== 'undefined' && browser === Object(browser)) return browser
   if (!force) throw new Error('Browser is not detected')
   return {}
 }
@@ -24,8 +24,8 @@ export const isContentScript = () => isExtensionContext() && isWeb()
 
 export const isInIframe = () => window !== window.parent
 
-export const getWindow = () => {
-  if (!window) throw new Error('Browser is not detected')
+export const getWindow = (force = false) => {
+  if (!window && !force) throw new Error('Browser is not detected')
   return window
 }
 

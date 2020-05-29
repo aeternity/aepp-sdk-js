@@ -1,3 +1,17 @@
+# [7.4.0](https://github.com/aeternity/aepp-sdk-js/compare/7.3.1...7.4.0) (2020-05-29)
+
+
+### Bug Fixes
+
+* **AEX-2:** Fix `getBrowserAPI` helper for cross-browser compatibility ([#1007](https://github.com/aeternity/aepp-sdk-js/issues/1007)) ([98b0e29](https://github.com/aeternity/aepp-sdk-js/commit/98b0e29))
+
+
+### Features
+
+* **ACI:** Event decoding ([#1006](https://github.com/aeternity/aepp-sdk-js/issues/1006)) ([6b8e6fe](https://github.com/aeternity/aepp-sdk-js/commit/6b8e6fe))
+
+
+
 ## [7.3.1](https://github.com/aeternity/aepp-sdk-js/compare/7.2.1...7.3.1) (2020-05-25)
 
 ### Improvements
