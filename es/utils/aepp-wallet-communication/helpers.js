@@ -7,11 +7,10 @@ import { isMemoryAccount } from '../../account/selector'
 const isWeb = () => location && location.protocol && location.protocol.startsWith('http')
 
 export const getBrowserAPI = (force = false) => {
-  const window = getWindow(force)
   // Chrome, Opera support
-  if (window && window.chrome === Object(window.chrome)) return window.chrome
+  if (typeof chrome !== 'undefined' && chrome === Object(chrome)) return chrome
   // Firefox support
-  if (window && window.browser === Object(window.browser)) return window.browser
+  if (typeof browser !== 'undefined' && browser === Object(browser)) return browser
   if (!force) throw new Error('Browser is not detected')
   return {}
 }
