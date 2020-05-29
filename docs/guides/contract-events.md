@@ -26,8 +26,14 @@ contract EventExample =
     ```
   - Decode using ACI
     ```js
+    // Auto decode of events on contract call
     const callRes = await contractIns.methods.emitEvents()
-    console.log(callRes.decodedEvents)
+    // decode of events using contract instance
+    const decodedUsingInstance = contractIns.decodeEvents('emitEvents', callRes.result.log)
+    // decode of events using contract instance ACI methods
+    const decodedUsingInstanceMethods = contractIns.methods.emitEvents.decodeEvents(callRes.result.log)
+    // callRes.decodedEvents === decodedUsingInstance === decodedUsingInstanceMethods
+    console.log(callRes.decodedEvents || decodedUsingInstance || decodedUsingInstanceMethods)
     /*
     [
       { address: 'ct_N9s65ZMz9SUUKx2HDLCtxVNpEYrzzmYEuESdJwmbEsAo5TzxM',
