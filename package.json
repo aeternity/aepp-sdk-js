@@ -56,7 +56,7 @@
   },
   "devDependencies": {
     "@babel/cli": "7.10.1",
-    "@babel/core": "7.10.1",
+    "@babel/core": "7.10.2",
     "@babel/node": "7.10.1",
     "@babel/plugin-proposal-export-default-from": "7.10.1",
     "@babel/plugin-proposal-object-rest-spread": "7.10.1",
