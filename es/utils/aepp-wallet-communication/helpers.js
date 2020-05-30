@@ -16,7 +16,7 @@ export const getBrowserAPI = (force = false) => {
 }
 
 const isExtensionContext = () => {
-  const browser = getBrowserAPI()
+  const browser = getBrowserAPI(true)
   return typeof browser === 'object' && browser && typeof browser.extension === 'object'
 }
 
