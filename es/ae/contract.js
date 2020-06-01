@@ -44,10 +44,11 @@ async function resolveContractAddress (addressOrName) {
   if (typeof addressOrName !== 'string') throw new Error('Invalid contract address. Should be a string with "ct" prefix or "AENS" name')
   if (assertedType(addressOrName, 'ct', true)) return addressOrName
   if (isNameValid(addressOrName)) {
-    const { pointers } = await this.getName(addressOrName)
-    const contract = pointers.find(({ id }) => id.split('_')[0] === 'ct')
-    if (!contract) throw new Error(`Name ${addressOrName} do not have pointers for contract`)
-    return contract.id
+    const name = await this.getName(addressOrName).catch(_ => null)
+    if (!name) throw new Error('Name not found')
+    const contractPointer = name.pointers.find(({ id }) => id.split('_')[0] === 'ct')
+    if (!contractPointer) throw new Error(`Name ${addressOrName} do not have pointers for contract`)
+    return contractPointer.id
   }
   throw new Error('Invalid contract address. Should be a string with "ct" prefix or "AENS" name')
 }
@@ -63,8 +64,8 @@ function sendAndProcess (tx, options) {
 
     const result = await this.getTxInfo(txData.hash)
     return result.returnType === 'ok'
-      ? onSuccess({ hash: txData.hash, tx: TxObject({ tx: txData.rawTx }), result, txData })
-      : typeof onError === 'function' ? onError(result) : this.handleCallError({ result, tx: TxObject({ tx: txData.rawTx }) })
+      ? onSuccess({ hash: txData.hash, tx: TxObject({ tx: txData.rawTx }), result, txData, rawTx: txData.rawTx })
+      : typeof onError === 'function' ? onError(result) : this.handleCallError({ result, tx: TxObject({ tx: txData.rawTx }), rawTx: txData.rawTx })
   }
 }
 
@@ -78,13 +79,14 @@ function sendAndProcess (tx, options) {
  * @throws Error Decoded error
  * @return {Promise<void>}
  */
-async function handleCallError ({ result, tx }) {
+async function handleCallError ({ result, tx, rawTx }) {
   const error = Buffer.from(result.returnValue).toString()
   if (isBase64(error.slice(3))) {
     const decodedError = Buffer.from(error.slice(3), 'base64').toString()
     throw Object.assign(Error(`Invocation failed: ${error}. Decoded: ${decodedError}`), R.merge(result, {
       tx,
       error,
+      rawTx,
       decodedError
     }))
   }
@@ -93,6 +95,7 @@ async function handleCallError ({ result, tx }) {
   throw Object.assign(Error(`Invocation failed: ${error}. Decoded: ${decodedError}`), R.merge(result, {
     tx,
     error,
+    rawTx,
     decodedError
   }))
 }
