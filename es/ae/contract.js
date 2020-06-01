@@ -36,8 +36,21 @@ import ContractACI from '../contract/aci'
 import BigNumber from 'bignumber.js'
 import NodePool from '../node-pool'
 import { AMOUNT, DEPOSIT, DRY_RUN_ACCOUNT, GAS, MIN_GAS_PRICE } from '../tx/builder/schema'
-import { decode, produceNameId } from '../tx/builder/helpers'
+import { decode, isNameValid, produceNameId } from '../tx/builder/helpers'
 import TxObject from '../tx/tx-object'
+import { assertedType } from '../utils/crypto'
+
+async function resolveContractAddress (addressOrName) {
+  if (typeof addressOrName !== 'string') throw new Error('Invalid contract address. Should be a string with "ct" prefix or "AENS" name')
+  if (assertedType(addressOrName, 'ct', true)) return addressOrName
+  if (isNameValid(addressOrName)) {
+    const { pointers } = await this.getName(addressOrName)
+    const contract = pointers.find(({ id }) => id.split('_')[0] === 'ct')
+    if (!contract) throw new Error(`Name ${addressOrName} do not have pointers for contract`)
+    return contract.id
+  }
+  throw new Error('Invalid contract address. Should be a string with "ct" prefix or "AENS" name')
+}
 
 function sendAndProcess (tx, options) {
   return async function (onSuccess, onError) {
@@ -170,7 +183,7 @@ async function contractCallStatic (source, address, name, args = [], { top, opti
     // Prepare `call` transaction
     const tx = await this.contractCallTx(R.merge(opt, {
       callerId,
-      contractId: address,
+      contractId: await this.resolveContractAddress(address),
       callData,
       nonce
     }))
@@ -208,7 +221,7 @@ async function dryRunContractTx (tx, callerId, source, name, opt = {}) {
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
  * @param {String} source Contract source code
- * @param {String} address Contract address
+ * @param {String} address Contract address or AENS name
  * @param {String} name Name of function to call
  * @param {Array|String} argsOrCallData Argument's array or callData for call function
  * @param {Object} [options={}] Transaction options (fee, ttl, gas, amount, deposit)
@@ -226,7 +239,7 @@ async function contractCall (source, address, name, argsOrCallData = [], options
 
   const tx = await this.contractCallTx(R.merge(opt, {
     callerId: await this.address(opt),
-    contractId: address,
+    contractId: await this.resolveContractAddress(address),
     callData: Array.isArray(argsOrCallData) ? await this.contractEncodeCall(source, name, argsOrCallData, opt) : argsOrCallData
   }))
 
@@ -483,6 +496,7 @@ export const ContractAPI = Ae.compose(ContractBase, ContractACI, {
     contractEncodeCall,
     contractDecodeData,
     dryRunContractTx,
+    resolveContractAddress,
     handleCallError,
     // Delegation for contract
     // AENS
