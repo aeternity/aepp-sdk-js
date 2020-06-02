@@ -1,3 +1,12 @@
+## [7.4.1](https://github.com/aeternity/aepp-sdk-js/compare/7.4.0...7.4.1) (2020-05-30)
+
+
+### Bug Fixes
+
+* **AEX-2:** Fix `isExtensionContext ` check ([#1011](https://github.com/aeternity/aepp-sdk-js/issues/1011)) ([814f99b](https://github.com/aeternity/aepp-sdk-js/commit/814f99b))
+
+
+
 # [7.4.0](https://github.com/aeternity/aepp-sdk-js/compare/7.3.1...7.4.0) (2020-05-29)
 
 
