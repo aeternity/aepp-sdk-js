@@ -52,8 +52,8 @@ describe('Aens', function () {
     const { version } = aens.getNodeInfo()
     const [majorVersion] = version.split('.')
     nameAuctionsSupported = +majorVersion === 5 && version !== '5.0.0-rc.1'
-    name = randomName(13, nameAuctionsSupported ? '.chain' : '.test') // 13 name length doesn't trigger auction
-    name2 = randomName(13, nameAuctionsSupported ? '.chain' : '.test')
+    name = randomName(13, '.chain') // 13 name length doesn't trigger auction
+    name2 = randomName(13,'.chain')
   })
 
   const lima = fn => async () => nameAuctionsSupported ? fn() : undefined
@@ -98,6 +98,21 @@ describe('Aens', function () {
     } catch (e) {
       e.message.should.be.equal(`Name ${name} do not have pointers for account`)
     }
+  })
+  it('Call contract using AENS name', async () => {
+    const identityContract = `
+contract Identity =
+ entrypoint main(x : int) = x
+`
+    const bytecode = await aens.contractCompile(identityContract)
+    const deployed = await bytecode.deploy([])
+    const nameObject = await aens.aensQuery(name)
+    await nameObject.update([deployed.address])
+    const callDataCall = await aens.contractEncodeCall(identityContract, 'main', ['1'])
+    const callRes = await aens.contractCall(identityContract, name, 'main', callDataCall)
+    const callResStatic = await aens.contractCallStatic(identityContract, name, 'main', callDataCall)
+    callResStatic.result.returnType.should.be.equal('ok')
+    callRes.hash.split('_')[0].should.be.equal('th')
   })
 
   it('updates names', async () => {
