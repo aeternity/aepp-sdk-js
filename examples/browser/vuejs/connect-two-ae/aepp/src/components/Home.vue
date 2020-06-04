@@ -319,10 +319,7 @@
           }
         }
 
-        const scannerConnection = await BrowserWindowMessageConnection({
-          connectionInfo: { id: 'spy' }
-        })
-        this.detector = await Detector({ connection: scannerConnection })
+        this.detector = await Detector()
         this.detector.scan(handleWallets.bind(this))
       }
     },
