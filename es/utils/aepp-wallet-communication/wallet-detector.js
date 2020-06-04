@@ -112,7 +112,7 @@ function getWallets () {
  * @return {WalletDetector}
  */
 export const WalletDetector = AsyncInit.compose({
-  async init ({ connection }) {
+  async init ({ connection } = {}) {
     if (!window) throw new Error('Window object not found, you can run wallet detector only in browser')
     this.connection = connection || BrowserWindowMessageConnection({ connectionInfo: { id: 'spy' }})
   },

@@ -173,10 +173,10 @@ const REQUESTS = {
 const handleMessage = (instance, id) => async (msg, origin) => {
   const client = rpcClients.getClient(id)
   if (!msg.id) {
-    return getHandler(NOTIFICATIONS, msg)(instance, { client })(msg, origin)
+    return getHandler(NOTIFICATIONS, msg, { debug: instance.debug })(instance, { client })(msg, origin)
   }
   if (Object.prototype.hasOwnProperty.call(client.callbacks, msg.id)) {
-    return getHandler(RESPONSES, msg)(instance, { client })(msg, origin)
+    return getHandler(RESPONSES, msg, { debug: instance.debug })(instance, { client })(msg, origin)
   } else {
     const { id, method } = msg
     const callInstance = (methodName, params, accept, deny) => new Promise(resolve => {
@@ -188,7 +188,7 @@ const handleMessage = (instance, id) => async (msg, origin) => {
         origin
       )
     })
-    const response = await getHandler(REQUESTS, msg)(callInstance, instance, client, msg.params)
+    const response = await getHandler(REQUESTS, msg, { debug: instance.debug })(callInstance, instance, client, msg.params)
     sendResponseMessage(client)(id, method, response)
   }
 }
@@ -209,7 +209,8 @@ const handleMessage = (instance, id) => async (msg, origin) => {
  * @return {Object}
  */
 export const WalletRpc = Ae.compose(Accounts, Selector, {
-  init ({ name, onConnection, onSubscription, onSign, onDisconnect, onAskAccounts, onMessageSign, forceValidation = false }) {
+  init ({ name, onConnection, onSubscription, onSign, onDisconnect, onAskAccounts, onMessageSign, forceValidation = false, debug = false }) {
+    this.debug = debug
     const eventsHandlers = ['onConnection', 'onSubscription', 'onSign', 'onDisconnect', 'onMessageSign']
     // CallBacks for events
     this.onConnection = onConnection

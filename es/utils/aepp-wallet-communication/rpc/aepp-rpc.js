@@ -62,11 +62,11 @@ const REQUESTS = {}
 
 const handleMessage = (instance) => async (msg) => {
   if (!msg.id) {
-    return getHandler(NOTIFICATIONS, msg)(instance)(msg)
+    return getHandler(NOTIFICATIONS, msg, { debug: instance.debug })(instance)(msg)
   } else if (Object.prototype.hasOwnProperty.call(instance.rpcClient.callbacks, msg.id)) {
-    return getHandler(RESPONSES, msg)(instance)(msg)
+    return getHandler(RESPONSES, msg, { debug: instance.debug })(instance)(msg)
   } else {
-    return getHandler(REQUESTS, msg)(instance)(msg)
+    return getHandler(REQUESTS, msg, { debug: instance.debug })(instance)(msg)
   }
 }
 
@@ -84,10 +84,11 @@ const handleMessage = (instance) => async (msg) => {
  * @return {Object}
  */
 export const AeppRpc = Ae.compose({
-  async init ({ name, onAddressChange = voidFn, onDisconnect = voidFn, onNetworkChange = voidFn, connection, forceValidation = false }) {
+  async init ({ name, onAddressChange = voidFn, onDisconnect = voidFn, onNetworkChange = voidFn, connection, forceValidation = false, debug = false }) {
     const eventsHandlers = ['onDisconnect', 'onAddressChange', 'onNetworkChange']
     this.connection = connection
     this.name = name
+    this.debug = debug
 
     if (connection) {
       // Init RPCClient
