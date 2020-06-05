@@ -220,7 +220,7 @@ async function getName (name) {
 async function resolveName (nameOrId, prefix, { verify = false, resolveByNode = false } = {}) {
   const prefixes = Object.keys(NAME_ID_KEY)
   if (!nameOrId || typeof nameOrId !== 'string') throw new Error('Invalid name or address. Should be a string')
-  if (!prefixes.includes(prefix)) throw new Error(`Invalid prefix ${prefix}. Should ne one of [${prefixes}]`)
+  if (!prefixes.includes(prefix)) throw new Error(`Invalid prefix ${prefix}. Should be one of [${prefixes}]`)
   if (assertedType(nameOrId, prefix, true)) return nameOrId
 
   if (isNameValid(nameOrId)) {

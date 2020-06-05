@@ -36,22 +36,8 @@ import ContractACI from '../contract/aci'
 import BigNumber from 'bignumber.js'
 import NodePool from '../node-pool'
 import { AMOUNT, DEPOSIT, DRY_RUN_ACCOUNT, GAS, MIN_GAS_PRICE } from '../tx/builder/schema'
-import { decode, isNameValid, produceNameId } from '../tx/builder/helpers'
+import { decode, produceNameId } from '../tx/builder/helpers'
 import TxObject from '../tx/tx-object'
-import { assertedType } from '../utils/crypto'
-
-async function resolveContractAddress (addressOrName) {
-  if (typeof addressOrName !== 'string') throw new Error('Invalid contract address. Should be a string with "ct" prefix or "AENS" name')
-  if (assertedType(addressOrName, 'ct', true)) return addressOrName
-  if (isNameValid(addressOrName)) {
-    const name = await this.getName(addressOrName).catch(_ => null)
-    if (!name) throw new Error('Name not found')
-    const contractPointer = name.pointers.find(({ id }) => id.split('_')[0] === 'ct')
-    if (!contractPointer) throw new Error(`Name ${addressOrName} do not have pointers for contract`)
-    return contractPointer.id
-  }
-  throw new Error('Invalid contract address. Should be a string with "ct" prefix or "AENS" name')
-}
 
 function sendAndProcess (tx, options) {
   return async function (onSuccess, onError) {
@@ -499,7 +485,6 @@ export const ContractAPI = Ae.compose(ContractBase, ContractACI, {
     contractEncodeCall,
     contractDecodeData,
     dryRunContractTx,
-    resolveContractAddress,
     handleCallError,
     // Delegation for contract
     // AENS
