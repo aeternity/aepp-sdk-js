@@ -186,7 +186,7 @@ async function contractCallStatic (source, address, name, args = [], { top, opti
     // Prepare `call` transaction
     const tx = await this.contractCallTx(R.merge(opt, {
       callerId,
-      contractId: await this.resolveContractAddress(address),
+      contractId: await this.resolveName(address, 'ct', { resolveByNode: true }),
       callData,
       nonce
     }))
@@ -242,7 +242,7 @@ async function contractCall (source, address, name, argsOrCallData = [], options
 
   const tx = await this.contractCallTx(R.merge(opt, {
     callerId: await this.address(opt),
-    contractId: await this.resolveContractAddress(address),
+    contractId: await this.resolveName(address, 'ct', { resolveByNode: true }),
     callData: Array.isArray(argsOrCallData) ? await this.contractEncodeCall(source, name, argsOrCallData, opt) : argsOrCallData
   }))
 

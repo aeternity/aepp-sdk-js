@@ -69,7 +69,7 @@ async function signUsingGA (tx, options = {}) {
  */
 async function spend (amount, recipientId, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  recipientId = await this.resolveRecipientName(recipientId, options)
+  recipientId = await this.resolveName(recipientId, 'ak', options)
   const spendTx = await this.spendTx(R.merge(opt, { senderId: await this.address(opt), recipientId, amount }))
   return this.send(spendTx, opt)
 }

@@ -21,6 +21,9 @@ import Oracle from '../oracle/node'
 import { AE_AMOUNT_FORMATS, formatAmount } from '../utils/amount-formatter'
 import TransactionValidator from '../tx/validator'
 import NodePool from '../node-pool'
+import { assertedType } from '../utils/crypto'
+import { isNameValid, produceNameId } from '../tx/builder/helpers'
+import { NAME_ID_KEY } from '../tx/builder/schema'
 
 /**
  * ChainNode module
@@ -207,6 +210,33 @@ async function getName (name) {
 }
 
 /**
+ * Resolve AENS name and return name hash
+ * @param {String} nameOrId
+ * @param {String} prefix
+ * @param {Boolean} verify
+ * @param {Boolean} resolveByNode
+ * @return {String} Address or AENS name hash
+ */
+async function resolveName (nameOrId, prefix, { verify = false, resolveByNode = false } = {}) {
+  const prefixes = Object.keys(NAME_ID_KEY)
+  if (!nameOrId || typeof nameOrId !== 'string') throw new Error('Invalid name or address. Should be a string')
+  if (!prefixes.includes(prefix)) throw new Error(`Invalid prefix ${prefix}. Should ne one of [${prefixes}]`)
+  if (assertedType(nameOrId, prefix, true)) return nameOrId
+
+  if (isNameValid(nameOrId)) {
+    if (resolveByNode || verify) {
+      const name = await this.getName(nameOrId).catch(_ => null)
+      if (!name) throw new Error('Name not found')
+      const pointer = name.pointers.find(({ id }) => id.split('_')[0] === prefix)
+      if (!pointer) throw new Error(`Name ${nameOrId} do not have pointers for ${prefix}`)
+      return pointer.id
+    }
+    return produceNameId(nameOrId)
+  }
+  throw new Error('Invalid name or address')
+}
+
+/**
  * ChainNode Stamp
  *
  * This is implementation of {@link module:@aeternity/aepp-sdk/es/chain--Chain}
@@ -243,7 +273,8 @@ const ChainNode = Chain.compose(Oracle, TransactionValidator, NodePool, {
     getContractByteCode,
     getContract,
     getName,
-    waitForTxConfirm
+    waitForTxConfirm,
+    resolveName
   }
 })
 
