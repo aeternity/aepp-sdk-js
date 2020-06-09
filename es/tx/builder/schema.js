@@ -42,6 +42,12 @@ export const NAME_FEE_BID_INCREMENT = 0.05 // # the increment is in percentage
 // # see https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L272
 export const NAME_BID_TIMEOUT_BLOCKS = 480 // # ~1 day
 export const NAME_BID_MAX_LENGTH = 12 // # this is the max length for a domain to be part of a bid
+export const NAME_ID_KEY = {
+  ak: 'account_pubkey',
+  ok: 'oracle_pubkey',
+  ct: 'contract_pubkey',
+  ch: 'channel'
+}
 // # ref: https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L290
 // # bid ranges:
 export const NAME_BID_RANGES = {

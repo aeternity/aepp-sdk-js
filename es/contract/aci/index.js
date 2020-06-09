@@ -62,7 +62,7 @@ export const prepareArgsForEncode = prepareArgs
  */
 async function getContractInstance (source, { aci, contractAddress, filesystem = {}, forceCodeCheck = true, opt } = {}) {
   aci = aci || await this.contractGetACI(source, { filesystem })
-  if (contractAddress) contractAddress = await this.resolveContractAddress(contractAddress)
+  if (contractAddress) contractAddress = await this.resolveName(contractAddress, 'ct', { resolveByNode: true })
   const defaultOptions = {
     skipArgsConvert: false,
     skipTransformDecoded: false,

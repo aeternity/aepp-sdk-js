@@ -20,7 +20,7 @@ import {
   NAME_FEE_BID_INCREMENT,
   NAME_BID_TIMEOUTS,
   FATE_ABI,
-  VM_TYPE
+  VM_TYPE, NAME_ID_KEY
 } from './schema'
 import { ceil } from '../../utils/bignumber'
 
@@ -279,20 +279,13 @@ export function isNameValid (name, throwError = true) {
  * returns the type, or throws an exception if type not found.
  */
 export function classify (s) {
-  const keys = {
-    ak: 'account_pubkey',
-    ok: 'oracle_pubkey',
-    ct: 'contract_pubkey',
-    ch: 'channel'
-  }
-
   if (!s.match(/^[a-z]{2}_.+/)) {
     throw Error('Not a valid hash')
   }
 
   const klass = s.substr(0, 2)
-  if (klass in keys) {
-    return keys[klass]
+  if (klass in NAME_ID_KEY) {
+    return NAME_ID_KEY[klass]
   } else {
     throw Error(`Unknown class ${klass}`)
   }
