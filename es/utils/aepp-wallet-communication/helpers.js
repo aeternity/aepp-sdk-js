@@ -66,7 +66,7 @@ export const getHandler = (schema, msg, { debug = false } = {}) => {
   const handler = schema[msg.method]
   if (!handler || typeof handler !== 'function') {
     debug && console.log(`Unknown message method ${msg.method}`)
-    return () => () => true
+    return () => async () => true
   }
   return handler
 }
