@@ -615,8 +615,8 @@ describe('Aepp<->Wallet', function () {
     it('Receive invalid message', () => {
       (!receive(() => true)(false)).should.be.equal(true)
     })
-    it('receive unknown method', () => {
-      getHandler({}, { method: 'hey' })()().should.be.equal(true)
+    it('receive unknown method', async () => {
+      (await getHandler({}, { method: 'hey' })()()).should.be.equal(true)
     })
     it('getBrowserAPI: not in browser', () => {
       global.chrome = null
