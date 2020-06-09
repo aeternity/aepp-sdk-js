@@ -163,28 +163,31 @@
           // Manually return accounts
           // you can check AEPP accounts using
           // `aepp.accounts`
-          accept({
-            accounts: {
-              current: { [keypair.publicKey]: {}},
-              connected: { [keypair2.publicKey]: {}, [sdkAcc]: {}, [account2.publicKey]: {} }
-            }
-          })
+          accept()
+          // accept({
+          //   accounts: {
+          //     current: { [keypair.publicKey]: {}},
+          //     connected: { [keypair2.publicKey]: {}, [sdkAcc]: {}, [account2.publicKey]: {} }
+          //   }
+          // })
         },
         onSign (aepp, { accept, deny, params }, origin) {
           // Get account outside of SDK if needed
-          const onAccount = {
-            [keypair.publicKey]: MemoryAccount({ keypair }),
-            [keypair2.publicKey]: MemoryAccount({ keypair: keypair2 }),
-          }[params.onAccount]
-          accept(null, { onAccount }) // provide this account for signing
+          // const onAccount = {
+          //   [keypair.publicKey]: MemoryAccount({ keypair }),
+          //   [keypair2.publicKey]: MemoryAccount({ keypair: keypair2 }),
+          // }[params.onAccount]
+          // accept(null , { onAccount }) // provide this account for signing
+          accept() // provide this account for signing
         },
         onMessageSign (aepp, { accept, deny, params }, origin) {
           // Get account outside of SDK if needed
-          const onAccount = {
-            [keypair.publicKey]: MemoryAccount({ keypair }),
-            [keypair2.publicKey]: MemoryAccount({ keypair: keypair2 }),
-          }[params.onAccount]
-          accept({ onAccount }) // provide this account for signing
+          // const onAccount = {
+          //   [keypair.publicKey]: MemoryAccount({ keypair }),
+          //   [keypair2.publicKey]: MemoryAccount({ keypair: keypair2 }),
+          // }[params.onAccount]
+          // accept({ onAccount }) // provide this account for signing
+          accept()
         },
         onAskAccounts: genConfirmCallback(() => 'get accounts'),
         onDisconnect (message, client) {
