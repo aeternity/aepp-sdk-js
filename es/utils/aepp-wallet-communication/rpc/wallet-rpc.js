@@ -188,7 +188,9 @@ const handleMessage = (instance, id) => async (msg, origin) => {
         origin
       )
     })
-    const response = await getHandler(REQUESTS, msg, { debug: instance.debug })(callInstance, instance, client, msg.params)()
+    // TODO make one structure for handler functions
+    const errorObjectOrHandler = getHandler(REQUESTS, msg, { debug: instance.debug })(callInstance, instance, client, msg.params)
+    const response = typeof errorObjectOrHandler === 'function' ? await errorObjectOrHandler() : errorObjectOrHandler
     sendResponseMessage(client)(id, method, response)
   }
 }
