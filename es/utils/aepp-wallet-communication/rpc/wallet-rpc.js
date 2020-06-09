@@ -30,7 +30,7 @@ const RESPONSES = {}
 const REQUESTS = {
   // Store client info and prepare two fn for each client `connect` and `denyConnection`
   // which automatically prepare and send response for that client
-  async [METHODS.aepp.connect] (callInstance, instance, client, { name, networkId, version, icons }) {
+  [METHODS.aepp.connect] (callInstance, instance, client, { name, networkId, version, icons }) {
     // Check if protocol and network is compatible with wallet
     if (version !== VERSION) return { error: ERRORS.unsupportedProtocol() }
 
@@ -57,7 +57,7 @@ const REQUESTS = {
       }
     )
   },
-  async [METHODS.aepp.subscribeAddress] (callInstance, instance, client, { type, value }) {
+  [METHODS.aepp.subscribeAddress] (callInstance, instance, client, { type, value }) {
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
 
@@ -84,7 +84,7 @@ const REQUESTS = {
       (error) => ({ error: ERRORS.rejectedByUser(error) })
     )
   },
-  async [METHODS.aepp.address] (callInstance, instance, client) {
+  [METHODS.aepp.address] (callInstance, instance, client) {
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
     if (!client.isSubscribed()) return { error: ERRORS.notAuthorize() }
@@ -96,7 +96,7 @@ const REQUESTS = {
       (error) => ({ error: ERRORS.rejectedByUser(error) })
     )
   },
-  async [METHODS.aepp.sign] (callInstance, instance, client, { tx, onAccount, networkId, returnSigned = false }) {
+  [METHODS.aepp.sign] (callInstance, instance, client, { tx, onAccount, networkId, returnSigned = false }) {
     const address = onAccount || client.currentAccount
     // Update client with new networkId
     networkId && rpcClients.updateClientInfo(client.id, { networkId })
@@ -140,7 +140,7 @@ const REQUESTS = {
       (error) => ({ error: ERRORS.rejectedByUser(error) })
     )
   },
-  async [METHODS.aepp.signMessage] (callInstance, instance, client, { message, onAccount }) {
+  [METHODS.aepp.signMessage] (callInstance, instance, client, { message, onAccount }) {
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
     const address = onAccount || client.currentAccount
@@ -173,13 +173,13 @@ const REQUESTS = {
 const handleMessage = (instance, id) => async (msg, origin) => {
   const client = rpcClients.getClient(id)
   if (!msg.id) {
-    return getHandler(NOTIFICATIONS, msg)(instance, { client })(msg, origin)
+    return getHandler(NOTIFICATIONS, msg, { debug: instance.debug })(instance, { client })(msg, origin)
   }
   if (Object.prototype.hasOwnProperty.call(client.callbacks, msg.id)) {
-    return getHandler(RESPONSES, msg)(instance, { client })(msg, origin)
+    return getHandler(RESPONSES, msg, { debug: instance.debug })(instance, { client })(msg, origin)
   } else {
     const { id, method } = msg
-    const callInstance = (methodName, params, accept, deny) => new Promise(resolve => {
+    const callInstance = (methodName, params, accept, deny) => () => new Promise(resolve => {
       instance[methodName](
         client,
         client.addAction({ id, method, params }, [
@@ -188,7 +188,7 @@ const handleMessage = (instance, id) => async (msg, origin) => {
         origin
       )
     })
-    const response = await getHandler(REQUESTS, msg)(callInstance, instance, client, msg.params)
+    const response = await getHandler(REQUESTS, msg, { debug: instance.debug })(callInstance, instance, client, msg.params)()
     sendResponseMessage(client)(id, method, response)
   }
 }
@@ -209,7 +209,8 @@ const handleMessage = (instance, id) => async (msg, origin) => {
  * @return {Object}
  */
 export const WalletRpc = Ae.compose(Accounts, Selector, {
-  init ({ name, onConnection, onSubscription, onSign, onDisconnect, onAskAccounts, onMessageSign, forceValidation = false }) {
+  init ({ name, onConnection, onSubscription, onSign, onDisconnect, onAskAccounts, onMessageSign, forceValidation = false, debug = false }) {
+    this.debug = debug
     const eventsHandlers = ['onConnection', 'onSubscription', 'onSign', 'onDisconnect', 'onMessageSign']
     // CallBacks for events
     this.onConnection = onConnection
