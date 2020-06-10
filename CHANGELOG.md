@@ -1,3 +1,17 @@
+## [7.4.2](https://github.com/aeternity/aepp-sdk-js/compare/7.2.1...7.4.2) (2020-06-10)
+
+
+### Bug Fixes
+
+* **AEX-2:** Handler always as Promise ([#1018](https://github.com/aeternity/aepp-sdk-js/issues/1018)) ([a8b0aab](https://github.com/aeternity/aepp-sdk-js/commit/a8b0aab))
+
+
+### Refactor
+
+* **AEX-2:** Add debug option for `getHandler`. Hide unknown message logs ([#1021](https://github.com/aeternity/aepp-sdk-js/issues/1021)) ([22c452c](https://github.com/aeternity/aepp-sdk-js/commit/22c452c))
+* **Contract** Add AENS name resolver for Contract API
+
+
 ## [7.4.1](https://github.com/aeternity/aepp-sdk-js/compare/7.4.0...7.4.1) (2020-05-30)
 
 
