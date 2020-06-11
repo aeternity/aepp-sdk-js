@@ -62,11 +62,11 @@ export const receive = (handler) => (msg, origin) => {
   handler(msg, origin)
 }
 
-export const getHandler = (schema, msg) => {
+export const getHandler = (schema, msg, { debug = false } = {}) => {
   const handler = schema[msg.method]
   if (!handler || typeof handler !== 'function') {
-    console.log(`Unknown message method ${msg.method}`)
-    return () => () => true
+    debug && console.log(`Unknown message method ${msg.method}`)
+    return () => async () => true
   }
   return handler
 }

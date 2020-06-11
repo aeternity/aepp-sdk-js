@@ -27,7 +27,7 @@ export const MIN_GAS_PRICE = 1000000000 // min gasPrice 1e9
 export const MAX_AUTH_FUN_GAS = 50000
 export const DRY_RUN_ACCOUNT = { pub: 'ak_11111111111111111111111111111111273Yts', amount: '100000000000000000000000000000000000' }
 // # AENS
-export const AENS_NAME_DOMAINS = ['chain', 'test']
+export const AENS_NAME_DOMAINS = ['chain']
 export const NAME_TTL = 50000
 // # max number of block into the future that the name is going to be available
 // # https://github.com/aeternity/protocol/blob/epoch-v0.22.0/AENS.md#update
@@ -42,6 +42,12 @@ export const NAME_FEE_BID_INCREMENT = 0.05 // # the increment is in percentage
 // # see https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L272
 export const NAME_BID_TIMEOUT_BLOCKS = 480 // # ~1 day
 export const NAME_BID_MAX_LENGTH = 12 // # this is the max length for a domain to be part of a bid
+export const NAME_ID_KEY = {
+  ak: 'account_pubkey',
+  ok: 'oracle_pubkey',
+  ct: 'contract_pubkey',
+  ch: 'channel'
+}
 // # ref: https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L290
 // # bid ranges:
 export const NAME_BID_RANGES = {

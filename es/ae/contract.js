@@ -50,8 +50,8 @@ function sendAndProcess (tx, options) {
 
     const result = await this.getTxInfo(txData.hash)
     return result.returnType === 'ok'
-      ? onSuccess({ hash: txData.hash, tx: TxObject({ tx: txData.rawTx }), result, txData })
-      : typeof onError === 'function' ? onError(result) : this.handleCallError({ result, tx: TxObject({ tx: txData.rawTx }) })
+      ? onSuccess({ hash: txData.hash, tx: TxObject({ tx: txData.rawTx }), result, txData, rawTx: txData.rawTx })
+      : typeof onError === 'function' ? onError(result) : this.handleCallError({ result, tx: TxObject({ tx: txData.rawTx }), rawTx: txData.rawTx })
   }
 }
 
@@ -65,13 +65,14 @@ function sendAndProcess (tx, options) {
  * @throws Error Decoded error
  * @return {Promise<void>}
  */
-async function handleCallError ({ result, tx }) {
+async function handleCallError ({ result, tx, rawTx }) {
   const error = Buffer.from(result.returnValue).toString()
   if (isBase64(error.slice(3))) {
     const decodedError = Buffer.from(error.slice(3), 'base64').toString()
     throw Object.assign(Error(`Invocation failed: ${error}. Decoded: ${decodedError}`), R.merge(result, {
       tx,
       error,
+      rawTx,
       decodedError
     }))
   }
@@ -80,6 +81,7 @@ async function handleCallError ({ result, tx }) {
   throw Object.assign(Error(`Invocation failed: ${error}. Decoded: ${decodedError}`), R.merge(result, {
     tx,
     error,
+    rawTx,
     decodedError
   }))
 }
@@ -170,7 +172,7 @@ async function contractCallStatic (source, address, name, args = [], { top, opti
     // Prepare `call` transaction
     const tx = await this.contractCallTx(R.merge(opt, {
       callerId,
-      contractId: address,
+      contractId: await this.resolveName(address, 'ct', { resolveByNode: true }),
       callData,
       nonce
     }))
@@ -208,7 +210,7 @@ async function dryRunContractTx (tx, callerId, source, name, opt = {}) {
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
  * @param {String} source Contract source code
- * @param {String} address Contract address
+ * @param {String} address Contract address or AENS name
  * @param {String} name Name of function to call
  * @param {Array|String} argsOrCallData Argument's array or callData for call function
  * @param {Object} [options={}] Transaction options (fee, ttl, gas, amount, deposit)
@@ -226,7 +228,7 @@ async function contractCall (source, address, name, argsOrCallData = [], options
 
   const tx = await this.contractCallTx(R.merge(opt, {
     callerId: await this.address(opt),
-    contractId: address,
+    contractId: await this.resolveName(address, 'ct', { resolveByNode: true }),
     callData: Array.isArray(argsOrCallData) ? await this.contractEncodeCall(source, name, argsOrCallData, opt) : argsOrCallData
   }))
 

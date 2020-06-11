@@ -29,8 +29,6 @@ import Account from '../account'
 import TxBuilder from '../tx/builder'
 import * as R from 'ramda'
 import { BigNumber } from 'bignumber.js'
-import { isAddressValid } from '../utils/crypto'
-import { isNameValid, produceNameId } from '../tx/builder/helpers'
 import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter'
 
 /**
@@ -69,28 +67,9 @@ async function signUsingGA (tx, options = {}) {
  */
 async function spend (amount, recipientId, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  recipientId = await this.resolveRecipientName(recipientId, options)
+  recipientId = await this.resolveName(recipientId, 'ak', options)
   const spendTx = await this.spendTx(R.merge(opt, { senderId: await this.address(opt), recipientId, amount }))
   return this.send(spendTx, opt)
-}
-
-/**
- * Resolve AENS name and return name hash
- * @param {String} nameOrAddress
- * @param {Boolean} verify
- * @return {String} Address or AENS name hash
- */
-async function resolveRecipientName (nameOrAddress, { verify = false }) {
-  if (isAddressValid(nameOrAddress)) return nameOrAddress
-  if (isNameValid(nameOrAddress)) {
-    // Validation
-    if (verify) {
-      const { pointers } = await this.getName(nameOrAddress)
-      if (!pointers.find(({ id }) => id.split('_')[0] === 'ak')) throw new Error(`Name ${nameOrAddress} do not have pointers for account`)
-    }
-    return produceNameId(nameOrAddress)
-  }
-  throw new Error('Invalid recipient name or address: ' + nameOrAddress)
 }
 
 /**
@@ -106,6 +85,7 @@ async function resolveRecipientName (nameOrAddress, { verify = false }) {
 async function transferFunds (percentage, recipientId, options = { excludeFee: false }) {
   if (percentage < 0 || percentage > 1) throw new Error(`Percentage should be a number between 0 and 1, got ${percentage}`)
   const opt = R.merge(this.Ae.defaults, options)
+  recipientId = await this.resolveName(recipientId, 'ak', opt)
 
   const requestTransferAmount = BigNumber(await this.balance(await this.address())).times(percentage)
   let spendTx = await this.spendTx(R.merge(opt, { senderId: await this.address(), recipientId, amount: requestTransferAmount }))
@@ -155,7 +135,7 @@ function destroyInstance () {
  * @return {Object} Ae instance
  */
 const Ae = stampit(Tx, Account, Chain, {
-  methods: { send, spend, transferFunds, destroyInstance, resolveRecipientName, signUsingGA },
+  methods: { send, spend, transferFunds, destroyInstance, signUsingGA },
   deepProps: { Ae: { defaults: { denomination: AE_AMOUNT_FORMATS.AETTOS } } },
   deepConfiguration: { Ae: { methods: ['signUsingGA'] } }
 })
