@@ -1,7 +1,7 @@
 import {
   verify,
   decodeBase58Check,
-  assertedType
+  assertedType, rlp
 } from '../utils/crypto'
 import { encode } from '../tx/builder/helpers'
 
@@ -17,7 +17,7 @@ import {
   SIGNATURE_VERIFICATION_SCHEMA,
   TX_TYPE
 } from './builder/schema'
-import { calculateFee, unpackTx } from './builder'
+import { buildTxHash, calculateFee, unpackTx } from './builder'
 import { NodePool } from '../node-pool'
 
 /**
@@ -31,7 +31,9 @@ const VALIDATORS = {
   // VALIDATE SIGNATURE
   signature ({ rlpEncoded, signature, ownerPublicKey, networkId = 'ae_mainnet' }) {
     const txWithNetworkId = Buffer.concat([Buffer.from(networkId), rlpEncoded])
-    return verify(txWithNetworkId, signature, decodeBase58Check(assertedType(ownerPublicKey, 'ak')))
+    const txHashWithNetworkId = Buffer.concat([Buffer.from(networkId), buildTxHash(rlpEncoded)])
+    const decodedPub = decodeBase58Check(assertedType(ownerPublicKey, 'ak'))
+    return verify(txWithNetworkId, signature, decodedPub) || verify(txHashWithNetworkId, signature, decodedPub)
   },
   // VALIDATE IF ENOUGH FEE
   insufficientFee ({ minFee, fee }) {
