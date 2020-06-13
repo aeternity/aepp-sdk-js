@@ -58,14 +58,13 @@ describe('Verify Transaction', function () {
     const checkErrors = async (signedTx) => {
       const { validation } = await client.unpackAndVerify(signedTx)
       const error = validation
-        .filter(({ type, txKey }) => type === 'error') // exclude contract vm/abi, has separated test for it
+        .filter(({ type }) => type === 'error') // exclude contract vm/abi, has separated test for it
         .map(({ txKey }) => txKey)
 
       JSON.stringify(ERRORS.filter(e => e !== 'gasPrice' && e !== 'ctVersion')).should.be.equals(JSON.stringify(error))
     }
     await checkErrors(signedTxHash)
     await checkErrors(signedTxFull)
-
   })
   it('verify transaction before broadcast', async () => {
     client = await ready(this)
