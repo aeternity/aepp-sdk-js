@@ -1,7 +1,7 @@
 import {
   verify,
   decodeBase58Check,
-  assertedType, rlp
+  assertedType
 } from '../utils/crypto'
 import { encode } from '../tx/builder/helpers'
 
