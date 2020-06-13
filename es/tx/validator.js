@@ -31,7 +31,7 @@ const VALIDATORS = {
   // VALIDATE SIGNATURE
   signature ({ rlpEncoded, signature, ownerPublicKey, networkId = 'ae_mainnet' }) {
     const txWithNetworkId = Buffer.concat([Buffer.from(networkId), rlpEncoded])
-    const txHashWithNetworkId = Buffer.concat([Buffer.from(networkId), buildTxHash(rlpEncoded)])
+    const txHashWithNetworkId = Buffer.concat([Buffer.from(networkId), buildTxHash(rlpEncoded, { raw: true })])
     const decodedPub = decodeBase58Check(assertedType(ownerPublicKey, 'ak'))
     return verify(txWithNetworkId, signature, decodedPub) || verify(txHashWithNetworkId, signature, decodedPub)
   },
