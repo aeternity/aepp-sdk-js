@@ -128,6 +128,14 @@ export function linkTypeDefs (t, bindings) {
   return aciType.typedef
 }
 
+const isTypedDefOrState = (t, bindings) => {
+  if (!['string', 'object'].includes(typeof t)) return false
+
+  t = typeof t === 'object' ? Object.keys(t)[0] : t
+  const [root] = t.split('.')
+  return root === bindings.contractName
+}
+
 /**
  * Parse sophia type
  * @param type
@@ -138,10 +146,7 @@ export function readType (type, { bindings } = {}) {
   let [t] = Array.isArray(type) ? type : [type]
 
   // Link State and typeDef
-  if (
-    (typeof t === 'string' && t.indexOf(bindings.contractName) !== -1) ||
-    (typeof t === 'object' && Object.keys(t)[0] && Object.keys(t)[0].indexOf(bindings.contractName) !== -1)
-  ) {
+  if (isTypedDefOrState(t, bindings)) {
     t = linkTypeDefs(t, bindings)
   }
 

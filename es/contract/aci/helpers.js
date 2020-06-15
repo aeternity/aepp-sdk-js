@@ -13,6 +13,7 @@ export function getFunctionACI (aci, name) {
   const fn = aci.functions.find(f => f.name === name)
   if (!fn && name !== 'init') throw new Error(`Function ${name} doesn't exist in contract`)
 
+  // TODO add resolving of typeDefs for external contract types here
   return {
     ...fn,
     bindings: {
