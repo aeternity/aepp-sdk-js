@@ -1,71 +1,30 @@
-branches:
-  only:
-    - master
-    - develop
-
-dist: xenial
-
-addons:
-  apt:
-    packages:
-      - build-essential
-      - curl
-      - libltdl7
-      - git
+dist: bionic
+language: node_js
+node_js: 12
 
 services:
   - docker
 
-language: node_js
-node_js: '10'
-
-cache:
-  timeout: 604800 # 7 days
-  directories:
-    - "$HOME/.npm"
-
-env:
-  global:
-    - TEST_NODE=http://localhost:3013
-    - TEST_URL=http://localhost:3013
-    - TEST_DEBUG_URL=http://localhost:3113
-    - TEST_WS_URL=ws://localhost:3014/channel
-    - TEST_NETWORK_ID=ae_devnet
-    - COMPILER_URL=http://localhost:3080
-    - FORCE_COMPATIBILITY=false
-
 before_install:
-  - docker-compose up -d node compiler
-
-install:
-  - npm ci
+  - if [[ $TRAVIS_EVENT_TYPE == "cron" ]]; then
+      export NODE_TAG=master;
+      export COMPILER_TAG=latest;
+      export FORCE_COMPATIBILITY=true;
+    fi
+  - docker-compose up -d
 
 jobs:
   include:
     - stage: Tests
-      if: type != "cron"
       name: Test AENS
       script:
         - npm run test-aens
         - npm run report-coverage
-    - stage: Tests
-      if: type != "cron"
-      name: Test Channel
+    - name: Test Channel
       script:
         - npm run test-channel
         - npm run report-coverage
-    - stage: Tests
-      if: type != "cron"
-      name: Test Contract, Node, Oracle, Account and else
+    - name: Test Contract, Node, Oracle, Account and else
       script:
         - npm run test-else
-        - npm run report-coverage
-    - stage: Tests
-      if: type = "cron"
-      env:
-        - NODE_TAG=master
-        - COMPILER_TAG=latest
-        - FORCE_COMPATIBILITY=true
-      script:
-        - npm run test
         - npm run report-coverage
