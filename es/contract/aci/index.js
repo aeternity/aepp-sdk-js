@@ -79,7 +79,7 @@ async function getContractInstance (source, { aci, contractAddress, filesystem =
   const instance = {
     interface: R.defaultTo(null, R.prop('interface', aci)),
     aci: R.defaultTo(null, R.path(['encoded_aci', 'contract'], aci)),
-    externalAci: aci.external_encoded_aci.map(a => a.contract || a.namespace),
+    externalAci: aci.external_encoded_aci ? aci.external_encoded_aci.map(a => a.contract || a.namespace) : [],
     source,
     compiled: null,
     deployInfo: { address: contractAddress },
