@@ -79,6 +79,7 @@ async function getContractInstance (source, { aci, contractAddress, filesystem =
   const instance = {
     interface: R.defaultTo(null, R.prop('interface', aci)),
     aci: R.defaultTo(null, R.path(['encoded_aci', 'contract'], aci)),
+    externalAci: aci.external_encoded_aci.map(a => a.contract || a.namespace),
     source,
     compiled: null,
     deployInfo: { address: contractAddress },
@@ -155,12 +156,12 @@ async function getContractInstance (source, { aci, contractAddress, filesystem =
 }
 
 const eventDecode = ({ instance }) => (fn, events) => {
-  return decodeEvents(events, getFunctionACI(instance.aci, fn))
+  return decodeEvents(events, getFunctionACI(instance.aci, fn, { external: instance.externalAci }))
 }
 
 const call = ({ client, instance }) => async (fn, params = [], options = {}) => {
   const opt = R.merge(instance.options, options)
-  const fnACI = getFunctionACI(instance.aci, fn)
+  const fnACI = getFunctionACI(instance.aci, fn, { external: instance.externalAci })
   const source = opt.source || instance.source
 
   if (!fn) throw new Error('Function name is required')
@@ -184,7 +185,7 @@ const call = ({ client, instance }) => async (fn, params = [], options = {}) => 
 
 const deploy = ({ client, instance }) => async (init = [], options = {}) => {
   const opt = R.merge(instance.options, options)
-  const fnACI = getFunctionACI(instance.aci, 'init')
+  const fnACI = getFunctionACI(instance.aci, 'init', { external: instance.externalAci })
   const source = opt.source || instance.source
 
   if (!instance.compiled) await instance.compile(opt)

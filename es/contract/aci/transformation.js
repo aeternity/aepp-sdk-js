@@ -116,24 +116,31 @@ export function injectVars (t, aciType) {
  * @return {Object}
  */
 export function linkTypeDefs (t, bindings) {
-  const [, typeDef] = typeof t === 'object' ? Object.keys(t)[0].split('.') : t.split('.')
+  const [root, typeDef] = typeof t === 'object' ? Object.keys(t)[0].split('.') : t.split('.')
+  const contractTypeDefs = bindings.find(c => c.name === root)
   const aciType = [
-    ...bindings.typedef,
-    { name: 'state', typedef: bindings.state, vars: [] }
+    ...contractTypeDefs.type_defs,
+    { name: 'state', typedef: contractTypeDefs.state, vars: [] }
   ].find(({ name }) => name === typeDef)
   if (aciType.vars.length) {
     aciType.typedef = injectVars(t, aciType)
   }
-
-  return aciType.typedef
+  return isTypedDefOrState(aciType.typedef, bindings) ? linkTypeDefs(aciType.typedef, bindings) : aciType.typedef
 }
 
 const isTypedDefOrState = (t, bindings) => {
   if (!['string', 'object'].includes(typeof t)) return false
 
   t = typeof t === 'object' ? Object.keys(t)[0] : t
-  const [root] = t.split('.')
-  return root === bindings.contractName
+  const [root, ...path] = t.split('.')
+  // Remote Contract Address
+  if (!path.length) return false
+  return bindings.map(c => c.name).includes(root)
+}
+
+const isRemoteAddress = (t) => {
+  const [root, ...path] = t.split('.')
+  return !path.length && !Object.values(SOPHIA_TYPES).includes(root)
 }
 
 /**
@@ -145,11 +152,10 @@ const isTypedDefOrState = (t, bindings) => {
 export function readType (type, { bindings } = {}) {
   let [t] = Array.isArray(type) ? type : [type]
 
+  // If remote address
+  if (isRemoteAddress(t)) return { t: SOPHIA_TYPES.address }
   // Link State and typeDef
-  if (isTypedDefOrState(t, bindings)) {
-    t = linkTypeDefs(t, bindings)
-  }
-
+  if (isTypedDefOrState(t, bindings)) t = linkTypeDefs(t, bindings)
   // Map, Tuple, List, Record, Bytes
   if (typeof t === 'object') {
     const [[baseType, generic]] = Object.entries(t)
@@ -317,9 +323,8 @@ export function transformDecodedData (aci, result, { skipTransformDecoded = fals
  * @return {Object} JoiSchema
  */
 export function prepareSchema (type, { bindings } = {}) {
-  let { t, generic } = readType(type, { bindings })
+  const { t, generic } = readType(type, { bindings })
 
-  if (!Object.values(SOPHIA_TYPES).includes(t)) t = SOPHIA_TYPES.address // Handle Contract address transformation
   switch (t) {
     case SOPHIA_TYPES.int:
       return Joi.number().error(getJoiErrorMsg)

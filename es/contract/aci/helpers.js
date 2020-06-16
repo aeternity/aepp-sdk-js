@@ -6,21 +6,24 @@ import { decodeEvents as unpackEvents, transform, transformDecodedData, validate
  * Get function schema from contract ACI object
  * @param {Object} aci Contract ACI object
  * @param {String} name Function name
+ * @param external
  * @return {Object} function ACI
  */
-export function getFunctionACI (aci, name) {
+export function getFunctionACI (aci, name, { external }) {
   if (!aci) throw new Error('ACI required')
   const fn = aci.functions.find(f => f.name === name)
   if (!fn && name !== 'init') throw new Error(`Function ${name} doesn't exist in contract`)
 
-  // TODO add resolving of typeDefs for external contract types here
   return {
     ...fn,
-    bindings: {
-      state: aci.state,
-      typedef: aci.type_defs,
-      contractName: aci.name
-    },
+    bindings: [
+      {
+        state: aci.state,
+        type_defs: aci.type_defs,
+        name: aci.name
+      },
+      ...external.map(R.pick(['state', 'type_defs', 'name']))
+    ],
     event: aci.event ? aci.event.variant : []
   }
 }
@@ -65,18 +68,18 @@ export const buildContractMethods = (instance) => () => ({
   ...instance.aci ? {
     init: Object.assign(
       function () {
-        const { arguments: aciArgs } = getFunctionACI(instance.aci, 'init')
+        const { arguments: aciArgs } = getFunctionACI(instance.aci, 'init', { external: instance.externalAci })
         const { opt, args } = parseArguments(aciArgs)(arguments)
         return instance.deploy(args, opt)
       },
       {
         get () {
-          const { arguments: aciArgs } = getFunctionACI(instance.aci, 'init')
+          const { arguments: aciArgs } = getFunctionACI(instance.aci, 'init', { external: instance.externalAci })
           const { opt, args } = parseArguments(aciArgs)(arguments)
           return instance.deploy(args, { ...opt, callStatic: true })
         },
         send () {
-          const { arguments: aciArgs } = getFunctionACI(instance.aci, 'init')
+          const { arguments: aciArgs } = getFunctionACI(instance.aci, 'init', { external: instance.externalAci })
           const { opt, args } = parseArguments(aciArgs)(arguments)
           return instance.deploy(args, { ...opt, callStatic: false })
         }
