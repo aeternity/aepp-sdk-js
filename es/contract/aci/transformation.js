@@ -139,6 +139,7 @@ const isTypedDefOrState = (t, bindings) => {
 }
 
 const isRemoteAddress = (t) => {
+  if (typeof t !== 'string') return false
   const [root, ...path] = t.split('.')
   return !path.length && !Object.values(SOPHIA_TYPES).includes(root)
 }
