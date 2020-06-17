@@ -62,7 +62,7 @@ contract StateContract =
   type number = int
   record state = { value: string, key: number, testOption: option(string) }
   record yesEr = { t: number}
-  
+
   datatype event = TheFirstEvent(int) | AnotherEvent(string, address) | AnotherEvent2(bool, string, int)
   datatype dateUnit = Year | Month | Day
   datatype one_or_both('a, 'b) = Left('a) | Right('b) | Both('a, 'b)
@@ -80,28 +80,28 @@ contract StateContract =
   entrypoint tupleFn (a: string*int) : string*int = a
   entrypoint tupleInTupleFn (a: (string*string)*int) : (string*string)*int = a
   entrypoint tupleWithList (a: list(int)*int) : list(int)*int = a
-  
+
   entrypoint listFn(a: list(int)) : list(int) = a
   entrypoint listInListFn(a: list(list(int))) : list(list(int)) = a
-  
+
   entrypoint mapFn(a: map(address, string*int)) : map(address, string*int) = a
   entrypoint mapOptionFn(a: map(address, string*option(int))) : map(address, string*option(int)) = a
-  
+
   entrypoint getRecord() : state = state
   stateful entrypoint setRecord(s: state) = put(s)
-  
+
   entrypoint intOption(s: option(int)) : option(int) = s
   entrypoint listOption(s: option(list(int*string))) : option(list(int*string)) = s
-  
+
   entrypoint testFn(a: list(int), b: bool) : list(int)*bool = (a, b)
   entrypoint approve(tx_id: int, voting_contract: Voting) : int = tx_id
-  
+
   entrypoint hashFn(s: hash): hash = s
   entrypoint signatureFn(s: signature): signature = s
   entrypoint bytesFn(s: bytes(32)): bytes(32) = s
-  
+
   entrypoint usingExternalLib(s: int): int = Test.double(s)
-  
+
   entrypoint datTypeFn(s: dateUnit): dateUnit = s
   entrypoint datTypeGFn(x : one_or_both(int, string)) : int =
     switch(x)
@@ -148,7 +148,7 @@ contract DelegateTest =
                                                  sign : signature,   // Signed oracle address
                                                  ttl  : ttl) : unit =
     Oracle.extend(o, signature = sign, ttl)
-  
+
   payable stateful entrypoint createQuery(o    : oracle(string, string),
                                           q    : string,
                                           qfee : int,
@@ -157,10 +157,10 @@ contract DelegateTest =
     require(qfee =< Call.value, "insufficient value for qfee")
     require(Oracle.check(o), "oracle not valid")
     Oracle.query(o, q, qfee, qttl, rttl)
-    
+
   entrypoint queryFee(o : oracle(string, int)) : int =
     Oracle.query_fee(o)
-  
+
   stateful entrypoint respond(o    : oracle(string, string),
                               q    : oracle_query(string, string),
                               sign : signature,        // Signed oracle query id + contract address
@@ -988,7 +988,7 @@ describe('Contract', function () {
           try {
             await contractObject.methods.hashFn({})
           } catch (e) {
-            e.message.should.be.equal('The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object. Received type object')
+            e.message.should.be.equal('The first argument must be of type string or an instance of Buffer, ArrayBuffer, or Array or an Array-like Object. Received an instance of Object')
           }
         })
         it('Invalid length', async () => {
@@ -1015,7 +1015,7 @@ describe('Contract', function () {
           try {
             await contractObject.methods.signatureFn({})
           } catch (e) {
-            e.message.should.be.equal('The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object. Received type object')
+            e.message.should.be.equal('The first argument must be of type string or an instance of Buffer, ArrayBuffer, or Array or an Array-like Object. Received an instance of Object')
           }
         })
         it('Invalid length', async () => {
@@ -1043,7 +1043,7 @@ describe('Contract', function () {
           try {
             await contractObject.methods.bytesFn({})
           } catch (e) {
-            e.message.should.be.equal('The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object. Received type object')
+            e.message.should.be.equal('The first argument must be of type string or an instance of Buffer, ArrayBuffer, or Array or an Array-like Object. Received an instance of Object')
           }
         })
         it('Invalid length', async () => {
