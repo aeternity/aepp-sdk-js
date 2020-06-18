@@ -8,8 +8,9 @@
 
 ### Refactor
 
-* **Deps:** Clean up repository ([#1029](https://github.com/aeternity/aepp-sdk-js/pull/1029)
-* **Env:** Simplify Travis and docker-compose ([#1031](https://github.com/aeternity/aepp-sdk-js/pull/1031)
+* **Deps:** Clean up repository ([#1029](https://github.com/aeternity/aepp-sdk-js/pull/1029))
+* **Env:** Simplify Travis and docker-compose ([#1031](https://github.com/aeternity/aepp-sdk-js/pull/1031))
+* **Env:** Remove unused packages ([#1032](https://github.com/aeternity/aepp-sdk-js/pull/1032))
 
 
 ## [7.4.2](https://github.com/aeternity/aepp-sdk-js/compare/7.2.1...7.4.2) (2020-06-10)
