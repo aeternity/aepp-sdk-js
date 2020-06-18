@@ -23,11 +23,12 @@ const fs = require('fs')
 const path = require('path')
 const R = require('ramda')
 
-const config = require(`${__dirname}/.jsdoc2md.json`)
-
 const outputDir = `${__dirname}/docs`
 const prefix = /^@aeternity\/aepp-sdk\/es\//
-const templateData = jsdoc2md.getTemplateDataSync(config)
+const templateData = jsdoc2md.getTemplateDataSync({
+  configure: '.jsdoc.json',
+  files: 'es/**'
+})
 
 function createDirs (path) {
   const paths = path.split(/\//).slice(1, -1)
