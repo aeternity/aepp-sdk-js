@@ -52,14 +52,19 @@ describe('Verify Transaction', function () {
 
     await client.addAccount(MemoryAccount({ keypair: generateKeyPair() }), { select: true })
     // Sign using another account
-    const signedTx = await client.signTransaction(spendTx)
+    const signedTxHash = await client.signTransaction(spendTx)
+    const signedTxFull = await client.signTransaction(spendTx, { signHash: false })
 
-    const { validation } = await client.unpackAndVerify(signedTx)
-    const error = validation
-      .filter(({ type, txKey }) => type === 'error') // exclude contract vm/abi, has separated test for it
-      .map(({ txKey }) => txKey)
+    const checkErrors = async (signedTx) => {
+      const { validation } = await client.unpackAndVerify(signedTx)
+      const error = validation
+        .filter(({ type }) => type === 'error') // exclude contract vm/abi, has separated test for it
+        .map(({ txKey }) => txKey)
 
-    JSON.stringify(ERRORS.filter(e => e !== 'gasPrice' && e !== 'ctVersion')).should.be.equals(JSON.stringify(error))
+      JSON.stringify(ERRORS.filter(e => e !== 'gasPrice' && e !== 'ctVersion')).should.be.equals(JSON.stringify(error))
+    }
+    await checkErrors(signedTxHash)
+    await checkErrors(signedTxFull)
   })
   it('verify transaction before broadcast', async () => {
     client = await ready(this)

@@ -21,8 +21,9 @@ import { decode } from '../../es/tx/builder/helpers'
 
 import * as R from 'ramda'
 import { randomName } from './aens'
-import { decodeEvents, SOPHIA_TYPES } from '../../es/contract/aci/transformation'
+import { decodeEvents, readType, SOPHIA_TYPES } from '../../es/contract/aci/transformation'
 import { hash, personalMessageToBinary } from '../../es/utils/crypto'
+import { getFunctionACI } from '../../es/contract/aci/helpers'
 
 const identityContract = `
 contract Identity =
@@ -55,6 +56,9 @@ namespace Test =
 
 
 contract Voting =
+  type test_type = int 
+  record state = { value: string, key: test_type, testOption: option(string) }
+  record test_record = { value: string, key: list(test_type) }
   entrypoint test : () => int
 
 include "testLib"
@@ -70,6 +74,8 @@ contract StateContract =
   entrypoint init(value: string, key: int, testOption: option(string)) : state = { value = value, key = key, testOption = testOption }
   entrypoint retrieve() : string*int = (state.value, state.key)
 
+  entrypoint remoteContract(a: Voting) : int = 1
+  entrypoint remoteArgs(a: Voting.test_record) : Voting.test_type = 1
   entrypoint intFn(a: int) : int = a
   payable entrypoint stringFn(a: string) : string = a
   entrypoint boolFn(a: bool) : bool = a
@@ -1088,6 +1094,21 @@ describe('Contract', function () {
       it('Call contract with contract type argument', async () => {
         const result = await contractObject.methods.approve(0, 'ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh')
         return result.decode().should.eventually.become(0)
+      })
+    })
+    describe('Type resolving', () => {
+      let cInstance
+      before(async () => {
+        cInstance = await contract.getContractInstance(testContract, { filesystem })
+      })
+      it('Resolve remote contract type', async () => {
+        const fnACI = getFunctionACI(cInstance.aci, 'remoteContract', { external: cInstance.externalAci })
+        readType('Voting', { bindings: fnACI.bindings }).t.should.be.equal('address')
+      })
+      it('Resolve external contract type', async () => {
+        const fnACI = getFunctionACI(cInstance.aci, 'remoteArgs', { external: cInstance.externalAci })
+        readType(fnACI.arguments[0].type, { bindings: fnACI.bindings }).should.eql(JSON.parse('{"t":"record","generic":[{"name":"value","type":"string"},{"name":"key","type":{"list":["Voting.test_type"]}}]}'))
+        readType(fnACI.returns, { bindings: fnACI.bindings }).t.should.be.equal('int')
       })
     })
   })
