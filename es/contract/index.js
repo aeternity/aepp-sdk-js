@@ -37,26 +37,7 @@ import { required } from '@stamp/required'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Contract instance
  */
-const ContractBase = stampit({
-  deepConf: {
-    Contract: {
-      methods: [
-        'contractEncodeCallDataAPI',
-        'contractDecodeDataAPI',
-        'compileContractAPI',
-        'contractDecodeCallDataBySourceAPI',
-        'contractDecodeCallDataByCodeAPI',
-        'contractGetACI',
-        'setCompilerUrl',
-        'getCompilerVersion',
-        'contractDecodeCallResultAPI',
-        'validateByteCodeAPI',
-        'getFateAssembler',
-        'getBytecodeCompilerVersion'
-      ]
-    }
-  }
-}, required({
+const ContractBase = stampit(required({
   methods: {
     contractEncodeCallDataAPI: required,
     contractDecodeDataAPI: required,

@@ -137,8 +137,7 @@ function destroyInstance () {
  */
 const Ae = stampit(Tx, Account, Chain, {
   methods: { send, spend, transferFunds, destroyInstance, signUsingGA },
-  deepProps: { Ae: { defaults: { denomination: AE_AMOUNT_FORMATS.AETTOS } } },
-  deepConfiguration: { Ae: { methods: ['signUsingGA'] } }
+  deepProps: { Ae: { defaults: { denomination: AE_AMOUNT_FORMATS.AETTOS } } }
 })
 
 export default Ae

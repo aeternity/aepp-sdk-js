@@ -16,7 +16,7 @@
  */
 
 import { before, describe, it } from 'mocha'
-import { Aepp, MemoryAccount, Node, RpcAepp, RpcWallet, Wallet } from '../../es'
+import { MemoryAccount, Node, RpcAepp, RpcWallet } from '../../es'
 import { unpackTx } from '../../es/tx/builder'
 import { decode } from '../../es/tx/builder/helpers'
 import BrowserWindowMessageConnection from '../../es/utils/aepp-wallet-communication/connection/browser-window-message'
@@ -548,71 +548,7 @@ describe('Aepp<->Wallet', function () {
       }
     })
   })
-  describe('Old RPC Wallet-AEPP', () => {
-    let wallet
-    let aepp
-    let connections
-    before(async () => {
-      connections = getConnections(true)
-      wallet = await Wallet({
-        compilerUrl,
-        accounts: [genesisAccount],
-        nodes: [{ name: 'test', instance: node }],
-        self: connections.waelletConnection
-      })
-      wallet.removeAccount(process.env.WALLET_PUB)
-      aepp = await Aepp({ parent: Object.assign({}, connections.aeppConnection), self: connections.aeppConnection })
-    })
-    it('Call wallet method without guards', async () => {
-      const errors = [
-        await aepp.address().catch(e => e === 'Address rejected'),
-        await aepp.height().catch(e => e === 'Chain operation [height] rejected'),
-        await aepp.spendTx({}).catch(e => e === 'Creating transaction [spendTx] rejected'),
-        await aepp.getCompilerVersion().catch(e => e === 'Contract operation [getCompilerVersion] rejected'),
-        await aepp.sign('tx_asdasd').catch(e => e === 'Signing rejected')
-      ]
-      errors.filter(e => e).length.should.be.equal(5)
-    })
-    it('Connect to the wallet', async () => {
-      wallet.onAccount = (m, p, s) => {
-        return true
-      }
-      const address = await aepp.address()
-      address.should.be.equal(publicKey)
-    })
-    it('Reject address retrieving', async () => {
-      wallet.onAccount = (m, p, s) => false
-      try {
-        await aepp.address()
-      } catch (e) {
-        e.should.be.equal('Address rejected')
-      }
-      wallet.onAccount = (m, p, s) => true
-    })
-    it('Send invalid message to AEPP', async () => {
-      connections.waelletConnection.postMessage(true)
-    })
-    it('Call node method through wallet', async () => {
-      wallet.onChain = () => true
-      const height = await aepp.height()
-      height.should.be.an('number')
-    })
-    it('Call compiler through Wallet', async () => {
-      wallet.onContract = () => true
-      const compilerVersion = await aepp.getCompilerVersion()
-      compilerVersion.should.be.a('string')
-      compilerVersion.split('.').length.should.be.equal(3)
-    })
-    it('Can spend', async () => {
-      wallet.onTx = () => true
-      const spendResult = await aepp.spend(0, await aepp.address())
-      spendResult.should.be.an('object')
-      spendResult.blockHeight.should.be.a('number')
-    })
-    it('Send invalid method to Wallet', () => {
-      connections.aeppConnection.postMessage({ method: 'blabla', jsonrpc: '2.0' })
-    })
-  })
+
   describe('Rpc helpers', () => {
     it('Receive invalid message', () => {
       (!receive(() => true)(false)).should.be.equal(true)
