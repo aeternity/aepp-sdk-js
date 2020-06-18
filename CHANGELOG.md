@@ -6,6 +6,10 @@
 * **Account:** Build signature from transaction hash ([#1025](https://github.com/aeternity/aepp-sdk-js/issues/1025)) ([2cb8cc2](https://github.com/aeternity/aepp-sdk-js/commit/2cb8cc2))
 * **ACI:** External contract integration ([#1027](https://github.com/aeternity/aepp-sdk-js/issues/1027)) ([a14d13a](https://github.com/aeternity/aepp-sdk-js/commit/a14d13a))
 
+### Refactor
+
+* **Deps:** Clean up repository ([#1029](https://github.com/aeternity/aepp-sdk-js/pull/1029)
+* **Env:** Simplify Travis and docker-compose ([#1031](https://github.com/aeternity/aepp-sdk-js/pull/1031)
 
 
 ## [7.4.2](https://github.com/aeternity/aepp-sdk-js/compare/7.2.1...7.4.2) (2020-06-10)
