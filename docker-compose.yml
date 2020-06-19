@@ -8,12 +8,10 @@ services:
       EPOCH_CONFIG: /home/aeternity/aeternity_node.yaml
     command: bin/aeternity console -noinput -aecore expected_mine_rate ${EPOCH_MINE_RATE:-5000}
     volumes:
-      - ${PWD}/docker/aeternity_node_mean16.yaml:/home/aeternity/aeternity_node.yaml
-      - ${PWD}/docker/keys/node:/home/aeternity/node/keys
-      - ${PWD}/docker/accounts_test.json:/home/aeternity/node/data/aecore/.genesis/accounts_test.json
+      - ./docker/aeternity_node_mean16.yaml:/home/aeternity/aeternity_node.yaml
+      - ./docker/keys/node:/home/aeternity/node/keys
+      - ./docker/accounts_test.json:/home/aeternity/node/data/aecore/.genesis/accounts_test.json
       - node_db:/home/aeternity/node/data/mnesia
-      - node_keys:/home/aeternity/node/keys
-
 
   compiler:
     image: aeternity/aesophia_http:${COMPILER_TAG}
@@ -22,4 +20,3 @@ services:
 
 volumes:
   node_db:
-  node_keys:

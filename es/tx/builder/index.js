@@ -409,11 +409,12 @@ export function unpackTx (encodedTx, fromRlpBinary = false, prefix = 'tx') {
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param {String | Buffer} rawTx base64 or rlp encoded transaction
+ * @param {{ raw: boolean = false }}  options Options
  * @return {String} Transaction hash
  */
-export function buildTxHash (rawTx) {
-  if (typeof rawTx === 'string' && rawTx.indexOf('tx_') !== -1) return buildHash('th', unpackTx(rawTx).rlpEncoded)
-  return buildHash('th', rawTx)
+export function buildTxHash (rawTx, options = { raw: false }) {
+  if (typeof rawTx === 'string' && rawTx.indexOf('tx_') !== -1) return buildHash('th', unpackTx(rawTx).rlpEncoded, options)
+  return buildHash('th', rawTx, options)
 }
 
 export default { calculateMinFee, calculateFee, unpackTx, unpackRawTx, buildTx, buildRawTx, validateParams, buildTxHash }
