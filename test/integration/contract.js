@@ -191,7 +191,7 @@ describe('Contract', function () {
   let deployed
 
   before(async function () {
-    contract = await ready(this, true, true)
+    contract = await ready(this, true)
   })
   describe('Aens and Oracle operation delegation', () => {
     let cInstance

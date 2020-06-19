@@ -15,13 +15,11 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { Universal } from '../../es/ae/universal'
-import * as Crypto from '../../es/utils/crypto'
+import { Universal, Crypto, MemoryAccount, Node } from '../../es'
 import { BigNumber } from 'bignumber.js'
-import MemoryAccount from '../../es/account/memory'
-import Node from '../../es/node'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
+
 chai.use(chaiAsPromised)
 chai.should()
 
@@ -31,7 +29,7 @@ export const compilerUrl = process.env.COMPILER_URL || 'http://localhost:3080'
 export const publicKey = process.env.PUBLIC_KEY || 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR'
 const secretKey = process.env.SECRET_KEY || 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b'
 export const networkId = process.env.TEST_NETWORK_ID || 'ae_devnet'
-export const forceCompatibility = process.env.FORCE_COMPATIBILITY || false
+const forceCompatibility = process.env.FORCE_COMPATIBILITY || false
 export const genesisAccount = MemoryAccount({ keypair: { publicKey, secretKey } })
 export const account = Crypto.generateKeyPair()
 
@@ -56,13 +54,11 @@ export function plan (amount) {
   planned = planned.plus(amount)
 }
 
-export const TIMEOUT = 18000000
-
 export function configure (mocha) {
-  mocha.timeout(TIMEOUT)
+  mocha.timeout(18000000)
 }
 
-export async function ready (mocha, native = true, withAccounts = false) {
+export async function ready (mocha, nativeMode = true) {
   configure(mocha)
 
   const ae = await BaseAe({ networkId })
@@ -77,17 +73,7 @@ export async function ready (mocha, native = true, withAccounts = false) {
   return BaseAe({
     accounts: [MemoryAccount({ keypair: account })],
     address: account.publicKey,
-    nativeMode: native,
+    nativeMode,
     networkId
   })
-}
-
-export default {
-  BaseAe,
-  url,
-  internalUrl,
-  networkId,
-  configure,
-  ready,
-  plan,
 }
