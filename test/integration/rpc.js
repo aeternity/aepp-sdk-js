@@ -393,7 +393,6 @@ describe('Aepp<->Wallet', function () {
       const connectedLength = Object.keys(aepp.rpcClient.accounts.connected).length
       const received = await new Promise((resolve, reject) => {
         aepp.onAddressChange = (accounts) => {
-          console.log(accounts)
           resolve(Object.keys(accounts.connected).length === connectedLength + 1)
         }
         wallet.addAccount(MemoryAccount({ keypair }))
