@@ -85,33 +85,6 @@ export async function ready (mocha, native = true, withAccounts = false) {
   })
 }
 
-export const WindowPostMessageFake = (name) => ({
-  name,
-  messages: [],
-  addEventListener (onEvent, listener) {
-    this.listener = listener
-  },
-  removeEventListener (onEvent, listener) {
-    return () => null
-  },
-  postMessage (msg) {
-    this.messages.push(msg)
-    setTimeout(() => { if (typeof this.listener === 'function') this.listener({ data: msg, origin: 'testOrigin', source: this }) }, 0)
-  }
-})
-
-export const getFakeConnections = (direct = false) => {
-  const waelletConnection = WindowPostMessageFake('wallet')
-  const aeppConnection = WindowPostMessageFake('aepp')
-  if (direct) {
-    const waelletP = waelletConnection.postMessage
-    const aeppP = aeppConnection.postMessage
-    waelletConnection.postMessage = aeppP.bind(aeppConnection)
-    aeppConnection.postMessage = waelletP.bind(waelletConnection)
-  }
-  return { waelletConnection, aeppConnection }
-}
-
 export default {
   BaseAe,
   url,
@@ -120,5 +93,4 @@ export default {
   configure,
   ready,
   plan,
-  WindowPostMessageFake
 }
