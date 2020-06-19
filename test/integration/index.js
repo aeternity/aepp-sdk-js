@@ -34,7 +34,6 @@ export const networkId = process.env.TEST_NETWORK_ID || 'ae_devnet'
 export const forceCompatibility = process.env.FORCE_COMPATIBILITY || false
 export const genesisAccount = MemoryAccount({ keypair: { publicKey, secretKey } })
 export const account = Crypto.generateKeyPair()
-export const account2 = Crypto.generateKeyPair()
 
 export const BaseAe = async (params = {}) => {
   const ae = await Universal.waitMined(true).compose({
@@ -72,13 +71,11 @@ export async function ready (mocha, native = true, withAccounts = false) {
   if (!charged && planned > 0) {
     console.log(`Charging new wallet ${account.publicKey} with ${planned}`)
     await ae.spend(planned.toString(10), account.publicKey)
-    console.log(`Charging new wallet ${account2.publicKey} with ${planned}`)
-    await ae.spend(planned.toString(10), account2.publicKey)
     charged = true
   }
 
   return BaseAe({
-    accounts: [MemoryAccount({ keypair: account }), MemoryAccount({ keypair: account2 })],
+    accounts: [MemoryAccount({ keypair: account })],
     address: account.publicKey,
     nativeMode: native,
     networkId
