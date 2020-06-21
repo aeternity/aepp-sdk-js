@@ -28,30 +28,20 @@ describe('Aens', function () {
   configure(this)
 
   let aens
-  let nameAuctionsSupported
   const account = generateKeyPair()
-  let name
-  let name2
+  const name = randomName(13) // 13 name length doesn't trigger auction
 
   before(async function () {
     aens = await ready(this)
     await aens.spend('1000000000000000', account.publicKey)
-    const { version } = aens.getNodeInfo()
-    const [majorVersion] = version.split('.')
-    nameAuctionsSupported = +majorVersion === 5 && version !== '5.0.0-rc.1'
-    name = randomName(13) // 13 name length doesn't trigger auction
-    name2 = randomName(13)
   })
 
-  const lima = fn => async () => nameAuctionsSupported ? fn() : undefined
-
   describe('fails on', () => {
-    it('querying non-existent names', async () => {
-      return aens.aensQuery(name2).should.eventually.be.rejected
-    })
+    it('querying non-existent names', () => aens
+      .aensQuery(randomName(13)).should.eventually.be.rejected)
 
     it('updating names not owned by the account', async () => {
-      const preclaim = await aens.aensPreclaim(name2)
+      const preclaim = await aens.aensPreclaim(randomName(13))
       await preclaim.claim()
       const current = await aens.address()
       const onAccount = aens.addresses().find(acc => acc !== current)
@@ -168,7 +158,7 @@ contract Identity =
   })
 
   describe('name auctions', function () {
-    it('claims names', lima(async () => {
+    it('claims names', async () => {
       try {
         const current = await aens.address()
         const onAccount = aens.addresses().find(acc => acc !== current)
@@ -193,6 +183,6 @@ contract Identity =
         if (e && typeof e.verifyTx === 'function') console.log(await e.verifyTx())
         throw e
       }
-    }))
+    })
   })
 })
