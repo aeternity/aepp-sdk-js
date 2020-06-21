@@ -6,8 +6,7 @@
  * @example import WalletRpc from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc'
  */
 import Ae from '../../../ae'
-import Accounts from '../../../accounts'
-import Selector from '../../../account/selector'
+import AccountMultiple from '../../../account/multiple'
 import TxObject from '../../../tx/tx-object'
 
 import { RpcClients } from './rpc-clients'
@@ -210,7 +209,7 @@ const handleMessage = (instance, id) => async (msg, origin) => {
  * @param {Function} onDisconnect Call-back function for disconnect event
  * @return {Object}
  */
-export const WalletRpc = Ae.compose(Accounts, Selector, {
+export const WalletRpc = Ae.compose(AccountMultiple, {
   init ({ name, onConnection, onSubscription, onSign, onDisconnect, onAskAccounts, onMessageSign, forceValidation = false, debug = false } = {}) {
     this.debug = debug
     const eventsHandlers = ['onConnection', 'onSubscription', 'onSign', 'onDisconnect', 'onMessageSign']
@@ -367,9 +366,9 @@ export const WalletRpc = Ae.compose(Accounts, Selector, {
      */
     getAccounts () {
       return {
-        current: this.Selector.address ? { [this.Selector.address]: {} } : {},
+        current: this.selectedAddress ? { [this.selectedAddress]: {} } : {},
         connected: this.addresses()
-          .filter(a => a !== this.Selector.address)
+          .filter(a => a !== this.selectedAddress)
           .reduce((acc, a) => ({ ...acc, [a]: {} }), {})
       }
     }

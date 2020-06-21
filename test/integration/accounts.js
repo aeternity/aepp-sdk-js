@@ -165,7 +165,7 @@ describe('Accounts', function () {
       try {
         await wallet.spend(1, await wallet.address(), { onAccount: 1 })
       } catch (e) {
-        e.message.should.be.equal('Invalid `onAccount` option: should be keyPair object or account address')
+        e.message.should.be.equal('Unknown account type: number (account: 1)')
       }
     })
 
@@ -181,7 +181,7 @@ describe('Accounts', function () {
       try {
         await wallet.sign('tx_Aasdasd', { onAccount: 123 })
       } catch (e) {
-        e.message.should.be.equal('Invalid `onAccount` option: should be keyPair object or account address')
+        e.message.should.be.equal('Unknown account type: number (account: 123)')
       }
     })
     it('Make operation on account using keyPair/MemoryAccount', async () => {
@@ -206,12 +206,12 @@ describe('Accounts', function () {
       try {
         await wallet.sign(data, { onAccount: keypair })
       } catch (e) {
-        e.message.should.be.equal('Invalid \'onAccount\' option: Invalid Key Pair')
+        e.message.should.be.equal('Invalid Key Pair')
       }
       try {
         await wallet.address({ onAccount: keypair })
       } catch (e) {
-        e.message.should.be.equal('Invalid \'onAccount\' option: Invalid Key Pair')
+        e.message.should.be.equal('Invalid Key Pair')
       }
     })
   })
