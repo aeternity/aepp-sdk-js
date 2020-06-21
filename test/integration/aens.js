@@ -39,8 +39,8 @@ describe('Aens', function () {
     const { version } = aens.getNodeInfo()
     const [majorVersion] = version.split('.')
     nameAuctionsSupported = +majorVersion === 5 && version !== '5.0.0-rc.1'
-    name = randomName(13, '.chain') // 13 name length doesn't trigger auction
-    name2 = randomName(13, '.chain')
+    name = randomName(13) // 13 name length doesn't trigger auction
+    name2 = randomName(13)
   })
 
   const lima = fn => async () => nameAuctionsSupported ? fn() : undefined
@@ -172,7 +172,7 @@ contract Identity =
       try {
         const current = await aens.address()
         const onAccount = aens.addresses().find(acc => acc !== current)
-        const name = randomName(12, '.chain')
+        const name = randomName(12)
 
         const preclaim = await aens.aensPreclaim(name)
         preclaim.should.be.an('object')
