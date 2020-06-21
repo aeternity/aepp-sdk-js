@@ -17,7 +17,7 @@
 
 import { describe, it, before } from 'mocha'
 import { encodeBase58Check, encodeBase64Check, generateKeyPair, salt } from '../../es/utils/crypto'
-import { ready, configure } from './index'
+import { ready } from './index'
 import { commitmentHash, isNameValid } from '../../es/tx/builder/helpers'
 import { MemoryAccount } from '../../es'
 import { AE_AMOUNT_FORMATS } from '../../es/utils/amount-formatter'
@@ -59,8 +59,6 @@ let _salt
 let commitmentId
 
 describe('Native Transaction', function () {
-  configure(this)
-
   let clientNative
   let client
   let oracleId
@@ -68,8 +66,8 @@ describe('Native Transaction', function () {
 
   before(async () => {
     const keyPair = generateKeyPair()
-    client = await ready(this, false)
-    clientNative = await ready(this)
+    client = await ready(false)
+    clientNative = await ready()
     await client.spend('16774200000000000000', keyPair.publicKey)
     await client.addAccount(MemoryAccount({ keypair: keyPair }), { select: true })
     await clientNative.addAccount(MemoryAccount({ keypair: keyPair }), { select: true })

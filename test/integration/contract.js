@@ -16,7 +16,7 @@
  */
 import Compiler from '../../es/contract/compiler'
 import { describe, it, before } from 'mocha'
-import { BaseAe, configure, plan, ready, compilerUrl, publicKey } from './'
+import { BaseAe, plan, ready, compilerUrl, publicKey } from './'
 import { decode } from '../../es/tx/builder/helpers'
 
 import * as R from 'ramda'
@@ -184,14 +184,12 @@ const filesystem = {
 
 plan('1000000000000000000000000')
 describe('Contract', function () {
-  configure(this)
-
   let contract
   let bytecode
   let deployed
 
   before(async function () {
-    contract = await ready(this, true)
+    contract = await ready(true)
   })
   describe('Aens and Oracle operation delegation', () => {
     let cInstance

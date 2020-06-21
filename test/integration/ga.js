@@ -16,7 +16,7 @@
  */
 
 import { describe, it, before } from 'mocha'
-import { configure, ready } from './'
+import { ready } from './'
 import { generateKeyPair } from '../../es/utils/crypto'
 import MemoryAccount from '../../es/account/memory'
 
@@ -30,13 +30,11 @@ const authContract = `contract BlindAuth =
             Some(tx_hash) => true
 `
 describe('Generalize Account', function () {
-  configure(this)
-
   let client
   const gaAccount = generateKeyPair()
 
   before(async function () {
-    client = await ready(this)
+    client = await ready()
     await client.spend('100000000000000000000', gaAccount.publicKey)
     await client.addAccount(await MemoryAccount({ keypair: gaAccount }))
   })

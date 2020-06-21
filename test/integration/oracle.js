@@ -16,20 +16,19 @@
  */
 
 import { describe, it, before } from 'mocha'
-import { configure, plan, ready } from './'
+import { plan, ready } from './'
 import { encodeBase64Check } from '../../es/utils/crypto'
 
 plan('100000000000000000000')
 
 describe('Oracle', function () {
-  configure(this)
   let client
   let oracle
   let query
   const queryResponse = "{'tmp': 30}"
 
   before(async function () {
-    client = await ready(this)
+    client = await ready()
   })
 
   it('Register Oracle with 5000 TTL', async () => {

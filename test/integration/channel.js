@@ -19,7 +19,7 @@
 import { describe, it, before, after, beforeEach, afterEach } from 'mocha'
 import * as sinon from 'sinon'
 import { BigNumber } from 'bignumber.js'
-import { configure, ready, plan, BaseAe, networkId } from './'
+import { ready, plan, BaseAe, networkId } from './'
 import { generateKeyPair, encodeBase64Check } from '../../es/utils/crypto'
 import { unpackTx, buildTx, buildTxHash } from '../../es/tx/builder'
 import { decode } from '../../es/tx/builder/helpers'
@@ -46,9 +46,6 @@ function waitForChannel (channel) {
 }
 
 describe('Channel', function () {
-  configure(this)
-  this.timeout(12000000)
-
   let initiator
   let responder
   let initiatorCh
@@ -86,7 +83,7 @@ describe('Channel', function () {
   }
 
   before(async function () {
-    initiator = await ready(this)
+    initiator = await ready()
     responder = await BaseAe({ nativeMode: true, networkId, accounts: [] })
     await responder.addAccount(MemoryAccount({ keypair: generateKeyPair() }), { select: true })
     sharedParams.initiatorId = await initiator.address()

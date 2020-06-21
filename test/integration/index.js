@@ -54,13 +54,7 @@ export function plan (amount) {
   planned = planned.plus(amount)
 }
 
-export function configure (mocha) {
-  mocha.timeout(18000000)
-}
-
-export async function ready (mocha, nativeMode = true) {
-  configure(mocha)
-
+export async function ready (nativeMode = true) {
   const ae = await BaseAe({ networkId })
   await ae.awaitHeight(2)
 
