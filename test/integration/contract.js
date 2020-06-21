@@ -20,7 +20,7 @@ import { BaseAe, configure, plan, ready, compilerUrl } from './'
 import { decode } from '../../es/tx/builder/helpers'
 
 import * as R from 'ramda'
-import { randomName } from './aens'
+import { randomName } from '../utils'
 import { decodeEvents, readType, SOPHIA_TYPES } from '../../es/contract/aci/transformation'
 import { hash, personalMessageToBinary } from '../../es/utils/crypto'
 import { getFunctionACI } from '../../es/contract/aci/helpers'
@@ -56,7 +56,7 @@ namespace Test =
 
 
 contract Voting =
-  type test_type = int 
+  type test_type = int
   record state = { value: string, key: test_type, testOption: option(string) }
   record test_record = { value: string, key: list(test_type) }
   entrypoint test : () => int
