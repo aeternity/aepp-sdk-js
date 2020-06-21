@@ -14,7 +14,7 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-import { BigNumber } from 'bignumber.js'
+import BigNumber from 'bignumber.js'
 import { isBase64, isHex } from './string'
 
 /**

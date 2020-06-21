@@ -16,7 +16,7 @@
  */
 
 import { Universal, Crypto, MemoryAccount, Node } from '../../es'
-import { BigNumber } from 'bignumber.js'
+import BigNumber from 'bignumber.js'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 

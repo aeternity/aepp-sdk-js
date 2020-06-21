@@ -28,7 +28,7 @@ import Chain from '../chain'
 import Account from '../account'
 import TxBuilder from '../tx/builder'
 import * as R from 'ramda'
-import { BigNumber } from 'bignumber.js'
+import BigNumber from 'bignumber.js'
 import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter'
 
 /**

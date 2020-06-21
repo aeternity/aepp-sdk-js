@@ -5,7 +5,7 @@ import {
 } from '../utils/crypto'
 import { encode } from '../tx/builder/helpers'
 
-import { BigNumber } from 'bignumber.js'
+import BigNumber from 'bignumber.js'
 import {
   BASE_VERIFICATION_SCHEMA,
   CONTRACT_VERIFICATION_SCHEMA,

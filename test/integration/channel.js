@@ -18,7 +18,7 @@
 
 import { describe, it, before, after, beforeEach, afterEach } from 'mocha'
 import * as sinon from 'sinon'
-import { BigNumber } from 'bignumber.js'
+import BigNumber from 'bignumber.js'
 import { ready, plan, BaseAe, networkId } from './'
 import { generateKeyPair, encodeBase64Check } from '../../es/utils/crypto'
 import { unpackTx, buildTx, buildTxHash } from '../../es/tx/builder'

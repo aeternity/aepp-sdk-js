@@ -18,7 +18,7 @@
 import { describe, it, before } from 'mocha'
 import { ready, BaseAe, networkId } from './'
 import { generateKeyPair } from '../../es/utils/crypto'
-import { BigNumber } from 'bignumber.js'
+import BigNumber from 'bignumber.js'
 import MemoryAccount from '../../es/account/memory'
 import { AE_AMOUNT_FORMATS } from '../../es/utils/amount-formatter'
 
