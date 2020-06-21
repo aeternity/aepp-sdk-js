@@ -19,7 +19,7 @@
 import { describe, it, before, after, beforeEach, afterEach } from 'mocha'
 import * as sinon from 'sinon'
 import BigNumber from 'bignumber.js'
-import { getSdk, plan, BaseAe, networkId } from './'
+import { getSdk, BaseAe, networkId } from './'
 import { generateKeyPair, encodeBase64Check } from '../../es/utils/crypto'
 import { unpackTx, buildTx, buildTxHash } from '../../es/tx/builder'
 import { decode } from '../../es/tx/builder/helpers'
@@ -27,8 +27,6 @@ import Channel from '../../es/channel'
 import MemoryAccount from '../../es/account/memory'
 
 const wsUrl = process.env.TEST_WS_URL || 'ws://localhost:3014/channel'
-
-plan(BigNumber('10000e18').toString())
 
 const identityContract = `
 contract Identity =

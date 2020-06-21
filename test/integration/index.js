@@ -16,7 +16,6 @@
  */
 
 import { Universal, Crypto, MemoryAccount, Node } from '../../es'
-import BigNumber from 'bignumber.js'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 
@@ -47,22 +46,14 @@ export const BaseAe = async (params = {}) => {
   return ae
 }
 
-let planned = BigNumber(0)
-let charged = false
-
-export function plan (amount) {
-  planned = planned.plus(amount)
-}
-
-export async function getSdk (nativeMode = true) {
+const spendPromise = (async () => {
   const ae = await BaseAe({ networkId })
   await ae.awaitHeight(2)
+  await ae.spend('1' + '0'.repeat(26), account.publicKey)
+})()
 
-  if (!charged && planned > 0) {
-    console.log(`Charging new wallet ${account.publicKey} with ${planned}`)
-    await ae.spend(planned.toString(10), account.publicKey)
-    charged = true
-  }
+export async function getSdk (nativeMode) {
+  await spendPromise
 
   return BaseAe({
     accounts: [MemoryAccount({ keypair: account })],

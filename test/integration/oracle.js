@@ -16,10 +16,8 @@
  */
 
 import { describe, it, before } from 'mocha'
-import { plan, getSdk } from './'
+import { getSdk } from './'
 import { encodeBase64Check } from '../../es/utils/crypto'
-
-plan('100000000000000000000')
 
 describe('Oracle', function () {
   let client

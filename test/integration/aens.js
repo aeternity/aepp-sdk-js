@@ -16,13 +16,11 @@
  */
 
 import { describe, it, before } from 'mocha'
-import { plan, getSdk } from './'
+import { getSdk } from './'
 import { randomName } from '../utils'
 import * as R from 'ramda'
 import { generateKeyPair } from '../../es/utils/crypto'
 import { buildContractId, classify, computeAuctionEndBlock, computeBidFee } from '../../es/tx/builder/helpers'
-
-plan('99000000000000000000000000')
 
 describe('Aens', function () {
   let aens

@@ -16,9 +16,8 @@
  */
 import Compiler from '../../es/contract/compiler'
 import { describe, it, before } from 'mocha'
-import { BaseAe, plan, getSdk, compilerUrl, publicKey } from './'
+import { BaseAe, getSdk, compilerUrl, publicKey } from './'
 import { decode } from '../../es/tx/builder/helpers'
-
 import * as R from 'ramda'
 import { randomName } from '../utils'
 import { decodeEvents, readType, SOPHIA_TYPES } from '../../es/contract/aci/transformation'
@@ -182,14 +181,13 @@ const filesystem = {
   testLib: libContract
 }
 
-plan('1000000000000000000000000')
 describe('Contract', function () {
   let contract
   let bytecode
   let deployed
 
   before(async function () {
-    contract = await getSdk(true)
+    contract = await getSdk()
   })
   describe('Aens and Oracle operation delegation', () => {
     let cInstance
