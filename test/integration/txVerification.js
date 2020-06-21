@@ -1,5 +1,5 @@
 import { before, describe, it } from 'mocha'
-import { ready } from '.'
+import { getSdk } from '.'
 import { generateKeyPair } from '../../es/utils/crypto'
 import { BASE_VERIFICATION_SCHEMA, SIGNATURE_VERIFICATION_SCHEMA } from '../../es/tx/builder/schema'
 import MemoryAccount from '../../es/account/memory'
@@ -12,7 +12,7 @@ describe('Verify Transaction', function () {
   let client
 
   before(async () => {
-    client = await ready()
+    client = await getSdk()
     await client.spend(1234, 'ak_LAqgfAAjAbpt4hhyrAfHyVg9xfVQWsk1kaHaii6fYXt6AJAGe')
   })
   it('validate params', async () => {
@@ -66,7 +66,7 @@ describe('Verify Transaction', function () {
     await checkErrors(signedTxFull)
   })
   it('verify transaction before broadcast', async () => {
-    client = await ready()
+    client = await getSdk()
     const spendTx = await client.spendTx({
       senderId: await client.address(),
       recipientId: await client.address(),

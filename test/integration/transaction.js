@@ -17,7 +17,7 @@
 
 import { describe, it, before } from 'mocha'
 import { encodeBase58Check, encodeBase64Check, generateKeyPair, salt } from '../../es/utils/crypto'
-import { ready } from './index'
+import { getSdk } from './index'
 import { commitmentHash, isNameValid } from '../../es/tx/builder/helpers'
 import { MemoryAccount } from '../../es'
 import { AE_AMOUNT_FORMATS } from '../../es/utils/amount-formatter'
@@ -66,8 +66,8 @@ describe('Native Transaction', function () {
 
   before(async () => {
     const keyPair = generateKeyPair()
-    client = await ready(false)
-    clientNative = await ready()
+    client = await getSdk(false)
+    clientNative = await getSdk()
     await client.spend('16774200000000000000', keyPair.publicKey)
     await client.addAccount(MemoryAccount({ keypair: keyPair }), { select: true })
     await clientNative.addAccount(MemoryAccount({ keypair: keyPair }), { select: true })

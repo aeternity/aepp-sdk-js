@@ -16,7 +16,7 @@
  */
 import Compiler from '../../es/contract/compiler'
 import { describe, it, before } from 'mocha'
-import { BaseAe, plan, ready, compilerUrl, publicKey } from './'
+import { BaseAe, plan, getSdk, compilerUrl, publicKey } from './'
 import { decode } from '../../es/tx/builder/helpers'
 
 import * as R from 'ramda'
@@ -189,7 +189,7 @@ describe('Contract', function () {
   let deployed
 
   before(async function () {
-    contract = await ready(true)
+    contract = await getSdk(true)
   })
   describe('Aens and Oracle operation delegation', () => {
     let cInstance

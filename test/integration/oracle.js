@@ -16,7 +16,7 @@
  */
 
 import { describe, it, before } from 'mocha'
-import { plan, ready } from './'
+import { plan, getSdk } from './'
 import { encodeBase64Check } from '../../es/utils/crypto'
 
 plan('100000000000000000000')
@@ -28,7 +28,7 @@ describe('Oracle', function () {
   const queryResponse = "{'tmp': 30}"
 
   before(async function () {
-    client = await ready()
+    client = await getSdk()
   })
 
   it('Register Oracle with 5000 TTL', async () => {

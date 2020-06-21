@@ -16,7 +16,7 @@
  */
 
 import { describe, it, before } from 'mocha'
-import { plan, ready } from './'
+import { plan, getSdk } from './'
 import { randomName } from '../utils'
 import * as R from 'ramda'
 import { generateKeyPair } from '../../es/utils/crypto'
@@ -30,7 +30,7 @@ describe('Aens', function () {
   const name = randomName(13) // 13 name length doesn't trigger auction
 
   before(async function () {
-    aens = await ready()
+    aens = await getSdk()
     await aens.spend('1000000000000000', account.publicKey)
   })
 

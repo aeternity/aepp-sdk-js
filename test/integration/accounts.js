@@ -16,7 +16,7 @@
  */
 
 import { describe, it, before } from 'mocha'
-import { ready, BaseAe, networkId } from './'
+import { getSdk, BaseAe, networkId } from './'
 import { generateKeyPair } from '../../es/utils/crypto'
 import BigNumber from 'bignumber.js'
 import MemoryAccount from '../../es/account/memory'
@@ -26,7 +26,7 @@ describe('Accounts', function () {
   let wallet
 
   before(async function () {
-    wallet = await ready()
+    wallet = await getSdk()
   })
 
   const { publicKey: receiver } = generateKeyPair()
@@ -35,7 +35,7 @@ describe('Accounts', function () {
     let wallet
 
     before(async function () {
-      wallet = await ready()
+      wallet = await getSdk()
       await wallet.addAccount(MemoryAccount({ keypair: generateKeyPair() }), { select: true })
     })
 
@@ -185,7 +185,7 @@ describe('Accounts', function () {
 
   describe('can be configured to return th', () => {
     it('on creation', async () => {
-      const wallet = await ready()
+      const wallet = await getSdk()
       const th = await wallet.spend(1, receiver)
       th.should.be.a('object')
       th.hash.slice(0, 3).should.equal('th_')

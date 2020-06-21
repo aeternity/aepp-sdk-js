@@ -54,7 +54,7 @@ export function plan (amount) {
   planned = planned.plus(amount)
 }
 
-export async function ready (nativeMode = true) {
+export async function getSdk (nativeMode = true) {
   const ae = await BaseAe({ networkId })
   await ae.awaitHeight(2)
 

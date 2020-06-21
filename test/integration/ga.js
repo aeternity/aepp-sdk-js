@@ -16,7 +16,7 @@
  */
 
 import { describe, it, before } from 'mocha'
-import { ready } from './'
+import { getSdk } from './'
 import { generateKeyPair } from '../../es/utils/crypto'
 import MemoryAccount from '../../es/account/memory'
 
@@ -34,7 +34,7 @@ describe('Generalize Account', function () {
   const gaAccount = generateKeyPair()
 
   before(async function () {
-    client = await ready()
+    client = await getSdk()
     await client.spend('100000000000000000000', gaAccount.publicKey)
     await client.addAccount(await MemoryAccount({ keypair: gaAccount }))
   })
