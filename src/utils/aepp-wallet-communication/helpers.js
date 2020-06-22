@@ -3,8 +3,6 @@
  */
 import { isAccountBase } from '../../account/base'
 
-const isWeb = () => window && window.location && window.location.protocol.startsWith('http')
-
 export const getBrowserAPI = (force = false) => {
   const { chrome, browser } = window
   // Chrome, Opera support
@@ -14,13 +12,6 @@ export const getBrowserAPI = (force = false) => {
   if (!force) throw new Error('Browser is not detected')
   return {}
 }
-
-const isExtensionContext = () => {
-  const browser = getBrowserAPI(true)
-  return typeof browser === 'object' && browser && typeof browser.extension === 'object'
-}
-
-export const isContentScript = () => isExtensionContext() && isWeb()
 
 export const isInIframe = () => window !== window.parent
 
