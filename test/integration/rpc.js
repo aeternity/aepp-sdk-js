@@ -23,7 +23,7 @@ import BrowserWindowMessageConnection from '../../src/utils/aepp-wallet-communic
 import {
   getBrowserAPI,
   getHandler,
-  getWindow, isInIframe,
+  isInIframe,
   receive
 } from '../../src/utils/aepp-wallet-communication/helpers'
 import { METHODS, RPC_STATUS } from '../../src/utils/aepp-wallet-communication/schema'
@@ -575,17 +575,6 @@ describe('Aepp<->Wallet', function () {
     it('getBrowserAPI: firefox', () => {
       global.window = { location: { origin: '//test' }, browser: { runtime: {}, firefox: true } }
       getBrowserAPI().firefox.should.be.equal(true)
-    })
-    it('isInIframe/getWindow', () => {
-      global.window = null
-      try {
-        getWindow()
-      } catch (e) {
-        e.message.should.be.equal('Browser is not detected')
-      }
-      global.window = {}
-      isInIframe().should.be.equal(true)
-      getWindow().should.be.an('Object')
     })
     it('Send message from content script', async () => {
       connectionFromWalletToAepp.disconnect()

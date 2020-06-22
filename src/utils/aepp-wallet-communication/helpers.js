@@ -24,11 +24,6 @@ export const isContentScript = () => isExtensionContext() && isWeb()
 
 export const isInIframe = () => window !== window.parent
 
-export const getWindow = (force = false) => {
-  if (!window && !force) throw new Error('Browser is not detected')
-  return window
-}
-
 /**
  * RPC helper functions
  */
