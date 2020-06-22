@@ -622,9 +622,7 @@ describe('Aepp<->Wallet', function () {
       (await getHandler({}, { method: 'hey' })()()).should.be.equal(true)
     })
     it('getBrowserAPI: not in browser', () => {
-      global.chrome = null
-      global.browser = null
-      global.window = null
+      global.window = {}
       try {
         getBrowserAPI()
       } catch (e) {
@@ -632,20 +630,15 @@ describe('Aepp<->Wallet', function () {
       }
     })
     it('getBrowserAPI: not in browser(force error)', () => {
-      global.chrome = null
-      global.browser = null
-      global.window = null
+      global.window = {}
       getBrowserAPI(true).should.be.an('object')
     })
     it('getBrowserAPI: chrome', () => {
-      global.chrome = { runtime: {}, chrome: true }
-      global.window = { location: { origin: '//test' }, chrome: global.chrome }
+      global.window = { location: { origin: '//test' }, chrome: { runtime: {}, chrome: true } }
       getBrowserAPI().chrome.should.be.equal(true)
     })
     it('getBrowserAPI: firefox', () => {
-      global.chrome = null
-      global.browser = { runtime: {}, firefox: true }
-      global.window = { location: { origin: '//test' }, browser: global.browser }
+      global.window = { location: { origin: '//test' }, browser: { runtime: {}, firefox: true } }
       getBrowserAPI().firefox.should.be.equal(true)
     })
     it('isInIframe/getWindow', () => {

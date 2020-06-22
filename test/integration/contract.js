@@ -566,11 +566,9 @@ describe('Contract', function () {
         schema.types.forEach((t, tIndex) => {
           const value = event.decoded[tIndex]
           const isNumber = typeof value === 'string' || typeof value === 'number'
-          // eslint-disable-next-line valid-typeof
           const v = typeof value === t
           switch (t) {
             case SOPHIA_TYPES.address:
-              // console.log('contractAddress check')
               event.address.should.be.equal(`ct_${value}`)
               break
             case SOPHIA_TYPES.int:
