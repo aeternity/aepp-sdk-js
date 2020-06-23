@@ -29,10 +29,6 @@ export default stampit({
     //    [msg.id]: { resolve, reject }
     // }
     this.callbacks = {}
-    // {
-    //    [id]: { accept, deny }
-    // }
-    this.actions = {}
     // ['connected', 'current']
     this.addressSubscription = []
     // {
@@ -181,31 +177,6 @@ export default stampit({
         this.addressSubscription = this.addressSubscription.filter(s => s !== value)
       }
       return this.addressSubscription
-    },
-    /**
-     * Add new action to actions
-     * @function addAction
-     * @instance
-     * @rtype (action: Object, [r: Function, j: Function]) => Object
-     * @param {Object} action Action object
-     * @param {Function[]} resolvers Array with two function [resolve, reject] action
-     * @return {Object}
-     */
-    addAction (action, [r, j]) {
-      const removeAction = ((ins) => (id) => delete ins[id])(this.actions)
-      if (Object.prototype.hasOwnProperty.call(this.callbacks, action.id)) throw new Error('Action for this request already exist')
-      this.actions[action.id] = {
-        ...action,
-        accept (...args) {
-          removeAction(action.id)
-          r(...args)
-        },
-        deny (...args) {
-          removeAction(action.id)
-          j(...args)
-        }
-      }
-      return this.actions[action.id]
     },
     /**
      * Make a request

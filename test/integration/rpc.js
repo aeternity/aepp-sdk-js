@@ -481,13 +481,6 @@ describe('Aepp<->Wallet', function () {
         e.message.should.be.equal('Unsupported Network')
       }
     })
-    it('Try add already existed action', async () => {
-      try {
-        aepp.rpcClient.addAction({ id: 1 }, [])
-      } catch (e) {
-        e.message.should.be.equal('Action for this request already exist')
-      }
-    })
     it('Process response ', async () => {
       try {
         await aepp.rpcClient.processResponse({ id: 11, error: {} })

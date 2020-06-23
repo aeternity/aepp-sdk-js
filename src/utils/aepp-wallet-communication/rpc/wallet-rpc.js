@@ -178,9 +178,13 @@ const handleMessage = (instance, id) => async (msg, origin) => {
     const callInstance = (methodName, params, accept, deny) => () => new Promise(resolve => {
       instance[methodName](
         client,
-        client.addAction({ id, method, params }, [
-          (...args) => resolve(accept(...args)), (...args) => resolve(deny(...args))
-        ]),
+        {
+          id,
+          method,
+          params,
+          accept: (...args) => resolve(accept(...args)),
+          deny: (...args) => resolve(deny(...args))
+        },
         origin
       )
     })
