@@ -320,7 +320,7 @@ export default Ae.compose(AccountMultiple, {
     shareWalletInfo (postFn) {
       postFn({
         jsonrpc: '2.0',
-        ...message(METHODS.wallet.readyToConnect, { ...this.getWalletInfo() })
+        ...message(METHODS.wallet.readyToConnect, this.getWalletInfo())
       })
     },
     /**
