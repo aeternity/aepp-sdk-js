@@ -39,20 +39,20 @@ import { AMOUNT, DEPOSIT, DRY_RUN_ACCOUNT, GAS, MIN_GAS_PRICE } from '../tx/buil
 import { decode, produceNameId } from '../tx/builder/helpers'
 import TxObject from '../tx/tx-object'
 
-function sendAndProcess (tx, options) {
-  return async function (onSuccess, onError) {
-    // Send transaction and get transaction info
-    const txData = await this.send(tx, options)
+async function sendAndProcess (tx, options) {
+  const txData = await this.send(tx, options)
 
-    if (typeof options.waitMined === 'boolean' && !options.waitMined) {
-      return onSuccess({ hash: txData.hash, rawTx: txData.rawTx })
-    }
-
-    const result = await this.getTxInfo(txData.hash)
-    return result.returnType === 'ok'
-      ? onSuccess({ hash: txData.hash, tx: TxObject({ tx: txData.rawTx }), result, txData, rawTx: txData.rawTx })
-      : typeof onError === 'function' ? onError(result) : this.handleCallError({ result, tx: TxObject({ tx: txData.rawTx }), rawTx: txData.rawTx })
+  if (options.waitMined === false) {
+    return { hash: txData.hash, rawTx: txData.rawTx }
   }
+
+  const result = await this.getTxInfo(txData.hash)
+
+  if (result.returnType !== 'ok') {
+    await this.handleCallError({ result, tx: TxObject({ tx: txData.rawTx }), rawTx: txData.rawTx })
+  }
+
+  return { hash: txData.hash, tx: TxObject({ tx: txData.rawTx }), result, txData, rawTx: txData.rawTx }
 }
 
 /**
@@ -67,23 +67,18 @@ function sendAndProcess (tx, options) {
  */
 async function handleCallError ({ result, tx, rawTx }) {
   const error = Buffer.from(result.returnValue).toString()
-  if (isBase64(error.slice(3))) {
-    const decodedError = Buffer.from(error.slice(3), 'base64').toString()
-    throw Object.assign(Error(`Invocation failed: ${error}. Decoded: ${decodedError}`), R.merge(result, {
+  const decodedError = isBase64(error.slice(3))
+    ? Buffer.from(error.slice(3), 'base64').toString()
+    : await this.contractDecodeDataAPI('string', error)
+  throw Object.assign(
+    new Error(`Invocation failed: ${error}. Decoded: ${decodedError}`), {
+      ...result,
       tx,
       error,
       rawTx,
       decodedError
-    }))
-  }
-
-  const decodedError = await this.contractDecodeDataAPI('string', error)
-  throw Object.assign(Error(`Invocation failed: ${error}. Decoded: ${decodedError}`), R.merge(result, {
-    tx,
-    error,
-    rawTx,
-    decodedError
-  }))
+    }
+  )
 }
 
 /**
@@ -232,16 +227,14 @@ async function contractCall (source, address, name, argsOrCallData = [], options
     callData: Array.isArray(argsOrCallData) ? await this.contractEncodeCall(source, name, argsOrCallData, opt) : argsOrCallData
   }))
 
-  return sendAndProcess(tx, opt).call(
-    this,
-    ({ hash, rawTx, result, txData }) => ({
-      hash,
-      rawTx,
-      result,
-      txData,
-      decode: () => result ? this.contractDecodeData(source, name, result.returnValue, result.returnType, opt) : {}
-    })
-  )
+  const { hash, rawTx, result, txData } = await sendAndProcess.call(this, tx, opt)
+  return {
+    hash,
+    rawTx,
+    result,
+    txData,
+    decode: () => result ? this.contractDecodeData(source, name, result.returnValue, result.returnType, opt) : {}
+  }
 }
 
 /**
@@ -278,23 +271,21 @@ async function contractDeploy (code, source, initState = [], options = {}) {
     ownerId
   }))
 
-  return sendAndProcess(tx, opt).call(
-    this,
-    ({ hash, rawTx, result, txData }) => Object.freeze({
-      result,
-      owner: ownerId,
-      transaction: hash,
-      rawTx,
-      txData,
-      address: contractId,
-      call: async (name, args = [], options = {}) => this.contractCall(source, contractId, name, args, R.merge(opt, options)),
-      callStatic: async (name, args = [], options = {}) => this.contractCallStatic(source, contractId, name, args, {
-        ...options,
-        options: { onAccount: opt.onAccount, ...R.merge(opt, options.options) }
-      }),
-      createdAt: new Date()
-    })
-  )
+  const { hash, rawTx, result, txData } = await sendAndProcess.call(this, tx, opt)
+  return Object.freeze({
+    result,
+    owner: ownerId,
+    transaction: hash,
+    rawTx,
+    txData,
+    address: contractId,
+    call: async (name, args = [], options = {}) => this.contractCall(source, contractId, name, args, R.merge(opt, options)),
+    callStatic: async (name, args = [], options = {}) => this.contractCallStatic(source, contractId, name, args, {
+      ...options,
+      options: { onAccount: opt.onAccount, ...R.merge(opt, options.options) }
+    }),
+    createdAt: new Date()
+  })
 }
 
 /**
