@@ -95,8 +95,8 @@ async function getQueryObject (oracleId, queryId) {
     ...q,
     decodedQuery: decodeBase64Check(q.query.slice(3)).toString(),
     decodedResponse: decodeBase64Check(q.response.slice(3)).toString(),
-    respond: (response, options) => this.respondToQuery(oracleId, queryId, response, options),
-    pollForResponse: ({ attempts, interval }) => this.pollForQueryResponse(oracleId, queryId, { attempts, interval }),
+    respond: this.respondToQuery.bind(this, oracleId, queryId),
+    pollForResponse: this.pollForQueryResponse.bind(this, oracleId, queryId),
     decode: (data) => decodeBase64Check(data.slice(3))
   }
 }
