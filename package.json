@@ -86,7 +86,7 @@
     "recursive-rename": "^4.0.0",
     "sinon": "^9.0.0",
     "source-map": "^0.7.3",
-    "standard": "^14.0.1",
+    "standard": "^14.3.4",
     "webpack": "^4.36.1",
     "webpack-bundle-analyzer": "^3.6.1",
     "webpack-cli": "3.3.8"
