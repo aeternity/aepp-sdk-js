@@ -28,7 +28,8 @@
 
 import Ae from './'
 import * as R from 'ramda'
-import { decodeBase64Check } from '../utils/crypto'
+import { decodeBase64Check, assertedType } from '../utils/crypto'
+import { pause } from '../utils/other'
 import { ORACLE_TTL, QUERY_FEE, QUERY_TTL, RESPONSE_TTL } from '../tx/builder/schema'
 
 /**
@@ -115,22 +116,15 @@ async function getQueryObject (oracleId, queryId) {
  * @return {Promise<Object>} OracleQuery object
  */
 export async function pollForQueryResponse (oracleId, queryId, { attempts = 20, interval = 5000 } = {}) {
-  const emptyResponse = 'or_Xfbg4g=='
-  async function pause (duration) {
-    await new Promise(resolve => setTimeout(resolve, duration))
-  }
-  async function probe (left) {
-    const query = await this.getOracleQuery(oracleId, queryId)
-    if (query.response !== emptyResponse) {
-      return { response: query.response, decode: () => decodeBase64Check(query.response.slice(3)) }
+  for (let i = 0; i < attempts; i++) {
+    if (i) await pause(interval)
+    const { response } = await this.getOracleQuery(oracleId, queryId)
+    const responseBuffer = decodeBase64Check(assertedType(response, 'or'))
+    if (responseBuffer.length) {
+      return { response, decode: () => responseBuffer } // TODO: Return just responseBuffer
     }
-    if (left > 0) {
-      await pause(interval)
-      return probe.bind(this)(left - 1)
-    }
-    throw Error(`Giving up after ${attempts * interval}ms`)
   }
-  return probe.bind(this)(attempts)
+  throw Error(`Giving up after ${(attempts - 1) * interval}ms`)
 }
 
 /**
