@@ -59,27 +59,23 @@ async function getOracleObject (oracleId) {
  * @alias module:@aeternity/aepp-sdk/es/ae/oracle
  * @instance
  * @function
- * @category async
  * @param {String} oracleId Oracle public key
  * @param {Function} onQuery OnQuery callback
  * @param {Object} [options] Options object
  * @param {Number} [options.interval] Poll interval(default: 5000)
  * @return {Function} stopPolling - Stop polling function
  */
-async function pollForQueries (oracleId, onQuery, { interval = 5000 } = {}) {
-  const queries = (await this.getOracleQueries(oracleId)).oracleQueries || []
-  let quriesIds = queries.map(q => q.id)
-  await onQuery(queries)
-
-  async function pollQueries () {
-    const { oracleQueries: q } = await this.getOracleQueries(oracleId)
-    const newQueries = q.filter(({ id }) => !quriesIds.includes(id))
-    if (newQueries.length) {
-      quriesIds = [...quriesIds, ...newQueries.map(a => a.id)]
-      onQuery(newQueries)
-    }
+function pollForQueries (oracleId, onQuery, { interval = 5000 } = {}) {
+  const sentQueryIds = new Set()
+  const fetchQueries = async () => {
+    const queries = ((await this.getOracleQueries(oracleId)).oracleQueries || [])
+      .filter(({ id }) => !sentQueryIds.has(id))
+    queries.forEach(({ id }) => sentQueryIds.add(id))
+    if (queries.length) onQuery(queries)
   }
-  const intervalId = setInterval(pollQueries.bind(this), interval)
+
+  fetchQueries()
+  const intervalId = setInterval(fetchQueries, interval)
   return () => clearInterval(intervalId)
 }
 
