@@ -185,7 +185,7 @@ async function postQueryToOracle (oracleId, query, options = {}) {
   }))
   return {
     ...(await this.send(oracleRegisterTx, opt)),
-    ...(await (await this.getOracleObject(oracleId)).getQuery(queryId))
+    ...(await this.getQueryObject(oracleId, queryId))
   }
 }
 
