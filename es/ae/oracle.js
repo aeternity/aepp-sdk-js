@@ -46,13 +46,11 @@ async function getOracleObject (oracleId) {
   return {
     ...oracle,
     queries,
-    pollQueries: (onQuery, { interval } = {}) => this.pollForQueries(oracleId, onQuery, { interval }),
-    postQuery: (query, options) => this.postQueryToOracle(oracleId, query, options),
-    respondToQuery: (queryId, response, options) => this.respondToQuery(oracleId, queryId, response, options),
-    extendOracle: (oracleTtl, options) => this.extendOracleTtl(oracleId, oracleTtl, options),
-    getQuery: async (queryId) => {
-      return getQueryObject.bind(this)(oracleId, queryId)
-    }
+    pollQueries: this.pollForQueries.bind(this, oracleId),
+    postQuery: this.postQueryToOracle.bind(this, oracleId),
+    respondToQuery: this.respondToQuery.bind(this, oracleId),
+    extendOracle: this.extendOracleTtl.bind(this, oracleId),
+    getQuery: this.getQueryObject.bind(this, oracleId)
   }
 }
 
