@@ -29,7 +29,7 @@ import Tx from './'
 
 import { buildTx, calculateFee } from './builder'
 import { ABI_VERSIONS, MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE, VM_TYPE, TX_TTL } from './builder/schema'
-import { buildContractId, oracleQueryId } from './builder/helpers'
+import { buildContractId } from './builder/helpers'
 import { TxObject } from './tx-object'
 
 async function spendTx ({ senderId, recipientId, amount, payload = '' }) {
@@ -269,7 +269,7 @@ async function oraclePostQueryTx ({ oracleId, responseTtl, query, queryTtl, quer
       senderId
     })
 
-  return { tx, queryId: oracleQueryId(senderId, nonce, oracleId) }
+  return tx
 }
 
 async function oracleRespondTx ({ oracleId, callerId, responseTtl, queryId, response }) {

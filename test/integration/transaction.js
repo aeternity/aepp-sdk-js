@@ -18,7 +18,7 @@
 import { describe, it, before } from 'mocha'
 import { encodeBase58Check, encodeBase64Check, generateKeyPair, salt } from '../../es/utils/crypto'
 import { getSdk } from './index'
-import { commitmentHash, isNameValid } from '../../es/tx/builder/helpers'
+import { commitmentHash, isNameValid, oracleQueryId } from '../../es/tx/builder/helpers'
 import { MemoryAccount } from '../../es'
 import { AE_AMOUNT_FORMATS } from '../../es/utils/amount-formatter'
 import { unpackTx } from '../../es/tx/builder'
@@ -225,16 +225,16 @@ describe('Native Transaction', function () {
 
     const params = { oracleId, responseTtl, query, queryTtl, queryFee, senderId }
 
-    const { tx: txFromAPI, queryId: oracleQueryId } = await client.oraclePostQueryTx(params)
-    const { tx: nativeTx } = await clientNative.oraclePostQueryTx(params)
+    const txFromAPI = await client.oraclePostQueryTx(params)
+    const nativeTx = await clientNative.oraclePostQueryTx(params)
+    queryId = oracleQueryId(senderId, unpackTx(txFromAPI).tx.nonce, oracleId)
 
     txFromAPI.should.be.equal(nativeTx)
 
     await client.send(nativeTx)
 
-    const oracleQuery = (await client.getOracleQuery(oracleId, oracleQueryId))
-    oracleQuery.id.should.be.equal(oracleQueryId)
-    queryId = oracleQueryId
+    const oracleQuery = (await client.getOracleQuery(oracleId, queryId))
+    oracleQuery.id.should.be.equal(queryId)
   })
 
   it('native build of oracle respond query tx', async () => {

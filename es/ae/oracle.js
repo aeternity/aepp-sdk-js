@@ -30,6 +30,8 @@ import Ae from './'
 import * as R from 'ramda'
 import { decodeBase64Check, assertedType } from '../utils/crypto'
 import { pause } from '../utils/other'
+import { oracleQueryId } from '../tx/builder/helpers'
+import { unpackTx } from '../tx/builder'
 import { ORACLE_TTL, QUERY_FEE, QUERY_TTL, RESPONSE_TTL } from '../tx/builder/schema'
 
 /**
@@ -178,11 +180,12 @@ async function postQueryToOracle (oracleId, query, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   const senderId = await this.address(opt)
 
-  const { tx: oracleRegisterTx, queryId } = await this.oraclePostQueryTx(R.merge(opt, {
+  const oracleRegisterTx = await this.oraclePostQueryTx(R.merge(opt, {
     oracleId,
     senderId,
     query
   }))
+  const queryId = oracleQueryId(senderId, unpackTx(oracleRegisterTx).tx.nonce, oracleId)
   return {
     ...await this.send(oracleRegisterTx, opt),
     ...await this.getQueryObject(oracleId, queryId)
