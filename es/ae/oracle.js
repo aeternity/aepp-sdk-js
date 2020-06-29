@@ -153,8 +153,8 @@ async function registerOracle (queryFormat, responseFormat, options = {}) {
     responseFormat
   }))
   return {
-    ...(await this.send(oracleRegisterTx, opt)),
-    ...(await this.getOracleObject(`ok_${accountId.slice(3)}`))
+    ...await this.send(oracleRegisterTx, opt),
+    ...await this.getOracleObject(`ok_${accountId.slice(3)}`)
   }
 }
 
@@ -184,8 +184,8 @@ async function postQueryToOracle (oracleId, query, options = {}) {
     query
   }))
   return {
-    ...(await this.send(oracleRegisterTx, opt)),
-    ...(await this.getQueryObject(oracleId, queryId))
+    ...await this.send(oracleRegisterTx, opt),
+    ...await this.getQueryObject(oracleId, queryId)
   }
 }
 
@@ -212,8 +212,8 @@ async function extendOracleTtl (oracleId, oracleTtl, options = {}) {
     oracleTtl
   }))
   return {
-    ...(await this.send(oracleExtendTx, opt)),
-    ...(await this.getOracleObject(oracleId))
+    ...await this.send(oracleExtendTx, opt),
+    ...await this.getOracleObject(oracleId)
   }
 }
 
@@ -243,8 +243,8 @@ async function respondToQuery (oracleId, queryId, response, options = {}) {
     response
   }))
   return {
-    ...(await this.send(oracleRespondTx, opt)),
-    ...(await this.getOracleObject(oracleId))
+    ...await this.send(oracleRespondTx, opt),
+    ...await this.getOracleObject(oracleId)
   }
 }
 
