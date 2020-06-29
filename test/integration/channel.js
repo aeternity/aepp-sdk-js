@@ -14,6 +14,7 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
+/* eslint-disable no-unused-expressions */
 
 import { describe, it, before, after, beforeEach, afterEach } from 'mocha'
 import * as sinon from 'sinon'
@@ -53,7 +54,6 @@ describe('Channel', function () {
   let initiatorCh
   let responderCh
   let responderShouldRejectUpdate
-  let existingChannelRound
   let existingChannelId
   let offchainTx
   let contractAddress
@@ -92,7 +92,7 @@ describe('Channel', function () {
     sharedParams.initiatorId = await initiator.address()
     sharedParams.responderId = await responder.address()
     await initiator.spend(BigNumber('500e18').toString(), await responder.address())
-    const version = initiator.getNodeInfo().version.split(/[\.-]/).map(i => parseInt(i, 10))
+    const version = initiator.getNodeInfo().version.split(/[.-]/).map(i => parseInt(i, 10))
     majorVersion = version[0]
     minorVersion = version[1]
   })
@@ -682,7 +682,7 @@ describe('Channel', function () {
       sign: responderSign
     })
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
-    existingChannelRound = initiatorCh.round()
+    initiatorCh.round() // existingChannelRound
     const result = await initiatorCh.leave()
     result.channelId.should.be.a('string')
     result.signedTx.should.be.a('string')
