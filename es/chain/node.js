@@ -132,8 +132,7 @@ async function awaitHeight (h, { interval = 5000, attempts = 20 } = {}) {
 }
 
 async function topBlock () {
-  const top = await this.api.getTopBlock()
-  return top[R.head(R.keys(top))]
+  return Object.values(await this.api.getTopBlock())[0]
 }
 
 async function poll (th, { blocks = 10, interval = 5000, allowUnsynced = false } = {}) {
