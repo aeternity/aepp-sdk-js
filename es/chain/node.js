@@ -22,6 +22,7 @@ import { AE_AMOUNT_FORMATS, formatAmount } from '../utils/amount-formatter'
 import TransactionValidator from '../tx/validator'
 import NodePool from '../node-pool'
 import { assertedType } from '../utils/crypto'
+import { pause } from '../utils/other'
 import { isNameValid, produceNameId } from '../tx/builder/helpers'
 import { NAME_ID_KEY } from '../tx/builder/schema'
 
@@ -109,26 +110,14 @@ async function height () {
   return (await this.api.getCurrentKeyBlockHeight()).height
 }
 
-async function pause (duration) {
-  await new Promise(resolve => setTimeout(resolve, duration))
-}
-
-async function awaitHeight (h, { interval = 5000, attempts = 20 } = {}) {
-  const instance = this
-
-  async function probe (left) {
-    const current = await instance.height()
-    if (current >= h) {
-      return current
-    }
-    if (left > 0) {
-      await pause(interval)
-      return probe(left - 1)
-    }
-    throw Error(`Giving up after ${attempts * interval}ms, current=${current}, h=${h}`)
+async function awaitHeight (height, { interval = 5000, attempts = 20 } = {}) {
+  let currentHeight
+  for (let i = 0; i < attempts; i++) {
+    if (i) await pause(interval)
+    currentHeight = await this.height()
+    if (currentHeight >= height) return currentHeight
   }
-
-  return probe(attempts)
+  throw Error(`Giving up after ${(attempts - 1) * interval}ms, current height: ${currentHeight}, desired height: ${height}`)
 }
 
 async function topBlock () {
@@ -136,22 +125,15 @@ async function topBlock () {
 }
 
 async function poll (th, { blocks = 10, interval = 5000, allowUnsynced = false } = {}) {
-  const instance = this
   const max = await this.height() + blocks
-
-  async function probe () {
-    const tx = await instance.tx(th).catch(_ => null)
+  do {
+    const tx = await this.tx(th).catch(_ => null)
     if (tx && (tx.blockHeight !== -1 || (allowUnsynced && tx.height))) {
       return tx
     }
-    if (await instance.height() < max) {
-      await pause(interval)
-      return probe()
-    }
-    throw new Error(`Giving up after ${blocks} blocks mined. TxHash ${th}`)
-  }
-
-  return probe()
+    await pause(interval)
+  } while (await this.height() < max)
+  throw new Error(`Giving up after ${blocks} blocks mined, transaction hash: ${th}`)
 }
 
 async function getTxInfo (hash) {
