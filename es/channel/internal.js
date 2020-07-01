@@ -27,22 +27,22 @@ const PING_TIMEOUT_MS = 10000
 // Close connection if pong message is not received within 5 seconds
 const PONG_TIMEOUT_MS = 5000
 
-const options = new WeakMap()
-const status = new WeakMap()
-const state = new WeakMap()
+export const options = new WeakMap()
+export const status = new WeakMap()
+export const state = new WeakMap()
 const fsm = new WeakMap()
 const websockets = new WeakMap()
-const eventEmitters = new WeakMap()
+export const eventEmitters = new WeakMap()
 const messageQueue = new WeakMap()
 const messageQueueLocked = new WeakMap()
 const actionQueue = new WeakMap()
 const actionQueueLocked = new WeakMap()
 const sequence = new WeakMap()
-const channelId = new WeakMap()
+export const channelId = new WeakMap()
 const rpcCallbacks = new WeakMap()
 const pingTimeoutId = new WeakMap()
 const pongTimeoutId = new WeakMap()
-const fsmId = new WeakMap()
+export const fsmId = new WeakMap()
 
 function channelURL (url, params) {
   const paramString = R.join('&', R.values(R.mapObjIndexed((value, key) =>
@@ -51,7 +51,7 @@ function channelURL (url, params) {
   return `${url}?${paramString}`
 }
 
-function emit (channel, ...args) {
+export function emit (channel, ...args) {
   eventEmitters.get(channel).emit(...args)
 }
 
@@ -66,7 +66,7 @@ function enterState (channel, nextState) {
   dequeueAction(channel)
 }
 
-function changeStatus (channel, newStatus) {
+export function changeStatus (channel, newStatus) {
   const prevStatus = status.get(channel)
   if (newStatus !== prevStatus) {
     status.set(channel, newStatus)
@@ -74,18 +74,18 @@ function changeStatus (channel, newStatus) {
   }
 }
 
-function changeState (channel, newState) {
+export function changeState (channel, newState) {
   state.set(channel, newState)
   emit(channel, 'stateChanged', newState)
 }
 
-function send (channel, message) {
+export function send (channel, message) {
   const { debug = false } = options.get(channel)
   if (debug) console.log('Send message: ', message)
   websockets.get(channel).send(JsonBig.stringify(message))
 }
 
-function enqueueAction (channel, guard, action) {
+export function enqueueAction (channel, guard, action) {
   actionQueue.set(channel, [
     ...actionQueue.get(channel) || [],
     { guard, action }
@@ -182,7 +182,7 @@ function wrapCallErrorMessage (message) {
   return Error(message.error.message)
 }
 
-function call (channel, method, params) {
+export function call (channel, method, params) {
   return new Promise((resolve, reject) => {
     const id = sequence.set(channel, sequence.get(channel) + 1).get(channel)
     rpcCallbacks.get(channel).set(id, (message) => {
@@ -193,7 +193,7 @@ function call (channel, method, params) {
   })
 }
 
-function disconnect (channel) {
+export function disconnect (channel) {
   websockets.get(channel).close()
   clearTimeout(pingTimeoutId.get(channel))
   clearTimeout(pongTimeoutId.get(channel))
@@ -219,7 +219,7 @@ function WebSocket (url, callbacks) {
   })
 }
 
-async function initialize (channel, channelOptions) {
+export async function initialize (channel, channelOptions) {
   const optionsKeys = ['sign', 'url']
   const params = R.pickBy((_, key) => !optionsKeys.includes(key), channelOptions)
   const { url } = channelOptions
@@ -254,21 +254,4 @@ async function initialize (channel, channelOptions) {
     onmessage: ({ data }) => onMessage(channel, data)
   })
   websockets.set(channel, ws)
-}
-
-export {
-  initialize,
-  options,
-  status,
-  state,
-  eventEmitters,
-  emit,
-  changeStatus,
-  changeState,
-  send,
-  enqueueAction,
-  channelId,
-  call,
-  disconnect,
-  fsmId
 }
