@@ -155,7 +155,8 @@ async function poll (th, { blocks = 10, interval = 5000, allowUnsynced = false }
 }
 
 async function getTxInfo (hash) {
-  return this.api.getTransactionInfoByHash(hash).then(res => res.callInfo ? res.callInfo : res)
+  const result = await this.api.getTransactionInfoByHash(hash)
+  return result.callInfo || result
 }
 
 async function mempool () {
