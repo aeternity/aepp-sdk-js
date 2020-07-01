@@ -53,7 +53,7 @@ async function sendTransaction (tx, options = {}) {
     const { txHash } = await this.api.postTransaction({ tx })
 
     if (waitMined) {
-      const txData = { ...(await this.poll(txHash, options)), rawTx: tx }
+      const txData = { ...await this.poll(txHash, options), rawTx: tx }
       // wait for transaction confirmation
       if (options.confirm) {
         return { ...txData, confirmationHeight: await this.waitForTxConfirm(txHash, options) }
@@ -67,7 +67,7 @@ async function sendTransaction (tx, options = {}) {
 }
 
 async function waitForTxConfirm (txHash, options = { confirm: 3 }) {
-  options.confirm = typeof options.confirm === 'boolean' && options.confirm ? 3 : options.confirm
+  options.confirm = options.confirm === true ? 3 : options.confirm
   const { blockHeight } = await this.tx(txHash)
   return this.awaitHeight(blockHeight + options.confirm, options)
 }
@@ -99,9 +99,7 @@ async function tx (hash, info = true) {
   if (['ContractCreateTx', 'ContractCallTx', 'ChannelForceProgressTx'].includes(tx.tx.type) && info && tx.blockHeight !== -1) {
     try {
       return { ...tx, ...await this.getTxInfo(hash) }
-    } catch (e) {
-      return tx
-    }
+    } catch (e) {}
   }
   return tx
 }
