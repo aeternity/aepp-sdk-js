@@ -17,7 +17,6 @@
 
 import { w3cwebsocket as W3CWebSocket } from 'websocket'
 import { EventEmitter } from 'events'
-import * as R from 'ramda'
 import JsonBig from '../utils/json-big'
 import { pascalToSnake } from '../utils/string'
 import { awaitingConnection, awaitingReconnection, channelOpen } from './handlers'
@@ -43,13 +42,6 @@ const rpcCallbacks = new WeakMap()
 const pingTimeoutId = new WeakMap()
 const pongTimeoutId = new WeakMap()
 export const fsmId = new WeakMap()
-
-function channelURL (url, params) {
-  const paramString = R.join('&', R.values(R.mapObjIndexed((value, key) =>
-    `${pascalToSnake(key)}=${encodeURIComponent(value)}`, params)))
-
-  return `${url}?${paramString}`
-}
 
 export function emit (channel, ...args) {
   eventEmitters.get(channel).emit(...args)
@@ -199,50 +191,32 @@ export function disconnect (channel) {
   clearTimeout(pongTimeoutId.get(channel))
 }
 
-function WebSocket (url, callbacks) {
-  function fireOnce (target, key, fn) {
-    const once = R.once(fn)
-    const original = target[key]
-    target[key] = (...args) => {
-      once(...args)
-      if (typeof original === 'function') {
-        original(...args)
-      }
-    }
-  }
-
-  return new Promise((resolve, reject) => {
-    const ws = new W3CWebSocket(url)
-    Object.entries(callbacks).forEach(([key, callback]) => { ws[key] = callback })
-    fireOnce(ws, 'onopen', () => resolve(ws))
-    fireOnce(ws, 'onerror', (err) => reject(err))
-  })
-}
-
-export async function initialize (channel, channelOptions) {
-  const optionsKeys = ['sign', 'url']
-  const params = R.pickBy((_, key) => !optionsKeys.includes(key), channelOptions)
-  const { url } = channelOptions
-  const wsUrl = channelURL(url, { ...params, protocol: 'json-rpc' })
-
+export async function initialize (channel, { url, ...channelOptions }) {
   options.set(channel, channelOptions)
-  if (params.existingFsmId) {
-    fsm.set(channel, { handler: awaitingReconnection })
-  } else {
-    fsm.set(channel, { handler: awaitingConnection })
-  }
+  fsm.set(channel, {
+    handler: channelOptions.existingFsmId ? awaitingReconnection : awaitingConnection
+  })
   eventEmitters.set(channel, new EventEmitter())
   sequence.set(channel, 0)
   rpcCallbacks.set(channel, new Map())
+
+  const wsUrl = new URL(url)
+  Object.entries(channelOptions)
+    .filter(([key]) => !['sign', 'debug'].includes(key))
+    .forEach(([key, value]) => wsUrl.searchParams.set(pascalToSnake(key), value))
+  wsUrl.searchParams.set('protocol', 'json-rpc')
   changeStatus(channel, 'connecting')
-  const ws = await WebSocket(wsUrl, {
+  const ws = new W3CWebSocket(wsUrl.toString())
+  await new Promise((resolve, reject) => Object.assign(ws, {
+    onerror: reject,
     onopen: () => {
+      resolve()
       changeStatus(channel, 'connected')
-      if (params.reconnectTx) {
+      if (channelOptions.reconnectTx) {
         enterState(channel, { handler: channelOpen })
-        setTimeout(async () =>
-          changeState(channel, (await call(channel, 'channels.get.offchain_state', {})).signed_tx)
-        , 0)
+        setTimeout(async () => changeState(channel,
+          (await call(channel, 'channels.get.offchain_state', {})).signed_tx
+        ))
       }
       ping(channel)
     },
@@ -252,6 +226,6 @@ export async function initialize (channel, channelOptions) {
       clearTimeout(pongTimeoutId.get(channel))
     },
     onmessage: ({ data }) => onMessage(channel, data)
-  })
+  }))
   websockets.set(channel, ws)
 }
