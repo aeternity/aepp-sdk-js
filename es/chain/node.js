@@ -60,14 +60,8 @@ async function sendTransaction (tx, options = {}) {
       return txData
     }
     return { hash: txHash, rawTx: tx }
-  } catch (e) {
-    throw Object.assign(
-      (new Error(e.message)),
-      {
-        rawTx: tx,
-        verifyTx: () => this.unpackAndVerify(tx)
-      }
-    )
+  } catch (error) {
+    throw Object.assign(error, { rawTx: tx, verifyTx: () => this.unpackAndVerify(tx) })
   }
 }
 
