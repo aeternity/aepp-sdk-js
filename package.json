@@ -30,6 +30,7 @@
   ],
   "dependencies": {
     "@aeternity/bip39": "^0.1.0",
+    "@aeternity/json-bigint": "^0.3.1",
     "@stamp/it": "^1.0.3",
     "@stamp/required": "^1.0.1",
     "aes-js": "^3.1.1",
