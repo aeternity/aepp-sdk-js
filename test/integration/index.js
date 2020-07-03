@@ -28,8 +28,8 @@ chai.should()
 export const url = process.env.TEST_URL || 'http://localhost:3013'
 export const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
 export const compilerUrl = process.env.COMPILER_URL || 'http://localhost:3080'
-export const publicKey = process.env.PUBLIC_KEY || 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR';
-const secretKey = process.env.SECRET_KEY || 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b';
+export const publicKey = process.env.PUBLIC_KEY || 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR'
+const secretKey = process.env.SECRET_KEY || 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b'
 export const networkId = process.env.TEST_NETWORK_ID || 'ae_devnet'
 export const forceCompatibility = process.env.FORCE_COMPATIBILITY || false
 export const genesisAccount = MemoryAccount({ keypair: { publicKey, secretKey } })
@@ -38,7 +38,7 @@ export const account2 = Crypto.generateKeyPair()
 
 export const BaseAe = async (params = {}) => {
   const ae = await Universal.waitMined(true).compose({
-    deepProps: { Swagger: { defaults: { debug: !!process.env['DEBUG'] } } },
+    deepProps: { Swagger: { defaults: { debug: !!process.env.DEBUG } } },
     props: { process, compilerUrl }
   })({
     ...params,

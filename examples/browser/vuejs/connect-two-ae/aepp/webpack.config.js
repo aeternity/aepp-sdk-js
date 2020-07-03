@@ -6,7 +6,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const { VueLoaderPlugin } = require('vue-loader')
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 const PurgecssPlugin = require('purgecss-webpack-plugin')
-let glob = require('glob-all')
+const glob = require('glob-all')
 
 const distFolder = path.resolve(__dirname, 'dist')
 const jsLoader = 'babel-loader!standard-loader?error=true'
@@ -32,7 +32,7 @@ module.exports = {
     }
   },
   entry: {
-    'wallet': './src/index.js'
+    wallet: './src/index.js'
   },
   output: {
     filename: 'bundle.js?[hash]'

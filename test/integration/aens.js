@@ -40,7 +40,7 @@ describe('Aens', function () {
     const [majorVersion] = version.split('.')
     nameAuctionsSupported = +majorVersion === 5 && version !== '5.0.0-rc.1'
     name = randomName(13, '.chain') // 13 name length doesn't trigger auction
-    name2 = randomName(13,'.chain')
+    name2 = randomName(13, '.chain')
   })
 
   const lima = fn => async () => nameAuctionsSupported ? fn() : undefined

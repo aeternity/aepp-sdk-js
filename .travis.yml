@@ -28,6 +28,7 @@ jobs:
         - npm run report-coverage
     - name: Test Contract, Node, Oracle, Account and else
       script:
+        - npm run lint
         - npm run build
         - npm run test-else
         - npm run report-coverage
