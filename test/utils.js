@@ -8,6 +8,6 @@ function randomString (len, charSet) {
   return randomString
 }
 
-export function randomName (length, namespace = '.chain') {
-  return randomString(length) + namespace
+export function randomName (length) {
+  return randomString(length) + '.chain'
 }

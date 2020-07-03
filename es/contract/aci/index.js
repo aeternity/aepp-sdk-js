@@ -24,7 +24,7 @@
  */
 
 import * as R from 'ramda'
-import { BigNumber } from 'bignumber.js'
+import BigNumber from 'bignumber.js'
 
 import AsyncInit from '../../utils/async-init'
 import semverSatisfies from '../../utils/semver-satisfies'

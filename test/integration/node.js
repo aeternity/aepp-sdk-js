@@ -16,7 +16,7 @@
  */
 
 import Node from '../../es/node'
-import { configure, url, internalUrl } from './'
+import { url, internalUrl } from './'
 
 import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
@@ -24,8 +24,6 @@ import * as R from 'ramda'
 import { NodePool } from '../../es/node-pool'
 
 describe('Node client', function () {
-  configure(this)
-
   let client
 
   before(async function () {

@@ -3,7 +3,7 @@
  * @module @aeternity/aepp-sdk/es/utils/bignumber
  * @example import { parseBigNumber, asBigNumber, isBigNumber, ceil } from '@aeternity/aepp-sdk/es/utils/bignumber'
  */
-import { BigNumber } from 'bignumber.js'
+import BigNumber from 'bignumber.js'
 
 /**
  * Convert number to string

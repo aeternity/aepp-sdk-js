@@ -16,8 +16,7 @@
  */
 
 import { Aepp, Wallet, Node, RpcWallet, RpcAepp, MemoryAccount } from '../../es'
-import { compilerUrl, getFakeConnections, url, internalUrl, networkId, publicKey, genesisAccount } from './'
-
+import { compilerUrl, url, internalUrl, networkId, publicKey, genesisAccount } from './'
 import { describe, it, before } from 'mocha'
 import BrowserWindowMessageConnection from '../../es/utils/aepp-wallet-communication/connection/browser-window-message'
 import { generateKeyPair, verify } from '../../es/utils/crypto'
@@ -668,6 +667,33 @@ describe('Aepp<->Wallet', function () {
     })
   })
 })
+
+const WindowPostMessageFake = (name) => ({
+  name,
+  messages: [],
+  addEventListener (onEvent, listener) {
+    this.listener = listener
+  },
+  removeEventListener (onEvent, listener) {
+    return () => null
+  },
+  postMessage (msg) {
+    this.messages.push(msg)
+    setTimeout(() => { if (typeof this.listener === 'function') this.listener({ data: msg, origin: 'testOrigin', source: this }) }, 0)
+  }
+})
+
+const getFakeConnections = (direct = false) => {
+  const waelletConnection = WindowPostMessageFake('wallet')
+  const aeppConnection = WindowPostMessageFake('aepp')
+  if (direct) {
+    const waelletP = waelletConnection.postMessage
+    const aeppP = aeppConnection.postMessage
+    waelletConnection.postMessage = aeppP.bind(aeppConnection)
+    aeppConnection.postMessage = waelletP.bind(waelletConnection)
+  }
+  return { waelletConnection, aeppConnection }
+}
 
 const getConnections = (direct) => {
   global.chrome = { runtime: {} }

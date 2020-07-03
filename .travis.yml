@@ -20,15 +20,17 @@ jobs:
     - stage: Tests
       name: Test AENS
       script:
-        - npm run test-aens
+        - npm run test:integration:aens
         - npm run report-coverage
     - name: Test Channel
       script:
-        - npm run test-channel
+        - npm run test:integration:channel
         - npm run report-coverage
     - name: Test Contract, Node, Oracle, Account and else
       script:
         - npm run lint
         - npm run build
-        - npm run test-else
+        - npm run test:unit
+        - npm run report-coverage
+        - npm run test:integration:else
         - npm run report-coverage
