@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
