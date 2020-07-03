@@ -603,7 +603,6 @@ export async function awaitingCallContractForceProgressUpdate (channel, message,
 }
 
 export function awaitingForceProgressCompletion (channel, message, state) {
-  console.log('From force progress await completion ->', message)
   if (message.method === 'channels.on_chain_tx') {
     if (state.onOnChainTx) {
       state.onOnChainTx(message.params.data)

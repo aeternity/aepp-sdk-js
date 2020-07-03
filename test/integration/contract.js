@@ -213,7 +213,6 @@ describe('Contract', function () {
       // @TODO enable after next HF
       // const commitmentId = commitmentHash(name, _salt)
       const preclaimSig = await contract.delegateNamePreclaimSignature(contractAddress)
-      console.log(`preclaimSig -> ${preclaimSig}`)
       // const preclaim = await cInstance.methods.signedPreclaim(await contract.address(), commitmentId, preclaimSig)
       // preclaim.result.returnType.should.be.equal('ok')
       await contract.awaitHeight((await contract.height()) + 2)
@@ -259,7 +258,6 @@ describe('Contract', function () {
       const queryExtend = await cInstanceOracle.methods.signedExtendOracle(oracleId, oracleExtendSig, ttl, { onAccount })
       queryExtend.result.returnType.should.be.equal('ok')
       const oracleExtended = await contract.getOracleObject(oracleId)
-      console.log(oracleExtended)
       oracleExtended.ttl.should.be.equal(oracle.ttl + 50)
 
       // TODO ask core about this
@@ -284,8 +282,6 @@ describe('Contract', function () {
     })
   })
   it('precompiled bytecode can be deployed', async () => {
-    const { version, consensusProtocolVersion } = contract.getNodeInfo()
-    console.log(`Node => ${version}, consensus => ${consensusProtocolVersion}, compiler => ${contract.compilerVersion}`)
     const code = await contract.contractCompile(identityContract)
     return contract.contractDeploy(code.bytecode, identityContract).should.eventually.have.property('address')
   })
@@ -416,10 +412,6 @@ describe('Contract', function () {
       .then(bytecode => bytecode.deploy([data]))
       .then(deployed => deployed.call('retrieve'))
       .then(result => result.decode())
-      .catch(e => {
-        console.log(e)
-        throw e
-      })
       .should.eventually.become('Hello World!')
   })
   describe('Namespaces', () => {
@@ -492,8 +484,9 @@ describe('Contract', function () {
       assembler.should.be.a('string')
     })
     it('Get compiler version from bytecode', async () => {
-      const version = await contract.getBytecodeCompilerVersion(bytecode)
-      console.log(version)
+      const { version } = await contract.getBytecodeCompilerVersion(bytecode)
+      version.should.be.a('string')
+      version.split('.').length.should.be.equal(3)
     })
     it('get contract ACI', async () => {
       const aci = await contract.contractGetACI(identityContract)

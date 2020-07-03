@@ -932,10 +932,8 @@ describe('Channel', function () {
       contract: contractAddress,
       abiVersion: 1
     }, async (tx) => initiator.signTransaction(tx))
-    console.log('after done')
     const hash = buildTxHash(forceTx.tx)
-    const txInfo = await initiator.tx(hash)
-    console.log(txInfo)
+    await initiator.tx(hash)
   })
 
   it('can call a contract and reject', async () => {

@@ -42,7 +42,6 @@ describe('Bytes', function () {
   })
   it('Is base64 string', () => {
     const bs64str = Buffer.from(snakeOrKebabToPascal('hello')).toString('base64')
-    console.log(bs64str)
     isBase64(bs64str).should.be.equal(true)
   })
 })
