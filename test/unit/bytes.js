@@ -18,21 +18,18 @@
 import '../'
 import { describe, it } from 'mocha'
 import { leftPad, rightPad, toBytes } from '../../es/utils/bytes'
-import { isBase64, snakeOrKebabToPascal } from '../../es/utils/string'
+import { isBase64, snakeOrKebabToPascal, snakeToPascal, pascalToSnake } from '../../es/utils/string'
 
 describe('Bytes', function () {
-  it('left/right pad', async () => {
-    const bytes = Buffer.from('hello')
-    const padRightMoreThenLength = rightPad(7, bytes)
-    const padRightLessThenLength = rightPad(4, bytes)
-    const padLeftMoreThenLength = leftPad(7, bytes)
-    const padLeftLessThenLength = leftPad(4, bytes)
+  const bytes = Buffer.from('hello')
 
-    padRightMoreThenLength.equals(Buffer.from([...bytes, 0, 0])).should.be.equal(true)
-    padRightLessThenLength.equals(bytes).should.be.equal(true)
-    padLeftMoreThenLength.equals(Buffer.from([0, 0, ...bytes])).should.be.equal(true)
-    padLeftLessThenLength.equals(bytes).should.be.equal(true)
+  it('left/right pad', () => {
+    rightPad(7, bytes).should.be.eql(Buffer.from([...bytes, 0, 0]))
+    rightPad(4, bytes).should.be.eql(bytes)
+    leftPad(7, bytes).should.be.eql(Buffer.from([0, 0, ...bytes]))
+    leftPad(4, bytes).should.be.eql(bytes)
   })
+
   it('toBytes: invalid input', () => {
     try {
       toBytes(true)
@@ -40,9 +37,19 @@ describe('Bytes', function () {
       e.message.should.be.equal('Byte serialization not supported')
     }
   })
-  it('Is base64 string', () => {
-    const bs64str = Buffer.from(snakeOrKebabToPascal('hello')).toString('base64')
-    console.log(bs64str)
-    isBase64(bs64str).should.be.equal(true)
-  })
+
+  it('is base64 string', () => isBase64(bytes.toString('base64')).should.be.equal(true))
+
+  it('is not base64 string', () => isBase64('hello').should.be.equal(false))
+
+  const testCase = 'test_test-testTest'
+
+  it('converts snake or kebab to pascal case', () => snakeOrKebabToPascal(testCase)
+    .should.be.equal('testTestTestTest'))
+
+  it('converts snake to pascal case', () => snakeToPascal(testCase)
+    .should.be.equal('testTest-testTest'))
+
+  it('converts pascal to snake case', () => pascalToSnake(testCase)
+    .should.be.equal('test_test-test_test'))
 })
