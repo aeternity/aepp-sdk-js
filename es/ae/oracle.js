@@ -69,16 +69,16 @@ async function getOracleObject (oracleId) {
  * @return {Function} stopPolling - Stop polling function
  */
 function pollForQueries (oracleId, onQuery, { interval = 5000 } = {}) {
-  const sentQueryIds = new Set()
-  const fetchQueries = async () => {
+  const knownQueryIds = new Set()
+  const checkNewQueries = async () => {
     const queries = ((await this.getOracleQueries(oracleId)).oracleQueries || [])
-      .filter(({ id }) => !sentQueryIds.has(id))
-    queries.forEach(({ id }) => sentQueryIds.add(id))
+      .filter(({ id }) => !knownQueryIds.has(id))
+    queries.forEach(({ id }) => knownQueryIds.add(id))
     if (queries.length) onQuery(queries)
   }
 
-  fetchQueries()
-  const intervalId = setInterval(fetchQueries, interval)
+  checkNewQueries()
+  const intervalId = setInterval(checkNewQueries, interval)
   return () => clearInterval(intervalId)
 }
 
