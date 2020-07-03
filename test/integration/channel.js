@@ -349,7 +349,7 @@ describe('Channel', function () {
     )
     sign.firstCall.args[1].updates.should.eql([
       sign.firstCall.args[1].updates[0],
-      { data: meta, op: 'OffChainMeta'}
+      { data: meta, op: 'OffChainMeta' }
     ])
     responderSign.firstCall.args[2].updates.should.eql([
       responderSign.firstCall.args[2].updates[0],
