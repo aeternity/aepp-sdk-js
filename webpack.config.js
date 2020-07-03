@@ -15,7 +15,7 @@ function configure (filename, opts = {}) {
         {
           test: /\.js$/,
           include: path.resolve(__dirname, 'es'),
-          loader: 'babel-loader!standard-loader?error=true'
+          loader: 'babel-loader'
         },
         {
           test: /\.js$/,

@@ -11,6 +11,7 @@
     "build:dev": "webpack --mode=development",
     "docs:docco": "docco -t tooling/docs/markdown.jst -c /dev/null examples/node/*.js && rm -f docs/null && node rename-to-md.js",
     "docs:api": "node apidoc.js",
+    "lint": "standard",
     "test": "nyc --require @babel/register mocha --recursive --exit",
     "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "test-channel": "nyc --require @babel/register mocha ./test/integration/channel.js --exit",
@@ -86,7 +87,6 @@
     "sinon": "^9.0.0",
     "source-map": "^0.7.3",
     "standard": "^14.0.1",
-    "standard-loader": "^7.0.0",
     "webpack": "^4.36.1",
     "webpack-bundle-analyzer": "^3.6.1",
     "webpack-cli": "3.3.8"
