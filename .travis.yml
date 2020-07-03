@@ -13,6 +13,8 @@ before_install:
     fi
   - docker-compose up -d
 
+install: npm ci --ignore-scripts
+
 jobs:
   include:
     - stage: Tests
@@ -26,5 +28,6 @@ jobs:
         - npm run report-coverage
     - name: Test Contract, Node, Oracle, Account and else
       script:
+        - npm run build
         - npm run test-else
         - npm run report-coverage

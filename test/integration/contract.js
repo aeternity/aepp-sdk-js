@@ -20,7 +20,7 @@ import { BaseAe, configure, plan, ready, compilerUrl, publicKey } from './'
 import { decode } from '../../es/tx/builder/helpers'
 
 import * as R from 'ramda'
-import { randomName } from './aens'
+import { randomName } from '../utils'
 import { decodeEvents, readType, SOPHIA_TYPES } from '../../es/contract/aci/transformation'
 import { hash, personalMessageToBinary } from '../../es/utils/crypto'
 import { getFunctionACI } from '../../es/contract/aci/helpers'

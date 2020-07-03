@@ -17,23 +17,10 @@
 
 import { describe, it, before } from 'mocha'
 import { configure, plan, ready } from './'
+import { randomName } from '../utils'
 import * as R from 'ramda'
 import { generateKeyPair } from '../../es/utils/crypto'
 import { buildContractId, classify, computeAuctionEndBlock, computeBidFee } from '../../es/tx/builder/helpers'
-
-export function randomName (length, namespace = '.chain') {
-  return randomString(length) + namespace
-}
-
-function randomString (len, charSet) {
-  charSet = charSet || 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  let randomString = ''
-  for (let i = 0; i < len; i++) {
-    const randomPoz = Math.floor(Math.random() * charSet.length)
-    randomString += charSet.substring(randomPoz, randomPoz + 1)
-  }
-  return randomString
-}
 
 plan('99000000000000000000000000')
 
