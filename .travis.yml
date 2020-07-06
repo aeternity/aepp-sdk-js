@@ -11,26 +11,30 @@ before_install:
       export COMPILER_TAG=latest;
       export FORCE_COMPATIBILITY=true;
     fi
-  - docker-compose up -d
+  - if [[ $TRAVIS_BUILD_STAGE_NAME == "Integration tests" ]]; then
+      docker-compose up -d;
+    fi
 
 install: npm ci --ignore-scripts
 
 jobs:
   include:
     - stage: Tests
-      name: Test AENS
-      script:
-        - npm run test:integration:aens
-        - npm run report-coverage
-    - name: Test Channel
-      script:
-        - npm run test:integration:channel
-        - npm run report-coverage
-    - name: Test Contract, Node, Oracle, Account and else
       script:
         - npm run lint
         - npm run build
         - npm run test:unit
         - npm run report-coverage
+    - stage: Integration tests
+      name: AENS
+      script:
+        - npm run test:integration:aens
+        - npm run report-coverage
+    - name: Channel
+      script:
+        - npm run test:integration:channel
+        - npm run report-coverage
+    - name: Contract, Node, Oracle, Account and else
+      script:
         - npm run test:integration:else
         - npm run report-coverage
