@@ -55,10 +55,11 @@ export function buildContractId (ownerId, nonce) {
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param {String} prefix Transaction hash prefix
  * @param {Buffer} data Rlp encoded transaction buffer
- * @param {{ raw: boolean = false }} options Options
+ * @param {Object} options
+ * @param {Boolean} options.raw
  * @return {String} Transaction hash
  */
-export function buildHash (prefix, data, options = { raw: false }) {
+export function buildHash (prefix, data, options = {}) {
   return options.raw ? hash(data) : encode(hash(data), prefix)
 }
 
