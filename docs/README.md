@@ -1,5 +1,8 @@
 # Guides
 
+## ⚠️ Disclaimer
+We're doing our best to keep the documentation up to date, but [please let us know if you see some out-of-date file](https://github.com/aeternity/aepp-sdk-js/issues/new). Thanks!
+
 ## Intro
 There are three different ways of incorporating aepp-sdk-js into your project, depending on the particular scenario:
 * ES Modules at `es/` (recommended)
