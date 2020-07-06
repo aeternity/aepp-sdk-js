@@ -26,15 +26,15 @@ jobs:
         - npm run test:unit
         - npm run report-coverage
     - stage: Integration tests
-      name: AENS
+      name: Channel, accounts
       script:
-        - npm run test:integration:aens
+        - npm run test:integration:channel,accounts
         - npm run report-coverage
-    - name: Channel
+    - name: Contract, chain
       script:
-        - npm run test:integration:channel
+        - npm run test:integration:contract,chain
         - npm run report-coverage
-    - name: Contract, Node, Oracle, Account and else
+    - name: Else
       script:
         - npm run test:integration:else
         - npm run report-coverage
