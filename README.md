@@ -1,4 +1,4 @@
-# [Æternity](https://aeternity.com/)'s Javascript SDK
+# [Æternity](https://aeternity.com/)'s JavaScript SDK
 
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/aeternity/aepp-sdk-js.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/aeternity/aepp-sdk-js/context:javascript)
 [![codecov](https://codecov.io/gh/aeternity/aepp-sdk-js/branch/develop/graph/badge.svg)](https://codecov.io/gh/aeternity/aepp-sdk-js)
@@ -17,7 +17,7 @@ JavaScript SDK for the revolutionary [æternity] blockchain, targeting the
 [develop branch]: https://github.com/aeternity/aepp-sdk-js/tree/develop
 
 ## Table of content
-- [Æternity's Javascript SDK](#%C3%86ternitys-Javascript-SDK)
+- [Æternity's JavaScript SDK](#%C3%86ternitys-Javascript-SDK)
   - [Table of content](#Table-of-content)
   - [Quick Start](#Quick-Start)
     - [1. Install SDK](#1-Install-SDK)
