@@ -62,6 +62,7 @@ async function getOracleObject (oracleId) {
  * @alias module:@aeternity/aepp-sdk/es/ae/oracle
  * @instance
  * @function
+ * @category async
  * @param {String} oracleId Oracle public key
  * @param {Function} onQuery OnQuery callback
  * @param {Object} [options] Options object
@@ -79,7 +80,8 @@ function pollForQueries (oracleId, onQuery, { interval = 5000 } = {}) {
 
   checkNewQueries()
   const intervalId = setInterval(checkNewQueries, interval)
-  return () => clearInterval(intervalId)
+  // TODO: Return just a callback in the next major release
+  return Promise.resolve(() => clearInterval(intervalId))
 }
 
 /**
