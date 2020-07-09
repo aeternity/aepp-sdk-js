@@ -55,6 +55,11 @@
         class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 text-xs"
         @click="switchNode"
       >Switch Node</button>
+      <button
+        v-if="client"
+        class="w-32 rounded rounded-full bg-purple text-white py-2 px-4 pin-r mr-8 mt-4 text-xs"
+        @click="disconnect"
+      >Disconnect</button>
     </div>
 
     <div v-if="!aeppUrl" class="w-full p-4 h-64 border border-black border-dashed shadow mx-auto mt-4 bg-grey-lighter">
@@ -73,6 +78,7 @@
   import BrowserWindowMessageConnection
     from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message'
   import { generateKeyPair } from '@aeternity/aepp-sdk/es/utils/crypto'
+  import { METHODS } from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/schema'
 
   const errorAsField = async fn => {
     try {
@@ -123,6 +129,10 @@
       disconnect () {
         const { clients: aepps } = this.client.getClients()
         const aepp = Array.from(aepps.values())[0]
+        aepp.sendMessage({
+          method: METHODS.closeConnection,
+          params: { reason: 'bye' },
+        }, true)
         aepp.disconnect()
       },
       async switchAccount () {

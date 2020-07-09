@@ -282,11 +282,14 @@
           )
         })())
       },
-      async disconnect() {
+      resetState() {
         this.walletName = null
         this.pub = null
         this.balance = null
         this.addressResponse = null
+      },
+      async disconnect() {
+        this.resetState()
         await this.client.disconnectWallet()
         setTimeout(() => this.scanForWallets(), 1000)
       },
@@ -346,7 +349,9 @@
           this.balance = await this.client.balance(this.pub).catch(e => '0')
           this.addressResponse = await errorAsField(this.client.address())
         },
-        onDisconnect (a) {
+        onDisconnect: () => {
+          this.resetState()
+          alert('Disconnected')
         }
       })
       this.height = await this.client.height()
