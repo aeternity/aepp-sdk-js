@@ -189,6 +189,52 @@ describe('Contract', function () {
   before(async function () {
     contract = await getSdk()
   })
+
+  const contractSource = `
+include "List.aes"
+
+contract DPLL =
+  entrypoint ins(cl: list(int)): list(int) =
+    6 :: cl
+
+  entrypoint test_bits (a:bits) = Bits.set(a, 40)
+  entrypoint test_bits_2 (a:bits) = Bits.clear(Bits.set(a, 42), 2)
+  entrypoint test_bits_all () = Bits.all
+  entrypoint test_bits_none () = Bits.none
+  entrypoint test_bits_1 () = Bits.set(Bits.set(Bits.none, 2), 4)
+`
+
+  it('reproduction', async () => {
+    const c = await contract.getContractInstance(contractSource)
+    await c.deploy()
+    // console.log(c)
+    // console.log(await c.methods.test_bits_all.get())
+    // console.log(await c.methods.test_bits_none.get())
+    // console.log(await c.methods.test_bits_1.get())
+    const t = await c.methods.test_bits_2.get('Bits.set(Bits.none, 2)')
+    console.log(t)
+    console.log(JSON.stringify(t.decodedResult))
+    // console.log(await c.methods.test_bits.get({ 'Bits.set': ['Bits.none', 2] }))
+  })
+
+  // it('reproduction', async () => {
+  //   bytecode = await contract.contractCompile(contractSource)
+  //   console.log('bytecode', bytecode)
+  //   deployed = await bytecode.deploy()
+  //   console.log('deployed', deployed)
+  //   console.log(await deployed.call('test'))
+  //   console.log(await deployed.call('ins', [1, 2]))
+  // })
+})
+
+describe.skip('Contract', function () {
+  let contract
+  let bytecode
+  let deployed
+
+  before(async function () {
+    contract = await getSdk()
+  })
   describe('Aens and Oracle operation delegation', () => {
     let cInstance
     let cInstanceOracle
