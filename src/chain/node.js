@@ -208,14 +208,19 @@ async function getName (name) {
  * Resolve AENS name and return name hash
  * @param {String} nameOrId
  * @param {String} prefix
- * @param {Boolean} verify
- * @param {Boolean} resolveByNode
+ * @param {Object} [options]
+ * @param {Boolean} [options.verify] Enables resolving by node, needed for compatibility with `verify` option of other methods
+ * @param {Boolean} [options.resolveByNode] Enables pointer resolving using node (isn't more durable to resolve it on the node side?)
  * @return {String} Address or AENS name hash
  */
-async function resolveName (nameOrId, prefix, { verify = false, resolveByNode = false } = {}) {
+async function resolveName (nameOrId, prefix, { verify, resolveByNode } = {}) {
+  if (!nameOrId || typeof nameOrId !== 'string') {
+    throw new Error('Invalid name or address. Should be a string')
+  }
   const prefixes = Object.keys(NAME_ID_KEY)
-  if (!nameOrId || typeof nameOrId !== 'string') throw new Error('Invalid name or address. Should be a string')
-  if (!prefixes.includes(prefix)) throw new Error(`Invalid prefix ${prefix}. Should be one of [${prefixes}]`)
+  if (!prefixes.includes(prefix)) {
+    throw new Error(`Invalid prefix ${prefix}. Should be one of [${prefixes}]`)
+  }
   if (assertedType(nameOrId, prefix, true)) return nameOrId
 
   if (isNameValid(nameOrId)) {
