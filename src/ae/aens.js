@@ -30,7 +30,7 @@ import * as R from 'ramda'
 import { salt } from '../utils/crypto'
 import {
   commitmentHash,
-  isNameValid,
+  ensureNameValid,
   getMinimumNameFee,
   classify,
   isAuctionName,
@@ -62,7 +62,7 @@ import { CLIENT_TTL, NAME_FEE, NAME_TTL } from '../tx/builder/schema'
  * await nameObject.revoke({ fee, ttl, nonce })
  */
 async function revoke (name, options = {}) {
-  isNameValid(name)
+  ensureNameValid(name)
   const opt = R.merge(this.Ae.defaults, options)
 
   const nameRevokeTx = await this.nameRevokeTx(R.merge(opt, {
@@ -102,7 +102,7 @@ async function revoke (name, options = {}) {
  * await nameObject.update(pointersArray, { nameTtl, ttl, fee, nonce, clientTtl })
  */
 async function update (name, pointers = [], options = { extendPointers: false }) {
-  isNameValid(name)
+  ensureNameValid(name)
   const opt = R.merge(this.Ae.defaults, options)
   if (!validatePointers(pointers)) throw new Error('Invalid pointers array')
 
@@ -144,7 +144,7 @@ async function update (name, pointers = [], options = { extendPointers: false })
  * await nameObject.transfer(recipientPub, { ttl, fee, nonce })
  */
 async function transfer (name, account, options = {}) {
-  isNameValid(name)
+  ensureNameValid(name)
   const opt = R.merge(this.Ae.defaults, options)
 
   const nameTransferTx = await this.nameTransferTx(R.merge(opt, {
@@ -179,7 +179,7 @@ async function transfer (name, account, options = {}) {
  * }
  */
 async function query (name, opt = {}) {
-  isNameValid(name)
+  ensureNameValid(name)
   const o = await this.getName(name)
 
   return Object.freeze(Object.assign(o, {
@@ -233,7 +233,7 @@ async function query (name, opt = {}) {
  * await sdkInstance.aensClaim(name, salt, { ttl, fee, nonce, nameFee })
  */
 async function claim (name, salt, options = { vsn: 2 }) {
-  isNameValid(name)
+  ensureNameValid(name)
   const opt = R.merge(this.Ae.defaults, options)
 
   const minNameFee = getMinimumNameFee(name)
@@ -283,7 +283,7 @@ async function claim (name, salt, options = { vsn: 2 }) {
  * }
  */
 async function preclaim (name, options = {}) {
-  isNameValid(name)
+  ensureNameValid(name)
   const opt = R.merge(this.Ae.defaults, options)
   const _salt = salt()
   const height = await this.height()
