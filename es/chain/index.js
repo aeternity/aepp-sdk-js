@@ -83,7 +83,7 @@ const Chain = Oracle.compose({
  * @param {String} tx - Transaction to submit
  * @param {String} [options={}] - Options to pass to the implementation
  * @param {String} [options.verify = false] - Verify transaction before broadcast.
- * @return {Object|String} Transaction or transaction hash
+ * @return {Object} Transaction
  */
 
 /**
