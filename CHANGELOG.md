@@ -1,3 +1,12 @@
+# [7.6.0](https://github.com/aeternity/aepp-sdk-js/compare/7.5.0...7.6.0) (2020-07-22)
+
+
+### Features
+
+* **wallet-detector:** allow to connect wallet to aepp between iframes ([3f74a05](https://github.com/aeternity/aepp-sdk-js/commit/3f74a05350aac261d9637cf61b5dd519b29b6723))
+
+
+
 # [7.5.0](https://github.com/aeternity/aepp-sdk-js/compare/7.4.2...7.5.0) (2020-06-18)
 
 
