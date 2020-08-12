@@ -28,7 +28,10 @@
 
 import Ae from './'
 import * as R from 'ramda'
-import { decodeBase64Check } from '../utils/crypto'
+import { decodeBase64Check, assertedType } from '../utils/crypto'
+import { pause } from '../utils/other'
+import { oracleQueryId } from '../tx/builder/helpers'
+import { unpackTx } from '../tx/builder'
 import { ORACLE_TTL, QUERY_FEE, QUERY_TTL, RESPONSE_TTL } from '../tx/builder/schema'
 
 /**
@@ -46,13 +49,11 @@ async function getOracleObject (oracleId) {
   return {
     ...oracle,
     queries,
-    pollQueries: (onQuery, { interval } = {}) => this.pollForQueries(oracleId, onQuery, { interval }),
-    postQuery: (query, options) => this.postQueryToOracle(oracleId, query, options),
-    respondToQuery: (queryId, response, options) => this.respondToQuery(oracleId, queryId, response, options),
-    extendOracle: (oracleTtl, options) => this.extendOracleTtl(oracleId, oracleTtl, options),
-    getQuery: async (queryId) => {
-      return getQueryObject.bind(this)(oracleId, queryId)
-    }
+    pollQueries: this.pollForQueries.bind(this, oracleId),
+    postQuery: this.postQueryToOracle.bind(this, oracleId),
+    respondToQuery: this.respondToQuery.bind(this, oracleId),
+    extendOracle: this.extendOracleTtl.bind(this, oracleId),
+    getQuery: this.getQueryObject.bind(this, oracleId)
   }
 }
 
@@ -68,21 +69,19 @@ async function getOracleObject (oracleId) {
  * @param {Number} [options.interval] Poll interval(default: 5000)
  * @return {Function} stopPolling - Stop polling function
  */
-async function pollForQueries (oracleId, onQuery, { interval = 5000 } = {}) {
-  const queries = (await this.getOracleQueries(oracleId)).oracleQueries || []
-  let quriesIds = queries.map(q => q.id)
-  await onQuery(queries)
-
-  async function pollQueries () {
-    const { oracleQueries: q } = await this.getOracleQueries(oracleId)
-    const newQueries = q.filter(({ id }) => !quriesIds.includes(id))
-    if (newQueries.length) {
-      quriesIds = [...quriesIds, ...newQueries.map(a => a.id)]
-      onQuery(newQueries)
-    }
+function pollForQueries (oracleId, onQuery, { interval = 5000 } = {}) {
+  const knownQueryIds = new Set()
+  const checkNewQueries = async () => {
+    const queries = ((await this.getOracleQueries(oracleId)).oracleQueries || [])
+      .filter(({ id }) => !knownQueryIds.has(id))
+    queries.forEach(({ id }) => knownQueryIds.add(id))
+    if (queries.length) onQuery(queries)
   }
-  const intervalId = setInterval(pollQueries.bind(this), interval)
-  return () => clearInterval(intervalId)
+
+  checkNewQueries()
+  const intervalId = setInterval(checkNewQueries, interval)
+  // TODO: Return just a callback in the next major release
+  return Promise.resolve(() => clearInterval(intervalId))
 }
 
 /**
@@ -101,8 +100,8 @@ async function getQueryObject (oracleId, queryId) {
     ...q,
     decodedQuery: decodeBase64Check(q.query.slice(3)).toString(),
     decodedResponse: decodeBase64Check(q.response.slice(3)).toString(),
-    respond: (response, options) => this.respondToQuery(oracleId, queryId, response, options),
-    pollForResponse: ({ attempts, interval }) => this.pollForQueryResponse(oracleId, queryId, { attempts, interval }),
+    respond: this.respondToQuery.bind(this, oracleId, queryId),
+    pollForResponse: this.pollForQueryResponse.bind(this, oracleId, queryId),
     decode: (data) => decodeBase64Check(data.slice(3))
   }
 }
@@ -121,22 +120,15 @@ async function getQueryObject (oracleId, queryId) {
  * @return {Promise<Object>} OracleQuery object
  */
 export async function pollForQueryResponse (oracleId, queryId, { attempts = 20, interval = 5000 } = {}) {
-  const emptyResponse = 'or_Xfbg4g=='
-  async function pause (duration) {
-    await new Promise(resolve => setTimeout(resolve, duration))
-  }
-  async function probe (left) {
-    const query = await this.getOracleQuery(oracleId, queryId)
-    if (query.response !== emptyResponse) {
-      return { response: query.response, decode: () => decodeBase64Check(query.response.slice(3)) }
+  for (let i = 0; i < attempts; i++) {
+    if (i) await pause(interval)
+    const { response } = await this.getOracleQuery(oracleId, queryId)
+    const responseBuffer = decodeBase64Check(assertedType(response, 'or'))
+    if (responseBuffer.length) {
+      return { response, decode: () => responseBuffer } // TODO: Return just responseBuffer
     }
-    if (left > 0) {
-      await pause(interval)
-      return probe.bind(this)(left - 1)
-    }
-    throw Error(`Giving up after ${attempts * interval}ms`)
   }
-  return probe.bind(this)(attempts)
+  throw Error(`Giving up after ${(attempts - 1) * interval}ms`)
 }
 
 /**
@@ -165,8 +157,8 @@ async function registerOracle (queryFormat, responseFormat, options = {}) {
     responseFormat
   }))
   return {
-    ...(await this.send(oracleRegisterTx, opt)),
-    ...(await this.getOracleObject(`ok_${accountId.slice(3)}`))
+    ...await this.send(oracleRegisterTx, opt),
+    ...await this.getOracleObject(`ok_${accountId.slice(3)}`)
   }
 }
 
@@ -190,14 +182,15 @@ async function postQueryToOracle (oracleId, query, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   const senderId = await this.address(opt)
 
-  const { tx: oracleRegisterTx, queryId } = await this.oraclePostQueryTx(R.merge(opt, {
+  const oracleRegisterTx = await this.oraclePostQueryTx(R.merge(opt, {
     oracleId,
     senderId,
     query
   }))
+  const queryId = oracleQueryId(senderId, unpackTx(oracleRegisterTx).tx.nonce, oracleId)
   return {
-    ...(await this.send(oracleRegisterTx, opt)),
-    ...(await (await this.getOracleObject(oracleId)).getQuery(queryId))
+    ...await this.send(oracleRegisterTx, opt),
+    ...await this.getQueryObject(oracleId, queryId)
   }
 }
 
@@ -224,8 +217,8 @@ async function extendOracleTtl (oracleId, oracleTtl, options = {}) {
     oracleTtl
   }))
   return {
-    ...(await this.send(oracleExtendTx, opt)),
-    ...(await this.getOracleObject(oracleId))
+    ...await this.send(oracleExtendTx, opt),
+    ...await this.getOracleObject(oracleId)
   }
 }
 
@@ -255,8 +248,8 @@ async function respondToQuery (oracleId, queryId, response, options = {}) {
     response
   }))
   return {
-    ...(await this.send(oracleRespondTx, opt)),
-    ...(await this.getOracleObject(oracleId))
+    ...await this.send(oracleRespondTx, opt),
+    ...await this.getOracleObject(oracleId)
   }
 }
 

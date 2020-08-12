@@ -433,7 +433,7 @@ export function decryptPubKey (password, encrypted) {
 }
 
 /**
- * Assert base58 encoded type and return its payload
+ * Assert encoded type and return its payload
  * @rtype (data: String, type: String) => String, throws: Error
  * @param {String} data - ae data
  * @param {String} type - Prefix
