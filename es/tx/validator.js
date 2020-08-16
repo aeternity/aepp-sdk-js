@@ -45,11 +45,11 @@ const VALIDATORS = {
   },
   // Insufficient Balance for Amount plus Fee
   insufficientBalanceForAmountFee ({ balance, amount = 0, fee }) {
-    return BigNumber(balance).gt(BigNumber(amount).plus(fee))
+    return BigNumber(balance).gte(BigNumber(amount).plus(fee))
   },
   // Insufficient Balance for Amount
   insufficientBalanceForAmount ({ balance, amount = 0 }) {
-    return BigNumber(balance).gt(BigNumber(amount))
+    return BigNumber(balance).gte(BigNumber(amount))
   },
   // IF NONCE USED
   nonceUsed ({ accountNonce, nonce }) {
@@ -78,7 +78,7 @@ const VALIDATORS = {
       []).includes(false)
   },
   insufficientBalanceForFeeNameFee ({ nameFee, fee, balance, VSN }) {
-    return VSN === 1 || BigNumber(balance).gt(BigNumber(nameFee).plus(fee))
+    return VSN === 1 || BigNumber(balance).gte(BigNumber(nameFee).plus(fee))
   }
 }
 
