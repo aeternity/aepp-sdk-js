@@ -17,7 +17,9 @@
 
 import '../'
 import { describe, it } from 'mocha'
-import { leftPad, rightPad, toBytes } from '../../es/utils/bytes'
+import { expect } from 'chai'
+import BigNumber from 'bignumber.js'
+import { leftPad, rightPad, toBytes, bigNumberToByteArray } from '../../es/utils/bytes'
 import { isBase64, snakeOrKebabToPascal, snakeToPascal, pascalToSnake } from '../../es/utils/string'
 
 describe('Bytes', function () {
@@ -52,4 +54,13 @@ describe('Bytes', function () {
 
   it('converts pascal to snake case', () => pascalToSnake(testCase)
     .should.be.equal('test_test-test_test'))
+
+  describe('bigNumberToByteArray', () => {
+    it('converts BigNumber to Buffer', () => bigNumberToByteArray(new BigNumber('1000'))
+      .readInt16BE().should.be.equal(1000))
+
+    it('throws error if BigNumber is not integer', () =>
+      expect(() => bigNumberToByteArray(new BigNumber('1.5')))
+        .to.throw(/Unexpected not integer value:/))
+  })
 })
