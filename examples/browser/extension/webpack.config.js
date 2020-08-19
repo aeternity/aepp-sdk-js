@@ -8,15 +8,9 @@ var HtmlWebpackPlugin = require('html-webpack-plugin')
 var WriteFilePlugin = require('write-file-webpack-plugin')
 
 // load the secrets
-var alias = {}
-
-var secretsPath = path.join(__dirname, ('secrets.' + env.NODE_ENV + '.js'))
+var secrets = path.join(__dirname, ('secrets.' + env.NODE_ENV + '.js'))
 
 var fileExtensions = ['jpg', 'jpeg', 'png', 'gif', 'eot', 'otf', 'svg', 'ttf', 'woff', 'woff2']
-
-if (fileSystem.existsSync(secretsPath)) {
-  alias.secrets = secretsPath
-}
 
 var options = {
   mode: process.env.NODE_ENV || 'development',
@@ -50,7 +44,10 @@ var options = {
     ]
   },
   resolve: {
-    alias: alias
+    alias: {
+      AE_SDK_MODULES: '../../../../../es/',
+      ...fileSystem.existsSync(secrets) && { secrets }
+    }
   },
   plugins: [
     // clean the build folder

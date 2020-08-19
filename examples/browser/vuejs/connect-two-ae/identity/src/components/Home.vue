@@ -73,12 +73,10 @@
 </template>
 
 <script>
-  // AE_SDK_MODULES is a webpack alias present in webpack.config.js
-  import { MemoryAccount, RpcWallet, Node } from '@aeternity/aepp-sdk/es'
+  import { MemoryAccount, RpcWallet, Node, Crypto } from 'AE_SDK_MODULES'
   import BrowserWindowMessageConnection
-    from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message'
-  import { generateKeyPair } from '@aeternity/aepp-sdk/es/utils/crypto'
-  import { METHODS } from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/schema'
+    from 'AE_SDK_MODULES/utils/aepp-wallet-communication/connection/browser-window-message'
+  import { METHODS } from 'AE_SDK_MODULES/utils/aepp-wallet-communication/schema'
 
   const errorAsField = async fn => {
     try {
@@ -148,7 +146,7 @@
       }
     },
     async created () {
-      const account2 = MemoryAccount({ keypair: generateKeyPair() })
+      const account2 = MemoryAccount({ keypair: Crypto.generateKeyPair() })
       const testNetNode = await Node({ url: this.url })
       const mainNetNode = await Node({ url: this.mainNetUrl })
 
@@ -156,8 +154,8 @@
         if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to ${getActionName(params)}`)) accept()
         else deny()
       }
-      const keypair = generateKeyPair()
-      const keypair2 = generateKeyPair()
+      const keypair = Crypto.generateKeyPair()
+      const keypair2 = Crypto.generateKeyPair()
       const sdkAcc = this.publicKey
       this.client = await RpcWallet({
         nodes: [
