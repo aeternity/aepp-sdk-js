@@ -21,7 +21,7 @@ var options = {
     inject: path.join(__dirname, 'src', 'js', 'inject.js')
   },
   output: {
-    path: path.join(__dirname, 'build'),
+    path: path.join(__dirname, 'dist'),
     filename: '[name].bundle.js'
   },
   module: {
@@ -50,8 +50,8 @@ var options = {
     }
   },
   plugins: [
-    // clean the build folder
-    new CleanWebpackPlugin(['build']),
+    // clean the dist folder
+    new CleanWebpackPlugin(['dist']),
     // expose and write the allowed env vars on the compiled bundle
     new webpack.EnvironmentPlugin(['NODE_ENV']),
     new CopyWebpackPlugin([{
