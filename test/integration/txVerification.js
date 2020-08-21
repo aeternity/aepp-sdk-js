@@ -1,5 +1,5 @@
 import { before, describe, it } from 'mocha'
-import { configure, ready } from '.'
+import { getSdk } from '.'
 import { generateKeyPair } from '../../es/utils/crypto'
 import { BASE_VERIFICATION_SCHEMA, SIGNATURE_VERIFICATION_SCHEMA } from '../../es/tx/builder/schema'
 import MemoryAccount from '../../es/account/memory'
@@ -9,11 +9,10 @@ const ERRORS = [...BASE_VERIFICATION_SCHEMA, ...SIGNATURE_VERIFICATION_SCHEMA].r
 const channelCreate = 'tx_+NkLAfhCuECIIeWttRUiZ32uriBdmM1t+dCg90KuG2ABxOiuXqzpAul6uTWvsyfx3EFJDah6trudrityh+6XSX3mkPEimhgGuJH4jzIBoQELtO15J/l7UeG8teE0DRIzWyorEsi8UiHWPEvLOdQeYYgbwW1nTsgAAKEB6bv2BOYRtUYKOzmZ6Xcbb2BBfXPOfFUZ4S9+EnoSJcqIG8FtZ07IAACIAWNFeF2KAAAKAIYSMJzlQADAoDBrIcoop8JfZ4HOD9p3nDTiNthj7jjl+ArdHwEMUrvQgitwOr/v3Q=='
 
 describe('Verify Transaction', function () {
-  configure(this)
   let client
 
   before(async () => {
-    client = await ready(this)
+    client = await getSdk()
     await client.spend(1234, 'ak_LAqgfAAjAbpt4hhyrAfHyVg9xfVQWsk1kaHaii6fYXt6AJAGe')
   })
   it('validate params', async () => {
@@ -67,7 +66,7 @@ describe('Verify Transaction', function () {
     await checkErrors(signedTxFull)
   })
   it('verify transaction before broadcast', async () => {
-    client = await ready(this)
+    client = await getSdk()
     const spendTx = await client.spendTx({
       senderId: await client.address(),
       recipientId: await client.address(),

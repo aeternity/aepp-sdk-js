@@ -16,28 +16,27 @@
  */
 
 import { describe, it, before } from 'mocha'
-import { configure, ready, BaseAe, networkId } from './'
+import { getSdk, BaseAe, networkId } from './'
 import { generateKeyPair } from '../../es/utils/crypto'
-import { BigNumber } from 'bignumber.js'
+import BigNumber from 'bignumber.js'
 import MemoryAccount from '../../es/account/memory'
 import { AE_AMOUNT_FORMATS } from '../../es/utils/amount-formatter'
 
 describe('Accounts', function () {
-  configure(this)
-
   let wallet
 
   before(async function () {
-    wallet = await ready(this)
+    wallet = await getSdk()
   })
 
-  const { publicKey: receiver } = generateKeyPair()
+  const receiverKey = generateKeyPair()
+  const receiver = receiverKey.publicKey
 
   describe('fails on unknown keypairs', () => {
     let wallet
 
     before(async function () {
-      wallet = await ready(this)
+      wallet = await getSdk()
       await wallet.addAccount(MemoryAccount({ keypair: generateKeyPair() }), { select: true })
     })
 
@@ -66,12 +65,44 @@ describe('Accounts', function () {
     return wallet.balance(await wallet.address()).should.eventually.be.a('string')
   })
 
-  it('Spend 50% of balance', async () => {
-    const balance = await wallet.balance(await wallet.address())
+  describe('transferFunds', async () => {
+    const spend = async fraction => {
+      const balanceBefore = new BigNumber(await wallet.balance(await wallet.address()))
+      const { tx } = await wallet.transferFunds(fraction, receiver)
+      const balanceAfter = new BigNumber(await wallet.balance(await wallet.address()))
+      return {
+        balanceBefore,
+        balanceAfter,
+        amount: new BigNumber(tx.amount),
+        fee: new BigNumber(tx.fee)
+      }
+    }
 
-    await wallet.transferFunds(0.5, 'ak_DMNCzsVoZnpV5fe8FTQnNsTfQ48YM5C3WbHPsJyHjAuTXebFi')
-    const balanceAfter = await wallet.balance(await wallet.address())
-    BigNumber(balance).div(balanceAfter).toNumber().should.be.equal(2)
+    it('throws exception if fraction is out of range', () => wallet.transferFunds(-1, receiver)
+      .should.be.rejectedWith(/Fraction should be a number between 0 and 1, got/))
+
+    it('spends 0% of balance', async () => {
+      const { balanceBefore, balanceAfter, amount } = await spend(0)
+      balanceBefore.should.be.not.eql(balanceAfter)
+      amount.isZero().should.be.equal(true)
+    })
+
+    it('spends 68.97% of balance', async () => {
+      const { balanceBefore, balanceAfter, amount, fee } = await spend(0.6897)
+      balanceBefore.times(0.6897).integerValue(BigNumber.ROUND_HALF_UP).should.be.eql(amount)
+      balanceAfter.plus(amount).plus(fee).should.be.eql(balanceBefore)
+    })
+
+    it('spends 100% of balance', async () => {
+      const { balanceBefore, balanceAfter, amount, fee } = await spend(1)
+      amount.plus(fee).should.be.eql(balanceBefore)
+      balanceAfter.isZero().should.be.equal(true)
+    })
+
+    it('accepts onAccount option', async () => {
+      await wallet.transferFunds(1, await wallet.address(), { onAccount: receiverKey })
+      new BigNumber(await wallet.balance(receiver)).isZero().should.be.equal(true)
+    })
   })
 
   it('spends tokens', async () => {
@@ -187,7 +218,7 @@ describe('Accounts', function () {
 
   describe('can be configured to return th', () => {
     it('on creation', async () => {
-      const wallet = await ready(this)
+      const wallet = await getSdk()
       const th = await wallet.spend(1, receiver)
       th.should.be.a('object')
       th.hash.slice(0, 3).should.equal('th_')

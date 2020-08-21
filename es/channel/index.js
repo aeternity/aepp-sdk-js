@@ -769,7 +769,7 @@ function sendMessage (message, recipient) {
     const onStatusChanged = (status) => {
       if (status !== 'connecting') {
         // For some reason we can't immediately send a message when connection is
-        // established established. Thus we wait 500ms which seems to work.
+        // established. Thus we wait 500ms which seems to work.
         setTimeout(() => doSend(this), 500)
         this.off('statusChanged', onStatusChanged)
       }

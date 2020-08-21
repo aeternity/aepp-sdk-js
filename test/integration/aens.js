@@ -16,55 +16,28 @@
  */
 
 import { describe, it, before } from 'mocha'
-import { configure, plan, ready } from './'
+import { getSdk } from './'
+import { randomName } from '../utils'
 import * as R from 'ramda'
 import { generateKeyPair } from '../../es/utils/crypto'
 import { buildContractId, classify, computeAuctionEndBlock, computeBidFee } from '../../es/tx/builder/helpers'
 
-export function randomName (length, namespace = '.chain') {
-  return randomString(length) + namespace
-}
-
-function randomString (len, charSet) {
-  charSet = charSet || 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  let randomString = ''
-  for (let i = 0; i < len; i++) {
-    const randomPoz = Math.floor(Math.random() * charSet.length)
-    randomString += charSet.substring(randomPoz, randomPoz + 1)
-  }
-  return randomString
-}
-
-plan('99000000000000000000000000')
-
 describe('Aens', function () {
-  configure(this)
-
   let aens
-  let nameAuctionsSupported
   const account = generateKeyPair()
-  let name
-  let name2
+  const name = randomName(13) // 13 name length doesn't trigger auction
 
   before(async function () {
-    aens = await ready(this)
+    aens = await getSdk()
     await aens.spend('1000000000000000', account.publicKey)
-    const { version } = aens.getNodeInfo()
-    const [majorVersion] = version.split('.')
-    nameAuctionsSupported = +majorVersion === 5 && version !== '5.0.0-rc.1'
-    name = randomName(13, '.chain') // 13 name length doesn't trigger auction
-    name2 = randomName(13,'.chain')
   })
 
-  const lima = fn => async () => nameAuctionsSupported ? fn() : undefined
-
   describe('fails on', () => {
-    it('querying non-existent names', async () => {
-      return aens.aensQuery(name2).should.eventually.be.rejected
-    })
+    it('querying non-existent names', () => aens
+      .aensQuery(randomName(13)).should.eventually.be.rejected)
 
     it('updating names not owned by the account', async () => {
-      const preclaim = await aens.aensPreclaim(name2)
+      const preclaim = await aens.aensPreclaim(randomName(13))
       await preclaim.claim()
       const current = await aens.address()
       const onAccount = aens.addresses().find(acc => acc !== current)
@@ -181,11 +154,11 @@ contract Identity =
   })
 
   describe('name auctions', function () {
-    it('claims names', lima(async () => {
+    it('claims names', async () => {
       try {
         const current = await aens.address()
         const onAccount = aens.addresses().find(acc => acc !== current)
-        const name = randomName(12, '.chain')
+        const name = randomName(12)
 
         const preclaim = await aens.aensPreclaim(name)
         preclaim.should.be.an('object')
@@ -206,6 +179,6 @@ contract Identity =
         if (e && typeof e.verifyTx === 'function') console.log(await e.verifyTx())
         throw e
       }
-    }))
+    })
   })
 })

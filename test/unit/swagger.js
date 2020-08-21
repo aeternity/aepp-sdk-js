@@ -96,12 +96,14 @@ describe('Swagger', function () {
     })
 
     it('objects', () => {
-      const spec = { type: 'object',
+      const spec = {
+        type: 'object',
         required: ['foo'],
         properties: {
           foo: { type: 'integer' },
           bar: { type: 'string' }
-        } }
+        }
+      }
       expect(internal.conform({ foo: 5 }, spec)).to.deep.equal({ foo: 5 })
       expect(internal.conform({ foo: 5, bar: 'xxx' }, spec)).to.deep.equal({ foo: 5, bar: 'xxx' })
       expect(internal.conform({ foo: 5, baz: 'yyy' }, spec)).to.deep.equal({ foo: 5 })
@@ -123,13 +125,13 @@ describe('Swagger', function () {
   it('maps operations', async () => {
     const [path, data] = R.head(R.toPairs(op))
     const [method, operation] = R.head(R.toPairs(data))
-    const fn = internal.operation(path, method, operation, def)(this, `//v2`)
+    const fn = internal.operation(path, method, operation, def)(this, '//v2')
     assert.equal(fn.length, 2)
   })
   it('Serialize BigNumber to JSON', () => {
     const obj = [
-      "JSON Test Pattern pass1",
-      {"object with 1 member":["array with 1 element"]},
+      'JSON Test Pattern pass1',
+      { 'object with 1 member': ['array with 1 element'] },
       {},
       [],
       -42,
@@ -137,53 +139,47 @@ describe('Swagger', function () {
       false,
       null,
       {
-        "integer": 1234567890,
-        "real": -9876.543210,
-        "e": 0.123456789e-12,
-        "E": 1.234567890E+34,
-        "":  23456789012E666,
-        "bigNumber": '2378562376872638746283764871268736871391236192461742314',
-        "zero": 0,
-        "one": 1,
-        "space": " ",
-        "quote": "\"",
-        "backslash": "\\",
-        "controls": "\b\f\n\r\t",
-        "slash": "/ & \/",
-        "alpha": "abcdefghijklmnopqrstuvwyz",
-        "ALPHA": "ABCDEFGHIJKLMNOPQRSTUVWYZ",
-        "digit": "0123456789",
-        "special": "`1~!@#$%^&*()_+-={':[,]}|;.</>?",
-        "hex": "\u0123\u4567\u89AB\uCDEF\uabcd\uef4A",
-        "true": true,
-        "false": false,
-        "null": null,
-        "array":[  ],
-        "object":{  },
-        "address": "50 St. James Street",
-        "url": "http://www.JSON.org/",
-        "comment": "// /* <!-- --",
-        "# -- --> */": " ",
-        " s p a c e d " :[1,2 , 3
+        integer: 1234567890,
+        real: -9876.543210,
+        e: 0.123456789e-12,
+        E: 1.234567890E+34,
+        '': 23456789012E666,
+        bigNumber: '2378562376872638746283764871268736871391236192461742314',
+        zero: 0,
+        one: 1,
+        space: ' ',
+        quote: '"',
+        backslash: '\\',
+        controls: '\b\f\n\r\t',
+        slash: '/ & \\',
+        alpha: 'abcdefghijklmnopqrstuvwyz',
+        ALPHA: 'ABCDEFGHIJKLMNOPQRSTUVWYZ',
+        digit: '0123456789',
+        special: "`1~!@#$%^&*()_+-={':[,]}|;.</>?",
+        hex: '\u0123\u4567\u89AB\uCDEF\uabcd\uef4A',
+        true: true,
+        false: false,
+        null: null,
+        array: [],
+        object: { },
+        address: '50 St. James Street',
+        url: 'http://www.JSON.org/',
+        comment: '// /* <!-- --',
+        '# -- --> */': ' ',
+        ' s p a c e d ': [1, 2, 3,
 
-          ,
-
-          4 , 5        ,          6           ,7        ],
-        "compact": [1,2,3,4,5,6,7],
-        "jsontext": "{\"object with 1 member\":[\"array with 1 element\"]}",
-        "quotes": "&#34; \u0022 %22 0x22 034 &#x22;",
-        "\/\\\"\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"
-          : "A key can be any string"
+          4, 5, 6, 7],
+        compact: [1, 2, 3, 4, 5, 6, 7],
+        jsontext: '{"object with 1 member":["array with 1 element"]}',
+        quotes: '&#34; \u0022 %22 0x22 034 &#x22;',
+        "/\\\"\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?": 'A key can be any string'
       },
-      0.5 ,98.6
-      ,
-      99.44
-      ,
+      0.5, 98.6,
+      99.44,
 
-      1066
+      1066,
 
-
-      ,"rosebud"]
+      'rosebud']
     const stringified = JsonBig.stringify(obj)
     const parsed = JsonBig.parse(stringified)
     parsed[8][''] = 23456789012E666

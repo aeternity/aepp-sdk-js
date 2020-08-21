@@ -1,12 +1,12 @@
 /**
  * Browser helper functions
  */
-/* eslint-disable no-undef */
 import { isMemoryAccount } from '../../account/selector'
 
-const isWeb = () => location && location.protocol && location.protocol.startsWith('http')
+const isWeb = () => window && window.location && window.location.protocol.startsWith('http')
 
 export const getBrowserAPI = (force = false) => {
+  const { chrome, browser } = window
   // Chrome, Opera support
   if (typeof chrome !== 'undefined' && chrome === Object(chrome)) return chrome
   // Firefox support

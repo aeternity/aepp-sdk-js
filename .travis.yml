@@ -2,6 +2,11 @@ dist: bionic
 language: node_js
 node_js: 12
 
+branches:
+  only:
+    - master
+    - develop
+
 services:
   - docker
 
@@ -11,20 +16,30 @@ before_install:
       export COMPILER_TAG=latest;
       export FORCE_COMPATIBILITY=true;
     fi
-  - docker-compose up -d
+  - if [[ $TRAVIS_BUILD_STAGE_NAME == "Integration tests" ]]; then
+      docker-compose up -d;
+    fi
+
+install: npm ci --ignore-scripts
 
 jobs:
   include:
     - stage: Tests
-      name: Test AENS
       script:
-        - npm run test-aens
+        - npm run lint
+        - npm run build
+        - npm run test:unit
         - npm run report-coverage
-    - name: Test Channel
+    - stage: Integration tests
+      name: Channel, accounts
       script:
-        - npm run test-channel
+        - npm run test:integration:channel,accounts
         - npm run report-coverage
-    - name: Test Contract, Node, Oracle, Account and else
+    - name: Contract, chain
       script:
-        - npm run test-else
+        - npm run test:integration:contract,chain
+        - npm run report-coverage
+    - name: Else
+      script:
+        - npm run test:integration:else
         - npm run report-coverage

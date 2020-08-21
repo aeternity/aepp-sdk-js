@@ -1,4 +1,4 @@
-import { BigNumber } from 'bignumber.js'
+import BigNumber from 'bignumber.js'
 import { AE_AMOUNT_FORMATS, formatAmount } from '../../utils/amount-formatter'
 import { assertedType, rlp } from '../../utils/crypto'
 

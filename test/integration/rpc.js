@@ -15,15 +15,13 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { Aepp, Wallet, Node, RpcWallet, RpcAepp } from '../../es'
-import { compilerUrl, getFakeConnections, url, internalUrl, networkId } from './'
-
+import { Aepp, Wallet, Node, RpcWallet, RpcAepp, MemoryAccount } from '../../es'
+import { compilerUrl, url, internalUrl, networkId, publicKey, genesisAccount } from './'
 import { describe, it, before } from 'mocha'
 import BrowserWindowMessageConnection from '../../es/utils/aepp-wallet-communication/connection/browser-window-message'
 import { generateKeyPair, verify } from '../../es/utils/crypto'
 import { decode } from '../../es/tx/builder/helpers'
 import { unpackTx } from '../../es/tx/builder'
-import MemoryAccount from '../../es/account/memory'
 import {
   getBrowserAPI,
   getHandler,
@@ -61,6 +59,7 @@ describe('Aepp<->Wallet', function () {
     before(async () => {
       wallet = await RpcWallet({
         compilerUrl: compilerUrl,
+        accounts: [genesisAccount],
         nodes: [{ name: 'local', instance: node }],
         name: 'Wallet',
         onConnection (aepp, { accept, deny }) {
@@ -77,6 +76,7 @@ describe('Aepp<->Wallet', function () {
           this.shareWalletInfo(connectionFromWalletToAepp.sendMessage.bind(connectionFromWalletToAepp))
         }
       })
+      wallet.removeAccount(process.env.WALLET_PUB)
       aepp = await RpcAepp({
         name: 'AEPP',
         nodes: [{ name: 'test', instance: node }],
@@ -187,7 +187,7 @@ describe('Aepp<->Wallet', function () {
       subscriptionResponse.subscription.should.be.an('array')
       subscriptionResponse.subscription.filter(e => e === 'connected').length.should.be.equal(1)
       subscriptionResponse.address.current.should.be.an('object')
-      Object.keys(subscriptionResponse.address.current)[0].should.be.equal('ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi')
+      Object.keys(subscriptionResponse.address.current)[0].should.be.equal(publicKey)
       subscriptionResponse.address.connected.should.be.an('object')
       Object.keys(subscriptionResponse.address.connected).length.should.be.equal(1)
     })
@@ -200,7 +200,7 @@ describe('Aepp<->Wallet', function () {
       }
     })
     it('Get address: subscribed for accounts', async () => {
-      (await aepp.address()).should.be.equal('ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi')
+      (await aepp.address()).should.be.equal(publicKey)
     })
     it('Ask for address: subscribed for accounts -> wallet deny', async () => {
       wallet.onAskAccounts = (aepp, actions) => {
@@ -219,7 +219,7 @@ describe('Aepp<->Wallet', function () {
       }
       const addressees = await aepp.askAddresses()
       addressees.length.should.be.equal(2)
-      addressees[0].should.be.equal('ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi')
+      addressees[0].should.be.equal(publicKey)
     })
     it('Not authorize', async () => {
       const rpcClients = wallet.getClients()
@@ -556,9 +556,11 @@ describe('Aepp<->Wallet', function () {
       connections = getConnections(true)
       wallet = await Wallet({
         compilerUrl,
+        accounts: [genesisAccount],
         nodes: [{ name: 'test', instance: node }],
         self: connections.waelletConnection
       })
+      wallet.removeAccount(process.env.WALLET_PUB)
       aepp = await Aepp({ parent: Object.assign({}, connections.aeppConnection), self: connections.aeppConnection })
     })
     it('Call wallet method without guards', async () => {
@@ -576,7 +578,7 @@ describe('Aepp<->Wallet', function () {
         return true
       }
       const address = await aepp.address()
-      address.should.be.equal('ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi')
+      address.should.be.equal(publicKey)
     })
     it('Reject address retrieving', async () => {
       wallet.onAccount = (m, p, s) => false
@@ -619,9 +621,7 @@ describe('Aepp<->Wallet', function () {
       (await getHandler({}, { method: 'hey' })()()).should.be.equal(true)
     })
     it('getBrowserAPI: not in browser', () => {
-      global.chrome = null
-      global.browser = null
-      global.window = null
+      global.window = {}
       try {
         getBrowserAPI()
       } catch (e) {
@@ -629,20 +629,15 @@ describe('Aepp<->Wallet', function () {
       }
     })
     it('getBrowserAPI: not in browser(force error)', () => {
-      global.chrome = null
-      global.browser = null
-      global.window = null
+      global.window = {}
       getBrowserAPI(true).should.be.an('object')
     })
     it('getBrowserAPI: chrome', () => {
-      global.chrome = { runtime: {}, chrome: true }
-      global.window = { location: { origin: '//test' }, chrome: global.chrome }
+      global.window = { location: { origin: '//test' }, chrome: { runtime: {}, chrome: true } }
       getBrowserAPI().chrome.should.be.equal(true)
     })
     it('getBrowserAPI: firefox', () => {
-      global.chrome = null
-      global.browser = { runtime: {}, firefox: true }
-      global.window = { location: { origin: '//test' }, browser: global.browser }
+      global.window = { location: { origin: '//test' }, browser: { runtime: {}, firefox: true } }
       getBrowserAPI().firefox.should.be.equal(true)
     })
     it('isInIframe/getWindow', () => {
@@ -672,6 +667,33 @@ describe('Aepp<->Wallet', function () {
     })
   })
 })
+
+const WindowPostMessageFake = (name) => ({
+  name,
+  messages: [],
+  addEventListener (onEvent, listener) {
+    this.listener = listener
+  },
+  removeEventListener (onEvent, listener) {
+    return () => null
+  },
+  postMessage (msg) {
+    this.messages.push(msg)
+    setTimeout(() => { if (typeof this.listener === 'function') this.listener({ data: msg, origin: 'testOrigin', source: this }) }, 0)
+  }
+})
+
+const getFakeConnections = (direct = false) => {
+  const waelletConnection = WindowPostMessageFake('wallet')
+  const aeppConnection = WindowPostMessageFake('aepp')
+  if (direct) {
+    const waelletP = waelletConnection.postMessage
+    const aeppP = aeppConnection.postMessage
+    waelletConnection.postMessage = aeppP.bind(aeppConnection)
+    aeppConnection.postMessage = waelletP.bind(waelletConnection)
+  }
+  return { waelletConnection, aeppConnection }
+}
 
 const getConnections = (direct) => {
   global.chrome = { runtime: {} }

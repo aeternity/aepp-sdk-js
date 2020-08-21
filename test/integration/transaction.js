@@ -17,8 +17,8 @@
 
 import { describe, it, before } from 'mocha'
 import { encodeBase58Check, encodeBase64Check, generateKeyPair, salt } from '../../es/utils/crypto'
-import { ready, configure } from './index'
-import { commitmentHash, isNameValid } from '../../es/tx/builder/helpers'
+import { getSdk } from './index'
+import { commitmentHash, isNameValid, oracleQueryId } from '../../es/tx/builder/helpers'
 import { MemoryAccount } from '../../es'
 import { AE_AMOUNT_FORMATS } from '../../es/utils/amount-formatter'
 import { unpackTx } from '../../es/tx/builder'
@@ -59,8 +59,6 @@ let _salt
 let commitmentId
 
 describe('Native Transaction', function () {
-  configure(this)
-
   let clientNative
   let client
   let oracleId
@@ -68,8 +66,8 @@ describe('Native Transaction', function () {
 
   before(async () => {
     const keyPair = generateKeyPair()
-    client = await ready(this, false)
-    clientNative = await ready(this)
+    client = await getSdk(false)
+    clientNative = await getSdk()
     await client.spend('16774200000000000000', keyPair.publicKey)
     await client.addAccount(MemoryAccount({ keypair: keyPair }), { select: true })
     await clientNative.addAccount(MemoryAccount({ keypair: keyPair }), { select: true })
@@ -227,16 +225,16 @@ describe('Native Transaction', function () {
 
     const params = { oracleId, responseTtl, query, queryTtl, queryFee, senderId }
 
-    const { tx: txFromAPI, queryId: oracleQueryId } = await client.oraclePostQueryTx(params)
-    const { tx: nativeTx } = await clientNative.oraclePostQueryTx(params)
+    const txFromAPI = await client.oraclePostQueryTx(params)
+    const nativeTx = await clientNative.oraclePostQueryTx(params)
+    queryId = oracleQueryId(senderId, unpackTx(txFromAPI).tx.nonce, oracleId)
 
     txFromAPI.should.be.equal(nativeTx)
 
     await client.send(nativeTx)
 
-    const oracleQuery = (await client.getOracleQuery(oracleId, oracleQueryId))
-    oracleQuery.id.should.be.equal(oracleQueryId)
-    queryId = oracleQueryId
+    const oracleQuery = (await client.getOracleQuery(oracleId, queryId))
+    oracleQuery.id.should.be.equal(queryId)
   })
 
   it('native build of oracle respond query tx', async () => {

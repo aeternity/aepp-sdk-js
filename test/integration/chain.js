@@ -15,17 +15,15 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 import { describe, it, before } from 'mocha'
-import { configure, ready } from './'
+import { getSdk } from './'
 import { generateKeyPair } from '../../es/utils/crypto'
 
 describe('Node Chain', function () {
-  configure(this)
-
   let client
   const { publicKey } = generateKeyPair()
 
   before(async function () {
-    client = await ready(this)
+    client = await getSdk()
   })
 
   it('determines the height', async () => {

@@ -14,3 +14,5 @@ debug/
 /coverage
 coverage.*
 .nyc_output/
+/examples/**/package-lock.json
+/examples/**/dist

@@ -14,7 +14,7 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-import { BigNumber } from 'bignumber.js'
+import BigNumber from 'bignumber.js'
 import { isBase64, isHex } from './string'
 
 /**
@@ -63,6 +63,7 @@ export function rightPad (length, inputBuffer) {
  * @return Buffer
  */
 export function bigNumberToByteArray (x) {
+  if (!x.isInteger()) throw new Error(`Unexpected not integer value: ${x.toFixed()}`)
   let hexString = x.toString(16)
   if (hexString.length % 2 > 0) hexString = '0' + hexString
   return Buffer.from(hexString, 'hex')

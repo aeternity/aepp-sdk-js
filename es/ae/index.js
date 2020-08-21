@@ -28,7 +28,7 @@ import Chain from '../chain'
 import Account from '../account'
 import TxBuilder from '../tx/builder'
 import * as R from 'ramda'
-import { BigNumber } from 'bignumber.js'
+import BigNumber from 'bignumber.js'
 import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter'
 
 /**
@@ -39,7 +39,7 @@ import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter'
  * @param {String} tx - Transaction
  * @param {Object} [options={}] options - Options
  * @param {Object} [options.verify] verify - Verify transaction before broadcast, throw error if not valid
- * @return {String|String} Transaction or transaction hash
+ * @return {Object} Transaction
  */
 async function send (tx, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
@@ -59,50 +59,51 @@ async function signUsingGA (tx, options = {}) {
  * Send tokens to another account
  * @instance
  * @category async
- * @rtype (amount: Number|String, recipientId: String, options?: Object) => Promise[String]
+ * @rtype (amount: Number|String, recipientIdOrName: String, options?: Object) => Promise[String]
  * @param {Number|String} amount - Amount to spend
- * @param {String} recipientId - Address or Name of recipient account
- * @param {Object} options - Options
- * @return {String|String} Transaction or transaction hash
+ * @param {String} recipientIdOrName - Address or name of recipient account
+ * @param {Object} [options] - Options
+ * @return {Object} Transaction
  */
-async function spend (amount, recipientId, options = {}) {
-  const opt = R.merge(this.Ae.defaults, options)
-  recipientId = await this.resolveName(recipientId, 'ak', options)
-  const spendTx = await this.spendTx(R.merge(opt, { senderId: await this.address(opt), recipientId, amount }))
-  return this.send(spendTx, opt)
+async function spend (amount, recipientIdOrName, options) {
+  const opt = { ...this.Ae.defaults, ...options }
+  return this.send(
+    await this.spendTx({
+      ...opt,
+      senderId: await this.address(opt),
+      recipientId: await this.resolveName(recipientIdOrName, 'ak', opt),
+      amount
+    }),
+    opt
+  )
 }
 
+// TODO: Rename to spendFraction
 /**
- * Send a percentage of funds to another account
+ * Send a fraction of token balance to another account
  * @instance
  * @category async
- * @rtype (percentage: Number|String, recipientId: String, options?: Object) => Promise[String]
- * @param {Number|String} percentage - Percentage of amount to spend
- * @param {String} recipientId - Address of recipient account
- * @param {Object} options - Options
- * @return {String|String} Transaction or transaction hash
+ * @rtype (fraction: Number|String, recipientIdOrName: String, options?: Object) => Promise[String]
+ * @param {Number|String} fraction - Fraction of balance to spend (between 0 and 1)
+ * @param {String} recipientIdOrName - Address or name of recipient account
+ * @param {Object} [options] - Options
+ * @return {Object} Transaction
  */
-async function transferFunds (percentage, recipientId, options = { excludeFee: false }) {
-  if (percentage < 0 || percentage > 1) throw new Error(`Percentage should be a number between 0 and 1, got ${percentage}`)
-  const opt = R.merge(this.Ae.defaults, options)
-  recipientId = await this.resolveName(recipientId, 'ak', opt)
-
-  const requestTransferAmount = BigNumber(await this.balance(await this.address())).times(percentage)
-  let spendTx = await this.spendTx(R.merge(opt, { senderId: await this.address(), recipientId, amount: requestTransferAmount }))
-
-  const { tx: txObject } = TxBuilder.unpackTx(spendTx)
-  // If the requestTransferAmount should include the fee keep calculating the fee
-  let amount = requestTransferAmount
-  if (!options.excludeFee) {
-    while (amount.plus(txObject.fee).gt(requestTransferAmount)) {
-      amount = requestTransferAmount.minus(txObject.fee)
-    }
+async function transferFunds (fraction, recipientIdOrName, options) {
+  if (fraction < 0 || fraction > 1) {
+    throw new Error(`Fraction should be a number between 0 and 1, got ${fraction}`)
   }
-
-  // Rebuild tx
-  spendTx = await this.spendTx(R.merge(opt, { senderId: await this.address(), recipientId, amount }))
-
-  return this.send(spendTx, opt)
+  const opt = { ...this.Ae.defaults, ...options }
+  const recipientId = await this.resolveName(recipientIdOrName, 'ak', opt)
+  const senderId = await this.address(opt)
+  const balance = new BigNumber(await this.balance(senderId))
+  const desiredAmount = balance.times(fraction).integerValue(BigNumber.ROUND_HALF_UP)
+  const { tx: { fee } } = TxBuilder.unpackTx(
+    await this.spendTx({ ...opt, senderId, recipientId, amount: desiredAmount })
+  )
+  // Reducing of the amount may reduce transaction fee, so this is not completely accurate
+  const amount = desiredAmount.plus(fee).gt(balance) ? balance.minus(fee) : desiredAmount
+  return this.send(await this.spendTx({ ...opt, senderId, recipientId, amount }), opt)
 }
 
 /**

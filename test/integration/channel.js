@@ -14,11 +14,12 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
+/* eslint-disable no-unused-expressions */
 
 import { describe, it, before, after, beforeEach, afterEach } from 'mocha'
 import * as sinon from 'sinon'
-import { BigNumber } from 'bignumber.js'
-import { configure, ready, plan, BaseAe, networkId } from './'
+import BigNumber from 'bignumber.js'
+import { getSdk, BaseAe, networkId } from './'
 import { generateKeyPair, encodeBase64Check } from '../../es/utils/crypto'
 import { unpackTx, buildTx, buildTxHash } from '../../es/tx/builder'
 import { decode } from '../../es/tx/builder/helpers'
@@ -26,8 +27,6 @@ import Channel from '../../es/channel'
 import MemoryAccount from '../../es/account/memory'
 
 const wsUrl = process.env.TEST_WS_URL || 'ws://localhost:3014/channel'
-
-plan(BigNumber('10000e18').toString())
 
 const identityContract = `
 contract Identity =
@@ -45,15 +44,11 @@ function waitForChannel (channel) {
 }
 
 describe('Channel', function () {
-  configure(this)
-  this.timeout(12000000)
-
   let initiator
   let responder
   let initiatorCh
   let responderCh
   let responderShouldRejectUpdate
-  let existingChannelRound
   let existingChannelId
   let offchainTx
   let contractAddress
@@ -86,13 +81,13 @@ describe('Channel', function () {
   }
 
   before(async function () {
-    initiator = await ready(this)
+    initiator = await getSdk()
     responder = await BaseAe({ nativeMode: true, networkId, accounts: [] })
     await responder.addAccount(MemoryAccount({ keypair: generateKeyPair() }), { select: true })
     sharedParams.initiatorId = await initiator.address()
     sharedParams.responderId = await responder.address()
     await initiator.spend(BigNumber('500e18').toString(), await responder.address())
-    const version = initiator.getNodeInfo().version.split(/[\.-]/).map(i => parseInt(i, 10))
+    const version = initiator.getNodeInfo().version.split(/[.-]/).map(i => parseInt(i, 10))
     majorVersion = version[0]
     minorVersion = version[1]
   })
@@ -349,7 +344,7 @@ describe('Channel', function () {
     )
     sign.firstCall.args[1].updates.should.eql([
       sign.firstCall.args[1].updates[0],
-      { data: meta, op: 'OffChainMeta'}
+      { data: meta, op: 'OffChainMeta' }
     ])
     responderSign.firstCall.args[2].updates.should.eql([
       responderSign.firstCall.args[2].updates[0],
@@ -682,7 +677,7 @@ describe('Channel', function () {
       sign: responderSign
     })
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
-    existingChannelRound = initiatorCh.round()
+    initiatorCh.round() // existingChannelRound
     const result = await initiatorCh.leave()
     result.channelId.should.be.a('string')
     result.signedTx.should.be.a('string')

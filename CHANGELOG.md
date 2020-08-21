@@ -1,3 +1,33 @@
+# [7.7.0](https://github.com/aeternity/aepp-sdk-js/compare/7.6.0...7.7.0) (2020-08-18)
+
+
+### Features
+
+* **transferFunds:** Accept onAccount option ([#1060](https://github.com/aeternity/aepp-sdk-js/pull/1060))
+* **bigNumberToByteArray:** Avoid unexpected behaviour by throwing exception ([#1066](https://github.com/aeternity/aepp-sdk-js/pull/1066))
+* **example:** Add disconnect button on wallet side ([#1056](https://github.com/aeternity/aepp-sdk-js/pull/1056))
+
+
+### Code Refactoring
+
+* Use external version of json-bigint ([#1033](https://github.com/aeternity/aepp-sdk-js/pull/1033))
+* Make tests configuration more flexible ([#1037](https://github.com/aeternity/aepp-sdk-js/pull/1037))
+* test-else: Exclude aens tests and speedup jobs ([#1040](https://github.com/aeternity/aepp-sdk-js/pull/1040))
+* Avoid unnecessary eslint-disable ([#1043](https://github.com/aeternity/aepp-sdk-js/pull/1043))
+* Add lint script ([#1045](https://github.com/aeternity/aepp-sdk-js/pull/1045))
+* Refactor tests ([#1039](https://github.com/aeternity/aepp-sdk-js/pull/1039))
+* Refactor bytes unit tests ([#1050](https://github.com/aeternity/aepp-sdk-js/pull/1050))
+* travis: Run linter and unit tests firstly ([#1051](https://github.com/aeternity/aepp-sdk-js/pull/1051))
+* Disable Travis on all branches except master, develop ([#1054](https://github.com/aeternity/aepp-sdk-js/pull/1054))
+* Refactor contract, oracle, chain ([#1048](https://github.com/aeternity/aepp-sdk-js/pull/1048))
+* Refactor state channels ([#1047](https://github.com/aeternity/aepp-sdk-js/pull/1047))
+
+
+### Docs
+
+* Fix typo in Readme.md ([#1053](https://github.com/aeternity/aepp-sdk-js/pull/1053))
+
+
 # [7.6.0](https://github.com/aeternity/aepp-sdk-js/compare/7.5.0...7.6.0) (2020-07-22)
 
 

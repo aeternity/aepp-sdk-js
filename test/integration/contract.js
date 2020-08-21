@@ -16,11 +16,10 @@
  */
 import Compiler from '../../es/contract/compiler'
 import { describe, it, before } from 'mocha'
-import { BaseAe, configure, plan, ready, compilerUrl } from './'
+import { BaseAe, getSdk, compilerUrl, publicKey } from './'
 import { decode } from '../../es/tx/builder/helpers'
-
 import * as R from 'ramda'
-import { randomName } from './aens'
+import { randomName } from '../utils'
 import { decodeEvents, readType, SOPHIA_TYPES } from '../../es/contract/aci/transformation'
 import { hash, personalMessageToBinary } from '../../es/utils/crypto'
 import { getFunctionACI } from '../../es/contract/aci/helpers'
@@ -56,7 +55,7 @@ namespace Test =
 
 
 contract Voting =
-  type test_type = int 
+  type test_type = int
   record state = { value: string, key: test_type, testOption: option(string) }
   record test_record = { value: string, key: list(test_type) }
   entrypoint test : () => int
@@ -182,16 +181,13 @@ const filesystem = {
   testLib: libContract
 }
 
-plan('1000000000000000000000000')
 describe('Contract', function () {
-  configure(this)
-
   let contract
   let bytecode
   let deployed
 
   before(async function () {
-    contract = await ready(this, true, true)
+    contract = await getSdk()
   })
   describe('Aens and Oracle operation delegation', () => {
     let cInstance
@@ -381,7 +377,7 @@ describe('Contract', function () {
 
   it('Dry-run without accounts', async () => {
     const client = await BaseAe()
-    client.removeAccount('ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi')
+    client.removeAccount(publicKey)
     client.addresses().length.should.be.equal(0)
     const address = await client.address().catch(e => false)
     address.should.be.equal(false)
@@ -566,11 +562,9 @@ describe('Contract', function () {
         schema.types.forEach((t, tIndex) => {
           const value = event.decoded[tIndex]
           const isNumber = typeof value === 'string' || typeof value === 'number'
-          // eslint-disable-next-line valid-typeof
-          const v = typeof value === t
+          const v = typeof value === t // eslint-disable-line valid-typeof
           switch (t) {
             case SOPHIA_TYPES.address:
-              // console.log('contractAddress check')
               event.address.should.be.equal(`ct_${value}`)
               break
             case SOPHIA_TYPES.int:

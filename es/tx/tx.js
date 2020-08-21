@@ -29,7 +29,7 @@ import Tx from './'
 
 import { buildTx, calculateFee } from './builder'
 import { ABI_VERSIONS, MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE, VM_TYPE, TX_TTL } from './builder/schema'
-import { buildContractId, oracleQueryId } from './builder/helpers'
+import { buildContractId } from './builder/helpers'
 import { TxObject } from './tx-object'
 
 async function spendTx ({ senderId, recipientId, amount, payload = '' }) {
@@ -269,7 +269,7 @@ async function oraclePostQueryTx ({ oracleId, responseTtl, query, queryTtl, quer
       senderId
     })
 
-  return { tx, queryId: oracleQueryId(senderId, nonce, oracleId) }
+  return tx
 }
 
 async function oracleRespondTx ({ oracleId, callerId, responseTtl, queryId, response }) {
@@ -480,7 +480,7 @@ async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, ga
   } else {
     n = n || (account.nonce + 1)
   }
-  const ttl = await (calculateTtl.bind(this)(t, !absoluteTtl))
+  const ttl = await calculateTtl.call(this, t, !absoluteTtl)
   const fee = calculateFee(f, txType, { showWarning: this.showWarning, gas, params: R.merge(R.last(arguments), { nonce: n, ttl }), vsn })
   return { fee, ttl, nonce: n }
 }
