@@ -15,13 +15,11 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { Aepp, Wallet, Node, RpcWallet, RpcAepp, MemoryAccount } from '../../es'
-import { compilerUrl, url, internalUrl, networkId, publicKey, genesisAccount } from './'
-import { describe, it, before } from 'mocha'
-import BrowserWindowMessageConnection from '../../es/utils/aepp-wallet-communication/connection/browser-window-message'
-import { generateKeyPair, verify } from '../../es/utils/crypto'
-import { decode } from '../../es/tx/builder/helpers'
+import { before, describe, it } from 'mocha'
+import { Aepp, MemoryAccount, Node, RpcAepp, RpcWallet, Wallet } from '../../es'
 import { unpackTx } from '../../es/tx/builder'
+import { decode } from '../../es/tx/builder/helpers'
+import BrowserWindowMessageConnection from '../../es/utils/aepp-wallet-communication/connection/browser-window-message'
 import {
   getBrowserAPI,
   getHandler,
@@ -29,6 +27,8 @@ import {
   receive
 } from '../../es/utils/aepp-wallet-communication/helpers'
 import { METHODS, RPC_STATUS } from '../../es/utils/aepp-wallet-communication/schema'
+import { generateKeyPair, verify } from '../../es/utils/crypto'
+import { compilerUrl, genesisAccount, internalUrl, networkId, publicKey, url } from './'
 
 describe('Aepp<->Wallet', function () {
   this.timeout(6000)
@@ -133,21 +133,21 @@ describe('Aepp<->Wallet', function () {
       try {
         await aepp.address()
       } catch (e) {
-        e.message.should.be.equal('You do not subscribed for accounts.')
+        e.message.should.be.equal('You are not subscribed for an account.')
       }
     })
     it('Try to ask for address', async () => {
       try {
         await aepp.askAddresses()
       } catch (e) {
-        e.message.should.be.equal('You do not subscribed for account.')
+        e.message.should.be.equal('You are not subscribed for an account.')
       }
     })
     it('Try to sign and send transaction to wallet without subscription', async () => {
       wallet.getAccounts().should.be.an('object')
       const errors = [
-        await aepp.signTransaction('tx_asdasd').catch(e => e.message === 'You do not subscribed for account.'),
-        await aepp.send('tx_asdasd').catch(e => e.message === 'You do not subscribed for account.')
+        await aepp.signTransaction('tx_asdasd').catch(e => e.message === 'You are not subscribed for an account.'),
+        await aepp.send('tx_asdasd').catch(e => e.message === 'You are not subscribed for an account.')
       ]
       errors.filter(e => e).length.should.be.equal(2)
     })
@@ -196,7 +196,7 @@ describe('Aepp<->Wallet', function () {
       try {
         await aepp.spend(100, publicKey, { onAccount: publicKey })
       } catch (e) {
-        e.message.indexOf(`You are not have access to account ${publicKey}`).should.not.be.equal(-1)
+        e.message.indexOf(`You do not have access to account ${publicKey}`).should.not.be.equal(-1)
       }
     })
     it('Get address: subscribed for accounts', async () => {
