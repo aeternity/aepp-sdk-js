@@ -19,7 +19,7 @@ keys:
   dir: ./keys
 
 chain:
-  persist: true
+  persist: false
   hard_forks:
     "1": 0
     "2": 2
@@ -29,8 +29,8 @@ chain:
 mining:
   autostart: true
   beneficiary: "ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688"
-  expected_mine_rate: 4000
-  micro_block_cycle: 1000
+  expected_mine_rate: 1000
+  micro_block_cycle: 200
   cuckoo:
     miner:
       executable: mean15-generic
