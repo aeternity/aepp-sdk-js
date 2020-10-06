@@ -392,13 +392,13 @@ describe('Contract', function () {
 
   it('call contract/deploy with `waitMined: false`', async () => {
     const deployed = await bytecode.deploy([], { waitMined: false })
-    await contract.poll(deployed.transaction)
+    await contract.poll(deployed.transaction, { interval: 50, attempts: 1200 })
     Boolean(deployed.result === undefined).should.be.equal(true)
     Boolean(deployed.txData === undefined).should.be.equal(true)
     const result = await deployed.call('main', ['42'], { waitMined: false, verify: false })
     Boolean(result.result === undefined).should.be.equal(true)
     Boolean(result.txData === undefined).should.be.equal(true)
-    await contract.poll(result.hash)
+    await contract.poll(result.hash, { interval: 50, attempts: 1200 })
   })
 
   it('calls deployed contracts static', async () => {
@@ -645,13 +645,13 @@ describe('Contract', function () {
     })
     it('Deploy/Call contract with { waitMined: false }', async () => {
       const deployed = await contractObject.methods.init('123', 1, 'hahahaha', { waitMined: false })
-      await contract.poll(deployed.transaction)
+      await contract.poll(deployed.transaction, { interval: 50, attempts: 1200 })
       Boolean(deployed.result === undefined).should.be.equal(true)
       Boolean(deployed.txData === undefined).should.be.equal(true)
       const result = await contractObject.methods.intFn.send(2, { waitMined: false })
       Boolean(result.result === undefined).should.be.equal(true)
       Boolean(result.txData === undefined).should.be.equal(true)
-      await contract.poll(result.hash)
+      await contract.poll(result.hash, { interval: 50, attempts: 1200 })
     })
     it('Generate ACI object with corresponding bytecode', async () => {
       await contract.getContractInstance(testContract, { contractAddress: contractObject.deployInfo.address, filesystem, opt: { ttl: 0 } })
