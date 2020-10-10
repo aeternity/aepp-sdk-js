@@ -1,0 +1,25 @@
+site_name: Aeternity JavaScript SDK
+extra_css: [extra.css]
+theme:
+    name: readthedocs
+    highlightjs: true
+    hljs_languages:
+        - yaml
+        - rust
+        - erlang
+        
+markdown_extensions:
+    - attr_list
+    - admonition
+    #- pymdownx.details
+    #- pymdownx.superfences
+
+nav:
+    - Overview : 'index.md'
+    - Quick Start : './guides/quick-start.md'
+    - Contracts : 'contracts.md'
+    - 'Standard Library Functions' : 'sophia_stdlib.md' 
+    - Examples : 'examples.md'
+
+repo_name: 'nikita-fuchs/sophiadocs'
+repo_url: 'https://github.com/nikita-fuchs/sophiadocs'
