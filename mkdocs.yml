@@ -19,6 +19,7 @@ markdown_extensions:
 
 nav:
     - Overview : 'index.md'
+    - Bugtest : 'bugtest.md'
     - Quick Start : './guides/quick-start.md'
     - Contracts : 'contracts.md'
     - 'Standard Library Functions' : 'sophia_stdlib.md' 
