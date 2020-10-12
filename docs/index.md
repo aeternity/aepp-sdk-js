@@ -14,7 +14,7 @@ JavaScript SDK for the revolutionary [æternity] blockchain, targeting the
   - [Table of content](#Table-of-content)
   - [Quick Start](./guides/quick-start.md)
     - [1. Install SDK](#1-Install-SDK)
-      - [A) Simple Usage: with ` <script>` tag](#A-Simple-Usage-with-script-tag)
+      - [A) Simple Usage: with ` <scrıpt>` tag](#A-Simple-Usage-with-script-tag)
       - [B) Advanced Usage: with `npm` or similar](#B-Advanced-Usage-with-npm-or-similar)
     - [2. Create an Account](#2-Create-an-Account)
       - [A) Using the Command Line](#A-Using-the-Command-Line)
@@ -29,9 +29,9 @@ JavaScript SDK for the revolutionary [æternity] blockchain, targeting the
   - [License](#License)
 
 
-## More: Guides & Examples
+## Guides & Examples
 
-Check out our [Guides](docs/README.md) and [Examples](examples/README.md).
+Check out our [Guides](./guides.md) and [Examples](examples/README.md).
 
 ## CLI - Command Line Client
 
