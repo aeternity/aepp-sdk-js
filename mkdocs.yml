@@ -19,11 +19,19 @@ markdown_extensions:
 
 nav:
     - Overview : 'index.md'
-    - Bugtest : 'bugtest.md'
     - Quick Start : './guides/quick-start.md'
-    - Contracts : 'contracts.md'
-    - 'Standard Library Functions' : 'sophia_stdlib.md' 
-    - Examples : 'examples.md'
+    - Guides : 
+        - Overview : './guides.md'
+        - 'In Depth' : 
+            - 'AENS usage' : './guides/aens-usage.md'
+            - 'AENS usage' : './guides/aens-usage.md'
+    - Examples :
+        - NodeJS:
+            Contract: './examples/node/aecontract.md'
+            Crypto: './examples/node/aecrypto.md'
+            Wallet: './examples/node/aewallet.md'
+    - Bugtest : 'bugtest.md'
+
 
 repo_name: 'aeternity/aepp-sdk-js'
 repo_url: 'https://github.com/aeternity/aepp-sdk-js'

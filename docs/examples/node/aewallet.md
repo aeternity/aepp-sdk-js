@@ -1,31 +1,17 @@
+# Generating Wallets and spending AE
+
+These examples show how to use the `Crypto` and `Wallet` module from the SDK to generate Aeternity wallets and send AE to
+other addresses.
 
 
+## Generating Key Pairs
 
-
-
-
-  
+This script shows how to use the SDK to generate and decrypt æternity
+compliant key pairs,
 
 ```js
 #!/usr/bin/env node
 
-```
-
-
-
-
-
-
-
-# Simple AE Token Spending Script
-
-This script shows how to use the `Wallet` module from the SDK to send AE to
-other addresses.
-
-
-  
-
-```js
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
@@ -45,19 +31,32 @@ other addresses.
 
 'use strict'
 
+const { Crypto, TxBuilder } = require('@aeternity/aepp-sdk')
+const program = require('commander')
+const fs = require('fs')
+const prompt = require('prompt')
+const path = require('path')
+
+function generateKeyPair (name, { output }) {
+  const { publicKey, secretKey } = Crypto.generateKeyPair()
+
+  const data = [
+    [path.join(output, name), secretKey],
+    [path.join(output, `${name}.pub`), publicKey]
+  ]
+
+  data.forEach(([path, data]) => {
+    fs.writeFileSync(path, data)
+    console.log(`Wrote ${path}`)
+  })
+}
+
 
 ```
 
-
-
-
-
-
+## Transfering AE
 
 We'll need the main client module `Ae` in the `Universal` flavor from the SDK.
-
-
-  
 
 ```js
 const { Universal: Ae, Node } = require('@aeternity/aepp-sdk')
