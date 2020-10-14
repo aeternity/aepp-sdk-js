@@ -9,25 +9,6 @@ JavaScript SDK for the revolutionary [æternity] blockchain, targeting the
 
 [develop branch]: https://github.com/aeternity/aepp-sdk-js/tree/develop
 
-## Table of content
-
-  - [Table of content](#Table-of-content)
-  - [Quick Start](./guides/quick-start.md)
-    - [1. Install SDK](#1-Install-SDK)
-      - [A) Simple Usage: with ` <scrıpt>` tag](#A-Simple-Usage-with-script-tag)
-      - [B) Advanced Usage: with `npm` or similar](#B-Advanced-Usage-with-npm-or-similar)
-    - [2. Create an Account](#2-Create-an-Account)
-      - [A) Using the Command Line](#A-Using-the-Command-Line)
-      - [B) Using the SDK](#B-Using-the-SDK)
-    - [3. Give yourself some _AE_ tokens](#3-Give-yourself-some-AE-tokens)
-    - [4. Import (a chosen Flavor)](#4-Import-a-chosen-Flavor)
-    - [5. Play with Aetenity's blockchain features](#5-Play-with-Aetenitys-blockchain-features)
-  - [More: Guides & Examples](#More-Guides--Examples)
-  - [CLI - Command Line Client](#CLI---Command-Line-Client)
-  - [Contributing](#Contributing)
-  - [Change Log](#Change-Log)
-  - [License](#License)
-
 
 ## Guides & Examples
 
@@ -46,11 +27,11 @@ _eg._ Create an Account:
 
 ## Contributing
 
-For advanced use, to get a deeper understanding of the SDK or to contribute to its development, it is advised to read the [Contributing Guidelines](docs/contrib/README.md) section.
+For advanced use, to get a deeper understanding of the SDK or to contribute to its development, it is advised to read the [Contributing Guidelines](./contrib/README.md) section.
 
 ## Change Log
 
-We keep our [Changelog](CHANGELOG.md) up to date.
+We keep our [Changelog](https://github.com/aeternity/aepp-sdk-js/blob/develop/CHANGELOG.md) up to date.
 
 ## License
 
