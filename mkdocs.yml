@@ -23,14 +23,25 @@ nav:
     - Guides : 
         - Overview : './guides.md'
         - 'In Depth' : 
+            - Events : './guides/contract-events.md'
+            - Oracles : './guides/oracle-usage.md'
             - 'AENS usage' : './guides/aens-usage.md'
-            - 'AENS usage' : './guides/aens-usage.md'
+            - 'Contract ACI' : './guides/contract-aci-usage.md'
+            - 'Contract Events' : './guides/contract-events.md'
+            - 'Delegate Signature to Contract' : './guides/contract-events.md'
+            - 'Wallet Api' : './guides/how-to-build-aepp-using-new-wallet-api.md'
+            - 'Building Wallets' : './guides/how-to-build-an-wallet-app-or-extension.md'
+            - 'Low vs High level API' : './guides/low-vs-high-usage.md'
+            - 'Low vs High level API' : './guides/low-vs-high-usage.md'
     - Examples :
         - NodeJS:
+            Setup : './guides/import-nodejs.md'
             Contract: './examples/node/aecontract.md'
             Crypto: './examples/node/aecrypto.md'
             Wallet: './examples/node/aewallet.md'
-    - Bugtest : 'bugtest.md'
+        - JS :
+           - '<script> tag': './guides/import-script-tag.md'
+           - Vue : './guides/import-vuejs.md'
 
 
 repo_name: 'aeternity/aepp-sdk-js'
