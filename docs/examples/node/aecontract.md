@@ -19,9 +19,13 @@
 
 # Simple Sophia Contract Compiler
 
-This script demonstrates how to deal with the different phases of compiling
-Sophia contracts to bytecode, deploying the bytecode to get a callable
-contract address and ultimately, invoke the deployed contract on the
+This script demonstrates how to 
+
+* deal with the different phases of compiling
+Sophia contracts to bytecode, 
+* deploying the bytecode to get a callable
+contract address and ultimately, 
+* invoke the deployed contract on the
 æternity blockchain.
 
 

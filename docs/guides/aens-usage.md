@@ -5,20 +5,22 @@ This guide describes the basic operations on [AENS name](https://github.com/aete
 ## Main Flow
 
   - Pre-claim name (broadcast `pre-claim` transaction with random `salt`)
-      ```js
-      const sdkInstance = await Universal({ ... }) // Init Universal instance
-    
-      const name = 'sometube.chain'
-      
-      const preclaim = await sdkInstance.aensPreclaim(name, { ttl, fee, nonce })
-      // {
-      //   ...transactionResult,
-      //   salt,
-      //   commitmentId
-      // } 
-      ```
-     >After transaction is included, you have a `300` blocks to broadcast `claim` transaction with
-     the same `salt` and it should be signed with the same private key as `pre-claim`
+
+```js
+const sdkInstance = await Universal({ ... }) // Init Universal instance
+
+const name = 'sometube.chain'
+
+const preclaim = await sdkInstance.aensPreclaim(name, { ttl, fee, nonce })
+// {
+//   ...transactionResult,
+//   salt,
+//   commitmentId
+// } 
+```
+
+After transaction is included, you have `300` blocks to broadcast `claim` transaction with
+the same `salt` and it should be signed with the same private key as `pre-claim`
 
   - Claim name (broadcast `claim` transaction which include the `salt` of `pre-claim`)  
       here, we have two possible scenarios:

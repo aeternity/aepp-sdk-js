@@ -1,0 +1,107 @@
+site_name: Aeternity JavaScript SDK
+extra_css: [extra.css]
+theme:
+    name: readthedocs
+    highlightjs: true
+    hljs_languages:
+        - yaml
+        - rust
+        - erlang
+        - javascript
+        - js
+        
+markdown_extensions:
+    - attr_list
+    - admonition
+    - codehilite
+    #- pymdownx.details
+    #- pymdownx.superfences
+
+nav:
+    - Overview : 'index.md'
+    - Quick Start : './guides/quick-start.md'
+    - Guides : 
+        - Overview : './guides.md'
+        - 'In Depth' : 
+            - Events : './guides/contract-events.md'
+            - Oracles : './guides/oracle-usage.md'
+            - 'AENS usage' : './guides/aens-usage.md'
+            - 'Contract ACI' : './guides/contract-aci-usage.md'
+            - 'Contract Events' : './guides/contract-events.md'
+            - 'Delegate Signature to Contract' : './guides/delegate-signature-to-contract.md'
+            - 'Wallet Api' : './guides/how-to-build-aepp-using-new-wallet-api.md'
+            - 'Building Wallets' : './guides/how-to-build-an-wallet-app-or-extension.md'
+            - 'Low vs High level API' : './guides/low-vs-high-usage.md'
+            - 'Tree Shaking' : './guides/import-tree-shaking.md'
+            - 'Migration' : './guides/migration/migration-7.0.0.md'
+        - 'API Reference' :
+            - account :
+                - Account: './api/account.md'
+                - './api/account/selector.md'
+                - './api/account/memory.md'
+                - Account Handling: './api/accounts.md'
+            - ae :
+                - './api/ae/aens.md'
+                - './api/ae/aepp.md'
+                - './api/ae/contract.md'
+                - './api/ae/oracle.md'
+                - './api/ae/universal.md'
+                - './api/ae/wallet.md'
+            - chain :
+                - './api/chain.md'
+                - './api/chain/node.md'
+            - channel :
+                - Overview: './api/channel/index.md'
+            - contract:
+                - './api/contract/aci.md'
+                - './api/contract/compiler.md'
+                - 'Generalized Accounts' : './api/contract/ga.md'
+            - oracle:
+                - './api/oracle.md'
+                - './api/oracle/node.md'
+            - rpc:
+                - './api/rpc/client.md'
+            - tx:
+                - builder:
+                    - './api/tx/builder.md'
+                    - './api/tx/builder/helpers.md'
+                    - './api/tx/builder/schema.md'
+                
+                - tx : './api/tx.md'
+                - tx stamp : './api/tx/tx.md'
+                - 'tx object' : './api/tx/tx-object.md'
+                - 'tx validator' : './api/tx/validator.md'
+            - 'Aepp Wallet Communication' :
+                - Connection: 
+                    - Setup: './api/utils/aepp-wallet-communication/connection.md'
+                    - 'Content Script Bridge' : ./api/utils/aepp-wallet-communication/content-script-bridge.md
+                    - 'Wallet detector' : './api/utils/aepp-wallet-communication/wallet-detector.md'
+                    - 'Browser Runtime' : './api/utils/aepp-wallet-communication/connection/browser-runtime.md'
+                    - 'Window Message' : './api/utils/aepp-wallet-communication/connection/browser-window-message.md'
+                - RPC:
+                    - 'Aepp RPC': ./api/utils/aepp-wallet-communication/rpc/aepp-rpc.md
+                    - 'RPC client': ./api/utils/aepp-wallet-communication/rpc/rpc-client.md
+                    - 'Wallet RPC': ./api/utils/aepp-wallet-communication/rpc/wallet-rpc.md
+            - utils:
+                - 'AE Utilities' : './api/ae.md'
+                - 'Amount formatter': './api/utils/amount-formatter.md'
+                - Bignumber: './api/utils/bignumber.md'
+                - Bytes : './api/utils/bytes.md'
+                - Crypto : './api/utils/crypto.md'
+                - Keystore : './api/utils/keystore.md'
+                - Contract : './api/contract.md'
+                - Node : './api/node.md'
+                - 'Node Pool': './api/node-pool.md'
+                - Swagger : './api/utils/swagger.md'
+    - Examples :
+        - NodeJS:
+            Setup : './guides/import-nodejs.md'
+            Contract: './examples/node/aecontract.md'
+            Crypto: './examples/node/aecrypto.md'
+            Wallet: './examples/node/aewallet.md'
+        - JS :
+           - 'Script Tag': './guides/import-script-tag.md'
+           - Vue : './guides/import-vuejs.md'
+
+repo_name: 'aeternity/aepp-sdk-js'
+repo_url: 'https://github.com/aeternity/aepp-sdk-js'

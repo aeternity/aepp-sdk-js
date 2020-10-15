@@ -2,9 +2,13 @@
 
 ## Intro
 There are three different ways of incorporating aepp-sdk-js into your project, depending on the particular scenario:
+
 * ES Modules at `es/` (recommended)
+
 * Node.js bundle at `dist/aepp-sdk.js`
+
 * Browser bundle at `dist/aepp-sdk.browser.js`
+
 * Browser bundle for using through \<script\> tag at `dist/aepp-sdk.browser-script.js`
 
 Also, please be aware that using `require` instead of module loader syntax
@@ -30,7 +34,8 @@ In order to cater more specific needs, it is recommended to refer to the
 ### Testing Networks
 When initialising a client, to test, you can use Aeternity's Test Nework URLs:
 
-### Testnet (https://sdk-testnet.aepps.com)
+` Testnet (https://sdk-testnet.aepps.com) `
+
 You can use this URL with any releasee on [npmjs](https://www.npmjs.com/package/@aeternity/aepp-sdk). It offers the last stable version of [Node](https://github.com/aeternity/aeternity), used by all of of Aeternity's Dev Tools.
 
 ## Guides
