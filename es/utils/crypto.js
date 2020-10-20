@@ -444,7 +444,7 @@ export function assertedType (data, type, forceError = false) {
   if (RegExp(`^${type}_.+$`).test(data)) {
     return data.split('_')[1]
   } else {
-    if (!forceError) throw Error(`Data doesn't match expected type ${type}`)
+    if (forceError) throw Error(`Data doesn't match expected type ${type}`)
     return false
   }
 }
