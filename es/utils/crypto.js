@@ -437,16 +437,13 @@ export function decryptPubKey (password, encrypted) {
  * @rtype (data: String, type: String) => String, throws: Error
  * @param {String} data - ae data
  * @param {String} type - Prefix
- * @param forceError
+ * @param {Boolean} omitError - Return false instead of throwing the error if data doesn't match expected type
  * @return {String|Boolean} Payload
  */
-export function assertedType (data, type, forceError = false) {
-  if (RegExp(`^${type}_.+$`).test(data)) {
-    return data.split('_')[1]
-  } else {
-    if (!forceError) throw Error(`Data doesn't match expected type ${type}`)
-    return false
-  }
+export function assertedType (data, type, omitError) {
+  if (RegExp(`^${type}_.+$`).test(data)) return data.split('_')[1]
+  else if (omitError) return false
+  else throw Error(`Data doesn't match expected type ${type}`)
 }
 
 /**
