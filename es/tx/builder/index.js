@@ -409,10 +409,11 @@ export function unpackTx (encodedTx, fromRlpBinary = false, prefix = 'tx') {
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param {String | Buffer} rawTx base64 or rlp encoded transaction
- * @param {{ raw: boolean = false }}  options Options
+ * @param {Object} options
+ * @param {Boolean} options.raw
  * @return {String} Transaction hash
  */
-export function buildTxHash (rawTx, options = { raw: false }) {
+export function buildTxHash (rawTx, options) {
   if (typeof rawTx === 'string' && rawTx.indexOf('tx_') !== -1) return buildHash('th', unpackTx(rawTx).rlpEncoded, options)
   return buildHash('th', rawTx, options)
 }

@@ -30,6 +30,16 @@ jobs:
         - npm run build
         - npm run test:unit
         - npm run report-coverage
+        - npm run docs:docco
+        - npm run docs:api
+      deploy:
+        - provider: pages
+          skip_cleanup: true
+          github_token: $GITHUB_TOKEN
+          keep_history: true
+          local_dir: docs
+          on:
+            branch: develop
     - stage: Integration tests
       name: Channel, accounts
       script:

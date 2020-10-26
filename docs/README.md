@@ -1,4 +1,7 @@
-# Guides
+# JavaScript SDK Documentation
+
+## ⚠️ Disclaimer
+We're doing our best to keep the documentation up to date, but [please let us know if you see some out-of-date file](https://github.com/aeternity/aepp-sdk-js/issues/new). Thanks!
 
 ## Intro
 There are three different ways of incorporating aepp-sdk-js into your project, depending on the particular scenario:
@@ -55,5 +58,7 @@ You can use this URL with any releasee on [npmjs](https://www.npmjs.com/package/
  - [How to build Wallet app/extension](guides/how-to-build-an-wallet-app-or-extension.md)
  - [How to build Aepp](guides/how-to-build-aepp-using-new-wallet-api.md)
 
+## [API Reference](api.md)
+
 ## Examples
-Check out our [Examples](../examples/README.md) for more.
+Check out our [Examples](examples/README.md) for more.

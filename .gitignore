@@ -4,6 +4,8 @@ node_modules
 .tern-project
 .dir-locals.el
 /dist
+/docs/api*
+/docs/examples
 /.envrc
 /yarn-error.log
 .idea
