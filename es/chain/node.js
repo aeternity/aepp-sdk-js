@@ -106,12 +106,12 @@ async function tx (hash, info = true) {
 
 async function height () {
   try {
-    if (this.height_query_promise === undefined) {
-      this.height_query_promise = this.api.getCurrentKeyBlockHeight()
+    if (!this._heightPromise) {
+      this._heightPromise = this.api.getCurrentKeyBlockHeight()
     }
-    return (await this.height_query_promise).height
+    return (await this._heightPromise).height
   } finally {
-    this.height_query_promise = undefined
+    delete this._heightPromise
   }
 }
 
