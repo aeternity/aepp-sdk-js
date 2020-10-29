@@ -5,7 +5,7 @@
 [![Build Status](https://travis-ci.com/aeternity/aepp-sdk-js.svg?branch=develop)](http://travis-ci.com/aeternity/aepp-sdk-js?branch=develop)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 [![npm](https://img.shields.io/npm/v/@aeternity/aepp-sdk.svg)](https://www.npmjs.com/package/@aeternity/aepp-sdk)
-[![npm](https://img.shields.io/npm/l/@aeternity/aepp-sdk.svg)](https://www.npmjs.com/package/@aeternity/aepp-sdk) 
+[![npm](https://img.shields.io/npm/l/@aeternity/aepp-sdk.svg)](https://www.npmjs.com/package/@aeternity/aepp-sdk)
 [![Greenkeeper badge](https://badges.greenkeeper.io/aeternity/aepp-sdk-js.svg)](https://greenkeeper.io/)
 JavaScript SDK for the revolutionary [æternity] blockchain, targeting the
 [æternity node] implementation. Aepp-sdk is [hosted on GitHub].
@@ -114,7 +114,7 @@ import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory' // or other fl
 import Node from '@aeternity/aepp-sdk/es/node' // or other flavor
 import { AE_AMOUNT_FORMATS } from '@aeternity/aepp-sdk/es/utils/amount-formatter'
 
-const NODE_URL = 'https://sdk-testnet.aepps.com'
+const NODE_URL = 'https://testnet.aeternity.io'
 const COMPILER_URL = 'COMPILER_URL' // required for using Contract
 const ACCOUNT = MemoryAccount({ keypair: { secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS' } })
 
@@ -128,7 +128,7 @@ const ACCOUNT = MemoryAccount({ keypair: { secretKey: 'A_PRIV_KEY', publicKey: '
 
   await sdkInstance.height() // get top block height
   console.log('Current Block Height:', height)
-  
+
   await sdkInstance.spend(1, 'ak_asd23dasdasda...', { denomination: AE_AMOUNT_FORMATS.AE }) // spend one AE
 
 })()

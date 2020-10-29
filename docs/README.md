@@ -33,7 +33,7 @@ In order to cater more specific needs, it is recommended to refer to the
 ### Testing Networks
 When initialising a client, to test, you can use Aeternity's Test Nework URLs:
 
-### Testnet (https://sdk-testnet.aepps.com)
+### Testnet (https://testnet.aeternity.io)
 You can use this URL with any releasee on [npmjs](https://www.npmjs.com/package/@aeternity/aepp-sdk). It offers the last stable version of [Node](https://github.com/aeternity/aeternity), used by all of of Aeternity's Dev Tools.
 
 ## Guides

@@ -50,7 +50,7 @@ import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
 
 // interact with aeternity's blockchain
 (async () => {
-  const node = await Node({ url: 'https://sdk-testnet.aepps.com' })
+  const node = await Node({ url: 'https://testnet.aeternity.io' })
   const account = MemoryAccount({ keypair: 'YOUR_KEYPAIR' })
   // Init client
   const client = await Universal({

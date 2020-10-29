@@ -28,7 +28,7 @@ export default {
     }
   },
   async mounted () {
-    const node = await Node({ url: 'https://sdk-testnet.aepps.com' })
+    const node = await Node({ url: 'https://testnet.aeternity.io' })
     const account = MemoryAccount({ keypair: 'YOUR_KEYPAIR' })
 
     // Init client
