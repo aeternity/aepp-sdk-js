@@ -1,4 +1,4 @@
-## [Vue.js]
+# Vue.js
 
 Adding aepp-sdk to a Vue.js project requires nothing special, but it should be
 noted that `client creation` is asynchronous which needs to be taken into account.
