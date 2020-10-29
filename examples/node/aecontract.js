@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 // # Simple Sophia Contract Compiler
 //
-// This script demonstrates how to deal with the different phases of compiling
-// Sophia contracts to bytecode, deploying the bytecode to get a callable
-// contract address and ultimately, invoke the deployed contract on the
-// æternity blockchain.
+// This script demonstrates how to
+//
+// * deal with the different phases of compiling Sophia contracts to bytecode,
+// * deploying the bytecode to get a callable contract address and ultimately,
+// * invoke the deployed contract on the æternity blockchain.
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
