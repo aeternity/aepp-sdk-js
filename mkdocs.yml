@@ -1,0 +1,7 @@
+site_name: Aeternity JavaScript SDK
+plugins:
+  - search
+  - mkdocs-simple-hooks:
+      hooks:
+        on_pre_build: "docs.hooks:pre_build"
+repo_url: 'https://github.com/aeternity/aepp-sdk-js'
