@@ -1,15 +1,10 @@
-<% for (var i = 0, l = sections.length; i<l; i++) { %>
-
-<% var section = sections[i]; %>
-
+<%
+   const codeTextToSkip = ['ISC License', 'usr/bin/env node']
+   sections.forEach(section => {
+%>
 <%= section.docsText %>
-
-<% if (!(/^\s*$/).test(section.codeText)) { %>  
-
+<% if (section.codeText.trim() && !codeTextToSkip.some(a => section.codeText.includes(a))) { %>
 ```js
-<%= section.codeText %>
+<%= section.codeText.trimEnd() %>
 ```
-
-<% } %>
-
-<% } %>
+<% }}) %>
