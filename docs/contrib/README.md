@@ -107,8 +107,8 @@ import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory.js'
 
 // make a "mixed flavor" containing Wallet and Contracts flavors
 Wallet.compose(Contract)({
-            url: 'https://sdk-testnet.aepps.com',
-            internalUrl: 'https://sdk-testnet.aepps.com',
+            url: 'https://testnet.aeternity.io',
+            internalUrl: 'https://testnet.aeternity.io',
             accounts: [MemoryAccount({keypair: {secretKey: account.priv, publicKey: account.pub}})],
             address: account.pub,
             onTx: true, // or a function to Guard the Rpc client

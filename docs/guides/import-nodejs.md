@@ -6,7 +6,7 @@ code, such as the ones provided in the [`examples/node` directory](../examples/n
 ```js
 const { Universal: Ae, MemoryAccount, Node } = require('@aeternity/aepp-sdk')
 
-const node1 = Node({ url: 'https://sdk-testnet.aepps.com', internalUrl: 'https://sdk-testnet.aepps.com' })
+const node1 = Node({ url: 'https://testnet.aeternity.io', internalUrl: 'https://testnet.aeternity.io' })
 // const node2 = ...
 
 const acc1 = MemoryAccount({ keypair: 'YOUR_KEYPAIR_OBJECT' })
@@ -14,7 +14,7 @@ const acc1 = MemoryAccount({ keypair: 'YOUR_KEYPAIR_OBJECT' })
 Promise.all([
   node1
 ]).then(nodes => {
-    Ae({ 
+    Ae({
       nodes: [
         { name: 'someNode', instance: nodes[0] },
       ],
@@ -32,11 +32,11 @@ Promise.all([
 
 // same with async
 const main = async () => {
-  const node1 = await Node({ url: 'https://sdk-testnet.aepps.com', internalUrl: 'https://sdk-testnet.aepps.com' })
+  const node1 = await Node({ url: 'https://testnet.aeternity.io', internalUrl: 'https://testnet.aeternity.io' })
   // const node2 = ...
 
   const acc1 = MemoryAccount({ keypair: 'YOUR_KEYPAIR_OBJECT' })
-  // const acc2 = ...  
+  // const acc2 = ...
 
   const client = await Ae({
       nodes: [

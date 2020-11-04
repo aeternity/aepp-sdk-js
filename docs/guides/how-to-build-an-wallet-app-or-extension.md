@@ -57,7 +57,7 @@ const readyStateCheckInterval = setInterval(function () {
 
 ```
 - Then we need to initialize `Waellet` stamp in our extension and subscribe for new `runtime` connection's
-After connection will be established we can start to send `announcePresence` message to the `page` to let `Aepp` know about `Waellet` 
+After connection will be established we can start to send `announcePresence` message to the `page` to let `Aepp` know about `Waellet`
 ```js
 // background.js
 
@@ -84,8 +84,8 @@ const accounts = [
   // account,
   account2
 ]
-const NODE_URL = 'https://sdk-testnet.aepps.com'
-const NODE_INTERNAL_URL = 'https://sdk-testnet.aepps.com'
+const NODE_URL = 'https://testnet.aeternity.io'
+const NODE_INTERNAL_URL = 'https://testnet.aeternity.io'
 const COMPILER_URL = 'https://compiler.aepps.com'
 
 // Init extension stamp from sdk
@@ -121,8 +121,8 @@ RpcWallet({
       //     connected: {  // Connected accounts
       //       'ak_1asdasd...': {},
       //       'ak_1asdasdf23...': {}
-      //     }         
-      //   }     
+      //     }
+      //   }
       // })
       action.accept()
     } else {
@@ -135,11 +135,11 @@ RpcWallet({
       // Here we can provide account for signing if it's not stored inside the SDK instance
       // To do that you need to create MemoryAccount instance and provide it as second argument of accept function
       // if (isInStorage(params.onAccount)) {
-        // First argument is encode transaction which will be using instead of one from AEPP (if provided) 
+        // First argument is encode transaction which will be using instead of one from AEPP (if provided)
         // Then this signing request will be signed using the provide MemoryAccount
         // If you do not provide account manually SDK will try to find it inside the instance, else throw error
         // action(null, { onAccount: MemoryAccount({ keypair }) })
-      // }   
+      // }
       accept()
     } else {
       deny()
@@ -205,8 +205,8 @@ RpcWallet({
             //     connected: {  // Connected accounts
             //       'ak_1asdasd...': {},
             //       'ak_1asdasdf23...': {}
-            //     }         
-            //   }     
+            //     }
+            //   }
             // })
             accept()
           } else { deny() }
@@ -217,11 +217,11 @@ RpcWallet({
             // Here we can provide account for signing if it's not stored inside the SDK instance
             // To do that you need to create MemoryAccount instance and provide it as second argument of accept function
             // if (isInStorage(params.onAccount)) {
-              // First argument is encode transaction which will be using instead of one from AEPP (if provided) 
+              // First argument is encode transaction which will be using instead of one from AEPP (if provided)
               // Then this signing request will be signed using the provide MemoryAccount
               // If you do not provide account manually SDK will try to find it inside the instance, else throw error
               // action(null, { onAccount: MemoryAccount({ keypair }) })
-            // }   
+            // }
             accept()
           } else {
             deny()

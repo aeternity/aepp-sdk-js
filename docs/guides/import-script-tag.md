@@ -27,7 +27,7 @@ The bundle will assign the SDK to a global `var` called `Ae`, and you can use it
   <!-- include latest SDK version -->
   <script src="https://unpkg.com/@aeternity/aepp-sdk/dist/aepp-sdk.browser-script.js"></script>
   <script type="text/javascript">
-    Ae.Node({ url: 'https://sdk-testnet.aepps.com' }).then(node => {
+    Ae.Node({ url: 'https://testnet.aeternity.io' }).then(node => {
         Ae.Universal({
               nodes: [{ name: 'local', instance: node }]
             }).then(aeInstance => {
