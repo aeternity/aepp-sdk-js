@@ -504,7 +504,7 @@ async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, ga
  * @param {String} options.url - Node url
  * @param {String} options.internalUrl - Node internal url
  * @return {Object} Transaction instance
- * @example Transaction({url: 'https://sdk-testnet.aepps.com/'})
+ * @example Transaction({url: 'https://testnet.aeternity.io/'})
  */
 const Transaction = ChainNode.compose(Tx, {
   init ({ nativeMode = true, showWarning = false }) {

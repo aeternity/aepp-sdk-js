@@ -112,7 +112,7 @@ function axiosError (handler) {
  * @param {String} options.internalUrl - Base URL for internal requests
  * @param {String} options.axiosConfig - Object with axios configuration. Example { config: {}, errorHandler: (err) => throw err }
  * @return {Object} Node client
- * @example Node({url: 'https://sdk-testnet.aepps.com'})
+ * @example Node({url: 'https://testnet.aeternity.io'})
  */
 const Node = stampit(AsyncInit, {
   async init ({ url = this.url, internalUrl = this.internalUrl, axiosConfig: { config, errorHandler } = {} }) {

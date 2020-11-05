@@ -217,7 +217,7 @@ function customVerification (txType, data) {
  * @param {Object} [options.url] - Node url
  * @param {Object} [options.internalUrl] - Node internal url
  * @return {Object} Transaction Validator instance
- * @example TransactionValidator({url: 'https://sdk-testnet.aepps.com'})
+ * @example TransactionValidator({url: 'https://testnet.aeternity.io'})
  */
 const TransactionValidator = NodePool.compose({
   methods: {

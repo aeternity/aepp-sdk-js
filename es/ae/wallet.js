@@ -126,7 +126,7 @@ async function rpcAddress ({ params, session }) {
  * @param {Function} [options.onContract] - Contract method protector function
  * @return {Object} Wallet instance
  * @example Wallet({
-  url: 'https://sdk-testnet.aepps.com/',
+  url: 'https://testnet.aeternity.io/',
   accounts: [MemoryAccount({keypair})],
   address: keypair.publicKey,
   onTx: confirm,
