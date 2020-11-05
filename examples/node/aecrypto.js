@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// # æternity Crypto Helper Script
+// # Crypto Helper Script
 //
 // This script shows how to use the SDK to generate and decrypt æternity
 // compliant key pairs, as well as encode and decode transactions.

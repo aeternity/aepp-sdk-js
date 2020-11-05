@@ -1,6 +1,6 @@
-## Basic structure of a Browser æpp
+# Low vs High level API
 
-### Interactions
+## Interactions
 
 > "There are two approaches, purist and high-level."
 *Alexander Kahl.*
@@ -17,34 +17,34 @@ understand the node's operations. Most real-world requirements involves a series
 of chain operations, so the SDK provides abstractions for these. The Javscript
 Promises framework makes this somewhat easy:
 
-### (**Recommended**) High-level SDK usage
+## (**Recommended**) High-level SDK usage
 Example spend function, using aeternity's SDK abstraction
 ```js
   // Import necessary Modules by simply importing the Wallet module
   import Universal from '@aeternity/aepp-sdk/es/ae/wallet' // import from SDK es-modules
   import Node from '@aeternity/aepp-sdk/es/node' // import from SDK es-modules
-  
+
   async function init () {
     const node = await Node({ url, internalUrl })
-    
+
     const sdkInstance = await Universal({
-        nodes: [{ name: 'test-net-node', instance: node }],    
+        nodes: [{ name: 'test-net-node', instance: node }],
         compilerUrl: 'COMPILER_URL_HERE',
         accounts: [MemoryAccount({keypair: {secretKey: 'PRIV_KEY_HERE', publicKey: 'PUB_KEY_HERE'}})],
         address: 'SELECTED_ACCOUNT_PUB_KEY_HERE',
       })
-   // Spend transaction info 
+   // Spend transaction info
    console.log(await sdkInstance.spend(parseInt(amount), 'RECEIVER_PUB_KEY'))
   }
- 
+
 ```
 
-### Low-level SDK usage (use [API](https://github.com/aeternity/protocol/tree/master/node/api) endpoints directly)
+## Low-level SDK usage (use [API](https://github.com/aeternity/protocol/tree/master/node/api) endpoints directly)
 Example spend function, using the SDK, talking directly to the [**API**](https://github.com/aeternity/protocol/tree/master/node/api):
 ```js
   // Import necessary Modules
   import Universal from '@aeternity/aepp-sdk/es/ae/universal'
-  import Node from '@aeternity/aepp-sdk/es/node' 
+  import Node from '@aeternity/aepp-sdk/es/node'
   import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
 
   async function spend (amount, receiver_pub_key) {

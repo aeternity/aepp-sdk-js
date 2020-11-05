@@ -1,4 +1,4 @@
-## ES Modules (enable Tree-Shaking)
+# Tree Shaking
 
 It is generally advised to use ESM (EcmaScript Modules), whenever possible. At
 this point however, this requires a modern _bundler_ which understands ES2015

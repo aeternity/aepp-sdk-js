@@ -30,8 +30,9 @@ jobs:
         - npm run build
         - npm run test:unit
         - npm run report-coverage
-        - npm run docs:docco
-        - npm run docs:api
+        - pyenv global 3.8
+        - pip3 install -r docs/requirements.txt
+        - mkdocs build
       deploy:
         - provider: pages
           skip_cleanup: true
