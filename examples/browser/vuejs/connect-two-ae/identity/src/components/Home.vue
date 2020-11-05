@@ -97,9 +97,8 @@
         balance: null,
         nodeInfoResponse: null,
         height: null,
-        url: 'https://sdk-testnet.aepps.com',
+        url: 'https://testnet.aeternity.io',
         mainNetUrl: 'https://mainnet.aeternity.io',
-        internalUrl: 'https://testnet.aeternity.io',
         compilerUrl: 'https://compiler.aepps.com',
         aeppUrl: '//0.0.0.0:9001'
       }

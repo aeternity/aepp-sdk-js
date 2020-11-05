@@ -227,7 +227,7 @@ async function resolveName (nameOrId, prefix, { verify = false, resolveByNode = 
  * @rtype Stamp
  * @param {Object} [options={}] - Initializer object
  * @return {Object} ChainNode instance
- * @example ChainNode({url: 'https://sdk-testnet.aepps.com/'})
+ * @example ChainNode({url: 'https://testnet.aeternity.io/'})
  */
 const ChainNode = Chain.compose(Oracle, TransactionValidator, NodePool, {
   init ({ verifyTx = true }) {

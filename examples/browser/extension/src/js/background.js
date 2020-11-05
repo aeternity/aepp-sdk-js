@@ -52,8 +52,8 @@ const accounts = [
   account2
 ]
 // Send wallet connection info to Aepp throug content script
-const NODE_URL = 'https://sdk-testnet.aepps.com'
-const NODE_INTERNAL_URL = 'https://sdk-testnet.aepps.com'
+const NODE_URL = 'https://testnet.aeternity.io'
+const NODE_INTERNAL_URL = 'https://testnet.aeternity.io'
 const COMPILER_URL = 'https://compiler.aepps.com'
 
 async function init () {
