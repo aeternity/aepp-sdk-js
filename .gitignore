@@ -6,6 +6,7 @@ node_modules
 /dist
 /docs/api*
 /docs/examples
+__pycache__
 /.envrc
 /yarn-error.log
 .idea
