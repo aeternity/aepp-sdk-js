@@ -6,6 +6,15 @@ plugins:
         on_pre_build: "docs.hooks:pre_build"
 repo_url: 'https://github.com/aeternity/aepp-sdk-js'
 
+theme:
+  name: readthedocs
+  highlightjs: true
+  hljs_languages:
+    - yaml
+    - erlang
+    - javascript
+    - js
+
 nav:
   - Overview: README.md
   - guides/quick-start.md
