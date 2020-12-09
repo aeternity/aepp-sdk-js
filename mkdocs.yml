@@ -8,12 +8,6 @@ repo_url: 'https://github.com/aeternity/aepp-sdk-js'
 
 theme:
   name: readthedocs
-  highlightjs: true
-  hljs_languages:
-    - yaml
-    - erlang
-    - javascript
-    - js
 
 nav:
   - Overview: README.md
