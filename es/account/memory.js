@@ -19,7 +19,11 @@
  * Memory Account module
  * @module @aeternity/aepp-sdk/es/account/memory
  * @export MemoryAccount
- * @example import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
+ * @example //JS
+ * import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
+ * 
+ * //NodeJS
+ * const { Universal: MemoryAccount } = require('@aeternity/aepp-sdk')
  */
 
 import Account from './'
@@ -59,7 +63,7 @@ function validateKeyPair (keyPair) {
 }
 
 /**
- * In-memory `Account` factory
+ * In-memory `Account` factory. The resulting account `stamp` is used in various functions for setting up and configuring the SDK.
  * @function
  * @alias module:@aeternity/aepp-sdk/es/account/memory
  * @rtype Stamp
@@ -68,6 +72,8 @@ function validateKeyPair (keyPair) {
  * @param {String} options.keypair.publicKey - Public key
  * @param {String} options.keypair.secretKey - Private key
  * @return {Account}
+  
+ * @example const account = MemoryAccount({ keypair: { secretKey: 'c3e717...**censored**...33d1d0', publicKey: 'ak_rh5G5EeDNCYyyKUyY9DSrMDjbw325HSvQdLXGgcTmDjaQf1Af', } })
  */
 const MemoryAccount = Account.compose({
   init ({ keypair, gaId }) {
