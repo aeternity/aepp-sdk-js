@@ -61,13 +61,15 @@ function validateKeyPair (keyPair) {
 /**
  * In-memory account stamp
  * @function
- * @alias module:@aeternity/aepp-sdk/es/account/memory
+ * @alias module:@aeternity/aepp-sdk/src/account/memory
  * @rtype Stamp
  * @param {Object} [options={}] - Initializer object
  * @param {Object} options.keypair - Key pair to use
  * @param {String} options.keypair.publicKey - Public key
  * @param {String} options.keypair.secretKey - Private key
  * @return {Account}
+  
+ * @example const account = MemoryAccount({ keypair: { secretKey: 'c3e717...**censored**...33d1d0', publicKey: 'ak_rh5G5EeDNCYyyKUyY9DSrMDjbw325HSvQdLXGgcTmDjaQf1Af', } })
  */
 export default AccountBase.compose({
   init ({ keypair, gaId }) {
