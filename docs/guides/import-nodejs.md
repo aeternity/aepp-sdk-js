@@ -9,7 +9,7 @@ const { Universal: Ae, MemoryAccount, Node } = require('@aeternity/aepp-sdk')
 const node1 = Node({ url: 'https://testnet.aeternity.io', internalUrl: 'https://testnet.aeternity.io' })
 // const node2 = ...
 
-const acc1 = MemoryAccount({ keypair: {publicKey: 'YOUR_PUBLIC_KEY', secretKey: 'YOUR_PRIVATE_KEY'} })
+const acc1 = MemoryAccount({ keypair: { publicKey: 'YOUR_PUBLIC_KEY', secretKey: 'YOUR_PRIVATE_KEY' } })
 // const acc2 = ...
 Promise.all([
   node1
