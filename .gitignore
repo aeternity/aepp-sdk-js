@@ -20,3 +20,4 @@ coverage.*
 /examples/**/package-lock.json
 /examples/**/dist
 .history
+.site
