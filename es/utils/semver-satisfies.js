@@ -6,7 +6,7 @@ export default function (version, geVersion, ltVersion) {
   const toNumber = (components, sliceLength) => components.slice(0, sliceLength).reverse()
     .reduce((acc, n, idx) => acc + n * Math.pow(base, idx), 0)
 
-  const componentsMinAmount = Math.min(versionComponents.length, geComponents.length, ltComponents.length);
+  const componentsMinAmount = Math.min(versionComponents.length, geComponents.length, ltComponents.length)
   const vNumber = toNumber(versionComponents, componentsMinAmount)
   const geNumber = toNumber(geComponents, componentsMinAmount)
   const ltNumber = toNumber(ltComponents, componentsMinAmount)
