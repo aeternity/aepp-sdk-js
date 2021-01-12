@@ -1,5 +1,9 @@
 // takes the generated DOC files and flattens their structure so that there are no more than 2 levels of nesting in the menu.
 
+// State: 
+// seems to be flattening everything beyond level 2 up to level 2 content, n
+// needs some more manual testing / verification though
+
 const { fakeServer } = require('sinon');
 const YAML = require('yamljs');
 const fs = require('fs')
@@ -54,10 +58,15 @@ const assignDepth = (arr, depth = 1, parentFileName = "") => {
         var contentAccumulator = ''
 
         Object.keys(arr).forEach(key => {
-            // if the 'content' key is checked, return that one as JSON basically
-            if (key == "content") {
+            // if the 'content' key is checked, return that one as JSON basically, and add its
+            // content to the accumulator so it's returned later, too
+            
+       /*      if (key == "content") {
+                console.log("checking content")
+                contentAccumulator = contentAccumulator + ' \n \n ' + arr.key
                 return {json: arr.content, content: undefined}
             }
+             */
             
             // if the depth is over 2, pass the previous parentFileName. 
             // If under, pass the key as parentFileName
@@ -79,7 +88,7 @@ const assignDepth = (arr, depth = 1, parentFileName = "") => {
 
         // when done, we add the depth key to it.
         arr.depth = depth
-        return {content: null, json: arr}
+        return {content: arr.content, json: arr}
     }
     
     // here it's only string.
@@ -110,6 +119,6 @@ parsedYaml = YAML.load('mkdocs_original.yml');
 let JSONwithDepth = assignDepth(parsedYaml.nav)
 
 console.log(JSONwithDepth)
-fs.writeFileSync('./testOutput', JSON.stringify(JSONwithDepth, null, 2))
+fs.writeFileSync('./testOutput.txt', JSON.stringify(JSONwithDepth, null, 2))
 //console.log(JSON.stringify(JSONwithDepth, null, 2))
 
