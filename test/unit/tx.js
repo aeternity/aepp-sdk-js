@@ -17,7 +17,8 @@
 
 import '../'
 import { describe, it } from 'mocha'
-import { salt, rlp } from '../../es/utils/crypto'
+import * as rlp from 'rlp'
+import { salt } from '../../es/utils/crypto'
 import { classify, commitmentHash, isNameValid, nameHash, produceNameId } from '../../es/tx/builder/helpers'
 import BigNumber from 'bignumber.js'
 import { toBytes } from '../../es/utils/bytes'

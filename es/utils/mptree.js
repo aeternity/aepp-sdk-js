@@ -15,7 +15,8 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { rlp, hash } from './crypto'
+import { encode } from 'rlp'
+import { hash } from './crypto'
 
 const NODE_TYPES = {
   branch: 1,
@@ -110,7 +111,7 @@ export function get (tree, key, hash) {
 }
 
 function nodeHash (node) {
-  return Buffer.from(hash(rlp.encode(node))).toString('hex')
+  return Buffer.from(hash(encode(node))).toString('hex')
 }
 
 /**

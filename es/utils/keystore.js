@@ -1,7 +1,7 @@
 import nacl from 'tweetnacl'
 import { v4 as uuid } from 'uuid'
 
-import { encodeBase58Check } from './crypto'
+import { getAddressFromPriv } from './crypto'
 import { isBase64, isHex } from './string'
 
 const _sodium = require('libsodium-wrappers-sumo')
@@ -158,12 +158,6 @@ function marshal (name, derivedKey, privateKey, nonce, salt, options = {}) {
       )
     }
   )
-}
-
-export function getAddressFromPriv (secret) {
-  const keys = nacl.sign.keyPair.fromSecretKey(str2buf(secret))
-  const publicBuffer = Buffer.from(keys.publicKey)
-  return `ak_${encodeBase58Check(publicBuffer)}`
 }
 
 /**

@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js'
+import * as rlp from 'rlp'
 import { AE_AMOUNT_FORMATS, formatAmount } from '../../utils/amount-formatter'
-import { assertedType, rlp } from '../../utils/crypto'
+import { assertedType } from '../../utils/crypto'
 
 import {
   DEFAULT_FEE,

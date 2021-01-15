@@ -17,7 +17,7 @@
 
 import '../'
 import { describe, it } from 'mocha'
-import { rlp } from '../../es/utils/crypto'
+import * as rlp from 'rlp'
 import { serialize, deserialize, get, verify } from '../../es/utils/mptree'
 
 describe('Merkle Patricia Tree', function () {

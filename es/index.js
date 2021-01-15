@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2020 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -15,75 +15,34 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import * as Crypto from './utils/crypto'
-import * as Keystore from './utils/keystore'
-import * as Bytes from './utils/bytes'
-import * as TxBuilder from './tx/builder'
-import * as TxBuilderHelper from './tx/builder/helpers'
-import * as SCHEMA from './tx/builder/schema'
-import * as ACIHelpers from './contract/aci/helpers'
-import * as ACITransformation from './contract/aci/transformation'
-import * as AmountFormatter from './utils/amount-formatter'
-import HdWallet from './utils/hd-wallet'
-
-import Ae from './ae'
-import Chain from './chain'
-import ChainNode from './chain/node'
-import Node from './node'
-import NodePool from './node-pool'
-import Tx from './tx'
-import Transaction from './tx/tx'
-import TransactionValidator from './tx/validator'
-import Account from './account'
-import Accounts from './accounts'
-import MemoryAccount from './account/memory'
-import Aens from './ae/aens'
-import Contract from './ae/contract'
-import GeneralizeAccount from './contract/ga'
-import ContractCompilerAPI from './contract/compiler'
-import { Aepp, RpcAepp } from './ae/aepp'
-import { Wallet, RpcWallet } from './ae/wallet'
-import Oracle from './ae/oracle'
-import OracleNodeAPI from './oracle/node'
-import Selector from './account/selector'
-import Channel from './channel'
-import Universal from './ae/universal'
-import ContractACI from './contract/aci'
-
-export {
-  AmountFormatter,
-  Account,
-  Accounts,
-  Ae,
-  Aens,
-  Aepp,
-  Bytes,
-  Contract,
-  ContractCompilerAPI,
-  ContractACI,
-  ACIHelpers,
-  ACITransformation,
-  ChainNode,
-  RpcAepp,
-  RpcWallet,
-  Channel,
-  Crypto,
-  Keystore,
-  Chain,
-  GeneralizeAccount,
-  HdWallet,
-  MemoryAccount,
-  Node,
-  NodePool,
-  Oracle,
-  OracleNodeAPI,
-  Selector,
-  Transaction,
-  TransactionValidator,
-  Tx,
-  TxBuilder,
-  TxBuilderHelper,
-  Universal,
-  Wallet,
-  SCHEMA
-}
+export * from './utils/crypto'
+export * from './utils/keystore'
+export * from './tx/builder'
+export * from './tx/builder/helpers'
+export * from './tx/builder/schema'
+export * from './contract/aci/transformation'
+export * from './utils/amount-formatter'
+export { default as HdWallet } from './utils/hd-wallet'
+export { default as Ae } from './ae'
+export { default as Chain } from './chain'
+export { default as ChainNode } from './chain/node'
+export { default as Node } from './node'
+export { default as NodePool } from './node-pool'
+export { default as Tx } from './tx'
+export { default as Transaction } from './tx/tx'
+export { default as TransactionValidator } from './tx/validator'
+export { default as Account } from './account'
+export { default as Accounts } from './accounts'
+export { default as MemoryAccount } from './account/memory'
+export { default as Aens } from './ae/aens'
+export { default as Contract } from './ae/contract'
+export { default as GeneralizeAccount } from './contract/ga'
+export { default as ContractCompilerAPI } from './contract/compiler'
+export { Aepp, RpcAepp } from './ae/aepp'
+export { Wallet, RpcWallet } from './ae/wallet'
+export { default as Oracle } from './ae/oracle'
+export { default as OracleNodeAPI } from './oracle/node'
+export { default as Selector } from './account/selector'
+export { default as Channel } from './channel'
+export { default as Universal } from './ae/universal'
+export { default as ContractACI } from './contract/aci'
