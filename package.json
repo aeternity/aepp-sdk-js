@@ -48,6 +48,7 @@
     "cross-fetch": "^3.1.4",
     "crypto-browserify": "^3.12.0",
     "ed2curve": "^0.3.0",
+    "fs-extra": "^9.0.1",
     "joi-browser": "^13.4.0",
     "libsodium-wrappers-sumo": "0.7.9",
     "path-browserify": "^1.0.1",
@@ -59,7 +60,9 @@
     "tweetnacl": "^1.0.3",
     "tweetnacl-auth": "^1.0.1",
     "uuid": "^8.3.2",
-    "websocket": "^1.0.34"
+    "websocket": "^1.0.34",
+    "json2yaml": "^1.1.0", 
+    "yamljs": "^0.3.0"
   },
   "repository": {
     "type": "git",

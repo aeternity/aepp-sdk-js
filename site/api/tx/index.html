@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>tx - Aeternity JavaScript SDK</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../../css/theme.css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "tx";
+    var mkdocs_page_input_path = "api/tx.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/rust.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/erlang.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/js.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> Aeternity JavaScript SDK</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/quick-start/">Quick Start</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Guides</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/contract-events/">Contract Events</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/oracle-usage/">Oracle Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/aens-usage/">AENS Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/contract-aci-usage/">Contract Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/delegate-signature-to-contract/">Delegate Signature to Contract</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/how-to-build-aepp-using-new-wallet-api/">Wallet Api</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/how-to-build-an-wallet-app-or-extension/">Building Wallets</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/low-vs-high-usage/">Low vs High level API</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/import-tree-shaking/">Tree Shaking</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">Migration</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../guides/migration/migration-7.0.0/">Migration to SDK 7.0.0</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API Reference</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="#">account</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../account/">Account</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../account/selector/">Selector</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../account/memory/">Memory</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../accounts/">Account Handling</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">ae</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../ae/aens/">Aens</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../ae/aepp/">Aepp</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../ae/contract/">Contract</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../ae/oracle/">Oracle</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../ae/universal/">Universal</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../ae/wallet/">Wallet</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">chain</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../chain/">Chain</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../chain/node/">Node</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../channel/">channel</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">contract</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../contract/aci/">Aci</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../contract/compiler/">Compiler</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../contract/ga/">Generalized Accounts</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">oracle</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../oracle/">Oracle</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../oracle/node/">Node</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../rpc/client/">Deprecated RPC Client</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="#">tx</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="#">builder</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="builder/">Builder</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="builder/helpers/">Helpers</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="builder/schema/">Schema</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="./">tx</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#txoptions-object">Tx([options]) ⇒ Object ⏏</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#txspendtxoptions-string">tx.spendTx(options) ⇒ String</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#txnamepreclaimtxoptions-string">tx.namePreclaimTx(options) ⇒ String</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#txnameclaimtxoptions-string">tx.nameClaimTx(options) ⇒ String</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#txnametransfertxoptions-string">tx.nameTransferTx(options) ⇒ String</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#txnameupdatetxoptions-string">tx.nameUpdateTx(options) ⇒ String</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#txnamerevoketxoptions-string">tx.nameRevokeTx(options) ⇒ String</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#txcontractcreatetxoptions-string">tx.contractCreateTx(options) ⇒ String</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#txcontractcalltxoptions-string">tx.contractCallTx(options) ⇒ String</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#txoracleregistertxoptions-string">tx.oracleRegisterTx(options) ⇒ String</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#txoracleextendtxoptions-string">tx.oracleExtendTx(options) ⇒ String</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#txoraclepostqueryoptions-string">tx.oraclePostQuery(options) ⇒ String</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#txoraclerespondtxoptions-string">tx.oracleRespondTx(options) ⇒ String</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#txgetaccountnonceaddress-number">tx.getAccountNonce(address) ⇒ Number</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="tx/">tx stamp</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="tx-object/">tx object</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="validator/">tx validator</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">Aepp Wallet Communication</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">Connection</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/connection/">Setup</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/content-script-bridge/">Content script bridge</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/wallet-detector/">Wallet detector</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/connection/browser-runtime/">Browser runtime</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/connection/browser-window-message/">Window message</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">RPC</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/rpc/aepp-rpc/">Aepp RPC</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/rpc/rpc-client/">RPC client</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/rpc/wallet-rpc/">Wallet RPC</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">utils</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../ae/">AE Utilities</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../utils/amount-formatter/">Amount formatter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../utils/bignumber/">Bignumber</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../utils/bytes/">Bytes</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../utils/crypto/">Crypto</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../utils/keystore/">Keystore</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../contract/">Contract</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../node/">Node</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../node-pool/">Node pool</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../utils/swagger/">Swagger</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Examples</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="#">NodeJS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../guides/import-nodejs/">Setup</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../examples/node/aecontract/">Simple Sophia Contract Compiler</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../examples/node/aecrypto/">Crypto Helper Script</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../examples/node/aewallet/">Simple AE Token Spending Script</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">JS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../guides/import-script-tag/">Script Tag</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../guides/import-vuejs/">Vue.js</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">Aeternity JavaScript SDK</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>tx &raquo;</li>
+        
+      
+        
+          <li>API Reference &raquo;</li>
+        
+      
+    
+    <li>tx</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/aeternity/aepp-sdk-js/edit/master/docs/api/tx.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p><a id="module_@aeternity/aepp-sdk/es/tx"></a></p>
+<h2 id="aeternityaepp-sdkestx">@aeternity/aepp-sdk/es/tx</h2>
+<p>Tx module</p>
+<p><strong>Example</strong>  </p>
+<pre><code class="js">import Tx from '@aeternity/aepp-sdk/es/tx'
+</code></pre>
+
+<ul>
+<li><a href="#module_@aeternity/aepp-sdk/es/tx">@aeternity/aepp-sdk/es/tx</a><ul>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/tx--Tx">Tx([options])</a> ⇒ <code>Object</code> ⏏<ul>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/tx--Tx+spendTx">.spendTx(options)</a> ⇒ <code>String</code></em></li>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/tx--Tx+namePreclaimTx">.namePreclaimTx(options)</a> ⇒ <code>String</code></em></li>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/tx--Tx+nameClaimTx">.nameClaimTx(options)</a> ⇒ <code>String</code></em></li>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/tx--Tx+nameTransferTx">.nameTransferTx(options)</a> ⇒ <code>String</code></em></li>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/tx--Tx+nameUpdateTx">.nameUpdateTx(options)</a> ⇒ <code>String</code></em></li>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/tx--Tx+nameRevokeTx">.nameRevokeTx(options)</a> ⇒ <code>String</code></em></li>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/tx--Tx+contractCreateTx">.contractCreateTx(options)</a> ⇒ <code>String</code></em></li>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/tx--Tx+contractCallTx">.contractCallTx(options)</a> ⇒ <code>String</code></em></li>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/tx--Tx+oracleRegisterTx">.oracleRegisterTx(options)</a> ⇒ <code>String</code></em></li>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/tx--Tx+oracleExtendTx">.oracleExtendTx(options)</a> ⇒ <code>String</code></em></li>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/tx--Tx+oraclePostQuery">.oraclePostQuery(options)</a> ⇒ <code>String</code></em></li>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/tx--Tx+oracleRespondTx">.oracleRespondTx(options)</a> ⇒ <code>String</code></em></li>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/tx--Tx+getAccountNonce">.getAccountNonce(address)</a> ⇒ <code>Number</code></em></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/tx--Tx"></a></p>
+<h3 id="txoptions-object">Tx([options]) ⇒ <code>Object</code> ⏏</h3>
+<p>Basic Tx Stamp</p>
+<p>Attempting to create instances from the Stamp without overwriting all
+abstract methods using composition will result in an exception.</p>
+<p>Tx is one of the three basic building blocks of an
+<a href="#exp_module_@aeternity/aepp-sdk/es/ae--Ae">Ae</a> client and provides methods to
+create aeternity transactions.</p>
+<p><strong>Kind</strong>: Exported function<br />
+<strong>Returns</strong>: <code>Object</code> - Tx instance<br />
+<strong>rtype</strong>: <code>Stamp</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[options]</td>
+<td><code>Object</code></td>
+<td><code>{}</code></td>
+<td>Initializer object</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>  </p>
+<pre><code class="js">Tx()
+</code></pre>
+
+<p><a id="module_@aeternity/aepp-sdk/es/tx--Tx+spendTx"></a></p>
+<h4 id="txspendtxoptions-string"><em>tx.spendTx(options) ⇒ <code>String</code></em></h4>
+<p>Create a <code>spend_tx</code> transaction</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/tx--Tx"><code>Tx</code></a><br />
+<strong>Returns</strong>: <code>String</code> - <code>spend_tx</code> transaction<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>({sender?: String, recipientId: String, amount: Number, fee?: Number, ttl?: Number, nonce?: Number, payload?: String}) =&gt; tx: Promise[String]</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td><code>Object</code></td>
+<td>The object to extract properties from</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/tx--Tx+namePreclaimTx"></a></p>
+<h4 id="txnamepreclaimtxoptions-string"><em>tx.namePreclaimTx(options) ⇒ <code>String</code></em></h4>
+<p>Create a <code>name_preclaim_tx</code> transaction</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/tx--Tx"><code>Tx</code></a><br />
+<strong>Returns</strong>: <code>String</code> - <code>name_preclaim_tx</code> transaction<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>({account?: String, commitment: String, fee?: Number, ttl?: Number, nonce?: Number}) =&gt; tx: Promise[String]</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td><code>Object</code></td>
+<td>The object to extract properties from</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/tx--Tx+nameClaimTx"></a></p>
+<h4 id="txnameclaimtxoptions-string"><em>tx.nameClaimTx(options) ⇒ <code>String</code></em></h4>
+<p>Create a <code>name_claim_tx</code> transaction</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/tx--Tx"><code>Tx</code></a><br />
+<strong>Returns</strong>: <code>String</code> - <code>name_claim_tx</code> transaction<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>({account?: String, name: String, nameSalt: String, fee?: Number, ttl?: Number, nonce?: Number}) =&gt; tx: Promise[String]</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td><code>Object</code></td>
+<td>The object to extract properties from</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/tx--Tx+nameTransferTx"></a></p>
+<h4 id="txnametransfertxoptions-string"><em>tx.nameTransferTx(options) ⇒ <code>String</code></em></h4>
+<p>Create a <code>name_transfer_tx</code> transaction</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/tx--Tx"><code>Tx</code></a><br />
+<strong>Returns</strong>: <code>String</code> - <code>name_transfer_tx</code> transaction<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>({account?: String, nameId: String, recipientId: String, fee?: Number, ttl?: Number, nonce?: Number}) =&gt; tx: Promise[String]</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td><code>Object</code></td>
+<td>The object to extract properties from</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/tx--Tx+nameUpdateTx"></a></p>
+<h4 id="txnameupdatetxoptions-string"><em>tx.nameUpdateTx(options) ⇒ <code>String</code></em></h4>
+<p>Create a <code>name_update_tx</code> transaction</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/tx--Tx"><code>Tx</code></a><br />
+<strong>Returns</strong>: <code>String</code> - <code>name_update_tx</code> transaction<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>({account?: String, nameId: String, pointers: Object, nameTtl: Number, clientTtl: Number, fee?: Number, ttl?: Number, nonce?: Number}) =&gt; tx: Promise[String]</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td><code>Object</code></td>
+<td>The object to extract properties from</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/tx--Tx+nameRevokeTx"></a></p>
+<h4 id="txnamerevoketxoptions-string"><em>tx.nameRevokeTx(options) ⇒ <code>String</code></em></h4>
+<p>Create a <code>name_revoke_tx</code> transaction</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/tx--Tx"><code>Tx</code></a><br />
+<strong>Returns</strong>: <code>String</code> - <code>name_revoke_tx</code> transaction<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>({account?: String, nameId: String, fee?: Number, ttl?: Number, nonce?: Number}) =&gt; tx: Promise[String]</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td><code>Object</code></td>
+<td>The object to extract properties from</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/tx--Tx+contractCreateTx"></a></p>
+<h4 id="txcontractcreatetxoptions-string"><em>tx.contractCreateTx(options) ⇒ <code>String</code></em></h4>
+<p>Create a <code>contract_create_tx</code> transaction</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/tx--Tx"><code>Tx</code></a><br />
+<strong>Returns</strong>: <code>String</code> - <code>contract_create_tx</code> transaction<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>({owner: String, code: String, callData: String, vmVersion: Number, deposit: Number, amount: Number, gas: Number, gasPrice: Number, fee?: Number, ttl?: Number, nonce?: Number}) =&gt; tx: Promise[String]</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td><code>Object</code></td>
+<td>The object to extract properties from</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/tx--Tx+contractCallTx"></a></p>
+<h4 id="txcontractcalltxoptions-string"><em>tx.contractCallTx(options) ⇒ <code>String</code></em></h4>
+<p>Create a <code>contract_call_tx</code> transaction</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/tx--Tx"><code>Tx</code></a><br />
+<strong>Returns</strong>: <code>String</code> - <code>contract_call_tx</code> transaction<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>({callerId: String, contract: String, callData: String, vmVersion: Number, amount: Number, gas: Number, gasPrice: Number, fee?: Number, ttl?: Number, nonce?: Number}) =&gt; tx: Promise[String]</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td><code>Object</code></td>
+<td>The object to extract properties from</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/tx--Tx+oracleRegisterTx"></a></p>
+<h4 id="txoracleregistertxoptions-string"><em>tx.oracleRegisterTx(options) ⇒ <code>String</code></em></h4>
+<p>Create a <code>oracle_register_tx</code> transaction</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/tx--Tx"><code>Tx</code></a><br />
+<strong>Returns</strong>: <code>String</code> - <code>oracle_register_tx</code> transaction<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>({ accountId: String, queryFormat: String, responseFormat: String, queryFee: String|Number, oracleTtl: Object, vmVersion: Number = ORACLE_VM_VERSION, fee?: Number, ttl?: Number, nonce?: Number }) =&gt; tx: Promise[String]</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td><code>Object</code></td>
+<td>The object to extract properties from</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/tx--Tx+oracleExtendTx"></a></p>
+<h4 id="txoracleextendtxoptions-string"><em>tx.oracleExtendTx(options) ⇒ <code>String</code></em></h4>
+<p>Create a <code>oracle_extend_tx</code> transaction</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/tx--Tx"><code>Tx</code></a><br />
+<strong>Returns</strong>: <code>String</code> - <code>oracle_extend_tx</code> transaction<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>({ oracleId: String, callerId: String, oracleTtl: Object, fee?: Number, ttl: Number, nonce?: Number}) =&gt; tx: Promise[String]</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td><code>Object</code></td>
+<td>The object to extract properties from</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/tx--Tx+oraclePostQuery"></a></p>
+<h4 id="txoraclepostqueryoptions-string"><em>tx.oraclePostQuery(options) ⇒ <code>String</code></em></h4>
+<p>Create a <code>oracle_post_query_tx</code> transaction</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/tx--Tx"><code>Tx</code></a><br />
+<strong>Returns</strong>: <code>String</code> - <code>oracle_post_query_tx</code> transaction<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>({ oracleId: String, responseTtl: Object, query: String, queryTtl: Object, queryFee: String|Number, senderId: String, fee?: Number, ttl: Number, nonce?: Number}) =&gt; tx: Promise[String]</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td><code>Object</code></td>
+<td>The object to extract properties from</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/tx--Tx+oracleRespondTx"></a></p>
+<h4 id="txoraclerespondtxoptions-string"><em>tx.oracleRespondTx(options) ⇒ <code>String</code></em></h4>
+<p>Create a <code>oracle_respond_tx</code> transaction</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/tx--Tx"><code>Tx</code></a><br />
+<strong>Returns</strong>: <code>String</code> - <code>oracle_respond_tx</code> transaction<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>({ oracleId: String, callerId: String, responseTtl: Object, queryId: String, response: String, fee?: Number, ttl?: Number, nonce?: Number}) =&gt; tx: Promise[String]</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td><code>Object</code></td>
+<td>The object to extract properties from</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/tx--Tx+getAccountNonce"></a></p>
+<h4 id="txgetaccountnonceaddress-number"><em>tx.getAccountNonce(address) ⇒ <code>Number</code></em></h4>
+<p>Get Account Nonce</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/tx--Tx"><code>Tx</code></a><br />
+<strong>Returns</strong>: <code>Number</code> - Result<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>(address) =&gt; result: Number</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>address</td>
+<td><code>String</code></td>
+<td>Account public key</td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tx/" class="btn btn-neutral float-right" title="tx stamp">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="builder/schema/" class="btn btn-neutral" title="Schema"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/aeternity/aepp-sdk-js/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="builder/schema/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="tx/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../../../../img/favicon.ico">
+  <title>Helpers - Aeternity JavaScript SDK</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../../../../css/theme.css" />
+  <link rel="stylesheet" href="../../../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Helpers";
+    var mkdocs_page_input_path = "api/tx/builder/helpers.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/rust.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/erlang.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/js.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="../../../.." class="icon icon-home"> Aeternity JavaScript SDK</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../..">Overview</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../../guides/quick-start/">Quick Start</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Guides</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../../guides/contract-events/">Contract Events</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../../guides/oracle-usage/">Oracle Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../../guides/aens-usage/">AENS Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../../guides/contract-aci-usage/">Contract Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../../guides/delegate-signature-to-contract/">Delegate Signature to Contract</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../../guides/how-to-build-aepp-using-new-wallet-api/">Wallet Api</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../../guides/how-to-build-an-wallet-app-or-extension/">Building Wallets</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../../guides/low-vs-high-usage/">Low vs High level API</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../../guides/import-tree-shaking/">Tree Shaking</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">Migration</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../guides/migration/migration-7.0.0/">Migration to SDK 7.0.0</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API Reference</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="#">account</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../account/">Account</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../account/selector/">Selector</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../account/memory/">Memory</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../accounts/">Account Handling</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">ae</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../ae/aens/">Aens</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../ae/aepp/">Aepp</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../ae/contract/">Contract</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../ae/oracle/">Oracle</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../ae/universal/">Universal</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../ae/wallet/">Wallet</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">chain</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../chain/">Chain</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../chain/node/">Node</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../channel/">channel</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">contract</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../contract/aci/">Aci</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../contract/compiler/">Compiler</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../contract/ga/">Generalized Accounts</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">oracle</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../oracle/">Oracle</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../oracle/node/">Node</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../rpc/client/">Deprecated RPC Client</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="#">tx</a>
+    <ul class="current">
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">builder</a>
+    <ul class="current">
+                <li class="toctree-l3"><a class="reference internal" href="../">Builder</a>
+                </li>
+                <li class="toctree-l3 current"><a class="reference internal current" href="./">Helpers</a>
+    <ul class="current">
+    <li class="toctree-l4"><a class="reference internal" href="#exportsbuildcontractidownerid-nonce-string">exports.buildContractId(ownerId, nonce) ⇒ string ⏏</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#exportsbuildhashprefix-data-options-string">exports.buildHash(prefix, data, options) ⇒ String ⏏</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#exportsformatsaltsalt-string">exports.formatSalt(salt) ⇒ string ⏏</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#exportsproducenameidname-string">exports.produceNameId(name) ⇒ String ⏏</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#exportsdecodedata-type-buffer">exports.decode(data, type) ⇒ Buffer ⏏</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#exportsencodedata-type-string">exports.encode(data, type) ⇒ String ⏏</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#exportswriteidhashid-buffer">exports.writeId(hashId) ⇒ Buffer ⏏</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#exportsreadidbuf-string">exports.readId(buf) ⇒ String ⏏</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#exportswriteintval-buffer">exports.writeInt(val) ⇒ Buffer ⏏</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#exportsreadintbuf-string">exports.readInt(buf) ⇒ String ⏏</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#exportsbuildpointerspointers-array">exports.buildPointers(pointers) ⇒ Array ⏏</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#exportsreadpointerspointers-array">exports.readPointers(pointers) ⇒ Array ⏏</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#exportsisnamevalidname-throwerror">exports.isNameValid(name, [throwError]) ⇒ ⏏</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#exportsvalidatepointerspointers-boolean">exports.validatePointers(pointers) ⇒ Boolean ⏏</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#exportsgetminimumnamefeedomain-string">exports.getMinimumNameFee(domain) ⇒ String ⏏</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#exportscomputebidfeedomain-startfee-increment-string">exports.computeBidFee(domain, startFee, [increment]) ⇒ String ⏏</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#exportscomputeauctionendblockdomain-claimheight-string">exports.computeAuctionEndBlock(domain, claimHeight) ⇒ String ⏏</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#exportsgetcontractbackendfromtx-string">exports.getContractBackendFromTx({) ⇒ String ⏏</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#exportsisauctionnamename-boolean">exports.isAuctionName(name) ⇒ Boolean ⏏</a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../schema/">Schema</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../">tx</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tx/">tx stamp</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tx-object/">tx object</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../validator/">tx validator</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">Aepp Wallet Communication</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">Connection</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../../utils/aepp-wallet-communication/connection/">Setup</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../utils/aepp-wallet-communication/content-script-bridge/">Content script bridge</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../utils/aepp-wallet-communication/wallet-detector/">Wallet detector</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../utils/aepp-wallet-communication/connection/browser-runtime/">Browser runtime</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../utils/aepp-wallet-communication/connection/browser-window-message/">Window message</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">RPC</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../../utils/aepp-wallet-communication/rpc/aepp-rpc/">Aepp RPC</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../utils/aepp-wallet-communication/rpc/rpc-client/">RPC client</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../utils/aepp-wallet-communication/rpc/wallet-rpc/">Wallet RPC</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">utils</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../ae/">AE Utilities</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../utils/amount-formatter/">Amount formatter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../utils/bignumber/">Bignumber</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../utils/bytes/">Bytes</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../utils/crypto/">Crypto</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../utils/keystore/">Keystore</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../contract/">Contract</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../node/">Node</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../node-pool/">Node pool</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../utils/swagger/">Swagger</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Examples</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="#">NodeJS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../guides/import-nodejs/">Setup</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../examples/node/aecontract/">Simple Sophia Contract Compiler</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../examples/node/aecrypto/">Crypto Helper Script</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../examples/node/aewallet/">Simple AE Token Spending Script</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">JS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../guides/import-script-tag/">Script Tag</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../guides/import-vuejs/">Vue.js</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../..">Aeternity JavaScript SDK</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>builder &raquo;</li>
+        
+      
+        
+          <li>tx &raquo;</li>
+        
+      
+        
+          <li>API Reference &raquo;</li>
+        
+      
+    
+    <li>Helpers</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/aeternity/aepp-sdk-js/edit/master/docs/api/tx/builder/helpers.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p><a id="module_@aeternity/aepp-sdk/es/tx/builder/helpers"></a></p>
+<h2 id="aeternityaepp-sdkestxbuilderhelpers">@aeternity/aepp-sdk/es/tx/builder/helpers</h2>
+<p>JavaScript-based Transaction builder helper function's</p>
+<p><strong>Example</strong>  </p>
+<pre><code class="js">import TxBuilderHelper from '@aeternity/aepp-sdk/es/tx/builder/helpers'
+</code></pre>
+
+<ul>
+<li><a href="#module_@aeternity/aepp-sdk/es/tx/builder/helpers">@aeternity/aepp-sdk/es/tx/builder/helpers</a><ul>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.buildContractId">exports.buildContractId(ownerId, nonce)</a> ⇒ <code>string</code> ⏏</li>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.buildHash">exports.buildHash(prefix, data, options)</a> ⇒ <code>String</code> ⏏</li>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.formatSalt">exports.formatSalt(salt)</a> ⇒ <code>string</code> ⏏</li>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.produceNameId">exports.produceNameId(name)</a> ⇒ <code>String</code> ⏏</li>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.decode">exports.decode(data, type)</a> ⇒ <code>Buffer</code> ⏏</li>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.encode">exports.encode(data, type)</a> ⇒ <code>String</code> ⏏</li>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.writeId">exports.writeId(hashId)</a> ⇒ <code>Buffer</code> ⏏</li>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.readId">exports.readId(buf)</a> ⇒ <code>String</code> ⏏</li>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.writeInt">exports.writeInt(val)</a> ⇒ <code>Buffer</code> ⏏</li>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.readInt">exports.readInt(buf)</a> ⇒ <code>String</code> ⏏</li>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.buildPointers">exports.buildPointers(pointers)</a> ⇒ <code>Array</code> ⏏</li>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.readPointers">exports.readPointers(pointers)</a> ⇒ <code>Array</code> ⏏</li>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.isNameValid">exports.isNameValid(name, [throwError])</a> ⇒ ⏏</li>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.validatePointers">exports.validatePointers(pointers)</a> ⇒ <code>Boolean</code> ⏏</li>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.getMinimumNameFee">exports.getMinimumNameFee(domain)</a> ⇒ <code>String</code> ⏏</li>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.computeBidFee">exports.computeBidFee(domain, startFee, [increment])</a> ⇒ <code>String</code> ⏏</li>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.computeAuctionEndBlock">exports.computeAuctionEndBlock(domain, claimHeight)</a> ⇒ <code>String</code> ⏏</li>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.getContractBackendFromTx">exports.getContractBackendFromTx({)</a> ⇒ <code>String</code> ⏏</li>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.isAuctionName">exports.isAuctionName(name)</a> ⇒ <code>Boolean</code> ⏏</li>
+</ul>
+</li>
+</ul>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.buildContractId"></a></p>
+<h3 id="exportsbuildcontractidownerid-nonce-string">exports.buildContractId(ownerId, nonce) ⇒ <code>string</code> ⏏</h3>
+<p>Build a contract public key</p>
+<p><strong>Kind</strong>: Exported function<br />
+<strong>Returns</strong>: <code>string</code> - Contract public key  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ownerId</td>
+<td><code>string</code></td>
+<td>The public key of the owner account</td>
+</tr>
+<tr>
+<td>nonce</td>
+<td><code>number</code></td>
+<td>the nonce of the transaction</td>
+</tr>
+</tbody>
+</table>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.buildHash"></a></p>
+<h3 id="exportsbuildhashprefix-data-options-string">exports.buildHash(prefix, data, options) ⇒ <code>String</code> ⏏</h3>
+<p>Build hash</p>
+<p><strong>Kind</strong>: Exported function<br />
+<strong>Returns</strong>: <code>String</code> - Transaction hash  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>prefix</td>
+<td><code>String</code></td>
+<td>Transaction hash prefix</td>
+</tr>
+<tr>
+<td>data</td>
+<td><code>Buffer</code></td>
+<td>Rlp encoded transaction buffer</td>
+</tr>
+<tr>
+<td>options</td>
+<td><code>Object</code></td>
+<td></td>
+</tr>
+<tr>
+<td>options.raw</td>
+<td><code>Boolean</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.formatSalt"></a></p>
+<h3 id="exportsformatsaltsalt-string">exports.formatSalt(salt) ⇒ <code>string</code> ⏏</h3>
+<p>Format the salt into a 64-byte hex string</p>
+<p><strong>Kind</strong>: Exported function<br />
+<strong>Returns</strong>: <code>string</code> - Zero-padded hex string of salt  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>salt</td>
+<td><code>number</code></td>
+</tr>
+</tbody>
+</table>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.produceNameId"></a></p>
+<h3 id="exportsproducenameidname-string">exports.produceNameId(name) ⇒ <code>String</code> ⏏</h3>
+<p>Encode a domain name</p>
+<p><strong>Kind</strong>: Exported function<br />
+<strong>Returns</strong>: <code>String</code> - <code>nm_</code> prefixed encoded domain name  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>name</td>
+<td><code>String</code></td>
+<td>Name to encode</td>
+</tr>
+</tbody>
+</table>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.decode"></a></p>
+<h3 id="exportsdecodedata-type-buffer">exports.decode(data, type) ⇒ <code>Buffer</code> ⏏</h3>
+<p>Decode data using the default encoding/decoding algorithm</p>
+<p><strong>Kind</strong>: Exported function<br />
+<strong>Returns</strong>: <code>Buffer</code> - Buffer of decoded Base58check or Base64check data  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>data</td>
+<td><code>string</code></td>
+<td>An encoded and prefixed string (ex tx_..., sg_..., ak_....)</td>
+</tr>
+<tr>
+<td>type</td>
+<td><code>string</code></td>
+<td>Prefix of Transaction</td>
+</tr>
+</tbody>
+</table>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.encode"></a></p>
+<h3 id="exportsencodedata-type-string">exports.encode(data, type) ⇒ <code>String</code> ⏏</h3>
+<p>Encode data using the default encoding/decoding algorithm</p>
+<p><strong>Kind</strong>: Exported function<br />
+<strong>Returns</strong>: <code>String</code> - Encoded string Base58check or Base64check data  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>data</td>
+<td><code>Buffer</code> | <code>String</code></td>
+<td>An decoded data</td>
+</tr>
+<tr>
+<td>type</td>
+<td><code>string</code></td>
+<td>Prefix of Transaction</td>
+</tr>
+</tbody>
+</table>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.writeId"></a></p>
+<h3 id="exportswriteidhashid-buffer">exports.writeId(hashId) ⇒ <code>Buffer</code> ⏏</h3>
+<p>Utility function to create and _id type</p>
+<p><strong>Kind</strong>: Exported function<br />
+<strong>Returns</strong>: <code>Buffer</code> - Buffer Buffer with ID tag and decoded HASh  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>hashId</td>
+<td><code>string</code></td>
+<td>Encoded hash</td>
+</tr>
+</tbody>
+</table>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.readId"></a></p>
+<h3 id="exportsreadidbuf-string">exports.readId(buf) ⇒ <code>String</code> ⏏</h3>
+<p>Utility function to read and _id type</p>
+<p><strong>Kind</strong>: Exported function<br />
+<strong>Returns</strong>: <code>String</code> - Encoided hash string with prefix  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>buf</td>
+<td><code>Buffer</code></td>
+<td>Data</td>
+</tr>
+</tbody>
+</table>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.writeInt"></a></p>
+<h3 id="exportswriteintval-buffer">exports.writeInt(val) ⇒ <code>Buffer</code> ⏏</h3>
+<p>Utility function to convert int to bytes</p>
+<p><strong>Kind</strong>: Exported function<br />
+<strong>Returns</strong>: <code>Buffer</code> - Buffer Buffer from number(BigEndian)  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>val</td>
+<td><code>Number</code> | <code>String</code> | <code>BigNumber</code></td>
+<td>Value</td>
+</tr>
+</tbody>
+</table>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.readInt"></a></p>
+<h3 id="exportsreadintbuf-string">exports.readInt(buf) ⇒ <code>String</code> ⏏</h3>
+<p>Utility function to convert bytes to int</p>
+<p><strong>Kind</strong>: Exported function<br />
+<strong>Returns</strong>: <code>String</code> - Buffer Buffer from number(BigEndian)  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>buf</td>
+<td><code>Buffer</code></td>
+<td>Value</td>
+</tr>
+</tbody>
+</table>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.buildPointers"></a></p>
+<h3 id="exportsbuildpointerspointers-array">exports.buildPointers(pointers) ⇒ <code>Array</code> ⏏</h3>
+<p>Helper function to build pointers for name update TX</p>
+<p><strong>Kind</strong>: Exported function<br />
+<strong>Returns</strong>: <code>Array</code> - Serialized pointers array  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pointers</td>
+<td><code>Array</code></td>
+<td>Array of pointers ([ { key: 'account_pubkey', id: 'ak_32klj5j23k23j5423l434l2j3423'} ])</td>
+</tr>
+</tbody>
+</table>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.readPointers"></a></p>
+<h3 id="exportsreadpointerspointers-array">exports.readPointers(pointers) ⇒ <code>Array</code> ⏏</h3>
+<p>Helper function to read pointers from name update TX</p>
+<p><strong>Kind</strong>: Exported function<br />
+<strong>Returns</strong>: <code>Array</code> - Deserialize pointer array  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pointers</td>
+<td><code>Array</code></td>
+<td>Array of pointers ([ { key: 'account_pubkey', id: 'ak_32klj5j23k23j5423l434l2j3423'} ])</td>
+</tr>
+</tbody>
+</table>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.isNameValid"></a></p>
+<h3 id="exportsisnamevalidname-throwerror">exports.isNameValid(name, [throwError]) ⇒ ⏏</h3>
+<p>Is name valid</p>
+<p><strong>Kind</strong>: Exported function<br />
+<strong>Returns</strong>: Boolean<br />
+<strong>Throws</strong>:</p>
+<ul>
+<li>Error</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>name</td>
+<td><code>string</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>[throwError]</td>
+<td><code>boolean</code></td>
+<td><code>true</code></td>
+<td>Throw error on invalid</td>
+</tr>
+</tbody>
+</table>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.validatePointers"></a></p>
+<h3 id="exportsvalidatepointerspointers-boolean">exports.validatePointers(pointers) ⇒ <code>Boolean</code> ⏏</h3>
+<p>Validate name pointers array</p>
+<p><strong>Kind</strong>: Exported function  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pointers</td>
+<td><code>Array.&amp;lt;String&amp;gt;</code></td>
+<td>Pointers array. Allowed values is: account(ak_), oracle(ok_), contract(ct_), channel(ch_)</td>
+</tr>
+</tbody>
+</table>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.getMinimumNameFee"></a></p>
+<h3 id="exportsgetminimumnamefeedomain-string">exports.getMinimumNameFee(domain) ⇒ <code>String</code> ⏏</h3>
+<p>Get the minimum name fee for a domain</p>
+<p><strong>Kind</strong>: Exported function<br />
+<strong>Returns</strong>: <code>String</code> - the minimum fee for the domain auction  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>domain</td>
+<td><code>String</code></td>
+<td>the domain name to get the fee for</td>
+</tr>
+</tbody>
+</table>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.computeBidFee"></a></p>
+<h3 id="exportscomputebidfeedomain-startfee-increment-string">exports.computeBidFee(domain, startFee, [increment]) ⇒ <code>String</code> ⏏</h3>
+<p>Compute bid fee for AENS auction</p>
+<p><strong>Kind</strong>: Exported function<br />
+<strong>Returns</strong>: <code>String</code> - Bid fee  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>domain</td>
+<td><code>String</code></td>
+<td></td>
+<td>the domain name to get the fee for</td>
+</tr>
+<tr>
+<td>startFee</td>
+<td><code>Number</code> | <code>String</code></td>
+<td></td>
+<td>Auction start fee</td>
+</tr>
+<tr>
+<td>[increment]</td>
+<td><code>Number</code></td>
+<td><code>0.5</code></td>
+<td>Bid multiplier(In percentage, must be between 0 and 1)</td>
+</tr>
+</tbody>
+</table>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.computeAuctionEndBlock"></a></p>
+<h3 id="exportscomputeauctionendblockdomain-claimheight-string">exports.computeAuctionEndBlock(domain, claimHeight) ⇒ <code>String</code> ⏏</h3>
+<p>Compute auction end height</p>
+<p><strong>Kind</strong>: Exported function<br />
+<strong>Returns</strong>: <code>String</code> - Auction end height  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>domain</td>
+<td><code>String</code></td>
+<td>the domain name to get the fee for</td>
+</tr>
+<tr>
+<td>claimHeight</td>
+<td><code>Number</code> | <code>String</code></td>
+<td>Auction starting height</td>
+</tr>
+</tbody>
+</table>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.getContractBackendFromTx"></a></p>
+<h3 id="exportsgetcontractbackendfromtx-string">exports.getContractBackendFromTx({) ⇒ <code>String</code> ⏏</h3>
+<p>Get contract backend by abiVersion</p>
+<p><strong>Kind</strong>: Exported function<br />
+<strong>Returns</strong>: <code>String</code> - Backend  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>{</td>
+<td><code>Object</code></td>
+<td>abiVersion } abiVersion Transaction abiVersion</td>
+</tr>
+</tbody>
+</table>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.isAuctionName"></a></p>
+<h3 id="exportsisauctionnamename-boolean">exports.isAuctionName(name) ⇒ <code>Boolean</code> ⏏</h3>
+<p>Is name accept going to auction</p>
+<p><strong>Kind</strong>: Exported function  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>name</td>
+<td><code>String</code></td>
+<td>Transaction abiVersion</td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../schema/" class="btn btn-neutral float-right" title="Schema">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../" class="btn btn-neutral" title="Builder"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/aeternity/aepp-sdk-js/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../schema/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../../../..';</script>
+    <script src="../../../../js/theme.js" defer></script>
+      <script src="../../../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

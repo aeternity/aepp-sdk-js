@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Contract Usage - Aeternity JavaScript SDK</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../../css/theme.css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Contract Usage";
+    var mkdocs_page_input_path = "guides/contract-aci-usage.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/rust.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/erlang.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/js.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> Aeternity JavaScript SDK</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../quick-start/">Quick Start</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Guides</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../contract-events/">Contract Events</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../oracle-usage/">Oracle Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../aens-usage/">AENS Usage</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Contract Usage</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#account-management">Account Management</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#deploying-smart-contract">Deploying Smart Contract</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#call-smart-contract-methods">Call Smart Contract methods</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#simple-call">Simple call</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#how-it-works-inside">How it works inside</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#manual-control">Manual control</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#overriding-default-transaction-params">Overriding default transaction params</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../delegate-signature-to-contract/">Delegate Signature to Contract</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../how-to-build-aepp-using-new-wallet-api/">Wallet Api</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../how-to-build-an-wallet-app-or-extension/">Building Wallets</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../low-vs-high-usage/">Low vs High level API</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../import-tree-shaking/">Tree Shaking</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">Migration</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../migration/migration-7.0.0/">Migration to SDK 7.0.0</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API Reference</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="#">account</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/account/">Account</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/account/selector/">Selector</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/account/memory/">Memory</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/accounts/">Account Handling</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">ae</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/ae/aens/">Aens</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/ae/aepp/">Aepp</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/ae/contract/">Contract</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/ae/oracle/">Oracle</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/ae/universal/">Universal</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/ae/wallet/">Wallet</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">chain</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/chain/">Chain</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/chain/node/">Node</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../api/channel/">channel</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">contract</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/contract/aci/">Aci</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/contract/compiler/">Compiler</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/contract/ga/">Generalized Accounts</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">oracle</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/oracle/">Oracle</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/oracle/node/">Node</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../api/rpc/client/">Deprecated RPC Client</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">tx</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">builder</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/tx/builder/">Builder</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/tx/builder/helpers/">Helpers</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/tx/builder/schema/">Schema</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/tx/">tx</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/tx/tx/">tx stamp</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/tx/tx-object/">tx object</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/tx/validator/">tx validator</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">Aepp Wallet Communication</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">Connection</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/utils/aepp-wallet-communication/connection/">Setup</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/utils/aepp-wallet-communication/content-script-bridge/">Content script bridge</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/utils/aepp-wallet-communication/wallet-detector/">Wallet detector</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/utils/aepp-wallet-communication/connection/browser-runtime/">Browser runtime</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/utils/aepp-wallet-communication/connection/browser-window-message/">Window message</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">RPC</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/utils/aepp-wallet-communication/rpc/aepp-rpc/">Aepp RPC</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/utils/aepp-wallet-communication/rpc/rpc-client/">RPC client</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/utils/aepp-wallet-communication/rpc/wallet-rpc/">Wallet RPC</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">utils</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/ae/">AE Utilities</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/utils/amount-formatter/">Amount formatter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/utils/bignumber/">Bignumber</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/utils/bytes/">Bytes</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/utils/crypto/">Crypto</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/utils/keystore/">Keystore</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/contract/">Contract</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/node/">Node</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/node-pool/">Node pool</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/utils/swagger/">Swagger</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Examples</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="#">NodeJS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../import-nodejs/">Setup</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../examples/node/aecontract/">Simple Sophia Contract Compiler</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../examples/node/aecrypto/">Crypto Helper Script</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../examples/node/aewallet/">Simple AE Token Spending Script</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">JS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../import-script-tag/">Script Tag</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../import-vuejs/">Vue.js</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">Aeternity JavaScript SDK</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Guides &raquo;</li>
+        
+      
+    
+    <li>Contract Usage</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/aeternity/aepp-sdk-js/edit/master/docs/guides/contract-aci-usage.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="contract-usage">Contract Usage</h1>
+<p>To have ability to interact with Aeternity Smart Contracts you need:
+ - Compiler
+ - Node
+ - SDK</p>
+<h2 id="account-management">Account Management</h2>
+<pre><code class="js">const { Universal: Ae, MemoryAccount, Node } = require('@aeternity/aepp-SDK')
+
+// same with async
+const main = async () =&gt; {
+  const node = await Node({ url: NODE_URL, internalUrl: NODE_INTERNAL_URL })
+  const acc = MemoryAccount({ keypair: KEYPAIR })
+
+  const SDKInstance = await Ae({
+      nodes: [
+        { name: 'testNet', instance: node },
+      ],
+      compilerUrl: 'COMPILER_URL',
+      accounts: [acc],
+      address: KEYPAIR.publicKey
+  })
+  const height = await client.height()
+  console.log('Current Block Height', height)
+
+  // Contract ACI. First of all we need to create a contract object
+  // contractAddress is optional
+  const contractObject = await SDKInstance.getContractInstance(CONTRACT_SOURCE, { contractAddress })
+  // Create contract object for contract which have external dependencies
+  const contractObject = await SDKInstance.getContractInstance(CONTRACT_SOURCE, { contractAddress, filesystem })
+  // In this step SDK will call the compiler and get the ACI for provided source code
+  // base on ACI SDK will generate the `js functions` for each of your SC method
+  // which you will find in `contractObject.methods` object
+</code></pre>
+
+<h2 id="deploying-smart-contract">Deploying Smart Contract</h2>
+<p>Now we want to deploy our SC with init function like:
+  <code>stateful function init(n: int) : state =&gt; { count: n }</code>
+  ```js
+const count = 1
+await contractObject.deploy([count])
+// or
+await contractObject.methods.init(count)</p>
+<p>// Now our SC is deployed and we can find a deploy information
+console.log(contractObject.deployInfo) // { owner, transaction, address, createdAt, result, rawTx }
+ ```</p>
+<h2 id="call-smart-contract-methods">Call Smart Contract methods</h2>
+<h3 id="simple-call">Simple call</h3>
+<p>Now we can make call to one of our SC function.
+Let's assume that we have a function like:
+<code>function sum (a: int, b: int) : int = a + b</code></p>
+<pre><code class="js">const callResult = await contractObject.methods.sum(1 , 2)
+// or
+const callResult = await contractObject.call('sum', [1, 2])
+
+// callResult will contain all info related to contract call transaction
+console.log(callResult.decodedRes) // 3
+</code></pre>
+
+<h3 id="how-it-works-inside">How it works inside</h3>
+<p>Let's talk more about auto-generated function of <code>contractObject</code> </p>
+<blockquote>
+<p><code>await contractObject.methods.sum(1 , 2)</code></p>
+<p>Here the SDK will decide:
+ - If the function is <code>stateful</code>(change SC state) -&gt; <code>SDK</code> will prepare and broadcast a <code>contract call</code> transaction
+ - If function is <code>not stateful</code>(state is not changed) -&gt; <code>SDK</code> will prepare contract call transaction and <code>dry-run</code> it</p>
+</blockquote>
+<h3 id="manual-control">Manual control</h3>
+<p>Also you can manually control this behaviour using the <code>send</code> and <code>get</code> methods:</p>
+<pre><code class="js">// Sign and Broadcast transaction to the chain
+const callResult = await contractObject.methods.sum.send(1 , 2)
+
+// Dry-run transaction
+// Make sure that you provide the node `internalUrl` which is used for `dry-run` node API endpoint
+const callResult = await contractObject.methods.sum.get(1 , 2)
+</code></pre>
+
+<h3 id="overriding-default-transaction-params">Overriding default transaction params</h3>
+<p>Make contract call and overwrite transaction props passing it as option: <code>fee, amount, ttl, ...</code>
+ Auto-generate functions (under <code>methods</code>) will have the same arguments length and order as we had in our SC source,
+ the last arguments is always options object
+ if <code>options</code> is not provide SDK will use the default options 
+ which you can find under the <code>contractObject.options</code> 
+ ```js
+const callResult = await contractObject.methods.sum.get(1 , 2, { amount: 1000, fee: 3232, gas: 123})
+// or
+const callResult = await contractObject.call('sum', [1 , 2], { amount: 1000, fee: 3232, gas: 123})</p>
+<pre><code>### Call contract using specific account
+You can use `onAccount` option for that which can  one of:
+ - `keypair` object({ secretKey, publicKey })
+ - `MemoryAccount` instance
+ - account `public key`
+ ```js
+// account must be included in SDK or you can always add it using account management API of SDK
+// await SDKInstance.addAccount(MemoryAccount({ keypair }))
+const options = { onAccount: keypair || MemoryAccount || publicKey } 
+const callResult = await contractObject.methods.sum.get(1 , 2, options)
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../delegate-signature-to-contract/" class="btn btn-neutral float-right" title="Delegate Signature to Contract">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../aens-usage/" class="btn btn-neutral" title="AENS Usage"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/aeternity/aepp-sdk-js/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../aens-usage/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../delegate-signature-to-contract/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

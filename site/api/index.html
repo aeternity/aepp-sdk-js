@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>API Table of Contents - Aeternity JavaScript SDK</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "API Table of Contents";
+    var mkdocs_page_input_path = "api.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/rust.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/erlang.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/js.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Aeternity JavaScript SDK</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../guides/quick-start/">Quick Start</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Guides</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../guides/contract-events/">Contract Events</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../guides/oracle-usage/">Oracle Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../guides/aens-usage/">AENS Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../guides/contract-aci-usage/">Contract Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../guides/delegate-signature-to-contract/">Delegate Signature to Contract</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../guides/how-to-build-aepp-using-new-wallet-api/">Wallet Api</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../guides/how-to-build-an-wallet-app-or-extension/">Building Wallets</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../guides/low-vs-high-usage/">Low vs High level API</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../guides/import-tree-shaking/">Tree Shaking</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">Migration</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../guides/migration/migration-7.0.0/">Migration to SDK 7.0.0</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API Reference</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="#">account</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="account/">Account</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="account/selector/">Selector</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="account/memory/">Memory</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="accounts/">Account Handling</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">ae</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="ae/aens/">Aens</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="ae/aepp/">Aepp</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="ae/contract/">Contract</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="ae/oracle/">Oracle</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="ae/universal/">Universal</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="ae/wallet/">Wallet</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">chain</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="chain/">Chain</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="chain/node/">Node</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="channel/">channel</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">contract</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="contract/aci/">Aci</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="contract/compiler/">Compiler</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="contract/ga/">Generalized Accounts</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">oracle</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="oracle/">Oracle</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="oracle/node/">Node</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="rpc/client/">Deprecated RPC Client</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">tx</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">builder</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="tx/builder/">Builder</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="tx/builder/helpers/">Helpers</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="tx/builder/schema/">Schema</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="tx/">tx</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="tx/tx/">tx stamp</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="tx/tx-object/">tx object</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="tx/validator/">tx validator</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">Aepp Wallet Communication</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">Connection</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="utils/aepp-wallet-communication/connection/">Setup</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="utils/aepp-wallet-communication/content-script-bridge/">Content script bridge</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="utils/aepp-wallet-communication/wallet-detector/">Wallet detector</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="utils/aepp-wallet-communication/connection/browser-runtime/">Browser runtime</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="utils/aepp-wallet-communication/connection/browser-window-message/">Window message</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">RPC</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="utils/aepp-wallet-communication/rpc/aepp-rpc/">Aepp RPC</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="utils/aepp-wallet-communication/rpc/rpc-client/">RPC client</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="utils/aepp-wallet-communication/rpc/wallet-rpc/">Wallet RPC</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">utils</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="ae/">AE Utilities</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="utils/amount-formatter/">Amount formatter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="utils/bignumber/">Bignumber</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="utils/bytes/">Bytes</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="utils/crypto/">Crypto</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="utils/keystore/">Keystore</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="contract/">Contract</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="node/">Node</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="node-pool/">Node pool</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="utils/swagger/">Swagger</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Examples</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="#">NodeJS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../guides/import-nodejs/">Setup</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../examples/node/aecontract/">Simple Sophia Contract Compiler</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../examples/node/aecrypto/">Crypto Helper Script</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../examples/node/aewallet/">Simple AE Token Spending Script</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">JS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../guides/import-script-tag/">Script Tag</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../guides/import-vuejs/">Vue.js</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Aeternity JavaScript SDK</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>API Table of Contents</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/aeternity/aepp-sdk-js/edit/master/docs/api.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="api-table-of-contents">API Table of Contents</h1>
+<ul>
+<li><a href="account/">@aeternity/aepp-sdk/es/account</a></li>
+<li><a href="account/memory/">@aeternity/aepp-sdk/es/account/memory</a></li>
+<li><a href="account/selector/">@aeternity/aepp-sdk/es/account/selector</a></li>
+<li><a href="accounts/">@aeternity/aepp-sdk/es/accounts</a></li>
+<li><a href="ae/aens/">@aeternity/aepp-sdk/es/ae/aens</a></li>
+<li><a href="ae/aepp/">@aeternity/aepp-sdk/es/ae/aepp</a></li>
+<li><a href="ae/contract/">@aeternity/aepp-sdk/es/ae/contract</a></li>
+<li><a href="ae/">@aeternity/aepp-sdk/es/ae</a></li>
+<li><a href="ae/oracle/">@aeternity/aepp-sdk/es/ae/oracle</a></li>
+<li><a href="ae/universal/">@aeternity/aepp-sdk/es/ae/universal</a></li>
+<li><a href="ae/wallet/">@aeternity/aepp-sdk/es/ae/wallet</a></li>
+<li><a href="chain/">@aeternity/aepp-sdk/es/chain</a></li>
+<li><a href="chain/node/">@aeternity/aepp-sdk/es/chain/node</a></li>
+<li><a href="channel/">@aeternity/aepp-sdk/es/channel/index</a></li>
+<li><a href="contract/aci/">@aeternity/aepp-sdk/es/contract/aci</a></li>
+<li><a href="contract/compiler/">@aeternity/aepp-sdk/es/contract/compiler</a></li>
+<li><a href="contract/ga/">@aeternity/aepp-sdk/es/contract/ga</a></li>
+<li><a href="contract/">@aeternity/aepp-sdk/es/contract</a></li>
+<li><a href="node-pool/">@aeternity/aepp-sdk/es/node-pool</a></li>
+<li><a href="node/">@aeternity/aepp-sdk/es/node</a></li>
+<li><a href="oracle/">@aeternity/aepp-sdk/es/oracle</a></li>
+<li><a href="oracle/node/">@aeternity/aepp-sdk/es/oracle/node</a></li>
+<li><a href="rpc/client/">@aeternity/aepp-sdk/es/rpc/client</a></li>
+<li><a href="tx/builder/helpers/">@aeternity/aepp-sdk/es/tx/builder/helpers</a></li>
+<li><a href="tx/builder/">@aeternity/aepp-sdk/es/tx/builder</a></li>
+<li><a href="tx/builder/schema/">@aeternity/aepp-sdk/es/tx/builder/schema</a></li>
+<li><a href="tx/">@aeternity/aepp-sdk/es/tx</a></li>
+<li><a href="tx/tx-object/">@aeternity/aepp-sdk/es/tx/tx-object</a></li>
+<li><a href="tx/tx/">@aeternity/aepp-sdk/es/tx/tx</a></li>
+<li><a href="tx/validator/">@aeternity/aepp-sdk/es/tx/validator</a></li>
+<li><a href="utils/aepp-wallet-communication/connection/browser-runtime/">@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-runtime</a></li>
+<li><a href="utils/aepp-wallet-communication/connection/browser-window-message/">@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message</a></li>
+<li><a href="utils/aepp-wallet-communication/connection/">@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection</a></li>
+<li><a href="utils/aepp-wallet-communication/content-script-bridge/">@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge</a></li>
+<li><a href="utils/aepp-wallet-communication/rpc/aepp-rpc/">@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc</a></li>
+<li><a href="utils/aepp-wallet-communication/rpc/rpc-client/">@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client</a></li>
+<li><a href="utils/aepp-wallet-communication/rpc/wallet-rpc/">@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc</a></li>
+<li><a href="utils/aepp-wallet-communication/wallet-detector/">@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector</a></li>
+<li><a href="utils/amount-formatter/">@aeternity/aepp-sdk/es/utils/amount-formatter</a></li>
+<li><a href="utils/bignumber/">@aeternity/aepp-sdk/es/utils/bignumber</a></li>
+<li><a href="utils/bytes/">@aeternity/aepp-sdk/es/utils/bytes</a></li>
+<li><a href="utils/crypto/">@aeternity/aepp-sdk/es/utils/crypto</a></li>
+<li><a href="utils/keystore/">@aeternity/aepp-sdk/es/utils/keystore</a></li>
+<li><a href="utils/swagger/">@aeternity/aepp-sdk/es/utils/swagger</a></li>
+</ul>
+              
+            </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/aeternity/aepp-sdk-js/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

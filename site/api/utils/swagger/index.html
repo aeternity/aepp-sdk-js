@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../../../img/favicon.ico">
+  <title>Swagger - Aeternity JavaScript SDK</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../../../css/theme.css" />
+  <link rel="stylesheet" href="../../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Swagger";
+    var mkdocs_page_input_path = "api/utils/swagger.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/rust.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/erlang.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/js.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="../../.." class="icon icon-home"> Aeternity JavaScript SDK</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../..">Overview</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/quick-start/">Quick Start</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Guides</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/contract-events/">Contract Events</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/oracle-usage/">Oracle Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/aens-usage/">AENS Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/contract-aci-usage/">Contract Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/delegate-signature-to-contract/">Delegate Signature to Contract</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/how-to-build-aepp-using-new-wallet-api/">Wallet Api</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/how-to-build-an-wallet-app-or-extension/">Building Wallets</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/low-vs-high-usage/">Low vs High level API</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/import-tree-shaking/">Tree Shaking</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">Migration</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../guides/migration/migration-7.0.0/">Migration to SDK 7.0.0</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API Reference</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="#">account</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../account/">Account</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../account/selector/">Selector</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../account/memory/">Memory</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../accounts/">Account Handling</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">ae</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../ae/aens/">Aens</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../ae/aepp/">Aepp</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../ae/contract/">Contract</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../ae/oracle/">Oracle</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../ae/universal/">Universal</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../ae/wallet/">Wallet</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">chain</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../chain/">Chain</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../chain/node/">Node</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../channel/">channel</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">contract</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../contract/aci/">Aci</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../contract/compiler/">Compiler</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../contract/ga/">Generalized Accounts</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">oracle</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../oracle/">Oracle</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../oracle/node/">Node</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../rpc/client/">Deprecated RPC Client</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">tx</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">builder</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../tx/builder/">Builder</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../tx/builder/helpers/">Helpers</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../tx/builder/schema/">Schema</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tx/">tx</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tx/tx/">tx stamp</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tx/tx-object/">tx object</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tx/validator/">tx validator</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">Aepp Wallet Communication</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">Connection</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../aepp-wallet-communication/connection/">Setup</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../aepp-wallet-communication/content-script-bridge/">Content script bridge</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../aepp-wallet-communication/wallet-detector/">Wallet detector</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../aepp-wallet-communication/connection/browser-runtime/">Browser runtime</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../aepp-wallet-communication/connection/browser-window-message/">Window message</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">RPC</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../aepp-wallet-communication/rpc/aepp-rpc/">Aepp RPC</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../aepp-wallet-communication/rpc/rpc-client/">RPC client</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../aepp-wallet-communication/rpc/wallet-rpc/">Wallet RPC</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="#">utils</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../../ae/">AE Utilities</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../amount-formatter/">Amount formatter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../bignumber/">Bignumber</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../bytes/">Bytes</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../crypto/">Crypto</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../keystore/">Keystore</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../contract/">Contract</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../node/">Node</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../node-pool/">Node pool</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="./">Swagger</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#swaggeroptions-object">Swagger(options) ⇒ Object ⏏</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#swaggerexpandpaths-string">Swagger.expandPath(s) ⇒ String</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#swaggerconformvalue-spec-types-object">Swagger.conform(value, spec, types) ⇒ Object</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#swaggertraversekeysfn-o-object">Swagger.traverseKeys(fn, o) ⇒ Object</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#swaggersnakizekeyso-object">Swagger.snakizeKeys(o) ⇒ Object</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#swaggerpascalizekeyso-object">Swagger.pascalizeKeys(o) ⇒ Object</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#swaggerassertonecoll-object">Swagger.assertOne(coll) ⇒ Object</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#swaggeroperationpath-method-definition-types-function">Swagger.operation(path, method, definition, types) ⇒ function</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#swaggerdebugswaggerbool-stamp">Swagger.debugSwagger(bool) ⇒ Stamp</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#swaggerconformtypes">Swagger~conformTypes</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#swaggerlookuptypepath-spec-types-object">Swagger~lookupType(path, spec, types) ⇒ Object</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#swaggerextendingerrorpathkey-fn-any">Swagger~extendingErrorPath(key, fn) ⇒ Any</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#swaggertypeerrormsg-spec-value-error">Swagger~TypeError(msg, spec, value) ⇒ Error</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#swaggerconformdispatchspec-string">Swagger~conformDispatch(spec) ⇒ String</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#swaggerclassifyparametersparameters-arrayltobjectgt">Swagger~classifyParameters(parameters) ⇒ Array.&amp;lt;Object&amp;gt;</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#swaggerpascalizeparametersparameters-arrayltobjectgt">Swagger~pascalizeParameters(parameters) ⇒ Array.&amp;lt;Object&amp;gt;</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#swaggeroperationsignaturename-req-opts-string">Swagger~operationSignature(name, req, opts) ⇒ String</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#swaggerdestructureclienterrorerror-string">Swagger~destructureClientError(error) ⇒ String</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#swaggerresolverefref-swag-object">Swagger~resolveRef(ref, swag) ⇒ Object</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Examples</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="#">NodeJS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../guides/import-nodejs/">Setup</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../examples/node/aecontract/">Simple Sophia Contract Compiler</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../examples/node/aecrypto/">Crypto Helper Script</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../examples/node/aewallet/">Simple AE Token Spending Script</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">JS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../guides/import-script-tag/">Script Tag</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../guides/import-vuejs/">Vue.js</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../..">Aeternity JavaScript SDK</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>utils &raquo;</li>
+        
+      
+        
+          <li>API Reference &raquo;</li>
+        
+      
+    
+    <li>Swagger</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/aeternity/aepp-sdk-js/edit/master/docs/api/utils/swagger.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p><a id="module_@aeternity/aepp-sdk/es/utils/swagger"></a></p>
+<h2 id="aeternityaepp-sdkesutilsswagger">@aeternity/aepp-sdk/es/utils/swagger</h2>
+<p>Swagger module</p>
+<p><strong>Example</strong>  </p>
+<pre><code class="js">import Swagger from '@aeternity/aepp-sdk/es/utils/swagger'
+</code></pre>
+
+<ul>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/swagger">@aeternity/aepp-sdk/es/utils/swagger</a><ul>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger">Swagger(options)</a> ⇒ <code>Object</code> ⏏<ul>
+<li><em>static</em><ul>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger.expandPath">.expandPath(s)</a> ⇒ <code>String</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger.conform">.conform(value, spec, types)</a> ⇒ <code>Object</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger.traverseKeys">.traverseKeys(fn, o)</a> ⇒ <code>Object</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger.snakizeKeys">.snakizeKeys(o)</a> ⇒ <code>Object</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger.pascalizeKeys">.pascalizeKeys(o)</a> ⇒ <code>Object</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger.assertOne">.assertOne(coll)</a> ⇒ <code>Object</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger.operation">.operation(path, method, definition, types)</a> ⇒ <code>function</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger.debugSwagger">.debugSwagger(bool)</a> ⇒ <code>Stamp</code></li>
+</ul>
+</li>
+<li><em>inner</em><ul>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..conformTypes">~conformTypes</a></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..lookupType">~lookupType(path, spec, types)</a> ⇒ <code>Object</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..extendingErrorPath">~extendingErrorPath(key, fn)</a> ⇒ <code>Any</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..TypeError">~TypeError(msg, spec, value)</a> ⇒ <code>Error</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..conformDispatch">~conformDispatch(spec)</a> ⇒ <code>String</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..classifyParameters">~classifyParameters(parameters)</a> ⇒ <code>Array.&amp;lt;Object&amp;gt;</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..pascalizeParameters">~pascalizeParameters(parameters)</a> ⇒ <code>Array.&amp;lt;Object&amp;gt;</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..operationSignature">~operationSignature(name, req, opts)</a> ⇒ <code>String</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..destructureClientError">~destructureClientError(error)</a> ⇒ <code>String</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..resolveRef">~resolveRef(ref, swag)</a> ⇒ <code>Object</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger"></a></p>
+<h3 id="swaggeroptions-object">Swagger(options) ⇒ <code>Object</code> ⏏</h3>
+<p>Swagger Stamp</p>
+<p><strong>Kind</strong>: Exported function<br />
+<strong>Returns</strong>: <code>Object</code> - Account instance<br />
+<strong>rtype</strong>: <code>Stamp</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td><code>Object</code></td>
+<td>Initializer object</td>
+</tr>
+<tr>
+<td>options.swag</td>
+<td><code>Object</code></td>
+<td>Swagger definition</td>
+</tr>
+<tr>
+<td>options.axiosConfig</td>
+<td><code>Object</code></td>
+<td>Object with axios configuration. Example { config: {}, errorHandler: (err) =&gt; throw err }</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>  </p>
+<pre><code class="js">Swagger({swag})
+</code></pre>
+
+<p><a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger.expandPath"></a></p>
+<h4 id="swaggerexpandpaths-string">Swagger.expandPath(s) ⇒ <code>String</code></h4>
+<p>Perform path string interpolation</p>
+<p><strong>Kind</strong>: static method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger"><code>Swagger</code></a><br />
+<strong>Returns</strong>: <code>String</code> - Converted string<br />
+<strong>rtype</strong>: <code>(path: String, replacements: Object) =&gt; String</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>s</td>
+<td><code>String</code></td>
+<td>String to convert</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger.conform"></a></p>
+<h4 id="swaggerconformvalue-spec-types-object">Swagger.conform(value, spec, types) ⇒ <code>Object</code></h4>
+<p>Conform <code>value</code> against its <code>spec</code></p>
+<p><strong>Kind</strong>: static method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger"><code>Swagger</code></a><br />
+<strong>Returns</strong>: <code>Object</code> - Conformed value<br />
+<strong>rtype</strong>: <code>(value: Any, spec: Object, types: Object) =&gt; Any, throws: Error</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>value</td>
+<td><code>Object</code></td>
+<td>Value to conform (validate and transform)</td>
+</tr>
+<tr>
+<td>spec</td>
+<td><code>Object</code></td>
+<td>Specification object</td>
+</tr>
+<tr>
+<td>types</td>
+<td><code>Object</code></td>
+<td>Types specification</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger.traverseKeys"></a></p>
+<h4 id="swaggertraversekeysfn-o-object">Swagger.traverseKeys(fn, o) ⇒ <code>Object</code></h4>
+<p>Key traversal metafunction</p>
+<p><strong>Kind</strong>: static method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger"><code>Swagger</code></a><br />
+<strong>Returns</strong>: <code>Object</code> - Transformed object<br />
+<strong>rtype</strong>: <code>(fn: (s: String) =&gt; String) =&gt; (o: Object) =&gt; Object</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>fn</td>
+<td><code>function</code></td>
+<td>Key transformation function</td>
+</tr>
+<tr>
+<td>o</td>
+<td><code>Object</code></td>
+<td>Object to traverse</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger.snakizeKeys"></a></p>
+<h4 id="swaggersnakizekeyso-object">Swagger.snakizeKeys(o) ⇒ <code>Object</code></h4>
+<p>snake_case key traversal</p>
+<p><strong>Kind</strong>: static method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger"><code>Swagger</code></a><br />
+<strong>Returns</strong>: <code>Object</code> - Transformed object<br />
+<strong>rtype</strong>: <code>(o: Object) =&gt; Object</code>
+<strong>See</strong>: pascalToSnake  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>o</td>
+<td><code>Object</code></td>
+<td>Object to traverse</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger.pascalizeKeys"></a></p>
+<h4 id="swaggerpascalizekeyso-object">Swagger.pascalizeKeys(o) ⇒ <code>Object</code></h4>
+<p>PascalCase key traversal</p>
+<p><strong>Kind</strong>: static method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger"><code>Swagger</code></a><br />
+<strong>Returns</strong>: <code>Object</code> - Transformed object<br />
+<strong>rtype</strong>: <code>(o: Object) =&gt; Object</code>
+<strong>See</strong>: snakeToPascal  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>o</td>
+<td><code>Object</code></td>
+<td>Object to traverse</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger.assertOne"></a></p>
+<h4 id="swaggerassertonecoll-object">Swagger.assertOne(coll) ⇒ <code>Object</code></h4>
+<p>Assert that <code>coll</code> is a sequence with a length of 1 and extract the only element</p>
+<p><strong>Kind</strong>: static method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger"><code>Swagger</code></a><br />
+<strong>rtype</strong>: <code>(coll: [...Any]) =&gt; Any, throws: Error</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>coll</td>
+<td><code>Array.&amp;lt;Object&amp;gt;</code></td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger.operation"></a></p>
+<h4 id="swaggeroperationpath-method-definition-types-function">Swagger.operation(path, method, definition, types) ⇒ <code>function</code></h4>
+<p>Generate callable operation</p>
+<p><strong>Kind</strong>: static method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger"><code>Swagger</code></a><br />
+<strong>rtype</strong>: <code>(path: String, method: String, definition: Object, types: Object) =&gt; (instance: Swagger, url: String) =&gt; Promise[Any], throws: Error</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>path</td>
+<td><code>String</code></td>
+<td>Path to call in URL</td>
+</tr>
+<tr>
+<td>method</td>
+<td><code>String</code></td>
+<td>HTTP method</td>
+</tr>
+<tr>
+<td>definition</td>
+<td><code>Object</code></td>
+<td>Complex definition</td>
+</tr>
+<tr>
+<td>types</td>
+<td><code>Object</code></td>
+<td>Swagger types</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger.debugSwagger"></a></p>
+<h4 id="swaggerdebugswaggerbool-stamp">Swagger.debugSwagger(bool) ⇒ <code>Stamp</code></h4>
+<p>Reconfigure Swagger to (not) spill debugging logs</p>
+<p><strong>Kind</strong>: static method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger"><code>Swagger</code></a><br />
+<strong>Returns</strong>: <code>Stamp</code> - Reconfigured Swagger Stamp<br />
+<strong>rtype</strong>: <code>(bool: Boolean) =&gt; Stamp</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bool</td>
+<td><code>boolean</code></td>
+<td>Whether to debug</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..conformTypes"></a></p>
+<h4 id="swaggerconformtypes">Swagger~conformTypes</h4>
+<p>Per-type <a href="conform">conform</a> dispatcher</p>
+<p><strong>Kind</strong>: inner constant of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger"><code>Swagger</code></a><br />
+<strong>rtype</strong>: <code>[(dispatch(value: String, spec: Object, types: Object) =&gt; Any, throws: Error)...]</code>
+<a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..lookupType"></a></p>
+<h4 id="swaggerlookuptypepath-spec-types-object">Swagger~lookupType(path, spec, types) ⇒ <code>Object</code></h4>
+<p>Lookup type</p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger"><code>Swagger</code></a><br />
+<strong>Returns</strong>: <code>Object</code> - Looked up type definition<br />
+<strong>rtype</strong>: <code>(path: [String...], spec: Object, types: Object) =&gt; Object</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>path</td>
+<td><code>Array.&amp;lt;String&amp;gt;</code></td>
+<td>Path to look up</td>
+</tr>
+<tr>
+<td>spec</td>
+<td><code>Object</code></td>
+<td></td>
+</tr>
+<tr>
+<td>types</td>
+<td><code>Object</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..extendingErrorPath"></a></p>
+<h4 id="swaggerextendingerrorpathkey-fn-any">Swagger~extendingErrorPath(key, fn) ⇒ <code>Any</code></h4>
+<p>Intercept errors thrown by <code>fn()</code>, extending them with information from <code>key</code></p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger"><code>Swagger</code></a><br />
+<strong>Returns</strong>: <code>Any</code> - Execution result<br />
+<strong>rtype</strong>: <code>(key: String, fn: Function) =&gt; Any</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>key</td>
+<td><code>String</code></td>
+<td>Information to attach</td>
+</tr>
+<tr>
+<td>fn</td>
+<td><code>function</code></td>
+<td>Thunk</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..TypeError"></a></p>
+<h4 id="swaggertypeerrormsg-spec-value-error">Swagger~TypeError(msg, spec, value) ⇒ <code>Error</code></h4>
+<p>Construct Error with additional type information (not thrown)</p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger"><code>Swagger</code></a><br />
+<strong>Returns</strong>: <code>Error</code> - Enhanced Error<br />
+<strong>rtype</strong>: <code>(msg: String, spec: String, value: String) =&gt; Error</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>msg</td>
+<td><code>String</code></td>
+<td>Error message</td>
+</tr>
+<tr>
+<td>spec</td>
+<td><code>String</code></td>
+<td></td>
+</tr>
+<tr>
+<td>value</td>
+<td><code>String</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..conformDispatch"></a></p>
+<h4 id="swaggerconformdispatchspec-string">Swagger~conformDispatch(spec) ⇒ <code>String</code></h4>
+<p><a href="conform">conform</a> dispatcher</p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger"><code>Swagger</code></a><br />
+<strong>Returns</strong>: <code>String</code> - Value to dispatch on<br />
+<strong>rtype</strong>: <code>(spec: Object) =&gt; String, throws: Error</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>spec</td>
+<td><code>Object</code></td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..classifyParameters"></a></p>
+<h4 id="swaggerclassifyparametersparameters-arrayltobjectgt">Swagger~classifyParameters(parameters) ⇒ <code>Array.&amp;lt;Object&amp;gt;</code></h4>
+<p>Classify given <code>parameters</code></p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger"><code>Swagger</code></a><br />
+<strong>Returns</strong>: <code>Array.&amp;lt;Object&amp;gt;</code> - Classified parameters<br />
+<strong>rtype</strong>: <code>(parameters: [{required: Boolean, in: String}...]) =&gt; {pathArgs: [...Object], queryArgs: [...Object], bodyArgs: [...Object], req: [...Object], opts: [...Object]}</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>parameters</td>
+<td><code>Array.&amp;lt;Object&amp;gt;</code></td>
+<td>Parameters to classify</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..pascalizeParameters"></a></p>
+<h4 id="swaggerpascalizeparametersparameters-arrayltobjectgt">Swagger~pascalizeParameters(parameters) ⇒ <code>Array.&amp;lt;Object&amp;gt;</code></h4>
+<p>Convert <code>name</code> attributes in <code>parameters</code> from snake_case to PascalCase</p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger"><code>Swagger</code></a><br />
+<strong>Returns</strong>: <code>Array.&amp;lt;Object&amp;gt;</code> - Pascalized parameters<br />
+<strong>rtype</strong>: <code>(parameters: [{name: String}...]) =&gt; [{name: String}...]</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>parameters</td>
+<td><code>Array.&amp;lt;Object&amp;gt;</code></td>
+<td>Parameters to pascalize</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..operationSignature"></a></p>
+<h4 id="swaggeroperationsignaturename-req-opts-string">Swagger~operationSignature(name, req, opts) ⇒ <code>String</code></h4>
+<p>Obtain readable signature for operation</p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger"><code>Swagger</code></a><br />
+<strong>Returns</strong>: <code>String</code> - Signature<br />
+<strong>rtype</strong>: <code>(name: String, req: [...Object], opts: [...Object]) =&gt; Object</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>name</td>
+<td><code>String</code></td>
+<td>Name of operation</td>
+</tr>
+<tr>
+<td>req</td>
+<td><code>Array.&amp;lt;Object&amp;gt;</code></td>
+<td>Required parameters to operation</td>
+</tr>
+<tr>
+<td>opts</td>
+<td><code>Array.&amp;lt;Object&amp;gt;</code></td>
+<td>Optional parameters to operation</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..destructureClientError"></a></p>
+<h4 id="swaggerdestructureclienterrorerror-string">Swagger~destructureClientError(error) ⇒ <code>String</code></h4>
+<p>Destructure HTTP client <code>error</code></p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger"><code>Swagger</code></a><br />
+<strong>rtype</strong>: <code>(error: Error) =&gt; String</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>error</td>
+<td><code>Error</code></td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..resolveRef"></a></p>
+<h4 id="swaggerresolverefref-swag-object">Swagger~resolveRef(ref, swag) ⇒ <code>Object</code></h4>
+<p>Resolve reference</p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger"><code>Swagger</code></a><br />
+<strong>Returns</strong>: <code>Object</code> - Resolved reference definition<br />
+<strong>rtype</strong>: <code>(ref: String, swag: Object) =&gt; Object</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ref</td>
+<td><code>String</code></td>
+<td>Reference to resolve</td>
+</tr>
+<tr>
+<td>swag</td>
+<td><code>Object</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../../../guides/import-nodejs/" class="btn btn-neutral float-right" title="Setup">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../../node-pool/" class="btn btn-neutral" title="Node pool"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/aeternity/aepp-sdk-js/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../../node-pool/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../../../guides/import-nodejs/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../../..';</script>
+    <script src="../../../js/theme.js" defer></script>
+      <script src="../../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

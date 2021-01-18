@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Low vs High level API - Aeternity JavaScript SDK</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../../css/theme.css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Low vs High level API";
+    var mkdocs_page_input_path = "guides/low-vs-high-usage.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/rust.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/erlang.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/js.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> Aeternity JavaScript SDK</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../quick-start/">Quick Start</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Guides</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../contract-events/">Contract Events</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../oracle-usage/">Oracle Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../aens-usage/">AENS Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../contract-aci-usage/">Contract Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../delegate-signature-to-contract/">Delegate Signature to Contract</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../how-to-build-aepp-using-new-wallet-api/">Wallet Api</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../how-to-build-an-wallet-app-or-extension/">Building Wallets</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Low vs High level API</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#interactions">Interactions</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#recommended-high-level-sdk-usage">(Recommended) High-level SDK usage</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#low-level-sdk-usage-use-api-endpoints-directly">Low-level SDK usage (use API endpoints directly)</a>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../import-tree-shaking/">Tree Shaking</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">Migration</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../migration/migration-7.0.0/">Migration to SDK 7.0.0</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API Reference</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="#">account</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/account/">Account</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/account/selector/">Selector</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/account/memory/">Memory</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/accounts/">Account Handling</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">ae</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/ae/aens/">Aens</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/ae/aepp/">Aepp</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/ae/contract/">Contract</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/ae/oracle/">Oracle</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/ae/universal/">Universal</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/ae/wallet/">Wallet</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">chain</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/chain/">Chain</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/chain/node/">Node</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../api/channel/">channel</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">contract</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/contract/aci/">Aci</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/contract/compiler/">Compiler</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/contract/ga/">Generalized Accounts</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">oracle</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/oracle/">Oracle</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/oracle/node/">Node</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../api/rpc/client/">Deprecated RPC Client</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">tx</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">builder</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/tx/builder/">Builder</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/tx/builder/helpers/">Helpers</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/tx/builder/schema/">Schema</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/tx/">tx</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/tx/tx/">tx stamp</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/tx/tx-object/">tx object</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/tx/validator/">tx validator</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">Aepp Wallet Communication</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">Connection</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/utils/aepp-wallet-communication/connection/">Setup</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/utils/aepp-wallet-communication/content-script-bridge/">Content script bridge</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/utils/aepp-wallet-communication/wallet-detector/">Wallet detector</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/utils/aepp-wallet-communication/connection/browser-runtime/">Browser runtime</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/utils/aepp-wallet-communication/connection/browser-window-message/">Window message</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">RPC</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/utils/aepp-wallet-communication/rpc/aepp-rpc/">Aepp RPC</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/utils/aepp-wallet-communication/rpc/rpc-client/">RPC client</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/utils/aepp-wallet-communication/rpc/wallet-rpc/">Wallet RPC</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">utils</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/ae/">AE Utilities</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/utils/amount-formatter/">Amount formatter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/utils/bignumber/">Bignumber</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/utils/bytes/">Bytes</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/utils/crypto/">Crypto</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/utils/keystore/">Keystore</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/contract/">Contract</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/node/">Node</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/node-pool/">Node pool</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/utils/swagger/">Swagger</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Examples</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="#">NodeJS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../import-nodejs/">Setup</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../examples/node/aecontract/">Simple Sophia Contract Compiler</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../examples/node/aecrypto/">Crypto Helper Script</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../examples/node/aewallet/">Simple AE Token Spending Script</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">JS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../import-script-tag/">Script Tag</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../import-vuejs/">Vue.js</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">Aeternity JavaScript SDK</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Guides &raquo;</li>
+        
+      
+    
+    <li>Low vs High level API</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/aeternity/aepp-sdk-js/edit/master/docs/guides/low-vs-high-usage.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="low-vs-high-level-api">Low vs High level API</h1>
+<h2 id="interactions">Interactions</h2>
+<blockquote>
+<p>"There are two approaches, purist and high-level."
+<em>Alexander Kahl.</em></p>
+</blockquote>
+<p>The purist uses the functions generated out of the Swagger
+file. After <code>create</code>ing the client and <code>await</code>ing it (or use <code>.then</code>),
+it exposes a mapping of all <code>operationId</code>s as functions, converted to
+camelCase (from PascalCase). So e.g. in order to get a transaction
+based on its hash, you would invoke <code>client.api.getTx(query)</code>.</p>
+<p>In this way the SDK is simply a mapping of the raw API calls into
+Javascript. It's excellent for low-level control, and as a teaching tool to
+understand the node's operations. Most real-world requirements involves a series
+of chain operations, so the SDK provides abstractions for these. The Javscript
+Promises framework makes this somewhat easy:</p>
+<h2 id="recommended-high-level-sdk-usage">(<strong>Recommended</strong>) High-level SDK usage</h2>
+<p>Example spend function, using aeternity's SDK abstraction</p>
+<pre><code class="js">  // Import necessary Modules by simply importing the Wallet module
+  import Universal from '@aeternity/aepp-sdk/es/ae/wallet' // import from SDK es-modules
+  import Node from '@aeternity/aepp-sdk/es/node' // import from SDK es-modules
+
+  async function init () {
+    const node = await Node({ url, internalUrl })
+
+    const sdkInstance = await Universal({
+        nodes: [{ name: 'test-net-node', instance: node }],
+        compilerUrl: 'COMPILER_URL_HERE',
+        accounts: [MemoryAccount({keypair: {secretKey: 'PRIV_KEY_HERE', publicKey: 'PUB_KEY_HERE'}})],
+        address: 'SELECTED_ACCOUNT_PUB_KEY_HERE',
+      })
+   // Spend transaction info
+   console.log(await sdkInstance.spend(parseInt(amount), 'RECEIVER_PUB_KEY'))
+  }
+
+</code></pre>
+
+<h2 id="low-level-sdk-usage-use-api-endpoints-directly">Low-level SDK usage (use <a href="https://github.com/aeternity/protocol/tree/master/node/api">API</a> endpoints directly)</h2>
+<p>Example spend function, using the SDK, talking directly to the <a href="https://github.com/aeternity/protocol/tree/master/node/api"><strong>API</strong></a>:</p>
+<pre><code class="js">  // Import necessary Modules
+  import Universal from '@aeternity/aepp-sdk/es/ae/universal'
+  import Node from '@aeternity/aepp-sdk/es/node'
+  import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
+
+  async function spend (amount, receiver_pub_key) {
+    const node = await Node({ url, internalUrl })
+    const nodes = [{ name: 'testnet-node', instance: node }]
+    const account = MemoryAccount({ keypair: { secretKey: 'PRIV_KEY_HERE', publicKey: 'PUB_KEY_HERE'} })
+
+    const sdkInstance = await Universal({
+      nodes,
+      accounts: [account]
+    })
+
+    const spendTx = await sdkInstance.spendTx({ sender: await sdkInstance.address(), receiver_pub_key, amount })
+
+    const signed = await sdkInstance.signTransaction(spendTx)
+    return sdkInstance.sendTransaction(signed, opt)
+
+  }
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../import-tree-shaking/" class="btn btn-neutral float-right" title="Tree Shaking">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../how-to-build-an-wallet-app-or-extension/" class="btn btn-neutral" title="Building Wallets"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/aeternity/aepp-sdk-js/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../how-to-build-an-wallet-app-or-extension/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../import-tree-shaking/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

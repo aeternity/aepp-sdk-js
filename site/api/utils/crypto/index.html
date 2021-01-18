@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../../../img/favicon.ico">
+  <title>Crypto - Aeternity JavaScript SDK</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../../../css/theme.css" />
+  <link rel="stylesheet" href="../../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Crypto";
+    var mkdocs_page_input_path = "api/utils/crypto.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/rust.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/erlang.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/js.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="../../.." class="icon icon-home"> Aeternity JavaScript SDK</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../..">Overview</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/quick-start/">Quick Start</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Guides</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/contract-events/">Contract Events</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/oracle-usage/">Oracle Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/aens-usage/">AENS Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/contract-aci-usage/">Contract Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/delegate-signature-to-contract/">Delegate Signature to Contract</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/how-to-build-aepp-using-new-wallet-api/">Wallet Api</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/how-to-build-an-wallet-app-or-extension/">Building Wallets</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/low-vs-high-usage/">Low vs High level API</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/import-tree-shaking/">Tree Shaking</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">Migration</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../guides/migration/migration-7.0.0/">Migration to SDK 7.0.0</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API Reference</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="#">account</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../account/">Account</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../account/selector/">Selector</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../account/memory/">Memory</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../accounts/">Account Handling</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">ae</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../ae/aens/">Aens</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../ae/aepp/">Aepp</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../ae/contract/">Contract</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../ae/oracle/">Oracle</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../ae/universal/">Universal</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../ae/wallet/">Wallet</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">chain</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../chain/">Chain</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../chain/node/">Node</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../channel/">channel</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">contract</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../contract/aci/">Aci</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../contract/compiler/">Compiler</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../contract/ga/">Generalized Accounts</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">oracle</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../oracle/">Oracle</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../oracle/node/">Node</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../rpc/client/">Deprecated RPC Client</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">tx</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">builder</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../tx/builder/">Builder</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../tx/builder/helpers/">Helpers</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../tx/builder/schema/">Schema</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tx/">tx</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tx/tx/">tx stamp</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tx/tx-object/">tx object</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tx/validator/">tx validator</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">Aepp Wallet Communication</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">Connection</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../aepp-wallet-communication/connection/">Setup</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../aepp-wallet-communication/content-script-bridge/">Content script bridge</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../aepp-wallet-communication/wallet-detector/">Wallet detector</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../aepp-wallet-communication/connection/browser-runtime/">Browser runtime</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../aepp-wallet-communication/connection/browser-window-message/">Window message</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">RPC</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../aepp-wallet-communication/rpc/aepp-rpc/">Aepp RPC</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../aepp-wallet-communication/rpc/rpc-client/">RPC client</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../aepp-wallet-communication/rpc/wallet-rpc/">Wallet RPC</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="#">utils</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../../ae/">AE Utilities</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../amount-formatter/">Amount formatter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../bignumber/">Bignumber</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../bytes/">Bytes</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="./">Crypto</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptodecode-array">@aeternity/aepp-sdk/es/utils/crypto.decode ⇒ Array</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptoformataddressformat-address-string">@aeternity/aepp-sdk/es/utils/crypto.formatAddress(format, address) ⇒ String</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptogetaddressfromprivsecret-string">@aeternity/aepp-sdk/es/utils/crypto.getAddressFromPriv(secret) ⇒ String</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptoisaddressvalidaddress-prefix-boolean">@aeternity/aepp-sdk/es/utils/crypto.isAddressValid(address, prefix) ⇒ Boolean</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptoaddresstohexbase58checkaddress-string">@aeternity/aepp-sdk/es/utils/crypto.addressToHex(base58CheckAddress) ⇒ String</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptoaddressfromdecimaldecimaladdress-string">@aeternity/aepp-sdk/es/utils/crypto.addressFromDecimal(decimalAddress) ⇒ String</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptohashinput-buffer">@aeternity/aepp-sdk/es/utils/crypto.hash(input) ⇒ Buffer</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptosha256hashinput-string">@aeternity/aepp-sdk/es/utils/crypto.sha256hash(input) ⇒ String</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptosalt-number">@aeternity/aepp-sdk/es/utils/crypto.salt() ⇒ Number</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptoencodebase64checkinput-buffer">@aeternity/aepp-sdk/es/utils/crypto.encodeBase64Check(input) ⇒ Buffer</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptodecodebase64checkstr-buffer">@aeternity/aepp-sdk/es/utils/crypto.decodeBase64Check(str) ⇒ Buffer</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptoencodebase58checkinput-string">@aeternity/aepp-sdk/es/utils/crypto.encodeBase58Check(input) ⇒ String</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptodecodebase58checkstr-buffer">@aeternity/aepp-sdk/es/utils/crypto.decodeBase58Check(str) ⇒ Buffer</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptohexstringtobytestr-uint8array">@aeternity/aepp-sdk/es/utils/crypto.hexStringToByte(str) ⇒ Uint8Array</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptoencodeunsignedvalue-buffer">@aeternity/aepp-sdk/es/utils/crypto.encodeUnsigned(value) ⇒ Buffer</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptoencodecontractaddressowner-nonce-string">@aeternity/aepp-sdk/es/utils/crypto.encodeContractAddress(owner, nonce) ⇒ String</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptogeneratekeypairfromsecretsecret-object">@aeternity/aepp-sdk/es/utils/crypto.generateKeyPairFromSecret(secret) ⇒ Object</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptogeneratekeypairraw-object">@aeternity/aepp-sdk/es/utils/crypto.generateKeyPair(raw) ⇒ Object</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptoencryptpublickeypassword-binarykey-uint8array">@aeternity/aepp-sdk/es/utils/crypto.encryptPublicKey(password, binaryKey) ⇒ Uint8Array</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptoencryptprivatekeypassword-binarykey-uint8array">@aeternity/aepp-sdk/es/utils/crypto.encryptPrivateKey(password, binaryKey) ⇒ Uint8Array</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptoencryptkeypassword-binarydata-uint8array">@aeternity/aepp-sdk/es/utils/crypto.encryptKey(password, binaryData) ⇒ Uint8Array</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptodecryptkeypassword-encrypted-buffer">@aeternity/aepp-sdk/es/utils/crypto.decryptKey(password, encrypted) ⇒ Buffer</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptosigndata-privatekey-buffer-uint8array">@aeternity/aepp-sdk/es/utils/crypto.sign(data, privateKey) ⇒ Buffer | Uint8Array</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptoverifystr-signature-publickey-boolean">@aeternity/aepp-sdk/es/utils/crypto.verify(str, signature, publicKey) ⇒ Boolean</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptopreparetxsignature-data-transaction">@aeternity/aepp-sdk/es/utils/crypto.prepareTx(signature, data) ⇒ Transaction</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptoaeencodekeybinarykey-string">@aeternity/aepp-sdk/es/utils/crypto.aeEncodeKey(binaryKey) ⇒ String</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptogeneratesavewalletpassword-object">@aeternity/aepp-sdk/es/utils/crypto.generateSaveWallet(password) ⇒ Object</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptodecryptprivatekeypassword-buffer">@aeternity/aepp-sdk/es/utils/crypto.decryptPrivateKey(password) ⇒ Buffer</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptodecryptpubkeypassword-buffer">@aeternity/aepp-sdk/es/utils/crypto.decryptPubKey(password) ⇒ Buffer</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptoassertedtypedata-type-omiterror-string-boolean">@aeternity/aepp-sdk/es/utils/crypto.assertedType(data, type, omitError) ⇒ String | Boolean</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptodecodetxtxhash-buffer">@aeternity/aepp-sdk/es/utils/crypto.decodeTx(txHash) ⇒ Buffer</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptoencodetxtxdata-string">@aeternity/aepp-sdk/es/utils/crypto.encodeTx(txData) ⇒ String</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptoisvalidkeypairprivatekey-publickey-boolean">@aeternity/aepp-sdk/es/utils/crypto.isValidKeypair(privateKey, publicKey) ⇒ Boolean</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptoenvkeypairenv-force-object">@aeternity/aepp-sdk/es/utils/crypto.envKeypair(env, [force]) ⇒ Object</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptoencryptdatamsg-publickey-object">@aeternity/aepp-sdk/es/utils/crypto.encryptData(msg, publicKey) ⇒ Object</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptodecryptdatasecretkey-encrypteddata-buffer-null">@aeternity/aepp-sdk/es/utils/crypto.decryptData(secretKey, encryptedData) ⇒ Buffer | null</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aeternityaepp-sdkesutilscryptotransaction-array">@aeternity/aepp-sdk/es/utils/crypto~Transaction : Array</a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../keystore/">Keystore</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../contract/">Contract</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../node/">Node</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../node-pool/">Node pool</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../swagger/">Swagger</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Examples</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="#">NodeJS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../guides/import-nodejs/">Setup</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../examples/node/aecontract/">Simple Sophia Contract Compiler</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../examples/node/aecrypto/">Crypto Helper Script</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../examples/node/aewallet/">Simple AE Token Spending Script</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">JS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../guides/import-script-tag/">Script Tag</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../guides/import-vuejs/">Vue.js</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../..">Aeternity JavaScript SDK</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>utils &raquo;</li>
+        
+      
+        
+          <li>API Reference &raquo;</li>
+        
+      
+    
+    <li>Crypto</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/aeternity/aepp-sdk-js/edit/master/docs/api/utils/crypto.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p><a id="module_@aeternity/aepp-sdk/es/utils/crypto"></a></p>
+<h2 id="aeternityaepp-sdkesutilscrypto">@aeternity/aepp-sdk/es/utils/crypto</h2>
+<p>Crypto module</p>
+<p><strong>Example</strong>  </p>
+<pre><code class="js">import * as Crypto from '@aeternity/aepp-sdk/es/utils/crypto'
+</code></pre>
+
+<ul>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto">@aeternity/aepp-sdk/es/utils/crypto</a><ul>
+<li><em>static</em><ul>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.decode">.decode</a> ⇒ <code>Array</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.formatAddress">.formatAddress(format, address)</a> ⇒ <code>String</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.getAddressFromPriv">.getAddressFromPriv(secret)</a> ⇒ <code>String</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.isAddressValid">.isAddressValid(address, prefix)</a> ⇒ <code>Boolean</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.addressToHex">.addressToHex(base58CheckAddress)</a> ⇒ <code>String</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.addressFromDecimal">.addressFromDecimal(decimalAddress)</a> ⇒ <code>String</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.hash">.hash(input)</a> ⇒ <code>Buffer</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.sha256hash">.sha256hash(input)</a> ⇒ <code>String</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.salt">.salt()</a> ⇒ <code>Number</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.encodeBase64Check">.encodeBase64Check(input)</a> ⇒ <code>Buffer</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.decodeBase64Check">.decodeBase64Check(str)</a> ⇒ <code>Buffer</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.encodeBase58Check">.encodeBase58Check(input)</a> ⇒ <code>String</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.decodeBase58Check">.decodeBase58Check(str)</a> ⇒ <code>Buffer</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.hexStringToByte">.hexStringToByte(str)</a> ⇒ <code>Uint8Array</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.encodeUnsigned">.encodeUnsigned(value)</a> ⇒ <code>Buffer</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.encodeContractAddress">.encodeContractAddress(owner, nonce)</a> ⇒ <code>String</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.generateKeyPairFromSecret">.generateKeyPairFromSecret(secret)</a> ⇒ <code>Object</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.generateKeyPair">.generateKeyPair(raw)</a> ⇒ <code>Object</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.encryptPublicKey">.encryptPublicKey(password, binaryKey)</a> ⇒ <code>Uint8Array</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.encryptPrivateKey">.encryptPrivateKey(password, binaryKey)</a> ⇒ <code>Uint8Array</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.encryptKey">.encryptKey(password, binaryData)</a> ⇒ <code>Uint8Array</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.decryptKey">.decryptKey(password, encrypted)</a> ⇒ <code>Buffer</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.sign">.sign(data, privateKey)</a> ⇒ <code>Buffer</code> | <code>Uint8Array</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.verify">.verify(str, signature, publicKey)</a> ⇒ <code>Boolean</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.prepareTx">.prepareTx(signature, data)</a> ⇒ <code>Transaction</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.aeEncodeKey">.aeEncodeKey(binaryKey)</a> ⇒ <code>String</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.generateSaveWallet">.generateSaveWallet(password)</a> ⇒ <code>Object</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.decryptPrivateKey">.decryptPrivateKey(password)</a> ⇒ <code>Buffer</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.decryptPubKey">.decryptPubKey(password)</a> ⇒ <code>Buffer</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.assertedType">.assertedType(data, type, omitError)</a> ⇒ <code>String</code> | <code>Boolean</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.decodeTx">.decodeTx(txHash)</a> ⇒ <code>Buffer</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.encodeTx">.encodeTx(txData)</a> ⇒ <code>String</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.isValidKeypair">.isValidKeypair(privateKey, publicKey)</a> ⇒ <code>Boolean</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.envKeypair">.envKeypair(env, [force])</a> ⇒ <code>Object</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.encryptData">.encryptData(msg, publicKey)</a> ⇒ <code>Object</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto.decryptData">.decryptData(secretKey, encryptedData)</a> ⇒ <code>Buffer</code> | <code>null</code></li>
+</ul>
+</li>
+<li><em>inner</em><ul>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/crypto..Transaction">~Transaction</a> : <code>Array</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.decode"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptodecode-array">@aeternity/aepp-sdk/es/utils/crypto.decode ⇒ <code>Array</code></h3>
+<p>RLP decode</p>
+<p><strong>Kind</strong>: static constant of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>Array</code> - Array of Buffers containing the original message<br />
+<strong>rtype</strong>: <code>(data: Any) =&gt; Buffer[]</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>data</td>
+<td><code>Buffer</code> | <code>String</code> | <code>Integer</code> | <code>Array</code></td>
+<td>Data to decode</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.formatAddress"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptoformataddressformat-address-string">@aeternity/aepp-sdk/es/utils/crypto.formatAddress(format, address) ⇒ <code>String</code></h3>
+<p>Format account address</p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>String</code> - Formatted address<br />
+<strong>rtype</strong>: <code>(format: String, address: String) =&gt; tx: Promise[String]</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>format</td>
+<td><code>String</code></td>
+<td>Format type</td>
+</tr>
+<tr>
+<td>address</td>
+<td><code>String</code></td>
+<td>Base58check account address</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.getAddressFromPriv"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptogetaddressfromprivsecret-string">@aeternity/aepp-sdk/es/utils/crypto.getAddressFromPriv(secret) ⇒ <code>String</code></h3>
+<p>Generate address from secret key</p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>String</code> - Public key<br />
+<strong>rtype</strong>: <code>(secret: String) =&gt; tx: Promise[String]</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>secret</td>
+<td><code>String</code></td>
+<td>Private key</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.isAddressValid"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptoisaddressvalidaddress-prefix-boolean">@aeternity/aepp-sdk/es/utils/crypto.isAddressValid(address, prefix) ⇒ <code>Boolean</code></h3>
+<p>Check if address is valid</p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>Boolean</code> - valid<br />
+<strong>rtype</strong>: <code>(input: String) =&gt; valid: Boolean</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>address</td>
+<td><code>String</code></td>
+<td>Address</td>
+</tr>
+<tr>
+<td>prefix</td>
+<td><code>String</code></td>
+<td>Transaction prefix. Default: 'ak'</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.addressToHex"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptoaddresstohexbase58checkaddress-string">@aeternity/aepp-sdk/es/utils/crypto.addressToHex(base58CheckAddress) ⇒ <code>String</code></h3>
+<p>Convert base58Check address to hex string</p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>String</code> - Hex string<br />
+<strong>rtype</strong>: <code>(base58CheckAddress: String) =&gt; hexAddress: String</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>base58CheckAddress</td>
+<td><code>String</code></td>
+<td>Address</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.addressFromDecimal"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptoaddressfromdecimaldecimaladdress-string">@aeternity/aepp-sdk/es/utils/crypto.addressFromDecimal(decimalAddress) ⇒ <code>String</code></h3>
+<p>Parse decimal address and return base58Check encoded address with prefix 'ak'</p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>String</code> - address<br />
+<strong>rtype</strong>: <code>(input: String) =&gt; address: String</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>decimalAddress</td>
+<td><code>String</code></td>
+<td>Address</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.hash"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptohashinput-buffer">@aeternity/aepp-sdk/es/utils/crypto.hash(input) ⇒ <code>Buffer</code></h3>
+<p>Calculate 256bits Blake2b hash of <code>input</code></p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>Buffer</code> - Hash<br />
+<strong>rtype</strong>: <code>(input: String) =&gt; hash: String</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>input</td>
+<td><code>String</code> | <code>Buffer</code></td>
+<td>Data to hash</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.sha256hash"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptosha256hashinput-string">@aeternity/aepp-sdk/es/utils/crypto.sha256hash(input) ⇒ <code>String</code></h3>
+<p>Calculate SHA256 hash of <code>input</code></p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>String</code> - Hash<br />
+<strong>rtype</strong>: <code>(input: String) =&gt; hash: String</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>input</td>
+<td><code>String</code></td>
+<td>Data to hash</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.salt"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptosalt-number">@aeternity/aepp-sdk/es/utils/crypto.salt() ⇒ <code>Number</code></h3>
+<p>Generate a random salt (positive integer)</p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>Number</code> - random salt<br />
+<strong>rtype</strong>: <code>() =&gt; salt: Number</code>
+<a id="module_@aeternity/aepp-sdk/es/utils/crypto.encodeBase64Check"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptoencodebase64checkinput-buffer">@aeternity/aepp-sdk/es/utils/crypto.encodeBase64Check(input) ⇒ <code>Buffer</code></h3>
+<p>Base64check encode given <code>input</code></p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>Buffer</code> - Base64check encoded data<br />
+<strong>rtype</strong>: <code>(input: String|buffer) =&gt; Buffer</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>input</td>
+<td><code>String</code></td>
+<td>Data to encode</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.decodeBase64Check"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptodecodebase64checkstr-buffer">@aeternity/aepp-sdk/es/utils/crypto.decodeBase64Check(str) ⇒ <code>Buffer</code></h3>
+<p>Base64check decode given <code>str</code></p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>Buffer</code> - Base64check decoded data<br />
+<strong>rtype</strong>: <code>(str: String) =&gt; Buffer</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>str</td>
+<td><code>String</code></td>
+<td>Data to decode</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.encodeBase58Check"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptoencodebase58checkinput-string">@aeternity/aepp-sdk/es/utils/crypto.encodeBase58Check(input) ⇒ <code>String</code></h3>
+<p>Base58 encode given <code>input</code></p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>String</code> - Base58 encoded data<br />
+<strong>rtype</strong>: <code>(input: String) =&gt; String</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>input</td>
+<td><code>String</code> | <code>Buffer</code></td>
+<td>Data to encode</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.decodeBase58Check"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptodecodebase58checkstr-buffer">@aeternity/aepp-sdk/es/utils/crypto.decodeBase58Check(str) ⇒ <code>Buffer</code></h3>
+<p>Base58 decode given <code>str</code></p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>Buffer</code> - Base58 decoded data<br />
+<strong>rtype</strong>: <code>(str: String) =&gt; Buffer</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>str</td>
+<td><code>String</code></td>
+<td>Data to decode</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.hexStringToByte"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptohexstringtobytestr-uint8array">@aeternity/aepp-sdk/es/utils/crypto.hexStringToByte(str) ⇒ <code>Uint8Array</code></h3>
+<p>Conver hex string to Uint8Array</p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>Uint8Array</code> - - converted data<br />
+<strong>rtype</strong>: <code>(str: String) =&gt; Uint8Array</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>str</td>
+<td><code>String</code></td>
+<td>Data to conver</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.encodeUnsigned"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptoencodeunsignedvalue-buffer">@aeternity/aepp-sdk/es/utils/crypto.encodeUnsigned(value) ⇒ <code>Buffer</code></h3>
+<p>Converts a positive integer to the smallest possible
+representation in a binary digit representation</p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>Buffer</code> - - Encoded data<br />
+<strong>rtype</strong>: <code>(value: Number) =&gt; Buffer</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>value</td>
+<td><code>Number</code></td>
+<td>Value to encode</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.encodeContractAddress"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptoencodecontractaddressowner-nonce-string">@aeternity/aepp-sdk/es/utils/crypto.encodeContractAddress(owner, nonce) ⇒ <code>String</code></h3>
+<p>Compute contract address</p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>String</code> - - Contract address<br />
+<strong>rtype</strong>: <code>(owner: String, nonce: Number) =&gt; String</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>owner</td>
+<td><code>String</code></td>
+<td>Address of contract owner</td>
+</tr>
+<tr>
+<td>nonce</td>
+<td><code>Number</code></td>
+<td>Round when contract was created</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.generateKeyPairFromSecret"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptogeneratekeypairfromsecretsecret-object">@aeternity/aepp-sdk/es/utils/crypto.generateKeyPairFromSecret(secret) ⇒ <code>Object</code></h3>
+<p>Generate keyPair from secret key</p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>Object</code> - - Object with Private(privateKey) and Public(publicKey) keys<br />
+<strong>rtype</strong>: <code>(secret: Uint8Array) =&gt; KeyPair</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>secret</td>
+<td><code>Uint8Array</code></td>
+<td>secret key</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.generateKeyPair"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptogeneratekeypairraw-object">@aeternity/aepp-sdk/es/utils/crypto.generateKeyPair(raw) ⇒ <code>Object</code></h3>
+<p>Generate a random ED25519 keypair</p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>Object</code> - Key pair<br />
+<strong>rtype</strong>: <code>(raw: Boolean) =&gt; {publicKey: String, secretKey: String} | {publicKey: Buffer, secretKey: Buffer}</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>raw</td>
+<td><code>Boolean</code></td>
+<td>Whether to return raw (binary) keys</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.encryptPublicKey"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptoencryptpublickeypassword-binarykey-uint8array">@aeternity/aepp-sdk/es/utils/crypto.encryptPublicKey(password, binaryKey) ⇒ <code>Uint8Array</code></h3>
+<p>Encrypt given public key using <code>password</code></p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>Uint8Array</code> - Encrypted key<br />
+<strong>rtype</strong>: <code>(password: String, binaryKey: Buffer) =&gt; Uint8Array</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>password</td>
+<td><code>String</code></td>
+<td>Password to encrypt with</td>
+</tr>
+<tr>
+<td>binaryKey</td>
+<td><code>Buffer</code></td>
+<td>Key to encrypt</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.encryptPrivateKey"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptoencryptprivatekeypassword-binarykey-uint8array">@aeternity/aepp-sdk/es/utils/crypto.encryptPrivateKey(password, binaryKey) ⇒ <code>Uint8Array</code></h3>
+<p>Encrypt given private key using <code>password</code></p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>Uint8Array</code> - Encrypted key<br />
+<strong>rtype</strong>: <code>(password: String, binaryKey: Buffer) =&gt; Uint8Array</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>password</td>
+<td><code>String</code></td>
+<td>Password to encrypt with</td>
+</tr>
+<tr>
+<td>binaryKey</td>
+<td><code>Buffer</code></td>
+<td>Key to encrypt</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.encryptKey"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptoencryptkeypassword-binarydata-uint8array">@aeternity/aepp-sdk/es/utils/crypto.encryptKey(password, binaryData) ⇒ <code>Uint8Array</code></h3>
+<p>Encrypt given data using <code>password</code></p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>Uint8Array</code> - Encrypted data<br />
+<strong>rtype</strong>: <code>(password: String, binaryData: Buffer) =&gt; Uint8Array</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>password</td>
+<td><code>String</code></td>
+<td>Password to encrypt with</td>
+</tr>
+<tr>
+<td>binaryData</td>
+<td><code>Buffer</code></td>
+<td>Data to encrypt</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.decryptKey"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptodecryptkeypassword-encrypted-buffer">@aeternity/aepp-sdk/es/utils/crypto.decryptKey(password, encrypted) ⇒ <code>Buffer</code></h3>
+<p>Decrypt given data using <code>password</code></p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>Buffer</code> - Decrypted data<br />
+<strong>rtype</strong>: <code>(password: String, encrypted: String) =&gt; Uint8Array</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>password</td>
+<td><code>String</code></td>
+<td>Password to decrypt with</td>
+</tr>
+<tr>
+<td>encrypted</td>
+<td><code>String</code></td>
+<td>Data to decrypt</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.sign"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptosigndata-privatekey-buffer-uint8array">@aeternity/aepp-sdk/es/utils/crypto.sign(data, privateKey) ⇒ <code>Buffer</code> | <code>Uint8Array</code></h3>
+<p>Generate signature</p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>Buffer</code> | <code>Uint8Array</code> - Signature<br />
+<strong>rtype</strong>: <code>(data: String|Buffer, privateKey: Buffer) =&gt; Buffer</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>data</td>
+<td><code>String</code> | <code>Buffer</code></td>
+<td>Data to sign</td>
+</tr>
+<tr>
+<td>privateKey</td>
+<td><code>String</code> | <code>Buffer</code></td>
+<td>Key to sign with</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.verify"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptoverifystr-signature-publickey-boolean">@aeternity/aepp-sdk/es/utils/crypto.verify(str, signature, publicKey) ⇒ <code>Boolean</code></h3>
+<p>Verify that signature was signed by public key</p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>Boolean</code> - Valid?<br />
+<strong>rtype</strong>: <code>(str: String, signature: Buffer, publicKey: Buffer) =&gt; Boolean</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>str</td>
+<td><code>String</code> | <code>Buffer</code></td>
+<td>Data to verify</td>
+</tr>
+<tr>
+<td>signature</td>
+<td><code>Buffer</code></td>
+<td>Signature to verify</td>
+</tr>
+<tr>
+<td>publicKey</td>
+<td><code>Buffer</code></td>
+<td>Key to verify against</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.prepareTx"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptopreparetxsignature-data-transaction">@aeternity/aepp-sdk/es/utils/crypto.prepareTx(signature, data) ⇒ <code>Transaction</code></h3>
+<p>Prepare a transaction for posting to the blockchain</p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>Transaction</code> - Transaction<br />
+<strong>rtype</strong>: <code>(signature: Buffer | String, data: Buffer) =&gt; Transaction</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>signature</td>
+<td><code>Buffer</code></td>
+<td>Signature of <code>data</code></td>
+</tr>
+<tr>
+<td>data</td>
+<td><code>Buffer</code></td>
+<td>Transaction data</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.aeEncodeKey"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptoaeencodekeybinarykey-string">@aeternity/aepp-sdk/es/utils/crypto.aeEncodeKey(binaryKey) ⇒ <code>String</code></h3>
+<p>æternity readable public keys are the base58-encoded public key, prepended
+with 'ak_'</p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>String</code> - Encoded key<br />
+<strong>rtype</strong>: <code>(binaryKey: Buffer) =&gt; String</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>binaryKey</td>
+<td><code>Buffer</code></td>
+<td>Key to encode</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.generateSaveWallet"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptogeneratesavewalletpassword-object">@aeternity/aepp-sdk/es/utils/crypto.generateSaveWallet(password) ⇒ <code>Object</code></h3>
+<p>Generate a new key pair using <a href="generateKeyPair">generateKeyPair</a> and encrypt it using <code>password</code></p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>Object</code> - Encrypted key pair<br />
+<strong>rtype</strong>: <code>(password: String) =&gt; {publicKey: Uint8Array, secretKey: Uint8Array}</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>password</td>
+<td><code>String</code></td>
+<td>Password to encrypt with</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.decryptPrivateKey"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptodecryptprivatekeypassword-buffer">@aeternity/aepp-sdk/es/utils/crypto.decryptPrivateKey(password) ⇒ <code>Buffer</code></h3>
+<p>Decrypt an encrypted private key</p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>Buffer</code> - Decrypted key<br />
+<strong>rtype</strong>: <code>(password: String, encrypted: Buffer) =&gt; Buffer</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>password</td>
+<td><code>String</code></td>
+<td>Password to decrypt with</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.decryptPubKey"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptodecryptpubkeypassword-buffer">@aeternity/aepp-sdk/es/utils/crypto.decryptPubKey(password) ⇒ <code>Buffer</code></h3>
+<p>Decrypt an encrypted public key</p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>Buffer</code> - Decrypted key<br />
+<strong>rtype</strong>: <code>(password: String, encrypted: Buffer) =&gt; Buffer</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>password</td>
+<td><code>String</code></td>
+<td>Password to decrypt with</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.assertedType"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptoassertedtypedata-type-omiterror-string-boolean">@aeternity/aepp-sdk/es/utils/crypto.assertedType(data, type, omitError) ⇒ <code>String</code> | <code>Boolean</code></h3>
+<p>Assert encoded type and return its payload</p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>String</code> | <code>Boolean</code> - Payload<br />
+<strong>rtype</strong>: <code>(data: String, type: String) =&gt; String, throws: Error</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>data</td>
+<td><code>String</code></td>
+<td>ae data</td>
+</tr>
+<tr>
+<td>type</td>
+<td><code>String</code></td>
+<td>Prefix</td>
+</tr>
+<tr>
+<td>omitError</td>
+<td><code>Boolean</code></td>
+<td>Return false instead of throwing the error if data doesn't match expected type</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.decodeTx"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptodecodetxtxhash-buffer">@aeternity/aepp-sdk/es/utils/crypto.decodeTx(txHash) ⇒ <code>Buffer</code></h3>
+<p>Decode a transaction</p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>Buffer</code> - Decoded transaction<br />
+<strong>rtype</strong>: <code>(txHash: String) =&gt; Buffer</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>txHash</td>
+<td><code>String</code></td>
+<td>Transaction hash</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.encodeTx"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptoencodetxtxdata-string">@aeternity/aepp-sdk/es/utils/crypto.encodeTx(txData) ⇒ <code>String</code></h3>
+<p>Encode a transaction</p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>String</code> - Encoded transaction<br />
+<strong>rtype</strong>: <code>(txData: Transaction) =&gt; String</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>txData</td>
+<td><code>Transaction</code></td>
+<td>Transaction to encode</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.isValidKeypair"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptoisvalidkeypairprivatekey-publickey-boolean">@aeternity/aepp-sdk/es/utils/crypto.isValidKeypair(privateKey, publicKey) ⇒ <code>Boolean</code></h3>
+<p>Check key pair for validity</p>
+<p>Sign a message, and then verifying that signature</p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>Boolean</code> - Valid?<br />
+<strong>rtype</strong>: <code>(privateKey: Buffer, publicKey: Buffer) =&gt; Boolean</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>privateKey</td>
+<td><code>Buffer</code></td>
+<td>Private key to verify</td>
+</tr>
+<tr>
+<td>publicKey</td>
+<td><code>Buffer</code></td>
+<td>Public key to verify</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.envKeypair"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptoenvkeypairenv-force-object">@aeternity/aepp-sdk/es/utils/crypto.envKeypair(env, [force]) ⇒ <code>Object</code></h3>
+<p>Obtain key pair from <code>env</code></p>
+<p>Designed to be used with <code>env</code> from nodejs. Assumes enviroment variables
+<code>WALLET_PRIV</code> and <code>WALLET_PUB</code>.</p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>Returns</strong>: <code>Object</code> - Key pair<br />
+<strong>rtype</strong>: <code>(env: Object) =&gt; {publicKey: String, secretKey: String}, throws: Error</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>env</td>
+<td><code>Object</code></td>
+<td></td>
+<td>Environment</td>
+</tr>
+<tr>
+<td>[force]</td>
+<td><code>Boolean</code></td>
+<td><code>false</code></td>
+<td>Force throwing error</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.encryptData"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptoencryptdatamsg-publickey-object">@aeternity/aepp-sdk/es/utils/crypto.encryptData(msg, publicKey) ⇒ <code>Object</code></h3>
+<p>This function encrypts a message using base58check encoded and 'ak' prefixed
+publicKey such that only the corresponding secretKey will
+be able to decrypt</p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>rtype</strong>: <code>(msg: String, publicKey: String) =&gt; Object</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>msg</td>
+<td><code>Buffer</code></td>
+<td>Data to encode</td>
+</tr>
+<tr>
+<td>publicKey</td>
+<td><code>String</code></td>
+<td>Public key</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto.decryptData"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptodecryptdatasecretkey-encrypteddata-buffer-null">@aeternity/aepp-sdk/es/utils/crypto.decryptData(secretKey, encryptedData) ⇒ <code>Buffer</code> | <code>null</code></h3>
+<p>This function decrypt a message using secret key</p>
+<p><strong>Kind</strong>: static method of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>rtype</strong>: <code>(secretKey: String, encryptedData: Object) =&gt; Buffer|null</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>secretKey</td>
+<td><code>String</code></td>
+<td>Secret key</td>
+</tr>
+<tr>
+<td>encryptedData</td>
+<td><code>Object</code></td>
+<td>Encrypted data</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/crypto..Transaction"></a></p>
+<h3 id="aeternityaepp-sdkesutilscryptotransaction-array">@aeternity/aepp-sdk/es/utils/crypto~Transaction : <code>Array</code></h3>
+<p><strong>Kind</strong>: inner typedef of <a href="#module_@aeternity/aepp-sdk/es/utils/crypto"><code>@aeternity/aepp-sdk/es/utils/crypto</code></a><br />
+<strong>rtype</strong>: <code>Transaction: [tag: Buffer, version: Buffer, [signature: Buffer], data: Buffer]</code></p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../keystore/" class="btn btn-neutral float-right" title="Keystore">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../bytes/" class="btn btn-neutral" title="Bytes"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/aeternity/aepp-sdk-js/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../bytes/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../keystore/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../../..';</script>
+    <script src="../../../js/theme.js" defer></script>
+      <script src="../../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,237 @@
+{
+  "json": [
+    {
+      "Overview": "README.md",
+      "depth": 1
+    },
+    "guides/quick-start.md",
+    {
+      "Guides": [
+        "guides/contract-events.md",
+        "guides/oracle-usage.md",
+        "guides/aens-usage.md",
+        "guides/contract-aci-usage.md",
+        "guides/delegate-signature-to-contract.md",
+        {
+          "Wallet Api": "guides/how-to-build-aepp-using-new-wallet-api.md",
+          "content": " \n \n 3 guides/how-to-build-aepp-using-new-wallet-api.md",
+          "depth": 2
+        },
+        {
+          "Building Wallets": "guides/how-to-build-an-wallet-app-or-extension.md",
+          "content": " \n \n 3 guides/how-to-build-an-wallet-app-or-extension.md",
+          "depth": 2
+        },
+        "guides/low-vs-high-usage.md",
+        "guides/import-tree-shaking.md",
+        {
+          "Migration": [
+            "guides/migration/migration-7.0.0.md"
+          ],
+          "content": " \n \n  \n \n 3 guides/migration/migration-7.0.0.md",
+          "depth": 2
+        }
+      ],
+      "depth": 1
+    },
+    {
+      "API Reference": [
+        {
+          "account": [
+            "api/account.md",
+            "api/account/selector.md",
+            "api/account/memory.md",
+            {
+              "Account Handling": "api/accounts.md",
+              "content": " \n \n 4 api/accounts.md",
+              "depth": 3
+            }
+          ],
+          "content": " \n \n  \n \n 3 api/account.md \n \n 3 api/account/selector.md \n \n 3 api/account/memory.md \n \n  \n \n 4 api/accounts.md",
+          "depth": 2
+        },
+        {
+          "ae": [
+            "api/ae/aens.md",
+            "api/ae/aepp.md",
+            "api/ae/contract.md",
+            "api/ae/oracle.md",
+            "api/ae/universal.md",
+            "api/ae/wallet.md"
+          ],
+          "content": " \n \n  \n \n 3 api/ae/aens.md \n \n 3 api/ae/aepp.md \n \n 3 api/ae/contract.md \n \n 3 api/ae/oracle.md \n \n 3 api/ae/universal.md \n \n 3 api/ae/wallet.md",
+          "depth": 2
+        },
+        {
+          "chain": [
+            "api/chain.md",
+            "api/chain/node.md"
+          ],
+          "content": " \n \n  \n \n 3 api/chain.md \n \n 3 api/chain/node.md",
+          "depth": 2
+        },
+        {
+          "channel": "api/channel/index.md",
+          "content": " \n \n 3 api/channel/index.md",
+          "depth": 2
+        },
+        {
+          "contract": [
+            "api/contract/aci.md",
+            "api/contract/compiler.md",
+            {
+              "Generalized Accounts": "api/contract/ga.md",
+              "content": " \n \n 4 api/contract/ga.md",
+              "depth": 3
+            }
+          ],
+          "content": " \n \n  \n \n 3 api/contract/aci.md \n \n 3 api/contract/compiler.md \n \n  \n \n 4 api/contract/ga.md",
+          "depth": 2
+        },
+        {
+          "oracle": [
+            "api/oracle.md",
+            "api/oracle/node.md"
+          ],
+          "content": " \n \n  \n \n 3 api/oracle.md \n \n 3 api/oracle/node.md",
+          "depth": 2
+        },
+        {
+          "Deprecated RPC Client": "api/rpc/client.md",
+          "content": " \n \n 3 api/rpc/client.md",
+          "depth": 2
+        },
+        {
+          "tx": [
+            {
+              "builder": [
+                "api/tx/builder.md",
+                "api/tx/builder/helpers.md",
+                "api/tx/builder/schema.md"
+              ],
+              "content": " \n \n  \n \n 4 api/tx/builder.md \n \n 4 api/tx/builder/helpers.md \n \n 4 api/tx/builder/schema.md",
+              "depth": 3
+            },
+            {
+              "tx": "api/tx.md",
+              "content": " \n \n 4 api/tx.md",
+              "depth": 3
+            },
+            {
+              "tx stamp": "api/tx/tx.md",
+              "content": " \n \n 4 api/tx/tx.md",
+              "depth": 3
+            },
+            {
+              "tx object": "api/tx/tx-object.md",
+              "content": " \n \n 4 api/tx/tx-object.md",
+              "depth": 3
+            },
+            {
+              "tx validator": "api/tx/validator.md",
+              "content": " \n \n 4 api/tx/validator.md",
+              "depth": 3
+            }
+          ],
+          "content": " \n \n  \n \n  \n \n  \n \n 4 api/tx/builder.md \n \n 4 api/tx/builder/helpers.md \n \n 4 api/tx/builder/schema.md \n \n  \n \n 4 api/tx.md \n \n  \n \n 4 api/tx/tx.md \n \n  \n \n 4 api/tx/tx-object.md \n \n  \n \n 4 api/tx/validator.md",
+          "depth": 2
+        },
+        {
+          "Aepp Wallet Communication": [
+            {
+              "Connection": [
+                {
+                  "Setup": "api/utils/aepp-wallet-communication/connection.md",
+                  "content": " \n \n 5 api/utils/aepp-wallet-communication/connection.md",
+                  "depth": 4
+                },
+                "api/utils/aepp-wallet-communication/content-script-bridge.md",
+                "api/utils/aepp-wallet-communication/wallet-detector.md",
+                "api/utils/aepp-wallet-communication/connection/browser-runtime.md",
+                {
+                  "Window message": "api/utils/aepp-wallet-communication/connection/browser-window-message.md",
+                  "content": " \n \n 5 api/utils/aepp-wallet-communication/connection/browser-window-message.md",
+                  "depth": 4
+                }
+              ],
+              "content": " \n \n  \n \n  \n \n 5 api/utils/aepp-wallet-communication/connection.md \n \n 4 api/utils/aepp-wallet-communication/content-script-bridge.md \n \n 4 api/utils/aepp-wallet-communication/wallet-detector.md \n \n 4 api/utils/aepp-wallet-communication/connection/browser-runtime.md \n \n  \n \n 5 api/utils/aepp-wallet-communication/connection/browser-window-message.md",
+              "depth": 3
+            },
+            {
+              "RPC": [
+                {
+                  "Aepp RPC": "api/utils/aepp-wallet-communication/rpc/aepp-rpc.md",
+                  "content": " \n \n 5 api/utils/aepp-wallet-communication/rpc/aepp-rpc.md",
+                  "depth": 4
+                },
+                {
+                  "RPC client": "api/utils/aepp-wallet-communication/rpc/rpc-client.md",
+                  "content": " \n \n 5 api/utils/aepp-wallet-communication/rpc/rpc-client.md",
+                  "depth": 4
+                },
+                {
+                  "Wallet RPC": "api/utils/aepp-wallet-communication/rpc/wallet-rpc.md",
+                  "content": " \n \n 5 api/utils/aepp-wallet-communication/rpc/wallet-rpc.md",
+                  "depth": 4
+                }
+              ],
+              "content": " \n \n  \n \n  \n \n 5 api/utils/aepp-wallet-communication/rpc/aepp-rpc.md \n \n  \n \n 5 api/utils/aepp-wallet-communication/rpc/rpc-client.md \n \n  \n \n 5 api/utils/aepp-wallet-communication/rpc/wallet-rpc.md",
+              "depth": 3
+            }
+          ],
+          "content": " \n \n  \n \n  \n \n  \n \n  \n \n 5 api/utils/aepp-wallet-communication/connection.md \n \n 4 api/utils/aepp-wallet-communication/content-script-bridge.md \n \n 4 api/utils/aepp-wallet-communication/wallet-detector.md \n \n 4 api/utils/aepp-wallet-communication/connection/browser-runtime.md \n \n  \n \n 5 api/utils/aepp-wallet-communication/connection/browser-window-message.md \n \n  \n \n  \n \n  \n \n 5 api/utils/aepp-wallet-communication/rpc/aepp-rpc.md \n \n  \n \n 5 api/utils/aepp-wallet-communication/rpc/rpc-client.md \n \n  \n \n 5 api/utils/aepp-wallet-communication/rpc/wallet-rpc.md",
+          "depth": 2
+        },
+        {
+          "utils": [
+            {
+              "AE Utilities": "api/ae.md",
+              "content": " \n \n 4 api/ae.md",
+              "depth": 3
+            },
+            "api/utils/amount-formatter.md",
+            "api/utils/bignumber.md",
+            "api/utils/bytes.md",
+            "api/utils/crypto.md",
+            "api/utils/keystore.md",
+            "api/contract.md",
+            "api/node.md",
+            "api/node-pool.md",
+            "api/utils/swagger.md"
+          ],
+          "content": " \n \n  \n \n  \n \n 4 api/ae.md \n \n 3 api/utils/amount-formatter.md \n \n 3 api/utils/bignumber.md \n \n 3 api/utils/bytes.md \n \n 3 api/utils/crypto.md \n \n 3 api/utils/keystore.md \n \n 3 api/contract.md \n \n 3 api/node.md \n \n 3 api/node-pool.md \n \n 3 api/utils/swagger.md",
+          "depth": 2
+        }
+      ],
+      "depth": 1
+    },
+    {
+      "Examples": [
+        {
+          "NodeJS": [
+            {
+              "Setup": "guides/import-nodejs.md",
+              "content": " \n \n 4 guides/import-nodejs.md",
+              "depth": 3
+            },
+            "examples/node/aecontract.md",
+            "examples/node/aecrypto.md",
+            "examples/node/aewallet.md"
+          ],
+          "content": " \n \n  \n \n  \n \n 4 guides/import-nodejs.md \n \n 3 examples/node/aecontract.md \n \n 3 examples/node/aecrypto.md \n \n 3 examples/node/aewallet.md",
+          "depth": 2
+        },
+        {
+          "JS": [
+            "guides/import-script-tag.md",
+            "guides/import-vuejs.md"
+          ],
+          "content": " \n \n  \n \n 3 guides/import-script-tag.md \n \n 3 guides/import-vuejs.md",
+          "depth": 2
+        }
+      ],
+      "depth": 1
+    }
+  ],
+  "content": null
+}
