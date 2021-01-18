@@ -18,18 +18,33 @@ cleanupAccumulator = (s) => {
     return s
 }
 
+Object.defineProperty(Set.prototype, 'addAll', {
+    enumerable: false,
+    configurable: false,
+    value: function (iterable) {
+      for (let item of iterable) {
+        this.add(item);
+      }
+      return this;
+    }
+  });
+
+const isObject = A => {
+    if( (typeof A === "object" || typeof A === 'function') && (A !== null) )
+    {
+        return true
+    } else {return false}
+}
+
+// stub, do header formatting based on depth here !
+const formatHeaders = (input, depth) =>{
+    return input
+}
+
 // for objects, for every key, we assume that every value of type string is a path to a file that can be opened
 
 // if depth is over 2 and we have a string, load that file and save it to parentFileName ! 
 const assignDepth = (arr, depth = 1, parentFileName = "") => {
-    
-    // we work on the input array, not constructing new one!
-    const isObject = A => {
-        if( (typeof A === "object" || typeof A === 'function') && (A !== null) )
-        {
-            return true
-        } else {return false}
-    }
 
     // if it's an array:
     if(Array.isArray(arr)){
@@ -104,8 +119,11 @@ const assignDepth = (arr, depth = 1, parentFileName = "") => {
 
     // if the depth is over 2, fetch the files' contents !
     if(depth > 2){
-
-        let data = fs.readFileSync(basePath + arr, "utf8");
+        // return file content
+        //let data = fs.readFileSync(basePath + arr, "utf8");
+        
+        // return file name and add depth indicator to the end
+        let data = arr + '---' + depth;
         //console.log(data)
         return {json: arr, 
                 content: data 
@@ -149,8 +167,6 @@ const deleteTooDeep = (arr, depth = 0, parentFileName = "") => {
             //console.log(value)
             //arr[index = json]
              if (isObject(json) && json.depth > 2){  
-                 console.log("Hier")
-                 console.log(json)
                 arr.splice(index,1)
             } else {
                 // just in case if JSON is not an object, add it anyway.
@@ -205,11 +221,90 @@ const deleteTooDeep = (arr, depth = 0, parentFileName = "") => {
     
 }
 
+const generateFilesFromContent = (arr) => {
+
+    // if it's an array:
+    if(Array.isArray(arr)){
+
+        var docs = new Set()
+
+        arr.forEach((value, index, array) => {
+            let json = generateFilesFromContent(value)
+
+            // just add it back
+            arr[index] = json
+        })
+
+        return arr
+
+    } // check if it is an object:
+    else if (isObject(arr) == true) {
+        // only handle if the key is not depth or content !
+
+        
+
+        Object.keys(arr).forEach(key => {
+            // get the "sweet stuff"
+            if(key != "depth" && key != "content") {
+                
+                var docs = new Set()
+
+                if(arr.content){
+                    // if docs exist, get them !
+                    if(Array.isArray(arr[key])) {
+                        let existingDocs = arr[key].filter(el => {
+                            return typeof el === 'string'
+                        })
+                        
+                        // add all docs from this "key" (which is non-content-nondepth)
+                        // to the Set
+                        existingDocs.forEach(el => docs.add(el))
+                    }
+                    // strip tag numbers from file paths and compare if 
+                    // the "content" stuff is already present in Set
+                    let contentArray = arr.content.split(' ➔ ')
+                    let filteredContentArray = []
+
+                    //process all existing "content":
+                    while(contentArray.length > 0){
+
+                        // get the last one and split it:
+                        let [path, originalDepth] = contentArray.pop().split('---')
+                        console.log("Path: ", path)
+                        console.log("has ?", docs.has(path))
+                        // if it exists in the set, put it back into the array still to be processed.
+                        !docs.has(path) ? filteredContentArray.push(path + "---" + originalDepth) : true
+                    }
+
+                    console.log(filteredContentArray)
+                    //docs.add
+                    // splice all shit to array, add it to set !
+                }
+
+                json = generateFilesFromContent(arr[key])
+
+            }
+
+        })
+
+        return arr
+
+    } else {
+
+        // just the strings - but those are we need ! 
+        return arr
+    }
+
+
+}
 // save the unflattened result
 console.log(JSONwithDepth)
 fs.writeFileSync('./testOutput.json', JSON.stringify(JSONwithDepth.json, null, 2))
 
 console.log("Now flattened: ")
+
+// another recursive function. this time, the TOCs array is populated with only newly constructed 
+// objects for its array
 const flattened = deleteTooDeep(JSONwithDepth.json)
 
 console.log(deleteTooDeep(flattened))
@@ -218,10 +313,10 @@ fs.writeFileSync('./flattened.txt', JSON.stringify(flattened, null, 2))
 
 const reFlattened = deleteTooDeep(flattened)
 
-fs.writeFileSync('./reFlattened.json', JSON.stringify(reFlattened, null, 2))
+fs.writeFileSync('./reFlattened.json', JSON.stringify(reFlattened, null, 4))
 
-// another recursive function. this time, the TOCs array is populated with only newly constructed 
-// objects for its array
+const filesProcessed = generateFilesFromContent(reFlattened)
+
 
 
 
