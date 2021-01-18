@@ -11,6 +11,13 @@ const fs = require('fs')
 /// helpers
 basePath = './docs/'
 
+cleanupAccumulator = (s) => {
+    while(s.charAt(0) === ' ' || s.charAt(0) === '➔'){
+        s = s.substring(1);
+    }
+    return s
+}
+
 // for objects, for every key, we assume that every value of type string is a path to a file that can be opened
 
 // if depth is over 2 and we have a string, load that file and save it to parentFileName ! 
@@ -38,8 +45,8 @@ const assignDepth = (arr, depth = 1, parentFileName = "") => {
             arr[index] = json
 
             // if there is content, add it to the content accumulator.
-            if (content != null) { 
-                contentAccumulator =  contentAccumulator + ' \n \n ' + content
+            if (content != null && content.length > 2) { 
+                contentAccumulator = contentAccumulator + ' ➔ ' + content
             }
             // <<<-------- accumulate content here !!!
         })
@@ -77,8 +84,10 @@ const assignDepth = (arr, depth = 1, parentFileName = "") => {
             arr[key] = json
 
             // store all the returned contents TODO: maybe sort keys alphabetically ?
-            if (content != null) { 
-                contentAccumulator =  contentAccumulator + ' \n \n ' + content
+            if (content != null && content.length > 2) { 
+                contentAccumulator = contentAccumulator + ' ➔ ' + content
+                // removes all the trailing nonsense:
+                contentAccumulator = cleanupAccumulator(contentAccumulator)
             }
         })
 
@@ -198,10 +207,10 @@ const deleteTooDeep = (arr, depth = 0, parentFileName = "") => {
 
 // save the unflattened result
 console.log(JSONwithDepth)
-fs.writeFileSync('./testOutput.txt', JSON.stringify(JSONwithDepth, null, 2))
+fs.writeFileSync('./testOutput.json', JSON.stringify(JSONwithDepth.json, null, 2))
 
 console.log("Now flattened: ")
-const flattened = deleteTooDeep(JSONwithDepth)
+const flattened = deleteTooDeep(JSONwithDepth.json)
 
 console.log(deleteTooDeep(flattened))
 fs.writeFileSync('./flattened.txt', JSON.stringify(flattened, null, 2))
@@ -209,7 +218,7 @@ fs.writeFileSync('./flattened.txt', JSON.stringify(flattened, null, 2))
 
 const reFlattened = deleteTooDeep(flattened)
 
-fs.writeFileSync('./reFlattened.txt', JSON.stringify(reFlattened, null, 2))
+fs.writeFileSync('./reFlattened.json', JSON.stringify(reFlattened, null, 2))
 
 // another recursive function. this time, the TOCs array is populated with only newly constructed 
 // objects for its array
