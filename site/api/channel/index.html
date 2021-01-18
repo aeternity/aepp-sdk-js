@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>channel - Aeternity JavaScript SDK</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../../css/theme.css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "channel";
+    var mkdocs_page_input_path = "api/channel/index.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/rust.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/erlang.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/js.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> Aeternity JavaScript SDK</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/quick-start/">Quick Start</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Guides</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/contract-events/">Contract Events</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/oracle-usage/">Oracle Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/aens-usage/">AENS Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/contract-aci-usage/">Contract Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/delegate-signature-to-contract/">Delegate Signature to Contract</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/how-to-build-aepp-using-new-wallet-api/">Wallet Api</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/how-to-build-an-wallet-app-or-extension/">Building Wallets</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/low-vs-high-usage/">Low vs High level API</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/import-tree-shaking/">Tree Shaking</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">Migration</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../guides/migration/migration-7.0.0/">Migration to SDK 7.0.0</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API Reference</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="#">account</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../account/">Account</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../account/selector/">Selector</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../account/memory/">Memory</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../accounts/">Account Handling</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">ae</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../ae/aens/">Aens</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../ae/aepp/">Aepp</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../ae/contract/">Contract</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../ae/oracle/">Oracle</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../ae/universal/">Universal</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../ae/wallet/">Wallet</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">chain</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../chain/">Chain</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../chain/node/">Node</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">channel</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#channeloptions-promiseltobjectgt">Channel(options) ⇒ Promise.&amp;lt;Object&amp;gt; ⏏</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#channelonevent-callback">Channel~on(event, callback)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#channeloffevent-callback">Channel~off(event, callback)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#channeldisconnect">Channel~disconnect()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#channelstatus-string">Channel~status() ⇒ String</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#channelstate-promiseltobjectgt">Channel~state() ⇒ Promise.&amp;lt;Object&amp;gt;</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#channelround-number">Channel~round() ⇒ Number</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#channelid-string">Channel~id() ⇒ String</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#channelfsmid-string">Channel~fsmId() ⇒ String</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#channelupdatefrom-to-amount-sign-metadata-promiseltobjectgt">Channel~update(from, to, amount, sign, metadata) ⇒ Promise.&amp;lt;Object&amp;gt;</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#channelpoiaddresses-promiseltstringgt">Channel~poi(addresses) ⇒ Promise.&amp;lt;String&amp;gt;</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#channelbalancesaccounts-promiseltobjectgt">Channel~balances(accounts) ⇒ Promise.&amp;lt;Object&amp;gt;</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#channelleave-promiseltobjectgt">Channel~leave() ⇒ Promise.&amp;lt;Object&amp;gt;</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#channelshutdownsign-promiseltstringgt">Channel~shutdown(sign) ⇒ Promise.&amp;lt;String&amp;gt;</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#channelwithdrawamount-sign-callbacks-promiseltobjectgt">Channel~withdraw(amount, sign, [callbacks]) ⇒ Promise.&amp;lt;Object&amp;gt;</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#channeldepositamount-sign-callbacks-promiseltobjectgt">Channel~deposit(amount, sign, [callbacks]) ⇒ Promise.&amp;lt;Object&amp;gt;</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#channelcreatecontractoptions-sign-promiseltobjectgt">Channel~createContract(options, sign) ⇒ Promise.&amp;lt;Object&amp;gt;</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#channelcallcontractoptions-sign-promiseltobjectgt">Channel~callContract(options, sign) ⇒ Promise.&amp;lt;Object&amp;gt;</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#channelforceprogressoptions-sign-callbacks-promiseltobjectgt">Channel~forceProgress(options, sign, callbacks) ⇒ Promise.&amp;lt;Object&amp;gt;</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#channelcallcontractstaticoptions-promiseltobjectgt">Channel~callContractStatic(options) ⇒ Promise.&amp;lt;Object&amp;gt;</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#channelgetcontractcalloptions-promiseltobjectgt">Channel~getContractCall(options) ⇒ Promise.&amp;lt;Object&amp;gt;</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#channelgetcontractstatecontract-promiseltobjectgt">Channel~getContractState(contract) ⇒ Promise.&amp;lt;Object&amp;gt;</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#channelcleancontractcalls-promise">Channel~cleanContractCalls() ⇒ Promise</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#channelsendmessagemessage-recipient">Channel~sendMessage(message, recipient)</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">contract</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../contract/aci/">Aci</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../contract/compiler/">Compiler</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../contract/ga/">Generalized Accounts</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">oracle</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../oracle/">Oracle</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../oracle/node/">Node</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../rpc/client/">Deprecated RPC Client</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">tx</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">builder</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../tx/builder/">Builder</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../tx/builder/helpers/">Helpers</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../tx/builder/schema/">Schema</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../tx/">tx</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../tx/tx/">tx stamp</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../tx/tx-object/">tx object</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../tx/validator/">tx validator</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">Aepp Wallet Communication</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">Connection</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/connection/">Setup</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/content-script-bridge/">Content script bridge</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/wallet-detector/">Wallet detector</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/connection/browser-runtime/">Browser runtime</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/connection/browser-window-message/">Window message</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">RPC</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/rpc/aepp-rpc/">Aepp RPC</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/rpc/rpc-client/">RPC client</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/rpc/wallet-rpc/">Wallet RPC</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">utils</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../ae/">AE Utilities</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../utils/amount-formatter/">Amount formatter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../utils/bignumber/">Bignumber</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../utils/bytes/">Bytes</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../utils/crypto/">Crypto</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../utils/keystore/">Keystore</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../contract/">Contract</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../node/">Node</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../node-pool/">Node pool</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../utils/swagger/">Swagger</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Examples</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="#">NodeJS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../guides/import-nodejs/">Setup</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../examples/node/aecontract/">Simple Sophia Contract Compiler</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../examples/node/aecrypto/">Crypto Helper Script</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../examples/node/aewallet/">Simple AE Token Spending Script</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">JS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../guides/import-script-tag/">Script Tag</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../guides/import-vuejs/">Vue.js</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">Aeternity JavaScript SDK</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>API Reference &raquo;</li>
+        
+      
+    
+    <li>channel</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/aeternity/aepp-sdk-js/edit/master/docs/api/channel/index.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p><a id="module_@aeternity/aepp-sdk/es/channel/index"></a></p>
+<h2 id="aeternityaepp-sdkeschannelindex">@aeternity/aepp-sdk/es/channel/index</h2>
+<p>Channel module</p>
+<p><strong>Example</strong>  </p>
+<pre><code class="js">import Channel from '@aeternity/aepp-sdk/es/channel/index'
+</code></pre>
+
+<ul>
+<li><a href="#module_@aeternity/aepp-sdk/es/channel/index">@aeternity/aepp-sdk/es/channel/index</a><ul>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel">Channel(options)</a> ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code> ⏏<ul>
+<li><a href="#module_@aeternity/aepp-sdk/es/channel/index--Channel..on">~on(event, callback)</a></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/channel/index--Channel..off">~off(event, callback)</a></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/channel/index--Channel..disconnect">~disconnect()</a></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/channel/index--Channel..status">~status()</a> ⇒ <code>String</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/channel/index--Channel..state">~state()</a> ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/channel/index--Channel..round">~round()</a> ⇒ <code>Number</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/channel/index--Channel..id">~id()</a> ⇒ <code>String</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/channel/index--Channel..fsmId">~fsmId()</a> ⇒ <code>String</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/channel/index--Channel..update">~update(from, to, amount, sign, metadata)</a> ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/channel/index--Channel..poi">~poi(addresses)</a> ⇒ <code>Promise.&amp;lt;String&amp;gt;</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/channel/index--Channel..balances">~balances(accounts)</a> ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/channel/index--Channel..leave">~leave()</a> ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/channel/index--Channel..shutdown">~shutdown(sign)</a> ⇒ <code>Promise.&amp;lt;String&amp;gt;</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/channel/index--Channel..withdraw">~withdraw(amount, sign, [callbacks])</a> ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/channel/index--Channel..deposit">~deposit(amount, sign, [callbacks])</a> ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/channel/index--Channel..createContract">~createContract(options, sign)</a> ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/channel/index--Channel..callContract">~callContract(options, sign)</a> ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/channel/index--Channel..forceProgress">~forceProgress(options, sign, callbacks)</a> ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/channel/index--Channel..callContractStatic">~callContractStatic(options)</a> ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/channel/index--Channel..getContractCall">~getContractCall(options)</a> ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/channel/index--Channel..getContractState">~getContractState(contract)</a> ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/channel/index--Channel..cleanContractCalls">~cleanContractCalls()</a> ⇒ <code>Promise</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/channel/index--Channel..sendMessage">~sendMessage(message, recipient)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/channel/index--Channel"></a></p>
+<h3 id="channeloptions-promiseltobjectgt">Channel(options) ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code> ⏏</h3>
+<p>Channel</p>
+<p><strong>Kind</strong>: Exported function<br />
+<strong>Returns</strong>: <code>Promise.&amp;lt;Object&amp;gt;</code> - Channel instance<br />
+<strong>rtype</strong>: <code>Channel</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td><code>Object</code></td>
+<td></td>
+<td>Channel params</td>
+</tr>
+<tr>
+<td>options.url</td>
+<td><code>String</code></td>
+<td></td>
+<td>Channel url (for example: "ws://localhost:3001")</td>
+</tr>
+<tr>
+<td>options.role</td>
+<td><code>String</code></td>
+<td></td>
+<td>Participant role ("initiator" or "responder")</td>
+</tr>
+<tr>
+<td>options.initiatorId</td>
+<td><code>String</code></td>
+<td></td>
+<td>Initiator's public key</td>
+</tr>
+<tr>
+<td>options.responderId</td>
+<td><code>String</code></td>
+<td></td>
+<td>Responder's public key</td>
+</tr>
+<tr>
+<td>options.pushAmount</td>
+<td><code>Number</code></td>
+<td></td>
+<td>Initial deposit in favour of the responder by the initiator</td>
+</tr>
+<tr>
+<td>options.initiatorAmount</td>
+<td><code>Number</code></td>
+<td></td>
+<td>Amount of tokens the initiator has committed to the channel</td>
+</tr>
+<tr>
+<td>options.responderAmount</td>
+<td><code>Number</code></td>
+<td></td>
+<td>Amount of tokens the responder has committed to the channel</td>
+</tr>
+<tr>
+<td>options.channelReserve</td>
+<td><code>Number</code></td>
+<td></td>
+<td>The minimum amount both peers need to maintain</td>
+</tr>
+<tr>
+<td>[options.ttl]</td>
+<td><code>Number</code></td>
+<td></td>
+<td>Minimum block height to include the channel_create_tx</td>
+</tr>
+<tr>
+<td>options.host</td>
+<td><code>String</code></td>
+<td></td>
+<td>Host of the responder's node</td>
+</tr>
+<tr>
+<td>options.port</td>
+<td><code>Number</code></td>
+<td></td>
+<td>The port of the responders node</td>
+</tr>
+<tr>
+<td>options.lockPeriod</td>
+<td><code>Number</code></td>
+<td></td>
+<td>Amount of blocks for disputing a solo close</td>
+</tr>
+<tr>
+<td>[options.existingChannelId]</td>
+<td><code>Number</code></td>
+<td></td>
+<td>Existing channel id (required if reestablishing a channel)</td>
+</tr>
+<tr>
+<td>[options.offchainTx]</td>
+<td><code>Number</code></td>
+<td></td>
+<td>Offchain transaction (required if reestablishing a channel)</td>
+</tr>
+<tr>
+<td>[options.timeoutIdle]</td>
+<td><code>Number</code></td>
+<td></td>
+<td>The time waiting for a new event to be initiated (default: 600000)</td>
+</tr>
+<tr>
+<td>[options.timeoutFundingCreate]</td>
+<td><code>Number</code></td>
+<td></td>
+<td>The time waiting for the initiator to produce the create channel transaction after the noise session had been established (default: 120000)</td>
+</tr>
+<tr>
+<td>[options.timeoutFundingSign]</td>
+<td><code>Number</code></td>
+<td></td>
+<td>The time frame the other client has to sign an off-chain update after our client had initiated and signed it. This applies only for double signed on-chain intended updates: channel create transaction, deposit, withdrawal and etc. (default: 120000)</td>
+</tr>
+<tr>
+<td>[options.timeoutFundingLock]</td>
+<td><code>Number</code></td>
+<td></td>
+<td>The time frame the other client has to confirm an on-chain transaction reaching maturity (passing minimum depth) after the local node has detected this. This applies only for double signed on-chain intended updates: channel create transaction, deposit, withdrawal and etc. (default: 360000)</td>
+</tr>
+<tr>
+<td>[options.timeoutSign]</td>
+<td><code>Number</code></td>
+<td></td>
+<td>The time frame the client has to return a signed off-chain update or to decline it. This applies for all off-chain updates (default: 500000)</td>
+</tr>
+<tr>
+<td>[options.timeoutAccept]</td>
+<td><code>Number</code></td>
+<td></td>
+<td>The time frame the other client has to react to an event. This applies for all off-chain updates that are not meant to land on-chain, as well as some special cases: opening a noise connection, mutual closing acknowledgement and reestablishing an existing channel (default: 120000)</td>
+</tr>
+<tr>
+<td>[options.timeoutInitialized]</td>
+<td><code>Number</code></td>
+<td></td>
+<td>the time frame the responder has to accept an incoming noise session. Applicable only for initiator (default: timeout_accept's value)</td>
+</tr>
+<tr>
+<td>[options.timeoutAwaitingOpen]</td>
+<td><code>Number</code></td>
+<td></td>
+<td>The time frame the initiator has to start an outgoing noise session to the responder's node. Applicable only for responder (default: timeout_idle's value)</td>
+</tr>
+<tr>
+<td>[options.debug]</td>
+<td><code>Number</code></td>
+<td><code>false</code></td>
+<td>Log websocket communication</td>
+</tr>
+<tr>
+<td>options.sign</td>
+<td><code>function</code></td>
+<td></td>
+<td>Function which verifies and signs transactions</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>  </p>
+<pre><code class="js">Channel({
+  url: 'ws://localhost:3001',
+  role: 'initiator'
+  initiatorId: 'ak_Y1NRjHuoc3CGMYMvCmdHSBpJsMDR6Ra2t5zjhRcbtMeXXLpLH',
+  responderId: 'ak_V6an1xhec1xVaAhLuak7QoEbi6t7w5hEtYWp9bMKaJ19i6A9E',
+  initiatorAmount: 1e18,
+  responderAmount: 1e18,
+  pushAmount: 0,
+  channelReserve: 0,
+  ttl: 1000,
+  host: 'localhost',
+  port: 3002,
+  lockPeriod: 10,
+  async sign (tag, tx) =&gt; await account.signTransaction(tx)
+})
+</code></pre>
+
+<p><a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..on"></a></p>
+<h4 id="channelonevent-callback">Channel~on(event, callback)</h4>
+<p>Register event listener function</p>
+<p>Possible events:</p>
+<ul>
+<li>"error"</li>
+<li>"onChainTx"</li>
+<li>"ownWithdrawLocked"</li>
+<li>"withdrawLocked"</li>
+<li>"ownDepositLocked"</li>
+<li>"depositLocked"</li>
+</ul>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel"><code>Channel</code></a>  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>event</td>
+<td><code>String</code></td>
+<td>Event name</td>
+</tr>
+<tr>
+<td>callback</td>
+<td><code>function</code></td>
+<td>Callback function</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..off"></a></p>
+<h4 id="channeloffevent-callback">Channel~off(event, callback)</h4>
+<p>Remove event listener function</p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel"><code>Channel</code></a>  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>event</td>
+<td><code>String</code></td>
+<td>Event name</td>
+</tr>
+<tr>
+<td>callback</td>
+<td><code>function</code></td>
+<td>Callback function</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..disconnect"></a></p>
+<h4 id="channeldisconnect">Channel~disconnect()</h4>
+<p>Close the connection</p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel"><code>Channel</code></a><br />
+<a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..status"></a></p>
+<h4 id="channelstatus-string">Channel~status() ⇒ <code>String</code></h4>
+<p>Get current status</p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel"><code>Channel</code></a><br />
+<a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..state"></a></p>
+<h4 id="channelstate-promiseltobjectgt">Channel~state() ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code></h4>
+<p>Get current state</p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel"><code>Channel</code></a><br />
+<a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..round"></a></p>
+<h4 id="channelround-number">Channel~round() ⇒ <code>Number</code></h4>
+<p>Get current round</p>
+<p>If round cannot be determined (for example when channel has not been opened)
+it will return <code>null</code>.</p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel"><code>Channel</code></a><br />
+<a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..id"></a></p>
+<h4 id="channelid-string">Channel~id() ⇒ <code>String</code></h4>
+<p>Get channel id</p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel"><code>Channel</code></a><br />
+<a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..fsmId"></a></p>
+<h4 id="channelfsmid-string">Channel~fsmId() ⇒ <code>String</code></h4>
+<p>Get channel's fsm id</p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel"><code>Channel</code></a><br />
+<a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..update"></a></p>
+<h4 id="channelupdatefrom-to-amount-sign-metadata-promiseltobjectgt">Channel~update(from, to, amount, sign, metadata) ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code></h4>
+<p>Trigger a transfer update</p>
+<p>The transfer update is moving tokens from one channel account to another.
+The update is a change to be applied on top of the latest state.</p>
+<p>Sender and receiver are the channel parties. Both the initiator and responder
+can take those roles. Any public key outside of the channel is considered invalid.</p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel"><code>Channel</code></a>  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>from</td>
+<td><code>String</code></td>
+<td>Sender's public address</td>
+</tr>
+<tr>
+<td>to</td>
+<td><code>String</code></td>
+<td>Receiver's public address</td>
+</tr>
+<tr>
+<td>amount</td>
+<td><code>Number</code></td>
+<td>Transaction amount</td>
+</tr>
+<tr>
+<td>sign</td>
+<td><code>function</code></td>
+<td>Function which verifies and signs offchain transaction</td>
+</tr>
+<tr>
+<td>metadata</td>
+<td><code>Array.&amp;lt;String&amp;gt;</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>  </p>
+<pre><code class="js">channel.update(
+  'ak_Y1NRjHuoc3CGMYMvCmdHSBpJsMDR6Ra2t5zjhRcbtMeXXLpLH',
+  'ak_V6an1xhec1xVaAhLuak7QoEbi6t7w5hEtYWp9bMKaJ19i6A9E',
+  10,
+  async (tx) =&gt; await account.signTransaction(tx)
+).then(({ accepted, signedTx }) =&gt;
+  if (accepted) {
+    console.log('Update has been accepted')
+  }
+)
+</code></pre>
+
+<p><a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..poi"></a></p>
+<h4 id="channelpoiaddresses-promiseltstringgt">Channel~poi(addresses) ⇒ <code>Promise.&amp;lt;String&amp;gt;</code></h4>
+<p>Get proof of inclusion</p>
+<p>If a certain address of an account or a contract is not found
+in the state tree - the response is an error.</p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel"><code>Channel</code></a>  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>addresses</td>
+<td><code>Object</code></td>
+<td></td>
+</tr>
+<tr>
+<td>[addresses.accounts]</td>
+<td><code>Array.&amp;lt;String&amp;gt;</code></td>
+<td>List of account addresses to include in poi</td>
+</tr>
+<tr>
+<td>[addresses.contracts]</td>
+<td><code>Array.&amp;lt;String&amp;gt;</code></td>
+<td>List of contract addresses to include in poi</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>  </p>
+<pre><code class="js">channel.poi({
+  accounts: [
+    'ak_Y1NRjHuoc3CGMYMvCmdHSBpJsMDR6Ra2t5zjhRcbtMeXXLpLH',
+    'ak_V6an1xhec1xVaAhLuak7QoEbi6t7w5hEtYWp9bMKaJ19i6A9E'
+  ],
+  contracts: ['ct_2dCUAWYZdrWfACz3a2faJeKVTVrfDYxCQHCqAt5zM15f3u2UfA']
+}).then(poi =&gt; console.log(poi))
+</code></pre>
+
+<p><a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..balances"></a></p>
+<h4 id="channelbalancesaccounts-promiseltobjectgt">Channel~balances(accounts) ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code></h4>
+<p>Get balances</p>
+<p>The accounts paramcontains a list of addresses to fetch balances of.
+Those can be either account balances or a contract ones, encoded as an account addresses.</p>
+<p>If a certain account address had not being found in the state tree - it is simply
+skipped in the response.</p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel"><code>Channel</code></a>  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>accounts</td>
+<td><code>Array.&amp;lt;String&amp;gt;</code></td>
+<td>List of addresses to fetch balances from</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>  </p>
+<pre><code class="js">channel.balances([
+  'ak_Y1NRjHuoc3CGMYMvCmdHSBpJsMDR6Ra2t5zjhRcbtMeXXLpLH',
+  'ak_V6an1xhec1xVaAhLuak7QoEbi6t7w5hEtYWp9bMKaJ19i6A9E'
+  'ct_2dCUAWYZdrWfACz3a2faJeKVTVrfDYxCQHCqAt5zM15f3u2UfA'
+]).then(balances =&gt;
+  console.log(balances['ak_Y1NRjHuoc3CGMYMvCmdHSBpJsMDR6Ra2t5zjhRcbtMeXXLpLH'])
+)
+</code></pre>
+
+<p><a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..leave"></a></p>
+<h4 id="channelleave-promiseltobjectgt">Channel~leave() ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code></h4>
+<p>Leave channel</p>
+<p>It is possible to leave a channel and then later reestablish the channel
+off-chain state and continue operation. When a leave method is called,
+the channel fsm passes it on to the peer fsm, reports the current mutually
+signed state and then terminates.</p>
+<p>The channel can be reestablished by instantiating another Channel instance
+with two extra params: existingChannelId and offchainTx (returned from leave
+method as channelId and signedTx respectively).</p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel"><code>Channel</code></a><br />
+<strong>Example</strong>  </p>
+<pre><code class="js">channel.leave().then(({ channelId, signedTx }) =&gt; {
+  console.log(channelId)
+  console.log(signedTx)
+})
+</code></pre>
+
+<p><a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..shutdown"></a></p>
+<h4 id="channelshutdownsign-promiseltstringgt">Channel~shutdown(sign) ⇒ <code>Promise.&amp;lt;String&amp;gt;</code></h4>
+<p>Trigger mutual close</p>
+<p>At any moment after the channel is opened, a closing procedure can be triggered.
+This can be done by either of the parties. The process is similar to the off-chain updates.</p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel"><code>Channel</code></a>  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>sign</td>
+<td><code>function</code></td>
+<td>Function which verifies and signs mutual close transaction</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>  </p>
+<pre><code class="js">channel.shutdown(
+  async (tx) =&gt; await account.signTransaction(tx)
+).then(tx =&gt; console.log('on_chain_tx', tx))
+</code></pre>
+
+<p><a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..withdraw"></a></p>
+<h4 id="channelwithdrawamount-sign-callbacks-promiseltobjectgt">Channel~withdraw(amount, sign, [callbacks]) ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code></h4>
+<p>Withdraw tokens from the channel</p>
+<p>After the channel had been opened any of the participants can initiate a withdrawal.
+The process closely resembles the update. The most notable difference is that the
+transaction has been co-signed: it is channel_withdraw_tx and after the procedure
+is finished - it is being posted on-chain.</p>
+<p>Any of the participants can initiate a withdrawal. The only requirements are:</p>
+<ul>
+<li>Channel is already opened</li>
+<li>No off-chain update/deposit/withdrawal is currently being performed</li>
+<li>Channel is not being closed or in a solo closing state</li>
+<li>The withdrawal amount must be equal to or greater than zero, and cannot exceed
+    the available balance on the channel (minus the channel_reserve)</li>
+</ul>
+<p>After the other party had signed the withdraw transaction, the transaction is posted
+on-chain and onOnChainTx callback is called with on-chain transaction as first argument.
+After computing transaction hash it can be tracked on the chain: entering the mempool,
+block inclusion and a number of confirmations.</p>
+<p>After the minimum_depth block confirmations onOwnWithdrawLocked callback is called
+(without any arguments).</p>
+<p>When the other party had confirmed that the block height needed is reached
+onWithdrawLocked callback is called (without any arguments).</p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel"><code>Channel</code></a>  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>amount</td>
+<td><code>Number</code></td>
+<td>Amount of tokens to withdraw</td>
+</tr>
+<tr>
+<td>sign</td>
+<td><code>function</code></td>
+<td>Function which verifies and signs withdraw transaction</td>
+</tr>
+<tr>
+<td>[callbacks]</td>
+<td><code>Object</code></td>
+<td></td>
+</tr>
+<tr>
+<td>[callbacks.onOnChainTx]</td>
+<td><code>function</code></td>
+<td>Called when withdraw transaction has been posted on chain</td>
+</tr>
+<tr>
+<td>[callbacks.onOwnWithdrawLocked]</td>
+<td><code>function</code></td>
+<td></td>
+</tr>
+<tr>
+<td>[callbacks.onWithdrawLocked]</td>
+<td><code>function</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>  </p>
+<pre><code class="js">channel.withdraw(
+  100,
+  async (tx) =&gt; await account.signTransaction(tx),
+  { onOnChainTx: (tx) =&gt; console.log('on_chain_tx', tx) }
+).then(({ accepted, signedTx }) =&gt; {
+  if (accepted) {
+    console.log('Withdrawal has been accepted')
+  } else {
+    console.log('Withdrawal has been rejected')
+  }
+})
+</code></pre>
+
+<p><a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..deposit"></a></p>
+<h4 id="channeldepositamount-sign-callbacks-promiseltobjectgt">Channel~deposit(amount, sign, [callbacks]) ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code></h4>
+<p>Deposit tokens into the channel</p>
+<p>After the channel had been opened any of the participants can initiate a deposit.
+The process closely resembles the update. The most notable difference is that the
+transaction has been co-signed: it is channel_deposit_tx and after the procedure
+is finished - it is being posted on-chain.</p>
+<p>Any of the participants can initiate a deposit. The only requirements are:</p>
+<ul>
+<li>Channel is already opened</li>
+<li>No off-chain update/deposit/withdrawal is currently being performed</li>
+<li>Channel is not being closed or in a solo closing state</li>
+<li>The deposit amount must be equal to or greater than zero, and cannot exceed
+    the available balance on the channel (minus the channel_reserve)</li>
+</ul>
+<p>After the other party had signed the deposit transaction, the transaction is posted
+on-chain and onOnChainTx callback is called with on-chain transaction as first argument.
+After computing transaction hash it can be tracked on the chain: entering the mempool,
+block inclusion and a number of confirmations.</p>
+<p>After the minimum_depth block confirmations onOwnDepositLocked callback is called
+(without any arguments).</p>
+<p>When the other party had confirmed that the block height needed is reached
+onDepositLocked callback is called (without any arguments).</p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel"><code>Channel</code></a>  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>amount</td>
+<td><code>Number</code></td>
+<td>Amount of tokens to deposit</td>
+</tr>
+<tr>
+<td>sign</td>
+<td><code>function</code></td>
+<td>Function which verifies and signs deposit transaction</td>
+</tr>
+<tr>
+<td>[callbacks]</td>
+<td><code>Object</code></td>
+<td></td>
+</tr>
+<tr>
+<td>[callbacks.onOnChainTx]</td>
+<td><code>function</code></td>
+<td>Called when deposit transaction has been posted on chain</td>
+</tr>
+<tr>
+<td>[callbacks.onOwnDepositLocked]</td>
+<td><code>function</code></td>
+<td></td>
+</tr>
+<tr>
+<td>[callbacks.onDepositLocked]</td>
+<td><code>function</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>  </p>
+<pre><code class="js">channel.deposit(
+  100,
+  async (tx) =&gt; await account.signTransaction(tx),
+  { onOnChainTx: (tx) =&gt; console.log('on_chain_tx', tx) }
+).then(({ accepted, state }) =&gt; {
+  if (accepted) {
+    console.log('Deposit has been accepted')
+    console.log('The new state is:', state)
+  } else {
+    console.log('Deposit has been rejected')
+  }
+})
+</code></pre>
+
+<p><a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..createContract"></a></p>
+<h4 id="channelcreatecontractoptions-sign-promiseltobjectgt">Channel~createContract(options, sign) ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code></h4>
+<p>Trigger create contract update</p>
+<p>The create contract update is creating a contract inside the channel's internal state tree.
+The update is a change to be applied on top of the latest state.</p>
+<p>That would create a contract with the poster being the owner of it. Poster commits initially
+a deposit amount of tokens to the new contract.</p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel"><code>Channel</code></a>  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td><code>Object</code></td>
+<td></td>
+</tr>
+<tr>
+<td>options.code</td>
+<td><code>String</code></td>
+<td>Api encoded compiled AEVM byte code</td>
+</tr>
+<tr>
+<td>options.callData</td>
+<td><code>String</code></td>
+<td>Api encoded compiled AEVM call data for the code</td>
+</tr>
+<tr>
+<td>options.deposit</td>
+<td><code>Number</code></td>
+<td>Initial amount the owner of the contract commits to it</td>
+</tr>
+<tr>
+<td>options.vmVersion</td>
+<td><code>Number</code></td>
+<td>Version of the AEVM</td>
+</tr>
+<tr>
+<td>options.abiVersion</td>
+<td><code>Number</code></td>
+<td>Version of the ABI</td>
+</tr>
+<tr>
+<td>sign</td>
+<td><code>function</code></td>
+<td>Function which verifies and signs create contract transaction</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>  </p>
+<pre><code class="js">channel.createContract({
+  code: 'cb_HKtpipK4aCgYb17wZ...',
+  callData: 'cb_1111111111111111...',
+  deposit: 10,
+  vmVersion: 3,
+  abiVersion: 1
+}).then(({ accepted, signedTx, address }) =&gt; {
+  if (accepted) {
+    console.log('New contract has been created')
+    console.log('Contract address:', address)
+  } else {
+    console.log('New contract has been rejected')
+  }
+})
+</code></pre>
+
+<p><a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..callContract"></a></p>
+<h4 id="channelcallcontractoptions-sign-promiseltobjectgt">Channel~callContract(options, sign) ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code></h4>
+<p>Trigger call a contract update</p>
+<p>The call contract update is calling a preexisting contract inside the channel's
+internal state tree. The update is a change to be applied on top of the latest state.</p>
+<p>That would call a contract with the poster being the caller of it. Poster commits
+an amount of tokens to the contract.</p>
+<p>The call would also create a call object inside the channel state tree. It contains
+the result of the contract call.</p>
+<p>It is worth mentioning that the gas is not consumed, because this is an off-chain
+contract call. It would be consumed if it were a on-chain one. This could happen
+if a call with a similar computation amount is to be forced on-chain.</p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel"><code>Channel</code></a>  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td><code>Object</code></td>
+<td></td>
+</tr>
+<tr>
+<td>[options.amount]</td>
+<td><code>String</code></td>
+<td>Amount the caller of the contract commits to it</td>
+</tr>
+<tr>
+<td>[options.callData]</td>
+<td><code>String</code></td>
+<td>ABI encoded compiled AEVM call data for the code</td>
+</tr>
+<tr>
+<td>[options.contract]</td>
+<td><code>Number</code></td>
+<td>Address of the contract to call</td>
+</tr>
+<tr>
+<td>[options.abiVersion]</td>
+<td><code>Number</code></td>
+<td>Version of the ABI</td>
+</tr>
+<tr>
+<td>sign</td>
+<td><code>function</code></td>
+<td>Function which verifies and signs contract call transaction</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>  </p>
+<pre><code class="js">channel.callContract({
+  contract: 'ct_9sRA9AVE4BYTAkh5RNfJYmwQe1NZ4MErasQLXZkFWG43TPBqa',
+  callData: 'cb_1111111111111111...',
+  amount: 0,
+  abiVersion: 1
+}).then(({ accepted, signedTx }) =&gt; {
+  if (accepted) {
+    console.log('Contract called succesfully')
+  } else {
+    console.log('Contract call has been rejected')
+  }
+})
+</code></pre>
+
+<p><a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..forceProgress"></a></p>
+<h4 id="channelforceprogressoptions-sign-callbacks-promiseltobjectgt">Channel~forceProgress(options, sign, callbacks) ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code></h4>
+<p>Trigger a force progress contract call
+This call is going on-chain</p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel"><code>Channel</code></a>  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td><code>Object</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>[options.amount]</td>
+<td><code>String</code></td>
+<td></td>
+<td>Amount the caller of the contract commits to it</td>
+</tr>
+<tr>
+<td>[options.callData]</td>
+<td><code>String</code></td>
+<td></td>
+<td>ABI encoded compiled AEVM call data for the code</td>
+</tr>
+<tr>
+<td>[options.contract]</td>
+<td><code>Number</code></td>
+<td></td>
+<td>Address of the contract to call</td>
+</tr>
+<tr>
+<td>[options.abiVersion]</td>
+<td><code>Number</code></td>
+<td></td>
+<td>Version of the ABI</td>
+</tr>
+<tr>
+<td>[options.gasPrice]</td>
+<td><code>Number</code></td>
+<td><code>1000000000</code></td>
+<td>Gas price</td>
+</tr>
+<tr>
+<td>[options.gas]</td>
+<td><code>Number</code></td>
+<td><code>1000000</code></td>
+<td>Gas limit</td>
+</tr>
+<tr>
+<td>sign</td>
+<td><code>function</code></td>
+<td></td>
+<td>Function which verifies and signs contract force progress transaction</td>
+</tr>
+<tr>
+<td>callbacks</td>
+<td><code>Object</code></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>  </p>
+<pre><code class="js">channel.forceProgress({
+  contract: 'ct_9sRA9AVE4BYTAkh5RNfJYmwQe1NZ4MErasQLXZkFWG43TPBqa',
+  callData: 'cb_1111111111111111...',
+  amount: 0,
+  abiVersion: 1,
+  gasPrice: 1000005554
+}).then(({ accepted, signedTx }) =&gt; {
+  if (accepted) {
+    console.log('Contract force progress call successful')
+  } else {
+    console.log('Contract force progress call has been rejected')
+  }
+})
+</code></pre>
+
+<p><a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..callContractStatic"></a></p>
+<h4 id="channelcallcontractstaticoptions-promiseltobjectgt">Channel~callContractStatic(options) ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code></h4>
+<p>Call contract using dry-run</p>
+<p>In order to get the result of a potential contract call, one might need to
+dry-run a contract call. It takes the exact same arguments as a call would
+and returns the call object.</p>
+<p>The call is executed in the channel's state but it does not impact the state
+whatsoever. It uses as an environment the latest channel's state and the current
+top of the blockchain as seen by the node.</p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel"><code>Channel</code></a>  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td><code>Object</code></td>
+<td></td>
+</tr>
+<tr>
+<td>[options.amount]</td>
+<td><code>String</code></td>
+<td>Amount the caller of the contract commits to it</td>
+</tr>
+<tr>
+<td>[options.callData]</td>
+<td><code>String</code></td>
+<td>ABI encoded compiled AEVM call data for the code</td>
+</tr>
+<tr>
+<td>[options.contract]</td>
+<td><code>Number</code></td>
+<td>Address of the contract to call</td>
+</tr>
+<tr>
+<td>[options.abiVersion]</td>
+<td><code>Number</code></td>
+<td>Version of the ABI</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>  </p>
+<pre><code class="js">channel.callContractStatic({
+  contract: 'ct_9sRA9AVE4BYTAkh5RNfJYmwQe1NZ4MErasQLXZkFWG43TPBqa',
+  callData: 'cb_1111111111111111...',
+  amount: 0,
+  abiVersion: 1
+}).then(({ returnValue, gasUsed }) =&gt; {
+  console.log('Returned value:', returnValue)
+  console.log('Gas used:', gasUsed)
+})
+</code></pre>
+
+<p><a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..getContractCall"></a></p>
+<h4 id="channelgetcontractcalloptions-promiseltobjectgt">Channel~getContractCall(options) ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code></h4>
+<p>Get contract call result</p>
+<p>The combination of a caller, contract and a round of execution determines the
+contract call. Providing an incorrect set of those results in an error response.</p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel"><code>Channel</code></a>  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td><code>Object</code></td>
+<td></td>
+</tr>
+<tr>
+<td>[options.caller]</td>
+<td><code>String</code></td>
+<td>Address of contract caller</td>
+</tr>
+<tr>
+<td>[options.contract]</td>
+<td><code>String</code></td>
+<td>Address of the contract</td>
+</tr>
+<tr>
+<td>[options.round]</td>
+<td><code>Number</code></td>
+<td>Round when contract was called</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>  </p>
+<pre><code class="js">channel.getContractCall({
+  caller: 'ak_Y1NRjHuoc3CGMYMvCmdHSBpJsMDR6Ra2t5zjhRcbtMeXXLpLH',
+  contract: 'ct_9sRA9AVE4BYTAkh5RNfJYmwQe1NZ4MErasQLXZkFWG43TPBqa',
+  round: 3
+}).then(({ returnType, returnValue }) =&gt; {
+  if (returnType === 'ok') console.log(returnValue)
+})
+</code></pre>
+
+<p><a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..getContractState"></a></p>
+<h4 id="channelgetcontractstatecontract-promiseltobjectgt">Channel~getContractState(contract) ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code></h4>
+<p>Get contract latest state</p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel"><code>Channel</code></a>  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>contract</td>
+<td><code>String</code></td>
+<td>Address of the contract</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>  </p>
+<pre><code class="js">channel.getContractState(
+  'ct_9sRA9AVE4BYTAkh5RNfJYmwQe1NZ4MErasQLXZkFWG43TPBqa'
+).then(({ contract }) =&gt; {
+  console.log('deposit:', contract.deposit)
+})
+</code></pre>
+
+<p><a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..cleanContractCalls"></a></p>
+<h4 id="channelcleancontractcalls-promise">Channel~cleanContractCalls() ⇒ <code>Promise</code></h4>
+<p>Clean up all locally stored contract calls</p>
+<p>Contract calls are kept locally in order for the participant to be able to look them up.
+They consume memory and in order for the participant to free it - one can prune all messages.
+This cleans up all locally stored contract calls and those will no longer be available for
+fetching and inspection.</p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel"><code>Channel</code></a><br />
+<a id="module_@aeternity/aepp-sdk/es/channel/index--Channel..sendMessage"></a></p>
+<h4 id="channelsendmessagemessage-recipient">Channel~sendMessage(message, recipient)</h4>
+<p>Send generic message</p>
+<p>If message is an object it will be serialized into JSON string
+before sending.</p>
+<p>If there is ongoing update that has not yet been finished the message
+will be sent after that update is finalized.</p>
+<p><strong>Kind</strong>: inner method of <a href="#exp_module_@aeternity/aepp-sdk/es/channel/index--Channel"><code>Channel</code></a>  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>message</td>
+<td><code>String</code> | <code>Object</code></td>
+<td></td>
+</tr>
+<tr>
+<td>recipient</td>
+<td><code>String</code></td>
+<td>Address of the recipient</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>  </p>
+<pre><code class="js">channel.sendMessage(
+  'hello world',
+  'ak_Y1NRjHuoc3CGMYMvCmdHSBpJsMDR6Ra2t5zjhRcbtMeXXLpLH'
+)
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../contract/aci/" class="btn btn-neutral float-right" title="Aci">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../chain/node/" class="btn btn-neutral" title="Node"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/aeternity/aepp-sdk-js/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../chain/node/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../contract/aci/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

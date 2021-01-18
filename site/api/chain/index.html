@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Chain - Aeternity JavaScript SDK</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../../css/theme.css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Chain";
+    var mkdocs_page_input_path = "api/chain.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/rust.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/erlang.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/js.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> Aeternity JavaScript SDK</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/quick-start/">Quick Start</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Guides</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/contract-events/">Contract Events</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/oracle-usage/">Oracle Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/aens-usage/">AENS Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/contract-aci-usage/">Contract Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/delegate-signature-to-contract/">Delegate Signature to Contract</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/how-to-build-aepp-using-new-wallet-api/">Wallet Api</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/how-to-build-an-wallet-app-or-extension/">Building Wallets</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/low-vs-high-usage/">Low vs High level API</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/import-tree-shaking/">Tree Shaking</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">Migration</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../guides/migration/migration-7.0.0/">Migration to SDK 7.0.0</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API Reference</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="#">account</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../account/">Account</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../account/selector/">Selector</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../account/memory/">Memory</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../accounts/">Account Handling</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">ae</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../ae/aens/">Aens</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../ae/aepp/">Aepp</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../ae/contract/">Contract</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../ae/oracle/">Oracle</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../ae/universal/">Universal</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../ae/wallet/">Wallet</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="#">chain</a>
+    <ul class="current">
+                <li class="toctree-l2 current"><a class="reference internal current" href="./">Chain</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#chainoptions-object">Chain([options]) ⇒ Object ⏏</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#chainsendtransactiontx-options-object">chain.sendTransaction(tx, [options]) ⇒ Object</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#chainheight-number">chain.height() ⇒ Number</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#chainawaitheightoptions-number">chain.awaitHeight([options]) ⇒ Number</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#chainpolloptions-object">chain.poll([options]) ⇒ Object</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#chainbalanceaddress-options-object">chain.balance(address, [options]) ⇒ Object</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#chaintxhash-info-object">chain.tx(hash, info) ⇒ Object</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#chaingettxinfohash-object">chain.getTxInfo(hash) ⇒ Object</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#chainmempool-arrayltobjectgt">chain.mempool() ⇒ Array.&amp;lt;Object&amp;gt;</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#chaingetcurrentgeneration-object">chain.getCurrentGeneration() ⇒ Object</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#chaingetgenerationhashorheight-object">chain.getGeneration(hashOrHeight) ⇒ Object</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#chainwaitfortxconfirmtxhash-options-promiseltnumbergt">chain.waitForTxConfirm(txHash, [options]) ⇒ Promise.&amp;lt;Number&amp;gt;</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#chaingetmicroblocktransactions-arrayltobjectgt">chain.getMicroBlockTransactions() ⇒ Array.&amp;lt;Object&amp;gt;</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#chaingetkeyblock-object">chain.getKeyBlock() ⇒ Object</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#chaingetmicroblockheader-object">chain.getMicroBlockHeader() ⇒ Object</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#chaingetaccountaddress-options-object">chain.getAccount(address, [options]) ⇒ Object</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#chaintxdryruntxs-accounts-hashorheight-object">chain.txDryRun(txs, accounts, hashOrHeight) ⇒ Object</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#chaingetinfo-object">chain.getInfo() ⇒ Object</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#chainwaitminedbool-stamp">Chain.waitMined(bool) ⇒ Stamp</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="node/">Node</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../channel/">channel</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">contract</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../contract/aci/">Aci</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../contract/compiler/">Compiler</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../contract/ga/">Generalized Accounts</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">oracle</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../oracle/">Oracle</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../oracle/node/">Node</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../rpc/client/">Deprecated RPC Client</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">tx</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">builder</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../tx/builder/">Builder</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../tx/builder/helpers/">Helpers</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../tx/builder/schema/">Schema</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../tx/">tx</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../tx/tx/">tx stamp</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../tx/tx-object/">tx object</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../tx/validator/">tx validator</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">Aepp Wallet Communication</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">Connection</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/connection/">Setup</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/content-script-bridge/">Content script bridge</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/wallet-detector/">Wallet detector</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/connection/browser-runtime/">Browser runtime</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/connection/browser-window-message/">Window message</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">RPC</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/rpc/aepp-rpc/">Aepp RPC</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/rpc/rpc-client/">RPC client</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/rpc/wallet-rpc/">Wallet RPC</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">utils</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../ae/">AE Utilities</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../utils/amount-formatter/">Amount formatter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../utils/bignumber/">Bignumber</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../utils/bytes/">Bytes</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../utils/crypto/">Crypto</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../utils/keystore/">Keystore</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../contract/">Contract</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../node/">Node</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../node-pool/">Node pool</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../utils/swagger/">Swagger</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Examples</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="#">NodeJS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../guides/import-nodejs/">Setup</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../examples/node/aecontract/">Simple Sophia Contract Compiler</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../examples/node/aecrypto/">Crypto Helper Script</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../examples/node/aewallet/">Simple AE Token Spending Script</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">JS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../guides/import-script-tag/">Script Tag</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../guides/import-vuejs/">Vue.js</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">Aeternity JavaScript SDK</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>chain &raquo;</li>
+        
+      
+        
+          <li>API Reference &raquo;</li>
+        
+      
+    
+    <li>Chain</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/aeternity/aepp-sdk-js/edit/master/docs/api/chain.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p><a id="module_@aeternity/aepp-sdk/es/chain"></a></p>
+<h2 id="aeternityaepp-sdkeschain">@aeternity/aepp-sdk/es/chain</h2>
+<p>Chain module</p>
+<p><strong>Example</strong>  </p>
+<pre><code class="js">import Chain from '@aeternity/aepp-sdk/es/chain'
+</code></pre>
+
+<ul>
+<li><a href="#module_@aeternity/aepp-sdk/es/chain">@aeternity/aepp-sdk/es/chain</a><ul>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/chain--Chain">Chain([options])</a> ⇒ <code>Object</code> ⏏<ul>
+<li><em>instance</em><ul>
+<li><em>async</em><ul>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/chain--Chain+sendTransaction">.sendTransaction(tx, [options])</a> ⇒ <code>Object</code></em></li>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/chain--Chain+height">.height()</a> ⇒ <code>Number</code></em></li>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/chain--Chain+awaitHeight">.awaitHeight([options])</a> ⇒ <code>Number</code></em></li>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/chain--Chain+poll">.poll([options])</a> ⇒ <code>Object</code></em></li>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/chain--Chain+balance">.balance(address, [options])</a> ⇒ <code>Object</code></em></li>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/chain--Chain+tx">.tx(hash, info)</a> ⇒ <code>Object</code></em></li>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/chain--Chain+getTxInfo">.getTxInfo(hash)</a> ⇒ <code>Object</code></em></li>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/chain--Chain+mempool">.mempool()</a> ⇒ <code>Array.&amp;lt;Object&amp;gt;</code></em></li>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/chain--Chain+getCurrentGeneration">.getCurrentGeneration()</a> ⇒ <code>Object</code></em></li>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/chain--Chain+getGeneration">.getGeneration(hashOrHeight)</a> ⇒ <code>Object</code></em></li>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/chain--Chain+waitForTxConfirm">.waitForTxConfirm(txHash, [options])</a> ⇒ <code>Promise.&amp;lt;Number&amp;gt;</code></em></li>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/chain--Chain+getMicroBlockTransactions">.getMicroBlockTransactions()</a> ⇒ <code>Array.&amp;lt;Object&amp;gt;</code></em></li>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/chain--Chain+getKeyBlock">.getKeyBlock()</a> ⇒ <code>Object</code></em></li>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/chain--Chain+getMicroBlockHeader">.getMicroBlockHeader()</a> ⇒ <code>Object</code></em></li>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/chain--Chain+getAccount">.getAccount(address, [options])</a> ⇒ <code>Object</code></em></li>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/chain--Chain+txDryRun">.txDryRun(txs, accounts, hashOrHeight)</a> ⇒ <code>Object</code></em></li>
+<li><em><a href="#module_@aeternity/aepp-sdk/es/chain--Chain+getInfo">.getInfo()</a> ⇒ <code>Object</code></em></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><em>static</em><ul>
+<li><a href="#module_@aeternity/aepp-sdk/es/chain--Chain.waitMined">.waitMined(bool)</a> ⇒ <code>Stamp</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/chain--Chain"></a></p>
+<h3 id="chainoptions-object">Chain([options]) ⇒ <code>Object</code> ⏏</h3>
+<p>Basic Chain Stamp</p>
+<p>Attempting to create instances from the Stamp without overwriting all
+abstract methods using composition will result in an exception.</p>
+<p><strong>Kind</strong>: Exported function<br />
+<strong>Returns</strong>: <code>Object</code> - Chain instance<br />
+<strong>rtype</strong>: <code>Stamp</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[options]</td>
+<td><code>Object</code></td>
+<td><code>{}</code></td>
+<td>Initializer object</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/chain--Chain+sendTransaction"></a></p>
+<h4 id="chainsendtransactiontx-options-object"><em>chain.sendTransaction(tx, [options]) ⇒ <code>Object</code></em></h4>
+<p>Submit a signed transaction for mining</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/chain--Chain"><code>Chain</code></a><br />
+<strong>Returns</strong>: <code>Object</code> - Transaction<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>(tx: String, options?: Object) =&gt; tx: Promise[Object]|txHash: Promise[String]</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>tx</td>
+<td><code>String</code></td>
+<td></td>
+<td>Transaction to submit</td>
+</tr>
+<tr>
+<td>[options]</td>
+<td><code>String</code></td>
+<td><code>{}</code></td>
+<td>Options to pass to the implementation</td>
+</tr>
+<tr>
+<td>[options.verify]</td>
+<td><code>String</code></td>
+<td><code>false</code></td>
+<td>Verify transaction before broadcast.</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/chain--Chain+height"></a></p>
+<h4 id="chainheight-number"><em>chain.height() ⇒ <code>Number</code></em></h4>
+<p>Obtain current height of the chain</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/chain--Chain"><code>Chain</code></a><br />
+<strong>Returns</strong>: <code>Number</code> - Current chain height<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>() =&gt; height: Number</code>
+<a id="module_@aeternity/aepp-sdk/es/chain--Chain+awaitHeight"></a></p>
+<h4 id="chainawaitheightoptions-number"><em>chain.awaitHeight([options]) ⇒ <code>Number</code></em></h4>
+<p>Wait for the chain to reach a specific height</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/chain--Chain"><code>Chain</code></a><br />
+<strong>Returns</strong>: <code>Number</code> - Current chain height<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>(height: Number, options?: Object) =&gt; height: Number</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[options]</td>
+<td><code>Object</code></td>
+<td><code>{}</code></td>
+<td>Options</td>
+</tr>
+<tr>
+<td>options.interval</td>
+<td><code>Number</code></td>
+<td></td>
+<td>Interval (in ms) at which to poll the chain</td>
+</tr>
+<tr>
+<td>options.attempts</td>
+<td><code>Number</code></td>
+<td></td>
+<td>Number of polling attempts after which to fail</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/chain--Chain+poll"></a></p>
+<h4 id="chainpolloptions-object"><em>chain.poll([options]) ⇒ <code>Object</code></em></h4>
+<p>Wait for a transaction to be mined</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/chain--Chain"><code>Chain</code></a><br />
+<strong>Returns</strong>: <code>Object</code> - The transaction as it was mined<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>(th: String, options?: Object) =&gt; tx: Object</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[options]</td>
+<td><code>Object</code></td>
+<td><code>{}</code></td>
+<td>Options</td>
+</tr>
+<tr>
+<td>options.interval</td>
+<td><code>Number</code></td>
+<td></td>
+<td>Interval (in ms) at which to poll the chain</td>
+</tr>
+<tr>
+<td>options.blocks</td>
+<td><code>Number</code></td>
+<td></td>
+<td>Number of blocks mined after which to fail</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/chain--Chain+balance"></a></p>
+<h4 id="chainbalanceaddress-options-object"><em>chain.balance(address, [options]) ⇒ <code>Object</code></em></h4>
+<p>Request the balance of specified account</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/chain--Chain"><code>Chain</code></a><br />
+<strong>Returns</strong>: <code>Object</code> - The transaction as it was mined<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>(address: String, options?: Object) =&gt; balance: Number</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>address</td>
+<td><code>String</code></td>
+<td></td>
+<td>The public account address to obtain the balance for</td>
+</tr>
+<tr>
+<td>[options]</td>
+<td><code>Object</code></td>
+<td><code>{}</code></td>
+<td>Options</td>
+</tr>
+<tr>
+<td>options.height</td>
+<td><code>Number</code></td>
+<td></td>
+<td>The chain height at which to obtain the balance for (default: top of chain)</td>
+</tr>
+<tr>
+<td>options.hash</td>
+<td><code>String</code></td>
+<td></td>
+<td>The block hash on which to obtain the balance for (default: top of chain)</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/chain--Chain+tx"></a></p>
+<h4 id="chaintxhash-info-object"><em>chain.tx(hash, info) ⇒ <code>Object</code></em></h4>
+<p>Obtain a transaction based on its hash</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/chain--Chain"><code>Chain</code></a><br />
+<strong>Returns</strong>: <code>Object</code> - Transaction<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>(hash: String, info = false) =&gt; tx: Object</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>hash</td>
+<td><code>String</code></td>
+<td>Transaction hash</td>
+</tr>
+<tr>
+<td>info</td>
+<td><code>Boolean</code></td>
+<td>Retrieve additional transaction date. Works only for (ContractCreate and ContractCall transaction's)</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/chain--Chain+getTxInfo"></a></p>
+<h4 id="chaingettxinfohash-object"><em>chain.getTxInfo(hash) ⇒ <code>Object</code></em></h4>
+<p>Obtain a transaction info based on its hash</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/chain--Chain"><code>Chain</code></a><br />
+<strong>Returns</strong>: <code>Object</code> - Transaction<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>(hash: String) =&gt; tx: Object</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>hash</td>
+<td><code>String</code></td>
+<td>Transaction hash</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/chain--Chain+mempool"></a></p>
+<h4 id="chainmempool-arrayltobjectgt"><em>chain.mempool() ⇒ <code>Array.&amp;lt;Object&amp;gt;</code></em></h4>
+<p>Obtain transaction's from mempool</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/chain--Chain"><code>Chain</code></a><br />
+<strong>Returns</strong>: <code>Array.&amp;lt;Object&amp;gt;</code> - Transactions<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>() =&gt; txs: [...Object]</code>
+<a id="module_@aeternity/aepp-sdk/es/chain--Chain+getCurrentGeneration"></a></p>
+<h4 id="chaingetcurrentgeneration-object"><em>chain.getCurrentGeneration() ⇒ <code>Object</code></em></h4>
+<p>Obtain current generation</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/chain--Chain"><code>Chain</code></a><br />
+<strong>Returns</strong>: <code>Object</code> - Current Generation<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>() =&gt; generation: Object</code>
+<a id="module_@aeternity/aepp-sdk/es/chain--Chain+getGeneration"></a></p>
+<h4 id="chaingetgenerationhashorheight-object"><em>chain.getGeneration(hashOrHeight) ⇒ <code>Object</code></em></h4>
+<p>Get generation by hash or height</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/chain--Chain"><code>Chain</code></a><br />
+<strong>Returns</strong>: <code>Object</code> - Generation<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>(hashOrHeight) =&gt; generation: Object</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>hashOrHeight</td>
+<td><code>String</code> | <code>Number</code></td>
+<td>Generation hash or height</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/chain--Chain+waitForTxConfirm"></a></p>
+<h4 id="chainwaitfortxconfirmtxhash-options-promiseltnumbergt"><em>chain.waitForTxConfirm(txHash, [options]) ⇒ <code>Promise.&amp;lt;Number&amp;gt;</code></em></h4>
+<p>Wait for transaction confirmation</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/chain--Chain"><code>Chain</code></a><br />
+<strong>Returns</strong>: <code>Promise.&amp;lt;Number&amp;gt;</code> - Current Height<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>(txHash: String, { confirm: Number | Boolean } = { confirm: 3 }) =&gt; Promise&lt;Number&gt;</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>txHash</td>
+<td><code>String</code></td>
+<td></td>
+<td>Generation hash or height</td>
+</tr>
+<tr>
+<td>[options]</td>
+<td><code>String</code></td>
+<td><code>{}</code></td>
+<td>options</td>
+</tr>
+<tr>
+<td>[options.confirm]</td>
+<td><code>String</code></td>
+<td><code>3</code></td>
+<td>Block confirmation count</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/chain--Chain+getMicroBlockTransactions"></a></p>
+<h4 id="chaingetmicroblocktransactions-arrayltobjectgt"><em>chain.getMicroBlockTransactions() ⇒ <code>Array.&amp;lt;Object&amp;gt;</code></em></h4>
+<p>Get micro block transactions</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/chain--Chain"><code>Chain</code></a><br />
+<strong>Returns</strong>: <code>Array.&amp;lt;Object&amp;gt;</code> - Transactions<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>(hash) =&gt; txs: [...Object]</code>
+<a id="module_@aeternity/aepp-sdk/es/chain--Chain+getKeyBlock"></a></p>
+<h4 id="chaingetkeyblock-object"><em>chain.getKeyBlock() ⇒ <code>Object</code></em></h4>
+<p>Get key block</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/chain--Chain"><code>Chain</code></a><br />
+<strong>Returns</strong>: <code>Object</code> - Key Block<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>(hashOrHeight) =&gt; keyBlock: Object</code>
+<a id="module_@aeternity/aepp-sdk/es/chain--Chain+getMicroBlockHeader"></a></p>
+<h4 id="chaingetmicroblockheader-object"><em>chain.getMicroBlockHeader() ⇒ <code>Object</code></em></h4>
+<p>Get micro block header</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/chain--Chain"><code>Chain</code></a><br />
+<strong>Returns</strong>: <code>Object</code> - Micro block header<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>(hash) =&gt; header: Object</code>
+<a id="module_@aeternity/aepp-sdk/es/chain--Chain+getAccount"></a></p>
+<h4 id="chaingetaccountaddress-options-object"><em>chain.getAccount(address, [options]) ⇒ <code>Object</code></em></h4>
+<p>Get account by account public key</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/chain--Chain"><code>Chain</code></a><br />
+<strong>Returns</strong>: <code>Object</code> - Account<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>(address, { hash, height }) =&gt; account: Object</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>address</td>
+<td><code>String</code></td>
+<td></td>
+<td>Account public key</td>
+</tr>
+<tr>
+<td>[options]</td>
+<td><code>Object</code></td>
+<td><code>{}</code></td>
+<td>Options</td>
+</tr>
+<tr>
+<td>[options.height]</td>
+<td><code>Number</code></td>
+<td></td>
+<td>Get account on specific block by block height</td>
+</tr>
+<tr>
+<td>[options.hash]</td>
+<td><code>String</code></td>
+<td></td>
+<td>Get account on specific block by block hash</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/chain--Chain+txDryRun"></a></p>
+<h4 id="chaintxdryruntxs-accounts-hashorheight-object"><em>chain.txDryRun(txs, accounts, hashOrHeight) ⇒ <code>Object</code></em></h4>
+<p>Transaction dry-run</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/chain--Chain"><code>Chain</code></a><br />
+<strong>Returns</strong>: <code>Object</code> - Result<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>(txs, accounts, hashOrHeight) =&gt; result: Object</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>txs</td>
+<td><code>Array</code></td>
+<td>Array of transaction's</td>
+</tr>
+<tr>
+<td>accounts</td>
+<td><code>Array</code></td>
+<td>Array of account's</td>
+</tr>
+<tr>
+<td>hashOrHeight</td>
+<td><code>String</code> | <code>Number</code></td>
+<td>hash or height of block on which to make dry-run</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/chain--Chain+getInfo"></a></p>
+<h4 id="chaingetinfo-object"><em>chain.getInfo() ⇒ <code>Object</code></em></h4>
+<p>Get Node Info</p>
+<p><strong>Kind</strong>: instance abstract method of <a href="#exp_module_@aeternity/aepp-sdk/es/chain--Chain"><code>Chain</code></a><br />
+<strong>Returns</strong>: <code>Object</code> - Result<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>() =&gt; result: Object</code>
+<a id="module_@aeternity/aepp-sdk/es/chain--Chain.waitMined"></a></p>
+<h4 id="chainwaitminedbool-stamp">Chain.waitMined(bool) ⇒ <code>Stamp</code></h4>
+<p>Reconfigure Stamp to (not) wait until transactions are mined</p>
+<p><strong>Kind</strong>: static method of <a href="#exp_module_@aeternity/aepp-sdk/es/chain--Chain"><code>Chain</code></a><br />
+<strong>Returns</strong>: <code>Stamp</code> - Reconfigured Chain Stamp<br />
+<strong>rtype</strong>: <code>(bool: Boolean) =&gt; Stamp</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bool</td>
+<td><code>boolean</code></td>
+<td>Whether to wait for transactions</td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="node/" class="btn btn-neutral float-right" title="Node">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../ae/wallet/" class="btn btn-neutral" title="Wallet"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/aeternity/aepp-sdk-js/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../ae/wallet/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="node/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

@@ -42,15 +42,19 @@
     "blakejs": "^1.1.0",
     "bs58check": "^2.1.1",
     "ed2curve": "^0.3.0",
+    "fs-extra": "^9.0.1",
     "joi-browser": "^13.4.0",
+    "json2yaml": "^1.1.0",
     "libsodium-wrappers-sumo": "0.7.6",
     "ramda": "^0.27.0",
+    "rimraf": "^3.0.2",
     "rlp": "2.2.5",
     "sha.js": "^2.4.11",
     "tweetnacl": "^1.0.0",
     "tweetnacl-auth": "^1.0.1",
     "uuid": "^8.0.0",
-    "websocket": "^1.0.26"
+    "websocket": "^1.0.26",
+    "yamljs": "^0.3.0"
   },
   "repository": {
     "type": "git",

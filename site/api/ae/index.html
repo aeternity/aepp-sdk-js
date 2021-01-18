@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>AE Utilities - Aeternity JavaScript SDK</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../../css/theme.css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "AE Utilities";
+    var mkdocs_page_input_path = "api/ae.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/rust.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/erlang.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/js.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> Aeternity JavaScript SDK</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/quick-start/">Quick Start</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Guides</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/contract-events/">Contract Events</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/oracle-usage/">Oracle Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/aens-usage/">AENS Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/contract-aci-usage/">Contract Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/delegate-signature-to-contract/">Delegate Signature to Contract</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/how-to-build-aepp-using-new-wallet-api/">Wallet Api</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/how-to-build-an-wallet-app-or-extension/">Building Wallets</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/low-vs-high-usage/">Low vs High level API</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/import-tree-shaking/">Tree Shaking</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">Migration</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../guides/migration/migration-7.0.0/">Migration to SDK 7.0.0</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API Reference</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="#">account</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../account/">Account</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../account/selector/">Selector</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../account/memory/">Memory</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../accounts/">Account Handling</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">ae</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="aens/">Aens</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="aepp/">Aepp</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="contract/">Contract</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="oracle/">Oracle</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="universal/">Universal</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="wallet/">Wallet</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">chain</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../chain/">Chain</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../chain/node/">Node</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../channel/">channel</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">contract</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../contract/aci/">Aci</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../contract/compiler/">Compiler</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../contract/ga/">Generalized Accounts</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">oracle</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../oracle/">Oracle</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../oracle/node/">Node</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../rpc/client/">Deprecated RPC Client</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">tx</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">builder</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../tx/builder/">Builder</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../tx/builder/helpers/">Helpers</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../tx/builder/schema/">Schema</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../tx/">tx</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../tx/tx/">tx stamp</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../tx/tx-object/">tx object</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../tx/validator/">tx validator</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">Aepp Wallet Communication</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">Connection</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/connection/">Setup</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/content-script-bridge/">Content script bridge</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/wallet-detector/">Wallet detector</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/connection/browser-runtime/">Browser runtime</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/connection/browser-window-message/">Window message</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">RPC</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/rpc/aepp-rpc/">Aepp RPC</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/rpc/rpc-client/">RPC client</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/aepp-wallet-communication/rpc/wallet-rpc/">Wallet RPC</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="#">utils</a>
+    <ul class="current">
+                <li class="toctree-l2 current"><a class="reference internal current" href="./">AE Utilities</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#aeoptions-object">Ae([options]) ⇒ Object ⏏</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#aedestroyinstance-void">ae.destroyInstance() ⇒ void</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#aesendtx-options-object">ae.send(tx, [options]) ⇒ Object</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#aespendamount-recipientidorname-options-object">ae.spend(amount, recipientIdOrName, [options]) ⇒ Object</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#aetransferfundsfraction-recipientidorname-options-object">ae.transferFunds(fraction, recipientIdOrName, [options]) ⇒ Object</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../utils/amount-formatter/">Amount formatter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../utils/bignumber/">Bignumber</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../utils/bytes/">Bytes</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../utils/crypto/">Crypto</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../utils/keystore/">Keystore</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../contract/">Contract</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../node/">Node</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../node-pool/">Node pool</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../utils/swagger/">Swagger</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Examples</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="#">NodeJS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../guides/import-nodejs/">Setup</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../examples/node/aecontract/">Simple Sophia Contract Compiler</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../examples/node/aecrypto/">Crypto Helper Script</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../examples/node/aewallet/">Simple AE Token Spending Script</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">JS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../guides/import-script-tag/">Script Tag</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../guides/import-vuejs/">Vue.js</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">Aeternity JavaScript SDK</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>utils &raquo;</li>
+        
+      
+        
+          <li>API Reference &raquo;</li>
+        
+      
+    
+    <li>AE Utilities</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/aeternity/aepp-sdk-js/edit/master/docs/api/ae.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p><a id="module_@aeternity/aepp-sdk/es/ae"></a></p>
+<h2 id="aeternityaepp-sdkesae">@aeternity/aepp-sdk/es/ae</h2>
+<p>Ae module</p>
+<p><strong>Example</strong>  </p>
+<pre><code class="js">import Ae from '@aeternity/aepp-sdk/es/ae'
+</code></pre>
+
+<ul>
+<li><a href="#module_@aeternity/aepp-sdk/es/ae">@aeternity/aepp-sdk/es/ae</a><ul>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/ae--Ae">Ae([options])</a> ⇒ <code>Object</code> ⏏<ul>
+<li><a href="#module_@aeternity/aepp-sdk/es/ae--Ae+destroyInstance">.destroyInstance()</a> ⇒ <code>void</code></li>
+<li><em>async</em><ul>
+<li><a href="#module_@aeternity/aepp-sdk/es/ae--Ae+send">.send(tx, [options])</a> ⇒ <code>Object</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/ae--Ae+spend">.spend(amount, recipientIdOrName, [options])</a> ⇒ <code>Object</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/ae--Ae+transferFunds">.transferFunds(fraction, recipientIdOrName, [options])</a> ⇒ <code>Object</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/ae--Ae"></a></p>
+<h3 id="aeoptions-object">Ae([options]) ⇒ <code>Object</code> ⏏</h3>
+<p>Basic Ae Stamp</p>
+<p>Attempting to create instances from the Stamp without overwriting all
+abstract methods using composition will result in an exception.</p>
+<p>Ae objects are the composition of three basic building blocks:
+* <a href="#exp_module_@aeternity/aepp-sdk/es/tx--Tx">Tx</a>
+* <a href="#exp_module_@aeternity/aepp-sdk/es/account--Account">Account</a>
+* <a href="#exp_module_@aeternity/aepp-sdk/es/chain--Chain">Chain</a>
+Only by providing the joint functionality of those three, most more advanced
+operations, i.e. the ones with actual use value on the chain, become
+available.</p>
+<p><strong>Kind</strong>: Exported function<br />
+<strong>Returns</strong>: <code>Object</code> - Ae instance<br />
+<strong>rtype</strong>: <code>Stamp</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[options]</td>
+<td><code>Object</code></td>
+<td><code>{}</code></td>
+<td>Initializer object</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/ae--Ae+destroyInstance"></a></p>
+<h4 id="aedestroyinstance-void">ae.destroyInstance() ⇒ <code>void</code></h4>
+<p>Remove all listeners for RPC</p>
+<p><strong>Kind</strong>: instance method of <a href="#exp_module_@aeternity/aepp-sdk/es/ae--Ae"><code>Ae</code></a><br />
+<a id="module_@aeternity/aepp-sdk/es/ae--Ae+send"></a></p>
+<h4 id="aesendtx-options-object">ae.send(tx, [options]) ⇒ <code>Object</code></h4>
+<p>Sign and post a transaction to the chain</p>
+<p><strong>Kind</strong>: instance method of <a href="#exp_module_@aeternity/aepp-sdk/es/ae--Ae"><code>Ae</code></a><br />
+<strong>Returns</strong>: <code>Object</code> - Transaction<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>(tx: String, options: Object) =&gt; Promise[String]</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>tx</td>
+<td><code>String</code></td>
+<td></td>
+<td>Transaction</td>
+</tr>
+<tr>
+<td>[options]</td>
+<td><code>Object</code></td>
+<td><code>{}</code></td>
+<td>options - Options</td>
+</tr>
+<tr>
+<td>[options.verify]</td>
+<td><code>Object</code></td>
+<td></td>
+<td>verify - Verify transaction before broadcast, throw error if not valid</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/ae--Ae+spend"></a></p>
+<h4 id="aespendamount-recipientidorname-options-object">ae.spend(amount, recipientIdOrName, [options]) ⇒ <code>Object</code></h4>
+<p>Send tokens to another account</p>
+<p><strong>Kind</strong>: instance method of <a href="#exp_module_@aeternity/aepp-sdk/es/ae--Ae"><code>Ae</code></a><br />
+<strong>Returns</strong>: <code>Object</code> - Transaction<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>(amount: Number|String, recipientIdOrName: String, options?: Object) =&gt; Promise[String]</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>amount</td>
+<td><code>Number</code> | <code>String</code></td>
+<td>Amount to spend</td>
+</tr>
+<tr>
+<td>recipientIdOrName</td>
+<td><code>String</code></td>
+<td>Address or name of recipient account</td>
+</tr>
+<tr>
+<td>[options]</td>
+<td><code>Object</code></td>
+<td>Options</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/ae--Ae+transferFunds"></a></p>
+<h4 id="aetransferfundsfraction-recipientidorname-options-object">ae.transferFunds(fraction, recipientIdOrName, [options]) ⇒ <code>Object</code></h4>
+<p>Send a fraction of token balance to another account</p>
+<p><strong>Kind</strong>: instance method of <a href="#exp_module_@aeternity/aepp-sdk/es/ae--Ae"><code>Ae</code></a><br />
+<strong>Returns</strong>: <code>Object</code> - Transaction<br />
+<strong>Category</strong>: async<br />
+<strong>rtype</strong>: <code>(fraction: Number|String, recipientIdOrName: String, options?: Object) =&gt; Promise[String]</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>fraction</td>
+<td><code>Number</code> | <code>String</code></td>
+<td>Fraction of balance to spend (between 0 and 1)</td>
+</tr>
+<tr>
+<td>recipientIdOrName</td>
+<td><code>String</code></td>
+<td>Address or name of recipient account</td>
+</tr>
+<tr>
+<td>[options]</td>
+<td><code>Object</code></td>
+<td>Options</td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../utils/amount-formatter/" class="btn btn-neutral float-right" title="Amount formatter">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../utils/aepp-wallet-communication/rpc/wallet-rpc/" class="btn btn-neutral" title="Wallet RPC"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/aeternity/aepp-sdk-js/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../utils/aepp-wallet-communication/rpc/wallet-rpc/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../utils/amount-formatter/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

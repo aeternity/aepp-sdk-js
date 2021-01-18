@@ -72,10 +72,11 @@ const assignDepth = (arr, depth = 1, parentFileName = "") => {
             
             // if the depth is over 2, pass the previous parentFileName. 
             // If under, pass the key as parentFileName
-            parentFile = depth > 2 ? parentFileName : key
+            //parentFile = depth > 2 ? parentFileName : key
             let {content, json} = assignDepth(arr[key], depth + 1, parentFile)
 
-            // "on the object we set object's key to..."
+            // "on the object we set object's key to the deeper stuff"
+
             arr[key] = json
             // store all the returned contents TODO: maybe sort keys alphabetically ?
             if (content != null) { 
@@ -110,6 +111,15 @@ const assignDepth = (arr, depth = 1, parentFileName = "") => {
     // we read the file's content, and return it. it gets combined in the array handler !
     
 }
+
+
+function deleteDeepOnes(obj){
+    delete obj.colname
+    if(obj.children){
+       for(var i=0;i<obj.children.length;i++)
+           deleteColnameRecursive(obj.children[i]);
+    }
+  }
 
 // first, parse mkdocs YAML
 parsedYaml = YAML.load('mkdocs_original.yml');

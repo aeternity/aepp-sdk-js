@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../../../../../img/favicon.ico">
+  <title>RPC client - Aeternity JavaScript SDK</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../../../../../css/theme.css" />
+  <link rel="stylesheet" href="../../../../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "RPC client";
+    var mkdocs_page_input_path = "api/utils/aepp-wallet-communication/rpc/rpc-client.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../../../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../../../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/rust.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/erlang.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/js.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="../../../../.." class="icon icon-home"> Aeternity JavaScript SDK</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../../..">Overview</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../../../guides/quick-start/">Quick Start</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Guides</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../../../guides/contract-events/">Contract Events</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../../../guides/oracle-usage/">Oracle Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../../../guides/aens-usage/">AENS Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../../../guides/contract-aci-usage/">Contract Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../../../guides/delegate-signature-to-contract/">Delegate Signature to Contract</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../../../guides/how-to-build-aepp-using-new-wallet-api/">Wallet Api</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../../../guides/how-to-build-an-wallet-app-or-extension/">Building Wallets</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../../../guides/low-vs-high-usage/">Low vs High level API</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../../../guides/import-tree-shaking/">Tree Shaking</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">Migration</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../../guides/migration/migration-7.0.0/">Migration to SDK 7.0.0</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API Reference</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="#">account</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../account/">Account</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../account/selector/">Selector</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../account/memory/">Memory</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../accounts/">Account Handling</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">ae</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ae/aens/">Aens</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ae/aepp/">Aepp</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ae/contract/">Contract</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ae/oracle/">Oracle</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ae/universal/">Universal</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ae/wallet/">Wallet</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">chain</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../chain/">Chain</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../chain/node/">Node</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../../channel/">channel</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">contract</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../contract/aci/">Aci</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../contract/compiler/">Compiler</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../contract/ga/">Generalized Accounts</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">oracle</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../oracle/">Oracle</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../oracle/node/">Node</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../../rpc/client/">Deprecated RPC Client</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">tx</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">builder</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../tx/builder/">Builder</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../tx/builder/helpers/">Helpers</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../tx/builder/schema/">Schema</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../tx/">tx</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../tx/tx/">tx stamp</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../tx/tx-object/">tx object</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../tx/validator/">tx validator</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="#">Aepp Wallet Communication</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="#">Connection</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../connection/">Setup</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../content-script-bridge/">Content script bridge</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../wallet-detector/">Wallet detector</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../connection/browser-runtime/">Browser runtime</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../connection/browser-window-message/">Window message</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">RPC</a>
+    <ul class="current">
+                <li class="toctree-l3"><a class="reference internal" href="../aepp-rpc/">Aepp RPC</a>
+                </li>
+                <li class="toctree-l3 current"><a class="reference internal current" href="./">RPC client</a>
+    <ul class="current">
+    <li class="toctree-l4"><a class="reference internal" href="#exportsrpcclientparam-object">exports.RpcClient(param) ⇒ Object ⏏</a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../wallet-rpc/">Wallet RPC</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">utils</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ae/">AE Utilities</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../amount-formatter/">Amount formatter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../bignumber/">Bignumber</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../bytes/">Bytes</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../crypto/">Crypto</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../keystore/">Keystore</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../contract/">Contract</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../node/">Node</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../node-pool/">Node pool</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../swagger/">Swagger</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Examples</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="#">NodeJS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../../guides/import-nodejs/">Setup</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../../examples/node/aecontract/">Simple Sophia Contract Compiler</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../../examples/node/aecrypto/">Crypto Helper Script</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../../examples/node/aewallet/">Simple AE Token Spending Script</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">JS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../../guides/import-script-tag/">Script Tag</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../../guides/import-vuejs/">Vue.js</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../../..">Aeternity JavaScript SDK</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>RPC &raquo;</li>
+        
+      
+        
+          <li>Aepp Wallet Communication &raquo;</li>
+        
+      
+        
+          <li>API Reference &raquo;</li>
+        
+      
+    
+    <li>RPC client</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/aeternity/aepp-sdk-js/edit/master/docs/api/utils/aepp-wallet-communication/rpc/rpc-client.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p><a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client"></a></p>
+<h2 id="aeternityaepp-sdkesutilsaepp-wallet-communicationrpcrpc-client">@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client</h2>
+<p>RPC client helpers</p>
+<p><strong>Example</strong>  </p>
+<pre><code class="js">import RpcClient from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client'
+</code></pre>
+
+<p><strong>Example</strong>  </p>
+<pre><code class="js">import RpcClients from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client'
+</code></pre>
+
+<ul>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client">@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client</a><ul>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient">exports.RpcClient(param)</a> ⇒ <code>Object</code> ⏏<ul>
+<li><em>instance</em><ul>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+addClient">.addClient(id, connectionData)</a> ⇒ <code>void</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+getClient">.getClient(id)</a> ⇒ <code>Object</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+removeClient">.removeClient(id, forceConnectionClose)</a> ⇒ <code>Boolean</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+updateClientInfo">.updateClientInfo(id, info)</a> ⇒ <code>void</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+sendNotificationByCondition">.sendNotificationByCondition(msg, condition, transformMessage)</a> ⇒ <code>void</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+operationByCondition">.operationByCondition(condition, operation)</a> ⇒ <code>void</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+hasAccessToAccount">.hasAccessToAccount(address)</a> ⇒ <code>Boolean</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+isConnected">.isConnected()</a> ⇒ <code>Boolean</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+getCurrentAccount">.getCurrentAccount(options)</a> ⇒ <code>String</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+disconnect">.disconnect()</a> ⇒ <code>void</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+updateSubscription">.updateSubscription(type, value)</a> ⇒ <code>Array.&amp;lt;String&amp;gt;</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+addAction">.addAction(action, resolvers)</a> ⇒ <code>Object</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+request">.request(name, params)</a> ⇒ <code>Promise</code></li>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+processResponse">.processResponse(msg, [transformResult])</a> ⇒ <code>void</code></li>
+</ul>
+</li>
+<li><em>static</em><ul>
+<li><a href="#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient.RpcClients">.RpcClients()</a> ⇒ <code>Object</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient"></a></p>
+<h3 id="exportsrpcclientparam-object">exports.RpcClient(param) ⇒ <code>Object</code> ⏏</h3>
+<p>Contain functionality for using RPC conection</p>
+<p><strong>Kind</strong>: Exported function<br />
+<strong>rtype</strong>: <code>Stamp</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>param</td>
+<td><code>Object</code></td>
+<td>Init params object</td>
+</tr>
+<tr>
+<td>param.id</td>
+<td><code>String</code></td>
+<td>Client id</td>
+</tr>
+<tr>
+<td>param.name</td>
+<td><code>String</code></td>
+<td>Client name</td>
+</tr>
+<tr>
+<td>param.connection</td>
+<td><code>Object</code></td>
+<td>Connection object</td>
+</tr>
+<tr>
+<td>param.handlers</td>
+<td><code>Array.&amp;lt;function()&amp;gt;</code></td>
+<td>Arrays with two function for handling messages ([ onMessage: Function, onDisconnect: Function])</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+addClient"></a></p>
+<h4 id="exportsrpcclientaddclientid-connectiondata-void">exports.RpcClient.addClient(id, connectionData) ⇒ <code>void</code></h4>
+<p>Add new client</p>
+<p><strong>Kind</strong>: instance method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient"><code>exports.RpcClient</code></a><br />
+<strong>rtype</strong>: <code>(id: (String|Number), connectionInfo: Object) =&gt; void</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td><code>String</code> | <code>Number</code></td>
+<td>Client ID</td>
+</tr>
+<tr>
+<td>connectionData</td>
+<td><code>Object</code></td>
+<td>Object containing <code>connectionInfo</code> and <code>connection</code> objects</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+getClient"></a></p>
+<h4 id="exportsrpcclientgetclientid-object">exports.RpcClient.getClient(id) ⇒ <code>Object</code></h4>
+<p>Get clien by id</p>
+<p><strong>Kind</strong>: instance method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient"><code>exports.RpcClient</code></a><br />
+<strong>Returns</strong>: <code>Object</code> - RpcClient<br />
+<strong>rtype</strong>: <code>(id: (String|Number)) =&gt; Object</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td><code>String</code> | <code>Number</code></td>
+<td>Client ID</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+removeClient"></a></p>
+<h4 id="exportsrpcclientremoveclientid-forceconnectionclose-boolean">exports.RpcClient.removeClient(id, forceConnectionClose) ⇒ <code>Boolean</code></h4>
+<p>Remove and disiconnect client by ID</p>
+<p><strong>Kind</strong>: instance method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient"><code>exports.RpcClient</code></a><br />
+<strong>rtype</strong>: <code>(id: (String|Number), { forceConnectionClose: boolean = false }) =&gt; boolean</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td><code>String</code> | <code>Number</code></td>
+<td>Client ID</td>
+</tr>
+<tr>
+<td>forceConnectionClose</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+updateClientInfo"></a></p>
+<h4 id="exportsrpcclientupdateclientinfoid-info-void">exports.RpcClient.updateClientInfo(id, info) ⇒ <code>void</code></h4>
+<p>Update client info by id</p>
+<p><strong>Kind</strong>: instance method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient"><code>exports.RpcClient</code></a><br />
+<strong>rtype</strong>: <code>(id: (String|Number), info: Object) =&gt; void</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td><code>String</code> | <code>Number</code></td>
+<td>Client ID</td>
+</tr>
+<tr>
+<td>info</td>
+<td><code>Object</code></td>
+<td>Info to update (will be merged with current info object)</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+sendNotificationByCondition"></a></p>
+<h4 id="exportsrpcclientsendnotificationbyconditionmsg-condition-transformmessage-void">exports.RpcClient.sendNotificationByCondition(msg, condition, transformMessage) ⇒ <code>void</code></h4>
+<p>Send notification to all client passing condition</p>
+<p><strong>Kind</strong>: instance method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient"><code>exports.RpcClient</code></a><br />
+<strong>rtype</strong>: <code>(msg: Object, condition: Function) =&gt; void</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>msg</td>
+<td><code>Object</code></td>
+<td>Msg object</td>
+</tr>
+<tr>
+<td>condition</td>
+<td><code>function</code></td>
+<td>Condition function of (client: RpcClient) =&gt; Boolean</td>
+</tr>
+<tr>
+<td>transformMessage</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+operationByCondition"></a></p>
+<h4 id="exportsrpcclientoperationbyconditioncondition-operation-void">exports.RpcClient.operationByCondition(condition, operation) ⇒ <code>void</code></h4>
+<p>Call provided function for each rpc client which by condition</p>
+<p><strong>Kind</strong>: instance method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient"><code>exports.RpcClient</code></a><br />
+<strong>rtype</strong>: <code>(condition: Function, operation: Function) =&gt; void</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>condition</td>
+<td><code>function</code></td>
+<td>Condition function of (client: RpcClient) =&gt; Boolean</td>
+</tr>
+<tr>
+<td>operation</td>
+<td><code>function</code></td>
+<td>Operation function of (client: RpcClient) =&gt; void</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+hasAccessToAccount"></a></p>
+<h4 id="exportsrpcclienthasaccesstoaccountaddress-boolean">exports.RpcClient.hasAccessToAccount(address) ⇒ <code>Boolean</code></h4>
+<p>Check if aepp has access to account</p>
+<p><strong>Kind</strong>: instance method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient"><code>exports.RpcClient</code></a><br />
+<strong>Returns</strong>: <code>Boolean</code> - is connected<br />
+<strong>rtype</strong>: <code>(address: String) =&gt; Boolean</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>address</td>
+<td><code>String</code></td>
+<td>Account address</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+isConnected"></a></p>
+<h4 id="exportsrpcclientisconnected-boolean">exports.RpcClient.isConnected() ⇒ <code>Boolean</code></h4>
+<p>Check if is connected</p>
+<p><strong>Kind</strong>: instance method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient"><code>exports.RpcClient</code></a><br />
+<strong>Returns</strong>: <code>Boolean</code> - is connected<br />
+<strong>rtype</strong>: <code>() =&gt; Boolean</code>
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+getCurrentAccount"></a></p>
+<h4 id="exportsrpcclientgetcurrentaccountoptions-string">exports.RpcClient.getCurrentAccount(options) ⇒ <code>String</code></h4>
+<p>Get selected account</p>
+<p><strong>Kind</strong>: instance method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient"><code>exports.RpcClient</code></a><br />
+<strong>rtype</strong>: <code>({ onAccount } = {}) =&gt; String</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td><code>Object</code></td>
+<td>Options</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+disconnect"></a></p>
+<h4 id="exportsrpcclientdisconnect-void">exports.RpcClient.disconnect() ⇒ <code>void</code></h4>
+<p>Disconnect</p>
+<p><strong>Kind</strong>: instance method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient"><code>exports.RpcClient</code></a><br />
+<strong>rtype</strong>: <code>() =&gt; void</code>
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+updateSubscription"></a></p>
+<h4 id="exportsrpcclientupdatesubscriptiontype-value-arrayltstringgt">exports.RpcClient.updateSubscription(type, value) ⇒ <code>Array.&amp;lt;String&amp;gt;</code></h4>
+<p>Update subscription</p>
+<p><strong>Kind</strong>: instance method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient"><code>exports.RpcClient</code></a><br />
+<strong>rtype</strong>: <code>(type: String, value: String) =&gt; void</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td><code>String</code></td>
+<td>Subscription type</td>
+</tr>
+<tr>
+<td>value</td>
+<td><code>String</code></td>
+<td>Subscription value</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+addAction"></a></p>
+<h4 id="exportsrpcclientaddactionaction-resolvers-object">exports.RpcClient.addAction(action, resolvers) ⇒ <code>Object</code></h4>
+<p>Add new action to actions</p>
+<p><strong>Kind</strong>: instance method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient"><code>exports.RpcClient</code></a><br />
+<strong>rtype</strong>: <code>(action: Object, [r: Function, j: Function]) =&gt; Object</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>action</td>
+<td><code>Object</code></td>
+<td>Action object</td>
+</tr>
+<tr>
+<td>resolvers</td>
+<td><code>Array.&amp;lt;function()&amp;gt;</code></td>
+<td>Array with two function [resolve, reject] action</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+request"></a></p>
+<h4 id="exportsrpcclientrequestname-params-promise">exports.RpcClient.request(name, params) ⇒ <code>Promise</code></h4>
+<p>Make a request</p>
+<p><strong>Kind</strong>: instance method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient"><code>exports.RpcClient</code></a><br />
+<strong>Returns</strong>: <code>Promise</code> - Promise which will be resolved after receiving response message<br />
+<strong>rtype</strong>: <code>(name: String, params: Object) =&gt; Promise</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>name</td>
+<td><code>String</code></td>
+<td>Method name</td>
+</tr>
+<tr>
+<td>params</td>
+<td><code>Object</code></td>
+<td>Method params</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient+processResponse"></a></p>
+<h4 id="exportsrpcclientprocessresponsemsg-transformresult-void">exports.RpcClient.processResponse(msg, [transformResult]) ⇒ <code>void</code></h4>
+<p>Process response message</p>
+<p><strong>Kind</strong>: instance method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient"><code>exports.RpcClient</code></a><br />
+<strong>rtype</strong>: <code>(msg: Object, transformResult: Function) =&gt; void</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>msg</td>
+<td><code>Object</code></td>
+<td>Message object</td>
+</tr>
+<tr>
+<td>[transformResult]</td>
+<td><code>function</code></td>
+<td>Optional parser function for message</td>
+</tr>
+</tbody>
+</table>
+<p><a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient.RpcClients"></a></p>
+<h4 id="exportsrpcclientrpcclients-object">exports.RpcClient.RpcClients() ⇒ <code>Object</code></h4>
+<p>Contain functionality for managing multiple RPC clients (RpcClient stamp)</p>
+<p><strong>Kind</strong>: static method of <a href="#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client--exports.RpcClient"><code>exports.RpcClient</code></a><br />
+<strong>rtype</strong>: <code>Stamp</code></p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../wallet-rpc/" class="btn btn-neutral float-right" title="Wallet RPC">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../aepp-rpc/" class="btn btn-neutral" title="Aepp RPC"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/aeternity/aepp-sdk-js/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../aepp-rpc/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../wallet-rpc/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../../../../..';</script>
+    <script src="../../../../../js/theme.js" defer></script>
+      <script src="../../../../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

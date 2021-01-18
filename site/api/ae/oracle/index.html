@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../../../img/favicon.ico">
+  <title>Oracle - Aeternity JavaScript SDK</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../../../css/theme.css" />
+  <link rel="stylesheet" href="../../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Oracle";
+    var mkdocs_page_input_path = "api/ae/oracle.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/rust.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/erlang.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/js.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="../../.." class="icon icon-home"> Aeternity JavaScript SDK</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../..">Overview</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/quick-start/">Quick Start</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Guides</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/contract-events/">Contract Events</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/oracle-usage/">Oracle Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/aens-usage/">AENS Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/contract-aci-usage/">Contract Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/delegate-signature-to-contract/">Delegate Signature to Contract</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/how-to-build-aepp-using-new-wallet-api/">Wallet Api</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/how-to-build-an-wallet-app-or-extension/">Building Wallets</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/low-vs-high-usage/">Low vs High level API</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../guides/import-tree-shaking/">Tree Shaking</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">Migration</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../guides/migration/migration-7.0.0/">Migration to SDK 7.0.0</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API Reference</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="#">account</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../account/">Account</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../account/selector/">Selector</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../account/memory/">Memory</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../accounts/">Account Handling</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="#">ae</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../aens/">Aens</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../aepp/">Aepp</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../contract/">Contract</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="./">Oracle</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#oracleoptions-object">Oracle([options]) ⇒ Object ⏏</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#getoracleobjectoracleid-promiseltobjectgt">.getOracleObject(oracleId) ⇒ Promise.&amp;lt;Object&amp;gt; ⏏</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#pollforqueriesoracleid-onquery-options-function">.pollForQueries(oracleId, onQuery, [options]) ⇒ function ⏏</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#getqueryobjectoracleid-queryid-promiseltobjectgt">.getQueryObject(oracleId, queryId) ⇒ Promise.&amp;lt;Object&amp;gt; ⏏</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#exportspollforqueryresponseoracleid-queryid-options-promiseltobjectgt">.exports.pollForQueryResponse(oracleId, queryId, [options]) ⇒ Promise.&amp;lt;Object&amp;gt; ⏏</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#registeroraclequeryformat-responseformat-options-promiseltobjectgt">.registerOracle(queryFormat, responseFormat, [options]) ⇒ Promise.&amp;lt;Object&amp;gt; ⏏</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#postquerytooracleoracleid-query-options-promiseltobjectgt">.postQueryToOracle(oracleId, query, [options]) ⇒ Promise.&amp;lt;Object&amp;gt; ⏏</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#extendoraclettloracleid-oraclettl-options-promiseltobjectgt">.extendOracleTtl(oracleId, oracleTtl, [options]) ⇒ Promise.&amp;lt;Object&amp;gt; ⏏</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#respondtoqueryoracleid-queryid-response-options-promiseltobjectgt">.respondToQuery(oracleId, queryId, response, [options]) ⇒ Promise.&amp;lt;Object&amp;gt; ⏏</a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../universal/">Universal</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../wallet/">Wallet</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">chain</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../chain/">Chain</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../chain/node/">Node</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../channel/">channel</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">contract</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../contract/aci/">Aci</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../contract/compiler/">Compiler</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../contract/ga/">Generalized Accounts</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">oracle</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../oracle/">Oracle</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../oracle/node/">Node</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../rpc/client/">Deprecated RPC Client</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">tx</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">builder</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../tx/builder/">Builder</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../tx/builder/helpers/">Helpers</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../tx/builder/schema/">Schema</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tx/">tx</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tx/tx/">tx stamp</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tx/tx-object/">tx object</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tx/validator/">tx validator</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">Aepp Wallet Communication</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">Connection</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../utils/aepp-wallet-communication/connection/">Setup</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../utils/aepp-wallet-communication/content-script-bridge/">Content script bridge</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../utils/aepp-wallet-communication/wallet-detector/">Wallet detector</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../utils/aepp-wallet-communication/connection/browser-runtime/">Browser runtime</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../utils/aepp-wallet-communication/connection/browser-window-message/">Window message</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">RPC</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../utils/aepp-wallet-communication/rpc/aepp-rpc/">Aepp RPC</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../utils/aepp-wallet-communication/rpc/rpc-client/">RPC client</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../utils/aepp-wallet-communication/rpc/wallet-rpc/">Wallet RPC</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">utils</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../">AE Utilities</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../utils/amount-formatter/">Amount formatter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../utils/bignumber/">Bignumber</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../utils/bytes/">Bytes</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../utils/crypto/">Crypto</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../utils/keystore/">Keystore</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../contract/">Contract</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../node/">Node</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../node-pool/">Node pool</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../utils/swagger/">Swagger</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Examples</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="#">NodeJS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../guides/import-nodejs/">Setup</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../examples/node/aecontract/">Simple Sophia Contract Compiler</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../examples/node/aecrypto/">Crypto Helper Script</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../examples/node/aewallet/">Simple AE Token Spending Script</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">JS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../guides/import-script-tag/">Script Tag</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../guides/import-vuejs/">Vue.js</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../..">Aeternity JavaScript SDK</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>ae &raquo;</li>
+        
+      
+        
+          <li>API Reference &raquo;</li>
+        
+      
+    
+    <li>Oracle</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/aeternity/aepp-sdk-js/edit/master/docs/api/ae/oracle.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p><a id="module_@aeternity/aepp-sdk/es/ae/oracle"></a></p>
+<h2 id="aeternityaepp-sdkesaeoracle">@aeternity/aepp-sdk/es/ae/oracle</h2>
+<p>Oracle module - routines to interact with the æternity oracle system</p>
+<p>The high-level description of the oracle system is
+https://github.com/aeternity/protocol/blob/master/ORACLE.md in the protocol
+repository.</p>
+<p><strong>Example</strong>  </p>
+<pre><code class="js">import Oracle from '@aeternity/aepp-sdk/es/ae/oracle'
+</code></pre>
+
+<ul>
+<li><a href="#module_@aeternity/aepp-sdk/es/ae/oracle">@aeternity/aepp-sdk/es/ae/oracle</a><ul>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/ae/oracle--Oracle">Oracle([options])</a> ⇒ <code>Object</code> ⏏</li>
+<li><em>instance</em><ul>
+<li><em>async</em><ul>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/ae/oracle--getOracleObject">.getOracleObject(oracleId)</a> ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code> ⏏</li>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/ae/oracle--pollForQueries">.pollForQueries(oracleId, onQuery, [options])</a> ⇒ <code>function</code> ⏏</li>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/ae/oracle--getQueryObject">.getQueryObject(oracleId, queryId)</a> ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code> ⏏</li>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/ae/oracle--exports.pollForQueryResponse">.exports.pollForQueryResponse(oracleId, queryId, [options])</a> ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code> ⏏</li>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/ae/oracle--registerOracle">.registerOracle(queryFormat, responseFormat, [options])</a> ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code> ⏏</li>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/ae/oracle--postQueryToOracle">.postQueryToOracle(oracleId, query, [options])</a> ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code> ⏏</li>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/ae/oracle--extendOracleTtl">.extendOracleTtl(oracleId, oracleTtl, [options])</a> ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code> ⏏</li>
+<li><a href="#exp_module_@aeternity/aepp-sdk/es/ae/oracle--respondToQuery">.respondToQuery(oracleId, queryId, response, [options])</a> ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code> ⏏</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/ae/oracle--Oracle"></a></p>
+<h3 id="oracleoptions-object">Oracle([options]) ⇒ <code>Object</code> ⏏</h3>
+<p>Oracle Stamp</p>
+<p>Oracle provides oracle-system related methods atop
+<a href="#exp_module_@aeternity/aepp-sdk/es/ae--Ae">Ae</a> clients.</p>
+<p><strong>Kind</strong>: Exported function<br />
+<strong>Returns</strong>: <code>Object</code> - Oracle instance<br />
+<strong>rtype</strong>: <code>Stamp</code></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[options]</td>
+<td><code>Object</code></td>
+<td><code>{}</code></td>
+<td>Initializer object</td>
+</tr>
+</tbody>
+</table>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/ae/oracle--getOracleObject"></a></p>
+<h3 id="getoracleobjectoracleid-promiseltobjectgt">.getOracleObject(oracleId) ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code> ⏏</h3>
+<p>Constructor for Oracle Object (helper object for using Oracle)</p>
+<p><strong>Kind</strong>: instance method of <a href="#module_@aeternity/aepp-sdk/es/ae/oracle"><code>@aeternity/aepp-sdk/es/ae/oracle</code></a><br />
+<strong>Returns</strong>: <code>Promise.&amp;lt;Object&amp;gt;</code> - Oracle object<br />
+<strong>Category</strong>: async  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>oracleId</td>
+<td><code>String</code></td>
+<td>Oracle public key</td>
+</tr>
+</tbody>
+</table>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/ae/oracle--pollForQueries"></a></p>
+<h3 id="pollforqueriesoracleid-onquery-options-function">.pollForQueries(oracleId, onQuery, [options]) ⇒ <code>function</code> ⏏</h3>
+<p>Poll for oracle queries</p>
+<p><strong>Kind</strong>: instance method of <a href="#module_@aeternity/aepp-sdk/es/ae/oracle"><code>@aeternity/aepp-sdk/es/ae/oracle</code></a><br />
+<strong>Returns</strong>: <code>function</code> - stopPolling - Stop polling function<br />
+<strong>Category</strong>: async  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>oracleId</td>
+<td><code>String</code></td>
+<td>Oracle public key</td>
+</tr>
+<tr>
+<td>onQuery</td>
+<td><code>function</code></td>
+<td>OnQuery callback</td>
+</tr>
+<tr>
+<td>[options]</td>
+<td><code>Object</code></td>
+<td>Options object</td>
+</tr>
+<tr>
+<td>[options.interval]</td>
+<td><code>Number</code></td>
+<td>Poll interval(default: 5000)</td>
+</tr>
+</tbody>
+</table>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/ae/oracle--getQueryObject"></a></p>
+<h3 id="getqueryobjectoracleid-queryid-promiseltobjectgt">.getQueryObject(oracleId, queryId) ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code> ⏏</h3>
+<p>Constructor for OracleQuery Object (helper object for using OracleQuery)</p>
+<p><strong>Kind</strong>: instance method of <a href="#module_@aeternity/aepp-sdk/es/ae/oracle"><code>@aeternity/aepp-sdk/es/ae/oracle</code></a><br />
+<strong>Returns</strong>: <code>Promise.&amp;lt;Object&amp;gt;</code> - OracleQuery object<br />
+<strong>Category</strong>: async  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>oracleId</td>
+<td><code>String</code></td>
+<td>Oracle public key</td>
+</tr>
+<tr>
+<td>queryId</td>
+<td><code>String</code></td>
+<td>Oracle Query id</td>
+</tr>
+</tbody>
+</table>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/ae/oracle--exports.pollForQueryResponse"></a></p>
+<h3 id="exportspollforqueryresponseoracleid-queryid-options-promiseltobjectgt">.exports.pollForQueryResponse(oracleId, queryId, [options]) ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code> ⏏</h3>
+<p>Poll for oracle query response</p>
+<p><strong>Kind</strong>: instance method of <a href="#module_@aeternity/aepp-sdk/es/ae/oracle"><code>@aeternity/aepp-sdk/es/ae/oracle</code></a><br />
+<strong>Returns</strong>: <code>Promise.&amp;lt;Object&amp;gt;</code> - OracleQuery object<br />
+<strong>Category</strong>: async  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>oracleId</td>
+<td><code>String</code></td>
+<td>Oracle public key</td>
+</tr>
+<tr>
+<td>queryId</td>
+<td><code>String</code></td>
+<td>Oracle Query id</td>
+</tr>
+<tr>
+<td>[options]</td>
+<td><code>Object</code></td>
+<td>Options object</td>
+</tr>
+<tr>
+<td>[options.attempts]</td>
+<td><code>Object</code></td>
+<td>Poll attempt's(default: 20)</td>
+</tr>
+<tr>
+<td>[options.interval]</td>
+<td><code>Object</code></td>
+<td>Poll interval(default: 5000)</td>
+</tr>
+</tbody>
+</table>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/ae/oracle--registerOracle"></a></p>
+<h3 id="registeroraclequeryformat-responseformat-options-promiseltobjectgt">.registerOracle(queryFormat, responseFormat, [options]) ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code> ⏏</h3>
+<p>Register oracle</p>
+<p><strong>Kind</strong>: instance method of <a href="#module_@aeternity/aepp-sdk/es/ae/oracle"><code>@aeternity/aepp-sdk/es/ae/oracle</code></a><br />
+<strong>Returns</strong>: <code>Promise.&amp;lt;Object&amp;gt;</code> - Oracle object<br />
+<strong>Category</strong>: async  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>queryFormat</td>
+<td><code>String</code></td>
+<td></td>
+<td>Format of query</td>
+</tr>
+<tr>
+<td>responseFormat</td>
+<td><code>String</code></td>
+<td></td>
+<td>Format of query response</td>
+</tr>
+<tr>
+<td>[options]</td>
+<td><code>Object</code></td>
+<td><code>{}</code></td>
+<td>Options</td>
+</tr>
+<tr>
+<td>[options.queryFee]</td>
+<td><code>String</code> | <code>Number</code></td>
+<td></td>
+<td>queryFee Oracle query Fee</td>
+</tr>
+<tr>
+<td>[options.oracleTtl]</td>
+<td><code>Object</code></td>
+<td></td>
+<td>oracleTtl OracleTtl object {type: 'delta</td>
+</tr>
+<tr>
+<td>[options.abiVersion]</td>
+<td><code>Number</code></td>
+<td></td>
+<td>abiVersion Always 0 (do not use virtual machine)</td>
+</tr>
+<tr>
+<td>[options.fee]</td>
+<td><code>Number</code> | <code>String</code></td>
+<td></td>
+<td>fee Transaction fee</td>
+</tr>
+<tr>
+<td>[options.ttl]</td>
+<td><code>Number</code> | <code>String</code></td>
+<td></td>
+<td>Transaction time to leave</td>
+</tr>
+</tbody>
+</table>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/ae/oracle--postQueryToOracle"></a></p>
+<h3 id="postquerytooracleoracleid-query-options-promiseltobjectgt">.postQueryToOracle(oracleId, query, [options]) ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code> ⏏</h3>
+<p>Post query to oracle</p>
+<p><strong>Kind</strong>: instance method of <a href="#module_@aeternity/aepp-sdk/es/ae/oracle"><code>@aeternity/aepp-sdk/es/ae/oracle</code></a><br />
+<strong>Returns</strong>: <code>Promise.&amp;lt;Object&amp;gt;</code> - Query object<br />
+<strong>Category</strong>: async  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>oracleId</td>
+<td><code>String</code></td>
+<td></td>
+<td>Oracle public key</td>
+</tr>
+<tr>
+<td>query</td>
+<td><code>String</code></td>
+<td></td>
+<td>Oracle query object</td>
+</tr>
+<tr>
+<td>[options]</td>
+<td><code>Object</code></td>
+<td><code>{}</code></td>
+<td></td>
+</tr>
+<tr>
+<td>[options.queryTtl]</td>
+<td><code>String</code> | <code>Number</code></td>
+<td></td>
+<td>queryTtl Oracle query time to leave</td>
+</tr>
+<tr>
+<td>[options.responseTtl]</td>
+<td><code>String</code> | <code>Number</code></td>
+<td></td>
+<td>queryFee Oracle query response time to leave</td>
+</tr>
+<tr>
+<td>[options.queryFee]</td>
+<td><code>String</code> | <code>Number</code></td>
+<td></td>
+<td>queryFee Oracle query fee</td>
+</tr>
+<tr>
+<td>[options.fee]</td>
+<td><code>Number</code></td>
+<td></td>
+<td>fee Transaction fee</td>
+</tr>
+<tr>
+<td>[options.ttl]</td>
+<td><code>Number</code></td>
+<td></td>
+<td>Transaction time to leave</td>
+</tr>
+</tbody>
+</table>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/ae/oracle--extendOracleTtl"></a></p>
+<h3 id="extendoraclettloracleid-oraclettl-options-promiseltobjectgt">.extendOracleTtl(oracleId, oracleTtl, [options]) ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code> ⏏</h3>
+<p>Extend oracle ttl</p>
+<p><strong>Kind</strong>: instance method of <a href="#module_@aeternity/aepp-sdk/es/ae/oracle"><code>@aeternity/aepp-sdk/es/ae/oracle</code></a><br />
+<strong>Returns</strong>: <code>Promise.&amp;lt;Object&amp;gt;</code> - Oracle object<br />
+<strong>Category</strong>: async  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>oracleId</td>
+<td><code>String</code></td>
+<td></td>
+<td>Oracle public key</td>
+</tr>
+<tr>
+<td>oracleTtl</td>
+<td><code>String</code></td>
+<td></td>
+<td>Oracle time to leave for extend</td>
+</tr>
+<tr>
+<td>[options]</td>
+<td><code>Object</code></td>
+<td><code>{}</code></td>
+<td></td>
+</tr>
+<tr>
+<td>[options.fee]</td>
+<td><code>Number</code></td>
+<td></td>
+<td>fee Transaction fee</td>
+</tr>
+<tr>
+<td>[options.ttl]</td>
+<td><code>Number</code></td>
+<td></td>
+<td>Transaction time to leave</td>
+</tr>
+</tbody>
+</table>
+<p><a id="exp_module_@aeternity/aepp-sdk/es/ae/oracle--respondToQuery"></a></p>
+<h3 id="respondtoqueryoracleid-queryid-response-options-promiseltobjectgt">.respondToQuery(oracleId, queryId, response, [options]) ⇒ <code>Promise.&amp;lt;Object&amp;gt;</code> ⏏</h3>
+<p>Extend oracle ttl</p>
+<p><strong>Kind</strong>: instance method of <a href="#module_@aeternity/aepp-sdk/es/ae/oracle"><code>@aeternity/aepp-sdk/es/ae/oracle</code></a><br />
+<strong>Returns</strong>: <code>Promise.&amp;lt;Object&amp;gt;</code> - Oracle object<br />
+<strong>Category</strong>: async  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>oracleId</td>
+<td><code>String</code></td>
+<td></td>
+<td>Oracle public key</td>
+</tr>
+<tr>
+<td>queryId</td>
+<td><code>String</code></td>
+<td></td>
+<td>Oracle query id</td>
+</tr>
+<tr>
+<td>response</td>
+<td><code>String</code></td>
+<td></td>
+<td>Oracle query response</td>
+</tr>
+<tr>
+<td>[options]</td>
+<td><code>Object</code></td>
+<td><code>{}</code></td>
+<td></td>
+</tr>
+<tr>
+<td>[options.responseTtl]</td>
+<td><code>Number</code></td>
+<td></td>
+<td>responseTtl Query response time to leave</td>
+</tr>
+<tr>
+<td>[options.fee]</td>
+<td><code>Number</code></td>
+<td></td>
+<td>Transaction fee</td>
+</tr>
+<tr>
+<td>[options.ttl]</td>
+<td><code>Number</code></td>
+<td></td>
+<td>Transaction time to leave</td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../universal/" class="btn btn-neutral float-right" title="Universal">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../contract/" class="btn btn-neutral" title="Contract"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/aeternity/aepp-sdk-js/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../contract/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../universal/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../../..';</script>
+    <script src="../../../js/theme.js" defer></script>
+      <script src="../../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

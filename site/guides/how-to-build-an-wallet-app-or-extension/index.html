@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Building Wallets - Aeternity JavaScript SDK</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../../css/theme.css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Building Wallets";
+    var mkdocs_page_input_path = "guides/how-to-build-an-wallet-app-or-extension.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/rust.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/erlang.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/js.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> Aeternity JavaScript SDK</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../quick-start/">Quick Start</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Guides</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../contract-events/">Contract Events</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../oracle-usage/">Oracle Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../aens-usage/">AENS Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../contract-aci-usage/">Contract Usage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../delegate-signature-to-contract/">Delegate Signature to Contract</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../how-to-build-aepp-using-new-wallet-api/">Wallet Api</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Building Wallets</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#first-we-need-to-initialize-our-aepp-stamp">First we need to initialize our Aepp stamp</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#extension-wallet">Extension wallet</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#web-waellet-iframereverse-iframe">Web Waellet (Iframe/Reverse Iframe)</a>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../low-vs-high-usage/">Low vs High level API</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../import-tree-shaking/">Tree Shaking</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">Migration</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../migration/migration-7.0.0/">Migration to SDK 7.0.0</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API Reference</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="#">account</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/account/">Account</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/account/selector/">Selector</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/account/memory/">Memory</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/accounts/">Account Handling</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">ae</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/ae/aens/">Aens</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/ae/aepp/">Aepp</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/ae/contract/">Contract</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/ae/oracle/">Oracle</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/ae/universal/">Universal</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/ae/wallet/">Wallet</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">chain</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/chain/">Chain</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/chain/node/">Node</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../api/channel/">channel</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">contract</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/contract/aci/">Aci</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/contract/compiler/">Compiler</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/contract/ga/">Generalized Accounts</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">oracle</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/oracle/">Oracle</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/oracle/node/">Node</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../api/rpc/client/">Deprecated RPC Client</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">tx</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">builder</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/tx/builder/">Builder</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/tx/builder/helpers/">Helpers</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/tx/builder/schema/">Schema</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/tx/">tx</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/tx/tx/">tx stamp</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/tx/tx-object/">tx object</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/tx/validator/">tx validator</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">Aepp Wallet Communication</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">Connection</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/utils/aepp-wallet-communication/connection/">Setup</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/utils/aepp-wallet-communication/content-script-bridge/">Content script bridge</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/utils/aepp-wallet-communication/wallet-detector/">Wallet detector</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/utils/aepp-wallet-communication/connection/browser-runtime/">Browser runtime</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/utils/aepp-wallet-communication/connection/browser-window-message/">Window message</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">RPC</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/utils/aepp-wallet-communication/rpc/aepp-rpc/">Aepp RPC</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/utils/aepp-wallet-communication/rpc/rpc-client/">RPC client</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/utils/aepp-wallet-communication/rpc/wallet-rpc/">Wallet RPC</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">utils</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/ae/">AE Utilities</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/utils/amount-formatter/">Amount formatter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/utils/bignumber/">Bignumber</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/utils/bytes/">Bytes</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/utils/crypto/">Crypto</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/utils/keystore/">Keystore</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/contract/">Contract</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/node/">Node</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/node-pool/">Node pool</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/utils/swagger/">Swagger</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Examples</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="#">NodeJS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../import-nodejs/">Setup</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../examples/node/aecontract/">Simple Sophia Contract Compiler</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../examples/node/aecrypto/">Crypto Helper Script</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../examples/node/aewallet/">Simple AE Token Spending Script</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">JS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../import-script-tag/">Script Tag</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../import-vuejs/">Vue.js</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">Aeternity JavaScript SDK</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Guides &raquo;</li>
+        
+      
+    
+    <li>Building Wallets</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/aeternity/aepp-sdk-js/edit/master/docs/guides/how-to-build-an-wallet-app-or-extension.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="how-to-build-a-wallet">How to build a wallet</h2>
+<p>This guide describing the process of building Waellet using the new Wallet&lt;-&gt;Aepp integration API
+The full example of implementation you can find here:
+- <a href="https://github.com/aeternity/aepp-sdk-js/tree/develop/examples/browser/vuejs/connect-two-ae/identity">Web Waellet</a>
+- <a href="https://github.com/aeternity/aepp-sdk-js/tree/develop/examples/browser/extension">Extension Waellet</a></p>
+<h3 id="first-we-need-to-initialize-our-aepp-stamp">First we need to initialize our <code>Aepp</code> stamp</h3>
+<h3 id="extension-wallet">Extension wallet</h3>
+<ul>
+<li>First we need to create an bridge between our extension and page
+This can be done by subscribing for window <code>message</code> event from the <code>page</code>
+and redirecting them using chrome|firefox <code>runtime</code> connection to the <code>extension</code> and back</li>
+</ul>
+<pre><code class="js">// inject.js file
+import BrowserRuntimeConnection from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-runtime'
+import BrowserWindowMessageConnection from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message'
+import { getBrowserAPI } from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/helpers'
+import { MESSAGE_DIRECTION } from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/schema'
+import ContentScriptBridge from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge'
+
+const readyStateCheckInterval = setInterval(function () {
+  // Wait until load
+  if (document.readyState === 'complete') {
+    clearInterval(readyStateCheckInterval)
+
+    // Create runtime connection with extension
+    const port = getBrowserAPI().runtime.connect()
+    // Create connection object for extension using `runtime` connection
+    const extConnection = BrowserRuntimeConnection({
+      connectionInfo: {
+        description: 'Content Script to Extension connection',
+        origin: window.origin
+      },
+      port
+    })
+    // Create connection object for page using `window.postMessage`
+    const pageConnection = BrowserWindowMessageConnection({
+      connectionInfo: {
+        description: 'Content Script to Page  connection',
+        origin: window.origin
+      },
+      origin: window.origin,
+      sendDirection: MESSAGE_DIRECTION.to_aepp,
+      receiveDirection: MESSAGE_DIRECTION.to_waellet
+    })
+
+    // Init ContentScriptBridge stamp
+    const bridge = ContentScriptBridge({ pageConnection, extConnection })
+    // Run. Start redirecting messages between extension and page
+    bridge.run()
+  }
+}, 10)
+
+</code></pre>
+
+<ul>
+<li>Then we need to initialize <code>Waellet</code> stamp in our extension and subscribe for new <code>runtime</code> connection's
+After connection will be established we can start to send <code>announcePresence</code> message to the <code>page</code> to let <code>Aepp</code> know about <code>Waellet</code></li>
+</ul>
+<pre><code class="js">// background.js
+
+import '../img/icon-128.png'
+import '../img/icon-34.png'
+
+import Node from '@aeternity/aepp-sdk/es/node'
+import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
+import { RpcWallet } from '@aeternity/aepp-sdk/es/ae/wallet'
+import BrowserRuntimeConnection
+  from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-runtime'
+import { generateKeyPair } from '@aeternity/aepp-sdk/es/utils/crypto'
+
+// const account = MemoryAccount({
+//   keypair: {
+//     secretKey: 'YOUR_PRIV',
+//     publicKey: 'YOUR_PUB'
+//   }
+// })
+const account2 = MemoryAccount({ keypair: generateKeyPair() })
+
+// Init accounts
+const accounts = [
+  // account,
+  account2
+]
+const NODE_URL = 'https://testnet.aeternity.io'
+const NODE_INTERNAL_URL = 'https://testnet.aeternity.io'
+const COMPILER_URL = 'https://compiler.aepps.com'
+
+// Init extension stamp from sdk
+RpcWallet({
+  nodes: [
+    { name: 'test-net', instance: await Node({ url: NODE_URL, internalUrl: NODE_INTERNAL_URL}) }
+  ],
+  compilerUrl: COMPILER_URL,
+  name: 'ExtensionWallet',
+  accounts,
+  // Call-back for new connection request
+  onConnection (aepp, action) {
+    if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to connect`)) {
+      action.accept()
+    } else {
+      action.deny()
+    }
+  },
+  // Call-back for disconnect event
+  onDisconnect (msg, client) {
+    client.disconnect()
+  },
+  // Call-back for account subscription request
+  onSubscription (aepp, action) {
+    if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} want to subscribe for accounts`)) {
+      // You are able to overwrite access to accounts for specific AEPP
+      // Manually prepare and pass as first argument of `accept` function, object with accounts
+      // Object should contain current and connected accounts
+      // Accounts can be stored outside of sdk(also combined some of accounts store in SDK some of account outside)
+      // action.accept({
+      //   accounts: {
+      //     current: { 'ak_bla23dfas...': {...meta-data} }, // Current account
+      //     connected: {  // Connected accounts
+      //       'ak_1asdasd...': {},
+      //       'ak_1asdasdf23...': {}
+      //     }
+      //   }
+      // })
+      action.accept()
+    } else {
+      action.deny()
+    }
+  },
+  // Call-back for sign request
+  onSign (aepp, { params, accept, deny, txObject, onAccount }) {
+    if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} want to sign tx ${action.params.tx}`)) {
+      // Here we can provide account for signing if it's not stored inside the SDK instance
+      // To do that you need to create MemoryAccount instance and provide it as second argument of accept function
+      // if (isInStorage(params.onAccount)) {
+        // First argument is encode transaction which will be using instead of one from AEPP (if provided)
+        // Then this signing request will be signed using the provide MemoryAccount
+        // If you do not provide account manually SDK will try to find it inside the instance, else throw error
+        // action(null, { onAccount: MemoryAccount({ keypair }) })
+      // }
+      accept()
+    } else {
+      deny()
+    }
+  },
+  // Call-back get accounts request
+  onAskAccounts (aepp, { accept, deny }) {
+    if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to get accounts`)) {
+      accept()
+    } else {
+      deny()
+    }
+  }
+}).then(wallet =&gt; {
+  // Subscribe for `runtime` connection from Content Script
+  chrome.runtime.onConnect.addListener(async function (port) {
+    // create BrowserRuntimeConnection
+    const connection = await BrowserRuntimeConnection({ connectionInfo: { id: port.sender.frameId }, port })
+    // add rpc client to wallet
+    wallet.addRpcClient(connection)
+    // Share wallet details. Inform aepp about wallet
+    wallet.shareWalletInfo(port.postMessage.bind(port))
+    setTimeout(() =&gt; wallet.shareWalletInfo(port.postMessage.bind(port)), 3000)
+  })
+}).catch(err =&gt; {
+  console.error(err)
+})
+
+</code></pre>
+
+<h3 id="web-waellet-iframereverse-iframe">Web Waellet (Iframe/Reverse Iframe)</h3>
+<ul>
+<li>This works the same as extension but without <code>Content Script bridge</code> in between</li>
+</ul>
+<pre><code class="js">  import { MemoryAccount, RpcWallet, Node } from '@aeternity/aepp-sdk/es'
+  import BrowserWindowMessageConnection from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message'
+
+  this.client = await RpcWallet({
+        nodes: [
+          { name: 'test-net', instance: await Node({ url: NODE_URL, internalUrl: NODE_INTERNAL_URL}) }
+        ],
+        compilerUrl: 'COMPILER_URL', // optional if your wallet don't support contract and all what requred compiler
+        accounts: [MemoryAccount({ keypair: { secretKey: 'YOUR_PRIVATE_KEY', publicKey: 'YOUR_PUBLIC_KEY' } })],
+        address: 'PUBLIC_KEY_OF_CURRENT_ACCOUNT', // default: first account in `accounts` array,
+        name: 'Wallet', // Your wallet name,
+        // call-back for connection request
+        async onConnection (aepp, { accept, deny }) {
+          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to connect`)) {
+            accept()
+          } else { deny() }
+        },
+        // call-back for subscription request
+        async onSubscription (aepp, { accept, deny }) {
+          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to subscribe address`)) {
+            // You are able to overwrite access to accounts for specific AEPP
+            // Manually prepare and pass as first argument of `accept` function, object with accounts
+            // Object should contain current and connected accounts
+            // Accounts can be stored outside of sdk(also combined some of accounts store in SDK some of account outside)
+            // action.accept({
+            //   accounts: {
+            //     current: { 'ak_bla23dfas...': {...meta-data} }, // Current account
+            //     connected: {  // Connected accounts
+            //       'ak_1asdasd...': {},
+            //       'ak_1asdasdf23...': {}
+            //     }
+            //   }
+            // })
+            accept()
+          } else { deny() }
+        },
+        // call-back for sign request
+        async onSign (aepp, { accept, deny, params }) {
+          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to ${params.returnSigned ? 'sign' : 'sign and broadcast'} ${JSON.stringify(params.tx)}`)) {
+            // Here we can provide account for signing if it's not stored inside the SDK instance
+            // To do that you need to create MemoryAccount instance and provide it as second argument of accept function
+            // if (isInStorage(params.onAccount)) {
+              // First argument is encode transaction which will be using instead of one from AEPP (if provided)
+              // Then this signing request will be signed using the provide MemoryAccount
+              // If you do not provide account manually SDK will try to find it inside the instance, else throw error
+              // action(null, { onAccount: MemoryAccount({ keypair }) })
+            // }
+            accept()
+          } else {
+            deny()
+          }
+        },
+        // call-back for get accounts request
+        onAskAccounts (aepp, { accept, deny }) {
+          if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to get accounts`)) {
+            accept()
+          } else {
+            deny()
+          }
+        },
+        // call-back for disconnect event
+        onDisconnect (message, client) {
+          this.shareWalletInfo(connection.sendMessage.bind(connection))
+        }
+      })
+      // Get target. Here we will check if wallet app running in frame or in top window
+      // Get target depending on approach iFrame/Reverse Iframe
+      const target = !this.runningInFrame ? window.frames.aepp : window.parent
+      // Create a connection
+      const connection = await BrowserWindowMessageConnection({
+        target
+      })
+      // Add RPC client to wallet
+      this.client.addRpcClient(connection)
+      // Notifiy AEPP about waellet by sending the `announcePresence` message
+      this.shareWalletInfo(connection.sendMessage.bind(connection))
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../low-vs-high-usage/" class="btn btn-neutral float-right" title="Low vs High level API">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../how-to-build-aepp-using-new-wallet-api/" class="btn btn-neutral" title="Wallet Api"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/aeternity/aepp-sdk-js/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../how-to-build-aepp-using-new-wallet-api/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../low-vs-high-usage/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
