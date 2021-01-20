@@ -1,12 +1,17 @@
 // takes the generated DOC files and flattens their structure so that there are no more than 2 levels of nesting in the menu.
 
 // State: 
-// seems to be flattening everything beyond level 2 up to level 2 content, n
-// needs some more manual testing / verification though
+// generates yaml seemingly as needed in the nav, 
+// left to do: -formatting the headers of the flattened, properly
+// - inserting into the mkdocs.yaml nav !
 
-const { fakeServer } = require('sinon');
+
+// one is better at parsing, the other is better at converting!
 const YAML = require('yamljs');
+const yaml = require('js-yaml');
+
 const fs = require('fs')
+var os = require("os");
 
 /// helpers
 basePath = './docs/'
@@ -40,9 +45,12 @@ const isObject = A => {
 const formatHeaders = (input, depth) =>{
     return input
 }
+const filenameFromPath = (path) => {
+    const regex = new RegExp('[ \\w-]+?(?=\\.)')
+    return path.match(regex)[0];
+}
 
 // for objects, for every key, we assume that every value of type string is a path to a file that can be opened
-
 // if depth is over 2 and we have a string, load that file and save it to parentFileName ! 
 const assignDepth = (arr, depth = 1, parentFileName = "") => {
 
@@ -136,7 +144,7 @@ const assignDepth = (arr, depth = 1, parentFileName = "") => {
     
 }
 
-// first, parse mkdocs YAML
+// first, parse mkdocs YAML to JSON
 parsedYaml = YAML.load('mkdocs_original.yml');
 
 // 3rd nesting: head title: ##   , content ###
@@ -251,15 +259,22 @@ const generateFilesFromContent = (arr) => {
 
                 if(arr.content){
                     // if docs exist, get them !
+                    var existingDocs = []
+                    // if "the key" is an array
                     if(Array.isArray(arr[key])) {
-                        let existingDocs = arr[key].filter(el => {
+                        existingDocs = arr[key].filter(el => {
                             return typeof el === 'string'
                         })
                         
                         // add all docs from this "key" (which is non-content-nondepth)
                         // to the Set
-                        existingDocs.forEach(el => docs.add(el))
+                        existingDocs.forEach(el => docs.add(el))  // <--------
+                    } else {
+                        // else we assume "the key" contains only a string
+                        docs.add(arr[key])
                     }
+
+
                     // strip tag numbers from file paths and compare if 
                     // the "content" stuff is already present in Set
                     let contentArray = arr.content.split(' ➔ ')
@@ -270,22 +285,57 @@ const generateFilesFromContent = (arr) => {
 
                         // get the last one and split it:
                         let [path, originalDepth] = contentArray.pop().split('---')
-                        console.log("Path: ", path)
-                        console.log("has ?", docs.has(path))
                         // if it exists in the set, put it back into the array still to be processed.
                         !docs.has(path) ? filteredContentArray.push(path + "---" + originalDepth) : true
+
                     }
 
-                    console.log(filteredContentArray)
-                    //docs.add
-                    // splice all shit to array, add it to set !
+
+                    // USE filteredContentArray ARRAY TO BUILD FILES (DONT FORGET TO PROCESS THEM)
+                    //AND ADD THE OUTPUT TO THE EXISTING DOCS ! 
+
+                    // THEN, ADD THE EXISTING DOCS AS VALUE FOR "THAT KEY"
+                    
+                    // put content from filtered files (those not present in list of contents yet)
+                    var filecontentAcc = ''
+                    var generatedFileName = ''
+
+                    if(filteredContentArray.length > 0){
+                        while(filteredContentArray.length > 0){
+                            let [path, originalDepth] = filteredContentArray.pop().split('---')
+                            let data = fs.readFileSync(basePath + path, "utf8");
+                            let adjustedHeadings = formatHeaders(data, originalDepth);
+                            filecontentAcc = filecontentAcc.concat([adjustedHeadings, os.EOL]);
+                            let filename = filenameFromPath(path)
+                            generatedFileName = generatedFileName.concat(filename + '-' + originalDepth);
+                        }
+                        // for the TOC
+                        let generatedFile_relativePath = 'flattened/' + generatedFileName + '.md'
+                        // for file writing
+                        let generatedFile_absolutePath = basePath + generatedFile_relativePath
+                        
+                        fs.writeFileSync(generatedFile_absolutePath, filecontentAcc, null, 2)
+                        existingDocs.push(generatedFile_relativePath)
+                        const docsAttachedWithGenerated = existingDocs
+
+                        console.log("Pushed: ", generatedFile_absolutePath)
+
+                        arr[key] = docsAttachedWithGenerated;
+
+                        //console.log(filteredContentArray)
+                    }
                 }
 
-                json = generateFilesFromContent(arr[key])
+                //?    json = generateFilesFromContent(arr[key])
+                return json = generateFilesFromContent(arr[key])
 
             }
 
         })
+
+        // delete the content and depth key
+        delete arr.content;
+        delete arr.depth;
 
         return arr
 
@@ -297,6 +347,9 @@ const generateFilesFromContent = (arr) => {
 
 
 }
+
+
+
 // save the unflattened result
 console.log(JSONwithDepth)
 fs.writeFileSync('./testOutput.json', JSON.stringify(JSONwithDepth.json, null, 2))
@@ -317,8 +370,16 @@ fs.writeFileSync('./reFlattened.json', JSON.stringify(reFlattened, null, 4))
 
 const filesProcessed = generateFilesFromContent(reFlattened)
 
+fs.writeFileSync('./final.json', JSON.stringify(filesProcessed, null, 4))
+
+var backToYaml = yaml.dump(filesProcessed);
+fs.writeFileSync('./yaml_jsyaml.yml', backToYaml, null, 4)
+
+// load the mkdocs.yml and insert the nav
+mkdocs = YAML.load('mkdocs.yml');
+mkdocs.nav = filesProcessed;
+console.log(mkdocs)
 
 
-
-// next: for every object: take the "content", make a file out of it, and attach it to the list of files 
-// in the array of that object (found under the key which is NOT depth and NOT content)
+var mkdocs_generated = yaml.dump(mkdocs);
+fs.writeFileSync('./mkdocs_generated.yml', mkdocs_generated, null, 4)
