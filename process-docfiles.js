@@ -319,11 +319,51 @@ const generateFilesFromContent = (arr) => {
                         const docsAttachedWithGenerated = existingDocs
 
                         console.log("Pushed: ", generatedFile_absolutePath)
-
+                            
+                        // as a last step: if "the key" consists of an array:
+                        // if the array length is only one, set its value for the key.
+                        // if more files in the entry, merge them all together, save, and put that new one as value !
+                        
                         arr[key] = docsAttachedWithGenerated;
-
                         //console.log(filteredContentArray)
                     }
+
+                           
+                    // as a last step: if "the key" consists of an array:
+                    // if the array length is only one, set its value for the key.
+                    // if more files in the entry, merge them all together, save, and put that new one as value !
+                        
+                    if (arr.depth && arr.depth > 1){
+                        if(key == 'ae'){
+                            console.log("AE coming!")
+                        }
+
+                        // if the array length is only one, set its value for the key.
+                        if (Array.isArray(arr[key]) && arr[key].length == 1){
+                            arr[key] = arr[key][0]
+                            // if more files in the entry, merge them all together, save, and put that new one as value !
+
+                        } else if (Array.isArray(arr[key]) && arr[key].length > 1) {
+                            var filecontentAcc = ''
+                            var generatedFileName = ''
+
+                            arr[key].forEach(path => {
+                                let data = fs.readFileSync(basePath + path, "utf8");
+                                filecontentAcc = filecontentAcc.concat([data, os.EOL]);
+                                let filename = filenameFromPath(path)
+                                generatedFileName = generatedFileName.concat(filename + '-');
+                            });
+                                                    // for the TOC
+                            let generatedFile_relativePath = 'flattened/' + generatedFileName + '.md'
+                            // for file writing
+                            let generatedFile_absolutePath = basePath + generatedFile_relativePath
+                            
+                            fs.writeFileSync(generatedFile_absolutePath, filecontentAcc, null, 2)
+
+                            arr[key] = generatedFile_relativePath
+                        }
+                    }
+
                 }
 
                 //?    json = generateFilesFromContent(arr[key])
@@ -334,8 +374,8 @@ const generateFilesFromContent = (arr) => {
         })
 
         // delete the content and depth key
-        delete arr.content;
-        delete arr.depth;
+         delete arr.content;
+         delete arr.depth;
 
         return arr
 
@@ -379,7 +419,6 @@ fs.writeFileSync('./yaml_jsyaml.yml', backToYaml, null, 4)
 mkdocs = YAML.load('mkdocs.yml');
 mkdocs.nav = filesProcessed;
 console.log(mkdocs)
-
 
 var mkdocs_generated = yaml.dump(mkdocs);
 fs.writeFileSync('./mkdocs_generated.yml', mkdocs_generated, null, 4)
