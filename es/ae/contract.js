@@ -176,27 +176,18 @@ async function contractCallStatic (source, address, name, args = [], { top, opti
   }
 }
 
-async function dryRunContractTx (tx, callerId, source, name, opt = {}) {
-  const { top } = opt
-  // Resolve Account for Dry-run
-  const dryRunAmount = BigNumber(opt.dryRunAccount.amount).gt(BigNumber(opt.amount || 0)) ? opt.dryRunAccount.amount : opt.amount
-  const dryRunAccount = {
-    amount: dryRunAmount,
-    pubKey: callerId
-  }
-  // Dry-run
-  const [{ result: status, callObj, reason }] = (await this.txDryRun([tx], [dryRunAccount], top)).results
+async function dryRunContractTx (tx, callerId, source, name, options) {
+  const { callObj, ...dryRunOther } = await this.txDryRun(tx, callerId, options)
 
-  // Process response
-  if (status !== 'ok') throw Object.assign(new Error('Dry run error, ' + reason), { tx: TxObject({ tx }), dryRunParams: { accounts: [dryRunAccount], top } })
   const { returnType, returnValue } = callObj
   if (returnType !== 'ok') {
     await this._handleCallError(callObj, tx)
   }
   return {
+    ...dryRunOther,
     tx: TxObject({ tx }),
     result: callObj,
-    decode: () => this.contractDecodeData(source, name, returnValue, returnType, opt)
+    decode: () => this.contractDecodeData(source, name, returnValue, returnType, options)
   }
 }
 

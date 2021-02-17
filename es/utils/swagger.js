@@ -120,6 +120,10 @@ const conformTypes = {
       throw TypeError('Not a string', spec, value)
     }
   },
+  boolean (value, spec) {
+    if (typeof value === 'boolean') return value
+    throw TypeError('Not a boolean', spec, value)
+  },
   object (value, spec, types) {
     if (R.type(value) === 'Object') {
       const required = (spec.required || []).map(snakeToPascal)

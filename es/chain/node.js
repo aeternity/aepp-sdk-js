@@ -24,7 +24,7 @@ import NodePool from '../node-pool'
 import { assertedType } from '../utils/crypto'
 import { pause } from '../utils/other'
 import { isNameValid, produceNameId } from '../tx/builder/helpers'
-import { NAME_ID_KEY } from '../tx/builder/schema'
+import { DRY_RUN_ACCOUNT, NAME_ID_KEY } from '../tx/builder/schema'
 
 /**
  * ChainNode module
@@ -174,8 +174,23 @@ async function getMicroBlockHeader (hash) {
   return this.api.getMicroBlockHeaderByHash(hash)
 }
 
-async function txDryRun (txs, accounts, top) {
-  return this.api.dryRunTxs({ txs: txs.map(tx => ({ tx })), accounts, top })
+async function txDryRun (tx, accountAddress, options) {
+  const { results: [{ result, reason, ...resultPayload }], ...other } =
+    await this.api.dryRunTxs({
+      ...options,
+      txs: [{ tx }],
+      accounts: [{
+        pubKey: accountAddress,
+        amount: DRY_RUN_ACCOUNT.amount
+      }]
+    })
+
+  if (result === 'ok') return { ...resultPayload, ...other }
+
+  throw Object.assign(
+    new Error('Dry run error, ' + reason),
+    { tx, accountAddress, options }
+  )
 }
 
 async function getContractByteCode (contractId) {
