@@ -36,7 +36,7 @@ describe('Generalize Account', function () {
   before(async function () {
     client = await getSdk()
     await client.spend('100000000000000000000', gaAccount.publicKey)
-    await client.addAccount(await MemoryAccount({ keypair: gaAccount }))
+    await client.addAccount(MemoryAccount({ keypair: gaAccount }))
   })
 
   it('Make account GA', async () => {
