@@ -49,7 +49,7 @@ async function sendAndProcess (tx, options) {
   const result = await this.getTxInfo(txData.hash)
 
   if (result.returnType !== 'ok') {
-    await this.handleCallError({ result, tx: TxObject({ tx: txData.rawTx }), rawTx: txData.rawTx })
+    await this._handleCallError(result, txData.rawTx)
   }
 
   return { hash: txData.hash, tx: TxObject({ tx: txData.rawTx }), result, txData, rawTx: txData.rawTx }
@@ -58,14 +58,15 @@ async function sendAndProcess (tx, options) {
 /**
  * Handle contract call error
  * @function
+ * @private
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
  * @param {Object} result call result object
- * @param {Object} tx Unpacked transaction
+ * @param {String} rawTx Raw transaction
  * @throws Error Decoded error
  * @return {Promise<void>}
  */
-async function handleCallError ({ result, tx, rawTx }) {
+async function _handleCallError (result, rawTx) {
   const error = Buffer.from(result.returnValue).toString()
   const decodedError = isBase64(error.slice(3))
     ? Buffer.from(error.slice(3), 'base64').toString()
@@ -73,7 +74,7 @@ async function handleCallError ({ result, tx, rawTx }) {
   throw Object.assign(
     new Error(`Invocation failed: ${error}. Decoded: ${decodedError}`), {
       ...result,
-      tx,
+      tx: TxObject({ tx: rawTx }),
       error,
       rawTx,
       decodedError
@@ -190,7 +191,7 @@ async function dryRunContractTx (tx, callerId, source, name, opt = {}) {
   if (status !== 'ok') throw Object.assign(new Error('Dry run error, ' + reason), { tx: TxObject({ tx }), dryRunParams: { accounts: [dryRunAccount], top } })
   const { returnType, returnValue } = callObj
   if (returnType !== 'ok') {
-    await this.handleCallError({ result: callObj, tx: TxObject({ tx }) })
+    await this._handleCallError(callObj, tx)
   }
   return {
     tx: TxObject({ tx }),
@@ -476,7 +477,7 @@ export const ContractAPI = Ae.compose(ContractBase, ContractACI, {
     contractEncodeCall,
     contractDecodeData,
     dryRunContractTx,
-    handleCallError,
+    _handleCallError,
     // Delegation for contract
     // AENS
     delegateSignatureCommon,
