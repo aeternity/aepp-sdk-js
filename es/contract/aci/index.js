@@ -160,7 +160,7 @@ const eventDecode = ({ instance }) => (fn, events) => {
 }
 
 const call = ({ client, instance }) => async (fn, params = [], options = {}) => {
-  const opt = R.merge(instance.options, options)
+  const opt = { ...instance.options, ...options }
   const fnACI = getFunctionACI(instance.aci, fn, { external: instance.externalAci })
   const source = opt.source || instance.source
 
@@ -172,10 +172,7 @@ const call = ({ client, instance }) => async (fn, params = [], options = {}) => 
   ) throw new Error(`You try to pay "${opt.amount}" to function "${fn}" which is not payable. Only payable function can accept tokens`)
   params = !opt.skipArgsConvert ? await prepareArgs(fnACI, params) : params
   const result = opt.callStatic
-    ? await client.contractCallStatic(source, instance.deployInfo.address, fn, params, {
-      top: opt.top,
-      options: opt
-    })
+    ? await client.contractCallStatic(source, instance.deployInfo.address, fn, params, opt)
     : await client.contractCall(source, instance.deployInfo.address, fn, params, opt)
   return {
     ...result,
@@ -184,7 +181,7 @@ const call = ({ client, instance }) => async (fn, params = [], options = {}) => 
 }
 
 const deploy = ({ client, instance }) => async (init = [], options = {}) => {
-  const opt = R.merge(instance.options, options)
+  const opt = { ...instance.options, ...options }
   const fnACI = getFunctionACI(instance.aci, 'init', { external: instance.externalAci })
   const source = opt.source || instance.source
 
@@ -193,8 +190,7 @@ const deploy = ({ client, instance }) => async (init = [], options = {}) => {
 
   if (opt.callStatic) {
     return client.contractCallStatic(source, null, 'init', init, {
-      top: opt.top,
-      options: opt,
+      ...opt,
       bytecode: instance.compiled
     })
   } else {

@@ -33,7 +33,6 @@ import { isBase64 } from '../utils/string'
 import ContractCompilerAPI from '../contract/compiler'
 import ContractBase from '../contract'
 import ContractACI from '../contract/aci'
-import BigNumber from 'bignumber.js'
 import NodePool from '../node-pool'
 import { AMOUNT, DEPOSIT, DRY_RUN_ACCOUNT, GAS, MIN_GAS_PRICE } from '../tx/builder/schema'
 import { decode, produceNameId } from '../tx/builder/helpers'
@@ -127,56 +126,41 @@ async function contractDecodeData (source, fn, callValue, callResult, options) {
  * @param {String} address Contract address
  * @param {String} name Name of function to call
  * @param {Array|String} args Argument's or callData for call/deploy transaction
- * @param {Object} [options={}]  Options
- * @param {String} [options.top] Block hash on which you want to call contract
+ * @param {Object} [options]
+ * @param {Number|String} [options.top] Block height or hash on which you want to call contract
  * @param {String} [options.bytecode] Block hash on which you want to call contract
- * @param {Object} [options.options]  Transaction options (fee, ttl, gas, amount, deposit)
- * @param {Object} [options.options.filesystem] Contract external namespaces map
+ * @param {Object} [options.filesystem] Contract external namespaces map
  * @return {Promise<Object>} Result object
  * @example
- * const callResult = await client.contractCallStatic(source, address, fnName, args = [], { top, options = {} })
+ * const callResult = await client.contractCallStatic(source, address, fnName, args)
  * {
  *   result: TX_DATA,
  *   decode: (type) => Decode call result
  * }
  */
-async function contractCallStatic (source, address, name, args = [], { top, options = {}, bytecode } = {}) {
-  const opt = R.merge(this.Ae.defaults, options)
-  const callerId = opt.onAccount
-    ? await this.address(opt)
-    : await this.address().catch(e => opt.dryRunAccount.pub)
-
-  // Prepare call-data
-  const callData = Array.isArray(args) ? await this.contractEncodeCall(source, name, args, opt) : args
-
-  // Get block hash by height
-  if (top && !isNaN(top)) {
-    top = (await this.getKeyBlock(top)).hash
+async function contractCallStatic (source, address, name, args = [], options = {}) {
+  const callerId = await this.address(options).catch(() => DRY_RUN_ACCOUNT.pub)
+  if (typeof options.top === 'number') {
+    options.top = (await this.getKeyBlock(options.top)).hash
   }
-  // Prepare nonce
-  const nonce = top ? (await this.getAccount(callerId, { hash: top })).nonce + 1 : undefined
-  if (name === 'init') {
-    // Prepare deploy transaction
-    const { tx } = await this.contractCreateTx(R.merge(opt, {
-      callData,
-      code: bytecode,
-      ownerId: callerId,
-      nonce
-    }))
-    return this.dryRunContractTx(tx, callerId, source, name, { ...opt, top })
-  } else {
-    // Prepare `call` transaction
-    const tx = await this.contractCallTx(R.merge(opt, {
+  const txOpt = {
+    ...this.Ae.defaults,
+    ...options,
+    callData: Array.isArray(args) ? await this.contractEncodeCall(source, name, args, options) : args,
+    nonce: options.top && (await this.getAccount(callerId, { hash: options.top })).nonce + 1
+  }
+  const tx = name === 'init'
+    ? (await this.contractCreateTx({
+      ...txOpt,
+      code: options.bytecode,
+      ownerId: callerId
+    })).tx
+    : await this.contractCallTx({
+      ...txOpt,
       callerId,
-      contractId: await this.resolveName(address, 'ct', { resolveByNode: true }),
-      callData,
-      nonce
-    }))
-    return this.dryRunContractTx(tx, callerId, source, name, { ...opt, top })
-  }
-}
+      contractId: await this.resolveName(address, 'ct', { resolveByNode: true })
+    })
 
-async function dryRunContractTx (tx, callerId, source, name, options) {
   const { callObj, ...dryRunOther } = await this.txDryRun(tx, callerId, options)
 
   const { returnType, returnValue } = callObj
@@ -253,7 +237,7 @@ async function contractCall (source, address, name, argsOrCallData = [], options
  * }
  */
 async function contractDeploy (code, source, initState = [], options = {}) {
-  const opt = R.merge(this.Ae.defaults, options)
+  const opt = { ...this.Ae.defaults, ...options }
   const callData = Array.isArray(initState) ? await this.contractEncodeCall(source, 'init', initState, opt) : initState
   const ownerId = await this.address(opt)
 
@@ -271,11 +255,10 @@ async function contractDeploy (code, source, initState = [], options = {}) {
     rawTx,
     txData,
     address: contractId,
-    call: async (name, args = [], options = {}) => this.contractCall(source, contractId, name, args, R.merge(opt, options)),
-    callStatic: async (name, args = [], options = {}) => this.contractCallStatic(source, contractId, name, args, {
-      ...options,
-      options: { onAccount: opt.onAccount, ...R.merge(opt, options.options) }
-    }),
+    call: (name, args, options) =>
+      this.contractCall(source, contractId, name, args, { ...opt, ...options }),
+    callStatic: (name, args, options) =>
+      this.contractCallStatic(source, contractId, name, args, { ...opt, ...options }),
     createdAt: new Date()
   })
 }
@@ -299,17 +282,18 @@ async function contractDeploy (code, source, initState = [], options = {}) {
  * }
  */
 async function contractCompile (source, options = {}) {
-  const opt = R.merge(this.Ae.defaults, options)
+  const opt = { ...this.Ae.defaults, ...options }
   const bytecode = await this.compileContractAPI(source, options)
-  return Object.freeze(Object.assign({
-    encodeCall: async (name, args) => this.contractEncodeCall(source, name, args, R.merge(opt, options)),
-    deploy: async (init, options = {}) => this.contractDeploy(bytecode, source, init, R.merge(opt, options)),
-    deployStatic: async (init, options = {}) => this.contractCallStatic(source, null, 'init', init, {
-      bytecode,
-      top: options.top,
-      options: R.merge(opt, options)
-    })
-  }, { bytecode }))
+  return Object.freeze({
+    encodeCall: (name, args) => this.contractEncodeCall(source, name, args, opt),
+    deploy: (init, options) => this.contractDeploy(bytecode, source, init, { ...opt, ...options }),
+    deployStatic: (init, options) => this.contractCallStatic(source, null, 'init', init, {
+      ...opt,
+      ...options,
+      bytecode
+    }),
+    bytecode
+  })
 }
 
 /**
@@ -467,7 +451,6 @@ export const ContractAPI = Ae.compose(ContractBase, ContractACI, {
     contractCall,
     contractEncodeCall,
     contractDecodeData,
-    dryRunContractTx,
     _handleCallError,
     // Delegation for contract
     // AENS
