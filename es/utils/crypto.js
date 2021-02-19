@@ -449,11 +449,11 @@ export function assertedType (data, type, omitError) {
 /**
  * Decode a transaction
  * @rtype (txHash: String) => Buffer
- * @param {String} txHash - Transaction hash
+ * @param {String} encodedTx - Encoded transaction
  * @return {Buffer} Decoded transaction
  */
-export function decodeTx (txHash) {
-  return RLP.decode(Buffer.from(decodeBase64Check(assertedType(txHash, 'tx'))))
+export function decodeTx (encodedTx) {
+  return RLP.decode(Buffer.from(decodeBase64Check(assertedType(encodedTx, 'tx'))))
 }
 
 /**
