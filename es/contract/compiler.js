@@ -117,7 +117,7 @@ function prepareCompilerOption ({ backend = this.compilerOptions.backend, filesy
 }
 
 function isInit () {
-  if (this.compilerVersion === null) throw Error('Compiler not defined')
+  if (this.compilerVersion === null) throw new Error('Compiler not defined')
   return true
 }
 

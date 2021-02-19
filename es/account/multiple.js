@@ -130,7 +130,7 @@ export default AccountBase.compose(AsyncInit, {
      */
     selectAccount (address) {
       assertedType(address, 'ak')
-      if (!this.accounts[address]) throw Error(`Account for ${address} not available`)
+      if (!this.accounts[address]) throw new Error(`Account for ${address} not available`)
       this.selectedAddress = address
     },
     /**
@@ -143,7 +143,7 @@ export default AccountBase.compose(AsyncInit, {
       switch (typeof account) {
         case 'string':
           assertedType(account, 'ak')
-          if (!this.accounts[account]) throw Error(`Account for ${account} not available`)
+          if (!this.accounts[account]) throw new Error(`Account for ${account} not available`)
           return this.accounts[account]
         case 'object':
           return isAccountBase(account) ? account : MemoryAccount({ keypair: account })

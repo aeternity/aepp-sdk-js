@@ -282,14 +282,14 @@ export function isNameValid (name, throwError = true) {
  */
 export function classify (s) {
   if (!s.match(/^[a-z]{2}_.+/)) {
-    throw Error('Not a valid hash')
+    throw new Error('Not a valid hash')
   }
 
   const klass = s.substr(0, 2)
   if (klass in NAME_ID_KEY) {
     return NAME_ID_KEY[klass]
   } else {
-    throw Error(`Unknown class ${klass}`)
+    throw new Error(`Unknown class ${klass}`)
   }
 }
 

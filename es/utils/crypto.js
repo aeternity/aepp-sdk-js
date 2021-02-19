@@ -443,7 +443,7 @@ export function decryptPubKey (password, encrypted) {
 export function assertedType (data, type, omitError) {
   if (RegExp(`^${type}_.+$`).test(data)) return data.split('_')[1]
   else if (omitError) return false
-  else throw Error(`Data doesn't match expected type ${type}`)
+  else throw new Error(`Data doesn't match expected type ${type}`)
 }
 
 /**
