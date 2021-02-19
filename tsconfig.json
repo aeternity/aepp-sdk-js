@@ -1,0 +1,21 @@
+{
+  // custom options for ts-node to run mocha tests
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs"
+    }
+  },
+  "compilerOptions": {
+    "outDir": "./dist/es",
+    "noImplicitAny": true,
+    "module": "es6",
+    "target": "es2017",
+    "moduleResolution": "node",
+    "preserveConstEnums": true,
+    "declaration": true,
+    "allowJs": true
+  },
+  "include": [
+    "es/**/*"
+  ],
+}

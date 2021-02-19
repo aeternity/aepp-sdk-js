@@ -13,7 +13,7 @@ function configure (filename, opts = {}) {
     module: {
       rules: [
         {
-          test: /\.js$/,
+          test: /\.(js|ts)$/,
           include: path.resolve(__dirname, 'es'),
           loader: 'babel-loader'
         },
@@ -24,6 +24,9 @@ function configure (filename, opts = {}) {
           options: { presets: ['@babel/preset-env'] }
         }
       ]
+    },
+    resolve: {
+      extensions: ['.ts', '.js']
     },
     plugins: argv.report ? [
       new BundleAnalyzerPlugin({
