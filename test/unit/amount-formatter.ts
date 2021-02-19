@@ -15,8 +15,8 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import '../'
 import { describe, it } from 'mocha'
+import '..'
 import { AE_AMOUNT_FORMATS, formatAmount, toAe, toAettos } from '../../es/utils/amount-formatter'
 import { asBigNumber, parseBigNumber } from '../../es/utils/bignumber'
 
@@ -29,7 +29,7 @@ describe('Amount Formatter', function () {
       [10012312, AE_AMOUNT_FORMATS.AE, 10012312e18],
       [1, AE_AMOUNT_FORMATS.AETTOS, 1]
     ].forEach(
-      ([v, d, e]) => parseBigNumber(e).should.be.equal(toAettos(v, { denomination: d }).toString(10))
+      ([v, d, e]) => parseBigNumber(e).should.be.equal(toAettos(v, { denomination: d.toString() }))
     )
   })
   it('to Ae', () => {
@@ -40,7 +40,7 @@ describe('Amount Formatter', function () {
       [10012312, AE_AMOUNT_FORMATS.AETTOS, asBigNumber(10012312).div(1e18)],
       [1, AE_AMOUNT_FORMATS.AE, 1]
     ].forEach(
-      ([v, d, e]) => parseBigNumber(e).should.be.equal(toAe(v, { denomination: d }).toString(10))
+      ([v, d, e]) => parseBigNumber(e).should.be.equal(toAe(v, { denomination: d.toString() }))
     )
   })
   it('format', () => {
@@ -65,7 +65,7 @@ describe('Amount Formatter', function () {
       [1, AE_AMOUNT_FORMATS.FEMTO_AE, AE_AMOUNT_FORMATS.AETTOS, asBigNumber(1000)],
       [1, AE_AMOUNT_FORMATS.NANO_AE, AE_AMOUNT_FORMATS.FEMTO_AE, asBigNumber(1000000)]
     ].forEach(
-      ([v, dF, dT, e]) => parseBigNumber(e).should.be.equal(formatAmount(v, { denomination: dF, targetDenomination: dT }).toString(10))
+      ([v, dF, dT, e]) => parseBigNumber(e).should.be.equal(formatAmount(v, { denomination: dF.toString(), targetDenomination: dT.toString() }))
     )
   })
   it('Invalid value', () => {
@@ -73,7 +73,7 @@ describe('Amount Formatter', function () {
       [true, [AE_AMOUNT_FORMATS.AE, AE_AMOUNT_FORMATS.AE], `Value ${true} is not type of number`],
       [1, [AE_AMOUNT_FORMATS.AE, 'ASD'], `Invalid target denomination. Current: ASD, available [${Object.keys(AE_AMOUNT_FORMATS)}]`],
       [1, ['ASD', AE_AMOUNT_FORMATS.AE], `Invalid denomination. Current: ASD, available [${Object.keys(AE_AMOUNT_FORMATS)}]`]
-    ].forEach(([v, [dF, dT], error]) => {
+    ].forEach(([v, [dF, dT], error]: Array<any>) => {
       try {
         formatAmount(v, { denomination: dF, targetDenomination: dT })
       } catch (e) {

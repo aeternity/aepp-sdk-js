@@ -20,8 +20,8 @@
  * @module @aeternity/aepp-sdk/es/utils/amount-formatter
  * @example import { format, toAettos, AE_AMOUNT_FORMATS } from '@aeternity/aepp-sdk/es/utils/amount-formatter'
  */
-import { asBigNumber, isBigNumber } from './bignumber'
 import BigNumber from 'bignumber.js'
+import { asBigNumber, isBigNumber } from './bignumber'
 
 /**
  * AE amount formats
@@ -56,7 +56,7 @@ export const DENOMINATION_MAGNITUDE = {
  * @param {String} [options.denomination='aettos'] denomination of amount, can be ['ae', 'aettos']
  * @return {String}
  */
-export const toAe = (value, { denomination = AE_AMOUNT_FORMATS.AETTOS } = {}) => formatAmount(value, { denomination, targetDenomination: AE_AMOUNT_FORMATS.AE })
+export const toAe = (value: string | number | BigNumber, { denomination = AE_AMOUNT_FORMATS.AETTOS } = {}) => formatAmount(value, { denomination, targetDenomination: AE_AMOUNT_FORMATS.AE })
 
 /**
  * Convert amount to aettos
@@ -65,7 +65,7 @@ export const toAe = (value, { denomination = AE_AMOUNT_FORMATS.AETTOS } = {}) =>
  * @param {String} [options.denomination='ae'] denomination of amount, can be ['ae', 'aettos']
  * @return {String}
  */
-export const toAettos = (value, { denomination = AE_AMOUNT_FORMATS.AE } = {}) => formatAmount(value, { denomination })
+export const toAettos = (value: string | number | BigNumber, { denomination = AE_AMOUNT_FORMATS.AE } = {}) => formatAmount(value, { denomination })
 
 /**
  * Convert amount from one to other denomination
@@ -75,7 +75,7 @@ export const toAettos = (value, { denomination = AE_AMOUNT_FORMATS.AE } = {}) =>
  * @param {String} [options.targetDenomination='aettos'] target denomination, can be ['ae', 'aettos']
  * @return {String}
  */
-export const formatAmount = (value, { denomination = AE_AMOUNT_FORMATS.AETTOS, targetDenomination = AE_AMOUNT_FORMATS.AETTOS } = {}) => {
+export const formatAmount = (value: string | number | BigNumber, { denomination = AE_AMOUNT_FORMATS.AETTOS, targetDenomination = AE_AMOUNT_FORMATS.AETTOS } = {}) => {
   if (!Object.values(AE_AMOUNT_FORMATS).includes(denomination)) throw new Error(`Invalid denomination. Current: ${denomination}, available [${Object.keys(AE_AMOUNT_FORMATS)}]`)
   if (!Object.values(AE_AMOUNT_FORMATS).includes(targetDenomination)) throw new Error(`Invalid target denomination. Current: ${targetDenomination}, available [${Object.keys(AE_AMOUNT_FORMATS)}]`)
   if (!isBigNumber(value)) throw new Error(`Value ${value} is not type of number`)
@@ -92,14 +92,14 @@ const prefixes = [
   { name: 'pico', magnitude: -12 }
 ]
 
-const getNearestPrefix = exponent => prefixes.reduce((p, n) => (
+const getNearestPrefix = (exponent: number) => prefixes.reduce((p, n) => (
   Math.abs(n.magnitude - exponent) < Math.abs(p.magnitude - exponent) ? n : p))
 
-const getLowerBoundPrefix = exponent => prefixes
+const getLowerBoundPrefix = (exponent: number) => prefixes
   .find(p => p.magnitude <= exponent) || prefixes[prefixes.length - 1]
 
-export default (value) => {
-  if (!BigNumber.isBigNumber(value)) value = BigNumber(value)
+export default (value: string | number | BigNumber) => {
+  if (!BigNumber.isBigNumber(value)) value = new BigNumber(value)
 
   const { name, magnitude } = (value.e < 0 ? getNearestPrefix : getLowerBoundPrefix)(value.e)
   const v = value
