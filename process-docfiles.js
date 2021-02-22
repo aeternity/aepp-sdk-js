@@ -12,6 +12,7 @@ const yaml = require('js-yaml');
 
 const fs = require('fs')
 var os = require("os");
+var S = require('string');
 
 /// helpers
 basePath = './docs/'
@@ -41,9 +42,130 @@ const isObject = A => {
     } else {return false}
 }
 
-// stub, do header formatting based on depth here !
-const formatHeaders = (input, depth) =>{
-    return input
+//Description: Tests if a string is some header in markdown
+const isSomeHeader = (input) => {
+
+}
+
+const formatContent = (input, topicLevel) => {
+    let regex = new RegExp('@aeternity/aepp-sdk/.*?$')
+}
+
+// 1. Formats the headers to resemble a correct TOC necessary for readthedocs
+const countUpAllTopicLevels = (input, depth) =>{
+    //console.log("format depth : ", depth)
+
+    // from depth 4 on we add one additional hashtag to topics, for depth 5 we add 2 hashtags, and so on.
+    let additionalHashtags = depth - 3
+    let result = input
+
+    let reg2 = new RegExp(`^## `, 'gm')
+    let reg3 = new RegExp(`^### `, 'gm')
+    let reg4 = new RegExp(`^#### `, 'gm')
+    let reg5 = new RegExp(`^##### `, 'gm')
+    let reg6 = new RegExp(`^###### `, 'gm')
+
+    result = result.replace(reg6, `######${'#'.repeat(additionalHashtags)} `)
+    result = result.replace(reg5, `#####${'#'.repeat(additionalHashtags)} `)
+    result = result.replace(reg4, `####${'#'.repeat(additionalHashtags)} `)
+    result = result.replace(reg3, `###${'#'.repeat(additionalHashtags)} `)
+    result = result.replace(reg2, `##${'#'.repeat(additionalHashtags)} `)
+    //var path = regex.exec(line)[0]
+
+    return result
+}
+
+
+// 1. remove unwanted tokens from headings ('.exports', etc.)
+const formatAllContent = (input, depth) =>{
+    // remove ⏏ everywhere 
+    let replaced = S(input).replaceAll('⏏', '').s
+    // split into array of lines
+    var lines = S(replaced).lines()
+    // do the actual formatting
+    var formattedLines = lines.map((line, index, array) => {
+        // remove module path from the title and put it one line below
+        let isHeadingRegex = new RegExp('^#.*? @aeternity/aepp-sdk/.*?$')
+        // remove TOC in text - nobody uses these docs in github
+        let isTOCline = new RegExp('.*?\\* .*?\\[.*?\]\\(#.*?\\).*?$')
+        // remove unnecessary .exports from subheadings
+        let isSubHeading = new RegExp('^##')
+        // get the function signature from heading
+        let funcSigRegex = new RegExp('[A-Za-z].*$')
+        // get only function name from heading's type signature
+        let pollutedHeaderRegex = new RegExp('(?<=[^#\\*a-zA-Z\\d\\s:]).*(?=\\()')
+        let cleanHeaderRegex = new RegExp('^[^\\*;](?<= )[^\\*;]*(?=\\()')
+
+        if (isHeadingRegex.test(line)){
+            // if it's a header like ## @aeternity/aepp-sdk/es/tx/builder:
+            //.. match the path:
+            let regex = new RegExp('@aeternity/aepp-sdk/.*?$')
+            var path = regex.exec(line)[0]
+            // ... and insert it as a new line under the old heading.
+            let newLine = `**Module Path:** ${path} \n` 
+            array.splice(index + 1 , 0, newLine)
+            // .. and remove path from heading
+            return removePath = S(line).replaceAll('@aeternity/aepp-sdk/es/', '').s
+
+
+        } else if(isTOCline.test(line)){
+            // if it's a ToC (table of contents) line, remove it
+            return null
+        } else if (isSubHeading.test(line)){
+            //remove '.exports'
+            let removeExports = line.replace('exports.', '')
+
+            // extract function signature from heading and add below heading
+            // first, test if it's some polluted header like #### *tx.nameUpdateTx(options) ⇒ `String`*
+            if(pollutedHeaderRegex.test(removeExports)){
+                let onlyFunctionName = pollutedHeaderRegex.exec(removeExports)[0]
+                var sig;
+                // extract the sig, clean it and add it a line below heading
+                try{sig = funcSigRegex.exec(removeExports)[0]} catch (e) {
+                    console.log("Issue with: ", removeExports); 
+                    process.exit()
+                }
+                let cleanedSig = sig.replace('*', '')
+                let sigLine = `**Type Sig:** ${cleanedSig}`
+                array.splice(index + 2 , 0, sigLine + "\n")
+             //TODO: Remember adding the correct ammount of #s ! 
+                return onlyFunctionName
+
+            } else if(cleanHeaderRegex.test(removeExports)){
+                // if it is a clean header like ### buildTransaction(type, params, [options]) ⇒ `Object` 
+                let onlyFunctionName = cleanHeaderRegex.exec(removeExports)[0]
+                if(onlyFunctionName.length < 2) {
+                    console.log("No function name found in : ", removeExports); 
+                    process.exit()
+                }
+                // extract the sig, clean it and add it a line below heading
+
+                let sig = funcSigRegex.exec(removeExports)[0]
+                let cleanedSig = sig.replace('*', '')
+                let sigLine = `**Type Sig:** ${cleanedSig}`
+                array.splice(index + 2 , 0, sigLine)
+             //TODO: Remember adding the correct ammount of #s ! 
+                return onlyFunctionName
+
+            } else {
+                console.log("================================== WARNING == no subheader formatting pattern matched, add one !")
+                return line
+            }
+
+           
+        } else{
+            return line
+        }
+    })
+    joinedLines = formattedLines.join('\n')
+
+    // Replace repeated empty lines
+    var EOL = joinedLines.match(/\r\n/gm)?"\r\n":"\n";
+    var regExp = new RegExp("("+EOL+"){3,}", "gm");
+    text = joinedLines.replace(regExp, EOL+EOL+EOL);
+
+    return text
+    //return input
 }
 const filenameFromPath = (path) => {
     const regex = new RegExp('[ \\w-]+?(?=\\.)')
@@ -192,19 +314,7 @@ const deleteTooDeep = (arr, depth = 0, parentFileName = "") => {
         // if yes, we process all its keys
 
         Object.keys(arr).forEach(key => {
-            // if the 'content' key is checked, return that one as JSON basically, and add its
-            // content to the accumulator so it's returned later, too
             
-       /*      if (key == "content") {
-                console.log("checking content")
-                contentAccumulator = contentAccumulator + ' \n \n ' + arr.key
-                return {json: arr.content, content: undefined}
-            }
-             */
-
-            // if the depth is over 2, pass the previous parentFileName. 
-            // If under, pass the key as parentFileName
-            //parentFile = depth > 2 ? parentFileName : key
             let json = deleteTooDeep(arr[key], depth + 1)
 
             // "on the object we set object's key to the deeper stuff"
@@ -304,9 +414,10 @@ const generateFilesFromContent = (arr) => {
                         while(filteredContentArray.length > 0){
                             let [path, originalDepth] = filteredContentArray.pop().split('---')
                             let data = fs.readFileSync(basePath + path, "utf8");
-                            let adjustedHeadings = formatHeaders(data, originalDepth);
+                            let adjustedHeadings = countUpAllTopicLevels(data, originalDepth);
                             filecontentAcc = filecontentAcc.concat([adjustedHeadings, os.EOL]);
                             let filename = filenameFromPath(path)
+                            console.log("Originaldepth : ", originalDepth)
                             generatedFileName = generatedFileName.concat(filename + '-' + originalDepth);
                         }
                         // for the TOC
