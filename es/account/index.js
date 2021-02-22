@@ -109,12 +109,7 @@ const Account = stampit({
       this.networkId = networkId
     }
   },
-  methods: { signTransaction, getNetworkId, signMessage, verifyMessage },
-  deepConf: {
-    Ae: {
-      methods: ['sign', 'address', 'signTransaction', 'getNetworkId', 'signMessage', 'verifyMessage']
-    }
-  }
+  methods: { signTransaction, getNetworkId, signMessage, verifyMessage }
 }, required({
   methods: {
     sign: required,

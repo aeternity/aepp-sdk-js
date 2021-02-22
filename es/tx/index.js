@@ -41,19 +41,7 @@ import { required } from '@stamp/required'
  * @return {Object} Tx instance
  * @example Tx()
  */
-const Tx = stampit({
-  deepConf: {
-    Ae: {
-      methods: [
-        'spendTx', 'namePreclaimTx', 'nameClaimTx', 'nameTransferTx',
-        'nameUpdateTx', 'nameRevokeTx', 'contractCreateTx', 'contractCallTx',
-        'oracleRegisterTx', 'oracleExtendTx', 'oraclePostQueryTx', 'oracleRespondTx', 'getAccountNonce',
-        'channelCloseSoloTx', 'channelSlashTx', 'channelSettleTx', 'channelSnapshotSoloTx', 'getVmVersion', 'prepareTxParams',
-        'gaAttachTx'
-      ]
-    }
-  }
-}, required({
+const Tx = stampit(required({
   methods: {
     spendTx: required,
     namePreclaimTx: required,

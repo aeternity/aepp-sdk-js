@@ -24,19 +24,17 @@
 
 import Ae from './'
 import Aens from './aens'
-import Rpc from '../rpc/client'
-import { ContractAPI, ContractWithCompiler as Contract } from './contract'
+import { ContractWithCompiler as Contract } from './contract'
 import AeppRpc from '../utils/aepp-wallet-communication/rpc/aepp-rpc'
 import Chain from '../chain/node'
 import Tx from '../tx/tx'
 import Oracle from './oracle'
-import GeneralizeAccount from '../contract/ga'
 
 /**
  * Aepp Stamp
  *
- * Aepp provides Ae base functionality with Contract and Aens.
- * This stamp can be used only with Wallet, all Aepp method's going through RPC to Wallet.
+ * Aepp provides base functionality.
+ * Expected to use this stamp with a Wallet.
  * {@link module:@aeternity/aepp-sdk/es/ae--Ae} clients.
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/aepp
@@ -44,6 +42,4 @@ import GeneralizeAccount from '../contract/ga'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Aepp instance
  */
-export const Aepp = Ae.compose(ContractAPI, Aens, Oracle, GeneralizeAccount, Rpc)
-export const RpcAepp = Ae.compose(Tx, Oracle, Contract, Aens, Chain, AeppRpc)
-export default Aepp
+export default Ae.compose(Tx, Oracle, Contract, Aens, Chain, AeppRpc)

@@ -37,17 +37,7 @@ import stampit from '@stamp/it'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Oracle instance
  */
-const OracleBase = stampit({
-  deepConf: {
-    Contract: {
-      methods: [
-        'getOracle',
-        'getOracleQueries',
-        'getOracleQuery'
-      ]
-    }
-  }
-}, required({
+const OracleBase = stampit(required({
   methods: {
     getOracle: required,
     getOracleQueries: required,
