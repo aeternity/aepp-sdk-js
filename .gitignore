@@ -21,3 +21,4 @@ coverage.*
 /examples/**/dist
 .history
 .site
+*.tgz

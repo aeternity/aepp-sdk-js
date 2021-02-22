@@ -2,7 +2,8 @@
   "name": "@aeternity/aepp-sdk",
   "version": "7.7.0",
   "description": "SDK for the æternity blockchain",
-  "main": "dist/aepp-sdk.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "browser": "dist/aepp-sdk.browser.js",
   "module": "es/index.js",
   "sideEffects": false,
@@ -21,7 +22,8 @@
     "test:watch": "mocha --recursive --require @babel/register --require ts-node/register --watch --timeout 10m",
     "prepare": "npm run build",
     "genChangelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
-    "prepublishOnly": "npm run docs:docco && npm run docs:api"
+    "prepublishOnly": "npm run docs:docco && npm run docs:api",
+    "prepack": "tsc"
   },
   "license": "ISC",
   "keywords": [
@@ -68,8 +70,10 @@
     "@babel/register": "7.10.1",
     "@babel/runtime": "^7.10.2",
     "@types/bignumber.js": "^5.0.0",
+    "@types/bn.js": "^5.1.0",
     "@types/chai": "^4.2.15",
     "@types/mocha": "^8.2.1",
+    "@types/node": "^14.14.31",
     "babel-loader": "^8.0.0-beta.2",
     "babel-plugin-ramda": "^2.0.0",
     "chai": "^4.1.2",
