@@ -44,6 +44,7 @@ import ContractCompilerAPI from './contract/compiler'
 import RpcAepp from './ae/aepp'
 import RpcWallet from './ae/wallet'
 import Oracle from './ae/oracle'
+import genSwaggerClient from './utils/swagger'
 import Channel from './channel'
 import Universal from './ae/universal'
 import ContractACI from './contract/aci'
@@ -73,6 +74,7 @@ export {
   Node,
   NodePool,
   Oracle,
+  genSwaggerClient,
   Transaction,
   TransactionValidator,
   Tx,

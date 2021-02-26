@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2021 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -22,24 +22,9 @@
  * @example import Node from '@aeternity/aepp-sdk/es/node'
  */
 
-import stampit from '@stamp/it'
-import axios from 'axios'
-import * as R from 'ramda'
 import AsyncInit from './utils/async-init'
-import Swagger from './utils/swagger'
+import genSwaggerClient from './utils/swagger'
 import semverSatisfies from './utils/semver-satisfies'
-
-/**
- * Obtain Swagger configuration from Node node
- * @category async
- * @rtype (url: String) => swagger: Object
- * @param {String} url - Node base URL
- * @param {Object} axiosConfig Axios configuration object
- * @return {Object} Swagger configuration
- */
-async function remoteSwag (url, axiosConfig) {
-  return (await axios.get(`${url}/api`, axiosConfig)).data
-}
 
 /**
  * Obtain networkId from account or node
@@ -52,26 +37,6 @@ export function getNetworkId ({ networkId, force = false } = {}) {
   if (!force && !networkId && !this.networkId && (!this.selectedNode || !this.selectedNode.networkId)) throw new Error('networkId is not provided')
   if (force && !networkId && !this.networkId && (!this.selectedNode || !this.selectedNode.networkId)) return null
   return networkId || this.networkId || this.selectedNode.networkId
-}
-
-/**
- * Node specific loader for `urlFor`
- * @rtype ({url: String, internalUrl?: String}) => (path: String, definition: Object) => tx: String
- * @param {Object} options
- * @param {String} options.url - Base URL for Node
- * @param {String} options.internalUrl - Base URL for internal requests
- * @return {Function} Implementation for {@link urlFor}
- */
-const loader = ({ url, internalUrl }) => (path, definition) => {
-  const { tags, operationId } = definition
-
-  if (R.contains('external', tags)) {
-    return `${url}${path}`
-  } else if (!R.isNil(internalUrl) && R.contains('internal', tags)) {
-    return `${internalUrl}${path}`
-  } else {
-    throw new Error(`Method ${operationId} is unsupported. No interface for ${R.toString(tags)}`)
-  }
 }
 
 /**
@@ -95,15 +60,8 @@ async function getConsensusProtocolVersion (protocols = [], height) {
   return version
 }
 
-function axiosError (handler) {
-  return (error) => {
-    handler && typeof handler === 'function' && handler(error)
-    throw error
-  }
-}
-
 /**
- * {@link Swagger} based Node remote API Stamp
+ * {@link genSwaggerClient} based Node remote API Stamp
  * @function
  * @alias module:@aeternity/aepp-sdk/es/node
  * @rtype Stamp
@@ -114,23 +72,16 @@ function axiosError (handler) {
  * @return {Object} Node client
  * @example Node({url: 'https://testnet.aeternity.io'})
  */
-const Node = stampit(AsyncInit, {
-  async init ({ url = this.url, internalUrl = this.internalUrl, axiosConfig: { config, errorHandler } = {} }) {
+const Node = AsyncInit.compose({
+  async init ({ url = this.url, internalUrl = this.internalUrl }) {
     if (!url) throw new Error('"url" required')
     url = url.replace(/\/?$/, '')
     internalUrl = internalUrl ? internalUrl.replace(/\/?$/, '') : url
-    // Get swagger schema
-    const swag = await remoteSwag(url, config).catch(this.axiosError(errorHandler))
-    this.version = swag.info.version
-    return Object.assign(this, {
-      url,
-      internalUrl,
-      swag: swag,
-      urlFor: loader({ url, internalUrl })
-    })
+    const client = await genSwaggerClient(`${url}/api`, internalUrl)
+    this.version = client.spec.info.version
+    this.api = client.api
   },
   methods: {
-    axiosError,
     getNodeInfo () {
       return {
         url: this.url,
@@ -147,7 +98,7 @@ const Node = stampit(AsyncInit, {
     consensusProtocolVersion: null,
     nodeNetworkId: null
   }
-}, Swagger, {
+}, {
   async init ({ forceCompatibility = false }) {
     const { nodeRevision: revision, genesisKeyBlockHash: genesisHash, networkId, protocols } = await this.api.getStatus()
     this.consensusProtocolVersion = await this.getConsensusProtocolVersion(protocols)

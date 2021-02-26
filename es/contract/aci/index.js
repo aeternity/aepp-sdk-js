@@ -71,7 +71,6 @@ async function getContractInstance (source, { aci, contractAddress, filesystem =
     gasPrice: MIN_GAS_PRICE, // min gasPrice 1e9
     amount: AMOUNT,
     gas: GAS,
-    top: null, // using for contract call static
     waitMined: true,
     verify: false,
     filesystem

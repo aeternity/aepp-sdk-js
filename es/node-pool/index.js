@@ -130,7 +130,7 @@ export const NodePool = AsyncInit.compose({
       }))
     },
     validateNodes (nodes) {
-      const nodeProps = ['Swagger', 'api', 'consensusProtocolVersion', 'genesisHash', 'methods']
+      const nodeProps = ['api', 'consensusProtocolVersion', 'genesisHash']
       nodes.forEach((node, index) => {
         if (typeof node !== 'object') throw new Error('Node must be an object with "name" and "instance" props')
         if (['name', 'instance'].find(k => !node[k])) throw new Error(`Node object on index ${index} must contain node "name" and "ins"`)
