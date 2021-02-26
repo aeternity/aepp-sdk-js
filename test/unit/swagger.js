@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2021 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -44,20 +44,6 @@ describe('Swagger', function () {
       xc: [3, {
         xca: 4
       }]
-    })
-  })
-
-  describe('converts case', () => {
-    it('from snake to pascal', () => {
-      expect(internal.snakeToPascal('foo_bar_baz')).to.equal('fooBarBaz')
-      expect(internal.snakeToPascal('foo_bar_')).to.equal('fooBar_')
-      expect(internal.snakeToPascal('_bar_baz')).to.equal('BarBaz')
-    })
-
-    it('from pascal to snake', () => {
-      expect(internal.pascalToSnake('fooBarBaz')).to.equal('foo_bar_baz')
-      expect(internal.pascalToSnake('fooBar')).to.equal('foo_bar')
-      expect(internal.pascalToSnake('BarBaz')).to.equal('_bar_baz')
     })
   })
 
