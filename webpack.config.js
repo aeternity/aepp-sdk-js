@@ -51,7 +51,7 @@ function configure (filename, opts = {}) {
 }
 
 module.exports = [
-  configure('aepp-sdk.js', { target: 'node' }),
-  configure('aepp-sdk.browser.js'),
-  configure('aepp-sdk.browser-script.js', { externals: undefined })
+  configure('aepp-sdk.js', { target: 'node', externals: {'demo_compiler': 'PS'} }),
+  configure('aepp-sdk.browser.js', { externals: {'demo_compiler': 'PS'} }),
+  configure('aepp-sdk.browser-script.js', { externals: {'demo_compiler': 'PS'} })
 ]
