@@ -34,7 +34,7 @@ export const account = Crypto.generateKeyPair()
 
 export const BaseAe = async (params = {}) => {
   const ae = await Universal.waitMined(true).compose({
-    deepProps: { Ae: { defaults: { interval: 50, attempts: 1200 } }, Swagger: { defaults: { debug: !!process.env.DEBUG } } },
+    deepProps: { Swagger: { defaults: { debug: !!process.env.DEBUG } } },
     props: { process, compilerUrl }
   })({
     ...params,
