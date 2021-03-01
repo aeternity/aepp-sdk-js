@@ -23,7 +23,8 @@
     "prepare": "npm run build",
     "genChangelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
     "prepublishOnly": "npm run docs:docco && npm run docs:api",
-    "prepack": "tsc"
+    "prepack": "tsc && node tooling/prepack.js",
+    "postpack": "node tooling/postpack.js"
   },
   "license": "ISC",
   "keywords": [
@@ -89,6 +90,7 @@
     "eslint-plugin-node": "^11.0.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.0",
+    "fs-extra": "^8.1.0",
     "jsdoc-to-markdown": "^6.0.1",
     "mocha": "^7.0.1",
     "nyc": "^15.0.0",
