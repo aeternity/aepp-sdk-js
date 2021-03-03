@@ -26,7 +26,7 @@ import JsonBig from './json-big'
 import stampit from '@stamp/it'
 import axios from 'axios'
 import * as R from 'ramda'
-import { snakeToPascal, pascalToSnake } from './string'
+import { snakeToPascal, pascalToSnake, isAeternityPrefixed } from './string'
 import BigNumber from 'bignumber.js'
 
 /**
@@ -273,7 +273,7 @@ const traverseKeys = R.curry((fn, o) => {
  * @see pascalToSnake
  */
 function snakizeKeys (o) {
-  return traverseKeys(pascalToSnake, o)
+  return traverseKeys(key => isAeternityPrefixed(key) ? key : pascalToSnake(key), o)
 }
 
 /**
@@ -285,7 +285,7 @@ function snakizeKeys (o) {
  * @see snakeToPascal
  */
 function pascalizeKeys (o) {
-  return traverseKeys(snakeToPascal, o)
+  return traverseKeys(key => isAeternityPrefixed(key) ? key : snakeToPascal(key), o)
 }
 
 /**
