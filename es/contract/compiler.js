@@ -31,25 +31,25 @@ import AsyncInit from '../utils/async-init'
 import { VM_TYPE } from '../tx/builder/schema'
 import PS from 'erlps-aesophia/dist/bundle'
 
-const showTerm = PS["Data.Show"].show(PS["Erlang.Type"].showErlangTerm);
-const erlBinToErlStr = (t) => PS["Erlang.Builtins"].erlang__binary_to_list__1([t]);
-const erlStrToErlBin = (t) => PS["Erlang.Builtins"].erlang__iolist_to_binary__1([t]);
-const erlStrToJSStr = (t) => PS["Erlang.Type"].fromErl(PS["Erlang.Type"].stringFromErlang)(t).value0
-const jsStrToErlStr = PS["Erlang.Type"].toErl(PS["Erlang.Type"].stringToErlang)
-const mkTuple = PS["Erlang.Type"].ErlangTuple.create;
-const mkAtom = PS["Erlang.Type"].ErlangAtom.create;
-const mkNil = PS["Erlang.Type"].ErlangEmptyList.value;
-const mkCons = (a,b) => PS["Erlang.Type"].ErlangCons.create(a)(b);
-const erlTermToJSONBIN =
+const showTerm = PS['Data.Show'].show(PS['Erlang.Type'].showErlangTerm)
+const erlBinToErlStr = (t) => PS['Erlang.Builtins'].erlang__binary_to_list__1([t])
+const erlStrToErlBin = (t) => PS['Erlang.Builtins'].erlang__iolist_to_binary__1([t])
+const erlStrToJSStr = (t) => PS['Erlang.Type'].fromErl(PS['Erlang.Type'].stringFromErlang)(t).value0
+const jsStrToErlStr = PS['Erlang.Type'].toErl(PS['Erlang.Type'].stringToErlang)
+const mkTuple = PS['Erlang.Type'].ErlangTuple.create
+const mkAtom = PS['Erlang.Type'].ErlangAtom.create
+const mkNil = PS['Erlang.Type'].ErlangEmptyList.value
+const mkCons = (a, b) => PS['Erlang.Type'].ErlangCons.create(a)(b)
+/* const erlTermToJSONBIN =
   (t) =>
-    PS["Jsx"].erlps__encode__1([t])
-//console.log(JSON.parse(erlTermToJSONBIN(jsStrToErlStr("AAAA")).value0.toString()))
+    PS['Jsx'].erlps__encode__1([t]) */
+//  console.log(JSON.parse(erlTermToJSONBIN(jsStrToErlStr("AAAA")).value0.toString()))
 
 async function getCompilerVersion (options = {}) {
-  let ver_erl_bin = PS["Aeso.Compiler"].erlps__version__0([]).value0[1];
-  let ver_erl_str = erlBinToErlStr(ver_erl_bin);
-  let ver = erlStrToJSStr(ver_erl_str);
-  return ver;
+  const verErlBin = PS['Aeso.Compiler'].erlps__version__0([]).value0[1]
+  const verErlStr = erlBinToErlStr(verErlBin)
+  const ver = erlStrToJSStr(verErlStr)
+  return ver
 }
 
 async function contractEncodeCallDataAPI (source, name, args = [], options = {}) {
@@ -94,45 +94,45 @@ async function validateByteCodeAPI (bytecode, source, options = {}) {
 async function compileContractAPI (code, options = {}) {
   this.isInit()
   try {
-    console.log("Compiling")
-    console.log(options);
-    let eopts = this.erlpsPrepareCompilerOption(options);
-    console.log(showTerm(eopts));
-    let a = PS["Aeso.Compiler"].erlps__from_string__2([jsStrToErlStr(code), eopts]).value0[1];
-    console.log(showTerm(a));
-    let b = PS["Aeser.Contract.Code"].erlps__serialize__1([a]);
-    //console.log(showTerm(b));
-    let c = PS["Aeser.Api.Encoder"].erlps__encode__2([mkAtom("contract_bytearray"), b]);
-    //console.log(showTerm(c));
-    let d = erlStrToJSStr(erlBinToErlStr(c));
-    console.log("ErlPS: ", d);
+    console.log('Compiling')
+    console.log(options)
+    const eopts = this.erlpsPrepareCompilerOption(options)
+    console.log(showTerm(eopts))
+    const a = PS['Aeso.Compiler'].erlps__from_string__2([jsStrToErlStr(code), eopts]).value0[1]
+    console.log(showTerm(a))
+    const b = PS['Aeser.Contract.Code'].erlps__serialize__1([a])
+    // console.log(showTerm(b))
+    const c = PS['Aeser.Api.Encoder'].erlps__encode__2([mkAtom('contract_bytearray'), b])
+    // console.log(showTerm(c))
+    const d = erlStrToJSStr(erlBinToErlStr(c))
+    console.log('ErlPS: ', d)
     this.http.post('/compile', { code, options: this.prepareCompilerOption(options) }, options)
-    .then(({ bytecode }) => {console.log("HTTP: ", bytecode); return bytecode})
-    return d;
-  } catch(e) {
+      .then(({ bytecode }) => { console.log('HTTP: ', bytecode); return bytecode })
+    return d
+  } catch (e) {
     console.log(e)
   }
 }
 
 async function contractGetACI (code, options = {}) {
-  this.isInit();
+  this.isInit()
   try {
     /*
       #{encoded_aci => lists:last(JsonACI),
       external_encoded_aci => lists:droplast(JsonACI),
       interface   => StringACI}
     */
-    let eopts = this.erlpsPrepareCompilerOption(options);
-    let json_aci = PS["Aeso.Aci"].erlps__contract_interface__3([mkAtom("json"), jsStrToErlStr(code), eopts]).value0[1];
-    let stub_aci = PS["Aeso.Aci"].erlps__render_aci_json__1([json_aci]).value0[1];
-    let ret = { interface: erlStrToJSStr(erlBinToErlStr(stub_aci)) };
+    const eopts = this.erlpsPrepareCompilerOption(options)
+    const jsonAci = PS['Aeso.Aci'].erlps__contract_interface__3([mkAtom('json'), jsStrToErlStr(code), eopts]).value0[1]
+    const stubAci = PS['Aeso.Aci'].erlps__render_aci_json__1([jsonAci]).value0[1]
+    const ret = { interface: erlStrToJSStr(erlBinToErlStr(stubAci)) }
     // TODO: implement erlang__atom_to_binary__2
-    //console.log(JSON.parse(erlTermToJSONBIN(json_aci).value0.toString()))
-    console.log(ret);
-    let a = await this.http.post('/aci', { code, options: this.prepareCompilerOption(options) }, options)
-    console.log(a);
-    return a;
-  } catch(e) {
+    // console.log(JSON.parse(erlTermToJSONBIN(json_aci).value0.toString()))
+    console.log(ret)
+    const a = await this.http.post('/aci', { code, options: this.prepareCompilerOption(options) }, options)
+    console.log(a)
+    return a
+  } catch (e) {
     console.log(e)
   }
 }
@@ -164,13 +164,13 @@ async function checkCompatibility ({ force = false, forceCompatibility = false }
 }
 
 function erlpsPrepareCompilerOption ({ backend = this.compilerOptions.backend, filesystem = {} } = {}) {
-  let erlfs = mkNil;
+  let erlfs = mkNil
   for (const [key, value] of Object.entries(filesystem)) {
-    erlfs = mkCons(mkTuple([jsStrToErlStr(key), erlStrToErlBin(jsStrToErlStr(value))]), erlfs);
+    erlfs = mkCons(mkTuple([jsStrToErlStr(key), erlStrToErlBin(jsStrToErlStr(value))]), erlfs)
   }
-  let filemap = PS["Erlang.Builtins"].maps__from_list__1([erlfs]);
-  return mkCons(mkTuple([mkAtom("backend"), mkAtom(backend)]),
-         mkCons(mkTuple([mkAtom("include"), mkTuple([mkAtom("explicit_files"), filemap])]), mkNil));
+  const filemap = PS['Erlang.Builtins'].maps__from_list__1([erlfs])
+  return mkCons(mkTuple([mkAtom('backend'), mkAtom(backend)]),
+    mkCons(mkTuple([mkAtom('include'), mkTuple([mkAtom('explicit_files'), filemap])]), mkNil))
 }
 
 function prepareCompilerOption ({ backend = this.compilerOptions.backend, filesystem = {} } = {}) {
