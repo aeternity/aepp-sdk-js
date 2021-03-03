@@ -50,11 +50,13 @@ const modules = templateData
   })
 
 R.forEachObjIndexed(({ name, out }) => {
+  //const template = `{{#module name="${name}"}}{{>docs}}{{/module}}`
   const template = `{{#module name="${name}"}}{{>docs}}{{/module}}`
   console.log(`rendering ${name}`)
   const dest = path.resolve(outputDir, `${out}.md`)
   const output = jsdoc2md.renderSync({
     data: templateData,
+    "heading-depth" : 3,
     template,
     partial: [
       'tooling/docs/header.hbs',
