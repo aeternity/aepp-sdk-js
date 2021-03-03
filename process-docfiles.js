@@ -47,9 +47,6 @@ const isSomeHeader = (input) => {
 
 }
 
-const formatContent = (input, topicLevel) => {
-    let regex = new RegExp('@aeternity/aepp-sdk/.*?$')
-}
 
 // 1. Formats the headers to resemble a correct TOC necessary for readthedocs
 const countUpAllTopicLevels = (input, depth) =>{
@@ -78,23 +75,40 @@ const countUpAllTopicLevels = (input, depth) =>{
 
 // 1. remove unwanted tokens from headings ('.exports', etc.)
 const formatAllContent = (input, depth) =>{
+
     // remove ⏏ everywhere 
     let replaced = S(input).replaceAll('⏏', '').s
+    replaced = S(replaced).replaceAll('* _instance_', '').s
+    replaced = S(replaced).replaceAll('* _async_', '').s
+    replaced = S(replaced).replaceAll('* _static_', '').s
     // split into array of lines
     var lines = S(replaced).lines()
+   
     // do the actual formatting
-    var formattedLines = lines.map((line, index, array) => {
+    var formattedLines = []; 
+    
+    lines.forEach((line, index, array) => {
+        if(line.startsWith("import TransactionValidator")){
+        /* if(line.startsWith("#### unpackAndVerify(txHash")){ */
+            console.log("found the deleted line!")
+            console.log("At line " + index + " of text array length: " + array.length)
+        }
         // remove module path from the title and put it one line below
         let isHeadingRegex = new RegExp('^#.*? @aeternity/aepp-sdk/.*?$')
         // remove TOC in text - nobody uses these docs in github
         let isTOCline = new RegExp('.*?\\* .*?\\[.*?\]\\(#.*?\\).*?$')
-        // remove unnecessary .exports from subheadings
+
         let isSubHeading = new RegExp('^##')
         // get the function signature from heading
         let funcSigRegex = new RegExp('[A-Za-z].*$')
         // get only function name from heading's type signature
         let pollutedHeaderRegex = new RegExp('(?<=[^#\\*a-zA-Z\\d\\s:]).*(?=\\()')
-        let cleanHeaderRegex = new RegExp('^[^\\*;](?<= )[^\\*;]*(?=\\()')
+        //let cleanHeaderRegex = new RegExp('^[^\\*;](?<= )[^\\*;]*(?=\\()')
+
+        let onlyFuncNameRegex = new RegExp('(?<=\\s).*?(?=\\()')
+
+        // get all the heading hashtags, without the trailing space.
+        let headingHashtagsRegex = new RegExp('^#.*#')
 
         if (isHeadingRegex.test(line)){
             // if it's a header like ## @aeternity/aepp-sdk/es/tx/builder:
@@ -102,10 +116,10 @@ const formatAllContent = (input, depth) =>{
             let regex = new RegExp('@aeternity/aepp-sdk/.*?$')
             var path = regex.exec(line)[0]
             // ... and insert it as a new line under the old heading.
-            let newLine = `**Module Path:** ${path} \n` 
-            array.splice(index + 1 , 0, newLine)
+            formattedLines.push(removePath = S(line).replaceAll('@aeternity/aepp-sdk/es/', '').s)
+            let modulePath = `**Module Path:** ${path} \n` 
+            formattedLines.push(modulePath)
             // .. and remove path from heading
-            return removePath = S(line).replaceAll('@aeternity/aepp-sdk/es/', '').s
 
 
         } else if(isTOCline.test(line)){
@@ -123,40 +137,50 @@ const formatAllContent = (input, depth) =>{
                 // extract the sig, clean it and add it a line below heading
                 try{sig = funcSigRegex.exec(removeExports)[0]} catch (e) {
                     console.log("Issue with: ", removeExports); 
-                    process.exit()
+                    formattedLines.push(removeExports)
                 }
                 let cleanedSig = sig.replace('*', '')
-                let sigLine = `**Type Sig:** ${cleanedSig}`
-                array.splice(index + 2 , 0, sigLine + "\n")
-             //TODO: Remember adding the correct ammount of #s ! 
-                return onlyFunctionName
+                
 
-            } else if(cleanHeaderRegex.test(removeExports)){
+                let onlyHeadings = headingHashtagsRegex.exec(removeExports)[0]
+                formattedLines.push(onlyHeadings + ' ' + onlyFunctionName)
+                
+                let sigLine = `**Type Sig:** ${cleanedSig}`
+                formattedLines.push(sigLine)
+
+            } else if (funcSigRegex.test(removeExports)) { // we assume it's a clean heading here
                 // if it is a clean header like ### buildTransaction(type, params, [options]) ⇒ `Object` 
-                let onlyFunctionName = cleanHeaderRegex.exec(removeExports)[0]
+                var onlyFunctionName = '';
+                try {
+                onlyFunctionName = onlyFuncNameRegex.exec(removeExports)[0]
+                } catch(e){
+                    console.log("Failed getting function name from this input: ", removeExports)
+                    formattedLines.push(removeExports)
+                }
                 if(onlyFunctionName.length < 2) {
                     console.log("No function name found in : ", removeExports); 
-                    process.exit()
+                    formattedLines.push(removeExports)
                 }
                 // extract the sig, clean it and add it a line below heading
 
+                let onlyHeadings = headingHashtagsRegex.exec(removeExports)[0]
+                formattedLines.push(onlyHeadings + ' ' + onlyFunctionName + '\n')
+                // add type signature
                 let sig = funcSigRegex.exec(removeExports)[0]
-                let cleanedSig = sig.replace('*', '')
-                let sigLine = `**Type Sig:** ${cleanedSig}`
-                array.splice(index + 2 , 0, sigLine)
-             //TODO: Remember adding the correct ammount of #s ! 
-                return onlyFunctionName
+                let sigLine = `**Type Sig:** ${sig}`
+                formattedLines.push(sigLine  + '\n')
 
             } else {
                 console.log("================================== WARNING == no subheader formatting pattern matched, add one !")
-                return line
+                formattedLines.push(line)
             }
 
            
         } else{
-            return line
+            formattedLines.push(line) // here it should be just some line of text
         }
     })
+
     joinedLines = formattedLines.join('\n')
 
     // Replace repeated empty lines
@@ -425,7 +449,10 @@ const generateFilesFromContent = (arr) => {
                         // for file writing
                         let generatedFile_absolutePath = basePath + generatedFile_relativePath
                         
-                        fs.writeFileSync(generatedFile_absolutePath, filecontentAcc, null, 2)
+                        // do the pretty-formatting before saving:
+                        let formattedContent = formatAllContent(filecontentAcc)
+
+                        fs.writeFileSync(generatedFile_absolutePath, formattedContent, null, 2)
                         existingDocs.push(generatedFile_relativePath)
                         const docsAttachedWithGenerated = existingDocs
 
@@ -469,7 +496,9 @@ const generateFilesFromContent = (arr) => {
                             // for file writing
                             let generatedFile_absolutePath = basePath + generatedFile_relativePath
                             
-                            fs.writeFileSync(generatedFile_absolutePath, filecontentAcc, null, 2)
+                            // do the pretty-formatting before saving:
+                            let formattedFilecontentAcc = formatAllContent(filecontentAcc)
+                            fs.writeFileSync(generatedFile_absolutePath, formattedFilecontentAcc, null, 2)
 
                             arr[key] = generatedFile_relativePath
                         }
@@ -532,4 +561,28 @@ mkdocs.nav = filesProcessed;
 console.log(mkdocs)
 
 var mkdocs_generated = yaml.dump(mkdocs);
-fs.writeFileSync('./mkdocs_generated.yml', mkdocs_generated, null, 4)
+fs.writeFileSync('./mkdocs.yml', mkdocs_generated, null, 4)
+
+// add the ## titles (2 hash signs) to all files in the API reference necessary for proper displaying in readthedocs
+
+
+// find the "API reference" entry in the navigation
+var APIref;
+
+mkdocs.nav.forEach(navEntry => {
+    if (Object.keys(navEntry)[0] == "API Reference"){
+        APIref = navEntry['API Reference'];
+    }
+})
+
+// add the topic to each file
+APIref.forEach(entry => {
+    fileTitle = Object.keys(entry)[0]
+    filePath = entry[fileTitle]
+        
+    var fileContent = S(fs.readFileSync(basePath + filePath)).lines()
+    fileContent.unshift("## " + fileTitle, ' ', )
+
+    withAddedHeadings = fileContent.join('\n')
+    fs.writeFileSync(basePath + filePath, withAddedHeadings)
+})
