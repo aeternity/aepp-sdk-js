@@ -44,8 +44,8 @@ import { ORACLE_TTL, QUERY_FEE, QUERY_TTL, RESPONSE_TTL } from '../tx/builder/sc
  * @return {Promise<Object>} Oracle object
  */
 async function getOracleObject (oracleId) {
-  const oracle = await this.getOracle(oracleId)
-  const { oracleQueries: queries } = await this.getOracleQueries(oracleId)
+  const oracle = await this.api.getOracleByPubkey(oracleId)
+  const { oracleQueries: queries } = await this.api.getOracleQueriesByPubkey(oracleId)
   return {
     ...oracle,
     queries,
@@ -72,7 +72,7 @@ async function getOracleObject (oracleId) {
 function pollForQueries (oracleId, onQuery, { interval = 5000 } = {}) {
   const knownQueryIds = new Set()
   const checkNewQueries = async () => {
-    const queries = ((await this.getOracleQueries(oracleId)).oracleQueries || [])
+    const queries = ((await this.api.getOracleQueriesByPubkey(oracleId)).oracleQueries || [])
       .filter(({ id }) => !knownQueryIds.has(id))
     queries.forEach(({ id }) => knownQueryIds.add(id))
     if (queries.length) onQuery(queries)
@@ -95,7 +95,7 @@ function pollForQueries (oracleId, onQuery, { interval = 5000 } = {}) {
  * @return {Promise<Object>} OracleQuery object
  */
 async function getQueryObject (oracleId, queryId) {
-  const q = await this.getOracleQuery(oracleId, queryId)
+  const q = await this.api.getOracleQueryByPubkeyAndQueryId(oracleId, queryId)
   return {
     ...q,
     decodedQuery: decodeBase64Check(q.query.slice(3)).toString(),
@@ -122,7 +122,7 @@ async function getQueryObject (oracleId, queryId) {
 export async function pollForQueryResponse (oracleId, queryId, { attempts = 20, interval = 5000 } = {}) {
   for (let i = 0; i < attempts; i++) {
     if (i) await pause(interval)
-    const { response } = await this.getOracleQuery(oracleId, queryId)
+    const { response } = await this.api.getOracleQueryByPubkeyAndQueryId(oracleId, queryId)
     const responseBuffer = decodeBase64Check(assertedType(response, 'or'))
     if (responseBuffer.length) {
       return { response, decode: () => responseBuffer } // TODO: Return just responseBuffer

@@ -22,7 +22,7 @@
  * @example import Chain from '@aeternity/aepp-sdk/es/chain'
  */
 
-import Oracle from '../oracle'
+import stampit from '@stamp/it'
 import { required } from '@stamp/required'
 
 /**
@@ -36,7 +36,7 @@ import { required } from '@stamp/required'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Chain instance
  */
-const Chain = Oracle.compose({
+const Chain = stampit({
   deepProps: { Ae: { defaults: { waitMined: true } } },
   statics: { waitMined (bool) { return this.deepProps({ Ae: { defaults: { waitMined: bool } } }) } }
 }, required({

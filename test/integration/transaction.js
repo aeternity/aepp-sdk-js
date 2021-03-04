@@ -201,14 +201,14 @@ describe('Native Transaction', function () {
     txFromAPI.should.be.equal(nativeTx)
     await clientNative.send(nativeTx, { verify: true })
 
-    const oId = (await client.getOracle(oracleId)).id
+    const oId = (await client.api.getOracleByPubkey(oracleId)).id
     oId.should.be.equal(oracleId)
   })
 
   it('native build of oracle extends tx', async () => {
     const callerId = await client.address()
     const params = { oracleId, callerId, oracleTtl }
-    const orTtl = (await client.getOracle(oracleId)).ttl
+    const orTtl = (await client.api.getOracleByPubkey(oracleId)).ttl
 
     const txFromAPI = await client.oracleExtendTx(params)
     const nativeTx = await clientNative.oracleExtendTx(params)
@@ -216,7 +216,7 @@ describe('Native Transaction', function () {
     txFromAPI.should.be.equal(nativeTx)
 
     await client.send(nativeTx)
-    const orNewTtl = (await client.getOracle(oracleId)).ttl
+    const orNewTtl = (await client.api.getOracleByPubkey(oracleId)).ttl
     orNewTtl.should.be.equal(orTtl + oracleTtl.value)
   })
 
@@ -233,7 +233,7 @@ describe('Native Transaction', function () {
 
     await client.send(nativeTx)
 
-    const oracleQuery = (await client.getOracleQuery(oracleId, queryId))
+    const oracleQuery = (await client.api.getOracleQueryByPubkeyAndQueryId(oracleId, queryId))
     oracleQuery.id.should.be.equal(queryId)
   })
 
@@ -247,7 +247,7 @@ describe('Native Transaction', function () {
 
     await client.send(nativeTx)
 
-    const orQuery = (await client.getOracleQuery(oracleId, queryId))
+    const orQuery = (await client.api.getOracleQueryByPubkeyAndQueryId(oracleId, queryId))
     orQuery.response.should.be.equal(`or_${encodeBase64Check(queryResponse)}`)
   })
   it('Get next account nonce', async () => {

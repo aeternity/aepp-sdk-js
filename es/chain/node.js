@@ -17,7 +17,6 @@
 import * as R from 'ramda'
 
 import Chain from './'
-import Oracle from '../oracle/node'
 import { AE_AMOUNT_FORMATS, formatAmount } from '../utils/amount-formatter'
 import TransactionValidator from '../tx/validator'
 import NodePool from '../node-pool'
@@ -229,7 +228,7 @@ async function resolveName (nameOrId, prefix, { verify = false, resolveByNode = 
  * @return {Object} ChainNode instance
  * @example ChainNode({url: 'https://testnet.aeternity.io/'})
  */
-const ChainNode = Chain.compose(Oracle, TransactionValidator, NodePool, {
+const ChainNode = Chain.compose(TransactionValidator, NodePool, {
   init ({ verifyTx = true }) {
     this.verifyTxBeforeSend = verifyTx
   },
