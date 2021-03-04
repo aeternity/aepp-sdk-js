@@ -31,32 +31,55 @@ import AsyncInit from '../utils/async-init'
 import { VM_TYPE } from '../tx/builder/schema'
 import PS from 'erlps-aesophia/dist/bundle'
 
+/* Pretty printer of elang terms */
 const showTerm = PS['Data.Show'].show(PS['Erlang.Type'].showErlangTerm)
+
+/* Erl -> Erl conversions */
 const erlBinToErlStr = (t) => PS['Erlang.Builtins'].erlang__binary_to_list__1([t])
 const erlStrToErlBin = (t) => PS['Erlang.Builtins'].erlang__iolist_to_binary__1([t])
+
+/* Erl -> JS casts */
 const erlStrToJSStr = (t) => PS['Erlang.Type'].fromErl(PS['Erlang.Type'].stringFromErlang)(t).value0
+const erlBinToJSStr = (t) => erlStrToJSStr(erlBinToErlStr(t))
+
+/* JS -> Erl casts */
 const jsStrToErlStr = PS['Erlang.Type'].toErl(PS['Erlang.Type'].stringToErlang)
-const mkTuple = PS['Erlang.Type'].ErlangTuple.create
+const jsStrToErlBin = (t) => erlStrToErlBin(jsStrToErlStr(t))
+const jsArrayToErlList = (t) => PS['Erlang.Builtins'].erlang__tuple_to_list__1([mkTuple(t)])
+
+/* Constructors for erlang types */
+const erlTuple = PS['Erlang.Type'].ErlangTuple
+const mkTuple = erlTuple.create
 const mkAtom = PS['Erlang.Type'].ErlangAtom.create
 const mkNil = PS['Erlang.Type'].ErlangEmptyList.value
 const mkCons = (a, b) => PS['Erlang.Type'].ErlangCons.create(a)(b)
-/* const erlTermToJSONBIN =
+
+/* Convert an erlang JSON to a JS JSON */
+const erlJSONToJsJSON =
   (t) =>
-    PS['Jsx'].erlps__encode__1([t]) */
-//  console.log(JSON.parse(erlTermToJSONBIN(jsStrToErlStr("AAAA")).value0.toString()))
+    JSON.parse(erlBinToJSStr(PS.Jsx.erlps__encode__1([t])))
 
 async function getCompilerVersion (options = {}) {
-  const verErlBin = PS['Aeso.Compiler'].erlps__version__0([]).value0[1]
-  const verErlStr = erlBinToErlStr(verErlBin)
-  const ver = erlStrToJSStr(verErlStr)
-  return ver
+  const r = PS['Aeso.Compiler'].erlps__version__0([])
+  if (r instanceof erlTuple && r.value0[0].value0 === 'ok') {
+    return erlBinToJSStr(r.value0[1])
+  } else {
+    console.log(showTerm(r))
+    throw new Error('Failed to get compiler version')
+  }
 }
 
 async function contractEncodeCallDataAPI (source, name, args = [], options = {}) {
   this.isInit()
-  return this.http
-    .post('/encode-calldata', { source, function: name, arguments: args, options: this.prepareCompilerOption(options) }, options)
-    .then(({ calldata }) => calldata)
+  const copts = this.erlpsPrepareCompilerOption(options)
+  const eargs = jsArrayToErlList(args.map(jsStrToErlStr))
+  const r = PS['Aeso.Compiler'].erlps__create_calldata__4([jsStrToErlStr(source), jsStrToErlStr(name), eargs, copts])
+  if (r instanceof erlTuple && r.value0[0].value0 === 'ok') {
+    return erlBinToJSStr(PS['Aeser.Api.Encoder'].erlps__encode__2([mkAtom('contract_bytearray'), r.value0[1]]))
+  } else {
+    console.log(showTerm(r))
+    throw new Error('Failed to encode calldata')
+  }
 }
 
 async function contractDecodeCallDataByCodeAPI (bytecode, calldata, backend = this.compilerOptions.backend, options = {}) {
@@ -73,8 +96,15 @@ async function contractDecodeCallDataBySourceAPI (source, fn, callData, options 
 
 async function contractDecodeCallResultAPI (source, fn, callValue, callResult, options = {}) {
   this.isInit()
-  return this.http
-    .post('/decode-call-result', { function: fn, source, 'call-result': callResult, 'call-value': callValue, options: this.prepareCompilerOption(options) }, options)
+  const copts = this.erlpsPrepareCompilerOption(options)
+  const cval = PS['Aeser.Api.Encoder'].erlps__safe_decode__2([mkAtom('contract_bytearray'), jsStrToErlBin(callValue)])
+  const r = PS['Aeso.Compiler'].erlps__to_sophia_value__5([jsStrToErlStr(source), jsStrToErlStr(fn), mkAtom(callResult), cval.value0[1], copts])
+  if (r instanceof erlTuple && r.value0[0].value0 === 'ok') {
+    return erlJSONToJsJSON(PS['Aeso.Aci'].erlps__json_encode_expr__1([r.value0[1]]))
+  } else {
+    console.log(showTerm(r))
+    throw new Error('Failed to decode call result')
+  }
 }
 
 async function contractDecodeDataAPI (type, data, options = {}) {
@@ -93,47 +123,35 @@ async function validateByteCodeAPI (bytecode, source, options = {}) {
 
 async function compileContractAPI (code, options = {}) {
   this.isInit()
-  try {
-    console.log('Compiling')
-    console.log(options)
-    const eopts = this.erlpsPrepareCompilerOption(options)
-    console.log(showTerm(eopts))
-    const a = PS['Aeso.Compiler'].erlps__from_string__2([jsStrToErlStr(code), eopts]).value0[1]
-    console.log(showTerm(a))
-    const b = PS['Aeser.Contract.Code'].erlps__serialize__1([a])
-    // console.log(showTerm(b))
-    const c = PS['Aeser.Api.Encoder'].erlps__encode__2([mkAtom('contract_bytearray'), b])
-    // console.log(showTerm(c))
-    const d = erlStrToJSStr(erlBinToErlStr(c))
-    console.log('ErlPS: ', d)
-    this.http.post('/compile', { code, options: this.prepareCompilerOption(options) }, options)
-      .then(({ bytecode }) => { console.log('HTTP: ', bytecode); return bytecode })
-    return d
-  } catch (e) {
-    console.log(e)
+  const copts = this.erlpsPrepareCompilerOption(options)
+  // const copts = mkCons(mkTuple([mkAtom("aci"), mkAtom("json")]), this.erlpsPrepareCompilerOption(options)); // Uncomment to generate the ACI alongside the bytecode ;)
+  const compiled = PS['Aeso.Compiler'].erlps__from_string__2([jsStrToErlStr(code), copts])
+  if (compiled instanceof erlTuple && compiled.value0[0].value0 === 'ok') {
+    const compiled1 = PS['Aeser.Contract.Code'].erlps__serialize__1([compiled.value0[1]])
+    const bytecode = PS['Aeser.Api.Encoder'].erlps__encode__2([mkAtom('contract_bytearray'), compiled1])
+    return erlBinToJSStr(bytecode)
+  } else {
+    console.log(showTerm(compiled))
+    throw new Error('Failed to compile contract')
   }
 }
 
 async function contractGetACI (code, options = {}) {
   this.isInit()
-  try {
-    /*
-      #{encoded_aci => lists:last(JsonACI),
-      external_encoded_aci => lists:droplast(JsonACI),
-      interface   => StringACI}
-    */
-    const eopts = this.erlpsPrepareCompilerOption(options)
-    const jsonAci = PS['Aeso.Aci'].erlps__contract_interface__3([mkAtom('json'), jsStrToErlStr(code), eopts]).value0[1]
-    const stubAci = PS['Aeso.Aci'].erlps__render_aci_json__1([jsonAci]).value0[1]
-    const ret = { interface: erlStrToJSStr(erlBinToErlStr(stubAci)) }
-    // TODO: implement erlang__atom_to_binary__2
-    // console.log(JSON.parse(erlTermToJSONBIN(json_aci).value0.toString()))
-    console.log(ret)
-    const a = await this.http.post('/aci', { code, options: this.prepareCompilerOption(options) }, options)
-    console.log(a)
-    return a
-  } catch (e) {
-    console.log(e)
+  const copts = this.erlpsPrepareCompilerOption(options)
+  const r = PS['Aeso.Aci'].erlps__contract_interface__3([mkAtom('json'), jsStrToErlStr(code), copts])
+  if (r instanceof erlTuple && r.value0[0].value0 === 'ok') {
+    const erlAci = r.value0[1]
+    const jsAci = erlJSONToJsJSON(erlAci)
+    const stubAci = PS['Aeso.Aci'].erlps__render_aci_json__1([erlAci]).value0[1]
+    return {
+      interface: erlBinToJSStr(stubAci),
+      encoded_aci: jsAci[jsAci.length - 1],
+      external_encoded_aci: jsAci.slice(0, -1)
+    }
+  } else {
+    console.log(showTerm(r))
+    throw new Error('Failed to generate ACI')
   }
 }
 
