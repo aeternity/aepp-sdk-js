@@ -264,7 +264,7 @@ describe('Aepp<->Wallet', function () {
         })
         await aepp.signTransaction(tx, { onAccount: keypair.publicKey })
       } catch (e) {
-        e.message.should.be.equal('Provided onAccount should be a MemoryAccount')
+        e.message.should.be.equal('Provided onAccount should be an AccountBase')
       }
     })
     it('Sign transaction: wallet allow', async () => {
@@ -362,7 +362,7 @@ describe('Aepp<->Wallet', function () {
         await aepp.signMessage('test', { onAccount })
       } catch (e) {
         e.code.should.be.equal(12)
-        e.message.should.be.equal('Provided onAccount should be a MemoryAccount')
+        e.message.should.be.equal('Provided onAccount should be an AccountBase')
       }
     })
     it('Sign message using account not from sdk instance', async () => {

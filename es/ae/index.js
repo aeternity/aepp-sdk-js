@@ -25,7 +25,7 @@
 import stampit from '@stamp/it'
 import Tx from '../tx'
 import Chain from '../chain'
-import Account from '../account'
+import AccountBase from '../account/base'
 import TxBuilder from '../tx/builder'
 import * as R from 'ramda'
 import BigNumber from 'bignumber.js'
@@ -135,7 +135,7 @@ function destroyInstance () {
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Ae instance
  */
-const Ae = stampit(Tx, Account, Chain, {
+const Ae = stampit(Tx, AccountBase, Chain, {
   methods: { send, spend, transferFunds, destroyInstance, signUsingGA },
   deepProps: { Ae: { defaults: { denomination: AE_AMOUNT_FORMATS.AETTOS } } }
 })

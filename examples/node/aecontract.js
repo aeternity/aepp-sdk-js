@@ -45,7 +45,7 @@ async function exec (infile, fn, args) {
   // `Ae` itself is asynchronous as it determines the node's version and
   // rest interface automatically. Only once the Promise is fulfilled, we know
   // we have a working ae client. Please take note `Ae` is not a constructor but
-  // a factory factory, which means it's *not* invoked with `new`.
+  // a factory, which means it's *not* invoked with `new`.
   // `contractCompile` takes a raw Sophia contract in string form and sends it
   // off to the node for bytecode compilation. This might in the future be done
   // without talking to the node, but requires a bytecode compiler

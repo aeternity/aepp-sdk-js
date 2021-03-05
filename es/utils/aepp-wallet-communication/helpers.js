@@ -1,7 +1,7 @@
 /**
  * Browser helper functions
  */
-import { isMemoryAccount } from '../../account/selector'
+import { isAccountBase } from '../../account/base'
 
 const isWeb = () => window && window.location && window.location.protocol.startsWith('http')
 
@@ -83,7 +83,7 @@ export const isValidAccounts = (accounts) => (['', 'connected', 'current'].filte
 
 export const resolveOnAccount = (addresses, onAccount, opt = {}) => {
   if (!addresses.find(a => a === onAccount)) {
-    if (typeof opt.onAccount !== 'object' || !isMemoryAccount(opt.onAccount)) throw new Error('Provided onAccount should be a MemoryAccount')
+    if (typeof opt.onAccount !== 'object' || !isAccountBase(opt.onAccount)) throw new Error('Provided onAccount should be an AccountBase')
     onAccount = opt.onAccount
   }
   return onAccount

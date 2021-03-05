@@ -484,29 +484,6 @@ export function isValidKeypair (privateKey, publicKey) {
 }
 
 /**
- * Obtain key pair from `env`
- *
- * Designed to be used with `env` from nodejs. Assumes enviroment variables
- * `WALLET_PRIV` and `WALLET_PUB`.
- * @rtype (env: Object) => {publicKey: String, secretKey: String}, throws: Error
- * @param {Object} env - Environment
- * @param {Boolean} [force=false] Force throwing error
- * @return {Object} Key pair
- */
-export function envKeypair (env, force = false) {
-  const keypair = {
-    secretKey: env.WALLET_PRIV,
-    publicKey: env.WALLET_PUB
-  }
-
-  if (keypair.publicKey && keypair.secretKey) {
-    return keypair
-  } else {
-    if (!force) throw Error('Environment variables WALLET_PRIV and WALLET_PUB need to be set')
-  }
-}
-
-/**
  * This function encrypts a message using base58check encoded and 'ak' prefixed
  * publicKey such that only the corresponding secretKey will
  * be able to decrypt

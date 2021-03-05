@@ -22,7 +22,7 @@
  * @example import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
  */
 
-import Account from './'
+import AccountBase from './base'
 import * as Crypto from '../utils/crypto'
 import { isHex } from '../utils/string'
 import { decode } from '../tx/builder/helpers'
@@ -59,7 +59,7 @@ function validateKeyPair (keyPair) {
 }
 
 /**
- * In-memory `Account` factory
+ * In-memory account stamp
  * @function
  * @alias module:@aeternity/aepp-sdk/es/account/memory
  * @rtype Stamp
@@ -69,7 +69,7 @@ function validateKeyPair (keyPair) {
  * @param {String} options.keypair.secretKey - Private key
  * @return {Account}
  */
-const MemoryAccount = Account.compose({
+export default AccountBase.compose({
   init ({ keypair, gaId }) {
     this.isGa = !!gaId
     if (gaId) {
@@ -84,5 +84,3 @@ const MemoryAccount = Account.compose({
   props: { isGa: false },
   methods: { sign, address, setSecret }
 })
-
-export default MemoryAccount

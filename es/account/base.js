@@ -16,20 +16,27 @@
  */
 
 /**
- * Account module
- * @module @aeternity/aepp-sdk/es/account
- * @export Account
- * @example import Account from '@aeternity/aepp-sdk/es/account'
+ * AccountBase module
+ * @module @aeternity/aepp-sdk/es/account/base
+ * @export AccountBase
+ * @export isAccountBase
  */
 
 import stampit from '@stamp/it'
 import { required } from '@stamp/required'
-
 import { hash, personalMessageToBinary, decodeBase64Check, assertedType, verifyPersonalMessage } from '../utils/crypto'
 import { buildTx, buildTxHash } from '../tx/builder'
 import { decode } from '../tx/builder/helpers'
 import { TX_TYPE } from '../tx/builder/schema'
 import { getNetworkId } from '../node'
+
+/**
+ * Check is provided object looks like an instance of AccountBase
+ * @rtype (Object) => Boolean
+ * @param {Object} acc - Object to check
+ * @return {Boolean}
+ */
+export const isAccountBase = (acc) => !['sign', 'address'].find(f => typeof acc[f] !== 'function')
 
 /**
  * Sign encoded transaction
@@ -88,7 +95,7 @@ async function verifyMessage (message, signature, opt = {}) {
 }
 
 /**
- * Basic Account Stamp
+ * AccountBase Stamp
  *
  * Attempting to create instances from the Stamp without overwriting all
  * abstract methods using composition will result in an exception.
@@ -103,7 +110,7 @@ async function verifyMessage (message, signature, opt = {}) {
  * @param {String} options.networkId - NETWORK_ID using for signing transaction's
  * @return {Object} Account instance
  */
-const Account = stampit({
+export default stampit({
   init ({ networkId }) { // NETWORK_ID using for signing transaction's
     if (!this.networkId && networkId) {
       this.networkId = networkId
@@ -137,5 +144,3 @@ const Account = stampit({
  * @rtype () => address: Promise[String]
  * @return {String} Public account address
  */
-
-export default Account

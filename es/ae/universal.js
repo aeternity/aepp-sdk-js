@@ -28,7 +28,7 @@ import Aens from './aens'
 import Transaction from '../tx/tx'
 import Oracle from './oracle'
 import GeneralizeAccount from '../contract/ga'
-import Accounts from '../accounts'
+import AccountMultiple from '../account/multiple'
 import Contract from './contract'
 
 /**
@@ -42,8 +42,7 @@ import Contract from './contract'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Universal instance
  */
-export const Universal = Ae.compose(Accounts, Chain, Transaction, Aens, Contract, Oracle, GeneralizeAccount, {
+export default Ae.compose(AccountMultiple, Chain, Transaction, Aens, Contract, Oracle, GeneralizeAccount, {
   init () {},
   props: { process: {} }
 })
-export default Universal
