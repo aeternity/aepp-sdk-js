@@ -37,6 +37,7 @@ const showTerm = PS['Data.Show'].show(PS['Erlang.Type'].showErlangTerm)
 /* Erl -> Erl conversions */
 const erlBinToErlStr = (t) => PS['Erlang.Builtins'].erlang__binary_to_list__1([t])
 const erlStrToErlBin = (t) => PS['Erlang.Builtins'].erlang__iolist_to_binary__1([t])
+const erlMapToErlList = (t) => PS['Erlang.Builtins'].maps__to_list__1([t])
 
 /* Erl -> JS casts */
 const erlStrToJSStr = (t) => PS['Erlang.Type'].fromErl(PS['Erlang.Type'].stringFromErlang)(t).value0
@@ -49,6 +50,13 @@ const jsArrayToErlList = (t) => PS['Erlang.Builtins'].erlang__tuple_to_list__1([
 
 /* Constructors for erlang types */
 const erlTuple = PS['Erlang.Type'].ErlangTuple
+const erlCons = PS['Erlang.Type'].ErlangCons
+const erlNil = PS['Erlang.Type'].ErlangEmptyList
+const erlAtom = PS['Erlang.Type'].ErlangAtom
+const erlBin = PS['Erlang.Type'].ErlangBinary
+const erlMap = PS['Erlang.Type'].ErlangMap
+const erlFloat = PS['Erlang.Type'].ErlangFloat
+const erlInt = PS['Erlang.Type'].ErlangInt
 const mkTuple = erlTuple.create
 const mkAtom = PS['Erlang.Type'].ErlangAtom.create
 const mkNil = PS['Erlang.Type'].ErlangEmptyList.value
@@ -56,8 +64,47 @@ const mkCons = (a, b) => PS['Erlang.Type'].ErlangCons.create(a)(b)
 
 /* Convert an erlang JSON to a JS JSON */
 const erlJSONToJsJSON =
-  (t) =>
-    JSON.parse(erlBinToJSStr(PS.Jsx.erlps__encode__1([t])))
+  (t) => {
+    if (t instanceof erlNil) return []
+    if (t instanceof erlCons) {
+        let r = [];
+        while (!(t instanceof erlNil)) {
+            r.push(erlJSONToJsJSON(t.value0));
+            t = t.value1;
+        }
+        return r;
+    }
+    if(t instanceof erlMap) {
+        t = erlMapToErlList(t);
+        let r = {};
+        while (!(t instanceof erlNil)) {
+            let k = t.value0.value0[0];
+            if (k instanceof erlAtom) k = k.value0;
+            else if (k instanceof erlBin) k = erlBinToJSStr(k);
+            else if (k instanceof erlInt) k = PS["Erlang.Utils"].bigIntToInt(k.value0).value0
+            else {
+                console.log(k)
+                throw new Error("Invalid Key")
+            }
+            let v = t.value0.value0[1];
+            r[k] = erlJSONToJsJSON(v);
+            t = t.value1;
+        }
+        return r;
+    }
+    if(t instanceof erlBin) return erlBinToJSStr(t)
+    if(t instanceof erlAtom) {
+        if(t.value0 == "true") return true;
+        if(t.value0 == "false") return false;
+        return t.value0
+    }
+    if(t instanceof erlFloat) return t.value0;
+    if(t instanceof erlInt) {
+      return PS["Erlang.Utils"].bigIntToInt(t.value0).value0
+    };
+    console.log(t)
+    throw new Error("Invalid value")
+    }
 
 async function getCompilerVersion (options = {}) {
   const r = PS['Aeso.Compiler'].erlps__version__0([])
