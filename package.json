@@ -21,7 +21,9 @@
     "test:watch": "mocha --recursive --require @babel/register --watch --timeout 10m",
     "prepare": "npm run build",
     "genChangelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
-    "prepublishOnly": "npm run docs:docco && npm run docs:api"
+    "prepublishOnly": "npm run docs:docco && npm run docs:api",
+    "publishSugar" : "npm run prepublishOnly && node process-docfiles.js",
+    "serveSugarDocs" : "npm run prepublishOnly && node process-docfiles.js && mkdocs serve"
   },
   "license": "ISC",
   "keywords": [
@@ -44,12 +46,14 @@
     "ed2curve": "^0.3.0",
     "fs-extra": "^9.0.1",
     "joi-browser": "^13.4.0",
+    "js-yaml": "^4.0.0",
     "json2yaml": "^1.1.0",
     "libsodium-wrappers-sumo": "0.7.6",
     "ramda": "^0.27.0",
     "rimraf": "^3.0.2",
     "rlp": "2.2.5",
     "sha.js": "^2.4.11",
+    "string": "^3.3.3",
     "tweetnacl": "^1.0.0",
     "tweetnacl-auth": "^1.0.1",
     "uuid": "^8.0.0",

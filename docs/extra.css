@@ -1,0 +1,6 @@
+td, th {
+    padding: 3px 5px;
+}
+td code {
+    border: none !important
+}

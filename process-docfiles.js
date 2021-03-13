@@ -72,12 +72,14 @@ const countUpAllTopicLevels = (input, depth) =>{
     return result
 }
 
-
-// 1. remove unwanted tokens from headings ('.exports', etc.)
+// takes text, returns text.
 const formatAllContent = (input, depth) =>{
-
+    
+    // 1. remove unwanted tokens from headings ('.exports', etc.)
     // remove ⏏ everywhere 
-    let replaced = S(input).replaceAll('⏏', '').s
+    let sig = funcSigRegex.exec(removeExports)[0]
+                let sigLine = `**Type Sig:** ${sig}`
+                formattedLines.push(sigLine  + '\n')
     replaced = S(replaced).replaceAll('* _instance_', '').s
     replaced = S(replaced).replaceAll('* _async_', '').s
     replaced = S(replaced).replaceAll('* _static_', '').s
@@ -95,7 +97,7 @@ const formatAllContent = (input, depth) =>{
         }
         // remove module path from the title and put it one line below
         let isHeadingRegex = new RegExp('^#.*? @aeternity/aepp-sdk/.*?$')
-        // remove TOC in text - nobody uses these docs in github
+        // remove TOC in text - nobody is using these docs in github
         let isTOCline = new RegExp('.*?\\* .*?\\[.*?\]\\(#.*?\\).*?$')
 
         let isSubHeading = new RegExp('^##')
@@ -159,7 +161,10 @@ const formatAllContent = (input, depth) =>{
                 }
                 if(onlyFunctionName.length < 2) {
                     console.log("No function name found in : ", removeExports); 
-                    formattedLines.push(removeExports)
+                    // if a function signature could not be found, just take the old heading without the #s
+                    let sig = S(removeExports).replaceAll('#', '').s
+                    let sigLine = `**Type Sig:**${sig}`
+                    formattedLines.push(sigLine  + '\n')
                 }
                 // extract the sig, clean it and add it a line below heading
 
@@ -450,7 +455,10 @@ const generateFilesFromContent = (arr) => {
                         let generatedFile_absolutePath = basePath + generatedFile_relativePath
                         
                         // do the pretty-formatting before saving:
-                        let formattedContent = formatAllContent(filecontentAcc)
+                        //let formattedContent = formatAllContent(filecontentAcc)
+
+                        // short-circuit file content formatting here, we do it in the end for every file.
+                        let formattedContent = filecontentAcc;
 
                         fs.writeFileSync(generatedFile_absolutePath, formattedContent, null, 2)
                         existingDocs.push(generatedFile_relativePath)
@@ -497,7 +505,9 @@ const generateFilesFromContent = (arr) => {
                             let generatedFile_absolutePath = basePath + generatedFile_relativePath
                             
                             // do the pretty-formatting before saving:
-                            let formattedFilecontentAcc = formatAllContent(filecontentAcc)
+                            // short-circuit file content formatting here, we do it in the end for every file.
+                            /* let formattedFilecontentAcc = formatAllContent(filecontentAcc) */
+                            let formattedFilecontentAcc = filecontentAcc
                             fs.writeFileSync(generatedFile_absolutePath, formattedFilecontentAcc, null, 2)
 
                             arr[key] = generatedFile_relativePath
@@ -575,12 +585,14 @@ mkdocs.nav.forEach(navEntry => {
     }
 })
 
-// add the topic to each file
+// format each file and add a header topic to it
 APIref.forEach(entry => {
     fileTitle = Object.keys(entry)[0]
     filePath = entry[fileTitle]
-        
-    var fileContent = S(fs.readFileSync(basePath + filePath)).lines()
+    
+    var theFile = fs.readFileSync(basePath + filePath);
+    
+    var fileContent = S(formatAllContent(theFile)).lines()
     fileContent.unshift("## " + fileTitle, ' ', )
 
     withAddedHeadings = fileContent.join('\n')
