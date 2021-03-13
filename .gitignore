@@ -22,3 +22,6 @@ coverage.*
 /examples/**/dist
 .history
 .site
+docs for demo
+docs example
+docs unformatted for comparison

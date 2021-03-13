@@ -24,7 +24,9 @@
     "test:watch": "mocha --recursive --require @babel/register --require ts-node/register --watch --timeout 10m",
     "prepare": "npm run build",
     "genChangelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
-    "prepublishOnly": "npm run docs:docco && npm run docs:api"
+    "prepublishOnly": "npm run docs:docco && npm run docs:api",
+    "publishSugar" : "npm run prepublishOnly && node process-docfiles.js",
+    "serveSugarDocs" : "npm run prepublishOnly && node process-docfiles.js && mkdocs serve"
   },
   "license": "ISC",
   "keywords": [
