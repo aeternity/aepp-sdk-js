@@ -77,9 +77,7 @@ const formatAllContent = (input, depth) =>{
     
     // 1. remove unwanted tokens from headings ('.exports', etc.)
     // remove ⏏ everywhere 
-    let sig = funcSigRegex.exec(removeExports)[0]
-                let sigLine = `**Type Sig:** ${sig}`
-                formattedLines.push(sigLine  + '\n')
+    let replaced = S(input).replaceAll('⏏', '').s
     replaced = S(replaced).replaceAll('* _instance_', '').s
     replaced = S(replaced).replaceAll('* _async_', '').s
     replaced = S(replaced).replaceAll('* _static_', '').s
@@ -542,7 +540,7 @@ const generateFilesFromContent = (arr) => {
 
 // save the unflattened result
 console.log(JSONwithDepth)
-fs.writeFileSync('./testOutput.json', JSON.stringify(JSONwithDepth.json, null, 2))
+//fs.writeFileSync('./testOutput.json', JSON.stringify(JSONwithDepth.json, null, 2))
 
 console.log("Now flattened: ")
 
@@ -551,19 +549,19 @@ console.log("Now flattened: ")
 const flattened = deleteTooDeep(JSONwithDepth.json)
 
 console.log(deleteTooDeep(flattened))
-fs.writeFileSync('./flattened.txt', JSON.stringify(flattened, null, 2))
+//fs.writeFileSync('./flattened.txt', JSON.stringify(flattened, null, 2))
 //console.log(JSON.stringify(JSONwithDepth, null, 2))
 
 const reFlattened = deleteTooDeep(flattened)
 
-fs.writeFileSync('./reFlattened.json', JSON.stringify(reFlattened, null, 4))
+//fs.writeFileSync('./reFlattened.json', JSON.stringify(reFlattened, null, 4))
 
 const filesProcessed = generateFilesFromContent(reFlattened)
 
-fs.writeFileSync('./final.json', JSON.stringify(filesProcessed, null, 4))
+//fs.writeFileSync('./final.json', JSON.stringify(filesProcessed, null, 4))
 
 var backToYaml = yaml.dump(filesProcessed);
-fs.writeFileSync('./yaml_jsyaml.yml', backToYaml, null, 4)
+//fs.writeFileSync('./yaml_jsyaml.yml', backToYaml, null, 4)
 
 // load the mkdocs.yml and insert the nav
 mkdocs = YAML.load('mkdocs.yml');
@@ -571,10 +569,12 @@ mkdocs.nav = filesProcessed;
 console.log(mkdocs)
 
 var mkdocs_generated = yaml.dump(mkdocs);
-fs.writeFileSync('./mkdocs.yml', mkdocs_generated, null, 4)
+var warning = "# DON'T touch ! This file is being auto-generated from mkdocs_original.yml ($ npm run publishSugar), all nav itels that are nested too deep to be displayed correctly are flattened to mutual files" + os.EOL
+fs.writeFileSync('./mkdocs.yml', warning + mkdocs_generated, null, 4)
+
+
 
 // add the ## titles (2 hash signs) to all files in the API reference necessary for proper displaying in readthedocs
-
 
 // find the "API reference" entry in the navigation
 var APIref;
