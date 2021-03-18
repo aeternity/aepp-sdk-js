@@ -49,7 +49,7 @@ async function appendSignature (tx, signFn) {
 function handleUnexpectedMessage (channel, message, state) {
   if (state && state.reject) {
     state.reject(Object.assign(
-      Error(`Unexpected message received:\n\n${JSON.stringify(message)}`),
+      new Error(`Unexpected message received:\n\n${JSON.stringify(message)}`),
       { wsMessage: message }
     ))
   }

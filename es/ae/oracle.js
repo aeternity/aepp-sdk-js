@@ -128,7 +128,7 @@ export async function pollForQueryResponse (oracleId, queryId, { attempts = 20, 
       return { response, decode: () => responseBuffer } // TODO: Return just responseBuffer
     }
   }
-  throw Error(`Giving up after ${(attempts - 1) * interval}ms`)
+  throw new Error(`Giving up after ${(attempts - 1) * interval}ms`)
 }
 
 /**

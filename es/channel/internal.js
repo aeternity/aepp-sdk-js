@@ -134,7 +134,7 @@ function ping (channel) {
     })
     pongTimeoutId.set(channel, setTimeout(() => {
       disconnect(channel)
-      emit(channel, 'error', Error('Server pong timed out'))
+      emit(channel, 'error', new Error('Server pong timed out'))
     }, PONG_TIMEOUT_MS))
   }, PING_TIMEOUT_MS))
 }
@@ -169,9 +169,9 @@ function onMessage (channel, data) {
 function wrapCallErrorMessage (message) {
   const [{ message: details } = {}] = message.error.data || []
   if (details) {
-    return Error(`${message.error.message}: ${details}`)
+    return new Error(`${message.error.message}: ${details}`)
   }
-  return Error(message.error.message)
+  return new Error(message.error.message)
 }
 
 export function call (channel, method, params) {

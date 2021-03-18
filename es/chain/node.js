@@ -40,7 +40,7 @@ async function sendTransaction (tx, options = {}) {
   if (verify || (typeof verify !== 'boolean' && this.verifyTxBeforeSend)) {
     const { validation, tx: txObject, txType } = await this.unpackAndVerify(tx)
     if (validation.length) {
-      throw Object.assign(Error('Transaction verification error: ' + JSON.stringify(validation)), {
+      throw Object.assign(new Error('Transaction verification error: ' + JSON.stringify(validation)), {
         code: 'TX_VERIFICATION_ERROR',
         errorData: { validation, tx: txObject, txType },
         txHash: tx
@@ -121,7 +121,7 @@ async function awaitHeight (height, { interval = 5000, attempts = 20 } = {}) {
     currentHeight = await this.height()
     if (currentHeight >= height) return currentHeight
   }
-  throw Error(`Giving up after ${(attempts - 1) * interval}ms, current height: ${currentHeight}, desired height: ${height}`)
+  throw new Error(`Giving up after ${(attempts - 1) * interval}ms, current height: ${currentHeight}, desired height: ${height}`)
 }
 
 async function topBlock () {
