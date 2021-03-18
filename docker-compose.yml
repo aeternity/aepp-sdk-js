@@ -1,7 +1,8 @@
 version: '3'
 services:
   node:
-    image: aeternity/aeternity:${NODE_TAG}
+    build:
+      context: https://github.com/aeternity/aeternity.git#GH-3539_OAS3_fixes
     hostname: node
     ports: ["3013:3013", "3113:3113", "3014:3014", "3114:3114"]
     environment:

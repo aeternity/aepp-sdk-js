@@ -40,12 +40,7 @@ const filterObject = (object, fn) => Object.fromEntries(Object.entries(object).f
  * @example (await genSwaggerClient('https://mainnet.aeternity.io/api')).getAccountByPubkey('ak_jupBUgZNbcC4krDLR3tAkw1iBZoBbkNeShAq4atBtpFWmz36r')
  */
 export default async (specUrl, internalUrl) => {
-  const spec = await (await fetch(specUrl)).json();
-
-  ['claim', 'preclaim', 'transfer', 'revoke', 'update'].forEach(name => {
-    const s = spec.paths[`/debug/names/${name}`]?.post
-    if (s && !s.consumes) s.consumes = ['application/json']
-  })
+  const spec = await (await fetch(specUrl)).json()
 
   const [external, internal] = await Promise.all([specUrl, internalUrl].map((urlString) => {
     if (!urlString) return null
