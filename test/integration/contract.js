@@ -32,6 +32,9 @@ contract Identity =
 const errorContract = `
 contract Identity =
  payable stateful entrypoint main(x : address) = Chain.spend(x, 1000000000)
+
+ payable stateful entrypoint foo() =
+    require(false, "CustomErrorMessage")
 `
 
 const stateContract = `
@@ -371,7 +374,12 @@ describe('Contract', function () {
     try {
       await deployed.call('main', [await contract.address()])
     } catch (e) {
-      e.message.indexOf('Invocation failed').should.not.be.equal(-1)
+      e.message.should.be.equal('Invocation failed')
+    }
+    try {
+      await deployed.call('foo')
+    } catch (e) {
+      e.message.should.be.equal('Invocation failed: "ICustomErrorMessage"')
     }
   })
 
