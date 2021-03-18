@@ -24,7 +24,6 @@
 
 import AsyncInit from './utils/async-init'
 import genSwaggerClient from './utils/swagger'
-import semverSatisfies from './utils/semver-satisfies'
 
 /**
  * Obtain networkId from account or node
@@ -102,26 +101,10 @@ const Node = AsyncInit.compose({
   async init ({ forceCompatibility = false }) {
     const { nodeRevision: revision, genesisKeyBlockHash: genesisHash, networkId, protocols } = await this.api.getStatus()
     this.consensusProtocolVersion = await this.getConsensusProtocolVersion(protocols)
-    if (
-      (
-        !semverSatisfies(this.version.split('-')[0], NODE_GE_VERSION, NODE_LT_VERSION) ||
-        this.version === '5.0.0-rc1'
-      ) &&
-      // Todo implement 'rc' version comparision in semverSatisfies
-      !forceCompatibility
-    ) {
-      throw new Error(
-        `Unsupported node version ${this.version}. ` +
-        `Supported: >= ${NODE_GE_VERSION} < ${NODE_LT_VERSION}`
-      )
-    }
 
     this.nodeNetworkId = networkId
     return Object.assign(this, { revision, genesisHash })
   }
 })
-
-const NODE_GE_VERSION = '5.0.0'
-const NODE_LT_VERSION = '6.0.0'
 
 export default Node
