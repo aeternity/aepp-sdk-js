@@ -245,10 +245,11 @@ const Chain = stampit({
  * @instance
  * @abstract
  * @category async
- * @rtype (txs, accounts, hashOrHeight) => result: Object
- * @param {Array} txs - Array of transaction's
- * @param {Array} accounts - Array of account's
- * @param {String|Number} hashOrHeight - hash or height of block on which to make dry-run
+ * @rtype (tx, accountAddress, options) => result: Object
+ * @param {String} tx - transaction to execute
+ * @param {String} accountAddress - address that will be used to execute transaction
+ * @param {String|Number} [options.top] - hash of block on which to make dry-run
+ * @param {Boolean} [options.txEvents] - collect and return on-chain tx events that would result from the call
  * @return {Object} Result
  */
 
