@@ -77,3 +77,5 @@ export function isBase64 (str) {
   const index = str.indexOf('=')
   return !!(index === -1 || str.slice(index).match(/={1,2}/))
 }
+
+export const isAeternityPrefixed = key => key.match(/^[a-z]{2}_/)
