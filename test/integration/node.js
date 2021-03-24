@@ -35,13 +35,13 @@ describe('Node client', function () {
     expect(client.revision).to.be.a('string')
   })
 
-  it('loads operations', async () => {
-    expect(client.methods).to.include.members(['postTransaction', 'getCurrentKeyBlock'])
+  it('loads operations', () => {
+    ['postTransaction', 'getCurrentKeyBlock']
+      .map(method => expect(client.api[method]).to.be.a('function'))
   })
 
   it('gets key blocks by height for the first 3 blocks', () => {
     expect(client.api.getKeyBlockByHeight).to.be.a('function')
-    expect(client.api.getKeyBlockByHeight.length).to.equal(1)
 
     return Promise.all(
       R.range(1, 3).map(async i => {
@@ -112,8 +112,6 @@ describe('Node client', function () {
       })
       const nodesList = nodes.getNodesInPool()
       nodesList.length.should.be.equal(1)
-      nodesList[0].url.should.be.equal(url)
-      nodesList[0].internalUrl.should.be.equal(internalUrl)
     })
   })
 })
