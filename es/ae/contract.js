@@ -37,6 +37,7 @@ import NodePool from '../node-pool'
 import { AMOUNT, DEPOSIT, DRY_RUN_ACCOUNT, GAS, MIN_GAS_PRICE } from '../tx/builder/schema'
 import { decode, produceNameId } from '../tx/builder/helpers'
 import TxObject from '../tx/tx-object'
+import { decodeBase64Check } from '../utils/crypto'
 
 async function sendAndProcess (tx, options) {
   const txData = await this.send(tx, options)
@@ -66,17 +67,16 @@ async function sendAndProcess (tx, options) {
  * @return {Promise<void>}
  */
 async function _handleCallError (result, rawTx) {
-  const error = Buffer.from(result.returnValue).toString()
-  const decodedError = isBase64(error.slice(3))
-    ? Buffer.from(error.slice(3), 'base64').toString()
+  let error = Buffer.from(result.returnValue).toString()
+  error = isBase64(error.slice(3))
+    ? decodeBase64Check(error.slice(3)).toString()
     : await this.contractDecodeDataAPI('string', error)
   throw Object.assign(
-    new Error(`Invocation failed: ${error}. Decoded: ${decodedError}`), {
+    new Error(`Invocation failed${error ? `: "${error}"` : ''}`), {
       ...result,
       tx: TxObject({ tx: rawTx }),
       error,
-      rawTx,
-      decodedError
+      rawTx
     }
   )
 }
