@@ -13,7 +13,8 @@
     "moduleResolution": "node",
     "preserveConstEnums": true,
     "declaration": true,
-    "allowJs": true
+    "allowJs": true,
+    "strictNullChecks": true
   },
   "include": [
     "src/**/*"

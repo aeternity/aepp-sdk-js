@@ -70,10 +70,10 @@ describe('Amount Formatter', function () {
   })
   it('Invalid value', () => {
     [
-      [true, [AE_AMOUNT_FORMATS.AE, AE_AMOUNT_FORMATS.AE], `Value ${true} is not type of number`],
-      [1, [AE_AMOUNT_FORMATS.AE, 'ASD'], `Invalid target denomination. Current: ASD, available [${Object.keys(AE_AMOUNT_FORMATS)}]`],
-      [1, ['ASD', AE_AMOUNT_FORMATS.AE], `Invalid denomination. Current: ASD, available [${Object.keys(AE_AMOUNT_FORMATS)}]`]
-    ].forEach(([v, [dF, dT], error]: Array<any>) => {
+      [true, [AE_AMOUNT_FORMATS.AE, AE_AMOUNT_FORMATS.AE], 'Value true is not type of number'],
+      [1, [AE_AMOUNT_FORMATS.AE, 'ASD'], 'Invalid target denomination: ASD'],
+      [1, ['ASD', AE_AMOUNT_FORMATS.AE], 'Invalid denomination: ASD']
+    ].forEach(([v, [dF, dT], error]: any[]) => {
       try {
         formatAmount(v, { denomination: dF, targetDenomination: dT })
       } catch (e) {
