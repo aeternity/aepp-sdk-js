@@ -8,7 +8,7 @@
   "module": "es/index.js",
   "sideEffects": false,
   "scripts": {
-    "build": "webpack -p && tsc",
+    "build": "tsc && webpack -p && babel src --config-file ./babel.esm.config.js --out-dir es --extensions '.js,.ts' --source-maps true",
     "build:dev": "webpack --mode=development",
     "docs:docco": "docco -t tooling/docs/markdown.jst -c /dev/null examples/node/*.js && rm -f docs/null && node rename-to-md.js",
     "docs:api": "node apidoc.js",
@@ -34,6 +34,7 @@
   "dependencies": {
     "@aeternity/bip39": "^0.1.0",
     "@aeternity/json-bigint": "^0.3.1",
+    "@babel/runtime-corejs3": "^7.13.10",
     "@stamp/it": "^1.0.3",
     "@stamp/required": "^1.0.1",
     "aes-js": "^3.1.1",
@@ -69,7 +70,6 @@
     "@babel/preset-env": "7.10.2",
     "@babel/preset-typescript": "^7.12.17",
     "@babel/register": "7.10.1",
-    "@babel/runtime": "^7.10.2",
     "@types/bn.js": "^5.1.0",
     "@types/chai": "^4.2.15",
     "@types/mocha": "^8.2.1",

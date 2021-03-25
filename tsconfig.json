@@ -6,10 +6,12 @@
     }
   },
   "compilerOptions": {
+    "emitDeclarationOnly": true,
+    "isolatedModules": true,
     "outDir": "./es",
     "noImplicitAny": true,
     "module": "es6",
-    "target": "es2017",
+    "target": "es5",
     "moduleResolution": "node",
     "preserveConstEnums": true,
     "declaration": true,
