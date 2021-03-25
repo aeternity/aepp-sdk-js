@@ -4,7 +4,7 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 
 function configure (filename, opts = {}) {
   return (env, argv) => R.mergeDeepRight({
-    entry: './es/index.js',
+    entry: './src/index.js',
     mode: 'development', // automatically overriden by production flag
     devtool: argv.mode === 'production' ? 'source-map' : 'eval-source-map',
     node: {
@@ -14,7 +14,7 @@ function configure (filename, opts = {}) {
       rules: [
         {
           test: /\.(js|ts)$/,
-          include: path.resolve(__dirname, 'es'),
+          include: path.resolve(__dirname, 'src'),
           loader: 'babel-loader'
         },
         {

@@ -1,8 +1,8 @@
 import { before, describe, it } from 'mocha'
 import { getSdk } from '.'
-import { generateKeyPair } from '../../es/utils/crypto'
-import { BASE_VERIFICATION_SCHEMA, SIGNATURE_VERIFICATION_SCHEMA } from '../../es/tx/builder/schema'
-import MemoryAccount from '../../es/account/memory'
+import { generateKeyPair } from '../../src/utils/crypto'
+import { BASE_VERIFICATION_SCHEMA, SIGNATURE_VERIFICATION_SCHEMA } from '../../src/tx/builder/schema'
+import MemoryAccount from '../../src/account/memory'
 
 const WARNINGS = [...SIGNATURE_VERIFICATION_SCHEMA, ...BASE_VERIFICATION_SCHEMA].reduce((acc, [msg, v, error]) => error.type === 'warning' ? [...acc, error.txKey] : acc, [])
 const ERRORS = [...BASE_VERIFICATION_SCHEMA, ...SIGNATURE_VERIFICATION_SCHEMA].reduce((acc, [msg, v, error]) => error.type === 'error' ? [...acc, error.txKey] : acc, [])

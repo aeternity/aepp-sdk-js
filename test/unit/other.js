@@ -18,7 +18,7 @@
 import '../'
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
-import { traverseKeys } from '../../es/utils/other'
+import { traverseKeys } from '../../src/utils/other'
 
 describe('Other utils', function () {
   it('walks through deep structures', () => {

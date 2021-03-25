@@ -16,12 +16,12 @@
  */
 
 import { describe, it, before } from 'mocha'
-import { encodeBase58Check, encodeBase64Check, generateKeyPair, salt } from '../../es/utils/crypto'
+import { encodeBase58Check, encodeBase64Check, generateKeyPair, salt } from '../../src/utils/crypto'
 import { getSdk } from './index'
-import { commitmentHash, isNameValid, oracleQueryId } from '../../es/tx/builder/helpers'
-import { MemoryAccount } from '../../es'
-import { AE_AMOUNT_FORMATS } from '../../es/utils/amount-formatter'
-import { unpackTx } from '../../es/tx/builder'
+import { commitmentHash, isNameValid, oracleQueryId } from '../../src/tx/builder/helpers'
+import { MemoryAccount } from '../../src'
+import { AE_AMOUNT_FORMATS } from '../../src/utils/amount-formatter'
+import { unpackTx } from '../../src/tx/builder'
 
 const nonce = 1
 const nameTtl = 1

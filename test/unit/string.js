@@ -18,7 +18,7 @@
 import '../'
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
-import { snakeToPascal, pascalToSnake } from '../../es/utils/string'
+import { snakeToPascal, pascalToSnake } from '../../src/utils/string'
 
 describe('Strings', function () {
   describe('converts case', () => {

@@ -17,8 +17,8 @@
 
 import { describe, it } from 'mocha'
 import '..'
-import { AE_AMOUNT_FORMATS, formatAmount, toAe, toAettos } from '../../es/utils/amount-formatter'
-import { asBigNumber, parseBigNumber } from '../../es/utils/bignumber'
+import { AE_AMOUNT_FORMATS, formatAmount, toAe, toAettos } from '../../src/utils/amount-formatter'
+import { asBigNumber, parseBigNumber } from '../../src/utils/bignumber'
 
 describe('Amount Formatter', function () {
   it('to aettos', async () => {

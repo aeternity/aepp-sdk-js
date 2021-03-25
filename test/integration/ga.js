@@ -17,8 +17,8 @@
 
 import { describe, it, before } from 'mocha'
 import { getSdk } from './'
-import { generateKeyPair } from '../../es/utils/crypto'
-import MemoryAccount from '../../es/account/memory'
+import { generateKeyPair } from '../../src/utils/crypto'
+import MemoryAccount from '../../src/account/memory'
 
 const authContract = `contract BlindAuth =
     record state = { owner : address }

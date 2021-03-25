@@ -15,7 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { Universal, Crypto, MemoryAccount, Node } from '../../es'
+import { Universal, Crypto, MemoryAccount, Node } from '../../src'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 

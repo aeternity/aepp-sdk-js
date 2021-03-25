@@ -19,8 +19,8 @@ import { describe, it, before } from 'mocha'
 import { getSdk } from './'
 import { randomName } from '../utils'
 import * as R from 'ramda'
-import { generateKeyPair } from '../../es/utils/crypto'
-import { buildContractId, classify, computeAuctionEndBlock, computeBidFee } from '../../es/tx/builder/helpers'
+import { generateKeyPair } from '../../src/utils/crypto'
+import { buildContractId, classify, computeAuctionEndBlock, computeBidFee } from '../../src/tx/builder/helpers'
 
 describe('Aens', function () {
   let aens

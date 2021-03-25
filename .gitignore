@@ -4,6 +4,7 @@ node_modules
 .tern-project
 .dir-locals.el
 /dist
+/es
 /docs/api*
 /docs/examples
 __pycache__

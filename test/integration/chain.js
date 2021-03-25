@@ -16,7 +16,7 @@
  */
 import { describe, it, before } from 'mocha'
 import { getSdk } from './'
-import { generateKeyPair } from '../../es/utils/crypto'
+import { generateKeyPair } from '../../src/utils/crypto'
 
 describe('Node Chain', function () {
   let client

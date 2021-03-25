@@ -14,15 +14,15 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-import Compiler from '../../es/contract/compiler'
+import Compiler from '../../src/contract/compiler'
 import { describe, it, before } from 'mocha'
 import { BaseAe, getSdk, compilerUrl, publicKey } from './'
-import { decode } from '../../es/tx/builder/helpers'
+import { decode } from '../../src/tx/builder/helpers'
 import * as R from 'ramda'
 import { randomName } from '../utils'
-import { decodeEvents, readType, SOPHIA_TYPES } from '../../es/contract/aci/transformation'
-import { hash, personalMessageToBinary } from '../../es/utils/crypto'
-import { getFunctionACI } from '../../es/contract/aci/helpers'
+import { decodeEvents, readType, SOPHIA_TYPES } from '../../src/contract/aci/transformation'
+import { hash, personalMessageToBinary } from '../../src/utils/crypto'
+import { getFunctionACI } from '../../src/contract/aci/helpers'
 
 const identityContract = `
 contract Identity =

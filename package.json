@@ -3,12 +3,12 @@
   "version": "7.7.0",
   "description": "SDK for the æternity blockchain",
   "main": "dist/aepp-sdk.js",
-  "types": "dist/es/index.d.ts",
+  "types": "es/index.d.ts",
   "browser": "dist/aepp-sdk.browser.js",
-  "module": "dist/es/index.js",
+  "module": "es/index.js",
   "sideEffects": false,
   "scripts": {
-    "build": "webpack -p",
+    "build": "webpack -p && tsc",
     "build:dev": "webpack --mode=development",
     "docs:docco": "docco -t tooling/docs/markdown.jst -c /dev/null examples/node/*.js && rm -f docs/null && node rename-to-md.js",
     "docs:api": "node apidoc.js",
@@ -106,5 +106,9 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
-  }
+  },
+  "files": [
+    "dist",
+    "es"
+  ]
 }

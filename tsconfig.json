@@ -6,7 +6,7 @@
     }
   },
   "compilerOptions": {
-    "outDir": "./dist/es",
+    "outDir": "./es",
     "noImplicitAny": true,
     "module": "es6",
     "target": "es2017",
@@ -16,6 +16,6 @@
     "allowJs": true
   },
   "include": [
-    "es/**/*"
+    "src/**/*"
   ],
 }

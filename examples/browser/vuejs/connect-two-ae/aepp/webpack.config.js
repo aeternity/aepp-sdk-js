@@ -25,7 +25,7 @@ module.exports = {
   mode: process.env.NODE_ENV === 'prod' ? 'production' : 'development',
   resolve: {
     alias: {
-      AE_SDK_MODULES: '../../../../../../../es/'
+      AE_SDK_MODULES: '../../../../../../../src/'
     }
   },
   entry: {
