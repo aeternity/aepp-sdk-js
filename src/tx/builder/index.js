@@ -34,7 +34,7 @@ import * as mpt from '../../utils/mptree'
  * JavaScript-based Transaction builder
  * @module @aeternity/aepp-sdk/es/tx/builder
  * @export TxBuilder
- * @example import Transaction from '@aeternity/aepp-sdk/es/tx/builder'
+ * @example import { TxBuilder } from '@aeternity/aepp-sdk'
  */
 
 const ORACLE_TTL_TYPES = {

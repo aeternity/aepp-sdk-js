@@ -23,7 +23,7 @@
  * repository.
  * @module @aeternity/aepp-sdk/es/ae/aens
  * @export Aens
- * @example import Aens from '@aeternity/aepp-sdk/es/ae/aens'
+ * @example import { Aens } from '@aeternity/aepp-sdk'
  */
 
 import * as R from 'ramda'

@@ -19,7 +19,7 @@
  * Memory Account module
  * @module @aeternity/aepp-sdk/es/account/memory
  * @export MemoryAccount
- * @example import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
+ * @example import { MemoryAccount } from '@aeternity/aepp-sdk'
  */
 
 import AccountBase from './base'

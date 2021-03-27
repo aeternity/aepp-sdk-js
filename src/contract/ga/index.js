@@ -20,8 +20,7 @@
  *
  * @module @aeternity/aepp-sdk/es/contract/ga
  * @export GeneralizeAccount
- * @example import GeneralizeAccount from '@aeternity/aepp-sdk/es/contract/ga' (Using tree-shaking)
- * @example import { GeneralizeAccount } from '@aeternity/aepp-sdk' (Using bundle)
+ * @example import { GeneralizeAccount } from '@aeternity/aepp-sdk'
  */
 import * as R from 'ramda'
 

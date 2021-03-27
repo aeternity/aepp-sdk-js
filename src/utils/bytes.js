@@ -20,7 +20,7 @@ import { isBase64, isHex } from './string'
 /**
  * Bytes module
  * @module @aeternity/aepp-sdk/es/utils/bytes
- * @example import * as Crypto from '@aeternity/aepp-sdk/es/utils/bytes'
+ * @example import { Crypto } from '@aeternity/aepp-sdk'
  */
 
 /**

@@ -64,12 +64,9 @@ After connection will be established we can start to send `announcePresence` mes
 import '../img/icon-128.png'
 import '../img/icon-34.png'
 
-import Node from '@aeternity/aepp-sdk/es/node'
-import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
-import { RpcWallet } from '@aeternity/aepp-sdk/es/ae/wallet'
+import { Node, MemoryAccount, RpcWallet, Crypto } from '@aeternity/aepp-sdk'
 import BrowserRuntimeConnection
   from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-runtime'
-import { generateKeyPair } from '@aeternity/aepp-sdk/es/utils/crypto'
 
 // const account = MemoryAccount({
 //   keypair: {
@@ -77,7 +74,7 @@ import { generateKeyPair } from '@aeternity/aepp-sdk/es/utils/crypto'
 //     publicKey: 'YOUR_PUB'
 //   }
 // })
-const account2 = MemoryAccount({ keypair: generateKeyPair() })
+const account2 = MemoryAccount({ keypair: Crypto.generateKeyPair() })
 
 // Init accounts
 const accounts = [

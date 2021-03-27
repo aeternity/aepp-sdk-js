@@ -2,7 +2,7 @@
  * NodePool module
  * @module @aeternity/aepp-sdk/es/node-pool
  * @export NodePool
- * @example import NodePool from '@aeternity/aepp-sdk/es/node-pool'
+ * @example import { NodePool } from '@aeternity/aepp-sdk'
  */
 import stampit from '@stamp/it'
 import { getterForCurrentNode, prepareNodeObject } from './helpers'

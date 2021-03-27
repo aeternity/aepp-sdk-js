@@ -5,7 +5,7 @@ The full example of implementation you can find here: [AEPP example](https://git
 ### First we need to initialize our `Aepp` stamp
 
 ```js
-  import { RpcAepp } from '@aeternity/aepp-sdk/es'
+  import { RpcAepp } from '@aeternity/aepp-sdk'
 
   // Open iframe with Wallet if run in top window
   //  window !== window.parent || await this.getReverseWindow()
@@ -54,7 +54,7 @@ The full example of implementation you can find here: [AEPP example](https://git
       const scannerConnection = await BrowserWindowMessageConnection({
         connectionInfo: { id: 'spy' }
       })
-      // Initialize WalletDetector 
+      // Initialize WalletDetector
       this.detector = await WalletDetector({ connection: scannerConnection })
       // Start scanning
       this.detector.scan(handleWallets.bind(this))

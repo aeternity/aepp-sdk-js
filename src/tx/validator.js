@@ -24,7 +24,7 @@ import { NodePool } from '../node-pool'
  * Transaction validator
  * @module @aeternity/aepp-sdk/es/tx/validator
  * @export TransactionValidator
- * @example import TransactionValidator from '@aeternity/aepp-sdk/es/tx/validator'
+ * @example import { TransactionValidator } from '@aeternity/aepp-sdk'
  */
 
 const VALIDATORS = {

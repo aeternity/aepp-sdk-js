@@ -20,7 +20,7 @@ npm i @aeternity/aepp-sdk
 npm i @aeternity/aepp-sdk@next
 
 # install the #develop version of the SDK
-npm i https://github.com/aeternity/aepp-sdk-js#develop
+npm i github:aeternity/aepp-sdk-js#develop
 ```
 
 **Note** : If you experience errors during the installation, you might need to install build tools for your OS.
@@ -44,12 +44,12 @@ xcode-select --install
 You can do many more things now, but you'll probably have to start with:
 
 ### A) Using the Command Line
-Create an account using the [💻 CLI](#cli---command-line-client)
+Create an account using the [💻 CLI](https://github.com/aeternity/aepp-cli-js)
 
 ### B) Using the SDK
 
 ```javascript
-  import { Crypto } from '@aeternity/aepp-sdk/es'
+  import { Crypto } from '@aeternity/aepp-sdk'
   const keypair = Crypto.generateKeyPair()
   console.log(`Secret key: ${keypair.secretKey}`)
   console.log(`Public key: ${keypair.publicKey}`)
@@ -65,34 +65,33 @@ Import the right [flavor](../README.md#flavors--entry-points). For this example 
 
 ```js
 // Import Flavor
-import Ae from '@aeternity/aepp-sdk/es/ae/universal' // or other flavor
+import { Universal } from '@aeternity/aepp-sdk' // or other flavor
 ```
 
 ## 5. Play with Aetenity's blockchain features
 
 ```js
 // Use Flavor
-import Ae from '@aeternity/aepp-sdk/es/ae/universal' // or other flavor
-import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory' // or other flavor
-import Node from '@aeternity/aepp-sdk/es/node' // or other flavor
-import { AE_AMOUNT_FORMATS } from '@aeternity/aepp-sdk/es/utils/amount-formatter'
+import { Universal, MemoryAccount, Node, AmountFormatter } from '@aeternity/aepp-sdk'
 
 const NODE_URL = 'https://testnet.aeternity.io'
-const COMPILER_URL = 'COMPILER_URL' // required for using Contract
-const ACCOUNT = MemoryAccount({ keypair: { secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS' } })
+const COMPILER_URL = 'https://compiler.aepps.com' // required for using Contract
+const account = MemoryAccount({ keypair: { secretKey: 'A_PRIV_KEY', publicKey: 'A_PUB_ADDRESS' } })
 
 (async function () {
   const nodeInstance = await Node({ url: NODE_URL })
-  const sdkInstance = await Ae({
+  const sdkInstance = await Universal({
      compilerUrl: COMPILER_URL,
      nodes: [ { name: 'test-net', instance: nodeInstance } ],
-     accounts: [ ACCOUNT ]
+     accounts: [ account ]
   })
 
   await sdkInstance.height() // get top block height
   console.log('Current Block Height:', height)
 
-  await sdkInstance.spend(1, 'ak_asd23dasdasda...', { denomination: AE_AMOUNT_FORMATS.AE }) // spend one AE
-
+  // spend one AE
+  await sdkInstance.spend(1, 'ak_asd23dasdasda...', {
+      denomination: AmountFormatter.AE_AMOUNT_FORMATS.AE
+  })
 })()
 ```
