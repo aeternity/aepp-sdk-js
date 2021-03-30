@@ -23,7 +23,7 @@
  * @export WalletDetector
  * @example import WalletDetector from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector'
  */
-import AsyncInit from '../async-init'
+import stampit from '@stamp/it'
 import BrowserWindowMessageConnection from './connection/browser-window-message'
 import { MESSAGE_DIRECTION, METHODS } from './schema'
 
@@ -101,8 +101,8 @@ function getWallets () {
  * @param {WalletConnection} params.connection - Connection for listening for wallets
  * @return {WalletDetector}
  */
-export const WalletDetector = AsyncInit.compose({
-  async init ({ connection } = {}) {
+export const WalletDetector = stampit({
+  init ({ connection } = {}) {
     if (!window) throw new Error('Window object not found, you can run wallet detector only in browser')
     this.connection = connection || BrowserWindowMessageConnection({ connectionInfo: { id: 'spy' } })
   },
