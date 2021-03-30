@@ -37,7 +37,6 @@ import {
 } from './helpers'
 import { isAddressValid } from '../../utils/crypto'
 import { COMPILER_LT_VERSION } from '../compiler'
-import { AMOUNT, DEPOSIT, GAS, MIN_GAS_PRICE } from '../../tx/builder/schema'
 
 /**
  * Generate contract ACI object with predefined js methods for contract usage - can be used for creating a reference to already deployed contracts
@@ -62,13 +61,10 @@ async function getContractInstance (source, { aci, contractAddress, filesystem =
   aci = aci || await this.contractGetACI(source, { filesystem })
   if (contractAddress) contractAddress = await this.resolveName(contractAddress, 'ct', { resolveByNode: true })
   const defaultOptions = {
+    ...this.Ae.defaults,
     skipArgsConvert: false,
     skipTransformDecoded: false,
     callStatic: false,
-    deposit: DEPOSIT,
-    gasPrice: MIN_GAS_PRICE,
-    amount: AMOUNT,
-    gas: GAS,
     waitMined: true,
     verify: false,
     filesystem
