@@ -18,6 +18,7 @@ import Compiler from '../../src/contract/compiler'
 import { describe, it, before } from 'mocha'
 import { BaseAe, getSdk, compilerUrl, publicKey } from './'
 import { decode } from '../../src/tx/builder/helpers'
+import { DRY_RUN_ACCOUNT } from '../../src/tx/builder/schema'
 import * as R from 'ramda'
 import { randomName } from '../utils'
 import { decodeEvents, readType, SOPHIA_TYPES } from '../../src/contract/aci/transformation'
@@ -390,7 +391,7 @@ describe('Contract', function () {
     const address = await client.address().catch(e => false)
     address.should.be.equal(false)
     const { result } = await client.contractCallStatic(identityContract, deployed.address, 'main', ['42'])
-    result.callerId.should.be.equal(client.Ae.defaults.dryRunAccount.pub)
+    result.callerId.should.be.equal(DRY_RUN_ACCOUNT.pub)
   })
 
   it('calls deployed contracts', async () => {
