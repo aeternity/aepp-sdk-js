@@ -470,8 +470,7 @@ export const ContractAPI = Ae.compose(ContractBase, ContractACI, {
         deposit: DEPOSIT,
         gasPrice: MIN_GAS_PRICE, // min gasPrice 1e9
         amount: AMOUNT,
-        gas: GAS,
-        options: ''
+        gas: GAS
       }
     }
   }
