@@ -68,7 +68,7 @@ async function getContractInstance (source, { aci, contractAddress, filesystem =
     skipTransformDecoded: false,
     callStatic: false,
     deposit: DEPOSIT,
-    gasPrice: MIN_GAS_PRICE, // min gasPrice 1e9
+    gasPrice: MIN_GAS_PRICE,
     amount: AMOUNT,
     gas: GAS,
     waitMined: true,
