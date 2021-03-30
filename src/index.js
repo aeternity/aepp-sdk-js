@@ -47,7 +47,6 @@ import Oracle from './ae/oracle'
 import genSwaggerClient from './utils/swagger'
 import Channel from './channel'
 import Universal from './ae/universal'
-import ContractACI from './contract/aci'
 
 export {
   AmountFormatter,
@@ -58,7 +57,6 @@ export {
   Bytes,
   Contract,
   ContractCompilerAPI,
-  ContractACI,
   ACIHelpers,
   ACITransformation,
   ChainNode,

@@ -19,14 +19,12 @@
  * ContractACI module
  *
  * @module @aeternity/aepp-sdk/es/contract/aci
- * @export ContractACI
- * @example import ContractACI from '@aeternity/aepp-sdk/es/contract/aci'
+ * @export getContractInstance
  */
 
 import * as R from 'ramda'
 import BigNumber from 'bignumber.js'
 
-import AsyncInit from '../../utils/async-init'
 import semverSatisfies from '../../utils/semver-satisfies'
 import {
   buildContractMethods,
@@ -57,7 +55,7 @@ import { COMPILER_LT_VERSION } from '../compiler'
  * Also you can call contract like: await contractIns.methods.setState(123, options)
  * Then sdk decide to make on-chain or static call(dry-run API) transaction based on function is stateful or not
  */
-async function getContractInstance (source, { aci, contractAddress, filesystem = {}, forceCodeCheck = true, opt } = {}) {
+export default async function getContractInstance (source, { aci, contractAddress, filesystem = {}, forceCodeCheck = true, opt } = {}) {
   aci = aci || await this.contractGetACI(source, { filesystem })
   if (contractAddress) contractAddress = await this.resolveName(contractAddress, 'ct', { resolveByNode: true })
   const defaultOptions = {
@@ -198,20 +196,3 @@ const compile = ({ client, instance }) => async (options = {}) => {
   instance.compiled = bytecode
   return instance.compiled
 }
-
-/**
- * Contract ACI Stamp
- *
- * @function
- * @alias module:@aeternity/aepp-sdk/es/contract/aci
- * @rtype Stamp
- * @return {Object} Contract compiler instance
- * @example ContractACI()
- */
-
-export const ContractACI = AsyncInit.compose({
-  methods: {
-    getContractInstance
-  }
-})
-export default ContractACI

@@ -32,7 +32,7 @@ import * as R from 'ramda'
 import { isBase64 } from '../utils/string'
 import ContractCompilerAPI from '../contract/compiler'
 import ContractBase from '../contract'
-import ContractACI from '../contract/aci'
+import getContractInstance from '../contract/aci'
 import NodePool from '../node-pool'
 import { AMOUNT, DEPOSIT, DRY_RUN_ACCOUNT, GAS, MIN_GAS_PRICE } from '../tx/builder/schema'
 import { decode, produceNameId } from '../tx/builder/helpers'
@@ -443,8 +443,9 @@ async function delegateOracleRespondSignature (queryId, contractId, opt = {}) {
  * const client = await ContractWithAe({ url, internalUrl, compilerUrl, keypair, ... })
  *
  */
-export const ContractAPI = Ae.compose(ContractBase, ContractACI, {
+export const ContractAPI = Ae.compose(ContractBase, {
   methods: {
+    getContractInstance,
     contractCompile,
     contractCallStatic,
     contractDeploy,
