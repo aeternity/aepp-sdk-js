@@ -38,8 +38,6 @@ import {
 import { isAddressValid } from '../../utils/crypto'
 import { COMPILER_LT_VERSION } from '../compiler'
 import { AMOUNT, DEPOSIT, GAS, MIN_GAS_PRICE } from '../../tx/builder/schema'
-// TODO remove when Breaking Changes release is coming
-export const prepareArgsForEncode = prepareArgs
 
 /**
  * Generate contract ACI object with predefined js methods for contract usage - can be used for creating a reference to already deployed contracts
