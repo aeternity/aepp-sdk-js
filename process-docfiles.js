@@ -187,13 +187,52 @@ const formatAllContent = (input, depth) =>{
 
     joinedLines = formattedLines.join('\n')
 
+    // Perform replacements on the full text:
+
+    //1.
     // Replace repeated empty lines
     var EOL = joinedLines.match(/\r\n/gm)?"\r\n":"\n";
     var regExp = new RegExp("("+EOL+"){3,}", "gm");
     text = joinedLines.replace(regExp, EOL+EOL+EOL);
 
+    //2.
+    // replace false heading entries with empty lines like :
+    //
+    //####
+    let emptyHeadingRegex = new RegExp('^\\r?\\n#.*# $', "gm");
+    text = text.replace(emptyHeadingRegex, ``)
+
+    //3.
+    // replace double appearances separated by empty line with just one appearance of that line, e.g. line, empty line, duplicate line. like:
+    // line1
+    // 
+    // line1
+    const sandwichRegex = /^(.*)(\r?\n\r?\n\r?\n\1)+$/gm;
+
+    let match; // temporary storage for matches, overwritten with every match
+    var replacementPairs = []
+    while ((match = sandwichRegex.exec(text)) !== null) {
+        // This is necessary to avoid infinite loops with zero-width matches
+        if (match.index === sandwichRegex.lastIndex) {
+            sandwichRegex.lastIndex++;
+        }
+        
+        replacementPairs.push({ original: match[0], replacement: match[1]})
+        if (match[1] == "undefined"){
+            console.log("stop")
+        }
+        // The result can be accessed through the `m`-variable.
+        match.forEach((match, groupIndex, array) => {
+            console.log(`Found match, group ${groupIndex}: ${match}`);
+            // group 0 is the full match: line, empty line, duplicate line.
+            // group 1 is the first line, we want to replace the full match with it
+        });
+    }
+    replacementPairs.forEach(pair => {
+        text = text.replace(pair.original, pair.replacement)
+    })
+
     return text
-    //return input
 }
 const filenameFromPath = (path) => {
     const regex = new RegExp('[ \\w-]+?(?=\\.)')

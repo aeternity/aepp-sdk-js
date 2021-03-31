@@ -18,10 +18,6 @@ import ContractACI from '@aeternity/aepp-sdk/es/contract/aci'
 #### instance.compile ⇒ `ContractInstance` 
 **Type Sig:** instance.compile ⇒ `ContractInstance` 
 
-#### 
-
-**Type Sig:** instance.compile ⇒ `ContractInstance` 
-
 Compile contract
 
 **Kind**: Exported member  
@@ -30,10 +26,6 @@ Compile contract
 <a id="exp_module_@aeternity/aepp-sdk/es/contract/aci--instance.deploy"></a>
 
 #### instance.deploy ⇒ `ContractInstance` 
-**Type Sig:** instance.deploy ⇒ `ContractInstance` 
-
-#### 
-
 **Type Sig:** instance.deploy ⇒ `ContractInstance` 
 
 Deploys a contract
@@ -53,7 +45,7 @@ Deploys a contract
 ```js
 //JS
 
-const options = {amount: "1337"}
+const options = {amount: "1337"} // optional
 
 const contractInstance = await SDKInstance.getContractInstance(CONTRACT_SOURCE, { contractAddress: ct_... }) // contractAddress optional, only if interacting with existing contract
 
@@ -62,10 +54,6 @@ const deploymentTransaction = await contractInstance.deploy([params], options)
 <a id="exp_module_@aeternity/aepp-sdk/es/contract/aci--instance.call"></a>
 
 #### instance.call ⇒ `Object` 
-**Type Sig:** instance.call ⇒ `Object` 
-
-#### 
-
 **Type Sig:** instance.call ⇒ `Object` 
 
 Call contract function
@@ -86,10 +74,6 @@ Call contract function
 <a id="exp_module_@aeternity/aepp-sdk/es/contract/aci--instance.decodeEvents"></a>
 
 #### instance.decodeEvents ⇒ `Object` 
-**Type Sig:** instance.decodeEvents ⇒ `Object` 
-
-#### 
-
 **Type Sig:** instance.decodeEvents ⇒ `Object` 
 
 Decode Events

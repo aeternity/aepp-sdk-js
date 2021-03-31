@@ -1518,10 +1518,6 @@ Reconfigure Swagger to (not) spill debugging logs
 ##### Swagger~conformTypes
 **Type Sig:** Swagger~conformTypes
 
-##### 
-
-**Type Sig:** Swagger~conformTypes
-
 Per-type [conform](conform) dispatcher
 
 **Kind**: inner constant of [`Swagger`](#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger)  
