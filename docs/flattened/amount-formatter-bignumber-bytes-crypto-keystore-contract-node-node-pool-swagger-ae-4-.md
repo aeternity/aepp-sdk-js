@@ -230,7 +230,7 @@ import * as Crypto from '@aeternity/aepp-sdk/es/utils/crypto'
 ```
 
     
-    * _inner_
+    
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.decode"></a>
 
@@ -816,7 +816,7 @@ const { Keystore } = require('@aeternity/aepp-sdk')
 ```
 
     
-    * _inner_
+    
 
 <a id="module_@aeternity/aepp-sdk/es/utils/keystore.recover"></a>
 
@@ -1147,7 +1147,7 @@ import Node from '@aeternity/aepp-sdk/es/node'
 
         
             
-        * _inner_
+        
             
 
 <a id="exp_module_@aeternity/aepp-sdk/es/node--Node"></a>
@@ -1371,7 +1371,7 @@ import Swagger from '@aeternity/aepp-sdk/es/utils/swagger'
 ```
 
         
-        * _inner_
+        
 
 <a id="exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger"></a>
 

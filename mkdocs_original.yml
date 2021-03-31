@@ -13,10 +13,10 @@ nav:
   - Overview: README.md
   - guides/quick-start.md
   - Guides:
+    - guides/contract-aci-usage.md
     - guides/contract-events.md
     - guides/oracle-usage.md
     - guides/aens-usage.md
-    - guides/contract-aci-usage.md
     - guides/delegate-signature-to-contract.md
     - Wallet Api: guides/how-to-build-aepp-using-new-wallet-api.md
     - Building Wallets: guides/how-to-build-an-wallet-app-or-extension.md

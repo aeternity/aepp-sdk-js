@@ -111,14 +111,23 @@ async function getContractInstance (source, { aci, contractAddress, filesystem =
    */
   instance.compile = compile({ client: this, instance })
   /**
-   * Deploy contract
+   * Deploys a contract
    * @alias module:@aeternity/aepp-sdk/es/contract/aci
-   * @rtype (init: Array, options: Object = { skipArgsConvert: false }) => ContractInstance: Object
+   * @rtype (init: Array, options: Object = { skipArgsConvert: false, amount: "0" }) => ContractInstance: Object
    * @param {Array} init Contract init function arguments array
-   * @param {Object} [options={}] options Options object
+   * @param {Object} [options={}] Options object
    * @param {Boolean} [options.skipArgsConvert=false] Skip Validation and Transforming arguments before prepare call-data
+   * @param {String} [options.amount="0"] The amount of aettos you want to send along with the deployment transaction to be stored in the contract
    * @return {ContractInstance} Contract ACI object with predefined js methods for contract usage
-   */
+   * @example //JS
+   * 
+   * const options = {amount: "1337"} // optional
+   * 
+   * const contractInstance = await SDKInstance.getContractInstance(CONTRACT_SOURCE, { contractAddress: ct_... }) // contractAddress optional, only if interacting with existing contract
+   *
+   * const deploymentTransaction = await contractInstance.deploy([params], options)
+  */
+
   instance.deploy = deploy({ client: this, instance })
   /**
    * Call contract function
@@ -165,7 +174,7 @@ const call = ({ client, instance }) => async (fn, params = [], options = {}) => 
   const source = opt.source || instance.source
 
   if (!fn) throw new Error('Function name is required')
-  if (!instance.deployInfo.address) throw new Error('You need to deploy contract before calling!')
+  if (!instance.deployInfo.address) throw new Error('You need to deploy contract before calling. \n This error might result from the fact that the node you \n are connected to is not fully synced. \n Please check your transaction manuall in a few seconds')
   if (
     BigNumber(opt.amount).gt(0) &&
     (Object.prototype.hasOwnProperty.call(fnACI, 'payable') && !fnACI.payable)

@@ -80,6 +80,7 @@ const formatAllContent = (input, depth) =>{
     let replaced = S(input).replaceAll('⏏', '').s
     replaced = S(replaced).replaceAll('* _instance_', '').s
     replaced = S(replaced).replaceAll('* _async_', '').s
+    replaced = S(replaced).replaceAll('* _inner_', '').s
     replaced = S(replaced).replaceAll('* _static_', '').s
     // split into array of lines
     var lines = S(replaced).lines()
