@@ -71,7 +71,7 @@ Now your contract should be deployed and you can find useful information about i
 console.log(transaction)
 console.log(contractObject.deployInfo) // { owner, transaction, address, createdAt, result, rawTx }
 ```
-TODO: 
+
 If you want to send some `aetto`s along with your transaction to have them stored in your contract or need other more granular deployment options,, you can pass an `options` object as the last parameter, like `.deploy([count], {amount: "1337"})` For details, please refer to the [API docs](../../flattened/aci-compiler-ga-4-#instancedeploy-contractinstance)
 
 ## Call Smart Contract methods

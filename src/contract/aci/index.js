@@ -111,7 +111,7 @@ export default async function getContractInstance (source, { aci, contractAddres
    * 
    * const options = {amount: "1337"} // optional
    * 
-   * const contractInstance = await SDKInstance.getContractInstance(CONTRACT_SOURCE, { contractAddress: ct_... }) // contractAddress optional, only if interacting with existing contract
+   * const contractInstance = await SDKInstance.getContractInstance(CONTRACT_SOURCE) // contractAddress optional, only if interacting with existing contract
    *
    * const deploymentTransaction = await contractInstance.deploy([params], options)
   */
