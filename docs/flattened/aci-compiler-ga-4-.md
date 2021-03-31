@@ -36,18 +36,29 @@ Compile contract
 
 **Type Sig:** instance.deploy ⇒ `ContractInstance` 
 
-Deploy contract
+Deploys a contract
 
 **Kind**: Exported member  
 **Returns**: `ContractInstance` - Contract ACI object with predefined js methods for contract usage  
-**rtype**: `(init: Array, options: Object = { skipArgsConvert: false }) => ContractInstance: Object`
+**rtype**: `(init: Array, options: Object = { skipArgsConvert: false, amount: "0" }) => ContractInstance: Object`
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | init | `Array` |  | Contract init function arguments array |
-| [options] | `Object` | <code>{}</code> | options Options object |
+| [options] | `Object` | <code>{}</code> | Options object |
 | [options.skipArgsConvert] | `Boolean` | <code>false</code> | Skip Validation and Transforming arguments before prepare call-data |
+| [options.amount] | `String` | <code>&quot;0&quot;</code> | The amount of aettos you want to send along with the deployment transaction to be stored in the contract |
 
+**Example**  
+```js
+//JS
+
+const options = {amount: "1337"}
+
+const contractInstance = await SDKInstance.getContractInstance(CONTRACT_SOURCE, { contractAddress: ct_... }) // contractAddress optional, only if interacting with existing contract
+
+const deploymentTransaction = await contractInstance.deploy([params], options)
+```
 <a id="exp_module_@aeternity/aepp-sdk/es/contract/aci--instance.call"></a>
 
 #### instance.call ⇒ `Object` 
