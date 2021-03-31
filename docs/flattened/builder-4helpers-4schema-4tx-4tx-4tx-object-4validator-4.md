@@ -496,10 +496,6 @@ import TxSchema from '@aeternity/aepp-sdk/es/tx/builder/schema'
 ##### TX\_TYPE 
 **Type Sig:** TX\_TYPE 
 
-##### 
-
-**Type Sig:** TX\_TYPE 
-
 Object with transaction types
 
 **Kind**: Exported constant  
