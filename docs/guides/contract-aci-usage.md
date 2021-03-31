@@ -1,9 +1,10 @@
 # Contract Usage
 
 In order to interact with contracts on Aeternity you need to have the following components set up:
- * Compiler (host your own one or use the public compiler at https://latest.compiler.aepps.com)
- * Node (host your own one or use the public testnet node at https://sdk-testnet.aepps.com)
- * SDK
+
+- Compiler (host your own one or use the public compiler at https://latest.compiler.aepps.com)
+- Node (host your own one or use the public testnet node at https://sdk-testnet.aepps.com)
+- SDK
  
  The following example shows how to set up the SDK :
 ## SDK Setup
