@@ -20,6 +20,7 @@ export const SOPHIA_TYPES = [
   'hash',
   'signature',
   'bytes',
+  'bits',
   'variant'
 ].reduce((acc, type) => ({ ...acc, [type]: type }), { ChainTtl: 'Chain.ttl' })
 
