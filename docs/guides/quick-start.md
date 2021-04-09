@@ -49,7 +49,7 @@ Create an account using the [💻 CLI](#cli---command-line-client)
 ### B) Using the SDK
 
 ```javascript
-  import { Crypto } from '@aeternity/aepp-sdk/es'
+  import { Crypto } from '@aeternity/aepp-sdk'
   const keypair = Crypto.generateKeyPair()
   console.log(`Secret key: ${keypair.secretKey}`)
   console.log(`Public key: ${keypair.publicKey}`)
