@@ -9,7 +9,7 @@
 import stampit from '@stamp/it'
 
 import { METHODS, RPC_STATUS, SUBSCRIPTION_TYPES } from '../schema'
-import { receive, sendMessage, message, isValidAccounts } from '../helpers'
+import { sendMessage, message, isValidAccounts } from '../helpers'
 
 /**
  * Contain functionality for managing multiple RPC clients (RpcClient stamp)
@@ -160,11 +160,20 @@ export const RpcClient = stampit({
     this.accounts = {}
 
     this.sendMessage = sendMessage(this.connection)
+
+    const handleMessage = (msg, origin) => {
+      if (!msg || !msg.jsonrpc || msg.jsonrpc !== '2.0' || !msg.method) {
+        throw new Error(`Received invalid message: ${msg}`)
+      }
+      onMessage(msg, origin)
+    }
+
     const disconnect = (aepp, connection) => {
       this.disconnect(true)
       typeof onDisconnect === 'function' && onDisconnect(connection, this)
     }
-    connection.connect(receive(onMessage), disconnect)
+
+    connection.connect(handleMessage, disconnect)
   },
   propertyDescriptors: {
     currentAccount: {

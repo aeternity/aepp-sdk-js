@@ -20,12 +20,7 @@ import { MemoryAccount, Node, RpcAepp, RpcWallet } from '../../src'
 import { unpackTx } from '../../src/tx/builder'
 import { decode } from '../../src/tx/builder/helpers'
 import BrowserWindowMessageConnection from '../../src/utils/aepp-wallet-communication/connection/browser-window-message'
-import {
-  getBrowserAPI,
-  getHandler,
-  isInIframe,
-  receive
-} from '../../src/utils/aepp-wallet-communication/helpers'
+import { getBrowserAPI, getHandler } from '../../src/utils/aepp-wallet-communication/helpers'
 import { METHODS, RPC_STATUS } from '../../src/utils/aepp-wallet-communication/schema'
 import { generateKeyPair, verify } from '../../src/utils/crypto'
 import { compilerUrl, genesisAccount, internalUrl, networkId, publicKey, url } from './'
@@ -550,9 +545,6 @@ describe('Aepp<->Wallet', function () {
   })
 
   describe('Rpc helpers', () => {
-    it('Receive invalid message', () => {
-      (!receive(() => true)(false)).should.be.equal(true)
-    })
     it('receive unknown method', async () => {
       (await getHandler({}, { method: 'hey' })()()).should.be.equal(true)
     })
