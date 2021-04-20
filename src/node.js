@@ -104,7 +104,7 @@ const Node = AsyncInit.compose({
     this.consensusProtocolVersion = await this.getConsensusProtocolVersion(protocols)
     if (
       (
-        !semverSatisfies(this.version.split('-')[0], NODE_GE_VERSION, NODE_LT_VERSION) ||
+        !semverSatisfies(this.version, NODE_GE_VERSION, NODE_LT_VERSION) ||
         this.version === '5.0.0-rc1'
       ) &&
       // Todo implement 'rc' version comparision in semverSatisfies

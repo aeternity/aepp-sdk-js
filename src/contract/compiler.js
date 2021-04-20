@@ -104,7 +104,7 @@ async function setCompilerUrl (url, { forceCompatibility = false } = {}) {
 
 async function checkCompatibility ({ force = false, forceCompatibility = false } = {}) {
   if (!this.compilerVersion && !force) throw new Error('Compiler do not respond')
-  if (!forceCompatibility && this.compilerVersion && !semverSatisfies(this.compilerVersion.split('-')[0], COMPILER_GE_VERSION, COMPILER_LT_VERSION)) {
+  if (!forceCompatibility && this.compilerVersion && !semverSatisfies(this.compilerVersion, COMPILER_GE_VERSION, COMPILER_LT_VERSION)) {
     const version = this.compilerVersion
     this.compilerVersion = null
     throw new Error(`Unsupported compiler version ${version}. ` +
