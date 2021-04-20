@@ -17,10 +17,10 @@
 
 import { describe, it, before } from 'mocha'
 import { getSdk, BaseAe, networkId } from './'
-import { generateKeyPair } from '../../es/utils/crypto'
+import { generateKeyPair } from '../../src/utils/crypto'
 import BigNumber from 'bignumber.js'
-import MemoryAccount from '../../es/account/memory'
-import { AE_AMOUNT_FORMATS } from '../../es/utils/amount-formatter'
+import MemoryAccount from '../../src/account/memory'
+import { AE_AMOUNT_FORMATS } from '../../src/utils/amount-formatter'
 
 describe('Accounts', function () {
   let wallet

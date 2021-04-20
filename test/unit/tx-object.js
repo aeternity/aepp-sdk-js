@@ -15,10 +15,10 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 import { describe, it } from 'mocha'
-import TxObject from '../../es/tx/tx-object'
-import { TX_TYPE } from '../../es/tx/builder/schema'
-import { generateKeyPair } from '../../es/utils/crypto'
-import MemoryAccount from '../../es/account/memory'
+import TxObject from '../../src/tx/tx-object'
+import { TX_TYPE } from '../../src/tx/builder/schema'
+import { generateKeyPair } from '../../src/utils/crypto'
+import MemoryAccount from '../../src/account/memory'
 
 describe('TxObject', () => {
   const keyPair = generateKeyPair()

@@ -16,18 +16,18 @@
  */
 
 import { before, describe, it } from 'mocha'
-import { MemoryAccount, Node, RpcAepp, RpcWallet } from '../../es'
-import { unpackTx } from '../../es/tx/builder'
-import { decode } from '../../es/tx/builder/helpers'
-import BrowserWindowMessageConnection from '../../es/utils/aepp-wallet-communication/connection/browser-window-message'
+import { MemoryAccount, Node, RpcAepp, RpcWallet } from '../../src'
+import { unpackTx } from '../../src/tx/builder'
+import { decode } from '../../src/tx/builder/helpers'
+import BrowserWindowMessageConnection from '../../src/utils/aepp-wallet-communication/connection/browser-window-message'
 import {
   getBrowserAPI,
   getHandler,
   getWindow, isInIframe,
   receive
-} from '../../es/utils/aepp-wallet-communication/helpers'
-import { METHODS, RPC_STATUS } from '../../es/utils/aepp-wallet-communication/schema'
-import { generateKeyPair, verify } from '../../es/utils/crypto'
+} from '../../src/utils/aepp-wallet-communication/helpers'
+import { METHODS, RPC_STATUS } from '../../src/utils/aepp-wallet-communication/schema'
+import { generateKeyPair, verify } from '../../src/utils/crypto'
 import { compilerUrl, genesisAccount, internalUrl, networkId, publicKey, url } from './'
 
 describe('Aepp<->Wallet', function () {

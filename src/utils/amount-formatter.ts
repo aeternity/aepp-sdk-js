@@ -20,8 +20,8 @@
  * @module @aeternity/aepp-sdk/es/utils/amount-formatter
  * @example import { format, toAettos, AE_AMOUNT_FORMATS } from '@aeternity/aepp-sdk/es/utils/amount-formatter'
  */
-import { asBigNumber, isBigNumber } from './bignumber'
 import BigNumber from 'bignumber.js'
+import { asBigNumber, isBigNumber } from './bignumber'
 
 /**
  * AE amount formats
@@ -56,7 +56,10 @@ export const DENOMINATION_MAGNITUDE = {
  * @param {String} [options.denomination='aettos'] denomination of amount, can be ['ae', 'aettos']
  * @return {String}
  */
-export const toAe = (value, { denomination = AE_AMOUNT_FORMATS.AETTOS } = {}) => formatAmount(value, { denomination, targetDenomination: AE_AMOUNT_FORMATS.AE })
+export const toAe = (
+  value: string | number | BigNumber,
+  { denomination = AE_AMOUNT_FORMATS.AETTOS } = {}
+): string => formatAmount(value, { denomination, targetDenomination: AE_AMOUNT_FORMATS.AE })
 
 /**
  * Convert amount to aettos
@@ -65,7 +68,10 @@ export const toAe = (value, { denomination = AE_AMOUNT_FORMATS.AETTOS } = {}) =>
  * @param {String} [options.denomination='ae'] denomination of amount, can be ['ae', 'aettos']
  * @return {String}
  */
-export const toAettos = (value, { denomination = AE_AMOUNT_FORMATS.AE } = {}) => formatAmount(value, { denomination })
+export const toAettos = (
+  value: string | number | BigNumber,
+  { denomination = AE_AMOUNT_FORMATS.AE } = {}
+): string => formatAmount(value, { denomination })
 
 /**
  * Convert amount from one to other denomination
@@ -75,36 +81,46 @@ export const toAettos = (value, { denomination = AE_AMOUNT_FORMATS.AE } = {}) =>
  * @param {String} [options.targetDenomination='aettos'] target denomination, can be ['ae', 'aettos']
  * @return {String}
  */
-export const formatAmount = (value, { denomination = AE_AMOUNT_FORMATS.AETTOS, targetDenomination = AE_AMOUNT_FORMATS.AETTOS } = {}) => {
-  if (!Object.values(AE_AMOUNT_FORMATS).includes(denomination)) throw new Error(`Invalid denomination. Current: ${denomination}, available [${Object.keys(AE_AMOUNT_FORMATS)}]`)
-  if (!Object.values(AE_AMOUNT_FORMATS).includes(targetDenomination)) throw new Error(`Invalid target denomination. Current: ${targetDenomination}, available [${Object.keys(AE_AMOUNT_FORMATS)}]`)
-  if (!isBigNumber(value)) throw new Error(`Value ${value} is not type of number`)
+export const formatAmount = (
+  value: string | number | BigNumber,
+  { denomination = AE_AMOUNT_FORMATS.AETTOS, targetDenomination = AE_AMOUNT_FORMATS.AETTOS } = {}
+): string => {
+  const denominations = Object.values(AE_AMOUNT_FORMATS)
+  if (!denominations.includes(denomination)) throw new Error(`Invalid denomination: ${denomination}`)
+  if (!denominations.includes(targetDenomination)) throw new Error(`Invalid target denomination: ${targetDenomination}`)
+  if (!isBigNumber(value)) throw new Error(`Value ${value.toString()} is not type of number`)
 
   return asBigNumber(value)
     .shiftedBy(DENOMINATION_MAGNITUDE[denomination] - DENOMINATION_MAGNITUDE[targetDenomination])
     .toFixed()
 }
 
-const prefixes = [
+interface Prefix {
+  name: string
+  magnitude: number
+}
+
+const prefixes: Prefix[] = [
   { name: 'exa', magnitude: 18 },
   { name: 'giga', magnitude: 9 },
   { name: '', magnitude: 0 },
   { name: 'pico', magnitude: -12 }
 ]
 
-const getNearestPrefix = exponent => prefixes.reduce((p, n) => (
+const getNearestPrefix = (exponent: number): Prefix => prefixes.reduce((p, n) => (
   Math.abs(n.magnitude - exponent) < Math.abs(p.magnitude - exponent) ? n : p))
 
-const getLowerBoundPrefix = exponent => prefixes
-  .find(p => p.magnitude <= exponent) || prefixes[prefixes.length - 1]
+const getLowerBoundPrefix = (exponent: number): Prefix => prefixes
+  .find(p => p.magnitude <= exponent) ?? prefixes[prefixes.length - 1]
 
-export default (value) => {
-  if (!BigNumber.isBigNumber(value)) value = BigNumber(value)
+export default (rawValue: string | number | BigNumber): string => {
+  const value: BigNumber = new BigNumber(rawValue)
 
-  const { name, magnitude } = (value.e < 0 ? getNearestPrefix : getLowerBoundPrefix)(value.e)
+  const exp = value.e ?? 0
+  const { name, magnitude } = (exp < 0 ? getNearestPrefix : getLowerBoundPrefix)(exp)
   const v = value
     .shiftedBy(-magnitude)
-    .precision(9 + Math.min(value.e - magnitude, 0))
+    .precision(9 + Math.min(exp - magnitude, 0))
     .toFixed()
-  return `${v}${name ? ' ' : ''}${name}`
+  return `${v}${name !== '' ? ' ' : ''}${name}`
 }

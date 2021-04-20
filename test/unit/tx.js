@@ -17,12 +17,12 @@
 
 import '../'
 import { describe, it } from 'mocha'
-import { salt, rlp } from '../../es/utils/crypto'
-import { classify, commitmentHash, isNameValid, nameHash, produceNameId } from '../../es/tx/builder/helpers'
+import { salt, rlp } from '../../src/utils/crypto'
+import { classify, commitmentHash, isNameValid, nameHash, produceNameId } from '../../src/tx/builder/helpers'
 import BigNumber from 'bignumber.js'
-import { toBytes } from '../../es/utils/bytes'
-import { parseBigNumber } from '../../es/utils/bignumber'
-import { buildTx, unpackTx } from '../../es/tx/builder'
+import { toBytes } from '../../src/utils/bytes'
+import { parseBigNumber } from '../../src/utils/bignumber'
+import { buildTx, unpackTx } from '../../src/tx/builder'
 
 describe('Tx', function () {
   it('reproducible commitment hashes can be generated', async () => {

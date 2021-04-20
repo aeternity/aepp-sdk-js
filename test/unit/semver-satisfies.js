@@ -16,7 +16,7 @@
  */
 import { expect } from 'chai'
 import { describe, it } from 'mocha'
-import semverSatisfies from '../../es/utils/semver-satisfies'
+import semverSatisfies from '../../src/utils/semver-satisfies'
 
 describe('semverSatisfies', () => {
   it('returns a proper value', () => {

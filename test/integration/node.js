@@ -15,13 +15,13 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import Node from '../../es/node'
+import Node from '../../src/node'
 import { url, internalUrl } from './'
 
 import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
 import * as R from 'ramda'
-import { NodePool } from '../../es/node-pool'
+import { NodePool } from '../../src/node-pool'
 
 describe('Node client', function () {
   let client

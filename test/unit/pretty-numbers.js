@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js'
-import prefixedAmount from '../../es/utils/amount-formatter'
+import prefixedAmount from '../../src/utils/amount-formatter'
 import { describe, it } from 'mocha'
 
 const MAGNITUDE = 18

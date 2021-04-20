@@ -21,8 +21,8 @@ import {
   generateSaveHDWallet, getHdWalletAccountFromMnemonic, getKeyPair,
   getMasterKeyFromSeed,
   getSaveHDWalletAccounts
-} from '../../es/utils/hd-wallet'
-import { encodeBase58Check } from '../../es/utils/crypto'
+} from '../../src/utils/hd-wallet'
+import { encodeBase58Check } from '../../src/utils/crypto'
 
 describe('hd wallet', () => {
   const testMnemonic = 'eye quarter chapter suit cruel scrub verify stuff volume control learn dust'

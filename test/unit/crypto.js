@@ -18,8 +18,8 @@
 import '../'
 import { describe, it } from 'mocha'
 import { assert, expect } from 'chai'
-import * as Crypto from '../../es/utils/crypto'
-import { buildTxHash, unpackTx } from '../../es/tx/builder'
+import * as Crypto from '../../src/utils/crypto'
+import { buildTxHash, unpackTx } from '../../src/tx/builder'
 
 // These keys are fixations for the encryption lifecycle tests and will
 // not be used for signing
