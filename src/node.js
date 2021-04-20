@@ -99,12 +99,12 @@ const Node = AsyncInit.compose({
     nodeNetworkId: null
   }
 }, {
-  async init ({ forceCompatibility = false }) {
+  async init ({ ignoreVersion = false }) {
     const { nodeRevision: revision, genesisKeyBlockHash: genesisHash, networkId, protocols } = await this.api.getStatus()
     this.consensusProtocolVersion = await this.getConsensusProtocolVersion(protocols)
     if (
       !semverSatisfies(this.version, NODE_GE_VERSION, NODE_LT_VERSION) &&
-      !forceCompatibility
+      !ignoreVersion
     ) {
       throw new Error(
         `Unsupported node version ${this.version}. ` +

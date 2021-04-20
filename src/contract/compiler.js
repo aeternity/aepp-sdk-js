@@ -96,15 +96,15 @@ async function getBytecodeCompilerVersion (bytecode, options = {}) {
   return this.http.post('/compiler-version', { bytecode, options: this.prepareCompilerOption(options) }, options)
 }
 
-async function setCompilerUrl (url, { forceCompatibility = false } = {}) {
+async function setCompilerUrl (url, { ignoreVersion = false } = {}) {
   this.http.changeBaseUrl(url)
   this.compilerVersion = await this.getCompilerVersion().catch(e => null)
-  await this.checkCompatibility({ forceCompatibility })
+  await this.checkCompatibility({ ignoreVersion })
 }
 
-async function checkCompatibility ({ force = false, forceCompatibility = false } = {}) {
+async function checkCompatibility ({ force = false, ignoreVersion = false } = {}) {
   if (!this.compilerVersion && !force) throw new Error('Compiler do not respond')
-  if (!forceCompatibility && this.compilerVersion && !semverSatisfies(this.compilerVersion, COMPILER_GE_VERSION, COMPILER_LT_VERSION)) {
+  if (!ignoreVersion && this.compilerVersion && !semverSatisfies(this.compilerVersion, COMPILER_GE_VERSION, COMPILER_LT_VERSION)) {
     const version = this.compilerVersion
     this.compilerVersion = null
     throw new Error(`Unsupported compiler version ${version}. ` +
@@ -134,10 +134,10 @@ function isInit () {
  * @example ContractCompilerAPI({ compilerUrl: 'COMPILER_URL' })
  */
 const ContractCompilerAPI = AsyncInit.compose(ContractBase, {
-  async init ({ compilerUrl = this.compilerUrl, forceCompatibility = false }) {
+  async init ({ compilerUrl = this.compilerUrl, ignoreVersion = false }) {
     this.http = Http({ baseUrl: compilerUrl })
     this.compilerVersion = await this.getCompilerVersion().catch(e => null)
-    await this.checkCompatibility({ force: true, forceCompatibility })
+    await this.checkCompatibility({ force: true, ignoreVersion })
   },
   methods: {
     contractEncodeCallDataAPI,
