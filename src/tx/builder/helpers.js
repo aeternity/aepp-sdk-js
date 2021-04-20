@@ -13,7 +13,6 @@ import { toBytes } from '../../utils/bytes'
 import {
   ID_TAG_PREFIX,
   PREFIX_ID_TAG,
-  AENS_NAME_DOMAINS,
   NAME_BID_RANGES,
   NAME_BID_MAX_LENGTH,
   NAME_FEE,
@@ -94,26 +93,6 @@ export function formatSalt (salt) {
 }
 
 /**
- * Calculate 256bits Blake2b nameId of `input`
- * as defined in https://github.com/aeternity/protocol/blob/master/AENS.md#hashing
- * @rtype (input: String) => hash: String
- * @param {String} input - Data to hash
- * @return {Buffer} Hash
- */
-export function nameHash (input) {
-  let buf = Buffer.allocUnsafe(32).fill(0)
-  if (!input) {
-    return buf
-  } else {
-    const labels = input.split('.')
-    for (let i = 0; i < labels.length; i++) {
-      buf = hash(Buffer.concat([buf, hash(labels[i])]))
-    }
-    return buf
-  }
-}
-
-/**
  * Encode a domain name
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
@@ -121,9 +100,8 @@ export function nameHash (input) {
  * @return {String} `nm_` prefixed encoded domain name
  */
 export function produceNameId (name) {
-  const namespace = R.last(name.split('.'))
-  if (namespace === 'chain') return encode(hash(name.toLowerCase()), 'nm')
-  return encode(nameHash(name), 'nm')
+  ensureNameValid(name)
+  return encode(hash(name.toLowerCase()), 'nm')
 }
 
 /**
@@ -139,9 +117,8 @@ export function produceNameId (name) {
  * @return {String} Commitment hash
  */
 export function commitmentHash (name, salt = createSalt()) {
-  const namespace = R.last(name.split('.'))
-  if (namespace === 'chain') return `cm_${encodeBase58Check(hash(Buffer.concat([Buffer.from(name.toLowerCase()), formatSalt(salt)])))}`
-  return `cm_${encodeBase58Check(hash(Buffer.concat([nameHash(name.toLowerCase()), formatSalt(salt)])))}`
+  ensureNameValid(name)
+  return `cm_${encodeBase58Check(hash(Buffer.concat([Buffer.from(name.toLowerCase()), formatSalt(salt)])))}`
 }
 
 /**
@@ -256,21 +233,32 @@ export function readPointers (pointers) {
 }
 
 /**
+ * Ensure that name is valid
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
+ * @param {string} name
+ * @return void
+ * @throws Error
+ */
+export function ensureNameValid (name) {
+  if (!name || typeof name !== 'string') throw new Error('Name must be a string')
+  if (!name.endsWith('.chain')) throw new Error(`Name should end with .chain: ${name}`)
+}
+
+/**
  * Is name valid
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param {string} name
- * @param {boolean} [throwError=true] Throw error on invalid
  * @return Boolean
- * @throws Error
  */
-export function isNameValid (name, throwError = true) {
-  if ((!name || typeof name !== 'string') && throwError) throw new Error('AENS: Name must be a string')
-  if (!AENS_NAME_DOMAINS.includes(R.last(name.split('.')))) {
-    if (throwError) throw new Error(`AENS: Invalid name domain. Possible domains [${AENS_NAME_DOMAINS}]`)
+export function isNameValid (name) {
+  try {
+    ensureNameValid(name)
+    return true
+  } catch (error) {
     return false
   }
-  return true
 }
 
 /**
@@ -373,27 +361,4 @@ export function getContractBackendFromTx ({ abiVersion } = {}) {
  */
 export function isAuctionName (name) {
   return name.replace('.chain', '').length < 13
-}
-
-export default {
-  readPointers,
-  buildPointers,
-  buildContractId,
-  readId,
-  writeId,
-  readInt,
-  writeInt,
-  encode,
-  decode,
-  commitmentHash,
-  formatSalt,
-  oracleQueryId,
-  getContractBackendFromTx,
-  createSalt,
-  buildHash,
-  isNameValid,
-  produceNameId,
-  classify,
-  isAuctionName,
-  validatePointers
 }

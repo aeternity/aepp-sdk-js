@@ -18,7 +18,7 @@
 import { describe, it, before } from 'mocha'
 import { encodeBase58Check, encodeBase64Check, generateKeyPair, salt } from '../../src/utils/crypto'
 import { getSdk } from './index'
-import { commitmentHash, isNameValid, oracleQueryId } from '../../src/tx/builder/helpers'
+import { commitmentHash, oracleQueryId } from '../../src/tx/builder/helpers'
 import { MemoryAccount } from '../../src'
 import { AE_AMOUNT_FORMATS } from '../../src/utils/amount-formatter'
 import { unpackTx } from '../../src/tx/builder'
@@ -29,7 +29,7 @@ const clientTtl = 1
 const amount = 0
 const senderId = 'ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688'
 const recipientId = 'ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688'
-const name = 'test123test.test'
+const name = 'test123test.chain'
 const nameHash = `nm_${encodeBase58Check(Buffer.from(name))}`
 const nameId = 'nm_2sFnPHi5ziAqhdApSpRBsYdomCahtmk3YGNZKYUTtUNpVSMccC'
 const nameFee = '1000000000000000000000'
@@ -257,13 +257,6 @@ describe('Native Transaction', function () {
     nonce.should.be.equal(accountNonce + 1)
     const nonceCustom = await client.getAccountNonce(await client.address(), 1)
     nonceCustom.should.be.equal(1)
-  })
-  it('Is name valid', () => {
-    try {
-      isNameValid('asdasdasd.testDomain')
-    } catch (e) {
-      e.message.indexOf('AENS: Invalid name domain').should.not.be.equal(-1)
-    }
   })
   it('Destroy instance', () => {
     client.destroyInstance()
