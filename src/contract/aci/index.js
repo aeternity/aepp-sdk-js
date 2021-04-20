@@ -25,7 +25,6 @@
 import * as R from 'ramda'
 import BigNumber from 'bignumber.js'
 
-import semverSatisfies from '../../utils/semver-satisfies'
 import {
   buildContractMethods,
   decodeCallResult,
@@ -34,7 +33,6 @@ import {
   prepareArgsForEncode as prepareArgs
 } from './helpers'
 import { isAddressValid } from '../../utils/crypto'
-import { COMPILER_LT_VERSION } from '../compiler'
 
 /**
  * Generate contract ACI object with predefined js methods for contract usage - can be used for creating a reference to already deployed contracts
@@ -86,8 +84,7 @@ export default async function getContractInstance (source, { aci, contractAddres
     if (!isAddressValid(contractAddress, 'ct')) throw new Error('Invalid contract address')
     const contract = await this.getContract(contractAddress).catch(e => null)
     if (!contract || !contract.active) throw new Error(`Contract with address ${contractAddress} not found on-chain or not active`)
-    // Check if we are using compiler version gte then 4.1.0(has comparing bytecode API)
-    if (!forceCodeCheck && semverSatisfies(this.compilerVersion, '4.1.0', COMPILER_LT_VERSION)) {
+    if (!forceCodeCheck) {
       const onChanByteCode = (await this.getContractByteCode(contractAddress)).bytecode
       const isCorrespondingBytecode = await this.validateByteCodeAPI(onChanByteCode, instance.source, instance.options).catch(e => false)
       if (!isCorrespondingBytecode) throw new Error('Contract source do not correspond to the contract bytecode deployed on the chain')
