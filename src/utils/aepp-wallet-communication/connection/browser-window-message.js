@@ -27,7 +27,7 @@ import stampit from '@stamp/it'
 import WalletConnection from '.'
 import { v4 as uuid } from 'uuid'
 import { MESSAGE_DIRECTION } from '../schema'
-import { isContentScript, isInIframe } from '../helpers'
+import { getBrowserAPI, isInIframe } from '../helpers'
 
 /**
  * Check if connected
@@ -97,10 +97,10 @@ function sendMessage (msg) {
 }
 
 const getTarget = () => {
-  const isCS = isContentScript()
-  if (isCS) {
-    return window
-  }
+  const isExtensionContext = typeof getBrowserAPI(true).extension === 'object'
+  const isWeb = window && window.location && window.location.protocol.startsWith('http')
+  const isContentScript = isExtensionContext && isWeb
+  if (isContentScript) return window
   // When we is the main page we need to decide the target by our self
   // Probably can be implemented some algo for checking DOM for Iframes and somehow decide which Iframe to talk
   return isInIframe() ? window.parent : undefined

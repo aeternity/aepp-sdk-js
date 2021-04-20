@@ -3,8 +3,6 @@
  */
 import { isAccountBase } from '../../account/base'
 
-const isWeb = () => window && window.location && window.location.protocol.startsWith('http')
-
 export const getBrowserAPI = (force = false) => {
   const { chrome, browser } = window
   // Chrome, Opera support
@@ -15,19 +13,7 @@ export const getBrowserAPI = (force = false) => {
   return {}
 }
 
-const isExtensionContext = () => {
-  const browser = getBrowserAPI(true)
-  return typeof browser === 'object' && browser && typeof browser.extension === 'object'
-}
-
-export const isContentScript = () => isExtensionContext() && isWeb()
-
 export const isInIframe = () => window !== window.parent
-
-export const getWindow = (force = false) => {
-  if (!window && !force) throw new Error('Browser is not detected')
-  return window
-}
 
 /**
  * RPC helper functions
@@ -52,14 +38,6 @@ export const sendMessage = (connection) => {
     })
     return id
   }
-}
-
-export const receive = (handler) => (msg, origin) => {
-  if (!msg || !msg.jsonrpc || msg.jsonrpc !== '2.0' || !msg.method) {
-    console.warn('Receive invalid message', msg)
-    return
-  }
-  handler(msg, origin)
 }
 
 export const getHandler = (schema, msg, { debug = false } = {}) => {

@@ -21,76 +21,10 @@
  * This is the complement to {@link module:@aeternity/aepp-sdk/es/utils}.
  * @module @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector
  * @export WalletDetector
- * @example import WalletDetector from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector'
  */
 import stampit from '@stamp/it'
 import BrowserWindowMessageConnection from './connection/browser-window-message'
 import { MESSAGE_DIRECTION, METHODS } from './schema'
-
-const wallets = {}
-
-const getOrigin = ({ isExtension, origin }) => {
-  if (isExtension) {
-    return window.origin
-  }
-  return origin
-}
-
-const handleDetection = (onDetected) => ({ method, params }, origin, source) => {
-  if (!method || !params) return
-  const ifExist = Object.prototype.hasOwnProperty.call(wallets, params.id)
-  if (method === METHODS.wallet.readyToConnect && !ifExist) {
-    const w = {
-      ...params,
-      async getConnection () {
-        // if detect extension wallet or page wallet
-        const isExtension = this.type === 'extension'
-        const origin = getOrigin({ isExtension, origin: this.origin })
-        return BrowserWindowMessageConnection({
-          connectionInfo: this,
-          sendDirection: isExtension ? MESSAGE_DIRECTION.to_waellet : undefined,
-          receiveDirection: isExtension ? MESSAGE_DIRECTION.to_aepp : undefined,
-          target: source,
-          origin
-        })
-      }
-    }
-    wallets[w.id] = w
-    onDetected({ wallets, newWallet: w })
-  }
-}
-
-/**
- * Start scanning
- * @function scan
- * @instance
- * @param {Function} onDetected Call-back function which trigger on new wallet
- * @return {void}
- */
-function scan (onDetected) {
-  this.connection.connect(handleDetection(onDetected))
-  !Object.keys(wallets).length || onDetected({ wallets })
-}
-
-/**
- * Stop scanning
- * @function stopScan
- * @instance
- * @return {void}
- */
-function stopScan () {
-  this.connection.disconnect()
-}
-
-/**
- * Get wallet list
- * @function getWallets
- * @instance
- * @return {Array} Available wallets
- */
-function getWallets () {
-  return wallets
-}
 
 /**
  * WalletDetector stamp
@@ -101,12 +35,54 @@ function getWallets () {
  * @param {WalletConnection} params.connection - Connection for listening for wallets
  * @return {WalletDetector}
  */
-export const WalletDetector = stampit({
+export default stampit({
   init ({ connection } = {}) {
     if (!window) throw new Error('Window object not found, you can run wallet detector only in browser')
     this.connection = connection || BrowserWindowMessageConnection({ connectionInfo: { id: 'spy' } })
+    this.wallets = {}
   },
-  methods: { scan, stopScan, getWallets }
-})
+  methods: {
+    /**
+     * Start scanning
+     * @function scan
+     * @instance
+     * @param {Function} onDetected Call-back function which trigger on new wallet
+     * @return {void}
+     */
+    scan (onDetected) {
+      const { wallets } = this
+      this.connection.connect(({ method, params }, origin, source) => {
+        if (!method || !params || method !== METHODS.wallet.readyToConnect || wallets[params.id]) return
 
-export default WalletDetector
+        const wallet = {
+          ...params,
+          async getConnection () {
+            // if detect extension wallet or page wallet
+            const isExtension = this.type === 'extension'
+            const origin = isExtension ? window.origin : this.origin
+            return BrowserWindowMessageConnection({
+              connectionInfo: this,
+              sendDirection: isExtension ? MESSAGE_DIRECTION.to_waellet : undefined,
+              receiveDirection: isExtension ? MESSAGE_DIRECTION.to_aepp : undefined,
+              target: source,
+              origin
+            })
+          }
+        }
+        wallets[wallet.id] = wallet
+        onDetected({ wallets, newWallet: wallet })
+      })
+      if (Object.keys(wallets).length) onDetected({ wallets })
+    },
+
+    /**
+    * Stop scanning
+    * @function stopScan
+    * @instance
+    * @return {void}
+    */
+    stopScan () {
+      this.connection.disconnect()
+    }
+  }
+})

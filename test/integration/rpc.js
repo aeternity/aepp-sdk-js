@@ -20,12 +20,7 @@ import { MemoryAccount, Node, RpcAepp, RpcWallet } from '../../src'
 import { unpackTx } from '../../src/tx/builder'
 import { decode } from '../../src/tx/builder/helpers'
 import BrowserWindowMessageConnection from '../../src/utils/aepp-wallet-communication/connection/browser-window-message'
-import {
-  getBrowserAPI,
-  getHandler,
-  getWindow, isInIframe,
-  receive
-} from '../../src/utils/aepp-wallet-communication/helpers'
+import { getBrowserAPI, getHandler } from '../../src/utils/aepp-wallet-communication/helpers'
 import { METHODS, RPC_STATUS } from '../../src/utils/aepp-wallet-communication/schema'
 import { generateKeyPair, verify } from '../../src/utils/crypto'
 import { compilerUrl, genesisAccount, internalUrl, networkId, publicKey, url } from './'
@@ -222,15 +217,14 @@ describe('Aepp<->Wallet', function () {
       addressees[0].should.be.equal(publicKey)
     })
     it('Not authorize', async () => {
-      const rpcClients = wallet.getClients()
-      const client = Array.from(rpcClients.clients.values())[0]
-      rpcClients.updateClientInfo(client.id, { status: RPC_STATUS.DISCONNECTED })
+      const client = Object.entries(wallet.rpcClients)[0][1]
+      client.updateInfo({ status: RPC_STATUS.DISCONNECTED })
       try {
         await aepp.askAddresses()
       } catch (e) {
         e.code.should.be.equal(10)
         e.message.should.be.equal('You are not connected to the wallet')
-        rpcClients.updateClientInfo(client.id, { status: RPC_STATUS.CONNECTED })
+        client.updateInfo({ status: RPC_STATUS.CONNECTED })
       }
     })
     it('Sign transaction: wallet deny', async () => {
@@ -487,23 +481,12 @@ describe('Aepp<->Wallet', function () {
         e.message.should.be.equal('Unsupported Network')
       }
     })
-    it('Try add already existed action', async () => {
-      try {
-        aepp.rpcClient.addAction({ id: 1 }, [])
-      } catch (e) {
-        e.message.should.be.equal('Action for this request already exist')
-      }
-    })
     it('Process response ', async () => {
       try {
         await aepp.rpcClient.processResponse({ id: 11, error: {} })
       } catch (e) {
         e.message.should.be.equal('Can\'t find callback for this messageId ' + 11)
       }
-    })
-    it('Try to get wallet clients', async () => {
-      const clients = wallet.getClients()
-      clients.should.be.a('Object')
     })
     it('Disconnect from wallet', async () => {
       const received = await new Promise((resolve, reject) => {
@@ -537,22 +520,19 @@ describe('Aepp<->Wallet', function () {
         target: connections.waelletConnection
       }))
 
-      wallet.removeRpcClient(id).should.be.equal(true)
-      wallet.getClients().clients.size.should.be.equal(1)
+      wallet.removeRpcClient(id)
+      Object.keys(wallet.rpcClients).length.should.be.equal(1)
     })
     it('Remove rpc client: client not found', async () => {
       try {
         wallet.removeRpcClient('a1')
       } catch (e) {
-        e.message.should.be.equal('Wallet RpcClient with id a1 do not exist')
+        e.message.should.be.equal('RpcClient with id a1 do not exist')
       }
     })
   })
 
   describe('Rpc helpers', () => {
-    it('Receive invalid message', () => {
-      (!receive(() => true)(false)).should.be.equal(true)
-    })
     it('receive unknown method', async () => {
       (await getHandler({}, { method: 'hey' })()()).should.be.equal(true)
     })
@@ -575,17 +555,6 @@ describe('Aepp<->Wallet', function () {
     it('getBrowserAPI: firefox', () => {
       global.window = { location: { origin: '//test' }, browser: { runtime: {}, firefox: true } }
       getBrowserAPI().firefox.should.be.equal(true)
-    })
-    it('isInIframe/getWindow', () => {
-      global.window = null
-      try {
-        getWindow()
-      } catch (e) {
-        e.message.should.be.equal('Browser is not detected')
-      }
-      global.window = {}
-      isInIframe().should.be.equal(true)
-      getWindow().should.be.an('Object')
     })
     it('Send message from content script', async () => {
       connectionFromWalletToAepp.disconnect()
