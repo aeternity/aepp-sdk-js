@@ -19,7 +19,7 @@
  * Universal module
  * @module @aeternity/aepp-sdk/es/ae/universal
  * @export Universal
- * @example import Ae from '@aeternity/aepp-sdk/es/ae/universal'
+ * @example import { Universal } from '@aeternity/aepp-sdk'
  */
 
 import Ae from './'

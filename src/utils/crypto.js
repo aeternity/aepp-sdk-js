@@ -18,7 +18,7 @@
 /**
  * Crypto module
  * @module @aeternity/aepp-sdk/es/utils/crypto
- * @example import * as Crypto from '@aeternity/aepp-sdk/es/utils/crypto'
+ * @example import { Crypto } from '@aeternity/aepp-sdk'
  */
 
 import bs58check from 'bs58check'

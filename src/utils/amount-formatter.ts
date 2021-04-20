@@ -18,7 +18,7 @@
 /**
  * Amount Formatter
  * @module @aeternity/aepp-sdk/es/utils/amount-formatter
- * @example import { format, toAettos, AE_AMOUNT_FORMATS } from '@aeternity/aepp-sdk/es/utils/amount-formatter'
+ * @example import { AmountFormatter } from '@aeternity/aepp-sdk'
  */
 import BigNumber from 'bignumber.js'
 import { asBigNumber, isBigNumber } from './bignumber'

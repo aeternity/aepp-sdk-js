@@ -27,7 +27,7 @@ import { ceil } from '../../utils/bignumber'
  * JavaScript-based Transaction builder helper function's
  * @module @aeternity/aepp-sdk/es/tx/builder/helpers
  * @export TxBuilderHelper
- * @example import TxBuilderHelper from '@aeternity/aepp-sdk/es/tx/builder/helpers'
+ * @example import { TxBuilderHelper } from '@aeternity/aepp-sdk'
  */
 
 export const createSalt = salt

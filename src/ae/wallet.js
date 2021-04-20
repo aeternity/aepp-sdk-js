@@ -19,7 +19,7 @@
  * Wallet module
  * @module @aeternity/aepp-sdk/es/ae/wallet
  * @export Wallet
- * @example import Wallet from '@aeternity/aepp-sdk/es/ae/wallet'
+ * @example import { RpcWallet } from '@aeternity/aepp-sdk'
  */
 
 import Ae from './'

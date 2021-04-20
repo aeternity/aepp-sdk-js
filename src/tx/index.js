@@ -19,7 +19,7 @@
  * Tx module
  * @module @aeternity/aepp-sdk/es/tx
  * @export Tx
- * @example import Tx from '@aeternity/aepp-sdk/es/tx'
+ * @example import { Tx } from '@aeternity/aepp-sdk'
  */
 
 import stampit from '@stamp/it'

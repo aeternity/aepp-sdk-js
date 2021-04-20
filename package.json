@@ -4,8 +4,10 @@
   "description": "SDK for the æternity blockchain",
   "main": "dist/aepp-sdk.js",
   "types": "es/index.d.ts",
-  "browser": "dist/aepp-sdk.browser.js",
   "module": "es/index.js",
+  "browser": {
+    "dist/aepp-sdk.js": "./dist/aepp-sdk.browser.js"
+  },
   "sideEffects": false,
   "scripts": {
     "build": "tsc && webpack -p && babel src --config-file ./babel.esm.config.js --out-dir es --extensions '.js,.ts' --source-maps true",

@@ -31,7 +31,7 @@ import { DRY_RUN_ACCOUNT, NAME_ID_KEY } from '../tx/builder/schema'
  * This is the complement to {@link module:@aeternity/aepp-sdk/es/chain}.
  * @module @aeternity/aepp-sdk/es/chain/node
  * @export ChainNode
- * @example import ChainNode from '@aeternity/aepp-sdk/es/chain/node'
+ * @example import { ChainNode } from '@aeternity/aepp-sdk'
  */
 
 async function sendTransaction (tx, options = {}) {

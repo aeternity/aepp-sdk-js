@@ -23,8 +23,7 @@
  *
  * @module @aeternity/aepp-sdk/es/ae/contract
  * @export Contract
- * @example import Contract from '@aeternity/aepp-sdk/es/ae/contract' (Using tree-shaking)
- * @example import { Contract } from '@aeternity/aepp-sdk' (Using bundle)
+ * @example import { Contract } from '@aeternity/aepp-sdk'
  */
 
 import Ae from './'

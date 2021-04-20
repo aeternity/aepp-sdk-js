@@ -20,12 +20,12 @@ recent change in [Babel] compilation and fully compliant with the standard.
 The recommended approach to use aepp-sdk is to import one of the following _Ae
 Factories_ based on the specific use case:
 
-* [@aeternity/aepp-sdk/es/ae/wallet](api/ae/wallet.md): for **Wallet**'s focused development
-* [@aeternity/aepp-sdk/es/ae/contract](api/ae/contract.md): for **Contract**'s focused development
-* [@aeternity/aepp-sdk/es/ae/aepp](api/ae/aepp.md): for **Web Aepp**'s focused development ⚠️ **_No Wallet support_**
-* [@aeternity/aepp-sdk/es/ae/aens](api/ae/aens.md): for **AENs**' focused development
-* [@aeternity/aepp-sdk/es/ae/oracle](api/ae/oracle.md): for **Oracle**'s focused development
-* [@aeternity/aepp-sdk/es/ae/universal](api/ae/universal.md): for **Universal** development (includes all SDK features)
+* [`RpcWallet`](api/ae/wallet.md): for **Wallet**'s focused development
+* [`Contract`](api/ae/contract.md): for **Contract**'s focused development
+* [`RpcAepp`](api/ae/aepp.md): for **Web Aepp**'s focused development ⚠️ **_No Wallet support_**
+* [`Aens`](api/ae/aens.md): for **AENs**' focused development
+* [`Oracle`](api/ae/oracle.md): for **Oracle**'s focused development
+* [`Universal`](api/ae/universal.md): for **Universal** development (includes all SDK features)
 
 In order to cater more specific needs, it is recommended to refer to the
 [contributing Docs](contrib/README.md).

@@ -11,9 +11,7 @@ The following code snippet shows how to generate
 signatures for name transactions delegation to a contract
 
 ```js
-import Universal from '@aeternity/aepp-sdk/es/ae/universal'
-import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
-import * as Crypto from '@aeternity/aepp-sdk/es/utils/crypto'
+import { Universal, MemoryAccount, Crypto } from '@aeternity/aepp-sdk'
 
 // Init account
 const keypair = Crypto.generateKeyPair()

@@ -19,7 +19,7 @@
  * Aepp module
  * @module @aeternity/aepp-sdk/es/ae/aepp
  * @export Aepp
- * @example import Ae from '@aeternity/aepp-sdk/es/ae/aepp'
+ * @example import { RpcAepp } from '@aeternity/aepp-sdk'
  */
 
 import Ae from './'

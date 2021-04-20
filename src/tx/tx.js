@@ -19,7 +19,7 @@
  * Transaction module
  * @module @aeternity/aepp-sdk/es/tx/tx
  * @export Transaction
- * @example import Transaction from '@aeternity/aepp-sdk/es/tx/tx'
+ * @example import { Transaction } from '@aeternity/aepp-sdk'
  */
 
 import * as R from 'ramda'

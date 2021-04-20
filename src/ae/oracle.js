@@ -23,7 +23,7 @@
  * repository.
  * @module @aeternity/aepp-sdk/es/ae/oracle
  * @export Oracle
- * @example import Oracle from '@aeternity/aepp-sdk/es/ae/oracle'
+ * @example import { Oracle } from '@aeternity/aepp-sdk'
  */
 
 import Ae from './'

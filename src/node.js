@@ -19,7 +19,7 @@
  * Node module
  * @module @aeternity/aepp-sdk/es/node
  * @export Node
- * @example import Node from '@aeternity/aepp-sdk/es/node'
+ * @example import { Node } from '@aeternity/aepp-sdk'
  */
 
 import AsyncInit from './utils/async-init'

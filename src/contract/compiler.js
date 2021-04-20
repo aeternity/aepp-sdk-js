@@ -21,7 +21,7 @@
  * This is the complement to {@link module:@aeternity/aepp-sdk/es/contract}.
  * @module @aeternity/aepp-sdk/es/contract/compiler
  * @export ContractCompilerAPI
- * @example import ContractCompilerAPI from '@aeternity/aepp-sdk/es/contract/compiler'
+ * @example import { ContractCompilerAPI } from '@aeternity/aepp-sdk'
  */
 
 import Http from '../utils/http'
