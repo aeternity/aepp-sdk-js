@@ -19,14 +19,12 @@
  * ContractACI module
  *
  * @module @aeternity/aepp-sdk/es/contract/aci
- * @export ContractACI
- * @example import ContractACI from '@aeternity/aepp-sdk/es/contract/aci'
+ * @export getContractInstance
  */
 
 import * as R from 'ramda'
 import BigNumber from 'bignumber.js'
 
-import AsyncInit from '../../utils/async-init'
 import semverSatisfies from '../../utils/semver-satisfies'
 import {
   buildContractMethods,
@@ -37,9 +35,6 @@ import {
 } from './helpers'
 import { isAddressValid } from '../../utils/crypto'
 import { COMPILER_LT_VERSION } from '../compiler'
-import { AMOUNT, DEPOSIT, GAS, MIN_GAS_PRICE } from '../../tx/builder/schema'
-// TODO remove when Breaking Changes release is coming
-export const prepareArgsForEncode = prepareArgs
 
 /**
  * Generate contract ACI object with predefined js methods for contract usage - can be used for creating a reference to already deployed contracts
@@ -60,17 +55,14 @@ export const prepareArgsForEncode = prepareArgs
  * Also you can call contract like: await contractIns.methods.setState(123, options)
  * Then sdk decide to make on-chain or static call(dry-run API) transaction based on function is stateful or not
  */
-async function getContractInstance (source, { aci, contractAddress, filesystem = {}, forceCodeCheck = true, opt } = {}) {
+export default async function getContractInstance (source, { aci, contractAddress, filesystem = {}, forceCodeCheck = true, opt } = {}) {
   aci = aci || await this.contractGetACI(source, { filesystem })
   if (contractAddress) contractAddress = await this.resolveName(contractAddress, 'ct', { resolveByNode: true })
   const defaultOptions = {
+    ...this.Ae.defaults,
     skipArgsConvert: false,
     skipTransformDecoded: false,
     callStatic: false,
-    deposit: DEPOSIT,
-    gasPrice: MIN_GAS_PRICE, // min gasPrice 1e9
-    amount: AMOUNT,
-    gas: GAS,
     waitMined: true,
     verify: false,
     filesystem
@@ -204,20 +196,3 @@ const compile = ({ client, instance }) => async (options = {}) => {
   instance.compiled = bytecode
   return instance.compiled
 }
-
-/**
- * Contract ACI Stamp
- *
- * @function
- * @alias module:@aeternity/aepp-sdk/es/contract/aci
- * @rtype Stamp
- * @return {Object} Contract compiler instance
- * @example ContractACI()
- */
-
-export const ContractACI = AsyncInit.compose({
-  methods: {
-    getContractInstance
-  }
-})
-export default ContractACI
