@@ -28,7 +28,6 @@
 
 import Ae from './'
 import * as R from 'ramda'
-import { isBase64 } from '../utils/string'
 import ContractCompilerAPI from '../contract/compiler'
 import ContractBase from '../contract'
 import getContractInstance from '../contract/aci'
@@ -36,22 +35,14 @@ import NodePool from '../node-pool'
 import { AMOUNT, DEPOSIT, DRY_RUN_ACCOUNT, GAS, MIN_GAS_PRICE } from '../tx/builder/schema'
 import { decode, produceNameId } from '../tx/builder/helpers'
 import TxObject from '../tx/tx-object'
-import { decodeBase64Check } from '../utils/crypto'
 
-async function sendAndProcess (tx, options) {
+async function _sendAndProcess (tx, source, name, options) {
   const txData = await this.send(tx, options)
-
-  if (options.waitMined === false) {
-    return { hash: txData.hash, rawTx: txData.rawTx }
-  }
-
-  const result = await this.getTxInfo(txData.hash)
-
-  if (result.returnType !== 'ok') {
-    await this._handleCallError(result, txData.rawTx)
-  }
-
-  return { hash: txData.hash, tx: TxObject({ tx: txData.rawTx }), result, txData, rawTx: txData.rawTx }
+  const result = { hash: txData.hash, tx: TxObject({ tx: txData.rawTx }), txData, rawTx: txData.rawTx }
+  if (options.waitMined === false) return result
+  const txInfo = await this.getTxInfo(txData.hash)
+  await this._handleCallError(source, name, txInfo)
+  return { ...result, result: txInfo }
 }
 
 /**
@@ -60,24 +51,17 @@ async function sendAndProcess (tx, options) {
  * @private
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
+ * @param {String} source contract source code
+ * @param {String} name name of called method
  * @param {Object} result call result object
- * @param {String} rawTx Raw transaction
  * @throws Error Decoded error
  * @return {Promise<void>}
  */
-async function _handleCallError (result, rawTx) {
-  let error = Buffer.from(result.returnValue).toString()
-  error = isBase64(error.slice(3))
-    ? decodeBase64Check(error.slice(3)).toString()
-    : await this.contractDecodeDataAPI('string', error)
-  throw Object.assign(
-    new Error(`Invocation failed${error ? `: "${error}"` : ''}`), {
-      ...result,
-      tx: TxObject({ tx: rawTx }),
-      error,
-      rawTx
-    }
-  )
+async function _handleCallError (source, name, result) {
+  if (result.returnType === 'ok') return
+  const error = await this.contractDecodeCallResultAPI(source, name, result.returnValue, result.returnType)
+  const message = error[{ revert: 'abort' }[result.returnType] || result.returnType][0]
+  throw new Error(`Invocation failed${message ? `: "${message}"` : ''}`)
 }
 
 /**
@@ -162,10 +146,8 @@ async function contractCallStatic (source, address, name, args = [], options = {
 
   const { callObj, ...dryRunOther } = await this.txDryRun(tx, callerId, options)
 
+  await this._handleCallError(source, name, callObj)
   const { returnType, returnValue } = callObj
-  if (returnType !== 'ok') {
-    await this._handleCallError(callObj, tx)
-  }
   return {
     ...dryRunOther,
     tx: TxObject({ tx }),
@@ -202,7 +184,7 @@ async function contractCall (source, address, name, argsOrCallData = [], options
     callData: Array.isArray(argsOrCallData) ? await this.contractEncodeCall(source, name, argsOrCallData, opt) : argsOrCallData
   }))
 
-  const { hash, rawTx, result, txData } = await sendAndProcess.call(this, tx, opt)
+  const { hash, rawTx, result, txData } = await this._sendAndProcess(tx, source, name, opt)
   return {
     hash,
     rawTx,
@@ -246,7 +228,7 @@ async function contractDeploy (code, source, initState = [], options = {}) {
     ownerId
   }))
 
-  const { hash, rawTx, result, txData } = await sendAndProcess.call(this, tx, opt)
+  const { hash, rawTx, result, txData } = await this._sendAndProcess(tx, source, 'init', opt)
   return Object.freeze({
     result,
     owner: ownerId,
@@ -452,6 +434,7 @@ export const ContractAPI = Ae.compose(ContractBase, {
     contractEncodeCall,
     contractDecodeData,
     _handleCallError,
+    _sendAndProcess,
     // Delegation for contract
     // AENS
     delegateSignatureCommon,
