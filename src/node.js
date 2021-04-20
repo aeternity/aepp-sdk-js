@@ -75,8 +75,8 @@ async function getConsensusProtocolVersion (protocols = [], height) {
 const Node = AsyncInit.compose({
   async init ({ url, internalUrl }) {
     if (!url) throw new Error('"url" required')
-    this.url = url.replace(/\/?$/, '')
-    this.internalUrl = internalUrl ? internalUrl.replace(/\/?$/, '') : this.url
+    this.url = url.replace(/\/$/, '')
+    this.internalUrl = internalUrl ? internalUrl.replace(/\/$/, '') : this.url
     const client = await genSwaggerClient(`${this.url}/api`, this.internalUrl)
     this.version = client.spec.info.version
     this.api = client.api
