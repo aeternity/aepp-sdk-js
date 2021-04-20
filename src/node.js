@@ -103,11 +103,7 @@ const Node = AsyncInit.compose({
     const { nodeRevision: revision, genesisKeyBlockHash: genesisHash, networkId, protocols } = await this.api.getStatus()
     this.consensusProtocolVersion = await this.getConsensusProtocolVersion(protocols)
     if (
-      (
-        !semverSatisfies(this.version, NODE_GE_VERSION, NODE_LT_VERSION) ||
-        this.version === '5.0.0-rc1'
-      ) &&
-      // Todo implement 'rc' version comparision in semverSatisfies
+      !semverSatisfies(this.version, NODE_GE_VERSION, NODE_LT_VERSION) &&
       !forceCompatibility
     ) {
       throw new Error(
@@ -121,7 +117,7 @@ const Node = AsyncInit.compose({
   }
 })
 
-const NODE_GE_VERSION = '5.0.0'
+const NODE_GE_VERSION = '5.0.1'
 const NODE_LT_VERSION = '6.0.0'
 
 export default Node
