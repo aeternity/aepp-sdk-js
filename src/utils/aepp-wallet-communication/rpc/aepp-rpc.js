@@ -83,7 +83,7 @@ const handleMessage = (instance) => async (msg) => {
  * @param {Object} connection Wallet connection object
  * @return {Object}
  */
-export const AeppRpc = Ae.compose({
+export default Ae.compose({
   async init ({ name, onAddressChange = voidFn, onDisconnect = voidFn, onNetworkChange = voidFn, connection, forceValidation = false, debug = false }) {
     const eventsHandlers = ['onDisconnect', 'onAddressChange', 'onNetworkChange']
     this.connection = connection
@@ -245,5 +245,3 @@ export const AeppRpc = Ae.compose({
     }
   }
 })
-
-export default AeppRpc

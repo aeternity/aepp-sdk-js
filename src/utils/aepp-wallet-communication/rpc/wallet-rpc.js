@@ -209,7 +209,7 @@ const handleMessage = (instance, id) => async (msg, origin) => {
  * @param {Function} onDisconnect Call-back function for disconnect event
  * @return {Object}
  */
-export const WalletRpc = Ae.compose(AccountMultiple, {
+export default Ae.compose(AccountMultiple, {
   init ({ name, onConnection, onSubscription, onSign, onDisconnect, onAskAccounts, onMessageSign, forceValidation = false, debug = false } = {}) {
     this.debug = debug
     const eventsHandlers = ['onConnection', 'onSubscription', 'onSign', 'onDisconnect', 'onMessageSign']
@@ -374,5 +374,3 @@ export const WalletRpc = Ae.compose(AccountMultiple, {
     }
   }
 })
-
-export default WalletRpc
