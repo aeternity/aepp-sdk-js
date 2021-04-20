@@ -9,7 +9,7 @@ import * as R from 'ramda'
 import { v4 as uuid } from 'uuid'
 
 import Ae from '../../../ae'
-import { RpcClient } from './rpc-clients'
+import RpcClient from './rpc-client'
 import { getHandler, message, voidFn } from '../helpers'
 import { METHODS, RPC_STATUS, VERSION } from '../schema'
 

@@ -1,10 +1,9 @@
 /**
- * RPC client helpers
+ * RpcClient module
  *
  * @module @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client
  * @export { RpcClient, RpcClients }
  * @example import RpcClient from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client'
- * @example import RpcClients from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client'
  */
 import stampit from '@stamp/it'
 
@@ -12,135 +11,18 @@ import { METHODS, RPC_STATUS, SUBSCRIPTION_TYPES } from '../schema'
 import { sendMessage, message, isValidAccounts } from '../helpers'
 
 /**
- * Contain functionality for managing multiple RPC clients (RpcClient stamp)
- * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client.RpcClients
- * @function
- * @rtype Stamp
- * @return {Object}
- */
-export const RpcClients = stampit({
-  init () {
-    this.clients = new Map()
-  },
-  methods: {
-    /**
-     * Check if has client by id
-     * @function hasClient
-     * @instance
-     * @memberOf @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client
-     * @rtype (id: (String|Number)) => Boolean
-     * @param {(String|Number)} id Client ID
-     * @return {Boolean}
-     */
-    hasClient (id) {
-      return this.clients.has(id)
-    },
-    /**
-     * Add new client
-     * @function addClient
-     * @instance
-     * @rtype (id: (String|Number), connectionInfo: Object) => void
-     * @param {(String|Number)} id Client ID
-     * @param {Object} connectionData Object containing `connectionInfo` and `connection` objects
-     * @return {void}
-     */
-    addClient (id, connectionData) {
-      if (this.hasClient(id)) console.warn(`Wallet RpcClient with id ${id} already exist`)
-      this.clients.set(id, RpcClient({ id, ...connectionData }))
-    },
-    /**
-     * Get clien by id
-     * @function getClient
-     * @instance
-     * @rtype (id: (String|Number)) => Object
-     * @param {(String|Number)} id Client ID
-     * @return {Object} RpcClient
-     */
-    getClient (id) {
-      return this.clients.get(id)
-    },
-    /**
-     * Remove and disiconnect client by ID
-     * @function removeClient
-     * @instance
-     * @rtype (id: (String|Number), { forceConnectionClose: boolean = false }) => boolean
-     * @param {(String|Number)} id Client ID
-     * @param forceConnectionClose
-     * @return {Boolean}
-     */
-    removeClient (id, { forceConnectionClose = false } = {}) {
-      if (!this.hasClient(id)) throw new Error(`Wallet RpcClient with id ${id} do not exist`)
-      this.clients.get(id).disconnect(forceConnectionClose)
-      this.clients.delete(id)
-      return true
-    },
-    /**
-     * Update client info by id
-     * @function updateClientInfo
-     * @instance
-     * @rtype (id: (String|Number), info: Object) => void
-     * @param {(String|Number)} id Client ID
-     * @param {Object} info Info to update (will be merged with current info object)
-     * @return {void}
-     */
-    updateClientInfo (id, info) {
-      const client = this.getClient(id)
-      client.info = { ...client.info, ...info }
-      this.clients.set(id, client)
-    },
-    /**
-     * Send notification to all client passing condition
-     * @function sendNotificationByCondition
-     * @instance
-     * @rtype (msg: Object, condition: Function) => void
-     * @param {Object} msg Msg object
-     * @param {Function} condition Condition function of (client: RpcClient) => Boolean
-     * @param transformMessage
-     * @return {void}
-     */
-    sendNotificationByCondition (msg, condition, transformMessage) {
-      if (typeof condition !== 'function') throw new Error('Condition argument must be a function which return boolean')
-      const clients = Array.from(
-        this.clients.values()
-      )
-        .filter(condition)
-      clients.forEach(client => client.sendMessage(typeof transformMessage === 'function' ? transformMessage(client, msg) : msg, true))
-    },
-    /**
-     * Call provided function for each rpc client which by condition
-     * @function operationByCondition
-     * @instance
-     * @rtype (condition: Function, operation: Function) => void
-     * @param {Function} condition Condition function of (client: RpcClient) => Boolean
-     * @param {Function} operation Operation function of (client: RpcClient) => void
-     * @return {void}
-     */
-    operationByCondition (condition, operation) {
-      if (typeof condition !== 'function') throw new Error('Condition argument must be a function which return boolean')
-      if (typeof operation !== 'function') throw new Error('Operation argument must be a function which return boolean')
-      Array
-        .from(this.clients.values())
-        .filter(condition)
-        .forEach(operation)
-    }
-  }
-})
-
-/**
  * Contain functionality for using RPC conection
  * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client
  * @function
  * @rtype Stamp
  * @param {Object} param Init params object
- * @param {String} param.id Client id
  * @param {String} param.name Client name
  * @param {Object} param.connection Connection object
  * @param {Function[]} param.handlers Arrays with two function for handling messages ([ onMessage: Function, onDisconnect: Function])
  * @return {Object}
  */
-export const RpcClient = stampit({
-  init ({ id, name, networkId, icons, connection, handlers: [onMessage, onDisconnect] }) {
-    this.id = id
+export default stampit({
+  init ({ name, networkId, icons, connection, handlers: [onMessage, onDisconnect] }) {
     this.connection = connection
     this.info = { name, networkId, icons }
     // {
@@ -203,6 +85,17 @@ export const RpcClient = stampit({
     }
   },
   methods: {
+    /**
+     * Update info
+     * @function updateInfo
+     * @instance
+     * @rtype (info: Object) => void
+     * @param {Object} info Info to update (will be merged with current info object)
+     * @return {void}
+     */
+    updateInfo (info) {
+      Object.assign(this.info, info)
+    },
     isHasAccounts () {
       return typeof this.accounts === 'object' &&
         typeof this.accounts.connected === 'object' &&

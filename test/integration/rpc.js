@@ -217,15 +217,14 @@ describe('Aepp<->Wallet', function () {
       addressees[0].should.be.equal(publicKey)
     })
     it('Not authorize', async () => {
-      const rpcClients = wallet.getClients()
-      const client = Array.from(rpcClients.clients.values())[0]
-      rpcClients.updateClientInfo(client.id, { status: RPC_STATUS.DISCONNECTED })
+      const client = Object.entries(wallet.rpcClients)[0][1]
+      client.updateInfo({ status: RPC_STATUS.DISCONNECTED })
       try {
         await aepp.askAddresses()
       } catch (e) {
         e.code.should.be.equal(10)
         e.message.should.be.equal('You are not connected to the wallet')
-        rpcClients.updateClientInfo(client.id, { status: RPC_STATUS.CONNECTED })
+        client.updateInfo({ status: RPC_STATUS.CONNECTED })
       }
     })
     it('Sign transaction: wallet deny', async () => {
@@ -496,10 +495,6 @@ describe('Aepp<->Wallet', function () {
         e.message.should.be.equal('Can\'t find callback for this messageId ' + 11)
       }
     })
-    it('Try to get wallet clients', async () => {
-      const clients = wallet.getClients()
-      clients.should.be.a('Object')
-    })
     it('Disconnect from wallet', async () => {
       const received = await new Promise((resolve, reject) => {
         let received = false
@@ -532,14 +527,14 @@ describe('Aepp<->Wallet', function () {
         target: connections.waelletConnection
       }))
 
-      wallet.removeRpcClient(id).should.be.equal(true)
-      wallet.getClients().clients.size.should.be.equal(1)
+      wallet.removeRpcClient(id)
+      Object.keys(wallet.rpcClients).length.should.be.equal(1)
     })
     it('Remove rpc client: client not found', async () => {
       try {
         wallet.removeRpcClient('a1')
       } catch (e) {
-        e.message.should.be.equal('Wallet RpcClient with id a1 do not exist')
+        e.message.should.be.equal('RpcClient with id a1 do not exist')
       }
     })
   })
