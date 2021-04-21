@@ -77,7 +77,7 @@ const Node = AsyncInit.compose({
     if (!url) throw new Error('"url" required')
     this.url = url.replace(/\/$/, '')
     this.internalUrl = internalUrl ? internalUrl.replace(/\/$/, '') : this.url
-    const client = await genSwaggerClient(`${this.url}/api`, this.internalUrl)
+    const client = await genSwaggerClient(`${this.url}/api`, { internalUrl: this.internalUrl })
     this.version = client.spec.info.version
     this.api = client.api
   },

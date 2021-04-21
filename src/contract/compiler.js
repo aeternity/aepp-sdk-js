@@ -24,102 +24,11 @@
  * @example import { ContractCompilerAPI } from '@aeternity/aepp-sdk'
  */
 
-import Http from '../utils/http'
 import ContractBase from './index'
 import semverSatisfies from '../utils/semver-satisfies'
 import AsyncInit from '../utils/async-init'
+import genSwaggerClient from '../utils/swagger'
 import { VM_TYPE } from '../tx/builder/schema'
-
-async function getCompilerVersion (options = {}) {
-  return this.http
-    .get('/api-version', options)
-    .then((res) => res['api-version'])
-}
-
-async function contractEncodeCallDataAPI (source, name, args = [], options = {}) {
-  this.isInit()
-  return this.http
-    .post('/encode-calldata', { source, function: name, arguments: args, options: this.prepareCompilerOption(options) }, options)
-    .then(({ calldata }) => calldata)
-}
-
-async function contractDecodeCallDataByCodeAPI (bytecode, calldata, backend = this.compilerOptions.backend, options = {}) {
-  this.isInit()
-  return this.http
-    .post('/decode-calldata/bytecode', { bytecode, calldata, backend }, options)
-}
-
-async function contractDecodeCallDataBySourceAPI (source, fn, callData, options = {}) {
-  this.isInit()
-  return this.http
-    .post('/decode-calldata/source', { function: fn, source, calldata: callData, options: this.prepareCompilerOption(options) }, options)
-}
-
-async function contractDecodeCallResultAPI (source, fn, callValue, callResult, options = {}) {
-  this.isInit()
-  return this.http
-    .post('/decode-call-result', { function: fn, source, 'call-result': callResult, 'call-value': callValue, options: this.prepareCompilerOption(options) }, options)
-}
-
-async function contractDecodeDataAPI (type, data, options = {}) {
-  this.isInit()
-  return this.http
-    .post('/decode-data', { data, 'sophia-type': type }, options)
-    .then(({ data }) => data)
-}
-
-async function validateByteCodeAPI (bytecode, source, options = {}) {
-  this.isInit()
-  return this.http
-    .post('/validate-byte-code', { bytecode, source, options: this.prepareCompilerOption(options) }, options)
-    .then(res => typeof res === 'object' ? true : res)
-}
-
-async function compileContractAPI (code, options = {}) {
-  this.isInit()
-  return this.http.post('/compile', { code, options: this.prepareCompilerOption(options) }, options)
-    .then(({ bytecode }) => bytecode)
-}
-
-async function contractGetACI (code, options = {}) {
-  this.isInit()
-  return this.http.post('/aci', { code, options: this.prepareCompilerOption(options) }, options)
-}
-
-async function getFateAssembler (bytecode, options = {}) {
-  this.isInit()
-  return this.http.post('/fate-assembler', { bytecode, options: this.prepareCompilerOption(options) }, options)
-}
-
-async function getBytecodeCompilerVersion (bytecode, options = {}) {
-  this.isInit()
-  return this.http.post('/compiler-version', { bytecode, options: this.prepareCompilerOption(options) }, options)
-}
-
-async function setCompilerUrl (url, { ignoreVersion = false } = {}) {
-  this.http.changeBaseUrl(url)
-  this.compilerVersion = await this.getCompilerVersion().catch(e => null)
-  await this.checkCompatibility({ ignoreVersion })
-}
-
-async function checkCompatibility ({ force = false, ignoreVersion = false } = {}) {
-  if (!this.compilerVersion && !force) throw new Error('Compiler do not respond')
-  if (!ignoreVersion && this.compilerVersion && !semverSatisfies(this.compilerVersion, COMPILER_GE_VERSION, COMPILER_LT_VERSION)) {
-    const version = this.compilerVersion
-    this.compilerVersion = null
-    throw new Error(`Unsupported compiler version ${version}. ` +
-      `Supported: >= ${COMPILER_GE_VERSION} < ${COMPILER_LT_VERSION}`)
-  }
-}
-
-function prepareCompilerOption ({ backend = this.compilerOptions.backend, filesystem = {} } = {}) {
-  return { backend, file_system: filesystem }
-}
-
-function isInit () {
-  if (this.compilerVersion === null) throw new Error('Compiler not defined')
-  return true
-}
 
 /**
  * Contract Compiler Stamp
@@ -133,28 +42,107 @@ function isInit () {
  * @return {Object} Contract compiler instance
  * @example ContractCompilerAPI({ compilerUrl: 'COMPILER_URL' })
  */
-const ContractCompilerAPI = AsyncInit.compose(ContractBase, {
-  async init ({ compilerUrl = this.compilerUrl, ignoreVersion = false }) {
-    this.http = Http({ baseUrl: compilerUrl })
-    this.compilerVersion = await this.getCompilerVersion().catch(e => null)
-    await this.checkCompatibility({ force: true, ignoreVersion })
+export default AsyncInit.compose(ContractBase, {
+  async init ({ compilerUrl, ignoreVersion }) {
+    if (!compilerUrl) return
+    await this.setCompilerUrl(compilerUrl, { ignoreVersion })
   },
   methods: {
-    contractEncodeCallDataAPI,
-    contractDecodeDataAPI,
-    compileContractAPI,
-    contractGetACI,
-    contractDecodeCallDataByCodeAPI,
-    contractDecodeCallDataBySourceAPI,
-    contractDecodeCallResultAPI,
-    setCompilerUrl,
-    getCompilerVersion,
-    validateByteCodeAPI,
-    isInit,
-    checkCompatibility,
-    prepareCompilerOption,
-    getFateAssembler,
-    getBytecodeCompilerVersion
+    async setCompilerUrl (compilerUrl, { ignoreVersion = false } = {}) {
+      if (!compilerUrl) throw new Error('"compilerUrl" required')
+      compilerUrl = compilerUrl.replace(/\/$/, '')
+      const client = await genSwaggerClient(`${compilerUrl}/api`, {
+        disableBigNumbers: true,
+        keysOfValuesToIgnore: ['fileSystem', 'arguments']
+      })
+      this.compilerVersion = client.spec.info.version
+      this._compilerApi = client.api
+
+      if (ignoreVersion) return
+      if (!semverSatisfies(this.compilerVersion, COMPILER_GE_VERSION, COMPILER_LT_VERSION)) {
+        throw new Error(`Unsupported compiler version ${this.compilerVersion}. ` +
+          `Supported: >= ${COMPILER_GE_VERSION} < ${COMPILER_LT_VERSION}`)
+      }
+    },
+    _ensureCompilerReady () {
+      if (!this._compilerApi) throw new Error('Compiler is not ready')
+    },
+    _prepareCompilerOptions ({ backend = this.compilerOptions.backend, filesystem = {} } = {}) {
+      return { backend, fileSystem: filesystem }
+    },
+    getCompilerVersion () {
+      this._ensureCompilerReady()
+      return Promise.resolve(this.compilerVersion)
+    },
+    async contractEncodeCallDataAPI (source, name, args = [], options) {
+      this._ensureCompilerReady()
+      const { calldata } = await this._compilerApi.encodeCalldata({
+        source,
+        function: name,
+        arguments: args,
+        options: this._prepareCompilerOptions(options)
+      })
+      return calldata
+    },
+    async contractDecodeDataAPI (type, data) {
+      this._ensureCompilerReady()
+      return (await this._compilerApi.decodeData({ data, 'sophia-type': type })).data
+    },
+    async compileContractAPI (code, options) {
+      this._ensureCompilerReady()
+      const { bytecode } = await this._compilerApi.compileContract({
+        code,
+        options: this._prepareCompilerOptions(options)
+      })
+      return bytecode
+    },
+    contractGetACI (code, options) {
+      this._ensureCompilerReady()
+      return this._compilerApi.generateACI({ code, options: this._prepareCompilerOptions(options) })
+    },
+    contractDecodeCallDataByCodeAPI (bytecode, calldata, backend = this.compilerOptions.backend) {
+      this._ensureCompilerReady()
+      return this._compilerApi.decodeCalldataBytecode({ bytecode, calldata, backend })
+    },
+    contractDecodeCallDataBySourceAPI (source, fn, callData, options) {
+      this._ensureCompilerReady()
+      return this._compilerApi.decodeCalldataSource({
+        function: fn,
+        source,
+        calldata: callData,
+        options: this._prepareCompilerOptions(options)
+      })
+    },
+    contractDecodeCallResultAPI (source, fn, callValue, callResult, options) {
+      this._ensureCompilerReady()
+      return this._compilerApi.decodeCallResult({
+        function: fn,
+        source,
+        'call-result': callResult,
+        'call-value': callValue,
+        options: this._prepareCompilerOptions(options)
+      })
+    },
+    async validateByteCodeAPI (bytecode, source, options) {
+      this._ensureCompilerReady()
+      const res = await this._compilerApi.validateByteCode({
+        bytecode,
+        source,
+        options: this._prepareCompilerOptions(options)
+      })
+      return typeof res === 'object' ? true : res
+    },
+    getFateAssembler (bytecode, options) {
+      this._ensureCompilerReady()
+      return this._compilerApi.getFateAssemblerCode({ bytecode, options: this._prepareCompilerOptions(options) })
+    },
+    getBytecodeCompilerVersion (bytecode, options) {
+      this._ensureCompilerReady()
+      return this._compilerApi.getCompilerVersion({
+        bytecode,
+        options: this._prepareCompilerOptions(options)
+      })
+    }
   },
   props: {
     compilerVersion: null,
@@ -166,5 +154,3 @@ const ContractCompilerAPI = AsyncInit.compose(ContractBase, {
 
 const COMPILER_GE_VERSION = '4.1.0'
 const COMPILER_LT_VERSION = '5.0.0'
-
-export default ContractCompilerAPI

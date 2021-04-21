@@ -32,12 +32,16 @@ import { snakizeKeys, pascalizeKeys, mapObject, filterObject } from './other'
  * @alias module:@aeternity/aepp-sdk/es/utils/swagger
  * @rtype Object
  * @param {String} specUrl - Swagger specification URL on external node host
- * @param {String} internalUrl - Node internal URL
+ * @param {Object} options
+ * @param {String} [options.internalUrl] - Node internal URL
+ * @param {Boolean} [options.disableBigNumbers]
+ * @param {Boolean} [options.keysOfValuesToIgnore] TODO: Convert keys according to Swagger definitions instead
  * @return {Object} Swagger client
  * @example (await genSwaggerClient('https://mainnet.aeternity.io/api')).getAccountByPubkey('ak_jupBUgZNbcC4krDLR3tAkw1iBZoBbkNeShAq4atBtpFWmz36r')
  */
-export default async (specUrl, internalUrl) => {
-  const spec = await (await fetch(specUrl)).json();
+export default async (specUrl, { internalUrl, disableBigNumbers, keysOfValuesToIgnore } = {}) => {
+  const spec = await (await fetch(specUrl)).json()
+  const jsonImp = disableBigNumbers ? JSON : JsonBig;
 
   ['claim', 'preclaim', 'transfer', 'revoke', 'update'].forEach(name => {
     const s = spec.paths[`/debug/names/${name}`]?.post
@@ -54,7 +58,7 @@ export default async (specUrl, internalUrl) => {
       spec: s,
       responseInterceptor: response => {
         if (!response.text) return response
-        const body = pascalizeKeys(JsonBig.parse(response.text))
+        const body = pascalizeKeys(jsonImp.parse(response.text), keysOfValuesToIgnore)
         return Object.assign(response, { body })
       }
     })
@@ -83,8 +87,11 @@ export default async (specUrl, internalUrl) => {
       const stringified = mapObject(values, ([param, value]) => {
         if (typeof value !== 'object') return [param, value]
         const rootKeys = Object.keys(parameters.find(p => p.name === param).schema.properties)
-        const filteredValue = filterObject(snakizeKeys(value), ([key]) => rootKeys.includes(key))
-        return [param, JsonBig.stringify(filteredValue)]
+        const filteredValue = filterObject(
+          snakizeKeys(value, keysOfValuesToIgnore),
+          ([key]) => rootKeys.includes(key)
+        )
+        return [param, jsonImp.stringify(filteredValue)]
       })
       return (await handler(stringified)).body
     }
