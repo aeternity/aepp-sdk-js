@@ -24,10 +24,7 @@
 import SwaggerClient from 'swagger-client'
 import fetch from 'cross-fetch'
 import JsonBig from './json-big'
-import { snakizeKeys, pascalizeKeys } from './other'
-
-const mapObject = (object, fn) => Object.fromEntries(Object.entries(object).map(fn))
-const filterObject = (object, fn) => Object.fromEntries(Object.entries(object).filter(fn))
+import { snakizeKeys, pascalizeKeys, mapObject, filterObject } from './other'
 
 /**
  * Generator of Swagger client
