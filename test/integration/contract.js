@@ -518,7 +518,7 @@ describe('Contract', function () {
       isString.should.be.equal(true)
     })
     it('decode call result', async () => {
-      return contract.contractDecodeCallResultAPI(identityContract, 'main', encodedNumberSix, 'ok', { backend: 'fate' }).should.eventually.become(6)
+      return contract.contractDecodeCallResultAPI(identityContract, 'main', encodedNumberSix, 'ok').should.eventually.become(6)
     })
     it('Decode call-data using source', async () => {
       const decodedCallData = await contract.contractDecodeCallDataBySourceAPI(identityContract, 'init', callData)
