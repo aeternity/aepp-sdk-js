@@ -44,7 +44,7 @@ jobs:
     - stage: Integration tests
       name: Channel, accounts
       script:
-        - npm run test:integration:channel,accounts
+        - npm run test:integration:channel,aens
         - npm run report-coverage
     - name: Contract, chain
       script:
