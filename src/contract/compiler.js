@@ -84,10 +84,6 @@ export default AsyncInit.compose(ContractBase, {
       })
       return calldata
     },
-    async contractDecodeDataAPI (type, data) {
-      this._ensureCompilerReady()
-      return (await this._compilerApi.decodeData({ data, 'sophia-type': type })).data
-    },
     async compileContractAPI (code, options) {
       this._ensureCompilerReady()
       const { bytecode } = await this._compilerApi.compileContract({

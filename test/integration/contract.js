@@ -532,10 +532,6 @@ describe('Contract', function () {
       decodedCallData.arguments.length.should.be.equal(0)
       decodedCallData.function.should.be.equal('init')
     })
-    it('Decode data API', async () => {
-      const returnData = 'cb_bzvA9Af6'
-      return contract.contractDecodeDataAPI('string', returnData).catch(e => 1).should.eventually.become(1)
-    })
     it('validate bytecode', async () => {
       return contract.validateByteCodeAPI(bytecode, identityContract).should.eventually.become(true)
     })

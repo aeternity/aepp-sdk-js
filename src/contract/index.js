@@ -40,7 +40,6 @@ import { required } from '@stamp/required'
 const ContractBase = stampit(required({
   methods: {
     contractEncodeCallDataAPI: required,
-    contractDecodeDataAPI: required,
     compileContractAPI: required,
     contractGetACI: required,
     setCompilerUrl: required,
@@ -80,18 +79,6 @@ const ContractBase = stampit(required({
  * @param {Object} [options.filesystem]  Contract external namespaces map
  * @param {Object} [options.backend]  Contract vm (default: fate)
  * @return {String} - Contract encoded data
- */
-
-/**
- * Decode data
- * @function contractDecodeDataAPI
- * @instance
- * @abstract
- * @category async
- * @rtype (type: String, data: String) => decodedResult: Promise[String]
- * @param {String} type - Contract call result type
- * @param {String} data - Encoded contract call result
- * @return {String} - Decoded contract call result
  */
 
 /**
