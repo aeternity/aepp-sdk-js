@@ -252,7 +252,7 @@ async function contractDeploy (code, source, initState = [], options = {}) {
  * @param {String} source Contract sourece code
  * @param {Object} [options={}] Transaction options (fee, ttl, gas, amount, deposit)
  * @param {Object} [options.filesystem={}] Contract external namespaces map* @return {Promise<Object>} Result object
- * @param {Object} [options.backend='aevm'] Contract backend version (aevm|fate)
+ * @param {Object} [options.backend='fate'] Contract backend version (aevm|fate)
  * @return {Promise<Object>} Result object
  * @example
  * const compiled = await client.contractCompile(SOURCE_CODE)
