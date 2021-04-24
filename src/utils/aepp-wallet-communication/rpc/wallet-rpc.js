@@ -302,6 +302,7 @@ export default Ae.compose(AccountMultiple, {
       // @TODO  detect if aepp has some history based on origin????: if yes use this instance for connection
       const id = uuid()
       this.rpcClients[id] = RpcClient({
+        id,
         info: { status: RPC_STATUS.WAITING_FOR_CONNECTION_REQUEST },
         connection: clientConnection,
         handlers: [handleMessage(this, id), this.onDisconnect]
