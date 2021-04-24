@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This [connect-two-aepp](https://github.com/aeternity/aepp-sdk-js/tree/master/examples/connect-two-ae) example project has been created to **showcase the aeternity SDK implementation** for both Base/Wallet Aepps and "regular" Aepps "depending" on a base (Wallet/Identity/Base) Aepp.
+This example project has been created to **showcase the aeternity SDK implementation** for both Base/Wallet Aepps and "regular" Aepps "depending" on a base (Wallet/Identity/Base) Aepp.
 
 ## 0. Setup info
 If you are trying these examples after checking out the entire Aepp-SDK repo (this repo), you want to first run `npm install`, from the repo root, to get all the SDK dependecies installed, and only then, move to individual apps (point nr. 1 and point nr. 2) installations.

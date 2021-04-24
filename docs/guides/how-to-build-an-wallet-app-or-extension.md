@@ -2,8 +2,8 @@
 
 This guide describing the process of building Waellet using the new Wallet<->Aepp integration API
 The full example of implementation you can find here:
-- [Web Waellet](https://github.com/aeternity/aepp-sdk-js/tree/develop/examples/browser/vuejs/connect-two-ae/identity)
-- [Extension Waellet](https://github.com/aeternity/aepp-sdk-js/tree/develop/examples/browser/extension)
+- [Web Waellet](../../examples/browser/vuejs/connect-two-ae/identity)
+- [Extension Waellet](../../examples/browser/extension)
 
 ### First we need to initialize our `Aepp` stamp
 

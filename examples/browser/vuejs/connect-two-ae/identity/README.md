@@ -1,9 +1,9 @@
 # Wallet/Identity Base Aepp
 
-This is part of the [connect-two-aepp](https://github.com/aeternity/aepp-sdk-js/tree/master/examples/connect-two-ae) example project.
+This is part of the [connect-two-aepp](..) example project.
 Ths is an exmaple Aepp (Distributed App) that lives inside an Aeternity Wallet Aepp.
 
-The [connect-two-aepp](https://github.com/aeternity/aepp-sdk-js/tree/master/examples/connect-two-ae) example project has been created to showcase the aeternity SDK implementation for both Base/Wallet Aepps and "regular" Aepps "depending" on a base (Wallet/Identity) Aepp.
+The [connect-two-aepp](..) example project has been created to showcase the aeternity SDK implementation for both Base/Wallet Aepps and "regular" Aepps "depending" on a base (Wallet/Identity) Aepp.
 
 ## Overview
 
@@ -12,7 +12,7 @@ This is a sample Wallet/Identity Aepp that expects an Aepp to be loaded into an 
 ### How it works
 
 1. Start this base Aepp, which will start on port `9000`
-2. Start the [sample Contract Aepp](https://github.com/aeternity/aepp-sdk-js/tree/develop/examples/connect-two-ae/aepp), which will start on port `9001`
+2. Start the [sample Contract Aepp](../aepp), which will start on port `9001`
 3. Visit `localhost:9000` to see this Aepp included into the Identity (Wallet) Aepp
 
 ## Installation

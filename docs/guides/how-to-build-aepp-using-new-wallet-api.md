@@ -1,7 +1,7 @@
 ## How to build an Aepp using new Wallet API
 
 This guide describing the process of building Aepp using the new Wallet<->Aepp integration API
-The full example of implementation you can find here: [AEPP example](https://github.com/aeternity/aepp-sdk-js/tree/develop/examples/browser/vuejs/connect-two-ae/aepp)
+The full example of implementation you can find here: [AEPP example](../../examples/browser/vuejs/connect-two-ae/aepp)
 ### First we need to initialize our `Aepp` stamp
 
 ```js

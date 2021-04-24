@@ -93,4 +93,4 @@ await nameObject.revoke(options)
 
 ## Related links
 - [AENS protocol](https://github.com/aeternity/protocol/blob/master/AENS.md)
-- [AENS SDK API Docs](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/api/ae/aens.md)
+- [AENS SDK API Docs](../api/ae/aens.md)

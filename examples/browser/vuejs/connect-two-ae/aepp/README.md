@@ -1,6 +1,6 @@
 # Sample Aepp for Contracts
 
-This is part of the [connect-two-aepp](https://github.com/aeternity/aepp-sdk-js/tree/master/examples/connect-two-ae) example project.
+This is part of the [connect-two-aepp](..) example project.
 Ths is an example Aepp (Distributed App) that lives inside an Aeternity Wallet Aepp.
 
 ## Overview
@@ -9,7 +9,7 @@ This is a sample Aepp that compiles contracts using the Aeternity JavaScript SDK
 
 ### How it works
 
-1. Start the [identity/wallet Aepp](https://github.com/aeternity/aepp-sdk-js/tree/develop/examples/connect-two-ae/identity), which will start on port `9000`
+1. Start the [identity/wallet Aepp](../identity), which will start on port `9000`
 2. Start this Aepp, which will start on port `9001`
 3. Visit `localhost:9000` to see this Aepp included into the Identity (Wallet) Aepp
 
