@@ -50,14 +50,7 @@ import AccountBase, { isAccountBase } from './base'
  */
 export default AccountBase.compose(AsyncInit, {
   async init ({ accounts = [], address }) {
-    const { WALLET_PUB, WALLET_PRIV } = process?.env || {}
-    if (WALLET_PUB && WALLET_PRIV) {
-      accounts.push(MemoryAccount({
-        keypair: { publicKey: WALLET_PUB, secretKey: WALLET_PRIV }
-      }))
-    }
     this.accounts = R.fromPairs(await Promise.all(accounts.map(async a => [await a.address(), a])))
-
     if (!address) address = Object.keys(this.accounts)[0]
     assertedType(address, 'ak')
     this.selectedAddress = address
