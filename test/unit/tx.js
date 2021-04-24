@@ -17,7 +17,8 @@
 
 import '../'
 import { describe, it } from 'mocha'
-import { salt, rlp } from '../../src/utils/crypto'
+import { encode as rlpEncode } from 'rlp'
+import { salt } from '../../src/utils/crypto'
 import { classify, commitmentHash, ensureNameValid, isNameValid, produceNameId } from '../../src/tx/builder/helpers'
 import BigNumber from 'bignumber.js'
 import { toBytes } from '../../src/utils/bytes'
@@ -99,7 +100,7 @@ describe('Tx', function () {
     }
   })
   it('Deserialize tx: invalid tx type', () => {
-    const tx = rlp.encode([99, 99])
+    const tx = rlpEncode([99, 99])
     try {
       unpackTx(tx, true)
     } catch (e) {
@@ -107,7 +108,7 @@ describe('Tx', function () {
     }
   })
   it('Deserialize tx: invalid tx VSN', () => {
-    const tx = rlp.encode([10, 99])
+    const tx = rlpEncode([10, 99])
     try {
       unpackTx(tx, true)
     } catch (e) {

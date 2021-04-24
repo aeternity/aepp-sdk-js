@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js'
+import { decode as rlpDecode, encode as rlpEncode } from 'rlp'
 import { AE_AMOUNT_FORMATS, formatAmount } from '../../utils/amount-formatter'
-import { assertedType, rlp } from '../../utils/crypto'
+import { assertedType } from '../../utils/crypto'
 
 import {
   DEFAULT_FEE,
@@ -378,7 +379,7 @@ export function buildTx (params, type, { excludeKeys = [], prefix = 'tx', vsn = 
   const [schema, tag] = getSchema({ type, vsn })
   const binary = buildRawTx({ ...params, VSN: vsn, tag }, schema, { excludeKeys, denomination: params.denomination || denomination }).filter(e => e !== undefined)
 
-  const rlpEncoded = rlp.encode(binary)
+  const rlpEncoded = rlpEncode(binary)
   const tx = encode(rlpEncoded, prefix)
 
   return { tx, rlpEncoded, binary, txObject: unpackRawTx(binary, schema) }
@@ -395,7 +396,7 @@ export function buildTx (params, type, { excludeKeys = [], prefix = 'tx', vsn = 
  */
 export function unpackTx (encodedTx, fromRlpBinary = false, prefix = 'tx') {
   const rlpEncoded = fromRlpBinary ? encodedTx : decode(encodedTx, prefix)
-  const binary = rlp.decode(rlpEncoded)
+  const binary = rlpDecode(rlpEncoded)
 
   const objId = readInt(binary[0])
   const vsn = readInt(binary[1])

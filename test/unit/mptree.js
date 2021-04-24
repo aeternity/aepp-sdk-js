@@ -17,7 +17,7 @@
 
 import '../'
 import { describe, it } from 'mocha'
-import { rlp } from '../../src/utils/crypto'
+import { decode as rlpDecode, encode as rlpEncode } from 'rlp'
 import { serialize, deserialize, get, verify } from '../../src/utils/mptree'
 
 describe('Merkle Patricia Tree', function () {
@@ -28,26 +28,26 @@ describe('Merkle Patricia Tree', function () {
   }
 
   it('can deserialize', () => {
-    const tree = deserialize(rlp.decode(binary))
+    const tree = deserialize(rlpDecode(binary))
     tree.should.be.an('object')
     tree.rootHash.should.be.a('string')
     tree.nodes.should.be.an('object')
   })
 
   it('can serialize', () => {
-    const serialized = rlp.encode(serialize(deserialize(rlp.decode(binary))))
+    const serialized = rlpEncode(serialize(deserialize(rlpDecode(binary))))
     serialized.toString('hex').should.equal(binary.toString('hex'))
   })
 
   it('can retrieve values', () => {
-    const tree = deserialize(rlp.decode(binary))
+    const tree = deserialize(rlpDecode(binary))
     Object.entries(map).forEach(([key, value]) => {
       get(tree, key).toString('hex').should.equal(value)
     })
   })
 
   it('can verify root hash', () => {
-    const tree = deserialize(rlp.decode(binary))
+    const tree = deserialize(rlpDecode(binary))
     verify(tree).should.equal(true)
     tree.nodes['65657db43209ef7d57acb7aaf2e2c38f8828f9d425e4bec0d7de5bfa26496c61'][1][3] = 13
     verify(tree).should.equal(false)
