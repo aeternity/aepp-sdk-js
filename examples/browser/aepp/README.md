@@ -11,4 +11,4 @@ This is a sample æpp that compiles contracts using the æternity JavaScript SDK
 
 ## Installation and running
 1. Install required dependencies with `npm install`
-1. Start the application `npm run start:dev`
+1. Start the application `npm run serve`
