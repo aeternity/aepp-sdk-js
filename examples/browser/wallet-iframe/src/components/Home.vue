@@ -124,13 +124,10 @@
         return await prob(attemps)
       },
       disconnect () {
-        const { clients: aepps } = this.client.getClients()
-        const aepp = Array.from(aepps.values())[0]
-        aepp.sendMessage({
-          method: METHODS.closeConnection,
-          params: { reason: 'bye' },
-        }, true)
-        aepp.disconnect()
+        Object.values(this.client.rpcClients).forEach(client => {
+          client.sendMessage({ method: METHODS.closeConnection }, true)
+          client.disconnect()
+        })
       },
       async switchAccount () {
         const secondAcc = this.client.addresses().find(a => a !== this.publicKey)
