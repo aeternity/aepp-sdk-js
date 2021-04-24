@@ -50,7 +50,7 @@ import AccountBase, { isAccountBase } from './base'
  */
 export default AccountBase.compose(AsyncInit, {
   async init ({ accounts = [], address }) {
-    const { WALLET_PUB, WALLET_PRIV } = process.env
+    const { WALLET_PUB, WALLET_PRIV } = process?.env || {}
     if (WALLET_PUB && WALLET_PRIV) {
       accounts.push(MemoryAccount({
         keypair: { publicKey: WALLET_PUB, secretKey: WALLET_PRIV }
