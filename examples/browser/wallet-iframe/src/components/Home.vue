@@ -3,7 +3,7 @@
     v-if="!runningInFrame"
     class="w-full p-4 flex justify-center flex-col bg-grey h-screen"
   >
-    <h1 class="mb-4">Wallet Aepp</h1>
+    <h1 class="mb-4">Wallet Iframe</h1>
 
     <div class="border">
       <template v-if="nodeInfoResponse">
@@ -164,7 +164,7 @@
         compilerUrl: this.compilerUrl,
         accounts: [MemoryAccount({ keypair: { secretKey: this.secretKey, publicKey: this.publicKey } }), account2],
         address: this.publicKey,
-        name: 'Wallet',
+        name: 'Wallet Iframe',
         onConnection: genConfirmCallback(() => 'connect'),
         onSubscription (aepp, { accept, deny }, origin) {
           // Manually return accounts

@@ -45,7 +45,7 @@ var options = {
   },
   resolve: {
     alias: {
-      AE_SDK_MODULES: '../../../../../src/',
+      AE_SDK_MODULES: '../../../../../es/',
       ...fileSystem.existsSync(secrets) && { secrets }
     }
   },

@@ -2,8 +2,9 @@
   "groups": {
     "default": {
       "packages": [
-        "examples/browser/vuejs/connect-two-ae/aepp/package.json",
-        "examples/browser/vuejs/connect-two-ae/identity/package.json",
+        "examples/browser/aepp/package.json",
+        "examples/browser/wallet-iframe/package.json",
+        "examples/browser/wallet-web-extension/package.json",
         "package.json"
       ]
     }

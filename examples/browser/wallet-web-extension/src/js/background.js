@@ -61,7 +61,7 @@ async function init () {
   RpcWallet({
     compilerUrl: COMPILER_URL,
     nodes: [{ name: 'test-net', instance: await Node({ url: NODE_URL, internalUrl: NODE_INTERNAL_URL }) }],
-    name: 'ExtensionWallet',
+    name: 'Wallet WebExtension',
     // By default `ExtesionProvider` use first account as default account. You can change active account using `selectAccount (address)` function
     accounts,
     // Hook for sdk registration

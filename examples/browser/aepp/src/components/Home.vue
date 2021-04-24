@@ -1,11 +1,11 @@
 <template>
   <div class="w-full p-4 flex flex-col">
-    <h1 class="mb-4">Your Aepp</h1>
+    <h1 class="mb-4">Simple Aepp</h1>
 
     <div class="border">
       <div class="bg-green w-full flex flex-row font-mono border border-b">
         <div class="p-2 w-1/4">
-          Public Key <small>(from Wallet Aepp)</small>
+          Public Key <small>(from Wallet)</small>
         </div>
         <div v-if="addressResponse" class="p-2 w-3/4 bg-grey-lightest break-words">
           {{addressResponse | responseToString}}
@@ -332,7 +332,7 @@
       window !== window.parent || await this.getReverseWindow()
 
       this.client = await RpcAepp({
-        name: 'AEPP',
+        name: 'Simple Aepp',
         nodes: [
           { name: 'ae_uat', instance: await Node({ url: TEST_NET_NODE_URL }) },
           { name: 'ae_mainnet', instance: await Node({ url: MAIN_NET_NODE_INTERNAL_URL }) }
