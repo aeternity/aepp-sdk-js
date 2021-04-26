@@ -112,20 +112,24 @@ Make contract call and overwrite transaction props passing it as option: `fee, a
  Auto-generate functions (under `methods`) will have the same arguments length and order as we had in our SC source,
  the last arguments is always options object
  if `options` is not provide SDK will use the default options 
- which you can find under the `contractObject.options` 
- ```js
+ which you can find under the `contractObject.options`. 
+
+```js
 const callResult = await contractObject.methods.sum.get(1 , 2, { amount: 1000, fee: 3232, gas: 123})
 // or
 const callResult = await contractObject.call('sum', [1 , 2], { amount: 1000, fee: 3232, gas: 123})
 ```
 ### Call contract using specific account
 You can use `onAccount` option for that which can  one of:
- - `keypair` object({ secretKey, publicKey })
- - `MemoryAccount` instance
- - account `public key`
- ```js
+
+- `keypair` object({ secretKey, publicKey })
+- `MemoryAccount` instance
+- account `public key`
+
+```js
 // account must be included in SDK or you can always add it using account management API of SDK
 // await SDKInstance.addAccount(MemoryAccount({ keypair }))
+
 const options = { onAccount: keypair || MemoryAccount || publicKey } 
 const callResult = await contractObject.methods.sum.get(1 , 2, options)
 ```
