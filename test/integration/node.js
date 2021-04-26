@@ -16,7 +16,7 @@
  */
 
 import Node from '../../src/node'
-import { url, internalUrl } from './'
+import { url, internalUrl, ignoreVersion } from './'
 
 import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
@@ -27,7 +27,7 @@ describe('Node client', function () {
   let client
 
   before(async function () {
-    client = await Node({ url, internalUrl })
+    client = await Node({ url, internalUrl, ignoreVersion })
   })
 
   it('determines remote version', () => {
@@ -81,7 +81,7 @@ describe('Node client', function () {
     it('Can change Node', async () => {
       const nodes = await NodePool({
         nodes: [
-          { name: 'first', instance: await Node({ url, internalUrl }) },
+          { name: 'first', instance: await Node({ url, internalUrl, ignoreVersion }) },
           { name: 'second', instance: client }
         ]
       })
@@ -94,7 +94,7 @@ describe('Node client', function () {
     it('Fail on undefined node', async () => {
       const nodes = await NodePool({
         nodes: [
-          { name: 'first', instance: await Node({ url, internalUrl }) },
+          { name: 'first', instance: await Node({ url, internalUrl, ignoreVersion }) },
           { name: 'second', instance: client }
         ]
       })

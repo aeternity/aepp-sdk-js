@@ -23,7 +23,7 @@ import BrowserWindowMessageConnection from '../../src/utils/aepp-wallet-communic
 import { getBrowserAPI, getHandler } from '../../src/utils/aepp-wallet-communication/helpers'
 import { METHODS, RPC_STATUS } from '../../src/utils/aepp-wallet-communication/schema'
 import { generateKeyPair, verify } from '../../src/utils/crypto'
-import { compilerUrl, genesisAccount, internalUrl, networkId, publicKey, url } from './'
+import { compilerUrl, genesisAccount, internalUrl, networkId, publicKey, url, ignoreVersion } from './'
 
 describe('Aepp<->Wallet', function () {
   this.timeout(6000)
@@ -33,7 +33,7 @@ describe('Aepp<->Wallet', function () {
   let connectionFromAeppToWallet
 
   before(async function () {
-    node = await Node({ url, internalUrl })
+    node = await Node({ url, internalUrl, ignoreVersion })
     connections = getConnections()
     connectionFromWalletToAepp = BrowserWindowMessageConnection({
       connectionInfo: { id: 'from_wallet_to_aepp' },
