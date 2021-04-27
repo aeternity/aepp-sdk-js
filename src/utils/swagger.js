@@ -41,21 +41,22 @@ import { snakizeKeys, pascalizeKeys, mapObject, filterObject } from './other'
  */
 export default async (specUrl, { internalUrl, disableBigNumbers, keysOfValuesToIgnore } = {}) => {
   const spec = await (await fetch(specUrl)).json()
-  const jsonImp = disableBigNumbers ? JSON : JsonBig;
+  const jsonImp = disableBigNumbers ? JSON : JsonBig
 
-  ['claim', 'preclaim', 'transfer', 'revoke', 'update'].forEach(name => {
-    const s = spec.paths[`/debug/names/${name}`]?.post
-    if (s && !s.consumes) s.consumes = ['application/json']
-  })
+  const isAeternityNode = spec.info.title === 'Aeternity node'
+  if (isAeternityNode && spec.swagger === '2.0') {
+    ['claim', 'preclaim', 'transfer', 'revoke', 'update'].forEach(name => {
+      const s = spec.paths[`/debug/names/${name}`]?.post
+      if (s && !s.consumes) s.consumes = ['application/json']
+    })
+  }
 
-  const [external, internal] = await Promise.all([specUrl, internalUrl].map((urlString) => {
-    if (!urlString) return null
-    const url = new URL(urlString)
-    const s = spec
-    s.schemes = [url.protocol.slice(0, -1)]
-    s.host = url.host
+  const [external, internal] = await Promise.all([specUrl, internalUrl].map((url) => {
+    if (!url) return null
+    spec.schemes = [new URL(url).protocol.slice(0, -1)]
     return SwaggerClient({
-      spec: s,
+      url,
+      spec,
       responseInterceptor: response => {
         if (!response.text) return response
         const body = pascalizeKeys(jsonImp.parse(response.text), keysOfValuesToIgnore)
@@ -77,14 +78,22 @@ export default async (specUrl, { internalUrl, disableBigNumbers, keysOfValuesToI
   const api = mapObject(combinedApi, ([opId, handler]) => [
     opId.slice(0, 1).toLowerCase() + opId.slice(1),
     async (...args) => {
-      const { parameters } = opSpecs[opId]
+      const opSpec = opSpecs[opId]
+      const parameters = [
+        ...opSpec.parameters,
+        ...opSpec.requestBody ? [{
+          required: opSpec.requestBody.required,
+          schema: Object.values(opSpec.requestBody.content)[0].schema,
+          name: '__requestBody'
+        }] : []
+      ]
       const required = parameters.filter(param => param.required).map(p => p.name)
       if (args.length < required.length) throw new Error('swagger: Not enough arguments')
       const values = required.reduce(
         (acc, req, idx) => ({ ...acc, [req]: args[idx] }),
         args[required.length] || {}
       )
-      const stringified = mapObject(values, ([param, value]) => {
+      const { __requestBody, ...stringified } = mapObject(values, ([param, value]) => {
         if (typeof value !== 'object') return [param, value]
         const rootKeys = Object.keys(parameters.find(p => p.name === param).schema.properties)
         const filteredValue = filterObject(
@@ -93,7 +102,7 @@ export default async (specUrl, { internalUrl, disableBigNumbers, keysOfValuesToI
         )
         return [param, jsonImp.stringify(filteredValue)]
       })
-      return (await handler(stringified)).body
+      return (await handler(stringified, { requestBody: __requestBody })).body
     }
   ])
 
