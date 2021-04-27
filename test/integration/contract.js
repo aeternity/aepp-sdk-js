@@ -16,6 +16,7 @@
  */
 import Compiler from '../../src/contract/compiler'
 import { describe, it, before } from 'mocha'
+import { expect } from 'chai'
 import { BaseAe, getSdk, compilerUrl, publicKey } from './'
 import { decode } from '../../src/tx/builder/helpers'
 import { DRY_RUN_ACCOUNT } from '../../src/tx/builder/schema'
@@ -30,11 +31,16 @@ contract Identity =
  entrypoint main(x : int) = x
 `
 
-const errorContract = `
-contract Identity =
- payable stateful entrypoint main(x : address) = Chain.spend(x, 1000000000)
+const contractWithBrokenDeploy = `
+contract Foo =
+  entrypoint init() = require(false, "CustomErrorMessage")
+`
 
- payable stateful entrypoint foo() =
+const contractWithBrokenMethods = `
+contract Foo =
+  payable stateful entrypoint failWithoutMessage(x : address) = Chain.spend(x, 1000000000)
+
+  payable stateful entrypoint failWithMessage() =
     require(false, "CustomErrorMessage")
 `
 
@@ -369,19 +375,31 @@ describe('Contract', function () {
     res.result.should.have.property('gasUsed')
     res.result.should.have.property('returnType')
   })
-  it('Test handleError(Parse and check contract execution error)', async () => {
-    const code = await contract.contractCompile(errorContract)
-    const deployed = await code.deploy()
-    try {
-      await deployed.call('main', [await contract.address()])
-    } catch (e) {
-      e.message.should.be.equal('Invocation failed')
-    }
-    try {
-      await deployed.call('foo')
-    } catch (e) {
-      e.message.should.be.equal('Invocation failed: "ICustomErrorMessage"')
-    }
+
+  describe('_handleCallError', () => {
+    it('throws error on deploy', async () => {
+      const code = await contract.contractCompile(contractWithBrokenDeploy)
+      try {
+        await code.deploy()
+      } catch (e) {
+        e.message.should.be.equal('Invocation failed: "CustomErrorMessage"')
+      }
+    })
+
+    it('throws errors on method call', async () => {
+      const code = await contract.contractCompile(contractWithBrokenMethods)
+      const deployed = await code.deploy()
+      try {
+        await deployed.call('failWithoutMessage', [await contract.address()])
+      } catch (e) {
+        e.message.should.be.equal('Invocation failed')
+      }
+      try {
+        await deployed.call('failWithMessage')
+      } catch (e) {
+        e.message.should.be.equal('Invocation failed: "CustomErrorMessage"')
+      }
+    })
   })
 
   it('Dry-run without accounts', async () => {
@@ -399,14 +417,14 @@ describe('Contract', function () {
     return result.decode().should.eventually.become(42)
   })
 
-  it('call contract/deploy with `waitMined: false`', async () => {
+  it('call contract/deploy with waitMined: false', async () => {
     const deployed = await bytecode.deploy([], { waitMined: false })
     await contract.poll(deployed.transaction, { interval: 50, attempts: 1200 })
-    Boolean(deployed.result === undefined).should.be.equal(true)
-    Boolean(deployed.txData === undefined).should.be.equal(true)
+    expect(deployed.result).to.be.equal(undefined)
+    deployed.txData.should.not.be.equal(undefined)
     const result = await deployed.call('main', ['42'], { waitMined: false, verify: false })
-    Boolean(result.result === undefined).should.be.equal(true)
-    Boolean(result.txData === undefined).should.be.equal(true)
+    expect(result.result).to.be.equal(undefined)
+    result.txData.should.not.be.equal(undefined)
     await contract.poll(result.hash, { interval: 50, attempts: 1200 })
   })
 
@@ -652,14 +670,14 @@ describe('Contract', function () {
       const isCompiled = contractObject.compiled.length && contractObject.compiled.slice(0, 3) === 'cb_'
       isCompiled.should.be.equal(true)
     })
-    it('Deploy/Call contract with { waitMined: false }', async () => {
+    it('Deploy/Call contract with waitMined: false', async () => {
       const deployed = await contractObject.methods.init('123', 1, 'hahahaha', { waitMined: false })
       await contract.poll(deployed.transaction, { interval: 50, attempts: 1200 })
-      Boolean(deployed.result === undefined).should.be.equal(true)
-      Boolean(deployed.txData === undefined).should.be.equal(true)
+      expect(deployed.result).to.be.equal(undefined)
+      expect(deployed.txData).to.be.equal(undefined)
       const result = await contractObject.methods.intFn.send(2, { waitMined: false })
-      Boolean(result.result === undefined).should.be.equal(true)
-      Boolean(result.txData === undefined).should.be.equal(true)
+      expect(result.result).to.be.equal(undefined)
+      result.txData.should.not.be.equal(undefined)
       await contract.poll(result.hash, { interval: 50, attempts: 1200 })
     })
     it('Generate ACI object with corresponding bytecode', async () => {
