@@ -140,7 +140,7 @@
 * **RPC:** Refactor rpc-related stuff ([#921](https://github.com/aeternity/aepp-sdk-js/pull/921))
 * **Build:** Include amountFormatter and SCHEMA in bundle([#936](https://github.com/aeternity/aepp-sdk-js/pull/936))
 * **Examples** Update examples apps
- 
+
 ### Features
 
 * **TX:** Introduce new stamp `TxObject`([#933](https://github.com/aeternity/aepp-sdk-js/pull/933))
@@ -168,7 +168,7 @@ This stamp give more flexibility on transaction serialization/deserialization pr
 * **Node:** Move `getNetworkId` to helpers ([#910](https://github.com/aeternity/aepp-sdk-js/pull/910))
 * **ACI:** Minor ACI validation improvement.
  Move decoding of events to builder. Add ability to decode events without ACI
- 
+
 ### Features
 
 * **ACI:** Implement Contract Events for ACI([Contract Event Guide](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/contract-events.md))
@@ -270,7 +270,7 @@ This release include all changes from [7.0.0-next.1](https://github.com/aeternit
 
 * **Wallet<->AEPP:** Add new Wallet<->Aepp communication API
 >Add two new stamps `RpcWallet` and `RpcAepp`
->Example of usage you can find heere: [Aepp example](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/how-to-build-aepp-using-new-wallet-api.md) and [Wallet example](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/how-to-build-an-wallet-app-or-extension.md) 
+>Example of usage you can find heere: [Aepp example](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/how-to-build-aepp-using-new-wallet-api.md) and [Wallet example](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/how-to-build-an-wallet-app-or-extension.md)
 
 * **Wallet:** Use `postMessage` for communication with extension wall… ([#815](https://github.com/aeternity/aepp-sdk-js/issues/815)) ([dc7b4c2](https://github.com/aeternity/aepp-sdk-js/commit/dc7b4c2))
 * **CI:** Move to Travis CI ([#809](https://github.com/aeternity/aepp-sdk-js/issues/809)) ([2d77f20](https://github.com/aeternity/aepp-sdk-js/commit/2d77f20))
@@ -419,7 +419,7 @@ Add `getContractByteCode` API
     - compiler 4.0.0 support
     - node 5.0.0 support
     - SDK use `FATE` for contract by default
-* **AE**: Add pointers verification for spend by name   
+* **AE**: Add pointers verification for spend by name
 
 ### BREAKING CHANGES
 
@@ -523,13 +523,13 @@ await contract.methods.optionFn(1 || undefined)
 
     // Make current account Generalized
     await client.createGeneralizeAccount(authFnName, authContract, [...authFnArguments]
-    
+
     // Make spend transaction using GA
     // One Way
         // encoded call data for auth contract
         const callData = 'cb_...'
         await client.spend(10000, receiverPub, { authData: { callData } })
-    
+
     // or
         // sdk will prepare callData itself
         await client.spend(10000, receiverPub, { authData: { source: authContract, args: [...authContractArgs] } })
@@ -547,7 +547,7 @@ await contract.methods.optionFn(1 || undefined)
 
 * **Contract:** add ability to use call-static/dry-run without keyPair ([#577](https://github.com/aeternity/aepp-sdk-js/issues/577)) ([c38edd9](https://github.com/aeternity/aepp-sdk-js/commit/c38edd9))
 * **AE:** Add ability to make operation on specific account using `onAccount` option.
-   ``` 
+   ```
     Exm: await client.spend(1, receiver, { onAccount: 'PUBLIC_KEY' })
     Add `onAccount` to `AENS`, `Contract`, `Oracle`.
     Add tests for using specific account to Contract, ACI, Account.
@@ -634,7 +634,7 @@ Add `options` object like last arguments of generate fn under `instance.methods`
   // Deploy contract
   await.contract.init(100, 'test', options)
   //or
-  await.contract.deploy([100, 'test], options)
+  await.contract.deploy([100, 'test'], options)
   // Call function
   const result = await instance.call('sum', [2, 5], options)
   //
@@ -701,7 +701,7 @@ Add `options` object like last arguments of generate fn under `instance.methods`
 * **DOCS** Restructure and rework sdk documentation
 * **SCM:** This change will make the release not compatible with older version of the node and
 compiler
-* **ACI:** Change Contract low lvl API: 
+* **ACI:** Change Contract low lvl API:
   - change `contractDecodeData` interface from:
     - `(type:String, data: String) => Any` to `(source: String, fn: String, callValue: String, callResult:String) => Any`.
     (`callResult` is `callType` from call result, can be `ok`, `revert`, ...)
@@ -773,9 +773,9 @@ fix(AEP exampe): Fix contract in AEPP example
 * **ACI:** Add ability to pass zero address as number. ([#396](https://github.com/aeternity/aepp-sdk-js/issues/396)) ([b5b5c61](https://github.com/aeternity/aepp-sdk-js/commit/b5b5c61))
 * **ACI:** Fix address type transformation when decoding data ([#335](https://github.com/aeternity/aepp-sdk-js/issues/335)) ([e37cdfc](https://github.com/aeternity/aepp-sdk-js/commit/e37cdfc))
 * **Contract:** Add error handling(decoding) in low lvl contract API ([#386](https://github.com/aeternity/aepp-sdk-js/issues/386)) ([e1fdce0](https://github.com/aeternity/aepp-sdk-js/commit/e1fdce0))
-* **Dependencies:** Use URL class instead of "url" package 
-* **Dependencies:** Use custom version of json-bigint 
-* **Dependencies:** Avoid usage of semver package and cleanup deps 
+* **Dependencies:** Use URL class instead of "url" package
+* **Dependencies:** Use custom version of json-bigint
+* **Dependencies:** Avoid usage of semver package and cleanup deps
 * **RPC:** rpc client: Handle case if aepp opened without wallet
 * **Channels:** Fix state channel test's
 
@@ -837,7 +837,7 @@ fix(AEP exampe): Fix contract in AEPP example
 
 ### Features
 
-* **TX_BUILDER:** Channel tx serializations 
+* **TX_BUILDER:** Channel tx serializations
 * **TxValidator:** Add minGasPrice validation to contract transactions
 * **ACI:** Update due to compiler API changes ([#331](https://github.com/aeternity/aepp-sdk-js/issues/331)) ([e047f3b](https://github.com/aeternity/aepp-sdk-js/commit/e047f3b))
 * **Aepp:** Add Compiler to Aepp rpc methods. Update example app ([#312](https://github.com/aeternity/aepp-sdk-js/issues/312)) ([9c72521](https://github.com/aeternity/aepp-sdk-js/commit/9c72521))
@@ -913,9 +913,9 @@ fix(AEP exampe): Fix contract in AEPP example
       sophia: 1, // return address like `0xHEX_ADDRESS`
       api: 2, // return address like `ak_9LJ8ne9tks78hTD2Tp571f7w2MJmzQMRsiZxKCkMA2d2Sbrc4`
     }
-    
+
     //
-    
+
     export { ADDRESS_FORMAT } from 'es/account'
     await account.address(format: ADDRESS_FORMAT) // default ADDRESS_FORMAT.api
     ```
@@ -1005,7 +1005,7 @@ fix(AEP exampe): Fix contract in AEPP example
 
 ### Feature
 
-* **TX_BUILDER:** Add `deserialization` schema for `Channel` transactions(`channelCreate`, `channelCloseMutual`, `channelDeposit`, `channelWithdraw`, `channelSettle`) 
+* **TX_BUILDER:** Add `deserialization` schema for `Channel` transactions(`channelCreate`, `channelCloseMutual`, `channelDeposit`, `channelWithdraw`, `channelSettle`)
 * **Chain:** Add `rawTx` and `verifyTx` to error from poll function(when you wait for transaction will mined)
 * **Chore:** Depend on `bip39` from npm instead of git repo
 * **Channel:** Change Channel `legacy` API to `JSON RPC`
