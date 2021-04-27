@@ -57,6 +57,15 @@ export default async (specUrl, { internalUrl, disableBigNumbers, keysOfValuesToI
     return SwaggerClient({
       url,
       spec,
+      requestInterceptor: request => {
+        if (
+          isAeternityNode &&
+          /^\/v3\/transactions\/\w+$/.test(new URL(request.url).pathname)
+        ) {
+          return { ...request, url: request.url.replace('v3', 'v2') }
+        }
+        return request
+      },
       responseInterceptor: response => {
         if (!response.text) return response
         const body = pascalizeKeys(jsonImp.parse(response.text), keysOfValuesToIgnore)
