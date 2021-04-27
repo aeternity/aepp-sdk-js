@@ -77,7 +77,11 @@ const Node = AsyncInit.compose({
     if (!url) throw new Error('"url" required')
     this.url = url.replace(/\/$/, '')
     this.internalUrl = internalUrl ? internalUrl.replace(/\/$/, '') : this.url
-    const client = await genSwaggerClient(`${this.url}/api`, { internalUrl: this.internalUrl })
+    let client = await genSwaggerClient(`${this.url}/api`, { internalUrl: this.internalUrl })
+    if (client.spec.info.version.split('-')[0] === '0.0.0') {
+      client = await genSwaggerClient(`${this.url}/api?oas3`, { internalUrl: this.internalUrl })
+      this._isIrisNode = true
+    }
     this.version = client.spec.info.version
     this.api = client.api
   },
