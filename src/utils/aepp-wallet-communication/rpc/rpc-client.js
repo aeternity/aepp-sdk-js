@@ -22,7 +22,8 @@ import { sendMessage, message, isValidAccounts } from '../helpers'
  * @return {Object}
  */
 export default stampit({
-  init ({ name, networkId, icons, connection, handlers: [onMessage, onDisconnect] }) {
+  init ({ id, name, networkId, icons, connection, handlers: [onMessage, onDisconnect] }) {
+    this.id = id
     this.connection = connection
     this.info = { name, networkId, icons }
     // {

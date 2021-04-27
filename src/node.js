@@ -73,11 +73,11 @@ async function getConsensusProtocolVersion (protocols = [], height) {
  * @example Node({url: 'https://testnet.aeternity.io'})
  */
 const Node = AsyncInit.compose({
-  async init ({ url = this.url, internalUrl = this.internalUrl }) {
+  async init ({ url, internalUrl }) {
     if (!url) throw new Error('"url" required')
-    url = url.replace(/\/?$/, '')
-    internalUrl = internalUrl ? internalUrl.replace(/\/?$/, '') : url
-    const client = await genSwaggerClient(`${url}/api`, internalUrl)
+    this.url = url.replace(/\/?$/, '')
+    this.internalUrl = internalUrl ? internalUrl.replace(/\/?$/, '') : this.url
+    const client = await genSwaggerClient(`${this.url}/api`, this.internalUrl)
     this.version = client.spec.info.version
     this.api = client.api
   },

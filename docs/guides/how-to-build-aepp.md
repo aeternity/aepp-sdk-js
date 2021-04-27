@@ -1,7 +1,7 @@
-## How to build an Aepp using new Wallet API
+## How to build an Aepp using RPC API
 
-This guide describing the process of building Aepp using the new Wallet<->Aepp integration API
-The full example of implementation you can find here: [AEPP example](https://github.com/aeternity/aepp-sdk-js/tree/develop/examples/browser/vuejs/connect-two-ae/aepp)
+This guide describing the process of building Aepp using the Wallet<->Aepp integration API
+The full example of implementation you can find here: [AEPP example](../../examples/browser/aepp)
 ### First we need to initialize our `Aepp` stamp
 
 ```js
@@ -61,7 +61,7 @@ The full example of implementation you can find here: [AEPP example](https://git
   }
 ```
 
-### The last step is to connect to the Waellet
+### The last step is to connect to the Wallet
 
 ```js
   async function connectToWallet (wallet) {

@@ -10,7 +10,7 @@ If you're using bundling/compilation techniques (eg. `webpack`), please continue
 Add the latest `@aeternity/aepp-sdk` release from npmjs.com to your project using one of these commands
 
 ```bash
-# install using npm...or yarn or pnpm
+# install using npm
 npm i @aeternity/aepp-sdk
 ```
 

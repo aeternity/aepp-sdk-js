@@ -3,7 +3,7 @@
     v-if="!runningInFrame"
     class="w-full p-4 flex justify-center flex-col bg-grey h-screen"
   >
-    <h1 class="mb-4">Wallet Aepp</h1>
+    <h1 class="mb-4">Wallet Iframe</h1>
 
     <div class="border">
       <template v-if="nodeInfoResponse">
@@ -124,13 +124,10 @@
         return await prob(attemps)
       },
       disconnect () {
-        const { clients: aepps } = this.client.getClients()
-        const aepp = Array.from(aepps.values())[0]
-        aepp.sendMessage({
-          method: METHODS.closeConnection,
-          params: { reason: 'bye' },
-        }, true)
-        aepp.disconnect()
+        Object.values(this.client.rpcClients).forEach(client => {
+          client.sendMessage({ method: METHODS.closeConnection }, true)
+          client.disconnect()
+        })
       },
       async switchAccount () {
         const secondAcc = this.client.addresses().find(a => a !== this.publicKey)
@@ -164,7 +161,7 @@
         compilerUrl: this.compilerUrl,
         accounts: [MemoryAccount({ keypair: { secretKey: this.secretKey, publicKey: this.publicKey } }), account2],
         address: this.publicKey,
-        name: 'Wallet',
+        name: 'Wallet Iframe',
         onConnection: genConfirmCallback(() => 'connect'),
         onSubscription (aepp, { accept, deny }, origin) {
           // Manually return accounts

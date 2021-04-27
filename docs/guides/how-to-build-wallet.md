@@ -1,12 +1,9 @@
 ## How to build a wallet
 
-This guide describing the process of building Waellet using the new Wallet<->Aepp integration API
+This guide describing the process of building Wallet using the new Wallet<->Aepp integration API
 The full example of implementation you can find here:
-- [Web Waellet](https://github.com/aeternity/aepp-sdk-js/tree/develop/examples/browser/vuejs/connect-two-ae/identity)
-- [Extension Waellet](https://github.com/aeternity/aepp-sdk-js/tree/develop/examples/browser/extension)
-
-### First we need to initialize our `Aepp` stamp
-
+- [iframe-based Wallet](../../examples/browser/wallet-iframe)
+- [Wallet WebExtension](../../examples/browser/wallet-web-extension)
 
 ### Extension wallet
 
@@ -56,8 +53,8 @@ const readyStateCheckInterval = setInterval(function () {
 }, 10)
 
 ```
-- Then we need to initialize `Waellet` stamp in our extension and subscribe for new `runtime` connection's
-After connection will be established we can start to send `announcePresence` message to the `page` to let `Aepp` know about `Waellet`
+- Then we need to initialize `Wallet` stamp in our extension and subscribe for new `runtime` connection's
+After connection will be established we can start to send `announcePresence` message to the `page` to let `Aepp` know about `Wallet`
 ```js
 // background.js
 
@@ -167,7 +164,7 @@ RpcWallet({
 
 ```
 
-### Web Waellet (Iframe/Reverse Iframe)
+### Web Wallet (Iframe/Reverse Iframe)
 
 - This works the same as extension but without `Content Script bridge` in between
 
