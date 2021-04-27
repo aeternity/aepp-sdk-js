@@ -125,7 +125,7 @@ export const BrowserWindowMessageConnection = stampit({
   init ({ connectionInfo = {}, target = getTarget(), self = window, origin, sendDirection, receiveDirection = MESSAGE_DIRECTION.to_aepp, debug = false, forceOrigin = false } = {}) {
     if (sendDirection && !Object.keys(MESSAGE_DIRECTION).includes(sendDirection)) throw new Error(`sendDirection must be one of [${Object.keys(MESSAGE_DIRECTION)}]`)
     if (!Object.keys(MESSAGE_DIRECTION).includes(receiveDirection)) throw new Error(`receiveDirection must be one of [${Object.keys(MESSAGE_DIRECTION)}]`)
-    this.connectionInfo = { ...{ id: uuid() }, ...connectionInfo }
+    this.connectionInfo = { id: uuid(), ...connectionInfo }
 
     const selfP = self
     const targetP = target
