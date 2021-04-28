@@ -21,7 +21,7 @@
  * @example import { AmountFormatter } from '@aeternity/aepp-sdk'
  */
 import BigNumber from 'bignumber.js'
-import { asBigNumber, isBigNumber } from './bignumber'
+import { isBigNumber } from './bignumber'
 
 /**
  * AE amount formats
@@ -90,7 +90,7 @@ export const formatAmount = (
   if (!denominations.includes(targetDenomination)) throw new Error(`Invalid target denomination: ${targetDenomination}`)
   if (!isBigNumber(value)) throw new Error(`Value ${value.toString()} is not type of number`)
 
-  return asBigNumber(value)
+  return new BigNumber(value)
     .shiftedBy(DENOMINATION_MAGNITUDE[denomination] - DENOMINATION_MAGNITUDE[targetDenomination])
     .toFixed()
 }

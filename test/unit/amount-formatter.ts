@@ -16,9 +16,10 @@
  */
 
 import { describe, it } from 'mocha'
+import BigNumber from 'bignumber.js'
 import '..'
 import { AE_AMOUNT_FORMATS, formatAmount, toAe, toAettos } from '../../src/utils/amount-formatter'
-import { asBigNumber, parseBigNumber } from '../../src/utils/bignumber'
+import { parseBigNumber } from '../../src/utils/bignumber'
 
 describe('Amount Formatter', function () {
   it('to aettos', async () => {
@@ -34,10 +35,10 @@ describe('Amount Formatter', function () {
   })
   it('to Ae', () => {
     [
-      [1, AE_AMOUNT_FORMATS.AETTOS, asBigNumber(1).div(1e18)],
-      [10, AE_AMOUNT_FORMATS.AETTOS, asBigNumber(10).div(1e18)],
-      [100, AE_AMOUNT_FORMATS.AETTOS, asBigNumber(100).div(1e18)],
-      [10012312, AE_AMOUNT_FORMATS.AETTOS, asBigNumber(10012312).div(1e18)],
+      [1, AE_AMOUNT_FORMATS.AETTOS, new BigNumber(1).div(1e18)],
+      [10, AE_AMOUNT_FORMATS.AETTOS, new BigNumber(10).div(1e18)],
+      [100, AE_AMOUNT_FORMATS.AETTOS, new BigNumber(100).div(1e18)],
+      [10012312, AE_AMOUNT_FORMATS.AETTOS, new BigNumber(10012312).div(1e18)],
       [1, AE_AMOUNT_FORMATS.AE, 1]
     ].forEach(
       ([v, d, e]) => parseBigNumber(e).should.be.equal(toAe(v, { denomination: d.toString() }))
@@ -45,25 +46,25 @@ describe('Amount Formatter', function () {
   })
   it('format', () => {
     [
-      [1, AE_AMOUNT_FORMATS.AE, AE_AMOUNT_FORMATS.AETTOS, asBigNumber(1e18)],
-      [10, AE_AMOUNT_FORMATS.AETTOS, AE_AMOUNT_FORMATS.AE, asBigNumber(10).div(1e18)],
-      [1e18, AE_AMOUNT_FORMATS.AETTOS, AE_AMOUNT_FORMATS.AE, asBigNumber(1)],
-      [10012312, AE_AMOUNT_FORMATS.AETTOS, AE_AMOUNT_FORMATS.AE, asBigNumber(10012312).div(1e18)],
+      [1, AE_AMOUNT_FORMATS.AE, AE_AMOUNT_FORMATS.AETTOS, new BigNumber(1e18)],
+      [10, AE_AMOUNT_FORMATS.AETTOS, AE_AMOUNT_FORMATS.AE, new BigNumber(10).div(1e18)],
+      [1e18, AE_AMOUNT_FORMATS.AETTOS, AE_AMOUNT_FORMATS.AE, new BigNumber(1)],
+      [10012312, AE_AMOUNT_FORMATS.AETTOS, AE_AMOUNT_FORMATS.AE, new BigNumber(10012312).div(1e18)],
       [1, AE_AMOUNT_FORMATS.AE, AE_AMOUNT_FORMATS.AE, 1],
-      [1, AE_AMOUNT_FORMATS.PICO_AE, AE_AMOUNT_FORMATS.AE, asBigNumber(0.000000000001)],
-      [1, AE_AMOUNT_FORMATS.PICO_AE, AE_AMOUNT_FORMATS.AETTOS, asBigNumber(1000000)],
-      [1e6, AE_AMOUNT_FORMATS.AETTOS, AE_AMOUNT_FORMATS.PICO_AE, asBigNumber(1)],
-      [0.0001, AE_AMOUNT_FORMATS.PICO_AE, AE_AMOUNT_FORMATS.AE, asBigNumber(0.0000000000000001)],
-      [0.000000000001, AE_AMOUNT_FORMATS.AE, AE_AMOUNT_FORMATS.PICO_AE, asBigNumber(1)],
-      [0.000001, AE_AMOUNT_FORMATS.PICO_AE, AE_AMOUNT_FORMATS.AETTOS, asBigNumber(1)],
-      [0.000000000001, AE_AMOUNT_FORMATS.MICRO_AE, AE_AMOUNT_FORMATS.AETTOS, asBigNumber(1)],
-      [0.000001, AE_AMOUNT_FORMATS.MICRO_AE, AE_AMOUNT_FORMATS.PICO_AE, asBigNumber(1)],
-      [1, AE_AMOUNT_FORMATS.MILI_AE, AE_AMOUNT_FORMATS.AETTOS, asBigNumber(1000000000000000)],
-      [1, AE_AMOUNT_FORMATS.AE, AE_AMOUNT_FORMATS.MILI_AE, asBigNumber(1000)],
-      [1, AE_AMOUNT_FORMATS.NANO_AE, AE_AMOUNT_FORMATS.AE, asBigNumber(0.000000001)],
-      [1, AE_AMOUNT_FORMATS.NANO_AE, AE_AMOUNT_FORMATS.AETTOS, asBigNumber(1000000000)],
-      [1, AE_AMOUNT_FORMATS.FEMTO_AE, AE_AMOUNT_FORMATS.AETTOS, asBigNumber(1000)],
-      [1, AE_AMOUNT_FORMATS.NANO_AE, AE_AMOUNT_FORMATS.FEMTO_AE, asBigNumber(1000000)]
+      [1, AE_AMOUNT_FORMATS.PICO_AE, AE_AMOUNT_FORMATS.AE, new BigNumber(0.000000000001)],
+      [1, AE_AMOUNT_FORMATS.PICO_AE, AE_AMOUNT_FORMATS.AETTOS, new BigNumber(1000000)],
+      [1e6, AE_AMOUNT_FORMATS.AETTOS, AE_AMOUNT_FORMATS.PICO_AE, new BigNumber(1)],
+      [0.0001, AE_AMOUNT_FORMATS.PICO_AE, AE_AMOUNT_FORMATS.AE, new BigNumber(0.0000000000000001)],
+      [0.000000000001, AE_AMOUNT_FORMATS.AE, AE_AMOUNT_FORMATS.PICO_AE, new BigNumber(1)],
+      [0.000001, AE_AMOUNT_FORMATS.PICO_AE, AE_AMOUNT_FORMATS.AETTOS, new BigNumber(1)],
+      [0.000000000001, AE_AMOUNT_FORMATS.MICRO_AE, AE_AMOUNT_FORMATS.AETTOS, new BigNumber(1)],
+      [0.000001, AE_AMOUNT_FORMATS.MICRO_AE, AE_AMOUNT_FORMATS.PICO_AE, new BigNumber(1)],
+      [1, AE_AMOUNT_FORMATS.MILI_AE, AE_AMOUNT_FORMATS.AETTOS, new BigNumber(1000000000000000)],
+      [1, AE_AMOUNT_FORMATS.AE, AE_AMOUNT_FORMATS.MILI_AE, new BigNumber(1000)],
+      [1, AE_AMOUNT_FORMATS.NANO_AE, AE_AMOUNT_FORMATS.AE, new BigNumber(0.000000001)],
+      [1, AE_AMOUNT_FORMATS.NANO_AE, AE_AMOUNT_FORMATS.AETTOS, new BigNumber(1000000000)],
+      [1, AE_AMOUNT_FORMATS.FEMTO_AE, AE_AMOUNT_FORMATS.AETTOS, new BigNumber(1000)],
+      [1, AE_AMOUNT_FORMATS.NANO_AE, AE_AMOUNT_FORMATS.FEMTO_AE, new BigNumber(1000000)]
     ].forEach(
       ([v, dF, dT, e]) => parseBigNumber(e).should.be.equal(formatAmount(v, { denomination: dF.toString(), targetDenomination: dT.toString() }))
     )

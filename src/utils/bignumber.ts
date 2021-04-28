@@ -1,7 +1,7 @@
 /**
  * Big Number Helpers
  * @module @aeternity/aepp-sdk/es/utils/bignumber
- * @example import { parseBigNumber, asBigNumber, isBigNumber, ceil } from '@aeternity/aepp-sdk/es/utils/bignumber'
+ * @example import { parseBigNumber, isBigNumber, ceil } from '@aeternity/aepp-sdk/es/utils/bignumber'
  */
 import BigNumber from 'bignumber.js'
 
@@ -12,14 +12,6 @@ import BigNumber from 'bignumber.js'
  */
 export const parseBigNumber = (number: string | number | BigNumber): string =>
   new BigNumber(number.toString()).toString(10)
-
-/**
- * Convert number to BigNumber instance
- * @param {String|Number|BigNumber} number number to convert
- * @return {BigNumber}
- */
-export const asBigNumber = (number: string | number | BigNumber): BigNumber =>
-  new BigNumber(number.toString())
 
 /**
  * Check if value is BigNumber, Number or number string representation
