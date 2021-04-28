@@ -102,8 +102,7 @@ function isConnected () {
  * @param {Boolean} [params.debug=false] - Debug flag
  * @return {Object}
  */
-
-export const BrowserRuntimeConnection = stampit({
+export default stampit({
   init ({ connectionInfo = {}, port, debug = false }) {
     if (!getBrowserAPI().runtime) throw new Error('Runtime is not accessible in your environment')
     this.debug = debug
@@ -112,5 +111,3 @@ export const BrowserRuntimeConnection = stampit({
   },
   methods: { connect, sendMessage, disconnect, isConnected }
 }, WalletConnection)
-
-export default BrowserRuntimeConnection

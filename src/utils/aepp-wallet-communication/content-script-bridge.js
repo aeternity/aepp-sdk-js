@@ -64,9 +64,9 @@ function stop () {
  * @param {Object} params - Initializer object
  * @param {Object} params.pageConnection - Page connection object(@link module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message)
  * @param {Object} params.extConnection - Extension connection object(module: @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-runtime)
- * @return {ContentScriptBridge}
+ * @return {Object}
  */
-export const ContentScriptBridge = stampit({
+export default stampit({
   init ({ pageConnection, extConnection, allowCrossOrigin = false }) {
     if (!window) throw new Error('Window object not found, you can run bridge only in browser')
     if (!pageConnection) throw new Error('pageConnection required')
@@ -77,5 +77,3 @@ export const ContentScriptBridge = stampit({
   },
   methods: { run, stop }
 })
-
-export default ContentScriptBridge

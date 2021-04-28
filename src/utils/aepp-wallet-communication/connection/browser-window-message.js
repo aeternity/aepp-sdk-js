@@ -121,7 +121,7 @@ const getTarget = () => {
  * @param {Boolean} [params.debug=false] - Debug flag
  * @return {Object}
  */
-export const BrowserWindowMessageConnection = stampit({
+export default stampit({
   init ({ connectionInfo = {}, target = getTarget(), self = window, origin, sendDirection, receiveDirection = MESSAGE_DIRECTION.to_aepp, debug = false, forceOrigin = false } = {}) {
     if (sendDirection && !Object.keys(MESSAGE_DIRECTION).includes(sendDirection)) throw new Error(`sendDirection must be one of [${Object.keys(MESSAGE_DIRECTION)}]`)
     if (!Object.keys(MESSAGE_DIRECTION).includes(receiveDirection)) throw new Error(`receiveDirection must be one of [${Object.keys(MESSAGE_DIRECTION)}]`)
@@ -141,5 +141,3 @@ export const BrowserWindowMessageConnection = stampit({
   },
   methods: { connect, sendMessage, disconnect, isConnected }
 }, WalletConnection)
-
-export default BrowserWindowMessageConnection
