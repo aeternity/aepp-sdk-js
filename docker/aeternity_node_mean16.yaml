@@ -8,6 +8,8 @@ http:
     debug_endpoints: true
     port: 3113
     listen_address: 0.0.0.0
+  endpoints:
+    dry-run: true
 
 websocket:
   channel:
@@ -22,9 +24,7 @@ chain:
   persist: false
   hard_forks:
     "1": 0
-    "2": 2
-    "3": 4
-    "4": 6
+    "5": 1
 
 mining:
   autostart: true
