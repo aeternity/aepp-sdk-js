@@ -33,14 +33,15 @@ import { snakizeKeys, pascalizeKeys, mapObject, filterObject } from './other'
  * @rtype Object
  * @param {String} specUrl - Swagger specification URL on external node host
  * @param {Object} options
+ * @param {String} [options.spec] - Override OpenAPI definition
  * @param {String} [options.internalUrl] - Node internal URL
  * @param {Boolean} [options.disableBigNumbers]
  * @param {Boolean} [options.keysOfValuesToIgnore] TODO: Convert keys according to Swagger definitions instead
  * @return {Object} Swagger client
  * @example (await genSwaggerClient('https://mainnet.aeternity.io/api')).getAccountByPubkey('ak_jupBUgZNbcC4krDLR3tAkw1iBZoBbkNeShAq4atBtpFWmz36r')
  */
-export default async (specUrl, { internalUrl, disableBigNumbers, keysOfValuesToIgnore } = {}) => {
-  const spec = await (await fetch(specUrl)).json()
+export default async (specUrl, { spec, internalUrl, disableBigNumbers, keysOfValuesToIgnore } = {}) => {
+  spec = spec || await (await fetch(specUrl)).json()
   const jsonImp = disableBigNumbers ? JSON : JsonBig
 
   const isAeternityNode = spec.info.title === 'Aeternity node'
