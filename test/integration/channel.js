@@ -843,33 +843,33 @@ describe('Channel', function () {
       sign: responderSign
     })
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
-    const code = await initiator.compileContractAPI(identityContract, { backend: 'aevm' })
-    const callData = await initiator.contractEncodeCallDataAPI(identityContract, 'init', [], { backend: 'aevm' })
+    const code = await initiator.compileContractAPI(identityContract)
+    const callData = await initiator.contractEncodeCallDataAPI(identityContract, 'init', [])
     const roundBefore = initiatorCh.round()
     const result = await initiatorCh.createContract({
       code,
       callData,
       deposit: 1000,
-      vmVersion: 6,
-      abiVersion: 1
+      vmVersion: 5,
+      abiVersion: 3
     }, async (tx) => initiator.signTransaction(tx))
     result.should.eql({ accepted: true, address: result.address, signedTx: (await initiatorCh.state()).signedTx })
     initiatorCh.round().should.equal(roundBefore + 1)
     contractAddress = result.address
-    contractEncodeCall = (method, args) => initiator.contractEncodeCallDataAPI(identityContract, method, args, { backend: 'aevm' })
+    contractEncodeCall = (method, args) => initiator.contractEncodeCallDataAPI(identityContract, method, args)
   })
 
   it('can create a contract and reject', async () => {
     responderShouldRejectUpdate = true
-    const code = await initiator.compileContractAPI(identityContract, { backend: 'aevm' })
-    const callData = await initiator.contractEncodeCallDataAPI(identityContract, 'init', [], { backend: 'aevm' })
+    const code = await initiator.compileContractAPI(identityContract)
+    const callData = await initiator.contractEncodeCallDataAPI(identityContract, 'init', [])
     const roundBefore = initiatorCh.round()
     const result = await initiatorCh.createContract({
       code,
       callData,
       deposit: BigNumber('10e18'),
-      vmVersion: 4,
-      abiVersion: 1
+      vmVersion: 5,
+      abiVersion: 3
     }, async (tx) => initiator.signTransaction(tx))
     initiatorCh.round().should.equal(roundBefore)
     result.should.eql({ ...result, accepted: false })
@@ -877,28 +877,28 @@ describe('Channel', function () {
 
   it('can abort contract sign request', async () => {
     const errorCode = 12345
-    const code = await initiator.compileContractAPI(identityContract, { backend: 'aevm' })
-    const callData = await initiator.contractEncodeCallDataAPI(identityContract, 'init', [], { backend: 'aevm' })
+    const code = await initiator.compileContractAPI(identityContract)
+    const callData = await initiator.contractEncodeCallDataAPI(identityContract, 'init', [])
     const result = await initiatorCh.createContract({
       code,
       callData,
       deposit: BigNumber('10e18'),
-      vmVersion: 4,
-      abiVersion: 1
+      vmVersion: 5,
+      abiVersion: 3
     }, () => errorCode)
     result.should.eql({ accepted: false })
   })
 
   it('can abort contract with custom error code', async () => {
     responderShouldRejectUpdate = 12345
-    const code = await initiator.compileContractAPI(identityContract, { backend: 'aevm' })
-    const callData = await initiator.contractEncodeCallDataAPI(identityContract, 'init', [], { backend: 'aevm' })
+    const code = await initiator.compileContractAPI(identityContract)
+    const callData = await initiator.contractEncodeCallDataAPI(identityContract, 'init', [])
     const result = await initiatorCh.createContract({
       code,
       callData,
       deposit: BigNumber('10e18'),
-      vmVersion: 4,
-      abiVersion: 1
+      vmVersion: 5,
+      abiVersion: 3
     }, async (tx) => initiator.signTransaction(tx))
     result.should.eql({
       accepted: false,
@@ -913,7 +913,7 @@ describe('Channel', function () {
       amount: 0,
       callData: await contractEncodeCall('main', ['42']),
       contract: contractAddress,
-      abiVersion: 1
+      abiVersion: 3
     }, async (tx) => initiator.signTransaction(tx))
     result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx })
     initiatorCh.round().should.equal(roundBefore + 1)
@@ -925,7 +925,7 @@ describe('Channel', function () {
       amount: 0,
       callData: await contractEncodeCall('main', ['42']),
       contract: contractAddress,
-      abiVersion: 1
+      abiVersion: 3
     }, async (tx) => initiator.signTransaction(tx))
     console.log('after done')
     const hash = buildTxHash(forceTx.tx)
@@ -940,7 +940,7 @@ describe('Channel', function () {
       amount: 0,
       callData: await contractEncodeCall('main', ['42']),
       contract: contractAddress,
-      abiVersion: 1
+      abiVersion: 3
     }, async (tx) => initiator.signTransaction(tx))
     initiatorCh.round().should.equal(roundBefore)
     result.should.eql({ ...result, accepted: false })
@@ -952,7 +952,7 @@ describe('Channel', function () {
       amount: 0,
       callData: await contractEncodeCall('main', ['42']),
       contract: contractAddress,
-      abiVersion: 1
+      abiVersion: 3
     }, () => errorCode)
     result.should.eql({ accepted: false })
   })
@@ -963,7 +963,7 @@ describe('Channel', function () {
       amount: 0,
       callData: await contractEncodeCall('main', ['42']),
       contract: contractAddress,
-      abiVersion: 1
+      abiVersion: 3
     }, async (tx) => initiator.signTransaction(tx))
     result.should.eql({
       accepted: false,
@@ -989,8 +989,8 @@ describe('Channel', function () {
       returnType: 'ok',
       returnValue: result.returnValue
     })
-    const value = await initiator.contractDecodeDataAPI('int', result.returnValue)
-    value.should.eql({ type: 'word', value: 42 })
+    const value = await initiator.contractDecodeCallResultAPI(identityContract, 'main', result.returnValue, result.returnType)
+    value.should.equal(42)
   })
 
   it('can call a contract using dry-run', async () => {
@@ -998,7 +998,7 @@ describe('Channel', function () {
       amount: 0,
       callData: await contractEncodeCall('main', ['42']),
       contract: contractAddress,
-      abiVersion: 1
+      abiVersion: 3
     })
     result.should.eql({
       callerId: await initiator.address(),
@@ -1011,8 +1011,8 @@ describe('Channel', function () {
       returnType: 'ok',
       returnValue: result.returnValue
     })
-    const value = await initiator.contractDecodeDataAPI('int', result.returnValue)
-    value.should.eql({ type: 'word', value: 42 })
+    const value = await initiator.contractDecodeCallResultAPI(identityContract, 'main', result.returnValue, result.returnType)
+    value.should.equal(42)
   })
 
   it('can clean contract calls', async () => {
@@ -1028,13 +1028,13 @@ describe('Channel', function () {
     const result = await initiatorCh.getContractState(contractAddress)
     result.should.eql({
       contract: {
-        abiVersion: 1,
+        abiVersion: 3,
         active: true,
         deposit: 1000,
         id: contractAddress,
         ownerId: await initiator.address(),
         referrerIds: [],
-        vmVersion: 6
+        vmVersion: 5
       },
       contractState: result.contractState
     })

@@ -461,8 +461,8 @@ function deposit (amount, sign, { onOnChainTx, onOwnDepositLocked, onDepositLock
  * @param {String} options.code - Api encoded compiled AEVM byte code
  * @param {String} options.callData - Api encoded compiled AEVM call data for the code
  * @param {Number} options.deposit - Initial amount the owner of the contract commits to it
- * @param {Number} options.vmVersion - Version of the AEVM
- * @param {Number} options.abiVersion - Version of the ABI
+ * @param {Number} options.vmVersion - Version of the Virtual Machine
+ * @param {Number} options.abiVersion - Version of the Application Binary Interface
  * @param {Function} sign - Function which verifies and signs create contract transaction
  * @return {Promise<Object>}
  * @example channel.createContract({

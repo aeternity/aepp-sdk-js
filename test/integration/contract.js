@@ -518,7 +518,7 @@ describe('Contract', function () {
       isString.should.be.equal(true)
     })
     it('decode call result', async () => {
-      return contract.contractDecodeCallResultAPI(identityContract, 'main', encodedNumberSix, 'ok', { backend: 'fate' }).should.eventually.become(6)
+      return contract.contractDecodeCallResultAPI(identityContract, 'main', encodedNumberSix, 'ok').should.eventually.become(6)
     })
     it('Decode call-data using source', async () => {
       const decodedCallData = await contract.contractDecodeCallDataBySourceAPI(identityContract, 'init', callData)
@@ -531,10 +531,6 @@ describe('Contract', function () {
       decodedCallData.arguments.should.be.an('array')
       decodedCallData.arguments.length.should.be.equal(0)
       decodedCallData.function.should.be.equal('init')
-    })
-    it('Decode data API', async () => {
-      const returnData = 'cb_bzvA9Af6'
-      return contract.contractDecodeDataAPI('string', returnData).catch(e => 1).should.eventually.become(1)
     })
     it('validate bytecode', async () => {
       return contract.validateByteCodeAPI(bytecode, identityContract).should.eventually.become(true)
