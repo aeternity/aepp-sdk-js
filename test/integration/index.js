@@ -32,10 +32,10 @@ const ignoreVersion = process.env.IGNORE_VERSION || false
 export const genesisAccount = MemoryAccount({ keypair: { publicKey, secretKey } })
 export const account = Crypto.generateKeyPair()
 
-export const BaseAe = async (params = {}) => {
-  const ae = await Universal.waitMined(true).compose({
-    deepProps: { Ae: { defaults: { interval: 50, attempts: 1200 } }, Swagger: { defaults: { debug: !!process.env.DEBUG } } },
-    props: { process }
+export const BaseAe = async (params = {}) => Universal
+  .waitMined(true)
+  .compose({
+    deepProps: { Ae: { defaults: { interval: 50, attempts: 1200 } }, Swagger: { defaults: { debug: !!process.env.DEBUG } } }
   })({
     ...params,
     compilerUrl,
@@ -43,9 +43,6 @@ export const BaseAe = async (params = {}) => {
     accounts: [...params.accounts || [], genesisAccount],
     nodes: [{ name: 'test', instance: await Node({ url, internalUrl }) }]
   })
-  ae.removeAccount(process.env.WALLET_PUB)
-  return ae
-}
 
 const spendPromise = (async () => {
   const ae = await BaseAe({ networkId })

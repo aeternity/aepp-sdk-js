@@ -42,7 +42,4 @@ import Contract from './contract'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Universal instance
  */
-export default Ae.compose(AccountMultiple, Chain, Transaction, Aens, Contract, Oracle, GeneralizeAccount, {
-  init () {},
-  props: { process: {} }
-})
+export default Ae.compose(AccountMultiple, Chain, Transaction, Aens, Contract, Oracle, GeneralizeAccount)

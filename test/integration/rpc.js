@@ -71,7 +71,6 @@ describe('Aepp<->Wallet', function () {
           this.shareWalletInfo(connectionFromWalletToAepp.sendMessage.bind(connectionFromWalletToAepp))
         }
       })
-      wallet.removeAccount(process.env.WALLET_PUB)
       aepp = await RpcAepp({
         name: 'AEPP',
         nodes: [{ name: 'test', instance: node }],
