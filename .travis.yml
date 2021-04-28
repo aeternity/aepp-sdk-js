@@ -14,7 +14,7 @@ before_install:
   - if [[ $TRAVIS_EVENT_TYPE == "cron" ]]; then
       export NODE_TAG=master;
       export COMPILER_TAG=latest;
-      export FORCE_COMPATIBILITY=true;
+      export IGNORE_VERSION=true;
     fi
   - if [[ $TRAVIS_BUILD_STAGE_NAME == "Integration tests" ]]; then
       docker-compose up -d;

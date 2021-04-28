@@ -14,10 +14,9 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-import Compiler from '../../src/contract/compiler'
 import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
-import { BaseAe, getSdk, compilerUrl, publicKey } from './'
+import { BaseAe, getSdk, publicKey } from './'
 import { decode } from '../../src/tx/builder/helpers'
 import { DRY_RUN_ACCOUNT } from '../../src/tx/builder/schema'
 import * as R from 'ramda'
@@ -458,7 +457,7 @@ describe('Contract', function () {
       try {
         await contract.contractCompile(contractWithLib)
       } catch (e) {
-        e.message.should.include('Couldn\'t find include file')
+        e.response.text.should.include('Couldn\'t find include file')
       }
     })
     it('Can deploy contract with external deps', async () => {
@@ -490,17 +489,6 @@ describe('Contract', function () {
   describe('Sophia Compiler', function () {
     let callData
     let bytecode
-    it('Init un-compatible compiler version', async () => {
-      try {
-        // Init compiler
-        const compiler = await Compiler({ compilerUrl })
-        // Overwrite compiler version
-        compiler.compilerVersion = '1.0.0'
-        await compiler.checkCompatibility()
-      } catch (e) {
-        e.message.should.satisfy(s => s.startsWith('Unsupported compiler version 1.0.0'))
-      }
-    })
     it('compile', async () => {
       bytecode = await contract.compileContractAPI(identityContract)
       const prefix = bytecode.slice(0, 2)
@@ -556,7 +544,7 @@ describe('Contract', function () {
         const cloned = R.clone(contract)
         await cloned.setCompilerUrl('https://compiler.aepps.comas')
       } catch (e) {
-        e.message.should.be.equal('Compiler do not respond')
+        e.message.should.be.equal('request to https://compiler.aepps.comas/api failed, reason: getaddrinfo ENOTFOUND compiler.aepps.comas')
       }
     })
   })
@@ -1125,7 +1113,18 @@ describe('Contract', function () {
       })
       it('Resolve external contract type', async () => {
         const fnACI = getFunctionACI(cInstance.aci, 'remoteArgs', { external: cInstance.externalAci })
-        readType(fnACI.arguments[0].type, { bindings: fnACI.bindings }).should.eql(JSON.parse('{"t":"record","generic":[{"name":"value","type":"string"},{"name":"key","type":{"list":["Voting.test_type"]}}]}'))
+        readType(fnACI.arguments[0].type, { bindings: fnACI.bindings }).should.eql({
+          t: 'record',
+          generic: [{
+            name: 'value',
+            type: 'string'
+          }, {
+            name: 'key',
+            type: {
+              list: ['Voting.test_type']
+            }
+          }]
+        })
         readType(fnACI.returns, { bindings: fnACI.bindings }).t.should.be.equal('int')
       })
     })

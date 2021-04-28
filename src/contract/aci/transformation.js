@@ -119,7 +119,7 @@ export function linkTypeDefs (t, bindings) {
   const [root, typeDef] = typeof t === 'object' ? Object.keys(t)[0].split('.') : t.split('.')
   const contractTypeDefs = bindings.find(c => c.name === root)
   const aciType = [
-    ...contractTypeDefs.type_defs,
+    ...contractTypeDefs.typeDefs,
     { name: 'state', typedef: contractTypeDefs.state, vars: [] }
   ].find(({ name }) => name === typeDef)
   if (aciType.vars.length) {

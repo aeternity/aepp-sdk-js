@@ -75,9 +75,9 @@ async function getConsensusProtocolVersion (protocols = [], height) {
 const Node = AsyncInit.compose({
   async init ({ url, internalUrl }) {
     if (!url) throw new Error('"url" required')
-    this.url = url.replace(/\/?$/, '')
-    this.internalUrl = internalUrl ? internalUrl.replace(/\/?$/, '') : this.url
-    const client = await genSwaggerClient(`${this.url}/api`, this.internalUrl)
+    this.url = url.replace(/\/$/, '')
+    this.internalUrl = internalUrl ? internalUrl.replace(/\/$/, '') : this.url
+    const client = await genSwaggerClient(`${this.url}/api`, { internalUrl: this.internalUrl })
     this.version = client.spec.info.version
     this.api = client.api
   },
@@ -99,16 +99,12 @@ const Node = AsyncInit.compose({
     nodeNetworkId: null
   }
 }, {
-  async init ({ forceCompatibility = false }) {
+  async init ({ ignoreVersion = false }) {
     const { nodeRevision: revision, genesisKeyBlockHash: genesisHash, networkId, protocols } = await this.api.getStatus()
     this.consensusProtocolVersion = await this.getConsensusProtocolVersion(protocols)
     if (
-      (
-        !semverSatisfies(this.version.split('-')[0], NODE_GE_VERSION, NODE_LT_VERSION) ||
-        this.version === '5.0.0-rc1'
-      ) &&
-      // Todo implement 'rc' version comparision in semverSatisfies
-      !forceCompatibility
+      !semverSatisfies(this.version, NODE_GE_VERSION, NODE_LT_VERSION) &&
+      !ignoreVersion
     ) {
       throw new Error(
         `Unsupported node version ${this.version}. ` +
@@ -121,7 +117,7 @@ const Node = AsyncInit.compose({
   }
 })
 
-const NODE_GE_VERSION = '5.0.0'
+const NODE_GE_VERSION = '5.0.1'
 const NODE_LT_VERSION = '6.0.0'
 
 export default Node
