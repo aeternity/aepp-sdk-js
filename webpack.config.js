@@ -7,9 +7,6 @@ function configure (filename, opts = {}) {
     entry: './src/index.js',
     mode: 'development', // automatically overriden by production flag
     devtool: argv.mode === 'production' ? 'source-map' : 'eval-source-map',
-    node: {
-      fs: 'empty'
-    },
     module: {
       rules: [
         {
@@ -26,7 +23,13 @@ function configure (filename, opts = {}) {
       ]
     },
     resolve: {
-      extensions: ['.ts', '.js']
+      extensions: ['.ts', '.js'],
+      fallback: {
+        buffer: require.resolve('buffer/'),
+        path: require.resolve('path-browserify'),
+        stream: require.resolve('stream-browserify'),
+        crypto: require.resolve('crypto-browserify')
+      }
     },
     plugins: argv.report ? [
       new BundleAnalyzerPlugin({

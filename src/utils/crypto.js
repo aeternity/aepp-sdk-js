@@ -22,7 +22,7 @@
  */
 
 import bs58check from 'bs58check'
-import * as RLP from 'rlp'
+import { decode as rlpDecode, encode as rlpEncode } from 'rlp'
 import { blake2b } from 'blakejs'
 import ed2curve from 'ed2curve'
 import nacl from 'tweetnacl'
@@ -453,7 +453,7 @@ export function assertedType (data, type, omitError) {
  * @return {Buffer} Decoded transaction
  */
 export function decodeTx (encodedTx) {
-  return RLP.decode(Buffer.from(decodeBase64Check(assertedType(encodedTx, 'tx'))))
+  return rlpDecode(Buffer.from(decodeBase64Check(assertedType(encodedTx, 'tx'))))
 }
 
 /**
@@ -463,7 +463,7 @@ export function decodeTx (encodedTx) {
  * @return {String} Encoded transaction
  */
 export function encodeTx (txData) {
-  const encodedTxData = RLP.encode(txData)
+  const encodedTxData = rlpEncode(txData)
   const encodedTx = encodeBase64Check(encodedTxData)
   return `tx_${encodedTx}`
 }
@@ -532,13 +532,3 @@ export function decryptData (secretKey, encryptedData) {
   )
   return decrypted ? Buffer.from(decrypted) : decrypted
 }
-
-/**
- * RLP decode
- * @rtype (data: Any) => Buffer[]
- * @param {Buffer|String|Integer|Array} data - Data to decode
- * @return {Array} Array of Buffers containing the original message
- */
-export const decode = RLP.decode
-export const encode = RLP.encode
-export const rlp = RLP
