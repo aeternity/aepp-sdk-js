@@ -20,7 +20,7 @@ import { describe, it } from 'mocha'
 import { expect } from 'chai'
 import BigNumber from 'bignumber.js'
 import { leftPad, rightPad, toBytes, bigNumberToByteArray } from '../../src/utils/bytes'
-import { isBase64, snakeOrKebabToPascal, snakeToPascal, pascalToSnake } from '../../src/utils/string'
+import { isBase64, snakeToPascal, pascalToSnake } from '../../src/utils/string'
 
 describe('Bytes', function () {
   const bytes = Buffer.from('hello')
@@ -45,9 +45,6 @@ describe('Bytes', function () {
   it('is not base64 string', () => isBase64('hello').should.be.equal(false))
 
   const testCase = 'test_test-testTest'
-
-  it('converts snake or kebab to pascal case', () => snakeOrKebabToPascal(testCase)
-    .should.be.equal('testTestTestTest'))
 
   it('converts snake to pascal case', () => snakeToPascal(testCase)
     .should.be.equal('testTest-testTest'))

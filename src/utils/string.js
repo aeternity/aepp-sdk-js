@@ -29,16 +29,6 @@ export function snakeToPascal (s) {
 }
 
 /**
- * Convert string from snake_case to PascalCase
- * @rtype (s: String) => String
- * @param {String} s - String to convert
- * @return {String} Converted string
- */
-export function snakeOrKebabToPascal (s) {
-  return s.replace(/[_|-]./g, match => R.toUpper(match[1]))
-}
-
-/**
  * Convert string from PascalCase to snake_case
  * @rtype (s: String) => String
  * @param {String} s - String to convert
