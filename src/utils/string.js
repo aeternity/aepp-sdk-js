@@ -48,16 +48,6 @@ export function isHex (str) {
 }
 
 /**
- * Check whether a string is Aeternity address
- * @param {string} str String to validate.
- * @return {boolean} True if the string is valid AE address
- */
-export function isAeAddress (str) {
-  if (typeof str !== 'string') return false
-  return str.split('_')[0].length === 2 && isAddressValid(str)
-}
-
-/**
  * Check whether a string is valid base-64.
  * @param {string} str String to validate.
  * @return {boolean} True if the string is valid base-64, false otherwise.

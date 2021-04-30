@@ -78,13 +78,12 @@ export function getAddressFromPriv (secret) {
  * @return {Boolean} valid
  */
 export function isAddressValid (address, prefix = 'ak') {
-  let isValid
+  if (typeof address !== 'string') return false
   try {
-    isValid = decodeBase58Check(assertedType(address, prefix)).length === 32
+    return decodeBase58Check(assertedType(address, prefix)).length === 32
   } catch (e) {
-    isValid = false
+    return false
   }
-  return isValid
 }
 
 /**
