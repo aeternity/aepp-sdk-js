@@ -1,3 +1,157 @@
+# [8.0.0-beta.1](https://github.com/aeternity/aepp-sdk-js/compare/7.7.0...8.0.0-beta.1) (2021-05-6)
+
+
+### Important changes
+
+* Iris compatibility (compatible with nodes >= 5.2.0 < 7.0.0)
+* initial TypeScript support (not enough type definitions yet)
+* documentation is generated using MkDocs on Travis
+
+### BREAKING CHANGES
+
+* Drop old aepp-wallet RPC interface ([254f5a93](https://github.com/aeternity/aepp-sdk-js/commit/254f5a93))
+* **refactor:** don't retrieve account from process.env ([59e5c9b5](https://github.com/aeternity/aepp-sdk-js/commit/59e5c9b5))
+* **refactor(crypto):** don't reexport RLP methods ([c6004bc7](https://github.com/aeternity/aepp-sdk-js/commit/c6004bc7))
+* **refactoring:** remove legacy contractDecodeDataAPI compiler method ([dfadac8d](https://github.com/aeternity/aepp-sdk-js/commit/dfadac8d))
+* **refactor:** rename `forceCompatibility` to more clear `ignoreVersion` ([72f1d326](https://github.com/aeternity/aepp-sdk-js/commit/72f1d326))
+* **refactoring:** require compiler above or equal to 4.1.0 ([c9f48f91](https://github.com/aeternity/aepp-sdk-js/commit/c9f48f91))
+* **RpcClient:** Drop unnecessary action stuff ([84545fd7](https://github.com/aeternity/aepp-sdk-js/commit/84545fd7))
+* Combine RpcWallet and RpcClients ([12892002](https://github.com/aeternity/aepp-sdk-js/commit/12892002))
+* Drop old names support, split ensureNameValid and isNameValid ([315a78a9](https://github.com/aeternity/aepp-sdk-js/commit/315a78a9))
+* **refactor(contract-aci):** export single function instead of stamp ([091b3282](https://github.com/aeternity/aepp-sdk-js/commit/091b3282))
+* Combine Accounts and Selector into AccountMultiple ([0cacd3b3](https://github.com/aeternity/aepp-sdk-js/commit/0cacd3b3))
+* Use swagger-client instead of a custom implementation ([4b3260d5](https://github.com/aeternity/aepp-sdk-js/commit/4b3260d5))
+* Remove OracleNodeAPI wrapper ([c6f9a76d](https://github.com/aeternity/aepp-sdk-js/commit/c6f9a76d))
+* Flatten options of contractCallStatic, remove extra dryRunContractTx ([f3ffb664](https://github.com/aeternity/aepp-sdk-js/commit/f3ffb664))
+* **txDryRun:** Simplify arguments, support `txEvents` option ([401c53da](https://github.com/aeternity/aepp-sdk-js/commit/401c53da))
+* **contracts:** Mark handleCallError as private, simplify arguments ([bdf76e24](https://github.com/aeternity/aepp-sdk-js/commit/bdf76e24))
+* import/no-named-as-default linter error ([d63e1511](https://github.com/aeternity/aepp-sdk-js/commit/d63e1511))
+* **oracle:** make pollForQueries a sync function ([dc955e14](https://github.com/aeternity/aepp-sdk-js/commit/dc955e14))
+* chore: drop aevm support and backend (compiler) option ([6eb702dd](https://github.com/aeternity/aepp-sdk-js/commit/6eb702dd))
+* refactor(schema): export enum with consensus protocol versions ([e92f187d](https://github.com/aeternity/aepp-sdk-js/commit/e92f187d))
+
+### Features
+
+* **swagger:** allow to provide external specification ([683082b3](https://github.com/aeternity/aepp-sdk-js/commit/683082b3))
+* **swagger:** make compatible with OpenAPI 3 ([1d83f1a4](https://github.com/aeternity/aepp-sdk-js/commit/1d83f1a4))
+* switch to v3 endpoints on Iris ([eca6697b](https://github.com/aeternity/aepp-sdk-js/commit/eca6697b))
+* **traverse-keys:** add keysOfValuesToIgnore option as a workaround ([8ff5afe4](https://github.com/aeternity/aepp-sdk-js/commit/8ff5afe4))
+* Use es modules version in browser if supported ([b49c38f0](https://github.com/aeternity/aepp-sdk-js/commit/b49c38f0))
+* Add typescript support ([abde033a](https://github.com/aeternity/aepp-sdk-js/commit/abde033a))
+
+### Docs
+
+* **contract:** fix default backend value ([9fcbeb32](https://github.com/aeternity/aepp-sdk-js/commit/9fcbeb32))
+* **wallet-iframe:** fix disconnect button ([59014bd0](https://github.com/aeternity/aepp-sdk-js/commit/59014bd0))
+* **examples-browser:** rearrange files and docs ([985e3b96](https://github.com/aeternity/aepp-sdk-js/commit/985e3b96))
+* use relative links between docs pages ([d34d8181](https://github.com/aeternity/aepp-sdk-js/commit/d34d8181))
+* remove outdated aecrypto example ([7df05bfe](https://github.com/aeternity/aepp-sdk-js/commit/7df05bfe))
+* refactor node examples ([e8c443cf](https://github.com/aeternity/aepp-sdk-js/commit/e8c443cf))
+* **changelog:** add missed single quote in example ([45fd0002](https://github.com/aeternity/aepp-sdk-js/commit/45fd0002))
+* **resolveName:** Document verify option ([ca865596](https://github.com/aeternity/aepp-sdk-js/commit/ca865596))
+* Remove outdated docs ([cf9c166f](https://github.com/aeternity/aepp-sdk-js/commit/cf9c166f))
+* **decodeTx:** Fix arg naming and annotation ([883819c0](https://github.com/aeternity/aepp-sdk-js/commit/883819c0))
+* **contract-events:** Remove outdated contract, update links and markup ([37d39d61](https://github.com/aeternity/aepp-sdk-js/commit/37d39d61))
+* Update docs/guides/import-nodejs.md ([9dc274ed](https://github.com/aeternity/aepp-sdk-js/commit/9dc274ed))
+* Update docs/guides/import-nodejs.md ([93bfce11](https://github.com/aeternity/aepp-sdk-js/commit/93bfce11))
+* break down json obj keys necessary for account initialization in nodejs docs ([af5ee41d](https://github.com/aeternity/aepp-sdk-js/commit/af5ee41d))
+* Ignore __pycache__ in the docs folder ([9989e8e7](https://github.com/aeternity/aepp-sdk-js/commit/9989e8e7))
+* Specify the python version more precisely ([d6204523](https://github.com/aeternity/aepp-sdk-js/commit/d6204523))
+* Add __pycache__ to .gitignore ([f0b7e1f1](https://github.com/aeternity/aepp-sdk-js/commit/f0b7e1f1))
+* Add navigation and update some titles ([8ad15ced](https://github.com/aeternity/aepp-sdk-js/commit/8ad15ced))
+* **docco template:** Remove extra new lines around code, skip extra blocks ([65ce3cf1](https://github.com/aeternity/aepp-sdk-js/commit/65ce3cf1))
+* **aecontract:** Make a list out of a long sentence ([8ff7839c](https://github.com/aeternity/aepp-sdk-js/commit/8ff7839c))
+* **aens-usage:** Use more semantic markup, compatible with mkdocs ([de3d3cd5](https://github.com/aeternity/aepp-sdk-js/commit/de3d3cd5))
+* **docs readme:** Fix typos and formatting ([5b0c790d](https://github.com/aeternity/aepp-sdk-js/commit/5b0c790d))
+* Add initial mkdocs and readthedocs configuration ([b688a96b](https://github.com/aeternity/aepp-sdk-js/commit/b688a96b))
+* Extract quick-start to guides ([28f7e6f7](https://github.com/aeternity/aepp-sdk-js/commit/28f7e6f7))
+* Update testnet URL ([7bb823f8](https://github.com/aeternity/aepp-sdk-js/commit/7bb823f8))
+* **assertedType:** Make the last parameter more obvious ([50094d3a](https://github.com/aeternity/aepp-sdk-js/commit/50094d3a))
+* **travis:** Build docs to gh-pages ([7c935a2b](https://github.com/aeternity/aepp-sdk-js/commit/7c935a2b))
+* **Docs root:** Add link to API reference ([4a36102d](https://github.com/aeternity/aepp-sdk-js/commit/4a36102d))
+* Move outdated disclaimer to the root readme ([80a6a663](https://github.com/aeternity/aepp-sdk-js/commit/80a6a663))
+* Remove generated docs ([fd802b00](https://github.com/aeternity/aepp-sdk-js/commit/fd802b00))
+* Fix api docs generation ([56e3aa9d](https://github.com/aeternity/aepp-sdk-js/commit/56e3aa9d))
+
+### Code Refactoring
+
+* use BigNumber constructor instead of custom wrapper ([4488b4d7](https://github.com/aeternity/aepp-sdk-js/commit/4488b4d7))
+* avoid extra object nesting ([f99d3045](https://github.com/aeternity/aepp-sdk-js/commit/f99d3045))
+* **compiler:** use swagger file ([0d821614](https://github.com/aeternity/aepp-sdk-js/commit/0d821614))
+* **semver-satisfies:** remove extra splitting by dash ([35d5c11a](https://github.com/aeternity/aepp-sdk-js/commit/35d5c11a))
+* remove extra char in regex ([37eeefae](https://github.com/aeternity/aepp-sdk-js/commit/37eeefae))
+* refactor wallet detector ([1bc8d027](https://github.com/aeternity/aepp-sdk-js/commit/1bc8d027))
+* **shareWalletInfo:** Don't create unnecessary copy of info ([3a4e50b9](https://github.com/aeternity/aepp-sdk-js/commit/3a4e50b9))
+* Inline receive helper that is used once ([a4a13889](https://github.com/aeternity/aepp-sdk-js/commit/a4a13889))
+* **rpc:** Inline helpers used once ([21903f4d](https://github.com/aeternity/aepp-sdk-js/commit/21903f4d))
+* **rpc:** Prefer default export ([70fc3f0f](https://github.com/aeternity/aepp-sdk-js/commit/70fc3f0f))
+* **rpc helpers:** Remove unused getWindow function ([c12b528f](https://github.com/aeternity/aepp-sdk-js/commit/c12b528f))
+* don't use AsyncInit where it is not necessary ([84373697](https://github.com/aeternity/aepp-sdk-js/commit/84373697))
+* **contract-aci:** reuse defaults from Contract stamp ([47013962](https://github.com/aeternity/aepp-sdk-js/commit/47013962))
+* cleanup MIN_GAS_PRICE ([a5b28842](https://github.com/aeternity/aepp-sdk-js/commit/a5b28842))
+* remove unused option string ([0e28af23](https://github.com/aeternity/aepp-sdk-js/commit/0e28af23))
+* remove unused dryRunAccount default option ([8c42b706](https://github.com/aeternity/aepp-sdk-js/commit/8c42b706))
+* Consistent new on Error creation ([39f93d3f](https://github.com/aeternity/aepp-sdk-js/commit/39f93d3f))
+* **height:** Use a shorter syntax ([b013bf9d](https://github.com/aeternity/aepp-sdk-js/commit/b013bf9d))
+* **height:** Improve naming of internal promise ([7915119a](https://github.com/aeternity/aepp-sdk-js/commit/7915119a))
+* Move source code to "src" folder ([ddbce389](https://github.com/aeternity/aepp-sdk-js/commit/ddbce389))
+* **sign-using-ga:** don't pass extra options ([44bab6d0](https://github.com/aeternity/aepp-sdk-js/commit/44bab6d0))
+
+### Bug Fixes
+
+* **traverse-keys:** add missed null check ([7b724b86](https://github.com/aeternity/aepp-sdk-js/commit/7b724b86))
+* **swagger:** add workaround to get transaction details of GAAttachTx ([bb7ec479](https://github.com/aeternity/aepp-sdk-js/commit/bb7ec479))
+* **top-block:** use getTopHeader on Iris, mark deprecated ([2b410257](https://github.com/aeternity/aepp-sdk-js/commit/2b410257))
+* **nonce-verification:** add missed space ([3f244dfb](https://github.com/aeternity/aepp-sdk-js/commit/3f244dfb))
+* missed aepp id in wallet connect handler ([1ed9284a](https://github.com/aeternity/aepp-sdk-js/commit/1ed9284a))
+* **get-node-info:** bring url and internalUrl back ([e984f3b3](https://github.com/aeternity/aepp-sdk-js/commit/e984f3b3))
+* contract error decoding ([d56931ac](https://github.com/aeternity/aepp-sdk-js/commit/d56931ac))
+* **contract-aci:** don't proxy prepareArgsForEncode from helpers ([7e40eda0](https://github.com/aeternity/aepp-sdk-js/commit/7e40eda0))
+* Improve handling of call error ([584eb5e4](https://github.com/aeternity/aepp-sdk-js/commit/584eb5e4))
+
+### Maintenance
+
+* Use ts-standard instead of standard ([be5aece7](https://github.com/aeternity/aepp-sdk-js/commit/be5aece7))
+* **tsconfig:** Set target version to es5 ([ed131b1b](https://github.com/aeternity/aepp-sdk-js/commit/ed131b1b))
+* Fix eslint errors manually ([dfe3a05e](https://github.com/aeternity/aepp-sdk-js/commit/dfe3a05e))
+* require node below 7.0.0 ([ae1a5ef5](https://github.com/aeternity/aepp-sdk-js/commit/ae1a5ef5))
+* require node above or equal to 5.2.0 ([ebb36f06](https://github.com/aeternity/aepp-sdk-js/commit/ebb36f06))
+* update dependencies ([d876cff7](https://github.com/aeternity/aepp-sdk-js/commit/d876cff7))
+* **deps:** bump ssri from 6.0.1 to 6.0.2 ([e0dfb8c9](https://github.com/aeternity/aepp-sdk-js/commit/e0dfb8c9))
+* **deps:** bump y18n from 4.0.0 to 4.0.1 ([9e4acd61](https://github.com/aeternity/aepp-sdk-js/commit/9e4acd61))
+* **deps:** bump elliptic from 6.5.3 to 6.5.4 ([feb3aa68](https://github.com/aeternity/aepp-sdk-js/commit/feb3aa68))
+* **deps:** bump axios from 0.19.2 to 0.21.1 ([0f619f27](https://github.com/aeternity/aepp-sdk-js/commit/0f619f27))
+* **deps:** bump ini from 1.3.5 to 1.3.7 ([95580324](https://github.com/aeternity/aepp-sdk-js/commit/95580324))
+* **deps:** bump highlight.js from 10.4.0 to 10.4.1 ([9fcfadfe](https://github.com/aeternity/aepp-sdk-js/commit/9fcfadfe))
+* **deps:** bump highlight.js from 10.1.1 to 10.4.0 ([43aff25f](https://github.com/aeternity/aepp-sdk-js/commit/43aff25f))
+* **deps:** bump node-fetch from 2.6.0 to 2.6.1 ([80ed6d70](https://github.com/aeternity/aepp-sdk-js/commit/80ed6d70))
+* Update node to 5.8.0 ([b6ff3422](https://github.com/aeternity/aepp-sdk-js/commit/b6ff3422))
+* Update .gitignore ([1f1563dc](https://github.com/aeternity/aepp-sdk-js/commit/1f1563dc))
+* add vscode .history folder to gitignore ([f4d61df4](https://github.com/aeternity/aepp-sdk-js/commit/f4d61df4))
+* Update testnet URL in JS files ([dc1b807a](https://github.com/aeternity/aepp-sdk-js/commit/dc1b807a))
+* add Iris consensus protocol ([41fd4a13](https://github.com/aeternity/aepp-sdk-js/commit/41fd4a13))
+* add vsn 2 version of GA_META transaction ([b5abe098](https://github.com/aeternity/aepp-sdk-js/commit/b5abe098))
+* add new versions of CHANNEL, CHANNEL_CREATE transactions ([366981a3](https://github.com/aeternity/aepp-sdk-js/commit/366981a3))
+* support compilers below 6.0.0 ([876e5164](https://github.com/aeternity/aepp-sdk-js/commit/876e5164))
+
+### Performance
+
+* Optimize height queries ([f74ca4cb](https://github.com/aeternity/aepp-sdk-js/commit/f74ca4cb))
+
+### Tests
+
+* simplify GA tests ([7b9628c2](https://github.com/aeternity/aepp-sdk-js/commit/7b9628c2))
+* **oracle:** avoid explicit waiting for 1 second ([f81cd3a1](https://github.com/aeternity/aepp-sdk-js/commit/f81cd3a1))
+* passing of forceCompatibility flag ([6f900b98](https://github.com/aeternity/aepp-sdk-js/commit/6f900b98))
+* **contract:** remove extra backend option ([184566f9](https://github.com/aeternity/aepp-sdk-js/commit/184566f9))
+* update channel tests to fate ([35a996d8](https://github.com/aeternity/aepp-sdk-js/commit/35a996d8))
+* Faster tests ([5d629103](https://github.com/aeternity/aepp-sdk-js/commit/5d629103))
+* Extract strings tests into separate file ([f3c7d3fa](https://github.com/aeternity/aepp-sdk-js/commit/f3c7d3fa))
+* **ga:** Remove extra await ([72bfc746](https://github.com/aeternity/aepp-sdk-js/commit/72bfc746))
+* Make tests more precise ([fe7a8567](https://github.com/aeternity/aepp-sdk-js/commit/fe7a8567))
+
+
+
 # [7.7.0](https://github.com/aeternity/aepp-sdk-js/compare/7.6.0...7.7.0) (2020-08-18)
 
 
