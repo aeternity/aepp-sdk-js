@@ -16,7 +16,7 @@ export const filterObject = (object, fn) => Object.fromEntries(Object.entries(ob
  * @return {Object} Transformed object
  */
 export const traverseKeys = (fn, object, keysOfValuesToIgnore = []) => {
-  if (typeof object !== 'object') return object
+  if (typeof object !== 'object' || object === null) return object
   if (Array.isArray(object)) return object.map(i => traverseKeys(fn, i, keysOfValuesToIgnore))
   return mapObject(object, ([key, value]) => [
     fn(key),

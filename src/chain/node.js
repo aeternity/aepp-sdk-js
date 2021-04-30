@@ -124,8 +124,13 @@ async function awaitHeight (height, { interval = 5000, attempts = 20 } = {}) {
   throw new Error(`Giving up after ${(attempts - 1) * interval}ms, current height: ${currentHeight}, desired height: ${height}`)
 }
 
+/**
+ * @deprecated
+ */
 async function topBlock () {
-  return Object.values(await this.api.getTopBlock())[0]
+  return this._isIrisNode
+    ? await this.api.getTopHeader()
+    : Object.values(await this.api.getTopBlock())[0]
 }
 
 async function poll (th, { blocks = 10, interval = 5000, allowUnsynced = false } = {}) {

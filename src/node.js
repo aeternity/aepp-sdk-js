@@ -73,13 +73,33 @@ async function getConsensusProtocolVersion (protocols = [], height) {
  * @example Node({url: 'https://testnet.aeternity.io'})
  */
 const Node = AsyncInit.compose({
-  async init ({ url, internalUrl }) {
+  async init ({ url, internalUrl, ignoreVersion }) {
     if (!url) throw new Error('"url" required')
     this.url = url.replace(/\/$/, '')
     this.internalUrl = internalUrl ? internalUrl.replace(/\/$/, '') : this.url
-    const client = await genSwaggerClient(`${this.url}/api`, { internalUrl: this.internalUrl })
+    let client = await genSwaggerClient(`${this.url}/api`, { internalUrl: this.internalUrl })
     this.version = client.spec.info.version
+    const isIrisPrereleaseNode = semverSatisfies(this.version, '0.0.0', '0.0.1') // TODO: Remove after Iris node release
+    if (
+      !isIrisPrereleaseNode &&
+      !semverSatisfies(this.version, NODE_GE_VERSION, NODE_LT_VERSION) &&
+      !ignoreVersion
+    ) {
+      throw new Error(
+        `Unsupported node version ${this.version}. ` +
+        `Supported: >= ${NODE_GE_VERSION} < ${NODE_LT_VERSION}`
+      )
+    }
+    if (isIrisPrereleaseNode || semverSatisfies(this.version, IRIS_NODE_GE_VERSION, NODE_LT_VERSION)) {
+      client = await genSwaggerClient(`${this.url}/api?oas3`, { internalUrl: this.internalUrl })
+      this._isIrisNode = true
+    }
     this.api = client.api
+
+    const { nodeRevision: revision, genesisKeyBlockHash: genesisHash, networkId, protocols } = await this.api.getStatus()
+    this.consensusProtocolVersion = await this.getConsensusProtocolVersion(protocols)
+    this.nodeNetworkId = networkId
+    return Object.assign(this, { revision, genesisHash })
   },
   methods: {
     getNodeInfo () {
@@ -98,26 +118,10 @@ const Node = AsyncInit.compose({
     consensusProtocolVersion: null,
     nodeNetworkId: null
   }
-}, {
-  async init ({ ignoreVersion = false }) {
-    const { nodeRevision: revision, genesisKeyBlockHash: genesisHash, networkId, protocols } = await this.api.getStatus()
-    this.consensusProtocolVersion = await this.getConsensusProtocolVersion(protocols)
-    if (
-      !semverSatisfies(this.version, NODE_GE_VERSION, NODE_LT_VERSION) &&
-      !ignoreVersion
-    ) {
-      throw new Error(
-        `Unsupported node version ${this.version}. ` +
-        `Supported: >= ${NODE_GE_VERSION} < ${NODE_LT_VERSION}`
-      )
-    }
-
-    this.nodeNetworkId = networkId
-    return Object.assign(this, { revision, genesisHash })
-  }
 })
 
-const NODE_GE_VERSION = '5.0.1'
-const NODE_LT_VERSION = '6.0.0'
+const NODE_GE_VERSION = '5.2.0'
+const IRIS_NODE_GE_VERSION = '6.0.0'
+const NODE_LT_VERSION = '7.0.0'
 
 export default Node

@@ -32,7 +32,8 @@ describe('Other utils', function () {
       }],
       t: {
         f: 6
-      }
+      },
+      d: null
     }
 
     expect(traverseKeys(k => 'x' + k, input, ['t'])).to.deep.equal({
@@ -45,7 +46,8 @@ describe('Other utils', function () {
       }],
       xt: {
         f: 6
-      }
+      },
+      xd: null
     })
   })
 })

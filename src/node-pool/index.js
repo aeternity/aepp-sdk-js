@@ -36,6 +36,13 @@ export const NodePool = stampit({
       get () {
         return getterForCurrentNode(this.selectedNode)
       }
+    },
+    _isIrisNode: {
+      enumerable: true,
+      configurable: false,
+      get () {
+        return this.selectedNode.instance._isIrisNode
+      }
     }
   },
   methods: {

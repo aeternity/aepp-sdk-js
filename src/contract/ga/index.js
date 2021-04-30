@@ -76,11 +76,11 @@ async function isGA (address) {
  * @function
  * @param {String} authFnName - Authorization function name
  * @param {String} source - Auth contract source code
- * @param {Array} args - init arguments
- * @param {Object} options - Options
+ * @param {Array} [args] - init arguments
+ * @param {Object} [options] - Options
  * @return {Promise<Readonly<{result: *, owner: *, createdAt: Date, address, rawTx: *, transaction: *}>>}
  */
-async function createGeneralizeAccount (authFnName, source, args, options = {}) {
+async function createGeneralizeAccount (authFnName, source, args = [], options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
   const ownerId = await this.address(opt)
 

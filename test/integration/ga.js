@@ -21,13 +21,11 @@ import { generateKeyPair } from '../../src/utils/crypto'
 import MemoryAccount from '../../src/account/memory'
 
 const authContract = `contract BlindAuth =
-    record state = { owner : address }
-    entrypoint init(owner' : address) = { owner = owner' }
-    stateful entrypoint authorize(r: int) : bool =
-        // r is a random number only used to make tx hashes unique
-        switch(Auth.tx_hash)
-            None          => abort("Not in Auth context")
-            Some(tx_hash) => true
+  stateful entrypoint authorize(r: int) : bool =
+    // r is a random number only used to make tx hashes unique
+    switch(Auth.tx_hash)
+      None          => abort("Not in Auth context")
+      Some(tx_hash) => true
 `
 describe('Generalize Account', function () {
   let client
@@ -36,31 +34,33 @@ describe('Generalize Account', function () {
   before(async function () {
     client = await getSdk()
     await client.spend('100000000000000000000', gaAccount.publicKey)
-    await client.addAccount(MemoryAccount({ keypair: gaAccount }))
+    await client.addAccount(MemoryAccount({ keypair: gaAccount }), { select: true })
   })
 
   it('Make account GA', async () => {
-    await client.createGeneralizeAccount('authorize', authContract, [gaAccount.publicKey], { onAccount: gaAccount.publicKey })
+    await client.createGeneralizeAccount('authorize', authContract)
     const isGa = await client.isGA(gaAccount.publicKey)
     isGa.should.be.equal(true)
   })
+
   it('Fail on make GA on already GA account', async () => {
     try {
-      await client.createGeneralizeAccount('authorize', authContract, [gaAccount.publicKey], { onAccount: gaAccount.publicKey })
+      await client.createGeneralizeAccount('authorize', authContract)
     } catch (e) {
       e.message.should.be.equal(`Account ${gaAccount.publicKey} is already GA`)
     }
   })
-  it('Init MemoryAccount for GA and Spend using GA', async () => {
-    const r = Math.floor(Math.random() * 20)
-    const r2 = Math.floor(Math.random() * 20)
-    const callData = await client.contractEncodeCall(authContract, 'authorize', [`${r}`])
 
-    const { publicKey } = generateKeyPair()
+  it('Init MemoryAccount for GA and Spend using GA', async () => {
     client.removeAccount(gaAccount.publicKey)
+    client.selectAccount(Object.keys(client.accounts)[0])
     await client.addAccount(MemoryAccount({ gaId: gaAccount.publicKey }))
+    const { publicKey } = generateKeyPair()
+
+    const r = () => Math.floor(Math.random() * 20).toString()
+    const callData = await client.contractEncodeCall(authContract, 'authorize', [r()])
     await client.spend(10000, publicKey, { authData: { callData }, onAccount: gaAccount.publicKey, verify: false })
-    await client.spend(10000, publicKey, { authData: { source: authContract, args: [`${r2}`] }, onAccount: gaAccount.publicKey, verify: false })
+    await client.spend(10000, publicKey, { authData: { source: authContract, args: [r()] }, onAccount: gaAccount.publicKey, verify: false })
     const balanceAfter = await client.balance(publicKey)
     balanceAfter.should.be.equal('20000')
   })

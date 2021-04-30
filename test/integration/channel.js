@@ -54,8 +54,6 @@ describe('Channel', function () {
   let contractAddress
   let contractEncodeCall
   let callerNonce
-  let majorVersion
-  let minorVersion
   const initiatorSign = sinon.spy((tag, tx) => initiator.signTransaction(tx))
   const responderSign = sinon.spy((tag, tx) => {
     if (typeof responderShouldRejectUpdate === 'number') {
@@ -87,9 +85,6 @@ describe('Channel', function () {
     sharedParams.initiatorId = await initiator.address()
     sharedParams.responderId = await responder.address()
     await initiator.spend(BigNumber('500e18').toString(), await responder.address())
-    const version = initiator.getNodeInfo().version.split(/[.-]/).map(i => parseInt(i, 10))
-    majorVersion = version[0]
-    minorVersion = version[1]
   })
 
   after(() => {
@@ -686,15 +681,11 @@ describe('Channel', function () {
   })
 
   it('can reestablish a channel', async () => {
-    const existingChannelIdKey =
-      majorVersion > 5 || (majorVersion === 5 && minorVersion >= 2)
-        ? 'existingFsmId'
-        : 'existingChannelId'
     initiatorCh = await Channel({
       ...sharedParams,
       role: 'initiator',
       port: 3002,
-      [existingChannelIdKey]: existingChannelId,
+      existingFsmId: existingChannelId,
       offchainTx,
       sign: initiatorSign
     })
@@ -1074,36 +1065,18 @@ describe('Channel', function () {
     )
     result.accepted.should.be.true
     const channelId = await initiatorCh.id()
-    const round = initiatorCh.round()
-    let ch
-    if (majorVersion > 5 || (majorVersion === 5 && minorVersion >= 2)) {
-      const fsmId = initiatorCh.fsmId()
-      initiatorCh.disconnect()
-      ch = await Channel({
-        url: sharedParams.url,
-        host: sharedParams.host,
-        port: 3006,
-        role: 'initiator',
-        existingChannelId: channelId,
-        existingFsmId: fsmId
-      })
-      await waitForChannel(ch)
-      ch.fsmId().should.equal(fsmId)
-    } else {
-      initiatorCh.disconnect()
-      ch = await Channel.reconnect({
-        ...sharedParams,
-        role: 'initiator',
-        port: 3006,
-        sign: initiatorSign
-      }, {
-        channelId,
-        round,
-        role: 'initiator',
-        pubkey: await initiator.address()
-      })
-      await waitForChannel(ch)
-    }
+    const fsmId = initiatorCh.fsmId()
+    initiatorCh.disconnect()
+    const ch = await Channel({
+      url: sharedParams.url,
+      host: sharedParams.host,
+      port: 3006,
+      role: 'initiator',
+      existingChannelId: channelId,
+      existingFsmId: fsmId
+    })
+    await waitForChannel(ch)
+    ch.fsmId().should.equal(fsmId)
     // TODO: why node doesn't return signed_tx when channel is reestablished?
     // await new Promise((resolve) => {
     //   const checkRound = () => {

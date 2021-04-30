@@ -1317,7 +1317,7 @@ export const BASE_VERIFICATION_SCHEMA = [
     ERRORS.insufficientBalanceForAmount
   ),
   VERIFICATION_FIELD(
-    ({ accountNonce }) => `The nonce is invalid(already used). Next valid nonce is ${accountNonce + 1})`,
+    ({ accountNonce }) => `The nonce is invalid (already used). Next valid nonce is ${accountNonce + 1})`,
     VALIDATORS.nonceUsed,
     ERRORS.nonceUsed
   ),

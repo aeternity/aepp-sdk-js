@@ -36,7 +36,7 @@ import { required } from '@stamp/required'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} WalletConnection instance
  */
-export const WalletConnection = required({
+export default required({
   methods: {
     connect: required,
     disconnect: required,
@@ -82,5 +82,3 @@ export const WalletConnection = required({
  * @rtype () => Boolean
  * @return {Boolean} Is connected
  */
-
-export default WalletConnection
