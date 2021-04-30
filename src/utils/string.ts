@@ -15,17 +15,14 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import * as R from 'ramda'
-import { isAddressValid } from './crypto'
-
 /**
  * Convert string from snake_case to PascalCase
  * @rtype (s: String) => String
  * @param {String} s - String to convert
  * @return {String} Converted string
  */
-export function snakeToPascal (s) {
-  return s.replace(/_./g, match => R.toUpper(match[1]))
+export function snakeToPascal (s: string): string {
+  return s.replace(/_./g, match => match[1].toUpperCase())
 }
 
 /**
@@ -34,8 +31,8 @@ export function snakeToPascal (s) {
  * @param {String} s - String to convert
  * @return {String} Converted string
  */
-export function pascalToSnake (s) {
-  return s.replace(/[A-Z]/g, match => `_${R.toLower(match)}`)
+export function pascalToSnake (s: string): string {
+  return s.replace(/[A-Z]/g, match => `_${match.toLowerCase()}`)
 }
 
 /**
@@ -43,8 +40,8 @@ export function pascalToSnake (s) {
  * @param {string} str String to validate.
  * @return {boolean} True if the string is valid hex, false otherwise.
  */
-export function isHex (str) {
-  return !!(typeof str === 'string' && str.length % 2 === 0 && str.match(/^[0-9a-f]+$/i))
+export function isHex (str: string): boolean {
+  return str.length % 2 === 0 && /^[0-9a-f]+$/i.test(str)
 }
 
 /**
@@ -52,8 +49,8 @@ export function isHex (str) {
  * @param {string} str String to validate.
  * @return {boolean} True if the string is valid base-64, false otherwise.
  */
-export function isBase64 (str) {
-  if (str.length % 4 > 0 || str.match(/[^0-9a-z+/=]/i)) return false
+export function isBase64 (str: string): boolean {
+  if (str.length % 4 > 0 || /[^0-9a-z+/=]/i.test(str)) return false
   const index = str.indexOf('=')
-  return !!(index === -1 || str.slice(index).match(/={1,2}/))
+  return index === -1 || /={1,2}/.test(str.slice(index))
 }
