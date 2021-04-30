@@ -28,7 +28,6 @@ import ContractBase from './index'
 import semverSatisfies from '../utils/semver-satisfies'
 import AsyncInit from '../utils/async-init'
 import genSwaggerClient from '../utils/swagger'
-import { VM_TYPE } from '../tx/builder/schema'
 
 /**
  * Contract Compiler Stamp
@@ -67,8 +66,8 @@ export default AsyncInit.compose(ContractBase, {
     _ensureCompilerReady () {
       if (!this._compilerApi) throw new Error('Compiler is not ready')
     },
-    _prepareCompilerOptions ({ backend = this.compilerOptions.backend, filesystem = {} } = {}) {
-      return { backend, fileSystem: filesystem }
+    _prepareCompilerOptions ({ filesystem = {} } = {}) {
+      return { fileSystem: filesystem }
     },
     getCompilerVersion () {
       this._ensureCompilerReady()
@@ -96,9 +95,9 @@ export default AsyncInit.compose(ContractBase, {
       this._ensureCompilerReady()
       return this._compilerApi.generateACI({ code, options: this._prepareCompilerOptions(options) })
     },
-    contractDecodeCallDataByCodeAPI (bytecode, calldata, backend = this.compilerOptions.backend) {
+    contractDecodeCallDataByCodeAPI (bytecode, calldata) {
       this._ensureCompilerReady()
-      return this._compilerApi.decodeCalldataBytecode({ bytecode, calldata, backend })
+      return this._compilerApi.decodeCalldataBytecode({ bytecode, calldata })
     },
     contractDecodeCallDataBySourceAPI (source, fn, callData, options) {
       this._ensureCompilerReady()
@@ -141,10 +140,7 @@ export default AsyncInit.compose(ContractBase, {
     }
   },
   props: {
-    compilerVersion: null,
-    compilerOptions: {
-      backend: VM_TYPE.FATE
-    }
+    compilerVersion: null
   }
 })
 

@@ -74,8 +74,7 @@ async function _handleCallError (source, name, result) {
  * @param {Array} args Argument's for call
  * @param {Object} [options={}]  Options
  * @param {Object} [options.filesystem={}] Contract external namespaces map
- * @param {Object} [options.backend='fate'] Compiler backend
- * @return {Promise<String>}
+  * @return {Promise<String>}
  */
 async function contractEncodeCall (source, name, args, options) {
   return this.contractEncodeCallDataAPI(source, name, args, options)
@@ -252,7 +251,6 @@ async function contractDeploy (code, source, initState = [], options = {}) {
  * @param {String} source Contract sourece code
  * @param {Object} [options={}] Transaction options (fee, ttl, gas, amount, deposit)
  * @param {Object} [options.filesystem={}] Contract external namespaces map* @return {Promise<Object>} Result object
- * @param {Object} [options.backend='fate'] Contract backend version (aevm|fate)
  * @return {Promise<Object>} Result object
  * @example
  * const compiled = await client.contractCompile(SOURCE_CODE)

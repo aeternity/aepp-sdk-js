@@ -61,7 +61,6 @@ const ContractBase = stampit(required({
  * @param {String} source - Contract source code
  * @param {Object} [options={}]  Options
  * @param {Object} [options.filesystem]  Contract external namespaces map
- * @param {Object} [options.backend]  Contract vm (default: fate)
  * @return {Object} - Contract aci object
  */
 
@@ -77,7 +76,6 @@ const ContractBase = stampit(required({
  * @param {Array} args - Function argument's
  * @param {Object} [options={}]  Options
  * @param {Object} [options.filesystem]  Contract external namespaces map
- * @param {Object} [options.backend]  Contract vm (default: fate)
  * @return {String} - Contract encoded data
  */
 
@@ -94,7 +92,6 @@ const ContractBase = stampit(required({
  * @param {String} callResult - contract call result status('ok', 'revert', ...)
  * @param {Object} [options={}]  Options
  * @param {Object} [options.filesystem]  Contract external namespaces map
- * @param {Object} [options.backend]  Contract vm (default: fate)
  * @return {String} - Decoded contract call result
  */
 
@@ -110,7 +107,6 @@ const ContractBase = stampit(required({
  * @param {String} callData - Encoded contract call data
  * @param {Object} [options={}]  Options
  * @param {Object} [options.filesystem]  Contract external namespaces map
- * @param {Object} [options.backend]  Contract vm (default: fate)
  * @return {String} - Decoded contract call data
  */
 
@@ -123,7 +119,6 @@ const ContractBase = stampit(required({
  * @rtype (code: String, callData: String) => decodedResult: Promise[String]
  * @param {String} code - contract byte code
  * @param {String} callData - Encoded contract call data
- * @param {String} backend - Contract vm (default: fate)
  * @return {String} - Decoded contract call data
  */
 
@@ -137,7 +132,6 @@ const ContractBase = stampit(required({
  * @param {String} code - Contract source code
  * @param {Object} [options={}]  Options
  * @param {Object} [options.filesystem]  Contract external namespaces map
- * @param {Object} [options.backend]  Contract vm (default: fate)
  * @return {Object} Object which contain bytecode of contract
  */
 

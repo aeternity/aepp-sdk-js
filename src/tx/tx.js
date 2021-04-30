@@ -28,7 +28,7 @@ import ChainNode from '../chain/node'
 import Tx from './'
 
 import { buildTx, calculateFee } from './builder'
-import { ABI_VERSIONS, MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE, VM_TYPE, TX_TTL } from './builder/schema'
+import { ABI_VERSIONS, MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE, TX_TTL } from './builder/schema'
 import { buildContractId } from './builder/helpers'
 import { TxObject } from './tx-object'
 
@@ -147,7 +147,7 @@ async function nameRevokeTx ({ accountId, nameId }) {
   return tx
 }
 
-async function contractCreateTx ({ ownerId, code, vmVersion, abiVersion, deposit, amount, gas, gasPrice = MIN_GAS_PRICE, callData, backend }) {
+async function contractCreateTx ({ ownerId, code, vmVersion, abiVersion, deposit, amount, gas, gasPrice = MIN_GAS_PRICE, callData }) {
   // Get VM_ABI version
   const ctVersion = this.getVmVersion(TX_TYPE.contractCreate, R.head(arguments))
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
@@ -164,7 +164,7 @@ async function contractCreateTx ({ ownerId, code, vmVersion, abiVersion, deposit
     : this.api.postContractCreate(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee), gas: parseInt(gas), gasPrice, vmVersion: ctVersion.vmVersion, abiVersion: ctVersion.abiVersion }))
 }
 
-async function contractCallTx ({ callerId, contractId, abiVersion, amount, gas, gasPrice = MIN_GAS_PRICE, callData, backend }) {
+async function contractCallTx ({ callerId, contractId, abiVersion, amount, gas, gasPrice = MIN_GAS_PRICE, callData }) {
   const ctVersion = this.getVmVersion(TX_TYPE.contractCall, R.head(arguments))
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
   const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.contractCall, { senderId: callerId, ...R.head(arguments), gasPrice, abiVersion: ctVersion.abiVersion })
@@ -396,7 +396,7 @@ async function channelSnapshotSoloTx ({ channelId, fromId, payload }) {
   return tx
 }
 
-async function gaAttachTx ({ ownerId, code, vmVersion, abiVersion, authFun, gas, gasPrice = MIN_GAS_PRICE, callData, backend }) {
+async function gaAttachTx ({ ownerId, code, vmVersion, abiVersion, authFun, gas, gasPrice = MIN_GAS_PRICE, callData }) {
   // Get VM_ABI version
   const ctVersion = this.getVmVersion(TX_TYPE.contractCreate, R.head(arguments))
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
@@ -416,9 +416,9 @@ async function gaAttachTx ({ ownerId, code, vmVersion, abiVersion, authFun, gas,
  *
  * @param {string} txType Type of transaction
  * @param {object} vmAbi Object with vm and abi version fields
- * @return {object} Object with vm/abi version ({ vmVersion: number, abiVersion: number, backend: string })
+ * @return {object} Object with vm/abi version ({ vmVersion: number, abiVersion: number })
  */
-function getVmVersion (txType, { vmVersion, abiVersion, backend } = {}) {
+function getVmVersion (txType, { vmVersion, abiVersion } = {}) {
   const { consensusProtocolVersion } = this.getNodeInfo()
   const supportedProtocol = PROTOCOL_VM_ABI[consensusProtocolVersion]
   if (!supportedProtocol) throw new Error('Not supported consensus protocol version')
@@ -426,8 +426,8 @@ function getVmVersion (txType, { vmVersion, abiVersion, backend } = {}) {
   if (!protocolForTX) throw new Error('Not supported tx type')
 
   const ctVersion = {
-    abiVersion: abiVersion !== undefined ? abiVersion : backend === VM_TYPE.AEVM ? protocolForTX.abiVersion[1] : backend === VM_TYPE.FATE ? protocolForTX.abiVersion[0] : protocolForTX.abiVersion[0],
-    vmVersion: vmVersion !== undefined ? vmVersion : backend === VM_TYPE.AEVM ? protocolForTX.vmVersion[1] : backend === VM_TYPE.FATE ? protocolForTX.vmVersion[0] : protocolForTX.vmVersion[0]
+    abiVersion: abiVersion || protocolForTX.abiVersion[0],
+    vmVersion: vmVersion || protocolForTX.vmVersion[0]
   }
   if (protocolForTX.vmVersion.length && !R.contains(ctVersion.vmVersion, protocolForTX.vmVersion)) throw new Error(`VM VERSION ${ctVersion.vmVersion} do not support by this node. Supported: [${protocolForTX.vmVersion}]`)
   if (protocolForTX.abiVersion.length && !R.contains(ctVersion.abiVersion, protocolForTX.abiVersion)) throw new Error(`ABI VERSION ${ctVersion.abiVersion} do not support by this node. Supported: [${protocolForTX.abiVersion}]`)
