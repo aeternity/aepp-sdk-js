@@ -79,9 +79,7 @@ const Node = AsyncInit.compose({
     this.internalUrl = internalUrl ? internalUrl.replace(/\/$/, '') : this.url
     let client = await genSwaggerClient(`${this.url}/api`, { internalUrl: this.internalUrl })
     this.version = client.spec.info.version
-    const isIrisPrereleaseNode = semverSatisfies(this.version, '0.0.0', '0.0.1') // TODO: Remove after Iris node release
     if (
-      !isIrisPrereleaseNode &&
       !semverSatisfies(this.version, NODE_GE_VERSION, NODE_LT_VERSION) &&
       !ignoreVersion
     ) {
@@ -90,7 +88,7 @@ const Node = AsyncInit.compose({
         `Supported: >= ${NODE_GE_VERSION} < ${NODE_LT_VERSION}`
       )
     }
-    if (isIrisPrereleaseNode || semverSatisfies(this.version, IRIS_NODE_GE_VERSION, NODE_LT_VERSION)) {
+    if (semverSatisfies(this.version, IRIS_NODE_GE_VERSION, NODE_LT_VERSION)) {
       client = await genSwaggerClient(`${this.url}/api?oas3`, { internalUrl: this.internalUrl })
       this._isIrisNode = true
     }
