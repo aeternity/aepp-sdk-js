@@ -23,7 +23,7 @@
  */
 
 import AccountBase from './base'
-import * as Crypto from '../utils/crypto'
+import { sign as cryptoSign, isAddressValid, isValidKeypair } from '../utils/crypto'
 import { isHex } from '../utils/string'
 import { decode } from '../tx/builder/helpers'
 
@@ -31,11 +31,11 @@ const secrets = new WeakMap()
 
 async function sign (data) {
   if (this.isGa) throw new Error('You are trying to sign data using GA account without keypair')
-  return Promise.resolve(Crypto.sign(data, secrets.get(this).secretKey))
+  return Promise.resolve(cryptoSign(data, secrets.get(this).secretKey))
 }
 
-async function address (opt = { format: Crypto.ADDRESS_FORMAT.api }) {
-  return Promise.resolve(Crypto.formatAddress(opt.format, secrets.get(this).publicKey))
+async function address () {
+  return Promise.resolve(secrets.get(this).publicKey)
 }
 
 function setSecret (keyPair) {
@@ -55,7 +55,7 @@ function validateKeyPair (keyPair) {
   ) throw new Error('Secret key must be hex string or Buffer')
 
   const pubBuffer = Buffer.from(decode(keyPair.publicKey, 'ak'))
-  if (!Crypto.isValidKeypair(Buffer.from(keyPair.secretKey, 'hex'), pubBuffer)) throw new Error('Invalid Key Pair')
+  if (!isValidKeypair(Buffer.from(keyPair.secretKey, 'hex'), pubBuffer)) throw new Error('Invalid Key Pair')
 }
 
 /**
@@ -73,7 +73,7 @@ export default AccountBase.compose({
   init ({ keypair, gaId }) {
     this.isGa = !!gaId
     if (gaId) {
-      if (!Crypto.isAddressValid(gaId)) throw new Error('Invalid GA address')
+      if (!isAddressValid(gaId)) throw new Error('Invalid GA address')
       secrets.set(this, { publicKey: gaId })
     } else {
       validateKeyPair(keypair)

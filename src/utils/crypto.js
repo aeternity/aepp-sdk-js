@@ -29,34 +29,11 @@ import aesjs from 'aes-js'
 import shajs from 'sha.js'
 
 import { leftPad, rightPad, str2buf, toBytes } from './bytes'
-import { decode as decodeNode } from '../tx/builder/helpers'
 import { hash } from './crypto-ts'
 
 export * from './crypto-ts'
 
 const Ecb = aesjs.ModeOfOperation.ecb
-
-export const ADDRESS_FORMAT = {
-  sophia: 1,
-  api: 2,
-  raw: 3
-}
-
-/**
- * Format account address
- * @rtype (format: String, address: String) => tx: Promise[String]
- * @param {String} format - Format type
- * @param {String} address - Base58check account address
- * @return {String} Formatted address
- */
-export function formatAddress (format = ADDRESS_FORMAT.api, address) {
-  switch (format) {
-    case ADDRESS_FORMAT.api:
-      return address
-    case ADDRESS_FORMAT.sophia:
-      return `0x${decodeNode(address, 'ak').toString('hex')}`
-  }
-}
 
 /**
  * Generate address from secret key
