@@ -33,7 +33,7 @@ describe('Other utils', function () {
       d: null
     }
 
-    expect(traverseKeys(k => 'x' + k, input)).to.deep.equal({
+    expect(traverseKeys((k: string) => 'x' + k, input)).to.deep.equal({
       xa: 1,
       xb: {
         xba: 2

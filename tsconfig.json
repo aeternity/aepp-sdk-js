@@ -10,6 +10,7 @@
     "isolatedModules": true,
     "outDir": "./es",
     "noImplicitAny": true,
+    "lib": ["es2019"],
     "module": "es6",
     "target": "es5",
     "lib": ["es2019"],
