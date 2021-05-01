@@ -150,12 +150,6 @@ describe('crypto', () => {
     salt2.should.be.a('Number')
     salt1.should.not.be.equal(salt2)
   })
-  it('Convert base58Check address to hex', () => {
-    const address = 'ak_Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm'
-    const hex = Crypto.addressToHex(address)
-    const fromHexAddress = 'ak_' + Crypto.encodeBase58Check(Buffer.from(hex.slice(2), 'hex'))
-    fromHexAddress.should.be.equal(address)
-  })
   it('Can produce tx hash', () => {
     const rlpEncodedTx = unpackTx(txRaw).rlpEncoded
     buildTxHash(txRaw).should.be.equal(expectedHash)

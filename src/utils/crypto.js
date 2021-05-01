@@ -87,16 +87,6 @@ export function isAddressValid (address, prefix = 'ak') {
 }
 
 /**
- * Convert base58Check address to hex string
- * @rtype (base58CheckAddress: String) => hexAddress: String
- * @param {String} base58CheckAddress - Address
- * @return {String} Hex string
- */
-export function addressToHex (base58CheckAddress) {
-  return `0x${decodeBase58Check(assertedType(base58CheckAddress, 'ak')).toString('hex')}`
-}
-
-/**
  * Parse decimal address and return base58Check encoded address with prefix 'ak'
  * @rtype (input: String) => address: String
  * @param {String} decimalAddress - Address
