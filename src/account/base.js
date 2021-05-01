@@ -24,7 +24,7 @@
 
 import stampit from '@stamp/it'
 import { required } from '@stamp/required'
-import { hash, personalMessageToBinary, decodeBase64Check, assertedType, verifyPersonalMessage } from '../utils/crypto'
+import { hash, messageToBinary, decodeBase64Check, assertedType, verifyMessage as verifyMessageCrypto } from '../utils/crypto'
 import { buildTx, buildTxHash } from '../tx/builder'
 import { decode } from '../tx/builder/helpers'
 import { TX_TYPE } from '../tx/builder/schema'
@@ -78,7 +78,7 @@ async function signTransaction (tx, opt) {
  * @return {String} Signature
  */
 async function signMessage (message, opt = { returnHex: false }) {
-  const sig = await this.sign(hash(personalMessageToBinary(message)), opt)
+  const sig = await this.sign(hash(messageToBinary(message)), opt)
   return opt.returnHex ? Buffer.from(sig).toString('hex') : sig
 }
 
@@ -93,7 +93,11 @@ async function signMessage (message, opt = { returnHex: false }) {
  * @return {Boolean}
  */
 async function verifyMessage (message, signature, opt = {}) {
-  return verifyPersonalMessage(message, typeof signature === 'string' ? Buffer.from(signature, 'hex') : signature, decode(await this.address(opt)))
+  return verifyMessageCrypto(
+    message,
+    typeof signature === 'string' ? Buffer.from(signature, 'hex') : signature,
+    decode(await this.address(opt))
+  )
 }
 
 /**

@@ -22,7 +22,7 @@ import { DRY_RUN_ACCOUNT } from '../../src/tx/builder/schema'
 import * as R from 'ramda'
 import { randomName } from '../utils'
 import { decodeEvents, readType, SOPHIA_TYPES } from '../../src/contract/aci/transformation'
-import { hash, personalMessageToBinary } from '../../src/utils/crypto'
+import { hash, messageToBinary } from '../../src/utils/crypto'
 import { getFunctionACI } from '../../src/contract/aci/helpers'
 
 const identityContract = `
@@ -295,7 +295,7 @@ describe('Contract', function () {
     return contract.contractDeploy(code.bytecode, identityContract).should.eventually.have.property('address')
   })
   it('Verify message in Sophia', async () => {
-    const msg = personalMessageToBinary('Hello')
+    const msg = messageToBinary('Hello')
     const msgHash = hash(msg)
     const signature = await contract.sign(msgHash)
     const signContract = await contract.getContractInstance(signSource)
