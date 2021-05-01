@@ -32,12 +32,8 @@ describe('Bytes', function () {
     leftPad(4, bytes).should.be.eql(bytes)
   })
 
-  it('toBytes: invalid input', () => {
-    try {
-      toBytes(true)
-    } catch (e) {
-      e.message.should.be.equal('Byte serialization not supported')
-    }
+  it('toBytes: converts null to empty array', () => {
+    toBytes(null).should.be.eql(Buffer.from([]))
   })
 
   it('is base64 string', () => isBase64(bytes.toString('base64')).should.be.equal(true))

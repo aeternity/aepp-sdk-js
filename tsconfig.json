@@ -17,6 +17,7 @@
     "moduleResolution": "node",
     "preserveConstEnums": true,
     "declaration": true,
+    "downlevelIteration": true,
     "strictNullChecks": true,
     "typeRoots": [
       "./node_modules/@types",
