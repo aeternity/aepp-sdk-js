@@ -47,11 +47,13 @@ export const isAccountBase = (acc) => !['sign', 'address'].find(f => typeof acc[
  * @param {Object} opt - Options
  * @return {String} Signed transaction
  */
-async function signTransaction (tx, opt = { signHash: true }) {
+async function signTransaction (tx, opt) {
   const networkId = this.getNetworkId(opt)
   const rlpBinaryTx = decodeBase64Check(assertedType(tx, 'tx'))
-  // Prepend `NETWORK_ID` to begin of data binary
-  const txWithNetworkId = Buffer.concat([Buffer.from(networkId), opt.signHash ? buildTxHash(rlpBinaryTx, { raw: true }) : rlpBinaryTx])
+  const txWithNetworkId = Buffer.concat([
+    Buffer.from(networkId),
+    buildTxHash(rlpBinaryTx, { raw: true })
+  ])
 
   const signatures = [await this.sign(txWithNetworkId, opt)]
   return buildTx({ encodedTx: rlpBinaryTx, signatures }, TX_TYPE.signed).tx
