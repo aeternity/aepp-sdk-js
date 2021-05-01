@@ -153,25 +153,6 @@ export function decodeBase58Check (str) {
 }
 
 /**
- * Conver hex string to Uint8Array
- * @rtype (str: String) => Uint8Array
- * @param {String} str - Data to conver
- * @return {Uint8Array} - converted data
- */
-export function hexStringToByte (str) {
-  if (!str) {
-    return new Uint8Array()
-  }
-
-  const a = []
-  for (let i = 0, len = str.length; i < len; i += 2) {
-    a.push(parseInt(str.substr(i, 2), 16))
-  }
-
-  return new Uint8Array(a)
-}
-
-/**
  * Converts a positive integer to the smallest possible
  * representation in a binary digit representation
  * @rtype (value: Number) => Buffer
