@@ -109,10 +109,9 @@ const callResult = await contractObject.methods.sum.get(1 , 2)
 ``` 
 ### Overriding default transaction params
 Make contract call and overwrite transaction props passing it as option: `fee, amount, ttl, ...`
- Auto-generate functions (under `methods`) will have the same arguments length and order as we had in our SC source,
- the last arguments is always options object
- if `options` is not provide SDK will use the default options 
- which you can find under the `contractObject.options`. 
+Auto-generated functions (under `methods`) will have the same arguments length and order as we had in our SC source,
+the last arguments is always options object if `options` is not provide SDK will use the default options 
+which you can find under the `contractObject.options`. 
 
 ```js
 const callResult = await contractObject.methods.sum.get(1 , 2, { amount: 1000, fee: 3232, gas: 123})
@@ -133,3 +132,31 @@ You can use `onAccount` option for that which can  one of:
 const options = { onAccount: keypair || MemoryAccount || publicKey } 
 const callResult = await contractObject.methods.sum.get(1 , 2, options)
 ```
+
+### Datatype Examples
+The following is a list of examples for passing various data types as arguments for calling
+functions in your smart contract:
+
+
+
+
+| Type | Sophia | JS |
+|------|--------|----|
+|  int    |  ` add_two(one: int, two: int)`      | `sum(1 , 2)`   |
+|  address    |  ` set_owner(owner: address)`        |  `set_owner("ak_1337...")`   |
+|  bool    |  `is_it_true(answer : bool)`      |  `is_it_true(true)`  |
+|  bits    |  `give_me_bits(input : bits)`      |  `give_me_bits([1,0,1,1,0,])`  |
+|  bytes    | `get_bytes(test : bytes(3))`       | `get_bytes(["0x01","0x1f", "0x10"])`   |
+|  string    | `hello_world(say_hello : string)`       |  `hello_world("Hello!")`  |
+|  list    |  `have_a_few(candy : list(string))`      |  `have_a_few(["Skittles", "M&Ms", "JellyBelly"])`  |
+|  functions    |   (Higher order) functions are not allowed in`entrypoint` params     |    |
+|  tuple    |  `a_few_things(things : (string * int * map(address, bool)))`      | `a_few_things(["hola", 3, {"ak_1337...": true}])`   |
+|  record    |   `record user = {`<br /> &nbsp; &nbsp; &nbsp; &nbsp; `name: string,` <br /> &nbsp; &nbsp; &nbsp; &nbsp; `surname: string` <br /> &nbsp; &nbsp; `}` <br />  <br />  `entrypoint golden_record(input: user) : string =` <br /> &nbsp; &nbsp; &nbsp; &nbsp; `input.surname`    |  `golden_record({"name": "Alfred", "surname": "Mustermann"})`  |
+| map     |  `balances(values : map(address, int))`      |  `balances({"ak_1337...": 123, "ak_FCKGW...": 321, "ak_Rm5U...": 999})`  |
+| option()     |     `entrypoint number_defined(value : option(int)) : bool = ` <br />  &nbsp; &nbsp; &nbsp; &nbsp; `switch(value)` <br />  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; `Some(int) => true` <br />  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;   `None => false`       |  `number_defined(1337)`  |
+| hash     |  `a_gram(of : hash)`      | `//32 bytes, eg. a1 == 1 byte` <br />  `a_gram(af01...490f)`  |
+| signature     |  `one_signature(sig: signature)`      |  `//64 bytes, eg. a1 == 1 byte` <br />  `a_gram(af01...490f)`  |
+| Chain.ttl     | `entrypoint time_remaining(value : Chain.ttl) `       |  `WIP by SDK`  |
+| oracle('a, 'b)     |    ?    |  ?  |
+| oracle_query('a, 'b)     |   ?     |  ?  |
+| contract     |        |    |

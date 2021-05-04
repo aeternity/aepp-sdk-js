@@ -4,3 +4,17 @@ td, th {
 td code {
     border: none !important
 }
+
+.wy-nav-content {
+    max-width: 1150px !important;
+    width: 100% !important;
+}
+
+
+tr:nth-child(2n-1) td {
+    background-color: #f3f6f6 !important;
+}
+
+td, th {
+    padding: 7px 9px !important;
+}
