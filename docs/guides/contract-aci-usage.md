@@ -157,6 +157,3 @@ functions in your smart contract:
 | hash     |  `a_gram(of : hash)`      | `//32 bytes, eg. a1 == 1 byte` <br />  `a_gram(af01...490f)`  |
 | signature     |  `one_signature(sig: signature)`      |  `//64 bytes, eg. a1 == 1 byte` <br />  `a_gram(af01...490f)`  |
 | Chain.ttl     | `entrypoint time_remaining(value : Chain.ttl) `       |  `WIP by SDK`  |
-| oracle('a, 'b)     |    ?    |  ?  |
-| oracle_query('a, 'b)     |   ?     |  ?  |
-| contract     |        |    |
