@@ -50,14 +50,13 @@ async function getConsensusProtocolVersion (protocols = [], height) {
   if (!height) height = (await this.api.getCurrentKeyBlock()).height
   if (height < 0) throw new Error('height must be a number >= 0')
 
-  const { version } = protocols
+  return protocols
+    .filter(({ effectiveAtHeight }) => height >= effectiveAtHeight)
     .reduce(
-      ({ effectiveAtHeight, version }, p) => height >= p.effectiveAtHeight && p.effectiveAtHeight > effectiveAtHeight
-        ? { effectiveAtHeight: p.effectiveAtHeight, version: p.version }
-        : { effectiveAtHeight, version },
+      (acc, p) => p.effectiveAtHeight > acc.effectiveAtHeight ? p : acc,
       { effectiveAtHeight: -1, version: 0 }
     )
-  return version
+    .version
 }
 
 /**

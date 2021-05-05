@@ -247,44 +247,95 @@ export const ABI_VERSIONS = {
   FATE: 3
 }
 
+export const PROTOCOL_VERSIONS = {
+  ROMA: 1,
+  MINERVA: 2,
+  FORTUNA: 3,
+  LIMA: 4,
+  IRIS: 5
+}
+
 // First abi/vm by default
-export const VM_ABI_MAP_ROMA = {
-  [TX_TYPE.contractCreate]: { vmVersion: [VM_VERSIONS.SOPHIA], abiVersion: [ABI_VERSIONS.SOPHIA] },
-  [TX_TYPE.contractCall]: { vmVersion: [VM_VERSIONS.SOPHIA], abiVersion: [ABI_VERSIONS.SOPHIA] },
-  [TX_TYPE.oracleRegister]: { vmVersion: [VM_VERSIONS.SOPHIA], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA] }
-}
-
-export const VM_ABI_MAP_MINERVA = {
-  [TX_TYPE.contractCreate]: { vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA], abiVersion: [ABI_VERSIONS.SOPHIA] },
-  [TX_TYPE.contractCall]: { vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA, VM_VERSIONS.SOPHIA], abiVersion: [ABI_VERSIONS.SOPHIA] },
-  [TX_TYPE.oracleRegister]: { vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA] }
-}
-
-export const VM_ABI_MAP_FORTUNA = {
-  [TX_TYPE.contractCreate]: { vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA], abiVersion: [ABI_VERSIONS.SOPHIA] },
-  [TX_TYPE.contractCall]: { vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA, VM_VERSIONS.SOPHIA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA], abiVersion: [ABI_VERSIONS.SOPHIA] },
-  [TX_TYPE.oracleRegister]: { vmVersion: [], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA] }
-}
-
-export const VM_ABI_MAP_LIMA = {
-  [TX_TYPE.contractCreate]: { vmVersion: [VM_VERSIONS.FATE, VM_VERSIONS.SOPHIA_IMPROVEMENTS_LIMA], abiVersion: [ABI_VERSIONS.FATE, ABI_VERSIONS.SOPHIA] },
-  [TX_TYPE.contractCall]: { vmVersion: [VM_VERSIONS.FATE, VM_VERSIONS.SOPHIA_IMPROVEMENTS_LIMA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA, VM_VERSIONS.SOPHIA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA], abiVersion: [ABI_VERSIONS.FATE, ABI_VERSIONS.SOPHIA] },
-  [TX_TYPE.oracleRegister]: { vmVersion: [], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA] }
-}
-
-export const VM_ABI_MAP_IRIS = {
-  [TX_TYPE.contractCreate]: { vmVersion: [VM_VERSIONS.FATE_2], abiVersion: [ABI_VERSIONS.FATE] },
-  // TODO: Ensure that AEVM is still available here
-  [TX_TYPE.contractCall]: { vmVersion: [VM_VERSIONS.FATE_2, VM_VERSIONS.FATE, VM_VERSIONS.SOPHIA_IMPROVEMENTS_LIMA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA, VM_VERSIONS.SOPHIA, VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA], abiVersion: [ABI_VERSIONS.FATE, ABI_VERSIONS.SOPHIA] },
-  [TX_TYPE.oracleRegister]: { vmVersion: [], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA] }
-}
-
 export const PROTOCOL_VM_ABI = {
-  1: VM_ABI_MAP_ROMA,
-  2: VM_ABI_MAP_MINERVA,
-  3: VM_ABI_MAP_FORTUNA,
-  4: VM_ABI_MAP_LIMA,
-  5: VM_ABI_MAP_IRIS
+  [PROTOCOL_VERSIONS.ROMA]: {
+    [TX_TYPE.contractCreate]: {
+      vmVersion: [VM_VERSIONS.SOPHIA], abiVersion: [ABI_VERSIONS.SOPHIA]
+    },
+    [TX_TYPE.contractCall]: {
+      vmVersion: [VM_VERSIONS.SOPHIA], abiVersion: [ABI_VERSIONS.SOPHIA]
+    },
+    [TX_TYPE.oracleRegister]: {
+      vmVersion: [VM_VERSIONS.SOPHIA], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA]
+    }
+  },
+  [PROTOCOL_VERSIONS.MINERVA]: {
+    [TX_TYPE.contractCreate]: {
+      vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA], abiVersion: [ABI_VERSIONS.SOPHIA]
+    },
+    [TX_TYPE.contractCall]: {
+      vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA, VM_VERSIONS.SOPHIA],
+      abiVersion: [ABI_VERSIONS.SOPHIA]
+    },
+    [TX_TYPE.oracleRegister]: {
+      vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA],
+      abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA]
+    }
+  },
+  [PROTOCOL_VERSIONS.FORTUNA]: {
+    [TX_TYPE.contractCreate]: {
+      vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA], abiVersion: [ABI_VERSIONS.SOPHIA]
+    },
+    [TX_TYPE.contractCall]: {
+      vmVersion: [
+        VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA,
+        VM_VERSIONS.SOPHIA,
+        VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA
+      ],
+      abiVersion: [ABI_VERSIONS.SOPHIA]
+    },
+    [TX_TYPE.oracleRegister]: {
+      vmVersion: [], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA]
+    }
+  },
+  [PROTOCOL_VERSIONS.LIMA]: {
+    [TX_TYPE.contractCreate]: {
+      vmVersion: [VM_VERSIONS.FATE, VM_VERSIONS.SOPHIA_IMPROVEMENTS_LIMA],
+      abiVersion: [ABI_VERSIONS.FATE, ABI_VERSIONS.SOPHIA]
+    },
+    [TX_TYPE.contractCall]: {
+      vmVersion: [
+        VM_VERSIONS.FATE,
+        VM_VERSIONS.SOPHIA_IMPROVEMENTS_LIMA,
+        VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA,
+        VM_VERSIONS.SOPHIA,
+        VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA
+      ],
+      abiVersion: [ABI_VERSIONS.FATE, ABI_VERSIONS.SOPHIA]
+    },
+    [TX_TYPE.oracleRegister]: {
+      vmVersion: [], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA]
+    }
+  },
+  [PROTOCOL_VERSIONS.IRIS]: {
+    [TX_TYPE.contractCreate]: {
+      vmVersion: [VM_VERSIONS.FATE_2], abiVersion: [ABI_VERSIONS.FATE]
+    },
+    // TODO: Ensure that AEVM is still available here
+    [TX_TYPE.contractCall]: {
+      vmVersion: [
+        VM_VERSIONS.FATE_2,
+        VM_VERSIONS.FATE,
+        VM_VERSIONS.SOPHIA_IMPROVEMENTS_LIMA,
+        VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA,
+        VM_VERSIONS.SOPHIA,
+        VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA
+      ],
+      abiVersion: [ABI_VERSIONS.FATE, ABI_VERSIONS.SOPHIA]
+    },
+    [TX_TYPE.oracleRegister]: {
+      vmVersion: [], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA]
+    }
+  }
 }
 
 export const OBJECT_ID_TX_TYPE = {
