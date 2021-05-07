@@ -4,6 +4,10 @@ node_modules
 .tern-project
 .dir-locals.el
 /dist
+/es
+/docs/api*
+/docs/examples
+__pycache__
 /.envrc
 /yarn-error.log
 .idea
@@ -16,3 +20,5 @@ coverage.*
 .nyc_output/
 /examples/**/package-lock.json
 /examples/**/dist
+.history
+.site

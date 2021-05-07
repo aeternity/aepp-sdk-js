@@ -17,19 +17,20 @@
 
 import '../'
 import { describe, it } from 'mocha'
-import { salt, rlp } from '../../es/utils/crypto'
-import { classify, commitmentHash, isNameValid, nameHash, produceNameId } from '../../es/tx/builder/helpers'
+import { encode as rlpEncode } from 'rlp'
+import { salt } from '../../src/utils/crypto'
+import { classify, commitmentHash, ensureNameValid, isNameValid, produceNameId } from '../../src/tx/builder/helpers'
 import BigNumber from 'bignumber.js'
-import { toBytes } from '../../es/utils/bytes'
-import { parseBigNumber } from '../../es/utils/bignumber'
-import { buildTx, unpackTx } from '../../es/tx/builder'
+import { toBytes } from '../../src/utils/bytes'
+import { parseBigNumber } from '../../src/utils/bignumber'
+import { buildTx, unpackTx } from '../../src/tx/builder'
 
 describe('Tx', function () {
   it('reproducible commitment hashes can be generated', async () => {
     const _salt = salt()
-    const hash = await commitmentHash('foobar.aet', _salt)
+    const hash = await commitmentHash('foobar.chain', _salt)
     hash.should.be.a('string')
-    return hash.should.be.equal(await commitmentHash('foobar.aet', _salt))
+    return hash.should.be.equal(await commitmentHash('foobar.chain', _salt))
   })
   it('Parse big number', async () => {
     parseBigNumber('123123123123').should.be.a('string')
@@ -54,15 +55,36 @@ describe('Tx', function () {
       n.toString(10).should.be.equal(bnFromBytes(n))
     })
   })
-  it('nameHash: Invalid input', () => {
-    nameHash(undefined).equals(Buffer.allocUnsafe(32).fill(0)).should.be.equal(true)
+  it('Produce name id for `.chain`', () => {
+    produceNameId('asdas.chain').should.be.equal('nm_2DMazuJNrGkQYve9eMttgdteaigeeuBk3fmRYSThJZ2NpX3r8R')
   })
-  it('Produce name if for `.test`', () => {
-    produceNameId('asdas.test').should.be.equal('nm_KhRggXqN4siPYQtacAncf9v4B4fBrcu4qrDkDi6PhsGpFxS7y')
+
+  describe('ensureNameValid', () => {
+    it('validates type', () => {
+      try {
+        ensureNameValid({})
+      } catch ({ message }) {
+        message.should.be.equal('Name must be a string')
+      }
+    })
+
+    it('validates domain', () => {
+      try {
+        ensureNameValid('asdasdasd.unknown')
+      } catch ({ message }) {
+        message.should.have.string('Name should end with .chain:')
+      }
+    })
+
+    it('don\'t throws exception', () => ensureNameValid('asdasdasd.chain'))
   })
-  it('isNameValid: invalid namespace', () => {
-    isNameValid('asdas.eth', false).should.be.equal(false)
+
+  describe('isNameValid', () => {
+    it('validates type', () => isNameValid({}).should.be.equal(false))
+    it('validates domain', () => isNameValid('asdasdasd.unknown').should.be.equal(false))
+    it('don\'t throws exception', () => isNameValid('asdasdasd.chain').should.be.equal(true))
   })
+
   it('classify: invalid hash', () => {
     try {
       classify('aaaaa')
@@ -78,7 +100,7 @@ describe('Tx', function () {
     }
   })
   it('Deserialize tx: invalid tx type', () => {
-    const tx = rlp.encode([99, 99])
+    const tx = rlpEncode([99, 99])
     try {
       unpackTx(tx, true)
     } catch (e) {
@@ -86,7 +108,7 @@ describe('Tx', function () {
     }
   })
   it('Deserialize tx: invalid tx VSN', () => {
-    const tx = rlp.encode([10, 99])
+    const tx = rlpEncode([10, 99])
     try {
       unpackTx(tx, true)
     } catch (e) {

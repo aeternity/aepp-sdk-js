@@ -15,19 +15,19 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import Node from '../../es/node'
-import { url, internalUrl } from './'
+import Node from '../../src/node'
+import { url, internalUrl, ignoreVersion } from './'
 
 import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
 import * as R from 'ramda'
-import { NodePool } from '../../es/node-pool'
+import { NodePool } from '../../src/node-pool'
 
 describe('Node client', function () {
   let client
 
   before(async function () {
-    client = await Node({ url, internalUrl })
+    client = await Node({ url, internalUrl, ignoreVersion })
   })
 
   it('determines remote version', () => {
@@ -35,13 +35,13 @@ describe('Node client', function () {
     expect(client.revision).to.be.a('string')
   })
 
-  it('loads operations', async () => {
-    expect(client.methods).to.include.members(['postTransaction', 'getCurrentKeyBlock'])
+  it('loads operations', () => {
+    ['postTransaction', 'getCurrentKeyBlock']
+      .map(method => expect(client.api[method]).to.be.a('function'))
   })
 
   it('gets key blocks by height for the first 3 blocks', () => {
     expect(client.api.getKeyBlockByHeight).to.be.a('function')
-    expect(client.api.getKeyBlockByHeight.length).to.equal(1)
 
     return Promise.all(
       R.range(1, 3).map(async i => {
@@ -81,7 +81,7 @@ describe('Node client', function () {
     it('Can change Node', async () => {
       const nodes = await NodePool({
         nodes: [
-          { name: 'first', instance: await Node({ url, internalUrl }) },
+          { name: 'first', instance: await Node({ url, internalUrl, ignoreVersion }) },
           { name: 'second', instance: client }
         ]
       })
@@ -94,7 +94,7 @@ describe('Node client', function () {
     it('Fail on undefined node', async () => {
       const nodes = await NodePool({
         nodes: [
-          { name: 'first', instance: await Node({ url, internalUrl }) },
+          { name: 'first', instance: await Node({ url, internalUrl, ignoreVersion }) },
           { name: 'second', instance: client }
         ]
       })
@@ -112,8 +112,6 @@ describe('Node client', function () {
       })
       const nodesList = nodes.getNodesInPool()
       nodesList.length.should.be.equal(1)
-      nodesList[0].url.should.be.equal(url)
-      nodesList[0].internalUrl.should.be.equal(internalUrl)
     })
   })
 })

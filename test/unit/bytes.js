@@ -19,8 +19,8 @@ import '../'
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
 import BigNumber from 'bignumber.js'
-import { leftPad, rightPad, toBytes, bigNumberToByteArray } from '../../es/utils/bytes'
-import { isBase64, snakeOrKebabToPascal, snakeToPascal, pascalToSnake } from '../../es/utils/string'
+import { leftPad, rightPad, toBytes, bigNumberToByteArray } from '../../src/utils/bytes'
+import { isBase64, snakeOrKebabToPascal, snakeToPascal, pascalToSnake } from '../../src/utils/string'
 
 describe('Bytes', function () {
   const bytes = Buffer.from('hello')

@@ -17,7 +17,7 @@
 
 import { describe, it, before } from 'mocha'
 import { getSdk } from './'
-import { encodeBase64Check } from '../../es/utils/crypto'
+import { encodeBase64Check } from '../../src/utils/crypto'
 
 describe('Oracle', function () {
   let client
@@ -47,22 +47,18 @@ describe('Oracle', function () {
     query.decode(query.query).toString().should.be.equal("{'city': 'Berlin'}")
   })
 
-  it('Pool for queries', async () => {
-    let queries = []
-    const stopPolling = await oracle.pollQueries((q) => {
-      queries = [...q.map(a => a.id), ...queries]
+  it('Pool for queries', (done) => {
+    let count = 0
+    const stopPolling = oracle.pollQueries((queries) => {
+      count += queries.length
+      if (count !== 4) return
+      stopPolling()
+      done()
     }, { interval: 100 })
-    await oracle.postQuery("{'city': 'Berlin2'}")
-    await oracle.postQuery("{'city': 'Berlin3'}")
-    await oracle.postQuery("{'city': 'Berlin4'}")
-    await (new Promise((resolve) => {
-      setTimeout(() => {
-        stopPolling()
-        resolve()
-      }, 1000)
-    }))
-    queries.length.should.be.equal(4)
-  })
+    oracle.postQuery("{'city': 'Berlin2'}")
+      .then(() => oracle.postQuery("{'city': 'Berlin3'}"))
+      .then(() => oracle.postQuery("{'city': 'Berlin4'}"))
+  }).timeout(10000)
 
   it('Poll for response for query without response', async () => {
     return query.pollForResponse({ attempts: 2, interval: 1000 }).should.be.rejectedWith(Error)

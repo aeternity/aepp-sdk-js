@@ -14,24 +14,33 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-import Compiler from '../../es/contract/compiler'
 import { describe, it, before } from 'mocha'
-import { BaseAe, getSdk, compilerUrl, publicKey } from './'
-import { decode } from '../../es/tx/builder/helpers'
+import { expect } from 'chai'
+import { BaseAe, getSdk, publicKey } from './'
+import { decode } from '../../src/tx/builder/helpers'
+import { DRY_RUN_ACCOUNT } from '../../src/tx/builder/schema'
 import * as R from 'ramda'
 import { randomName } from '../utils'
-import { decodeEvents, readType, SOPHIA_TYPES } from '../../es/contract/aci/transformation'
-import { hash, personalMessageToBinary } from '../../es/utils/crypto'
-import { getFunctionACI } from '../../es/contract/aci/helpers'
+import { decodeEvents, readType, SOPHIA_TYPES } from '../../src/contract/aci/transformation'
+import { hash, personalMessageToBinary } from '../../src/utils/crypto'
+import { getFunctionACI } from '../../src/contract/aci/helpers'
 
 const identityContract = `
 contract Identity =
  entrypoint main(x : int) = x
 `
 
-const errorContract = `
-contract Identity =
- payable stateful entrypoint main(x : address) = Chain.spend(x, 1000000000)
+const contractWithBrokenDeploy = `
+contract Foo =
+  entrypoint init() = require(false, "CustomErrorMessage")
+`
+
+const contractWithBrokenMethods = `
+contract Foo =
+  payable stateful entrypoint failWithoutMessage(x : address) = Chain.spend(x, 1000000000)
+
+  payable stateful entrypoint failWithMessage() =
+    require(false, "CustomErrorMessage")
 `
 
 const stateContract = `
@@ -365,14 +374,31 @@ describe('Contract', function () {
     res.result.should.have.property('gasUsed')
     res.result.should.have.property('returnType')
   })
-  it('Test handleError(Parse and check contract execution error)', async () => {
-    const code = await contract.contractCompile(errorContract)
-    const deployed = await code.deploy()
-    try {
-      await deployed.call('main', [await contract.address()])
-    } catch (e) {
-      e.message.indexOf('Invocation failed').should.not.be.equal(-1)
-    }
+
+  describe('_handleCallError', () => {
+    it('throws error on deploy', async () => {
+      const code = await contract.contractCompile(contractWithBrokenDeploy)
+      try {
+        await code.deploy()
+      } catch (e) {
+        e.message.should.be.equal('Invocation failed: "CustomErrorMessage"')
+      }
+    })
+
+    it('throws errors on method call', async () => {
+      const code = await contract.contractCompile(contractWithBrokenMethods)
+      const deployed = await code.deploy()
+      try {
+        await deployed.call('failWithoutMessage', [await contract.address()])
+      } catch (e) {
+        e.message.should.be.equal('Invocation failed')
+      }
+      try {
+        await deployed.call('failWithMessage')
+      } catch (e) {
+        e.message.should.be.equal('Invocation failed: "CustomErrorMessage"')
+      }
+    })
   })
 
   it('Dry-run without accounts', async () => {
@@ -382,7 +408,7 @@ describe('Contract', function () {
     const address = await client.address().catch(e => false)
     address.should.be.equal(false)
     const { result } = await client.contractCallStatic(identityContract, deployed.address, 'main', ['42'])
-    result.callerId.should.be.equal(client.Ae.defaults.dryRunAccount.pub)
+    result.callerId.should.be.equal(DRY_RUN_ACCOUNT.pub)
   })
 
   it('calls deployed contracts', async () => {
@@ -390,15 +416,15 @@ describe('Contract', function () {
     return result.decode().should.eventually.become(42)
   })
 
-  it('call contract/deploy with `waitMined: false`', async () => {
+  it('call contract/deploy with waitMined: false', async () => {
     const deployed = await bytecode.deploy([], { waitMined: false })
-    await contract.poll(deployed.transaction)
-    Boolean(deployed.result === undefined).should.be.equal(true)
-    Boolean(deployed.txData === undefined).should.be.equal(true)
+    await contract.poll(deployed.transaction, { interval: 50, attempts: 1200 })
+    expect(deployed.result).to.be.equal(undefined)
+    deployed.txData.should.not.be.equal(undefined)
     const result = await deployed.call('main', ['42'], { waitMined: false, verify: false })
-    Boolean(result.result === undefined).should.be.equal(true)
-    Boolean(result.txData === undefined).should.be.equal(true)
-    await contract.poll(result.hash)
+    expect(result.result).to.be.equal(undefined)
+    result.txData.should.not.be.equal(undefined)
+    await contract.poll(result.hash, { interval: 50, attempts: 1200 })
   })
 
   it('calls deployed contracts static', async () => {
@@ -431,7 +457,7 @@ describe('Contract', function () {
       try {
         await contract.contractCompile(contractWithLib)
       } catch (e) {
-        e.message.indexOf('Couldn\'t find include file').should.not.be.equal(-1)
+        e.response.text.should.include('Couldn\'t find include file')
       }
     })
     it('Can deploy contract with external deps', async () => {
@@ -447,7 +473,7 @@ describe('Contract', function () {
       deployedStatic.result.should.have.property('returnType')
 
       const encodedCallData = await compiled.encodeCall('sumNumbers', ['1', '2'])
-      encodedCallData.indexOf('cb_').should.not.be.equal(-1)
+      encodedCallData.should.satisfy(s => s.startsWith('cb_'))
     })
     it('Can call contract with external deps', async () => {
       const callResult = await deployed.call('sumNumbers', ['1', '2'])
@@ -463,17 +489,6 @@ describe('Contract', function () {
   describe('Sophia Compiler', function () {
     let callData
     let bytecode
-    it('Init un-compatible compiler version', async () => {
-      try {
-        // Init compiler
-        const compiler = await Compiler({ compilerUrl })
-        // Overwrite compiler version
-        compiler.compilerVersion = '1.0.0'
-        await compiler.checkCompatibility()
-      } catch (e) {
-        e.message.indexOf('Unsupported compiler version 1.0.0').should.not.be.equal(-1)
-      }
-    })
     it('compile', async () => {
       bytecode = await contract.compileContractAPI(identityContract)
       const prefix = bytecode.slice(0, 2)
@@ -503,7 +518,7 @@ describe('Contract', function () {
       isString.should.be.equal(true)
     })
     it('decode call result', async () => {
-      return contract.contractDecodeCallResultAPI(identityContract, 'main', encodedNumberSix, 'ok', { backend: 'fate' }).should.eventually.become(6)
+      return contract.contractDecodeCallResultAPI(identityContract, 'main', encodedNumberSix, 'ok').should.eventually.become(6)
     })
     it('Decode call-data using source', async () => {
       const decodedCallData = await contract.contractDecodeCallDataBySourceAPI(identityContract, 'init', callData)
@@ -517,10 +532,6 @@ describe('Contract', function () {
       decodedCallData.arguments.length.should.be.equal(0)
       decodedCallData.function.should.be.equal('init')
     })
-    it('Decode data API', async () => {
-      const returnData = 'cb_bzvA9Af6'
-      return contract.contractDecodeDataAPI('string', returnData).catch(e => 1).should.eventually.become(1)
-    })
     it('validate bytecode', async () => {
       return contract.validateByteCodeAPI(bytecode, identityContract).should.eventually.become(true)
     })
@@ -529,7 +540,7 @@ describe('Contract', function () {
         const cloned = R.clone(contract)
         await cloned.setCompilerUrl('https://compiler.aepps.comas')
       } catch (e) {
-        e.message.should.be.equal('Compiler do not respond')
+        e.message.should.be.equal('request to https://compiler.aepps.comas/api failed, reason: getaddrinfo ENOTFOUND compiler.aepps.comas')
       }
     })
   })
@@ -626,32 +637,21 @@ describe('Contract', function () {
       result.should.have.property('returnType')
       result.callerId.should.be.equal(onAccount)
     })
-    it('Can deploy/call using AEVM', async () => {
-      await contractObject.compile({ backend: 'aevm' })
-      const deployStatic = await contractObject.methods.init.get('123', 1, 'hahahaha', { backend: 'aevm' })
-      deployStatic.should.be.an('object')
-      deployed = await contractObject.methods.init.send('123', 1, 'hahahaha', { backend: 'aevm' })
-      deployed.should.be.an('object')
-      const { result } = await contractObject.methods.intFn(123, { backend: 'aevm' })
-      result.should.have.property('gasUsed')
-      result.should.have.property('returnType')
-      await contractObject.compile()
-    })
     it('Deploy contract before compile', async () => {
       contractObject.compiled = null
       await contractObject.methods.init('123', 1, 'hahahaha')
       const isCompiled = contractObject.compiled.length && contractObject.compiled.slice(0, 3) === 'cb_'
       isCompiled.should.be.equal(true)
     })
-    it('Deploy/Call contract with { waitMined: false }', async () => {
+    it('Deploy/Call contract with waitMined: false', async () => {
       const deployed = await contractObject.methods.init('123', 1, 'hahahaha', { waitMined: false })
-      await contract.poll(deployed.transaction)
-      Boolean(deployed.result === undefined).should.be.equal(true)
-      Boolean(deployed.txData === undefined).should.be.equal(true)
+      await contract.poll(deployed.transaction, { interval: 50, attempts: 1200 })
+      expect(deployed.result).to.be.equal(undefined)
+      expect(deployed.txData).to.be.equal(undefined)
       const result = await contractObject.methods.intFn.send(2, { waitMined: false })
-      Boolean(result.result === undefined).should.be.equal(true)
-      Boolean(result.txData === undefined).should.be.equal(true)
-      await contract.poll(result.hash)
+      expect(result.result).to.be.equal(undefined)
+      result.txData.should.not.be.equal(undefined)
+      await contract.poll(result.hash, { interval: 50, attempts: 1200 })
     })
     it('Generate ACI object with corresponding bytecode', async () => {
       await contract.getContractInstance(testContract, { contractAddress: contractObject.deployInfo.address, filesystem, opt: { ttl: 0 } })
@@ -997,8 +997,7 @@ describe('Contract', function () {
           try {
             await contractObject.methods.hashFn(decoded)
           } catch (e) {
-            const isSizeCheck = e.message.indexOf('not a 32 bytes') !== -1
-            isSizeCheck.should.be.equal(true)
+            e.message.should.include('not a 32 bytes')
           }
         })
         it('Valid', async () => {
@@ -1024,8 +1023,7 @@ describe('Contract', function () {
           try {
             await contractObject.methods.signatureFn(decoded)
           } catch (e) {
-            const isSizeCheck = e.message.indexOf('not a 64 bytes') !== -1
-            isSizeCheck.should.be.equal(true)
+            e.message.should.include('not a 64 bytes')
           }
         })
         it('Valid', async () => {
@@ -1052,8 +1050,7 @@ describe('Contract', function () {
           try {
             await contractObject.methods.bytesFn(Buffer.from([...decoded, 2]))
           } catch (e) {
-            const isSizeCheck = e.message.indexOf('not a 32 bytes') !== -1
-            isSizeCheck.should.be.equal(true)
+            e.message.should.include('not a 32 bytes')
           }
         })
         it('Valid', async () => {
@@ -1101,7 +1098,18 @@ describe('Contract', function () {
       })
       it('Resolve external contract type', async () => {
         const fnACI = getFunctionACI(cInstance.aci, 'remoteArgs', { external: cInstance.externalAci })
-        readType(fnACI.arguments[0].type, { bindings: fnACI.bindings }).should.eql(JSON.parse('{"t":"record","generic":[{"name":"value","type":"string"},{"name":"key","type":{"list":["Voting.test_type"]}}]}'))
+        readType(fnACI.arguments[0].type, { bindings: fnACI.bindings }).should.eql({
+          t: 'record',
+          generic: [{
+            name: 'value',
+            type: 'string'
+          }, {
+            name: 'key',
+            type: {
+              list: ['Voting.test_type']
+            }
+          }]
+        })
         readType(fnACI.returns, { bindings: fnACI.bindings }).t.should.be.equal('int')
       })
     })

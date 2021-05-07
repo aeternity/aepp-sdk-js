@@ -17,8 +17,8 @@
 
 import '../'
 import { describe, it } from 'mocha'
-import { dump, recover, getAddressFromPriv, validateKeyObj } from '../../es/utils/keystore'
-import { generateKeyPair } from '../../es/utils/crypto'
+import { dump, recover, getAddressFromPriv, validateKeyObj } from '../../src/utils/keystore'
+import { generateKeyPair } from '../../src/utils/crypto'
 
 const invalidKeystore = {
   name: 'test',

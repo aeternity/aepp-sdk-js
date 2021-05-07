@@ -17,8 +17,8 @@
 
 import '../'
 import { describe, it } from 'mocha'
-import MemoryAccount from '../../es/account/memory'
-import { generateKeyPair } from '../../es/utils/crypto'
+import MemoryAccount from '../../src/account/memory'
+import { generateKeyPair } from '../../src/utils/crypto'
 
 const testAcc = generateKeyPair()
 

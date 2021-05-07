@@ -16,7 +16,7 @@
  */
 import { describe, it, before } from 'mocha'
 import { getSdk } from './'
-import { generateKeyPair } from '../../es/utils/crypto'
+import { generateKeyPair } from '../../src/utils/crypto'
 
 describe('Node Chain', function () {
   let client
@@ -30,9 +30,31 @@ describe('Node Chain', function () {
     return client.height().should.eventually.be.a('number')
   })
 
+  it('Compresses height queries', async () => {
+    const origFun = client.api.getCurrentKeyBlockHeight
+    try {
+      var calls = 0
+      client.api.getCurrentKeyBlockHeight = () => {
+        calls += 1
+        return origFun()
+      }
+      const H1P = client.height()
+      const H2P = client.height()
+      const H3P = client.height()
+      const H1 = await H1P
+      const H2 = await H2P
+      const H3 = await H3P
+      H1.should.be.equal(H2)
+      H1.should.be.equal(H3)
+      calls.should.be.equal(1)
+    } finally {
+      client.api.getCurrentKeyBlockHeight = origFun
+    }
+  })
+
   it('waits for specified heights', async () => {
     const target = await client.height() + 1
-    await client.awaitHeight(target, { attempts: 120 }).should.eventually.be.at.least(target)
+    await client.awaitHeight(target, { interval: 200, attempts: 100 }).should.eventually.be.at.least(target)
     return client.height().should.eventually.be.at.least(target)
   })
   it('Can verify transaction from broadcast error', async () => {
@@ -87,17 +109,17 @@ describe('Node Chain', function () {
     const signed = await client.signTransaction(tx)
     const { txHash } = await client.api.postTransaction({ tx: signed })
 
-    await client.poll(txHash).should.eventually.be.fulfilled
-    return client.poll('th_xxx', { blocks: 1 }).should.eventually.be.rejected
+    await client.poll(txHash, { interval: 50, attempts: 1200 }).should.eventually.be.fulfilled
+    return client.poll('th_xxx', { blocks: 1, interval: 50, attempts: 1200 }).should.eventually.be.rejected
   })
 
   it('Wait for transaction confirmation', async () => {
-    const txData = await client.spend(1000, await client.address(), { confirm: true })
+    const txData = await client.spend(1000, await client.address(), { confirm: true, interval: 400, attempts: 50 })
     const isConfirmed = (await client.height()) >= txData.blockHeight + 3
 
     isConfirmed.should.be.equal(true)
 
-    const txData2 = await client.spend(1000, await client.address(), { confirm: 4 })
+    const txData2 = await client.spend(1000, await client.address(), { confirm: 4, interval: 400, attempts: 50 })
     const isConfirmed2 = (await client.height()) >= txData2.blockHeight + 4
     isConfirmed2.should.be.equal(true)
   })

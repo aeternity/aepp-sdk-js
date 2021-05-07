@@ -4,17 +4,14 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 
 function configure (filename, opts = {}) {
   return (env, argv) => R.mergeDeepRight({
-    entry: './es/index.js',
+    entry: './src/index.js',
     mode: 'development', // automatically overriden by production flag
     devtool: argv.mode === 'production' ? 'source-map' : 'eval-source-map',
-    node: {
-      fs: 'empty'
-    },
     module: {
       rules: [
         {
-          test: /\.js$/,
-          include: path.resolve(__dirname, 'es'),
+          test: /\.(js|ts)$/,
+          include: path.resolve(__dirname, 'src'),
           loader: 'babel-loader'
         },
         {
@@ -24,6 +21,15 @@ function configure (filename, opts = {}) {
           options: { presets: ['@babel/preset-env'] }
         }
       ]
+    },
+    resolve: {
+      extensions: ['.ts', '.js'],
+      fallback: {
+        buffer: require.resolve('buffer/'),
+        path: require.resolve('path-browserify'),
+        stream: require.resolve('stream-browserify'),
+        crypto: require.resolve('crypto-browserify')
+      }
     },
     plugins: argv.report ? [
       new BundleAnalyzerPlugin({

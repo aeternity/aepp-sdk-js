@@ -15,7 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { Universal, Crypto, MemoryAccount, Node } from '../../es'
+import { Universal, Crypto, MemoryAccount, Node } from '../../src'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 
@@ -28,23 +28,21 @@ export const compilerUrl = process.env.COMPILER_URL || 'http://localhost:3080'
 export const publicKey = process.env.PUBLIC_KEY || 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR'
 const secretKey = process.env.SECRET_KEY || 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b'
 export const networkId = process.env.TEST_NETWORK_ID || 'ae_devnet'
-const forceCompatibility = process.env.FORCE_COMPATIBILITY || false
+export const ignoreVersion = process.env.IGNORE_VERSION || false
 export const genesisAccount = MemoryAccount({ keypair: { publicKey, secretKey } })
 export const account = Crypto.generateKeyPair()
 
-export const BaseAe = async (params = {}) => {
-  const ae = await Universal.waitMined(true).compose({
-    deepProps: { Swagger: { defaults: { debug: !!process.env.DEBUG } } },
-    props: { process, compilerUrl }
+export const BaseAe = async (params = {}) => Universal
+  .waitMined(true)
+  .compose({
+    deepProps: { Ae: { defaults: { interval: 50, attempts: 1200 } }, Swagger: { defaults: { debug: !!process.env.DEBUG } } }
   })({
     ...params,
-    forceCompatibility,
+    compilerUrl,
+    ignoreVersion,
     accounts: [...params.accounts || [], genesisAccount],
-    nodes: [{ name: 'test', instance: await Node({ url, internalUrl }) }]
+    nodes: [{ name: 'test', instance: await Node({ url, internalUrl, ignoreVersion }) }]
   })
-  ae.removeAccount(process.env.WALLET_PUB)
-  return ae
-}
 
 const spendPromise = (async () => {
   const ae = await BaseAe({ networkId })

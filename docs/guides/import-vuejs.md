@@ -1,24 +1,21 @@
-## [Vue.js]
+# Vue.js
 
 Adding aepp-sdk to a Vue.js project requires nothing special, but it should be
 noted that `client creation` is asynchronous which needs to be taken into account.
 
 ```bash
-vue init webpack my-project
+npm install -g @vue/cli
+vue create my-project
 cd my-project
 npm install @aeternity/aepp-sdk
 ```
 
-```html
-# src/components/HelloWorld.vue
+```vue
+<!-- src/components/HelloWorld.vue -->
 
 <script>
-// import Universal stamp
-import Universal from '@aeternity/aepp-sdk/es/ae/universal'
-// import Node
-import Node from '@aeternity/aepp-sdk/es/node'
-// import Account
-import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory'
+// import Universal stamp, Node, and Account
+import { Universal, Node, MemoryAccount } from '@aeternity/aepp-sdk'
 
 export default {
   name: 'HelloWorld',
@@ -28,7 +25,7 @@ export default {
     }
   },
   async mounted () {
-    const node = await Node({ url: 'https://sdk-testnet.aepps.com' })
+    const node = await Node({ url: 'https://testnet.aeternity.io' })
     const account = MemoryAccount({ keypair: 'YOUR_KEYPAIR' })
 
     // Init client
@@ -43,5 +40,3 @@ export default {
 }
 </script>
 ```
-
-[Vue.js]: https://vuejs.org/
