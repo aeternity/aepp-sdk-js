@@ -15,7 +15,6 @@
     "moduleResolution": "node",
     "preserveConstEnums": true,
     "declaration": true,
-    "allowJs": true,
     "strictNullChecks": true
   },
   "include": [
