@@ -52,7 +52,7 @@ export default AsyncInit.compose(ContractBase, {
       compilerUrl = compilerUrl.replace(/\/$/, '')
       const client = await genSwaggerClient(`${compilerUrl}/api`, {
         disableBigNumbers: true,
-        keysOfValuesToIgnore: ['fileSystem', 'arguments']
+        disableCaseConversion: true
       })
       this.compilerVersion = client.spec.info.version
       this._compilerApi = client.api
@@ -67,7 +67,7 @@ export default AsyncInit.compose(ContractBase, {
       if (!this._compilerApi) throw new Error('Compiler is not ready')
     },
     _prepareCompilerOptions ({ filesystem = {} } = {}) {
-      return { fileSystem: filesystem }
+      return { file_system: filesystem }
     },
     getCompilerVersion () {
       this._ensureCompilerReady()

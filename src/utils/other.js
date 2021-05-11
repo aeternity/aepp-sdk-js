@@ -12,16 +12,12 @@ export const filterObject = (object, fn) => Object.fromEntries(Object.entries(ob
  * @rtype (fn: (s: String) => String) => (o: Object) => Object
  * @param {Function} fn - Key transformation function
  * @param {Object} object - Object to traverse
- * @param {Array} [keysOfValuesToIgnore] - Workaround to fix serialisation
  * @return {Object} Transformed object
  */
-export const traverseKeys = (fn, object, keysOfValuesToIgnore = []) => {
+export const traverseKeys = (fn, object) => {
   if (typeof object !== 'object' || object === null) return object
-  if (Array.isArray(object)) return object.map(i => traverseKeys(fn, i, keysOfValuesToIgnore))
-  return mapObject(object, ([key, value]) => [
-    fn(key),
-    keysOfValuesToIgnore.includes(key) ? value : traverseKeys(fn, value, keysOfValuesToIgnore)
-  ])
+  if (Array.isArray(object)) return object.map(i => traverseKeys(fn, i))
+  return mapObject(object, ([key, value]) => [fn(key), traverseKeys(fn, value)])
 }
 
 /**
@@ -29,7 +25,6 @@ export const traverseKeys = (fn, object, keysOfValuesToIgnore = []) => {
  * @static
  * @rtype (o: Object) => Object
  * @param {Object} object - Object to traverse
- * @param {Array} keysOfValuesToIgnore
  * @return {Object} Transformed object
  * @see pascalToSnake
  */
@@ -40,7 +35,6 @@ export const snakizeKeys = traverseKeys.bind(null, pascalToSnake)
  * @static
  * @rtype (o: Object) => Object
  * @param {Object} object - Object to traverse
- * @param {Array} keysOfValuesToIgnore
  * @return {Object} Transformed object
  * @see snakeToPascal
  */

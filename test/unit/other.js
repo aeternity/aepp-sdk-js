@@ -30,13 +30,10 @@ describe('Other utils', function () {
       c: [3, {
         ca: 4
       }],
-      t: {
-        f: 6
-      },
       d: null
     }
 
-    expect(traverseKeys(k => 'x' + k, input, ['t'])).to.deep.equal({
+    expect(traverseKeys(k => 'x' + k, input)).to.deep.equal({
       xa: 1,
       xb: {
         xba: 2
@@ -44,9 +41,6 @@ describe('Other utils', function () {
       xc: [3, {
         xca: 4
       }],
-      xt: {
-        f: 6
-      },
       xd: null
     })
   })
