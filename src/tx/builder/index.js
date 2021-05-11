@@ -25,8 +25,7 @@ import {
   buildPointers,
   encode,
   decode,
-  buildHash,
-  getContractBackendFromTx
+  buildHash
 } from './helpers'
 import { toBytes } from '../../utils/bytes'
 import * as mpt from '../../utils/mptree'
@@ -253,7 +252,7 @@ export function calculateMinFee (txType, { gas = 0, params, vsn }) {
 function buildFee (txType, { params, gas = 0, multiplier, vsn }) {
   const { rlpEncoded: txWithOutFee } = buildTx({ ...params }, txType, { vsn })
   const txSize = txWithOutFee.length
-  return TX_FEE_BASE_GAS(txType, { backend: getContractBackendFromTx(params) })
+  return TX_FEE_BASE_GAS(txType)
     .plus(TX_FEE_OTHER_GAS(txType)({ txSize, relativeTtl: getOracleRelativeTtl(params, txType) }))
     .times(multiplier)
 }

@@ -25,7 +25,7 @@
 import * as R from 'ramda'
 
 import { ContractAPI } from '../../ae/contract'
-import { TX_TYPE } from '../../tx/builder/schema'
+import { TX_TYPE, PROTOCOL_VERSIONS } from '../../tx/builder/schema'
 import { buildTx } from '../../tx/builder'
 import { getContractAuthFan, prepareGaParams, wrapInEmptySignedTx } from './helpers'
 import { assertedType, decodeBase64Check } from '../../utils/crypto'
@@ -125,9 +125,14 @@ async function createMetaTx (rawTransaction, authData, authFnName, options = {})
   // Prepare params for META tx
   const params = { ...opt, tx: rlpEncoded, gaId: await this.address(opt), abiVersion: abiVersion, authData: authCallData, gas }
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
+  // TODO: Remove ttl after Iris HF
   const { fee, ttl } = await this.prepareTxParams(TX_TYPE.gaMeta, params)
   // Build META tx
-  const { rlpEncoded: metaTxRlp } = buildTx({ ...params, fee: `${fee}`, ttl }, TX_TYPE.gaMeta)
+  const { rlpEncoded: metaTxRlp } = buildTx(
+    { ...params, fee: `${fee}`, ttl },
+    TX_TYPE.gaMeta,
+    { vsn: this.getNodeInfo().consensusProtocolVersion === PROTOCOL_VERSIONS.IRIS ? 2 : 1 }
+  )
   // Wrap in empty signed tx
   const { tx } = wrapInEmptySignedTx(metaTxRlp)
   // Send tx to the chain

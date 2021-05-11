@@ -18,8 +18,7 @@ import {
   NAME_FEE,
   NAME_FEE_BID_INCREMENT,
   NAME_BID_TIMEOUTS,
-  FATE_ABI,
-  VM_TYPE, NAME_ID_KEY
+  NAME_ID_KEY
 } from './schema'
 import { ceil } from '../../utils/bignumber'
 
@@ -337,19 +336,6 @@ export function computeAuctionEndBlock (domain, claimHeight) {
     [R.lte(NAME_BID_MAX_LENGTH), R.always(NAME_BID_TIMEOUTS[12].plus(claimHeight))],
     [R.T, R.always(BigNumber(claimHeight))]
   ])(domain.replace('.chain', '').length).toString(10)
-}
-
-/**
- * Get contract backend by abiVersion
- * @function
- * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {Object} { abiVersion } abiVersion Transaction abiVersion
- * @return {String} Backend
- */
-export function getContractBackendFromTx ({ abiVersion } = {}) {
-  return FATE_ABI.includes(parseInt(abiVersion))
-    ? VM_TYPE.FATE
-    : VM_TYPE.AEVM
 }
 
 /**

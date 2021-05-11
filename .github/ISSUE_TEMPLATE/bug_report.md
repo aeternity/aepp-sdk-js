@@ -24,11 +24,11 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Please tell us about your environment:**
-  
+
   - Node Version: v0.0.0
   - Protocol Version: 1
   - Compiler version: v0.0.0
-  - VM Version: aevm | fate
+  - VM Version: fate | fate2
   - SDK Version: v0.0.0
   - Python version: v3.7.0
 

@@ -50,8 +50,7 @@ async function send (tx, options = {}) {
   return this.sendTransaction(signed, opt)
 }
 
-async function signUsingGA (tx, options = {}) {
-  const { authData, authFun } = options
+async function signUsingGA (tx, { authData, authFun, ...options } = {}) {
   return this.createMetaTx(tx, authData, authFun, options)
 }
 
