@@ -19,10 +19,10 @@ export function getFunctionACI (aci, name, { external }) {
     bindings: [
       {
         state: aci.state,
-        typeDefs: aci.typeDefs,
+        type_defs: aci.type_defs,
         name: aci.name
       },
-      ...external.map(R.pick(['state', 'typeDefs', 'name']))
+      ...external.map(R.pick(['state', 'type_defs', 'name']))
     ],
     event: aci.event ? aci.event.variant : []
   }

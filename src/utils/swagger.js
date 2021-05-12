@@ -36,11 +36,11 @@ import { snakizeKeys, pascalizeKeys, mapObject, filterObject } from './other'
  * @param {String} [options.spec] - Override OpenAPI definition
  * @param {String} [options.internalUrl] - Node internal URL
  * @param {Boolean} [options.disableBigNumbers]
- * @param {Boolean} [options.keysOfValuesToIgnore] TODO: Convert keys according to Swagger definitions instead
+ * @param {Boolean} [options.disableCaseConversion]
  * @return {Object} Swagger client
  * @example (await genSwaggerClient('https://mainnet.aeternity.io/api')).getAccountByPubkey('ak_jupBUgZNbcC4krDLR3tAkw1iBZoBbkNeShAq4atBtpFWmz36r')
  */
-export default async (specUrl, { spec, internalUrl, disableBigNumbers, keysOfValuesToIgnore } = {}) => {
+export default async (specUrl, { spec, internalUrl, disableBigNumbers, disableCaseConversion } = {}) => {
   spec = spec || await (await fetch(specUrl)).json()
   const jsonImp = disableBigNumbers ? JSON : JsonBig
 
@@ -69,8 +69,10 @@ export default async (specUrl, { spec, internalUrl, disableBigNumbers, keysOfVal
       },
       responseInterceptor: response => {
         if (!response.text) return response
-        const body = pascalizeKeys(jsonImp.parse(response.text), keysOfValuesToIgnore)
-        return Object.assign(response, { body })
+        const body = jsonImp.parse(response.text)
+        return Object.assign(response, {
+          body: disableCaseConversion ? body : pascalizeKeys(body)
+        })
       }
     })
   }))
@@ -107,7 +109,7 @@ export default async (specUrl, { spec, internalUrl, disableBigNumbers, keysOfVal
         if (typeof value !== 'object') return [param, value]
         const rootKeys = Object.keys(parameters.find(p => p.name === param).schema.properties)
         const filteredValue = filterObject(
-          snakizeKeys(value, keysOfValuesToIgnore),
+          disableCaseConversion ? value : snakizeKeys(value),
           ([key]) => rootKeys.includes(key)
         )
         return [param, jsonImp.stringify(filteredValue)]
