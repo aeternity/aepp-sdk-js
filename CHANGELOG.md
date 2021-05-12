@@ -1,3 +1,15 @@
+## [8.0.0-beta.2](https://github.com/aeternity/aepp-sdk-js/compare/8.0.0-beta.1...8.0.0-beta.2) (2021-05-12)
+
+
+### Bug Fixes
+
+* revert conversion of case in calls to compiler ([0a69e49](https://github.com/aeternity/aepp-sdk-js/commit/0a69e4979b20bdd5ee954e2860fdc827f808eb8f))
+
+### Maintenance
+
+* avoid ts definitions based on broken JsDoc ([572d19f](https://github.com/aeternity/aepp-sdk-js/commit/572d19f5ae6bd549c92a1a37452c0270490b9f6e))
+
+
 # [8.0.0-beta.1](https://github.com/aeternity/aepp-sdk-js/compare/7.7.0...8.0.0-beta.1) (2021-05-6)
 
 
