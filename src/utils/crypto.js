@@ -22,7 +22,6 @@
  */
 
 import bs58check from 'bs58check'
-import { decode as rlpDecode, encode as rlpEncode } from 'rlp'
 import ed2curve from 'ed2curve'
 import nacl from 'tweetnacl'
 import aesjs from 'aes-js'
@@ -291,24 +290,6 @@ export function verify (str, signature, publicKey) {
   return nacl.sign.detached.verify(new Uint8Array(str), signature, publicKey)
 }
 
-/**
- * @typedef {Array} Transaction
- * @rtype Transaction: [tag: Buffer, version: Buffer, [signature: Buffer], data: Buffer]
- */
-
-/**
- * Prepare a transaction for posting to the blockchain
- * @rtype (signature: Buffer | String, data: Buffer) => Transaction
- * @param {Buffer} signature - Signature of `data`
- * @param {Buffer} data - Transaction data
- * @return {Transaction} Transaction
- */
-export function prepareTx (signature, data) {
-  // the signed tx deserializer expects a 4-tuple:
-  // <tag, version, signatures_array, binary_tx>
-  return [Buffer.from([11]), Buffer.from([1]), [Buffer.from(signature)], data]
-}
-
 export function messageToHash (message) {
   const p = Buffer.from('aeternity Signed Message:\n', 'utf8')
   const msg = Buffer.from(message, 'utf8')
@@ -383,28 +364,6 @@ export function assertedType (data, type, omitError) {
   if (RegExp(`^${type}_.+$`).test(data)) return data.split('_')[1]
   else if (omitError) return false
   else throw new Error(`Data doesn't match expected type ${type}`)
-}
-
-/**
- * Decode a transaction
- * @rtype (txHash: String) => Buffer
- * @param {String} encodedTx - Encoded transaction
- * @return {Buffer} Decoded transaction
- */
-export function decodeTx (encodedTx) {
-  return rlpDecode(Buffer.from(decodeBase64Check(assertedType(encodedTx, 'tx'))))
-}
-
-/**
- * Encode a transaction
- * @rtype (txData: Transaction) => String
- * @param {Transaction} txData - Transaction to encode
- * @return {String} Encoded transaction
- */
-export function encodeTx (txData) {
-  const encodedTxData = rlpEncode(txData)
-  const encodedTx = encodeBase64Check(encodedTxData)
-  return `tx_${encodedTx}`
 }
 
 /**
