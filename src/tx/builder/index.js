@@ -83,7 +83,7 @@ function deserializeField (value, type, prefix) {
     case FIELD_TYPES.callStack:
       // TODO: fix this
       return [readInt(value)]
-    case FIELD_TYPES.mptree:
+    case FIELD_TYPES.mptrees:
       return value.map(mpt.deserialize)
     case FIELD_TYPES.callReturnType:
       switch (readInt(value)) {
@@ -131,7 +131,7 @@ function serializeField (value, type, prefix) {
       return toBytes(value)
     case FIELD_TYPES.pointers:
       return buildPointers(value)
-    case FIELD_TYPES.mptree:
+    case FIELD_TYPES.mptrees:
       return value.map(mpt.serialize)
     case FIELD_TYPES.ctVersion:
       return Buffer.from([...toBytes(value.vmVersion), 0, ...toBytes(value.abiVersion)])
