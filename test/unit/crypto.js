@@ -60,26 +60,6 @@ describe('crypto', () => {
     })
   })
 
-  describe('encryptPassword', () => {
-    describe('generate a password encrypted key pair', () => {
-      const keyPair = Crypto.generateKeyPair(true)
-      const password = 'verysecret'
-
-      it('works for private keys', () => {
-        const privateBinary = keyPair.secretKey
-        const encryptedPrivate = Crypto.encryptPrivateKey(password, privateBinary)
-        const decryptedPrivate = Crypto.decryptPrivateKey(password, encryptedPrivate)
-        assert.deepEqual(decryptedPrivate, privateBinary)
-      })
-      it('works for public keys', () => {
-        const publicBinary = keyPair.publicKey
-        const encryptedPublic = Crypto.encryptPublicKey(password, publicBinary)
-        const decryptedPublic = Crypto.decryptPubKey(password, encryptedPublic)
-        assert.deepEqual(decryptedPublic, publicBinary)
-      })
-    })
-  })
-
   describe('encodeBase', () => {
     it('can be encoded and decoded', () => {
       const input = 'helloword010101023'

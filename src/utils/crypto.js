@@ -27,7 +27,7 @@ import nacl from 'tweetnacl'
 import aesjs from 'aes-js'
 import shajs from 'sha.js'
 
-import { leftPad, rightPad, str2buf, toBytes } from './bytes'
+import { str2buf, toBytes } from './bytes'
 import { hash } from './crypto-ts'
 
 export * from './crypto-ts'
@@ -217,28 +217,6 @@ export function generateKeyPair (raw = false) {
 }
 
 /**
- * Encrypt given public key using `password`
- * @rtype (password: String, binaryKey: Buffer) => Uint8Array
- * @param {String} password - Password to encrypt with
- * @param {Buffer} binaryKey - Key to encrypt
- * @return {Uint8Array} Encrypted key
- */
-export function encryptPublicKey (password, binaryKey) {
-  return encryptKey(password, rightPad(32, binaryKey))
-}
-
-/**
- * Encrypt given private key using `password`
- * @rtype (password: String, binaryKey: Buffer) => Uint8Array
- * @param {String} password - Password to encrypt with
- * @param {Buffer} binaryKey - Key to encrypt
- * @return {Uint8Array} Encrypted key
- */
-export function encryptPrivateKey (password, binaryKey) {
-  return encryptKey(password, leftPad(64, binaryKey))
-}
-
-/**
  * Encrypt given data using `password`
  * @rtype (password: String, binaryData: Buffer) => Uint8Array
  * @param {String} password - Password to encrypt with
@@ -316,40 +294,6 @@ export function aeEncodeKey (binaryKey) {
   const publicKeyBuffer = Buffer.from(binaryKey, 'hex')
   const pubKeyAddress = encodeBase58Check(publicKeyBuffer)
   return `ak_${pubKeyAddress}`
-}
-
-/**
- * Generate a new key pair using {@link generateKeyPair} and encrypt it using `password`
- * @rtype (password: String) => {publicKey: Uint8Array, secretKey: Uint8Array}
- * @param {String} password - Password to encrypt with
- * @return {Object} Encrypted key pair
- */
-export function generateSaveWallet (password) {
-  const keys = generateKeyPair(true)
-  return {
-    publicKey: encryptPublicKey(password, keys.publicKey),
-    secretKey: encryptPrivateKey(password, keys.secretKey)
-  }
-}
-
-/**
- * Decrypt an encrypted private key
- * @rtype (password: String, encrypted: Buffer) => Buffer
- * @param {String} password - Password to decrypt with
- * @return {Buffer} Decrypted key
- */
-export function decryptPrivateKey (password, encrypted) {
-  return decryptKey(password, encrypted)
-}
-
-/**
- * Decrypt an encrypted public key
- * @rtype (password: String, encrypted: Buffer) => Buffer
- * @param {String} password - Password to decrypt with
- * @return {Buffer} Decrypted key
- */
-export function decryptPubKey (password, encrypted) {
-  return decryptKey(password, encrypted).slice(0, 65)
 }
 
 /**

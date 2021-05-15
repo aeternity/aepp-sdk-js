@@ -19,18 +19,11 @@ import '../'
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
 import BigNumber from 'bignumber.js'
-import { leftPad, rightPad, toBytes, bigNumberToByteArray } from '../../src/utils/bytes'
+import { toBytes, bigNumberToByteArray } from '../../src/utils/bytes'
 import { isBase64, snakeToPascal, pascalToSnake } from '../../src/utils/string'
 
 describe('Bytes', function () {
   const bytes = Buffer.from('hello')
-
-  it('left/right pad', () => {
-    rightPad(7, bytes).should.be.eql(Buffer.from([...bytes, 0, 0]))
-    rightPad(4, bytes).should.be.eql(bytes)
-    leftPad(7, bytes).should.be.eql(Buffer.from([0, 0, ...bytes]))
-    leftPad(4, bytes).should.be.eql(bytes)
-  })
 
   it('toBytes: converts null to empty array', () => {
     toBytes(null).should.be.eql(Buffer.from([]))

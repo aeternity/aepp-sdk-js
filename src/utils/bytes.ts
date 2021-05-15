@@ -23,30 +23,6 @@ import { isBase64, isHex } from './string'
  * @example import { Crypto } from '@aeternity/aepp-sdk'
  */
 
-const pad = (left: boolean, length: number, input: Buffer): Buffer => {
-  const fill = length - input.length
-  if (fill <= 0) return input
-  const fillArray = new Uint8Array(fill)
-  fillArray.fill(0, fill)
-  return Buffer.concat(left ? [fillArray, input] : [input, fillArray])
-}
-
-/**
- * Left pad the input data with 0 bytes
- * @param length to pad to
- * @param input data to pad
- * @return the padded data
- */
-export const leftPad = pad.bind(null, true)
-
-/**
- * Right pad the input data with 0 bytes
- * @param length to pad to
- * @param input data to pad
- * @return the padded data
- */
-export const rightPad = pad.bind(null, false)
-
 /**
  * Convert bignumber to byte array
  * @param {BigNumber} x bignumber instance
