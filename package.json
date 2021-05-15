@@ -10,8 +10,9 @@
   },
   "sideEffects": false,
   "scripts": {
-    "build": "tsc && webpack --mode=production && babel src --config-file ./babel.esm.config.js --out-dir es --extensions '.js,.ts' --source-maps true",
-    "build:dev": "webpack --mode=development",
+    "build:es": "tsc && babel src --config-file ./babel.esm.config.js --out-dir es --extensions '.js,.ts' --source-maps true",
+    "build": "webpack --mode=production && npm run build:es",
+    "build:dev": "webpack --mode=development && npm run build:es",
     "docs:docco": "docco -t tooling/docs/markdown.jst -c /dev/null examples/node/*.js && rm -f docs/null && node rename-to-md.js",
     "docs:api": "node apidoc.js",
     "lint": "commitlint --from develop --verbose && ts-standard",
