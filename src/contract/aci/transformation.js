@@ -233,11 +233,9 @@ export function transformVariant (value, generic, { bindings }) {
 }
 
 export function transformMap (value, generic, { bindings }) {
-  if (value instanceof Map) {
-    value = Array.from(value.entries())
-  }
-  if (!Array.isArray(value) && value instanceof Object) {
-    value = Object.entries(value)
+  if (!Array.isArray(value)) {
+    if (value.entries) value = Array.from(value.entries())
+    else if (value instanceof Object) value = Object.entries(value)
   }
 
   return `{${value
