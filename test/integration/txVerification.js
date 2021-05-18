@@ -36,7 +36,7 @@ describe('Verify Transaction', function () {
       .filter(({ type }) => type === 'warning')
       .map(({ txKey }) => txKey)
 
-    JSON.stringify(WARNINGS).should.be.equals(JSON.stringify(warning))
+    WARNINGS.should.be.eql(warning)
   })
   it('check errors', async () => {
     const spendTx = await client.spendTx({
@@ -60,7 +60,7 @@ describe('Verify Transaction', function () {
         .filter(({ type }) => type === 'error') // exclude contract vm/abi, has separated test for it
         .map(({ txKey }) => txKey)
 
-      JSON.stringify(ERRORS.filter(e => e !== 'gasPrice' && e !== 'ctVersion')).should.be.equals(JSON.stringify(error))
+      ERRORS.filter(e => e !== 'gasPrice' && e !== 'ctVersion').should.be.eql(error)
     }
     await checkErrors(signedTxHash)
     await checkErrors(signedTxFull)

@@ -233,25 +233,21 @@ export function transformVariant (value, generic, { bindings }) {
 }
 
 export function transformMap (value, generic, { bindings }) {
-  if (value instanceof Map) {
-    value = Array.from(value.entries())
-  }
-  if (!Array.isArray(value) && value instanceof Object) {
-    value = Object.entries(value)
+  if (!Array.isArray(value)) {
+    if (value.entries) value = Array.from(value.entries())
+    else if (value instanceof Object) value = Object.entries(value)
   }
 
-  return `{${value
-    .reduce(
-      (acc, [key, value], i) => {
-        if (i !== 0) acc += ','
-        acc += `[${transform(generic[0], key, {
-          bindings
-        })}] = ${transform(generic[1], value, { bindings })}`
-        return acc
-      },
-      ''
-    )
-  }}`
+  return [
+    '{',
+    value
+      .map(([key, value]) => [
+        `[${transform(generic[0], key, { bindings })}]`,
+        transform(generic[1], value, { bindings })
+      ].join(' = '))
+      .join(),
+    '}'
+  ].join('')
 }
 
 // FUNCTION RETURN VALUE TRANSFORMATION ↓↓↓

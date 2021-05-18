@@ -1,6 +1,6 @@
 {
   "name": "@aeternity/aepp-sdk",
-  "version": "8.0.0-beta.2",
+  "version": "8.0.0",
   "description": "SDK for the æternity blockchain",
   "main": "dist/aepp-sdk.js",
   "types": "es/index.d.ts",
@@ -106,6 +106,7 @@
   },
   "files": [
     "dist",
+    "src",
     "es"
   ]
 }
