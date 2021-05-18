@@ -833,69 +833,39 @@ describe('Contract', function () {
           decodedResult.should.be.eql([[1, 2], [3, 4]])
         })
       })
+
       describe('MAP', function () {
+        const address = 'ak_gvxNbZf5CuxYVfcUFoKAP4geZatWaC2Yy4jpx5vZoCKank4Gc'
+
         it('Valid', async () => {
-          const address = await contract.address()
-          const mapArg = new Map(
-            [
-              [address, ['someStringV', 324]]
-            ]
-          )
-          const objectFromMap = Array.from(mapArg.entries()).reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {})
-          const { decodedResult } = await contractObject.methods.mapFn(objectFromMap)
+          const mapArg = new Map([[address, ['someStringV', 324]]])
+          const { decodedResult } = await contractObject.methods.mapFn(Object.fromEntries(mapArg))
           decodedResult.should.be.eql(Array.from(mapArg.entries()))
         })
+
         it('Map With Option Value', async () => {
-          const address = await contract.address()
-          const mapArgWithSomeValue = new Map(
-            [
-              [address, ['someStringV', 123]]
-            ]
-          )
-          const mapArgWithNoneValue = new Map(
-            [
-              [address, ['someStringV', undefined]]
-            ]
-          )
-          const returnArgWithSomeValue = new Map(
-            [
-              [address, ['someStringV', 123]]
-            ]
-          )
-          const returnArgWithNoneValue = new Map(
-            [
-              [address, ['someStringV', undefined]]
-            ]
-          )
-          const resultWithSome = await contractObject.methods.mapOptionFn(mapArgWithSomeValue)
-          const resultWithNone = await contractObject.methods.mapOptionFn(mapArgWithNoneValue)
-
-          const decodedSome = resultWithSome.decodedResult
-
-          decodedSome.should.be.eql(Array.from(returnArgWithSomeValue.entries()))
-          resultWithNone.decodedResult.should.be.eql(Array.from(returnArgWithNoneValue.entries()))
+          const mapWithSomeValue = new Map([[address, ['someStringV', 123]]])
+          const mapWithNoneValue = new Map([[address, ['someStringV', undefined]]])
+          let result = await contractObject.methods.mapOptionFn(mapWithSomeValue)
+          result.decodedResult.should.be.eql(Array.from(mapWithSomeValue.entries()))
+          result = await contractObject.methods.mapOptionFn(mapWithNoneValue)
+          result.decodedResult.should.be.eql(Array.from(mapWithNoneValue.entries()))
         })
+
         it('Cast from string to int', async () => {
-          const address = await contract.address()
-          const mapArg = new Map(
-            [
-              [address, ['someStringV', '324']]
-            ]
-          )
+          const mapArg = new Map([[address, ['someStringV', '324']]])
           const result = await contractObject.methods.mapFn(mapArg)
           mapArg.set(address, ['someStringV', 324])
           result.decodedResult.should.be.eql(Array.from(mapArg.entries()))
         })
+
         it('Cast from array to map', async () => {
-          const address = await contract.address()
-          const mapArg =
-            [
-              [address, ['someStringV', 324]]
-            ]
+          const mapArg = [[address, ['someStringV', 324]]]
           const { decodedResult } = await contractObject.methods.mapFn(mapArg)
           decodedResult.should.be.eql(mapArg)
         })
       })
+
       describe('RECORD/STATE', function () {
         it('Valid Set Record (Cast from JS object)', async () => {
           await contractObject.methods.setRecord({ value: 'qwe', key: 1234, testOption: 'test' })
