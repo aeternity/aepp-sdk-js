@@ -1,3 +1,12 @@
+# [8.0.0](https://github.com/aeternity/aepp-sdk-js/compare/8.0.0-beta.2...8.0.0) (2021-05-18)
+
+
+### Bug Fixes
+
+* avoid instanceof between possible not/polyfilled objects ([906ee0e](https://github.com/aeternity/aepp-sdk-js/commit/906ee0ea4eb71160c3a482ea068cbb0d857cef8f))
+
+
+
 ## [8.0.0-beta.2](https://github.com/aeternity/aepp-sdk-js/compare/8.0.0-beta.1...8.0.0-beta.2) (2021-05-12)
 
 
@@ -10,7 +19,7 @@
 * avoid ts definitions based on broken JsDoc ([572d19f](https://github.com/aeternity/aepp-sdk-js/commit/572d19f5ae6bd549c92a1a37452c0270490b9f6e))
 
 
-# [8.0.0-beta.1](https://github.com/aeternity/aepp-sdk-js/compare/7.7.0...8.0.0-beta.1) (2021-05-6)
+## [8.0.0-beta.1](https://github.com/aeternity/aepp-sdk-js/compare/7.7.0...8.0.0-beta.1) (2021-05-6)
 
 
 ### Important changes
