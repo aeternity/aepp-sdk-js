@@ -253,14 +253,4 @@ const Chain = stampit({
  * @return {Object} Result
  */
 
-/**
- * Get Node Info
- * @function getInfo
- * @instance
- * @abstract
- * @category async
- * @rtype () => result: Object
- * @return {Object} Result
- */
-
 export default Chain
