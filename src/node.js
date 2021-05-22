@@ -76,7 +76,7 @@ const Node = AsyncInit.compose({
     if (!url) throw new Error('"url" required')
     this.url = url.replace(/\/$/, '')
     this.internalUrl = internalUrl ? internalUrl.replace(/\/$/, '') : this.url
-    let client = await genSwaggerClient(`${this.url}/api`, { internalUrl: this.internalUrl })
+    const client = await genSwaggerClient(`${this.url}/api?oas3`, { internalUrl: this.internalUrl })
     this.version = client.spec.info.version
     if (
       !semverSatisfies(this.version, NODE_GE_VERSION, NODE_LT_VERSION) &&
@@ -86,10 +86,6 @@ const Node = AsyncInit.compose({
         `Unsupported node version ${this.version}. ` +
         `Supported: >= ${NODE_GE_VERSION} < ${NODE_LT_VERSION}`
       )
-    }
-    if (semverSatisfies(this.version, IRIS_NODE_GE_VERSION, NODE_LT_VERSION)) {
-      client = await genSwaggerClient(`${this.url}/api?oas3`, { internalUrl: this.internalUrl })
-      this._isIrisNode = true
     }
     this.api = client.api
 
@@ -117,8 +113,7 @@ const Node = AsyncInit.compose({
   }
 })
 
-const NODE_GE_VERSION = '5.2.0'
-const IRIS_NODE_GE_VERSION = '6.0.0'
+const NODE_GE_VERSION = '6.0.0'
 const NODE_LT_VERSION = '7.0.0'
 
 export default Node

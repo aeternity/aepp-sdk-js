@@ -46,29 +46,11 @@ export default async (specUrl, { spec, internalUrl, disableBigNumbers, disableCa
   spec = spec || await (await fetch(specUrl)).json()
   const jsonImp = disableBigNumbers ? JSON : JsonBig
 
-  const isAeternityNode = spec.info.title === 'Aeternity node'
-  if (isAeternityNode && spec.swagger === '2.0') {
-    ['claim', 'preclaim', 'transfer', 'revoke', 'update'].forEach(name => {
-      const s = spec.paths[`/debug/names/${name}`]?.post
-      if (s && !s.consumes) s.consumes = ['application/json']
-    })
-  }
-
   const [external, internal] = await Promise.all([specUrl, internalUrl].map((url) => {
     if (!url) return null
-    spec.schemes = [new URL(url).protocol.slice(0, -1)]
     return SwaggerClient({
       url,
       spec,
-      requestInterceptor: request => {
-        if (
-          isAeternityNode &&
-          /^\/v3\/transactions\/\w+$/.test(new URL(request.url).pathname)
-        ) {
-          return { ...request, url: request.url.replace('v3', 'v2') }
-        }
-        return request
-      },
       responseInterceptor: response => {
         if (!response.text) return response
         const body = jsonImp.parse(response.text)
