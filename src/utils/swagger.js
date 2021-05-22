@@ -26,6 +26,8 @@ import fetch from 'cross-fetch'
 import JsonBig from './json-big'
 import { snakizeKeys, pascalizeKeys, mapObject, filterObject } from './other'
 
+let warnedAboutInternalApiUsage = false
+
 /**
  * Generator of Swagger client
  * @function
@@ -79,7 +81,17 @@ export default async (specUrl, { spec, internalUrl, disableBigNumbers, disableCa
 
   const combinedApi = [
     ...Object.values(external.apis),
-    ...internal ? [internal.apis.internal, internal.apis.debug] : []
+    mapObject(internal?.apis.internal || {}, ([key, handler]) => [key, (...args) => {
+      if (!warnedAboutInternalApiUsage) {
+        console.warn(
+          'SDK\'s wrapper of aeternity node internal API is deprecated, please use external ' +
+          'equivalent (for example, "sdk.api.protectedDryRunTxs" instead of "sdk.api.dryRunTxs") ' +
+          'or create a wrapper of internal API by yourself (using "genSwaggerClient")'
+        )
+        warnedAboutInternalApiUsage = true
+      }
+      return handler(...args)
+    }])
   ].reduce((acc, n) => ({ ...acc, ...n }))
 
   const opSpecs = Object.values(spec.paths)
