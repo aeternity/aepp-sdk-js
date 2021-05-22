@@ -25,7 +25,7 @@
 import * as R from 'ramda'
 
 import { ContractAPI } from '../../ae/contract'
-import { TX_TYPE, PROTOCOL_VERSIONS } from '../../tx/builder/schema'
+import { TX_TYPE } from '../../tx/builder/schema'
 import { buildTx } from '../../tx/builder'
 import { getContractAuthFan, prepareGaParams, wrapInEmptySignedTx } from './helpers'
 import { assertedType, decodeBase64Check } from '../../utils/crypto'
@@ -131,7 +131,7 @@ async function createMetaTx (rawTransaction, authData, authFnName, options = {})
   const { rlpEncoded: metaTxRlp } = buildTx(
     { ...params, fee: `${fee}`, ttl },
     TX_TYPE.gaMeta,
-    { vsn: this.getNodeInfo().consensusProtocolVersion === PROTOCOL_VERSIONS.IRIS ? 2 : 1 }
+    { vsn: 2 }
   )
   // Wrap in empty signed tx
   const { tx } = wrapInEmptySignedTx(metaTxRlp)
