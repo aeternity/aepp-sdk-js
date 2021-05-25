@@ -189,7 +189,7 @@ async function getMicroBlockHeader (hash) {
 
 async function txDryRun (tx, accountAddress, options) {
   const { results: [{ result, reason, ...resultPayload }], ...other } =
-    await this.api.dryRunTxs({
+    await this.api[this._isIrisNode ? 'protectedDryRunTxs' : 'dryRunTxs']({
       ...options,
       txs: [{ tx }],
       accounts: [{
