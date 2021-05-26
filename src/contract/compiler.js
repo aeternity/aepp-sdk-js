@@ -145,4 +145,4 @@ export default AsyncInit.compose(ContractBase, {
 })
 
 const COMPILER_GE_VERSION = '4.1.0'
-const COMPILER_LT_VERSION = '6.0.0'
+const COMPILER_LT_VERSION = '7.0.0'
