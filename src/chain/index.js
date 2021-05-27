@@ -189,9 +189,9 @@ const Chain = stampit({
  * @abstract
  * @category async
  * @rtype (txHash: String, { confirm: Number | Boolean } = { confirm: 3 }) => Promise<Number>
- * @param {String} txHash - Generation hash or height
- * @param {String} [options={}] - options
- * @param {String} [options.confirm=3] - Block confirmation count
+ * @param {String} txHash - Transaction hash
+ * @param {Object} [options] - options
+ * @param {Number} [options.confirm=3] - Number of blocks to wait for transaction confirmation
  * @return {Promise<Number>} Current Height
  */
 

@@ -68,7 +68,16 @@ async function sendTransaction (tx, options = {}) {
 async function waitForTxConfirm (txHash, options = { confirm: 3 }) {
   options.confirm = options.confirm === true ? 3 : options.confirm
   const { blockHeight } = await this.tx(txHash)
-  return this.awaitHeight(blockHeight + options.confirm, options)
+  const height = await this.awaitHeight(blockHeight + options.confirm, options)
+  const { blockHeight: newBlockHeight } = await this.tx(txHash)
+  switch (newBlockHeight) {
+    case -1:
+      throw new Error(`Transaction ${txHash} is removed from chain`)
+    case blockHeight:
+      return height
+    default:
+      return waitForTxConfirm(txHash, options)
+  }
 }
 
 async function getAccount (address, { height, hash } = {}) {
