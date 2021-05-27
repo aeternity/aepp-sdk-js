@@ -75,15 +75,15 @@ describe('Aens', function () {
   it('Call contract using AENS name', async () => {
     const identityContract = `
 contract Identity =
- entrypoint main(x : int) = x
+ entrypoint getArg(x : int) = x
 `
     const bytecode = await aens.contractCompile(identityContract)
     const deployed = await bytecode.deploy([])
     const nameObject = await aens.aensQuery(name)
     await nameObject.update([deployed.address])
-    const callDataCall = await aens.contractEncodeCall(identityContract, 'main', ['1'])
-    const callRes = await aens.contractCall(identityContract, name, 'main', callDataCall)
-    const callResStatic = await aens.contractCallStatic(identityContract, name, 'main', callDataCall)
+    const callDataCall = await aens.contractEncodeCall(identityContract, 'getArg', ['1'])
+    const callRes = await aens.contractCall(identityContract, name, 'getArg', callDataCall)
+    const callResStatic = await aens.contractCallStatic(identityContract, name, 'getArg', callDataCall)
     callResStatic.result.returnType.should.be.equal('ok')
     callRes.hash.split('_')[0].should.be.equal('th')
   })

@@ -31,7 +31,7 @@ const CONTRACT_CODE = `
 contract Multiplier =
   record state = { factor: int }
   entrypoint init(f : int) : state = { factor = f }
-  entrypoint main(x : int) = x * state.factor
+  entrypoint multiplyBy(x : int) = x * state.factor
 `
 const ACCOUNT_KEYPAIR = {
   publicKey: 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR',
@@ -77,7 +77,7 @@ const account = MemoryAccount({ keypair: ACCOUNT_KEYPAIR });
   // any public function defined within it. The miner who found the next block
   // will not only be rewarded a fixed amount, but also an amount depending on
   // the amount of gas spend.
-  const call = await deployed.call('main', ['7'])
+  const call = await deployed.call('multiplyBy', ['7'])
   console.log(`Contract call transaction hash ${call.hash}`)
 
   // The execution result, if successful, will be an FATE-encoded result value.
