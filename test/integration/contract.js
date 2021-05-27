@@ -58,12 +58,12 @@ include "testLib"
 contract Voting =
   entrypoint sumNumbers(x: int, y: int) : int = TestLib.sum(x, y)
 `
-const testContract = `
+const genTestContract = isCompiler6 => `
 namespace Test =
   function double(x: int): int = x*2
 
 
-contract Voting =
+contract ${isCompiler6 ? 'interface' : ''} Voting =
   type test_type = int
   record state = { value: string, key: test_type, testOption: option(string) }
   record test_record = { value: string, key: list(test_type) }
@@ -555,7 +555,10 @@ describe('Contract', function () {
       let decodedEventsUsingBuildInMethod
 
       before(async () => {
-        cInstance = await contract.getContractInstance(testContract, { filesystem })
+        cInstance = await contract.getContractInstance(
+          genTestContract(contract._isCompiler6),
+          { filesystem }
+        )
         await cInstance.deploy(['test', 1, 'some'])
         eventResult = await cInstance.methods.emitEvents()
         const { log } = await contract.tx(eventResult.hash)
@@ -603,7 +606,10 @@ describe('Contract', function () {
     })
 
     it('Generate ACI object', async () => {
-      contractObject = await contract.getContractInstance(testContract, { filesystem, opt: { ttl: 0 } })
+      contractObject = await contract.getContractInstance(
+        genTestContract(contract._isCompiler6),
+        { filesystem, opt: { ttl: 0 } }
+      )
       contractObject.should.have.property('interface')
       contractObject.should.have.property('aci')
       contractObject.should.have.property('source')
@@ -654,7 +660,10 @@ describe('Contract', function () {
       await contract.poll(result.hash, { interval: 50, attempts: 1200 })
     })
     it('Generate ACI object with corresponding bytecode', async () => {
-      await contract.getContractInstance(testContract, { contractAddress: contractObject.deployInfo.address, filesystem, opt: { ttl: 0 } })
+      await contract.getContractInstance(
+        genTestContract(contract._isCompiler6),
+        { contractAddress: contractObject.deployInfo.address, filesystem, opt: { ttl: 0 } }
+      )
     })
     it('Generate ACI object with not corresponding bytecode', async () => {
       try {
@@ -668,7 +677,10 @@ describe('Contract', function () {
     })
     it('Throw error on creating contract instance with invalid contractAddress', async () => {
       try {
-        await contract.getContractInstance(testContract, { filesystem, contractAddress: 'ct_asdasdasd', opt: { ttl: 0 } })
+        await contract.getContractInstance(
+          genTestContract(contract._isCompiler6),
+          { filesystem, contractAddress: 'ct_asdasdasd', opt: { ttl: 0 } }
+        )
       } catch (e) {
         e.message.should.be.equal('Invalid contract address')
       }
@@ -676,7 +688,10 @@ describe('Contract', function () {
     it('Throw error on creating contract instance with contract address which is not found on-chain or not active', async () => {
       const contractAddress = 'ct_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT'
       try {
-        await contract.getContractInstance(testContract, { filesystem, contractAddress, opt: { ttl: 0 } })
+        await contract.getContractInstance(
+          genTestContract(contract._isCompiler6),
+          { filesystem, contractAddress, opt: { ttl: 0 } }
+        )
       } catch (e) {
         e.message.should.be.equal(`Contract with address ${contractAddress} not found on-chain or not active`)
       }
@@ -1058,7 +1073,10 @@ describe('Contract', function () {
     describe('Type resolving', () => {
       let cInstance
       before(async () => {
-        cInstance = await contract.getContractInstance(testContract, { filesystem })
+        cInstance = await contract.getContractInstance(
+          genTestContract(contract._isCompiler6),
+          { filesystem }
+        )
       })
       it('Resolve remote contract type', async () => {
         const fnACI = getFunctionACI(cInstance.aci, 'remoteContract', { external: cInstance.externalAci })
