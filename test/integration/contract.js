@@ -27,7 +27,7 @@ import { getFunctionACI } from '../../src/contract/aci/helpers'
 
 const identityContract = `
 contract Identity =
- entrypoint main(x : int) = x
+ entrypoint getArg(x : int) = x
 `
 
 const contractWithBrokenDeploy = `
@@ -323,7 +323,7 @@ describe('Contract', function () {
     const callArg = 1
     const { bytecode } = await contract.contractCompile(identityContract)
     const callDataDeploy = await contract.contractEncodeCall(identityContract, 'init', [])
-    const callDataCall = await contract.contractEncodeCall(identityContract, 'main', [callArg.toString()])
+    const callDataCall = await contract.contractEncodeCall(identityContract, 'getArg', [callArg.toString()])
 
     const deployStatic = await contract.contractCallStatic(identityContract, null, 'init', callDataDeploy, { bytecode })
     deployStatic.result.should.have.property('gasUsed')
@@ -334,13 +334,13 @@ describe('Contract', function () {
     deployed.result.should.have.property('returnType')
     deployed.should.have.property('address')
 
-    const callStaticRes = await contract.contractCallStatic(identityContract, deployed.address, 'main', callDataCall)
+    const callStaticRes = await contract.contractCallStatic(identityContract, deployed.address, 'getArg', callDataCall)
     callStaticRes.result.should.have.property('gasUsed')
     callStaticRes.result.should.have.property('returnType')
     const decodedCallStaticResult = await callStaticRes.decode()
     decodedCallStaticResult.should.be.equal(callArg)
 
-    const callRes = await contract.contractCall(identityContract, deployed.address, 'main', callDataCall)
+    const callRes = await contract.contractCall(identityContract, deployed.address, 'getArg', callDataCall)
     callRes.result.should.have.property('gasUsed')
     callRes.result.should.have.property('returnType')
     callRes.result.should.have.property('returnType')
@@ -354,9 +354,9 @@ describe('Contract', function () {
 
     const deployed = await bytecode.deploy([], { onAccount })
     deployed.result.callerId.should.be.equal(onAccount)
-    const callRes = await deployed.call('main', ['42'])
+    const callRes = await deployed.call('getArg', ['42'])
     callRes.result.callerId.should.be.equal(onAccount)
-    const callStaticRes = await deployed.callStatic('main', ['42'])
+    const callStaticRes = await deployed.callStatic('getArg', ['42'])
     callStaticRes.result.callerId.should.be.equal(onAccount)
   })
 
@@ -407,12 +407,12 @@ describe('Contract', function () {
     client.addresses().length.should.be.equal(0)
     const address = await client.address().catch(e => false)
     address.should.be.equal(false)
-    const { result } = await client.contractCallStatic(identityContract, deployed.address, 'main', ['42'])
+    const { result } = await client.contractCallStatic(identityContract, deployed.address, 'getArg', ['42'])
     result.callerId.should.be.equal(DRY_RUN_ACCOUNT.pub)
   })
 
   it('calls deployed contracts', async () => {
-    const result = await deployed.call('main', ['42'])
+    const result = await deployed.call('getArg', ['42'])
     return result.decode().should.eventually.become(42)
   })
 
@@ -421,14 +421,14 @@ describe('Contract', function () {
     await contract.poll(deployed.transaction, { interval: 50, attempts: 1200 })
     expect(deployed.result).to.be.equal(undefined)
     deployed.txData.should.not.be.equal(undefined)
-    const result = await deployed.call('main', ['42'], { waitMined: false, verify: false })
+    const result = await deployed.call('getArg', ['42'], { waitMined: false, verify: false })
     expect(result.result).to.be.equal(undefined)
     result.txData.should.not.be.equal(undefined)
     await contract.poll(result.hash, { interval: 50, attempts: 1200 })
   })
 
   it('calls deployed contracts static', async () => {
-    const result = await deployed.callStatic('main', ['42'])
+    const result = await deployed.callStatic('getArg', ['42'])
     return result.decode().should.eventually.become(42)
   })
 
@@ -518,7 +518,7 @@ describe('Contract', function () {
       isString.should.be.equal(true)
     })
     it('decode call result', async () => {
-      return contract.contractDecodeCallResultAPI(identityContract, 'main', encodedNumberSix, 'ok').should.eventually.become(6)
+      return contract.contractDecodeCallResultAPI(identityContract, 'getArg', encodedNumberSix, 'ok').should.eventually.become(6)
     })
     it('Decode call-data using source', async () => {
       const decodedCallData = await contract.contractDecodeCallDataBySourceAPI(identityContract, 'init', callData)

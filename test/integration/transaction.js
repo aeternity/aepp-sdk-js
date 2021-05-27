@@ -48,7 +48,7 @@ const queryResponse = '{\'tmp\': 101}'
 // Contract test data
 const contractCode = `
 contract Identity =
-  entrypoint main(x : int) = x
+  entrypoint getArg(x : int) = x
 `
 let contractId
 const deposit = 4
@@ -172,7 +172,7 @@ describe('Native Transaction', function () {
   })
 
   it('native build of contract call tx', async () => {
-    const callData = await client.contractEncodeCall(contractCode, 'main', ['2'])
+    const callData = await client.contractEncodeCall(contractCode, 'getArg', ['2'])
     const owner = await client.address()
 
     const txFromAPI = await client.contractCallTx({ callerId: owner, contractId, amount, gas, gasPrice, callData })

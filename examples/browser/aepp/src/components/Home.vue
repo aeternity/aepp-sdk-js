@@ -230,7 +230,7 @@
         spendError: null,
         balance: null,
         contractCode: `contract Identity =
-      entrypoint main(x : int) = x`,
+      entrypoint getArg(x : int) = x`,
         byteCode: null,
         compileBytecodeResponse: null,
         contractInitState: [],
@@ -269,7 +269,7 @@
           this.compileBytecodeResponse.result, this.contractCode, this.contractInitState
         ));
       },
-      async call (code, method = 'main', returnType = 'int', args = ['5']) {
+      async call (code, method = 'getArg', returnType = 'int', args = ['5']) {
         this.callResponse = await errorAsField((async () => {
           const result = await this.client.contractCall(
             this.contractCode, this.deployResponse.result.address, method,  args
