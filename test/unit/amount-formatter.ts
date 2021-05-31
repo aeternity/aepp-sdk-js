@@ -16,6 +16,7 @@
  */
 
 import { describe, it } from 'mocha'
+import { expect } from 'chai'
 import BigNumber from 'bignumber.js'
 import '..'
 import { AE_AMOUNT_FORMATS, formatAmount, toAe, toAettos } from '../../src/utils/amount-formatter'
@@ -30,7 +31,7 @@ describe('Amount Formatter', function () {
       [10012312, AE_AMOUNT_FORMATS.AE, 10012312e18],
       [1, AE_AMOUNT_FORMATS.AETTOS, 1]
     ].forEach(
-      ([v, d, e]) => parseBigNumber(e).should.be.equal(toAettos(v, { denomination: d.toString() }))
+      ([v, d, e]) => expect(parseBigNumber(e)).to.be.equal(toAettos(v, { denomination: d.toString() }))
     )
   })
   it('to Ae', () => {
@@ -41,7 +42,7 @@ describe('Amount Formatter', function () {
       [10012312, AE_AMOUNT_FORMATS.AETTOS, new BigNumber(10012312).div(1e18)],
       [1, AE_AMOUNT_FORMATS.AE, 1]
     ].forEach(
-      ([v, d, e]) => parseBigNumber(e).should.be.equal(toAe(v, { denomination: d.toString() }))
+      ([v, d, e]) => expect(parseBigNumber(e)).to.be.equal(toAe(v, { denomination: d.toString() }))
     )
   })
   it('format', () => {
@@ -66,7 +67,7 @@ describe('Amount Formatter', function () {
       [1, AE_AMOUNT_FORMATS.FEMTO_AE, AE_AMOUNT_FORMATS.AETTOS, new BigNumber(1000)],
       [1, AE_AMOUNT_FORMATS.NANO_AE, AE_AMOUNT_FORMATS.FEMTO_AE, new BigNumber(1000000)]
     ].forEach(
-      ([v, dF, dT, e]) => parseBigNumber(e).should.be.equal(formatAmount(v, { denomination: dF.toString(), targetDenomination: dT.toString() }))
+      ([v, dF, dT, e]) => expect(parseBigNumber(e)).to.be.equal(formatAmount(v, { denomination: dF.toString(), targetDenomination: dT.toString() }))
     )
   })
   it('Invalid value', () => {
@@ -78,7 +79,7 @@ describe('Amount Formatter', function () {
       try {
         formatAmount(v, { denomination: dF, targetDenomination: dT })
       } catch (e) {
-        e.message.should.be.equal(error)
+        expect(e.message).to.be.equal(error)
       }
     })
   })

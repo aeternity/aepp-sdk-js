@@ -23,7 +23,6 @@
 
 import bs58check from 'bs58check'
 import { decode as rlpDecode, encode as rlpEncode } from 'rlp'
-import { blake2b } from 'blakejs'
 import ed2curve from 'ed2curve'
 import nacl from 'tweetnacl'
 import aesjs from 'aes-js'
@@ -31,6 +30,9 @@ import shajs from 'sha.js'
 
 import { leftPad, rightPad, str2buf, toBytes } from './bytes'
 import { decode as decodeNode } from '../tx/builder/helpers'
+import { hash } from './crypto-ts'
+
+export * from './crypto-ts'
 
 const Ecb = aesjs.ModeOfOperation.ecb
 
@@ -103,16 +105,6 @@ export function addressToHex (base58CheckAddress) {
  */
 export function addressFromDecimal (decimalAddress) {
   return aeEncodeKey(toBytes(decimalAddress, true))
-}
-
-/**
- * Calculate 256bits Blake2b hash of `input`
- * @rtype (input: String) => hash: String
- * @param {String|Buffer} input - Data to hash
- * @return {Buffer} Hash
- */
-export function hash (input) {
-  return Buffer.from(blake2b(input, null, 32)) // 256 bits
 }
 
 /**

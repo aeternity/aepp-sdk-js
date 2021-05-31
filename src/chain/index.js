@@ -189,9 +189,9 @@ const Chain = stampit({
  * @abstract
  * @category async
  * @rtype (txHash: String, { confirm: Number | Boolean } = { confirm: 3 }) => Promise<Number>
- * @param {String} txHash - Generation hash or height
- * @param {String} [options={}] - options
- * @param {String} [options.confirm=3] - Block confirmation count
+ * @param {String} txHash - Transaction hash
+ * @param {Object} [options] - options
+ * @param {Number} [options.confirm=3] - Number of blocks to wait for transaction confirmation
  * @return {Promise<Number>} Current Height
  */
 
@@ -250,16 +250,6 @@ const Chain = stampit({
  * @param {String} accountAddress - address that will be used to execute transaction
  * @param {String|Number} [options.top] - hash of block on which to make dry-run
  * @param {Boolean} [options.txEvents] - collect and return on-chain tx events that would result from the call
- * @return {Object} Result
- */
-
-/**
- * Get Node Info
- * @function getInfo
- * @instance
- * @abstract
- * @category async
- * @rtype () => result: Object
  * @return {Object} Result
  */
 

@@ -409,7 +409,7 @@ export const FIELD_TYPES = {
   offChainUpdates: 'offChainUpdates',
   callStack: 'callStack',
   proofOfInclusion: 'proofOfInclusion',
-  mptree: 'mptree',
+  mptrees: 'mptrees',
   callReturnType: 'callReturnType',
   ctVersion: 'ctVersion',
   sophiaCodeTypeInfo: 'sophiaCodeTypeInfo',

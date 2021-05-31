@@ -57,6 +57,7 @@ export default AsyncInit.compose(ContractBase, {
       this.compilerVersion = client.spec.info.version
       this._compilerApi = client.api
 
+      this._isCompiler6 = semverSatisfies(this.compilerVersion, COMPILER_6_GE_VERSION, COMPILER_LT_VERSION)
       if (ignoreVersion) return
       if (!semverSatisfies(this.compilerVersion, COMPILER_GE_VERSION, COMPILER_LT_VERSION)) {
         throw new Error(`Unsupported compiler version ${this.compilerVersion}. ` +
@@ -145,4 +146,5 @@ export default AsyncInit.compose(ContractBase, {
 })
 
 const COMPILER_GE_VERSION = '4.1.0'
-const COMPILER_LT_VERSION = '6.0.0'
+const COMPILER_6_GE_VERSION = '6.0.0'
+const COMPILER_LT_VERSION = '7.0.0'
