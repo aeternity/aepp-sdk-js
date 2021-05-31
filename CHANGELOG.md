@@ -1,3 +1,18 @@
+# [8.1.0](https://github.com/aeternity/aepp-sdk-js/compare/8.0.0...8.1.0) (2021-05-31)
+
+
+### Bug Fixes
+
+* **poi-tx schema:** use proper type name ([9e7c7b2](https://github.com/aeternity/aepp-sdk-js/commit/9e7c7b22c70cb0dcd194f8b1871be8fbf9b914ea))
+* **wait-for-tx-confirm:** validate transaction height after awaitHeight ([95e0d93](https://github.com/aeternity/aepp-sdk-js/commit/95e0d9334ffb9bf56f028fcc96d75f5a83905df0))
+
+
+### Features
+
+* support compiler@6.0.0 and above ([3cdc7f9](https://github.com/aeternity/aepp-sdk-js/commit/3cdc7f9046b53de5c1ddeb0f7bd1b20af7cf433e))
+
+
+
 # [8.0.0](https://github.com/aeternity/aepp-sdk-js/compare/8.0.0-beta.2...8.0.0) (2021-05-18)
 
 
