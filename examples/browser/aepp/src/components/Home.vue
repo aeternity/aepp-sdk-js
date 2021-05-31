@@ -327,9 +327,6 @@
       }
     },
     async created () {
-      // Open iframe with Wallet if run in top window
-      if (window === window.parent) this.openReverseIframe()
-
       this.client = await RpcAepp({
         name: 'Simple Aepp',
         nodes: [
@@ -354,6 +351,8 @@
       this.height = await this.client.height()
       // Start looking for wallets
       this.scanForWallets()
+      // Open iframe with Wallet if run in top window
+      if (window === window.parent) this.openReverseIframe()
     }
   }
 </script>
