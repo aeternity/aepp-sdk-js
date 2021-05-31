@@ -291,12 +291,11 @@
         await this.client.disconnectWallet()
         setTimeout(() => this.scanForWallets(), 1000)
       },
-      async getReverseWindow() {
+      openReverseIframe() {
         const iframe = document.createElement('iframe')
         iframe.src = prompt('Enter wallet URL', 'http://localhost:9000')
         iframe.style.display = 'none'
         document.body.appendChild(iframe)
-        return iframe.contentWindow
       },
       async connectToWallet (wallet) {
         await this.client.connectToWallet(await wallet.getConnection())
@@ -310,7 +309,7 @@
         this.nodeInfoResponse = await errorAsField(this.client.getNodeInfo())
         this.compilerVersionResponse = await errorAsField(this.client.getCompilerVersion())
       },
-      async scanForWallets () {
+      scanForWallets () {
         const handleWallets = async function ({ wallets, newWallet }) {
           newWallet = newWallet || Object.values(wallets)[0]
           if (confirm(`Do you want to connect to wallet ${newWallet.name}`)) {
@@ -320,17 +319,14 @@
           }
         }
 
-        const scannerConnection = await BrowserWindowMessageConnection({
+        const scannerConnection = BrowserWindowMessageConnection({
           connectionInfo: { id: 'spy' }
         })
-        this.detector = await Detector({ connection: scannerConnection })
+        this.detector = Detector({ connection: scannerConnection })
         this.detector.scan(handleWallets.bind(this))
       }
     },
     async created () {
-      // Open iframe with Wallet if run in top window
-      window !== window.parent || await this.getReverseWindow()
-
       this.client = await RpcAepp({
         name: 'Simple Aepp',
         nodes: [
@@ -354,7 +350,9 @@
       })
       this.height = await this.client.height()
       // Start looking for wallets
-      await this.scanForWallets()
+      this.scanForWallets()
+      // Open iframe with Wallet if run in top window
+      if (window === window.parent) this.openReverseIframe()
     }
   }
 </script>

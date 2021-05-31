@@ -128,7 +128,7 @@ const REQUESTS = {
             const validationResult = await instance.unpackAndVerify(rawTx || tx)
             if (validationResult.validation.length) return { error: ERRORS.invalidTransaction(validationResult) }
             // Send broadcast failed error to aepp
-            return { error: ERRORS.broadcastFailde(e.message) }
+            return { error: ERRORS.broadcastFailed(e.message) }
           }
           throw e
         }
