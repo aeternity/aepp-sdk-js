@@ -27,7 +27,7 @@ export const MIN_GAS_PRICE = 1e9
 export const MAX_AUTH_FUN_GAS = 50000
 export const DRY_RUN_ACCOUNT = { pub: 'ak_11111111111111111111111111111111273Yts', amount: '100000000000000000000000000000000000' }
 // # AENS
-export const NAME_TTL = 50000
+export const NAME_TTL = 180000
 // # max number of block into the future that the name is going to be available
 // # https://github.com/aeternity/protocol/blob/epoch-v0.22.0/AENS.md#update
 // # https://github.com/aeternity/protocol/blob/44a93d3aab957ca820183c3520b9daf6b0fedff4/AENS.md#aens-entry
