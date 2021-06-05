@@ -34,8 +34,10 @@ function configure (filename, opts = {}) {
     output: {
       path: path.resolve(__dirname, 'dist'),
       filename,
-      library: 'Ae',
-      libraryTarget: 'umd'
+      library: {
+        name: 'Ae',
+        type: 'umd'
+      }
     },
     externals: Object
       .keys(require('./package').dependencies)
