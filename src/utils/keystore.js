@@ -1,6 +1,6 @@
 import nacl from 'tweetnacl'
 import { v4 as uuid } from 'uuid'
-import sodium from 'libsodium-wrappers-sumo'
+import { ArgonType, hash } from '@aeternity/argon2-browser/dist/argon2-bundled.min.js'
 import { encodeBase58Check } from './crypto'
 import { str2buf } from './bytes'
 import {
@@ -36,19 +36,17 @@ const DERIVED_KEY_FUNCTIONS = {
   argon2id: deriveKeyUsingArgon2id
 }
 
-export async function deriveKeyUsingArgon2id (password, salt, options) {
-  const { memlimit_kib: memoryCost, opslimit: timeCost } = options.kdf_params
-  // const isBrowser = !(typeof module !== 'undefined' && module.exports)
+export async function deriveKeyUsingArgon2id (pass, salt, options) {
+  const { memlimit_kib: mem, opslimit: time } = options.kdf_params
 
-  await sodium.ready
-  const result = sodium.crypto_pwhash(
-    32,
-    password,
+  const result = (await hash({
+    hashLen: 32,
+    pass,
     salt,
-    timeCost,
-    memoryCost * 1024,
-    sodium.crypto_pwhash_ALG_ARGON2ID13
-  )
+    time,
+    mem,
+    type: ArgonType.Argon2id
+  })).hash
   return Buffer.from(result)
 }
 
