@@ -12,12 +12,6 @@ function configure (filename, opts = {}) {
           test: /\.(js|ts)$/,
           include: path.resolve(__dirname, 'src'),
           loader: 'babel-loader'
-        },
-        {
-          test: /\.js$/,
-          include: path.resolve(__dirname, 'node_modules/rlp'),
-          loader: 'babel-loader',
-          options: { presets: ['@babel/preset-env'] }
         }
       ]
     },
