@@ -27,7 +27,8 @@ function configure (filename, opts = {}) {
     },
     plugins: [
       ...opts.target === 'node' ? [] : [new webpack.ProvidePlugin({
-        process: 'process'
+        process: 'process',
+        Buffer: ['buffer', 'Buffer']
       })],
       ...argv.report ? [new BundleAnalyzerPlugin({
         analyzerMode: 'static',
