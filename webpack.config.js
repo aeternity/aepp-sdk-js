@@ -23,6 +23,9 @@ function configure (filename, opts = {}) {
         path: require.resolve('path-browserify'),
         stream: require.resolve('stream-browserify'),
         crypto: require.resolve('crypto-browserify')
+      },
+      alias: {
+        'js-yaml': false
       }
     },
     plugins: [
