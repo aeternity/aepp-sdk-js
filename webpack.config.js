@@ -1,9 +1,8 @@
 const path = require('path')
-const R = require('ramda')
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 
 function configure (filename, opts = {}) {
-  return (env, argv) => R.mergeDeepRight({
+  return (env, argv) => ({
     entry: './src/index.js',
     mode: 'development', // automatically overriden by production flag
     devtool: argv.mode === 'production' ? 'source-map' : 'eval-source-map',
@@ -52,8 +51,9 @@ function configure (filename, opts = {}) {
           commonjs: dependency,
           commonjs2: dependency
         }
-      }), {})
-  }, opts)
+      }), {}),
+    ...opts
+  })
 }
 
 module.exports = [
