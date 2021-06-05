@@ -1,3 +1,4 @@
+const webpack = require('webpack')
 const path = require('path')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 
@@ -24,13 +25,16 @@ function configure (filename, opts = {}) {
         crypto: require.resolve('crypto-browserify')
       }
     },
-    plugins: argv.report ? [
-      new BundleAnalyzerPlugin({
+    plugins: [
+      ...opts.target === 'node' ? [] : [new webpack.ProvidePlugin({
+        process: 'process'
+      })],
+      ...argv.report ? [new BundleAnalyzerPlugin({
         analyzerMode: 'static',
         reportFilename: filename + '.html',
         openAnalyzer: false
-      })
-    ] : [],
+      })] : []
+    ],
     output: {
       path: path.resolve(__dirname, 'dist'),
       filename,
