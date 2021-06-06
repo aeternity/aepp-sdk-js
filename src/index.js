@@ -48,6 +48,13 @@ import genSwaggerClient from './utils/swagger'
 import Channel from './channel'
 import Universal from './ae/universal'
 
+export { default as ContentScriptBridge } from './utils/aepp-wallet-communication/content-script-bridge'
+export * as AeppWalletHelpers from './utils/aepp-wallet-communication/helpers'
+export * as AeppWalletSchema from './utils/aepp-wallet-communication/schema'
+export { default as WalletDetector } from './utils/aepp-wallet-communication/wallet-detector'
+export { default as BrowserRuntimeConnection } from './utils/aepp-wallet-communication/connection/browser-runtime'
+export { default as BrowserWindowMessageConnection } from './utils/aepp-wallet-communication/connection/browser-window-message'
+
 export {
   AmountFormatter,
   AccountBase,

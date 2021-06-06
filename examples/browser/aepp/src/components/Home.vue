@@ -195,9 +195,7 @@
 </template>
 
 <script>
-  import { RpcAepp, Node } from 'AE_SDK_MODULES'
-  import Detector from 'AE_SDK_MODULES/utils/aepp-wallet-communication/wallet-detector'
-  import BrowserWindowMessageConnection from 'AE_SDK_MODULES/utils/aepp-wallet-communication/connection/browser-window-message'
+  import { RpcAepp, Node, WalletDetector, BrowserWindowMessageConnection } from 'AE_SDK_MODULES'
 
   // Send wallet connection info to Aepp throug content script
   const TEST_NET_NODE_URL = 'https://testnet.aeternity.io'
@@ -322,7 +320,7 @@
         const scannerConnection = BrowserWindowMessageConnection({
           connectionInfo: { id: 'spy' }
         })
-        this.detector = Detector({ connection: scannerConnection })
+        this.detector = WalletDetector({ connection: scannerConnection })
         this.detector.scan(handleWallets.bind(this))
       }
     },

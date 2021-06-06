@@ -1,16 +1,13 @@
-import BrowserRuntimeConnection
-  from 'AE_SDK_MODULES/utils/aepp-wallet-communication/connection/browser-runtime'
-import BrowserWindowMessageConnection
-  from 'AE_SDK_MODULES/utils/aepp-wallet-communication/connection/browser-window-message'
-import { getBrowserAPI } from 'AE_SDK_MODULES/utils/aepp-wallet-communication/helpers'
-import { MESSAGE_DIRECTION } from 'AE_SDK_MODULES/utils/aepp-wallet-communication/schema'
-import ContentScriptBridge from 'AE_SDK_MODULES/utils/aepp-wallet-communication/content-script-bridge'
+import {
+  BrowserRuntimeConnection, BrowserWindowMessageConnection, AeppWalletSchema,
+  ContentScriptBridge, AeppWalletHelpers
+} from 'AE_SDK_MODULES'
 
 const readyStateCheckInterval = setInterval(function () {
   if (document.readyState === 'complete') {
     clearInterval(readyStateCheckInterval)
 
-    const port = getBrowserAPI().runtime.connect()
+    const port = AeppWalletHelpers.getBrowserAPI().runtime.connect()
     const extConnection = BrowserRuntimeConnection({
       connectionInfo: {
         description: 'Content Script to Extension connection',
@@ -24,8 +21,8 @@ const readyStateCheckInterval = setInterval(function () {
         origin: window.origin
       },
       origin: window.origin,
-      sendDirection: MESSAGE_DIRECTION.to_aepp,
-      receiveDirection: MESSAGE_DIRECTION.to_waellet
+      sendDirection: AeppWalletSchema.MESSAGE_DIRECTION.to_aepp,
+      receiveDirection: AeppWalletSchema.MESSAGE_DIRECTION.to_waellet
     })
 
     const bridge = ContentScriptBridge({ pageConnection, extConnection })
