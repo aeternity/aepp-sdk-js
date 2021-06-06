@@ -315,7 +315,7 @@ function prepareSchema (type, bindings) {
 
   switch (t) {
     case SOPHIA_TYPES.int:
-      return Joi.number().error(getJoiErrorMsg)
+      return Joi.number()
     case SOPHIA_TYPES.variant:
       return Joi.alternatives().try([
         Joi.string().valid(
@@ -335,21 +335,21 @@ function prepareSchema (type, bindings) {
         ).or(...generic.map(e => Object.keys(e)[0]))
       ])
     case SOPHIA_TYPES.ChainTtl:
-      return Joi.string().error(getJoiErrorMsg)
+      return Joi.string()
     case SOPHIA_TYPES.string:
-      return Joi.string().error(getJoiErrorMsg)
+      return Joi.string()
     case SOPHIA_TYPES.address:
-      return Joi.string().regex(/^(ak_|ct_|ok_|oq_)/).error(getJoiErrorMsg)
+      return Joi.string().regex(/^(ak_|ct_|ok_|oq_)/)
     case SOPHIA_TYPES.bool:
-      return Joi.boolean().error(getJoiErrorMsg)
+      return Joi.boolean()
     case SOPHIA_TYPES.list:
-      return Joi.array().items(prepareSchema(generic, bindings)).error(getJoiErrorMsg)
+      return Joi.array().items(prepareSchema(generic, bindings))
     case SOPHIA_TYPES.tuple:
-      return Joi.array().ordered(generic.map(type => prepareSchema(type, bindings).required())).label('Tuple argument').error(getJoiErrorMsg)
+      return Joi.array().ordered(generic.map(type => prepareSchema(type, bindings).required())).label('Tuple argument')
     case SOPHIA_TYPES.record:
       return Joi.object(
         generic.reduce((acc, { name, type }) => ({ ...acc, [name]: prepareSchema(type, bindings) }), {})
-      ).error(getJoiErrorMsg)
+      )
     case SOPHIA_TYPES.hash:
       return JoiBinary.binary().bufferCheck(32).error(getJoiErrorMsg)
     case SOPHIA_TYPES.bytes:
@@ -357,7 +357,7 @@ function prepareSchema (type, bindings) {
     case SOPHIA_TYPES.signature:
       return JoiBinary.binary().bufferCheck(64).error(getJoiErrorMsg)
     case SOPHIA_TYPES.option:
-      return prepareSchema(generic, bindings).optional().error(getJoiErrorMsg)
+      return prepareSchema(generic, bindings).optional()
     // @Todo Need to transform Map to Array of arrays before validating it
     // case SOPHIA_TYPES.map:
     //   return Joi.array().items(Joi.array().ordered(generic.map(type => prepareSchema(type))))
@@ -377,18 +377,6 @@ function getJoiErrorMsg (errors) {
     let value = Object.prototype.hasOwnProperty.call(context, 'value') ? context.value : context.label
     value = typeof value === 'object' ? JSON.stringify(value).slice(1).slice(0, -1) : value
     switch (type) {
-      case 'string.base':
-        return ({ ...err, message: `Value "${value}" at path: [${path}] not a string` })
-      case 'number.base':
-        return ({ ...err, message: `Value "${value}" at path: [${path}] not a number` })
-      case 'boolean.base':
-        return ({ ...err, message: `Value "${value}" at path: [${path}] not a boolean` })
-      case 'array.base':
-        return ({ ...err, message: `Value "${value}" at path: [${path}] not a array` })
-      case 'object.base':
-        return ({ ...err, message: `Value '${value}' at path: [${path}] not a object` })
-      case 'object.type':
-        return ({ ...err, message: `Value '${value}' at path: [${path}] not a ${context.type}` })
       case 'binary.bufferCheck':
         return ({
           ...err,
