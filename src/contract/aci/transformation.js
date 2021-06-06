@@ -3,7 +3,7 @@ import { isHex } from '../../utils/string'
 import { toBytes } from '../../utils/bytes'
 import { decode } from '../../tx/builder/helpers'
 import { parseBigNumber } from '../../utils/bignumber'
-import { isAddressValid, addressFromDecimal, hash } from '../../utils/crypto'
+import { addressFromDecimal, hash } from '../../utils/crypto'
 
 export const SOPHIA_TYPES = [
   'int',
@@ -195,7 +195,6 @@ export function transform (type, value, bindings) {
     case SOPHIA_TYPES.signature:
       if (typeof value === 'string') {
         if (isHex(value)) return `#${value}`
-        if (isAddressValid(value)) return `#${decode(value).toString('hex')}`
       }
       return `#${Buffer.from(value).toString('hex')}`
     case SOPHIA_TYPES.record:
@@ -374,7 +373,6 @@ const JoiBinary = Joi.extend((joi) => ({
   base: joi.binary(),
   coerce (value) {
     if (typeof value !== 'string') return { value: Buffer.from(value) }
-    if (isAddressValid(value)) return { value: decode(value) }
   }
 }))
 
