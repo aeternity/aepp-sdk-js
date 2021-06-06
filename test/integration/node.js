@@ -59,7 +59,7 @@ describe('Node client', function () {
       try {
         nodes.addNode('test', {})
       } catch (e) {
-        e.message.should.be.equal('"node" at position 0 fails because [child "instance" fails because [child "api" fails because ["api" is required]]]')
+        e.message.should.be.equal('"[0].instance.api" is required')
       }
     })
     it('Throw error on get network without node ', async () => {
