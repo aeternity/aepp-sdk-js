@@ -3,9 +3,7 @@
 import '../img/icon-128.png'
 import '../img/icon-34.png'
 
-import { RpcWallet, Node, MemoryAccount, Crypto } from 'AE_SDK_MODULES'
-import BrowserRuntimeConnection
-  from 'AE_SDK_MODULES/utils/aepp-wallet-communication/connection/browser-runtime'
+import { RpcWallet, Node, MemoryAccount, Crypto, BrowserRuntimeConnection } from 'AE_SDK_MODULES'
 
 // const account = MemoryAccount({
 //   keypair: {
