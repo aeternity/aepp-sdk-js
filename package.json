@@ -51,6 +51,7 @@
     "joi-browser": "^13.4.0",
     "libsodium-wrappers-sumo": "0.7.9",
     "path-browserify": "^1.0.1",
+    "process": "^0.11.10",
     "ramda": "^0.27.1",
     "rlp": "2.2.6",
     "sha.js": "^2.4.11",
