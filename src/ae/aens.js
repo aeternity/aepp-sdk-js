@@ -198,7 +198,7 @@ async function query (name, opt = {}) {
     },
     revoke: async (options = {}) => this.aensRevoke(name, R.merge(opt, options)),
     extendTtl: async (nameTtl = NAME_TTL, options = {}) => {
-      if (!nameTtl || typeof nameTtl !== 'number' || nameTtl > NAME_TTL) throw new Error('Ttl must be an number and less then 50000 blocks')
+      if (!nameTtl || typeof nameTtl !== 'number' || nameTtl > NAME_TTL) throw new Error('Ttl must be an number and less then 180000 blocks')
 
       return {
         ...(await this.aensUpdate(name, o.pointers.map(p => p.id), { ...R.merge(opt, options), nameTtl })),
