@@ -5,6 +5,7 @@
  * @example import { NodePool } from '@aeternity/aepp-sdk'
  */
 import stampit from '@stamp/it'
+import Joi from 'joi-browser'
 import { getterForCurrentNode, prepareNodeObject } from './helpers'
 import { getNetworkId } from '../node'
 
@@ -137,14 +138,17 @@ export const NodePool = stampit({
       }))
     },
     validateNodes (nodes) {
-      const nodeProps = ['api', 'consensusProtocolVersion', 'genesisHash']
-      nodes.forEach((node, index) => {
-        if (typeof node !== 'object') throw new Error('Node must be an object with "name" and "instance" props')
-        if (['name', 'instance'].find(k => !node[k])) throw new Error(`Node object on index ${index} must contain node "name" and "ins"`)
-        if (!node.instance || typeof node.instance !== 'object' || nodeProps.find(prop => !(prop in node.instance))) {
-          throw new Error('Invalid node instance object')
-        }
-      })
+      const { error } = Joi.array().items(
+        Joi.object({
+          name: Joi.string().required(),
+          instance: Joi.object({
+            api: Joi.object().required(),
+            consensusProtocolVersion: Joi.number().required(),
+            genesisHash: Joi.string().required()
+          }).unknown()
+        })
+      ).label('node').validate(nodes)
+      if (error) throw error
     }
   },
   props: {
