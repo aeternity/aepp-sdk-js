@@ -82,10 +82,12 @@ Decode Events
 | fn | `String` | Function name |
 | events | `Array` | Array of encoded events(callRes.result.log) |
 
-<a id="exp_module_@aeternity/aepp-sdk/es/contract/aci--module.exports"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/contract/aci--getContractInstance"></a>
 
-#### exports
-**Type Sig:** module.exports(source, [options]) ⇒ `ContractInstance` 
+#### getContractInstance
+
+**Type Sig:** getContractInstance(source, [options]) ⇒ `ContractInstance` 
+
 Generate contract ACI object with predefined js methods for contract usage - can be used for creating a reference to already deployed contracts
 
 **Kind**: Exported function  
@@ -202,8 +204,8 @@ Convert current account to GA account
 | --- | --- | --- |
 | authFnName | `String` | Authorization function name |
 | source | `String` | Auth contract source code |
-| [args] | `Array` | init arguments |
-| [options] | `Object` | Options |
+| args | `Array` | init arguments |
+| options | `Object` | Options |
 
 <a id="exp_module_@aeternity/aepp-sdk/es/contract/ga--createMetaTx"></a>
 

@@ -9,7 +9,8 @@ ContractACI module
     * [instance.deploy](#exp_module_@aeternity/aepp-sdk/es/contract/aci--instance.deploy) ⇒ `ContractInstance` ⏏
     * [instance.call](#exp_module_@aeternity/aepp-sdk/es/contract/aci--instance.call) ⇒ `Object` ⏏
     * [instance.decodeEvents](#exp_module_@aeternity/aepp-sdk/es/contract/aci--instance.decodeEvents) ⇒ `Object` ⏏
-    * [module.exports(source, [options])](#exp_module_@aeternity/aepp-sdk/es/contract/aci--module.exports) ⇒ `ContractInstance` ⏏
+    * [getContractInstance(source, [options])](#exp_module_@aeternity/aepp-sdk/es/contract/aci--getContractInstance) ⇒ `ContractInstance` ⏏
+    * [exports.ContractACI()](#exp_module_@aeternity/aepp-sdk/es/contract/aci--exports.ContractACI) ⇒ `Object` ⏏
 
 <a id="exp_module_@aeternity/aepp-sdk/es/contract/aci--instance.compile"></a>
 

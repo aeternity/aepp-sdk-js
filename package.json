@@ -56,7 +56,6 @@
     "path-browserify": "^1.0.1",
     "ramda": "^0.27.1",
     "rlp": "2.2.6",
-    "sha.js": "^2.4.11",
     "stream-browserify": "^3.0.0",
     "swagger-client": "^3.13.2",
     "tweetnacl": "^1.0.3",
@@ -64,6 +63,10 @@
     "uuid": "^8.3.2",
     "websocket": "^1.0.34",
     "json2yaml": "^1.1.0", 
+    "js-yaml": "^4.0.0",
+    "rimraf": "^3.0.2",
+    "sha.js": "^2.4.11",
+    "string": "^3.3.3",
     "yamljs": "^0.3.0"
   },
   "repository": {

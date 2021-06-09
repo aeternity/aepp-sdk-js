@@ -35,9 +35,16 @@ Start scanning
 | --- | --- | --- |
 | onDetected | `function` | Call-back function which trigger on new wallet |
 
-<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector--module.exports+stopScan"></a>
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector--exports.WalletDetector+stopScan"></a>
 
-##### module.exports.stopScan() ⇒ `void`
+##### exports.WalletDetector.stopScan() ⇒ `void`
 Stop scanning
 
-**Kind**: instance method of [`module.exports`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector--module.exports)  
+**Kind**: instance method of [`exports.WalletDetector`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector--exports.WalletDetector)  
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector--exports.WalletDetector+getWallets"></a>
+
+##### exports.WalletDetector.getWallets() ⇒ `Array`
+Get wallet list
+
+**Kind**: instance method of [`exports.WalletDetector`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector--exports.WalletDetector)  
+**Returns**: `Array` - Available wallets  

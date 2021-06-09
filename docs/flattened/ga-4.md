@@ -5,7 +5,11 @@ Generalize Account module - routines to use generalize account
 
 **Example**  
 ```js
-import { GeneralizeAccount } from '@aeternity/aepp-sdk'
+import GeneralizeAccount from '@aeternity/aepp-sdk/es/contract/ga' (Using tree-shaking)
+```
+**Example**  
+```js
+import { GeneralizeAccount } from '@aeternity/aepp-sdk' (Using bundle)
 ```
 
 * [@aeternity/aepp-sdk/es/contract/ga](#module_@aeternity/aepp-sdk/es/contract/ga)
