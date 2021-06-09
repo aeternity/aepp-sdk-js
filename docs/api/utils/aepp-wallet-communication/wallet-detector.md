@@ -5,20 +5,15 @@ Wallet Detector
 
 This is the complement to [module:@aeternity/aepp-sdk/es/utils](module:@aeternity/aepp-sdk/es/utils).
 
-**Example**  
-```js
-import WalletDetector from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector'
-```
 
 * [@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector)
-    * [exports.WalletDetector(params)](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector--exports.WalletDetector) ⇒ `WalletDetector` ⏏
-        * [.scan(onDetected)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector--exports.WalletDetector+scan) ⇒ `void`
-        * [.stopScan()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector--exports.WalletDetector+stopScan) ⇒ `void`
-        * [.getWallets()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector--exports.WalletDetector+getWallets) ⇒ `Array`
+    * [module.exports(params)](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector--module.exports) ⇒ `WalletDetector` ⏏
+        * [.scan(onDetected)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector--module.exports+scan) ⇒ `void`
+        * [.stopScan()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector--module.exports+stopScan) ⇒ `void`
 
-<a id="exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector--exports.WalletDetector"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector--module.exports"></a>
 
-#### exports.WalletDetector(params) ⇒ `WalletDetector` ⏏
+#### module.exports(params) ⇒ `WalletDetector` ⏏
 WalletDetector stamp
 
 **Kind**: Exported function  
@@ -29,27 +24,20 @@ WalletDetector stamp
 | params | `Object` | <code>{}</code> | Initializer object |
 | params.connection | `WalletConnection` |  | Connection for listening for wallets |
 
-<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector--exports.WalletDetector+scan"></a>
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector--module.exports+scan"></a>
 
-##### exports.WalletDetector.scan(onDetected) ⇒ `void`
+##### module.exports.scan(onDetected) ⇒ `void`
 Start scanning
 
-**Kind**: instance method of [`exports.WalletDetector`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector--exports.WalletDetector)  
+**Kind**: instance method of [`module.exports`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector--module.exports)  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | onDetected | `function` | Call-back function which trigger on new wallet |
 
-<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector--exports.WalletDetector+stopScan"></a>
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector--module.exports+stopScan"></a>
 
-##### exports.WalletDetector.stopScan() ⇒ `void`
+##### module.exports.stopScan() ⇒ `void`
 Stop scanning
 
-**Kind**: instance method of [`exports.WalletDetector`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector--exports.WalletDetector)  
-<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector--exports.WalletDetector+getWallets"></a>
-
-##### exports.WalletDetector.getWallets() ⇒ `Array`
-Get wallet list
-
-**Kind**: instance method of [`exports.WalletDetector`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector--exports.WalletDetector)  
-**Returns**: `Array` - Available wallets  
+**Kind**: instance method of [`module.exports`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/wallet-detector--module.exports)  

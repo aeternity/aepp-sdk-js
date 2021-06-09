@@ -9,19 +9,19 @@ import ContentScriptBridge from '@aeternity/aepp-sdk/es/utils/aepp-wallet-commun
 ```
 
 * [@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc)
-    * [exports.AeppRpc(param, onAddressChange, onDisconnect, onNetworkChange, connection)](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc) ⇒ `Object` ⏏
-        * [.connectToWallet(connection)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+connectToWallet) ⇒ `void`
-        * [.disconnectWallet(sendDisconnect)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+disconnectWallet) ⇒ `void`
-        * [.askAddresses()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+askAddresses) ⇒ `Promise`
-        * [.subscribeAddress(type, value)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+subscribeAddress) ⇒ `Promise`
-        * [.signTransaction()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+signTransaction) ⇒ `Promise.&lt;String&gt;`
-        * [.signMessage()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+signMessage) ⇒ `Promise.&lt;String&gt;`
-        * [.sendConnectRequest()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+sendConnectRequest) ⇒ `Promise`
-        * [.send(tx, [options])](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+send) ⇒ `Promise.&lt;Object&gt;`
+    * [module.exports(param, onAddressChange, onDisconnect, onNetworkChange, connection)](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--module.exports) ⇒ `Object` ⏏
+        * [.connectToWallet(connection)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--module.exports+connectToWallet) ⇒ `void`
+        * [.disconnectWallet(sendDisconnect)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--module.exports+disconnectWallet) ⇒ `void`
+        * [.askAddresses()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--module.exports+askAddresses) ⇒ `Promise`
+        * [.subscribeAddress(type, value)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--module.exports+subscribeAddress) ⇒ `Promise`
+        * [.signTransaction()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--module.exports+signTransaction) ⇒ `Promise.&lt;String&gt;`
+        * [.signMessage()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--module.exports+signMessage) ⇒ `Promise.&lt;String&gt;`
+        * [.sendConnectRequest()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--module.exports+sendConnectRequest) ⇒ `Promise`
+        * [.send(tx, [options])](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--module.exports+send) ⇒ `Promise.&lt;Object&gt;`
 
-<a id="exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--module.exports"></a>
 
-#### exports.AeppRpc(param, onAddressChange, onDisconnect, onNetworkChange, connection) ⇒ `Object` ⏏
+#### module.exports(param, onAddressChange, onDisconnect, onNetworkChange, connection) ⇒ `Object` ⏏
 Contain functionality for wallet interaction and connect it to sdk
 
 **Kind**: Exported function  
@@ -36,44 +36,44 @@ Contain functionality for wallet interaction and connect it to sdk
 | onNetworkChange | `function` | Call-back function for update network event |
 | connection | `Object` | Wallet connection object |
 
-<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+connectToWallet"></a>
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--module.exports+connectToWallet"></a>
 
-##### exports.AeppRpc.connectToWallet(connection) ⇒ `void`
+##### module.exports.connectToWallet(connection) ⇒ `void`
 Connect to wallet
 
-**Kind**: instance method of [`exports.AeppRpc`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc)  
+**Kind**: instance method of [`module.exports`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--module.exports)  
 **rtype**: `(connection: Object) => void`
 
 | Param | Type | Description |
 | --- | --- | --- |
 | connection | `Object` | Wallet connection object |
 
-<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+disconnectWallet"></a>
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--module.exports+disconnectWallet"></a>
 
-##### exports.AeppRpc.disconnectWallet(sendDisconnect) ⇒ `void`
+##### module.exports.disconnectWallet(sendDisconnect) ⇒ `void`
 Disconnect from wallet
 
-**Kind**: instance method of [`exports.AeppRpc`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc)  
+**Kind**: instance method of [`module.exports`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--module.exports)  
 **rtype**: `(force: Boolean = false) => void`
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | sendDisconnect | `Boolean` | <code>false</code> | Force sending close connection message |
 
-<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+askAddresses"></a>
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--module.exports+askAddresses"></a>
 
-##### exports.AeppRpc.askAddresses() ⇒ `Promise`
+##### module.exports.askAddresses() ⇒ `Promise`
 Ask address from wallet
 
-**Kind**: instance method of [`exports.AeppRpc`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc)  
+**Kind**: instance method of [`module.exports`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--module.exports)  
 **Returns**: `Promise` - Address from wallet  
 **rtype**: `() => Promise`
-<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+subscribeAddress"></a>
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--module.exports+subscribeAddress"></a>
 
-##### exports.AeppRpc.subscribeAddress(type, value) ⇒ `Promise`
+##### module.exports.subscribeAddress(type, value) ⇒ `Promise`
 Subscribe for addresses from wallet
 
-**Kind**: instance method of [`exports.AeppRpc`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc)  
+**Kind**: instance method of [`module.exports`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--module.exports)  
 **Returns**: `Promise` - Address from wallet  
 **rtype**: `(type: String, value: String) => Promise`
 
@@ -82,40 +82,40 @@ Subscribe for addresses from wallet
 | type | `String` | Type of subscription can be one of ['current'(just for selected account updates), 'connected(all accounts)'] |
 | value | `String` | Subscription action('subscribe'|'unsubscribe') |
 
-<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+signTransaction"></a>
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--module.exports+signTransaction"></a>
 
-##### exports.AeppRpc.signTransaction() ⇒ `Promise.&lt;String&gt;`
+##### module.exports.signTransaction() ⇒ `Promise.&lt;String&gt;`
 Overwriting of `signTransaction` AE method
 All sdk API which use it will be send notification to wallet and wait for callBack
 
-**Kind**: instance method of [`exports.AeppRpc`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc)  
+**Kind**: instance method of [`module.exports`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--module.exports)  
 **Returns**: `Promise.&lt;String&gt;` - Signed transaction  
 **rtype**: `(tx: String, options = {}) => Promise`
-<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+signMessage"></a>
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--module.exports+signMessage"></a>
 
-##### exports.AeppRpc.signMessage() ⇒ `Promise.&lt;String&gt;`
+##### module.exports.signMessage() ⇒ `Promise.&lt;String&gt;`
 Overwriting of `signMessage` AE method
 All sdk API which use it will be send notification to wallet and wait for callBack
 
-**Kind**: instance method of [`exports.AeppRpc`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc)  
+**Kind**: instance method of [`module.exports`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--module.exports)  
 **Returns**: `Promise.&lt;String&gt;` - Signed transaction  
 **rtype**: `(msg: String, options = {}) => Promise`
-<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+sendConnectRequest"></a>
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--module.exports+sendConnectRequest"></a>
 
-##### exports.AeppRpc.sendConnectRequest() ⇒ `Promise`
+##### module.exports.sendConnectRequest() ⇒ `Promise`
 Send connection request to wallet
 
-**Kind**: instance method of [`exports.AeppRpc`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc)  
+**Kind**: instance method of [`module.exports`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--module.exports)  
 **Returns**: `Promise` - Connection response  
 **rtype**: `() => Promise`
-<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc+send"></a>
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--module.exports+send"></a>
 
-##### exports.AeppRpc.send(tx, [options]) ⇒ `Promise.&lt;Object&gt;`
+##### module.exports.send(tx, [options]) ⇒ `Promise.&lt;Object&gt;`
 Overwriting of `send` AE method
 All sdk API which use it will be send notification to wallet and wait for callBack
 This method will sign, broadcast and wait until transaction will be accepted using rpc communication with wallet
 
-**Kind**: instance method of [`exports.AeppRpc`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--exports.AeppRpc)  
+**Kind**: instance method of [`module.exports`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc--module.exports)  
 **Returns**: `Promise.&lt;Object&gt;` - Transaction broadcast result  
 **rtype**: `(tx: String, options = {}) => Promise`
 

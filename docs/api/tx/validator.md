@@ -5,7 +5,7 @@ Transaction validator
 
 **Example**  
 ```js
-import TransactionValidator from '@aeternity/aepp-sdk/es/tx/validator'
+import { TransactionValidator } from '@aeternity/aepp-sdk'
 ```
 
 * [@aeternity/aepp-sdk/es/tx/validator](#module_@aeternity/aepp-sdk/es/tx/validator)

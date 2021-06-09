@@ -184,11 +184,7 @@
         },
         {
           "utils": [
-            {
-              "AE Utilities": "api/ae.md",
-              "content": "api/ae.md---4",
-              "depth": 3
-            },
+            "api/ae.md",
             "api/utils/amount-formatter.md",
             "api/utils/bignumber.md",
             "api/utils/bytes.md",
@@ -199,7 +195,7 @@
             "api/node-pool.md",
             "api/utils/swagger.md"
           ],
-          "content": "api/ae.md---4 ➔ api/utils/amount-formatter.md---3 ➔ api/utils/bignumber.md---3 ➔ api/utils/bytes.md---3 ➔ api/utils/crypto.md---3 ➔ api/utils/keystore.md---3 ➔ api/contract.md---3 ➔ api/node.md---3 ➔ api/node-pool.md---3 ➔ api/utils/swagger.md---3",
+          "content": "api/ae.md---3 ➔ api/utils/amount-formatter.md---3 ➔ api/utils/bignumber.md---3 ➔ api/utils/bytes.md---3 ➔ api/utils/crypto.md---3 ➔ api/utils/keystore.md---3 ➔ api/contract.md---3 ➔ api/node.md---3 ➔ api/node-pool.md---3 ➔ api/utils/swagger.md---3",
           "depth": 2
         }
       ],
@@ -214,11 +210,10 @@
               "content": "guides/import-nodejs.md---4",
               "depth": 3
             },
-            "examples/node/aecontract.md",
-            "examples/node/aecrypto.md",
-            "examples/node/aewallet.md"
+            "examples/node/contract.md",
+            "examples/node/wallet.md"
           ],
-          "content": "guides/import-nodejs.md---4 ➔ examples/node/aecontract.md---3 ➔ examples/node/aecrypto.md---3 ➔ examples/node/aewallet.md---3",
+          "content": "guides/import-nodejs.md---4 ➔ examples/node/contract.md---3 ➔ examples/node/wallet.md---3",
           "depth": 2
         },
         {

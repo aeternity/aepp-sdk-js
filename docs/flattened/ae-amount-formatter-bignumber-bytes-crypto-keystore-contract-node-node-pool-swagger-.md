@@ -9,7 +9,7 @@ Ae module
 
 **Example**  
 ```js
-import Ae from '@aeternity/aepp-sdk/es/ae'
+import { Ae } from '@aeternity/aepp-sdk'
 ```
 
         
@@ -26,6 +26,7 @@ Attempting to create instances from the Stamp without overwriting all
 abstract methods using composition will result in an exception.
 
 Ae objects are the composition of three basic building blocks:
+* [module:@aeternity/aepp-sdk/es/account--Account](module:@aeternity/aepp-sdk/es/account--Account)
 Only by providing the joint functionality of those three, most more advanced
 operations, i.e. the ones with actual use value on the chain, become
 available.
@@ -248,7 +249,7 @@ Bytes module
 
 **Example**  
 ```js
-import * as Crypto from '@aeternity/aepp-sdk/es/utils/bytes'
+import { Crypto } from '@aeternity/aepp-sdk'
 ```
 
 
@@ -323,26 +324,11 @@ Crypto module
 
 **Example**  
 ```js
-import * as Crypto from '@aeternity/aepp-sdk/es/utils/crypto'
+import { Crypto } from '@aeternity/aepp-sdk'
 ```
 
     
     
-
-<a id="module_@aeternity/aepp-sdk/es/utils/crypto.decode"></a>
-
-#### utils/crypto.decode ⇒ `Array`
-**Module Path:** @aeternity/aepp-sdk/es/utils/crypto.decode ⇒ `Array` 
-
-RLP decode
-
-**Kind**: static constant of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
-**Returns**: `Array` - Array of Buffers containing the original message  
-**rtype**: `(data: Any) => Buffer[]`
-
-| Param | Type | Description |
-| --- | --- | --- |
-| data | `Buffer` \| `String` \| `Integer` \| `Array` | Data to decode |
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.formatAddress"></a>
 
@@ -420,21 +406,6 @@ Parse decimal address and return base58Check encoded address with prefix 'ak'
 | Param | Type | Description |
 | --- | --- | --- |
 | decimalAddress | `String` | Address |
-
-<a id="module_@aeternity/aepp-sdk/es/utils/crypto.hash"></a>
-
-#### utils/crypto.hash(input) ⇒ `Buffer`
-**Module Path:** @aeternity/aepp-sdk/es/utils/crypto.hash(input) ⇒ `Buffer` 
-
-Calculate 256bits Blake2b hash of `input`
-
-**Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
-**Returns**: `Buffer` - Hash  
-**rtype**: `(input: String) => hash: String`
-
-| Param | Type | Description |
-| --- | --- | --- |
-| input | `String` \| `Buffer` | Data to hash |
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.sha256hash"></a>
 
@@ -791,8 +762,8 @@ Assert encoded type and return its payload
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.decodeTx"></a>
 
-#### utils/crypto.decodeTx(txHash) ⇒ `Buffer`
-**Module Path:** @aeternity/aepp-sdk/es/utils/crypto.decodeTx(txHash) ⇒ `Buffer` 
+#### utils/crypto.decodeTx(encodedTx) ⇒ `Buffer`
+**Module Path:** @aeternity/aepp-sdk/es/utils/crypto.decodeTx(encodedTx) ⇒ `Buffer` 
 
 Decode a transaction
 
@@ -802,7 +773,7 @@ Decode a transaction
 
 | Param | Type | Description |
 | --- | --- | --- |
-| txHash | `String` | Transaction hash |
+| encodedTx | `String` | Encoded transaction |
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.encodeTx"></a>
 
@@ -836,25 +807,6 @@ Sign a message, and then verifying that signature
 | --- | --- | --- |
 | privateKey | `Buffer` | Private key to verify |
 | publicKey | `Buffer` | Public key to verify |
-
-<a id="module_@aeternity/aepp-sdk/es/utils/crypto.envKeypair"></a>
-
-#### utils/crypto.envKeypair(env, [force]) ⇒ `Object`
-**Module Path:** @aeternity/aepp-sdk/es/utils/crypto.envKeypair(env, [force]) ⇒ `Object` 
-
-Obtain key pair from `env`
-
-Designed to be used with `env` from nodejs. Assumes enviroment variables
-`WALLET_PRIV` and `WALLET_PUB`.
-
-**Kind**: static method of [`@aeternity/aepp-sdk/es/utils/crypto`](#module_@aeternity/aepp-sdk/es/utils/crypto)  
-**Returns**: `Object` - Key pair  
-**rtype**: `(env: Object) => {publicKey: String, secretKey: String}, throws: Error`
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| env | `Object` |  | Environment |
-| [force] | `Boolean` | <code>false</code> | Force throwing error |
 
 <a id="module_@aeternity/aepp-sdk/es/utils/crypto.encryptData"></a>
 
@@ -905,7 +857,7 @@ KeyStore module
 
 **Example**  
 ```js
-import * as Keystore from '@aeternity/aepp-sdk/es/utils/keystore'
+import { Keystore } from '@aeternity/aepp-sdk'
 ```
 **Example**  
 ```js
@@ -1091,7 +1043,6 @@ Get contract ACI
 | source | `String` |  | Contract source code |
 | [options] | `Object` | <code>{}</code> | Options |
 | [options.filesystem] | `Object` |  | Contract external namespaces map |
-| [options.backend] | `Object` |  | Contract vm(default: aevm) |
 
 <a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+contractEncodeCallDataAPI"></a>
 
@@ -1111,23 +1062,6 @@ Encode contract data
 | args | `Array` |  | Function argument's |
 | [options] | `Object` | <code>{}</code> | Options |
 | [options.filesystem] | `Object` |  | Contract external namespaces map |
-| [options.backend] | `Object` |  | Contract vm(default: aevm) |
-
-<a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+contractDecodeDataAPI"></a>
-
-##### contractDecodeDataAPI
-**Type Sig:** contractBase.contractDecodeDataAPI(type, data) ⇒ `String`
-Decode data
-
-**Kind**: instance abstract method of [`ContractBase`](#exp_module_@aeternity/aepp-sdk/es/contract--ContractBase)  
-**Returns**: `String` - - Decoded contract call result  
-**Category**: async  
-**rtype**: `(type: String, data: String) => decodedResult: Promise[String]`
-
-| Param | Type | Description |
-| --- | --- | --- |
-| type | `String` | Contract call result type |
-| data | `String` | Encoded contract call result |
 
 <a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+contractDecodeCallResultAPI"></a>
 
@@ -1148,7 +1082,6 @@ Decode contract call result data
 | callResult | `String` |  | contract call result status('ok', 'revert', ...) |
 | [options] | `Object` | <code>{}</code> | Options |
 | [options.filesystem] | `Object` |  | Contract external namespaces map |
-| [options.backend] | `Object` |  | Contract vm(default: aevm) |
 
 <a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+contractDecodeCallDataBySourceAPI"></a>
 
@@ -1168,12 +1101,11 @@ Decode call data by source
 | callData | `String` |  | Encoded contract call data |
 | [options] | `Object` | <code>{}</code> | Options |
 | [options.filesystem] | `Object` |  | Contract external namespaces map |
-| [options.backend] | `Object` |  | Contract vm(default: aevm) |
 
 <a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+contractDecodeCallDataByCodeAPI"></a>
 
 ##### contractDecodeCallDataByCodeAPI
-**Type Sig:** contractBase.contractDecodeCallDataByCodeAPI(code, callData, backend) ⇒ `String`
+**Type Sig:** contractBase.contractDecodeCallDataByCodeAPI(code, callData) ⇒ `String`
 Decode call data by bytecode
 
 **Kind**: instance abstract method of [`ContractBase`](#exp_module_@aeternity/aepp-sdk/es/contract--ContractBase)  
@@ -1185,7 +1117,6 @@ Decode call data by bytecode
 | --- | --- | --- |
 | code | `String` | contract byte code |
 | callData | `String` | Encoded contract call data |
-| backend | `String` | Contract vm(default: aevm) |
 
 <a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+compileContractAPI"></a>
 
@@ -1203,7 +1134,6 @@ Compile contract
 | code | `String` |  | Contract source code |
 | [options] | `Object` | <code>{}</code> | Options |
 | [options.filesystem] | `Object` |  | Contract external namespaces map |
-| [options.backend] | `Object` |  | Contract vm(default: aevm) |
 
 <a id="module_@aeternity/aepp-sdk/es/contract--ContractBase+setCompilerUrl"></a>
 
@@ -1239,13 +1169,12 @@ Node module
 
 **Example**  
 ```js
-import Node from '@aeternity/aepp-sdk/es/node'
+import { Node } from '@aeternity/aepp-sdk'
 ```
 
         
             
         
-            
 
 <a id="exp_module_@aeternity/aepp-sdk/es/node--Node"></a>
 
@@ -1253,7 +1182,7 @@ import Node from '@aeternity/aepp-sdk/es/node'
 
 **Type Sig:** Node([options]) ⇒ `Object` 
 
-[Swagger](Swagger) based Node remote API Stamp
+[genSwaggerClient](genSwaggerClient) based Node remote API Stamp
 
 **Kind**: Exported function  
 **Returns**: `Object` - Node client  
@@ -1280,22 +1209,6 @@ Obtain networkId from account or node
 **Returns**: `String` - NetworkId  
 **Category**: async  
 **rtype**: `() => networkId: String`
-<a id="module_@aeternity/aepp-sdk/es/node--Node..loader"></a>
-
-##### loader
-**Type Sig:** Node~loader(options) ⇒ `function`
-Node specific loader for `urlFor`
-
-**Kind**: inner method of [`Node`](#exp_module_@aeternity/aepp-sdk/es/node--Node)  
-**Returns**: `function` - Implementation for [urlFor](urlFor)  
-**rtype**: `({url: String, internalUrl?: String}) => (path: String, definition: Object) => tx: String`
-
-| Param | Type | Description |
-| --- | --- | --- |
-| options | `Object` |  |
-| options.url | `String` | Base URL for Node |
-| options.internalUrl | `String` | Base URL for internal requests |
-
 <a id="module_@aeternity/aepp-sdk/es/node--Node..getConsensusProtocolVersion"></a>
 
 ##### getConsensusProtocolVersion
@@ -1310,22 +1223,6 @@ get consensus protocol version
 | protocols | `Array` | Array of protocols |
 | height | `Number` | Height |
 
-<a id="module_@aeternity/aepp-sdk/es/node--Node..remoteSwag"></a>
-
-##### remoteSwag
-**Type Sig:** Node~remoteSwag(url, axiosConfig) ⇒ `Object`
-Obtain Swagger configuration from Node node
-
-**Kind**: inner method of [`Node`](#exp_module_@aeternity/aepp-sdk/es/node--Node)  
-**Returns**: `Object` - Swagger configuration  
-**Category**: async  
-**rtype**: `(url: String) => swagger: Object`
-
-| Param | Type | Description |
-| --- | --- | --- |
-| url | `String` | Node base URL |
-| axiosConfig | `Object` | Axios configuration object |
-
 ,
 <a id="module_@aeternity/aepp-sdk/es/node-pool"></a>
 
@@ -1336,7 +1233,7 @@ NodePool module
 
 **Example**  
 ```js
-import NodePool from '@aeternity/aepp-sdk/es/node-pool'
+import { NodePool } from '@aeternity/aepp-sdk'
 ```
 
 
@@ -1460,296 +1357,29 @@ nodePool.getNodesInPool()
 ### utils/swagger
 **Module Path:** @aeternity/aepp-sdk/es/utils/swagger 
 
-Swagger module
+Generator of Swagger client module
 
-**Example**  
-```js
-import Swagger from '@aeternity/aepp-sdk/es/utils/swagger'
-```
+<a id="exp_module_@aeternity/aepp-sdk/es/utils/swagger--module.exports"></a>
 
-        
-        
-
-<a id="exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger"></a>
-
-#### Swagger
-
-**Type Sig:** Swagger(options) ⇒ `Object` 
-
-Swagger Stamp
+#### exports
+**Type Sig:** module.exports(specUrl, options) ⇒ `Object` 
+Generator of Swagger client
 
 **Kind**: Exported function  
-**Returns**: `Object` - Account instance  
-**rtype**: `Stamp`
+**Returns**: `Object` - Swagger client  
+**rtype**: `Object`
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | `Object` | Initializer object |
-| options.swag | `Object` | Swagger definition |
-| options.axiosConfig | `Object` | Object with axios configuration. Example { config: {}, errorHandler: (err) => throw err } |
+| specUrl | `String` | Swagger specification URL on external node host |
+| options | `Object` |  |
+| [options.spec] | `String` | Override OpenAPI definition |
+| [options.internalUrl] | `String` | Node internal URL |
+| [options.disableBigNumbers] | `Boolean` |  |
+| [options.disableCaseConversion] | `Boolean` |  |
 
 **Example**  
 ```js
-Swagger({swag})
+(await genSwaggerClient('https://mainnet.aeternity.io/api')).getAccountByPubkey('ak_jupBUgZNbcC4krDLR3tAkw1iBZoBbkNeShAq4atBtpFWmz36r')
 ```
-<a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger.expandPath"></a>
-
-##### expandPath
-**Type Sig:** Swagger.expandPath(s) ⇒ `String`
-Perform path string interpolation
-
-**Kind**: static method of [`Swagger`](#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger)  
-**Returns**: `String` - Converted string  
-**rtype**: `(path: String, replacements: Object) => String`
-
-| Param | Type | Description |
-| --- | --- | --- |
-| s | `String` | String to convert |
-
-<a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger.conform"></a>
-
-##### conform
-**Type Sig:** Swagger.conform(value, spec, types) ⇒ `Object`
-Conform `value` against its `spec`
-
-**Kind**: static method of [`Swagger`](#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger)  
-**Returns**: `Object` - Conformed value  
-**rtype**: `(value: Any, spec: Object, types: Object) => Any, throws: Error`
-
-| Param | Type | Description |
-| --- | --- | --- |
-| value | `Object` | Value to conform (validate and transform) |
-| spec | `Object` | Specification object |
-| types | `Object` | Types specification |
-
-<a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger.traverseKeys"></a>
-
-##### traverseKeys
-**Type Sig:** Swagger.traverseKeys(fn, o) ⇒ `Object`
-Key traversal metafunction
-
-**Kind**: static method of [`Swagger`](#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger)  
-**Returns**: `Object` - Transformed object  
-**rtype**: `(fn: (s: String) => String) => (o: Object) => Object`
-
-| Param | Type | Description |
-| --- | --- | --- |
-| fn | `function` | Key transformation function |
-| o | `Object` | Object to traverse |
-
-<a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger.snakizeKeys"></a>
-
-##### snakizeKeys
-**Type Sig:** Swagger.snakizeKeys(o) ⇒ `Object`
-snake_case key traversal
-
-**Kind**: static method of [`Swagger`](#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger)  
-**Returns**: `Object` - Transformed object  
-**rtype**: `(o: Object) => Object`
-**See**: pascalToSnake  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| o | `Object` | Object to traverse |
-
-<a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger.pascalizeKeys"></a>
-
-##### pascalizeKeys
-**Type Sig:** Swagger.pascalizeKeys(o) ⇒ `Object`
-PascalCase key traversal
-
-**Kind**: static method of [`Swagger`](#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger)  
-**Returns**: `Object` - Transformed object  
-**rtype**: `(o: Object) => Object`
-**See**: snakeToPascal  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| o | `Object` | Object to traverse |
-
-<a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger.assertOne"></a>
-
-##### assertOne
-**Type Sig:** Swagger.assertOne(coll) ⇒ `Object`
-Assert that `coll` is a sequence with a length of 1 and extract the only element
-
-**Kind**: static method of [`Swagger`](#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger)  
-**rtype**: `(coll: [...Any]) => Any, throws: Error`
-
-| Param | Type |
-| --- | --- |
-| coll | `Array.&lt;Object&gt;` | 
-
-<a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger.operation"></a>
-
-##### operation
-**Type Sig:** Swagger.operation(path, method, definition, types) ⇒ `function`
-Generate callable operation
-
-**Kind**: static method of [`Swagger`](#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger)  
-**rtype**: `(path: String, method: String, definition: Object, types: Object) => (instance: Swagger, url: String) => Promise[Any], throws: Error`
-
-| Param | Type | Description |
-| --- | --- | --- |
-| path | `String` | Path to call in URL |
-| method | `String` | HTTP method |
-| definition | `Object` | Complex definition |
-| types | `Object` | Swagger types |
-
-<a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger.debugSwagger"></a>
-
-##### debugSwagger
-**Type Sig:** Swagger.debugSwagger(bool) ⇒ `Stamp`
-Reconfigure Swagger to (not) spill debugging logs
-
-**Kind**: static method of [`Swagger`](#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger)  
-**Returns**: `Stamp` - Reconfigured Swagger Stamp  
-**rtype**: `(bool: Boolean) => Stamp`
-
-| Param | Type | Description |
-| --- | --- | --- |
-| bool | `boolean` | Whether to debug |
-
-<a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..conformTypes"></a>
-
-##### Swagger~conformTypes
-**Type Sig:** Swagger~conformTypes
-
-Per-type [conform](conform) dispatcher
-
-**Kind**: inner constant of [`Swagger`](#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger)  
-**rtype**: `[(dispatch(value: String, spec: Object, types: Object) => Any, throws: Error)...]`
-<a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..lookupType"></a>
-
-##### lookupType
-**Type Sig:** Swagger~lookupType(path, spec, types) ⇒ `Object`
-Lookup type
-
-**Kind**: inner method of [`Swagger`](#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger)  
-**Returns**: `Object` - Looked up type definition  
-**rtype**: `(path: [String...], spec: Object, types: Object) => Object`
-
-| Param | Type | Description |
-| --- | --- | --- |
-| path | `Array.&lt;String&gt;` | Path to look up |
-| spec | `Object` |  |
-| types | `Object` |  |
-
-<a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..extendingErrorPath"></a>
-
-##### extendingErrorPath
-**Type Sig:** Swagger~extendingErrorPath(key, fn) ⇒ `Any`
-Intercept errors thrown by `fn()`, extending them with information from `key`
-
-**Kind**: inner method of [`Swagger`](#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger)  
-**Returns**: `Any` - Execution result  
-**rtype**: `(key: String, fn: Function) => Any`
-
-| Param | Type | Description |
-| --- | --- | --- |
-| key | `String` | Information to attach |
-| fn | `function` | Thunk |
-
-<a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..TypeError"></a>
-
-##### TypeError
-**Type Sig:** Swagger~TypeError(msg, spec, value) ⇒ `Error`
-Construct Error with additional type information (not thrown)
-
-**Kind**: inner method of [`Swagger`](#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger)  
-**Returns**: `Error` - Enhanced Error  
-**rtype**: `(msg: String, spec: String, value: String) => Error`
-
-| Param | Type | Description |
-| --- | --- | --- |
-| msg | `String` | Error message |
-| spec | `String` |  |
-| value | `String` |  |
-
-<a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..conformDispatch"></a>
-
-##### conformDispatch
-**Type Sig:** Swagger~conformDispatch(spec) ⇒ `String`
-[conform](conform) dispatcher
-
-**Kind**: inner method of [`Swagger`](#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger)  
-**Returns**: `String` - Value to dispatch on  
-**rtype**: `(spec: Object) => String, throws: Error`
-
-| Param | Type |
-| --- | --- |
-| spec | `Object` | 
-
-<a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..classifyParameters"></a>
-
-##### classifyParameters
-**Type Sig:** Swagger~classifyParameters(parameters) ⇒ `Array.&lt;Object&gt;`
-Classify given `parameters`
-
-**Kind**: inner method of [`Swagger`](#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger)  
-**Returns**: `Array.&lt;Object&gt;` - Classified parameters  
-**rtype**: `(parameters: [{required: Boolean, in: String}...]) => {pathArgs: [...Object], queryArgs: [...Object], bodyArgs: [...Object], req: [...Object], opts: [...Object]}`
-
-| Param | Type | Description |
-| --- | --- | --- |
-| parameters | `Array.&lt;Object&gt;` | Parameters to classify |
-
-<a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..pascalizeParameters"></a>
-
-##### pascalizeParameters
-**Type Sig:** Swagger~pascalizeParameters(parameters) ⇒ `Array.&lt;Object&gt;`
-Convert `name` attributes in `parameters` from snake_case to PascalCase
-
-**Kind**: inner method of [`Swagger`](#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger)  
-**Returns**: `Array.&lt;Object&gt;` - Pascalized parameters  
-**rtype**: `(parameters: [{name: String}...]) => [{name: String}...]`
-
-| Param | Type | Description |
-| --- | --- | --- |
-| parameters | `Array.&lt;Object&gt;` | Parameters to pascalize |
-
-<a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..operationSignature"></a>
-
-##### operationSignature
-**Type Sig:** Swagger~operationSignature(name, req, opts) ⇒ `String`
-Obtain readable signature for operation
-
-**Kind**: inner method of [`Swagger`](#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger)  
-**Returns**: `String` - Signature  
-**rtype**: `(name: String, req: [...Object], opts: [...Object]) => Object`
-
-| Param | Type | Description |
-| --- | --- | --- |
-| name | `String` | Name of operation |
-| req | `Array.&lt;Object&gt;` | Required parameters to operation |
-| opts | `Array.&lt;Object&gt;` | Optional parameters to operation |
-
-<a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..destructureClientError"></a>
-
-##### destructureClientError
-**Type Sig:** Swagger~destructureClientError(error) ⇒ `String`
-Destructure HTTP client `error`
-
-**Kind**: inner method of [`Swagger`](#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger)  
-**rtype**: `(error: Error) => String`
-
-| Param | Type |
-| --- | --- |
-| error | `Error` | 
-
-<a id="module_@aeternity/aepp-sdk/es/utils/swagger--Swagger..resolveRef"></a>
-
-##### resolveRef
-**Type Sig:** Swagger~resolveRef(ref, swag) ⇒ `Object`
-Resolve reference
-
-**Kind**: inner method of [`Swagger`](#exp_module_@aeternity/aepp-sdk/es/utils/swagger--Swagger)  
-**Returns**: `Object` - Resolved reference definition  
-**rtype**: `(ref: String, swag: Object) => Object`
-
-| Param | Type | Description |
-| --- | --- | --- |
-| ref | `String` | Reference to resolve |
-| swag | `Object` |  |
-
 ,

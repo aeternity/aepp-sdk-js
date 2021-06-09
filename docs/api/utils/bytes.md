@@ -5,7 +5,7 @@ Bytes module
 
 **Example**  
 ```js
-import * as Crypto from '@aeternity/aepp-sdk/es/utils/bytes'
+import { Crypto } from '@aeternity/aepp-sdk'
 ```
 
 * [@aeternity/aepp-sdk/es/utils/bytes](#module_@aeternity/aepp-sdk/es/utils/bytes)

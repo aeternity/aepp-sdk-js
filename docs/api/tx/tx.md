@@ -5,7 +5,7 @@ Transaction module
 
 **Example**  
 ```js
-import Transaction from '@aeternity/aepp-sdk/es/tx/tx'
+import { Transaction } from '@aeternity/aepp-sdk'
 ```
 <a id="exp_module_@aeternity/aepp-sdk/es/tx/tx--Transaction"></a>
 

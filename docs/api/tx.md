@@ -5,7 +5,7 @@ Tx module
 
 **Example**  
 ```js
-import Tx from '@aeternity/aepp-sdk/es/tx'
+import { Tx } from '@aeternity/aepp-sdk'
 ```
 
 * [@aeternity/aepp-sdk/es/tx](#module_@aeternity/aepp-sdk/es/tx)

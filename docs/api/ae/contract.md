@@ -8,17 +8,12 @@ https://github.com/aeternity/protocol/tree/master/contracts and
 
 **Example**  
 ```js
-import Contract from '@aeternity/aepp-sdk/es/ae/contract' (Using tree-shaking)
-```
-**Example**  
-```js
-import { Contract } from '@aeternity/aepp-sdk' (Using bundle)
+import { Contract } from '@aeternity/aepp-sdk'
 ```
 
 * [@aeternity/aepp-sdk/es/ae/contract](#module_@aeternity/aepp-sdk/es/ae/contract)
     * [exports.ContractAPI([options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--exports.ContractAPI) ⇒ `Object` ⏏
     * _async_
-        * [handleCallError(result, tx)](#exp_module_@aeternity/aepp-sdk/es/ae/contract--handleCallError) ⇒ `Promise.&lt;void&gt;` ⏏
         * [contractEncodeCall(source, name, args, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractEncodeCall) ⇒ `Promise.&lt;String&gt;` ⏏
         * [contractDecodeData(source, fn, callValue, callResult, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractDecodeData) ⇒ `Promise.&lt;String&gt;` ⏏
         * [contractCallStatic(source, address, name, args, [options])](#exp_module_@aeternity/aepp-sdk/es/ae/contract--contractCallStatic) ⇒ `Promise.&lt;Object&gt;` ⏏
@@ -69,23 +64,6 @@ const ContractWithAE = await Contract
    .compose(ContractCompilerAPI) // ContractBase implementation
 const client = await ContractWithAe({ url, internalUrl, compilerUrl, keypair, ... })
 ```
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--handleCallError"></a>
-
-#### handleCallError(result, tx) ⇒ `Promise.&lt;void&gt;` ⏏
-Handle contract call error
-
-**Kind**: Exported function  
-**Category**: async  
-**Throws**:
-
-- Error Decoded error
-
-
-| Param | Type | Description |
-| --- | --- | --- |
-| result | `Object` | call result object |
-| tx | `Object` | Unpacked transaction |
-
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--contractEncodeCall"></a>
 
 #### contractEncodeCall(source, name, args, [options]) ⇒ `Promise.&lt;String&gt;` ⏏
@@ -101,7 +79,6 @@ Encode call data for contract call
 | args | `Array` |  | Argument's for call |
 | [options] | `Object` | <code>{}</code> | Options |
 | [options.filesystem] | `Object` | <code>{}</code> | Contract external namespaces map |
-| [options.backend] | `Object` | <code>&#x27;fate&#x27;</code> | Compiler backend |
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--contractDecodeData"></a>
 
@@ -134,21 +111,20 @@ Static contract call(using dry-run)
 **Returns**: `Promise.&lt;Object&gt;` - Result object  
 **Category**: async  
 
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| source | `String` |  | Contract source code |
-| address | `String` |  | Contract address |
-| name | `String` |  | Name of function to call |
-| args | `Array` \| `String` |  | Argument's or callData for call/deploy transaction |
-| [options] | `Object` | <code>{}</code> | Options |
-| [options.top] | `String` |  | Block hash on which you want to call contract |
-| [options.bytecode] | `String` |  | Block hash on which you want to call contract |
-| [options.options] | `Object` |  | Transaction options (fee, ttl, gas, amount, deposit) |
-| [options.options.filesystem] | `Object` |  | Contract external namespaces map |
+| Param | Type | Description |
+| --- | --- | --- |
+| source | `String` | Contract source code |
+| address | `String` | Contract address |
+| name | `String` | Name of function to call |
+| args | `Array` \| `String` | Argument's or callData for call/deploy transaction |
+| [options] | `Object` |  |
+| [options.top] | `Number` \| `String` | Block height or hash on which you want to call contract |
+| [options.bytecode] | `String` | Block hash on which you want to call contract |
+| [options.filesystem] | `Object` | Contract external namespaces map |
 
 **Example**  
 ```js
-const callResult = await client.contractCallStatic(source, address, fnName, args = [], { top, options = {} })
+const callResult = await client.contractCallStatic(source, address, fnName, args)
 {
   result: TX_DATA,
   decode: (type) => Decode call result
@@ -224,7 +200,6 @@ Compile contract source code
 | source | `String` |  | Contract sourece code |
 | [options] | `Object` | <code>{}</code> | Transaction options (fee, ttl, gas, amount, deposit) |
 | [options.filesystem] | `Object` | <code>{}</code> | Contract external namespaces map* @return {Promise<Object>} Result object |
-| [options.backend] | `Object` | <code>&#x27;aevm&#x27;</code> | Contract backend version (aevm|fate) |
 
 **Example**  
 ```js

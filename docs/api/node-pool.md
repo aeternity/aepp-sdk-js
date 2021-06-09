@@ -5,7 +5,7 @@ NodePool module
 
 **Example**  
 ```js
-import NodePool from '@aeternity/aepp-sdk/es/node-pool'
+import { NodePool } from '@aeternity/aepp-sdk'
 ```
 
 * [@aeternity/aepp-sdk/es/node-pool](#module_@aeternity/aepp-sdk/es/node-pool)

@@ -3,18 +3,13 @@
 ### @aeternity/aepp-sdk/es/contract/aci
 ContractACI module
 
-**Example**  
-```js
-import ContractACI from '@aeternity/aepp-sdk/es/contract/aci'
-```
 
 * [@aeternity/aepp-sdk/es/contract/aci](#module_@aeternity/aepp-sdk/es/contract/aci)
     * [instance.compile](#exp_module_@aeternity/aepp-sdk/es/contract/aci--instance.compile) ⇒ `ContractInstance` ⏏
     * [instance.deploy](#exp_module_@aeternity/aepp-sdk/es/contract/aci--instance.deploy) ⇒ `ContractInstance` ⏏
     * [instance.call](#exp_module_@aeternity/aepp-sdk/es/contract/aci--instance.call) ⇒ `Object` ⏏
     * [instance.decodeEvents](#exp_module_@aeternity/aepp-sdk/es/contract/aci--instance.decodeEvents) ⇒ `Object` ⏏
-    * [getContractInstance(source, [options])](#exp_module_@aeternity/aepp-sdk/es/contract/aci--getContractInstance) ⇒ `ContractInstance` ⏏
-    * [exports.ContractACI()](#exp_module_@aeternity/aepp-sdk/es/contract/aci--exports.ContractACI) ⇒ `Object` ⏏
+    * [module.exports(source, [options])](#exp_module_@aeternity/aepp-sdk/es/contract/aci--module.exports) ⇒ `ContractInstance` ⏏
 
 <a id="exp_module_@aeternity/aepp-sdk/es/contract/aci--instance.compile"></a>
 
@@ -82,9 +77,9 @@ Decode Events
 | fn | `String` | Function name |
 | events | `Array` | Array of encoded events(callRes.result.log) |
 
-<a id="exp_module_@aeternity/aepp-sdk/es/contract/aci--getContractInstance"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/contract/aci--module.exports"></a>
 
-#### getContractInstance(source, [options]) ⇒ `ContractInstance` ⏏
+#### module.exports(source, [options]) ⇒ `ContractInstance` ⏏
 Generate contract ACI object with predefined js methods for contract usage - can be used for creating a reference to already deployed contracts
 
 **Kind**: Exported function  
@@ -108,16 +103,4 @@ const callResult = await contractIns.call('setState', [123]) or await contractIn
 const staticCallResult = await contractIns.call('setState', [123], { callStatic: true }) or await contractIns.methods.setState.get(123, options)
 Also you can call contract like: await contractIns.methods.setState(123, options)
 Then sdk decide to make on-chain or static call(dry-run API) transaction based on function is stateful or not
-```
-<a id="exp_module_@aeternity/aepp-sdk/es/contract/aci--exports.ContractACI"></a>
-
-#### exports.ContractACI() ⇒ `Object` ⏏
-Contract ACI Stamp
-
-**Kind**: Exported function  
-**Returns**: `Object` - Contract compiler instance  
-**rtype**: `Stamp`
-**Example**  
-```js
-ContractACI()
 ```

@@ -5,7 +5,7 @@ Chain module
 
 **Example**  
 ```js
-import Chain from '@aeternity/aepp-sdk/es/chain'
+import { Chain } from '@aeternity/aepp-sdk'
 ```
 
 * [@aeternity/aepp-sdk/es/chain](#module_@aeternity/aepp-sdk/es/chain)
@@ -27,8 +27,7 @@ import Chain from '@aeternity/aepp-sdk/es/chain'
                 * *[.getKeyBlock()](#module_@aeternity/aepp-sdk/es/chain--Chain+getKeyBlock) ⇒ `Object`*
                 * *[.getMicroBlockHeader()](#module_@aeternity/aepp-sdk/es/chain--Chain+getMicroBlockHeader) ⇒ `Object`*
                 * *[.getAccount(address, [options])](#module_@aeternity/aepp-sdk/es/chain--Chain+getAccount) ⇒ `Object`*
-                * *[.txDryRun(txs, accounts, hashOrHeight)](#module_@aeternity/aepp-sdk/es/chain--Chain+txDryRun) ⇒ `Object`*
-                * *[.getInfo()](#module_@aeternity/aepp-sdk/es/chain--Chain+getInfo) ⇒ `Object`*
+                * *[.txDryRun(tx, accountAddress)](#module_@aeternity/aepp-sdk/es/chain--Chain+txDryRun) ⇒ `Object`*
         * _static_
             * [.waitMined(bool)](#module_@aeternity/aepp-sdk/es/chain--Chain.waitMined) ⇒ `Stamp`
 
@@ -195,9 +194,9 @@ Wait for transaction confirmation
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| txHash | `String` |  | Generation hash or height |
-| [options] | `String` | <code>{}</code> | options |
-| [options.confirm] | `String` | <code>3</code> | Block confirmation count |
+| txHash | `String` |  | Transaction hash |
+| [options] | `Object` |  | options |
+| [options.confirm] | `Number` | <code>3</code> | Number of blocks to wait for transaction confirmation |
 
 <a id="module_@aeternity/aepp-sdk/es/chain--Chain+getMicroBlockTransactions"></a>
 
@@ -245,29 +244,21 @@ Get account by account public key
 
 <a id="module_@aeternity/aepp-sdk/es/chain--Chain+txDryRun"></a>
 
-##### *chain.txDryRun(txs, accounts, hashOrHeight) ⇒ `Object`*
+##### *chain.txDryRun(tx, accountAddress) ⇒ `Object`*
 Transaction dry-run
 
 **Kind**: instance abstract method of [`Chain`](#exp_module_@aeternity/aepp-sdk/es/chain--Chain)  
 **Returns**: `Object` - Result  
 **Category**: async  
-**rtype**: `(txs, accounts, hashOrHeight) => result: Object`
+**rtype**: `(tx, accountAddress, options) => result: Object`
 
 | Param | Type | Description |
 | --- | --- | --- |
-| txs | `Array` | Array of transaction's |
-| accounts | `Array` | Array of account's |
-| hashOrHeight | `String` \| `Number` | hash or height of block on which to make dry-run |
+| tx | `String` | transaction to execute |
+| accountAddress | `String` | address that will be used to execute transaction |
+| [options.top] | `String` \| `Number` | hash of block on which to make dry-run |
+| [options.txEvents] | `Boolean` | collect and return on-chain tx events that would result from the call |
 
-<a id="module_@aeternity/aepp-sdk/es/chain--Chain+getInfo"></a>
-
-##### *chain.getInfo() ⇒ `Object`*
-Get Node Info
-
-**Kind**: instance abstract method of [`Chain`](#exp_module_@aeternity/aepp-sdk/es/chain--Chain)  
-**Returns**: `Object` - Result  
-**Category**: async  
-**rtype**: `() => result: Object`
 <a id="module_@aeternity/aepp-sdk/es/chain--Chain.waitMined"></a>
 
 ##### Chain.waitMined(bool) ⇒ `Stamp`

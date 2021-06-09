@@ -9,9 +9,9 @@ This is the complement to [@aeternity/aepp-sdk/es/utils/aepp-wallet-communicatio
 ```js
 import BrowserWindowMessageConnection from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message'
 ```
-<a id="exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message--exports.BrowserWindowMessageConnection"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message--module.exports"></a>
 
-#### exports.BrowserWindowMessageConnection([params]) ⇒ `Object` ⏏
+#### module.exports([params]) ⇒ `Object` ⏏
 BrowserWindowMessageConnection
 
 **Kind**: Exported function  

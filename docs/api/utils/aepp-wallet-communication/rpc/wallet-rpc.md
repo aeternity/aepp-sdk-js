@@ -9,17 +9,16 @@ import WalletRpc from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rp
 ```
 
 * [@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc)
-    * [exports.WalletRpc(param, onConnection, onSubscription, onSign, onAskAccounts, onMessageSign, onDisconnect)](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--exports.WalletRpc) ⇒ `Object` ⏏
-        * [.getClients()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--exports.WalletRpc+getClients) ⇒ `Object`
-        * [.removeRpcClient(id, [opt])](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--exports.WalletRpc+removeRpcClient) ⇒ `Object`
-        * [.addRpcClient(clientConnection)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--exports.WalletRpc+addRpcClient) ⇒ `String`
-        * [.shareWalletInfo(postFn)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--exports.WalletRpc+shareWalletInfo) ⇒ `void`
-        * [.getWalletInfo()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--exports.WalletRpc+getWalletInfo) ⇒ `Object`
-        * [.getAccounts()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--exports.WalletRpc+getAccounts) ⇒ `Object`
+    * [module.exports(param, onConnection, onSubscription, onSign, onAskAccounts, onMessageSign, onDisconnect)](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--module.exports) ⇒ `Object` ⏏
+        * [.removeRpcClient(id, [opt])](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--module.exports+removeRpcClient) ⇒ `void`
+        * [.addRpcClient(clientConnection)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--module.exports+addRpcClient) ⇒ `String`
+        * [.shareWalletInfo(postFn)](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--module.exports+shareWalletInfo) ⇒ `void`
+        * [.getWalletInfo()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--module.exports+getWalletInfo) ⇒ `Object`
+        * [.getAccounts()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--module.exports+getAccounts) ⇒ `Object`
 
-<a id="exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--exports.WalletRpc"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--module.exports"></a>
 
-#### exports.WalletRpc(param, onConnection, onSubscription, onSign, onAskAccounts, onMessageSign, onDisconnect) ⇒ `Object` ⏏
+#### module.exports(param, onConnection, onSubscription, onSign, onAskAccounts, onMessageSign, onDisconnect) ⇒ `Object` ⏏
 Contain functionality for aepp interaction and managing multiple aepps
 
 **Kind**: Exported function  
@@ -36,32 +35,25 @@ Contain functionality for aepp interaction and managing multiple aepps
 | onMessageSign | `function` | Call-back function for incoming AEPP sign message request (Second argument contain function for accept/deny request) |
 | onDisconnect | `function` | Call-back function for disconnect event |
 
-<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--exports.WalletRpc+getClients"></a>
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--module.exports+removeRpcClient"></a>
 
-##### exports.WalletRpc.getClients() ⇒ `Object`
-Get RpcClients object which contain all connected AEPPS
-
-**Kind**: instance method of [`exports.WalletRpc`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--exports.WalletRpc)  
-**rtype**: `() => Object`
-<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--exports.WalletRpc+removeRpcClient"></a>
-
-##### exports.WalletRpc.removeRpcClient(id, [opt]) ⇒ `Object`
+##### module.exports.removeRpcClient(id, [opt]) ⇒ `void`
 Remove specific RpcClient by ID
 
-**Kind**: instance method of [`exports.WalletRpc`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--exports.WalletRpc)  
-**rtype**: `(id: string) => Boolean`
+**Kind**: instance method of [`module.exports`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--module.exports)  
+**rtype**: `(id: string) => void`
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | id | `String` |  | Client ID |
 | [opt] | `Object` | <code>{}</code> |  |
 
-<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--exports.WalletRpc+addRpcClient"></a>
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--module.exports+addRpcClient"></a>
 
-##### exports.WalletRpc.addRpcClient(clientConnection) ⇒ `String`
-Add new AEPP connection
+##### module.exports.addRpcClient(clientConnection) ⇒ `String`
+Add new client by AEPP connection
 
-**Kind**: instance method of [`exports.WalletRpc`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--exports.WalletRpc)  
+**Kind**: instance method of [`module.exports`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--module.exports)  
 **Returns**: `String` - Client ID  
 **rtype**: `(clientConnection: Object) => Object`
 
@@ -69,32 +61,32 @@ Add new AEPP connection
 | --- | --- | --- |
 | clientConnection | `Object` | AEPP connection object |
 
-<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--exports.WalletRpc+shareWalletInfo"></a>
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--module.exports+shareWalletInfo"></a>
 
-##### exports.WalletRpc.shareWalletInfo(postFn) ⇒ `void`
+##### module.exports.shareWalletInfo(postFn) ⇒ `void`
 Share wallet info
 Send shareWalletInfo message to notify AEPP about wallet
 
-**Kind**: instance method of [`exports.WalletRpc`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--exports.WalletRpc)  
+**Kind**: instance method of [`module.exports`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--module.exports)  
 **rtype**: `(postFn: Function) => void`
 
 | Param | Type | Description |
 | --- | --- | --- |
 | postFn | `function` | Send message function like `(msg) => void` |
 
-<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--exports.WalletRpc+getWalletInfo"></a>
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--module.exports+getWalletInfo"></a>
 
-##### exports.WalletRpc.getWalletInfo() ⇒ `Object`
+##### module.exports.getWalletInfo() ⇒ `Object`
 Get Wallet info object
 
-**Kind**: instance method of [`exports.WalletRpc`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--exports.WalletRpc)  
+**Kind**: instance method of [`module.exports`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--module.exports)  
 **Returns**: `Object` - Object with wallet information(id, name, network, ...)  
 **rtype**: `() => Object`
-<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--exports.WalletRpc+getAccounts"></a>
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--module.exports+getAccounts"></a>
 
-##### exports.WalletRpc.getAccounts() ⇒ `Object`
+##### module.exports.getAccounts() ⇒ `Object`
 Get Wallet accounts
 
-**Kind**: instance method of [`exports.WalletRpc`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--exports.WalletRpc)  
+**Kind**: instance method of [`module.exports`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc--module.exports)  
 **Returns**: `Object` - Object with accounts information({ connected: Object, current: Object })  
 **rtype**: `() => Object`

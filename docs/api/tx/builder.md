@@ -5,7 +5,7 @@ JavaScript-based Transaction builder
 
 **Example**  
 ```js
-import Transaction from '@aeternity/aepp-sdk/es/tx/builder'
+import { TxBuilder } from '@aeternity/aepp-sdk'
 ```
 
 * [@aeternity/aepp-sdk/es/tx/builder](#module_@aeternity/aepp-sdk/es/tx/builder)

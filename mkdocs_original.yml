@@ -83,9 +83,9 @@ nav:
   - Examples:
     - NodeJS:
       - Setup: guides/import-nodejs.md
-      - examples/node/aecontract.md
-      - examples/node/aecrypto.md
-      - examples/node/aewallet.md
+      - examples/node/contract.md
+      #- examples/node/aecrypto.md
+      - examples/node/wallet.md
     - JS:
       - guides/import-script-tag.md
       - guides/import-vuejs.md

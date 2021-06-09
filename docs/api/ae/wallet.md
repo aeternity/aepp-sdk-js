@@ -5,11 +5,11 @@ Wallet module
 
 **Example**  
 ```js
-import Wallet from '@aeternity/aepp-sdk/es/ae/wallet'
+import { RpcWallet } from '@aeternity/aepp-sdk'
 ```
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/wallet--exports.Wallet"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/wallet--module.exports"></a>
 
-#### exports.Wallet([options]) ⇒ `Object` ⏏
+#### module.exports([options]) ⇒ `Object` ⏏
 Wallet Stamp
 
 **Kind**: Exported function  
@@ -22,10 +22,6 @@ Wallet Stamp
 | options.url | `String` |  | Node instance to connect to |
 | [options.accounts] | `Array.&lt;Account&gt;` |  | Accounts to initialize with |
 | [options.account] | `String` |  | Public key of account to preselect |
-| [options.onTx] | `function` |  | Tx method protector function |
-| [options.onChain] | `function` |  | Chain method protector function |
-| [options.onAccount] | `function` |  | Account method protector function |
-| [options.onContract] | `function` |  | Contract method protector function |
 
 **Example**  
 ```js
@@ -33,9 +29,5 @@ Wallet({
   url: 'https://testnet.aeternity.io/',
   accounts: [MemoryAccount({keypair})],
   address: keypair.publicKey,
-  onTx: confirm,
-  onChain: confirm,
-  onAccount: confirm
-  onContract: confirm
 })
 ```

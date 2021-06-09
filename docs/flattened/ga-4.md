@@ -5,16 +5,12 @@ Generalize Account module - routines to use generalize account
 
 **Example**  
 ```js
-import GeneralizeAccount from '@aeternity/aepp-sdk/es/contract/ga' (Using tree-shaking)
-```
-**Example**  
-```js
-import { GeneralizeAccount } from '@aeternity/aepp-sdk' (Using bundle)
+import { GeneralizeAccount } from '@aeternity/aepp-sdk'
 ```
 
 * [@aeternity/aepp-sdk/es/contract/ga](#module_@aeternity/aepp-sdk/es/contract/ga)
     * [exports.GeneralizeAccount([options])](#exp_module_@aeternity/aepp-sdk/es/contract/ga--exports.GeneralizeAccount) ⇒ `Object` ⏏
-    * [createGeneralizeAccount(authFnName, source, args, options)](#exp_module_@aeternity/aepp-sdk/es/contract/ga--createGeneralizeAccount) ⇒ `Promise.&lt;Readonly.&lt;{result: \*, owner: \*, createdAt: Date, address, rawTx: \*, transaction: \*}&gt;&gt;` ⏏
+    * [createGeneralizeAccount(authFnName, source, [args], [options])](#exp_module_@aeternity/aepp-sdk/es/contract/ga--createGeneralizeAccount) ⇒ `Promise.&lt;Readonly.&lt;{result: \*, owner: \*, createdAt: Date, address, rawTx: \*, transaction: \*}&gt;&gt;` ⏏
     * [createMetaTx(rawTransaction, authData, authFnName, options)](#exp_module_@aeternity/aepp-sdk/es/contract/ga--createMetaTx) ⇒ `String` ⏏
 
 <a id="exp_module_@aeternity/aepp-sdk/es/contract/ga--exports.GeneralizeAccount"></a>
@@ -45,7 +41,7 @@ await client.spend(10000, receiverPub, { authData: { source: authContract, args:
 ```
 <a id="exp_module_@aeternity/aepp-sdk/es/contract/ga--createGeneralizeAccount"></a>
 
-##### createGeneralizeAccount(authFnName, source, args, options) ⇒ `Promise.&lt;Readonly.&lt;{result: \*, owner: \*, createdAt: Date, address, rawTx: \*, transaction: \*}&gt;&gt;` ⏏
+##### createGeneralizeAccount(authFnName, source, [args], [options]) ⇒ `Promise.&lt;Readonly.&lt;{result: \*, owner: \*, createdAt: Date, address, rawTx: \*, transaction: \*}&gt;&gt;` ⏏
 Convert current account to GA account
 
 **Kind**: Exported function  
@@ -54,8 +50,8 @@ Convert current account to GA account
 | --- | --- | --- |
 | authFnName | `String` | Authorization function name |
 | source | `String` | Auth contract source code |
-| args | `Array` | init arguments |
-| options | `Object` | Options |
+| [args] | `Array` | init arguments |
+| [options] | `Object` | Options |
 
 <a id="exp_module_@aeternity/aepp-sdk/es/contract/ga--createMetaTx"></a>
 

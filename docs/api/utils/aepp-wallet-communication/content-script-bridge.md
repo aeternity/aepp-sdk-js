@@ -9,13 +9,13 @@ import ContentScriptBridge from '@aeternity/aepp-sdk/es/utils/wallet-communicati
 ```
 
 * [@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge)
-    * [exports.ContentScriptBridge(params)](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge--exports.ContentScriptBridge) ⇒ `ContentScriptBridge` ⏏
-        * [.run()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge--exports.ContentScriptBridge+run) ⇒ `void`
-        * [.stop()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge--exports.ContentScriptBridge+stop) ⇒ `void`
+    * [module.exports(params)](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge--module.exports) ⇒ `Object` ⏏
+        * [.run()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge--module.exports+run) ⇒ `void`
+        * [.stop()](#module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge--module.exports+stop) ⇒ `void`
 
-<a id="exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge--exports.ContentScriptBridge"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge--module.exports"></a>
 
-#### exports.ContentScriptBridge(params) ⇒ `ContentScriptBridge` ⏏
+#### module.exports(params) ⇒ `Object` ⏏
 ContentScriptBridge stamp
 Provide functionality to easly redirect messages from page to extension and from extension to page through content script
 Using Runtime(Extension) and WindowPostMessage(Web-Page) connections
@@ -29,15 +29,15 @@ Using Runtime(Extension) and WindowPostMessage(Web-Page) connections
 | params.pageConnection | `Object` | Page connection object(@link module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message) |
 | params.extConnection | `Object` | Extension connection object(module: @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-runtime) |
 
-<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge--exports.ContentScriptBridge+run"></a>
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge--module.exports+run"></a>
 
-##### exports.ContentScriptBridge.run() ⇒ `void`
+##### module.exports.run() ⇒ `void`
 Start message proxy
 
-**Kind**: instance method of [`exports.ContentScriptBridge`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge--exports.ContentScriptBridge)  
-<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge--exports.ContentScriptBridge+stop"></a>
+**Kind**: instance method of [`module.exports`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge--module.exports)  
+<a id="module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge--module.exports+stop"></a>
 
-##### exports.ContentScriptBridge.stop() ⇒ `void`
+##### module.exports.stop() ⇒ `void`
 Stop message proxy
 
-**Kind**: instance method of [`exports.ContentScriptBridge`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge--exports.ContentScriptBridge)  
+**Kind**: instance method of [`module.exports`](#exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge--module.exports)  

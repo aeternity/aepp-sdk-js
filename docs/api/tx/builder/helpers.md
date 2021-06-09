@@ -5,7 +5,7 @@ JavaScript-based Transaction builder helper function's
 
 **Example**  
 ```js
-import TxBuilderHelper from '@aeternity/aepp-sdk/es/tx/builder/helpers'
+import { TxBuilderHelper } from '@aeternity/aepp-sdk'
 ```
 
 * [@aeternity/aepp-sdk/es/tx/builder/helpers](#module_@aeternity/aepp-sdk/es/tx/builder/helpers)
@@ -21,12 +21,12 @@ import TxBuilderHelper from '@aeternity/aepp-sdk/es/tx/builder/helpers'
     * [exports.readInt(buf)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.readInt) ⇒ `String` ⏏
     * [exports.buildPointers(pointers)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.buildPointers) ⇒ `Array` ⏏
     * [exports.readPointers(pointers)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.readPointers) ⇒ `Array` ⏏
-    * [exports.isNameValid(name, [throwError])](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.isNameValid) ⇒ ⏏
+    * [exports.ensureNameValid(name)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.ensureNameValid) ⇒ ⏏
+    * [exports.isNameValid(name)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.isNameValid) ⇒ ⏏
     * [exports.validatePointers(pointers)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.validatePointers) ⇒ `Boolean` ⏏
     * [exports.getMinimumNameFee(domain)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.getMinimumNameFee) ⇒ `String` ⏏
     * [exports.computeBidFee(domain, startFee, [increment])](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.computeBidFee) ⇒ `String` ⏏
     * [exports.computeAuctionEndBlock(domain, claimHeight)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.computeAuctionEndBlock) ⇒ `String` ⏏
-    * [exports.getContractBackendFromTx({)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.getContractBackendFromTx) ⇒ `String` ⏏
     * [exports.isAuctionName(name)](#exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.isAuctionName) ⇒ `Boolean` ⏏
 
 <a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.buildContractId"></a>
@@ -179,22 +179,33 @@ Helper function to read pointers from name update TX
 | --- | --- | --- |
 | pointers | `Array` | Array of pointers ([ { key: 'account_pubkey', id: 'ak_32klj5j23k23j5423l434l2j3423'} ]) |
 
-<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.isNameValid"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.ensureNameValid"></a>
 
-#### exports.isNameValid(name, [throwError]) ⇒ ⏏
-Is name valid
+#### exports.ensureNameValid(name) ⇒ ⏏
+Ensure that name is valid
 
 **Kind**: Exported function  
-**Returns**: Boolean  
+**Returns**: void  
 **Throws**:
 
 - Error
 
 
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| name | `string` |  |  |
-| [throwError] | `boolean` | <code>true</code> | Throw error on invalid |
+| Param | Type |
+| --- | --- |
+| name | `string` | 
+
+<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.isNameValid"></a>
+
+#### exports.isNameValid(name) ⇒ ⏏
+Is name valid
+
+**Kind**: Exported function  
+**Returns**: Boolean  
+
+| Param | Type |
+| --- | --- |
+| name | `string` | 
 
 <a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.validatePointers"></a>
 
@@ -245,18 +256,6 @@ Compute auction end height
 | --- | --- | --- |
 | domain | `String` | the domain name to get the fee for |
 | claimHeight | `Number` \| `String` | Auction starting height |
-
-<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.getContractBackendFromTx"></a>
-
-#### exports.getContractBackendFromTx({) ⇒ `String` ⏏
-Get contract backend by abiVersion
-
-**Kind**: Exported function  
-**Returns**: `String` - Backend  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| { | `Object` | abiVersion } abiVersion Transaction abiVersion |
 
 <a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.isAuctionName"></a>
 

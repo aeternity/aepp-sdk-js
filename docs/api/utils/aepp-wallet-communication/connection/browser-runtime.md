@@ -9,9 +9,9 @@ This is the complement to [@aeternity/aepp-sdk/es/utils/aepp-wallet-communicatio
 ```js
 import BrowserRuntimeConnection from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-runtime'
 ```
-<a id="exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-runtime--exports.BrowserRuntimeConnection"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-runtime--module.exports"></a>
 
-#### exports.BrowserRuntimeConnection(params) ⇒ `Object` ⏏
+#### module.exports(params) ⇒ `Object` ⏏
 BrowserRuntimeConnection stamp
 Handle browser runtime communication
 

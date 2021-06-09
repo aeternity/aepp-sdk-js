@@ -1,8 +1,22 @@
 ## Deprecated RPC Client
  
+## Deprecated RPC Client
+**Type Sig:** Deprecated RPC Client
+
+ 
+## Deprecated RPC Client
+**Type Sig:** Deprecated RPC Client
+
+**Type Sig:** Deprecated RPC Client
+
+ 
 <a id="module_@aeternity/aepp-sdk/es/rpc/client"></a>
 
 ### rpc/client
+**Type Sig:** rpc/client
+
+**Type Sig:** rpc/client
+
 **Module Path:** @aeternity/aepp-sdk/es/rpc/client 
 
 RPC client module
@@ -14,6 +28,10 @@ import RpcClient from '@aeternity/aepp-sdk/es/rpc/client'
 <a id="exp_module_@aeternity/aepp-sdk/es/rpc/client--RpcClient"></a>
 
 #### RpcClient
+**Type Sig:** RpcClient
+
+**Type Sig:** RpcClient
+
 
 **Type Sig:** RpcClient([options]) ⇒ `Object` 
 

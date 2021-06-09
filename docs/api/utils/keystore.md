@@ -5,7 +5,7 @@ KeyStore module
 
 **Example**  
 ```js
-import * as Keystore from '@aeternity/aepp-sdk/es/utils/keystore'
+import { Keystore } from '@aeternity/aepp-sdk'
 ```
 **Example**  
 ```js

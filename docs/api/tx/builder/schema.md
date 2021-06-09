@@ -5,7 +5,7 @@ Transaction Schema for TxBuilder
 
 **Example**  
 ```js
-import TxSchema from '@aeternity/aepp-sdk/es/tx/builder/schema'
+import { SCHEMA } from '@aeternity/aepp-sdk'
 ```
 <a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/schema--exports.TX_TYPE"></a>
 

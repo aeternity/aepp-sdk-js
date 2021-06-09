@@ -35,5 +35,5 @@ nav:
       - utils: >-
           flattened/ae-amount-formatter-bignumber-bytes-crypto-keystore-contract-node-node-pool-swagger-.md
   - Examples:
-      - NodeJS: flattened/aecontract-aecrypto-aewallet-import-nodejs-4-.md
+      - NodeJS: flattened/contract-wallet-import-nodejs-4-.md
       - JS: flattened/import-script-tag-import-vuejs-.md

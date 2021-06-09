@@ -9,7 +9,7 @@ Chain module
 
 **Example**  
 ```js
-import Chain from '@aeternity/aepp-sdk/es/chain'
+import { Chain } from '@aeternity/aepp-sdk'
 ```
 
         
@@ -193,9 +193,9 @@ Wait for transaction confirmation
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| txHash | `String` |  | Generation hash or height |
-| [options] | `String` | <code>{}</code> | options |
-| [options.confirm] | `String` | <code>3</code> | Block confirmation count |
+| txHash | `String` |  | Transaction hash |
+| [options] | `Object` |  | options |
+| [options.confirm] | `Number` | <code>3</code> | Number of blocks to wait for transaction confirmation |
 
 <a id="module_@aeternity/aepp-sdk/es/chain--Chain+getMicroBlockTransactions"></a>
 
@@ -248,30 +248,21 @@ Get account by account public key
 <a id="module_@aeternity/aepp-sdk/es/chain--Chain+txDryRun"></a>
 
 ##### txDryRun
-**Type Sig:** chain.txDryRun(txs, accounts, hashOrHeight) ⇒ `Object`
+**Type Sig:** chain.txDryRun(tx, accountAddress) ⇒ `Object`
 Transaction dry-run
 
 **Kind**: instance abstract method of [`Chain`](#exp_module_@aeternity/aepp-sdk/es/chain--Chain)  
 **Returns**: `Object` - Result  
 **Category**: async  
-**rtype**: `(txs, accounts, hashOrHeight) => result: Object`
+**rtype**: `(tx, accountAddress, options) => result: Object`
 
 | Param | Type | Description |
 | --- | --- | --- |
-| txs | `Array` | Array of transaction's |
-| accounts | `Array` | Array of account's |
-| hashOrHeight | `String` \| `Number` | hash or height of block on which to make dry-run |
+| tx | `String` | transaction to execute |
+| accountAddress | `String` | address that will be used to execute transaction |
+| [options.top] | `String` \| `Number` | hash of block on which to make dry-run |
+| [options.txEvents] | `Boolean` | collect and return on-chain tx events that would result from the call |
 
-<a id="module_@aeternity/aepp-sdk/es/chain--Chain+getInfo"></a>
-
-##### getInfo
-**Type Sig:** chain.getInfo() ⇒ `Object`
-Get Node Info
-
-**Kind**: instance abstract method of [`Chain`](#exp_module_@aeternity/aepp-sdk/es/chain--Chain)  
-**Returns**: `Object` - Result  
-**Category**: async  
-**rtype**: `() => result: Object`
 <a id="module_@aeternity/aepp-sdk/es/chain--Chain.waitMined"></a>
 
 ##### waitMined
@@ -298,7 +289,7 @@ This is the complement to [@aeternity/aepp-sdk/es/chain](#module_@aeternity/aepp
 
 **Example**  
 ```js
-import ChainNode from '@aeternity/aepp-sdk/es/chain/node'
+import { ChainNode } from '@aeternity/aepp-sdk'
 ```
 <a id="exp_module_@aeternity/aepp-sdk/es/chain/node--ChainNode"></a>
 

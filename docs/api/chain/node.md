@@ -7,7 +7,7 @@ This is the complement to [@aeternity/aepp-sdk/es/chain](#module_@aeternity/aepp
 
 **Example**  
 ```js
-import ChainNode from '@aeternity/aepp-sdk/es/chain/node'
+import { ChainNode } from '@aeternity/aepp-sdk'
 ```
 <a id="exp_module_@aeternity/aepp-sdk/es/chain/node--ChainNode"></a>
 

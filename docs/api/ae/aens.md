@@ -9,7 +9,7 @@ repository.
 
 **Example**  
 ```js
-import Aens from '@aeternity/aepp-sdk/es/ae/aens'
+import { Aens } from '@aeternity/aepp-sdk'
 ```
 
 * [@aeternity/aepp-sdk/es/ae/aens](#module_@aeternity/aepp-sdk/es/ae/aens)

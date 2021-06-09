@@ -9,7 +9,7 @@ JavaScript-based Transaction builder
 
 **Example**  
 ```js
-import Transaction from '@aeternity/aepp-sdk/es/tx/builder'
+import { TxBuilder } from '@aeternity/aepp-sdk'
 ```
 
 
@@ -178,7 +178,7 @@ JavaScript-based Transaction builder helper function's
 
 **Example**  
 ```js
-import TxBuilderHelper from '@aeternity/aepp-sdk/es/tx/builder/helpers'
+import { TxBuilderHelper } from '@aeternity/aepp-sdk'
 ```
 
 
@@ -368,25 +368,39 @@ Helper function to read pointers from name update TX
 | --- | --- | --- |
 | pointers | `Array` | Array of pointers ([ { key: 'account_pubkey', id: 'ak_32klj5j23k23j5423l434l2j3423'} ]) |
 
-<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.isNameValid"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.ensureNameValid"></a>
 
-##### isNameValid
+##### ensureNameValid
 
-**Type Sig:** isNameValid(name, [throwError]) ⇒ 
+**Type Sig:** ensureNameValid(name) ⇒ 
 
-Is name valid
+Ensure that name is valid
 
 **Kind**: Exported function  
-**Returns**: Boolean  
+**Returns**: void  
 **Throws**:
 
 - Error
 
 
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| name | `string` |  |  |
-| [throwError] | `boolean` | <code>true</code> | Throw error on invalid |
+| Param | Type |
+| --- | --- |
+| name | `string` | 
+
+<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.isNameValid"></a>
+
+##### isNameValid
+
+**Type Sig:** isNameValid(name) ⇒ 
+
+Is name valid
+
+**Kind**: Exported function  
+**Returns**: Boolean  
+
+| Param | Type |
+| --- | --- |
+| name | `string` | 
 
 <a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.validatePointers"></a>
 
@@ -450,21 +464,6 @@ Compute auction end height
 | domain | `String` | the domain name to get the fee for |
 | claimHeight | `Number` \| `String` | Auction starting height |
 
-<a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.getContractBackendFromTx"></a>
-
-##### getContractBackendFromTx
-
-**Type Sig:** getContractBackendFromTx({) ⇒ `String` 
-
-Get contract backend by abiVersion
-
-**Kind**: Exported function  
-**Returns**: `String` - Backend  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| { | `Object` | abiVersion } abiVersion Transaction abiVersion |
-
 <a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/helpers--exports.isAuctionName"></a>
 
 ##### isAuctionName
@@ -489,7 +488,7 @@ Transaction Schema for TxBuilder
 
 **Example**  
 ```js
-import TxSchema from '@aeternity/aepp-sdk/es/tx/builder/schema'
+import { SCHEMA } from '@aeternity/aepp-sdk'
 ```
 <a id="exp_module_@aeternity/aepp-sdk/es/tx/builder/schema--exports.TX_TYPE"></a>
 
@@ -527,7 +526,7 @@ Tx module
 
 **Example**  
 ```js
-import Tx from '@aeternity/aepp-sdk/es/tx'
+import { Tx } from '@aeternity/aepp-sdk'
 ```
 
 
@@ -763,7 +762,7 @@ Transaction module
 
 **Example**  
 ```js
-import Transaction from '@aeternity/aepp-sdk/es/tx/tx'
+import { Transaction } from '@aeternity/aepp-sdk'
 ```
 <a id="exp_module_@aeternity/aepp-sdk/es/tx/tx--Transaction"></a>
 
@@ -986,7 +985,7 @@ Transaction validator
 
 **Example**  
 ```js
-import TransactionValidator from '@aeternity/aepp-sdk/es/tx/validator'
+import { TransactionValidator } from '@aeternity/aepp-sdk'
 ```
 
 

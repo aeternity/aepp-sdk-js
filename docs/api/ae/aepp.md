@@ -5,15 +5,15 @@ Aepp module
 
 **Example**  
 ```js
-import Ae from '@aeternity/aepp-sdk/es/ae/aepp'
+import { RpcAepp } from '@aeternity/aepp-sdk'
 ```
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/aepp--exports.Aepp"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/aepp--module.exports"></a>
 
-#### exports.Aepp([options]) ⇒ `Object` ⏏
+#### module.exports([options]) ⇒ `Object` ⏏
 Aepp Stamp
 
-Aepp provides Ae base functionality with Contract and Aens.
-This stamp can be used only with Wallet, all Aepp method's going through RPC to Wallet.
+Aepp provides base functionality.
+Expected to use this stamp with a Wallet.
 [Ae](#exp_module_@aeternity/aepp-sdk/es/ae--Ae) clients.
 
 **Kind**: Exported function  

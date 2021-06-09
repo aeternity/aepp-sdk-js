@@ -5,7 +5,7 @@ Ae module
 
 **Example**  
 ```js
-import Ae from '@aeternity/aepp-sdk/es/ae'
+import { Ae } from '@aeternity/aepp-sdk'
 ```
 
 * [@aeternity/aepp-sdk/es/ae](#module_@aeternity/aepp-sdk/es/ae)
@@ -26,7 +26,7 @@ abstract methods using composition will result in an exception.
 
 Ae objects are the composition of three basic building blocks:
 * [Tx](#exp_module_@aeternity/aepp-sdk/es/tx--Tx)
-* [Account](#exp_module_@aeternity/aepp-sdk/es/account--Account)
+* [module:@aeternity/aepp-sdk/es/account--Account](module:@aeternity/aepp-sdk/es/account--Account)
 * [Chain](#exp_module_@aeternity/aepp-sdk/es/chain--Chain)
 Only by providing the joint functionality of those three, most more advanced
 operations, i.e. the ones with actual use value on the chain, become

@@ -13,7 +13,7 @@ repository.
 
 **Example**  
 ```js
-import Aens from '@aeternity/aepp-sdk/es/ae/aens'
+import { Aens } from '@aeternity/aepp-sdk'
 ```
 
     
@@ -258,18 +258,16 @@ Aepp module
 
 **Example**  
 ```js
-import Ae from '@aeternity/aepp-sdk/es/ae/aepp'
+import { RpcAepp } from '@aeternity/aepp-sdk'
 ```
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/aepp--exports.Aepp"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/aepp--module.exports"></a>
 
-#### Aepp
-
-**Type Sig:** Aepp([options]) ⇒ `Object` 
-
+#### exports
+**Type Sig:** module.exports([options]) ⇒ `Object` 
 Aepp Stamp
 
-Aepp provides Ae base functionality with Contract and Aens.
-This stamp can be used only with Wallet, all Aepp method's going through RPC to Wallet.
+Aepp provides base functionality.
+Expected to use this stamp with a Wallet.
 [Ae](#exp_module_@aeternity/aepp-sdk/es/ae--Ae) clients.
 
 **Kind**: Exported function  
@@ -293,11 +291,7 @@ https://github.com/aeternity/protocol/tree/master/contracts and
 
 **Example**  
 ```js
-import Contract from '@aeternity/aepp-sdk/es/ae/contract' (Using tree-shaking)
-```
-**Example**  
-```js
-import { Contract } from '@aeternity/aepp-sdk' (Using bundle)
+import { Contract } from '@aeternity/aepp-sdk'
 ```
 
     
@@ -340,26 +334,6 @@ const ContractWithAE = await Contract
    .compose(ContractCompilerAPI) // ContractBase implementation
 const client = await ContractWithAe({ url, internalUrl, compilerUrl, keypair, ... })
 ```
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--handleCallError"></a>
-
-#### handleCallError
-
-**Type Sig:** handleCallError(result, tx) ⇒ `Promise.&lt;void&gt;` 
-
-Handle contract call error
-
-**Kind**: Exported function  
-**Category**: async  
-**Throws**:
-
-- Error Decoded error
-
-
-| Param | Type | Description |
-| --- | --- | --- |
-| result | `Object` | call result object |
-| tx | `Object` | Unpacked transaction |
-
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--contractEncodeCall"></a>
 
 #### contractEncodeCall
@@ -378,7 +352,6 @@ Encode call data for contract call
 | args | `Array` |  | Argument's for call |
 | [options] | `Object` | <code>{}</code> | Options |
 | [options.filesystem] | `Object` | <code>{}</code> | Contract external namespaces map |
-| [options.backend] | `Object` | <code>&#x27;fate&#x27;</code> | Compiler backend |
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/contract--contractDecodeData"></a>
 
@@ -417,21 +390,20 @@ Static contract call(using dry-run)
 **Returns**: `Promise.&lt;Object&gt;` - Result object  
 **Category**: async  
 
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| source | `String` |  | Contract source code |
-| address | `String` |  | Contract address |
-| name | `String` |  | Name of function to call |
-| args | `Array` \| `String` |  | Argument's or callData for call/deploy transaction |
-| [options] | `Object` | <code>{}</code> | Options |
-| [options.top] | `String` |  | Block hash on which you want to call contract |
-| [options.bytecode] | `String` |  | Block hash on which you want to call contract |
-| [options.options] | `Object` |  | Transaction options (fee, ttl, gas, amount, deposit) |
-| [options.options.filesystem] | `Object` |  | Contract external namespaces map |
+| Param | Type | Description |
+| --- | --- | --- |
+| source | `String` | Contract source code |
+| address | `String` | Contract address |
+| name | `String` | Name of function to call |
+| args | `Array` \| `String` | Argument's or callData for call/deploy transaction |
+| [options] | `Object` |  |
+| [options.top] | `Number` \| `String` | Block height or hash on which you want to call contract |
+| [options.bytecode] | `String` | Block hash on which you want to call contract |
+| [options.filesystem] | `Object` | Contract external namespaces map |
 
 **Example**  
 ```js
-const callResult = await client.contractCallStatic(source, address, fnName, args = [], { top, options = {} })
+const callResult = await client.contractCallStatic(source, address, fnName, args)
 {
   result: TX_DATA,
   decode: (type) => Decode call result
@@ -516,7 +488,6 @@ Compile contract source code
 | source | `String` |  | Contract sourece code |
 | [options] | `Object` | <code>{}</code> | Transaction options (fee, ttl, gas, amount, deposit) |
 | [options.filesystem] | `Object` | <code>{}</code> | Contract external namespaces map* @return {Promise<Object>} Result object |
-| [options.backend] | `Object` | <code>&#x27;aevm&#x27;</code> | Contract backend version (aevm|fate) |
 
 **Example**  
 ```js
@@ -682,7 +653,7 @@ repository.
 
 **Example**  
 ```js
-import Oracle from '@aeternity/aepp-sdk/es/ae/oracle'
+import { Oracle } from '@aeternity/aepp-sdk'
 ```
 
     
@@ -707,6 +678,22 @@ Oracle provides oracle-system related methods atop
 | --- | --- | --- | --- |
 | [options] | `Object` | <code>{}</code> | Initializer object |
 
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/oracle--pollForQueries"></a>
+
+#### pollForQueries
+**Type Sig:** pollForQueries(oracleId, onQuery, [options]) ⇒ `function` 
+Poll for oracle queries
+
+**Kind**: instance method of [`@aeternity/aepp-sdk/es/ae/oracle`](#module_@aeternity/aepp-sdk/es/ae/oracle)  
+**Returns**: `function` - stopPolling - Stop polling function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| oracleId | `String` | Oracle public key |
+| onQuery | `function` | OnQuery callback |
+| [options] | `Object` | Options object |
+| [options.interval] | `Number` | Poll interval(default: 5000) |
+
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/oracle--getOracleObject"></a>
 
 #### getOracleObject
@@ -720,23 +707,6 @@ Constructor for Oracle Object (helper object for using Oracle)
 | Param | Type | Description |
 | --- | --- | --- |
 | oracleId | `String` | Oracle public key |
-
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/oracle--pollForQueries"></a>
-
-#### pollForQueries
-**Type Sig:** pollForQueries(oracleId, onQuery, [options]) ⇒ `function` 
-Poll for oracle queries
-
-**Kind**: instance method of [`@aeternity/aepp-sdk/es/ae/oracle`](#module_@aeternity/aepp-sdk/es/ae/oracle)  
-**Returns**: `function` - stopPolling - Stop polling function  
-**Category**: async  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| oracleId | `String` | Oracle public key |
-| onQuery | `function` | OnQuery callback |
-| [options] | `Object` | Options object |
-| [options.interval] | `Number` | Poll interval(default: 5000) |
 
 <a id="exp_module_@aeternity/aepp-sdk/es/ae/oracle--getQueryObject"></a>
 
@@ -861,14 +831,12 @@ Universal module
 
 **Example**  
 ```js
-import Ae from '@aeternity/aepp-sdk/es/ae/universal'
+import { Universal } from '@aeternity/aepp-sdk'
 ```
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/universal--exports.Universal"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/universal--module.exports"></a>
 
-#### Universal
-
-**Type Sig:** Universal([options]) ⇒ `Object` 
-
+#### exports
+**Type Sig:** module.exports([options]) ⇒ `Object` 
 Universal Stamp
 
 Universal provides Ae base functionality with Contract and Aens
@@ -892,14 +860,12 @@ Wallet module
 
 **Example**  
 ```js
-import Wallet from '@aeternity/aepp-sdk/es/ae/wallet'
+import { RpcWallet } from '@aeternity/aepp-sdk'
 ```
-<a id="exp_module_@aeternity/aepp-sdk/es/ae/wallet--exports.Wallet"></a>
+<a id="exp_module_@aeternity/aepp-sdk/es/ae/wallet--module.exports"></a>
 
-#### Wallet
-
-**Type Sig:** Wallet([options]) ⇒ `Object` 
-
+#### exports
+**Type Sig:** module.exports([options]) ⇒ `Object` 
 Wallet Stamp
 
 **Kind**: Exported function  
@@ -912,10 +878,6 @@ Wallet Stamp
 | options.url | `String` |  | Node instance to connect to |
 | [options.accounts] | `Array.&lt;Account&gt;` |  | Accounts to initialize with |
 | [options.account] | `String` |  | Public key of account to preselect |
-| [options.onTx] | `function` |  | Tx method protector function |
-| [options.onChain] | `function` |  | Chain method protector function |
-| [options.onAccount] | `function` |  | Account method protector function |
-| [options.onContract] | `function` |  | Contract method protector function |
 
 **Example**  
 ```js
@@ -923,10 +885,6 @@ Wallet({
   url: 'https://testnet.aeternity.io/',
   accounts: [MemoryAccount({keypair})],
   address: keypair.publicKey,
-  onTx: confirm,
-  onChain: confirm,
-  onAccount: confirm
-  onContract: confirm
 })
 ```
 ,
