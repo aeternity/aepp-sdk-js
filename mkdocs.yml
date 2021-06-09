@@ -33,7 +33,7 @@ nav:
       - Aepp Wallet Communication: >-
           flattened/connection-5content-script-bridge-4wallet-detector-4browser-runtime-4browser-window-message-5aepp-rpc-5rpc-client-5wallet-rpc-5.md
       - utils: >-
-          flattened/amount-formatter-bignumber-bytes-crypto-keystore-contract-node-node-pool-swagger-ae-4-.md
+          flattened/ae-amount-formatter-bignumber-bytes-crypto-keystore-contract-node-node-pool-swagger-.md
   - Examples:
       - NodeJS: flattened/aecontract-aecrypto-aewallet-import-nodejs-4-.md
       - JS: flattened/import-script-tag-import-vuejs-.md

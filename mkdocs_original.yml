@@ -70,7 +70,7 @@ nav:
         - RPC client: api/utils/aepp-wallet-communication/rpc/rpc-client.md
         - Wallet RPC: api/utils/aepp-wallet-communication/rpc/wallet-rpc.md
     - utils:
-      - AE Utilities: api/ae.md
+      - api/ae.md
       - api/utils/amount-formatter.md
       - api/utils/bignumber.md
       - api/utils/bytes.md
