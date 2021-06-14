@@ -165,7 +165,7 @@ async function verifyTx ({ tx, signatures, rlpEncoded }, networkId) {
   const gas = Object.prototype.hasOwnProperty.call(tx, 'gas') ? +tx.gas : 0
   const txType = OBJECT_ID_TX_TYPE[+tx.tag]
   const resolvedData = {
-    minFee: calculateFee(0, txType, { gas, params: tx, showWarning: false }),
+    minFee: calculateFee(0, txType, { gas, params: tx, showWarning: false, vsn: tx.VSN }),
     ...(await resolveDataForBase(this, { ownerPublicKey })),
     ...tx,
     txType

@@ -232,7 +232,6 @@ export const TX_TYPE = {
 export const VM_VERSIONS = {
   NO_VM: 0,
   SOPHIA: 1,
-  SOLIDITY: 2,
   SOPHIA_IMPROVEMENTS_MINERVA: 3,
   SOPHIA_IMPROVEMENTS_FORTUNA: 4,
   FATE: 5,
@@ -243,79 +242,15 @@ export const VM_VERSIONS = {
 export const ABI_VERSIONS = {
   NO_ABI: 0,
   SOPHIA: 1,
-  SOLIDITY: 2,
   FATE: 3
 }
 
 export const PROTOCOL_VERSIONS = {
-  ROMA: 1,
-  MINERVA: 2,
-  FORTUNA: 3,
-  LIMA: 4,
   IRIS: 5
 }
 
 // First abi/vm by default
 export const PROTOCOL_VM_ABI = {
-  [PROTOCOL_VERSIONS.ROMA]: {
-    [TX_TYPE.contractCreate]: {
-      vmVersion: [VM_VERSIONS.SOPHIA], abiVersion: [ABI_VERSIONS.SOPHIA]
-    },
-    [TX_TYPE.contractCall]: {
-      vmVersion: [VM_VERSIONS.SOPHIA], abiVersion: [ABI_VERSIONS.SOPHIA]
-    },
-    [TX_TYPE.oracleRegister]: {
-      vmVersion: [VM_VERSIONS.SOPHIA], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA]
-    }
-  },
-  [PROTOCOL_VERSIONS.MINERVA]: {
-    [TX_TYPE.contractCreate]: {
-      vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA], abiVersion: [ABI_VERSIONS.SOPHIA]
-    },
-    [TX_TYPE.contractCall]: {
-      vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA, VM_VERSIONS.SOPHIA],
-      abiVersion: [ABI_VERSIONS.SOPHIA]
-    },
-    [TX_TYPE.oracleRegister]: {
-      vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA],
-      abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA]
-    }
-  },
-  [PROTOCOL_VERSIONS.FORTUNA]: {
-    [TX_TYPE.contractCreate]: {
-      vmVersion: [VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA], abiVersion: [ABI_VERSIONS.SOPHIA]
-    },
-    [TX_TYPE.contractCall]: {
-      vmVersion: [
-        VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA,
-        VM_VERSIONS.SOPHIA,
-        VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA
-      ],
-      abiVersion: [ABI_VERSIONS.SOPHIA]
-    },
-    [TX_TYPE.oracleRegister]: {
-      vmVersion: [], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA]
-    }
-  },
-  [PROTOCOL_VERSIONS.LIMA]: {
-    [TX_TYPE.contractCreate]: {
-      vmVersion: [VM_VERSIONS.FATE, VM_VERSIONS.SOPHIA_IMPROVEMENTS_LIMA],
-      abiVersion: [ABI_VERSIONS.FATE, ABI_VERSIONS.SOPHIA]
-    },
-    [TX_TYPE.contractCall]: {
-      vmVersion: [
-        VM_VERSIONS.FATE,
-        VM_VERSIONS.SOPHIA_IMPROVEMENTS_LIMA,
-        VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA,
-        VM_VERSIONS.SOPHIA,
-        VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA
-      ],
-      abiVersion: [ABI_VERSIONS.FATE, ABI_VERSIONS.SOPHIA]
-    },
-    [TX_TYPE.oracleRegister]: {
-      vmVersion: [], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA]
-    }
-  },
   [PROTOCOL_VERSIONS.IRIS]: {
     [TX_TYPE.contractCreate]: {
       vmVersion: [VM_VERSIONS.FATE_2], abiVersion: [ABI_VERSIONS.FATE]
@@ -490,12 +425,6 @@ const BASE_TX = [
   TX_FIELD('VSN', FIELD_TYPES.int)
 ]
 
-const ACCOUNT_TX = [
-  ...BASE_TX,
-  TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('balance', FIELD_TYPES.int)
-]
-
 export const CONTRACT_BYTE_CODE_LIMA = [
   ...BASE_TX,
   TX_FIELD('sourceCodeHash', FIELD_TYPES.rawBinary),
@@ -503,21 +432,6 @@ export const CONTRACT_BYTE_CODE_LIMA = [
   TX_FIELD('byteCode', FIELD_TYPES.rawBinary),
   TX_FIELD('compilerVersion', FIELD_TYPES.string),
   TX_FIELD('payable', FIELD_TYPES.bool)
-]
-
-export const CONTRACT_BYTE_CODE_MINERVA = [
-  ...BASE_TX,
-  TX_FIELD('sourceCodeHash', FIELD_TYPES.rawBinary),
-  TX_FIELD('typeInfo', FIELD_TYPES.sophiaCodeTypeInfo),
-  TX_FIELD('byteCode', FIELD_TYPES.rawBinary),
-  TX_FIELD('compilerVersion', FIELD_TYPES.string)
-]
-
-export const CONTRACT_BYTE_CODE_ROMA = [
-  ...BASE_TX,
-  TX_FIELD('sourceCodeHash', FIELD_TYPES.rawBinary),
-  TX_FIELD('typeInfo', FIELD_TYPES.sophiaCodeTypeInfo),
-  TX_FIELD('byteCode', FIELD_TYPES.rawBinary)
 ]
 
 const ACCOUNT_TX_2 = [
@@ -551,16 +465,6 @@ const NAME_PRE_CLAIM_TX = [
   TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
   TX_FIELD('commitmentId', FIELD_TYPES.id, 'cm'),
-  TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('ttl', FIELD_TYPES.int)
-]
-
-const NAME_CLAIM_TX = [
-  ...BASE_TX,
-  TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('name', FIELD_TYPES.binary, 'nm'),
-  TX_FIELD('nameSalt', FIELD_TYPES.int),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int)
 ]
@@ -630,18 +534,6 @@ const GA_ATTACH_TX = [
   TX_FIELD('gas', FIELD_TYPES.int),
   TX_FIELD('gasPrice', FIELD_TYPES.int),
   TX_FIELD('callData', FIELD_TYPES.binary, 'cb')
-]
-
-const GA_META_TX = [
-  ...BASE_TX,
-  TX_FIELD('gaId', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('authData', FIELD_TYPES.binary, 'cb'),
-  TX_FIELD('abiVersion', FIELD_TYPES.int),
-  TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('gas', FIELD_TYPES.int),
-  TX_FIELD('gasPrice', FIELD_TYPES.int),
-  TX_FIELD('ttl', FIELD_TYPES.int),
-  TX_FIELD('tx', FIELD_TYPES.rlpBinary)
 ]
 
 const GA_META_TX_2 = [
@@ -748,21 +640,6 @@ const ORACLE_RESPOND_TX = [
   TX_FIELD('ttl', FIELD_TYPES.int)
 ]
 
-const CHANNEL_CREATE_TX = [
-  ...BASE_TX,
-  TX_FIELD('initiator', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('initiatorAmount', FIELD_TYPES.int),
-  TX_FIELD('responder', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('responderAmount', FIELD_TYPES.int),
-  TX_FIELD('channelReserve', FIELD_TYPES.int),
-  TX_FIELD('lockPeriod', FIELD_TYPES.int),
-  TX_FIELD('ttl', FIELD_TYPES.int),
-  TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('delegateIds', FIELD_TYPES.string),
-  TX_FIELD('stateHash', FIELD_TYPES.binary, 'st'),
-  TX_FIELD('nonce', FIELD_TYPES.int)
-]
-
 const CHANNEL_CREATE_TX_2 = [
   ...BASE_TX,
   TX_FIELD('initiator', FIELD_TYPES.id, 'ak'),
@@ -861,53 +738,11 @@ const CHANNEL_FORCE_PROGRESS_TX = [
   TX_FIELD('nonce', FIELD_TYPES.int)
 ]
 
-const CHANNEL_OFFCHAIN_TX = [
-  ...BASE_TX,
-  TX_FIELD('channelId', FIELD_TYPES.id, 'ch'),
-  TX_FIELD('round', FIELD_TYPES.int),
-  TX_FIELD('updates', FIELD_TYPES.offChainUpdates),
-  TX_FIELD('stateHash', FIELD_TYPES.binary, 'st')
-]
-
 const CHANNEL_OFFCHAIN_TX_2 = [
   ...BASE_TX,
   TX_FIELD('channelId', FIELD_TYPES.id, 'ch'),
   TX_FIELD('round', FIELD_TYPES.int),
   TX_FIELD('stateHash', FIELD_TYPES.binary, 'st')
-]
-
-const CHANNEL_TX = [
-  ...BASE_TX,
-  TX_FIELD('initiator', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('responder', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('channelAmount', FIELD_TYPES.int),
-  TX_FIELD('initiatorAmount', FIELD_TYPES.int),
-  TX_FIELD('responderAmount', FIELD_TYPES.int),
-  TX_FIELD('channelReserve', FIELD_TYPES.int),
-  TX_FIELD('delegateIds', FIELD_TYPES.ids),
-  TX_FIELD('stateHash', FIELD_TYPES.hex),
-  TX_FIELD('round', FIELD_TYPES.int),
-  TX_FIELD('soloRound', FIELD_TYPES.int),
-  TX_FIELD('lockPeriod', FIELD_TYPES.int),
-  TX_FIELD('lockedUntil', FIELD_TYPES.int)
-]
-
-const CHANNEL_TX_2 = [
-  ...BASE_TX,
-  TX_FIELD('initiator', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('responder', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('channelAmount', FIELD_TYPES.int),
-  TX_FIELD('initiatorAmount', FIELD_TYPES.int),
-  TX_FIELD('responderAmount', FIELD_TYPES.int),
-  TX_FIELD('channelReserve', FIELD_TYPES.int),
-  TX_FIELD('delegateIds', FIELD_TYPES.ids),
-  TX_FIELD('stateHash', FIELD_TYPES.hex),
-  TX_FIELD('round', FIELD_TYPES.int),
-  TX_FIELD('soloRound', FIELD_TYPES.int),
-  TX_FIELD('lockPeriod', FIELD_TYPES.int),
-  TX_FIELD('lockedUntil', FIELD_TYPES.int),
-  TX_FIELD('initiatorAuth', FIELD_TYPES.binary, 'cb'),
-  TX_FIELD('responderAuth', FIELD_TYPES.binary, 'cb')
 ]
 
 const CHANNEL_TX_3 = [
@@ -1050,7 +885,6 @@ const ACCOUNTS_TREE_TX = [
 
 export const TX_SERIALIZATION_SCHEMA = {
   [TX_TYPE.account]: {
-    1: TX_SCHEMA_FIELD(ACCOUNT_TX, OBJECT_TAG_ACCOUNT),
     2: TX_SCHEMA_FIELD(ACCOUNT_TX_2, OBJECT_TAG_ACCOUNT)
   },
   [TX_TYPE.signed]: {
@@ -1063,7 +897,6 @@ export const TX_SERIALIZATION_SCHEMA = {
     1: TX_SCHEMA_FIELD(NAME_PRE_CLAIM_TX, OBJECT_TAG_NAME_SERVICE_PRECLAIM_TRANSACTION)
   },
   [TX_TYPE.nameClaim]: {
-    1: TX_SCHEMA_FIELD(NAME_CLAIM_TX, OBJECT_TAG_NAME_SERVICE_CLAIM_TRANSACTION),
     2: TX_SCHEMA_FIELD(NAME_CLAIM_TX_2, OBJECT_TAG_NAME_SERVICE_CLAIM_TRANSACTION)
   },
   [TX_TYPE.nameUpdate]: {
@@ -1100,7 +933,6 @@ export const TX_SERIALIZATION_SCHEMA = {
     1: TX_SCHEMA_FIELD(ORACLE_RESPOND_TX, OBJECT_TAG_ORACLE_RESPONSE_TRANSACTION)
   },
   [TX_TYPE.channelCreate]: {
-    1: TX_SCHEMA_FIELD(CHANNEL_CREATE_TX, OBJECT_TAG_CHANNEL_CREATE_TX),
     2: TX_SCHEMA_FIELD(CHANNEL_CREATE_TX_2, OBJECT_TAG_CHANNEL_CREATE_TX)
   },
   [TX_TYPE.channelCloseMutual]: {
@@ -1125,12 +957,9 @@ export const TX_SERIALIZATION_SCHEMA = {
     1: TX_SCHEMA_FIELD(CHANNEL_FORCE_PROGRESS_TX, OBJECT_TAG_CHANNEL_FORCE_PROGRESS_TX)
   },
   [TX_TYPE.channelOffChain]: {
-    1: TX_SCHEMA_FIELD(CHANNEL_OFFCHAIN_TX, OBJECT_TAG_CHANNEL_OFFCHAIN_TX),
     2: TX_SCHEMA_FIELD(CHANNEL_OFFCHAIN_TX_2, OBJECT_TAG_CHANNEL_OFFCHAIN_TX)
   },
   [TX_TYPE.channel]: {
-    1: TX_SCHEMA_FIELD(CHANNEL_TX, OBJECT_TAG_CHANNEL),
-    2: TX_SCHEMA_FIELD(CHANNEL_TX_2, OBJECT_TAG_CHANNEL),
     3: TX_SCHEMA_FIELD(CHANNEL_TX_3, OBJECT_TAG_CHANNEL)
   },
   [TX_TYPE.channelSnapshotSolo]: {
@@ -1188,14 +1017,12 @@ export const TX_SERIALIZATION_SCHEMA = {
     1: TX_SCHEMA_FIELD(GA_ATTACH_TX, OBJECT_TAG_GA_ATTACH)
   },
   [TX_TYPE.gaMeta]: {
-    1: TX_SCHEMA_FIELD(GA_META_TX, OBJECT_TAG_GA_META),
     2: TX_SCHEMA_FIELD(GA_META_TX_2, OBJECT_TAG_GA_META)
   }
 }
 
 export const TX_DESERIALIZATION_SCHEMA = {
   [OBJECT_TAG_ACCOUNT]: {
-    1: TX_SCHEMA_FIELD(ACCOUNT_TX, OBJECT_TAG_ACCOUNT),
     2: TX_SCHEMA_FIELD(ACCOUNT_TX_2, OBJECT_TAG_ACCOUNT)
   },
   [OBJECT_TAG_SIGNED_TRANSACTION]: {
@@ -1208,7 +1035,6 @@ export const TX_DESERIALIZATION_SCHEMA = {
     1: TX_SCHEMA_FIELD(NAME_PRE_CLAIM_TX, OBJECT_TAG_NAME_SERVICE_PRECLAIM_TRANSACTION)
   },
   [OBJECT_TAG_NAME_SERVICE_CLAIM_TRANSACTION]: {
-    1: TX_SCHEMA_FIELD(NAME_CLAIM_TX, OBJECT_TAG_NAME_SERVICE_CLAIM_TRANSACTION),
     2: TX_SCHEMA_FIELD(NAME_CLAIM_TX_2, OBJECT_TAG_NAME_SERVICE_CLAIM_TRANSACTION)
   },
   [OBJECT_TAG_NAME_SERVICE_UPDATE_TRANSACTION]: {
@@ -1245,7 +1071,6 @@ export const TX_DESERIALIZATION_SCHEMA = {
     1: TX_SCHEMA_FIELD(ORACLE_RESPOND_TX, OBJECT_TAG_ORACLE_RESPONSE_TRANSACTION)
   },
   [OBJECT_TAG_CHANNEL_CREATE_TX]: {
-    1: TX_SCHEMA_FIELD(CHANNEL_CREATE_TX, OBJECT_TAG_CHANNEL_CREATE_TX),
     2: TX_SCHEMA_FIELD(CHANNEL_CREATE_TX_2, OBJECT_TAG_CHANNEL_CREATE_TX)
   },
   [OBJECT_TAG_CHANNEL_CLOSE_MUTUAL_TX]: {
@@ -1267,12 +1092,9 @@ export const TX_DESERIALIZATION_SCHEMA = {
     1: TX_SCHEMA_FIELD(CHANNEL_SETTLE_TX, OBJECT_TAG_CHANNEL_SETTLE_TX)
   },
   [OBJECT_TAG_CHANNEL_OFFCHAIN_TX]: {
-    1: TX_SCHEMA_FIELD(CHANNEL_OFFCHAIN_TX, OBJECT_TAG_CHANNEL_OFFCHAIN_TX),
     2: TX_SCHEMA_FIELD(CHANNEL_OFFCHAIN_TX_2, OBJECT_TAG_CHANNEL_OFFCHAIN_TX)
   },
   [OBJECT_TAG_CHANNEL]: {
-    1: TX_SCHEMA_FIELD(CHANNEL_TX, OBJECT_TAG_CHANNEL),
-    2: TX_SCHEMA_FIELD(CHANNEL_TX_2, OBJECT_TAG_CHANNEL),
     3: TX_SCHEMA_FIELD(CHANNEL_TX_3, OBJECT_TAG_CHANNEL)
   },
   [OBJECT_TAG_CHANNEL_SNAPSHOT_SOLO_TX]: {
@@ -1330,15 +1152,12 @@ export const TX_DESERIALIZATION_SCHEMA = {
     1: TX_SCHEMA_FIELD(GA_ATTACH_TX, OBJECT_TAG_GA_ATTACH)
   },
   [OBJECT_TAG_GA_META]: {
-    1: TX_SCHEMA_FIELD(GA_META_TX, OBJECT_TAG_GA_META),
     2: TX_SCHEMA_FIELD(GA_META_TX_2, OBJECT_TAG_GA_META)
   },
   [OBJECT_TAG_CHANNEL_FORCE_PROGRESS_TX]: {
     1: TX_SCHEMA_FIELD(CHANNEL_FORCE_PROGRESS_TX, OBJECT_TAG_CHANNEL_FORCE_PROGRESS_TX)
   },
   [OBJECT_TAG_SOPHIA_BYTE_CODE]: {
-    1: TX_SCHEMA_FIELD(CONTRACT_BYTE_CODE_ROMA, OBJECT_TAG_SOPHIA_BYTE_CODE),
-    2: TX_SCHEMA_FIELD(CONTRACT_BYTE_CODE_MINERVA, OBJECT_TAG_SOPHIA_BYTE_CODE),
     3: TX_SCHEMA_FIELD(CONTRACT_BYTE_CODE_LIMA, OBJECT_TAG_SOPHIA_BYTE_CODE)
   }
 }

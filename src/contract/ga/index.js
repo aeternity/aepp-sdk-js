@@ -123,13 +123,20 @@ async function createMetaTx (rawTransaction, authData, authFnName, options = {})
   // Get abi
   const { abiVersion } = await this.getVmVersion(TX_TYPE.contractCall)
   // Prepare params for META tx
-  const params = { ...opt, tx: rlpEncoded, gaId: await this.address(opt), abiVersion: abiVersion, authData: authCallData, gas }
+  const params = {
+    ...opt,
+    tx: rlpEncoded,
+    gaId: await this.address(opt),
+    abiVersion: abiVersion,
+    authData: authCallData,
+    gas,
+    vsn: 2
+  }
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  // TODO: Remove ttl after Iris HF
-  const { fee, ttl } = await this.prepareTxParams(TX_TYPE.gaMeta, params)
+  const { fee } = await this.prepareTxParams(TX_TYPE.gaMeta, params)
   // Build META tx
   const { rlpEncoded: metaTxRlp } = buildTx(
-    { ...params, fee: `${fee}`, ttl },
+    { ...params, fee: `${fee}` },
     TX_TYPE.gaMeta,
     { vsn: 2 }
   )

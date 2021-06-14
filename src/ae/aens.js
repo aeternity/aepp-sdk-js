@@ -217,14 +217,13 @@ async function query (name, opt = {}) {
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param {String} name
  * @param {Number} salt Salt from pre-claim, or 0 if it's a bid
- * @param {Object} [options={}] options
+ * @param {Object} [options] options
  * @param {String|Object} [options.onAccount] onAccount Make operation on specific account from sdk(you pass publickKey) or
  * using provided KeyPair(Can be keypair object or MemoryAccount)
  * @param {Number|String|BigNumber} [options.fee] fee
  * @param {Number|String|BigNumber} [options.ttl] ttl
  * @param {Number|String|BigNumber} [options.nonce] nonce
  * @param {Number|String} [options.nameFee] Name Fee (By default calculated by sdk)
- * @param {Number|String} [options.vsn = 2] Transaction vsn from Lima is 2
  * @return {Promise<Object>} the result of the claim
  * @example
  * const name = 'test.chain'
@@ -232,7 +231,7 @@ async function query (name, opt = {}) {
  *
  * await sdkInstance.aensClaim(name, salt, { ttl, fee, nonce, nameFee })
  */
-async function claim (name, salt, options = { vsn: 2 }) {
+async function claim (name, salt, options) {
   ensureNameValid(name)
   const opt = R.merge(this.Ae.defaults, options)
 
@@ -249,7 +248,6 @@ async function claim (name, salt, options = { vsn: 2 }) {
 
   const result = await this.send(claimTx, opt)
   if (!isAuctionName(name)) {
-    delete opt.vsn
     const nameInter = opt.waitMined ? await this.aensQuery(name, opt) : {}
     return Object.assign(result, nameInter)
   }
