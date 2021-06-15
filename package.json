@@ -14,7 +14,7 @@
     "build:dev": "webpack --mode=development",
     "docs:docco": "docco -t tooling/docs/markdown.jst -c /dev/null examples/node/*.js && rm -f docs/null && node rename-to-md.js",
     "docs:api": "node apidoc.js",
-    "lint": "ts-standard",
+    "lint": "commitlint --from develop --verbose && ts-standard",
     "test": "nyc --require @babel/register --require ts-node/register mocha --recursive --exit --timeout 10m",
     "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "test:integration:channel,accounts": "nyc --require @babel/register --require ts-node/register mocha './test/integration/@(channel|accounts).js' --exit --timeout 10m",
@@ -23,8 +23,8 @@
     "test:unit": "nyc --require @babel/register --require ts-node/register mocha './test/unit/*'",
     "test:watch": "mocha --recursive --require @babel/register --require ts-node/register --watch --timeout 10m",
     "prepare": "npm run build",
-    "genChangelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
-    "prepublishOnly": "npm run docs:docco && npm run docs:api"
+    "prepublishOnly": "npm run docs:docco && npm run docs:api",
+    "release": "standard-version --skip.tag"
   },
   "license": "ISC",
   "keywords": [
@@ -76,6 +76,8 @@
     "@babel/preset-env": "7.14.4",
     "@babel/preset-typescript": "^7.13.0",
     "@babel/register": "7.13.16",
+    "@commitlint/cli": "^12.1.4",
+    "@commitlint/config-conventional": "^12.1.4",
     "@types/bn.js": "^5.1.0",
     "@types/chai": "^4.2.18",
     "@types/mocha": "^8.2.2",
@@ -85,7 +87,6 @@
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
     "codecov": "^3.8.2",
-    "cz-conventional-changelog": "^3.3.0",
     "docco": "^0.8.1",
     "jsdoc-to-markdown": "^7.0.1",
     "mocha": "^8.4.0",
@@ -93,17 +94,13 @@
     "recursive-rename": "^4.0.0",
     "sinon": "^11.1.1",
     "source-map": "^0.7.3",
+    "standard-version": "^9.3.0",
     "ts-node": "^10.0.0",
     "ts-standard": "^10.0.0",
     "typescript": "^4.3.2",
     "webpack": "^5.38.1",
     "webpack-bundle-analyzer": "^4.4.2",
     "webpack-cli": "4.7.0"
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
   },
   "files": [
     "dist",
