@@ -16,10 +16,6 @@ websocket:
     listen_address: 0.0.0.0
     port: 3014
 
-keys:
-  peer_password: "top secret"
-  dir: ./keys
-
 chain:
   persist: false
   hard_forks:
