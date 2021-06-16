@@ -19,13 +19,13 @@ function configure (filename, opts = {}) {
     resolve: {
       extensions: ['.ts', '.js'],
       fallback: {
-        buffer: require.resolve('buffer/'),
-        path: require.resolve('path-browserify'),
-        stream: require.resolve('stream-browserify'),
-        crypto: require.resolve('crypto-browserify')
+        stream: require.resolve('stream-browserify')
       },
       alias: {
-        'js-yaml': false
+        'js-yaml': false,
+        ...opts.target === 'node' ? {} : {
+          'argon2-browser': 'argon2-browser/dist/argon2-bundled.min.js'
+        }
       }
     },
     plugins: [
