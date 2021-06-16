@@ -2,6 +2,7 @@
 // # Simple AE Token Spending Script
 //
 // This script shows how to use the SDK to send AE to other addresses.
+//
 /*
  * ISC License (ISC)
  * Copyright (c) 2021 aeternity developers

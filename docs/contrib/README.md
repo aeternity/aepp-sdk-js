@@ -56,11 +56,11 @@ aepp-sdk is transpiled to EcmaScript 5 through [WebPack](https://webpack.js.org/
 
 ## Documenting
 
-Apart from documenting features and code, there is also documentation automatically generated using [**jsdoc**](http://usejsdoc.org/) for documenting JS files (later transformed in to `.md` files (to have them readable in platforms like GitHub) and [**docco**](http://ashkenas.com/docco/) for documenting examples and code partials.
+Apart from documenting features and code, there is also documentation automatically generated using [**jsdoc**](http://usejsdoc.org/) for documenting JS files (later transformed in to `.md` files (to have them readable in platforms like GitHub) and [a script](../../tooling/docs/examples-to-md.js) for documenting examples and code partials.
 
 ```bash
-#generate documentation with docco + jsdoc (and markdownify jsdoc)
-npm run docs:docco && npm run docs:api
+#generate examples and api documentation
+npm run docs:examples && npm run docs:api
 ```
 
 ## Building
