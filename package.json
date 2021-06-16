@@ -47,7 +47,6 @@
     "buffer": "^6.0.3",
     "cross-fetch": "^3.1.4",
     "crypto-browserify": "^3.12.0",
-    "ed2curve": "^0.3.0",
     "joi-browser": "^13.4.0",
     "libsodium-wrappers-sumo": "0.7.9",
     "path-browserify": "^1.0.1",

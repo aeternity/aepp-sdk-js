@@ -161,30 +161,4 @@ describe('crypto', () => {
     buildTxHash(txRaw).should.be.equal(expectedHash)
     buildTxHash(rlpEncodedTx).should.be.equal(expectedHash)
   })
-  describe('Encrypt data using nacl box asymmetric encryption', async () => {
-    const { publicKey, secretKey } = Crypto.generateKeyPair()
-    const msgString = 'Test string'
-    const msgBuffer = Buffer.from(msgString)
-
-    it('Encrypt String/Buffer and decrypt', () => {
-      const encryptedString = Crypto.encryptData(msgString, publicKey)
-      const encryptedBuffer = Crypto.encryptData(msgBuffer, publicKey)
-
-      const decryptedString = Crypto.decryptData(secretKey, encryptedString)
-      const decryptedBuffer = Crypto.decryptData(secretKey, encryptedBuffer)
-      Buffer.from(decryptedString).toString().should.be.equal(msgString)
-      decryptedBuffer.equals(msgBuffer).should.be.equal(true)
-    })
-    it('Decrypt with wrong secret', () => {
-      const keyPair = Crypto.generateKeyPair()
-
-      const encryptedString = Crypto.encryptData(msgString, keyPair.publicKey)
-      const encryptedBuffer = Crypto.encryptData(msgBuffer, keyPair.publicKey)
-
-      const decryptedString = Crypto.decryptData(secretKey, encryptedString)
-      const decryptedBuffer = Crypto.decryptData(secretKey, encryptedBuffer)
-      const isNull = decryptedBuffer === null && decryptedString === null
-      isNull.should.be.equal(true)
-    })
-  })
 })
