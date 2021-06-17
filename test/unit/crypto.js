@@ -60,26 +60,6 @@ describe('crypto', () => {
     })
   })
 
-  describe('encryptPassword', () => {
-    describe('generate a password encrypted key pair', () => {
-      const keyPair = Crypto.generateKeyPair(true)
-      const password = 'verysecret'
-
-      it('works for private keys', () => {
-        const privateBinary = keyPair.secretKey
-        const encryptedPrivate = Crypto.encryptPrivateKey(password, privateBinary)
-        const decryptedPrivate = Crypto.decryptPrivateKey(password, encryptedPrivate)
-        assert.deepEqual(decryptedPrivate, privateBinary)
-      })
-      it('works for public keys', () => {
-        const publicBinary = keyPair.publicKey
-        const encryptedPublic = Crypto.encryptPublicKey(password, publicBinary)
-        const decryptedPublic = Crypto.decryptPubKey(password, encryptedPublic)
-        assert.deepEqual(decryptedPublic, publicBinary)
-      })
-    })
-  })
-
   describe('encodeBase', () => {
     it('can be encoded and decoded', () => {
       const input = 'helloword010101023'
@@ -104,7 +84,7 @@ describe('crypto', () => {
     })
   })
 
-  describe('personal messages', () => {
+  describe('messages', () => {
     const message = 'test'
     const messageSignatureAsHex = 'c910daedceebb658f49ad862b2032e6b455143ebc1d698e9018ac4cf2d76f65fefda254893b0f56203b4cef1ff549f72ef155d58792fd52d0c1b6e210525e207'
     const messageSignature = Buffer.from(messageSignatureAsHex, 'hex')
@@ -115,24 +95,24 @@ describe('crypto', () => {
 
     describe('sign', () => {
       it('should produce correct signature of message', () => {
-        const s = Crypto.signPersonalMessage(message, privateKey)
+        const s = Crypto.signMessage(message, privateKey)
         expect(s).to.eql(messageSignature)
       })
 
       it('should produce correct signature of message with non-ASCII chars', () => {
-        const s = Crypto.signPersonalMessage(messageNonASCII, privateKey)
+        const s = Crypto.signMessage(messageNonASCII, privateKey)
         expect(s).to.eql(messageNonASCIISignature)
       })
     })
 
     describe('verify', () => {
       it('should verify message', () => {
-        const result = Crypto.verifyPersonalMessage(message, messageSignature, publicKey)
+        const result = Crypto.verifyMessage(message, messageSignature, publicKey)
         assert.isTrue(result)
       })
 
       it('should verify message with non-ASCII chars', () => {
-        const result = Crypto.verifyPersonalMessage(messageNonASCII, messageNonASCIISignature, publicKey)
+        const result = Crypto.verifyMessage(messageNonASCII, messageNonASCIISignature, publicKey)
         assert.isTrue(result)
       })
     })
@@ -149,12 +129,6 @@ describe('crypto', () => {
     salt1.should.be.a('Number')
     salt2.should.be.a('Number')
     salt1.should.not.be.equal(salt2)
-  })
-  it('Convert base58Check address to hex', () => {
-    const address = 'ak_Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm'
-    const hex = Crypto.addressToHex(address)
-    const fromHexAddress = 'ak_' + Crypto.encodeBase58Check(Buffer.from(hex.slice(2), 'hex'))
-    fromHexAddress.should.be.equal(address)
   })
   it('Can produce tx hash', () => {
     const rlpEncodedTx = unpackTx(txRaw).rlpEncoded

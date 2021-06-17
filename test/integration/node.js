@@ -21,7 +21,7 @@ import { url, internalUrl, ignoreVersion } from './'
 import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
 import * as R from 'ramda'
-import { NodePool } from '../../src/node-pool'
+import NodePool from '../../src/node-pool'
 
 describe('Node client', function () {
   let client

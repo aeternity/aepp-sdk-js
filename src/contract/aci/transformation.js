@@ -1,9 +1,9 @@
 import Joi from 'joi-browser'
-import { isAeAddress, isHex } from '../../utils/string'
+import { isHex } from '../../utils/string'
 import { toBytes } from '../../utils/bytes'
 import { decode } from '../../tx/builder/helpers'
 import { parseBigNumber } from '../../utils/bignumber'
-import { addressFromDecimal, hash } from '../../utils/crypto'
+import { isAddressValid, addressFromDecimal, hash } from '../../utils/crypto'
 
 export const SOPHIA_TYPES = [
   'int',
@@ -199,7 +199,7 @@ export function transform (type, value, { bindings } = {}) {
     case SOPHIA_TYPES.signature:
       if (typeof value === 'string') {
         if (isHex(value)) return `#${value}`
-        if (isAeAddress(value)) return `#${decode(value).toString('hex')}`
+        if (isAddressValid(value)) return `#${decode(value).toString('hex')}`
       }
       return `#${Buffer.from(value).toString('hex')}`
     case SOPHIA_TYPES.record:
@@ -417,7 +417,7 @@ const JoiBinary = Joi.extend((joi) => ({
   base: joi.any(),
   pre (value, state, options) {
     if (options.convert && typeof value === 'string') {
-      if (isAeAddress(value)) {
+      if (isAddressValid(value)) {
         return decode(value)
       }
       try {

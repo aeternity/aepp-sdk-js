@@ -14,34 +14,18 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-
-import '../'
-import { describe, it } from 'mocha'
 import { expect } from 'chai'
-import { traverseKeys } from '../../src/utils/other'
+import { describe, it } from 'mocha'
+import semverSatisfies from '../../src/utils/semver-satisfies'
 
-describe('Other utils', function () {
-  it('walks through deep structures', () => {
-    const input = {
-      a: 1,
-      b: {
-        ba: 2
-      },
-      c: [3, {
-        ca: 4
-      }],
-      d: null
-    }
-
-    expect(traverseKeys(k => 'x' + k, input)).to.deep.equal({
-      xa: 1,
-      xb: {
-        xba: 2
-      },
-      xc: [3, {
-        xca: 4
-      }],
-      xd: null
-    })
+describe('semverSatisfies', () => {
+  it('returns a proper value', () => {
+    expect(semverSatisfies('1.0.0', '1.0.0', '1.0.1')).to.equal(true)
+    expect(semverSatisfies('1.0.0', '1.0.1', '1.0.2')).to.equal(false)
+    expect(semverSatisfies('2.4.0', '1.4.0', '3.0.0')).to.equal(true)
+    expect(semverSatisfies('2.4.0', '2.5.0', '3.0.0')).to.equal(false)
+    expect(semverSatisfies('1.9.0', '2.0.0', '3.0.0')).to.equal(false)
+    expect(semverSatisfies('1.9.0', '2.0.0', '3.0.0')).to.equal(false)
+    expect(semverSatisfies('5.0.0', '3.0.0', '5.0.0')).to.equal(false)
   })
 })

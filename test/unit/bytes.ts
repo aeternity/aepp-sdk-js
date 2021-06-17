@@ -19,25 +19,14 @@ import '../'
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
 import BigNumber from 'bignumber.js'
-import { leftPad, rightPad, toBytes, bigNumberToByteArray } from '../../src/utils/bytes'
-import { isBase64, snakeOrKebabToPascal, snakeToPascal, pascalToSnake } from '../../src/utils/string'
+import { toBytes, bigNumberToByteArray } from '../../src/utils/bytes'
+import { isBase64, snakeToPascal, pascalToSnake } from '../../src/utils/string'
 
 describe('Bytes', function () {
   const bytes = Buffer.from('hello')
 
-  it('left/right pad', () => {
-    rightPad(7, bytes).should.be.eql(Buffer.from([...bytes, 0, 0]))
-    rightPad(4, bytes).should.be.eql(bytes)
-    leftPad(7, bytes).should.be.eql(Buffer.from([0, 0, ...bytes]))
-    leftPad(4, bytes).should.be.eql(bytes)
-  })
-
-  it('toBytes: invalid input', () => {
-    try {
-      toBytes(true)
-    } catch (e) {
-      e.message.should.be.equal('Byte serialization not supported')
-    }
+  it('toBytes: converts null to empty array', () => {
+    toBytes(null).should.be.eql(Buffer.from([]))
   })
 
   it('is base64 string', () => isBase64(bytes.toString('base64')).should.be.equal(true))
@@ -45,9 +34,6 @@ describe('Bytes', function () {
   it('is not base64 string', () => isBase64('hello').should.be.equal(false))
 
   const testCase = 'test_test-testTest'
-
-  it('converts snake or kebab to pascal case', () => snakeOrKebabToPascal(testCase)
-    .should.be.equal('testTestTestTest'))
 
   it('converts snake to pascal case', () => snakeToPascal(testCase)
     .should.be.equal('testTest-testTest'))

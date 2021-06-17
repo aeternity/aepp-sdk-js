@@ -18,7 +18,7 @@ import {
   TX_TYPE
 } from './builder/schema'
 import { buildTxHash, calculateFee, unpackTx } from './builder'
-import { NodePool } from '../node-pool'
+import NodePool from '../node-pool'
 
 /**
  * Transaction validator
