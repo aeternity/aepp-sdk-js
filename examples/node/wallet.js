@@ -1,8 +1,4 @@
 #!/usr/bin/env node
-// # Simple AE Token Spending Script
-//
-// This script shows how to use the SDK to send AE to other addresses.
-//
 /*
  * ISC License (ISC)
  * Copyright (c) 2021 aeternity developers
@@ -19,6 +15,10 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
+
+// # Simple AE Token Spending Script
+//
+// This script shows how to use the SDK to send AE to other addresses.
 
 // We'll need the main client module `Sdk` in the `Universal` flavor from the SDK.
 const { Universal: Sdk, Node, MemoryAccount } = require('../../dist/aepp-sdk')

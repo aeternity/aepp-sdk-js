@@ -1,10 +1,8 @@
 # JavaScript SDK Documentation
 
-## ⚠️ Disclaimer
-We're doing our best to keep the documentation up to date, but [please let us know if you see some out-of-date file](https://github.com/aeternity/aepp-sdk-js/issues/new). Thanks!
-
 ## Intro
 There are three different ways of incorporating aepp-sdk-js into your project, depending on the particular scenario:
+
 * ES Modules at `es/` (recommended)
 * Node.js bundle at `dist/aepp-sdk.js`
 * Browser bundle at `dist/aepp-sdk.browser.js`
@@ -15,17 +13,17 @@ Also, please be aware that using `require` instead of module loader syntax
 `default`, which is reflected below in the code examples. This is due to a
 recent change in [Babel] compilation and fully compliant with the standard.
 
-### Flavors / Entry Points
+### Stamps (composable factory functions)
 
-The recommended approach to use aepp-sdk is to import one of the following _Ae
-Factories_ based on the specific use case:
+Currently the SDK is making heavy use of [Stamps](https://stampit.js.org/essentials/what-is-a-stamp) that compose certain functionalities:
+
+* [`Universal`](api/ae/universal.md): for all the typical use cases
 
 * [`RpcWallet`](api/ae/wallet.md): for **Wallet**'s focused development
 * [`Contract`](api/ae/contract.md): for **Contract**'s focused development
-* [`RpcAepp`](api/ae/aepp.md): for **Web Aepp**'s focused development ⚠️ **_No Wallet support_**
+* [`RpcAepp`](api/ae/aepp.md): for **Web Aepp**'s focused development
 * [`Aens`](api/ae/aens.md): for **AENs**' focused development
 * [`Oracle`](api/ae/oracle.md): for **Oracle**'s focused development
-* [`Universal`](api/ae/universal.md): for **Universal** development (includes all SDK features)
 
 In order to cater more specific needs, it is recommended to refer to the
 [contributing Docs](contrib/README.md).

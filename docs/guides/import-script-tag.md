@@ -12,10 +12,12 @@ In case you're not using any JS bundling/compilation technique, the SDK can also
 ```html
 <script src="https://unpkg.com/@aeternity/aepp-sdk@VERSION/dist/aepp-sdk.browser-script.js"></script>
 ```
-...where `VERSION` is the version number of the SDK you want to use (eg. `4.0.1`).
+...where `VERSION` is the version number of the SDK you want to use (eg. `8.1.0`).
 
 ## Browser `<script>` tag
-The bundle will assign the SDK to a global `var` called `Ae`, and you can use it like so:
+The bundle will assign the SDK to a global variable called `Ae` that makes all functionalities of the SDK accessible.
+
+Usage:
 
 ```html
 <!doctype html>
@@ -29,7 +31,7 @@ The bundle will assign the SDK to a global `var` called `Ae`, and you can use it
   <script type="text/javascript">
     Ae.Node({ url: 'https://testnet.aeternity.io' }).then(node => {
         Ae.Universal({
-              nodes: [{ name: 'local', instance: node }]
+              nodes: [{ name: 'testnet', instance: node }]
             }).then(aeInstance => {
               aeInstance.height().then(height => {
                 console.log("Current Block Height:" + height)
@@ -42,4 +44,4 @@ The bundle will assign the SDK to a global `var` called `Ae`, and you can use it
 ```
 
 ## CodePen Example
-Immediately [**START**](https://codepen.io/ricricucit/pen/JQWRNb) playing with our latest SDK release in Codepen.
+Immediately [**START**](https://codepen.io/ricricucit/pen/JQWRNb) playing with our latest SDK release on CodePen.

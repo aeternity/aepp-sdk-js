@@ -3,8 +3,43 @@ plugins:
   - search
   - mkdocs-simple-hooks:
       hooks:
-        on_pre_build: "docs.hooks:pre_build"
+        on_pre_build: 'docs.hooks:pre_build'
 repo_url: 'https://github.com/aeternity/aepp-sdk-js'
+edit_uri: ''
+
+theme:
+  name: material
+  language: en
+  palette:
+    - scheme: default
+      primary: pink
+      accent: pink
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - scheme: slate
+      primary: pink
+      accent: pink
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - content.tabs.link
+    # - navigation.instant
+    # - navigation.sections
+    # - navigation.tabs
+    # - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+  
+  # Don't include MkDocs' JavaScript
+  include_search_page: false
+  search_index_only: true
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
 
 nav:
   - Overview: README.md
@@ -80,9 +115,8 @@ nav:
   - Examples:
     - NodeJS:
       - Setup: guides/import-nodejs.md
-      - examples/node/aecontract.md
-      - examples/node/aecrypto.md
-      - examples/node/aewallet.md
+      - examples/node/wallet.md
+      - examples/node/contract.md
     - JS:
       - guides/import-script-tag.md
       - guides/import-vuejs.md
