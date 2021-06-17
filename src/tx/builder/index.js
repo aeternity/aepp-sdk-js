@@ -131,6 +131,8 @@ function serializeField (value, type, prefix) {
       return toBytes(value)
     case FIELD_TYPES.pointers:
       return buildPointers(value)
+    case FIELD_TYPES.rlpBinary:
+      return value.rlpEncoded ?? value
     case FIELD_TYPES.mptrees:
       return value.map(t => t.serialize())
     case FIELD_TYPES.ctVersion:
