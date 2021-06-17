@@ -116,13 +116,13 @@ const verifySchema = (schema, data) => {
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/validator
  *
- * @param {String} txHash Base64Check transaction hash
+ * @param {String} transaction Base64Check-encoded transaction
  * @param {Object} [options={}] Options
  * @param {String} [options.networkId] networkId Use in signature verification
  * @return {Promise<Object>} Object with verification errors and warnings
  */
-async function unpackAndVerify (txHash, { networkId } = {}) {
-  const { tx: unpackedTx, rlpEncoded, txType } = unpackTx(txHash)
+async function unpackAndVerify (transaction, { networkId } = {}) {
+  const { tx: unpackedTx, rlpEncoded, txType } = unpackTx(transaction)
 
   if (+unpackedTx.tag === OBJECT_TAG_SIGNED_TRANSACTION) {
     const { txType, tx } = unpackedTx.encodedTx
