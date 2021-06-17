@@ -73,10 +73,10 @@
 </template>
 
 <script>
-  import { MemoryAccount, RpcWallet, Node, Crypto } from 'AE_SDK_MODULES'
-  import BrowserWindowMessageConnection
-    from 'AE_SDK_MODULES/utils/aepp-wallet-communication/connection/browser-window-message'
-  import { METHODS } from 'AE_SDK_MODULES/utils/aepp-wallet-communication/schema'
+  import {
+    MemoryAccount, RpcWallet, Node, Crypto,
+    BrowserWindowMessageConnection, AeppWalletSchema
+  } from 'AE_SDK_MODULES'
 
   const errorAsField = async fn => {
     try {
@@ -125,7 +125,7 @@
       },
       disconnect () {
         Object.values(this.client.rpcClients).forEach(client => {
-          client.sendMessage({ method: METHODS.closeConnection }, true)
+          client.sendMessage({ method: AeppWalletSchema.METHODS.closeConnection }, true)
           client.disconnect()
         })
       },

@@ -21,7 +21,7 @@ import { url, internalUrl, ignoreVersion } from './'
 import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
 import * as R from 'ramda'
-import { NodePool } from '../../src/node-pool'
+import NodePool from '../../src/node-pool'
 
 describe('Node client', function () {
   let client
@@ -59,7 +59,7 @@ describe('Node client', function () {
       try {
         node.addNode('test', {})
       } catch (e) {
-        e.message.should.be.equal('Invalid node instance object')
+        e.message.should.be.equal('"node" at position 0 fails because [child "instance" fails because [child "api" fails because ["api" is required]]]')
       }
     })
     it('Throw error on get network without node ', async () => {

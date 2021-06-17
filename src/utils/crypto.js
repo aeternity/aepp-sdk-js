@@ -22,41 +22,17 @@
  */
 
 import bs58check from 'bs58check'
-import { decode as rlpDecode, encode as rlpEncode } from 'rlp'
 import ed2curve from 'ed2curve'
 import nacl from 'tweetnacl'
 import aesjs from 'aes-js'
 import shajs from 'sha.js'
 
-import { leftPad, rightPad, str2buf, toBytes } from './bytes'
-import { decode as decodeNode } from '../tx/builder/helpers'
+import { str2buf, toBytes } from './bytes'
 import { hash } from './crypto-ts'
 
 export * from './crypto-ts'
 
 const Ecb = aesjs.ModeOfOperation.ecb
-
-export const ADDRESS_FORMAT = {
-  sophia: 1,
-  api: 2,
-  raw: 3
-}
-
-/**
- * Format account address
- * @rtype (format: String, address: String) => tx: Promise[String]
- * @param {String} format - Format type
- * @param {String} address - Base58check account address
- * @return {String} Formatted address
- */
-export function formatAddress (format = ADDRESS_FORMAT.api, address) {
-  switch (format) {
-    case ADDRESS_FORMAT.api:
-      return address
-    case ADDRESS_FORMAT.sophia:
-      return `0x${decodeNode(address, 'ak').toString('hex')}`
-  }
-}
 
 /**
  * Generate address from secret key
@@ -78,23 +54,12 @@ export function getAddressFromPriv (secret) {
  * @return {Boolean} valid
  */
 export function isAddressValid (address, prefix = 'ak') {
-  let isValid
+  if (typeof address !== 'string') return false
   try {
-    isValid = decodeBase58Check(assertedType(address, prefix)).length === 32
+    return decodeBase58Check(assertedType(address, prefix)).length === 32
   } catch (e) {
-    isValid = false
+    return false
   }
-  return isValid
-}
-
-/**
- * Convert base58Check address to hex string
- * @rtype (base58CheckAddress: String) => hexAddress: String
- * @param {String} base58CheckAddress - Address
- * @return {String} Hex string
- */
-export function addressToHex (base58CheckAddress) {
-  return `0x${decodeBase58Check(assertedType(base58CheckAddress, 'ak')).toString('hex')}`
 }
 
 /**
@@ -187,25 +152,6 @@ export function decodeBase58Check (str) {
 }
 
 /**
- * Conver hex string to Uint8Array
- * @rtype (str: String) => Uint8Array
- * @param {String} str - Data to conver
- * @return {Uint8Array} - converted data
- */
-export function hexStringToByte (str) {
-  if (!str) {
-    return new Uint8Array()
-  }
-
-  const a = []
-  for (let i = 0, len = str.length; i < len; i += 2) {
-    a.push(parseInt(str.substr(i, 2), 16))
-  }
-
-  return new Uint8Array(a)
-}
-
-/**
  * Converts a positive integer to the smallest possible
  * representation in a binary digit representation
  * @rtype (value: Number) => Buffer
@@ -271,28 +217,6 @@ export function generateKeyPair (raw = false) {
 }
 
 /**
- * Encrypt given public key using `password`
- * @rtype (password: String, binaryKey: Buffer) => Uint8Array
- * @param {String} password - Password to encrypt with
- * @param {Buffer} binaryKey - Key to encrypt
- * @return {Uint8Array} Encrypted key
- */
-export function encryptPublicKey (password, binaryKey) {
-  return encryptKey(password, rightPad(32, binaryKey))
-}
-
-/**
- * Encrypt given private key using `password`
- * @rtype (password: String, binaryKey: Buffer) => Uint8Array
- * @param {String} password - Password to encrypt with
- * @param {Buffer} binaryKey - Key to encrypt
- * @return {Uint8Array} Encrypted key
- */
-export function encryptPrivateKey (password, binaryKey) {
-  return encryptKey(password, leftPad(64, binaryKey))
-}
-
-/**
  * Encrypt given data using `password`
  * @rtype (password: String, binaryData: Buffer) => Uint8Array
  * @param {String} password - Password to encrypt with
@@ -344,37 +268,19 @@ export function verify (str, signature, publicKey) {
   return nacl.sign.detached.verify(new Uint8Array(str), signature, publicKey)
 }
 
-/**
- * @typedef {Array} Transaction
- * @rtype Transaction: [tag: Buffer, version: Buffer, [signature: Buffer], data: Buffer]
- */
-
-/**
- * Prepare a transaction for posting to the blockchain
- * @rtype (signature: Buffer | String, data: Buffer) => Transaction
- * @param {Buffer} signature - Signature of `data`
- * @param {Buffer} data - Transaction data
- * @return {Transaction} Transaction
- */
-export function prepareTx (signature, data) {
-  // the signed tx deserializer expects a 4-tuple:
-  // <tag, version, signatures_array, binary_tx>
-  return [Buffer.from([11]), Buffer.from([1]), [Buffer.from(signature)], data]
-}
-
-export function personalMessageToBinary (message) {
+export function messageToHash (message) {
   const p = Buffer.from('aeternity Signed Message:\n', 'utf8')
   const msg = Buffer.from(message, 'utf8')
   if (msg.length >= 0xFD) throw new Error('message too long')
-  return Buffer.concat([Buffer.from([p.length]), p, Buffer.from([msg.length]), msg])
+  return hash(Buffer.concat([Buffer.from([p.length]), p, Buffer.from([msg.length]), msg]))
 }
 
-export function signPersonalMessage (message, privateKey) {
-  return sign(hash(personalMessageToBinary(message)), privateKey)
+export function signMessage (message, privateKey) {
+  return sign(messageToHash(message), privateKey)
 }
 
-export function verifyPersonalMessage (str, signature, publicKey) {
-  return verify(hash(personalMessageToBinary(str)), signature, publicKey)
+export function verifyMessage (str, signature, publicKey) {
+  return verify(messageToHash(str), signature, publicKey)
 }
 
 /**
@@ -391,40 +297,6 @@ export function aeEncodeKey (binaryKey) {
 }
 
 /**
- * Generate a new key pair using {@link generateKeyPair} and encrypt it using `password`
- * @rtype (password: String) => {publicKey: Uint8Array, secretKey: Uint8Array}
- * @param {String} password - Password to encrypt with
- * @return {Object} Encrypted key pair
- */
-export function generateSaveWallet (password) {
-  const keys = generateKeyPair(true)
-  return {
-    publicKey: encryptPublicKey(password, keys.publicKey),
-    secretKey: encryptPrivateKey(password, keys.secretKey)
-  }
-}
-
-/**
- * Decrypt an encrypted private key
- * @rtype (password: String, encrypted: Buffer) => Buffer
- * @param {String} password - Password to decrypt with
- * @return {Buffer} Decrypted key
- */
-export function decryptPrivateKey (password, encrypted) {
-  return decryptKey(password, encrypted)
-}
-
-/**
- * Decrypt an encrypted public key
- * @rtype (password: String, encrypted: Buffer) => Buffer
- * @param {String} password - Password to decrypt with
- * @return {Buffer} Decrypted key
- */
-export function decryptPubKey (password, encrypted) {
-  return decryptKey(password, encrypted).slice(0, 65)
-}
-
-/**
  * Assert encoded type and return its payload
  * @rtype (data: String, type: String) => String, throws: Error
  * @param {String} data - ae data
@@ -436,28 +308,6 @@ export function assertedType (data, type, omitError) {
   if (RegExp(`^${type}_.+$`).test(data)) return data.split('_')[1]
   else if (omitError) return false
   else throw new Error(`Data doesn't match expected type ${type}`)
-}
-
-/**
- * Decode a transaction
- * @rtype (txHash: String) => Buffer
- * @param {String} encodedTx - Encoded transaction
- * @return {Buffer} Decoded transaction
- */
-export function decodeTx (encodedTx) {
-  return rlpDecode(Buffer.from(decodeBase64Check(assertedType(encodedTx, 'tx'))))
-}
-
-/**
- * Encode a transaction
- * @rtype (txData: Transaction) => String
- * @param {Transaction} txData - Transaction to encode
- * @return {String} Encoded transaction
- */
-export function encodeTx (txData) {
-  const encodedTxData = rlpEncode(txData)
-  const encodedTx = encodeBase64Check(encodedTxData)
-  return `tx_${encodedTx}`
 }
 
 /**

@@ -1,9 +1,17 @@
 import { snakeToPascal, pascalToSnake } from './string'
 
-export const pause = duration => new Promise(resolve => setTimeout(resolve, duration))
+export const pause = async (duration: number): Promise<undefined> =>
+  await new Promise(resolve => setTimeout(resolve, duration))
 
-export const mapObject = (object, fn) => Object.fromEntries(Object.entries(object).map(fn))
-export const filterObject = (object, fn) => Object.fromEntries(Object.entries(object).filter(fn))
+export const mapObject = (
+  object: object,
+  fn: (value: [string, any], index: number, array: Array<[string, any]>) => Array<[string, any]>
+): object => Object.fromEntries(Object.entries(object).map(fn))
+
+export const filterObject = (
+  object: object,
+  fn: (value: [string, any], index: number, array: Array<[string, any]>) => boolean
+): object => Object.fromEntries(Object.entries(object).filter(fn))
 
 /**
  * Key traversal metafunction
@@ -14,10 +22,12 @@ export const filterObject = (object, fn) => Object.fromEntries(Object.entries(ob
  * @param {Object} object - Object to traverse
  * @return {Object} Transformed object
  */
-export const traverseKeys = (fn, object) => {
+export const traverseKeys = (fn: Function, object: any): any => {
   if (typeof object !== 'object' || object === null) return object
   if (Array.isArray(object)) return object.map(i => traverseKeys(fn, i))
-  return mapObject(object, ([key, value]) => [fn(key), traverseKeys(fn, value)])
+  return mapObject(object, ([key, value]: [string, any]) => [
+    fn(key), traverseKeys(fn, value)
+  ])
 }
 
 /**

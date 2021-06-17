@@ -6,7 +6,7 @@ import MemoryAccount from '../../src/account/memory'
 
 const WARNINGS = [...SIGNATURE_VERIFICATION_SCHEMA, ...BASE_VERIFICATION_SCHEMA].reduce((acc, [msg, v, error]) => error.type === 'warning' ? [...acc, error.txKey] : acc, [])
 const ERRORS = [...BASE_VERIFICATION_SCHEMA, ...SIGNATURE_VERIFICATION_SCHEMA].reduce((acc, [msg, v, error]) => error.type === 'error' ? [...acc, error.txKey] : acc, [])
-const channelCreate = 'tx_+NkLAfhCuECIIeWttRUiZ32uriBdmM1t+dCg90KuG2ABxOiuXqzpAul6uTWvsyfx3EFJDah6trudrityh+6XSX3mkPEimhgGuJH4jzIBoQELtO15J/l7UeG8teE0DRIzWyorEsi8UiHWPEvLOdQeYYgbwW1nTsgAAKEB6bv2BOYRtUYKOzmZ6Xcbb2BBfXPOfFUZ4S9+EnoSJcqIG8FtZ07IAACIAWNFeF2KAAAKAIYSMJzlQADAoDBrIcoop8JfZ4HOD9p3nDTiNthj7jjl+ArdHwEMUrvQgitwOr/v3Q=='
+const channelCreate = 'tx_+IgyAqEBA36iFX3O+BMXMZJbffeT423KLpEuFsISUTsGu8Sb10eJBWvHXi1jEAAAoQGTnVZ1Jow5NGyBOg3NAf+ie3mV8qDj/wBwyKBHFNdhT4kFa8deLWMQAAAAAQCGECcSfcAAwMCgGAbROhx5lfoSkXsM5MQLw+EAWei3pcUGj/zWSO8RGkAKfIRASg=='
 
 describe('Verify Transaction', function () {
   let client
@@ -51,19 +51,14 @@ describe('Verify Transaction', function () {
 
     await client.addAccount(MemoryAccount({ keypair: generateKeyPair() }), { select: true })
     // Sign using another account
-    const signedTxHash = await client.signTransaction(spendTx)
-    const signedTxFull = await client.signTransaction(spendTx, { signHash: false })
+    const signedTx = await client.signTransaction(spendTx)
 
-    const checkErrors = async (signedTx) => {
-      const { validation } = await client.unpackAndVerify(signedTx)
-      const error = validation
-        .filter(({ type }) => type === 'error') // exclude contract vm/abi, has separated test for it
-        .map(({ txKey }) => txKey)
+    const { validation } = await client.unpackAndVerify(signedTx)
+    const error = validation
+      .filter(({ type }) => type === 'error') // exclude contract vm/abi, has separated test for it
+      .map(({ txKey }) => txKey)
 
-      ERRORS.filter(e => e !== 'gasPrice' && e !== 'ctVersion').should.be.eql(error)
-    }
-    await checkErrors(signedTxHash)
-    await checkErrors(signedTxFull)
+    ERRORS.filter(e => e !== 'gasPrice' && e !== 'ctVersion').should.be.eql(error)
   })
   it('verify transaction before broadcast', async () => {
     client = await getSdk()

@@ -1,0 +1,59 @@
+name: Test, build, and deploy
+on: [push, pull_request]
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - if: github.ref != 'refs/heads/develop'
+        uses: actions/checkout@v2
+        with:
+          ref: develop
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 100
+      - if: github.ref != 'refs/heads/develop'
+        run: git branch develop origin/develop
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+      - uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+
+      - run: npm ci --ignore-scripts
+      - run: npm run lint
+      - run: npm run build
+      - run: npm run test:unit
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip3
+          key: ${{ runner.os }}-pip-${{ hashFiles('docs/requirements.txt') }}
+      - run: pip3 install -r docs/requirements.txt
+      - run: mkdocs build
+
+      - run: docker-compose up -d
+      - name: Ensure that node is running
+        run: |
+          while [[ `curl -s -o /dev/null -w %{http_code} localhost:3013/api` != 200 ]]; do
+            sleep 0.2;
+          done
+
+      - run: npm run test:integration:channel,accounts
+      - run: npm run test:integration:contract,chain
+      - run: npm run test:integration:else
+      - run: npm run report-coverage
+        if: always()
+      - run: docker-compose logs
+        if: always()
+
+      - uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/master'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs

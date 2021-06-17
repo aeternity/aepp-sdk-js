@@ -62,7 +62,7 @@ export const RPC_STATUS = {
 }
 
 export const ERRORS = {
-  broadcastFailde: (error = {}) => ({
+  broadcastFailed: (error = {}) => ({
     code: 3,
     data: error,
     message: 'Broadcast failed'

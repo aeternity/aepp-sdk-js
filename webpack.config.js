@@ -1,9 +1,9 @@
+const webpack = require('webpack')
 const path = require('path')
-const R = require('ramda')
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 
 function configure (filename, opts = {}) {
-  return (env, argv) => R.mergeDeepRight({
+  return (env, argv) => ({
     entry: './src/index.js',
     mode: 'development', // automatically overriden by production flag
     devtool: argv.mode === 'production' ? 'source-map' : 'eval-source-map',
@@ -13,12 +13,6 @@ function configure (filename, opts = {}) {
           test: /\.(js|ts)$/,
           include: path.resolve(__dirname, 'src'),
           loader: 'babel-loader'
-        },
-        {
-          test: /\.js$/,
-          include: path.resolve(__dirname, 'node_modules/rlp'),
-          loader: 'babel-loader',
-          options: { presets: ['@babel/preset-env'] }
         }
       ]
     },
@@ -29,20 +23,29 @@ function configure (filename, opts = {}) {
         path: require.resolve('path-browserify'),
         stream: require.resolve('stream-browserify'),
         crypto: require.resolve('crypto-browserify')
+      },
+      alias: {
+        'js-yaml': false
       }
     },
-    plugins: argv.report ? [
-      new BundleAnalyzerPlugin({
+    plugins: [
+      ...opts.target === 'node' ? [] : [new webpack.ProvidePlugin({
+        process: 'process',
+        Buffer: ['buffer', 'Buffer']
+      })],
+      ...argv.report ? [new BundleAnalyzerPlugin({
         analyzerMode: 'static',
         reportFilename: filename + '.html',
         openAnalyzer: false
-      })
-    ] : [],
+      })] : []
+    ],
     output: {
       path: path.resolve(__dirname, 'dist'),
       filename,
-      library: 'Ae',
-      libraryTarget: 'umd'
+      library: {
+        name: 'Ae',
+        type: 'umd'
+      }
     },
     externals: Object
       .keys(require('./package').dependencies)
@@ -52,8 +55,9 @@ function configure (filename, opts = {}) {
           commonjs: dependency,
           commonjs2: dependency
         }
-      }), {})
-  }, opts)
+      }), {}),
+    ...opts
+  })
 }
 
 module.exports = [
