@@ -116,11 +116,9 @@ const REQUESTS = {
         }
         try {
           return {
-            result: {
-              ...returnSigned
-                ? { signedTransaction: await instance.signTransaction(rawTx || tx, { onAccount: onAcc }) }
-                : { transactionHash: await instance.send(rawTx || tx, { onAccount: onAcc, verify: false }) }
-            }
+            result: returnSigned
+              ? { signedTransaction: await instance.signTransaction(rawTx || tx, { onAccount: onAcc }) }
+              : { transactionHash: await instance.send(rawTx || tx, { onAccount: onAcc, verify: false }) }
           }
         } catch (e) {
           if (!returnSigned) {
