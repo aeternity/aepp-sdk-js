@@ -1,41 +1,69 @@
-# Contract Usage
+# Contracts
 
-To have ability to interact with Aeternity Smart Contracts you need:
- - Compiler
- - Node
- - SDK
- 
-## Account Management
+The SDK needs to interact with following components in order to enable Smart Contract interactions on the aeternity blockchain:
 
+- [aeternity](https://github.com/aeternity/aeternity) (host your own one or use the public testnet node at `https://testnet.aeternity.io`)
+- [aesophia_http](https://github.com/aeternity/aesophia_http) (host your own one or use the public compiler at `https://compiler.aepps.com`)
+
+Note:
+
+- For production deployments you should ***always*** host these services by yourself.
+
+## 1. Specify imports
 ```js
-const { Universal: Ae, MemoryAccount, Node } = require('@aeternity/aepp-SDK')
-
-// same with async
-const main = async () => {
-  const node = await Node({ url: NODE_URL, internalUrl: NODE_INTERNAL_URL })
-  const acc = MemoryAccount({ keypair: KEYPAIR })
-
-  const SDKInstance = await Ae({
-      nodes: [
-        { name: 'testNet', instance: node },
-      ],
-      compilerUrl: 'COMPILER_URL',
-      accounts: [acc],
-      address: KEYPAIR.publicKey
-  })
-  const height = await client.height()
-  console.log('Current Block Height', height)
-  
-  // Contract ACI. First of all we need to create a contract object
-  // contractAddress is optional
-  const contractObject = await SDKInstance.getContractInstance(CONTRACT_SOURCE, { contractAddress })
-  // Create contract object for contract which have external dependencies
-  const contractObject = await SDKInstance.getContractInstance(CONTRACT_SOURCE, { contractAddress, filesystem })
-  // In this step SDK will call the compiler and get the ACI for provided source code
-  // base on ACI SDK will generate the `js functions` for each of your SC method
-  // which you will find in `contractObject.methods` object
+// node.js import
+const { Universal, MemoryAccount, Node } = require('@aeternity/aepp-sdk')
+// ES import
+import { Universal, MemoryAccount, Node } from '@aeternity/aepp-sdk'
 ```
-## Deploying Smart Contract
+
+## 2. Initialize the SDK providing an account
+When initializing the SDK you need to provide an account which will be used to sign transactions like `ContractCreateTx` and `ContractCallTx` that will be broadcasted to the network.
+
+```js 
+const node = await Node({
+  url: 'https://testnet.aeternity.io' // ideally host your own node
+})
+const account = MemoryAccount({
+  // provide a valid keypair with your secretKey and publicKey
+  keypair: { secretKey: SECRET_KEY, publicKey: PUBLIC_KEY }
+})
+
+const client = await Universal({
+  nodes: [
+    { name: 'testnet', instance: node }
+  ],
+  compilerUrl: 'https://compiler.aepps.com', // ideally host your own compiler
+  accounts: [account]
+})
+
+```
+
+Note:
+
+- You can provide multiple accounts to the SDK
+- For each transaction you can choose a specific account to use for signing (by default the first account will be used)
+
+## 3. Initialize the contract instance
+```js
+const CONTRACT_SOURCE = ... // source code of the contract
+const contractInstance = await client.getContractInstance(CONTRACT_SOURCE)
+```
+
+Note:
+
+- If your contract includes external dependencies you should initialize the contract using:
+  ```js
+  const filesystem = ... // key-value map with name of the include as key and source code of the include as value
+  const contractInstance = await client.getContractInstance(CONTRACT_SOURCE, { filesystem })
+  ```
+- If your contract is already deployed and you know the contract address you can initialize the contract instance using:
+  ```js
+  const contractAddress = ... // the address of the contract
+  const contractInstance = await client.getContractInstance(CONTRACT_SOURCE, { contractAddress })
+  ```
+
+## 4. Deploy the contract
 Now we want to deploy our SC with init function like:
   `stateful function init(n: int) : state => { count: n }`
   ```js
