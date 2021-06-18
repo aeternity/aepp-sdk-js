@@ -1,3 +1,48 @@
+# Changelog
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+## [8.2.0](https://github.com/aeternity/aepp-sdk-js/compare/8.1.0...v8.2.0) (2021-06-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* **crypto:** remove outdated generateSaveWallet function
+* **crypto:** remove unused prepareTx, encodeTx, decodeTx functions
+* **crypto:** remove unused hexStringToByte function
+* **crypto:** rename messageToBinary to messageToHash adding hashing
+* **crypto:** drop extra "personal" from message functions
+* **crypto:** remove unused formatAddress function
+* **crypto:** remove unused addressToHex function
+* **node-pool:** inline helpers, export by default
+* **string:** use isAddressValid instead of isAeAddress
+* **string:** remove unused snakeOrKebabToPascal function
+* drop outdated protocols and transactions schemas
+* drop compatibility with node@5
+
+### Bug Fixes
+
+* export aepp-wallet-communication ([d5d741c](https://github.com/aeternity/aepp-sdk-js/commit/d5d741cfd71c757f1b3e55e6708fb589c8ed6136))
+* ponyfill `Buffer` in browser ([953bf08](https://github.com/aeternity/aepp-sdk-js/commit/953bf0845bd64731cd57ed152fed67575120a276))
+* ponyfill `process` in browser ([798ab63](https://github.com/aeternity/aepp-sdk-js/commit/798ab63d0f3ebd3648be4bfce88b0b3d38013e6e))
+* **rlp:** import as it is ([736b0f5](https://github.com/aeternity/aepp-sdk-js/commit/736b0f5b8a4cfb39c76c2dc57880c234b804a8e2))
+* typo name of broadcast failed error generator ([ae7e823](https://github.com/aeternity/aepp-sdk-js/commit/ae7e8238c378e0aa2095328577ef0ce2bd518e49))
+* **examlple-aepp:** open only when ready to accept connection ([4872eb9](https://github.com/aeternity/aepp-sdk-js/commit/4872eb979330f1676241dfefc434c0eeafcf5eab))
+
+
+* **crypto:** drop extra "personal" from message functions ([34288cb](https://github.com/aeternity/aepp-sdk-js/commit/34288cb9adb443d8bd44ba6ddc93edf4de37349a))
+* **crypto:** remove outdated generateSaveWallet function ([37298be](https://github.com/aeternity/aepp-sdk-js/commit/37298be567d7065e06904cb0d7d5a01f649131fb))
+* **crypto:** remove unused addressToHex function ([93f9def](https://github.com/aeternity/aepp-sdk-js/commit/93f9def0e90bcc20641aab464f93ddcedd1d1aa2))
+* **crypto:** remove unused formatAddress function ([a5d4b62](https://github.com/aeternity/aepp-sdk-js/commit/a5d4b6263d45edf0e454addfe1e96b4741b46db3))
+* **crypto:** remove unused hexStringToByte function ([ed39a76](https://github.com/aeternity/aepp-sdk-js/commit/ed39a7659ac04abd5dbd80d54d28369bfa4322b9))
+* **crypto:** remove unused prepareTx, encodeTx, decodeTx functions ([64d15eb](https://github.com/aeternity/aepp-sdk-js/commit/64d15eb8eb7608b7418eebd84bedb697a1a7b12a))
+* **crypto:** rename messageToBinary to messageToHash adding hashing ([df37004](https://github.com/aeternity/aepp-sdk-js/commit/df37004f57a751b0f089dcef7b8fbcdf306bd08f))
+* **node-pool:** inline helpers, export by default ([ed1cfb5](https://github.com/aeternity/aepp-sdk-js/commit/ed1cfb59ada165b535a7f9bb7a3f3acdec00aac1))
+* **string:** remove unused snakeOrKebabToPascal function ([79bdc04](https://github.com/aeternity/aepp-sdk-js/commit/79bdc0490024e173c7620cfa089a4e84212930b3))
+* **string:** use isAddressValid instead of isAeAddress ([ac7d827](https://github.com/aeternity/aepp-sdk-js/commit/ac7d82701e30f9b7f2bc0d40412244face330d18))
+* drop compatibility with node@5 ([f5e2fdb](https://github.com/aeternity/aepp-sdk-js/commit/f5e2fdb42cc115a11c6be6e3dfd5cd1acfd6d3cc))
+* drop outdated protocols and transactions schemas ([f18d305](https://github.com/aeternity/aepp-sdk-js/commit/f18d305ca29204f006a438c157add0b511df4e93))
+
 # [8.1.0](https://github.com/aeternity/aepp-sdk-js/compare/8.0.0...8.1.0) (2021-05-31)
 
 
