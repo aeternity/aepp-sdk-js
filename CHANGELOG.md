@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.2.1](https://github.com/aeternity/aepp-sdk-js/compare/v8.2.0...v8.2.1) (2021-06-21)
+
+
+### Bug Fixes
+
+* swagger file of aeternity's compiler ([4001e64](https://github.com/aeternity/aepp-sdk-js/commit/4001e64f8ce90d234c9cd971e05f6b386b54221d))
+* swagger file of aeternity's latest compiler ([a1caa03](https://github.com/aeternity/aepp-sdk-js/commit/a1caa0374e3a0be84644d7b8dd846d70193e8242))
+
 ## [8.2.0](https://github.com/aeternity/aepp-sdk-js/compare/8.1.0...v8.2.0) (2021-06-17)
 
 

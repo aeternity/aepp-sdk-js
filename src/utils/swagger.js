@@ -46,6 +46,11 @@ export default async (specUrl, { spec, internalUrl, disableBigNumbers, disableCa
   spec = spec || await (await fetch(specUrl)).json()
   const jsonImp = disableBigNumbers ? JSON : JsonBig
 
+  if (['https://compiler.aepps.com', 'https://latest.compiler.aepps.com']
+    .includes(new URL(specUrl).origin)) {
+    spec.schemes = ['https']
+  }
+
   const [external, internal] = await Promise.all([specUrl, internalUrl].map((url) => {
     if (!url) return null
     return SwaggerClient({
