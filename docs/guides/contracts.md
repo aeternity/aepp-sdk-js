@@ -63,8 +63,8 @@ Note:
 
 - If your contract includes external dependencies which are not part of the [standard library](https://aeternity.com/aesophia/latest/sophia_stdlib) you should initialize the contract using:
   ```js
-  const filesystem = ... // key-value map with name of the include as key and source code of the include as value
-  const contractInstance = await aeSdk.getContractInstance({ source: CONTRACT_SOURCE, filesystem })
+  const fileSystem = ... // key-value map with name of the include as key and source code of the include as value
+  const contractInstance = await aeSdk.getContractInstance({ source: CONTRACT_SOURCE, fileSystem })
   ```
 
 ### By ACI and bytecode
@@ -93,7 +93,7 @@ const contractInstance = await aeSdk.getContractInstance({ aci, contractAddress 
     - `contractAddress`
         - The address where the contract is located at.
         - To be used if a contract is already deployed.
-    - `filesystem` (default: {})
+    - `fileSystem` (default: {})
         - Key-value map with name of the include as key and source code of the include as value.
     - `validateBytecode` (default: false)
         - Compare source code with on-chain version.

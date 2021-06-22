@@ -23,11 +23,11 @@
  * @example import { ContractCompilerHttp } from '@aeternity/aepp-sdk'
  */
 
+import { RestError } from '@azure/core-rest-pipeline'
 import semverSatisfies from '../utils/semver-satisfies'
 import AsyncInit from '../utils/async-init'
-import genSwaggerClient from '../utils/swagger'
+import { Compiler as CompilerApi } from '../apis/compiler/'
 import { MissingParamError, UnsupportedVersionError } from '../utils/errors'
-import { mapObject } from '../utils/other'
 
 /**
  * Contract Compiler Stamp
@@ -49,46 +49,54 @@ export default AsyncInit.compose({
   methods: {
     async setCompilerUrl (compilerUrl, { ignoreVersion = false } = {}) {
       if (!compilerUrl) throw new MissingParamError('compilerUrl required')
-      compilerUrl = compilerUrl.replace(/\/$/, '')
-      const client = await genSwaggerClient(`${compilerUrl}/api`, {
-        disableBigNumbers: true,
-        disableCaseConversion: true,
-        responseInterceptor: response => {
-          if (response.ok) return
-          let message = `${new URL(response.url).pathname.slice(1)} error`
-          if (response.body.reason) {
-            message += ': ' + response.body.reason +
-              (response.body.parameter ? ` in ${response.body.parameter}` : '') +
-              // TODO: revising after improving documentation https://github.com/aeternity/aesophia_http/issues/78
-              (response.body.info ? ` (${JSON.stringify(response.body.info)})` : '')
-          }
-          if (Array.isArray(response.body)) {
-            message += ':\n' + response.body
-              .map(e => `${e.type}:${e.pos.line}:${e.pos.col}: ${e.message}${e.context ? `(${e.context})` : ''}`)
-              .map(e => e.trim()) // TODO: remove after fixing https://github.com/aeternity/aesophia_http/issues/80
-              .join('\n')
-          }
-          response.statusText = message
-          return response
-        }
+      const compilerApi = new CompilerApi(compilerUrl, {
+        allowInsecureConnection: true,
+        additionalPolicies: [{
+          policy: {
+            name: 'error-formatter',
+            async sendRequest (request, next) {
+              try {
+                return await next(request)
+              } catch (error) {
+                if (!(error instanceof RestError)) throw error
+                let body
+                try {
+                  body = JSON.parse(error.response.bodyAsText)
+                } catch (e) {
+                  throw error
+                }
+                error.message = `${new URL(error.request.url).pathname.slice(1)} error`
+                if (body.reason) {
+                  error.message += ': ' + body.reason +
+                    (body.parameter ? ` in ${body.parameter}` : '') +
+                    // TODO: revising after improving documentation https://github.com/aeternity/aesophia_http/issues/78
+                    (body.info ? ` (${JSON.stringify(body.info)})` : '')
+                }
+                if (Array.isArray(body)) {
+                  error.message += ':\n' + body
+                    .map(e => `${e.type}:${e.pos.line}:${e.pos.col}: ${e.message}${e.context ? `(${e.context})` : ''}`)
+                    .map(e => e.trim()) // TODO: remove after fixing https://github.com/aeternity/aesophia_http/issues/80
+                    .join('\n')
+                }
+                throw error
+              }
+            }
+          },
+          position: 'perCall'
+        }]
       })
-      this.compilerVersion = client.spec.info.version
-      this.compilerApi = mapObject(
-        client.api,
-        ([key, fn]) => [
-          key,
-          ({ options: { filesystem, ...options } = {}, ...args } = {}) => fn({
-            ...args, options: { ...options, file_system: filesystem }
-          })
-        ]
-      )
+      const compilerVersion = (await compilerApi.aPIVersion()).apiVersion
 
-      if (ignoreVersion) return
-      if (!semverSatisfies(this.compilerVersion, COMPILER_GE_VERSION, COMPILER_LT_VERSION)) {
+      if (
+        !ignoreVersion &&
+        !semverSatisfies(compilerVersion, COMPILER_GE_VERSION, COMPILER_LT_VERSION)
+      ) {
         throw new UnsupportedVersionError(
-          'compiler', this.compilerVersion, COMPILER_GE_VERSION, COMPILER_LT_VERSION
+          'compiler', compilerVersion, COMPILER_GE_VERSION, COMPILER_LT_VERSION
         )
       }
+
+      Object.assign(this, { compilerApi, compilerVersion })
     }
   },
   props: {

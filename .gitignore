@@ -27,3 +27,4 @@ coverage.*
 .history
 .site
 site
+/src/apis/

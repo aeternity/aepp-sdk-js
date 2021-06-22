@@ -131,7 +131,7 @@ contract StateContract =
     put(state{value = t})
     recursion(t)
 `
-const filesystem = {
+const fileSystem = {
   testLib: libContractSource
 }
 const notExistingContractAddress = 'ct_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT'
@@ -146,16 +146,16 @@ describe('Contract instance', function () {
   before(async function () {
     aeSdk = await getSdk()
     testContractAci = await aeSdk.compilerApi
-      .generateACI({ code: testContractSource, options: { filesystem } })
+      .generateACI({ code: testContractSource, options: { fileSystem } })
     testContractBytecode = (await aeSdk.compilerApi.compileContract({
-      code: testContractSource, options: { filesystem }
+      code: testContractSource, options: { fileSystem }
     })).bytecode
   })
 
   it('generates by source code', async () => {
     aeSdk.Ae.defaults.testProperty = 'test'
     testContract = await aeSdk.getContractInstance({
-      source: testContractSource, filesystem, ttl: 0, gasLimit: 15000
+      source: testContractSource, fileSystem, ttl: 0, gasLimit: 15000
     })
     delete aeSdk.Ae.defaults.testProperty
     expect(testContract.options.testProperty).to.be.equal('test')
@@ -166,10 +166,10 @@ describe('Contract instance', function () {
     testContract.should.have.property('call')
     testContract.should.have.property('deploy')
     testContract.options.ttl.should.be.equal(0)
-    testContract.options.should.have.property('filesystem')
-    testContract.options.filesystem.should.have.property('testLib')
+    testContract.options.should.have.property('fileSystem')
+    testContract.options.fileSystem.should.have.property('testLib')
     expect(Object.keys(testContract.methods)).to.be.eql(
-      testContract._aci.encoded_aci.contract.functions.map(({ name }) => name)
+      testContract._aci.encodedAci.contract.functions.map(({ name }) => name)
     )
   })
 
@@ -245,7 +245,7 @@ describe('Contract instance', function () {
 
   it('accepts matching source code with enabled validation', () => aeSdk.getContractInstance({
     source: testContractSource,
-    filesystem,
+    fileSystem,
     contractAddress: testContractAddress,
     validateBytecode: true
   }))
@@ -264,9 +264,11 @@ describe('Contract instance', function () {
   }))
 
   it('rejects not matching bytecode with enabled validation', async () => expect(aeSdk.getContractInstance({
-    bytecode: (await aeSdk.compilerApi.compileContract({ code: identityContractSource })).bytecode,
+    bytecode: (await aeSdk.compilerApi.compileContract({
+      code: identityContractSource, options: {}
+    })).bytecode,
     aci: await aeSdk.compilerApi
-      .generateACI({ code: identityContractSource, options: { filesystem } }),
+      .generateACI({ code: identityContractSource, options: { fileSystem } }),
     contractAddress: testContractAddress,
     validateBytecode: true
   })).to.be.rejectedWith(BytecodeMismatchError, 'Contract bytecode do not correspond to the bytecode deployed on the chain'))
@@ -318,7 +320,7 @@ describe('Contract instance', function () {
     let contract
 
     before(async () => {
-      contract = await aeSdk.getContractInstance({ source: testContractSource, filesystem })
+      contract = await aeSdk.getContractInstance({ source: testContractSource, fileSystem })
     })
 
     it('estimates gas by default for contract deployments', async () => {
@@ -329,7 +331,7 @@ describe('Contract instance', function () {
 
     it('overrides gas through getContractInstance options for contract deployments', async () => {
       const ct = await aeSdk.getContractInstance({
-        source: testContractSource, filesystem, gasLimit: 300
+        source: testContractSource, fileSystem, gasLimit: 300
       })
       const { tx: { gas }, gasUsed } = (await ct.deploy(['test', 42])).txData
       expect(gasUsed).to.be.equal(160)
