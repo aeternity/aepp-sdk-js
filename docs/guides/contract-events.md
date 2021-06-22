@@ -1,92 +1,111 @@
 # Contract Events
 
-Here are code examples of decoding [Sophia Events](https://github.com/aeternity/aesophia/blob/lima/docs/sophia.md#events)
-using SDK.
+The Sophia language also provides you the possibility to emit [Events](https://github.com/aeternity/aesophia/blob/v6.0.0/docs/sophia.md#events) in your functions.
+On this page you will learn how to access and decode the event log of a specific transaction.
 
-## SDK initialisation
-```js
-import { Universal, Node, MemoryAccount } from '@aeternity/aepp-sdk/es'
-const eventContract = `SOURCE_HERE`
-const node = await Node({ ... })
-const account = MemoryAccount({ keypair })
-const initParams = { accounts: [account], nodes: [{ name: 'test', instance: node }] }
+## EventEmitter contract
+This example contract that emits events will be used in the following examples:
 
-const sdkInstance = await Universal({ ...initParams })
+```sophia
+contract EventEmitter =
 
-const contractIns = await sdkInstance.getContractInstance(eventContract)
+    datatype event =
+        FirstEvent(int)
+        | AnotherEvent(indexed address, string)
+
+    entrypoint emitEvents(value: int, msg: string) =
+        Chain.event(FirstEvent(value))
+        Chain.event(AnotherEvent(Call.caller, msg))
 ```
 
-## Decode using ACI
+## Decode events using ACI (high-level, recommended)
+When initializing a contract instance using the source code and providing the [ACI](https://github.com/aeternity/aesophia/blob/v6.0.0/docs/aeso_aci.md)
+or obtaining it via http compiler (default) you will be able to access the `emitEvents` entrypoint of the Sophia contract above as follows: 
+
 ```js
-// Auto decode of events on contract call
-const callRes = await contractIns.methods.emitEvents()
-// decode of events using contract instance
-const decodedUsingInstance = contractIns.decodeEvents('emitEvents', callRes.result.log)
-// decode of events using contract instance ACI methods
-const decodedUsingInstanceMethods = contractIns.methods.emitEvents.decodeEvents(callRes.result.log)
-// callRes.decodedEvents === decodedUsingInstance === decodedUsingInstanceMethods
-console.log(callRes.decodedEvents || decodedUsingInstance || decodedUsingInstanceMethods)
+// events emitted by contract calls are automatically decoded (recommended)
+const tx = await contractInstance.methods.emitEvents(1337, "this message is not indexed")
+console.log(tx.decodedEvents)
+
+// decode events using contract instance (no need to do that as you already have access to the decoded events)
+const decodedUsingInstance = contractInstance.decodeEvents('emitEvents', tx.result.log)
+console.log(decodedUsingInstance)
+
+// decode of events using contract instance ACI methods (no need to do that as you already have access to the decoded events)
+const decodedUsingInstanceMethods = contractInstance.methods.emitEvents.decodeEvents(tx.result.log)
+console.log(decodedUsingInstanceMethods)
+
 /*
 [
-  { address: 'ct_N9s65ZMz9SUUKx2HDLCtxVNpEYrzzmYEuESdJwmbEsAo5TzxM',
-    data: 'cb_VGhpcyBpcyBub3QgaW5kZXhlZK+w140=',
-    topics:
-     [ '101640830366340000167918459210098337687948756568954742276612796897811614700269',
-       '21724616073664889730503604151713289093967432540957029082538744539361158114576' ],
+  {
+    address: 'ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh',
+    data: 'cb_dGhpcyBtZXNzYWdlIGlzIG5vdCBpbmRleGVkdWmUpw==',
+    topics: [
+      '101640830366340000167918459210098337687948756568954742276612796897811614700269',
+      '39519965516565108473327470053407124751867067078530473195651550649472681599133'
+    ],
     name: 'AnotherEvent',
-    decoded:
-     [ 'This is not indexed',
-       'N9s65ZMz9SUUKx2HDLCtxVNpEYrzzmYEuESdJwmbEsAo5TzxM' ]
+    decoded: [
+      'fUq2NesPXcYZ1CcqBcGC3StpdnQw3iVxMA3YSeCNAwfN4myQk',
+      'this message is not indexed'
+    ]
   },
-  { address: 'ct_N9s65ZMz9SUUKx2HDLCtxVNpEYrzzmYEuESdJwmbEsAo5TzxM',
+  {
+    address: 'ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh',
     data: 'cb_Xfbg4g==',
-    topics:
-     [ '25381774165057387707802602748622431964055296361151037811644748771109370239835',
-       42 ],
-    name: 'TheFirstEvent',
-    decoded: [ '42' ]
+    topics: [
+      '59505622142252318624300825714684802559980671551955787864303522023309554554980',
+      1337
+    ],
+    name: 'FirstEvent',
+    decoded: [ '1337' ]
   }
 ]
 */
 ```
 
-## Decode without ACI
+## Decode events without ACI (low-level)
+As an alternative you can make use of the low-level API which allows you to decode events for a given transaction by providing the `log` of the transaction as well as the correct `schema` of the events to the `decodeEvents` function manually:
+
 ```js
 import { decodeEvents, SOPHIA_TYPES } from '@aeternity/aepp-sdk/es/contract/aci/transformation'
 
-const txHash = 'tx_asdad2d23...'
-const tx = await sdkInstance.tx(txHash)
+// hash of a real tx on testnet
+const txHash = 'th_2tMWziKAQR1CwK2PMfvMhKZgEVLmcxsPYkRXey97s9SdXj4zat'
+// client is an object instance of the Universal Stamp
+const tx = await client.tx(txHash)
 
 const eventsSchema = [
-  { name: 'TheFirstEvent', types: [SOPHIA_TYPES.int] },
-  { name: 'AnotherEvent', types: [SOPHIA_TYPES.string, SOPHIA_TYPES.address] },
+  { name: 'FirstEvent', types: [SOPHIA_TYPES.int] },
+  { name: 'AnotherEvent', types: [SOPHIA_TYPES.address, SOPHIA_TYPES.string] },
 ]
+
 const decodedEvents = decodeEvents(tx.log, { schema: eventsSchema })
 console.log(decodedEvents)
 /*
 [
-  { address: 'ct_N9s65ZMz9SUUKx2HDLCtxVNpEYrzzmYEuESdJwmbEsAo5TzxM',
-    data: 'cb_VGhpcyBpcyBub3QgaW5kZXhlZK+w140=',
-    topics:
-     [ '101640830366340000167918459210098337687948756568954742276612796897811614700269',
-       '21724616073664889730503604151713289093967432540957029082538744539361158114576' ],
+  {
+    address: 'ct_2dE7Xd7XCg3cwpKWP18VPDwfhz5Miji9FoKMTZN7TYvGt64Kc',
+    data: 'cb_dGhpcyBtZXNzYWdlIGlzIG5vdCBpbmRleGVkdWmUpw==',
+    topics: [
+      '101640830366340000167918459210098337687948756568954742276612796897811614700269',
+      '39519965516565108473327470053407124751867067078530473195651550649472681599133'
+    ],
     name: 'AnotherEvent',
-    decoded:
-     [ 'This is not indexed',
-       'N9s65ZMz9SUUKx2HDLCtxVNpEYrzzmYEuESdJwmbEsAo5TzxM' ]
+    decoded: [
+      'fUq2NesPXcYZ1CcqBcGC3StpdnQw3iVxMA3YSeCNAwfN4myQk',
+      'this message is not indexed'
+    ]
   },
-  { address: 'ct_N9s65ZMz9SUUKx2HDLCtxVNpEYrzzmYEuESdJwmbEsAo5TzxM',
+  {
+    address: 'ct_2dE7Xd7XCg3cwpKWP18VPDwfhz5Miji9FoKMTZN7TYvGt64Kc',
     data: 'cb_Xfbg4g==',
-    topics:
-     [ '25381774165057387707802602748622431964055296361151037811644748771109370239835',
-       42 ],
-    name: 'TheFirstEvent',
-    decoded: [ '42' ]
+    topics: [
+      '59505622142252318624300825714684802559980671551955787864303522023309554554980',
+      1337
+    ],
+    decoded: []
   }
 ]
 */
 ```
-
-# Related Link
-  - [Sophia Events](https://github.com/aeternity/aesophia/blob/lima/docs/sophia.md#events)
-  - [Sophia Events Explained](https://github.com/aeternity/protocol/blob/master/contracts/events.md)

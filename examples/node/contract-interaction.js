@@ -62,6 +62,7 @@ const COMPILER_URL = 'https://compiler.aepps.com';
 // dealing with subsequent actions is running them one by one using `await`.
 // Therefore you need to put the logic into an `async` code block
 (async () => {
+
   // ## 4. Create object instances
   const account = MemoryAccount({ keypair: ACCOUNT_KEYPAIR })
   const node = await Node({ url: NODE_URL })
@@ -72,7 +73,7 @@ const COMPILER_URL = 'https://compiler.aepps.com';
   });
 
   // The `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp) itself is asynchronous as it determines the node's version and
-  // rest interface automatically. Only once the Promise is fulfilled, you know have a working object instance
+  // rest interface automatically. Only once the Promise is fulfilled, you know you have a working object instance
   // which is assigned to the `client` constant in this case.
   // 
   // Note:
@@ -100,7 +101,6 @@ const COMPILER_URL = 'https://compiler.aepps.com';
   //
   //  - Sophia contracts always have an `init` function which needs to be invoked.
   //  - The SDK receives the required `calldata` for the provided arguments by calling the HTTP compiler.
-  //  - If the `init` function doesn't expect an argument you need to provide an empty array to the `deploy` function.
 
   // ## 7. Call a contract function via dry-run
   // Once the `ContractCreateTx` has been successfully mined, you can attempt to invoke
@@ -136,6 +136,6 @@ const COMPILER_URL = 'https://compiler.aepps.com';
   //    and avoid having to call `contractCompile` (step 5),  `call`/`callStatic` (step 7) and `decode` (step 8) manually
   //      - see [Contracts Guide](../../guides/contracts.md)
 
-// ## 10. Close async codeblock
+// ## 10. Close and run async codeblock
 // Now you can close the async codeblock and execute it at the same time.
 })()

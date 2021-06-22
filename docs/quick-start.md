@@ -1,7 +1,7 @@
 # Quick Start
 
-## 1. Define imports
-For the following snippets in the guide we specify multiple imports. Most imports like `Universal`, `MemoryAccount` & `Node` are [Stamps](https://stampit.js.org/essentials/what-is-a-stamp) that compose certain functionalities. Others like `AmountFormatter` & `Crypto` are util modules with typical function exports.
+## 1. Specify imports
+For the following snippets in the guide you need to specify multiple imports. Most imports like `Universal`, `MemoryAccount` & `Node` are [Stamps](https://stampit.js.org/essentials/what-is-a-stamp) that compose certain functionalities. Others like `AmountFormatter` & `Crypto` are util modules with typical function exports.
 
 ```js
 import {
@@ -22,7 +22,7 @@ import {
 ```
 
 ## 3. Get some _AE_ tokens using the Faucet
-To receive some _AE_ you can use the [🚰 Faucet](https://faucet.aepps.com/). Just add your publicKey, and you'll immediately get some test tokens.
+To receive some _AE_ you can use the [Faucet](https://faucet.aepps.com/). Just add your publicKey, and you'll immediately get some test tokens.
 
 ## 4. Interact with the aeternity blockchain
 This example shows:
@@ -56,3 +56,8 @@ const account = MemoryAccount({
   })
 })()
 ```
+
+Note:
+
+- By default the `spend` function expects the amount to be spent in `aettos` (the smallest possible unit)
+- Following the example snippet you would specify `AE` as denomination

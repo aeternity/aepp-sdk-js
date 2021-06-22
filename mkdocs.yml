@@ -8,6 +8,7 @@ repo_url: 'https://github.com/aeternity/aepp-sdk-js'
 edit_uri: ''
 
 theme:
+  favicon: images/favicon.png
   name: material
   language: en
   palette:
@@ -42,7 +43,7 @@ markdown_extensions:
   - pymdownx.superfences
 
 nav:
-  - installation.md
+  - index.md
   - quick-start.md
   - Usage Guides:
     - guides/contracts.md

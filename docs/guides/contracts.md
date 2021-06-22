@@ -1,6 +1,11 @@
 # Contracts
 
-The SDK needs to interact with following components in order to enable Smart Contract interactions on the aeternity blockchain:
+## Introduction
+The smart contract language of the aeternity blockchain is [Sophia](https://github.com/aeternity/aesophia/blob/v6.0.0/docs/sophia.md). It is a functional language in the ML family, strongly typed and has restricted mutable state.
+
+Before interacting with contracts using the SDK you should get familiar with Sophia itself first. Have a look into [aepp-sophia-examples](https://github.com/aeternity/aepp-sophia-examples) and start rapid prototyping using [AEstudio](https://studio.aepps.com).
+
+The SDK needs to interact with following components in order to enable smart contract interactions on the aeternity blockchain:
 
 - [aeternity](https://github.com/aeternity/aeternity) (host your own one or use the public testnet node at `https://testnet.aeternity.io`)
 - [aesophia_http](https://github.com/aeternity/aesophia_http) (host your own one or use the public compiler at `https://compiler.aepps.com`)
@@ -41,8 +46,9 @@ const client = await Universal({
 
 Note:
 
-- You can provide multiple accounts to the SDK
-- For each transaction you can choose a specific account to use for signing (by default the first account will be used)
+- You can provide multiple accounts to the SDK.
+- For each transaction you can choose a specific account to use for signing (by default the first account will be used), see [transaction specific options](#transaction-specific-options).
+    - This is specifically important and useful for writing tests.
 
 ## 3. Initialize the contract instance
 ```js
@@ -52,7 +58,7 @@ const contractInstance = await client.getContractInstance(CONTRACT_SOURCE)
 
 Note:
 
-- If your contract includes external dependencies you should initialize the contract using:
+- If your contract includes external dependencies which are not part of the [standard library](https://github.com/aeternity/aesophia/blob/v6.0.0/docs/sophia_stdlib.md) you should initialize the contract using:
   ```js
   const filesystem = ... // key-value map with name of the include as key and source code of the include as value
   const contractInstance = await client.getContractInstance(CONTRACT_SOURCE, { filesystem })
@@ -62,71 +68,141 @@ Note:
   const contractAddress = ... // the address of the contract
   const contractInstance = await client.getContractInstance(CONTRACT_SOURCE, { contractAddress })
   ```
+- Following attributes can be provided in an `options` object to `getContractInstance`:
+    - `aci` (default: obtained via http compiler)
+        - The Contract ACI.
+    - `contractAddress`
+        - The address where the contract is located at.
+        - To be used if a contract is already deployed.
+    - `filesystem` (default: {})
+        - Key-value map with name of the include as key and source code of the include as value.
+    - `forceCodeCheck` (default: true)
+        - Don't check source code.
+    - `opt` (default: {})
+        - Object with other [transaction specific options](#transaction-specific-options) which will be provided to **every transaction** that is initiated using the contract instance. You should be aware that:
+            - For most of these additional options it doesn't make sense to define them at contract instance level.
+            - You wouldn't want to provide an `amount` to each transaction or use the same `nonce` which would result in invalid transactions.
+            - For options like `ttl` or `gasPrice` it does absolutely make sense to set this on contract instance level.
 
 ## 4. Deploy the contract
-Now we want to deploy our SC with init function like:
-  `stateful function init(n: int) : state => { count: n }`
-  ```js
-const count = 1
-await contractObject.deploy([count])
-// or
-await contractObject.methods.init(count)
 
-// Now our SC is deployed and we can find a deploy information
-console.log(contractObject.deployInfo) // { owner, transaction, address, createdAt, result, rawTx }
- ```
+If you have a Sophia contract that looks like this:
+```sophia
+contract Increment =
 
-## Call Smart Contract methods
-### Simple call
-Now we can make call to one of our SC function.
-Let's assume that we have a function like:
-`function sum (a: int, b: int) : int = a + b`
+    record state =
+        { count: int }
+
+    entrypoint init(start: int) = 
+        { count = start }
+
+    stateful entrypoint increment(value: int) =
+        put(state{ count = state.count + value })
+
+    entrypoint get_count() =
+        state.count
+```
+
+The contract can be deployed using the `contractInstance` in two different ways:
+
 ```js
-const callResult = await contractObject.methods.sum(1 , 2)
+const tx = await contractInstance.deploy([1]) // recommended
 // or
-const callResult = await contractObject.call('sum', [1, 2])
+const tx = await contractInstance.methods.init(1)
 
-// callResult will contain all info related to contract call transaction
-console.log(callResult.decodedRes) // 3
+// after successful deployment you can look up the transaction and the deploy information
+console.log(tx)
+console.log(contractInstance.deployInfo) // { owner, transaction, address, createdAt, result, rawTx }
 ```
-### How it works inside
 
-Let's talk more about auto-generated function of `contractObject` 
- >`await contractObject.methods.sum(1 , 2)`
->
-Here the SDK will decide:
- - If the function is `stateful`(change SC state) -> `SDK` will prepare and broadcast a `contract call` transaction
- - If function is `not stateful`(state is not changed) -> `SDK` will prepare contract call transaction and `dry-run` it
+Note:
 
-### Manual control
-Also you can manually control this behaviour using the `send` and `get` methods:
+- The `init` entrypoint is a special function which is only called once for deployment, initializes the contract's state and doesn't require the `stateful` declaration.
+- In Sophia all `public functions` are called `entrypoints` and need to be declared as `stateful`
+if they should produce changes to the state of the smart contract, see `increment(value: int)`.
+
+## 5. Call contract entrypoints
+
+### a) Stateful entrypoints 
+According to the example above you can call the `stateful` entrypoint `increment` by using one of the following lines:
+
 ```js
-// Sign and Broadcast transaction to the chain
-const callResult = await contractObject.methods.sum.send(1 , 2)
-
-// Dry-run transaction
-// Make sure that you provide the node `internalUrl` which is used for `dry-run` node API endpoint
-const callResult = await contractObject.methods.sum.get(1 , 2)
-``` 
-### Overriding default transaction params
-Make contract call and overwrite transaction props passing it as option: `fee, amount, ttl, ...`
- Auto-generate functions (under `methods`) will have the same arguments length and order as we had in our SC source,
- the last arguments is always options object
- if `options` is not provide SDK will use the default options 
- which you can find under the `contractObject.options` 
- ```js
-const callResult = await contractObject.methods.sum.get(1 , 2, { amount: 1000, fee: 3232, gas: 123})
+const tx = await contractInstance.methods.increment(3) // recommended
 // or
-const callResult = await contractObject.call('sum', [1 , 2], { amount: 1000, fee: 3232, gas: 123})
+const tx = await contractInstance.methods.increment.send(3)
+// or
+const tx = await contractInstance.call('increment', [3])
 ```
-### Call contract using specific account
-You can use `onAccount` option for that which can  one of:
- - `keypair` object({ secretKey, publicKey })
- - `MemoryAccount` instance
- - account `public key`
- ```js
-// account must be included in SDK or you can always add it using account management API of SDK
-// await SDKInstance.addAccount(MemoryAccount({ keypair }))
-const options = { onAccount: keypair || MemoryAccount || publicKey } 
-const callResult = await contractObject.methods.sum.get(1 , 2, options)
+
+Note:
+
+- The functions `send` and `call` provide an explicit way to tell the SDK to sign and broadcast the transaction.
+- When using the `increment` function directly the SDK will automatically determine if it's a `stateful` entrypoint.
+
+### b) Regular entrypoints
+The aeternity node can expose an API endpoint that allows to execute a `dry-run` for a transaction. You can make use of that functionality to get the result of entrypoints that don't execute state changes. Following lines show how you can do that using the SDK for the `get_count` entrypoint of the example above:
+
+```js
+const tx = await contractInstance.methods.get_count() // recommended
+// or
+const tx = await contractInstance.methods.get_count.get()
+// or
+const tx = await contractInstance.callStatic('get_count', [])
+
+// access the decoded result returned by the execution of the entrypoint
+console.log(tx.decodedResult);
 ```
+
+### c) Payable entrypoints
+You will probably also write functions that require an amount of `aettos` to be provided. These functions must be declared with `payable` and (most likely) `stateful`. Let's assume you have declared following Sophia entrypoint which checks if a required amount of `aettos` has been provided before it continues execution:
+
+```sophia
+payable stateful entrypoint fund_project(project_id: int) =
+        require(Call.value >= 50, "at least 50 aettos need to be provided")
+        // further logic ...
+```
+
+In order to successfully call the `fund_project` entrypoint you need to provide at least 50 `aettos`. You can do this by providing the desired amount of `aettos` using one of the following lines:
+
+```js
+const tx = await contractInstance.methods.fund_project(1, { amount: 50 }) // recommended
+// or
+const tx = await contractInstance.methods.fund_project.send(1, { amount: 50 })
+// or
+const tx = await contractInstance.call('fund_project', [1], { amount: 50 })
+```
+
+## Transaction specific options
+For each transaction it is possible to provide an `options` object with one or multiple of the following attributes:
+
+- `amount` (default: 0)
+    - To be used for providing `aettos` (or `AE` with respective denomination) to a contract related transaction.
+- `denomination`
+    - You can specify the denomination of the `amount` that will be provided to the contract related transaction.
+- `onAccount` (default: the first account defined in the account array of the SDK instance)
+    - You can specify the account that should be used to sign a transaction.
+    - Note:
+        - The account needs to be provided to the SDK instance in order to be used for signing.
+- `nonce` (default: current nonce of the account + 1)
+    - The default behavior might cause problems if you perform many transactions in a short period of time.
+    - You might want to implement your own nonce management and provide the nonce "manually".
+- `ttl` (default: 0)
+    - Should be set if you want the transaction to be only valid until a certain block height is reached.
+- `fee` (default: calculated for each tx-type)
+    - The minimum fee is dependent on the tx-type.
+    - You can provide a higher fee to additionally reward the miners.
+- `gas` (default: 1600000 - 21000)
+    - Max. amount of gas to be consumed.
+- `gasPrice` (default: 1e9)
+    - To increase chances to get your transaction included quickly you can use a higher gasPrice.
+- `verify` (default: false)
+    - If set to true the transaction will be verified prior to broadcasting it.
+- `waitMined` (default: true)
+    - Wait for transactions to be mined.
+    - You can get the tx object that contains the tx-hash immediately by setting to `false` and should implement your own logic to watch for mined transactions.
+- `skipTransformDecoded` (default: false)
+    - TODO
+- `skipArgsConvert` (default: false)
+    - TODO
+- `deposit` (default: 0)
+    - Only relevant for a `ContractCreateTx` which is triggered by calling `deploy` or the `init` function.
