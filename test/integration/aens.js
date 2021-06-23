@@ -69,7 +69,7 @@ describe('Aens', function () {
     try {
       await aens.spend(100, name, { onAccount, verify: true })
     } catch (e) {
-      e.message.should.be.equal(`Name ${name} do not have pointers for ak`)
+      e.message.should.be.equal(`Name ${name} don't have pointers for ak`)
     }
   })
   it('Call contract using AENS name', async () => {
