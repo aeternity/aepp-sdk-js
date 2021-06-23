@@ -38,7 +38,7 @@ import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter'
  * @rtype (tx: String, options: Object) => Promise[String]
  * @param {String} tx - Transaction
  * @param {Object} [options={}] options - Options
- * @param {Object} [options.verify] verify - Verify transaction before broadcast, throw error if not valid
+ * @param {Object} [options.verify=true] verify - Verify transaction before broadcast, throw error if not valid
  * @return {Object} Transaction
  */
 async function send (tx, options = {}) {

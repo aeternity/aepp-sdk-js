@@ -36,8 +36,7 @@ import { DRY_RUN_ACCOUNT, NAME_ID_KEY } from '../tx/builder/schema'
 
 async function sendTransaction (tx, options = {}) {
   const { waitMined, verify } = R.merge(this.Ae.defaults, options)
-  // Verify transaction before broadcast
-  if (verify || (typeof verify !== 'boolean' && this.verifyTxBeforeSend)) {
+  if (verify) {
     const { validation, tx: txObject, txType } = await this.unpackAndVerify(tx)
     if (validation.length) {
       throw Object.assign(new Error('Transaction verification error: ' + JSON.stringify(validation)), {
@@ -260,9 +259,6 @@ async function resolveName (nameOrId, prefix, { verify, resolveByNode } = {}) {
  * @example ChainNode({url: 'https://testnet.aeternity.io/'})
  */
 const ChainNode = Chain.compose(TransactionValidator, NodePool, {
-  init ({ verifyTx = true }) {
-    this.verifyTxBeforeSend = verifyTx
-  },
   methods: {
     sendTransaction,
     balance,

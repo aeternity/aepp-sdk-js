@@ -37,7 +37,7 @@ import { required } from '@stamp/required'
  * @return {Object} Chain instance
  */
 const Chain = stampit({
-  deepProps: { Ae: { defaults: { waitMined: true } } },
+  deepProps: { Ae: { defaults: { waitMined: true, verify: true } } },
   statics: { waitMined (bool) { return this.deepProps({ Ae: { defaults: { waitMined: bool } } }) } }
 }, required({
   methods: {
@@ -74,7 +74,7 @@ const Chain = stampit({
  * @rtype (tx: String, options?: Object) => tx: Promise[Object]|txHash: Promise[String]
  * @param {String} tx - Transaction to submit
  * @param {String} [options={}] - Options to pass to the implementation
- * @param {String} [options.verify = false] - Verify transaction before broadcast.
+ * @param {String} [options.verify=true] - Verify transaction before broadcast.
  * @return {Object} Transaction
  */
 

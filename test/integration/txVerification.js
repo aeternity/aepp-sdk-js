@@ -71,7 +71,7 @@ describe('Verify Transaction', function () {
     })
 
     try {
-      await client.send(spendTx, { verify: true })
+      await client.send(spendTx)
     } catch ({ errorData }) {
       const atLeastOneError = !!errorData.validation.length
       atLeastOneError.should.be.equal(true)

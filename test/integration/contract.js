@@ -420,7 +420,7 @@ describe('Contract', function () {
     await contract.poll(deployed.transaction, { interval: 50, attempts: 1200 })
     expect(deployed.result).to.be.equal(undefined)
     deployed.txData.should.not.be.equal(undefined)
-    const result = await deployed.call('getArg', ['42'], { waitMined: false, verify: false })
+    const result = await deployed.call('getArg', ['42'], { waitMined: false })
     expect(result.result).to.be.equal(undefined)
     result.txData.should.not.be.equal(undefined)
     await contract.poll(result.hash, { interval: 50, attempts: 1200 })
