@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { decode as rlpDecode, encode as rlpEncode } from 'rlp'
 import { AE_AMOUNT_FORMATS, formatAmount } from '../../utils/amount-formatter'
-import { assertedType } from '../../utils/crypto'
+import { assertedType, hash } from '../../utils/crypto'
 
 import {
   DEFAULT_FEE,
@@ -24,8 +24,7 @@ import {
   writeInt,
   buildPointers,
   encode,
-  decode,
-  buildHash
+  decode
 } from './helpers'
 import { toBytes } from '../../utils/bytes'
 import MPTree from '../../utils/mptree'
@@ -411,13 +410,11 @@ export function unpackTx (encodedTx, fromRlpBinary = false, prefix = 'tx') {
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param {String | Buffer} rawTx base64 or rlp encoded transaction
- * @param {Object} options
- * @param {Boolean} options.raw
  * @return {String} Transaction hash
  */
-export function buildTxHash (rawTx, options) {
-  if (typeof rawTx === 'string' && rawTx.indexOf('tx_') !== -1) return buildHash('th', unpackTx(rawTx).rlpEncoded, options)
-  return buildHash('th', rawTx, options)
+export function buildTxHash (rawTx) {
+  const data = typeof rawTx === 'string' && rawTx.startsWith('tx_') ? decode(rawTx, 'tx') : rawTx
+  return encode(hash(data), 'th')
 }
 
 export default { calculateMinFee, calculateFee, unpackTx, unpackRawTx, buildTx, buildRawTx, validateParams, buildTxHash }

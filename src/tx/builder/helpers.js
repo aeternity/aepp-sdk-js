@@ -48,20 +48,6 @@ export function buildContractId (ownerId, nonce) {
 }
 
 /**
- * Build hash
- * @function
- * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {String} prefix Transaction hash prefix
- * @param {Buffer} data Rlp encoded transaction buffer
- * @param {Object} options
- * @param {Boolean} options.raw
- * @return {String} Transaction hash
- */
-export function buildHash (prefix, data, options = {}) {
-  return options.raw ? hash(data) : encode(hash(data), prefix)
-}
-
-/**
  * Build a oracle query id
  * @function
  * @function* @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
