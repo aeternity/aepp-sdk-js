@@ -24,7 +24,7 @@
 
 import stampit from '@stamp/it'
 import { required } from '@stamp/required'
-import { messageToHash, decodeBase64Check, assertedType, verifyMessage as verifyMessageCrypto, hash } from '../utils/crypto'
+import { messageToHash, verifyMessage as verifyMessageCrypto, hash } from '../utils/crypto'
 import { buildTx } from '../tx/builder'
 import { decode } from '../tx/builder/helpers'
 import { TX_TYPE } from '../tx/builder/schema'
@@ -49,7 +49,7 @@ export const isAccountBase = (acc) => !['sign', 'address'].find(f => typeof acc[
  */
 async function signTransaction (tx, opt) {
   const networkId = this.getNetworkId(opt)
-  const rlpBinaryTx = decodeBase64Check(assertedType(tx, 'tx'))
+  const rlpBinaryTx = decode(tx, 'tx')
   const txWithNetworkId = Buffer.concat([Buffer.from(networkId), hash(rlpBinaryTx)])
 
   const signatures = [await this.sign(txWithNetworkId, opt)]
