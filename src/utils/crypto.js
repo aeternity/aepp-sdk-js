@@ -298,20 +298,6 @@ export function aeEncodeKey (binaryKey) {
 }
 
 /**
- * Assert encoded type and return its payload
- * @rtype (data: String, type: String) => String, throws: Error
- * @param {String} data - ae data
- * @param {String} type - Prefix
- * @param {Boolean} omitError - Return false instead of throwing the error if data doesn't match expected type
- * @return {String|Boolean} Payload
- */
-export function assertedType (data, type, omitError) {
-  if (RegExp(`^${type}_.+$`).test(data)) return data.split('_')[1]
-  else if (omitError) return false
-  else throw new Error(`Data doesn't match expected type ${type}`)
-}
-
-/**
  * Check key pair for validity
  *
  * Sign a message, and then verifying that signature

@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { decode as rlpDecode, encode as rlpEncode } from 'rlp'
 import { AE_AMOUNT_FORMATS, formatAmount } from '../../utils/amount-formatter'
-import { assertedType, hash } from '../../utils/crypto'
+import { hash } from '../../utils/crypto'
 
 import {
   DEFAULT_FEE,
@@ -160,12 +160,11 @@ function validateField (value, key, type, prefix) {
       const isMinusValue = (!isNaN(value) || BigNumber.isBigNumber(value)) && BigNumber(value).lt(0)
       return assert((!isNaN(value) || BigNumber.isBigNumber(value)) && BigNumber(value).gte(0), { value, isMinusValue })
     }
-    case FIELD_TYPES.id:
-      if (Array.isArray(prefix)) {
-        const p = prefix.find(p => p === value.split('_')[0])
-        return assert(p && PREFIX_ID_TAG[value.split('_')[0]], { value, prefix })
-      }
-      return assert(assertedType(value, prefix) && PREFIX_ID_TAG[value.split('_')[0]] && value.split('_')[0] === prefix, { value, prefix })
+    case FIELD_TYPES.id: {
+      const prefixes = Array.isArray(prefix) ? prefix : [prefix]
+      const p = prefixes.find(p => p === value.split('_')[0])
+      return assert(p && PREFIX_ID_TAG[value.split('_')[0]], { value, prefix })
+    }
     case FIELD_TYPES.binary:
       return assert(value.split('_')[0] === prefix, { prefix, value })
     case FIELD_TYPES.string:

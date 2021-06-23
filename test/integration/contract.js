@@ -681,7 +681,7 @@ describe('Contract', function () {
           { filesystem, contractAddress: 'ct_asdasdasd', opt: { ttl: 0 } }
         )
       } catch (e) {
-        e.message.should.be.equal('Invalid contract address')
+        e.message.should.be.equal('Invalid name or address: ct_asdasdasd')
       }
     })
     it('Throw error on creating contract instance with contract address which is not found on-chain or not active', async () => {

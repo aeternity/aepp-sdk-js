@@ -20,9 +20,8 @@ import Chain from './'
 import { AE_AMOUNT_FORMATS, formatAmount } from '../utils/amount-formatter'
 import verifyTransaction from '../tx/validator'
 import NodePool from '../node-pool'
-import { assertedType } from '../utils/crypto'
 import { pause } from '../utils/other'
-import { isNameValid, produceNameId } from '../tx/builder/helpers'
+import { isNameValid, produceNameId, decode } from '../tx/builder/helpers'
 import { DRY_RUN_ACCOUNT, NAME_ID_KEY } from '../tx/builder/schema'
 
 /**
@@ -234,7 +233,10 @@ async function resolveName (nameOrId, prefix, { verify, resolveByNode } = {}) {
   if (!prefixes.includes(prefix)) {
     throw new Error(`Invalid prefix ${prefix}, should be one of [${prefixes}]`)
   }
-  if (assertedType(nameOrId, prefix, true)) return nameOrId
+  try {
+    decode(nameOrId, prefix)
+    return nameOrId
+  } catch (error) {}
   if (isNameValid(nameOrId)) {
     if (verify || resolveByNode) {
       const name = await this.getName(nameOrId).catch(_ => null)
