@@ -47,7 +47,7 @@ const client = await Universal({
 Note:
 
 - You can provide multiple accounts to the SDK.
-- For each transaction you can choose a specific account to use for signing (by default the first account will be used), see [transaction specific options](#transaction-specific-options).
+- For each transaction you can choose a specific account to use for signing (by default the first account will be used), see [transaction options](./transaction-options.md).
     - This is specifically important and useful for writing tests.
 
 ## 3. Initialize the contract instance
@@ -79,7 +79,7 @@ Note:
     - `forceCodeCheck` (default: true)
         - Don't check source code.
     - `opt` (default: {})
-        - Object with other [transaction specific options](#transaction-specific-options) which will be provided to **every transaction** that is initiated using the contract instance. You should be aware that:
+        - Object with other [transaction options](./transaction-options.md) which will be provided to **every transaction** that is initiated using the contract instance. You should be aware that:
             - For most of these additional options it doesn't make sense to define them at contract instance level.
             - You wouldn't want to provide an `amount` to each transaction or use the same `nonce` which would result in invalid transactions.
             - For options like `ttl` or `gasPrice` it does absolutely make sense to set this on contract instance level.
@@ -153,6 +153,11 @@ const tx = await contractInstance.callStatic('get_count', [])
 console.log(tx.decodedResult);
 ```
 
+Note:
+
+- The functions `get` and `callStatic` provide an explicit way to tell the SDK to perform a `dry-run` and to **NOT** broadcast the transaction.
+- When using the `get_count` function directly the SDK will automatically determine that the function is not declared `stateful` and thus perform a `dry-run`, too.
+
 ### c) Payable entrypoints
 You will probably also write functions that require an amount of `aettos` to be provided. These functions must be declared with `payable` and (most likely) `stateful`. Let's assume you have declared following Sophia entrypoint which checks if a required amount of `aettos` has been provided before it continues execution:
 
@@ -171,38 +176,3 @@ const tx = await contractInstance.methods.fund_project.send(1, { amount: 50 })
 // or
 const tx = await contractInstance.call('fund_project', [1], { amount: 50 })
 ```
-
-## Transaction specific options
-For each transaction it is possible to provide an `options` object with one or multiple of the following attributes:
-
-- `amount` (default: 0)
-    - To be used for providing `aettos` (or `AE` with respective denomination) to a contract related transaction.
-- `denomination`
-    - You can specify the denomination of the `amount` that will be provided to the contract related transaction.
-- `onAccount` (default: the first account defined in the account array of the SDK instance)
-    - You can specify the account that should be used to sign a transaction.
-    - Note:
-        - The account needs to be provided to the SDK instance in order to be used for signing.
-- `nonce` (default: current nonce of the account + 1)
-    - The default behavior might cause problems if you perform many transactions in a short period of time.
-    - You might want to implement your own nonce management and provide the nonce "manually".
-- `ttl` (default: 0)
-    - Should be set if you want the transaction to be only valid until a certain block height is reached.
-- `fee` (default: calculated for each tx-type)
-    - The minimum fee is dependent on the tx-type.
-    - You can provide a higher fee to additionally reward the miners.
-- `gas` (default: 1600000 - 21000)
-    - Max. amount of gas to be consumed.
-- `gasPrice` (default: 1e9)
-    - To increase chances to get your transaction included quickly you can use a higher gasPrice.
-- `verify` (default: false)
-    - If set to true the transaction will be verified prior to broadcasting it.
-- `waitMined` (default: true)
-    - Wait for transactions to be mined.
-    - You can get the tx object that contains the tx-hash immediately by setting to `false` and should implement your own logic to watch for mined transactions.
-- `skipTransformDecoded` (default: false)
-    - TODO
-- `skipArgsConvert` (default: false)
-    - TODO
-- `deposit` (default: 0)
-    - Only relevant for a `ContractCreateTx` which is triggered by calling `deploy` or the `init` function.
