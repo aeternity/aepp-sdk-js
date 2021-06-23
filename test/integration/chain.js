@@ -62,7 +62,7 @@ describe('Node Chain', function () {
       await client.spend(0, publicKey, { fee: 100, verify: false })
     } catch (e) {
       const validation = await e.verifyTx()
-      validation.should.has.property('validation')
+      validation.should.has.lengthOf(1)
     }
   })
   it('Get top block', async () => {

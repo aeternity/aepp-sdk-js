@@ -18,7 +18,7 @@ import * as R from 'ramda'
 
 import Chain from './'
 import { AE_AMOUNT_FORMATS, formatAmount } from '../utils/amount-formatter'
-import TransactionValidator from '../tx/validator'
+import verifyTransaction from '../tx/validator'
 import NodePool from '../node-pool'
 import { assertedType } from '../utils/crypto'
 import { pause } from '../utils/other'
@@ -37,12 +37,14 @@ import { DRY_RUN_ACCOUNT, NAME_ID_KEY } from '../tx/builder/schema'
 async function sendTransaction (tx, options = {}) {
   const { waitMined, verify } = R.merge(this.Ae.defaults, options)
   if (verify) {
-    const { validation, tx: txObject, txType } = await this.unpackAndVerify(tx)
+    const validation = await verifyTransaction(tx, this.selectedNode.instance)
     if (validation.length) {
-      throw Object.assign(new Error('Transaction verification error: ' + JSON.stringify(validation)), {
+      const message = 'Transaction verification errors: ' +
+        validation.map(v => v.message).join(', ')
+      throw Object.assign(new Error(message), {
         code: 'TX_VERIFICATION_ERROR',
-        errorData: { validation, tx: txObject, txType },
-        txHash: tx
+        validation,
+        transaction: tx
       })
     }
   }
@@ -60,7 +62,7 @@ async function sendTransaction (tx, options = {}) {
     }
     return { hash: txHash, rawTx: tx }
   } catch (error) {
-    throw Object.assign(error, { rawTx: tx, verifyTx: () => this.unpackAndVerify(tx) })
+    throw Object.assign(error, { rawTx: tx, verifyTx: () => verifyTransaction(tx, this.selectedNode.instance) })
   }
 }
 
@@ -258,7 +260,7 @@ async function resolveName (nameOrId, prefix, { verify, resolveByNode } = {}) {
  * @return {Object} ChainNode instance
  * @example ChainNode({url: 'https://testnet.aeternity.io/'})
  */
-const ChainNode = Chain.compose(TransactionValidator, NodePool, {
+const ChainNode = Chain.compose(NodePool, {
   methods: {
     sendTransaction,
     balance,
