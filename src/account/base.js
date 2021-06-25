@@ -45,12 +45,14 @@ export const isAccountBase = (acc) => !['sign', 'address'].find(f => typeof acc[
  * @rtype (tx: String) => tx: Promise[String], throws: Error
  * @param {String} tx - Transaction to sign
  * @param {Object} opt - Options
+ * @param {Object} [opt.innerTx] - Sign as inner transaction for PayingFor
  * @return {String} Signed transaction
  */
-async function signTransaction (tx, opt) {
-  const networkId = this.getNetworkId(opt)
+async function signTransaction (tx, opt = {}) {
+  const prefixes = [this.getNetworkId(opt)]
+  if (opt.innerTx) prefixes.push('inner_tx')
   const rlpBinaryTx = decode(tx, 'tx')
-  const txWithNetworkId = Buffer.concat([Buffer.from(networkId), hash(rlpBinaryTx)])
+  const txWithNetworkId = Buffer.concat([Buffer.from(prefixes.join('-')), hash(rlpBinaryTx)])
 
   const signatures = [await this.sign(txWithNetworkId, opt)]
   return buildTx({ encodedTx: rlpBinaryTx, signatures }, TX_TYPE.signed).tx

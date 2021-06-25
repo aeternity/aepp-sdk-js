@@ -149,6 +149,7 @@ const OBJECT_TAG_ORACLES_TREE = 625
 const OBJECT_TAG_ACCOUNTS_TREE = 626
 const OBJECT_TAG_GA_ATTACH = 80
 const OBJECT_TAG_GA_META = 81
+const OBJECT_TAG_PAYING_FOR = 82
 const OBJECT_TAG_SOPHIA_BYTE_CODE = 70
 
 const TX_FIELD = (name, type, prefix) => [name, type, prefix]
@@ -225,6 +226,7 @@ export const TX_TYPE = {
   // GA ACCOUNTS
   gaAttach: 'gaAttach',
   gaMeta: 'gaMeta',
+  payingFor: 'payingFor',
   sophiaByteCode: 'sophiaByteCode'
 }
 
@@ -324,6 +326,7 @@ export const OBJECT_ID_TX_TYPE = {
   // GA Accounts
   [OBJECT_TAG_GA_ATTACH]: TX_TYPE.gaAttach,
   [OBJECT_TAG_GA_META]: TX_TYPE.gaMeta,
+  [OBJECT_TAG_PAYING_FOR]: TX_TYPE.payingFor,
   [OBJECT_TAG_SOPHIA_BYTE_CODE]: TX_TYPE.sophiaByteCode
 }
 
@@ -361,33 +364,39 @@ export const KEY_BLOCK_INTERVAL = 3
 
 // MAP WITH FEE CALCULATION https://github.com/aeternity/protocol/blob/master/consensus/consensus.md#gas
 export const TX_FEE_BASE_GAS = (txType) => {
-  switch (txType) {
-    // case TX_TYPE.gaMeta: // TODO investigate MetaTx calculation
-    case TX_TYPE.gaAttach:
-    case TX_TYPE.contractCreate:
-      return BigNumber(5 * BASE_GAS)
-    // Todo Implement meta tx fee calculation
-    case TX_TYPE.gaMeta:
-    case TX_TYPE.contractCall:
-      return BigNumber(12 * BASE_GAS)
-    default:
-      return BigNumber(BASE_GAS)
-  }
+  const factor = ({
+    [TX_TYPE.channelForceProgress]: 30,
+    [TX_TYPE.channelOffChain]: 0,
+    [TX_TYPE.channelOffChainCallContract]: 0,
+    [TX_TYPE.channelOffChainCreateContract]: 0,
+    [TX_TYPE.channelOffChainUpdateDeposit]: 0,
+    [TX_TYPE.channelOffChainUpdateWithdrawal]: 0,
+    [TX_TYPE.channelOffChainUpdateTransfer]: 0,
+    [TX_TYPE.contractCreate]: 5,
+    [TX_TYPE.contractCall]: 12,
+    [TX_TYPE.gaAttach]: 5,
+    [TX_TYPE.gaMeta]: 5,
+    [TX_TYPE.payingFor]: 1 / 5
+  })[txType] || 1
+  return new BigNumber(factor * BASE_GAS)
 }
 
-export const TX_FEE_OTHER_GAS = (txType) => ({ txSize, relativeTtl }) => {
+export const TX_FEE_OTHER_GAS = (txType, txSize, { relativeTtl, innerTxSize }) => {
   switch (txType) {
     case TX_TYPE.oracleRegister:
     case TX_TYPE.oracleExtend:
     case TX_TYPE.oracleQuery:
     case TX_TYPE.oracleResponse:
-      return BigNumber(txSize)
+      return new BigNumber(txSize)
         .times(GAS_PER_BYTE)
         .plus(
           Math.ceil(32000 * relativeTtl / Math.floor(60 * 24 * 365 / KEY_BLOCK_INTERVAL))
         )
+    case TX_TYPE.gaMeta:
+    case TX_TYPE.payingFor:
+      return new BigNumber(txSize).minus(innerTxSize).times(GAS_PER_BYTE)
     default:
-      return BigNumber(txSize).times(GAS_PER_BYTE)
+      return new BigNumber(txSize).times(GAS_PER_BYTE)
   }
 }
 
@@ -544,6 +553,14 @@ const GA_META_TX_2 = [
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('gas', FIELD_TYPES.int),
   TX_FIELD('gasPrice', FIELD_TYPES.int),
+  TX_FIELD('tx', FIELD_TYPES.rlpBinary)
+]
+
+const PAYING_FOR_TX = [
+  ...BASE_TX,
+  TX_FIELD('payerId', FIELD_TYPES.id, 'ak'),
+  TX_FIELD('nonce', FIELD_TYPES.int),
+  TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('tx', FIELD_TYPES.rlpBinary)
 ]
 
@@ -1018,6 +1035,9 @@ export const TX_SERIALIZATION_SCHEMA = {
   },
   [TX_TYPE.gaMeta]: {
     2: TX_SCHEMA_FIELD(GA_META_TX_2, OBJECT_TAG_GA_META)
+  },
+  [TX_TYPE.payingFor]: {
+    1: TX_SCHEMA_FIELD(PAYING_FOR_TX, OBJECT_TAG_PAYING_FOR)
   }
 }
 
@@ -1153,6 +1173,9 @@ export const TX_DESERIALIZATION_SCHEMA = {
   },
   [OBJECT_TAG_GA_META]: {
     2: TX_SCHEMA_FIELD(GA_META_TX_2, OBJECT_TAG_GA_META)
+  },
+  [OBJECT_TAG_PAYING_FOR]: {
+    1: TX_SCHEMA_FIELD(PAYING_FOR_TX, OBJECT_TAG_PAYING_FOR)
   },
   [OBJECT_TAG_CHANNEL_FORCE_PROGRESS_TX]: {
     1: TX_SCHEMA_FIELD(CHANNEL_FORCE_PROGRESS_TX, OBJECT_TAG_CHANNEL_FORCE_PROGRESS_TX)

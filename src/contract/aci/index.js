@@ -60,7 +60,6 @@ export default async function getContractInstance (source, { aci, contractAddres
     skipArgsConvert: false,
     skipTransformDecoded: false,
     callStatic: false,
-    waitMined: true,
     filesystem
   }
   const instance = {

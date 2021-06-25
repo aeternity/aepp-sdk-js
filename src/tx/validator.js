@@ -13,17 +13,21 @@ import { calculateFee, unpackTx } from './builder'
  */
 
 const validators = [
-  async ({ encodedTx, signatures }, { account, node }) => {
+  async ({ encodedTx, signatures }, { account, node, parentTxTypes }) => {
     if ((encodedTx ?? signatures) === undefined) return []
     if (signatures.length !== 1) return [] // TODO: Support multisignature?
-    const networkId = Buffer.from(node.nodeNetworkId)
-    const txWithNetworkId = Buffer.concat([networkId, encodedTx.rlpEncoded])
-    const txHashWithNetworkId = Buffer.concat([networkId, hash(encodedTx.rlpEncoded)])
+    const prefix = Buffer.from([
+      node.nodeNetworkId,
+      ...parentTxTypes.includes(TX_TYPE.payingFor) ? ['inner_tx'] : []
+    ].join('-'))
+    const txWithNetworkId = Buffer.concat([prefix, encodedTx.rlpEncoded])
+    const txHashWithNetworkId = Buffer.concat([prefix, hash(encodedTx.rlpEncoded)])
     const decodedPub = decode(account.id, 'ak')
     if (verify(txWithNetworkId, signatures[0], decodedPub) ||
       verify(txHashWithNetworkId, signatures[0], decodedPub)) return []
     return [{
-      message: 'Signature cannot be verified, please ensure that you using the correct network and the correct private key for the sender address',
+      message: 'Signature cannot be verified, please ensure that you transaction have' +
+        ' the correct prefix and the correct private key for the sender address',
       key: 'InvalidSignature',
       checkedKeys: ['encodedTx', 'signatures']
     }]
@@ -58,9 +62,11 @@ const validators = [
       checkedKeys: ['ttl']
     }]
   },
-  ({ amount, fee, nameFee }, { account }) => {
+  ({ amount, fee, nameFee, tx }, { account, parentTxTypes, txType }) => {
     if ((amount ?? fee ?? nameFee) === undefined) return []
     const cost = new BigNumber(fee).plus(nameFee || 0).plus(amount || 0)
+      .plus(txType === TX_TYPE.payingFor ? tx.tx.encodedTx.tx.fee : 0)
+      .minus(parentTxTypes.includes(TX_TYPE.payingFor) ? fee : 0)
     if (cost.lte(account.balance)) return []
     return [{
       message: `Account balance ${account.balance} is not enough to execute the transaction that costs ${cost.toFixed()}`,
@@ -113,7 +119,8 @@ const validators = [
 ]
 
 const getSenderAddress = tx => [
-  'senderId', 'accountId', 'ownerId', 'callerId', 'oracleId', 'fromId', 'initiator', 'gaId'
+  'senderId', 'accountId', 'ownerId', 'callerId',
+  'oracleId', 'fromId', 'initiator', 'gaId', 'payerId'
 ]
   .map(key => tx[key])
   .filter(a => a)

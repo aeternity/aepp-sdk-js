@@ -32,10 +32,11 @@ export const ignoreVersion = process.env.IGNORE_VERSION || false
 export const genesisAccount = MemoryAccount({ keypair: { publicKey, secretKey } })
 export const account = Crypto.generateKeyPair()
 
-export const BaseAe = async (params = {}) => Universal
+export const BaseAe = async (params = {}, compose = {}) => Universal
   .compose({
     deepProps: { Ae: { defaults: { interval: 50, attempts: 1200 } } }
-  })({
+  })
+  .compose(compose)({
     ...params,
     compilerUrl,
     ignoreVersion,

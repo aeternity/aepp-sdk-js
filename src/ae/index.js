@@ -106,6 +106,27 @@ async function transferFunds (fraction, recipientIdOrName, options) {
 }
 
 /**
+ * Submit transaction of another account paying for it (fee and gas)
+ * @instance
+ * @category async
+ * @rtype (transaction: String, options?: Object) => Promise[String]
+ * @param {String} transaction - tx_<base64>-encoded transaction
+ * @param {Object} [options]
+ * @return {Object} Transaction
+ */
+async function payForTransaction (transaction, options) {
+  const opt = { ...this.Ae.defaults, ...options }
+  return this.send(
+    await this.payingForTx({
+      ...opt,
+      payerId: await this.address(opt),
+      tx: transaction
+    }),
+    opt
+  )
+}
+
+/**
  * Remove all listeners for RPC
  * @instance
  * @return {void}
@@ -135,7 +156,7 @@ function destroyInstance () {
  * @return {Object} Ae instance
  */
 const Ae = stampit(Tx, AccountBase, Chain, {
-  methods: { send, spend, transferFunds, destroyInstance, signUsingGA },
+  methods: { send, spend, transferFunds, payForTransaction, destroyInstance, signUsingGA },
   deepProps: { Ae: { defaults: { denomination: AE_AMOUNT_FORMATS.AETTOS } } }
 })
 

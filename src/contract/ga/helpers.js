@@ -1,6 +1,5 @@
 import BigNumber from 'bignumber.js'
-import { MAX_AUTH_FUN_GAS, TX_TYPE } from '../../tx/builder/schema'
-import { buildTx } from '../../tx/builder'
+import { MAX_AUTH_FUN_GAS } from '../../tx/builder/schema'
 import { hash } from '../../utils/crypto'
 
 export const prepareGaParams = (ins) => async (authData, authFnName) => {
@@ -21,5 +20,3 @@ export const getContractAuthFan = (ins) => async (source, fnName) => {
 
   return { bytecode, authFun: hash(fnName) }
 }
-
-export const wrapInEmptySignedTx = (rlp) => buildTx({ encodedTx: rlp, signatures: [] }, TX_TYPE.signed)
