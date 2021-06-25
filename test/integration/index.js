@@ -33,7 +33,6 @@ export const genesisAccount = MemoryAccount({ keypair: { publicKey, secretKey } 
 export const account = Crypto.generateKeyPair()
 
 export const BaseAe = async (params = {}) => Universal
-  .waitMined(true)
   .compose({
     deepProps: { Ae: { defaults: { interval: 50, attempts: 1200 } } }
   })({
