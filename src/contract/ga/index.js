@@ -27,8 +27,8 @@ import * as R from 'ramda'
 import { ContractAPI } from '../../ae/contract'
 import { TX_TYPE } from '../../tx/builder/schema'
 import { buildTx } from '../../tx/builder'
-import { getContractAuthFan, prepareGaParams, wrapInEmptySignedTx } from './helpers'
-import { assertedType, decodeBase64Check } from '../../utils/crypto'
+import { prepareGaParams, wrapInEmptySignedTx } from './helpers'
+import { assertedType, decodeBase64Check, hash } from '../../utils/crypto'
 
 /**
  * GeneralizeAccount Stamp
@@ -86,16 +86,19 @@ async function createGeneralizeAccount (authFnName, source, args = [], options =
 
   if (await this.isGA(ownerId)) throw new Error(`Account ${ownerId} is already GA`)
 
-  const { authFun, bytecode } = await getContractAuthFan(this)(source, authFnName)
-  const callData = await this.contractEncodeCall(source, 'init', args)
+  const { tx, contractId } = await this.gaAttachTx({
+    ...opt,
+    ownerId,
+    code: (await this.contractCompile(source)).bytecode,
+    callData: await this.contractEncodeCall(source, 'init', args),
+    authFun: hash(authFnName)
+  })
 
-  const { tx, contractId } = await this.gaAttachTx(R.merge(opt, { ownerId, code: bytecode, callData, authFun }))
-
-  const { hash, rawTx } = await this.send(tx, opt)
+  const { hash: transaction, rawTx } = await this.send(tx, opt)
 
   return Object.freeze({
     owner: ownerId,
-    transaction: hash,
+    transaction,
     rawTx,
     gaContractId: contractId
   })
