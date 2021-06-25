@@ -72,7 +72,7 @@ import { decodeEvents, SOPHIA_TYPES } from '@aeternity/aepp-sdk/es/contract/aci/
 
 // hash of a real tx on testnet
 const txHash = 'th_2tMWziKAQR1CwK2PMfvMhKZgEVLmcxsPYkRXey97s9SdXj4zat'
-// client is an object instance of the Universal Stamp
+// client is an instance of the Universal Stamp
 const tx = await client.tx(txHash)
 
 const eventsSchema = [

@@ -1,6 +1,19 @@
 # Transaction options
-For every transaction it is possible to provide an `options` object with one or multiple of the following attributes.
+For every transaction it is possible to provide an `options` object with one or multiple of the following attributes to the respective function that builds and broadcasts the transaction.
 Some of these are common and can be provided for each transaction type. Others are transaction specific and only relevant for a specific tx-type.
+
+The `options` object can be optionally passed to the respective function behind the last parameter, example:
+```js
+const sender = 'ak_...'
+const recipient = 'ak_...'
+const options = { onAccount: sender, denomination: 'ae' } // optional options object
+// client is an instance of the Universal Stamp
+await client.spend(1, recipient, options) // amount, recipient and (optional) options
+```
+
+Note:
+
+- Without the `options` object the sender would be the first account defined in the accounts array that is used to initialize the Universal Stamp and the recipient would receive `1 aetto` instead of `1 AE`.
 
 ## Common options
 These options are common and can be provided to every tx-type:
@@ -17,10 +30,6 @@ These options are common and can be provided to every tx-type:
 - `fee` (default: calculated for each tx-type)
     - The minimum fee is dependent on the tx-type.
     - You can provide a higher fee to additionally reward the miners.
-- `gas` (default: `1600000 - 21000`)
-    - Max. amount of gas to be consumed.
-- `gasPrice` (default: `1e9`)
-    - To increase chances to get your transaction included quickly you can use a higher gasPrice.
 - `verify` (default: `false`)
     - If set to true the transaction will be verified prior to broadcasting it.
 - `waitMined` (default: `true`)
@@ -35,6 +44,10 @@ The following options are sepcific for each tx-type.
     - To be used for providing `aettos` (or `AE` with respective denomination) to a contract related transaction.
 - `denomination` (default: `aettos`)
     - You can specify the denomination of the `amount` that will be provided to the contract related transaction.
+- `gas` (default: `1600000 - 21000`)
+    - Max. amount of gas to be consumed by the transaction.
+- `gasPrice` (default: `1e9`)
+    - To increase chances to get your transaction included quickly you can use a higher gasPrice.
 - `skipTransformDecoded` (default: `false`)
     - TODO, does this work? https://github.com/aeternity/aepp-sdk-js/issues/1228#issue-926690233
 - `skipArgsConvert` (default: `false`)
@@ -56,3 +69,19 @@ The following options are sepcific for each tx-type.
 - `responseTtl` (default `{ type: 'delta', value: 10 }`)
     - The TTL of the response that defines its expiration. The response of the oracle will be garbage collected after its expiration.
     - Format: `{type: 'delta|block', value: 'number'}`
+
+### NameClaimTx
+- `nameFee` (default: calculated based on the length of the name)
+    - The fee in `aettos` that will be payed to claim the name.
+    - For bids in an auction you need to explicitely calculate the required `nameFee` based on the last bid
+
+### NameUpdateTx
+- `clientTtl` (default: `84600`)
+    - This option is an indicator for indexing tools to know how long (in seconds) they could or should cache the name information.
+- `nameTtl` (default: `180000`)
+    - This option tells the protocol the relative TTL based on the current block height.
+    - `180000` is the maximum possible value
+
+### SpendTx
+- `denomination` (default: `aettos`)
+    - You can specify the denomination of the `amount` that will be provided to the contract related transaction.

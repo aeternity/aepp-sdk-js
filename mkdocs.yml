@@ -49,17 +49,16 @@ nav:
     - guides/contracts.md
     - guides/contract-events.md
     - guides/oracles.md
-    - guides/aens-usage.md
-    - guides/delegate-signature-to-contract.md
-    - Wallet Api: guides/how-to-build-aepp.md
-    - Building Wallets: guides/how-to-build-wallet.md
+    - guides/aens.md
+    - Wallet interaction:
+      - guides/connect-aepp-to-wallet.md
+      - guides/build-wallet.md
     - guides/low-vs-high-usage.md
-    - guides/import-tree-shaking.md
-    - guides/transaction-options.md
-  - Tutorials:
-    - NodeJS:
-      - examples/node/transfer-ae-tokens.md
-      - examples/node/contract-interaction.md
-    - tutorials/vuejs/helloworld-blockheight.md
+    - Example Tutorials:
+      - NodeJS:
+        - examples/node/transfer-ae-tokens.md
+        - examples/node/contract-interaction.md
+      - tutorials/vuejs/helloworld-blockheight.md
+  - transaction-options.md
   - Migration Guides:
     - guides/migration/migration-7.0.0.md

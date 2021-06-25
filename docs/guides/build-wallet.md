@@ -1,10 +1,59 @@
-/* global chrome */
+# How to build a wallet
 
-import '../img/icon-128.png'
-import '../img/icon-34.png'
+This guide shows how to build either an **WebExtension Wallet** or a **iFrame-based Wallet**.
 
-import { RpcWallet, Node, MemoryAccount, Crypto, BrowserRuntimeConnection } from 'AE_SDK_MODULES'
+## WebExtension wallet
+The full implementation of this example can be found here:
 
+- [WebExtension Wallet Example](https://github.com/aeternity/aepp-sdk-js/tree/master/examples/browser/wallet-web-extension)
+
+
+Note:
+
+- If you want to see a more advanced implementation you can take a look into the repository of the [Superhero Wallet](https://github.com/aeternity/superhero-wallet)
+
+### 1. Create bridge between extension and page
+First you need to create a bridge between your extension and the page. This can be done as follows:
+
+```js
+import {
+  BrowserRuntimeConnection, BrowserWindowMessageConnection, AeppWalletSchema,
+  ContentScriptBridge, AeppWalletHelpers
+} from '@aeternity/aepp-sdk'
+
+const readyStateCheckInterval = setInterval(function () {
+  if (document.readyState === 'complete') {
+    clearInterval(readyStateCheckInterval)
+
+    const port = AeppWalletHelpers.getBrowserAPI().runtime.connect()
+    const extConnection = BrowserRuntimeConnection({
+      connectionInfo: {
+        description: 'Content Script to Extension connection',
+        origin: window.origin
+      },
+      port
+    })
+    const pageConnection = BrowserWindowMessageConnection({
+      connectionInfo: {
+        description: 'Content Script to Page connection',
+        origin: window.origin
+      },
+      origin: window.origin,
+      sendDirection: AeppWalletSchema.MESSAGE_DIRECTION.to_aepp,
+      receiveDirection: AeppWalletSchema.MESSAGE_DIRECTION.to_waellet
+    })
+
+    const bridge = ContentScriptBridge({ pageConnection, extConnection })
+    bridge.run()
+  }
+}, 10)
+```
+
+### 2. Initialize `RpcWallet` Stamp
+Then you need to initialize `RpcWallet` Stamp in your extension and subscribe for new `runtime` connections.
+After the connection is established you can share the wallet details with the application.
+
+```js
 // ideally this can be configured by the users of the extension
 const NODE_URL = 'https://testnet.aeternity.io'
 const COMPILER_URL = 'https://compiler.aepps.com'
@@ -76,3 +125,11 @@ async function init () {
 }
 
 init().then(_ => console.log('Wallet initialized!'))
+```
+
+## iFrame-based Wallet
+The **iFrame-based** approach works similar to the **WebExtension** approach except that the `ContentScriptBridge` in between isn't needed.
+
+You can take a look into the implementation of the following example to see how it works:
+
+- [iFrame-based Wallet Example](https://github.com/aeternity/aepp-sdk-js/tree/master/examples/browser/wallet-iframe)
