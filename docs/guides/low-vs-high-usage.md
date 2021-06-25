@@ -63,3 +63,77 @@ async function spend (amount, recipient) {
   console.log(await client.api.postTransaction({tx: signedTx}))
 }
 ```
+
+Following functions are available with the low-level API right now:
+
+```js
+console.log(client.api)
+/*
+{
+  getTopHeader: [Function (anonymous)],
+  getCurrentKeyBlock: [Function (anonymous)],
+  getCurrentKeyBlockHash: [Function (anonymous)],
+  getCurrentKeyBlockHeight: [Function (anonymous)],
+  getPendingKeyBlock: [Function (anonymous)],
+  getKeyBlockByHash: [Function (anonymous)],
+  getKeyBlockByHeight: [Function (anonymous)],
+  getMicroBlockHeaderByHash: [Function (anonymous)],
+  getMicroBlockTransactionsByHash: [Function (anonymous)],
+  getMicroBlockTransactionByHashAndIndex: [Function (anonymous)],
+  getMicroBlockTransactionsCountByHash: [Function (anonymous)],
+  getCurrentGeneration: [Function (anonymous)],
+  getGenerationByHash: [Function (anonymous)],
+  getGenerationByHeight: [Function (anonymous)],
+  getAccountByPubkey: [Function (anonymous)],
+  getAccountByPubkeyAndHeight: [Function (anonymous)],
+  getAccountByPubkeyAndHash: [Function (anonymous)],
+  getPendingAccountTransactionsByPubkey: [Function (anonymous)],
+  protectedDryRunTxs: [Function (anonymous)],
+  getTransactionByHash: [Function (anonymous)],
+  getTransactionInfoByHash: [Function (anonymous)],
+  postTransaction: [Function (anonymous)],
+  getContract: [Function (anonymous)],
+  getContractCode: [Function (anonymous)],
+  getContractPoI: [Function (anonymous)],
+  getOracleByPubkey: [Function (anonymous)],
+  getOracleQueriesByPubkey: [Function (anonymous)],
+  getOracleQueryByPubkeyAndQueryId: [Function (anonymous)],
+  getNameEntryByName: [Function (anonymous)],
+  getChannelByPubkey: [Function (anonymous)],
+  getPeerPubkey: [Function (anonymous)],
+  getStatus: [Function (anonymous)],
+  getChainEnds: [Function (anonymous)],
+  postKeyBlock: [Function (anonymous)],
+  postSpend: [Function (anonymous)],
+  getPendingTransactions: [Function (anonymous)],
+  postPayingFor: [Function (anonymous)],
+  postContractCreate: [Function (anonymous)],
+  postContractCall: [Function (anonymous)],
+  postOracleRegister: [Function (anonymous)],
+  postOracleExtend: [Function (anonymous)],
+  postOracleQuery: [Function (anonymous)],
+  postOracleRespond: [Function (anonymous)],
+  postNamePreclaim: [Function (anonymous)],
+  postNameClaim: [Function (anonymous)],
+  postNameUpdate: [Function (anonymous)],
+  postNameTransfer: [Function (anonymous)],
+  postNameRevoke: [Function (anonymous)],
+  getCommitmentId: [Function (anonymous)],
+  postChannelCreate: [Function (anonymous)],
+  postChannelDeposit: [Function (anonymous)],
+  postChannelWithdraw: [Function (anonymous)],
+  postChannelSnapshotSolo: [Function (anonymous)],
+  postChannelSetDelegates: [Function (anonymous)],
+  postChannelCloseMutual: [Function (anonymous)],
+  postChannelCloseSolo: [Function (anonymous)],
+  postChannelSlash: [Function (anonymous)],
+  postChannelSettle: [Function (anonymous)],
+  getNetworkStatus: [Function (anonymous)],
+  getNodeBeneficiary: [Function (anonymous)],
+  getNodePubkey: [Function (anonymous)],
+  getPeers: [Function (anonymous)],
+  dryRunTxs: [Function (anonymous)],
+  getTokenSupplyByHeight: [Function (anonymous)]
+}
+*/
+```

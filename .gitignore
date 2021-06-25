@@ -5,7 +5,7 @@ node_modules
 .dir-locals.el
 /dist
 /es
-/docs/api*
+/docs/api/*
 /docs/examples
 /docs/public
 /docs/docco.css
