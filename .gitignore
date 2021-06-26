@@ -5,6 +5,7 @@ node_modules
 .dir-locals.el
 /dist
 /es
+/docs/api.md
 /docs/api/*
 /docs/examples
 /docs/public
