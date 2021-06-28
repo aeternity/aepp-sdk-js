@@ -7,7 +7,7 @@ This guide shows you how to perform all the operations that you need within the 
 ## 1. Oracle: register
 You register an oracle that responds with the temperature of the city that is included in the query.
 
-To register an oracle you need to provide a `queryFormat` and a `responseFormat` to the `registerOracle` function of the SDK. In addition to the common transaction options you can provide the oracle specific options `queryFee` and `oracleTtl`, see [transaction options](./transaction-options.md#oracleregistertx).
+To register an oracle you need to provide a `queryFormat` and a `responseFormat` to the `registerOracle` function of the SDK. In addition to the common transaction options you can provide the oracle specific options `queryFee` and `oracleTtl`, see [transaction options](../transaction-options.md#oracleregistertx).
 
 ```js
 // init the SDK using the Universal Stamp
@@ -57,7 +57,7 @@ const query = await client.postQueryToOracle(oracleId, "{'city': 'Berlin'}", opt
 
 Note:
 
-- Again, take a look into the [transaction options](./transaction-options.md#oraclequerytx) to see what (other) options you can provide.
+- Again, take a look into the [transaction options](../transaction-options.md#oraclequerytx) to see what (other) options you can provide.
 
 ### Poll for response
 Now you have access to the query object and can poll for the response to that specific query:

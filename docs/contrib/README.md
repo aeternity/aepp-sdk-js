@@ -1,4 +1,4 @@
-# Contributing Info
+# Development
 
 ## Principles
 
@@ -56,7 +56,7 @@ aepp-sdk is transpiled to EcmaScript 5 through [WebPack](https://webpack.js.org/
 
 ## Documenting
 
-Apart from documenting features and code, there is also documentation automatically generated using [**jsdoc**](http://usejsdoc.org/) for documenting JS files (later transformed in to `.md` files (to have them readable in platforms like GitHub) and [a script](../../tooling/docs/examples-to-md.js) for documenting examples and code partials.
+Apart from documenting features and code, there is also documentation automatically generated using [**jsdoc**](http://usejsdoc.org/) for documenting JS files (later transformed in to `.md` files (to have them readable in platforms like GitHub) and [a script](https://github.com/aeternity/aepp-sdk-js/blob/master/tooling/docs/examples-to-md.js) for documenting examples and code partials.
 
 ```bash
 #generate examples and api documentation
@@ -135,8 +135,3 @@ In order to add a local development version of aepp-sdk to a project, `npm link`
 ## Releasing
 
 [How to release a new version](releases.md)
-
-
-## Guides
-
-If you're interested in getting sample code/guide, you can check out the [Guides](../README.md)

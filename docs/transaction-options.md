@@ -48,10 +48,6 @@ The following options are sepcific for each tx-type.
     - Max. amount of gas to be consumed by the transaction.
 - `gasPrice` (default: `1e9`)
     - To increase chances to get your transaction included quickly you can use a higher gasPrice.
-- `skipTransformDecoded` (default: `false`)
-    - TODO, does this work? https://github.com/aeternity/aepp-sdk-js/issues/1228#issue-926690233
-- `skipArgsConvert` (default: `false`)
-    - TODO, what is this for? https://github.com/aeternity/aepp-sdk-js/issues/1228#issue-926690233
 
 ### OracleRegisterTx
 - `queryFee` (default: `30000`)

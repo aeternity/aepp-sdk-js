@@ -111,7 +111,7 @@ console.log(claimTx)
 Note:
 
 - The `nameFee` that is required will be correctly calculated automatically for the initial claim.
-    - It's still possible to pass it as additional param, see [transaction options](./transaction-options.md#nameclaimtx).
+    - It's still possible to pass it as additional param, see [transaction options](../transaction-options.md#nameclaimtx).
 - In case the `claim` triggers an auction the required `nameFee` is locked by the protocol.
     - If you win the auction the `nameFee` is permanently deducted from your accounts balance and effectively *burned*.
         - It will be credited to `ak_11111111111111111111111111111111273Yts` which nobody can access. This reduces the total supply of AE over time. 
@@ -227,7 +227,7 @@ console.log(nameUpdateTx)
 
 Note:
 
-- It's also possible to pass additional [transaction options](./transaction-options.md#nameupdatetx) here, too.
+- It's also possible to pass additional [transaction options](../transaction-options.md#nameupdatetx) here, too.
 
 ### Extend TTL while keeping pointers
 In case you want to extend a name using a custom TTL and keep the current pointers you can do this as follows:

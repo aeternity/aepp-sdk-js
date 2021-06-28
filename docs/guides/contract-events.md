@@ -23,17 +23,9 @@ When initializing a contract instance using the source code and providing the [A
 or obtaining it via http compiler (default) you will be able to access the `emitEvents` entrypoint of the Sophia contract above as follows: 
 
 ```js
-// events emitted by contract calls are automatically decoded (recommended)
+// events emitted by contract calls are automatically decoded
 const tx = await contractInstance.methods.emitEvents(1337, "this message is not indexed")
 console.log(tx.decodedEvents)
-
-// decode events using contract instance (no need to do that as you already have access to the decoded events)
-const decodedUsingInstance = contractInstance.decodeEvents('emitEvents', tx.result.log)
-console.log(decodedUsingInstance)
-
-// decode of events using contract instance ACI methods (no need to do that as you already have access to the decoded events)
-const decodedUsingInstanceMethods = contractInstance.methods.emitEvents.decodeEvents(tx.result.log)
-console.log(decodedUsingInstanceMethods)
 
 /*
 [
@@ -64,13 +56,54 @@ console.log(decodedUsingInstanceMethods)
 */
 ```
 
+In case you obtain the transaction detail from the node you can decode the event data using the contractInstance as follows:
+```js
+const txHash = 'th_2YV3AmAz2kXdTnQxXtR2uxQi3KuLS9wfvXyqKkQQ2Y6dE6RnET';
+// client is an instance of the Universal Stamp
+const tx = await client.tx(txHash)
+
+// decode events using contract instance
+const decodedUsingInstance = contractInstance.decodeEvents('emitEvents', tx.log)
+
+// OR decode of events using contract instance ACI methods
+const decodedUsingInstanceMethods = contractInstance.methods.emitEvents.decodeEvents(tx.log)
+console.log(decodedUsingInstanceMethods || decodedUsingInstance)
+
+/*
+[
+  {
+    address: 'ct_fKhQBiNQkDfoZcVF1ZzPzY7Lig6FnHDCLyFYBY33ZjfzGYPps',
+    data: 'cb_dGhpcyBtZXNzYWdlIGlzIG5vdCBpbmRleGVkdWmUpw==',
+    topics: [
+      '101640830366340000167918459210098337687948756568954742276612796897811614700269',
+      '39519965516565108473327470053407124751867067078530473195651550649472681599133'
+    ],
+    name: 'AnotherEvent',
+    decoded: [
+      'fUq2NesPXcYZ1CcqBcGC3StpdnQw3iVxMA3YSeCNAwfN4myQk',
+      'this message is not indexed'
+    ]
+  },
+  {
+    address: 'ct_fKhQBiNQkDfoZcVF1ZzPzY7Lig6FnHDCLyFYBY33ZjfzGYPps',
+    data: 'cb_Xfbg4g==',
+    topics: [
+      '59505622142252318624300825714684802559980671551955787864303522023309554554980',
+      1337
+    ],
+    name: 'FirstEvent',
+    decoded: [ '1337' ]
+  }
+]
+*/
+```
+
 ## Decode events without ACI (low-level)
 As an alternative you can make use of the low-level API which allows you to decode events for a given transaction by providing the `log` of the transaction as well as the correct `schema` of the events to the `decodeEvents` function manually:
 
 ```js
 import { decodeEvents, SOPHIA_TYPES } from '@aeternity/aepp-sdk/es/contract/aci/transformation'
 
-// hash of a real tx on testnet
 const txHash = 'th_2tMWziKAQR1CwK2PMfvMhKZgEVLmcxsPYkRXey97s9SdXj4zat'
 // client is an instance of the Universal Stamp
 const tx = await client.tx(txHash)

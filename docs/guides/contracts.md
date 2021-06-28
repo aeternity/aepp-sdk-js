@@ -47,7 +47,7 @@ const client = await Universal({
 Note:
 
 - You can provide multiple accounts to the SDK.
-- For each transaction you can choose a specific account to use for signing (by default the first account will be used), see [transaction options](./transaction-options.md).
+- For each transaction you can choose a specific account to use for signing (by default the first account will be used), see [transaction options](../transaction-options.md).
     - This is specifically important and useful for writing tests.
 
 ## 3. Initialize the contract instance
@@ -79,7 +79,7 @@ Note:
     - `forceCodeCheck` (default: true)
         - Don't check source code.
     - `opt` (default: {})
-        - Object with other [transaction options](./transaction-options.md) which will be provided to **every transaction** that is initiated using the contract instance. You should be aware that:
+        - Object with other [transaction options](../transaction-options.md) which will be provided to **every transaction** that is initiated using the contract instance. You should be aware that:
             - For most of these additional options it doesn't make sense to define them at contract instance level.
             - You wouldn't want to provide an `amount` to each transaction or use the same `nonce` which would result in invalid transactions.
             - For options like `ttl` or `gasPrice` it does absolutely make sense to set this on contract instance level.

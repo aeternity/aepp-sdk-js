@@ -60,6 +60,9 @@ nav:
         - examples/node/contract-interaction.md
       - tutorials/vuejs/helloworld-blockheight.md
   - transaction-options.md
-  - api-reference.md
   - Migration Guides:
     - guides/migration/migration-7.0.0.md
+  - api-reference.md
+  - Contribute:
+    - contrib/README.md
+    - contrib/releases.md
