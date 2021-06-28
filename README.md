@@ -1,4 +1,4 @@
-# [Æternity](https://aeternity.com/)'s JavaScript SDK
+# [aeternity](https://aeternity.com/)'s JavaScript SDK
 
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/aeternity/aepp-sdk-js.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/aeternity/aepp-sdk-js/context:javascript)
 [![codecov](https://codecov.io/gh/aeternity/aepp-sdk-js/branch/develop/graph/badge.svg)](https://codecov.io/gh/aeternity/aepp-sdk-js)
@@ -18,16 +18,16 @@ JavaScript SDK for the revolutionary [æternity] blockchain, targeting the
 
 ## Guides & Examples
 
-Check out our [Quick Start guide](docs/guides/quick-start.md), [Documentation](docs/README.md), and [Examples](examples/README.md).
+Check out [Installation](docs/index.md), [Quick Start](docs/quick-start.md) and [Examples](examples/README.md).
 
 ## CLI - Command Line Client
 
-To quickly test _all_ of Aeternity's blockchain features from your Terminal, you can Install and use our **NodeJS [CLI](https://github.com/aeternity/aepp-cli-js)** by running:
+To quickly test _all_ of aeternity's blockchain features from your terminal, you can install and use our **NodeJS [CLI](https://github.com/aeternity/aepp-cli-js)** by running:
 
 1. `npm i -g @aeternity/aepp-cli` to globally install the CLI
 2. `aecli --help` to get a list of possible commands
 
-_eg._ Create an Account:
+_eg._ Create an account:
 
 `aecli account create testWhateverAccountName`
 
@@ -35,7 +35,7 @@ _eg._ Create an Account:
 
 For advanced use, to get a deeper understanding of the SDK or to contribute to its development, it is advised to read the [Contributing Guidelines](docs/contrib/README.md) section.
 
-## Change Log
+## Changelog
 
 We keep our [Changelog](CHANGELOG.md) up to date.
 

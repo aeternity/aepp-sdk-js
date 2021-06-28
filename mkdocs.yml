@@ -1,4 +1,4 @@
-site_name: Aeternity JavaScript SDK
+site_name: aeternity JavaScript SDK
 plugins:
   - search
   - mkdocs-simple-hooks:
@@ -26,10 +26,6 @@ theme:
         name: Switch to light mode
   features:
     - content.tabs.link
-    # - navigation.instant
-    # - navigation.sections
-    # - navigation.tabs
-    # - navigation.tracking
     - search.highlight
     - search.share
     - search.suggest
@@ -46,23 +42,24 @@ nav:
   - index.md
   - quick-start.md
   - Usage Guides:
+    - guides/aens.md
     - guides/contracts.md
     - guides/contract-events.md
     - guides/oracles.md
-    - guides/aens.md
+    - guides/low-vs-high-usage.md
     - Wallet interaction:
       - guides/connect-aepp-to-wallet.md
       - guides/build-wallet.md
-    - guides/low-vs-high-usage.md
-    - Example Tutorials:
-      - NodeJS:
-        - examples/node/transfer-ae-tokens.md
-        - examples/node/contract-interaction.md
-      - tutorials/vuejs/helloworld-blockheight.md
   - transaction-options.md
+  - Examples & Tutorials:
+    - NodeJS:
+      - examples/node/transfer-ae-tokens.md
+      - examples/node/contract-interaction.md
+    - tutorials/vuejs/helloworld-blockheight.md
+  - api-reference.md
+  - Changelog: CHANGELOG.md
   - Migration Guides:
     - guides/migration/migration-7.0.0.md
-  - api-reference.md
   - Contribute:
     - contrib/README.md
     - contrib/releases.md

@@ -49,6 +49,18 @@ The following options are sepcific for each tx-type.
 - `gasPrice` (default: `1e9`)
     - To increase chances to get your transaction included quickly you can use a higher gasPrice.
 
+### NameClaimTx
+- `nameFee` (default: calculated based on the length of the name)
+    - The fee in `aettos` that will be payed to claim the name.
+    - For bids in an auction you need to explicitely calculate the required `nameFee` based on the last bid
+
+### NameUpdateTx
+- `clientTtl` (default: `84600`)
+    - This option is an indicator for indexing tools to know how long (in seconds) they could or should cache the name information.
+- `nameTtl` (default: `180000`)
+    - This option tells the protocol the relative TTL based on the current block height.
+    - `180000` is the maximum possible value
+
 ### OracleRegisterTx
 - `queryFee` (default: `30000`)
     - The fee in `aettos` that the oracle requests in order to provide a response.
@@ -65,18 +77,6 @@ The following options are sepcific for each tx-type.
 - `responseTtl` (default `{ type: 'delta', value: 10 }`)
     - The TTL of the response that defines its expiration. The response of the oracle will be garbage collected after its expiration.
     - Format: `{type: 'delta|block', value: 'number'}`
-
-### NameClaimTx
-- `nameFee` (default: calculated based on the length of the name)
-    - The fee in `aettos` that will be payed to claim the name.
-    - For bids in an auction you need to explicitely calculate the required `nameFee` based on the last bid
-
-### NameUpdateTx
-- `clientTtl` (default: `84600`)
-    - This option is an indicator for indexing tools to know how long (in seconds) they could or should cache the name information.
-- `nameTtl` (default: `180000`)
-    - This option tells the protocol the relative TTL based on the current block height.
-    - `180000` is the maximum possible value
 
 ### SpendTx
 - `denomination` (default: `aettos`)

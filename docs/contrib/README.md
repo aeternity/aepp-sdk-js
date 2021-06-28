@@ -22,10 +22,10 @@ It uses the following Javascript technologies and principles:
 - Convention over configuration
 - "Easy things should be easy, and hard things should be possible." [source] -- [Larry Wall]
 - Support for
-  - module access, enabling tree-shaking
-  - direct use in node scripts through bundling
-  - direct use in browser `<script>` tags through bundling
-  - bundling through webpack
+    - module access, enabling tree-shaking
+    - direct use in node scripts through bundling
+    - direct use in browser `<script>` tags through bundling
+    - bundling through webpack
 
 [Node's Swagger file]: https://github.com/aeternity/aeternity/blob/master/config/swagger.yaml
 [stampit]: http://stampit.js.org/
