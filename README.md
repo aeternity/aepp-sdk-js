@@ -18,7 +18,18 @@ JavaScript SDK for the revolutionary [æternity] blockchain, targeting the
 
 ## Guides & Examples
 
-Check out [Installation](docs/index.md), [Quick Start](docs/quick-start.md) and [Examples](examples/README.md).
+Introduction
+- [Installation](docs/index.md)
+- [Quick Start](docs/quick-start.md)
+
+Usage guides:
+- [Aeternity Naming System](docs/guides/aens.md)
+- [Contracts](docs/guides/contracts.md)
+- [Contract events](docs/guides/contract-events.md)
+- [Oracles](docs/guides/oracles.md)
+- [Low vs High level API](docs/guides/low-vs-high-usage.md)
+
+There are also [examples](examples/README.md) that you can directly use and play with.
 
 ## CLI - Command Line Client
 
@@ -26,10 +37,6 @@ To quickly test _all_ of aeternity's blockchain features from your terminal, you
 
 1. `npm i -g @aeternity/aepp-cli` to globally install the CLI
 2. `aecli --help` to get a list of possible commands
-
-_eg._ Create an account:
-
-`aecli account create testWhateverAccountName`
 
 ## Contributing
 
