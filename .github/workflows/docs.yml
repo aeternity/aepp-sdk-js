@@ -1,0 +1,23 @@
+name: Publish docs
+on:
+  push:
+    branches: ['develop', 'docs-improvements']
+      
+jobs:
+  mkdocs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip3
+          key: ${{ runner.os }}-pip-${{ hashFiles('docs/requirements.txt') }}
+      - run: pip3 install -r docs/requirements.txt
+      - run: mkdocs build
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: site
