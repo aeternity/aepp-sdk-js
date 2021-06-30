@@ -1,7 +1,7 @@
 # Contracts
 
 ## Introduction
-The smart contract language of the aeternity blockchain is [Sophia](https://github.com/aeternity/aesophia/blob/v6.0.0/docs/sophia.md). It is a functional language in the ML family, strongly typed and has restricted mutable state.
+The smart contract language of the aeternity blockchain is [Sophia](https://github.com/aeternity/aesophia/blob/v6.0.1/docs/sophia.md). It is a functional language in the ML family, strongly typed and has restricted mutable state.
 
 Before interacting with contracts using the SDK you should get familiar with Sophia itself first. Have a look into [aepp-sophia-examples](https://github.com/aeternity/aepp-sophia-examples) and start rapid prototyping using [AEstudio](https://studio.aepps.com).
 
@@ -58,7 +58,7 @@ const contractInstance = await client.getContractInstance(CONTRACT_SOURCE)
 
 Note:
 
-- If your contract includes external dependencies which are not part of the [standard library](https://github.com/aeternity/aesophia/blob/v6.0.0/docs/sophia_stdlib.md) you should initialize the contract using:
+- If your contract includes external dependencies which are not part of the [standard library](https://github.com/aeternity/aesophia/blob/v6.0.1/docs/sophia_stdlib.md) you should initialize the contract using:
   ```js
   const filesystem = ... // key-value map with name of the include as key and source code of the include as value
   const contractInstance = await client.getContractInstance(CONTRACT_SOURCE, { filesystem })
@@ -163,7 +163,7 @@ You will probably also write functions that require an amount of `aettos` to be 
 
 ```sophia
 payable stateful entrypoint fund_project(project_id: int) =
-        require(Call.value >= 50, "at least 50 aettos need to be provided")
+        require(Call.value >= 50, 'at least 50 aettos need to be provided')
         // further logic ...
 ```
 
@@ -176,3 +176,26 @@ const tx = await contractInstance.methods.fund_project.send(1, { amount: 50 })
 // or
 const tx = await contractInstance.call('fund_project', [1], { amount: 50 })
 ```
+
+## Transaction options
+As already stated various times in the guide it is possible to provide [transaction options](../transaction-options.md) as object to a function of the SDK that builds and potentially broadcasts a transaction. This object can be passed as additional param to each of these functions and overrides the default settings.
+
+## Sophia datatype cheatsheet
+Sometimes you might wonder how to pass params to the JavaScript method that calls an entrypoint of your Sophia smart contract. The following table may help you out.
+
+| Type | Sophia entrypoint definition | JavaScript method call |
+|------|--------|----|
+|  int    |  ` add_two(one: int, two: int)`      | `add_two(1 , 2)`   |
+|  address    |  ` set_owner(owner: address)`        |  `set_owner('ak_1337...')`   |
+|  bool    |  `is_it_true(answer: bool)`      |  `is_it_true(true)`  |
+|  bits    |  `give_me_bits(input: bits)`      |  `give_me_bits([1,0,1,1,0,])`  |
+|  bytes    | `get_bytes(test: bytes(3))`       | `get_bytes(['0x01','0x1f', '0x10'])`   |
+|  string    | `hello_world(say_hello: string)`       |  `hello_world('Hello!')`  |
+|  list    |  `have_a_few(candy: list(string))`      |  `have_a_few(['Skittles', 'M&Ms', 'JellyBelly'])`  |
+|  tuple    |  `a_few_things(things: (string * int * map(address, bool)))`      | `a_few_things(['hola', 3, {'ak_1337...': true}])`   |
+|  record    |   `record user = {`<br /> &nbsp; &nbsp; &nbsp; &nbsp; `firstname: string,` <br /> &nbsp; &nbsp; &nbsp; &nbsp; `lastname: string` <br /> `}` <br />  <br />  `get_firstname(input: user): string`    |  `get_firstname({'firstname': 'Alfred', 'lastname': 'Mustermann'})`  |
+| map     |  `balances(values: map(address, int))`      |  `balances({'ak_1337...': 123, 'ak_FCKGW...': 321, 'ak_Rm5U...': 999})`  |
+| option()     |     `number_defined(value: option(int)): bool = `<br />  &nbsp; &nbsp; &nbsp; &nbsp; `Option.is_some(value)`       |  `// the datatype in the option()` <br /> `number_defined(1337) // int in this case`  |
+| hash     |  `a_gram(of: hash)`      | `// 32 bytes signature` <br />  `a_gram(af01...490f)`  |
+| signature     |  `one_signature(sig: signature)`      |  `// 64 bytes signature` <br />  `one_signature(af01...490f)`  |
+|  functions    |   (Higher order) functions are not allowed in `entrypoint` params     |    |

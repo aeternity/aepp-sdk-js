@@ -350,7 +350,7 @@ Note:
 - After a timeout of `2016` keyblocks the name will be available for claiming again. 
 
 ## Delegate signature to contract (AENS interface)
-It is possible to authorize a Sophia contract to manage an AENS name on behalf of your account. In order to achieve that you need to provide a delegation signature to the contract. The contract will then be able to use the [AENS interface](https://github.com/aeternity/aesophia/blob/v6.0.0/docs/sophia.md#aens-interface) and perform AENS related actions on behalf of your account.
+It is possible to authorize a Sophia contract to manage an AENS name on behalf of your account. In order to achieve that you need to provide a delegation signature to the contract. The contract will then be able to use the [AENS interface](https://github.com/aeternity/aesophia/blob/v6.0.1/docs/sophia.md#aens-interface) and perform AENS related actions on behalf of your account.
 
 This functionality could for example be used to build an AENS marketplace.
 
