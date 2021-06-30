@@ -26,3 +26,4 @@ coverage.*
 /examples/**/dist
 .history
 .site
+site

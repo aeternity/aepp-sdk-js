@@ -7,9 +7,14 @@ plugins:
 repo_url: 'https://github.com/aeternity/aepp-sdk-js'
 edit_uri: ''
 
+extra:
+  version:
+    provider: mike
+
 theme:
   favicon: images/favicon.png
   name: material
+  custom_dir: tooling/docs/overrides
   language: en
   palette:
     - scheme: default
