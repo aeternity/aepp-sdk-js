@@ -18,4 +18,5 @@ jobs:
       - run: pip3 install -r docs/requirements.txt
       - run: git config --global user.email "github-action@users.noreply.github.com"
       - run: git config --global user.name "GitHub Action"
-      - run: mike deploy --push --update-aliases develop latest
+      - run: mike deploy --push --update-aliases develop latest --force
+      - run: mike set-default --push latest --force
