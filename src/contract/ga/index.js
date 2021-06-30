@@ -27,8 +27,8 @@ import * as R from 'ramda'
 import { ContractAPI } from '../../ae/contract'
 import { TX_TYPE } from '../../tx/builder/schema'
 import { buildTx } from '../../tx/builder'
+import { decode } from '../../tx/builder/helpers'
 import { getContractAuthFan, prepareGaParams, wrapInEmptySignedTx } from './helpers'
-import { assertedType, decodeBase64Check } from '../../utils/crypto'
 
 /**
  * GeneralizeAccount Stamp
@@ -117,7 +117,7 @@ async function createMetaTx (rawTransaction, authData, authFnName, options = {})
   const { authCallData, gas } = await prepareGaParams(this)(authData, authFnName)
   const opt = R.merge(this.Ae.defaults, options)
   // Get transaction rlp binary
-  const rlpBinaryTx = decodeBase64Check(assertedType(rawTransaction, 'tx'))
+  const rlpBinaryTx = decode(rawTransaction, 'tx')
   // Wrap in SIGNED tx with empty signatures
   const { rlpEncoded } = wrapInEmptySignedTx(rlpBinaryTx)
   // Get abi

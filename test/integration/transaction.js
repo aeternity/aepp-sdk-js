@@ -199,7 +199,7 @@ describe('Native Transaction', function () {
     const nativeTx = await clientNative.oracleRegisterTx(params)
 
     txFromAPI.should.be.equal(nativeTx)
-    await clientNative.send(nativeTx, { verify: true })
+    await clientNative.send(nativeTx)
 
     const oId = (await client.api.getOracleByPubkey(oracleId)).id
     oId.should.be.equal(oracleId)

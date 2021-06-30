@@ -18,11 +18,10 @@ import * as R from 'ramda'
 
 import Chain from './'
 import { AE_AMOUNT_FORMATS, formatAmount } from '../utils/amount-formatter'
-import TransactionValidator from '../tx/validator'
+import verifyTransaction from '../tx/validator'
 import NodePool from '../node-pool'
-import { assertedType } from '../utils/crypto'
 import { pause } from '../utils/other'
-import { isNameValid, produceNameId } from '../tx/builder/helpers'
+import { isNameValid, produceNameId, decode } from '../tx/builder/helpers'
 import { DRY_RUN_ACCOUNT, NAME_ID_KEY } from '../tx/builder/schema'
 
 /**
@@ -36,14 +35,15 @@ import { DRY_RUN_ACCOUNT, NAME_ID_KEY } from '../tx/builder/schema'
 
 async function sendTransaction (tx, options = {}) {
   const { waitMined, verify } = R.merge(this.Ae.defaults, options)
-  // Verify transaction before broadcast
-  if (verify || (typeof verify !== 'boolean' && this.verifyTxBeforeSend)) {
-    const { validation, tx: txObject, txType } = await this.unpackAndVerify(tx)
+  if (verify) {
+    const validation = await verifyTransaction(tx, this.selectedNode.instance)
     if (validation.length) {
-      throw Object.assign(new Error('Transaction verification error: ' + JSON.stringify(validation)), {
+      const message = 'Transaction verification errors: ' +
+        validation.map(v => v.message).join(', ')
+      throw Object.assign(new Error(message), {
         code: 'TX_VERIFICATION_ERROR',
-        errorData: { validation, tx: txObject, txType },
-        txHash: tx
+        validation,
+        transaction: tx
       })
     }
   }
@@ -61,7 +61,7 @@ async function sendTransaction (tx, options = {}) {
     }
     return { hash: txHash, rawTx: tx }
   } catch (error) {
-    throw Object.assign(error, { rawTx: tx, verifyTx: () => this.unpackAndVerify(tx) })
+    throw Object.assign(error, { rawTx: tx, verifyTx: () => verifyTransaction(tx, this.selectedNode.instance) })
   }
 }
 
@@ -221,31 +221,33 @@ async function getName (name) {
  * @param {String} nameOrId
  * @param {String} prefix
  * @param {Object} [options]
- * @param {Boolean} [options.verify] Enables resolving by node, needed for compatibility with `verify` option of other methods
- * @param {Boolean} [options.resolveByNode] Enables pointer resolving using node (isn't more durable to resolve it on the node side?)
+ * @param {Boolean} [options.verify] To ensure that name exist and have a corresponding pointer
+ * @param {Boolean} [options.resolveByNode] Enables pointer resolving using node // TODO: avoid that to don't trust to current api gateway
  * @return {String} Address or AENS name hash
  */
 async function resolveName (nameOrId, prefix, { verify, resolveByNode } = {}) {
   if (!nameOrId || typeof nameOrId !== 'string') {
-    throw new Error('Invalid name or address. Should be a string')
+    throw new Error(`Name or address should be a string: ${nameOrId}`)
   }
   const prefixes = Object.keys(NAME_ID_KEY)
   if (!prefixes.includes(prefix)) {
-    throw new Error(`Invalid prefix ${prefix}. Should be one of [${prefixes}]`)
+    throw new Error(`Invalid prefix ${prefix}, should be one of [${prefixes}]`)
   }
-  if (assertedType(nameOrId, prefix, true)) return nameOrId
-
+  try {
+    decode(nameOrId, prefix)
+    return nameOrId
+  } catch (error) {}
   if (isNameValid(nameOrId)) {
-    if (resolveByNode || verify) {
+    if (verify || resolveByNode) {
       const name = await this.getName(nameOrId).catch(_ => null)
-      if (!name) throw new Error('Name not found')
+      if (!name) throw new Error(`Name not found: ${nameOrId}`)
       const pointer = name.pointers.find(({ id }) => id.split('_')[0] === prefix)
-      if (!pointer) throw new Error(`Name ${nameOrId} do not have pointers for ${prefix}`)
-      return pointer.id
+      if (!pointer) throw new Error(`Name ${nameOrId} don't have pointers for ${prefix}`)
+      if (resolveByNode) return pointer.id
     }
     return produceNameId(nameOrId)
   }
-  throw new Error('Invalid name or address')
+  throw new Error(`Invalid name or address: ${nameOrId}`)
 }
 
 /**
@@ -260,10 +262,7 @@ async function resolveName (nameOrId, prefix, { verify, resolveByNode } = {}) {
  * @return {Object} ChainNode instance
  * @example ChainNode({url: 'https://testnet.aeternity.io/'})
  */
-const ChainNode = Chain.compose(TransactionValidator, NodePool, {
-  init ({ verifyTx = true }) {
-    this.verifyTxBeforeSend = verifyTx
-  },
+const ChainNode = Chain.compose(NodePool, {
   methods: {
     sendTransaction,
     balance,

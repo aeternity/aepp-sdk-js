@@ -1,229 +1,152 @@
-import {
-  verify,
-  decodeBase58Check,
-  assertedType
-} from '../utils/crypto'
-import { encode } from '../tx/builder/helpers'
+import { verify, hash } from '../utils/crypto'
+import { encode, decode } from './builder/helpers'
 
 import BigNumber from 'bignumber.js'
-import {
-  BASE_VERIFICATION_SCHEMA,
-  CONTRACT_VERIFICATION_SCHEMA,
-  MIN_GAS_PRICE,
-  NAME_CLAIM_VERIFICATION_SCHEMA,
-  OBJECT_ID_TX_TYPE,
-  OBJECT_TAG_SIGNED_TRANSACTION,
-  PROTOCOL_VM_ABI,
-  SIGNATURE_VERIFICATION_SCHEMA,
-  TX_TYPE
-} from './builder/schema'
-import { buildTxHash, calculateFee, unpackTx } from './builder'
-import NodePool from '../node-pool'
+import { MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE } from './builder/schema'
+import { calculateFee, unpackTx } from './builder'
 
 /**
  * Transaction validator
  * @module @aeternity/aepp-sdk/es/tx/validator
- * @export TransactionValidator
- * @example import { TransactionValidator } from '@aeternity/aepp-sdk'
+ * @export verifyTransaction
+ * @example import { verifyTransaction } from '@aeternity/aepp-sdk'
  */
 
-const VALIDATORS = {
-  // VALIDATE SIGNATURE
-  signature ({ rlpEncoded, signature, ownerPublicKey, networkId = 'ae_mainnet' }) {
-    const txWithNetworkId = Buffer.concat([Buffer.from(networkId), rlpEncoded])
-    const txHashWithNetworkId = Buffer.concat([Buffer.from(networkId), buildTxHash(rlpEncoded, { raw: true })])
-    const decodedPub = decodeBase58Check(assertedType(ownerPublicKey, 'ak'))
-    return verify(txWithNetworkId, signature, decodedPub) || verify(txHashWithNetworkId, signature, decodedPub)
+const validators = [
+  async ({ encodedTx, signatures }, { account, node }) => {
+    if ((encodedTx ?? signatures) === undefined) return []
+    if (signatures.length !== 1) return [] // TODO: Support multisignature?
+    const networkId = Buffer.from(node.nodeNetworkId)
+    const txWithNetworkId = Buffer.concat([networkId, encodedTx.rlpEncoded])
+    const txHashWithNetworkId = Buffer.concat([networkId, hash(encodedTx.rlpEncoded)])
+    const decodedPub = decode(account.id, 'ak')
+    if (verify(txWithNetworkId, signatures[0], decodedPub) ||
+      verify(txHashWithNetworkId, signatures[0], decodedPub)) return []
+    return [{
+      message: 'Signature cannot be verified, please ensure that you using the correct network and the correct private key for the sender address',
+      key: 'InvalidSignature',
+      checkedKeys: ['encodedTx', 'signatures']
+    }]
   },
-  // VALIDATE IF ENOUGH FEE
-  insufficientFee ({ minFee, fee }) {
-    return BigNumber(minFee).lte(BigNumber(fee))
+  async ({ encodedTx, tx }, { node, parentTxTypes, txType }) => {
+    if ((encodedTx ?? tx) === undefined) return []
+    return verifyTransaction(
+      encode((encodedTx ?? tx).rlpEncoded, 'tx'),
+      node,
+      [...parentTxTypes, txType]
+    )
   },
-  // VALIDATE IF TTL VALID
-  expiredTTL ({ ttl, height }) {
-    return BigNumber(ttl).eq(0) || BigNumber(ttl).gte(BigNumber(height))
-  },
-  // Insufficient Balance for Amount plus Fee
-  insufficientBalanceForAmountFee ({ balance, amount = 0, fee }) {
-    return BigNumber(balance).gte(BigNumber(amount).plus(fee))
-  },
-  // Insufficient Balance for Amount
-  insufficientBalanceForAmount ({ balance, amount = 0 }) {
-    return BigNumber(balance).gte(BigNumber(amount))
-  },
-  // IF NONCE USED
-  nonceUsed ({ accountNonce, nonce }) {
-    return BigNumber(nonce).gt(BigNumber(accountNonce))
-  },
-  // IF NONCE TO HIGH
-  nonceHigh ({ accountNonce, nonce }) {
-    return !(BigNumber(nonce).gt(BigNumber(accountNonce).plus(1)))
-  },
-  minGasPrice ({ gasPrice }) {
-    return isNaN(gasPrice) || BigNumber(gasPrice).gte(BigNumber(MIN_GAS_PRICE))
-  },
-  // VM/ABI version validation based on consensus protocol version
-  vmAndAbiVersion ({ ctVersion, abiVersion, consensusProtocolVersion, txType }) {
-    // If not contract tx
-    if (!ctVersion) ctVersion = { abiVersion }
-    const supportedProtocol = PROTOCOL_VM_ABI[consensusProtocolVersion]
-    // If protocol not implemented
-    if (!supportedProtocol) return true
-    // If protocol for tx type not implemented
-    const txProtocol = supportedProtocol[txType]
-
-    return !Object.entries(ctVersion)
-      .reduce((acc, [key, value]) =>
-        [...acc, value === undefined ? true : txProtocol[key].includes(parseInt(value))],
-      []).includes(false)
-  },
-  insufficientBalanceForFeeNameFee ({ nameFee, fee, balance, VSN }) {
-    return VSN === 1 || BigNumber(balance).gte(BigNumber(nameFee).plus(fee))
-  }
-}
-
-const resolveDataForBase = async (chain, { ownerPublicKey }) => {
-  let accountNonce = 0
-  let accountBalance = 0
-  try {
-    const { nonce, balance } = await chain.api.getAccountByPubkey(ownerPublicKey)
-    accountNonce = nonce
-    accountBalance = balance
-  } catch (e) { console.log('We can not get info about this publicKey') }
-  return {
-    height: (await chain.api.getCurrentKeyBlockHeight()).height,
-    balance: accountBalance,
-    accountNonce,
-    ownerPublicKey,
-    ...chain.getNodeInfo()
-  }
-}
-
-// Verification using SCHEMA
-const verifySchema = (schema, data) => {
-  // Verify through schema
-  return schema.reduce(
-    (acc, [msg, validatorKey, { key, type, txKey }]) => {
-      if (!VALIDATORS[validatorKey](data)) acc.push({ msg: msg(data), txKey, type })
-      return acc
-    },
-    []
-  )
-}
-
-/**
- * Unpack and verify transaction (verify nonce, ttl, fee, signature, account balance)
- * @function
- * @alias module:@aeternity/aepp-sdk/es/tx/validator
- *
- * @param {String} txHash Base64Check transaction hash
- * @param {Object} [options={}] Options
- * @param {String} [options.networkId] networkId Use in signature verification
- * @return {Promise<Object>} Object with verification errors and warnings
- */
-async function unpackAndVerify (txHash, { networkId } = {}) {
-  const { tx: unpackedTx, rlpEncoded, txType } = unpackTx(txHash)
-
-  if (+unpackedTx.tag === OBJECT_TAG_SIGNED_TRANSACTION) {
-    const { txType, tx } = unpackedTx.encodedTx
-    const signatures = unpackedTx.signatures.map(raw => ({ raw, hash: encode(raw, 'sg') }))
-    const rlpEncodedTx = unpackedTx.encodedTx.rlpEncoded
-
-    return {
-      validation: await this.verifyTx({ tx, signatures, rlpEncoded: rlpEncodedTx }, networkId),
-      tx,
-      signatures,
-      txType
-    }
-  }
-  return {
-    validation: await this.verifyTx({ tx: unpackedTx, rlpEncoded }, networkId),
-    tx: unpackedTx,
-    txType
-  }
-}
-
-const getOwnerPublicKey = (tx) =>
-  tx[['senderId', 'accountId', 'ownerId', 'callerId', 'oracleId', 'fromId', 'initiator', 'gaId'].find(key => tx[key])].replace('ok_', 'ak_')
-
-/**
- * Verify transaction (verify nonce, ttl, fee, signature, account balance)
- * @function
- * @alias module:@aeternity/aepp-sdk/es/tx/validator
- *
- * @param {Object} [data={}] data TX data object
- * @param {String} [data.tx] tx Transaction hash
- * @param {Array} [data.signatures] signatures Transaction signature's
- * @param {Array} [data.rlpEncoded] rlpEncoded RLP encoded transaction
- * @param {String} networkId networkId Use in signature verification
- * @return {Promise<Array>} Object with verification errors and warnings
- */
-async function verifyTx ({ tx, signatures, rlpEncoded }, networkId) {
-  networkId = networkId || this.getNetworkId() || 'ae_mainnet'
-  // Fetch data for verification
-  const ownerPublicKey = getOwnerPublicKey(tx)
-  const gas = Object.prototype.hasOwnProperty.call(tx, 'gas') ? +tx.gas : 0
-  const txType = OBJECT_ID_TX_TYPE[+tx.tag]
-  const resolvedData = {
-    minFee: calculateFee(0, txType, { gas, params: tx, showWarning: false, vsn: tx.VSN }),
-    ...(await resolveDataForBase(this, { ownerPublicKey })),
-    ...tx,
-    txType
-  }
-  const signatureVerification = signatures && signatures.length
-    ? verifySchema(SIGNATURE_VERIFICATION_SCHEMA, {
-      rlpEncoded,
-      signature: signatures[0].raw,
-      ownerPublicKey,
-      networkId
+  (tx, { txType }) => {
+    if (tx.fee === undefined) return []
+    const minFee = calculateFee(0, txType, {
+      gas: +tx.gas || 0, params: tx, showWarning: false, vsn: tx.VSN
     })
-    : []
-  const baseVerification = verifySchema(BASE_VERIFICATION_SCHEMA, resolvedData)
-
-  return [
-    ...baseVerification,
-    ...signatureVerification,
-    ...customVerification(txType, resolvedData)
-  ]
-}
-
-/**
- * Verification for speciific txType
- * @param txType
- * @param data
- * @return {Array}
- */
-function customVerification (txType, data) {
-  switch (txType) {
-    case TX_TYPE.contractCreate:
-    case TX_TYPE.contractCall:
-    case TX_TYPE.oracleRegister:
-      return verifySchema(CONTRACT_VERIFICATION_SCHEMA, data)
-    case TX_TYPE.nameClaim:
-      return verifySchema(NAME_CLAIM_VERIFICATION_SCHEMA, data)
-    default:
-      return []
+    if (new BigNumber(minFee).lte(tx.fee)) return []
+    return [{
+      message: `Fee ${tx.fee} is too low, minimum fee for this transaction is ${minFee}`,
+      key: 'InsufficientFee',
+      checkedKeys: ['fee']
+    }]
+  },
+  ({ ttl }, { height }) => {
+    if (ttl === undefined) return []
+    ttl = +ttl
+    if (ttl === 0 || ttl >= height) return []
+    return [{
+      message: `TTL ${ttl} is already expired, current height is ${height}`,
+      key: 'ExpiredTTL',
+      checkedKeys: ['ttl']
+    }]
+  },
+  ({ amount, fee, nameFee }, { account }) => {
+    if ((amount ?? fee ?? nameFee) === undefined) return []
+    const cost = new BigNumber(fee).plus(nameFee || 0).plus(amount || 0)
+    if (cost.lte(account.balance)) return []
+    return [{
+      message: `Account balance ${account.balance} is not enough to execute the transaction that costs ${cost.toFixed()}`,
+      key: 'InsufficientBalance',
+      checkedKeys: ['amount', 'fee', 'nameFee']
+    }]
+  },
+  ({ nonce }, { account, parentTxTypes }) => {
+    if (nonce === undefined || parentTxTypes.includes(TX_TYPE.gaMeta)) return []
+    nonce = +nonce
+    const validNonce = account.nonce + 1
+    if (nonce === validNonce) return []
+    return [{
+      ...nonce < validNonce ? {
+        message: `Nonce ${nonce} is already used, valid nonce is ${validNonce}`,
+        key: 'NonceAlreadyUsed'
+      } : {
+        message: `Nonce ${nonce} is too high, valid nonce is ${validNonce}`,
+        key: 'NonceHigh'
+      },
+      checkedKeys: ['nonce']
+    }]
+  },
+  ({ gasPrice }) => {
+    if (gasPrice === undefined) return []
+    if (gasPrice >= MIN_GAS_PRICE) return []
+    return [{
+      message: `Gas price ${gasPrice} must be bigger then ${MIN_GAS_PRICE}`,
+      key: 'MinGasPrice',
+      checkedKeys: ['gasPrice']
+    }]
+  },
+  ({ ctVersion, abiVersion }, { txType, node }) => {
+    const { consensusProtocolVersion } = node.getNodeInfo()
+    const protocol = PROTOCOL_VM_ABI[consensusProtocolVersion]
+    if (!protocol) throw new Error(`Unsupported protocol: ${consensusProtocolVersion}`)
+    // If not contract create tx
+    if (!ctVersion) ctVersion = { abiVersion }
+    const txProtocol = protocol[txType]
+    if (!txProtocol) return []
+    if (Object.entries(ctVersion).some(([key, value]) => !txProtocol[key].includes(+value))) {
+      return [{
+        message: `ABI/VM version ${JSON.stringify(ctVersion)} is wrong, supported is: ${JSON.stringify(txProtocol)}`,
+        key: 'VmAndAbiVersionMismatch',
+        checkedKeys: ['ctVersion', 'abiVersion']
+      }]
+    }
+    return []
   }
-}
+]
+
+const getSenderAddress = tx => [
+  'senderId', 'accountId', 'ownerId', 'callerId', 'oracleId', 'fromId', 'initiator', 'gaId'
+]
+  .map(key => tx[key])
+  .filter(a => a)
+  .map(a => a.replace(/^ok_/, 'ak_'))[0]
 
 /**
- * Transaction Validator Stamp
- * This stamp give us possibility to unpack and validate some of transaction properties,
- * to make sure we can post it to the chain
+ * Transaction Validator
+ * This function validates some of transaction properties,
+ * to make sure it can be posted it to the chain
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/validator
- * @rtype Stamp
- * @param {Object} [options={}] - Initializer object
- * @param {Object} [options.url] - Node url
- * @param {Object} [options.internalUrl] - Node internal url
- * @return {Object} Transaction Validator instance
- * @example TransactionValidator({url: 'https://testnet.aeternity.io'})
+ * @rtype (tx: String, node) => void
+ * @param {String} transaction Base64Check-encoded transaction
+ * @param {Object} node Node to validate transaction against
+ * @param {String[]} [parentTxTypes] Types of parent transactions
+ * @return {Promise<Object[]>} Array with verification errors
+ * @example const errors = await verifyTransaction(transaction, node)
  */
-const TransactionValidator = NodePool.compose({
-  methods: {
-    verifyTx,
-    unpackAndVerify
-  }
-})
+export default async function verifyTransaction (transaction, node, parentTxTypes = []) {
+  const { tx, txType } = unpackTx(transaction)
 
-export default TransactionValidator
+  const address = getSenderAddress(tx) ??
+    (txType === TX_TYPE.signed ? getSenderAddress(tx.encodedTx.tx) : null)
+  const [account, height] = await Promise.all([
+    address && node.api.getAccountByPubkey(address).catch(() => ({
+      id: address,
+      balance: new BigNumber(0),
+      nonce: 0
+    })),
+    node.api.getCurrentKeyBlockHeight().then(({ height }) => height)
+  ])
+
+  return (await Promise.all(
+    validators.map(v => v(tx, { txType, node, account, height, parentTxTypes })))
+  ).flat()
+}

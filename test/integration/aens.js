@@ -67,9 +67,9 @@ describe('Aens', function () {
     const { pointers } = await aens.getName(name)
     pointers.length.should.be.equal(0)
     try {
-      await aens.spend(100, name, { onAccount, verify: true })
+      await aens.spend(100, name, { onAccount })
     } catch (e) {
-      e.message.should.be.equal(`Name ${name} do not have pointers for ak`)
+      e.message.should.be.equal(`Name ${name} don't have pointers for ak`)
     }
   })
   it('Call contract using AENS name', async () => {
@@ -118,7 +118,7 @@ contract Identity =
   it('Spend by name', async () => {
     const current = await aens.address()
     const onAccount = aens.addresses().find(acc => acc !== current)
-    await aens.spend(100, name, { onAccount, verify: true })
+    await aens.spend(100, name, { onAccount })
   })
 
   it('transfers names', async () => {

@@ -44,11 +44,8 @@ describe('Generalize Account', function () {
   })
 
   it('Fail on make GA on already GA account', async () => {
-    try {
-      await client.createGeneralizeAccount('authorize', authContract)
-    } catch (e) {
-      e.message.should.be.equal(`Account ${gaAccount.publicKey} is already GA`)
-    }
+    await client.createGeneralizeAccount('authorize', authContract)
+      .should.be.rejectedWith(`Account ${gaAccount.publicKey} is already GA`)
   })
 
   it('Init MemoryAccount for GA and Spend using GA', async () => {
@@ -59,8 +56,8 @@ describe('Generalize Account', function () {
 
     const r = () => Math.floor(Math.random() * 20).toString()
     const callData = await client.contractEncodeCall(authContract, 'authorize', [r()])
-    await client.spend(10000, publicKey, { authData: { callData }, onAccount: gaAccount.publicKey, verify: false })
-    await client.spend(10000, publicKey, { authData: { source: authContract, args: [r()] }, onAccount: gaAccount.publicKey, verify: false })
+    await client.spend(10000, publicKey, { authData: { callData }, onAccount: gaAccount.publicKey })
+    await client.spend(10000, publicKey, { authData: { source: authContract, args: [r()] }, onAccount: gaAccount.publicKey })
     const balanceAfter = await client.balance(publicKey)
     balanceAfter.should.be.equal('20000')
   })
