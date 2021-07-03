@@ -106,5 +106,10 @@
     "dist",
     "src",
     "es"
-  ]
+  ],
+  "ts-standard": {
+    "ignore": [
+      "examples/**/*.js"
+    ]
+  }
 }
