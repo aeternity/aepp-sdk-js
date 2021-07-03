@@ -23,7 +23,7 @@
  */
 
 import AsyncInit from './utils/async-init'
-import genSwaggerClient from './utils/swagger'
+import { NodeApi } from '../apis/node/'
 import semverSatisfies from './utils/semver-satisfies'
 
 /**
@@ -42,7 +42,7 @@ export function getNetworkId ({ networkId, force = false } = {}) {
 /**
  * get consensus protocol version
  * @param {Array} protocols Array of protocols
- * @param {Number} height Height
+ * @param {Number} [height] Height
  * @return {Number} version Protocol version
  */
 async function getConsensusProtocolVersion (protocols = [], height) {
@@ -76,8 +76,16 @@ const Node = AsyncInit.compose({
     if (!url) throw new Error('"url" required')
     this.url = url.replace(/\/$/, '')
     this.internalUrl = internalUrl ? internalUrl.replace(/\/$/, '') : this.url
-    const client = await genSwaggerClient(`${this.url}/api?oas3`, { internalUrl: this.internalUrl })
-    this.version = client.spec.info.version
+    this.api = new NodeApi(this.url, { allowInsecureConnection: true })
+    this.api.intAsString = true
+    const {
+      nodeRevision: revision,
+      nodeVersion: version,
+      genesisKeyBlockHash: genesisHash,
+      networkId: nodeNetworkId,
+      protocols
+    } = await this.api.getStatus()
+    Object.assign(this, { revision, genesisHash, nodeNetworkId, version })
     if (
       !semverSatisfies(this.version, NODE_GE_VERSION, NODE_LT_VERSION) &&
       !ignoreVersion
@@ -87,12 +95,7 @@ const Node = AsyncInit.compose({
         `Supported: >= ${NODE_GE_VERSION} < ${NODE_LT_VERSION}`
       )
     }
-    this.api = client.api
-
-    const { nodeRevision: revision, genesisKeyBlockHash: genesisHash, networkId, protocols } = await this.api.getStatus()
     this.consensusProtocolVersion = await this.getConsensusProtocolVersion(protocols)
-    this.nodeNetworkId = networkId
-    return Object.assign(this, { revision, genesisHash })
   },
   methods: {
     getNodeInfo () {

@@ -1,3 +1,4 @@
+/* @ts-ignore */
 /*
  * ISC License (ISC)
  * Copyright (c) 2018 aeternity developers
@@ -15,20 +16,16 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import '../'
 import { describe, it } from 'mocha'
-import AsyncInit from '../../src/utils/async-init'
+import { expect } from 'chai'
+import { NodeApi } from '../../apis/node/'
 
-describe('AsyncInit', function () {
-  it('composes Stamps', async () => {
-    return AsyncInit.compose({
-      async init (val) {
-        return Promise.resolve(val)
-      }
-    }, {
-      async init (val) {
-        return Promise.resolve(`${val} World`)
-      }
-    })('Hello').should.eventually.be.equal('Hello World')
+describe('AeternityNode', function () {
+  it('works', async () => {
+    const node = new NodeApi('https://mainnet.aeternity.io')
+    node.intAsString = true
+    console.log(await node.getAccountByPubkey(
+      42
+    ))
   })
 })

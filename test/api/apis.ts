@@ -1,6 +1,7 @@
+/* @ts-ignore */
 /*
  * ISC License (ISC)
- * Copyright (c) 2021 aeternity developers
+ * Copyright (c) 2018 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -14,18 +15,18 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-import { expect } from 'chai'
-import { describe, it } from 'mocha'
-import semverSatisfies from '../../src/utils/semver-satisfies'
 
-describe('semverSatisfies', () => {
-  it('returns a proper value', () => {
-    expect(semverSatisfies('1.0.0', '1.0.0', '1.0.1')).to.equal(true)
-    expect(semverSatisfies('1.0.0', '1.0.1', '1.0.2')).to.equal(false)
-    expect(semverSatisfies('2.4.0', '1.4.0', '3.0.0')).to.equal(true)
-    expect(semverSatisfies('2.4.0', '2.5.0', '3.0.0')).to.equal(false)
-    expect(semverSatisfies('1.9.0', '2.0.0', '3.0.0')).to.equal(false)
-    expect(semverSatisfies('1.9.0', '2.0.0', '3.0.0')).to.equal(false)
-    expect(semverSatisfies('5.0.0', '3.0.0', '5.0.0')).to.equal(false)
+import { describe, it } from 'mocha'
+import { expect } from 'chai'
+import { NodeApi } from '../../apis/node/'
+
+describe('AeternityNode', function () {
+  it('works', async () => {
+    const node = new NodeApi('https://mainnet.aeternity.io')
+    node.intAsString = true
+    console.log('node', node)
+    console.log(await node.getAccountByPubkey(
+      'ak_gvxNbZf5CuxYVfcUFoKAP4geZatWaC2Yy4jpx5vZoCKank4Gc'
+    ))
   })
 })

@@ -25,7 +25,10 @@ export const AMOUNT = 0
 export const GAS = 1600000 - 21000
 export const MIN_GAS_PRICE = 1e9
 export const MAX_AUTH_FUN_GAS = 50000
-export const DRY_RUN_ACCOUNT = { pub: 'ak_11111111111111111111111111111111273Yts', amount: '100000000000000000000000000000000000' }
+export const DRY_RUN_ACCOUNT = {
+  pub: 'ak_11111111111111111111111111111111273Yts',
+  amount: new BigNumber('100000000000000000000000000000000000')
+}
 // # AENS
 export const NAME_TTL = 180000
 // # max number of block into the future that the name is going to be available

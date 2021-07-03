@@ -22,3 +22,5 @@ coverage.*
 /examples/**/dist
 .history
 .site
+/apis/node/
+/apis/node.json

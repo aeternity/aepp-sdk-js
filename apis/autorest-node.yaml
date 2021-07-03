@@ -1,0 +1,47 @@
+---
+directive:
+  - from: node.json
+    where: $.info.title
+    set: node api
+    reason: the whole SDK already about aeternity
+
+  - from: node.json
+    where: $.components.schemas
+    transform: >
+      ['UInt', 'UInt16', 'UInt32', 'UInt64'].forEach(key => {
+        if (!$[key].oneOf) return;
+        $[key] = $[key].oneOf.find(({ type }) => type === 'integer');
+      });
+    reason: fix parsing of big numbers
+
+  - from: node.json
+    where: $.paths.*.*.parameters[?(@.$ref && !@.$ref.includes('intAsString'))]
+    transform: >
+      const absolutePath = $.$ref.split('/');
+      const relativePath = absolutePath.slice(absolutePath.indexOf('node.json#') + 1);
+      return relativePath.reduce((o, p) => o[p], $doc);
+    reason: remove commonly required parameters from the generated context
+
+  - from: node.json
+    where: $.paths
+    transform: >
+      const apiPrefix = '/v3';
+      Object.keys($)
+        .filter(a => !a.startsWith(apiPrefix))
+        .forEach(key => {
+          $[apiPrefix + key] = $[key];
+          delete $[key];
+        });
+    reason: don't add prefix to $host parameter
+
+version: ^3.1.3
+use-extension:
+  '@autorest/typescript': ^1.0.0-beta.3
+  '@autorest/modelerfour': ^4.15.456
+input-file: node.json
+output-folder: node
+source-code-folder-path: .
+client-side-validation: true
+generator: typescript
+generate-metadata: false
+add-credentials: false
