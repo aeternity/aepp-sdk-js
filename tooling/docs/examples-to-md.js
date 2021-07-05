@@ -40,7 +40,7 @@ process.argv.slice(2).forEach(fileName => {
   const textMd = splitCodeIntoBlocks(text)
     .map(({ type, content }) => ({
       type,
-      content: type === 'code' ? content.replace(/^\n+|\n+$/g, '') : content.trimLeft()
+      content: type === 'code' ? content.replace(/^\n+|\n+$/g, '') : content.replace(/^ /, '')
     }))
     .filter(({ type, content }) => type !== 'code' || content)
     .filter(({ content }) => !content.includes('License'))
