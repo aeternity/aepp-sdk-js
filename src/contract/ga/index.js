@@ -26,9 +26,8 @@ import * as R from 'ramda'
 
 import { ContractAPI } from '../../ae/contract'
 import { TX_TYPE } from '../../tx/builder/schema'
-import { buildTx } from '../../tx/builder'
-import { decode } from '../../tx/builder/helpers'
-import { getContractAuthFan, prepareGaParams, wrapInEmptySignedTx } from './helpers'
+import { buildTx, unpackTx } from '../../tx/builder'
+import { getContractAuthFan, prepareGaParams } from './helpers'
 
 /**
  * GeneralizeAccount Stamp
@@ -101,6 +100,8 @@ async function createGeneralizeAccount (authFnName, source, args = [], options =
   })
 }
 
+const wrapInEmptySignedTx = (tx) => buildTx({ encodedTx: tx, signatures: [] }, TX_TYPE.signed)
+
 /**
  * Create a metaTx transaction
  * @alias module:@aeternity/aepp-sdk/es/contract/ga
@@ -116,32 +117,25 @@ async function createMetaTx (rawTransaction, authData, authFnName, options = {})
   // Check if authData is callData or if it's an object prepare a callData from source and args
   const { authCallData, gas } = await prepareGaParams(this)(authData, authFnName)
   const opt = R.merge(this.Ae.defaults, options)
-  // Get transaction rlp binary
-  const rlpBinaryTx = decode(rawTransaction, 'tx')
-  // Wrap in SIGNED tx with empty signatures
-  const { rlpEncoded } = wrapInEmptySignedTx(rlpBinaryTx)
-  // Get abi
   const { abiVersion } = await this.getVmVersion(TX_TYPE.contractCall)
-  // Prepare params for META tx
+  const wrappedTx = wrapInEmptySignedTx(unpackTx(rawTransaction))
   const params = {
     ...opt,
-    tx: rlpEncoded,
+    tx: {
+      ...wrappedTx,
+      tx: wrappedTx.txObject
+    },
     gaId: await this.address(opt),
     abiVersion: abiVersion,
     authData: authCallData,
     gas,
     vsn: 2
   }
-  // Calculate fee, get absolute ttl (ttl + height), get account nonce
   const { fee } = await this.prepareTxParams(TX_TYPE.gaMeta, params)
-  // Build META tx
   const { rlpEncoded: metaTxRlp } = buildTx(
     { ...params, fee: `${fee}` },
     TX_TYPE.gaMeta,
     { vsn: 2 }
   )
-  // Wrap in empty signed tx
-  const { tx } = wrapInEmptySignedTx(metaTxRlp)
-  // Send tx to the chain
-  return tx
+  return wrapInEmptySignedTx(metaTxRlp).tx
 }
