@@ -1,0 +1,24 @@
+name: Publish release docs
+on:
+  release:
+    types: [released]
+      
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip3
+          key: ${{ runner.os }}-pip-${{ hashFiles('docs/requirements.txt') }}
+      - run: pip3 install -r docs/requirements.txt
+      - run: git config --global user.email "github-action@users.noreply.github.com"
+      - run: git config --global user.name "GitHub Action"
+      - run: echo "RELEASE_VERSION=${GITHUB_REF:10}" >> $GITHUB_ENV
+      - run: mike deploy --push --update-aliases $RELEASE_VERSION latest

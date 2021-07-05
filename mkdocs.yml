@@ -1,88 +1,70 @@
-site_name: Aeternity JavaScript SDK
+site_name: aeternity JavaScript SDK
 plugins:
   - search
   - mkdocs-simple-hooks:
       hooks:
-        on_pre_build: "docs.hooks:pre_build"
+        on_pre_build: 'docs.hooks:pre_build'
 repo_url: 'https://github.com/aeternity/aepp-sdk-js'
+edit_uri: ''
+
+extra:
+  version:
+    provider: mike
+
+theme:
+  favicon: images/favicon.png
+  name: material
+  custom_dir: tooling/docs/overrides
+  language: en
+  palette:
+    - scheme: default
+      primary: pink
+      accent: pink
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - scheme: slate
+      primary: pink
+      accent: pink
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - content.tabs.link
+    - search.highlight
+    - search.share
+    - search.suggest
+  
+  # Don't include MkDocs' JavaScript
+  include_search_page: false
+  search_index_only: true
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
 
 nav:
-  - Overview: README.md
-  - guides/quick-start.md
-  - Guides:
+  - index.md
+  - quick-start.md
+  - Usage Guides:
+    - guides/aens.md
+    - guides/contracts.md
     - guides/contract-events.md
-    - guides/oracle-usage.md
-    - guides/aens-usage.md
-    - guides/contract-aci-usage.md
-    - guides/delegate-signature-to-contract.md
-    - Wallet Api: guides/how-to-build-aepp-using-new-wallet-api.md
-    - Building Wallets: guides/how-to-build-an-wallet-app-or-extension.md
+    - guides/oracles.md
     - guides/low-vs-high-usage.md
-    - guides/import-tree-shaking.md
-    - Migration:
-      - guides/migration/migration-7.0.0.md
-  - API Reference:
-    - account:
-      - api/account.md
-      - api/account/selector.md
-      - api/account/memory.md
-      - Account Handling: api/accounts.md
-    - ae:
-      - api/ae/aens.md
-      - api/ae/aepp.md
-      - api/ae/contract.md
-      - api/ae/oracle.md
-      - api/ae/universal.md
-      - api/ae/wallet.md
-    - chain:
-      - api/chain.md
-      - api/chain/node.md
-    - channel: api/channel/index.md
-    - contract:
-      - api/contract/aci.md
-      - api/contract/compiler.md
-      - Generalized Accounts: api/contract/ga.md
-    - oracle:
-      - api/oracle.md
-      - api/oracle/node.md
-    - Deprecated RPC Client: api/rpc/client.md
-    - tx:
-      - builder:
-        - api/tx/builder.md
-        - api/tx/builder/helpers.md
-        - api/tx/builder/schema.md
-      - tx: api/tx.md
-      - tx stamp: api/tx/tx.md
-      - tx object: api/tx/tx-object.md
-      - tx validator: api/tx/validator.md
-    - Aepp Wallet Communication:
-      - Connection:
-        - Setup: api/utils/aepp-wallet-communication/connection.md
-        - api/utils/aepp-wallet-communication/content-script-bridge.md
-        - api/utils/aepp-wallet-communication/wallet-detector.md
-        - api/utils/aepp-wallet-communication/connection/browser-runtime.md
-        - Window message: api/utils/aepp-wallet-communication/connection/browser-window-message.md
-      - RPC:
-        - Aepp RPC: api/utils/aepp-wallet-communication/rpc/aepp-rpc.md
-        - RPC client: api/utils/aepp-wallet-communication/rpc/rpc-client.md
-        - Wallet RPC: api/utils/aepp-wallet-communication/rpc/wallet-rpc.md
-    - utils:
-      - AE Utilities: api/ae.md
-      - api/utils/amount-formatter.md
-      - api/utils/bignumber.md
-      - api/utils/bytes.md
-      - api/utils/crypto.md
-      - api/utils/keystore.md
-      - api/contract.md
-      - api/node.md
-      - api/node-pool.md
-      - api/utils/swagger.md
-  - Examples:
+    - Wallet interaction:
+      - guides/connect-aepp-to-wallet.md
+      - guides/build-wallet.md
+  - transaction-options.md
+  - Examples & Tutorials:
     - NodeJS:
-      - Setup: guides/import-nodejs.md
-      - examples/node/aecontract.md
-      - examples/node/aecrypto.md
-      - examples/node/aewallet.md
-    - JS:
-      - guides/import-script-tag.md
-      - guides/import-vuejs.md
+      - examples/node/transfer-ae-tokens.md
+      - examples/node/contract-interaction.md
+    - tutorials/vuejs/helloworld-blockheight.md
+  - api-reference.md
+  - Changelog: CHANGELOG.md
+  - Migration Guides:
+    - guides/migration/migration-7.0.0.md
+  - Contribute:
+    - contrib/README.md
+    - contrib/releases.md
