@@ -26,8 +26,12 @@
 //  - transfer AE tokens to another account
 
 // ## 1. Specify imports
-// We'll need to import `Universal`, `Node` and `MemoryAccount` [Stamps](https://stampit.js.org/essentials/what-is-a-stamp) from the SDK.
+// You need to import `Universal`, `Node` and `MemoryAccount` [Stamps](https://stampit.js.org/essentials/what-is-a-stamp) from the SDK.
 const { Universal, Node, MemoryAccount } = require('@aeternity/aepp-sdk')
+
+// **Note**:
+//
+//  - You need to have the SDK installed via `npm i @aetenity/aepp-sdk -g` to run that example code.
 
 // ## 2. Define constants
 // The following constants are used in the subsequent code snippets.

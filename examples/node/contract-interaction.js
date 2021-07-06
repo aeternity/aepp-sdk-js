@@ -20,20 +20,20 @@
 // ## Introduction
 // The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/master/examples/node/contract.js) and this page explains in detail how to:
 //
-// * deal with the different phases of compiling Sophia contracts to bytecode
-// * deploy the bytecode to get a callable contract address
-// * invoke the deployed contract on the æternity blockchain using `callStatic`
-// * get the contract instance of an already deployed contract
-// * access an `entrypoint` (public contract function) directly without using `call` or `callStatic`
+// - deal with the different phases of compiling Sophia contracts to bytecode
+// - deploy the bytecode to get a callable contract address
+// - invoke the deployed contract on the æternity blockchain using `callStatic`
+// - get the contract instance of an already deployed contract
+// - access an `entrypoint` (public contract function) directly without using `call` or `callStatic`
 
 // ## 1. Specify imports
 //
-// You will need to import `Universal`, `Node` and `MemoryAccount` [Stamps](https://stampit.js.org/essentials/what-is-a-stamp) from the SDK.
+// You need to import `Universal`, `Node` and `MemoryAccount` [Stamps](https://stampit.js.org/essentials/what-is-a-stamp) from the SDK.
 const { Universal, Node, MemoryAccount } = require('@aeternity/aepp-sdk')
 
 // **Note**:
-
-//    - you need to have the SDK installed via `npm i @aetenity/aepp-sdk -g` to run that example code
+//
+//  - You need to have the SDK installed via `npm i @aetenity/aepp-sdk -g` to run that example code.
 
 // ## 2. Define constants
 // The following constants are used in the subsequent code snippets.

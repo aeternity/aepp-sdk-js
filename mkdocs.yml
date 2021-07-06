@@ -51,6 +51,7 @@ nav:
     - guides/contracts.md
     - guides/contract-events.md
     - guides/oracles.md
+    - guides/paying-for-tx.md
     - guides/low-vs-high-usage.md
     - Wallet interaction:
       - guides/connect-aepp-to-wallet.md
@@ -60,6 +61,9 @@ nav:
     - NodeJS:
       - examples/node/transfer-ae-tokens.md
       - examples/node/contract-interaction.md
+      - PayingForTx:
+        - examples/node/paying-for-tx-contract-call-tx.md
+        - examples/node/paying-for-tx-spend-tx.md
     - tutorials/vuejs/helloworld-blockheight.md
   - api-reference.md
   - Changelog: CHANGELOG.md

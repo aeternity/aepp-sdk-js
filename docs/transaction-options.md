@@ -30,6 +30,8 @@ These options are common and can be provided to every tx-type:
 - `fee` (default: calculated for each tx-type)
     - The minimum fee is dependent on the tx-type.
     - You can provide a higher fee to additionally reward the miners.
+- `innerTx` (default: `false`)
+    - Should be used for signing an inner transaction that will be wrapped in a `PayingForTx`.
 - `verify` (default: `false`)
     - If set to true the transaction will be verified prior to broadcasting it.
 - `waitMined` (default: `true`)
