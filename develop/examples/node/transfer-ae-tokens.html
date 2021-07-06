@@ -322,6 +322,18 @@
   
   
     <li class="md-nav__item">
+      <a href="../../guides/paying-for-tx.html" class="md-nav__link">
+        PayingForTx
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../guides/low-vs-high-usage.html" class="md-nav__link">
         Low vs High level API
       </a>
@@ -337,14 +349,14 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_6" type="checkbox" id="__nav_3_6" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_7" type="checkbox" id="__nav_3_7" >
       
-      <label class="md-nav__link" for="__nav_3_6">
+      <label class="md-nav__link" for="__nav_3_7">
         Wallet interaction
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="Wallet interaction" data-md-level="2">
-        <label class="md-nav__title" for="__nav_3_6">
+        <label class="md-nav__title" for="__nav_3_7">
           <span class="md-nav__icon md-icon"></span>
           Wallet interaction
         </label>
@@ -566,6 +578,57 @@
       <a href="contract-interaction.html" class="md-nav__link">
         Compile & Deploy a Sophia Smart Contract
       </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_1_3" type="checkbox" id="__nav_5_1_3" >
+      
+      <label class="md-nav__link" for="__nav_5_1_3">
+        PayingForTx
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="PayingForTx" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_1_3">
+          <span class="md-nav__icon md-icon"></span>
+          PayingForTx
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="paying-for-tx-contract-call-tx.html" class="md-nav__link">
+        InnerTx: ContractCallTx
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="paying-for-tx-spend-tx.html" class="md-nav__link">
+        InnerTx: SpendTx
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
     </li>
   
 
@@ -830,9 +893,13 @@ and this page explains in detail how to:</p>
 <li>transfer AE tokens to another account</li>
 </ul>
 <h2 id="1-specify-imports">1. Specify imports</h2>
-<p>We'll need to import <code>Universal</code>, <code>Node</code> and <code>MemoryAccount</code> <a href="https://stampit.js.org/essentials/what-is-a-stamp">Stamps</a> from the SDK.
+<p>You need to import <code>Universal</code>, <code>Node</code> and <code>MemoryAccount</code> <a href="https://stampit.js.org/essentials/what-is-a-stamp">Stamps</a> from the SDK.
 <div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="p">{</span> <span class="nx">Universal</span><span class="p">,</span> <span class="nx">Node</span><span class="p">,</span> <span class="nx">MemoryAccount</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">)</span>
-</code></pre></div></p>
+</code></pre></div>
+<strong>Note</strong>:</p>
+<ul>
+<li>You need to have the SDK installed via <code>npm i @aetenity/aepp-sdk -g</code> to run that example code.</li>
+</ul>
 <h2 id="2-define-constants">2. Define constants</h2>
 <p>The following constants are used in the subsequent code snippets.
 <div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">ACCOUNT_KEYPAIR</span> <span class="o">=</span> <span class="p">{</span>
@@ -844,12 +911,16 @@ and this page explains in detail how to:</p>
 </code></pre></div>
 Note:</p>
 <ul>
-<li>The keypair of the account is pre-funded and only used for demonstration purpose</li>
+<li>The keypair of the account is pre-funded and only used for demonstration purpose<ul>
 <li>You should replace it with your own keypair (see <a href="../../quick-start.html#2-create-a-keypair">Create a Keypair</a>)</li>
+</ul>
+</li>
 <li>In case the account runs out of funds you can request new AE tokens using the <a href="https://faucet.aepps.com/">Faucet</a></li>
-<li>By default the script will transfer <code>1 aetto</code> and use the demo account itself as recipient</li>
+<li>By default the script will transfer <code>1 aetto</code> and use the demo account itself as recipient<ul>
 <li>Optionally you can provide the amount and a different recipient by providing the arguments when executing the script,
-e.g. <code>node transfer-ae-tokens.js 3 ak_6D2uyunJaERXfgbsc94G8vrp79nZrbtorL7VCRXk3sWiFK5jb</code></li>
+   e.g. <code>node transfer-ae-tokens.js 3 ak_6D2uyunJaERXfgbsc94G8vrp79nZrbtorL7VCRXk3sWiFK5jb</code></li>
+</ul>
+</li>
 </ul>
 <h2 id="3-open-async-codeblock">3. Open async codeblock</h2>
 <p>Most functions of the SDK return <em>Promises</em>, so the recommended way of
@@ -889,7 +960,7 @@ which is assigned to the <code>client</code> constant in this case.</p>
 Note:</p>
 <ul>
 <li>If the recipient is the same account as the sender (default of the script if no arguments provided) the balance will be lower
-after transfer because a transaction <code>fee</code> has been paid to the miners.</li>
+   after transfer because a transaction <code>fee</code> has been paid to the miners.</li>
 </ul>
 <h2 id="8-close-and-run-async-codeblock">8. Close and run async codeblock</h2>
 <p>Now you can close the async codeblock and execute it at the same time.
