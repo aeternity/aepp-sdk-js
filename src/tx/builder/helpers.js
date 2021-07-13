@@ -17,6 +17,7 @@ import {
   NAME_FEE,
   NAME_FEE_BID_INCREMENT,
   NAME_BID_TIMEOUTS,
+  NAME_MAX_LENGTH_FEE,
   NAME_ID_KEY
 } from './schema'
 import { ceil } from '../../utils/bignumber'
@@ -288,7 +289,7 @@ export function validatePointers (pointers = []) {
  */
 export function getMinimumNameFee (domain) {
   const nameLength = domain.replace('.chain', '').length
-  return NAME_BID_RANGES[nameLength >= NAME_BID_MAX_LENGTH ? NAME_BID_MAX_LENGTH : nameLength]
+  return NAME_BID_RANGES[nameLength >= NAME_MAX_LENGTH_FEE ? NAME_MAX_LENGTH_FEE : nameLength]
 }
 
 /**
