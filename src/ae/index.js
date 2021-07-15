@@ -48,7 +48,9 @@ async function send (tx, options = {}) {
   const signed = contractId
     ? await this.signUsingGA(tx, { ...opt, authFun })
     : await this.signTransaction(tx, opt)
-  return this.sendTransaction(signed, opt)
+  return opt.innerTx
+    ? { hash: TxBuilder.buildTxHash(signed), rawTx: signed }
+    : this.sendTransaction(signed, opt)
 }
 
 async function signUsingGA (tx, { authData, authFun, ...options } = {}) {
