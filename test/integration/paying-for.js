@@ -61,7 +61,8 @@ describe('Paying for transaction of another account', function () {
 
   it('pays for contract deployment', async () => {
     unPayingSdk = await BaseAe({
-      account: MemoryAccount({ keypair: Crypto.generateKeyPair() })
+      withoutGenesisAccount: true,
+      accounts: [MemoryAccount({ keypair: Crypto.generateKeyPair() })]
     }, {
       deepProps: { Ae: { defaults: { waitMined: false, innerTx: true } } }
     })
