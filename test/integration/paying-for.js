@@ -19,7 +19,7 @@ import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
 import BigNumber from 'bignumber.js'
 import { getSdk, BaseAe } from './'
-import { Crypto, MemoryAccount, TxBuilder } from '../../src'
+import { Crypto, MemoryAccount } from '../../src'
 
 describe('Paying for transaction of another account', function () {
   let sdk
@@ -61,12 +61,10 @@ describe('Paying for transaction of another account', function () {
 
   it('pays for contract deployment', async () => {
     unPayingSdk = await BaseAe({
-      account: MemoryAccount({ keypair: Crypto.generateKeyPair() })
+      withoutGenesisAccount: true,
+      accounts: [MemoryAccount({ keypair: Crypto.generateKeyPair() })]
     }, {
-      deepProps: { Ae: { defaults: { waitMined: false, innerTx: true } } },
-      methods: {
-        sendTransaction: tx => ({ hash: TxBuilder.buildTxHash(tx), rawTx: tx })
-      }
+      deepProps: { Ae: { defaults: { waitMined: false, innerTx: true } } }
     })
     const contract = await unPayingSdk.getContractInstance(contractCode)
     const { rawTx: contractDeployTx, address } = await contract.deploy([42])

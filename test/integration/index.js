@@ -40,7 +40,10 @@ export const BaseAe = async (params = {}, compose = {}) => Universal
     ...params,
     compilerUrl,
     ignoreVersion,
-    accounts: [...params.accounts || [], genesisAccount],
+    accounts: [
+      ...params.accounts || [],
+      ...params.withoutGenesisAccount ? [] : [genesisAccount]
+    ],
     nodes: [{ name: 'test', instance: await Node({ url, internalUrl, ignoreVersion }) }]
   })
 

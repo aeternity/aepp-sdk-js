@@ -43,11 +43,14 @@ import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter'
  */
 async function send (tx, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const { contractId: gaId, authFun } = await this.getAccount(await this.address(opt))
-  const signed = gaId
+  const { contractId, authFun } = options.innerTx
+    ? { contractId: false } : await this.getAccount(await this.address(opt))
+  const signed = contractId
     ? await this.signUsingGA(tx, { ...opt, authFun })
     : await this.signTransaction(tx, opt)
-  return this.sendTransaction(signed, opt)
+  return opt.innerTx
+    ? { hash: TxBuilder.buildTxHash(signed), rawTx: signed }
+    : this.sendTransaction(signed, opt)
 }
 
 async function signUsingGA (tx, { authData, authFun, ...options } = {}) {
