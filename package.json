@@ -36,6 +36,7 @@
     "SDK"
   ],
   "dependencies": {
+    "@aeternity/aepp-calldata": "^0.1.0",
     "@aeternity/bip39": "^0.1.0",
     "@aeternity/json-bigint": "^0.3.1",
     "@babel/runtime-corejs3": "^7.14.0",
@@ -51,8 +52,10 @@
     "crypto-browserify": "^3.12.0",
     "ed2curve": "^0.3.0",
     "events": "^3.3.0",
+    "i": "^0.3.6",
     "joi-browser": "^13.4.0",
     "libsodium-wrappers-sumo": "0.7.9",
+    "npm": "^7.20.5",
     "path-browserify": "^1.0.1",
     "process": "^0.11.10",
     "ramda": "^0.27.1",
