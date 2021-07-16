@@ -34,7 +34,7 @@ theme:
     - search.highlight
     - search.share
     - search.suggest
-  
+
   # Don't include MkDocs' JavaScript
   include_search_page: false
   search_index_only: true
@@ -68,7 +68,8 @@ nav:
   - api-reference.md
   - Changelog: CHANGELOG.md
   - Migration Guides:
-    - guides/migration/migration-7.0.0.md
+    - guides/migration/9.0.0.md
+    - guides/migration/7.0.0.md
   - Contribute:
     - contrib/README.md
     - contrib/releases.md
