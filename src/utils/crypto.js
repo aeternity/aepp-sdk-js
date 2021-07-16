@@ -28,6 +28,7 @@ import aesjs from 'aes-js'
 import shajs from 'sha.js'
 
 import { str2buf, toBytes } from './bytes'
+import { decode } from '../tx/builder/helpers'
 import { hash } from './crypto-ts'
 
 export * from './crypto-ts'
@@ -56,7 +57,7 @@ export function getAddressFromPriv (secret) {
 export function isAddressValid (address, prefix = 'ak') {
   if (typeof address !== 'string') return false
   try {
-    return decodeBase58Check(assertedType(address, prefix)).length === 32
+    return decode(address, prefix).length === 32
   } catch (e) {
     return false
   }
@@ -173,7 +174,7 @@ export function encodeUnsigned (value) {
  * @return {String} - Contract address
  */
 export function encodeContractAddress (owner, nonce) {
-  const publicKey = decodeBase58Check(assertedType(owner, 'ak'))
+  const publicKey = decode(owner, 'ak')
   const binary = Buffer.concat([publicKey, encodeUnsigned(nonce)])
   return `ct_${encodeBase58Check(hash(binary))}`
 }
@@ -297,20 +298,6 @@ export function aeEncodeKey (binaryKey) {
 }
 
 /**
- * Assert encoded type and return its payload
- * @rtype (data: String, type: String) => String, throws: Error
- * @param {String} data - ae data
- * @param {String} type - Prefix
- * @param {Boolean} omitError - Return false instead of throwing the error if data doesn't match expected type
- * @return {String|Boolean} Payload
- */
-export function assertedType (data, type, omitError) {
-  if (RegExp(`^${type}_.+$`).test(data)) return data.split('_')[1]
-  else if (omitError) return false
-  else throw new Error(`Data doesn't match expected type ${type}`)
-}
-
-/**
  * Check key pair for validity
  *
  * Sign a message, and then verifying that signature
@@ -336,7 +323,7 @@ export function isValidKeypair (privateKey, publicKey) {
  */
 export function encryptData (msg, publicKey) {
   const ephemeralKeyPair = nacl.box.keyPair()
-  const pubKeyUInt8Array = decodeBase58Check(assertedType(publicKey, 'ak'))
+  const pubKeyUInt8Array = decode(publicKey, 'ak')
   const nonce = nacl.randomBytes(nacl.box.nonceLength)
 
   const encryptedMessage = nacl.box(

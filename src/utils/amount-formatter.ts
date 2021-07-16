@@ -88,7 +88,7 @@ export const formatAmount = (
   const denominations = Object.values(AE_AMOUNT_FORMATS)
   if (!denominations.includes(denomination)) throw new Error(`Invalid denomination: ${denomination}`)
   if (!denominations.includes(targetDenomination)) throw new Error(`Invalid target denomination: ${targetDenomination}`)
-  if (!isBigNumber(value)) throw new Error(`Value ${value.toString()} is not type of number`)
+  if (!isBigNumber(value)) throw new Error(`Value ${value?.toString()} is not type of number`)
 
   return new BigNumber(value)
     .shiftedBy(DENOMINATION_MAGNITUDE[denomination] - DENOMINATION_MAGNITUDE[targetDenomination])

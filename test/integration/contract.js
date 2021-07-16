@@ -420,7 +420,7 @@ describe('Contract', function () {
     await contract.poll(deployed.transaction, { interval: 50, attempts: 1200 })
     expect(deployed.result).to.be.equal(undefined)
     deployed.txData.should.not.be.equal(undefined)
-    const result = await deployed.call('getArg', ['42'], { waitMined: false, verify: false })
+    const result = await deployed.call('getArg', ['42'], { waitMined: false })
     expect(result.result).to.be.equal(undefined)
     result.txData.should.not.be.equal(undefined)
     await contract.poll(result.hash, { interval: 50, attempts: 1200 })
@@ -681,7 +681,7 @@ describe('Contract', function () {
           { filesystem, contractAddress: 'ct_asdasdasd', opt: { ttl: 0 } }
         )
       } catch (e) {
-        e.message.should.be.equal('Invalid contract address')
+        e.message.should.be.equal('Invalid name or address: ct_asdasdasd')
       }
     })
     it('Throw error on creating contract instance with contract address which is not found on-chain or not active', async () => {

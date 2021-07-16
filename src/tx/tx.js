@@ -27,7 +27,7 @@ import * as R from 'ramda'
 import ChainNode from '../chain/node'
 import Tx from './'
 
-import { buildTx, calculateFee } from './builder'
+import { buildTx, calculateFee, unpackTx } from './builder'
 import { ABI_VERSIONS, MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE, TX_TTL } from './builder/schema'
 import { buildContractId } from './builder/helpers'
 import { TxObject } from './tx-object'
@@ -411,6 +411,14 @@ async function gaAttachTx ({ ownerId, code, vmVersion, abiVersion, authFun, gas,
   }
 }
 
+async function payingForTx ({ tx, payerId, ...args }) {
+  const params = { tx: unpackTx(tx), payerId }
+  const { fee, nonce } = await this.prepareTxParams(TX_TYPE.payingFor, {
+    ...params, ...args, senderId: payerId
+  })
+  return buildTx({ ...params, ...args, fee, nonce }, TX_TYPE.payingFor).tx
+}
+
 /**
  * Validated vm/abi version or get default based on transaction type and NODE version
  *
@@ -535,6 +543,7 @@ const Transaction = ChainNode.compose(Tx, {
     channelSettleTx,
     channelSnapshotSoloTx,
     gaAttachTx,
+    payingForTx,
     getAccountNonce,
     getVmVersion
   }

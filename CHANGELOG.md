@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.0.0](https://github.com/aeternity/aepp-sdk-js/compare/v8.2.1...v9.0.0) (2021-07-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* drop `waitMined` static method
+* drop `assertedType`, use `decode` instead
+* **validator:** recursive validator, simplify schema
+* simplify buildTxHash helper
+* enable verification in deep props instead of extra variable
+
+### Features
+
+* `payForTransaction` method ([fbf204d](https://github.com/aeternity/aepp-sdk-js/commit/fbf204dd2ba333551327adce579b9f9d9edc601b))
+
+
+### Bug Fixes
+
+* **AENS:** name length minimum bid fee ([dde47d6](https://github.com/aeternity/aepp-sdk-js/commit/dde47d6ece55b2478b69b5bf64745210d9a7417e))
+* swagger https issue ([1325aa6](https://github.com/aeternity/aepp-sdk-js/commit/1325aa6fe1c5d6596b1d1e1f2b51f8e9f8701a7b))
+* **tx serialisation:** accept unpackTx output produced by deserialisator ([ff0b3f5](https://github.com/aeternity/aepp-sdk-js/commit/ff0b3f551f7cf0684ac9c8e528d94eae9c31f226))
+* **validator:** recursive validator, simplify schema ([95a2a23](https://github.com/aeternity/aepp-sdk-js/commit/95a2a232f3fd8b875b223e352445b045a7217dad))
+
+
+* drop `assertedType`, use `decode` instead ([00d563f](https://github.com/aeternity/aepp-sdk-js/commit/00d563feca871e2c9474df667696946d1c8d12c7))
+* drop `waitMined` static method ([2f299de](https://github.com/aeternity/aepp-sdk-js/commit/2f299de2c985ce2619db10e4a264f7e6d1b7279c))
+* enable verification in deep props instead of extra variable ([989b36f](https://github.com/aeternity/aepp-sdk-js/commit/989b36f28e9649fd74b384f2a16bf8fd64bac85c))
+* simplify buildTxHash helper ([9e1fde7](https://github.com/aeternity/aepp-sdk-js/commit/9e1fde7693986359a9ac0ff80829dbc058882f7b))
+
 ### [8.2.1](https://github.com/aeternity/aepp-sdk-js/compare/v8.2.0...v8.2.1) (2021-06-21)
 
 
@@ -439,13 +468,13 @@ This stamp give more flexibility on transaction serialization/deserialization pr
 
 ### Docs
 
-* **Guide** [Add 7.0.0 migration guide](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/migration/migration-7.0.0.md)
+* **Guide** [Add 7.0.0 migration guide](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/migration/7.0.0.md)
 * **Guide:** Add [Oracle](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/oracle-usage.md), [AENS](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/aens-usage.md) and [Contract](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/contract-aci-usage.md) guides
 
 
 ### BREAKING CHANGES
 
-Please check out [7.0.0 migration guide](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/migration/migration-7.0.0.md)
+Please check out [7.0.0 migration guide](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/migration/7.0.0.md)
 
 This release include all changes from [7.0.0-next.1](https://github.com/aeternity/aepp-sdk-js/releases/tag/7.0.0-next.1), [7.0.0-next.2](https://github.com/aeternity/aepp-sdk-js/releases/tag/7.0.0-next.2), [7.0.0-next.3](https://github.com/aeternity/aepp-sdk-js/releases/tag/7.0.0-next.3)
 

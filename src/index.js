@@ -33,7 +33,7 @@ import Node from './node'
 import NodePool from './node-pool'
 import Tx from './tx'
 import Transaction from './tx/tx'
-import TransactionValidator from './tx/validator'
+import verifyTransaction from './tx/validator'
 import AccountBase from './account/base'
 import AccountMultiple from './account/multiple'
 import MemoryAccount from './account/memory'
@@ -81,7 +81,7 @@ export {
   Oracle,
   genSwaggerClient,
   Transaction,
-  TransactionValidator,
+  verifyTransaction,
   Tx,
   TxBuilder,
   TxBuilderHelper,

@@ -37,8 +37,7 @@ import { required } from '@stamp/required'
  * @return {Object} Chain instance
  */
 const Chain = stampit({
-  deepProps: { Ae: { defaults: { waitMined: true } } },
-  statics: { waitMined (bool) { return this.deepProps({ Ae: { defaults: { waitMined: bool } } }) } }
+  deepProps: { Ae: { defaults: { waitMined: true, verify: true } } }
 }, required({
   methods: {
     sendTransaction: required,
@@ -57,15 +56,6 @@ const Chain = stampit({
 }))
 
 /**
- * Reconfigure Stamp to (not) wait until transactions are mined
- * @function waitMined
- * @static
- * @rtype (bool: Boolean) => Stamp
- * @param {boolean} bool - Whether to wait for transactions
- * @return {Stamp} Reconfigured Chain Stamp
- */
-
-/**
  * Submit a signed transaction for mining
  * @function sendTransaction
  * @instance
@@ -74,7 +64,7 @@ const Chain = stampit({
  * @rtype (tx: String, options?: Object) => tx: Promise[Object]|txHash: Promise[String]
  * @param {String} tx - Transaction to submit
  * @param {String} [options={}] - Options to pass to the implementation
- * @param {String} [options.verify = false] - Verify transaction before broadcast.
+ * @param {String} [options.verify=true] - Verify transaction before broadcast.
  * @return {Object} Transaction
  */
 
