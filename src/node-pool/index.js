@@ -5,7 +5,7 @@
  * @example import { NodePool } from '@aeternity/aepp-sdk'
  */
 import stampit from '@stamp/it'
-import Joi from 'joi-browser'
+import Joi from 'joi'
 import { getNetworkId } from '../node'
 
 /**
