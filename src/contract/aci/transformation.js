@@ -276,16 +276,10 @@ export function transformDecodedData (aci, result, { skipTransformDecoded = fals
       return result.split('#')[1]
     case SOPHIA_TYPES.map: {
       const [keyT, valueT] = generic
-      return result
-        .reduce(
-          (acc, [key, val]) => {
-            key = transformDecodedData(keyT, key, { bindings })
-            val = transformDecodedData(valueT, val, { bindings })
-            acc.push([key, val])
-            return acc
-          },
-          []
-        )
+      return new Map(result.map(([key, val]) => [
+        transformDecodedData(keyT, key, { bindings }),
+        transformDecodedData(valueT, val, { bindings })
+      ]))
     }
     case SOPHIA_TYPES.option: {
       if (result === 'None') return undefined
