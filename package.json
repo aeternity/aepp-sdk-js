@@ -21,6 +21,7 @@
     "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "test:integration:channel,accounts": "nyc --require @babel/register --require ts-node/register mocha './test/integration/@(channel|accounts).js' --exit --timeout 10m",
     "test:integration:contract,chain": "nyc --require @babel/register --require ts-node/register mocha './test/integration/@(contract|chain).js' --timeout 10m",
+    "test:integration:contract": "nyc --require @babel/register --require ts-node/register mocha './test/integration/@(contract).js' --timeout 10m",
     "test:integration:else": "nyc --require @babel/register --require ts-node/register mocha './test/integration/!(channel|accounts|contract|chain).js' --timeout 10m",
     "test:unit": "nyc --require @babel/register --require ts-node/register mocha './test/unit/*'",
     "test:watch": "mocha --recursive --require @babel/register --require ts-node/register --watch --timeout 10m",
