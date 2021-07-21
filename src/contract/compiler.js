@@ -24,10 +24,11 @@
  * @example import { ContractCompilerAPI } from '@aeternity/aepp-sdk'
  */
 
-import ContractBase from './index'
-import semverSatisfies from '../utils/semver-satisfies'
+import Encoder from '@aeternity/aepp-calldata-js/src/Encoder'
 import AsyncInit from '../utils/async-init'
+import semverSatisfies from '../utils/semver-satisfies'
 import genSwaggerClient from '../utils/swagger'
+import ContractBase from './index'
 
 /**
  * Contract Compiler Stamp
@@ -82,7 +83,30 @@ export default AsyncInit.compose(ContractBase, {
         arguments: args,
         options: this._prepareCompilerOptions(options)
       })
-      return calldata
+
+      // Generate using the calldata lib
+
+      // In order to be able to use the encode / decode calldata we need to have
+      // access to the contracts compiled abi.
+      const aci = await this.contractGetACI(source);
+
+      // The encoder expects the aci to be passed as array, thus this weird flex :D
+      const encoder = new Encoder([aci.encoded_aci]);
+
+      const testCallData = encoder.encode(
+        aci.encoded_aci.contract.name,
+        name,
+        args,
+      );
+
+      // TODO: compare the results
+      // console.log({
+      //   testCallData,
+      //   calldata,
+      //   matching: testCallData == calldata,
+      // });
+
+      return testCallData; // calldata;
     },
     async compileContractAPI (code, options) {
       this._ensureCompilerReady()
@@ -100,14 +124,39 @@ export default AsyncInit.compose(ContractBase, {
       this._ensureCompilerReady()
       return this._compilerApi.decodeCalldataBytecode({ bytecode, calldata })
     },
-    contractDecodeCallDataBySourceAPI (source, fn, callData, options) {
+    async contractDecodeCallDataBySourceAPI (source, fn, callData, options) {
       this._ensureCompilerReady()
-      return this._compilerApi.decodeCalldataSource({
+      const decoded = await this._compilerApi.decodeCalldataSource({
         function: fn,
         source,
         calldata: callData,
         options: this._prepareCompilerOptions(options)
       })
+
+      // Decode call result via calldata-js
+
+      // In order to be able to use the encode / decode calldata we need to have
+      // access to the contracts compiled abi.
+      const aci = await this.contractGetACI(source);
+
+      // The encoder expects the aci to be passed as array, thus this weird flex :D
+      const encoder = new Encoder([aci.encoded_aci]);
+
+      const libDecoded = encoder.decode(
+        aci.encoded_aci.contract.name,
+        fn,
+        callData,
+      );
+
+      // TODO: compare the results
+      console.log({
+        rawCallData: callData,
+        lib_decoded: libDecoded,
+        compiler_decoded: decoded,
+        matching: libDecoded == decoded,
+      });
+
+      return libDecoded; // decoded;
     },
     contractDecodeCallResultAPI (source, fn, callValue, callResult, options) {
       this._ensureCompilerReady()
