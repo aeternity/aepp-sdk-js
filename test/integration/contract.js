@@ -14,16 +14,16 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
-import { BaseAe, getSdk, publicKey } from './'
-import { decode } from '../../src/tx/builder/helpers'
-import { DRY_RUN_ACCOUNT } from '../../src/tx/builder/schema'
+import { before, describe, it } from 'mocha'
 import * as R from 'ramda'
-import { randomName } from '../utils'
-import { decodeEvents, readType, SOPHIA_TYPES } from '../../src/contract/aci/transformation'
-import { messageToHash } from '../../src/utils/crypto'
 import { getFunctionACI } from '../../src/contract/aci/helpers'
+import { decodeEvents, readType, SOPHIA_TYPES } from '../../src/contract/aci/transformation'
+import { commitmentHash, decode } from '../../src/tx/builder/helpers'
+import { DRY_RUN_ACCOUNT } from '../../src/tx/builder/schema'
+import { messageToHash, salt } from '../../src/utils/crypto'
+import { randomName } from '../utils'
+import { BaseAe, getSdk, publicKey } from './'
 
 const identityContract = `
 contract Identity =
@@ -214,16 +214,17 @@ describe('Contract', function () {
       const currentOwner = await sdk.address()
 
       // preclaim
-      const { salt: _salt } = await sdk.aensPreclaim(name)
-      // @TODO enable after next HF
-      // const commitmentId = commitmentHash(name, _salt)
+      const _salt = salt()
+      const commitmentId = commitmentHash(name, _salt)
+      // TODO: provide more convenient way to create the decoded commitmentId ?
+      const commitmentIdDecoded = decode(commitmentId, 'cm')
       const preclaimSig = await sdk.createAensDelegationSignature({ contractId }, { onAccount: currentOwner })
       console.log(`preclaimSig -> ${preclaimSig}`)
-      // const preclaim = await cInstance.methods.signedPreclaim(await contract.address(), commitmentId, preclaimSig)
-      // preclaim.result.returnType.should.be.equal('ok')
+      const preclaim = await cInstance.methods.signedPreclaim(await sdk.address(), commitmentIdDecoded, preclaimSig)
+      preclaim.result.returnType.should.be.equal('ok')
       await sdk.awaitHeight((await sdk.height()) + 2)
 
-      // Signature for any other name related operations
+      // signature for any other name related operations
       const aensDelegationSig = await sdk.createAensDelegationSignature({ contractId, name }, { onAccount: currentOwner })
 
       // claim
