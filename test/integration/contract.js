@@ -707,6 +707,7 @@ describe('Contract', function () {
       }
     })
     it('Fail on paying to not payable function', async () => {
+      console.log('contractObject', contractObject)
       const amount = 100
       try {
         await contractObject.methods.intFn.send(1, { amount })

@@ -88,25 +88,25 @@ export default AsyncInit.compose(ContractBase, {
 
       // In order to be able to use the encode / decode calldata we need to have
       // access to the contracts compiled abi.
-      const aci = await this.contractGetACI(source);
+      const aci = await this.contractGetACI(source)
 
       // The encoder expects the aci to be passed as array, thus this weird flex :D
-      const encoder = new Encoder([aci.encoded_aci]);
+      const encoder = new Encoder([aci.encoded_aci])
 
       const calldataEncoded = encoder.encode(
         aci.encoded_aci.contract.name,
         name,
-        args,
-      );
+        args
+      )
 
       // TODO: compare the results
       console.log({
         calldataEncoded,
         calldata,
-        matching: calldataEncoded == calldata,
-      });
+        matching: calldataEncoded === calldata
+      })
 
-      return calldataEncoded; // calldata;
+      return calldataEncoded // calldata;
     },
     async compileContractAPI (code, options) {
       this._ensureCompilerReady()
@@ -116,7 +116,7 @@ export default AsyncInit.compose(ContractBase, {
       })
       return bytecode
     },
-    contractGetACI (code, options) {
+    async contractGetACI (code, options) {
       this._ensureCompilerReady()
       return this._compilerApi.generateACI({ code, options: this._prepareCompilerOptions(options) })
     },
@@ -137,26 +137,26 @@ export default AsyncInit.compose(ContractBase, {
 
       // In order to be able to use the encode / decode calldata we need to have
       // access to the contracts compiled abi.
-      const aci = await this.contractGetACI(source);
+      const aci = await this.contractGetACI(source)
 
       // The encoder expects the aci to be passed as array, thus this weird flex :D
-      const encoder = new Encoder([aci.encoded_aci]);
+      const encoder = new Encoder([aci.encoded_aci])
 
       const calldataDecoded = encoder.decode(
         aci.encoded_aci.contract.name,
         fn,
-        callData,
-      );
+        callData
+      )
 
       // TODO: compare the results
       console.log({
         rawCallData: callData,
         lib_decoded: calldataDecoded,
         compiler_decoded: decoded,
-        matching: calldataDecoded == decoded,
-      });
+        matching: calldataDecoded === decoded
+      })
 
-      return calldataDecoded; // decoded;
+      return calldataDecoded // decoded;
     },
     contractDecodeCallResultAPI (source, fn, callValue, callResult, options) {
       this._ensureCompilerReady()
