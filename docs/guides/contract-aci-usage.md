@@ -59,7 +59,7 @@ const callResult = await contractObject.methods.sum(1 , 2)
 const callResult = await contractObject.call('sum', [1, 2])
 
 // callResult will contain all info related to contract call transaction
-console.log(callResult.decodedRes) // 3
+console.log(callResult.decodedResult) // 3
 ```
 ### How it works inside
 
