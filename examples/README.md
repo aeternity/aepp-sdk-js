@@ -6,7 +6,7 @@ Create a [new issue](https://github.com/aeternity/aepp-sdk-js/issues/new) to sug
 ## Wallet connection
 
 ### Connect to a wallet
-- [Aepp](browser/aepp) (VueJS)
+- [æpp](browser/aepp) (VueJS)
 
 ### Build a wallet
 - [iframe-based Wallet](browser/wallet-iframe) (VueJS)

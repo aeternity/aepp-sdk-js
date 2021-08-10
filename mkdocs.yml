@@ -1,4 +1,4 @@
-site_name: aeternity JavaScript SDK
+site_name: æternity JavaScript SDK
 plugins:
   - search
   - mkdocs-simple-hooks:

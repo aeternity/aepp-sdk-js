@@ -1,7 +1,7 @@
-# Aeternity Naming System
+# æternity naming system
 
 ## Introduction
-This guide shows you how to perform all the operations that you need within the lifecycle of [Aeternity Naming System (AENS)](https://github.com/aeternity/protocol/blob/master/AENS.md) using the SDK.
+This guide shows you how to perform all the operations that you need within the lifecycle of [æternity naming system (AENS)](https://github.com/aeternity/protocol/blob/master/AENS.md) using the SDK.
 
 If you successfully claimed a name it will expire after 180000 keyblocks (~375 days). You will need to update your name before it expires!
 

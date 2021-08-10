@@ -36,7 +36,7 @@
 // Examples:
 //
 //  - Game developers that want to quickly onboard new users.
-//  - Governance aepps that want people to vote on important proposals without having them to pay anything.
+//  - Governance æpps that want people to vote on important proposals without having them to pay anything.
 //  - Custodians that want to offer an additional services to cover the transaction fees of their clients.
 //  - ... many more!
 

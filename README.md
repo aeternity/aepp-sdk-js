@@ -1,4 +1,4 @@
-# [aeternity](https://aeternity.com/)'s JavaScript SDK
+# [æternity](https://aeternity.com/)'s JavaScript SDK
 
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/aeternity/aepp-sdk-js.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/aeternity/aepp-sdk-js/context:javascript)
 [![codecov](https://codecov.io/gh/aeternity/aepp-sdk-js/branch/develop/graph/badge.svg)](https://codecov.io/gh/aeternity/aepp-sdk-js)
@@ -23,7 +23,7 @@ Introduction
 - [Quick Start](docs/quick-start.md)
 
 Usage guides:
-- [Aeternity Naming System](docs/guides/aens.md)
+- [æternity naming system](docs/guides/aens.md)
 - [Contracts](docs/guides/contracts.md)
 - [Contract events](docs/guides/contract-events.md)
 - [Oracles](docs/guides/oracles.md)
@@ -33,7 +33,7 @@ There are also [examples](examples/README.md) that you can directly use and play
 
 ## CLI - Command Line Client
 
-To quickly test _all_ of aeternity's blockchain features from your terminal, you can install and use our **NodeJS [CLI](https://github.com/aeternity/aepp-cli-js)** by running:
+To quickly test _all_ of æternity's blockchain features from your terminal, you can install and use our **NodeJS [CLI](https://github.com/aeternity/aepp-cli-js)** by running:
 
 1. `npm i -g @aeternity/aepp-cli` to globally install the CLI
 2. `aecli --help` to get a list of possible commands
@@ -49,7 +49,7 @@ We keep our [Changelog](CHANGELOG.md) up to date.
 ## License
 
 ISC License (ISC)
-Copyright © 2018 aeternity developers
+Copyright © 2018 æternity developers
 
 Permission to use, copy, modify, and/or distribute this software for any purpose
 with or without fee is hereby granted, provided that the above copyright notice
