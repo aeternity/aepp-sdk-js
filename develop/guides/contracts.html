@@ -14,7 +14,7 @@
     
     
       
-        <title>Contracts - aeternity JavaScript SDK</title>
+        <title>Contracts - æternity JavaScript SDK</title>
       
     
     
@@ -76,7 +76,7 @@
     
       <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="aeternity JavaScript SDK" class="md-header__button md-logo" aria-label="aeternity JavaScript SDK" data-md-component="logo">
+    <a href="../index.html" title="æternity JavaScript SDK" class="md-header__button md-logo" aria-label="æternity JavaScript SDK" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -89,7 +89,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            aeternity JavaScript SDK
+            æternity JavaScript SDK
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -191,13 +191,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="aeternity JavaScript SDK" class="md-nav__button md-logo" aria-label="aeternity JavaScript SDK" data-md-component="logo">
+    <a href="../index.html" title="æternity JavaScript SDK" class="md-nav__button md-logo" aria-label="æternity JavaScript SDK" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
 
     </a>
-    aeternity JavaScript SDK
+    æternity JavaScript SDK
   </label>
   
     <div class="md-nav__source">
@@ -277,7 +277,7 @@
   
     <li class="md-nav__item">
       <a href="aens.html" class="md-nav__link">
-        Aeternity Naming System
+        æternity naming system
       </a>
     </li>
   
@@ -486,7 +486,7 @@
   
     <li class="md-nav__item">
       <a href="connect-aepp-to-wallet.html" class="md-nav__link">
-        Connect an aepp to a wallet
+        Connect an æpp to a wallet
       </a>
     </li>
   
@@ -936,11 +936,11 @@
                 
                 <h1 id="contracts">Contracts</h1>
 <h2 id="introduction">Introduction</h2>
-<p>The smart contract language of the aeternity blockchain is <a href="https://github.com/aeternity/aesophia/blob/v6.0.1/docs/sophia.md">Sophia</a>. It is a functional language in the ML family, strongly typed and has restricted mutable state.</p>
+<p>The smart contract language of the æternity blockchain is <a href="https://github.com/aeternity/aesophia/blob/v6.0.1/docs/sophia.md">Sophia</a>. It is a functional language in the ML family, strongly typed and has restricted mutable state.</p>
 <p>Before interacting with contracts using the SDK you should get familiar with Sophia itself first. Have a look into <a href="https://github.com/aeternity/aepp-sophia-examples">aepp-sophia-examples</a> and start rapid prototyping using <a href="https://studio.aepps.com">AEstudio</a>.</p>
-<p>The SDK needs to interact with following components in order to enable smart contract interactions on the aeternity blockchain:</p>
+<p>The SDK needs to interact with following components in order to enable smart contract interactions on the æternity blockchain:</p>
 <ul>
-<li><a href="https://github.com/aeternity/aeternity">aeternity</a> (host your own one or use the public testnet node at <code>https://testnet.aeternity.io</code>)</li>
+<li><a href="https://github.com/aeternity/aeternity">æternity</a> (host your own one or use the public testnet node at <code>https://testnet.aeternity.io</code>)</li>
 <li><a href="https://github.com/aeternity/aesophia_http">aesophia_http</a> (host your own one or use the public compiler at <code>https://compiler.aepps.com</code>)</li>
 </ul>
 <p>Note:</p>
@@ -951,7 +951,7 @@
 <div class="highlight"><pre><span></span><code><span class="c1">// node.js import</span>
 <span class="kd">const</span> <span class="p">{</span> <span class="nx">Universal</span><span class="p">,</span> <span class="nx">MemoryAccount</span><span class="p">,</span> <span class="nx">Node</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">)</span>
 <span class="c1">// ES import</span>
-<span class="k">import</span> <span class="p">{</span> <span class="nx">Universal</span><span class="p">,</span> <span class="nx">MemoryAccount</span><span class="p">,</span> <span class="nx">Node</span> <span class="p">}</span> <span class="k">from</span> <span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">Universal</span><span class="p">,</span> <span class="nx">MemoryAccount</span><span class="p">,</span> <span class="nx">Node</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
 </code></pre></div>
 <h2 id="2-initialize-the-sdk-providing-an-account">2. Initialize the SDK providing an account</h2>
 <p>When initializing the SDK you need to provide an account which will be used to sign transactions like <code>ContractCreateTx</code> and <code>ContractCallTx</code> that will be broadcasted to the network.</p>
@@ -1069,7 +1069,7 @@ if they should produce changes to the state of the smart contract, see <code>inc
 <li>When using the <code>increment</code> function directly the SDK will automatically determine if it's a <code>stateful</code> entrypoint.</li>
 </ul>
 <h3 id="b-regular-entrypoints">b) Regular entrypoints</h3>
-<p>The aeternity node can expose an API endpoint that allows to execute a <code>dry-run</code> for a transaction. You can make use of that functionality to get the result of entrypoints that don't execute state changes. Following lines show how you can do that using the SDK for the <code>get_count</code> entrypoint of the example above:</p>
+<p>The æternity node can expose an API endpoint that allows to execute a <code>dry-run</code> for a transaction. You can make use of that functionality to get the result of entrypoints that don't execute state changes. Following lines show how you can do that using the SDK for the <code>get_count</code> entrypoint of the example above:</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">tx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">get_count</span><span class="p">()</span> <span class="c1">// recommended</span>
 <span class="c1">// or</span>
 <span class="kd">const</span> <span class="nx">tx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">get_count</span><span class="p">.</span><span class="nx">get</span><span class="p">()</span>
@@ -1201,7 +1201,7 @@ if they should produce changes to the state of the smart contract, see <code>inc
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
         
-        <a href="aens.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: Aeternity Naming System" rel="prev">
+        <a href="aens.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: æternity naming system" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
           </div>
@@ -1210,7 +1210,7 @@ if they should produce changes to the state of the smart contract, see <code>inc
               <span class="md-footer__direction">
                 Previous
               </span>
-              Aeternity Naming System
+              æternity naming system
             </div>
           </div>
         </a>

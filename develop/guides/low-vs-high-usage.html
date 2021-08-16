@@ -14,7 +14,7 @@
     
     
       
-        <title>Low vs High level API - aeternity JavaScript SDK</title>
+        <title>Low vs High level API - æternity JavaScript SDK</title>
       
     
     
@@ -76,7 +76,7 @@
     
       <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="aeternity JavaScript SDK" class="md-header__button md-logo" aria-label="aeternity JavaScript SDK" data-md-component="logo">
+    <a href="../index.html" title="æternity JavaScript SDK" class="md-header__button md-logo" aria-label="æternity JavaScript SDK" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -89,7 +89,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            aeternity JavaScript SDK
+            æternity JavaScript SDK
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -191,13 +191,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="aeternity JavaScript SDK" class="md-nav__button md-logo" aria-label="aeternity JavaScript SDK" data-md-component="logo">
+    <a href="../index.html" title="æternity JavaScript SDK" class="md-nav__button md-logo" aria-label="æternity JavaScript SDK" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
 
     </a>
-    aeternity JavaScript SDK
+    æternity JavaScript SDK
   </label>
   
     <div class="md-nav__source">
@@ -277,7 +277,7 @@
   
     <li class="md-nav__item">
       <a href="aens.html" class="md-nav__link">
-        Aeternity Naming System
+        æternity naming system
       </a>
     </li>
   
@@ -424,7 +424,7 @@
   
     <li class="md-nav__item">
       <a href="connect-aepp-to-wallet.html" class="md-nav__link">
-        Connect an aepp to a wallet
+        Connect an æpp to a wallet
       </a>
     </li>
   
@@ -824,8 +824,8 @@ JavaScript. It's excellent for low-level control, and as a teaching tool to
 understand the node's operations. Most real-world requirements involves a series
 of chain operations, so the SDK provides abstractions for these.</p>
 <h2 id="recommended-high-level-sdk-usage">(<strong>Recommended</strong>) High-level SDK usage</h2>
-<p>Example spend function, using aeternity's SDK abstraction.</p>
-<div class="highlight"><pre><span></span><code><span class="k">import</span> <span class="p">{</span> <span class="nx">MemoryAccount</span><span class="p">,</span> <span class="nx">Node</span><span class="p">,</span> <span class="nx">Universal</span> <span class="p">}</span> <span class="k">from</span> <span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
+<p>Example spend function, using æternity's SDK abstraction.</p>
+<div class="highlight"><pre><span></span><code><span class="k">import</span> <span class="p">{</span> <span class="nx">MemoryAccount</span><span class="p">,</span> <span class="nx">Node</span><span class="p">,</span> <span class="nx">Universal</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
 
 <span class="k">async</span> <span class="kd">function</span> <span class="nx">init</span> <span class="p">()</span> <span class="p">{</span>
   <span class="kd">const</span> <span class="nx">node</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Node</span><span class="p">({</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span> <span class="p">})</span> <span class="c1">// ideally host your own node!</span>
@@ -842,7 +842,7 @@ of chain operations, so the SDK provides abstractions for these.</p>
 </code></pre></div>
 <h2 id="low-level-sdk-usage-use-api-endpoints-directly">Low-level SDK usage (use <a href="https://github.com/aeternity/protocol/tree/master/node/api">API</a> endpoints directly)</h2>
 <p>Example spend function, using the SDK, talking directly to the <a href="https://github.com/aeternity/protocol/tree/master/node/api"><strong>API</strong></a>:
-<div class="highlight"><pre><span></span><code><span class="k">import</span> <span class="p">{</span> <span class="nx">MemoryAccount</span><span class="p">,</span> <span class="nx">Node</span><span class="p">,</span> <span class="nx">Universal</span> <span class="p">}</span> <span class="k">from</span> <span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
+<div class="highlight"><pre><span></span><code><span class="k">import</span> <span class="p">{</span> <span class="nx">MemoryAccount</span><span class="p">,</span> <span class="nx">Node</span><span class="p">,</span> <span class="nx">Universal</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
 
 <span class="k">async</span> <span class="kd">function</span> <span class="nx">spend</span> <span class="p">(</span><span class="nx">amount</span><span class="p">,</span> <span class="nx">recipient</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">const</span> <span class="nx">node</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Node</span><span class="p">({</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span> <span class="p">})</span> <span class="c1">// ideally host your own node!</span>
@@ -974,13 +974,13 @@ of chain operations, so the SDK provides abstractions for these.</p>
       
       
         
-        <a href="connect-aepp-to-wallet.html" class="md-footer__link md-footer__link--next" aria-label="Next: Connect an aepp to a wallet" rel="next">
+        <a href="connect-aepp-to-wallet.html" class="md-footer__link md-footer__link--next" aria-label="Next: Connect an æpp to a wallet" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Connect an aepp to a wallet
+              Connect an æpp to a wallet
             </div>
           </div>
           <div class="md-footer__button md-icon">
