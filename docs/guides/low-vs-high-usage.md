@@ -15,7 +15,7 @@ understand the node's operations. Most real-world requirements involves a series
 of chain operations, so the SDK provides abstractions for these.
 
 ## (**Recommended**) High-level SDK usage
-Example spend function, using aeternity's SDK abstraction.
+Example spend function, using æternity's SDK abstraction.
 
 ```js
 import { MemoryAccount, Node, Universal } from '@aeternity/aepp-sdk'

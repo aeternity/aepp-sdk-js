@@ -1,6 +1,6 @@
 # Vue.js HelloWorld
 This tutorial shows you how to use the SDK in your Vue.js application.
-You will replace the content of the default `HelloWorld` component and display the current block height of the aeternity testnet.
+You will replace the content of the default `HelloWorld` component and display the current block height of the æternity testnet.
 
 ## 1. Install Vue.js
 ```bash

@@ -24,7 +24,7 @@ import {
 ## 3. Get some _AE_ tokens using the Faucet
 To receive some _AE_ you can use the [Faucet](https://faucet.aepps.com/). Just add your publicKey, and you'll immediately get some test tokens.
 
-## 4. Interact with the aeternity blockchain
+## 4. Interact with the æternity blockchain
 This example shows:
 
 - how to initialize the SDK client using the `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp)

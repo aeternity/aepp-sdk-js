@@ -1,4 +1,4 @@
-# Connect an aepp to a wallet
+# Connect an æpp to a wallet
 
 ## Introduction
 

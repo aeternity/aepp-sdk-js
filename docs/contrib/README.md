@@ -80,7 +80,7 @@ To test, launch the `test` command. This will run [mocha](https://mochajs.org/)'
 pnpm run test
 ```
 
-This repository also includes a docker-compose file, to allow you to **run your own aeternity node locally**. If you want to do so, **from the root of the project**:
+This repository also includes a docker-compose file, to allow you to **run your own æternity node locally**. If you want to do so, **from the root of the project**:
 
 1. Create a _**docker-compose.override.yml**_ file with this content:
 ```yaml
@@ -94,7 +94,7 @@ services:
       - 3001:3001
 ```
 2. Run `docker-compose up node`
-3. Congrats! you're now running your own aeternity node locally.
+3. Congrats! you're now running your own æternity node locally.
 
 
 ## Composing new Flavors

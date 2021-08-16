@@ -1,13 +1,13 @@
 # Contracts
 
 ## Introduction
-The smart contract language of the aeternity blockchain is [Sophia](https://github.com/aeternity/aesophia/blob/v6.0.1/docs/sophia.md). It is a functional language in the ML family, strongly typed and has restricted mutable state.
+The smart contract language of the æternity blockchain is [Sophia](https://github.com/aeternity/aesophia/blob/v6.0.1/docs/sophia.md). It is a functional language in the ML family, strongly typed and has restricted mutable state.
 
 Before interacting with contracts using the SDK you should get familiar with Sophia itself first. Have a look into [aepp-sophia-examples](https://github.com/aeternity/aepp-sophia-examples) and start rapid prototyping using [AEstudio](https://studio.aepps.com).
 
-The SDK needs to interact with following components in order to enable smart contract interactions on the aeternity blockchain:
+The SDK needs to interact with following components in order to enable smart contract interactions on the æternity blockchain:
 
-- [aeternity](https://github.com/aeternity/aeternity) (host your own one or use the public testnet node at `https://testnet.aeternity.io`)
+- [æternity](https://github.com/aeternity/aeternity) (host your own one or use the public testnet node at `https://testnet.aeternity.io`)
 - [aesophia_http](https://github.com/aeternity/aesophia_http) (host your own one or use the public compiler at `https://compiler.aepps.com`)
 
 Note:
@@ -140,7 +140,7 @@ Note:
 - When using the `increment` function directly the SDK will automatically determine if it's a `stateful` entrypoint.
 
 ### b) Regular entrypoints
-The aeternity node can expose an API endpoint that allows to execute a `dry-run` for a transaction. You can make use of that functionality to get the result of entrypoints that don't execute state changes. Following lines show how you can do that using the SDK for the `get_count` entrypoint of the example above:
+The æternity node can expose an API endpoint that allows to execute a `dry-run` for a transaction. You can make use of that functionality to get the result of entrypoints that don't execute state changes. Following lines show how you can do that using the SDK for the `get_count` entrypoint of the example above:
 
 ```js
 const tx = await contractInstance.methods.get_count() // recommended
