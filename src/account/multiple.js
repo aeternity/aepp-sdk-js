@@ -51,13 +51,13 @@ import AccountBase, { isAccountBase } from './base'
 export default AccountBase.compose(AsyncInit, {
   async init ({ accounts = [], address }) {
     /* An Account maynot be required for the Node/Chain methods */
-    if(Array.isArray(accounts) && accounts.length) {
+    if (Array.isArray(accounts) && accounts.length) {
       this.accounts = R.fromPairs(await Promise.all(accounts.map(async a => [await a.address(), a])))
       if (!address) address = Object.keys(this.accounts)[0]
       decode(address, 'ak')
       this.selectedAddress = address
     } else {
-      console.warn("No account/accounts supplied")
+      console.warn('No account/accounts supplied')
     }
   },
   props: {

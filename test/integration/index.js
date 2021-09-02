@@ -53,13 +53,13 @@ const spendPromise = (async () => {
   await ae.spend('1' + '0'.repeat(26), account.publicKey)
 })()
 
-export async function getSdk({ nativeMode = true, withoutAccount } = {}) {
+export async function getSdk ({ nativeMode = true, withoutAccount } = {}) {
   await spendPromise
 
   return BaseAe({
     accounts: (withoutAccount === undefined || withoutAccount === false) ? [MemoryAccount({ keypair: account })] : [],
     address: (withoutAccount === undefined || withoutAccount === false) ? account.publicKey : undefined,
-    withoutGenesisAccount: (withoutAccount === undefined || withoutAccount === false) ? false : true,
+    withoutGenesisAccount: !((withoutAccount === undefined || withoutAccount === false)),
     nativeMode,
     networkId
   })
