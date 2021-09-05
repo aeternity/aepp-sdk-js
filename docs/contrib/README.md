@@ -46,7 +46,7 @@ It uses the following Javascript technologies and principles:
 
 ## Requirements
 
-aepp-sdk is transpiled to EcmaScript 5 through [WebPack](https://webpack.js.org/), using [Babel](https://babeljs.io/) and is expected to work in any sufficiently new version of [Node.js](https://nodejs.org/en/) (`>= 8.11`) or modern web browser.
+aepp-sdk is transpiled to EcmaScript 5 through [WebPack](https://webpack.js.org/), using [Babel](https://babeljs.io/) and is expected to work in any sufficiently new version of [Node.js](https://nodejs.org/en/) (`>= v12.17`) or modern web browser.
 
 ## Contributing
 
