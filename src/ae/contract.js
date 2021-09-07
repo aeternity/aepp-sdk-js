@@ -217,7 +217,7 @@ async function contractCall (source, address, name, argsOrCallData = [], options
  * }
  */
 async function contractDeploy (code, source, initState = [], options = {}) {
-  const opt = { ...this.Ae.defaults, ...options }
+  const opt = { ...this.Ae.defaults, ...options, deposit: DEPOSIT }
   const callData = Array.isArray(initState) ? await this.contractEncodeCall(source, 'init', initState, opt) : initState
   const ownerId = await this.address(opt)
 

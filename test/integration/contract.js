@@ -294,6 +294,13 @@ describe('Contract', function () {
     const code = await contract.contractCompile(identityContract)
     return contract.contractDeploy(code.bytecode, identityContract).should.eventually.have.property('address')
   })
+  it('enforce zero deposit for contract deployment', async () => {
+    const { version, consensusProtocolVersion } = contract.getNodeInfo()
+    console.log(`Node => ${version}, consensus => ${consensusProtocolVersion}, compiler => ${contract.compilerVersion}`)
+    const code = await contract.contractCompile(identityContract)
+    var { txData } = await contract.contractDeploy(code.bytecode, identityContract, [], { deposit: 10 })
+    return txData.tx.deposit.should.be.equal(0)
+  })
   it('Verify message in Sophia', async () => {
     const msgHash = messageToHash('Hello')
     const signature = await contract.sign(msgHash)
