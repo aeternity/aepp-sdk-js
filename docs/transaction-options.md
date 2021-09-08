@@ -86,6 +86,6 @@ The following options are sepcific for each tx-type.
 
 ## How to estimate gas?
 - As æpp developer, it is reasonable to estimate the gas consumption for a contract call using the dry-run feature of the node **once** and provide a specific offset (e.g. multiplied by 1.5 or 2) as default in the æpp to ensure that contract calls are mined. Depending on the logic of the contract the gas consumption of a specific contract call can vary and therefore you should monitor the gas consumption and increase the default for the respective contract call accordingly over time.
-- The default `gas` value of `25000` covers trivial contract calls but, The recommended way is estimating the gas using the dry-run feature instead of relying on the default value.
+- The default `gas` value of `25000` should cover all trivial contract calls. In case transactions start running out of gas you should proceed the way described above and estimate the required gas using the dry-run feature.
 
 
