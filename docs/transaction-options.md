@@ -46,8 +46,8 @@ The following options are sepcific for each tx-type.
     - To be used for providing `aettos` (or `AE` with respective denomination) to a contract related transaction.
 - `denomination` (default: `aettos`)
     - You can specify the denomination of the `amount` that will be provided to the contract related transaction.
-- `gas` (default: `1600000 - 21000`)
-    - Max. amount of gas to be consumed by the transaction.
+- `gas` (default: `25000`)
+    - Max. amount of gas to be consumed by the transaction. Learn more on [How to estimate gas?](#how-to-estimate-gas)
 - `gasPrice` (default: `1e9`)
     - To increase chances to get your transaction included quickly you can use a higher gasPrice.
 
@@ -83,3 +83,9 @@ The following options are sepcific for each tx-type.
 ### SpendTx
 - `denomination` (default: `aettos`)
     - You can specify the denomination of the `amount` that will be provided to the contract related transaction.
+
+## How to estimate gas?
+- As æpp developer, It is reasonable to estimate the gas consumption for a contract call using the dry-run feature of the node **once** and provide a specific offset (multiplied by 1.5 or 2) as default in the æpp to ensure that contract calls are mined. Depending on the logic of the contract the gas consumption of a specific contract call can vary and therefore you should monitor the gas consumption and increase the default for the respective contract call accordingly.
+- The default `gas` value of `25000` covers trivial contract calls but, The recommended way is estimating the gas using the dry-run feature instead of relying on the default value.
+
+
