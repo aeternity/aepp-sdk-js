@@ -290,7 +290,7 @@ async function delegateSignatureCommon (ids = [], opt = {}) {
     Buffer.concat(
       [
         Buffer.from(this.getNetworkId(opt)),
-        decode(await this.address(opt)),
+        ...(Object.prototype.hasOwnProperty.call(opt, 'onAccount') ? [decode(await this.address(opt))] : []),
         ...ids.map(e => decode(e))
       ]
     ),
