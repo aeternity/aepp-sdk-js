@@ -217,19 +217,19 @@ describe('Contract', function () {
       const { salt: _salt } = await contract.aensPreclaim(name)
       // @TODO enable after next HF
       // const commitmentId = commitmentHash(name, _salt)
-      const preclaimSig = await contract.delegateNamePreclaimSignature(contractAddress)
+      const preclaimSig = await contract.delegateNamePreclaimSignature(contractAddress, { onAccount: current })
       console.log(`preclaimSig -> ${preclaimSig}`)
       // const preclaim = await cInstance.methods.signedPreclaim(await contract.address(), commitmentId, preclaimSig)
       // preclaim.result.returnType.should.be.equal('ok')
       await contract.awaitHeight((await contract.height()) + 2)
       // claim
-      const claimSig = await contract.delegateNameClaimSignature(contractAddress, name)
+      const claimSig = await contract.delegateNameClaimSignature(contractAddress, name, { onAccount: current })
       const claim = await cInstance.methods.signedClaim(await contract.address(), name, _salt, nameFee, claimSig)
       claim.result.returnType.should.be.equal('ok')
       await contract.awaitHeight((await contract.height()) + 2)
 
       // transfer
-      const transferSig = await contract.delegateNameTransferSignature(contractAddress, name)
+      const transferSig = await contract.delegateNameTransferSignature(contractAddress, name, { onAccount: current })
       const onAccount = contract.addresses().find(acc => acc !== current)
       const transfer = await cInstance.methods.signedTransfer(await contract.address(), onAccount, name, transferSig)
       transfer.result.returnType.should.be.equal('ok')
