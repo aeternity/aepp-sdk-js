@@ -267,25 +267,24 @@ describe('Contract', function () {
       console.log(oracleExtended)
       oracleExtended.ttl.should.be.equal(oracle.ttl + 50)
 
-      // TODO ask core about this
-      // // create query
-      // const q = 'Hello!'
-      // const newOracle = await contract.registerOracle('string', 'int', { onAccount, queryFee: qFee })
-      // const query = await cInstanceOracle.methods.createQuery(newOracle.id, q, 1000 + qFee, ttl, ttl, { onAccount, amount: 5 * qFee })
-      // query.should.be.an('object')
-      // const queryObject = await contract.getQueryObject(newOracle.id, query.decodedResult)
-      // queryObject.should.be.an('object')
-      // queryObject.decodedQuery.should.be.equal(q)
-      // console.log(queryObject)
-      //
-      // // respond to query
-      // const r = 'Hi!'
-      // const respondSig = await contract.delegateOracleRespondSignature(newOracle.id, queryObject.id, contractAddress, { onAccount })
-      // const response = await cInstanceOracle.methods.respond(newOracle.id, queryObject.id, respondSig, r, { onAccount })
-      // console.log(response)
-      // const queryObject2 = await contract.getQueryObject(newOracle.id, queryObject.id)
-      // console.log(queryObject2)
-      // queryObject2.decodedResponse.should.be.equal(r)
+      // create query
+      const q = 'Hello!'
+      const newOracle = await contract.registerOracle('string', 'int', { queryFee: qFee })
+      const query = await cInstanceOracle.methods.createQuery(newOracle.id, q, 1000 + qFee, ttl, ttl, { onAccount, amount: 5 * qFee })
+      query.should.be.an('object')
+      const queryObject = await contract.getQueryObject(newOracle.id, query.decodedResult)
+      queryObject.should.be.an('object')
+      queryObject.decodedQuery.should.be.equal(q)
+      console.log(queryObject)
+
+      // respond to query
+      const r = 'Hi!'
+      const respondSig = await contract.delegateOracleRespondSignature(queryObject.id, contractAddress)
+      const response = await cInstanceOracle.methods.respond(newOracle.id, queryObject.id, respondSig, r, { onAccount })
+      console.log(response)
+      const queryObject2 = await contract.getQueryObject(newOracle.id, queryObject.id)
+      console.log(queryObject2)
+      queryObject2.decodedResponse.should.be.equal(r)
     })
   })
   it('precompiled bytecode can be deployed', async () => {
