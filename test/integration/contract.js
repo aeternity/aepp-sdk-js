@@ -211,33 +211,35 @@ describe('Contract', function () {
       const name = randomName(15)
       const contractAddress = cInstance.deployInfo.address
       const nameFee = 20 * (10 ** 18) // 20 AE
-      const current = await contract.address()
+      const currentOwner = await contract.address()
 
       // preclaim
       const { salt: _salt } = await contract.aensPreclaim(name)
       // @TODO enable after next HF
       // const commitmentId = commitmentHash(name, _salt)
-      const preclaimSig = await contract.createAensDelegationSignature(contractAddress, { onAccount: current })
+      const preclaimSig = await contract.createAensDelegationSignature(contractAddress, { onAccount: currentOwner })
       console.log(`preclaimSig -> ${preclaimSig}`)
       // const preclaim = await cInstance.methods.signedPreclaim(await contract.address(), commitmentId, preclaimSig)
       // preclaim.result.returnType.should.be.equal('ok')
       await contract.awaitHeight((await contract.height()) + 2)
+
+      // Signature for any other name related operations
+      const sig = await contract.createAensDelegationSignature(contractAddress, name, { onAccount: currentOwner })
+
       // claim
-      const claimSig = await contract.createAensDelegationSignature(contractAddress, name, { onAccount: current })
-      const claim = await cInstance.methods.signedClaim(await contract.address(), name, _salt, nameFee, claimSig)
+      const claim = await cInstance.methods.signedClaim(await contract.address(), name, _salt, nameFee, sig)
       claim.result.returnType.should.be.equal('ok')
       await contract.awaitHeight((await contract.height()) + 2)
 
       // transfer
-      const transferSig = await contract.createAensDelegationSignature(contractAddress, name, { onAccount: current })
-      const onAccount = contract.addresses().find(acc => acc !== current)
-      const transfer = await cInstance.methods.signedTransfer(await contract.address(), onAccount, name, transferSig)
+      const newOwner = contract.addresses().find(acc => acc !== currentOwner)
+      const transfer = await cInstance.methods.signedTransfer(await contract.address(), newOwner, name, sig)
       transfer.result.returnType.should.be.equal('ok')
-
       await contract.awaitHeight((await contract.height()) + 2)
+
       // revoke
-      const revokeSig = await contract.createAensDelegationSignature(contractAddress, name, { onAccount })
-      const revoke = await cInstance.methods.signedRevoke(onAccount, name, revokeSig)
+      const revokeSig = await contract.createAensDelegationSignature(contractAddress, name, { onAccount: newOwner })
+      const revoke = await cInstance.methods.signedRevoke(newOwner, name, revokeSig)
       revoke.result.returnType.should.be.equal('ok')
 
       try {
