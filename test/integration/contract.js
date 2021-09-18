@@ -217,26 +217,26 @@ describe('Contract', function () {
       const { salt: _salt } = await contract.aensPreclaim(name)
       // @TODO enable after next HF
       // const commitmentId = commitmentHash(name, _salt)
-      const preclaimSig = await contract.delegateNamePreclaimSignature(contractAddress, { onAccount: current })
+      const preclaimSig = await contract.createAensDelegationSignature(contractAddress, { onAccount: current })
       console.log(`preclaimSig -> ${preclaimSig}`)
       // const preclaim = await cInstance.methods.signedPreclaim(await contract.address(), commitmentId, preclaimSig)
       // preclaim.result.returnType.should.be.equal('ok')
       await contract.awaitHeight((await contract.height()) + 2)
       // claim
-      const claimSig = await contract.delegateNameClaimSignature(contractAddress, name, { onAccount: current })
+      const claimSig = await contract.createAensDelegationSignature(contractAddress, name, { onAccount: current })
       const claim = await cInstance.methods.signedClaim(await contract.address(), name, _salt, nameFee, claimSig)
       claim.result.returnType.should.be.equal('ok')
       await contract.awaitHeight((await contract.height()) + 2)
 
       // transfer
-      const transferSig = await contract.delegateNameTransferSignature(contractAddress, name, { onAccount: current })
+      const transferSig = await contract.createAensDelegationSignature(contractAddress, name, { onAccount: current })
       const onAccount = contract.addresses().find(acc => acc !== current)
       const transfer = await cInstance.methods.signedTransfer(await contract.address(), onAccount, name, transferSig)
       transfer.result.returnType.should.be.equal('ok')
 
       await contract.awaitHeight((await contract.height()) + 2)
       // revoke
-      const revokeSig = await contract.delegateNameRevokeSignature(contractAddress, name, { onAccount })
+      const revokeSig = await contract.createAensDelegationSignature(contractAddress, name, { onAccount })
       const revoke = await cInstance.methods.signedRevoke(onAccount, name, revokeSig)
       revoke.result.returnType.should.be.equal('ok')
 
