@@ -307,6 +307,15 @@ async function delegateSignatureCommon (ids = [], opt = {}) {
  * @param {String} [name] The name
  * @param {{ onAccount: String | Object }} [opt={}] opt Options
  * @return {Promise<String>} Signature for delegation
+ * @example
+ * const client = await Universal({ ... })
+ * const contractId = 'ct_asd2ks...' // contract address
+ * const name = 'example.chain' // AENS name
+ * const onAccount = await client.address() Sign with a specific account
+ * // Preclaim signature
+ * const preclaimSig = await client.createAensDelegationSignature(contractId, { onAccount: current })
+ * // Claim, transfer and revoke signature
+ * const sig = await contract.createAensDelegationSignature(contractAddress, name, { onAccount: current })
  */
 async function createAensDelegationSignature (contractId, name, opt = {}) {
   return (typeof name === 'string')
