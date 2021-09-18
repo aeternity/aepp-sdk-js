@@ -299,58 +299,19 @@ async function delegateSignatureCommon (ids = [], opt = {}) {
 }
 
 /**
- * Helper to generate a signature to delegate a name pre-claim to a contract.
+ * Helper to generate a signature to delegate pre-claim/claim/transfer/revoke of a name to a contract.
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
  * @param {String} contractId Contract Id
+ * @param {String} [name] The name
  * @param {{ onAccount: String | Object }} [opt={}] opt Options
  * @return {Promise<String>} Signature for delegation
  */
-async function delegateNamePreclaimSignature (contractId, opt = {}) {
-  return this.delegateSignatureCommon([contractId], opt)
-}
-
-/**
- * Helper to generate a signature to delegate a name claim to a contract.
- * @function
- * @alias module:@aeternity/aepp-sdk/es/ae/contract
- * @category async
- * @param {String} name The name being claimed
- * @param {String} contractId Contract Id
- * @param {{ onAccount: String | Object }} [opt={}] opt Options
- * @return {Promise<String>} Signature for delegation
- */
-async function delegateNameClaimSignature (contractId, name, opt = {}) {
-  return this.delegateSignatureCommon([produceNameId(name), contractId], opt)
-}
-
-/**
- * Helper to generate a signature to delegate a name transfer to a contract.
- * @function
- * @alias module:@aeternity/aepp-sdk/es/ae/contract
- * @category async
- * @param {String} contractId Contract Id
- * @param {String} name The name being transferred
- * @param {{ onAccount: String | Object }} [opt={}] opt Options
- * @return {Promise<String>} Signature for delegation
- */
-async function delegateNameTransferSignature (contractId, name, opt = {}) {
-  return this.delegateSignatureCommon([produceNameId(name), contractId], opt)
-}
-
-/**
- * Helper to generate a signature to delegate a name revoke to a contract.
- * @function
- * @alias module:@aeternity/aepp-sdk/es/ae/contract
- * @category async
- * @param {String} contractId Contract Id
- * @param {String} name The name being revoked
- * @param {{ onAccount: String | Object }} [opt={}] opt Options
- * @return {Promise<String>} Signature for delegation
- */
-async function delegateNameRevokeSignature (contractId, name, opt = {}) {
-  return this.delegateSignatureCommon([produceNameId(name), contractId], opt)
+async function createAensDelegationSignature (contractId, name, opt = {}) {
+  return (typeof name === 'string')
+    ? this.delegateSignatureCommon([produceNameId(name), contractId], opt)
+    : this.delegateSignatureCommon([contractId], opt)
 }
 
 /**
@@ -434,12 +395,9 @@ export const ContractAPI = Ae.compose(ContractBase, {
     _handleCallError,
     _sendAndProcess,
     // Delegation for contract
-    // AENS
     delegateSignatureCommon,
-    delegateNamePreclaimSignature,
-    delegateNameClaimSignature,
-    delegateNameTransferSignature,
-    delegateNameRevokeSignature,
+    // AENS
+    createAensDelegationSignature,
     // Oracle
     delegateOracleRegisterSignature,
     delegateOracleExtendSignature,
