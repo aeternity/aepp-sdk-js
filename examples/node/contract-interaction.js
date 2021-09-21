@@ -55,7 +55,7 @@ const COMPILER_URL = 'https://compiler.aepps.com';
 //
 //  - The keypair of the account is pre-funded and only used for demonstration purpose
 //      - You should replace it with your own keypair (see [Create a Keypair](../../quick-start.md#2-create-a-keypair))
-//  - In case the account runs out of funds you can request new AE tokens using the [Faucet](https://faucet.aepps.com/)
+//  - In case the account runs out of funds you can always request AE using the [Faucet](https://faucet.aepps.com/)
 
 // ## 3. Open async codeblock
 // Most functions of the SDK return _Promises_, so the recommended way of

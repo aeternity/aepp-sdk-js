@@ -16,14 +16,14 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-// # Transfer AE tokens
+// # Transfer AE
 //
 // ## Introduction
-// The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/master/examples/node/transfer-ae-tokens.js)
+// The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/master/examples/node/transfer-ae.js)
 // and this page explains in detail how to:
 //
 //  - initialize the SDK with a pre-funded account
-//  - transfer AE tokens to another account
+//  - transfer AE to another account
 
 // ## 1. Specify imports
 // You need to import `Universal`, `Node` and `MemoryAccount` [Stamps](https://stampit.js.org/essentials/what-is-a-stamp) from the SDK.
@@ -46,10 +46,10 @@ const [amount = 1, recipient = ACCOUNT_KEYPAIR.publicKey] = process.argv.slice(2
 //
 //  - The keypair of the account is pre-funded and only used for demonstration purpose
 //      - You should replace it with your own keypair (see [Create a Keypair](../../quick-start.md#2-create-a-keypair))
-//  - In case the account runs out of funds you can request new AE tokens using the [Faucet](https://faucet.aepps.com/)
+//  - In case the account runs out of funds you can always request AE using the [Faucet](https://faucet.aepps.com/)
 //  - By default the script will transfer `1 aetto` and use the demo account itself as recipient
 //      - Optionally you can provide the amount and a different recipient by providing the arguments when executing the script,
-//        e.g. `node transfer-ae-tokens.js 3 ak_6D2uyunJaERXfgbsc94G8vrp79nZrbtorL7VCRXk3sWiFK5jb`
+//        e.g. `node transfer-ae.js 3 ak_6D2uyunJaERXfgbsc94G8vrp79nZrbtorL7VCRXk3sWiFK5jb`
 
 // ## 3. Open async codeblock
 // Most functions of the SDK return _Promises_, so the recommended way of
@@ -78,7 +78,7 @@ const [amount = 1, recipient = ACCOUNT_KEYPAIR.publicKey] = process.argv.slice(2
   const balanceBefore = await client.getBalance(recipient)
   console.log(`Balance of ${recipient} (before): ${balanceBefore} aettos`)
 
-  // ## 6. Transfer AE tokens
+  // ## 6. Transfer AE
   // Calling the `spend` function will create, sign and broadcast a `SpendTx` to the network.
   const tx = await client.spend(amount, recipient)
   console.log('Transaction mined', tx)

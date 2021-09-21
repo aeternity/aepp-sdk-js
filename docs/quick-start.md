@@ -21,8 +21,8 @@ import {
   console.log(`Public key: ${keypair.publicKey}`)
 ```
 
-## 3. Get some _AE_ tokens using the Faucet
-To receive some _AE_ you can use the [Faucet](https://faucet.aepps.com/). Just add your publicKey, and you'll immediately get some test tokens.
+## 3. Get some _AE_ using the Faucet
+To receive some _AE_ you can use the [Faucet](https://faucet.aepps.com/). Just add your publicKey, and you'll immediately get some test coins.
 
 ## 4. Interact with the æternity blockchain
 This example shows:

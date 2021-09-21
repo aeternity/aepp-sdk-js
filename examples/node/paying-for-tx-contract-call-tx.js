@@ -31,7 +31,7 @@
 //
 // ### UseCases
 // This functionality allows **every service** to let their users interact with their
-// decentralized aepp without having them to buy AE tokens by covering their fees.
+// decentralized aepp without having them to buy AE by covering their fees.
 //
 // Examples:
 //
@@ -81,7 +81,7 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
 //
 //  - The keypair of the account is pre-funded and only used for demonstration purpose
 //      - You can replace it with your own keypair (see [Create a Keypair](../../quick-start.md#2-create-a-keypair))
-//      - In case the account runs out of funds you can request new AE tokens using the [Faucet](https://faucet.aepps.com/)
+//      - In case the account runs out of funds you can always request AE using the [Faucet](https://faucet.aepps.com/)
 //  - The contract is already deployed at the defined address.
 //  - The `NEW_USER_KEYPAIR` is used to call the contract. The `PayingForTx` allows the new user to perform a contract call without having any funds.
 
