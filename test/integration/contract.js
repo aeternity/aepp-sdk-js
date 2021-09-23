@@ -209,35 +209,37 @@ describe('Contract', function () {
     })
     it('Delegate AENS operations', async () => {
       const name = randomName(15)
-      const contractAddress = cInstance.deployInfo.address
+      const contractId = cInstance.deployInfo.address
       const nameFee = 20 * (10 ** 18) // 20 AE
-      const current = await contract.address()
+      const currentOwner = await contract.address()
 
       // preclaim
       const { salt: _salt } = await contract.aensPreclaim(name)
       // @TODO enable after next HF
       // const commitmentId = commitmentHash(name, _salt)
-      const preclaimSig = await contract.delegateNamePreclaimSignature(contractAddress)
+      const preclaimSig = await contract.createAensDelegationSignature({ contractId }, { onAccount: currentOwner })
       console.log(`preclaimSig -> ${preclaimSig}`)
       // const preclaim = await cInstance.methods.signedPreclaim(await contract.address(), commitmentId, preclaimSig)
       // preclaim.result.returnType.should.be.equal('ok')
       await contract.awaitHeight((await contract.height()) + 2)
+
+      // Signature for any other name related operations
+      const aensDelegationSig = await contract.createAensDelegationSignature({ contractId, name }, { onAccount: currentOwner })
+
       // claim
-      const claimSig = await contract.delegateNameClaimSignature(contractAddress, name)
-      const claim = await cInstance.methods.signedClaim(await contract.address(), name, _salt, nameFee, claimSig)
+      const claim = await cInstance.methods.signedClaim(await contract.address(), name, _salt, nameFee, aensDelegationSig)
       claim.result.returnType.should.be.equal('ok')
       await contract.awaitHeight((await contract.height()) + 2)
 
       // transfer
-      const transferSig = await contract.delegateNameTransferSignature(contractAddress, name)
-      const onAccount = contract.addresses().find(acc => acc !== current)
-      const transfer = await cInstance.methods.signedTransfer(await contract.address(), onAccount, name, transferSig)
+      const newOwner = contract.addresses().find(acc => acc !== currentOwner)
+      const transfer = await cInstance.methods.signedTransfer(await contract.address(), newOwner, name, aensDelegationSig)
       transfer.result.returnType.should.be.equal('ok')
-
       await contract.awaitHeight((await contract.height()) + 2)
+
       // revoke
-      const revokeSig = await contract.delegateNameRevokeSignature(contractAddress, name, { onAccount })
-      const revoke = await cInstance.methods.signedRevoke(onAccount, name, revokeSig)
+      const revokeSig = await contract.createAensDelegationSignature({ contractId, name }, { onAccount: newOwner })
+      const revoke = await cInstance.methods.signedRevoke(newOwner, name, revokeSig)
       revoke.result.returnType.should.be.equal('ok')
 
       try {
@@ -247,45 +249,47 @@ describe('Contract', function () {
       }
     })
     it('Delegate Oracle operations', async () => {
-      const contractAddress = cInstanceOracle.deployInfo.address
+      const contractId = cInstanceOracle.deployInfo.address
       const current = await contract.address()
       const onAccount = contract.addresses().find(acc => acc !== current)
       const qFee = 500000
       const ttl = 'RelativeTTL(50)'
       const oracleId = `ok_${onAccount.slice(3)}`
 
-      const oracleCreateSig = await contract.delegateOracleRegisterSignature(contractAddress, { onAccount })
-      const oracleRegister = await cInstanceOracle.methods.signedRegisterOracle(onAccount, oracleCreateSig, qFee, ttl, { onAccount })
+      const oracleDelegationSig = await contract.createOracleDelegationSignature({ contractId }, { onAccount })
+
+      // register Oracle
+      const oracleRegister = await cInstanceOracle.methods.signedRegisterOracle(onAccount, oracleDelegationSig, qFee, ttl, { onAccount })
       oracleRegister.result.returnType.should.be.equal('ok')
       const oracle = await contract.getOracleObject(oracleId)
       oracle.id.should.be.equal(oracleId)
 
-      const oracleExtendSig = await contract.delegateOracleExtendSignature(contractAddress, { onAccount })
-      const queryExtend = await cInstanceOracle.methods.signedExtendOracle(oracleId, oracleExtendSig, ttl, { onAccount })
+      // extend oracle
+      const queryExtend = await cInstanceOracle.methods.signedExtendOracle(oracleId, oracleDelegationSig, ttl, { onAccount })
       queryExtend.result.returnType.should.be.equal('ok')
       const oracleExtended = await contract.getOracleObject(oracleId)
       console.log(oracleExtended)
       oracleExtended.ttl.should.be.equal(oracle.ttl + 50)
 
-      // TODO ask core about this
-      // // create query
-      // const q = 'Hello!'
-      // const newOracle = await contract.registerOracle('string', 'int', { onAccount, queryFee: qFee })
-      // const query = await cInstanceOracle.methods.createQuery(newOracle.id, q, 1000 + qFee, ttl, ttl, { onAccount, amount: 5 * qFee })
-      // query.should.be.an('object')
-      // const queryObject = await contract.getQueryObject(newOracle.id, query.decodedResult)
-      // queryObject.should.be.an('object')
-      // queryObject.decodedQuery.should.be.equal(q)
-      // console.log(queryObject)
-      //
-      // // respond to query
-      // const r = 'Hi!'
-      // const respondSig = await contract.delegateOracleRespondSignature(newOracle.id, queryObject.id, contractAddress, { onAccount })
-      // const response = await cInstanceOracle.methods.respond(newOracle.id, queryObject.id, respondSig, r, { onAccount })
-      // console.log(response)
-      // const queryObject2 = await contract.getQueryObject(newOracle.id, queryObject.id)
-      // console.log(queryObject2)
-      // queryObject2.decodedResponse.should.be.equal(r)
+      // create query
+      const q = 'Hello!'
+      const newOracle = await contract.registerOracle('string', 'int', { queryFee: qFee })
+      const query = await cInstanceOracle.methods.createQuery(newOracle.id, q, 1000 + qFee, ttl, ttl, { onAccount, amount: 5 * qFee })
+      query.should.be.an('object')
+      const queryObject = await contract.getQueryObject(newOracle.id, query.decodedResult)
+      queryObject.should.be.an('object')
+      queryObject.decodedQuery.should.be.equal(q)
+      console.log(queryObject)
+
+      // respond to query
+      const r = 'Hi!'
+      const queryId = queryObject.id
+      const respondSig = await contract.createOracleDelegationSignature({ contractId, queryId })
+      const response = await cInstanceOracle.methods.respond(newOracle.id, queryObject.id, respondSig, r, { onAccount })
+      console.log(response)
+      const queryObject2 = await contract.getQueryObject(newOracle.id, queryObject.id)
+      console.log(queryObject2)
+      queryObject2.decodedResponse.should.be.equal(r)
     })
   })
   it('precompiled bytecode can be deployed', async () => {

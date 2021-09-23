@@ -17,16 +17,20 @@
 
 import { describe, it, before } from 'mocha'
 import { getSdk } from './'
-import { encodeBase64Check } from '../../src/utils/crypto'
+import { encodeBase64Check, generateKeyPair } from '../../src/utils/crypto'
+import MemoryAccount from '../../src/account/memory'
 
 describe('Oracle', function () {
   let client
   let oracle
   let query
   const queryResponse = "{'tmp': 30}"
+  const account = generateKeyPair()
 
   before(async function () {
     client = await getSdk()
+    await client.spend('1' + '0'.repeat(20), account.publicKey)
+    client.addAccount(MemoryAccount({ keypair: account }), { select: true })
   })
 
   it('Register Oracle with 5000 TTL', async () => {

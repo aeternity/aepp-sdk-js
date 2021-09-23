@@ -114,7 +114,7 @@ Note:
     - It's still possible to pass it as additional param, see [transaction options](../transaction-options.md#nameclaimtx).
 - In case the `claim` triggers an auction the required `nameFee` is locked by the protocol.
     - If you win the auction the `nameFee` is permanently deducted from your accounts balance and effectively *burned*.
-        - It will be credited to `ak_11111111111111111111111111111111273Yts` which nobody can access. This reduces the total supply of AE over time. 
+        - It will be credited to `ak_11111111111111111111111111111111273Yts` which nobody can access. This reduces the total supply of AE over time.
     - If somebody else outbids you the provided `nameFee` is immediately released and returned to your account.
 
 ### Bid during an auction
@@ -347,7 +347,7 @@ console.log(nameRevokeTx)
 Note:
 
 - On revocation the name enters in a `revoked` state.
-- After a timeout of `2016` keyblocks the name will be available for claiming again. 
+- After a timeout of `2016` keyblocks the name will be available for claiming again.
 
 ## Delegate signature to contract (AENS interface)
 It is possible to authorize a Sophia contract to manage an AENS name on behalf of your account. In order to achieve that you need to provide a delegation signature to the contract. The contract will then be able to use the [AENS interface](https://github.com/aeternity/aesophia/blob/v6.0.1/docs/sophia.md#aens-interface) and perform AENS related actions on behalf of your account.
@@ -363,20 +363,13 @@ const client = await Universal({ ... }) // init instance of Universal Stamp
 const contractId = 'ct_asd2ks...'
 // AENS name
 const name = 'example.chain'
+// Sign with a specific account
+const onAccount = await client.address()
 
 // this signature will allow the contract to perform a pre-claim on your behalf
-const sig = await client.delegateNamePreclaimSignature(contractId)
+const preClaimSig = await client.createAensDelegationSignature({ contractId }, { onAccount })
 
 // this signature will allow the contract to perform
 // any name related transaction for a specific name that you own
-const sig = await client.delegateNameClaimSignature(contractId, name)
+const aensDelegationSig = await client.createAensDelegationSignature({ contractId, name }, { onAccount })
 ```
-
-Note:
-
-- If required you can pass an additional options object like `{ onAccount: <account> }` to these functions in order to sign with a specific account.
-- The SDK currently also provides two other functions to generate a delegation signature:
-    - `delegateNameTransferSignature`
-    - `delegateNameRevokeSignature`
-- Both of these functions produce the same signature as `delegateNameClaimSignature` which can be confusing. There is an open issue that proposes to change that:
-    - https://github.com/aeternity/aepp-sdk-js/issues/1237
