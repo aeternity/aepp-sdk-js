@@ -1064,7 +1064,7 @@ the same <code>salt</code> and it should be signed with the same private key as 
 </li>
 <li>In case the <code>claim</code> triggers an auction the required <code>nameFee</code> is locked by the protocol.<ul>
 <li>If you win the auction the <code>nameFee</code> is permanently deducted from your accounts balance and effectively <em>burned</em>.<ul>
-<li>It will be credited to <code>ak_11111111111111111111111111111111273Yts</code> which nobody can access. This reduces the total supply of AE over time. </li>
+<li>It will be credited to <code>ak_11111111111111111111111111111111273Yts</code> which nobody can access. This reduces the total supply of AE over time.</li>
 </ul>
 </li>
 <li>If somebody else outbids you the provided <code>nameFee</code> is immediately released and returned to your account.</li>
@@ -1294,7 +1294,7 @@ the same <code>salt</code> and it should be signed with the same private key as 
 <p>Note:</p>
 <ul>
 <li>On revocation the name enters in a <code>revoked</code> state.</li>
-<li>After a timeout of <code>2016</code> keyblocks the name will be available for claiming again. </li>
+<li>After a timeout of <code>2016</code> keyblocks the name will be available for claiming again.</li>
 </ul>
 <h2 id="delegate-signature-to-contract-aens-interface">Delegate signature to contract (AENS interface)</h2>
 <p>It is possible to authorize a Sophia contract to manage an AENS name on behalf of your account. In order to achieve that you need to provide a delegation signature to the contract. The contract will then be able to use the <a href="https://github.com/aeternity/aesophia/blob/v6.0.1/docs/sophia.md#aens-interface">AENS interface</a> and perform AENS related actions on behalf of your account.</p>
@@ -1307,27 +1307,16 @@ the same <code>salt</code> and it should be signed with the same private key as 
 <span class="kd">const</span> <span class="nx">contractId</span> <span class="o">=</span> <span class="s1">&#39;ct_asd2ks...&#39;</span>
 <span class="c1">// AENS name</span>
 <span class="kd">const</span> <span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;example.chain&#39;</span>
+<span class="c1">// Sign with a specific account</span>
+<span class="kd">const</span> <span class="nx">onAccount</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">address</span><span class="p">()</span>
 
 <span class="c1">// this signature will allow the contract to perform a pre-claim on your behalf</span>
-<span class="kd">const</span> <span class="nx">sig</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">delegateNamePreclaimSignature</span><span class="p">(</span><span class="nx">contractId</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">preClaimSig</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">createAensDelegationSignature</span><span class="p">({</span> <span class="nx">contractId</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">onAccount</span> <span class="p">})</span>
 
 <span class="c1">// this signature will allow the contract to perform</span>
 <span class="c1">// any name related transaction for a specific name that you own</span>
-<span class="kd">const</span> <span class="nx">sig</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">delegateNameClaimSignature</span><span class="p">(</span><span class="nx">contractId</span><span class="p">,</span> <span class="nx">name</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">aensDelegationSig</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">createAensDelegationSignature</span><span class="p">({</span> <span class="nx">contractId</span><span class="p">,</span> <span class="nx">name</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">onAccount</span> <span class="p">})</span>
 </code></pre></div>
-<p>Note:</p>
-<ul>
-<li>If required you can pass an additional options object like <code>{ onAccount: &lt;account&gt; }</code> to these functions in order to sign with a specific account.</li>
-<li>The SDK currently also provides two other functions to generate a delegation signature:<ul>
-<li><code>delegateNameTransferSignature</code></li>
-<li><code>delegateNameRevokeSignature</code></li>
-</ul>
-</li>
-<li>Both of these functions produce the same signature as <code>delegateNameClaimSignature</code> which can be confusing. There is an open issue that proposes to change that:<ul>
-<li>https://github.com/aeternity/aepp-sdk-js/issues/1237</li>
-</ul>
-</li>
-</ul>
                 
               
               
