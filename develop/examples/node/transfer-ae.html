@@ -14,7 +14,7 @@
     
     
       
-        <title>Transfer AE tokens - æternity JavaScript SDK</title>
+        <title>Transfer AE - æternity JavaScript SDK</title>
       
     
     
@@ -65,7 +65,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#transfer-ae-tokens" class="md-skip">
+        <a href="#transfer-ae" class="md-skip">
           Skip to content
         </a>
       
@@ -95,7 +95,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Transfer AE tokens
+              Transfer AE
             
           </span>
         </div>
@@ -419,14 +419,12 @@
 
   
   
-    
-  
   
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
       
       <label class="md-nav__link" for="__nav_5">
         Examples & Tutorials
@@ -442,14 +440,12 @@
             
   
   
-    
-  
   
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_1" type="checkbox" id="__nav_5_1" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_1" type="checkbox" id="__nav_5_1" >
       
       <label class="md-nav__link" for="__nav_5_1">
         NodeJS
@@ -465,107 +461,11 @@
             
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Transfer AE tokens
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="transfer-ae-tokens.html" class="md-nav__link md-nav__link--active">
-        Transfer AE tokens
+    <li class="md-nav__item">
+      <a href="transfer-ae-tokens.md" class="md-nav__link">
+        None
       </a>
-      
-        
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#introduction" class="md-nav__link">
-    Introduction
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#1-specify-imports" class="md-nav__link">
-    1. Specify imports
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#2-define-constants" class="md-nav__link">
-    2. Define constants
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#3-open-async-codeblock" class="md-nav__link">
-    3. Open async codeblock
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#4-create-object-instances" class="md-nav__link">
-    4. Create object instances
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#5-get-ae-balance-of-recipient-before-transfer" class="md-nav__link">
-    5. Get AE balance of recipient (before transfer)
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#6-transfer-ae-tokens" class="md-nav__link">
-    6. Transfer AE tokens
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#7-get-ae-balance-of-recipient-after-transfer" class="md-nav__link">
-    7. Get AE balance of recipient (after transfer)
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#8-close-and-run-async-codeblock" class="md-nav__link">
-    8. Close and run async codeblock
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -863,8 +763,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#6-transfer-ae-tokens" class="md-nav__link">
-    6. Transfer AE tokens
+  <a href="#6-transfer-ae" class="md-nav__link">
+    6. Transfer AE
   </a>
   
 </li>
@@ -896,13 +796,13 @@
               
                 
                 
-                <h1 id="transfer-ae-tokens">Transfer AE tokens</h1>
+                <h1 id="transfer-ae">Transfer AE</h1>
 <h2 id="introduction">Introduction</h2>
-<p>The whole script is <a href="https://github.com/aeternity/aepp-sdk-js/blob/master/examples/node/transfer-ae-tokens.js">located in the repository</a>
+<p>The whole script is <a href="https://github.com/aeternity/aepp-sdk-js/blob/master/examples/node/transfer-ae.js">located in the repository</a>
 and this page explains in detail how to:</p>
 <ul>
 <li>initialize the SDK with a pre-funded account</li>
-<li>transfer AE tokens to another account</li>
+<li>transfer AE to another account</li>
 </ul>
 <h2 id="1-specify-imports">1. Specify imports</h2>
 <p>You need to import <code>Universal</code>, <code>Node</code> and <code>MemoryAccount</code> <a href="https://stampit.js.org/essentials/what-is-a-stamp">Stamps</a> from the SDK.
@@ -927,10 +827,10 @@ Note:</p>
 <li>You should replace it with your own keypair (see <a href="../../quick-start.html#2-create-a-keypair">Create a Keypair</a>)</li>
 </ul>
 </li>
-<li>In case the account runs out of funds you can request new AE tokens using the <a href="https://faucet.aepps.com/">Faucet</a></li>
+<li>In case the account runs out of funds you can always request AE using the <a href="https://faucet.aepps.com/">Faucet</a></li>
 <li>By default the script will transfer <code>1 aetto</code> and use the demo account itself as recipient<ul>
 <li>Optionally you can provide the amount and a different recipient by providing the arguments when executing the script,
-   e.g. <code>node transfer-ae-tokens.js 3 ak_6D2uyunJaERXfgbsc94G8vrp79nZrbtorL7VCRXk3sWiFK5jb</code></li>
+   e.g. <code>node transfer-ae.js 3 ak_6D2uyunJaERXfgbsc94G8vrp79nZrbtorL7VCRXk3sWiFK5jb</code></li>
 </ul>
 </li>
 </ul>
@@ -960,7 +860,7 @@ which is assigned to the <code>client</code> constant in this case.</p>
 <div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">balanceBefore</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getBalance</span><span class="p">(</span><span class="nx">recipient</span><span class="p">)</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Balance of </span><span class="si">${</span><span class="nx">recipient</span><span class="si">}</span><span class="sb"> (before): </span><span class="si">${</span><span class="nx">balanceBefore</span><span class="si">}</span><span class="sb"> aettos`</span><span class="p">)</span>
 </code></pre></div></p>
-<h2 id="6-transfer-ae-tokens">6. Transfer AE tokens</h2>
+<h2 id="6-transfer-ae">6. Transfer AE</h2>
 <p>Calling the <code>spend</code> function will create, sign and broadcast a <code>SpendTx</code> to the network.
 <div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">tx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="nx">amount</span><span class="p">,</span> <span class="nx">recipient</span><span class="p">)</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Transaction mined&#39;</span><span class="p">,</span> <span class="nx">tx</span><span class="p">)</span>
@@ -993,41 +893,6 @@ Note:</p>
       
         
 <footer class="md-footer">
-  
-    <nav class="md-footer__inner md-grid" aria-label="Footer">
-      
-        
-        <a href="../../transaction-options.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: Transaction options" rel="prev">
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
-          </div>
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Previous
-              </span>
-              Transaction options
-            </div>
-          </div>
-        </a>
-      
-      
-        
-        <a href="contract-interaction.html" class="md-footer__link md-footer__link--next" aria-label="Next: Compile &amp; Deploy a Sophia Smart Contract" rel="next">
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              Compile & Deploy a Sophia Smart Contract
-            </div>
-          </div>
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
-          </div>
-        </a>
-      
-    </nav>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
