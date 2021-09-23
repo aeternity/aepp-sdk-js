@@ -76,16 +76,7 @@ export default AsyncInit.compose(ContractBase, {
       return Promise.resolve(this.compilerVersion)
     },
     async contractEncodeCallDataAPI (source, name, args = [], options) {
-      this._ensureCompilerReady()
-      const { calldata } = await this._compilerApi.encodeCalldata({
-        source,
-        function: name,
-        arguments: args,
-        options: this._prepareCompilerOptions(options)
-      })
-
       // Generate using the calldata lib
-
       // In order to be able to use the encode / decode calldata we need to have
       // access to the contracts compiled abi.
       const aci = await this.contractGetACI(source)
@@ -93,20 +84,11 @@ export default AsyncInit.compose(ContractBase, {
       // The encoder expects the aci to be passed as array, thus this weird flex :D
       const encoder = new Encoder([aci.encoded_aci])
 
-      const calldataEncoded = encoder.encode(
+      return encoder.encode(
         aci.encoded_aci.contract.name,
         name,
         args
       )
-
-      // TODO: compare the results
-      console.log({
-        calldataEncoded,
-        calldata,
-        matching: calldataEncoded === calldata
-      })
-
-      return calldataEncoded // calldata;
     },
     async compileContractAPI (code, options) {
       this._ensureCompilerReady()
@@ -125,14 +107,6 @@ export default AsyncInit.compose(ContractBase, {
       return this._compilerApi.decodeCalldataBytecode({ bytecode, calldata })
     },
     async contractDecodeCallDataBySourceAPI (source, fn, callData, options) {
-      this._ensureCompilerReady()
-      const decoded = await this._compilerApi.decodeCalldataSource({
-        function: fn,
-        source,
-        calldata: callData,
-        options: this._prepareCompilerOptions(options)
-      })
-
       // Decode call result via calldata-js
 
       // In order to be able to use the encode / decode calldata we need to have
@@ -142,21 +116,11 @@ export default AsyncInit.compose(ContractBase, {
       // The encoder expects the aci to be passed as array, thus this weird flex :D
       const encoder = new Encoder([aci.encoded_aci])
 
-      const calldataDecoded = encoder.decode(
+      return encoder.decode(
         aci.encoded_aci.contract.name,
         fn,
         callData
       )
-
-      // TODO: compare the results
-      console.log({
-        rawCallData: callData,
-        lib_decoded: calldataDecoded,
-        compiler_decoded: decoded,
-        matching: calldataDecoded === decoded
-      })
-
-      return calldataDecoded // decoded;
     },
     contractDecodeCallResultAPI (source, fn, callValue, callResult, options) {
       this._ensureCompilerReady()
