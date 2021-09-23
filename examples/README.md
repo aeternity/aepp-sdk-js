@@ -14,5 +14,5 @@ Create a [new issue](https://github.com/aeternity/aepp-sdk-js/issues/new) to sug
 
 ## NodeJS
 1. [Contract interaction](node/contract-interaction.js)
-2. [Transfer AE Tokens](node/transfer-ae-tokens.js)
+2. [Transfer AE](node/transfer-ae.js)
 3. [PayingForTx](node/paying-for-tx.js)

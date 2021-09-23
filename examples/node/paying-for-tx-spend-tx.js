@@ -52,7 +52,7 @@ const AMOUNT = 1;
 //
 //  - The keypair of the account is pre-funded and only used for demonstration purpose
 //      - You can replace it with your own keypair (see [Create a Keypair](../../quick-start.md#2-create-a-keypair))
-//      - In case the account runs out of funds you can request new AE tokens using the [Faucet](https://faucet.aepps.com/)
+//      - In case the account runs out of funds you can always request AE using the [Faucet](https://faucet.aepps.com/)
 //  - The `AMOUNT` (in `aettos`) will be send to the new user and returned to the payer.
 
 // ## 3. Open async codeblock
