@@ -7,6 +7,7 @@
  */
 import { v4 as uuid } from 'uuid'
 import Ae from '../../../ae'
+import verifyTransaction from '../../../tx/validator'
 import AccountMultiple from '../../../account/multiple'
 import TxObject from '../../../tx/tx-object'
 import RpcClient from './rpc-client'
@@ -116,17 +117,15 @@ const REQUESTS = {
         }
         try {
           return {
-            result: {
-              ...returnSigned
-                ? { signedTransaction: await instance.signTransaction(rawTx || tx, { onAccount: onAcc }) }
-                : { transactionHash: await instance.send(rawTx || tx, { onAccount: onAcc, verify: false }) }
-            }
+            result: returnSigned
+              ? { signedTransaction: await instance.signTransaction(rawTx || tx, { onAccount: onAcc }) }
+              : { transactionHash: await instance.send(rawTx || tx, { onAccount: onAcc, verify: false }) }
           }
         } catch (e) {
           if (!returnSigned) {
             // Validate transaction
-            const validationResult = await instance.unpackAndVerify(rawTx || tx)
-            if (validationResult.validation.length) return { error: ERRORS.invalidTransaction(validationResult) }
+            const validation = await verifyTransaction(rawTx || tx, instance.selectedNode.instance)
+            if (validation.length) return { error: ERRORS.invalidTransaction(validation) }
             // Send broadcast failed error to aepp
             return { error: ERRORS.broadcastFailed(e.message) }
           }

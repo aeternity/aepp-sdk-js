@@ -66,7 +66,7 @@ describe('Native Transaction', function () {
 
   before(async () => {
     const keyPair = generateKeyPair()
-    client = await getSdk(false)
+    client = await getSdk({ nativeMode: false })
     clientNative = await getSdk()
     await client.spend('16774200000000000000', keyPair.publicKey)
     await client.addAccount(MemoryAccount({ keypair: keyPair }), { select: true })
@@ -199,7 +199,7 @@ describe('Native Transaction', function () {
     const nativeTx = await clientNative.oracleRegisterTx(params)
 
     txFromAPI.should.be.equal(nativeTx)
-    await clientNative.send(nativeTx, { verify: true })
+    await clientNative.send(nativeTx)
 
     const oId = (await client.api.getOracleByPubkey(oracleId)).id
     oId.should.be.equal(oracleId)

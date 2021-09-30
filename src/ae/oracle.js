@@ -28,9 +28,9 @@
 
 import Ae from './'
 import * as R from 'ramda'
-import { decodeBase64Check, assertedType } from '../utils/crypto'
+import { decodeBase64Check } from '../utils/crypto'
 import { pause } from '../utils/other'
-import { oracleQueryId } from '../tx/builder/helpers'
+import { oracleQueryId, decode } from '../tx/builder/helpers'
 import { unpackTx } from '../tx/builder'
 import { ORACLE_TTL, QUERY_FEE, QUERY_TTL, RESPONSE_TTL } from '../tx/builder/schema'
 
@@ -121,7 +121,7 @@ export async function pollForQueryResponse (oracleId, queryId, { attempts = 20, 
   for (let i = 0; i < attempts; i++) {
     if (i) await pause(interval)
     const { response } = await this.api.getOracleQueryByPubkeyAndQueryId(oracleId, queryId)
-    const responseBuffer = decodeBase64Check(assertedType(response, 'or'))
+    const responseBuffer = decode(response, 'or')
     if (responseBuffer.length) {
       return { response, decode: () => responseBuffer } // TODO: Return just responseBuffer
     }

@@ -32,30 +32,34 @@ export const ignoreVersion = process.env.IGNORE_VERSION || false
 export const genesisAccount = MemoryAccount({ keypair: { publicKey, secretKey } })
 export const account = Crypto.generateKeyPair()
 
-export const BaseAe = async (params = {}) => Universal
-  .waitMined(true)
+export const BaseAe = async (params = {}, compose = {}) => Universal
   .compose({
-    deepProps: { Ae: { defaults: { interval: 50, attempts: 1200 } }, Swagger: { defaults: { debug: !!process.env.DEBUG } } }
-  })({
+    deepProps: { Ae: { defaults: { interval: 50, attempts: 1200 } } }
+  })
+  .compose(compose)({
     ...params,
     compilerUrl,
     ignoreVersion,
-    accounts: [...params.accounts || [], genesisAccount],
+    accounts: [
+      ...params.accounts || [],
+      ...params.withoutGenesisAccount ? [] : [genesisAccount]
+    ],
     nodes: [{ name: 'test', instance: await Node({ url, internalUrl, ignoreVersion }) }]
   })
 
 const spendPromise = (async () => {
-  const ae = await BaseAe({ networkId })
+  const ae = await BaseAe({ networkId, withoutGenesisAccount: false })
   await ae.awaitHeight(2)
   await ae.spend('1' + '0'.repeat(26), account.publicKey)
 })()
 
-export async function getSdk (nativeMode) {
+export async function getSdk ({ nativeMode = true, withoutAccount } = {}) {
   await spendPromise
 
   return BaseAe({
-    accounts: [MemoryAccount({ keypair: account })],
-    address: account.publicKey,
+    accounts: (withoutAccount === undefined || withoutAccount === false) ? [MemoryAccount({ keypair: account })] : [],
+    address: (withoutAccount === undefined || withoutAccount === false) ? account.publicKey : undefined,
+    withoutGenesisAccount: !((withoutAccount === undefined || withoutAccount === false)),
     nativeMode,
     networkId
   })

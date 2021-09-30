@@ -24,7 +24,7 @@
 import * as R from 'ramda'
 import AsyncInit from '../utils/async-init'
 import MemoryAccount from './memory'
-import { assertedType } from '../utils/crypto'
+import { decode } from '../tx/builder/helpers'
 import AccountBase, { isAccountBase } from './base'
 
 /**
@@ -50,10 +50,15 @@ import AccountBase, { isAccountBase } from './base'
  */
 export default AccountBase.compose(AsyncInit, {
   async init ({ accounts = [], address }) {
-    this.accounts = R.fromPairs(await Promise.all(accounts.map(async a => [await a.address(), a])))
-    if (!address) address = Object.keys(this.accounts)[0]
-    assertedType(address, 'ak')
-    this.selectedAddress = address
+    /* An Account maynot be required for the Node/Chain methods */
+    if (Array.isArray(accounts) && accounts.length) {
+      this.accounts = R.fromPairs(await Promise.all(accounts.map(async a => [await a.address(), a])))
+      if (!address) address = Object.keys(this.accounts)[0]
+      decode(address, 'ak')
+      this.selectedAddress = address
+    } else {
+      console.warn('No account/accounts supplied')
+    }
   },
   props: {
     accounts: {}
@@ -122,7 +127,7 @@ export default AccountBase.compose(AsyncInit, {
      * @example selectAccount('ak_xxxxxxxx')
      */
     selectAccount (address) {
-      assertedType(address, 'ak')
+      decode(address, 'ak')
       if (!this.accounts[address]) throw new Error(`Account for ${address} not available`)
       this.selectedAddress = address
     },
@@ -135,7 +140,7 @@ export default AccountBase.compose(AsyncInit, {
     _resolveAccount (account) {
       switch (typeof account) {
         case 'string':
-          assertedType(account, 'ak')
+          decode(account, 'ak')
           if (!this.accounts[account]) throw new Error(`Account for ${account} not available`)
           return this.accounts[account]
         case 'object':

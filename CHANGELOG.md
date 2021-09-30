@@ -2,6 +2,45 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.0.0](https://github.com/aeternity/aepp-sdk-js/compare/v8.2.1...v9.0.0) (2021-09-27)
+
+### ⚠ BREAKING CHANGES
+
+* refactor aens & oracle delegation signature methods to accept parameters as objects
+* merge aens signature delegation methods into a single implementation
+* change t
+* drop `waitMined` static method
+* drop `assertedType`, use `decode` instead
+* **validator:** recursive validator, simplify schema
+* simplify buildTxHash helper
+* enable verification in deep props instead of extra variable
+
+### Features
+
+* `payForTransaction` method ([fbf204d](https://github.com/aeternity/aepp-sdk-js/commit/fbf204dd2ba333551327adce579b9f9d9edc601b))
+
+
+### Bug Fixes
+
+* **AENS:** name length minimum bid fee ([db6ca4c](https://github.com/aeternity/aepp-sdk-js/commit/db6ca4c3d89eedf7fa326bd6d0484ea0d94de19e))
+* **delegate-signature:** stop using the default account in the contex for signing ([29d760e](https://github.com/aeternity/aepp-sdk-js/commit/29d760ef04591cd9a745a508ff4dfbb8859c347a))
+* **deposit-trap:** enforce zero value for `deposit` during contract deploy ([cfb5f22](https://github.com/aeternity/aepp-sdk-js/commit/cfb5f2263316f0f70290cb174c1d334cf49c6db3))
+* **mustAccountStamp:** process accounts only if supplied ([10ec2c3](https://github.com/aeternity/aepp-sdk-js/commit/10ec2c37f6f35516023cace435bdde6294786ed7))
+* **payingFor:** don't check is GA if innerTx ([0ee9db4](https://github.com/aeternity/aepp-sdk-js/commit/0ee9db4b7e1cbab5b874bee56b5bf8814610b913))
+* **payingFor:** don't sent to blockchain if innerTx ([523e9bb](https://github.com/aeternity/aepp-sdk-js/commit/523e9bbd62a506efd8a9d50317bcf3980052948e))
+* swagger https issue ([3a876bb](https://github.com/aeternity/aepp-sdk-js/commit/3a876bbb80300cbf91891daa642f6daee61c1427))
+* **tx serialisation:** accept unpackTx output produced by deserialisator ([ff0b3f5](https://github.com/aeternity/aepp-sdk-js/commit/ff0b3f551f7cf0684ac9c8e528d94eae9c31f226))
+* **validator:** recursive validator, simplify schema ([95a2a23](https://github.com/aeternity/aepp-sdk-js/commit/95a2a232f3fd8b875b223e352445b045a7217dad))
+
+
+* change t ([831e4dd](https://github.com/aeternity/aepp-sdk-js/commit/831e4dde12a78583d1a567fdc5a9ef86518d5fe6))
+* drop `assertedType`, use `decode` instead ([00d563f](https://github.com/aeternity/aepp-sdk-js/commit/00d563feca871e2c9474df667696946d1c8d12c7))
+* drop `waitMined` static method ([2f299de](https://github.com/aeternity/aepp-sdk-js/commit/2f299de2c985ce2619db10e4a264f7e6d1b7279c))
+* enable verification in deep props instead of extra variable ([989b36f](https://github.com/aeternity/aepp-sdk-js/commit/989b36f28e9649fd74b384f2a16bf8fd64bac85c))
+* merge aens signature delegation methods into a single implementation ([456fe00](https://github.com/aeternity/aepp-sdk-js/commit/456fe00cb8b8eba09ea53800e8713550d0f329cc))
+* merge oracle delegation signature methods ([88b7bf3](https://github.com/aeternity/aepp-sdk-js/commit/88b7bf3aa55b3740c9a64fb4049abcc0fdd3b277))
+* simplify buildTxHash helper ([9e1fde7](https://github.com/aeternity/aepp-sdk-js/commit/9e1fde7693986359a9ac0ff80829dbc058882f7b))
+
 ### [8.2.1](https://github.com/aeternity/aepp-sdk-js/compare/v8.2.0...v8.2.1) (2021-06-21)
 
 
@@ -439,13 +478,13 @@ This stamp give more flexibility on transaction serialization/deserialization pr
 
 ### Docs
 
-* **Guide** [Add 7.0.0 migration guide](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/migration/migration-7.0.0.md)
+* **Guide** [Add 7.0.0 migration guide](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/migration/7.0.0.md)
 * **Guide:** Add [Oracle](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/oracle-usage.md), [AENS](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/aens-usage.md) and [Contract](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/contract-aci-usage.md) guides
 
 
 ### BREAKING CHANGES
 
-Please check out [7.0.0 migration guide](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/migration/migration-7.0.0.md)
+Please check out [7.0.0 migration guide](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/migration/7.0.0.md)
 
 This release include all changes from [7.0.0-next.1](https://github.com/aeternity/aepp-sdk-js/releases/tag/7.0.0-next.1), [7.0.0-next.2](https://github.com/aeternity/aepp-sdk-js/releases/tag/7.0.0-next.2), [7.0.0-next.3](https://github.com/aeternity/aepp-sdk-js/releases/tag/7.0.0-next.3)
 

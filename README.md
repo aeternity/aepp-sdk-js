@@ -1,4 +1,4 @@
-# [Æternity](https://aeternity.com/)'s JavaScript SDK
+# [æternity](https://aeternity.com/)'s JavaScript SDK
 
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/aeternity/aepp-sdk-js.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/aeternity/aepp-sdk-js/context:javascript)
 [![codecov](https://codecov.io/gh/aeternity/aepp-sdk-js/branch/develop/graph/badge.svg)](https://codecov.io/gh/aeternity/aepp-sdk-js)
@@ -18,31 +18,38 @@ JavaScript SDK for the revolutionary [æternity] blockchain, targeting the
 
 ## Guides & Examples
 
-Check out our [Quick Start guide](docs/guides/quick-start.md), [Documentation](docs/README.md), and [Examples](examples/README.md).
+Introduction
+- [Installation](docs/index.md)
+- [Quick Start](docs/quick-start.md)
+
+Usage guides:
+- [æternity naming system](docs/guides/aens.md)
+- [Contracts](docs/guides/contracts.md)
+- [Contract events](docs/guides/contract-events.md)
+- [Oracles](docs/guides/oracles.md)
+- [Low vs High level API](docs/guides/low-vs-high-usage.md)
+
+There are also [examples](examples/README.md) that you can directly use and play with.
 
 ## CLI - Command Line Client
 
-To quickly test _all_ of Aeternity's blockchain features from your Terminal, you can Install and use our **NodeJS [CLI](https://github.com/aeternity/aepp-cli-js)** by running:
+To quickly test _all_ of æternity's blockchain features from your terminal, you can install and use our **NodeJS [CLI](https://github.com/aeternity/aepp-cli-js)** by running:
 
 1. `npm i -g @aeternity/aepp-cli` to globally install the CLI
 2. `aecli --help` to get a list of possible commands
-
-_eg._ Create an Account:
-
-`aecli account create testWhateverAccountName`
 
 ## Contributing
 
 For advanced use, to get a deeper understanding of the SDK or to contribute to its development, it is advised to read the [Contributing Guidelines](docs/contrib/README.md) section.
 
-## Change Log
+## Changelog
 
 We keep our [Changelog](CHANGELOG.md) up to date.
 
 ## License
 
 ISC License (ISC)
-Copyright © 2018 aeternity developers
+Copyright © 2018 æternity developers
 
 Permission to use, copy, modify, and/or distribute this software for any purpose
 with or without fee is hereby granted, provided that the above copyright notice

@@ -34,6 +34,7 @@ describe('Generalize Account', function () {
   before(async function () {
     client = await getSdk()
     await client.spend('100000000000000000000', gaAccount.publicKey)
+    client.removeAccount(client.selectedAddress)
     await client.addAccount(MemoryAccount({ keypair: gaAccount }), { select: true })
   })
 
@@ -44,23 +45,19 @@ describe('Generalize Account', function () {
   })
 
   it('Fail on make GA on already GA account', async () => {
-    try {
-      await client.createGeneralizeAccount('authorize', authContract)
-    } catch (e) {
-      e.message.should.be.equal(`Account ${gaAccount.publicKey} is already GA`)
-    }
+    await client.createGeneralizeAccount('authorize', authContract)
+      .should.be.rejectedWith(`Account ${gaAccount.publicKey} is already GA`)
   })
 
   it('Init MemoryAccount for GA and Spend using GA', async () => {
     client.removeAccount(gaAccount.publicKey)
-    client.selectAccount(Object.keys(client.accounts)[0])
-    await client.addAccount(MemoryAccount({ gaId: gaAccount.publicKey }))
+    await client.addAccount(MemoryAccount({ gaId: gaAccount.publicKey }), { select: true })
     const { publicKey } = generateKeyPair()
 
     const r = () => Math.floor(Math.random() * 20).toString()
     const callData = await client.contractEncodeCall(authContract, 'authorize', [r()])
-    await client.spend(10000, publicKey, { authData: { callData }, onAccount: gaAccount.publicKey, verify: false })
-    await client.spend(10000, publicKey, { authData: { source: authContract, args: [r()] }, onAccount: gaAccount.publicKey, verify: false })
+    await client.spend(10000, publicKey, { authData: { callData } })
+    await client.spend(10000, publicKey, { authData: { source: authContract, args: [r()] } })
     const balanceAfter = await client.balance(publicKey)
     balanceAfter.should.be.equal('20000')
   })

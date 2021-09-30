@@ -1,6 +1,6 @@
 {
   "name": "@aeternity/aepp-sdk",
-  "version": "8.2.1",
+  "version": "9.0.0",
   "description": "SDK for the æternity blockchain",
   "main": "dist/aepp-sdk.js",
   "types": "es/index.d.ts",
@@ -13,8 +13,9 @@
     "build:es": "tsc && babel src --config-file ./babel.esm.config.js --out-dir es --extensions '.js,.ts' --source-maps true",
     "build": "webpack --mode=production && npm run build:es",
     "build:dev": "webpack --mode=development && npm run build:es",
-    "docs:docco": "docco -t tooling/docs/markdown.jst -c /dev/null examples/node/*.js && rm -f docs/null && node rename-to-md.js",
+    "docs:examples": "node tooling/docs/examples-to-md.js examples/node/*.js",
     "docs:api": "node apidoc.js",
+    "docs:changelog": "cp CHANGELOG.md docs/CHANGELOG.md",
     "lint": "commitlint --from develop --verbose && ts-standard",
     "test": "nyc --require @babel/register --require ts-node/register mocha --recursive --exit --timeout 10m",
     "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
@@ -24,7 +25,7 @@
     "test:unit": "nyc --require @babel/register --require ts-node/register mocha './test/unit/*'",
     "test:watch": "mocha --recursive --require @babel/register --require ts-node/register --watch --timeout 10m",
     "prepare": "npm run build",
-    "prepublishOnly": "npm run docs:docco && npm run docs:api",
+    "prepublishOnly": "npm run docs:examples && npm run docs:changelog",
     "release": "standard-version --skip.tag"
   },
   "license": "ISC",
@@ -49,6 +50,7 @@
     "cross-fetch": "^3.1.4",
     "crypto-browserify": "^3.12.0",
     "ed2curve": "^0.3.0",
+    "events": "^3.3.0",
     "joi-browser": "^13.4.0",
     "libsodium-wrappers-sumo": "0.7.9",
     "path-browserify": "^1.0.1",
@@ -88,17 +90,15 @@
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
     "codecov": "^3.8.2",
-    "docco": "^0.8.1",
     "jsdoc-to-markdown": "^7.0.1",
     "mocha": "^8.4.0",
     "nyc": "^15.1.0",
-    "recursive-rename": "^4.0.0",
     "sinon": "^11.1.1",
     "source-map": "^0.7.3",
     "standard-version": "^9.3.0",
     "ts-node": "^10.0.0",
     "ts-standard": "^10.0.0",
-    "typescript": "^4.3.2",
+    "typescript": "4.2.4",
     "webpack": "^5.38.1",
     "webpack-bundle-analyzer": "^4.4.2",
     "webpack-cli": "4.7.0"
@@ -107,5 +107,10 @@
     "dist",
     "src",
     "es"
-  ]
+  ],
+  "ts-standard": {
+    "ignore": [
+      "examples/**/*.js"
+    ]
+  }
 }

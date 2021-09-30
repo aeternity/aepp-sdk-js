@@ -38,16 +38,19 @@ import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter'
  * @rtype (tx: String, options: Object) => Promise[String]
  * @param {String} tx - Transaction
  * @param {Object} [options={}] options - Options
- * @param {Object} [options.verify] verify - Verify transaction before broadcast, throw error if not valid
+ * @param {Object} [options.verify=true] verify - Verify transaction before broadcast, throw error if not valid
  * @return {Object} Transaction
  */
 async function send (tx, options = {}) {
   const opt = R.merge(this.Ae.defaults, options)
-  const { contractId: gaId, authFun } = await this.getAccount(await this.address(opt))
-  const signed = gaId
+  const { contractId, authFun } = options.innerTx
+    ? { contractId: false } : await this.getAccount(await this.address(opt))
+  const signed = contractId
     ? await this.signUsingGA(tx, { ...opt, authFun })
     : await this.signTransaction(tx, opt)
-  return this.sendTransaction(signed, opt)
+  return opt.innerTx
+    ? { hash: TxBuilder.buildTxHash(signed), rawTx: signed }
+    : this.sendTransaction(signed, opt)
 }
 
 async function signUsingGA (tx, { authData, authFun, ...options } = {}) {
@@ -106,6 +109,27 @@ async function transferFunds (fraction, recipientIdOrName, options) {
 }
 
 /**
+ * Submit transaction of another account paying for it (fee and gas)
+ * @instance
+ * @category async
+ * @rtype (transaction: String, options?: Object) => Promise[String]
+ * @param {String} transaction - tx_<base64>-encoded transaction
+ * @param {Object} [options]
+ * @return {Object} Transaction
+ */
+async function payForTransaction (transaction, options) {
+  const opt = { ...this.Ae.defaults, ...options }
+  return this.send(
+    await this.payingForTx({
+      ...opt,
+      payerId: await this.address(opt),
+      tx: transaction
+    }),
+    opt
+  )
+}
+
+/**
  * Remove all listeners for RPC
  * @instance
  * @return {void}
@@ -135,7 +159,7 @@ function destroyInstance () {
  * @return {Object} Ae instance
  */
 const Ae = stampit(Tx, AccountBase, Chain, {
-  methods: { send, spend, transferFunds, destroyInstance, signUsingGA },
+  methods: { send, spend, transferFunds, payForTransaction, destroyInstance, signUsingGA },
   deepProps: { Ae: { defaults: { denomination: AE_AMOUNT_FORMATS.AETTOS } } }
 })
 

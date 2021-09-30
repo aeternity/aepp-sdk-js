@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { decode as rlpDecode, encode as rlpEncode } from 'rlp'
 import { AE_AMOUNT_FORMATS, formatAmount } from '../../utils/amount-formatter'
-import { assertedType } from '../../utils/crypto'
+import { hash } from '../../utils/crypto'
 
 import {
   DEFAULT_FEE,
@@ -24,8 +24,7 @@ import {
   writeInt,
   buildPointers,
   encode,
-  decode,
-  buildHash
+  decode
 } from './helpers'
 import { toBytes } from '../../utils/bytes'
 import MPTree from '../../utils/mptree'
@@ -131,6 +130,8 @@ function serializeField (value, type, prefix) {
       return toBytes(value)
     case FIELD_TYPES.pointers:
       return buildPointers(value)
+    case FIELD_TYPES.rlpBinary:
+      return value.rlpEncoded ?? value
     case FIELD_TYPES.mptrees:
       return value.map(t => t.serialize())
     case FIELD_TYPES.ctVersion:
@@ -159,12 +160,11 @@ function validateField (value, key, type, prefix) {
       const isMinusValue = (!isNaN(value) || BigNumber.isBigNumber(value)) && BigNumber(value).lt(0)
       return assert((!isNaN(value) || BigNumber.isBigNumber(value)) && BigNumber(value).gte(0), { value, isMinusValue })
     }
-    case FIELD_TYPES.id:
-      if (Array.isArray(prefix)) {
-        const p = prefix.find(p => p === value.split('_')[0])
-        return assert(p && PREFIX_ID_TAG[value.split('_')[0]], { value, prefix })
-      }
-      return assert(assertedType(value, prefix) && PREFIX_ID_TAG[value.split('_')[0]] && value.split('_')[0] === prefix, { value, prefix })
+    case FIELD_TYPES.id: {
+      const prefixes = Array.isArray(prefix) ? prefix : [prefix]
+      const p = prefixes.find(p => p === value.split('_')[0])
+      return assert(p && PREFIX_ID_TAG[value.split('_')[0]], { value, prefix })
+    }
     case FIELD_TYPES.binary:
       return assert(value.split('_')[0] === prefix, { prefix, value })
     case FIELD_TYPES.string:
@@ -253,7 +253,11 @@ function buildFee (txType, { params, gas = 0, multiplier, vsn }) {
   const { rlpEncoded: txWithOutFee } = buildTx({ ...params }, txType, { vsn })
   const txSize = txWithOutFee.length
   return TX_FEE_BASE_GAS(txType)
-    .plus(TX_FEE_OTHER_GAS(txType)({ txSize, relativeTtl: getOracleRelativeTtl(params, txType) }))
+    .plus(TX_FEE_OTHER_GAS(txType, txSize, {
+      relativeTtl: getOracleRelativeTtl(params, txType),
+      innerTxSize: [TX_TYPE.gaMeta, TX_TYPE.payingFor].includes(txType)
+        ? params.tx.tx.encodedTx.rlpEncoded.length : 0
+    }))
     .times(multiplier)
 }
 
@@ -409,13 +413,11 @@ export function unpackTx (encodedTx, fromRlpBinary = false, prefix = 'tx') {
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param {String | Buffer} rawTx base64 or rlp encoded transaction
- * @param {Object} options
- * @param {Boolean} options.raw
  * @return {String} Transaction hash
  */
-export function buildTxHash (rawTx, options) {
-  if (typeof rawTx === 'string' && rawTx.indexOf('tx_') !== -1) return buildHash('th', unpackTx(rawTx).rlpEncoded, options)
-  return buildHash('th', rawTx, options)
+export function buildTxHash (rawTx) {
+  const data = typeof rawTx === 'string' && rawTx.startsWith('tx_') ? decode(rawTx, 'tx') : rawTx
+  return encode(hash(data), 'th')
 }
 
 export default { calculateMinFee, calculateFee, unpackTx, unpackRawTx, buildTx, buildRawTx, validateParams, buildTxHash }

@@ -46,18 +46,19 @@ On the release branch, remove the `next` portion of the `version`
 string in `package.json`.
 
 Execute `npm run release` to automatically
- - update [change log file]
+
  - bump version number in package.json and package-lock.json (according to
    [Semantic Versioning])
- - output changes to CHANGELOG.md
+ - output changes to [CHANGELOG.md]
  - commit package-lock.json and package.json and CHANGELOG.md
 
 Next, `git diff` the release, branch a `release/vX.X.X` (where `vX.X.X` is your
 latest release) against `master` and validate that all changes are covered in
-the changelog. You can find more instructions on how to maintain a CHANGELOG:
-[here](http://keepachangelog.com).
+the changelog. You can find more instructions on how to maintain a CHANGELOG here:
 
-[change log file]: ../CHANGELOG.md
+- [https://keepachangelog.com](https://keepachangelog.com)
+
+[CHANGELOG.md]: ../CHANGELOG.md
 [Semantic Versioning]: https://semver.org
 
 ## PR against `master`

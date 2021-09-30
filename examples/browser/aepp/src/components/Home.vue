@@ -1,6 +1,6 @@
 <template>
   <div class="w-full p-4 flex flex-col">
-    <h1 class="mb-4">Simple Aepp</h1>
+    <h1 class="mb-4">Simple æpp</h1>
 
     <div class="border">
       <div class="bg-green w-full flex flex-row font-mono border border-b">
@@ -197,7 +197,7 @@
 <script>
   import { RpcAepp, Node, WalletDetector, BrowserWindowMessageConnection } from 'AE_SDK_MODULES'
 
-  // Send wallet connection info to Aepp throug content script
+  // Send wallet connection info to æpp through content script
   const TEST_NET_NODE_URL = 'https://testnet.aeternity.io'
   const MAIN_NET_NODE_INTERNAL_URL = 'https://mainnet.aeternity.io'
   const COMPILER_URL = 'https://compiler.aepps.com'

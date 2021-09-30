@@ -2,7 +2,6 @@ import * as R from 'ramda'
 import BigNumber from 'bignumber.js'
 
 import {
-  assertedType,
   decodeBase58Check,
   decodeBase64Check,
   encodeBase58Check, encodeBase64Check,
@@ -18,6 +17,7 @@ import {
   NAME_FEE,
   NAME_FEE_BID_INCREMENT,
   NAME_BID_TIMEOUTS,
+  NAME_MAX_LENGTH_FEE,
   NAME_ID_KEY
 } from './schema'
 import { ceil } from '../../utils/bignumber'
@@ -45,20 +45,6 @@ export function buildContractId (ownerId, nonce) {
   const ownerIdAndNonce = Buffer.from([...decode(ownerId, 'ak'), ...toBytes(nonce)])
   const b2bHash = hash(ownerIdAndNonce)
   return encode(b2bHash, 'ct')
-}
-
-/**
- * Build hash
- * @function
- * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {String} prefix Transaction hash prefix
- * @param {Buffer} data Rlp encoded transaction buffer
- * @param {Object} options
- * @param {Boolean} options.raw
- * @return {String} Transaction hash
- */
-export function buildHash (prefix, data, options = {}) {
-  return options.raw ? hash(data) : encode(hash(data), prefix)
 }
 
 /**
@@ -124,15 +110,17 @@ export function commitmentHash (name, salt = createSalt()) {
  * Decode data using the default encoding/decoding algorithm
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {string} data  An encoded and prefixed string (ex tx_..., sg_..., ak_....)
- * @param {string} type Prefix of Transaction
- * @return {Buffer} Buffer of decoded Base58check or Base64check data
+ * @param {string} data An Base58check or Base64check encoded and prefixed string (ex tx_..., sg_..., ak_....)
+ * @param {string} [requiredPrefix] Ensure that data have this prefix
+ * @return {Buffer} Decoded data
  */
-export function decode (data, type = '') {
-  if (!type) type = data.split('_')[0]
-  return base64Types.includes(type)
-    ? decodeBase64Check(assertedType(data, type))
-    : decodeBase58Check(assertedType(data, type))
+export function decode (data, requiredPrefix) {
+  const [prefix, payload, extra] = data.split('_')
+  if (extra) throw new Error(`Encoded string have extra parts: ${data}`)
+  if (requiredPrefix && requiredPrefix !== prefix) {
+    throw new Error(`Encoded string have a wrong type: ${prefix} (expected: ${requiredPrefix})`)
+  }
+  return (base64Types.includes(prefix) ? decodeBase64Check : decodeBase58Check)(payload)
 }
 
 /**
@@ -301,7 +289,7 @@ export function validatePointers (pointers = []) {
  */
 export function getMinimumNameFee (domain) {
   const nameLength = domain.replace('.chain', '').length
-  return NAME_BID_RANGES[nameLength >= NAME_BID_MAX_LENGTH ? NAME_BID_MAX_LENGTH : nameLength]
+  return NAME_BID_RANGES[nameLength >= NAME_MAX_LENGTH_FEE ? NAME_MAX_LENGTH_FEE : nameLength]
 }
 
 /**

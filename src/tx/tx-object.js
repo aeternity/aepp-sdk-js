@@ -5,7 +5,6 @@
  * @example import TxObject from '@aeternity/aepp-sdk/es/tx/tx-object'
  */
 import stampit from '@stamp/it'
-import { assertedType } from '../utils/crypto'
 import { buildTx, calculateFee, unpackTx } from './builder'
 import { TX_TYPE } from './builder/schema'
 import { encode } from './builder/helpers'
@@ -38,7 +37,6 @@ const buildTransaction = (type, params, options = {}) => {
 const unpackTransaction = (tx) => {
   if (!tx) throw new Error(`Invalid transaction: ${tx}`)
   if (typeof tx === 'string') {
-    if (!assertedType(tx, 'tx', true)) throw new Error('Invalid transaction string. Tx should be `tx` prefixed base58c string')
     const { txType: type, tx: params, rlpEncoded, binary } = unpackTx(tx)
     return { encodedTx: tx, type, params, rlpEncoded, binary }
   }

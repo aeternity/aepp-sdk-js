@@ -32,7 +32,6 @@ import {
   getFunctionACI,
   prepareArgsForEncode as prepareArgs
 } from './helpers'
-import { isAddressValid } from '../../utils/crypto'
 
 /**
  * Generate contract ACI object with predefined js methods for contract usage - can be used for creating a reference to already deployed contracts
@@ -61,8 +60,6 @@ export default async function getContractInstance (source, { aci, contractAddres
     skipArgsConvert: false,
     skipTransformDecoded: false,
     callStatic: false,
-    waitMined: true,
-    verify: false,
     filesystem
   }
   const instance = {
@@ -81,7 +78,6 @@ export default async function getContractInstance (source, { aci, contractAddres
 
   // Check for valid contract address and contract code
   if (contractAddress) {
-    if (!isAddressValid(contractAddress, 'ct')) throw new Error('Invalid contract address')
     const contract = await this.getContract(contractAddress).catch(e => null)
     if (!contract || !contract.active) throw new Error(`Contract with address ${contractAddress} not found on-chain or not active`)
     if (!forceCodeCheck) {

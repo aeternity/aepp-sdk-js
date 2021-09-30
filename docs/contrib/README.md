@@ -1,4 +1,4 @@
-# Contributing Info
+# Development
 
 ## Principles
 
@@ -22,10 +22,10 @@ It uses the following Javascript technologies and principles:
 - Convention over configuration
 - "Easy things should be easy, and hard things should be possible." [source] -- [Larry Wall]
 - Support for
-  - module access, enabling tree-shaking
-  - direct use in node scripts through bundling
-  - direct use in browser `<script>` tags through bundling
-  - bundling through webpack
+    - module access, enabling tree-shaking
+    - direct use in node scripts through bundling
+    - direct use in browser `<script>` tags through bundling
+    - bundling through webpack
 
 [Node's Swagger file]: https://github.com/aeternity/aeternity/blob/master/config/swagger.yaml
 [stampit]: http://stampit.js.org/
@@ -46,7 +46,7 @@ It uses the following Javascript technologies and principles:
 
 ## Requirements
 
-aepp-sdk is transpiled to EcmaScript 5 through [WebPack](https://webpack.js.org/), using [Babel](https://babeljs.io/) and is expected to work in any sufficiently new version of [Node.js](https://nodejs.org/en/) (`>= 8.11`) or modern web browser.
+aepp-sdk is transpiled to EcmaScript 5 through [WebPack](https://webpack.js.org/), using [Babel](https://babeljs.io/) and is expected to work in any sufficiently new version of [Node.js](https://nodejs.org/en/) (`>= v12.17`) or modern web browser.
 
 ## Contributing
 
@@ -56,11 +56,11 @@ aepp-sdk is transpiled to EcmaScript 5 through [WebPack](https://webpack.js.org/
 
 ## Documenting
 
-Apart from documenting features and code, there is also documentation automatically generated using [**jsdoc**](http://usejsdoc.org/) for documenting JS files (later transformed in to `.md` files (to have them readable in platforms like GitHub) and [**docco**](http://ashkenas.com/docco/) for documenting examples and code partials.
+Apart from documenting features and code, there is also documentation automatically generated using [**jsdoc**](http://usejsdoc.org/) for documenting JS files (later transformed in to `.md` files (to have them readable in platforms like GitHub) and [a script](https://github.com/aeternity/aepp-sdk-js/blob/master/tooling/docs/examples-to-md.js) for documenting examples and code partials.
 
 ```bash
-#generate documentation with docco + jsdoc (and markdownify jsdoc)
-npm run docs:docco && npm run docs:api
+#generate examples and api documentation
+npm run docs:examples && npm run docs:api
 ```
 
 ## Building
@@ -80,7 +80,7 @@ To test, launch the `test` command. This will run [mocha](https://mochajs.org/)'
 pnpm run test
 ```
 
-This repository also includes a docker-compose file, to allow you to **run your own aeternity node locally**. If you want to do so, **from the root of the project**:
+This repository also includes a docker-compose file, to allow you to **run your own æternity node locally**. If you want to do so, **from the root of the project**:
 
 1. Create a _**docker-compose.override.yml**_ file with this content:
 ```yaml
@@ -94,7 +94,7 @@ services:
       - 3001:3001
 ```
 2. Run `docker-compose up node`
-3. Congrats! you're now running your own aeternity node locally.
+3. Congrats! you're now running your own æternity node locally.
 
 
 ## Composing new Flavors
@@ -135,8 +135,3 @@ In order to add a local development version of aepp-sdk to a project, `npm link`
 ## Releasing
 
 [How to release a new version](releases.md)
-
-
-## Guides
-
-If you're interested in getting sample code/guide, you can check out the [Guides](../README.md)

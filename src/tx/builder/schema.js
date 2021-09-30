@@ -22,7 +22,7 @@ export const RESPONSE_TTL = { type: 'delta', value: 10 }
 // # CONTRACT
 export const DEPOSIT = 0
 export const AMOUNT = 0
-export const GAS = 1600000 - 21000
+export const GAS = 25000
 export const MIN_GAS_PRICE = 1e9
 export const MAX_AUTH_FUN_GAS = 50000
 export const DRY_RUN_ACCOUNT = { pub: 'ak_11111111111111111111111111111111273Yts', amount: '100000000000000000000000000000000000' }
@@ -36,10 +36,11 @@ export const NAME_MAX_CLIENT_TTL = 84600
 export const CLIENT_TTL = NAME_MAX_CLIENT_TTL
 export const NAME_FEE = 0
 // # see https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L67
-export const NAME_FEE_MULTIPLIER = 100000000000000
+export const NAME_FEE_MULTIPLIER = 1e14 // 100000000000000
 export const NAME_FEE_BID_INCREMENT = 0.05 // # the increment is in percentage
 // # see https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L272
 export const NAME_BID_TIMEOUT_BLOCKS = 480 // # ~1 day
+export const NAME_MAX_LENGTH_FEE = 31 // # this is the max length for a domain that requires a base fee to be paid
 export const NAME_BID_MAX_LENGTH = 12 // # this is the max length for a domain to be part of a bid
 export const NAME_ID_KEY = {
   ak: 'account_pubkey',
@@ -149,6 +150,7 @@ const OBJECT_TAG_ORACLES_TREE = 625
 const OBJECT_TAG_ACCOUNTS_TREE = 626
 const OBJECT_TAG_GA_ATTACH = 80
 const OBJECT_TAG_GA_META = 81
+const OBJECT_TAG_PAYING_FOR = 82
 const OBJECT_TAG_SOPHIA_BYTE_CODE = 70
 
 const TX_FIELD = (name, type, prefix) => [name, type, prefix]
@@ -225,6 +227,7 @@ export const TX_TYPE = {
   // GA ACCOUNTS
   gaAttach: 'gaAttach',
   gaMeta: 'gaMeta',
+  payingFor: 'payingFor',
   sophiaByteCode: 'sophiaByteCode'
 }
 
@@ -324,6 +327,7 @@ export const OBJECT_ID_TX_TYPE = {
   // GA Accounts
   [OBJECT_TAG_GA_ATTACH]: TX_TYPE.gaAttach,
   [OBJECT_TAG_GA_META]: TX_TYPE.gaMeta,
+  [OBJECT_TAG_PAYING_FOR]: TX_TYPE.payingFor,
   [OBJECT_TAG_SOPHIA_BYTE_CODE]: TX_TYPE.sophiaByteCode
 }
 
@@ -361,33 +365,39 @@ export const KEY_BLOCK_INTERVAL = 3
 
 // MAP WITH FEE CALCULATION https://github.com/aeternity/protocol/blob/master/consensus/consensus.md#gas
 export const TX_FEE_BASE_GAS = (txType) => {
-  switch (txType) {
-    // case TX_TYPE.gaMeta: // TODO investigate MetaTx calculation
-    case TX_TYPE.gaAttach:
-    case TX_TYPE.contractCreate:
-      return BigNumber(5 * BASE_GAS)
-    // Todo Implement meta tx fee calculation
-    case TX_TYPE.gaMeta:
-    case TX_TYPE.contractCall:
-      return BigNumber(12 * BASE_GAS)
-    default:
-      return BigNumber(BASE_GAS)
-  }
+  const factor = ({
+    [TX_TYPE.channelForceProgress]: 30,
+    [TX_TYPE.channelOffChain]: 0,
+    [TX_TYPE.channelOffChainCallContract]: 0,
+    [TX_TYPE.channelOffChainCreateContract]: 0,
+    [TX_TYPE.channelOffChainUpdateDeposit]: 0,
+    [TX_TYPE.channelOffChainUpdateWithdrawal]: 0,
+    [TX_TYPE.channelOffChainUpdateTransfer]: 0,
+    [TX_TYPE.contractCreate]: 5,
+    [TX_TYPE.contractCall]: 12,
+    [TX_TYPE.gaAttach]: 5,
+    [TX_TYPE.gaMeta]: 5,
+    [TX_TYPE.payingFor]: 1 / 5
+  })[txType] || 1
+  return new BigNumber(factor * BASE_GAS)
 }
 
-export const TX_FEE_OTHER_GAS = (txType) => ({ txSize, relativeTtl }) => {
+export const TX_FEE_OTHER_GAS = (txType, txSize, { relativeTtl, innerTxSize }) => {
   switch (txType) {
     case TX_TYPE.oracleRegister:
     case TX_TYPE.oracleExtend:
     case TX_TYPE.oracleQuery:
     case TX_TYPE.oracleResponse:
-      return BigNumber(txSize)
+      return new BigNumber(txSize)
         .times(GAS_PER_BYTE)
         .plus(
           Math.ceil(32000 * relativeTtl / Math.floor(60 * 24 * 365 / KEY_BLOCK_INTERVAL))
         )
+    case TX_TYPE.gaMeta:
+    case TX_TYPE.payingFor:
+      return new BigNumber(txSize).minus(innerTxSize).times(GAS_PER_BYTE)
     default:
-      return BigNumber(txSize).times(GAS_PER_BYTE)
+      return new BigNumber(txSize).times(GAS_PER_BYTE)
   }
 }
 
@@ -544,6 +554,14 @@ const GA_META_TX_2 = [
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('gas', FIELD_TYPES.int),
   TX_FIELD('gasPrice', FIELD_TYPES.int),
+  TX_FIELD('tx', FIELD_TYPES.rlpBinary)
+]
+
+const PAYING_FOR_TX = [
+  ...BASE_TX,
+  TX_FIELD('payerId', FIELD_TYPES.id, 'ak'),
+  TX_FIELD('nonce', FIELD_TYPES.int),
+  TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('tx', FIELD_TYPES.rlpBinary)
 ]
 
@@ -1018,6 +1036,9 @@ export const TX_SERIALIZATION_SCHEMA = {
   },
   [TX_TYPE.gaMeta]: {
     2: TX_SCHEMA_FIELD(GA_META_TX_2, OBJECT_TAG_GA_META)
+  },
+  [TX_TYPE.payingFor]: {
+    1: TX_SCHEMA_FIELD(PAYING_FOR_TX, OBJECT_TAG_PAYING_FOR)
   }
 }
 
@@ -1154,6 +1175,9 @@ export const TX_DESERIALIZATION_SCHEMA = {
   [OBJECT_TAG_GA_META]: {
     2: TX_SCHEMA_FIELD(GA_META_TX_2, OBJECT_TAG_GA_META)
   },
+  [OBJECT_TAG_PAYING_FOR]: {
+    1: TX_SCHEMA_FIELD(PAYING_FOR_TX, OBJECT_TAG_PAYING_FOR)
+  },
   [OBJECT_TAG_CHANNEL_FORCE_PROGRESS_TX]: {
     1: TX_SCHEMA_FIELD(CHANNEL_FORCE_PROGRESS_TX, OBJECT_TAG_CHANNEL_FORCE_PROGRESS_TX)
   },
@@ -1161,93 +1185,3 @@ export const TX_DESERIALIZATION_SCHEMA = {
     3: TX_SCHEMA_FIELD(CONTRACT_BYTE_CODE_LIMA, OBJECT_TAG_SOPHIA_BYTE_CODE)
   }
 }
-
-// VERIFICATION SCHEMA
-
-const ERROR_TYPE = { ERROR: 'error', WARNING: 'warning' }
-const VERIFICATION_FIELD = (msg, verificationFn, error) => [msg, verificationFn, error]
-
-const VALIDATORS = {
-  signature: 'signature',
-  insufficientFee: 'insufficientFee',
-  expiredTTL: 'expiredTTL',
-  insufficientBalanceForAmountFee: 'insufficientBalanceForAmountFee',
-  insufficientBalanceForAmount: 'insufficientBalanceForAmount',
-  nonceUsed: 'nonceUsed',
-  nonceHigh: 'nonceHigh',
-  minGasPrice: 'minGasPrice',
-  vmAndAbiVersion: 'vmAndAbiVersion',
-  insufficientBalanceForFeeNameFee: 'insufficientBalanceForFeeNameFee'
-}
-
-const ERRORS = {
-  invalidSignature: { key: 'InvalidSignature', type: ERROR_TYPE.ERROR, txKey: 'signature' },
-  insufficientFee: { key: 'InsufficientFee', type: ERROR_TYPE.ERROR, txKey: 'fee' },
-  expiredTTL: { key: 'ExpiredTTL', type: ERROR_TYPE.ERROR, txKey: 'ttl' },
-  insufficientBalanceForAmountFee: { key: 'InsufficientBalanceForAmountFee', type: ERROR_TYPE.WARNING, txKey: 'fee' },
-  insufficientBalanceForAmount: { key: 'InsufficientBalanceForAmount', type: ERROR_TYPE.WARNING, txKey: 'amount' },
-  nonceUsed: { key: 'NonceUsed', type: ERROR_TYPE.ERROR, txKey: 'nonce' },
-  nonceHigh: { key: 'NonceHigh', type: ERROR_TYPE.WARNING, txKey: 'nonce' },
-  minGasPrice: { key: 'minGasPrice', type: ERROR_TYPE.ERROR, txKey: 'gasPrice' },
-  vmAndAbiVersion: { key: 'vmAndAbiVersion', type: ERROR_TYPE.ERROR, txKey: 'ctVersion' },
-  insufficientBalanceForFeeNameFee: { key: 'insufficientBalanceForFeeNameFee', type: ERROR_TYPE.ERROR, txKey: 'nameFee' }
-}
-
-export const SIGNATURE_VERIFICATION_SCHEMA = [
-  VERIFICATION_FIELD(
-    () => 'The signature cannot be verified, please verify that you used the correct network id and the correct private key for the sender address',
-    VALIDATORS.signature,
-    ERRORS.invalidSignature
-  )
-]
-export const CONTRACT_VERIFICATION_SCHEMA = [
-  VERIFICATION_FIELD(
-    ({ ctVersion, consensusProtocolVersion, txType }) => `Wrong abi/vm version, Supported is: ${PROTOCOL_VM_ABI[consensusProtocolVersion] ? JSON.stringify(PROTOCOL_VM_ABI[consensusProtocolVersion][txType]) : ' None for this protocol ' + consensusProtocolVersion}`,
-    VALIDATORS.vmAndAbiVersion,
-    ERRORS.vmAndAbiVersion
-  ),
-  VERIFICATION_FIELD(
-    () => `The gasPrice must be bigger then ${MIN_GAS_PRICE}`,
-    VALIDATORS.minGasPrice,
-    ERRORS.minGasPrice
-  )
-]
-export const NAME_CLAIM_VERIFICATION_SCHEMA = [
-  VERIFICATION_FIELD(
-    ({ balance }) => `The account balance ${balance} is not enough to execute the transaction`,
-    VALIDATORS.insufficientBalanceForFeeNameFee,
-    ERRORS.insufficientBalanceForFeeNameFee
-  )
-]
-export const BASE_VERIFICATION_SCHEMA = [
-  VERIFICATION_FIELD(
-    ({ minFee }) => `The fee for the transaction is too low, the minimum fee for this transaction is ${minFee}`,
-    VALIDATORS.insufficientFee,
-    ERRORS.insufficientFee
-  ),
-  VERIFICATION_FIELD(
-    ({ height }) => `The TTL is already expired, the current height is ${height}`,
-    VALIDATORS.expiredTTL,
-    ERRORS.expiredTTL
-  ),
-  VERIFICATION_FIELD(
-    ({ balance }) => `The account balance ${balance} is not enough to execute the transaction`,
-    VALIDATORS.insufficientBalanceForAmountFee,
-    ERRORS.insufficientBalanceForAmountFee
-  ),
-  VERIFICATION_FIELD(
-    ({ balance }) => `The account balance ${balance} is not enough to execute the transaction`,
-    VALIDATORS.insufficientBalanceForAmount,
-    ERRORS.insufficientBalanceForAmount
-  ),
-  VERIFICATION_FIELD(
-    ({ accountNonce }) => `The nonce is invalid (already used). Next valid nonce is ${accountNonce + 1})`,
-    VALIDATORS.nonceUsed,
-    ERRORS.nonceUsed
-  ),
-  VERIFICATION_FIELD(
-    ({ accountNonce }) => `The nonce is technically valid but will not be processed immediately by the node (next valid nonce is ${accountNonce + 1})`,
-    VALIDATORS.nonceHigh,
-    ERRORS.nonceHigh
-  )
-]

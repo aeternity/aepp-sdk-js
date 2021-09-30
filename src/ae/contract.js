@@ -217,7 +217,7 @@ async function contractCall (source, address, name, argsOrCallData = [], options
  * }
  */
 async function contractDeploy (code, source, initState = [], options = {}) {
-  const opt = { ...this.Ae.defaults, ...options }
+  const opt = { ...this.Ae.defaults, ...options, deposit: DEPOSIT }
   const callData = Array.isArray(initState) ? await this.contractEncodeCall(source, 'init', initState, opt) : initState
   const ownerId = await this.address(opt)
 
@@ -290,7 +290,7 @@ async function delegateSignatureCommon (ids = [], opt = {}) {
     Buffer.concat(
       [
         Buffer.from(this.getNetworkId(opt)),
-        decode(await this.address(opt)),
+        ...(Object.prototype.hasOwnProperty.call(opt, 'onAccount') ? [decode(await this.address(opt))] : []),
         ...ids.map(e => decode(e))
       ]
     ),
@@ -299,98 +299,53 @@ async function delegateSignatureCommon (ids = [], opt = {}) {
 }
 
 /**
- * Helper to generate a signature to delegate a name pre-claim to a contract.
+ * Helper to generate a signature to delegate pre-claim/claim/transfer/revoke of a name to a contract.
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
  * @param {String} contractId Contract Id
+ * @param {String} [name] The name
  * @param {{ onAccount: String | Object }} [opt={}] opt Options
  * @return {Promise<String>} Signature for delegation
+ * @example
+ * const client = await Universal({ ... })
+ * const contractId = 'ct_asd2ks...' // contract address
+ * const name = 'example.chain' // AENS name
+ * const onAccount = await client.address() // Sign with a specific account
+ * // Preclaim signature
+ * const params = { contractId }
+ * const preclaimSig = await client.createAensDelegationSignature(params, { onAccount: current })
+ * // Claim, transfer and revoke signature
+ * const params = { contractId, name }
+ * const aensDelegationSig = await contract.createAensDelegationSignature(params, name, { onAccount: current })
  */
-async function delegateNamePreclaimSignature (contractId, opt = {}) {
-  return this.delegateSignatureCommon([contractId], opt)
+async function createAensDelegationSignature ({ contractId, name }, opt = {}) {
+  return this.delegateSignatureCommon([...name ? [produceNameId(name)] : [], contractId], opt)
 }
 
 /**
- * Helper to generate a signature to delegate a name claim to a contract.
- * @function
- * @alias module:@aeternity/aepp-sdk/es/ae/contract
- * @category async
- * @param {String} name The name being claimed
- * @param {String} contractId Contract Id
- * @param {{ onAccount: String | Object }} [opt={}] opt Options
- * @return {Promise<String>} Signature for delegation
- */
-async function delegateNameClaimSignature (contractId, name, opt = {}) {
-  return this.delegateSignatureCommon([produceNameId(name), contractId], opt)
-}
-
-/**
- * Helper to generate a signature to delegate a name transfer to a contract.
+ * Helper to generate a signature to delegate register/extend/respond of a Oracle to a contract.
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
  * @param {String} contractId Contract Id
- * @param {String} name The name being transferred
+ * @param {String} [queryId] Oracle Query Id
  * @param {{ onAccount: String | Object }} [opt={}] opt Options
  * @return {Promise<String>} Signature for delegation
+ * @example
+ * const client = await Universal({ ... })
+ * const contractId = 'ct_asd2ks...' // contract address
+ * const queryId = 'oq_...' // Oracle Query Id
+ * const onAccount = await client.address() // Sign with a specific account
+ * // Oracle register and extend signature
+ * const params = { contractId }
+ * const oracleDelegationSig = await contract.createOracleDelegationSignature(params, { onAccount })
+ * // Oracle respond signature
+ * const params = { contractId, queryId }
+ * const respondSig = await contract.createOracleDelegationSignature(params, queryId)
  */
-async function delegateNameTransferSignature (contractId, name, opt = {}) {
-  return this.delegateSignatureCommon([produceNameId(name), contractId], opt)
-}
-
-/**
- * Helper to generate a signature to delegate a name revoke to a contract.
- * @function
- * @alias module:@aeternity/aepp-sdk/es/ae/contract
- * @category async
- * @param {String} contractId Contract Id
- * @param {String} name The name being revoked
- * @param {{ onAccount: String | Object }} [opt={}] opt Options
- * @return {Promise<String>} Signature for delegation
- */
-async function delegateNameRevokeSignature (contractId, name, opt = {}) {
-  return this.delegateSignatureCommon([produceNameId(name), contractId], opt)
-}
-
-/**
- * Helper to generate a signature to delegate a Oracle register to a contract.
- * @function
- * @alias module:@aeternity/aepp-sdk/es/ae/contract
- * @category async
- * @param {String} contractId Contract Id
- * @param {{ onAccount: String | Object }} [opt={}] opt Options
- * @return {Promise<String>} Signature for delegation
- */
-async function delegateOracleRegisterSignature (contractId, opt = {}) {
-  return this.delegateSignatureCommon([contractId], opt)
-}
-
-/**
- * Helper to generate a signature to delegate a Oracle extend to a contract.
- * @function
- * @alias module:@aeternity/aepp-sdk/es/ae/contract
- * @category async
- * @param {String} contractId Contract Id
- * @param {{ onAccount: String | Object }} [opt={}] opt Options
- * @return {Promise<String>} Signature for delegation
- */
-async function delegateOracleExtendSignature (contractId, opt = {}) {
-  return this.delegateSignatureCommon([contractId], opt)
-}
-
-/**
- * Helper to generate a signature to delegate a Oracle respond to a contract.
- * @function
- * @alias module:@aeternity/aepp-sdk/es/ae/contract
- * @category async
- * @param {String} queryId Oracle Query Id
- * @param {String} contractId Contract Id
- * @param {{ onAccount: String | Object }} [opt={}] opt Options
- * @return {Promise<String>} Signature for delegation
- */
-async function delegateOracleRespondSignature (queryId, contractId, opt = {}) {
-  return this.delegateSignatureCommon([queryId, contractId], opt)
+async function createOracleDelegationSignature ({ contractId, queryId }, opt = {}) {
+  return this.delegateSignatureCommon([...queryId ? [queryId] : [], contractId], opt)
 }
 
 /**
@@ -434,16 +389,11 @@ export const ContractAPI = Ae.compose(ContractBase, {
     _handleCallError,
     _sendAndProcess,
     // Delegation for contract
-    // AENS
     delegateSignatureCommon,
-    delegateNamePreclaimSignature,
-    delegateNameClaimSignature,
-    delegateNameTransferSignature,
-    delegateNameRevokeSignature,
+    // AENS
+    createAensDelegationSignature,
     // Oracle
-    delegateOracleRegisterSignature,
-    delegateOracleExtendSignature,
-    delegateOracleRespondSignature
+    createOracleDelegationSignature
   },
   deepProps: {
     Ae: {

@@ -24,8 +24,8 @@
 
 import stampit from '@stamp/it'
 import { required } from '@stamp/required'
-import { messageToHash, decodeBase64Check, assertedType, verifyMessage as verifyMessageCrypto } from '../utils/crypto'
-import { buildTx, buildTxHash } from '../tx/builder'
+import { messageToHash, verifyMessage as verifyMessageCrypto, hash } from '../utils/crypto'
+import { buildTx } from '../tx/builder'
 import { decode } from '../tx/builder/helpers'
 import { TX_TYPE } from '../tx/builder/schema'
 import { getNetworkId } from '../node'
@@ -45,15 +45,14 @@ export const isAccountBase = (acc) => !['sign', 'address'].find(f => typeof acc[
  * @rtype (tx: String) => tx: Promise[String], throws: Error
  * @param {String} tx - Transaction to sign
  * @param {Object} opt - Options
+ * @param {Object} [opt.innerTx] - Sign as inner transaction for PayingFor
  * @return {String} Signed transaction
  */
-async function signTransaction (tx, opt) {
-  const networkId = this.getNetworkId(opt)
-  const rlpBinaryTx = decodeBase64Check(assertedType(tx, 'tx'))
-  const txWithNetworkId = Buffer.concat([
-    Buffer.from(networkId),
-    buildTxHash(rlpBinaryTx, { raw: true })
-  ])
+async function signTransaction (tx, opt = {}) {
+  const prefixes = [this.getNetworkId(opt)]
+  if (opt.innerTx) prefixes.push('inner_tx')
+  const rlpBinaryTx = decode(tx, 'tx')
+  const txWithNetworkId = Buffer.concat([Buffer.from(prefixes.join('-')), hash(rlpBinaryTx)])
 
   const signatures = [await this.sign(txWithNetworkId, opt)]
   return buildTx({ encodedTx: rlpBinaryTx, signatures }, TX_TYPE.signed).tx
