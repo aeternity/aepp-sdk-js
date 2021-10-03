@@ -30,7 +30,6 @@ import Oracle from './oracle'
 import GeneralizeAccount from '../contract/ga'
 import AccountMultiple from '../account/multiple'
 import Contract from './contract'
-import Channel from '../channel'
 
 /**
  * Universal Stamp
@@ -43,4 +42,4 @@ import Channel from '../channel'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Universal instance
  */
-export default Ae.compose(AccountMultiple, Chain, Transaction, Aens, Contract, Oracle, GeneralizeAccount, Channel)
+export default Ae.compose(AccountMultiple, Chain, Transaction, Aens, Contract, Oracle, GeneralizeAccount)
