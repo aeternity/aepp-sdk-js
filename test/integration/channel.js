@@ -23,6 +23,7 @@ import { getSdk, BaseAe, networkId } from './'
 import { generateKeyPair, encodeBase64Check } from '../../src/utils/crypto'
 import { unpackTx, buildTx, buildTxHash } from '../../src/tx/builder'
 import { decode } from '../../src/tx/builder/helpers'
+import Channel from '../../src/channel'
 import MemoryAccount from '../../src/account/memory'
 
 const wsUrl = process.env.TEST_WS_URL || 'ws://localhost:3014/channel'
@@ -101,12 +102,12 @@ describe('Channel', function () {
   })
 
   it('can open a channel', async () => {
-    initiatorCh = await BaseAe({
+    initiatorCh = await Channel({
       ...sharedParams,
       role: 'initiator',
       sign: initiatorSign
     })
-    responderCh = await BaseAe({
+    responderCh = await Channel({
       ...sharedParams,
       role: 'responder',
       sign: responderSign
@@ -660,12 +661,12 @@ describe('Channel', function () {
   it('can leave a channel', async () => {
     initiatorCh.disconnect()
     responderCh.disconnect()
-    initiatorCh = await BaseAe({
+    initiatorCh = await Channel({
       ...sharedParams,
       role: 'initiator',
       sign: initiatorSign
     })
-    responderCh = await BaseAe({
+    responderCh = await Channel({
       ...sharedParams,
       role: 'responder',
       sign: responderSign
@@ -680,7 +681,7 @@ describe('Channel', function () {
   })
 
   it('can reestablish a channel', async () => {
-    initiatorCh = await BaseAe({
+    initiatorCh = await Channel({
       ...sharedParams,
       role: 'initiator',
       port: 3002,
@@ -698,13 +699,13 @@ describe('Channel', function () {
   it('can solo close a channel', async () => {
     initiatorCh.disconnect()
     responderCh.disconnect()
-    initiatorCh = await BaseAe({
+    initiatorCh = await Channel({
       ...sharedParams,
       role: 'initiator',
       port: 3003,
       sign: initiatorSign
     })
-    responderCh = await BaseAe({
+    responderCh = await Channel({
       ...sharedParams,
       role: 'responder',
       port: 3003,
@@ -757,14 +758,14 @@ describe('Channel', function () {
     const responderAddr = await responder.address()
     initiatorCh.disconnect()
     responderCh.disconnect()
-    initiatorCh = await BaseAe({
+    initiatorCh = await Channel({
       ...sharedParams,
       lockPeriod: 5,
       role: 'initiator',
       sign: initiatorSign,
       port: 3004
     })
-    responderCh = await BaseAe({
+    responderCh = await Channel({
       ...sharedParams,
       lockPeriod: 5,
       role: 'responder',
@@ -820,13 +821,13 @@ describe('Channel', function () {
   it('can create a contract and accept', async () => {
     initiatorCh.disconnect()
     responderCh.disconnect()
-    initiatorCh = await BaseAe({
+    initiatorCh = await Channel({
       ...sharedParams,
       role: 'initiator',
       port: 3005,
       sign: initiatorSign
     })
-    responderCh = await BaseAe({
+    responderCh = await Channel({
       ...sharedParams,
       role: 'responder',
       port: 3005,
@@ -1043,13 +1044,13 @@ describe('Channel', function () {
   it('can reconnect', async () => {
     initiatorCh.disconnect()
     responderCh.disconnect()
-    initiatorCh = await BaseAe({
+    initiatorCh = await Channel({
       ...sharedParams,
       role: 'initiator',
       port: 3006,
       sign: initiatorSign
     })
-    responderCh = await BaseAe({
+    responderCh = await Channel({
       ...sharedParams,
       role: 'responder',
       port: 3006,
@@ -1066,7 +1067,7 @@ describe('Channel', function () {
     const channelId = await initiatorCh.id()
     const fsmId = initiatorCh.fsmId()
     initiatorCh.disconnect()
-    const ch = await BaseAe({
+    const ch = await Channel({
       url: sharedParams.url,
       host: sharedParams.host,
       port: 3006,
@@ -1102,13 +1103,13 @@ describe('Channel', function () {
 
     initiatorCh.disconnect()
     responderCh.disconnect()
-    initiatorCh = await BaseAe({
+    initiatorCh = await Channel({
       ...sharedParams,
       role: 'initiator',
       port: 3007,
       sign: initiatorSign
     })
-    responderCh = await BaseAe({
+    responderCh = await Channel({
       ...sharedParams,
       role: 'responder',
       port: 3007,
@@ -1142,13 +1143,13 @@ describe('Channel', function () {
     before(async function () {
       initiatorCh.disconnect()
       responderCh.disconnect()
-      initiatorCh = await BaseAe({
+      initiatorCh = await Channel({
         ...sharedParams,
         role: 'initiator',
         port: 3008,
         sign: initiatorSign
       })
-      responderCh = await BaseAe({
+      responderCh = await Channel({
         ...sharedParams,
         role: 'responder',
         port: 3008,

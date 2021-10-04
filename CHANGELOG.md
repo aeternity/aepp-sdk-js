@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.0.1](https://github.com/aeternity/aepp-sdk-js/compare/v9.0.0...v9.0.1) (2021-10-04)
+
+### Refactoring
+
+* Remove channel from universal stamp ([63e88ce74](https://github.com/aeternity/aepp-sdk-js/commit/63e88ce74))
+
 ## [9.0.0](https://github.com/aeternity/aepp-sdk-js/compare/v8.2.1...v9.0.0) (2021-09-30)
 
 ### ⚠ BREAKING CHANGES
@@ -39,8 +45,7 @@ All notable changes to this project will be documented in this file. See [standa
 * swagger https issue ([3a876bb](https://github.com/aeternity/aepp-sdk-js/commit/3a876bbb80300cbf91891daa642f6daee61c1427))
 * **tx serialisation:** accept unpackTx output produced by deserialisator ([ff0b3f5](https://github.com/aeternity/aepp-sdk-js/commit/ff0b3f551f7cf0684ac9c8e528d94eae9c31f226))
 
-### [8.2.1](https://github.com/aeternity/aepp-sdk-js/compare/v8.2.0...v8.2.1) (2021-06-21)
-
+## [8.2.1](https://github.com/aeternity/aepp-sdk-js/compare/v8.2.0...v8.2.1) (2021-06-21)
 
 ### Bug Fixes
 
@@ -48,7 +53,6 @@ All notable changes to this project will be documented in this file. See [standa
 * swagger file of aeternity's latest compiler ([a1caa03](https://github.com/aeternity/aepp-sdk-js/commit/a1caa0374e3a0be84644d7b8dd846d70193e8242))
 
 ## [8.2.0](https://github.com/aeternity/aepp-sdk-js/compare/8.1.0...v8.2.0) (2021-06-17)
-
 
 ### ⚠ BREAKING CHANGES
 
@@ -88,32 +92,24 @@ All notable changes to this project will be documented in this file. See [standa
 * drop compatibility with node@5 ([f5e2fdb](https://github.com/aeternity/aepp-sdk-js/commit/f5e2fdb42cc115a11c6be6e3dfd5cd1acfd6d3cc))
 * drop outdated protocols and transactions schemas ([f18d305](https://github.com/aeternity/aepp-sdk-js/commit/f18d305ca29204f006a438c157add0b511df4e93))
 
-# [8.1.0](https://github.com/aeternity/aepp-sdk-js/compare/8.0.0...8.1.0) (2021-05-31)
-
+## [8.1.0](https://github.com/aeternity/aepp-sdk-js/compare/8.0.0...8.1.0) (2021-05-31)
 
 ### Bug Fixes
 
 * **poi-tx schema:** use proper type name ([9e7c7b2](https://github.com/aeternity/aepp-sdk-js/commit/9e7c7b22c70cb0dcd194f8b1871be8fbf9b914ea))
 * **wait-for-tx-confirm:** validate transaction height after awaitHeight ([95e0d93](https://github.com/aeternity/aepp-sdk-js/commit/95e0d9334ffb9bf56f028fcc96d75f5a83905df0))
 
-
 ### Features
 
 * support compiler@6.0.0 and above ([3cdc7f9](https://github.com/aeternity/aepp-sdk-js/commit/3cdc7f9046b53de5c1ddeb0f7bd1b20af7cf433e))
 
-
-
-# [8.0.0](https://github.com/aeternity/aepp-sdk-js/compare/8.0.0-beta.2...8.0.0) (2021-05-18)
-
+## [8.0.0](https://github.com/aeternity/aepp-sdk-js/compare/8.0.0-beta.2...8.0.0) (2021-05-18)
 
 ### Bug Fixes
 
 * avoid instanceof between possible not/polyfilled objects ([906ee0e](https://github.com/aeternity/aepp-sdk-js/commit/906ee0ea4eb71160c3a482ea068cbb0d857cef8f))
 
-
-
 ## [8.0.0-beta.2](https://github.com/aeternity/aepp-sdk-js/compare/8.0.0-beta.1...8.0.0-beta.2) (2021-05-12)
-
 
 ### Bug Fixes
 
@@ -123,9 +119,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 * avoid ts definitions based on broken JsDoc ([572d19f](https://github.com/aeternity/aepp-sdk-js/commit/572d19f5ae6bd549c92a1a37452c0270490b9f6e))
 
-
 ## [8.0.0-beta.1](https://github.com/aeternity/aepp-sdk-js/compare/7.7.0...8.0.0-beta.1) (2021-05-6)
-
 
 ### Important changes
 
@@ -276,17 +270,13 @@ All notable changes to this project will be documented in this file. See [standa
 * **ga:** Remove extra await ([72bfc746](https://github.com/aeternity/aepp-sdk-js/commit/72bfc746))
 * Make tests more precise ([fe7a8567](https://github.com/aeternity/aepp-sdk-js/commit/fe7a8567))
 
-
-
-# [7.7.0](https://github.com/aeternity/aepp-sdk-js/compare/7.6.0...7.7.0) (2020-08-18)
-
+## [7.7.0](https://github.com/aeternity/aepp-sdk-js/compare/7.6.0...7.7.0) (2020-08-18)
 
 ### Features
 
 * **transferFunds:** Accept onAccount option ([#1060](https://github.com/aeternity/aepp-sdk-js/pull/1060))
 * **bigNumberToByteArray:** Avoid unexpected behaviour by throwing exception ([#1066](https://github.com/aeternity/aepp-sdk-js/pull/1066))
 * **example:** Add disconnect button on wallet side ([#1056](https://github.com/aeternity/aepp-sdk-js/pull/1056))
-
 
 ### Code Refactoring
 
@@ -302,23 +292,17 @@ All notable changes to this project will be documented in this file. See [standa
 * Refactor contract, oracle, chain ([#1048](https://github.com/aeternity/aepp-sdk-js/pull/1048))
 * Refactor state channels ([#1047](https://github.com/aeternity/aepp-sdk-js/pull/1047))
 
-
 ### Docs
 
 * Fix typo in Readme.md ([#1053](https://github.com/aeternity/aepp-sdk-js/pull/1053))
 
-
-# [7.6.0](https://github.com/aeternity/aepp-sdk-js/compare/7.5.0...7.6.0) (2020-07-22)
-
+## [7.6.0](https://github.com/aeternity/aepp-sdk-js/compare/7.5.0...7.6.0) (2020-07-22)
 
 ### Features
 
 * **wallet-detector:** allow to connect wallet to aepp between iframes ([3f74a05](https://github.com/aeternity/aepp-sdk-js/commit/3f74a05350aac261d9637cf61b5dd519b29b6723))
 
-
-
-# [7.5.0](https://github.com/aeternity/aepp-sdk-js/compare/7.4.2...7.5.0) (2020-06-18)
-
+## [7.5.0](https://github.com/aeternity/aepp-sdk-js/compare/7.4.2...7.5.0) (2020-06-18)
 
 ### Features
 
@@ -331,43 +315,32 @@ All notable changes to this project will be documented in this file. See [standa
 * **Env:** Simplify Travis and docker-compose ([#1031](https://github.com/aeternity/aepp-sdk-js/pull/1031))
 * **Env:** Remove unused packages ([#1032](https://github.com/aeternity/aepp-sdk-js/pull/1032))
 
-
 ## [7.4.2](https://github.com/aeternity/aepp-sdk-js/compare/7.2.1...7.4.2) (2020-06-10)
-
 
 ### Bug Fixes
 
 * **AEX-2:** Handler always as Promise ([#1018](https://github.com/aeternity/aepp-sdk-js/issues/1018)) ([a8b0aab](https://github.com/aeternity/aepp-sdk-js/commit/a8b0aab))
-
 
 ### Refactor
 
 * **AEX-2:** Add debug option for `getHandler`. Hide unknown message logs ([#1021](https://github.com/aeternity/aepp-sdk-js/issues/1021)) ([22c452c](https://github.com/aeternity/aepp-sdk-js/commit/22c452c))
 * **Contract** Add AENS name resolver for Contract API
 
-
 ## [7.4.1](https://github.com/aeternity/aepp-sdk-js/compare/7.4.0...7.4.1) (2020-05-30)
-
 
 ### Bug Fixes
 
 * **AEX-2:** Fix `isExtensionContext ` check ([#1011](https://github.com/aeternity/aepp-sdk-js/issues/1011)) ([814f99b](https://github.com/aeternity/aepp-sdk-js/commit/814f99b))
 
-
-
-# [7.4.0](https://github.com/aeternity/aepp-sdk-js/compare/7.3.1...7.4.0) (2020-05-29)
-
+## [7.4.0](https://github.com/aeternity/aepp-sdk-js/compare/7.3.1...7.4.0) (2020-05-29)
 
 ### Bug Fixes
 
 * **AEX-2:** Fix `getBrowserAPI` helper for cross-browser compatibility ([#1007](https://github.com/aeternity/aepp-sdk-js/issues/1007)) ([98b0e29](https://github.com/aeternity/aepp-sdk-js/commit/98b0e29))
 
-
 ### Features
 
 * **ACI:** Event decoding ([#1006](https://github.com/aeternity/aepp-sdk-js/issues/1006)) ([6b8e6fe](https://github.com/aeternity/aepp-sdk-js/commit/6b8e6fe))
-
-
 
 ## [7.3.1](https://github.com/aeternity/aepp-sdk-js/compare/7.2.1...7.3.1) (2020-05-25)
 
@@ -375,15 +348,11 @@ All notable changes to this project will be documented in this file. See [standa
 
 * **AEX_2:** Handle network switch and update state on both sides. Adjust networkId check for signing request. Add node switcher for example apps ([#996](https://github.com/aeternity/aepp-sdk-js/pull/996))
 
-
-
-# [7.3.0](https://github.com/aeternity/aepp-sdk-js/compare/7.2.1...7.3.0) (2020-05-20)
-
+## [7.3.0](https://github.com/aeternity/aepp-sdk-js/compare/7.2.1...7.3.0) (2020-05-20)
 
 ### Bug Fixes
 
 * **example:** Regenerate lock ([#960](https://github.com/aeternity/aepp-sdk-js/issues/960)) ([5b6a30e](https://github.com/aeternity/aepp-sdk-js/commit/5b6a30e))
-
 
 ### Features
 
@@ -397,19 +366,13 @@ All notable changes to this project will be documented in this file. See [standa
 * **Contract:** Add unpacked transaction to contract call with error ([#981](https://github.com/aeternity/aepp-sdk-js/issues/981)) ([4efd341](https://github.com/aeternity/aepp-sdk-js/commit/4efd341))
 * **Node:** Add `debug` option to Channel stamp ([#967](https://github.com/aeternity/aepp-sdk-js/issues/967)) ([68fcba5](https://github.com/aeternity/aepp-sdk-js/commit/68fcba5))
 
-
-
 ## [7.2.1](https://github.com/aeternity/aepp-sdk-js/compare/7.2.0...7.2.1) (2020-03-25)
-
 
 ### Fix
 
 * **build** Remove resolving of `minimist` using `npx`
 
-
-
-# [7.2.0](https://github.com/aeternity/aepp-sdk-js/compare/7.1.1...7.2.0) (2020-03-24)
-
+## [7.2.0](https://github.com/aeternity/aepp-sdk-js/compare/7.1.1...7.2.0) (2020-03-24)
 
 ### Docs
 
@@ -428,19 +391,14 @@ This stamp give more flexibility on transaction serialization/deserialization pr
 * **Keystore:** Allow to store secret as hex or buffer ([#939](https://github.com/aeternity/aepp-sdk-js/pull/939))
 * **AEX-2:**  Add permission layer for account management ([#937](https://github.com/aeternity/aepp-sdk-js/pull/937))
 
-
-
 ## [7.1.1](https://github.com/aeternity/aepp-sdk-js/compare/7.1.0...7.1.1) (2020-02-27)
-
 
 ### Bug Fixes
 
 * **TxBuilder:** Fix fee calculation for Oracles ([#924](https://github.com/aeternity/aepp-sdk-js/issues/924)) ([a9d784f](https://github.com/aeternity/aepp-sdk-js/commit/a9d784f))
 * **AEX-2:** Broken wallet detection ([#926](https://github.com/aeternity/aepp-sdk-js/pull/926))
 
-
-
-# [7.1.0](https://github.com/aeternity/aepp-sdk-js/compare/7.0.0...7.1.0) (2020-02-25)
+## [7.1.0](https://github.com/aeternity/aepp-sdk-js/compare/7.0.0...7.1.0) (2020-02-25)
 
 ### Refactor
 
@@ -458,14 +416,11 @@ This stamp give more flexibility on transaction serialization/deserialization pr
 * **Account:** Implement Message Signing (`singMessage`, `verifyMessage`) ([#903](https://github.com/aeternity/aepp-sdk-js/pull/903))
 * **AEX-2:** Add `removeRpcClient` method to RpcClient/RpcWallet stamp's([#912](https://github.com/aeternity/aepp-sdk-js/pull/912))
 
-
-# [7.0.0](https://github.com/aeternity/aepp-sdk-js/compare/7.0.0-next.3...7.0.0) (2020-01-31)
-
+## [7.0.0](https://github.com/aeternity/aepp-sdk-js/compare/7.0.0-next.3...7.0.0) (2020-01-31)
 
 ### Bug Fixes
 
 * **AEX-2:** Fix firefox compatibility issue ([#882](https://github.com/aeternity/aepp-sdk-js/issues/882)) ([2e16e10](https://github.com/aeternity/aepp-sdk-js/commit/2e16e10))
-
 
 ### Features
 
@@ -473,12 +428,10 @@ This stamp give more flexibility on transaction serialization/deserialization pr
 * **Compiler:** Add new compiler methods API ([#875](https://github.com/aeternity/aepp-sdk-js/issues/875)) ([a939395](https://github.com/aeternity/aepp-sdk-js/commit/a939395))
 * **network:** Throw error when can not get networkId ([#863](https://github.com/aeternity/aepp-sdk-js/issues/863)) ([41b7bd1](https://github.com/aeternity/aepp-sdk-js/commit/41b7bd1))
 
-
 ### Docs
 
 * **Guide** [Add 7.0.0 migration guide](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/migration/7.0.0.md)
 * **Guide:** Add [Oracle](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/oracle-usage.md), [AENS](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/aens-usage.md) and [Contract](https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/contract-aci-usage.md) guides
-
 
 ### BREAKING CHANGES
 
@@ -486,10 +439,7 @@ Please check out [7.0.0 migration guide](https://github.com/aeternity/aepp-sdk-j
 
 This release include all changes from [7.0.0-next.1](https://github.com/aeternity/aepp-sdk-js/releases/tag/7.0.0-next.1), [7.0.0-next.2](https://github.com/aeternity/aepp-sdk-js/releases/tag/7.0.0-next.2), [7.0.0-next.3](https://github.com/aeternity/aepp-sdk-js/releases/tag/7.0.0-next.3)
 
-
-
-# [7.0.0-next.3](https://github.com/aeternity/aepp-sdk-js/compare/7.0.0-next.2...7.0.0-next.3) (2020-01-22)
-
+## [7.0.0-next.3](https://github.com/aeternity/aepp-sdk-js/compare/7.0.0-next.2...7.0.0-next.3) (2020-01-22)
 
 ### Features
 
@@ -504,16 +454,12 @@ This release include all changes from [7.0.0-next.1](https://github.com/aeternit
 * **AENS:** Change AENS methods arguments
 > Now all of AENS module methods accept `name` as a first argument instead of `nameId`
 
-
-
-# [7.0.0-next.2](https://github.com/aeternity/aepp-sdk-js/compare/6.0.1...7.0.0-next.2) (2020-01-10)
-
+## [7.0.0-next.2](https://github.com/aeternity/aepp-sdk-js/compare/6.0.1...7.0.0-next.2) (2020-01-10)
 
 ### Bug Fixes
 
 * **codecov:** Adjust codecov badge. Move @babel/runtime to dev-deps ([#848](https://github.com/aeternity/aepp-sdk-js/issues/848)) ([109b851](https://github.com/aeternity/aepp-sdk-js/commit/109b851))
 * **AEX-2:** Fix `getBrowserAPI` function for firefox ([#853](https://github.com/aeternity/aepp-sdk-js/pull/853))
-
 
 ### Features
 
@@ -526,17 +472,13 @@ This release include all changes from [7.0.0-next.1](https://github.com/aeternit
 
 * **Guide:** Add guide for Contract ACI usage ([#852](https://github.com/aeternity/aepp-sdk-js/pull/852))
 
-
-
-# [7.0.0-next.1](https://github.com/aeternity/aepp-sdk-js/compare/6.1.3...7.0.0-next.1) (2019-12-18)
-
+## [7.0.0-next.1](https://github.com/aeternity/aepp-sdk-js/compare/6.1.3...7.0.0-next.1) (2019-12-18)
 
 ### Bug Fixes
 
 * **Contract/Chain:** Using { waitMined: false } with Contract high lvl API ([#828](https://github.com/aeternity/aepp-sdk-js/issues/828)) ([475c2aa](https://github.com/aeternity/aepp-sdk-js/commit/475c2aa))
 * **HdWallet:** Fix derive function ([#801](https://github.com/aeternity/aepp-sdk-js/issues/801)) ([6c6177d](https://github.com/aeternity/aepp-sdk-js/commit/6c6177d))
 * **Compiler:** Filter compiler options
-
 
 ### Code Refactoring
 
@@ -561,7 +503,6 @@ This release include all changes from [7.0.0-next.1](https://github.com/aeternit
 * **Compiler:** Add new API `validateByteCodeAPI` available on compiler >= 4.1.0 ([#788](https://github.com/aeternity/aepp-sdk-js/issues/788)) ([c0cccc9](https://github.com/aeternity/aepp-sdk-js/commit/c0cccc9))
 * **Tx:** Always verify transaction before send it to the node ([#798](https://github.com/aeternity/aepp-sdk-js/issues/798)) ([170f479](https://github.com/aeternity/aepp-sdk-js/commit/170f479))
 
-
 ### BREAKING CHANGES
 
 * **Tx:** By default `sdk` make a transaction `verification`
@@ -574,41 +515,29 @@ Add `getContractByteCode` API
 - remove `keypair` params instead use `accounts: [MemmoryAccount({ keypair })]`
 - remove `setKeypair` function from `Account` stamps
 
-
 ## [6.1.3](https://github.com/aeternity/aepp-sdk-js/compare/6.1.2...6.1.3) (2019-12-11)
-
 
 ### Bug Fixes
 
 * **Channel:** 5.2.0 compatibility ([4be8eb8](https://github.com/aeternity/aepp-sdk-js/commit/4be8eb8))
 
-
-
 ## [6.1.2](https://github.com/aeternity/aepp-sdk-js/compare/6.1.1...6.1.2) (2019-11-12)
-
 
 ### Bug Fixes
 
 * **Composition:** Chain composition ([9ac705f](https://github.com/aeternity/aepp-sdk-js/commit/9ac705f))
 
-
-
-# [6.1.1](https://github.com/aeternity/aepp-sdk-js/compare/6.1.0...6.1.1) (2019-11-12)
-
+## [6.1.1](https://github.com/aeternity/aepp-sdk-js/compare/6.1.0...6.1.1) (2019-11-12)
 
 ### Bug Fixes
 
 * **ACI:** Disable bytecode check for source and code on-chain. This changes will be included in next major release ([#783](https://github.com/aeternity/aepp-sdk-js/issues/783)) ([fe6021b](https://github.com/aeternity/aepp-sdk-js/commit/fe6021b))
 
-
 ### Features
 
 * **KeyStore:** Remove `argon2` package, use `libsodium` for both browser and node ([#782](https://github.com/aeternity/aepp-sdk-js/issues/782)) ([c18047e](https://github.com/aeternity/aepp-sdk-js/commit/c18047e))
 
-
-
-# [6.1.0](https://github.com/aeternity/aepp-sdk-js/compare/6.0.2...6.1.0) (2019-11-11)
-
+## [6.1.0](https://github.com/aeternity/aepp-sdk-js/compare/6.0.2...6.1.0) (2019-11-11)
 
 ### Bug Fixes
 
@@ -616,7 +545,6 @@ Add `getContractByteCode` API
 * **AENS:** Fix `produceNameId` function(Make name lowercase). Enable … ([#750](https://github.com/aeternity/aepp-sdk-js/issues/750)) ([fd14225](https://github.com/aeternity/aepp-sdk-js/commit/fd14225))
 * **state channels:** wait for connection to be established before sending generic message ([#723](https://github.com/aeternity/aepp-sdk-js/issues/723)) ([c5f35d1](https://github.com/aeternity/aepp-sdk-js/commit/c5f35d1))
 * **TxHelpers:** Use BigNumber in auction end block calculation ([777c012](https://github.com/aeternity/aepp-sdk-js/commit/777c012))
-
 
 ### Features
 
@@ -631,34 +559,23 @@ Add `getContractByteCode` API
 * **state channels:** make state channels compatible with node v5.0.0… ([#688](https://github.com/aeternity/aepp-sdk-js/issues/688)) ([deed7fc](https://github.com/aeternity/aepp-sdk-js/commit/deed7fc)), closes [#632](https://github.com/aeternity/aepp-sdk-js/issues/632) [#653](https://github.com/aeternity/aepp-sdk-js/issues/653) [#658](https://github.com/aeternity/aepp-sdk-js/issues/658) [#660](https://github.com/aeternity/aepp-sdk-js/issues/660) [#680](https://github.com/aeternity/aepp-sdk-js/issues/680) [#693](https://github.com/aeternity/aepp-sdk-js/issues/693) [#687](https://github.com/aeternity/aepp-sdk-js/issues/687)
 * **state channels:** make state channels compatible with node v5.1.0… ([#776](https://github.com/aeternity/aepp-sdk-js/issues/776)) ([74952aa](https://github.com/aeternity/aepp-sdk-js/commit/74952aa))
 
-
-
 ## [6.0.2](https://github.com/aeternity/aepp-sdk-js/compare/6.0.1...6.0.2) (2019-10-31)
-
 
 ### Bug Fixes
 
 * **name claim:** Revert ignoring waitMined from user passed options (#727)
 
-
-
 ## [6.0.1](https://github.com/aeternity/aepp-sdk-js/compare/6.0.0...6.0.1) (2019-10-29)
-
 
 ### Bug Fixes
 
 * **aens:** added lower case transformation for aens names ([#730](https://github.com/aeternity/aepp-sdk-js/issues/730)) ([f7f9f17](https://github.com/aeternity/aepp-sdk-js/commit/f7f9f17246c727566ce3c8159d30b7de19b027c9)), closes [#728](https://github.com/aeternity/aepp-sdk-js/issues/728)
 
-
-
-
-# [6.0.0](https://github.com/aeternity/aepp-sdk-js/compare/4.7.0...6.0.0) (2019-10-16)
-
+## [6.0.0](https://github.com/aeternity/aepp-sdk-js/compare/4.7.0...6.0.0) (2019-10-16)
 
 ### Code Refactoring
 
 * **SPEND:** Add additional validation for recipient ([#715](https://github.com/aeternity/aepp-sdk-js/issues/715)) ([c1854bf](https://github.com/aeternity/aepp-sdk-js/commit/c1854bf))
-
 
 ### Features
 
@@ -668,26 +585,19 @@ Add `getContractByteCode` API
 * **AENS:** auction name fee calculation. Name fee validation and calculation in `claim/bid` ([#706](https://github.com/aeternity/aepp-sdk-js/pull/706))
 * **AENS:** Add `nameId` computation function (#709) ([#706](https://github.com/aeternity/aepp-sdk-js/pull/706))
 
-
 ### BREAKING CHANGES
 
 * **AENS:** Change `tld` for Lima from `.aet` to `.chain`
 
-
-
-
-# [5.0.0](https://github.com/aeternity/aepp-sdk-js/compare/4.7.0...5.0.0) (2019-10-04)
-
+## [5.0.0](https://github.com/aeternity/aepp-sdk-js/compare/4.7.0...5.0.0) (2019-10-04)
 
 ### Bug Fixes
 
 * **rpc:** fix resolution rpc ops ([#669](https://github.com/aeternity/aepp-sdk-js/issues/669)) ([abd7c56](https://github.com/aeternity/aepp-sdk-js/commit/abd7c56))
 
-
 ### Code Refactoring
 
 * **ACI:** rework Sophia Option type representation ([#691](https://github.com/aeternity/aepp-sdk-js/issues/691)) ([0dbb2fe](https://github.com/aeternity/aepp-sdk-js/commit/0dbb2fe))
-
 
 ### Features
 
@@ -711,15 +621,11 @@ await contract.methods.optionFn(Promise.resolve(1) || Promise.reject())
 await contract.methods.optionFn(1 || undefined)
 ```
 
-
-
-# [5.0.0-next.1](https://github.com/aeternity/aepp-sdk-js/compare/4.6.0...4.7.0-next.1) (2019-09-10)
-
+## [5.0.0-next.1](https://github.com/aeternity/aepp-sdk-js/compare/4.6.0...4.7.0-next.1) (2019-09-10)
 
 ### Bug Fixes
 
 * **package:** update serialize-javascript to version 2.0.0 ([#647](https://github.com/aeternity/aepp-sdk-js/issues/647)) ([1ddb392](https://github.com/aeternity/aepp-sdk-js/commit/1ddb392))
-
 
 ### Features
 
@@ -727,11 +633,7 @@ await contract.methods.optionFn(1 || undefined)
 * **Compiler:** Compiler 4.0.0 compatibility ([#632](https://github.com/aeternity/aepp-sdk-js/issues/632)) ([d5f1632](https://github.com/aeternity/aepp-sdk-js/commit/d5f1632))
 * **Contract/ACI:** Add ability to use contract with external namespaces(`include "someLib"`) ([#653](https://github.com/aeternity/aepp-sdk-js/issues/653)) ([9708b43](https://github.com/aeternity/aepp-sdk-js/commit/9708b43))
 
-
-
-
-# [4.7.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.7.0) (2019-09-11)
-
+## [4.7.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.7.0) (2019-09-11)
 
 ### Features
 
@@ -740,47 +642,32 @@ await contract.methods.optionFn(1 || undefined)
 * **state channels:** add reconnect method ([#662](https://github.com/aeternity/aepp-sdk-js/issues/662)) ([9d8d1e8](https://github.com/aeternity/aepp-sdk-js/commit/9d8d1e8))
 * **state channels:** add backchannel updates test[#664](https://github.com/aeternity/aepp-sdk-js/pull/664)
 
-
-
-
-# [4.6.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.6.0) (2019-08-28)
-
-
+## [4.6.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.6.0) (2019-08-28)
 
 ### Bug Fixes
 
 * **Compiler:** Fix `forceCompatibility` option ([26beba8](https://github.com/aeternity/aepp-sdk-js/commit/26beba8))
-
 
 ### Features
 
 * **Lima**: add preliminary support for lima
 * **ACI/Contract:** Implement static-call for deploy transaction for ACI methods/Contract low lvl API ([#630](https://github.com/aeternity/aepp-sdk-js/issues/630)) ([5b7eeb4](https://github.com/aeternity/aepp-sdk-js/commit/5b7eeb4))
 
-
 ### Notes
 
 **GA support has been disabled until further notice due to node compatibility issues**
 **This version support aeternity node up to 5.0.0-rc.1**
 
-
-
 ## [4.5.1](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.5.1) (2019-08-22)
-
-
 
 ### Refactor
 * **Example**  Add node info to AEPP ([#620](https://github.com/aeternity/aepp-sdk-js/pull/620))
-
 
 ### Bug Fixes
 
 * **GA** Fix GA account composition ([211e409](https://github.com/aeternity/aepp-sdk-js/pull/620/commits/211e409d785a2962d1220677b0b0bcf00196abc1))
 
-
-
-
-# [4.5.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.5.0) (2019-08-20)
+## [4.5.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.5.0) (2019-08-20)
 
 
 ### Bug Fixes
@@ -790,7 +677,6 @@ await contract.methods.optionFn(1 || undefined)
 * **state channels:** add missing argument in onOnChainTx callback ([#604](https://github.com/aeternity/aepp-sdk-js/issues/604)) ([165cfe8](https://github.com/aeternity/aepp-sdk-js/commit/165cfe8))
 * **state channels:** fix awaitingOnChainTx state handler ([#608](https://github.com/aeternity/aepp-sdk-js/issues/608)) ([8b7b65a](https://github.com/aeternity/aepp-sdk-js/commit/8b7b65a))
 * **Swagger:** Always throw error from `axios` error handler ([#607](https://github.com/aeternity/aepp-sdk-js/issues/607)) ([0e5cf61](https://github.com/aeternity/aepp-sdk-js/commit/0e5cf61))
-
 
 ### Features
 
@@ -815,8 +701,7 @@ await contract.methods.optionFn(1 || undefined)
         await client.spend(10000, receiverPub, { authData: { source: authContract, args: [...authContractArgs] } })
     ```
 
-# [4.4.0](https://github.com/aeternity/aepp-sdk-js/compare/4.3.0...4.4.0) (2019-08-09)
-
+## [4.4.0](https://github.com/aeternity/aepp-sdk-js/compare/4.3.0...4.4.0) (2019-08-09)
 
 ### Bug Fixes
 
@@ -836,10 +721,7 @@ await contract.methods.optionFn(1 || undefined)
 * **MemoryAccount:** Add validation of `keypair`  ([#594](https://github.com/aeternity/aepp-sdk-js/issues/594)) ([b8c2b20](https://github.com/aeternity/aepp-sdk-js/commit/b8c2b20))
 * **State Channels:** persist connection by pinging every 10 seconds ([#571](https://github.com/aeternity/aepp-sdk-js/issues/571)) ([a70f919](https://github.com/aeternity/aepp-sdk-js/commit/a70f919))
 
-
-
-# [4.3.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.3.0) (2019-08-05)
-
+## [4.3.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.3.0) (2019-08-05)
 
 ### Bug Fixes
 
@@ -851,7 +733,6 @@ await contract.methods.optionFn(1 || undefined)
 
 * **State Channel:** Do not include white space for outgoing websocket messages ([#559](https://github.com/aeternity/aepp-sdk-js/pull/559))
 
-
 ### Features
 
 * **ACI:** Implement sophia `variant` type ([#567](https://github.com/aeternity/aepp-sdk-js/issues/567)) ([8505dcf](https://github.com/aeternity/aepp-sdk-js/commit/8505dcf))
@@ -861,21 +742,16 @@ await contract.methods.optionFn(1 || undefined)
 * **TxBuilder:** Add helper for producing tx hash ([#579](https://github.com/aeternity/aepp-sdk-js/issues/579)) ([e1b405e](https://github.com/aeternity/aepp-sdk-js/commit/e1b405e))
 * **AE** Make all AE stamps composed with Accounts ([#581](https://github.com/aeternity/aepp-sdk-js/pull/581))
 
-
 ### Docs
 
 * **ACI** Add some additional clarification to `getContractInstance`
 
-
-
-# [4.2.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.2.0) (2019-07-15)
-
+## [4.2.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.2.0) (2019-07-15)
 
 ### Bug Fixes
 
 * **package:** update libsodium-wrappers-sumo to version 0.7.5 ([#541](https://github.com/aeternity/aepp-sdk-js/issues/541)) ([956ed75](https://github.com/aeternity/aepp-sdk-js/commit/956ed75))
 * **rpc-server:** Fix type 'object' check ([#526](https://github.com/aeternity/aepp-sdk-js/issues/526)) ([48c42e4](https://github.com/aeternity/aepp-sdk-js/commit/48c42e4))
-
 
 ### Code Refactoring
 
@@ -890,17 +766,13 @@ await contract.methods.optionFn(1 || undefined)
 * **Compiler:** Add compatibility with compiler 3.2.0
 * **Channel:** Implement GA awareness of State Channels
 
-
-
-# [4.1.0](https://github.com/aeternity/aepp-sdk-js/compare/4.0.1...4.1.0) (2019-06-22)
-
+## [4.1.0](https://github.com/aeternity/aepp-sdk-js/compare/4.0.1...4.1.0) (2019-06-22)
 
 ### Bug Fixes
 
 * **Node:** Do not throw error if `internalUrl` not provided. Instead use `url` ([#503](https://github.com/aeternity/aepp-sdk-js/issues/503)) ([053faae](https://github.com/aeternity/aepp-sdk-js/commit/053faae))
 * **TXBuilder:** Fix payload serialization if you try to unpack and pack tx. ([#498](https://github.com/aeternity/aepp-sdk-js/issues/498)) ([73552e5](https://github.com/aeternity/aepp-sdk-js/commit/73552e5))
 * **TxValidator:** Fix validation of state channel open transaction ([#496](https://github.com/aeternity/aepp-sdk-js/issues/496)) ([325cc90](https://github.com/aeternity/aepp-sdk-js/commit/325cc90))
-
 
 ### Features
 
@@ -931,10 +803,7 @@ Add `options` object like last arguments of generate fn under `instance.methods`
 
 * **Usage:**: Add instructions about how to include directly the `SDK` in a `html page`
 
-
-
 ## [4.0.1](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.0.1) (2019-06-13)
-
 
 ### Bug Fixes
 
@@ -950,10 +819,7 @@ Add `options` object like last arguments of generate fn under `instance.methods`
 
 * **webpack:** Add another bundle(`dist/aepp-sdk.browser-script.js`) for using in `<script>` tag ([#485](https://github.com/aeternity/aepp-sdk-js/pull/485))
 
-
-
-# [4.0.0](https://github.com/aeternity/aepp-sdk-js/compare/3.4.1...4.0.0) (2019-06-12)
-
+## [4.0.0](https://github.com/aeternity/aepp-sdk-js/compare/3.4.1...4.0.0) (2019-06-12)
 
 ### Bug Fixes
 
@@ -975,7 +841,6 @@ Add `options` object like last arguments of generate fn under `instance.methods`
 * **TX:** encode payload as base64 ([#460](https://github.com/aeternity/aepp-sdk-js/issues/460)) ([ad490af](https://github.com/aeternity/aepp-sdk-js/commit/ad490af))
 * **TX_BUILDER:** Fix bug related to contract fee calculation. ([#472](https://github.com/aeternity/aepp-sdk-js/issues/472)) ([7214cfb](https://github.com/aeternity/aepp-sdk-js/commit/7214cfb))
 
-
 ### BREAKING CHANGES
 
 * **DOCS** Restructure and rework sdk documentation
@@ -986,24 +851,17 @@ compiler
     - `(type:String, data: String) => Any` to `(source: String, fn: String, callValue: String, callResult:String) => Any`.
     (`callResult` is `callType` from call result, can be `ok`, `revert`, ...)
 
-
-
 ## [3.4.1](https://github.com/aeternity/aepp-sdk-js/compare/3.4.0...3.4.1) (2019-06-05)
-
 
 ### Bug Fixes
 
 * **Deps:** Update axios lib to 0.19.0 due to security issue ([f951765](https://github.com/aeternity/aepp-sdk-js/commit/f951765))
 
-
-
-# [3.4.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...3.4.0) (2019-05-22)
-
+## [3.4.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...3.4.0) (2019-05-22)
 
 ### Bug Fixes
 
 * **State Channels:** Remove automatic pinging to fix browser compatibility ([#432](https://github.com/aeternity/aepp-sdk-js/issues/432)) ([0700f3a](https://github.com/aeternity/aepp-sdk-js/commit/0700f3a))
-
 
 ### Features
 
@@ -1014,10 +872,7 @@ compiler
   > Example: `Universal({ axiosConfig: { config: { // axios config object }, errorHandler: (err) => throw err }})`
 * **Transaction Builder:** Implement vm/abi validation for contract/oracle tx based on consensus protocol version. Add custom verification based on transaction type ([#425](https://github.com/aeternity/aepp-sdk-js/pull/425)) ([#426](https://github.com/aeternity/aepp-sdk-js/pull/426))
 
-
-
-# [3.3.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...3.3.0) (2019-05-17)
-
+## [3.3.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...3.3.0) (2019-05-17)
 
 ### Bug Fixes
 
@@ -1030,23 +885,17 @@ fix(AEP exampe): Fix contract in AEPP example
 * **State Channels:** Make state channels compatible with aeternity 3.0.0 ([#415](https://github.com/aeternity/aepp-sdk-js/issues/415)) ([668e7f1](https://github.com/aeternity/aepp-sdk-js/commit/668e7f1))
 * **Transaction Builder:** Add serializations for transactions introd… ([#416](https://github.com/aeternity/aepp-sdk-js/issues/416)) ([fd7b8ce](https://github.com/aeternity/aepp-sdk-js/commit/fd7b8ce))
 
-
 ### BREAKING CHANGES
 
 * **NODE** Change compatibility from `2.3.0` to `3.0.0`
 
-
-# [3.2.1](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...3.2.1) (2019-05-16)
-
+## [3.2.1](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...3.2.1) (2019-05-16)
 
 ### Bug Fixes
 
 * **Joi:** Add `JOI` browser comparability
 
-
-
-# [3.2.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...3.2.0) (2019-05-16)
-
+## [3.2.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...3.2.0) (2019-05-16)
 
 ### Bug Fixes
 
@@ -1079,21 +928,16 @@ fix(AEP exampe): Fix contract in AEPP example
 * **State Channels:** Ping every 10 seconds to persist connection ([#324](https://github.com/aeternity/aepp-sdk-js/issues/324)) ([6d0e156](https://github.com/aeternity/aepp-sdk-js/commit/6d0e156)), closes [#276](https://github.com/aeternity/aepp-sdk-js/issues/276) [#299](https://github.com/aeternity/aepp-sdk-js/issues/299) [#300](https://github.com/aeternity/aepp-sdk-js/issues/300) [#303](https://github.com/aeternity/aepp-sdk-js/issues/303) [#302](https://github.com/aeternity/aepp-sdk-js/issues/302) [#279](https://github.com/aeternity/aepp-sdk-js/issues/279) [#275](https://github.com/aeternity/aepp-sdk-js/issues/275) [#276](https://github.com/aeternity/aepp-sdk-js/issues/276) [#299](https://github.com/aeternity/aepp-sdk-js/issues/299) [#300](https://github.com/aeternity/aepp-sdk-js/issues/300)
 * **State Channels:** Remove endpoint param ([#391](https://github.com/aeternity/aepp-sdk-js/issues/391)) ([8d9ea7e](https://github.com/aeternity/aepp-sdk-js/commit/8d9ea7e))
 
-
 ### BREAKING CHANGES
 
 * **State Channels:** Endpoint param is removed and no longer defaults to "/channel". This means that
 "/channel" (or other path) must be appendend to url para
 
-
-
-# [3.1.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...3.1.0) (2019-04-24)
-
+## [3.1.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...3.1.0) (2019-04-24)
 
 ### Bug Fixes
 
 * **ACI:** Fix address type transformation when decoding data ([#335](https://github.com/aeternity/aepp-sdk-js/issues/335)) ([e37cdfc](https://github.com/aeternity/aepp-sdk-js/commit/e37cdfc))
-
 
 ### Features
 
@@ -1105,15 +949,11 @@ fix(AEP exampe): Fix contract in AEPP example
 * **State Channels:** Add cleanContractCalls method ([#338](https://github.com/aeternity/aepp-sdk-js/issues/338)) ([778159a](https://github.com/aeternity/aepp-sdk-js/commit/778159a))
 * **State Channels:** Ping every 10 seconds to persist connection ([#324](https://github.com/aeternity/aepp-sdk-js/issues/324)) ([6d0e156](https://github.com/aeternity/aepp-sdk-js/commit/6d0e156))
 
-
-
-# [3.0.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...3.0.0) (2019-04-17)
-
+## [3.0.0](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...3.0.0) (2019-04-17)
 
 ### Bug Fixes
 
 * **ACI:** Fix address type transformation when decoding data ([#335](https://github.com/aeternity/aepp-sdk-js/issues/335)) ([e37cdfc](https://github.com/aeternity/aepp-sdk-js/commit/e37cdfc))
-
 
 ### Features
 
@@ -1123,15 +963,11 @@ fix(AEP exampe): Fix contract in AEPP example
 * **Aepp:** Add Compiler to Aepp rpc methods. Update example app ([#312](https://github.com/aeternity/aepp-sdk-js/issues/312)) ([9c72521](https://github.com/aeternity/aepp-sdk-js/commit/9c72521))
 * **State Channels:** Add cleanContractCalls method ([#338](https://github.com/aeternity/aepp-sdk-js/issues/338)) ([778159a](https://github.com/aeternity/aepp-sdk-js/commit/778159a))
 
-
 ### BREAKING CHANGES
 
 * **ACI** Remove 2.0.0 compiler compatibility
 
-
-
-# [2.4.1](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...2.4.1) (2019-04-17)
-
+## [2.4.1](https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...2.4.1) (2019-04-17)
 
 ### Features
 
@@ -1142,13 +978,11 @@ fix(AEP exampe): Fix contract in AEPP example
 * **Channel:** Get full channel state support
 * **DOCS:** Adjust ACI, Contract and Usage
 
-
 ### Bug Fixes
 
 * **HTTP:** Handle no response in http stamp error handler
 * **Crypto:** Fix crypto `formatAddress`
 * **Crypto:** Move ADDRESS_FORMAT to crypto
-
 
 ### BREAKING CHANGES
 
@@ -1161,9 +995,7 @@ fix(AEP exampe): Fix contract in AEPP example
   - `channel.createContract(...).state` has been renamed to `signedTx`
   - `channel.callContract(...).state` has been renamed to `signedTx`
 
-
-# [2.4.0](https://github.com/aeternity/aepp-sdk-js/compare/2.3.2...2.4.0) (2019-04-17)
-
+## [2.4.0](https://github.com/aeternity/aepp-sdk-js/compare/2.3.2...2.4.0) (2019-04-17)
 
 ### Features
 
@@ -1205,7 +1037,6 @@ fix(AEP exampe): Fix contract in AEPP example
 * **Chain:** Add ability to get `account/balance` on specific block `hash/height`
 * **Universal:** Add `{ compilerUrl }` to `Universal, Contract, Wallet` stamp initialization
 
-
 ### Bug Fixes
 
 * **Contract:** decode node error coming from contract `call` and `callStatic`
@@ -1213,8 +1044,8 @@ fix(AEP exampe): Fix contract in AEPP example
 * **Crypto:** fix arguments parsing in `Crypto.sing`
 * **Crypto:** Fix `name hash` function arguments parsing in `Crypto`
 
+### BREAKING CHANGES
 
- ### BREAKING CHANGES
  * **Contract:** Remove `ContractNodeAPI` stamp
  * **Contract:** Change Contract stamp API
     ```
@@ -1226,9 +1057,7 @@ fix(AEP exampe): Fix contract in AEPP example
      - contractEncodeCall (code, abi, name, args, call) -> (source, name, args) // 'source' is -> Contract source code or ACI interface source
     ```
 
-
 ## [2.3.2](https://github.com/aeternity/aepp-sdk-js/compare/2.3.1...2.3.2) (2019-03-04)
-
 
 ### Features
 
@@ -1236,9 +1065,7 @@ fix(AEP exampe): Fix contract in AEPP example
 * **AEPP:** Fix `AEPP` example app
 * **Build:** Force `image` pull before `builds`
 
-
-# [2.3.1](https://github.com/aeternity/aepp-sdk-js/compare/2.3.0...2.3.1) (2019-02-22)
-
+## [2.3.1](https://github.com/aeternity/aepp-sdk-js/compare/2.3.0...2.3.1) (2019-02-22)
 
 ### Features
 
@@ -1247,9 +1074,7 @@ fix(AEP exampe): Fix contract in AEPP example
 * **TX_BUILDER:** Change `FEE_BYTE_SIZE` from 1 to 8 bytes in `fee` calculation
 * **TX_BUILDER:** Improve error handling in `tx` builder
 
-
-# [2.3.0](https://github.com/aeternity/aepp-sdk-js/compare/2.3.0-next...2.3.0) (2019-02-22)
-
+## [2.3.0](https://github.com/aeternity/aepp-sdk-js/compare/2.3.0-next...2.3.0) (2019-02-22)
 
 ### Features
 
@@ -1264,10 +1089,7 @@ fix(AEP exampe): Fix contract in AEPP example
 * **Node:** Change supported node version range to `1.4.0 <= version < 3.0.0`
 * This release contain changes from: [2.3.0-next](https://github.com/aeternity/aepp-sdk-js/releases/tag/2.3.0-next), [2.2.1-next](https://github.com/aeternity/aepp-sdk-js/releases/tag/2.2.1-next), [2.1.1-0.1.0-next](https://github.com/aeternity/aepp-sdk-js/releases/tag/2.1.1-0.1.0-next), [2.1.0](https://github.com/aeternity/aepp-sdk-js/releases/tag/2.1.0)
 
-
-
-# [2.3.0-next](https://github.com/aeternity/aepp-sdk-js/compare/2.2.1-next...2.3.0-next) (2019-02-21)
-
+## [2.3.0-next](https://github.com/aeternity/aepp-sdk-js/compare/2.2.1-next...2.3.0-next) (2019-02-21)
 
 ### Features
 
@@ -1278,10 +1100,7 @@ fix(AEP exampe): Fix contract in AEPP example
 * **Contract:** Change default `gasPrice` to `1e9`
 * **TX_BUILDER:** Change `Fee` byte_size to 1
 
-
-
-# [2.2.1-next](https://github.com/aeternity/aepp-sdk-js/compare/2.1.1-0.1.0-next...2.2.1-next) (2019-02-21)
-
+## [2.2.1-next](https://github.com/aeternity/aepp-sdk-js/compare/2.1.1-0.1.0-next...2.2.1-next) (2019-02-21)
 
 ### Feature
 
@@ -1291,32 +1110,23 @@ fix(AEP exampe): Fix contract in AEPP example
 * **Channel:** Change Channel `legacy` API to `JSON RPC`
 * **TX_BUILDER:** Change `minFee` calculation, multiply min fee by 10^9
 
-
-# [2.1.1-0.1.0-next](https://github.com/aeternity/aepp-sdk-js/compare/2.1.0...2.1.1-0.1.0-next) (2019-02-21)
-
+## [2.1.1-0.1.0-next](https://github.com/aeternity/aepp-sdk-js/compare/2.1.0...2.1.1-0.1.0-next) (2019-02-21)
 
 ### Bug Fixes
 * **Chore:** Fix linter errors
 
-
-
-# [2.1.0](https://github.com/aeternity/aepp-sdk-js/compare/2.0.0...2.1.0) (2019-02-21)
-
+## [2.1.0](https://github.com/aeternity/aepp-sdk-js/compare/2.0.0...2.1.0) (2019-02-21)
 
 ### Features
 
 * **Node:** `Minerva` comparability
 * **Utils:** Add `Mnemonic` wallet implementation `es/utils/hd-wallet`
 
-
 ### BREAKING CHANGES
 
 * **Node:** Change supported node version range to `1.4.0 <= version < 3.0.0`
 
-
-
-# [2.0.0](https://github.com/aeternity/aepp-sdk-js/compare/1.3.2...2.0.0) (2019-02-21)
-
+## [2.0.0](https://github.com/aeternity/aepp-sdk-js/compare/1.3.2...2.0.0) (2019-02-21)
 
 ### Features
 
@@ -1335,7 +1145,6 @@ fix(AEP exampe): Fix contract in AEPP example
 * **Chain:** Move `Contract` and `Oracle` API wrapper's to `Chain` stamp
 * **Chore:** Rename `epoch` in `CHANGELOG`, `README`, `HACKING`
 
-
 ### Bug Fixes
 
 * **Rpc:** `RpcServer`: Avoid storing of `window` in `instance` properties
@@ -1345,7 +1154,6 @@ fix(AEP exampe): Fix contract in AEPP example
 * **Chore:** Fix unpack tx example in `bin/aecrypto.js`
 * **Chore:** Remove unused function's from `crypto.js`
 
-
 ### BREAKING CHANGES
 
 * **TX:** Remove old transaction builder `es/tx/js.js` (Please use `es/tx/builder` instead)
@@ -1353,10 +1161,7 @@ fix(AEP exampe): Fix contract in AEPP example
 * **Chore:** Rename `Oracle`, `Contract`, `Chain` API wrapper files from `epoch` to `node`
 * **Chore:** Rename `Contract` api wrapper method's
 
-
-
 ## [1.3.2](https://github.com/aeternity/aepp-sdk-js/compare/1.3.1...1.3.2) (2019-02-01)
-
 
 ### Features
 
@@ -1366,25 +1171,18 @@ fix(AEP exampe): Fix contract in AEPP example
 * **Chore:** Contract call static now using `dry-run` API
 * **Test:** Improve test's for Transaction verification
 
-
 ### Changed
 
 * **Docs:** Adjust doc's for `Contract` and `Aens` stamp's
 * **Chore:** Fix decoding of address from contract call
 
-
-
 ## [1.3.1](https://github.com/aeternity/aepp-sdk-js/compare/1.3.0...1.3.1) (2019-01-29)
-
 
 ### Features
 
 * **Build:** Remove KeyStore from bundle due to build issue(for now you can export it only using tree-shaking `import * as Keystore from '@aeternity/aepp-sdk/utils/keystore'`)
 
-
-
-# [1.3.0](https://github.com/aeternity/aepp-sdk-js/compare/1.2.1...1.3.0) (2019-01-29)
-
+## [1.3.0](https://github.com/aeternity/aepp-sdk-js/compare/1.2.1...1.3.0) (2019-01-29)
 
 ### Features
 
@@ -1396,14 +1194,10 @@ fix(AEP exampe): Fix contract in AEPP example
 * **Contract:** Set default values for amount and deposit to 0 for `contract` transaction
 * **Rpc:** Improve RPC server
 
-
 ### Notes and known Issues
 - Old transaction builder `es/tx/js.js` will be removed in next major release.
 
-
-
 ## [1.2.1](https://github.com/aeternity/aepp-sdk-js/compare/1.1.2...1.2.1) (2018-12-21)
-
 
 ### Features
 
@@ -1413,13 +1207,11 @@ fix(AEP exampe): Fix contract in AEPP example
 * **Chore:** Use `prepare` instead of `postinstall-build` (thanks @davidyuk)
 * **Docs:** Refreshed Docs: README.md + docs/usage.md
 
-
 ### Bug Fixes
 
 * **Chr:** Fix Import RLP package (thanks @davidyuk)
 * **Rpc:** Fix for NetworkId propagation and override
 * **Tx:** TxJS is not a stamp anymore, and instead: it exports helper functions
-
 
 ### BREAKING CHANGES
 
@@ -1431,46 +1223,34 @@ fix(AEP exampe): Fix contract in AEPP example
 * **Chore:** `10 exa` should be `10 ae`
 * **Chain:** format shouldn't be a flag, but a request for `unit` eg. `{ format: `ae` }`
 
-
-
 ## [1.1.2](https://github.com/aeternity/aepp-sdk-js/compare/1.1.1...1.1.2) (2018-12-15)
-
 
 ### Feature
 
 * **Chore:** isAddressValid check
 * **Tx:** Tx Fee formulas
 
-
 ### Bug Fixes
 
 * **Rpc:** Fixed networkId propagation (and overriding on init of Flavors)
 * **Crypto:** Fixed encodeBase58Check by feeding Buffered input
 
-
 ### BREAKING CHANGES
 
 * **Chore:** Compatibility with Node >= 1.0.0 and <= 1.1.0
 
-
-
 ## [1.1.1](https://github.com/aeternity/aepp-sdk-js/compare/1.1.0...1.1.1) (2018-12-11)
-
 
 ### Features
 
 * **Rpc:** Added a command to remove images after CI testing
-
 
 ### Bug Fixes
 
 * **Rpc:** Fix Testing
 * **Rpc:** Fixed Oracle error for Wallet flavor
 
-
-
-# [1.1.0](https://github.com/aeternity/aepp-sdk-js/compare/1.0.1...1.1.0) (2018-12-11)
-
+## [1.1.0](https://github.com/aeternity/aepp-sdk-js/compare/1.0.1...1.1.0) (2018-12-11)
 
 ### Features
 
@@ -1481,36 +1261,25 @@ fix(AEP exampe): Fix contract in AEPP example
 
 * **Tx:** Fixed issue with big numbers and `TX`
 
-
-
 ## [1.0.1](https://github.com/aeternity/aepp-sdk-js/compare/1.0.0...1.0.1) (2018-11-30)
-
-
 
 ### Features
 
 * **Node:** ability to support Node range(s) using semver package (see https://www.npmjs.com/package/semver#ranges)
 
-
 ### BREAKING CHANGES
 
 * **Node:** Support for Node >= 1.0.0 and < 2.0.0
 
-
-
 ## [1.0.0](https://github.com/aeternity/aepp-sdk-js/compare/0.25.0-0.1.1...1.0.0) (2018-11-30)
-
-
 
 ### Features
 
 * **Contract:** Contract native Transactions
 
-
 ### Bug Fixes
 
 * **BigNumber:** Rolled back to bignumbers.js for easier fix with axios.get/post
-
 
 ### BREAKING CHANGES
 
@@ -1518,24 +1287,17 @@ fix(AEP exampe): Fix contract in AEPP example
 * **Build:** New NETWORK_ID (also used in docker/sdk.env for CI tests)
 * **Protocol:** Encoding of transaction (and other objects) [changed from base58check to base64check](https://github.com/aeternity/protocol/blob/master/node/api/api_encoding.md)
 
-
 ### Notes and known Issues
 
 * **Channel:** State Channels have been excluded for problems with CI, will be included in next release
 
-
-
 ## [0.25.0-0.1.1](https://github.com/aeternity/aepp-sdk-js/compare/0.25.0-0.1.0...0.25.0-0.1.1) (2018-11-30)
-
 
 ### Notes and known Issues
 
 * **Chore:** See [0.25.0-0.1.0]
 
-
-
 ## [0.25.0-0.1.0](https://github.com/aeternity/aepp-sdk-js/compare/0.25.0-0.1.0-next...0.25.0-0.1.0) (2018-11-30)
-
 
 ### Features
 
@@ -1544,16 +1306,12 @@ fix(AEP exampe): Fix contract in AEPP example
 * **Tx** Implement native build of `AENS` transaction.
 * **Keystore** Update keystore for new [requirements](https://www.pivotaltracker.com/n/projects/2124891/stories/155155204)
 
-
 ### BREAKING CHANGES
 
 * **CLI** [AE CLI](https://github.com/aeternity/aecli-js) and [AE PROJECT CLI](https://github.com/aeternity/aeproject) moved to separate repos and packages
 * **Node** Support for < 0.25.0
 
-
-
 ## [0.25.0-0.1.0-next](https://github.com/aeternity/aepp-sdk-js/compare/0.24.0-0.2.0...0.25.0-0.1.0-next) (2018-11-30)
-
 
 ### Features
 
@@ -1564,18 +1322,13 @@ fix(AEP exampe): Fix contract in AEPP example
 
 * **Contract** Fixed keystore by adding a salt param for derivedKey function
 
-
 ### Breaking Changes
 
 * **Contract** Support for < 0.25.0
 * **Contract** Aens use domain `.test` instead of `.aet` (see [here](https://github.com/aeternity/aepp-sdk-js/commit/9c252f937f7ea501c4aaacbbef53c4c1833e48e4#diff-8ef3b328d008ef3dbb72a0bca42eba37L24))
 * **Contract** Use NETWORK_ID for signing (see [here](https://github.com/aeternity/aepp-sdk-js/commit/9c252f937f7ea501c4aaacbbef53c4c1833e48e4#diff-ffb275ebb09085c85c59f140998199e0R28))
 
-
-
-# [0.24.0-0.2.0](https://github.com/aeternity/aepp-sdk-js/compare/v0.24.0-0.1.0...v0.24.0-0.2.0) (2018-10-30)
-
-
+## [0.24.0-0.2.0](https://github.com/aeternity/aepp-sdk-js/compare/v0.24.0-0.1.0...v0.24.0-0.2.0) (2018-10-30)
 
 ### Features
 
@@ -1584,7 +1337,6 @@ fix(AEP exampe): Fix contract in AEPP example
 * **CLI**  born
 * **CLI** `Host` parameter became `Url`. (`-u` for hostname, `-U` for internal)
 * **CLI** New keystore following these specifications: https://www.pivotaltracker.com/n/projects/2124891/stories/155155204
-
 
 ### BREAKING CHANGES
 
@@ -1595,11 +1347,7 @@ fix(AEP exampe): Fix contract in AEPP example
 
 * **Chore** CLI and AE PROJECT CLI will move to a separate package
 
-
-
-
-# [0.24.0-0.1.0](https://github.com/aeternity/aepp-sdk-js/compare/0.22.0-0.1.0-beta.1...v0.24.0-0.1.0) (2018-10-23)
-
+## [0.24.0-0.1.0](https://github.com/aeternity/aepp-sdk-js/compare/0.22.0-0.1.0-beta.1...v0.24.0-0.1.0) (2018-10-23)
 
 ### Features
 
@@ -1615,16 +1363,13 @@ fix(AEP exampe): Fix contract in AEPP example
 * **Chore** Update `docco` config and change `rename` package to `recursive-rename`
 * **Docs** Improved documentation
 
-
 ### BREAKING CHANGES
 
 * **Node** Support for < 0.24.0
 * **Keystore** `ethereum keystore` usage will be removed in the next release
 * **CLI** CLI will move to a separate package
 
-
-
-# [0.22.0-0.1.0-beta.1](https://github.com/aeternity/aepp-sdk-js/compare/v0.18.0-0.1.1...0.22.0-0.1.0-beta.1) (2018-10-02)
+## [0.22.0-0.1.0-beta.1](https://github.com/aeternity/aepp-sdk-js/compare/v0.18.0-0.1.1...0.22.0-0.1.0-beta.1) (2018-10-02)
 
 ### Features
 
@@ -1648,9 +1393,7 @@ fix(AEP exampe): Fix contract in AEPP example
 
 * **Node** Support for < 0.22.0
 
-
-
-# [0.18.0-0.1.1](https://github.com/aeternity/aepp-sdk-js/compare/v0.18.0-0.1.0...v0.18.0-0.1.1) (2018-07-31)
+## [0.18.0-0.1.1](https://github.com/aeternity/aepp-sdk-js/compare/v0.18.0-0.1.0...v0.18.0-0.1.1) (2018-07-31)
 
 ### Features
 
@@ -1664,10 +1407,7 @@ fix(AEP exampe): Fix contract in AEPP example
 * **Docs** Structure of documentation
 * **Docs** Generate Markdown from Docco
 
-
-
-# [0.18.0-0.1.0](https://github.com/aeternity/aepp-sdk-js/compare/v0.15.0-0.1.0...v0.18.0-0.1.0) (2018-07-24)
-
+## [0.18.0-0.1.0](https://github.com/aeternity/aepp-sdk-js/compare/v0.15.0-0.1.0...v0.18.0-0.1.0) (2018-07-24)
 
 ### Features
 
@@ -1680,27 +1420,20 @@ fix(AEP exampe): Fix contract in AEPP example
 * **Build** Module load path (src -> es)
 * **Chore** Lower mining rate (5s) in docker-compose
 
-
 ### Bug Fixes
 
 * **Crypto** Symmetric key encryption/decryption
-
 
 ### BREAKING CHANGES
 
 * **Node** Support for < 0.18.0 (changed endpoints)
 
-
-
-
-# [0.15.0-0.1.0](https://github.com/aeternity/aepp-sdk-js/compare/v0.14.0-0.1.0...v0.15.0-0.1.0) (2018-06-12)
-
+## [0.15.0-0.1.0](https://github.com/aeternity/aepp-sdk-js/compare/v0.14.0-0.1.0...v0.15.0-0.1.0) (2018-06-12)
 
 ### Features
 
 * **Node** Legacy Swagger file loading
 * **Node** Compatibility with < 0.15.0
-
 
 ### Bug Fixes
 
@@ -1708,10 +1441,7 @@ fix(AEP exampe): Fix contract in AEPP example
 * **Node** Missing required parameter for name transfers (workaround for
   [Swagger file bug](https://www.pivotaltracker.com/n/projects/2124891))
 
-
-
-# [0.14.0-0.1.0](https://github.com/aeternity/aepp-sdk-js/compare/v0.13.0-0.1.1...v0.14.0-0.1.0) (2018-06-11)
-
+## [0.14.0-0.1.0](https://github.com/aeternity/aepp-sdk-js/compare/v0.13.0-0.1.1...v0.14.0-0.1.0) (2018-06-11)
 
 ### Features
 
@@ -1723,11 +1453,9 @@ fix(AEP exampe): Fix contract in AEPP example
 * **API** Adapted new method of obtaining transaction hash, breaks compatibility (see
   below)
 
-
 ### Bug Fixes
 
 * **API** [GH-49]: Handle existing path components correctly
-
 
 ### BREAKING CHANGES
 * **API** Remove Oracle API (for the time being)
@@ -1735,10 +1463,7 @@ fix(AEP exampe): Fix contract in AEPP example
 * **API** Remove Compatibility with older versions of Node which provide the transaction hash
   the old way
 
-
-
-# [0.13.0-0.1.1](https://github.com/aeternity/aepp-sdk-js/compare/v0.13.0-0.1.0...v0.13.0-0.1.1) (2018-05-24)
-
+## [0.13.0-0.1.1](https://github.com/aeternity/aepp-sdk-js/compare/v0.13.0-0.1.0...v0.13.0-0.1.1) (2018-05-24)
 
 ### Features
 
@@ -1750,11 +1475,9 @@ fix(AEP exampe): Fix contract in AEPP example
 * **Chore** Authors are now taken from `AUTHORS` instead of `package.json`
 * **Docs** Moved code examples from README to separate file in docs
 
-
 ### BREAKING CHANGES
 
 * **Node** Defunct scripts; will be brought back later
-
 
 ### Bug Fixes
 
