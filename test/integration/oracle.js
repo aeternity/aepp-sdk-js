@@ -79,6 +79,6 @@ describe('Oracle', function () {
 
   it('Poll for response', async () => {
     const response = await query.pollForResponse({ attempts: 2, interval: 1000 })
-    response.decode().toString().should.be.equal(queryResponse)
+    response.should.be.equal(queryResponse)
   })
 })
