@@ -16,7 +16,7 @@
     "docs:examples": "node tooling/docs/examples-to-md.js examples/node/*.js",
     "docs:api": "node apidoc.js",
     "docs:changelog": "cp CHANGELOG.md docs/CHANGELOG.md",
-    "lint": "commitlint --from develop --verbose && ts-standard",
+    "lint": "commitlint --from 635f1aa --verbose && ts-standard",
     "test": "nyc --require @babel/register --require ts-node/register mocha --recursive --exit --timeout 10m",
     "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "test:integration:channel,accounts": "nyc --require @babel/register --require ts-node/register mocha './test/integration/@(channel|accounts).js' --exit --timeout 10m",
