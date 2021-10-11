@@ -23,10 +23,11 @@ import MemoryAccount from '../../src/account/memory'
 import { AE_AMOUNT_FORMATS } from '../../src/utils/amount-formatter'
 
 describe('Accounts', function () {
-  let wallet
+  let wallet, openClient
 
   before(async function () {
     wallet = await getSdk()
+    openClient = await getSdk({ withoutAccount: true })
   })
 
   const receiverKey = generateKeyPair()
@@ -177,6 +178,16 @@ describe('Accounts', function () {
         e.message.should.be.equal('Account for ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk not available')
       }
     })
+
+    it('Fail on no accounts', async () => {
+      // SPEND
+      try {
+        await openClient.spend(1, await wallet.address())
+      } catch (e) {
+        e.message.should.be.equal('No account or wallet configured')
+      }
+    })
+
     it('Invalid on account options', async () => {
       try {
         await wallet.sign('tx_Aasdasd', { onAccount: 123 })
