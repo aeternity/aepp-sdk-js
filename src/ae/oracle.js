@@ -177,7 +177,8 @@ async function registerOracle (queryFormat, responseFormat, options = {}) {
  * @return {Promise<Object>} Query object
  */
 async function postQueryToOracle (oracleId, query, options = {}) {
-  const opt = R.merge(this.Ae.defaults, options)
+  const oracle = await this.api.getOracleByPubkey(oracleId)
+  const opt = R.mergeAll([this.Ae.defaults, oracle, options])
   const senderId = await this.address(opt)
 
   const oracleRegisterTx = await this.oraclePostQueryTx(R.merge(opt, {

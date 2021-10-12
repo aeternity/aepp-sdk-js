@@ -19,6 +19,7 @@ import { describe, it, before } from 'mocha'
 import { getSdk } from './'
 import { encodeBase64Check, generateKeyPair } from '../../src/utils/crypto'
 import MemoryAccount from '../../src/account/memory'
+import { QUERY_FEE } from '../../src/tx/builder/schema'
 
 describe('Oracle', function () {
   let client
@@ -80,5 +81,32 @@ describe('Oracle', function () {
   it('Poll for response', async () => {
     const response = await query.pollForResponse({ attempts: 2, interval: 1000 })
     response.decode().toString().should.be.equal(queryResponse)
+  })
+
+  describe('Oracle query fee settings', async () => {
+    let oracleWithFee
+    const queryFee = 24000
+    const account = generateKeyPair()
+
+    before(async function () {
+      await client.spend('1' + '0'.repeat(15), account.publicKey)
+      client.addAccount(MemoryAccount({ keypair: account }), { select: true })
+      oracleWithFee = await client.registerOracle("{'city': str}", "{'tmp': num}", { queryFee, onAccount: account })
+    })
+
+    it('Post Oracle Query with default query fee', async () => {
+      query = await oracle.postQuery("{'city': 'Berlin'}")
+      query.tx.queryFee.should.be.equal(QUERY_FEE)
+    })
+
+    it('Post Oracle Query with registered query fee', async () => {
+      query = await oracleWithFee.postQuery("{'city': 'Berlin'}")
+      query.tx.queryFee.should.be.equal(queryFee)
+    })
+
+    it('Post Oracle Query with custom query fee', async () => {
+      query = await oracleWithFee.postQuery("{'city': 'Berlin'}", { queryFee: queryFee + 2000 })
+      query.tx.queryFee.should.be.equal(queryFee + 2000)
+    })
   })
 })
