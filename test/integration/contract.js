@@ -191,19 +191,19 @@ const filesystem = {
 }
 
 describe('Contract', function () {
-  let contract
+  let sdk
   let bytecode
   let deployed
 
   before(async function () {
-    contract = await getSdk()
+    sdk = await getSdk()
   })
   describe('Aens and Oracle operation delegation', () => {
     let cInstance
     let cInstanceOracle
     before(async () => {
-      cInstance = await contract.getContractInstance(aensDelegationContract)
-      cInstanceOracle = await contract.getContractInstance(oracleContract)
+      cInstance = await sdk.getContractInstance(aensDelegationContract)
+      cInstanceOracle = await sdk.getContractInstance(oracleContract)
       await cInstance.deploy()
       await cInstanceOracle.deploy()
     })
@@ -211,72 +211,72 @@ describe('Contract', function () {
       const name = randomName(15)
       const contractId = cInstance.deployInfo.address
       const nameFee = 20 * (10 ** 18) // 20 AE
-      const currentOwner = await contract.address()
+      const currentOwner = await sdk.address()
 
       // preclaim
-      const { salt: _salt } = await contract.aensPreclaim(name)
+      const { salt: _salt } = await sdk.aensPreclaim(name)
       // @TODO enable after next HF
       // const commitmentId = commitmentHash(name, _salt)
-      const preclaimSig = await contract.createAensDelegationSignature({ contractId }, { onAccount: currentOwner })
+      const preclaimSig = await sdk.createAensDelegationSignature({ contractId }, { onAccount: currentOwner })
       console.log(`preclaimSig -> ${preclaimSig}`)
       // const preclaim = await cInstance.methods.signedPreclaim(await contract.address(), commitmentId, preclaimSig)
       // preclaim.result.returnType.should.be.equal('ok')
-      await contract.awaitHeight((await contract.height()) + 2)
+      await sdk.awaitHeight((await sdk.height()) + 2)
 
       // Signature for any other name related operations
-      const aensDelegationSig = await contract.createAensDelegationSignature({ contractId, name }, { onAccount: currentOwner })
+      const aensDelegationSig = await sdk.createAensDelegationSignature({ contractId, name }, { onAccount: currentOwner })
 
       // claim
-      const claim = await cInstance.methods.signedClaim(await contract.address(), name, _salt, nameFee, aensDelegationSig)
+      const claim = await cInstance.methods.signedClaim(await sdk.address(), name, _salt, nameFee, aensDelegationSig)
       claim.result.returnType.should.be.equal('ok')
-      await contract.awaitHeight((await contract.height()) + 2)
+      await sdk.awaitHeight((await sdk.height()) + 2)
 
       // transfer
-      const newOwner = contract.addresses().find(acc => acc !== currentOwner)
-      const transfer = await cInstance.methods.signedTransfer(await contract.address(), newOwner, name, aensDelegationSig)
+      const newOwner = sdk.addresses().find(acc => acc !== currentOwner)
+      const transfer = await cInstance.methods.signedTransfer(await sdk.address(), newOwner, name, aensDelegationSig)
       transfer.result.returnType.should.be.equal('ok')
-      await contract.awaitHeight((await contract.height()) + 2)
+      await sdk.awaitHeight((await sdk.height()) + 2)
 
       // revoke
-      const revokeSig = await contract.createAensDelegationSignature({ contractId, name }, { onAccount: newOwner })
+      const revokeSig = await sdk.createAensDelegationSignature({ contractId, name }, { onAccount: newOwner })
       const revoke = await cInstance.methods.signedRevoke(newOwner, name, revokeSig)
       revoke.result.returnType.should.be.equal('ok')
 
       try {
-        await contract.aensQuery(name)
+        await sdk.aensQuery(name)
       } catch (e) {
         e.message.should.be.an('string')
       }
     })
     it('Delegate Oracle operations', async () => {
       const contractId = cInstanceOracle.deployInfo.address
-      const current = await contract.address()
-      const onAccount = contract.addresses().find(acc => acc !== current)
+      const current = await sdk.address()
+      const onAccount = sdk.addresses().find(acc => acc !== current)
       const qFee = 500000
       const ttl = 'RelativeTTL(50)'
       const oracleId = `ok_${onAccount.slice(3)}`
 
-      const oracleDelegationSig = await contract.createOracleDelegationSignature({ contractId }, { onAccount })
+      const oracleDelegationSig = await sdk.createOracleDelegationSignature({ contractId }, { onAccount })
 
       // register Oracle
       const oracleRegister = await cInstanceOracle.methods.signedRegisterOracle(onAccount, oracleDelegationSig, qFee, ttl, { onAccount })
       oracleRegister.result.returnType.should.be.equal('ok')
-      const oracle = await contract.getOracleObject(oracleId)
+      const oracle = await sdk.getOracleObject(oracleId)
       oracle.id.should.be.equal(oracleId)
 
       // extend oracle
       const queryExtend = await cInstanceOracle.methods.signedExtendOracle(oracleId, oracleDelegationSig, ttl, { onAccount })
       queryExtend.result.returnType.should.be.equal('ok')
-      const oracleExtended = await contract.getOracleObject(oracleId)
+      const oracleExtended = await sdk.getOracleObject(oracleId)
       console.log(oracleExtended)
       oracleExtended.ttl.should.be.equal(oracle.ttl + 50)
 
       // create query
       const q = 'Hello!'
-      const newOracle = await contract.registerOracle('string', 'int', { queryFee: qFee })
+      const newOracle = await sdk.registerOracle('string', 'int', { queryFee: qFee })
       const query = await cInstanceOracle.methods.createQuery(newOracle.id, q, 1000 + qFee, ttl, ttl, { onAccount, amount: 5 * qFee })
       query.should.be.an('object')
-      const queryObject = await contract.getQueryObject(newOracle.id, query.decodedResult)
+      const queryObject = await sdk.getQueryObject(newOracle.id, query.decodedResult)
       queryObject.should.be.an('object')
       queryObject.decodedQuery.should.be.equal(q)
       console.log(queryObject)
@@ -284,37 +284,37 @@ describe('Contract', function () {
       // respond to query
       const r = 'Hi!'
       const queryId = queryObject.id
-      const respondSig = await contract.createOracleDelegationSignature({ contractId, queryId })
+      const respondSig = await sdk.createOracleDelegationSignature({ contractId, queryId })
       const response = await cInstanceOracle.methods.respond(newOracle.id, queryObject.id, respondSig, r, { onAccount })
       console.log(response)
-      const queryObject2 = await contract.getQueryObject(newOracle.id, queryObject.id)
+      const queryObject2 = await sdk.getQueryObject(newOracle.id, queryObject.id)
       console.log(queryObject2)
       queryObject2.decodedResponse.should.be.equal(r)
     })
   })
   it('precompiled bytecode can be deployed', async () => {
-    const { version, consensusProtocolVersion } = contract.getNodeInfo()
-    console.log(`Node => ${version}, consensus => ${consensusProtocolVersion}, compiler => ${contract.compilerVersion}`)
-    const code = await contract.contractCompile(identityContract)
-    return contract.contractDeploy(code.bytecode, identityContract).should.eventually.have.property('address')
+    const { version, consensusProtocolVersion } = sdk.getNodeInfo()
+    console.log(`Node => ${version}, consensus => ${consensusProtocolVersion}, compiler => ${sdk.compilerVersion}`)
+    const code = await sdk.contractCompile(identityContract)
+    return sdk.contractDeploy(code.bytecode, identityContract).should.eventually.have.property('address')
   })
   it('enforce zero deposit for contract deployment', async () => {
-    const { version, consensusProtocolVersion } = contract.getNodeInfo()
-    console.log(`Node => ${version}, consensus => ${consensusProtocolVersion}, compiler => ${contract.compilerVersion}`)
-    const code = await contract.contractCompile(identityContract)
-    var { txData } = await contract.contractDeploy(code.bytecode, identityContract, [], { deposit: 10 })
+    const { version, consensusProtocolVersion } = sdk.getNodeInfo()
+    console.log(`Node => ${version}, consensus => ${consensusProtocolVersion}, compiler => ${sdk.compilerVersion}`)
+    const code = await sdk.contractCompile(identityContract)
+    var { txData } = await sdk.contractDeploy(code.bytecode, identityContract, [], { deposit: 10 })
     return txData.tx.deposit.should.be.equal(0)
   })
   it('Verify message in Sophia', async () => {
     const msgHash = messageToHash('Hello')
-    const signature = await contract.sign(msgHash)
-    const signContract = await contract.getContractInstance(signSource)
+    const signature = await sdk.sign(msgHash)
+    const signContract = await sdk.getContractInstance(signSource)
     await signContract.deploy()
-    const { decodedResult } = await signContract.methods.verify(msgHash, await contract.address(), signature)
+    const { decodedResult } = await signContract.methods.verify(msgHash, await sdk.address(), signature)
     decodedResult.should.be.equal(true)
   })
   it('compiles Sophia code', async () => {
-    bytecode = await contract.contractCompile(identityContract)
+    bytecode = await sdk.contractCompile(identityContract)
     return bytecode.should.have.property('bytecode')
   })
 
@@ -331,26 +331,26 @@ describe('Contract', function () {
 
   it('Deploy/Call/Dry-run contract using callData', async () => {
     const callArg = 1
-    const { bytecode } = await contract.contractCompile(identityContract)
-    const callDataDeploy = await contract.contractEncodeCall(identityContract, 'init', [])
-    const callDataCall = await contract.contractEncodeCall(identityContract, 'getArg', [callArg.toString()])
+    const { bytecode } = await sdk.contractCompile(identityContract)
+    const callDataDeploy = await sdk.contractEncodeCall(identityContract, 'init', [])
+    const callDataCall = await sdk.contractEncodeCall(identityContract, 'getArg', [callArg.toString()])
 
-    const deployStatic = await contract.contractCallStatic(identityContract, null, 'init', callDataDeploy, { bytecode })
+    const deployStatic = await sdk.contractCallStatic(identityContract, null, 'init', callDataDeploy, { bytecode })
     deployStatic.result.should.have.property('gasUsed')
     deployStatic.result.should.have.property('returnType')
 
-    const deployed = await contract.contractDeploy(bytecode, identityContract, callDataDeploy)
+    const deployed = await sdk.contractDeploy(bytecode, identityContract, callDataDeploy)
     deployed.result.should.have.property('gasUsed')
     deployed.result.should.have.property('returnType')
     deployed.should.have.property('address')
 
-    const callStaticRes = await contract.contractCallStatic(identityContract, deployed.address, 'getArg', callDataCall)
+    const callStaticRes = await sdk.contractCallStatic(identityContract, deployed.address, 'getArg', callDataCall)
     callStaticRes.result.should.have.property('gasUsed')
     callStaticRes.result.should.have.property('returnType')
     const decodedCallStaticResult = await callStaticRes.decode()
     decodedCallStaticResult.should.be.equal(callArg)
 
-    const callRes = await contract.contractCall(identityContract, deployed.address, 'getArg', callDataCall)
+    const callRes = await sdk.contractCall(identityContract, deployed.address, 'getArg', callDataCall)
     callRes.result.should.have.property('gasUsed')
     callRes.result.should.have.property('returnType')
     callRes.result.should.have.property('returnType')
@@ -359,8 +359,8 @@ describe('Contract', function () {
   })
 
   it('Deploy and call contract on specific account', async () => {
-    const current = await contract.address()
-    const onAccount = contract.addresses().find(acc => acc !== current)
+    const current = await sdk.address()
+    const onAccount = sdk.addresses().find(acc => acc !== current)
 
     const deployed = await bytecode.deploy([], { onAccount })
     deployed.result.callerId.should.be.equal(onAccount)
@@ -372,22 +372,22 @@ describe('Contract', function () {
 
   it('Call-Static deploy transaction', async () => {
     const compiled = bytecode.bytecode
-    const res = await contract.contractCallStatic(identityContract, null, 'init', [], { bytecode: compiled })
+    const res = await sdk.contractCallStatic(identityContract, null, 'init', [], { bytecode: compiled })
     res.result.should.have.property('gasUsed')
     res.result.should.have.property('returnType')
   })
 
   it('Call-Static deploy transaction on specific hash', async () => {
-    const { hash } = await contract.topBlock()
+    const { hash } = await sdk.topBlock()
     const compiled = bytecode.bytecode
-    const res = await contract.contractCallStatic(identityContract, null, 'init', [], { bytecode: compiled, top: hash })
+    const res = await sdk.contractCallStatic(identityContract, null, 'init', [], { bytecode: compiled, top: hash })
     res.result.should.have.property('gasUsed')
     res.result.should.have.property('returnType')
   })
 
   describe('_handleCallError', () => {
     it('throws error on deploy', async () => {
-      const code = await contract.contractCompile(contractWithBrokenDeploy)
+      const code = await sdk.contractCompile(contractWithBrokenDeploy)
       try {
         await code.deploy()
       } catch (e) {
@@ -396,10 +396,10 @@ describe('Contract', function () {
     })
 
     it('throws errors on method call', async () => {
-      const code = await contract.contractCompile(contractWithBrokenMethods)
+      const code = await sdk.contractCompile(contractWithBrokenMethods)
       const deployed = await code.deploy()
       try {
-        await deployed.call('failWithoutMessage', [await contract.address()])
+        await deployed.call('failWithoutMessage', [await sdk.address()])
       } catch (e) {
         e.message.should.be.equal('Invocation failed')
       }
@@ -428,13 +428,13 @@ describe('Contract', function () {
 
   it('call contract/deploy with waitMined: false', async () => {
     const deployed = await bytecode.deploy([], { waitMined: false })
-    await contract.poll(deployed.transaction, { interval: 50, attempts: 1200 })
+    await sdk.poll(deployed.transaction, { interval: 50, attempts: 1200 })
     expect(deployed.result).to.be.equal(undefined)
     deployed.txData.should.not.be.equal(undefined)
     const result = await deployed.call('getArg', ['42'], { waitMined: false })
     expect(result.result).to.be.equal(undefined)
     result.txData.should.not.be.equal(undefined)
-    await contract.poll(result.hash, { interval: 50, attempts: 1200 })
+    await sdk.poll(result.hash, { interval: 50, attempts: 1200 })
   })
 
   it('calls deployed contracts static', async () => {
@@ -444,7 +444,7 @@ describe('Contract', function () {
 
   it('initializes contract state', async () => {
     const data = '"Hello World!"'
-    return contract.contractCompile(stateContract)
+    return sdk.contractCompile(stateContract)
       .then(bytecode => bytecode.deploy([data]))
       .then(deployed => deployed.call('retrieve'))
       .then(result => result.decode())
@@ -460,12 +460,12 @@ describe('Contract', function () {
       const filesystem = {
         testLib: libContract
       }
-      const compiled = await contract.contractCompile(contractWithLib, { filesystem })
+      const compiled = await sdk.contractCompile(contractWithLib, { filesystem })
       compiled.should.have.property('bytecode')
     })
     it('Throw error when try to compile contract without providing external deps', async () => {
       try {
-        await contract.contractCompile(contractWithLib)
+        await sdk.contractCompile(contractWithLib)
       } catch (e) {
         e.response.text.should.include('Couldn\'t find include file')
       }
@@ -474,7 +474,7 @@ describe('Contract', function () {
       const filesystem = {
         testLib: libContract
       }
-      const compiled = await contract.contractCompile(contractWithLib, { filesystem })
+      const compiled = await sdk.contractCompile(contractWithLib, { filesystem })
       deployed = await compiled.deploy()
       deployed.should.have.property('address')
 
@@ -500,54 +500,54 @@ describe('Contract', function () {
     let callData
     let bytecode
     it('compile', async () => {
-      bytecode = await contract.compileContractAPI(identityContract)
+      bytecode = await sdk.compileContractAPI(identityContract)
       const prefix = bytecode.slice(0, 2)
       const isString = typeof bytecode === 'string'
       prefix.should.be.equal('cb')
       isString.should.be.equal(true)
     })
     it('Get FATE assembler', async () => {
-      const result = await contract.getFateAssembler(bytecode)
+      const result = await sdk.getFateAssembler(bytecode)
       result.should.be.a('object')
       const assembler = result['fate-assembler']
       assembler.should.be.a('string')
     })
     it('Get compiler version from bytecode', async () => {
-      const version = await contract.getBytecodeCompilerVersion(bytecode)
+      const version = await sdk.getBytecodeCompilerVersion(bytecode)
       console.log(version)
     })
     it('get contract ACI', async () => {
-      const aci = await contract.contractGetACI(identityContract)
+      const aci = await sdk.contractGetACI(identityContract)
       aci.should.have.property('interface')
     })
     it('encode call-data', async () => {
-      callData = await contract.contractEncodeCallDataAPI(identityContract, 'init', [])
+      callData = await sdk.contractEncodeCallDataAPI(identityContract, 'init', [])
       const prefix = callData.slice(0, 2)
       const isString = typeof callData === 'string'
       prefix.should.be.equal('cb')
       isString.should.be.equal(true)
     })
     it('decode call result', async () => {
-      return contract.contractDecodeCallResultAPI(identityContract, 'getArg', encodedNumberSix, 'ok').should.eventually.become(6)
+      return sdk.contractDecodeCallResultAPI(identityContract, 'getArg', encodedNumberSix, 'ok').should.eventually.become(6)
     })
     it('Decode call-data using source', async () => {
-      const decodedCallData = await contract.contractDecodeCallDataBySourceAPI(identityContract, 'init', callData)
+      const decodedCallData = await sdk.contractDecodeCallDataBySourceAPI(identityContract, 'init', callData)
       decodedCallData.arguments.should.be.an('array')
       decodedCallData.arguments.length.should.be.equal(0)
       decodedCallData.function.should.be.equal('init')
     })
     it('Decode call-data using bytecode', async () => {
-      const decodedCallData = await contract.contractDecodeCallDataByCodeAPI(bytecode, callData)
+      const decodedCallData = await sdk.contractDecodeCallDataByCodeAPI(bytecode, callData)
       decodedCallData.arguments.should.be.an('array')
       decodedCallData.arguments.length.should.be.equal(0)
       decodedCallData.function.should.be.equal('init')
     })
     it('validate bytecode', async () => {
-      return contract.validateByteCodeAPI(bytecode, identityContract).should.eventually.become(true)
+      return sdk.validateByteCodeAPI(bytecode, identityContract).should.eventually.become(true)
     })
     it('Use invalid compiler url', async () => {
       try {
-        const cloned = R.clone(contract)
+        const cloned = R.clone(sdk)
         await cloned.setCompilerUrl('https://compiler.aepps.comas')
       } catch (e) {
         e.message.should.be.equal('request to https://compiler.aepps.comas/api failed, reason: getaddrinfo ENOTFOUND compiler.aepps.comas')
@@ -565,13 +565,13 @@ describe('Contract', function () {
       let decodedEventsUsingBuildInMethod
 
       before(async () => {
-        cInstance = await contract.getContractInstance(
-          genTestContract(contract._isCompiler6),
+        cInstance = await sdk.getContractInstance(
+          genTestContract(sdk._isCompiler6),
           { filesystem }
         )
         await cInstance.deploy(['test', 1, 'some'])
         eventResult = await cInstance.methods.emitEvents()
-        const { log } = await contract.tx(eventResult.hash)
+        const { log } = await sdk.tx(eventResult.hash)
         decodedEventsWithoutACI = decodeEvents(log, { schema: events })
         decodedEventsUsingACI = cInstance.decodeEvents('emitEvents', log)
         decodedEventsUsingBuildInMethod = cInstance.methods.emitEvents.decodeEvents(log)
@@ -616,8 +616,8 @@ describe('Contract', function () {
     })
 
     it('Generate ACI object', async () => {
-      contractObject = await contract.getContractInstance(
-        genTestContract(contract._isCompiler6),
+      contractObject = await sdk.getContractInstance(
+        genTestContract(sdk._isCompiler6),
         { filesystem, opt: { ttl: 0 } }
       )
       contractObject.should.have.property('interface')
@@ -646,8 +646,8 @@ describe('Contract', function () {
       res.result.should.have.property('returnType')
     })
     it('Dry-run deploy fn on specific account', async () => {
-      const current = await contract.address()
-      const onAccount = contract.addresses().find(acc => acc !== current)
+      const current = await sdk.address()
+      const onAccount = sdk.addresses().find(acc => acc !== current)
       const { result } = await contractObject.methods.init.get('123', 1, 'hahahaha', { onAccount })
       result.should.have.property('gasUsed')
       result.should.have.property('returnType')
@@ -661,34 +661,34 @@ describe('Contract', function () {
     })
     it('Deploy/Call contract with waitMined: false', async () => {
       const deployed = await contractObject.methods.init('123', 1, 'hahahaha', { waitMined: false })
-      await contract.poll(deployed.transaction, { interval: 50, attempts: 1200 })
+      await sdk.poll(deployed.transaction, { interval: 50, attempts: 1200 })
       expect(deployed.result).to.be.equal(undefined)
       expect(deployed.txData).to.be.equal(undefined)
       const result = await contractObject.methods.intFn.send(2, { waitMined: false })
       expect(result.result).to.be.equal(undefined)
       result.txData.should.not.be.equal(undefined)
-      await contract.poll(result.hash, { interval: 50, attempts: 1200 })
+      await sdk.poll(result.hash, { interval: 50, attempts: 1200 })
     })
     it('Generate ACI object with corresponding bytecode', async () => {
-      await contract.getContractInstance(
-        genTestContract(contract._isCompiler6),
+      await sdk.getContractInstance(
+        genTestContract(sdk._isCompiler6),
         { contractAddress: contractObject.deployInfo.address, filesystem, opt: { ttl: 0 } }
       )
     })
     it('Generate ACI object with not corresponding bytecode', async () => {
       try {
-        await contract.getContractInstance(identityContract, { contractAddress: contractObject.deployInfo.address, opt: { ttl: 0 } })
+        await sdk.getContractInstance(identityContract, { contractAddress: contractObject.deployInfo.address, opt: { ttl: 0 } })
       } catch (e) {
         e.message.should.be.equal('Contract source do not correspond to the contract bytecode deployed on the chain')
       }
     })
     it('Generate ACI object with not corresponding bytecode and force this check', async () => {
-      await contract.getContractInstance(identityContract, { forceCodeCheck: true, contractAddress: contractObject.deployInfo.address, opt: { ttl: 0 } })
+      await sdk.getContractInstance(identityContract, { forceCodeCheck: true, contractAddress: contractObject.deployInfo.address, opt: { ttl: 0 } })
     })
     it('Throw error on creating contract instance with invalid contractAddress', async () => {
       try {
-        await contract.getContractInstance(
-          genTestContract(contract._isCompiler6),
+        await sdk.getContractInstance(
+          genTestContract(sdk._isCompiler6),
           { filesystem, contractAddress: 'ct_asdasdasd', opt: { ttl: 0 } }
         )
       } catch (e) {
@@ -698,8 +698,8 @@ describe('Contract', function () {
     it('Throw error on creating contract instance with contract address which is not found on-chain or not active', async () => {
       const contractAddress = 'ct_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT'
       try {
-        await contract.getContractInstance(
-          genTestContract(contract._isCompiler6),
+        await sdk.getContractInstance(
+          genTestContract(sdk._isCompiler6),
           { filesystem, contractAddress, opt: { ttl: 0 } }
         )
       } catch (e) {
@@ -715,14 +715,14 @@ describe('Contract', function () {
       }
     })
     it('Can pay to payable function', async () => {
-      const contractBalance = await contract.balance(contractObject.deployInfo.address)
+      const contractBalance = await sdk.balance(contractObject.deployInfo.address)
       await contractObject.methods.stringFn.send('1', { amount: 100 })
-      const balanceAfter = await contract.balance(contractObject.deployInfo.address)
+      const balanceAfter = await sdk.balance(contractObject.deployInfo.address)
       balanceAfter.should.be.equal(`${+contractBalance + 100}`)
     })
     it('Call contract on specific account', async () => {
-      const current = await contract.address()
-      const onAccount = contract.addresses().find(acc => acc !== current)
+      const current = await sdk.address()
+      const onAccount = sdk.addresses().find(acc => acc !== current)
       const { result } = await contractObject.methods.intFn('123', { onAccount })
       result.callerId.should.be.equal(onAccount)
     })
@@ -782,8 +782,8 @@ describe('Contract', function () {
           }
         })
         it('Return address', async () => {
-          const { decodedResult } = await contractObject.methods.accountAddress(await contract.address())
-          decodedResult.should.be.equal(await contract.address())
+          const { decodedResult } = await contractObject.methods.accountAddress(await sdk.address())
+          decodedResult.should.be.equal(await sdk.address())
         })
         it('Valid', async () => {
           const { decodedResult } = await contractObject.methods.addressFn('ak_2ct6nMwmRnyGX6jPhraFPedZ5bYp1GXqpvnAq5LXeL5TTPfFif')
@@ -986,7 +986,7 @@ describe('Contract', function () {
           }
         })
         it('Invalid length', async () => {
-          const address = await contract.address()
+          const address = await sdk.address()
           const decoded = Buffer.from(decode(address, 'ak').slice(1))
           try {
             await contractObject.methods.hashFn(decoded)
@@ -995,7 +995,7 @@ describe('Contract', function () {
           }
         })
         it('Valid', async () => {
-          const address = await contract.address()
+          const address = await sdk.address()
           const decoded = decode(address, 'ak')
           const hashAsBuffer = await contractObject.methods.hashFn(decoded)
           const hashAsHex = await contractObject.methods.hashFn(decoded.toString('hex'))
@@ -1012,7 +1012,7 @@ describe('Contract', function () {
           }
         })
         it('Invalid length', async () => {
-          const address = await contract.address()
+          const address = await sdk.address()
           const decoded = decode(address, 'ak')
           try {
             await contractObject.methods.signatureFn(decoded)
@@ -1021,9 +1021,9 @@ describe('Contract', function () {
           }
         })
         it('Valid', async () => {
-          const address = await contract.address()
+          const address = await sdk.address()
           const decoded = decode(address, 'ak')
-          const fakeSignature = Buffer.from(await contract.sign(decoded))
+          const fakeSignature = Buffer.from(await sdk.sign(decoded))
           const hashAsBuffer = await contractObject.methods.signatureFn(fakeSignature)
           const hashAsHex = await contractObject.methods.signatureFn(fakeSignature.toString('hex'))
           hashAsBuffer.decodedResult.should.be.equal(fakeSignature.toString('hex'))
@@ -1039,7 +1039,7 @@ describe('Contract', function () {
           }
         })
         it('Invalid length', async () => {
-          const address = await contract.address()
+          const address = await sdk.address()
           const decoded = decode(address, 'ak')
           try {
             await contractObject.methods.bytesFn(Buffer.from([...decoded, 2]))
@@ -1048,7 +1048,7 @@ describe('Contract', function () {
           }
         })
         it('Valid', async () => {
-          const address = await contract.address()
+          const address = await sdk.address()
           const decoded = decode(address, 'ak')
           const hashAsBuffer = await contractObject.methods.bytesFn(decoded)
           const hashAsHex = await contractObject.methods.bytesFn(decoded.toString('hex'))
@@ -1083,8 +1083,8 @@ describe('Contract', function () {
     describe('Type resolving', () => {
       let cInstance
       before(async () => {
-        cInstance = await contract.getContractInstance(
-          genTestContract(contract._isCompiler6),
+        cInstance = await sdk.getContractInstance(
+          genTestContract(sdk._isCompiler6),
           { filesystem }
         )
       })
