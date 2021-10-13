@@ -32,6 +32,7 @@ import BigNumber from 'bignumber.js'
 import { toBytes } from '../../src/utils/bytes'
 import { parseBigNumber } from '../../src/utils/bignumber'
 import { buildTx, unpackTx } from '../../src/tx/builder'
+import { NAME_BID_RANGES } from '../../src/tx/builder/schema'
 
 describe('Tx', function () {
   it('reproducible commitment hashes can be generated', async () => {
@@ -89,17 +90,9 @@ describe('Tx', function () {
 
   describe('getMinimumNameFee', () => {
     it('returns correct name fees', () => {
-      // protocol name fees: https://github.com/aeternity/protocol/blob/master/AENS.md#protocol-fees-and-protection-times
-      const nameFees = [
-        5702887, 3524578, 2178309, 1346269, 832040, 514229, 317811, 196418,
-        121393, 75025, 46368, 28657, 17711, 10946, 6765, 4181, 2584, 1597, 987,
-        610, 377, 233, 144, 89, 55, 34, 21, 13, 8, 5, 3
-      ]
-
-      for (let i = 0; i < nameFees.length; i++) {
-        getMinimumNameFee(randomName(i + 1))
-          .toString()
-          .should.be.equal(BigNumber(nameFees[i]).times(1e14).toString())
+      for (let i = 1; i <= Object.keys(NAME_BID_RANGES).length; i++) {
+        getMinimumNameFee(randomName(i)).toString()
+          .should.be.equal(NAME_BID_RANGES[i].toString())
       }
     })
   })
