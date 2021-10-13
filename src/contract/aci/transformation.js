@@ -71,7 +71,7 @@ export function decodeEvents (events, options = { schema: [] }) {
  * @param {String} type Event type from schema
  * @return {*}
  */
-export function transformEvent (event, type) {
+function transformEvent (event, type) {
   switch (type) {
     case SOPHIA_TYPES.int:
       return parseBigNumber(event)
@@ -88,7 +88,7 @@ export function transformEvent (event, type) {
   }
 }
 
-export function injectVars (t, aciType) {
+function injectVars (t, aciType) {
   const [[baseType, generic]] = Object.entries(aciType.typedef)
   const [[, varianValue]] = Object.entries(t)
   switch (baseType) {
@@ -115,7 +115,7 @@ export function injectVars (t, aciType) {
  * @param bindings
  * @return {Object}
  */
-export function linkTypeDefs (t, bindings) {
+function linkTypeDefs (t, bindings) {
   const [root, typeDef] = typeof t === 'object' ? Object.keys(t)[0].split('.') : t.split('.')
   const contractTypeDefs = bindings.find(c => c.name === root)
   const aciType = [
@@ -221,7 +221,7 @@ export function transform (type, value, { bindings } = {}) {
   return `${value}`
 }
 
-export function transformVariant (value, generic, { bindings }) {
+function transformVariant (value, generic, { bindings }) {
   const [[variant, variantArgs]] = typeof value === 'string' ? [[value, []]] : Object.entries(value)
   const [[v, type]] = Object.entries(generic.find(o => Object.keys(o)[0].toLowerCase() === variant.toLowerCase()))
   return `${v}${!type.length
@@ -232,7 +232,7 @@ export function transformVariant (value, generic, { bindings }) {
   }`
 }
 
-export function transformMap (value, generic, { bindings }) {
+function transformMap (value, generic, { bindings }) {
   if (!Array.isArray(value)) {
     if (value.entries) value = Array.from(value.entries())
     else if (value instanceof Object) value = Object.entries(value)
@@ -318,7 +318,7 @@ export function transformDecodedData (aci, result, { bindings } = {}) {
  * @param bindings
  * @return {Object} JoiSchema
  */
-export function prepareSchema (type, { bindings } = {}) {
+function prepareSchema (type, { bindings } = {}) {
   const { t, generic } = readType(type, { bindings })
 
   switch (t) {
@@ -379,7 +379,7 @@ export function prepareSchema (type, { bindings } = {}) {
  * @param errors
  * @return {Object} JoiError
  */
-export function getJoiErrorMsg (errors) {
+function getJoiErrorMsg (errors) {
   return errors.map(err => {
     const { path, type, context } = err
     let value = Object.prototype.hasOwnProperty.call(context, 'value') ? context.value : context.label
