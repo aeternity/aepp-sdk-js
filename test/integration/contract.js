@@ -1077,11 +1077,11 @@ describe('Contract', function () {
       })
       it('Resolve remote contract type', async () => {
         const fnACI = getFunctionACI(cInstance.aci, 'remoteContract', { external: cInstance.externalAci })
-        readType('Voting', { bindings: fnACI.bindings }).t.should.be.equal('address')
+        readType('Voting', fnACI.bindings).t.should.be.equal('address')
       })
       it('Resolve external contract type', async () => {
         const fnACI = getFunctionACI(cInstance.aci, 'remoteArgs', { external: cInstance.externalAci })
-        readType(fnACI.arguments[0].type, { bindings: fnACI.bindings }).should.eql({
+        readType(fnACI.arguments[0].type, fnACI.bindings).should.eql({
           t: 'record',
           generic: [{
             name: 'value',
@@ -1093,7 +1093,7 @@ describe('Contract', function () {
             }
           }]
         })
-        readType(fnACI.returns, { bindings: fnACI.bindings }).t.should.be.equal('int')
+        readType(fnACI.returns, fnACI.bindings).t.should.be.equal('int')
       })
     })
   })
