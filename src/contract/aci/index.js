@@ -57,7 +57,6 @@ export default async function getContractInstance (source, { aci, contractAddres
   if (contractAddress) contractAddress = await this.resolveName(contractAddress, 'ct', { resolveByNode: true })
   const defaultOptions = {
     ...this.Ae.defaults,
-    skipTransformDecoded: false,
     callStatic: false,
     filesystem
   }
@@ -105,11 +104,10 @@ export default async function getContractInstance (source, { aci, contractAddres
   /**
    * Call contract function
    * @alias module:@aeternity/aepp-sdk/es/contract/aci
-   * @rtype (init: Array, options: Object = { skipTransformDecoded: false, callStatic: false }) => CallResult: Object
+   * @rtype (init: Array, options: Object = { callStatic: false }) => CallResult: Object
    * @param {String} fn Function name
    * @param {Array} params Array of function arguments
    * @param {Object} [options={}] Array of function arguments
-   * @param {Boolean} [options.skipTransformDecoded=false] Skip Transform decoded data to JS type
    * @param {Boolean} [options.callStatic=false] Static function call
    * @return {Object} CallResult
    */

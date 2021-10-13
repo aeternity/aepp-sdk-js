@@ -259,8 +259,7 @@ export function transformMap (value, generic, { bindings }) {
  * @param transformDecodedData
  * @return {*}
  */
-export function transformDecodedData (aci, result, { skipTransformDecoded = false, addressPrefix = 'ak', bindings } = {}) {
-  if (skipTransformDecoded) return result
+export function transformDecodedData (aci, result, { bindings } = {}) {
   const { t, generic } = readType(aci, { bindings })
 
   switch (t) {

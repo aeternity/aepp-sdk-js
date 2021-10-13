@@ -1062,13 +1062,6 @@ describe('Contract', function () {
         const res = await contractObject.methods.listFn([1, 2])
         return res.decode().should.eventually.become([1, 2])
       })
-      it('Call contract using using js type arguments and skip result transform', async () => {
-        contractObject.setOptions({ skipTransformDecoded: true })
-        const res = await contractObject.methods.listFn([1, 2])
-        const decoded = await res.decode()
-        contractObject.setOptions({ skipTransformDecoded: false })
-        decoded.should.be.eql([1, 2])
-      })
       it('Call contract with contract type argument', async () => {
         const result = await contractObject.methods.approve(0, 'ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh')
         return result.decode().should.eventually.become(0)
