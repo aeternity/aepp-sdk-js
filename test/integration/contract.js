@@ -1058,12 +1058,6 @@ describe('Contract', function () {
       })
     })
     describe('Call contract', function () {
-      it('Call contract using using sophia type arguments', async () => {
-        contractObject.setOptions({ skipArgsConvert: true })
-        const res = await contractObject.methods.listFn('[ 1, 2 ]')
-        contractObject.setOptions({ skipArgsConvert: false })
-        return res.decode().should.eventually.become([1, 2])
-      })
       it('Call contract using using js type arguments', async () => {
         const res = await contractObject.methods.listFn([1, 2])
         return res.decode().should.eventually.become([1, 2])
