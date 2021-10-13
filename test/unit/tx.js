@@ -18,6 +18,7 @@
 import '../'
 import { describe, it } from 'mocha'
 import { encode as rlpEncode } from 'rlp'
+import { randomName } from '../utils'
 import { salt } from '../../src/utils/crypto'
 import {
   classify,
@@ -88,19 +89,6 @@ describe('Tx', function () {
 
   describe('getMinimumNameFee', () => {
     it('returns correct name fees', () => {
-      // based on: https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
-      function randomName (length) {
-        let result = ''
-        const characters =
-          'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-        for (let i = 0; i < length; i++) {
-          result += characters.charAt(
-            Math.floor(Math.random() * characters.length)
-          )
-        }
-        return result
-      }
-
       // protocol name fees: https://github.com/aeternity/protocol/blob/master/AENS.md#protocol-fees-and-protection-times
       const nameFees = [
         5702887, 3524578, 2178309, 1346269, 832040, 514229, 317811, 196418,
@@ -109,7 +97,7 @@ describe('Tx', function () {
       ]
 
       for (let i = 0; i < nameFees.length; i++) {
-        getMinimumNameFee(randomName(i + 1) + '.chain')
+        getMinimumNameFee(randomName(i + 1))
           .toString()
           .should.be.equal(BigNumber(nameFees[i]).times(1e14).toString())
       }
