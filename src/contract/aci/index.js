@@ -30,7 +30,7 @@ import {
   decodeCallResult,
   decodeEvents,
   getFunctionACI,
-  prepareArgsForEncode as prepareArgs
+  prepareArgsForEncode
 } from './helpers'
 
 /**
@@ -130,7 +130,7 @@ export default async function getContractInstance (source, { aci, contractAddres
    * `await contract.methods.testFunction.get()` -> use call-static(dry-run)
    * `await contract.methods.testFunction.send()` -> send tx on-chain
    */
-  instance.methods = buildContractMethods(instance)()
+  instance.methods = buildContractMethods(instance)
   return instance
 }
 
@@ -149,13 +149,13 @@ const call = ({ client, instance }) => async (fn, params = [], options = {}) => 
     BigNumber(opt.amount).gt(0) &&
     (Object.prototype.hasOwnProperty.call(fnACI, 'payable') && !fnACI.payable)
   ) throw new Error(`You try to pay "${opt.amount}" to function "${fn}" which is not payable. Only payable function can accept tokens`)
-  params = await prepareArgs(fnACI, params)
+  params = await prepareArgsForEncode(fnACI, params)
   const result = opt.callStatic
     ? await client.contractCallStatic(source, instance.deployInfo.address, fn, params, opt)
     : await client.contractCall(source, instance.deployInfo.address, fn, params, opt)
   return {
     ...result,
-    ...opt.waitMined ? await decodeCallResult(result, fnACI, opt) : {}
+    ...opt.waitMined ? await decodeCallResult(result, fnACI) : {}
   }
 }
 
@@ -165,7 +165,7 @@ const deploy = ({ client, instance }) => async (init = [], options = {}) => {
   const source = opt.source || instance.source
 
   if (!instance.compiled) await instance.compile(opt)
-  init = await prepareArgs(fnACI, init)
+  init = await prepareArgsForEncode(fnACI, init)
 
   if (opt.callStatic) {
     return client.contractCallStatic(source, null, 'init', init, {
