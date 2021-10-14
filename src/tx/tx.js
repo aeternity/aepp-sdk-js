@@ -487,7 +487,13 @@ async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, ga
   if (account.contractId) {
     n = 0
   } else {
-    n = n || (account.nonce + 1)
+    if (!n) {
+      try {
+        n = (await this.api.getAccountNextNonce(senderId)).nextNonce
+      } catch (e) {
+        n = (account.nonce + 1)
+      }
+    }
   }
   const ttl = await calculateTtl.call(this, t, !absoluteTtl)
   const fee = calculateFee(f, txType, { showWarning: this.showWarning, gas, params: R.merge(R.last(arguments), { nonce: n, ttl }), vsn })
