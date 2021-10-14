@@ -1076,11 +1076,11 @@ describe('Contract', function () {
         )
       })
       it('Resolve remote contract type', async () => {
-        const fnACI = getFunctionACI(cInstance.aci, 'remoteContract', { external: cInstance.externalAci })
+        const fnACI = getFunctionACI(cInstance.aci, 'remoteContract', cInstance.externalAci)
         readType('Voting', fnACI.bindings).t.should.be.equal('address')
       })
       it('Resolve external contract type', async () => {
-        const fnACI = getFunctionACI(cInstance.aci, 'remoteArgs', { external: cInstance.externalAci })
+        const fnACI = getFunctionACI(cInstance.aci, 'remoteArgs', cInstance.externalAci)
         readType(fnACI.arguments[0].type, fnACI.bindings).should.eql({
           t: 'record',
           generic: [{

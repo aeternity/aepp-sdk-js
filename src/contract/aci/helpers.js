@@ -8,7 +8,7 @@ import { decodeEvents as unpackEvents, transform, transformDecodedData, validate
  * @param external
  * @return {Object} function ACI
  */
-export function getFunctionACI (aci, name, { external }) {
+export function getFunctionACI (aci, name, external) {
   if (!aci) throw new Error('ACI required')
   const fn = aci.functions.find(f => f.name === name)
   if (!fn && name !== 'init') throw new Error(`Function ${name} doesn't exist in contract`)
@@ -67,18 +67,18 @@ export const buildContractMethods = (instance) => ({
   ...instance.aci ? {
     init: Object.assign(
       function () {
-        const { arguments: aciArgs } = getFunctionACI(instance.aci, 'init', { external: instance.externalAci })
+        const { arguments: aciArgs } = getFunctionACI(instance.aci, 'init', instance.externalAci)
         const { opt, args } = parseArguments(aciArgs, arguments)
         return instance.deploy(args, opt)
       },
       {
         get () {
-          const { arguments: aciArgs } = getFunctionACI(instance.aci, 'init', { external: instance.externalAci })
+          const { arguments: aciArgs } = getFunctionACI(instance.aci, 'init', instance.externalAci)
           const { opt, args } = parseArguments(aciArgs, arguments)
           return instance.deploy(args, { ...opt, callStatic: true })
         },
         send () {
-          const { arguments: aciArgs } = getFunctionACI(instance.aci, 'init', { external: instance.externalAci })
+          const { arguments: aciArgs } = getFunctionACI(instance.aci, 'init', instance.externalAci)
           const { opt, args } = parseArguments(aciArgs, arguments)
           return instance.deploy(args, { ...opt, callStatic: false })
         }

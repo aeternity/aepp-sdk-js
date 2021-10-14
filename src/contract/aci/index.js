@@ -135,12 +135,12 @@ export default async function getContractInstance (source, { aci, contractAddres
 }
 
 const eventDecode = ({ instance }) => (fn, events) => {
-  return decodeEvents(events, getFunctionACI(instance.aci, fn, { external: instance.externalAci }))
+  return decodeEvents(events, getFunctionACI(instance.aci, fn, instance.externalAci))
 }
 
 const call = ({ client, instance }) => async (fn, params = [], options = {}) => {
   const opt = { ...instance.options, ...options }
-  const fnACI = getFunctionACI(instance.aci, fn, { external: instance.externalAci })
+  const fnACI = getFunctionACI(instance.aci, fn, instance.externalAci)
   const source = opt.source || instance.source
 
   if (!fn) throw new Error('Function name is required')
@@ -161,7 +161,7 @@ const call = ({ client, instance }) => async (fn, params = [], options = {}) => 
 
 const deploy = ({ client, instance }) => async (init = [], options = {}) => {
   const opt = { ...instance.options, ...options }
-  const fnACI = getFunctionACI(instance.aci, 'init', { external: instance.externalAci })
+  const fnACI = getFunctionACI(instance.aci, 'init', instance.externalAci)
   const source = opt.source || instance.source
 
   if (!instance.compiled) await instance.compile(opt)
