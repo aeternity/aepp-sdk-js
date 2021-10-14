@@ -21,21 +21,21 @@ import { encodeBase64Check, generateKeyPair } from '../../src/utils/crypto'
 import MemoryAccount from '../../src/account/memory'
 
 describe('Oracle', function () {
-  let client
+  let sdk
   let oracle
   let query
   const queryResponse = "{'tmp': 30}"
   const account = generateKeyPair()
 
   before(async function () {
-    client = await getSdk()
-    await client.spend('1' + '0'.repeat(20), account.publicKey)
-    client.addAccount(MemoryAccount({ keypair: account }), { select: true })
+    sdk = await getSdk()
+    await sdk.spend('1' + '0'.repeat(20), account.publicKey)
+    sdk.addAccount(MemoryAccount({ keypair: account }), { select: true })
   })
 
   it('Register Oracle with 5000 TTL', async () => {
-    const expectedOracleId = `ok_${(await client.address()).slice(3)}`
-    oracle = await client.registerOracle("{'city': str}", "{'tmp': num}", { oracleTtl: { type: 'delta', value: 5000 } })
+    const expectedOracleId = `ok_${(await sdk.address()).slice(3)}`
+    oracle = await sdk.registerOracle("{'city': str}", "{'tmp': num}", { oracleTtl: { type: 'delta', value: 5000 } })
     oracle.id.should.be.equal(expectedOracleId)
   })
 
