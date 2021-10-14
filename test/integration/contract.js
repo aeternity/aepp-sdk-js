@@ -732,7 +732,7 @@ describe('Contract', function () {
           try {
             await contractObject.methods.intFn('asd')
           } catch (e) {
-            e.message.should.be.equal('"Argument" at position 0 fails because [Value "[asd]" at path: [0] not a number]')
+            e.message.should.be.equal('"[asd]" must be a number')
           }
         })
         it('Valid', async () => {
@@ -745,7 +745,7 @@ describe('Contract', function () {
           try {
             await contractObject.methods.boolFn({})
           } catch (e) {
-            e.message.should.be.equal('"Argument" at position 0 fails because [Value "[[object Object]]" at path: [0] not a boolean]')
+            e.message.should.be.equal('"[[object Object]]" must be a boolean')
           }
         })
         it('Valid', async () => {
@@ -758,7 +758,7 @@ describe('Contract', function () {
           try {
             await contractObject.methods.stringFn(123)
           } catch (e) {
-            e.message.should.be.equal('"Argument" at position 0 fails because [Value "123" at path: [0] not a string]')
+            e.message.should.be.equal('"[123]" must be a string')
           }
         })
         it('Valid', async () => {
@@ -771,14 +771,14 @@ describe('Contract', function () {
           try {
             await contractObject.methods.addressFn('asdasasd')
           } catch (e) {
-            e.message.should.be.equal('"Argument" at position 0 fails because ["[asdasasd]" with value "asdasasd" fails to match the required pattern: /^(ak_|ct_|ok_|oq_)/]')
+            e.message.should.be.equal('"[asdasasd]" with value "asdasasd" fails to match the required pattern: /^(ak_|ct_|ok_|oq_)/')
           }
         })
         it('Invalid address type', async () => {
           try {
             await contractObject.methods.addressFn(333)
           } catch (e) {
-            e.message.should.be.equal('"Argument" at position 0 fails because [Value "333" at path: [0] not a string]')
+            e.message.should.be.equal('"[333]" must be a string')
           }
         })
         it('Return address', async () => {
@@ -795,35 +795,35 @@ describe('Contract', function () {
           try {
             await contractObject.methods.tupleFn('asdasasd')
           } catch (e) {
-            e.message.should.be.equal('"Argument" at position 0 fails because [Value "[asdasasd]" at path: [0] not a array]')
+            e.message.should.be.equal('"[asdasasd]" must be an array')
           }
         })
         it('Invalid tuple prop type', async () => {
           try {
             await contractObject.methods.tupleFn([1, 'string'])
           } catch (e) {
-            e.message.should.be.equal('"Argument" at position 0 fails because ["[1,string]" at position 0 fails because [Value "1" at path: [0,0] not a string], "[1,string]" at position 1 fails because [Value "1" at path: [0,1] not a number]]')
+            e.message.should.be.equal('"[0][0]" must be a string. "[0][1]" must be a number')
           }
         })
         it('Required tuple prop', async () => {
           try {
             await contractObject.methods.tupleFn([1])
           } catch (e) {
-            e.message.should.be.equal('"Argument" at position 0 fails because ["[1]" at position 0 fails because [Value "1" at path: [0,0] not a string], "[1]" does not contain 1 required value(s)]')
+            e.message.should.be.equal('"[0][0]" must be a string. "[1]" does not contain 1 required value(s)')
           }
         })
         it('Wrong type in list inside tuple', async () => {
           try {
             await contractObject.methods.tupleWithList([[true], 1])
           } catch (e) {
-            e.message.should.be.equal('"Argument" at position 0 fails because ["[true,1]" at position 0 fails because ["0" at position 0 fails because [Value "0" at path: [0,0,0] not a number]]]')
+            e.message.should.be.equal('"[0][0][0]" must be a number')
           }
         })
         it('Wrong type in tuple inside tuple', async () => {
           try {
             await contractObject.methods.tupleInTupleFn([['str', 1], 1])
           } catch (e) {
-            e.message.should.be.equal('"Argument" at position 0 fails because ["[str,1,1]" at position 0 fails because ["Tuple argument" at position 1 fails because [Value "1" at path: [0,0,1] not a string]]]')
+            e.message.should.be.equal('"[0][0][1]" must be a string')
           }
         })
         it('Valid', async () => {
@@ -836,21 +836,21 @@ describe('Contract', function () {
           try {
             await contractObject.methods.listFn('asdasasd')
           } catch (e) {
-            e.message.should.be.equal('"Argument" at position 0 fails because [Value "[asdasasd]" at path: [0] not a array]')
+            e.message.should.be.equal('"[asdasasd]" must be an array')
           }
         })
         it('Invalid list element type', async () => {
           try {
             await contractObject.methods.listFn([1, 'string'])
           } catch (e) {
-            e.message.should.be.equal('"Argument" at position 0 fails because ["[1,string]" at position 1 fails because [Value "1" at path: [0,1] not a number]]')
+            e.message.should.be.equal('"[0][1]" must be a number')
           }
         })
         it('Invalid list element type nested', async () => {
           try {
             await contractObject.methods.listInListFn([['childListWronmgElement'], 'parentListWrongElement'])
           } catch (e) {
-            e.message.should.be.equal('"Argument" at position 0 fails because ["[childListWronmgElement,parentListWrongElement]" at position 0 fails because ["0" at position 0 fails because [Value "0" at path: [0,0,0] not a number]], "[childListWronmgElement,parentListWrongElement]" at position 1 fails because [Value "1" at path: [0,1] not a array]]')
+            e.message.should.be.equal('"[0][0][0]" must be a number. "[0][1]" must be an array')
           }
         })
         it('Valid', async () => {
@@ -911,7 +911,7 @@ describe('Contract', function () {
           try {
             await contractObject.methods.setRecord({ value: 123, key: 'test' })
           } catch (e) {
-            e.message.should.be.equal('"Argument" at position 0 fails because [child "value" fails because [Value "123" at path: [0,value] not a string], child "key" fails because [Value "key" at path: [0,key] not a number]]')
+            e.message.should.be.equal('"[0].value" must be a string. "[0].key" must be a number')
           }
         })
       })
@@ -935,7 +935,7 @@ describe('Contract', function () {
           try {
             await contractObject.methods.intOption('string')
           } catch (e) {
-            e.message.should.be.equal('"Argument" at position 0 fails because [Value "[string]" at path: [0] not a number]')
+            e.message.should.be.equal('"[string]" must be a number')
           }
         })
       })
@@ -951,7 +951,7 @@ describe('Contract', function () {
           try {
             await contractObject.methods.datTypeFn({})
           } catch (e) {
-            e.message.should.be.equal('"Argument" at position 0 fails because ["0" must be a string, "value" must contain at least one of [Year, Month, Day]]')
+            e.message.should.be.equal('"[[object Object]]" does not match any of the allowed types')
           }
         })
         it('Call generic datatype', async () => {
@@ -969,7 +969,7 @@ describe('Contract', function () {
           try {
             await contractObject.methods.datTypeFn('asdcxz')
           } catch (e) {
-            e.message.should.be.equal('"Argument" at position 0 fails because ["0" must be one of [Year, Month, Day], "0" must be an object]')
+            e.message.should.be.equal('"[asdcxz]" must be one of [Year, Month, Day, object]')
           }
         })
         it('Valid', async () => {
@@ -991,7 +991,7 @@ describe('Contract', function () {
           try {
             await contractObject.methods.hashFn(decoded)
           } catch (e) {
-            e.message.should.include('not a 32 bytes')
+            e.message.should.include('must be 32 bytes')
           }
         })
         it('Valid', async () => {
@@ -1017,7 +1017,7 @@ describe('Contract', function () {
           try {
             await contractObject.methods.signatureFn(decoded)
           } catch (e) {
-            e.message.should.include('not a 64 bytes')
+            e.message.should.include('must be 64 bytes')
           }
         })
         it('Valid', async () => {
@@ -1044,7 +1044,7 @@ describe('Contract', function () {
           try {
             await contractObject.methods.bytesFn(Buffer.from([...decoded, 2]))
           } catch (e) {
-            e.message.should.include('not a 32 bytes')
+            e.message.should.include('must be 32 bytes')
           }
         })
         it('Valid', async () => {
