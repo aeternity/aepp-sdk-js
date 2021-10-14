@@ -1058,22 +1058,9 @@ describe('Contract', function () {
       })
     })
     describe('Call contract', function () {
-      it('Call contract using using sophia type arguments', async () => {
-        contractObject.setOptions({ skipArgsConvert: true })
-        const res = await contractObject.methods.listFn('[ 1, 2 ]')
-        contractObject.setOptions({ skipArgsConvert: false })
-        return res.decode().should.eventually.become([1, 2])
-      })
       it('Call contract using using js type arguments', async () => {
         const res = await contractObject.methods.listFn([1, 2])
         return res.decode().should.eventually.become([1, 2])
-      })
-      it('Call contract using using js type arguments and skip result transform', async () => {
-        contractObject.setOptions({ skipTransformDecoded: true })
-        const res = await contractObject.methods.listFn([1, 2])
-        const decoded = await res.decode()
-        contractObject.setOptions({ skipTransformDecoded: false })
-        decoded.should.be.eql([1, 2])
       })
       it('Call contract with contract type argument', async () => {
         const result = await contractObject.methods.approve(0, 'ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh')
@@ -1090,11 +1077,11 @@ describe('Contract', function () {
       })
       it('Resolve remote contract type', async () => {
         const fnACI = getFunctionACI(cInstance.aci, 'remoteContract', { external: cInstance.externalAci })
-        readType('Voting', { bindings: fnACI.bindings }).t.should.be.equal('address')
+        readType('Voting', fnACI.bindings).t.should.be.equal('address')
       })
       it('Resolve external contract type', async () => {
         const fnACI = getFunctionACI(cInstance.aci, 'remoteArgs', { external: cInstance.externalAci })
-        readType(fnACI.arguments[0].type, { bindings: fnACI.bindings }).should.eql({
+        readType(fnACI.arguments[0].type, fnACI.bindings).should.eql({
           t: 'record',
           generic: [{
             name: 'value',
@@ -1106,7 +1093,7 @@ describe('Contract', function () {
             }
           }]
         })
-        readType(fnACI.returns, { bindings: fnACI.bindings }).t.should.be.equal('int')
+        readType(fnACI.returns, fnACI.bindings).t.should.be.equal('int')
       })
     })
   })

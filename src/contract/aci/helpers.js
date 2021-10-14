@@ -113,9 +113,7 @@ export const prepareArgsForEncode = async (aci, params) => {
   validateArguments(aci, params)
   const bindings = aci.bindings
   // Cast argument from JS to Sophia type
-  return Promise.all(aci.arguments.map(async ({ type }, i) => transform(type, params[i], {
-    bindings
-  })))
+  return Promise.all(aci.arguments.map(async ({ type }, i) => transform(type, params[i], bindings)))
 }
 
 export const decodeEvents = (events, fnACI) => {
@@ -133,7 +131,7 @@ export const decodeCallResult = async (result, fnACI, opt) => {
     decodedResult: await transformDecodedData(
       fnACI.returns,
       await result.decode(),
-      { ...opt, bindings: fnACI.bindings }
+      fnACI.bindings
     ),
     decodedEvents: decodeEvents(result.result.log, fnACI)
   }
