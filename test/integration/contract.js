@@ -656,7 +656,7 @@ describe('Contract', function () {
     it('Deploy contract before compile', async () => {
       contractObject.compiled = null
       await contractObject.methods.init('123', 1, 'hahahaha')
-      const isCompiled = contractObject.compiled.length && contractObject.compiled.slice(0, 3) === 'cb_'
+      const isCompiled = contractObject.compiled.length && contractObject.compiled.startsWith('cb_')
       isCompiled.should.be.equal(true)
     })
     it('Deploy/Call contract with waitMined: false', async () => {

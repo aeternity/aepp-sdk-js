@@ -31,66 +31,27 @@ export function getFunctionACI (aci, name, external) {
  * Build contract methods base on ACI
  * @return {Object} Contract instance methods
  */
-export const buildContractMethods = (instance) => ({
-  ...instance.aci
-    ? instance
-      .aci
-      .functions
-      .reduce(
-        (acc, { name, arguments: aciArgs, stateful }) => ({
-          ...acc,
-          [name]: Object.assign(
-            function () {
-              const { opt, args } = parseArguments(aciArgs, arguments)
-              if (name === 'init') return instance.deploy(args, opt)
-              return instance.call(name, args, { callStatic: !stateful, ...opt })
-            },
-            {
-              get () {
-                const { opt, args } = parseArguments(aciArgs, arguments)
-                return instance.call(name, args, { ...opt, callStatic: true })
-              },
-              send () {
-                const { opt, args } = parseArguments(aciArgs, arguments)
-                if (name === 'init') return instance.deploy(args, opt)
-                return instance.call(name, args, { ...opt, callStatic: false })
-              },
-              decodeEvents (events) {
-                return instance.decodeEvents(name, events)
-              }
-            }
-          )
-        }),
-        {}
-      )
-    : {},
-  ...instance.aci ? {
-    init: Object.assign(
-      function () {
-        const { arguments: aciArgs } = getFunctionACI(instance.aci, 'init', instance.externalAci)
-        const { opt, args } = parseArguments(aciArgs, arguments)
-        return instance.deploy(args, opt)
-      },
-      {
-        get () {
-          const { arguments: aciArgs } = getFunctionACI(instance.aci, 'init', instance.externalAci)
-          const { opt, args } = parseArguments(aciArgs, arguments)
-          return instance.deploy(args, { ...opt, callStatic: true })
-        },
-        send () {
-          const { arguments: aciArgs } = getFunctionACI(instance.aci, 'init', instance.externalAci)
-          const { opt, args } = parseArguments(aciArgs, arguments)
-          return instance.deploy(args, { ...opt, callStatic: false })
+export const buildContractMethods = (instance) => Object.fromEntries(instance.aci.functions
+  .map(({ name, arguments: aciArgs, stateful }) => {
+    const genHandler = callStatic => (...args) => {
+      const options = args.length === aciArgs.length + 1 ? args.pop() : {}
+      if (typeof options !== 'object') throw new Error(`Options should be an object: ${options}`)
+      if (name === 'init') return instance.deploy(args, { callStatic, ...options })
+      return instance.call(name, args, { callStatic, ...options })
+    }
+    return [
+      name,
+      Object.assign(
+        genHandler(name === 'init' ? false : !stateful),
+        {
+          get: genHandler(true),
+          send: genHandler(false),
+          decodeEvents: events => instance.decodeEvents(name, events)
         }
-      }
-    )
-  } : {}
-})
-
-const parseArguments = (aciArgs = [], args) => ({
-  opt: args.length > aciArgs.length ? R.last(args) : {},
-  args: Object.values(args).slice(0, aciArgs.length)
-})
+      )
+    ]
+  })
+)
 
 /**
  * Validated contract call arguments using contract ACI

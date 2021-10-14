@@ -25,7 +25,7 @@ import { Universal, MemoryAccount, Node } from '@aeternity/aepp-sdk'
 ## 2. Initialize the SDK providing an account
 When initializing the SDK you need to provide an account which will be used to sign transactions like `ContractCreateTx` and `ContractCallTx` that will be broadcasted to the network.
 
-```js 
+```js
 const node = await Node({
   url: 'https://testnet.aeternity.io' // ideally host your own node
 })
@@ -93,7 +93,7 @@ contract Increment =
     record state =
         { count: int }
 
-    entrypoint init(start: int) = 
+    entrypoint init(start: int) =
         { count = start }
 
     stateful entrypoint increment(value: int) =
@@ -123,7 +123,7 @@ if they should produce changes to the state of the smart contract, see `incremen
 
 ## 5. Call contract entrypoints
 
-### a) Stateful entrypoints 
+### a) Stateful entrypoints
 According to the example above you can call the `stateful` entrypoint `increment` by using one of the following lines:
 
 ```js
