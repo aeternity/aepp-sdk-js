@@ -24,67 +24,49 @@ export const SOPHIA_TYPES = [
 ].reduce((acc, type) => ({ ...acc, [type]: type }), { ChainTtl: 'Chain.ttl' })
 
 /**
- * Transform decoded event to JS type
- * @param {Object[]} events Array of events
- * @param {Object} [options={}] Options
- * @param {Object} [options.schema=[]] SC function ACI schema
+ * Decode events fields
+ * @param {Object[]} events Array of events with encoded fields
+ * @param {Array} schemas Smart contract event ACI schemas
  * @return {Object}
  */
-export function decodeEvents (events, options = { schema: [] }) {
-  if (!events.length) return []
-
-  return events.map(l => {
-    const [eName, ...eParams] = l.topics
-    const hexHash = toBytes(eName, true).toString('hex')
-    const { schema } = options.schema
-      .reduce(
-        (acc, el) => {
-          if (hash(el.name).toString('hex') === hexHash) {
-            l.name = el.name
-            return {
-              schema: el.types,
-              name: el.name
-            }
-          }
-          return acc
-        },
-        { schema: [] }
-      )
-    const { decoded } = schema.reduce((acc, el) => {
-      if (el === SOPHIA_TYPES.string) {
-        return { decoded: [...acc.decoded, transformEvent(l.data, el)], params: acc.params }
-      }
-      const [event, ...tail] = acc.params
-      return { decoded: [...acc.decoded, transformEvent(event, el)], params: tail }
-    }, { decoded: [], params: eParams })
-
-    return {
-      ...l,
-      decoded
-    }
-  })
-}
+export const decodeEvents = (events, schemas = []) => events.map(event => {
+  const [nameHash, ...params] = event.topics
+  const schema = schemas.find((s) => hash(s.name).equals(toBytes(nameHash, true)))
+  if (!schema) throw new Error(`Can't find schema by event: ${nameHash}`)
+  const stringCount = schema.types.filter(t => t === SOPHIA_TYPES.string).length
+  if (stringCount > 1) throw new Error(`Event schema contains more than one string: ${schema.types}`)
+  const topicsCount = schema.types.length - stringCount
+  if (topicsCount !== params.length) {
+    throw new Error(`Schema defines ${topicsCount} types, but ${params.length} topics present`)
+  }
+  return {
+    ...event,
+    name: schema.name,
+    decoded: schema.types.map((type) =>
+      decodeEventField(type === SOPHIA_TYPES.string ? event.data : params.pop(), type))
+  }
+})
 
 /**
  * Transform Event based on type
- * @param {String|Number} event Event data
+ * @param {String|Number} field Event data
  * @param {String} type Event type from schema
  * @return {*}
  */
-function transformEvent (event, type) {
+function decodeEventField (field, type) {
   switch (type) {
     case SOPHIA_TYPES.int:
-      return parseBigNumber(event)
+      return parseBigNumber(field)
     case SOPHIA_TYPES.bool:
-      return !!event
+      return !!field
     case SOPHIA_TYPES.hash:
-      return toBytes(event, true).toString('hex')
+      return toBytes(field, true).toString('hex')
     case SOPHIA_TYPES.address:
-      return addressFromDecimal(event).split('_')[1]
+      return addressFromDecimal(field).split('_')[1]
     case SOPHIA_TYPES.string:
-      return decode(event).toString('utf-8')
+      return decode(field).toString('utf-8')
     default:
-      return toBytes(event, true)
+      return toBytes(field, true)
   }
 }
 

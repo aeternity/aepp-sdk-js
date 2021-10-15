@@ -572,7 +572,7 @@ describe('Contract', function () {
         await cInstance.deploy(['test', 1, 'some'])
         eventResult = await cInstance.methods.emitEvents()
         const { log } = await sdk.tx(eventResult.hash)
-        decodedEventsWithoutACI = decodeEvents(log, { schema: events })
+        decodedEventsWithoutACI = decodeEvents(log, events)
         decodedEventsUsingACI = cInstance.decodeEvents('emitEvents', log)
         decodedEventsUsingBuildInMethod = cInstance.methods.emitEvents.decodeEvents(log)
       })
@@ -585,21 +585,20 @@ describe('Contract', function () {
         schema.name.should.be.equal(event.name)
         schema.types.forEach((t, tIndex) => {
           const value = event.decoded[tIndex]
-          const isNumber = typeof value === 'string' || typeof value === 'number'
-          const v = typeof value === t // eslint-disable-line valid-typeof
           switch (t) {
             case SOPHIA_TYPES.address:
               event.address.should.be.equal(`ct_${value}`)
               break
             case SOPHIA_TYPES.int:
-              isNumber.should.be.equal(true)
+              expect(typeof value === 'string' || typeof value === 'number')
+                .to.be.equal(true)
               Number.isInteger(+value).should.be.equal(true)
               break
             case SOPHIA_TYPES.bool:
               value.should.be.a('boolean')
               break
-            default:
-              v.should.be.equal(true)
+            case SOPHIA_TYPES.string:
+              value.should.be.a('string')
               break
           }
         })
@@ -663,7 +662,6 @@ describe('Contract', function () {
       const deployed = await contractObject.methods.init('123', 1, 'hahahaha', { waitMined: false })
       await sdk.poll(deployed.transaction, { interval: 50, attempts: 1200 })
       expect(deployed.result).to.be.equal(undefined)
-      expect(deployed.txData).to.be.equal(undefined)
       const result = await contractObject.methods.intFn.send(2, { waitMined: false })
       expect(result.result).to.be.equal(undefined)
       result.txData.should.not.be.equal(undefined)

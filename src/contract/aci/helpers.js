@@ -1,5 +1,5 @@
 import * as R from 'ramda'
-import { decodeEvents as unpackEvents, transform, transformDecodedData, validateArguments } from './transformation'
+import { transform, validateArguments } from './transformation'
 
 /**
  * Get function schema from contract ACI object
@@ -28,32 +28,6 @@ export function getFunctionACI (aci, name, external) {
 }
 
 /**
- * Build contract methods base on ACI
- * @return {Object} Contract instance methods
- */
-export const buildContractMethods = (instance) => Object.fromEntries(instance.aci.functions
-  .map(({ name, arguments: aciArgs, stateful }) => {
-    const genHandler = callStatic => (...args) => {
-      const options = args.length === aciArgs.length + 1 ? args.pop() : {}
-      if (typeof options !== 'object') throw new Error(`Options should be an object: ${options}`)
-      if (name === 'init') return instance.deploy(args, { callStatic, ...options })
-      return instance.call(name, args, { callStatic, ...options })
-    }
-    return [
-      name,
-      Object.assign(
-        genHandler(name === 'init' ? false : !stateful),
-        {
-          get: genHandler(true),
-          send: genHandler(false),
-          decodeEvents: events => instance.decodeEvents(name, events)
-        }
-      )
-    ]
-  })
-)
-
-/**
  * Validated contract call arguments using contract ACI
  * @function validateCallParams
  * @rtype (aci: Object, params: Array) => Object
@@ -73,22 +47,3 @@ export const prepareArgsForEncode = async (aci, params) => {
   // Cast argument from JS to Sophia type
   return Promise.all(aci.arguments.map(async ({ type }, i) => transform(type, params[i], bindings)))
 }
-
-export const decodeEvents = (events, fnACI) => {
-  if (!fnACI || !fnACI.event || !fnACI.event.length) return []
-
-  const eventsSchema = fnACI.event.map(e => {
-    const name = Object.keys(e)[0]
-    return { name, types: e[name] }
-  })
-  return unpackEvents(events, { schema: eventsSchema })
-}
-
-export const decodeCallResult = async (result, fnACI) => ({
-  decodedResult: await transformDecodedData(
-    fnACI.returns,
-    await result.decode(),
-    fnACI.bindings
-  ),
-  decodedEvents: decodeEvents(result.result.log, fnACI)
-})
