@@ -481,7 +481,7 @@ async function getAccountNonce (accountId, nonce) {
  * @param {Object} params Object which contains all tx data
  * @return {Object} { ttl, nonce, fee } Object with account nonce, absolute ttl and transaction fee
  */
-async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, gas, absoluteTtl, vsn }) {
+async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, gas, absoluteTtl, vsn, strategy }) {
   const account = await this.getAccount(senderId).catch(e => ({ nonce: 0 }))
   // Is GA account
   if (account.contractId) {
@@ -489,7 +489,7 @@ async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, ga
   } else {
     if (!n) {
       try {
-        n = (await this.api.getAccountNextNonce(senderId)).nextNonce
+        n = (await this.api.getAccountNextNonce(senderId, { strategy: 'continuity' })).nextNonce
       } catch (e) {
         n = (account.nonce + 1)
       }
