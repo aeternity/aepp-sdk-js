@@ -89,9 +89,9 @@ describe('Oracle', function () {
     const account = generateKeyPair()
 
     before(async function () {
-      await client.spend(1e15, account.publicKey)
-      client.addAccount(MemoryAccount({ keypair: account }), { select: true })
-      oracleWithFee = await client.registerOracle("{'city': str}", "{'tmp': num}", { queryFee, onAccount: account })
+      await sdk.spend(1e15, account.publicKey)
+      sdk.addAccount(MemoryAccount({ keypair: account }), { select: true })
+      oracleWithFee = await sdk.registerOracle("{'city': str}", "{'tmp': num}", { queryFee, onAccount: account })
     })
 
     it('Post Oracle Query with default query fee', async () => {
