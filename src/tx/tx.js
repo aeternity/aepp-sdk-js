@@ -483,8 +483,9 @@ async function getAccountNonce (accountId, nonce) {
  */
 async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, gas, absoluteTtl, vsn, strategy }) {
   const { nextNonce } = await this.api.getAccountNextNonce(senderId, { strategy }).catch(e => ({ nextNonce: 1 }))
+  n = n || nextNonce
   const ttl = await calculateTtl.call(this, t, !absoluteTtl)
-  const fee = calculateFee(f, txType, { showWarning: this.showWarning, gas, params: R.merge(R.last(arguments), { nonce: n || nextNonce, ttl }), vsn })
+  const fee = calculateFee(f, txType, { showWarning: this.showWarning, gas, params: R.merge(R.last(arguments), { nonce: n, ttl }), vsn })
   return { fee, ttl, nonce: n }
 }
 
