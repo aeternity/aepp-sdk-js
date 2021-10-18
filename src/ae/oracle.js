@@ -123,7 +123,7 @@ export async function pollForQueryResponse (oracleId, queryId, { attempts = 20, 
     const { response } = await this.api.getOracleQueryByPubkeyAndQueryId(oracleId, queryId)
     const responseBuffer = decode(response, 'or')
     if (responseBuffer.length) {
-      return { response, decode: () => responseBuffer } // TODO: Return just responseBuffer
+      return String(responseBuffer)
     }
   }
   throw new Error(`Giving up after ${(attempts - 1) * interval}ms`)

@@ -1,9 +1,9 @@
-import Joi from 'joi-browser'
+import Joi from 'joi'
 import { isHex } from '../../utils/string'
 import { toBytes } from '../../utils/bytes'
 import { decode } from '../../tx/builder/helpers'
 import { parseBigNumber } from '../../utils/bignumber'
-import { isAddressValid, addressFromDecimal, hash } from '../../utils/crypto'
+import { addressFromDecimal, hash } from '../../utils/crypto'
 
 export const SOPHIA_TYPES = [
   'int',
@@ -71,7 +71,7 @@ export function decodeEvents (events, options = { schema: [] }) {
  * @param {String} type Event type from schema
  * @return {*}
  */
-export function transformEvent (event, type) {
+function transformEvent (event, type) {
   switch (type) {
     case SOPHIA_TYPES.int:
       return parseBigNumber(event)
@@ -88,7 +88,7 @@ export function transformEvent (event, type) {
   }
 }
 
-export function injectVars (t, aciType) {
+function injectVars (t, aciType) {
   const [[baseType, generic]] = Object.entries(aciType.typedef)
   const [[, varianValue]] = Object.entries(t)
   switch (baseType) {
@@ -115,7 +115,7 @@ export function injectVars (t, aciType) {
  * @param bindings
  * @return {Object}
  */
-export function linkTypeDefs (t, bindings) {
+function linkTypeDefs (t, bindings) {
   const [root, typeDef] = typeof t === 'object' ? Object.keys(t)[0].split('.') : t.split('.')
   const contractTypeDefs = bindings.find(c => c.name === root)
   const aciType = [
@@ -147,10 +147,10 @@ const isRemoteAddress = (t) => {
 /**
  * Parse sophia type
  * @param type
- * @param returnType
+ * @param bindings
  * @return {Object}
  */
-export function readType (type, { bindings } = {}) {
+export function readType (type, bindings) {
   let [t] = Array.isArray(type) ? type : [type]
 
   // If remote address
@@ -175,8 +175,8 @@ export function readType (type, { bindings } = {}) {
  * @param bindings
  * @return {string}
  */
-export function transform (type, value, { bindings } = {}) {
-  const { t, generic } = readType(type, { bindings })
+export function transform (type, value, bindings) {
+  const { t, generic } = readType(type, bindings)
 
   switch (t) {
     case SOPHIA_TYPES.ChainTtl:
@@ -184,55 +184,46 @@ export function transform (type, value, { bindings } = {}) {
     case SOPHIA_TYPES.string:
       return `"${value}"`
     case SOPHIA_TYPES.list:
-      return `[${value.map(el => transform(generic, el, { bindings }))}]`
+      return `[${value.map(el => transform(generic, el, bindings))}]`
     case SOPHIA_TYPES.tuple:
-      return `(${value.map((el, i) => transform(generic[i], el, {
-        bindings
-      }))})`
+      return `(${value.map((el, i) => transform(generic[i], el, bindings))})`
     case SOPHIA_TYPES.option: {
-      return value === undefined ? 'None' : `Some(${transform(generic, value, {
-        bindings
-      })})`
+      return value === undefined ? 'None' : `Some(${transform(generic, value, bindings)})`
     }
     case SOPHIA_TYPES.hash:
     case SOPHIA_TYPES.bytes:
     case SOPHIA_TYPES.signature:
       if (typeof value === 'string') {
         if (isHex(value)) return `#${value}`
-        if (isAddressValid(value)) return `#${decode(value).toString('hex')}`
       }
       return `#${Buffer.from(value).toString('hex')}`
     case SOPHIA_TYPES.record:
       return `{${generic.reduce(
         (acc, { name, type }, i) => {
-          acc += `${i !== 0 ? ',' : ''}${name} = ${transform(type, value[name], {
-            bindings
-          })}`
+          acc += `${i !== 0 ? ',' : ''}${name} = ${transform(type, value[name], bindings)}`
           return acc
         },
         ''
       )}}`
     case SOPHIA_TYPES.map:
-      return transformMap(value, generic, { bindings })
+      return transformMap(value, generic, bindings)
     case SOPHIA_TYPES.variant:
-      return transformVariant(value, generic, { bindings })
+      return transformVariant(value, generic, bindings)
   }
 
   return `${value}`
 }
 
-export function transformVariant (value, generic, { bindings }) {
+function transformVariant (value, generic, bindings) {
   const [[variant, variantArgs]] = typeof value === 'string' ? [[value, []]] : Object.entries(value)
   const [[v, type]] = Object.entries(generic.find(o => Object.keys(o)[0].toLowerCase() === variant.toLowerCase()))
   return `${v}${!type.length
     ? ''
-    : `(${variantArgs.slice(0, type.length).map((el, i) => transform(type[i], el, {
-      bindings
-    }))})`
+    : `(${variantArgs.slice(0, type.length).map((el, i) => transform(type[i], el, bindings))})`
   }`
 }
 
-export function transformMap (value, generic, { bindings }) {
+function transformMap (value, generic, bindings) {
   if (!Array.isArray(value)) {
     if (value.entries) value = Array.from(value.entries())
     else if (value instanceof Object) value = Object.entries(value)
@@ -242,8 +233,8 @@ export function transformMap (value, generic, { bindings }) {
     '{',
     value
       .map(([key, value]) => [
-        `[${transform(generic[0], key, { bindings })}]`,
-        transform(generic[1], value, { bindings })
+        `[${transform(generic[0], key, bindings)}]`,
+        transform(generic[1], value, bindings)
       ].join(' = '))
       .join(),
     '}'
@@ -256,12 +247,11 @@ export function transformMap (value, generic, { bindings }) {
  * Transform decoded data to JS type
  * @param aci
  * @param result
- * @param transformDecodedData
+ * @param bindings
  * @return {*}
  */
-export function transformDecodedData (aci, result, { skipTransformDecoded = false, addressPrefix = 'ak', bindings } = {}) {
-  if (skipTransformDecoded) return result
-  const { t, generic } = readType(aci, { bindings })
+export function transformDecodedData (aci, result, bindings) {
+  const { t, generic } = readType(aci, bindings)
 
   switch (t) {
     case SOPHIA_TYPES.bool:
@@ -279,8 +269,8 @@ export function transformDecodedData (aci, result, { skipTransformDecoded = fals
       return result
         .reduce(
           (acc, [key, val]) => {
-            key = transformDecodedData(keyT, key, { bindings })
-            val = transformDecodedData(valueT, val, { bindings })
+            key = transformDecodedData(keyT, key, bindings)
+            val = transformDecodedData(valueT, val, bindings)
             acc.push([key, val])
             return acc
           },
@@ -290,19 +280,19 @@ export function transformDecodedData (aci, result, { skipTransformDecoded = fals
     case SOPHIA_TYPES.option: {
       if (result === 'None') return undefined
       const [[variantType, [value]]] = Object.entries(result)
-      return variantType === 'Some' ? transformDecodedData(generic, value, { bindings }) : undefined
+      return variantType === 'Some' ? transformDecodedData(generic, value, bindings) : undefined
     }
     case SOPHIA_TYPES.list:
-      return result.map((value) => transformDecodedData(generic, value, { bindings }))
+      return result.map((value) => transformDecodedData(generic, value, bindings))
     case SOPHIA_TYPES.tuple:
-      return result.map((value, i) => { return transformDecodedData(generic[i], value, { bindings }) })
+      return result.map((value, i) => { return transformDecodedData(generic[i], value, bindings) })
     case SOPHIA_TYPES.record: {
       const genericMap = generic.reduce((acc, val) => ({ ...acc, [val.name]: { type: val.type } }), {})
       return Object.entries(result).reduce(
         (acc, [name, value]) =>
           ({
             ...acc,
-            [name]: transformDecodedData(genericMap[name].type, value, { bindings })
+            [name]: transformDecodedData(genericMap[name].type, value, bindings)
           }),
         {}
       )
@@ -319,14 +309,14 @@ export function transformDecodedData (aci, result, { skipTransformDecoded = fals
  * @param bindings
  * @return {Object} JoiSchema
  */
-export function prepareSchema (type, { bindings } = {}) {
-  const { t, generic } = readType(type, { bindings })
+function prepareSchema (type, bindings) {
+  const { t, generic } = readType(type, bindings)
 
   switch (t) {
     case SOPHIA_TYPES.int:
-      return Joi.number().error(getJoiErrorMsg)
+      return Joi.number().unsafe()
     case SOPHIA_TYPES.variant:
-      return Joi.alternatives().try([
+      return Joi.alternatives().try(
         Joi.string().valid(
           ...generic.reduce((acc, el) => {
             const [[t, g]] = Object.entries(el)
@@ -342,109 +332,48 @@ export function prepareSchema (type, { bindings } = {}) {
             },
             {})
         ).or(...generic.map(e => Object.keys(e)[0]))
-      ])
+      )
     case SOPHIA_TYPES.ChainTtl:
-      return Joi.string().error(getJoiErrorMsg)
+      return Joi.string()
     case SOPHIA_TYPES.string:
-      return Joi.string().error(getJoiErrorMsg)
+      return Joi.string()
     case SOPHIA_TYPES.address:
-      return Joi.string().regex(/^(ak_|ct_|ok_|oq_)/).error(getJoiErrorMsg)
+      return Joi.string().regex(/^(ak_|ct_|ok_|oq_)/)
     case SOPHIA_TYPES.bool:
-      return Joi.boolean().error(getJoiErrorMsg)
+      return Joi.boolean()
     case SOPHIA_TYPES.list:
-      return Joi.array().items(prepareSchema(generic, { bindings })).error(getJoiErrorMsg)
+      return Joi.array().items(prepareSchema(generic, bindings))
     case SOPHIA_TYPES.tuple:
-      return Joi.array().ordered(generic.map(type => prepareSchema(type, { bindings }).required())).label('Tuple argument').error(getJoiErrorMsg)
+      return Joi.array().ordered(...generic.map(type => prepareSchema(type, bindings).required())).label('Tuple argument')
     case SOPHIA_TYPES.record:
       return Joi.object(
-        generic.reduce((acc, { name, type }) => ({ ...acc, [name]: prepareSchema(type, { bindings }) }), {})
-      ).error(getJoiErrorMsg)
+        generic.reduce((acc, { name, type }) => ({ ...acc, [name]: prepareSchema(type, bindings) }), {})
+      )
     case SOPHIA_TYPES.hash:
-      return JoiBinary.binary().bufferCheck(32).error(getJoiErrorMsg)
+      return JoiBinary.binary().encoding('hex').length(32)
     case SOPHIA_TYPES.bytes:
-      return JoiBinary.binary().bufferCheck(generic).error(getJoiErrorMsg)
+      return JoiBinary.binary().encoding('hex').length(generic)
     case SOPHIA_TYPES.signature:
-      return JoiBinary.binary().bufferCheck(64).error(getJoiErrorMsg)
+      return JoiBinary.binary().encoding('hex').length(64)
     case SOPHIA_TYPES.option:
-      return prepareSchema(generic, { bindings }).optional().error(getJoiErrorMsg)
+      return prepareSchema(generic, bindings).optional()
     // @Todo Need to transform Map to Array of arrays before validating it
     // case SOPHIA_TYPES.map:
-    //   return Joi.array().items(Joi.array().ordered(generic.map(type => prepareSchema(type))))
+    //   return Joi.array().items(Joi.array().ordered(...generic.map(type => prepareSchema(type))))
     default:
       return Joi.any()
   }
 }
 
 /**
- * Parse Joi validation error message
- * @param errors
- * @return {Object} JoiError
- */
-export function getJoiErrorMsg (errors) {
-  return errors.map(err => {
-    const { path, type, context } = err
-    let value = Object.prototype.hasOwnProperty.call(context, 'value') ? context.value : context.label
-    value = typeof value === 'object' ? JSON.stringify(value).slice(1).slice(0, -1) : value
-    switch (type) {
-      case 'string.base':
-        return ({ ...err, message: `Value "${value}" at path: [${path}] not a string` })
-      case 'number.base':
-        return ({ ...err, message: `Value "${value}" at path: [${path}] not a number` })
-      case 'boolean.base':
-        return ({ ...err, message: `Value "${value}" at path: [${path}] not a boolean` })
-      case 'array.base':
-        return ({ ...err, message: `Value "${value}" at path: [${path}] not a array` })
-      case 'object.base':
-        return ({ ...err, message: `Value '${value}' at path: [${path}] not a object` })
-      case 'object.type':
-        return ({ ...err, message: `Value '${value}' at path: [${path}] not a ${context.type}` })
-      case 'binary.bufferCheck':
-        return ({
-          ...err,
-          message: `Value '${Buffer.from(value).toString('hex')}' at path: [${path}] not a ${context.size} bytes`
-        })
-      default:
-        return err
-    }
-  })
-}
-
-/**
  * Custom Joi Validator for binary type
  */
 const JoiBinary = Joi.extend((joi) => ({
-  name: 'binary',
-  base: joi.any(),
-  pre (value, state, options) {
-    if (options.convert && typeof value === 'string') {
-      if (isAddressValid(value)) {
-        return decode(value)
-      }
-      try {
-        return Buffer.from(value, 'hex')
-      } catch (e) { return undefined }
-    }
-
-    return Buffer.from(value)
-  },
-  rules: [
-    {
-      name: 'bufferCheck',
-      params: {
-        size: joi.number().required()
-      },
-      validate (params, value, state, options) {
-        if (!Buffer.isBuffer(value)) {
-          return this.createError('binary.base', { value }, state, options)
-        }
-        if (value.length !== params.size) {
-          return this.createError('binary.bufferCheck', { value, size: params.size }, state, options)
-        }
-
-        return value
-      }
-    }
-  ]
+  type: 'binary',
+  base: joi.binary(),
+  coerce (value) {
+    if (typeof value !== 'string') return { value: Buffer.from(value) }
+  }
 }))
 
 /**
@@ -454,10 +383,10 @@ const JoiBinary = Joi.extend((joi) => ({
  */
 export function validateArguments (aci, params) {
   const validationSchema = Joi.array().ordered(
-    aci.arguments
-      .map(({ type }, i) => prepareSchema(type, { bindings: aci.bindings }).label(`[${params[i]}]`))
+    ...aci.arguments
+      .map(({ type }, i) => prepareSchema(type, aci.bindings).label(`[${params[i]}]`))
   ).sparse(true).label('Argument')
-  const { error } = Joi.validate(params, validationSchema, { abortEarly: false })
+  const { error } = validationSchema.validate(params, { abortEarly: false })
   if (error) {
     throw error
   }

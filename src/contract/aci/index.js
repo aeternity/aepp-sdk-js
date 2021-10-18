@@ -57,8 +57,6 @@ export default async function getContractInstance (source, { aci, contractAddres
   if (contractAddress) contractAddress = await this.resolveName(contractAddress, 'ct', { resolveByNode: true })
   const defaultOptions = {
     ...this.Ae.defaults,
-    skipArgsConvert: false,
-    skipTransformDecoded: false,
     callStatic: false,
     filesystem
   }
@@ -97,22 +95,19 @@ export default async function getContractInstance (source, { aci, contractAddres
   /**
    * Deploy contract
    * @alias module:@aeternity/aepp-sdk/es/contract/aci
-   * @rtype (init: Array, options: Object = { skipArgsConvert: false }) => ContractInstance: Object
+   * @rtype (init: Array, options: Object) => ContractInstance: Object
    * @param {Array} init Contract init function arguments array
-   * @param {Object} [options={}] options Options object
-   * @param {Boolean} [options.skipArgsConvert=false] Skip Validation and Transforming arguments before prepare call-data
+   * @param {Object} [options={}] options
    * @return {ContractInstance} Contract ACI object with predefined js methods for contract usage
    */
   instance.deploy = deploy({ client: this, instance })
   /**
    * Call contract function
    * @alias module:@aeternity/aepp-sdk/es/contract/aci
-   * @rtype (init: Array, options: Object = { skipArgsConvert: false, skipTransformDecoded: false, callStatic: false }) => CallResult: Object
+   * @rtype (init: Array, options: Object = { callStatic: false }) => CallResult: Object
    * @param {String} fn Function name
    * @param {Array} params Array of function arguments
    * @param {Object} [options={}] Array of function arguments
-   * @param {Boolean} [options.skipArgsConvert=false] Skip Validation and Transforming arguments before prepare call-data
-   * @param {Boolean} [options.skipTransformDecoded=false] Skip Transform decoded data to JS type
    * @param {Boolean} [options.callStatic=false] Static function call
    * @return {Object} CallResult
    */
@@ -154,7 +149,7 @@ const call = ({ client, instance }) => async (fn, params = [], options = {}) => 
     BigNumber(opt.amount).gt(0) &&
     (Object.prototype.hasOwnProperty.call(fnACI, 'payable') && !fnACI.payable)
   ) throw new Error(`You try to pay "${opt.amount}" to function "${fn}" which is not payable. Only payable function can accept tokens`)
-  params = !opt.skipArgsConvert ? await prepareArgs(fnACI, params) : params
+  params = await prepareArgs(fnACI, params)
   const result = opt.callStatic
     ? await client.contractCallStatic(source, instance.deployInfo.address, fn, params, opt)
     : await client.contractCall(source, instance.deployInfo.address, fn, params, opt)
@@ -170,7 +165,7 @@ const deploy = ({ client, instance }) => async (init = [], options = {}) => {
   const source = opt.source || instance.source
 
   if (!instance.compiled) await instance.compile(opt)
-  init = !opt.skipArgsConvert ? await prepareArgs(fnACI, init) : init
+  init = await prepareArgs(fnACI, init)
 
   if (opt.callStatic) {
     return client.contractCallStatic(source, null, 'init', init, {

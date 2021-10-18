@@ -56,8 +56,6 @@ export default AccountBase.compose(AsyncInit, {
       if (!address) address = Object.keys(this.accounts)[0]
       decode(address, 'ak')
       this.selectedAddress = address
-    } else {
-      console.warn('No account/accounts supplied')
     }
   },
   props: {
@@ -138,15 +136,19 @@ export default AccountBase.compose(AsyncInit, {
      * @private
      */
     _resolveAccount (account) {
-      switch (typeof account) {
-        case 'string':
-          decode(account, 'ak')
-          if (!this.accounts[account]) throw new Error(`Account for ${account} not available`)
-          return this.accounts[account]
-        case 'object':
-          return isAccountBase(account) ? account : MemoryAccount({ keypair: account })
-        default:
-          throw new Error(`Unknown account type: ${typeof account} (account: ${account})`)
+      if (account === null) {
+        throw new Error('No account or wallet configured')
+      } else {
+        switch (typeof account) {
+          case 'string':
+            decode(account, 'ak')
+            if (!this.accounts[account]) throw new Error(`Account for ${account} not available`)
+            return this.accounts[account]
+          case 'object':
+            return isAccountBase(account) ? account : MemoryAccount({ keypair: account })
+          default:
+            throw new Error(`Unknown account type: ${typeof account} (account: ${account})`)
+        }
       }
     }
   }
