@@ -89,7 +89,7 @@ describe('Oracle', function () {
     const account = generateKeyPair()
 
     before(async function () {
-      await client.spend('1' + '0'.repeat(15), account.publicKey)
+      await client.spend(1e15, account.publicKey)
       client.addAccount(MemoryAccount({ keypair: account }), { select: true })
       oracleWithFee = await client.registerOracle("{'city': str}", "{'tmp': num}", { queryFee, onAccount: account })
     })
