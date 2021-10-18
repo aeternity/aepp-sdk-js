@@ -489,9 +489,9 @@ async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, ga
   } else {
     if (!n) {
       try {
-        n = (await this.api.getAccountNextNonce(senderId, { strategy: 'continuity' })).nextNonce
+        n = (await this.api.getAccountNextNonce(senderId, { strategy })).nextNonce
       } catch (e) {
-        n = (account.nonce + 1)
+        n = 1
       }
     }
   }
