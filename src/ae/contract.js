@@ -65,25 +65,6 @@ async function _handleCallError (source, name, result) {
 }
 
 /**
- * Decode contract call result data
- * @function
- * @alias module:@aeternity/aepp-sdk/es/ae/contract
- * @category async
- * @param {String} source - source code
- * @param {String } fn - function name
- * @param {String} callValue - result call data
- * @param {String} callResult - result status
- * @param {Object} [options={}]  Options
- * @param {Object} [options.filesystem={}] Contract external namespaces map
- * @return {Promise<String>} Result object
- * @example
- * const decodedData = await client.contractDecodeData(SourceCode ,'functionName', 'cb_asdasdasd...', 'ok|revert')lt
- */
-async function contractDecodeData (source, fn, callValue, callResult, options) {
-  return this.contractDecodeCallResultAPI(source, fn, callValue, callResult, options)
-}
-
-/**
  * Static contract call(using dry-run)
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
@@ -135,7 +116,7 @@ async function contractCallStatic (source, address, name, args = [], options = {
     ...dryRunOther,
     tx: TxObject({ tx }),
     result: callObj,
-    decode: () => this.contractDecodeData(source, name, returnValue, returnType, options)
+    decode: () => this.contractDecodeCallResultAPI(source, name, returnValue, returnType, options)
   }
 }
 
@@ -173,7 +154,7 @@ async function contractCall (source, address, name, argsOrCallData = [], options
     rawTx,
     result,
     txData,
-    decode: () => result ? this.contractDecodeData(source, name, result.returnValue, result.returnType, opt) : {}
+    decode: () => result ? this.contractDecodeCallResultAPI(source, name, result.returnValue, result.returnType, opt) : {}
   }
 }
 
@@ -368,7 +349,6 @@ export const ContractAPI = Ae.compose(ContractBase, {
     contractCallStatic,
     contractDeploy,
     contractCall,
-    contractDecodeData,
     _handleCallError,
     _sendAndProcess,
     // Delegation for contract
