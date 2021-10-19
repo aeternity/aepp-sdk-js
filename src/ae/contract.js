@@ -32,7 +32,7 @@ import ContractCompilerAPI from '../contract/compiler'
 import ContractBase from '../contract'
 import getContractInstance from '../contract/aci'
 import NodePool from '../node-pool'
-import { AMOUNT, DEPOSIT, DRY_RUN_ACCOUNT, GAS, MIN_GAS_PRICE } from '../tx/builder/schema'
+import { AMOUNT, DEPOSIT, GAS, MIN_GAS_PRICE } from '../tx/builder/schema'
 import { decode, produceNameId } from '../tx/builder/helpers'
 import TxObject from '../tx/tx-object'
 
@@ -69,10 +69,11 @@ async function _handleCallError (source, name, result) {
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
+ * @deprecated
  * @param {String} source Contract source code
- * @param {String} address Contract address
+ * @param {String} contractAddress Contract address
  * @param {String} name Name of function to call
- * @param {Array|String} args Argument's or callData for call/deploy transaction
+ * @param {Array} args Arguments array for call/deploy transaction
  * @param {Object} [options]
  * @param {Number|String} [options.top] Block height or hash on which you want to call contract
  * @param {String} [options.bytecode] Block hash on which you want to call contract
@@ -85,39 +86,9 @@ async function _handleCallError (source, name, result) {
  *   decode: (type) => Decode call result
  * }
  */
-async function contractCallStatic (source, address, name, args = [], options = {}) {
-  const callerId = await this.address(options).catch(() => DRY_RUN_ACCOUNT.pub)
-  if (typeof options.top === 'number') {
-    options.top = (await this.getKeyBlock(options.top)).hash
-  }
-  const txOpt = {
-    ...this.Ae.defaults,
-    ...options,
-    callData: Array.isArray(args) ? await this.contractEncodeCallDataAPI(source, name, args, options) : args,
-    nonce: options.top && (await this.getAccount(callerId, { hash: options.top })).nonce + 1
-  }
-  const tx = name === 'init'
-    ? (await this.contractCreateTx({
-      ...txOpt,
-      code: options.bytecode,
-      ownerId: callerId
-    })).tx
-    : await this.contractCallTx({
-      ...txOpt,
-      callerId,
-      contractId: await this.resolveName(address, 'ct', { resolveByNode: true })
-    })
-
-  const { callObj, ...dryRunOther } = await this.txDryRun(tx, callerId, options)
-
-  await this._handleCallError(source, name, callObj)
-  const { returnType, returnValue } = callObj
-  return {
-    ...dryRunOther,
-    tx: TxObject({ tx }),
-    result: callObj,
-    decode: () => this.contractDecodeCallResultAPI(source, name, returnValue, returnType, options)
-  }
+async function contractCallStatic (source, contractAddress, name, args = [], options) {
+  const contract = await this.getContractInstance(source, { ...options, contractAddress })
+  return contract.call(name, args, { ...options, callStatic: true })
 }
 
 /**
@@ -125,12 +96,14 @@ async function contractCallStatic (source, address, name, args = [], options = {
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
+ * @deprecated
  * @param {String} source Contract source code
- * @param {String} address Contract address or AENS name
+ * @param {String} contractAddress Contract address or AENS name
  * @param {String} name Name of function to call
- * @param {Array|String} argsOrCallData Argument's array or callData for call function
- * @param {Object} [options={}] Transaction options (fee, ttl, gas, amount, deposit)
- * @param {Object} [options.filesystem={}] Contract external namespaces map* @return {Promise<Object>} Result object
+ * @param {Array} args Arguments array for call/deploy transaction
+ * @param {Object} [options] Transaction options (fee, ttl, gas, amount, deposit)
+ * @param {Object} [options.filesystem] Contract external namespaces map
+ * @return {Promise<Object>} Result object
  * @example
  * const callResult = await client.contractCall(source, address, fnName, args = [], options)
  * {
@@ -139,23 +112,9 @@ async function contractCallStatic (source, address, name, args = [], options = {
  *   decode: (type) => Decode call result
  * }
  */
-async function contractCall (source, address, name, argsOrCallData = [], options = {}) {
-  const opt = R.merge(this.Ae.defaults, options)
-
-  const tx = await this.contractCallTx(R.merge(opt, {
-    callerId: await this.address(opt),
-    contractId: await this.resolveName(address, 'ct', { resolveByNode: true }),
-    callData: Array.isArray(argsOrCallData) ? await this.contractEncodeCallDataAPI(source, name, argsOrCallData, opt) : argsOrCallData
-  }))
-
-  const { hash, rawTx, result, txData } = await this._sendAndProcess(tx, source, name, opt)
-  return {
-    hash,
-    rawTx,
-    result,
-    txData,
-    decode: () => result ? this.contractDecodeCallResultAPI(source, name, result.returnValue, result.returnType, opt) : {}
-  }
+async function contractCall (source, contractAddress, name, args, options) {
+  const contract = await this.getContractInstance(source, { ...options, contractAddress })
+  return contract.call(name, args, options)
 }
 
 /**
