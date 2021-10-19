@@ -618,7 +618,7 @@ describe('Contract', function () {
     it('Generate ACI object', async () => {
       contractObject = await sdk.getContractInstance(
         genTestContract(sdk._isCompiler6),
-        { filesystem, opt: { ttl: 0 } }
+        { filesystem, ttl: 0 }
       )
       contractObject.should.have.property('interface')
       contractObject.should.have.property('aci')
@@ -671,24 +671,30 @@ describe('Contract', function () {
     it('Generate ACI object with corresponding bytecode', async () => {
       await sdk.getContractInstance(
         genTestContract(sdk._isCompiler6),
-        { contractAddress: contractObject.deployInfo.address, filesystem, opt: { ttl: 0 } }
+        { contractAddress: contractObject.deployInfo.address, filesystem, ttl: 0 }
       )
     })
     it('Generate ACI object with not corresponding bytecode', async () => {
       try {
-        await sdk.getContractInstance(identityContract, { contractAddress: contractObject.deployInfo.address, opt: { ttl: 0 } })
+        await sdk.getContractInstance(
+          identityContract,
+          { contractAddress: contractObject.deployInfo.address, ttl: 0 }
+        )
       } catch (e) {
         e.message.should.be.equal('Contract source do not correspond to the contract bytecode deployed on the chain')
       }
     })
     it('Generate ACI object with not corresponding bytecode and force this check', async () => {
-      await sdk.getContractInstance(identityContract, { forceCodeCheck: true, contractAddress: contractObject.deployInfo.address, opt: { ttl: 0 } })
+      await sdk.getContractInstance(
+        identityContract,
+        { forceCodeCheck: true, contractAddress: contractObject.deployInfo.address, ttl: 0 }
+      )
     })
     it('Throw error on creating contract instance with invalid contractAddress', async () => {
       try {
         await sdk.getContractInstance(
           genTestContract(sdk._isCompiler6),
-          { filesystem, contractAddress: 'ct_asdasdasd', opt: { ttl: 0 } }
+          { filesystem, contractAddress: 'ct_asdasdasd', ttl: 0 }
         )
       } catch (e) {
         e.message.should.be.equal('Invalid name or address: ct_asdasdasd')
@@ -699,7 +705,7 @@ describe('Contract', function () {
       try {
         await sdk.getContractInstance(
           genTestContract(sdk._isCompiler6),
-          { filesystem, contractAddress, opt: { ttl: 0 } }
+          { filesystem, contractAddress, ttl: 0 }
         )
       } catch (e) {
         e.message.should.be.equal(`Contract with address ${contractAddress} not found on-chain or not active`)

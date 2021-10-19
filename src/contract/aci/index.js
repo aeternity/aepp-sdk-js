@@ -37,7 +37,6 @@ import { decodeEvents, transformDecodedData } from './transformation'
  * @param {String} [options.contractAddress] Contract address
  * @param {Object} [options.filesystem] Contact source external namespaces map
  * @param {Object} [options.forceCodeCheck=true] Don't check contract code
- * @param {Object} [options.opt] Contract options
  * @return {ContractInstance} JS Contract API
  * @example
  * const contractIns = await client.getContractInstance(sourceCode)
@@ -47,14 +46,9 @@ import { decodeEvents, transformDecodedData } from './transformation'
  * Also you can call contract like: await contractIns.methods.setState(123, options)
  * Then sdk decide to make on-chain or static call(dry-run API) transaction based on function is stateful or not
  */
-export default async function getContractInstance (source, { aci, contractAddress, filesystem = {}, forceCodeCheck = true, opt } = {}) {
+export default async function getContractInstance (source, { aci, contractAddress, filesystem = {}, forceCodeCheck = true, ...otherOptions } = {}) {
   aci = aci || await this.contractGetACI(source, { filesystem })
   if (contractAddress) contractAddress = await this.resolveName(contractAddress, 'ct', { resolveByNode: true })
-  const defaultOptions = {
-    ...this.Ae.defaults,
-    callStatic: false,
-    filesystem
-  }
   const instance = {
     interface: R.defaultTo(null, R.prop('interface', aci)),
     aci: R.defaultTo(null, R.path(['encoded_aci', 'contract'], aci)),
@@ -62,7 +56,12 @@ export default async function getContractInstance (source, { aci, contractAddres
     source,
     compiled: null,
     deployInfo: { address: contractAddress },
-    options: R.merge(defaultOptions, opt),
+    options: {
+      ...this.Ae.defaults,
+      callStatic: false,
+      filesystem,
+      ...otherOptions
+    },
     compilerVersion: this.compilerVersion
   }
 
