@@ -63,10 +63,7 @@ export default async function getContractInstance (source, { aci, contractAddres
     compiled: null,
     deployInfo: { address: contractAddress },
     options: R.merge(defaultOptions, opt),
-    compilerVersion: this.compilerVersion,
-    setOptions (opt) {
-      this.options = R.merge(this.options, opt)
-    }
+    compilerVersion: this.compilerVersion
   }
 
   // Check for valid contract address and contract code
