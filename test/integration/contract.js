@@ -333,8 +333,8 @@ describe('Contract', function () {
   it('Deploy/Call/Dry-run contract using callData', async () => {
     const callArg = 1
     const { bytecode } = await sdk.contractCompile(identityContract)
-    const callDataDeploy = await sdk.contractEncodeCall(identityContract, 'init', [])
-    const callDataCall = await sdk.contractEncodeCall(identityContract, 'getArg', [callArg.toString()])
+    const callDataDeploy = await sdk.contractEncodeCallDataAPI(identityContract, 'init', [])
+    const callDataCall = await sdk.contractEncodeCallDataAPI(identityContract, 'getArg', [callArg.toString()])
 
     const deployStatic = await sdk.contractCallStatic(identityContract, null, 'init', callDataDeploy, { bytecode })
     deployStatic.result.should.have.property('gasUsed')

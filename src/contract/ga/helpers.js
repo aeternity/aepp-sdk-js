@@ -10,6 +10,6 @@ export const prepareGaParams = (ins) => async (authData, authFnName) => {
     return { authCallData: authData.callData, gas }
   } else {
     if (!authData.source || !authData.args) throw new Error('Auth data must contain source code and arguments.')
-    return { authCallData: await ins.contractEncodeCall(authData.source, authFnName, authData.args), gas }
+    return { authCallData: await ins.contractEncodeCallDataAPI(authData.source, authFnName, authData.args), gas }
   }
 }

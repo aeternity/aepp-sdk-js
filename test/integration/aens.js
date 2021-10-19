@@ -81,7 +81,7 @@ contract Identity =
     const deployed = await bytecode.deploy([])
     const nameObject = await sdk.aensQuery(name)
     await nameObject.update([deployed.address])
-    const callDataCall = await sdk.contractEncodeCall(identityContract, 'getArg', ['1'])
+    const callDataCall = await sdk.contractEncodeCallDataAPI(identityContract, 'getArg', ['1'])
     const callRes = await sdk.contractCall(identityContract, name, 'getArg', callDataCall)
     const callResStatic = await sdk.contractCallStatic(identityContract, name, 'getArg', callDataCall)
     callResStatic.result.returnType.should.be.equal('ok')

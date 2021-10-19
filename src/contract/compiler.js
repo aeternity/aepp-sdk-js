@@ -74,6 +74,17 @@ export default AsyncInit.compose(ContractBase, {
       this._ensureCompilerReady()
       return Promise.resolve(this.compilerVersion)
     },
+    /**
+     * Encode call data for contract call
+     * @function
+     * @category async
+     * @param {String} source Contract source code
+     * @param {String} name Name of function to call
+     * @param {Array} args Argument's for call
+     * @param {Object} [options={}]  Options
+     * @param {Object} [options.filesystem={}] Contract external namespaces map
+     * @return {Promise<String>}
+     */
     async contractEncodeCallDataAPI (source, name, args = [], options) {
       this._ensureCompilerReady()
       const { calldata } = await this._compilerApi.encodeCalldata({

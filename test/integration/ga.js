@@ -55,7 +55,7 @@ describe('Generalize Account', function () {
     const { publicKey } = generateKeyPair()
 
     const r = () => Math.floor(Math.random() * 20).toString()
-    const callData = await sdk.contractEncodeCall(authContract, 'authorize', [r()])
+    const callData = await sdk.contractEncodeCallDataAPI(authContract, 'authorize', [r()])
     await sdk.spend(10000, publicKey, { authData: { callData } })
     await sdk.spend(10000, publicKey, { authData: { source: authContract, args: [r()] } })
     const balanceAfter = await sdk.balance(publicKey)
