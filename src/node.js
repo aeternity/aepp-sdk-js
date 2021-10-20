@@ -113,7 +113,7 @@ const Node = AsyncInit.compose({
   }
 })
 
-const NODE_GE_VERSION = '6.0.0'
+const NODE_GE_VERSION = '6.2.0'
 const NODE_LT_VERSION = '7.0.0'
 
 export default Node

@@ -481,14 +481,8 @@ async function getAccountNonce (accountId, nonce) {
  * @param {Object} params Object which contains all tx data
  * @return {Object} { ttl, nonce, fee } Object with account nonce, absolute ttl and transaction fee
  */
-async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, gas, absoluteTtl, vsn }) {
-  const account = await this.getAccount(senderId).catch(e => ({ nonce: 0 }))
-  // Is GA account
-  if (account.contractId) {
-    n = 0
-  } else {
-    n = n || (account.nonce + 1)
-  }
+async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, gas, absoluteTtl, vsn, strategy }) {
+  n = n || (await this.api.getAccountNextNonce(senderId, { strategy }).catch(e => ({ nextNonce: 1 }))).nextNonce
   const ttl = await calculateTtl.call(this, t, !absoluteTtl)
   const fee = calculateFee(f, txType, { showWarning: this.showWarning, gas, params: R.merge(R.last(arguments), { nonce: n, ttl }), vsn })
   return { fee, ttl, nonce: n }

@@ -22,9 +22,14 @@ These options are common and can be provided to every tx-type:
     - You can specify the account that should be used to sign a transaction.
     - Note:
         - The account needs to be provided to the SDK instance in order to be used for signing.
-- `nonce` (default: current nonce of the account obtained via node API + 1)
+- `nonce` (default: obtain nonce of the account via node API)
     - The default behavior might cause problems if you perform many transactions in a short period of time.
     - You might want to implement your own nonce management and provide the nonce "manually".
+    - 2 different strategies to use in order to determine the next nonce, See option `strategy` to learn more.
+- `strategy` (default: `max`)
+    - The strategy to obtain next nonce for an account via node API
+    - If set to `max`, then the greatest nonce seen in the account or currently in the transaction pool is incremented with 1 and returned. 
+    If the strategy is set to `continuity`, then transactions in the mempool are checked if there are gaps - missing nonces that prevent transactions with greater nonces to get included
 - `ttl` (default: `0`)
     - Should be set if you want the transaction to be only valid until a certain block height is reached.
 - `fee` (default: calculated for each tx-type)
