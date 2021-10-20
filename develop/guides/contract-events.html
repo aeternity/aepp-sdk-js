@@ -827,7 +827,7 @@ On this page you will learn how to access and decode the event log of a specific
 </code></pre></div>
 <h2 id="decode-events-using-aci-high-level-recommended">Decode events using ACI (high-level, recommended)</h2>
 <p>When initializing a contract instance using the source code and providing the <a href="https://github.com/aeternity/aesophia/blob/v6.0.1/docs/aeso_aci.md">ACI</a>
-or obtaining it via http compiler (default) you will be able to access the <code>emitEvents</code> entrypoint of the Sophia contract above as follows: </p>
+or obtaining it via http compiler (default) you will be able to access the <code>emitEvents</code> entrypoint of the Sophia contract above as follows:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// events emitted by contract calls are automatically decoded</span>
 <span class="kd">const</span> <span class="nx">tx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">emitEvents</span><span class="p">(</span><span class="mf">1337</span><span class="p">,</span> <span class="s2">&quot;this message is not indexed&quot;</span><span class="p">)</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">tx</span><span class="p">.</span><span class="nx">decodedEvents</span><span class="p">)</span>
@@ -917,7 +917,7 @@ or obtaining it via http compiler (default) you will be able to access the <code
   <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;AnotherEvent&#39;</span><span class="p">,</span> <span class="nx">types</span><span class="o">:</span> <span class="p">[</span><span class="nx">SOPHIA_TYPES</span><span class="p">.</span><span class="nx">address</span><span class="p">,</span> <span class="nx">SOPHIA_TYPES</span><span class="p">.</span><span class="nx">string</span><span class="p">]</span> <span class="p">},</span>
 <span class="p">]</span>
 
-<span class="kd">const</span> <span class="nx">decodedEvents</span> <span class="o">=</span> <span class="nx">decodeEvents</span><span class="p">(</span><span class="nx">tx</span><span class="p">.</span><span class="nx">log</span><span class="p">,</span> <span class="p">{</span> <span class="nx">schema</span><span class="o">:</span> <span class="nx">eventsSchema</span> <span class="p">})</span>
+<span class="kd">const</span> <span class="nx">decodedEvents</span> <span class="o">=</span> <span class="nx">decodeEvents</span><span class="p">(</span><span class="nx">tx</span><span class="p">.</span><span class="nx">log</span><span class="p">,</span> <span class="nx">eventsSchema</span><span class="p">)</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">decodedEvents</span><span class="p">)</span>
 <span class="cm">/*</span>
 <span class="cm">[</span>
