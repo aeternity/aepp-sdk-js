@@ -929,9 +929,16 @@ Some of these are common and can be provided for each transaction type. Others a
 </li>
 </ul>
 </li>
-<li><code>nonce</code> (default: current nonce of the account obtained via node API + 1)<ul>
+<li><code>nonce</code> (default: obtain nonce of the account via node API)<ul>
 <li>The default behavior might cause problems if you perform many transactions in a short period of time.</li>
 <li>You might want to implement your own nonce management and provide the nonce "manually".</li>
+<li>2 different strategies to use in order to determine the next nonce, See option <code>strategy</code> to learn more.</li>
+</ul>
+</li>
+<li><code>strategy</code> (default: <code>max</code>)<ul>
+<li>The strategy to obtain next nonce for an account via node API</li>
+<li>If set to <code>max</code>, then the greatest nonce seen in the account or currently in the transaction pool is incremented with 1 and returned. 
+If the strategy is set to <code>continuity</code>, then transactions in the mempool are checked if there are gaps - missing nonces that prevent transactions with greater nonces to get included</li>
 </ul>
 </li>
 <li><code>ttl</code> (default: <code>0</code>)<ul>
