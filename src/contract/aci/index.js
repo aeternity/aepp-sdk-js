@@ -25,13 +25,8 @@
 import * as R from 'ramda'
 import BigNumber from 'bignumber.js'
 
-import {
-  buildContractMethods,
-  decodeCallResult,
-  decodeEvents,
-  getFunctionACI,
-  prepareArgsForEncode as prepareArgs
-} from './helpers'
+import { getFunctionACI, prepareArgsForEncode } from './helpers'
+import { decodeEvents, transformDecodedData } from './transformation'
 
 /**
  * Generate contract ACI object with predefined js methods for contract usage - can be used for creating a reference to already deployed contracts
@@ -89,18 +84,40 @@ export default async function getContractInstance (source, { aci, contractAddres
    * Compile contract
    * @alias module:@aeternity/aepp-sdk/es/contract/aci
    * @rtype () => ContractInstance: Object
-   * @return {ContractInstance} Contract ACI object with predefined js methods for contract usage
+   * @return {String} compiled bytecode
    */
-  instance.compile = compile({ client: this, instance })
+  instance.compile = async (options = {}) => {
+    const { bytecode } = await this.contractCompile(instance.source, { ...instance.options, ...options })
+    instance.compiled = bytecode
+    return instance.compiled
+  }
+
   /**
    * Deploy contract
    * @alias module:@aeternity/aepp-sdk/es/contract/aci
    * @rtype (init: Array, options: Object) => ContractInstance: Object
    * @param {Array} init Contract init function arguments array
    * @param {Object} [options={}] options
-   * @return {ContractInstance} Contract ACI object with predefined js methods for contract usage
+   * @return {Object} deploy info
    */
-  instance.deploy = deploy({ client: this, instance })
+  instance.deploy = async (init = [], options = {}) => {
+    const opt = { ...instance.options, ...options }
+    const fnACI = getFunctionACI(instance.aci, 'init', instance.externalAci)
+    const source = opt.source || instance.source
+
+    if (!instance.compiled) await instance.compile(opt)
+    init = await prepareArgsForEncode(fnACI, init)
+
+    if (opt.callStatic) {
+      return this.contractCallStatic(source, null, 'init', init, {
+        ...opt,
+        bytecode: instance.compiled
+      })
+    }
+    instance.deployInfo = await this.contractDeploy(instance.compiled, opt.source || instance.source, init, opt)
+    return instance.deployInfo
+  }
+
   /**
    * Call contract function
    * @alias module:@aeternity/aepp-sdk/es/contract/aci
@@ -111,7 +128,34 @@ export default async function getContractInstance (source, { aci, contractAddres
    * @param {Boolean} [options.callStatic=false] Static function call
    * @return {Object} CallResult
    */
-  instance.call = call({ client: this, instance })
+  instance.call = async (fn, params = [], options = {}) => {
+    const opt = { ...instance.options, ...options }
+    const fnACI = getFunctionACI(instance.aci, fn, instance.externalAci)
+    const source = opt.source || instance.source
+
+    if (!fn) throw new Error('Function name is required')
+    if (!instance.deployInfo.address) throw new Error('You need to deploy contract before calling!')
+    if (
+      BigNumber(opt.amount).gt(0) &&
+      (Object.prototype.hasOwnProperty.call(fnACI, 'payable') && !fnACI.payable)
+    ) throw new Error(`You try to pay "${opt.amount}" to function "${fn}" which is not payable. Only payable function can accept tokens`)
+    params = await prepareArgsForEncode(fnACI, params)
+    const result = opt.callStatic
+      ? await this.contractCallStatic(source, instance.deployInfo.address, fn, params, opt)
+      : await this.contractCall(source, instance.deployInfo.address, fn, params, opt)
+    return {
+      ...result,
+      ...opt.waitMined && {
+        decodedResult: await transformDecodedData(
+          fnACI.returns,
+          await result.decode(),
+          fnACI.bindings
+        ),
+        decodedEvents: instance.decodeEvents(fn, result.result.log)
+      }
+    }
+  }
+
   /**
    * Decode Events
    * @alias module:@aeternity/aepp-sdk/es/contract/aci
@@ -120,7 +164,16 @@ export default async function getContractInstance (source, { aci, contractAddres
    * @param {Array} events Array of encoded events(callRes.result.log)
    * @return {Object} DecodedEvents
    */
-  instance.decodeEvents = eventDecode({ instance })
+  instance.decodeEvents = (fn, events) => {
+    const fnACI = getFunctionACI(instance.aci, fn, instance.externalAci)
+    if (!fnACI.event || !fnACI.event.length) return []
+
+    const eventsSchema = fnACI.event.map(e => {
+      const name = Object.keys(e)[0]
+      return { name, types: e[name] }
+    })
+    return decodeEvents(events, eventsSchema)
+  }
 
   /**
    * Generate proto function based on contract function using Contract ACI schema
@@ -130,57 +183,27 @@ export default async function getContractInstance (source, { aci, contractAddres
    * `await contract.methods.testFunction.get()` -> use call-static(dry-run)
    * `await contract.methods.testFunction.send()` -> send tx on-chain
    */
-  instance.methods = buildContractMethods(instance)()
-  return instance
-}
-
-const eventDecode = ({ instance }) => (fn, events) => {
-  return decodeEvents(events, getFunctionACI(instance.aci, fn, { external: instance.externalAci }))
-}
-
-const call = ({ client, instance }) => async (fn, params = [], options = {}) => {
-  const opt = { ...instance.options, ...options }
-  const fnACI = getFunctionACI(instance.aci, fn, { external: instance.externalAci })
-  const source = opt.source || instance.source
-
-  if (!fn) throw new Error('Function name is required')
-  if (!instance.deployInfo.address) throw new Error('You need to deploy contract before calling!')
-  if (
-    BigNumber(opt.amount).gt(0) &&
-    (Object.prototype.hasOwnProperty.call(fnACI, 'payable') && !fnACI.payable)
-  ) throw new Error(`You try to pay "${opt.amount}" to function "${fn}" which is not payable. Only payable function can accept tokens`)
-  params = await prepareArgs(fnACI, params)
-  const result = opt.callStatic
-    ? await client.contractCallStatic(source, instance.deployInfo.address, fn, params, opt)
-    : await client.contractCall(source, instance.deployInfo.address, fn, params, opt)
-  return {
-    ...result,
-    ...opt.waitMined ? await decodeCallResult(result, fnACI, opt) : {}
-  }
-}
-
-const deploy = ({ client, instance }) => async (init = [], options = {}) => {
-  const opt = { ...instance.options, ...options }
-  const fnACI = getFunctionACI(instance.aci, 'init', { external: instance.externalAci })
-  const source = opt.source || instance.source
-
-  if (!instance.compiled) await instance.compile(opt)
-  init = await prepareArgs(fnACI, init)
-
-  if (opt.callStatic) {
-    return client.contractCallStatic(source, null, 'init', init, {
-      ...opt,
-      bytecode: instance.compiled
+  instance.methods = Object.fromEntries(instance.aci.functions
+    .map(({ name, arguments: aciArgs, stateful }) => {
+      const genHandler = callStatic => (...args) => {
+        const options = args.length === aciArgs.length + 1 ? args.pop() : {}
+        if (typeof options !== 'object') throw new Error(`Options should be an object: ${options}`)
+        if (name === 'init') return instance.deploy(args, { callStatic, ...options })
+        return instance.call(name, args, { callStatic, ...options })
+      }
+      return [
+        name,
+        Object.assign(
+          genHandler(name === 'init' ? false : !stateful),
+          {
+            get: genHandler(true),
+            send: genHandler(false),
+            decodeEvents: events => instance.decodeEvents(name, events)
+          }
+        )
+      ]
     })
-  } else {
-    const { owner, transaction, address, createdAt, result, rawTx } = await client.contractDeploy(instance.compiled, opt.source || instance.source, init, opt)
-    instance.deployInfo = { owner, transaction, address, createdAt, result, rawTx }
-    return instance.deployInfo
-  }
-}
+  )
 
-const compile = ({ client, instance }) => async (options = {}) => {
-  const { bytecode } = await client.contractCompile(instance.source, { ...instance.options, ...options })
-  instance.compiled = bytecode
-  return instance.compiled
+  return instance
 }

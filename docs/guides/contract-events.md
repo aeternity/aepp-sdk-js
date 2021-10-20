@@ -20,7 +20,7 @@ contract EventEmitter =
 
 ## Decode events using ACI (high-level, recommended)
 When initializing a contract instance using the source code and providing the [ACI](https://github.com/aeternity/aesophia/blob/v6.0.1/docs/aeso_aci.md)
-or obtaining it via http compiler (default) you will be able to access the `emitEvents` entrypoint of the Sophia contract above as follows: 
+or obtaining it via http compiler (default) you will be able to access the `emitEvents` entrypoint of the Sophia contract above as follows:
 
 ```js
 // events emitted by contract calls are automatically decoded
@@ -117,7 +117,7 @@ const eventsSchema = [
   { name: 'AnotherEvent', types: [SOPHIA_TYPES.address, SOPHIA_TYPES.string] },
 ]
 
-const decodedEvents = decodeEvents(tx.log, { schema: eventsSchema })
+const decodedEvents = decodeEvents(tx.log, eventsSchema)
 console.log(decodedEvents)
 /*
 [
