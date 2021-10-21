@@ -24,7 +24,7 @@
 
 import * as R from 'ramda'
 import BigNumber from 'bignumber.js'
-
+import { Encoder as Calldata } from '@aeternity/aepp-calldata'
 import { getFunctionACI, prepareArgsForEncode } from './helpers'
 import { decodeEvents, transformDecodedData } from './transformation'
 import { DRY_RUN_ACCOUNT } from '../../tx/builder/schema'
@@ -54,6 +54,7 @@ export default async function getContractInstance (source, { aci, contractAddres
   const instance = {
     interface: R.defaultTo(null, R.prop('interface', aci)),
     aci: R.defaultTo(null, R.path(['encoded_aci', 'contract'], aci)),
+    calldata: new Calldata([aci.encoded_aci, ...aci.external_encoded_aci]),
     externalAci: aci.external_encoded_aci ? aci.external_encoded_aci.map(a => a.contract || a.namespace) : [],
     source,
     compiled: null,
@@ -139,12 +140,7 @@ export default async function getContractInstance (source, { aci, contractAddres
       if (opt.callStatic) return DRY_RUN_ACCOUNT.pub
       else throw error
     })
-    const callData = await this.contractEncodeCallDataAPI(
-      source,
-      fn,
-      await prepareArgsForEncode(fnACI, params),
-      opt
-    )
+    const callData = instance.calldata.encode(instance.aci.name, fn, params)
 
     let res
     if (opt.callStatic) {

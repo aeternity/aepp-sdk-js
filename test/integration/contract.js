@@ -179,7 +179,7 @@ describe('Contract', function () {
       const current = await sdk.address()
       const onAccount = sdk.addresses().find(acc => acc !== current)
       const qFee = 500000
-      const ttl = 'RelativeTTL(50)'
+      const ttl = { variant: 'RelativeTTL', values: [50] }
       const oracleId = `ok_${onAccount.slice(3)}`
 
       const oracleDelegationSig = await sdk.createOracleDelegationSignature({ contractId }, { onAccount })
@@ -262,9 +262,9 @@ describe('Contract', function () {
 
     const deployed = await bytecode.deploy([], { onAccount })
     deployed.result.callerId.should.be.equal(onAccount)
-    const callRes = await deployed.call('getArg', ['42'])
+    const callRes = await deployed.call('getArg', [42])
     callRes.result.callerId.should.be.equal(onAccount)
-    const callStaticRes = await deployed.callStatic('getArg', ['42'])
+    const callStaticRes = await deployed.callStatic('getArg', [42])
     callStaticRes.result.callerId.should.be.equal(onAccount)
   })
 
@@ -310,7 +310,7 @@ describe('Contract', function () {
   })
 
   it('calls deployed contracts', async () => {
-    const result = await deployed.call('getArg', ['42'])
+    const result = await deployed.call('getArg', [42])
     return result.decode().should.eventually.become(42)
   })
 
@@ -319,14 +319,14 @@ describe('Contract', function () {
     await sdk.poll(deployed.transaction, { interval: 50, attempts: 1200 })
     expect(deployed.result).to.be.equal(undefined)
     deployed.txData.should.not.be.equal(undefined)
-    const result = await deployed.call('getArg', ['42'], { waitMined: false })
+    const result = await deployed.call('getArg', [42], { waitMined: false })
     expect(result.result).to.be.equal(undefined)
     result.txData.should.not.be.equal(undefined)
     await sdk.poll(result.hash, { interval: 50, attempts: 1200 })
   })
 
   it('calls deployed contracts static', async () => {
-    const result = await deployed.callStatic('getArg', ['42'])
+    const result = await deployed.callStatic('getArg', [42])
     return result.decode().should.eventually.become(42)
   })
 
@@ -372,11 +372,11 @@ describe('Contract', function () {
     })
 
     it('Can call contract with external deps', async () => {
-      const callResult = await deployed.call('sumNumbers', ['1', '2'])
+      const callResult = await deployed.call('sumNumbers', [1, 2])
       const decoded = await callResult.decode()
       decoded.should.be.equal(3)
 
-      const callStaticResult = await deployed.callStatic('sumNumbers', ['1', '2'])
+      const callStaticResult = await deployed.callStatic('sumNumbers', [1, 2])
       const decoded2 = await callStaticResult.decode()
       decoded2.should.be.equal(3)
     })
