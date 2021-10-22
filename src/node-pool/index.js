@@ -5,7 +5,6 @@
  * @example import { NodePool } from '@aeternity/aepp-sdk'
  */
 import stampit from '@stamp/it'
-import Joi from 'joi'
 import { getNetworkId } from '../node'
 
 /**
@@ -141,17 +140,27 @@ export default stampit({
       }))
     },
     validateNodes (nodes) {
-      const { error } = Joi.array().items(
-        Joi.object({
-          name: Joi.string().required(),
-          instance: Joi.object({
-            api: Joi.object().required(),
-            consensusProtocolVersion: Joi.number().required(),
-            genesisHash: Joi.string().required()
-          }).unknown()
-        })
-      ).label('node').validate(nodes)
-      if (error) throw error
+      // TODO: validate it on TypeScript level instead (to speedup development, save runtime resources)
+      if (!Array.isArray(nodes)) throw new Error('"nodes" should be an array')
+      const notObject = nodes.map(n => typeof n).find(t => t !== 'object')
+      if (notObject) throw new Error(`Each node should be an object, got ${notObject} instead`)
+      const wrongFields = nodes.find(n => typeof n.name !== 'string' || typeof n.instance !== 'object')
+      if (notObject) {
+        throw new Error(
+          'Each node should have name (string), instance (object) ' +
+          `fields, got ${JSON.stringify(wrongFields)} instead`
+        )
+      }
+      const wrongInstanceFields = nodes
+        .map(n => n.instance)
+        .find(i => typeof i.api !== 'object' || typeof i.genesisHash !== 'string' ||
+          typeof i.consensusProtocolVersion !== 'number')
+      if (wrongInstanceFields) {
+        throw new Error(
+          'Each node instance should have api (object), consensusProtocolVersion (number), ' +
+          `genesisHash (string) fields, got ${JSON.stringify(wrongInstanceFields)} instead`
+        )
+      }
     }
   },
   props: {
