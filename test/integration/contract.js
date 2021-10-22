@@ -330,35 +330,6 @@ describe('Contract', function () {
     return deployed.should.have.property('address')
   })
 
-  it('Deploy/Call/Dry-run contract using callData', async () => {
-    const callArg = 1
-    const { bytecode } = await sdk.contractCompile(identityContract)
-    const callDataDeploy = await sdk.contractEncodeCall(identityContract, 'init', [])
-    const callDataCall = await sdk.contractEncodeCall(identityContract, 'getArg', [callArg.toString()])
-
-    const deployStatic = await sdk.contractCallStatic(identityContract, null, 'init', callDataDeploy, { bytecode })
-    deployStatic.result.should.have.property('gasUsed')
-    deployStatic.result.should.have.property('returnType')
-
-    const deployed = await sdk.contractDeploy(bytecode, identityContract, callDataDeploy)
-    deployed.result.should.have.property('gasUsed')
-    deployed.result.should.have.property('returnType')
-    deployed.should.have.property('address')
-
-    const callStaticRes = await sdk.contractCallStatic(identityContract, deployed.address, 'getArg', callDataCall)
-    callStaticRes.result.should.have.property('gasUsed')
-    callStaticRes.result.should.have.property('returnType')
-    const decodedCallStaticResult = await callStaticRes.decode()
-    decodedCallStaticResult.should.be.equal(callArg)
-
-    const callRes = await sdk.contractCall(identityContract, deployed.address, 'getArg', callDataCall)
-    callRes.result.should.have.property('gasUsed')
-    callRes.result.should.have.property('returnType')
-    callRes.result.should.have.property('returnType')
-    const decodedCallResult = await callRes.decode()
-    decodedCallResult.should.be.equal(callArg)
-  })
-
   it('Deploy and call contract on specific account', async () => {
     const current = await sdk.address()
     const onAccount = sdk.addresses().find(acc => acc !== current)
@@ -418,7 +389,7 @@ describe('Contract', function () {
     client.addresses().length.should.be.equal(0)
     const address = await client.address().catch(e => false)
     address.should.be.equal(false)
-    const { result } = await client.contractCallStatic(identityContract, deployed.address, 'getArg', ['42'])
+    const { result } = await client.contractCallStatic(identityContract, deployed.address, 'getArg', [42])
     result.callerId.should.be.equal(DRY_RUN_ACCOUNT.pub)
   })
 
@@ -618,7 +589,7 @@ describe('Contract', function () {
     it('Generate ACI object', async () => {
       contractObject = await sdk.getContractInstance(
         genTestContract(sdk._isCompiler6),
-        { filesystem, opt: { ttl: 0 } }
+        { filesystem, ttl: 0 }
       )
       contractObject.should.have.property('interface')
       contractObject.should.have.property('aci')
@@ -644,6 +615,7 @@ describe('Contract', function () {
       const res = await contractObject.methods.init.get('123', 1, 'hahahaha')
       res.result.should.have.property('gasUsed')
       res.result.should.have.property('returnType')
+      // TODO: ensure that return value is always can't be decoded (empty?)
     })
     it('Dry-run deploy fn on specific account', async () => {
       const current = await sdk.address()
@@ -671,24 +643,30 @@ describe('Contract', function () {
     it('Generate ACI object with corresponding bytecode', async () => {
       await sdk.getContractInstance(
         genTestContract(sdk._isCompiler6),
-        { contractAddress: contractObject.deployInfo.address, filesystem, opt: { ttl: 0 } }
+        { contractAddress: contractObject.deployInfo.address, filesystem, ttl: 0 }
       )
     })
     it('Generate ACI object with not corresponding bytecode', async () => {
       try {
-        await sdk.getContractInstance(identityContract, { contractAddress: contractObject.deployInfo.address, opt: { ttl: 0 } })
+        await sdk.getContractInstance(
+          identityContract,
+          { contractAddress: contractObject.deployInfo.address, ttl: 0 }
+        )
       } catch (e) {
         e.message.should.be.equal('Contract source do not correspond to the contract bytecode deployed on the chain')
       }
     })
     it('Generate ACI object with not corresponding bytecode and force this check', async () => {
-      await sdk.getContractInstance(identityContract, { forceCodeCheck: true, contractAddress: contractObject.deployInfo.address, opt: { ttl: 0 } })
+      await sdk.getContractInstance(
+        identityContract,
+        { forceCodeCheck: true, contractAddress: contractObject.deployInfo.address, ttl: 0 }
+      )
     })
     it('Throw error on creating contract instance with invalid contractAddress', async () => {
       try {
         await sdk.getContractInstance(
           genTestContract(sdk._isCompiler6),
-          { filesystem, contractAddress: 'ct_asdasdasd', opt: { ttl: 0 } }
+          { filesystem, contractAddress: 'ct_asdasdasd', ttl: 0 }
         )
       } catch (e) {
         e.message.should.be.equal('Invalid name or address: ct_asdasdasd')
@@ -699,7 +677,7 @@ describe('Contract', function () {
       try {
         await sdk.getContractInstance(
           genTestContract(sdk._isCompiler6),
-          { filesystem, contractAddress, opt: { ttl: 0 } }
+          { filesystem, contractAddress, ttl: 0 }
         )
       } catch (e) {
         e.message.should.be.equal(`Contract with address ${contractAddress} not found on-chain or not active`)

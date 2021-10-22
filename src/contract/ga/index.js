@@ -90,7 +90,7 @@ async function createGeneralizeAccount (authFnName, source, args = [], options =
     ...opt,
     ownerId,
     code: (await this.contractCompile(source)).bytecode,
-    callData: await this.contractEncodeCall(source, 'init', args),
+    callData: await this.contractEncodeCallDataAPI(source, 'init', args),
     authFun: hash(authFnName)
   })
 

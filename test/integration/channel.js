@@ -52,7 +52,6 @@ describe('Channel', function () {
   let existingChannelId
   let offchainTx
   let contractAddress
-  let contractEncodeCall
   let callerNonce
   const initiatorSign = sinon.spy((tag, tx) => initiator.signTransaction(tx))
   const responderSign = sinon.spy((tag, tx) => {
@@ -847,7 +846,6 @@ describe('Channel', function () {
     result.should.eql({ accepted: true, address: result.address, signedTx: (await initiatorCh.state()).signedTx })
     initiatorCh.round().should.equal(roundBefore + 1)
     contractAddress = result.address
-    contractEncodeCall = (method, args) => initiator.contractEncodeCallDataAPI(identityContract, method, args)
   })
 
   it('can create a contract and reject', async () => {
@@ -902,7 +900,7 @@ describe('Channel', function () {
     const roundBefore = initiatorCh.round()
     const result = await initiatorCh.callContract({
       amount: 0,
-      callData: await contractEncodeCall('getArg', ['42']),
+      callData: await initiator.contractEncodeCallDataAPI(identityContract, 'getArg', ['42']),
       contract: contractAddress,
       abiVersion: 3
     }, async (tx) => initiator.signTransaction(tx))
@@ -914,7 +912,7 @@ describe('Channel', function () {
   it('can call a force progress', async () => {
     const forceTx = await initiatorCh.forceProgress({
       amount: 0,
-      callData: await contractEncodeCall('getArg', ['42']),
+      callData: await initiator.contractEncodeCallDataAPI(identityContract, 'getArg', ['42']),
       contract: contractAddress,
       abiVersion: 3
     }, async (tx) => initiator.signTransaction(tx))
@@ -929,7 +927,7 @@ describe('Channel', function () {
     const roundBefore = initiatorCh.round()
     const result = await initiatorCh.callContract({
       amount: 0,
-      callData: await contractEncodeCall('getArg', ['42']),
+      callData: await initiator.contractEncodeCallDataAPI(identityContract, 'getArg', ['42']),
       contract: contractAddress,
       abiVersion: 3
     }, async (tx) => initiator.signTransaction(tx))
@@ -941,7 +939,7 @@ describe('Channel', function () {
     const errorCode = 12345
     const result = await initiatorCh.callContract({
       amount: 0,
-      callData: await contractEncodeCall('getArg', ['42']),
+      callData: await initiator.contractEncodeCallDataAPI(identityContract, 'getArg', ['42']),
       contract: contractAddress,
       abiVersion: 3
     }, () => errorCode)
@@ -952,7 +950,7 @@ describe('Channel', function () {
     responderShouldRejectUpdate = 12345
     const result = await initiatorCh.callContract({
       amount: 0,
-      callData: await contractEncodeCall('getArg', ['42']),
+      callData: await initiator.contractEncodeCallDataAPI(identityContract, 'getArg', ['42']),
       contract: contractAddress,
       abiVersion: 3
     }, async (tx) => initiator.signTransaction(tx))
@@ -987,7 +985,7 @@ describe('Channel', function () {
   it('can call a contract using dry-run', async () => {
     const result = await initiatorCh.callContractStatic({
       amount: 0,
-      callData: await contractEncodeCall('getArg', ['42']),
+      callData: await initiator.contractEncodeCallDataAPI(identityContract, 'getArg', ['42']),
       contract: contractAddress,
       abiVersion: 3
     })

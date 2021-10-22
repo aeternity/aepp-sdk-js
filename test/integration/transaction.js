@@ -142,7 +142,7 @@ describe('Native Transaction', function () {
 
   it('native build of contract create tx', async () => {
     const { bytecode } = await sdk.contractCompile(contractCode)
-    const callData = await sdk.contractEncodeCall(contractCode, 'init')
+    const callData = await sdk.contractEncodeCallDataAPI(contractCode, 'init')
     const owner = await sdk.address()
 
     const txFromAPI = await sdk.contractCreateTx({
@@ -172,7 +172,7 @@ describe('Native Transaction', function () {
   })
 
   it('native build of contract call tx', async () => {
-    const callData = await sdk.contractEncodeCall(contractCode, 'getArg', ['2'])
+    const callData = await sdk.contractEncodeCallDataAPI(contractCode, 'getArg', ['2'])
     const owner = await sdk.address()
 
     const txFromAPI = await sdk.contractCallTx({ callerId: owner, contractId, amount, gas, gasPrice, callData })

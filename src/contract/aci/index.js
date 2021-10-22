@@ -27,6 +27,8 @@ import BigNumber from 'bignumber.js'
 
 import { getFunctionACI, prepareArgsForEncode } from './helpers'
 import { decodeEvents, transformDecodedData } from './transformation'
+import { DRY_RUN_ACCOUNT } from '../../tx/builder/schema'
+import TxObject from '../../tx/tx-object'
 
 /**
  * Generate contract ACI object with predefined js methods for contract usage - can be used for creating a reference to already deployed contracts
@@ -37,7 +39,6 @@ import { decodeEvents, transformDecodedData } from './transformation'
  * @param {String} [options.contractAddress] Contract address
  * @param {Object} [options.filesystem] Contact source external namespaces map
  * @param {Object} [options.forceCodeCheck=true] Don't check contract code
- * @param {Object} [options.opt] Contract options
  * @return {ContractInstance} JS Contract API
  * @example
  * const contractIns = await client.getContractInstance(sourceCode)
@@ -47,14 +48,9 @@ import { decodeEvents, transformDecodedData } from './transformation'
  * Also you can call contract like: await contractIns.methods.setState(123, options)
  * Then sdk decide to make on-chain or static call(dry-run API) transaction based on function is stateful or not
  */
-export default async function getContractInstance (source, { aci, contractAddress, filesystem = {}, forceCodeCheck = true, opt } = {}) {
+export default async function getContractInstance (source, { aci, contractAddress, filesystem = {}, forceCodeCheck = true, ...otherOptions } = {}) {
   aci = aci || await this.contractGetACI(source, { filesystem })
   if (contractAddress) contractAddress = await this.resolveName(contractAddress, 'ct', { resolveByNode: true })
-  const defaultOptions = {
-    ...this.Ae.defaults,
-    callStatic: false,
-    filesystem
-  }
   const instance = {
     interface: R.defaultTo(null, R.prop('interface', aci)),
     aci: R.defaultTo(null, R.path(['encoded_aci', 'contract'], aci)),
@@ -62,11 +58,13 @@ export default async function getContractInstance (source, { aci, contractAddres
     source,
     compiled: null,
     deployInfo: { address: contractAddress },
-    options: R.merge(defaultOptions, opt),
-    compilerVersion: this.compilerVersion,
-    setOptions (opt) {
-      this.options = R.merge(this.options, opt)
-    }
+    options: {
+      ...this.Ae.defaults,
+      callStatic: false,
+      filesystem,
+      ...otherOptions
+    },
+    compilerVersion: this.compilerVersion
   }
 
   // Check for valid contract address and contract code
@@ -102,18 +100,13 @@ export default async function getContractInstance (source, { aci, contractAddres
    */
   instance.deploy = async (init = [], options = {}) => {
     const opt = { ...instance.options, ...options }
-    const fnACI = getFunctionACI(instance.aci, 'init', instance.externalAci)
-    const source = opt.source || instance.source
 
     if (!instance.compiled) await instance.compile(opt)
-    init = await prepareArgsForEncode(fnACI, init)
 
-    if (opt.callStatic) {
-      return this.contractCallStatic(source, null, 'init', init, {
-        ...opt,
-        bytecode: instance.compiled
-      })
-    }
+    if (opt.callStatic) return instance.call('init', init, opt)
+
+    const fnACI = getFunctionACI(instance.aci, 'init', instance.externalAci)
+    init = await prepareArgsForEncode(fnACI, init)
     instance.deployInfo = await this.contractDeploy(instance.compiled, opt.source || instance.source, init, opt)
     return instance.deployInfo
   }
@@ -132,28 +125,58 @@ export default async function getContractInstance (source, { aci, contractAddres
     const opt = { ...instance.options, ...options }
     const fnACI = getFunctionACI(instance.aci, fn, instance.externalAci)
     const source = opt.source || instance.source
+    const contractId = instance.deployInfo.address
 
     if (!fn) throw new Error('Function name is required')
-    if (!instance.deployInfo.address) throw new Error('You need to deploy contract before calling!')
+    if (fn === 'init' && !opt.callStatic) throw new Error('"init" can be called only via dryRun')
+    if (!contractId && fn !== 'init') throw new Error('You need to deploy contract before calling!')
     if (
       BigNumber(opt.amount).gt(0) &&
       (Object.prototype.hasOwnProperty.call(fnACI, 'payable') && !fnACI.payable)
     ) throw new Error(`You try to pay "${opt.amount}" to function "${fn}" which is not payable. Only payable function can accept tokens`)
-    params = await prepareArgsForEncode(fnACI, params)
-    const result = opt.callStatic
-      ? await this.contractCallStatic(source, instance.deployInfo.address, fn, params, opt)
-      : await this.contractCall(source, instance.deployInfo.address, fn, params, opt)
-    return {
-      ...result,
-      ...opt.waitMined && {
-        decodedResult: await transformDecodedData(
-          fnACI.returns,
-          await result.decode(),
-          fnACI.bindings
-        ),
-        decodedEvents: instance.decodeEvents(fn, result.result.log)
+
+    const callerId = await this.address(opt).catch(error => {
+      if (opt.callStatic) return DRY_RUN_ACCOUNT.pub
+      else throw error
+    })
+    const callData = await this.contractEncodeCallDataAPI(
+      source,
+      fn,
+      await prepareArgsForEncode(fnACI, params),
+      opt
+    )
+
+    let res
+    if (opt.callStatic) {
+      if (typeof opt.top === 'number') {
+        opt.top = (await this.getKeyBlock(opt.top)).hash
       }
+      const txOpt = {
+        ...opt,
+        callData,
+        nonce: opt.top && (await this.getAccount(callerId, { hash: opt.top })).nonce + 1
+      }
+      const tx = fn === 'init'
+        ? (await this.contractCreateTx({ ...txOpt, code: instance.compiled || opt.bytecode, ownerId: callerId })).tx
+        : await this.contractCallTx({ ...txOpt, callerId, contractId })
+
+      const { callObj, ...dryRunOther } = await this.txDryRun(tx, callerId, opt)
+      await this._handleCallError(source, fn, callObj)
+      res = { ...dryRunOther, tx: TxObject({ tx }), result: callObj }
+    } else {
+      const tx = await this.contractCallTx({ ...opt, callerId, contractId, callData })
+      res = await this._sendAndProcess(tx, source, fn, opt)
     }
+    res.decode = () => this.contractDecodeCallResultAPI(source, fn, res.result.returnValue, res.result.returnType, opt)
+    if (opt.waitMined) {
+      res.decodedResult = fnACI.returns && fn !== 'init' && await transformDecodedData(
+        fnACI.returns,
+        await res.decode(),
+        fnACI.bindings
+      )
+      res.decodedEvents = instance.decodeEvents(fn, res.result.log)
+    }
+    return res
   }
 
   /**
