@@ -14,6 +14,7 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
+/* global BigInt */ // TODO: remove after updating ts-standard
 import { expect } from 'chai'
 import { before, describe, it } from 'mocha'
 import * as R from 'ramda'
@@ -309,9 +310,10 @@ describe('Contract', function () {
     result.callerId.should.be.equal(DRY_RUN_ACCOUNT.pub)
   })
 
-  it('calls deployed contracts', async () => {
-    const result = await deployed.call('getArg', [42])
-    return result.decode().should.eventually.become(42)
+  it('calls deployed contracts with unsafe integer', async () => {
+    const unsafeInt = BigInt(Number.MAX_SAFE_INTEGER + '0')
+    const result = await deployed.call('getArg', [unsafeInt])
+    expect(result.decodedResult).to.be.equal(unsafeInt)
   })
 
   it('call contract/deploy with waitMined: false', async () => {
@@ -327,7 +329,7 @@ describe('Contract', function () {
 
   it('calls deployed contracts static', async () => {
     const result = await deployed.callStatic('getArg', [42])
-    return result.decode().should.eventually.become(42)
+    expect(result.decodedResult).to.be.equal(42n)
   })
 
   it('initializes contract state', async () => {
@@ -335,7 +337,7 @@ describe('Contract', function () {
     return sdk.contractCompile(stateContract)
       .then(bytecode => bytecode.deploy([data]))
       .then(deployed => deployed.call('retrieve'))
-      .then(result => result.decode())
+      .then(result => result.decodedResult)
       .should.eventually.become('Hello World!')
   })
 
@@ -373,12 +375,10 @@ describe('Contract', function () {
 
     it('Can call contract with external deps', async () => {
       const callResult = await deployed.call('sumNumbers', [1, 2])
-      const decoded = await callResult.decode()
-      decoded.should.be.equal(3)
+      callResult.decodedResult.should.be.equal(3n)
 
       const callStaticResult = await deployed.callStatic('sumNumbers', [1, 2])
-      const decoded2 = await callStaticResult.decode()
-      decoded2.should.be.equal(3)
+      callStaticResult.decodedResult.should.be.equal(3n)
     })
   })
 
@@ -442,7 +442,8 @@ describe('Contract', function () {
     })
 
     it('decode call result', async () => {
-      return sdk.contractDecodeCallResultAPI(identityContract, 'getArg', encodedNumberSix, 'ok').should.eventually.become(6)
+      return sdk.contractDecodeCallResultAPI(identityContract, 'getArg', encodedNumberSix, 'ok')
+        .should.eventually.become(6)
     })
 
     it('Decode call-data using source', async () => {

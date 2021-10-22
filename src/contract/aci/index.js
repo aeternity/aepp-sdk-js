@@ -26,7 +26,7 @@ import * as R from 'ramda'
 import BigNumber from 'bignumber.js'
 import { Encoder as Calldata } from '@aeternity/aepp-calldata'
 import { getFunctionACI, prepareArgsForEncode } from './helpers'
-import { decodeEvents, transformDecodedData } from './transformation'
+import { decodeEvents } from './transformation'
 import { DRY_RUN_ACCOUNT } from '../../tx/builder/schema'
 import TxObject from '../../tx/tx-object'
 
@@ -163,13 +163,9 @@ export default async function getContractInstance (source, { aci, contractAddres
       const tx = await this.contractCallTx({ ...opt, callerId, contractId, callData })
       res = await this._sendAndProcess(tx, source, fn, opt)
     }
-    res.decode = () => this.contractDecodeCallResultAPI(source, fn, res.result.returnValue, res.result.returnType, opt)
-    if (opt.waitMined) {
-      res.decodedResult = fnACI.returns && fn !== 'init' && await transformDecodedData(
-        fnACI.returns,
-        await res.decode(),
-        fnACI.bindings
-      )
+    if (opt.waitMined || opt.callStatic) {
+      res.decodedResult = fnACI.returns && fnACI.returns !== 'unit' && fn !== 'init' &&
+        instance.calldata.decode(instance.aci.name, fn, res.result.returnValue)
       res.decodedEvents = instance.decodeEvents(fn, res.result.log)
     }
     return res

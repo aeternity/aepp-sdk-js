@@ -71,13 +71,13 @@ describe('Paying for transaction of another account', function () {
     contractAddress = address
     await sdk.payForTransaction(contractDeployTx)
     payingContract = await unPayingSdk.getContractInstance(contractCode, { contractAddress })
-    expect(await (await payingContract.methods.getValue()).decode()).to.be.equal(42)
+    expect((await payingContract.methods.getValue()).decodedResult).to.be.equal(42n)
   })
 
   it('pays for contract call', async () => {
     const contract = await unPayingSdk.getContractInstance(contractCode, { contractAddress })
     const { rawTx: contractCallTx } = await contract.methods.setValue(43)
     await sdk.payForTransaction(contractCallTx)
-    expect(await (await payingContract.methods.getValue()).decode()).to.be.equal(43)
+    expect((await payingContract.methods.getValue()).decodedResult).to.be.equal(43n)
   })
 })
