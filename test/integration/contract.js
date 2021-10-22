@@ -333,7 +333,7 @@ describe('Contract', function () {
   })
 
   it('initializes contract state', async () => {
-    const data = '"Hello World!"'
+    const data = 'Hello World!'
     return sdk.contractCompile(stateContract)
       .then(bytecode => bytecode.deploy([data]))
       .then(deployed => deployed.call('retrieve'))
