@@ -1,6 +1,6 @@
 import { snakeToPascal, pascalToSnake } from './string'
 
-export const pause = async (duration: number): Promise<undefined> =>
+export const pause = async (duration: number): Promise<void> =>
   await new Promise(resolve => setTimeout(resolve, duration))
 
 export const mapObject = (
