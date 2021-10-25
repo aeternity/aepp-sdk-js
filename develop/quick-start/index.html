@@ -9,19 +9,19 @@
       
       
       
-      <link rel="icon" href="../../images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.1, mkdocs-material-7.1.9">
+      <link rel="icon" href="../images/favicon.png">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.1.9">
     
     
       
-        <title>Transfer AE - æternity JavaScript SDK</title>
+        <title>Quick Start - æternity JavaScript SDK</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.ca7ac06f.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ca7ac06f.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.f1a3b89f.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.f1a3b89f.min.css">
         
       
     
@@ -55,7 +55,7 @@
     <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="pink" data-md-color-accent="pink">
   
     
-    <script>function __prefix(e){return new URL("../..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
     
       <script>var palette=__get("__palette");if(null!==palette&&"object"==typeof palette.color)for(var key in palette.color)document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
     
@@ -65,7 +65,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#transfer-ae" class="md-skip">
+        <a href="#quick-start" class="md-skip">
           Skip to content
         </a>
       
@@ -76,7 +76,7 @@
     
       <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="æternity JavaScript SDK" class="md-header__button md-logo" aria-label="æternity JavaScript SDK" data-md-component="logo">
+    <a href=".." title="æternity JavaScript SDK" class="md-header__button md-logo" aria-label="æternity JavaScript SDK" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -95,7 +95,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Transfer AE
+              Quick Start
             
           </span>
         </div>
@@ -191,7 +191,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="æternity JavaScript SDK" class="md-nav__button md-logo" aria-label="æternity JavaScript SDK" data-md-component="logo">
+    <a href=".." title="æternity JavaScript SDK" class="md-nav__button md-logo" aria-label="æternity JavaScript SDK" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -223,7 +223,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../index.html" class="md-nav__link">
+      <a href=".." class="md-nav__link">
         Installation
       </a>
     </li>
@@ -236,11 +236,72 @@
 
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../../quick-start.html" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Quick Start
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Quick Start
       </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-specify-imports" class="md-nav__link">
+    1. Specify imports
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-create-a-keypair" class="md-nav__link">
+    2. Create a Keypair
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-get-some-ae-using-the-faucet" class="md-nav__link">
+    3. Get some AE using the Faucet
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-interact-with-the-ternity-blockchain" class="md-nav__link">
+    4. Interact with the æternity blockchain
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -274,7 +335,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../guides/aens.html" class="md-nav__link">
+      <a href="../guides/aens/" class="md-nav__link">
         æternity naming system
       </a>
     </li>
@@ -286,7 +347,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../guides/contracts.html" class="md-nav__link">
+      <a href="../guides/contracts/" class="md-nav__link">
         Contracts
       </a>
     </li>
@@ -298,7 +359,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../guides/contract-events.html" class="md-nav__link">
+      <a href="../guides/contract-events/" class="md-nav__link">
         Contract Events
       </a>
     </li>
@@ -310,7 +371,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../guides/oracles.html" class="md-nav__link">
+      <a href="../guides/oracles/" class="md-nav__link">
         Oracles
       </a>
     </li>
@@ -322,7 +383,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../guides/paying-for-tx.html" class="md-nav__link">
+      <a href="../guides/paying-for-tx/" class="md-nav__link">
         PayingForTx
       </a>
     </li>
@@ -334,7 +395,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../guides/low-vs-high-usage.html" class="md-nav__link">
+      <a href="../guides/low-vs-high-usage/" class="md-nav__link">
         Low vs High level API
       </a>
     </li>
@@ -367,7 +428,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../guides/connect-aepp-to-wallet.html" class="md-nav__link">
+      <a href="../guides/connect-aepp-to-wallet/" class="md-nav__link">
         Connect an æpp to a wallet
       </a>
     </li>
@@ -379,7 +440,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../guides/build-wallet.html" class="md-nav__link">
+      <a href="../guides/build-wallet/" class="md-nav__link">
         How to build a wallet
       </a>
     </li>
@@ -406,7 +467,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../transaction-options.html" class="md-nav__link">
+      <a href="../transaction-options/" class="md-nav__link">
         Transaction options
       </a>
     </li>
@@ -463,7 +524,7 @@
   
   
     <li class="md-nav__item">
-      <a href="transfer-ae-tokens.md" class="md-nav__link">
+      <a href="../examples/node/transfer-ae-tokens.md" class="md-nav__link">
         None
       </a>
     </li>
@@ -475,7 +536,7 @@
   
   
     <li class="md-nav__item">
-      <a href="contract-interaction.html" class="md-nav__link">
+      <a href="../examples/node/contract-interaction/" class="md-nav__link">
         Compile & Deploy a Sophia Smart Contract
       </a>
     </li>
@@ -508,7 +569,7 @@
   
   
     <li class="md-nav__item">
-      <a href="paying-for-tx-contract-call-tx.html" class="md-nav__link">
+      <a href="../examples/node/paying-for-tx-contract-call-tx/" class="md-nav__link">
         InnerTx: ContractCallTx
       </a>
     </li>
@@ -520,7 +581,7 @@
   
   
     <li class="md-nav__item">
-      <a href="paying-for-tx-spend-tx.html" class="md-nav__link">
+      <a href="../examples/node/paying-for-tx-spend-tx/" class="md-nav__link">
         InnerTx: SpendTx
       </a>
     </li>
@@ -544,7 +605,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/vuejs/helloworld-blockheight.html" class="md-nav__link">
+      <a href="../tutorials/vuejs/helloworld-blockheight/" class="md-nav__link">
         Vue.js HelloWorld
       </a>
     </li>
@@ -565,7 +626,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api-reference.html" class="md-nav__link">
+      <a href="../api-reference/" class="md-nav__link">
         API Reference
       </a>
     </li>
@@ -580,7 +641,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../CHANGELOG.html" class="md-nav__link">
+      <a href="../CHANGELOG/" class="md-nav__link">
         Changelog
       </a>
     </li>
@@ -616,7 +677,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../guides/migration/9.0.0.html" class="md-nav__link">
+      <a href="../guides/migration/9.0.0/" class="md-nav__link">
         Migration to 9.0.0
       </a>
     </li>
@@ -628,7 +689,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../guides/migration/7.0.0.html" class="md-nav__link">
+      <a href="../guides/migration/7.0.0/" class="md-nav__link">
         Migration to 7.0.0
       </a>
     </li>
@@ -670,7 +731,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../contrib/index.html" class="md-nav__link">
+      <a href="../contrib/" class="md-nav__link">
         Development
       </a>
     </li>
@@ -682,7 +743,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../contrib/releases.html" class="md-nav__link">
+      <a href="../contrib/releases/" class="md-nav__link">
         Releases
       </a>
     </li>
@@ -721,13 +782,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#introduction" class="md-nav__link">
-    Introduction
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#1-specify-imports" class="md-nav__link">
     1. Specify imports
   </a>
@@ -735,50 +789,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-define-constants" class="md-nav__link">
-    2. Define constants
+  <a href="#2-create-a-keypair" class="md-nav__link">
+    2. Create a Keypair
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-open-async-codeblock" class="md-nav__link">
-    3. Open async codeblock
+  <a href="#3-get-some-ae-using-the-faucet" class="md-nav__link">
+    3. Get some AE using the Faucet
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-create-object-instances" class="md-nav__link">
-    4. Create object instances
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#5-get-ae-balance-of-recipient-before-transfer" class="md-nav__link">
-    5. Get AE balance of recipient (before transfer)
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#6-transfer-ae" class="md-nav__link">
-    6. Transfer AE
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#7-get-ae-balance-of-recipient-after-transfer" class="md-nav__link">
-    7. Get AE balance of recipient (after transfer)
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#8-close-and-run-async-codeblock" class="md-nav__link">
-    8. Close and run async codeblock
+  <a href="#4-interact-with-the-ternity-blockchain" class="md-nav__link">
+    4. Interact with the æternity blockchain
   </a>
   
 </li>
@@ -796,88 +822,60 @@
               
                 
                 
-                <h1 id="transfer-ae">Transfer AE</h1>
-<h2 id="introduction">Introduction</h2>
-<p>The whole script is <a href="https://github.com/aeternity/aepp-sdk-js/blob/master/examples/node/transfer-ae.js">located in the repository</a>
-and this page explains in detail how to:</p>
-<ul>
-<li>initialize the SDK with a pre-funded account</li>
-<li>transfer AE to another account</li>
-</ul>
+                <h1 id="quick-start">Quick Start</h1>
 <h2 id="1-specify-imports">1. Specify imports</h2>
-<p>You need to import <code>Universal</code>, <code>Node</code> and <code>MemoryAccount</code> <a href="https://stampit.js.org/essentials/what-is-a-stamp">Stamps</a> from the SDK.
-<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="p">{</span> <span class="nx">Universal</span><span class="p">,</span> <span class="nx">Node</span><span class="p">,</span> <span class="nx">MemoryAccount</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">)</span>
+<p>For the following snippets in the guide you need to specify multiple imports. Most imports like <code>Universal</code>, <code>MemoryAccount</code> &amp; <code>Node</code> are <a href="https://stampit.js.org/essentials/what-is-a-stamp">Stamps</a> that compose certain functionalities. Others like <code>AmountFormatter</code> &amp; <code>Crypto</code> are util modules with typical function exports.</p>
+<div class="highlight"><pre><span></span><code><span class="k">import</span> <span class="p">{</span>
+  <span class="nx">Universal</span><span class="p">,</span>
+  <span class="nx">MemoryAccount</span><span class="p">,</span>
+  <span class="nx">Node</span><span class="p">,</span>
+  <span class="nx">AmountFormatter</span><span class="p">,</span>
+  <span class="nx">Crypto</span>
+<span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
 </code></pre></div>
-<strong>Note</strong>:</p>
-<ul>
-<li>You need to have the SDK installed via <code>npm i @aetenity/aepp-sdk -g</code> to run that example code.</li>
-</ul>
-<h2 id="2-define-constants">2. Define constants</h2>
-<p>The following constants are used in the subsequent code snippets.
-<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">ACCOUNT_KEYPAIR</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="nx">publicKey</span><span class="o">:</span> <span class="s1">&#39;ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR&#39;</span><span class="p">,</span>
-  <span class="nx">secretKey</span><span class="o">:</span> <span class="s1">&#39;bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b&#39;</span>
-<span class="p">}</span>
-<span class="kd">const</span> <span class="nx">NODE_URL</span> <span class="o">=</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">;</span>
-<span class="kd">const</span> <span class="p">[</span><span class="nx">amount</span> <span class="o">=</span> <span class="mf">1</span><span class="p">,</span> <span class="nx">recipient</span> <span class="o">=</span> <span class="nx">ACCOUNT_KEYPAIR</span><span class="p">.</span><span class="nx">publicKey</span><span class="p">]</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">argv</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mf">2</span><span class="p">);</span>
+<h2 id="2-create-a-keypair">2. Create a Keypair</h2>
+<div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">keypair</span> <span class="o">=</span> <span class="nx">Crypto</span><span class="p">.</span><span class="nx">generateKeyPair</span><span class="p">()</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Secret key: </span><span class="si">${</span><span class="nx">keypair</span><span class="p">.</span><span class="nx">secretKey</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Public key: </span><span class="si">${</span><span class="nx">keypair</span><span class="p">.</span><span class="nx">publicKey</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
 </code></pre></div>
-Note:</p>
+<h2 id="3-get-some-ae-using-the-faucet">3. Get some <em>AE</em> using the Faucet</h2>
+<p>To receive some <em>AE</em> you can use the <a href="https://faucet.aepps.com/">Faucet</a>. Just add your publicKey, and you'll immediately get some test coins.</p>
+<h2 id="4-interact-with-the-ternity-blockchain">4. Interact with the æternity blockchain</h2>
+<p>This example shows:</p>
 <ul>
-<li>The keypair of the account is pre-funded and only used for demonstration purpose<ul>
-<li>You should replace it with your own keypair (see <a href="../../quick-start.html#2-create-a-keypair">Create a Keypair</a>)</li>
+<li>how to initialize the SDK client using the <code>Universal</code> <a href="https://stampit.js.org/essentials/what-is-a-stamp">Stamp</a></li>
+<li>how to get the current block height</li>
+<li>how to spend 1 AE from the account the SDK was initialized with to some other AE address</li>
 </ul>
-</li>
-<li>In case the account runs out of funds you can always request AE using the <a href="https://faucet.aepps.com/">Faucet</a></li>
-<li>By default the script will transfer <code>1 aetto</code> and use the demo account itself as recipient<ul>
-<li>Optionally you can provide the amount and a different recipient by providing the arguments when executing the script,
-   e.g. <code>node transfer-ae.js 3 ak_6D2uyunJaERXfgbsc94G8vrp79nZrbtorL7VCRXk3sWiFK5jb</code></li>
-</ul>
-</li>
-</ul>
-<h2 id="3-open-async-codeblock">3. Open async codeblock</h2>
-<p>Most functions of the SDK return <em>Promises</em>, so the recommended way of
-dealing with subsequent actions is running them one by one using <code>await</code>.
-Therefore we are putting our logic into an <code>async</code> code block
-<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="k">async</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
-</code></pre></div></p>
-<h2 id="4-create-object-instances">4. Create object instances</h2>
-<p><div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">account</span> <span class="o">=</span> <span class="nx">MemoryAccount</span><span class="p">({</span> <span class="nx">keypair</span><span class="o">:</span> <span class="nx">ACCOUNT_KEYPAIR</span> <span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">NODE_URL</span> <span class="o">=</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">COMPILER_URL</span> <span class="o">=</span> <span class="s1">&#39;https://compiler.aepps.com&#39;</span><span class="p">;</span> <span class="c1">// required for contract interactions (compiling and creating calldata)</span>
+<span class="kd">const</span> <span class="nx">account</span> <span class="o">=</span> <span class="nx">MemoryAccount</span><span class="p">({</span>
+  <span class="c1">// replace &lt;YOUR_SECRET&gt; and &lt;YOUR_PUBLIC_KEY&gt; with the values from step 2</span>
+  <span class="nx">keypair</span><span class="o">:</span> <span class="p">{</span> <span class="nx">secretKey</span><span class="o">:</span> <span class="s1">&#39;&lt;YOUR_SECRET&gt;&#39;</span><span class="p">,</span> <span class="nx">publicKey</span><span class="o">:</span> <span class="s1">&#39;&lt;YOUR_PUBLIC_KEY&gt;&#39;</span> <span class="p">}</span>
+<span class="p">})</span>
+
+<span class="p">(</span><span class="k">async</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="kd">const</span> <span class="nx">node</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Node</span><span class="p">({</span> <span class="nx">url</span><span class="o">:</span> <span class="nx">NODE_URL</span> <span class="p">})</span>
   <span class="kd">const</span> <span class="nx">client</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span>
-    <span class="nx">nodes</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;testnet&#39;</span><span class="p">,</span> <span class="nx">instance</span><span class="o">:</span> <span class="nx">node</span> <span class="p">}],</span>
-    <span class="nx">accounts</span><span class="o">:</span> <span class="p">[</span><span class="nx">account</span><span class="p">]</span>
+     <span class="nx">compilerUrl</span><span class="o">:</span> <span class="nx">COMPILER_URL</span><span class="p">,</span>
+     <span class="nx">nodes</span><span class="o">:</span> <span class="p">[</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;testnet&#39;</span><span class="p">,</span> <span class="nx">instance</span><span class="o">:</span> <span class="nx">node</span> <span class="p">}</span> <span class="p">],</span>
+     <span class="nx">accounts</span><span class="o">:</span> <span class="p">[</span> <span class="nx">account</span> <span class="p">]</span>
   <span class="p">})</span>
+
+  <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">height</span><span class="p">()</span> <span class="c1">// get top block height</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Current Block Height:&#39;</span><span class="p">,</span> <span class="nx">height</span><span class="p">)</span>
+
+  <span class="c1">// spend one AE</span>
+  <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="s1">&#39;&lt;RECIPIENT_PUBLIC_KEY&gt;&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="c1">// replace &lt;RECIPIENT_PUBLIC_KEY&gt;</span>
+      <span class="nx">denomination</span><span class="o">:</span> <span class="nx">AmountFormatter</span><span class="p">.</span><span class="nx">AE_AMOUNT_FORMATS</span><span class="p">.</span><span class="nx">AE</span>
+  <span class="p">})</span>
+<span class="p">})()</span>
 </code></pre></div>
-The <code>Universal</code> <a href="https://stampit.js.org/essentials/what-is-a-stamp">Stamp</a> itself is asynchronous as it determines the node's version and
-rest interface automatically. Only once the Promise is fulfilled, you know you have a working object instance
-which is assigned to the <code>client</code> constant in this case.</p>
 <p>Note:</p>
 <ul>
-<li><code>Universal</code> is not a constructor but a factory, which means it's <em>not</em> invoked with <code>new</code>.</li>
+<li>By default the <code>spend</code> function expects the amount to be spent in <code>aettos</code> (the smallest possible unit)</li>
+<li>Following the example snippet you would specify <code>AE</code> as denomination</li>
 </ul>
-<h2 id="5-get-ae-balance-of-recipient-before-transfer">5. Get AE balance of recipient (before transfer)</h2>
-<p>Before the transfer of AE you can check the AE balance of the recipient.
-<div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">balanceBefore</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getBalance</span><span class="p">(</span><span class="nx">recipient</span><span class="p">)</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Balance of </span><span class="si">${</span><span class="nx">recipient</span><span class="si">}</span><span class="sb"> (before): </span><span class="si">${</span><span class="nx">balanceBefore</span><span class="si">}</span><span class="sb"> aettos`</span><span class="p">)</span>
-</code></pre></div></p>
-<h2 id="6-transfer-ae">6. Transfer AE</h2>
-<p>Calling the <code>spend</code> function will create, sign and broadcast a <code>SpendTx</code> to the network.
-<div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">tx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="nx">amount</span><span class="p">,</span> <span class="nx">recipient</span><span class="p">)</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Transaction mined&#39;</span><span class="p">,</span> <span class="nx">tx</span><span class="p">)</span>
-</code></pre></div></p>
-<h2 id="7-get-ae-balance-of-recipient-after-transfer">7. Get AE balance of recipient (after transfer)</h2>
-<p><div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">balanceAfter</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getBalance</span><span class="p">(</span><span class="nx">recipient</span><span class="p">)</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Balance of </span><span class="si">${</span><span class="nx">recipient</span><span class="si">}</span><span class="sb"> (after): </span><span class="si">${</span><span class="nx">balanceAfter</span><span class="si">}</span><span class="sb"> aettos`</span><span class="p">)</span>
-</code></pre></div>
-Note:</p>
-<ul>
-<li>If the recipient is the same account as the sender (default of the script if no arguments provided) the balance will be lower
-   after transfer because a transaction <code>fee</code> has been paid to the miners.</li>
-</ul>
-<h2 id="8-close-and-run-async-codeblock">8. Close and run async codeblock</h2>
-<p>Now you can close the async codeblock and execute it at the same time.
-<div class="highlight"><pre><span></span><code><span class="p">})()</span>
-</code></pre></div></p>
                 
               
               
@@ -893,6 +891,41 @@ Note:</p>
       
         
 <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href=".." class="md-footer__link md-footer__link--prev" aria-label="Previous: Installation" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Installation
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../guides/aens/" class="md-footer__link md-footer__link--next" aria-label="Next: æternity naming system" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              æternity naming system
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
@@ -913,10 +946,10 @@ Note:</p>
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "../..", "features": ["content.tabs.link", "search.highlight", "search.share", "search.suggest"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.477d984a.min.js", "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link", "search.highlight", "search.share", "search.suggest"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.477d984a.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.82b56eb2.min.js"></script>
+      <script src="../assets/javascripts/bundle.82b56eb2.min.js"></script>
       
     
   </body>
