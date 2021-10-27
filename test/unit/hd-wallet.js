@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2021 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -65,6 +65,7 @@ describe('hd wallet', () => {
         publicKey: `ak_${encodeBase58Check(Buffer.from(acc.publicKey, 'hex'))}`
       })))
     }))
+
   describe('getMasterKeyFromSeed', () =>
     it('generates correct master key', () => {
       const masterKey = getMasterKeyFromSeed(testSeed)
@@ -169,23 +170,18 @@ describe('hd wallet', () => {
             })))
       })
   )
+
   it('Generate mnemonic', () => {
     const mnemonic = generateMnemonic()
     const wallet = getHdWalletAccountFromMnemonic(mnemonic, 0)
     wallet.publicKey.split('_')[0].should.be.equal('ak')
   })
+
   it('Try to get wallet from invalid mnemonic', () => {
-    try {
-      generateSaveHDWallet('asdasdasdasdas')
-    } catch (e) {
-      e.message.should.be.equal('Invalid mnemonic')
-    }
+    expect(() => generateSaveHDWallet('asdasdasdasdas')).to.throw('Invalid mnemonic')
   })
+
   it('Derive child with invalid path', () => {
-    try {
-      derivePathFromSeed('asd')
-    } catch (e) {
-      e.message.should.be.equal('Invalid path')
-    }
+    expect(() => derivePathFromSeed('asd')).to.throw('Invalid path')
   })
 })

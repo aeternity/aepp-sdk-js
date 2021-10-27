@@ -15,6 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 import { describe, it } from 'mocha'
+import { expect } from 'chai'
 import TxObject from '../../src/tx/tx-object'
 import { TX_TYPE } from '../../src/tx/builder/schema'
 import { generateKeyPair } from '../../src/utils/crypto'
@@ -24,36 +25,26 @@ describe('TxObject', () => {
   const keyPair = generateKeyPair()
   let txObject
   let signedTx
+
   describe('Invalid initialization', () => {
     it('Empty arguments', () => {
-      try {
-        TxObject()
-      } catch (e) {
-        e.message.should.be.equal('Invalid TxObject arguments. Please provide one of { tx: "tx_asdasd23..." } or { type: "spendTx", params: {...} }')
-      }
+      expect(() => TxObject()).to.throw('Invalid TxObject arguments. Please provide one of { tx: "tx_asdasd23..." } or { type: "spendTx", params: {...} }')
     })
+
     it('Invalid "params"', () => {
-      try {
-        TxObject({ params: true, type: TX_TYPE.spend })
-      } catch (e) {
-        e.message.should.be.equal('"params" should be an object')
-      }
+      expect(() => TxObject({ params: true, type: TX_TYPE.spend })).to.throw('"params" should be an object')
     })
+
     it('Invalid "type"', () => {
-      try {
-        TxObject({ params: {}, type: 1 })
-      } catch (e) {
-        e.message.should.be.equal('Unknown transaction type 1')
-      }
+      expect(() => TxObject({ params: {}, type: 1 })).to.throw('Unknown transaction type 1')
     })
+
     it('Not enough arguments', () => {
-      try {
-        TxObject({ params: { senderId: 'ak_123', amount: 1 }, type: TX_TYPE.spend })
-      } catch (e) {
-        e.message.indexOf('Transaction build error').should.not.be.equal(-1)
-      }
+      expect(() => TxObject({ params: { senderId: 'ak_123', amount: 1 }, type: TX_TYPE.spend }))
+        .to.throw('Transaction build error')
     })
   })
+
   describe('Init TxObject', () => {
     it('Build transaction', async () => {
       txObject = TxObject({
@@ -66,6 +57,7 @@ describe('TxObject', () => {
       txObject.binary.should.be.a('Array')
       txObject.params.should.be.a('object')
     })
+
     it('Unpack transaction from string/rlp', () => {
       const txFromString = TxObject.fromString(txObject.encodedTx)
       txFromString.rlpEncoded.equals(txObject.rlpEncoded).should.be.equal(true)
@@ -78,25 +70,22 @@ describe('TxObject', () => {
       rtxFromRlpBinary.encodedTx.should.be.equal(txObject.encodedTx)
       rtxFromRlpBinary.params.should.be.deep.include(txObject.params)
     })
+
     it('Unpack signed transaction', () => {
       const tx = TxObject.fromString(signedTx)
       tx.getSignatures().length.should.not.be.equal(0)
       tx.isSigned.should.be.equal(true)
     })
+
     it('Get signature on unsigned tx', () => {
-      try {
-        txObject.getSignatures()
-      } catch (e) {
-        e.message.should.be.equal('Signature not found, transaction is not signed')
-      }
+      expect(() => txObject.getSignatures())
+        .to.throw('Signature not found, transaction is not signed')
     })
+
     it('Invalid props', () => {
-      try {
-        txObject.setProp(true)
-      } catch (e) {
-        e.message.should.be.equal('Props should be an object')
-      }
+      expect(() => txObject.setProp(true)).to.throw('Props should be an object')
     })
+
     it('Change props of signed transaction', () => {
       const signedTxObject = TxObject.fromString(signedTx)
       const fee = signedTxObject.params.fee
@@ -104,6 +93,7 @@ describe('TxObject', () => {
       signedTxObject.params.fee.should.not.be.equal(fee)
       signedTxObject.params.amount.should.be.equal('10000')
     })
+
     it('Add signatures', async () => {
       const oldTx = txObject.encodedTx
       const txWithNetworkId = Buffer.concat([Buffer.from('ae_mainnet'), txObject.rlpEncoded])
@@ -113,12 +103,10 @@ describe('TxObject', () => {
       txObject.isSigned.should.be.equal(true)
       oldTx.should.not.be.equal(txObject.encodedTx)
     })
+
     it('Invalid signature', async () => {
-      try {
-        txObject.addSignature({})
-      } catch (e) {
-        e.message.should.be.equal('Invalid signature, signature must be of type Buffer or Uint8Array')
-      }
+      expect(() => txObject.addSignature({}))
+        .to.throw('Invalid signature, signature must be of type Buffer or Uint8Array')
     })
   })
 })

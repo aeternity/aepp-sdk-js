@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2021 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -17,6 +17,7 @@
 
 import '../'
 import { describe, it } from 'mocha'
+import { expect } from 'chai'
 import MemoryAccount from '../../src/account/memory'
 import { generateKeyPair } from '../../src/utils/crypto'
 
@@ -25,65 +26,35 @@ const testAcc = generateKeyPair()
 describe('MemoryAccount', function () {
   describe('Fail on invalid params', () => {
     it('Fail on empty keypair', async () => {
-      try {
-        MemoryAccount({})
-      } catch (e) {
-        e.message.should.be.equal('KeyPair must be an object')
-      }
+      expect(() => MemoryAccount({})).to.throw('KeyPair must be an object')
     })
+
     it('Fail on empty keypair object', async () => {
-      try {
-        MemoryAccount({ keypair: {} })
-      } catch (e) {
-        e.message.should.be.equal('KeyPair must must have "secretKey", "publicKey" properties')
-      }
+      expect(() => MemoryAccount({ keypair: {} }))
+        .to.throw('KeyPair must must have "secretKey", "publicKey" properties')
     })
+
     it('Fail on invalid secret key', async () => {
-      try {
-        MemoryAccount({
-          keypair: {
-            publicKey: testAcc.publicKey,
-            secretKey: ' '
-          }
-        })
-      } catch (e) {
-        e.message.should.be.equal('Secret key must be hex string or Buffer')
-      }
+      expect(() => MemoryAccount({ keypair: { publicKey: testAcc.publicKey, secretKey: ' ' } }))
+        .to.throw('Secret key must be hex string or Buffer')
     })
+
     it('Fail on invalid publicKey', async () => {
-      try {
-        MemoryAccount({
-          keypair: {
-            publicKey: ' ',
-            secretKey: testAcc.secretKey
-          }
-        })
-      } catch (e) {
-        e.message.should.be.equal('Public Key must be a base58c string with "ak_" prefix')
-      }
+      expect(() => MemoryAccount({ keypair: { publicKey: ' ', secretKey: testAcc.secretKey } }))
+        .to.throw('Public Key must be a base58c string with "ak_" prefix')
     })
+
     it('Fail on invalid publicKey', async () => {
-      try {
-        MemoryAccount({
-          keypair: {
-            publicKey: generateKeyPair().publicKey,
-            secretKey: testAcc.secretKey
-          }
-        })
-      } catch (e) {
-        e.message.should.be.equal('Invalid Key Pair')
-      }
+      const keypair = { publicKey: generateKeyPair().publicKey, secretKey: testAcc.secretKey }
+      expect(() => MemoryAccount({ keypair })).to.throw('Invalid Key Pair')
     })
   })
+
   it('Init with secretKey as hex string', async () => {
-    const acc = MemoryAccount({
-      keypair: {
-        publicKey: testAcc.publicKey,
-        secretKey: testAcc.secretKey
-      }
-    })
+    const acc = MemoryAccount({ keypair: testAcc })
     return acc.address().should.eventually.be.equal(testAcc.publicKey)
   })
+
   it('Init with secretKey as hex Buffer', async () => {
     const acc = MemoryAccount({
       keypair: {
@@ -93,6 +64,7 @@ describe('MemoryAccount', function () {
     })
     return acc.address().should.eventually.be.equal(testAcc.publicKey)
   })
+
   it('Sign message', async () => {
     const message = 'test'
     const acc = MemoryAccount({ keypair: testAcc })

@@ -76,11 +76,7 @@ describe('Amount Formatter', function () {
       [1, [AE_AMOUNT_FORMATS.AE, 'ASD'], 'Invalid target denomination: ASD'],
       [1, ['ASD', AE_AMOUNT_FORMATS.AE], 'Invalid denomination: ASD']
     ].forEach(([v, [dF, dT], error]: any[]) => {
-      try {
-        formatAmount(v, { denomination: dF, targetDenomination: dT })
-      } catch (e) {
-        expect(e.message).to.be.equal(error)
-      }
+      expect(() => formatAmount(v, { denomination: dF, targetDenomination: dT })).to.throw(error)
     })
   })
 })
