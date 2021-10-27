@@ -15,6 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 import { describe, it, before } from 'mocha'
+import { expect } from 'chai'
 import { getSdk } from './'
 import { generateKeyPair } from '../../src/utils/crypto'
 
@@ -59,12 +60,8 @@ describe('Node Chain', function () {
     return sdk.height().should.eventually.be.at.least(target)
   })
   it('Can verify transaction from broadcast error', async () => {
-    try {
-      await sdkAccount.spend(0, publicKey, { fee: 100, verify: false })
-    } catch (e) {
-      const validation = await e.verifyTx()
-      validation.should.has.lengthOf(1)
-    }
+    const error = await sdkAccount.spend(0, publicKey, { fee: 100, verify: false }).catch(e => e)
+    expect(await error.verifyTx()).to.have.lengthOf(1)
   })
   it('Get top block', async () => {
     const top = await sdk.topBlock()

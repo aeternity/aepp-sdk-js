@@ -16,6 +16,7 @@
  */
 
 import { describe, it, before } from 'mocha'
+import { expect } from 'chai'
 import { getSdk } from './'
 import { randomName } from '../utils'
 import * as R from 'ramda'
@@ -66,11 +67,8 @@ describe('Aens', function () {
     const onAccount = sdk.addresses().find(acc => acc !== current)
     const { pointers } = await sdk.getName(name)
     pointers.length.should.be.equal(0)
-    try {
-      await sdk.spend(100, name, { onAccount })
-    } catch (e) {
-      e.message.should.be.equal(`Name ${name} don't have pointers for ak`)
-    }
+    await expect(sdk.spend(100, name, { onAccount }))
+      .to.be.rejectedWith(`Name ${name} don't have pointers for ak`)
   })
   it('Call contract using AENS name', async () => {
     const identityContract = `

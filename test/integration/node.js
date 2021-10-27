@@ -50,34 +50,26 @@ describe('Node client', function () {
       })
     )
   })
+
   describe('Node Pool', () => {
     it('throw error on invalid node object', async () => {
       const nodes = await NodePool()
       expect(() => nodes.addNode('test', {})).to.throw(Error)
       expect(() => nodes.addNode('test', 1)).to.throw(Error)
       expect(() => nodes.addNode('test', null)).to.throw(Error)
-      try {
-        nodes.addNode('test', {})
-      } catch (e) {
-        e.message.should.be.equal('"[0].instance.api" is required')
-      }
+      expect(() => nodes.addNode('test', {})).to.throw('"[0].instance.api" is required')
     })
+
     it('Throw error on get network without node ', async () => {
       const nodes = await NodePool()
-      try {
-        nodes.getNetworkId()
-      } catch (e) {
-        e.message.should.be.equal('networkId is not provided')
-      }
+      expect(() => nodes.getNetworkId()).to.throw('networkId is not provided')
     })
+
     it('Throw error on using API without node', async () => {
       const nodes = await NodePool()
-      try {
-        nodes.api.someAPIfn()
-      } catch (e) {
-        e.message.should.be.equal('You can\'t use Node API. Node is not connected or not defined!')
-      }
+      expect(() => nodes.api.someAPIfn()).to.throw('You can\'t use Node API. Node is not connected or not defined!')
     })
+
     it('Can change Node', async () => {
       const nodes = await NodePool({
         nodes: [
@@ -91,6 +83,7 @@ describe('Node client', function () {
       const secondNodeInfo = nodes.getNodeInfo()
       secondNodeInfo.name.should.be.equal('second')
     })
+
     it('Fail on undefined node', async () => {
       const nodes = await NodePool({
         nodes: [
@@ -98,12 +91,9 @@ describe('Node client', function () {
           { name: 'second', instance: node }
         ]
       })
-      try {
-        nodes.selectNode('asdasd')
-      } catch (e) {
-        e.message.should.be.equal('Node with name asdasd not in pool')
-      }
+      expect(() => nodes.selectNode('asdasd')).to.throw('Node with name asdasd not in pool')
     })
+
     it('Can get list of nodes', async () => {
       const nodes = await NodePool({
         nodes: [

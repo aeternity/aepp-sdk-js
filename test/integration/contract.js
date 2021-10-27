@@ -124,15 +124,18 @@ describe('Contract', function () {
   before(async function () {
     sdk = await getSdk()
   })
+
   describe('Aens and Oracle operation delegation', () => {
     let cInstance
     let cInstanceOracle
+
     before(async () => {
       cInstance = await sdk.getContractInstance(aensDelegationContract)
       cInstanceOracle = await sdk.getContractInstance(oracleContract)
       await cInstance.deploy()
       await cInstanceOracle.deploy()
     })
+
     it('Delegate AENS operations', async () => {
       const name = randomName(15)
       const contractId = cInstance.deployInfo.address
@@ -169,12 +172,9 @@ describe('Contract', function () {
       const revoke = await cInstance.methods.signedRevoke(newOwner, name, revokeSig)
       revoke.result.returnType.should.be.equal('ok')
 
-      try {
-        await sdk.aensQuery(name)
-      } catch (e) {
-        e.message.should.be.an('string')
-      }
+      await expect(sdk.aensQuery(name)).to.be.rejectedWith(Error)
     })
+
     it('Delegate Oracle operations', async () => {
       const contractId = cInstanceOracle.deployInfo.address
       const current = await sdk.address()
@@ -219,12 +219,14 @@ describe('Contract', function () {
       queryObject2.decodedResponse.should.be.equal(r)
     })
   })
+
   it('precompiled bytecode can be deployed', async () => {
     const { version, consensusProtocolVersion } = sdk.getNodeInfo()
     console.log(`Node => ${version}, consensus => ${consensusProtocolVersion}, compiler => ${sdk.compilerVersion}`)
     const code = await sdk.contractCompile(identityContract)
     return sdk.contractDeploy(code.bytecode, identityContract).should.eventually.have.property('address')
   })
+
   it('enforce zero deposit for contract deployment', async () => {
     const { version, consensusProtocolVersion } = sdk.getNodeInfo()
     console.log(`Node => ${version}, consensus => ${consensusProtocolVersion}, compiler => ${sdk.compilerVersion}`)
@@ -232,6 +234,7 @@ describe('Contract', function () {
     var { txData } = await sdk.contractDeploy(code.bytecode, identityContract, [], { deposit: 10 })
     return txData.tx.deposit.should.be.equal(0)
   })
+
   it('Verify message in Sophia', async () => {
     const msgHash = messageToHash('Hello')
     const signature = await sdk.sign(msgHash)
@@ -240,6 +243,7 @@ describe('Contract', function () {
     const { decodedResult } = await signContract.methods.verify(msgHash, await sdk.address(), signature)
     decodedResult.should.be.equal(true)
   })
+
   it('compiles Sophia code', async () => {
     bytecode = await sdk.contractCompile(identityContract)
     return bytecode.should.have.property('bytecode')
@@ -286,26 +290,16 @@ describe('Contract', function () {
   describe('_handleCallError', () => {
     it('throws error on deploy', async () => {
       const code = await sdk.contractCompile(contractWithBrokenDeploy)
-      try {
-        await code.deploy()
-      } catch (e) {
-        e.message.should.be.equal('Invocation failed: "CustomErrorMessage"')
-      }
+      await expect(code.deploy()).to.be.rejectedWith('Invocation failed: "CustomErrorMessage"')
     })
 
     it('throws errors on method call', async () => {
       const code = await sdk.contractCompile(contractWithBrokenMethods)
       const deployed = await code.deploy()
-      try {
-        await deployed.call('failWithoutMessage', [await sdk.address()])
-      } catch (e) {
-        e.message.should.be.equal('Invocation failed')
-      }
-      try {
-        await deployed.call('failWithMessage')
-      } catch (e) {
-        e.message.should.be.equal('Invocation failed: "CustomErrorMessage"')
-      }
+      await expect(deployed.call('failWithoutMessage', [await sdk.address()]))
+        .to.be.rejectedWith('Invocation failed')
+      await expect(deployed.call('failWithMessage'))
+        .to.be.rejectedWith('Invocation failed: "CustomErrorMessage"')
     })
   })
 
@@ -352,8 +346,10 @@ describe('Contract', function () {
       })
       .should.eventually.become('Hello World!')
   })
+
   describe('Namespaces', () => {
     let deployed
+
     it('Can compiler contract with external deps', async () => {
       const filesystem = {
         testLib: libContract
@@ -361,13 +357,12 @@ describe('Contract', function () {
       const compiled = await sdk.contractCompile(contractWithLib, { filesystem })
       compiled.should.have.property('bytecode')
     })
+
     it('Throw error when try to compile contract without providing external deps', async () => {
-      try {
-        await sdk.contractCompile(contractWithLib)
-      } catch (e) {
-        e.response.text.should.include('Couldn\'t find include file')
-      }
+      const error = await sdk.contractCompile(contractWithLib).then(() => null, e => e)
+      expect(error.response.text).to.contain('Couldn\'t find include file')
     })
+
     it('Can deploy contract with external deps', async () => {
       const filesystem = {
         testLib: libContract
@@ -383,6 +378,7 @@ describe('Contract', function () {
       const encodedCallData = await compiled.encodeCall('sumNumbers', ['1', '2'])
       encodedCallData.should.satisfy(s => s.startsWith('cb_'))
     })
+
     it('Can call contract with external deps', async () => {
       const callResult = await deployed.call('sumNumbers', ['1', '2'])
       const decoded = await callResult.decode()
@@ -397,6 +393,7 @@ describe('Contract', function () {
   describe('Sophia Compiler', function () {
     let callData
     let bytecode
+
     it('compile', async () => {
       bytecode = await sdk.compileContractAPI(identityContract)
       const prefix = bytecode.slice(0, 2)
@@ -404,20 +401,24 @@ describe('Contract', function () {
       prefix.should.be.equal('cb')
       isString.should.be.equal(true)
     })
+
     it('Get FATE assembler', async () => {
       const result = await sdk.getFateAssembler(bytecode)
       result.should.be.a('object')
       const assembler = result['fate-assembler']
       assembler.should.be.a('string')
     })
+
     it('Get compiler version from bytecode', async () => {
       const version = await sdk.getBytecodeCompilerVersion(bytecode)
       console.log(version)
     })
+
     it('get contract ACI', async () => {
       const aci = await sdk.contractGetACI(identityContract)
       aci.should.have.property('interface')
     })
+
     it('encode call-data', async () => {
       callData = await sdk.contractEncodeCallDataAPI(identityContract, 'init', [])
       const prefix = callData.slice(0, 2)
@@ -425,31 +426,33 @@ describe('Contract', function () {
       prefix.should.be.equal('cb')
       isString.should.be.equal(true)
     })
+
     it('decode call result', async () => {
       return sdk.contractDecodeCallResultAPI(identityContract, 'getArg', encodedNumberSix, 'ok').should.eventually.become(6)
     })
+
     it('Decode call-data using source', async () => {
       const decodedCallData = await sdk.contractDecodeCallDataBySourceAPI(identityContract, 'init', callData)
       decodedCallData.arguments.should.be.an('array')
       decodedCallData.arguments.length.should.be.equal(0)
       decodedCallData.function.should.be.equal('init')
     })
+
     it('Decode call-data using bytecode', async () => {
       const decodedCallData = await sdk.contractDecodeCallDataByCodeAPI(bytecode, callData)
       decodedCallData.arguments.should.be.an('array')
       decodedCallData.arguments.length.should.be.equal(0)
       decodedCallData.function.should.be.equal('init')
     })
+
     it('validate bytecode', async () => {
       return sdk.validateByteCodeAPI(bytecode, identityContract).should.eventually.become(true)
     })
+
     it('Use invalid compiler url', async () => {
-      try {
-        const cloned = R.clone(sdk)
-        await cloned.setCompilerUrl('https://compiler.aepps.comas')
-      } catch (e) {
-        e.message.should.be.equal('request to https://compiler.aepps.comas/api failed, reason: getaddrinfo ENOTFOUND compiler.aepps.comas')
-      }
+      const cloned = R.clone(sdk)
+      await expect(cloned.setCompilerUrl('https://compiler.aepps.comas'))
+        .to.be.rejectedWith('request to https://compiler.aepps.comas/api failed, reason: getaddrinfo ENOTFOUND compiler.aepps.comas')
     })
   })
 })

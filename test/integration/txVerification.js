@@ -58,11 +58,8 @@ describe('Verify Transaction', function () {
       ttl: 2,
       absoluteTtl: true
     })
-    try {
-      await sdk.send(spendTx)
-    } catch ({ validation }) {
-      expect(validation).to.have.lengthOf(1)
-    }
+    const error = await sdk.send(spendTx).catch(e => e)
+    expect(error.validation).to.have.lengthOf(1)
   })
 
   it('verifies vmVersion/abiVersion for contract transactions', async () => {

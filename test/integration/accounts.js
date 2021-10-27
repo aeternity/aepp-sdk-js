@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2021 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -16,6 +16,7 @@
  */
 
 import { describe, it, before } from 'mocha'
+import { expect } from 'chai'
 import { getSdk, BaseAe, networkId } from './'
 import { generateKeyPair } from '../../src/utils/crypto'
 import BigNumber from 'bignumber.js'
@@ -53,13 +54,8 @@ describe('Accounts', function () {
       return wallet.spend(1, receiver).should.be.rejectedWith(Error)
     })
 
-    it('spending minus amount of tokens', async () => {
-      try {
-        await wallet.spend(-1, receiver)
-      } catch (e) {
-        e.message.should.be.equal('Transaction build error. {"amount":"-1 must be >= 0"}')
-      }
-    })
+    it('spending negative amount of tokens', () => expect(wallet.spend(-1, receiver))
+      .to.be.rejectedWith('Transaction build error. {"amount":"-1 must be >= 0"}'))
   })
 
   it('determines the balance using `balance`', async () => {
@@ -155,45 +151,30 @@ describe('Accounts', function () {
       const current = await sdk.address()
       const accounts = sdk.addresses()
       const onAccount = accounts.find(acc => acc !== current)
-      // SPEND
+
       const { tx } = await sdk.spend(1, await sdk.address(), { onAccount })
       tx.senderId.should.be.equal(onAccount)
       current.should.be.equal(current)
     })
 
     it('Fail on invalid account', async () => {
-      // SPEND
-      try {
-        await sdk.spend(1, await sdk.address(), { onAccount: 1 })
-      } catch (e) {
-        e.message.should.be.equal('Unknown account type: number (account: 1)')
-      }
+      return expect(sdk.spend(1, await sdk.address(), { onAccount: 1 }))
+        .to.be.rejectedWith('Unknown account type: number (account: 1)')
     })
 
     it('Fail on non exist account', async () => {
-      // SPEND
-      try {
-        await sdk.spend(1, await sdk.address(), { onAccount: 'ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk' })
-      } catch (e) {
-        e.message.should.be.equal('Account for ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk not available')
-      }
+      return expect(sdk.spend(1, await sdk.address(), { onAccount: 'ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk' }))
+        .to.be.rejectedWith('Account for ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk not available')
     })
 
     it('Fail on no accounts', async () => {
-      // SPEND
-      try {
-        await openClient.spend(1, await sdk.address())
-      } catch (e) {
-        e.message.should.be.equal('No account or wallet configured')
-      }
+      return expect(openClient.spend(1, await sdk.address()))
+        .to.be.rejectedWith('No account or wallet configured')
     })
 
-    it('Invalid on account options', async () => {
-      try {
-        await sdk.sign('tx_Aasdasd', { onAccount: 123 })
-      } catch (e) {
-        e.message.should.be.equal('Unknown account type: number (account: 123)')
-      }
+    it('Invalid on account options', () => {
+      return expect(sdk.sign('tx_Aasdasd', { onAccount: 123 }))
+        .to.be.rejectedWith('Unknown account type: number (account: 123)')
     })
     it('Make operation on account using keyPair/MemoryAccount', async () => {
       const keypair = generateKeyPair()
@@ -214,16 +195,8 @@ describe('Accounts', function () {
       const keypair = generateKeyPair()
       keypair.publicKey = 'ak_bev1aPMdAeJTuUiCJ7mHbdQiAizrkRGgoV9FfxHYb6pAxo5WY'
       const data = 'Hello'
-      try {
-        await sdk.sign(data, { onAccount: keypair })
-      } catch (e) {
-        e.message.should.be.equal('Invalid Key Pair')
-      }
-      try {
-        await sdk.address({ onAccount: keypair })
-      } catch (e) {
-        e.message.should.be.equal('Invalid Key Pair')
-      }
+      await expect(sdk.sign(data, { onAccount: keypair })).to.be.rejectedWith('Invalid Key Pair')
+      await expect(sdk.address({ onAccount: keypair })).to.be.rejectedWith('Invalid Key Pair')
     })
   })
 
