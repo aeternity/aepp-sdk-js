@@ -38,7 +38,7 @@ import TxObject from '../../tx/tx-object'
  * @param {String} [options.aci] Contract ACI
  * @param {String} [options.contractAddress] Contract address
  * @param {Object} [options.filesystem] Contact source external namespaces map
- * @param {Object} [options.forceCodeCheck=true] Don't check contract code
+ * @param {Boolean} [options.validateByteCode] Compare source code with on-chain version
  * @return {ContractInstance} JS Contract API
  * @example
  * const contractIns = await client.getContractInstance(sourceCode)
@@ -48,7 +48,7 @@ import TxObject from '../../tx/tx-object'
  * Also you can call contract like: await contractIns.methods.setState(123, options)
  * Then sdk decide to make on-chain or static call(dry-run API) transaction based on function is stateful or not
  */
-export default async function getContractInstance (source, { aci, contractAddress, filesystem = {}, forceCodeCheck = true, ...otherOptions } = {}) {
+export default async function getContractInstance (source, { aci, contractAddress, filesystem = {}, validateByteCode, ...otherOptions } = {}) {
   aci = aci || await this.contractGetACI(source, { filesystem })
   if (contractAddress) contractAddress = await this.resolveName(contractAddress, 'ct', { resolveByNode: true })
   const instance = {
@@ -71,7 +71,7 @@ export default async function getContractInstance (source, { aci, contractAddres
   if (contractAddress) {
     const contract = await this.getContract(contractAddress).catch(e => null)
     if (!contract || !contract.active) throw new Error(`Contract with address ${contractAddress} not found on-chain or not active`)
-    if (!forceCodeCheck) {
+    if (validateByteCode) {
       const onChanByteCode = (await this.getContractByteCode(contractAddress)).bytecode
       const isCorrespondingBytecode = await this.validateByteCodeAPI(onChanByteCode, instance.source, instance.options).catch(e => false)
       if (!isCorrespondingBytecode) throw new Error('Contract source do not correspond to the contract bytecode deployed on the chain')

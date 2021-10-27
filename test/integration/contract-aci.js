@@ -238,21 +238,17 @@ describe('Contract ACI Interface', function () {
   })
 
   it('Generate ACI object with not corresponding bytecode', async () => {
-    try {
-      await sdk.getContractInstance(
-        identityContract,
-        { contractAddress: contractObject.deployInfo.address, ttl: 0 }
-      )
-    } catch (e) {
-      e.message.should.be.equal('Contract source do not correspond to the contract bytecode deployed on the chain')
-    }
-  })
-
-  it('Generate ACI object with not corresponding bytecode and force this check', async () => {
     await sdk.getContractInstance(
       identityContract,
-      { forceCodeCheck: true, contractAddress: contractObject.deployInfo.address, ttl: 0 }
+      { contractAddress: contractObject.deployInfo.address, ttl: 0 }
     )
+  })
+
+  it('Generate ACI object with not corresponding bytecode and check is code the same', async () => {
+    await expect(sdk.getContractInstance(
+      identityContract,
+      { validateByteCode: true, contractAddress: contractObject.deployInfo.address, ttl: 0 }
+    )).to.be.rejectedWith('Contract source do not correspond to the contract bytecode deployed on the chain')
   })
 
   it('Throw error on creating contract instance with invalid contractAddress', async () => {
