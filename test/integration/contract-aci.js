@@ -31,12 +31,12 @@ const libContract = `
 namespace TestLib =
   function sum(x: int, y: int) : int = x + y
 `
-const genTestContract = isCompiler6 => `
+const testContract = `
 namespace Test =
   function double(x: int): int = x*2
 
 
-contract ${isCompiler6 ? 'interface' : ''} Voting =
+contract interface Voting =
   type test_type = int
   record state = { value: string, key: test_type, testOption: option(string) }
   record test_record = { value: string, key: list(test_type) }
@@ -121,7 +121,7 @@ describe('Contract ACI Interface', function () {
 
     before(async () => {
       cInstance = await sdk.getContractInstance(
-        genTestContract(sdk._isCompiler6),
+        testContract,
         { filesystem }
       )
       await cInstance.deploy(['test', 1, 'some'])
@@ -171,7 +171,7 @@ describe('Contract ACI Interface', function () {
 
   it('Generate ACI object', async () => {
     contractObject = await sdk.getContractInstance(
-      genTestContract(sdk._isCompiler6),
+      testContract,
       { filesystem, ttl: 0 }
     )
     contractObject.should.have.property('interface')
@@ -225,7 +225,7 @@ describe('Contract ACI Interface', function () {
   })
   it('Generate ACI object with corresponding bytecode', async () => {
     await sdk.getContractInstance(
-      genTestContract(sdk._isCompiler6),
+      testContract,
       { contractAddress: contractObject.deployInfo.address, filesystem, ttl: 0 }
     )
   })
@@ -248,7 +248,7 @@ describe('Contract ACI Interface', function () {
   it('Throw error on creating contract instance with invalid contractAddress', async () => {
     try {
       await sdk.getContractInstance(
-        genTestContract(sdk._isCompiler6),
+        testContract,
         { filesystem, contractAddress: 'ct_asdasdasd', ttl: 0 }
       )
     } catch (e) {
@@ -259,7 +259,7 @@ describe('Contract ACI Interface', function () {
     const contractAddress = 'ct_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT'
     try {
       await sdk.getContractInstance(
-        genTestContract(sdk._isCompiler6),
+        testContract,
         { filesystem, contractAddress, ttl: 0 }
       )
     } catch (e) {
@@ -631,7 +631,7 @@ describe('Contract ACI Interface', function () {
     let cInstance
     before(async () => {
       cInstance = await sdk.getContractInstance(
-        genTestContract(sdk._isCompiler6),
+        testContract,
         { filesystem }
       )
     })
