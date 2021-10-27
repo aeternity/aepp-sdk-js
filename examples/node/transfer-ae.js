@@ -68,7 +68,7 @@ const [amount = 1, recipient = ACCOUNT_KEYPAIR.publicKey] = process.argv.slice(2
   // The `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp) itself is asynchronous as it determines the node's version and
   // rest interface automatically. Only once the Promise is fulfilled, you know you have a working object instance
   // which is assigned to the `client` constant in this case.
-  // 
+  //
   // Note:
   //
   //   - `Universal` is not a constructor but a factory, which means it's *not* invoked with `new`.
