@@ -74,7 +74,7 @@ const REQUESTS = {
             }
           }
         } catch (e) {
-          console.error(e)
+          if (instance.debug) console.error(e)
           return { error: ERRORS.internalError({ msg: e.message }) }
         }
       },
@@ -112,7 +112,7 @@ const REQUESTS = {
         try {
           onAcc = resolveOnAccount(instance.addresses(), address, opt)
         } catch (e) {
-          console.error(e)
+          if (instance.debug) console.error(e)
           return { error: ERRORS.internalError({ msg: e.message }) }
         }
         try {
@@ -156,7 +156,7 @@ const REQUESTS = {
             }
           }
         } catch (e) {
-          console.error(e)
+          if (instance.debug) console.error(e)
           return { error: ERRORS.internalError({ msg: e.message }) }
         }
       },

@@ -17,6 +17,7 @@
 
 import '../'
 import { describe, it } from 'mocha'
+import { expect } from 'chai'
 import { dump, recover, getAddressFromPriv, validateKeyObj } from '../../src/utils/keystore'
 import { generateKeyPair } from '../../src/utils/crypto'
 
@@ -65,19 +66,9 @@ describe('Keystore', function () {
     publicKey.should.be.equal(accAddress)
   })
 
-  it('use invalid keystore json', async () => {
-    try {
-      await recover(password, invalidKeystore)
-    } catch (e) {
-      e.message.should.be.equal('Invalid key file format. Require properties: ciphertext,symmetric_alg')
-    }
-  })
+  it('use invalid keystore json', () => expect(recover(password, invalidKeystore))
+    .to.be.rejectedWith('Invalid key file format. Require properties: ciphertext,symmetric_alg'))
 
-  it('use invalid keystore password', async () => {
-    try {
-      await recover(password + 1, keystoreBuffer)
-    } catch (e) {
-      e.message.should.be.equal('Invalid password or nonce')
-    }
-  })
+  it('use invalid keystore password', () => expect(recover(password + 1, keystoreBuffer))
+    .to.be.rejectedWith('Invalid password or nonce'))
 })
