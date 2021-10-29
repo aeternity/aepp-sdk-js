@@ -258,8 +258,7 @@ describe('Native Transaction', function () {
     const nonceCustom = await sdk.getAccountNonce(await sdk.address(), 1)
     nonceCustom.should.be.equal(1)
   })
-  it('Destroy instance', () => {
+  it('Destroy instance finishes without error', () => {
     sdk.destroyInstance()
-    console.log('Finish without error')
   })
 })

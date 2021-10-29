@@ -17,6 +17,7 @@
 /* eslint-disable no-unused-expressions */
 
 import { describe, it, before, after, beforeEach, afterEach } from 'mocha'
+import { expect } from 'chai'
 import * as sinon from 'sinon'
 import BigNumber from 'bignumber.js'
 import { getSdk, BaseAe, networkId } from './'
@@ -916,10 +917,9 @@ describe('Channel', function () {
       contract: contractAddress,
       abiVersion: 3
     }, async (tx) => initiator.signTransaction(tx))
-    console.log('after done')
     const hash = buildTxHash(forceTx.tx)
-    const txInfo = await initiator.tx(hash)
-    console.log(txInfo)
+    const { returnType } = await initiator.tx(hash)
+    expect(returnType).to.be.equal('ok')
   })
 
   it('can call a contract and reject', async () => {

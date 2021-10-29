@@ -152,30 +152,25 @@ contract Identity =
 
   describe('name auctions', function () {
     it('claims names', async () => {
-      try {
-        const current = await sdk.address()
-        const onAccount = sdk.addresses().find(acc => acc !== current)
-        const name = randomName(12)
+      const current = await sdk.address()
+      const onAccount = sdk.addresses().find(acc => acc !== current)
+      const name = randomName(12)
 
-        const preclaim = await sdk.aensPreclaim(name)
-        preclaim.should.be.an('object')
+      const preclaim = await sdk.aensPreclaim(name)
+      preclaim.should.be.an('object')
 
-        const claim = await preclaim.claim()
-        claim.should.be.an('object')
+      const claim = await preclaim.claim()
+      claim.should.be.an('object')
 
-        const bidFee = computeBidFee(name)
-        const bid = await sdk.aensBid(name, bidFee, { onAccount })
-        bid.should.be.an('object')
+      const bidFee = computeBidFee(name)
+      const bid = await sdk.aensBid(name, bidFee, { onAccount })
+      bid.should.be.an('object')
 
-        const isAuctionFinished = await sdk.getName(name).catch(e => false)
-        isAuctionFinished.should.be.equal(false)
+      const isAuctionFinished = await sdk.getName(name).catch(e => false)
+      isAuctionFinished.should.be.equal(false)
 
-        const auctionEndBlock = computeAuctionEndBlock(name, bid.blockHeight)
-        console.log(`BID STARTED AT ${bid.blockHeight} WILL END AT ${auctionEndBlock}`)
-      } catch (e) {
-        if (e && typeof e.verifyTx === 'function') console.log(await e.verifyTx())
-        throw e
-      }
+      const auctionEndBlock = computeAuctionEndBlock(name, bid.blockHeight)
+      console.log(`BID STARTED AT ${bid.blockHeight} WILL END AT ${auctionEndBlock}`)
     })
   })
 })
