@@ -734,7 +734,7 @@ describe('Channel', function () {
       payload: signedTx
     })
     const closeSoloTxFee = unpackTx(closeSoloTx).tx.fee
-    await initiator.sendTransaction(await initiator.signTransaction(closeSoloTx), { waitMined: true })
+    await initiator.sendTransaction(await initiator.signTransaction(closeSoloTx), { waitMined: true, interval: 400, attempts: 10 })
     const settleTx = await initiator.channelSettleTx({
       channelId: await initiatorCh.id(),
       fromId: initiatorAddr,
@@ -742,7 +742,7 @@ describe('Channel', function () {
       responderAmountFinal: balances[responderAddr]
     })
     const settleTxFee = unpackTx(settleTx).tx.fee
-    await initiator.sendTransaction(await initiator.signTransaction(settleTx), { waitMined: true })
+    await initiator.sendTransaction(await initiator.signTransaction(settleTx), { waitMined: true, interval: 400, attempts: 10 })
     const initiatorBalanceAfterClose = await initiator.balance(initiatorAddr)
     const responderBalanceAfterClose = await responder.balance(responderAddr)
     new BigNumber(initiatorBalanceAfterClose).minus(initiatorBalanceBeforeClose).plus(closeSoloTxFee).plus(settleTxFee).isEqualTo(
@@ -791,7 +791,7 @@ describe('Channel', function () {
       payload: oldUpdate.signedTx
     })
     const closeSoloTxFee = unpackTx(closeSoloTx).tx.fee
-    await initiator.sendTransaction(await initiator.signTransaction(closeSoloTx), { waitMined: true })
+    await initiator.sendTransaction(await initiator.signTransaction(closeSoloTx), { waitMined: true, interval: 400, attempts: 10 })
     const slashTx = await responder.channelSlashTx({
       channelId: responderCh.id(),
       fromId: responderAddr,
@@ -799,7 +799,7 @@ describe('Channel', function () {
       payload: recentUpdate.signedTx
     })
     const slashTxFee = unpackTx(slashTx).tx.fee
-    await responder.sendTransaction(await responder.signTransaction(slashTx), { waitMined: true })
+    await responder.sendTransaction(await responder.signTransaction(slashTx), { waitMined: true, interval: 400, attempts: 10 })
     const settleTx = await responder.channelSettleTx({
       channelId: responderCh.id(),
       fromId: responderAddr,
@@ -807,7 +807,7 @@ describe('Channel', function () {
       responderAmountFinal: recentBalances[responderAddr]
     })
     const settleTxFee = unpackTx(settleTx).tx.fee
-    await responder.sendTransaction(await responder.signTransaction(settleTx), { waitMined: true })
+    await responder.sendTransaction(await responder.signTransaction(settleTx), { waitMined: true, interval: 400, attempts: 10 })
     const initiatorBalanceAfterClose = await initiator.balance(initiatorAddr)
     const responderBalanceAfterClose = await responder.balance(responderAddr)
     new BigNumber(initiatorBalanceAfterClose).minus(initiatorBalanceBeforeClose).plus(closeSoloTxFee).isEqualTo(
