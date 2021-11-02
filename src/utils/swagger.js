@@ -39,10 +39,14 @@ let warnedAboutInternalApiUsage = false
  * @param {String} [options.internalUrl] - Node internal URL
  * @param {Boolean} [options.disableBigNumbers]
  * @param {Boolean} [options.disableCaseConversion]
+ * @param {Function} [options.responseInterceptor]
  * @return {Object} Swagger client
  * @example (await genSwaggerClient('https://mainnet.aeternity.io/api')).getAccountByPubkey('ak_jupBUgZNbcC4krDLR3tAkw1iBZoBbkNeShAq4atBtpFWmz36r')
  */
-export default async (specUrl, { spec, internalUrl, disableBigNumbers, disableCaseConversion } = {}) => {
+export default async (
+  specUrl,
+  { spec, internalUrl, disableBigNumbers, disableCaseConversion, responseInterceptor } = {}
+) => {
   spec = spec || await (await fetch(specUrl)).json()
   const jsonImp = disableBigNumbers ? JSON : JsonBig
 
@@ -64,9 +68,10 @@ export default async (specUrl, { spec, internalUrl, disableBigNumbers, disableCa
       responseInterceptor: response => {
         if (!response.text) return response
         const body = jsonImp.parse(response.text)
-        return Object.assign(response, {
+        Object.assign(response, {
           body: disableCaseConversion ? body : pascalizeKeys(body)
         })
+        return (responseInterceptor && responseInterceptor(response)) || response
       }
     })
   }))

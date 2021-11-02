@@ -394,6 +394,22 @@ describe('Contract', function () {
       isString.should.be.equal(true)
     })
 
+    it('throws clear exception if compile broken contract', async () => {
+      await expect(sdk.compileContractAPI(
+        'contract Foo =\n' +
+        '  entrypoint getArg(x : bar) = x\n' +
+        '  entrypoint getArg(x : int) = baz\n' +
+        '  entrypoint getArg1(x : int) = baz\n'
+      )).to.be.rejectedWith(
+        'compile error:\n' +
+        'type_error:3:3: Duplicate definitions of getArg at\n' +
+        '  - line 2, column 3\n' +
+        '  - line 3, column 3\n' +
+        'type_error:3:32: Unbound variable baz at line 3, column 32\n' +
+        'type_error:4:33: Unbound variable baz at line 4, column 33'
+      )
+    })
+
     it('Get FATE assembler', async () => {
       const result = await sdk.getFateAssembler(bytecode)
       result.should.be.a('object')
@@ -410,6 +426,11 @@ describe('Contract', function () {
     it('get contract ACI', async () => {
       const aci = await sdk.contractGetACI(identityContract)
       aci.should.have.property('interface')
+    })
+
+    it('throws clear exception if generating ACI with no arguments', async () => {
+      await expect(sdk.contractGetACI())
+        .to.be.rejectedWith('validation_error in body ({"error":"missing_required_property","data":"code","path":[]})')
     })
 
     it('encode call-data', async () => {

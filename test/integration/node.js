@@ -51,6 +51,11 @@ describe('Node client', function () {
     )
   })
 
+  it('throws clear exceptions when can\'t get transaction by hash', async () => {
+    await expect(node.api.getTransactionByHash('th_test'))
+      .to.be.rejectedWith('v3/transactions/th_test error: Invalid hash')
+  })
+
   describe('Node Pool', () => {
     it('throw error on invalid node object', async () => {
       const nodes = await NodePool()

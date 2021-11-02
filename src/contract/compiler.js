@@ -52,7 +52,25 @@ export default AsyncInit.compose(ContractBase, {
       compilerUrl = compilerUrl.replace(/\/$/, '')
       const client = await genSwaggerClient(`${compilerUrl}/api`, {
         disableBigNumbers: true,
-        disableCaseConversion: true
+        disableCaseConversion: true,
+        responseInterceptor: response => {
+          if (response.ok) return
+          let message = `${new URL(response.url).pathname.slice(1)} error`
+          if (response.body.reason) {
+            message += ': ' + response.body.reason +
+              (response.body.parameter ? ` in ${response.body.parameter}` : '') +
+              // TODO: revising after improving documentation https://github.com/aeternity/aesophia_http/issues/78
+              (response.body.info ? ` (${JSON.stringify(response.body.info)})` : '')
+          }
+          if (Array.isArray(response.body)) {
+            message += ':\n' + response.body
+              .map(e => `${e.type}:${e.pos.line}:${e.pos.col}: ${e.message}${e.context ? `(${e.context})` : ''}`)
+              .map(e => e.trim()) // TODO: remove after fixing https://github.com/aeternity/aesophia_http/issues/80
+              .join('\n')
+          }
+          response.statusText = message
+          return response
+        }
       })
       this.compilerVersion = client.spec.info.version
       this._compilerApi = client.api

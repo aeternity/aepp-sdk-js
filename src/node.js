@@ -76,7 +76,15 @@ const Node = AsyncInit.compose({
     if (!url) throw new Error('"url" required')
     this.url = url.replace(/\/$/, '')
     this.internalUrl = internalUrl ? internalUrl.replace(/\/$/, '') : this.url
-    const client = await genSwaggerClient(`${this.url}/api?oas3`, { internalUrl: this.internalUrl })
+    const client = await genSwaggerClient(`${this.url}/api?oas3`, {
+      internalUrl: this.internalUrl,
+      responseInterceptor: response => {
+        if (response.ok) return
+        return Object.assign(response, {
+          statusText: `${new URL(response.url).pathname.slice(1)} error: ` + response.body.reason
+        })
+      }
+    })
     this.version = client.spec.info.version
     if (
       !semverSatisfies(this.version, NODE_GE_VERSION, NODE_LT_VERSION) &&
