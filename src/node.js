@@ -40,26 +40,6 @@ export function getNetworkId ({ networkId, force = false } = {}) {
 }
 
 /**
- * get consensus protocol version
- * @param {Array} protocols Array of protocols
- * @param {Number} height Height
- * @return {Number} version Protocol version
- */
-async function getConsensusProtocolVersion (protocols = [], height) {
-  if (!protocols) throw new Error('Protocols must be an array')
-  if (!height) height = (await this.api.getCurrentKeyBlock()).height
-  if (height < 0) throw new Error('height must be a number >= 0')
-
-  return protocols
-    .filter(({ effectiveAtHeight }) => height >= effectiveAtHeight)
-    .reduce(
-      (acc, p) => p.effectiveAtHeight > acc.effectiveAtHeight ? p : acc,
-      { effectiveAtHeight: -1, version: 0 }
-    )
-    .version
-}
-
-/**
  * {@link genSwaggerClient} based Node remote API Stamp
  * @function
  * @alias module:@aeternity/aepp-sdk/es/node
@@ -101,7 +81,13 @@ const Node = AsyncInit.compose({
       nodeRevision: revision, genesisKeyBlockHash: genesisHash, networkId,
       protocols, topBlockHeight
     } = await this.api.getStatus()
-    this.consensusProtocolVersion = await this.getConsensusProtocolVersion(protocols, topBlockHeight)
+    this.consensusProtocolVersion = protocols
+      .filter(({ effectiveAtHeight }) => topBlockHeight >= effectiveAtHeight)
+      .reduce(
+        (acc, p) => p.effectiveAtHeight > acc.effectiveAtHeight ? p : acc,
+        { effectiveAtHeight: -1, version: 0 }
+      )
+      .version
     this.nodeNetworkId = networkId
     return Object.assign(this, { revision, genesisHash })
   },
@@ -114,8 +100,7 @@ const Node = AsyncInit.compose({
         version: this.version,
         consensusProtocolVersion: this.consensusProtocolVersion
       }
-    },
-    getConsensusProtocolVersion
+    }
   },
   props: {
     version: null,
