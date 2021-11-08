@@ -97,8 +97,11 @@ const Node = AsyncInit.compose({
     }
     this.api = client.api
 
-    const { nodeRevision: revision, genesisKeyBlockHash: genesisHash, networkId, protocols } = await this.api.getStatus()
-    this.consensusProtocolVersion = await this.getConsensusProtocolVersion(protocols)
+    const {
+      nodeRevision: revision, genesisKeyBlockHash: genesisHash, networkId,
+      protocols, topBlockHeight
+    } = await this.api.getStatus()
+    this.consensusProtocolVersion = await this.getConsensusProtocolVersion(protocols, topBlockHeight)
     this.nodeNetworkId = networkId
     return Object.assign(this, { revision, genesisHash })
   },
