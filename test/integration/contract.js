@@ -180,7 +180,7 @@ describe('Contract', function () {
       const current = await sdk.address()
       const onAccount = sdk.addresses().find(acc => acc !== current)
       const qFee = 500000
-      const ttl = { variant: 'RelativeTTL', values: [50] }
+      const ttl = { RelativeTTL: [50] }
       const oracleId = `ok_${onAccount.slice(3)}`
 
       const oracleDelegationSig = await sdk.createOracleDelegationSignature({ contractId }, { onAccount })
