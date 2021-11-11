@@ -59,26 +59,24 @@ contract Voting =
 `
 const aensDelegationContract = `
 contract DelegateTest =
-  // Transactions
-  stateful payable entrypoint signedPreclaim(addr  : address,
-                                             chash : hash,
-                                             sign  : signature) : unit =
+  entrypoint getName(name: string): option(AENS.name) =
+    AENS.lookup(name)
+  stateful payable entrypoint signedPreclaim(addr: address, chash: hash, sign: signature): unit =
     AENS.preclaim(addr, chash, signature = sign)
-  stateful entrypoint signedClaim(addr : address,
-                                name : string,
-                                salt : int,
-                                name_fee : int,
-                                sign : signature) : unit =
+  stateful entrypoint signedClaim(
+    addr: address, name: string, salt: int, name_fee: int, sign: signature): unit =
     AENS.claim(addr, name, salt, name_fee, signature = sign)
-  stateful entrypoint signedTransfer(owner     : address,
-                                   new_owner : address,
-                                   name      : string,
-                                   sign      : signature) : unit =
+  stateful entrypoint signedTransfer(
+    owner: address, new_owner: address, name: string, sign: signature): unit =
     AENS.transfer(owner, new_owner, name, signature = sign)
-  stateful entrypoint signedRevoke(owner     : address,
-                                   name      : string,
-                                   sign      : signature) : unit =
-    AENS.revoke(owner, name, signature = sign)`
+  stateful entrypoint signedRevoke(owner: address, name: string, sign: signature): unit =
+    AENS.revoke(owner, name, signature = sign)
+  stateful entrypoint signedUpdate(
+    owner: address, name: string, key: string, pt: AENS.pointee, sig: signature) =
+    switch(AENS.lookup(name))
+      None => ()
+      Some(AENS.Name(_, _, ptrs)) =>
+        AENS.update(owner, name, None, None, Some(ptrs{[key] = pt}), signature = sig)`
 const oracleContract = `
 contract DelegateTest =
   type fee = int
@@ -126,102 +124,154 @@ describe('Contract', function () {
     sdk = await getSdk()
   })
 
-  describe('Aens and Oracle operation delegation', () => {
-    let cInstance
-    let cInstanceOracle
+  describe('AENS operation delegation', () => {
+    let contract
+    let contractId
+    const name = randomName(15)
+    const nameSalt = salt()
+    let owner
+    let newOwner
+    let delegationSignature
 
     before(async () => {
-      cInstance = await sdk.getContractInstance(aensDelegationContract)
-      cInstanceOracle = await sdk.getContractInstance(oracleContract)
-      await cInstance.deploy()
-      await cInstanceOracle.deploy()
+      contract = await sdk.getContractInstance(aensDelegationContract)
+      await contract.deploy()
+      contractId = contract.deployInfo.address
+      owner = await sdk.address()
+      newOwner = sdk.addresses().find(acc => acc !== owner)
     })
 
-    it('Delegate AENS operations', async () => {
-      const name = randomName(15)
-      const contractId = cInstance.deployInfo.address
-      const nameFee = 20 * (10 ** 18) // 20 AE
-      const currentOwner = await sdk.address()
-
-      // preclaim
-      const _salt = salt()
-      const commitmentId = commitmentHash(name, _salt)
+    it('preclaims', async () => {
+      const commitmentId = commitmentHash(name, nameSalt)
       // TODO: provide more convenient way to create the decoded commitmentId ?
       const commitmentIdDecoded = decode(commitmentId, 'cm')
-      const preclaimSig = await sdk.createAensDelegationSignature({ contractId }, { onAccount: currentOwner })
-      const preclaim = await cInstance.methods.signedPreclaim(await sdk.address(), commitmentIdDecoded, preclaimSig)
+      const preclaimSig = await sdk.createAensDelegationSignature(
+        { contractId }, { onAccount: owner }
+      )
+      const preclaim = await contract.methods
+        .signedPreclaim(owner, commitmentIdDecoded, preclaimSig)
       preclaim.result.returnType.should.be.equal('ok')
       await sdk.awaitHeight((await sdk.height()) + 2, { interval: 200, attempts: 100 })
-
       // signature for any other name related operations
-      const aensDelegationSig = await sdk.createAensDelegationSignature({ contractId, name }, { onAccount: currentOwner })
-
-      // claim
-      const claim = await cInstance.methods.signedClaim(await sdk.address(), name, _salt, nameFee, aensDelegationSig)
-      claim.result.returnType.should.be.equal('ok')
-      await sdk.awaitHeight((await sdk.height()) + 2, { interval: 200, attempts: 100 })
-
-      // transfer
-      const newOwner = sdk.addresses().find(acc => acc !== currentOwner)
-      const transfer = await cInstance.methods.signedTransfer(await sdk.address(), newOwner, name, aensDelegationSig)
-      transfer.result.returnType.should.be.equal('ok')
-      await sdk.awaitHeight((await sdk.height()) + 2, { interval: 200, attempts: 100 })
-
-      // revoke
-      const revokeSig = await sdk.createAensDelegationSignature({ contractId, name }, { onAccount: newOwner })
-      const revoke = await cInstance.methods.signedRevoke(newOwner, name, revokeSig)
-      revoke.result.returnType.should.be.equal('ok')
-
-      await expect(sdk.aensQuery(name)).to.be.rejectedWith(Error)
+      delegationSignature = await sdk.createAensDelegationSignature(
+        { contractId, name }, { onAccount: owner }
+      )
     })
 
-    it('Delegate Oracle operations', async () => {
-      const contractId = cInstanceOracle.deployInfo.address
+    it('claims', async () => {
+      const nameFee = 20e18 // 20 AE
+      const claim = await contract.methods.signedClaim(
+        owner, name, nameSalt, nameFee, delegationSignature
+      )
+      claim.result.returnType.should.be.equal('ok')
+    })
+
+    it('gets', async () => {
+      const nameEntry = (await contract.methods.getName(name)).decodedResult['AENS.Name']
+      expect(nameEntry[0]).to.be.equal(owner)
+      expect(nameEntry[1].FixedTTL[0]).to.be.a('bigint')
+      expect(nameEntry[2]).to.be.eql(new Map())
+    })
+
+    it('updates', async () => {
+      const pointee = { 'AENS.OraclePt': [newOwner] }
+      const update = await contract.methods.signedUpdate(
+        owner, name, 'oracle', pointee, delegationSignature
+      )
+      expect(update.result.returnType).to.be.equal('ok')
+      expect((await sdk.aensQuery(name)).pointers).to.be.eql([{
+        key: 'oracle',
+        id: newOwner.replace('ak', 'ok')
+      }])
+    })
+
+    it('transfers', async () => {
+      const transfer = await contract.methods.signedTransfer(
+        owner, newOwner, name, delegationSignature
+      )
+      transfer.result.returnType.should.be.equal('ok')
+    })
+
+    it('revokes', async () => {
+      const revokeSig = await sdk.createAensDelegationSignature(
+        { contractId, name }, { onAccount: newOwner }
+      )
+      const revoke = await contract.methods.signedRevoke(newOwner, name, revokeSig)
+      revoke.result.returnType.should.be.equal('ok')
+      await expect(sdk.aensQuery(name)).to.be.rejectedWith(Error)
+    })
+  })
+
+  describe('Oracle operation delegation', () => {
+    let contract
+    let contractId
+    let onAccount
+    let oracle
+    let oracleId
+    let queryObject
+    let delegationSignature
+    const queryFee = 500000
+    const ttl = { RelativeTTL: [50] }
+
+    before(async () => {
+      contract = await sdk.getContractInstance(oracleContract)
+      await contract.deploy()
+      contractId = contract.deployInfo.address
       const current = await sdk.address()
-      const onAccount = sdk.addresses().find(acc => acc !== current)
-      const qFee = 500000
-      const ttl = { RelativeTTL: [50] }
-      const oracleId = `ok_${onAccount.slice(3)}`
+      onAccount = sdk.addresses().find(acc => acc !== current)
+      oracleId = `ok_${onAccount.slice(3)}`
+    })
 
-      const oracleDelegationSig = await sdk.createOracleDelegationSignature({ contractId }, { onAccount })
-
-      // register Oracle
-      const oracleRegister = await cInstanceOracle.methods.signedRegisterOracle(onAccount, oracleDelegationSig, qFee, ttl, { onAccount })
+    it('registers', async () => {
+      delegationSignature = await sdk.createOracleDelegationSignature(
+        { contractId }, { onAccount }
+      )
+      const oracleRegister = await contract.methods.signedRegisterOracle(
+        onAccount, delegationSignature, queryFee, ttl, { onAccount }
+      )
       oracleRegister.result.returnType.should.be.equal('ok')
-      const oracle = await sdk.getOracleObject(oracleId)
+      oracle = await sdk.getOracleObject(oracleId)
       oracle.id.should.be.equal(oracleId)
+    })
 
-      // extend oracle
-      const queryExtend = await cInstanceOracle.methods.signedExtendOracle(oracleId, oracleDelegationSig, ttl, { onAccount })
+    it('extends', async () => {
+      const queryExtend = await contract.methods.signedExtendOracle(
+        oracleId, delegationSignature, ttl, { onAccount }
+      )
       queryExtend.result.returnType.should.be.equal('ok')
       const oracleExtended = await sdk.getOracleObject(oracleId)
       oracleExtended.ttl.should.be.equal(oracle.ttl + 50)
+    })
 
-      // create query
+    it('creates query', async () => {
       const q = 'Hello!'
-      const newOracle = await sdk.registerOracle('string', 'int', { queryFee: qFee })
-      const query = await cInstanceOracle.methods.createQuery(newOracle.id, q, 1000 + qFee, ttl, ttl, { onAccount, amount: 5 * qFee })
-      query.should.be.an('object')
-      const queryObject = await sdk.getQueryObject(newOracle.id, query.decodedResult)
+      oracle = await sdk.registerOracle('string', 'int', { queryFee })
+      const query = await contract.methods.createQuery(
+        oracle.id, q, 1000 + queryFee, ttl, ttl, { onAccount, amount: 5 * queryFee }
+      )
+      query.result.returnType.should.be.equal('ok')
+      queryObject = await sdk.getQueryObject(oracle.id, query.decodedResult)
       queryObject.should.be.an('object')
       queryObject.decodedQuery.should.be.equal(q)
-      console.log(queryObject)
+    })
 
-      // respond to query
+    it('responds to query', async () => {
       const r = 'Hi!'
       const queryId = queryObject.id
       const respondSig = await sdk.createOracleDelegationSignature({ contractId, queryId })
-      const response = await cInstanceOracle.methods.respond(newOracle.id, queryObject.id, respondSig, r, { onAccount })
-      console.log(response)
-      const queryObject2 = await sdk.getQueryObject(newOracle.id, queryObject.id)
-      console.log(queryObject2)
+      const response = await contract.methods.respond(
+        oracle.id, queryObject.id, respondSig, r, { onAccount }
+      )
+      response.result.returnType.should.be.equal('ok')
+      const queryObject2 = await sdk.getQueryObject(oracle.id, queryObject.id)
       queryObject2.decodedResponse.should.be.equal(r)
     })
   })
 
   it('precompiled bytecode can be deployed', async () => {
     const code = await sdk.contractCompile(identityContract)
-    return sdk.contractDeploy(code.bytecode, identityContract).should.eventually.have.property('address')
+    return sdk.contractDeploy(code.bytecode, identityContract)
+      .should.eventually.have.property('address')
   })
 
   it('enforce zero deposit for contract deployment', async () => {

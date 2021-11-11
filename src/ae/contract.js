@@ -189,16 +189,15 @@ async function contractCompile (source, options = {}) {
  * @return {Promise<String>} Signature in hex representation
  */
 async function delegateSignatureCommon (ids = [], opt = {}) {
-  return this.sign(
-    Buffer.concat(
-      [
-        Buffer.from(this.getNetworkId(opt)),
-        ...(Object.prototype.hasOwnProperty.call(opt, 'onAccount') ? [decode(await this.address(opt))] : []),
-        ...ids.map(e => decode(e))
-      ]
-    ),
+  const signature = await this.sign(
+    Buffer.concat([
+      Buffer.from(this.getNetworkId(opt)),
+      ...(Object.prototype.hasOwnProperty.call(opt, 'onAccount') ? [decode(await this.address(opt))] : []),
+      ...ids.map(e => decode(e))
+    ]),
     opt
-  ).then(s => Buffer.from(s).toString('hex'))
+  )
+  return Buffer.from(signature).toString('hex')
 }
 
 /**
