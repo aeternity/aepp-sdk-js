@@ -49,7 +49,7 @@ export const BaseAe = async (params = {}, compose = {}) => Universal
 
 const spendPromise = (async () => {
   const ae = await BaseAe({ networkId, withoutGenesisAccount: false })
-  await ae.awaitHeight(2)
+  await ae.awaitHeight(2, { interval: 200, attempts: 100 })
   await ae.spend('1' + '0'.repeat(26), account.publicKey)
 })()
 

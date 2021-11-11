@@ -134,9 +134,9 @@ describe('Accounts', function () {
 
   it('Get Account by block height/hash', async () => {
     const h = await sdk.height()
-    await sdk.awaitHeight(h + 3)
+    await sdk.awaitHeight(h + 3, { interval: 200, attempts: 100 })
     const spend = await sdk.spend(123, 'ak_DMNCzsVoZnpV5fe8FTQnNsTfQ48YM5C3WbHPsJyHjAuTXebFi')
-    await sdk.awaitHeight(spend.blockHeight + 2)
+    await sdk.awaitHeight(spend.blockHeight + 2, { interval: 200, attempts: 100 })
     const accountAfterSpend = await sdk.getAccount(await sdk.address())
     const accountBeforeSpendByHash = await sdk.getAccount(await sdk.address(), { height: spend.blockHeight - 1 })
     BigNumber(accountBeforeSpendByHash.balance)

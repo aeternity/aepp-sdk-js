@@ -151,7 +151,7 @@ describe('Contract', function () {
       const preclaimSig = await sdk.createAensDelegationSignature({ contractId }, { onAccount: currentOwner })
       const preclaim = await cInstance.methods.signedPreclaim(await sdk.address(), commitmentIdDecoded, preclaimSig)
       preclaim.result.returnType.should.be.equal('ok')
-      await sdk.awaitHeight((await sdk.height()) + 2)
+      await sdk.awaitHeight((await sdk.height()) + 2, { interval: 200, attempts: 100 })
 
       // signature for any other name related operations
       const aensDelegationSig = await sdk.createAensDelegationSignature({ contractId, name }, { onAccount: currentOwner })
@@ -159,13 +159,13 @@ describe('Contract', function () {
       // claim
       const claim = await cInstance.methods.signedClaim(await sdk.address(), name, _salt, nameFee, aensDelegationSig)
       claim.result.returnType.should.be.equal('ok')
-      await sdk.awaitHeight((await sdk.height()) + 2)
+      await sdk.awaitHeight((await sdk.height()) + 2, { interval: 200, attempts: 100 })
 
       // transfer
       const newOwner = sdk.addresses().find(acc => acc !== currentOwner)
       const transfer = await cInstance.methods.signedTransfer(await sdk.address(), newOwner, name, aensDelegationSig)
       transfer.result.returnType.should.be.equal('ok')
-      await sdk.awaitHeight((await sdk.height()) + 2)
+      await sdk.awaitHeight((await sdk.height()) + 2, { interval: 200, attempts: 100 })
 
       // revoke
       const revokeSig = await sdk.createAensDelegationSignature({ contractId, name }, { onAccount: newOwner })
