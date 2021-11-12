@@ -30,7 +30,7 @@ describe('Oracle', function () {
 
   before(async function () {
     sdk = await getSdk()
-    await sdk.spend('1' + '0'.repeat(20), account.publicKey)
+    await sdk.spend(1e20, account.publicKey)
     sdk.addAccount(MemoryAccount({ keypair: account }), { select: true })
   })
 

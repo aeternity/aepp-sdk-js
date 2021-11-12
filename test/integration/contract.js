@@ -22,6 +22,7 @@ import { DRY_RUN_ACCOUNT } from '../../src/tx/builder/schema'
 import { messageToHash, salt } from '../../src/utils/crypto'
 import { randomName } from '../utils'
 import { BaseAe, getSdk, publicKey } from './'
+import { Crypto, MemoryAccount } from '../../src'
 
 const identityContract = `
 contract Identity =
@@ -121,6 +122,9 @@ describe('Contract', function () {
 
   before(async function () {
     sdk = await getSdk()
+    sdk.removeAccount(sdk.addresses()[1]) // TODO: option of getSdk to have accounts without genesis
+    await sdk.addAccount(MemoryAccount({ keypair: Crypto.generateKeyPair() }))
+    await sdk.spend(1e18, sdk.addresses()[1])
   })
 
   it('precompiled bytecode can be deployed', async () => {
@@ -161,9 +165,7 @@ describe('Contract', function () {
   })
 
   it('Deploy and call contract on specific account', async () => {
-    const current = await sdk.address()
-    const onAccount = sdk.addresses().find(acc => acc !== current)
-
+    const onAccount = sdk.addresses()[1]
     const deployed = await bytecode.deploy([], { onAccount })
     deployed.result.callerId.should.be.equal(onAccount)
     const callRes = await deployed.call('getArg', [42])
@@ -385,9 +387,8 @@ describe('Contract', function () {
     before(async () => {
       contract = await sdk.getContractInstance(aensDelegationContract)
       await contract.deploy()
-      contractId = contract.deployInfo.address
-      owner = await sdk.address()
-      newOwner = sdk.addresses().find(acc => acc !== owner)
+      contractId = contract.deployInfo.address;
+      [owner, newOwner] = sdk.addresses()
     })
 
     it('preclaims', async () => {
@@ -466,8 +467,7 @@ describe('Contract', function () {
       contract = await sdk.getContractInstance(oracleContract)
       await contract.deploy()
       contractId = contract.deployInfo.address
-      const current = await sdk.address()
-      onAccount = sdk.addresses().find(acc => acc !== current)
+      onAccount = sdk.addresses()[1]
       oracleId = `ok_${onAccount.slice(3)}`
     })
 

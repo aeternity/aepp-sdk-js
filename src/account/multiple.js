@@ -49,13 +49,11 @@ import AccountBase, { isAccountBase } from './base'
  */
 export default AccountBase.compose(AsyncInit, {
   async init ({ accounts = [], address }) {
-    /* An Account maynot be required for the Node/Chain methods */
-    if (Array.isArray(accounts) && accounts.length) {
-      this.accounts = Object.fromEntries(await Promise.all(accounts.map(async a => [await a.address(), a])))
-      if (!address) address = Object.keys(this.accounts)[0]
-      decode(address, 'ak')
-      this.selectedAddress = address
-    }
+    this.accounts = Object.fromEntries(await Promise.all(
+      accounts.map(async a => [await a.address(), a])
+    ))
+    address = address || Object.keys(this.accounts)[0]
+    if (address) this.selectAccount(address)
   },
   props: {
     accounts: {}
