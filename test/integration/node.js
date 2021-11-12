@@ -62,7 +62,8 @@ describe('Node client', function () {
       expect(() => nodes.addNode('test', {})).to.throw(Error)
       expect(() => nodes.addNode('test', 1)).to.throw(Error)
       expect(() => nodes.addNode('test', null)).to.throw(Error)
-      expect(() => nodes.addNode('test', {})).to.throw('"[0].instance.api" is required')
+      expect(() => nodes.addNode('test', {}))
+        .to.throw('Each node instance should have api (object), consensusProtocolVersion (number), genesisHash (string) fields, got {} instead')
     })
 
     it('Throw error on get network without node ', async () => {

@@ -27,7 +27,6 @@
  */
 
 import Ae from './'
-import * as R from 'ramda'
 import ContractCompilerAPI from '../contract/compiler'
 import ContractBase from '../contract'
 import getContractInstance from '../contract/aci'
@@ -122,10 +121,11 @@ async function contractCall (source, contractAddress, name, args, options) {
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
+ * @deprecated
  * @param {String} code Compiled contract
  * @param {String} source Contract source code
- * @param {Array|String} initState Arguments of contract constructor(init) function. Can be array of arguments or callData string
- * @param {Object} [options={}] Transaction options (fee, ttl, gas, amount, deposit)
+ * @param {Array} params Arguments of contract constructor(init) function. Can be array of arguments or callData string
+ * @param {Object} [options] Transaction options (fee, ttl, gas, amount, deposit)
  * @param {Object} [options.filesystem={}] Contract external namespaces map* @return {Promise<Object>} Result object
  * @return {Promise<Object>} Result object
  * @example
@@ -140,31 +140,10 @@ async function contractCall (source, contractAddress, name, args, options) {
  *   callStatic: (fnName, args = [], options) => Static all contract function
  * }
  */
-async function contractDeploy (code, source, initState = [], options = {}) {
-  const opt = { ...this.Ae.defaults, ...options, deposit: DEPOSIT }
-  const callData = Array.isArray(initState) ? await this.contractEncodeCallDataAPI(source, 'init', initState, opt) : initState
-  const ownerId = await this.address(opt)
-
-  const { tx, contractId } = await this.contractCreateTx(R.merge(opt, {
-    callData,
-    code,
-    ownerId
-  }))
-
-  const { hash, rawTx, result, txData } = await this._sendAndProcess(tx, source, 'init', opt)
-  return Object.freeze({
-    result,
-    owner: ownerId,
-    transaction: hash,
-    rawTx,
-    txData,
-    address: contractId,
-    call: (name, args, options) =>
-      this.contractCall(source, contractId, name, args, { ...opt, ...options }),
-    callStatic: (name, args, options) =>
-      this.contractCallStatic(source, contractId, name, args, { ...opt, ...options }),
-    createdAt: new Date()
-  })
+async function contractDeploy (code, source, params, options) {
+  const contract = await this.getContractInstance(source, options)
+  contract.compiled = code
+  return contract.deploy(params, options)
 }
 
 /**
@@ -210,16 +189,15 @@ async function contractCompile (source, options = {}) {
  * @return {Promise<String>} Signature in hex representation
  */
 async function delegateSignatureCommon (ids = [], opt = {}) {
-  return this.sign(
-    Buffer.concat(
-      [
-        Buffer.from(this.getNetworkId(opt)),
-        ...(Object.prototype.hasOwnProperty.call(opt, 'onAccount') ? [decode(await this.address(opt))] : []),
-        ...ids.map(e => decode(e))
-      ]
-    ),
+  const signature = await this.sign(
+    Buffer.concat([
+      Buffer.from(this.getNetworkId(opt)),
+      ...(Object.prototype.hasOwnProperty.call(opt, 'onAccount') ? [decode(await this.address(opt))] : []),
+      ...ids.map(e => decode(e))
+    ]),
     opt
-  ).then(s => Buffer.from(s).toString('hex'))
+  )
+  return Buffer.from(signature).toString('hex')
 }
 
 /**

@@ -63,7 +63,7 @@ const CONTRACT_SOURCE =
 @compiler >= 6
 
 contract PayingForTxExample =
-    
+
     record state = { last_caller: option(address) }
 
     entrypoint init() =
@@ -104,7 +104,7 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
   // The `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp) itself is asynchronous as it determines the node's version and
   // rest interface automatically. Only once the Promise is fulfilled, you know you have a working object instance
   // which is assigned to the `client` constant in this case.
-  // 
+  //
   // Note:
   //
   //  - `Universal` is not a constructor but a factory, which means it's *not* invoked with `new`.
@@ -137,7 +137,7 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
   const contractInstance = await client.getContractInstance(CONTRACT_SOURCE, { contractAddress: CONTRACT_ADDRESS })
   const dryRunTx = await contractInstance.methods.get_last_caller()
   console.log(`New user: ${await newUserAccount.address()}`)
-  console.log(`Last caller: ${dryRunTx.decodedResult}`)
+  console.log(`Last caller:`, dryRunTx.decodedResult)
 
   // Note:
   //

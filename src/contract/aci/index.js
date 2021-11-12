@@ -24,11 +24,35 @@
 
 import * as R from 'ramda'
 import BigNumber from 'bignumber.js'
-
-import { getFunctionACI, prepareArgsForEncode } from './helpers'
-import { decodeEvents, transformDecodedData } from './transformation'
-import { DRY_RUN_ACCOUNT } from '../../tx/builder/schema'
+import { Encoder as Calldata } from '@aeternity/aepp-calldata'
+import { decodeEvents } from './transformation'
+import { DRY_RUN_ACCOUNT, DEPOSIT } from '../../tx/builder/schema'
 import TxObject from '../../tx/tx-object'
+
+/**
+ * Get function schema from contract ACI object
+ * @param {Object} aci Contract ACI object
+ * @param {String} name Function name
+ * @param external
+ * @return {Object} function ACI
+ */
+function getFunctionACI (aci, name, external) {
+  const fn = aci.functions.find(f => f.name === name)
+  if (!fn && name !== 'init') throw new Error(`Function ${name} doesn't exist in contract`)
+
+  return {
+    ...fn,
+    bindings: [
+      {
+        state: aci.state,
+        type_defs: aci.type_defs,
+        name: aci.name
+      },
+      ...external.map(R.pick(['state', 'type_defs', 'name']))
+    ],
+    event: aci.event ? aci.event.variant : []
+  }
+}
 
 /**
  * Generate contract ACI object with predefined js methods for contract usage - can be used for creating a reference to already deployed contracts
@@ -54,6 +78,7 @@ export default async function getContractInstance (source, { aci, contractAddres
   const instance = {
     interface: R.defaultTo(null, R.prop('interface', aci)),
     aci: R.defaultTo(null, R.path(['encoded_aci', 'contract'], aci)),
+    calldata: new Calldata([aci.encoded_aci, ...aci.external_encoded_aci]),
     externalAci: aci.external_encoded_aci ? aci.external_encoded_aci.map(a => a.contract || a.namespace) : [],
     source,
     compiled: null,
@@ -94,20 +119,37 @@ export default async function getContractInstance (source, { aci, contractAddres
    * Deploy contract
    * @alias module:@aeternity/aepp-sdk/es/contract/aci
    * @rtype (init: Array, options: Object) => ContractInstance: Object
-   * @param {Array} init Contract init function arguments array
-   * @param {Object} [options={}] options
+   * @param {Array} params Contract init function arguments array
+   * @param {Object} [options] options
    * @return {Object} deploy info
    */
-  instance.deploy = async (init = [], options = {}) => {
-    const opt = { ...instance.options, ...options }
-
+  instance.deploy = async (params = [], options) => {
+    const opt = { ...instance.options, ...options, deposit: DEPOSIT }
     if (!instance.compiled) await instance.compile(opt)
 
-    if (opt.callStatic) return instance.call('init', init, opt)
+    if (opt.callStatic) return instance.call('init', params, opt)
 
-    const fnACI = getFunctionACI(instance.aci, 'init', instance.externalAci)
-    init = await prepareArgsForEncode(fnACI, init)
-    instance.deployInfo = await this.contractDeploy(instance.compiled, opt.source || instance.source, init, opt)
+    const source = opt.source || instance.source
+    const ownerId = await this.address(opt)
+    const { tx, contractId } = await this.contractCreateTx(R.merge(opt, {
+      callData: instance.calldata.encode(instance.aci.name, 'init', params),
+      code: instance.compiled,
+      ownerId
+    }))
+    const { hash, rawTx, result, txData } = await this._sendAndProcess(tx, source, 'init', opt)
+    instance.deployInfo = Object.freeze({
+      result,
+      owner: ownerId,
+      transaction: hash,
+      rawTx,
+      txData,
+      address: contractId,
+      call: (name, args, options) =>
+        this.contractCall(source, contractId, name, args, { ...opt, ...options }),
+      callStatic: (name, args, options) =>
+        this.contractCallStatic(source, contractId, name, args, { ...opt, ...options }),
+      createdAt: new Date()
+    })
     return instance.deployInfo
   }
 
@@ -139,12 +181,7 @@ export default async function getContractInstance (source, { aci, contractAddres
       if (opt.callStatic) return DRY_RUN_ACCOUNT.pub
       else throw error
     })
-    const callData = await this.contractEncodeCallDataAPI(
-      source,
-      fn,
-      await prepareArgsForEncode(fnACI, params),
-      opt
-    )
+    const callData = instance.calldata.encode(instance.aci.name, fn, params)
 
     let res
     if (opt.callStatic) {
@@ -167,13 +204,9 @@ export default async function getContractInstance (source, { aci, contractAddres
       const tx = await this.contractCallTx({ ...opt, callerId, contractId, callData })
       res = await this._sendAndProcess(tx, source, fn, opt)
     }
-    res.decode = () => this.contractDecodeCallResultAPI(source, fn, res.result.returnValue, res.result.returnType, opt)
-    if (opt.waitMined) {
-      res.decodedResult = fnACI.returns && fn !== 'init' && await transformDecodedData(
-        fnACI.returns,
-        await res.decode(),
-        fnACI.bindings
-      )
+    if (opt.waitMined || opt.callStatic) {
+      res.decodedResult = fnACI.returns && fnACI.returns !== 'unit' && fn !== 'init' &&
+        instance.calldata.decode(instance.aci.name, fn, res.result.returnValue)
       res.decodedEvents = instance.decodeEvents(fn, res.result.log)
     }
     return res
