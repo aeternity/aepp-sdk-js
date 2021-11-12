@@ -34,13 +34,13 @@ import { TxObject } from './tx-object'
 
 async function spendTx ({ senderId, recipientId, amount, payload = '' }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.spend, { senderId, ...R.head(arguments), payload })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.spend, { senderId, ...arguments[0], payload })
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? {
       tx: TxObject({
         params: {
-          ...R.head(arguments),
+          ...arguments[0],
           recipientId,
           senderId,
           nonce,
@@ -51,7 +51,7 @@ async function spendTx ({ senderId, recipientId, amount, payload = '' }) {
       }).encodedTx
     }
     : await this.api.postSpend({
-      ...R.head(arguments),
+      ...arguments[0],
       amount: parseInt(amount),
       recipientId,
       senderId,
@@ -66,121 +66,121 @@ async function spendTx ({ senderId, recipientId, amount, payload = '' }) {
 
 async function namePreclaimTx ({ accountId, commitmentId }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.namePreClaim, { senderId: accountId, ...R.head(arguments) })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.namePreClaim, { senderId: accountId, ...arguments[0] })
 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? {
       tx: TxObject({
-        params: { ...R.head(arguments), nonce, ttl, fee },
+        params: { ...arguments[0], nonce, ttl, fee },
         type: TX_TYPE.namePreClaim
       }).encodedTx
     }
-    : await this.api.postNamePreclaim({ ...R.head(arguments), nonce, ttl, fee: parseInt(fee) })
+    : await this.api.postNamePreclaim({ ...arguments[0], nonce, ttl, fee: parseInt(fee) })
 
   return tx
 }
 
 async function nameClaimTx ({ accountId, name, nameSalt, vsn = 2 }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.nameClaim, { senderId: accountId, ...R.head(arguments), vsn })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.nameClaim, { senderId: accountId, ...arguments[0], vsn })
 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? {
       tx: TxObject({
-        params: { ...R.head(arguments), nonce, ttl, fee, vsn },
+        params: { ...arguments[0], nonce, ttl, fee, vsn },
         type: TX_TYPE.nameClaim
       }).encodedTx
     }
-    : await this.api.postNameClaim({ ...R.head(arguments), nonce, ttl, fee: parseInt(fee) })
+    : await this.api.postNameClaim({ ...arguments[0], nonce, ttl, fee: parseInt(fee) })
 
   return tx
 }
 
 async function nameTransferTx ({ accountId, nameId, recipientId }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.nameTransfer, { senderId: accountId, ...R.head(arguments) })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.nameTransfer, { senderId: accountId, ...arguments[0] })
 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? {
       tx: TxObject({
-        params: { ...R.head(arguments), recipientId, nonce, ttl, fee },
+        params: { ...arguments[0], recipientId, nonce, ttl, fee },
         type: TX_TYPE.nameTransfer
       }).encodedTx
     }
-    : await this.api.postNameTransfer({ ...R.head(arguments), recipientId, nonce, ttl, fee: parseInt(fee) })
+    : await this.api.postNameTransfer({ ...arguments[0], recipientId, nonce, ttl, fee: parseInt(fee) })
 
   return tx
 }
 
 async function nameUpdateTx ({ accountId, nameId, nameTtl, pointers, clientTtl }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.nameUpdate, { senderId: accountId, ...R.head(arguments) })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.nameUpdate, { senderId: accountId, ...arguments[0] })
 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? {
       tx: TxObject({
-        params: { ...R.head(arguments), nonce, ttl, fee },
+        params: { ...arguments[0], nonce, ttl, fee },
         type: TX_TYPE.nameUpdate
       }).encodedTx
     }
-    : await this.api.postNameUpdate({ ...R.head(arguments), nonce, ttl, fee: parseInt(fee) })
+    : await this.api.postNameUpdate({ ...arguments[0], nonce, ttl, fee: parseInt(fee) })
 
   return tx
 }
 
 async function nameRevokeTx ({ accountId, nameId }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.nameRevoke, { senderId: accountId, ...R.head(arguments) })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.nameRevoke, { senderId: accountId, ...arguments[0] })
 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? {
       tx: TxObject({
-        params: { ...R.head(arguments), nonce, ttl, fee },
+        params: { ...arguments[0], nonce, ttl, fee },
         type: TX_TYPE.nameRevoke
       }).encodedTx
     }
-    : await this.api.postNameRevoke({ ...R.head(arguments), nonce, ttl, fee: parseInt(fee) })
+    : await this.api.postNameRevoke({ ...arguments[0], nonce, ttl, fee: parseInt(fee) })
 
   return tx
 }
 
 async function contractCreateTx ({ ownerId, code, vmVersion, abiVersion, deposit, amount, gas, gasPrice = MIN_GAS_PRICE, callData }) {
   // Get VM_ABI version
-  const ctVersion = this.getVmVersion(TX_TYPE.contractCreate, R.head(arguments))
+  const ctVersion = this.getVmVersion(TX_TYPE.contractCreate, arguments[0])
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.contractCreate, { senderId: ownerId, ...R.head(arguments), ctVersion, gasPrice })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.contractCreate, { senderId: ownerId, ...arguments[0], ctVersion, gasPrice })
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   return this.nativeMode
     ? {
       tx: TxObject({
-        params: { ...R.head(arguments), nonce, ttl, fee, ctVersion, gasPrice },
+        params: { ...arguments[0], nonce, ttl, fee, ctVersion, gasPrice },
         type: TX_TYPE.contractCreate
       }).encodedTx,
       contractId: buildContractId(ownerId, nonce)
     }
-    : this.api.postContractCreate({ ...R.head(arguments), nonce, ttl, fee: parseInt(fee), gas: parseInt(gas), gasPrice, vmVersion: ctVersion.vmVersion, abiVersion: ctVersion.abiVersion })
+    : this.api.postContractCreate({ ...arguments[0], nonce, ttl, fee: parseInt(fee), gas: parseInt(gas), gasPrice, vmVersion: ctVersion.vmVersion, abiVersion: ctVersion.abiVersion })
 }
 
 async function contractCallTx ({ callerId, contractId, abiVersion, amount, gas, gasPrice = MIN_GAS_PRICE, callData }) {
-  const ctVersion = this.getVmVersion(TX_TYPE.contractCall, R.head(arguments))
+  const ctVersion = this.getVmVersion(TX_TYPE.contractCall, arguments[0])
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.contractCall, { senderId: callerId, ...R.head(arguments), gasPrice, abiVersion: ctVersion.abiVersion })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.contractCall, { senderId: callerId, ...arguments[0], gasPrice, abiVersion: ctVersion.abiVersion })
 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? {
       tx: TxObject({
-        params: { ...R.head(arguments), nonce, ttl, fee, abiVersion: ctVersion.abiVersion, gasPrice },
+        params: { ...arguments[0], nonce, ttl, fee, abiVersion: ctVersion.abiVersion, gasPrice },
         type: TX_TYPE.contractCall
       }).encodedTx
     }
     : await this.api.postContractCall({
-      ...R.head(arguments),
+      ...arguments[0],
       nonce,
       ttl,
       fee: parseInt(fee),
@@ -193,9 +193,9 @@ async function contractCallTx ({ callerId, contractId, abiVersion, amount, gas, 
 }
 
 async function oracleRegisterTx ({ accountId, queryFormat, responseFormat, queryFee, oracleTtl, abiVersion = ABI_VERSIONS.NO_ABI }) {
-  // const { abiVersion: abi } = this.getVmVersion(TX_TYPE.oracleRegister, R.head(arguments))
+  // const { abiVersion: abi } = this.getVmVersion(TX_TYPE.oracleRegister, arguments[0])
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.oracleRegister, { senderId: accountId, ...R.head(arguments), abiVersion })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.oracleRegister, { senderId: accountId, ...arguments[0], abiVersion })
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? {
@@ -231,7 +231,7 @@ async function oracleRegisterTx ({ accountId, queryFormat, responseFormat, query
 
 async function oracleExtendTx ({ oracleId, callerId, oracleTtl }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.oracleExtend, { senderId: callerId, ...R.head(arguments) })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.oracleExtend, { senderId: callerId, ...arguments[0] })
 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
@@ -248,7 +248,7 @@ async function oracleExtendTx ({ oracleId, callerId, oracleTtl }) {
 
 async function oraclePostQueryTx ({ oracleId, responseTtl, query, queryTtl, queryFee, senderId }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.oracleQuery, { senderId, ...R.head(arguments) })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.oracleQuery, { senderId, ...arguments[0] })
 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
@@ -275,7 +275,7 @@ async function oraclePostQueryTx ({ oracleId, responseTtl, query, queryTtl, quer
 
 async function oracleRespondTx ({ oracleId, callerId, responseTtl, queryId, response }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.oracleResponse, { senderId: callerId, ...R.head(arguments) })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.oracleResponse, { senderId: callerId, ...arguments[0] })
 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
@@ -291,12 +291,12 @@ async function oracleRespondTx ({ oracleId, callerId, responseTtl, queryId, resp
 
 async function channelCloseSoloTx ({ channelId, fromId, payload, poi }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.channelCloseSolo, { senderId: fromId, ...R.head(arguments), payload })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.channelCloseSolo, { senderId: fromId, ...arguments[0], payload })
 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? buildTx({
-      ...R.head(arguments),
+      ...arguments[0],
       channelId,
       fromId,
       payload,
@@ -306,7 +306,7 @@ async function channelCloseSoloTx ({ channelId, fromId, payload, poi }) {
       nonce
     }, TX_TYPE.channelCloseSolo)
     : await this.api.postChannelCloseSolo({
-      ...R.head(arguments),
+      ...arguments[0],
       channelId,
       fromId,
       payload,
@@ -321,12 +321,12 @@ async function channelCloseSoloTx ({ channelId, fromId, payload, poi }) {
 
 async function channelSlashTx ({ channelId, fromId, payload, poi }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.channelSlash, { senderId: fromId, ...R.head(arguments), payload })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.channelSlash, { senderId: fromId, ...arguments[0], payload })
 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? buildTx({
-      ...R.head(arguments),
+      ...arguments[0],
       channelId,
       fromId,
       payload,
@@ -336,7 +336,7 @@ async function channelSlashTx ({ channelId, fromId, payload, poi }) {
       nonce
     }, TX_TYPE.channelSlash)
     : await this.api.postChannelSlash({
-      ...R.head(arguments),
+      ...arguments[0],
       channelId,
       fromId,
       payload,
@@ -351,12 +351,12 @@ async function channelSlashTx ({ channelId, fromId, payload, poi }) {
 
 async function channelSettleTx ({ channelId, fromId, initiatorAmountFinal, responderAmountFinal }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.channelSettle, { senderId: fromId, ...R.head(arguments) })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.channelSettle, { senderId: fromId, ...arguments[0] })
 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? buildTx({
-      ...R.head(arguments),
+      ...arguments[0],
       channelId,
       fromId,
       initiatorAmountFinal,
@@ -366,7 +366,7 @@ async function channelSettleTx ({ channelId, fromId, initiatorAmountFinal, respo
       nonce
     }, TX_TYPE.channelSettle)
     : await this.api.postChannelSettle({
-      ...R.head(arguments),
+      ...arguments[0],
       channelId,
       fromId,
       initiatorAmountFinal: parseInt(initiatorAmountFinal),
@@ -381,12 +381,12 @@ async function channelSettleTx ({ channelId, fromId, initiatorAmountFinal, respo
 
 async function channelSnapshotSoloTx ({ channelId, fromId, payload }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.channelSnapshotSolo, { senderId: fromId, ...R.head(arguments), payload })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.channelSnapshotSolo, { senderId: fromId, ...arguments[0], payload })
 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? buildTx({
-      ...R.head(arguments),
+      ...arguments[0],
       channelId,
       fromId,
       payload,
@@ -395,7 +395,7 @@ async function channelSnapshotSoloTx ({ channelId, fromId, payload }) {
       nonce
     }, TX_TYPE.channelSnapshotSolo)
     : await this.api.postChannelSnapshotSolo({
-      ...R.head(arguments),
+      ...arguments[0],
       channelId,
       fromId,
       payload,
@@ -409,13 +409,13 @@ async function channelSnapshotSoloTx ({ channelId, fromId, payload }) {
 
 async function gaAttachTx ({ ownerId, code, vmVersion, abiVersion, authFun, gas, gasPrice = MIN_GAS_PRICE, callData }) {
   // Get VM_ABI version
-  const ctVersion = this.getVmVersion(TX_TYPE.contractCreate, R.head(arguments))
+  const ctVersion = this.getVmVersion(TX_TYPE.contractCreate, arguments[0])
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
-  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.gaAttach, { senderId: ownerId, ...R.head(arguments), ctVersion, gasPrice })
+  const { fee, ttl, nonce } = await this.prepareTxParams(TX_TYPE.gaAttach, { senderId: ownerId, ...arguments[0], ctVersion, gasPrice })
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   return {
     tx: TxObject({
-      params: { ...R.head(arguments), nonce, ttl, fee, ctVersion, gasPrice },
+      params: { ...arguments[0], nonce, ttl, fee, ctVersion, gasPrice },
       type: TX_TYPE.gaAttach
     }).encodedTx,
     contractId: buildContractId(ownerId, nonce)
