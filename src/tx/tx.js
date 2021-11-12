@@ -39,17 +39,19 @@ async function spendTx ({ senderId, recipientId, amount, payload = '' }) {
   const { tx } = this.nativeMode
     ? {
       tx: TxObject({
-        params: R.merge(R.head(arguments), {
+        params: {
+          ...R.head(arguments),
           recipientId,
           senderId,
           nonce,
           ttl,
           payload
-        }),
+        },
         type: TX_TYPE.spend
       }).encodedTx
     }
-    : await this.api.postSpend(R.merge(R.head(arguments), {
+    : await this.api.postSpend({
+      ...R.head(arguments),
       amount: parseInt(amount),
       recipientId,
       senderId,
@@ -57,7 +59,7 @@ async function spendTx ({ senderId, recipientId, amount, payload = '' }) {
       ttl,
       fee: parseInt(fee),
       payload
-    }))
+    })
 
   return tx
 }
@@ -70,11 +72,11 @@ async function namePreclaimTx ({ accountId, commitmentId }) {
   const { tx } = this.nativeMode
     ? {
       tx: TxObject({
-        params: R.merge(R.head(arguments), { nonce, ttl, fee }),
+        params: { ...R.head(arguments), nonce, ttl, fee },
         type: TX_TYPE.namePreClaim
       }).encodedTx
     }
-    : await this.api.postNamePreclaim(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
+    : await this.api.postNamePreclaim({ ...R.head(arguments), nonce, ttl, fee: parseInt(fee) })
 
   return tx
 }
@@ -87,11 +89,11 @@ async function nameClaimTx ({ accountId, name, nameSalt, vsn = 2 }) {
   const { tx } = this.nativeMode
     ? {
       tx: TxObject({
-        params: R.merge(R.head(arguments), { nonce, ttl, fee, vsn }),
+        params: { ...R.head(arguments), nonce, ttl, fee, vsn },
         type: TX_TYPE.nameClaim
       }).encodedTx
     }
-    : await this.api.postNameClaim(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
+    : await this.api.postNameClaim({ ...R.head(arguments), nonce, ttl, fee: parseInt(fee) })
 
   return tx
 }
@@ -104,11 +106,11 @@ async function nameTransferTx ({ accountId, nameId, recipientId }) {
   const { tx } = this.nativeMode
     ? {
       tx: TxObject({
-        params: R.merge(R.head(arguments), { recipientId, nonce, ttl, fee }),
+        params: { ...R.head(arguments), recipientId, nonce, ttl, fee },
         type: TX_TYPE.nameTransfer
       }).encodedTx
     }
-    : await this.api.postNameTransfer(R.merge(R.head(arguments), { recipientId, nonce, ttl, fee: parseInt(fee) }))
+    : await this.api.postNameTransfer({ ...R.head(arguments), recipientId, nonce, ttl, fee: parseInt(fee) })
 
   return tx
 }
@@ -121,11 +123,11 @@ async function nameUpdateTx ({ accountId, nameId, nameTtl, pointers, clientTtl }
   const { tx } = this.nativeMode
     ? {
       tx: TxObject({
-        params: R.merge(R.head(arguments), { nonce, ttl, fee }),
+        params: { ...R.head(arguments), nonce, ttl, fee },
         type: TX_TYPE.nameUpdate
       }).encodedTx
     }
-    : await this.api.postNameUpdate(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
+    : await this.api.postNameUpdate({ ...R.head(arguments), nonce, ttl, fee: parseInt(fee) })
 
   return tx
 }
@@ -138,11 +140,11 @@ async function nameRevokeTx ({ accountId, nameId }) {
   const { tx } = this.nativeMode
     ? {
       tx: TxObject({
-        params: R.merge(R.head(arguments), { nonce, ttl, fee }),
+        params: { ...R.head(arguments), nonce, ttl, fee },
         type: TX_TYPE.nameRevoke
       }).encodedTx
     }
-    : await this.api.postNameRevoke(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee) }))
+    : await this.api.postNameRevoke({ ...R.head(arguments), nonce, ttl, fee: parseInt(fee) })
 
   return tx
 }
@@ -156,12 +158,12 @@ async function contractCreateTx ({ ownerId, code, vmVersion, abiVersion, deposit
   return this.nativeMode
     ? {
       tx: TxObject({
-        params: R.merge(R.head(arguments), { nonce, ttl, fee, ctVersion, gasPrice }),
+        params: { ...R.head(arguments), nonce, ttl, fee, ctVersion, gasPrice },
         type: TX_TYPE.contractCreate
       }).encodedTx,
       contractId: buildContractId(ownerId, nonce)
     }
-    : this.api.postContractCreate(R.merge(R.head(arguments), { nonce, ttl, fee: parseInt(fee), gas: parseInt(gas), gasPrice, vmVersion: ctVersion.vmVersion, abiVersion: ctVersion.abiVersion }))
+    : this.api.postContractCreate({ ...R.head(arguments), nonce, ttl, fee: parseInt(fee), gas: parseInt(gas), gasPrice, vmVersion: ctVersion.vmVersion, abiVersion: ctVersion.abiVersion })
 }
 
 async function contractCallTx ({ callerId, contractId, abiVersion, amount, gas, gasPrice = MIN_GAS_PRICE, callData }) {
@@ -173,18 +175,19 @@ async function contractCallTx ({ callerId, contractId, abiVersion, amount, gas, 
   const { tx } = this.nativeMode
     ? {
       tx: TxObject({
-        params: R.merge(R.head(arguments), { nonce, ttl, fee, abiVersion: ctVersion.abiVersion, gasPrice }),
+        params: { ...R.head(arguments), nonce, ttl, fee, abiVersion: ctVersion.abiVersion, gasPrice },
         type: TX_TYPE.contractCall
       }).encodedTx
     }
-    : await this.api.postContractCall(R.merge(R.head(arguments), {
+    : await this.api.postContractCall({
+      ...R.head(arguments),
       nonce,
       ttl,
       fee: parseInt(fee),
       gas: parseInt(gas),
       gasPrice,
       abiVersion: ctVersion.abiVersion
-    }))
+    })
 
   return tx
 }
@@ -292,7 +295,8 @@ async function channelCloseSoloTx ({ channelId, fromId, payload, poi }) {
 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
-    ? buildTx(R.merge(R.head(arguments), {
+    ? buildTx({
+      ...R.head(arguments),
       channelId,
       fromId,
       payload,
@@ -300,8 +304,9 @@ async function channelCloseSoloTx ({ channelId, fromId, payload, poi }) {
       ttl,
       fee,
       nonce
-    }), TX_TYPE.channelCloseSolo)
-    : await this.api.postChannelCloseSolo(R.merge(R.head(arguments), {
+    }, TX_TYPE.channelCloseSolo)
+    : await this.api.postChannelCloseSolo({
+      ...R.head(arguments),
       channelId,
       fromId,
       payload,
@@ -309,7 +314,7 @@ async function channelCloseSoloTx ({ channelId, fromId, payload, poi }) {
       ttl,
       fee: parseInt(fee),
       nonce
-    }))
+    })
 
   return tx
 }
@@ -320,7 +325,8 @@ async function channelSlashTx ({ channelId, fromId, payload, poi }) {
 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
-    ? buildTx(R.merge(R.head(arguments), {
+    ? buildTx({
+      ...R.head(arguments),
       channelId,
       fromId,
       payload,
@@ -328,8 +334,9 @@ async function channelSlashTx ({ channelId, fromId, payload, poi }) {
       ttl,
       fee,
       nonce
-    }), TX_TYPE.channelSlash)
-    : await this.api.postChannelSlash(R.merge(R.head(arguments), {
+    }, TX_TYPE.channelSlash)
+    : await this.api.postChannelSlash({
+      ...R.head(arguments),
       channelId,
       fromId,
       payload,
@@ -337,7 +344,7 @@ async function channelSlashTx ({ channelId, fromId, payload, poi }) {
       ttl,
       fee: parseInt(fee),
       nonce
-    }))
+    })
 
   return tx
 }
@@ -348,7 +355,8 @@ async function channelSettleTx ({ channelId, fromId, initiatorAmountFinal, respo
 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
-    ? buildTx(R.merge(R.head(arguments), {
+    ? buildTx({
+      ...R.head(arguments),
       channelId,
       fromId,
       initiatorAmountFinal,
@@ -356,8 +364,9 @@ async function channelSettleTx ({ channelId, fromId, initiatorAmountFinal, respo
       ttl,
       fee,
       nonce
-    }), TX_TYPE.channelSettle)
-    : await this.api.postChannelSettle(R.merge(R.head(arguments), {
+    }, TX_TYPE.channelSettle)
+    : await this.api.postChannelSettle({
+      ...R.head(arguments),
       channelId,
       fromId,
       initiatorAmountFinal: parseInt(initiatorAmountFinal),
@@ -365,7 +374,7 @@ async function channelSettleTx ({ channelId, fromId, initiatorAmountFinal, respo
       ttl,
       fee: parseInt(fee),
       nonce
-    }))
+    })
 
   return tx
 }
@@ -376,22 +385,24 @@ async function channelSnapshotSoloTx ({ channelId, fromId, payload }) {
 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
-    ? buildTx(R.merge(R.head(arguments), {
+    ? buildTx({
+      ...R.head(arguments),
       channelId,
       fromId,
       payload,
       ttl,
       fee,
       nonce
-    }), TX_TYPE.channelSnapshotSolo)
-    : await this.api.postChannelSnapshotSolo(R.merge(R.head(arguments), {
+    }, TX_TYPE.channelSnapshotSolo)
+    : await this.api.postChannelSnapshotSolo({
+      ...R.head(arguments),
       channelId,
       fromId,
       payload,
       ttl,
       fee: parseInt(fee),
       nonce
-    }))
+    })
 
   return tx
 }
@@ -404,7 +415,7 @@ async function gaAttachTx ({ ownerId, code, vmVersion, abiVersion, authFun, gas,
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   return {
     tx: TxObject({
-      params: R.merge(R.head(arguments), { nonce, ttl, fee, ctVersion, gasPrice }),
+      params: { ...R.head(arguments), nonce, ttl, fee, ctVersion, gasPrice },
       type: TX_TYPE.gaAttach
     }).encodedTx,
     contractId: buildContractId(ownerId, nonce)
@@ -484,7 +495,7 @@ async function getAccountNonce (accountId, nonce) {
 async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, gas, absoluteTtl, vsn, strategy }) {
   n = n || (await this.api.getAccountNextNonce(senderId, { strategy }).catch(e => ({ nextNonce: 1 }))).nextNonce
   const ttl = await calculateTtl.call(this, t, !absoluteTtl)
-  const fee = calculateFee(f, txType, { showWarning: this.showWarning, gas, params: R.merge(R.last(arguments), { nonce: n, ttl }), vsn })
+  const fee = calculateFee(f, txType, { showWarning: this.showWarning, gas, params: { ...R.last(arguments), nonce: n, ttl }, vsn })
   return { fee, ttl, nonce: n }
 }
 

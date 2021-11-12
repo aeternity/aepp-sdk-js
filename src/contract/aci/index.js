@@ -131,11 +131,12 @@ export default async function getContractInstance (source, { aci, contractAddres
 
     const source = opt.source || instance.source
     const ownerId = await this.address(opt)
-    const { tx, contractId } = await this.contractCreateTx(R.merge(opt, {
+    const { tx, contractId } = await this.contractCreateTx({
+      ...opt,
       callData: instance.calldata.encode(instance.aci.name, 'init', params),
       code: instance.compiled,
       ownerId
-    }))
+    })
     const { hash, rawTx, result, txData } = await this._sendAndProcess(tx, source, 'init', opt)
     instance.deployInfo = Object.freeze({
       result,

@@ -63,12 +63,13 @@ import { CLIENT_TTL, NAME_FEE, NAME_TTL } from '../tx/builder/schema'
  */
 async function revoke (name, options = {}) {
   ensureNameValid(name)
-  const opt = R.merge(this.Ae.defaults, options)
+  const opt = { ...this.Ae.defaults, ...options }
 
-  const nameRevokeTx = await this.nameRevokeTx(R.merge(opt, {
+  const nameRevokeTx = await this.nameRevokeTx({
+    ...opt,
     nameId: produceNameId(name),
     accountId: await this.address(opt)
-  }))
+  })
 
   return this.send(nameRevokeTx, opt)
 }
@@ -103,18 +104,19 @@ async function revoke (name, options = {}) {
  */
 async function update (name, pointers = [], options = { extendPointers: false }) {
   ensureNameValid(name)
-  const opt = R.merge(this.Ae.defaults, options)
+  const opt = { ...this.Ae.defaults, ...options }
   if (!validatePointers(pointers)) throw new Error('Invalid pointers array')
 
   pointers = [
     ...options.extendPointers ? (await this.getName(name)).pointers : [],
     ...pointers.map(p => R.fromPairs([['id', p], ['key', classify(p)]]))
   ].reduce((acc, el) => [...acc.filter(p => p.key !== el.key), el], [])
-  const nameUpdateTx = await this.nameUpdateTx(R.merge(opt, {
+  const nameUpdateTx = await this.nameUpdateTx({
+    ...opt,
     nameId: produceNameId(name),
     accountId: await this.address(opt),
     pointers
-  }))
+  })
 
   return this.send(nameUpdateTx, opt)
 }
@@ -145,13 +147,14 @@ async function update (name, pointers = [], options = { extendPointers: false })
  */
 async function transfer (name, account, options = {}) {
   ensureNameValid(name)
-  const opt = R.merge(this.Ae.defaults, options)
+  const opt = { ...this.Ae.defaults, ...options }
 
-  const nameTransferTx = await this.nameTransferTx(R.merge(opt, {
+  const nameTransferTx = await this.nameTransferTx({
+    ...opt,
     nameId: produceNameId(name),
     accountId: await this.address(opt),
     recipientId: account
-  }))
+  })
 
   return this.send(nameTransferTx, opt)
 }
@@ -186,22 +189,22 @@ async function query (name, opt = {}) {
     pointers: o.pointers || [],
     update: async (pointers = [], options = {}) => {
       return {
-        ...(await this.aensUpdate(name, pointers, R.merge(opt, options))),
+        ...(await this.aensUpdate(name, pointers, { ...opt, ...options })),
         ...(await this.aensQuery(name))
       }
     },
     transfer: async (account, options = {}) => {
       return {
-        ...(await this.aensTransfer(name, account, R.merge(opt, options))),
+        ...(await this.aensTransfer(name, account, { ...opt, ...options })),
         ...(await this.aensQuery(name))
       }
     },
-    revoke: async (options = {}) => this.aensRevoke(name, R.merge(opt, options)),
+    revoke: async (options = {}) => this.aensRevoke(name, { ...opt, ...options }),
     extendTtl: async (nameTtl = NAME_TTL, options = {}) => {
       if (!nameTtl || typeof nameTtl !== 'number' || nameTtl > NAME_TTL) throw new Error('Ttl must be an number and less then 180000 blocks')
 
       return {
-        ...(await this.aensUpdate(name, o.pointers.map(p => p.id), { ...R.merge(opt, options), nameTtl })),
+        ...(await this.aensUpdate(name, o.pointers.map(p => p.id), { ...opt, ...options, nameTtl })),
         ...(await this.aensQuery(name))
       }
     }
@@ -233,18 +236,19 @@ async function query (name, opt = {}) {
  */
 async function claim (name, salt, options) {
   ensureNameValid(name)
-  const opt = R.merge(this.Ae.defaults, options)
+  const opt = { ...this.Ae.defaults, ...options }
 
   const minNameFee = getMinimumNameFee(name)
   if (opt.nameFee !== this.Ae.defaults.nameFee && minNameFee.gt(opt.nameFee)) {
     throw new Error(`the provided fee ${opt.nameFee} is not enough to execute the claim, required: ${minNameFee}`)
   }
   opt.nameFee = opt.nameFee !== this.Ae.defaults.nameFee ? opt.nameFee : minNameFee
-  const claimTx = await this.nameClaimTx(R.merge(opt, {
+  const claimTx = await this.nameClaimTx({
+    ...opt,
     accountId: await this.address(opt),
     nameSalt: salt,
     name: encode(name, 'nm')
-  }))
+  })
 
   const result = await this.send(claimTx, opt)
   if (!isAuctionName(name)) {
@@ -282,15 +286,16 @@ async function claim (name, salt, options) {
  */
 async function preclaim (name, options = {}) {
   ensureNameValid(name)
-  const opt = R.merge(this.Ae.defaults, options)
+  const opt = { ...this.Ae.defaults, ...options }
   const _salt = salt()
   const height = await this.height()
   const commitmentId = commitmentHash(name, _salt)
 
-  const preclaimTx = await this.namePreclaimTx(R.merge(opt, {
+  const preclaimTx = await this.namePreclaimTx({
+    ...opt,
     accountId: await this.address(opt),
     commitmentId
-  }))
+  })
 
   const result = await this.send(preclaimTx, opt)
 
