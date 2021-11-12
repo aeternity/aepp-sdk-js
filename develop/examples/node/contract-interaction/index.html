@@ -1001,7 +1001,7 @@ implementation directly in the SDK.
 <p>Invoking <code>deploy</code> on the bytecode object will result in the <code>CreateContractTx</code>
 being created, signed (using the <em>secretKey</em> of the previously defined <code>MemoryAccount</code>) and broadcasted to the network.
 It will be picked up by the miners and written to the chain.
-<div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">contract</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">bytecode</span><span class="p">.</span><span class="nx">deploy</span><span class="p">([</span><span class="s1">&#39;5&#39;</span><span class="p">])</span>
+<div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">contract</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">bytecode</span><span class="p">.</span><span class="nx">deploy</span><span class="p">([</span><span class="mf">5</span><span class="p">])</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Contract deployed at </span><span class="si">${</span><span class="nx">contract</span><span class="p">.</span><span class="nx">address</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
 </code></pre></div>
 Note:</p>
@@ -1013,7 +1013,7 @@ Note:</p>
 <p>Once the <code>ContractCreateTx</code> has been successfully mined, you can attempt to invoke
 any public function (aka <code>entrypoint</code> in Sophia) defined within it.
 In this case you can use <code>callStatic</code> which performs a <code>dry-run</code> of the transaction which allows you to get the result without having to mine a transaction.
-<div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">call</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">contract</span><span class="p">.</span><span class="nx">callStatic</span><span class="p">(</span><span class="s1">&#39;multiplyBy&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;7&#39;</span><span class="p">])</span>
+<div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">call</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">contract</span><span class="p">.</span><span class="nx">callStatic</span><span class="p">(</span><span class="s1">&#39;multiplyBy&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mf">7</span><span class="p">])</span>
 </code></pre></div>
 <strong>Note</strong>:</p>
 <ul>
@@ -1022,7 +1022,7 @@ In this case you can use <code>callStatic</code> which performs a <code>dry-run<
 <h2 id="8-decode-the-call-result">8. Decode the call result</h2>
 <p>The execution result, if successful, will be an FATE-encoded result value.
 The <code>decode</code> function will use the Sophia HTTP compiler to decode the result value.
-<div class="highlight"><pre><span></span><code>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Execution result: </span><span class="si">${</span><span class="k">await</span> <span class="nx">call</span><span class="p">.</span><span class="nx">decode</span><span class="p">()</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Execution result: </span><span class="si">${</span><span class="nx">call</span><span class="p">.</span><span class="nx">decodedResult</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
 </code></pre></div></p>
 <h2 id="9-get-contract-instance-of-a-deployed-contract">9. Get contract instance of a deployed contract</h2>
 <p>Knowing the contract address and the source code allows you to
