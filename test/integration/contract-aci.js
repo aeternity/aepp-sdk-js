@@ -16,7 +16,6 @@
  */
 import { expect } from 'chai'
 import { before, describe, it } from 'mocha'
-import * as R from 'ramda'
 import { decodeEvents, SOPHIA_TYPES } from '../../src/contract/aci/transformation'
 import { decode } from '../../src/tx/builder/helpers'
 import { getSdk } from './'
@@ -187,7 +186,7 @@ describe('Contract ACI Interface', function () {
     contractObject.options.filesystem.should.have.property('testLib')
     const functionsFromACI = contractObject.aci.functions.map(({ name }) => name)
     const methods = Object.keys(contractObject.methods)
-    R.equals(methods, functionsFromACI).should.be.equal(true)
+    expect(methods).to.be.eql(functionsFromACI)
   })
 
   it('Compile contract', async () => {

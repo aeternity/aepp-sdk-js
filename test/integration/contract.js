@@ -17,7 +17,6 @@
 /* global BigInt */ // TODO: remove after updating ts-standard
 import { expect } from 'chai'
 import { before, describe, it } from 'mocha'
-import * as R from 'ramda'
 import { commitmentHash, decode } from '../../src/tx/builder/helpers'
 import { DRY_RUN_ACCOUNT } from '../../src/tx/builder/schema'
 import { messageToHash, salt } from '../../src/utils/crypto'
@@ -369,8 +368,7 @@ describe('Contract', function () {
     })
 
     it('Use invalid compiler url', async () => {
-      const cloned = R.clone(sdk)
-      await expect(cloned.setCompilerUrl('https://compiler.aepps.comas'))
+      await expect(sdk.setCompilerUrl('https://compiler.aepps.comas'))
         .to.be.rejectedWith('request to https://compiler.aepps.comas/api failed, reason: getaddrinfo ENOTFOUND compiler.aepps.comas')
     })
   })

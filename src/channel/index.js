@@ -39,7 +39,6 @@ import {
   disconnect as channelDisconnect,
   fsmId as channelFsmId
 } from './internal'
-import * as R from 'ramda'
 
 function snakeToPascalObjKeys (obj) {
   return Object.entries(obj).reduce((result, [key, val]) => ({
@@ -238,10 +237,10 @@ async function poi ({ accounts, contracts }) {
  * )
  */
 async function balances (accounts) {
-  return R.reduce((acc, item) => ({
-    ...acc,
-    [item.account]: item.balance
-  }), {}, await call(this, 'channels.get.balances', { accounts }))
+  return Object.fromEntries(
+    (await call(this, 'channels.get.balances', { accounts }))
+      .map(item => [item.account, item.balance])
+  )
 }
 
 /**

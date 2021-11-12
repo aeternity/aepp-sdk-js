@@ -22,11 +22,8 @@
  * @example import { Transaction } from '@aeternity/aepp-sdk'
  */
 
-import * as R from 'ramda'
-
 import ChainNode from '../chain/node'
 import Tx from './'
-
 import { buildTx, calculateFee, unpackTx } from './builder'
 import { ABI_VERSIONS, MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE, TX_TTL } from './builder/schema'
 import { buildContractId } from './builder/helpers'
@@ -497,7 +494,7 @@ async function getAccountNonce (accountId, nonce) {
 async function prepareTxParams (txType, { senderId, nonce: n, ttl: t, fee: f, gas, absoluteTtl, vsn, strategy }) {
   n = n || (await this.api.getAccountNextNonce(senderId, { strategy }).catch(e => ({ nextNonce: 1 }))).nextNonce
   const ttl = await calculateTtl.call(this, t, !absoluteTtl)
-  const fee = calculateFee(f, txType, { showWarning: this.showWarning, gas, params: { ...R.last(arguments), nonce: n, ttl }, vsn })
+  const fee = calculateFee(f, txType, { showWarning: this.showWarning, gas, params: { ...arguments[1], nonce: n, ttl }, vsn })
   return { fee, ttl, nonce: n }
 }
 

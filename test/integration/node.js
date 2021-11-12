@@ -17,10 +17,8 @@
 
 import Node from '../../src/node'
 import { url, internalUrl, ignoreVersion } from './'
-
 import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
-import * as R from 'ramda'
 import NodePool from '../../src/node-pool'
 
 describe('Node client', function () {
@@ -40,15 +38,10 @@ describe('Node client', function () {
       .map(method => expect(node.api[method]).to.be.a('function'))
   })
 
-  it('gets key blocks by height for the first 3 blocks', () => {
+  it('gets key blocks by height for the first 3 blocks', async () => {
     expect(node.api.getKeyBlockByHeight).to.be.a('function')
-
-    return Promise.all(
-      R.range(1, 3).map(async i => {
-        const result = await node.api.getKeyBlockByHeight(i)
-        expect(result.height, i).to.equal(i)
-      })
-    )
+    const blocks = await Promise.all([1, 2, 3].map(i => node.api.getKeyBlockByHeight(i)))
+    expect(blocks.map(b => b.height)).to.eql([1, 2, 3])
   })
 
   it('throws clear exceptions when can\'t get transaction by hash', async () => {
