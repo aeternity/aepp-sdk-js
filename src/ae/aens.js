@@ -26,7 +26,6 @@
  * @example import { Aens } from '@aeternity/aepp-sdk'
  */
 
-import * as R from 'ramda'
 import { salt } from '../utils/crypto'
 import {
   commitmentHash,
@@ -109,7 +108,7 @@ async function update (name, pointers = [], options = { extendPointers: false })
 
   pointers = [
     ...options.extendPointers ? (await this.getName(name)).pointers : [],
-    ...pointers.map(p => R.fromPairs([['id', p], ['key', classify(p)]]))
+    ...pointers.map(p => Object.fromEntries([['id', p], ['key', classify(p)]]))
   ].reduce((acc, el) => [...acc.filter(p => p.key !== el.key), el], [])
   const nameUpdateTx = await this.nameUpdateTx({
     ...opt,

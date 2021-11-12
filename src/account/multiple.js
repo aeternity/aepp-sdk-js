@@ -21,7 +21,6 @@
  * @export AccountMultiple
  */
 
-import * as R from 'ramda'
 import AsyncInit from '../utils/async-init'
 import MemoryAccount from './memory'
 import { decode } from '../tx/builder/helpers'
@@ -52,7 +51,7 @@ export default AccountBase.compose(AsyncInit, {
   async init ({ accounts = [], address }) {
     /* An Account maynot be required for the Node/Chain methods */
     if (Array.isArray(accounts) && accounts.length) {
-      this.accounts = R.fromPairs(await Promise.all(accounts.map(async a => [await a.address(), a])))
+      this.accounts = Object.fromEntries(await Promise.all(accounts.map(async a => [await a.address(), a])))
       if (!address) address = Object.keys(this.accounts)[0]
       decode(address, 'ak')
       this.selectedAddress = address
