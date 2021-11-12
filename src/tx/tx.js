@@ -444,14 +444,16 @@ function getVmVersion (txType, { vmVersion, abiVersion } = {}) {
   const protocolForTX = supportedProtocol[txType]
   if (!protocolForTX) throw new Error('Not supported tx type')
 
-  const ctVersion = {
-    abiVersion: abiVersion || protocolForTX.abiVersion[0],
-    vmVersion: vmVersion || protocolForTX.vmVersion[0]
+  abiVersion = abiVersion || protocolForTX.abiVersion[0]
+  vmVersion = vmVersion || protocolForTX.vmVersion[0]
+  if (!protocolForTX.vmVersion.includes(vmVersion)) {
+    throw new Error(`VM VERSION ${vmVersion} do not support by this node. Supported: [${protocolForTX.vmVersion}]`)
   }
-  if (protocolForTX.vmVersion.length && !R.contains(ctVersion.vmVersion, protocolForTX.vmVersion)) throw new Error(`VM VERSION ${ctVersion.vmVersion} do not support by this node. Supported: [${protocolForTX.vmVersion}]`)
-  if (protocolForTX.abiVersion.length && !R.contains(ctVersion.abiVersion, protocolForTX.abiVersion)) throw new Error(`ABI VERSION ${ctVersion.abiVersion} do not support by this node. Supported: [${protocolForTX.abiVersion}]`)
+  if (!protocolForTX.abiVersion.includes(abiVersion)) {
+    throw new Error(`ABI VERSION ${abiVersion} do not support by this node. Supported: [${protocolForTX.abiVersion}]`)
+  }
 
-  return ctVersion
+  return { vmVersion, abiVersion }
 }
 
 /**
