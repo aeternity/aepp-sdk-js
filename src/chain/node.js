@@ -140,7 +140,7 @@ async function topBlock () {
   return this.api.getTopHeader()
 }
 
-async function poll (th, { blocks = 10, interval = 5000, allowUnsynced = false } = {}) {
+async function poll (th, { blocks = 10, interval = 500, allowUnsynced = false } = {}) {
   const max = await this.height() + blocks
   do {
     const tx = await this.tx(th).catch(_ => null)
