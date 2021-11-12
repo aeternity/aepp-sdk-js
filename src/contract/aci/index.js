@@ -28,6 +28,7 @@ import { Encoder as Calldata } from '@aeternity/aepp-calldata'
 import { decodeEvents } from './transformation'
 import { DRY_RUN_ACCOUNT, DEPOSIT } from '../../tx/builder/schema'
 import TxObject from '../../tx/tx-object'
+import { decode } from '../../tx/builder/helpers'
 
 /**
  * Get function schema from contract ACI object
@@ -115,6 +116,33 @@ export default async function getContractInstance (source, { aci, contractAddres
     return instance.compiled
   }
 
+  const sendAndProcess = async (tx, options) => {
+    const txData = await this.send(tx, options)
+    const result = {
+      hash: txData.hash, tx: TxObject({ tx: txData.rawTx }), txData, rawTx: txData.rawTx
+    }
+    if (options.waitMined === false) return result
+    const txInfo = await this.getTxInfo(txData.hash)
+    await handleCallError(txInfo)
+    return { ...result, result: txInfo }
+  }
+
+  const handleCallError = ({ returnType, returnValue }) => {
+    let message
+    // TODO: ensure that it works correctly https://github.com/aeternity/aepp-calldata-js/issues/88
+    switch (returnType) {
+      case 'ok': return
+      case 'revert':
+        message = instance.calldata.serializer.deserializeStream(decode(returnValue))[0].valueOf()
+        break
+      case 'error':
+        message = decode(returnValue).toString()
+        break
+      default: throw new Error(`Unknown returnType: ${returnType}`)
+    }
+    throw new Error(`Invocation failed${message ? `: "${message}"` : ''}`)
+  }
+
   /**
    * Deploy contract
    * @alias module:@aeternity/aepp-sdk/es/contract/aci
@@ -137,7 +165,7 @@ export default async function getContractInstance (source, { aci, contractAddres
       code: instance.compiled,
       ownerId
     })
-    const { hash, rawTx, result, txData } = await this._sendAndProcess(tx, source, 'init', opt)
+    const { hash, rawTx, result, txData } = await sendAndProcess(tx, opt)
     instance.deployInfo = Object.freeze({
       result,
       owner: ownerId,
@@ -167,7 +195,6 @@ export default async function getContractInstance (source, { aci, contractAddres
   instance.call = async (fn, params = [], options = {}) => {
     const opt = { ...instance.options, ...options }
     const fnACI = getFunctionACI(instance.aci, fn, instance.externalAci)
-    const source = opt.source || instance.source
     const contractId = instance.deployInfo.address
 
     if (!fn) throw new Error('Function name is required')
@@ -199,11 +226,11 @@ export default async function getContractInstance (source, { aci, contractAddres
         : await this.contractCallTx({ ...txOpt, callerId, contractId })
 
       const { callObj, ...dryRunOther } = await this.txDryRun(tx, callerId, opt)
-      await this._handleCallError(source, fn, callObj)
+      await handleCallError(callObj)
       res = { ...dryRunOther, tx: TxObject({ tx }), result: callObj }
     } else {
       const tx = await this.contractCallTx({ ...opt, callerId, contractId, callData })
-      res = await this._sendAndProcess(tx, source, fn, opt)
+      res = await sendAndProcess(tx, opt)
     }
     if (opt.waitMined || opt.callStatic) {
       res.decodedResult = fnACI.returns && fnACI.returns !== 'unit' && fn !== 'init' &&

@@ -33,35 +33,6 @@ import getContractInstance from '../contract/aci'
 import NodePool from '../node-pool'
 import { AMOUNT, DEPOSIT, GAS, MIN_GAS_PRICE } from '../tx/builder/schema'
 import { decode, produceNameId } from '../tx/builder/helpers'
-import TxObject from '../tx/tx-object'
-
-async function _sendAndProcess (tx, source, name, options) {
-  const txData = await this.send(tx, options)
-  const result = { hash: txData.hash, tx: TxObject({ tx: txData.rawTx }), txData, rawTx: txData.rawTx }
-  if (options.waitMined === false) return result
-  const txInfo = await this.getTxInfo(txData.hash)
-  await this._handleCallError(source, name, txInfo)
-  return { ...result, result: txInfo }
-}
-
-/**
- * Handle contract call error
- * @function
- * @private
- * @alias module:@aeternity/aepp-sdk/es/ae/contract
- * @category async
- * @param {String} source contract source code
- * @param {String} name name of called method
- * @param {Object} result call result object
- * @throws Error Decoded error
- * @return {Promise<void>}
- */
-async function _handleCallError (source, name, result) {
-  if (result.returnType === 'ok') return
-  const error = await this.contractDecodeCallResultAPI(source, name, result.returnValue, result.returnType)
-  const message = error[{ revert: 'abort' }[result.returnType] || result.returnType][0]
-  throw new Error(`Invocation failed${message ? `: "${message}"` : ''}`)
-}
 
 /**
  * Static contract call(using dry-run)
@@ -286,8 +257,6 @@ export const ContractAPI = Ae.compose(ContractBase, {
     contractCallStatic,
     contractDeploy,
     contractCall,
-    _handleCallError,
-    _sendAndProcess,
     // Delegation for contract
     delegateSignatureCommon,
     // AENS

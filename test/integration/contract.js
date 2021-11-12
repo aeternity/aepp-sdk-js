@@ -189,20 +189,18 @@ describe('Contract', function () {
     res.result.should.have.property('returnType')
   })
 
-  describe('_handleCallError', () => {
-    it('throws error on deploy', async () => {
-      const code = await sdk.contractCompile(contractWithBrokenDeploy)
-      await expect(code.deploy()).to.be.rejectedWith('Invocation failed: "CustomErrorMessage"')
-    })
+  it('throws error on deploy', async () => {
+    const code = await sdk.contractCompile(contractWithBrokenDeploy)
+    await expect(code.deploy()).to.be.rejectedWith('Invocation failed: "CustomErrorMessage"')
+  })
 
-    it('throws errors on method call', async () => {
-      const code = await sdk.contractCompile(contractWithBrokenMethods)
-      const deployed = await code.deploy()
-      await expect(deployed.call('failWithoutMessage', [await sdk.address()]))
-        .to.be.rejectedWith('Invocation failed')
-      await expect(deployed.call('failWithMessage'))
-        .to.be.rejectedWith('Invocation failed: "CustomErrorMessage"')
-    })
+  it('throws errors on method call', async () => {
+    const code = await sdk.contractCompile(contractWithBrokenMethods)
+    const deployed = await code.deploy()
+    await expect(deployed.call('failWithoutMessage', [await sdk.address()]))
+      .to.be.rejectedWith('Invocation failed')
+    await expect(deployed.call('failWithMessage'))
+      .to.be.rejectedWith('Invocation failed: "CustomErrorMessage"')
   })
 
   it('Dry-run without accounts', async () => {
