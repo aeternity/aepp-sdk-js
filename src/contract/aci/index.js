@@ -58,31 +58,51 @@ function getFunctionACI (aci, name, external) {
 /**
  * Generate contract ACI object with predefined js methods for contract usage - can be used for creating a reference to already deployed contracts
  * @alias module:@aeternity/aepp-sdk/es/contract/aci
- * @param {String} source Contract source code
  * @param {Object} [options={}] Options object
- * @param {String} [options.aci] Contract ACI
+ * @param {String} [options.source] Contract source code
+ * @param {String} [options.bytecode] Contract bytecode
+ * @param {Object} [options.aci] Contract ACI
  * @param {String} [options.contractAddress] Contract address
  * @param {Object} [options.filesystem] Contact source external namespaces map
  * @param {Boolean} [options.validateByteCode] Compare source code with on-chain version
  * @return {ContractInstance} JS Contract API
  * @example
- * const contractIns = await client.getContractInstance(sourceCode)
+ * const contractIns = await client.getContractInstance({ source })
  * await contractIns.deploy([321]) or await contractIns.methods.init(321)
  * const callResult = await contractIns.call('setState', [123]) or await contractIns.methods.setState.send(123, options)
  * const staticCallResult = await contractIns.call('setState', [123], { callStatic: true }) or await contractIns.methods.setState.get(123, options)
  * Also you can call contract like: await contractIns.methods.setState(123, options)
  * Then sdk decide to make on-chain or static call(dry-run API) transaction based on function is stateful or not
  */
-export default async function getContractInstance (source, { aci, contractAddress, filesystem = {}, validateByteCode, ...otherOptions } = {}) {
-  aci = aci || await this.contractGetACI(source, { filesystem })
-  if (contractAddress) contractAddress = await this.resolveName(contractAddress, 'ct', { resolveByNode: true })
+export default async function getContractInstance ({
+  source,
+  bytecode,
+  aci,
+  contractAddress,
+  filesystem = {},
+  validateByteCode,
+  ...otherOptions
+} = {}) {
+  aci = aci || (source && await this.contractGetACI(source, { filesystem }))
+  if (!aci) throw new Error('Either ACI or source code is required')
+  contractAddress = contractAddress && await this.resolveName(
+    contractAddress, 'ct', { resolveByNode: true }
+  )
+  if (!contractAddress && !source && !bytecode) throw new Error('Can\'t create instance by ACI without address')
+
+  if (contractAddress) {
+    const contract = await this.getContract(contractAddress).catch(() => null)
+    if (!contract) throw new Error(`Contract with address ${contractAddress} not found on-chain`)
+    if (!contract.active) throw new Error(`Contract with address ${contractAddress} not active`)
+  }
+
   const instance = {
     interface: R.defaultTo(null, R.prop('interface', aci)),
     aci: R.defaultTo(null, R.path(['encoded_aci', 'contract'], aci)),
     calldata: new Calldata([aci.encoded_aci, ...aci.external_encoded_aci]),
     externalAci: aci.external_encoded_aci ? aci.external_encoded_aci.map(a => a.contract || a.namespace) : [],
     source,
-    compiled: null,
+    bytecode,
     deployInfo: { address: contractAddress },
     options: {
       ...this.Ae.defaults,
@@ -93,27 +113,27 @@ export default async function getContractInstance (source, { aci, contractAddres
     compilerVersion: this.compilerVersion
   }
 
-  // Check for valid contract address and contract code
-  if (contractAddress) {
-    const contract = await this.getContract(contractAddress).catch(e => null)
-    if (!contract || !contract.active) throw new Error(`Contract with address ${contractAddress} not found on-chain or not active`)
-    if (validateByteCode) {
-      const onChanByteCode = (await this.getContractByteCode(contractAddress)).bytecode
-      const isCorrespondingBytecode = await this.validateByteCodeAPI(onChanByteCode, instance.source, instance.options).catch(e => false)
-      if (!isCorrespondingBytecode) throw new Error('Contract source do not correspond to the contract bytecode deployed on the chain')
-    }
+  if (validateByteCode) {
+    if (!contractAddress) throw new Error('Can\'t validate bytecode without contract address')
+    const onChanBytecode = (await this.getContractByteCode(contractAddress)).bytecode
+    const isValid = (source && await this
+      .validateByteCodeAPI(onChanBytecode, source, instance.options).catch(() => false)) ||
+      bytecode === onChanBytecode
+    if (!isValid) throw new Error(`Contract ${source ? 'source' : 'bytecode'} do not correspond to the bytecode deployed on the chain`)
   }
 
   /**
    * Compile contract
    * @alias module:@aeternity/aepp-sdk/es/contract/aci
    * @rtype () => ContractInstance: Object
-   * @return {String} compiled bytecode
+   * @return {String} bytecode bytecode
    */
   instance.compile = async (options = {}) => {
+    if (instance.bytecode) throw new Error('Contract already compiled')
+    if (!instance.source) throw new Error('Can\'t compile without source code')
     const { bytecode } = await this.contractCompile(instance.source, { ...instance.options, ...options })
-    instance.compiled = bytecode
-    return instance.compiled
+    instance.bytecode = bytecode
+    return instance.bytecode
   }
 
   const sendAndProcess = async (tx, options) => {
@@ -153,16 +173,15 @@ export default async function getContractInstance (source, { aci, contractAddres
    */
   instance.deploy = async (params = [], options) => {
     const opt = { ...instance.options, ...options, deposit: DEPOSIT }
-    if (!instance.compiled) await instance.compile(opt)
-
+    if (!instance.bytecode) await instance.compile(opt)
     if (opt.callStatic) return instance.call('init', params, opt)
+    if (instance.deployInfo.address) throw new Error('Contract already deployed')
 
-    const source = opt.source || instance.source
     const ownerId = await this.address(opt)
     const { tx, contractId } = await this.contractCreateTx({
       ...opt,
       callData: instance.calldata.encode(instance.aci.name, 'init', params),
-      code: instance.compiled,
+      code: instance.bytecode,
       ownerId
     })
     const { hash, rawTx, result, txData } = await sendAndProcess(tx, opt)
@@ -174,9 +193,9 @@ export default async function getContractInstance (source, { aci, contractAddres
       txData,
       address: contractId,
       call: (name, args, options) =>
-        this.contractCall(source, contractId, name, args, { ...opt, ...options }),
+        this.contractCall(instance.source, contractId, name, args, { ...opt, ...options }),
       callStatic: (name, args, options) =>
-        this.contractCallStatic(source, contractId, name, args, { ...opt, ...options }),
+        this.contractCallStatic(instance.source, contractId, name, args, { ...opt, ...options }),
       createdAt: new Date()
     })
     return instance.deployInfo
@@ -222,7 +241,7 @@ export default async function getContractInstance (source, { aci, contractAddres
         nonce: opt.top && (await this.getAccount(callerId, { hash: opt.top })).nonce + 1
       }
       const tx = fn === 'init'
-        ? (await this.contractCreateTx({ ...txOpt, code: instance.compiled || opt.bytecode, ownerId: callerId })).tx
+        ? (await this.contractCreateTx({ ...txOpt, code: instance.bytecode, ownerId: callerId })).tx
         : await this.contractCallTx({ ...txOpt, callerId, contractId })
 
       const { callObj, ...dryRunOther } = await this.txDryRun(tx, callerId, opt)

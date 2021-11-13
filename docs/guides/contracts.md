@@ -53,7 +53,7 @@ Note:
 ## 3. Initialize the contract instance
 ```js
 const CONTRACT_SOURCE = ... // source code of the contract
-const contractInstance = await client.getContractInstance(CONTRACT_SOURCE)
+const contractInstance = await client.getContractInstance({ source: CONTRACT_SOURCE })
 ```
 
 Note:
@@ -61,12 +61,12 @@ Note:
 - If your contract includes external dependencies which are not part of the [standard library](https://github.com/aeternity/aesophia/blob/v6.0.1/docs/sophia_stdlib.md) you should initialize the contract using:
   ```js
   const filesystem = ... // key-value map with name of the include as key and source code of the include as value
-  const contractInstance = await client.getContractInstance(CONTRACT_SOURCE, { filesystem })
+  const contractInstance = await client.getContractInstance({ source: CONTRACT_SOURCE, filesystem })
   ```
 - If your contract is already deployed and you know the contract address you can initialize the contract instance using:
   ```js
   const contractAddress = ... // the address of the contract
-  const contractInstance = await client.getContractInstance(CONTRACT_SOURCE, { contractAddress })
+  const contractInstance = await client.getContractInstance({ source: CONTRACT_SOURCE, contractAddress })
   ```
 - Following attributes can be provided in an `options` object to `getContractInstance`:
     - `aci` (default: obtained via http compiler)

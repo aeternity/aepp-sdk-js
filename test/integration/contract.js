@@ -142,7 +142,7 @@ describe('Contract', function () {
   it('Verify message in Sophia', async () => {
     const msgHash = messageToHash('Hello')
     const signature = await sdk.sign(msgHash)
-    const signContract = await sdk.getContractInstance(signSource)
+    const signContract = await sdk.getContractInstance({ source: signSource })
     await signContract.deploy()
     const { decodedResult } = await signContract.methods.verify(msgHash, await sdk.address(), signature)
     decodedResult.should.be.equal(true)
@@ -383,7 +383,7 @@ describe('Contract', function () {
     let delegationSignature
 
     before(async () => {
-      contract = await sdk.getContractInstance(aensDelegationContract)
+      contract = await sdk.getContractInstance({ source: aensDelegationContract })
       await contract.deploy()
       contractId = contract.deployInfo.address;
       [owner, newOwner] = sdk.addresses()
@@ -462,7 +462,7 @@ describe('Contract', function () {
     const ttl = { RelativeTTL: [50] }
 
     before(async () => {
-      contract = await sdk.getContractInstance(oracleContract)
+      contract = await sdk.getContractInstance({ source: oracleContract })
       await contract.deploy()
       contractId = contract.deployInfo.address
       onAccount = sdk.addresses()[1]

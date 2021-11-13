@@ -118,10 +118,7 @@ describe('Contract ACI Interface', function () {
     let decodedEventsUsingBuildInMethod
 
     before(async () => {
-      cInstance = await sdk.getContractInstance(
-        testContract,
-        { filesystem }
-      )
+      cInstance = await sdk.getContractInstance({ source: testContract, filesystem })
       await cInstance.deploy(['test', 1, 'some'])
       eventResult = await cInstance.methods.emitEvents()
       const { log } = await sdk.tx(eventResult.hash)
@@ -169,14 +166,11 @@ describe('Contract ACI Interface', function () {
   })
 
   it('Generate ACI object', async () => {
-    contractObject = await sdk.getContractInstance(
-      testContract,
-      { filesystem, ttl: 0 }
-    )
+    contractObject = await sdk.getContractInstance({ source: testContract, filesystem, ttl: 0 })
     contractObject.should.have.property('interface')
     contractObject.should.have.property('aci')
     contractObject.should.have.property('source')
-    contractObject.should.have.property('compiled')
+    contractObject.should.have.property('bytecode')
     contractObject.should.have.property('deployInfo')
     contractObject.should.have.property('compile')
     contractObject.should.have.property('call')
@@ -191,7 +185,7 @@ describe('Contract ACI Interface', function () {
 
   it('Compile contract', async () => {
     await contractObject.compile()
-    const isCompiled = contractObject.compiled.length && contractObject.compiled.slice(0, 3) === 'cb_'
+    const isCompiled = contractObject.bytecode.length && contractObject.bytecode.slice(0, 3) === 'cb_'
     isCompiled.should.be.equal(true)
   })
 
@@ -212,13 +206,14 @@ describe('Contract ACI Interface', function () {
   })
 
   it('Deploy contract before compile', async () => {
-    contractObject.compiled = null
+    contractObject.bytecode = null
     await contractObject.methods.init('test', 1, 'hahahaha')
-    const isCompiled = contractObject.compiled.length && contractObject.compiled.startsWith('cb_')
+    const isCompiled = contractObject.bytecode.length && contractObject.bytecode.startsWith('cb_')
     isCompiled.should.be.equal(true)
   })
 
   it('Deploy/Call contract with waitMined: false', async () => {
+    contractObject.deployInfo = {}
     const deployed = await contractObject.methods.init('test', 1, 'hahahaha', { waitMined: false })
     await sdk.poll(deployed.transaction, { interval: 50, attempts: 1200 })
     expect(deployed.result).to.be.equal(undefined)
@@ -229,39 +224,37 @@ describe('Contract ACI Interface', function () {
   })
 
   it('Generate ACI object with corresponding bytecode', async () => {
-    await sdk.getContractInstance(
-      testContract,
-      { contractAddress: contractObject.deployInfo.address, filesystem, ttl: 0 }
-    )
+    await sdk.getContractInstance({
+      source: testContract, contractAddress: contractObject.deployInfo.address, filesystem, ttl: 0
+    })
   })
 
   it('Generate ACI object with not corresponding bytecode', async () => {
     await sdk.getContractInstance(
-      identityContract,
-      { contractAddress: contractObject.deployInfo.address, ttl: 0 }
+      { source: identityContract, contractAddress: contractObject.deployInfo.address, ttl: 0 }
     )
   })
 
   it('Generate ACI object with not corresponding bytecode and check is code the same', async () => {
-    await expect(sdk.getContractInstance(
-      identityContract,
-      { validateByteCode: true, contractAddress: contractObject.deployInfo.address, ttl: 0 }
-    )).to.be.rejectedWith('Contract source do not correspond to the contract bytecode deployed on the chain')
+    await expect(sdk.getContractInstance({
+      source: identityContract,
+      validateByteCode: true,
+      contractAddress: contractObject.deployInfo.address,
+      ttl: 0
+    })).to.be.rejectedWith('Contract source do not correspond to the bytecode deployed on the chain')
   })
 
   it('Throw error on creating contract instance with invalid contractAddress', async () => {
     await expect(sdk.getContractInstance(
-      testContract,
-      { filesystem, contractAddress: 'ct_asdasdasd', ttl: 0 }
+      { source: testContract, filesystem, contractAddress: 'ct_asdasdasd', ttl: 0 }
     )).to.be.rejectedWith('Invalid name or address: ct_asdasdasd')
   })
 
   it('Throw error on creating contract instance with contract address which is not found on-chain or not active', async () => {
     const contractAddress = 'ct_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT'
     await expect(sdk.getContractInstance(
-      testContract,
-      { filesystem, contractAddress, ttl: 0 }
-    )).to.be.rejectedWith(`Contract with address ${contractAddress} not found on-chain or not active`)
+      { source: testContract, filesystem, contractAddress, ttl: 0 }
+    )).to.be.rejectedWith(`Contract with address ${contractAddress} not found on-chain`)
   })
 
   it('Fail on paying to not payable function', async () => {

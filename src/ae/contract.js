@@ -57,7 +57,7 @@ import { decode, produceNameId } from '../tx/builder/helpers'
  * }
  */
 async function contractCallStatic (source, contractAddress, name, args = [], options) {
-  const contract = await this.getContractInstance(source, { ...options, contractAddress })
+  const contract = await this.getContractInstance({ ...options, source, contractAddress })
   return contract.call(name, args, { ...options, callStatic: true })
 }
 
@@ -83,7 +83,7 @@ async function contractCallStatic (source, contractAddress, name, args = [], opt
  * }
  */
 async function contractCall (source, contractAddress, name, args, options) {
-  const contract = await this.getContractInstance(source, { ...options, contractAddress })
+  const contract = await this.getContractInstance({ ...options, source, contractAddress })
   return contract.call(name, args, options)
 }
 
@@ -112,8 +112,8 @@ async function contractCall (source, contractAddress, name, args, options) {
  * }
  */
 async function contractDeploy (code, source, params, options) {
-  const contract = await this.getContractInstance(source, options)
-  contract.compiled = code
+  const contract = await this.getContractInstance({ ...options, source })
+  contract.bytecode = code
   return contract.deploy(params, options)
 }
 
