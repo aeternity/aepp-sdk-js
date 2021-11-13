@@ -119,7 +119,7 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
   //     the contract source, the name of the `entrypoint` to call as well as the required params.
   //      - The `entrypoint` with the name `set_latest_caller` doesn't require any params so you can provide an empty array
   //  1. Create the `ContractCreateTx` by providing all required params.
-  //      - You could omit `amount`, `gas` and `gasPrice` if you choose to stick to the default values (see [transaction options](../transaction-options.md#contractcreatetx-contractcalltx))
+  //      - You could omit `amount`, `gas` and `gasPrice` if you choose to stick to the default values (see [transaction options](../../../transaction-options#contractcreatetx-contractcalltx))
   //  1. Sign the transaction by providing `innerTx: true` as transaction option.
   //      - The transaction will be signed in a special way that is required for inner transactions.
   //

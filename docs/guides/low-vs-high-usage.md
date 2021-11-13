@@ -34,8 +34,8 @@ async function init () {
 }
 ```
 
-## Low-level SDK usage (use [API](https://github.com/aeternity/protocol/tree/master/node/api) endpoints directly)
-Example spend function, using the SDK, talking directly to the [**API**](https://github.com/aeternity/protocol/tree/master/node/api):
+## Low-level SDK usage (use [API](https://aeternity.com/protocol/node/api) endpoints directly)
+Example spend function, using the SDK, talking directly to the [**API**](https://aeternity.com/protocol/node/api):
 ```js
 import { MemoryAccount, Node, Universal } from '@aeternity/aepp-sdk'
 

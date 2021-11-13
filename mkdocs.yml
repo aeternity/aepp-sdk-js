@@ -59,7 +59,7 @@ nav:
   - transaction-options.md
   - Examples & Tutorials:
     - NodeJS:
-      - examples/node/transfer-ae-tokens.md
+      - examples/node/transfer-ae.md
       - examples/node/contract-interaction.md
       - PayingForTx:
         - examples/node/paying-for-tx-contract-call-tx.md
