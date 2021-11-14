@@ -101,16 +101,22 @@ contract StateContract =
 const filesystem = {
   testLib: libContractSource
 }
+const notExistingContractAddress = 'ct_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT'
 
-describe('Contract ACI Interface', function () {
+describe('Contract instance', function () {
   let sdk
   let testContract
+  let testContractAddress
+  let testContractAci
+  let testContractBytecode
 
   before(async function () {
     sdk = await getSdk()
+    testContractAci = await sdk.contractGetACI(testContractSource, { filesystem })
+    testContractBytecode = (await sdk.contractCompile(testContractSource, { filesystem })).bytecode
   })
 
-  it('Generate ACI object', async () => {
+  it('generates by source code', async () => {
     testContract = await sdk.getContractInstance({ source: testContractSource, filesystem, ttl: 0 })
     testContract.should.have.property('interface')
     testContract.should.have.property('aci')
@@ -128,96 +134,129 @@ describe('Contract ACI Interface', function () {
     expect(methods).to.be.eql(functionsFromACI)
   })
 
-  it('Compile contract', async () => {
+  it('compiles', async () => {
     await testContract.compile()
-    const isCompiled = testContract.bytecode.length && testContract.bytecode.slice(0, 3) === 'cb_'
-    isCompiled.should.be.equal(true)
+    expect(testContract.bytecode.startsWith('cb_')).to.be.equal(true)
   })
 
-  it('Dry-run deploy fn', async () => {
+  it('fails on calling without deployment', () => expect(testContract.methods.intFn(2))
+    .to.be.rejectedWith('You need to deploy contract before calling!'))
+
+  it('deploys', async () => {
+    const deployInfo = await testContract.deploy(['test', 1, 'hahahaha'])
+    expect(deployInfo.address.startsWith('ct_')).to.equal(true)
+    expect(testContract.bytecode.startsWith('cb_')).to.be.equal(true)
+    testContractAddress = deployInfo.address
+  })
+
+  it('calls', async () => {
+    expect((await testContract.methods.intFn(2)).decodedResult).to.be.equal(2n)
+  })
+
+  it('generates by aci', () =>
+    sdk.getContractInstance({ aci: testContractAci, contractAddress: testContractAddress }))
+
+  it('fails on trying to generate with not existing contract address', () =>
+    expect(sdk.getContractInstance(
+      { aci: identityContractSource, contractAddress: notExistingContractAddress }
+    )).to.be.rejectedWith(`Contract with address ${notExistingContractAddress} not found on-chain`))
+
+  it('fails on trying to generate with invalid address', () =>
+    expect(sdk.getContractInstance(
+      { aci: identityContractSource, contractAddress: 'ct_asdasdasd' }
+    )).to.be.rejectedWith('Invalid name or address: ct_asdasdasd'))
+
+  it('fails on trying to generate by aci without address', () =>
+    expect(sdk.getContractInstance({ aci: testContractAci }))
+      .to.be.rejectedWith('Can\'t create instance by ACI without address'))
+
+  it('generates by bytecode and aci', () =>
+    sdk.getContractInstance({ bytecode: testContractBytecode, aci: testContractAci }))
+
+  it('fails on generation without arguments', () =>
+    expect(sdk.getContractInstance()).to.be.rejectedWith('Either ACI or source code is required'))
+
+  it('calls by aci', async () => {
+    const contract = await sdk.getContractInstance(
+      { aci: testContractAci, contractAddress: testContract.deployInfo.address }
+    )
+    expect((await contract.methods.intFn(3)).decodedResult).to.be.equal(3n)
+  })
+
+  it('deploys and calls by bytecode and aci', async () => {
+    const contract = await sdk.getContractInstance(
+      { bytecode: testContractBytecode, aci: testContractAci }
+    )
+    await contract.deploy(['test', 1])
+    expect((await contract.methods.intFn(3)).decodedResult).to.be.equal(3n)
+  })
+
+  it('accepts matching source code with enabled validation', () => sdk.getContractInstance({
+    source: testContractSource,
+    filesystem,
+    contractAddress: testContractAddress,
+    validateByteCode: true
+  }))
+
+  it('rejects not matching source code with enabled validation', () => expect(sdk.getContractInstance({
+    source: identityContractSource,
+    contractAddress: testContractAddress,
+    validateByteCode: true
+  })).to.be.rejectedWith('Contract source do not correspond to the bytecode deployed on the chain'))
+
+  it('accepts matching bytecode with enabled validation', () => sdk.getContractInstance({
+    bytecode: testContractBytecode,
+    aci: testContractAci,
+    contractAddress: testContractAddress,
+    validateByteCode: true
+  }))
+
+  it('rejects not matching bytecode with enabled validation', async () => expect(sdk.getContractInstance({
+    bytecode: (await sdk.contractCompile(identityContractSource)).bytecode,
+    aci: await sdk.contractGetACI(identityContractSource, { filesystem }),
+    contractAddress: testContractAddress,
+    validateByteCode: true
+  })).to.be.rejectedWith('Contract bytecode do not correspond to the bytecode deployed on the chain'))
+
+  it('dry-runs init function', async () => {
     const res = await testContract.methods.init.get('test', 1, 'hahahaha')
     res.result.should.have.property('gasUsed')
     res.result.should.have.property('returnType')
     // TODO: ensure that return value is always can't be decoded (empty?)
   })
 
-  it('Dry-run deploy fn on specific account', async () => {
-    const current = await sdk.address()
-    const onAccount = sdk.addresses().find(acc => acc !== current)
+  it('dry-runs init function on specific account', async () => {
+    const [, onAccount] = sdk.addresses()
     const { result } = await testContract.methods.init.get('test', 1, 'hahahaha', { onAccount })
-    result.should.have.property('gasUsed')
-    result.should.have.property('returnType')
     result.callerId.should.be.equal(onAccount)
   })
 
-  it('Deploy contract before compile', async () => {
-    testContract.bytecode = null
-    await testContract.methods.init('test', 1, 'hahahaha')
-    const isCompiled = testContract.bytecode.length && testContract.bytecode.startsWith('cb_')
-    isCompiled.should.be.equal(true)
-  })
-
-  it('Deploy/Call contract with waitMined: false', async () => {
+  it('deploys and calls contract without waiting for mining', async () => {
     testContract.deployInfo = {}
     const deployed = await testContract.methods.init('test', 1, 'hahahaha', { waitMined: false })
     await sdk.poll(deployed.transaction, { interval: 50, attempts: 1200 })
     expect(deployed.result).to.be.equal(undefined)
     const result = await testContract.methods.intFn.send(2, { waitMined: false })
     expect(result.result).to.be.equal(undefined)
-    result.txData.should.not.be.equal(undefined)
+    expect(result.txData).to.not.be.equal(undefined)
     await sdk.poll(result.hash, { interval: 50, attempts: 1200 })
   })
 
-  it('Generate ACI object with corresponding bytecode', async () => {
-    await sdk.getContractInstance({
-      source: testContractSource, contractAddress: testContract.deployInfo.address, filesystem, ttl: 0
-    })
-  })
-
-  it('Generate ACI object with not corresponding bytecode', async () => {
-    await sdk.getContractInstance(
-      { source: identityContractSource, contractAddress: testContract.deployInfo.address, ttl: 0 }
-    )
-  })
-
-  it('Generate ACI object with not corresponding bytecode and check is code the same', async () => {
-    await expect(sdk.getContractInstance({
-      source: identityContractSource,
-      validateByteCode: true,
-      contractAddress: testContract.deployInfo.address,
-      ttl: 0
-    })).to.be.rejectedWith('Contract source do not correspond to the bytecode deployed on the chain')
-  })
-
-  it('Throw error on creating contract instance with invalid contractAddress', async () => {
-    await expect(sdk.getContractInstance(
-      { source: testContractSource, filesystem, contractAddress: 'ct_asdasdasd', ttl: 0 }
-    )).to.be.rejectedWith('Invalid name or address: ct_asdasdasd')
-  })
-
-  it('Throw error on creating contract instance with contract address which is not found on-chain or not active', async () => {
-    const contractAddress = 'ct_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT'
-    await expect(sdk.getContractInstance(
-      { source: testContractSource, filesystem, contractAddress, ttl: 0 }
-    )).to.be.rejectedWith(`Contract with address ${contractAddress} not found on-chain`)
-  })
-
-  it('Fail on paying to not payable function', async () => {
+  it('fails on paying to not payable function', async () => {
     const amount = 100
     await expect(testContract.methods.intFn.send(1, { amount }))
       .to.be.rejectedWith(`You try to pay "${amount}" to function "intFn" which is not payable. Only payable function can accept tokens`)
   })
 
-  it('Can pay to payable function', async () => {
+  it('pays to payable function', async () => {
     const contractBalance = await sdk.balance(testContract.deployInfo.address)
     await testContract.methods.stringFn.send('test', { amount: 100 })
     const balanceAfter = await sdk.balance(testContract.deployInfo.address)
     balanceAfter.should.be.equal(`${+contractBalance + 100}`)
   })
 
-  it('Call contract on specific account', async () => {
-    const current = await sdk.address()
-    const onAccount = sdk.addresses().find(acc => acc !== current)
+  it('calls on specific account', async () => {
+    const [, onAccount] = sdk.addresses()
     const { result } = await testContract.methods.intFn(123, { onAccount })
     result.callerId.should.be.equal(onAccount)
   })
