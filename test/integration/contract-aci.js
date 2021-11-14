@@ -20,16 +20,16 @@ import { decodeEvents, SOPHIA_TYPES } from '../../src/contract/aci/transformatio
 import { decode } from '../../src/tx/builder/helpers'
 import { getSdk } from './'
 
-const identityContract = `
+const identityContractSource = `
 contract Identity =
  entrypoint getArg(x : int) = x
 `
 
-const libContract = `
+const libContractSource = `
 namespace TestLib =
   function sum(x: int, y: int) : int = x + y
 `
-const testContract = `
+const testContractSource = `
 namespace Test =
   function double(x: int): int = x*2
 
@@ -99,15 +99,127 @@ contract StateContract =
     Chain.event(AnotherEvent2(true, "This is not indexed", 1))
 `
 const filesystem = {
-  testLib: libContract
+  testLib: libContractSource
 }
 
 describe('Contract ACI Interface', function () {
   let sdk
-  let contractObject
+  let testContract
 
   before(async function () {
     sdk = await getSdk()
+  })
+
+  it('Generate ACI object', async () => {
+    testContract = await sdk.getContractInstance({ source: testContractSource, filesystem, ttl: 0 })
+    testContract.should.have.property('interface')
+    testContract.should.have.property('aci')
+    testContract.should.have.property('source')
+    testContract.should.have.property('bytecode')
+    testContract.should.have.property('deployInfo')
+    testContract.should.have.property('compile')
+    testContract.should.have.property('call')
+    testContract.should.have.property('deploy')
+    testContract.options.ttl.should.be.equal(0)
+    testContract.options.should.have.property('filesystem')
+    testContract.options.filesystem.should.have.property('testLib')
+    const functionsFromACI = testContract.aci.functions.map(({ name }) => name)
+    const methods = Object.keys(testContract.methods)
+    expect(methods).to.be.eql(functionsFromACI)
+  })
+
+  it('Compile contract', async () => {
+    await testContract.compile()
+    const isCompiled = testContract.bytecode.length && testContract.bytecode.slice(0, 3) === 'cb_'
+    isCompiled.should.be.equal(true)
+  })
+
+  it('Dry-run deploy fn', async () => {
+    const res = await testContract.methods.init.get('test', 1, 'hahahaha')
+    res.result.should.have.property('gasUsed')
+    res.result.should.have.property('returnType')
+    // TODO: ensure that return value is always can't be decoded (empty?)
+  })
+
+  it('Dry-run deploy fn on specific account', async () => {
+    const current = await sdk.address()
+    const onAccount = sdk.addresses().find(acc => acc !== current)
+    const { result } = await testContract.methods.init.get('test', 1, 'hahahaha', { onAccount })
+    result.should.have.property('gasUsed')
+    result.should.have.property('returnType')
+    result.callerId.should.be.equal(onAccount)
+  })
+
+  it('Deploy contract before compile', async () => {
+    testContract.bytecode = null
+    await testContract.methods.init('test', 1, 'hahahaha')
+    const isCompiled = testContract.bytecode.length && testContract.bytecode.startsWith('cb_')
+    isCompiled.should.be.equal(true)
+  })
+
+  it('Deploy/Call contract with waitMined: false', async () => {
+    testContract.deployInfo = {}
+    const deployed = await testContract.methods.init('test', 1, 'hahahaha', { waitMined: false })
+    await sdk.poll(deployed.transaction, { interval: 50, attempts: 1200 })
+    expect(deployed.result).to.be.equal(undefined)
+    const result = await testContract.methods.intFn.send(2, { waitMined: false })
+    expect(result.result).to.be.equal(undefined)
+    result.txData.should.not.be.equal(undefined)
+    await sdk.poll(result.hash, { interval: 50, attempts: 1200 })
+  })
+
+  it('Generate ACI object with corresponding bytecode', async () => {
+    await sdk.getContractInstance({
+      source: testContractSource, contractAddress: testContract.deployInfo.address, filesystem, ttl: 0
+    })
+  })
+
+  it('Generate ACI object with not corresponding bytecode', async () => {
+    await sdk.getContractInstance(
+      { source: identityContractSource, contractAddress: testContract.deployInfo.address, ttl: 0 }
+    )
+  })
+
+  it('Generate ACI object with not corresponding bytecode and check is code the same', async () => {
+    await expect(sdk.getContractInstance({
+      source: identityContractSource,
+      validateByteCode: true,
+      contractAddress: testContract.deployInfo.address,
+      ttl: 0
+    })).to.be.rejectedWith('Contract source do not correspond to the bytecode deployed on the chain')
+  })
+
+  it('Throw error on creating contract instance with invalid contractAddress', async () => {
+    await expect(sdk.getContractInstance(
+      { source: testContractSource, filesystem, contractAddress: 'ct_asdasdasd', ttl: 0 }
+    )).to.be.rejectedWith('Invalid name or address: ct_asdasdasd')
+  })
+
+  it('Throw error on creating contract instance with contract address which is not found on-chain or not active', async () => {
+    const contractAddress = 'ct_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT'
+    await expect(sdk.getContractInstance(
+      { source: testContractSource, filesystem, contractAddress, ttl: 0 }
+    )).to.be.rejectedWith(`Contract with address ${contractAddress} not found on-chain`)
+  })
+
+  it('Fail on paying to not payable function', async () => {
+    const amount = 100
+    await expect(testContract.methods.intFn.send(1, { amount }))
+      .to.be.rejectedWith(`You try to pay "${amount}" to function "intFn" which is not payable. Only payable function can accept tokens`)
+  })
+
+  it('Can pay to payable function', async () => {
+    const contractBalance = await sdk.balance(testContract.deployInfo.address)
+    await testContract.methods.stringFn.send('test', { amount: 100 })
+    const balanceAfter = await sdk.balance(testContract.deployInfo.address)
+    balanceAfter.should.be.equal(`${+contractBalance + 100}`)
+  })
+
+  it('Call contract on specific account', async () => {
+    const current = await sdk.address()
+    const onAccount = sdk.addresses().find(acc => acc !== current)
+    const { result } = await testContract.methods.intFn(123, { onAccount })
+    result.callerId.should.be.equal(onAccount)
   })
 
   describe('Events parsing', async () => {
@@ -118,7 +230,7 @@ describe('Contract ACI Interface', function () {
     let decodedEventsUsingBuildInMethod
 
     before(async () => {
-      cInstance = await sdk.getContractInstance({ source: testContract, filesystem })
+      cInstance = await sdk.getContractInstance({ source: testContractSource, filesystem })
       await cInstance.deploy(['test', 1, 'some'])
       eventResult = await cInstance.methods.emitEvents()
       const { log } = await sdk.tx(eventResult.hash)
@@ -165,139 +277,27 @@ describe('Contract ACI Interface', function () {
       })
   })
 
-  it('Generate ACI object', async () => {
-    contractObject = await sdk.getContractInstance({ source: testContract, filesystem, ttl: 0 })
-    contractObject.should.have.property('interface')
-    contractObject.should.have.property('aci')
-    contractObject.should.have.property('source')
-    contractObject.should.have.property('bytecode')
-    contractObject.should.have.property('deployInfo')
-    contractObject.should.have.property('compile')
-    contractObject.should.have.property('call')
-    contractObject.should.have.property('deploy')
-    contractObject.options.ttl.should.be.equal(0)
-    contractObject.options.should.have.property('filesystem')
-    contractObject.options.filesystem.should.have.property('testLib')
-    const functionsFromACI = contractObject.aci.functions.map(({ name }) => name)
-    const methods = Object.keys(contractObject.methods)
-    expect(methods).to.be.eql(functionsFromACI)
-  })
-
-  it('Compile contract', async () => {
-    await contractObject.compile()
-    const isCompiled = contractObject.bytecode.length && contractObject.bytecode.slice(0, 3) === 'cb_'
-    isCompiled.should.be.equal(true)
-  })
-
-  it('Dry-run deploy fn', async () => {
-    const res = await contractObject.methods.init.get('test', 1, 'hahahaha')
-    res.result.should.have.property('gasUsed')
-    res.result.should.have.property('returnType')
-    // TODO: ensure that return value is always can't be decoded (empty?)
-  })
-
-  it('Dry-run deploy fn on specific account', async () => {
-    const current = await sdk.address()
-    const onAccount = sdk.addresses().find(acc => acc !== current)
-    const { result } = await contractObject.methods.init.get('test', 1, 'hahahaha', { onAccount })
-    result.should.have.property('gasUsed')
-    result.should.have.property('returnType')
-    result.callerId.should.be.equal(onAccount)
-  })
-
-  it('Deploy contract before compile', async () => {
-    contractObject.bytecode = null
-    await contractObject.methods.init('test', 1, 'hahahaha')
-    const isCompiled = contractObject.bytecode.length && contractObject.bytecode.startsWith('cb_')
-    isCompiled.should.be.equal(true)
-  })
-
-  it('Deploy/Call contract with waitMined: false', async () => {
-    contractObject.deployInfo = {}
-    const deployed = await contractObject.methods.init('test', 1, 'hahahaha', { waitMined: false })
-    await sdk.poll(deployed.transaction, { interval: 50, attempts: 1200 })
-    expect(deployed.result).to.be.equal(undefined)
-    const result = await contractObject.methods.intFn.send(2, { waitMined: false })
-    expect(result.result).to.be.equal(undefined)
-    result.txData.should.not.be.equal(undefined)
-    await sdk.poll(result.hash, { interval: 50, attempts: 1200 })
-  })
-
-  it('Generate ACI object with corresponding bytecode', async () => {
-    await sdk.getContractInstance({
-      source: testContract, contractAddress: contractObject.deployInfo.address, filesystem, ttl: 0
-    })
-  })
-
-  it('Generate ACI object with not corresponding bytecode', async () => {
-    await sdk.getContractInstance(
-      { source: identityContract, contractAddress: contractObject.deployInfo.address, ttl: 0 }
-    )
-  })
-
-  it('Generate ACI object with not corresponding bytecode and check is code the same', async () => {
-    await expect(sdk.getContractInstance({
-      source: identityContract,
-      validateByteCode: true,
-      contractAddress: contractObject.deployInfo.address,
-      ttl: 0
-    })).to.be.rejectedWith('Contract source do not correspond to the bytecode deployed on the chain')
-  })
-
-  it('Throw error on creating contract instance with invalid contractAddress', async () => {
-    await expect(sdk.getContractInstance(
-      { source: testContract, filesystem, contractAddress: 'ct_asdasdasd', ttl: 0 }
-    )).to.be.rejectedWith('Invalid name or address: ct_asdasdasd')
-  })
-
-  it('Throw error on creating contract instance with contract address which is not found on-chain or not active', async () => {
-    const contractAddress = 'ct_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT'
-    await expect(sdk.getContractInstance(
-      { source: testContract, filesystem, contractAddress, ttl: 0 }
-    )).to.be.rejectedWith(`Contract with address ${contractAddress} not found on-chain`)
-  })
-
-  it('Fail on paying to not payable function', async () => {
-    const amount = 100
-    await expect(contractObject.methods.intFn.send(1, { amount }))
-      .to.be.rejectedWith(`You try to pay "${amount}" to function "intFn" which is not payable. Only payable function can accept tokens`)
-  })
-
-  it('Can pay to payable function', async () => {
-    const contractBalance = await sdk.balance(contractObject.deployInfo.address)
-    await contractObject.methods.stringFn.send('test', { amount: 100 })
-    const balanceAfter = await sdk.balance(contractObject.deployInfo.address)
-    balanceAfter.should.be.equal(`${+contractBalance + 100}`)
-  })
-
-  it('Call contract on specific account', async () => {
-    const current = await sdk.address()
-    const onAccount = sdk.addresses().find(acc => acc !== current)
-    const { result } = await contractObject.methods.intFn(123, { onAccount })
-    result.callerId.should.be.equal(onAccount)
-  })
-
   describe('Arguments Validation and Casting', function () {
     describe('INT', function () {
       it('Invalid', async () => {
-        await expect(contractObject.methods.intFn('asd'))
+        await expect(testContract.methods.intFn('asd'))
           .to.be.rejectedWith('Cannot convert asd to a number')
       })
 
       it('Valid', async () => {
-        const { decodedResult } = await contractObject.methods.intFn.get(1)
+        const { decodedResult } = await testContract.methods.intFn.get(1)
         decodedResult.toString().should.be.equal('1')
       })
     })
 
     describe('BOOL', function () {
       it('Accepts empty object as true', async () => {
-        const { decodedResult } = await contractObject.methods.boolFn({})
+        const { decodedResult } = await testContract.methods.boolFn({})
         decodedResult.should.be.equal(true)
       })
 
       it('Valid', async () => {
-        const { decodedResult } = await contractObject.methods.boolFn.get(true)
+        const { decodedResult } = await testContract.methods.boolFn.get(true)
         decodedResult.should.be.equal(true)
       })
     })
@@ -305,93 +305,93 @@ describe('Contract ACI Interface', function () {
     describe('STRING', function () {
       it('Accepts array as joined string', async () => {
         const arr = [1, 2, 3]
-        const { decodedResult } = await contractObject.methods.stringFn(arr)
+        const { decodedResult } = await testContract.methods.stringFn(arr)
         decodedResult.should.be.equal(arr.join(','))
       })
 
       it('Accepts number as string', async () => {
-        const { decodedResult } = await contractObject.methods.stringFn(123)
+        const { decodedResult } = await testContract.methods.stringFn(123)
         decodedResult.should.be.equal('123')
       })
 
       it('Valid', async () => {
-        const { decodedResult } = await contractObject.methods.stringFn('test-string')
+        const { decodedResult } = await testContract.methods.stringFn('test-string')
         decodedResult.should.be.equal('test-string')
       })
     })
 
     describe('ADDRESS', function () {
       it('Invalid address', async () => {
-        await expect(contractObject.methods.addressFn('asdasasd'))
+        await expect(testContract.methods.addressFn('asdasasd'))
           .to.be.rejectedWith('Address should start with ak_, got asdasasd instead')
       })
 
       it('Invalid address type', async () => {
-        await expect(contractObject.methods.addressFn(333)).to.be
+        await expect(testContract.methods.addressFn(333)).to.be
           .rejectedWith('Address should start with ak_, got 333 instead')
       })
 
       it('Return address', async () => {
-        const { decodedResult } = await contractObject.methods.accountAddress(await sdk.address())
+        const { decodedResult } = await testContract.methods.accountAddress(await sdk.address())
         decodedResult.should.be.equal(await sdk.address())
       })
 
       it('Valid', async () => {
-        const { decodedResult } = await contractObject.methods.addressFn('ak_2ct6nMwmRnyGX6jPhraFPedZ5bYp1GXqpvnAq5LXeL5TTPfFif')
+        const { decodedResult } = await testContract.methods.addressFn('ak_2ct6nMwmRnyGX6jPhraFPedZ5bYp1GXqpvnAq5LXeL5TTPfFif')
         decodedResult.should.be.equal('ak_2ct6nMwmRnyGX6jPhraFPedZ5bYp1GXqpvnAq5LXeL5TTPfFif')
       })
     })
 
     describe('TUPLE', function () {
       it('Invalid type', async () => {
-        await expect(contractObject.methods.tupleFn('asdasasd'))
+        await expect(testContract.methods.tupleFn('asdasasd'))
           .to.be.rejectedWith('Tuple must be an array, got asdasasd instead')
       })
 
       it('Invalid tuple prop type', async () => {
-        await expect(contractObject.methods.tupleFn([1, 'test-string']))
+        await expect(testContract.methods.tupleFn([1, 'test-string']))
           .to.be.rejectedWith('Cannot convert test-string to a number')
       })
 
       it('Required tuple prop', async () => {
-        await expect(contractObject.methods.tupleFn([1]))
+        await expect(testContract.methods.tupleFn([1]))
           .to.be.rejectedWith('Cannot convert undefined to a number')
       })
 
       it('Wrong type in list inside tuple', async () => {
-        await expect(contractObject.methods.tupleWithList([['test-string'], 1]))
+        await expect(testContract.methods.tupleWithList([['test-string'], 1]))
           .to.be.rejectedWith('Cannot convert test-string to a number')
       })
 
       it('Wrong type in tuple inside tuple', async () => {
-        await expect(contractObject.methods.tupleInTupleFn([['str', 'test-string'], 1]))
+        await expect(testContract.methods.tupleInTupleFn([['str', 'test-string'], 1]))
           .to.be.rejectedWith('Cannot convert test-string to a number')
       })
 
       it('Valid', async () => {
-        const { decodedResult } = await contractObject.methods.tupleFn(['test', 1])
+        const { decodedResult } = await testContract.methods.tupleFn(['test', 1])
         decodedResult.should.be.eql(['test', 1n])
       })
     })
 
     describe('LIST', function () {
       it('Invalid type', async () => {
-        await expect(contractObject.methods.listFn('asdasasd'))
+        await expect(testContract.methods.listFn('asdasasd'))
           .to.be.rejectedWith('List must be an array, got asdasasd instead')
       })
 
       it('Invalid list element type', async () => {
-        await expect(contractObject.methods.listFn([1, 'test-string']))
+        await expect(testContract.methods.listFn([1, 'test-string']))
           .to.be.rejectedWith('Cannot convert test-string to a number')
       })
 
       it('Invalid list element type nested', async () => {
-        await expect(contractObject.methods.listInListFn([['childListWronmgElement'], 'parentListWrongElement']))
+        await expect(testContract.methods.listInListFn([['childListWronmgElement'], 'parentListWrongElement']))
           .to.be.rejectedWith('Cannot convert childListWronmgElement to a number')
       })
 
       it('Valid', async () => {
-        const { decodedResult } = await contractObject.methods.listInListFn([[1, 2], [3, 4]])
+        const { decodedResult } = await testContract.methods.listInListFn([[1, 2], [3, 4]])
         decodedResult.should.be.eql([[1n, 2n], [3n, 4n]])
       })
     })
@@ -401,131 +401,131 @@ describe('Contract ACI Interface', function () {
 
       it('Valid', async () => {
         const mapArg = new Map([[address, ['someStringV', 324n]]])
-        const { decodedResult } = await contractObject.methods.mapFn(mapArg)
+        const { decodedResult } = await testContract.methods.mapFn(mapArg)
         decodedResult.should.be.eql(mapArg)
       })
 
       it('Map With Option Value', async () => {
         const mapWithSomeValue = new Map([[address, ['someStringV', 123n]]])
         const mapWithNoneValue = new Map([[address, ['someStringV', undefined]]])
-        let result = await contractObject.methods.mapOptionFn(mapWithSomeValue)
+        let result = await testContract.methods.mapOptionFn(mapWithSomeValue)
         result.decodedResult.should.be.eql(mapWithSomeValue)
-        result = await contractObject.methods.mapOptionFn(mapWithNoneValue)
+        result = await testContract.methods.mapOptionFn(mapWithNoneValue)
         result.decodedResult.should.be.eql(mapWithNoneValue)
       })
 
       it('Cast from string to int', async () => {
         const mapArg = new Map([[address, ['someStringV', '324']]])
-        const result = await contractObject.methods.mapFn(mapArg)
+        const result = await testContract.methods.mapFn(mapArg)
         mapArg.set(address, ['someStringV', 324n])
         result.decodedResult.should.be.eql(mapArg)
       })
 
       it('Cast from array to map', async () => {
         const mapArg = [[address, ['someStringV', 324n]]]
-        const { decodedResult } = await contractObject.methods.mapFn(mapArg)
+        const { decodedResult } = await testContract.methods.mapFn(mapArg)
         decodedResult.should.be.eql(new Map(mapArg))
       })
     })
 
     describe('RECORD/STATE', function () {
       it('Valid Set Record (Cast from JS object)', async () => {
-        await contractObject.methods.setRecord({ value: 'qwe', key: 1234, testOption: 'test' })
-        const state = await contractObject.methods.getRecord()
+        await testContract.methods.setRecord({ value: 'qwe', key: 1234, testOption: 'test' })
+        const state = await testContract.methods.getRecord()
         state.decodedResult.should.be.eql({ value: 'qwe', key: 1234n, testOption: 'test' })
       })
 
       it('Get Record(Convert to JS object)', async () => {
-        const result = await contractObject.methods.getRecord()
+        const result = await testContract.methods.getRecord()
         result.decodedResult.should.be.eql({ value: 'qwe', key: 1234n, testOption: 'test' })
       })
 
       it('Get Record With Option (Convert to JS object)', async () => {
-        await contractObject.methods.setRecord({ key: 1234, value: 'qwe', testOption: 'resolved string' })
-        const result = await contractObject.methods.getRecord()
+        await testContract.methods.setRecord({ key: 1234, value: 'qwe', testOption: 'resolved string' })
+        const result = await testContract.methods.getRecord()
         result.decodedResult.should.be.eql({ value: 'qwe', key: 1234n, testOption: 'resolved string' })
       })
 
       it('Invalid value type', async () => {
-        await expect(contractObject.methods.setRecord({ value: 123, key: 'test' }))
+        await expect(testContract.methods.setRecord({ value: 123, key: 'test' }))
           .to.be.rejectedWith('Cannot convert test to a number')
       })
     })
 
     describe('OPTION', function () {
       it('Set Some Option Value(Cast from JS value/Convert result to JS)', async () => {
-        const optionRes = await contractObject.methods.intOption(123)
+        const optionRes = await testContract.methods.intOption(123)
         optionRes.decodedResult.should.be.equal(123n)
       })
 
       it('Set Some Option List Value(Cast from JS value/Convert result to JS)', async () => {
-        const optionRes = await contractObject.methods.listOption([[1, 'testString']])
+        const optionRes = await testContract.methods.listOption([[1, 'testString']])
         optionRes.decodedResult.should.be.eql([[1n, 'testString']])
       })
 
       it('Set None Option Value(Cast from JS value/Convert to JS)', async () => {
-        const optionRes = await contractObject.methods.intOption(null)
+        const optionRes = await testContract.methods.intOption(null)
         expect(optionRes.decodedResult).to.be.equal(undefined)
       })
 
       it('Invalid option type', async () => {
-        await expect(contractObject.methods.intOption('test-string'))
+        await expect(testContract.methods.intOption('test-string'))
           .to.be.rejectedWith('Cannot convert test-string to a number')
       })
     })
 
     describe('NAMESPACES', function () {
       it('Use namespace in function body', async () => {
-        const res = await contractObject.methods.usingExternalLib(2)
+        const res = await testContract.methods.usingExternalLib(2)
         res.decodedResult.should.be.equal(4n)
       })
     })
 
     describe('DATATYPE', function () {
       it('Invalid type', async () => {
-        await expect(contractObject.methods.datTypeFn({}))
+        await expect(testContract.methods.datTypeFn({}))
           .to.be.rejectedWith('Unknown variant: undefined')
       })
 
       it('Call generic datatype', async () => {
-        const res = await contractObject.methods.datTypeGFn({ Left: [2] })
+        const res = await testContract.methods.datTypeGFn({ Left: [2] })
         res.decodedResult.should.be.equal(2n)
       })
 
       it('Invalid arguments length', async () => {
-        await expect(contractObject.methods.datTypeGFn())
+        await expect(testContract.methods.datTypeGFn())
           .to.be.rejectedWith('Non matching number of arguments. Got 0 but expected from 1 to 1')
       })
 
       it('Invalid variant', async () => {
-        await expect(contractObject.methods.datTypeFn({ asdcxz: [] }))
+        await expect(testContract.methods.datTypeFn({ asdcxz: [] }))
           .to.be.rejectedWith('Unknown variant: asdcxz')
       })
 
       it('Valid', async () => {
-        const res = await contractObject.methods.datTypeFn({ Year: [] })
+        const res = await testContract.methods.datTypeFn({ Year: [] })
         res.decodedResult.should.be.eql({ Year: [] })
       })
     })
 
     describe('Hash', function () {
       it('Invalid type', async () => {
-        await expect(contractObject.methods.hashFn({}))
+        await expect(testContract.methods.hashFn({}))
           .to.be.rejectedWith('Should be one of: Array, ArrayBuffer, hex string, Number, BigInt; got [object Object] instead')
       })
 
       it('Invalid length', async () => {
         const address = await sdk.address()
         const decoded = Buffer.from(decode(address, 'ak').slice(1))
-        await expect(contractObject.methods.hashFn(decoded))
+        await expect(testContract.methods.hashFn(decoded))
           .to.be.rejectedWith('Invalid length: got 31 bytes instead of 32 bytes')
       })
 
       it('Valid', async () => {
         const address = await sdk.address()
         const decoded = decode(address, 'ak')
-        const hashAsBuffer = await contractObject.methods.hashFn(decoded)
-        const hashAsHex = await contractObject.methods.hashFn(decoded.toString('hex'))
+        const hashAsBuffer = await testContract.methods.hashFn(decoded)
+        const hashAsHex = await testContract.methods.hashFn(decoded.toString('hex'))
         hashAsBuffer.decodedResult.should.be.eql(decoded)
         hashAsHex.decodedResult.should.be.eql(decoded)
       })
@@ -533,14 +533,14 @@ describe('Contract ACI Interface', function () {
 
     describe('Signature', function () {
       it('Invalid type', async () => {
-        await expect(contractObject.methods.signatureFn({}))
+        await expect(testContract.methods.signatureFn({}))
           .to.be.rejectedWith('Should be one of: Array, ArrayBuffer, hex string, Number, BigInt; got [object Object] instead')
       })
 
       it('Invalid length', async () => {
         const address = await sdk.address()
         const decoded = decode(address, 'ak')
-        await expect(contractObject.methods.signatureFn(decoded))
+        await expect(testContract.methods.signatureFn(decoded))
           .to.be.rejectedWith('Invalid length: got 32 bytes instead of 64 bytes')
       })
 
@@ -548,8 +548,8 @@ describe('Contract ACI Interface', function () {
         const address = await sdk.address()
         const decoded = decode(address, 'ak')
         const fakeSignature = Buffer.from(await sdk.sign(decoded))
-        const hashAsBuffer = await contractObject.methods.signatureFn(fakeSignature)
-        const hashAsHex = await contractObject.methods.signatureFn(fakeSignature.toString('hex'))
+        const hashAsBuffer = await testContract.methods.signatureFn(fakeSignature)
+        const hashAsHex = await testContract.methods.signatureFn(fakeSignature.toString('hex'))
         hashAsBuffer.decodedResult.should.be.eql(fakeSignature)
         hashAsHex.decodedResult.should.be.eql(fakeSignature)
       })
@@ -557,22 +557,22 @@ describe('Contract ACI Interface', function () {
 
     describe('Bytes', function () {
       it('Invalid type', async () => {
-        await expect(contractObject.methods.bytesFn({}))
+        await expect(testContract.methods.bytesFn({}))
           .to.be.rejectedWith('Should be one of: Array, ArrayBuffer, hex string, Number, BigInt; got [object Object] instead')
       })
 
       it('Invalid length', async () => {
         const address = await sdk.address()
         const decoded = decode(address, 'ak')
-        await expect(contractObject.methods.bytesFn(Buffer.from([...decoded, 2])))
+        await expect(testContract.methods.bytesFn(Buffer.from([...decoded, 2])))
           .to.be.rejectedWith('is not of type [{bytes,32}]')
       })
 
       it('Valid', async () => {
         const address = await sdk.address()
         const decoded = decode(address, 'ak')
-        const hashAsBuffer = await contractObject.methods.bytesFn(decoded)
-        const hashAsHex = await contractObject.methods.bytesFn(decoded.toString('hex'))
+        const hashAsBuffer = await testContract.methods.bytesFn(decoded)
+        const hashAsHex = await testContract.methods.bytesFn(decoded.toString('hex'))
         hashAsBuffer.decodedResult.should.be.eql(decoded)
         hashAsHex.decodedResult.should.be.eql(decoded)
       })
@@ -581,12 +581,12 @@ describe('Contract ACI Interface', function () {
 
   describe('Call contract', function () {
     it('Call contract using using js type arguments', async () => {
-      const res = await contractObject.methods.listFn([1, 2])
+      const res = await testContract.methods.listFn([1, 2])
       expect(res.decodedResult).to.be.eql([1n, 2n])
     })
 
     it('Call contract with contract type argument', async () => {
-      const result = await contractObject.methods.approve(0, 'ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh')
+      const result = await testContract.methods.approve(0, 'ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh')
       expect(result.decodedResult).to.be.equal(0n)
     })
   })
