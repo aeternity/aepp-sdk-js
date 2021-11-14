@@ -85,7 +85,9 @@ const ContractBase = stampit(required({
  * @instance
  * @abstract
  * @category async
- * @rtype (source: String, fn: String, callValue: String, callResult: String, options: Array) => decodedResult: Promise[String]
+ * @rtype (
+ *   source: String, fn: String, callValue: String, callResult: String, options: Array
+ * ) => decodedResult: Promise[String]
  * @param {String} source - Contract source
  * @param {String} fn - Fn name
  * @param {String} callValue - result data (cb_das...)
@@ -101,7 +103,9 @@ const ContractBase = stampit(required({
  * @instance
  * @abstract
  * @category async
- * @rtype (source: String, function: String, callData: String, options: Array) => decodedResult: Promise[String]
+ * @rtype (
+ *   source: String, function: String, callData: String, options: Array
+ * ) => decodedResult: Promise[String]
  * @param {String} source - contract source
  * @param {String} function - function name
  * @param {String} callData - Encoded contract call data

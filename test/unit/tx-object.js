@@ -49,7 +49,14 @@ describe('TxObject', () => {
     it('Build transaction', async () => {
       txObject = TxObject({
         type: TX_TYPE.spend,
-        params: { senderId: keyPair.publicKey, recipientId: keyPair.publicKey, amount: 100, ttl: 0, nonce: 1, fee: 100 }
+        params: {
+          senderId: keyPair.publicKey,
+          recipientId: keyPair.publicKey,
+          amount: 100,
+          ttl: 0,
+          nonce: 1,
+          fee: 100
+        }
       })
       signedTx = await MemoryAccount({ keypair: keyPair, networkId: 'ae_mainnet' }).signTransaction(txObject.encodedTx)
       txObject.encodedTx.should.be.a('string')
@@ -66,7 +73,8 @@ describe('TxObject', () => {
       txFromString.params.should.be.deep.include(txObject.params)
       const rtxFromRlpBinary = TxObject.fromRlp(txObject.rlpEncoded)
       rtxFromRlpBinary.rlpEncoded.equals(txObject.rlpEncoded).should.be.equal(true)
-      Buffer.from(rtxFromRlpBinary.binary).equals(Buffer.from(txObject.binary)).should.be.equal(true)
+      Buffer.from(rtxFromRlpBinary.binary).equals(Buffer.from(txObject.binary))
+        .should.be.equal(true)
       rtxFromRlpBinary.encodedTx.should.be.equal(txObject.encodedTx)
       rtxFromRlpBinary.params.should.be.deep.include(txObject.params)
     })

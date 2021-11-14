@@ -149,7 +149,9 @@ export default AsyncInit.compose(ContractBase, {
      * @param {Object} [options.filesystem={}] Contract external namespaces map
      * @return {Promise<String>} Result object
      * @example
-     * const decodedData = await sdk.contractDecodeCallResultAPI(SourceCode ,'functionName', 'cb_asdasdasd...', 'ok|revert')lt
+     * const decodedData = await sdk.contractDecodeCallResultAPI(
+     *   SourceCode ,'functionName', 'cb_asdasdasd...', 'ok|revert'
+     * )
      */
     contractDecodeCallResultAPI (source, fn, callValue, callResult, options) {
       this._ensureCompilerReady()
@@ -172,7 +174,9 @@ export default AsyncInit.compose(ContractBase, {
     },
     getFateAssembler (bytecode, options) {
       this._ensureCompilerReady()
-      return this._compilerApi.getFateAssemblerCode({ bytecode, options: this._prepareCompilerOptions(options) })
+      return this._compilerApi.getFateAssemblerCode(
+        { bytecode, options: this._prepareCompilerOptions(options) }
+      )
     },
     getBytecodeCompilerVersion (bytecode, options) {
       this._ensureCompilerReady()

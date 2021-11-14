@@ -54,7 +54,8 @@ const COMPILER_URL = 'https://compiler.aepps.com';
 // Note:
 //
 //  - The keypair of the account is pre-funded and only used for demonstration purpose
-//      - You should replace it with your own keypair (see [Create a Keypair](../../quick-start.md#2-create-a-keypair))
+//      - You should replace it with your own keypair (see
+//        [Create a Keypair](../../quick-start.md#2-create-a-keypair))
 //  - In case the account runs out of funds you can always request AE using the [Faucet](https://faucet.aepps.com/)
 
 // ## 3. Open async codeblock
@@ -71,8 +72,9 @@ const COMPILER_URL = 'https://compiler.aepps.com';
     accounts: [account]
   })
 
-  // The `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp) itself is asynchronous as it determines the node's version and
-  // rest interface automatically. Only once the Promise is fulfilled, you know you have a working object instance
+  // The `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp) itself is
+  // asynchronous as it determines the node's version and rest interface automatically. Only once
+  // the Promise is fulfilled, you know you have a working object instance
   // which is assigned to the `client` constant in this case.
   //
   // Note:
@@ -90,8 +92,8 @@ const COMPILER_URL = 'https://compiler.aepps.com';
 
   // ## 6. Deploy the contract
   // Invoking `deploy` on the bytecode object will result in the `CreateContractTx`
-  // being created, signed (using the _secretKey_ of the previously defined `MemoryAccount`) and broadcasted to the network.
-  // It will be picked up by the miners and written to the chain.
+  // being created, signed (using the _secretKey_ of the previously defined `MemoryAccount`) and
+  // broadcasted to the network. It will be picked up by the miners and written to the chain.
 
   const contract = await bytecode.deploy([5])
   console.log(`Contract deployed at ${contract.address}`)
@@ -99,18 +101,21 @@ const COMPILER_URL = 'https://compiler.aepps.com';
   // Note:
   //
   //  - Sophia contracts always have an `init` function which needs to be invoked.
-  //  - The SDK receives the required `calldata` for the provided arguments by calling the HTTP compiler.
+  //  - The SDK receives the required `calldata` for the provided arguments by calling the HTTP
+  //    compiler.
 
   // ## 7. Call a contract function via dry-run
   // Once the `ContractCreateTx` has been successfully mined, you can attempt to invoke
   // any public function (aka `entrypoint` in Sophia) defined within it.
-  // In this case you can use `callStatic` which performs a `dry-run` of the transaction which allows you to get the result without having to mine a transaction.
+  // In this case you can use `callStatic` which performs a `dry-run` of the transaction which
+  // allows you to get the result without having to mine a transaction.
 
   const call = await contract.callStatic('multiplyBy', [7])
 
   // **Note**:
   //
-  //    - for `stateful entrypoints` that may apply changes to the contract's state you will always have to use `call` which broadcasts the transaction to be mined
+  //    - for `stateful entrypoints` that may apply changes to the contract's state you will always
+  //      have to use `call` which broadcasts the transaction to be mined
 
   // ## 8. Decode the call result
   // The execution result, if successful, will be an FATE-encoded result value.
@@ -122,17 +127,22 @@ const COMPILER_URL = 'https://compiler.aepps.com';
   // Knowing the contract address and the source code allows you to
   // initialize a contract instance and interact with the contract in a convenient way.
 
-  const contractInstance = await client.getContractInstance({ source: CONTRACT_CODE, contractAddress: contract.address })
+  const contractInstance = await client.getContractInstance(
+    { source: CONTRACT_CODE, contractAddress: contract.address }
+  )
   const callResult = await contractInstance.methods.multiplyBy(7)
   console.log(`Execution result (via contractInstance initialized with existing contract): ${callResult.decodedResult}`)
 
   // Note:
   //
-  //  - The `contractInstance` automatically chooses to perform a dry-run call as `multiplyBy` is a non-stateful entrypoint
-  //      - if `multiplyBy` would be a `stateful entrypoint` the transaction would be broadcasted to the network and picked up by miners
+  //  - The `contractInstance` automatically chooses to perform a dry-run call as `multiplyBy` is a
+  //    non-stateful entrypoint
+  //      - if `multiplyBy` would be a `stateful entrypoint` the transaction would be broadcasted to
+  //        the network and picked up by miners
   //  - The `decodedResult` is automatically being included in the `callResult`
-  //  - You can also use `getContractInstance` directly to deploy a contract
-  //    and avoid having to call `contractCompile` (step 5),  `call`/`callStatic` (step 7) and `decode` (step 8) manually
+  //  - You can also use `getContractInstance` directly to deploy a contract and avoid having to
+  //    call `contractCompile` (step 5),  `call`/`callStatic` (step 7) and `decode` (step 8)
+  //    manually
   //      - see [Contracts Guide](../../guides/contracts.md)
 
 // ## 10. Close and run async codeblock

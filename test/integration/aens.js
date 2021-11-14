@@ -99,7 +99,7 @@ contract Identity =
     const address = await sdk.address()
     const anotherContract = buildContractId(address, 12)
     const newPointers = [address, address.replace('ak', 'ok'), anotherContract]
-    return nameObject.update([anotherContract], { extendPointers: true }).should.eventually.deep.include({
+    expect(await nameObject.update([anotherContract], { extendPointers: true })).to.deep.include({
       pointers: newPointers.map(p => Object.fromEntries([['key', classify(p)], ['id', p]]))
     })
   })

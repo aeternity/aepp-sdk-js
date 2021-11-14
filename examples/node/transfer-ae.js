@@ -45,10 +45,12 @@ const [amount = 1, recipient = ACCOUNT_KEYPAIR.publicKey] = process.argv.slice(2
 // Note:
 //
 //  - The keypair of the account is pre-funded and only used for demonstration purpose
-//      - You should replace it with your own keypair (see [Create a Keypair](../../quick-start.md#2-create-a-keypair))
+//      - You should replace it with your own keypair
+//        (see [Create a Keypair](../../quick-start.md#2-create-a-keypair))
 //  - In case the account runs out of funds you can always request AE using the [Faucet](https://faucet.aepps.com/)
 //  - By default the script will transfer `1 aetto` and use the demo account itself as recipient
-//      - Optionally you can provide the amount and a different recipient by providing the arguments when executing the script,
+//      - Optionally you can provide the amount and a different recipient by providing the
+//        arguments when executing the script,
 //        e.g. `node transfer-ae.js 3 ak_6D2uyunJaERXfgbsc94G8vrp79nZrbtorL7VCRXk3sWiFK5jb`
 
 // ## 3. Open async codeblock
@@ -64,8 +66,9 @@ const [amount = 1, recipient = ACCOUNT_KEYPAIR.publicKey] = process.argv.slice(2
     accounts: [account]
   })
 
-  // The `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp) itself is asynchronous as it determines the node's version and
-  // rest interface automatically. Only once the Promise is fulfilled, you know you have a working object instance
+  // The `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp) itself is
+  // asynchronous as it determines the node's version and rest interface automatically. Only once
+  // the Promise is fulfilled, you know you have a working object instance
   // which is assigned to the `client` constant in this case.
   //
   // Note:
@@ -88,8 +91,9 @@ const [amount = 1, recipient = ACCOUNT_KEYPAIR.publicKey] = process.argv.slice(2
 
   // Note:
   //
-  //  - If the recipient is the same account as the sender (default of the script if no arguments provided) the balance will be lower
-  //    after transfer because a transaction `fee` has been paid to the miners.
+  //  - If the recipient is the same account as the sender (default of the script if no arguments
+  //    provided) the balance will be lower after transfer because a transaction `fee` has been
+  //    paid to the miners.
 
 // ## 8. Close and run async codeblock
 // Now you can close the async codeblock and execute it at the same time.

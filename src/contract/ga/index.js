@@ -45,7 +45,9 @@ import { hash } from '../../utils/crypto'
  * const callData = 'cb_...' // encoded call data for auth contract
  * await client.spend(10000, receiverPub, { authData: { callData } })
  * // or
- * await client.spend(10000, receiverPub, { authData: { source: authContract, args: [...authContractArgs] } }) // sdk will prepare callData itself
+ * await client.spend(10000, receiverPub, {
+ *   authData: { source: authContract, args: [...authContractArgs] }
+ * }) // sdk will prepare callData itself
  */
 export const GeneralizeAccount = ContractAPI.compose({
   methods: {
@@ -76,7 +78,9 @@ async function isGA (address) {
  * @param {String} source - Auth contract source code
  * @param {Array} [args] - init arguments
  * @param {Object} [options] - Options
- * @return {Promise<Readonly<{result: *, owner: *, createdAt: Date, address, rawTx: *, transaction: *}>>}
+ * @return {Promise<Readonly<{
+ *   result: *, owner: *, createdAt: Date, address, rawTx: *, transaction: *
+ * }>>}
  */
 async function createGeneralizeAccount (authFnName, source, args = [], options = {}) {
   const opt = { ...this.Ae.defaults, ...options }

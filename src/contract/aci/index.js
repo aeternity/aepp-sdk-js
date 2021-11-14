@@ -56,7 +56,8 @@ function getFunctionACI (aci, name, external) {
 }
 
 /**
- * Generate contract ACI object with predefined js methods for contract usage - can be used for creating a reference to already deployed contracts
+ * Generate contract ACI object with predefined js methods for contract usage - can be used for
+ * creating a reference to already deployed contracts
  * @alias module:@aeternity/aepp-sdk/es/contract/aci
  * @param {Object} [options={}] Options object
  * @param {String} [options.source] Contract source code
@@ -69,10 +70,13 @@ function getFunctionACI (aci, name, external) {
  * @example
  * const contractIns = await client.getContractInstance({ source })
  * await contractIns.deploy([321]) or await contractIns.methods.init(321)
- * const callResult = await contractIns.call('setState', [123]) or await contractIns.methods.setState.send(123, options)
- * const staticCallResult = await contractIns.call('setState', [123], { callStatic: true }) or await contractIns.methods.setState.get(123, options)
+ * const callResult = await contractIns.call('setState', [123]) or
+ * await contractIns.methods.setState.send(123, options)
+ * const staticCallResult = await contractIns.call('setState', [123], { callStatic: true }) or
+ * await contractIns.methods.setState.get(123, options)
  * Also you can call contract like: await contractIns.methods.setState(123, options)
- * Then sdk decide to make on-chain or static call(dry-run API) transaction based on function is stateful or not
+ * Then sdk decide to make on-chain or static call(dry-run API) transaction based on function is
+ * stateful or not
  */
 export default async function getContractInstance ({
   source,
@@ -100,7 +104,7 @@ export default async function getContractInstance ({
     interface: R.defaultTo(null, R.prop('interface', aci)),
     aci: R.defaultTo(null, R.path(['encoded_aci', 'contract'], aci)),
     calldata: new Calldata([aci.encoded_aci, ...aci.external_encoded_aci]),
-    externalAci: aci.external_encoded_aci ? aci.external_encoded_aci.map(a => a.contract || a.namespace) : [],
+    externalAci: (aci.external_encoded_aci ?? []).map(a => a.contract || a.namespace),
     source,
     bytecode,
     deployInfo: { address: contractAddress },
@@ -131,7 +135,9 @@ export default async function getContractInstance ({
   instance.compile = async (options = {}) => {
     if (instance.bytecode) throw new Error('Contract already compiled')
     if (!instance.source) throw new Error('Can\'t compile without source code')
-    const { bytecode } = await this.contractCompile(instance.source, { ...instance.options, ...options })
+    const { bytecode } = await this.contractCompile(
+      instance.source, { ...instance.options, ...options }
+    )
     instance.bytecode = bytecode
     return instance.bytecode
   }
@@ -279,7 +285,8 @@ export default async function getContractInstance ({
   /**
    * Generate proto function based on contract function using Contract ACI schema
    * All function can be called like:
-   * 'await contract.methods.testFunction()' -> then sdk will decide to use dry-run or send tx on-chain base on if function stateful or not.
+   * 'await contract.methods.testFunction()' -> then sdk will decide to use dry-run or send tx
+   * on-chain base on if function stateful or not.
    * Also you can manually do that:
    * `await contract.methods.testFunction.get()` -> use call-static(dry-run)
    * `await contract.methods.testFunction.send()` -> send tx on-chain

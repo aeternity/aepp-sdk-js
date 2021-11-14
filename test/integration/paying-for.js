@@ -70,12 +70,16 @@ describe('Paying for transaction of another account', function () {
     const { rawTx: contractDeployTx, address } = await contract.deploy([42])
     contractAddress = address
     await sdk.payForTransaction(contractDeployTx)
-    payingContract = await unPayingSdk.getContractInstance({ source: contractSource, contractAddress })
+    payingContract = await unPayingSdk.getContractInstance(
+      { source: contractSource, contractAddress }
+    )
     expect((await payingContract.methods.getValue()).decodedResult).to.be.equal(42n)
   })
 
   it('pays for contract call', async () => {
-    const contract = await unPayingSdk.getContractInstance({ source: contractSource, contractAddress })
+    const contract = await unPayingSdk.getContractInstance(
+      { source: contractSource, contractAddress }
+    )
     const { rawTx: contractCallTx } = await contract.methods.setValue(43)
     await sdk.payForTransaction(contractCallTx)
     expect((await payingContract.methods.getValue()).decodedResult).to.be.equal(43n)

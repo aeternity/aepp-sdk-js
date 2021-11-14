@@ -95,9 +95,10 @@ async function contractCall (source, contractAddress, name, args, options) {
  * @deprecated
  * @param {String} code Compiled contract
  * @param {String} source Contract source code
- * @param {Array} params Arguments of contract constructor(init) function. Can be array of arguments or callData string
+ * @param {Array} params Arguments of contract constructor(init) function. Can be array of
+ * arguments or callData string
  * @param {Object} [options] Transaction options (fee, ttl, gas, amount, deposit)
- * @param {Object} [options.filesystem={}] Contract external namespaces map* @return {Promise<Object>} Result object
+ * @param {Object} [options.filesystem={}] Contract external namespaces map*
  * @return {Promise<Object>} Result object
  * @example
  * const deployed = await client.contractDeploy(bytecode, source, init = [], options)
@@ -124,7 +125,7 @@ async function contractDeploy (code, source, params, options) {
  * @category async
  * @param {String} source Contract sourece code
  * @param {Object} [options={}] Transaction options (fee, ttl, gas, amount, deposit)
- * @param {Object} [options.filesystem={}] Contract external namespaces map* @return {Promise<Object>} Result object
+ * @param {Object} [options.filesystem={}] Contract external namespaces map*
  * @return {Promise<Object>} Result object
  * @example
  * const compiled = await client.contractCompile(SOURCE_CODE)
@@ -172,7 +173,8 @@ async function delegateSignatureCommon (ids = [], opt = {}) {
 }
 
 /**
- * Helper to generate a signature to delegate pre-claim/claim/transfer/revoke of a name to a contract.
+ * Helper to generate a signature to delegate pre-claim/claim/transfer/revoke of a name to
+ * a contract.
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
@@ -190,7 +192,9 @@ async function delegateSignatureCommon (ids = [], opt = {}) {
  * const preclaimSig = await client.createAensDelegationSignature(params, { onAccount: current })
  * // Claim, transfer and revoke signature
  * const params = { contractId, name }
- * const aensDelegationSig = await contract.createAensDelegationSignature(params, name, { onAccount: current })
+ * const aensDelegationSig = await contract.createAensDelegationSignature(
+ *   params, name, { onAccount: current }
+ * )
  */
 async function createAensDelegationSignature ({ contractId, name }, opt = {}) {
   return this.delegateSignatureCommon([...name ? [produceNameId(name)] : [], contractId], opt)

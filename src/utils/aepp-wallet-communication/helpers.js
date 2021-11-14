@@ -51,9 +51,11 @@ export const getHandler = (schema, msg, { debug = false } = {}) => {
 
 export const message = (method, params = {}) => ({ method, params })
 
-export const responseMessage = (id, method, { error, result } = {}) => ({ id, method, ...(error ? { error } : { result }) })
+export const responseMessage = (id, method, { error, result } = {}) =>
+  ({ id, method, ...(error ? { error } : { result }) })
 
-export const sendResponseMessage = (client) => (id, method, data) => client.sendMessage(responseMessage(id, method, data), true)
+export const sendResponseMessage = (client) => (id, method, data) =>
+  client.sendMessage(responseMessage(id, method, data), true)
 
 export const voidFn = () => undefined
 

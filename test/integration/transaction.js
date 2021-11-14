@@ -75,68 +75,62 @@ describe('Native Transaction', function () {
     _salt = salt()
     commitmentId = await commitmentHash(name, _salt)
   })
+
   it('Build tx using denomination amount', async () => {
-    const spendAe = await sdkNative.spendTx({ senderId, recipientId, amount: 1, nonce, payload: 'test', denomination: AE_AMOUNT_FORMATS.AE })
-    const spendAettos = await sdkNative.spendTx({ senderId, recipientId, amount: 1e18, nonce, payload: 'test' })
+    const params = { senderId, recipientId, nonce, payload: 'test' }
+    const spendAe = await sdkNative.spendTx(
+      { ...params, amount: 1, denomination: AE_AMOUNT_FORMATS.AE }
+    )
+    const spendAettos = await sdkNative.spendTx({ ...params, amount: 1e18, payload: 'test' })
     spendAe.should.be.equal(spendAettos)
     const { tx: { amount } } = unpackTx(spendAe)
     const { tx: { amount: amount2 } } = unpackTx(spendAettos)
     amount.should.be.equal(amount2)
   })
+
   it('native build of spend tx', async () => {
     const aeAmount = 2
     const aettosAmount = 2e18
-    const txFromAPI = await sdk.spendTx({ senderId, recipientId, amount: aettosAmount, nonce, payload: 'test' })
-    const nativeTx = await sdkNative.spendTx({ senderId, recipientId, amount: aeAmount, nonce, payload: 'test', denomination: AE_AMOUNT_FORMATS.AE })
+    const params = { senderId, recipientId, nonce, payload: 'test' }
+    const txFromAPI = await sdk.spendTx({ ...params, amount: aettosAmount })
+    const nativeTx = await sdkNative.spendTx(
+      { ...params, amount: aeAmount, denomination: AE_AMOUNT_FORMATS.AE }
+    )
     txFromAPI.should.be.equal(nativeTx)
   })
 
   it('native build of name pre-claim tx', async () => {
-    const txFromAPI = await sdk.namePreclaimTx({ accountId: senderId, nonce, commitmentId })
-    const nativeTx = await sdkNative.namePreclaimTx({ accountId: senderId, nonce, commitmentId })
+    const params = { accountId: senderId, nonce, commitmentId }
+    const txFromAPI = await sdk.namePreclaimTx(params)
+    const nativeTx = await sdkNative.namePreclaimTx(params)
     txFromAPI.should.be.equal(nativeTx)
   })
 
   it('native build of claim tx', async () => {
-    const txFromAPI = await sdk.nameClaimTx({
-      accountId: senderId,
-      nonce,
-      name: nameHash,
-      nameSalt: _salt,
-      nameFee
-    })
-    const nativeTx = await sdkNative.nameClaimTx({
-      accountId: senderId,
-      nonce,
-      name: nameHash,
-      nameSalt: _salt,
-      nameFee
-    })
+    const params = { accountId: senderId, nonce, name: nameHash, nameSalt: _salt, nameFee }
+    const txFromAPI = await sdk.nameClaimTx(params)
+    const nativeTx = await sdkNative.nameClaimTx(params)
     txFromAPI.should.be.equal(nativeTx)
   })
 
   it('native build of update tx', async () => {
-    const nativeTx = await sdkNative.nameUpdateTx({
-      accountId: senderId,
-      nonce,
-      nameId,
-      nameTtl,
-      pointers,
-      clientTtl
-    })
-    const txFromAPI = await sdk.nameUpdateTx({ accountId: senderId, nonce, nameId, nameTtl, pointers, clientTtl })
+    const params = { accountId: senderId, nonce, nameId, nameTtl, pointers, clientTtl }
+    const nativeTx = await sdkNative.nameUpdateTx(params)
+    const txFromAPI = await sdk.nameUpdateTx(params)
     txFromAPI.should.be.equal(nativeTx)
   })
 
   it('native build of revoke tx', async () => {
-    const txFromAPI = await sdk.nameRevokeTx({ accountId: senderId, nonce, nameId })
-    const nativeTx = await sdkNative.nameRevokeTx({ accountId: senderId, nonce, nameId })
+    const params = { accountId: senderId, nonce, nameId }
+    const txFromAPI = await sdk.nameRevokeTx(params)
+    const nativeTx = await sdkNative.nameRevokeTx(params)
     txFromAPI.should.be.equal(nativeTx)
   })
 
   it('native build of transfer tx', async () => {
-    const txFromAPI = await sdk.nameTransferTx({ accountId: senderId, nonce, nameId, recipientId })
-    const nativeTx = await sdkNative.nameTransferTx({ accountId: senderId, nonce, nameId, recipientId })
+    const params = { accountId: senderId, nonce, nameId, recipientId }
+    const txFromAPI = await sdk.nameTransferTx(params)
+    const nativeTx = await sdkNative.nameTransferTx(params)
     txFromAPI.should.be.equal(nativeTx)
   })
 
@@ -145,24 +139,9 @@ describe('Native Transaction', function () {
     const callData = await sdk.contractEncodeCallDataAPI(contractCode, 'init')
     const owner = await sdk.address()
 
-    const txFromAPI = await sdk.contractCreateTx({
-      ownerId: owner,
-      code: bytecode,
-      deposit,
-      amount,
-      gas,
-      gasPrice,
-      callData
-    })
-    const nativeTx = await sdkNative.contractCreateTx({
-      ownerId: owner,
-      code: bytecode,
-      deposit,
-      amount,
-      gas,
-      gasPrice,
-      callData
-    })
+    const params = { ownerId: owner, code: bytecode, deposit, amount, gas, gasPrice, callData }
+    const txFromAPI = await sdk.contractCreateTx(params)
+    const nativeTx = await sdkNative.contractCreateTx(params)
 
     txFromAPI.tx.should.be.equal(nativeTx.tx)
     txFromAPI.contractId.should.be.equal(nativeTx.contractId)
@@ -175,8 +154,9 @@ describe('Native Transaction', function () {
     const callData = await sdk.contractEncodeCallDataAPI(contractCode, 'getArg', ['2'])
     const owner = await sdk.address()
 
-    const txFromAPI = await sdk.contractCallTx({ callerId: owner, contractId, amount, gas, gasPrice, callData })
-    const nativeTx = await sdkNative.contractCallTx({ callerId: owner, contractId, amount, gas, gasPrice, callData })
+    const params = { callerId: owner, contractId, amount, gas, gasPrice, callData }
+    const txFromAPI = await sdk.contractCallTx(params)
+    const nativeTx = await sdkNative.contractCallTx(params)
     txFromAPI.should.be.equal(nativeTx)
 
     const { hash } = await sdk.send(nativeTx)
@@ -187,13 +167,7 @@ describe('Native Transaction', function () {
 
   it('native build of oracle create tx', async () => {
     const accountId = await sdk.address()
-    const params = {
-      accountId,
-      queryFormat,
-      responseFormat,
-      queryFee,
-      oracleTtl
-    }
+    const params = { accountId, queryFormat, responseFormat, queryFee, oracleTtl }
 
     const txFromAPI = await sdk.oracleRegisterTx(params)
     const nativeTx = await sdkNative.oracleRegisterTx(params)
@@ -252,7 +226,8 @@ describe('Native Transaction', function () {
   })
   it('Get next account nonce', async () => {
     const accountId = await sdk.address()
-    const { nonce: accountNonce } = await sdk.api.getAccountByPubkey(accountId).catch(() => ({ nonce: 0 }))
+    const { nonce: accountNonce } = await sdk.api.getAccountByPubkey(accountId)
+      .catch(() => ({ nonce: 0 }))
     const nonce = await sdk.getAccountNonce(await sdk.address())
     nonce.should.be.equal(accountNonce + 1)
     const nonceCustom = await sdk.getAccountNonce(await sdk.address(), 1)

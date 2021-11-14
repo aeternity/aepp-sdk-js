@@ -46,11 +46,11 @@ import { CLIENT_TTL, NAME_FEE, NAME_TTL } from '../tx/builder/schema'
  * @category async
  * @param {String} name Name hash
  * @param {Object} [options={}] options
- * @param {(String|Object)} [options.onAccount] onAccount Make operation on specific account from sdk(you pass publickKey) or
- * using provided KeyPair(Can be keypair object or MemoryAccount)
- * @param {(Number|String|BigNumber)} [options.fee] fee
- * @param {(Number|String|BigNumber)} [options.ttl] ttl
- * @param {(Number|String|BigNumber)} [options.nonce] nonce
+ * @param {String|Object} [options.onAccount] Make operation on specific account from sdk (you pass
+ * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
+ * @param {Number|String|BigNumber} [options.fee] fee
+ * @param {Number|String|BigNumber} [options.ttl] ttl
+ * @param {Number|String|BigNumber} [options.nonce] nonce
  * @return {Promise<Object>} Transaction result
  * @example
  * const name = 'test.chain'
@@ -80,16 +80,20 @@ async function revoke (name, options = {}) {
  * @category async
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param {String} name AENS name
- * @param {String[]} pointers Array of name pointers. Can be oracle|account|contract|channel public key
+ * @param {String[]} pointers Array of name pointers. Can be oracle|account|contract|channel public
+ * key
  * @param {Object} [options={}]
- * @param {Boolean} [options.extendPointers=false] extendPointers Get the pointers from the node and merge with provided one. Pointers with the same type will be overwrited
- * @param {(String|Object)} [options.onAccount] onAccount Make operation on specific account from sdk(you pass publickKey) or
- * using provided KeyPair(Can be keypair object or MemoryAccount)
- * @param {(Number|String|BigNumber)} [options.fee] fee
- * @param {(Number|String|BigNumber)} [options.ttl] ttl
- * @param {(Number|String|BigNumber)} [options.nonce] nonce
- * @param {(Number|String|BigNumber)} [options.nameTtl=50000] nameTtl Name ttl represented in number of blocks (Max value is 50000 blocks)
- * @param {(Number|String|BigNumber)} [options.clientTtl=84600] clientTtl a suggestion as to how long any clients should cache this information
+ * @param {Boolean} [options.extendPointers=false] Get the pointers from the node and merge with
+ * provided one. Pointers with the same type will be overwrited
+ * @param {String|Object} [options.onAccount] Make operation on specific account from sdk (you
+ * pass publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
+ * @param {Number|String|BigNumber} [options.fee] fee
+ * @param {Number|String|BigNumber} [options.ttl] ttl
+ * @param {Number|String|BigNumber} [options.nonce] nonce
+ * @param {Number|String|BigNumber} [options.nameTtl=50000] Name ttl represented in number of
+ * blocks (Max value is 50000 blocks)
+ * @param {Number|String|BigNumber} [options.clientTtl=84600] a suggestion as to how long any
+ * clients should cache this information
  * @return {Promise<Object>}
  * @throws Invalid pointer array error
  * @example
@@ -129,11 +133,11 @@ async function update (name, pointers = [], options = { extendPointers: false })
  * @param {String} name AENS name
  * @param {String} account Recipient account publick key
  * @param {Object} [options={}]
- * @param {(String|Object)} [options.onAccount] onAccount Make operation on specific account from sdk(you pass publickKey) or
- * using provided KeyPair(Can be keypair object or MemoryAccount)
- * @param {(Number|String|BigNumber)} [options.fee] fee
- * @param {(Number|String|BigNumber)} [options.ttl] ttl
- * @param {(Number|String|BigNumber)} [options.nonce] nonce
+ * @param {String|Object} [options.onAccount] Make operation on specific account from sdk (you pass
+ * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
+ * @param {Number|String|BigNumber} [options.fee] fee
+ * @param {Number|String|BigNumber} [options.ttl] ttl
+ * @param {Number|String|BigNumber} [options.nonce] nonce
  * @return {Promise<Object>} Transaction result
  * @example
  * const name = 'test.chain'
@@ -203,8 +207,8 @@ async function query (name, opt = {}) {
       if (!nameTtl || typeof nameTtl !== 'number' || nameTtl > NAME_TTL) throw new Error('Ttl must be an number and less then 180000 blocks')
 
       return {
-        ...(await this.aensUpdate(name, o.pointers.map(p => p.id), { ...opt, ...options, nameTtl })),
-        ...(await this.aensQuery(name))
+        ...await this.aensUpdate(name, o.pointers.map(p => p.id), { ...opt, ...options, nameTtl }),
+        ...await this.aensQuery(name)
       }
     }
   }))
@@ -220,8 +224,8 @@ async function query (name, opt = {}) {
  * @param {String} name
  * @param {Number} salt Salt from pre-claim, or 0 if it's a bid
  * @param {Object} [options] options
- * @param {String|Object} [options.onAccount] onAccount Make operation on specific account from sdk(you pass publickKey) or
- * using provided KeyPair(Can be keypair object or MemoryAccount)
+ * @param {String|Object} [options.onAccount] Make operation on specific account from sdk (you pass
+ * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
  * @param {Number|String|BigNumber} [options.fee] fee
  * @param {Number|String|BigNumber} [options.ttl] ttl
  * @param {Number|String|BigNumber} [options.nonce] nonce
@@ -265,8 +269,8 @@ async function claim (name, salt, options) {
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param {String} name
  * @param {Object} [options={}]
- * @param {String|Object} [options.onAccount] onAccount Make operation on specific account from sdk(you pass publickKey) or
- * using provided KeyPair(Can be keypair object or MemoryAccount)
+ * @param {String|Object} [options.onAccount] Make operation on specific account from sdk (you pass
+ * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
  * @param {Number|String|BigNumber} [options.fee] fee
  * @param {Number|String|BigNumber} [options.ttl] ttl
  * @param {Number|String|BigNumber} [options.nonce] nonce
@@ -316,8 +320,8 @@ async function preclaim (name, options = {}) {
  * @param {String} name Domain name
  * @param {String|Number} nameFee Name fee (bid fee)
  * @param {Object} [options={}]
- * @param {String|Object} [options.onAccount] onAccount Make operation on specific account from sdk(you pass publickKey) or
- * using provided KeyPair(Can be keypair object or MemoryAccount)
+ * @param {String|Object} [options.onAccount] Make operation on specific account from sdk (you pass
+ * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
  * @param {Number|String|BigNumber} [options.fee] fee
  * @param {Number|String|BigNumber} [options.ttl] ttl
  * @param {Number|String|BigNumber} [options.nonce] nonce

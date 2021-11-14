@@ -59,7 +59,10 @@ async function sendTransaction (tx, options = {}) {
     }
     return { hash: txHash, rawTx: tx }
   } catch (error) {
-    throw Object.assign(error, { rawTx: tx, verifyTx: () => verifyTransaction(tx, this.selectedNode.instance) })
+    throw Object.assign(error, {
+      rawTx: tx,
+      verifyTx: () => verifyTransaction(tx, this.selectedNode.instance)
+    })
   }
 }
 
@@ -220,7 +223,8 @@ async function getName (name) {
  * @param {String} prefix
  * @param {Object} [options]
  * @param {Boolean} [options.verify] To ensure that name exist and have a corresponding pointer
- * @param {Boolean} [options.resolveByNode] Enables pointer resolving using node // TODO: avoid that to don't trust to current api gateway
+ * // TODO: avoid that to don't trust to current api gateway
+ * @param {Boolean} [options.resolveByNode] Enables pointer resolving using node
  * @return {String} Address or AENS name hash
  */
 async function resolveName (nameOrId, prefix, { verify, resolveByNode } = {}) {
@@ -252,7 +256,8 @@ async function resolveName (nameOrId, prefix, { verify, resolveByNode } = {}) {
  * ChainNode Stamp
  *
  * This is implementation of {@link module:@aeternity/aepp-sdk/es/chain--Chain}
- * composed with {@link module:@aeternity/aepp-sdk/es/contract/node--ContractNodeAPI} and {@link module:@aeternity/aepp-sdk/es/oracle/node--OracleNodeAPI}
+ * composed with {@link module:@aeternity/aepp-sdk/es/contract/node--ContractNodeAPI} and
+ * {@link module:@aeternity/aepp-sdk/es/oracle/node--OracleNodeAPI}
  * @function
  * @alias module:@aeternity/aepp-sdk/es/chain/node
  * @rtype Stamp

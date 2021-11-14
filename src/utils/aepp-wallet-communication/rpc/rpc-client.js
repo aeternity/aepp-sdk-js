@@ -3,7 +3,8 @@
  *
  * @module @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client
  * @export { RpcClient, RpcClients }
- * @example import RpcClient from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client'
+ * @example
+ * import RpcClient from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client'
  */
 import stampit from '@stamp/it'
 
@@ -18,7 +19,9 @@ import { sendMessage, message, isValidAccounts } from '../helpers'
  * @param {Object} param Init params object
  * @param {String} param.name Client name
  * @param {Object} param.connection Connection object
- * @param {Function[]} param.handlers Arrays with two function for handling messages ([ onMessage: Function, onDisconnect: Function])
+ * @param {Function[]} param.handlers Array with two function for message handling
+ * @param {Function} param.handlers[0] Message handler
+ * @param {Function} param.handlers[1] Disconnect callback
  * @return {Object}
  */
 export default stampit({
@@ -148,10 +151,11 @@ export default stampit({
     },
     /**
      * Update accounts and sent `update.address` notification to AEPP
-     * @param {{ current: Object, connected: Object }} accounts Object with current and connected accounts
-     * @param {{ forceNotification: Boolean }} [options={ forceNotification: false }] Don not sent update notification to AEPP
+     * @param {{ current: Object, connected: Object }} accounts Current and connected accounts
+     * @param {Object} [options]
+     * @param {Boolean} [options.forceNotification] Don't sent update notification to AEPP
      */
-    setAccounts (accounts, { forceNotification = false } = {}) {
+    setAccounts (accounts, { forceNotification } = {}) {
       if (!isValidAccounts(accounts)) {
         throw new Error('Invalid accounts object. Should be object like: `{ connected: {}, selected: {} }`')
       }
