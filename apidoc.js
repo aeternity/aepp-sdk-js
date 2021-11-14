@@ -23,7 +23,7 @@ const fs = require('fs')
 const path = require('path')
 const R = require('ramda')
 
-const outputDir = `${__dirname}/docs`
+const outputDir = path.join(__dirname, 'docs')
 const prefix = /^@aeternity\/aepp-sdk\/es\//
 const templateData = jsdoc2md.getTemplateDataSync({
   configure: '.jsdoc.json',
