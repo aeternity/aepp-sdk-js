@@ -17,5 +17,12 @@ module.exports = {
   ],
   ignorePatterns: ['dist', 'es'],
   rules: {
+    'max-len': ['error', 100, 2, {
+      ignoreUrls: true,
+      ignoreComments: false,
+      ignoreRegExpLiterals: true,
+      ignoreStrings: true,
+      ignoreTemplateLiterals: true
+    }]
   }
 }
