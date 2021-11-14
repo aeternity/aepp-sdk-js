@@ -14,7 +14,6 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-/* global BigInt */ // TODO: remove after updating ts-standard
 import { expect } from 'chai'
 import { before, describe, it } from 'mocha'
 import { decodeEvents, SOPHIA_TYPES } from '../../src/contract/aci/transformation'
