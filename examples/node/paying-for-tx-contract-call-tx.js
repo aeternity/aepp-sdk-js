@@ -55,9 +55,9 @@ const PAYER_ACCOUNT_KEYPAIR = {
   publicKey: 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR',
   secretKey: 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b'
 }
-const NODE_URL = 'https://testnet.aeternity.io';
-const COMPILER_URL = 'https://compiler.aepps.com';
-const CONTRACT_ADDRESS = 'ct_iy86kak8GGt4U5VjDFNQf1a9qjbyxKpmGVNe3UuKwnmcM6LW8';
+const NODE_URL = 'https://testnet.aeternity.io'
+const COMPILER_URL = 'https://compiler.aepps.com'
+const CONTRACT_ADDRESS = 'ct_iy86kak8GGt4U5VjDFNQf1a9qjbyxKpmGVNe3UuKwnmcM6LW8'
 const CONTRACT_SOURCE =
 `
 @compiler >= 6
@@ -90,7 +90,6 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
 // dealing with subsequent actions is running them one by one using `await`.
 // Therefore we are putting our logic into an `async` code block
 (async () => {
-
   // ## 4. Create object instances
   const payerAccount = MemoryAccount({ keypair: PAYER_ACCOUNT_KEYPAIR })
   const newUserAccount = MemoryAccount({ keypair: NEW_USER_KEYPAIR })
@@ -98,7 +97,7 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
   const client = await Universal({
     nodes: [{ name: 'testnet', instance: node }],
     compilerUrl: COMPILER_URL,
-    accounts: [payerAccount, newUserAccount],
+    accounts: [payerAccount, newUserAccount]
   })
 
   // The `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp) itself is asynchronous as it determines the node's version and
@@ -123,7 +122,7 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
   //  1. Sign the transaction by providing `innerTx: true` as transaction option.
   //      - The transaction will be signed in a special way that is required for inner transactions.
   //
-  const calldata = await client.contractEncodeCallDataAPI(CONTRACT_SOURCE, "set_last_caller", [])
+  const calldata = await client.contractEncodeCallDataAPI(CONTRACT_SOURCE, 'set_last_caller', [])
   const contractCallTx = await client.contractCallTx({ callerId: await newUserAccount.address(), contractId: CONTRACT_ADDRESS, amount: 0, gas: 1000000, gasPrice: 1500000000, callData: calldata })
   const signedContractCallTx = await client.signTransaction(contractCallTx, { onAccount: newUserAccount, innerTx: true })
 
@@ -137,7 +136,7 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
   const contractInstance = await client.getContractInstance({ source: CONTRACT_SOURCE, contractAddress: CONTRACT_ADDRESS })
   const dryRunTx = await contractInstance.methods.get_last_caller()
   console.log(`New user: ${await newUserAccount.address()}`)
-  console.log(`Last caller:`, dryRunTx.decodedResult)
+  console.log('Last caller:', dryRunTx.decodedResult)
 
   // Note:
   //

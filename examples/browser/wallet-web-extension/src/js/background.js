@@ -10,7 +10,7 @@ const NODE_URL = 'https://testnet.aeternity.io'
 const COMPILER_URL = 'https://compiler.aepps.com'
 const accounts = [
   MemoryAccount({ keypair: Crypto.generateKeyPair() }), // generate keypair for account1
-  MemoryAccount({ keypair: Crypto.generateKeyPair() })  // generate keypair for account2
+  MemoryAccount({ keypair: Crypto.generateKeyPair() }) // generate keypair for account2
 ]
 
 async function init () {

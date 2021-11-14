@@ -39,7 +39,7 @@ const ACCOUNT_KEYPAIR = {
   publicKey: 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR',
   secretKey: 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b'
 }
-const NODE_URL = 'https://testnet.aeternity.io';
+const NODE_URL = 'https://testnet.aeternity.io'
 const [amount = 1, recipient = ACCOUNT_KEYPAIR.publicKey] = process.argv.slice(2);
 
 // Note:
@@ -56,7 +56,6 @@ const [amount = 1, recipient = ACCOUNT_KEYPAIR.publicKey] = process.argv.slice(2
 // dealing with subsequent actions is running them one by one using `await`.
 // Therefore we are putting our logic into an `async` code block
 (async () => {
-
   // ## 4. Create object instances
   const account = MemoryAccount({ keypair: ACCOUNT_KEYPAIR })
   const node = await Node({ url: NODE_URL })

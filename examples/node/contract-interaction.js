@@ -48,7 +48,7 @@ const ACCOUNT_KEYPAIR = {
   publicKey: 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR',
   secretKey: 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b'
 }
-const NODE_URL = 'https://testnet.aeternity.io';
+const NODE_URL = 'https://testnet.aeternity.io'
 const COMPILER_URL = 'https://compiler.aepps.com';
 
 // Note:
@@ -62,7 +62,6 @@ const COMPILER_URL = 'https://compiler.aepps.com';
 // dealing with subsequent actions is running them one by one using `await`.
 // Therefore you need to put the logic into an `async` code block
 (async () => {
-
   // ## 4. Create object instances
   const account = MemoryAccount({ keypair: ACCOUNT_KEYPAIR })
   const node = await Node({ url: NODE_URL })
@@ -70,7 +69,7 @@ const COMPILER_URL = 'https://compiler.aepps.com';
     nodes: [{ name: 'testnet', instance: node }],
     compilerUrl: COMPILER_URL,
     accounts: [account]
-  });
+  })
 
   // The `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp) itself is asynchronous as it determines the node's version and
   // rest interface automatically. Only once the Promise is fulfilled, you know you have a working object instance
@@ -85,7 +84,7 @@ const COMPILER_URL = 'https://compiler.aepps.com';
   // to the HTTP compiler for bytecode compilation. In the future this will be done
   // without talking to the node, but requiring a bytecode compiler
   // implementation directly in the SDK.
-  console.log(CONTRACT_CODE);
+  console.log(CONTRACT_CODE)
   const bytecode = await client.contractCompile(CONTRACT_CODE)
   console.log(`Obtained bytecode ${bytecode.bytecode}`)
 

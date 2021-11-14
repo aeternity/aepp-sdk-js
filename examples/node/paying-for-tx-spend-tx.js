@@ -60,14 +60,13 @@ const AMOUNT = 1;
 // dealing with subsequent actions is running them one by one using `await`.
 // Therefore we are putting our logic into an `async` code block
 (async () => {
-
   // ## 4. Create object instances
   const payerAccount = MemoryAccount({ keypair: PAYER_ACCOUNT_KEYPAIR })
   const newUserAccount = MemoryAccount({ keypair: NEW_USER_KEYPAIR })
   const node = await Node({ url: NODE_URL })
   const client = await Universal({
     nodes: [{ name: 'testnet', instance: node }],
-    accounts: [payerAccount, newUserAccount],
+    accounts: [payerAccount, newUserAccount]
   })
 
   // The `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp) itself is asynchronous as it determines the node's version and
