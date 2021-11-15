@@ -1,7 +1,7 @@
 # Contracts
 
 ## Introduction
-The smart contract language of the æternity blockchain is [Sophia](https://github.com/aeternity/aesophia/blob/v6.0.1/docs/sophia.md). It is a functional language in the ML family, strongly typed and has restricted mutable state.
+The smart contract language of the æternity blockchain is [Sophia](https://aeternity.com/aesophia). It is a functional language in the ML family, strongly typed and has restricted mutable state.
 
 Before interacting with contracts using the SDK you should get familiar with Sophia itself first. Have a look into [aepp-sophia-examples](https://github.com/aeternity/aepp-sophia-examples) and start rapid prototyping using [AEstudio](https://studio.aepps.com).
 
@@ -58,7 +58,7 @@ const contractInstance = await client.getContractInstance(CONTRACT_SOURCE)
 
 Note:
 
-- If your contract includes external dependencies which are not part of the [standard library](https://github.com/aeternity/aesophia/blob/v6.0.1/docs/sophia_stdlib.md) you should initialize the contract using:
+- If your contract includes external dependencies which are not part of the [standard library](https://aeternity.com/aesophia/latest/sophia_stdlib) you should initialize the contract using:
   ```js
   const filesystem = ... // key-value map with name of the include as key and source code of the include as value
   const contractInstance = await client.getContractInstance(CONTRACT_SOURCE, { filesystem })
