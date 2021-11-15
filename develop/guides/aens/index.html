@@ -587,8 +587,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/node/transfer-ae-tokens.md" class="md-nav__link">
-        None
+      <a href="../../examples/node/transfer-ae/" class="md-nav__link">
+        Transfer AE
       </a>
     </li>
   
@@ -948,7 +948,7 @@
                 
                 <h1 id="ternity-naming-system">æternity naming system</h1>
 <h2 id="introduction">Introduction</h2>
-<p>This guide shows you how to perform all the operations that you need within the lifecycle of <a href="https://github.com/aeternity/protocol/blob/master/AENS.md">æternity naming system (AENS)</a> using the SDK.</p>
+<p>This guide shows you how to perform all the operations that you need within the lifecycle of <a href="https://aeternity.com/protocol/AENS.html">æternity naming system (AENS)</a> using the SDK.</p>
 <p>If you successfully claimed a name it will expire after 180000 keyblocks (~375 days). You will need to update your name before it expires!</p>
 <h2 id="1-claim-a-name">1. Claim a name</h2>
 <p>Claiming an AENS name requires you (at least) 2 transactions:</p>
@@ -1297,7 +1297,7 @@ the same <code>salt</code> and it should be signed with the same private key as 
 <li>After a timeout of <code>2016</code> keyblocks the name will be available for claiming again.</li>
 </ul>
 <h2 id="delegate-signature-to-contract-aens-interface">Delegate signature to contract (AENS interface)</h2>
-<p>It is possible to authorize a Sophia contract to manage an AENS name on behalf of your account. In order to achieve that you need to provide a delegation signature to the contract. The contract will then be able to use the <a href="https://github.com/aeternity/aesophia/blob/v6.0.1/docs/sophia.md#aens-interface">AENS interface</a> and perform AENS related actions on behalf of your account.</p>
+<p>It is possible to authorize a Sophia contract to manage an AENS name on behalf of your account. In order to achieve that you need to provide a delegation signature to the contract. The contract will then be able to use the <a href="https://aeternity.com/aesophia/latest/sophia_features/#aens-interface">AENS interface</a> and perform AENS related actions on behalf of your account.</p>
 <p>This functionality could for example be used to build an AENS marketplace.</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// imports</span>
 

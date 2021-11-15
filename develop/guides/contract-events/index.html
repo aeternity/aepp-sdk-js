@@ -519,8 +519,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/node/transfer-ae-tokens.md" class="md-nav__link">
-        None
+      <a href="../../examples/node/transfer-ae/" class="md-nav__link">
+        Transfer AE
       </a>
     </li>
   
@@ -811,7 +811,7 @@
                 
                 
                 <h1 id="contract-events">Contract Events</h1>
-<p>The Sophia language also provides you the possibility to emit <a href="https://github.com/aeternity/aesophia/blob/v6.0.1/docs/sophia.md#events">Events</a> in your functions.
+<p>The Sophia language also provides you the possibility to emit <a href="https://aeternity.com/aesophia/latest/sophia_features/#events">Events</a> in your functions.
 On this page you will learn how to access and decode the event log of a specific transaction.</p>
 <h2 id="eventemitter-contract">EventEmitter contract</h2>
 <p>This example contract that emits events will be used in the following examples:</p>
@@ -826,7 +826,7 @@ On this page you will learn how to access and decode the event log of a specific
         Chain.event(AnotherEvent(Call.caller, msg))
 </code></pre></div>
 <h2 id="decode-events-using-aci-high-level-recommended">Decode events using ACI (high-level, recommended)</h2>
-<p>When initializing a contract instance using the source code and providing the <a href="https://github.com/aeternity/aesophia/blob/v6.0.1/docs/aeso_aci.md">ACI</a>
+<p>When initializing a contract instance using the source code and providing the <a href="https://aeternity.com/aesophia/latest/aeso_aci/">ACI</a>
 or obtaining it via http compiler (default) you will be able to access the <code>emitEvents</code> entrypoint of the Sophia contract above as follows:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// events emitted by contract calls are automatically decoded</span>
 <span class="kd">const</span> <span class="nx">tx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">emitEvents</span><span class="p">(</span><span class="mf">1337</span><span class="p">,</span> <span class="s2">&quot;this message is not indexed&quot;</span><span class="p">)</span>

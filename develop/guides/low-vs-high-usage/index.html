@@ -519,8 +519,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/node/transfer-ae-tokens.md" class="md-nav__link">
-        None
+      <a href="../../examples/node/transfer-ae/" class="md-nav__link">
+        Transfer AE
       </a>
     </li>
   
@@ -840,8 +840,8 @@ of chain operations, so the SDK provides abstractions for these.</p>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">100</span><span class="p">,</span> <span class="s1">&#39;ak_...&#39;</span><span class="p">))</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="low-level-sdk-usage-use-api-endpoints-directly">Low-level SDK usage (use <a href="https://github.com/aeternity/protocol/tree/master/node/api">API</a> endpoints directly)</h2>
-<p>Example spend function, using the SDK, talking directly to the <a href="https://github.com/aeternity/protocol/tree/master/node/api"><strong>API</strong></a>:
+<h2 id="low-level-sdk-usage-use-api-endpoints-directly">Low-level SDK usage (use <a href="https://aeternity.com/protocol/node/api">API</a> endpoints directly)</h2>
+<p>Example spend function, using the SDK, talking directly to the <a href="https://aeternity.com/protocol/node/api"><strong>API</strong></a>:
 <div class="highlight"><pre><span></span><code><span class="k">import</span> <span class="p">{</span> <span class="nx">MemoryAccount</span><span class="p">,</span> <span class="nx">Node</span><span class="p">,</span> <span class="nx">Universal</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
 
 <span class="k">async</span> <span class="kd">function</span> <span class="nx">spend</span> <span class="p">(</span><span class="nx">amount</span><span class="p">,</span> <span class="nx">recipient</span><span class="p">)</span> <span class="p">{</span>

@@ -581,8 +581,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/node/transfer-ae-tokens.md" class="md-nav__link">
-        None
+      <a href="../../examples/node/transfer-ae/" class="md-nav__link">
+        Transfer AE
       </a>
     </li>
   
@@ -936,7 +936,7 @@
                 
                 <h1 id="contracts">Contracts</h1>
 <h2 id="introduction">Introduction</h2>
-<p>The smart contract language of the æternity blockchain is <a href="https://github.com/aeternity/aesophia/blob/v6.0.1/docs/sophia.md">Sophia</a>. It is a functional language in the ML family, strongly typed and has restricted mutable state.</p>
+<p>The smart contract language of the æternity blockchain is <a href="https://aeternity.com/aesophia">Sophia</a>. It is a functional language in the ML family, strongly typed and has restricted mutable state.</p>
 <p>Before interacting with contracts using the SDK you should get familiar with Sophia itself first. Have a look into <a href="https://github.com/aeternity/aepp-sophia-examples">aepp-sophia-examples</a> and start rapid prototyping using <a href="https://studio.aepps.com">AEstudio</a>.</p>
 <p>The SDK needs to interact with following components in order to enable smart contract interactions on the æternity blockchain:</p>
 <ul>
@@ -985,7 +985,7 @@
 </code></pre></div>
 <p>Note:</p>
 <ul>
-<li>If your contract includes external dependencies which are not part of the <a href="https://github.com/aeternity/aesophia/blob/v6.0.1/docs/sophia_stdlib.md">standard library</a> you should initialize the contract using:
+<li>If your contract includes external dependencies which are not part of the <a href="https://aeternity.com/aesophia/latest/sophia_stdlib">standard library</a> you should initialize the contract using:
   <div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">filesystem</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// key-value map with name of the include as key and source code of the include as value</span>
 <span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">(</span><span class="nx">CONTRACT_SOURCE</span><span class="p">,</span> <span class="p">{</span> <span class="nx">filesystem</span> <span class="p">})</span>
 </code></pre></div></li>
