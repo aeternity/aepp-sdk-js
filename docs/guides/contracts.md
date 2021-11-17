@@ -76,7 +76,7 @@ Note:
         - To be used if a contract is already deployed.
     - `filesystem` (default: {})
         - Key-value map with name of the include as key and source code of the include as value.
-    - `validateByteCode` (default: false)
+    - `validateBytecode` (default: false)
         - Compare source code with on-chain version.
     - other [transaction options](../transaction-options.md) which will be provided to **every transaction** that is initiated using the contract instance. You should be aware that:
         - For most of these additional options it doesn't make sense to define them at contract instance level.

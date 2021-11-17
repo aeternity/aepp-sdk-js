@@ -64,7 +64,7 @@ function getFunctionACI (aci, name, external) {
  * @param {Object} [options.aci] Contract ACI
  * @param {String} [options.contractAddress] Contract address
  * @param {Object} [options.filesystem] Contact source external namespaces map
- * @param {Boolean} [options.validateByteCode] Compare source code with on-chain version
+ * @param {Boolean} [options.validateBytecode] Compare source code with on-chain version
  * @return {ContractInstance} JS Contract API
  * @example
  * const contractIns = await client.getContractInstance({ source })
@@ -80,7 +80,7 @@ export default async function getContractInstance ({
   aci,
   contractAddress,
   filesystem = {},
-  validateByteCode,
+  validateBytecode,
   ...otherOptions
 } = {}) {
   aci = aci || (source && await this.contractGetACI(source, { filesystem }))
@@ -113,7 +113,7 @@ export default async function getContractInstance ({
     compilerVersion: this.compilerVersion
   }
 
-  if (validateByteCode) {
+  if (validateBytecode) {
     if (!contractAddress) throw new Error('Can\'t validate bytecode without contract address')
     const onChanBytecode = (await this.getContractByteCode(contractAddress)).bytecode
     const isValid = (source && await this
