@@ -17,12 +17,12 @@
 /* global BigInt */ // TODO: remove after updating ts-standard
 import { expect } from 'chai'
 import { before, describe, it } from 'mocha'
-import * as R from 'ramda'
 import { commitmentHash, decode } from '../../src/tx/builder/helpers'
 import { DRY_RUN_ACCOUNT } from '../../src/tx/builder/schema'
 import { messageToHash, salt } from '../../src/utils/crypto'
 import { randomName } from '../utils'
 import { BaseAe, getSdk, publicKey } from './'
+import { Crypto, MemoryAccount } from '../../src'
 
 const identityContract = `
 contract Identity =
@@ -122,6 +122,9 @@ describe('Contract', function () {
 
   before(async function () {
     sdk = await getSdk()
+    sdk.removeAccount(sdk.addresses()[1]) // TODO: option of getSdk to have accounts without genesis
+    await sdk.addAccount(MemoryAccount({ keypair: Crypto.generateKeyPair() }))
+    await sdk.spend(1e18, sdk.addresses()[1])
   })
 
   it('precompiled bytecode can be deployed', async () => {
@@ -139,7 +142,7 @@ describe('Contract', function () {
   it('Verify message in Sophia', async () => {
     const msgHash = messageToHash('Hello')
     const signature = await sdk.sign(msgHash)
-    const signContract = await sdk.getContractInstance(signSource)
+    const signContract = await sdk.getContractInstance({ source: signSource })
     await signContract.deploy()
     const { decodedResult } = await signContract.methods.verify(msgHash, await sdk.address(), signature)
     decodedResult.should.be.equal(true)
@@ -162,9 +165,7 @@ describe('Contract', function () {
   })
 
   it('Deploy and call contract on specific account', async () => {
-    const current = await sdk.address()
-    const onAccount = sdk.addresses().find(acc => acc !== current)
-
+    const onAccount = sdk.addresses()[1]
     const deployed = await bytecode.deploy([], { onAccount })
     deployed.result.callerId.should.be.equal(onAccount)
     const callRes = await deployed.call('getArg', [42])
@@ -188,20 +189,18 @@ describe('Contract', function () {
     res.result.should.have.property('returnType')
   })
 
-  describe('_handleCallError', () => {
-    it('throws error on deploy', async () => {
-      const code = await sdk.contractCompile(contractWithBrokenDeploy)
-      await expect(code.deploy()).to.be.rejectedWith('Invocation failed: "CustomErrorMessage"')
-    })
+  it('throws error on deploy', async () => {
+    const code = await sdk.contractCompile(contractWithBrokenDeploy)
+    await expect(code.deploy()).to.be.rejectedWith('Invocation failed: "CustomErrorMessage"')
+  })
 
-    it('throws errors on method call', async () => {
-      const code = await sdk.contractCompile(contractWithBrokenMethods)
-      const deployed = await code.deploy()
-      await expect(deployed.call('failWithoutMessage', [await sdk.address()]))
-        .to.be.rejectedWith('Invocation failed')
-      await expect(deployed.call('failWithMessage'))
-        .to.be.rejectedWith('Invocation failed: "CustomErrorMessage"')
-    })
+  it('throws errors on method call', async () => {
+    const code = await sdk.contractCompile(contractWithBrokenMethods)
+    const deployed = await code.deploy()
+    await expect(deployed.call('failWithoutMessage', [await sdk.address()]))
+      .to.be.rejectedWith('Invocation failed')
+    await expect(deployed.call('failWithMessage'))
+      .to.be.rejectedWith('Invocation failed: "CustomErrorMessage"')
   })
 
   it('Dry-run without accounts', async () => {
@@ -369,8 +368,7 @@ describe('Contract', function () {
     })
 
     it('Use invalid compiler url', async () => {
-      const cloned = R.clone(sdk)
-      await expect(cloned.setCompilerUrl('https://compiler.aepps.comas'))
+      await expect(sdk.setCompilerUrl('https://compiler.aepps.comas'))
         .to.be.rejectedWith('request to https://compiler.aepps.comas/api failed, reason: getaddrinfo ENOTFOUND compiler.aepps.comas')
     })
   })
@@ -385,11 +383,10 @@ describe('Contract', function () {
     let delegationSignature
 
     before(async () => {
-      contract = await sdk.getContractInstance(aensDelegationContract)
+      contract = await sdk.getContractInstance({ source: aensDelegationContract })
       await contract.deploy()
-      contractId = contract.deployInfo.address
-      owner = await sdk.address()
-      newOwner = sdk.addresses().find(acc => acc !== owner)
+      contractId = contract.deployInfo.address;
+      [owner, newOwner] = sdk.addresses()
     })
 
     it('preclaims', async () => {
@@ -465,11 +462,10 @@ describe('Contract', function () {
     const ttl = { RelativeTTL: [50] }
 
     before(async () => {
-      contract = await sdk.getContractInstance(oracleContract)
+      contract = await sdk.getContractInstance({ source: oracleContract })
       await contract.deploy()
       contractId = contract.deployInfo.address
-      const current = await sdk.address()
-      onAccount = sdk.addresses().find(acc => acc !== current)
+      onAccount = sdk.addresses()[1]
       oracleId = `ok_${onAccount.slice(3)}`
     })
 

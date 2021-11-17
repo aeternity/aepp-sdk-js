@@ -22,8 +22,6 @@
  * @export GeneralizeAccount
  * @example import { GeneralizeAccount } from '@aeternity/aepp-sdk'
  */
-import * as R from 'ramda'
-
 import { ContractAPI } from '../../ae/contract'
 import { TX_TYPE } from '../../tx/builder/schema'
 import { buildTx, unpackTx } from '../../tx/builder'
@@ -81,7 +79,7 @@ async function isGA (address) {
  * @return {Promise<Readonly<{result: *, owner: *, createdAt: Date, address, rawTx: *, transaction: *}>>}
  */
 async function createGeneralizeAccount (authFnName, source, args = [], options = {}) {
-  const opt = R.merge(this.Ae.defaults, options)
+  const opt = { ...this.Ae.defaults, ...options }
   const ownerId = await this.address(opt)
 
   if (await this.isGA(ownerId)) throw new Error(`Account ${ownerId} is already GA`)
@@ -120,7 +118,7 @@ async function createMetaTx (rawTransaction, authData, authFnName, options = {})
   if (!authData) throw new Error('authData is required')
   // Check if authData is callData or if it's an object prepare a callData from source and args
   const { authCallData, gas } = await prepareGaParams(this)(authData, authFnName)
-  const opt = R.merge(this.Ae.defaults, options)
+  const opt = { ...this.Ae.defaults, ...options }
   const { abiVersion } = await this.getVmVersion(TX_TYPE.contractCall)
   const wrappedTx = wrapInEmptySignedTx(unpackTx(rawTransaction))
   const params = {

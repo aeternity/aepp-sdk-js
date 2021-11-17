@@ -134,7 +134,7 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
   // ## 7. Check that last caller is the new user
   // Knowing the contract address and the source code allows you to
   // initialize a contract instance and interact with the contract in a convenient way.
-  const contractInstance = await client.getContractInstance(CONTRACT_SOURCE, { contractAddress: CONTRACT_ADDRESS })
+  const contractInstance = await client.getContractInstance({ source: CONTRACT_SOURCE, contractAddress: CONTRACT_ADDRESS })
   const dryRunTx = await contractInstance.methods.get_last_caller()
   console.log(`New user: ${await newUserAccount.address()}`)
   console.log(`Last caller:`, dryRunTx.decodedResult)

@@ -27,7 +27,6 @@ import Tx from '../tx'
 import Chain from '../chain'
 import AccountBase from '../account/base'
 import TxBuilder from '../tx/builder'
-import * as R from 'ramda'
 import BigNumber from 'bignumber.js'
 import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter'
 
@@ -42,7 +41,7 @@ import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter'
  * @return {Object} Transaction
  */
 async function send (tx, options = {}) {
-  const opt = R.merge(this.Ae.defaults, options)
+  const opt = { ...this.Ae.defaults, ...options }
   const { contractId, authFun } = options.innerTx
     ? { contractId: false } : await this.getAccount(await this.address(opt))
   const signed = contractId

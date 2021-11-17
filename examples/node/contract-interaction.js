@@ -123,7 +123,7 @@ const COMPILER_URL = 'https://compiler.aepps.com';
   // Knowing the contract address and the source code allows you to
   // initialize a contract instance and interact with the contract in a convenient way.
 
-  const contractInstance = await client.getContractInstance(CONTRACT_CODE, {contractAddress: contract.address})
+  const contractInstance = await client.getContractInstance({ source: CONTRACT_CODE, contractAddress: contract.address })
   const callResult = await contractInstance.methods.multiplyBy(7)
   console.log(`Execution result (via contractInstance initialized with existing contract): ${callResult.decodedResult}`)
 

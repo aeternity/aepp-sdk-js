@@ -19,7 +19,6 @@ import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
 import { getSdk } from './'
 import { randomName } from '../utils'
-import * as R from 'ramda'
 import { generateKeyPair } from '../../src/utils/crypto'
 import { buildContractId, classify, computeAuctionEndBlock, computeBidFee } from '../../src/tx/builder/helpers'
 
@@ -92,7 +91,7 @@ contract Identity =
     const oracle = address.replace('ak', 'ok')
     const pointers = [address, contract, oracle]
     return nameObject.update(pointers).should.eventually.deep.include({
-      pointers: pointers.map(p => R.fromPairs([['key', classify(p)], ['id', p]]))
+      pointers: pointers.map(p => Object.fromEntries([['key', classify(p)], ['id', p]]))
     })
   })
   it('updates names: extend pointers', async () => {
@@ -101,7 +100,7 @@ contract Identity =
     const anotherContract = buildContractId(address, 12)
     const newPointers = [address, address.replace('ak', 'ok'), anotherContract]
     return nameObject.update([anotherContract], { extendPointers: true }).should.eventually.deep.include({
-      pointers: newPointers.map(p => R.fromPairs([['key', classify(p)], ['id', p]]))
+      pointers: newPointers.map(p => Object.fromEntries([['key', classify(p)], ['id', p]]))
     })
   })
   it('Extend name ttl', async () => {
@@ -126,7 +125,7 @@ contract Identity =
 
     const claim2 = await sdk.aensQuery(name)
     return claim2.update([onAccount], { onAccount }).should.eventually.deep.include({
-      pointers: [R.fromPairs([['key', 'account_pubkey'], ['id', onAccount]])]
+      pointers: [Object.fromEntries([['key', 'account_pubkey'], ['id', onAccount]])]
     })
   })
 

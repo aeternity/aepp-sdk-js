@@ -34,13 +34,13 @@ function createDirs (path) {
   const paths = path.split(/\//).slice(1, -1)
     .reduce((acc, e) => acc.concat([`${R.last(acc)}/${e}`]), ['']).slice(1)
 
-  R.forEach(dir => {
+  paths.forEach(dir => {
     try {
       fs.openSync(dir, 'r')
     } catch (e) {
       fs.mkdirSync(dir)
     }
-  }, paths)
+  })
 }
 
 const modules = templateData

@@ -1,6 +1,4 @@
-import * as R from 'ramda'
-
-const asEnum = (array) => R.zipObj(array, array)
+const asEnum = (array) => Object.fromEntries(array.map(a => [a, a]))
 
 export const VERSION = 1
 
