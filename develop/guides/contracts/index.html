@@ -981,17 +981,17 @@
 </ul>
 <h2 id="3-initialize-the-contract-instance">3. Initialize the contract instance</h2>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">CONTRACT_SOURCE</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// source code of the contract</span>
-<span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">(</span><span class="nx">CONTRACT_SOURCE</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span> <span class="nx">source</span><span class="o">:</span> <span class="nx">CONTRACT_SOURCE</span> <span class="p">})</span>
 </code></pre></div>
 <p>Note:</p>
 <ul>
 <li>If your contract includes external dependencies which are not part of the <a href="https://aeternity.com/aesophia/latest/sophia_stdlib">standard library</a> you should initialize the contract using:
   <div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">filesystem</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// key-value map with name of the include as key and source code of the include as value</span>
-<span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">(</span><span class="nx">CONTRACT_SOURCE</span><span class="p">,</span> <span class="p">{</span> <span class="nx">filesystem</span> <span class="p">})</span>
+<span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span> <span class="nx">source</span><span class="o">:</span> <span class="nx">CONTRACT_SOURCE</span><span class="p">,</span> <span class="nx">filesystem</span> <span class="p">})</span>
 </code></pre></div></li>
 <li>If your contract is already deployed and you know the contract address you can initialize the contract instance using:
   <div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">contractAddress</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// the address of the contract</span>
-<span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">(</span><span class="nx">CONTRACT_SOURCE</span><span class="p">,</span> <span class="p">{</span> <span class="nx">contractAddress</span> <span class="p">})</span>
+<span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span> <span class="nx">source</span><span class="o">:</span> <span class="nx">CONTRACT_SOURCE</span><span class="p">,</span> <span class="nx">contractAddress</span> <span class="p">})</span>
 </code></pre></div></li>
 <li>Following attributes can be provided in an <code>options</code> object to <code>getContractInstance</code>:<ul>
 <li><code>aci</code> (default: obtained via http compiler)<ul>
