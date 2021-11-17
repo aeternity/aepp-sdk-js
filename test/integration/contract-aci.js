@@ -207,27 +207,27 @@ describe('Contract instance', function () {
     source: testContractSource,
     filesystem,
     contractAddress: testContractAddress,
-    validateByteCode: true
+    validateBytecode: true
   }))
 
   it('rejects not matching source code with enabled validation', () => expect(sdk.getContractInstance({
     source: identityContractSource,
     contractAddress: testContractAddress,
-    validateByteCode: true
+    validateBytecode: true
   })).to.be.rejectedWith(BytecodeMismatchError, 'Contract source do not correspond to the bytecode deployed on the chain'))
 
   it('accepts matching bytecode with enabled validation', () => sdk.getContractInstance({
     bytecode: testContractBytecode,
     aci: testContractAci,
     contractAddress: testContractAddress,
-    validateByteCode: true
+    validateBytecode: true
   }))
 
   it('rejects not matching bytecode with enabled validation', async () => expect(sdk.getContractInstance({
     bytecode: (await sdk.contractCompile(identityContractSource)).bytecode,
     aci: await sdk.contractGetACI(identityContractSource, { filesystem }),
     contractAddress: testContractAddress,
-    validateByteCode: true
+    validateBytecode: true
   })).to.be.rejectedWith(BytecodeMismatchError, 'Contract bytecode do not correspond to the bytecode deployed on the chain'))
 
   it('dry-runs init function', async () => {
