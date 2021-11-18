@@ -14,6 +14,7 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
+/* global BigInt */ // TODO: remove after updating ts-standard
 import { expect } from 'chai'
 import { before, describe, it } from 'mocha'
 import { decodeEvents, SOPHIA_TYPES } from '../../src/contract/aci/transformation'
@@ -84,6 +85,8 @@ contract StateContract =
   entrypoint hashFn(s: hash): hash = s
   entrypoint signatureFn(s: signature): signature = s
   entrypoint bytesFn(s: bytes(32)): bytes(32) = s
+
+  entrypoint bitsFn(s: bits): bits = s
 
   entrypoint usingExternalLib(s: int): int = Test.double(s)
 
@@ -614,6 +617,19 @@ describe('Contract instance', function () {
         const hashAsHex = await testContract.methods.bytesFn(decoded.toString('hex'))
         hashAsBuffer.decodedResult.should.be.eql(decoded)
         hashAsHex.decodedResult.should.be.eql(decoded)
+      })
+    })
+
+    describe('Bits', function () {
+      it('Invalid', async () => {
+        await expect(testContract.methods.bitsFn({}))
+          .to.be.rejectedWith('Cannot convert [object Object] to a BigInt')
+      })
+
+      it('Valid', async () => {
+        (await Promise.all([0, -1n, 0b101n]
+          .map(async value => [value, (await testContract.methods.bitsFn(value)).decodedResult])))
+          .forEach(([v1, v2]) => expect(v2).to.be.equal(BigInt(v1)))
       })
     })
   })
