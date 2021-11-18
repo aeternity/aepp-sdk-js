@@ -78,11 +78,10 @@ Note:
         - Key-value map with name of the include as key and source code of the include as value.
     - `validateByteCode` (default: false)
         - Compare source code with on-chain version.
-    - `opt` (default: {})
-        - Object with other [transaction options](../transaction-options.md) which will be provided to **every transaction** that is initiated using the contract instance. You should be aware that:
-            - For most of these additional options it doesn't make sense to define them at contract instance level.
-            - You wouldn't want to provide an `amount` to each transaction or use the same `nonce` which would result in invalid transactions.
-            - For options like `ttl` or `gasPrice` it does absolutely make sense to set this on contract instance level.
+    - other [transaction options](../transaction-options.md) which will be provided to **every transaction** that is initiated using the contract instance. You should be aware that:
+        - For most of these additional options it doesn't make sense to define them at contract instance level.
+        - You wouldn't want to provide an `amount` to each transaction or use the same `nonce` which would result in invalid transactions.
+        - For options like `ttl` or `gasPrice` it does absolutely make sense to set this on contract instance level.
 
 ## 4. Deploy the contract
 
