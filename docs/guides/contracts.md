@@ -145,8 +145,6 @@ The æternity node can expose an API endpoint that allows to execute a `dry-run`
 const tx = await contractInstance.methods.get_count() // recommended
 // or
 const tx = await contractInstance.methods.get_count.get()
-// or
-const tx = await contractInstance.callStatic('get_count', [])
 
 // access the decoded result returned by the execution of the entrypoint
 console.log(tx.decodedResult);
