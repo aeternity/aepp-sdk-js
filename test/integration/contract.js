@@ -134,7 +134,7 @@ describe('Contract', function () {
 
   it('enforce zero deposit for contract deployment', async () => {
     const code = await sdk.contractCompile(identityContract)
-    var { txData } = await sdk.contractDeploy(code.bytecode, identityContract, [], { deposit: 10 })
+    const { txData } = await sdk.contractDeploy(code.bytecode, identityContract, [], { deposit: 10 })
     return txData.tx.deposit.should.be.equal(0)
   })
 

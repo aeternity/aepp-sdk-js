@@ -35,7 +35,7 @@ describe('Node Chain', function () {
   it('Compresses height queries', async () => {
     const origFun = sdk.api.getCurrentKeyBlockHeight
     try {
-      var calls = 0
+      let calls = 0
       sdk.api.getCurrentKeyBlockHeight = () => {
         calls += 1
         return origFun()

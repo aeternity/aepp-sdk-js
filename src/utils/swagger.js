@@ -102,11 +102,13 @@ export default async (
       const opSpec = opSpecs[opId]
       const parameters = [
         ...opSpec.parameters,
-        ...opSpec.requestBody ? [{
-          required: opSpec.requestBody.required,
-          schema: Object.values(opSpec.requestBody.content)[0].schema,
-          name: '__requestBody'
-        }] : []
+        ...opSpec.requestBody
+          ? [{
+              required: opSpec.requestBody.required,
+              schema: Object.values(opSpec.requestBody.content)[0].schema,
+              name: '__requestBody'
+            }]
+          : []
       ]
       const required = parameters.filter(param => param.required).map(p => p.name)
       if (args.length < required.length) throw new Error('swagger: Not enough arguments')
