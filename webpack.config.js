@@ -29,15 +29,19 @@ function configure (filename, opts = {}) {
       }
     },
     plugins: [
-      ...opts.target === 'node' ? [] : [new webpack.ProvidePlugin({
-        process: 'process',
-        Buffer: ['buffer', 'Buffer']
-      })],
-      ...argv.report ? [new BundleAnalyzerPlugin({
-        analyzerMode: 'static',
-        reportFilename: filename + '.html',
-        openAnalyzer: false
-      })] : []
+      ...opts.target === 'node'
+        ? []
+        : [new webpack.ProvidePlugin({
+            process: 'process',
+            Buffer: ['buffer', 'Buffer']
+          })],
+      ...argv.report
+        ? [new BundleAnalyzerPlugin({
+            analyzerMode: 'static',
+            reportFilename: filename + '.html',
+            openAnalyzer: false
+          })]
+        : []
     ],
     output: {
       path: path.resolve(__dirname, 'dist'),

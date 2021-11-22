@@ -256,7 +256,8 @@ function buildFee (txType, { params, gas = 0, multiplier, vsn }) {
     .plus(TX_FEE_OTHER_GAS(txType, txSize, {
       relativeTtl: getOracleRelativeTtl(params, txType),
       innerTxSize: [TX_TYPE.gaMeta, TX_TYPE.payingFor].includes(txType)
-        ? params.tx.tx.encodedTx.rlpEncoded.length : 0
+        ? params.tx.tx.encodedTx.rlpEncoded.length
+        : 0
     }))
     .times(multiplier)
 }

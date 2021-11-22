@@ -35,18 +35,18 @@ async function spendTx ({ senderId, recipientId, amount, payload = '' }) {
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? {
-      tx: TxObject({
-        params: {
-          ...arguments[0],
-          recipientId,
-          senderId,
-          nonce,
-          ttl,
-          payload
-        },
-        type: TX_TYPE.spend
-      }).encodedTx
-    }
+        tx: TxObject({
+          params: {
+            ...arguments[0],
+            recipientId,
+            senderId,
+            nonce,
+            ttl,
+            payload
+          },
+          type: TX_TYPE.spend
+        }).encodedTx
+      }
     : await this.api.postSpend({
       ...arguments[0],
       amount: parseInt(amount),
@@ -68,11 +68,11 @@ async function namePreclaimTx ({ accountId, commitmentId }) {
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? {
-      tx: TxObject({
-        params: { ...arguments[0], nonce, ttl, fee },
-        type: TX_TYPE.namePreClaim
-      }).encodedTx
-    }
+        tx: TxObject({
+          params: { ...arguments[0], nonce, ttl, fee },
+          type: TX_TYPE.namePreClaim
+        }).encodedTx
+      }
     : await this.api.postNamePreclaim({ ...arguments[0], nonce, ttl, fee: parseInt(fee) })
 
   return tx
@@ -85,11 +85,11 @@ async function nameClaimTx ({ accountId, name, nameSalt, vsn = 2 }) {
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? {
-      tx: TxObject({
-        params: { ...arguments[0], nonce, ttl, fee, vsn },
-        type: TX_TYPE.nameClaim
-      }).encodedTx
-    }
+        tx: TxObject({
+          params: { ...arguments[0], nonce, ttl, fee, vsn },
+          type: TX_TYPE.nameClaim
+        }).encodedTx
+      }
     : await this.api.postNameClaim({ ...arguments[0], nonce, ttl, fee: parseInt(fee) })
 
   return tx
@@ -102,11 +102,11 @@ async function nameTransferTx ({ accountId, nameId, recipientId }) {
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? {
-      tx: TxObject({
-        params: { ...arguments[0], recipientId, nonce, ttl, fee },
-        type: TX_TYPE.nameTransfer
-      }).encodedTx
-    }
+        tx: TxObject({
+          params: { ...arguments[0], recipientId, nonce, ttl, fee },
+          type: TX_TYPE.nameTransfer
+        }).encodedTx
+      }
     : await this.api.postNameTransfer({ ...arguments[0], recipientId, nonce, ttl, fee: parseInt(fee) })
 
   return tx
@@ -119,11 +119,11 @@ async function nameUpdateTx ({ accountId, nameId, nameTtl, pointers, clientTtl }
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? {
-      tx: TxObject({
-        params: { ...arguments[0], nonce, ttl, fee },
-        type: TX_TYPE.nameUpdate
-      }).encodedTx
-    }
+        tx: TxObject({
+          params: { ...arguments[0], nonce, ttl, fee },
+          type: TX_TYPE.nameUpdate
+        }).encodedTx
+      }
     : await this.api.postNameUpdate({ ...arguments[0], nonce, ttl, fee: parseInt(fee) })
 
   return tx
@@ -136,11 +136,11 @@ async function nameRevokeTx ({ accountId, nameId }) {
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? {
-      tx: TxObject({
-        params: { ...arguments[0], nonce, ttl, fee },
-        type: TX_TYPE.nameRevoke
-      }).encodedTx
-    }
+        tx: TxObject({
+          params: { ...arguments[0], nonce, ttl, fee },
+          type: TX_TYPE.nameRevoke
+        }).encodedTx
+      }
     : await this.api.postNameRevoke({ ...arguments[0], nonce, ttl, fee: parseInt(fee) })
 
   return tx
@@ -154,12 +154,12 @@ async function contractCreateTx ({ ownerId, code, vmVersion, abiVersion, deposit
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   return this.nativeMode
     ? {
-      tx: TxObject({
-        params: { ...arguments[0], nonce, ttl, fee, ctVersion, gasPrice },
-        type: TX_TYPE.contractCreate
-      }).encodedTx,
-      contractId: buildContractId(ownerId, nonce)
-    }
+        tx: TxObject({
+          params: { ...arguments[0], nonce, ttl, fee, ctVersion, gasPrice },
+          type: TX_TYPE.contractCreate
+        }).encodedTx,
+        contractId: buildContractId(ownerId, nonce)
+      }
     : this.api.postContractCreate({ ...arguments[0], nonce, ttl, fee: parseInt(fee), gas: parseInt(gas), gasPrice, vmVersion: ctVersion.vmVersion, abiVersion: ctVersion.abiVersion })
 }
 
@@ -171,11 +171,11 @@ async function contractCallTx ({ callerId, contractId, abiVersion, amount, gas, 
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? {
-      tx: TxObject({
-        params: { ...arguments[0], nonce, ttl, fee, abiVersion: ctVersion.abiVersion, gasPrice },
-        type: TX_TYPE.contractCall
-      }).encodedTx
-    }
+        tx: TxObject({
+          params: { ...arguments[0], nonce, ttl, fee, abiVersion: ctVersion.abiVersion, gasPrice },
+          type: TX_TYPE.contractCall
+        }).encodedTx
+      }
     : await this.api.postContractCall({
       ...arguments[0],
       nonce,
@@ -196,21 +196,21 @@ async function oracleRegisterTx ({ accountId, queryFormat, responseFormat, query
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? {
-      tx: TxObject({
-        params: {
-          accountId,
-          queryFee,
-          abiVersion,
-          fee,
-          oracleTtl,
-          nonce,
-          ttl,
-          queryFormat,
-          responseFormat
-        },
-        type: TX_TYPE.oracleRegister
-      }).encodedTx
-    }
+        tx: TxObject({
+          params: {
+            accountId,
+            queryFee,
+            abiVersion,
+            fee,
+            oracleTtl,
+            nonce,
+            ttl,
+            queryFormat,
+            responseFormat
+          },
+          type: TX_TYPE.oracleRegister
+        }).encodedTx
+      }
     : await this.api.postOracleRegister({
       accountId,
       queryFee,
@@ -233,11 +233,11 @@ async function oracleExtendTx ({ oracleId, callerId, oracleTtl }) {
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? {
-      tx: TxObject({
-        params: { oracleId, fee, oracleTtl, nonce, ttl },
-        type: TX_TYPE.oracleExtend
-      }).encodedTx
-    }
+        tx: TxObject({
+          params: { oracleId, fee, oracleTtl, nonce, ttl },
+          type: TX_TYPE.oracleExtend
+        }).encodedTx
+      }
     : await this.api.postOracleExtend({ oracleId, fee: parseInt(fee), oracleTtl, nonce, ttl })
 
   return tx
@@ -250,11 +250,11 @@ async function oraclePostQueryTx ({ oracleId, responseTtl, query, queryTtl, quer
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? {
-      tx: TxObject({
-        params: { oracleId, responseTtl, query, queryTtl, fee, queryFee, ttl, nonce, senderId },
-        type: TX_TYPE.oracleQuery
-      }).encodedTx
-    }
+        tx: TxObject({
+          params: { oracleId, responseTtl, query, queryTtl, fee, queryFee, ttl, nonce, senderId },
+          type: TX_TYPE.oracleQuery
+        }).encodedTx
+      }
     : await this.api.postOracleQuery({
       oracleId,
       responseTtl,
@@ -277,11 +277,11 @@ async function oracleRespondTx ({ oracleId, callerId, responseTtl, queryId, resp
   // Build transaction using sdk (if nativeMode) or build on `AETERNITY NODE` side
   const { tx } = this.nativeMode
     ? {
-      tx: TxObject({
-        params: { oracleId, responseTtl, queryId, response, fee, ttl, nonce },
-        type: TX_TYPE.oracleResponse
-      }).encodedTx
-    }
+        tx: TxObject({
+          params: { oracleId, responseTtl, queryId, response, fee, ttl, nonce },
+          type: TX_TYPE.oracleResponse
+        }).encodedTx
+      }
     : await this.api.postOracleRespond({ oracleId, responseTtl, queryId, response, fee: parseInt(fee), ttl, nonce })
   return tx
 }
