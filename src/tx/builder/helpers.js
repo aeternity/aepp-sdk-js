@@ -18,7 +18,7 @@ import {
   NAME_FEE_BID_INCREMENT,
   NAME_BID_TIMEOUTS,
   NAME_MAX_LENGTH_FEE,
-  NAME_ID_KEY
+  POINTER_KEY_BY_PREFIX
 } from './schema'
 import { ceil } from '../../utils/bignumber'
 
@@ -116,6 +116,7 @@ export function commitmentHash (name, salt = createSalt()) {
  */
 export function decode (data, requiredPrefix) {
   const [prefix, payload, extra] = data.split('_')
+  if (!payload) throw new Error(`Encoded string missing payload: ${data}`)
   if (extra) throw new Error(`Encoded string have extra parts: ${data}`)
   if (requiredPrefix && requiredPrefix !== prefix) {
     throw new Error(`Encoded string have a wrong type: ${prefix} (expected: ${requiredPrefix})`)
@@ -145,6 +146,9 @@ export function encode (data, type) {
  * @return {Buffer} Buffer Buffer with ID tag and decoded HASh
  */
 export function writeId (hashId) {
+  if (typeof hashId !== 'string') {
+    throw new Error(`Address should be a string, got ${hashId} instead`)
+  }
   const prefix = hashId.slice(0, 2)
   const idTag = PREFIX_ID_TAG[prefix]
   if (!idTag) throw new Error(`Id tag for prefix ${prefix} not found.`)
@@ -251,36 +255,15 @@ export function isNameValid (name) {
 }
 
 /**
- * What kind of a hash is this? If it begins with 'ak_' it is an
- * account key, if with 'ok_' it's an oracle key.
- *
- * @param s - the hash.
- * returns the type, or throws an exception if type not found.
+ * @param identifier - account/oracle/contract address, or channel
+ * @returns {String} default AENS pointer key
+ * @throws exception when default key not defined
  */
-export function classify (s) {
-  if (!s.match(/^[a-z]{2}_.+/)) {
-    throw new Error('Not a valid hash')
-  }
-
-  const klass = s.substr(0, 2)
-  if (klass in NAME_ID_KEY) {
-    return NAME_ID_KEY[klass]
-  } else {
-    throw new Error(`Unknown class ${klass}`)
-  }
-}
-
-/**
- * Validate name pointers array
- * @function
- * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {String[]} pointers Pointers array.
- * Allowed values is: account(ak_), oracle(ok_), contract(ct_), channel(ch_)
- * @return {Boolean}
- */
-export function validatePointers (pointers = []) {
-  return !pointers
-    .find(p => !p || typeof p !== 'string' || !['ak', 'ok', 'ct', 'ch'].includes(p.split('_')[0]))
+export function getDefaultPointerKey (identifier) {
+  decode(identifier)
+  const prefix = identifier.substr(0, 2)
+  return POINTER_KEY_BY_PREFIX[prefix] ||
+    (() => { throw new Error(`Default AENS pointer key is not defined for ${prefix} prefix`) })()
 }
 
 /**

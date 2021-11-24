@@ -43,7 +43,7 @@ export const NAME_BID_TIMEOUT_BLOCKS = 480 // # ~1 day
 // # this is the max length for a domain that requires a base fee to be paid
 export const NAME_MAX_LENGTH_FEE = 31
 export const NAME_BID_MAX_LENGTH = 12 // # this is the max length for a domain to be part of a bid
-export const NAME_ID_KEY = {
+export const POINTER_KEY_BY_PREFIX = {
   ak: 'account_pubkey',
   ok: 'oracle_pubkey',
   ct: 'contract_pubkey',

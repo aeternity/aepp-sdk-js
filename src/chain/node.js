@@ -20,7 +20,7 @@ import verifyTransaction from '../tx/validator'
 import NodePool from '../node-pool'
 import { pause } from '../utils/other'
 import { isNameValid, produceNameId, decode } from '../tx/builder/helpers'
-import { DRY_RUN_ACCOUNT, NAME_ID_KEY } from '../tx/builder/schema'
+import { DRY_RUN_ACCOUNT } from '../tx/builder/schema'
 
 /**
  * ChainNode module
@@ -220,31 +220,29 @@ async function getName (name) {
 /**
  * Resolve AENS name and return name hash
  * @param {String} nameOrId
- * @param {String} prefix
+ * @param {String} key in AENS pointers record
  * @param {Object} [options]
  * @param {Boolean} [options.verify] To ensure that name exist and have a corresponding pointer
  * // TODO: avoid that to don't trust to current api gateway
  * @param {Boolean} [options.resolveByNode] Enables pointer resolving using node
  * @return {String} Address or AENS name hash
  */
-async function resolveName (nameOrId, prefix, { verify, resolveByNode } = {}) {
+async function resolveName (nameOrId, key, { verify, resolveByNode } = {}) {
   if (!nameOrId || typeof nameOrId !== 'string') {
     throw new Error(`Name or address should be a string: ${nameOrId}`)
   }
-  const prefixes = Object.keys(NAME_ID_KEY)
-  if (!prefixes.includes(prefix)) {
-    throw new Error(`Invalid prefix ${prefix}, should be one of [${prefixes}]`)
-  }
   try {
-    decode(nameOrId, prefix)
+    decode(nameOrId)
     return nameOrId
   } catch (error) {}
   if (isNameValid(nameOrId)) {
     if (verify || resolveByNode) {
-      const name = await this.getName(nameOrId).catch(_ => null)
+      const name = await this.api.getNameEntryByName(nameOrId).catch(_ => null)
       if (!name) throw new Error(`Name not found: ${nameOrId}`)
-      const pointer = name.pointers.find(({ id }) => id.split('_')[0] === prefix)
-      if (!pointer) throw new Error(`Name ${nameOrId} don't have pointers for ${prefix}`)
+      const pointer = name.pointers.find(pointer => pointer.key === key)
+      if (!pointer) {
+        throw new Error(`Name ${nameOrId} don't have pointers for ${key}`)
+      }
       if (resolveByNode) return pointer.id
     }
     return produceNameId(nameOrId)
