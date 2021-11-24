@@ -189,9 +189,9 @@ Sometimes you might wonder how to pass params to the JavaScript method that call
 | bytes     | `get_bytes(test: bytes(3))`       | `get_bytes(new Uint8Array([0x1, 0x1f, 0x10]))`   |
 | string    | `hello_world(say_hello: string)`  | `hello_world('Hello!')`                          |
 | list      | `have_a_few(candy: list(string))` | `have_a_few(['Skittles', 'M&Ms', 'JellyBelly'])` |
-| tuple     | `a_few_things(things: (string * int * map(address, bool)))` | `a_few_things(['hola', 3, {'ak_1337...': true}])` |
+| tuple     | `a_few_things(things: (string * int * map(address, bool)))` | `a_few_things(['hola', 3, new Map([['ak_1337...', true]])])` |
 | record    | `record user = {`<br />&nbsp; &nbsp; &nbsp; &nbsp; `firstname: string,` <br /> &nbsp; &nbsp; &nbsp; &nbsp; `lastname: string` <br /> `}` <br />  <br />  `get_firstname(input: user): string`    |  `get_firstname({'firstname': 'Alfred', 'lastname': 'Mustermann'})`  |
-| map       | `balances(values: map(address, int))`      |  `balances({'ak_1337...': 123, 'ak_FCKGW...': 321, 'ak_Rm5U...': 999})`  |
+| map       | `balances(values: map(address, int))`      |  `balances(new Map([['ak_1337...', 123], ['ak_FCKGW...', 321], ['ak_Rm5U...', 999]]))`  |
 | option()  | `number_defined(value: option(int)): bool = `<br />  &nbsp; &nbsp; &nbsp; &nbsp; `Option.is_some(value)`       |  `// the datatype in the option()` <br /> `number_defined(1337) // int in this case`  |
 | hash      | `a_gram(of: hash)`      | `// 32 bytes signature` <br />  `a_gram('af01...490f')`  |
 | signature | `one_signature(sig: signature)`      |  `// 64 bytes signature` <br />  `one_signature('af01...490f')`  |
