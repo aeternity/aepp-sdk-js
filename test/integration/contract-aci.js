@@ -321,7 +321,7 @@ describe('Contract instance', function () {
     describe('INT', function () {
       it('Invalid', async () => {
         await expect(testContract.methods.intFn('asd'))
-          .to.be.rejectedWith('Cannot convert asd to a number')
+          .to.be.rejectedWith('Cannot convert asd to a BigInt')
       })
 
       it('Valid', async () => {
@@ -385,27 +385,27 @@ describe('Contract instance', function () {
     describe('TUPLE', function () {
       it('Invalid type', async () => {
         await expect(testContract.methods.tupleFn('asdasasd'))
-          .to.be.rejectedWith('Tuple must be an array, got asdasasd instead')
+          .to.be.rejectedWith('Fate tuple must be an Array, got asdasasd instead')
       })
 
       it('Invalid tuple prop type', async () => {
         await expect(testContract.methods.tupleFn([1, 'test-string']))
-          .to.be.rejectedWith('Cannot convert test-string to a number')
+          .to.be.rejectedWith('Cannot convert test-string to a BigInt')
       })
 
       it('Required tuple prop', async () => {
         await expect(testContract.methods.tupleFn([1]))
-          .to.be.rejectedWith('Cannot convert undefined to a number')
+          .to.be.rejectedWith('Cannot convert undefined to a BigInt')
       })
 
       it('Wrong type in list inside tuple', async () => {
         await expect(testContract.methods.tupleWithList([['test-string'], 1]))
-          .to.be.rejectedWith('Cannot convert test-string to a number')
+          .to.be.rejectedWith('Cannot convert test-string to a BigInt')
       })
 
       it('Wrong type in tuple inside tuple', async () => {
         await expect(testContract.methods.tupleInTupleFn([['str', 'test-string'], 1]))
-          .to.be.rejectedWith('Cannot convert test-string to a number')
+          .to.be.rejectedWith('Cannot convert test-string to a BigInt')
       })
 
       it('Valid', async () => {
@@ -417,17 +417,17 @@ describe('Contract instance', function () {
     describe('LIST', function () {
       it('Invalid type', async () => {
         await expect(testContract.methods.listFn('asdasasd'))
-          .to.be.rejectedWith('List must be an array, got asdasasd instead')
+          .to.be.rejectedWith('Fate list must be an Array, got asdasasd instead')
       })
 
       it('Invalid list element type', async () => {
         await expect(testContract.methods.listFn([1, 'test-string']))
-          .to.be.rejectedWith('Cannot convert test-string to a number')
+          .to.be.rejectedWith('Cannot convert test-string to a BigInt')
       })
 
       it('Invalid list element type nested', async () => {
         await expect(testContract.methods.listInListFn([['childListWronmgElement'], 'parentListWrongElement']))
-          .to.be.rejectedWith('Cannot convert childListWronmgElement to a number')
+          .to.be.rejectedWith('Cannot convert childListWronmgElement to a BigInt')
       })
 
       it('Valid', async () => {
@@ -488,7 +488,7 @@ describe('Contract instance', function () {
 
       it('Invalid value type', async () => {
         await expect(testContract.methods.setRecord({ value: 123, key: 'test' }))
-          .to.be.rejectedWith('Cannot convert test to a number')
+          .to.be.rejectedWith('Cannot convert test to a BigInt')
       })
     })
 
@@ -510,7 +510,7 @@ describe('Contract instance', function () {
 
       it('Invalid option type', async () => {
         await expect(testContract.methods.intOption('test-string'))
-          .to.be.rejectedWith('Cannot convert test-string to a number')
+          .to.be.rejectedWith('Cannot convert test-string to a BigInt')
       })
     })
 
@@ -524,7 +524,7 @@ describe('Contract instance', function () {
     describe('DATATYPE', function () {
       it('Invalid type', async () => {
         await expect(testContract.methods.datTypeFn({}))
-          .to.be.rejectedWith('Unknown variant: undefined')
+          .to.be.rejectedWith('Variant should be an object mapping constructor to array of values, got [object Object] instead')
       })
 
       it('Call generic datatype', async () => {
@@ -539,7 +539,7 @@ describe('Contract instance', function () {
 
       it('Invalid variant', async () => {
         await expect(testContract.methods.datTypeFn({ asdcxz: [] }))
-          .to.be.rejectedWith('Unknown variant: asdcxz')
+          .to.be.rejectedWith('Unknown variant constructor: asdcxz')
       })
 
       it('Valid', async () => {
