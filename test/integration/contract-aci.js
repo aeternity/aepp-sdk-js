@@ -301,7 +301,8 @@ describe('Contract instance', function () {
         const value = event.decoded[tIndex]
         switch (t) {
           case SOPHIA_TYPES.address:
-            event.address.should.be.equal(`ct_${value}`)
+            // the address type in sophia is with ak_ prefix, if a ct_ prefix is expected, contract type should be used
+            event.address.replace('ct_', 'ak_').should.be.equal(value)
             break
           case SOPHIA_TYPES.int:
             expect(typeof value === 'string' || typeof value === 'number')
