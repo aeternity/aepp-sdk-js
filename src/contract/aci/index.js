@@ -153,7 +153,7 @@ export default async function getContractInstance ({
     switch (returnType) {
       case 'ok': return
       case 'revert':
-        message = instance.calldata.serializer.deserializeStream(decode(returnValue))[0].valueOf()
+        message = instance.calldata.decodeFateString(returnValue)
         break
       case 'error':
         message = decode(returnValue).toString()
