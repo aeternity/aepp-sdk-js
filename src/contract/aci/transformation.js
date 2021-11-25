@@ -27,23 +27,26 @@ export const SOPHIA_TYPES = [
  * @param {Array} schemas Smart contract event ACI schemas
  * @return {Object}
  */
-export const decodeEvents = (events, schemas = []) => events.map(event => {
+export const decodeEvents = (events, schemas = []) => events.reduce((acc, event) => {
   const [nameHash, ...params] = event.topics
   const schema = schemas.find((s) => hash(s.name).equals(toBytes(nameHash, true)))
-  if (!schema) throw new Error(`Can't find schema by event: ${nameHash}`)
+  if (!schema) return acc
   const stringCount = schema.types.filter(t => t === SOPHIA_TYPES.string).length
   if (stringCount > 1) throw new Error(`Event schema contains more than one string: ${schema.types}`)
   const topicsCount = schema.types.length - stringCount
   if (topicsCount !== params.length) {
     throw new Error(`Schema defines ${topicsCount} types, but ${params.length} topics present`)
   }
-  return {
+
+  acc.push({
     ...event,
     name: schema.name,
     decoded: schema.types.map((type) =>
       decodeEventField(type === SOPHIA_TYPES.string ? event.data : params.shift(), type))
-  }
-})
+  })
+
+  return acc
+}, [])
 
 /**
  * Transform Event based on type
