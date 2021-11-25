@@ -269,7 +269,7 @@ export default async function getContractInstance ({
     if (opt.waitMined || opt.callStatic) {
       res.decodedResult = fnACI.returns && fnACI.returns !== 'unit' && fn !== 'init' &&
         instance.calldata.decode(instance.aci.name, fn, res.result.returnValue)
-      res.decodedEvents = instance.decodeEvents(fn, res.result.log)
+      res.decodedEvents = instance.decodeEvents(res.result.log)
     }
     return res
   }
@@ -277,19 +277,17 @@ export default async function getContractInstance ({
   /**
    * Decode Events
    * @alias module:@aeternity/aepp-sdk/es/contract/aci
-   * @rtype (fn: String, events: Array) => DecodedEvents: Array
-   * @param {String} fn Function name
+   * @rtype (events: Array) => DecodedEvents: Array
    * @param {Array} events Array of encoded events(callRes.result.log)
    * @return {Object} DecodedEvents
    */
-  instance.decodeEvents = (fn, events) => {
-    const fnACI = getFunctionACI(instance.aci, fn, instance.externalAci)
-    if (!fnACI.event || !fnACI.event.length) return []
-
-    const eventsSchema = fnACI.event.map(e => {
+  instance.decodeEvents = (events) => {
+    const eventsACI = instance.aci.event ? instance.aci.event.variant : []
+    const eventsSchema = eventsACI.map(e => {
       const name = Object.keys(e)[0]
       return { name, types: e[name] }
     })
+
     return decodeEvents(events, eventsSchema)
   }
 
@@ -316,7 +314,7 @@ export default async function getContractInstance ({
           {
             get: genHandler(true),
             send: genHandler(false),
-            decodeEvents: events => instance.decodeEvents(name, events)
+            decodeEvents: events => instance.decodeEvents(events)
           }
         )
       ]

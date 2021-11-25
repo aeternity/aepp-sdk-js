@@ -67,7 +67,7 @@ const txHash = 'th_2YV3AmAz2kXdTnQxXtR2uxQi3KuLS9wfvXyqKkQQ2Y6dE6RnET';
 const tx = await client.tx(txHash)
 
 // decode events using contract instance
-const decodedUsingInstance = contractInstance.decodeEvents('emitEvents', tx.log)
+const decodedUsingInstance = contractInstance.decodeEvents(tx.log)
 
 // OR decode of events using contract instance ACI methods
 const decodedUsingInstanceMethods = contractInstance.methods.emitEvents.decodeEvents(tx.log)

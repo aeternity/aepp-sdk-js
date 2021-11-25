@@ -286,7 +286,7 @@ describe('Contract instance', function () {
       eventResult = await cInstance.methods.emitEvents()
       const { log } = await sdk.tx(eventResult.hash)
       decodedEventsWithoutACI = decodeEvents(log, events)
-      decodedEventsUsingACI = cInstance.decodeEvents('emitEvents', log)
+      decodedEventsUsingACI = cInstance.decodeEvents(log)
       decodedEventsUsingBuildInMethod = cInstance.methods.emitEvents.decodeEvents(log)
     })
 
