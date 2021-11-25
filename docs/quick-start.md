@@ -47,7 +47,7 @@ const account = MemoryAccount({
      accounts: [ account ]
   })
 
-  await client.height() // get top block height
+  const height = await client.height() // get top block height
   console.log('Current Block Height:', height)
 
   // spend one AE

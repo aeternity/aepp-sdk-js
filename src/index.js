@@ -21,7 +21,6 @@ import * as Bytes from './utils/bytes'
 import * as TxBuilder from './tx/builder'
 import * as TxBuilderHelper from './tx/builder/helpers'
 import * as SCHEMA from './tx/builder/schema'
-import * as ACIHelpers from './contract/aci/helpers'
 import * as ACITransformation from './contract/aci/transformation'
 import * as AmountFormatter from './utils/amount-formatter'
 import HdWallet from './utils/hd-wallet'
@@ -64,7 +63,6 @@ export {
   Bytes,
   Contract,
   ContractCompilerAPI,
-  ACIHelpers,
   ACITransformation,
   ChainNode,
   RpcAepp,

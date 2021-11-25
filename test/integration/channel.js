@@ -17,6 +17,7 @@
 /* eslint-disable no-unused-expressions */
 
 import { describe, it, before, after, beforeEach, afterEach } from 'mocha'
+import { expect } from 'chai'
 import * as sinon from 'sinon'
 import BigNumber from 'bignumber.js'
 import { getSdk, BaseAe, networkId } from './'
@@ -52,7 +53,6 @@ describe('Channel', function () {
   let existingChannelId
   let offchainTx
   let contractAddress
-  let contractEncodeCall
   let callerNonce
   const initiatorSign = sinon.spy((tag, tx) => initiator.signTransaction(tx))
   const responderSign = sinon.spy((tag, tx) => {
@@ -734,7 +734,7 @@ describe('Channel', function () {
       payload: signedTx
     })
     const closeSoloTxFee = unpackTx(closeSoloTx).tx.fee
-    await initiator.sendTransaction(await initiator.signTransaction(closeSoloTx), { waitMined: true })
+    await initiator.sendTransaction(await initiator.signTransaction(closeSoloTx), { waitMined: true, interval: 400, attempts: 10 })
     const settleTx = await initiator.channelSettleTx({
       channelId: await initiatorCh.id(),
       fromId: initiatorAddr,
@@ -742,7 +742,7 @@ describe('Channel', function () {
       responderAmountFinal: balances[responderAddr]
     })
     const settleTxFee = unpackTx(settleTx).tx.fee
-    await initiator.sendTransaction(await initiator.signTransaction(settleTx), { waitMined: true })
+    await initiator.sendTransaction(await initiator.signTransaction(settleTx), { waitMined: true, interval: 400, attempts: 10 })
     const initiatorBalanceAfterClose = await initiator.balance(initiatorAddr)
     const responderBalanceAfterClose = await responder.balance(responderAddr)
     new BigNumber(initiatorBalanceAfterClose).minus(initiatorBalanceBeforeClose).plus(closeSoloTxFee).plus(settleTxFee).isEqualTo(
@@ -791,7 +791,7 @@ describe('Channel', function () {
       payload: oldUpdate.signedTx
     })
     const closeSoloTxFee = unpackTx(closeSoloTx).tx.fee
-    await initiator.sendTransaction(await initiator.signTransaction(closeSoloTx), { waitMined: true })
+    await initiator.sendTransaction(await initiator.signTransaction(closeSoloTx), { waitMined: true, interval: 400, attempts: 10 })
     const slashTx = await responder.channelSlashTx({
       channelId: responderCh.id(),
       fromId: responderAddr,
@@ -799,7 +799,7 @@ describe('Channel', function () {
       payload: recentUpdate.signedTx
     })
     const slashTxFee = unpackTx(slashTx).tx.fee
-    await responder.sendTransaction(await responder.signTransaction(slashTx), { waitMined: true })
+    await responder.sendTransaction(await responder.signTransaction(slashTx), { waitMined: true, interval: 400, attempts: 10 })
     const settleTx = await responder.channelSettleTx({
       channelId: responderCh.id(),
       fromId: responderAddr,
@@ -807,7 +807,7 @@ describe('Channel', function () {
       responderAmountFinal: recentBalances[responderAddr]
     })
     const settleTxFee = unpackTx(settleTx).tx.fee
-    await responder.sendTransaction(await responder.signTransaction(settleTx), { waitMined: true })
+    await responder.sendTransaction(await responder.signTransaction(settleTx), { waitMined: true, interval: 400, attempts: 10 })
     const initiatorBalanceAfterClose = await initiator.balance(initiatorAddr)
     const responderBalanceAfterClose = await responder.balance(responderAddr)
     new BigNumber(initiatorBalanceAfterClose).minus(initiatorBalanceBeforeClose).plus(closeSoloTxFee).isEqualTo(
@@ -847,7 +847,6 @@ describe('Channel', function () {
     result.should.eql({ accepted: true, address: result.address, signedTx: (await initiatorCh.state()).signedTx })
     initiatorCh.round().should.equal(roundBefore + 1)
     contractAddress = result.address
-    contractEncodeCall = (method, args) => initiator.contractEncodeCallDataAPI(identityContract, method, args)
   })
 
   it('can create a contract and reject', async () => {
@@ -902,7 +901,7 @@ describe('Channel', function () {
     const roundBefore = initiatorCh.round()
     const result = await initiatorCh.callContract({
       amount: 0,
-      callData: await contractEncodeCall('getArg', ['42']),
+      callData: await initiator.contractEncodeCallDataAPI(identityContract, 'getArg', ['42']),
       contract: contractAddress,
       abiVersion: 3
     }, async (tx) => initiator.signTransaction(tx))
@@ -914,14 +913,13 @@ describe('Channel', function () {
   it('can call a force progress', async () => {
     const forceTx = await initiatorCh.forceProgress({
       amount: 0,
-      callData: await contractEncodeCall('getArg', ['42']),
+      callData: await initiator.contractEncodeCallDataAPI(identityContract, 'getArg', ['42']),
       contract: contractAddress,
       abiVersion: 3
     }, async (tx) => initiator.signTransaction(tx))
-    console.log('after done')
     const hash = buildTxHash(forceTx.tx)
-    const txInfo = await initiator.tx(hash)
-    console.log(txInfo)
+    const { returnType } = await initiator.tx(hash)
+    expect(returnType).to.be.equal('ok')
   })
 
   it('can call a contract and reject', async () => {
@@ -929,7 +927,7 @@ describe('Channel', function () {
     const roundBefore = initiatorCh.round()
     const result = await initiatorCh.callContract({
       amount: 0,
-      callData: await contractEncodeCall('getArg', ['42']),
+      callData: await initiator.contractEncodeCallDataAPI(identityContract, 'getArg', ['42']),
       contract: contractAddress,
       abiVersion: 3
     }, async (tx) => initiator.signTransaction(tx))
@@ -941,7 +939,7 @@ describe('Channel', function () {
     const errorCode = 12345
     const result = await initiatorCh.callContract({
       amount: 0,
-      callData: await contractEncodeCall('getArg', ['42']),
+      callData: await initiator.contractEncodeCallDataAPI(identityContract, 'getArg', ['42']),
       contract: contractAddress,
       abiVersion: 3
     }, () => errorCode)
@@ -952,7 +950,7 @@ describe('Channel', function () {
     responderShouldRejectUpdate = 12345
     const result = await initiatorCh.callContract({
       amount: 0,
-      callData: await contractEncodeCall('getArg', ['42']),
+      callData: await initiator.contractEncodeCallDataAPI(identityContract, 'getArg', ['42']),
       contract: contractAddress,
       abiVersion: 3
     }, async (tx) => initiator.signTransaction(tx))
@@ -987,7 +985,7 @@ describe('Channel', function () {
   it('can call a contract using dry-run', async () => {
     const result = await initiatorCh.callContractStatic({
       amount: 0,
-      callData: await contractEncodeCall('getArg', ['42']),
+      callData: await initiator.contractEncodeCallDataAPI(identityContract, 'getArg', ['42']),
       contract: contractAddress,
       abiVersion: 3
     })

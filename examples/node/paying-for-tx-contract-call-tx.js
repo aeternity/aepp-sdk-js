@@ -63,7 +63,7 @@ const CONTRACT_SOURCE =
 @compiler >= 6
 
 contract PayingForTxExample =
-    
+
     record state = { last_caller: option(address) }
 
     entrypoint init() =
@@ -104,7 +104,7 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
   // The `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp) itself is asynchronous as it determines the node's version and
   // rest interface automatically. Only once the Promise is fulfilled, you know you have a working object instance
   // which is assigned to the `client` constant in this case.
-  // 
+  //
   // Note:
   //
   //  - `Universal` is not a constructor but a factory, which means it's *not* invoked with `new`.
@@ -119,7 +119,7 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
   //     the contract source, the name of the `entrypoint` to call as well as the required params.
   //      - The `entrypoint` with the name `set_latest_caller` doesn't require any params so you can provide an empty array
   //  1. Create the `ContractCreateTx` by providing all required params.
-  //      - You could omit `amount`, `gas` and `gasPrice` if you choose to stick to the default values (see [transaction options](../transaction-options.md#contractcreatetx-contractcalltx))
+  //      - You could omit `amount`, `gas` and `gasPrice` if you choose to stick to the default values (see [transaction options](../../../transaction-options#contractcreatetx-contractcalltx))
   //  1. Sign the transaction by providing `innerTx: true` as transaction option.
   //      - The transaction will be signed in a special way that is required for inner transactions.
   //
@@ -134,10 +134,10 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
   // ## 7. Check that last caller is the new user
   // Knowing the contract address and the source code allows you to
   // initialize a contract instance and interact with the contract in a convenient way.
-  const contractInstance = await client.getContractInstance(CONTRACT_SOURCE, { contractAddress: CONTRACT_ADDRESS })
+  const contractInstance = await client.getContractInstance({ source: CONTRACT_SOURCE, contractAddress: CONTRACT_ADDRESS })
   const dryRunTx = await contractInstance.methods.get_last_caller()
   console.log(`New user: ${await newUserAccount.address()}`)
-  console.log(`Last caller: ${dryRunTx.decodedResult}`)
+  console.log(`Last caller:`, dryRunTx.decodedResult)
 
   // Note:
   //

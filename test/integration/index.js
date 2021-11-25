@@ -49,17 +49,17 @@ export const BaseAe = async (params = {}, compose = {}) => Universal
 
 const spendPromise = (async () => {
   const ae = await BaseAe({ networkId, withoutGenesisAccount: false })
-  await ae.awaitHeight(2)
-  await ae.spend('1' + '0'.repeat(26), account.publicKey)
+  await ae.awaitHeight(2, { interval: 200, attempts: 100 })
+  await ae.spend(1e26, account.publicKey)
 })()
 
 export async function getSdk ({ nativeMode = true, withoutAccount } = {}) {
   await spendPromise
 
   return BaseAe({
-    accounts: (withoutAccount === undefined || withoutAccount === false) ? [MemoryAccount({ keypair: account })] : [],
-    address: (withoutAccount === undefined || withoutAccount === false) ? account.publicKey : undefined,
-    withoutGenesisAccount: !((withoutAccount === undefined || withoutAccount === false)),
+    ...withoutAccount
+      ? { withoutGenesisAccount: true }
+      : { accounts: [MemoryAccount({ keypair: account })] },
     nativeMode,
     networkId
   })

@@ -52,12 +52,29 @@ export default AsyncInit.compose(ContractBase, {
       compilerUrl = compilerUrl.replace(/\/$/, '')
       const client = await genSwaggerClient(`${compilerUrl}/api`, {
         disableBigNumbers: true,
-        disableCaseConversion: true
+        disableCaseConversion: true,
+        responseInterceptor: response => {
+          if (response.ok) return
+          let message = `${new URL(response.url).pathname.slice(1)} error`
+          if (response.body.reason) {
+            message += ': ' + response.body.reason +
+              (response.body.parameter ? ` in ${response.body.parameter}` : '') +
+              // TODO: revising after improving documentation https://github.com/aeternity/aesophia_http/issues/78
+              (response.body.info ? ` (${JSON.stringify(response.body.info)})` : '')
+          }
+          if (Array.isArray(response.body)) {
+            message += ':\n' + response.body
+              .map(e => `${e.type}:${e.pos.line}:${e.pos.col}: ${e.message}${e.context ? `(${e.context})` : ''}`)
+              .map(e => e.trim()) // TODO: remove after fixing https://github.com/aeternity/aesophia_http/issues/80
+              .join('\n')
+          }
+          response.statusText = message
+          return response
+        }
       })
       this.compilerVersion = client.spec.info.version
       this._compilerApi = client.api
 
-      this._isCompiler6 = semverSatisfies(this.compilerVersion, COMPILER_6_GE_VERSION, COMPILER_LT_VERSION)
       if (ignoreVersion) return
       if (!semverSatisfies(this.compilerVersion, COMPILER_GE_VERSION, COMPILER_LT_VERSION)) {
         throw new Error(`Unsupported compiler version ${this.compilerVersion}. ` +
@@ -74,6 +91,17 @@ export default AsyncInit.compose(ContractBase, {
       this._ensureCompilerReady()
       return Promise.resolve(this.compilerVersion)
     },
+    /**
+     * Encode call data for contract call
+     * @function
+     * @category async
+     * @param {String} source Contract source code
+     * @param {String} name Name of function to call
+     * @param {Array} args Argument's for call
+     * @param {Object} [options={}]  Options
+     * @param {Object} [options.filesystem={}] Contract external namespaces map
+     * @return {Promise<String>}
+     */
     async contractEncodeCallDataAPI (source, name, args = [], options) {
       this._ensureCompilerReady()
       const { calldata } = await this._compilerApi.encodeCalldata({
@@ -109,6 +137,20 @@ export default AsyncInit.compose(ContractBase, {
         options: this._prepareCompilerOptions(options)
       })
     },
+    /**
+     * Decode contract call result data
+     * @function
+     * @category async
+     * @param {String} source - source code
+     * @param {String } fn - function name
+     * @param {String} callValue - result call data
+     * @param {String} callResult - result status
+     * @param {Object} [options={}]  Options
+     * @param {Object} [options.filesystem={}] Contract external namespaces map
+     * @return {Promise<String>} Result object
+     * @example
+     * const decodedData = await sdk.contractDecodeCallResultAPI(SourceCode ,'functionName', 'cb_asdasdasd...', 'ok|revert')lt
+     */
     contractDecodeCallResultAPI (source, fn, callValue, callResult, options) {
       this._ensureCompilerReady()
       return this._compilerApi.decodeCallResult({
@@ -145,6 +187,5 @@ export default AsyncInit.compose(ContractBase, {
   }
 })
 
-const COMPILER_GE_VERSION = '4.1.0'
-const COMPILER_6_GE_VERSION = '6.0.0'
+const COMPILER_GE_VERSION = '6.0.0'
 const COMPILER_LT_VERSION = '7.0.0'

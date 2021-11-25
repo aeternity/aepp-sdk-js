@@ -28,37 +28,37 @@ const authContract = `contract BlindAuth =
       Some(tx_hash) => true
 `
 describe('Generalize Account', function () {
-  let client
+  let sdk
   const gaAccount = generateKeyPair()
 
   before(async function () {
-    client = await getSdk()
-    await client.spend('100000000000000000000', gaAccount.publicKey)
-    client.removeAccount(client.selectedAddress)
-    await client.addAccount(MemoryAccount({ keypair: gaAccount }), { select: true })
+    sdk = await getSdk()
+    await sdk.spend('100000000000000000000', gaAccount.publicKey)
+    sdk.removeAccount(sdk.selectedAddress)
+    await sdk.addAccount(MemoryAccount({ keypair: gaAccount }), { select: true })
   })
 
   it('Make account GA', async () => {
-    await client.createGeneralizeAccount('authorize', authContract)
-    const isGa = await client.isGA(gaAccount.publicKey)
+    await sdk.createGeneralizeAccount('authorize', authContract)
+    const isGa = await sdk.isGA(gaAccount.publicKey)
     isGa.should.be.equal(true)
   })
 
   it('Fail on make GA on already GA account', async () => {
-    await client.createGeneralizeAccount('authorize', authContract)
+    await sdk.createGeneralizeAccount('authorize', authContract)
       .should.be.rejectedWith(`Account ${gaAccount.publicKey} is already GA`)
   })
 
   it('Init MemoryAccount for GA and Spend using GA', async () => {
-    client.removeAccount(gaAccount.publicKey)
-    await client.addAccount(MemoryAccount({ gaId: gaAccount.publicKey }), { select: true })
+    sdk.removeAccount(gaAccount.publicKey)
+    await sdk.addAccount(MemoryAccount({ gaId: gaAccount.publicKey }), { select: true })
     const { publicKey } = generateKeyPair()
 
     const r = () => Math.floor(Math.random() * 20).toString()
-    const callData = await client.contractEncodeCall(authContract, 'authorize', [r()])
-    await client.spend(10000, publicKey, { authData: { callData } })
-    await client.spend(10000, publicKey, { authData: { source: authContract, args: [r()] } })
-    const balanceAfter = await client.balance(publicKey)
+    const callData = await sdk.contractEncodeCallDataAPI(authContract, 'authorize', [r()])
+    await sdk.spend(10000, publicKey, { authData: { callData } })
+    await sdk.spend(10000, publicKey, { authData: { source: authContract, args: [r()] } })
+    const balanceAfter = await sdk.balance(publicKey)
     balanceAfter.should.be.equal('20000')
   })
 })

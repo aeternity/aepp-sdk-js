@@ -6,30 +6,30 @@ import MemoryAccount from '../../src/account/memory'
 import verifyTransaction from '../../src/tx/validator'
 
 describe('Verify Transaction', function () {
-  let client, node
+  let sdk, node
 
   before(async () => {
-    client = await getSdk()
-    node = client.selectedNode.instance
-    await client.spend(1234, 'ak_LAqgfAAjAbpt4hhyrAfHyVg9xfVQWsk1kaHaii6fYXt6AJAGe')
+    sdk = await getSdk()
+    node = sdk.selectedNode.instance
+    await sdk.spend(1234, 'ak_LAqgfAAjAbpt4hhyrAfHyVg9xfVQWsk1kaHaii6fYXt6AJAGe')
   })
 
   it('validates params in buildRawTx', async () => {
-    return expect(client.spendTx({})).to.be.rejectedWith('Value undefined is not type of number')
+    return expect(sdk.spendTx({})).to.be.rejectedWith('Value undefined is not type of number')
     // TODO: should be /^Transaction build error./ instead
   })
 
   it('returns errors', async () => {
-    const spendTx = await client.spendTx({
-      senderId: await client.address(),
-      recipientId: await client.address(),
+    const spendTx = await sdk.spendTx({
+      senderId: await sdk.address(),
+      recipientId: await sdk.address(),
       amount: 1e30,
       fee: '1000',
       nonce: '1',
       ttl: 2,
       absoluteTtl: true
     })
-    const signedTx = await client.signTransaction(
+    const signedTx = await sdk.signTransaction(
       spendTx,
       { onAccount: MemoryAccount({ keypair: generateKeyPair() }) }
     )
@@ -40,9 +40,9 @@ describe('Verify Transaction', function () {
   })
 
   it('returns NonceHigh error', async () => {
-    const spendTx = await client.spendTx({
-      senderId: await client.address(),
-      recipientId: await client.address(),
+    const spendTx = await sdk.spendTx({
+      senderId: await sdk.address(),
+      recipientId: await sdk.address(),
       amount: 100,
       nonce: 100
     })
@@ -51,18 +51,15 @@ describe('Verify Transaction', function () {
   })
 
   it('verifies transactions before broadcasting', async () => {
-    const spendTx = await client.spendTx({
-      senderId: await client.address(),
-      recipientId: await client.address(),
+    const spendTx = await sdk.spendTx({
+      senderId: await sdk.address(),
+      recipientId: await sdk.address(),
       amount: 1,
       ttl: 2,
       absoluteTtl: true
     })
-    try {
-      await client.send(spendTx)
-    } catch ({ validation }) {
-      expect(validation).to.have.lengthOf(1)
-    }
+    const error = await sdk.send(spendTx).catch(e => e)
+    expect(error.validation).to.have.lengthOf(1)
   })
 
   it('verifies vmVersion/abiVersion for contract transactions', async () => {

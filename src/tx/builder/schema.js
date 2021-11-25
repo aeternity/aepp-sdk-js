@@ -48,7 +48,8 @@ export const NAME_ID_KEY = {
   ct: 'contract_pubkey',
   ch: 'channel'
 }
-// # ref: https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L290
+// # https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L290
+// # https://github.com/aeternity/protocol/blob/master/AENS.md#protocol-fees-and-protection-times
 // # bid ranges:
 export const NAME_BID_RANGES = {
   31: BigNumber(3).times(NAME_FEE_MULTIPLIER),

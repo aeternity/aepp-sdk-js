@@ -17,72 +17,63 @@
 
 import Node from '../../src/node'
 import { url, internalUrl, ignoreVersion } from './'
-
 import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
-import * as R from 'ramda'
 import NodePool from '../../src/node-pool'
 
 describe('Node client', function () {
-  let client
+  let node
 
   before(async function () {
-    client = await Node({ url, internalUrl, ignoreVersion })
+    node = await Node({ url, internalUrl, ignoreVersion })
   })
 
   it('determines remote version', () => {
-    expect(client.version).to.be.a('string')
-    expect(client.revision).to.be.a('string')
+    expect(node.version).to.be.a('string')
+    expect(node.revision).to.be.a('string')
   })
 
   it('loads operations', () => {
     ['postTransaction', 'getCurrentKeyBlock']
-      .map(method => expect(client.api[method]).to.be.a('function'))
+      .map(method => expect(node.api[method]).to.be.a('function'))
   })
 
-  it('gets key blocks by height for the first 3 blocks', () => {
-    expect(client.api.getKeyBlockByHeight).to.be.a('function')
-
-    return Promise.all(
-      R.range(1, 3).map(async i => {
-        const result = await client.api.getKeyBlockByHeight(i)
-        expect(result.height, i).to.equal(i)
-      })
-    )
+  it('gets key blocks by height for the first 3 blocks', async () => {
+    expect(node.api.getKeyBlockByHeight).to.be.a('function')
+    const blocks = await Promise.all([1, 2, 3].map(i => node.api.getKeyBlockByHeight(i)))
+    expect(blocks.map(b => b.height)).to.eql([1, 2, 3])
   })
+
+  it('throws clear exceptions when can\'t get transaction by hash', async () => {
+    await expect(node.api.getTransactionByHash('th_test'))
+      .to.be.rejectedWith('v3/transactions/th_test error: Invalid hash')
+  })
+
   describe('Node Pool', () => {
     it('throw error on invalid node object', async () => {
-      const node = await NodePool()
-      expect(() => node.addNode('test', {})).to.throw(Error)
-      expect(() => node.addNode('test', 1)).to.throw(Error)
-      expect(() => node.addNode('test', null)).to.throw(Error)
-      try {
-        node.addNode('test', {})
-      } catch (e) {
-        e.message.should.be.equal('"node" at position 0 fails because [child "instance" fails because [child "api" fails because ["api" is required]]]')
-      }
+      const nodes = await NodePool()
+      expect(() => nodes.addNode('test', {})).to.throw(Error)
+      expect(() => nodes.addNode('test', 1)).to.throw(Error)
+      expect(() => nodes.addNode('test', null)).to.throw(Error)
+      expect(() => nodes.addNode('test', {}))
+        .to.throw('Each node instance should have api (object), consensusProtocolVersion (number), genesisHash (string) fields, got {} instead')
     })
+
     it('Throw error on get network without node ', async () => {
-      const node = await NodePool()
-      try {
-        node.getNetworkId()
-      } catch (e) {
-        e.message.should.be.equal('networkId is not provided')
-      }
+      const nodes = await NodePool()
+      expect(() => nodes.getNetworkId()).to.throw('networkId is not provided')
     })
+
     it('Throw error on using API without node', async () => {
-      const node = await NodePool()
-      try {
-        node.api.someAPIfn()
-      } catch (e) {
-        e.message.should.be.equal('You can\'t use Node API. Node is not connected or not defined!')
-      }
+      const nodes = await NodePool()
+      expect(() => nodes.api.someAPIfn()).to.throw('You can\'t use Node API. Node is not connected or not defined!')
     })
+
     it('Can change Node', async () => {
       const nodes = await NodePool({
         nodes: [
           { name: 'first', instance: await Node({ url, internalUrl, ignoreVersion }) },
-          { name: 'second', instance: client }
+          { name: 'second', instance: node }
         ]
       })
       const activeNode = nodes.getNodeInfo()
@@ -91,23 +82,21 @@ describe('Node client', function () {
       const secondNodeInfo = nodes.getNodeInfo()
       secondNodeInfo.name.should.be.equal('second')
     })
+
     it('Fail on undefined node', async () => {
       const nodes = await NodePool({
         nodes: [
           { name: 'first', instance: await Node({ url, internalUrl, ignoreVersion }) },
-          { name: 'second', instance: client }
+          { name: 'second', instance: node }
         ]
       })
-      try {
-        nodes.selectNode('asdasd')
-      } catch (e) {
-        e.message.should.be.equal('Node with name asdasd not in pool')
-      }
+      expect(() => nodes.selectNode('asdasd')).to.throw('Node with name asdasd not in pool')
     })
+
     it('Can get list of nodes', async () => {
       const nodes = await NodePool({
         nodes: [
-          { name: 'first', instance: client }
+          { name: 'first', instance: node }
         ]
       })
       const nodesList = nodes.getNodesInPool()

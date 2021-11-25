@@ -40,26 +40,6 @@ export function getNetworkId ({ networkId, force = false } = {}) {
 }
 
 /**
- * get consensus protocol version
- * @param {Array} protocols Array of protocols
- * @param {Number} height Height
- * @return {Number} version Protocol version
- */
-async function getConsensusProtocolVersion (protocols = [], height) {
-  if (!protocols) throw new Error('Protocols must be an array')
-  if (!height) height = (await this.api.getCurrentKeyBlock()).height
-  if (height < 0) throw new Error('height must be a number >= 0')
-
-  return protocols
-    .filter(({ effectiveAtHeight }) => height >= effectiveAtHeight)
-    .reduce(
-      (acc, p) => p.effectiveAtHeight > acc.effectiveAtHeight ? p : acc,
-      { effectiveAtHeight: -1, version: 0 }
-    )
-    .version
-}
-
-/**
  * {@link genSwaggerClient} based Node remote API Stamp
  * @function
  * @alias module:@aeternity/aepp-sdk/es/node
@@ -76,7 +56,15 @@ const Node = AsyncInit.compose({
     if (!url) throw new Error('"url" required')
     this.url = url.replace(/\/$/, '')
     this.internalUrl = internalUrl ? internalUrl.replace(/\/$/, '') : this.url
-    const client = await genSwaggerClient(`${this.url}/api?oas3`, { internalUrl: this.internalUrl })
+    const client = await genSwaggerClient(`${this.url}/api?oas3`, {
+      internalUrl: this.internalUrl,
+      responseInterceptor: response => {
+        if (response.ok) return
+        return Object.assign(response, {
+          statusText: `${new URL(response.url).pathname.slice(1)} error: ` + response.body.reason
+        })
+      }
+    })
     this.version = client.spec.info.version
     if (
       !semverSatisfies(this.version, NODE_GE_VERSION, NODE_LT_VERSION) &&
@@ -89,8 +77,17 @@ const Node = AsyncInit.compose({
     }
     this.api = client.api
 
-    const { nodeRevision: revision, genesisKeyBlockHash: genesisHash, networkId, protocols } = await this.api.getStatus()
-    this.consensusProtocolVersion = await this.getConsensusProtocolVersion(protocols)
+    const {
+      nodeRevision: revision, genesisKeyBlockHash: genesisHash, networkId,
+      protocols, topBlockHeight
+    } = await this.api.getStatus()
+    this.consensusProtocolVersion = protocols
+      .filter(({ effectiveAtHeight }) => topBlockHeight >= effectiveAtHeight)
+      .reduce(
+        (acc, p) => p.effectiveAtHeight > acc.effectiveAtHeight ? p : acc,
+        { effectiveAtHeight: -1, version: 0 }
+      )
+      .version
     this.nodeNetworkId = networkId
     return Object.assign(this, { revision, genesisHash })
   },
@@ -103,8 +100,7 @@ const Node = AsyncInit.compose({
         version: this.version,
         consensusProtocolVersion: this.consensusProtocolVersion
       }
-    },
-    getConsensusProtocolVersion
+    }
   },
   props: {
     version: null,
@@ -113,7 +109,7 @@ const Node = AsyncInit.compose({
   }
 })
 
-const NODE_GE_VERSION = '6.0.0'
+const NODE_GE_VERSION = '6.2.0'
 const NODE_LT_VERSION = '7.0.0'
 
 export default Node

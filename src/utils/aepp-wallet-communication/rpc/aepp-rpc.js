@@ -5,9 +5,7 @@
  * @export AeppRpc
  * @example import ContentScriptBridge from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc'
  */
-import * as R from 'ramda'
 import { v4 as uuid } from 'uuid'
-
 import Ae from '../../../ae'
 import RpcClient from './rpc-client'
 import { getHandler, message, voidFn } from '../helpers'
@@ -236,7 +234,7 @@ export default Ae.compose({
       if (!this.rpcClient || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
       if (!this.rpcClient.currentAccount) throw new Error('You are not subscribed for an account.')
       if (options.onAccount && !this.rpcClient.hasAccessToAccount(options.onAccount)) throw new Error(`You do not have access to account ${options.onAccount}`)
-      const opt = R.merge(this.Ae.defaults, options)
+      const opt = { ...this.Ae.defaults, ...options }
       if (!opt.walletBroadcast) {
         const signed = await this.signTransaction(tx, { onAccount: opt.onAccount })
         return this.sendTransaction(signed, opt)

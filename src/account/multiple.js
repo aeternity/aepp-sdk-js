@@ -21,7 +21,6 @@
  * @export AccountMultiple
  */
 
-import * as R from 'ramda'
 import AsyncInit from '../utils/async-init'
 import MemoryAccount from './memory'
 import { decode } from '../tx/builder/helpers'
@@ -50,15 +49,11 @@ import AccountBase, { isAccountBase } from './base'
  */
 export default AccountBase.compose(AsyncInit, {
   async init ({ accounts = [], address }) {
-    /* An Account maynot be required for the Node/Chain methods */
-    if (Array.isArray(accounts) && accounts.length) {
-      this.accounts = R.fromPairs(await Promise.all(accounts.map(async a => [await a.address(), a])))
-      if (!address) address = Object.keys(this.accounts)[0]
-      decode(address, 'ak')
-      this.selectedAddress = address
-    } else {
-      console.warn('No account/accounts supplied')
-    }
+    this.accounts = Object.fromEntries(await Promise.all(
+      accounts.map(async a => [await a.address(), a])
+    ))
+    address = address || Object.keys(this.accounts)[0]
+    if (address) this.selectAccount(address)
   },
   props: {
     accounts: {}
@@ -138,15 +133,19 @@ export default AccountBase.compose(AsyncInit, {
      * @private
      */
     _resolveAccount (account) {
-      switch (typeof account) {
-        case 'string':
-          decode(account, 'ak')
-          if (!this.accounts[account]) throw new Error(`Account for ${account} not available`)
-          return this.accounts[account]
-        case 'object':
-          return isAccountBase(account) ? account : MemoryAccount({ keypair: account })
-        default:
-          throw new Error(`Unknown account type: ${typeof account} (account: ${account})`)
+      if (account === null) {
+        throw new Error('No account or wallet configured')
+      } else {
+        switch (typeof account) {
+          case 'string':
+            decode(account, 'ak')
+            if (!this.accounts[account]) throw new Error(`Account for ${account} not available`)
+            return this.accounts[account]
+          case 'object':
+            return isAccountBase(account) ? account : MemoryAccount({ keypair: account })
+          default:
+            throw new Error(`Unknown account type: ${typeof account} (account: ${account})`)
+        }
       }
     }
   }

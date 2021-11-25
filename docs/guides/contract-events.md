@@ -1,6 +1,6 @@
 # Contract Events
 
-The Sophia language also provides you the possibility to emit [Events](https://github.com/aeternity/aesophia/blob/v6.0.1/docs/sophia.md#events) in your functions.
+The Sophia language also provides you the possibility to emit [Events](https://aeternity.com/aesophia/latest/sophia_features/#events) in your functions.
 On this page you will learn how to access and decode the event log of a specific transaction.
 
 ## EventEmitter contract
@@ -19,8 +19,8 @@ contract EventEmitter =
 ```
 
 ## Decode events using ACI (high-level, recommended)
-When initializing a contract instance using the source code and providing the [ACI](https://github.com/aeternity/aesophia/blob/v6.0.1/docs/aeso_aci.md)
-or obtaining it via http compiler (default) you will be able to access the `emitEvents` entrypoint of the Sophia contract above as follows: 
+When initializing a contract instance using the source code and providing the [ACI](https://aeternity.com/aesophia/latest/aeso_aci/)
+or obtaining it via http compiler (default) you will be able to access the `emitEvents` entrypoint of the Sophia contract above as follows:
 
 ```js
 // events emitted by contract calls are automatically decoded
@@ -67,7 +67,7 @@ const txHash = 'th_2YV3AmAz2kXdTnQxXtR2uxQi3KuLS9wfvXyqKkQQ2Y6dE6RnET';
 const tx = await client.tx(txHash)
 
 // decode events using contract instance
-const decodedUsingInstance = contractInstance.decodeEvents('emitEvents', tx.log)
+const decodedUsingInstance = contractInstance.decodeEvents(tx.log)
 
 // OR decode of events using contract instance ACI methods
 const decodedUsingInstanceMethods = contractInstance.methods.emitEvents.decodeEvents(tx.log)
@@ -117,7 +117,7 @@ const eventsSchema = [
   { name: 'AnotherEvent', types: [SOPHIA_TYPES.address, SOPHIA_TYPES.string] },
 ]
 
-const decodedEvents = decodeEvents(tx.log, { schema: eventsSchema })
+const decodedEvents = decodeEvents(tx.log, eventsSchema)
 console.log(decodedEvents)
 /*
 [

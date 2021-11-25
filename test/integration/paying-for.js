@@ -49,7 +49,7 @@ describe('Paying for transaction of another account', function () {
     expect(await sdk.getBalance(await receiver.address())).to.equal('10000')
   })
 
-  const contractCode = `
+  const contractSource = `
     contract Test =
       record state = { value: int }
       entrypoint init(x: int): state = { value = x }
@@ -66,18 +66,18 @@ describe('Paying for transaction of another account', function () {
     }, {
       deepProps: { Ae: { defaults: { waitMined: false, innerTx: true } } }
     })
-    const contract = await unPayingSdk.getContractInstance(contractCode)
+    const contract = await unPayingSdk.getContractInstance({ source: contractSource })
     const { rawTx: contractDeployTx, address } = await contract.deploy([42])
     contractAddress = address
     await sdk.payForTransaction(contractDeployTx)
-    payingContract = await unPayingSdk.getContractInstance(contractCode, { contractAddress })
-    expect(await (await payingContract.methods.getValue()).decode()).to.be.equal(42)
+    payingContract = await unPayingSdk.getContractInstance({ source: contractSource, contractAddress })
+    expect((await payingContract.methods.getValue()).decodedResult).to.be.equal(42n)
   })
 
   it('pays for contract call', async () => {
-    const contract = await unPayingSdk.getContractInstance(contractCode, { contractAddress })
+    const contract = await unPayingSdk.getContractInstance({ source: contractSource, contractAddress })
     const { rawTx: contractCallTx } = await contract.methods.setValue(43)
     await sdk.payForTransaction(contractCallTx)
-    expect(await (await payingContract.methods.getValue()).decode()).to.be.equal(43)
+    expect((await payingContract.methods.getValue()).decodedResult).to.be.equal(43n)
   })
 })

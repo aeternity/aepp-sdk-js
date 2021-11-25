@@ -1,6 +1,5 @@
 import BigNumber from 'bignumber.js'
 import { MAX_AUTH_FUN_GAS } from '../../tx/builder/schema'
-import { hash } from '../../utils/crypto'
 
 export const prepareGaParams = (ins) => async (authData, authFnName) => {
   if (typeof authData !== 'object') throw new Error('AuthData must be an object')
@@ -11,12 +10,6 @@ export const prepareGaParams = (ins) => async (authData, authFnName) => {
     return { authCallData: authData.callData, gas }
   } else {
     if (!authData.source || !authData.args) throw new Error('Auth data must contain source code and arguments.')
-    return { authCallData: await ins.contractEncodeCall(authData.source, authFnName, authData.args), gas }
+    return { authCallData: await ins.contractEncodeCallDataAPI(authData.source, authFnName, authData.args), gas }
   }
-}
-
-export const getContractAuthFan = (ins) => async (source, fnName) => {
-  const { bytecode } = await ins.contractCompile(source)
-
-  return { bytecode, authFun: hash(fnName) }
 }

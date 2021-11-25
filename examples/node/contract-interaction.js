@@ -75,7 +75,7 @@ const COMPILER_URL = 'https://compiler.aepps.com';
   // The `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp) itself is asynchronous as it determines the node's version and
   // rest interface automatically. Only once the Promise is fulfilled, you know you have a working object instance
   // which is assigned to the `client` constant in this case.
-  // 
+  //
   // Note:
   //
   //   - `Universal` is not a constructor but a factory, which means it's *not* invoked with `new`.
@@ -94,7 +94,7 @@ const COMPILER_URL = 'https://compiler.aepps.com';
   // being created, signed (using the _secretKey_ of the previously defined `MemoryAccount`) and broadcasted to the network.
   // It will be picked up by the miners and written to the chain.
 
-  const contract = await bytecode.deploy(['5'])
+  const contract = await bytecode.deploy([5])
   console.log(`Contract deployed at ${contract.address}`)
 
   // Note:
@@ -107,7 +107,7 @@ const COMPILER_URL = 'https://compiler.aepps.com';
   // any public function (aka `entrypoint` in Sophia) defined within it.
   // In this case you can use `callStatic` which performs a `dry-run` of the transaction which allows you to get the result without having to mine a transaction.
 
-  const call = await contract.callStatic('multiplyBy', ['7'])
+  const call = await contract.callStatic('multiplyBy', [7])
 
   // **Note**:
   //
@@ -117,13 +117,13 @@ const COMPILER_URL = 'https://compiler.aepps.com';
   // The execution result, if successful, will be an FATE-encoded result value.
   // The `decode` function will use the Sophia HTTP compiler to decode the result value.
 
-  console.log(`Execution result: ${await call.decode()}`)
+  console.log(`Execution result: ${call.decodedResult}`)
 
   // ## 9. Get contract instance of a deployed contract
   // Knowing the contract address and the source code allows you to
   // initialize a contract instance and interact with the contract in a convenient way.
 
-  const contractInstance = await client.getContractInstance(CONTRACT_CODE, {contractAddress: contract.address})
+  const contractInstance = await client.getContractInstance({ source: CONTRACT_CODE, contractAddress: contract.address })
   const callResult = await contractInstance.methods.multiplyBy(7)
   console.log(`Execution result (via contractInstance initialized with existing contract): ${callResult.decodedResult}`)
 

@@ -27,7 +27,6 @@
  */
 
 import Ae from './'
-import * as R from 'ramda'
 import { decodeBase64Check } from '../utils/crypto'
 import { pause } from '../utils/other'
 import { oracleQueryId, decode } from '../tx/builder/helpers'
@@ -123,7 +122,7 @@ export async function pollForQueryResponse (oracleId, queryId, { attempts = 20, 
     const { response } = await this.api.getOracleQueryByPubkeyAndQueryId(oracleId, queryId)
     const responseBuffer = decode(response, 'or')
     if (responseBuffer.length) {
-      return { response, decode: () => responseBuffer } // TODO: Return just responseBuffer
+      return String(responseBuffer)
     }
   }
   throw new Error(`Giving up after ${(attempts - 1) * interval}ms`)
@@ -146,14 +145,15 @@ export async function pollForQueryResponse (oracleId, queryId, { attempts = 20, 
  * @return {Promise<Object>} Oracle object
  */
 async function registerOracle (queryFormat, responseFormat, options = {}) {
-  const opt = R.merge(this.Ae.defaults, options) // Preset VmVersion for oracle
+  const opt = { ...this.Ae.defaults, ...options } // Preset VmVersion for oracle
   const accountId = await this.address(opt)
 
-  const oracleRegisterTx = await this.oracleRegisterTx(R.merge(opt, {
+  const oracleRegisterTx = await this.oracleRegisterTx({
+    ...opt,
     accountId,
     queryFormat,
     responseFormat
-  }))
+  })
   return {
     ...await this.send(oracleRegisterTx, opt),
     ...await this.getOracleObject(`ok_${accountId.slice(3)}`)
@@ -177,14 +177,16 @@ async function registerOracle (queryFormat, responseFormat, options = {}) {
  * @return {Promise<Object>} Query object
  */
 async function postQueryToOracle (oracleId, query, options = {}) {
-  const opt = R.merge(this.Ae.defaults, options)
+  const queryFee = options.queryFee || (await this.api.getOracleByPubkey(oracleId)).queryFee
+  const opt = { ...this.Ae.defaults, queryFee, ...options }
   const senderId = await this.address(opt)
 
-  const oracleRegisterTx = await this.oraclePostQueryTx(R.merge(opt, {
+  const oracleRegisterTx = await this.oraclePostQueryTx({
+    ...opt,
     oracleId,
     senderId,
     query
-  }))
+  })
   const queryId = oracleQueryId(senderId, unpackTx(oracleRegisterTx).tx.nonce, oracleId)
   return {
     ...await this.send(oracleRegisterTx, opt),
@@ -206,14 +208,15 @@ async function postQueryToOracle (oracleId, query, options = {}) {
  * @return {Promise<Object>} Oracle object
  */
 async function extendOracleTtl (oracleId, oracleTtl, options = {}) {
-  const opt = R.merge(this.Ae.defaults, options)
+  const opt = { ...this.Ae.defaults, ...options }
   const callerId = await this.address(opt)
 
-  const oracleExtendTx = await this.oracleExtendTx(R.merge(opt, {
+  const oracleExtendTx = await this.oracleExtendTx({
+    ...opt,
     oracleId,
     callerId,
     oracleTtl
-  }))
+  })
   return {
     ...await this.send(oracleExtendTx, opt),
     ...await this.getOracleObject(oracleId)
@@ -236,15 +239,16 @@ async function extendOracleTtl (oracleId, oracleTtl, options = {}) {
  * @return {Promise<Object>} Oracle object
  */
 async function respondToQuery (oracleId, queryId, response, options = {}) {
-  const opt = R.merge(this.Ae.defaults, options)
+  const opt = { ...this.Ae.defaults, ...options }
   const callerId = await this.address(opt)
 
-  const oracleRespondTx = await this.oracleRespondTx(R.merge(opt, {
+  const oracleRespondTx = await this.oracleRespondTx({
+    ...opt,
     oracleId,
     queryId,
     callerId,
     response
-  }))
+  })
   return {
     ...await this.send(oracleRespondTx, opt),
     ...await this.getOracleObject(oracleId)

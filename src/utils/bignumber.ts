@@ -19,7 +19,8 @@ export const parseBigNumber = (number: string | number | BigNumber): string =>
  * @return {Boolean}
  */
 export const isBigNumber = (number: string | number | BigNumber): boolean =>
-  !isNaN(number as number) || Number.isInteger(number) || BigNumber.isBigNumber(number)
+  ['number', 'object', 'string', 'bigint'].includes(typeof number) &&
+  (!isNaN(number as number) || Number.isInteger(number) || BigNumber.isBigNumber(number))
 
 /**
  * BigNumber ceil operation

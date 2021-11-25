@@ -14,8 +14,6 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-import * as R from 'ramda'
-
 import Chain from './'
 import { AE_AMOUNT_FORMATS, formatAmount } from '../utils/amount-formatter'
 import verifyTransaction from '../tx/validator'
@@ -34,7 +32,7 @@ import { DRY_RUN_ACCOUNT, NAME_ID_KEY } from '../tx/builder/schema'
  */
 
 async function sendTransaction (tx, options = {}) {
-  const { waitMined, verify } = R.merge(this.Ae.defaults, options)
+  const { waitMined, verify } = { ...this.Ae.defaults, ...options }
   if (verify) {
     const validation = await verifyTransaction(tx, this.selectedNode.instance)
     if (validation.length) {
@@ -140,7 +138,7 @@ async function topBlock () {
   return this.api.getTopHeader()
 }
 
-async function poll (th, { blocks = 10, interval = 5000, allowUnsynced = false } = {}) {
+async function poll (th, { blocks = 10, interval = 500, allowUnsynced = false } = {}) {
   const max = await this.height() + blocks
   do {
     const tx = await this.tx(th).catch(_ => null)

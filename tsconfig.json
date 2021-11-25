@@ -11,13 +11,14 @@
     "outDir": "./es",
     "noImplicitAny": true,
     "module": "es6",
-    "target": "es5",
+    "target": "es6",
     "lib": ["es2019"],
     "moduleResolution": "node",
     "preserveConstEnums": true,
     "declaration": true,
     "downlevelIteration": true,
     "strictNullChecks": true,
+    "allowSyntheticDefaultImports": true,
     "typeRoots": [
       "./node_modules/@types",
       "./src/typings"
