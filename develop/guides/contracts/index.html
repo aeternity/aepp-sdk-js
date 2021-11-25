@@ -1011,13 +1011,10 @@
 <li>Compare source code with on-chain version.</li>
 </ul>
 </li>
-<li><code>opt</code> (default: {})<ul>
-<li>Object with other <a href="../../transaction-options/">transaction options</a> which will be provided to <strong>every transaction</strong> that is initiated using the contract instance. You should be aware that:<ul>
+<li>other <a href="../../transaction-options/">transaction options</a> which will be provided to <strong>every transaction</strong> that is initiated using the contract instance. You should be aware that:<ul>
 <li>For most of these additional options it doesn't make sense to define them at contract instance level.</li>
 <li>You wouldn't want to provide an <code>amount</code> to each transaction or use the same <code>nonce</code> which would result in invalid transactions.</li>
 <li>For options like <code>ttl</code> or <code>gasPrice</code> it does absolutely make sense to set this on contract instance level.</li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>
@@ -1073,8 +1070,6 @@ if they should produce changes to the state of the smart contract, see <code>inc
 <div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">tx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">get_count</span><span class="p">()</span> <span class="c1">// recommended</span>
 <span class="c1">// or</span>
 <span class="kd">const</span> <span class="nx">tx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">get_count</span><span class="p">.</span><span class="nx">get</span><span class="p">()</span>
-<span class="c1">// or</span>
-<span class="kd">const</span> <span class="nx">tx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">contractInstance</span><span class="p">.</span><span class="nx">callStatic</span><span class="p">(</span><span class="s1">&#39;get_count&#39;</span><span class="p">,</span> <span class="p">[])</span>
 
 <span class="c1">// access the decoded result returned by the execution of the entrypoint</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">tx</span><span class="p">.</span><span class="nx">decodedResult</span><span class="p">);</span>
@@ -1128,12 +1123,12 @@ if they should produce changes to the state of the smart contract, see <code>inc
 <tr>
 <td>bits</td>
 <td><code>give_me_bits(input: bits)</code></td>
-<td><code>give_me_bits([1,0,1,1,0,])</code></td>
+<td><code>give_me_bits(0b10110n)</code></td>
 </tr>
 <tr>
 <td>bytes</td>
 <td><code>get_bytes(test: bytes(3))</code></td>
-<td><code>get_bytes(['0x01','0x1f', '0x10'])</code></td>
+<td><code>get_bytes(new Uint8Array([0x1, 0x1f, 0x10]))</code></td>
 </tr>
 <tr>
 <td>string</td>
@@ -1148,17 +1143,17 @@ if they should produce changes to the state of the smart contract, see <code>inc
 <tr>
 <td>tuple</td>
 <td><code>a_few_things(things: (string * int * map(address, bool)))</code></td>
-<td><code>a_few_things(['hola', 3, {'ak_1337...': true}])</code></td>
+<td><code>a_few_things(['hola', 3, new Map([['ak_1337...', true]])])</code></td>
 </tr>
 <tr>
 <td>record</td>
-<td><code>record user = {</code><br /> &nbsp; &nbsp; &nbsp; &nbsp; <code>firstname: string,</code> <br /> &nbsp; &nbsp; &nbsp; &nbsp; <code>lastname: string</code> <br /> <code>}</code> <br />  <br />  <code>get_firstname(input: user): string</code></td>
+<td><code>record user = {</code><br />&nbsp; &nbsp; &nbsp; &nbsp; <code>firstname: string,</code> <br /> &nbsp; &nbsp; &nbsp; &nbsp; <code>lastname: string</code> <br /> <code>}</code> <br />  <br />  <code>get_firstname(input: user): string</code></td>
 <td><code>get_firstname({'firstname': 'Alfred', 'lastname': 'Mustermann'})</code></td>
 </tr>
 <tr>
 <td>map</td>
 <td><code>balances(values: map(address, int))</code></td>
-<td><code>balances({'ak_1337...': 123, 'ak_FCKGW...': 321, 'ak_Rm5U...': 999})</code></td>
+<td><code>balances(new Map([['ak_1337...', 123], ['ak_FCKGW...', 321], ['ak_Rm5U...', 999]]))</code></td>
 </tr>
 <tr>
 <td>option()</td>
@@ -1168,12 +1163,12 @@ if they should produce changes to the state of the smart contract, see <code>inc
 <tr>
 <td>hash</td>
 <td><code>a_gram(of: hash)</code></td>
-<td><code>// 32 bytes signature</code> <br />  <code>a_gram(af01...490f)</code></td>
+<td><code>// 32 bytes signature</code> <br />  <code>a_gram('af01...490f')</code></td>
 </tr>
 <tr>
 <td>signature</td>
 <td><code>one_signature(sig: signature)</code></td>
-<td><code>// 64 bytes signature</code> <br />  <code>one_signature(af01...490f)</code></td>
+<td><code>// 64 bytes signature</code> <br />  <code>one_signature('af01...490f')</code></td>
 </tr>
 <tr>
 <td>functions</td>
