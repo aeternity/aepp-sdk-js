@@ -51,6 +51,9 @@ Note:
     - This is specifically important and useful for writing tests.
 
 ## 3. Initialize the contract instance
+
+### By sourcecode
+
 ```js
 const CONTRACT_SOURCE = ... // source code of the contract
 const contractInstance = await client.getContractInstance({ source: CONTRACT_SOURCE })
@@ -63,12 +66,28 @@ Note:
   const filesystem = ... // key-value map with name of the include as key and source code of the include as value
   const contractInstance = await client.getContractInstance({ source: CONTRACT_SOURCE, filesystem })
   ```
-- If your contract is already deployed and you know the contract address you can initialize the contract instance using:
-  ```js
-  const contractAddress = ... // the address of the contract
-  const contractInstance = await client.getContractInstance({ source: CONTRACT_SOURCE, contractAddress })
-  ```
-- Following attributes can be provided in an `options` object to `getContractInstance`:
+
+### By ACI and bytecode
+If you pre-compiled the contracts you can also initialize a contract instance by providing ACI and bytecode:
+
+```js
+const aci = ... // ACI of the contract
+const bytecode = ... // bytecode of the contract
+const contractInstance = await client.getContractInstance({ aci, bytecode })
+```
+
+### By ACI and contract address
+In many cases an application doesn't need to deploy a contract or verify its bytecode. In this case you'd want to initialize the instance by just providing the ACI and the contract address. This is also possible:
+
+```js
+const aci = ... // ACI of the contract
+const contractAddress = ... // the address of the contract
+const contractInstance = await client.getContractInstance({ aci, contractAddress })
+```
+
+### Options
+
+- Following attributes can be provided via `options` to `getContractInstance`:
     - `aci` (default: obtained via http compiler)
         - The Contract ACI.
     - `contractAddress`
@@ -116,6 +135,7 @@ console.log(contractInstance.deployInfo) // { owner, transaction, address, creat
 
 Note:
 
+- Deployment is only possible if the contract instance was initialized by providing sourcecode or bytecode.
 - The `init` entrypoint is a special function which is only called once for deployment, initializes the contract's state and doesn't require the `stateful` declaration.
 - In Sophia all `public functions` are called `entrypoints` and need to be declared as `stateful`
 if they should produce changes to the state of the smart contract, see `increment(value: int)`.
