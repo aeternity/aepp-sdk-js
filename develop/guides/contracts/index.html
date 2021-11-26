@@ -346,6 +346,40 @@
     3. Initialize the contract instance
   </a>
   
+    <nav class="md-nav" aria-label="3. Initialize the contract instance">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#by-sourcecode" class="md-nav__link">
+    By sourcecode
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#by-aci-and-bytecode" class="md-nav__link">
+    By ACI and bytecode
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#by-aci-and-contract-address" class="md-nav__link">
+    By ACI and contract address
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#options" class="md-nav__link">
+    Options
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -876,6 +910,40 @@
     3. Initialize the contract instance
   </a>
   
+    <nav class="md-nav" aria-label="3. Initialize the contract instance">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#by-sourcecode" class="md-nav__link">
+    By sourcecode
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#by-aci-and-bytecode" class="md-nav__link">
+    By ACI and bytecode
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#by-aci-and-contract-address" class="md-nav__link">
+    By ACI and contract address
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#options" class="md-nav__link">
+    Options
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -992,6 +1060,7 @@
 </li>
 </ul>
 <h2 id="3-initialize-the-contract-instance">3. Initialize the contract instance</h2>
+<h3 id="by-sourcecode">By sourcecode</h3>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">CONTRACT_SOURCE</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// source code of the contract</span>
 <span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span> <span class="nx">source</span><span class="o">:</span> <span class="nx">CONTRACT_SOURCE</span> <span class="p">})</span>
 </code></pre></div>
@@ -1001,11 +1070,22 @@
   <div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">filesystem</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// key-value map with name of the include as key and source code of the include as value</span>
 <span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span> <span class="nx">source</span><span class="o">:</span> <span class="nx">CONTRACT_SOURCE</span><span class="p">,</span> <span class="nx">filesystem</span> <span class="p">})</span>
 </code></pre></div></li>
-<li>If your contract is already deployed and you know the contract address you can initialize the contract instance using:
-  <div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">contractAddress</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// the address of the contract</span>
-<span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span> <span class="nx">source</span><span class="o">:</span> <span class="nx">CONTRACT_SOURCE</span><span class="p">,</span> <span class="nx">contractAddress</span> <span class="p">})</span>
-</code></pre></div></li>
-<li>Following attributes can be provided in an <code>options</code> object to <code>getContractInstance</code>:<ul>
+</ul>
+<h3 id="by-aci-and-bytecode">By ACI and bytecode</h3>
+<p>If you pre-compiled the contracts you can also initialize a contract instance by providing ACI and bytecode:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">aci</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// ACI of the contract</span>
+<span class="kd">const</span> <span class="nx">bytecode</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// bytecode of the contract</span>
+<span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span> <span class="nx">aci</span><span class="p">,</span> <span class="nx">bytecode</span> <span class="p">})</span>
+</code></pre></div>
+<h3 id="by-aci-and-contract-address">By ACI and contract address</h3>
+<p>In many cases an application doesn't need to deploy a contract or verify its bytecode. In this case you'd want to initialize the instance by just providing the ACI and the contract address. This is also possible:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">aci</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// ACI of the contract</span>
+<span class="kd">const</span> <span class="nx">contractAddress</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// the address of the contract</span>
+<span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span> <span class="nx">aci</span><span class="p">,</span> <span class="nx">contractAddress</span> <span class="p">})</span>
+</code></pre></div>
+<h3 id="options">Options</h3>
+<ul>
+<li>Following attributes can be provided via <code>options</code> to <code>getContractInstance</code>:<ul>
 <li><code>aci</code> (default: obtained via http compiler)<ul>
 <li>The Contract ACI.</li>
 </ul>
@@ -1059,6 +1139,7 @@
 </code></pre></div>
 <p>Note:</p>
 <ul>
+<li>Deployment is only possible if the contract instance was initialized by providing sourcecode or bytecode.</li>
 <li>The <code>init</code> entrypoint is a special function which is only called once for deployment, initializes the contract's state and doesn't require the <code>stateful</code> declaration.</li>
 <li>In Sophia all <code>public functions</code> are called <code>entrypoints</code> and need to be declared as <code>stateful</code>
 if they should produce changes to the state of the smart contract, see <code>increment(value: int)</code>.</li>
