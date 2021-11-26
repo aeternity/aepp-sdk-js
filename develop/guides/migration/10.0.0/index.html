@@ -593,12 +593,14 @@
 
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" checked>
       
       <label class="md-nav__link" for="__nav_8">
         Migration Guides
@@ -610,6 +612,156 @@
           Migration Guides
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Migration to 10.0.0
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Migration to 10.0.0
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#pollforqueryresponse-returns-response-as-string-1285" class="md-nav__link">
+    pollForQueryResponse returns response as string (#1285)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#removed-skipargsconvert-option-of-contract-call-and-deployment-6d4a599" class="md-nav__link">
+    removed skipArgsConvert option of contract call and deployment (6d4a599)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#removed-skiptransformdecoded-option-of-contract-call-and-deployment-bb49239" class="md-nav__link">
+    removed skipTransformDecoded option of contract call and deployment (bb49239)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ak_-addresses-are-not-accepted-as-hashes-bytes-and-signatures-anymore-cbaac62" class="md-nav__link">
+    ak_ addresses are not accepted as hashes, bytes, and signatures anymore (cbaac62)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#removed-contractencodecall-a4b303f" class="md-nav__link">
+    removed contractEncodeCall (a4b303f)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#removed-contractdecodedata-5df2285" class="md-nav__link">
+    removed contractDecodeData (5df2285)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#removed-setoptions-on-contract-instance-b88e767" class="md-nav__link">
+    removed setOptions on contract instance (b88e767)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contractcallstatic-contractcall-contractdeploy-are-deprecated-now-c4ec019" class="md-nav__link">
+    contractCallStatic, contractCall, contractDeploy are deprecated now (c4ec019)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dropped-compatibility-with-compiler410-f9cef12" class="md-nav__link">
+    dropped compatibility with compiler@4.1.0 (f9cef12)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#invert-and-rename-forcecodecheck-option-to-validatebytecode-in-getcontractinstance-72122fa" class="md-nav__link">
+    invert and rename forceCodeCheck option to validateBytecode in getContractInstance (72122fa)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#removed-getconsensusprotocolversion-method-75f0447" class="md-nav__link">
+    removed getConsensusProtocolVersion method (75f0447)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#switched-to-aeternityaepp-calldata-package-1313" class="md-nav__link">
+    switched to @aeternity/aepp-calldata package (#1313)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pass-source-in-options-of-sdkgetcontractinstance-5c690d2" class="md-nav__link">
+    pass source in options of sdk.getContractInstance (5c690d2)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-options-of-getcontractinstance-accepted-as-usual-ones-10fb7ba" class="md-nav__link">
+    additional options of getContractInstance accepted as usual ones (10fb7ba)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#drop-compatibility-with-es5-1331" class="md-nav__link">
+    drop compatibility with es5 (#1331)
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
           
             
   
@@ -932,6 +1084,41 @@ app. In Webpack it can be done by <a href="https://webpack.js.org/configuration/
       
         
 <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../../../CHANGELOG/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Changelog" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Changelog
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../9.0.0/" class="md-footer__link md-footer__link--next" aria-label="Next: Migration to 9.0.0" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Migration to 9.0.0
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
