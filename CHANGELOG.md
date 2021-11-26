@@ -2,6 +2,62 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [10.0.0-beta.1](https://github.com/aeternity/aepp-sdk-js/compare/v9.0.1...v10.0.0-beta.1) (2021-11-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* specify browserlist to better choice of features to transpile
+* **aci:** don't require source code
+* make contractDeploy a wrapper, remove unused code
+* inline getConsensusProtocolVersion function
+* invert and rename forceCodeCheck option to validateByteCode
+* require compiler 6 and above
+* make contractCall/Static a wrapper around getContractInstance
+* **contract instance:** thread all extra options as contract's
+* **contract instance:** remove unnecessary `setOptions` function
+* remove contractDecodeData as extra wrapper
+* remove contractEncodeCall as extra wrapper
+* don't accept ak_ addresses as hash, bytes and signature
+* **transformation:** drop extra wrapper around bindings
+* **transformation:** don't export extra functions
+* drop unnecessary skipTransformDecoded option
+* drop unnecessary skipArgsConvert option
+
+### Features
+
+* **aci:** don't require source code ([5c690d2](https://github.com/aeternity/aepp-sdk-js/commit/5c690d2d77a433c8496ab9cda6fd66e52a6b4b23))
+* decode using calldata package ([2bb494d](https://github.com/aeternity/aepp-sdk-js/commit/2bb494d67c02c9abd017274e06c55ed07aef65d7))
+* encode using calldata package ([eeebbd5](https://github.com/aeternity/aepp-sdk-js/commit/eeebbd58b860c2e4b35c1ed4cb3aaf12677b0982))
+* **poll-interval:** reduce poll interval to be a more sensible default ([9e55b2b](https://github.com/aeternity/aepp-sdk-js/commit/9e55b2be92125b42713f0e2a35916abc9f3c18fb))
+* support for new node feature next-nonce of release 6.2.0 ([#1299](https://github.com/aeternity/aepp-sdk-js/issues/1299)) ([e40b046](https://github.com/aeternity/aepp-sdk-js/commit/e40b04678b7c4819074803095da31c813aa367e0))
+* **aens:** enable commitmentHash preclaim in tests ([5de05e5](https://github.com/aeternity/aepp-sdk-js/commit/5de05e58d097a2842c78d80a34c49a8e7635997c))
+
+
+### Bug Fixes
+
+* **compiler errors:** construct error message by server response ([8621352](https://github.com/aeternity/aepp-sdk-js/commit/8621352691d47373d4e79d495f2d6e6d6e87b432))
+* **events:** fix event decoding order and address prefix ([faad530](https://github.com/aeternity/aepp-sdk-js/commit/faad53057cbf7bca65d0f2c6262b27090773fbb6))
+* **events:** fix test for incorrect address return type ([31aaeec](https://github.com/aeternity/aepp-sdk-js/commit/31aaeec87fcd59eb3866682a0d529100a975f7fb))
+* **node errors:** construct error message by server response ([d556936](https://github.com/aeternity/aepp-sdk-js/commit/d5569361c925bca35df76f31bcb049c83a6daf31))
+* **semverSatisfies:** ignore build number ([c3cce0a](https://github.com/aeternity/aepp-sdk-js/commit/c3cce0a256b9b0af29b30662e4fa7a08bb9ab187))
+* commitlint issue ([2c1cf54](https://github.com/aeternity/aepp-sdk-js/commit/2c1cf541e45b87b6acf54c2929847a3d227d8ada))
+* don't accept ak_ addresses as hash, bytes and signature ([cbaac62](https://github.com/aeternity/aepp-sdk-js/commit/cbaac6263dd1729d64ef3a01c94e10687fed3b0d))
+* drop unnecessary skipArgsConvert option ([6d4a599](https://github.com/aeternity/aepp-sdk-js/commit/6d4a59986d6833866b6828085fad96b364e5d315))
+* drop unnecessary skipTransformDecoded option ([bb49239](https://github.com/aeternity/aepp-sdk-js/commit/bb492396a29d673f02eee7cfec4e114c2fba2f3c))
+* inline getConsensusProtocolVersion function ([75f0447](https://github.com/aeternity/aepp-sdk-js/commit/75f044792bd2d81eca3a2abc8218e8ca5f167134))
+* invert and rename forceCodeCheck option to validateByteCode ([72122fa](https://github.com/aeternity/aepp-sdk-js/commit/72122facdcec9921202b210c387c19509b26e578))
+* make contractCall/Static a wrapper around getContractInstance ([c4ec019](https://github.com/aeternity/aepp-sdk-js/commit/c4ec019372f5d5745378e781afb1eb6b2b5acfeb))
+* make contractDeploy a wrapper, remove unused code ([48d36f9](https://github.com/aeternity/aepp-sdk-js/commit/48d36f9be30805a476590282bffae9944134eb41))
+* remove contractDecodeData as extra wrapper ([5df2285](https://github.com/aeternity/aepp-sdk-js/commit/5df2285a7b5694475554e5154c544e0885bd4b33))
+* require compiler 6 and above ([f9cef12](https://github.com/aeternity/aepp-sdk-js/commit/f9cef12a7db4b2559519ef7f8380cc9e89630492))
+* specify browserlist to better choice of features to transpile ([c2ec71a](https://github.com/aeternity/aepp-sdk-js/commit/c2ec71a7690ed2590093c0cbff048599b5ca87bd))
+* **contract instance:** remove unnecessary `setOptions` function ([b88e767](https://github.com/aeternity/aepp-sdk-js/commit/b88e767c86874f259ff7a1eb1784c368524e7167))
+* **contract instance:** thread all extra options as contract's  ([10fb7ba](https://github.com/aeternity/aepp-sdk-js/commit/10fb7bad8f61b973c1be5daec50909d251ec1f90))
+* remove contractEncodeCall as extra wrapper ([a4b303f](https://github.com/aeternity/aepp-sdk-js/commit/a4b303fbcc3b7cc544a2b5b3415d0f4a147b488c))
+* **transformation:** don't export extra functions ([fa38b40](https://github.com/aeternity/aepp-sdk-js/commit/fa38b40ef56744e2941db198533b3f454b3bf53c))
+* **transformation:** drop extra wrapper around bindings ([9b70f8e](https://github.com/aeternity/aepp-sdk-js/commit/9b70f8ea0ce509a91ec78f0718574b59c0143de0))
+
 ## [9.0.1](https://github.com/aeternity/aepp-sdk-js/compare/v9.0.0...v9.0.1) (2021-10-04)
 
 ### Refactoring
@@ -16,7 +72,7 @@ All notable changes to this project will be documented in this file. See [standa
    * ` delegateNamePreclaimSignature`
    * ` delegateNameClaimSignature`
    * `delegateNameTransferSignature`
-   * `delegateNameRevokeSignature` 
+   * `delegateNameRevokeSignature`
 * drop following oracle delegation signature methods over the new common  `createOracleDelegationSignature` implementation accepts an object param ([88b7bf3](https://github.com/aeternity/aepp-sdk-js/commit/88b7bf3aa55b3740c9a64fb4049abcc0fdd3b277))
    * `delegateOracleRegisterSignature`
    * `delegateOracleExtendSignature`
