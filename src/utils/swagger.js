@@ -66,7 +66,7 @@ export default async (
       url,
       spec,
       responseInterceptor: response => {
-        if (!response.text) return response
+        if (response.text === '' || response.text?.size === 0) return response
         const body = jsonImp.parse(response.text)
         Object.assign(response, {
           body: disableCaseConversion ? body : pascalizeKeys(body)
