@@ -31,11 +31,6 @@ console.log(tx.decodedEvents)
 [
   {
     address: 'ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh',
-    data: 'cb_dGhpcyBtZXNzYWdlIGlzIG5vdCBpbmRleGVkdWmUpw==',
-    topics: [
-      '101640830366340000167918459210098337687948756568954742276612796897811614700269',
-      '39519965516565108473327470053407124751867067078530473195651550649472681599133'
-    ],
     name: 'AnotherEvent',
     decoded: [
       'fUq2NesPXcYZ1CcqBcGC3StpdnQw3iVxMA3YSeCNAwfN4myQk',
@@ -44,11 +39,6 @@ console.log(tx.decodedEvents)
   },
   {
     address: 'ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh',
-    data: 'cb_Xfbg4g==',
-    topics: [
-      '59505622142252318624300825714684802559980671551955787864303522023309554554980',
-      1337
-    ],
     name: 'FirstEvent',
     decoded: [ '1337' ]
   }
@@ -74,11 +64,6 @@ console.log(decodedUsingInstance)
 [
   {
     address: 'ct_fKhQBiNQkDfoZcVF1ZzPzY7Lig6FnHDCLyFYBY33ZjfzGYPps',
-    data: 'cb_dGhpcyBtZXNzYWdlIGlzIG5vdCBpbmRleGVkdWmUpw==',
-    topics: [
-      '101640830366340000167918459210098337687948756568954742276612796897811614700269',
-      '39519965516565108473327470053407124751867067078530473195651550649472681599133'
-    ],
     name: 'AnotherEvent',
     decoded: [
       'fUq2NesPXcYZ1CcqBcGC3StpdnQw3iVxMA3YSeCNAwfN4myQk',
@@ -87,11 +72,6 @@ console.log(decodedUsingInstance)
   },
   {
     address: 'ct_fKhQBiNQkDfoZcVF1ZzPzY7Lig6FnHDCLyFYBY33ZjfzGYPps',
-    data: 'cb_Xfbg4g==',
-    topics: [
-      '59505622142252318624300825714684802559980671551955787864303522023309554554980',
-      1337
-    ],
     name: 'FirstEvent',
     decoded: [ '1337' ]
   }
@@ -120,11 +100,6 @@ console.log(decodedEvents)
 [
   {
     address: 'ct_2dE7Xd7XCg3cwpKWP18VPDwfhz5Miji9FoKMTZN7TYvGt64Kc',
-    data: 'cb_dGhpcyBtZXNzYWdlIGlzIG5vdCBpbmRleGVkdWmUpw==',
-    topics: [
-      '101640830366340000167918459210098337687948756568954742276612796897811614700269',
-      '39519965516565108473327470053407124751867067078530473195651550649472681599133'
-    ],
     name: 'AnotherEvent',
     decoded: [
       'fUq2NesPXcYZ1CcqBcGC3StpdnQw3iVxMA3YSeCNAwfN4myQk',
@@ -133,11 +108,6 @@ console.log(decodedEvents)
   },
   {
     address: 'ct_2dE7Xd7XCg3cwpKWP18VPDwfhz5Miji9FoKMTZN7TYvGt64Kc',
-    data: 'cb_Xfbg4g==',
-    topics: [
-      '59505622142252318624300825714684802559980671551955787864303522023309554554980',
-      1337
-    ],
     decoded: []
   }
 ]

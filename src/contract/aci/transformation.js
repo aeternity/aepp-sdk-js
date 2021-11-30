@@ -39,7 +39,7 @@ export const decodeEvents = (events, schemas = []) => events.map((event) => {
   }
 
   return {
-    ...event,
+    address: event.address,
     name: schema.name,
     decoded: schema.types.map((type) =>
       decodeEventField(type === SOPHIA_TYPES.string ? event.data : params.shift(), type))
