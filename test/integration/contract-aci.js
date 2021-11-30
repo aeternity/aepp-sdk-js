@@ -274,7 +274,6 @@ describe('Contract instance', function () {
       const { log } = await sdk.tx(eventResult.hash)
       expect(decodeEvents(log, events)).to.be.eql(eventResult.decodedEvents)
       expect(cInstance.decodeEvents(log)).to.be.eql(eventResult.decodedEvents)
-      expect(cInstance.methods.emitEvents.decodeEvents(log)).to.be.eql(eventResult.decodedEvents)
     })
 
     const events = [

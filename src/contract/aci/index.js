@@ -290,8 +290,7 @@ export default async function getContractInstance ({
           genHandler(name === 'init' ? false : !stateful),
           {
             get: genHandler(true),
-            send: genHandler(false),
-            decodeEvents: events => instance.decodeEvents(events)
+            send: genHandler(false)
           }
         )
       ]
