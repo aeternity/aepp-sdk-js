@@ -266,18 +266,15 @@ describe('Contract instance', function () {
   describe('Events parsing', async () => {
     let cInstance
     let eventResult
-    let decodedEventsWithoutACI
-    let decodedEventsUsingACI
-    let decodedEventsUsingBuildInMethod
 
     before(async () => {
       cInstance = await sdk.getContractInstance({ source: testContractSource, filesystem })
       await cInstance.deploy(['test', 1, 'some'])
       eventResult = await cInstance.methods.emitEvents()
       const { log } = await sdk.tx(eventResult.hash)
-      decodedEventsWithoutACI = decodeEvents(log, events)
-      decodedEventsUsingACI = cInstance.decodeEvents(log)
-      decodedEventsUsingBuildInMethod = cInstance.methods.emitEvents.decodeEvents(log)
+      expect(decodeEvents(log, events)).to.be.eql(eventResult.decodedEvents)
+      expect(cInstance.decodeEvents(log)).to.be.eql(eventResult.decodedEvents)
+      expect(cInstance.methods.emitEvents.decodeEvents(log)).to.be.eql(eventResult.decodedEvents)
     })
 
     const events = [
@@ -311,12 +308,7 @@ describe('Contract instance', function () {
     }
     events
       .forEach((el, i) => {
-        describe(`Correct parse of ${el.name}(${el.types})`, () => {
-          it('ACI call result', () => checkEvents(eventResult.decodedEvents[i], el))
-          it('ACI instance', () => checkEvents(decodedEventsUsingACI[i], el))
-          it('ACI instance methods', () => checkEvents(decodedEventsUsingBuildInMethod[i], el))
-          it('Without ACI', () => checkEvents(decodedEventsWithoutACI[i], el))
-        })
+        it(`parses ${el.name} (${el.types})`, () => checkEvents(eventResult.decodedEvents[i], el))
       })
   })
 
