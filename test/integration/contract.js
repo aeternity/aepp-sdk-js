@@ -14,7 +14,6 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-/* global BigInt */ // TODO: remove after updating ts-standard
 import { expect } from 'chai'
 import { before, describe, it } from 'mocha'
 import { commitmentHash, decode } from '../../src/tx/builder/helpers'
@@ -23,6 +22,7 @@ import { messageToHash, salt } from '../../src/utils/crypto'
 import { randomName } from '../utils'
 import { BaseAe, getSdk, publicKey } from './'
 import { Crypto, MemoryAccount } from '../../src'
+import { NodeInvocationError } from '../../src/utils/error'
 
 const identityContract = `
 contract Identity =
@@ -135,7 +135,7 @@ describe('Contract', function () {
 
   it('enforce zero deposit for contract deployment', async () => {
     const code = await sdk.contractCompile(identityContract)
-    var { txData } = await sdk.contractDeploy(code.bytecode, identityContract, [], { deposit: 10 })
+    const { txData } = await sdk.contractDeploy(code.bytecode, identityContract, [], { deposit: 10 })
     return txData.tx.deposit.should.be.equal(0)
   })
 
@@ -191,7 +191,7 @@ describe('Contract', function () {
 
   it('throws error on deploy', async () => {
     const code = await sdk.contractCompile(contractWithBrokenDeploy)
-    await expect(code.deploy()).to.be.rejectedWith('Invocation failed: "CustomErrorMessage"')
+    await expect(code.deploy()).to.be.rejectedWith(NodeInvocationError, 'Invocation failed: "CustomErrorMessage"')
   })
 
   it('throws errors on method call', async () => {

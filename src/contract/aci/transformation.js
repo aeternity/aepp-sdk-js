@@ -2,6 +2,10 @@ import { toBytes } from '../../utils/bytes'
 import { decode } from '../../tx/builder/helpers'
 import { parseBigNumber } from '../../utils/bignumber'
 import { addressFromDecimal, hash } from '../../utils/crypto'
+import {
+  MissingSchemaError,
+  InvalidSchemaError
+} from '../../utils/error'
 
 export const SOPHIA_TYPES = [
   'int',
@@ -30,12 +34,12 @@ export const SOPHIA_TYPES = [
 export const decodeEvents = (events, schemas = []) => events.map(event => {
   const [nameHash, ...params] = event.topics
   const schema = schemas.find((s) => hash(s.name).equals(toBytes(nameHash, true)))
-  if (!schema) throw new Error(`Can't find schema by event: ${nameHash}`)
+  if (!schema) throw new MissingSchemaError(nameHash)
   const stringCount = schema.types.filter(t => t === SOPHIA_TYPES.string).length
-  if (stringCount > 1) throw new Error(`Event schema contains more than one string: ${schema.types}`)
+  if (stringCount > 1) throw new InvalidSchemaError(`Event schema contains more than one string: ${schema.types}`)
   const topicsCount = schema.types.length - stringCount
   if (topicsCount !== params.length) {
-    throw new Error(`Schema defines ${topicsCount} types, but ${params.length} topics present`)
+    throw new InvalidSchemaError(`Schema defines ${topicsCount} types, but ${params.length} topics present`)
   }
   return {
     ...event,

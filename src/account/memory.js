@@ -26,6 +26,7 @@ import AccountBase from './base'
 import { sign, isAddressValid, isValidKeypair } from '../utils/crypto'
 import { isHex } from '../utils/string'
 import { decode } from '../tx/builder/helpers'
+import { InvalidKeypairError, InvalidGAaddressError } from '../utils/error'
 
 const secrets = new WeakMap()
 
@@ -44,21 +45,21 @@ export default AccountBase.compose({
   init ({ keypair, gaId }) {
     this.isGa = !!gaId
     if (gaId) {
-      if (!isAddressValid(gaId)) throw new Error('Invalid GA address')
+      if (!isAddressValid(gaId)) throw new InvalidGAaddressError()
       secrets.set(this, { publicKey: gaId })
       return
     }
 
-    if (!keypair || typeof keypair !== 'object') throw new Error('KeyPair must be an object')
-    if (!keypair.secretKey || !keypair.publicKey) throw new Error('KeyPair must must have "secretKey", "publicKey" properties')
-    if (typeof keypair.publicKey !== 'string' || keypair.publicKey.indexOf('ak_') === -1) throw new Error('Public Key must be a base58c string with "ak_" prefix')
+    if (!keypair || typeof keypair !== 'object') throw new InvalidKeypairError('KeyPair must be an object')
+    if (!keypair.secretKey || !keypair.publicKey) throw new InvalidKeypairError('KeyPair must must have "secretKey", "publicKey" properties')
+    if (typeof keypair.publicKey !== 'string' || keypair.publicKey.indexOf('ak_') === -1) throw new InvalidKeypairError('Public Key must be a base58c string with "ak_" prefix')
     if (
       !Buffer.isBuffer(keypair.secretKey) &&
       (typeof keypair.secretKey === 'string' && !isHex(keypair.secretKey))
-    ) throw new Error('Secret key must be hex string or Buffer')
+    ) throw new InvalidKeypairError('Secret key must be hex string or Buffer')
 
     const pubBuffer = Buffer.from(decode(keypair.publicKey, 'ak'))
-    if (!isValidKeypair(Buffer.from(keypair.secretKey, 'hex'), pubBuffer)) throw new Error('Invalid Key Pair')
+    if (!isValidKeypair(Buffer.from(keypair.secretKey, 'hex'), pubBuffer)) throw new InvalidKeypairError('Invalid Key Pair')
 
     secrets.set(this, {
       secretKey: Buffer.isBuffer(keypair.secretKey) ? keypair.secretKey : Buffer.from(keypair.secretKey, 'hex'),
@@ -68,7 +69,7 @@ export default AccountBase.compose({
   props: { isGa: false },
   methods: {
     sign (data) {
-      if (this.isGa) throw new Error('You are trying to sign data using GA account without keypair')
+      if (this.isGa) throw new InvalidKeypairError('You are trying to sign data using GA account without keypair')
       return Promise.resolve(sign(data, secrets.get(this).secretKey))
     },
     address () {

@@ -80,13 +80,15 @@ const validators = [
     const validNonce = account.nonce + 1
     if (nonce === validNonce) return []
     return [{
-      ...nonce < validNonce ? {
-        message: `Nonce ${nonce} is already used, valid nonce is ${validNonce}`,
-        key: 'NonceAlreadyUsed'
-      } : {
-        message: `Nonce ${nonce} is too high, valid nonce is ${validNonce}`,
-        key: 'NonceHigh'
-      },
+      ...nonce < validNonce
+        ? {
+            message: `Nonce ${nonce} is already used, valid nonce is ${validNonce}`,
+            key: 'NonceAlreadyUsed'
+          }
+        : {
+            message: `Nonce ${nonce} is too high, valid nonce is ${validNonce}`,
+            key: 'NonceHigh'
+          },
       checkedKeys: ['nonce']
     }]
   },
