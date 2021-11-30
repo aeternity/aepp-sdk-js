@@ -97,7 +97,7 @@ contract StateContract =
       Both(x, _) => x
   stateful entrypoint emitEvents() : unit =
     Chain.event(TheFirstEvent(42))
-    Chain.event(AnotherEvent("This is not indexed", Contract.address))
+    Chain.event(AnotherEvent("This is not indexed", ak_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT))
     Chain.event(AnotherEvent2(true, "This is not indexed", 1))
 `
 const filesystem = {
@@ -263,52 +263,56 @@ describe('Contract instance', function () {
     result.callerId.should.be.equal(onAccount)
   })
 
-  describe('Events parsing', async () => {
-    let cInstance
+  describe('Events parsing', () => {
     let eventResult
 
     before(async () => {
-      cInstance = await sdk.getContractInstance({ source: testContractSource, filesystem })
-      await cInstance.deploy(['test', 1, 'some'])
-      eventResult = await cInstance.methods.emitEvents()
-      const { log } = await sdk.tx(eventResult.hash)
-      expect(decodeEvents(log, events)).to.be.eql(eventResult.decodedEvents)
-      expect(cInstance.decodeEvents(log)).to.be.eql(eventResult.decodedEvents)
+      eventResult = await testContract.methods.emitEvents()
     })
 
-    const events = [
-      { name: 'AnotherEvent2', types: [SOPHIA_TYPES.bool, SOPHIA_TYPES.string, SOPHIA_TYPES.int] },
-      { name: 'AnotherEvent', types: [SOPHIA_TYPES.string, SOPHIA_TYPES.address] },
-      { name: 'TheFirstEvent', types: [SOPHIA_TYPES.int] }
-    ]
-    const checkEvents = (event, schema) => {
-      schema.name.should.be.equal(event.name)
-      schema.types.forEach((t, tIndex) => {
-        const value = event.decoded[tIndex]
-        switch (t) {
-          case SOPHIA_TYPES.address:
-            // the address type in sophia is with ak_ prefix
-            // if a ct_ prefix is expected, contract type should be used
-            event.address.replace('ct_', 'ak_').should.be.equal(value)
-            break
-          case SOPHIA_TYPES.int:
-            expect(typeof value === 'string' || typeof value === 'number')
-              .to.be.equal(true)
-            Number.isInteger(+value).should.be.equal(true)
-            break
-          case SOPHIA_TYPES.bool:
-            value.should.be.a('boolean')
-            break
-          case SOPHIA_TYPES.string:
-            value.should.be.a('string')
-            break
-        }
-      })
-    }
-    events
-      .forEach((el, i) => {
-        it(`parses ${el.name} (${el.types})`, () => checkEvents(eventResult.decodedEvents[i], el))
-      })
+    it('decodes events', async () => {
+      expect(eventResult.decodedEvents).to.be.eql([{
+        data: 'cb_VGhpcyBpcyBub3QgaW5kZXhlZK+w140=',
+        decoded: [true, 'This is not indexed', '1'],
+        name: 'AnotherEvent2',
+        topics: [
+          '7065442193418278913262533136158148486147352807284929017531784742205476270109',
+          1,
+          1
+        ]
+      }, {
+        data: 'cb_VGhpcyBpcyBub3QgaW5kZXhlZK+w140=',
+        decoded: [
+          'This is not indexed',
+          'ak_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT'
+        ],
+        name: 'AnotherEvent',
+        topics: [
+          '101640830366340000167918459210098337687948756568954742276612796897811614700269',
+          '49180964914851211480947510179994463529225625518291257200987587042126943230822'
+        ]
+      }, {
+        data: 'cb_Xfbg4g==',
+        decoded: ['42'],
+        name: 'TheFirstEvent',
+        topics: [
+          '25381774165057387707802602748622431964055296361151037811644748771109370239835',
+          42
+        ]
+      }].map(e => ({ ...e, address: testContract.deployInfo.address })))
+    })
+
+    it('decodes events the same using different methods', async () => {
+      const { log } = await sdk.tx(eventResult.hash)
+      const events = [
+        { name: 'AnotherEvent2', types: [SOPHIA_TYPES.bool, SOPHIA_TYPES.string, SOPHIA_TYPES.int] },
+        { name: 'AnotherEvent', types: [SOPHIA_TYPES.string, SOPHIA_TYPES.address] },
+        { name: 'TheFirstEvent', types: [SOPHIA_TYPES.int] }
+      ]
+      expect(decodeEvents(log, events)).to.be.eql(eventResult.decodedEvents)
+
+      expect(testContract.decodeEvents(log)).to.be.eql(eventResult.decodedEvents)
+    })
   })
 
   describe('Arguments Validation and Casting', function () {
