@@ -29,6 +29,7 @@ import AccountBase from '../account/base'
 import TxBuilder from '../tx/builder'
 import BigNumber from 'bignumber.js'
 import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter'
+import { IlleagalArgumentError } from '../utils/error'
 
 /**
  * Sign and post a transaction to the chain
@@ -93,7 +94,7 @@ async function spend (amount, recipientIdOrName, options) {
  */
 async function transferFunds (fraction, recipientIdOrName, options) {
   if (fraction < 0 || fraction > 1) {
-    throw new Error(`Fraction should be a number between 0 and 1, got ${fraction}`)
+    throw new IlleagalArgumentError(`Fraction should be a number between 0 and 1, got ${fraction}`)
   }
   const opt = { ...this.Ae.defaults, ...options }
   const recipientId = await this.resolveName(recipientIdOrName, 'ak', opt)

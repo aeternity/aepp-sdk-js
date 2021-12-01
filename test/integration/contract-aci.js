@@ -19,6 +19,15 @@ import { expect } from 'chai'
 import { before, describe, it } from 'mocha'
 import { decodeEvents, SOPHIA_TYPES } from '../../src/contract/aci/transformation'
 import { decode } from '../../src/tx/builder/helpers'
+import {
+  BytecodeMismatchError,
+  NoSuchContractError,
+  InvalidAensNameError,
+  InvalidMethodInvocationError,
+  MissingContractAddressError,
+  MissingContractDefError,
+  NotPayableFunctionError
+} from '../../src/utils/error'
 import { getSdk } from './'
 
 const identityContractSource = `
@@ -143,7 +152,7 @@ describe('Contract instance', function () {
   })
 
   it('fails on calling without deployment', () => expect(testContract.methods.intFn(2))
-    .to.be.rejectedWith('You need to deploy contract before calling!'))
+    .to.be.rejectedWith(InvalidMethodInvocationError, 'You need to deploy contract before calling!'))
 
   it('deploys', async () => {
     const deployInfo = await testContract.deploy(['test', 1, 'hahahaha'])
@@ -162,22 +171,22 @@ describe('Contract instance', function () {
   it('fails on trying to generate with not existing contract address', () =>
     expect(sdk.getContractInstance(
       { aci: identityContractSource, contractAddress: notExistingContractAddress }
-    )).to.be.rejectedWith(`Contract with address ${notExistingContractAddress} not found on-chain`))
+    )).to.be.rejectedWith(NoSuchContractError, `Contract with address ${notExistingContractAddress} not found on-chain`))
 
   it('fails on trying to generate with invalid address', () =>
     expect(sdk.getContractInstance(
       { aci: identityContractSource, contractAddress: 'ct_asdasdasd' }
-    )).to.be.rejectedWith('Invalid name or address: ct_asdasdasd'))
+    )).to.be.rejectedWith(InvalidAensNameError, 'Invalid name or address: ct_asdasdasd'))
 
   it('fails on trying to generate by aci without address', () =>
     expect(sdk.getContractInstance({ aci: testContractAci }))
-      .to.be.rejectedWith('Can\'t create instance by ACI without address'))
+      .to.be.rejectedWith(MissingContractAddressError, 'Can\'t create instance by ACI without address'))
 
   it('generates by bytecode and aci', () =>
     sdk.getContractInstance({ bytecode: testContractBytecode, aci: testContractAci }))
 
   it('fails on generation without arguments', () =>
-    expect(sdk.getContractInstance()).to.be.rejectedWith('Either ACI or source code is required'))
+    expect(sdk.getContractInstance()).to.be.rejectedWith(MissingContractDefError, 'Either ACI or source code is required'))
 
   it('calls by aci', async () => {
     const contract = await sdk.getContractInstance(
@@ -205,7 +214,7 @@ describe('Contract instance', function () {
     source: identityContractSource,
     contractAddress: testContractAddress,
     validateBytecode: true
-  })).to.be.rejectedWith('Contract source do not correspond to the bytecode deployed on the chain'))
+  })).to.be.rejectedWith(BytecodeMismatchError, 'Contract source do not correspond to the bytecode deployed on the chain'))
 
   it('accepts matching bytecode with enabled validation', () => sdk.getContractInstance({
     bytecode: testContractBytecode,
@@ -219,7 +228,7 @@ describe('Contract instance', function () {
     aci: await sdk.contractGetACI(identityContractSource, { filesystem }),
     contractAddress: testContractAddress,
     validateBytecode: true
-  })).to.be.rejectedWith('Contract bytecode do not correspond to the bytecode deployed on the chain'))
+  })).to.be.rejectedWith(BytecodeMismatchError, 'Contract bytecode do not correspond to the bytecode deployed on the chain'))
 
   it('dry-runs init function', async () => {
     const res = await testContract.methods.init.get('test', 1, 'hahahaha')
@@ -248,7 +257,7 @@ describe('Contract instance', function () {
   it('fails on paying to not payable function', async () => {
     const amount = 100
     await expect(testContract.methods.intFn.send(1, { amount }))
-      .to.be.rejectedWith(`You try to pay "${amount}" to function "intFn" which is not payable. Only payable function can accept tokens`)
+      .to.be.rejectedWith(NotPayableFunctionError, `You try to pay "${amount}" to function "intFn" which is not payable. Only payable function can accept tokens`)
   })
 
   it('pays to payable function', async () => {

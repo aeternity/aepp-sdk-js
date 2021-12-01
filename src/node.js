@@ -25,6 +25,7 @@
 import AsyncInit from './utils/async-init'
 import genSwaggerClient from './utils/swagger'
 import semverSatisfies from './utils/semver-satisfies'
+import { MissingParamError, UnsupportedNodeError } from './utils/error'
 
 /**
  * Obtain networkId from account or node
@@ -34,7 +35,7 @@ import semverSatisfies from './utils/semver-satisfies'
  * @return {String} NetworkId
  */
 export function getNetworkId ({ networkId, force = false } = {}) {
-  if (!force && !networkId && !this.networkId && (!this.selectedNode || !this.selectedNode.networkId)) throw new Error('networkId is not provided')
+  if (!force && !networkId && !this.networkId && (!this.selectedNode || !this.selectedNode.networkId)) throw new MissingParamError('networkId is not provided')
   if (force && !networkId && !this.networkId && (!this.selectedNode || !this.selectedNode.networkId)) return null
   return networkId || this.networkId || this.selectedNode.networkId
 }
@@ -53,7 +54,7 @@ export function getNetworkId ({ networkId, force = false } = {}) {
  */
 const Node = AsyncInit.compose({
   async init ({ url, internalUrl, ignoreVersion }) {
-    if (!url) throw new Error('"url" required')
+    if (!url) throw new MissingParamError('"url" required')
     this.url = url.replace(/\/$/, '')
     this.internalUrl = internalUrl ? internalUrl.replace(/\/$/, '') : this.url
     const client = await genSwaggerClient(`${this.url}/api?oas3`, {
@@ -70,10 +71,7 @@ const Node = AsyncInit.compose({
       !semverSatisfies(this.version, NODE_GE_VERSION, NODE_LT_VERSION) &&
       !ignoreVersion
     ) {
-      throw new Error(
-        `Unsupported node version ${this.version}. ` +
-        `Supported: >= ${NODE_GE_VERSION} < ${NODE_LT_VERSION}`
-      )
+      throw new UnsupportedNodeError(this.version, NODE_GE_VERSION, NODE_LT_VERSION)
     }
     this.api = client.api
 

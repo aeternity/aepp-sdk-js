@@ -32,6 +32,7 @@ import { pause } from '../utils/other'
 import { oracleQueryId, decode } from '../tx/builder/helpers'
 import { unpackTx } from '../tx/builder'
 import { ORACLE_TTL, QUERY_FEE, QUERY_TTL, RESPONSE_TTL } from '../tx/builder/schema'
+import { RequestTimedOutError } from '../utils/error'
 
 /**
  * Constructor for Oracle Object (helper object for using Oracle)
@@ -125,7 +126,7 @@ export async function pollForQueryResponse (oracleId, queryId, { attempts = 20, 
       return String(responseBuffer)
     }
   }
-  throw new Error(`Giving up after ${(attempts - 1) * interval}ms`)
+  throw new RequestTimedOutError((attempts - 1) * interval)
 }
 
 /**

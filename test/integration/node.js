@@ -20,6 +20,7 @@ import { url, internalUrl, ignoreVersion } from './'
 import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
 import NodePool from '../../src/node-pool'
+import { MissingParamError } from '../../src/utils/error'
 
 describe('Node client', function () {
   let node
@@ -61,7 +62,7 @@ describe('Node client', function () {
 
     it('Throw error on get network without node ', async () => {
       const nodes = await NodePool()
-      expect(() => nodes.getNetworkId()).to.throw('networkId is not provided')
+      expect(() => nodes.getNetworkId()).to.throw(MissingParamError, 'networkId is not provided')
     })
 
     it('Throw error on using API without node', async () => {
