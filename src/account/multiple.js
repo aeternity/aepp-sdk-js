@@ -25,6 +25,10 @@ import AsyncInit from '../utils/async-init'
 import MemoryAccount from './memory'
 import { decode } from '../tx/builder/helpers'
 import AccountBase, { isAccountBase } from './base'
+import {
+  UnavailableAccountError,
+  TypeError
+} from '../utils/error'
 
 /**
  * AccountMultiple stamp
@@ -125,7 +129,7 @@ export default AccountBase.compose(AsyncInit, {
      */
     selectAccount (address) {
       decode(address, 'ak')
-      if (!this.accounts[address]) throw new Error(`Account for ${address} not available`)
+      if (!this.accounts[address]) throw new UnavailableAccountError(address)
       this.selectedAddress = address
     },
     /**
@@ -136,17 +140,21 @@ export default AccountBase.compose(AsyncInit, {
      */
     _resolveAccount (account) {
       if (account === null) {
-        throw new Error('No account or wallet configured')
+        throw new TypeError(
+          'Account should be an address (ak-prefixed string), ' +
+          'keypair, or instance of account base, got null instead')
       } else {
         switch (typeof account) {
           case 'string':
             decode(account, 'ak')
-            if (!this.accounts[account]) throw new Error(`Account for ${account} not available`)
+            if (!this.accounts[account]) throw new UnavailableAccountError(account)
             return this.accounts[account]
           case 'object':
             return isAccountBase(account) ? account : MemoryAccount({ keypair: account })
           default:
-            throw new Error(`Unknown account type: ${typeof account} (account: ${account})`)
+            throw new TypeError(
+              'Account should be an address (ak-prefixed string), ' +
+              `keypair, or instance of account base, got ${account} instead`)
         }
       }
     }

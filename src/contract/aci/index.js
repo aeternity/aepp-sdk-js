@@ -28,6 +28,21 @@ import { decodeEvents } from './transformation'
 import { DRY_RUN_ACCOUNT, DEPOSIT } from '../../tx/builder/schema'
 import TxObject from '../../tx/tx-object'
 import { decode } from '../../tx/builder/helpers'
+import {
+  MissingContractDefError,
+  MissingContractAddressError,
+  NoSuchContractError,
+  InactiveContractError,
+  BytecodeMismatchError,
+  UnknownCallReturnTypeError,
+  DuplicateContractError,
+  MissingFunctionNameError,
+  InvalidMethodInvocationError,
+  NotPayableFunctionError,
+  TypeError,
+  NodeInvocationError,
+  IlleagalArgumentError
+} from '../../utils/error'
 
 /**
  * Get function schema from contract ACI object
@@ -76,16 +91,16 @@ export default async function getContractInstance ({
   ...otherOptions
 } = {}) {
   aci = aci || (source && await this.contractGetACI(source, { filesystem }))
-  if (!aci) throw new Error('Either ACI or source code is required')
+  if (!aci) throw new MissingContractDefError()
   contractAddress = contractAddress && await this.resolveName(
     contractAddress, 'contract_pubkey', { resolveByNode: true }
   )
-  if (!contractAddress && !source && !bytecode) throw new Error('Can\'t create instance by ACI without address')
+  if (!contractAddress && !source && !bytecode) throw new MissingContractAddressError('Can\'t create instance by ACI without address')
 
   if (contractAddress) {
     const contract = await this.getContract(contractAddress).catch(() => null)
-    if (!contract) throw new Error(`Contract with address ${contractAddress} not found on-chain`)
-    if (!contract.active) throw new Error(`Contract with address ${contractAddress} not active`)
+    if (!contract) throw new NoSuchContractError(contractAddress)
+    if (!contract.active) throw new InactiveContractError(contractAddress)
   }
 
   const instance = {
@@ -106,12 +121,12 @@ export default async function getContractInstance ({
   }
 
   if (validateBytecode) {
-    if (!contractAddress) throw new Error('Can\'t validate bytecode without contract address')
+    if (!contractAddress) throw new MissingContractAddressError('Can\'t validate bytecode without contract address')
     const onChanBytecode = (await this.getContractByteCode(contractAddress)).bytecode
     const isValid = (source && await this
       .validateByteCodeAPI(onChanBytecode, source, instance.options).catch(() => false)) ||
       bytecode === onChanBytecode
-    if (!isValid) throw new Error(`Contract ${source ? 'source' : 'bytecode'} do not correspond to the bytecode deployed on the chain`)
+    if (!isValid) throw new BytecodeMismatchError(source ? 'source' : 'bytecode')
   }
 
   /**
@@ -121,8 +136,8 @@ export default async function getContractInstance ({
    * @return {String} bytecode bytecode
    */
   instance.compile = async (options = {}) => {
-    if (instance.bytecode) throw new Error('Contract already compiled')
-    if (!instance.source) throw new Error('Can\'t compile without source code')
+    if (instance.bytecode) throw new IlleagalArgumentError('Contract already compiled')
+    if (!instance.source) throw new IlleagalArgumentError('Can\'t compile without source code')
     const { bytecode } = await this.contractCompile(
       instance.source, { ...instance.options, ...options }
     )
@@ -152,9 +167,9 @@ export default async function getContractInstance ({
       case 'error':
         message = decode(returnValue).toString()
         break
-      default: throw new Error(`Unknown returnType: ${returnType}`)
+      default: throw new UnknownCallReturnTypeError(returnType)
     }
-    throw new Error(`Invocation failed${message ? `: "${message}"` : ''}`)
+    throw new NodeInvocationError(message)
   }
 
   /**
@@ -169,7 +184,7 @@ export default async function getContractInstance ({
     const opt = { ...instance.options, ...options, deposit: DEPOSIT }
     if (!instance.bytecode) await instance.compile(opt)
     if (opt.callStatic) return instance.call('init', params, opt)
-    if (instance.deployInfo.address) throw new Error('Contract already deployed')
+    if (instance.deployInfo.address) throw new DuplicateContractError()
 
     const ownerId = await this.address(opt)
     const { tx, contractId } = await this.contractCreateTx({
@@ -210,10 +225,10 @@ export default async function getContractInstance ({
     const fnACI = getFunctionACI(instance.aci, fn, instance.externalAci)
     const contractId = instance.deployInfo.address
 
-    if (!fn) throw new Error('Function name is required')
-    if (fn === 'init' && !opt.callStatic) throw new Error('"init" can be called only via dryRun')
-    if (!contractId && fn !== 'init') throw new Error('You need to deploy contract before calling!')
-    if (opt.amount > 0 && fnACI.payable === false) throw new Error(`You try to pay "${opt.amount}" to function "${fn}" which is not payable. Only payable function can accept coins`)
+    if (!fn) throw new MissingFunctionNameError('Function name is required')
+    if (fn === 'init' && !opt.callStatic) throw new InvalidMethodInvocationError('"init" can be called only via dryRun')
+    if (!contractId && fn !== 'init') throw new InvalidMethodInvocationError('You need to deploy contract before calling!')
+    if (opt.amount > 0 && fnACI.payable === false) throw new NotPayableFunctionError(`You try to pay "${opt.amount}" to function "${fn}" which is not payable. Only payable function can accept coins`)
 
     const callerId = await this.address(opt).catch(error => {
       if (opt.callStatic) return DRY_RUN_ACCOUNT.pub
@@ -272,7 +287,7 @@ export default async function getContractInstance ({
     .map(({ name, arguments: aciArgs, stateful }) => {
       const genHandler = callStatic => (...args) => {
         const options = args.length === aciArgs.length + 1 ? args.pop() : {}
-        if (typeof options !== 'object') throw new Error(`Options should be an object: ${options}`)
+        if (typeof options !== 'object') throw new TypeError(`Options should be an object: ${options}`)
         if (name === 'init') return instance.deploy(args, { callStatic, ...options })
         return instance.call(name, args, { callStatic, ...options })
       }

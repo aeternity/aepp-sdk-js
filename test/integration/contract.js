@@ -22,6 +22,7 @@ import { messageToHash, salt } from '../../src/utils/crypto'
 import { randomName } from '../utils'
 import { BaseAe, getSdk, publicKey } from './'
 import { Crypto, MemoryAccount } from '../../src'
+import { NodeInvocationError } from '../../src/utils/error'
 
 const identityContract = `
 contract Identity =
@@ -193,7 +194,7 @@ describe('Contract', function () {
 
   it('throws error on deploy', async () => {
     const code = await sdk.contractCompile(contractWithBrokenDeploy)
-    await expect(code.deploy()).to.be.rejectedWith('Invocation failed: "CustomErrorMessage"')
+    await expect(code.deploy()).to.be.rejectedWith(NodeInvocationError, 'Invocation failed: "CustomErrorMessage"')
   })
 
   it('throws errors on method call', async () => {

@@ -21,6 +21,17 @@ import NodePool from '../node-pool'
 import { pause } from '../utils/other'
 import { isNameValid, produceNameId, decode } from '../tx/builder/helpers'
 import { DRY_RUN_ACCOUNT } from '../tx/builder/schema'
+import {
+  AensNameNotFoundError,
+  AensPointerContextError,
+  DryRunError,
+  InvalidAensNameError,
+  InvalidTxError,
+  RequestTimedOutError,
+  TxTimedOutError,
+  TxNotInChainError,
+  IlleagalArgumentError
+} from '../utils/error'
 
 /**
  * ChainNode module
@@ -38,7 +49,7 @@ async function sendTransaction (tx, options = {}) {
     if (validation.length) {
       const message = 'Transaction verification errors: ' +
         validation.map(v => v.message).join(', ')
-      throw Object.assign(new Error(message), {
+      throw Object.assign(new InvalidTxError(message), {
         code: 'TX_VERIFICATION_ERROR',
         validation,
         transaction: tx
@@ -73,7 +84,7 @@ async function waitForTxConfirm (txHash, options = { confirm: 3 }) {
   const { blockHeight: newBlockHeight } = await this.tx(txHash)
   switch (newBlockHeight) {
     case -1:
-      throw new Error(`Transaction ${txHash} is removed from chain`)
+      throw new TxNotInChainError(txHash)
     case blockHeight:
       return height
     default:
@@ -131,7 +142,7 @@ async function awaitHeight (height, { interval = 5000, attempts = 20 } = {}) {
     currentHeight = await this.height()
     if (currentHeight >= height) return currentHeight
   }
-  throw new Error(`Giving up after ${(attempts - 1) * interval}ms, current height: ${currentHeight}, desired height: ${height}`)
+  throw new RequestTimedOutError((attempts - 1) * interval, currentHeight, height)
 }
 
 /**
@@ -150,7 +161,7 @@ async function poll (th, { blocks = 10, interval = 500, allowUnsynced = false } 
     }
     await pause(interval)
   } while (await this.height() < max)
-  throw new Error(`Giving up after ${blocks} blocks mined, transaction hash: ${th}`)
+  throw new TxTimedOutError(blocks, th)
 }
 
 async function getTxInfo (hash) {
@@ -169,7 +180,7 @@ async function getCurrentGeneration () {
 async function getGeneration (hashOrHeight) {
   if (typeof hashOrHeight === 'string') return this.api.getGenerationByHash(hashOrHeight)
   if (typeof hashOrHeight === 'number') return this.api.getGenerationByHeight(hashOrHeight)
-  throw new Error('Invalid param, param must be hash or height')
+  throw new IlleagalArgumentError('Invalid param, param must be hash or height')
 }
 
 async function getMicroBlockTransactions (hash) {
@@ -179,7 +190,7 @@ async function getMicroBlockTransactions (hash) {
 async function getKeyBlock (hashOrHeight) {
   if (typeof hashOrHeight === 'string') return this.api.getKeyBlockByHash(hashOrHeight)
   if (typeof hashOrHeight === 'number') return this.api.getKeyBlockByHeight(hashOrHeight)
-  throw new Error('Invalid param, param must be hash or height')
+  throw new IlleagalArgumentError('Invalid param, param must be hash or height')
 }
 
 async function getMicroBlockHeader (hash) {
@@ -200,7 +211,7 @@ async function txDryRun (tx, accountAddress, options) {
   if (result === 'ok') return { ...resultPayload, ...other }
 
   throw Object.assign(
-    new Error('Dry run error, ' + reason),
+    new DryRunError(reason),
     { tx, accountAddress, options }
   )
 }
@@ -229,7 +240,7 @@ async function getName (name) {
  */
 async function resolveName (nameOrId, key, { verify, resolveByNode } = {}) {
   if (!nameOrId || typeof nameOrId !== 'string') {
-    throw new Error(`Name or address should be a string: ${nameOrId}`)
+    throw new InvalidAensNameError(`Name or address should be a string: ${nameOrId}`)
   }
   try {
     decode(nameOrId)
@@ -238,16 +249,16 @@ async function resolveName (nameOrId, key, { verify, resolveByNode } = {}) {
   if (isNameValid(nameOrId)) {
     if (verify || resolveByNode) {
       const name = await this.api.getNameEntryByName(nameOrId).catch(_ => null)
-      if (!name) throw new Error(`Name not found: ${nameOrId}`)
+      if (!name) throw new AensNameNotFoundError(`Name not found: ${nameOrId}`)
       const pointer = name.pointers.find(pointer => pointer.key === key)
       if (!pointer) {
-        throw new Error(`Name ${nameOrId} don't have pointers for ${key}`)
+        throw new AensPointerContextError(`Name ${nameOrId} don't have pointers for ${key}`)
       }
       if (resolveByNode) return pointer.id
     }
     return produceNameId(nameOrId)
   }
-  throw new Error(`Invalid name or address: ${nameOrId}`)
+  throw new InvalidAensNameError(`Invalid name or address: ${nameOrId}`)
 }
 
 /**
