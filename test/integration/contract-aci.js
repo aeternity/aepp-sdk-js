@@ -288,11 +288,13 @@ describe('Contract instance', function () {
 
     it('decodes events the same using different methods', async () => {
       const { log } = await sdk.tx(eventResult.hash)
-      const events = [
-        { name: 'AnotherEvent2', types: [SOPHIA_TYPES.bool, SOPHIA_TYPES.string, SOPHIA_TYPES.int] },
-        { name: 'AnotherEvent', types: [SOPHIA_TYPES.string, SOPHIA_TYPES.address] },
-        { name: 'TheFirstEvent', types: [SOPHIA_TYPES.int] }
-      ]
+      const events = {
+        variant: [
+          { AnotherEvent2: [SOPHIA_TYPES.bool, SOPHIA_TYPES.string, SOPHIA_TYPES.int] },
+          { AnotherEvent: [SOPHIA_TYPES.string, SOPHIA_TYPES.address] },
+          { TheFirstEvent: [SOPHIA_TYPES.int] }
+        ]
+      }
       expect(decodeEvents(log, events)).to.be.eql(eventResult.decodedEvents)
 
       expect(testContract.decodeEvents(log)).to.be.eql(eventResult.decodedEvents)

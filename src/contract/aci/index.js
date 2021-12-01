@@ -257,15 +257,7 @@ export default async function getContractInstance ({
    * @param {Array} events Array of encoded events(callRes.result.log)
    * @return {Object} DecodedEvents
    */
-  instance.decodeEvents = (events) => {
-    const eventsACI = instance.aci.event ? instance.aci.event.variant : []
-    const eventsSchema = eventsACI.map(e => {
-      const name = Object.keys(e)[0]
-      return { name, types: e[name] }
-    })
-
-    return decodeEvents(events, eventsSchema)
-  }
+  instance.decodeEvents = events => decodeEvents(events, instance.aci.event)
 
   /**
    * Generate proto function based on contract function using Contract ACI schema

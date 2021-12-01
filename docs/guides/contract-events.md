@@ -89,12 +89,14 @@ const txHash = 'th_2tMWziKAQR1CwK2PMfvMhKZgEVLmcxsPYkRXey97s9SdXj4zat'
 // client is an instance of the Universal Stamp
 const tx = await client.tx(txHash)
 
-const eventsSchema = [
-  { name: 'FirstEvent', types: [SOPHIA_TYPES.int] },
-  { name: 'AnotherEvent', types: [SOPHIA_TYPES.address, SOPHIA_TYPES.string] },
-]
+const eventsAci = {
+  variant: [
+    { FirstEvent: [SOPHIA_TYPES.int] },
+    { AnotherEvent: [SOPHIA_TYPES.address, SOPHIA_TYPES.string] }
+  ]
+}
 
-const decodedEvents = decodeEvents(tx.log, eventsSchema)
+const decodedEvents = decodeEvents(tx.log, eventsAci)
 console.log(decodedEvents)
 /*
 [
