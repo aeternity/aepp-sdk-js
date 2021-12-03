@@ -944,7 +944,8 @@
 and this page explains in detail how to:</p>
 <ul>
 <li>Create and sign a <code>SpendTx</code> for an account with the <code>innerTx</code> option.</li>
-<li>Wrap the signed <code>SpendTx</code> in a <code>PayingForTx</code>, signing it using an account that pays the fees of the inner <code>SpendTx</code> and broadcasts it to the network.</li>
+<li>Wrap the signed <code>SpendTx</code> in a <code>PayingForTx</code>, signing it using an account that pays the fees
+   of the inner <code>SpendTx</code> and broadcasts it to the network.</li>
 </ul>
 <p>Note:</p>
 <ul>
@@ -972,7 +973,8 @@ Additionally you import the <code>Crypto</code> utility module to generate a new
 Note:</p>
 <ul>
 <li>The keypair of the account is pre-funded and only used for demonstration purpose<ul>
-<li>You can replace it with your own keypair (see <a href="../../../quick-start/#2-create-a-keypair">Create a Keypair</a>)</li>
+<li>You can replace it with your own keypair (see
+   <a href="../../../quick-start/#2-create-a-keypair">Create a Keypair</a>)</li>
 <li>In case the account runs out of funds you can always request AE using the <a href="https://faucet.aepps.com/">Faucet</a></li>
 </ul>
 </li>
@@ -990,18 +992,21 @@ Therefore we are putting our logic into an <code>async</code> code block
   <span class="kd">const</span> <span class="nx">node</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Node</span><span class="p">({</span> <span class="nx">url</span><span class="o">:</span> <span class="nx">NODE_URL</span> <span class="p">})</span>
   <span class="kd">const</span> <span class="nx">client</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span>
     <span class="nx">nodes</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;testnet&#39;</span><span class="p">,</span> <span class="nx">instance</span><span class="o">:</span> <span class="nx">node</span> <span class="p">}],</span>
-    <span class="nx">accounts</span><span class="o">:</span> <span class="p">[</span><span class="nx">payerAccount</span><span class="p">,</span> <span class="nx">newUserAccount</span><span class="p">],</span>
+    <span class="nx">accounts</span><span class="o">:</span> <span class="p">[</span><span class="nx">payerAccount</span><span class="p">,</span> <span class="nx">newUserAccount</span><span class="p">]</span>
   <span class="p">})</span>
 </code></pre></div>
-The <code>Universal</code> <a href="https://stampit.js.org/essentials/what-is-a-stamp">Stamp</a> itself is asynchronous as it determines the node's version and
-rest interface automatically. Only once the Promise is fulfilled, you know you have a working object instance
-which is assigned to the <code>client</code> constant in this case.</p>
+The <code>Universal</code> <a href="https://stampit.js.org/essentials/what-is-a-stamp">Stamp</a> itself is
+asynchronous as it determines the node's version and rest interface automatically. Only once
+the Promise is fulfilled, you know you have a working object instance which is assigned to the
+<code>client</code> constant in this case.</p>
 <p>Note:</p>
 <ul>
 <li><code>Universal</code> is not a constructor but a factory, which means it's <em>not</em> invoked with <code>new</code>.</li>
 </ul>
 <h2 id="5-send-1-aetto-from-payer-to-new-user">5. Send 1 <code>aetto</code> from payer to new user</h2>
-<div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">spendTxResult</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="nx">AMOUNT</span><span class="p">,</span> <span class="k">await</span> <span class="nx">newUserAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">(),</span> <span class="p">{</span> <span class="nx">onAccount</span><span class="o">:</span> <span class="nx">payerAccount</span> <span class="p">})</span>
+<div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">spendTxResult</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span>
+    <span class="nx">AMOUNT</span><span class="p">,</span> <span class="k">await</span> <span class="nx">newUserAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">(),</span> <span class="p">{</span> <span class="nx">onAccount</span><span class="o">:</span> <span class="nx">payerAccount</span> <span class="p">}</span>
+  <span class="p">)</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">spendTxResult</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="6-check-balance-of-new-user-before">6. Check balance of new user (before)</h2>
@@ -1018,12 +1023,14 @@ Note:</p>
     <span class="nx">recipientId</span><span class="o">:</span> <span class="k">await</span> <span class="nx">payerAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">(),</span>
     <span class="nx">amount</span><span class="o">:</span> <span class="nx">AMOUNT</span>
   <span class="p">})</span>
-  <span class="kd">const</span> <span class="nx">signedSpendTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">signTransaction</span><span class="p">(</span><span class="nx">spendTx</span><span class="p">,</span> <span class="p">{</span> <span class="nx">onAccount</span><span class="o">:</span> <span class="nx">newUserAccount</span><span class="p">,</span> <span class="nx">innerTx</span><span class="o">:</span> <span class="kc">true</span> <span class="p">})</span>
+  <span class="kd">const</span> <span class="nx">signedSpendTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">signTransaction</span><span class="p">(</span>
+    <span class="nx">spendTx</span><span class="p">,</span> <span class="p">{</span> <span class="nx">onAccount</span><span class="o">:</span> <span class="nx">newUserAccount</span><span class="p">,</span> <span class="nx">innerTx</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span>
+  <span class="p">)</span>
 </code></pre></div>
 Note:</p>
 <ul>
-<li>The provided <a href="../../../transaction-options/">transaction option</a> <code>innerTx</code> indicates that the transaction needs
-   to be signed in a special way</li>
+<li>The provided <a href="../../../transaction-options/">transaction option</a> <code>innerTx</code> indicates that
+   the transaction needs to be signed in a special way</li>
 </ul>
 <h2 id="7-create-sign-broadcast-the-payingfortx-as-payer">7. Create, sign &amp; broadcast the <code>PayingForTx</code> as payer</h2>
 <p><div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">payForTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">payForTransaction</span><span class="p">(</span><span class="nx">signedSpendTx</span><span class="p">,</span> <span class="p">{</span> <span class="nx">onAccount</span><span class="o">:</span> <span class="nx">payerAccount</span> <span class="p">})</span>
@@ -1031,7 +1038,8 @@ Note:</p>
 </code></pre></div>
 Note:</p>
 <ul>
-<li>Normally sending the whole balance (1 <code>aetto</code>) would not be possible as the new user would have to cover the transaction fee.</li>
+<li>Normally sending the whole balance (1 <code>aetto</code>) would not be possible as the new user would
+   have to cover the transaction fee.</li>
 </ul>
 <h2 id="8-check-balance-of-new-user-after">8. Check balance of new user (after)</h2>
 <p><div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">newUserBalanceAfter</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getBalance</span><span class="p">(</span><span class="k">await</span> <span class="nx">newUserAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">())</span>

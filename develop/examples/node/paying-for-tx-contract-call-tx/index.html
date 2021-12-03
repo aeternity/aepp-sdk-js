@@ -941,8 +941,10 @@
 <p>The whole script is <a href="https://github.com/aeternity/aepp-sdk-js/blob/master/examples/node/paying-for-tx-contract-call-tx.js">located in the repository</a>
 and this page explains in detail how to:</p>
 <ul>
-<li>Create and sign a <code>ContractCallTx</code> with the <code>innerTx</code> option for an account that has no balance.</li>
-<li>Wrap the signed <code>ContractCallTx</code> in a <code>PayingForTx</code> using an account with balance to pay the fees of the inner transaction.</li>
+<li>Create and sign a <code>ContractCallTx</code> with the <code>innerTx</code> option for an account that has no
+   balance.</li>
+<li>Wrap the signed <code>ContractCallTx</code> in a <code>PayingForTx</code> using an account with balance to pay the
+   fees of the inner transaction.</li>
 </ul>
 <p>Note:</p>
 <ul>
@@ -954,8 +956,10 @@ decentralized aepp without having them to buy AE by covering their fees.</p>
 <p>Examples:</p>
 <ul>
 <li>Game developers that want to quickly onboard new users.</li>
-<li>Governance æpps that want people to vote on important proposals without having them to pay anything.</li>
-<li>Custodians that want to offer an additional services to cover the transaction fees of their clients.</li>
+<li>Governance æpps that want people to vote on important proposals without having them to pay
+   anything.</li>
+<li>Custodians that want to offer an additional services to cover the transaction fees of their
+   clients.</li>
 <li>... many more!</li>
 </ul>
 <h2 id="1-specify-imports">1. Specify imports</h2>
@@ -973,9 +977,9 @@ Additionally you import the <code>Crypto</code> utility module to generate a new
   <span class="nx">publicKey</span><span class="o">:</span> <span class="s1">&#39;ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR&#39;</span><span class="p">,</span>
   <span class="nx">secretKey</span><span class="o">:</span> <span class="s1">&#39;bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b&#39;</span>
 <span class="p">}</span>
-<span class="kd">const</span> <span class="nx">NODE_URL</span> <span class="o">=</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">;</span>
-<span class="kd">const</span> <span class="nx">COMPILER_URL</span> <span class="o">=</span> <span class="s1">&#39;https://compiler.aepps.com&#39;</span><span class="p">;</span>
-<span class="kd">const</span> <span class="nx">CONTRACT_ADDRESS</span> <span class="o">=</span> <span class="s1">&#39;ct_iy86kak8GGt4U5VjDFNQf1a9qjbyxKpmGVNe3UuKwnmcM6LW8&#39;</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">NODE_URL</span> <span class="o">=</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span>
+<span class="kd">const</span> <span class="nx">COMPILER_URL</span> <span class="o">=</span> <span class="s1">&#39;https://compiler.aepps.com&#39;</span>
+<span class="kd">const</span> <span class="nx">CONTRACT_ADDRESS</span> <span class="o">=</span> <span class="s1">&#39;ct_iy86kak8GGt4U5VjDFNQf1a9qjbyxKpmGVNe3UuKwnmcM6LW8&#39;</span>
 <span class="kd">const</span> <span class="nx">CONTRACT_SOURCE</span> <span class="o">=</span>
 <span class="sb">`</span>
 <span class="sb">@compiler &gt;= 6</span>
@@ -998,12 +1002,14 @@ Additionally you import the <code>Crypto</code> utility module to generate a new
 Note:</p>
 <ul>
 <li>The keypair of the account is pre-funded and only used for demonstration purpose<ul>
-<li>You can replace it with your own keypair (see <a href="../../../quick-start/#2-create-a-keypair">Create a Keypair</a>)</li>
+<li>You can replace it with your own keypair (see
+   <a href="../../../quick-start/#2-create-a-keypair">Create a Keypair</a>)</li>
 <li>In case the account runs out of funds you can always request AE using the <a href="https://faucet.aepps.com/">Faucet</a></li>
 </ul>
 </li>
 <li>The contract is already deployed at the defined address.</li>
-<li>The <code>NEW_USER_KEYPAIR</code> is used to call the contract. The <code>PayingForTx</code> allows the new user to perform a contract call without having any funds.</li>
+<li>The <code>NEW_USER_KEYPAIR</code> is used to call the contract. The <code>PayingForTx</code> allows the new user to
+   perform a contract call without having any funds.</li>
 </ul>
 <h2 id="3-open-async-codeblock">3. Open async codeblock</h2>
 <p>Most functions of the SDK return <em>Promises</em>, so the recommended way of
@@ -1018,28 +1024,34 @@ Therefore we are putting our logic into an <code>async</code> code block
   <span class="kd">const</span> <span class="nx">client</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span>
     <span class="nx">nodes</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;testnet&#39;</span><span class="p">,</span> <span class="nx">instance</span><span class="o">:</span> <span class="nx">node</span> <span class="p">}],</span>
     <span class="nx">compilerUrl</span><span class="o">:</span> <span class="nx">COMPILER_URL</span><span class="p">,</span>
-    <span class="nx">accounts</span><span class="o">:</span> <span class="p">[</span><span class="nx">payerAccount</span><span class="p">,</span> <span class="nx">newUserAccount</span><span class="p">],</span>
+    <span class="nx">accounts</span><span class="o">:</span> <span class="p">[</span><span class="nx">payerAccount</span><span class="p">,</span> <span class="nx">newUserAccount</span><span class="p">]</span>
   <span class="p">})</span>
 </code></pre></div>
-The <code>Universal</code> <a href="https://stampit.js.org/essentials/what-is-a-stamp">Stamp</a> itself is asynchronous as it determines the node's version and
-rest interface automatically. Only once the Promise is fulfilled, you know you have a working object instance
-which is assigned to the <code>client</code> constant in this case.</p>
+The <code>Universal</code> <a href="https://stampit.js.org/essentials/what-is-a-stamp">Stamp</a> itself is
+asynchronous as it determines the node's version and rest interface automatically. Only once
+the Promise is fulfilled, you know you have a working object instance which is assigned to the
+<code>client</code> constant in this case.</p>
 <p>Note:</p>
 <ul>
 <li><code>Universal</code> is not a constructor but a factory, which means it's <em>not</em> invoked with <code>new</code>.</li>
 </ul>
 <h2 id="5-create-and-sign-contractcalltx-on-behalf-of-new-user">5. Create and sign <code>ContractCallTx</code> on behalf of new user</h2>
-<p>Currently there is no high-level API available that allows you to create and sign the <code>ContractCallTx</code>
-by invoking the generated contract method on the contract instance that you typically use for contract calls.</p>
+<p>Currently there is no high-level API available that allows you to create and sign the
+<code>ContractCallTx</code> by invoking the generated contract method on the contract instance that you
+typically use for contract calls.</p>
 <p>Following 3 steps need to be done:</p>
 <ol>
-<li>Create calldata by calling the http compiler using <code>contractEncodeCallDataAPI</code> and providing
-    the contract source, the name of the <code>entrypoint</code> to call as well as the required params.<ul>
-<li>The <code>entrypoint</code> with the name <code>set_latest_caller</code> doesn't require any params so you can provide an empty array</li>
+<li>Create calldata by calling the http compiler using <code>contractEncodeCallDataAPI</code> and
+    providing the contract source, the name of the <code>entrypoint</code> to call as well as the
+    required params.<ul>
+<li>The <code>entrypoint</code> with the name <code>set_latest_caller</code> doesn't require any params so you
+   can provide an empty array</li>
 </ul>
 </li>
 <li>Create the <code>ContractCreateTx</code> by providing all required params.<ul>
-<li>You could omit <code>amount</code>, <code>gas</code> and <code>gasPrice</code> if you choose to stick to the default values (see <a href="../../../transaction-options#contractcreatetx-contractcalltx">transaction options</a>)</li>
+<li>You could omit <code>amount</code>, <code>gas</code> and <code>gasPrice</code> if you choose to stick to the default
+   values (see
+   <a href="../../../transaction-options#contractcreatetx-contractcalltx">transaction options</a>)</li>
 </ul>
 </li>
 <li>Sign the transaction by providing <code>innerTx: true</code> as transaction option.<ul>
@@ -1047,9 +1059,18 @@ by invoking the generated contract method on the contract instance that you typi
 </ul>
 </li>
 </ol>
-<div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">calldata</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">contractEncodeCallDataAPI</span><span class="p">(</span><span class="nx">CONTRACT_SOURCE</span><span class="p">,</span> <span class="s2">&quot;set_last_caller&quot;</span><span class="p">,</span> <span class="p">[])</span>
-  <span class="kd">const</span> <span class="nx">contractCallTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">contractCallTx</span><span class="p">({</span> <span class="nx">callerId</span><span class="o">:</span> <span class="k">await</span> <span class="nx">newUserAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">(),</span> <span class="nx">contractId</span><span class="o">:</span> <span class="nx">CONTRACT_ADDRESS</span><span class="p">,</span> <span class="nx">amount</span><span class="o">:</span> <span class="mf">0</span><span class="p">,</span> <span class="nx">gas</span><span class="o">:</span> <span class="mf">1000000</span><span class="p">,</span> <span class="nx">gasPrice</span><span class="o">:</span> <span class="mf">1500000000</span><span class="p">,</span> <span class="nx">callData</span><span class="o">:</span> <span class="nx">calldata</span> <span class="p">})</span>
-  <span class="kd">const</span> <span class="nx">signedContractCallTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">signTransaction</span><span class="p">(</span><span class="nx">contractCallTx</span><span class="p">,</span> <span class="p">{</span> <span class="nx">onAccount</span><span class="o">:</span> <span class="nx">newUserAccount</span><span class="p">,</span> <span class="nx">innerTx</span><span class="o">:</span> <span class="kc">true</span> <span class="p">})</span>
+<div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">calldata</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">contractEncodeCallDataAPI</span><span class="p">(</span><span class="nx">CONTRACT_SOURCE</span><span class="p">,</span> <span class="s1">&#39;set_last_caller&#39;</span><span class="p">,</span> <span class="p">[])</span>
+  <span class="kd">const</span> <span class="nx">contractCallTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">contractCallTx</span><span class="p">({</span>
+    <span class="nx">callerId</span><span class="o">:</span> <span class="k">await</span> <span class="nx">newUserAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">(),</span>
+    <span class="nx">contractId</span><span class="o">:</span> <span class="nx">CONTRACT_ADDRESS</span><span class="p">,</span>
+    <span class="nx">amount</span><span class="o">:</span> <span class="mf">0</span><span class="p">,</span>
+    <span class="nx">gas</span><span class="o">:</span> <span class="mf">1000000</span><span class="p">,</span>
+    <span class="nx">gasPrice</span><span class="o">:</span> <span class="mf">1500000000</span><span class="p">,</span>
+    <span class="nx">callData</span><span class="o">:</span> <span class="nx">calldata</span>
+  <span class="p">})</span>
+  <span class="kd">const</span> <span class="nx">signedContractCallTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">signTransaction</span><span class="p">(</span>
+    <span class="nx">contractCallTx</span><span class="p">,</span> <span class="p">{</span> <span class="nx">onAccount</span><span class="o">:</span> <span class="nx">newUserAccount</span><span class="p">,</span> <span class="nx">innerTx</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span>
+  <span class="p">)</span>
 </code></pre></div>
 <h2 id="6-create-sign-broadcast-the-payingfortx-as-payer">6. Create, sign &amp; broadcast the <code>PayingForTx</code> as payer</h2>
 <div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">payForTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">payForTransaction</span><span class="p">(</span><span class="nx">signedContractCallTx</span><span class="p">,</span> <span class="p">{</span> <span class="nx">onAccount</span><span class="o">:</span> <span class="nx">payerAccount</span> <span class="p">})</span>
@@ -1058,15 +1079,19 @@ by invoking the generated contract method on the contract instance that you typi
 <h2 id="7-check-that-last-caller-is-the-new-user">7. Check that last caller is the new user</h2>
 <p>Knowing the contract address and the source code allows you to
 initialize a contract instance and interact with the contract in a convenient way.
-<div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span> <span class="nx">source</span><span class="o">:</span> <span class="nx">CONTRACT_SOURCE</span><span class="p">,</span> <span class="nx">contractAddress</span><span class="o">:</span> <span class="nx">CONTRACT_ADDRESS</span> <span class="p">})</span>
+<div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">(</span>
+    <span class="p">{</span> <span class="nx">source</span><span class="o">:</span> <span class="nx">CONTRACT_SOURCE</span><span class="p">,</span> <span class="nx">contractAddress</span><span class="o">:</span> <span class="nx">CONTRACT_ADDRESS</span> <span class="p">}</span>
+  <span class="p">)</span>
   <span class="kd">const</span> <span class="nx">dryRunTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">get_last_caller</span><span class="p">()</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`New user: </span><span class="si">${</span><span class="k">await</span> <span class="nx">newUserAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">()</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Last caller:`</span><span class="p">,</span> <span class="nx">dryRunTx</span><span class="p">.</span><span class="nx">decodedResult</span><span class="p">)</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Last caller:&#39;</span><span class="p">,</span> <span class="nx">dryRunTx</span><span class="p">.</span><span class="nx">decodedResult</span><span class="p">)</span>
 </code></pre></div>
 Note:</p>
 <ul>
 <li>Last caller should now be the address of the new user.</li>
-<li>For regular (non-stateful) entrypoints the SDK automatically performs a dry-run which allows to perform read-only calls for free, see <a href="../../../guides/contracts/#b-regular-entrypoints">Contract guide</a>.</li>
+<li>For regular (non-stateful) entrypoints the SDK automatically performs a dry-run which
+   allows to perform read-only calls for free, see
+   <a href="../../../guides/contracts/#b-regular-entrypoints">Contract guide</a>.</li>
 </ul>
 <h2 id="8-close-and-run-async-codeblock">8. Close and run async codeblock</h2>
 <p>Now you can close the async codeblock and execute it at the same time.

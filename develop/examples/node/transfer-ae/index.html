@@ -930,18 +930,20 @@ and this page explains in detail how to:</p>
   <span class="nx">publicKey</span><span class="o">:</span> <span class="s1">&#39;ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR&#39;</span><span class="p">,</span>
   <span class="nx">secretKey</span><span class="o">:</span> <span class="s1">&#39;bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b&#39;</span>
 <span class="p">}</span>
-<span class="kd">const</span> <span class="nx">NODE_URL</span> <span class="o">=</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">NODE_URL</span> <span class="o">=</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span>
 <span class="kd">const</span> <span class="p">[</span><span class="nx">amount</span> <span class="o">=</span> <span class="mf">1</span><span class="p">,</span> <span class="nx">recipient</span> <span class="o">=</span> <span class="nx">ACCOUNT_KEYPAIR</span><span class="p">.</span><span class="nx">publicKey</span><span class="p">]</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">argv</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mf">2</span><span class="p">);</span>
 </code></pre></div>
 Note:</p>
 <ul>
 <li>The keypair of the account is pre-funded and only used for demonstration purpose<ul>
-<li>You should replace it with your own keypair (see <a href="../../../quick-start/#2-create-a-keypair">Create a Keypair</a>)</li>
+<li>You should replace it with your own keypair
+   (see <a href="../../../quick-start/#2-create-a-keypair">Create a Keypair</a>)</li>
 </ul>
 </li>
 <li>In case the account runs out of funds you can always request AE using the <a href="https://faucet.aepps.com/">Faucet</a></li>
 <li>By default the script will transfer <code>1 aetto</code> and use the demo account itself as recipient<ul>
-<li>Optionally you can provide the amount and a different recipient by providing the arguments when executing the script,
+<li>Optionally you can provide the amount and a different recipient by providing the
+   arguments when executing the script,
    e.g. <code>node transfer-ae.js 3 ak_6D2uyunJaERXfgbsc94G8vrp79nZrbtorL7VCRXk3sWiFK5jb</code></li>
 </ul>
 </li>
@@ -960,8 +962,9 @@ Therefore we are putting our logic into an <code>async</code> code block
     <span class="nx">accounts</span><span class="o">:</span> <span class="p">[</span><span class="nx">account</span><span class="p">]</span>
   <span class="p">})</span>
 </code></pre></div>
-The <code>Universal</code> <a href="https://stampit.js.org/essentials/what-is-a-stamp">Stamp</a> itself is asynchronous as it determines the node's version and
-rest interface automatically. Only once the Promise is fulfilled, you know you have a working object instance
+The <code>Universal</code> <a href="https://stampit.js.org/essentials/what-is-a-stamp">Stamp</a> itself is
+asynchronous as it determines the node's version and rest interface automatically. Only once
+the Promise is fulfilled, you know you have a working object instance
 which is assigned to the <code>client</code> constant in this case.</p>
 <p>Note:</p>
 <ul>
@@ -983,8 +986,9 @@ which is assigned to the <code>client</code> constant in this case.</p>
 </code></pre></div>
 Note:</p>
 <ul>
-<li>If the recipient is the same account as the sender (default of the script if no arguments provided) the balance will be lower
-   after transfer because a transaction <code>fee</code> has been paid to the miners.</li>
+<li>If the recipient is the same account as the sender (default of the script if no arguments
+   provided) the balance will be lower after transfer because a transaction <code>fee</code> has been
+   paid to the miners.</li>
 </ul>
 <h2 id="8-close-and-run-async-codeblock">8. Close and run async codeblock</h2>
 <p>Now you can close the async codeblock and execute it at the same time.
