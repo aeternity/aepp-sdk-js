@@ -17,13 +17,17 @@ import { isHex } from '../utils/string'
  * @param {Object} params Transaction params
  * @param {Object} [options={}] Options
  * @throws {Error} Arguments validation error's
- * @return {{ encodedTx: String, binary: Array<Buffer>, rlpEncoded: Buffer, params: Object, type: String }}
+ * @return {{
+ *   encodedTx: String, binary: Array<Buffer>, rlpEncoded: Buffer, params: Object, type: String
+ * }}
  */
 const buildTransaction = (type, params, options = {}) => {
   if (typeof params !== 'object') throw new Error('"params" should be an object')
   if (typeof type !== 'string' || !Object.values(TX_TYPE).includes(type)) throw new Error(`Unknown transaction type ${type}`)
   const fee = calculateFee(params.fee, type, { gas: params.gas, params, vsn: params.vsn })
-  const { rlpEncoded, binary, tx: encodedTx, txObject } = buildTx({ ...params, fee }, type, { vsn: params.vsn, ...options })
+  const { rlpEncoded, binary, tx: encodedTx, txObject } = buildTx(
+    { ...params, fee }, type, { vsn: params.vsn, ...options }
+  )
   return { rlpEncoded, binary, encodedTx, params: txObject, type }
 }
 
@@ -32,7 +36,9 @@ const buildTransaction = (type, params, options = {}) => {
  * @alias module:@aeternity/aepp-sdk/es/tx/tx-object
  * @param {Buffer|String} tx RLP encoded binary or base64c(rlpBinary) string
  * @throws {Error} Arguments validation error's
- * @return {{ encodedTx: String, binary: Array<Buffer>, rlpEncoded: Buffer, type: String, params: Object }}
+ * @return {{
+ *   encodedTx: String, binary: Array<Buffer>, rlpEncoded: Buffer, type: String, params: Object
+ * }}
  */
 const unpackTransaction = (tx) => {
   if (!tx) throw new Error(`Invalid transaction: ${tx}`)
@@ -55,7 +61,9 @@ const unpackTransaction = (tx) => {
  * @param {String} type Transaction type
  * @param {Object} [options={}] Options
  * @throws {Error} Arguments validation error's
- * @return {{encodedTx: String, binary: Array<Buffer>, rlpEncoded: Buffer, type: String, params: Object}}
+ * @return {{
+ *   encodedTx: String, binary: Array<Buffer>, rlpEncoded: Buffer, type: String, params: Object
+ * }}
  */
 const initTransaction = ({ tx, params, type, options = {} } = {}) => {
   if (params && type) return buildTransaction(type, params, options)
@@ -122,7 +130,12 @@ export const TxObject = stampit({
       if (typeof props !== 'object') throw new Error('Props should be an object')
       this.isSigned = false
       this.signatures = []
-      Object.assign(this, buildTransaction(this.type, { ...this.params, ...props, fee: null }, { ...this.options, ...options }))
+      Object.assign(
+        this,
+        buildTransaction(
+          this.type, { ...this.params, ...props, fee: null }, { ...this.options, ...options }
+        )
+      )
       return this
     },
     /**
@@ -143,7 +156,13 @@ export const TxObject = stampit({
     addSignature (signature) {
       signature = isHex(signature) ? Buffer.from(signature, 'hex') : signature
       if (!Buffer.isBuffer(signature) && !(signature instanceof Uint8Array)) throw new Error('Invalid signature, signature must be of type Buffer or Uint8Array')
-      Object.assign(this, buildTransaction(TX_TYPE.signed, { encodedTx: this.rlpEncoded, signatures: [[...this.signatures, signature]] }))
+      Object.assign(
+        this,
+        buildTransaction(
+          TX_TYPE.signed,
+          { encodedTx: this.rlpEncoded, signatures: [[...this.signatures, signature]] }
+        )
+      )
 
       const { signatures, encodedTx: { txType, tx } } = this.params
       this.signatures = signatures

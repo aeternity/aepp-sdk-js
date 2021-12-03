@@ -134,7 +134,9 @@ describe('Contract', function () {
 
   it('enforce zero deposit for contract deployment', async () => {
     const code = await sdk.contractCompile(identityContract)
-    const { txData } = await sdk.contractDeploy(code.bytecode, identityContract, [], { deposit: 10 })
+    const { txData } = await sdk.contractDeploy(
+      code.bytecode, identityContract, [], { deposit: 10 }
+    )
     return txData.tx.deposit.should.be.equal(0)
   })
 
@@ -143,7 +145,8 @@ describe('Contract', function () {
     const signature = await sdk.sign(msgHash)
     const signContract = await sdk.getContractInstance({ source: signSource })
     await signContract.deploy()
-    const { decodedResult } = await signContract.methods.verify(msgHash, await sdk.address(), signature)
+    const { decodedResult } = await signContract.methods
+      .verify(msgHash, await sdk.address(), signature)
     decodedResult.should.be.equal(true)
   })
 

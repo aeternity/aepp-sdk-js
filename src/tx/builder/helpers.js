@@ -110,7 +110,7 @@ export function commitmentHash (name, salt = createSalt()) {
  * Decode data using the default encoding/decoding algorithm
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {string} data An Base58check or Base64check encoded and prefixed string (ex tx_..., sg_..., ak_....)
+ * @param {string} data An Base58/64check encoded and prefixed string (ex tx_..., sg_..., ak_....)
  * @param {string} [requiredPrefix] Ensure that data have this prefix
  * @return {Buffer} Decoded data
  */
@@ -191,7 +191,8 @@ export function readInt (buf = Buffer.from([])) {
  * Helper function to build pointers for name update TX
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {Array} pointers - Array of pointers ([ { key: 'account_pubkey', id: 'ak_32klj5j23k23j5423l434l2j3423'} ])
+ * @param {Array} pointers - Array of pointers
+ * ([ { key: 'account_pubkey', id: 'ak_32klj5j23k23j5423l434l2j3423'} ])
  * @return {Array} Serialized pointers array
  */
 export function buildPointers (pointers) {
@@ -207,7 +208,8 @@ export function buildPointers (pointers) {
  * Helper function to read pointers from name update TX
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {Array} pointers - Array of pointers ([ { key: 'account_pubkey', id: 'ak_32klj5j23k23j5423l434l2j3423'} ])
+ * @param {Array} pointers - Array of pointers
+ * ([ { key: 'account_pubkey', id: 'ak_32klj5j23k23j5423l434l2j3423'} ])
  * @return {Array} Deserialize pointer array
  */
 export function readPointers (pointers) {
@@ -272,7 +274,8 @@ export function classify (s) {
  * Validate name pointers array
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {String[]} pointers Pointers array. Allowed values is: account(ak_), oracle(ok_), contract(ct_), channel(ch_)
+ * @param {String[]} pointers Pointers array.
+ * Allowed values is: account(ak_), oracle(ok_), contract(ct_), channel(ch_)
  * @return {Boolean}
  */
 export function validatePointers (pointers = []) {
@@ -305,7 +308,8 @@ export function computeBidFee (domain, startFee = NAME_FEE, increment = NAME_FEE
   if (!(Number(increment) === increment && increment % 1 !== 0)) throw new Error(`Increment must be float. Current increment ${increment}`)
   if (increment < NAME_FEE_BID_INCREMENT) throw new Error(`minimum increment percentage is ${NAME_FEE_BID_INCREMENT}`)
   return ceil(
-    BigNumber(BigNumber(startFee).eq(NAME_FEE) ? getMinimumNameFee(domain) : startFee).times(BigNumber(NAME_FEE_BID_INCREMENT).plus(1))
+    BigNumber(BigNumber(startFee).eq(NAME_FEE) ? getMinimumNameFee(domain) : startFee)
+      .times(BigNumber(NAME_FEE_BID_INCREMENT).plus(1))
   )
 }
 

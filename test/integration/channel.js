@@ -734,7 +734,10 @@ describe('Channel', function () {
       payload: signedTx
     })
     const closeSoloTxFee = unpackTx(closeSoloTx).tx.fee
-    await initiator.sendTransaction(await initiator.signTransaction(closeSoloTx), { waitMined: true, interval: 400, attempts: 10 })
+    await initiator.sendTransaction(
+      await initiator.signTransaction(closeSoloTx),
+      { waitMined: true, interval: 400, attempts: 10 }
+    )
     const settleTx = await initiator.channelSettleTx({
       channelId: await initiatorCh.id(),
       fromId: initiatorAddr,
@@ -742,15 +745,22 @@ describe('Channel', function () {
       responderAmountFinal: balances[responderAddr]
     })
     const settleTxFee = unpackTx(settleTx).tx.fee
-    await initiator.sendTransaction(await initiator.signTransaction(settleTx), { waitMined: true, interval: 400, attempts: 10 })
+    await initiator.sendTransaction(
+      await initiator.signTransaction(settleTx),
+      { waitMined: true, interval: 400, attempts: 10 }
+    )
     const initiatorBalanceAfterClose = await initiator.balance(initiatorAddr)
     const responderBalanceAfterClose = await responder.balance(responderAddr)
-    new BigNumber(initiatorBalanceAfterClose).minus(initiatorBalanceBeforeClose).plus(closeSoloTxFee).plus(settleTxFee).isEqualTo(
-      new BigNumber(balances[initiatorAddr])
-    ).should.be.equal(true)
-    new BigNumber(responderBalanceAfterClose).minus(responderBalanceBeforeClose).isEqualTo(
-      new BigNumber(balances[responderAddr])
-    ).should.be.equal(true)
+    new BigNumber(initiatorBalanceAfterClose)
+      .minus(initiatorBalanceBeforeClose)
+      .plus(closeSoloTxFee)
+      .plus(settleTxFee)
+      .isEqualTo(balances[initiatorAddr])
+      .should.be.equal(true)
+    new BigNumber(responderBalanceAfterClose)
+      .minus(responderBalanceBeforeClose)
+      .isEqualTo(balances[responderAddr])
+      .should.be.equal(true)
   })
 
   it('can dispute via slash tx', async () => {
@@ -775,11 +785,15 @@ describe('Channel', function () {
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
     const initiatorBalanceBeforeClose = await initiator.balance(initiatorAddr)
     const responderBalanceBeforeClose = await responder.balance(responderAddr)
-    const oldUpdate = await initiatorCh.update(initiatorAddr, responderAddr, 100, (tx) => initiator.signTransaction(tx))
+    const oldUpdate = await initiatorCh.update(
+      initiatorAddr, responderAddr, 100, (tx) => initiator.signTransaction(tx)
+    )
     const oldPoi = await initiatorCh.poi({
       accounts: [initiatorAddr, responderAddr]
     })
-    const recentUpdate = await initiatorCh.update(initiatorAddr, responderAddr, 100, (tx) => initiator.signTransaction(tx))
+    const recentUpdate = await initiatorCh.update(
+      initiatorAddr, responderAddr, 100, (tx) => initiator.signTransaction(tx)
+    )
     const recentPoi = await responderCh.poi({
       accounts: [initiatorAddr, responderAddr]
     })
@@ -791,7 +805,9 @@ describe('Channel', function () {
       payload: oldUpdate.signedTx
     })
     const closeSoloTxFee = unpackTx(closeSoloTx).tx.fee
-    await initiator.sendTransaction(await initiator.signTransaction(closeSoloTx), { waitMined: true, interval: 400, attempts: 10 })
+    await initiator.sendTransaction(
+      await initiator.signTransaction(closeSoloTx), { waitMined: true, interval: 400, attempts: 10 }
+    )
     const slashTx = await responder.channelSlashTx({
       channelId: responderCh.id(),
       fromId: responderAddr,
@@ -799,7 +815,9 @@ describe('Channel', function () {
       payload: recentUpdate.signedTx
     })
     const slashTxFee = unpackTx(slashTx).tx.fee
-    await responder.sendTransaction(await responder.signTransaction(slashTx), { waitMined: true, interval: 400, attempts: 10 })
+    await responder.sendTransaction(
+      await responder.signTransaction(slashTx), { waitMined: true, interval: 400, attempts: 10 }
+    )
     const settleTx = await responder.channelSettleTx({
       channelId: responderCh.id(),
       fromId: responderAddr,
@@ -807,15 +825,22 @@ describe('Channel', function () {
       responderAmountFinal: recentBalances[responderAddr]
     })
     const settleTxFee = unpackTx(settleTx).tx.fee
-    await responder.sendTransaction(await responder.signTransaction(settleTx), { waitMined: true, interval: 400, attempts: 10 })
+    await responder.sendTransaction(
+      await responder.signTransaction(settleTx), { waitMined: true, interval: 400, attempts: 10 }
+    )
     const initiatorBalanceAfterClose = await initiator.balance(initiatorAddr)
     const responderBalanceAfterClose = await responder.balance(responderAddr)
-    new BigNumber(initiatorBalanceAfterClose).minus(initiatorBalanceBeforeClose).plus(closeSoloTxFee).isEqualTo(
-      new BigNumber(recentBalances[initiatorAddr])
-    ).should.be.equal(true)
-    new BigNumber(responderBalanceAfterClose).minus(responderBalanceBeforeClose).plus(slashTxFee).plus(settleTxFee).isEqualTo(
-      new BigNumber(recentBalances[responderAddr])
-    ).should.be.equal(true)
+    new BigNumber(initiatorBalanceAfterClose)
+      .minus(initiatorBalanceBeforeClose)
+      .plus(closeSoloTxFee)
+      .isEqualTo(recentBalances[initiatorAddr])
+      .should.be.equal(true)
+    new BigNumber(responderBalanceAfterClose)
+      .minus(responderBalanceBeforeClose)
+      .plus(slashTxFee)
+      .plus(settleTxFee)
+      .isEqualTo(recentBalances[responderAddr])
+      .should.be.equal(true)
   })
 
   it('can create a contract and accept', async () => {
@@ -844,7 +869,9 @@ describe('Channel', function () {
       vmVersion: 5,
       abiVersion: 3
     }, async (tx) => initiator.signTransaction(tx))
-    result.should.eql({ accepted: true, address: result.address, signedTx: (await initiatorCh.state()).signedTx })
+    result.should.eql({
+      accepted: true, address: result.address, signedTx: (await initiatorCh.state()).signedTx
+    })
     initiatorCh.round().should.equal(roundBefore + 1)
     contractAddress = result.address
   })
@@ -1036,7 +1063,9 @@ describe('Channel', function () {
       fromId: await initiator.address(),
       payload: (await initiatorCh.state()).signedTx
     })
-    await initiator.sendTransaction(await initiator.signTransaction(snapshotSoloTx), { waitMined: true })
+    await initiator.sendTransaction(
+      await initiator.signTransaction(snapshotSoloTx), { waitMined: true }
+    )
   })
 
   it('can reconnect', async () => {

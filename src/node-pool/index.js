@@ -51,7 +51,8 @@ export default stampit({
      * @param {Boolean} select - Select this node as current
      * @return {void}
      * @example
-     * nodePool.addNode('testNode', awaitNode({ url, internalUrl }), true) // add and select new node with name 'testNode'
+     * // add and select new node with name 'testNode'
+     * nodePool.addNode('testNode', awaitNode({ url, internalUrl }), true)
      */
     addNode (name, node, select = false) {
       if (this.pool.has(name)) throw new Error(`Node with name ${name} already exist`)
@@ -140,7 +141,8 @@ export default stampit({
       }))
     },
     validateNodes (nodes) {
-      // TODO: validate it on TypeScript level instead (to speedup development, save runtime resources)
+      // TODO: validate it on TypeScript level instead
+      // (to speedup development, save runtime resources)
       if (!Array.isArray(nodes)) throw new Error('"nodes" should be an array')
       const notObject = nodes.map(n => typeof n).find(t => t !== 'object')
       if (notObject) throw new Error(`Each node should be an object, got ${notObject} instead`)

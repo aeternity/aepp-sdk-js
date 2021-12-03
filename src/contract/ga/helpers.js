@@ -8,8 +8,10 @@ export const prepareGaParams = (ins) => async (authData, authFnName) => {
   if (authData.callData) {
     if (authData.callData.split('_')[0] !== 'cb') throw new Error('Auth data must be a string with "cb" prefix.')
     return { authCallData: authData.callData, gas }
-  } else {
-    if (!authData.source || !authData.args) throw new Error('Auth data must contain source code and arguments.')
-    return { authCallData: await ins.contractEncodeCallDataAPI(authData.source, authFnName, authData.args), gas }
+  }
+  if (!authData.source || !authData.args) throw new Error('Auth data must contain source code and arguments.')
+  return {
+    authCallData: await ins.contractEncodeCallDataAPI(authData.source, authFnName, authData.args),
+    gas
   }
 }

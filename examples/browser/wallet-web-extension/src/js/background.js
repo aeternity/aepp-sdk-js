@@ -10,7 +10,7 @@ const NODE_URL = 'https://testnet.aeternity.io'
 const COMPILER_URL = 'https://compiler.aepps.com'
 const accounts = [
   MemoryAccount({ keypair: Crypto.generateKeyPair() }), // generate keypair for account1
-  MemoryAccount({ keypair: Crypto.generateKeyPair() })  // generate keypair for account2
+  MemoryAccount({ keypair: Crypto.generateKeyPair() }) // generate keypair for account2
 ]
 
 async function init () {
@@ -19,7 +19,8 @@ async function init () {
     compilerUrl: COMPILER_URL,
     nodes: [{ name: 'testnet', instance: await Node({ url: NODE_URL }) }],
     name: 'Wallet WebExtension',
-    // The `ExtensionProvider` uses the first account by default. You can change active account using `selectAccount(address)` function
+    // The `ExtensionProvider` uses the first account by default.
+    // You can change active account using `selectAccount(address)` function
     accounts,
     // Hook for sdk registration
     onConnection (aepp, action) {
@@ -63,7 +64,9 @@ async function init () {
   }).then(wallet => {
     chrome.runtime.onConnect.addListener(async function (port) {
       // create connection
-      const connection = await BrowserRuntimeConnection({ connectionInfo: { id: port.sender.frameId }, port })
+      const connection = await BrowserRuntimeConnection(
+        { connectionInfo: { id: port.sender.frameId }, port }
+      )
       // add new aepp to wallet
       wallet.addRpcClient(connection)
       // share wallet details

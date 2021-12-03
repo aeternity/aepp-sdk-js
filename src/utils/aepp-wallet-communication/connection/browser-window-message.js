@@ -18,10 +18,13 @@
 /**
  * Browser window Post Message connector module
  *
- * This is the complement to {@link module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection}.
+ * This is the complement to
+ * {@link module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection}.
  * @module @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message
  * @export BrowserWindowMessageConnection
- * @example import BrowserWindowMessageConnection from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message'
+ * @example
+ * import BrowserWindowMessageConnection
+ * from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message'
  */
 import stampit from '@stamp/it'
 import WalletConnection from '.'
@@ -102,27 +105,42 @@ const getTarget = () => {
   const isContentScript = isExtensionContext && isWeb
   if (isContentScript) return window
   // When we is the main page we need to decide the target by our self
-  // Probably can be implemented some algo for checking DOM for Iframes and somehow decide which Iframe to talk
+  // Probably can be implemented some algo for checking DOM for Iframes and somehow decide which
+  // Iframe to talk
   return isInIframe() ? window.parent : undefined
 }
 
 /**
  * BrowserWindowMessageConnection
  * @function
- * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message
+ * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication\
+ * /connection/browser-window-message
  * @rtype Stamp
  * @param {Object} [params={}] - Initializer object
  * @param {Object} [params.target=window.parent] - Target window for message
  * @param {Object} [params.self=window] - Host window for message
  * @param {Object} [params.origin] - Origin of receiver
- * @param {Object} [params.sendDirection] - Optional field for wrapping messages in additional structure({ type: 'to_aepp' || 'to_waellet', data }).Used for handling messages netween content script and page
- * @param {Object} [params.receiveDirection='to_aepp'] - Optional(default: 'to_aepp') field for unwrapping messages from additional structure({ type: 'to_aepp' || 'to_waellet', data }).Used for handling messages netween content script and page
+ * @param {String} [params.sendDirection] Wrapping messages into additional struct
+ * ({ type: 'to_aepp' || 'to_waellet', data })
+ * Used for handling messages between content script and page
+ * @param {String} [params.receiveDirection='to_aepp'] Unwrapping messages from additional struct
+ * ({ type: 'to_aepp' || 'to_waellet', data })
+ * Used for handling messages between content script and page
  * @param {Object} [params.connectionInfo={}] - Connection info object
  * @param {Boolean} [params.debug=false] - Debug flag
  * @return {Object}
  */
 export default stampit({
-  init ({ connectionInfo = {}, target = getTarget(), self = window, origin, sendDirection, receiveDirection = MESSAGE_DIRECTION.to_aepp, debug = false, forceOrigin = false } = {}) {
+  init ({
+    connectionInfo = {},
+    target = getTarget(),
+    self = window,
+    origin,
+    sendDirection,
+    receiveDirection = MESSAGE_DIRECTION.to_aepp,
+    debug = false,
+    forceOrigin = false
+  } = {}) {
     if (sendDirection && !Object.keys(MESSAGE_DIRECTION).includes(sendDirection)) throw new Error(`sendDirection must be one of [${Object.keys(MESSAGE_DIRECTION)}]`)
     if (!Object.keys(MESSAGE_DIRECTION).includes(receiveDirection)) throw new Error(`receiveDirection must be one of [${Object.keys(MESSAGE_DIRECTION)}]`)
     this.connectionInfo = { id: uuid(), ...connectionInfo }

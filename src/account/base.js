@@ -85,7 +85,9 @@ async function signMessage (message, opt = { returnHex: false }) {
  * Verify message
  * @instance
  * @category async
- * @rtype (msg: String, signature: String, publicKey: String) => signature: Promise[String], throws: Error
+ * @rtype (
+ *   msg: String, signature: String, publicKey: String
+ * ) => signature: Promise[String], throws: Error
  * @param {String} message - Message to verify
  * @param {String} signature - Signature
  * @param {Object} opt - Options

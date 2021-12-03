@@ -338,7 +338,8 @@ function shutdown (sign) {
  * @param {Number} amount - Amount of tokens to withdraw
  * @param {Function} sign - Function which verifies and signs withdraw transaction
  * @param {Object} [callbacks]
- * @param {Function} [callbacks.onOnChainTx] - Called when withdraw transaction has been posted on chain
+ * @param {Function} [callbacks.onOnChainTx] - Called when withdraw transaction has been posted
+ * on chain
  * @param {Function} [callbacks.onOwnWithdrawLocked]
  * @param {Function} [callbacks.onWithdrawLocked]
  * @return {Promise<Object>}
@@ -407,7 +408,8 @@ function withdraw (amount, sign, { onOnChainTx, onOwnWithdrawLocked, onWithdrawL
  * @param {Number} amount - Amount of tokens to deposit
  * @param {Function} sign - Function which verifies and signs deposit transaction
  * @param {Object} [callbacks]
- * @param {Function} [callbacks.onOnChainTx] - Called when deposit transaction has been posted on chain
+ * @param {Function} [callbacks.onOnChainTx] - Called when deposit transaction has been posted
+ * on chain
  * @param {Function} [callbacks.onOwnDepositLocked]
  * @param {Function} [callbacks.onDepositLocked]
  * @return {Promise<Object>}
@@ -597,7 +599,11 @@ function callContract ({ amount, callData, contract, abiVersion }, sign) {
  *   }
  * })
  */
-function forceProgress ({ amount, callData, contract, abiVersion, gas = 1000000, gasPrice = 1000000000, nonce }, sign, { onOnChainTx } = {}) {
+function forceProgress (
+  { amount, callData, contract, abiVersion, gas = 1000000, gasPrice = 1000000000, nonce },
+  sign,
+  { onOnChainTx } = {}
+) {
   return new Promise((resolve, reject) => {
     enqueueAction(
       this,
@@ -800,23 +806,42 @@ async function reconnect (options, txParams) {
  * @param {String} options.initiatorId - Initiator's public key
  * @param {String} options.responderId - Responder's public key
  * @param {Number} options.pushAmount - Initial deposit in favour of the responder by the initiator
- * @param {Number} options.initiatorAmount - Amount of tokens the initiator has committed to the channel
- * @param {Number} options.responderAmount - Amount of tokens the responder has committed to the channel
+ * @param {Number} options.initiatorAmount - Amount of tokens the initiator has committed to
+ * the channel
+ * @param {Number} options.responderAmount - Amount of tokens the responder has committed to
+ * the channel
  * @param {Number} options.channelReserve - The minimum amount both peers need to maintain
  * @param {Number} [options.ttl] - Minimum block height to include the channel_create_tx
  * @param {String} options.host - Host of the responder's node
  * @param {Number} options.port - The port of the responders node
  * @param {Number} options.lockPeriod - Amount of blocks for disputing a solo close
- * @param {Number} [options.existingChannelId] - Existing channel id (required if reestablishing a channel)
- * @param {Number} [options.offchainTx] - Offchain transaction (required if reestablishing a channel)
- * @param {Number} [options.timeoutIdle] - The time waiting for a new event to be initiated (default: 600000)
- * @param {Number} [options.timeoutFundingCreate] - The time waiting for the initiator to produce the create channel transaction after the noise session had been established (default: 120000)
- * @param {Number} [options.timeoutFundingSign] - The time frame the other client has to sign an off-chain update after our client had initiated and signed it. This applies only for double signed on-chain intended updates: channel create transaction, deposit, withdrawal and etc. (default: 120000)
- * @param {Number} [options.timeoutFundingLock] - The time frame the other client has to confirm an on-chain transaction reaching maturity (passing minimum depth) after the local node has detected this. This applies only for double signed on-chain intended updates: channel create transaction, deposit, withdrawal and etc. (default: 360000)
- * @param {Number} [options.timeoutSign] - The time frame the client has to return a signed off-chain update or to decline it. This applies for all off-chain updates (default: 500000)
- * @param {Number} [options.timeoutAccept] - The time frame the other client has to react to an event. This applies for all off-chain updates that are not meant to land on-chain, as well as some special cases: opening a noise connection, mutual closing acknowledgement and reestablishing an existing channel (default: 120000)
- * @param {Number} [options.timeoutInitialized] - the time frame the responder has to accept an incoming noise session. Applicable only for initiator (default: timeout_accept's value)
- * @param {Number} [options.timeoutAwaitingOpen] - The time frame the initiator has to start an outgoing noise session to the responder's node. Applicable only for responder (default: timeout_idle's value)
+ * @param {Number} [options.existingChannelId] - Existing channel id (required if reestablishing a
+ * channel)
+ * @param {Number} [options.offchainTx] - Offchain transaction (required if reestablishing
+ * a channel)
+ * @param {Number} [options.timeoutIdle] - The time waiting for a new event to be initiated
+ * (default: 600000)
+ * @param {Number} [options.timeoutFundingCreate] - The time waiting for the initiator to produce
+ * the create channel transaction after the noise session had been established (default: 120000)
+ * @param {Number} [options.timeoutFundingSign] - The time frame the other client has to sign an
+ * off-chain update after our client had initiated and signed it. This applies only for double
+ * signed on-chain intended updates: channel create transaction, deposit, withdrawal and etc.
+ * (default: 120000)
+ * @param {Number} [options.timeoutFundingLock] - The time frame the other client has to confirm an
+ * on-chain transaction reaching maturity (passing minimum depth) after the local node has detected
+ * this. This applies only for double signed on-chain intended updates: channel create transaction,
+ * deposit, withdrawal and etc. (default: 360000)
+ * @param {Number} [options.timeoutSign] - The time frame the client has to return a signed
+ * off-chain update or to decline it. This applies for all off-chain updates (default: 500000)
+ * @param {Number} [options.timeoutAccept] - The time frame the other client has to react to an
+ * event. This applies for all off-chain updates that are not meant to land on-chain, as well as
+ * some special cases: opening a noise connection, mutual closing acknowledgement and
+ * reestablishing an existing channel (default: 120000)
+ * @param {Number} [options.timeoutInitialized] - the time frame the responder has to accept an
+ * incoming noise session. Applicable only for initiator (default: timeout_accept's value)
+ * @param {Number} [options.timeoutAwaitingOpen] - The time frame the initiator has to start an
+ * outgoing noise session to the responder's node. Applicable only for responder (default:
+ * timeout_idle's value)
  * @param {Number} [options.debug=false] - Log websocket communication
  * @param {Function} options.sign - Function which verifies and signs transactions
  * @return {Promise<Object>} Channel instance

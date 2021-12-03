@@ -193,7 +193,7 @@ export function generateKeyPairFromSecret (secret) {
 
 /**
  * Generate a random ED25519 keypair
- * @rtype (raw: Boolean) => {publicKey: String, secretKey: String} | {publicKey: Buffer, secretKey: Buffer}
+ * @rtype (raw: Boolean) => {publicKey: String | Buffer, secretKey: String | Buffer}
  * @param {Boolean} raw - Whether to return raw (binary) keys
  * @return {Object} Key pair
  */

@@ -189,7 +189,14 @@ export async function recover (password, keyObject) {
  * @param {Object=} options.kdfparams KDF parameters (default: constants.<kdf>).
  * @return {Object}
  */
-export async function dump (name, password, privateKey, nonce = nacl.randomBytes(24), salt = nacl.randomBytes(16), options = {}) {
+export async function dump (
+  name,
+  password,
+  privateKey,
+  nonce = nacl.randomBytes(24),
+  salt = nacl.randomBytes(16),
+  options = {}
+) {
   const opt = Object.assign({}, DEFAULTS.crypto, options)
   return marshal(
     name,
@@ -208,7 +215,8 @@ export function validateKeyObj (obj) {
   const missingRootKeys = root.filter(key => !Object.prototype.hasOwnProperty.call(obj, key))
   if (missingRootKeys.length) throw new Error(`Invalid key file format. Require properties: ${missingRootKeys}`)
 
-  const missingCryptoKeys = cryptoKeys.filter(key => !Object.prototype.hasOwnProperty.call(obj.crypto, key))
+  const missingCryptoKeys = cryptoKeys
+    .filter(key => !Object.prototype.hasOwnProperty.call(obj.crypto, key))
   if (missingCryptoKeys.length) throw new Error(`Invalid key file format. Require properties: ${missingCryptoKeys}`)
 
   return true

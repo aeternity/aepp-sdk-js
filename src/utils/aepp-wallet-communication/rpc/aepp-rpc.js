@@ -3,7 +3,9 @@
  *
  * @module @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc
  * @export AeppRpc
- * @example import ContentScriptBridge from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc'
+ * @example
+ * import ContentScriptBridge
+ * from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc'
  */
 import { v4 as uuid } from 'uuid'
 import Ae from '../../../ae'
@@ -40,15 +42,21 @@ const RESPONSES = {
   [METHODS.aepp.subscribeAddress]: (instance) =>
     (msg) => {
       if (msg.result) {
-        msg.result.address && (instance.rpcClient.accounts = msg.result.address)
-        msg.result.subscription && (instance.rpcClient.addressSubscription = msg.result.subscription)
+        if (msg.result.address) {
+          instance.rpcClient.accounts = msg.result.address
+        }
+        if (msg.result.subscription) {
+          instance.rpcClient.addressSubscription = msg.result.subscription
+        }
       }
 
       instance.rpcClient.processResponse(msg, ({ id, result }) => [result])
     },
   [METHODS.aepp.sign]: (instance) =>
     (msg) => {
-      instance.rpcClient.processResponse(msg, ({ id, result }) => [result.signedTransaction || result.transactionHash])
+      instance.rpcClient.processResponse(
+        msg, ({ id, result }) => [result.signedTransaction || result.transactionHash]
+      )
     },
   [METHODS.aepp.signMessage]: (instance) =>
     (msg) => {
@@ -82,7 +90,15 @@ const handleMessage = (instance) => async (msg) => {
  * @return {Object}
  */
 export default Ae.compose({
-  async init ({ name, onAddressChange = voidFn, onDisconnect = voidFn, onNetworkChange = voidFn, connection, forceValidation = false, debug = false }) {
+  async init ({
+    name,
+    onAddressChange = voidFn,
+    onDisconnect = voidFn,
+    onNetworkChange = voidFn,
+    connection,
+    forceValidation = false,
+    debug = false
+  }) {
     const eventsHandlers = ['onDisconnect', 'onAddressChange', 'onNetworkChange']
     this.connection = connection
     this.name = name
@@ -166,7 +182,7 @@ export default Ae.compose({
      * @function subscribeAddress
      * @instance
      * @rtype (type: String, value: String) => Promise
-     * @param {String} type Type of subscription can be one of ['current'(just for selected account updates), 'connected(all accounts)']
+     * @param {String} type Should be one of 'current' (the selected account), 'connected' (all)
      * @param {String} value Subscription action('subscribe'|'unsubscribe')
      * @return {Promise} Address from wallet
      */
@@ -186,7 +202,10 @@ export default Ae.compose({
       if (!this.rpcClient || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
       if (!this.rpcClient.currentAccount) throw new Error('You are not subscribed for an account.')
       if (opt.onAccount && !this.rpcClient.hasAccessToAccount(opt.onAccount)) throw new Error(`You do not have access to account ${opt.onAccount}`)
-      return this.rpcClient.request(METHODS.aepp.sign, { ...opt, tx, returnSigned: true, networkId: this.getNetworkId() })
+      return this.rpcClient.request(
+        METHODS.aepp.sign,
+        { ...opt, tx, returnSigned: true, networkId: this.getNetworkId() }
+      )
     },
     /**
      * Overwriting of `signMessage` AE method
@@ -221,7 +240,8 @@ export default Ae.compose({
     /**
      * Overwriting of `send` AE method
      * All sdk API which use it will be send notification to wallet and wait for callBack
-     * This method will sign, broadcast and wait until transaction will be accepted using rpc communication with wallet
+     * This method will sign, broadcast and wait until transaction will be accepted using rpc
+     * communication with wallet
      * @function send
      * @instance
      * @rtype (tx: String, options = {}) => Promise
@@ -239,7 +259,10 @@ export default Ae.compose({
         const signed = await this.signTransaction(tx, { onAccount: opt.onAccount })
         return this.sendTransaction(signed, opt)
       }
-      return this.rpcClient.request(METHODS.aepp.sign, { onAccount: opt.onAccount, tx, returnSigned: false, networkId: this.getNetworkId() })
+      return this.rpcClient.request(
+        METHODS.aepp.sign,
+        { onAccount: opt.onAccount, tx, returnSigned: false, networkId: this.getNetworkId() }
+      )
     }
   }
 })

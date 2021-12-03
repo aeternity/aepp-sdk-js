@@ -16,7 +16,7 @@
     "docs:examples": "node tooling/docs/examples-to-md.js examples/node/*.js",
     "docs:api": "node apidoc.js",
     "docs:changelog": "cp CHANGELOG.md docs/CHANGELOG.md",
-    "lint": "commitlint --from 635f1aa --verbose && ts-standard",
+    "lint": "commitlint --from 635f1aa --verbose && eslint .",
     "test": "nyc --require @babel/register --require ts-node/register mocha './test/unit/' './test/integration/' --recursive --exit --timeout 40s",
     "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "test:integration:channel,accounts": "nyc --require @babel/register --require ts-node/register mocha './test/integration/@(channel|accounts).js' --exit --timeout 40s",
@@ -83,11 +83,18 @@
     "@types/chai": "^4.2.22",
     "@types/mocha": "^9.0.0",
     "@types/node": "^16.11.9",
+    "@typescript-eslint/eslint-plugin": "^5.3.1",
+    "@typescript-eslint/parser": "^5.3.1",
     "babel-loader": "^8.2.3",
     "babel-plugin-ramda": "^2.0.0",
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
     "codecov": "^3.8.3",
+    "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.1",
     "jsdoc-to-markdown": "^7.1.0",
     "mocha": "^9.1.3",
     "nyc": "^15.1.0",
@@ -95,7 +102,6 @@
     "source-map": "^0.7.3",
     "standard-version": "^9.3.2",
     "ts-node": "^10.4.0",
-    "ts-standard": "^11.0.0",
     "typescript": "^4.5.2",
     "webpack": "^5.64.1",
     "webpack-bundle-analyzer": "^4.5.0",
@@ -106,11 +112,6 @@
     "src",
     "es"
   ],
-  "ts-standard": {
-    "ignore": [
-      "examples/**/*.js"
-    ]
-  },
   "browserslist": [
     "> 1%",
     "last 2 versions",
