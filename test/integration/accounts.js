@@ -26,7 +26,8 @@ import {
   UnavailableAccountError,
   TypeError,
   IlleagalArgumentError,
-  InvalidKeypairError
+  InvalidKeypairError,
+  InvalidTxParamsError
 } from '../../src/utils/error'
 
 describe('Accounts', function () {
@@ -61,7 +62,7 @@ describe('Accounts', function () {
     })
 
     it('spending negative amount of tokens', () => expect(wallet.spend(-1, receiver))
-      .to.be.rejectedWith('Transaction build error. {"amount":"-1 must be >= 0"}'))
+      .to.be.rejectedWith(InvalidTxParamsError, 'Transaction build error. {"amount":"-1 must be >= 0"}'))
   })
 
   it('determines the balance using `balance`', async () => {
