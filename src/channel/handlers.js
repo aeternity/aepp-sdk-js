@@ -28,6 +28,12 @@ import {
   fsmId
 } from './internal'
 import { unpackTx, buildTx } from '../tx/builder'
+import {
+  IlleagalArgumentError,
+  InsufficientBalanceError,
+  ChannelConnectionError,
+  UnexpectedChannelMessageError
+} from '../utils/error'
 
 function encodeRlpTx (rlpBinary) {
   return `tx_${encodeBase64Check(rlpBinary)}`
@@ -49,7 +55,7 @@ async function appendSignature (tx, signFn) {
 function handleUnexpectedMessage (channel, message, state) {
   if (state && state.reject) {
     state.reject(Object.assign(
-      new Error(`Unexpected message received:\n\n${JSON.stringify(message)}`),
+      new UnexpectedChannelMessageError(`Unexpected message received:\n\n${JSON.stringify(message)}`),
       { wsMessage: message }
     ))
   }
@@ -75,7 +81,7 @@ export function awaitingConnection (channel, message, state) {
     return { handler: awaitingConnection }
   }
   if (message.method === 'channels.error') {
-    emit(channel, 'error', new Error(message.payload.message))
+    emit(channel, 'error', new ChannelConnectionError(message.payload.message))
     return { handler: channelClosed }
   }
 }
@@ -251,17 +257,17 @@ export async function awaitingOffChainTx (channel, message, state) {
     }
   }
   if (message.method === 'channels.error') {
-    state.reject(new Error(message.data.message))
+    state.reject(new ChannelConnectionError(message.data.message))
     return { handler: channelOpen }
   }
   if (message.error) {
     const { data = [] } = message.error
     if (data.find(i => i.code === 1001)) {
-      state.reject(new Error('Insufficient balance'))
+      state.reject(new InsufficientBalanceError('Insufficient balance'))
     } else if (data.find(i => i.code === 1002)) {
-      state.reject(new Error('Amount cannot be negative'))
+      state.reject(new IlleagalArgumentError('Amount cannot be negative'))
     } else {
-      state.reject(new Error(message.error.message))
+      state.reject(new ChannelConnectionError(message.error.message))
     }
     return { handler: channelOpen }
   }
@@ -303,7 +309,7 @@ export function awaitingOffChainUpdate (channel, message, state) {
     }
   }
   if (message.error) {
-    state.reject(new Error(message.error.message))
+    state.reject(new ChannelConnectionError(message.error.message))
     return { handler: channelOpen }
   }
   return handleUnexpectedMessage(channel, message, state)
@@ -387,7 +393,7 @@ export function awaitingLeave (channel, message, state) {
     return { handler: channelClosed }
   }
   if (message.method === 'channels.error') {
-    state.reject(new Error(message.data.message))
+    state.reject(new ChannelConnectionError(message.data.message))
     return { handler: channelOpen }
   }
   return handleUnexpectedMessage(channel, message, state)
@@ -651,7 +657,7 @@ export function awaitingCallsPruned (channels, message, state) {
     state.resolve()
     return { handler: channelOpen }
   }
-  state.reject(new Error('Unexpected message received'))
+  state.reject(new UnexpectedChannelMessageError('Unexpected message received'))
   return { handler: channelClosed }
 }
 
