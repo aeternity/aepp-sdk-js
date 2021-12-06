@@ -9,6 +9,13 @@ import { buildTx, calculateFee, unpackTx } from './builder'
 import { TX_TYPE } from './builder/schema'
 import { encode } from './builder/helpers'
 import { isHex } from '../utils/string'
+import {
+  InvalidTxError,
+  TypeError,
+  UnknownTxError,
+  InvalidSignatureError,
+  UnsignedTxError
+} from '../utils/error'
 
 /**
  * Build transaction from object
@@ -20,8 +27,8 @@ import { isHex } from '../utils/string'
  * @return {{ encodedTx: String, binary: Array<Buffer>, rlpEncoded: Buffer, params: Object, type: String }}
  */
 const buildTransaction = (type, params, options = {}) => {
-  if (typeof params !== 'object') throw new Error('"params" should be an object')
-  if (typeof type !== 'string' || !Object.values(TX_TYPE).includes(type)) throw new Error(`Unknown transaction type ${type}`)
+  if (typeof params !== 'object') throw new TypeError('tx "params" should be an object')
+  if (typeof type !== 'string' || !Object.values(TX_TYPE).includes(type)) throw new UnknownTxError(`Unknown transaction type ${type}`)
   const fee = calculateFee(params.fee, type, { gas: params.gas, params, vsn: params.vsn })
   const { rlpEncoded, binary, tx: encodedTx, txObject } = buildTx({ ...params, fee }, type, { vsn: params.vsn, ...options })
   return { rlpEncoded, binary, encodedTx, params: txObject, type }
@@ -35,7 +42,7 @@ const buildTransaction = (type, params, options = {}) => {
  * @return {{ encodedTx: String, binary: Array<Buffer>, rlpEncoded: Buffer, type: String, params: Object }}
  */
 const unpackTransaction = (tx) => {
-  if (!tx) throw new Error(`Invalid transaction: ${tx}`)
+  if (!tx) throw new InvalidTxError(`Invalid transaction: ${tx}`)
   if (typeof tx === 'string') {
     const { txType: type, tx: params, rlpEncoded, binary } = unpackTx(tx)
     return { encodedTx: tx, type, params, rlpEncoded, binary }
@@ -60,7 +67,7 @@ const unpackTransaction = (tx) => {
 const initTransaction = ({ tx, params, type, options = {} } = {}) => {
   if (params && type) return buildTransaction(type, params, options)
   if (tx) return unpackTransaction(tx)
-  throw new Error('Invalid TxObject arguments. Please provide one of { tx: "tx_asdasd23..." } or { type: "spendTx", params: {...} }')
+  throw new InvalidTxError('Invalid TxObject arguments. Please provide one of { tx: "tx_asdasd23..." } or { type: "spendTx", params: {...} }')
 }
 
 /**
@@ -119,7 +126,7 @@ export const TxObject = stampit({
      * @return {TxObject}
      */
     setProp (props = {}, options = {}) {
-      if (typeof props !== 'object') throw new Error('Props should be an object')
+      if (typeof props !== 'object') throw new TypeError('Props should be an object')
       this.isSigned = false
       this.signatures = []
       Object.assign(this, buildTransaction(this.type, { ...this.params, ...props, fee: null }, { ...this.options, ...options }))
@@ -131,7 +138,7 @@ export const TxObject = stampit({
      * @return {Array} Array of signatures
      */
     getSignatures () {
-      if (!this.isSigned) throw new Error('Signature not found, transaction is not signed')
+      if (!this.isSigned) throw new UnsignedTxError()
       return this.signatures
     },
     /**
@@ -142,7 +149,9 @@ export const TxObject = stampit({
      */
     addSignature (signature) {
       signature = isHex(signature) ? Buffer.from(signature, 'hex') : signature
-      if (!Buffer.isBuffer(signature) && !(signature instanceof Uint8Array)) throw new Error('Invalid signature, signature must be of type Buffer or Uint8Array')
+      if (!Buffer.isBuffer(signature) && !(signature instanceof Uint8Array)) {
+        throw new InvalidSignatureError('Invalid signature, signature must be of type Buffer or Uint8Array')
+      }
       Object.assign(this, buildTransaction(TX_TYPE.signed, { encodedTx: this.rlpEncoded, signatures: [[...this.signatures, signature]] }))
 
       const { signatures, encodedTx: { txType, tx } } = this.params

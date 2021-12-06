@@ -21,6 +21,16 @@ import {
   NAME_ID_KEY
 } from './schema'
 import { ceil } from '../../utils/bignumber'
+import {
+  PrefixMismatchError,
+  DecodeError,
+  TagNotFoundError,
+  PrefixNotFoundError,
+  InvalidNameError,
+  InvalidHashError,
+  UnknownHashClassError,
+  IllegalBidFeeError
+} from '../../utils/error'
 
 /**
  * JavaScript-based Transaction builder helper function's
@@ -116,9 +126,9 @@ export function commitmentHash (name, salt = createSalt()) {
  */
 export function decode (data, requiredPrefix) {
   const [prefix, payload, extra] = data.split('_')
-  if (extra) throw new Error(`Encoded string have extra parts: ${data}`)
+  if (extra) throw new DecodeError(`Encoded string have extra parts: ${data}`)
   if (requiredPrefix && requiredPrefix !== prefix) {
-    throw new Error(`Encoded string have a wrong type: ${prefix} (expected: ${requiredPrefix})`)
+    throw new PrefixMismatchError(prefix, requiredPrefix)
   }
   return (base64Types.includes(prefix) ? decodeBase64Check : decodeBase58Check)(payload)
 }
@@ -147,7 +157,7 @@ export function encode (data, type) {
 export function writeId (hashId) {
   const prefix = hashId.slice(0, 2)
   const idTag = PREFIX_ID_TAG[prefix]
-  if (!idTag) throw new Error(`Id tag for prefix ${prefix} not found.`)
+  if (!idTag) throw new TagNotFoundError(prefix)
   return Buffer.from([...toBytes(idTag), ...decode(hashId, prefix)])
 }
 
@@ -161,7 +171,7 @@ export function writeId (hashId) {
 export function readId (buf) {
   const tag = buf.readUIntBE(0, 1)
   const prefix = ID_TAG_PREFIX[tag]
-  if (!prefix) throw new Error(`Prefix for id-tag ${tag} not found.`)
+  if (!prefix) throw new PrefixNotFoundError(tag)
   return encode(buf.slice(1, buf.length), prefix)
 }
 
@@ -228,8 +238,8 @@ export function readPointers (pointers) {
  * @throws Error
  */
 export function ensureNameValid (name) {
-  if (!name || typeof name !== 'string') throw new Error('Name must be a string')
-  if (!name.endsWith('.chain')) throw new Error(`Name should end with .chain: ${name}`)
+  if (!name || typeof name !== 'string') throw new InvalidNameError('Name must be a string')
+  if (!name.endsWith('.chain')) throw new InvalidNameError(`Name should end with .chain: ${name}`)
 }
 
 /**
@@ -257,14 +267,14 @@ export function isNameValid (name) {
  */
 export function classify (s) {
   if (!s.match(/^[a-z]{2}_.+/)) {
-    throw new Error('Not a valid hash')
+    throw new InvalidHashError()
   }
 
   const klass = s.substr(0, 2)
   if (klass in NAME_ID_KEY) {
     return NAME_ID_KEY[klass]
   } else {
-    throw new Error(`Unknown class ${klass}`)
+    throw new UnknownHashClassError(klass)
   }
 }
 
@@ -302,8 +312,8 @@ export function getMinimumNameFee (domain) {
  * @return {String} Bid fee
  */
 export function computeBidFee (domain, startFee = NAME_FEE, increment = NAME_FEE_BID_INCREMENT) {
-  if (!(Number(increment) === increment && increment % 1 !== 0)) throw new Error(`Increment must be float. Current increment ${increment}`)
-  if (increment < NAME_FEE_BID_INCREMENT) throw new Error(`minimum increment percentage is ${NAME_FEE_BID_INCREMENT}`)
+  if (!(Number(increment) === increment && increment % 1 !== 0)) throw new IllegalBidFeeError(`Increment must be float. Current increment ${increment}`)
+  if (increment < NAME_FEE_BID_INCREMENT) throw new IllegalBidFeeError(`minimum increment percentage is ${NAME_FEE_BID_INCREMENT}`)
   return ceil(
     BigNumber(BigNumber(startFee).eq(NAME_FEE) ? getMinimumNameFee(domain) : startFee).times(BigNumber(NAME_FEE_BID_INCREMENT).plus(1))
   )

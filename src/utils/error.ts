@@ -62,6 +62,34 @@ export class InsufficientBalanceError extends AeError {
   }
 }
 
+export class UnsupportedProtocolError extends AeError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'UnsupportedProtocolError'
+  }
+}
+
+export class InvalidNameError extends AeError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'InvalidNameError'
+  }
+}
+
+export class InvalidHashError extends AeError {
+  constructor () {
+    super('Not a valid hash')
+    this.name = 'InvalidHashError'
+  }
+}
+
+export class UnknownHashClassError extends AeError {
+  constructor (klass: string) {
+    super(`Unknown class ${klass}`)
+    this.name = 'UnknownHashClassError'
+  }
+}
+
 /* keypair an account related errors */
 export class InvalidKeypairError extends IlleagalArgumentError {
   constructor (msg: string) {
@@ -125,6 +153,90 @@ export class DryRunError extends AeError {
   constructor (msg: string) {
     super(msg)
     this.name = 'DryRunError'
+  }
+}
+
+export class UnsupportedVMversionError extends AeError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'UnsupportedVMversionError'
+  }
+}
+
+export class UnsupportedABIversionError extends AeError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'UnsupportedABIversionError'
+  }
+}
+
+export class UnknownTxError extends AeError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'UnknownTxError'
+  }
+}
+
+export class UnsignedTxError extends AeError {
+  constructor () {
+    super('Signature not found, transaction is not signed')
+    this.name = 'UnsignedTxError'
+  }
+}
+
+export class InvalidSignatureError extends AeError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'UnsignedTxError'
+  }
+}
+
+export class SchemaNotFoundError extends AeError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'SchemaNotFoundError'
+  }
+}
+
+export class InvalidTxParamsError extends AeError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'InvalidTxParamsError'
+  }
+}
+
+export class PrefixMismatchError extends AeError {
+  constructor (prefix: string, requiredPrefix: string) {
+    super(`Encoded string have a wrong type: ${prefix} (expected: ${requiredPrefix})`)
+    this.name = 'PrefixMismatchError'
+  }
+}
+
+export class DecodeError extends AeError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'DecodeError'
+  }
+}
+
+export class TagNotFoundError extends AeError {
+  constructor (prefix: string) {
+    super(`Id tag for prefix ${prefix} not found.`)
+    this.name = 'DecodeError'
+  }
+}
+
+export class PrefixNotFoundError extends AeError {
+  constructor (tag: string) {
+    super(`Prefix for id-tag ${tag} not found.`)
+    this.name = 'PrefixNotFoundError'
+  }
+}
+
+export class IllegalBidFeeError extends AeError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'IllegalBidFeeError'
   }
 }
 

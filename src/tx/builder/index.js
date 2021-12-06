@@ -28,6 +28,7 @@ import {
 } from './helpers'
 import { toBytes } from '../../utils/bytes'
 import MPTree from '../../utils/mptree'
+import { InvalidTxParamsError, SchemaNotFoundError } from '../../utils/error'
 
 /**
  * JavaScript-based Transaction builder
@@ -319,7 +320,7 @@ export function buildRawTx (params, schema, { excludeKeys = [], denomination = A
   // Validation
   const valid = validateParams(params, schema, { excludeKeys })
   if (Object.keys(valid).length) {
-    throw new Error('Transaction build error. ' + JSON.stringify(valid))
+    throw new InvalidTxParamsError('Transaction build error. ' + JSON.stringify(valid))
   }
 
   return filteredSchema
@@ -359,10 +360,10 @@ const getSchema = ({ vsn, objId, type }) => {
   const schema = isDeserialize ? TX_DESERIALIZATION_SCHEMA : TX_SERIALIZATION_SCHEMA
 
   if (!schema[firstKey]) {
-    throw new Error(`Transaction ${isDeserialize ? 'deserialization' : 'serialization'} not implemented for ${isDeserialize ? 'tag ' + objId : type}`)
+    throw new SchemaNotFoundError(`Transaction ${isDeserialize ? 'deserialization' : 'serialization'} not implemented for ${isDeserialize ? 'tag ' + objId : type}`)
   }
   if (!schema[firstKey][vsn]) {
-    throw new Error(`Transaction ${isDeserialize ? 'deserialization' : 'serialization'} not implemented for ${isDeserialize ? 'tag ' + objId : type} version ${vsn}`)
+    throw new SchemaNotFoundError(`Transaction ${isDeserialize ? 'deserialization' : 'serialization'} not implemented for ${isDeserialize ? 'tag ' + objId : type} version ${vsn}`)
   }
   return schema[firstKey][vsn]
 }

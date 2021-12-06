@@ -34,6 +34,12 @@ import { toBytes } from '../../src/utils/bytes'
 import { parseBigNumber } from '../../src/utils/bignumber'
 import { buildTx, unpackTx } from '../../src/tx/builder'
 import { NAME_BID_RANGES } from '../../src/tx/builder/schema'
+import {
+  InvalidHashError,
+  InvalidNameError,
+  UnknownHashClassError,
+  SchemaNotFoundError
+} from '../../src/utils/error'
 
 describe('Tx', function () {
   it('reproducible commitment hashes can be generated', async () => {
@@ -74,11 +80,11 @@ describe('Tx', function () {
 
   describe('ensureNameValid', () => {
     it('validates type', () => {
-      expect(() => ensureNameValid({})).to.throw('Name must be a string')
+      expect(() => ensureNameValid({})).to.throw(InvalidNameError, 'Name must be a string')
     })
 
     it('validates domain', () => {
-      expect(() => ensureNameValid('asdasdasd.unknown')).to.throw('Name should end with .chain:')
+      expect(() => ensureNameValid('asdasdasd.unknown')).to.throw(InvalidNameError, 'Name should end with .chain:')
     })
 
     it('don\'t throws exception', () => ensureNameValid('asdasdasd.chain'))
@@ -100,32 +106,32 @@ describe('Tx', function () {
   })
 
   it('classify: invalid hash', () => {
-    expect(() => classify('aaaaa')).to.throw('Not a valid hash')
+    expect(() => classify('aaaaa')).to.throw(InvalidHashError, 'Not a valid hash')
   })
 
   it('classify: invalid prefix', () => {
-    expect(() => classify('aa_23aaaaa')).to.throw('Unknown class aa')
+    expect(() => classify('aa_23aaaaa')).to.throw(UnknownHashClassError, 'Unknown class aa')
   })
 
   it('Deserialize tx: invalid tx type', () => {
     const tx = rlpEncode([99, 99])
     expect(() => unpackTx(tx, true))
-      .to.throw('Transaction deserialization not implemented for tag ' + 99)
+      .to.throw(SchemaNotFoundError, 'Transaction deserialization not implemented for tag ' + 99)
   })
 
   it('Deserialize tx: invalid tx VSN', () => {
     const tx = rlpEncode([10, 99])
     expect(() => unpackTx(tx, true))
-      .to.throw('Transaction deserialization not implemented for tag ' + 10 + ' version ' + 99)
+      .to.throw(SchemaNotFoundError, 'Transaction deserialization not implemented for tag ' + 10 + ' version ' + 99)
   })
 
   it('Serialize tx: invalid tx type', () => {
     expect(() => buildTx({}, 'someTx'))
-      .to.throw('Transaction serialization not implemented for someTx')
+      .to.throw(SchemaNotFoundError, 'Transaction serialization not implemented for someTx')
   })
 
   it('Serialize tx: invalid tx VSN', () => {
     expect(() => buildTx({}, 'spendTx', { vsn: 5 }))
-      .to.throw('Transaction serialization not implemented for spendTx version 5')
+      .to.throw(SchemaNotFoundError, 'Transaction serialization not implemented for spendTx version 5')
   })
 })
