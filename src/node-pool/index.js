@@ -6,6 +6,7 @@
  */
 import stampit from '@stamp/it'
 import { getNetworkId } from '../node'
+import { DisconnectedError, DuplicateNodeError, NodeNotFoundError, TypeError } from '../utils/error'
 
 /**
  * Node Pool Stamp
@@ -34,7 +35,7 @@ export default stampit({
       configurable: false,
       get () {
         if (!this.selectedNode || !this.selectedNode.instance) {
-          throw new Error('You can\'t use Node API. Node is not connected or not defined!')
+          throw new NodeNotFoundError('You can\'t use Node API. Node is not connected or not defined!')
         }
         return this.selectedNode.instance.api
       }
@@ -54,7 +55,7 @@ export default stampit({
      * nodePool.addNode('testNode', awaitNode({ url, internalUrl }), true) // add and select new node with name 'testNode'
      */
     addNode (name, node, select = false) {
-      if (this.pool.has(name)) throw new Error(`Node with name ${name} already exist`)
+      if (this.pool.has(name)) throw new DuplicateNodeError(name)
 
       this.validateNodes([{ name, instance: node }])
 
@@ -82,7 +83,7 @@ export default stampit({
      * nodePool.selectNode('testNode')
      */
     selectNode (name) {
-      if (!this.pool.has(name)) throw new Error(`Node with name ${name} not in pool`)
+      if (!this.pool.has(name)) throw new NodeNotFoundError(`Node with name ${name} not in pool`)
 
       this.selectedNode = this.pool.get(name)
     },
@@ -118,7 +119,7 @@ export default stampit({
      * nodePool.getNodeInfo() // { name, version, networkId, protocol, ... }
      */
     getNodeInfo () {
-      if (!this.isNodeConnected()) throw new Error('Can not get node info. Node is not connected')
+      if (!this.isNodeConnected()) throw new DisconnectedError()
       return {
         name: this.selectedNode.name,
         ...this.selectedNode.instance.getNodeInfo()
@@ -141,12 +142,12 @@ export default stampit({
     },
     validateNodes (nodes) {
       // TODO: validate it on TypeScript level instead (to speedup development, save runtime resources)
-      if (!Array.isArray(nodes)) throw new Error('"nodes" should be an array')
+      if (!Array.isArray(nodes)) throw new TypeError('"nodes" should be an array')
       const notObject = nodes.map(n => typeof n).find(t => t !== 'object')
-      if (notObject) throw new Error(`Each node should be an object, got ${notObject} instead`)
+      if (notObject) throw new TypeError(`Each node should be an object, got ${notObject} instead`)
       const wrongFields = nodes.find(n => typeof n.name !== 'string' || typeof n.instance !== 'object')
       if (notObject) {
-        throw new Error(
+        throw new TypeError(
           'Each node should have name (string), instance (object) ' +
           `fields, got ${JSON.stringify(wrongFields)} instead`
         )
@@ -156,7 +157,7 @@ export default stampit({
         .find(i => typeof i.api !== 'object' || typeof i.genesisHash !== 'string' ||
           typeof i.consensusProtocolVersion !== 'number')
       if (wrongInstanceFields) {
-        throw new Error(
+        throw new TypeError(
           'Each node instance should have api (object), consensusProtocolVersion (number), ' +
           `genesisHash (string) fields, got ${JSON.stringify(wrongInstanceFields)} instead`
         )

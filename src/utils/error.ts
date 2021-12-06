@@ -55,6 +55,13 @@ export class MissingParamError extends AeError {
   }
 }
 
+export class InsufficientBalanceError extends AeError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'InsufficientBalanceError'
+  }
+}
+
 /* keypair an account related errors */
 export class InvalidKeypairError extends IlleagalArgumentError {
   constructor (msg: string) {
@@ -239,5 +246,71 @@ export class UnsupportedNodeError extends AeError {
     super(
       `Unsupported node version ${nodeVersion}. ` +
       `Supported: >= ${NODE_GE_VERSION} < ${NODE_LT_VERSION}`)
+    this.name = 'UnsupportedNodeError'
+  }
+}
+
+/* Channel orginated errors */
+export class ChannelInitializationError extends AeError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'ChannelInitializationError'
+  }
+}
+
+export class UnknownChannelStateError extends AeError {
+  constructor () {
+    super('State Channels FSM entered unknown state')
+    this.name = 'UnknownChannelStateError'
+  }
+}
+
+export class ChannelPingTimedOutError extends AeError {
+  constructor () {
+    super('Server pong timed out')
+    this.name = 'ChannelPingTimedOutError'
+  }
+}
+
+export class ChannelCallError extends AeError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'ChannelCallError'
+  }
+}
+
+export class UnexpectedChannelMessageError extends AeError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'UnexpectedChannelMessageError'
+  }
+}
+
+export class ChannelConnectionError extends AeError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'ChannelConnectionError'
+  }
+}
+
+/* Node errors */
+export class NodeNotFoundError extends AeError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'NodeNotFoundError'
+  }
+}
+
+export class DuplicateNodeError extends AeError {
+  constructor (name: string) {
+    super(`Node with name ${name} already exist`)
+    this.name = 'DuplicateNodeError'
+  }
+}
+
+export class DisconnectedError extends AeError {
+  constructor () {
+    super('Can not get node info. Node is not connected')
+    this.name = 'DisconnectedError'
   }
 }
