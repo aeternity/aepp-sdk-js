@@ -25,7 +25,7 @@ import { AE_AMOUNT_FORMATS } from '../../src/utils/amount-formatter'
 import {
   UnavailableAccountError,
   TypeError,
-  IlleagalArgumentError,
+  IllegalArgumentError,
   InvalidKeypairError,
   InvalidTxParamsError
 } from '../../src/utils/error'
@@ -83,7 +83,7 @@ describe('Accounts', function () {
     }
 
     it('throws exception if fraction is out of range', () => sdk.transferFunds(-1, receiver)
-      .should.be.rejectedWith(IlleagalArgumentError, /Fraction should be a number between 0 and 1, got/))
+      .should.be.rejectedWith(IllegalArgumentError, /Fraction should be a number between 0 and 1, got/))
 
     it('spends 0% of balance', async () => {
       const { balanceBefore, balanceAfter, amount } = await spend(0)

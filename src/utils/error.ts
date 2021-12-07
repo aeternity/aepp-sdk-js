@@ -15,10 +15,10 @@ export class AeError extends Error {
 }
 
 /* Common error patterns */
-export class IlleagalArgumentError extends AeError {
+export class IllegalArgumentError extends AeError {
   constructor (msg: string) {
     super(msg)
-    this.name = 'IlleagalArgumentError'
+    this.name = 'IllegalArgumentError'
   }
 }
 
@@ -91,7 +91,7 @@ export class UnknownHashClassError extends AeError {
 }
 
 /* keypair an account related errors */
-export class InvalidKeypairError extends IlleagalArgumentError {
+export class InvalidKeypairError extends IllegalArgumentError {
   constructor (msg: string) {
     super(msg)
     this.name = 'InvalidKeypairError'
@@ -105,7 +105,7 @@ export class UnavailableAccountError extends AeError {
   }
 }
 
-/* errors orginating from AENS operation */
+/* errors originating from AENS operation */
 export class InsufficientNameFeeError extends AeError {
   constructor (nameFee: number, minNameFee: number) {
     super(`the provided fee ${nameFee} is not enough to execute the claim, required: ${minNameFee}`)
@@ -362,7 +362,7 @@ export class UnsupportedNodeError extends AeError {
   }
 }
 
-/* Channel orginated errors */
+/* Channel originated errors */
 export class ChannelInitializationError extends AeError {
   constructor (msg: string) {
     super(msg)

@@ -30,7 +30,7 @@ import {
   RequestTimedOutError,
   TxTimedOutError,
   TxNotInChainError,
-  IlleagalArgumentError
+  IllegalArgumentError
 } from '../utils/error'
 
 /**
@@ -180,7 +180,7 @@ async function getCurrentGeneration () {
 async function getGeneration (hashOrHeight) {
   if (typeof hashOrHeight === 'string') return this.api.getGenerationByHash(hashOrHeight)
   if (typeof hashOrHeight === 'number') return this.api.getGenerationByHeight(hashOrHeight)
-  throw new IlleagalArgumentError('Invalid param, param must be hash or height')
+  throw new IllegalArgumentError('Invalid param, param must be hash or height')
 }
 
 async function getMicroBlockTransactions (hash) {
@@ -190,7 +190,7 @@ async function getMicroBlockTransactions (hash) {
 async function getKeyBlock (hashOrHeight) {
   if (typeof hashOrHeight === 'string') return this.api.getKeyBlockByHash(hashOrHeight)
   if (typeof hashOrHeight === 'number') return this.api.getKeyBlockByHeight(hashOrHeight)
-  throw new IlleagalArgumentError('Invalid param, param must be hash or height')
+  throw new IllegalArgumentError('Invalid param, param must be hash or height')
 }
 
 async function getMicroBlockHeader (hash) {
