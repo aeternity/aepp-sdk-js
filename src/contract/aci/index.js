@@ -42,7 +42,7 @@ import {
   NotPayableFunctionError,
   TypeError,
   NodeInvocationError,
-  IlleagalArgumentError
+  IllegalArgumentError
 } from '../../utils/error'
 
 /**
@@ -144,8 +144,8 @@ export default async function getContractInstance ({
    * @return {String} bytecode bytecode
    */
   instance.compile = async (options = {}) => {
-    if (instance.bytecode) throw new IlleagalArgumentError('Contract already compiled')
-    if (!instance.source) throw new IlleagalArgumentError('Can\'t compile without source code')
+    if (instance.bytecode) throw new IllegalArgumentError('Contract already compiled')
+    if (!instance.source) throw new IllegalArgumentError('Can\'t compile without source code')
     const { bytecode } = await this.contractCompile(instance.source, { ...instance.options, ...options })
     instance.bytecode = bytecode
     return instance.bytecode

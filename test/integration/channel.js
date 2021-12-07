@@ -27,7 +27,7 @@ import { decode } from '../../src/tx/builder/helpers'
 import Channel from '../../src/channel'
 import MemoryAccount from '../../src/account/memory'
 import {
-  IlleagalArgumentError,
+  IllegalArgumentError,
   InsufficientBalanceError,
   ChannelConnectionError
 } from '../../src/utils/error'
@@ -1176,7 +1176,7 @@ describe('Channel', function () {
     }
 
     it('when posting an update with negative amount', async () => {
-      return update({ amount: -10 }).should.eventually.be.rejectedWith(IlleagalArgumentError, 'Amount cannot be negative')
+      return update({ amount: -10 }).should.eventually.be.rejectedWith(IllegalArgumentError, 'Amount cannot be negative')
     })
 
     it('when posting an update with insufficient balance', async () => {

@@ -29,7 +29,7 @@ import {
 } from './internal'
 import { unpackTx, buildTx } from '../tx/builder'
 import {
-  IlleagalArgumentError,
+  IllegalArgumentError,
   InsufficientBalanceError,
   ChannelConnectionError,
   UnexpectedChannelMessageError
@@ -263,7 +263,7 @@ export async function awaitingOffChainTx (channel, message, state) {
     if (data.find(i => i.code === 1001)) {
       state.reject(new InsufficientBalanceError('Insufficient balance'))
     } else if (data.find(i => i.code === 1002)) {
-      state.reject(new IlleagalArgumentError('Amount cannot be negative'))
+      state.reject(new IllegalArgumentError('Amount cannot be negative'))
     } else {
       state.reject(new ChannelConnectionError(message.error.message))
     }

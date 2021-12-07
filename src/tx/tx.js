@@ -29,7 +29,7 @@ import { ABI_VERSIONS, MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE, TX_TTL } from '.
 import { buildContractId } from './builder/helpers'
 import { TxObject } from './tx-object'
 import {
-  IlleagalArgumentError,
+  IllegalArgumentError,
   UnsupportedABIversionError,
   UnsupportedVMversionError,
   UnsupportedProtocolError,
@@ -469,7 +469,7 @@ function getVmVersion (txType, { vmVersion, abiVersion } = {}) {
  */
 async function calculateTtl (ttl = TX_TTL, relative = true) {
   if (ttl === 0) return 0
-  if (ttl < 0) throw new IlleagalArgumentError('ttl must be greater than 0')
+  if (ttl < 0) throw new IllegalArgumentError('ttl must be greater than 0')
 
   if (relative) {
     const { height } = await this.api.getCurrentKeyBlock()

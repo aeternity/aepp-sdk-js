@@ -39,7 +39,7 @@ import Ae from './'
 import { CLIENT_TTL, NAME_FEE, NAME_TTL } from '../tx/builder/schema'
 import {
   InsufficientNameFeeError,
-  IlleagalArgumentError
+  IllegalArgumentError
 } from '../utils/error'
 
 /**
@@ -108,7 +108,7 @@ async function revoke (name, options = {}) {
 async function update (name, pointers = [], options = { extendPointers: false }) {
   ensureNameValid(name)
   const opt = { ...this.Ae.defaults, ...options }
-  if (!validatePointers(pointers)) throw new IlleagalArgumentError('Invalid pointers array')
+  if (!validatePointers(pointers)) throw new IllegalArgumentError('Invalid pointers array')
 
   pointers = [
     ...options.extendPointers ? (await this.getName(name)).pointers : [],
@@ -204,7 +204,7 @@ async function query (name, opt = {}) {
     },
     revoke: async (options = {}) => this.aensRevoke(name, { ...opt, ...options }),
     extendTtl: async (nameTtl = NAME_TTL, options = {}) => {
-      if (!nameTtl || typeof nameTtl !== 'number' || nameTtl > NAME_TTL) { throw new IlleagalArgumentError('Ttl must be an number and less then 180000 blocks') }
+      if (!nameTtl || typeof nameTtl !== 'number' || nameTtl > NAME_TTL) { throw new IllegalArgumentError('Ttl must be an number and less then 180000 blocks') }
 
       return {
         ...(await this.aensUpdate(name, o.pointers.map(p => p.id), { ...opt, ...options, nameTtl })),
