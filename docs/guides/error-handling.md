@@ -95,6 +95,8 @@ AeError
 │
 └───TransactionError
 │   │   DecodeError
+│   │   EncodeError
+│   │   PayloadLengthError
 │   │   DryRunError
 │   │   IllegalBidFeeError
 │   │   InvalidSignatureError

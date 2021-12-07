@@ -22,6 +22,8 @@ import { encode as rlpEncode } from 'rlp'
 import { randomName } from '../utils'
 import { salt } from '../../src/utils/crypto'
 import {
+  decode,
+  encode,
   getDefaultPointerKey,
   commitmentHash,
   ensureNameValid,
@@ -103,18 +105,41 @@ describe('Tx', function () {
     it('don\'t throws exception', () => isNameValid('asdasdasd.chain').should.be.equal(true))
   })
 
-  describe('getDefaultPointerKey', () => {
-    it('throws if invalid identifier', () => expect(() => getDefaultPointerKey('aaaaa'))
+  describe('decode', () => {
+    it('throws if not a string', () => expect(() => decode({}))
+      .to.throw('Encoded should be a string, got [object Object] instead'))
+
+    it('throws if invalid identifier', () => expect(() => decode('aaaaa'))
       .to.throw('Encoded string missing payload: aaaaa'))
 
-    it('throws if invalid checksum', () => expect(() => getDefaultPointerKey('aa_23aaaaa'))
+    it('throws if unknown type', () => expect(() => decode('aa_aaaaa'))
+      .to.throw('Encoded string have unknown type: aa'))
+
+    it('throws if invalid checksum', () => expect(() => decode('ak_23aaaaa'))
       .to.throw('Invalid checksum'))
 
-    it('throws if unknown prefix', () => expect(() => getDefaultPointerKey('aa_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR'))
-      .to.throw('Default AENS pointer key is not defined for aa prefix'))
+    it('throws if not matching type', () => expect(() => decode('cb_DA6sWJo=', 'ak'))
+      .to.throw('Encoded string have a wrong type: cb (expected: ak)'))
 
-    it('returns default pointer key for contract', () => expect(getDefaultPointerKey('ct_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR'))
-      .to.be.equal('contract_pubkey'))
+    it('throws if invalid size', () => expect(() => decode('ak_An6Ui6sE1F'))
+      .to.throw('Payload should be 32 bytes, got 4 instead'))
+
+    it('decodes', () => expect(decode('cb_DA6sWJo=')).to.be.eql(Buffer.from([12])))
+  })
+
+  describe('encode', () => {
+    it('throws if unknown type', () => expect(() => encode([1, 2, 3, 4], 'aa'))
+      .to.throw('Unknown type: aa'))
+  })
+
+  describe('getDefaultPointerKey', () => {
+    it('throws if unknown prefix', () =>
+      expect(() => getDefaultPointerKey('th_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR'))
+        .to.throw('Default AENS pointer key is not defined for th prefix'))
+
+    it('returns default pointer key for contract', () =>
+      expect(getDefaultPointerKey('ct_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR'))
+        .to.be.equal('contract_pubkey'))
   })
 
   it('Deserialize tx: invalid tx type', () => {

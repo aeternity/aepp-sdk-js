@@ -69,6 +69,11 @@ describe('crypto', () => {
     })
   })
 
+  it('isAddressValid', () => {
+    expect(Crypto.isAddressValid('test')).to.be.equal(false)
+    expect(Crypto.isAddressValid('ak_11111111111111111111111111111111273Yts')).to.be.equal(true)
+  })
+
   describe('encodeBase', () => {
     it('can be encoded and decoded', () => {
       const input = 'helloword010101023'

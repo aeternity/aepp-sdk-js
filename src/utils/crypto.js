@@ -55,9 +55,9 @@ export function getAddressFromPriv (secret) {
  * @return {Boolean} valid
  */
 export function isAddressValid (address, prefix = 'ak') {
-  if (typeof address !== 'string') return false
   try {
-    return decode(address, prefix).length === 32
+    decode(address, prefix)
+    return true
   } catch (e) {
     return false
   }

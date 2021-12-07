@@ -24,6 +24,8 @@ import { ceil } from '../../utils/bignumber'
 import {
   PrefixMismatchError,
   DecodeError,
+  EncodeError,
+  PayloadLengthError,
   TagNotFoundError,
   PrefixNotFoundError,
   InvalidNameError,
@@ -40,8 +42,6 @@ import {
  */
 
 export const createSalt = salt
-
-const base64Types = ['tx', 'st', 'ss', 'pi', 'ov', 'or', 'cb', 'cs', 'ba']
 
 /**
  * Build a contract public key
@@ -116,6 +116,22 @@ export function commitmentHash (name, salt = createSalt()) {
   return `cm_${encodeBase58Check(hash(Buffer.concat([Buffer.from(name.toLowerCase()), formatSalt(salt)])))}`
 }
 
+// based on https://github.com/aeternity/protocol/blob/master/node/api/api_encoding.md
+const base64Types = ['ba', 'cb', 'or', 'ov', 'pi', 'ss', 'cs', 'ck', 'cv', 'st', 'tx']
+const base58Types = ['ak', 'bf', 'bs', 'bx', 'ch', 'cm', 'ct', 'kh', 'mh', 'nm', 'ok', 'oq', 'pp', 'sg', 'th']
+// TODO: add all types with a fixed length
+const typesLength = {
+  ak: 32,
+  ct: 32,
+  ok: 32
+}
+
+function ensureValidLength (data, type) {
+  if (!typesLength[type]) return
+  if (data.length === typesLength[type]) return
+  throw new PayloadLengthError(`Payload should be ${typesLength[type]} bytes, got ${data.length} instead`)
+}
+
 /**
  * Decode data using the default encoding/decoding algorithm
  * @function
@@ -125,13 +141,21 @@ export function commitmentHash (name, salt = createSalt()) {
  * @return {Buffer} Decoded data
  */
 export function decode (data, requiredPrefix) {
-  const [prefix, payload, extra] = data.split('_')
-  if (!payload) throw new DecodeError(`Encoded string missing payload: ${data}`)
+  if (typeof data !== 'string') throw new DecodeError(`Encoded should be a string, got ${data} instead`)
+  const [prefix, encodedPayload, extra] = data.split('_')
+  if (!encodedPayload) throw new DecodeError(`Encoded string missing payload: ${data}`)
   if (extra) throw new DecodeError(`Encoded string have extra parts: ${data}`)
   if (requiredPrefix && requiredPrefix !== prefix) {
     throw new PrefixMismatchError(prefix, requiredPrefix)
   }
-  return (base64Types.includes(prefix) ? decodeBase64Check : decodeBase58Check)(payload)
+  const decoder = (base64Types.includes(prefix) && decodeBase64Check) ||
+    (base58Types.includes(prefix) && decodeBase58Check)
+  if (!decoder) {
+    throw new DecodeError(`Encoded string have unknown type: ${prefix}`)
+  }
+  const payload = decoder(encodedPayload)
+  ensureValidLength(payload, prefix)
+  return payload
 }
 
 /**
@@ -143,9 +167,13 @@ export function decode (data, requiredPrefix) {
  * @return {String} Encoded string Base58check or Base64check data
  */
 export function encode (data, type) {
-  return `${type}_${base64Types.includes(type)
-    ? encodeBase64Check(data)
-    : encodeBase58Check(data)}`
+  const encoder = (base64Types.includes(type) && encodeBase64Check) ||
+    (base58Types.includes(type) && encodeBase58Check)
+  if (!encoder) {
+    throw new EncodeError(`Unknown type: ${type}`)
+  }
+  ensureValidLength(data, type)
+  return `${type}_${encoder(data)}`
 }
 
 /**
