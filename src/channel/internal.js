@@ -110,16 +110,21 @@ async function handleMessage (channel, message) {
 }
 
 async function dequeueMessage (channel) {
-  const queue = messageQueue.get(channel)
-  if (messageQueueLocked.get(channel) || !queue.length) {
-    return
-  }
-  const [message, ...remaining] = queue
-  messageQueue.set(channel, remaining || [])
+  if (messageQueueLocked.get(channel)) return
+  const messages = messageQueue.get(channel)
+  if (!messages.length) return
   messageQueueLocked.set(channel, true)
-  await handleMessage(channel, message)
+  while (messages.length) {
+    const message = messages.shift()
+    try {
+      await handleMessage(channel, message)
+    } catch (error) {
+      console.error('Error handling incoming message:')
+      console.error(message)
+      console.error(error)
+    }
+  }
   messageQueueLocked.set(channel, false)
-  dequeueMessage(channel)
 }
 
 function ping (channel) {
@@ -151,9 +156,13 @@ function onMessage (channel, data) {
     } finally {
       rpcCallbacks.get(channel).delete(message.id)
     }
-  } else if (message.method === 'channels.message') {
+    return
+  }
+  if (message.method === 'channels.message') {
     emit(channel, 'message', message.params.data.message)
-  } else if (message.method === 'channels.system.pong') {
+    return
+  }
+  if (message.method === 'channels.system.pong') {
     if (
       (message.params.channel_id === channelId.get(channel)) ||
       // Skip channelId check if channelId is not known yet
@@ -161,10 +170,10 @@ function onMessage (channel, data) {
     ) {
       ping(channel)
     }
-  } else {
-    messageQueue.set(channel, [...(messageQueue.get(channel) || []), message])
-    dequeueMessage(channel)
+    return
   }
+  messageQueue.get(channel).push(message)
+  dequeueMessage(channel)
 }
 
 function wrapCallErrorMessage (message) {
@@ -200,6 +209,7 @@ export async function initialize (channel, { url, ...channelOptions }) {
   eventEmitters.set(channel, new EventEmitter())
   sequence.set(channel, 0)
   rpcCallbacks.set(channel, new Map())
+  messageQueue.set(channel, [])
 
   const wsUrl = new URL(url)
   Object.entries(channelOptions)
