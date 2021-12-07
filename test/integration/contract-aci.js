@@ -99,6 +99,8 @@ contract StateContract =
     Chain.event(TheFirstEvent(42))
     Chain.event(AnotherEvent("This is not indexed", Contract.address))
     Chain.event(AnotherEvent2(true, "This is not indexed", 1))
+
+  entrypoint chainTtlFn(t: Chain.ttl): Chain.ttl = t
 `
 const filesystem = {
   testLib: libContractSource
@@ -631,6 +633,18 @@ describe('Contract instance', function () {
         (await Promise.all([0, -1n, 0b101n]
           .map(async value => [value, (await testContract.methods.bitsFn(value)).decodedResult])))
           .forEach(([v1, v2]) => expect(v2).to.be.equal(BigInt(v1)))
+      })
+    })
+
+    describe('Chain.ttl variant', function () {
+      it('Invalid', async () => {
+        await expect(testContract.methods.chainTtlFn(50))
+          .to.be.rejectedWith('Variant should be an object mapping constructor to array of values, got 50 instead')
+      })
+
+      it('Valid', async () => {
+        const value = { FixedTTL: [50n] }
+        expect((await testContract.methods.chainTtlFn(value)).decodedResult).to.be.eql(value)
       })
     })
   })
