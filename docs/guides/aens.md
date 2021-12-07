@@ -176,15 +176,24 @@ Now that you own your AENS name you might want to update it in order to:
 
 ### Set pointers & update TTL
 ```js
+import { getDefaultPointerKey } from '@aeternity/aepp-sdk'
+
 const name = 'testNameForTheGuide.chain'
-const pointersArray = ['ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk'] // 'ct_...', 'ok_...', 'ch_...'
+const oracle = 'ok_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk'
+const pointers = {
+  account_pubkey: 'ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk',
+  customKey: 'ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk',
+  [getDefaultPointerKey(oracle)]: oracle, // the same as `oracle_pubkey: oracle,`
+  contract_pubkey: 'ct_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk',
+  channel: 'ch_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk',
+}
 
 // using client (instance of Universal Stamp)
-const nameUpdateTx = await client.aensUpdate(name, pointersArray)
+const nameUpdateTx = await client.aensUpdate(name, pointers)
 
 // OR using the instance of a name
 const nameInstance = await client.aensQuery(name)
-const nameUpdateTx = await nameInstance.update(pointersArray)
+const nameUpdateTx = await nameInstance.update(pointers)
 
 console.log(nameUpdateTx)
 
@@ -236,11 +245,11 @@ In case you want to extend a name using a custom TTL and keep the current pointe
 const name = 'testNameForTheGuide.chain'
 
 // using client (instance of Universal Stamp)
-const nameUpdateTx = await client.aensUpdate(name, [], { nameTtl: 100000, extendPointers: true })
+const nameUpdateTx = await client.aensUpdate(name, {}, { nameTtl: 100000, extendPointers: true })
 
 // OR using the instance of a name
 const nameInstance = await client.aensQuery(name)
-const nameUpdateTx = await nameInstance.update([], { nameTtl: 100000, extendPointers: true })
+const nameUpdateTx = await nameInstance.update({}, { nameTtl: 100000, extendPointers: true })
 
 console.log(nameUpdateTx)
 

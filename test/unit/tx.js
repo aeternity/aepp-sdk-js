@@ -22,7 +22,7 @@ import { encode as rlpEncode } from 'rlp'
 import { randomName } from '../utils'
 import { salt } from '../../src/utils/crypto'
 import {
-  classify,
+  getDefaultPointerKey,
   commitmentHash,
   ensureNameValid,
   getMinimumNameFee,
@@ -99,12 +99,18 @@ describe('Tx', function () {
     it('don\'t throws exception', () => isNameValid('asdasdasd.chain').should.be.equal(true))
   })
 
-  it('classify: invalid hash', () => {
-    expect(() => classify('aaaaa')).to.throw('Not a valid hash')
-  })
+  describe('getDefaultPointerKey', () => {
+    it('throws if invalid identifier', () => expect(() => getDefaultPointerKey('aaaaa'))
+      .to.throw('Encoded string missing payload: aaaaa'))
 
-  it('classify: invalid prefix', () => {
-    expect(() => classify('aa_23aaaaa')).to.throw('Unknown class aa')
+    it('throws if invalid checksum', () => expect(() => getDefaultPointerKey('aa_23aaaaa'))
+      .to.throw('Invalid checksum'))
+
+    it('throws if unknown prefix', () => expect(() => getDefaultPointerKey('aa_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR'))
+      .to.throw('Default AENS pointer key is not defined for aa prefix'))
+
+    it('returns default pointer key for contract', () => expect(getDefaultPointerKey('ct_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR'))
+      .to.be.equal('contract_pubkey'))
   })
 
   it('Deserialize tx: invalid tx type', () => {

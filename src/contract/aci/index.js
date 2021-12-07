@@ -90,7 +90,7 @@ export default async function getContractInstance ({
   aci = aci || (source && await this.contractGetACI(source, { filesystem }))
   if (!aci) throw new Error('Either ACI or source code is required')
   contractAddress = contractAddress && await this.resolveName(
-    contractAddress, 'ct', { resolveByNode: true }
+    contractAddress, 'contract_pubkey', { resolveByNode: true }
   )
   if (!contractAddress && !source && !bytecode) throw new Error('Can\'t create instance by ACI without address')
 
