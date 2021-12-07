@@ -1142,15 +1142,24 @@ the same <code>salt</code> and it should be signed with the same private key as 
 </li>
 </ul>
 <h3 id="set-pointers-update-ttl">Set pointers &amp; update TTL</h3>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;testNameForTheGuide.chain&#39;</span>
-<span class="kd">const</span> <span class="nx">pointersArray</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="p">]</span> <span class="c1">// &#39;ct_...&#39;, &#39;ok_...&#39;, &#39;ch_...&#39;</span>
+<div class="highlight"><pre><span></span><code><span class="k">import</span> <span class="p">{</span> <span class="nx">getDefaultPointerKey</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
+
+<span class="kd">const</span> <span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;testNameForTheGuide.chain&#39;</span>
+<span class="kd">const</span> <span class="nx">oracle</span> <span class="o">=</span> <span class="s1">&#39;ok_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span>
+<span class="kd">const</span> <span class="nx">pointers</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="nx">account_pubkey</span><span class="o">:</span> <span class="s1">&#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="p">,</span>
+  <span class="nx">customKey</span><span class="o">:</span> <span class="s1">&#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="p">,</span>
+  <span class="p">[</span><span class="nx">getDefaultPointerKey</span><span class="p">(</span><span class="nx">oracle</span><span class="p">)]</span><span class="o">:</span> <span class="nx">oracle</span><span class="p">,</span> <span class="c1">// the same as `oracle_pubkey: oracle,`</span>
+  <span class="nx">contract_pubkey</span><span class="o">:</span> <span class="s1">&#39;ct_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="p">,</span>
+  <span class="nx">channel</span><span class="o">:</span> <span class="s1">&#39;ch_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="p">,</span>
+<span class="p">}</span>
 
 <span class="c1">// using client (instance of Universal Stamp)</span>
-<span class="kd">const</span> <span class="nx">nameUpdateTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">pointersArray</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">nameUpdateTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">pointers</span><span class="p">)</span>
 
 <span class="c1">// OR using the instance of a name</span>
 <span class="kd">const</span> <span class="nx">nameInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">aensQuery</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span>
-<span class="kd">const</span> <span class="nx">nameUpdateTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">nameInstance</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">pointersArray</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">nameUpdateTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">nameInstance</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">pointers</span><span class="p">)</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">nameUpdateTx</span><span class="p">)</span>
 
@@ -1199,11 +1208,11 @@ the same <code>salt</code> and it should be signed with the same private key as 
 <div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;testNameForTheGuide.chain&#39;</span>
 
 <span class="c1">// using client (instance of Universal Stamp)</span>
-<span class="kd">const</span> <span class="nx">nameUpdateTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span> <span class="nx">nameTtl</span><span class="o">:</span> <span class="mf">100000</span><span class="p">,</span> <span class="nx">extendPointers</span><span class="o">:</span> <span class="kc">true</span> <span class="p">})</span>
+<span class="kd">const</span> <span class="nx">nameUpdateTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="p">{},</span> <span class="p">{</span> <span class="nx">nameTtl</span><span class="o">:</span> <span class="mf">100000</span><span class="p">,</span> <span class="nx">extendPointers</span><span class="o">:</span> <span class="kc">true</span> <span class="p">})</span>
 
 <span class="c1">// OR using the instance of a name</span>
 <span class="kd">const</span> <span class="nx">nameInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">aensQuery</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span>
-<span class="kd">const</span> <span class="nx">nameUpdateTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">nameInstance</span><span class="p">.</span><span class="nx">update</span><span class="p">([],</span> <span class="p">{</span> <span class="nx">nameTtl</span><span class="o">:</span> <span class="mf">100000</span><span class="p">,</span> <span class="nx">extendPointers</span><span class="o">:</span> <span class="kc">true</span> <span class="p">})</span>
+<span class="kd">const</span> <span class="nx">nameUpdateTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">nameInstance</span><span class="p">.</span><span class="nx">update</span><span class="p">({},</span> <span class="p">{</span> <span class="nx">nameTtl</span><span class="o">:</span> <span class="mf">100000</span><span class="p">,</span> <span class="nx">extendPointers</span><span class="o">:</span> <span class="kc">true</span> <span class="p">})</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">nameUpdateTx</span><span class="p">)</span>
 
