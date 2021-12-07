@@ -10,4 +10,4 @@ This is a sample wallet that expects an æpp to be loaded into its iframe.
 
 ## Installation and running
 1. Install required dependencies with `npm install`
-1. Start the application `npm run start:dev`
+1. Start the application `npm run serve`
