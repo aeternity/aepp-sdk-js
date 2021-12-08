@@ -23,7 +23,6 @@
  */
 
 import { Encoder as Calldata } from '@aeternity/aepp-calldata'
-import { decodeEvents } from './transformation'
 import { DRY_RUN_ACCOUNT, DEPOSIT } from '../../tx/builder/schema'
 import TxObject from '../../tx/tx-object'
 import { decode } from '../../tx/builder/helpers'
@@ -265,7 +264,7 @@ export default async function getContractInstance ({
     if (opt.waitMined || opt.callStatic) {
       res.decodedResult = fnACI.returns && fnACI.returns !== 'unit' && fn !== 'init' &&
         instance.calldata.decode(instance._name, fn, res.result.returnValue)
-      res.decodedEvents = instance.decodeEvents(res.result.log)
+      res.decodedEvents = instance.decodeEvents(res.result.log, opt)
     }
     return res
   }
@@ -274,10 +273,49 @@ export default async function getContractInstance ({
    * Decode Events
    * @alias module:@aeternity/aepp-sdk/es/contract/aci
    * @rtype (events: Array) => DecodedEvents: Array
-   * @param {Array} events Array of encoded events(callRes.result.log)
+   * @param {Array} events Array of encoded events (callRes.result.log)
+   * @param {Object} [options]
+   * @param {Boolean} [options.omitUnknown] Omit events that can't be decoded in case ACI is not
+   * complete
    * @return {Object} DecodedEvents
    */
-  instance.decodeEvents = events => decodeEvents(events, instance._aci.encoded_aci.contract.event)
+  instance.decodeEvents = (events, { omitUnknown } = {}) => {
+    const contractNames = [
+      instance._name,
+      ...instance._aci.external_encoded_aci
+        .filter(({ contract }) => contract)
+        .map(({ contract }) => contract.name)
+    ]
+    return events
+      .map(event => {
+        const decoded = contractNames.reduce((acc, contract) => {
+          if (acc) return acc
+          try {
+            const decoded = instance.calldata.decodeEvent(
+              contract, event.data, event.topics.map(t => BigInt(t))
+            )
+            return [contract, ...Object.entries(decoded)[0]]
+          } catch (error) {
+            if (error.name === 'TypeResolveError') return false
+            throw error
+          }
+        }, false)
+        if (!decoded) {
+          if (omitUnknown) return null
+          else throw new Error(`Can't decode event from ${event.address}`)
+        }
+        const [contractName, name, args] = decoded
+        return {
+          name,
+          args,
+          contract: {
+            name: contractName,
+            address: event.address
+          }
+        }
+      })
+      .filter(e => e)
+  }
 
   /**
    * Generate proto function based on contract function using Contract ACI schema

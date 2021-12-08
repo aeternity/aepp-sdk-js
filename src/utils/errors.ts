@@ -367,13 +367,6 @@ export class InactiveContractError extends ContractError {
   }
 }
 
-export class InvalidEventSchemaError extends ContractError {
-  constructor (msg: string) {
-    super(msg)
-    this.name = 'InvalidEventSchemaError'
-  }
-}
-
 export class InvalidMethodInvocationError extends ContractError {
   constructor (msg: string) {
     super(msg)

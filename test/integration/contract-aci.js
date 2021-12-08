@@ -17,7 +17,6 @@
 import { expect } from 'chai'
 import { before, describe, it } from 'mocha'
 import BigNumber from 'bignumber.js'
-import { decodeEvents, SOPHIA_TYPES } from '../../src/contract/aci/transformation'
 import { decode } from '../../src/tx/builder/helpers'
 import {
   BytecodeMismatchError,
@@ -39,16 +38,25 @@ const libContractSource = `
 namespace TestLib =
   function sum(x: int, y: int) : int = x + y
 `
+
+const remoteContractSource = `
+contract Remote =
+  datatype event = RemoteEvent1(int) | RemoteEvent2(string, int)
+  stateful entrypoint emitEvents() : unit =
+    Chain.event(RemoteEvent2("test-string", 43))
+`
+
 const testContractSource = `
 namespace Test =
   function double(x: int): int = x*2
 
-
-contract interface Voting =
+contract interface Remote =
   type test_type = int
   record state = { value: string, key: test_type, testOption: option(string) }
   record test_record = { value: string, key: list(test_type) }
   entrypoint test : () => int
+  datatype event = RemoteEvent1(int) | RemoteEvent2(string, int)
+  entrypoint emitEvents : () => unit
 
 include "testLib"
 contract StateContract =
@@ -63,8 +71,8 @@ contract StateContract =
   entrypoint init(value: string, key: int, testOption: option(string)) : state = { value = value, key = key, testOption = testOption }
   entrypoint retrieve() : string*int = (state.value, state.key)
 
-  entrypoint remoteContract(a: Voting) : int = 1
-  entrypoint remoteArgs(a: Voting.test_record) : Voting.test_type = 1
+  entrypoint remoteContract(a: Remote) : int = 1
+  entrypoint remoteArgs(a: Remote.test_record) : Remote.test_type = 1
   entrypoint intFn(a: int) : int = a
   payable entrypoint stringFn(a: string) : string = a
   entrypoint boolFn(a: bool) : bool = a
@@ -89,7 +97,7 @@ contract StateContract =
   entrypoint listOption(s: option(list(int*string))) : option(list(int*string)) = s
 
   entrypoint testFn(a: list(int), b: bool) : list(int)*bool = (a, b)
-  entrypoint approve(tx_id: int, voting_contract: Voting) : int = tx_id
+  entrypoint approve(tx_id: int, remote_contract: Remote) : int = tx_id
 
   entrypoint hashFn(s: hash): hash = s
   entrypoint signatureFn(s: signature): signature = s
@@ -105,9 +113,11 @@ contract StateContract =
       Left(x)    => x
       Right(_)   => abort("asdasd")
       Both(x, _) => x
-  stateful entrypoint emitEvents() : unit =
+
+  stateful entrypoint emitEvents(remote: Remote) : unit =
     Chain.event(TheFirstEvent(42))
     Chain.event(AnotherEvent("This is not indexed", ak_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT))
+    remote.emitEvents()
     Chain.event(AnotherEvent2(true, "This is not indexed", 1))
 
   entrypoint chainTtlFn(t: Chain.ttl): Chain.ttl = t
@@ -279,40 +289,55 @@ describe('Contract instance', function () {
   })
 
   describe('Events parsing', () => {
+    let remoteContract
     let eventResult
 
     before(async () => {
-      eventResult = await testContract.methods.emitEvents()
+      remoteContract = await sdk.getContractInstance({ source: remoteContractSource })
+      await remoteContract.deploy()
+      eventResult = await testContract.methods.emitEvents(remoteContract.deployInfo.address)
     })
 
     it('decodes events', async () => {
       expect(eventResult.decodedEvents).to.be.eql([{
         name: 'AnotherEvent2',
-        decoded: [true, 'This is not indexed', '1']
+        args: [true, 'This is not indexed', 1n],
+        contract: {
+          name: 'StateContract',
+          address: testContract.deployInfo.address
+        }
+      }, {
+        name: 'RemoteEvent2',
+        args: [
+          'test-string',
+          43n
+        ],
+        contract: {
+          name: 'Remote',
+          address: remoteContract.deployInfo.address
+        }
       }, {
         name: 'AnotherEvent',
-        decoded: [
+        args: [
           'This is not indexed',
           'ak_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT'
-        ]
+        ],
+        contract: {
+          name: 'StateContract',
+          address: testContract.deployInfo.address
+        }
       }, {
         name: 'TheFirstEvent',
-        decoded: ['42']
-      }].map(e => ({ ...e, address: testContract.deployInfo.address })))
+        args: [42n],
+        contract: {
+          name: 'StateContract',
+          address: testContract.deployInfo.address
+        }
+      }])
     })
 
-    it('decodes events the same using different methods', async () => {
-      const { callInfo: { log } } = await sdk.api.getTransactionInfoByHash(eventResult.hash)
-      const events = {
-        variant: [
-          { AnotherEvent2: [SOPHIA_TYPES.bool, SOPHIA_TYPES.string, SOPHIA_TYPES.int] },
-          { AnotherEvent: [SOPHIA_TYPES.string, SOPHIA_TYPES.address] },
-          { TheFirstEvent: [SOPHIA_TYPES.int] }
-        ]
-      }
-      expect(decodeEvents(log, events)).to.be.eql(eventResult.decodedEvents)
-
-      expect(testContract.decodeEvents(log)).to.be.eql(eventResult.decodedEvents)
+    it('decodes events using decodeEvents', async () => {
+      expect(testContract.decodeEvents(eventResult.result.log)).to.be.eql(eventResult.decodedEvents)
     })
   })
 

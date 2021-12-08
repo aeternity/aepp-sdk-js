@@ -56,7 +56,6 @@ AeError
 │   │   BytecodeMismatchError
 │   │   DuplicateContractError
 │   │   InactiveContractError
-│   │   InvalidEventSchemaError
 │   │   InvalidMethodInvocationError
 │   │   MissingContractAddressError
 │   │   MissingContractDefError
