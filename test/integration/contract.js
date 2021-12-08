@@ -184,7 +184,7 @@ describe('Contract', function () {
   })
 
   it('Call-Static deploy transaction on specific hash', async () => {
-    const { hash } = await sdk.topBlock()
+    const { hash } = await sdk.api.getTopHeader()
     const compiled = bytecode.bytecode
     const res = await sdk.contractCallStatic(identityContract, null, 'init', [], { bytecode: compiled, top: hash })
     res.result.should.have.property('gasUsed')

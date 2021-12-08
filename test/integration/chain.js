@@ -53,12 +53,6 @@ describe('Node Chain', function () {
     expect(await error.verifyTx()).to.have.lengthOf(1)
   })
 
-  it('Get top block', async () => {
-    const top = await sdk.topBlock()
-    top.should.has.property('hash')
-    top.should.has.property('height')
-  })
-
   it('Get pending transaction', async () => {
     const mempool = await sdk.mempool()
     mempool.should.has.property('transactions')
