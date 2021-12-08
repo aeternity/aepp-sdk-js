@@ -37,7 +37,8 @@ import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter'
  * @rtype (tx: String, options: Object) => Promise[String]
  * @param {String} tx - Transaction
  * @param {Object} [options={}] options - Options
- * @param {Object} [options.verify=true] verify - Verify transaction before broadcast, throw error if not valid
+ * @param {Object} [options.verify=true] - Verify transaction before broadcast, throw error if not
+ * valid
  * @return {Object} Transaction
  */
 async function send (tx, options = {}) {
@@ -73,7 +74,7 @@ async function spend (amount, recipientIdOrName, options) {
     await this.spendTx({
       ...opt,
       senderId: await this.address(opt),
-      recipientId: await this.resolveName(recipientIdOrName, 'ak', opt),
+      recipientId: await this.resolveName(recipientIdOrName, 'account_pubkey', opt),
       amount
     }),
     opt
@@ -96,7 +97,7 @@ async function transferFunds (fraction, recipientIdOrName, options) {
     throw new Error(`Fraction should be a number between 0 and 1, got ${fraction}`)
   }
   const opt = { ...this.Ae.defaults, ...options }
-  const recipientId = await this.resolveName(recipientIdOrName, 'ak', opt)
+  const recipientId = await this.resolveName(recipientIdOrName, 'account_pubkey', opt)
   const senderId = await this.address(opt)
   const balance = new BigNumber(await this.balance(senderId))
   const desiredAmount = balance.times(fraction).integerValue(BigNumber.ROUND_HALF_UP)

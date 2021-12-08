@@ -56,7 +56,8 @@ describe('Node Chain', function () {
 
   it('waits for specified heights', async () => {
     const target = await sdk.height() + 1
-    await sdk.awaitHeight(target, { interval: 200, attempts: 100 }).should.eventually.be.at.least(target)
+    await sdk.awaitHeight(target, { interval: 200, attempts: 100 })
+      .should.eventually.be.at.least(target)
     return sdk.height().should.eventually.be.at.least(target)
   })
   it('Can verify transaction from broadcast error', async () => {
@@ -111,12 +112,16 @@ describe('Node Chain', function () {
   })
 
   it('Wait for transaction confirmation', async () => {
-    const txData = await sdkAccount.spend(1000, await sdkAccount.address(), { confirm: true, interval: 400, attempts: 50 })
+    const txData = await sdkAccount.spend(
+      1000, await sdkAccount.address(), { confirm: true, interval: 400, attempts: 50 }
+    )
     const isConfirmed = (await sdkAccount.height()) >= txData.blockHeight + 3
 
     isConfirmed.should.be.equal(true)
 
-    const txData2 = await sdkAccount.spend(1000, await sdkAccount.address(), { confirm: 4, interval: 400, attempts: 50 })
+    const txData2 = await sdkAccount.spend(
+      1000, await sdkAccount.address(), { confirm: 4, interval: 400, attempts: 50 }
+    )
     const isConfirmed2 = (await sdkAccount.height()) >= txData2.blockHeight + 4
     isConfirmed2.should.be.equal(true)
   })

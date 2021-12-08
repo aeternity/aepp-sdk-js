@@ -20,7 +20,7 @@ import { expect } from 'chai'
 import { getSdk } from './'
 import { randomName } from '../utils'
 import { generateKeyPair } from '../../src/utils/crypto'
-import { buildContractId, classify, computeAuctionEndBlock, computeBidFee } from '../../src/tx/builder/helpers'
+import { buildContractId, computeAuctionEndBlock, computeBidFee } from '../../src/tx/builder/helpers'
 
 describe('Aens', function () {
   let sdk
@@ -67,7 +67,7 @@ describe('Aens', function () {
     const { pointers } = await sdk.getName(name)
     pointers.length.should.be.equal(0)
     await expect(sdk.spend(100, name, { onAccount }))
-      .to.be.rejectedWith(`Name ${name} don't have pointers for ak`)
+      .to.be.rejectedWith(`Name ${name} don't have pointers for account_pubkey`)
   })
   it('Call contract using AENS name', async () => {
     const identityContract = `
@@ -77,32 +77,40 @@ contract Identity =
     const bytecode = await sdk.contractCompile(identityContract)
     const deployed = await bytecode.deploy([])
     const nameObject = await sdk.aensQuery(name)
-    await nameObject.update([deployed.address])
+    await nameObject.update({ contract_pubkey: deployed.address })
     const callRes = await sdk.contractCall(identityContract, name, 'getArg', [1])
     const callResStatic = await sdk.contractCallStatic(identityContract, name, 'getArg', [1])
     callResStatic.result.returnType.should.be.equal('ok')
     callRes.hash.split('_')[0].should.be.equal('th')
   })
 
-  it('updates names', async () => {
+  const address = generateKeyPair().publicKey
+  const pointers = {
+    myKey: address,
+    account_pubkey: address,
+    oracle_pubkey: address.replace('ak', 'ok'),
+    channel: address.replace('ak', 'ch'),
+    contract_pubkey: buildContractId(address, 13)
+  }
+  const pointersNode = Object.entries(pointers).map(([key, id]) => ({ key, id }))
+
+  it('updates', async () => {
     const nameObject = await sdk.aensQuery(name)
-    const address = await sdk.address()
-    const contract = buildContractId(address, 13)
-    const oracle = address.replace('ak', 'ok')
-    const pointers = [address, contract, oracle]
-    return nameObject.update(pointers).should.eventually.deep.include({
-      pointers: pointers.map(p => Object.fromEntries([['key', classify(p)], ['id', p]]))
-    })
+    expect(await nameObject.update(pointers)).to.deep.include({ pointers: pointersNode })
   })
-  it('updates names: extend pointers', async () => {
+
+  it('updates extending pointers', async () => {
     const nameObject = await sdk.aensQuery(name)
-    const address = await sdk.address()
     const anotherContract = buildContractId(address, 12)
-    const newPointers = [address, address.replace('ak', 'ok'), anotherContract]
-    return nameObject.update([anotherContract], { extendPointers: true }).should.eventually.deep.include({
-      pointers: newPointers.map(p => Object.fromEntries([['key', classify(p)], ['id', p]]))
-    })
+    expect(await nameObject.update({ contract_pubkey: anotherContract }, { extendPointers: true }))
+      .to.deep.include({
+        pointers: [
+          ...pointersNode.filter(pointer => pointer.key !== 'contract_pubkey'),
+          { key: 'contract_pubkey', id: anotherContract }
+        ]
+      })
   })
+
   it('Extend name ttl', async () => {
     const nameObject = await sdk.aensQuery(name)
     const extendResult = await nameObject.extendTtl(10000)
@@ -124,8 +132,8 @@ contract Identity =
     await claim.transfer(onAccount)
 
     const claim2 = await sdk.aensQuery(name)
-    return claim2.update([onAccount], { onAccount }).should.eventually.deep.include({
-      pointers: [Object.fromEntries([['key', 'account_pubkey'], ['id', onAccount]])]
+    expect(await claim2.update({ account_pubkey: onAccount }, { onAccount })).to.deep.include({
+      pointers: [{ key: 'account_pubkey', id: onAccount }]
     })
   })
 

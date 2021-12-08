@@ -18,10 +18,11 @@
 /**
  * Browser runtime connector module
  *
- * This is the complement to {@link module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection}.
+ * This is the complement to
+ * {@link module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection}.
  * @module @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-runtime
  * @export BrowserRuntimeConnection
- * @example import BrowserRuntimeConnection from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-runtime'
+ * @example import { BrowserRuntimeConnection } from '@aeternity/aepp-sdk'
  */
 import stampit from '@stamp/it'
 

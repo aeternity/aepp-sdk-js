@@ -26,6 +26,8 @@ jobs:
       - run: npm run lint
       - run: npm run build
       - run: npm run test:unit
+      - run: npm run report-coverage
+        if: always()
 
       - run: docker-compose up -d
       - name: Ensure that node is running
@@ -34,9 +36,7 @@ jobs:
             sleep 0.2;
           done
 
-      - run: npm run test:integration:channel,accounts
-      - run: npm run test:integration:contract,chain
-      - run: npm run test:integration:else
+      - run: npm run test:integration
       - run: npm run report-coverage
         if: always()
       - run: docker-compose logs

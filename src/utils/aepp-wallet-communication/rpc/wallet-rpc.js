@@ -3,7 +3,8 @@
  *
  * @module @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc
  * @export WalletRpc
- * @example import WalletRpc from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc'
+ * @example
+ * import WalletRpc from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc'
  */
 import { v4 as uuid } from 'uuid'
 import Ae from '../../../ae'
@@ -89,20 +90,28 @@ const REQUESTS = {
     return callInstance(
       'onAskAccounts',
       {},
-      ({ accounts } = {}) => ({ result: accounts || [...Object.keys(client.accounts.current), ...Object.keys(client.accounts.connected)] }),
+      ({ accounts } = {}) => ({
+        result: accounts ||
+          [...Object.keys(client.accounts.current), ...Object.keys(client.accounts.connected)]
+      }),
       (error) => ({ error: ERRORS.rejectedByUser(error) })
     )
   },
-  [METHODS.aepp.sign] (callInstance, instance, client, { tx, onAccount, networkId, returnSigned = false }) {
+  [METHODS.aepp.sign] (callInstance, instance, client, options) {
+    const { tx, onAccount, networkId, returnSigned = false } = options
     const address = onAccount || client.currentAccount
     // Update client with new networkId
     networkId && client.updateInfo({ networkId })
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
     // Account permission check
-    if (!client.hasAccessToAccount(address)) return { error: ERRORS.permissionDeny({ account: address }) }
+    if (!client.hasAccessToAccount(address)) {
+      return { error: ERRORS.permissionDeny({ account: address }) }
+    }
     // NetworkId check
-    if (!networkId || networkId !== instance.getNetworkId()) return { error: ERRORS.unsupportedNetwork() }
+    if (!networkId || networkId !== instance.getNetworkId()) {
+      return { error: ERRORS.unsupportedNetwork() }
+    }
 
     return callInstance(
       'onSign',
@@ -116,11 +125,11 @@ const REQUESTS = {
           return { error: ERRORS.internalError({ msg: e.message }) }
         }
         try {
-          return {
-            result: returnSigned
-              ? { signedTransaction: await instance.signTransaction(rawTx || tx, { onAccount: onAcc }) }
-              : { transactionHash: await instance.send(rawTx || tx, { onAccount: onAcc, verify: false }) }
-          }
+          const t = rawTx || tx
+          const result = returnSigned
+            ? { signedTransaction: await instance.signTransaction(t, { onAccount: onAcc }) }
+            : { transactionHash: await instance.send(t, { onAccount: onAcc, verify: false }) }
+          return { result }
         } catch (e) {
           if (!returnSigned) {
             // Validate transaction
@@ -139,7 +148,9 @@ const REQUESTS = {
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
     const address = onAccount || client.currentAccount
-    if (!client.hasAccessToAccount(address)) return { error: ERRORS.permissionDeny({ account: address }) }
+    if (!client.hasAccessToAccount(address)) {
+      return { error: ERRORS.permissionDeny({ account: address }) }
+    }
 
     return callInstance(
       'onMessageSign',
@@ -168,7 +179,9 @@ const REQUESTS = {
 const handleMessage = (instance, id) => async (msg, origin) => {
   const client = instance.rpcClients[id]
   if (!msg.id) {
-    return getHandler(NOTIFICATIONS, msg, { debug: instance.debug })(instance, { client })(msg, origin)
+    return getHandler(
+      NOTIFICATIONS, msg, { debug: instance.debug }
+    )(instance, { client })(msg, origin)
   }
   if (Object.prototype.hasOwnProperty.call(client.callbacks, msg.id)) {
     return getHandler(RESPONSES, msg, { debug: instance.debug })(instance, { client })(msg, origin)
@@ -188,7 +201,9 @@ const handleMessage = (instance, id) => async (msg, origin) => {
       )
     })
     // TODO make one structure for handler functions
-    const errorObjectOrHandler = getHandler(REQUESTS, msg, { debug: instance.debug })(callInstance, instance, client, msg.params)
+    const errorObjectOrHandler = getHandler(REQUESTS, msg, { debug: instance.debug })(
+      callInstance, instance, client, msg.params
+    )
     const response = typeof errorObjectOrHandler === 'function' ? await errorObjectOrHandler() : errorObjectOrHandler
     sendResponseMessage(client)(id, method, response)
   }
@@ -201,18 +216,31 @@ const handleMessage = (instance, id) => async (msg, origin) => {
  * @rtype Stamp
  * @param {Object} param Init params object
  * @param {String=} [param.name] Wallet name
- * @param {Function} onConnection Call-back function for incoming AEPP connection (Second argument contain function for accept/deny request)
- * @param {Function} onSubscription Call-back function for incoming AEPP account subscription (Second argument contain function for accept/deny request)
- * @param {Function} onSign Call-back function for incoming AEPP sign request (Second argument contain function for accept/deny request)
- * @param {Function} onAskAccounts Call-back function for incoming AEPP get address request (Second argument contain function for accept/deny request)
- * @param {Function} onMessageSign Call-back function for incoming AEPP sign message request (Second argument contain function for accept/deny request)
+ * @param {Function} onConnection Call-back function for incoming AEPP connection
+ * @param {Function} onSubscription Call-back function for incoming AEPP account subscription
+ * @param {Function} onSign Call-back function for incoming AEPP sign request
+ * @param {Function} onAskAccounts Call-back function for incoming AEPP get address request
+ * @param {Function} onMessageSign Call-back function for incoming AEPP sign message request
+ * Second argument of incoming call-backs contain function for accept/deny request
  * @param {Function} onDisconnect Call-back function for disconnect event
  * @return {Object}
  */
 export default Ae.compose(AccountMultiple, {
-  init ({ name, onConnection, onSubscription, onSign, onDisconnect, onAskAccounts, onMessageSign, forceValidation = false, debug = false } = {}) {
+  init ({
+    name,
+    onConnection,
+    onSubscription,
+    onSign,
+    onDisconnect,
+    onAskAccounts,
+    onMessageSign,
+    forceValidation = false,
+    debug = false
+  } = {}) {
     this.debug = debug
-    const eventsHandlers = ['onConnection', 'onSubscription', 'onSign', 'onDisconnect', 'onMessageSign']
+    const eventsHandlers = [
+      'onConnection', 'onSubscription', 'onSign', 'onDisconnect', 'onMessageSign'
+    ]
     // CallBacks for events
     this.onConnection = onConnection
     this.onSubscription = onSubscription
@@ -223,7 +251,9 @@ export default Ae.compose(AccountMultiple, {
     this.rpcClients = {}
 
     eventsHandlers.forEach(event => {
-      if (!forceValidation && typeof this[event] !== 'function') throw new Error(`Call-back for ${event} must be an function!`)
+      if (!forceValidation && typeof this[event] !== 'function') {
+        throw new Error(`Call-back for ${event} must be an function!`)
+      }
     })
     //
     this.name = name
@@ -298,7 +328,8 @@ export default Ae.compose(AccountMultiple, {
      * @return {String} Client ID
      */
     addRpcClient (clientConnection) {
-      // @TODO  detect if aepp has some history based on origin????: if yes use this instance for connection
+      // @TODO  detect if aepp has some history based on origin????
+      // if yes use this instance for connection
       const id = uuid()
       this.rpcClients[id] = RpcClient({
         id,

@@ -19,7 +19,8 @@
  * Wallet Connection base module
  * @module @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection
  * @export WalletConnection
- * @example import WalletConnection from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection'
+ * @example
+ * import WalletConnection from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection'
  */
 
 import { required } from '@stamp/required'

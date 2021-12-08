@@ -14,7 +14,6 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-/* global BigInt */ // TODO: remove after updating ts-standard
 import { expect } from 'chai'
 import { before, describe, it } from 'mocha'
 import { decodeEvents, SOPHIA_TYPES } from '../../src/contract/aci/transformation'
@@ -100,6 +99,8 @@ contract StateContract =
     Chain.event(TheFirstEvent(42))
     Chain.event(AnotherEvent("This is not indexed", Contract.address))
     Chain.event(AnotherEvent2(true, "This is not indexed", 1))
+
+  entrypoint chainTtlFn(t: Chain.ttl): Chain.ttl = t
 `
 const filesystem = {
   testLib: libContractSource
@@ -292,7 +293,8 @@ describe('Contract instance', function () {
         const value = event.decoded[tIndex]
         switch (t) {
           case SOPHIA_TYPES.address:
-            // the address type in sophia is with ak_ prefix, if a ct_ prefix is expected, contract type should be used
+            // the address type in sophia is with ak_ prefix
+            // if a ct_ prefix is expected, contract type should be used
             event.address.replace('ct_', 'ak_').should.be.equal(value)
             break
           case SOPHIA_TYPES.int:
@@ -631,6 +633,18 @@ describe('Contract instance', function () {
         (await Promise.all([0, -1n, 0b101n]
           .map(async value => [value, (await testContract.methods.bitsFn(value)).decodedResult])))
           .forEach(([v1, v2]) => expect(v2).to.be.equal(BigInt(v1)))
+      })
+    })
+
+    describe('Chain.ttl variant', function () {
+      it('Invalid', async () => {
+        await expect(testContract.methods.chainTtlFn(50))
+          .to.be.rejectedWith('Variant should be an object mapping constructor to array of values, got 50 instead')
+      })
+
+      it('Valid', async () => {
+        const value = { FixedTTL: [50n] }
+        expect((await testContract.methods.chainTtlFn(value)).decodedResult).to.be.eql(value)
       })
     })
   })

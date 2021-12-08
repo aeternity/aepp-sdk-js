@@ -116,7 +116,11 @@ async function getQueryObject (oracleId, queryId) {
  * @param {Object} [options.interval] Poll interval(default: 5000)
  * @return {Promise<Object>} OracleQuery object
  */
-export async function pollForQueryResponse (oracleId, queryId, { attempts = 20, interval = 5000 } = {}) {
+export async function pollForQueryResponse (
+  oracleId,
+  queryId,
+  { attempts = 20, interval = 5000 } = {}
+) {
   for (let i = 0; i < attempts; i++) {
     if (i) await pause(interval)
     const { response } = await this.api.getOracleQueryByPubkeyAndQueryId(oracleId, queryId)
@@ -137,10 +141,10 @@ export async function pollForQueryResponse (oracleId, queryId, { attempts = 20, 
  * @param {String} queryFormat Format of query
  * @param {String} responseFormat Format of query response
  * @param {Object} [options={}] Options
- * @param {String|Number} [options.queryFee] queryFee Oracle query Fee
- * @param {Object} [options.oracleTtl] oracleTtl OracleTtl object {type: 'delta|block', value: 'number'}
- * @param {Number} [options.abiVersion] abiVersion Always 0 (do not use virtual machine)
- * @param {Number|String} [options.fee] fee Transaction fee
+ * @param {String|Number} [options.queryFee] Oracle query Fee
+ * @param {Object} [options.oracleTtl] OracleTtl object {type: 'delta|block', value: 'number'}
+ * @param {Number} [options.abiVersion] Always 0 (do not use virtual machine)
+ * @param {Number|String} [options.fee] Transaction fee
  * @param {Number|String} [options.ttl] Transaction time to leave
  * @return {Promise<Object>} Oracle object
  */

@@ -18,7 +18,7 @@ import {
   NAME_FEE_BID_INCREMENT,
   NAME_BID_TIMEOUTS,
   NAME_MAX_LENGTH_FEE,
-  NAME_ID_KEY
+  POINTER_KEY_BY_PREFIX
 } from './schema'
 import { ceil } from '../../utils/bignumber'
 
@@ -110,12 +110,13 @@ export function commitmentHash (name, salt = createSalt()) {
  * Decode data using the default encoding/decoding algorithm
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {string} data An Base58check or Base64check encoded and prefixed string (ex tx_..., sg_..., ak_....)
+ * @param {string} data An Base58/64check encoded and prefixed string (ex tx_..., sg_..., ak_....)
  * @param {string} [requiredPrefix] Ensure that data have this prefix
  * @return {Buffer} Decoded data
  */
 export function decode (data, requiredPrefix) {
   const [prefix, payload, extra] = data.split('_')
+  if (!payload) throw new Error(`Encoded string missing payload: ${data}`)
   if (extra) throw new Error(`Encoded string have extra parts: ${data}`)
   if (requiredPrefix && requiredPrefix !== prefix) {
     throw new Error(`Encoded string have a wrong type: ${prefix} (expected: ${requiredPrefix})`)
@@ -145,6 +146,9 @@ export function encode (data, type) {
  * @return {Buffer} Buffer Buffer with ID tag and decoded HASh
  */
 export function writeId (hashId) {
+  if (typeof hashId !== 'string') {
+    throw new Error(`Address should be a string, got ${hashId} instead`)
+  }
   const prefix = hashId.slice(0, 2)
   const idTag = PREFIX_ID_TAG[prefix]
   if (!idTag) throw new Error(`Id tag for prefix ${prefix} not found.`)
@@ -191,7 +195,8 @@ export function readInt (buf = Buffer.from([])) {
  * Helper function to build pointers for name update TX
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {Array} pointers - Array of pointers ([ { key: 'account_pubkey', id: 'ak_32klj5j23k23j5423l434l2j3423'} ])
+ * @param {Array} pointers - Array of pointers
+ * ([ { key: 'account_pubkey', id: 'ak_32klj5j23k23j5423l434l2j3423'} ])
  * @return {Array} Serialized pointers array
  */
 export function buildPointers (pointers) {
@@ -207,7 +212,8 @@ export function buildPointers (pointers) {
  * Helper function to read pointers from name update TX
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {Array} pointers - Array of pointers ([ { key: 'account_pubkey', id: 'ak_32klj5j23k23j5423l434l2j3423'} ])
+ * @param {Array} pointers - Array of pointers
+ * ([ { key: 'account_pubkey', id: 'ak_32klj5j23k23j5423l434l2j3423'} ])
  * @return {Array} Deserialize pointer array
  */
 export function readPointers (pointers) {
@@ -249,35 +255,15 @@ export function isNameValid (name) {
 }
 
 /**
- * What kind of a hash is this? If it begins with 'ak_' it is an
- * account key, if with 'ok_' it's an oracle key.
- *
- * @param s - the hash.
- * returns the type, or throws an exception if type not found.
+ * @param identifier - account/oracle/contract address, or channel
+ * @returns {String} default AENS pointer key
+ * @throws exception when default key not defined
  */
-export function classify (s) {
-  if (!s.match(/^[a-z]{2}_.+/)) {
-    throw new Error('Not a valid hash')
-  }
-
-  const klass = s.substr(0, 2)
-  if (klass in NAME_ID_KEY) {
-    return NAME_ID_KEY[klass]
-  } else {
-    throw new Error(`Unknown class ${klass}`)
-  }
-}
-
-/**
- * Validate name pointers array
- * @function
- * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {String[]} pointers Pointers array. Allowed values is: account(ak_), oracle(ok_), contract(ct_), channel(ch_)
- * @return {Boolean}
- */
-export function validatePointers (pointers = []) {
-  return !pointers
-    .find(p => !p || typeof p !== 'string' || !['ak', 'ok', 'ct', 'ch'].includes(p.split('_')[0]))
+export function getDefaultPointerKey (identifier) {
+  decode(identifier)
+  const prefix = identifier.substr(0, 2)
+  return POINTER_KEY_BY_PREFIX[prefix] ||
+    (() => { throw new Error(`Default AENS pointer key is not defined for ${prefix} prefix`) })()
 }
 
 /**
@@ -305,7 +291,8 @@ export function computeBidFee (domain, startFee = NAME_FEE, increment = NAME_FEE
   if (!(Number(increment) === increment && increment % 1 !== 0)) throw new Error(`Increment must be float. Current increment ${increment}`)
   if (increment < NAME_FEE_BID_INCREMENT) throw new Error(`minimum increment percentage is ${NAME_FEE_BID_INCREMENT}`)
   return ceil(
-    BigNumber(BigNumber(startFee).eq(NAME_FEE) ? getMinimumNameFee(domain) : startFee).times(BigNumber(NAME_FEE_BID_INCREMENT).plus(1))
+    BigNumber(BigNumber(startFee).eq(NAME_FEE) ? getMinimumNameFee(domain) : startFee)
+      .times(BigNumber(NAME_FEE_BID_INCREMENT).plus(1))
   )
 }
 

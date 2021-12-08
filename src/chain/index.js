@@ -113,8 +113,10 @@ const Chain = stampit({
  * @rtype (address: String, options?: Object) => balance: Number
  * @param {String} address - The public account address to obtain the balance for
  * @param {Object} [options={}] - Options
- * @param {Number} options.height - The chain height at which to obtain the balance for (default: top of chain)
- * @param {String} options.hash - The block hash on which to obtain the balance for (default: top of chain)
+ * @param {Number} options.height - The chain height at which to obtain the balance for (default:
+ * top of chain)
+ * @param {String} options.hash - The block hash on which to obtain the balance for (default: top
+ * of chain)
  * @return {Object} The transaction as it was mined
  */
 
@@ -126,7 +128,8 @@ const Chain = stampit({
  * @category async
  * @rtype (hash: String, info = false) => tx: Object
  * @param {String} hash - Transaction hash
- * @param {Boolean} info - Retrieve additional transaction date. Works only for (ContractCreate and ContractCall transaction's)
+ * @param {Boolean} info - Retrieve additional transaction date. Works only for (ContractCreate and
+ * ContractCall transaction's)
  * @return {Object} Transaction
  */
 
@@ -239,7 +242,8 @@ const Chain = stampit({
  * @param {String} tx - transaction to execute
  * @param {String} accountAddress - address that will be used to execute transaction
  * @param {String|Number} [options.top] - hash of block on which to make dry-run
- * @param {Boolean} [options.txEvents] - collect and return on-chain tx events that would result from the call
+ * @param {Boolean} [options.txEvents] - collect and return on-chain tx events that would result
+ * from the call
  * @return {Object} Result
  */
 

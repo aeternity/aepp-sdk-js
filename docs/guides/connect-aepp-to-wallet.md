@@ -6,7 +6,7 @@ This guide describes the 3 steps that are necessary to connect your application 
 
 Note:
 
-- The steps below are snippets taken from the full implementation of the [Simple Aepp](https://github.com/aeternity/aepp-sdk-js/tree/master/examples/browser/aepp)
+- The steps below are snippets taken from the full implementation of the [Simple æpp](https://github.com/aeternity/aepp-sdk-js/tree/master/examples/browser/aepp)
 
 ## 1. Initialize the `RpcAepp` Stamp
 

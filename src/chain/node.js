@@ -20,7 +20,7 @@ import verifyTransaction from '../tx/validator'
 import NodePool from '../node-pool'
 import { pause } from '../utils/other'
 import { isNameValid, produceNameId, decode } from '../tx/builder/helpers'
-import { DRY_RUN_ACCOUNT, NAME_ID_KEY } from '../tx/builder/schema'
+import { DRY_RUN_ACCOUNT } from '../tx/builder/schema'
 
 /**
  * ChainNode module
@@ -59,7 +59,10 @@ async function sendTransaction (tx, options = {}) {
     }
     return { hash: txHash, rawTx: tx }
   } catch (error) {
-    throw Object.assign(error, { rawTx: tx, verifyTx: () => verifyTransaction(tx, this.selectedNode.instance) })
+    throw Object.assign(error, {
+      rawTx: tx,
+      verifyTx: () => verifyTransaction(tx, this.selectedNode.instance)
+    })
   }
 }
 
@@ -217,30 +220,29 @@ async function getName (name) {
 /**
  * Resolve AENS name and return name hash
  * @param {String} nameOrId
- * @param {String} prefix
+ * @param {String} key in AENS pointers record
  * @param {Object} [options]
  * @param {Boolean} [options.verify] To ensure that name exist and have a corresponding pointer
- * @param {Boolean} [options.resolveByNode] Enables pointer resolving using node // TODO: avoid that to don't trust to current api gateway
+ * // TODO: avoid that to don't trust to current api gateway
+ * @param {Boolean} [options.resolveByNode] Enables pointer resolving using node
  * @return {String} Address or AENS name hash
  */
-async function resolveName (nameOrId, prefix, { verify, resolveByNode } = {}) {
+async function resolveName (nameOrId, key, { verify, resolveByNode } = {}) {
   if (!nameOrId || typeof nameOrId !== 'string') {
     throw new Error(`Name or address should be a string: ${nameOrId}`)
   }
-  const prefixes = Object.keys(NAME_ID_KEY)
-  if (!prefixes.includes(prefix)) {
-    throw new Error(`Invalid prefix ${prefix}, should be one of [${prefixes}]`)
-  }
   try {
-    decode(nameOrId, prefix)
+    decode(nameOrId)
     return nameOrId
   } catch (error) {}
   if (isNameValid(nameOrId)) {
     if (verify || resolveByNode) {
-      const name = await this.getName(nameOrId).catch(_ => null)
+      const name = await this.api.getNameEntryByName(nameOrId).catch(_ => null)
       if (!name) throw new Error(`Name not found: ${nameOrId}`)
-      const pointer = name.pointers.find(({ id }) => id.split('_')[0] === prefix)
-      if (!pointer) throw new Error(`Name ${nameOrId} don't have pointers for ${prefix}`)
+      const pointer = name.pointers.find(pointer => pointer.key === key)
+      if (!pointer) {
+        throw new Error(`Name ${nameOrId} don't have pointers for ${key}`)
+      }
       if (resolveByNode) return pointer.id
     }
     return produceNameId(nameOrId)
@@ -252,7 +254,8 @@ async function resolveName (nameOrId, prefix, { verify, resolveByNode } = {}) {
  * ChainNode Stamp
  *
  * This is implementation of {@link module:@aeternity/aepp-sdk/es/chain--Chain}
- * composed with {@link module:@aeternity/aepp-sdk/es/contract/node--ContractNodeAPI} and {@link module:@aeternity/aepp-sdk/es/oracle/node--OracleNodeAPI}
+ * composed with {@link module:@aeternity/aepp-sdk/es/contract/node--ContractNodeAPI} and
+ * {@link module:@aeternity/aepp-sdk/es/oracle/node--OracleNodeAPI}
  * @function
  * @alias module:@aeternity/aepp-sdk/es/chain/node
  * @rtype Stamp

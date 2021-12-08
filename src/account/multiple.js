@@ -41,7 +41,9 @@ import AccountBase, { isAccountBase } from './base'
  * @param {String} [options.address] - Address of account to select
  * @return {Object} AccountMultiple instance
  * @example
- * const accounts = await AccountMultiple({ accounts: [ MemmoryAccount({ keypair: 'keypair_object' }) ] })
+ * const accounts = await AccountMultiple({
+ *   accounts: [MemoryAccount({ keypair: 'keypair_object' })]
+ * })
  * await accounts.addAccount(account, { select: true }) // Add account and make it selected
  * accounts.removeAccount(address) // Remove account
  * accounts.selectAccount(address) // Select account
@@ -128,7 +130,7 @@ export default AccountBase.compose(AsyncInit, {
     },
     /**
      * Resolves an account
-     * @param account can be account address (should exist in sdk instance), MemoryAccount or keypair
+     * @param account account address (should exist in sdk instance), MemoryAccount or keypair
      * @returns {AccountBase}
      * @private
      */

@@ -34,9 +34,10 @@ import semverSatisfies from './utils/semver-satisfies'
  * @return {String} NetworkId
  */
 export function getNetworkId ({ networkId, force = false } = {}) {
-  if (!force && !networkId && !this.networkId && (!this.selectedNode || !this.selectedNode.networkId)) throw new Error('networkId is not provided')
-  if (force && !networkId && !this.networkId && (!this.selectedNode || !this.selectedNode.networkId)) return null
-  return networkId || this.networkId || this.selectedNode.networkId
+  const res = networkId || this.networkId || this.selectedNode?.networkId
+  if (!force && !res) throw new Error('networkId is not provided')
+  if (force && !res) return null
+  return res
 }
 
 /**
@@ -47,7 +48,9 @@ export function getNetworkId ({ networkId, force = false } = {}) {
  * @param {Object} [options={}] - Options
  * @param {String} options.url - Base URL for Node
  * @param {String} options.internalUrl - Base URL for internal requests
- * @param {String} options.axiosConfig - Object with axios configuration. Example { config: {}, errorHandler: (err) => throw err }
+ * @param {Object} options.axiosConfig - Object with axios configuration
+ * @param {Object} options.axiosConfig.config
+ * @param {Function} options.axiosConfig.errorHandler - (err) => throw err
  * @return {Object} Node client
  * @example Node({url: 'https://testnet.aeternity.io'})
  */

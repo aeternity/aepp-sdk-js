@@ -20,7 +20,9 @@
  *
  * @module @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge
  * @export ContentScriptBridge
- * @example import ContentScriptBridge from '@aeternity/aepp-sdk/es/utils/wallet-communication/content-script-bridge
+ * @example
+ * import ContentScriptBridge
+ * from '@aeternity/aepp-sdk/es/utils/wallet-communication/content-script-bridge
  */
 import stampit from '@stamp/it'
 
@@ -56,14 +58,18 @@ function stop () {
 
 /**
  * ContentScriptBridge stamp
- * Provide functionality to easly redirect messages from page to extension and from extension to page through content script
+ * Provide functionality to easly redirect messages from page to extension and from extension to
+ * page through content script
  * Using Runtime(Extension) and WindowPostMessage(Web-Page) connections
  * @function
  * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge
  * @rtype Stamp
  * @param {Object} params - Initializer object
- * @param {Object} params.pageConnection - Page connection object(@link module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message)
- * @param {Object} params.extConnection - Extension connection object(module: @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-runtime)
+ * @param {Object} params.pageConnection - Page connection object
+ * (@link module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/\
+ * browser-window-message)
+ * @param {Object} params.extConnection - Extension connection object
+ * (@link module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-runtime)
  * @return {Object}
  */
 export default stampit({

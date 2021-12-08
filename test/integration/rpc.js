@@ -70,7 +70,9 @@ describe('Aepp<->Wallet', function () {
         onMessageSign (message, { accept }) {
         },
         onDisconnect (message, client) {
-          this.shareWalletInfo(connectionFromWalletToAepp.sendMessage.bind(connectionFromWalletToAepp))
+          this.shareWalletInfo(
+            connectionFromWalletToAepp.sendMessage.bind(connectionFromWalletToAepp)
+          )
         }
       })
       aepp = await RpcAepp({
@@ -100,7 +102,9 @@ describe('Aepp<->Wallet', function () {
       })
 
       wallet.addRpcClient(connectionFromWalletToAepp)
-      await wallet.shareWalletInfo(connectionFromWalletToAepp.sendMessage.bind(connectionFromWalletToAepp))
+      await wallet.shareWalletInfo(
+        connectionFromWalletToAepp.sendMessage.bind(connectionFromWalletToAepp)
+      )
       const is = await isReceived
       is.should.be.equal(true)
     })
@@ -334,7 +338,9 @@ describe('Aepp<->Wallet', function () {
 
     it('Sign message using account not from sdk instance', async () => {
       wallet.onMessageSign = (aepp, action) => {
-        if (action.params.onAccount === keypair.publicKey) action.accept({ onAccount: MemoryAccount({ keypair }) })
+        if (action.params.onAccount === keypair.publicKey) {
+          action.accept({ onAccount: MemoryAccount({ keypair }) })
+        }
       }
       const onAccount = keypair.publicKey
       const messageSig = await aepp.signMessage('test', { onAccount })

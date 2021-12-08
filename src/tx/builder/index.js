@@ -158,7 +158,10 @@ function validateField (value, key, type, prefix) {
     case FIELD_TYPES.amount:
     case FIELD_TYPES.int: {
       const isMinusValue = (!isNaN(value) || BigNumber.isBigNumber(value)) && BigNumber(value).lt(0)
-      return assert((!isNaN(value) || BigNumber.isBigNumber(value)) && BigNumber(value).gte(0), { value, isMinusValue })
+      return assert(
+        (!isNaN(value) || BigNumber.isBigNumber(value)) && BigNumber(value).gte(0),
+        { value, isMinusValue }
+      )
     }
     case FIELD_TYPES.id: {
       const prefixes = Array.isArray(prefix) ? prefix : [prefix]
@@ -181,7 +184,10 @@ function validateField (value, key, type, prefix) {
 function transformParams (params, schema, { denomination } = {}) {
   params = schema
     .filter(([_, t]) => t === FIELD_TYPES.amount)
-    .reduce((acc, [key]) => ({ ...params, [key]: formatAmount(params[key], { denomination }) }), params)
+    .reduce(
+      (acc, [key]) => ({ ...params, [key]: formatAmount(params[key], { denomination }) }),
+      params
+    )
   const schemaKeys = schema.map(([k]) => k)
   return Object
     .entries(params)
@@ -294,7 +300,9 @@ export function validateParams (params, schema, { excludeKeys = [] }) {
   return schema
     .filter(([key]) => !excludeKeys.includes(key) && key !== 'payload')
     .reduce(
-      (acc, [key, type, prefix]) => Object.assign(acc, validateField(params[key], key, type, prefix)),
+      (acc, [key, type, prefix]) => Object.assign(
+        acc, validateField(params[key], key, type, prefix)
+      ),
       {}
     )
 }
@@ -306,12 +314,16 @@ export function validateParams (params, schema, { excludeKeys = [] }) {
  * @param {Object} params Object with tx params
  * @param {Array} schema Transaction schema
  * @param {Object} [options={}] options
- * @param {Array} [options.excludeKeys=[]] excludeKeys Array of keys to exclude for validation and build
- * @param {String} [options.denomination='aettos'] denomination Denomination of amounts (default: aettos)
+ * @param {String[]} [options.excludeKeys=[]] Array of keys to exclude for validation and build
+ * @param {String} [options.denomination='aettos'] Denomination of amounts
  * @throws {Error} Validation error
  * @return {Array} Array with binary fields of transaction
  */
-export function buildRawTx (params, schema, { excludeKeys = [], denomination = AE_AMOUNT_FORMATS.AETTOS } = {}) {
+export function buildRawTx (
+  params,
+  schema,
+  { excludeKeys = [], denomination = AE_AMOUNT_FORMATS.AETTOS } = {}
+) {
   const filteredSchema = schema.filter(([key]) => !excludeKeys.includes(key))
 
   // Transform `amount` type fields to `aettos`
@@ -374,14 +386,25 @@ const getSchema = ({ vsn, objId, type }) => {
  * @param {Object} params Object with tx params
  * @param {String} type Transaction type
  * @param {Object} [options={}] options
- * @param {Object} [options.excludeKeys] excludeKeys Array of keys to exclude for validation and build
+ * @param {String[]} [options.excludeKeys] Array of keys to exclude for validation and build
  * @param {String} [options.prefix] Prefix of transaction
  * @throws {Error} Validation error
- * @return {Object} { tx, rlpEncoded, binary } Object with tx -> Base64Check transaction hash with 'tx_' prefix, rlp encoded transaction and binary transaction
+ * @returns {Object} object
+ * @returns {String} object.tx Base64Check transaction hash with 'tx_' prefix
+ * @returns {Buffer} object.rlpEncoded rlp encoded transaction
+ * @returns {Array<Buffer>} object.binary binary transaction
  */
-export function buildTx (params, type, { excludeKeys = [], prefix = 'tx', vsn = VSN, denomination = AE_AMOUNT_FORMATS.AETTOS } = {}) {
+export function buildTx (
+  params,
+  type,
+  { excludeKeys = [], prefix = 'tx', vsn = VSN, denomination = AE_AMOUNT_FORMATS.AETTOS } = {}
+) {
   const [schema, tag] = getSchema({ type, vsn })
-  const binary = buildRawTx({ ...params, VSN: vsn, tag }, schema, { excludeKeys, denomination: params.denomination || denomination }).filter(e => e !== undefined)
+  const binary = buildRawTx(
+    { ...params, VSN: vsn, tag },
+    schema,
+    { excludeKeys, denomination: params.denomination || denomination }
+  ).filter(e => e !== undefined)
 
   const rlpEncoded = rlpEncode(binary)
   const tx = encode(rlpEncoded, prefix)
@@ -393,10 +416,14 @@ export function buildTx (params, type, { excludeKeys = [], prefix = 'tx', vsn = 
  * Unpack transaction hash
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
- * @param {String|Buffer} encodedTx String or RLP encoded transaction array (if fromRlpBinary flag is true)
+ * @param {String|Buffer} encodedTx String or RLP encoded transaction array
+ * (if fromRlpBinary flag is true)
  * @param {Boolean} fromRlpBinary Unpack from RLP encoded transaction (default: false)
  * @param {String} prefix - Prefix of data
- * @return {Object} { tx, rlpEncoded, binary } Object with tx -> Object with transaction param's, rlp encoded transaction and binary transaction
+ * @returns {Object} object
+ * @returns {Object} object.tx Object with transaction param's
+ * @returns {Buffer} object.rlpEncoded rlp encoded transaction
+ * @returns {Array<Buffer>} object.binary binary transaction
  */
 export function unpackTx (encodedTx, fromRlpBinary = false, prefix = 'tx') {
   const rlpEncoded = fromRlpBinary ? encodedTx : decode(encodedTx, prefix)
@@ -421,4 +448,13 @@ export function buildTxHash (rawTx) {
   return encode(hash(data), 'th')
 }
 
-export default { calculateMinFee, calculateFee, unpackTx, unpackRawTx, buildTx, buildRawTx, validateParams, buildTxHash }
+export default {
+  calculateMinFee,
+  calculateFee,
+  unpackTx,
+  unpackRawTx,
+  buildTx,
+  buildRawTx,
+  validateParams,
+  buildTxHash
+}
