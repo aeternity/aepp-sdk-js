@@ -79,7 +79,7 @@ export default AsyncInit.compose(ContractBase, {
         }
       })
       this.compilerVersion = client.spec.info.version
-      this._compilerApi = mapObject(
+      this.compilerApi = mapObject(
         client.api,
         ([key, fn]) => [
           key,
@@ -97,7 +97,7 @@ export default AsyncInit.compose(ContractBase, {
       }
     },
     _ensureCompilerReady () {
-      if (!this._compilerApi) throw new UnavailableCompilerError()
+      if (!this.compilerApi) throw new UnavailableCompilerError()
     },
     getCompilerVersion () {
       this._ensureCompilerReady()
@@ -116,7 +116,7 @@ export default AsyncInit.compose(ContractBase, {
      */
     async contractEncodeCallDataAPI (source, name, args = [], options) {
       this._ensureCompilerReady()
-      const { calldata } = await this._compilerApi.encodeCalldata({
+      const { calldata } = await this.compilerApi.encodeCalldata({
         source,
         function: name,
         arguments: args,
@@ -126,20 +126,20 @@ export default AsyncInit.compose(ContractBase, {
     },
     async compileContractAPI (code, options) {
       this._ensureCompilerReady()
-      const { bytecode } = await this._compilerApi.compileContract({ code, options })
+      const { bytecode } = await this.compilerApi.compileContract({ code, options })
       return bytecode
     },
     contractGetACI (code, options) {
       this._ensureCompilerReady()
-      return this._compilerApi.generateACI({ code, options })
+      return this.compilerApi.generateACI({ code, options })
     },
     contractDecodeCallDataByCodeAPI (bytecode, calldata) {
       this._ensureCompilerReady()
-      return this._compilerApi.decodeCalldataBytecode({ bytecode, calldata })
+      return this.compilerApi.decodeCalldataBytecode({ bytecode, calldata })
     },
     contractDecodeCallDataBySourceAPI (source, fn, calldata, options) {
       this._ensureCompilerReady()
-      return this._compilerApi.decodeCalldataSource({
+      return this.compilerApi.decodeCalldataSource({
         function: fn,
         source,
         calldata,
@@ -164,7 +164,7 @@ export default AsyncInit.compose(ContractBase, {
      */
     contractDecodeCallResultAPI (source, fn, callValue, callResult, options) {
       this._ensureCompilerReady()
-      return this._compilerApi.decodeCallResult({
+      return this.compilerApi.decodeCallResult({
         function: fn,
         source,
         'call-result': callResult,
@@ -174,16 +174,16 @@ export default AsyncInit.compose(ContractBase, {
     },
     async validateByteCodeAPI (bytecode, source, options) {
       this._ensureCompilerReady()
-      const res = await this._compilerApi.validateByteCode({ bytecode, source, options })
+      const res = await this.compilerApi.validateByteCode({ bytecode, source, options })
       return typeof res === 'object' ? true : res
     },
     getFateAssembler (bytecode, options) {
       this._ensureCompilerReady()
-      return this._compilerApi.getFateAssemblerCode({ bytecode, options })
+      return this.compilerApi.getFateAssemblerCode({ bytecode, options })
     },
     getBytecodeCompilerVersion (bytecode, options) {
       this._ensureCompilerReady()
-      return this._compilerApi.getCompilerVersion({ bytecode, options })
+      return this.compilerApi.getCompilerVersion({ bytecode, options })
     }
   },
   props: {
