@@ -21,6 +21,20 @@ export class CryptographyError extends AeError {
   }
 }
 
+export class WalletError extends AeError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'WalletError'
+  }
+}
+
+export class AeppError extends AeError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'AeppError'
+  }
+}
+
 export class SwaggerError extends AeError {
   constructor (msg: string) {
     super(msg)
@@ -115,6 +129,20 @@ export class NoSerializerFoundError extends AeError {
   constructor () {
     super('Byte serialization not supported')
     this.name = 'NoSerializerFoundError'
+  }
+}
+
+export class UnsupportedPlatformError extends AeError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'UnsupportedPlatformError'
+  }
+}
+
+export class NoBrowserFoundError extends AeError {
+  constructor () {
+    super('Browser is not detected')
+    this.name = 'NoBrowserFoundError'
   }
 }
 
@@ -478,6 +506,13 @@ export class InvalidSchemaError extends AeError {
   }
 }
 
+export class NoSuchContractFunctionError extends AeError {
+  constructor (name: string) {
+    super(`Function ${name} doesn't exist in contract`)
+    this.name = 'NoSuchContractFunctionError'
+  }
+}
+
 /* Node communication errors  */
 export class UnsupportedNodeError extends AeError {
   constructor (nodeVersion: string, NODE_GE_VERSION: string, NODE_LT_VERSION: string) {
@@ -550,5 +585,69 @@ export class DisconnectedError extends AeError {
   constructor () {
     super('Can not get node info. Node is not connected')
     this.name = 'DisconnectedError'
+  }
+}
+
+/* Wallet & Aepp related Errors */
+export class RpcConnectionError extends WalletError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'RpcConnectionError'
+  }
+}
+
+export class AlreadyConnectedError extends WalletError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'AlreadyConnectedError'
+  }
+}
+
+export class NoWalletConnectedError extends WalletError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'NoWalletConnectedError'
+  }
+}
+
+export class MessageDirectionError extends WalletError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'MessageDirectionError'
+  }
+}
+
+export class UnsubscribedAccountError extends AeppError {
+  constructor () {
+    super('You are not subscribed for an account.')
+    this.name = 'UnsubscribedAccountError'
+  }
+}
+
+export class UnAuthorizedAccountError extends AeppError {
+  constructor (onAccount: string) {
+    super(`You do not have access to account ${onAccount}`)
+    this.name = 'UnAuthorizedAccountError'
+  }
+}
+
+export class UnknownRpcClientError extends AeppError {
+  constructor (id: string) {
+    super(`RpcClient with id ${id} do not exist`)
+    this.name = 'UnknownRpcClientError'
+  }
+}
+
+export class InvalidRpcMessage extends AeppError {
+  constructor (msg: string) {
+    super(`Received invalid message: ${msg}`)
+    this.name = 'InvalidRpcMessage'
+  }
+}
+
+export class MissingCallbackError extends AeppError {
+  constructor (id: string) {
+    super(`Can't find callback for this messageId ${id}`)
+    this.name = 'MissingCallbackError'
   }
 }

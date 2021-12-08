@@ -10,6 +10,12 @@ import stampit from '@stamp/it'
 
 import { METHODS, RPC_STATUS, SUBSCRIPTION_TYPES } from '../schema'
 import { sendMessage, message, isValidAccounts } from '../helpers'
+import {
+  InvalidRpcMessage,
+  TypeError,
+  DuplicateCallbackError,
+  MissingCallbackError
+} from '../../error'
 
 /**
  * Contain functionality for using RPC conection
@@ -45,7 +51,7 @@ export default stampit({
 
     const handleMessage = (msg, origin) => {
       if (!msg || !msg.jsonrpc || msg.jsonrpc !== '2.0' || !msg.method) {
-        throw new Error(`Received invalid message: ${msg}`)
+        throw new InvalidRpcMessage(msg)
       }
       onMessage(msg, origin)
     }
@@ -157,7 +163,7 @@ export default stampit({
      */
     setAccounts (accounts, { forceNotification } = {}) {
       if (!isValidAccounts(accounts)) {
-        throw new Error('Invalid accounts object. Should be object like: `{ connected: {}, selected: {} }`')
+        throw new TypeError('Invalid accounts object. Should be object like: `{ connected: {}, selected: {} }`')
       }
       this.accounts = accounts
       if (!forceNotification) {
@@ -194,7 +200,7 @@ export default stampit({
      */
     request (name, params) {
       const msgId = this.sendMessage(message(name, params))
-      if (Object.prototype.hasOwnProperty.call(this.callbacks, msgId)) throw new Error('Callback Already exist')
+      if (Object.prototype.hasOwnProperty.call(this.callbacks, msgId)) throw new DuplicateCallbackError()
       return new Promise((resolve, reject) => {
         this.callbacks[msgId] = { resolve, reject }
       })
@@ -209,7 +215,7 @@ export default stampit({
      * @return {void}
      */
     processResponse ({ id, error, result }, transformResult) {
-      if (!this.callbacks[id]) throw new Error(`Can't find callback for this messageId ${id}`)
+      if (!this.callbacks[id]) throw new MissingCallbackError(id)
       if (result) {
         this.callbacks[id].resolve(...typeof transformResult === 'function'
           ? transformResult({ id, result })

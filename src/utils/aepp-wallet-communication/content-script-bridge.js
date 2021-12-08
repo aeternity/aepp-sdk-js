@@ -25,6 +25,7 @@
  * from '@aeternity/aepp-sdk/es/utils/wallet-communication/content-script-bridge
  */
 import stampit from '@stamp/it'
+import { UnsupportedPlatformError, MissingParamError } from '../error'
 
 /**
  * Start message proxy
@@ -74,9 +75,9 @@ function stop () {
  */
 export default stampit({
   init ({ pageConnection, extConnection, allowCrossOrigin = false }) {
-    if (!window) throw new Error('Window object not found, you can run bridge only in browser')
-    if (!pageConnection) throw new Error('pageConnection required')
-    if (!extConnection) throw new Error('extConnection required')
+    if (!window) throw new UnsupportedPlatformError('Window object not found, you can run bridge only in browser')
+    if (!pageConnection) throw new MissingParamError('pageConnection required')
+    if (!extConnection) throw new MissingParamError('extConnection required')
     this.allowCrossOrigin = allowCrossOrigin
     this.pageConnection = pageConnection
     this.extConnection = extConnection

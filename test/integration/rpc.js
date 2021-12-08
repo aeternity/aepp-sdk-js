@@ -25,6 +25,14 @@ import { getBrowserAPI, getHandler } from '../../src/utils/aepp-wallet-communica
 import { METHODS, RPC_STATUS } from '../../src/utils/aepp-wallet-communication/schema'
 import { generateKeyPair, verify, hash } from '../../src/utils/crypto'
 import { compilerUrl, genesisAccount, internalUrl, networkId, publicKey, url, ignoreVersion } from './'
+import {
+  NoBrowserFoundError,
+  NoWalletConnectedError,
+  TypeError,
+  UnAuthorizedAccountError,
+  UnsubscribedAccountError,
+  UnknownRpcClientError
+} from '../../src/utils/error'
 
 describe('Aepp<->Wallet', function () {
   this.timeout(6000)
@@ -90,7 +98,7 @@ describe('Aepp<->Wallet', function () {
     it('Fail on not connected', async () => {
       await Promise.all(
         ['send', 'subscribeAddress', 'askAddresses', 'address', 'disconnectWallet']
-          .map(method => expect(aepp[method]()).to.be.rejectedWith('You are not connected to Wallet'))
+          .map(method => expect(aepp[method]()).to.be.rejectedWith(NoWalletConnectedError, 'You are not connected to Wallet'))
       )
     })
 
@@ -128,17 +136,17 @@ describe('Aepp<->Wallet', function () {
     })
 
     it('Try to get address from wallet: not subscribed for account', async () => {
-      await expect(aepp.address()).to.be.rejectedWith('You are not subscribed for an account.')
+      await expect(aepp.address()).to.be.rejectedWith(UnsubscribedAccountError, 'You are not subscribed for an account.')
     })
 
     it('Try to ask for address', async () => {
-      await expect(aepp.askAddresses()).to.be.rejectedWith('You are not subscribed for an account.')
+      await expect(aepp.askAddresses()).to.be.rejectedWith(UnsubscribedAccountError, 'You are not subscribed for an account.')
     })
 
     it('Try to sign and send transaction to wallet without subscription', async () => {
       wallet.getAccounts().should.be.an('object')
       await Promise.all([aepp.signTransaction('tx_asdasd'), aepp.send('tx_asdasd')]
-        .map((promise) => expect(promise).to.be.rejectedWith('You are not subscribed for an account.')))
+        .map((promise) => expect(promise).to.be.rejectedWith(UnsubscribedAccountError, 'You are not subscribed for an account.')))
     })
 
     it('Subscribe to address: wallet reject', async () => {
@@ -180,7 +188,7 @@ describe('Aepp<->Wallet', function () {
     it('Try to use `onAccount` for not existent account', async () => {
       const { publicKey } = generateKeyPair()
       await expect(aepp.spend(100, publicKey, { onAccount: publicKey }))
-        .to.be.rejectedWith(`You do not have access to account ${publicKey}`)
+        .to.be.rejectedWith(UnAuthorizedAccountError, `You do not have access to account ${publicKey}`)
     })
 
     it('Get address: subscribed for accounts', async () => {
@@ -406,7 +414,7 @@ describe('Aepp<->Wallet', function () {
       current.should.be.equal(aepp.rpcClient.currentAccount)
       aepp.rpcClient.origin.should.be.an('object')
       expect(() => aepp.rpcClient.setAccounts(true))
-        .to.throw('Invalid accounts object. Should be object like: `{ connected: {}, selected: {} }`')
+        .to.throw(TypeError, 'Invalid accounts object. Should be object like: `{ connected: {}, selected: {} }`')
     })
 
     it('Resolve/Reject callback for undefined message', async () => {
@@ -480,7 +488,7 @@ describe('Aepp<->Wallet', function () {
     })
 
     it('Remove rpc client: client not found', () => {
-      expect(() => wallet.removeRpcClient('a1')).to.throw('RpcClient with id a1 do not exist')
+      expect(() => wallet.removeRpcClient('a1')).to.throw(UnknownRpcClientError, 'RpcClient with id a1 do not exist')
     })
   })
 
@@ -491,7 +499,7 @@ describe('Aepp<->Wallet', function () {
 
     it('getBrowserAPI: not in browser', () => {
       global.window = {}
-      expect(() => getBrowserAPI()).to.throw('Browser is not detected')
+      expect(() => getBrowserAPI()).to.throw(NoBrowserFoundError, 'Browser is not detected')
     })
 
     it('getBrowserAPI: not in browser(force error)', () => {
