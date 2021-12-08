@@ -24,29 +24,31 @@ export const SOPHIA_TYPES = [
 /**
  * Decode events fields
  * @param {Object[]} events Array of events with encoded fields
- * @param {Array} schemas Smart contract event ACI schemas
+ * @param {Object} eventAci Smart contract event ACI schemas
  * @return {Object}
  */
-export const decodeEvents = (events, schemas = []) => events.reduce((acc, event) => {
+export const decodeEvents = (events, eventAci) => events.map((event) => {
+  if (!eventAci?.variant) throw new Error('Event ACI should have a variant key')
   const [nameHash, ...params] = event.topics
-  const schema = schemas.find((s) => hash(s.name).equals(toBytes(nameHash, true)))
-  if (!schema) return acc
-  const stringCount = schema.types.filter(t => t === SOPHIA_TYPES.string).length
-  if (stringCount > 1) throw new Error(`Event schema contains more than one string: ${schema.types}`)
-  const topicsCount = schema.types.length - stringCount
+  const [name, types] = eventAci.variant
+    .map(s => Object.entries(s)[0])
+    .find(([name]) => hash(name).equals(toBytes(nameHash, true))) || []
+  if (!name) return null
+  const stringCount = types.filter(t => t === SOPHIA_TYPES.string).length
+  if (stringCount > 1) throw new Error(`Event schema contains more than one string: ${types}`)
+  const topicsCount = types.length - stringCount
   if (topicsCount !== params.length) {
     throw new Error(`Schema defines ${topicsCount} types, but ${params.length} topics present`)
   }
 
-  acc.push({
-    ...event,
-    name: schema.name,
-    decoded: schema.types.map((type) =>
+  return {
+    address: event.address,
+    name: name,
+    decoded: types.map((type) =>
       decodeEventField(type === SOPHIA_TYPES.string ? event.data : params.shift(), type))
-  })
-
-  return acc
-}, [])
+  }
+})
+  .filter(e => e)
 
 /**
  * Transform Event based on type

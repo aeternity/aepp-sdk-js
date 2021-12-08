@@ -23,7 +23,6 @@
  */
 
 import * as R from 'ramda'
-import BigNumber from 'bignumber.js'
 import { Encoder as Calldata } from '@aeternity/aepp-calldata'
 import { decodeEvents } from './transformation'
 import { DRY_RUN_ACCOUNT, DEPOSIT } from '../../tx/builder/schema'
@@ -39,20 +38,9 @@ import { decode } from '../../tx/builder/helpers'
  */
 function getFunctionACI (aci, name, external) {
   const fn = aci.functions.find(f => f.name === name)
-  if (!fn && name !== 'init') throw new Error(`Function ${name} doesn't exist in contract`)
-
-  return {
-    ...fn,
-    bindings: [
-      {
-        state: aci.state,
-        type_defs: aci.type_defs,
-        name: aci.name
-      },
-      ...external.map(R.pick(['state', 'type_defs', 'name']))
-    ],
-    event: aci.event ? aci.event.variant : []
-  }
+  if (fn) return fn
+  if (name === 'init') return { payable: false }
+  throw new Error(`Function ${name} doesn't exist in contract`)
 }
 
 /**
@@ -225,10 +213,7 @@ export default async function getContractInstance ({
     if (!fn) throw new Error('Function name is required')
     if (fn === 'init' && !opt.callStatic) throw new Error('"init" can be called only via dryRun')
     if (!contractId && fn !== 'init') throw new Error('You need to deploy contract before calling!')
-    if (
-      BigNumber(opt.amount).gt(0) &&
-      (Object.prototype.hasOwnProperty.call(fnACI, 'payable') && !fnACI.payable)
-    ) throw new Error(`You try to pay "${opt.amount}" to function "${fn}" which is not payable. Only payable function can accept tokens`)
+    if (opt.amount > 0 && fnACI.payable === false) throw new Error(`You try to pay "${opt.amount}" to function "${fn}" which is not payable. Only payable function can accept coins`)
 
     const callerId = await this.address(opt).catch(error => {
       if (opt.callStatic) return DRY_RUN_ACCOUNT.pub
@@ -272,15 +257,7 @@ export default async function getContractInstance ({
    * @param {Array} events Array of encoded events(callRes.result.log)
    * @return {Object} DecodedEvents
    */
-  instance.decodeEvents = (events) => {
-    const eventsACI = instance.aci.event ? instance.aci.event.variant : []
-    const eventsSchema = eventsACI.map(e => {
-      const name = Object.keys(e)[0]
-      return { name, types: e[name] }
-    })
-
-    return decodeEvents(events, eventsSchema)
-  }
+  instance.decodeEvents = events => decodeEvents(events, instance.aci.event)
 
   /**
    * Generate proto function based on contract function using Contract ACI schema
@@ -305,8 +282,7 @@ export default async function getContractInstance ({
           genHandler(name === 'init' ? false : !stateful),
           {
             get: genHandler(true),
-            send: genHandler(false),
-            decodeEvents: events => instance.decodeEvents(events)
+            send: genHandler(false)
           }
         )
       ]

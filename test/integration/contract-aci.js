@@ -97,7 +97,7 @@ contract StateContract =
       Both(x, _) => x
   stateful entrypoint emitEvents() : unit =
     Chain.event(TheFirstEvent(42))
-    Chain.event(AnotherEvent("This is not indexed", Contract.address))
+    Chain.event(AnotherEvent("This is not indexed", ak_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT))
     Chain.event(AnotherEvent2(true, "This is not indexed", 1))
 
   entrypoint chainTtlFn(t: Chain.ttl): Chain.ttl = t
@@ -249,7 +249,7 @@ describe('Contract instance', function () {
   it('fails on paying to not payable function', async () => {
     const amount = 100
     await expect(testContract.methods.intFn.send(1, { amount }))
-      .to.be.rejectedWith(`You try to pay "${amount}" to function "intFn" which is not payable. Only payable function can accept tokens`)
+      .to.be.rejectedWith(`You try to pay "${amount}" to function "intFn" which is not payable. Only payable function can accept coins`)
   })
 
   it('pays to payable function', async () => {
@@ -265,61 +265,42 @@ describe('Contract instance', function () {
     result.callerId.should.be.equal(onAccount)
   })
 
-  describe('Events parsing', async () => {
-    let cInstance
+  describe('Events parsing', () => {
     let eventResult
-    let decodedEventsWithoutACI
-    let decodedEventsUsingACI
-    let decodedEventsUsingBuildInMethod
 
     before(async () => {
-      cInstance = await sdk.getContractInstance({ source: testContractSource, filesystem })
-      await cInstance.deploy(['test', 1, 'some'])
-      eventResult = await cInstance.methods.emitEvents()
-      const { log } = await sdk.tx(eventResult.hash)
-      decodedEventsWithoutACI = decodeEvents(log, events)
-      decodedEventsUsingACI = cInstance.decodeEvents(log)
-      decodedEventsUsingBuildInMethod = cInstance.methods.emitEvents.decodeEvents(log)
+      eventResult = await testContract.methods.emitEvents()
     })
 
-    const events = [
-      { name: 'AnotherEvent2', types: [SOPHIA_TYPES.bool, SOPHIA_TYPES.string, SOPHIA_TYPES.int] },
-      { name: 'AnotherEvent', types: [SOPHIA_TYPES.string, SOPHIA_TYPES.address] },
-      { name: 'TheFirstEvent', types: [SOPHIA_TYPES.int] }
-    ]
-    const checkEvents = (event, schema) => {
-      schema.name.should.be.equal(event.name)
-      schema.types.forEach((t, tIndex) => {
-        const value = event.decoded[tIndex]
-        switch (t) {
-          case SOPHIA_TYPES.address:
-            // the address type in sophia is with ak_ prefix
-            // if a ct_ prefix is expected, contract type should be used
-            event.address.replace('ct_', 'ak_').should.be.equal(value)
-            break
-          case SOPHIA_TYPES.int:
-            expect(typeof value === 'string' || typeof value === 'number')
-              .to.be.equal(true)
-            Number.isInteger(+value).should.be.equal(true)
-            break
-          case SOPHIA_TYPES.bool:
-            value.should.be.a('boolean')
-            break
-          case SOPHIA_TYPES.string:
-            value.should.be.a('string')
-            break
-        }
-      })
-    }
-    events
-      .forEach((el, i) => {
-        describe(`Correct parse of ${el.name}(${el.types})`, () => {
-          it('ACI call result', () => checkEvents(eventResult.decodedEvents[i], el))
-          it('ACI instance', () => checkEvents(decodedEventsUsingACI[i], el))
-          it('ACI instance methods', () => checkEvents(decodedEventsUsingBuildInMethod[i], el))
-          it('Without ACI', () => checkEvents(decodedEventsWithoutACI[i], el))
-        })
-      })
+    it('decodes events', async () => {
+      expect(eventResult.decodedEvents).to.be.eql([{
+        name: 'AnotherEvent2',
+        decoded: [true, 'This is not indexed', '1']
+      }, {
+        name: 'AnotherEvent',
+        decoded: [
+          'This is not indexed',
+          'ak_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT'
+        ]
+      }, {
+        name: 'TheFirstEvent',
+        decoded: ['42']
+      }].map(e => ({ ...e, address: testContract.deployInfo.address })))
+    })
+
+    it('decodes events the same using different methods', async () => {
+      const { log } = await sdk.tx(eventResult.hash)
+      const events = {
+        variant: [
+          { AnotherEvent2: [SOPHIA_TYPES.bool, SOPHIA_TYPES.string, SOPHIA_TYPES.int] },
+          { AnotherEvent: [SOPHIA_TYPES.string, SOPHIA_TYPES.address] },
+          { TheFirstEvent: [SOPHIA_TYPES.int] }
+        ]
+      }
+      expect(decodeEvents(log, events)).to.be.eql(eventResult.decodedEvents)
+
+      expect(testContract.decodeEvents(log)).to.be.eql(eventResult.decodedEvents)
+    })
   })
 
   describe('Arguments Validation and Casting', function () {
