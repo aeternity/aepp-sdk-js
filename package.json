@@ -34,7 +34,7 @@
     "SDK"
   ],
   "dependencies": {
-    "@aeternity/aepp-calldata": "^1.0.0",
+    "@aeternity/aepp-calldata": "^1.1.0",
     "@aeternity/bip39": "^0.1.0",
     "@aeternity/json-bigint": "^0.3.1",
     "@babel/runtime-corejs3": "^7.16.8",
