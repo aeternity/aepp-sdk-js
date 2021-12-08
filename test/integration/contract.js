@@ -348,7 +348,8 @@ describe('Contract', function () {
     })
 
     it('validate bytecode', async () => {
-      return sdk.validateByteCodeAPI(bytecode, identityContract).should.eventually.become(true)
+      expect(await sdk.compilerApi.validateByteCode({ bytecode, source: identityContract }))
+        .to.be.eql({})
     })
 
     it('Use invalid compiler url', async () => {

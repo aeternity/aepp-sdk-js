@@ -171,11 +171,6 @@ export default AsyncInit.compose(ContractBase, {
         'call-value': callValue,
         options
       })
-    },
-    async validateByteCodeAPI (bytecode, source, options) {
-      this._ensureCompilerReady()
-      const res = await this.compilerApi.validateByteCode({ bytecode, source, options })
-      return typeof res === 'object' ? true : res
     }
   },
   props: {
