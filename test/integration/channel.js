@@ -35,7 +35,7 @@ import {
 
 const wsUrl = process.env.TEST_WS_URL || 'ws://localhost:3014/channel'
 
-const identityContract = `
+const contractSource = `
 contract Identity =
   entrypoint getArg(x : int) : int = x
 `
@@ -60,6 +60,7 @@ describe('Channel', function () {
   let offchainTx
   let contractAddress
   let callerNonce
+  let contract
   const initiatorSign = sinon.spy((tag, tx) => initiator.signTransaction(tx))
   const responderSign = sinon.spy((tag, tx) => {
     if (typeof responderShouldRejectUpdate === 'number') {
@@ -874,12 +875,12 @@ describe('Channel', function () {
       sign: responderSign
     })
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
-    const code = await initiator.compileContractAPI(identityContract)
-    const callData = await initiator.contractEncodeCallDataAPI(identityContract, 'init', [])
+    contract = await initiator.getContractInstance({ source: contractSource })
+    await contract.compile()
     const roundBefore = initiatorCh.round()
     const result = await initiatorCh.createContract({
-      code,
-      callData,
+      code: contract.bytecode,
+      callData: contract.calldata.encode('Identity', 'init', []),
       deposit: 1000,
       vmVersion: 5,
       abiVersion: 3
@@ -893,12 +894,10 @@ describe('Channel', function () {
 
   it('can create a contract and reject', async () => {
     responderShouldRejectUpdate = true
-    const code = await initiator.compileContractAPI(identityContract)
-    const callData = await initiator.contractEncodeCallDataAPI(identityContract, 'init', [])
     const roundBefore = initiatorCh.round()
     const result = await initiatorCh.createContract({
-      code,
-      callData,
+      code: contract.bytecode,
+      callData: contract.calldata.encode('Identity', 'init', []),
       deposit: BigNumber('10e18'),
       vmVersion: 5,
       abiVersion: 3
@@ -909,11 +908,9 @@ describe('Channel', function () {
 
   it('can abort contract sign request', async () => {
     const errorCode = 12345
-    const code = await initiator.compileContractAPI(identityContract)
-    const callData = await initiator.contractEncodeCallDataAPI(identityContract, 'init', [])
     const result = await initiatorCh.createContract({
-      code,
-      callData,
+      code: contract.bytecode,
+      callData: contract.calldata.encode('Identity', 'init', []),
       deposit: BigNumber('10e18'),
       vmVersion: 5,
       abiVersion: 3
@@ -923,11 +920,9 @@ describe('Channel', function () {
 
   it('can abort contract with custom error code', async () => {
     responderShouldRejectUpdate = 12345
-    const code = await initiator.compileContractAPI(identityContract)
-    const callData = await initiator.contractEncodeCallDataAPI(identityContract, 'init', [])
     const result = await initiatorCh.createContract({
-      code,
-      callData,
+      code: contract.bytecode,
+      callData: contract.calldata.encode('Identity', 'init', []),
       deposit: BigNumber('10e18'),
       vmVersion: 5,
       abiVersion: 3
@@ -943,7 +938,7 @@ describe('Channel', function () {
     const roundBefore = initiatorCh.round()
     const result = await initiatorCh.callContract({
       amount: 0,
-      callData: await initiator.contractEncodeCallDataAPI(identityContract, 'getArg', ['42']),
+      callData: contract.calldata.encode('Identity', 'getArg', [42]),
       contract: contractAddress,
       abiVersion: 3
     }, async (tx) => initiator.signTransaction(tx))
@@ -955,7 +950,7 @@ describe('Channel', function () {
   it('can call a force progress', async () => {
     const forceTx = await initiatorCh.forceProgress({
       amount: 0,
-      callData: await initiator.contractEncodeCallDataAPI(identityContract, 'getArg', ['42']),
+      callData: contract.calldata.encode('Identity', 'getArg', [42]),
       contract: contractAddress,
       abiVersion: 3
     }, async (tx) => initiator.signTransaction(tx))
@@ -969,7 +964,7 @@ describe('Channel', function () {
     const roundBefore = initiatorCh.round()
     const result = await initiatorCh.callContract({
       amount: 0,
-      callData: await initiator.contractEncodeCallDataAPI(identityContract, 'getArg', ['42']),
+      callData: contract.calldata.encode('Identity', 'getArg', [42]),
       contract: contractAddress,
       abiVersion: 3
     }, async (tx) => initiator.signTransaction(tx))
@@ -981,7 +976,7 @@ describe('Channel', function () {
     const errorCode = 12345
     const result = await initiatorCh.callContract({
       amount: 0,
-      callData: await initiator.contractEncodeCallDataAPI(identityContract, 'getArg', ['42']),
+      callData: contract.calldata.encode('Identity', 'getArg', [42]),
       contract: contractAddress,
       abiVersion: 3
     }, () => errorCode)
@@ -992,7 +987,7 @@ describe('Channel', function () {
     responderShouldRejectUpdate = 12345
     const result = await initiatorCh.callContract({
       amount: 0,
-      callData: await initiator.contractEncodeCallDataAPI(identityContract, 'getArg', ['42']),
+      callData: contract.calldata.encode('Identity', 'getArg', [42]),
       contract: contractAddress,
       abiVersion: 3
     }, async (tx) => initiator.signTransaction(tx))
@@ -1020,14 +1015,14 @@ describe('Channel', function () {
       returnType: 'ok',
       returnValue: result.returnValue
     })
-    const value = await initiator.contractDecodeCallResultAPI(identityContract, 'getArg', result.returnValue, result.returnType)
-    value.should.equal(42)
+    expect(result.returnType).to.be.equal('ok')
+    expect(contract.calldata.decode('Identity', 'getArg', result.returnValue)).to.be.equal(42n)
   })
 
   it('can call a contract using dry-run', async () => {
     const result = await initiatorCh.callContractStatic({
       amount: 0,
-      callData: await initiator.contractEncodeCallDataAPI(identityContract, 'getArg', ['42']),
+      callData: contract.calldata.encode('Identity', 'getArg', [42]),
       contract: contractAddress,
       abiVersion: 3
     })
@@ -1042,8 +1037,8 @@ describe('Channel', function () {
       returnType: 'ok',
       returnValue: result.returnValue
     })
-    const value = await initiator.contractDecodeCallResultAPI(identityContract, 'getArg', result.returnValue, result.returnType)
-    value.should.equal(42)
+    expect(result.returnType).to.be.equal('ok')
+    expect(contract.calldata.decode('Identity', 'getArg', result.returnValue)).to.be.equal(42n)
   })
 
   it('can clean contract calls', async () => {
