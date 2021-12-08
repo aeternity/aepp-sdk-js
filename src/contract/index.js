@@ -45,8 +45,7 @@ const ContractBase = stampit(required({
     setCompilerUrl: required,
     getCompilerVersion: required,
     contractDecodeCallResultAPI: required,
-    validateByteCodeAPI: required,
-    getFateAssembler: required
+    validateByteCodeAPI: required
   }
 }))
 

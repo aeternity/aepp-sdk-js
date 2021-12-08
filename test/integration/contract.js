@@ -310,13 +310,6 @@ describe('Contract', function () {
       )
     })
 
-    it('Get FATE assembler', async () => {
-      const result = await sdk.getFateAssembler(bytecode)
-      result.should.be.a('object')
-      const assembler = result['fate-assembler']
-      assembler.should.be.a('string')
-    })
-
     it('get contract ACI', async () => {
       const aci = await sdk.contractGetACI(identityContract)
       aci.should.have.property('interface')

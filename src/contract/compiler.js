@@ -176,10 +176,6 @@ export default AsyncInit.compose(ContractBase, {
       this._ensureCompilerReady()
       const res = await this.compilerApi.validateByteCode({ bytecode, source, options })
       return typeof res === 'object' ? true : res
-    },
-    getFateAssembler (bytecode, options) {
-      this._ensureCompilerReady()
-      return this.compilerApi.getFateAssemblerCode({ bytecode, options })
     }
   },
   props: {
