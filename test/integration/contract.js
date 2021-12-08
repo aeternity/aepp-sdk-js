@@ -317,12 +317,6 @@ describe('Contract', function () {
       assembler.should.be.a('string')
     })
 
-    it('Get compiler version from bytecode', async () => {
-      const { version } = await sdk.getBytecodeCompilerVersion(bytecode)
-      version.should.be.a('string')
-      version.split('.').length.should.be.equal(3)
-    })
-
     it('get contract ACI', async () => {
       const aci = await sdk.contractGetACI(identityContract)
       aci.should.have.property('interface')

@@ -180,10 +180,6 @@ export default AsyncInit.compose(ContractBase, {
     getFateAssembler (bytecode, options) {
       this._ensureCompilerReady()
       return this.compilerApi.getFateAssemblerCode({ bytecode, options })
-    },
-    getBytecodeCompilerVersion (bytecode, options) {
-      this._ensureCompilerReady()
-      return this.compilerApi.getCompilerVersion({ bytecode, options })
     }
   },
   props: {
