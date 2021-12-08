@@ -33,6 +33,7 @@ import {
   MissingParamError,
   UnsupportedCompilerError
 } from '../utils/errors'
+import { mapObject } from '../utils/other'
 
 /**
  * Contract Compiler Stamp
@@ -78,7 +79,15 @@ export default AsyncInit.compose(ContractBase, {
         }
       })
       this.compilerVersion = client.spec.info.version
-      this._compilerApi = client.api
+      this._compilerApi = mapObject(
+        client.api,
+        ([key, fn]) => [
+          key,
+          ({ options: { filesystem, ...options } = {}, ...args } = {}) => fn({
+            ...args, options: { ...options, file_system: filesystem }
+          })
+        ]
+      )
 
       if (ignoreVersion) return
       if (!semverSatisfies(this.compilerVersion, COMPILER_GE_VERSION, COMPILER_LT_VERSION)) {
@@ -89,9 +98,6 @@ export default AsyncInit.compose(ContractBase, {
     },
     _ensureCompilerReady () {
       if (!this._compilerApi) throw new UnavailableCompilerError()
-    },
-    _prepareCompilerOptions ({ filesystem = {} } = {}) {
-      return { file_system: filesystem }
     },
     getCompilerVersion () {
       this._ensureCompilerReady()
@@ -114,33 +120,30 @@ export default AsyncInit.compose(ContractBase, {
         source,
         function: name,
         arguments: args,
-        options: this._prepareCompilerOptions(options)
+        options
       })
       return calldata
     },
     async compileContractAPI (code, options) {
       this._ensureCompilerReady()
-      const { bytecode } = await this._compilerApi.compileContract({
-        code,
-        options: this._prepareCompilerOptions(options)
-      })
+      const { bytecode } = await this._compilerApi.compileContract({ code, options })
       return bytecode
     },
     contractGetACI (code, options) {
       this._ensureCompilerReady()
-      return this._compilerApi.generateACI({ code, options: this._prepareCompilerOptions(options) })
+      return this._compilerApi.generateACI({ code, options })
     },
     contractDecodeCallDataByCodeAPI (bytecode, calldata) {
       this._ensureCompilerReady()
       return this._compilerApi.decodeCalldataBytecode({ bytecode, calldata })
     },
-    contractDecodeCallDataBySourceAPI (source, fn, callData, options) {
+    contractDecodeCallDataBySourceAPI (source, fn, calldata, options) {
       this._ensureCompilerReady()
       return this._compilerApi.decodeCalldataSource({
         function: fn,
         source,
-        calldata: callData,
-        options: this._prepareCompilerOptions(options)
+        calldata,
+        options
       })
     },
     /**
@@ -166,30 +169,21 @@ export default AsyncInit.compose(ContractBase, {
         source,
         'call-result': callResult,
         'call-value': callValue,
-        options: this._prepareCompilerOptions(options)
+        options
       })
     },
     async validateByteCodeAPI (bytecode, source, options) {
       this._ensureCompilerReady()
-      const res = await this._compilerApi.validateByteCode({
-        bytecode,
-        source,
-        options: this._prepareCompilerOptions(options)
-      })
+      const res = await this._compilerApi.validateByteCode({ bytecode, source, options })
       return typeof res === 'object' ? true : res
     },
     getFateAssembler (bytecode, options) {
       this._ensureCompilerReady()
-      return this._compilerApi.getFateAssemblerCode(
-        { bytecode, options: this._prepareCompilerOptions(options) }
-      )
+      return this._compilerApi.getFateAssemblerCode({ bytecode, options })
     },
     getBytecodeCompilerVersion (bytecode, options) {
       this._ensureCompilerReady()
-      return this._compilerApi.getCompilerVersion({
-        bytecode,
-        options: this._prepareCompilerOptions(options)
-      })
+      return this._compilerApi.getCompilerVersion({ bytecode, options })
     }
   },
   props: {
