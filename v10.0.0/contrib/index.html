@@ -1,0 +1,1077 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      <link rel="icon" href="../images/favicon.png">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.1.9">
+    
+    
+      
+        <title>Development - æternity JavaScript SDK</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ca7ac06f.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.f1a3b89f.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+    
+      
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="pink" data-md-color-accent="pink">
+  
+    
+    <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+      <script>var palette=__get("__palette");if(null!==palette&&"object"==typeof palette.color)for(var key in palette.color)document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#development" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="æternity JavaScript SDK" class="md-header__button md-logo" aria-label="æternity JavaScript SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            æternity JavaScript SDK
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Development
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="pink" data-md-color-accent="pink"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3 3.19.09m3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95 2.06.05m-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31z"/></svg>
+            </label>
+          
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="pink" data-md-color-accent="pink"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+          
+            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5c-.84 0-1.65.15-2.39.42L12 2M3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29L3.34 7m.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14L3.36 17M20.65 7l-1.77 3.79a7.023 7.023 0 0 0-2.38-4.15l4.15.36m-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29L20.64 17M12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44L12 22z"/></svg>
+            </label>
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/aeternity/aepp-sdk-js" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="æternity JavaScript SDK" class="md-nav__button md-logo" aria-label="æternity JavaScript SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    æternity JavaScript SDK
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/aeternity/aepp-sdk-js" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Installation
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../quick-start/" class="md-nav__link">
+        Quick Start
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+      
+      <label class="md-nav__link" for="__nav_3">
+        Usage Guides
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Usage Guides" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Usage Guides
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/aens/" class="md-nav__link">
+        æternity naming system
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/contracts/" class="md-nav__link">
+        Contracts
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/contract-events/" class="md-nav__link">
+        Contract Events
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/oracles/" class="md-nav__link">
+        Oracles
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/paying-for-tx/" class="md-nav__link">
+        PayingForTx
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/low-vs-high-usage/" class="md-nav__link">
+        Low vs High level API
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_7" type="checkbox" id="__nav_3_7" >
+      
+      <label class="md-nav__link" for="__nav_3_7">
+        Wallet interaction
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Wallet interaction" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_7">
+          <span class="md-nav__icon md-icon"></span>
+          Wallet interaction
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/connect-aepp-to-wallet/" class="md-nav__link">
+        Connect an æpp to a wallet
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/build-wallet/" class="md-nav__link">
+        How to build a wallet
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transaction-options/" class="md-nav__link">
+        Transaction options
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
+      
+      <label class="md-nav__link" for="__nav_5">
+        Examples & Tutorials
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Examples & Tutorials" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          Examples & Tutorials
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_1" type="checkbox" id="__nav_5_1" >
+      
+      <label class="md-nav__link" for="__nav_5_1">
+        NodeJS
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="NodeJS" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_1">
+          <span class="md-nav__icon md-icon"></span>
+          NodeJS
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/node/transfer-ae/" class="md-nav__link">
+        Transfer AE
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/node/contract-interaction/" class="md-nav__link">
+        Compile & Deploy a Sophia Smart Contract
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_1_3" type="checkbox" id="__nav_5_1_3" >
+      
+      <label class="md-nav__link" for="__nav_5_1_3">
+        PayingForTx
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="PayingForTx" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_1_3">
+          <span class="md-nav__icon md-icon"></span>
+          PayingForTx
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/node/paying-for-tx-contract-call-tx/" class="md-nav__link">
+        InnerTx: ContractCallTx
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/node/paying-for-tx-spend-tx/" class="md-nav__link">
+        InnerTx: SpendTx
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/vuejs/helloworld-blockheight/" class="md-nav__link">
+        Vue.js HelloWorld
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api-reference/" class="md-nav__link">
+        API Reference
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CHANGELOG/" class="md-nav__link">
+        Changelog
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+      
+      <label class="md-nav__link" for="__nav_8">
+        Migration Guides
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Migration Guides" data-md-level="1">
+        <label class="md-nav__title" for="__nav_8">
+          <span class="md-nav__icon md-icon"></span>
+          Migration Guides
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/migration/10.0.0/" class="md-nav__link">
+        Migration to 10.0.0
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/migration/9.0.0/" class="md-nav__link">
+        Migration to 9.0.0
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/migration/7.0.0/" class="md-nav__link">
+        Migration to 7.0.0
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" checked>
+      
+      <label class="md-nav__link" for="__nav_9">
+        Contribute
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Contribute" data-md-level="1">
+        <label class="md-nav__title" for="__nav_9">
+          <span class="md-nav__icon md-icon"></span>
+          Contribute
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Development
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Development
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#principles" class="md-nav__link">
+    Principles
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#requirements" class="md-nav__link">
+    Requirements
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contributing" class="md-nav__link">
+    Contributing
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#documenting" class="md-nav__link">
+    Documenting
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building" class="md-nav__link">
+    Building
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
+    Testing
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#composing-new-flavors" class="md-nav__link">
+    Composing new Flavors
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation-linking" class="md-nav__link">
+    Installation / Linking
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#releasing" class="md-nav__link">
+    Releasing
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="releases/" class="md-nav__link">
+        Releases
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#principles" class="md-nav__link">
+    Principles
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#requirements" class="md-nav__link">
+    Requirements
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contributing" class="md-nav__link">
+    Contributing
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#documenting" class="md-nav__link">
+    Documenting
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building" class="md-nav__link">
+    Building
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
+    Testing
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#composing-new-flavors" class="md-nav__link">
+    Composing new Flavors
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation-linking" class="md-nav__link">
+    Installation / Linking
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#releasing" class="md-nav__link">
+    Releasing
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                <h1 id="development">Development</h1>
+<h2 id="principles">Principles</h2>
+<p>The Javascript SDK wraps the æternity API explosed by
+<a href="https://github.com/aeternity/aeternity/blob/master/config/swagger.yaml">Node's Swagger file</a>. It aims to abstract the API, while still providing
+low-level access to it's endpoints, when necessary.</p>
+<p>It uses the following Javascript technologies and principles:</p>
+<ul>
+<li><a href="http://stampit.js.org/">stampit</a> provides composable Factories based on the <a href="https://github.com/stampit-org/stamp-specification">Stamp
+  Specification</a>. This is how aepp-sdk approached the <a href="https://medium.com/front-end-hacking/classless-javascript-composition-over-inheritance-6b27c35893b1">composition over
+  inheritance</a> principle.</li>
+<li><a href="https://github.com/dwyl/Javascript-the-Good-Parts-notes">JavaScript the Good Parts</a> (because Crockford is always right)</li>
+<li><a href="https://hacks.mozilla.org/2015/08/es6-in-depth-modules/">ES6 modules</a>, using <code>export</code> and <code>import</code></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises">Promises</a> using ES7 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function">async/await</a> syntax, where applicable</li>
+<li>Functional Programming using <a href="https://ramdajs.com/">Ramda</a></li>
+<li>Statelessness wherever possible</li>
+<li><a href="https://webpack.js.org/">webpack 4</a> and the <a href="https://github.com/babel/babel-loader">Babel</a></li>
+<li>Strictly enforced <a href="https://standardjs.com/">StandardJS</a></li>
+<li>Loose coupling of modules to enable <a href="https://webpack.js.org/guides/tree-shaking/">tree-shaking</a></li>
+<li>Convention over configuration</li>
+<li>"Easy things should be easy, and hard things should be possible." <a href="https://www.amazon.com/gp/feature.html?ie=UTF8&amp;docId=7137">source</a> -- <a href="https://en.wikipedia.org/wiki/Larry_Wall">Larry Wall</a></li>
+<li>Support for<ul>
+<li>module access, enabling tree-shaking</li>
+<li>direct use in node scripts through bundling</li>
+<li>direct use in browser <code>&lt;script&gt;</code> tags through bundling</li>
+<li>bundling through webpack</li>
+</ul>
+</li>
+</ul>
+<h2 id="requirements">Requirements</h2>
+<p>aepp-sdk is transpiled to EcmaScript 5 through <a href="https://webpack.js.org/">WebPack</a>, using <a href="https://babeljs.io/">Babel</a> and is expected to work in any sufficiently new version of <a href="https://nodejs.org/en/">Node.js</a> (<code>&gt;= v12.17</code>) or modern web browser.</p>
+<h2 id="contributing">Contributing</h2>
+<ol>
+<li>Clone the application</li>
+<li>Make sure your editor/IDE can read and use the <code>.editorconfig</code> file</li>
+<li>Start hacking (and dont forget to add <a href="#testing">test</a> for whatever you'll be building).</li>
+</ol>
+<h2 id="documenting">Documenting</h2>
+<p>Apart from documenting features and code, there is also documentation automatically generated using <a href="http://usejsdoc.org/"><strong>jsdoc</strong></a> for documenting JS files (later transformed in to <code>.md</code> files (to have them readable in platforms like GitHub) and <a href="https://github.com/aeternity/aepp-sdk-js/blob/master/tooling/docs/examples-to-md.js">a script</a> for documenting examples and code partials.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">#generate examples and api documentation</span>
+npm run docs:examples <span class="o">&amp;&amp;</span> npm run docs:api
+</code></pre></div>
+<h2 id="building">Building</h2>
+<p>aepp-sdk is built using <a href="https://pnpm.js.org/">pnpm</a>. In order to build a development version, launch the <code>build:dev</code> command.</p>
+<div class="highlight"><pre><span></span><code>pnpm install
+pnpm run build:dev
+</code></pre></div>
+<h2 id="testing">Testing</h2>
+<p>To test, launch the <code>test</code> command. This will run <a href="https://mochajs.org/">mocha</a>'s tests locally.</p>
+<div class="highlight"><pre><span></span><code>pnpm run <span class="nb">test</span>
+</code></pre></div>
+<p>This repository also includes a docker-compose file, to allow you to <strong>run your own æternity node locally</strong>. If you want to do so, <strong>from the root of the project</strong>:</p>
+<ol>
+<li>Create a <em><strong>docker-compose.override.yml</strong></em> file with this content:
+<div class="highlight"><pre><span></span><code><span class="nt">version</span><span class="p">:</span> <span class="s">&quot;3&quot;</span>
+<span class="nt">services</span><span class="p">:</span>
+  <span class="nt">node</span><span class="p">:</span>
+    <span class="nt">ports</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">3013:3013</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">3113:3113</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">3014:3014</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">3001:3001</span>
+</code></pre></div></li>
+<li>Run <code>docker-compose up node</code></li>
+<li>Congrats! you're now running your own æternity node locally.</li>
+</ol>
+<h2 id="composing-new-flavors">Composing new Flavors</h2>
+<p>You can also "compose" your own flavor by mixing 2 or more flavors likes so:</p>
+<div class="highlight"><pre><span></span><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Wallet</span><span class="p">,</span> <span class="nx">Contract</span><span class="p">,</span> <span class="nx">MemoryAccount</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
+
+<span class="c1">// make a &quot;mixed flavor&quot; containing Wallet and Contracts flavors</span>
+<span class="nx">Wallet</span><span class="p">.</span><span class="nx">compose</span><span class="p">(</span><span class="nx">Contract</span><span class="p">)({</span>
+            <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">,</span>
+            <span class="nx">internalUrl</span><span class="o">:</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">,</span>
+            <span class="nx">accounts</span><span class="o">:</span> <span class="p">[</span><span class="nx">MemoryAccount</span><span class="p">({</span><span class="nx">keypair</span><span class="o">:</span> <span class="p">{</span><span class="nx">secretKey</span><span class="o">:</span> <span class="nx">account</span><span class="p">.</span><span class="nx">priv</span><span class="p">,</span> <span class="nx">publicKey</span><span class="o">:</span> <span class="nx">account</span><span class="p">.</span><span class="nx">pub</span><span class="p">}})],</span>
+            <span class="nx">address</span><span class="o">:</span> <span class="nx">account</span><span class="p">.</span><span class="nx">pub</span><span class="p">,</span>
+            <span class="nx">onTx</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="c1">// or a function to Guard the Rpc client</span>
+            <span class="nx">onChain</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="c1">// or a function to Guard the Rpc client</span>
+            <span class="nx">onAccount</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="c1">// or a function to Guard the Rpc client</span>
+            <span class="nx">networkId</span><span class="o">:</span> <span class="s1">&#39;ae_uat&#39;</span>
+          <span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="nx">ae</span> <span class="p">=&gt;</span> <span class="p">{</span>
+            <span class="c1">// ae is your initialised client now! :)</span>
+            <span class="c1">// ...</span>
+</code></pre></div>
+<p>The WebPack compilation provides two different build artifacts in <code>dist/</code>, one
+for Node.js and one for browsers. When referencing aepp-sdk through any modern
+build tooling, it should pick the right one automatically through the entry
+points defined in <code>package.json</code>.</p>
+<h2 id="installation-linking">Installation / Linking</h2>
+<p>In order to add a local development version of aepp-sdk to a project, <code>npm link</code><a href="https://docs.npmjs.com/cli/link">1</a> can be used.</p>
+<h2 id="releasing">Releasing</h2>
+<p><a href="releases/">How to release a new version</a></p>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../guides/migration/7.0.0/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Migration to 7.0.0" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Migration to 7.0.0
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="releases/" class="md-footer__link md-footer__link--next" aria-label="Next: Releases" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Releases
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link", "search.highlight", "search.share", "search.suggest"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.477d984a.min.js", "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.82b56eb2.min.js"></script>
+      
+    
+  </body>
+</html>
