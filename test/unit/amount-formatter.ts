@@ -20,21 +20,20 @@ import { expect } from 'chai'
 import BigNumber from 'bignumber.js'
 import '..'
 import { AE_AMOUNT_FORMATS, formatAmount, toAe, toAettos } from '../../src/utils/amount-formatter'
-import { parseBigNumber } from '../../src/utils/bignumber'
 import { InvalidDenominationError, IllegalArgumentError } from '../../src/utils/errors'
 
 describe('Amount Formatter', function () {
-  it('to aettos', async () => {
+  it('to aettos', () => {
     [
-      [1, AE_AMOUNT_FORMATS.AE, 1e18],
-      [10, AE_AMOUNT_FORMATS.AE, 10e18],
-      [100, AE_AMOUNT_FORMATS.AE, 100e18],
-      [10012312, AE_AMOUNT_FORMATS.AE, 10012312e18],
-      [1, AE_AMOUNT_FORMATS.AETTOS, 1]
-    ].forEach(
-      ([v, d, e]) => expect(parseBigNumber(e)).to.be.equal(toAettos(v, { denomination: d.toString() }))
-    )
+      [1, AE_AMOUNT_FORMATS.AE, '1000000000000000000'],
+      [11, AE_AMOUNT_FORMATS.AE, '11000000000000000000'],
+      [111, AE_AMOUNT_FORMATS.AE, '111000000000000000000'],
+      [10012312, AE_AMOUNT_FORMATS.AE, '10012312000000000000000000'],
+      [1, AE_AMOUNT_FORMATS.AETTOS, '1']
+    ].forEach(([v, denomination, e]: [number, string, string]) =>
+      expect(toAettos(v, { denomination })).to.be.equal(e))
   })
+
   it('to Ae', () => {
     [
       [1, AE_AMOUNT_FORMATS.AETTOS, new BigNumber(1).div(1e18)],
@@ -42,10 +41,10 @@ describe('Amount Formatter', function () {
       [100, AE_AMOUNT_FORMATS.AETTOS, new BigNumber(100).div(1e18)],
       [10012312, AE_AMOUNT_FORMATS.AETTOS, new BigNumber(10012312).div(1e18)],
       [1, AE_AMOUNT_FORMATS.AE, 1]
-    ].forEach(
-      ([v, d, e]) => expect(parseBigNumber(e)).to.be.equal(toAe(v, { denomination: d.toString() }))
-    )
+    ].forEach(([v, denomination, e]: [number, string, BigNumber]) =>
+      expect(toAe(v, { denomination })).to.be.equal(e.toString(10)))
   })
+
   it('format', () => {
     [
       [1, AE_AMOUNT_FORMATS.AE, AE_AMOUNT_FORMATS.AETTOS, new BigNumber(1e18)],
@@ -67,17 +66,18 @@ describe('Amount Formatter', function () {
       [1, AE_AMOUNT_FORMATS.NANO_AE, AE_AMOUNT_FORMATS.AETTOS, new BigNumber(1000000000)],
       [1, AE_AMOUNT_FORMATS.FEMTO_AE, AE_AMOUNT_FORMATS.AETTOS, new BigNumber(1000)],
       [1, AE_AMOUNT_FORMATS.NANO_AE, AE_AMOUNT_FORMATS.FEMTO_AE, new BigNumber(1000000)]
-    ].forEach(
-      ([v, dF, dT, e]) => expect(parseBigNumber(e)).to.be.equal(formatAmount(v, { denomination: dF.toString(), targetDenomination: dT.toString() }))
-    )
+    ].forEach(([v, denomination, targetDenomination, e]: [number, string, string, BigNumber]) =>
+      expect(formatAmount(v, { denomination, targetDenomination })).to.be.equal(e.toString(10)))
   })
+
   it('Invalid value', () => {
     [
-      [true, [AE_AMOUNT_FORMATS.AE, AE_AMOUNT_FORMATS.AE], 'Value true is not type of number', IllegalArgumentError],
-      [1, [AE_AMOUNT_FORMATS.AE, 'ASD'], 'Invalid target denomination: ASD', InvalidDenominationError],
-      [1, ['ASD', AE_AMOUNT_FORMATS.AE], 'Invalid denomination: ASD', InvalidDenominationError]
-    ].forEach(([v, [dF, dT], error]: any[]) => {
-      expect(() => formatAmount(v, { denomination: dF, targetDenomination: dT })).to.throw(error)
+      [true, AE_AMOUNT_FORMATS.AE, AE_AMOUNT_FORMATS.AE, IllegalArgumentError, 'Value true is not type of number'],
+      [1, AE_AMOUNT_FORMATS.AE, 'ASD', InvalidDenominationError, 'Invalid target denomination: ASD'],
+      [1, 'ASD', AE_AMOUNT_FORMATS.AE, InvalidDenominationError, 'Invalid denomination: ASD']
+    ].forEach(([v, dF, dT, error, msg]: any[]) => {
+      expect(() => formatAmount(v, { denomination: dF, targetDenomination: dT }))
+        .to.throw(error, msg)
     })
   })
 })

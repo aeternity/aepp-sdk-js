@@ -26,7 +26,7 @@ import nacl from 'tweetnacl'
 import aesjs from 'aes-js'
 import shajs from 'sha.js'
 
-import { str2buf, toBytes } from './bytes'
+import { str2buf } from './bytes'
 import { decode } from '../tx/builder/helpers'
 import { hash } from './crypto-ts'
 import { InvalidChecksumError, MessageLimitError } from './errors'
@@ -61,16 +61,6 @@ export function isAddressValid (address, prefix = 'ak') {
   } catch (e) {
     return false
   }
-}
-
-/**
- * Parse decimal address and return base58Check encoded address with prefix 'ak'
- * @rtype (input: String) => address: String
- * @param {String} decimalAddress - Address
- * @return {String} address
- */
-export function addressFromDecimal (decimalAddress) {
-  return aeEncodeKey(toBytes(decimalAddress, true))
 }
 
 /**
@@ -282,19 +272,6 @@ export function signMessage (message, privateKey) {
 
 export function verifyMessage (str, signature, publicKey) {
   return verify(messageToHash(str), signature, publicKey)
-}
-
-/**
- * æternity readable public keys are the base58-encoded public key, prepended
- * with 'ak_'
- * @rtype (binaryKey: Buffer) => String
- * @param {Buffer} binaryKey - Key to encode
- * @return {String} Encoded key
- */
-export function aeEncodeKey (binaryKey) {
-  const publicKeyBuffer = Buffer.from(binaryKey, 'hex')
-  const pubKeyAddress = encodeBase58Check(publicKeyBuffer)
-  return `ak_${pubKeyAddress}`
 }
 
 /**
