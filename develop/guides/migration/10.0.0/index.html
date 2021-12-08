@@ -755,6 +755,20 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#removed-primitives-for-encryptiondecryption-by-keypairs-1183" class="md-nav__link">
+    removed primitives for encryption/decryption by keypairs (#1183)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aensupdate-accepts-pointers-as-object-f6b8999" class="md-nav__link">
+    aensUpdate accepts pointers as object (f6b8999)
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -977,6 +991,20 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#removed-primitives-for-encryptiondecryption-by-keypairs-1183" class="md-nav__link">
+    removed primitives for encryption/decryption by keypairs (#1183)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aensupdate-accepts-pointers-as-object-f6b8999" class="md-nav__link">
+    aensUpdate accepts pointers as object (f6b8999)
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1069,6 +1097,24 @@ with
 app. In Webpack it can be done by <a href="https://webpack.js.org/configuration/module/#ruleexclude">excluding</a>
 <code>node_modules</code> folder except for this package in <code>babe-loader</code> rule. In <code>@vue/cli</code> you can use
 <a href="https://cli.vuejs.org/config/#transpiledependencies">transpileDependencies</a> option.</p>
+<h3 id="removed-primitives-for-encryptiondecryption-by-keypairs-1183">removed primitives for encryption/decryption by keypairs (<a href="https://github.com/aeternity/aepp-sdk-js/pull/1183">#1183</a>)</h3>
+<p>Use third-party cryptographic packages instead of <code>Crypto.encryptData</code>, <code>Crypto.decryptData</code>
+methods.</p>
+<h3 id="aensupdate-accepts-pointers-as-object-f6b8999"><code>aensUpdate</code> accepts pointers as object (<a href="https://github.com/aeternity/aepp-sdk-js/commit/f6b8999ac70d10c5455e9a45d8ad65e161d28ca4">f6b8999</a>)</h3>
+<p>For example, replace
+<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="s1">&#39;test.chain&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="p">])</span>
+</code></pre></div>
+with
+<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="s1">&#39;test.chain&#39;</span><span class="p">,</span> <span class="p">{</span>
+  <span class="nx">account_pubkey</span><span class="o">:</span> <span class="s1">&#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span>
+<span class="p">})</span>
+</code></pre></div>
+Additionally, <code>getDefaultPointerKey</code> (was named <code>classify</code> before) helper function can be used
+<div class="highlight"><pre><span></span><code><span class="k">import</span> <span class="p">{</span> <span class="nx">getDefaultPointerKey</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
+
+<span class="kd">const</span> <span class="nx">address</span> <span class="o">=</span> <span class="s1">&#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span>
+<span class="nx">sdk</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="s1">&#39;test.chain&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="p">[</span><span class="nx">getDefaultPointerKey</span><span class="p">(</span><span class="nx">address</span><span class="p">)]</span><span class="o">:</span> <span class="nx">address</span> <span class="p">})</span>
+</code></pre></div></p>
                 
               
               
