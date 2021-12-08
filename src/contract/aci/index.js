@@ -22,7 +22,6 @@
  * @export getContractInstance
  */
 
-import { defaultTo, prop, path } from 'ramda'
 import { Encoder as Calldata } from '@aeternity/aepp-calldata'
 import { decodeEvents } from './transformation'
 import { DRY_RUN_ACCOUNT, DEPOSIT } from '../../tx/builder/schema'
@@ -44,20 +43,6 @@ import {
   IllegalArgumentError,
   NoSuchContractFunctionError
 } from '../../utils/errors'
-
-/**
- * Get function schema from contract ACI object
- * @param {Object} aci Contract ACI object
- * @param {String} name Function name
- * @param external
- * @return {Object} function ACI
- */
-function getFunctionACI (aci, name, external) {
-  const fn = aci.functions.find(f => f.name === name)
-  if (fn) return fn
-  if (name === 'init') return { payable: false }
-  throw new NoSuchContractFunctionError(`Function ${name} doesn't exist in contract`)
-}
 
 /**
  * Generate contract ACI object with predefined js methods for contract usage - can be used for
@@ -85,20 +70,22 @@ function getFunctionACI (aci, name, external) {
 export default async function getContractInstance ({
   source,
   bytecode,
-  aci,
+  aci: _aci,
   contractAddress,
   filesystem = {},
   validateBytecode,
   ...otherOptions
 } = {}) {
-  if (!aci && source) {
-    aci = await this.compilerApi.generateACI({ code: source, options: { filesystem } })
+  if (!_aci && source) {
+    _aci = await this.compilerApi.generateACI({ code: source, options: { filesystem } })
   }
-  if (!aci) throw new MissingContractDefError()
+  if (!_aci) throw new MissingContractDefError()
   contractAddress = contractAddress && await this.resolveName(
     contractAddress, 'contract_pubkey', { resolveByNode: true }
   )
-  if (!contractAddress && !source && !bytecode) throw new MissingContractAddressError('Can\'t create instance by ACI without address')
+  if (!contractAddress && !source && !bytecode) {
+    throw new MissingContractAddressError('Can\'t create instance by ACI without address')
+  }
 
   if (contractAddress) {
     const contract = await this.getContract(contractAddress).catch(() => null)
@@ -107,10 +94,9 @@ export default async function getContractInstance ({
   }
 
   const instance = {
-    interface: defaultTo(null, prop('interface', aci)),
-    aci: defaultTo(null, path(['encoded_aci', 'contract'], aci)),
-    calldata: new Calldata([aci.encoded_aci, ...aci.external_encoded_aci]),
-    externalAci: (aci.external_encoded_aci ?? []).map(a => a.contract || a.namespace),
+    _aci,
+    _name: _aci.encoded_aci.contract.name,
+    calldata: new Calldata([_aci.encoded_aci, ..._aci.external_encoded_aci]),
     source,
     bytecode,
     deployInfo: { address: contractAddress },
@@ -195,7 +181,7 @@ export default async function getContractInstance ({
     const ownerId = await this.address(opt)
     const { tx, contractId } = await this.contractCreateTx({
       ...opt,
-      callData: instance.calldata.encode(instance.aci.name, 'init', params),
+      callData: instance.calldata.encode(instance._name, 'init', params),
       code: instance.bytecode,
       ownerId
     })
@@ -217,6 +203,18 @@ export default async function getContractInstance ({
   }
 
   /**
+   * Get function schema from contract ACI object
+   * @param {String} name Function name
+   * @return {Object} function ACI
+   */
+  function getFunctionACI (name) {
+    const fn = instance._aci.encoded_aci.contract.functions.find(f => f.name === name)
+    if (fn) return fn
+    if (name === 'init') return { payable: false }
+    throw new NoSuchContractFunctionError(`Function ${name} doesn't exist in contract`)
+  }
+
+  /**
    * Call contract function
    * @alias module:@aeternity/aepp-sdk/es/contract/aci
    * @rtype (init: Array, options: Object = { callStatic: false }) => CallResult: Object
@@ -228,7 +226,7 @@ export default async function getContractInstance ({
    */
   instance.call = async (fn, params = [], options = {}) => {
     const opt = { ...instance.options, ...options }
-    const fnACI = getFunctionACI(instance.aci, fn, instance.externalAci)
+    const fnACI = getFunctionACI(fn)
     const contractId = instance.deployInfo.address
 
     if (!fn) throw new MissingFunctionNameError()
@@ -240,7 +238,7 @@ export default async function getContractInstance ({
       if (opt.callStatic) return DRY_RUN_ACCOUNT.pub
       else throw error
     })
-    const callData = instance.calldata.encode(instance.aci.name, fn, params)
+    const callData = instance.calldata.encode(instance._name, fn, params)
 
     let res
     if (opt.callStatic) {
@@ -266,7 +264,7 @@ export default async function getContractInstance ({
     }
     if (opt.waitMined || opt.callStatic) {
       res.decodedResult = fnACI.returns && fnACI.returns !== 'unit' && fn !== 'init' &&
-        instance.calldata.decode(instance.aci.name, fn, res.result.returnValue)
+        instance.calldata.decode(instance._name, fn, res.result.returnValue)
       res.decodedEvents = instance.decodeEvents(res.result.log)
     }
     return res
@@ -279,7 +277,7 @@ export default async function getContractInstance ({
    * @param {Array} events Array of encoded events(callRes.result.log)
    * @return {Object} DecodedEvents
    */
-  instance.decodeEvents = events => decodeEvents(events, instance.aci.event)
+  instance.decodeEvents = events => decodeEvents(events, instance._aci.encoded_aci.contract.event)
 
   /**
    * Generate proto function based on contract function using Contract ACI schema
@@ -290,7 +288,7 @@ export default async function getContractInstance ({
    * `await contract.methods.testFunction.get()` -> use call-static(dry-run)
    * `await contract.methods.testFunction.send()` -> send tx on-chain
    */
-  instance.methods = Object.fromEntries(instance.aci.functions
+  instance.methods = Object.fromEntries(instance._aci.encoded_aci.contract.functions
     .map(({ name, arguments: aciArgs, stateful }) => {
       const genHandler = callStatic => (...args) => {
         const options = args.length === aciArgs.length + 1 ? args.pop() : {}

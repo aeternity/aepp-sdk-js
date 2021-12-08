@@ -133,8 +133,6 @@ describe('Contract instance', function () {
 
   it('generates by source code', async () => {
     testContract = await sdk.getContractInstance({ source: testContractSource, filesystem, ttl: 0 })
-    testContract.should.have.property('interface')
-    testContract.should.have.property('aci')
     testContract.should.have.property('source')
     testContract.should.have.property('bytecode')
     testContract.should.have.property('deployInfo')
@@ -144,9 +142,9 @@ describe('Contract instance', function () {
     testContract.options.ttl.should.be.equal(0)
     testContract.options.should.have.property('filesystem')
     testContract.options.filesystem.should.have.property('testLib')
-    const functionsFromACI = testContract.aci.functions.map(({ name }) => name)
-    const methods = Object.keys(testContract.methods)
-    expect(methods).to.be.eql(functionsFromACI)
+    expect(Object.keys(testContract.methods)).to.be.eql(
+      testContract._aci.encoded_aci.contract.functions.map(({ name }) => name)
+    )
   })
 
   it('compiles', async () => {

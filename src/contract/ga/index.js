@@ -94,7 +94,7 @@ async function createGeneralizeAccount (authFnName, source, args = [], options =
     ...opt,
     ownerId,
     code: contract.bytecode,
-    callData: contract.calldata.encode(contract.aci.name, 'init', args),
+    callData: contract.calldata.encode(contract._name, 'init', args),
     authFun: hash(authFnName)
   })
 
