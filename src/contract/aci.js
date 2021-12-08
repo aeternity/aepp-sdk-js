@@ -23,9 +23,9 @@
  */
 
 import { Encoder as Calldata } from '@aeternity/aepp-calldata'
-import { DRY_RUN_ACCOUNT, DEPOSIT } from '../../tx/builder/schema'
-import TxObject from '../../tx/tx-object'
-import { decode } from '../../tx/builder/helpers'
+import { DRY_RUN_ACCOUNT, DEPOSIT } from '../tx/builder/schema'
+import TxObject from '../tx/tx-object'
+import { decode } from '../tx/builder/helpers'
 import {
   MissingContractDefError,
   MissingContractAddressError,
@@ -41,7 +41,7 @@ import {
   NodeInvocationError,
   IllegalArgumentError,
   NoSuchContractFunctionError
-} from '../../utils/errors'
+} from '../utils/errors'
 
 /**
  * Generate contract ACI object with predefined js methods for contract usage - can be used for
