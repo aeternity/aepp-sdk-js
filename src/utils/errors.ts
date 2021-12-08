@@ -195,13 +195,6 @@ export class UnsupportedProtocolError extends AeError {
 }
 
 /* keypair an account related errors */
-export class InvalidGaAddressError extends AccountError {
-  constructor (msg: string) {
-    super(msg)
-    this.name = 'InvalidGaAddressError'
-  }
-}
-
 export class InvalidKeypairError extends AccountError {
   constructor (msg: string) {
     super(msg)

@@ -23,7 +23,6 @@ AeError
 │   UnsupportedProtocolError
 │
 └───AccountError
-│   │   InvalidGaAddressError
 │   │   InvalidKeypairError
 │   │   UnavailableAccountError
 │
