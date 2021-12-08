@@ -14,8 +14,22 @@ export class AeError extends Error {
   }
 }
 
+export class CryptographyError extends AeError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'CryptographyError'
+  }
+}
+
+export class SwaggerError extends AeError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'SwaggerError'
+  }
+}
+
 /* Common error patterns */
-export class IllegalArgumentError extends AeError {
+export class IllegalArgumentError extends CryptographyError {
   constructor (msg: string) {
     super(msg)
     this.name = 'IllegalArgumentError'
@@ -90,6 +104,118 @@ export class UnknownHashClassError extends AeError {
   }
 }
 
+export class InvalidDenominationError extends AeError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'InvalidDenominationError'
+  }
+}
+
+export class NoSerializerFoundError extends AeError {
+  constructor () {
+    super('Byte serialization not supported')
+    this.name = 'NoSerializerFoundError'
+  }
+}
+
+/* cryptography errors */
+export class InvalidChecksumError extends CryptographyError {
+  constructor () {
+    super('Invalid checksum')
+    this.name = 'InvalidChecksumError'
+  }
+}
+
+export class MessageLimitError extends CryptographyError {
+  constructor () {
+    super('message too long')
+    this.name = 'MessageLimitError'
+  }
+}
+
+export class InvalidDerivationPathError extends CryptographyError {
+  constructor () {
+    super('Invalid path')
+    this.name = 'InvalidDerivationPathError'
+  }
+}
+
+export class NotHardenedSegmentError extends CryptographyError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'NotHardenedSegmentError'
+  }
+}
+
+export class UnsupportedChildIndexError extends CryptographyError {
+  constructor (index: string) {
+    super(`Child index #${index} is not supported`)
+    this.name = 'UnsupportedChildIndexError'
+  }
+}
+
+export class InvalidMnemonicError extends CryptographyError {
+  constructor () {
+    super('Invalid mnemonic')
+    this.name = 'InvalidMnemonicError'
+  }
+}
+
+export class MerkleTreeHashMismatchError extends CryptographyError {
+  constructor () {
+    super('Node hash is not equal to provided one')
+    this.name = 'MerkleTreeHashMismatchError'
+  }
+}
+
+export class MissingNodeInTreeError extends CryptographyError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'MissingNodeInTreeError'
+  }
+}
+
+export class UnknownPathNibbleError extends CryptographyError {
+  constructor (nibble: number) {
+    super(`Unknown path nibble: ${nibble}`)
+    this.name = 'UnknownPathNibbleError'
+  }
+}
+
+export class UnknownNodeLengthError extends CryptographyError {
+  constructor (nodeLength: number) {
+    super(`Unknown node length: ${nodeLength}`)
+    this.name = 'UnknownNodeLengthError'
+  }
+}
+
+export class InvalidKeyError extends CryptographyError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'InvalidKeyError'
+  }
+}
+
+export class NoSuchAlgorithmError extends CryptographyError {
+  constructor (algo: string) {
+    super(algo + ' is not available')
+    this.name = 'NoSuchAlgorithmError'
+  }
+}
+
+export class UnsupportedKdfError extends CryptographyError {
+  constructor () {
+    super('Unsupported kdf type')
+    this.name = 'UnsupportedKdfError'
+  }
+}
+
+export class InvalidPasswordError extends CryptographyError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'InvalidPasswordError'
+  }
+}
 /* keypair an account related errors */
 export class InvalidKeypairError extends IllegalArgumentError {
   constructor (msg: string) {

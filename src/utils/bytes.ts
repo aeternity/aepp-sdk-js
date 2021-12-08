@@ -15,6 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 import BigNumber from 'bignumber.js'
+import { NoSerializerFoundError, TypeError } from './error'
 import { isBase64, isHex } from './string'
 
 /**
@@ -29,7 +30,7 @@ import { isBase64, isHex } from './string'
  * @return Buffer
  */
 export function bigNumberToByteArray (x: BigNumber): Buffer {
-  if (!x.isInteger()) throw new Error(`Unexpected not integer value: ${x.toFixed()}`)
+  if (!x.isInteger()) throw new TypeError(`Unexpected not integer value: ${x.toFixed()}`)
   let hexString = x.toString(16)
   if (hexString.length % 2 === 1) hexString = '0' + hexString
   return Buffer.from(hexString, 'hex')
@@ -54,7 +55,7 @@ export function toBytes (val?: null | string | number | BigNumber, big: boolean 
   if (typeof val === 'string') {
     return Buffer.from(val)
   }
-  throw new Error('Byte serialization not supported')
+  throw new NoSerializerFoundError()
 }
 
 /**

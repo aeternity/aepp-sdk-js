@@ -21,6 +21,7 @@ import BigNumber from 'bignumber.js'
 import '..'
 import { AE_AMOUNT_FORMATS, formatAmount, toAe, toAettos } from '../../src/utils/amount-formatter'
 import { parseBigNumber } from '../../src/utils/bignumber'
+import { InvalidDenominationError, IllegalArgumentError } from '../../src/utils/error'
 
 describe('Amount Formatter', function () {
   it('to aettos', async () => {
@@ -72,9 +73,9 @@ describe('Amount Formatter', function () {
   })
   it('Invalid value', () => {
     [
-      [true, [AE_AMOUNT_FORMATS.AE, AE_AMOUNT_FORMATS.AE], 'Value true is not type of number'],
-      [1, [AE_AMOUNT_FORMATS.AE, 'ASD'], 'Invalid target denomination: ASD'],
-      [1, ['ASD', AE_AMOUNT_FORMATS.AE], 'Invalid denomination: ASD']
+      [true, [AE_AMOUNT_FORMATS.AE, AE_AMOUNT_FORMATS.AE], 'Value true is not type of number', IllegalArgumentError],
+      [1, [AE_AMOUNT_FORMATS.AE, 'ASD'], 'Invalid target denomination: ASD', InvalidDenominationError],
+      [1, ['ASD', AE_AMOUNT_FORMATS.AE], 'Invalid denomination: ASD', InvalidDenominationError]
     ].forEach(([v, [dF, dT], error]: any[]) => {
       expect(() => formatAmount(v, { denomination: dF, targetDenomination: dT })).to.throw(error)
     })

@@ -23,6 +23,7 @@ import {
   getSaveHDWalletAccounts
 } from '../../src/utils/hd-wallet'
 import { encodeBase58Check } from '../../src/utils/crypto'
+import { InvalidDerivationPathError, InvalidMnemonicError } from '../../src/utils/error'
 
 describe('hd wallet', () => {
   const testMnemonic = 'eye quarter chapter suit cruel scrub verify stuff volume control learn dust'
@@ -178,10 +179,10 @@ describe('hd wallet', () => {
   })
 
   it('Try to get wallet from invalid mnemonic', () => {
-    expect(() => generateSaveHDWallet('asdasdasdasdas')).to.throw('Invalid mnemonic')
+    expect(() => generateSaveHDWallet('asdasdasdasdas')).to.throw(InvalidMnemonicError, 'Invalid mnemonic')
   })
 
   it('Derive child with invalid path', () => {
-    expect(() => derivePathFromSeed('asd')).to.throw('Invalid path')
+    expect(() => derivePathFromSeed('asd')).to.throw(InvalidDerivationPathError, 'Invalid path')
   })
 })

@@ -4,6 +4,7 @@ import { getSdk } from '.'
 import { generateKeyPair } from '../../src/utils/crypto'
 import MemoryAccount from '../../src/account/memory'
 import verifyTransaction from '../../src/tx/validator'
+import { IllegalArgumentError } from '../../src/utils/error'
 
 describe('Verify Transaction', function () {
   let sdk, node
@@ -15,7 +16,7 @@ describe('Verify Transaction', function () {
   })
 
   it('validates params in buildRawTx', async () => {
-    return expect(sdk.spendTx({})).to.be.rejectedWith('Value undefined is not type of number')
+    return expect(sdk.spendTx({})).to.be.rejectedWith(IllegalArgumentError, 'Value undefined is not type of number')
     // TODO: should be /^Transaction build error./ instead
   })
 
