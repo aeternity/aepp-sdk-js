@@ -25,7 +25,7 @@ import SwaggerClient from 'swagger-client'
 import fetch from 'cross-fetch'
 import JsonBig from './json-big'
 import { snakizeKeys, pascalizeKeys, mapObject, filterObject } from './other'
-import { SwaggerError } from './error'
+import { SwaggerError } from './errors'
 
 let warnedAboutInternalApiUsage = false
 

@@ -18,7 +18,7 @@ import {
   IllegalArgumentError,
   TypeError,
   UnknownRpcClientError
-} from '../../error'
+} from '../../errors'
 
 const NOTIFICATIONS = {
   [METHODS.closeConnection]: (instance, { client }) =>

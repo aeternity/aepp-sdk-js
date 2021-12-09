@@ -32,7 +32,7 @@ import {
   RpcConnectionError,
   AlreadyConnectedError,
   NoWalletConnectedError
-} from '../../error'
+} from '../../errors'
 
 /**
  * Disconnect

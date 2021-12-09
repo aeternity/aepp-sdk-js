@@ -15,7 +15,7 @@ import {
   TypeError,
   DuplicateCallbackError,
   MissingCallbackError
-} from '../../error'
+} from '../../errors'
 
 /**
  * Contain functionality for using RPC conection
@@ -200,7 +200,9 @@ export default stampit({
      */
     request (name, params) {
       const msgId = this.sendMessage(message(name, params))
-      if (Object.prototype.hasOwnProperty.call(this.callbacks, msgId)) throw new DuplicateCallbackError()
+      if (Object.prototype.hasOwnProperty.call(this.callbacks, msgId)) {
+        throw new DuplicateCallbackError()
+      }
       return new Promise((resolve, reject) => {
         this.callbacks[msgId] = { resolve, reject }
       })

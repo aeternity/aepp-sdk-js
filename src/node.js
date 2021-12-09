@@ -25,7 +25,7 @@
 import AsyncInit from './utils/async-init'
 import genSwaggerClient from './utils/swagger'
 import semverSatisfies from './utils/semver-satisfies'
-import { MissingParamError, UnsupportedNodeError } from './utils/error'
+import { MissingParamError, UnsupportedNodeError } from './utils/errors'
 
 /**
  * Obtain networkId from account or node

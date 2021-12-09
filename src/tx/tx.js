@@ -34,7 +34,7 @@ import {
   UnsupportedVMversionError,
   UnsupportedProtocolError,
   UnknownTxError
-} from '../utils/error'
+} from '../utils/errors'
 
 async function spendTx ({ senderId, recipientId, amount, payload = '' }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce

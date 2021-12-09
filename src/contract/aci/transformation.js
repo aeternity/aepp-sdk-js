@@ -3,8 +3,8 @@ import { decode } from '../../tx/builder/helpers'
 import { parseBigNumber } from '../../utils/bignumber'
 import { addressFromDecimal, hash } from '../../utils/crypto'
 import {
-  InvalidSchemaError
-} from '../../utils/error'
+  InvalidEventSchemaError
+} from '../../utils/errors'
 
 export const SOPHIA_TYPES = [
   'int',
@@ -31,17 +31,17 @@ export const SOPHIA_TYPES = [
  * @return {Object}
  */
 export const decodeEvents = (events, eventAci) => events.map((event) => {
-  if (!eventAci?.variant) throw new Error('Event ACI should have a variant key')
+  if (!eventAci?.variant) throw new InvalidEventSchemaError('Event ACI should have a variant key')
   const [nameHash, ...params] = event.topics
   const [name, types] = eventAci.variant
     .map(s => Object.entries(s)[0])
     .find(([name]) => hash(name).equals(toBytes(nameHash, true))) || []
   if (!name) return null
   const stringCount = types.filter(t => t === SOPHIA_TYPES.string).length
-  if (stringCount > 1) throw new InvalidSchemaError(`Event schema contains more than one string: ${types}`)
+  if (stringCount > 1) throw new InvalidEventSchemaError(`Event schema contains more than one string: ${types}`)
   const topicsCount = types.length - stringCount
   if (topicsCount !== params.length) {
-    throw new InvalidSchemaError(`Schema defines ${topicsCount} types, but ${params.length} topics present`)
+    throw new InvalidEventSchemaError(`Schema defines ${topicsCount} types, but ${params.length} topics present`)
   }
 
   return {

@@ -26,7 +26,7 @@ import {
   TypeError,
   UnknownTxError,
   UnsignedTxError
-} from '../../src/utils/error'
+} from '../../src/utils/errors'
 
 describe('TxObject', () => {
   const keyPair = generateKeyPair()

@@ -21,7 +21,7 @@ import { expect } from 'chai'
 import BigNumber from 'bignumber.js'
 import { toBytes, bigNumberToByteArray } from '../../src/utils/bytes'
 import { isBase64, snakeToPascal, pascalToSnake } from '../../src/utils/string'
-import { TypeError } from '../../src/utils/error'
+import { TypeError } from '../../src/utils/errors'
 
 describe('Bytes', function () {
   const bytes = Buffer.from('hello')

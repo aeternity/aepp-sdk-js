@@ -20,7 +20,7 @@ import { describe, it } from 'mocha'
 import { expect } from 'chai'
 import MemoryAccount from '../../src/account/memory'
 import { generateKeyPair } from '../../src/utils/crypto'
-import { InvalidKeypairError } from '../../src/utils/error'
+import { InvalidKeypairError } from '../../src/utils/errors'
 
 const testAcc = generateKeyPair()
 

@@ -25,7 +25,7 @@
  * from '@aeternity/aepp-sdk/es/utils/wallet-communication/content-script-bridge
  */
 import stampit from '@stamp/it'
-import { UnsupportedPlatformError, MissingParamError } from '../error'
+import { UnsupportedPlatformError, MissingParamError } from '../errors'
 
 /**
  * Start message proxy

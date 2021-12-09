@@ -30,7 +30,7 @@ import {
   IllegalArgumentError,
   InsufficientBalanceError,
   ChannelConnectionError
-} from '../../src/utils/error'
+} from '../../src/utils/errors'
 
 const wsUrl = process.env.TEST_WS_URL || 'ws://localhost:3014/channel'
 

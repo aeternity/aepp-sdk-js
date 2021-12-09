@@ -35,7 +35,7 @@ import { CLIENT_TTL, NAME_FEE, NAME_TTL } from '../tx/builder/schema'
 import {
   InsufficientNameFeeError,
   IllegalArgumentError
-} from '../utils/error'
+} from '../utils/errors'
 
 /**
  * Revoke a name
@@ -203,7 +203,7 @@ async function query (name, opt = {}) {
     },
     revoke: async (options = {}) => this.aensRevoke(name, { ...opt, ...options }),
     extendTtl: async (nameTtl = NAME_TTL, options = {}) => {
-      if (!nameTtl || typeof nameTtl !== 'number' || nameTtl > NAME_TTL) { throw new IllegalArgumentError('Ttl must be an number and less then 180000 blocks') }
+      if (!nameTtl || typeof nameTtl !== 'number' || nameTtl > NAME_TTL) throw new IllegalArgumentError('Ttl must be an number and less then 180000 blocks')
 
       return {
         ...await this.aensUpdate(name, {}, { ...opt, ...options, nameTtl, extendPointers: true }),

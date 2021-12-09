@@ -9,7 +9,7 @@ import {
   NoSuchAlgorithmError,
   UnsupportedKdfError,
   InvalidPasswordError
-} from './error'
+} from './errors'
 
 const _sodium = require('libsodium-wrappers-sumo')
 
@@ -116,7 +116,9 @@ async function deriveKey (password, nonce, options = {
     throw new IllegalArgumentError('Must provide password and nonce to derive a key')
   }
 
-  if (!Object.prototype.hasOwnProperty.call(DERIVED_KEY_FUNCTIONS, options.kdf)) throw new UnsupportedKdfError()
+  if (!Object.prototype.hasOwnProperty.call(DERIVED_KEY_FUNCTIONS, options.kdf)) {
+    throw new UnsupportedKdfError()
+  }
 
   return DERIVED_KEY_FUNCTIONS[options.kdf](password, nonce, options)
 }

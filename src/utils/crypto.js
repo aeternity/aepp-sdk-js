@@ -29,7 +29,7 @@ import shajs from 'sha.js'
 import { str2buf, toBytes } from './bytes'
 import { decode } from '../tx/builder/helpers'
 import { hash } from './crypto-ts'
-import { InvalidChecksumError, MessageLimitError } from './error'
+import { InvalidChecksumError, MessageLimitError } from './errors'
 
 export * from './crypto-ts'
 

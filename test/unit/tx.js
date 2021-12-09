@@ -37,7 +37,7 @@ import { NAME_BID_RANGES } from '../../src/tx/builder/schema'
 import {
   InvalidNameError,
   SchemaNotFoundError
-} from '../../src/utils/error'
+} from '../../src/utils/errors'
 
 describe('Tx', function () {
   it('reproducible commitment hashes can be generated', async () => {

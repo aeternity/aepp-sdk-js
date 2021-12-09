@@ -28,7 +28,7 @@ import AccountBase, { isAccountBase } from './base'
 import {
   UnavailableAccountError,
   TypeError
-} from '../utils/error'
+} from '../utils/errors'
 
 /**
  * AccountMultiple stamp

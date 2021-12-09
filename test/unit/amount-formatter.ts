@@ -21,7 +21,7 @@ import BigNumber from 'bignumber.js'
 import '..'
 import { AE_AMOUNT_FORMATS, formatAmount, toAe, toAettos } from '../../src/utils/amount-formatter'
 import { parseBigNumber } from '../../src/utils/bignumber'
-import { InvalidDenominationError, IllegalArgumentError } from '../../src/utils/error'
+import { InvalidDenominationError, IllegalArgumentError } from '../../src/utils/errors'
 
 describe('Amount Formatter', function () {
   it('to aettos', async () => {

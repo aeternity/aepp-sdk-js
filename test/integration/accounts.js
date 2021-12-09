@@ -28,7 +28,7 @@ import {
   IllegalArgumentError,
   InvalidKeypairError,
   InvalidTxParamsError
-} from '../../src/utils/error'
+} from '../../src/utils/errors'
 
 describe('Accounts', function () {
   let sdk, openClient

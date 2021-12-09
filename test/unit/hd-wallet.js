@@ -23,7 +23,7 @@ import {
   getSaveHDWalletAccounts
 } from '../../src/utils/hd-wallet'
 import { encodeBase58Check } from '../../src/utils/crypto'
-import { InvalidDerivationPathError, InvalidMnemonicError } from '../../src/utils/error'
+import { InvalidDerivationPathError, InvalidMnemonicError } from '../../src/utils/errors'
 
 describe('hd wallet', () => {
   const testMnemonic = 'eye quarter chapter suit cruel scrub verify stuff volume control learn dust'

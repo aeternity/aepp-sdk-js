@@ -31,7 +31,7 @@ import {
   TxTimedOutError,
   TxNotInChainError,
   IllegalArgumentError
-} from '../utils/error'
+} from '../utils/errors'
 
 /**
  * ChainNode module

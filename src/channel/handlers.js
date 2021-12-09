@@ -33,7 +33,7 @@ import {
   InsufficientBalanceError,
   ChannelConnectionError,
   UnexpectedChannelMessageError
-} from '../utils/error'
+} from '../utils/errors'
 
 function encodeRlpTx (rlpBinary) {
   return `tx_${encodeBase64Check(rlpBinary)}`

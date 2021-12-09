@@ -41,8 +41,9 @@ import {
   NotPayableFunctionError,
   TypeError,
   NodeInvocationError,
-  IllegalArgumentError
-} from '../../utils/error'
+  IllegalArgumentError,
+  NoSuchContractFunctionError
+} from '../../utils/errors'
 
 /**
  * Get function schema from contract ACI object
@@ -55,7 +56,7 @@ function getFunctionACI (aci, name, external) {
   const fn = aci.functions.find(f => f.name === name)
   if (fn) return fn
   if (name === 'init') return { payable: false }
-  throw new Error(`Function ${name} doesn't exist in contract`)
+  throw new NoSuchContractFunctionError(`Function ${name} doesn't exist in contract`)
 }
 
 /**
@@ -225,7 +226,7 @@ export default async function getContractInstance ({
     const fnACI = getFunctionACI(instance.aci, fn, instance.externalAci)
     const contractId = instance.deployInfo.address
 
-    if (!fn) throw new MissingFunctionNameError('Function name is required')
+    if (!fn) throw new MissingFunctionNameError()
     if (fn === 'init' && !opt.callStatic) throw new InvalidMethodInvocationError('"init" can be called only via dryRun')
     if (!contractId && fn !== 'init') throw new InvalidMethodInvocationError('You need to deploy contract before calling!')
     if (opt.amount > 0 && fnACI.payable === false) throw new NotPayableFunctionError(`You try to pay "${opt.amount}" to function "${fn}" which is not payable. Only payable function can accept coins`)

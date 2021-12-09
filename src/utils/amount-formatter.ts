@@ -22,7 +22,7 @@
  */
 import BigNumber from 'bignumber.js'
 import { isBigNumber } from './bignumber'
-import { IllegalArgumentError, InvalidDenominationError } from './error'
+import { IllegalArgumentError, InvalidDenominationError } from './errors'
 
 /**
  * AE amount formats

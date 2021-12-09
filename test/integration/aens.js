@@ -21,7 +21,7 @@ import { getSdk } from './'
 import { randomName } from '../utils'
 import { generateKeyPair } from '../../src/utils/crypto'
 import { buildContractId, computeAuctionEndBlock, computeBidFee } from '../../src/tx/builder/helpers'
-import { AensPointerContextError } from '../../src/utils/error'
+import { AensPointerContextError } from '../../src/utils/errors'
 
 describe('Aens', function () {
   let sdk

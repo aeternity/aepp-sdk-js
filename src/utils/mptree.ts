@@ -23,7 +23,7 @@ import {
   MissingNodeInTreeError,
   UnknownPathNibbleError,
   UnknownNodeLengthError
-} from './error'
+} from './errors'
 
 enum NodeType {
   Branch,

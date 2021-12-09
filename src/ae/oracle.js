@@ -32,7 +32,7 @@ import { pause } from '../utils/other'
 import { oracleQueryId, decode } from '../tx/builder/helpers'
 import { unpackTx } from '../tx/builder'
 import { ORACLE_TTL, QUERY_FEE, QUERY_TTL, RESPONSE_TTL } from '../tx/builder/schema'
-import { RequestTimedOutError } from '../utils/error'
+import { RequestTimedOutError } from '../utils/errors'
 
 /**
  * Constructor for Oracle Object (helper object for using Oracle)

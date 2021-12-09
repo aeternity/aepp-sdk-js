@@ -2,7 +2,7 @@
  * Browser helper functions
  */
 import { isAccountBase } from '../../account/base'
-import { TypeError, NoBrowserFoundError } from '../error'
+import { TypeError, NoBrowserFoundError } from '../errors'
 
 export const getBrowserAPI = (force = false) => {
   const { chrome, browser } = window

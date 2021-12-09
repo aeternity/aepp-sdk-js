@@ -20,7 +20,7 @@ import { EventEmitter } from 'events'
 import JsonBig from '../utils/json-big'
 import { pascalToSnake } from '../utils/string'
 import { awaitingConnection, awaitingReconnection, channelOpen } from './handlers'
-import { ChannelCallError, ChannelPingTimedOutError, UnknownChannelStateError } from '../utils/error'
+import { ChannelCallError, ChannelPingTimedOutError, UnknownChannelStateError } from '../utils/errors'
 
 // Send ping message every 10 seconds
 const PING_TIMEOUT_MS = 10000

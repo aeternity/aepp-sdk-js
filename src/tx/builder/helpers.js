@@ -27,10 +27,10 @@ import {
   TagNotFoundError,
   PrefixNotFoundError,
   InvalidNameError,
-  InvalidHashError,
-  UnknownHashClassError,
-  IllegalBidFeeError
-} from '../../utils/error'
+  IllegalBidFeeError,
+  NoDefaultAensPointerError,
+  IllegalArgumentError
+} from '../../utils/errors'
 
 /**
  * JavaScript-based Transaction builder helper function's
@@ -157,7 +157,7 @@ export function encode (data, type) {
  */
 export function writeId (hashId) {
   if (typeof hashId !== 'string') {
-    throw new Error(`Address should be a string, got ${hashId} instead`)
+    throw new IllegalArgumentError(`Address should be a string, got ${hashId} instead`)
   }
   const prefix = hashId.slice(0, 2)
   const idTag = PREFIX_ID_TAG[prefix]
@@ -273,7 +273,7 @@ export function getDefaultPointerKey (identifier) {
   decode(identifier)
   const prefix = identifier.substr(0, 2)
   return POINTER_KEY_BY_PREFIX[prefix] ||
-    (() => { throw new Error(`Default AENS pointer key is not defined for ${prefix} prefix`) })()
+    (() => { throw new NoDefaultAensPointerError(prefix) })()
 }
 
 /**

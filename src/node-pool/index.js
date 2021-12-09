@@ -6,7 +6,7 @@
  */
 import stampit from '@stamp/it'
 import { getNetworkId } from '../node'
-import { DisconnectedError, DuplicateNodeError, NodeNotFoundError, TypeError } from '../utils/error'
+import { DisconnectedError, DuplicateNodeError, NodeNotFoundError, TypeError } from '../utils/errors'
 
 /**
  * Node Pool Stamp

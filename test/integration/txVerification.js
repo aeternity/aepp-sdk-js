@@ -4,7 +4,7 @@ import { getSdk } from '.'
 import { generateKeyPair } from '../../src/utils/crypto'
 import MemoryAccount from '../../src/account/memory'
 import verifyTransaction from '../../src/tx/validator'
-import { IllegalArgumentError } from '../../src/utils/error'
+import { IllegalArgumentError } from '../../src/utils/errors'
 
 describe('Verify Transaction', function () {
   let sdk, node

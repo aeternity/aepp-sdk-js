@@ -32,7 +32,7 @@ import {
   UnavailableCompilerError,
   MissingParamError,
   UnsupportedCompilerError
-} from '../utils/error'
+} from '../utils/errors'
 
 /**
  * Contract Compiler Stamp
@@ -82,7 +82,9 @@ export default AsyncInit.compose(ContractBase, {
 
       if (ignoreVersion) return
       if (!semverSatisfies(this.compilerVersion, COMPILER_GE_VERSION, COMPILER_LT_VERSION)) {
-        throw new UnsupportedCompilerError(this.compilerVersion, COMPILER_GE_VERSION, COMPILER_LT_VERSION)
+        throw new UnsupportedCompilerError(
+          this.compilerVersion, COMPILER_GE_VERSION, COMPILER_LT_VERSION
+        )
       }
     },
     _ensureCompilerReady () {

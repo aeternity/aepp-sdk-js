@@ -53,6 +53,7 @@ export * as AeppWalletSchema from './utils/aepp-wallet-communication/schema'
 export { default as WalletDetector } from './utils/aepp-wallet-communication/wallet-detector'
 export { default as BrowserRuntimeConnection } from './utils/aepp-wallet-communication/connection/browser-runtime'
 export { default as BrowserWindowMessageConnection } from './utils/aepp-wallet-communication/connection/browser-window-message'
+export * from './utils/errors'
 
 export const getDefaultPointerKey = TxBuilderHelper.getDefaultPointerKey
 

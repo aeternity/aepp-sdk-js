@@ -32,7 +32,7 @@ import {
   UnAuthorizedAccountError,
   UnsubscribedAccountError,
   UnknownRpcClientError
-} from '../../src/utils/error'
+} from '../../src/utils/errors'
 
 describe('Aepp<->Wallet', function () {
   this.timeout(6000)

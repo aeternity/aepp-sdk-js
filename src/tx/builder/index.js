@@ -28,7 +28,7 @@ import {
 } from './helpers'
 import { toBytes } from '../../utils/bytes'
 import MPTree from '../../utils/mptree'
-import { InvalidTxParamsError, SchemaNotFoundError } from '../../utils/error'
+import { InvalidTxParamsError, SchemaNotFoundError } from '../../utils/errors'
 
 /**
  * JavaScript-based Transaction builder

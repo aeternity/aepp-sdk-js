@@ -8,7 +8,7 @@ import {
   NotHardenedSegmentError,
   UnsupportedChildIndexError,
   InvalidMnemonicError
-} from './error'
+} from './errors'
 
 const ED25519_CURVE = Buffer.from('ed25519 seed')
 const HARDENED_OFFSET = 0x80000000

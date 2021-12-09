@@ -15,7 +15,7 @@ import {
   UnknownTxError,
   InvalidSignatureError,
   UnsignedTxError
-} from '../utils/error'
+} from '../utils/errors'
 
 /**
  * Build transaction from object

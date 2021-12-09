@@ -26,7 +26,7 @@ import {
   MissingContractAddressError,
   MissingContractDefError,
   NotPayableFunctionError
-} from '../../src/utils/error'
+} from '../../src/utils/errors'
 import { getSdk } from './'
 
 const identityContractSource = `

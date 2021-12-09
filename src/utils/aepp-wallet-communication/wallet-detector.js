@@ -25,7 +25,7 @@
 import stampit from '@stamp/it'
 import BrowserWindowMessageConnection from './connection/browser-window-message'
 import { MESSAGE_DIRECTION, METHODS } from './schema'
-import { UnsupportedPlatformError } from '../error'
+import { UnsupportedPlatformError } from '../errors'
 
 /**
  * WalletDetector stamp

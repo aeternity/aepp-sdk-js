@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { MAX_AUTH_FUN_GAS } from '../../tx/builder/schema'
-import { InvalidAuthDataError } from '../../utils/error'
+import { InvalidAuthDataError } from '../../utils/errors'
 
 export const prepareGaParams = (ins) => async (authData, authFnName) => {
   if (typeof authData !== 'object') throw new InvalidAuthDataError('AuthData must be an object')

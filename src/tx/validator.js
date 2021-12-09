@@ -4,7 +4,7 @@ import { encode, decode } from './builder/helpers'
 import BigNumber from 'bignumber.js'
 import { MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE } from './builder/schema'
 import { calculateFee, unpackTx } from './builder'
-import { UnsupportedProtocolError } from '../utils/error'
+import { UnsupportedProtocolError } from '../utils/errors'
 
 /**
  * Transaction validator

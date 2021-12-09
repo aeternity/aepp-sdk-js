@@ -20,7 +20,7 @@ import { describe, it } from 'mocha'
 import { expect } from 'chai'
 import { dump, recover, getAddressFromPriv, validateKeyObj } from '../../src/utils/keystore'
 import { generateKeyPair } from '../../src/utils/crypto'
-import { InvalidKeyError, InvalidPasswordError } from '../../src/utils/error'
+import { InvalidKeyError, InvalidPasswordError } from '../../src/utils/errors'
 
 const invalidKeystore = {
   name: 'test',

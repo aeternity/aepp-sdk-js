@@ -22,7 +22,7 @@ import { messageToHash, salt } from '../../src/utils/crypto'
 import { randomName } from '../utils'
 import { BaseAe, getSdk, publicKey } from './'
 import { Crypto, MemoryAccount } from '../../src'
-import { NodeInvocationError } from '../../src/utils/error'
+import { NodeInvocationError } from '../../src/utils/errors'
 
 const identityContract = `
 contract Identity =

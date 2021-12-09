@@ -27,6 +27,7 @@ import { TX_TYPE } from '../../tx/builder/schema'
 import { buildTx, unpackTx } from '../../tx/builder'
 import { prepareGaParams } from './helpers'
 import { hash } from '../../utils/crypto'
+import { IllegalArgumentError, MissingParamError } from '../../utils/errors'
 
 /**
  * GeneralizeAccount Stamp
@@ -85,8 +86,7 @@ async function isGA (address) {
 async function createGeneralizeAccount (authFnName, source, args = [], options = {}) {
   const opt = { ...this.Ae.defaults, ...options }
   const ownerId = await this.address(opt)
-
-  if (await this.isGA(ownerId)) throw new Error(`Account ${ownerId} is already GA`)
+  if (await this.isGA(ownerId)) throw new IllegalArgumentError(`Account ${ownerId} is already GA`)
 
   const { tx, contractId } = await this.gaAttachTx({
     ...opt,
@@ -119,7 +119,7 @@ const wrapInEmptySignedTx = (tx) => buildTx({ encodedTx: tx, signatures: [] }, T
  * @return {String}
  */
 async function createMetaTx (rawTransaction, authData, authFnName, options = {}) {
-  if (!authData) throw new Error('authData is required')
+  if (!authData) throw new MissingParamError('authData is required')
   // Check if authData is callData or if it's an object prepare a callData from source and args
   const { authCallData, gas } = await prepareGaParams(this)(authData, authFnName)
   const opt = { ...this.Ae.defaults, ...options }

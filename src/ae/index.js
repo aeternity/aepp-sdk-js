@@ -29,7 +29,7 @@ import AccountBase from '../account/base'
 import TxBuilder from '../tx/builder'
 import BigNumber from 'bignumber.js'
 import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter'
-import { IllegalArgumentError } from '../utils/error'
+import { IllegalArgumentError } from '../utils/errors'
 
 /**
  * Sign and post a transaction to the chain

@@ -35,7 +35,7 @@ import {
   AlreadyConnectedError,
   NoWalletConnectedError,
   MessageDirectionError
-} from '../../error'
+} from '../../errors'
 
 /**
  * Check if connected

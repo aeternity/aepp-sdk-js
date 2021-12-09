@@ -15,7 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 import BigNumber from 'bignumber.js'
-import { NoSerializerFoundError, TypeError } from './error'
+import { NoSerializerFoundError, TypeError } from './errors'
 import { isBase64, isHex } from './string'
 
 /**
