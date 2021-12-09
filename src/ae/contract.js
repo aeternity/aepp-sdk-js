@@ -129,15 +129,13 @@ async function contractDeploy (code, source, params, options) {
  * const compiled = await client.contractCompile(SOURCE_CODE)
  * {
  *   bytecode: CONTRACT_BYTE_CODE,
- *   deploy: (init = [], options = {}) => Deploy Contract,
- *   encodeCall: (fnName, args = []) => Prepare callData
+ *   deploy: (init = [], options = {}) => Deploy Contract
  * }
  */
 async function contractCompile (code, options = {}) {
   const opt = { ...this.Ae.defaults, ...options }
   const { bytecode } = await this.compilerApi.compileContract({ code, options })
   return Object.freeze({
-    encodeCall: (name, args) => this.contractEncodeCallDataAPI(code, name, args, opt),
     deploy: (init, options) => this.contractDeploy(bytecode, code, init, { ...opt, ...options }),
     deployStatic: (init, options) => this.contractCallStatic(code, null, 'init', init, {
       ...opt,

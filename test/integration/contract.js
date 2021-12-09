@@ -267,9 +267,6 @@ describe('Contract', function () {
       const deployedStatic = await compiled.deployStatic([])
       deployedStatic.result.should.have.property('gasUsed')
       deployedStatic.result.should.have.property('returnType')
-
-      const encodedCallData = await compiled.encodeCall('sumNumbers', ['1', '2'])
-      encodedCallData.should.satisfy(s => s.startsWith('cb_'))
     })
 
     it('Can call contract with external deps', async () => {
