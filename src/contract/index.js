@@ -43,8 +43,7 @@ const ContractBase = stampit(required({
     compileContractAPI: required,
     contractGetACI: required,
     setCompilerUrl: required,
-    getCompilerVersion: required,
-    contractDecodeCallResultAPI: required
+    getCompilerVersion: required
   }
 }))
 
@@ -74,24 +73,6 @@ const ContractBase = stampit(required({
  * @param {Object} [options={}]  Options
  * @param {Object} [options.filesystem]  Contract external namespaces map
  * @return {String} - Contract encoded data
- */
-
-/**
- * Decode contract call result data
- * @function contractDecodeCallResultAPI
- * @instance
- * @abstract
- * @category async
- * @rtype (
- *   source: String, fn: String, callValue: String, callResult: String, options: Array
- * ) => decodedResult: Promise[String]
- * @param {String} source - Contract source
- * @param {String} fn - Fn name
- * @param {String} callValue - result data (cb_das...)
- * @param {String} callResult - contract call result status('ok', 'revert', ...)
- * @param {Object} [options={}]  Options
- * @param {Object} [options.filesystem]  Contract external namespaces map
- * @return {String} - Decoded contract call result
  */
 
 /**

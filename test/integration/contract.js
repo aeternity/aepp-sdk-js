@@ -108,7 +108,6 @@ contract DelegateTest =
                               sign : signature,        // Signed oracle query id + contract address
                               r    : string) =
     Oracle.respond(o, q, signature = sign, r)`
-const encodedNumberSix = 'cb_DA6sWJo='
 const signSource = `
 contract Sign =
   entrypoint verify (msg: hash, pub: address, sig: signature): bool =
@@ -326,11 +325,6 @@ describe('Contract', function () {
       const isString = typeof callData === 'string'
       prefix.should.be.equal('cb')
       isString.should.be.equal(true)
-    })
-
-    it('decode call result', async () => {
-      return sdk.contractDecodeCallResultAPI(identityContract, 'getArg', encodedNumberSix, 'ok')
-        .should.eventually.become(6)
     })
 
     it('Decode call-data using source', async () => {

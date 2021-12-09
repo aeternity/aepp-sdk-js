@@ -145,32 +145,6 @@ export default AsyncInit.compose(ContractBase, {
         calldata,
         options
       })
-    },
-    /**
-     * Decode contract call result data
-     * @function
-     * @category async
-     * @param {String} source - source code
-     * @param {String } fn - function name
-     * @param {String} callValue - result call data
-     * @param {String} callResult - result status
-     * @param {Object} [options={}]  Options
-     * @param {Object} [options.filesystem={}] Contract external namespaces map
-     * @return {Promise<String>} Result object
-     * @example
-     * const decodedData = await sdk.contractDecodeCallResultAPI(
-     *   SourceCode ,'functionName', 'cb_asdasdasd...', 'ok|revert'
-     * )
-     */
-    contractDecodeCallResultAPI (source, fn, callValue, callResult, options) {
-      this._ensureCompilerReady()
-      return this.compilerApi.decodeCallResult({
-        function: fn,
-        source,
-        'call-result': callResult,
-        'call-value': callValue,
-        options
-      })
     }
   },
   props: {
