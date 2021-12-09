@@ -128,10 +128,6 @@ export default AsyncInit.compose(ContractBase, {
       this._ensureCompilerReady()
       const { bytecode } = await this.compilerApi.compileContract({ code, options })
       return bytecode
-    },
-    contractGetACI (code, options) {
-      this._ensureCompilerReady()
-      return this.compilerApi.generateACI({ code, options })
     }
   },
   props: {

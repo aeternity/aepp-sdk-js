@@ -309,13 +309,15 @@ describe('Contract', function () {
       )
     })
 
-    it('get contract ACI', async () => {
-      const aci = await sdk.contractGetACI(identityContract)
-      aci.should.have.property('interface')
+    it('generate contract ACI', async () => {
+      const aci = await sdk.compilerApi.generateACI({ code: identityContract })
+      expect(aci).to.have.property('encoded_aci')
+      expect(aci).to.have.property('external_encoded_aci')
+      expect(aci).to.have.property('interface')
     })
 
     it('throws clear exception if generating ACI with no arguments', async () => {
-      await expect(sdk.contractGetACI())
+      await expect(sdk.compilerApi.generateACI())
         .to.be.rejectedWith('validation_error in body ({"error":"missing_required_property","data":"code","path":[]})')
     })
 

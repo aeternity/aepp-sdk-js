@@ -91,7 +91,9 @@ export default async function getContractInstance ({
   validateBytecode,
   ...otherOptions
 } = {}) {
-  aci = aci || (source && await this.contractGetACI(source, { filesystem }))
+  if (!aci && source) {
+    aci = await this.compilerApi.generateACI({ code: source, options: { filesystem } })
+  }
   if (!aci) throw new MissingContractDefError()
   contractAddress = contractAddress && await this.resolveName(
     contractAddress, 'contract_pubkey', { resolveByNode: true }

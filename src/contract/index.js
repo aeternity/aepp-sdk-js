@@ -41,24 +41,10 @@ const ContractBase = stampit(required({
   methods: {
     contractEncodeCallDataAPI: required,
     compileContractAPI: required,
-    contractGetACI: required,
     setCompilerUrl: required,
     getCompilerVersion: required
   }
 }))
-
-/**
- * Get contract ACI
- * @function contractGetACI
- * @instance
- * @abstract
- * @category async
- * @rtype (source: String, options: Array) => aciObject: Promise[Object]
- * @param {String} source - Contract source code
- * @param {Object} [options={}]  Options
- * @param {Object} [options.filesystem]  Contract external namespaces map
- * @return {Object} - Contract aci object
- */
 
 /**
  * Encode contract data

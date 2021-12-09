@@ -126,7 +126,8 @@ describe('Contract instance', function () {
 
   before(async function () {
     sdk = await getSdk()
-    testContractAci = await sdk.contractGetACI(testContractSource, { filesystem })
+    testContractAci = await sdk.compilerApi
+      .generateACI({ code: testContractSource, options: { filesystem } })
     testContractBytecode = (await sdk.contractCompile(testContractSource, { filesystem })).bytecode
   })
 
@@ -230,7 +231,8 @@ describe('Contract instance', function () {
 
   it('rejects not matching bytecode with enabled validation', async () => expect(sdk.getContractInstance({
     bytecode: (await sdk.contractCompile(identityContractSource)).bytecode,
-    aci: await sdk.contractGetACI(identityContractSource, { filesystem }),
+    aci: await sdk.compilerApi
+      .generateACI({ code: identityContractSource, options: { filesystem } }),
     contractAddress: testContractAddress,
     validateBytecode: true
   })).to.be.rejectedWith(BytecodeMismatchError, 'Contract bytecode do not correspond to the bytecode deployed on the chain'))
