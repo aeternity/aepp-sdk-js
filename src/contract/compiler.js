@@ -99,10 +99,6 @@ export default AsyncInit.compose(ContractBase, {
     _ensureCompilerReady () {
       if (!this.compilerApi) throw new UnavailableCompilerError()
     },
-    getCompilerVersion () {
-      this._ensureCompilerReady()
-      return Promise.resolve(this.compilerVersion)
-    },
     /**
      * Encode call data for contract call
      * @function
