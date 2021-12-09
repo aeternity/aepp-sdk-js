@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2021 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -16,15 +16,13 @@
  */
 
 /**
- * ContractCompilerAPI module
+ * ContractCompilerHttp module
  *
- * This is the complement to {@link module:@aeternity/aepp-sdk/es/contract}.
  * @module @aeternity/aepp-sdk/es/contract/compiler
- * @export ContractCompilerAPI
- * @example import { ContractCompilerAPI } from '@aeternity/aepp-sdk'
+ * @export ContractCompilerHttp
+ * @example import { ContractCompilerHttp } from '@aeternity/aepp-sdk'
  */
 
-import ContractBase from './index'
 import semverSatisfies from '../utils/semver-satisfies'
 import AsyncInit from '../utils/async-init'
 import genSwaggerClient from '../utils/swagger'
@@ -41,9 +39,9 @@ import { mapObject } from '../utils/other'
  * @param {Object} [options={}] - Initializer object
  * @param {String} [options.compilerUrl] compilerUrl - Url for compiler API
  * @return {Object} Contract compiler instance
- * @example ContractCompilerAPI({ compilerUrl: 'COMPILER_URL' })
+ * @example ContractCompilerHttp({ compilerUrl: 'COMPILER_URL' })
  */
-export default AsyncInit.compose(ContractBase, {
+export default AsyncInit.compose({
   async init ({ compilerUrl, ignoreVersion }) {
     if (!compilerUrl) return
     await this.setCompilerUrl(compilerUrl, { ignoreVersion })
