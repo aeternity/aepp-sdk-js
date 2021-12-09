@@ -123,7 +123,7 @@ async function contractDeploy (code, source, params, options) {
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
- * @param {String} source Contract sourece code
+ * @param {String} code Contract source code
  * @param {Object} [options={}] Transaction options (fee, ttl, gas, amount, deposit)
  * @param {Object} [options.filesystem={}] Contract external namespaces map*
  * @return {Promise<Object>} Result object
@@ -135,13 +135,13 @@ async function contractDeploy (code, source, params, options) {
  *   encodeCall: (fnName, args = []) => Prepare callData
  * }
  */
-async function contractCompile (source, options = {}) {
+async function contractCompile (code, options = {}) {
   const opt = { ...this.Ae.defaults, ...options }
-  const bytecode = await this.compileContractAPI(source, options)
+  const { bytecode } = await this.compilerApi.compileContract({ code, options })
   return Object.freeze({
-    encodeCall: (name, args) => this.contractEncodeCallDataAPI(source, name, args, opt),
-    deploy: (init, options) => this.contractDeploy(bytecode, source, init, { ...opt, ...options }),
-    deployStatic: (init, options) => this.contractCallStatic(source, null, 'init', init, {
+    encodeCall: (name, args) => this.contractEncodeCallDataAPI(code, name, args, opt),
+    deploy: (init, options) => this.contractDeploy(bytecode, code, init, { ...opt, ...options }),
+    deployStatic: (init, options) => this.contractCallStatic(code, null, 'init', init, {
       ...opt,
       ...options,
       bytecode

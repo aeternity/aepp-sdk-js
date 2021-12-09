@@ -286,20 +286,19 @@ describe('Contract', function () {
     let bytecode
 
     it('compile', async () => {
-      bytecode = await sdk.compileContractAPI(identityContract)
-      const prefix = bytecode.slice(0, 2)
-      const isString = typeof bytecode === 'string'
-      prefix.should.be.equal('cb')
-      isString.should.be.equal(true)
+      bytecode = (await sdk.compilerApi.compileContract({ code: identityContract })).bytecode
+      expect(bytecode).to.be.a('string')
+      expect(bytecode.split('_')[0]).to.be.equal('cb')
     })
 
     it('throws clear exception if compile broken contract', async () => {
-      await expect(sdk.compileContractAPI(
-        'contract Foo =\n' +
-        '  entrypoint getArg(x : bar) = x\n' +
-        '  entrypoint getArg(x : int) = baz\n' +
-        '  entrypoint getArg1(x : int) = baz\n'
-      )).to.be.rejectedWith(
+      await expect(sdk.compilerApi.compileContract({
+        code:
+          'contract Foo =\n' +
+          '  entrypoint getArg(x : bar) = x\n' +
+          '  entrypoint getArg(x : int) = baz\n' +
+          '  entrypoint getArg1(x : int) = baz\n'
+      })).to.be.rejectedWith(
         'compile error:\n' +
         'type_error:3:3: Duplicate definitions of getArg at\n' +
         '  - line 2, column 3\n' +

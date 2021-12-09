@@ -123,11 +123,6 @@ export default AsyncInit.compose(ContractBase, {
         options
       })
       return calldata
-    },
-    async compileContractAPI (code, options) {
-      this._ensureCompilerReady()
-      const { bytecode } = await this.compilerApi.compileContract({ code, options })
-      return bytecode
     }
   },
   props: {
