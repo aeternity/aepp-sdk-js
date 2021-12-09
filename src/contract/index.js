@@ -76,23 +76,6 @@ const ContractBase = stampit(required({
  */
 
 /**
- * Decode call data by source
- * @function contractDecodeCallDataBySourceAPI
- * @instance
- * @abstract
- * @category async
- * @rtype (
- *   source: String, function: String, callData: String, options: Array
- * ) => decodedResult: Promise[String]
- * @param {String} source - contract source
- * @param {String} function - function name
- * @param {String} callData - Encoded contract call data
- * @param {Object} [options={}]  Options
- * @param {Object} [options.filesystem]  Contract external namespaces map
- * @return {String} - Decoded contract call data
- */
-
-/**
  * Decode call data by bytecode
  * @function contractDecodeCallDataByCodeAPI
  * @instance

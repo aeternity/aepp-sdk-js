@@ -136,15 +136,6 @@ export default AsyncInit.compose(ContractBase, {
     contractDecodeCallDataByCodeAPI (bytecode, calldata) {
       this._ensureCompilerReady()
       return this.compilerApi.decodeCalldataBytecode({ bytecode, calldata })
-    },
-    contractDecodeCallDataBySourceAPI (source, fn, calldata, options) {
-      this._ensureCompilerReady()
-      return this.compilerApi.decodeCalldataSource({
-        function: fn,
-        source,
-        calldata,
-        options
-      })
     }
   },
   props: {
