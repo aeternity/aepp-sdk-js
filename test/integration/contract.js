@@ -282,7 +282,6 @@ describe('Contract', function () {
   })
 
   describe('Sophia Compiler', function () {
-    let callData
     let bytecode
 
     it('compile', async () => {
@@ -318,14 +317,6 @@ describe('Contract', function () {
     it('throws clear exception if generating ACI with no arguments', async () => {
       await expect(sdk.compilerApi.generateACI())
         .to.be.rejectedWith('validation_error in body ({"error":"missing_required_property","data":"code","path":[]})')
-    })
-
-    it('encode call-data', async () => {
-      callData = await sdk.contractEncodeCallDataAPI(identityContract, 'init', [])
-      const prefix = callData.slice(0, 2)
-      const isString = typeof callData === 'string'
-      prefix.should.be.equal('cb')
-      isString.should.be.equal(true)
     })
 
     it('validate bytecode', async () => {

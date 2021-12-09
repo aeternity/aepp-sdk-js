@@ -28,11 +28,7 @@ import ContractBase from './index'
 import semverSatisfies from '../utils/semver-satisfies'
 import AsyncInit from '../utils/async-init'
 import genSwaggerClient from '../utils/swagger'
-import {
-  UnavailableCompilerError,
-  MissingParamError,
-  UnsupportedCompilerError
-} from '../utils/errors'
+import { MissingParamError, UnsupportedCompilerError } from '../utils/errors'
 import { mapObject } from '../utils/other'
 
 /**
@@ -95,30 +91,6 @@ export default AsyncInit.compose(ContractBase, {
           this.compilerVersion, COMPILER_GE_VERSION, COMPILER_LT_VERSION
         )
       }
-    },
-    _ensureCompilerReady () {
-      if (!this.compilerApi) throw new UnavailableCompilerError()
-    },
-    /**
-     * Encode call data for contract call
-     * @function
-     * @category async
-     * @param {String} source Contract source code
-     * @param {String} name Name of function to call
-     * @param {Array} args Argument's for call
-     * @param {Object} [options={}]  Options
-     * @param {Object} [options.filesystem={}] Contract external namespaces map
-     * @return {Promise<String>}
-     */
-    async contractEncodeCallDataAPI (source, name, args = [], options) {
-      this._ensureCompilerReady()
-      const { calldata } = await this.compilerApi.encodeCalldata({
-        source,
-        function: name,
-        arguments: args,
-        options
-      })
-      return calldata
     }
   },
   props: {

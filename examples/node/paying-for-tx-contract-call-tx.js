@@ -120,11 +120,11 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
   // `ContractCallTx` by invoking the generated contract method on the contract instance that you
   // typically use for contract calls.
   //
-  // Following 3 steps need to be done:
+  // Following 4 steps need to be done:
   //
-  //  1. Create calldata by calling the http compiler using `contractEncodeCallDataAPI` and
-  //     providing the contract source, the name of the `entrypoint` to call as well as the
-  //     required params.
+  //  1. Initialize a contract instance by the source code and the contract address.
+  //  1. Create calldata by calling the `encode` function providing the contract name, the name of
+  //     the `entrypoint` to call as well as the required params.
   //      - The `entrypoint` with the name `set_latest_caller` doesn't require any params so you
   //        can provide an empty array
   //  1. Create the `ContractCreateTx` by providing all required params.
@@ -134,7 +134,10 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
   //  1. Sign the transaction by providing `innerTx: true` as transaction option.
   //      - The transaction will be signed in a special way that is required for inner transactions.
   //
-  const calldata = await client.contractEncodeCallDataAPI(CONTRACT_SOURCE, 'set_last_caller', [])
+  const contract = await client.getContractInstance(
+    { source: CONTRACT_SOURCE, contractAddress: CONTRACT_ADDRESS }
+  )
+  const calldata = contract.calldata.encode('PayingForTxExample', 'set_last_caller', [])
   const contractCallTx = await client.contractCallTx({
     callerId: await newUserAccount.address(),
     contractId: CONTRACT_ADDRESS,
@@ -152,12 +155,8 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
   console.log(payForTx)
 
   // ## 7. Check that last caller is the new user
-  // Knowing the contract address and the source code allows you to
-  // initialize a contract instance and interact with the contract in a convenient way.
-  const contractInstance = await client.getContractInstance(
-    { source: CONTRACT_SOURCE, contractAddress: CONTRACT_ADDRESS }
-  )
-  const dryRunTx = await contractInstance.methods.get_last_caller()
+  // Contract instance allows interacting with the contract in a convenient way.
+  const dryRunTx = await contract.methods.get_last_caller()
   console.log(`New user: ${await newUserAccount.address()}`)
   console.log('Last caller:', dryRunTx.decodedResult)
 

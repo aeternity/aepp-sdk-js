@@ -11,8 +11,9 @@ export const prepareGaParams = (ins) => async (authData, authFnName) => {
     return { authCallData: authData.callData, gas }
   }
   if (!authData.source || !authData.args) throw new InvalidAuthDataError('Auth data must contain source code and arguments.')
+  const contract = await ins.getContractInstance({ source: authData.source })
   return {
-    authCallData: await ins.contractEncodeCallDataAPI(authData.source, authFnName, authData.args),
+    authCallData: contract.calldata.encode(contract.aci.name, authFnName, authData.args),
     gas
   }
 }

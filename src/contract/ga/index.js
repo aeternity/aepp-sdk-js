@@ -88,11 +88,13 @@ async function createGeneralizeAccount (authFnName, source, args = [], options =
   const ownerId = await this.address(opt)
   if (await this.isGA(ownerId)) throw new IllegalArgumentError(`Account ${ownerId} is already GA`)
 
+  const contract = await this.getContractInstance({ source })
+  await contract.compile()
   const { tx, contractId } = await this.gaAttachTx({
     ...opt,
     ownerId,
-    code: (await this.contractCompile(source)).bytecode,
-    callData: await this.contractEncodeCallDataAPI(source, 'init', args),
+    code: contract.bytecode,
+    callData: contract.calldata.encode(contract.aci.name, 'init', args),
     authFun: hash(authFnName)
   })
 

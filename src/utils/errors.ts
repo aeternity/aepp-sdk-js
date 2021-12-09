@@ -329,13 +329,6 @@ export class UnknownChannelStateError extends ChannelError {
 }
 
 /* compiler issued errors */
-export class UnavailableCompilerError extends CompilerError {
-  constructor () {
-    super('Compiler is not ready')
-    this.name = 'UnavailableCompilerError'
-  }
-}
-
 export class UnsupportedCompilerError extends CompilerError {
   constructor (compilerVersion: string, COMPILER_GE_VERSION: string, COMPILER_LT_VERSION: string) {
     super(`Unsupported compiler version ${compilerVersion}. ` +
