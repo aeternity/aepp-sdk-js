@@ -327,13 +327,6 @@ describe('Contract', function () {
       isString.should.be.equal(true)
     })
 
-    it('Decode call-data using bytecode', async () => {
-      const decodedCallData = await sdk.contractDecodeCallDataByCodeAPI(bytecode, callData)
-      decodedCallData.arguments.should.be.an('array')
-      decodedCallData.arguments.length.should.be.equal(0)
-      decodedCallData.function.should.be.equal('init')
-    })
-
     it('validate bytecode', async () => {
       expect(await sdk.compilerApi.validateByteCode({ bytecode, source: identityContract }))
         .to.be.eql({})

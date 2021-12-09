@@ -132,10 +132,6 @@ export default AsyncInit.compose(ContractBase, {
     contractGetACI (code, options) {
       this._ensureCompilerReady()
       return this.compilerApi.generateACI({ code, options })
-    },
-    contractDecodeCallDataByCodeAPI (bytecode, calldata) {
-      this._ensureCompilerReady()
-      return this.compilerApi.decodeCalldataBytecode({ bytecode, calldata })
     }
   },
   props: {

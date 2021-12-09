@@ -76,18 +76,6 @@ const ContractBase = stampit(required({
  */
 
 /**
- * Decode call data by bytecode
- * @function contractDecodeCallDataByCodeAPI
- * @instance
- * @abstract
- * @category async
- * @rtype (code: String, callData: String) => decodedResult: Promise[String]
- * @param {String} code - contract byte code
- * @param {String} callData - Encoded contract call data
- * @return {String} - Decoded contract call data
- */
-
-/**
  * Compile contract
  * @function compileContractAPI
  * @instance
