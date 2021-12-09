@@ -203,8 +203,8 @@ export default async function getContractInstance ({
       rawTx,
       txData,
       address: contractId,
-      call: (name, args, options) =>
-        this.contractCall(instance.source, contractId, name, args, { ...opt, ...options }),
+      call: (name, args = [], options) =>
+        instance.methods[name].send(...args, { ...opt, ...options }),
       callStatic: (name, args, options) =>
         this.contractCallStatic(instance.source, contractId, name, args, { ...opt, ...options }),
       createdAt: new Date()

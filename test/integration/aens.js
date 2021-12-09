@@ -62,17 +62,16 @@ describe('Aens', function () {
   })
 
   it('Call contract using AENS name', async () => {
-    const identityContract =
-      'contract Identity =\n' +
+    const source =
+      'contract Identity =' +
       '  entrypoint getArg(x : int) = x'
-    const bytecode = await sdk.contractCompile(identityContract)
-    const deployed = await bytecode.deploy([])
+    const contract = await sdk.getContractInstance({ source })
+    await contract.deploy([])
     const nameObject = await sdk.aensQuery(name)
-    await nameObject.update({ contract_pubkey: deployed.address })
-    const callRes = await sdk.contractCall(identityContract, name, 'getArg', [1])
-    const callResStatic = await sdk.contractCallStatic(identityContract, name, 'getArg', [1])
-    callResStatic.result.returnType.should.be.equal('ok')
-    callRes.hash.split('_')[0].should.be.equal('th')
+    await nameObject.update({ contract_pubkey: contract.deployInfo.address })
+
+    const contractByName = await sdk.getContractInstance({ source, contractAddress: name })
+    expect((await contractByName.methods.getArg(42)).decodedResult).to.be.equal(42n)
   })
 
   const address = generateKeyPair().publicKey

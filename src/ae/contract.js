@@ -60,32 +60,6 @@ async function contractCallStatic (source, contractAddress, name, args = [], opt
 }
 
 /**
- * Call contract function
- * @function
- * @alias module:@aeternity/aepp-sdk/es/ae/contract
- * @category async
- * @deprecated
- * @param {String} source Contract source code
- * @param {String} contractAddress Contract address or AENS name
- * @param {String} name Name of function to call
- * @param {Array} args Arguments array for call/deploy transaction
- * @param {Object} [options] Transaction options (fee, ttl, gas, amount, deposit)
- * @param {Object} [options.filesystem] Contract external namespaces map
- * @return {Promise<Object>} Result object
- * @example
- * const callResult = await client.contractCall(source, address, fnName, args = [], options)
- * {
- *   hash: TX_HASH,
- *   result: TX_DATA,
- *   decode: (type) => Decode call result
- * }
- */
-async function contractCall (source, contractAddress, name, args, options) {
-  const contract = await this.getContractInstance({ ...options, source, contractAddress })
-  return contract.call(name, args, options)
-}
-
-/**
  * Deploy contract to the node
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
@@ -245,7 +219,6 @@ export default Ae.compose(ContractCompilerHttp, {
     contractCompile,
     contractCallStatic,
     contractDeploy,
-    contractCall,
     // Delegation for contract
     delegateSignatureCommon,
     // AENS
