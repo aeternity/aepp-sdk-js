@@ -19,6 +19,7 @@ import { describe, it, before } from 'mocha'
 import { encodeBase58Check, encodeBase64Check, generateKeyPair, salt } from '../../src/utils/crypto'
 import { getSdk } from './index'
 import { commitmentHash, oracleQueryId } from '../../src/tx/builder/helpers'
+import { GAS_MAX, MIN_GAS_PRICE } from '../../src/tx/builder/schema'
 import { MemoryAccount } from '../../src'
 import { AE_AMOUNT_FORMATS } from '../../src/utils/amount-formatter'
 import { unpackTx } from '../../src/tx/builder'
@@ -52,8 +53,6 @@ contract Identity =
 `
 let contractId
 const deposit = 4
-const gasPrice = 1000000000
-const gas = 1600000 - 21000 // MAX GAS
 
 let _salt
 let commitmentId
@@ -143,8 +142,8 @@ describe('Native Transaction', function () {
       code: contract.bytecode,
       deposit,
       amount,
-      gas,
-      gasPrice,
+      gas: GAS_MAX,
+      gasPrice: MIN_GAS_PRICE,
       callData: contract.calldata.encode('Identity', 'init', [])
     }
     const txFromAPI = await sdk.contractCreateTx(params)
@@ -161,7 +160,14 @@ describe('Native Transaction', function () {
     const callData = contract.calldata.encode('Identity', 'getArg', [2])
     const owner = await sdk.address()
 
-    const params = { callerId: owner, contractId, amount, gas, gasPrice, callData }
+    const params = {
+      callerId: owner,
+      contractId,
+      amount,
+      gas: GAS_MAX,
+      gasPrice: MIN_GAS_PRICE,
+      callData
+    }
     const txFromAPI = await sdk.contractCallTx(params)
     const nativeTx = await sdkNative.contractCallTx(params)
     txFromAPI.should.be.equal(nativeTx)

@@ -75,6 +75,7 @@ contract StateContract =
 
   entrypoint init(value: string, key: int, testOption: option(string)) : state = { value = value, key = key, testOption = testOption }
   entrypoint retrieve() : string*int = (state.value, state.key)
+  stateful entrypoint setKey(key: number) = put(state{key = key})
 
   entrypoint remoteContract(a: RemoteI) : int = 1
   entrypoint remoteArgs(a: RemoteI.test_record) : RemoteI.test_type = 1
@@ -126,6 +127,10 @@ contract StateContract =
     Chain.event(AnotherEvent2(true, "This is not indexed", 1))
 
   entrypoint chainTtlFn(t: Chain.ttl): Chain.ttl = t
+
+  stateful entrypoint recursion(t: string): string =
+    put(state{value = t})
+    recursion(t)
 `
 const filesystem = {
   testLib: libContractSource
@@ -147,7 +152,12 @@ describe('Contract instance', function () {
   })
 
   it('generates by source code', async () => {
-    testContract = await sdk.getContractInstance({ source: testContractSource, filesystem, ttl: 0 })
+    sdk.Ae.defaults.testProperty = 'test'
+    testContract = await sdk.getContractInstance({
+      source: testContractSource, filesystem, ttl: 0, gas: 15000
+    })
+    delete sdk.Ae.defaults.testProperty
+    expect(testContract.options.testProperty).to.be.equal('test')
     testContract.should.have.property('source')
     testContract.should.have.property('bytecode')
     testContract.should.have.property('deployInfo')
@@ -173,7 +183,7 @@ describe('Contract instance', function () {
   it('deploys', async () => {
     const deployInfo = await testContract.deploy(['test', 1, 'hahahaha'], { amount: 42 })
     expect(deployInfo.address.startsWith('ct_')).to.equal(true)
-    expect(deployInfo.txData.tx.gas).to.be.equal(25000)
+    expect(deployInfo.txData.tx.gas).to.be.equal(15000)
     expect(deployInfo.txData.tx.amount).to.be.equal(42)
     expect(deployInfo.txData.gasUsed).to.be.equal(209)
     expect(testContract.bytecode.startsWith('cb_')).to.be.equal(true)
@@ -291,6 +301,50 @@ describe('Contract instance', function () {
     const [, onAccount] = sdk.addresses()
     const { result } = await testContract.methods.intFn(123, { onAccount })
     result.callerId.should.be.equal(onAccount)
+  })
+
+  describe('Gas', () => {
+    let contract
+
+    before(async () => {
+      contract = await sdk.getContractInstance({ source: testContractSource, filesystem })
+    })
+
+    it('estimates gas by default for contract deployments', async () => {
+      const { tx: { gas }, gasUsed } = (await contract.deploy(['test', 42])).txData
+      expect(gasUsed).to.be.equal(160)
+      expect(gas).to.be.equal(200)
+    })
+
+    it('overrides gas through getContractInstance options for contract deployments', async () => {
+      const ct = await sdk.getContractInstance({
+        source: testContractSource, filesystem, gas: 300
+      })
+      const { tx: { gas }, gasUsed } = (await ct.deploy(['test', 42])).txData
+      expect(gasUsed).to.be.equal(160)
+      expect(gas).to.be.equal(300)
+    })
+
+    it('estimates gas by default for contract calls', async () => {
+      const { tx: { gas }, gasUsed } = (await contract.methods.setKey(2)).txData
+      expect(gasUsed).to.be.equal(61)
+      expect(gas).to.be.equal(76)
+    })
+
+    it('overrides gas through options for contract calls', async () => {
+      const { tx: { gas }, gasUsed } = (await contract.methods.setKey(3, { gas: 100 })).txData
+      expect(gasUsed).to.be.equal(61)
+      expect(gas).to.be.equal(100)
+    })
+
+    it('runs out of gas with correct message', async () => {
+      await expect(contract.methods.setKey(42, { gas: 10, callStatic: true }))
+        .to.be.rejectedWith('Invocation failed: "Out of gas"')
+      await expect(contract.methods.setKey(42, { gas: 10 }))
+        .to.be.rejectedWith('Invocation failed')
+      await expect(contract.methods.recursion('infinite'))
+        .to.be.rejectedWith('Invocation failed: "Out of gas"')
+    })
   })
 
   describe('Events parsing', () => {

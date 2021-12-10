@@ -233,11 +233,10 @@ describe('Contract', function () {
 
   it('initializes contract state', async () => {
     const data = 'Hello World!'
-    return sdk.contractCompile(stateContract)
-      .then(bytecode => bytecode.deploy([data]))
-      .then(deployed => deployed.call('retrieve'))
-      .then(result => result.decodedResult)
-      .should.eventually.become('Hello World!')
+    const bytecode = await sdk.contractCompile(stateContract)
+    const deployed = await bytecode.deploy([data])
+    const result = await deployed.call('retrieve')
+    expect(result.decodedResult).to.be.equal('Hello World!')
   })
 
   describe('Namespaces', () => {

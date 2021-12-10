@@ -23,7 +23,7 @@
  * @example import { GeneralizeAccount } from '@aeternity/aepp-sdk'
  */
 import Contract from '../../ae/contract'
-import { TX_TYPE } from '../../tx/builder/schema'
+import { TX_TYPE, GAS_ABOVE_AVERAGE } from '../../tx/builder/schema'
 import { buildTx, unpackTx } from '../../tx/builder'
 import { prepareGaParams } from './helpers'
 import { hash } from '../../utils/crypto'
@@ -91,6 +91,7 @@ async function createGeneralizeAccount (authFnName, source, args = [], options =
   const contract = await this.getContractInstance({ source })
   await contract.compile()
   const { tx, contractId } = await this.gaAttachTx({
+    gas: GAS_ABOVE_AVERAGE,
     ...opt,
     ownerId,
     code: contract.bytecode,
