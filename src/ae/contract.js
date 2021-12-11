@@ -91,36 +91,6 @@ async function contractDeploy (code, source, params, options) {
 }
 
 /**
- * Compile contract source code
- * @function
- * @alias module:@aeternity/aepp-sdk/es/ae/contract
- * @category async
- * @param {String} code Contract source code
- * @param {Object} [options={}] Transaction options (fee, ttl, gas, amount, deposit)
- * @param {Object} [options.filesystem={}] Contract external namespaces map*
- * @return {Promise<Object>} Result object
- * @example
- * const compiled = await client.contractCompile(SOURCE_CODE)
- * {
- *   bytecode: CONTRACT_BYTE_CODE,
- *   deploy: (init = [], options = {}) => Deploy Contract
- * }
- */
-async function contractCompile (code, options = {}) {
-  const opt = { ...this.Ae.defaults, ...options }
-  const { bytecode } = await this.compilerApi.compileContract({ code, options })
-  return Object.freeze({
-    deploy: (init, options) => this.contractDeploy(bytecode, code, init, { ...opt, ...options }),
-    deployStatic: (init, options) => this.contractCallStatic(code, null, 'init', init, {
-      ...opt,
-      ...options,
-      bytecode
-    }),
-    bytecode
-  })
-}
-
-/**
  * Utility method to create a delegate signature for a contract
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
@@ -216,7 +186,6 @@ async function createOracleDelegationSignature ({ contractId, queryId }, opt = {
 export default Ae.compose(ContractCompilerHttp, {
   methods: {
     getContractInstance,
-    contractCompile,
     contractCallStatic,
     contractDeploy,
     // Delegation for contract

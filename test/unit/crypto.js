@@ -50,7 +50,7 @@ describe('crypto', () => {
     it('generates an account key pair', () => {
       const keyPair = Crypto.generateKeyPair()
       assert.ok(keyPair)
-      assert.isTrue(keyPair.publicKey.startsWith('ak_'))
+      expect(keyPair.publicKey).to.satisfy(b => b.startsWith('ak_'))
       assert.isAtLeast(keyPair.publicKey.length, 51)
       assert.isAtMost(keyPair.publicKey.length, 53)
     })

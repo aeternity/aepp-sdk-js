@@ -148,7 +148,9 @@ describe('Contract instance', function () {
     sdk = await getSdk()
     testContractAci = await sdk.compilerApi
       .generateACI({ code: testContractSource, options: { filesystem } })
-    testContractBytecode = (await sdk.contractCompile(testContractSource, { filesystem })).bytecode
+    testContractBytecode = (await sdk.compilerApi.compileContract({
+      code: testContractSource, options: { filesystem }
+    })).bytecode
   })
 
   it('generates by source code', async () => {
@@ -174,7 +176,7 @@ describe('Contract instance', function () {
 
   it('compiles', async () => {
     await testContract.compile()
-    expect(testContract.bytecode.startsWith('cb_')).to.be.equal(true)
+    expect(testContract.bytecode).to.satisfy(b => b.startsWith('cb_'))
   })
 
   it('fails on calling without deployment', () => expect(testContract.methods.intFn(2))
@@ -182,11 +184,11 @@ describe('Contract instance', function () {
 
   it('deploys', async () => {
     const deployInfo = await testContract.deploy(['test', 1, 'hahahaha'], { amount: 42 })
-    expect(deployInfo.address.startsWith('ct_')).to.equal(true)
+    expect(deployInfo.address).to.satisfy(b => b.startsWith('ct_'))
     expect(deployInfo.txData.tx.gas).to.be.equal(15000)
     expect(deployInfo.txData.tx.amount).to.be.equal(42)
     expect(deployInfo.txData.gasUsed).to.be.equal(209)
-    expect(testContract.bytecode.startsWith('cb_')).to.be.equal(true)
+    expect(testContract.bytecode).to.satisfy(b => b.startsWith('cb_'))
     testContractAddress = deployInfo.address
   })
 
@@ -253,7 +255,7 @@ describe('Contract instance', function () {
   }))
 
   it('rejects not matching bytecode with enabled validation', async () => expect(sdk.getContractInstance({
-    bytecode: (await sdk.contractCompile(identityContractSource)).bytecode,
+    bytecode: (await sdk.compilerApi.compileContract({ code: identityContractSource })).bytecode,
     aci: await sdk.compilerApi
       .generateACI({ code: identityContractSource, options: { filesystem } }),
     contractAddress: testContractAddress,
