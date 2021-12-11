@@ -169,14 +169,14 @@ describe('Contract', function () {
   })
 
   it('Call-Static deploy transaction', async () => {
-    const res = await sdk.contractCallStatic(identityContract, null, 'init', [], { bytecode })
+    const res = await contract.deploy([], { callStatic: true })
     res.result.should.have.property('gasUsed')
     res.result.should.have.property('returnType')
   })
 
   it('Call-Static deploy transaction on specific hash', async () => {
     const { hash } = await sdk.api.getTopHeader()
-    const res = await sdk.contractCallStatic(identityContract, null, 'init', [], { bytecode, top: hash })
+    const res = await contract.deploy([], { callStatic: true, top: hash })
     res.result.should.have.property('gasUsed')
     res.result.should.have.property('returnType')
   })
@@ -196,12 +196,15 @@ describe('Contract', function () {
   })
 
   it('Dry-run without accounts', async () => {
-    const client = await BaseAe()
-    client.removeAccount(publicKey)
-    client.addresses().length.should.be.equal(0)
-    const address = await client.address().catch(e => false)
+    const sdk = await BaseAe()
+    sdk.removeAccount(publicKey)
+    sdk.addresses().length.should.be.equal(0)
+    const address = await sdk.address().catch(e => false)
     address.should.be.equal(false)
-    const { result } = await client.contractCallStatic(identityContract, deployed.address, 'getArg', [42])
+    const contract = await sdk.getContractInstance({
+      source: identityContract, contractAddress: deployed.address
+    })
+    const { result } = await contract.methods.getArg(42)
     result.callerId.should.be.equal(DRY_RUN_ACCOUNT.pub)
   })
 

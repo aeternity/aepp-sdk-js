@@ -206,7 +206,7 @@ export default async function getContractInstance ({
       call: (name, args = [], options) =>
         instance.methods[name].send(...args, { ...opt, ...options }),
       callStatic: (name, args, options) =>
-        this.contractCallStatic(instance.source, contractId, name, args, { ...opt, ...options }),
+        instance.methods[name].get(...args, { ...opt, ...options }),
       createdAt: new Date()
     })
     return instance.deployInfo

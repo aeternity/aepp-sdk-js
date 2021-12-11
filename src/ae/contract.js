@@ -33,33 +33,6 @@ import { AMOUNT, DEPOSIT, MIN_GAS_PRICE } from '../tx/builder/schema'
 import { decode, produceNameId } from '../tx/builder/helpers'
 
 /**
- * Static contract call(using dry-run)
- * @function
- * @alias module:@aeternity/aepp-sdk/es/ae/contract
- * @category async
- * @deprecated
- * @param {String} source Contract source code
- * @param {String} contractAddress Contract address
- * @param {String} name Name of function to call
- * @param {Array} args Arguments array for call/deploy transaction
- * @param {Object} [options]
- * @param {Number|String} [options.top] Block height or hash on which you want to call contract
- * @param {String} [options.bytecode] Block hash on which you want to call contract
- * @param {Object} [options.filesystem] Contract external namespaces map
- * @return {Promise<Object>} Result object
- * @example
- * const callResult = await client.contractCallStatic(source, address, fnName, args)
- * {
- *   result: TX_DATA,
- *   decode: (type) => Decode call result
- * }
- */
-async function contractCallStatic (source, contractAddress, name, args = [], options) {
-  const contract = await this.getContractInstance({ ...options, source, contractAddress })
-  return contract.call(name, args, { ...options, callStatic: true })
-}
-
-/**
  * Utility method to create a delegate signature for a contract
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
@@ -155,7 +128,6 @@ async function createOracleDelegationSignature ({ contractId, queryId }, opt = {
 export default Ae.compose(ContractCompilerHttp, {
   methods: {
     getContractInstance,
-    contractCallStatic,
     // Delegation for contract
     delegateSignatureCommon,
     // AENS
