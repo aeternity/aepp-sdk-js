@@ -130,7 +130,7 @@ const tx = await contractInstance.methods.init(1)
 
 // after successful deployment you can look up the transaction and the deploy information
 console.log(tx)
-console.log(contractInstance.deployInfo) // { owner, transaction, address, createdAt, result, rawTx }
+console.log(contractInstance.deployInfo) // { owner, transaction, address, result, rawTx }
 ```
 
 Note:

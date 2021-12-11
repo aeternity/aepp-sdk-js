@@ -80,7 +80,7 @@ async function isGA (address) {
  * @param {Array} [args] - init arguments
  * @param {Object} [options] - Options
  * @return {Promise<Readonly<{
- *   result: *, owner: *, createdAt: Date, address, rawTx: *, transaction: *
+ *   result: *, owner: *, address, rawTx: *, transaction: *
  * }>>}
  */
 async function createGeneralizeAccount (authFnName, source, args = [], options = {}) {
