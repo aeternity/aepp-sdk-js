@@ -60,37 +60,6 @@ async function contractCallStatic (source, contractAddress, name, args = [], opt
 }
 
 /**
- * Deploy contract to the node
- * @function
- * @alias module:@aeternity/aepp-sdk/es/ae/contract
- * @category async
- * @deprecated
- * @param {String} code Compiled contract
- * @param {String} source Contract source code
- * @param {Array} params Arguments of contract constructor(init) function. Can be array of
- * arguments or callData string
- * @param {Object} [options] Transaction options (fee, ttl, gas, amount, deposit)
- * @param {Object} [options.filesystem={}] Contract external namespaces map*
- * @return {Promise<Object>} Result object
- * @example
- * const deployed = await client.contractDeploy(bytecode, source, init = [], options)
- * {
- *   owner: OWNER_PUB_KEY,
- *   transaction: TX_HASH,
- *   address: CONTRACT_ADDRESS,
- *   createdAt: Date,
- *   result: DEPLOY_TX_DATA,
- *   call: (fnName, args = [], options) => Call contract function,
- *   callStatic: (fnName, args = [], options) => Static all contract function
- * }
- */
-async function contractDeploy (code, source, params, options) {
-  const contract = await this.getContractInstance({ ...options, source })
-  contract.bytecode = code
-  return contract.deploy(params, options)
-}
-
-/**
  * Utility method to create a delegate signature for a contract
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
@@ -187,7 +156,6 @@ export default Ae.compose(ContractCompilerHttp, {
   methods: {
     getContractInstance,
     contractCallStatic,
-    contractDeploy,
     // Delegation for contract
     delegateSignatureCommon,
     // AENS

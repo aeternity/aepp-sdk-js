@@ -117,6 +117,7 @@ contract Sign =
 describe('Contract', function () {
   let sdk
   let bytecode
+  let contract
   let deployed
 
   before(async function () {
@@ -132,19 +133,18 @@ describe('Contract', function () {
   })
 
   it('deploys precompiled bytecode', async () => {
-    expect(await sdk.contractDeploy(bytecode, identityContract))
-      .to.have.property('address')
+    contract = await sdk.getContractInstance({ bytecode, source: identityContract })
+    expect(await contract.deploy()).to.have.property('address')
   })
 
   it('enforces zero deposit for contract deployment', async () => {
-    const { txData } = await sdk.contractDeploy(
-      bytecode, identityContract, [], { deposit: 10 }
-    )
-    return txData.tx.deposit.should.be.equal(0)
+    contract.deployInfo = {}
+    expect((await contract.deploy([], { deposit: 10 })).txData.tx.deposit)
+      .to.be.equal(0)
   })
 
   it('deploys static', async () => {
-    const res = await sdk.contractDeploy(bytecode, identityContract, { callStatic: true })
+    const res = await contract.deploy([], { callStatic: true })
     expect(res.result).to.have.property('gasUsed')
     expect(res.result).to.have.property('returnType')
   })
@@ -160,13 +160,12 @@ describe('Contract', function () {
   })
 
   it('Deploy and call contract on specific account', async () => {
+    contract.deployInfo = {}
     const onAccount = sdk.addresses()[1]
-    deployed = await sdk.contractDeploy(bytecode, identityContract, [], { onAccount })
+    deployed = await contract.deploy([], { onAccount })
     expect(deployed.result.callerId).to.be.equal(onAccount)
-    const callRes = await deployed.call('getArg', [42])
-    callRes.result.callerId.should.be.equal(onAccount)
-    const callStaticRes = await deployed.callStatic('getArg', [42])
-    callStaticRes.result.callerId.should.be.equal(onAccount)
+    expect((await deployed.call('getArg', [42])).result.callerId).to.be.equal(onAccount)
+    expect((await deployed.callStatic('getArg', [42])).result.callerId).to.be.equal(onAccount)
   })
 
   it('Call-Static deploy transaction', async () => {
@@ -207,7 +206,8 @@ describe('Contract', function () {
   })
 
   it('call contract/deploy with waitMined: false', async () => {
-    const deployed = await sdk.contractDeploy(bytecode, identityContract, [], { waitMined: false })
+    contract.deployInfo = {}
+    const deployed = await contract.deploy([], { waitMined: false })
     await sdk.poll(deployed.transaction)
     expect(deployed.result).to.be.equal(undefined)
     deployed.txData.should.not.be.equal(undefined)
