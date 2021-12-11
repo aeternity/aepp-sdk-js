@@ -202,11 +202,7 @@ export default async function getContractInstance ({
       transaction: hash,
       rawTx,
       txData,
-      address: contractId,
-      call: (name, args = [], options) =>
-        instance.methods[name].send(...args, { ...opt, ...options }),
-      callStatic: (name, args, options) =>
-        instance.methods[name].get(...args, { ...opt, ...options })
+      address: contractId
     })
     return instance.deployInfo
   }

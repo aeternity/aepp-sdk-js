@@ -162,10 +162,14 @@ describe('Contract', function () {
   it('Deploy and call contract on specific account', async () => {
     contract.deployInfo = {}
     const onAccount = sdk.addresses()[1]
-    deployed = await contract.deploy([], { onAccount })
+    contract.options.onAccount = onAccount
+    deployed = await contract.deploy()
     expect(deployed.result.callerId).to.be.equal(onAccount)
-    expect((await deployed.call('getArg', [42])).result.callerId).to.be.equal(onAccount)
-    expect((await deployed.callStatic('getArg', [42])).result.callerId).to.be.equal(onAccount)
+    expect((await contract.methods.getArg(42, { callStatic: true })).result.callerId)
+      .to.be.equal(onAccount)
+    expect((await contract.methods.getArg(42, { callStatic: false })).result.callerId)
+      .to.be.equal(onAccount)
+    delete contract.options.onAccount
   })
 
   it('Call-Static deploy transaction', async () => {
@@ -214,14 +218,14 @@ describe('Contract', function () {
     await sdk.poll(deployed.transaction)
     expect(deployed.result).to.be.equal(undefined)
     deployed.txData.should.not.be.equal(undefined)
-    const result = await deployed.call('getArg', [42], { waitMined: false })
+    const result = await contract.methods.getArg(42, { callStatic: false, waitMined: false })
     expect(result.result).to.be.equal(undefined)
     result.txData.should.not.be.equal(undefined)
     await sdk.poll(result.hash)
   })
 
   it('calls deployed contracts static', async () => {
-    const result = await deployed.callStatic('getArg', [42])
+    const result = await contract.methods.getArg(42, { callStatic: true })
     expect(result.decodedResult).to.be.equal(42n)
   })
 
