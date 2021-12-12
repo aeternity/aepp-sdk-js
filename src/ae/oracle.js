@@ -68,7 +68,11 @@ async function getOracleObject (oracleId) {
  * @param {Number} [options.interval] Poll interval(default: 5000)
  * @return {Function} stopPolling - Stop polling function
  */
-function pollForQueries (oracleId, onQuery, { interval = 5000 } = {}) {
+function pollForQueries (
+  oracleId,
+  onQuery,
+  { interval = this._getPollInterval('microblock') } = {}
+) {
   const knownQueryIds = new Set()
   const checkNewQueries = async () => {
     const queries = ((await this.api.getOracleQueriesByPubkey(oracleId)).oracleQueries || [])
@@ -120,7 +124,7 @@ async function getQueryObject (oracleId, queryId) {
 export async function pollForQueryResponse (
   oracleId,
   queryId,
-  { attempts = 20, interval = 5000 } = {}
+  { attempts = 20, interval = this._getPollInterval('microblock') } = {}
 ) {
   for (let i = 0; i < attempts; i++) {
     if (i) await pause(interval)

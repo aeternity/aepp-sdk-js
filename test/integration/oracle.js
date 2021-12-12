@@ -59,14 +59,14 @@ describe('Oracle', function () {
       if (count !== 4) return
       stopPolling()
       done()
-    }, { interval: 100 })
+    })
     oracle.postQuery("{'city': 'Berlin2'}")
       .then(() => oracle.postQuery("{'city': 'Berlin3'}"))
       .then(() => oracle.postQuery("{'city': 'Berlin4'}"))
   }).timeout(10000)
 
   it('Poll for response for query without response', async () => {
-    return query.pollForResponse({ attempts: 2, interval: 1000 }).should.be.rejectedWith(Error)
+    return query.pollForResponse().should.be.rejectedWith(Error)
   })
 
   it('Respond to query', async () => {
@@ -79,7 +79,7 @@ describe('Oracle', function () {
   })
 
   it('Poll for response', async () => {
-    const response = await query.pollForResponse({ attempts: 2, interval: 1000 })
+    const response = await query.pollForResponse()
     response.should.be.equal(queryResponse)
   })
 

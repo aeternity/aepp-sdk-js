@@ -224,13 +224,13 @@ describe('Contract', function () {
 
   it('call contract/deploy with waitMined: false', async () => {
     const deployed = await bytecode.deploy([], { waitMined: false })
-    await sdk.poll(deployed.transaction, { interval: 50, attempts: 1200 })
+    await sdk.poll(deployed.transaction)
     expect(deployed.result).to.be.equal(undefined)
     deployed.txData.should.not.be.equal(undefined)
     const result = await deployed.call('getArg', [42], { waitMined: false })
     expect(result.result).to.be.equal(undefined)
     result.txData.should.not.be.equal(undefined)
-    await sdk.poll(result.hash, { interval: 50, attempts: 1200 })
+    await sdk.poll(result.hash)
   })
 
   it('calls deployed contracts static', async () => {
@@ -402,7 +402,7 @@ describe('Contract', function () {
       const preclaim = await contract.methods
         .signedPreclaim(owner, commitmentIdDecoded, preclaimSig)
       preclaim.result.returnType.should.be.equal('ok')
-      await sdk.awaitHeight((await sdk.height()) + 2, { interval: 200, attempts: 100 })
+      await sdk.awaitHeight((await sdk.height()) + 2)
       // signature for any other name related operations
       delegationSignature = await sdk.createAensDelegationSignature(
         { contractId, name }, { onAccount: owner }
