@@ -4,15 +4,9 @@ jobs:
   main:
     runs-on: ubuntu-latest
     steps:
-      - if: github.ref != 'refs/heads/develop'
-        uses: actions/checkout@v2
-        with:
-          ref: develop
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 100
-      - if: github.ref != 'refs/heads/develop'
-        run: git branch develop origin/develop
+          fetch-depth: 50
 
       - uses: actions/setup-node@v2
         with:
