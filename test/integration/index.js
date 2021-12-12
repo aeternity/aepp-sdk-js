@@ -38,7 +38,7 @@ export const BaseAe = async (params = {}, compose = {}) => Universal
       Ae: {
         defaults: {
           _expectedMineRate: 1000,
-          _microBlockCycle: 20
+          _microBlockCycle: 300
         }
       }
     }
