@@ -1,6 +1,6 @@
 import nacl from 'tweetnacl'
 import { v4 as uuid } from 'uuid'
-
+import sodium from 'libsodium-wrappers-sumo'
 import { encodeBase58Check } from './crypto'
 import { str2buf } from './bytes'
 import {
@@ -10,8 +10,6 @@ import {
   UnsupportedKdfError,
   InvalidPasswordError
 } from './errors'
-
-const _sodium = require('libsodium-wrappers-sumo')
 
 /**
  * KeyStore module
@@ -42,20 +40,16 @@ export async function deriveKeyUsingArgon2id (password, salt, options) {
   const { memlimit_kib: memoryCost, opslimit: timeCost } = options.kdf_params
   // const isBrowser = !(typeof module !== 'undefined' && module.exports)
 
-  return _sodium.ready.then(async () => {
-    // tslint:disable-next-line:typedef
-    const sodium = _sodium
-
-    const result = sodium.crypto_pwhash(
-      32,
-      password,
-      salt,
-      timeCost,
-      memoryCost * 1024,
-      sodium.crypto_pwhash_ALG_ARGON2ID13
-    )
-    return Buffer.from(result)
-  })
+  await sodium.ready
+  const result = sodium.crypto_pwhash(
+    32,
+    password,
+    salt,
+    timeCost,
+    memoryCost * 1024,
+    sodium.crypto_pwhash_ALG_ARGON2ID13
+  )
+  return Buffer.from(result)
 }
 
 // CRYPTO PART
