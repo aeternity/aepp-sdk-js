@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import { cond, lt, always, lte, T } from 'ramda'
 import BigNumber from 'bignumber.js'
 
 import {
@@ -343,11 +343,11 @@ export function computeBidFee (domain, startFee = NAME_FEE, increment = NAME_FEE
  * @return {String} Auction end height
  */
 export function computeAuctionEndBlock (domain, claimHeight) {
-  return R.cond([
-    [R.lt(5), R.always(NAME_BID_TIMEOUTS[4].plus(claimHeight))],
-    [R.lt(9), R.always(NAME_BID_TIMEOUTS[8].plus(claimHeight))],
-    [R.lte(NAME_BID_MAX_LENGTH), R.always(NAME_BID_TIMEOUTS[12].plus(claimHeight))],
-    [R.T, R.always(BigNumber(claimHeight))]
+  return cond([
+    [lt(5), always(NAME_BID_TIMEOUTS[4].plus(claimHeight))],
+    [lt(9), always(NAME_BID_TIMEOUTS[8].plus(claimHeight))],
+    [lte(NAME_BID_MAX_LENGTH), always(NAME_BID_TIMEOUTS[12].plus(claimHeight))],
+    [T, always(BigNumber(claimHeight))]
   ])(domain.replace('.chain', '').length).toString(10)
 }
 

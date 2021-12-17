@@ -22,7 +22,7 @@
  * @export getContractInstance
  */
 
-import * as R from 'ramda'
+import { defaultTo, prop, path } from 'ramda'
 import { Encoder as Calldata } from '@aeternity/aepp-calldata'
 import { decodeEvents } from './transformation'
 import { DRY_RUN_ACCOUNT, DEPOSIT } from '../../tx/builder/schema'
@@ -105,8 +105,8 @@ export default async function getContractInstance ({
   }
 
   const instance = {
-    interface: R.defaultTo(null, R.prop('interface', aci)),
-    aci: R.defaultTo(null, R.path(['encoded_aci', 'contract'], aci)),
+    interface: defaultTo(null, prop('interface', aci)),
+    aci: defaultTo(null, path(['encoded_aci', 'contract'], aci)),
     calldata: new Calldata([aci.encoded_aci, ...aci.external_encoded_aci]),
     externalAci: (aci.external_encoded_aci ?? []).map(a => a.contract || a.namespace),
     source,
