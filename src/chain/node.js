@@ -167,7 +167,8 @@ async function poll (
     }
     await pause(interval)
   } while (await this.height() < max)
-  throw new TxTimedOutError(blocks, th)
+  const status = this.api.getCheckTxInPool && (await this.api.getCheckTxInPool(th)).status
+  throw new TxTimedOutError(blocks, th, status)
 }
 
 async function getTxInfo (hash) {
