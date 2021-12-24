@@ -215,12 +215,6 @@ describe('Contract', function () {
     result.callerId.should.be.equal(DRY_RUN_ACCOUNT.pub)
   })
 
-  it('calls deployed contracts with unsafe integer', async () => {
-    const unsafeInt = BigInt(Number.MAX_SAFE_INTEGER + '0')
-    const result = await deployed.call('getArg', [unsafeInt])
-    expect(result.decodedResult).to.be.equal(unsafeInt)
-  })
-
   it('call contract/deploy with waitMined: false', async () => {
     const deployed = await bytecode.deploy([], { waitMined: false })
     await sdk.poll(deployed.transaction, { interval: 50, attempts: 1200 })
