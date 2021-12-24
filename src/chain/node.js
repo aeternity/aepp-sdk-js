@@ -161,7 +161,7 @@ async function topBlock () {
 async function poll (th, { blocks = 10, interval = this._getPollInterval('microblock') } = {}) {
   const max = await this.height() + blocks
   do {
-    const tx = await this.tx(th)
+    const tx = await this.api.getTransactionByHash(th)
     if (tx.blockHeight !== -1) return tx
     await pause(interval)
   } while (await this.height() < max)
