@@ -960,7 +960,7 @@ describe('Channel', function () {
       abiVersion: 3
     }, async (tx) => initiator.signTransaction(tx))
     const hash = buildTxHash(forceTx.tx)
-    const { returnType } = await initiator.tx(hash)
+    const { callInfo: { returnType } } = await initiator.api.getTransactionInfoByHash(hash)
     expect(returnType).to.be.equal('ok')
   })
 

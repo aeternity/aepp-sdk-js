@@ -152,9 +152,10 @@ export default async function getContractInstance ({
       hash: txData.hash, tx: TxObject({ tx: txData.rawTx }), txData, rawTx: txData.rawTx
     }
     if (options.waitMined === false) return result
-    const txInfo = await this.getTxInfo(txData.hash)
-    await handleCallError(txInfo)
-    return { ...result, result: txInfo }
+    const { callInfo } = await this.api.getTransactionInfoByHash(txData.hash)
+    Object.assign(result.txData, callInfo) // TODO: don't duplicate data in result
+    await handleCallError(callInfo)
+    return { ...result, result: callInfo }
   }
 
   const handleCallError = ({ returnType, returnValue }) => {

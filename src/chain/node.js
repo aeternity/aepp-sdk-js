@@ -79,9 +79,9 @@ async function sendTransaction (tx, options = {}) {
 
 async function waitForTxConfirm (txHash, options = { confirm: 3 }) {
   options.confirm = options.confirm === true ? 3 : options.confirm
-  const { blockHeight } = await this.tx(txHash)
+  const { blockHeight } = await this.api.getTransactionByHash(txHash)
   const height = await this.awaitHeight(blockHeight + options.confirm, options)
-  const { blockHeight: newBlockHeight } = await this.tx(txHash)
+  const { blockHeight: newBlockHeight } = await this.api.getTransactionByHash(txHash)
   switch (newBlockHeight) {
     case -1:
       throw new TxNotInChainError(txHash)
@@ -114,6 +114,9 @@ async function getBalance (address, { height, hash, format = AE_AMOUNT_FORMATS.A
   return formatAmount(balance, { targetDenomination: format }).toString()
 }
 
+/**
+ * @deprecated use `sdk.api.getTransactionByHash/getTransactionInfoByHash` instead
+ */
 async function tx (hash, info = true) {
   const tx = await this.api.getTransactionByHash(hash)
   if (['ContractCreateTx', 'ContractCallTx', 'ChannelForceProgressTx'].includes(tx.tx.type) && info && tx.blockHeight !== -1) {
@@ -166,6 +169,9 @@ async function poll (th, { blocks = 10, interval = this._getPollInterval('microb
   throw new TxTimedOutError(blocks, th, status)
 }
 
+/**
+ * @deprecated use `sdk.api.getTransactionInfoByHash` instead
+ */
 async function getTxInfo (hash) {
   const result = await this.api.getTransactionInfoByHash(hash)
   return result.callInfo || result

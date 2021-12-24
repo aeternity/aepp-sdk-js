@@ -302,7 +302,7 @@ describe('Contract instance', function () {
     })
 
     it('decodes events the same using different methods', async () => {
-      const { log } = await sdk.tx(eventResult.hash)
+      const { callInfo: { log } } = await sdk.api.getTransactionInfoByHash(eventResult.hash)
       const events = {
         variant: [
           { AnotherEvent2: [SOPHIA_TYPES.bool, SOPHIA_TYPES.string, SOPHIA_TYPES.int] },

@@ -54,10 +54,10 @@ Of course it is also possible to decode the event log if you request the transac
 ```js
 const txHash = 'th_2YV3AmAz2kXdTnQxXtR2uxQi3KuLS9wfvXyqKkQQ2Y6dE6RnET';
 // client is an instance of the Universal Stamp
-const tx = await client.tx(txHash)
+const txInfo = await client.api.getTransactionInfoByHash(txHash)
 
 // decode events using contract instance
-const decodedUsingInstance = contractInstance.decodeEvents(tx.log)
+const decodedUsingInstance = contractInstance.decodeEvents(txInfo.callInfo.log)
 console.log(decodedUsingInstance)
 
 /*
@@ -87,7 +87,7 @@ import { decodeEvents, SOPHIA_TYPES } from '@aeternity/aepp-sdk/es/contract/aci/
 
 const txHash = 'th_2tMWziKAQR1CwK2PMfvMhKZgEVLmcxsPYkRXey97s9SdXj4zat'
 // client is an instance of the Universal Stamp
-const tx = await client.tx(txHash)
+const txInfo = await client.api.getTransactionInfoByHash(txHash)
 
 const eventsAci = {
   variant: [
@@ -96,7 +96,7 @@ const eventsAci = {
   ]
 }
 
-const decodedEvents = decodeEvents(tx.log, eventsAci)
+const decodedEvents = decodeEvents(txInfo.callInfo.log, eventsAci)
 console.log(decodedEvents)
 /*
 [
