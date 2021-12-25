@@ -15,7 +15,9 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 import { describe, it, before } from 'mocha'
-import { expect } from 'chai'
+import { expect, assert } from 'chai'
+import { spy } from 'sinon'
+import http from 'http'
 import { getSdk } from './'
 import { generateKeyPair } from '../../src/utils/crypto'
 
@@ -29,29 +31,15 @@ describe('Node Chain', function () {
   })
 
   it('determines the height', async () => {
-    return sdk.height().should.eventually.be.a('number')
+    expect(await sdk.height()).to.be.a('number')
   })
 
-  it('Compresses height queries', async () => {
-    const origFun = sdk.api.getCurrentKeyBlockHeight
-    try {
-      let calls = 0
-      sdk.api.getCurrentKeyBlockHeight = () => {
-        calls += 1
-        return origFun()
-      }
-      const H1P = sdk.height()
-      const H2P = sdk.height()
-      const H3P = sdk.height()
-      const H1 = await H1P
-      const H2 = await H2P
-      const H3 = await H3P
-      H1.should.be.equal(H2)
-      H1.should.be.equal(H3)
-      calls.should.be.equal(1)
-    } finally {
-      sdk.api.getCurrentKeyBlockHeight = origFun
-    }
+  it('combines height queries', async () => {
+    spy(http, 'request')
+    const heights = await Promise.all(new Array(5).fill().map(() => sdk.height()))
+    expect(heights).to.eql(heights.map(() => heights[0]))
+    assert(http.request.calledOnce)
+    http.request.restore()
   })
 
   it('waits for specified heights', async () => {
@@ -59,23 +47,28 @@ describe('Node Chain', function () {
     await sdk.awaitHeight(target).should.eventually.be.at.least(target)
     return sdk.height().should.eventually.be.at.least(target)
   })
+
   it('Can verify transaction from broadcast error', async () => {
     const error = await sdkAccount.spend(0, publicKey, { fee: 100, verify: false }).catch(e => e)
     expect(await error.verifyTx()).to.have.lengthOf(1)
   })
+
   it('Get top block', async () => {
     const top = await sdk.topBlock()
     top.should.has.property('hash')
     top.should.has.property('height')
   })
+
   it('Get pending transaction', async () => {
     const mempool = await sdk.mempool()
     mempool.should.has.property('transactions')
   })
+
   it('Get current generation', async () => {
     const generation = await sdk.getCurrentGeneration()
     generation.should.has.property('keyBlock')
   })
+
   it('Get key block', async () => {
     const { keyBlock } = await sdk.getCurrentGeneration()
     const keyBlockByHash = await sdk.getKeyBlock(keyBlock.hash)
@@ -85,6 +78,7 @@ describe('Node Chain', function () {
     keyBlockByHeight.should.be.an('object')
     keyBlockError.should.be.equal(true)
   })
+
   it('Get generation', async () => {
     const { keyBlock } = await sdk.getCurrentGeneration()
     const genByHash = await sdk.getGeneration(keyBlock.hash)
@@ -94,6 +88,7 @@ describe('Node Chain', function () {
     genByHeight.should.be.an('object')
     genArgsError.should.be.equal(true)
   })
+
   it('polls for transactions', async () => {
     const senderId = await sdkAccount.address()
     const tx = await sdkAccount.spendTx({

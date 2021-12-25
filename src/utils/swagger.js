@@ -64,9 +64,25 @@ export default async (
 
   const [external, internal] = await Promise.all([specUrl, internalUrl].map((url) => {
     if (!url) return null
+    const pendingGetRequests = {}
     return SwaggerClient({
       url,
       spec,
+      requestInterceptor: request => {
+        if (request.method !== 'GET') return
+        return {
+          ...request,
+          userFetch: async (url, request) => {
+            const key = JSON.stringify({ ...request, url })
+            pendingGetRequests[key] ??= fetch(url, request)
+            try {
+              return (await pendingGetRequests[key]).clone()
+            } finally {
+              delete pendingGetRequests[key]
+            }
+          }
+        }
+      },
       responseInterceptor: response => {
         if (response.text === '' || response.text?.size === 0) return response
         const body = jsonImp.parse(response.text)
