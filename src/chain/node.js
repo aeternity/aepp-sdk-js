@@ -43,8 +43,8 @@ import {
  */
 
 async function sendTransaction (tx, options = {}) {
-  const { waitMined, verify } = { ...this.Ae.defaults, ...options }
-  if (verify) {
+  const opt = { ...this.Ae.defaults, ...options }
+  if (opt.verify) {
     const validation = await verifyTransaction(tx, this.selectedNode.instance)
     if (validation.length) {
       const message = 'Transaction verification errors: ' +
@@ -58,9 +58,10 @@ async function sendTransaction (tx, options = {}) {
   }
 
   try {
-    const { txHash } = await this.api.postTransaction({ tx })
+    const { txHash } = await this.api
+      .postTransaction({ tx }, { __queue: `tx-${await this.address(options)}` })
 
-    if (waitMined) {
+    if (opt.waitMined) {
       const txData = { ...await this.poll(txHash, options), rawTx: tx }
       // wait for transaction confirmation
       if (options.confirm) {

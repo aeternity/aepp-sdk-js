@@ -115,4 +115,36 @@ describe('Node Chain', function () {
     const isConfirmed2 = (await sdkAccount.height()) >= txData2.blockHeight + 4
     isConfirmed2.should.be.equal(true)
   })
+
+  const accounts = new Array(10).fill().map(() => generateKeyPair())
+  const transactions = []
+
+  it('multiple spends from one account', async () => {
+    const { nextNonce } = await sdkAccount.api.getAccountNextNonce(await sdkAccount.address())
+    spy(http, 'request')
+    const spends = await Promise.all(accounts.map((account, idx) => sdkAccount.spend(
+      Math.floor(Math.random() * 1000 + 1e16),
+      account.publicKey,
+      { nonce: nextNonce + idx, verify: false, waitMined: false }
+    )))
+    transactions.push(...spends.map(({ hash }) => hash))
+    const accountGetCount = 1
+    const txPostCount = accounts.length
+    expect(http.request.args.length).to.be.equal(accountGetCount + txPostCount)
+    http.request.restore()
+  })
+
+  it('multiple spends from different accounts', async () => {
+    const receiver = await sdkAccount.address()
+    spy(http, 'request')
+    const spends = await Promise.all(accounts.map(onAccount =>
+      sdk.spend(1e15, receiver, { nonce: 1, verify: false, onAccount, waitMined: false })))
+    transactions.push(...spends.map(({ hash }) => hash))
+    const accountGetCount = accounts.length
+    const txPostCount = accounts.length
+    expect(http.request.args.length).to.be.equal(accountGetCount + txPostCount)
+    http.request.restore()
+  })
+
+  it('ensure transactions mined', () => Promise.all(transactions.map(hash => sdk.poll(hash))))
 })

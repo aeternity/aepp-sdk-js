@@ -115,6 +115,7 @@ export default async (
     .flat()
     .reduce((acc, n) => ({ ...acc, [n.operationId]: n }), {})
 
+  const requestQueues = {}
   const api = mapObject(combinedApi, ([opId, handler]) => [
     opId.slice(0, 1).toLowerCase() + snakeToPascal(opId.slice(1)),
     async (...args) => {
@@ -135,7 +136,7 @@ export default async (
         (acc, req, idx) => ({ ...acc, [req]: args[idx] }),
         args[required.length] || {}
       )
-      const { __requestBody, ...stringified } = mapObject(values, ([param, value]) => {
+      const { __requestBody, __queue, ...stringified } = mapObject(values, ([param, value]) => {
         if (typeof value !== 'object') return [param, value]
         const rootKeys = Object.keys(parameters.find(p => p.name === param).schema.properties)
         const filteredValue = filterObject(
@@ -144,7 +145,14 @@ export default async (
         )
         return [param, jsonImp.stringify(filteredValue)]
       })
-      return (await handler(stringified, { requestBody: __requestBody })).body
+
+      const request = async () => (await handler(stringified, { requestBody: __requestBody })).body
+      if (!__queue) return request()
+      const res = (requestQueues[__queue] ?? Promise.resolve()).then(request, request)
+      // TODO: remove after fixing https://github.com/aeternity/aeternity/issues/3803
+      // gap to ensure that node won't reject the nonce
+      requestQueues[__queue] = res.then(() => new Promise(resolve => setTimeout(resolve, 750)))
+      return res
     }
   ])
 
