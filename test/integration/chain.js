@@ -147,4 +147,23 @@ describe('Node Chain', function () {
   })
 
   it('ensure transactions mined', () => Promise.all(transactions.map(hash => sdk.poll(hash))))
+
+  it('multiple contract dry-runs calls at one request', async () => {
+    const contract = await sdkAccount.getContractInstance({
+      source:
+        'contract Test =\n' +
+        '  entrypoint foo(x : int) = x * 100'
+    })
+    await contract.deploy()
+    const { result: { gasUsed: gas } } = await contract.methods.foo(5)
+    const { nextNonce } = await sdkAccount.api.getAccountNextNonce(await sdkAccount.address())
+    spy(http, 'request')
+    const numbers = new Array(32).fill().map((v, idx) => idx * 2)
+    const results = (await Promise.all(
+      numbers.map((v, idx) => contract.methods.foo(v, { nonce: nextNonce + idx, gas }))
+    )).map(r => r.decodedResult)
+    expect(results).to.be.eql(numbers.map(v => BigInt(v * 100)))
+    expect(http.request.args.length).to.be.equal(1)
+    http.request.restore()
+  })
 })
