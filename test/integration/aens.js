@@ -32,19 +32,6 @@ describe('Aens', function () {
     await sdk.spend('1000000000000000', account.publicKey)
   })
 
-  describe('fails on', () => {
-    it('querying non-existent names', () => sdk
-      .aensQuery(randomName(13)).should.eventually.be.rejected)
-
-    it('updating names not owned by the account', async () => {
-      const preclaim = await sdk.aensPreclaim(randomName(13))
-      await preclaim.claim()
-      const current = await sdk.address()
-      const onAccount = sdk.addresses().find(acc => acc !== current)
-      return sdk.aensUpdate(name, onAccount, { onAccount, blocks: 1 }).should.eventually.be.rejected
-    })
-  })
-
   it('claims names', async () => {
     const preclaim = await sdk.aensPreclaim(name)
     preclaim.should.be.an('object')
@@ -61,6 +48,9 @@ describe('Aens', function () {
     return sdk.aensQuery(name).should.eventually.be.an('object')
   })
 
+  it('throws error on querying non-existent name', () => sdk
+    .aensQuery(randomName(13)).should.eventually.be.rejected)
+
   it('Spend using name with invalid pointers', async () => {
     const current = await sdk.address()
     const onAccount = sdk.addresses().find(acc => acc !== current)
@@ -69,11 +59,11 @@ describe('Aens', function () {
     await expect(sdk.spend(100, name, { onAccount }))
       .to.be.rejectedWith(`Name ${name} don't have pointers for account_pubkey`)
   })
+
   it('Call contract using AENS name', async () => {
-    const identityContract = `
-contract Identity =
- entrypoint getArg(x : int) = x
-`
+    const identityContract =
+      'contract Identity =\n' +
+      '  entrypoint getArg(x : int) = x'
     const bytecode = await sdk.contractCompile(identityContract)
     const deployed = await bytecode.deploy([])
     const nameObject = await sdk.aensQuery(name)
@@ -97,6 +87,14 @@ contract Identity =
   it('updates', async () => {
     const nameObject = await sdk.aensQuery(name)
     expect(await nameObject.update(pointers)).to.deep.include({ pointers: pointersNode })
+  })
+
+  it('throws error on updating names not owned by the account', async () => {
+    const preclaim = await sdk.aensPreclaim(randomName(13))
+    await preclaim.claim()
+    const current = await sdk.address()
+    const onAccount = sdk.addresses().find(acc => acc !== current)
+    return sdk.aensUpdate(name, onAccount, { onAccount, blocks: 1 }).should.eventually.be.rejected
   })
 
   it('updates extending pointers', async () => {
