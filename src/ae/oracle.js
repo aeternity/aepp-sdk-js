@@ -72,12 +72,11 @@ function pollForQueries (
   onQuery,
   { interval = this._getPollInterval('microblock') } = {}
 ) {
-  const knownQueryIds = new Set()
+  let from
   const checkNewQueries = async () => {
-    const queries = ((await this.api.getOracleQueriesByPubkey(oracleId)).oracleQueries || [])
-      .filter(({ id }) => !knownQueryIds.has(id))
-    queries.forEach(({ id }) => knownQueryIds.add(id))
-    if (queries.length) onQuery(queries)
+    const { oracleQueries } = await this.api.getOracleQueriesByPubkey(oracleId)
+    from = oracleQueries[oracleQueries.length - 1]?.id ?? from
+    if (oracleQueries.length) onQuery(oracleQueries)
   }
 
   let stopped
