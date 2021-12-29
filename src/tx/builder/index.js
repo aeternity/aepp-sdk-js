@@ -7,7 +7,6 @@ import {
   DEFAULT_FEE,
   FIELD_TYPES,
   OBJECT_ID_TX_TYPE,
-  PREFIX_ID_TAG,
   TX_DESERIALIZATION_SCHEMA,
   TX_FEE_BASE_GAS,
   TX_FEE_OTHER_GAS,
@@ -148,15 +147,6 @@ function serializeField (value, type, prefix) {
 }
 
 function validateField (value, type, prefix) {
-  const VALIDATION_MESSAGE = {
-    [FIELD_TYPES.int]: ({ value, isMinusValue }) => isMinusValue ? `${value} must be >= 0` : `${value} is not of type Number or BigNumber`,
-    [FIELD_TYPES.amount]: ({ value, isMinusValue }) => isMinusValue ? `${value} must be >= 0` : `${value} is not of type Number or BigNumber`,
-    [FIELD_TYPES.id]: ({ value, prefix }) => `'${value}' prefix doesn't match expected prefix '${prefix}' or ID_TAG for prefix not found`,
-    [FIELD_TYPES.pointers]: () => 'Value must be of type Array and contains only object\'s like \'{key: "account_pubkey", id: "ak_lkamsflkalsdalksdlasdlasdlamd"}\'',
-    [FIELD_TYPES.ctVersion]: () => 'Value must be an object with "vmVersion" and "abiVersion" fields'
-  }
-
-  const assert = (valid, params) => valid ? undefined : VALIDATION_MESSAGE[type](params)
   // All fields are required
   if (value === undefined || value === null) return 'Field is required'
 
@@ -164,23 +154,29 @@ function validateField (value, type, prefix) {
   switch (type) {
     case FIELD_TYPES.amount:
     case FIELD_TYPES.int: {
-      const isMinusValue = (!isNaN(value) || BigNumber.isBigNumber(value)) && BigNumber(value).lt(0)
-      return assert(
-        (!isNaN(value) || BigNumber.isBigNumber(value)) && BigNumber(value).gte(0),
-        { value, isMinusValue }
-      )
+      if (isNaN(value) && !BigNumber.isBigNumber(value)) {
+        return `${value} is not of type Number or BigNumber`
+      }
+      if (new BigNumber(value).lt(0)) return `${value} must be >= 0`
+      return
     }
     case FIELD_TYPES.id: {
       const prefixes = Array.isArray(prefix) ? prefix : [prefix]
-      const p = prefixes.find(p => p === value.split('_')[0])
-      return assert(p && PREFIX_ID_TAG[value.split('_')[0]], { value, prefix })
+      if (!prefixes.includes(value.split('_')[0])) {
+        return `'${value}' prefix doesn't match expected prefix '${prefix}'`
+      }
+      return
     }
     case FIELD_TYPES.ctVersion:
-      return assert(typeof value === 'object' && Object.prototype.hasOwnProperty.call(value, 'abiVersion') && Object.prototype.hasOwnProperty.call(value, 'vmVersion'))
-    case FIELD_TYPES.pointers:
-      return assert(Array.isArray(value) && !value.find(e => e !== Object(e)), { value })
-    default:
+      if (!value?.abiVersion || !value?.vmVersion) {
+        return 'Value must be an object with "vmVersion" and "abiVersion" fields'
+      }
       return
+    case FIELD_TYPES.pointers:
+      if (!Array.isArray(value)) return 'Value must be of type Array'
+      if (value.some(p => !p?.key || !p?.id)) {
+        return 'Value must contains only object\'s like \'{key: "account_pubkey", id: "ak_lkamsflkalsdalksdlasdlasdlamd"}\''
+      }
   }
 }
 
