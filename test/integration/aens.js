@@ -109,6 +109,15 @@ describe('Aens', function () {
       })
   })
 
+  it('throws error on setting 33 pointers', async () => {
+    const nameObject = await sdk.aensQuery(name)
+    const pointers = Object.fromEntries(
+      new Array(33).fill().map((v, i) => [`pointer-${i}`, address])
+    )
+    expect(nameObject.update(pointers))
+      .to.be.rejectedWith('Expected 32 pointers or less, got 33 instead')
+  })
+
   it('Extend name ttl', async () => {
     const nameObject = await sdk.aensQuery(name)
     const extendResult = await nameObject.extendTtl(10000)

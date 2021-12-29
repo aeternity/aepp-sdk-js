@@ -177,6 +177,9 @@ function validateField (value, type, prefix) {
       if (value.some(p => !p?.key || !p?.id)) {
         return 'Value must contains only object\'s like \'{key: "account_pubkey", id: "ak_lkamsflkalsdalksdlasdlasdlamd"}\''
       }
+      if (value.length > 32) {
+        return `Expected 32 pointers or less, got ${value.length} instead`
+      }
   }
 }
 
