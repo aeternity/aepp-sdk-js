@@ -147,7 +147,7 @@ function serializeField (value, type, prefix) {
   }
 }
 
-function validateField (value, key, type, prefix) {
+function validateField (value, type, prefix) {
   const VALIDATION_MESSAGE = {
     [FIELD_TYPES.int]: ({ value, isMinusValue }) => isMinusValue ? `${value} must be >= 0` : `${value} is not of type Number or BigNumber`,
     [FIELD_TYPES.amount]: ({ value, isMinusValue }) => isMinusValue ? `${value} must be >= 0` : `${value} is not of type Number or BigNumber`,
@@ -156,9 +156,9 @@ function validateField (value, key, type, prefix) {
     [FIELD_TYPES.ctVersion]: () => 'Value must be an object with "vmVersion" and "abiVersion" fields'
   }
 
-  const assert = (valid, params) => valid ? {} : { [key]: VALIDATION_MESSAGE[type](params) }
+  const assert = (valid, params) => valid ? undefined : VALIDATION_MESSAGE[type](params)
   // All fields are required
-  if (value === undefined || value === null) return { [key]: 'Field is required' }
+  if (value === undefined || value === null) return 'Field is required'
 
   // Validate type of value
   switch (type) {
@@ -180,7 +180,7 @@ function validateField (value, key, type, prefix) {
     case FIELD_TYPES.pointers:
       return assert(Array.isArray(value) && !value.find(e => e !== Object(e)), { value })
     default:
-      return {}
+      return
   }
 }
 
@@ -300,14 +300,12 @@ export function calculateFee (fee = 0, txType, { gas = 0, params, showWarning = 
  * @return {Object} Object with validation errors
  */
 export function validateParams (params, schema, { excludeKeys = [] }) {
-  return schema
-    .filter(([key]) => !excludeKeys.includes(key) && key !== 'payload')
-    .reduce(
-      (acc, [key, type, prefix]) => Object.assign(
-        acc, validateField(params[key], key, type, prefix)
-      ),
-      {}
-    )
+  return Object.fromEntries(
+    schema
+      .filter(([key]) => !excludeKeys.includes(key) && key !== 'payload')
+      .map(([key, type, prefix]) => [key, validateField(params[key], type, prefix)])
+      .filter(([, message]) => message)
+  )
 }
 
 /**
