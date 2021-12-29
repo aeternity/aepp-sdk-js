@@ -75,9 +75,15 @@ function pollForQueries (oracleId, onQuery, { interval = 5000 } = {}) {
     if (queries.length) onQuery(queries)
   }
 
-  checkNewQueries()
-  const intervalId = setInterval(checkNewQueries, interval)
-  return () => clearInterval(intervalId)
+  let stopped
+  (async () => {
+    while (!stopped) { // eslint-disable-line no-unmodified-loop-condition
+      // TODO: allow to handle this error somehow
+      await checkNewQueries().catch(console.error)
+      await pause(interval)
+    }
+  })()
+  return () => { stopped = true }
 }
 
 /**
