@@ -27,7 +27,6 @@
  */
 
 import Ae from './'
-import { decodeBase64Check } from '../utils/crypto'
 import { pause } from '../utils/other'
 import { oracleQueryId, decode } from '../tx/builder/helpers'
 import { unpackTx } from '../tx/builder'
@@ -95,11 +94,16 @@ async function getQueryObject (oracleId, queryId) {
   const q = await this.api.getOracleQueryByPubkeyAndQueryId(oracleId, queryId)
   return {
     ...q,
-    decodedQuery: decodeBase64Check(q.query.slice(3)).toString(),
-    decodedResponse: decodeBase64Check(q.response.slice(3)).toString(),
+    decodedQuery: decode(q.query).toString(),
+    decodedResponse: decode(q.response).toString(),
     respond: this.respondToQuery.bind(this, oracleId, queryId),
     pollForResponse: this.pollForQueryResponse.bind(this, oracleId, queryId),
-    decode: (data) => decodeBase64Check(data.slice(3))
+    /**
+     * @deprecated use TxBuilderHelper.decode instead
+     * @param data
+     * @returns {Buffer}
+     */
+    decode: (data) => decode(data)
   }
 }
 
