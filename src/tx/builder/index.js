@@ -152,7 +152,6 @@ function validateField (value, key, type, prefix) {
     [FIELD_TYPES.int]: ({ value, isMinusValue }) => isMinusValue ? `${value} must be >= 0` : `${value} is not of type Number or BigNumber`,
     [FIELD_TYPES.amount]: ({ value, isMinusValue }) => isMinusValue ? `${value} must be >= 0` : `${value} is not of type Number or BigNumber`,
     [FIELD_TYPES.id]: ({ value, prefix }) => `'${value}' prefix doesn't match expected prefix '${prefix}' or ID_TAG for prefix not found`,
-    [FIELD_TYPES.binary]: ({ prefix, value }) => `'${value}' prefix doesn't match expected prefix '${prefix}'`,
     [FIELD_TYPES.string]: () => 'Not a string',
     [FIELD_TYPES.pointers]: () => 'Value must be of type Array and contains only object\'s like \'{key: "account_pubkey", id: "ak_lkamsflkalsdalksdlasdlasdlamd"}\'',
     [FIELD_TYPES.ctVersion]: () => 'Value must be an object with "vmVersion" and "abiVersion" fields'
@@ -177,8 +176,6 @@ function validateField (value, key, type, prefix) {
       const p = prefixes.find(p => p === value.split('_')[0])
       return assert(p && PREFIX_ID_TAG[value.split('_')[0]], { value, prefix })
     }
-    case FIELD_TYPES.binary:
-      return assert(value.split('_')[0] === prefix, { prefix, value })
     case FIELD_TYPES.string:
       return assert(true)
     case FIELD_TYPES.ctVersion:
