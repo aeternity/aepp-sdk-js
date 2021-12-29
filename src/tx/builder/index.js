@@ -13,7 +13,6 @@ import {
   TX_FEE_OTHER_GAS,
   TX_SERIALIZATION_SCHEMA,
   TX_TYPE,
-  VALIDATION_MESSAGE,
   VSN
 } from './schema'
 import {
@@ -149,6 +148,16 @@ function serializeField (value, type, prefix) {
 }
 
 function validateField (value, key, type, prefix) {
+  const VALIDATION_MESSAGE = {
+    [FIELD_TYPES.int]: ({ value, isMinusValue }) => isMinusValue ? `${value} must be >= 0` : `${value} is not of type Number or BigNumber`,
+    [FIELD_TYPES.amount]: ({ value, isMinusValue }) => isMinusValue ? `${value} must be >= 0` : `${value} is not of type Number or BigNumber`,
+    [FIELD_TYPES.id]: ({ value, prefix }) => `'${value}' prefix doesn't match expected prefix '${prefix}' or ID_TAG for prefix not found`,
+    [FIELD_TYPES.binary]: ({ prefix, value }) => `'${value}' prefix doesn't match expected prefix '${prefix}'`,
+    [FIELD_TYPES.string]: () => 'Not a string',
+    [FIELD_TYPES.pointers]: () => 'Value must be of type Array and contains only object\'s like \'{key: "account_pubkey", id: "ak_lkamsflkalsdalksdlasdlasdlamd"}\'',
+    [FIELD_TYPES.ctVersion]: () => 'Value must be an object with "vmVersion" and "abiVersion" fields'
+  }
+
   const assert = (valid, params) => valid ? {} : { [key]: VALIDATION_MESSAGE[type](params) }
   // All fields are required
   if (value === undefined || value === null) return { [key]: 'Field is required' }

@@ -421,17 +421,6 @@ export const PREFIX_ID_TAG = {
   ch: ID_TAG.channel
 }
 export const ID_TAG_PREFIX = revertObject(PREFIX_ID_TAG)
-const VALIDATION_ERROR = (msg) => msg
-
-export const VALIDATION_MESSAGE = {
-  [FIELD_TYPES.int]: ({ value, isMinusValue }) => isMinusValue ? VALIDATION_ERROR(`${value} must be >= 0`) : VALIDATION_ERROR(`${value} is not of type Number or BigNumber`),
-  [FIELD_TYPES.amount]: ({ value, isMinusValue }) => isMinusValue ? VALIDATION_ERROR(`${value} must be >= 0`) : VALIDATION_ERROR(`${value} is not of type Number or BigNumber`),
-  [FIELD_TYPES.id]: ({ value, prefix }) => VALIDATION_ERROR(`'${value}' prefix doesn't match expected prefix '${prefix}' or ID_TAG for prefix not found`),
-  [FIELD_TYPES.binary]: ({ prefix, value }) => VALIDATION_ERROR(`'${value}' prefix doesn't match expected prefix '${prefix}'`),
-  [FIELD_TYPES.string]: ({ value }) => VALIDATION_ERROR('Not a string'),
-  [FIELD_TYPES.pointers]: ({ value }) => VALIDATION_ERROR('Value must be of type Array and contains only object\'s like \'{key: "account_pubkey", id: "ak_lkamsflkalsdalksdlasdlasdlamd"}\''),
-  [FIELD_TYPES.ctVersion]: ({ value }) => VALIDATION_ERROR('Value must be an object with "vmVersion" and "abiVersion" fields')
-}
 
 const BASE_TX = [
   TX_FIELD('tag', FIELD_TYPES.int),
