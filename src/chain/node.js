@@ -135,7 +135,10 @@ async function height () {
   }
 }
 
-async function awaitHeight (height, { interval = 5000, attempts = 20 } = {}) {
+async function awaitHeight (
+  height,
+  { interval = this._getPollInterval('block'), attempts = 20 } = {}
+) {
   let currentHeight
   for (let i = 0; i < attempts; i++) {
     if (i) await pause(interval)
@@ -152,7 +155,10 @@ async function topBlock () {
   return this.api.getTopHeader()
 }
 
-async function poll (th, { blocks = 10, interval = 500, allowUnsynced = false } = {}) {
+async function poll (
+  th,
+  { blocks = 10, interval = this._getPollInterval('microblock'), allowUnsynced = false } = {}
+) {
   const max = await this.height() + blocks
   do {
     const tx = await this.tx(th).catch(_ => null)

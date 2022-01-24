@@ -248,12 +248,12 @@ describe('Contract instance', function () {
   it('deploys and calls contract without waiting for mining', async () => {
     testContract.deployInfo = {}
     const deployed = await testContract.methods.init('test', 1, 'hahahaha', { waitMined: false })
-    await sdk.poll(deployed.transaction, { interval: 50, attempts: 1200 })
+    await sdk.poll(deployed.transaction)
     expect(deployed.result).to.be.equal(undefined)
     const result = await testContract.methods.intFn.send(2, { waitMined: false })
     expect(result.result).to.be.equal(undefined)
     expect(result.txData).to.not.be.equal(undefined)
-    await sdk.poll(result.hash, { interval: 50, attempts: 1200 })
+    await sdk.poll(result.hash)
   })
 
   it('fails on paying to not payable function', async () => {
