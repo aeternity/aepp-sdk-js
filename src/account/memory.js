@@ -23,10 +23,10 @@
  */
 
 import AccountBase from './base'
-import { sign, isAddressValid, isValidKeypair } from '../utils/crypto'
+import { sign, isValidKeypair } from '../utils/crypto'
 import { isHex } from '../utils/string'
 import { decode } from '../tx/builder/helpers'
-import { InvalidKeypairError, InvalidGaAddressError } from '../utils/errors'
+import { InvalidKeypairError } from '../utils/errors'
 
 const secrets = new WeakMap()
 
@@ -45,7 +45,7 @@ export default AccountBase.compose({
   init ({ keypair, gaId }) {
     this.isGa = !!gaId
     if (gaId) {
-      if (!isAddressValid(gaId)) throw new InvalidGaAddressError()
+      decode(gaId)
       secrets.set(this, { publicKey: gaId })
       return
     }

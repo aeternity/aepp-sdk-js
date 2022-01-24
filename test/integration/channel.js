@@ -25,6 +25,7 @@ import { generateKeyPair, encodeBase64Check } from '../../src/utils/crypto'
 import { unpackTx, buildTx, buildTxHash } from '../../src/tx/builder'
 import { decode } from '../../src/tx/builder/helpers'
 import Channel from '../../src/channel'
+import { send } from '../../src/channel/internal'
 import MemoryAccount from '../../src/account/memory'
 import {
   IllegalArgumentError,
@@ -138,6 +139,22 @@ describe('Channel', function () {
     initiatorTx.should.eql({ ...initiatorTx, ...expectedTxParams })
     responderTxType.should.equal('channelCreate')
     responderTx.should.eql({ ...responderTx, ...expectedTxParams })
+  })
+
+  it('prints error on handling incoming messages', async () => {
+    const received = new Promise(resolve => sinon.stub(console, 'error').callsFake(resolve))
+    send(initiatorCh, {
+      jsonrpc: '2.0',
+      method: 'not-existing-method',
+      params: {}
+    })
+    await received
+    expect(console.error.callCount).to.be.equal(3)
+    expect(console.error.getCall(0).firstArg).to.be.equal('Error handling incoming message:')
+    expect(console.error.getCall(1).firstArg.error.message).to.be.equal('Method not found')
+    expect(console.error.getCall(2).firstArg.toString())
+      .to.be.equal('UnknownChannelStateError: State Channels FSM entered unknown state')
+    console.error.restore()
   })
 
   it('can post update and accept', async () => {

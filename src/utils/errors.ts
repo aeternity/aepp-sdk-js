@@ -195,13 +195,6 @@ export class UnsupportedProtocolError extends AeError {
 }
 
 /* keypair an account related errors */
-export class InvalidGaAddressError extends AccountError {
-  constructor (msg: string) {
-    super(msg)
-    this.name = 'InvalidGaAddressError'
-  }
-}
-
 export class InvalidKeypairError extends AccountError {
   constructor (msg: string) {
     super(msg)
@@ -586,6 +579,20 @@ export class DecodeError extends TransactionError {
   constructor (msg: string) {
     super(msg)
     this.name = 'DecodeError'
+  }
+}
+
+export class EncodeError extends TransactionError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'EncodeError'
+  }
+}
+
+export class PayloadLengthError extends TransactionError {
+  constructor (msg: string) {
+    super(msg)
+    this.name = 'PayloadLengthError'
   }
 }
 
