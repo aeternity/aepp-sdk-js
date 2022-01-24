@@ -7,13 +7,11 @@ import {
   DEFAULT_FEE,
   FIELD_TYPES,
   OBJECT_ID_TX_TYPE,
-  PREFIX_ID_TAG,
   TX_DESERIALIZATION_SCHEMA,
   TX_FEE_BASE_GAS,
   TX_FEE_OTHER_GAS,
   TX_SERIALIZATION_SCHEMA,
   TX_TYPE,
-  VALIDATION_MESSAGE,
   VSN
 } from './schema'
 import {
@@ -149,36 +147,40 @@ function serializeField (value, type, prefix) {
   }
 }
 
-function validateField (value, key, type, prefix) {
-  const assert = (valid, params) => valid ? {} : { [key]: VALIDATION_MESSAGE[type](params) }
+function validateField (value, type, prefix) {
   // All fields are required
-  if (value === undefined || value === null) return { [key]: 'Field is required' }
+  if (value === undefined || value === null) return 'Field is required'
 
   // Validate type of value
   switch (type) {
     case FIELD_TYPES.amount:
     case FIELD_TYPES.int: {
-      const isMinusValue = (!isNaN(value) || BigNumber.isBigNumber(value)) && BigNumber(value).lt(0)
-      return assert(
-        (!isNaN(value) || BigNumber.isBigNumber(value)) && BigNumber(value).gte(0),
-        { value, isMinusValue }
-      )
+      if (isNaN(value) && !BigNumber.isBigNumber(value)) {
+        return `${value} is not of type Number or BigNumber`
+      }
+      if (new BigNumber(value).lt(0)) return `${value} must be >= 0`
+      return
     }
     case FIELD_TYPES.id: {
       const prefixes = Array.isArray(prefix) ? prefix : [prefix]
-      const p = prefixes.find(p => p === value.split('_')[0])
-      return assert(p && PREFIX_ID_TAG[value.split('_')[0]], { value, prefix })
+      if (!prefixes.includes(value.split('_')[0])) {
+        return `'${value}' prefix doesn't match expected prefix '${prefix}'`
+      }
+      return
     }
-    case FIELD_TYPES.binary:
-      return assert(value.split('_')[0] === prefix, { prefix, value })
-    case FIELD_TYPES.string:
-      return assert(true)
     case FIELD_TYPES.ctVersion:
-      return assert(typeof value === 'object' && Object.prototype.hasOwnProperty.call(value, 'abiVersion') && Object.prototype.hasOwnProperty.call(value, 'vmVersion'))
+      if (!value?.abiVersion || !value?.vmVersion) {
+        return 'Value must be an object with "vmVersion" and "abiVersion" fields'
+      }
+      return
     case FIELD_TYPES.pointers:
-      return assert(Array.isArray(value) && !value.find(e => e !== Object(e)), { value })
-    default:
-      return {}
+      if (!Array.isArray(value)) return 'Value must be of type Array'
+      if (value.some(p => !p?.key || !p?.id)) {
+        return 'Value must contains only object\'s like \'{key: "account_pubkey", id: "ak_lkamsflkalsdalksdlasdlasdlamd"}\''
+      }
+      if (value.length > 32) {
+        return `Expected 32 pointers or less, got ${value.length} instead`
+      }
   }
 }
 
@@ -298,14 +300,12 @@ export function calculateFee (fee = 0, txType, { gas = 0, params, showWarning = 
  * @return {Object} Object with validation errors
  */
 export function validateParams (params, schema, { excludeKeys = [] }) {
-  return schema
-    .filter(([key]) => !excludeKeys.includes(key) && key !== 'payload')
-    .reduce(
-      (acc, [key, type, prefix]) => Object.assign(
-        acc, validateField(params[key], key, type, prefix)
-      ),
-      {}
-    )
+  return Object.fromEntries(
+    schema
+      .filter(([key]) => !excludeKeys.includes(key) && key !== 'payload')
+      .map(([key, type, prefix]) => [key, validateField(params[key], type, prefix)])
+      .filter(([, message]) => message)
+  )
 }
 
 /**
