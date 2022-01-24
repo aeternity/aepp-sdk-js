@@ -1051,11 +1051,11 @@ the Promise is fulfilled, you know you have a working object instance which is a
 <p>Currently there is no high-level API available that allows you to create and sign the
 <code>ContractCallTx</code> by invoking the generated contract method on the contract instance that you
 typically use for contract calls.</p>
-<p>Following 3 steps need to be done:</p>
+<p>Following 4 steps need to be done:</p>
 <ol>
-<li>Create calldata by calling the http compiler using <code>contractEncodeCallDataAPI</code> and
-    providing the contract source, the name of the <code>entrypoint</code> to call as well as the
-    required params.<ul>
+<li>Initialize a contract instance by the source code and the contract address.</li>
+<li>Create calldata by calling the <code>encode</code> function providing the contract name, the name of
+    the <code>entrypoint</code> to call as well as the required params.<ul>
 <li>The <code>entrypoint</code> with the name <code>set_latest_caller</code> doesn't require any params so you
    can provide an empty array</li>
 </ul>
@@ -1071,7 +1071,10 @@ typically use for contract calls.</p>
 </ul>
 </li>
 </ol>
-<div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">calldata</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">contractEncodeCallDataAPI</span><span class="p">(</span><span class="nx">CONTRACT_SOURCE</span><span class="p">,</span> <span class="s1">&#39;set_last_caller&#39;</span><span class="p">,</span> <span class="p">[])</span>
+<div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">contract</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">(</span>
+    <span class="p">{</span> <span class="nx">source</span><span class="o">:</span> <span class="nx">CONTRACT_SOURCE</span><span class="p">,</span> <span class="nx">contractAddress</span><span class="o">:</span> <span class="nx">CONTRACT_ADDRESS</span> <span class="p">}</span>
+  <span class="p">)</span>
+  <span class="kd">const</span> <span class="nx">calldata</span> <span class="o">=</span> <span class="nx">contract</span><span class="p">.</span><span class="nx">calldata</span><span class="p">.</span><span class="nx">encode</span><span class="p">(</span><span class="s1">&#39;PayingForTxExample&#39;</span><span class="p">,</span> <span class="s1">&#39;set_last_caller&#39;</span><span class="p">,</span> <span class="p">[])</span>
   <span class="kd">const</span> <span class="nx">contractCallTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">contractCallTx</span><span class="p">({</span>
     <span class="nx">callerId</span><span class="o">:</span> <span class="k">await</span> <span class="nx">newUserAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">(),</span>
     <span class="nx">contractId</span><span class="o">:</span> <span class="nx">CONTRACT_ADDRESS</span><span class="p">,</span>
@@ -1089,12 +1092,8 @@ typically use for contract calls.</p>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">payForTx</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="7-check-that-last-caller-is-the-new-user">7. Check that last caller is the new user</h2>
-<p>Knowing the contract address and the source code allows you to
-initialize a contract instance and interact with the contract in a convenient way.
-<div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">(</span>
-    <span class="p">{</span> <span class="nx">source</span><span class="o">:</span> <span class="nx">CONTRACT_SOURCE</span><span class="p">,</span> <span class="nx">contractAddress</span><span class="o">:</span> <span class="nx">CONTRACT_ADDRESS</span> <span class="p">}</span>
-  <span class="p">)</span>
-  <span class="kd">const</span> <span class="nx">dryRunTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">get_last_caller</span><span class="p">()</span>
+<p>Contract instance allows interacting with the contract in a convenient way.
+<div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">dryRunTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">contract</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">get_last_caller</span><span class="p">()</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`New user: </span><span class="si">${</span><span class="k">await</span> <span class="nx">newUserAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">()</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Last caller:&#39;</span><span class="p">,</span> <span class="nx">dryRunTx</span><span class="p">.</span><span class="nx">decodedResult</span><span class="p">)</span>
 </code></pre></div>
