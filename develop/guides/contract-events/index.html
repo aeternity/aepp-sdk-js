@@ -869,10 +869,10 @@ or obtaining it via http compiler (default) you will be able to access the <code
 <p>Of course it is also possible to decode the event log if you request the transaction details from the node for a transaction that has been mined already. You can request the transaction details by providing the tx-hash and then decode the event log using the <code>contractInstance</code> as follows:
 <div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">txHash</span> <span class="o">=</span> <span class="s1">&#39;th_2YV3AmAz2kXdTnQxXtR2uxQi3KuLS9wfvXyqKkQQ2Y6dE6RnET&#39;</span><span class="p">;</span>
 <span class="c1">// client is an instance of the Universal Stamp</span>
-<span class="kd">const</span> <span class="nx">tx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">tx</span><span class="p">(</span><span class="nx">txHash</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">txInfo</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">api</span><span class="p">.</span><span class="nx">getTransactionInfoByHash</span><span class="p">(</span><span class="nx">txHash</span><span class="p">)</span>
 
 <span class="c1">// decode events using contract instance</span>
-<span class="kd">const</span> <span class="nx">decodedUsingInstance</span> <span class="o">=</span> <span class="nx">contractInstance</span><span class="p">.</span><span class="nx">decodeEvents</span><span class="p">(</span><span class="nx">tx</span><span class="p">.</span><span class="nx">log</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">decodedUsingInstance</span> <span class="o">=</span> <span class="nx">contractInstance</span><span class="p">.</span><span class="nx">decodeEvents</span><span class="p">(</span><span class="nx">txInfo</span><span class="p">.</span><span class="nx">callInfo</span><span class="p">.</span><span class="nx">log</span><span class="p">)</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">decodedUsingInstance</span><span class="p">)</span>
 
 <span class="cm">/*</span>
@@ -899,7 +899,7 @@ or obtaining it via http compiler (default) you will be able to access the <code
 
 <span class="kd">const</span> <span class="nx">txHash</span> <span class="o">=</span> <span class="s1">&#39;th_2tMWziKAQR1CwK2PMfvMhKZgEVLmcxsPYkRXey97s9SdXj4zat&#39;</span>
 <span class="c1">// client is an instance of the Universal Stamp</span>
-<span class="kd">const</span> <span class="nx">tx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">tx</span><span class="p">(</span><span class="nx">txHash</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">txInfo</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">api</span><span class="p">.</span><span class="nx">getTransactionInfoByHash</span><span class="p">(</span><span class="nx">txHash</span><span class="p">)</span>
 
 <span class="kd">const</span> <span class="nx">eventsAci</span> <span class="o">=</span> <span class="p">{</span>
   <span class="nx">variant</span><span class="o">:</span> <span class="p">[</span>
@@ -908,7 +908,7 @@ or obtaining it via http compiler (default) you will be able to access the <code
   <span class="p">]</span>
 <span class="p">}</span>
 
-<span class="kd">const</span> <span class="nx">decodedEvents</span> <span class="o">=</span> <span class="nx">decodeEvents</span><span class="p">(</span><span class="nx">tx</span><span class="p">.</span><span class="nx">log</span><span class="p">,</span> <span class="nx">eventsAci</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">decodedEvents</span> <span class="o">=</span> <span class="nx">decodeEvents</span><span class="p">(</span><span class="nx">txInfo</span><span class="p">.</span><span class="nx">callInfo</span><span class="p">.</span><span class="nx">log</span><span class="p">,</span> <span class="nx">eventsAci</span><span class="p">)</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">decodedEvents</span><span class="p">)</span>
 <span class="cm">/*</span>
 <span class="cm">[</span>
