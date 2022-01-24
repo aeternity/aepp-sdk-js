@@ -780,7 +780,6 @@
 │   UnsupportedProtocolError
 │
 └───AccountError
-│   │   InvalidGaAddressError
 │   │   InvalidKeypairError
 │   │   UnavailableAccountError
 │
@@ -852,6 +851,8 @@
 │
 └───TransactionError
 │   │   DecodeError
+│   │   EncodeError
+│   │   PayloadLengthError
 │   │   DryRunError
 │   │   IllegalBidFeeError
 │   │   InvalidSignatureError
@@ -875,17 +876,17 @@
 │   │   RpcConnectionError
 </code></pre></div>
 <h2 id="usage">Usage</h2>
-<div class="highlight"><pre><span></span><code><span class="c1">// import required error classes </span>
-<span class="kd">const</span> <span class="p">{</span> 
-  <span class="nx">Universal</span><span class="p">,</span> 
-  <span class="nx">Node</span><span class="p">,</span> 
+<div class="highlight"><pre><span></span><code><span class="c1">// import required error classes</span>
+<span class="kd">const</span> <span class="p">{</span>
+  <span class="nx">Universal</span><span class="p">,</span>
+  <span class="nx">Node</span><span class="p">,</span>
   <span class="nx">MemoryAccount</span><span class="p">,</span>
   <span class="nx">Crypto</span><span class="p">,</span>
   <span class="nx">InvalidTxParamsError</span><span class="p">,</span>
-  <span class="nx">InvalidAensNameError</span> 
+  <span class="nx">InvalidAensNameError</span>
 <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">)</span>
 
-<span class="c1">// setup </span>
+<span class="c1">// setup</span>
 <span class="kd">const</span> <span class="nx">NODE_URL</span> <span class="o">=</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span>
 <span class="kd">const</span> <span class="nx">PAYER_ACCOUNT_KEYPAIR</span> <span class="o">=</span> <span class="nx">Crypto</span><span class="p">.</span><span class="nx">generateKeyPair</span><span class="p">()</span>
 <span class="kd">const</span> <span class="nx">NEW_USER_KEYPAIR</span> <span class="o">=</span> <span class="nx">Crypto</span><span class="p">.</span><span class="nx">generateKeyPair</span><span class="p">()</span>
