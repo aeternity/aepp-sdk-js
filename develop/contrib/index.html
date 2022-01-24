@@ -959,14 +959,14 @@ pnpm run build:dev
 <p>This repository also includes a docker-compose file, to allow you to <strong>run your own æternity node locally</strong>. If you want to do so, <strong>from the root of the project</strong>:</p>
 <ol>
 <li>Create a <em><strong>docker-compose.override.yml</strong></em> file with this content:
-<div class="highlight"><pre><span></span><code><span class="nt">version</span><span class="p">:</span> <span class="s">&quot;3&quot;</span>
-<span class="nt">services</span><span class="p">:</span>
-  <span class="nt">node</span><span class="p">:</span>
-    <span class="nt">ports</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">3013:3013</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">3113:3113</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">3014:3014</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">3001:3001</span>
+<div class="highlight"><pre><span></span><code><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;3&quot;</span><span class="w"></span>
+<span class="nt">services</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">node</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3013:3013</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3113:3113</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3014:3014</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3001:3001</span><span class="w"></span>
 </code></pre></div></li>
 <li>Run <code>docker-compose up node</code></li>
 <li>Congrats! you're now running your own æternity node locally.</li>
