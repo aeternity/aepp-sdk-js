@@ -18,6 +18,12 @@
 import { encode as rlpEncode } from 'rlp'
 import type { Input } from 'rlp'
 import { hash } from './crypto-ts'
+import {
+  MerkleTreeHashMismatchError,
+  MissingNodeInTreeError,
+  UnknownPathNibbleError,
+  UnknownNodeLengthError
+} from './errors'
 
 enum NodeType {
   Branch,
@@ -47,9 +53,9 @@ export default class MPTree {
       binary[1].map((node) => [node[0].toString('hex'), node[1]])
     )
 
-    if (this.nodes[this.rootHash] === undefined) throw new Error('Can\'t find a node by root hash')
+    if (this.nodes[this.rootHash] === undefined) throw new MissingNodeInTreeError('Can\'t find a node by root hash')
     Object.entries(this.nodes).forEach(([key, node]) => {
-      if (MPTree.nodeHash(node) !== key) throw new Error('Node hash is not equal to provided one')
+      if (MPTree.nodeHash(node) !== key) throw new MerkleTreeHashMismatchError()
       const { type, payload } = MPTree.parseNode(node)
       switch (type) {
         case NodeType.Branch:
@@ -58,13 +64,13 @@ export default class MPTree {
             .filter(n => n.length)
             .forEach((n) => {
               if (this.nodes[n.toString('hex')] === undefined) {
-                throw new Error('Can\'t find a node by hash in branch node')
+                throw new MissingNodeInTreeError('Can\'t find a node by hash in branch node')
               }
             })
           break
         case NodeType.Extension:
           if (this.nodes[payload[0].toString('hex')] === undefined) {
-            throw new Error('Can\'t find a node by hash in extension node')
+            throw new MissingNodeInTreeError('Can\'t find a node by hash in extension node')
           }
       }
     })
@@ -81,13 +87,13 @@ export default class MPTree {
       case 2: {
         const path = node[0].toString('hex')
         const nibble = parseInt(path[0], 16)
-        if (nibble > 3) throw new Error(`Unknown path nibble: ${nibble}`)
+        if (nibble > 3) throw new UnknownPathNibbleError(nibble)
         const type = nibble <= 1 ? NodeType.Extension : NodeType.Leaf
         const slice = [0, 2].includes(nibble) ? 2 : 1
         return { type, payload: [node[1]], path: path.slice(slice) }
       }
       default:
-        throw new Error(`Unknown node length: ${node.length}`)
+        throw new UnknownNodeLengthError(node.length)
     }
   }
 

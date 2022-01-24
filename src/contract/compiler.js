@@ -28,6 +28,11 @@ import ContractBase from './index'
 import semverSatisfies from '../utils/semver-satisfies'
 import AsyncInit from '../utils/async-init'
 import genSwaggerClient from '../utils/swagger'
+import {
+  UnavailableCompilerError,
+  MissingParamError,
+  UnsupportedCompilerError
+} from '../utils/errors'
 
 /**
  * Contract Compiler Stamp
@@ -48,7 +53,7 @@ export default AsyncInit.compose(ContractBase, {
   },
   methods: {
     async setCompilerUrl (compilerUrl, { ignoreVersion = false } = {}) {
-      if (!compilerUrl) throw new Error('"compilerUrl" required')
+      if (!compilerUrl) throw new MissingParamError('compilerUrl required')
       compilerUrl = compilerUrl.replace(/\/$/, '')
       const client = await genSwaggerClient(`${compilerUrl}/api`, {
         disableBigNumbers: true,
@@ -77,12 +82,13 @@ export default AsyncInit.compose(ContractBase, {
 
       if (ignoreVersion) return
       if (!semverSatisfies(this.compilerVersion, COMPILER_GE_VERSION, COMPILER_LT_VERSION)) {
-        throw new Error(`Unsupported compiler version ${this.compilerVersion}. ` +
-          `Supported: >= ${COMPILER_GE_VERSION} < ${COMPILER_LT_VERSION}`)
+        throw new UnsupportedCompilerError(
+          this.compilerVersion, COMPILER_GE_VERSION, COMPILER_LT_VERSION
+        )
       }
     },
     _ensureCompilerReady () {
-      if (!this._compilerApi) throw new Error('Compiler is not ready')
+      if (!this._compilerApi) throw new UnavailableCompilerError()
     },
     _prepareCompilerOptions ({ filesystem = {} } = {}) {
       return { file_system: filesystem }

@@ -26,6 +26,7 @@ Usage guides:
 - [æternity naming system](docs/guides/aens.md)
 - [Contracts](docs/guides/contracts.md)
 - [Contract events](docs/guides/contract-events.md)
+- [Error handling](docs/guides/error-handling.md)
 - [Oracles](docs/guides/oracles.md)
 - [Low vs High level API](docs/guides/low-vs-high-usage.md)
 

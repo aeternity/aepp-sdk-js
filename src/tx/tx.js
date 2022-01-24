@@ -28,6 +28,13 @@ import { buildTx, calculateFee, unpackTx } from './builder'
 import { ABI_VERSIONS, MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE, TX_TTL } from './builder/schema'
 import { buildContractId } from './builder/helpers'
 import { TxObject } from './tx-object'
+import {
+  IllegalArgumentError,
+  UnsupportedABIversionError,
+  UnsupportedVMversionError,
+  UnsupportedProtocolError,
+  UnknownTxError
+} from '../utils/errors'
 
 async function spendTx ({ senderId, recipientId, amount, payload = '' }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
@@ -493,17 +500,17 @@ async function payingForTx ({ tx, payerId, ...args }) {
 function getVmVersion (txType, { vmVersion, abiVersion } = {}) {
   const { consensusProtocolVersion } = this.getNodeInfo()
   const supportedProtocol = PROTOCOL_VM_ABI[consensusProtocolVersion]
-  if (!supportedProtocol) throw new Error('Not supported consensus protocol version')
+  if (!supportedProtocol) throw new UnsupportedProtocolError('Not supported consensus protocol version')
   const protocolForTX = supportedProtocol[txType]
-  if (!protocolForTX) throw new Error('Not supported tx type')
+  if (!protocolForTX) throw new UnknownTxError('Not supported tx type')
 
   abiVersion = abiVersion || protocolForTX.abiVersion[0]
   vmVersion = vmVersion || protocolForTX.vmVersion[0]
   if (!protocolForTX.vmVersion.includes(vmVersion)) {
-    throw new Error(`VM VERSION ${vmVersion} do not support by this node. Supported: [${protocolForTX.vmVersion}]`)
+    throw new UnsupportedVMversionError(`VM VERSION ${vmVersion} do not support by this node. Supported: [${protocolForTX.vmVersion}]`)
   }
   if (!protocolForTX.abiVersion.includes(abiVersion)) {
-    throw new Error(`ABI VERSION ${abiVersion} do not support by this node. Supported: [${protocolForTX.abiVersion}]`)
+    throw new UnsupportedABIversionError(`ABI VERSION ${abiVersion} do not support by this node. Supported: [${protocolForTX.abiVersion}]`)
   }
 
   return { vmVersion, abiVersion }
@@ -518,7 +525,7 @@ function getVmVersion (txType, { vmVersion, abiVersion } = {}) {
  */
 async function calculateTtl (ttl = TX_TTL, relative = true) {
   if (ttl === 0) return 0
-  if (ttl < 0) throw new Error('ttl must be greater than 0')
+  if (ttl < 0) throw new IllegalArgumentError('ttl must be greater than 0')
 
   if (relative) {
     const { height } = await this.api.getCurrentKeyBlock()

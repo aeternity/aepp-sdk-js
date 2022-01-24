@@ -20,6 +20,7 @@ import { describe, it } from 'mocha'
 import { expect } from 'chai'
 import { dump, recover, getAddressFromPriv, validateKeyObj } from '../../src/utils/keystore'
 import { generateKeyPair } from '../../src/utils/crypto'
+import { InvalidKeyError, InvalidPasswordError } from '../../src/utils/errors'
 
 const invalidKeystore = {
   name: 'test',
@@ -67,8 +68,8 @@ describe('Keystore', function () {
   })
 
   it('use invalid keystore json', () => expect(recover(password, invalidKeystore))
-    .to.be.rejectedWith('Invalid key file format. Require properties: ciphertext,symmetric_alg'))
+    .to.be.rejectedWith(InvalidKeyError, 'Invalid key file format. Require properties: ciphertext,symmetric_alg'))
 
   it('use invalid keystore password', () => expect(recover(password + 1, keystoreBuffer))
-    .to.be.rejectedWith('Invalid password or nonce'))
+    .to.be.rejectedWith(InvalidPasswordError, 'Invalid password or nonce'))
 })

@@ -22,6 +22,13 @@ import { generateKeyPair } from '../../src/utils/crypto'
 import BigNumber from 'bignumber.js'
 import MemoryAccount from '../../src/account/memory'
 import { AE_AMOUNT_FORMATS } from '../../src/utils/amount-formatter'
+import {
+  UnavailableAccountError,
+  TypeError,
+  IllegalArgumentError,
+  InvalidKeypairError,
+  InvalidTxParamsError
+} from '../../src/utils/errors'
 
 describe('Accounts', function () {
   let sdk, openClient
@@ -55,7 +62,7 @@ describe('Accounts', function () {
     })
 
     it('spending negative amount of tokens', () => expect(wallet.spend(-1, receiver))
-      .to.be.rejectedWith('Transaction build error. {"amount":"-1 must be >= 0"}'))
+      .to.be.rejectedWith(InvalidTxParamsError, 'Transaction build error. {"amount":"-1 must be >= 0"}'))
   })
 
   it('determines the balance using `balance`', async () => {
@@ -76,7 +83,7 @@ describe('Accounts', function () {
     }
 
     it('throws exception if fraction is out of range', () => sdk.transferFunds(-1, receiver)
-      .should.be.rejectedWith(/Fraction should be a number between 0 and 1, got/))
+      .should.be.rejectedWith(IllegalArgumentError, /Fraction should be a number between 0 and 1, got/))
 
     it('spends 0% of balance', async () => {
       const { balanceBefore, balanceAfter, amount } = await spend(0)
@@ -161,22 +168,30 @@ describe('Accounts', function () {
 
     it('Fail on invalid account', async () => {
       return expect(sdk.spend(1, await sdk.address(), { onAccount: 1 }))
-        .to.be.rejectedWith('Unknown account type: number (account: 1)')
+        .to.be.rejectedWith(
+          TypeError,
+          'Account should be an address (ak-prefixed string), keypair, or instance of account base, got 1 instead')
     })
 
     it('Fail on non exist account', async () => {
       return expect(sdk.spend(1, await sdk.address(), { onAccount: 'ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk' }))
-        .to.be.rejectedWith('Account for ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk not available')
+        .to.be.rejectedWith(
+          UnavailableAccountError,
+          'Account for ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk not available')
     })
 
     it('Fail on no accounts', async () => {
       return expect(openClient.spend(1, await sdk.address()))
-        .to.be.rejectedWith('No account or wallet configured')
+        .to.be.rejectedWith(
+          TypeError,
+          'Account should be an address (ak-prefixed string), keypair, or instance of account base, got null instead')
     })
 
     it('Invalid on account options', () => {
       return expect(sdk.sign('tx_Aasdasd', { onAccount: 123 }))
-        .to.be.rejectedWith('Unknown account type: number (account: 123)')
+        .to.be.rejectedWith(
+          TypeError,
+          'Account should be an address (ak-prefixed string), keypair, or instance of account base, got 123 instead')
     })
     it('Make operation on account using keyPair/MemoryAccount', async () => {
       const keypair = generateKeyPair()
@@ -197,8 +212,8 @@ describe('Accounts', function () {
       const keypair = generateKeyPair()
       keypair.publicKey = 'ak_bev1aPMdAeJTuUiCJ7mHbdQiAizrkRGgoV9FfxHYb6pAxo5WY'
       const data = 'Hello'
-      await expect(sdk.sign(data, { onAccount: keypair })).to.be.rejectedWith('Invalid Key Pair')
-      await expect(sdk.address({ onAccount: keypair })).to.be.rejectedWith('Invalid Key Pair')
+      await expect(sdk.sign(data, { onAccount: keypair })).to.be.rejectedWith(InvalidKeypairError, 'Invalid Key Pair')
+      await expect(sdk.address({ onAccount: keypair })).to.be.rejectedWith(InvalidKeypairError, 'Invalid Key Pair')
     })
   })
 

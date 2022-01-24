@@ -25,6 +25,7 @@ import SwaggerClient from 'swagger-client'
 import fetch from 'cross-fetch'
 import JsonBig from './json-big'
 import { snakizeKeys, pascalizeKeys, mapObject, filterObject } from './other'
+import { SwaggerError } from './errors'
 
 let warnedAboutInternalApiUsage = false
 
@@ -111,7 +112,7 @@ export default async (
           : []
       ]
       const required = parameters.filter(param => param.required).map(p => p.name)
-      if (args.length < required.length) throw new Error('swagger: Not enough arguments')
+      if (args.length < required.length) throw new SwaggerError('swagger: Not enough arguments')
       const values = required.reduce(
         (acc, req, idx) => ({ ...acc, [req]: args[idx] }),
         args[required.length] || {}

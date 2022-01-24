@@ -12,6 +12,13 @@ import Ae from '../../../ae'
 import RpcClient from './rpc-client'
 import { getHandler, message, voidFn } from '../helpers'
 import { METHODS, RPC_STATUS, VERSION } from '../schema'
+import {
+  AlreadyConnectedError,
+  NoWalletConnectedError,
+  UnsubscribedAccountError,
+  UnAuthorizedAccountError,
+  IllegalArgumentError
+} from '../../errors'
 
 const NOTIFICATIONS = {
   [METHODS.wallet.updateAddress]: (instance) =>
@@ -114,7 +121,7 @@ export default Ae.compose({
     this.onNetworkChange = onNetworkChange
     // validation
     eventsHandlers.forEach(event => {
-      if (!forceValidation && typeof this[event] !== 'function') throw new Error(`Call-back for ${event} must be an function!`)
+      if (!forceValidation && typeof this[event] !== 'function') throw new IllegalArgumentError(`Call-back for ${event} must be an function!`)
     })
   },
   deepProps: { Ae: { defaults: { walletBroadcast: true } } },
@@ -122,7 +129,7 @@ export default Ae.compose({
     sign () {
     },
     addresses () {
-      if (!this.rpcClient.currentAccount) throw new Error('You are not subscribed for an account.')
+      if (!this.rpcClient.currentAccount) throw new UnsubscribedAccountError()
       return [this.rpcClient.currentAccount, ...Object.keys(this.rpcClient.accounts.connected)]
     },
     /**
@@ -134,7 +141,7 @@ export default Ae.compose({
      * @return {void}
      */
     async connectToWallet (connection) {
-      if (this.rpcClient && this.rpcClient.isConnected()) throw new Error('You are already connected to wallet ' + this.rpcClient)
+      if (this.rpcClient && this.rpcClient.isConnected()) throw new AlreadyConnectedError('You are already connected to wallet ' + this.rpcClient)
       this.rpcClient = RpcClient({
         connection,
         networkId: this.getNetworkId({ force: true }),
@@ -153,16 +160,16 @@ export default Ae.compose({
      * @return {void}
      */
     async disconnectWallet (sendDisconnect = true) {
-      if (!this.rpcClient || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
+      if (!this.rpcClient || !this.rpcClient.isConnected()) throw new NoWalletConnectedError('You are not connected to Wallet')
       sendDisconnect && this.rpcClient.sendMessage(message(METHODS.closeConnection, { reason: 'bye' }), true)
       this.rpcClient.disconnect()
       this.rpcClient = null
     },
     async address ({ onAccount } = {}) {
-      if (!this.rpcClient || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
+      if (!this.rpcClient || !this.rpcClient.isConnected()) throw new NoWalletConnectedError('You are not connected to Wallet')
       const current = this.rpcClient.currentAccount
-      if (!current) throw new Error('You are not subscribed for an account.')
-      if (onAccount && !this.rpcClient.hasAccessToAccount(onAccount)) throw new Error(`You do not have access to account ${onAccount}`)
+      if (!current) throw new UnsubscribedAccountError()
+      if (onAccount && !this.rpcClient.hasAccessToAccount(onAccount)) throw new UnAuthorizedAccountError(`You do not have access to account ${onAccount}`)
       return onAccount || current
     },
     /**
@@ -173,8 +180,8 @@ export default Ae.compose({
      * @return {Promise} Address from wallet
      */
     async askAddresses () {
-      if (!this.rpcClient || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
-      if (!this.rpcClient.currentAccount) throw new Error('You are not subscribed for an account.')
+      if (!this.rpcClient || !this.rpcClient.isConnected()) throw new NoWalletConnectedError('You are not connected to Wallet')
+      if (!this.rpcClient.currentAccount) throw new UnsubscribedAccountError()
       return this.rpcClient.request(METHODS.aepp.address)
     },
     /**
@@ -187,7 +194,7 @@ export default Ae.compose({
      * @return {Promise} Address from wallet
      */
     async subscribeAddress (type, value) {
-      if (!this.rpcClient || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
+      if (!this.rpcClient || !this.rpcClient.isConnected()) throw new NoWalletConnectedError('You are not connected to Wallet')
       return this.rpcClient.request(METHODS.aepp.subscribeAddress, { type, value })
     },
     /**
@@ -199,9 +206,9 @@ export default Ae.compose({
      * @return {Promise<String>} Signed transaction
      */
     async signTransaction (tx, opt = {}) {
-      if (!this.rpcClient || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
-      if (!this.rpcClient.currentAccount) throw new Error('You are not subscribed for an account.')
-      if (opt.onAccount && !this.rpcClient.hasAccessToAccount(opt.onAccount)) throw new Error(`You do not have access to account ${opt.onAccount}`)
+      if (!this.rpcClient || !this.rpcClient.isConnected()) throw new NoWalletConnectedError('You are not connected to Wallet')
+      if (!this.rpcClient.currentAccount) throw new UnsubscribedAccountError()
+      if (opt.onAccount && !this.rpcClient.hasAccessToAccount(opt.onAccount)) throw new UnAuthorizedAccountError(`You do not have access to account ${opt.onAccount}`)
       return this.rpcClient.request(
         METHODS.aepp.sign,
         { ...opt, tx, returnSigned: true, networkId: this.getNetworkId() }
@@ -216,9 +223,9 @@ export default Ae.compose({
      * @return {Promise<String>} Signed transaction
      */
     async signMessage (msg, opt = {}) {
-      if (!this.rpcClient || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
-      if (!this.rpcClient.currentAccount) throw new Error('You are not subscribed for an account.')
-      if (opt.onAccount && !this.rpcClient.hasAccessToAccount(opt.onAccount)) throw new Error(`You do not have access to account ${opt.onAccount}`)
+      if (!this.rpcClient || !this.rpcClient.isConnected()) throw new NoWalletConnectedError('You are not connected to Wallet')
+      if (!this.rpcClient.currentAccount) throw new UnsubscribedAccountError()
+      if (opt.onAccount && !this.rpcClient.hasAccessToAccount(opt.onAccount)) throw new UnAuthorizedAccountError(`You do not have access to account ${opt.onAccount}`)
       return this.rpcClient.request(METHODS.aepp.signMessage, { ...opt, message: msg })
     },
     /**
@@ -251,9 +258,9 @@ export default Ae.compose({
      * @return {Promise<Object>} Transaction broadcast result
      */
     async send (tx, options = {}) {
-      if (!this.rpcClient || !this.rpcClient.isConnected()) throw new Error('You are not connected to Wallet')
-      if (!this.rpcClient.currentAccount) throw new Error('You are not subscribed for an account.')
-      if (options.onAccount && !this.rpcClient.hasAccessToAccount(options.onAccount)) throw new Error(`You do not have access to account ${options.onAccount}`)
+      if (!this.rpcClient || !this.rpcClient.isConnected()) throw new NoWalletConnectedError('You are not connected to Wallet')
+      if (!this.rpcClient.currentAccount) throw new UnsubscribedAccountError()
+      if (options.onAccount && !this.rpcClient.hasAccessToAccount(options.onAccount)) throw new UnAuthorizedAccountError(`You do not have access to account ${options.onAccount}`)
       const opt = { ...this.Ae.defaults, ...options }
       if (!opt.walletBroadcast) {
         const signed = await this.signTransaction(tx, { onAccount: opt.onAccount })

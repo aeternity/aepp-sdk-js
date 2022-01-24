@@ -2,6 +2,7 @@
  * Browser helper functions
  */
 import { isAccountBase } from '../../account/base'
+import { TypeError, NoBrowserFoundError } from '../errors'
 
 export const getBrowserAPI = (force = false) => {
   const { chrome, browser } = window
@@ -9,7 +10,7 @@ export const getBrowserAPI = (force = false) => {
   if (typeof chrome !== 'undefined' && chrome === Object(chrome)) return chrome
   // Firefox support
   if (typeof browser !== 'undefined' && browser === Object(browser)) return browser
-  if (!force) throw new Error('Browser is not detected')
+  if (!force) throw new NoBrowserFoundError()
   return {}
 }
 
@@ -63,7 +64,7 @@ export const isValidAccounts = (accounts) => (['', 'connected', 'current'].filte
 
 export const resolveOnAccount = (addresses, onAccount, opt = {}) => {
   if (!addresses.find(a => a === onAccount)) {
-    if (typeof opt.onAccount !== 'object' || !isAccountBase(opt.onAccount)) throw new Error('Provided onAccount should be an AccountBase')
+    if (typeof opt.onAccount !== 'object' || !isAccountBase(opt.onAccount)) throw new TypeError('Provided onAccount should be an AccountBase')
     onAccount = opt.onAccount
   }
   return onAccount

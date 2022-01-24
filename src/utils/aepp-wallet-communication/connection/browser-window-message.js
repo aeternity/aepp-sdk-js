@@ -31,6 +31,11 @@ import WalletConnection from '.'
 import { v4 as uuid } from 'uuid'
 import { MESSAGE_DIRECTION } from '../schema'
 import { getBrowserAPI, isInIframe } from '../helpers'
+import {
+  AlreadyConnectedError,
+  NoWalletConnectedError,
+  MessageDirectionError
+} from '../../errors'
 
 /**
  * Check if connected
@@ -56,7 +61,7 @@ function connect (onMessage) {
   const receiveDirection = this.receiveDirection
   const debug = this.debug
   const forceOrigin = this.forceOrigin
-  if (this.listener) throw new Error('You already connected')
+  if (this.listener) throw new AlreadyConnectedError('You already connected')
 
   this.listener = (msg, source) => {
     if (!msg || typeof msg.data !== 'object') return
@@ -80,7 +85,7 @@ function connect (onMessage) {
  * @return {void}
  */
 function disconnect () {
-  if (!this.listener) throw new Error('You dont have connection. Please connect before')
+  if (!this.listener) throw new NoWalletConnectedError('You dont have connection. Please connect before')
   this.unsubscribeFn(this.listener)
   this.listener = null
 }
@@ -141,8 +146,8 @@ export default stampit({
     debug = false,
     forceOrigin = false
   } = {}) {
-    if (sendDirection && !Object.keys(MESSAGE_DIRECTION).includes(sendDirection)) throw new Error(`sendDirection must be one of [${Object.keys(MESSAGE_DIRECTION)}]`)
-    if (!Object.keys(MESSAGE_DIRECTION).includes(receiveDirection)) throw new Error(`receiveDirection must be one of [${Object.keys(MESSAGE_DIRECTION)}]`)
+    if (sendDirection && !Object.keys(MESSAGE_DIRECTION).includes(sendDirection)) throw new MessageDirectionError(`sendDirection must be one of [${Object.keys(MESSAGE_DIRECTION)}]`)
+    if (!Object.keys(MESSAGE_DIRECTION).includes(receiveDirection)) throw new MessageDirectionError(`receiveDirection must be one of [${Object.keys(MESSAGE_DIRECTION)}]`)
     this.connectionInfo = { id: uuid(), ...connectionInfo }
 
     const selfP = self
@@ -155,7 +160,6 @@ export default stampit({
     this.subscribeFn = (listener) => selfP.addEventListener('message', listener, false)
     this.unsubscribeFn = (listener) => selfP.removeEventListener('message', listener, false)
     this.postFn = (msg) => targetP.postMessage(msg, this.origin || '*')
-    if (!this.connectionInfo.id) throw new Error('ID required.')
   },
   methods: { connect, sendMessage, disconnect, isConnected }
 }, WalletConnection)

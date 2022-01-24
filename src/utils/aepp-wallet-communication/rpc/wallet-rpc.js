@@ -14,6 +14,11 @@ import TxObject from '../../../tx/tx-object'
 import RpcClient from './rpc-client'
 import { getBrowserAPI, getHandler, isValidAccounts, message, resolveOnAccount, sendResponseMessage } from '../helpers'
 import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE } from '../schema'
+import {
+  IllegalArgumentError,
+  TypeError,
+  UnknownRpcClientError
+} from '../../errors'
 
 const NOTIFICATIONS = {
   [METHODS.closeConnection]: (instance, { client }) =>
@@ -65,7 +70,9 @@ const REQUESTS = {
       async ({ accounts } = {}) => {
         try {
           const clientAccounts = accounts || instance.getAccounts()
-          if (!isValidAccounts(clientAccounts)) throw new Error('Invalid provided accounts object')
+          if (!isValidAccounts(clientAccounts)) {
+            throw new TypeError('Invalid provided accounts object')
+          }
           const subscription = client.updateSubscription(type, value)
           client.setAccounts(clientAccounts, { forceNotification: true })
           return {
@@ -252,7 +259,7 @@ export default Ae.compose(AccountMultiple, {
 
     eventsHandlers.forEach(event => {
       if (!forceValidation && typeof this[event] !== 'function') {
-        throw new Error(`Call-back for ${event} must be an function!`)
+        throw new IllegalArgumentError(`Call-back for ${event} must be an function!`)
       }
     })
     //
@@ -315,7 +322,7 @@ export default Ae.compose(AccountMultiple, {
      */
     removeRpcClient (id, { forceConnectionClose = false } = {}) {
       const client = this.rpcClients[id]
-      if (!client) throw new Error(`RpcClient with id ${id} do not exist`)
+      if (!client) throw new UnknownRpcClientError(id)
       client.disconnect(forceConnectionClose)
       delete this.rpcClients[id]
     },

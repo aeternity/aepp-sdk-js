@@ -20,6 +20,7 @@ import { EventEmitter } from 'events'
 import JsonBig from '../utils/json-big'
 import { pascalToSnake } from '../utils/string'
 import { awaitingConnection, awaitingReconnection, channelOpen } from './handlers'
+import { ChannelCallError, ChannelPingTimedOutError, UnknownChannelStateError } from '../utils/errors'
 
 // Send ping message every 10 seconds
 const PING_TIMEOUT_MS = 10000
@@ -49,7 +50,7 @@ export function emit (channel, ...args) {
 
 function enterState (channel, nextState) {
   if (!nextState) {
-    throw new Error('State Channels FSM entered unknown state')
+    throw new UnknownChannelStateError()
   }
   fsm.set(channel, nextState)
   if (nextState.handler.enter) {
@@ -134,7 +135,7 @@ function ping (channel) {
     })
     pongTimeoutId.set(channel, setTimeout(() => {
       disconnect(channel)
-      emit(channel, 'error', new Error('Server pong timed out'))
+      emit(channel, 'error', new ChannelPingTimedOutError())
     }, PONG_TIMEOUT_MS))
   }, PING_TIMEOUT_MS))
 }
@@ -169,9 +170,9 @@ function onMessage (channel, data) {
 function wrapCallErrorMessage (message) {
   const [{ message: details } = {}] = message.error.data || []
   if (details) {
-    return new Error(`${message.error.message}: ${details}`)
+    return new ChannelCallError(`${message.error.message}: ${details}`)
   }
-  return new Error(message.error.message)
+  return new ChannelCallError(message.error.message)
 }
 
 export function call (channel, method, params) {

@@ -25,6 +25,7 @@
 import stampit from '@stamp/it'
 import BrowserWindowMessageConnection from './connection/browser-window-message'
 import { MESSAGE_DIRECTION, METHODS } from './schema'
+import { UnsupportedPlatformError } from '../errors'
 
 /**
  * WalletDetector stamp
@@ -37,7 +38,7 @@ import { MESSAGE_DIRECTION, METHODS } from './schema'
  */
 export default stampit({
   init ({ connection } = {}) {
-    if (!window) throw new Error('Window object not found, you can run wallet detector only in browser')
+    if (!window) throw new UnsupportedPlatformError('Window object not found, you can run wallet detector only in browser')
     this.connection = connection || BrowserWindowMessageConnection({ connectionInfo: { id: 'spy' } })
     this.wallets = {}
   },

@@ -4,6 +4,7 @@ import { encode, decode } from './builder/helpers'
 import BigNumber from 'bignumber.js'
 import { MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE } from './builder/schema'
 import { calculateFee, unpackTx } from './builder'
+import { UnsupportedProtocolError } from '../utils/errors'
 
 /**
  * Transaction validator
@@ -104,7 +105,7 @@ const validators = [
   ({ ctVersion, abiVersion }, { txType, node }) => {
     const { consensusProtocolVersion } = node.getNodeInfo()
     const protocol = PROTOCOL_VM_ABI[consensusProtocolVersion]
-    if (!protocol) throw new Error(`Unsupported protocol: ${consensusProtocolVersion}`)
+    if (!protocol) throw new UnsupportedProtocolError(`Unsupported protocol: ${consensusProtocolVersion}`)
     // If not contract create tx
     if (!ctVersion) ctVersion = { abiVersion }
     const txProtocol = protocol[txType]

@@ -3,6 +3,13 @@ import { v4 as uuid } from 'uuid'
 
 import { encodeBase58Check } from './crypto'
 import { str2buf } from './bytes'
+import {
+  IllegalArgumentError,
+  InvalidKeyError,
+  NoSuchAlgorithmError,
+  UnsupportedKdfError,
+  InvalidPasswordError
+} from './errors'
 
 const _sodium = require('libsodium-wrappers-sumo')
 
@@ -62,7 +69,7 @@ function encryptXsalsa20Poly1305 ({ plaintext, key, nonce }) {
 
 function decryptXsalsa20Poly1305 ({ ciphertext, key, nonce }) {
   const res = nacl.secretbox.open(ciphertext, nonce, key)
-  if (!res) throw new Error('Invalid password or nonce')
+  if (!res) throw new InvalidPasswordError('Invalid password or nonce')
   return res
 }
 
@@ -75,7 +82,7 @@ function decryptXsalsa20Poly1305 ({ ciphertext, key, nonce }) {
  * @return {buffer} Encrypted data.
  */
 function encrypt (plaintext, key, nonce, algo = DEFAULTS.crypto.symmetric_alg) {
-  if (!CRYPTO_FUNCTIONS[algo]) throw new Error(algo + ' is not available')
+  if (!CRYPTO_FUNCTIONS[algo]) throw new NoSuchAlgorithmError(algo)
   return CRYPTO_FUNCTIONS[algo].encrypt({ plaintext, nonce, key })
 }
 
@@ -88,7 +95,7 @@ function encrypt (plaintext, key, nonce, algo = DEFAULTS.crypto.symmetric_alg) {
  * @return {buffer} Decrypted data.
  */
 function decrypt (ciphertext, key, nonce, algo) {
-  if (!CRYPTO_FUNCTIONS[algo]) throw new Error(algo + ' is not available')
+  if (!CRYPTO_FUNCTIONS[algo]) throw new NoSuchAlgorithmError(algo)
   return CRYPTO_FUNCTIONS[algo].decrypt({ ciphertext, nonce, key })
 }
 
@@ -106,10 +113,12 @@ async function deriveKey (password, nonce, options = {
   kdf: DEFAULTS.crypto.kdf
 }) {
   if (typeof password === 'undefined' || password === null || !nonce) {
-    throw new Error('Must provide password and nonce to derive a key')
+    throw new IllegalArgumentError('Must provide password and nonce to derive a key')
   }
 
-  if (!Object.prototype.hasOwnProperty.call(DERIVED_KEY_FUNCTIONS, options.kdf)) throw new Error('Unsupported kdf type')
+  if (!Object.prototype.hasOwnProperty.call(DERIVED_KEY_FUNCTIONS, options.kdf)) {
+    throw new UnsupportedKdfError()
+  }
 
   return DERIVED_KEY_FUNCTIONS[options.kdf](password, nonce, options)
 }
@@ -170,7 +179,7 @@ export async function recover (password, keyObject) {
     nonce,
     keyObject.crypto.symmetric_alg
   )
-  if (!key) throw new Error('Invalid password')
+  if (!key) throw new InvalidPasswordError('Invalid password')
 
   if (Buffer.from(key).length === 64) return Buffer.from(key).toString('hex')
   return Buffer.from(key).toString('utf-8')
@@ -213,11 +222,11 @@ export function validateKeyObj (obj) {
   const cryptoKeys = ['cipher_params', 'ciphertext', 'symmetric_alg', 'kdf', 'kdf_params']
 
   const missingRootKeys = root.filter(key => !Object.prototype.hasOwnProperty.call(obj, key))
-  if (missingRootKeys.length) throw new Error(`Invalid key file format. Require properties: ${missingRootKeys}`)
+  if (missingRootKeys.length) throw new InvalidKeyError(`Invalid key file format. Require properties: ${missingRootKeys}`)
 
   const missingCryptoKeys = cryptoKeys
     .filter(key => !Object.prototype.hasOwnProperty.call(obj.crypto, key))
-  if (missingCryptoKeys.length) throw new Error(`Invalid key file format. Require properties: ${missingCryptoKeys}`)
+  if (missingCryptoKeys.length) throw new InvalidKeyError(`Invalid key file format. Require properties: ${missingCryptoKeys}`)
 
   return true
 }

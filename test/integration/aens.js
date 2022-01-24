@@ -21,6 +21,7 @@ import { getSdk } from './'
 import { randomName } from '../utils'
 import { generateKeyPair } from '../../src/utils/crypto'
 import { buildContractId, computeAuctionEndBlock, computeBidFee } from '../../src/tx/builder/helpers'
+import { AensPointerContextError } from '../../src/utils/errors'
 
 describe('Aens', function () {
   let sdk
@@ -67,7 +68,7 @@ describe('Aens', function () {
     const { pointers } = await sdk.getName(name)
     pointers.length.should.be.equal(0)
     await expect(sdk.spend(100, name, { onAccount }))
-      .to.be.rejectedWith(`Name ${name} don't have pointers for account_pubkey`)
+      .to.be.rejectedWith(AensPointerContextError, `Name ${name} don't have pointers for account_pubkey`)
   })
   it('Call contract using AENS name', async () => {
     const identityContract = `

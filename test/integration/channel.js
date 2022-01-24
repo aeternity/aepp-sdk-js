@@ -26,6 +26,11 @@ import { unpackTx, buildTx, buildTxHash } from '../../src/tx/builder'
 import { decode } from '../../src/tx/builder/helpers'
 import Channel from '../../src/channel'
 import MemoryAccount from '../../src/account/memory'
+import {
+  IllegalArgumentError,
+  InsufficientBalanceError,
+  ChannelConnectionError
+} from '../../src/utils/errors'
 
 const wsUrl = process.env.TEST_WS_URL || 'ws://localhost:3014/channel'
 
@@ -1200,15 +1205,15 @@ describe('Channel', function () {
     }
 
     it('when posting an update with negative amount', async () => {
-      return update({ amount: -10 }).should.eventually.be.rejectedWith('Amount cannot be negative')
+      return update({ amount: -10 }).should.eventually.be.rejectedWith(IllegalArgumentError, 'Amount cannot be negative')
     })
 
     it('when posting an update with insufficient balance', async () => {
-      return update({ amount: BigNumber('999e18') }).should.eventually.be.rejectedWith('Insufficient balance')
+      return update({ amount: BigNumber('999e18') }).should.eventually.be.rejectedWith(InsufficientBalanceError, 'Insufficient balance')
     })
 
     it('when posting an update with incorrect address', async () => {
-      return update({ from: 'ak_123' }).should.eventually.be.rejectedWith('Rejected')
+      return update({ from: 'ak_123' }).should.eventually.be.rejectedWith(ChannelConnectionError, 'Rejected')
     })
   })
 })

@@ -20,6 +20,13 @@ import TxObject from '../../src/tx/tx-object'
 import { TX_TYPE } from '../../src/tx/builder/schema'
 import { generateKeyPair } from '../../src/utils/crypto'
 import MemoryAccount from '../../src/account/memory'
+import {
+  InvalidSignatureError,
+  InvalidTxError,
+  TypeError,
+  UnknownTxError,
+  UnsignedTxError
+} from '../../src/utils/errors'
 
 describe('TxObject', () => {
   const keyPair = generateKeyPair()
@@ -28,15 +35,15 @@ describe('TxObject', () => {
 
   describe('Invalid initialization', () => {
     it('Empty arguments', () => {
-      expect(() => TxObject()).to.throw('Invalid TxObject arguments. Please provide one of { tx: "tx_asdasd23..." } or { type: "spendTx", params: {...} }')
+      expect(() => TxObject()).to.throw(InvalidTxError, 'Invalid TxObject arguments. Please provide one of { tx: "tx_asdasd23..." } or { type: "spendTx", params: {...} }')
     })
 
     it('Invalid "params"', () => {
-      expect(() => TxObject({ params: true, type: TX_TYPE.spend })).to.throw('"params" should be an object')
+      expect(() => TxObject({ params: true, type: TX_TYPE.spend })).to.throw(TypeError, '"params" should be an object')
     })
 
     it('Invalid "type"', () => {
-      expect(() => TxObject({ params: {}, type: 1 })).to.throw('Unknown transaction type 1')
+      expect(() => TxObject({ params: {}, type: 1 })).to.throw(UnknownTxError, 'Unknown transaction type 1')
     })
 
     it('Not enough arguments', () => {
@@ -87,11 +94,11 @@ describe('TxObject', () => {
 
     it('Get signature on unsigned tx', () => {
       expect(() => txObject.getSignatures())
-        .to.throw('Signature not found, transaction is not signed')
+        .to.throw(UnsignedTxError, 'Signature not found, transaction is not signed')
     })
 
     it('Invalid props', () => {
-      expect(() => txObject.setProp(true)).to.throw('Props should be an object')
+      expect(() => txObject.setProp(true)).to.throw(TypeError, 'Props should be an object')
     })
 
     it('Change props of signed transaction', () => {
@@ -114,7 +121,7 @@ describe('TxObject', () => {
 
     it('Invalid signature', async () => {
       expect(() => txObject.addSignature({}))
-        .to.throw('Invalid signature, signature must be of type Buffer or Uint8Array')
+        .to.throw(InvalidSignatureError, 'Invalid signature, signature must be of type Buffer or Uint8Array')
     })
   })
 })

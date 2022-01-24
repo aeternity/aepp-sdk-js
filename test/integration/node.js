@@ -20,6 +20,7 @@ import { url, internalUrl, ignoreVersion } from './'
 import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
 import NodePool from '../../src/node-pool'
+import { MissingParamError, NodeNotFoundError, TypeError } from '../../src/utils/errors'
 
 describe('Node client', function () {
   let node
@@ -56,17 +57,17 @@ describe('Node client', function () {
       expect(() => nodes.addNode('test', 1)).to.throw(Error)
       expect(() => nodes.addNode('test', null)).to.throw(Error)
       expect(() => nodes.addNode('test', {}))
-        .to.throw('Each node instance should have api (object), consensusProtocolVersion (number), genesisHash (string) fields, got {} instead')
+        .to.throw(TypeError, 'Each node instance should have api (object), consensusProtocolVersion (number), genesisHash (string) fields, got {} instead')
     })
 
     it('Throw error on get network without node ', async () => {
       const nodes = await NodePool()
-      expect(() => nodes.getNetworkId()).to.throw('networkId is not provided')
+      expect(() => nodes.getNetworkId()).to.throw(MissingParamError, 'networkId is not provided')
     })
 
     it('Throw error on using API without node', async () => {
       const nodes = await NodePool()
-      expect(() => nodes.api.someAPIfn()).to.throw('You can\'t use Node API. Node is not connected or not defined!')
+      expect(() => nodes.api.someAPIfn()).to.throw(NodeNotFoundError, 'You can\'t use Node API. Node is not connected or not defined!')
     })
 
     it('Can change Node', async () => {
@@ -90,7 +91,7 @@ describe('Node client', function () {
           { name: 'second', instance: node }
         ]
       })
-      expect(() => nodes.selectNode('asdasd')).to.throw('Node with name asdasd not in pool')
+      expect(() => nodes.selectNode('asdasd')).to.throw(NodeNotFoundError, 'Node with name asdasd not in pool')
     })
 
     it('Can get list of nodes', async () => {

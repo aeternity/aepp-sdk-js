@@ -32,6 +32,10 @@ import {
 } from '../tx/builder/helpers'
 import Ae from './'
 import { CLIENT_TTL, NAME_FEE, NAME_TTL } from '../tx/builder/schema'
+import {
+  InsufficientNameFeeError,
+  IllegalArgumentError
+} from '../utils/errors'
 
 /**
  * Revoke a name
@@ -199,7 +203,7 @@ async function query (name, opt = {}) {
     },
     revoke: async (options = {}) => this.aensRevoke(name, { ...opt, ...options }),
     extendTtl: async (nameTtl = NAME_TTL, options = {}) => {
-      if (!nameTtl || typeof nameTtl !== 'number' || nameTtl > NAME_TTL) throw new Error('Ttl must be an number and less then 180000 blocks')
+      if (!nameTtl || typeof nameTtl !== 'number' || nameTtl > NAME_TTL) throw new IllegalArgumentError('Ttl must be an number and less then 180000 blocks')
 
       return {
         ...await this.aensUpdate(name, {}, { ...opt, ...options, nameTtl, extendPointers: true }),
@@ -238,7 +242,7 @@ async function claim (name, salt, options) {
 
   const minNameFee = getMinimumNameFee(name)
   if (opt.nameFee !== this.Ae.defaults.nameFee && minNameFee.gt(opt.nameFee)) {
-    throw new Error(`the provided fee ${opt.nameFee} is not enough to execute the claim, required: ${minNameFee}`)
+    throw new InsufficientNameFeeError(opt.nameFee, minNameFee)
   }
   opt.nameFee = opt.nameFee !== this.Ae.defaults.nameFee ? opt.nameFee : minNameFee
   const claimTx = await this.nameClaimTx({

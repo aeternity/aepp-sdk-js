@@ -29,6 +29,7 @@ import shajs from 'sha.js'
 import { str2buf, toBytes } from './bytes'
 import { decode } from '../tx/builder/helpers'
 import { hash } from './crypto-ts'
+import { InvalidChecksumError, MessageLimitError } from './errors'
 
 export * from './crypto-ts'
 
@@ -127,7 +128,7 @@ function decodeRaw (buffer) {
 export function decodeBase64Check (str) {
   const buffer = Buffer.from(str, 'base64')
   const payload = decodeRaw(buffer)
-  if (!payload) throw new Error('Invalid checksum')
+  if (!payload) throw new InvalidChecksumError()
   return Buffer.from(payload)
 }
 
@@ -271,7 +272,7 @@ export function verify (str, signature, publicKey) {
 export function messageToHash (message) {
   const p = Buffer.from('aeternity Signed Message:\n', 'utf8')
   const msg = Buffer.from(message, 'utf8')
-  if (msg.length >= 0xFD) throw new Error('message too long')
+  if (msg.length >= 0xFD) throw new MessageLimitError()
   return hash(Buffer.concat([Buffer.from([p.length]), p, Buffer.from([msg.length]), msg]))
 }
 
