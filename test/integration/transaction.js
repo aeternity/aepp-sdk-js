@@ -46,7 +46,7 @@ const query = '{\'city\': \'Berlin\'}'
 const queryResponse = '{\'tmp\': 101}'
 
 // Contract test data
-const contractCode = `
+const contractSource = `
 contract Identity =
   entrypoint getArg(x : int) = x
 `
@@ -134,12 +134,19 @@ describe('Native Transaction', function () {
     txFromAPI.should.be.equal(nativeTx)
   })
 
+  let contract
   it('native build of contract create tx', async () => {
-    const { bytecode } = await sdk.contractCompile(contractCode)
-    const callData = await sdk.contractEncodeCallDataAPI(contractCode, 'init')
-    const owner = await sdk.address()
-
-    const params = { ownerId: owner, code: bytecode, deposit, amount, gas, gasPrice, callData }
+    contract = await sdk.getContractInstance({ source: contractSource })
+    await contract.compile()
+    const params = {
+      ownerId: await sdk.address(),
+      code: contract.bytecode,
+      deposit,
+      amount,
+      gas,
+      gasPrice,
+      callData: contract.calldata.encode('Identity', 'init', [])
+    }
     const txFromAPI = await sdk.contractCreateTx(params)
     const nativeTx = await sdkNative.contractCreateTx(params)
 
@@ -151,7 +158,7 @@ describe('Native Transaction', function () {
   })
 
   it('native build of contract call tx', async () => {
-    const callData = await sdk.contractEncodeCallDataAPI(contractCode, 'getArg', ['2'])
+    const callData = contract.calldata.encode('Identity', 'getArg', [2])
     const owner = await sdk.address()
 
     const params = { callerId: owner, contractId, amount, gas, gasPrice, callData }

@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2021 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -39,7 +39,7 @@ import MemoryAccount from './account/memory'
 import Aens from './ae/aens'
 import Contract from './ae/contract'
 import GeneralizeAccount from './contract/ga'
-import ContractCompilerAPI from './contract/compiler'
+import ContractCompilerHttp from './contract/compiler'
 import RpcAepp from './ae/aepp'
 import RpcWallet from './ae/wallet'
 import Oracle from './ae/oracle'
@@ -65,7 +65,7 @@ export {
   Aens,
   Bytes,
   Contract,
-  ContractCompilerAPI,
+  ContractCompilerHttp,
   ACITransformation,
   ChainNode,
   RpcAepp,

@@ -108,7 +108,6 @@ contract DelegateTest =
                               sign : signature,        // Signed oracle query id + contract address
                               r    : string) =
     Oracle.respond(o, q, signature = sign, r)`
-const encodedNumberSix = 'cb_DA6sWJo='
 const signSource = `
 contract Sign =
   entrypoint verify (msg: hash, pub: address, sig: signature): bool =
@@ -268,9 +267,6 @@ describe('Contract', function () {
       const deployedStatic = await compiled.deployStatic([])
       deployedStatic.result.should.have.property('gasUsed')
       deployedStatic.result.should.have.property('returnType')
-
-      const encodedCallData = await compiled.encodeCall('sumNumbers', ['1', '2'])
-      encodedCallData.should.satisfy(s => s.startsWith('cb_'))
     })
 
     it('Can call contract with external deps', async () => {
@@ -283,24 +279,22 @@ describe('Contract', function () {
   })
 
   describe('Sophia Compiler', function () {
-    let callData
     let bytecode
 
     it('compile', async () => {
-      bytecode = await sdk.compileContractAPI(identityContract)
-      const prefix = bytecode.slice(0, 2)
-      const isString = typeof bytecode === 'string'
-      prefix.should.be.equal('cb')
-      isString.should.be.equal(true)
+      bytecode = (await sdk.compilerApi.compileContract({ code: identityContract })).bytecode
+      expect(bytecode).to.be.a('string')
+      expect(bytecode.split('_')[0]).to.be.equal('cb')
     })
 
     it('throws clear exception if compile broken contract', async () => {
-      await expect(sdk.compileContractAPI(
-        'contract Foo =\n' +
-        '  entrypoint getArg(x : bar) = x\n' +
-        '  entrypoint getArg(x : int) = baz\n' +
-        '  entrypoint getArg1(x : int) = baz\n'
-      )).to.be.rejectedWith(
+      await expect(sdk.compilerApi.compileContract({
+        code:
+          'contract Foo =\n' +
+          '  entrypoint getArg(x : bar) = x\n' +
+          '  entrypoint getArg(x : int) = baz\n' +
+          '  entrypoint getArg1(x : int) = baz\n'
+      })).to.be.rejectedWith(
         'compile error:\n' +
         'type_error:3:3: Duplicate definitions of getArg at\n' +
         '  - line 2, column 3\n' +
@@ -310,58 +304,21 @@ describe('Contract', function () {
       )
     })
 
-    it('Get FATE assembler', async () => {
-      const result = await sdk.getFateAssembler(bytecode)
-      result.should.be.a('object')
-      const assembler = result['fate-assembler']
-      assembler.should.be.a('string')
-    })
-
-    it('Get compiler version from bytecode', async () => {
-      const { version } = await sdk.getBytecodeCompilerVersion(bytecode)
-      version.should.be.a('string')
-      version.split('.').length.should.be.equal(3)
-    })
-
-    it('get contract ACI', async () => {
-      const aci = await sdk.contractGetACI(identityContract)
-      aci.should.have.property('interface')
+    it('generate contract ACI', async () => {
+      const aci = await sdk.compilerApi.generateACI({ code: identityContract })
+      expect(aci).to.have.property('encoded_aci')
+      expect(aci).to.have.property('external_encoded_aci')
+      expect(aci).to.have.property('interface')
     })
 
     it('throws clear exception if generating ACI with no arguments', async () => {
-      await expect(sdk.contractGetACI())
+      await expect(sdk.compilerApi.generateACI())
         .to.be.rejectedWith('validation_error in body ({"error":"missing_required_property","data":"code","path":[]})')
     })
 
-    it('encode call-data', async () => {
-      callData = await sdk.contractEncodeCallDataAPI(identityContract, 'init', [])
-      const prefix = callData.slice(0, 2)
-      const isString = typeof callData === 'string'
-      prefix.should.be.equal('cb')
-      isString.should.be.equal(true)
-    })
-
-    it('decode call result', async () => {
-      return sdk.contractDecodeCallResultAPI(identityContract, 'getArg', encodedNumberSix, 'ok')
-        .should.eventually.become(6)
-    })
-
-    it('Decode call-data using source', async () => {
-      const decodedCallData = await sdk.contractDecodeCallDataBySourceAPI(identityContract, 'init', callData)
-      decodedCallData.arguments.should.be.an('array')
-      decodedCallData.arguments.length.should.be.equal(0)
-      decodedCallData.function.should.be.equal('init')
-    })
-
-    it('Decode call-data using bytecode', async () => {
-      const decodedCallData = await sdk.contractDecodeCallDataByCodeAPI(bytecode, callData)
-      decodedCallData.arguments.should.be.an('array')
-      decodedCallData.arguments.length.should.be.equal(0)
-      decodedCallData.function.should.be.equal('init')
-    })
-
     it('validate bytecode', async () => {
-      return sdk.validateByteCodeAPI(bytecode, identityContract).should.eventually.become(true)
+      expect(await sdk.compilerApi.validateByteCode({ bytecode, source: identityContract }))
+        .to.be.eql({})
     })
 
     it('Use invalid compiler url', async () => {

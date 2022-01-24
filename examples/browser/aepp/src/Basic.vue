@@ -19,7 +19,7 @@
     </div>
     <div>
       <div>Compiler version</div>
-      <Value :value="compilerVersionPromise" />
+      <div>{{ compilerVersion }}</div>
     </div>
   </div>
 
@@ -69,7 +69,7 @@ export default {
     balancePromise: null,
     heightPromise: null,
     nodeInfoPromise: null,
-    compilerVersionPromise: null,
+    compilerVersion: '',
     spendTo: '',
     spendAmount: '',
     spendPayload: '',
@@ -80,7 +80,7 @@ export default {
       ({ sdk, address, networkId }) => [sdk, address, networkId],
       ([sdk, address]) => {
         if (!sdk) return
-        this.compilerVersionPromise = sdk.getCompilerVersion()
+        this.compilerVersion = sdk.compilerVersion
         this.balancePromise = sdk.balance(address)
         this.heightPromise = sdk.height()
         this.nodeInfoPromise = sdk.getNodeInfo()

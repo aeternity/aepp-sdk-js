@@ -91,7 +91,9 @@ export default async function getContractInstance ({
   validateBytecode,
   ...otherOptions
 } = {}) {
-  aci = aci || (source && await this.contractGetACI(source, { filesystem }))
+  if (!aci && source) {
+    aci = await this.compilerApi.generateACI({ code: source, options: { filesystem } })
+  }
   if (!aci) throw new MissingContractDefError()
   contractAddress = contractAddress && await this.resolveName(
     contractAddress, 'contract_pubkey', { resolveByNode: true }
@@ -124,9 +126,11 @@ export default async function getContractInstance ({
   if (validateBytecode) {
     if (!contractAddress) throw new MissingContractAddressError('Can\'t validate bytecode without contract address')
     const onChanBytecode = (await this.getContractByteCode(contractAddress)).bytecode
-    const isValid = (source && await this
-      .validateByteCodeAPI(onChanBytecode, source, instance.options).catch(() => false)) ||
-      bytecode === onChanBytecode
+    const isValid = source
+      ? await this.compilerApi.validateByteCode(
+        { bytecode: onChanBytecode, source, options: instance.options }
+      ).then((res) => Object.entries(res).length === 0, () => false)
+      : bytecode === onChanBytecode
     if (!isValid) throw new BytecodeMismatchError(source ? 'source' : 'bytecode')
   }
 

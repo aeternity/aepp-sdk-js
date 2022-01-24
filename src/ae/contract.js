@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2021 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -27,10 +27,8 @@
  */
 
 import Ae from './'
-import ContractCompilerAPI from '../contract/compiler'
-import ContractBase from '../contract'
+import ContractCompilerHttp from '../contract/compiler'
 import getContractInstance from '../contract/aci'
-import NodePool from '../node-pool'
 import { AMOUNT, DEPOSIT, GAS, MIN_GAS_PRICE } from '../tx/builder/schema'
 import { decode, produceNameId } from '../tx/builder/helpers'
 
@@ -123,7 +121,7 @@ async function contractDeploy (code, source, params, options) {
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae/contract
  * @category async
- * @param {String} source Contract sourece code
+ * @param {String} code Contract source code
  * @param {Object} [options={}] Transaction options (fee, ttl, gas, amount, deposit)
  * @param {Object} [options.filesystem={}] Contract external namespaces map*
  * @return {Promise<Object>} Result object
@@ -131,17 +129,15 @@ async function contractDeploy (code, source, params, options) {
  * const compiled = await client.contractCompile(SOURCE_CODE)
  * {
  *   bytecode: CONTRACT_BYTE_CODE,
- *   deploy: (init = [], options = {}) => Deploy Contract,
- *   encodeCall: (fnName, args = []) => Prepare callData
+ *   deploy: (init = [], options = {}) => Deploy Contract
  * }
  */
-async function contractCompile (source, options = {}) {
+async function contractCompile (code, options = {}) {
   const opt = { ...this.Ae.defaults, ...options }
-  const bytecode = await this.compileContractAPI(source, options)
+  const { bytecode } = await this.compilerApi.compileContract({ code, options })
   return Object.freeze({
-    encodeCall: (name, args) => this.contractEncodeCallDataAPI(source, name, args, opt),
-    deploy: (init, options) => this.contractDeploy(bytecode, source, init, { ...opt, ...options }),
-    deployStatic: (init, options) => this.contractCallStatic(source, null, 'init', init, {
+    deploy: (init, options) => this.contractDeploy(bytecode, code, init, { ...opt, ...options }),
+    deployStatic: (init, options) => this.contractCallStatic(code, null, 'init', init, {
       ...opt,
       ...options,
       bytecode
@@ -236,25 +232,14 @@ async function createOracleDelegationSignature ({ contractId, queryId }, opt = {
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Contract instance
  * @example
- * import Transaction from '@aeternity/aepp-sdk/es/tx/tx
- * import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory
- * import ChainNode from '@aeternity/aepp-sdk/es/chain/node
- * import ContractCompilerAPI from '@aeternity/aepp-sdk/es/contract/compiler
- * // or using bundle
- * import {
- *   Transaction,
- *   MemoryAccount,
- *   ChainNode,
- *   ContractCompilerAPI
- * } from '@aeternity/aepp-sdk
+ * import { Transaction, MemoryAccount, ChainNode } from '@aeternity/aepp-sdk
  *
  * const ContractWithAE = await Contract
  *    .compose(Transaction, MemoryAccount, ChainNode) // AE implementation
- *    .compose(ContractCompilerAPI) // ContractBase implementation
  * const client = await ContractWithAe({ url, internalUrl, compilerUrl, keypair, ... })
  *
  */
-export const ContractAPI = Ae.compose(ContractBase, {
+export default Ae.compose(ContractCompilerHttp, {
   methods: {
     getContractInstance,
     contractCompile,
@@ -279,7 +264,3 @@ export const ContractAPI = Ae.compose(ContractBase, {
     }
   }
 })
-
-export const Contract = ContractAPI.compose(NodePool)
-export const ContractWithCompiler = Contract.compose(ContractCompilerAPI)
-export default ContractWithCompiler

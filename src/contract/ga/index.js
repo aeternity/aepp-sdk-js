@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2021 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -22,7 +22,7 @@
  * @export GeneralizeAccount
  * @example import { GeneralizeAccount } from '@aeternity/aepp-sdk'
  */
-import { ContractAPI } from '../../ae/contract'
+import Contract from '../../ae/contract'
 import { TX_TYPE } from '../../tx/builder/schema'
 import { buildTx, unpackTx } from '../../tx/builder'
 import { prepareGaParams } from './helpers'
@@ -50,7 +50,7 @@ import { IllegalArgumentError, MissingParamError } from '../../utils/errors'
  *   authData: { source: authContract, args: [...authContractArgs] }
  * }) // sdk will prepare callData itself
  */
-export const GeneralizeAccount = ContractAPI.compose({
+export const GeneralizeAccount = Contract.compose({
   methods: {
     createGeneralizeAccount,
     createMetaTx,
@@ -88,11 +88,13 @@ async function createGeneralizeAccount (authFnName, source, args = [], options =
   const ownerId = await this.address(opt)
   if (await this.isGA(ownerId)) throw new IllegalArgumentError(`Account ${ownerId} is already GA`)
 
+  const contract = await this.getContractInstance({ source })
+  await contract.compile()
   const { tx, contractId } = await this.gaAttachTx({
     ...opt,
     ownerId,
-    code: (await this.contractCompile(source)).bytecode,
-    callData: await this.contractEncodeCallDataAPI(source, 'init', args),
+    code: contract.bytecode,
+    callData: contract.calldata.encode(contract.aci.name, 'init', args),
     authFun: hash(authFnName)
   })
 

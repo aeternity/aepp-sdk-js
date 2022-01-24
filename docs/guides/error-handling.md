@@ -49,7 +49,6 @@ AeError
 │   │   UnknownChannelStateError
 │
 └───CompilerError
-│   │   UnavailableCompilerError
 │   │   UnsupportedCompilerError
 │   │   InvalidAuthDataError
 │

@@ -23,12 +23,12 @@ async created () {
     compilerUrl: COMPILER_URL,
     onNetworkChange: async (params) => {
       this.client.selectNode(params.networkId)
-      this.nodeInfoResponse = await errorAsField(this.client.getNodeInfo())
+      this.nodeInfoResponse = await this.client.getNodeInfo()
     },
     onAddressChange:  async (addresses) => {
       this.pub = await this.client.address()
       this.balance = await this.client.balance(this.pub).catch(e => '0')
-      this.addressResponse = await errorAsField(this.client.address())
+      this.addressResponse = await this.client.address()
     },
     onDisconnect: () => {
       this.resetState()
@@ -73,9 +73,8 @@ async connectToWallet (wallet) {
   this.onAccount = this.pub
   this.balance = await this.client.getBalance(this.pub)
   this.walletName = this.client.rpcClient.info.name
-  this.addressResponse = await errorAsField(this.client.address())
-  this.heightResponse = await errorAsField(this.client.height())
-  this.nodeInfoResponse = await errorAsField(this.client.getNodeInfo())
-  this.compilerVersionResponse = await errorAsField(this.client.getCompilerVersion())
+  this.addressResponse = await this.client.address()
+  this.heightResponse = await this.client.height()
+  this.nodeInfoResponse = await this.client.getNodeInfo()
 }
 ```

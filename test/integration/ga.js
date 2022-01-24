@@ -20,7 +20,7 @@ import { getSdk } from './'
 import { generateKeyPair } from '../../src/utils/crypto'
 import MemoryAccount from '../../src/account/memory'
 
-const authContract = `contract BlindAuth =
+const authContractSource = `contract BlindAuth =
   stateful entrypoint authorize(r: int) : bool =
     // r is a random number only used to make tx hashes unique
     switch(Auth.tx_hash)
@@ -39,13 +39,13 @@ describe('Generalize Account', function () {
   })
 
   it('Make account GA', async () => {
-    await sdk.createGeneralizeAccount('authorize', authContract)
+    await sdk.createGeneralizeAccount('authorize', authContractSource)
     const isGa = await sdk.isGA(gaAccount.publicKey)
     isGa.should.be.equal(true)
   })
 
   it('Fail on make GA on already GA account', async () => {
-    await sdk.createGeneralizeAccount('authorize', authContract)
+    await sdk.createGeneralizeAccount('authorize', authContractSource)
       .should.be.rejectedWith(`Account ${gaAccount.publicKey} is already GA`)
   })
 
@@ -55,9 +55,10 @@ describe('Generalize Account', function () {
     const { publicKey } = generateKeyPair()
 
     const r = () => Math.floor(Math.random() * 20).toString()
-    const callData = await sdk.contractEncodeCallDataAPI(authContract, 'authorize', [r()])
+    const authContract = await sdk.getContractInstance({ source: authContractSource })
+    const callData = authContract.calldata.encode('BlindAuth', 'authorize', [r()])
     await sdk.spend(10000, publicKey, { authData: { callData } })
-    await sdk.spend(10000, publicKey, { authData: { source: authContract, args: [r()] } })
+    await sdk.spend(10000, publicKey, { authData: { source: authContractSource, args: [r()] } })
     const balanceAfter = await sdk.balance(publicKey)
     balanceAfter.should.be.equal('20000')
   })

@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2021 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -24,7 +24,7 @@
 
 import Ae from './'
 import Aens from './aens'
-import { ContractWithCompiler as Contract } from './contract'
+import Contract from './contract'
 import AeppRpc from '../utils/aepp-wallet-communication/rpc/aepp-rpc'
 import Chain from '../chain/node'
 import Tx from '../tx/tx'
