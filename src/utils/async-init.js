@@ -16,7 +16,7 @@
  */
 
 import stampit from '@stamp/it'
-import * as R from 'ramda'
+import { without, uniqWith, identical, flatten, path } from 'ramda'
 
 function asyncInit (options = {}, { stamp, args, instance }) {
   return stamp.compose.deepConfiguration.AsyncInit.initializers.reduce(async (instance, init) => {
@@ -33,7 +33,17 @@ const AsyncInit = stampit({
   deepConf: { AsyncInit: { initializers: [] } },
   composers ({ stamp, composables }) {
     const conf = stamp.compose.deepConfiguration.AsyncInit
-    conf.initializers = R.without([asyncInit], R.uniqWith(R.identical, R.flatten(composables.map(c => R.path(['compose', 'deepConfiguration', 'AsyncInit', 'initializers'], c) || (c.compose || c).initializers || []))))
+    conf.initializers = without(
+      [asyncInit],
+      uniqWith(
+        identical,
+        flatten(
+          composables.map(c =>
+            path(['compose', 'deepConfiguration', 'AsyncInit', 'initializers'], c) ||
+            (c.compose || c).initializers ||
+            []))
+      )
+    )
     stamp.compose.initializers = [asyncInit]
   }
 })

@@ -4,13 +4,13 @@
   "description": "SDK for the æternity blockchain",
   "main": "dist/aepp-sdk.js",
   "types": "es/index.d.ts",
-  "module": "es/index.js",
+  "module": "es/index.mjs",
   "browser": {
     "dist/aepp-sdk.js": "./dist/aepp-sdk.browser.js"
   },
   "sideEffects": false,
   "scripts": {
-    "build:es": "tsc && babel src --config-file ./babel.esm.config.js --out-dir es --extensions '.js,.ts' --source-maps true",
+    "build:es": "tsc && babel src --config-file ./babel.esm.config.js --out-dir es --extensions '.js,.ts' --out-file-extension .mjs --source-maps true",
     "build": "webpack --mode=production && npm run build:es",
     "build:dev": "webpack --mode=development && npm run build:es",
     "docs:examples": "node tooling/docs/examples-to-md.js examples/node/*.js",
@@ -83,7 +83,8 @@
     "@typescript-eslint/eslint-plugin": "^5.3.1",
     "@typescript-eslint/parser": "^5.3.1",
     "babel-loader": "^8.2.3",
-    "babel-plugin-ramda": "^2.0.0",
+    "babel-plugin-add-import-extension": "^1.6.0",
+    "babel-plugin-transform-default-named-imports": "^1.2.1",
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
     "codecov": "^3.8.3",
