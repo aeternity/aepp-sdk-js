@@ -121,17 +121,17 @@ AeError
 ## Usage
 
 ```js
-// import required error classes 
-const { 
-  Universal, 
-  Node, 
+// import required error classes
+const {
+  Universal,
+  Node,
   MemoryAccount,
   Crypto,
   InvalidTxParamsError,
-  InvalidAensNameError 
+  InvalidAensNameError
 } = require('@aeternity/aepp-sdk')
 
-// setup 
+// setup
 const NODE_URL = 'https://testnet.aeternity.io'
 const PAYER_ACCOUNT_KEYPAIR = Crypto.generateKeyPair()
 const NEW_USER_KEYPAIR = Crypto.generateKeyPair()
