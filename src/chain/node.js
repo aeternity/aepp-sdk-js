@@ -161,13 +161,14 @@ async function poll (
 ) {
   const max = await this.height() + blocks
   do {
-    const tx = await this.tx(th).catch(_ => null)
-    if (tx && (tx.blockHeight !== -1 || (allowUnsynced && tx.height))) {
+    const tx = await this.tx(th)
+    if (tx.blockHeight !== -1 || (allowUnsynced && tx.height)) {
       return tx
     }
     await pause(interval)
   } while (await this.height() < max)
-  throw new TxTimedOutError(blocks, th)
+  const status = this.api.getCheckTxInPool && (await this.api.getCheckTxInPool(th)).status
+  throw new TxTimedOutError(blocks, th, status)
 }
 
 async function getTxInfo (hash) {

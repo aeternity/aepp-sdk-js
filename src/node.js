@@ -59,7 +59,7 @@ const Node = AsyncInit.compose({
   async init ({ url, internalUrl, ignoreVersion }) {
     if (!url) throw new MissingParamError('"url" required')
     this.url = url.replace(/\/$/, '')
-    this.internalUrl = internalUrl ? internalUrl.replace(/\/$/, '') : this.url
+    this.internalUrl = internalUrl?.replace(/\/$/, '')
     const client = await genSwaggerClient(`${this.url}/api?oas3`, {
       internalUrl: this.internalUrl,
       responseInterceptor: response => {

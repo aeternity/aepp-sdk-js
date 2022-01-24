@@ -34,9 +34,14 @@ describe('Node client', function () {
     expect(node.revision).to.be.a('string')
   })
 
-  it('loads operations', () => {
+  it('wraps endpoints', () => {
     ['postTransaction', 'getCurrentKeyBlock']
       .map(method => expect(node.api[method]).to.be.a('function'))
+  })
+
+  it('don\'t wraps internal endpoints if internalUrl is not provided', async () => {
+    const node = await Node({ url, ignoreVersion })
+    expect(node.api.getPendingTransactions).to.be.an('undefined')
   })
 
   it('gets key blocks by height for the first 3 blocks', async () => {

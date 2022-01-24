@@ -161,8 +161,12 @@ export class RequestTimedOutError extends AeError {
 }
 
 export class TxTimedOutError extends AeError {
-  constructor (blocks: number, th: string) {
-    super(`Giving up after ${blocks} blocks mined, transaction hash: ${th}`)
+  constructor (blocks: number, th: string, status?: string) {
+    super([
+      `Giving up after ${blocks} blocks mined`,
+      `transaction hash: ${th}`,
+      ...status ? [`status: ${status}`] : []
+    ].join(', '))
     this.name = 'TxTimedOutError'
   }
 }

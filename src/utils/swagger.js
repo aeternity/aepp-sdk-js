@@ -78,8 +78,9 @@ export default async (
     })
   }))
 
-  const combinedApi = [
-    ...Object.values(external.apis),
+  const combinedApi = Object.assign(
+    {},
+    ...external.apis.external ? [external.apis.external] : Object.values(external.apis),
     mapObject(internal?.apis.internal || {}, ([key, handler]) => [key, (...args) => {
       if (!warnedAboutInternalApiUsage) {
         console.warn(
@@ -91,7 +92,7 @@ export default async (
       }
       return handler(...args)
     }])
-  ].reduce((acc, n) => ({ ...acc, ...n }))
+  )
 
   const opSpecs = Object.values(spec.paths)
     .map(paths => Object.values(paths))
