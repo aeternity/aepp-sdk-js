@@ -26,6 +26,7 @@ import fetch from 'cross-fetch'
 import JsonBig from './json-big'
 import { snakizeKeys, pascalizeKeys, mapObject, filterObject } from './other'
 import { SwaggerError } from './errors'
+import { snakeToPascal } from './string'
 
 let warnedAboutInternalApiUsage = false
 
@@ -98,7 +99,7 @@ export default async (
     .reduce((acc, n) => ({ ...acc, [n.operationId]: n }), {})
 
   const api = mapObject(combinedApi, ([opId, handler]) => [
-    opId.slice(0, 1).toLowerCase() + opId.slice(1),
+    opId.slice(0, 1).toLowerCase() + snakeToPascal(opId.slice(1)),
     async (...args) => {
       const opSpec = opSpecs[opId]
       const parameters = [
