@@ -635,8 +635,12 @@ describe('Contract instance', function () {
       })
 
       it('Valid', async () => {
+        const { nextNonce: base } = await sdk.api.getAccountNextNonce(await sdk.address());
         (await Promise.all([0, -1n, 0b101n]
-          .map(async value => [value, (await testContract.methods.bitsFn(value)).decodedResult])))
+          .map(async (value, idx) => [
+            value,
+            (await testContract.methods.bitsFn(value, { nonce: base + idx })).decodedResult
+          ])))
           .forEach(([v1, v2]) => expect(v2).to.be.equal(BigInt(v1)))
       })
     })

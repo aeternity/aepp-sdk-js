@@ -246,7 +246,8 @@ export default async function getContractInstance ({
       const txOpt = {
         ...opt,
         callData,
-        nonce: opt.top && (await this.getAccount(callerId, { hash: opt.top })).nonce + 1
+        nonce: opt.nonce ??
+          (opt.top && (await this.getAccount(callerId, { hash: opt.top })).nonce + 1)
       }
       const tx = fn === 'init'
         ? (await this.contractCreateTx({ ...txOpt, code: instance.bytecode, ownerId: callerId })).tx

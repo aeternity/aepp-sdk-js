@@ -53,6 +53,7 @@ nav:
     - guides/oracles.md
     - guides/paying-for-tx.md
     - guides/low-vs-high-usage.md
+    - guides/batch-requests.md
     - Wallet interaction:
       - guides/connect-aepp-to-wallet.md
       - guides/build-wallet.md

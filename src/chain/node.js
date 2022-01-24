@@ -43,8 +43,8 @@ import {
  */
 
 async function sendTransaction (tx, options = {}) {
-  const { waitMined, verify } = { ...this.Ae.defaults, ...options }
-  if (verify) {
+  const opt = { ...this.Ae.defaults, ...options }
+  if (opt.verify) {
     const validation = await verifyTransaction(tx, this.selectedNode.instance)
     if (validation.length) {
       const message = 'Transaction verification errors: ' +
@@ -58,9 +58,10 @@ async function sendTransaction (tx, options = {}) {
   }
 
   try {
-    const { txHash } = await this.api.postTransaction({ tx })
+    const { txHash } = await this.api
+      .postTransaction({ tx }, { __queue: `tx-${await this.address(options)}` })
 
-    if (waitMined) {
+    if (opt.waitMined) {
       const txData = { ...await this.poll(txHash, options), rawTx: tx }
       // wait for transaction confirmation
       if (options.confirm) {
@@ -128,14 +129,7 @@ async function tx (hash, info = true) {
 }
 
 async function height () {
-  try {
-    if (!this._heightPromise) {
-      this._heightPromise = this.api.getCurrentKeyBlockHeight()
-    }
-    return (await this._heightPromise).height
-  } finally {
-    delete this._heightPromise
-  }
+  return (await this.api.getCurrentKeyBlockHeight()).height
 }
 
 async function awaitHeight (
@@ -205,23 +199,42 @@ async function getMicroBlockHeader (hash) {
   return this.api.getMicroBlockHeaderByHash(hash)
 }
 
-async function txDryRun (tx, accountAddress, options) {
-  const { results: [{ result, reason, ...resultPayload }], ...other } =
-    await this.api.protectedDryRunTxs({
-      ...options,
-      txs: [{ tx }],
-      accounts: [{
-        pubKey: accountAddress,
-        amount: DRY_RUN_ACCOUNT.amount
-      }]
+async function txDryRunHandler (key) {
+  const rs = this._txDryRun[key]
+  delete this._txDryRun[key]
+
+  let dryRunRes
+  try {
+    dryRunRes = await this.api.protectedDryRunTxs({
+      top: rs[0].top,
+      txEvents: rs[0].txEvents,
+      txs: rs.map(req => ({ tx: req.tx })),
+      accounts: Array.from(new Set(rs.map(req => req.accountAddress)))
+        .map(pubKey => ({ pubKey, amount: DRY_RUN_ACCOUNT.amount }))
     })
+  } catch (error) {
+    rs.forEach(({ reject }) => reject(error))
+    return
+  }
 
-  if (result === 'ok') return { ...resultPayload, ...other }
+  const { results, txEvents } = dryRunRes
+  results.forEach(({ result, reason, ...resultPayload }, idx) => {
+    const { resolve, reject, tx, options, accountAddress } = rs[idx]
+    if (result === 'ok') return resolve({ ...resultPayload, txEvents })
+    reject(Object.assign(
+      new DryRunError(reason), { tx, accountAddress, options }
+    ))
+  })
+}
 
-  throw Object.assign(
-    new DryRunError(reason),
-    { tx, accountAddress, options }
-  )
+async function txDryRun (tx, accountAddress, { top, txEvents }) {
+  const key = [top, txEvents].join()
+  this._txDryRun ??= {}
+  this._txDryRun[key] ??= []
+  return new Promise((resolve, reject) => {
+    this._txDryRun[key].push({ tx, accountAddress, top, txEvents, resolve, reject })
+    this._txDryRun[key].timeout ??= setTimeout(txDryRunHandler.bind(this, key))
+  })
 }
 
 async function getContractByteCode (contractId) {
