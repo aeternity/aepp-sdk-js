@@ -16,6 +16,7 @@
  */
 import { expect } from 'chai'
 import { before, describe, it } from 'mocha'
+import BigNumber from 'bignumber.js'
 import { decodeEvents, SOPHIA_TYPES } from '../../src/contract/aci/transformation'
 import { decode } from '../../src/tx/builder/helpers'
 import {
@@ -321,7 +322,18 @@ describe('Contract instance', function () {
 
       it('Valid', async () => {
         const { decodedResult } = await testContract.methods.intFn.get(1)
-        decodedResult.toString().should.be.equal('1')
+        expect(decodedResult).to.be.equal(1n)
+      })
+
+      const unsafeInt = BigInt(Number.MAX_SAFE_INTEGER + '0')
+      it('Supports unsafe integer', async () => {
+        const { decodedResult } = await testContract.methods.intFn.get(unsafeInt)
+        expect(decodedResult).to.be.equal(unsafeInt)
+      })
+
+      it('Supports BigNumber', async () => {
+        const { decodedResult } = await testContract.methods.intFn.get(new BigNumber(unsafeInt))
+        expect(decodedResult).to.be.equal(unsafeInt)
       })
     })
 
