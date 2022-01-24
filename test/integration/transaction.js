@@ -160,9 +160,9 @@ describe('Native Transaction', function () {
     txFromAPI.should.be.equal(nativeTx)
 
     const { hash } = await sdk.send(nativeTx)
-    const result = await sdk.getTxInfo(hash)
+    const { callInfo: { returnType } } = await sdk.api.getTransactionInfoByHash(hash)
 
-    result.returnType.should.be.equal('ok')
+    returnType.should.be.equal('ok')
   })
 
   it('native build of oracle create tx', async () => {
