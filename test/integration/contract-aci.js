@@ -157,8 +157,11 @@ describe('Contract instance', function () {
     .to.be.rejectedWith(InvalidMethodInvocationError, 'You need to deploy contract before calling!'))
 
   it('deploys', async () => {
-    const deployInfo = await testContract.deploy(['test', 1, 'hahahaha'])
+    const deployInfo = await testContract.deploy(['test', 1, 'hahahaha'], { amount: 42 })
     expect(deployInfo.address.startsWith('ct_')).to.equal(true)
+    expect(deployInfo.txData.tx.gas).to.be.equal(25000)
+    expect(deployInfo.txData.tx.amount).to.be.equal(42)
+    expect(deployInfo.txData.gasUsed).to.be.equal(209)
     expect(testContract.bytecode.startsWith('cb_')).to.be.equal(true)
     testContractAddress = deployInfo.address
   })
