@@ -16,7 +16,7 @@
     "docs:examples": "node tooling/docs/examples-to-md.js examples/node/*.js",
     "docs:api": "node apidoc.js",
     "docs:changelog": "cp CHANGELOG.md docs/CHANGELOG.md",
-    "lint": "commitlint --from HEAD~40 && eslint .",
+    "lint": "commitlint --from HEAD~49 && eslint .",
     "test": "nyc mocha './test/unit/' './test/integration/'",
     "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "test:integration": "nyc mocha './test/integration/'",
