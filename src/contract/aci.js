@@ -166,7 +166,7 @@ export default async function getContractInstance ({
     throw new NodeInvocationError(message)
   }
 
-  const estimateGas = async (name, params, options) => {
+  instance._estimateGas = async (name, params, options) => {
     const { result: { gasUsed } } =
       await instance.call(name, params, { ...options, callStatic: true })
     // taken from https://github.com/aeternity/aepp-sdk-js/issues/1286#issuecomment-977814771
@@ -190,7 +190,7 @@ export default async function getContractInstance ({
     const ownerId = await this.address(opt)
     const { tx, contractId } = await this.contractCreateTx({
       ...opt,
-      gas: opt.gas ?? await estimateGas('init', params, opt),
+      gas: opt.gas ?? await instance._estimateGas('init', params, opt),
       callData: instance.calldata.encode(instance._name, 'init', params),
       code: instance.bytecode,
       ownerId
@@ -272,7 +272,7 @@ export default async function getContractInstance ({
     } else {
       const tx = await this.contractCallTx({
         ...opt,
-        gas: opt.gas ?? await estimateGas(fn, params, opt),
+        gas: opt.gas ?? await instance._estimateGas(fn, params, opt),
         callerId,
         contractId,
         callData

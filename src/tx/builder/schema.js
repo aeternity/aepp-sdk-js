@@ -22,7 +22,6 @@ export const RESPONSE_TTL = { type: 'delta', value: 10 }
 // # CONTRACT
 export const DEPOSIT = 0
 export const AMOUNT = 0
-export const GAS_ABOVE_AVERAGE = 25000 // TODO: don't use this
 export const GAS_MAX = 1600000 - 21000
 export const MIN_GAS_PRICE = 1e9
 export const MAX_AUTH_FUN_GAS = 50000
