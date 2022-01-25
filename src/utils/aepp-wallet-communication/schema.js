@@ -9,40 +9,21 @@ export const WALLET_TYPE = asEnum([
   'extension'
 ])
 
-export const NOTIFICATIONS = asEnum([
-  'readyToConnect',
-  'closeConnection',
-  'updateNetwork',
-  'updateAddress'
-])
-
-export const REQUESTS = asEnum([
-  'connect',
-  'subscribeAddress',
-  'sign',
-  'address',
-  'signMessage'
-])
-
 export const SUBSCRIPTION_TYPES = asEnum([
   'subscribe',
   'unsubscribe'
 ])
 
 export const METHODS = {
-  wallet: {
-    [NOTIFICATIONS.readyToConnect]: 'connection.announcePresence',
-    [NOTIFICATIONS.updateAddress]: 'address.update'
-  },
-  aepp: {
-    [REQUESTS.address]: 'address.get',
-    [REQUESTS.connect]: 'connection.open',
-    [REQUESTS.sign]: 'transaction.sign',
-    [REQUESTS.signMessage]: 'message.sign',
-    [REQUESTS.subscribeAddress]: 'address.subscribe'
-  },
-  [NOTIFICATIONS.updateNetwork]: 'networkId.update',
-  [NOTIFICATIONS.closeConnection]: 'connection.close'
+  readyToConnect: 'connection.announcePresence',
+  updateAddress: 'address.update',
+  address: 'address.get',
+  connect: 'connection.open',
+  sign: 'transaction.sign',
+  signMessage: 'message.sign',
+  subscribeAddress: 'address.subscribe',
+  updateNetwork: 'networkId.update',
+  closeConnection: 'connection.close'
 }
 
 export const RPC_STATUS = {

@@ -33,7 +33,7 @@ const RESPONSES = {}
 const REQUESTS = {
   // Store client info and prepare two fn for each client `connect` and `denyConnection`
   // which automatically prepare and send response for that client
-  [METHODS.aepp.connect] (callInstance, instance, client, { name, networkId, version, icons }) {
+  [METHODS.connect] (callInstance, instance, client, { name, networkId, version, icons }) {
     // Check if protocol and network is compatible with wallet
     if (version !== VERSION) return { error: ERRORS.unsupportedProtocol() }
 
@@ -60,7 +60,7 @@ const REQUESTS = {
       }
     )
   },
-  [METHODS.aepp.subscribeAddress] (callInstance, instance, client, { type, value }) {
+  [METHODS.subscribeAddress] (callInstance, instance, client, { type, value }) {
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
 
@@ -89,7 +89,7 @@ const REQUESTS = {
       (error) => ({ error: ERRORS.rejectedByUser(error) })
     )
   },
-  [METHODS.aepp.address] (callInstance, instance, client) {
+  [METHODS.address] (callInstance, instance, client) {
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
     if (!client.isSubscribed()) return { error: ERRORS.notAuthorize() }
@@ -104,7 +104,7 @@ const REQUESTS = {
       (error) => ({ error: ERRORS.rejectedByUser(error) })
     )
   },
-  [METHODS.aepp.sign] (callInstance, instance, client, options) {
+  [METHODS.sign] (callInstance, instance, client, options) {
     const { tx, onAccount, networkId, returnSigned = false } = options
     const address = onAccount || client.currentAccount
     // Update client with new networkId
@@ -151,7 +151,7 @@ const REQUESTS = {
       (error) => ({ error: ERRORS.rejectedByUser(error) })
     )
   },
-  [METHODS.aepp.signMessage] (callInstance, instance, client, { message, onAccount }) {
+  [METHODS.signMessage] (callInstance, instance, client, { message, onAccount }) {
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
     const address = onAccount || client.currentAccount
@@ -358,7 +358,7 @@ export default Ae.compose(AccountMultiple, {
     shareWalletInfo (postFn) {
       postFn({
         jsonrpc: '2.0',
-        ...message(METHODS.wallet.readyToConnect, this.getWalletInfo())
+        ...message(METHODS.readyToConnect, this.getWalletInfo())
       })
     },
     /**

@@ -55,7 +55,7 @@ export default stampit({
       this.connection.connect(({ method, params }, origin, source) => {
         if (
           !method || !params ||
-          method !== METHODS.wallet.readyToConnect || wallets[params.id]
+          method !== METHODS.readyToConnect || wallets[params.id]
         ) return
 
         const wallet = {
