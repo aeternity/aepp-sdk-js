@@ -12,13 +12,22 @@ import verifyTransaction from '../../../tx/validator'
 import AccountMultiple from '../../../account/multiple'
 import TxObject from '../../../tx/tx-object'
 import RpcClient from './rpc-client'
-import { getBrowserAPI, getHandler, isValidAccounts, message, resolveOnAccount, sendResponseMessage } from '../helpers'
+import { getBrowserAPI, getHandler, isValidAccounts, message, sendResponseMessage } from '../helpers'
 import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE } from '../schema'
 import {
   IllegalArgumentError,
   TypeError,
   UnknownRpcClientError
 } from '../../errors'
+import { isAccountBase } from '../../../account/base'
+
+const resolveOnAccount = (addresses, onAccount, opt = {}) => {
+  if (!addresses.find(a => a === onAccount)) {
+    if (typeof opt.onAccount !== 'object' || !isAccountBase(opt.onAccount)) throw new TypeError('Provided onAccount should be an AccountBase')
+    onAccount = opt.onAccount
+  }
+  return onAccount
+}
 
 const NOTIFICATIONS = {
   [METHODS.closeConnection]: (instance, { client }) =>
