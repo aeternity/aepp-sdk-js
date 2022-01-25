@@ -83,7 +83,7 @@ const REQUESTS = {
           }
         } catch (e) {
           if (instance.debug) console.error(e)
-          return { error: ERRORS.internalError({ msg: e.message }) }
+          return { error: ERRORS.internalError(e.message) }
         }
       },
       (error) => ({ error: ERRORS.rejectedByUser(error) })
@@ -113,7 +113,7 @@ const REQUESTS = {
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
     // Account permission check
     if (!client.hasAccessToAccount(address)) {
-      return { error: ERRORS.permissionDeny({ account: address }) }
+      return { error: ERRORS.permissionDeny(address) }
     }
     // NetworkId check
     if (!networkId || networkId !== instance.getNetworkId()) {
@@ -129,7 +129,7 @@ const REQUESTS = {
           onAcc = resolveOnAccount(instance.addresses(), address, opt)
         } catch (e) {
           if (instance.debug) console.error(e)
-          return { error: ERRORS.internalError({ msg: e.message }) }
+          return { error: ERRORS.internalError(e.message) }
         }
         try {
           const t = rawTx || tx
@@ -156,7 +156,7 @@ const REQUESTS = {
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
     const address = onAccount || client.currentAccount
     if (!client.hasAccessToAccount(address)) {
-      return { error: ERRORS.permissionDeny({ account: address }) }
+      return { error: ERRORS.permissionDeny(address) }
     }
 
     return callInstance(
@@ -175,7 +175,7 @@ const REQUESTS = {
           }
         } catch (e) {
           if (instance.debug) console.error(e)
-          return { error: ERRORS.internalError({ msg: e.message }) }
+          return { error: ERRORS.internalError(e.message) }
         }
       },
       (error) => ({ error: ERRORS.rejectedByUser(error) })
