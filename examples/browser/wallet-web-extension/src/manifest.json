@@ -1,38 +1,37 @@
 {
-  "name": "Wallet",
-  "options_page": "options.html",
+  "manifest_version": 2,
+  "name": "wallet-web-extension",
+  "homepage_url": "http://localhost:8080/",
+  "description": "A Vue Browser Extension",
+  "permissions": [
+    "activeTab",
+    "<all_urls>",
+    "*://*/*"
+  ],
+  "icons": {
+    "128": "icons/128.png"
+  },
   "background": {
-    "persistent": false,
-    "page": "background.html"
+    "scripts": [
+      "js/background.js"
+    ],
+    "persistent": false
   },
   "browser_action": {
     "default_popup": "popup.html",
-    "default_icon": "icon-34.png"
-  },
-  "icons": {
-    "128": "icon-128.png"
-  },
-  "manifest_version": 2,
-  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
-  "permissions": [
-    "contentSettings",
-    "notifications",
-    "https://*/*"
-  ],
-  "externally_connectable": {
-    "ids": ["*"],
-    "matches": ["http://localhost/*"]
-  },
-  "content_scripts": [
-    {
-      "matches": [
-        "https://*/*",
-        "http://*/*"
-      ],
-      "js": [
-        "inject.bundle.js"
-      ],
-      "all_frames": true
+    "default_title": "wallet-web-extension",
+    "default_icon": {
+      "34": "icons/34.png"
     }
-  ]
+  },
+  "content_scripts": [{
+    "matches": [
+      "https://*/*",
+      "http://*/*"
+    ],
+    "js": [
+      "js/content-script.js"
+    ],
+    "all_frames": true
+  }]
 }
