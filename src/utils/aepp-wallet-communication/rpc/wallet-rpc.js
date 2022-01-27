@@ -12,13 +12,22 @@ import verifyTransaction from '../../../tx/validator'
 import AccountMultiple from '../../../account/multiple'
 import TxObject from '../../../tx/tx-object'
 import RpcClient from './rpc-client'
-import { getBrowserAPI, getHandler, isValidAccounts, message, resolveOnAccount, sendResponseMessage } from '../helpers'
+import { getBrowserAPI, getHandler, isValidAccounts, message, sendResponseMessage } from '../helpers'
 import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE } from '../schema'
 import {
   IllegalArgumentError,
   TypeError,
   UnknownRpcClientError
 } from '../../errors'
+import { isAccountBase } from '../../../account/base'
+
+const resolveOnAccount = (addresses, onAccount, opt = {}) => {
+  if (!addresses.find(a => a === onAccount)) {
+    if (typeof opt.onAccount !== 'object' || !isAccountBase(opt.onAccount)) throw new TypeError('Provided onAccount should be an AccountBase')
+    onAccount = opt.onAccount
+  }
+  return onAccount
+}
 
 const NOTIFICATIONS = {
   [METHODS.closeConnection]: (instance, { client }) =>
@@ -33,7 +42,7 @@ const RESPONSES = {}
 const REQUESTS = {
   // Store client info and prepare two fn for each client `connect` and `denyConnection`
   // which automatically prepare and send response for that client
-  [METHODS.aepp.connect] (callInstance, instance, client, { name, networkId, version, icons }) {
+  [METHODS.connect] (callInstance, instance, client, { name, networkId, version, icons }) {
     // Check if protocol and network is compatible with wallet
     if (version !== VERSION) return { error: ERRORS.unsupportedProtocol() }
 
@@ -60,7 +69,7 @@ const REQUESTS = {
       }
     )
   },
-  [METHODS.aepp.subscribeAddress] (callInstance, instance, client, { type, value }) {
+  [METHODS.subscribeAddress] (callInstance, instance, client, { type, value }) {
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
 
@@ -83,13 +92,13 @@ const REQUESTS = {
           }
         } catch (e) {
           if (instance.debug) console.error(e)
-          return { error: ERRORS.internalError({ msg: e.message }) }
+          return { error: ERRORS.internalError(e.message) }
         }
       },
       (error) => ({ error: ERRORS.rejectedByUser(error) })
     )
   },
-  [METHODS.aepp.address] (callInstance, instance, client) {
+  [METHODS.address] (callInstance, instance, client) {
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
     if (!client.isSubscribed()) return { error: ERRORS.notAuthorize() }
@@ -104,7 +113,7 @@ const REQUESTS = {
       (error) => ({ error: ERRORS.rejectedByUser(error) })
     )
   },
-  [METHODS.aepp.sign] (callInstance, instance, client, options) {
+  [METHODS.sign] (callInstance, instance, client, options) {
     const { tx, onAccount, networkId, returnSigned = false } = options
     const address = onAccount || client.currentAccount
     // Update client with new networkId
@@ -113,7 +122,7 @@ const REQUESTS = {
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
     // Account permission check
     if (!client.hasAccessToAccount(address)) {
-      return { error: ERRORS.permissionDeny({ account: address }) }
+      return { error: ERRORS.permissionDeny(address) }
     }
     // NetworkId check
     if (!networkId || networkId !== instance.getNetworkId()) {
@@ -129,7 +138,7 @@ const REQUESTS = {
           onAcc = resolveOnAccount(instance.addresses(), address, opt)
         } catch (e) {
           if (instance.debug) console.error(e)
-          return { error: ERRORS.internalError({ msg: e.message }) }
+          return { error: ERRORS.internalError(e.message) }
         }
         try {
           const t = rawTx || tx
@@ -151,12 +160,12 @@ const REQUESTS = {
       (error) => ({ error: ERRORS.rejectedByUser(error) })
     )
   },
-  [METHODS.aepp.signMessage] (callInstance, instance, client, { message, onAccount }) {
+  [METHODS.signMessage] (callInstance, instance, client, { message, onAccount }) {
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
     const address = onAccount || client.currentAccount
     if (!client.hasAccessToAccount(address)) {
-      return { error: ERRORS.permissionDeny({ account: address }) }
+      return { error: ERRORS.permissionDeny(address) }
     }
 
     return callInstance(
@@ -175,7 +184,7 @@ const REQUESTS = {
           }
         } catch (e) {
           if (instance.debug) console.error(e)
-          return { error: ERRORS.internalError({ msg: e.message }) }
+          return { error: ERRORS.internalError(e.message) }
         }
       },
       (error) => ({ error: ERRORS.rejectedByUser(error) })
@@ -358,7 +367,7 @@ export default Ae.compose(AccountMultiple, {
     shareWalletInfo (postFn) {
       postFn({
         jsonrpc: '2.0',
-        ...message(METHODS.wallet.readyToConnect, this.getWalletInfo())
+        ...message(METHODS.readyToConnect, this.getWalletInfo())
       })
     },
     /**

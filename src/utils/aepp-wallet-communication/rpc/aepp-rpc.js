@@ -21,7 +21,7 @@ import {
 } from '../../errors'
 
 const NOTIFICATIONS = {
-  [METHODS.wallet.updateAddress]: (instance) =>
+  [METHODS.updateAddress]: (instance) =>
     ({ params }) => {
       instance.rpcClient.accounts = params
       instance.onAddressChange(params)
@@ -39,14 +39,14 @@ const NOTIFICATIONS = {
 }
 
 const RESPONSES = {
-  [METHODS.aepp.address]: (instance) =>
+  [METHODS.address]: (instance) =>
     (msg) => instance.rpcClient.processResponse(msg),
-  [METHODS.aepp.connect]: (instance) =>
+  [METHODS.connect]: (instance) =>
     (msg) => {
       if (msg.result) instance.rpcClient.info.status = RPC_STATUS.CONNECTED
       instance.rpcClient.processResponse(msg)
     },
-  [METHODS.aepp.subscribeAddress]: (instance) =>
+  [METHODS.subscribeAddress]: (instance) =>
     (msg) => {
       if (msg.result) {
         if (msg.result.address) {
@@ -59,13 +59,13 @@ const RESPONSES = {
 
       instance.rpcClient.processResponse(msg, ({ id, result }) => [result])
     },
-  [METHODS.aepp.sign]: (instance) =>
+  [METHODS.sign]: (instance) =>
     (msg) => {
       instance.rpcClient.processResponse(
         msg, ({ id, result }) => [result.signedTransaction || result.transactionHash]
       )
     },
-  [METHODS.aepp.signMessage]: (instance) =>
+  [METHODS.signMessage]: (instance) =>
     (msg) => {
       instance.rpcClient.processResponse(msg, ({ id, result }) => [result.signature])
     }
@@ -182,7 +182,7 @@ export default Ae.compose({
     async askAddresses () {
       if (!this.rpcClient || !this.rpcClient.isConnected()) throw new NoWalletConnectedError('You are not connected to Wallet')
       if (!this.rpcClient.currentAccount) throw new UnsubscribedAccountError()
-      return this.rpcClient.request(METHODS.aepp.address)
+      return this.rpcClient.request(METHODS.address)
     },
     /**
      * Subscribe for addresses from wallet
@@ -195,7 +195,7 @@ export default Ae.compose({
      */
     async subscribeAddress (type, value) {
       if (!this.rpcClient || !this.rpcClient.isConnected()) throw new NoWalletConnectedError('You are not connected to Wallet')
-      return this.rpcClient.request(METHODS.aepp.subscribeAddress, { type, value })
+      return this.rpcClient.request(METHODS.subscribeAddress, { type, value })
     },
     /**
      * Overwriting of `signTransaction` AE method
@@ -210,7 +210,7 @@ export default Ae.compose({
       if (!this.rpcClient.currentAccount) throw new UnsubscribedAccountError()
       if (opt.onAccount && !this.rpcClient.hasAccessToAccount(opt.onAccount)) throw new UnAuthorizedAccountError(`You do not have access to account ${opt.onAccount}`)
       return this.rpcClient.request(
-        METHODS.aepp.sign,
+        METHODS.sign,
         { ...opt, tx, returnSigned: true, networkId: this.getNetworkId() }
       )
     },
@@ -226,7 +226,7 @@ export default Ae.compose({
       if (!this.rpcClient || !this.rpcClient.isConnected()) throw new NoWalletConnectedError('You are not connected to Wallet')
       if (!this.rpcClient.currentAccount) throw new UnsubscribedAccountError()
       if (opt.onAccount && !this.rpcClient.hasAccessToAccount(opt.onAccount)) throw new UnAuthorizedAccountError(`You do not have access to account ${opt.onAccount}`)
-      return this.rpcClient.request(METHODS.aepp.signMessage, { ...opt, message: msg })
+      return this.rpcClient.request(METHODS.signMessage, { ...opt, message: msg })
     },
     /**
      * Send connection request to wallet
@@ -237,7 +237,7 @@ export default Ae.compose({
      */
     async sendConnectRequest () {
       return this.rpcClient.request(
-        METHODS.aepp.connect, {
+        METHODS.connect, {
           name: this.name,
           version: VERSION,
           networkId: this.getNetworkId({ force: true })
@@ -267,7 +267,7 @@ export default Ae.compose({
         return this.sendTransaction(signed, opt)
       }
       return this.rpcClient.request(
-        METHODS.aepp.sign,
+        METHODS.sign,
         { onAccount: opt.onAccount, tx, returnSigned: false, networkId: this.getNetworkId() }
       )
     }

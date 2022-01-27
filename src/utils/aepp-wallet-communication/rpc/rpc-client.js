@@ -168,7 +168,7 @@ export default stampit({
       this.accounts = accounts
       if (!forceNotification) {
         // Sent notification about account updates
-        this.sendMessage(message(METHODS.wallet.updateAddress, this.accounts), true)
+        this.sendMessage(message(METHODS.updateAddress, this.accounts), true)
       }
     },
     /**
