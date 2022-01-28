@@ -367,13 +367,6 @@ export class InactiveContractError extends ContractError {
   }
 }
 
-export class InvalidEventSchemaError extends ContractError {
-  constructor (msg: string) {
-    super(msg)
-    this.name = 'InvalidEventSchemaError'
-  }
-}
-
 export class InvalidMethodInvocationError extends ContractError {
   constructor (msg: string) {
     super(msg)
@@ -437,6 +430,27 @@ export class UnknownCallReturnTypeError extends ContractError {
   constructor (returnType: any) {
     super(`Unknown returnType: ${String(returnType)}`)
     this.name = 'UnknownCallReturnTypeError'
+  }
+}
+
+export class MissingEventDefinitionError extends ContractError {
+  constructor (eventNameHash: string, eventAddress: string) {
+    super(
+      `Can't find definition of ${eventNameHash} event emitted by ${eventAddress}` +
+      ' (use omitUnknown option to ignore events like this)'
+    )
+    this.name = 'MissingEventDefinitionError'
+  }
+}
+
+export class AmbiguousEventDefinitionError extends ContractError {
+  constructor (eventAddress: string, matchedEvents: [string, string][]) {
+    super(
+      `Found multiple definitions of "${matchedEvents[0][1]}" event emitted by ${eventAddress}` +
+      ` in ${matchedEvents.map(([name]) => `"${name}"`).join(', ')} contracts` +
+      ' (use contractAddressToName option to specify contract name corresponding to address)'
+    )
+    this.name = 'AmbiguousEventDefinitionError'
   }
 }
 

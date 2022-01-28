@@ -56,7 +56,6 @@ AeError
 │   │   BytecodeMismatchError
 │   │   DuplicateContractError
 │   │   InactiveContractError
-│   │   InvalidEventSchemaError
 │   │   InvalidMethodInvocationError
 │   │   MissingContractAddressError
 │   │   MissingContractDefError
@@ -66,6 +65,8 @@ AeError
 │   │   NoSuchContractFunctionError
 │   │   NotPayableFunctionError
 │   │   UnknownCallReturnTypeError
+│   │   MissingEventDefinitionError
+│   │   AmbiguousEventDefinitionError
 │
 └───CryptographyError
 │   │   InvalidChecksumError

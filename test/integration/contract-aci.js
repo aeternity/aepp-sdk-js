@@ -17,7 +17,6 @@
 import { expect } from 'chai'
 import { before, describe, it } from 'mocha'
 import BigNumber from 'bignumber.js'
-import { decodeEvents, SOPHIA_TYPES } from '../../src/contract/aci/transformation'
 import { decode } from '../../src/tx/builder/helpers'
 import {
   BytecodeMismatchError,
@@ -26,7 +25,9 @@ import {
   InvalidMethodInvocationError,
   MissingContractAddressError,
   MissingContractDefError,
-  NotPayableFunctionError
+  NotPayableFunctionError,
+  MissingEventDefinitionError,
+  AmbiguousEventDefinitionError
 } from '../../src/utils/errors'
 import { getSdk } from './'
 
@@ -39,16 +40,28 @@ const libContractSource = `
 namespace TestLib =
   function sum(x: int, y: int) : int = x + y
 `
+
+const remoteContractSource = `
+contract Remote =
+  datatype event = RemoteEvent1(int) | RemoteEvent2(string, int) | Duplicate(int)
+  stateful entrypoint emitEvents(duplicate: bool) : unit =
+    Chain.event(RemoteEvent2("test-string", 43))
+    switch(duplicate)
+      true => Chain.event(Duplicate(0))
+      false => ()
+`
+
 const testContractSource = `
 namespace Test =
   function double(x: int): int = x*2
 
-
-contract interface Voting =
+contract interface RemoteI =
   type test_type = int
   record state = { value: string, key: test_type, testOption: option(string) }
   record test_record = { value: string, key: list(test_type) }
   entrypoint test : () => int
+  datatype event = RemoteEvent1(int) | RemoteEvent2(string, int) | Duplicate(int)
+  entrypoint emitEvents : (bool) => unit
 
 include "testLib"
 contract StateContract =
@@ -56,15 +69,15 @@ contract StateContract =
   record state = { value: string, key: number, testOption: option(string) }
   record yesEr = { t: number}
 
-  datatype event = TheFirstEvent(int) | AnotherEvent(string, address) | AnotherEvent2(bool, string, int)
+  datatype event = TheFirstEvent(int) | AnotherEvent(string, address) | AnotherEvent2(bool, string, int) | Duplicate(string)
   datatype dateUnit = Year | Month | Day
   datatype one_or_both('a, 'b) = Left('a) | Right('b) | Both('a, 'b)
 
   entrypoint init(value: string, key: int, testOption: option(string)) : state = { value = value, key = key, testOption = testOption }
   entrypoint retrieve() : string*int = (state.value, state.key)
 
-  entrypoint remoteContract(a: Voting) : int = 1
-  entrypoint remoteArgs(a: Voting.test_record) : Voting.test_type = 1
+  entrypoint remoteContract(a: RemoteI) : int = 1
+  entrypoint remoteArgs(a: RemoteI.test_record) : RemoteI.test_type = 1
   entrypoint intFn(a: int) : int = a
   payable entrypoint stringFn(a: string) : string = a
   entrypoint boolFn(a: bool) : bool = a
@@ -89,7 +102,7 @@ contract StateContract =
   entrypoint listOption(s: option(list(int*string))) : option(list(int*string)) = s
 
   entrypoint testFn(a: list(int), b: bool) : list(int)*bool = (a, b)
-  entrypoint approve(tx_id: int, voting_contract: Voting) : int = tx_id
+  entrypoint approve(tx_id: int, remote_contract: RemoteI) : int = tx_id
 
   entrypoint hashFn(s: hash): hash = s
   entrypoint signatureFn(s: signature): signature = s
@@ -105,9 +118,11 @@ contract StateContract =
       Left(x)    => x
       Right(_)   => abort("asdasd")
       Both(x, _) => x
-  stateful entrypoint emitEvents() : unit =
+
+  stateful entrypoint emitEvents(remote: RemoteI, duplicate: bool) : unit =
     Chain.event(TheFirstEvent(42))
     Chain.event(AnotherEvent("This is not indexed", ak_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT))
+    remote.emitEvents(duplicate)
     Chain.event(AnotherEvent2(true, "This is not indexed", 1))
 
   entrypoint chainTtlFn(t: Chain.ttl): Chain.ttl = t
@@ -133,8 +148,6 @@ describe('Contract instance', function () {
 
   it('generates by source code', async () => {
     testContract = await sdk.getContractInstance({ source: testContractSource, filesystem, ttl: 0 })
-    testContract.should.have.property('interface')
-    testContract.should.have.property('aci')
     testContract.should.have.property('source')
     testContract.should.have.property('bytecode')
     testContract.should.have.property('deployInfo')
@@ -144,9 +157,9 @@ describe('Contract instance', function () {
     testContract.options.ttl.should.be.equal(0)
     testContract.options.should.have.property('filesystem')
     testContract.options.filesystem.should.have.property('testLib')
-    const functionsFromACI = testContract.aci.functions.map(({ name }) => name)
-    const methods = Object.keys(testContract.methods)
-    expect(methods).to.be.eql(functionsFromACI)
+    expect(Object.keys(testContract.methods)).to.be.eql(
+      testContract._aci.encoded_aci.contract.functions.map(({ name }) => name)
+    )
   })
 
   it('compiles', async () => {
@@ -281,40 +294,106 @@ describe('Contract instance', function () {
   })
 
   describe('Events parsing', () => {
+    let remoteContract
     let eventResult
 
     before(async () => {
-      eventResult = await testContract.methods.emitEvents()
+      remoteContract = await sdk.getContractInstance({ source: remoteContractSource })
+      await remoteContract.deploy()
+      eventResult = await testContract.methods.emitEvents(remoteContract.deployInfo.address, false)
     })
 
-    it('decodes events', async () => {
+    it('decodes events', () => {
       expect(eventResult.decodedEvents).to.be.eql([{
         name: 'AnotherEvent2',
-        decoded: [true, 'This is not indexed', '1']
+        args: [true, 'This is not indexed', 1n],
+        contract: {
+          name: 'StateContract',
+          address: testContract.deployInfo.address
+        }
+      }, {
+        name: 'RemoteEvent2',
+        args: [
+          'test-string',
+          43n
+        ],
+        contract: {
+          name: 'RemoteI',
+          address: remoteContract.deployInfo.address
+        }
       }, {
         name: 'AnotherEvent',
-        decoded: [
+        args: [
           'This is not indexed',
           'ak_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT'
-        ]
+        ],
+        contract: {
+          name: 'StateContract',
+          address: testContract.deployInfo.address
+        }
       }, {
         name: 'TheFirstEvent',
-        decoded: ['42']
-      }].map(e => ({ ...e, address: testContract.deployInfo.address })))
+        args: [42n],
+        contract: {
+          name: 'StateContract',
+          address: testContract.deployInfo.address
+        }
+      }])
     })
 
-    it('decodes events the same using different methods', async () => {
-      const { callInfo: { log } } = await sdk.api.getTransactionInfoByHash(eventResult.hash)
-      const events = {
-        variant: [
-          { AnotherEvent2: [SOPHIA_TYPES.bool, SOPHIA_TYPES.string, SOPHIA_TYPES.int] },
-          { AnotherEvent: [SOPHIA_TYPES.string, SOPHIA_TYPES.address] },
-          { TheFirstEvent: [SOPHIA_TYPES.int] }
-        ]
-      }
-      expect(decodeEvents(log, events)).to.be.eql(eventResult.decodedEvents)
+    it('decodes events using decodeEvents', () => {
+      expect(testContract.decodeEvents(eventResult.result.log)).to.be.eql(eventResult.decodedEvents)
+    })
 
-      expect(testContract.decodeEvents(log)).to.be.eql(eventResult.decodedEvents)
+    it('throws error if can\'t find event definition', () => {
+      const event = eventResult.result.log[0]
+      event.topics[0] = event.topics[0].replace('0', '1')
+      expect(() => testContract.decodeEvents([event])).to.throw(
+        MissingEventDefinitionError,
+        'Can\'t find definition of 7165442193418278913262533136158148486147352807284929017531784742205476270109' +
+        ` event emitted by ${testContract.deployInfo.address}` +
+        ' (use omitUnknown option to ignore events like this)'
+      )
+    })
+
+    it('omits events without definition using omitUnknown option', () => {
+      const event = eventResult.result.log[0]
+      event.topics[0] = event.topics[0].replace('0', '1')
+      expect(testContract.decodeEvents([event], { omitUnknown: true })).to.be.eql([])
+    })
+
+    const getDuplicateLog = () => [{
+      address: remoteContract.deployInfo.address,
+      data: 'cb_Xfbg4g==',
+      topics: [
+        '28631352549432199952459007654025571262660118571086898449909844428770770966435',
+        0
+      ]
+    }]
+
+    it('throws error if found multiple event definitions', () => {
+      expect(() => testContract.decodeEvents(getDuplicateLog())).to.throw(
+        AmbiguousEventDefinitionError,
+        'Found multiple definitions of "Duplicate" event emitted by' +
+        ` ${remoteContract.deployInfo.address} in "StateContract", "RemoteI" contracts` +
+        ' (use contractAddressToName option to specify contract name corresponding to address)'
+      )
+    })
+
+    it('multiple event definitions resolved using contractAddressToName', () => {
+      expect(
+        testContract.decodeEvents(
+          getDuplicateLog(),
+          { contractAddressToName: { [remoteContract.deployInfo.address]: 'RemoteI' } }
+        )
+      ).to.be.eql([{
+        name: 'Duplicate',
+        args: [0n],
+        contract: {
+          address: remoteContract.deployInfo.address,
+          name: 'RemoteI'
+        }
+      }])
     })
   })
 

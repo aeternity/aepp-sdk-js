@@ -18,7 +18,7 @@ contract EventEmitter =
         Chain.event(AnotherEvent(Call.caller, msg))
 ```
 
-## Decode events using ACI (high-level, recommended)
+## Decode events using ACI
 When initializing a contract instance using the source code and providing the [ACI](https://aeternity.com/aesophia/latest/aeso_aci/)
 or obtaining it via http compiler (default) you will be able to access the `emitEvents` entrypoint of the Sophia contract above as follows:
 
@@ -30,17 +30,23 @@ console.log(tx.decodedEvents)
 /*
 [
   {
-    address: 'ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh',
     name: 'AnotherEvent',
-    decoded: [
+    args: [
       'fUq2NesPXcYZ1CcqBcGC3StpdnQw3iVxMA3YSeCNAwfN4myQk',
       'this message is not indexed'
-    ]
+    ],
+    contract: {
+      name: 'EventEmitter',
+      address: 'ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh'
+    }
   },
   {
-    address: 'ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh',
     name: 'FirstEvent',
-    decoded: [ '1337' ]
+    args: [1337n],
+    contract: {
+      name: 'EventEmitter',
+      address: 'ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh'
+    }
   }
 ]
 */
@@ -63,54 +69,23 @@ console.log(decodedUsingInstance)
 /*
 [
   {
-    address: 'ct_fKhQBiNQkDfoZcVF1ZzPzY7Lig6FnHDCLyFYBY33ZjfzGYPps',
     name: 'AnotherEvent',
-    decoded: [
+    args: [
       'fUq2NesPXcYZ1CcqBcGC3StpdnQw3iVxMA3YSeCNAwfN4myQk',
       'this message is not indexed'
-    ]
+    ],
+    contract: {
+      name: 'EventEmitter',
+      address: 'ct_fKhQBiNQkDfoZcVF1ZzPzY7Lig6FnHDCLyFYBY33ZjfzGYPps'
+    }
   },
   {
-    address: 'ct_fKhQBiNQkDfoZcVF1ZzPzY7Lig6FnHDCLyFYBY33ZjfzGYPps',
     name: 'FirstEvent',
-    decoded: [ '1337' ]
-  }
-]
-*/
-```
-
-## Decode events without ACI (low-level)
-As an alternative you can make use of the low-level API which allows you to decode events for a given transaction by providing the `log` of the transaction as well as the correct `schema` of the events to the `decodeEvents` function manually:
-
-```js
-import { decodeEvents, SOPHIA_TYPES } from '@aeternity/aepp-sdk/es/contract/aci/transformation'
-
-const txHash = 'th_2tMWziKAQR1CwK2PMfvMhKZgEVLmcxsPYkRXey97s9SdXj4zat'
-// client is an instance of the Universal Stamp
-const txInfo = await client.api.getTransactionInfoByHash(txHash)
-
-const eventsAci = {
-  variant: [
-    { FirstEvent: [SOPHIA_TYPES.int] },
-    { AnotherEvent: [SOPHIA_TYPES.address, SOPHIA_TYPES.string] }
-  ]
-}
-
-const decodedEvents = decodeEvents(txInfo.callInfo.log, eventsAci)
-console.log(decodedEvents)
-/*
-[
-  {
-    address: 'ct_2dE7Xd7XCg3cwpKWP18VPDwfhz5Miji9FoKMTZN7TYvGt64Kc',
-    name: 'AnotherEvent',
-    decoded: [
-      'fUq2NesPXcYZ1CcqBcGC3StpdnQw3iVxMA3YSeCNAwfN4myQk',
-      'this message is not indexed'
-    ]
-  },
-  {
-    address: 'ct_2dE7Xd7XCg3cwpKWP18VPDwfhz5Miji9FoKMTZN7TYvGt64Kc',
-    decoded: []
+    args: [1337n],
+    contract: {
+      name: 'EventEmitter',
+      address: 'ct_fKhQBiNQkDfoZcVF1ZzPzY7Lig6FnHDCLyFYBY33ZjfzGYPps'
+    }
   }
 ]
 */

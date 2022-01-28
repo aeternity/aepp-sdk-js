@@ -54,7 +54,7 @@ namespace TestLib =
 `
 const contractWithLib = `
 include "testLib"
-contract Voting =
+contract ContractWithLib =
   entrypoint sumNumbers(x: int, y: int) : int = TestLib.sum(x, y)
 `
 const aensDelegationContract = `

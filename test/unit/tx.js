@@ -33,7 +33,6 @@ import {
 } from '../../src/tx/builder/helpers'
 import BigNumber from 'bignumber.js'
 import { toBytes } from '../../src/utils/bytes'
-import { parseBigNumber } from '../../src/utils/bignumber'
 import { buildTx, unpackTx } from '../../src/tx/builder'
 import { NAME_BID_RANGES } from '../../src/tx/builder/schema'
 import {
@@ -47,10 +46,6 @@ describe('Tx', function () {
     const hash = await commitmentHash('foobar.chain', _salt)
     hash.should.be.a('string')
     return hash.should.be.equal(await commitmentHash('foobar.chain', _salt))
-  })
-
-  it('Parse big number', async () => {
-    parseBigNumber('123123123123').should.be.a('string')
   })
 
   it('test from big number to bytes', async () => {
