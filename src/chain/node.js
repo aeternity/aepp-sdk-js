@@ -58,8 +58,9 @@ async function sendTransaction (tx, options = {}) {
   }
 
   try {
-    const { txHash } = await this.api
-      .postTransaction({ tx }, { __queue: `tx-${await this.address(options)}` })
+    const { txHash } = await this.api.postTransaction({ tx }, {
+      __queue: `tx-${await this.address?.(options).catch(() => '')}`
+    })
 
     if (opt.waitMined) {
       const txData = { ...await this.poll(txHash, options), rawTx: tx }
