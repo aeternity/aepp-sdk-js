@@ -40,8 +40,11 @@ import {
   TypeError,
   NodeInvocationError,
   IllegalArgumentError,
-  NoSuchContractFunctionError
+  NoSuchContractFunctionError,
+  MissingEventDefinitionError,
+  AmbiguousEventDefinitionError
 } from '../utils/errors'
+import { hash } from '../utils/crypto-ts'
 
 /**
  * Generate contract ACI object with predefined js methods for contract usage - can be used for
@@ -270,6 +273,35 @@ export default async function getContractInstance ({
   }
 
   /**
+   * @param {String} address Contract address that emitted event
+   * @param {BigInt} nameHash Hash of emitted event name
+   * @param {Object} [options]
+   * @param {Object} [options.contractAddressToName] Map of contract addresses to their names
+   * @return {String} Contract name
+   * @throws {MissingEventDefinitionError}
+   * @throws {AmbiguousEventDefinitionError}
+   */
+  function getContractNameByEvent (address, nameHash, { contractAddressToName }) {
+    const addressToName = { ...instance.options.contractAddressToName, ...contractAddressToName }
+    if (addressToName[address]) return addressToName[address]
+
+    const matchedEvents = [
+      instance._aci.encoded_aci,
+      ...instance._aci.external_encoded_aci
+    ]
+      .filter(({ contract }) => contract?.event)
+      .map(({ contract }) => [contract.name, contract.event.variant])
+      .map(([name, events]) => events.map(event => [name, Object.keys(event)[0]]))
+      .flat()
+      .filter(([, eventName]) => BigInt('0x' + hash(eventName).toString('hex')) === nameHash)
+    switch (matchedEvents.length) {
+      case 0: throw new MissingEventDefinitionError(nameHash, address)
+      case 1: return matchedEvents[0][0]
+      default: throw new AmbiguousEventDefinitionError(address, matchedEvents)
+    }
+  }
+
+  /**
    * Decode Events
    * @alias module:@aeternity/aepp-sdk/es/contract/aci
    * @rtype (events: Array) => DecodedEvents: Array
@@ -279,43 +311,28 @@ export default async function getContractInstance ({
    * complete
    * @return {Object} DecodedEvents
    */
-  instance.decodeEvents = (events, { omitUnknown } = {}) => {
-    const contractNames = [
-      instance._name,
-      ...instance._aci.external_encoded_aci
-        .filter(({ contract }) => contract)
-        .map(({ contract }) => contract.name)
-    ]
-    return events
-      .map(event => {
-        const decoded = contractNames.reduce((acc, contract) => {
-          if (acc) return acc
-          try {
-            const decoded = instance.calldata.decodeEvent(
-              contract, event.data, event.topics.map(t => BigInt(t))
-            )
-            return [contract, ...Object.entries(decoded)[0]]
-          } catch (error) {
-            if (error.name === 'TypeResolveError') return false
-            throw error
-          }
-        }, false)
-        if (!decoded) {
-          if (omitUnknown) return null
-          else throw new Error(`Can't decode event from ${event.address}`)
+  instance.decodeEvents = (events, { omitUnknown, ...opt } = {}) => events
+    .map(event => {
+      const topics = event.topics.map(t => BigInt(t))
+      let contractName
+      try {
+        contractName = getContractNameByEvent(event.address, topics[0], opt)
+      } catch (error) {
+        if (omitUnknown && error instanceof MissingEventDefinitionError) return null
+        throw error
+      }
+      const decoded = instance.calldata.decodeEvent(contractName, event.data, topics)
+      const [name, args] = Object.entries(decoded)[0]
+      return {
+        name,
+        args,
+        contract: {
+          name: contractName,
+          address: event.address
         }
-        const [contractName, name, args] = decoded
-        return {
-          name,
-          args,
-          contract: {
-            name: contractName,
-            address: event.address
-          }
-        }
-      })
-      .filter(e => e)
-  }
+      }
+    })
+    .filter(e => e)
 
   /**
    * Generate proto function based on contract function using Contract ACI schema

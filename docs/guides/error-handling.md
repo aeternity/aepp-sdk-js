@@ -65,6 +65,8 @@ AeError
 │   │   NoSuchContractFunctionError
 │   │   NotPayableFunctionError
 │   │   UnknownCallReturnTypeError
+│   │   MissingEventDefinitionError
+│   │   AmbiguousEventDefinitionError
 │
 └───CryptographyError
 │   │   InvalidChecksumError

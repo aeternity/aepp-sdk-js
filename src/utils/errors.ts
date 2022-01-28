@@ -433,6 +433,27 @@ export class UnknownCallReturnTypeError extends ContractError {
   }
 }
 
+export class MissingEventDefinitionError extends ContractError {
+  constructor (eventNameHash: string, eventAddress: string) {
+    super(
+      `Can't find definition of ${eventNameHash} event emitted by ${eventAddress}` +
+      ' (use omitUnknown option to ignore events like this)'
+    )
+    this.name = 'MissingEventDefinitionError'
+  }
+}
+
+export class AmbiguousEventDefinitionError extends ContractError {
+  constructor (eventAddress: string, matchedEvents: [string, string][]) {
+    super(
+      `Found multiple definitions of "${matchedEvents[0][1]}" event emitted by ${eventAddress}` +
+      ` in ${matchedEvents.map(([name]) => `"${name}"`).join(', ')} contracts` +
+      ' (use contractAddressToName option to specify contract name corresponding to address)'
+    )
+    this.name = 'AmbiguousEventDefinitionError'
+  }
+}
+
 /* cryptography errors */
 export class InvalidChecksumError extends CryptographyError {
   constructor () {
