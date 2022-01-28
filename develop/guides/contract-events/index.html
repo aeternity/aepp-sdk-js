@@ -340,15 +340,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decode-events-using-aci-high-level-recommended" class="md-nav__link">
-    Decode events using ACI (high-level, recommended)
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#decode-events-without-aci-low-level" class="md-nav__link">
-    Decode events without ACI (low-level)
+  <a href="#decode-events-using-aci" class="md-nav__link">
+    Decode events using ACI
   </a>
   
 </li>
@@ -808,15 +801,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decode-events-using-aci-high-level-recommended" class="md-nav__link">
-    Decode events using ACI (high-level, recommended)
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#decode-events-without-aci-low-level" class="md-nav__link">
-    Decode events without ACI (low-level)
+  <a href="#decode-events-using-aci" class="md-nav__link">
+    Decode events using ACI
   </a>
   
 </li>
@@ -849,7 +835,7 @@ On this page you will learn how to access and decode the event log of a specific
 <span class="w">        </span><span class="nc">Chain</span><span class="p">.</span><span class="n">event</span><span class="p">(</span><span class="nf">FirstEvent</span><span class="p">(</span><span class="n">value</span><span class="p">))</span><span class="w"></span>
 <span class="w">        </span><span class="nc">Chain</span><span class="p">.</span><span class="n">event</span><span class="p">(</span><span class="nf">AnotherEvent</span><span class="p">(</span><span class="nc">Call</span><span class="p">.</span><span class="n">caller</span><span class="p">,</span><span class="w"> </span><span class="n">msg</span><span class="p">))</span><span class="w"></span>
 </code></pre></div>
-<h2 id="decode-events-using-aci-high-level-recommended">Decode events using ACI (high-level, recommended)</h2>
+<h2 id="decode-events-using-aci">Decode events using ACI</h2>
 <p>When initializing a contract instance using the source code and providing the <a href="https://aeternity.com/aesophia/latest/aeso_aci/">ACI</a>
 or obtaining it via http compiler (default) you will be able to access the <code>emitEvents</code> entrypoint of the Sophia contract above as follows:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// events emitted by contract calls are automatically decoded</span>
@@ -859,17 +845,23 @@ or obtaining it via http compiler (default) you will be able to access the <code
 <span class="cm">/*</span>
 <span class="cm">[</span>
 <span class="cm">  {</span>
-<span class="cm">    address: &#39;ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh&#39;,</span>
 <span class="cm">    name: &#39;AnotherEvent&#39;,</span>
-<span class="cm">    decoded: [</span>
+<span class="cm">    args: [</span>
 <span class="cm">      &#39;fUq2NesPXcYZ1CcqBcGC3StpdnQw3iVxMA3YSeCNAwfN4myQk&#39;,</span>
 <span class="cm">      &#39;this message is not indexed&#39;</span>
-<span class="cm">    ]</span>
+<span class="cm">    ],</span>
+<span class="cm">    contract: {</span>
+<span class="cm">      name: &#39;EventEmitter&#39;,</span>
+<span class="cm">      address: &#39;ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh&#39;</span>
+<span class="cm">    }</span>
 <span class="cm">  },</span>
 <span class="cm">  {</span>
-<span class="cm">    address: &#39;ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh&#39;,</span>
 <span class="cm">    name: &#39;FirstEvent&#39;,</span>
-<span class="cm">    decoded: [ &#39;1337&#39; ]</span>
+<span class="cm">    args: [1337n],</span>
+<span class="cm">    contract: {</span>
+<span class="cm">      name: &#39;EventEmitter&#39;,</span>
+<span class="cm">      address: &#39;ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh&#39;</span>
+<span class="cm">    }</span>
 <span class="cm">  }</span>
 <span class="cm">]</span>
 <span class="cm">*/</span>
@@ -890,55 +882,27 @@ or obtaining it via http compiler (default) you will be able to access the <code
 <span class="cm">/*</span>
 <span class="cm">[</span>
 <span class="cm">  {</span>
-<span class="cm">    address: &#39;ct_fKhQBiNQkDfoZcVF1ZzPzY7Lig6FnHDCLyFYBY33ZjfzGYPps&#39;,</span>
 <span class="cm">    name: &#39;AnotherEvent&#39;,</span>
-<span class="cm">    decoded: [</span>
+<span class="cm">    args: [</span>
 <span class="cm">      &#39;fUq2NesPXcYZ1CcqBcGC3StpdnQw3iVxMA3YSeCNAwfN4myQk&#39;,</span>
 <span class="cm">      &#39;this message is not indexed&#39;</span>
-<span class="cm">    ]</span>
+<span class="cm">    ],</span>
+<span class="cm">    contract: {</span>
+<span class="cm">      name: &#39;EventEmitter&#39;,</span>
+<span class="cm">      address: &#39;ct_fKhQBiNQkDfoZcVF1ZzPzY7Lig6FnHDCLyFYBY33ZjfzGYPps&#39;</span>
+<span class="cm">    }</span>
 <span class="cm">  },</span>
 <span class="cm">  {</span>
-<span class="cm">    address: &#39;ct_fKhQBiNQkDfoZcVF1ZzPzY7Lig6FnHDCLyFYBY33ZjfzGYPps&#39;,</span>
 <span class="cm">    name: &#39;FirstEvent&#39;,</span>
-<span class="cm">    decoded: [ &#39;1337&#39; ]</span>
+<span class="cm">    args: [1337n],</span>
+<span class="cm">    contract: {</span>
+<span class="cm">      name: &#39;EventEmitter&#39;,</span>
+<span class="cm">      address: &#39;ct_fKhQBiNQkDfoZcVF1ZzPzY7Lig6FnHDCLyFYBY33ZjfzGYPps&#39;</span>
+<span class="cm">    }</span>
 <span class="cm">  }</span>
 <span class="cm">]</span>
 <span class="cm">*/</span>
 </code></pre></div></p>
-<h2 id="decode-events-without-aci-low-level">Decode events without ACI (low-level)</h2>
-<p>As an alternative you can make use of the low-level API which allows you to decode events for a given transaction by providing the <code>log</code> of the transaction as well as the correct <code>schema</code> of the events to the <code>decodeEvents</code> function manually:</p>
-<div class="highlight"><pre><span></span><code><span class="k">import</span> <span class="p">{</span> <span class="nx">decodeEvents</span><span class="p">,</span> <span class="nx">SOPHIA_TYPES</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@aeternity/aepp-sdk/es/contract/aci/transformation&#39;</span>
-
-<span class="kd">const</span> <span class="nx">txHash</span> <span class="o">=</span> <span class="s1">&#39;th_2tMWziKAQR1CwK2PMfvMhKZgEVLmcxsPYkRXey97s9SdXj4zat&#39;</span>
-<span class="c1">// client is an instance of the Universal Stamp</span>
-<span class="kd">const</span> <span class="nx">txInfo</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">api</span><span class="p">.</span><span class="nx">getTransactionInfoByHash</span><span class="p">(</span><span class="nx">txHash</span><span class="p">)</span>
-
-<span class="kd">const</span> <span class="nx">eventsAci</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="nx">variant</span><span class="o">:</span> <span class="p">[</span>
-    <span class="p">{</span> <span class="nx">FirstEvent</span><span class="o">:</span> <span class="p">[</span><span class="nx">SOPHIA_TYPES</span><span class="p">.</span><span class="kr">int</span><span class="p">]</span> <span class="p">},</span>
-    <span class="p">{</span> <span class="nx">AnotherEvent</span><span class="o">:</span> <span class="p">[</span><span class="nx">SOPHIA_TYPES</span><span class="p">.</span><span class="nx">address</span><span class="p">,</span> <span class="nx">SOPHIA_TYPES</span><span class="p">.</span><span class="nx">string</span><span class="p">]</span> <span class="p">}</span>
-  <span class="p">]</span>
-<span class="p">}</span>
-
-<span class="kd">const</span> <span class="nx">decodedEvents</span> <span class="o">=</span> <span class="nx">decodeEvents</span><span class="p">(</span><span class="nx">txInfo</span><span class="p">.</span><span class="nx">callInfo</span><span class="p">.</span><span class="nx">log</span><span class="p">,</span> <span class="nx">eventsAci</span><span class="p">)</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">decodedEvents</span><span class="p">)</span>
-<span class="cm">/*</span>
-<span class="cm">[</span>
-<span class="cm">  {</span>
-<span class="cm">    address: &#39;ct_2dE7Xd7XCg3cwpKWP18VPDwfhz5Miji9FoKMTZN7TYvGt64Kc&#39;,</span>
-<span class="cm">    name: &#39;AnotherEvent&#39;,</span>
-<span class="cm">    decoded: [</span>
-<span class="cm">      &#39;fUq2NesPXcYZ1CcqBcGC3StpdnQw3iVxMA3YSeCNAwfN4myQk&#39;,</span>
-<span class="cm">      &#39;this message is not indexed&#39;</span>
-<span class="cm">    ]</span>
-<span class="cm">  },</span>
-<span class="cm">  {</span>
-<span class="cm">    address: &#39;ct_2dE7Xd7XCg3cwpKWP18VPDwfhz5Miji9FoKMTZN7TYvGt64Kc&#39;,</span>
-<span class="cm">    decoded: []</span>
-<span class="cm">  }</span>
-<span class="cm">]</span>
-<span class="cm">*/</span>
-</code></pre></div>
                 
               
               
