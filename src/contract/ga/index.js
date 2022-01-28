@@ -92,6 +92,7 @@ async function createGeneralizeAccount (authFnName, source, args = [], options =
   await contract.compile()
   const { tx, contractId } = await this.gaAttachTx({
     ...opt,
+    gas: opt.gas ?? await contract._estimateGas('init', args, opt),
     ownerId,
     code: contract.bytecode,
     callData: contract.calldata.encode(contract._name, 'init', args),

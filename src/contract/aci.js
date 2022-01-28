@@ -23,7 +23,7 @@
  */
 
 import { Encoder as Calldata } from '@aeternity/aepp-calldata'
-import { DRY_RUN_ACCOUNT, DEPOSIT } from '../tx/builder/schema'
+import { DRY_RUN_ACCOUNT, DEPOSIT, GAS_MAX } from '../tx/builder/schema'
 import TxObject from '../tx/tx-object'
 import { decode } from '../tx/builder/helpers'
 import {
@@ -166,6 +166,13 @@ export default async function getContractInstance ({
     throw new NodeInvocationError(message)
   }
 
+  instance._estimateGas = async (name, params, options) => {
+    const { result: { gasUsed } } =
+      await instance.call(name, params, { ...options, callStatic: true })
+    // taken from https://github.com/aeternity/aepp-sdk-js/issues/1286#issuecomment-977814771
+    return Math.floor(gasUsed * 1.25)
+  }
+
   /**
    * Deploy contract
    * @alias module:@aeternity/aepp-sdk/es/contract/aci
@@ -183,6 +190,7 @@ export default async function getContractInstance ({
     const ownerId = await this.address(opt)
     const { tx, contractId } = await this.contractCreateTx({
       ...opt,
+      gas: opt.gas ?? await instance._estimateGas('init', params, opt),
       callData: instance.calldata.encode(instance._name, 'init', params),
       code: instance.bytecode,
       ownerId
@@ -249,6 +257,7 @@ export default async function getContractInstance ({
       }
       const txOpt = {
         ...opt,
+        gas: opt.gas ?? GAS_MAX,
         callData,
         nonce: opt.nonce ??
           (opt.top && (await this.getAccount(callerId, { hash: opt.top })).nonce + 1)
@@ -261,7 +270,13 @@ export default async function getContractInstance ({
       await handleCallError(callObj)
       res = { ...dryRunOther, tx: TxObject({ tx }), result: callObj }
     } else {
-      const tx = await this.contractCallTx({ ...opt, callerId, contractId, callData })
+      const tx = await this.contractCallTx({
+        ...opt,
+        gas: opt.gas ?? await instance._estimateGas(fn, params, opt),
+        callerId,
+        contractId,
+        callData
+      })
       res = await sendAndProcess(tx, opt)
     }
     if (opt.waitMined || opt.callStatic) {

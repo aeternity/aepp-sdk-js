@@ -29,7 +29,7 @@
 import Ae from './'
 import ContractCompilerHttp from '../contract/compiler'
 import getContractInstance from '../contract/aci'
-import { AMOUNT, DEPOSIT, GAS, MIN_GAS_PRICE } from '../tx/builder/schema'
+import { AMOUNT, DEPOSIT, MIN_GAS_PRICE } from '../tx/builder/schema'
 import { decode, produceNameId } from '../tx/builder/helpers'
 
 /**
@@ -258,8 +258,7 @@ export default Ae.compose(ContractCompilerHttp, {
       defaults: {
         deposit: DEPOSIT,
         gasPrice: MIN_GAS_PRICE,
-        amount: AMOUNT,
-        gas: GAS
+        amount: AMOUNT
       }
     }
   }
