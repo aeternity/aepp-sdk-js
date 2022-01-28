@@ -395,6 +395,17 @@ describe('Contract instance', function () {
         }
       }])
     })
+
+    it('calls a contract that emits events with no defined events', async () => {
+      const contract = await sdk.getContractInstance({
+        source:
+          'contract FooContract =\n' +
+          '  entrypoint emitEvents(f: bool) = ()',
+        contractAddress: remoteContract.deployInfo.address
+      })
+      const result = await contract.methods.emitEvents(false, { omitUnknown: true })
+      expect(result.decodedEvents).to.be.eql([])
+    })
   })
 
   describe('Arguments Validation and Casting', function () {
