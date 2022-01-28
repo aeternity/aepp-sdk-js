@@ -145,13 +145,6 @@ async function awaitHeight (
   throw new RequestTimedOutError((attempts - 1) * interval, currentHeight, height)
 }
 
-/**
- * @deprecated
- */
-async function topBlock () {
-  return this.api.getTopHeader()
-}
-
 async function poll (th, { blocks = 10, interval = this._getPollInterval('microblock') } = {}) {
   const max = await this.height() + blocks
   do {
@@ -301,7 +294,6 @@ const ChainNode = Chain.compose(NodePool, {
     balance,
     getBalance,
     getAccount,
-    topBlock,
     tx,
     height,
     awaitHeight,

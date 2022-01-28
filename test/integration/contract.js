@@ -117,6 +117,7 @@ contract Sign =
 describe('Contract', function () {
   let sdk
   let bytecode
+  let contract
   let deployed
 
   before(async function () {
@@ -126,18 +127,26 @@ describe('Contract', function () {
     await sdk.spend(1e18, sdk.addresses()[1])
   })
 
-  it('precompiled bytecode can be deployed', async () => {
-    const code = await sdk.contractCompile(identityContract)
-    return sdk.contractDeploy(code.bytecode, identityContract)
-      .should.eventually.have.property('address')
+  it('compiles Sophia code', async () => {
+    bytecode = (await sdk.compilerApi.compileContract({ code: identityContract })).bytecode
+    expect(bytecode).to.satisfy(b => b.startsWith('cb_'))
   })
 
-  it('enforce zero deposit for contract deployment', async () => {
-    const code = await sdk.contractCompile(identityContract)
-    const { txData } = await sdk.contractDeploy(
-      code.bytecode, identityContract, [], { deposit: 10 }
-    )
-    return txData.tx.deposit.should.be.equal(0)
+  it('deploys precompiled bytecode', async () => {
+    contract = await sdk.getContractInstance({ bytecode, source: identityContract })
+    expect(await contract.deploy()).to.have.property('address')
+  })
+
+  it('enforces zero deposit for contract deployment', async () => {
+    contract.deployInfo = {}
+    expect((await contract.deploy([], { deposit: 10 })).txData.tx.deposit)
+      .to.be.equal(0)
+  })
+
+  it('deploys static', async () => {
+    const res = await contract.deploy([], { callStatic: true })
+    expect(res.result).to.have.property('gasUsed')
+    expect(res.result).to.have.property('returnType')
   })
 
   it('Verify message in Sophia', async () => {
@@ -150,130 +159,112 @@ describe('Contract', function () {
     decodedResult.should.be.equal(true)
   })
 
-  it('compiles Sophia code', async () => {
-    bytecode = await sdk.contractCompile(identityContract)
-    return bytecode.should.have.property('bytecode')
-  })
-
-  it('deploy static compiled contract', async () => {
-    const res = await bytecode.deployStatic([])
-    res.result.should.have.property('gasUsed')
-    res.result.should.have.property('returnType')
-  })
-
-  it('deploys compiled contracts', async () => {
-    deployed = await bytecode.deploy([])
-    return deployed.should.have.property('address')
-  })
-
   it('Deploy and call contract on specific account', async () => {
+    contract.deployInfo = {}
     const onAccount = sdk.addresses()[1]
-    const deployed = await bytecode.deploy([], { onAccount })
-    deployed.result.callerId.should.be.equal(onAccount)
-    const callRes = await deployed.call('getArg', [42])
-    callRes.result.callerId.should.be.equal(onAccount)
-    const callStaticRes = await deployed.callStatic('getArg', [42])
-    callStaticRes.result.callerId.should.be.equal(onAccount)
+    contract.options.onAccount = onAccount
+    deployed = await contract.deploy()
+    expect(deployed.result.callerId).to.be.equal(onAccount)
+    expect((await contract.methods.getArg(42, { callStatic: true })).result.callerId)
+      .to.be.equal(onAccount)
+    expect((await contract.methods.getArg(42, { callStatic: false })).result.callerId)
+      .to.be.equal(onAccount)
+    delete contract.options.onAccount
   })
 
   it('Call-Static deploy transaction', async () => {
-    const compiled = bytecode.bytecode
-    const res = await sdk.contractCallStatic(identityContract, null, 'init', [], { bytecode: compiled })
+    const res = await contract.deploy([], { callStatic: true })
     res.result.should.have.property('gasUsed')
     res.result.should.have.property('returnType')
   })
 
   it('Call-Static deploy transaction on specific hash', async () => {
-    const { hash } = await sdk.topBlock()
-    const compiled = bytecode.bytecode
-    const res = await sdk.contractCallStatic(identityContract, null, 'init', [], { bytecode: compiled, top: hash })
+    const { hash } = await sdk.api.getTopHeader()
+    const res = await contract.deploy([], { callStatic: true, top: hash })
     res.result.should.have.property('gasUsed')
     res.result.should.have.property('returnType')
   })
 
   it('throws error on deploy', async () => {
-    const code = await sdk.contractCompile(contractWithBrokenDeploy)
-    await expect(code.deploy()).to.be.rejectedWith(NodeInvocationError, 'Invocation failed: "CustomErrorMessage"')
+    const contract = await sdk.getContractInstance({ source: contractWithBrokenDeploy })
+    await expect(contract.deploy()).to.be.rejectedWith(NodeInvocationError, 'Invocation failed: "CustomErrorMessage"')
   })
 
   it('throws errors on method call', async () => {
-    const code = await sdk.contractCompile(contractWithBrokenMethods)
-    const deployed = await code.deploy()
-    await expect(deployed.call('failWithoutMessage', [await sdk.address()]))
+    const contract = await sdk.getContractInstance({ source: contractWithBrokenMethods })
+    await contract.deploy()
+    await expect(contract.methods.failWithoutMessage(await sdk.address()))
       .to.be.rejectedWith('Invocation failed')
-    await expect(deployed.call('failWithMessage'))
+    await expect(contract.methods.failWithMessage())
       .to.be.rejectedWith('Invocation failed: "CustomErrorMessage"')
   })
 
   it('Dry-run without accounts', async () => {
-    const client = await BaseAe()
-    client.removeAccount(publicKey)
-    client.addresses().length.should.be.equal(0)
-    const address = await client.address().catch(e => false)
+    const sdk = await BaseAe()
+    sdk.removeAccount(publicKey)
+    sdk.addresses().length.should.be.equal(0)
+    const address = await sdk.address().catch(e => false)
     address.should.be.equal(false)
-    const { result } = await client.contractCallStatic(identityContract, deployed.address, 'getArg', [42])
+    const contract = await sdk.getContractInstance({
+      source: identityContract, contractAddress: deployed.address
+    })
+    const { result } = await contract.methods.getArg(42)
     result.callerId.should.be.equal(DRY_RUN_ACCOUNT.pub)
   })
 
   it('call contract/deploy with waitMined: false', async () => {
-    const deployed = await bytecode.deploy([], { waitMined: false })
+    contract.deployInfo = {}
+    const deployed = await contract.deploy([], { waitMined: false })
     await sdk.poll(deployed.transaction)
     expect(deployed.result).to.be.equal(undefined)
     deployed.txData.should.not.be.equal(undefined)
-    const result = await deployed.call('getArg', [42], { waitMined: false })
+    const result = await contract.methods.getArg(42, { callStatic: false, waitMined: false })
     expect(result.result).to.be.equal(undefined)
     result.txData.should.not.be.equal(undefined)
     await sdk.poll(result.hash)
   })
 
   it('calls deployed contracts static', async () => {
-    const result = await deployed.callStatic('getArg', [42])
+    const result = await contract.methods.getArg(42, { callStatic: true })
     expect(result.decodedResult).to.be.equal(42n)
   })
 
   it('initializes contract state', async () => {
+    const contract = await sdk.getContractInstance({ source: stateContract })
     const data = 'Hello World!'
-    const bytecode = await sdk.contractCompile(stateContract)
-    const deployed = await bytecode.deploy([data])
-    const result = await deployed.call('retrieve')
-    expect(result.decodedResult).to.be.equal('Hello World!')
+    await contract.deploy([data])
+    expect((await contract.methods.retrieve()).decodedResult).to.be.equal(data)
   })
 
   describe('Namespaces', () => {
-    let deployed
+    let contract
 
     it('Can compiler contract with external deps', async () => {
-      const filesystem = {
-        testLib: libContract
-      }
-      const compiled = await sdk.contractCompile(contractWithLib, { filesystem })
-      compiled.should.have.property('bytecode')
+      contract = await sdk.getContractInstance({
+        source: contractWithLib, filesystem: { testLib: libContract }
+      })
+      expect(await contract.compile()).to.satisfy(b => b.startsWith('cb_'))
     })
 
     it('Throw error when try to compile contract without providing external deps', async () => {
-      const error = await sdk.contractCompile(contractWithLib).then(() => null, e => e)
-      expect(error.response.text).to.contain('Couldn\'t find include file')
+      await expect(sdk.getContractInstance({ source: contractWithLib }))
+        .to.be.rejectedWith('Couldn\'t find include file')
     })
 
     it('Can deploy contract with external deps', async () => {
-      const filesystem = {
-        testLib: libContract
-      }
-      const compiled = await sdk.contractCompile(contractWithLib, { filesystem })
-      deployed = await compiled.deploy()
-      deployed.should.have.property('address')
+      const deployInfo = await contract.deploy()
+      expect(deployInfo).to.have.property('address')
 
-      const deployedStatic = await compiled.deployStatic([])
-      deployedStatic.result.should.have.property('gasUsed')
-      deployedStatic.result.should.have.property('returnType')
+      const deployedStatic = await contract.deploy([], { callStatic: true })
+      expect(deployedStatic.result).to.have.property('gasUsed')
+      expect(deployedStatic.result).to.have.property('returnType')
     })
 
     it('Can call contract with external deps', async () => {
-      const callResult = await deployed.call('sumNumbers', [1, 2])
-      callResult.decodedResult.should.be.equal(3n)
-
-      const callStaticResult = await deployed.callStatic('sumNumbers', [1, 2])
-      callStaticResult.decodedResult.should.be.equal(3n)
+      expect((await contract.methods.sumNumbers(1, 2, { callStatic: false })).decodedResult)
+        .to.be.equal(3n)
+      expect((await contract.methods.sumNumbers(1, 2, { callStatic: true })).decodedResult)
+        .to.be.equal(3n)
     })
   })
 

@@ -63,7 +63,6 @@ const Chain = stampit({
     sendTransaction: required,
     height: required,
     awaitHeight: required,
-    topBlock: required,
     poll: required,
     balance: required,
     getBalance: required,

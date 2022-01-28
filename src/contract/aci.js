@@ -131,9 +131,9 @@ export default async function getContractInstance ({
   instance.compile = async (options = {}) => {
     if (instance.bytecode) throw new IllegalArgumentError('Contract already compiled')
     if (!instance.source) throw new IllegalArgumentError('Can\'t compile without source code')
-    const { bytecode } = await this.contractCompile(
-      instance.source, { ...instance.options, ...options }
-    )
+    const { bytecode } = await this.compilerApi.compileContract({
+      code: instance.source, options: { ...instance.options, ...options }
+    })
     instance.bytecode = bytecode
     return instance.bytecode
   }
@@ -202,12 +202,7 @@ export default async function getContractInstance ({
       transaction: hash,
       rawTx,
       txData,
-      address: contractId,
-      call: (name, args, options) =>
-        this.contractCall(instance.source, contractId, name, args, { ...opt, ...options }),
-      callStatic: (name, args, options) =>
-        this.contractCallStatic(instance.source, contractId, name, args, { ...opt, ...options }),
-      createdAt: new Date()
+      address: contractId
     })
     return instance.deployInfo
   }
