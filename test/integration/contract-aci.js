@@ -536,7 +536,7 @@ describe('Contract instance', function () {
     describe('DATATYPE', function () {
       it('Invalid type', async () => {
         await expect(testContract.methods.datTypeFn({}))
-          .to.be.rejectedWith('Variant should be an object mapping constructor to array of values, got [object Object] instead')
+          .to.be.rejectedWith('Variant should be an object mapping constructor to array of values, got "[object Object]" instead')
       })
 
       it('Call generic datatype', async () => {
@@ -546,7 +546,7 @@ describe('Contract instance', function () {
 
       it('Invalid arguments length', async () => {
         await expect(testContract.methods.datTypeGFn())
-          .to.be.rejectedWith('Non matching number of arguments. Got 0 but expected from 1 to 1')
+          .to.be.rejectedWith('Non matching number of arguments. datTypeGFn expects between 1 and 1 number of arguments but got 0')
       })
 
       it('Invalid variant', async () => {
@@ -650,7 +650,7 @@ describe('Contract instance', function () {
     describe('Chain.ttl variant', function () {
       it('Invalid', async () => {
         await expect(testContract.methods.chainTtlFn(50))
-          .to.be.rejectedWith('Variant should be an object mapping constructor to array of values, got 50 instead')
+          .to.be.rejectedWith('Variant should be an object mapping constructor to array of values, got "50" instead')
       })
 
       it('Valid', async () => {
