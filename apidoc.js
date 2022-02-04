@@ -21,7 +21,6 @@
 const jsdoc2md = require('jsdoc-to-markdown')
 const fs = require('fs')
 const path = require('path')
-const R = require('ramda')
 
 const outputDir = path.join(__dirname, 'docs')
 const prefix = /^@aeternity\/aepp-sdk\/es\//
@@ -32,7 +31,7 @@ const templateData = jsdoc2md.getTemplateDataSync({
 
 function createDirs (path) {
   const paths = path.split(/\//).slice(1, -1)
-    .reduce((acc, e) => acc.concat([`${R.last(acc)}/${e}`]), ['']).slice(1)
+    .reduce((acc, e) => acc.concat([`${acc[acc.length - 1]}/${e}`]), ['']).slice(1)
 
   paths.forEach(dir => {
     try {
@@ -44,12 +43,12 @@ function createDirs (path) {
 }
 
 const modules = templateData
-  .filter(R.propEq('kind', 'module'))
+  .filter(({ kind }) => kind === 'module')
   .map(({ name }) => {
     return { name, out: `api/${name.replace(prefix, '')}` }
   })
 
-R.forEachObjIndexed(({ name, out }) => {
+Object.values(modules).forEach(({ name, out }) => {
   const template = `{{#module name="${name}"}}{{>docs}}{{/module}}`
   console.log(`rendering ${name}`)
   const dest = path.resolve(outputDir, `${out}.md`)
@@ -64,7 +63,7 @@ R.forEachObjIndexed(({ name, out }) => {
   })
   createDirs(dest)
   fs.writeFileSync(dest, output)
-}, modules)
+})
 
 const output = jsdoc2md.renderSync({
   data: modules,
