@@ -69,7 +69,7 @@ export default AccountBase.compose({
   props: { isGa: false },
   methods: {
     sign (data) {
-      if (this.isGa) throw new InvalidKeypairError('You are trying to sign data using GA account without keypair')
+      if (this.isGa) throw new InvalidKeypairError('You are trying to sign data using generalized account without keypair')
       return Promise.resolve(sign(data, secrets.get(this).secretKey))
     },
     address () {

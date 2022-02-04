@@ -37,7 +37,7 @@ import AccountMultiple from './account/multiple'
 import MemoryAccount from './account/memory'
 import Aens from './ae/aens'
 import Contract from './ae/contract'
-import GeneralizeAccount from './contract/ga'
+import GeneralizedAccount from './contract/ga'
 import ContractCompilerHttp from './contract/compiler'
 import RpcAepp from './ae/aepp'
 import RpcWallet from './ae/wallet'
@@ -72,7 +72,7 @@ export {
   Crypto,
   Keystore,
   Chain,
-  GeneralizeAccount,
+  GeneralizedAccount,
   HdWallet,
   MemoryAccount,
   Node,

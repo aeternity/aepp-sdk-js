@@ -27,7 +27,7 @@ const authContractSource = `contract BlindAuth =
       None          => abort("Not in Auth context")
       Some(tx_hash) => true
 `
-describe('Generalize Account', function () {
+describe('Generalized Account', function () {
   let sdk
   const gaAccount = generateKeyPair()
 
@@ -39,13 +39,13 @@ describe('Generalize Account', function () {
   })
 
   it('Make account GA', async () => {
-    await sdk.createGeneralizeAccount('authorize', authContractSource)
+    await sdk.createGeneralizedAccount('authorize', authContractSource)
     const isGa = await sdk.isGA(gaAccount.publicKey)
     isGa.should.be.equal(true)
   })
 
-  it('Fail on make GA on already GA account', async () => {
-    await sdk.createGeneralizeAccount('authorize', authContractSource)
+  it('Fail on make GA on already GA', async () => {
+    await sdk.createGeneralizedAccount('authorize', authContractSource)
       .should.be.rejectedWith(`Account ${gaAccount.publicKey} is already GA`)
   })
 
