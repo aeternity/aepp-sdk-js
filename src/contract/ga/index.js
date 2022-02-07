@@ -16,11 +16,11 @@
  */
 
 /**
- * Generalize Account module - routines to use generalize account
+ * Generalized Account module - routines to use generalized account
  *
  * @module @aeternity/aepp-sdk/es/contract/ga
- * @export GeneralizeAccount
- * @example import { GeneralizeAccount } from '@aeternity/aepp-sdk'
+ * @export GeneralizedAccount
+ * @example import { GeneralizedAccount } from '@aeternity/aepp-sdk'
  */
 import Contract from '../../ae/contract'
 import { TX_TYPE } from '../../tx/builder/schema'
@@ -30,18 +30,18 @@ import { hash } from '../../utils/crypto'
 import { IllegalArgumentError, MissingParamError } from '../../utils/errors'
 
 /**
- * GeneralizeAccount Stamp
+ * GeneralizedAccount Stamp
  *
- * Provide Generalize Account implementation
+ * Provide Generalized Account implementation
  * {@link module:@aeternity/aepp-sdk/es/contract/ga} clients.
  * @function
  * @alias module:@aeternity/aepp-sdk/es/contract/ga
  * @rtype Stamp
  * @param {Object} [options={}] - Initializer object
- * @return {Object} GeneralizeAccount instance
+ * @return {Object} GeneralizedAccount instance
  * @example
  * const authContract = ``
- * await client.createGeneralizeAccount(authFnName, authContract, [...authFnArguments]
+ * await client.createGeneralizedAccount(authFnName, authContract, [...authFnArguments]
  * // Make spend using GA
  * const callData = 'cb_...' // encoded call data for auth contract
  * await client.spend(10000, receiverPub, { authData: { callData } })
@@ -50,19 +50,19 @@ import { IllegalArgumentError, MissingParamError } from '../../utils/errors'
  *   authData: { source: authContract, args: [...authContractArgs] }
  * }) // sdk will prepare callData itself
  */
-export const GeneralizeAccount = Contract.compose({
+export const GeneralizedAccount = Contract.compose({
   methods: {
-    createGeneralizeAccount,
+    createGeneralizedAccount,
     createMetaTx,
     isGA
   }
 })
-export default GeneralizeAccount
+export default GeneralizedAccount
 
 /**
  * @alias module:@aeternity/aepp-sdk/es/contract/ga
  * @function
- * Check if account is GA account
+ * Check if account is GA
  * @param {String} address - Account address
  * @return {Boolean}
  */
@@ -72,7 +72,7 @@ async function isGA (address) {
 }
 
 /**
- * Convert current account to GA account
+ * Convert current account to GA
  * @alias module:@aeternity/aepp-sdk/es/contract/ga
  * @function
  * @param {String} authFnName - Authorization function name
@@ -83,7 +83,7 @@ async function isGA (address) {
  *   result: *, owner: *, address, rawTx: *, transaction: *
  * }>>}
  */
-async function createGeneralizeAccount (authFnName, source, args = [], options = {}) {
+async function createGeneralizedAccount (authFnName, source, args = [], options = {}) {
   const opt = { ...this.Ae.defaults, ...options }
   const ownerId = await this.address(opt)
   if (await this.isGA(ownerId)) throw new IllegalArgumentError(`Account ${ownerId} is already GA`)

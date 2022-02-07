@@ -26,7 +26,7 @@ import Ae from './'
 import Chain from '../chain/node'
 import Tx from '../tx/tx'
 import Contract from './contract'
-import GeneralizeAccount from '../contract/ga'
+import GeneralizedAccount from '../contract/ga'
 import WalletRpc from '../utils/aepp-wallet-communication/rpc/wallet-rpc'
 import Oracle from './oracle'
 import Aens from './aens'
@@ -47,4 +47,4 @@ import Aens from './aens'
   address: keypair.publicKey,
 })
  */
-export default Ae.compose(WalletRpc, Tx, Contract, Oracle, Aens, GeneralizeAccount, Chain)
+export default Ae.compose(WalletRpc, Tx, Contract, Oracle, Aens, GeneralizedAccount, Chain)

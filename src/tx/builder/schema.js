@@ -227,7 +227,6 @@ export const TX_TYPE = {
   nameserviceTree: 'nameserviceTree',
   oraclesTree: 'oraclesTree',
   accountsTree: 'accountsTree',
-  // GA ACCOUNTS
   gaAttach: 'gaAttach',
   gaMeta: 'gaMeta',
   payingFor: 'payingFor',
@@ -327,7 +326,6 @@ export const OBJECT_ID_TX_TYPE = {
   [OBJECT_TAG_NAMESERVICE_TREE]: TX_TYPE.nameserviceTree,
   [OBJECT_TAG_ORACLES_TREE]: TX_TYPE.oraclesTree,
   [OBJECT_TAG_ACCOUNTS_TREE]: TX_TYPE.accountsTree,
-  // GA Accounts
   [OBJECT_TAG_GA_ATTACH]: TX_TYPE.gaAttach,
   [OBJECT_TAG_GA_META]: TX_TYPE.gaMeta,
   [OBJECT_TAG_PAYING_FOR]: TX_TYPE.payingFor,
