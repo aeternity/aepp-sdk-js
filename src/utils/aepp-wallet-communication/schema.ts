@@ -20,6 +20,7 @@ export const enum METHODS {
   updateAddress = 'address.update',
   address = 'address.get',
   connect = 'connection.open',
+  bridge = 'connection.bridge',
   sign = 'transaction.sign',
   signMessage = 'message.sign',
   subscribeAddress = 'address.subscribe',
