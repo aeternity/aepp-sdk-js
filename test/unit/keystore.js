@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -40,36 +40,32 @@ const invalidKeystore = {
     }
   }
 }
-
 const password = 'test'
-describe('Keystore', function () {
-  this.timeout(300000)
 
+describe('Keystore', () => {
   const { secretKey } = generateKeyPair(true)
-  const publicKey = getAddressFromPriv(secretKey)
-  let keystoreBuffer
-  let keystoreHex
+  let keystore
 
   it('dump account to keystore object', async () => {
-    keystoreBuffer = await dump('test', password, secretKey)
-    keystoreHex = await dump('test', password, secretKey.toString('hex'))
-    validateKeyObj(keystoreBuffer).should.be.equal(true)
-    validateKeyObj(keystoreHex).should.be.equal(true)
+    keystore = await dump('test', password, secretKey)
+    expect(keystore.public_key).to.be.equal(getAddressFromPriv(secretKey))
+    validateKeyObj(keystore).should.be.equal(true)
   })
 
-  it('restore account from keystore object', async () => {
-    const privFromBuffer = await recover(password, keystoreBuffer)
-    const privFromHex = await recover(password, keystoreHex)
-    const accAddress = getAddressFromPriv(privFromBuffer)
-
-    secretKey.toString('hex').should.be.equal(privFromBuffer)
-    secretKey.toString('hex').should.be.equal(privFromHex)
-    publicKey.should.be.equal(accAddress)
+  it('dump accepts hex', async () => {
+    const nonce = Buffer.from(keystore.crypto.cipher_params.nonce, 'hex')
+    const salt = Buffer.from(keystore.crypto.kdf_params.salt, 'hex')
+    const k = await dump('test', password, secretKey.toString('hex'), nonce, salt)
+    k.id = keystore.id
+    expect(k).to.be.eql(keystore)
   })
+
+  it('restore account from keystore object', async () =>
+    expect(await recover(password, keystore)).to.be.equal(secretKey.toString('hex')))
 
   it('use invalid keystore json', () => expect(recover(password, invalidKeystore))
     .to.be.rejectedWith(InvalidKeyError, 'Invalid key file format. Require properties: ciphertext,symmetric_alg'))
 
-  it('use invalid keystore password', () => expect(recover(password + 1, keystoreBuffer))
+  it('use invalid keystore password', () => expect(recover(password + 1, keystore))
     .to.be.rejectedWith(InvalidPasswordError, 'Invalid password or nonce'))
 })
