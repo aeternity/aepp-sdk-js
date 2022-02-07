@@ -1,6 +1,6 @@
 import nacl from 'tweetnacl'
 import { v4 as uuid } from 'uuid'
-import sodium from 'libsodium-wrappers-sumo'
+import { ArgonType, hash } from '@aeternity/argon2-browser/dist/argon2-bundled.min.js'
 import { encodeBase58Check } from './crypto'
 import { str2buf } from './bytes'
 import {
@@ -36,19 +36,17 @@ const DERIVED_KEY_FUNCTIONS = {
   argon2id: deriveKeyUsingArgon2id
 }
 
-export async function deriveKeyUsingArgon2id (password, salt, options) {
-  const { memlimit_kib: memoryCost, opslimit: timeCost } = options.kdf_params
-  // const isBrowser = !(typeof module !== 'undefined' && module.exports)
+export async function deriveKeyUsingArgon2id (pass, salt, options) {
+  const { memlimit_kib: mem, opslimit: time } = options.kdf_params
 
-  await sodium.ready
-  const result = sodium.crypto_pwhash(
-    32,
-    password,
+  const result = (await hash({
+    hashLen: 32,
+    pass,
     salt,
-    timeCost,
-    memoryCost * 1024,
-    sodium.crypto_pwhash_ALG_ARGON2ID13
-  )
+    time,
+    mem,
+    type: ArgonType.Argon2id
+  })).hash
   return Buffer.from(result)
 }
 
@@ -69,11 +67,11 @@ function decryptXsalsa20Poly1305 ({ ciphertext, key, nonce }) {
 
 /**
  * Symmetric private key encryption using secret (derived) key.
- * @param {buffer|string} plaintext Data to be encrypted.
- * @param {buffer|string} key Secret key.
- * @param {buffer|string} nonce Randomly generated nonce.
+ * @param {Buffer|string} plaintext Data to be encrypted.
+ * @param {Buffer|string} key Secret key.
+ * @param {Buffer|string} nonce Randomly generated nonce.
  * @param {string=} algo Encryption algorithm (default: DEFAULTS.crypto.symmetric_alg).
- * @return {buffer} Encrypted data.
+ * @return {Buffer} Encrypted data.
  */
 function encrypt (plaintext, key, nonce, algo = DEFAULTS.crypto.symmetric_alg) {
   if (!CRYPTO_FUNCTIONS[algo]) throw new NoSuchAlgorithmError(algo)
@@ -82,11 +80,11 @@ function encrypt (plaintext, key, nonce, algo = DEFAULTS.crypto.symmetric_alg) {
 
 /**
  * Symmetric private key decryption using secret (derived) key.
- * @param {buffer|Uint8Array} ciphertext Data to be decrypted.
- * @param {buffer|Uint8Array} key Secret key.
- * @param {buffer|Uint8Array} nonce Nonce from key-object.
+ * @param {Buffer|Uint8Array} ciphertext Data to be decrypted.
+ * @param {Buffer|Uint8Array} key Secret key.
+ * @param {Buffer|Uint8Array} nonce Nonce from key-object.
  * @param {string=} algo Encryption algorithm.
- * @return {buffer} Decrypted data.
+ * @return {Buffer} Decrypted data.
  */
 function decrypt (ciphertext, key, nonce, algo) {
   if (!CRYPTO_FUNCTIONS[algo]) throw new NoSuchAlgorithmError(algo)
@@ -96,11 +94,11 @@ function decrypt (ciphertext, key, nonce, algo) {
 /**
  * Derive secret key from password with key derivation function.
  * @param {string} password User-supplied password.
- * @param {buffer|Uint8Array} nonce Randomly generated nonce.
+ * @param {Buffer|Uint8Array} nonce Randomly generated nonce.
  * @param {Object=} options Encryption parameters.
  * @param {string=} options.kdf Key derivation function (default: DEFAULTS.crypto.kdf).
  * @param {Object=} options.kdf_params KDF parameters (default: DEFAULTS.crypto.kdf_params).
- * @return {buffer} Secret key derived from password.
+ * @return {Buffer} Secret key derived from password.
  */
 async function deriveKey (password, nonce, options = {
   kdf_params: DEFAULTS.crypto.kdf_params,
@@ -119,11 +117,11 @@ async function deriveKey (password, nonce, options = {
 
 /**
  * Assemble key data object in secret-storage format.
- * @param {buffer} name Key name.
- * @param {buffer} derivedKey Password-derived secret key.
- * @param {buffer} privateKey Private key.
- * @param {buffer} nonce Randomly generated 24byte nonce.
- * @param {buffer} salt Randomly generated 16byte salt.
+ * @param {Buffer} name Key name.
+ * @param {Buffer} derivedKey Password-derived secret key.
+ * @param {Buffer} privateKey Private key.
+ * @param {Buffer} nonce Randomly generated 24byte nonce.
+ * @param {Buffer} salt Randomly generated 16byte salt.
  * @param {Object=} options Encryption parameters.
  * @param {string=} options.kdf Key derivation function (default: argon2id).
  * @param {string=} options.cipher Symmetric cipher (default: constants.cipher).
@@ -183,7 +181,7 @@ export async function recover (password, keyObject) {
  * Export private key to keystore secret-storage format.
  * @param {String} name Key name.
  * @param {String} password User-supplied password.
- * @param {String} privateKey Private key.
+ * @param {String|Buffer} privateKey Private key as hex-string or a Buffer.
  * @param {Buffer} nonce Randomly generated 24byte nonce.
  * @param {Buffer} salt Randomly generated 16byte salt.
  * @param {Object=} options Encryption parameters.
@@ -204,7 +202,7 @@ export async function dump (
   return marshal(
     name,
     await deriveKey(password, salt, opt),
-    privateKey,
+    typeof privateKey === 'string' ? Buffer.from(privateKey, 'hex') : privateKey,
     nonce,
     salt,
     opt
