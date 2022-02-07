@@ -51,15 +51,9 @@ function configure (filename, opts = {}) {
         type: 'umd'
       }
     },
-    externals: Object
-      .keys(require('./package').dependencies)
-      .reduce((p, dependency) => ({
-        ...p,
-        [dependency]: {
-          commonjs: dependency,
-          commonjs2: dependency
-        }
-      }), {}),
+    externals: Object.fromEntries(
+      Object.keys(require('./package').dependencies)
+        .map((dependency) => [dependency, dependency])),
     ...opts
   })
 }
