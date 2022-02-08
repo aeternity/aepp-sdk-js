@@ -41,7 +41,7 @@ const buildTransaction = (type, params, options = {}) => {
 /**
  * Unpack transaction from RLP encoded binary or base64c string
  * @alias module:@aeternity/aepp-sdk/es/tx/tx-object
- * @param {Buffer|String} tx RLP encoded binary or base64c(rlpBinary) string
+ * @param {Uint8Array|String} tx RLP encoded binary or base64c(rlpBinary) string
  * @throws {Error} Arguments validation error's
  * @return {{
  *   encodedTx: String, binary: Array<Buffer>, rlpEncoded: Buffer, type: String, params: Object
@@ -53,10 +53,11 @@ const unpackTransaction = (tx) => {
     const { txType: type, tx: params, rlpEncoded, binary } = unpackTx(tx)
     return { encodedTx: tx, type, params, rlpEncoded, binary }
   }
-  if (Buffer.isBuffer(tx)) {
+  if (tx instanceof Uint8Array) {
     const { txType: type, tx: params, rlpEncoded, binary } = unpackTx(tx, true)
     return { encodedTx: encode(tx, 'tx'), type, params, rlpEncoded, binary }
   }
+  throw new InvalidTxError(`"tx" should be a string or Uint8Array, got ${tx} instead`)
 }
 
 /**

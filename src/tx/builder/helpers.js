@@ -199,7 +199,7 @@ export function writeId (hashId) {
  * @return {String} Encoided hash string with prefix
  */
 export function readId (buf) {
-  const tag = buf.readUIntBE(0, 1)
+  const tag = Buffer.from(buf).readUIntBE(0, 1)
   const prefix = ID_TAG_PREFIX[tag]
   if (!prefix) throw new PrefixNotFoundError(tag)
   return encode(buf.slice(1, buf.length), prefix)
@@ -224,7 +224,7 @@ export function writeInt (val) {
  * @return {String} Buffer Buffer from number(BigEndian)
  */
 export function readInt (buf = Buffer.from([])) {
-  return BigNumber(buf.toString('hex'), 16).toString(10)
+  return new BigNumber(Buffer.from(buf).toString('hex'), 16).toString(10)
 }
 
 /**
