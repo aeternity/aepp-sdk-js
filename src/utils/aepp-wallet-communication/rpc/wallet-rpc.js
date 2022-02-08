@@ -131,7 +131,7 @@ const REQUESTS = {
       {},
       ({ accounts } = {}) => ({
         result: accounts ||
-           [...Object.keys(client.accounts.current), ...Object.keys(client.accounts.connected)]
+          [...Object.keys(client.accounts.current), ...Object.keys(client.accounts.connected)]
       }),
       (error) => ({ error: ERRORS.rejectedByUser(error) })
     )
@@ -249,22 +249,22 @@ const handleMessage = (instance, id) => async (msg, origin) => {
 }
 
 /**
-  * Contain functionality for aepp interaction and managing multiple aepps
-  * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc
-  * @function
-  * @rtype Stamp
-  * @param {Object} param Init params object
-  * @param {String=} [param.name] Wallet name
-  * @param {Function} onConnection Call-back function for incoming AEPP connection
-  * @param {Function} onSubscription Call-back function for incoming AEPP account subscription
-  * @param {Function} onSign Call-back function for incoming AEPP sign request
-  * @param {Function} onAskAccounts Call-back function for incoming AEPP get address request
-  * @param {Function} onMessageSign Call-back function for incoming AEPP sign message request
-  * @param {Function} onNodeBridge Call-back function for incoming AEPP node connection request
-  * Second argument of incoming call-backs contain function for accept/deny request
-  * @param {Function} onDisconnect Call-back function for disconnect event
-  * @return {Object}
-  */
+ * Contain functionality for aepp interaction and managing multiple aepps
+ * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc
+ * @function
+ * @rtype Stamp
+ * @param {Object} param Init params object
+ * @param {String=} [param.name] Wallet name
+ * @param {Function} onConnection Call-back function for incoming AEPP connection
+ * @param {Function} onSubscription Call-back function for incoming AEPP account subscription
+ * @param {Function} onSign Call-back function for incoming AEPP sign request
+ * @param {Function} onAskAccounts Call-back function for incoming AEPP get address request
+ * @param {Function} onMessageSign Call-back function for incoming AEPP sign message request
+ * @param {Function} onNodeBridge Call-back function for incoming AEPP node connection request
+ * Second argument of incoming call-backs contain function for accept/deny request
+ * @param {Function} onDisconnect Call-back function for disconnect event
+ * @return {Object}
+ */
 export default Ae.compose(AccountMultiple, {
   init ({
     name,
@@ -293,7 +293,7 @@ export default Ae.compose(AccountMultiple, {
       _selectAccount(address)
       Object.values(this.rpcClients)
         .filter(client => client.isConnected() && client.isSubscribed() &&
-           client.hasAccessToAccount(address) && condition(client))
+          client.hasAccessToAccount(address) && condition(client))
         .forEach(client => client.setAccounts({
           current: { [address]: {} },
           connected: {
@@ -330,14 +330,14 @@ export default Ae.compose(AccountMultiple, {
   },
   methods: {
     /**
-      * Remove specific RpcClient by ID
-      * @function removeRpcClient
-      * @instance
-      * @rtype (id: string) => void
-      * @param {String} id Client ID
-      * @param {Object} [opt = {}]
-      * @return {void}
-      */
+     * Remove specific RpcClient by ID
+     * @function removeRpcClient
+     * @instance
+     * @rtype (id: string) => void
+     * @param {String} id Client ID
+     * @param {Object} [opt = {}]
+     * @return {void}
+     */
     removeRpcClient (id, { forceConnectionClose = false } = {}) {
       const client = this.rpcClients[id]
       if (!client) throw new UnknownRpcClientError(id)
@@ -345,13 +345,13 @@ export default Ae.compose(AccountMultiple, {
       delete this.rpcClients[id]
     },
     /**
-      * Add new client by AEPP connection
-      * @function addRpcClient
-      * @instance
-      * @rtype (clientConnection: Object) => Object
-      * @param {Object} clientConnection AEPP connection object
-      * @return {String} Client ID
-      */
+     * Add new client by AEPP connection
+     * @function addRpcClient
+     * @instance
+     * @rtype (clientConnection: Object) => Object
+     * @param {Object} clientConnection AEPP connection object
+     * @return {String} Client ID
+     */
     addRpcClient (clientConnection) {
       // @TODO  detect if aepp has some history based on origin????
       // if yes use this instance for connection
@@ -365,14 +365,14 @@ export default Ae.compose(AccountMultiple, {
       return id
     },
     /**
-      * Share wallet info
-      * Send shareWalletInfo message to notify AEPP about wallet
-      * @function shareWalletInfo
-      * @instance
-      * @rtype (postFn: Function) => void
-      * @param {Function} postFn Send message function like `(msg) => void`
-      * @return {void}
-      */
+     * Share wallet info
+     * Send shareWalletInfo message to notify AEPP about wallet
+     * @function shareWalletInfo
+     * @instance
+     * @rtype (postFn: Function) => void
+     * @param {Function} postFn Send message function like `(msg) => void`
+     * @return {void}
+     */
     shareWalletInfo (postFn) {
       postFn({
         jsonrpc: '2.0',
@@ -380,12 +380,12 @@ export default Ae.compose(AccountMultiple, {
       })
     },
     /**
-      * Get Wallet info object
-      * @function getWalletInfo
-      * @instance
-      * @rtype () => Object
-      * @return {Object} Object with wallet information(id, name, network, ...)
-      */
+     * Get Wallet info object
+     * @function getWalletInfo
+     * @instance
+     * @rtype () => Object
+     * @return {Object} Object with wallet information(id, name, network, ...)
+     */
     getWalletInfo () {
       const runtime = getBrowserAPI(true).runtime
       return {
@@ -397,12 +397,12 @@ export default Ae.compose(AccountMultiple, {
       }
     },
     /**
-      * Get Wallet accounts
-      * @function getAccounts
-      * @instance
-      * @rtype () => Object
-      * @return {Object} Object with accounts information({ connected: Object, current: Object })
-      */
+     * Get Wallet accounts
+     * @function getAccounts
+     * @instance
+     * @rtype () => Object
+     * @return {Object} Object with accounts information({ connected: Object, current: Object })
+     */
     getAccounts () {
       return {
         current: this.selectedAddress ? { [this.selectedAddress]: {} } : {},
