@@ -160,7 +160,7 @@ export default Ae.compose({
       if (!this.rpcClient || !this.rpcClient.isConnected()) throw new NoWalletConnectedError('You are not connected to Wallet')
       const walletNode = await this.sendBridgeRequest()
       if (!walletNode.url) {
-        throw new Error('Missing node url')
+        throw new MissingNodeUrl()
       } else {
         const node = await Node({
           url: walletNode.url,

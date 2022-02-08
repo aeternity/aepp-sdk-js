@@ -87,8 +87,7 @@ const REQUESTS = {
         }
       },
       (error) => {
-        client.updateInfo({ status: RPC_STATUS.CONNECTION_REJECTED })
-        return { error: ERRORS.connectionDeny(error) }
+        return { error: ERRORS.rejectedByUser(error) }
       }
     )
   },

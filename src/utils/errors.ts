@@ -681,3 +681,10 @@ export class RpcConnectionError extends WalletError {
     this.name = 'RpcConnectionError'
   }
 }
+
+export class MissingNodeUrl extends WalletError {
+  constructor () {
+    super('Unable to connect to the node, Missing node connection details')
+    this.name = 'MissingNodeUrl'
+  }
+}
