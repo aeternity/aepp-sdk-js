@@ -27,7 +27,7 @@ import aesjs from 'aes-js'
 import shajs from 'sha.js'
 
 import { str2buf } from './bytes'
-import { decode } from '../tx/builder/helpers'
+import { encode, decode } from '../tx/builder/helpers'
 import { hash } from './crypto-ts'
 import { InvalidChecksumError, MessageLimitError } from './errors'
 
@@ -44,7 +44,7 @@ const Ecb = aesjs.ModeOfOperation.ecb
 export function getAddressFromPriv (secret) {
   const keys = nacl.sign.keyPair.fromSecretKey(str2buf(secret))
   const publicBuffer = Buffer.from(keys.publicKey)
-  return `ak_${encodeBase58Check(publicBuffer)}`
+  return encode(publicBuffer, 'ak')
 }
 
 /**
@@ -166,7 +166,7 @@ export function encodeUnsigned (value) {
 export function encodeContractAddress (owner, nonce) {
   const publicKey = decode(owner, 'ak')
   const binary = Buffer.concat([publicKey, encodeUnsigned(nonce)])
-  return `ct_${encodeBase58Check(hash(binary))}`
+  return encode(hash(binary), 'ct')
 }
 
 // KEY-PAIR HELPERS
@@ -201,7 +201,7 @@ export function generateKeyPair (raw = false) {
     }
   } else {
     return {
-      publicKey: `ak_${encodeBase58Check(publicBuffer)}`,
+      publicKey: encode(publicBuffer, 'ak'),
       secretKey: secretBuffer.toString('hex')
     }
   }

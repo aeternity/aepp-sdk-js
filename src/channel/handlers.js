@@ -15,7 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { generateKeyPair, encodeContractAddress, encodeBase64Check } from '../utils/crypto'
+import { generateKeyPair, encodeContractAddress } from '../utils/crypto'
 import {
   options,
   changeStatus,
@@ -28,6 +28,7 @@ import {
   fsmId
 } from './internal'
 import { unpackTx, buildTx } from '../tx/builder'
+import { encode } from '../tx/builder/helpers'
 import {
   IllegalArgumentError,
   InsufficientBalanceError,
@@ -35,19 +36,15 @@ import {
   UnexpectedChannelMessageError
 } from '../utils/errors'
 
-function encodeRlpTx (rlpBinary) {
-  return `tx_${encodeBase64Check(rlpBinary)}`
-}
-
 async function appendSignature (tx, signFn) {
   const { signatures, encodedTx } = unpackTx(tx).tx
-  const result = await signFn(encodeRlpTx(encodedTx.rlpEncoded))
+  const result = await signFn(encode(encodedTx.rlpEncoded, 'tx'))
   if (typeof result === 'string') {
     const { tx: signedTx, txType } = unpackTx(result)
-    return encodeRlpTx(buildTx({
+    return buildTx({
       signatures: signatures.concat(signedTx.signatures),
       encodedTx: signedTx.encodedTx.rlpEncoded
-    }, txType).rlpEncoded)
+    }, txType).tx
   }
   return result
 }

@@ -16,9 +16,9 @@
  */
 
 import { describe, it, before } from 'mocha'
-import { encodeBase64Check, generateKeyPair, salt } from '../../src/utils/crypto'
+import { generateKeyPair, salt } from '../../src/utils/crypto'
 import { getSdk } from './index'
-import { commitmentHash, oracleQueryId } from '../../src/tx/builder/helpers'
+import { commitmentHash, oracleQueryId, encode } from '../../src/tx/builder/helpers'
 import { GAS_MAX, MIN_GAS_PRICE } from '../../src/tx/builder/schema'
 import { MemoryAccount } from '../../src'
 import { AE_AMOUNT_FORMATS } from '../../src/utils/amount-formatter'
@@ -234,7 +234,7 @@ describe('Native Transaction', function () {
     await sdk.send(nativeTx)
 
     const orQuery = (await sdk.api.getOracleQueryByPubkeyAndQueryId(oracleId, queryId))
-    orQuery.response.should.be.equal(`or_${encodeBase64Check(queryResponse)}`)
+    orQuery.response.should.be.equal(encode(queryResponse, 'or'))
   })
   it('Get next account nonce', async () => {
     const accountId = await sdk.address()

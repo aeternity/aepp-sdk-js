@@ -22,7 +22,7 @@ import {
   getMasterKeyFromSeed,
   getSaveHDWalletAccounts
 } from '../../src/utils/hd-wallet'
-import { encodeBase58Check } from '../../src/utils/crypto'
+import { encode } from '../../src/tx/builder/helpers'
 import { InvalidDerivationPathError, InvalidMnemonicError } from '../../src/utils/errors'
 
 describe('hd wallet', () => {
@@ -63,7 +63,7 @@ describe('hd wallet', () => {
 
       expect(accounts).to.eql(testAccounts.map(acc => ({
         secretKey: acc.secretKey,
-        publicKey: `ak_${encodeBase58Check(Buffer.from(acc.publicKey, 'hex'))}`
+        publicKey: encode(Buffer.from(acc.publicKey, 'hex'), 'ak')
       })))
     }))
 

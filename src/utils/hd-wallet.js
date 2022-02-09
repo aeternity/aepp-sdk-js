@@ -2,7 +2,8 @@ import nacl from 'tweetnacl'
 import { full as hmac } from 'tweetnacl-auth'
 import { fromString } from 'bip32-path'
 import { validateMnemonic, mnemonicToSeed, generateMnemonic as genMnemonic } from '@aeternity/bip39'
-import { decryptKey, encodeBase58Check, encryptKey } from './crypto'
+import { decryptKey, encryptKey } from './crypto'
+import { encode } from '../tx/builder/helpers'
 import {
   InvalidDerivationPathError,
   NotHardenedSegmentError,
@@ -38,7 +39,7 @@ function formatAccount (keys) {
   const { secretKey, publicKey } = keys
   return {
     secretKey: toHex(secretKey),
-    publicKey: `ak_${encodeBase58Check(publicKey)}`
+    publicKey: encode(publicKey, 'ak')
   }
 }
 

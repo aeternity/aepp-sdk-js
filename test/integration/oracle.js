@@ -18,9 +18,10 @@
 import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
 import { getSdk } from './'
-import { encodeBase64Check, generateKeyPair } from '../../src/utils/crypto'
+import { generateKeyPair } from '../../src/utils/crypto'
 import MemoryAccount from '../../src/account/memory'
 import { QUERY_FEE } from '../../src/tx/builder/schema'
+import { decode } from '../../src/tx/builder/helpers'
 
 describe('Oracle', function () {
   let sdk
@@ -76,7 +77,7 @@ describe('Oracle', function () {
     query = await oracle.getQuery(query.id)
 
     expect(query.decodedResponse).to.be.equal(queryResponse)
-    expect(query.response.slice(3)).to.be.equal(encodeBase64Check(queryResponse))
+    expect(decode(query.response, 'or').toString()).to.be.equal(queryResponse)
   })
 
   it('Poll for response', async () => {

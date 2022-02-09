@@ -110,7 +110,7 @@ export function produceNameId (name) {
  */
 export function commitmentHash (name, salt = createSalt()) {
   ensureNameValid(name)
-  return `cm_${encodeBase58Check(hash(Buffer.concat([Buffer.from(name.toLowerCase()), formatSalt(salt)])))}`
+  return encode(hash(Buffer.concat([Buffer.from(name.toLowerCase()), formatSalt(salt)])), 'cm')
 }
 
 // based on https://github.com/aeternity/protocol/blob/master/node/api/api_encoding.md
