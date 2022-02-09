@@ -6,7 +6,7 @@
  * @example
  * import WalletRpc from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc'
  */
-import { v4 as uuid } from 'uuid'
+import { v4 as uuid } from '@aeternity/uuid'
 import Ae from '../../../ae'
 import verifyTransaction from '../../../tx/validator'
 import AccountMultiple from '../../../account/multiple'

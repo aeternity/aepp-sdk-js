@@ -28,7 +28,7 @@
  */
 import stampit from '@stamp/it'
 import WalletConnection from '.'
-import { v4 as uuid } from 'uuid'
+import { v4 as uuid } from '@aeternity/uuid'
 import { MESSAGE_DIRECTION } from '../schema'
 import { getBrowserAPI, isInIframe } from '../helpers'
 import {
