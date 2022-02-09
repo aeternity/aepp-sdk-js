@@ -52,7 +52,6 @@
     "process": "^0.11.10",
     "rlp": "^3.0.0",
     "sha.js": "^2.4.11",
-    "stream-browserify": "^3.0.0",
     "swagger-client": "^3.18.4",
     "tweetnacl": "^1.0.3",
     "tweetnacl-auth": "^1.0.1",
