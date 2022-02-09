@@ -46,7 +46,7 @@
     "bignumber.js": "^9.0.2",
     "bip32-path": "^0.4.2",
     "blakejs": "^1.1.1",
-    "bs58check": "^2.1.2",
+    "bs58": "^4.0.1",
     "buffer": "^6.0.3",
     "cross-fetch": "^3.1.5",
     "events": "^3.3.0",
