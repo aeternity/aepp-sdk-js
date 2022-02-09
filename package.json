@@ -36,7 +36,6 @@
   "dependencies": {
     "@aeternity/aepp-calldata": "^1.1.0",
     "@aeternity/argon2-browser": "^0.1.1",
-    "@aeternity/bip39": "^0.1.0",
     "@aeternity/json-bigint": "^0.3.1",
     "@aeternity/uuid": "^0.0.1",
     "@babel/runtime-corejs3": "^7.17.2",
