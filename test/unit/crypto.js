@@ -75,16 +75,6 @@ describe('crypto', () => {
     expect(Crypto.isAddressValid('ak_11111111111111111111111111111111273Yts')).to.be.equal(true)
   })
 
-  describe('encodeBase', () => {
-    it('can be encoded and decoded', () => {
-      const input = 'helloword010101023'
-      const inputBuffer = Buffer.from(input)
-      const encoded = Crypto.encodeBase58Check(inputBuffer)
-      const decoded = Crypto.decodeBase58Check(encoded)
-      assert.equal(input, decoded)
-    })
-  })
-
   describe('sign', () => {
     it('should produce correct signature', () => {
       const s = Crypto.sign(txBinary, privateKey)

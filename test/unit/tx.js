@@ -100,7 +100,12 @@ describe('Tx', function () {
     it('don\'t throws exception', () => isNameValid('asdasdasd.chain').should.be.equal(true))
   })
 
+  const payload = Buffer.from([1, 2, 42])
   describe('decode', () => {
+    it('decodes base64check', () => expect(decode('ba_AQIq9Y55kw==')).to.be.eql(payload))
+
+    it('decodes base58check', () => expect(decode('bf_3DZUwMat2')).to.be.eql(payload))
+
     it('throws if not a string', () => expect(() => decode({}))
       .to.throw('Encoded should be a string, got [object Object] instead'))
 
@@ -118,11 +123,13 @@ describe('Tx', function () {
 
     it('throws if invalid size', () => expect(() => decode('ak_An6Ui6sE1F'))
       .to.throw('Payload should be 32 bytes, got 4 instead'))
-
-    it('decodes', () => expect(decode('cb_DA6sWJo=')).to.be.eql(Buffer.from([12])))
   })
 
   describe('encode', () => {
+    it('encodes base64check', () => expect(encode(payload, 'ba')).to.be.equal('ba_AQIq9Y55kw=='))
+
+    it('encodes base58check', () => expect(encode(payload, 'bf')).to.be.equal('bf_3DZUwMat2'))
+
     it('throws if unknown type', () => expect(() => encode([1, 2, 3, 4], 'aa'))
       .to.throw('Unknown type: aa'))
   })

@@ -21,7 +21,6 @@
  * @example import { Crypto } from '@aeternity/aepp-sdk'
  */
 
-import bs58 from 'bs58'
 import nacl from 'tweetnacl'
 import aesjs from 'aes-js'
 import shajs from 'sha.js'
@@ -29,7 +28,7 @@ import shajs from 'sha.js'
 import { str2buf } from './bytes'
 import { encode, decode } from '../tx/builder/helpers'
 import { hash } from './crypto-ts'
-import { InvalidChecksumError, MessageLimitError } from './errors'
+import { MessageLimitError } from './errors'
 
 export * from './crypto-ts'
 
@@ -80,59 +79,6 @@ export function sha256hash (input) {
  */
 export function salt () {
   return Math.floor(Math.random() * Math.floor(Number.MAX_SAFE_INTEGER))
-}
-
-const getChecksum = payload => sha256hash(sha256hash(payload)).slice(0, 4)
-
-const addChecksum = (input) => {
-  const payload = Buffer.from(input)
-  return Buffer.concat([payload, getChecksum(payload)])
-}
-
-function getPayload (buffer) {
-  const payload = buffer.slice(0, -4)
-  if (!getChecksum(payload).equals(buffer.slice(-4))) throw new InvalidChecksumError()
-  return payload
-}
-
-/**
- * Base64check encode given `input`
- * @rtype (input: Buffer) => String
- * @param {Buffer} input - Data to encode
- * @return {String} Base64check encoded data
- */
-export function encodeBase64Check (input) {
-  return addChecksum(input).toString('base64')
-}
-
-/**
- * Base64check decode given `str`
- * @rtype (str: String) => Buffer
- * @param {String} str - Data to decode
- * @return {Buffer} Base64check decoded data
- */
-export function decodeBase64Check (str) {
-  return getPayload(Buffer.from(str, 'base64'))
-}
-
-/**
- * Base58 encode given `input`
- * @rtype (input: Buffer) => String
- * @param {Buffer} input - Data to encode
- * @return {String} Base58 encoded data
- */
-export function encodeBase58Check (input) {
-  return bs58.encode(addChecksum(input))
-}
-
-/**
- * Base58 decode given `str`
- * @rtype (str: String) => Buffer
- * @param {String} str - Data to decode
- * @return {Buffer} Base58 decoded data
- */
-export function decodeBase58Check (str) {
-  return getPayload(bs58.decode(str))
 }
 
 /**

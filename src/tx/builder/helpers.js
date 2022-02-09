@@ -1,12 +1,6 @@
 import BigNumber from 'bignumber.js'
-
-import {
-  decodeBase58Check,
-  decodeBase64Check,
-  encodeBase58Check, encodeBase64Check,
-  hash,
-  salt
-} from '../../utils/crypto'
+import bs58 from 'bs58'
+import { hash, salt, sha256hash } from '../../utils/crypto'
 import { toBytes } from '../../utils/bytes'
 import {
   ID_TAG_PREFIX,
@@ -28,7 +22,8 @@ import {
   InvalidNameError,
   IllegalBidFeeError,
   NoDefaultAensPointerError,
-  IllegalArgumentError
+  IllegalArgumentError,
+  InvalidChecksumError
 } from '../../utils/errors'
 
 /**
@@ -129,6 +124,29 @@ function ensureValidLength (data, type) {
   throw new PayloadLengthError(`Payload should be ${typesLength[type]} bytes, got ${data.length} instead`)
 }
 
+const getChecksum = payload => sha256hash(sha256hash(payload)).slice(0, 4)
+
+const addChecksum = (input) => {
+  const payload = Buffer.from(input)
+  return Buffer.concat([payload, getChecksum(payload)])
+}
+
+function getPayload (buffer) {
+  const payload = buffer.slice(0, -4)
+  if (!getChecksum(payload).equals(buffer.slice(-4))) throw new InvalidChecksumError()
+  return payload
+}
+
+const base64 = {
+  encode: buffer => addChecksum(buffer).toString('base64'),
+  decode: string => getPayload(Buffer.from(string, 'base64'))
+}
+
+const base58 = {
+  encode: buffer => bs58.encode(addChecksum(buffer)),
+  decode: string => getPayload(bs58.decode(string))
+}
+
 /**
  * Decode data using the default encoding/decoding algorithm
  * @function
@@ -145,8 +163,8 @@ export function decode (data, requiredPrefix) {
   if (requiredPrefix && requiredPrefix !== prefix) {
     throw new PrefixMismatchError(prefix, requiredPrefix)
   }
-  const decoder = (base64Types.includes(prefix) && decodeBase64Check) ||
-    (base58Types.includes(prefix) && decodeBase58Check)
+  const decoder = (base64Types.includes(prefix) && base64.decode) ||
+    (base58Types.includes(prefix) && base58.decode)
   if (!decoder) {
     throw new DecodeError(`Encoded string have unknown type: ${prefix}`)
   }
@@ -164,8 +182,8 @@ export function decode (data, requiredPrefix) {
  * @return {String} Encoded string Base58check or Base64check data
  */
 export function encode (data, type) {
-  const encoder = (base64Types.includes(type) && encodeBase64Check) ||
-    (base58Types.includes(type) && encodeBase58Check)
+  const encoder = (base64Types.includes(type) && base64.encode) ||
+    (base58Types.includes(type) && base58.encode)
   if (!encoder) {
     throw new EncodeError(`Unknown type: ${type}`)
   }
