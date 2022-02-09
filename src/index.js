@@ -22,7 +22,7 @@ import * as TxBuilder from './tx/builder'
 import * as TxBuilderHelper from './tx/builder/helpers'
 import * as SCHEMA from './tx/builder/schema'
 import * as AmountFormatter from './utils/amount-formatter'
-import HdWallet from './utils/hd-wallet'
+import * as HdWallet from './utils/hd-wallet'
 
 import Ae from './ae'
 import Chain from './chain'

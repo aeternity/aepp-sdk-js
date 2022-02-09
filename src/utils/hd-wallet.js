@@ -111,12 +111,3 @@ export const getHdWalletAccountFromMnemonic = (mnemonic, accountIdx) => {
     idx: accountIdx
   }
 }
-
-export default {
-  getHdWalletAccountFromMnemonic,
-  getSaveHDWalletAccounts,
-  generateSaveHDWallet,
-  generateMnemonic,
-  deriveChild,
-  getMasterKeyFromSeed
-}
