@@ -34,7 +34,7 @@
     "SDK"
   ],
   "dependencies": {
-    "@aeternity/aepp-calldata": "^1.1.0",
+    "@aeternity/aepp-calldata": "github:aeternity/aepp-calldata-js#a623a44a259cc53e99b1e358ecc7b3f88edcb45c",
     "@aeternity/argon2-browser": "^0.1.1",
     "@aeternity/json-bigint": "^0.3.1",
     "@aeternity/uuid": "^0.0.1",
