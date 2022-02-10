@@ -221,12 +221,16 @@ async function txDryRunHandler (key) {
   })
 }
 
-async function txDryRun (tx, accountAddress, { top, txEvents }) {
-  const key = [top, txEvents].join()
+async function txDryRun (tx, accountAddress, { top, txEvents, combine }) {
+  const key = combine ? [top, txEvents].join() : 'immediate'
   this._txDryRun ??= {}
   this._txDryRun[key] ??= []
   return new Promise((resolve, reject) => {
     this._txDryRun[key].push({ tx, accountAddress, top, txEvents, resolve, reject })
+    if (!combine) {
+      txDryRunHandler.call(this, key)
+      return
+    }
     this._txDryRun[key].timeout ??= setTimeout(txDryRunHandler.bind(this, key))
   })
 }

@@ -36,12 +36,12 @@ will make SDK create a new dry-run request for each static call. It may be not e
 ```js
 const base = (await sdk.api.getAccountNextNonce(await sdk.address())).nextNonce
 const results = await Promise.all(
-  data.map((d, idx) => contract.methods.foo(d, { nonce: base + idx }))
+  data.map((d, idx) => contract.methods.foo(d, { nonce: base + idx, combine: true }))
 )
 ```
-SDK will detect it and put all of them into a single dry-run request. Also, good to manage nonces on the aepp side to avoid extra requests to the node.
+With `combine` flag SDK would put all of them into a single dry-run request. Also, it is necessary to generate increasing nonces on the aepp side to avoid nonce-already-used errors.
 
-This approach has a limitation: by default, dry-run is limited by 6000000 gas. This is enough to execute only 32 plain contract calls. it can be avoided by:
+This approach has another limitation: by default, dry-run is limited by 6000000 gas. This is enough to execute only 32 plain contract calls. it can be avoided by:
 - increasing the default gas limit of restricted dry-run endpoint in node configuration
 - decreasing the gas limit of each static call
 - using a debug dry-run instead of restricted one
