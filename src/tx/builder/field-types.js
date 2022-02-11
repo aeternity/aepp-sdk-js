@@ -1,7 +1,7 @@
 import {
   writeId, readId, isNameValid, produceNameId, ensureNameValid, getMinimumNameFee, readInt, writeInt
 } from './helpers'
-import { InsufficientNameFeeError } from '../../utils/errors'
+import { InsufficientNameFeeError, IllegalArgumentError } from '../../utils/errors'
 
 export class Field {
   static serialize (value) {
@@ -42,6 +42,17 @@ export class NameFee extends Field {
       throw new InsufficientNameFeeError(value, minNameFee)
     }
     return writeInt(value)
+  }
+
+  static deserialize (value) {
+    return readInt(value)
+  }
+}
+
+export class Deposit extends Field {
+  static serialize (value, { name }) {
+    if (+value) throw new IllegalArgumentError(`Contract deposit is not refundable, so it should be equal 0, got ${value} instead`)
+    return writeInt(0)
   }
 
   static deserialize (value) {

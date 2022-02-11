@@ -8,7 +8,7 @@
 // # https://github.com/aeternity/protocol/blob/master/serializations.md#binary-serialization
 
 import BigNumber from 'bignumber.js'
-import { Name, NameId, NameFee } from './field-types'
+import { Name, NameId, NameFee, Deposit } from './field-types'
 
 export const VSN = 1
 export const VSN_2 = 2
@@ -21,7 +21,6 @@ export const ORACLE_TTL = { type: 'delta', value: 500 }
 export const QUERY_TTL = { type: 'delta', value: 10 }
 export const RESPONSE_TTL = { type: 'delta', value: 10 }
 // # CONTRACT
-export const DEPOSIT = 0
 export const AMOUNT = 0
 export const GAS_MAX = 1600000 - 21000
 export const MIN_GAS_PRICE = 1e9
@@ -519,7 +518,7 @@ const CONTRACT_TX = [
   TX_FIELD('log', FIELD_TYPES.binary, 'cb'),
   TX_FIELD('active', FIELD_TYPES.bool),
   TX_FIELD('referers', FIELD_TYPES.ids, 'ak'),
-  TX_FIELD('deposit', FIELD_TYPES.amount)
+  TX_FIELD('deposit', Deposit)
 ]
 
 const GA_ATTACH_TX = [
@@ -563,7 +562,7 @@ const CONTRACT_CREATE_TX = [
   TX_FIELD('ctVersion', FIELD_TYPES.ctVersion),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int),
-  TX_FIELD('deposit', FIELD_TYPES.amount),
+  TX_FIELD('deposit', Deposit),
   TX_FIELD('amount', FIELD_TYPES.amount),
   TX_FIELD('gas', FIELD_TYPES.int),
   TX_FIELD('gasPrice', FIELD_TYPES.int),

@@ -170,7 +170,7 @@ async function nameRevokeTx ({ accountId, nameId }) {
 }
 
 async function contractCreateTx ({
-  ownerId, code, vmVersion, abiVersion, deposit, amount, gas, gasPrice = MIN_GAS_PRICE, callData
+  ownerId, code, vmVersion, abiVersion, amount, gas, gasPrice = MIN_GAS_PRICE, callData
 }) {
   // Get VM_ABI version
   const ctVersion = this.getVmVersion(TX_TYPE.contractCreate, arguments[0])

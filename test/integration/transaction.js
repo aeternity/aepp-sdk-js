@@ -51,7 +51,7 @@ contract Identity =
   entrypoint getArg(x : int) = x
 `
 let contractId
-const deposit = 4
+const deposit = 0
 
 let _salt
 let commitmentId

@@ -50,7 +50,6 @@ function deserializeField (value, type, prefix) {
       return { vmVersion: readInt(Buffer.from([vm])), abiVersion: readInt(Buffer.from([abi])) }
     }
     case FIELD_TYPES.amount:
-      return readInt(value)
     case FIELD_TYPES.int:
       return readInt(value)
     case FIELD_TYPES.id:
@@ -306,7 +305,8 @@ export function validateParams (params, schema, { excludeKeys = [] }) {
   return Object.fromEntries(
     schema
       // TODO: allow optional keys in schema
-      .filter(([key]) => !excludeKeys.includes(key) && !['payload', 'nameFee'].includes(key))
+      .filter(([key]) => !excludeKeys.includes(key) &&
+        !['payload', 'nameFee', 'deposit'].includes(key))
       .map(([key, type, prefix]) => [key, validateField(params[key], type, prefix)])
       .filter(([, message]) => message)
   )
