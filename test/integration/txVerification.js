@@ -87,4 +87,10 @@ describe('Verify Transaction', function () {
     const errors = await verifyTransaction(tx, node)
     expect(errors.map(({ key }) => key)).to.include('InsufficientBalance')
   })
+
+  it('verifies contractId for contractCall transaction', async () => {
+    const contractCall = 'tx_+GIrAaEBSzqoqjLLKO9NzXLgIBsTC+sNe5ronuTV/lr8IBJNlAECoQV/aqb9TshuuhhzeovvJCD/WmSOnqF8RCu4eY8hXYg/DgOGpYctWWAAAACCE4iEO5rKAIgrEYB4IJIbCmfzF0w='
+    const errors = await verifyTransaction(contractCall, node)
+    expect(errors.map(({ key }) => key)).to.include('ContractNotFound')
+  })
 })

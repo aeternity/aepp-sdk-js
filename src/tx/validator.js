@@ -14,7 +14,7 @@ import { UnsupportedProtocolError } from '../utils/errors'
  */
 
 const validators = [
-  async ({ encodedTx, signatures }, { account, node, parentTxTypes }) => {
+  ({ encodedTx, signatures }, { account, node, parentTxTypes }) => {
     if ((encodedTx ?? signatures) === undefined) return []
     if (signatures.length !== 1) return [] // TODO: Support multisignature?
     const prefix = Buffer.from([
@@ -33,7 +33,7 @@ const validators = [
       checkedKeys: ['encodedTx', 'signatures']
     }]
   },
-  async ({ encodedTx, tx }, { node, parentTxTypes, txType }) => {
+  ({ encodedTx, tx }, { node, parentTxTypes, txType }) => {
     if ((encodedTx ?? tx) === undefined) return []
     return verifyTransaction(
       encode((encodedTx ?? tx).rlpEncoded, 'tx'),
@@ -118,6 +118,25 @@ const validators = [
       }]
     }
     return []
+  },
+  async ({ contractId }, { txType, node }) => {
+    if (TX_TYPE.contractCall !== txType) return []
+    try {
+      const { active } = await node.api.getContract(contractId)
+      if (active) return []
+      return [{
+        message: `Contract ${contractId} is not active`,
+        key: 'ContractNotActive',
+        checkedKeys: ['contractId']
+      }]
+    } catch (error) {
+      if (!error.response?.body?.reason) throw error
+      return [{
+        message: error.response.body.reason,
+        key: 'ContractNotFound',
+        checkedKeys: ['contractId']
+      }]
+    }
   }
 ]
 
@@ -147,13 +166,13 @@ export default async function verifyTransaction (transaction, node, parentTxType
 
   const address = getSenderAddress(tx) ??
     (txType === TX_TYPE.signed ? getSenderAddress(tx.encodedTx.tx) : null)
-  const [account, height] = await Promise.all([
+  const [account, { height }] = await Promise.all([
     address && node.api.getAccountByPubkey(address).catch(() => ({
       id: address,
       balance: new BigNumber(0),
       nonce: 0
     })),
-    node.api.getCurrentKeyBlockHeight().then(({ height }) => height)
+    node.api.getCurrentKeyBlockHeight()
   ])
 
   return (await Promise.all(
