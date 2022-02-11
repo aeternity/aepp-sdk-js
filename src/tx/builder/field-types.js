@@ -1,4 +1,4 @@
-import { writeId, readId, isNameValid, produceNameId } from './helpers'
+import { writeId, readId, isNameValid, produceNameId, ensureNameValid } from './helpers'
 
 export class Field {
   static serialize (value) {
@@ -7,6 +7,17 @@ export class Field {
 
   static deserialize (value) {
     return value
+  }
+}
+
+export class Name extends Field {
+  static serialize (value) {
+    ensureNameValid(value)
+    return Buffer.from(value)
+  }
+
+  static deserialize (value) {
+    return value.toString()
   }
 }
 

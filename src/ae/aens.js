@@ -28,7 +28,7 @@
 
 import { salt } from '../utils/crypto'
 import {
-  commitmentHash, ensureNameValid, getMinimumNameFee, isAuctionName, encode
+  commitmentHash, ensureNameValid, getMinimumNameFee, isAuctionName
 } from '../tx/builder/helpers'
 import Ae from './'
 import { CLIENT_TTL, NAME_FEE, NAME_TTL } from '../tx/builder/schema'
@@ -249,7 +249,7 @@ async function claim (name, salt, options) {
     ...opt,
     accountId: await this.address(opt),
     nameSalt: salt,
-    name: encode(name, 'nm')
+    name
   })
 
   const result = await this.send(claimTx, opt)

@@ -8,7 +8,7 @@
 // # https://github.com/aeternity/protocol/blob/master/serializations.md#binary-serialization
 
 import BigNumber from 'bignumber.js'
-import { NameId } from './field-types'
+import { Name, NameId } from './field-types'
 
 export const VSN = 1
 export const VSN_2 = 2
@@ -474,7 +474,7 @@ const NAME_CLAIM_TX_2 = [
   ...BASE_TX,
   TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('name', FIELD_TYPES.binary, 'nm'),
+  TX_FIELD('name', Name),
   TX_FIELD('nameSalt', FIELD_TYPES.int),
   TX_FIELD('nameFee', FIELD_TYPES.amount),
   TX_FIELD('fee', FIELD_TYPES.int),

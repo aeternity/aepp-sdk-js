@@ -16,7 +16,7 @@
  */
 
 import { describe, it, before } from 'mocha'
-import { encodeBase58Check, encodeBase64Check, generateKeyPair, salt } from '../../src/utils/crypto'
+import { encodeBase64Check, generateKeyPair, salt } from '../../src/utils/crypto'
 import { getSdk } from './index'
 import { commitmentHash, oracleQueryId } from '../../src/tx/builder/helpers'
 import { GAS_MAX, MIN_GAS_PRICE } from '../../src/tx/builder/schema'
@@ -31,7 +31,6 @@ const amount = 0
 const senderId = 'ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688'
 const recipientId = 'ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688'
 const name = 'test123test.chain'
-const nameHash = `nm_${encodeBase58Check(Buffer.from(name))}`
 const nameId = 'nm_2sFnPHi5ziAqhdApSpRBsYdomCahtmk3YGNZKYUTtUNpVSMccC'
 const nameFee = '1000000000000000000000'
 const pointers = [{ key: 'account_pubkey', id: senderId }]
@@ -106,7 +105,7 @@ describe('Native Transaction', function () {
   })
 
   it('native build of claim tx', async () => {
-    const params = { accountId: senderId, nonce, name: nameHash, nameSalt: _salt, nameFee }
+    const params = { accountId: senderId, nonce, name, nameSalt: _salt, nameFee }
     const txFromAPI = await sdk.nameClaimTx(params)
     const nativeTx = await sdkNative.nameClaimTx(params)
     txFromAPI.should.be.equal(nativeTx)
