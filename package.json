@@ -10,7 +10,7 @@
   },
   "sideEffects": false,
   "scripts": {
-    "build:es": "tsc && babel src --config-file ./babel.esm.config.js --out-dir es --extensions '.js,.ts' --out-file-extension .mjs --source-maps true",
+    "build:es": "tsc && babel src --config-file ./babel.esm.config.js --out-dir es --extensions .js,.ts --out-file-extension .mjs --source-maps true",
     "build": "webpack --mode=production && npm run build:es",
     "build:dev": "webpack --mode=development && npm run build:es",
     "docs:examples": "node tooling/docs/examples-to-md.js examples/node/*.js",
