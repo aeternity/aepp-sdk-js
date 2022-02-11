@@ -6,6 +6,9 @@ config.presets
 
 config.plugins.push(
   ['add-import-extension', { extension: 'mjs' }],
+  ['import-globals', {
+    Buffer: { moduleName: 'buffer', exportName: 'Buffer' }
+  }],
   ['transform-default-named-imports', { exclude: ['rlp'] }]
 )
 

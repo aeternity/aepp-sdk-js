@@ -7,7 +7,7 @@
  * import ContentScriptBridge
  * from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc'
  */
-import { v4 as uuid } from 'uuid'
+import { v4 as uuid } from '@aeternity/uuid'
 import Ae from '../../../ae'
 import RpcClient from './rpc-client'
 import { getHandler, message, voidFn } from '../helpers'

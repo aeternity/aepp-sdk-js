@@ -1,5 +1,5 @@
 import nacl from 'tweetnacl'
-import { v4 as uuid } from 'uuid'
+import { v4 as uuid } from '@aeternity/uuid'
 import { ArgonType, hash } from '@aeternity/argon2-browser/dist/argon2-bundled.min.js'
 import { encodeBase58Check } from './crypto'
 import { str2buf } from './bytes'
