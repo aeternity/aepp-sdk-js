@@ -12,7 +12,6 @@ import {
   ID_TAG_PREFIX,
   PREFIX_ID_TAG,
   NAME_BID_RANGES,
-  NAME_FEE,
   NAME_FEE_BID_INCREMENT,
   NAME_BID_TIMEOUTS,
   NAME_MAX_LENGTH_FEE,
@@ -326,12 +325,11 @@ export function getMinimumNameFee (name) {
  * @param {Number} [increment=0.5] Bid multiplier(In percentage, must be between 0 and 1)
  * @return {String} Bid fee
  */
-export function computeBidFee (name, startFee = NAME_FEE, increment = NAME_FEE_BID_INCREMENT) {
+export function computeBidFee (name, startFee, increment = NAME_FEE_BID_INCREMENT) {
   if (!(Number(increment) === increment && increment % 1 !== 0)) throw new IllegalBidFeeError(`Increment must be float. Current increment ${increment}`)
   if (increment < NAME_FEE_BID_INCREMENT) throw new IllegalBidFeeError(`minimum increment percentage is ${NAME_FEE_BID_INCREMENT}`)
   return ceil(
-    BigNumber(BigNumber(startFee).eq(NAME_FEE) ? getMinimumNameFee(name) : startFee)
-      .times(BigNumber(NAME_FEE_BID_INCREMENT).plus(1))
+    BigNumber(startFee ?? getMinimumNameFee(name)).times(BigNumber(NAME_FEE_BID_INCREMENT).plus(1))
   )
 }
 

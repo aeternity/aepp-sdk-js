@@ -305,7 +305,8 @@ export function calculateFee (fee = 0, txType, { gas = 0, params, showWarning = 
 export function validateParams (params, schema, { excludeKeys = [] }) {
   return Object.fromEntries(
     schema
-      .filter(([key]) => !excludeKeys.includes(key) && key !== 'payload')
+      // TODO: allow optional keys in schema
+      .filter(([key]) => !excludeKeys.includes(key) && !['payload', 'nameFee'].includes(key))
       .map(([key, type, prefix]) => [key, validateField(params[key], type, prefix)])
       .filter(([, message]) => message)
   )

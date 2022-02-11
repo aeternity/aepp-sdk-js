@@ -29,7 +29,7 @@
 import { salt } from '../utils/crypto'
 import { commitmentHash, ensureNameValid, isAuctionName } from '../tx/builder/helpers'
 import Ae from './'
-import { CLIENT_TTL, NAME_FEE, NAME_TTL } from '../tx/builder/schema'
+import { CLIENT_TTL, NAME_TTL } from '../tx/builder/schema'
 import { IllegalArgumentError } from '../utils/errors'
 
 /**
@@ -321,7 +321,7 @@ async function preclaim (name, options = {}) {
  *
  * await sdkInstance.aensBid(name, 213109412839123, { ttl, fee, nonce })
  */
-async function bid (name, nameFee = NAME_FEE, options = {}) {
+async function bid (name, nameFee, options = {}) {
   return this.aensClaim(name, 0, { ...options, nameFee, vsn: 2 })
 }
 
@@ -350,8 +350,7 @@ const Aens = Ae.compose({
     Ae: {
       defaults: {
         clientTtl: CLIENT_TTL,
-        nameTtl: NAME_TTL, // aec_governance:name_claim_max_expiration() => 50000
-        nameFee: NAME_FEE
+        nameTtl: NAME_TTL // aec_governance:name_claim_max_expiration() => 50000
       }
     }
   }
