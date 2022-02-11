@@ -27,15 +27,10 @@
  */
 
 import { salt } from '../utils/crypto'
-import {
-  commitmentHash, ensureNameValid, getMinimumNameFee, isAuctionName
-} from '../tx/builder/helpers'
+import { commitmentHash, ensureNameValid, isAuctionName } from '../tx/builder/helpers'
 import Ae from './'
 import { CLIENT_TTL, NAME_FEE, NAME_TTL } from '../tx/builder/schema'
-import {
-  InsufficientNameFeeError,
-  IllegalArgumentError
-} from '../utils/errors'
+import { IllegalArgumentError } from '../utils/errors'
 
 /**
  * Revoke a name
@@ -240,11 +235,6 @@ async function claim (name, salt, options) {
   ensureNameValid(name)
   const opt = { ...this.Ae.defaults, ...options }
 
-  const minNameFee = getMinimumNameFee(name)
-  if (opt.nameFee !== this.Ae.defaults.nameFee && minNameFee.gt(opt.nameFee)) {
-    throw new InsufficientNameFeeError(opt.nameFee, minNameFee)
-  }
-  opt.nameFee = opt.nameFee !== this.Ae.defaults.nameFee ? opt.nameFee : minNameFee
   const claimTx = await this.nameClaimTx({
     ...opt,
     accountId: await this.address(opt),

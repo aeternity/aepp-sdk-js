@@ -1,4 +1,7 @@
-import { writeId, readId, isNameValid, produceNameId, ensureNameValid } from './helpers'
+import {
+  writeId, readId, isNameValid, produceNameId, ensureNameValid, getMinimumNameFee, readInt, writeInt
+} from './helpers'
+import { InsufficientNameFeeError } from '../../utils/errors'
 
 export class Field {
   static serialize (value) {
@@ -28,5 +31,20 @@ export class NameId extends Field {
 
   static deserialize (value) {
     return readId(value)
+  }
+}
+
+export class NameFee extends Field {
+  static serialize (value, { name }) {
+    const minNameFee = getMinimumNameFee(name)
+    value ??= minNameFee
+    if (minNameFee.gt(value)) {
+      throw new InsufficientNameFeeError(value, minNameFee)
+    }
+    return writeInt(value)
+  }
+
+  static deserialize (value) {
+    return readInt(value)
   }
 }
