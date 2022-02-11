@@ -21,7 +21,7 @@ import { DRY_RUN_ACCOUNT } from '../../src/tx/builder/schema'
 import { messageToHash, salt } from '../../src/utils/crypto'
 import { randomName } from '../utils'
 import { BaseAe, getSdk, publicKey } from './'
-import { Crypto, MemoryAccount } from '../../src'
+import { Crypto, IllegalArgumentError, MemoryAccount } from '../../src'
 import { NodeInvocationError } from '../../src/utils/errors'
 
 const identityContract = `
@@ -137,10 +137,12 @@ describe('Contract', function () {
     expect(await contract.deploy()).to.have.property('address')
   })
 
-  it('enforces zero deposit for contract deployment', async () => {
+  it('throws exception if deploy deposit is not zero', async () => {
     contract.deployInfo = {}
-    expect((await contract.deploy([], { deposit: 10 })).txData.tx.deposit)
-      .to.be.equal(0)
+    await expect(contract.deploy([], { deposit: 10 })).to.be.rejectedWith(
+      IllegalArgumentError,
+      'Contract deposit is not refundable, so it should be equal 0, got 10 instead'
+    )
   })
 
   it('deploys static', async () => {

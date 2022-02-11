@@ -12,7 +12,6 @@ import {
   ID_TAG_PREFIX,
   PREFIX_ID_TAG,
   NAME_BID_RANGES,
-  NAME_FEE,
   NAME_FEE_BID_INCREMENT,
   NAME_BID_TIMEOUTS,
   NAME_MAX_LENGTH_FEE,
@@ -86,11 +85,11 @@ export function formatSalt (salt) {
 }
 
 /**
- * Encode a domain name
+ * Encode an AENS name
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param {String} name Name to encode
- * @return {String} `nm_` prefixed encoded domain name
+ * @return {String} `nm_` prefixed encoded AENS name
  */
 export function produceNameId (name) {
   ensureNameValid(name)
@@ -261,8 +260,10 @@ export function readPointers (pointers) {
   )
 }
 
+const AENS_SUFFIX = '.chain'
+
 /**
- * Ensure that name is valid
+ * Ensure that AENS name is valid
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param {string} name
@@ -271,11 +272,11 @@ export function readPointers (pointers) {
  */
 export function ensureNameValid (name) {
   if (!name || typeof name !== 'string') throw new InvalidNameError('Name must be a string')
-  if (!name.endsWith('.chain')) throw new InvalidNameError(`Name should end with .chain: ${name}`)
+  if (!name.endsWith(AENS_SUFFIX)) throw new InvalidNameError(`Name should end with ${AENS_SUFFIX}: ${name}`)
 }
 
 /**
- * Is name valid
+ * Is AENS name valid
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param {string} name
@@ -303,32 +304,32 @@ export function getDefaultPointerKey (identifier) {
 }
 
 /**
- * Get the minimum name fee for a domain
+ * Get the minimum AENS name fee
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {String} domain the domain name to get the fee for
- * @return {String} the minimum fee for the domain auction
+ * @param {String} name the AENS name to get the fee for
+ * @return {String} the minimum fee for the AENS name auction
  */
-export function getMinimumNameFee (domain) {
-  const nameLength = domain.replace('.chain', '').length
-  return NAME_BID_RANGES[nameLength >= NAME_MAX_LENGTH_FEE ? NAME_MAX_LENGTH_FEE : nameLength]
+export function getMinimumNameFee (name) {
+  ensureNameValid(name)
+  const nameLength = name.length - AENS_SUFFIX.length
+  return NAME_BID_RANGES[Math.min(nameLength, NAME_MAX_LENGTH_FEE)]
 }
 
 /**
  * Compute bid fee for AENS auction
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {String} domain the domain name to get the fee for
+ * @param {String} name the AENS name to get the fee for
  * @param {Number|String} startFee Auction start fee
  * @param {Number} [increment=0.5] Bid multiplier(In percentage, must be between 0 and 1)
  * @return {String} Bid fee
  */
-export function computeBidFee (domain, startFee = NAME_FEE, increment = NAME_FEE_BID_INCREMENT) {
+export function computeBidFee (name, startFee, increment = NAME_FEE_BID_INCREMENT) {
   if (!(Number(increment) === increment && increment % 1 !== 0)) throw new IllegalBidFeeError(`Increment must be float. Current increment ${increment}`)
   if (increment < NAME_FEE_BID_INCREMENT) throw new IllegalBidFeeError(`minimum increment percentage is ${NAME_FEE_BID_INCREMENT}`)
   return ceil(
-    BigNumber(BigNumber(startFee).eq(NAME_FEE) ? getMinimumNameFee(domain) : startFee)
-      .times(BigNumber(NAME_FEE_BID_INCREMENT).plus(1))
+    BigNumber(startFee ?? getMinimumNameFee(name)).times(BigNumber(NAME_FEE_BID_INCREMENT).plus(1))
   )
 }
 
@@ -336,12 +337,13 @@ export function computeBidFee (domain, startFee = NAME_FEE, increment = NAME_FEE
  * Compute auction end height
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {String} domain the domain name to get the fee for
+ * @param {String} name
  * @param {Number|String} claimHeight Auction starting height
  * @return {String} Auction end height
  */
-export function computeAuctionEndBlock (domain, claimHeight) {
-  const { length } = domain.replace('.chain', '')
+export function computeAuctionEndBlock (name, claimHeight) {
+  ensureNameValid(name)
+  const length = name.length - AENS_SUFFIX.length
   const h = (length <= 4 && NAME_BID_TIMEOUTS[4]) ||
     (length <= 8 && NAME_BID_TIMEOUTS[8]) ||
     (length <= 12 && NAME_BID_TIMEOUTS[12]) ||
@@ -353,9 +355,10 @@ export function computeAuctionEndBlock (domain, claimHeight) {
  * Is name accept going to auction
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {String} name Transaction abiVersion
+ * @param {String} name
  * @return {Boolean}
  */
 export function isAuctionName (name) {
-  return name.replace('.chain', '').length < 13
+  ensureNameValid(name)
+  return name.length < 13 + AENS_SUFFIX.length
 }

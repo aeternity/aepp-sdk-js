@@ -26,7 +26,7 @@ import ChainNode from '../chain/node'
 import Tx from './'
 import { buildTx, calculateFee, unpackTx } from './builder'
 import { ABI_VERSIONS, MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE, TX_TTL } from './builder/schema'
-import { buildContractId } from './builder/helpers'
+import { buildContractId, encode } from './builder/helpers'
 import { TxObject } from './tx-object'
 import {
   IllegalArgumentError,
@@ -103,7 +103,9 @@ async function nameClaimTx ({ accountId, name, nameSalt, vsn = 2 }) {
           type: TX_TYPE.nameClaim
         }).encodedTx
       }
-    : await this.api.postNameClaim({ ...arguments[0], nonce, ttl, fee: parseInt(fee) })
+    : await this.api.postNameClaim({
+      ...arguments[0], nonce, ttl, fee: parseInt(fee), name: encode(name, 'nm')
+    })
 
   return tx
 }
@@ -168,7 +170,7 @@ async function nameRevokeTx ({ accountId, nameId }) {
 }
 
 async function contractCreateTx ({
-  ownerId, code, vmVersion, abiVersion, deposit, amount, gas, gasPrice = MIN_GAS_PRICE, callData
+  ownerId, code, vmVersion, abiVersion, amount, gas, gasPrice = MIN_GAS_PRICE, callData
 }) {
   // Get VM_ABI version
   const ctVersion = this.getVmVersion(TX_TYPE.contractCreate, arguments[0])

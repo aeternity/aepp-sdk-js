@@ -23,7 +23,7 @@
  */
 
 import { Encoder as Calldata } from '@aeternity/aepp-calldata'
-import { DRY_RUN_ACCOUNT, DEPOSIT, GAS_MAX } from '../tx/builder/schema'
+import { DRY_RUN_ACCOUNT, GAS_MAX } from '../tx/builder/schema'
 import TxObject from '../tx/tx-object'
 import { decode } from '../tx/builder/helpers'
 import {
@@ -182,7 +182,7 @@ export default async function getContractInstance ({
    * @return {Object} deploy info
    */
   instance.deploy = async (params = [], options) => {
-    const opt = { ...instance.options, ...options, deposit: DEPOSIT }
+    const opt = { ...instance.options, ...options }
     if (!instance.bytecode) await instance.compile(opt)
     if (opt.callStatic) return instance.call('init', params, opt)
     if (instance.deployInfo.address) throw new DuplicateContractError()

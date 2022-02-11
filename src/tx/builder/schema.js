@@ -8,6 +8,7 @@
 // # https://github.com/aeternity/protocol/blob/master/serializations.md#binary-serialization
 
 import BigNumber from 'bignumber.js'
+import { Name, NameId, NameFee, Deposit } from './field-types'
 
 export const VSN = 1
 export const VSN_2 = 2
@@ -20,7 +21,6 @@ export const ORACLE_TTL = { type: 'delta', value: 500 }
 export const QUERY_TTL = { type: 'delta', value: 10 }
 export const RESPONSE_TTL = { type: 'delta', value: 10 }
 // # CONTRACT
-export const DEPOSIT = 0
 export const AMOUNT = 0
 export const GAS_MAX = 1600000 - 21000
 export const MIN_GAS_PRICE = 1e9
@@ -34,7 +34,6 @@ export const NAME_TTL = 180000
 export const NAME_MAX_TTL = 36000
 export const NAME_MAX_CLIENT_TTL = 84600
 export const CLIENT_TTL = NAME_MAX_CLIENT_TTL
-export const NAME_FEE = 0
 // # see https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L67
 export const NAME_FEE_MULTIPLIER = 1e14 // 100000000000000
 export const NAME_FEE_BID_INCREMENT = 0.05 // # the increment is in percentage
@@ -473,9 +472,9 @@ const NAME_CLAIM_TX_2 = [
   ...BASE_TX,
   TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('name', FIELD_TYPES.binary, 'nm'),
+  TX_FIELD('name', Name),
   TX_FIELD('nameSalt', FIELD_TYPES.int),
-  TX_FIELD('nameFee', FIELD_TYPES.amount),
+  TX_FIELD('nameFee', NameFee),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int)
 ]
@@ -484,7 +483,7 @@ const NAME_UPDATE_TX = [
   ...BASE_TX,
   TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('nameId', FIELD_TYPES.id, 'nm'),
+  TX_FIELD('nameId', NameId),
   TX_FIELD('nameTtl', FIELD_TYPES.int),
   TX_FIELD('pointers', FIELD_TYPES.pointers),
   TX_FIELD('clientTtl', FIELD_TYPES.int),
@@ -496,7 +495,7 @@ const NAME_TRANSFER_TX = [
   ...BASE_TX,
   TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('nameId', FIELD_TYPES.id, 'nm'),
+  TX_FIELD('nameId', NameId),
   TX_FIELD('recipientId', FIELD_TYPES.id, ['ak', 'nm']),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int)
@@ -506,7 +505,7 @@ const NAME_REVOKE_TX = [
   ...BASE_TX,
   TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('nameId', FIELD_TYPES.id, 'nm'),
+  TX_FIELD('nameId', NameId),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int)
 ]
@@ -519,7 +518,7 @@ const CONTRACT_TX = [
   TX_FIELD('log', FIELD_TYPES.binary, 'cb'),
   TX_FIELD('active', FIELD_TYPES.bool),
   TX_FIELD('referers', FIELD_TYPES.ids, 'ak'),
-  TX_FIELD('deposit', FIELD_TYPES.amount)
+  TX_FIELD('deposit', Deposit)
 ]
 
 const GA_ATTACH_TX = [
@@ -563,7 +562,7 @@ const CONTRACT_CREATE_TX = [
   TX_FIELD('ctVersion', FIELD_TYPES.ctVersion),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int),
-  TX_FIELD('deposit', FIELD_TYPES.amount),
+  TX_FIELD('deposit', Deposit),
   TX_FIELD('amount', FIELD_TYPES.amount),
   TX_FIELD('gas', FIELD_TYPES.int),
   TX_FIELD('gasPrice', FIELD_TYPES.int),

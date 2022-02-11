@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js'
 import { decode as rlpDecode, encode as rlpEncode } from 'rlp'
 import { AE_AMOUNT_FORMATS, formatAmount } from '../../utils/amount-formatter'
 import { hash } from '../../utils/crypto'
+import { Field } from './field-types'
 
 import {
   DEFAULT_FEE,
@@ -49,7 +50,6 @@ function deserializeField (value, type, prefix) {
       return { vmVersion: readInt(Buffer.from([vm])), abiVersion: readInt(Buffer.from([abi])) }
     }
     case FIELD_TYPES.amount:
-      return readInt(value)
     case FIELD_TYPES.int:
       return readInt(value)
     case FIELD_TYPES.id:
@@ -98,11 +98,12 @@ function deserializeField (value, type, prefix) {
           {}
         )
     default:
+      if (type.prototype instanceof Field) return type.deserialize(value)
       return value
   }
 }
 
-function serializeField (value, type, prefix) {
+function serializeField (value, type, prefix, params) {
   switch (type) {
     case FIELD_TYPES.amount:
     case FIELD_TYPES.int:
@@ -143,6 +144,7 @@ function serializeField (value, type, prefix) {
         default: return value
       }
     default:
+      if (type.prototype instanceof Field) return type.serialize(value, params)
       return value
   }
 }
@@ -302,7 +304,9 @@ export function calculateFee (fee = 0, txType, { gas = 0, params, showWarning = 
 export function validateParams (params, schema, { excludeKeys = [] }) {
   return Object.fromEntries(
     schema
-      .filter(([key]) => !excludeKeys.includes(key) && key !== 'payload')
+      // TODO: allow optional keys in schema
+      .filter(([key]) => !excludeKeys.includes(key) &&
+        !['payload', 'nameFee', 'deposit'].includes(key))
       .map(([key, type, prefix]) => [key, validateField(params[key], type, prefix)])
       .filter(([, message]) => message)
   )
@@ -336,7 +340,7 @@ export function buildRawTx (
   }
 
   return filteredSchema
-    .map(([key, fieldType, prefix]) => serializeField(params[key], fieldType, prefix))
+    .map(([key, fieldType, prefix]) => serializeField(params[key], fieldType, prefix, params))
 }
 
 /**
