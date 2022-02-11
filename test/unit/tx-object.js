@@ -38,6 +38,10 @@ describe('TxObject', () => {
       expect(() => TxObject()).to.throw(InvalidTxError, 'Invalid TxObject arguments. Please provide one of { tx: "tx_asdasd23..." } or { type: "spendTx", params: {...} }')
     })
 
+    it('Invalid "tx"', () => {
+      expect(() => TxObject({ tx: {} })).to.throw(InvalidTxError, '"tx" should be a string or Uint8Array, got [object Object] instead')
+    })
+
     it('Invalid "params"', () => {
       expect(() => TxObject({ params: true, type: TX_TYPE.spend })).to.throw(TypeError, '"params" should be an object')
     })
@@ -67,23 +71,14 @@ describe('TxObject', () => {
       })
       signedTx = await MemoryAccount({ keypair: keyPair, networkId: 'ae_mainnet' }).signTransaction(txObject.encodedTx)
       txObject.encodedTx.should.be.a('string')
-      Buffer.isBuffer(txObject.rlpEncoded).should.be.equal(true)
+      expect(txObject.rlpEncoded).to.be.an.instanceOf(Uint8Array)
       txObject.binary.should.be.a('Array')
       txObject.params.should.be.a('object')
     })
 
     it('Unpack transaction from string/rlp', () => {
-      const txFromString = TxObject.fromString(txObject.encodedTx)
-      txFromString.rlpEncoded.equals(txObject.rlpEncoded).should.be.equal(true)
-      Buffer.from(txFromString.binary).equals(Buffer.from(txObject.binary)).should.be.equal(true)
-      txFromString.encodedTx.should.be.equal(txObject.encodedTx)
-      txFromString.params.should.be.deep.include(txObject.params)
-      const rtxFromRlpBinary = TxObject.fromRlp(txObject.rlpEncoded)
-      rtxFromRlpBinary.rlpEncoded.equals(txObject.rlpEncoded).should.be.equal(true)
-      Buffer.from(rtxFromRlpBinary.binary).equals(Buffer.from(txObject.binary))
-        .should.be.equal(true)
-      rtxFromRlpBinary.encodedTx.should.be.equal(txObject.encodedTx)
-      rtxFromRlpBinary.params.should.be.deep.include(txObject.params)
+      expect(TxObject.fromString(txObject.encodedTx)).to.eql(txObject)
+      expect(TxObject.fromRlp(txObject.rlpEncoded)).to.eql(txObject)
     })
 
     it('Unpack signed transaction', () => {

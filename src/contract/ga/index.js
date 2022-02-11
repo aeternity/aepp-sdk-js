@@ -135,7 +135,7 @@ async function createMetaTx (rawTransaction, authData, authFnName, options = {})
       tx: wrappedTx.txObject
     },
     gaId: await this.address(opt),
-    abiVersion: abiVersion,
+    abiVersion,
     authData: authCallData,
     gas,
     vsn: 2
