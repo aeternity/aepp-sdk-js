@@ -21,7 +21,7 @@ import { expect } from 'chai'
 import * as sinon from 'sinon'
 import BigNumber from 'bignumber.js'
 import { getSdk, BaseAe, networkId } from './'
-import { generateKeyPair, encodeBase64Check } from '../../src/utils/crypto'
+import { generateKeyPair } from '../../src/utils/crypto'
 import { unpackTx, buildTx, buildTxHash } from '../../src/tx/builder'
 import { decode } from '../../src/tx/builder/helpers'
 import Channel from '../../src/channel'
@@ -1131,11 +1131,10 @@ describe('Channel', function () {
   it('can post backchannel update', async () => {
     async function appendSignature (target, source) {
       const { txType, tx: { signatures, encodedTx: { rlpEncoded } } } = unpackTx(target)
-      const tx = buildTx({
+      return buildTx({
         signatures: signatures.concat(unpackTx(source).tx.signatures),
         encodedTx: rlpEncoded
-      }, txType)
-      return `tx_${encodeBase64Check(tx.rlpEncoded)}`
+      }, txType).tx
     }
 
     initiatorCh.disconnect()

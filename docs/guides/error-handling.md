@@ -72,7 +72,6 @@ AeError
 │   │   InvalidChecksumError
 │   │   InvalidDerivationPathError
 │   │   InvalidKeyError
-│   │   InvalidMnemonicError
 │   │   InvalidPasswordError
 │   │   MerkleTreeHashMismatchError
 │   │   MessageLimitError

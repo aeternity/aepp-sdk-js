@@ -20,13 +20,14 @@ import { describe, it } from 'mocha'
 import { assert, expect } from 'chai'
 import * as Crypto from '../../src/utils/crypto'
 import { buildTxHash, unpackTx } from '../../src/tx/builder'
+import { decode } from '../../src/tx/builder/helpers'
 
 // These keys are fixations for the encryption lifecycle tests and will
 // not be used for signing
 const privateKeyAsHex = '4d881dd1917036cc231f9881a0db978c8899dd76a817252418606b02bf6ab9d22378f892b7cc82c2d2739e994ec9953aa36461f1eb5a4a49a5b0de17b3d23ae8'
 const privateKey = Buffer.from(privateKeyAsHex, 'hex')
 const publicKeyWithPrefix = 'ak_Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm'
-const publicKey = Buffer.from(Crypto.decodeBase58Check(publicKeyWithPrefix.split('_')[1]))
+const publicKey = decode(publicKeyWithPrefix, 'ak')
 
 const txBinaryAsArray = [
   248, 76, 12, 1, 160, 35, 120, 248, 146, 183, 204, 130, 194, 210, 115, 158, 153, 78, 201, 149, 58,
@@ -72,16 +73,6 @@ describe('crypto', () => {
   it('isAddressValid', () => {
     expect(Crypto.isAddressValid('test')).to.be.equal(false)
     expect(Crypto.isAddressValid('ak_11111111111111111111111111111111273Yts')).to.be.equal(true)
-  })
-
-  describe('encodeBase', () => {
-    it('can be encoded and decoded', () => {
-      const input = 'helloword010101023'
-      const inputBuffer = Buffer.from(input)
-      const encoded = Crypto.encodeBase58Check(inputBuffer)
-      const decoded = Crypto.decodeBase58Check(encoded)
-      assert.equal(input, decoded)
-    })
   })
 
   describe('sign', () => {

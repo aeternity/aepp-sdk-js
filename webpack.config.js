@@ -19,8 +19,7 @@ function configure (filename, opts = {}) {
     resolve: {
       extensions: ['.ts', '.js'],
       fallback: {
-        buffer: require.resolve('buffer/'),
-        stream: require.resolve('stream-browserify')
+        buffer: require.resolve('buffer/')
       },
       alias: {
         'js-yaml': false

@@ -476,13 +476,6 @@ export class InvalidKeyError extends CryptographyError {
   }
 }
 
-export class InvalidMnemonicError extends CryptographyError {
-  constructor () {
-    super('Invalid mnemonic')
-    this.name = 'InvalidMnemonicError'
-  }
-}
-
 export class InvalidPasswordError extends CryptographyError {
   constructor (msg: string) {
     super(msg)

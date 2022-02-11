@@ -17,16 +17,16 @@
 import { expect } from 'chai'
 import { describe, it } from 'mocha'
 import {
-  deriveChild, derivePathFromKey, derivePathFromSeed, generateMnemonic,
-  generateSaveHDWallet, getHdWalletAccountFromMnemonic, getKeyPair,
+  deriveChild, derivePathFromKey, derivePathFromSeed,
+  generateSaveHDWalletFromSeed, getHdWalletAccountFromSeed, getKeyPair,
   getMasterKeyFromSeed,
   getSaveHDWalletAccounts
 } from '../../src/utils/hd-wallet'
-import { encodeBase58Check } from '../../src/utils/crypto'
-import { InvalidDerivationPathError, InvalidMnemonicError } from '../../src/utils/errors'
+import { encode, decode } from '../../src/tx/builder/helpers'
+import { InvalidDerivationPathError } from '../../src/utils/errors'
 
 describe('hd wallet', () => {
-  const testMnemonic = 'eye quarter chapter suit cruel scrub verify stuff volume control learn dust'
+  const testMnemonicSeed = Buffer.from('Git7bFJkmfC1Ho+6YFSFuxSzmDZydmjzk8FubrPDz4PmrkORlBDlfnPTk02Wq9Pj2ZdQ5cTA0SxHKGrq3xSjOw==', 'base64')
   const testPassword = 'test-password'
   const testSaveHDWallet = {
     chainCode: 'dd5cb572e8bddab36882ebbf87854e3b66f565447f20cfac874a5d3d7dd6d0d5',
@@ -51,9 +51,9 @@ describe('hd wallet', () => {
     chainCode: Buffer.from('1fa9899b84631aaadf1daba7f7cf780e2fecfb8dd34a2edf6568eb1a9bb2f627', 'hex')
   }
 
-  describe('generateSaveHDWallet', () =>
+  describe('generateSaveHDWalletFromSeed', () =>
     it('generates encrypted extended wallet key', () => {
-      const walletKeys = generateSaveHDWallet(testMnemonic, testPassword)
+      const walletKeys = generateSaveHDWalletFromSeed(testMnemonicSeed, testPassword)
       expect(walletKeys).to.eql(testSaveHDWallet)
     }))
 
@@ -63,7 +63,7 @@ describe('hd wallet', () => {
 
       expect(accounts).to.eql(testAccounts.map(acc => ({
         secretKey: acc.secretKey,
-        publicKey: `ak_${encodeBase58Check(Buffer.from(acc.publicKey, 'hex'))}`
+        publicKey: encode(Buffer.from(acc.publicKey, 'hex'), 'ak')
       })))
     }))
 
@@ -172,14 +172,9 @@ describe('hd wallet', () => {
       })
   )
 
-  it('Generate mnemonic', () => {
-    const mnemonic = generateMnemonic()
-    const wallet = getHdWalletAccountFromMnemonic(mnemonic, 0)
-    wallet.publicKey.split('_')[0].should.be.equal('ak')
-  })
-
-  it('Try to get wallet from invalid mnemonic', () => {
-    expect(() => generateSaveHDWallet('asdasdasdasdas')).to.throw(InvalidMnemonicError, 'Invalid mnemonic')
+  it('get HdWalletAccount from seed', () => {
+    const wallet = getHdWalletAccountFromSeed(testMnemonicSeed, 0)
+    decode(wallet.publicKey, 'ak')
   })
 
   it('Derive child with invalid path', () => {
