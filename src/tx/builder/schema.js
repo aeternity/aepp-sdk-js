@@ -8,6 +8,7 @@
 // # https://github.com/aeternity/protocol/blob/master/serializations.md#binary-serialization
 
 import BigNumber from 'bignumber.js'
+import { NameId } from './field-types'
 
 export const VSN = 1
 export const VSN_2 = 2
@@ -484,7 +485,7 @@ const NAME_UPDATE_TX = [
   ...BASE_TX,
   TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('nameId', FIELD_TYPES.id, 'nm'),
+  TX_FIELD('nameId', NameId),
   TX_FIELD('nameTtl', FIELD_TYPES.int),
   TX_FIELD('pointers', FIELD_TYPES.pointers),
   TX_FIELD('clientTtl', FIELD_TYPES.int),
@@ -496,7 +497,7 @@ const NAME_TRANSFER_TX = [
   ...BASE_TX,
   TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('nameId', FIELD_TYPES.id, 'nm'),
+  TX_FIELD('nameId', NameId),
   TX_FIELD('recipientId', FIELD_TYPES.id, ['ak', 'nm']),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int)
@@ -506,7 +507,7 @@ const NAME_REVOKE_TX = [
   ...BASE_TX,
   TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('nameId', FIELD_TYPES.id, 'nm'),
+  TX_FIELD('nameId', NameId),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int)
 ]

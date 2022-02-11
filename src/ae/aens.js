@@ -28,7 +28,7 @@
 
 import { salt } from '../utils/crypto'
 import {
-  commitmentHash, ensureNameValid, getMinimumNameFee, isAuctionName, encode, produceNameId
+  commitmentHash, ensureNameValid, getMinimumNameFee, isAuctionName, encode
 } from '../tx/builder/helpers'
 import Ae from './'
 import { CLIENT_TTL, NAME_FEE, NAME_TTL } from '../tx/builder/schema'
@@ -65,7 +65,7 @@ async function revoke (name, options = {}) {
 
   const nameRevokeTx = await this.nameRevokeTx({
     ...opt,
-    nameId: produceNameId(name),
+    nameId: name,
     accountId: await this.address(opt)
   })
 
@@ -115,7 +115,7 @@ async function update (name, pointers = {}, options = {}) {
 
   const nameUpdateTx = await this.nameUpdateTx({
     ...opt,
-    nameId: produceNameId(name),
+    nameId: name,
     accountId: await this.address(opt),
     pointers: Object.entries(allPointers).map(([key, id]) => ({ key, id }))
   })
@@ -153,7 +153,7 @@ async function transfer (name, account, options = {}) {
 
   const nameTransferTx = await this.nameTransferTx({
     ...opt,
-    nameId: produceNameId(name),
+    nameId: name,
     accountId: await this.address(opt),
     recipientId: account
   })
