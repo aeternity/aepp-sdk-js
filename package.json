@@ -35,7 +35,7 @@
   ],
   "dependencies": {
     "@aeternity/aepp-calldata": "github:aeternity/aepp-calldata-js#a623a44a259cc53e99b1e358ecc7b3f88edcb45c",
-    "@aeternity/argon2-browser": "^0.1.1",
+    "@aeternity/argon2-browser": "^0.1.2",
     "@aeternity/json-bigint": "^0.3.1",
     "@aeternity/uuid": "^0.0.1",
     "@babel/runtime-corejs3": "^7.17.2",
