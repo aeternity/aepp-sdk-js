@@ -31,7 +31,7 @@ import {
   MissingContractAddressError,
   InactiveContractError,
   BytecodeMismatchError,
-  UnknownCallReturnTypeError,
+  InternalError,
   DuplicateContractError,
   MissingFunctionNameError,
   InvalidMethodInvocationError,
@@ -159,7 +159,7 @@ export default async function getContractInstance ({
       case 'error':
         message = decode(returnValue).toString()
         break
-      default: throw new UnknownCallReturnTypeError(returnType)
+      default: throw new InternalError(`Unknown returnType: ${returnType}`)
     }
     throw new NodeInvocationError(message)
   }

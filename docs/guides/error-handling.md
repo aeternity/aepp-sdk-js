@@ -20,6 +20,7 @@ AeError
 │   UnsupportedProtocolError
 │   NotImplementedError
 │   UnsupportedVersionError
+│   InternalError
 │
 └───AccountError
 │   │   InvalidKeypairError
@@ -59,7 +60,6 @@ AeError
 │   │   NodeInvocationError
 │   │   NoSuchContractFunctionError
 │   │   NotPayableFunctionError
-│   │   UnknownCallReturnTypeError
 │   │   MissingEventDefinitionError
 │   │   AmbiguousEventDefinitionError
 │

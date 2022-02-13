@@ -199,6 +199,13 @@ export class UnsupportedVersionError extends AeError {
   }
 }
 
+export class InternalError extends AeError {
+  constructor (message: string) {
+    super(message)
+    this.name = 'InternalError'
+  }
+}
+
 /* keypair an account related errors */
 export class InvalidKeypairError extends AccountError {
   constructor (message: string) {
@@ -395,13 +402,6 @@ export class NotPayableFunctionError extends ContractError {
       `You try to pay "${amount}" to function "${fn}" which is not payable. ` +
       'Only payable function can accept tokens')
     this.name = 'NotPayableFunctionError'
-  }
-}
-
-export class UnknownCallReturnTypeError extends ContractError {
-  constructor (returnType: any) {
-    super(`Unknown returnType: ${String(returnType)}`)
-    this.name = 'UnknownCallReturnTypeError'
   }
 }
 
