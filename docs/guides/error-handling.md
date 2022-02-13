@@ -5,7 +5,7 @@ This guide shows you how to handle errors originating from the SDK. SDK by defau
 ## Error Hierarchy
 
 ```
-AeError
+BaseError
 │   ArgumentError
 │   IllegalArgumentError
 │   InsufficientBalanceError
@@ -149,7 +149,7 @@ try {
 }
 
 // using generic error classes
-const {AensError, TransactionError, AeError } = require('@aeternity/aepp-sdk')
+const {AensError, TransactionError, BaseError } = require('@aeternity/aepp-sdk')
 
 try {
   const spendTxResult = await client.spend(1, "ak_2tv", { onAccount: payerAccount})
@@ -158,7 +158,7 @@ try {
     // address or AENS related errors
   } else if(err instanceof TransactionError) {
     // transaction errors
-  } else if(err instanceof AeError){
+  } else if(err instanceof BaseError){
     // match any errors from the SDK
   }
 }

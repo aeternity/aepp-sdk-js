@@ -7,84 +7,84 @@
 /**
  * aepp-sdk originated error
  */
-export abstract class AeError extends Error {
+export abstract class BaseError extends Error {
   constructor (message: string) {
     super(message)
-    this.name = 'AeError'
+    this.name = 'BaseError'
   }
 }
 
-export class AccountError extends AeError {
+export class AccountError extends BaseError {
   constructor (message: string) {
     super(message)
     this.name = 'AccountError'
   }
 }
 
-export class AensError extends AeError {
+export class AensError extends BaseError {
   constructor (message: string) {
     super(message)
     this.name = 'AensError'
   }
 }
 
-export class AeppError extends AeError {
+export class AeppError extends BaseError {
   constructor (message: string) {
     super(message)
     this.name = 'AeppError'
   }
 }
 
-export class ChannelError extends AeError {
+export class ChannelError extends BaseError {
   constructor (message: string) {
     super(message)
     this.name = 'ChannelError'
   }
 }
 
-export class CompilerError extends AeError {
+export class CompilerError extends BaseError {
   constructor (message: string) {
     super(message)
     this.name = 'CompilerError'
   }
 }
 
-export class ContractError extends AeError {
+export class ContractError extends BaseError {
   constructor (message: string) {
     super(message)
     this.name = 'ContractError'
   }
 }
 
-export class CryptographyError extends AeError {
+export class CryptographyError extends BaseError {
   constructor (message: string) {
     super(message)
     this.name = 'CryptographyError'
   }
 }
 
-export class NodeError extends AeError {
+export class NodeError extends BaseError {
   constructor (message: string) {
     super(message)
     this.name = 'NodeError'
   }
 }
 
-export class SwaggerError extends AeError {
+export class SwaggerError extends BaseError {
   constructor (message: string) {
     super(message)
     this.name = 'SwaggerError'
   }
 }
 
-export class TransactionError extends AeError {
+export class TransactionError extends BaseError {
   constructor (message: string) {
     super(message)
     this.name = 'TransactionError'
   }
 }
 
-export class WalletError extends AeError {
+export class WalletError extends BaseError {
   constructor (message: string) {
     super(message)
     this.name = 'WalletError'
@@ -92,7 +92,7 @@ export class WalletError extends AeError {
 }
 
 /* Common error patterns */
-export class ArgumentError extends AeError {
+export class ArgumentError extends BaseError {
   constructor (argumentName: string, requirement: string, argumentValue: any) {
     super(`${argumentName} should be ${requirement}, got ${argumentValue} instead`)
     this.name = 'ArgumentError'
@@ -106,49 +106,49 @@ export class IllegalArgumentError extends CryptographyError {
   }
 }
 
-export class InsufficientBalanceError extends AeError {
+export class InsufficientBalanceError extends BaseError {
   constructor (message: string) {
     super(message)
     this.name = 'InsufficientBalanceError'
   }
 }
 
-export class InvalidDenominationError extends AeError {
+export class InvalidDenominationError extends BaseError {
   constructor (message: string) {
     super(message)
     this.name = 'InvalidDenominationError'
   }
 }
 
-export class InvalidNameError extends AeError {
+export class InvalidNameError extends BaseError {
   constructor (message: string) {
     super(message)
     this.name = 'InvalidNameError'
   }
 }
 
-export class MissingParamError extends AeError {
+export class MissingParamError extends BaseError {
   constructor (message: string) {
     super(message)
     this.name = 'MissingParamError'
   }
 }
 
-export class NoBrowserFoundError extends AeError {
+export class NoBrowserFoundError extends BaseError {
   constructor () {
     super('Browser is not detected')
     this.name = 'NoBrowserFoundError'
   }
 }
 
-export class NoSerializerFoundError extends AeError {
+export class NoSerializerFoundError extends BaseError {
   constructor () {
     super('Byte serialization not supported')
     this.name = 'NoSerializerFoundError'
   }
 }
 
-export class RequestTimedOutError extends AeError {
+export class RequestTimedOutError extends BaseError {
   constructor (requestTime: number);
   constructor (requestTime: number, currentHeight?: number, height?: number) {
     if (currentHeight !== undefined && height !== undefined) {
@@ -160,7 +160,7 @@ export class RequestTimedOutError extends AeError {
   }
 }
 
-export class TxTimedOutError extends AeError {
+export class TxTimedOutError extends BaseError {
   constructor (blocks: number, th: string, status?: string) {
     super([
       `Giving up after ${blocks} blocks mined`,
@@ -171,42 +171,42 @@ export class TxTimedOutError extends AeError {
   }
 }
 
-export class TypeError extends AeError {
+export class TypeError extends BaseError {
   constructor (message: string) {
     super(message)
     this.name = 'TypeError'
   }
 }
 
-export class UnsupportedPlatformError extends AeError {
+export class UnsupportedPlatformError extends BaseError {
   constructor (message: string) {
     super(message)
     this.name = 'UnsupportedPlatformError'
   }
 }
 
-export class UnsupportedProtocolError extends AeError {
+export class UnsupportedProtocolError extends BaseError {
   constructor (message: string) {
     super(message)
     this.name = 'UnsupportedProtocolError'
   }
 }
 
-export class NotImplementedError extends AeError {
+export class NotImplementedError extends BaseError {
   constructor (message: string) {
     super(message)
     this.name = 'NotImplementedError'
   }
 }
 
-export class UnsupportedVersionError extends AeError {
+export class UnsupportedVersionError extends BaseError {
   constructor (dependency: string, version: string, geVersion: string, ltVersion: string) {
     super(`Unsupported ${dependency} version ${version}. Supported: >= ${geVersion} < ${ltVersion}`)
     this.name = 'UnsupportedVersionError'
   }
 }
 
-export class InternalError extends AeError {
+export class InternalError extends BaseError {
   constructor (message: string) {
     super(message)
     this.name = 'InternalError'
