@@ -7,10 +7,8 @@ This guide shows you how to handle errors originating from the SDK. SDK by defau
 ```
 AeError
 │   IllegalArgumentError
-│   IllegalArgumentError
 │   InsufficientBalanceError
 │   InvalidDenominationError
-│   InvalidHashError
 │   InvalidNameError
 │   MissingParamError
 │   NoBrowserFoundError
@@ -18,7 +16,6 @@ AeError
 │   RequestTimedOutError
 │   TxTimedOutError
 │   TypeError
-│   UnknownHashClassError
 │   UnsupportedPlatformError
 │   UnsupportedProtocolError
 │
@@ -43,7 +40,6 @@ AeError
 └───ChannelError
 │   │   ChannelCallError
 │   │   ChannelConnectionError
-│   │   ChannelInitializationError
 │   │   ChannelPingTimedOutError
 │   │   UnexpectedChannelMessageError
 │   │   UnknownChannelStateError

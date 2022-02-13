@@ -113,13 +113,6 @@ export class InvalidDenominationError extends AeError {
   }
 }
 
-export class InvalidHashError extends AeError {
-  constructor () {
-    super('Not a valid hash')
-    this.name = 'InvalidHashError'
-  }
-}
-
 export class InvalidNameError extends AeError {
   constructor (msg: string) {
     super(msg)
@@ -168,13 +161,6 @@ export class TxTimedOutError extends AeError {
       ...status ? [`status: ${status}`] : []
     ].join(', '))
     this.name = 'TxTimedOutError'
-  }
-}
-
-export class UnknownHashClassError extends AeError {
-  constructor (klass: string) {
-    super(`Unknown class ${klass}`)
-    this.name = 'UnknownHashClassError'
   }
 }
 
@@ -297,13 +283,6 @@ export class ChannelConnectionError extends ChannelError {
   constructor (msg: string) {
     super(msg)
     this.name = 'ChannelConnectionError'
-  }
-}
-
-export class ChannelInitializationError extends ChannelError {
-  constructor (msg: string) {
-    super(msg)
-    this.name = 'ChannelInitializationError'
   }
 }
 
