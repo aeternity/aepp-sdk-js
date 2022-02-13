@@ -25,7 +25,7 @@
 import AsyncInit from './utils/async-init'
 import genSwaggerClient from './utils/swagger'
 import semverSatisfies from './utils/semver-satisfies'
-import { MissingParamError, UnsupportedNodeError } from './utils/errors'
+import { MissingParamError, UnsupportedVersionError } from './utils/errors'
 
 /**
  * Obtain networkId from account or node
@@ -74,7 +74,7 @@ const Node = AsyncInit.compose({
       !semverSatisfies(this.version, NODE_GE_VERSION, NODE_LT_VERSION) &&
       !ignoreVersion
     ) {
-      throw new UnsupportedNodeError(this.version, NODE_GE_VERSION, NODE_LT_VERSION)
+      throw new UnsupportedVersionError('node', this.version, NODE_GE_VERSION, NODE_LT_VERSION)
     }
     this.api = client.api
 

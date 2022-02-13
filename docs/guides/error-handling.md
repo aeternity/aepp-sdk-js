@@ -19,6 +19,7 @@ AeError
 │   UnsupportedPlatformError
 │   UnsupportedProtocolError
 │   NotImplementedError
+│   UnsupportedVersionError
 │
 └───AccountError
 │   │   InvalidKeypairError
@@ -45,7 +46,6 @@ AeError
 │   │   UnknownChannelStateError
 │
 └───CompilerError
-│   │   UnsupportedCompilerError
 │   │   InvalidAuthDataError
 │
 └───ContractError
@@ -81,7 +81,6 @@ AeError
 │   │   DisconnectedError
 │   │   DuplicateNodeError
 │   │   NodeNotFoundError
-│   │   UnsupportedNodeError
 │
 └───SwaggerError
 │

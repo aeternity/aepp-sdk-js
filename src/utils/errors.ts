@@ -192,6 +192,13 @@ export class NotImplementedError extends AeError {
   }
 }
 
+export class UnsupportedVersionError extends AeError {
+  constructor (dependency: string, version: string, geVersion: string, ltVersion: string) {
+    super(`Unsupported ${dependency} version ${version}. Supported: >= ${geVersion} < ${ltVersion}`)
+    this.name = 'UnsupportedVersionError'
+  }
+}
+
 /* keypair an account related errors */
 export class InvalidKeypairError extends AccountError {
   constructor (message: string) {
@@ -309,14 +316,6 @@ export class UnknownChannelStateError extends ChannelError {
 }
 
 /* compiler issued errors */
-export class UnsupportedCompilerError extends CompilerError {
-  constructor (compilerVersion: string, COMPILER_GE_VERSION: string, COMPILER_LT_VERSION: string) {
-    super(`Unsupported compiler version ${compilerVersion}. ` +
-    `Supported: >= ${COMPILER_GE_VERSION} < ${COMPILER_LT_VERSION}`)
-    this.name = 'UnsupportedCompilerError'
-  }
-}
-
 /* errors from option validations */
 export class InvalidAuthDataError extends CompilerError {
   constructor (message: string) {
@@ -531,16 +530,6 @@ export class NodeNotFoundError extends NodeError {
   constructor (message: string) {
     super(message)
     this.name = 'NodeNotFoundError'
-  }
-}
-
-/* Node communication errors  */
-export class UnsupportedNodeError extends NodeError {
-  constructor (nodeVersion: string, NODE_GE_VERSION: string, NODE_LT_VERSION: string) {
-    super(
-      `Unsupported node version ${nodeVersion}. ` +
-      `Supported: >= ${NODE_GE_VERSION} < ${NODE_LT_VERSION}`)
-    this.name = 'UnsupportedNodeError'
   }
 }
 
