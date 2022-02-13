@@ -103,7 +103,6 @@ export default Ae.compose({
     onDisconnect = voidFn,
     onNetworkChange = voidFn,
     connection,
-    forceValidation = false,
     debug = false
   }) {
     const eventsHandlers = ['onDisconnect', 'onAddressChange', 'onNetworkChange']
@@ -121,7 +120,7 @@ export default Ae.compose({
     this.onNetworkChange = onNetworkChange
     // validation
     eventsHandlers.forEach(event => {
-      if (!forceValidation && typeof this[event] !== 'function') throw new IllegalArgumentError(`Call-back for ${event} must be an function!`)
+      if (typeof this[event] !== 'function') throw new IllegalArgumentError(`Call-back for ${event} must be an function!`)
     })
   },
   deepProps: { Ae: { defaults: { walletBroadcast: true } } },

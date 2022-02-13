@@ -250,7 +250,6 @@ export default Ae.compose(AccountMultiple, {
     onDisconnect,
     onAskAccounts,
     onMessageSign,
-    forceValidation = false,
     debug = false
   } = {}) {
     this.debug = debug
@@ -267,7 +266,7 @@ export default Ae.compose(AccountMultiple, {
     this.rpcClients = {}
 
     eventsHandlers.forEach(event => {
-      if (!forceValidation && typeof this[event] !== 'function') {
+      if (typeof this[event] !== 'function') {
         throw new IllegalArgumentError(`Call-back for ${event} must be an function!`)
       }
     })
