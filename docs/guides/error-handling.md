@@ -24,7 +24,6 @@ AeError
 │   │   UnavailableAccountError
 │
 └───AensError
-│   │   AensNameNotFoundError
 │   │   AensPointerContextError
 │   │   InsufficientNameFeeError
 │   │   InvalidAensNameError

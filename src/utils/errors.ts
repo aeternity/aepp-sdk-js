@@ -200,13 +200,6 @@ export class UnavailableAccountError extends AccountError {
 }
 
 /* errors originating from AENS operation */
-export class AensNameNotFoundError extends AensError {
-  constructor (nameOrId: string) {
-    super(`Name not found: ${nameOrId}`)
-    this.name = 'AensNameNotFoundError'
-  }
-}
-
 export class AensPointerContextError extends AensError {
   constructor (nameOrId: string, prefix: string) {
     super(`Name ${nameOrId} don't have pointers for ${prefix}`)

@@ -22,7 +22,6 @@ import { pause } from '../utils/other'
 import { isNameValid, produceNameId, decode } from '../tx/builder/helpers'
 import { DRY_RUN_ACCOUNT } from '../tx/builder/schema'
 import {
-  AensNameNotFoundError,
   AensPointerContextError,
   DryRunError,
   InvalidAensNameError,
@@ -267,8 +266,7 @@ async function resolveName (nameOrId, key, { verify, resolveByNode } = {}) {
   } catch (error) {}
   if (isNameValid(nameOrId)) {
     if (verify || resolveByNode) {
-      const name = await this.api.getNameEntryByName(nameOrId).catch(_ => null)
-      if (!name) throw new AensNameNotFoundError(`Name not found: ${nameOrId}`)
+      const name = await this.api.getNameEntryByName(nameOrId)
       const pointer = name.pointers.find(pointer => pointer.key === key)
       if (!pointer) {
         throw new AensPointerContextError(`Name ${nameOrId} don't have pointers for ${key}`)
