@@ -258,10 +258,10 @@ export class DuplicateCallbackError extends AeppError {
   }
 }
 
-export class InvalidRpcMessage extends AeppError {
+export class InvalidRpcMessageError extends AeppError {
   constructor (message: string) {
     super(`Received invalid message: ${message}`)
-    this.name = 'InvalidRpcMessage'
+    this.name = 'InvalidRpcMessageError'
   }
 }
 

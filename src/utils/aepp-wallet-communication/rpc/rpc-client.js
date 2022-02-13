@@ -11,7 +11,7 @@ import stampit from '@stamp/it'
 import { METHODS, RPC_STATUS, SUBSCRIPTION_TYPES } from '../schema'
 import { sendMessage, message, isValidAccounts } from '../helpers'
 import {
-  InvalidRpcMessage,
+  InvalidRpcMessageError,
   TypeError,
   DuplicateCallbackError,
   MissingCallbackError
@@ -51,7 +51,7 @@ export default stampit({
 
     const handleMessage = (msg, origin) => {
       if (!msg || !msg.jsonrpc || msg.jsonrpc !== '2.0' || !msg.method) {
-        throw new InvalidRpcMessage(msg)
+        throw new InvalidRpcMessageError(msg)
       }
       onMessage(msg, origin)
     }

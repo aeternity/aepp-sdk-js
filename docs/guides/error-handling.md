@@ -35,7 +35,7 @@ BaseError
 │
 └───AeppError
 │   │   DuplicateCallbackError
-│   │   InvalidRpcMessage
+│   │   InvalidRpcMessageError
 │   │   MissingCallbackError
 │   │   UnAuthorizedAccountError
 │   │   UnknownRpcClientError
