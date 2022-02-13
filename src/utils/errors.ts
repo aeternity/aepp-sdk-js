@@ -8,121 +8,121 @@
  * aepp-sdk originated error
  */
 export abstract class AeError extends Error {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'AeError'
   }
 }
 
 export class AccountError extends AeError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'AccountError'
   }
 }
 
 export class AensError extends AeError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'AensError'
   }
 }
 
 export class AeppError extends AeError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'AeppError'
   }
 }
 
 export class ChannelError extends AeError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'ChannelError'
   }
 }
 
 export class CompilerError extends AeError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'CompilerError'
   }
 }
 
 export class ContractError extends AeError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'ContractError'
   }
 }
 
 export class CryptographyError extends AeError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'CryptographyError'
   }
 }
 
 export class NodeError extends AeError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'NodeError'
   }
 }
 
 export class SwaggerError extends AeError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'SwaggerError'
   }
 }
 
 export class TransactionError extends AeError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'TransactionError'
   }
 }
 
 export class WalletError extends AeError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'WalletError'
   }
 }
 
 /* Common error patterns */
 export class IllegalArgumentError extends CryptographyError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'IllegalArgumentError'
   }
 }
 
 export class InsufficientBalanceError extends AeError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'InsufficientBalanceError'
   }
 }
 
 export class InvalidDenominationError extends AeError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'InvalidDenominationError'
   }
 }
 
 export class InvalidNameError extends AeError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'InvalidNameError'
   }
 }
 
 export class MissingParamError extends AeError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'MissingParamError'
   }
 }
@@ -165,29 +165,29 @@ export class TxTimedOutError extends AeError {
 }
 
 export class TypeError extends AeError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'TypeError'
   }
 }
 
 export class UnsupportedPlatformError extends AeError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'UnsupportedPlatformError'
   }
 }
 export class UnsupportedProtocolError extends AeError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'UnsupportedProtocolError'
   }
 }
 
 /* keypair an account related errors */
 export class InvalidKeypairError extends AccountError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'InvalidKeypairError'
   }
 }
@@ -215,8 +215,8 @@ export class InsufficientNameFeeError extends AensError {
 }
 
 export class InvalidAensNameError extends AensError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'InvalidAensNameError'
   }
 }
@@ -230,8 +230,8 @@ export class DuplicateCallbackError extends AeppError {
 }
 
 export class InvalidRpcMessage extends AeppError {
-  constructor (msg: string) {
-    super(`Received invalid message: ${msg}`)
+  constructor (message: string) {
+    super(`Received invalid message: ${message}`)
     this.name = 'InvalidRpcMessage'
   }
 }
@@ -266,15 +266,15 @@ export class UnsubscribedAccountError extends AeppError {
 
 /* Channel originated errors */
 export class ChannelCallError extends ChannelError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'ChannelCallError'
   }
 }
 
 export class ChannelConnectionError extends ChannelError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'ChannelConnectionError'
   }
 }
@@ -287,8 +287,8 @@ export class ChannelPingTimedOutError extends ChannelError {
 }
 
 export class UnexpectedChannelMessageError extends ChannelError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'UnexpectedChannelMessageError'
   }
 }
@@ -311,8 +311,8 @@ export class UnsupportedCompilerError extends CompilerError {
 
 /* errors from option validations */
 export class InvalidAuthDataError extends CompilerError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'InvalidAuthDataError'
   }
 }
@@ -340,15 +340,15 @@ export class InactiveContractError extends ContractError {
 }
 
 export class InvalidMethodInvocationError extends ContractError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'InvalidMethodInvocationError'
   }
 }
 
 export class MissingContractAddressError extends ContractError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'MissingContractAddressError'
   }
 }
@@ -368,9 +368,9 @@ export class MissingFunctionNameError extends ContractError {
 }
 
 export class NodeInvocationError extends ContractError {
-  constructor (msg?: string) {
-    msg = msg ?? ''
-    super(`Invocation failed${msg === '' ? '' : `: "${msg}"`}`)
+  constructor (message?: string) {
+    message = message ?? ''
+    super(`Invocation failed${message === '' ? '' : `: "${message}"`}`)
     this.name = 'NodeInvocationError'
   }
 }
@@ -435,15 +435,15 @@ export class InvalidDerivationPathError extends CryptographyError {
 }
 
 export class InvalidKeyError extends CryptographyError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'InvalidKeyError'
   }
 }
 
 export class InvalidPasswordError extends CryptographyError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'InvalidPasswordError'
   }
 }
@@ -463,8 +463,8 @@ export class MessageLimitError extends CryptographyError {
 }
 
 export class MissingNodeInTreeError extends CryptographyError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'MissingNodeInTreeError'
   }
 }
@@ -477,8 +477,8 @@ export class NoSuchAlgorithmError extends CryptographyError {
 }
 
 export class NotHardenedSegmentError extends CryptographyError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'NotHardenedSegmentError'
   }
 }
@@ -527,8 +527,8 @@ export class DuplicateNodeError extends NodeError {
 }
 
 export class NodeNotFoundError extends NodeError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'NodeNotFoundError'
   }
 }
@@ -545,57 +545,57 @@ export class UnsupportedNodeError extends NodeError {
 
 /* transaction related errors */
 export class DecodeError extends TransactionError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'DecodeError'
   }
 }
 
 export class EncodeError extends TransactionError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'EncodeError'
   }
 }
 
 export class PayloadLengthError extends TransactionError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'PayloadLengthError'
   }
 }
 
 export class DryRunError extends TransactionError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'DryRunError'
   }
 }
 
 export class IllegalBidFeeError extends TransactionError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'IllegalBidFeeError'
   }
 }
 
 export class InvalidSignatureError extends TransactionError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'UnsignedTxError'
   }
 }
 
 export class InvalidTxError extends TransactionError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'InvalidTxError'
   }
 }
 
 export class InvalidTxParamsError extends TransactionError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'InvalidTxParamsError'
   }
 }
@@ -622,8 +622,8 @@ export class PrefixNotFoundError extends TransactionError {
 }
 
 export class SchemaNotFoundError extends TransactionError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'SchemaNotFoundError'
   }
 }
@@ -643,8 +643,8 @@ export class TxNotInChainError extends TransactionError {
 }
 
 export class UnknownTxError extends TransactionError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'UnknownTxError'
   }
 }
@@ -657,44 +657,44 @@ export class UnsignedTxError extends TransactionError {
 }
 
 export class UnsupportedABIversionError extends TransactionError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'UnsupportedABIversionError'
   }
 }
 
 export class UnsupportedVMversionError extends TransactionError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'UnsupportedVMversionError'
   }
 }
 
 /* Wallet Errors */
 export class AlreadyConnectedError extends WalletError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'AlreadyConnectedError'
   }
 }
 
 export class MessageDirectionError extends WalletError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'MessageDirectionError'
   }
 }
 
 export class NoWalletConnectedError extends WalletError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'NoWalletConnectedError'
   }
 }
 
 export class RpcConnectionError extends WalletError {
-  constructor (msg: string) {
-    super(msg)
+  constructor (message: string) {
+    super(message)
     this.name = 'RpcConnectionError'
   }
 }
