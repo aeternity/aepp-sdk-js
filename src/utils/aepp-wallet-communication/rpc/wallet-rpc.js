@@ -244,33 +244,21 @@ const handleMessage = (instance, id) => async (msg, origin) => {
 export default Ae.compose(AccountMultiple, {
   init ({
     name,
-    onConnection,
-    onSubscription,
-    onSign,
-    onDisconnect,
-    onAskAccounts,
-    onMessageSign,
-    debug = false
+    debug = false,
+    ...other
   } = {}) {
-    this.debug = debug
-    const eventsHandlers = [
-      'onConnection', 'onSubscription', 'onSign', 'onDisconnect', 'onMessageSign'
-    ]
-    // CallBacks for events
-    this.onConnection = onConnection
-    this.onSubscription = onSubscription
-    this.onSign = onSign
-    this.onDisconnect = onDisconnect
-    this.onAskAccounts = onAskAccounts
-    this.onMessageSign = onMessageSign
-    this.rpcClients = {}
-
-    eventsHandlers.forEach(event => {
-      if (typeof this[event] !== 'function') {
+    [
+      'onConnection', 'onSubscription', 'onSign', 'onDisconnect', 'onAskAccounts', 'onMessageSign'
+    ].forEach(event => {
+      const handler = other[event]
+      if (typeof handler !== 'function') {
         throw new IllegalArgumentError(`Call-back for ${event} must be an function!`)
       }
+      this[event] = handler
     })
-    //
+
+    this.debug = debug
+    this.rpcClients = {}
     this.name = name
     this.id = uuid()
 
