@@ -70,13 +70,6 @@ export class NodeError extends BaseError {
   }
 }
 
-export class SwaggerError extends BaseError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'SwaggerError'
-  }
-}
-
 export class TransactionError extends BaseError {
   constructor (message: string) {
     super(message)
@@ -103,6 +96,13 @@ export class IllegalArgumentError extends CryptographyError {
   constructor (message: string) {
     super(message)
     this.name = 'IllegalArgumentError'
+  }
+}
+
+export class ArgumentCountMismatchError extends BaseError {
+  constructor (functionName: string, requiredCount: number, providedCount: number) {
+    super(`${functionName} expects ${requiredCount} arguments, got ${providedCount} instead`)
+    this.name = 'ArgumentCountMismatchError'
   }
 }
 

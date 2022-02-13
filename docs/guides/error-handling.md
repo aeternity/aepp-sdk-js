@@ -8,6 +8,7 @@ This guide shows you how to handle errors originating from the SDK. SDK by defau
 BaseError
 │   ArgumentError
 │   IllegalArgumentError
+│   ArgumentCountMismatchError
 │   InsufficientBalanceError
 │   InvalidDenominationError
 │   InvalidNameError
@@ -81,8 +82,6 @@ BaseError
 │   │   DisconnectedError
 │   │   DuplicateNodeError
 │   │   NodeNotFoundError
-│
-└───SwaggerError
 │
 └───TransactionError
 │   │   DecodeError

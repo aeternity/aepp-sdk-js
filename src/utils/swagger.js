@@ -25,7 +25,7 @@ import SwaggerClient from 'swagger-client'
 import fetch from 'cross-fetch'
 import JsonBig from './json-big'
 import { snakizeKeys, pascalizeKeys, mapObject, filterObject } from './other'
-import { SwaggerError } from './errors'
+import { ArgumentCountMismatchError } from './errors'
 import { snakeToPascal } from './string'
 
 let warnedAboutInternalApiUsage = false
@@ -106,45 +106,51 @@ export default async (
     .reduce((acc, n) => ({ ...acc, [n.operationId]: n }), {})
 
   const requestQueues = {}
-  const api = mapObject(combinedApi, ([opId, handler]) => [
-    opId.slice(0, 1).toLowerCase() + snakeToPascal(opId.slice(1)),
-    async (...args) => {
-      const opSpec = opSpecs[opId]
-      const parameters = [
-        ...opSpec.parameters,
-        ...opSpec.requestBody
-          ? [{
-              required: opSpec.requestBody.required,
-              schema: Object.values(opSpec.requestBody.content)[0].schema,
-              name: '__requestBody'
-            }]
-          : []
-      ]
-      const required = parameters.filter(param => param.required).map(p => p.name)
-      if (args.length < required.length) throw new SwaggerError('swagger: Not enough arguments')
-      const values = required.reduce(
-        (acc, req, idx) => ({ ...acc, [req]: args[idx] }),
-        args[required.length] || {}
-      )
-      const { __requestBody, __queue, ...stringified } = mapObject(values, ([param, value]) => {
-        if (typeof value !== 'object') return [param, value]
-        const rootKeys = Object.keys(parameters.find(p => p.name === param).schema.properties)
-        const filteredValue = filterObject(
-          disableCaseConversion ? value : snakizeKeys(value),
-          ([key]) => rootKeys.includes(key)
+  const api = mapObject(combinedApi, ([opId, handler]) => {
+    const functionName = opId.slice(0, 1).toLowerCase() + snakeToPascal(opId.slice(1))
+    return [
+      functionName,
+      async (...args) => {
+        const opSpec = opSpecs[opId]
+        const parameters = [
+          ...opSpec.parameters,
+          ...opSpec.requestBody
+            ? [{
+                required: opSpec.requestBody.required,
+                schema: Object.values(opSpec.requestBody.content)[0].schema,
+                name: '__requestBody'
+              }]
+            : []
+        ]
+        const required = parameters.filter(param => param.required).map(p => p.name)
+        if (![0, 1].includes(args.length - required.length)) {
+          throw new ArgumentCountMismatchError(functionName, required.length, args.length)
+        }
+        const values = required.reduce(
+          (acc, req, idx) => ({ ...acc, [req]: args[idx] }),
+          args[required.length] || {}
         )
-        return [param, jsonImp.stringify(filteredValue)]
-      })
+        const { __requestBody, __queue, ...stringified } = mapObject(values, ([param, value]) => {
+          if (typeof value !== 'object') return [param, value]
+          const rootKeys = Object.keys(parameters.find(p => p.name === param).schema.properties)
+          const filteredValue = filterObject(
+            disableCaseConversion ? value : snakizeKeys(value),
+            ([key]) => rootKeys.includes(key)
+          )
+          return [param, jsonImp.stringify(filteredValue)]
+        })
 
-      const request = async () => (await handler(stringified, { requestBody: __requestBody })).body
-      if (!__queue) return request()
-      const res = (requestQueues[__queue] ?? Promise.resolve()).then(request, request)
-      // TODO: remove after fixing https://github.com/aeternity/aeternity/issues/3803
-      // gap to ensure that node won't reject the nonce
-      requestQueues[__queue] = res.then(() => new Promise(resolve => setTimeout(resolve, 750)))
-      return res
-    }
-  ])
+        const request = async () => (await handler(stringified, { requestBody: __requestBody }))
+          .body
+        if (!__queue) return request()
+        const res = (requestQueues[__queue] ?? Promise.resolve()).then(request, request)
+        // TODO: remove after fixing https://github.com/aeternity/aeternity/issues/3803
+        // gap to ensure that node won't reject the nonce
+        requestQueues[__queue] = res.then(() => new Promise(resolve => setTimeout(resolve, 750)))
+        return res
+      }
+    ]
+  })
 
   return Object.assign(external, { api })
 }
