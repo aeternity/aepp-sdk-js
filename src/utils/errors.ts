@@ -469,10 +469,10 @@ export class MissingNodeInTreeError extends CryptographyError {
   }
 }
 
-export class NoSuchAlgorithmError extends CryptographyError {
+export class UnsupportedAlgorithmError extends CryptographyError {
   constructor (algo: string) {
     super(algo + ' is not available')
-    this.name = 'NoSuchAlgorithmError'
+    this.name = 'UnsupportedAlgorithmError'
   }
 }
 
@@ -501,13 +501,6 @@ export class UnsupportedChildIndexError extends CryptographyError {
   constructor (index: string) {
     super(`Child index #${index} is not supported`)
     this.name = 'UnsupportedChildIndexError'
-  }
-}
-
-export class UnsupportedKdfError extends CryptographyError {
-  constructor () {
-    super('Unsupported kdf type')
-    this.name = 'UnsupportedKdfError'
   }
 }
 

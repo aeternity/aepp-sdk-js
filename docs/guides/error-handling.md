@@ -70,12 +70,11 @@ AeError
 │   │   InvalidPasswordError
 │   │   MerkleTreeHashMismatchError
 │   │   MissingNodeInTreeError
-│   │   NoSuchAlgorithmError
+│   │   UnsupportedAlgorithmError
 │   │   NotHardenedSegmentError
 │   │   UnknownNodeLengthError
 │   │   UnknownPathNibbleError
 │   │   UnsupportedChildIndexError
-│   │   UnsupportedKdfError
 │
 └───NodeError
 │   │   DisconnectedError
