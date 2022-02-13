@@ -21,11 +21,7 @@ import { TX_TYPE } from '../../src/tx/builder/schema'
 import { generateKeyPair } from '../../src/utils/crypto'
 import MemoryAccount from '../../src/account/memory'
 import {
-  InvalidSignatureError,
-  InvalidTxError,
-  TypeError,
-  UnknownTxError,
-  UnsignedTxError
+  InvalidSignatureError, InvalidTxError, TypeError, UnknownTxError
 } from '../../src/utils/errors'
 
 describe('TxObject', () => {
@@ -87,10 +83,7 @@ describe('TxObject', () => {
       tx.isSigned.should.be.equal(true)
     })
 
-    it('Get signature on unsigned tx', () => {
-      expect(() => txObject.getSignatures())
-        .to.throw(UnsignedTxError, 'Signature not found, transaction is not signed')
-    })
+    it('Get signature on unsigned tx', () => expect(txObject.getSignatures()).to.eql([]))
 
     it('Invalid props', () => {
       expect(() => txObject.setProp(true)).to.throw(TypeError, 'Props should be an object')

@@ -572,7 +572,7 @@ export class IllegalBidFeeError extends TransactionError {
 export class InvalidSignatureError extends TransactionError {
   constructor (message: string) {
     super(message)
-    this.name = 'UnsignedTxError'
+    this.name = 'InvalidSignatureError'
   }
 }
 
@@ -636,13 +636,6 @@ export class UnknownTxError extends TransactionError {
   constructor (message: string) {
     super(message)
     this.name = 'UnknownTxError'
-  }
-}
-
-export class UnsignedTxError extends TransactionError {
-  constructor () {
-    super('Signature not found, transaction is not signed')
-    this.name = 'UnsignedTxError'
   }
 }
 

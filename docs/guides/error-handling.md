@@ -99,7 +99,6 @@ BaseError
 │   │   TagNotFoundError
 │   │   TxNotInChainError
 │   │   UnknownTxError
-│   │   UnsignedTxError
 │   │   UnsupportedABIversionError
 │   │   UnsupportedVMversionError
 │
