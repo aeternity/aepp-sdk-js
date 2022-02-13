@@ -375,13 +375,6 @@ export class NodeInvocationError extends ContractError {
   }
 }
 
-export class NoSuchContractError extends ContractError {
-  constructor (notExistingContractAddress: string) {
-    super(`Contract with address ${notExistingContractAddress} not found on-chain`)
-    this.name = 'NoSuchContractError'
-  }
-}
-
 export class NoSuchContractFunctionError extends ContractError {
   constructor (name: string) {
     super(`Function ${name} doesn't exist in contract`)

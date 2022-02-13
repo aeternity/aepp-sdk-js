@@ -29,7 +29,6 @@ import { decode } from '../tx/builder/helpers'
 import {
   MissingContractDefError,
   MissingContractAddressError,
-  NoSuchContractError,
   InactiveContractError,
   BytecodeMismatchError,
   UnknownCallReturnTypeError,
@@ -90,8 +89,7 @@ export default async function getContractInstance ({
   }
 
   if (contractAddress) {
-    const contract = await this.getContract(contractAddress).catch(() => null)
-    if (!contract) throw new NoSuchContractError(contractAddress)
+    const contract = await this.getContract(contractAddress)
     if (!contract.active) throw new InactiveContractError(contractAddress)
   }
 

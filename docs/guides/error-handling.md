@@ -56,7 +56,6 @@ AeError
 │   │   MissingContractDefError
 │   │   MissingFunctionNameError
 │   │   NodeInvocationError
-│   │   NoSuchContractError
 │   │   NoSuchContractFunctionError
 │   │   NotPayableFunctionError
 │   │   UnknownCallReturnTypeError
