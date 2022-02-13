@@ -28,7 +28,7 @@ import shajs from 'sha.js'
 import { str2buf } from './bytes'
 import { encode, decode } from '../tx/builder/helpers'
 import { hash } from './crypto-ts'
-import { MessageLimitError } from './errors'
+import { NotImplementedError } from './errors'
 
 export * from './crypto-ts'
 
@@ -201,7 +201,7 @@ export function verify (str, signature, publicKey) {
 export function messageToHash (message) {
   const p = Buffer.from('aeternity Signed Message:\n', 'utf8')
   const msg = Buffer.from(message, 'utf8')
-  if (msg.length >= 0xFD) throw new MessageLimitError()
+  if (msg.length >= 0xFD) throw new NotImplementedError('Message too long')
   return hash(Buffer.concat([Buffer.from([p.length]), p, Buffer.from([msg.length]), msg]))
 }
 

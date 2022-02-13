@@ -177,10 +177,18 @@ export class UnsupportedPlatformError extends AeError {
     this.name = 'UnsupportedPlatformError'
   }
 }
+
 export class UnsupportedProtocolError extends AeError {
   constructor (message: string) {
     super(message)
     this.name = 'UnsupportedProtocolError'
+  }
+}
+
+export class NotImplementedError extends AeError {
+  constructor (message: string) {
+    super(message)
+    this.name = 'NotImplementedError'
   }
 }
 
@@ -452,13 +460,6 @@ export class MerkleTreeHashMismatchError extends CryptographyError {
   constructor () {
     super('Node hash is not equal to provided one')
     this.name = 'MerkleTreeHashMismatchError'
-  }
-}
-
-export class MessageLimitError extends CryptographyError {
-  constructor () {
-    super('message too long')
-    this.name = 'MessageLimitError'
   }
 }
 

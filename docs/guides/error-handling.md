@@ -18,6 +18,7 @@ AeError
 │   TypeError
 │   UnsupportedPlatformError
 │   UnsupportedProtocolError
+│   NotImplementedError
 │
 └───AccountError
 │   │   InvalidKeypairError
@@ -68,7 +69,6 @@ AeError
 │   │   InvalidKeyError
 │   │   InvalidPasswordError
 │   │   MerkleTreeHashMismatchError
-│   │   MessageLimitError
 │   │   MissingNodeInTreeError
 │   │   NoSuchAlgorithmError
 │   │   NotHardenedSegmentError
