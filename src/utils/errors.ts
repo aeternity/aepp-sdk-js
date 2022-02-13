@@ -92,6 +92,13 @@ export class WalletError extends AeError {
 }
 
 /* Common error patterns */
+export class ArgumentError extends AeError {
+  constructor (argumentName: string, requirement: string, argumentValue: any) {
+    super(`${argumentName} should be ${requirement}, got ${argumentValue} instead`)
+    this.name = 'ArgumentError'
+  }
+}
+
 export class IllegalArgumentError extends CryptographyError {
   constructor (message: string) {
     super(message)

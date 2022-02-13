@@ -14,11 +14,7 @@ import TxObject from '../../../tx/tx-object'
 import RpcClient from './rpc-client'
 import { getBrowserAPI, getHandler, isValidAccounts, message, sendResponseMessage } from '../helpers'
 import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE } from '../schema'
-import {
-  IllegalArgumentError,
-  TypeError,
-  UnknownRpcClientError
-} from '../../errors'
+import { ArgumentError, TypeError, UnknownRpcClientError } from '../../errors'
 import { isAccountBase } from '../../../account/base'
 
 const resolveOnAccount = (addresses, onAccount, opt = {}) => {
@@ -251,9 +247,7 @@ export default Ae.compose(AccountMultiple, {
       'onConnection', 'onSubscription', 'onSign', 'onDisconnect', 'onAskAccounts', 'onMessageSign'
     ].forEach(event => {
       const handler = other[event]
-      if (typeof handler !== 'function') {
-        throw new IllegalArgumentError(`Call-back for ${event} must be an function!`)
-      }
+      if (typeof handler !== 'function') throw new ArgumentError(event, 'a function', handler)
       this[event] = handler
     })
 

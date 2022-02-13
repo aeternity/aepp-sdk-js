@@ -4,7 +4,7 @@ import { ArgonType, hash } from '@aeternity/argon2-browser/dist/argon2-bundled.m
 import { encode } from '../tx/builder/helpers'
 import { str2buf } from './bytes'
 import {
-  IllegalArgumentError, InvalidKeyError, UnsupportedAlgorithmError, InvalidPasswordError
+  ArgumentError, InvalidKeyError, UnsupportedAlgorithmError, InvalidPasswordError
 } from './errors'
 
 /**
@@ -100,9 +100,8 @@ async function deriveKey (password, nonce, options = {
   kdf_params: DEFAULTS.crypto.kdf_params,
   kdf: DEFAULTS.crypto.kdf
 }) {
-  if (typeof password === 'undefined' || password === null || !nonce) {
-    throw new IllegalArgumentError('Must provide password and nonce to derive a key')
-  }
+  if (!nonce) throw new ArgumentError('nonce', 'provided', nonce)
+  if (password == null) throw new ArgumentError('password', 'provided', password)
 
   if (!Object.prototype.hasOwnProperty.call(DERIVED_KEY_FUNCTIONS, options.kdf)) {
     throw new UnsupportedAlgorithmError(options.kdf)

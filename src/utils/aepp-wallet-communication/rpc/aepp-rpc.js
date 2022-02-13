@@ -17,7 +17,7 @@ import {
   NoWalletConnectedError,
   UnsubscribedAccountError,
   UnAuthorizedAccountError,
-  IllegalArgumentError
+  ArgumentError
 } from '../../errors'
 
 const NOTIFICATIONS = {
@@ -105,9 +105,7 @@ export default Ae.compose({
   }) {
     ['onAddressChange', 'onDisconnect', 'onNetworkChange'].forEach(event => {
       const handler = other[event] ?? (() => {})
-      if (typeof handler !== 'function') {
-        throw new IllegalArgumentError(`Call-back for ${event} must be an function!`)
-      }
+      if (typeof handler !== 'function') throw new ArgumentError(event, 'a function', handler)
       this[event] = handler
     })
 

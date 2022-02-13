@@ -6,6 +6,7 @@ This guide shows you how to handle errors originating from the SDK. SDK by defau
 
 ```
 AeError
+│   ArgumentError
 │   IllegalArgumentError
 │   InsufficientBalanceError
 │   InvalidDenominationError
