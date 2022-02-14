@@ -9,7 +9,7 @@ config.plugins.push(
   ['import-globals', {
     Buffer: { moduleName: 'buffer', exportName: 'Buffer' }
   }],
-  ['transform-default-named-imports', { exclude: ['rlp'] }]
+  ['transform-default-named-imports']
 )
 
 module.exports = config

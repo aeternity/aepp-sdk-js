@@ -34,8 +34,8 @@
     "SDK"
   ],
   "dependencies": {
-    "@aeternity/aepp-calldata": "github:aeternity/aepp-calldata-js#a623a44a259cc53e99b1e358ecc7b3f88edcb45c",
-    "@aeternity/argon2-browser": "^0.1.1",
+    "@aeternity/aepp-calldata": "github:aeternity/aepp-calldata-js#a2afc153ae03c28e2fd0706eefb3055c24459683",
+    "@aeternity/argon2-browser": "^0.1.2",
     "@aeternity/json-bigint": "^0.3.1",
     "@aeternity/uuid": "^0.0.1",
     "@babel/runtime-corejs3": "^7.17.2",
@@ -44,7 +44,7 @@
     "aes-js": "^3.1.2",
     "bignumber.js": "^9.0.2",
     "bip32-path": "^0.4.2",
-    "blakejs": "^1.1.1",
+    "blakejs": "github:aeternity/blakejs",
     "bs58": "^4.0.1",
     "buffer": "^6.0.3",
     "cross-fetch": "^3.1.5",
