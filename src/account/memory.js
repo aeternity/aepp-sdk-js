@@ -51,8 +51,12 @@ export default AccountBase.compose({
     }
 
     if (!keypair || typeof keypair !== 'object') throw new InvalidKeypairError('KeyPair must be an object')
-    if (!keypair.secretKey || !keypair.publicKey) throw new InvalidKeypairError('KeyPair must must have "secretKey", "publicKey" properties')
-    if (typeof keypair.publicKey !== 'string' || keypair.publicKey.indexOf('ak_') === -1) throw new InvalidKeypairError('Public Key must be a base58c string with "ak_" prefix')
+    if (!keypair.secretKey || !keypair.publicKey) {
+      throw new InvalidKeypairError('KeyPair must must have "secretKey", "publicKey" properties')
+    }
+    if (typeof keypair.publicKey !== 'string' || keypair.publicKey.indexOf('ak_') === -1) {
+      throw new InvalidKeypairError('Public Key must be a base58c string with "ak_" prefix')
+    }
     if (
       !Buffer.isBuffer(keypair.secretKey) &&
       (typeof keypair.secretKey === 'string' && !isHex(keypair.secretKey))

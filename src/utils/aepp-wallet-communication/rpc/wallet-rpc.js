@@ -69,21 +69,13 @@ const REQUESTS = {
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
 
-    // wait for approval
-    client.updateInfo()
-
     return callInstance(
       'onNodeBridge',
       { name },
       () => {
+        const { url, internalUrl } = instance.selectedNode
         return {
-          result: {
-            url: instance.selectedNode.url,
-            ...(instance.selectedNode.internalUrl &&
-              {
-                internalUrl: instance.selectedNode.internalUrl
-              })
-          }
+          result: { url, ...internalUrl && { internalUrl } }
         }
       },
       (error) => {
