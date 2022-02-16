@@ -4,11 +4,7 @@ import { ArgonType, hash } from '@aeternity/argon2-browser/dist/argon2-bundled.m
 import { encode } from '../tx/builder/helpers'
 import { str2buf } from './bytes'
 import {
-  IllegalArgumentError,
-  InvalidKeyError,
-  NoSuchAlgorithmError,
-  UnsupportedKdfError,
-  InvalidPasswordError
+  ArgumentError, InvalidKeyError, UnsupportedAlgorithmError, InvalidPasswordError
 } from './errors'
 
 /**
@@ -74,7 +70,7 @@ function decryptXsalsa20Poly1305 ({ ciphertext, key, nonce }) {
  * @return {Buffer} Encrypted data.
  */
 function encrypt (plaintext, key, nonce, algo = DEFAULTS.crypto.symmetric_alg) {
-  if (!CRYPTO_FUNCTIONS[algo]) throw new NoSuchAlgorithmError(algo)
+  if (!CRYPTO_FUNCTIONS[algo]) throw new UnsupportedAlgorithmError(algo)
   return CRYPTO_FUNCTIONS[algo].encrypt({ plaintext, nonce, key })
 }
 
@@ -87,7 +83,7 @@ function encrypt (plaintext, key, nonce, algo = DEFAULTS.crypto.symmetric_alg) {
  * @return {Buffer} Decrypted data.
  */
 function decrypt (ciphertext, key, nonce, algo) {
-  if (!CRYPTO_FUNCTIONS[algo]) throw new NoSuchAlgorithmError(algo)
+  if (!CRYPTO_FUNCTIONS[algo]) throw new UnsupportedAlgorithmError(algo)
   return CRYPTO_FUNCTIONS[algo].decrypt({ ciphertext, nonce, key })
 }
 
@@ -104,12 +100,11 @@ async function deriveKey (password, nonce, options = {
   kdf_params: DEFAULTS.crypto.kdf_params,
   kdf: DEFAULTS.crypto.kdf
 }) {
-  if (typeof password === 'undefined' || password === null || !nonce) {
-    throw new IllegalArgumentError('Must provide password and nonce to derive a key')
-  }
+  if (!nonce) throw new ArgumentError('nonce', 'provided', nonce)
+  if (password == null) throw new ArgumentError('password', 'provided', password)
 
   if (!Object.prototype.hasOwnProperty.call(DERIVED_KEY_FUNCTIONS, options.kdf)) {
-    throw new UnsupportedKdfError()
+    throw new UnsupportedAlgorithmError(options.kdf)
   }
 
   return DERIVED_KEY_FUNCTIONS[options.kdf](password, nonce, options)

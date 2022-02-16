@@ -22,7 +22,7 @@ import {
   InvalidNameError,
   IllegalBidFeeError,
   NoDefaultAensPointerError,
-  IllegalArgumentError,
+  ArgumentError,
   InvalidChecksumError
 } from '../../utils/errors'
 
@@ -199,9 +199,7 @@ export function encode (data, type) {
  * @return {Buffer} Buffer Buffer with ID tag and decoded HASh
  */
 export function writeId (hashId) {
-  if (typeof hashId !== 'string') {
-    throw new IllegalArgumentError(`Address should be a string, got ${hashId} instead`)
-  }
+  if (typeof hashId !== 'string') throw new ArgumentError('hashId', 'a string', hashId)
   const prefix = hashId.slice(0, 2)
   const idTag = PREFIX_ID_TAG[prefix]
   if (!idTag) throw new TagNotFoundError(prefix)

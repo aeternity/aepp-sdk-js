@@ -20,7 +20,6 @@ import BigNumber from 'bignumber.js'
 import { decode } from '../../src/tx/builder/helpers'
 import {
   BytecodeMismatchError,
-  NoSuchContractError,
   InvalidAensNameError,
   InvalidMethodInvocationError,
   MissingContractAddressError,
@@ -202,7 +201,7 @@ describe('Contract instance', function () {
   it('fails on trying to generate with not existing contract address', () =>
     expect(sdk.getContractInstance(
       { aci: identityContractSource, contractAddress: notExistingContractAddress }
-    )).to.be.rejectedWith(NoSuchContractError, `Contract with address ${notExistingContractAddress} not found on-chain`))
+    )).to.be.rejectedWith(`v3/contracts/${notExistingContractAddress} error: Contract not found`))
 
   it('fails on trying to generate with invalid address', () =>
     expect(sdk.getContractInstance(

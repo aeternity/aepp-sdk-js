@@ -14,11 +14,7 @@ import TxObject from '../../../tx/tx-object'
 import RpcClient from './rpc-client'
 import { getBrowserAPI, getHandler, isValidAccounts, message, sendResponseMessage } from '../helpers'
 import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE } from '../schema'
-import {
-  IllegalArgumentError,
-  TypeError,
-  UnknownRpcClientError
-} from '../../errors'
+import { ArgumentError, TypeError, UnknownRpcClientError } from '../../errors'
 import { isAccountBase } from '../../../account/base'
 
 const resolveOnAccount = (addresses, onAccount, opt = {}) => {
@@ -244,34 +240,19 @@ const handleMessage = (instance, id) => async (msg, origin) => {
 export default Ae.compose(AccountMultiple, {
   init ({
     name,
-    onConnection,
-    onSubscription,
-    onSign,
-    onDisconnect,
-    onAskAccounts,
-    onMessageSign,
-    forceValidation = false,
-    debug = false
+    debug = false,
+    ...other
   } = {}) {
-    this.debug = debug
-    const eventsHandlers = [
-      'onConnection', 'onSubscription', 'onSign', 'onDisconnect', 'onMessageSign'
-    ]
-    // CallBacks for events
-    this.onConnection = onConnection
-    this.onSubscription = onSubscription
-    this.onSign = onSign
-    this.onDisconnect = onDisconnect
-    this.onAskAccounts = onAskAccounts
-    this.onMessageSign = onMessageSign
-    this.rpcClients = {}
-
-    eventsHandlers.forEach(event => {
-      if (!forceValidation && typeof this[event] !== 'function') {
-        throw new IllegalArgumentError(`Call-back for ${event} must be an function!`)
-      }
+    [
+      'onConnection', 'onSubscription', 'onSign', 'onDisconnect', 'onAskAccounts', 'onMessageSign'
+    ].forEach(event => {
+      const handler = other[event]
+      if (typeof handler !== 'function') throw new ArgumentError(event, 'a function', handler)
+      this[event] = handler
     })
-    //
+
+    this.debug = debug
+    this.rpcClients = {}
     this.name = name
     this.id = uuid()
 

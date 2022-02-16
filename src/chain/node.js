@@ -22,7 +22,6 @@ import { pause } from '../utils/other'
 import { isNameValid, produceNameId, decode } from '../tx/builder/helpers'
 import { DRY_RUN_ACCOUNT } from '../tx/builder/schema'
 import {
-  AensNameNotFoundError,
   AensPointerContextError,
   DryRunError,
   InvalidAensNameError,
@@ -30,7 +29,7 @@ import {
   RequestTimedOutError,
   TxTimedOutError,
   TxNotInChainError,
-  IllegalArgumentError
+  ArgumentError
 } from '../utils/errors'
 
 /**
@@ -176,7 +175,7 @@ async function getCurrentGeneration () {
 async function getGeneration (hashOrHeight) {
   if (typeof hashOrHeight === 'string') return this.api.getGenerationByHash(hashOrHeight)
   if (typeof hashOrHeight === 'number') return this.api.getGenerationByHeight(hashOrHeight)
-  throw new IllegalArgumentError('Invalid param, param must be hash or height')
+  throw new ArgumentError('hashOrHeight', 'a string or number', hashOrHeight)
 }
 
 async function getMicroBlockTransactions (hash) {
@@ -186,7 +185,7 @@ async function getMicroBlockTransactions (hash) {
 async function getKeyBlock (hashOrHeight) {
   if (typeof hashOrHeight === 'string') return this.api.getKeyBlockByHash(hashOrHeight)
   if (typeof hashOrHeight === 'number') return this.api.getKeyBlockByHeight(hashOrHeight)
-  throw new IllegalArgumentError('Invalid param, param must be hash or height')
+  throw new ArgumentError('hashOrHeight', 'a string or number', hashOrHeight)
 }
 
 async function getMicroBlockHeader (hash) {
@@ -267,8 +266,7 @@ async function resolveName (nameOrId, key, { verify, resolveByNode } = {}) {
   } catch (error) {}
   if (isNameValid(nameOrId)) {
     if (verify || resolveByNode) {
-      const name = await this.api.getNameEntryByName(nameOrId).catch(_ => null)
-      if (!name) throw new AensNameNotFoundError(`Name not found: ${nameOrId}`)
+      const name = await this.api.getNameEntryByName(nameOrId)
       const pointer = name.pointers.find(pointer => pointer.key === key)
       if (!pointer) {
         throw new AensPointerContextError(`Name ${nameOrId} don't have pointers for ${key}`)

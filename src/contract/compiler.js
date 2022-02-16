@@ -26,7 +26,7 @@
 import semverSatisfies from '../utils/semver-satisfies'
 import AsyncInit from '../utils/async-init'
 import genSwaggerClient from '../utils/swagger'
-import { MissingParamError, UnsupportedCompilerError } from '../utils/errors'
+import { MissingParamError, UnsupportedVersionError } from '../utils/errors'
 import { mapObject } from '../utils/other'
 
 /**
@@ -85,8 +85,8 @@ export default AsyncInit.compose({
 
       if (ignoreVersion) return
       if (!semverSatisfies(this.compilerVersion, COMPILER_GE_VERSION, COMPILER_LT_VERSION)) {
-        throw new UnsupportedCompilerError(
-          this.compilerVersion, COMPILER_GE_VERSION, COMPILER_LT_VERSION
+        throw new UnsupportedVersionError(
+          'compiler', this.compilerVersion, COMPILER_GE_VERSION, COMPILER_LT_VERSION
         )
       }
     }

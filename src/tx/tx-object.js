@@ -9,13 +9,7 @@ import { buildTx, calculateFee, unpackTx } from './builder'
 import { TX_TYPE } from './builder/schema'
 import { encode } from './builder/helpers'
 import { isHex } from '../utils/string'
-import {
-  InvalidTxError,
-  TypeError,
-  UnknownTxError,
-  InvalidSignatureError,
-  UnsignedTxError
-} from '../utils/errors'
+import { InvalidTxError, TypeError, UnknownTxError, InvalidSignatureError } from '../utils/errors'
 
 /**
  * Build transaction from object
@@ -152,7 +146,6 @@ export const TxObject = stampit({
      * @return {Array} Array of signatures
      */
     getSignatures () {
-      if (!this.isSigned) throw new UnsignedTxError()
       return this.signatures
     },
     /**

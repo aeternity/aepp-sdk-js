@@ -176,20 +176,15 @@ function onMessage (channel, data) {
   dequeueMessage(channel)
 }
 
-function wrapCallErrorMessage (message) {
-  const [{ message: details } = {}] = message.error.data || []
-  if (details) {
-    return new ChannelCallError(`${message.error.message}: ${details}`)
-  }
-  return new ChannelCallError(message.error.message)
-}
-
 export function call (channel, method, params) {
   return new Promise((resolve, reject) => {
     const id = sequence.set(channel, sequence.get(channel) + 1).get(channel)
     rpcCallbacks.get(channel).set(id, (message) => {
       if (message.result) return resolve(message.result)
-      if (message.error) return reject(wrapCallErrorMessage(message))
+      if (message.error) {
+        const [{ message: details } = {}] = message.error.data || []
+        return reject(new ChannelCallError(message.error.message + (details ? `: ${details}` : '')))
+      }
     })
     send(channel, { jsonrpc: '2.0', method, id, params })
   })

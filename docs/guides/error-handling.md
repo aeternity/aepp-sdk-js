@@ -5,12 +5,12 @@ This guide shows you how to handle errors originating from the SDK. SDK by defau
 ## Error Hierarchy
 
 ```
-AeError
+BaseError
+│   ArgumentError
 │   IllegalArgumentError
-│   IllegalArgumentError
+│   ArgumentCountMismatchError
 │   InsufficientBalanceError
 │   InvalidDenominationError
-│   InvalidHashError
 │   InvalidNameError
 │   MissingParamError
 │   NoBrowserFoundError
@@ -18,23 +18,24 @@ AeError
 │   RequestTimedOutError
 │   TxTimedOutError
 │   TypeError
-│   UnknownHashClassError
 │   UnsupportedPlatformError
 │   UnsupportedProtocolError
+│   NotImplementedError
+│   UnsupportedVersionError
+│   InternalError
 │
 └───AccountError
 │   │   InvalidKeypairError
 │   │   UnavailableAccountError
 │
 └───AensError
-│   │   AensNameNotFoundError
 │   │   AensPointerContextError
 │   │   InsufficientNameFeeError
 │   │   InvalidAensNameError
 │
 └───AeppError
 │   │   DuplicateCallbackError
-│   │   InvalidRpcMessage
+│   │   InvalidRpcMessageError
 │   │   MissingCallbackError
 │   │   UnAuthorizedAccountError
 │   │   UnknownRpcClientError
@@ -43,13 +44,11 @@ AeError
 └───ChannelError
 │   │   ChannelCallError
 │   │   ChannelConnectionError
-│   │   ChannelInitializationError
 │   │   ChannelPingTimedOutError
 │   │   UnexpectedChannelMessageError
 │   │   UnknownChannelStateError
 │
 └───CompilerError
-│   │   UnsupportedCompilerError
 │   │   InvalidAuthDataError
 │
 └───ContractError
@@ -61,10 +60,8 @@ AeError
 │   │   MissingContractDefError
 │   │   MissingFunctionNameError
 │   │   NodeInvocationError
-│   │   NoSuchContractError
 │   │   NoSuchContractFunctionError
 │   │   NotPayableFunctionError
-│   │   UnknownCallReturnTypeError
 │   │   MissingEventDefinitionError
 │   │   AmbiguousEventDefinitionError
 │
@@ -74,22 +71,17 @@ AeError
 │   │   InvalidKeyError
 │   │   InvalidPasswordError
 │   │   MerkleTreeHashMismatchError
-│   │   MessageLimitError
 │   │   MissingNodeInTreeError
-│   │   NoSuchAlgorithmError
+│   │   UnsupportedAlgorithmError
 │   │   NotHardenedSegmentError
 │   │   UnknownNodeLengthError
 │   │   UnknownPathNibbleError
 │   │   UnsupportedChildIndexError
-│   │   UnsupportedKdfError
 │
 └───NodeError
 │   │   DisconnectedError
 │   │   DuplicateNodeError
 │   │   NodeNotFoundError
-│   │   UnsupportedNodeError
-│
-└───SwaggerError
 │
 └───TransactionError
 │   │   DecodeError
@@ -107,7 +99,6 @@ AeError
 │   │   TagNotFoundError
 │   │   TxNotInChainError
 │   │   UnknownTxError
-│   │   UnsignedTxError
 │   │   UnsupportedABIversionError
 │   │   UnsupportedVMversionError
 │
@@ -156,7 +147,7 @@ try {
 }
 
 // using generic error classes
-const {AensError, TransactionError, AeError } = require('@aeternity/aepp-sdk')
+const {AensError, TransactionError, BaseError } = require('@aeternity/aepp-sdk')
 
 try {
   const spendTxResult = await client.spend(1, "ak_2tv", { onAccount: payerAccount})
@@ -165,7 +156,7 @@ try {
     // address or AENS related errors
   } else if(err instanceof TransactionError) {
     // transaction errors
-  } else if(err instanceof AeError){
+  } else if(err instanceof BaseError){
     // match any errors from the SDK
   }
 }

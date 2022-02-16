@@ -10,14 +10,14 @@
 import { v4 as uuid } from '@aeternity/uuid'
 import Ae from '../../../ae'
 import RpcClient from './rpc-client'
-import { getHandler, message, voidFn } from '../helpers'
+import { getHandler, message } from '../helpers'
 import { METHODS, RPC_STATUS, VERSION } from '../schema'
 import {
   AlreadyConnectedError,
   NoWalletConnectedError,
   UnsubscribedAccountError,
   UnAuthorizedAccountError,
-  IllegalArgumentError
+  ArgumentError
 } from '../../errors'
 
 const NOTIFICATIONS = {
@@ -99,14 +99,16 @@ const handleMessage = (instance) => async (msg) => {
 export default Ae.compose({
   async init ({
     name,
-    onAddressChange = voidFn,
-    onDisconnect = voidFn,
-    onNetworkChange = voidFn,
     connection,
-    forceValidation = false,
-    debug = false
+    debug = false,
+    ...other
   }) {
-    const eventsHandlers = ['onDisconnect', 'onAddressChange', 'onNetworkChange']
+    ['onAddressChange', 'onDisconnect', 'onNetworkChange'].forEach(event => {
+      const handler = other[event] ?? (() => {})
+      if (typeof handler !== 'function') throw new ArgumentError(event, 'a function', handler)
+      this[event] = handler
+    })
+
     this.connection = connection
     this.name = name
     this.debug = debug
@@ -115,14 +117,6 @@ export default Ae.compose({
       // Init RPCClient
       await this.connectToWallet(connection)
     }
-    // Event callbacks
-    this.onDisconnect = onDisconnect
-    this.onAddressChange = onAddressChange
-    this.onNetworkChange = onNetworkChange
-    // validation
-    eventsHandlers.forEach(event => {
-      if (!forceValidation && typeof this[event] !== 'function') throw new IllegalArgumentError(`Call-back for ${event} must be an function!`)
-    })
   },
   deepProps: { Ae: { defaults: { walletBroadcast: true } } },
   methods: {

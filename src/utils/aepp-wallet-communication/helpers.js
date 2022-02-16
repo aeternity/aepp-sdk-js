@@ -57,6 +57,4 @@ export const responseMessage = (id, method, { error, result } = {}) =>
 export const sendResponseMessage = (client) => (id, method, data) =>
   client.sendMessage(responseMessage(id, method, data), true)
 
-export const voidFn = () => undefined
-
 export const isValidAccounts = (accounts) => (['', 'connected', 'current'].filter(k => typeof (k ? accounts[k] : accounts) === 'object')).length === 3

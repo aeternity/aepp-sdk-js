@@ -22,7 +22,7 @@
  */
 import BigNumber from 'bignumber.js'
 import { isBigNumber } from './bignumber'
-import { IllegalArgumentError, InvalidDenominationError } from './errors'
+import { ArgumentError, InvalidDenominationError } from './errors'
 
 /**
  * AE amount formats
@@ -89,7 +89,7 @@ export const formatAmount = (
   const denominations = Object.values(AE_AMOUNT_FORMATS)
   if (!denominations.includes(denomination)) throw new InvalidDenominationError(`Invalid denomination: ${denomination}`)
   if (!denominations.includes(targetDenomination)) throw new InvalidDenominationError(`Invalid target denomination: ${targetDenomination}`)
-  if (!isBigNumber(value)) throw new IllegalArgumentError(`Value ${value?.toString()} is not type of number`)
+  if (!isBigNumber(value)) throw new ArgumentError('value', `a number`, value)
 
   return new BigNumber(value)
     .shiftedBy(DENOMINATION_MAGNITUDE[denomination] - DENOMINATION_MAGNITUDE[targetDenomination])

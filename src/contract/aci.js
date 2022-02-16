@@ -29,10 +29,9 @@ import { decode } from '../tx/builder/helpers'
 import {
   MissingContractDefError,
   MissingContractAddressError,
-  NoSuchContractError,
   InactiveContractError,
   BytecodeMismatchError,
-  UnknownCallReturnTypeError,
+  InternalError,
   DuplicateContractError,
   MissingFunctionNameError,
   InvalidMethodInvocationError,
@@ -90,8 +89,7 @@ export default async function getContractInstance ({
   }
 
   if (contractAddress) {
-    const contract = await this.getContract(contractAddress).catch(() => null)
-    if (!contract) throw new NoSuchContractError(contractAddress)
+    const contract = await this.getContract(contractAddress)
     if (!contract.active) throw new InactiveContractError(contractAddress)
   }
 
@@ -161,7 +159,7 @@ export default async function getContractInstance ({
       case 'error':
         message = decode(returnValue).toString()
         break
-      default: throw new UnknownCallReturnTypeError(returnType)
+      default: throw new InternalError(`Unknown returnType: ${returnType}`)
     }
     throw new NodeInvocationError(message)
   }
