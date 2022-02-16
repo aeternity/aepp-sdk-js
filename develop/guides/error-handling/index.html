@@ -774,12 +774,12 @@
                 <h1 id="error-handling">Error Handling</h1>
 <p>This guide shows you how to handle errors originating from the SDK. SDK by default exports the following error classes from file <a href="../../src/utils/errors.ts">errors.ts</a></p>
 <h2 id="error-hierarchy">Error Hierarchy</h2>
-<div class="highlight"><pre><span></span><code>AeError
+<div class="highlight"><pre><span></span><code>BaseError
+│   ArgumentError
 │   IllegalArgumentError
-│   IllegalArgumentError
+│   ArgumentCountMismatchError
 │   InsufficientBalanceError
 │   InvalidDenominationError
-│   InvalidHashError
 │   InvalidNameError
 │   MissingParamError
 │   NoBrowserFoundError
@@ -787,23 +787,24 @@
 │   RequestTimedOutError
 │   TxTimedOutError
 │   TypeError
-│   UnknownHashClassError
 │   UnsupportedPlatformError
 │   UnsupportedProtocolError
+│   NotImplementedError
+│   UnsupportedVersionError
+│   InternalError
 │
 └───AccountError
 │   │   InvalidKeypairError
 │   │   UnavailableAccountError
 │
 └───AensError
-│   │   AensNameNotFoundError
 │   │   AensPointerContextError
 │   │   InsufficientNameFeeError
 │   │   InvalidAensNameError
 │
 └───AeppError
 │   │   DuplicateCallbackError
-│   │   InvalidRpcMessage
+│   │   InvalidRpcMessageError
 │   │   MissingCallbackError
 │   │   UnAuthorizedAccountError
 │   │   UnknownRpcClientError
@@ -812,13 +813,11 @@
 └───ChannelError
 │   │   ChannelCallError
 │   │   ChannelConnectionError
-│   │   ChannelInitializationError
 │   │   ChannelPingTimedOutError
 │   │   UnexpectedChannelMessageError
 │   │   UnknownChannelStateError
 │
 └───CompilerError
-│   │   UnsupportedCompilerError
 │   │   InvalidAuthDataError
 │
 └───ContractError
@@ -830,10 +829,8 @@
 │   │   MissingContractDefError
 │   │   MissingFunctionNameError
 │   │   NodeInvocationError
-│   │   NoSuchContractError
 │   │   NoSuchContractFunctionError
 │   │   NotPayableFunctionError
-│   │   UnknownCallReturnTypeError
 │   │   MissingEventDefinitionError
 │   │   AmbiguousEventDefinitionError
 │
@@ -843,22 +840,17 @@
 │   │   InvalidKeyError
 │   │   InvalidPasswordError
 │   │   MerkleTreeHashMismatchError
-│   │   MessageLimitError
 │   │   MissingNodeInTreeError
-│   │   NoSuchAlgorithmError
+│   │   UnsupportedAlgorithmError
 │   │   NotHardenedSegmentError
 │   │   UnknownNodeLengthError
 │   │   UnknownPathNibbleError
 │   │   UnsupportedChildIndexError
-│   │   UnsupportedKdfError
 │
 └───NodeError
 │   │   DisconnectedError
 │   │   DuplicateNodeError
 │   │   NodeNotFoundError
-│   │   UnsupportedNodeError
-│
-└───SwaggerError
 │
 └───TransactionError
 │   │   DecodeError
@@ -876,7 +868,6 @@
 │   │   TagNotFoundError
 │   │   TxNotInChainError
 │   │   UnknownTxError
-│   │   UnsignedTxError
 │   │   UnsupportedABIversionError
 │   │   UnsupportedVMversionError
 │
@@ -922,7 +913,7 @@
 <span class="p">}</span>
 
 <span class="c1">// using generic error classes</span>
-<span class="kd">const</span> <span class="p">{</span><span class="nx">AensError</span><span class="p">,</span> <span class="nx">TransactionError</span><span class="p">,</span> <span class="nx">AeError</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">)</span>
+<span class="kd">const</span> <span class="p">{</span><span class="nx">AensError</span><span class="p">,</span> <span class="nx">TransactionError</span><span class="p">,</span> <span class="nx">BaseError</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">)</span>
 
 <span class="k">try</span> <span class="p">{</span>
   <span class="kd">const</span> <span class="nx">spendTxResult</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="s2">&quot;ak_2tv&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">onAccount</span><span class="o">:</span> <span class="nx">payerAccount</span><span class="p">})</span>
@@ -931,7 +922,7 @@
     <span class="c1">// address or AENS related errors</span>
   <span class="p">}</span> <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="nx">err</span> <span class="ow">instanceof</span> <span class="nx">TransactionError</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">// transaction errors</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="nx">err</span> <span class="ow">instanceof</span> <span class="nx">AeError</span><span class="p">){</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="nx">err</span> <span class="ow">instanceof</span> <span class="nx">BaseError</span><span class="p">){</span>
     <span class="c1">// match any errors from the SDK</span>
   <span class="p">}</span>
 <span class="p">}</span>
