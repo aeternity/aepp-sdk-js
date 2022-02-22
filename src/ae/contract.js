@@ -46,7 +46,6 @@ async function delegateSignatureCommon (ids = [], opt = {}) {
   const signature = await this.sign(
     Buffer.concat([
       Buffer.from(this.getNetworkId(opt)),
-      ...(Object.prototype.hasOwnProperty.call(opt, 'onAccount') ? [decode(await this.address(opt))] : []),
       ...ids.map(e => decode(e))
     ]),
     opt
@@ -79,7 +78,10 @@ async function delegateSignatureCommon (ids = [], opt = {}) {
  * )
  */
 async function createAensDelegationSignature ({ contractId, name }, opt = {}) {
-  return this.delegateSignatureCommon([...name ? [produceNameId(name)] : [], contractId], opt)
+  return this.delegateSignatureCommon(
+    [await this.address(opt), ...name ? [produceNameId(name)] : [], contractId],
+    opt
+  )
 }
 
 /**
