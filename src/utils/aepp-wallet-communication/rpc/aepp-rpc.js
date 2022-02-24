@@ -17,7 +17,8 @@ import {
   NoWalletConnectedError,
   UnsubscribedAccountError,
   UnAuthorizedAccountError,
-  ArgumentError
+  ArgumentError,
+  RpcConnectionError
 } from '../../errors'
 import { Node } from '../../../index'
 
@@ -45,10 +46,6 @@ const RESPONSES = {
   [METHODS.connect]: (instance) =>
     (msg) => {
       if (msg.result) instance.rpcClient.info.status = RPC_STATUS.CONNECTED
-      instance.rpcClient.processResponse(msg)
-    },
-  [METHODS.bridge]: (instance) =>
-    (msg) => {
       instance.rpcClient.processResponse(msg)
     },
   [METHODS.subscribeAddress]: (instance) =>
@@ -137,9 +134,10 @@ export default Ae.compose({
      * @instance
      * @rtype (connection: Object) => void
      * @param {Object} connection Wallet connection object
+     * @param {Object} [options] Options object
      * @return {void}
      */
-    async connectToWallet (connection) {
+    async connectToWallet (connection, { attach = false, name = 'wallet-node', select = false } = {}) {
       if (this.rpcClient && this.rpcClient.isConnected()) throw new AlreadyConnectedError('You are already connected to wallet ' + this.rpcClient)
       this.rpcClient = RpcClient({
         connection,
@@ -148,22 +146,12 @@ export default Ae.compose({
         id: uuid(),
         handlers: [handleMessage(this), this.onDisconnect]
       })
-      return this.sendConnectRequest()
-    },
-    /**
-     * Connect to node
-     * @function bridgeNode
-     * @instance
-     * @return {void}
-     */
-    async bridgeNode () {
-      if (!this.isConnected()) throw new NoWalletConnectedError('You are not connected to Wallet')
-      const walletNode = await this.sendBridgeRequest()
-      if (!walletNode.url) {
-        throw new MissingNodeUrl()
+      const walletInfo = await this.sendConnectRequest()
+      if (attach && !Object.prototype.hasOwnProperty.call(walletInfo, 'node')) {
+        throw new RpcConnectionError('Missing URLs of the Node')
       }
-      const node = await Node(walletNode)
-      this.addNode('wallet-bridge', node, true)
+      attach && this.addNode(name, await Node(walletInfo.node), select)
+      return walletInfo
     },
     /**
      * Disconnect from wallet
@@ -261,20 +249,6 @@ export default Ae.compose({
           name: this.name,
           version: VERSION,
           networkId: this.getNetworkId({ force: true })
-        }
-      )
-    },
-    /**
-     * Send node bridge request to wallet
-     * @function sendConnectRequest
-     * @instance
-     * @rtype () => Promise
-     * @return {Promise} Node configuration details
-     */
-    async sendBridgeRequest () {
-      return this.rpcClient.request(
-        METHODS.bridge, {
-          name: this.name
         }
       )
     },

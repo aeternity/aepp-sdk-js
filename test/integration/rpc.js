@@ -69,8 +69,6 @@ describe('Aepp<->Wallet', function () {
         name: 'Wallet',
         onConnection (aepp, { accept, deny }) {
         },
-        onNodeBridge (aepp, { accept, deny }) {
-        },
         onSubscription (aepp, { accept, deny }) {
         },
         onSign (aepp, { accept, deny, params }) {
@@ -134,9 +132,6 @@ describe('Aepp<->Wallet', function () {
 
     it('AEPP connect to wallet: wallet accept connection', async () => {
       wallet.onConnection = (aepp, actions) => {
-        actions.accept()
-      }
-      wallet.onNodeBridge = (aepp, actions) => {
         actions.accept()
       }
       connectionFromAeppToWallet.disconnect()
@@ -555,9 +550,7 @@ describe('Aepp<->Wallet', function () {
         nodes: [{ name: 'local', instance: node }],
         name: 'Wallet',
         onConnection (aepp, { accept, deny }) {
-          accept()
-        },
-        onNodeBridge (aepp, { accept, deny }) {
+          accept({ shareNode: true })
         },
         onSubscription (aepp, { accept, deny }) {
         },
@@ -583,24 +576,7 @@ describe('Aepp<->Wallet', function () {
         }
       })
       wallet.addRpcClient(connectionFromWalletToAepp)
-      await aepp.connectToWallet(connectionFromAeppToWallet)
-    })
-
-    it('AEPP connect to wallet node: wallet reject request', async () => {
-      wallet.onNodeBridge = (aepp, actions) => {
-        actions.deny()
-      }
-
-      await expect(aepp.bridgeNode()).to.be.rejectedWith('Operation rejected by user')
-    })
-
-    it('AEPP connect to wallet node: wallet accept request', async () => {
-      wallet.onNodeBridge = (aepp, actions) => {
-        actions.accept()
-      }
-      await aepp.bridgeNode()
-
-      aepp.api.should.be.an('object')
+      await aepp.connectToWallet(connectionFromAeppToWallet, { attach: true, name: 'wallet-node', select: true })
     })
 
     it('Subscribe to address: wallet accept', async () => {

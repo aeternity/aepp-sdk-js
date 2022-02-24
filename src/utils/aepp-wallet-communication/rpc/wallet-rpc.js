@@ -48,38 +48,26 @@ const REQUESTS = {
       name,
       networkId,
       icons,
-      version
+      version,
+      origin: window.location.origin
     })
 
     // Call onConnection callBack to notice Wallet about new AEPP
     return callInstance(
       'onConnection',
       { name, networkId, version },
-      () => {
+      ({ shareNode } = {}) => {
         client.updateInfo({ status: RPC_STATUS.CONNECTED })
-        return { result: instance.getWalletInfo() }
+        return {
+          result: {
+            ...instance.getWalletInfo(),
+            ...(shareNode && { node: instance.selectedNode })
+          }
+        }
       },
       (error) => {
         client.updateInfo({ status: RPC_STATUS.CONNECTION_REJECTED })
         return { error: ERRORS.connectionDeny(error) }
-      }
-    )
-  },
-  [METHODS.bridge] (callInstance, instance, client, { name }) {
-    // Authorization check
-    if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
-
-    return callInstance(
-      'onNodeBridge',
-      { name },
-      () => {
-        const { url, internalUrl } = instance.selectedNode
-        return {
-          result: { url, ...internalUrl && { internalUrl } }
-        }
-      },
-      (error) => {
-        return { error: ERRORS.rejectedByUser(error) }
       }
     )
   },
@@ -251,8 +239,7 @@ const handleMessage = (instance, id) => async (msg, origin) => {
  * @param {Function} onSign Call-back function for incoming AEPP sign request
  * @param {Function} onAskAccounts Call-back function for incoming AEPP get address request
  * @param {Function} onMessageSign Call-back function for incoming AEPP sign message request
- * @param {Function} onNodeBridge Call-back function for incoming AEPP node connection request
- * Second argument of incoming call-backs contain function for accept/deny request
+   * Second argument of incoming call-backs contain function for accept/deny request
  * @param {Function} onDisconnect Call-back function for disconnect event
  * @return {Object}
  */
