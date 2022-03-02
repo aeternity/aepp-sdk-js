@@ -85,6 +85,6 @@ AEPP can request the wallet to share its connected node URLs if any to interact 
 
 ```js
 async connectToWallet (wallet) {
-    await this.client.connectToWallet(await wallet.getConnection(), { attach: true, name: 'wallet-node', select: true })
+    await this.client.connectToWallet(await wallet.getConnection(), { connectNode: true, name: 'wallet-node', select: true })
 }
 ```

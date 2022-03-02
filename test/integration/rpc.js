@@ -538,7 +538,7 @@ describe('Aepp<->Wallet', function () {
     })
   })
 
-  describe('New RPC Wallet-AEPP: Wallet node', () => {
+  describe('New RPC Wallet-AEPP: Bind wallet node to AEPP', () => {
     const keypair = generateKeyPair()
     let aepp
     let wallet
@@ -576,7 +576,10 @@ describe('Aepp<->Wallet', function () {
         }
       })
       wallet.addRpcClient(connectionFromWalletToAepp)
-      await aepp.connectToWallet(connectionFromAeppToWallet, { attach: true, name: 'wallet-node', select: true })
+      await aepp.connectToWallet(
+        connectionFromAeppToWallet,
+        { connectNode: true, name: 'wallet-node', select: true }
+      )
     })
 
     it('Subscribe to address: wallet accept', async () => {
@@ -619,6 +622,18 @@ describe('Aepp<->Wallet', function () {
       const res = await aepp.send(tx, { walletBroadcast: false })
       decode(res.tx.payload).toString().should.be.equal('zerospend2')
       res.blockHeight.should.be.a('number')
+    })
+
+    it('Aepp: receive notification with node for network update', async () => {
+      const received = await new Promise((resolve, reject) => {
+        aepp.onNetworkChange = (msg, from) => {
+          msg.networkId.should.be.equal(networkId)
+          msg.node.should.be.an('object')
+          resolve(wallet.selectedNode.name === 'second_node')
+        }
+        wallet.addNode('second_node', node, true)
+      })
+      received.should.be.equal(true)
     })
   })
 })

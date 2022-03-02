@@ -38,10 +38,13 @@ const RESPONSES = {}
 const REQUESTS = {
   // Store client info and prepare two fn for each client `connect` and `denyConnection`
   // which automatically prepare and send response for that client
-  [METHODS.connect] (callInstance, instance, client, { name, networkId, version, icons }) {
+  [METHODS.connect] (
+    callInstance,
+    instance,
+    client,
+    { name, networkId, version, icons, connectNode }) {
     // Check if protocol and network is compatible with wallet
     if (version !== VERSION) return { error: ERRORS.unsupportedProtocol() }
-
     // Store new AEPP and wait for connection approve
     client.updateInfo({
       status: RPC_STATUS.WAITING_FOR_CONNECTION_APPROVE,
@@ -49,7 +52,8 @@ const REQUESTS = {
       networkId,
       icons,
       version,
-      origin: window.location.origin
+      origin: window.location.origin,
+      connectNode
     })
 
     // Call onConnection callBack to notice Wallet about new AEPP
@@ -57,7 +61,7 @@ const REQUESTS = {
       'onConnection',
       { name, networkId, version },
       ({ shareNode } = {}) => {
-        client.updateInfo({ status: RPC_STATUS.CONNECTED })
+        client.updateInfo({ status: shareNode ? RPC_STATUS.NODE_BINDED : RPC_STATUS.CONNECTED })
         return {
           result: {
             ...instance.getWalletInfo(),
@@ -301,9 +305,13 @@ export default Ae.compose(AccountMultiple, {
       // Send notification 'update.network' to all Aepp which connected
       Object.values(this.rpcClients)
         .filter(client => client.isConnected())
-        .forEach(client => client.sendMessage(
-          message(METHODS.updateNetwork, { networkId: this.getNetworkId() }), true
-        ))
+        .forEach(client => {
+          client.sendMessage(
+            message(METHODS.updateNetwork, {
+              networkId: this.getNetworkId(),
+              ...(client.info.status === RPC_STATUS.NODE_BINDED && { node: this.selectedNode })
+            }), true)
+        })
     }
   },
   methods: {

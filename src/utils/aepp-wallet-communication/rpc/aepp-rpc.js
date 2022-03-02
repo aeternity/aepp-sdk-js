@@ -29,9 +29,11 @@ const NOTIFICATIONS = {
       instance.onAddressChange(params)
     },
   [METHODS.updateNetwork]: (instance) =>
-    (msg) => {
-      instance.rpcClient.info.networkId = msg.params.networkId
-      instance.onNetworkChange(msg.params)
+    async ({ params }) => {
+      const { networkId, node } = params
+      instance.rpcClient.info.networkId = networkId
+      node && instance.addNode(node.name, await Node(node), true)
+      instance.onNetworkChange(params)
     },
   [METHODS.closeConnection]: (instance) =>
     (msg) => {
@@ -134,10 +136,13 @@ export default Ae.compose({
      * @instance
      * @rtype (connection: Object) => void
      * @param {Object} connection Wallet connection object
-     * @param {Object} [options] Options object
-     * @return {void}
+     * @param {Object} [options={}]
+     * @param {Boolean} [options.connectNode=true] - Request wallet to bind node
+     * @param {String}  [options.name=wallet-node] - Node name
+     * @param {Boolean} [options.select=false] - Select this node as current
+     * @return {Object}
      */
-    async connectToWallet (connection, { attach = false, name = 'wallet-node', select = false } = {}) {
+    async connectToWallet (connection, { connectNode = false, name = 'wallet-node', select = false } = {}) {
       if (this.rpcClient && this.rpcClient.isConnected()) throw new AlreadyConnectedError('You are already connected to wallet ' + this.rpcClient)
       this.rpcClient = RpcClient({
         connection,
@@ -146,11 +151,11 @@ export default Ae.compose({
         id: uuid(),
         handlers: [handleMessage(this), this.onDisconnect]
       })
-      const walletInfo = await this.sendConnectRequest()
-      if (attach && !Object.prototype.hasOwnProperty.call(walletInfo, 'node')) {
+      const walletInfo = await this.sendConnectRequest(connectNode)
+      if (connectNode && !Object.prototype.hasOwnProperty.call(walletInfo, 'node')) {
         throw new RpcConnectionError('Missing URLs of the Node')
       }
-      attach && this.addNode(name, await Node(walletInfo.node), select)
+      connectNode && this.addNode(name, await Node(walletInfo.node), select)
       return walletInfo
     },
     /**
@@ -240,15 +245,17 @@ export default Ae.compose({
      * Send connection request to wallet
      * @function sendConnectRequest
      * @instance
+     * @param {Boolean} connectNode - Request wallet to bind node
      * @rtype () => Promise
      * @return {Promise} Connection response
      */
-    async sendConnectRequest () {
+    async sendConnectRequest (connectNode) {
       return this.rpcClient.request(
         METHODS.connect, {
           name: this.name,
           version: VERSION,
-          networkId: this.getNetworkId({ force: true })
+          networkId: this.getNetworkId({ force: true }),
+          connectNode
         }
       )
     },

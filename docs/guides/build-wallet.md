@@ -152,7 +152,7 @@ async function init () {
       if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to connect`)) {
         // Whitelist aepp domains for node connection
         const aepps = ['https://test', 'https://aepp.aeternity.com']
-        if (aepps.includes(aepp.info.origin)) {
+        if (aepp.info.connectNode && aepps.includes(aepp.info.origin)) {
           action.accept({ shareNode: true })
         }
         action.accept() // Accept wallet connection without sharing node URLs
