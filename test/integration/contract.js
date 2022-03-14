@@ -16,7 +16,7 @@
  */
 import { expect } from 'chai'
 import { before, describe, it } from 'mocha'
-import { commitmentHash, decode } from '../../src/tx/builder/helpers'
+import { commitmentHash, decode, encode } from '../../src/tx/builder/helpers'
 import { DRY_RUN_ACCOUNT } from '../../src/tx/builder/schema'
 import { messageToHash, salt } from '../../src/utils/crypto'
 import { randomName } from '../utils'
@@ -339,17 +339,13 @@ describe('Contract', function () {
       const commitmentId = commitmentHash(name, nameSalt)
       // TODO: provide more convenient way to create the decoded commitmentId ?
       const commitmentIdDecoded = decode(commitmentId, 'cm')
-      const preclaimSig = await sdk.createAensDelegationSignature(
-        { contractId }, { onAccount: owner }
-      )
+      const preclaimSig = await sdk.createAensDelegationSignature({ contractId })
       const preclaim = await contract.methods
         .signedPreclaim(owner, commitmentIdDecoded, preclaimSig)
       preclaim.result.returnType.should.be.equal('ok')
-      await sdk.awaitHeight((await sdk.height()) + 2)
+      await sdk.awaitHeight(2 + await sdk.height())
       // signature for any other name related operations
-      delegationSignature = await sdk.createAensDelegationSignature(
-        { contractId, name }, { onAccount: owner }
-      )
+      delegationSignature = await sdk.createAensDelegationSignature({ contractId, name })
     })
 
     it('claims', async () => {
@@ -399,7 +395,7 @@ describe('Contract', function () {
   describe('Oracle operation delegation', () => {
     let contract
     let contractId
-    let onAccount
+    let address
     let oracle
     let oracleId
     let queryObject
@@ -411,16 +407,14 @@ describe('Contract', function () {
       contract = await sdk.getContractInstance({ source: oracleContract })
       await contract.deploy()
       contractId = contract.deployInfo.address
-      onAccount = sdk.addresses()[1]
-      oracleId = `ok_${onAccount.slice(3)}`
+      address = await sdk.address()
+      oracleId = encode(decode(address), 'ok')
     })
 
     it('registers', async () => {
-      delegationSignature = await sdk.createOracleDelegationSignature(
-        { contractId }, { onAccount }
-      )
+      delegationSignature = await sdk.delegateSignatureCommon([address, contractId])
       const oracleRegister = await contract.methods.signedRegisterOracle(
-        onAccount, delegationSignature, queryFee, ttl, { onAccount }
+        address, delegationSignature, queryFee, ttl
       )
       oracleRegister.result.returnType.should.be.equal('ok')
       oracle = await sdk.getOracleObject(oracleId)
@@ -429,7 +423,7 @@ describe('Contract', function () {
 
     it('extends', async () => {
       const queryExtend = await contract.methods.signedExtendOracle(
-        oracleId, delegationSignature, ttl, { onAccount }
+        oracleId, delegationSignature, ttl
       )
       queryExtend.result.returnType.should.be.equal('ok')
       const oracleExtended = await sdk.getOracleObject(oracleId)
@@ -438,9 +432,10 @@ describe('Contract', function () {
 
     it('creates query', async () => {
       const q = 'Hello!'
-      oracle = await sdk.registerOracle('string', 'int', { queryFee })
+      // TODO: don't register an extra oracle after fixing https://github.com/aeternity/aepp-sdk-js/issues/1419
+      oracle = await sdk.registerOracle('string', 'int', { queryFee, onAccount: sdk.addresses()[1] })
       const query = await contract.methods.createQuery(
-        oracle.id, q, 1000 + queryFee, ttl, ttl, { onAccount, amount: 5 * queryFee }
+        oracle.id, q, 1000 + queryFee, ttl, ttl, { amount: 5 * queryFee }
       )
       query.result.returnType.should.be.equal('ok')
       queryObject = await sdk.getQueryObject(oracle.id, query.decodedResult)
@@ -451,9 +446,10 @@ describe('Contract', function () {
     it('responds to query', async () => {
       const r = 'Hi!'
       const queryId = queryObject.id
+      sdk.selectAccount(sdk.addresses()[1])
       const respondSig = await sdk.createOracleDelegationSignature({ contractId, queryId })
       const response = await contract.methods.respond(
-        oracle.id, queryObject.id, respondSig, r, { onAccount }
+        oracle.id, queryObject.id, respondSig, r
       )
       response.result.returnType.should.be.equal('ok')
       const queryObject2 = await sdk.getQueryObject(oracle.id, queryObject.id)
