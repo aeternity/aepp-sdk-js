@@ -67,7 +67,7 @@ const COMPILER_URL = 'https://compiler.aepps.com';
   // ## 4. Create object instances
   const account = MemoryAccount({ keypair: ACCOUNT_KEYPAIR })
   const node = await Node({ url: NODE_URL })
-  const client = await Universal({
+  const aeSdk = await Universal({
     nodes: [{ name: 'testnet', instance: node }],
     compilerUrl: COMPILER_URL,
     accounts: [account]
@@ -76,7 +76,7 @@ const COMPILER_URL = 'https://compiler.aepps.com';
   // The `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp) itself is
   // asynchronous as it determines the node's version and rest interface automatically. Only once
   // the Promise is fulfilled, you know you have a working object instance
-  // which is assigned to the `client` constant in this case.
+  // which is assigned to the `aeSdk` constant in this case.
   //
   // Note:
   //
@@ -86,7 +86,7 @@ const COMPILER_URL = 'https://compiler.aepps.com';
   // Knowing the source code allows you to initialize a contract instance and interact with the
   // contract in a convenient way.
   console.log(CONTRACT_SOURCE)
-  const contract = await client.getContractInstance({ source: CONTRACT_SOURCE })
+  const contract = await aeSdk.getContractInstance({ source: CONTRACT_SOURCE })
 
   // ## 6. Compile the contract
   // The `compile` function sends a raw Sophia contract as string
