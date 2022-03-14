@@ -443,6 +443,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#4-use-wallets-node-for-chain-communication" class="md-nav__link">
+    4. Use Wallet's Node for chain communication
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -837,6 +844,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#4-use-wallets-node-for-chain-communication" class="md-nav__link">
+    4. Use Wallet's Node for chain communication
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -918,6 +932,12 @@
   <span class="k">this</span><span class="p">.</span><span class="nx">addressResponse</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">address</span><span class="p">()</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">heightResponse</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">height</span><span class="p">()</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">nodeInfoResponse</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">getNodeInfo</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="4-use-wallets-node-for-chain-communication">4. Use Wallet's Node for chain communication</h2>
+<p>AEPP can request the wallet to share its connected node URLs if any to interact with the chain.</p>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="nx">connectToWallet</span> <span class="p">(</span><span class="nx">wallet</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">connectToWallet</span><span class="p">(</span><span class="k">await</span> <span class="nx">wallet</span><span class="p">.</span><span class="nx">getConnection</span><span class="p">(),</span> <span class="p">{</span> <span class="nx">connectNode</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;wallet-node&#39;</span><span class="p">,</span> <span class="nx">select</span><span class="o">:</span> <span class="kc">true</span> <span class="p">})</span>
 <span class="p">}</span>
 </code></pre></div>
                 
