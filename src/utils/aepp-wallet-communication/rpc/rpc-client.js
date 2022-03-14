@@ -129,7 +129,8 @@ export default stampit({
      * @return {Boolean} is connected
      */
     isConnected () {
-      return this.connection.isConnected() && this.info.status === RPC_STATUS.CONNECTED
+      return this.connection.isConnected() &&
+        (this.info.status === RPC_STATUS.CONNECTED || this.info.status === RPC_STATUS.NODE_BINDED)
     },
     /**
      * Get selected account

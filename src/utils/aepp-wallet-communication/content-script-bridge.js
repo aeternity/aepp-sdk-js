@@ -67,7 +67,7 @@ function stop () {
  * @rtype Stamp
  * @param {Object} params - Initializer object
  * @param {Object} params.pageConnection - Page connection object
- * (@link module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/\
+ * (@link module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/
  * browser-window-message)
  * @param {Object} params.extConnection - Extension connection object
  * (@link module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-runtime)

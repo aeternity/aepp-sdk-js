@@ -17,8 +17,10 @@ import {
   NoWalletConnectedError,
   UnsubscribedAccountError,
   UnAuthorizedAccountError,
-  ArgumentError
+  ArgumentError,
+  RpcConnectionError
 } from '../../errors'
+import { Node } from '../../../index'
 
 const NOTIFICATIONS = {
   [METHODS.updateAddress]: (instance) =>
@@ -27,9 +29,11 @@ const NOTIFICATIONS = {
       instance.onAddressChange(params)
     },
   [METHODS.updateNetwork]: (instance) =>
-    (msg) => {
-      instance.rpcClient.info.networkId = msg.params.networkId
-      instance.onNetworkChange(msg.params)
+    async ({ params }) => {
+      const { networkId, node } = params
+      instance.rpcClient.info.networkId = networkId
+      node && instance.addNode(node.name, await Node(node), true)
+      instance.onNetworkChange(params)
     },
   [METHODS.closeConnection]: (instance) =>
     (msg) => {
@@ -123,7 +127,7 @@ export default Ae.compose({
     sign () {
     },
     addresses () {
-      if (!this.rpcClient.currentAccount) throw new UnsubscribedAccountError()
+      if (!this.isSubscribedAccount()) throw new UnsubscribedAccountError()
       return [this.rpcClient.currentAccount, ...Object.keys(this.rpcClient.accounts.connected)]
     },
     /**
@@ -132,9 +136,13 @@ export default Ae.compose({
      * @instance
      * @rtype (connection: Object) => void
      * @param {Object} connection Wallet connection object
-     * @return {void}
+     * @param {Object} [options={}]
+     * @param {Boolean} [options.connectNode=true] - Request wallet to bind node
+     * @param {String}  [options.name=wallet-node] - Node name
+     * @param {Boolean} [options.select=false] - Select this node as current
+     * @return {Object}
      */
-    async connectToWallet (connection) {
+    async connectToWallet (connection, { connectNode = false, name = 'wallet-node', select = false } = {}) {
       if (this.rpcClient && this.rpcClient.isConnected()) throw new AlreadyConnectedError('You are already connected to wallet ' + this.rpcClient)
       this.rpcClient = RpcClient({
         connection,
@@ -143,7 +151,12 @@ export default Ae.compose({
         id: uuid(),
         handlers: [handleMessage(this), this.onDisconnect]
       })
-      return this.sendConnectRequest()
+      const walletInfo = await this.sendConnectRequest(connectNode)
+      if (connectNode && !Object.prototype.hasOwnProperty.call(walletInfo, 'node')) {
+        throw new RpcConnectionError('Missing URLs of the Node')
+      }
+      connectNode && this.addNode(name, await Node(walletInfo.node), select)
+      return walletInfo
     },
     /**
      * Disconnect from wallet
@@ -154,13 +167,13 @@ export default Ae.compose({
      * @return {void}
      */
     async disconnectWallet (sendDisconnect = true) {
-      if (!this.rpcClient || !this.rpcClient.isConnected()) throw new NoWalletConnectedError('You are not connected to Wallet')
+      if (!this.isConnected()) throw new NoWalletConnectedError('You are not connected to Wallet')
       sendDisconnect && this.rpcClient.sendMessage(message(METHODS.closeConnection, { reason: 'bye' }), true)
       this.rpcClient.disconnect()
       this.rpcClient = null
     },
     async address ({ onAccount } = {}) {
-      if (!this.rpcClient || !this.rpcClient.isConnected()) throw new NoWalletConnectedError('You are not connected to Wallet')
+      if (!this.isConnected()) throw new NoWalletConnectedError('You are not connected to Wallet')
       const current = this.rpcClient.currentAccount
       if (!current) throw new UnsubscribedAccountError()
       if (onAccount && !this.rpcClient.hasAccessToAccount(onAccount)) {
@@ -176,8 +189,8 @@ export default Ae.compose({
      * @return {Promise} Address from wallet
      */
     async askAddresses () {
-      if (!this.rpcClient || !this.rpcClient.isConnected()) throw new NoWalletConnectedError('You are not connected to Wallet')
-      if (!this.rpcClient.currentAccount) throw new UnsubscribedAccountError()
+      if (!this.isConnected()) throw new NoWalletConnectedError('You are not connected to Wallet')
+      if (!this.isSubscribedAccount()) throw new UnsubscribedAccountError()
       return this.rpcClient.request(METHODS.address)
     },
     /**
@@ -190,7 +203,7 @@ export default Ae.compose({
      * @return {Promise} Address from wallet
      */
     async subscribeAddress (type, value) {
-      if (!this.rpcClient || !this.rpcClient.isConnected()) throw new NoWalletConnectedError('You are not connected to Wallet')
+      if (!this.isConnected()) throw new NoWalletConnectedError('You are not connected to Wallet')
       return this.rpcClient.request(METHODS.subscribeAddress, { type, value })
     },
     /**
@@ -202,8 +215,8 @@ export default Ae.compose({
      * @return {Promise<String>} Signed transaction
      */
     async signTransaction (tx, opt = {}) {
-      if (!this.rpcClient || !this.rpcClient.isConnected()) throw new NoWalletConnectedError('You are not connected to Wallet')
-      if (!this.rpcClient.currentAccount) throw new UnsubscribedAccountError()
+      if (!this.isConnected()) throw new NoWalletConnectedError('You are not connected to Wallet')
+      if (!this.isSubscribedAccount()) throw new UnsubscribedAccountError()
       if (opt.onAccount && !this.rpcClient.hasAccessToAccount(opt.onAccount)) {
         throw new UnAuthorizedAccountError(opt.onAccount)
       }
@@ -221,8 +234,8 @@ export default Ae.compose({
      * @return {Promise<String>} Signed transaction
      */
     async signMessage (msg, opt = {}) {
-      if (!this.rpcClient || !this.rpcClient.isConnected()) throw new NoWalletConnectedError('You are not connected to Wallet')
-      if (!this.rpcClient.currentAccount) throw new UnsubscribedAccountError()
+      if (!this.isConnected()) throw new NoWalletConnectedError('You are not connected to Wallet')
+      if (!this.isSubscribedAccount()) throw new UnsubscribedAccountError()
       if (opt.onAccount && !this.rpcClient.hasAccessToAccount(opt.onAccount)) {
         throw new UnAuthorizedAccountError(opt.onAccount)
       }
@@ -232,15 +245,17 @@ export default Ae.compose({
      * Send connection request to wallet
      * @function sendConnectRequest
      * @instance
+     * @param {Boolean} connectNode - Request wallet to bind node
      * @rtype () => Promise
      * @return {Promise} Connection response
      */
-    async sendConnectRequest () {
+    async sendConnectRequest (connectNode) {
       return this.rpcClient.request(
         METHODS.connect, {
           name: this.name,
           version: VERSION,
-          networkId: this.getNetworkId({ force: true })
+          networkId: this.getNetworkId({ force: true }),
+          connectNode
         }
       )
     },
@@ -258,8 +273,8 @@ export default Ae.compose({
      * @return {Promise<Object>} Transaction broadcast result
      */
     async send (tx, options = {}) {
-      if (!this.rpcClient || !this.rpcClient.isConnected()) throw new NoWalletConnectedError('You are not connected to Wallet')
-      if (!this.rpcClient.currentAccount) throw new UnsubscribedAccountError()
+      if (!this.isConnected()) throw new NoWalletConnectedError('You are not connected to Wallet')
+      if (!this.isSubscribedAccount()) throw new UnsubscribedAccountError()
       if (options.onAccount && !this.rpcClient.hasAccessToAccount(options.onAccount)) {
         throw new UnAuthorizedAccountError(options.onAccount)
       }
@@ -272,6 +287,8 @@ export default Ae.compose({
         METHODS.sign,
         { onAccount: opt.onAccount, tx, returnSigned: false, networkId: this.getNetworkId() }
       )
-    }
+    },
+    isConnected () { return (this.rpcClient && this.rpcClient.isConnected()) },
+    isSubscribedAccount () { return typeof this.rpcClient.currentAccount !== 'undefined' }
   }
 })

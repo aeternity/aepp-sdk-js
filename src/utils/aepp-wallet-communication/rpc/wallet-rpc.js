@@ -38,26 +38,36 @@ const RESPONSES = {}
 const REQUESTS = {
   // Store client info and prepare two fn for each client `connect` and `denyConnection`
   // which automatically prepare and send response for that client
-  [METHODS.connect] (callInstance, instance, client, { name, networkId, version, icons }) {
+  [METHODS.connect] (
+    callInstance,
+    instance,
+    client,
+    { name, networkId, version, icons, connectNode }) {
     // Check if protocol and network is compatible with wallet
     if (version !== VERSION) return { error: ERRORS.unsupportedProtocol() }
-
     // Store new AEPP and wait for connection approve
     client.updateInfo({
       status: RPC_STATUS.WAITING_FOR_CONNECTION_APPROVE,
       name,
       networkId,
       icons,
-      version
+      version,
+      origin: window.location.origin,
+      connectNode
     })
 
     // Call onConnection callBack to notice Wallet about new AEPP
     return callInstance(
       'onConnection',
       { name, networkId, version },
-      () => {
-        client.updateInfo({ status: RPC_STATUS.CONNECTED })
-        return { result: instance.getWalletInfo() }
+      ({ shareNode } = {}) => {
+        client.updateInfo({ status: shareNode ? RPC_STATUS.NODE_BINDED : RPC_STATUS.CONNECTED })
+        return {
+          result: {
+            ...instance.getWalletInfo(),
+            ...(shareNode && { node: instance.selectedNode })
+          }
+        }
       },
       (error) => {
         client.updateInfo({ status: RPC_STATUS.CONNECTION_REJECTED })
@@ -233,7 +243,7 @@ const handleMessage = (instance, id) => async (msg, origin) => {
  * @param {Function} onSign Call-back function for incoming AEPP sign request
  * @param {Function} onAskAccounts Call-back function for incoming AEPP get address request
  * @param {Function} onMessageSign Call-back function for incoming AEPP sign message request
- * Second argument of incoming call-backs contain function for accept/deny request
+   * Second argument of incoming call-backs contain function for accept/deny request
  * @param {Function} onDisconnect Call-back function for disconnect event
  * @return {Object}
  */
@@ -295,9 +305,13 @@ export default Ae.compose(AccountMultiple, {
       // Send notification 'update.network' to all Aepp which connected
       Object.values(this.rpcClients)
         .filter(client => client.isConnected())
-        .forEach(client => client.sendMessage(
-          message(METHODS.updateNetwork, { networkId: this.getNetworkId() }), true
-        ))
+        .forEach(client => {
+          client.sendMessage(
+            message(METHODS.updateNetwork, {
+              networkId: this.getNetworkId(),
+              ...(client.info.status === RPC_STATUS.NODE_BINDED && { node: this.selectedNode })
+            }), true)
+        })
     }
   },
   methods: {

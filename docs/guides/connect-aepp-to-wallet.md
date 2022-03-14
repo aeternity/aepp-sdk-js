@@ -78,3 +78,13 @@ async connectToWallet (wallet) {
   this.nodeInfoResponse = await this.client.getNodeInfo()
 }
 ```
+
+## 4. Use Wallet's Node for chain communication
+
+AEPP can request the wallet to share its connected node URLs if any to interact with the chain.
+
+```js
+async connectToWallet (wallet) {
+    await this.client.connectToWallet(await wallet.getConnection(), { connectNode: true, name: 'wallet-node', select: true })
+}
+```
