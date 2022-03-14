@@ -216,7 +216,7 @@ describe('Channel', function () {
 
   it('can post update and reject', async () => {
     responderShouldRejectUpdate = true
-    const sign = sinon.spy(aeSdkInitiatior.signTransaction.bind(initiator))
+    const sign = sinon.spy(aeSdkInitiatior.signTransaction.bind(aeSdkInitiatior))
     const amount = 1
     const roundBefore = initiatorCh.round()
     const result = await initiatorCh.update(
@@ -413,7 +413,7 @@ describe('Channel', function () {
   })
 
   it('can request a withdraw and accept', async () => {
-    const sign = sinon.spy(aeSdkInitiatior.signTransaction.bind(initiator))
+    const sign = sinon.spy(aeSdkInitiatior.signTransaction.bind(aeSdkInitiatior))
     const amount = BigNumber('2e18')
     const onOnChainTx = sinon.spy()
     const onOwnWithdrawLocked = sinon.spy()
@@ -768,7 +768,8 @@ describe('Channel', function () {
       responderAmountFinal: balances[responderAddr]
     })
     const settleTxFee = unpackTx(settleTx).tx.fee
-    await aeSdkInitiatior.sendTransaction(await aeSdkInitiatior.signTransaction(settleTx), { waitMined: true })
+    await aeSdkInitiatior.sendTransaction(
+      await aeSdkInitiatior.signTransaction(settleTx), { waitMined: true })
     const initiatorBalanceAfterClose = await aeSdkInitiatior.balance(initiatorAddr)
     const responderBalanceAfterClose = await aeSdkResponder.balance(responderAddr)
     new BigNumber(initiatorBalanceAfterClose)
@@ -835,7 +836,8 @@ describe('Channel', function () {
       payload: recentUpdate.signedTx
     })
     const slashTxFee = unpackTx(slashTx).tx.fee
-    await aeSdkResponder.sendTransaction(await aeSdkResponder.signTransaction(slashTx), { waitMined: true })
+    await aeSdkResponder.sendTransaction(
+      await aeSdkResponder.signTransaction(slashTx), { waitMined: true })
     const settleTx = await aeSdkResponder.channelSettleTx({
       channelId: responderCh.id(),
       fromId: responderAddr,
@@ -843,7 +845,8 @@ describe('Channel', function () {
       responderAmountFinal: recentBalances[responderAddr]
     })
     const settleTxFee = unpackTx(settleTx).tx.fee
-    await aeSdkResponder.sendTransaction(await aeSdkResponder.signTransaction(settleTx), { waitMined: true })
+    await aeSdkResponder.sendTransaction(
+      await aeSdkResponder.signTransaction(settleTx), { waitMined: true })
     const initiatorBalanceAfterClose = await aeSdkInitiatior.balance(initiatorAddr)
     const responderBalanceAfterClose = await aeSdkResponder.balance(responderAddr)
     new BigNumber(initiatorBalanceAfterClose)

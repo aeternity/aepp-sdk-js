@@ -36,7 +36,7 @@ describe('Node Chain', function () {
 
   it('combines height queries', async () => {
     spy(http, 'request')
-    const heights = await Promise.all(new Array(5).fill().map(() => sdk.height()))
+    const heights = await Promise.all(new Array(5).fill().map(() => aeSdk.height()))
     expect(heights).to.eql(heights.map(() => heights[0]))
     assert(http.request.calledOnce)
     http.request.restore()
@@ -132,7 +132,9 @@ describe('Node Chain', function () {
     const receiver = await aeSdk.address()
     spy(http, 'request')
     const spends = await Promise.all(accounts.map(onAccount =>
-      aeSdkWithoutAccount.spend(1e15, receiver, { nonce: 1, verify: false, onAccount, waitMined: false })))
+      aeSdkWithoutAccount.spend(1e15, receiver, {
+        nonce: 1, verify: false, onAccount, waitMined: false
+      })))
     transactions.push(...spends.map(({ hash }) => hash))
     const accountGetCount = accounts.length
     const txPostCount = accounts.length

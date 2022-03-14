@@ -121,8 +121,9 @@ describe('Contract', function () {
   let deployed
 
   before(async function () {
-    aeSdk = await getSdk({ withoutAccount: true })
-    aeSdk.removeAccount(aeSdk.addresses()[1]) // TODO: option of getSdk to have accounts without genesis
+    aeSdk = await getSdk()
+    // TODO: option of getSdk to have accounts without genesis
+    aeSdk.removeAccount(aeSdk.addresses()[1])
     await aeSdk.addAccount(MemoryAccount({ keypair: Crypto.generateKeyPair() }))
     await aeSdk.spend(1e18, aeSdk.addresses()[1])
   })
