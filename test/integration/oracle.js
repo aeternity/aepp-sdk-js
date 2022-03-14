@@ -24,21 +24,21 @@ import { QUERY_FEE } from '../../src/tx/builder/schema'
 import { decode } from '../../src/tx/builder/helpers'
 
 describe('Oracle', function () {
-  let sdk
+  let aeSdk
   let oracle
   let query
   const queryResponse = "{'tmp': 30}"
   const account = generateKeyPair()
 
   before(async function () {
-    sdk = await getSdk()
-    await sdk.spend(1e20, account.publicKey)
-    sdk.addAccount(MemoryAccount({ keypair: account }), { select: true })
+    aeSdk = await getSdk()
+    await aeSdk.spend(1e20, account.publicKey)
+    aeSdk.addAccount(MemoryAccount({ keypair: account }), { select: true })
   })
 
   it('Register Oracle with 5000 TTL', async () => {
-    const expectedOracleId = `ok_${(await sdk.address()).slice(3)}`
-    oracle = await sdk.registerOracle(
+    const expectedOracleId = `ok_${(await aeSdk.address()).slice(3)}`
+    oracle = await aeSdk.registerOracle(
       "{'city': str}", "{'tmp': num}", { oracleTtl: { type: 'delta', value: 5000 } }
     )
     oracle.id.should.be.equal(expectedOracleId)
@@ -91,9 +91,9 @@ describe('Oracle', function () {
     const account = generateKeyPair()
 
     before(async function () {
-      await sdk.spend(1e15, account.publicKey)
-      sdk.addAccount(MemoryAccount({ keypair: account }), { select: true })
-      oracleWithFee = await sdk.registerOracle("{'city': str}", "{'tmp': num}", { queryFee, onAccount: account })
+      await aeSdk.spend(1e15, account.publicKey)
+      aeSdk.addAccount(MemoryAccount({ keypair: account }), { select: true })
+      oracleWithFee = await aeSdk.registerOracle("{'city': str}", "{'tmp': num}", { queryFee, onAccount: account })
     })
 
     it('Post Oracle Query with default query fee', async () => {

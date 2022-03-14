@@ -137,27 +137,27 @@ const filesystem = {
 const notExistingContractAddress = 'ct_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT'
 
 describe('Contract instance', function () {
-  let sdk
+  let aeSdk
   let testContract
   let testContractAddress
   let testContractAci
   let testContractBytecode
 
   before(async function () {
-    sdk = await getSdk()
-    testContractAci = await sdk.compilerApi
+    aeSdk = await getSdk()
+    testContractAci = await aeSdk.compilerApi
       .generateACI({ code: testContractSource, options: { filesystem } })
-    testContractBytecode = (await sdk.compilerApi.compileContract({
+    testContractBytecode = (await aeSdk.compilerApi.compileContract({
       code: testContractSource, options: { filesystem }
     })).bytecode
   })
 
   it('generates by source code', async () => {
-    sdk.Ae.defaults.testProperty = 'test'
-    testContract = await sdk.getContractInstance({
+    aeSdk.Ae.defaults.testProperty = 'test'
+    testContract = await aeSdk.getContractInstance({
       source: testContractSource, filesystem, ttl: 0, gas: 15000
     })
-    delete sdk.Ae.defaults.testProperty
+    delete aeSdk.Ae.defaults.testProperty
     expect(testContract.options.testProperty).to.be.equal('test')
     testContract.should.have.property('source')
     testContract.should.have.property('bytecode')
@@ -196,66 +196,66 @@ describe('Contract instance', function () {
   })
 
   it('generates by aci', () =>
-    sdk.getContractInstance({ aci: testContractAci, contractAddress: testContractAddress }))
+    aeSdk.getContractInstance({ aci: testContractAci, contractAddress: testContractAddress }))
 
   it('fails on trying to generate with not existing contract address', () =>
-    expect(sdk.getContractInstance(
+    expect(aeSdk.getContractInstance(
       { aci: identityContractSource, contractAddress: notExistingContractAddress }
     )).to.be.rejectedWith(`v3/contracts/${notExistingContractAddress} error: Contract not found`))
 
   it('fails on trying to generate with invalid address', () =>
-    expect(sdk.getContractInstance(
+    expect(aeSdk.getContractInstance(
       { aci: identityContractSource, contractAddress: 'ct_asdasdasd' }
     )).to.be.rejectedWith(InvalidAensNameError, 'Invalid name or address: ct_asdasdasd'))
 
   it('fails on trying to generate by aci without address', () =>
-    expect(sdk.getContractInstance({ aci: testContractAci }))
+    expect(aeSdk.getContractInstance({ aci: testContractAci }))
       .to.be.rejectedWith(MissingContractAddressError, 'Can\'t create instance by ACI without address'))
 
   it('generates by bytecode and aci', () =>
-    sdk.getContractInstance({ bytecode: testContractBytecode, aci: testContractAci }))
+    aeSdk.getContractInstance({ bytecode: testContractBytecode, aci: testContractAci }))
 
   it('fails on generation without arguments', () =>
-    expect(sdk.getContractInstance()).to.be.rejectedWith(MissingContractDefError, 'Either ACI or source code is required'))
+    expect(aeSdk.getContractInstance()).to.be.rejectedWith(MissingContractDefError, 'Either ACI or source code is required'))
 
   it('calls by aci', async () => {
-    const contract = await sdk.getContractInstance(
+    const contract = await aeSdk.getContractInstance(
       { aci: testContractAci, contractAddress: testContract.deployInfo.address }
     )
     expect((await contract.methods.intFn(3)).decodedResult).to.be.equal(3n)
   })
 
   it('deploys and calls by bytecode and aci', async () => {
-    const contract = await sdk.getContractInstance(
+    const contract = await aeSdk.getContractInstance(
       { bytecode: testContractBytecode, aci: testContractAci }
     )
     await contract.deploy(['test', 1])
     expect((await contract.methods.intFn(3)).decodedResult).to.be.equal(3n)
   })
 
-  it('accepts matching source code with enabled validation', () => sdk.getContractInstance({
+  it('accepts matching source code with enabled validation', () => aeSdk.getContractInstance({
     source: testContractSource,
     filesystem,
     contractAddress: testContractAddress,
     validateBytecode: true
   }))
 
-  it('rejects not matching source code with enabled validation', () => expect(sdk.getContractInstance({
+  it('rejects not matching source code with enabled validation', () => expect(aeSdk.getContractInstance({
     source: identityContractSource,
     contractAddress: testContractAddress,
     validateBytecode: true
   })).to.be.rejectedWith(BytecodeMismatchError, 'Contract source do not correspond to the bytecode deployed on the chain'))
 
-  it('accepts matching bytecode with enabled validation', () => sdk.getContractInstance({
+  it('accepts matching bytecode with enabled validation', () => aeSdk.getContractInstance({
     bytecode: testContractBytecode,
     aci: testContractAci,
     contractAddress: testContractAddress,
     validateBytecode: true
   }))
 
-  it('rejects not matching bytecode with enabled validation', async () => expect(sdk.getContractInstance({
-    bytecode: (await sdk.compilerApi.compileContract({ code: identityContractSource })).bytecode,
-    aci: await sdk.compilerApi
+  it('rejects not matching bytecode with enabled validation', async () => expect(aeSdk.getContractInstance({
+    bytecode: (await aeSdk.compilerApi.compileContract({ code: identityContractSource })).bytecode,
+    aci: await aeSdk.compilerApi
       .generateACI({ code: identityContractSource, options: { filesystem } }),
     contractAddress: testContractAddress,
     validateBytecode: true
@@ -269,7 +269,7 @@ describe('Contract instance', function () {
   })
 
   it('dry-runs init function on specific account', async () => {
-    const [, onAccount] = sdk.addresses()
+    const [, onAccount] = aeSdk.addresses()
     const { result } = await testContract.methods.init.get('test', 1, 'hahahaha', { onAccount })
     result.callerId.should.be.equal(onAccount)
   })
@@ -277,12 +277,12 @@ describe('Contract instance', function () {
   it('deploys and calls contract without waiting for mining', async () => {
     testContract.deployInfo = {}
     const deployed = await testContract.methods.init('test', 1, 'hahahaha', { waitMined: false })
-    await sdk.poll(deployed.transaction)
+    await aeSdk.poll(deployed.transaction)
     expect(deployed.result).to.be.equal(undefined)
     const result = await testContract.methods.intFn.send(2, { waitMined: false })
     expect(result.result).to.be.equal(undefined)
     expect(result.txData).to.not.be.equal(undefined)
-    await sdk.poll(result.hash)
+    await aeSdk.poll(result.hash)
   })
 
   it('fails on paying to not payable function', async () => {
@@ -292,14 +292,14 @@ describe('Contract instance', function () {
   })
 
   it('pays to payable function', async () => {
-    const contractBalance = await sdk.balance(testContract.deployInfo.address)
+    const contractBalance = await aeSdk.balance(testContract.deployInfo.address)
     await testContract.methods.stringFn.send('test', { amount: 100 })
-    const balanceAfter = await sdk.balance(testContract.deployInfo.address)
+    const balanceAfter = await aeSdk.balance(testContract.deployInfo.address)
     balanceAfter.should.be.equal(`${+contractBalance + 100}`)
   })
 
   it('calls on specific account', async () => {
-    const [, onAccount] = sdk.addresses()
+    const [, onAccount] = aeSdk.addresses()
     const { result } = await testContract.methods.intFn(123, { onAccount })
     result.callerId.should.be.equal(onAccount)
   })
@@ -308,7 +308,7 @@ describe('Contract instance', function () {
     let contract
 
     before(async () => {
-      contract = await sdk.getContractInstance({ source: testContractSource, filesystem })
+      contract = await aeSdk.getContractInstance({ source: testContractSource, filesystem })
     })
 
     it('estimates gas by default for contract deployments', async () => {
@@ -318,7 +318,7 @@ describe('Contract instance', function () {
     })
 
     it('overrides gas through getContractInstance options for contract deployments', async () => {
-      const ct = await sdk.getContractInstance({
+      const ct = await aeSdk.getContractInstance({
         source: testContractSource, filesystem, gas: 300
       })
       const { tx: { gas }, gasUsed } = (await ct.deploy(['test', 42])).txData
@@ -353,7 +353,7 @@ describe('Contract instance', function () {
     let eventResult
 
     before(async () => {
-      remoteContract = await sdk.getContractInstance({ source: remoteContractSource })
+      remoteContract = await aeSdk.getContractInstance({ source: remoteContractSource })
       await remoteContract.deploy()
       eventResult = await testContract.methods.emitEvents(remoteContract.deployInfo.address, false)
     })
@@ -452,7 +452,7 @@ describe('Contract instance', function () {
     })
 
     it('calls a contract that emits events with no defined events', async () => {
-      const contract = await sdk.getContractInstance({
+      const contract = await aeSdk.getContractInstance({
         source:
           'contract FooContract =\n' +
           '  entrypoint emitEvents(f: bool) = ()',
@@ -529,8 +529,8 @@ describe('Contract instance', function () {
       })
 
       it('Return address', async () => {
-        const { decodedResult } = await testContract.methods.accountAddress(await sdk.address())
-        decodedResult.should.be.equal(await sdk.address())
+        const { decodedResult } = await testContract.methods.accountAddress(await aeSdk.address())
+        decodedResult.should.be.equal(await aeSdk.address())
       })
 
       it('Valid', async () => {
@@ -712,14 +712,14 @@ describe('Contract instance', function () {
       })
 
       it('Invalid length', async () => {
-        const address = await sdk.address()
+        const address = await aeSdk.address()
         const decoded = Buffer.from(decode(address, 'ak').slice(1))
         await expect(testContract.methods.hashFn(decoded))
           .to.be.rejectedWith('Invalid length: got 31 bytes instead of 32 bytes')
       })
 
       it('Valid', async () => {
-        const address = await sdk.address()
+        const address = await aeSdk.address()
         const decoded = decode(address, 'ak')
         const hashAsBuffer = await testContract.methods.hashFn(decoded)
         const hashAsHex = await testContract.methods.hashFn(decoded.toString('hex'))
@@ -735,16 +735,16 @@ describe('Contract instance', function () {
       })
 
       it('Invalid length', async () => {
-        const address = await sdk.address()
+        const address = await aeSdk.address()
         const decoded = decode(address, 'ak')
         await expect(testContract.methods.signatureFn(decoded))
           .to.be.rejectedWith('Invalid length: got 32 bytes instead of 64 bytes')
       })
 
       it('Valid', async () => {
-        const address = await sdk.address()
+        const address = await aeSdk.address()
         const decoded = decode(address, 'ak')
-        const fakeSignature = Buffer.from(await sdk.sign(decoded))
+        const fakeSignature = Buffer.from(await aeSdk.sign(decoded))
         const hashAsBuffer = await testContract.methods.signatureFn(fakeSignature)
         const hashAsHex = await testContract.methods.signatureFn(fakeSignature.toString('hex'))
         hashAsBuffer.decodedResult.should.be.eql(fakeSignature)
@@ -759,14 +759,14 @@ describe('Contract instance', function () {
       })
 
       it('Invalid length', async () => {
-        const address = await sdk.address()
+        const address = await aeSdk.address()
         const decoded = decode(address, 'ak')
         await expect(testContract.methods.bytesFn(Buffer.from([...decoded, 2])))
           .to.be.rejectedWith('is not of type [{bytes,32}]')
       })
 
       it('Valid', async () => {
-        const address = await sdk.address()
+        const address = await aeSdk.address()
         const decoded = decode(address, 'ak')
         const hashAsBuffer = await testContract.methods.bytesFn(decoded)
         const hashAsHex = await testContract.methods.bytesFn(decoded.toString('hex'))
