@@ -41,12 +41,12 @@ import { IllegalArgumentError, MissingParamError } from '../../utils/errors'
  * @return {Object} GeneralizedAccount instance
  * @example
  * const authContract = ``
- * await client.createGeneralizedAccount(authFnName, authContract, [...authFnArguments]
+ * await aeSdk.createGeneralizedAccount(authFnName, authContract, [...authFnArguments]
  * // Make spend using GA
  * const callData = 'cb_...' // encoded call data for auth contract
- * await client.spend(10000, receiverPub, { authData: { callData } })
+ * await aeSdk.spend(10000, receiverPub, { authData: { callData } })
  * // or
- * await client.spend(10000, receiverPub, {
+ * await aeSdk.spend(10000, receiverPub, {
  *   authData: { source: authContract, args: [...authContractArgs] }
  * }) // sdk will prepare callData itself
  */
