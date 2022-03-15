@@ -346,18 +346,6 @@
             
   
   
-  
-    <li class="md-nav__item">
-      <a href="../batch-requests/" class="md-nav__link">
-        Making a sequence of requests in efficient way
-      </a>
-    </li>
-  
-
-          
-            
-  
-  
     
   
   
@@ -365,14 +353,14 @@
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_8" type="checkbox" id="__nav_3_8" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_7" type="checkbox" id="__nav_3_7" checked>
       
-      <label class="md-nav__link" for="__nav_3_8">
+      <label class="md-nav__link" for="__nav_3_7">
         Wallet interaction
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="Wallet interaction" data-md-level="2">
-        <label class="md-nav__title" for="__nav_3_8">
+        <label class="md-nav__title" for="__nav_3_7">
           <span class="md-nav__icon md-icon"></span>
           Wallet interaction
         </label>
@@ -472,6 +460,30 @@
           
         </ul>
       </nav>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../error-handling/" class="md-nav__link">
+        Error Handling
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../batch-requests/" class="md-nav__link">
+        Batch transactions
+      </a>
     </li>
   
 
@@ -664,6 +676,21 @@
   
   
     <li class="md-nav__item">
+      <a href="../../compatibility/" class="md-nav__link">
+        Compatibility Table
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../CHANGELOG/" class="md-nav__link">
         Changelog
       </a>
@@ -682,14 +709,14 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
       
-      <label class="md-nav__link" for="__nav_8">
+      <label class="md-nav__link" for="__nav_9">
         Migration Guides
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="Migration Guides" data-md-level="1">
-        <label class="md-nav__title" for="__nav_8">
+        <label class="md-nav__title" for="__nav_9">
           <span class="md-nav__icon md-icon"></span>
           Migration Guides
         </label>
@@ -748,14 +775,14 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_10" type="checkbox" id="__nav_10" >
       
-      <label class="md-nav__link" for="__nav_9">
+      <label class="md-nav__link" for="__nav_10">
         Contribute
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="Contribute" data-md-level="1">
-        <label class="md-nav__title" for="__nav_9">
+        <label class="md-nav__title" for="__nav_10">
           <span class="md-nav__icon md-icon"></span>
           Contribute
         </label>
@@ -875,7 +902,7 @@
 <div class="highlight"><pre><span></span><code><span class="k">import</span> <span class="p">{</span> <span class="nx">RpcAepp</span><span class="p">,</span> <span class="nx">WalletDetector</span><span class="p">,</span> <span class="nx">BrowserWindowMessageConnection</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
 
 <span class="k">async</span> <span class="nx">created</span> <span class="p">()</span> <span class="p">{</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">client</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">RpcAepp</span><span class="p">({</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">RpcAepp</span><span class="p">({</span>
     <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;Simple Aepp&#39;</span><span class="p">,</span>
     <span class="nx">nodes</span><span class="o">:</span> <span class="p">[</span>
       <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;ae_uat&#39;</span><span class="p">,</span> <span class="nx">instance</span><span class="o">:</span> <span class="k">await</span> <span class="nx">Node</span><span class="p">({</span> <span class="nx">url</span><span class="o">:</span> <span class="nx">TEST_NET_NODE_URL</span> <span class="p">})</span> <span class="p">},</span>
@@ -883,20 +910,20 @@
     <span class="p">],</span>
     <span class="nx">compilerUrl</span><span class="o">:</span> <span class="nx">COMPILER_URL</span><span class="p">,</span>
     <span class="nx">onNetworkChange</span><span class="o">:</span> <span class="k">async</span> <span class="p">(</span><span class="nx">params</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
-      <span class="k">this</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">selectNode</span><span class="p">(</span><span class="nx">params</span><span class="p">.</span><span class="nx">networkId</span><span class="p">)</span>
-      <span class="k">this</span><span class="p">.</span><span class="nx">nodeInfoResponse</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">getNodeInfo</span><span class="p">()</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">selectNode</span><span class="p">(</span><span class="nx">params</span><span class="p">.</span><span class="nx">networkId</span><span class="p">)</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">nodeInfoResponse</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getNodeInfo</span><span class="p">()</span>
     <span class="p">},</span>
     <span class="nx">onAddressChange</span><span class="o">:</span>  <span class="k">async</span> <span class="p">(</span><span class="nx">addresses</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
-      <span class="k">this</span><span class="p">.</span><span class="nx">pub</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">address</span><span class="p">()</span>
-      <span class="k">this</span><span class="p">.</span><span class="nx">balance</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">balance</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">pub</span><span class="p">).</span><span class="k">catch</span><span class="p">(</span><span class="nx">e</span> <span class="p">=&gt;</span> <span class="s1">&#39;0&#39;</span><span class="p">)</span>
-      <span class="k">this</span><span class="p">.</span><span class="nx">addressResponse</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">address</span><span class="p">()</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">pub</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">address</span><span class="p">()</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">balance</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">balance</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">pub</span><span class="p">).</span><span class="k">catch</span><span class="p">(</span><span class="nx">e</span> <span class="p">=&gt;</span> <span class="s1">&#39;0&#39;</span><span class="p">)</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">addressResponse</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">address</span><span class="p">()</span>
     <span class="p">},</span>
     <span class="nx">onDisconnect</span><span class="o">:</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
       <span class="k">this</span><span class="p">.</span><span class="nx">resetState</span><span class="p">()</span>
       <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;Disconnected&#39;</span><span class="p">)</span>
     <span class="p">}</span>
   <span class="p">})</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">height</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">height</span><span class="p">()</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">height</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">height</span><span class="p">()</span>
   <span class="c1">// start looking for wallets, see step 2.</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">scanForWallets</span><span class="p">()</span>
   <span class="c1">// open iframe with Wallet if run in top window</span>
@@ -923,21 +950,21 @@
 </code></pre></div>
 <h2 id="3-connect-to-wallet">3. Connect to Wallet</h2>
 <div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="nx">connectToWallet</span> <span class="p">(</span><span class="nx">wallet</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">connectToWallet</span><span class="p">(</span><span class="k">await</span> <span class="nx">wallet</span><span class="p">.</span><span class="nx">getConnection</span><span class="p">())</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">accounts</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">subscribeAddress</span><span class="p">(</span><span class="s1">&#39;subscribe&#39;</span><span class="p">,</span> <span class="s1">&#39;connected&#39;</span><span class="p">)</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">pub</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">address</span><span class="p">()</span>
+  <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">connectToWallet</span><span class="p">(</span><span class="k">await</span> <span class="nx">wallet</span><span class="p">.</span><span class="nx">getConnection</span><span class="p">())</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">accounts</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">subscribeAddress</span><span class="p">(</span><span class="s1">&#39;subscribe&#39;</span><span class="p">,</span> <span class="s1">&#39;connected&#39;</span><span class="p">)</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">pub</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">address</span><span class="p">()</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">onAccount</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">pub</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">balance</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">getBalance</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">pub</span><span class="p">)</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">walletName</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">rpcClient</span><span class="p">.</span><span class="nx">info</span><span class="p">.</span><span class="nx">name</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">addressResponse</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">address</span><span class="p">()</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">heightResponse</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">height</span><span class="p">()</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">nodeInfoResponse</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">getNodeInfo</span><span class="p">()</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">balance</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getBalance</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">pub</span><span class="p">)</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">walletName</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">rpcClient</span><span class="p">.</span><span class="nx">info</span><span class="p">.</span><span class="nx">name</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">addressResponse</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">address</span><span class="p">()</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">heightResponse</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">height</span><span class="p">()</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">nodeInfoResponse</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getNodeInfo</span><span class="p">()</span>
 <span class="p">}</span>
 </code></pre></div>
 <h2 id="4-use-wallets-node-for-chain-communication">4. Use Wallet's Node for chain communication</h2>
 <p>AEPP can request the wallet to share its connected node URLs if any to interact with the chain.</p>
 <div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="nx">connectToWallet</span> <span class="p">(</span><span class="nx">wallet</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">client</span><span class="p">.</span><span class="nx">connectToWallet</span><span class="p">(</span><span class="k">await</span> <span class="nx">wallet</span><span class="p">.</span><span class="nx">getConnection</span><span class="p">(),</span> <span class="p">{</span> <span class="nx">connectNode</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;wallet-node&#39;</span><span class="p">,</span> <span class="nx">select</span><span class="o">:</span> <span class="kc">true</span> <span class="p">})</span>
+    <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">connectToWallet</span><span class="p">(</span><span class="k">await</span> <span class="nx">wallet</span><span class="p">.</span><span class="nx">getConnection</span><span class="p">(),</span> <span class="p">{</span> <span class="nx">connectNode</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;wallet-node&#39;</span><span class="p">,</span> <span class="nx">select</span><span class="o">:</span> <span class="kc">true</span> <span class="p">})</span>
 <span class="p">}</span>
 </code></pre></div>
                 
@@ -959,7 +986,7 @@
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
         
-        <a href="../batch-requests/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Making a sequence of requests in efficient way" rel="prev">
+        <a href="../low-vs-high-usage/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Low vs High level API" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
           </div>
@@ -968,7 +995,7 @@
               <span class="md-footer__direction">
                 Previous
               </span>
-              Making a sequence of requests in efficient way
+              Low vs High level API
             </div>
           </div>
         </a>

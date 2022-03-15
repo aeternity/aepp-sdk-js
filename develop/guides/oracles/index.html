@@ -462,30 +462,18 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../batch-requests/" class="md-nav__link">
-        Making a sequence of requests in efficient way
-      </a>
-    </li>
-  
-
-          
-            
-  
-  
-  
     
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_8" type="checkbox" id="__nav_3_8" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_7" type="checkbox" id="__nav_3_7" >
       
-      <label class="md-nav__link" for="__nav_3_8">
+      <label class="md-nav__link" for="__nav_3_7">
         Wallet interaction
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="Wallet interaction" data-md-level="2">
-        <label class="md-nav__title" for="__nav_3_8">
+        <label class="md-nav__title" for="__nav_3_7">
           <span class="md-nav__icon md-icon"></span>
           Wallet interaction
         </label>
@@ -517,6 +505,30 @@
           
         </ul>
       </nav>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../error-handling/" class="md-nav__link">
+        Error Handling
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../batch-requests/" class="md-nav__link">
+        Batch transactions
+      </a>
     </li>
   
 
@@ -709,6 +721,21 @@
   
   
     <li class="md-nav__item">
+      <a href="../../compatibility/" class="md-nav__link">
+        Compatibility Table
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../CHANGELOG/" class="md-nav__link">
         Changelog
       </a>
@@ -727,14 +754,14 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
       
-      <label class="md-nav__link" for="__nav_8">
+      <label class="md-nav__link" for="__nav_9">
         Migration Guides
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="Migration Guides" data-md-level="1">
-        <label class="md-nav__title" for="__nav_8">
+        <label class="md-nav__title" for="__nav_9">
           <span class="md-nav__icon md-icon"></span>
           Migration Guides
         </label>
@@ -793,14 +820,14 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_10" type="checkbox" id="__nav_10" >
       
-      <label class="md-nav__link" for="__nav_9">
+      <label class="md-nav__link" for="__nav_10">
         Contribute
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="Contribute" data-md-level="1">
-        <label class="md-nav__title" for="__nav_9">
+        <label class="md-nav__title" for="__nav_10">
           <span class="md-nav__icon md-icon"></span>
           Contribute
         </label>
@@ -962,8 +989,8 @@
 <h2 id="1-oracle-register">1. Oracle: register</h2>
 <p>You register an oracle that responds with the temperature of the city that is included in the query.</p>
 <p>To register an oracle you need to provide a <code>queryFormat</code> and a <code>responseFormat</code> to the <code>registerOracle</code> function of the SDK. In addition to the common transaction options you can provide the oracle specific options <code>queryFee</code> and <code>oracleTtl</code>, see <a href="../../transaction-options/#oracleregistertx">transaction options</a>.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// init the SDK using the Universal Stamp</span>
-<span class="kd">const</span> <span class="nx">client</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span> <span class="p">...</span> <span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="c1">// init an instance of the SDK using the Universal Stamp</span>
+<span class="kd">const</span> <span class="nx">aeSdk</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span> <span class="p">...</span> <span class="p">})</span>
 
 <span class="c1">// set TTL with a delta of 1000 blocks</span>
 <span class="kd">const</span> <span class="nx">oracleTtl</span> <span class="o">=</span> <span class="p">{</span><span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;delta&#39;</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="mf">1000</span><span class="p">}</span>
@@ -975,7 +1002,7 @@
 <span class="kd">const</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span><span class="nx">queryFee</span><span class="o">:</span> <span class="mf">1337</span><span class="p">,</span> <span class="nx">oracleTtl</span> <span class="p">}</span>
 
 <span class="c1">// the first argument is the queryFormat and the second is the responseFormat</span>
-<span class="kd">const</span> <span class="nx">oracle</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">registerOracle</span><span class="p">(</span><span class="s2">&quot;{&#39;city&#39;: string}&quot;</span><span class="p">,</span> <span class="s2">&quot;{&#39;temperature&#39;: int}&quot;</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">oracle</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">registerOracle</span><span class="p">(</span><span class="s2">&quot;{&#39;city&#39;: string}&quot;</span><span class="p">,</span> <span class="s2">&quot;{&#39;temperature&#39;: int}&quot;</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
 </code></pre></div>
 <p>Note:</p>
 <ul>
@@ -996,11 +1023,11 @@
 <span class="kd">const</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span><span class="nx">queryFee</span><span class="o">:</span> <span class="mf">1337</span><span class="p">,</span> <span class="nx">queryTtl</span><span class="o">:</span> <span class="p">{</span><span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;delta&#39;</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="mf">20</span><span class="p">},</span> <span class="nx">responseTtl</span><span class="o">:</span> <span class="p">{</span><span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;delta&#39;</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="mf">50</span><span class="p">}}</span>
 
 <span class="c1">// using the oracle object</span>
-<span class="kd">const</span> <span class="nx">oracle</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getOracleObject</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">)</span> <span class="c1">// in case you need to instantiate the oracle object first</span>
+<span class="kd">const</span> <span class="nx">oracle</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getOracleObject</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">)</span> <span class="c1">// in case you need to instantiate the oracle object first</span>
 <span class="kd">const</span> <span class="nx">query</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">oracle</span><span class="p">.</span><span class="nx">postQuery</span><span class="p">(</span><span class="s2">&quot;{&#39;city&#39;: &#39;Berlin&#39;}&quot;</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="c1">// using the oracle instance</span>
 
-<span class="c1">// OR using the client (instance of Universal stamp) by providing the oracleId</span>
-<span class="kd">const</span> <span class="nx">query</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">postQueryToOracle</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span> <span class="s2">&quot;{&#39;city&#39;: &#39;Berlin&#39;}&quot;</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
+<span class="c1">// OR using the aeSdk (instance of Universal stamp) directly by providing the oracleId</span>
+<span class="kd">const</span> <span class="nx">query</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">postQueryToOracle</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span> <span class="s2">&quot;{&#39;city&#39;: &#39;Berlin&#39;}&quot;</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
 </code></pre></div>
 <p>Note:</p>
 <ul>
@@ -1012,11 +1039,11 @@
 <span class="kd">const</span> <span class="nx">queryId</span> <span class="o">=</span> <span class="s1">&#39;oq_...&#39;</span><span class="p">;</span>
 
 <span class="c1">// using the query instance</span>
-<span class="kd">const</span> <span class="nx">query</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getQueryObject</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span> <span class="nx">queryId</span><span class="p">)</span> <span class="c1">// in case you need to get the query instance first</span>
+<span class="kd">const</span> <span class="nx">query</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getQueryObject</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span> <span class="nx">queryId</span><span class="p">)</span> <span class="c1">// in case you need to get the query instance first</span>
 <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">query</span><span class="p">.</span><span class="nx">pollForResponse</span><span class="p">({</span> <span class="nx">attempts</span><span class="o">:</span> <span class="mf">10</span><span class="p">,</span> <span class="nx">interval</span><span class="o">:</span> <span class="mf">6000</span> <span class="p">})</span>
 
-<span class="c1">// OR using the client (instance of Universal stamp) by providing the oracleId</span>
-<span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">pollForQueryResponse</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span> <span class="nx">queryId</span><span class="p">,</span> <span class="p">{</span> <span class="nx">attempts</span><span class="o">:</span> <span class="mf">10</span><span class="p">,</span> <span class="nx">interval</span><span class="o">:</span> <span class="mf">6000</span> <span class="p">})</span>
+<span class="c1">// OR using the aeSdk (instance of Universal stamp) directly by providing the oracleId</span>
+<span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">pollForQueryResponse</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span> <span class="nx">queryId</span><span class="p">,</span> <span class="p">{</span> <span class="nx">attempts</span><span class="o">:</span> <span class="mf">10</span><span class="p">,</span> <span class="nx">interval</span><span class="o">:</span> <span class="mf">6000</span> <span class="p">})</span>
 
 <span class="c1">// decode the oracle response</span>
 <span class="c1">// the decode function returns a buffer that needs to be converted to a string</span>
@@ -1044,11 +1071,11 @@ has not been expired.</p>
 <span class="kd">const</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">onAccount</span><span class="o">:</span> <span class="s1">&#39;ak_...&#39;</span> <span class="p">}</span> <span class="c1">// only the account of the oracle can respond to the query</span>
 
 <span class="c1">// using the query instance</span>
-<span class="kd">const</span> <span class="nx">query</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getQueryObject</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span> <span class="nx">queryId</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">query</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getQueryObject</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span> <span class="nx">queryId</span><span class="p">)</span>
 <span class="k">await</span> <span class="nx">query</span><span class="p">.</span><span class="nx">respond</span><span class="p">(</span><span class="s1">&#39;{ &quot;temperature&quot;: 27.5 }&#39;</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
 
-<span class="c1">// OR using the client (instance of Universal stamp) by providing the oracleId and the queryId</span>
-<span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">respondToQuery</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span> <span class="nx">queryId</span><span class="p">,</span> <span class="s1">&#39;{ &quot;temperature&quot;: 27.5 }&#39;</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
+<span class="c1">// OR using the aeSdk (instance of Universal stamp) directly by providing the oracleId and the queryId</span>
+<span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">respondToQuery</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span> <span class="nx">queryId</span><span class="p">,</span> <span class="s1">&#39;{ &quot;temperature&quot;: 27.5 }&#39;</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
 </code></pre></div>
 <p>Note:</p>
 <ul>
@@ -1063,11 +1090,11 @@ has not been expired.</p>
 <span class="kd">const</span> <span class="nx">oracleTtl</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;delta&#39;</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="mf">500</span> <span class="p">}</span>
 
 <span class="c1">// using the oracle instance</span>
-<span class="kd">const</span> <span class="nx">oracle</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getOracleObject</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">oracle</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getOracleObject</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">)</span>
 <span class="kd">const</span> <span class="nx">extendedOracle</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">oracle</span><span class="p">.</span><span class="nx">extendOracle</span><span class="p">(</span><span class="nx">oracleTtl</span><span class="p">)</span>
 
-<span class="c1">// OR using the client (instance of Universal stamp) by providing the oracleId</span>
-<span class="kd">const</span> <span class="nx">extendedOracle</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">extendOracleTtl</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span> <span class="nx">oracleTtl</span><span class="p">)</span>
+<span class="c1">// OR using the aeSdk (instance of Universal stamp) directly by providing the oracleId</span>
+<span class="kd">const</span> <span class="nx">extendedOracle</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">extendOracleTtl</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span> <span class="nx">oracleTtl</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="example-applications">Example applications</h2>
 <ul>

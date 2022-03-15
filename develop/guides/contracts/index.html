@@ -335,8 +335,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-initialize-the-sdk-providing-an-account" class="md-nav__link">
-    2. Initialize the SDK providing an account
+  <a href="#2-create-an-instance-of-the-sdk" class="md-nav__link">
+    2. Create an instance of the SDK
   </a>
   
 </li>
@@ -497,30 +497,18 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../batch-requests/" class="md-nav__link">
-        Making a sequence of requests in efficient way
-      </a>
-    </li>
-  
-
-          
-            
-  
-  
-  
     
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_8" type="checkbox" id="__nav_3_8" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_7" type="checkbox" id="__nav_3_7" >
       
-      <label class="md-nav__link" for="__nav_3_8">
+      <label class="md-nav__link" for="__nav_3_7">
         Wallet interaction
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="Wallet interaction" data-md-level="2">
-        <label class="md-nav__title" for="__nav_3_8">
+        <label class="md-nav__title" for="__nav_3_7">
           <span class="md-nav__icon md-icon"></span>
           Wallet interaction
         </label>
@@ -552,6 +540,30 @@
           
         </ul>
       </nav>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../error-handling/" class="md-nav__link">
+        Error Handling
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../batch-requests/" class="md-nav__link">
+        Batch transactions
+      </a>
     </li>
   
 
@@ -744,6 +756,21 @@
   
   
     <li class="md-nav__item">
+      <a href="../../compatibility/" class="md-nav__link">
+        Compatibility Table
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../CHANGELOG/" class="md-nav__link">
         Changelog
       </a>
@@ -762,14 +789,14 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
       
-      <label class="md-nav__link" for="__nav_8">
+      <label class="md-nav__link" for="__nav_9">
         Migration Guides
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="Migration Guides" data-md-level="1">
-        <label class="md-nav__title" for="__nav_8">
+        <label class="md-nav__title" for="__nav_9">
           <span class="md-nav__icon md-icon"></span>
           Migration Guides
         </label>
@@ -828,14 +855,14 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_10" type="checkbox" id="__nav_10" >
       
-      <label class="md-nav__link" for="__nav_9">
+      <label class="md-nav__link" for="__nav_10">
         Contribute
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="Contribute" data-md-level="1">
-        <label class="md-nav__title" for="__nav_9">
+        <label class="md-nav__title" for="__nav_10">
           <span class="md-nav__icon md-icon"></span>
           Contribute
         </label>
@@ -911,8 +938,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-initialize-the-sdk-providing-an-account" class="md-nav__link">
-    2. Initialize the SDK providing an account
+  <a href="#2-create-an-instance-of-the-sdk" class="md-nav__link">
+    2. Create an instance of the SDK
   </a>
   
 </li>
@@ -1045,8 +1072,8 @@
 <span class="c1">// ES import</span>
 <span class="k">import</span> <span class="p">{</span> <span class="nx">Universal</span><span class="p">,</span> <span class="nx">MemoryAccount</span><span class="p">,</span> <span class="nx">Node</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
 </code></pre></div>
-<h2 id="2-initialize-the-sdk-providing-an-account">2. Initialize the SDK providing an account</h2>
-<p>When initializing the SDK you need to provide an account which will be used to sign transactions like <code>ContractCreateTx</code> and <code>ContractCallTx</code> that will be broadcasted to the network.</p>
+<h2 id="2-create-an-instance-of-the-sdk">2. Create an instance of the SDK</h2>
+<p>When creating an instance of the SDK you need to provide an account which will be used to sign transactions like <code>ContractCreateTx</code> and <code>ContractCallTx</code> that will be broadcasted to the network.</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">node</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Node</span><span class="p">({</span>
   <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span> <span class="c1">// ideally host your own node</span>
 <span class="p">})</span>
@@ -1055,7 +1082,7 @@
   <span class="nx">keypair</span><span class="o">:</span> <span class="p">{</span> <span class="nx">secretKey</span><span class="o">:</span> <span class="nx">SECRET_KEY</span><span class="p">,</span> <span class="nx">publicKey</span><span class="o">:</span> <span class="nx">PUBLIC_KEY</span> <span class="p">}</span>
 <span class="p">})</span>
 
-<span class="kd">const</span> <span class="nx">client</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span>
+<span class="kd">const</span> <span class="nx">aeSdk</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span>
   <span class="nx">nodes</span><span class="o">:</span> <span class="p">[</span>
     <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;testnet&#39;</span><span class="p">,</span> <span class="nx">instance</span><span class="o">:</span> <span class="nx">node</span> <span class="p">}</span>
   <span class="p">],</span>
@@ -1074,26 +1101,26 @@
 <h2 id="3-initialize-the-contract-instance">3. Initialize the contract instance</h2>
 <h3 id="by-sourcecode">By sourcecode</h3>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">CONTRACT_SOURCE</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// source code of the contract</span>
-<span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span> <span class="nx">source</span><span class="o">:</span> <span class="nx">CONTRACT_SOURCE</span> <span class="p">})</span>
+<span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span> <span class="nx">source</span><span class="o">:</span> <span class="nx">CONTRACT_SOURCE</span> <span class="p">})</span>
 </code></pre></div>
 <p>Note:</p>
 <ul>
 <li>If your contract includes external dependencies which are not part of the <a href="https://aeternity.com/aesophia/latest/sophia_stdlib">standard library</a> you should initialize the contract using:
   <div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">filesystem</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// key-value map with name of the include as key and source code of the include as value</span>
-<span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span> <span class="nx">source</span><span class="o">:</span> <span class="nx">CONTRACT_SOURCE</span><span class="p">,</span> <span class="nx">filesystem</span> <span class="p">})</span>
+<span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span> <span class="nx">source</span><span class="o">:</span> <span class="nx">CONTRACT_SOURCE</span><span class="p">,</span> <span class="nx">filesystem</span> <span class="p">})</span>
 </code></pre></div></li>
 </ul>
 <h3 id="by-aci-and-bytecode">By ACI and bytecode</h3>
 <p>If you pre-compiled the contracts you can also initialize a contract instance by providing ACI and bytecode:</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">aci</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// ACI of the contract</span>
 <span class="kd">const</span> <span class="nx">bytecode</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// bytecode of the contract</span>
-<span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span> <span class="nx">aci</span><span class="p">,</span> <span class="nx">bytecode</span> <span class="p">})</span>
+<span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span> <span class="nx">aci</span><span class="p">,</span> <span class="nx">bytecode</span> <span class="p">})</span>
 </code></pre></div>
 <h3 id="by-aci-and-contract-address">By ACI and contract address</h3>
 <p>In many cases an application doesn't need to deploy a contract or verify its bytecode. In this case you'd want to initialize the instance by just providing the ACI and the contract address. This is also possible:</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">aci</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// ACI of the contract</span>
 <span class="kd">const</span> <span class="nx">contractAddress</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// the address of the contract</span>
-<span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span> <span class="nx">aci</span><span class="p">,</span> <span class="nx">contractAddress</span> <span class="p">})</span>
+<span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span> <span class="nx">aci</span><span class="p">,</span> <span class="nx">contractAddress</span> <span class="p">})</span>
 </code></pre></div>
 <h3 id="options">Options</h3>
 <ul>

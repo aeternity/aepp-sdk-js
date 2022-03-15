@@ -345,30 +345,18 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../../../guides/batch-requests/" class="md-nav__link">
-        Making a sequence of requests in efficient way
-      </a>
-    </li>
-  
-
-          
-            
-  
-  
-  
     
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_8" type="checkbox" id="__nav_3_8" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_7" type="checkbox" id="__nav_3_7" >
       
-      <label class="md-nav__link" for="__nav_3_8">
+      <label class="md-nav__link" for="__nav_3_7">
         Wallet interaction
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="Wallet interaction" data-md-level="2">
-        <label class="md-nav__title" for="__nav_3_8">
+        <label class="md-nav__title" for="__nav_3_7">
           <span class="md-nav__icon md-icon"></span>
           Wallet interaction
         </label>
@@ -400,6 +388,30 @@
           
         </ul>
       </nav>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guides/error-handling/" class="md-nav__link">
+        Error Handling
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guides/batch-requests/" class="md-nav__link">
+        Batch transactions
+      </a>
     </li>
   
 
@@ -692,6 +704,21 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../compatibility/" class="md-nav__link">
+        Compatibility Table
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../CHANGELOG/" class="md-nav__link">
         Changelog
       </a>
@@ -710,14 +737,14 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
       
-      <label class="md-nav__link" for="__nav_8">
+      <label class="md-nav__link" for="__nav_9">
         Migration Guides
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="Migration Guides" data-md-level="1">
-        <label class="md-nav__title" for="__nav_8">
+        <label class="md-nav__title" for="__nav_9">
           <span class="md-nav__icon md-icon"></span>
           Migration Guides
         </label>
@@ -776,14 +803,14 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_10" type="checkbox" id="__nav_10" >
       
-      <label class="md-nav__link" for="__nav_9">
+      <label class="md-nav__link" for="__nav_10">
         Contribute
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="Contribute" data-md-level="1">
-        <label class="md-nav__title" for="__nav_9">
+        <label class="md-nav__title" for="__nav_10">
           <span class="md-nav__icon md-icon"></span>
           Contribute
         </label>
@@ -925,7 +952,7 @@
 <p>The whole script is <a href="https://github.com/aeternity/aepp-sdk-js/blob/master/examples/node/transfer-ae.js">located in the repository</a>
 and this page explains in detail how to:</p>
 <ul>
-<li>initialize the SDK with a pre-funded account</li>
+<li>initialize an instance of the SDK with a pre-funded account</li>
 <li>transfer AE to another account</li>
 </ul>
 <h2 id="1-specify-imports">1. Specify imports</h2>
@@ -969,7 +996,7 @@ Therefore we are putting our logic into an <code>async</code> code block
 <h2 id="4-create-object-instances">4. Create object instances</h2>
 <p><div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">account</span> <span class="o">=</span> <span class="nx">MemoryAccount</span><span class="p">({</span> <span class="nx">keypair</span><span class="o">:</span> <span class="nx">ACCOUNT_KEYPAIR</span> <span class="p">})</span>
   <span class="kd">const</span> <span class="nx">node</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Node</span><span class="p">({</span> <span class="nx">url</span><span class="o">:</span> <span class="nx">NODE_URL</span> <span class="p">})</span>
-  <span class="kd">const</span> <span class="nx">client</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span>
+  <span class="kd">const</span> <span class="nx">aeSdk</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span>
     <span class="nx">nodes</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;testnet&#39;</span><span class="p">,</span> <span class="nx">instance</span><span class="o">:</span> <span class="nx">node</span> <span class="p">}],</span>
     <span class="nx">accounts</span><span class="o">:</span> <span class="p">[</span><span class="nx">account</span><span class="p">]</span>
   <span class="p">})</span>
@@ -977,23 +1004,23 @@ Therefore we are putting our logic into an <code>async</code> code block
 The <code>Universal</code> <a href="https://stampit.js.org/essentials/what-is-a-stamp">Stamp</a> itself is
 asynchronous as it determines the node's version and rest interface automatically. Only once
 the Promise is fulfilled, you know you have a working object instance
-which is assigned to the <code>client</code> constant in this case.</p>
+which is assigned to the <code>aeSdk</code> constant in this case.</p>
 <p>Note:</p>
 <ul>
 <li><code>Universal</code> is not a constructor but a factory, which means it's <em>not</em> invoked with <code>new</code>.</li>
 </ul>
 <h2 id="5-get-ae-balance-of-recipient-before-transfer">5. Get AE balance of recipient (before transfer)</h2>
 <p>Before the transfer of AE you can check the AE balance of the recipient.
-<div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">balanceBefore</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getBalance</span><span class="p">(</span><span class="nx">recipient</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">balanceBefore</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getBalance</span><span class="p">(</span><span class="nx">recipient</span><span class="p">)</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Balance of </span><span class="si">${</span><span class="nx">recipient</span><span class="si">}</span><span class="sb"> (before): </span><span class="si">${</span><span class="nx">balanceBefore</span><span class="si">}</span><span class="sb"> aettos`</span><span class="p">)</span>
 </code></pre></div></p>
 <h2 id="6-transfer-ae">6. Transfer AE</h2>
 <p>Calling the <code>spend</code> function will create, sign and broadcast a <code>SpendTx</code> to the network.
-<div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">tx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="nx">amount</span><span class="p">,</span> <span class="nx">recipient</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">tx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="nx">amount</span><span class="p">,</span> <span class="nx">recipient</span><span class="p">)</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Transaction mined&#39;</span><span class="p">,</span> <span class="nx">tx</span><span class="p">)</span>
 </code></pre></div></p>
 <h2 id="7-get-ae-balance-of-recipient-after-transfer">7. Get AE balance of recipient (after transfer)</h2>
-<p><div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">balanceAfter</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getBalance</span><span class="p">(</span><span class="nx">recipient</span><span class="p">)</span>
+<p><div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">balanceAfter</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getBalance</span><span class="p">(</span><span class="nx">recipient</span><span class="p">)</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Balance of </span><span class="si">${</span><span class="nx">recipient</span><span class="si">}</span><span class="sb"> (after): </span><span class="si">${</span><span class="nx">balanceAfter</span><span class="si">}</span><span class="sb"> aettos`</span><span class="p">)</span>
 </code></pre></div>
 Note:</p>

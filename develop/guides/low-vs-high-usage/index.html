@@ -401,30 +401,18 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../batch-requests/" class="md-nav__link">
-        Making a sequence of requests in efficient way
-      </a>
-    </li>
-  
-
-          
-            
-  
-  
-  
     
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_8" type="checkbox" id="__nav_3_8" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_7" type="checkbox" id="__nav_3_7" >
       
-      <label class="md-nav__link" for="__nav_3_8">
+      <label class="md-nav__link" for="__nav_3_7">
         Wallet interaction
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="Wallet interaction" data-md-level="2">
-        <label class="md-nav__title" for="__nav_3_8">
+        <label class="md-nav__title" for="__nav_3_7">
           <span class="md-nav__icon md-icon"></span>
           Wallet interaction
         </label>
@@ -456,6 +444,30 @@
           
         </ul>
       </nav>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../error-handling/" class="md-nav__link">
+        Error Handling
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../batch-requests/" class="md-nav__link">
+        Batch transactions
+      </a>
     </li>
   
 
@@ -648,6 +660,21 @@
   
   
     <li class="md-nav__item">
+      <a href="../../compatibility/" class="md-nav__link">
+        Compatibility Table
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../CHANGELOG/" class="md-nav__link">
         Changelog
       </a>
@@ -666,14 +693,14 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
       
-      <label class="md-nav__link" for="__nav_8">
+      <label class="md-nav__link" for="__nav_9">
         Migration Guides
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="Migration Guides" data-md-level="1">
-        <label class="md-nav__title" for="__nav_8">
+        <label class="md-nav__title" for="__nav_9">
           <span class="md-nav__icon md-icon"></span>
           Migration Guides
         </label>
@@ -732,14 +759,14 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_10" type="checkbox" id="__nav_10" >
       
-      <label class="md-nav__link" for="__nav_9">
+      <label class="md-nav__link" for="__nav_10">
         Contribute
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="Contribute" data-md-level="1">
-        <label class="md-nav__title" for="__nav_9">
+        <label class="md-nav__title" for="__nav_10">
           <span class="md-nav__icon md-icon"></span>
           Contribute
         </label>
@@ -841,8 +868,8 @@
 <em>Alexander Kahl.</em></p>
 </blockquote>
 <p>The purist uses the functions generated out of the Swagger
-file. After instantiating a <code>client</code> with the Universal Stamp it exposes a mapping of all <code>operationId</code>s as functions, converted to camelCase (from PascalCase). So e.g. in order to get a transaction
-based on its hash you would invoke <code>client.api.getTransactionByHash('th_...')</code>.</p>
+file. After creating the SDK instance <code>aeSdk</code> with the Universal Stamp it exposes a mapping of all <code>operationId</code>s as functions, converted to camelCase (from PascalCase). So e.g. in order to get a transaction
+based on its hash you would invoke <code>aeSdk.api.getTransactionByHash('th_...')</code>.</p>
 <p>In this way the SDK is simply a mapping of the raw API calls into
 JavaScript. It's excellent for low-level control, and as a teaching tool to
 understand the node's operations. Most real-world requirements involves a series
@@ -854,14 +881,14 @@ of chain operations, so the SDK provides abstractions for these.</p>
 <span class="k">async</span> <span class="kd">function</span> <span class="nx">init</span> <span class="p">()</span> <span class="p">{</span>
   <span class="kd">const</span> <span class="nx">node</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Node</span><span class="p">({</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span> <span class="p">})</span> <span class="c1">// ideally host your own node!</span>
 
-  <span class="kd">const</span> <span class="nx">client</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span>
+  <span class="kd">const</span> <span class="nx">aeSdk</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span>
     <span class="nx">nodes</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;testnet&#39;</span><span class="p">,</span> <span class="nx">instance</span><span class="o">:</span> <span class="nx">node</span> <span class="p">}],</span>
     <span class="nx">compilerUrl</span><span class="o">:</span> <span class="s1">&#39;https://compiler.aepps.com&#39;</span><span class="p">,</span> <span class="c1">// ideally host your own compiler!</span>
     <span class="nx">accounts</span><span class="o">:</span> <span class="p">[</span><span class="nx">MemoryAccount</span><span class="p">({</span><span class="nx">keypair</span><span class="o">:</span> <span class="p">{</span><span class="nx">secretKey</span><span class="o">:</span> <span class="s1">&#39;&lt;PRIV_KEY_HERE&gt;&#39;</span><span class="p">,</span> <span class="nx">publicKey</span><span class="o">:</span> <span class="s1">&#39;&lt;PUB_KEY_HERE&gt;&#39;</span><span class="p">}})],</span>
   <span class="p">})</span>
 
   <span class="c1">// log transaction info</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">100</span><span class="p">,</span> <span class="s1">&#39;ak_...&#39;</span><span class="p">))</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">100</span><span class="p">,</span> <span class="s1">&#39;ak_...&#39;</span><span class="p">))</span>
 <span class="p">}</span>
 </code></pre></div>
 <h2 id="low-level-sdk-usage-use-api-endpoints-directly">Low-level SDK usage (use <a href="https://aeternity.com/protocol/node/api">API</a> endpoints directly)</h2>
@@ -870,15 +897,15 @@ of chain operations, so the SDK provides abstractions for these.</p>
 
 <span class="k">async</span> <span class="kd">function</span> <span class="nx">spend</span> <span class="p">(</span><span class="nx">amount</span><span class="p">,</span> <span class="nx">recipient</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">const</span> <span class="nx">node</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Node</span><span class="p">({</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span> <span class="p">})</span> <span class="c1">// ideally host your own node!</span>
-  <span class="kd">const</span> <span class="nx">client</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span>
+  <span class="kd">const</span> <span class="nx">aeSdk</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span>
     <span class="nx">nodes</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;testnet&#39;</span><span class="p">,</span> <span class="nx">instance</span><span class="o">:</span> <span class="nx">node</span> <span class="p">}],</span>
     <span class="nx">compilerUrl</span><span class="o">:</span> <span class="s1">&#39;https://compiler.aepps.com&#39;</span><span class="p">,</span> <span class="c1">// ideally host your own compiler!</span>
     <span class="nx">accounts</span><span class="o">:</span> <span class="p">[</span><span class="nx">MemoryAccount</span><span class="p">({</span><span class="nx">keypair</span><span class="o">:</span> <span class="p">{</span><span class="nx">secretKey</span><span class="o">:</span> <span class="s1">&#39;&lt;PRIV_KEY_HERE&gt;&#39;</span><span class="p">,</span> <span class="nx">publicKey</span><span class="o">:</span> <span class="s1">&#39;&lt;PUB_KEY_HERE&gt;&#39;</span><span class="p">}})],</span>
   <span class="p">})</span>
 
   <span class="c1">// builds an unsigned SpendTx using the debug endpoint of the node&#39;s API</span>
-  <span class="kd">const</span> <span class="nx">spendTxResponse</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">api</span><span class="p">.</span><span class="nx">postSpend</span><span class="p">({</span>
-      <span class="nx">sender_id</span><span class="o">:</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">address</span><span class="p">(),</span>
+  <span class="kd">const</span> <span class="nx">spendTxResponse</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">api</span><span class="p">.</span><span class="nx">postSpend</span><span class="p">({</span>
+      <span class="nx">sender_id</span><span class="o">:</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">address</span><span class="p">(),</span>
       <span class="nx">recipient_id</span><span class="o">:</span> <span class="nx">recipient</span><span class="p">,</span>
       <span class="nx">fee</span><span class="o">:</span> <span class="mf">18000000000000</span><span class="p">,</span> <span class="c1">// you must provide enough fee</span>
       <span class="nx">amount</span><span class="p">,</span> <span class="c1">// aettos</span>
@@ -886,14 +913,14 @@ of chain operations, so the SDK provides abstractions for these.</p>
   <span class="p">})</span>
 
   <span class="c1">// sign the encoded transaction returned by the node</span>
-  <span class="kd">const</span> <span class="nx">signedTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">signTransaction</span><span class="p">(</span><span class="nx">spendTxResponse</span><span class="p">.</span><span class="nx">tx</span><span class="p">)</span>
+  <span class="kd">const</span> <span class="nx">signedTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">signTransaction</span><span class="p">(</span><span class="nx">spendTxResponse</span><span class="p">.</span><span class="nx">tx</span><span class="p">)</span>
 
   <span class="c1">// broadcast the signed tx to the node</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">api</span><span class="p">.</span><span class="nx">postTransaction</span><span class="p">({</span><span class="nx">tx</span><span class="o">:</span> <span class="nx">signedTx</span><span class="p">}))</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">api</span><span class="p">.</span><span class="nx">postTransaction</span><span class="p">({</span><span class="nx">tx</span><span class="o">:</span> <span class="nx">signedTx</span><span class="p">}))</span>
 <span class="p">}</span>
 </code></pre></div></p>
 <p>Following functions are available with the low-level API right now:</p>
-<div class="highlight"><pre><span></span><code><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">client</span><span class="p">.</span><span class="nx">api</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">api</span><span class="p">)</span>
 <span class="cm">/*</span>
 <span class="cm">{</span>
 <span class="cm">  getTopHeader: [Function (anonymous)],</span>
@@ -998,13 +1025,13 @@ of chain operations, so the SDK provides abstractions for these.</p>
       
       
         
-        <a href="../batch-requests/" class="md-footer__link md-footer__link--next" aria-label="Next: Making a sequence of requests in efficient way" rel="next">
+        <a href="../connect-aepp-to-wallet/" class="md-footer__link md-footer__link--next" aria-label="Next: Connect an æpp to a wallet" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Making a sequence of requests in efficient way
+              Connect an æpp to a wallet
             </div>
           </div>
           <div class="md-footer__button md-icon">

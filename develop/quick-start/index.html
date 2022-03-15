@@ -406,30 +406,18 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../guides/batch-requests/" class="md-nav__link">
-        Making a sequence of requests in efficient way
-      </a>
-    </li>
-  
-
-          
-            
-  
-  
-  
     
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_8" type="checkbox" id="__nav_3_8" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_7" type="checkbox" id="__nav_3_7" >
       
-      <label class="md-nav__link" for="__nav_3_8">
+      <label class="md-nav__link" for="__nav_3_7">
         Wallet interaction
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="Wallet interaction" data-md-level="2">
-        <label class="md-nav__title" for="__nav_3_8">
+        <label class="md-nav__title" for="__nav_3_7">
           <span class="md-nav__icon md-icon"></span>
           Wallet interaction
         </label>
@@ -461,6 +449,30 @@
           
         </ul>
       </nav>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/error-handling/" class="md-nav__link">
+        Error Handling
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/batch-requests/" class="md-nav__link">
+        Batch transactions
+      </a>
     </li>
   
 
@@ -653,6 +665,21 @@
   
   
     <li class="md-nav__item">
+      <a href="../compatibility/" class="md-nav__link">
+        Compatibility Table
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../CHANGELOG/" class="md-nav__link">
         Changelog
       </a>
@@ -671,14 +698,14 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
       
-      <label class="md-nav__link" for="__nav_8">
+      <label class="md-nav__link" for="__nav_9">
         Migration Guides
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="Migration Guides" data-md-level="1">
-        <label class="md-nav__title" for="__nav_8">
+        <label class="md-nav__title" for="__nav_9">
           <span class="md-nav__icon md-icon"></span>
           Migration Guides
         </label>
@@ -737,14 +764,14 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_10" type="checkbox" id="__nav_10" >
       
-      <label class="md-nav__link" for="__nav_9">
+      <label class="md-nav__link" for="__nav_10">
         Contribute
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="Contribute" data-md-level="1">
-        <label class="md-nav__title" for="__nav_9">
+        <label class="md-nav__title" for="__nav_10">
           <span class="md-nav__icon md-icon"></span>
           Contribute
         </label>
@@ -867,9 +894,9 @@
 <h2 id="4-interact-with-the-ternity-blockchain">4. Interact with the æternity blockchain</h2>
 <p>This example shows:</p>
 <ul>
-<li>how to initialize the SDK client using the <code>Universal</code> <a href="https://stampit.js.org/essentials/what-is-a-stamp">Stamp</a></li>
+<li>how to create an instance of the SDK using the <code>Universal</code> <a href="https://stampit.js.org/essentials/what-is-a-stamp">Stamp</a></li>
 <li>how to get the current block height</li>
-<li>how to spend 1 AE from the account the SDK was initialized with to some other AE address</li>
+<li>how to spend 1 AE from the account the SDK instance was initialized with to some other AE address</li>
 </ul>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">NODE_URL</span> <span class="o">=</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">;</span>
 <span class="kd">const</span> <span class="nx">COMPILER_URL</span> <span class="o">=</span> <span class="s1">&#39;https://compiler.aepps.com&#39;</span><span class="p">;</span> <span class="c1">// required for contract interactions (compiling and creating calldata)</span>
@@ -880,17 +907,17 @@
 
 <span class="p">(</span><span class="k">async</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="kd">const</span> <span class="nx">node</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Node</span><span class="p">({</span> <span class="nx">url</span><span class="o">:</span> <span class="nx">NODE_URL</span> <span class="p">})</span>
-  <span class="kd">const</span> <span class="nx">client</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span>
+  <span class="kd">const</span> <span class="nx">aeSdk</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span>
      <span class="nx">compilerUrl</span><span class="o">:</span> <span class="nx">COMPILER_URL</span><span class="p">,</span>
      <span class="nx">nodes</span><span class="o">:</span> <span class="p">[</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;testnet&#39;</span><span class="p">,</span> <span class="nx">instance</span><span class="o">:</span> <span class="nx">node</span> <span class="p">}</span> <span class="p">],</span>
      <span class="nx">accounts</span><span class="o">:</span> <span class="p">[</span> <span class="nx">account</span> <span class="p">]</span>
   <span class="p">})</span>
 
-  <span class="kd">const</span> <span class="nx">height</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">height</span><span class="p">()</span> <span class="c1">// get top block height</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Current Block Height:&#39;</span><span class="p">,</span> <span class="nx">height</span><span class="p">)</span>
+  <span class="kd">const</span> <span class="nx">height</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">height</span><span class="p">()</span> <span class="c1">// get top keyblock height</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Current Keyblock Height:&#39;</span><span class="p">,</span> <span class="nx">height</span><span class="p">)</span>
 
   <span class="c1">// spend one AE</span>
-  <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="s1">&#39;&lt;RECIPIENT_PUBLIC_KEY&gt;&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="c1">// replace &lt;RECIPIENT_PUBLIC_KEY&gt;</span>
+  <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="s1">&#39;&lt;RECIPIENT_PUBLIC_KEY&gt;&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="c1">// replace &lt;RECIPIENT_PUBLIC_KEY&gt;</span>
       <span class="nx">denomination</span><span class="o">:</span> <span class="nx">AmountFormatter</span><span class="p">.</span><span class="nx">AE_AMOUNT_FORMATS</span><span class="p">.</span><span class="nx">AE</span>
   <span class="p">})</span>
 <span class="p">})()</span>

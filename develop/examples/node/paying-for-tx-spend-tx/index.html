@@ -345,30 +345,18 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../../../guides/batch-requests/" class="md-nav__link">
-        Making a sequence of requests in efficient way
-      </a>
-    </li>
-  
-
-          
-            
-  
-  
-  
     
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_8" type="checkbox" id="__nav_3_8" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_7" type="checkbox" id="__nav_3_7" >
       
-      <label class="md-nav__link" for="__nav_3_8">
+      <label class="md-nav__link" for="__nav_3_7">
         Wallet interaction
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="Wallet interaction" data-md-level="2">
-        <label class="md-nav__title" for="__nav_3_8">
+        <label class="md-nav__title" for="__nav_3_7">
           <span class="md-nav__icon md-icon"></span>
           Wallet interaction
         </label>
@@ -400,6 +388,30 @@
           
         </ul>
       </nav>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guides/error-handling/" class="md-nav__link">
+        Error Handling
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guides/batch-requests/" class="md-nav__link">
+        Batch transactions
+      </a>
     </li>
   
 
@@ -708,6 +720,21 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../compatibility/" class="md-nav__link">
+        Compatibility Table
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../CHANGELOG/" class="md-nav__link">
         Changelog
       </a>
@@ -726,14 +753,14 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
       
-      <label class="md-nav__link" for="__nav_8">
+      <label class="md-nav__link" for="__nav_9">
         Migration Guides
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="Migration Guides" data-md-level="1">
-        <label class="md-nav__title" for="__nav_8">
+        <label class="md-nav__title" for="__nav_9">
           <span class="md-nav__icon md-icon"></span>
           Migration Guides
         </label>
@@ -792,14 +819,14 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_10" type="checkbox" id="__nav_10" >
       
-      <label class="md-nav__link" for="__nav_9">
+      <label class="md-nav__link" for="__nav_10">
         Contribute
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="Contribute" data-md-level="1">
-        <label class="md-nav__title" for="__nav_9">
+        <label class="md-nav__title" for="__nav_10">
           <span class="md-nav__icon md-icon"></span>
           Contribute
         </label>
@@ -1002,7 +1029,7 @@ Therefore we are putting our logic into an <code>async</code> code block
 <p><div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">payerAccount</span> <span class="o">=</span> <span class="nx">MemoryAccount</span><span class="p">({</span> <span class="nx">keypair</span><span class="o">:</span> <span class="nx">PAYER_ACCOUNT_KEYPAIR</span> <span class="p">})</span>
   <span class="kd">const</span> <span class="nx">newUserAccount</span> <span class="o">=</span> <span class="nx">MemoryAccount</span><span class="p">({</span> <span class="nx">keypair</span><span class="o">:</span> <span class="nx">NEW_USER_KEYPAIR</span> <span class="p">})</span>
   <span class="kd">const</span> <span class="nx">node</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Node</span><span class="p">({</span> <span class="nx">url</span><span class="o">:</span> <span class="nx">NODE_URL</span> <span class="p">})</span>
-  <span class="kd">const</span> <span class="nx">client</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span>
+  <span class="kd">const</span> <span class="nx">aeSdk</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span>
     <span class="nx">nodes</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;testnet&#39;</span><span class="p">,</span> <span class="nx">instance</span><span class="o">:</span> <span class="nx">node</span> <span class="p">}],</span>
     <span class="nx">accounts</span><span class="o">:</span> <span class="p">[</span><span class="nx">payerAccount</span><span class="p">,</span> <span class="nx">newUserAccount</span><span class="p">]</span>
   <span class="p">})</span>
@@ -1010,19 +1037,19 @@ Therefore we are putting our logic into an <code>async</code> code block
 The <code>Universal</code> <a href="https://stampit.js.org/essentials/what-is-a-stamp">Stamp</a> itself is
 asynchronous as it determines the node's version and rest interface automatically. Only once
 the Promise is fulfilled, you know you have a working object instance which is assigned to the
-<code>client</code> constant in this case.</p>
+<code>aeSdk</code> constant in this case.</p>
 <p>Note:</p>
 <ul>
 <li><code>Universal</code> is not a constructor but a factory, which means it's <em>not</em> invoked with <code>new</code>.</li>
 </ul>
 <h2 id="5-send-1-aetto-from-payer-to-new-user">5. Send 1 <code>aetto</code> from payer to new user</h2>
-<div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">spendTxResult</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">spendTxResult</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span>
     <span class="nx">AMOUNT</span><span class="p">,</span> <span class="k">await</span> <span class="nx">newUserAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">(),</span> <span class="p">{</span> <span class="nx">onAccount</span><span class="o">:</span> <span class="nx">payerAccount</span> <span class="p">}</span>
   <span class="p">)</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">spendTxResult</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="6-check-balance-of-new-user-before">6. Check balance of new user (before)</h2>
-<p><div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">newUserBalanceBefore</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getBalance</span><span class="p">(</span><span class="k">await</span> <span class="nx">newUserAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">())</span>
+<p><div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">newUserBalanceBefore</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getBalance</span><span class="p">(</span><span class="k">await</span> <span class="nx">newUserAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">())</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`new user balance (before): </span><span class="si">${</span><span class="nx">newUserBalanceBefore</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
 </code></pre></div>
 Note:</p>
@@ -1030,12 +1057,12 @@ Note:</p>
 <li>The balance should now be 1</li>
 </ul>
 <h2 id="7-create-and-sign-spendtx-on-behalf-of-new-user">7. Create and sign <code>SpendTx</code> on behalf of new user</h2>
-<p><div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">spendTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">spendTx</span><span class="p">({</span>
+<p><div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">spendTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spendTx</span><span class="p">({</span>
     <span class="nx">senderId</span><span class="o">:</span> <span class="k">await</span> <span class="nx">newUserAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">(),</span>
     <span class="nx">recipientId</span><span class="o">:</span> <span class="k">await</span> <span class="nx">payerAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">(),</span>
     <span class="nx">amount</span><span class="o">:</span> <span class="nx">AMOUNT</span>
   <span class="p">})</span>
-  <span class="kd">const</span> <span class="nx">signedSpendTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">signTransaction</span><span class="p">(</span>
+  <span class="kd">const</span> <span class="nx">signedSpendTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">signTransaction</span><span class="p">(</span>
     <span class="nx">spendTx</span><span class="p">,</span> <span class="p">{</span> <span class="nx">onAccount</span><span class="o">:</span> <span class="nx">newUserAccount</span><span class="p">,</span> <span class="nx">innerTx</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span>
   <span class="p">)</span>
 </code></pre></div>
@@ -1045,7 +1072,7 @@ Note:</p>
    the transaction needs to be signed in a special way</li>
 </ul>
 <h2 id="7-create-sign-broadcast-the-payingfortx-as-payer">7. Create, sign &amp; broadcast the <code>PayingForTx</code> as payer</h2>
-<p><div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">payForTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">payForTransaction</span><span class="p">(</span><span class="nx">signedSpendTx</span><span class="p">,</span> <span class="p">{</span> <span class="nx">onAccount</span><span class="o">:</span> <span class="nx">payerAccount</span> <span class="p">})</span>
+<p><div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">payForTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">payForTransaction</span><span class="p">(</span><span class="nx">signedSpendTx</span><span class="p">,</span> <span class="p">{</span> <span class="nx">onAccount</span><span class="o">:</span> <span class="nx">payerAccount</span> <span class="p">})</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">payForTx</span><span class="p">)</span>
 </code></pre></div>
 Note:</p>
@@ -1054,7 +1081,7 @@ Note:</p>
    have to cover the transaction fee.</li>
 </ul>
 <h2 id="8-check-balance-of-new-user-after">8. Check balance of new user (after)</h2>
-<p><div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">newUserBalanceAfter</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">getBalance</span><span class="p">(</span><span class="k">await</span> <span class="nx">newUserAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">())</span>
+<p><div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">newUserBalanceAfter</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getBalance</span><span class="p">(</span><span class="k">await</span> <span class="nx">newUserAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">())</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`new user balance (after): </span><span class="si">${</span><span class="nx">newUserBalanceAfter</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
 </code></pre></div>
 Note:</p>

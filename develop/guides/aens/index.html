@@ -469,30 +469,18 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../batch-requests/" class="md-nav__link">
-        Making a sequence of requests in efficient way
-      </a>
-    </li>
-  
-
-          
-            
-  
-  
-  
     
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_8" type="checkbox" id="__nav_3_8" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_7" type="checkbox" id="__nav_3_7" >
       
-      <label class="md-nav__link" for="__nav_3_8">
+      <label class="md-nav__link" for="__nav_3_7">
         Wallet interaction
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="Wallet interaction" data-md-level="2">
-        <label class="md-nav__title" for="__nav_3_8">
+        <label class="md-nav__title" for="__nav_3_7">
           <span class="md-nav__icon md-icon"></span>
           Wallet interaction
         </label>
@@ -524,6 +512,30 @@
           
         </ul>
       </nav>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../error-handling/" class="md-nav__link">
+        Error Handling
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../batch-requests/" class="md-nav__link">
+        Batch transactions
+      </a>
     </li>
   
 
@@ -716,6 +728,21 @@
   
   
     <li class="md-nav__item">
+      <a href="../../compatibility/" class="md-nav__link">
+        Compatibility Table
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../CHANGELOG/" class="md-nav__link">
         Changelog
       </a>
@@ -734,14 +761,14 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
       
-      <label class="md-nav__link" for="__nav_8">
+      <label class="md-nav__link" for="__nav_9">
         Migration Guides
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="Migration Guides" data-md-level="1">
-        <label class="md-nav__title" for="__nav_8">
+        <label class="md-nav__title" for="__nav_9">
           <span class="md-nav__icon md-icon"></span>
           Migration Guides
         </label>
@@ -800,14 +827,14 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_10" type="checkbox" id="__nav_10" >
       
-      <label class="md-nav__link" for="__nav_9">
+      <label class="md-nav__link" for="__nav_10">
         Contribute
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="Contribute" data-md-level="1">
-        <label class="md-nav__title" for="__nav_9">
+        <label class="md-nav__title" for="__nav_10">
           <span class="md-nav__icon md-icon"></span>
           Contribute
         </label>
@@ -990,11 +1017,11 @@
 <h3 id="pre-claim">Pre-claim</h3>
 <div class="highlight"><pre><span></span><code><span class="c1">// imports</span>
 
-<span class="kd">const</span> <span class="nx">client</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span> <span class="p">...</span> <span class="p">})</span> <span class="c1">// init instance of Universal Stamp</span>
+<span class="kd">const</span> <span class="nx">aeSdk</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span> <span class="p">...</span> <span class="p">})</span> <span class="c1">// init the SDK instance with Universal Stamp</span>
 
 <span class="kd">const</span> <span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;testNameForTheGuide.chain&#39;</span>
 
-<span class="kd">const</span> <span class="nx">preClaimTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">aensPreclaim</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">preClaimTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">aensPreclaim</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">preClaimTx</span><span class="p">)</span>
 
 <span class="cm">/*</span>
@@ -1047,7 +1074,7 @@ the same <code>salt</code> and it should be signed with the same private key as 
 <span class="c1">// the minimum `nameFee` will be automatically generated by sdk</span>
 <span class="c1">// in case you want to provide a custom `nameFee` you can so so by providing it in an options object</span>
 <span class="c1">// in case of starting the auction `nameFee` will be the starting bid</span>
-<span class="kd">const</span> <span class="nx">claimTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">aensClaim</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">salt</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">claimTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">aensClaim</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">salt</span><span class="p">)</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">claimTx</span><span class="p">)</span>
 
 <span class="cm">/*</span>
@@ -1108,7 +1135,7 @@ the same <code>salt</code> and it should be signed with the same private key as 
 <span class="c1">// startFee MUST be at least the nameFee of the last bid</span>
 <span class="c1">// increment is OPTIONAL and defaults to 0.05</span>
 <span class="kd">const</span> <span class="nx">nameFee</span> <span class="o">=</span> <span class="nx">TxBuilderHelper</span><span class="p">.</span><span class="nx">computeBidFee</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">startFee</span><span class="p">,</span> <span class="nx">increment</span><span class="p">)</span>
-<span class="kd">const</span> <span class="nx">bidTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">aensBid</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">nameFee</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">bidTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">aensBid</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">nameFee</span><span class="p">)</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">bidTx</span><span class="p">)</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`BID PLACED AT </span><span class="si">${</span><span class="nx">bidTx</span><span class="p">.</span><span class="nx">blockHeight</span><span class="si">}</span><span class="sb"> WILL END AT </span><span class="si">${</span><span class="nx">TxBuilderHelper</span><span class="p">.</span><span class="nx">computeAuctionEndBlock</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">bidTx</span><span class="p">.</span><span class="nx">blockHeight</span><span class="p">)</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
@@ -1166,11 +1193,11 @@ the same <code>salt</code> and it should be signed with the same private key as 
   <span class="nx">channel</span><span class="o">:</span> <span class="s1">&#39;ch_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="p">,</span>
 <span class="p">}</span>
 
-<span class="c1">// using client (instance of Universal Stamp)</span>
-<span class="kd">const</span> <span class="nx">nameUpdateTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">pointers</span><span class="p">)</span>
+<span class="c1">// using aeSdk directly (instance of Universal Stamp)</span>
+<span class="kd">const</span> <span class="nx">nameUpdateTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">pointers</span><span class="p">)</span>
 
 <span class="c1">// OR using the instance of a name</span>
-<span class="kd">const</span> <span class="nx">nameInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">aensQuery</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">nameInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">aensQuery</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span>
 <span class="kd">const</span> <span class="nx">nameUpdateTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">nameInstance</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">pointers</span><span class="p">)</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">nameUpdateTx</span><span class="p">)</span>
@@ -1219,11 +1246,11 @@ the same <code>salt</code> and it should be signed with the same private key as 
 <p>In case you want to extend a name using a custom TTL and keep the current pointers you can do this as follows:</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;testNameForTheGuide.chain&#39;</span>
 
-<span class="c1">// using client (instance of Universal Stamp)</span>
-<span class="kd">const</span> <span class="nx">nameUpdateTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="p">{},</span> <span class="p">{</span> <span class="nx">nameTtl</span><span class="o">:</span> <span class="mf">100000</span><span class="p">,</span> <span class="nx">extendPointers</span><span class="o">:</span> <span class="kc">true</span> <span class="p">})</span>
+<span class="c1">// using aeSdk directly (instance of Universal Stamp)</span>
+<span class="kd">const</span> <span class="nx">nameUpdateTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="p">{},</span> <span class="p">{</span> <span class="nx">nameTtl</span><span class="o">:</span> <span class="mf">100000</span><span class="p">,</span> <span class="nx">extendPointers</span><span class="o">:</span> <span class="kc">true</span> <span class="p">})</span>
 
 <span class="c1">// OR using the instance of a name</span>
-<span class="kd">const</span> <span class="nx">nameInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">aensQuery</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">nameInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">aensQuery</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span>
 <span class="kd">const</span> <span class="nx">nameUpdateTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">nameInstance</span><span class="p">.</span><span class="nx">update</span><span class="p">({},</span> <span class="p">{</span> <span class="nx">nameTtl</span><span class="o">:</span> <span class="mf">100000</span><span class="p">,</span> <span class="nx">extendPointers</span><span class="o">:</span> <span class="kc">true</span> <span class="p">})</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">nameUpdateTx</span><span class="p">)</span>
@@ -1263,11 +1290,11 @@ the same <code>salt</code> and it should be signed with the same private key as 
 <p>In some cases you might want to transfer the ownership of a name to another account. Of course this is also possible and you can do that as follows:</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">recipient</span> <span class="o">=</span> <span class="s1">&#39;ak_...&#39;</span>
 
-<span class="c1">// using client (instance of Universal Stamp)</span>
-<span class="kd">const</span> <span class="nx">nameTransferTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">aensTransfer</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">recipient</span><span class="p">)</span>
+<span class="c1">// using aeSdk directly (instance of Universal Stamp)</span>
+<span class="kd">const</span> <span class="nx">nameTransferTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">aensTransfer</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">recipient</span><span class="p">)</span>
 
 <span class="c1">// OR using the instance of a name</span>
-<span class="kd">const</span> <span class="nx">nameInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">aensQuery</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">nameInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">aensQuery</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span>
 <span class="kd">const</span> <span class="nx">nameTransferTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">nameInstance</span><span class="p">.</span><span class="nx">transfer</span><span class="p">(</span><span class="nx">recipient</span><span class="p">)</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">nameTransferTx</span><span class="p">)</span>
@@ -1295,11 +1322,11 @@ the same <code>salt</code> and it should be signed with the same private key as 
 </code></pre></div>
 <h2 id="4-revoke-a-name">4. Revoke a name</h2>
 <p>In case you want to revoke a name prior to its expiration for whatever reason you can do that as follows:
-<div class="highlight"><pre><span></span><code><span class="c1">// using client (instance of Universal Stamp)</span>
-<span class="kd">const</span> <span class="nx">nameRevokeTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">aensRevoke</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="c1">// using aeSdk directly (instance of Universal Stamp)</span>
+<span class="kd">const</span> <span class="nx">nameRevokeTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">aensRevoke</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span>
 
 <span class="c1">// OR using the instance of a name</span>
-<span class="kd">const</span> <span class="nx">nameInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">aensQuery</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">nameInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">aensQuery</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span>
 <span class="kd">const</span> <span class="nx">nameRevokeTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">nameInstance</span><span class="p">.</span><span class="nx">revoke</span><span class="p">()</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">nameRevokeTx</span><span class="p">)</span>
@@ -1334,21 +1361,21 @@ the same <code>salt</code> and it should be signed with the same private key as 
 <p>This functionality could for example be used to build an AENS marketplace.</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// imports</span>
 
-<span class="kd">const</span> <span class="nx">client</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span> <span class="p">...</span> <span class="p">})</span> <span class="c1">// init instance of Universal Stamp</span>
+<span class="kd">const</span> <span class="nx">aeSdk</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span> <span class="p">...</span> <span class="p">})</span> <span class="c1">// init the SDK instance with Universal Stamp</span>
 
 <span class="c1">// contract address</span>
 <span class="kd">const</span> <span class="nx">contractId</span> <span class="o">=</span> <span class="s1">&#39;ct_asd2ks...&#39;</span>
 <span class="c1">// AENS name</span>
 <span class="kd">const</span> <span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;example.chain&#39;</span>
 <span class="c1">// Sign with a specific account</span>
-<span class="kd">const</span> <span class="nx">onAccount</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">address</span><span class="p">()</span>
+<span class="kd">const</span> <span class="nx">onAccount</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">address</span><span class="p">()</span>
 
 <span class="c1">// this signature will allow the contract to perform a pre-claim on your behalf</span>
-<span class="kd">const</span> <span class="nx">preClaimSig</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">createAensDelegationSignature</span><span class="p">({</span> <span class="nx">contractId</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">onAccount</span> <span class="p">})</span>
+<span class="kd">const</span> <span class="nx">preClaimSig</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">createAensDelegationSignature</span><span class="p">({</span> <span class="nx">contractId</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">onAccount</span> <span class="p">})</span>
 
 <span class="c1">// this signature will allow the contract to perform</span>
 <span class="c1">// any name related transaction for a specific name that you own</span>
-<span class="kd">const</span> <span class="nx">aensDelegationSig</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">createAensDelegationSignature</span><span class="p">({</span> <span class="nx">contractId</span><span class="p">,</span> <span class="nx">name</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">onAccount</span> <span class="p">})</span>
+<span class="kd">const</span> <span class="nx">aensDelegationSig</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">createAensDelegationSignature</span><span class="p">({</span> <span class="nx">contractId</span><span class="p">,</span> <span class="nx">name</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">onAccount</span> <span class="p">})</span>
 </code></pre></div>
                 
               
