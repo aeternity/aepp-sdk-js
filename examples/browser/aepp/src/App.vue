@@ -2,13 +2,13 @@
   <h2>Simple æpp</h2>
 
   <Connect
-    @sdk="sdk = $event"
+    @aeSdk="aeSdk = $event"
     @address="address = $event"
     @networkId="networkId = $event"
   />
 
   <div
-    v-if="sdk"
+    v-if="aeSdk"
     class="nav"
   >
     <a
@@ -28,9 +28,9 @@
   </div>
 
   <Component
-    v-if="sdk && view"
+    v-if="aeSdk && view"
     :is="view"
-    :sdk="sdk"
+    :aeSdk="aeSdk"
     :address="address"
     :networkId="networkId"
   />
@@ -45,7 +45,7 @@ export default {
   components: { Connect, Basic, Contracts },
   data: () => ({
     view: '',
-    sdk: null,
+    aeSdk: null,
     address: '',
     networkId: '',
   })

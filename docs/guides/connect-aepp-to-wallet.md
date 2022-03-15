@@ -14,7 +14,7 @@ Note:
 import { RpcAepp, WalletDetector, BrowserWindowMessageConnection } from '@aeternity/aepp-sdk'
 
 async created () {
-  this.client = await RpcAepp({
+  this.aeSdk = await RpcAepp({
     name: 'Simple Aepp',
     nodes: [
       { name: 'ae_uat', instance: await Node({ url: TEST_NET_NODE_URL }) },
@@ -22,20 +22,20 @@ async created () {
     ],
     compilerUrl: COMPILER_URL,
     onNetworkChange: async (params) => {
-      this.client.selectNode(params.networkId)
-      this.nodeInfoResponse = await this.client.getNodeInfo()
+      this.aeSdk.selectNode(params.networkId)
+      this.nodeInfoResponse = await this.aeSdk.getNodeInfo()
     },
     onAddressChange:  async (addresses) => {
-      this.pub = await this.client.address()
-      this.balance = await this.client.balance(this.pub).catch(e => '0')
-      this.addressResponse = await this.client.address()
+      this.pub = await this.aeSdk.address()
+      this.balance = await this.aeSdk.balance(this.pub).catch(e => '0')
+      this.addressResponse = await this.aeSdk.address()
     },
     onDisconnect: () => {
       this.resetState()
       alert('Disconnected')
     }
   })
-  this.height = await this.client.height()
+  this.height = await this.aeSdk.height()
   // start looking for wallets, see step 2.
   this.scanForWallets()
   // open iframe with Wallet if run in top window
@@ -67,15 +67,15 @@ scanForWallets () {
 
 ```js
 async connectToWallet (wallet) {
-  await this.client.connectToWallet(await wallet.getConnection())
-  this.accounts = await this.client.subscribeAddress('subscribe', 'connected')
-  this.pub = await this.client.address()
+  await this.aeSdk.connectToWallet(await wallet.getConnection())
+  this.accounts = await this.aeSdk.subscribeAddress('subscribe', 'connected')
+  this.pub = await this.aeSdk.address()
   this.onAccount = this.pub
-  this.balance = await this.client.getBalance(this.pub)
-  this.walletName = this.client.rpcClient.info.name
-  this.addressResponse = await this.client.address()
-  this.heightResponse = await this.client.height()
-  this.nodeInfoResponse = await this.client.getNodeInfo()
+  this.balance = await this.aeSdk.getBalance(this.pub)
+  this.walletName = this.aeSdk.rpcClient.info.name
+  this.addressResponse = await this.aeSdk.address()
+  this.heightResponse = await this.aeSdk.height()
+  this.nodeInfoResponse = await this.aeSdk.getNodeInfo()
 }
 ```
 
@@ -85,6 +85,6 @@ AEPP can request the wallet to share its connected node URLs if any to interact 
 
 ```js
 async connectToWallet (wallet) {
-    await this.client.connectToWallet(await wallet.getConnection(), { connectNode: true, name: 'wallet-node', select: true })
+    await this.aeSdk.connectToWallet(await wallet.getConnection(), { connectNode: true, name: 'wallet-node', select: true })
 }
 ```
