@@ -10,7 +10,7 @@ You register an oracle that responds with the temperature of the city that is in
 To register an oracle you need to provide a `queryFormat` and a `responseFormat` to the `registerOracle` function of the SDK. In addition to the common transaction options you can provide the oracle specific options `queryFee` and `oracleTtl`, see [transaction options](../transaction-options.md#oracleregistertx).
 
 ```js
-// init the SDK using the Universal Stamp
+// init an instance of the SDK using the Universal Stamp
 const aeSdk = await Universal({ ... })
 
 // set TTL with a delta of 1000 blocks

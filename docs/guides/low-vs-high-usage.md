@@ -6,7 +6,7 @@
 *Alexander Kahl.*
 
 The purist uses the functions generated out of the Swagger
-file. After instantiating the `aeSdk` with the Universal Stamp it exposes a mapping of all `operationId`s as functions, converted to camelCase (from PascalCase). So e.g. in order to get a transaction
+file. After creating the SDK instance `aeSdk` with the Universal Stamp it exposes a mapping of all `operationId`s as functions, converted to camelCase (from PascalCase). So e.g. in order to get a transaction
 based on its hash you would invoke `aeSdk.api.getTransactionByHash('th_...')`.
 
 In this way the SDK is simply a mapping of the raw API calls into

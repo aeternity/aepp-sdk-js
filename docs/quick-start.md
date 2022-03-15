@@ -27,9 +27,9 @@ To receive some _AE_ you can use the [Faucet](https://faucet.aepps.com/). Just a
 ## 4. Interact with the æternity blockchain
 This example shows:
 
-- how to initialize the SDK using the `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp)
+- how to create an instance of the SDK using the `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp)
 - how to get the current block height
-- how to spend 1 AE from the account the SDK was initialized with to some other AE address
+- how to spend 1 AE from the account the SDK instance was initialized with to some other AE address
 
 ```js
 const NODE_URL = 'https://testnet.aeternity.io';

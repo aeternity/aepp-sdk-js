@@ -22,8 +22,8 @@ const { Universal, MemoryAccount, Node } = require('@aeternity/aepp-sdk')
 import { Universal, MemoryAccount, Node } from '@aeternity/aepp-sdk'
 ```
 
-## 2. Initialize the SDK providing an account
-When initializing the SDK you need to provide an account which will be used to sign transactions like `ContractCreateTx` and `ContractCallTx` that will be broadcasted to the network.
+## 2. Create an instance of the SDK
+When creating an instance of the SDK you need to provide an account which will be used to sign transactions like `ContractCreateTx` and `ContractCallTx` that will be broadcasted to the network.
 
 ```js
 const node = await Node({
