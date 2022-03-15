@@ -22,7 +22,7 @@
 // The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/master/examples/node/transfer-ae.js)
 // and this page explains in detail how to:
 //
-//  - initialize the SDK with a pre-funded account
+//  - initialize an instance of the SDK with a pre-funded account
 //  - transfer AE to another account
 
 // ## 1. Specify imports
@@ -61,7 +61,7 @@ const [amount = 1, recipient = ACCOUNT_KEYPAIR.publicKey] = process.argv.slice(2
   // ## 4. Create object instances
   const account = MemoryAccount({ keypair: ACCOUNT_KEYPAIR })
   const node = await Node({ url: NODE_URL })
-  const client = await Universal({
+  const aeSdk = await Universal({
     nodes: [{ name: 'testnet', instance: node }],
     accounts: [account]
   })
@@ -69,7 +69,7 @@ const [amount = 1, recipient = ACCOUNT_KEYPAIR.publicKey] = process.argv.slice(2
   // The `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp) itself is
   // asynchronous as it determines the node's version and rest interface automatically. Only once
   // the Promise is fulfilled, you know you have a working object instance
-  // which is assigned to the `client` constant in this case.
+  // which is assigned to the `aeSdk` constant in this case.
   //
   // Note:
   //
@@ -77,16 +77,16 @@ const [amount = 1, recipient = ACCOUNT_KEYPAIR.publicKey] = process.argv.slice(2
 
   // ## 5. Get AE balance of recipient (before transfer)
   // Before the transfer of AE you can check the AE balance of the recipient.
-  const balanceBefore = await client.getBalance(recipient)
+  const balanceBefore = await aeSdk.getBalance(recipient)
   console.log(`Balance of ${recipient} (before): ${balanceBefore} aettos`)
 
   // ## 6. Transfer AE
   // Calling the `spend` function will create, sign and broadcast a `SpendTx` to the network.
-  const tx = await client.spend(amount, recipient)
+  const tx = await aeSdk.spend(amount, recipient)
   console.log('Transaction mined', tx)
 
   // ## 7. Get AE balance of recipient (after transfer)
-  const balanceAfter = await client.getBalance(recipient)
+  const balanceAfter = await aeSdk.getBalance(recipient)
   console.log(`Balance of ${recipient} (after): ${balanceAfter} aettos`)
 
   // Note:

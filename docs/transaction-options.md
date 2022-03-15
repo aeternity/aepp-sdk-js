@@ -7,8 +7,8 @@ The `options` object can be optionally passed to the respective function behind 
 const sender = 'ak_...'
 const recipient = 'ak_...'
 const options = { onAccount: sender, denomination: 'ae' } // optional options object
-// client is an instance of the Universal Stamp
-await client.spend(1, recipient, options) // amount, recipient and (optional) options
+// aeSdk is an instance of the Universal Stamp
+await aeSdk.spend(1, recipient, options) // amount, recipient and (optional) options
 ```
 
 Note:

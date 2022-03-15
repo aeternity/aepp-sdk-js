@@ -130,14 +130,14 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair()
 const payerAccount = MemoryAccount({ keypair: PAYER_ACCOUNT_KEYPAIR })
 const newUserAccount = MemoryAccount({ keypair: NEW_USER_KEYPAIR })
 const node = await Node({ url: NODE_URL })
-const client = await Universal({
+const aeSdk = await Universal({
   nodes: [{ name: 'testnet', instance: node }],
   accounts: [payerAccount, newUserAccount]
 })
 
 // catch exceptions
 try {
-  const spendTxResult = await client.spend(-1, await newUserAccount.address(), { onAccount: payerAccount})
+  const spendTxResult = await aeSdk.spend(-1, await newUserAccount.address(), { onAccount: payerAccount})
 } catch(err) {
   if(err instanceof InvalidTxParamsError){
     console.log(`Amount specified is not valid, ${err.message}`)
@@ -150,13 +150,13 @@ try {
 const {AensError, TransactionError, BaseError } = require('@aeternity/aepp-sdk')
 
 try {
-  const spendTxResult = await client.spend(1, "ak_2tv", { onAccount: payerAccount})
+  const spendTxResult = await aeSdk.spend(1, "ak_2tv", { onAccount: payerAccount})
 } catch(err) {
-  if(err instanceof AensError){
+  if(err instanceof AensError) {
     // address or AENS related errors
   } else if(err instanceof TransactionError) {
     // transaction errors
-  } else if(err instanceof BaseError){
+  } else if(err instanceof BaseError) {
     // match any errors from the SDK
   }
 }

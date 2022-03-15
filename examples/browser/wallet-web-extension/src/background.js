@@ -5,7 +5,7 @@ import {
 } from '@aeternity/aepp-sdk'
 
 (async () => {
-  const sdk = await RpcWallet({
+  const aeSdk = await RpcWallet({
     compilerUrl: 'https://compiler.aepps.com',
     nodes: [{
       name: 'testnet',
@@ -70,10 +70,10 @@ import {
       { connectionInfo: { id: port.sender.frameId }, port }
     )
     // add new aepp to wallet
-    sdk.addRpcClient(connection)
+    aeSdk.addRpcClient(connection)
     // share wallet details
-    sdk.shareWalletInfo(port.postMessage.bind(port))
-    setInterval(() => sdk.shareWalletInfo(port.postMessage.bind(port)), 3000)
+    aeSdk.shareWalletInfo(port.postMessage.bind(port))
+    setInterval(() => aeSdk.shareWalletInfo(port.postMessage.bind(port)), 3000)
   })
 
   console.log('Wallet initialized!')

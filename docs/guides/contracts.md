@@ -22,8 +22,8 @@ const { Universal, MemoryAccount, Node } = require('@aeternity/aepp-sdk')
 import { Universal, MemoryAccount, Node } from '@aeternity/aepp-sdk'
 ```
 
-## 2. Initialize the SDK providing an account
-When initializing the SDK you need to provide an account which will be used to sign transactions like `ContractCreateTx` and `ContractCallTx` that will be broadcasted to the network.
+## 2. Create an instance of the SDK
+When creating an instance of the SDK you need to provide an account which will be used to sign transactions like `ContractCreateTx` and `ContractCallTx` that will be broadcasted to the network.
 
 ```js
 const node = await Node({
@@ -34,7 +34,7 @@ const account = MemoryAccount({
   keypair: { secretKey: SECRET_KEY, publicKey: PUBLIC_KEY }
 })
 
-const client = await Universal({
+const aeSdk = await Universal({
   nodes: [
     { name: 'testnet', instance: node }
   ],
@@ -56,7 +56,7 @@ Note:
 
 ```js
 const CONTRACT_SOURCE = ... // source code of the contract
-const contractInstance = await client.getContractInstance({ source: CONTRACT_SOURCE })
+const contractInstance = await aeSdk.getContractInstance({ source: CONTRACT_SOURCE })
 ```
 
 Note:
@@ -64,7 +64,7 @@ Note:
 - If your contract includes external dependencies which are not part of the [standard library](https://aeternity.com/aesophia/latest/sophia_stdlib) you should initialize the contract using:
   ```js
   const filesystem = ... // key-value map with name of the include as key and source code of the include as value
-  const contractInstance = await client.getContractInstance({ source: CONTRACT_SOURCE, filesystem })
+  const contractInstance = await aeSdk.getContractInstance({ source: CONTRACT_SOURCE, filesystem })
   ```
 
 ### By ACI and bytecode
@@ -73,7 +73,7 @@ If you pre-compiled the contracts you can also initialize a contract instance by
 ```js
 const aci = ... // ACI of the contract
 const bytecode = ... // bytecode of the contract
-const contractInstance = await client.getContractInstance({ aci, bytecode })
+const contractInstance = await aeSdk.getContractInstance({ aci, bytecode })
 ```
 
 ### By ACI and contract address
@@ -82,7 +82,7 @@ In many cases an application doesn't need to deploy a contract or verify its byt
 ```js
 const aci = ... // ACI of the contract
 const contractAddress = ... // the address of the contract
-const contractInstance = await client.getContractInstance({ aci, contractAddress })
+const contractInstance = await aeSdk.getContractInstance({ aci, contractAddress })
 ```
 
 ### Options

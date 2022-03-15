@@ -58,7 +58,7 @@ import { hash } from '../utils/crypto-ts'
  * @param {Boolean} [options.validateBytecode] Compare source code with on-chain version
  * @return {ContractInstance} JS Contract API
  * @example
- * const contractIns = await client.getContractInstance({ source })
+ * const contractIns = await aeSdk.getContractInstance({ source })
  * await contractIns.deploy([321]) or await contractIns.methods.init(321)
  * const callResult = await contractIns.call('setState', [123]) or
  * await contractIns.methods.setState.send(123, options)

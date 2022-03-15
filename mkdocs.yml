@@ -53,10 +53,11 @@ nav:
     - guides/oracles.md
     - guides/paying-for-tx.md
     - guides/low-vs-high-usage.md
-    - guides/batch-requests.md
     - Wallet interaction:
       - guides/connect-aepp-to-wallet.md
       - guides/build-wallet.md
+    - guides/error-handling.md
+    - guides/batch-requests.md
   - transaction-options.md
   - Examples & Tutorials:
     - NodeJS:
@@ -67,6 +68,7 @@ nav:
         - examples/node/paying-for-tx-spend-tx.md
     - tutorials/vuejs/helloworld-blockheight.md
   - api-reference.md
+  - compatibility.md
   - Changelog: CHANGELOG.md
   - Migration Guides:
     - guides/migration/10.0.0.md

@@ -7,7 +7,7 @@ contract Test =
 
 (async () => {
   const node = await Node({ url: 'https://testnet.aeternity.io' })
-  const sdk = await Universal({
+  const aeSdk = await Universal({
     nodes: [{ name: 'testnet', instance: node }],
     compilerUrl: 'https://compiler.aepps.com',
     accounts: [MemoryAccount({
@@ -18,10 +18,10 @@ contract Test =
     })]
   })
 
-  console.log('Height:', await sdk.height())
-  console.log('Instanceof works correctly for nodes pool', sdk.pool instanceof Map)
+  console.log('Height:', await aeSdk.height())
+  console.log('Instanceof works correctly for nodes pool', aeSdk.pool instanceof Map)
 
-  const contract = await sdk.getContractInstance({ source: contractSource })
+  const contract = await aeSdk.getContractInstance({ source: contractSource })
   const deployInfo = await contract.deploy()
   console.log('Contract deployed at', deployInfo.address)
   const map = new Map([['foo', 42], ['bar', 43]])

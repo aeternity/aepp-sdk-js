@@ -90,7 +90,7 @@ contract Multiplier =
 export default {
   components: { Value },
   props: {
-    sdk: { type: Object, required: true },
+    aeSdk: { type: Object, required: true },
     address: { type: String, default: '' },
     networkId: { type: String, default: '' },
   },
@@ -105,7 +105,7 @@ export default {
   }),
   methods: {
     create () {
-      return this.sdk.getContractInstance({ source: this.contractSource })
+      return this.aeSdk.getContractInstance({ source: this.contractSource })
     },
     async compile () {
       return (await this.createPromise).compile()

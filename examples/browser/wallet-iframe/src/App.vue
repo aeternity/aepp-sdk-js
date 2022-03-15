@@ -39,7 +39,7 @@ export default {
   data () {
     return {
       runningInFrame: window.parent !== window,
-      // sdk: null, see https://github.com/aeternity/aepp-sdk-js/issues/1347
+      // aeSdk: null, see https://github.com/aeternity/aepp-sdk-js/issues/1347
       nodeName: '',
       address: '',
       balancePromise: null,
@@ -47,28 +47,28 @@ export default {
   },
   methods: {
     async shareWalletInfo (postFn, { interval = 5000, attemps = 5 } = {}) {
-      this.sdk.shareWalletInfo(postFn)
+      this.aeSdk.shareWalletInfo(postFn)
       while (attemps -= 1) {
         await new Promise(resolve => setTimeout(resolve, interval))
-        this.sdk.shareWalletInfo(postFn)
+        this.aeSdk.shareWalletInfo(postFn)
       }
       console.log('Finish sharing wallet info')
     },
     disconnect () {
-      Object.values(this.sdk.rpcClients).forEach(client => {
+      Object.values(this.aeSdk.rpcClients).forEach(client => {
         client.sendMessage({ method: AeppWalletSchema.METHODS.closeConnection }, true)
         client.disconnect()
       })
     },
     async switchAccount () {
-      this.address = this.sdk.addresses().find(a => a !== this.address)
-      this.sdk.selectAccount(this.address)
+      this.address = this.aeSdk.addresses().find(a => a !== this.address)
+      this.aeSdk.selectAccount(this.address)
     },
     async switchNode () {
-      this.nodeName = this.sdk.getNodesInPool()
+      this.nodeName = this.aeSdk.getNodesInPool()
         .map(({ name }) => name)
         .find(name => name !== this.nodeName)
-      this.sdk.selectNode(this.nodeName)
+      this.aeSdk.selectNode(this.nodeName)
     }
   },
   async mounted () {
@@ -76,7 +76,7 @@ export default {
       if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to ${getActionName(params)}`)) accept()
       else deny()
     }
-    this.sdk = await RpcWallet({
+    this.aeSdk = await RpcWallet({
       nodes: [
         { name: 'ae_uat', instance: await Node({ url: 'https://testnet.aeternity.io' }) },
         { name: 'ae_mainnet', instance: await Node({ url: 'https://mainnet.aeternity.io' }) },
@@ -101,18 +101,18 @@ export default {
         this.shareWalletInfo(connection.sendMessage.bind(connection))
       }
     })
-    this.nodeName = this.sdk.selectedNode.name
-    this.address = this.sdk.addresses()[0]
+    this.nodeName = this.aeSdk.selectedNode.name
+    this.address = this.aeSdk.addresses()[0]
 
     const target = this.runningInFrame ? window.parent : this.$refs.aepp.contentWindow
     const connection = BrowserWindowMessageConnection({ target })
-    this.sdk.addRpcClient(connection)
+    this.aeSdk.addRpcClient(connection)
     this.shareWalletInfo(connection.sendMessage.bind(connection))
 
     this.$watch(
       ({ address, nodeName }) => [address, nodeName],
       ([address]) => {
-        this.balancePromise = this.sdk.getBalance(address)
+        this.balancePromise = this.aeSdk.getBalance(address)
       },
       { immediate: true }
     )

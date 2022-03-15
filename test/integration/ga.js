@@ -28,38 +28,38 @@ const authContractSource = `contract BlindAuth =
       Some(tx_hash) => true
 `
 describe('Generalized Account', function () {
-  let sdk
+  let aeSdk
   const gaAccount = generateKeyPair()
 
   before(async function () {
-    sdk = await getSdk()
-    await sdk.spend('100000000000000000000', gaAccount.publicKey)
-    sdk.removeAccount(sdk.selectedAddress)
-    await sdk.addAccount(MemoryAccount({ keypair: gaAccount }), { select: true })
+    aeSdk = await getSdk()
+    await aeSdk.spend('100000000000000000000', gaAccount.publicKey)
+    aeSdk.removeAccount(aeSdk.selectedAddress)
+    await aeSdk.addAccount(MemoryAccount({ keypair: gaAccount }), { select: true })
   })
 
   it('Make account GA', async () => {
-    await sdk.createGeneralizedAccount('authorize', authContractSource)
-    const isGa = await sdk.isGA(gaAccount.publicKey)
+    await aeSdk.createGeneralizedAccount('authorize', authContractSource)
+    const isGa = await aeSdk.isGA(gaAccount.publicKey)
     isGa.should.be.equal(true)
   })
 
   it('Fail on make GA on already GA', async () => {
-    await sdk.createGeneralizedAccount('authorize', authContractSource)
+    await aeSdk.createGeneralizedAccount('authorize', authContractSource)
       .should.be.rejectedWith(`Account ${gaAccount.publicKey} is already GA`)
   })
 
   it('Init MemoryAccount for GA and Spend using GA', async () => {
-    sdk.removeAccount(gaAccount.publicKey)
-    await sdk.addAccount(MemoryAccount({ gaId: gaAccount.publicKey }), { select: true })
+    aeSdk.removeAccount(gaAccount.publicKey)
+    await aeSdk.addAccount(MemoryAccount({ gaId: gaAccount.publicKey }), { select: true })
     const { publicKey } = generateKeyPair()
 
     const r = () => Math.floor(Math.random() * 20).toString()
-    const authContract = await sdk.getContractInstance({ source: authContractSource })
+    const authContract = await aeSdk.getContractInstance({ source: authContractSource })
     const callData = authContract.calldata.encode('BlindAuth', 'authorize', [r()])
-    await sdk.spend(10000, publicKey, { authData: { callData } })
-    await sdk.spend(10000, publicKey, { authData: { source: authContractSource, args: [r()] } })
-    const balanceAfter = await sdk.balance(publicKey)
+    await aeSdk.spend(10000, publicKey, { authData: { callData } })
+    await aeSdk.spend(10000, publicKey, { authData: { source: authContractSource, args: [r()] } })
+    const balanceAfter = await aeSdk.balance(publicKey)
     balanceAfter.should.be.equal('20000')
   })
 })

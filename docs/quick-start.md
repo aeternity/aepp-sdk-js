@@ -27,9 +27,9 @@ To receive some _AE_ you can use the [Faucet](https://faucet.aepps.com/). Just a
 ## 4. Interact with the æternity blockchain
 This example shows:
 
-- how to initialize the SDK client using the `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp)
+- how to create an instance of the SDK using the `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp)
 - how to get the current block height
-- how to spend 1 AE from the account the SDK was initialized with to some other AE address
+- how to spend 1 AE from the account the SDK instance was initialized with to some other AE address
 
 ```js
 const NODE_URL = 'https://testnet.aeternity.io';
@@ -41,17 +41,17 @@ const account = MemoryAccount({
 
 (async function () {
   const node = await Node({ url: NODE_URL })
-  const client = await Universal({
+  const aeSdk = await Universal({
      compilerUrl: COMPILER_URL,
      nodes: [ { name: 'testnet', instance: node } ],
      accounts: [ account ]
   })
 
-  const height = await client.height() // get top block height
-  console.log('Current Block Height:', height)
+  const height = await aeSdk.height() // get top keyblock height
+  console.log('Current Keyblock Height:', height)
 
   // spend one AE
-  await client.spend(1, '<RECIPIENT_PUBLIC_KEY>', { // replace <RECIPIENT_PUBLIC_KEY>
+  await aeSdk.spend(1, '<RECIPIENT_PUBLIC_KEY>', { // replace <RECIPIENT_PUBLIC_KEY>
       denomination: AmountFormatter.AE_AMOUNT_FORMATS.AE
   })
 })()

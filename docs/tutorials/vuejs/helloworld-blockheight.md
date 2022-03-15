@@ -40,12 +40,12 @@ export default {
     // Init required Node stamp
     const node = await Node({ url: 'https://testnet.aeternity.io' })
 
-    // Init sdk client with Universal stamp
-    const client = await Universal({
+    // Init SDK instance with Universal stamp
+    const aeSdk = await Universal({
        nodes: [{ name: 'test-net', instance: node }],
     })
-    // Start using sdk client
-    const height = await client.height()
+    // Start using the SDK
+    const height = await aeSdk.height()
     this.msg = 'Current Block: ' + height
   }
 }

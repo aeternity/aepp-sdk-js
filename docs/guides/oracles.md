@@ -10,8 +10,8 @@ You register an oracle that responds with the temperature of the city that is in
 To register an oracle you need to provide a `queryFormat` and a `responseFormat` to the `registerOracle` function of the SDK. In addition to the common transaction options you can provide the oracle specific options `queryFee` and `oracleTtl`, see [transaction options](../transaction-options.md#oracleregistertx).
 
 ```js
-// init the SDK using the Universal Stamp
-const client = await Universal({ ... })
+// init an instance of the SDK using the Universal Stamp
+const aeSdk = await Universal({ ... })
 
 // set TTL with a delta of 1000 blocks
 const oracleTtl = {type: 'delta', value: 1000}
@@ -23,7 +23,7 @@ const oracleTtl = { type: 'block', value: 555555 }
 const options = {queryFee: 1337, oracleTtl }
 
 // the first argument is the queryFormat and the second is the responseFormat
-const oracle = await client.registerOracle("{'city': string}", "{'temperature': int}", options)
+const oracle = await aeSdk.registerOracle("{'city': string}", "{'temperature': int}", options)
 ```
 
 Note:
@@ -48,11 +48,11 @@ const oracleId = 'ok_...';
 const options = {queryFee: 1337, queryTtl: {type: 'delta', value: 20}, responseTtl: {type: 'delta', value: 50}}
 
 // using the oracle object
-const oracle = await client.getOracleObject(oracleId) // in case you need to instantiate the oracle object first
+const oracle = await aeSdk.getOracleObject(oracleId) // in case you need to instantiate the oracle object first
 const query = await oracle.postQuery("{'city': 'Berlin'}", options) // using the oracle instance
 
-// OR using the client (instance of Universal stamp) by providing the oracleId
-const query = await client.postQueryToOracle(oracleId, "{'city': 'Berlin'}", options)
+// OR using the aeSdk (instance of Universal stamp) directly by providing the oracleId
+const query = await aeSdk.postQueryToOracle(oracleId, "{'city': 'Berlin'}", options)
 ```
 
 Note:
@@ -67,11 +67,11 @@ const oracleId = 'ok_...';
 const queryId = 'oq_...';
 
 // using the query instance
-const query = await client.getQueryObject(oracleId, queryId) // in case you need to get the query instance first
+const query = await aeSdk.getQueryObject(oracleId, queryId) // in case you need to get the query instance first
 const response = await query.pollForResponse({ attempts: 10, interval: 6000 })
 
-// OR using the client (instance of Universal stamp) by providing the oracleId
-const response = await client.pollForQueryResponse(oracleId, queryId, { attempts: 10, interval: 6000 })
+// OR using the aeSdk (instance of Universal stamp) directly by providing the oracleId
+const response = await aeSdk.pollForQueryResponse(oracleId, queryId, { attempts: 10, interval: 6000 })
 
 // decode the oracle response
 // the decode function returns a buffer that needs to be converted to a string
@@ -106,11 +106,11 @@ const queryId = 'oq_...';
 const options = { onAccount: 'ak_...' } // only the account of the oracle can respond to the query
 
 // using the query instance
-const query = await client.getQueryObject(oracleId, queryId)
+const query = await aeSdk.getQueryObject(oracleId, queryId)
 await query.respond('{ "temperature": 27.5 }', options)
 
-// OR using the client (instance of Universal stamp) by providing the oracleId and the queryId
-await client.respondToQuery(oracleId, queryId, '{ "temperature": 27.5 }', options)
+// OR using the aeSdk (instance of Universal stamp) directly by providing the oracleId and the queryId
+await aeSdk.respondToQuery(oracleId, queryId, '{ "temperature": 27.5 }', options)
 ```
 
 Note:
@@ -128,11 +128,11 @@ const oracleId = 'ok_...';
 const oracleTtl = { type: 'delta', value: 500 }
 
 // using the oracle instance
-const oracle = await client.getOracleObject(oracleId)
+const oracle = await aeSdk.getOracleObject(oracleId)
 const extendedOracle = await oracle.extendOracle(oracleTtl)
 
-// OR using the client (instance of Universal stamp) by providing the oracleId
-const extendedOracle = await client.extendOracleTtl(oracleId, oracleTtl)
+// OR using the aeSdk (instance of Universal stamp) directly by providing the oracleId
+const extendedOracle = await aeSdk.extendOracleTtl(oracleId, oracleTtl)
 ```
 
 ## Example applications

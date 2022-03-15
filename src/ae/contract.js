@@ -64,13 +64,13 @@ async function delegateSignatureCommon (ids = [], opt = {}) {
  * @param {{ onAccount: String | Object }} [opt={}] opt Options
  * @return {Promise<String>} Signature for delegation
  * @example
- * const client = await Universal({ ... })
+ * const aeSdk = await Universal({ ... })
  * const contractId = 'ct_asd2ks...' // contract address
  * const name = 'example.chain' // AENS name
- * const onAccount = await client.address() // Sign with a specific account
+ * const onAccount = await aeSdk.address() // Sign with a specific account
  * // Preclaim signature
  * const params = { contractId }
- * const preclaimSig = await client.createAensDelegationSignature(params, { onAccount: current })
+ * const preclaimSig = await aeSdk.createAensDelegationSignature(params, { onAccount: current })
  * // Claim, transfer and revoke signature
  * const params = { contractId, name }
  * const aensDelegationSig = await contract.createAensDelegationSignature(
@@ -94,10 +94,10 @@ async function createAensDelegationSignature ({ contractId, name }, opt = {}) {
  * @param {{ onAccount: String | Object }} [opt={}] opt Options
  * @return {Promise<String>} Signature for delegation
  * @example
- * const client = await Universal({ ... })
+ * const aeSdk = await Universal({ ... })
  * const contractId = 'ct_asd2ks...' // contract address
  * const queryId = 'oq_...' // Oracle Query Id
- * const onAccount = await client.address() // Sign with a specific account
+ * const onAccount = await aeSdk.address() // Sign with a specific account
  * // Oracle register and extend signature
  * const params = { contractId }
  * const oracleDelegationSig = await contract.createOracleDelegationSignature(params, { onAccount })

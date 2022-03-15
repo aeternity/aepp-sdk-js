@@ -7,30 +7,30 @@ import verifyTransaction from '../../src/tx/validator'
 import { ArgumentError } from '../../src/utils/errors'
 
 describe('Verify Transaction', function () {
-  let sdk, node
+  let aeSdk, node
 
   before(async () => {
-    sdk = await getSdk()
-    node = sdk.selectedNode.instance
-    await sdk.spend(1234, 'ak_LAqgfAAjAbpt4hhyrAfHyVg9xfVQWsk1kaHaii6fYXt6AJAGe')
+    aeSdk = await getSdk()
+    node = aeSdk.selectedNode.instance
+    await aeSdk.spend(1234, 'ak_LAqgfAAjAbpt4hhyrAfHyVg9xfVQWsk1kaHaii6fYXt6AJAGe')
   })
 
   it('validates params in buildRawTx', async () => {
-    return expect(sdk.spendTx({})).to.be.rejectedWith(ArgumentError, 'value should be a number, got undefined instead')
+    return expect(aeSdk.spendTx({})).to.be.rejectedWith(ArgumentError, 'value should be a number, got undefined instead')
     // TODO: should be /^Transaction build error./ instead
   })
 
   it('returns errors', async () => {
-    const spendTx = await sdk.spendTx({
-      senderId: await sdk.address(),
-      recipientId: await sdk.address(),
+    const spendTx = await aeSdk.spendTx({
+      senderId: await aeSdk.address(),
+      recipientId: await aeSdk.address(),
       amount: 1e30,
       fee: '1000',
       nonce: '1',
       ttl: 2,
       absoluteTtl: true
     })
-    const signedTx = await sdk.signTransaction(
+    const signedTx = await aeSdk.signTransaction(
       spendTx,
       { onAccount: MemoryAccount({ keypair: generateKeyPair() }) }
     )
@@ -41,9 +41,9 @@ describe('Verify Transaction', function () {
   })
 
   it('returns NonceHigh error', async () => {
-    const spendTx = await sdk.spendTx({
-      senderId: await sdk.address(),
-      recipientId: await sdk.address(),
+    const spendTx = await aeSdk.spendTx({
+      senderId: await aeSdk.address(),
+      recipientId: await aeSdk.address(),
       amount: 100,
       nonce: 100
     })
@@ -52,14 +52,14 @@ describe('Verify Transaction', function () {
   })
 
   it('verifies transactions before broadcasting', async () => {
-    const spendTx = await sdk.spendTx({
-      senderId: await sdk.address(),
-      recipientId: await sdk.address(),
+    const spendTx = await aeSdk.spendTx({
+      senderId: await aeSdk.address(),
+      recipientId: await aeSdk.address(),
       amount: 1,
       ttl: 2,
       absoluteTtl: true
     })
-    const error = await sdk.send(spendTx).catch(e => e)
+    const error = await aeSdk.send(spendTx).catch(e => e)
     expect(error.validation).to.have.lengthOf(1)
   })
 

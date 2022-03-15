@@ -1,4 +1,4 @@
-# Compatibility table
+# Compatibility Table
 
 This package is expected to work in these environments:
 

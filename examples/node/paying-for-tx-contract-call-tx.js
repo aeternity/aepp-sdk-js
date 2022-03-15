@@ -100,7 +100,7 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
   const payerAccount = MemoryAccount({ keypair: PAYER_ACCOUNT_KEYPAIR })
   const newUserAccount = MemoryAccount({ keypair: NEW_USER_KEYPAIR })
   const node = await Node({ url: NODE_URL })
-  const client = await Universal({
+  const aeSdk = await Universal({
     nodes: [{ name: 'testnet', instance: node }],
     compilerUrl: COMPILER_URL,
     accounts: [payerAccount, newUserAccount]
@@ -109,7 +109,7 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
   // The `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp) itself is
   // asynchronous as it determines the node's version and rest interface automatically. Only once
   // the Promise is fulfilled, you know you have a working object instance which is assigned to the
-  // `client` constant in this case.
+  // `aeSdk` constant in this case.
   //
   // Note:
   //
@@ -134,11 +134,11 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
   //  1. Sign the transaction by providing `innerTx: true` as transaction option.
   //      - The transaction will be signed in a special way that is required for inner transactions.
   //
-  const contract = await client.getContractInstance(
+  const contract = await aeSdk.getContractInstance(
     { source: CONTRACT_SOURCE, contractAddress: CONTRACT_ADDRESS }
   )
   const calldata = contract.calldata.encode('PayingForTxExample', 'set_last_caller', [])
-  const contractCallTx = await client.contractCallTx({
+  const contractCallTx = await aeSdk.contractCallTx({
     callerId: await newUserAccount.address(),
     contractId: CONTRACT_ADDRESS,
     amount: 0,
@@ -146,12 +146,12 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
     gasPrice: 1500000000,
     callData: calldata
   })
-  const signedContractCallTx = await client.signTransaction(
+  const signedContractCallTx = await aeSdk.signTransaction(
     contractCallTx, { onAccount: newUserAccount, innerTx: true }
   )
 
   // ## 6. Create, sign & broadcast the `PayingForTx` as payer
-  const payForTx = await client.payForTransaction(signedContractCallTx, { onAccount: payerAccount })
+  const payForTx = await aeSdk.payForTransaction(signedContractCallTx, { onAccount: payerAccount })
   console.log(payForTx)
 
   // ## 7. Check that last caller is the new user
