@@ -15,7 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { blake2b } from 'blakejs'
+import { blake2b } from '@aeternity/blakejs'
 import type { Data } from 'blakejs'
 
 /**
@@ -25,5 +25,5 @@ import type { Data } from 'blakejs'
  * @return {Buffer} Hash
  */
 export function hash (input: Data): Buffer {
-  return Buffer.from(blake2b(input, null, 32)) // 256 bits
+  return Buffer.from(blake2b(input, undefined, 32)) // 256 bits
 }
