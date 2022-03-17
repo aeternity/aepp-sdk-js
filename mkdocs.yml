@@ -71,6 +71,7 @@ nav:
   - compatibility.md
   - Changelog: CHANGELOG.md
   - Migration Guides:
+    - guides/migration/11.0.0.md
     - guides/migration/10.0.0.md
     - guides/migration/9.0.0.md
     - guides/migration/7.0.0.md

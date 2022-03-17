@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## [11.0.0](https://github.com/aeternity/aepp-sdk-js/compare/v10.0.0...v11.0.0) (2022-03-16)
 
+### Request batching: SDK now supports batching requests([batch-requests.md](docs/guides/batch-requests.md ))
+
+### Custom error types: Introduced error types([error-handling.md](docs/guides/error-handling.md))
+
+### Naming convention: Instances of the SDK in the examples and tests are now called as `aeSdk`.
 
 ### ⚠ BREAKING CHANGES
 
