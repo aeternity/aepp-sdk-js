@@ -1,6 +1,6 @@
 # Error Handling
 
-This guide shows you how to handle errors originating from the SDK. SDK by default exports the following error classes from file [errors.ts](../../src/utils/errors.ts)
+This guide shows you how to handle errors originating from the SDK. SDK by default exports the following error classes from file [errors.ts](https://github.com/aeternity/aepp-sdk-js/blob/develop/src/utils/errors.ts)
 
 ## Error Hierarchy
 
