@@ -17,6 +17,7 @@ jobs:
           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
 
       - run: npm ci --ignore-scripts
+      - run: npx commitlint --from HEAD~${{ github.event.pull_request.commits }} --to HEAD
       - run: npm run lint
       - run: npm run build
       - run: npm run test:unit

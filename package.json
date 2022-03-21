@@ -15,7 +15,7 @@
     "build:dev": "webpack --mode=development && npm run build:es",
     "docs:examples": "node tooling/docs/examples-to-md.js examples/node/*.js",
     "docs:api": "node apidoc.js",
-    "lint": "commitlint --from HEAD~50 && eslint .",
+    "lint": "eslint .",
     "test": "nyc mocha './test/unit/' './test/integration/'",
     "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "test:integration": "nyc mocha './test/integration/'",
