@@ -15,17 +15,18 @@ jobs:
         with:
           path: ~/.npm
           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-
       - run: npm ci --ignore-scripts
       - name: Run Commitlint
-        if: github.event_name == 'pull_request'
         env:
+          EVENT_TYPE: ${{ github.event_name }}
           HEAD: ${{ github.event.pull_request.head.sha }}
           BASE: ${{ github.event.pull_request.base.sha }}
-        run: npx commitlint --from $BASE --to $HEAD --verbose
-      - name: Run Commitlint
-        if: github.event_name == 'push'
-        run: npx commitlint --from HEAD~${{ github.event.push.commits }} --to HEAD --verbose
+        run: |
+          if [ "$EVENT_TYPE" = "push" ]; then
+            npx commitlint --from HEAD~${{ github.event.push.commits }} --to HEAD --verbose
+          else
+            npx commitlint --from $BASE --to $HEAD --verbose
+          fi
       - run: npm run lint
       - run: npm run build
       - run: npm run test:unit
