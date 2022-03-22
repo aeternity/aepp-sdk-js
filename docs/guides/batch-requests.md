@@ -1,4 +1,4 @@
-# Batch transactions
+# Batch Transactions
 
 ## Introduction
 In some cases, aepp developer may need to send a set of transactions at once. The SDK provides optimizations for this scenario but it also requires additional effort by the developer. This guide covers specific cases with suggestions on how to proceed with them to produce a sequence of requests in an efficient way.

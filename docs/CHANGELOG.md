@@ -2,6 +2,145 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [11.0.0](https://github.com/aeternity/aepp-sdk-js/compare/v10.0.0...v11.0.0) (2022-03-18)
+
+### Request batching: SDK now supports [batching transactions](guides/batch-requests.md)
+
+### Custom error types: Introduced [error types](guides/error-handling.md)
+
+### Naming convention: Instances of the SDK in the examples and tests are now called as `aeSdk`.
+
+### ⚠ BREAKING CHANGES
+
+* return empty array instead of throwing UnsignedTxError
+* **rpc:** remove forceValidation flag
+* **hd-wallet:** expect that bip39 used externally
+* **hd-wallet:** remove default export
+* **crypto:** make (encode/decode)Base(58/64)Check private
+* use bs58 instead of bs58check
+* update rlp to 3.0.0
+* **tx builder:** throw exception if deposit is not zero
+* **tx schema:** remove default NAME_FEE equal to 0
+* **tx builder:** accept unencoded name in nameClaimTx
+* spelling of GeneralizedAccount
+* **aci:** remove call/callStatic from deployInfo
+* **aci:** remove createdAt property generated at client
+* **contract:** remove deprecated contractCallStatic
+* **contract:** remove deprecated contractDeploy
+* **contract:** remove contractCompile
+* **contract:** remove deprecated contractCall
+* remove deprecated topBlock
+* remove unused functions
+* **contract events:** remote contract support
+* **contract instance:** store aci as it is
+* **wallet-rpc:** inline resolveOnAccount helper
+* **aepp-wallet schema:** convert to TS
+* **aepp-wallet schema:** rearrange METHODS enum
+* **aepp-wallet schema:** remove unused enums
+* **contractCompile:** remove encodeCall
+* **compiler:** remove contractEncodeCallDataAPI
+* **compiler:** remove getCompilerVersion
+* **contract:** remove compileContractAPI
+* **contract:** remove contractGetACI
+* **contract:** remove contractDecodeCallDataByCodeAPI
+* **contract:** remove contractDecodeCallDataBySourceAPI
+* **contract:** remove contractDecodeCallResultAPI
+* **compiler:** remove validateByteCodeAPI
+* **compiler:** remove getFateAssembler
+* **compiler:** remove getBytecodeCompilerVersion
+* **poll:** avoid extra transaction info request to node
+* drop https scheme workaround for hosted compiler
+* **node:** don't wrap internal endpoints if internalUrl missed
+* **tx builder:** inline VALIDATION_MESSAGE
+* **decodeEvents:** accept event schemas as it is in ACI
+* **contract:** remove already processed fields from decoded events
+* **aci:** drop redundant per-method event decoding
+
+### Features
+
+* **aci:** use dry-run to estimate gas and get rich errors ([bb6977d](https://github.com/aeternity/aepp-sdk-js/commit/bb6977de0068b51ede3780015e4089567ee41e3f))
+* calculate default polling intervals depending on node settings ([d9c6cf9](https://github.com/aeternity/aepp-sdk-js/commit/d9c6cf9aae59515f9e9a032e58b45840c6801b50))
+* **chain:** combine multiple dry-run requests at one ([ddcdaef](https://github.com/aeternity/aepp-sdk-js/commit/ddcdaef60f80a2caeb14aab798a502e9e4d3b50e))
+* **contract events:** ability to resolve multiple definitions of event ([c5b77fa](https://github.com/aeternity/aepp-sdk-js/commit/c5b77faff828b94c63177bc89fdbf12817d198c7))
+* **contract events:** remote contract support ([c7599c7](https://github.com/aeternity/aepp-sdk-js/commit/c7599c73a67d6b34235e99349340b95ee8429342))
+* **createGeneralizeAccount:** estimate gas limit instead of using const ([da88852](https://github.com/aeternity/aepp-sdk-js/commit/da88852eece61dc60e80dfa596fb9b6061634197))
+* **decode encode:** validate base58 prefix and payload length ([e836260](https://github.com/aeternity/aepp-sdk-js/commit/e836260d35527cde3e7a5a8810b58d03ead16683))
+* **error:** introduce error types ([#1345](https://github.com/aeternity/aepp-sdk-js/issues/1345)) ([444bb33](https://github.com/aeternity/aepp-sdk-js/commit/444bb3373839aa8d711f996888c556e5728b6efa))
+* **package:** build es version compatible with node ([480c747](https://github.com/aeternity/aepp-sdk-js/commit/480c747481a691355392a51fb69155dc9327d856))
+* **poll:** use getCheckTxInPool if available ([690db5b](https://github.com/aeternity/aepp-sdk-js/commit/690db5bd2919958edcadca79fd75b5ad96b77c62))
+* **swagger:** converts operationId in snake case to pascal ([e52b739](https://github.com/aeternity/aepp-sdk-js/commit/e52b739f051024f605997575cf7b88ee733550c3))
+* **swagger:** split transactions by queues to post batch of txs from one account ([0023fc7](https://github.com/aeternity/aepp-sdk-js/commit/0023fc72b24bc73f77a3eeb07f06e6175d01a940))
+* **tx builder:** accept unencoded name in nameClaimTx ([eea92be](https://github.com/aeternity/aepp-sdk-js/commit/eea92be7432cfc56e781c2234379c8f2c3398e3e))
+* **tx builder:** don't require produceNameId to create AENS txs ([57ef9c7](https://github.com/aeternity/aepp-sdk-js/commit/57ef9c75836c48e4db9d3ddfdadddd845dba5bad))
+* **tx builder:** provide default name fee ([18e4bab](https://github.com/aeternity/aepp-sdk-js/commit/18e4bab931eb925f8b05cb9778eac5054b2aae25))
+* **validator:** check contractId ([5e667a5](https://github.com/aeternity/aepp-sdk-js/commit/5e667a598ce6299aa82ba391a9415dc1e3ff9664))
+* **wallet:** add switch for aepp wallet node sharing ([b5640d6](https://github.com/aeternity/aepp-sdk-js/commit/b5640d63f221d83405f8616339111805a3ecc881))
+* **wallet:** enable aepp to wallet node connection ([d87e1fa](https://github.com/aeternity/aepp-sdk-js/commit/d87e1fa189193f8c3feeeed12ee84fdfbbdc9b86))
+* **wallet:** provide switch for aepp wallet node connection ([dfbab59](https://github.com/aeternity/aepp-sdk-js/commit/dfbab5957dc3e7769427737f8f0b31fc1e63d20a))
+
+
+### Bug Fixes
+
+* **aens helpers:** improve naming, add additional validations ([d2a10e1](https://github.com/aeternity/aepp-sdk-js/commit/d2a10e19d65f6fba2cb41852709ee88a34219b9c))
+* **babel:** compatibility with create-react-app ([e4b56fe](https://github.com/aeternity/aepp-sdk-js/commit/e4b56fe82e486a64c7450ed5741c41a388533dd4))
+* **babel:** depend on buffer package in es build ([0ba51e9](https://github.com/aeternity/aepp-sdk-js/commit/0ba51e958d8dfa0483e0b6d9720bd6dc202da68d))
+* **babel:** don't rewrite import of rlp package for @vue/cli@4.5.15 ([0fdd296](https://github.com/aeternity/aepp-sdk-js/commit/0fdd296722b1d30fab797777a20f811202a817e3))
+* **chain:** don't require address function to post transaction ([07bc105](https://github.com/aeternity/aepp-sdk-js/commit/07bc105055b0bf59bc99c088983f9ba4233cc17e))
+* **channel force progress:** add missed binary prefixes ([78660d2](https://github.com/aeternity/aepp-sdk-js/commit/78660d2837b3b4f2fb4972b264a0d534510bb21d))
+* **channel:** ignore messages that can't be handled, print to console ([aaad8e3](https://github.com/aeternity/aepp-sdk-js/commit/aaad8e315302a576a23aa70b280debaaad82407a))
+* **compatibility:** update argon2-browser to version with default export ([0e69d8b](https://github.com/aeternity/aepp-sdk-js/commit/0e69d8b4ec83ad68183ab32474d7d49cd6b26069))
+* **compatibility:** use blakejs that doesn't refer to Buffer ([94f1879](https://github.com/aeternity/aepp-sdk-js/commit/94f187916b734adcc3c531be4d703703a08ec4cd))
+* **contract events:** don't throw error if events emitted by remote ([fa1c569](https://github.com/aeternity/aepp-sdk-js/commit/fa1c569cd5047b7993bd2593d4fb943e9a3f4b1b))
+* **delegate signature:** don't encode address depending on onAccount ([563a972](https://github.com/aeternity/aepp-sdk-js/commit/563a9722baa15a60110a61fb21088e9158442518))
+* **dry-run:** don't combine requests by default ([0f36efc](https://github.com/aeternity/aepp-sdk-js/commit/0f36efcea4f65d0280d1206c7eb5d3a8ac71c4b4))
+* **error:** remove duplicate error message ([8b4df9a](https://github.com/aeternity/aepp-sdk-js/commit/8b4df9ac689566d108c05aa2cfbabecba0b359ab))
+* **es:** babel build on windows ([30f5213](https://github.com/aeternity/aepp-sdk-js/commit/30f5213e9dd9dfb29871c0038755f2f3d66757b5))
+* **keystore:** encoding of hex privateKey, simplify tests ([9f3ad6b](https://github.com/aeternity/aepp-sdk-js/commit/9f3ad6b4254bdcda0af3f3d729f79f24d36970e0))
+* spelling of GeneralizedAccount ([21c1dd3](https://github.com/aeternity/aepp-sdk-js/commit/21c1dd30e16c5d731a7dc3cff0593c80632b01c0))
+* **tx builder:** reject more than 32 pointers ([9c06dab](https://github.com/aeternity/aepp-sdk-js/commit/9c06dab7d1a44a142d0aa9644d5d754fbc2ca4d1))
+* **tx builder:** throw exception if deposit is not zero ([7b3d0e3](https://github.com/aeternity/aepp-sdk-js/commit/7b3d0e3b7f6d62c3099b9ffb3d5cca98ccec1dba))
+
+
+* **aci:** drop redundant per-method event decoding ([a84d781](https://github.com/aeternity/aepp-sdk-js/commit/a84d781ab08473b7af8e6c16491492cb166d6155))
+* **aci:** remove call/callStatic from deployInfo ([84d082d](https://github.com/aeternity/aepp-sdk-js/commit/84d082d52ab639e942e15587e9157bea09554806))
+* **aci:** remove createdAt property generated at client ([406684c](https://github.com/aeternity/aepp-sdk-js/commit/406684c65c24063603e0a4fde13303472ec7ed05))
+* **aepp-wallet schema:** convert to TS ([1775e91](https://github.com/aeternity/aepp-sdk-js/commit/1775e915d5a09891162324dccac8f2fa96598d35))
+* **aepp-wallet schema:** rearrange METHODS enum ([8a40105](https://github.com/aeternity/aepp-sdk-js/commit/8a40105dc6d0d90bcc1f4c0c52af413547d78893))
+* **aepp-wallet schema:** remove unused enums ([95bf0e9](https://github.com/aeternity/aepp-sdk-js/commit/95bf0e9ea80f897087b687830542c0003ea7604a))
+* **compiler:** remove contractEncodeCallDataAPI ([7d02317](https://github.com/aeternity/aepp-sdk-js/commit/7d023177c8d30b3d7e3093389aadf7c3db20ec0d))
+* **compiler:** remove getBytecodeCompilerVersion ([13283be](https://github.com/aeternity/aepp-sdk-js/commit/13283becb279ca37bd872bb1dfe28a5463d1663e))
+* **compiler:** remove getCompilerVersion ([fb929f8](https://github.com/aeternity/aepp-sdk-js/commit/fb929f8a4b66623b08d17525974b50515095d06c))
+* **compiler:** remove getFateAssembler ([165d492](https://github.com/aeternity/aepp-sdk-js/commit/165d49214690bb5978f7a64ac8d9af663d75c55c))
+* **compiler:** remove validateByteCodeAPI ([90ba164](https://github.com/aeternity/aepp-sdk-js/commit/90ba1648caa097b2e6684d922e269c448bca846e))
+* **contract instance:** store aci as it is ([978225e](https://github.com/aeternity/aepp-sdk-js/commit/978225e666eab37e91c0a0c31823cbb56c98fd88))
+* **contractCompile:** remove encodeCall ([6d0ade5](https://github.com/aeternity/aepp-sdk-js/commit/6d0ade516bb290a04a2fcdfdcf9687b446d502cc))
+* **contract:** remove already processed fields from decoded events ([45bae5f](https://github.com/aeternity/aepp-sdk-js/commit/45bae5f8f0b21d374966a761512ba91bb747c47a))
+* **contract:** remove compileContractAPI ([5ae9c62](https://github.com/aeternity/aepp-sdk-js/commit/5ae9c62ae5d5ae155976b99f2beb81c38b4791c4))
+* **contract:** remove contractCompile ([7390629](https://github.com/aeternity/aepp-sdk-js/commit/7390629e07ce98d1570b6cd43ac2a5037a214cfe))
+* **contract:** remove contractDecodeCallDataByCodeAPI ([2fe798a](https://github.com/aeternity/aepp-sdk-js/commit/2fe798a292e8eb7b027a030c4d482158b3e10d5b))
+* **contract:** remove contractDecodeCallDataBySourceAPI ([8b13f70](https://github.com/aeternity/aepp-sdk-js/commit/8b13f703d702ecb8a5b20102263a377bffb48de3))
+* **contract:** remove contractDecodeCallResultAPI ([b9fbfa6](https://github.com/aeternity/aepp-sdk-js/commit/b9fbfa6f3c55396228ddc9427721d160031875d2))
+* **contract:** remove contractGetACI ([23ada71](https://github.com/aeternity/aepp-sdk-js/commit/23ada718ac0deb36cea859dd20da45c17bcd4595))
+* **contract:** remove deprecated contractCall ([c079e6e](https://github.com/aeternity/aepp-sdk-js/commit/c079e6eb90e5dd4bfcdc50f889e204d36e13012d))
+* **contract:** remove deprecated contractCallStatic ([1e3ac6d](https://github.com/aeternity/aepp-sdk-js/commit/1e3ac6da6eb4d6b6674913225c2fad88d2c3ac2f))
+* **contract:** remove deprecated contractDeploy ([08e423e](https://github.com/aeternity/aepp-sdk-js/commit/08e423e12e31c8c3807c5cd018ce0680c33e2afb))
+* **crypto:** make (encode/decode)Base(58/64)Check private ([c151183](https://github.com/aeternity/aepp-sdk-js/commit/c1511837abd38bf6c2a6c8215519dba2255c6868))
+* **decodeEvents:** accept event schemas as it is in ACI ([17b9cc4](https://github.com/aeternity/aepp-sdk-js/commit/17b9cc42573f58084a1ca4ae96ec2f5d3b743757))
+* drop https scheme workaround for hosted compiler ([9fc0a02](https://github.com/aeternity/aepp-sdk-js/commit/9fc0a02e7d26476f0645f9e472f4cf641c12cba8))
+* **hd-wallet:** expect that bip39 used externally ([f6243ad](https://github.com/aeternity/aepp-sdk-js/commit/f6243adea2017b5e20c079d51a8e0a469ed9792c))
+* **hd-wallet:** remove default export ([951ebb2](https://github.com/aeternity/aepp-sdk-js/commit/951ebb227153b3cf1262f25ff30d4f1308040d89))
+* **node:** don't wrap internal endpoints if internalUrl missed ([50d7bba](https://github.com/aeternity/aepp-sdk-js/commit/50d7bbad51fb240f370ad86d6accfbc72d75f6f1))
+* **poll:** avoid extra transaction info request to node ([22c4838](https://github.com/aeternity/aepp-sdk-js/commit/22c4838dab7828a9fd53098097c182f100fa83bb))
+* remove deprecated topBlock ([4535c07](https://github.com/aeternity/aepp-sdk-js/commit/4535c077d431fec2091f88f87cb96559a65158ff))
+* remove unused functions ([8c00de5](https://github.com/aeternity/aepp-sdk-js/commit/8c00de5f0c88a50d5dcaa9656fe64317ea707fc8))
+* return empty array instead of throwing UnsignedTxError ([c6bacdf](https://github.com/aeternity/aepp-sdk-js/commit/c6bacdf911b402c6dff57b790950214f74988849))
+* **rpc:** remove forceValidation flag ([9f958c3](https://github.com/aeternity/aepp-sdk-js/commit/9f958c3549228c990b4c6074b88ed5b45284bf55))
+* **tx builder:** inline VALIDATION_MESSAGE ([defb7e1](https://github.com/aeternity/aepp-sdk-js/commit/defb7e110ad72c451e59720b25a9a75c04ee39ef))
+* **tx schema:** remove default NAME_FEE equal to 0 ([9d8339a](https://github.com/aeternity/aepp-sdk-js/commit/9d8339ab8ed65dbee846a0e555f13d6f7042d427))
+* update rlp to 3.0.0 ([bb32b77](https://github.com/aeternity/aepp-sdk-js/commit/bb32b7721db2596f6218dc51731b681922c914ad))
+* use bs58 instead of bs58check ([32e836b](https://github.com/aeternity/aepp-sdk-js/commit/32e836b83e24bdbdb7304af6de90ecb4eb6b6383))
+* **wallet-rpc:** inline resolveOnAccount helper ([1277b5b](https://github.com/aeternity/aepp-sdk-js/commit/1277b5bcc53b7577497efb213734579c5e997883))
+
 ## [10.0.0](https://github.com/aeternity/aepp-sdk-js/compare/v9.0.1...v10.0.0) (2021-12-07)
 
 
