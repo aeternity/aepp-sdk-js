@@ -22,7 +22,7 @@
     "test:watch": "mocha './test/unit/' './test/integration/' --watch",
     "prepare": "npm run build",
     "prepublishOnly": "npm run docs:examples",
-    "release": "standard-version --skip.tag"
+    "release": "standard-version --skip.tag --infile docs/CHANGELOG.md"
   },
   "license": "ISC",
   "keywords": [
