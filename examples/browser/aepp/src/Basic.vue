@@ -19,7 +19,7 @@
     </div>
     <div>
       <div>Compiler version</div>
-      <Value :value="compilerVersionPromise" />
+      <div>{{ compilerVersion }}</div>
     </div>
   </div>
 
@@ -43,7 +43,7 @@
       <div><input v-model="spendPayload"></div>
     </div>
     <button
-      :disabled="!sdk"
+      :disabled="!aeSdk"
       @click="spendPromise = spend()"
     >
       Spend
@@ -61,7 +61,7 @@ import Value from './Value.vue'
 export default {
   components: { Value },
   props: {
-    sdk: { type: Object, required: true },
+    aeSdk: { type: Object, required: true },
     address: { type: String, default: '' },
     networkId: { type: String, default: '' },
   },
@@ -69,7 +69,7 @@ export default {
     balancePromise: null,
     heightPromise: null,
     nodeInfoPromise: null,
-    compilerVersionPromise: null,
+    compilerVersion: '',
     spendTo: '',
     spendAmount: '',
     spendPayload: '',
@@ -77,20 +77,20 @@ export default {
   }),
   mounted () {
     this.$watch(
-      ({ sdk, address, networkId }) => [sdk, address, networkId],
-      ([sdk, address]) => {
-        if (!sdk) return
-        this.compilerVersionPromise = sdk.getCompilerVersion()
-        this.balancePromise = sdk.balance(address)
-        this.heightPromise = sdk.height()
-        this.nodeInfoPromise = sdk.getNodeInfo()
+      ({ aeSdk, address, networkId }) => [aeSdk, address, networkId],
+      ([aeSdk, address]) => {
+        if (!aeSdk) return
+        this.compilerVersion = aeSdk.compilerVersion
+        this.balancePromise = aeSdk.balance(address)
+        this.heightPromise = aeSdk.height()
+        this.nodeInfoPromise = aeSdk.getNodeInfo()
       },
       { immediate: true }
     )
   },
   methods: {
     spend () {
-      return this.sdk.spend(this.spendAmount, this.spendTo, { payload: this.spendPayload })
+      return this.aeSdk.spend(this.spendAmount, this.spendTo, { payload: this.spendPayload })
     }
   }
 }

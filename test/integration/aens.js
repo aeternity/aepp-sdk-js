@@ -21,32 +21,20 @@ import { getSdk } from './'
 import { randomName } from '../utils'
 import { generateKeyPair } from '../../src/utils/crypto'
 import { buildContractId, computeAuctionEndBlock, computeBidFee } from '../../src/tx/builder/helpers'
+import { AensPointerContextError } from '../../src/utils/errors'
 
 describe('Aens', function () {
-  let sdk
+  let aeSdk
   const account = generateKeyPair()
   const name = randomName(13) // 13 name length doesn't trigger auction
 
   before(async function () {
-    sdk = await getSdk()
-    await sdk.spend('1000000000000000', account.publicKey)
-  })
-
-  describe('fails on', () => {
-    it('querying non-existent names', () => sdk
-      .aensQuery(randomName(13)).should.eventually.be.rejected)
-
-    it('updating names not owned by the account', async () => {
-      const preclaim = await sdk.aensPreclaim(randomName(13))
-      await preclaim.claim()
-      const current = await sdk.address()
-      const onAccount = sdk.addresses().find(acc => acc !== current)
-      return sdk.aensUpdate(name, onAccount, { onAccount, blocks: 1 }).should.eventually.be.rejected
-    })
+    aeSdk = await getSdk()
+    await aeSdk.spend('1000000000000000', account.publicKey)
   })
 
   it('claims names', async () => {
-    const preclaim = await sdk.aensPreclaim(name)
+    const preclaim = await aeSdk.aensPreclaim(name)
     preclaim.should.be.an('object')
     const claimed = await preclaim.claim()
     claimed.should.be.an('object')
@@ -58,30 +46,32 @@ describe('Aens', function () {
     // For some reason the node will return 404 when name is queried
     // just right after claim tx has been mined so we wait 0.5s
     await new Promise(resolve => setTimeout(resolve, 500))
-    return sdk.aensQuery(name).should.eventually.be.an('object')
+    return aeSdk.aensQuery(name).should.eventually.be.an('object')
   })
 
+  it('throws error on querying non-existent name', () => aeSdk
+    .aensQuery(randomName(13)).should.eventually.be.rejected)
+
   it('Spend using name with invalid pointers', async () => {
-    const current = await sdk.address()
-    const onAccount = sdk.addresses().find(acc => acc !== current)
-    const { pointers } = await sdk.getName(name)
+    const current = await aeSdk.address()
+    const onAccount = aeSdk.addresses().find(acc => acc !== current)
+    const { pointers } = await aeSdk.getName(name)
     pointers.length.should.be.equal(0)
-    await expect(sdk.spend(100, name, { onAccount }))
-      .to.be.rejectedWith(`Name ${name} don't have pointers for account_pubkey`)
+    await expect(aeSdk.spend(100, name, { onAccount }))
+      .to.be.rejectedWith(AensPointerContextError, `Name ${name} don't have pointers for account_pubkey`)
   })
+
   it('Call contract using AENS name', async () => {
-    const identityContract = `
-contract Identity =
- entrypoint getArg(x : int) = x
-`
-    const bytecode = await sdk.contractCompile(identityContract)
-    const deployed = await bytecode.deploy([])
-    const nameObject = await sdk.aensQuery(name)
-    await nameObject.update({ contract_pubkey: deployed.address })
-    const callRes = await sdk.contractCall(identityContract, name, 'getArg', [1])
-    const callResStatic = await sdk.contractCallStatic(identityContract, name, 'getArg', [1])
-    callResStatic.result.returnType.should.be.equal('ok')
-    callRes.hash.split('_')[0].should.be.equal('th')
+    const source =
+      'contract Identity =' +
+      '  entrypoint getArg(x : int) = x'
+    const contract = await aeSdk.getContractInstance({ source })
+    await contract.deploy([])
+    const nameObject = await aeSdk.aensQuery(name)
+    await nameObject.update({ contract_pubkey: contract.deployInfo.address })
+
+    const contractByName = await aeSdk.getContractInstance({ source, contractAddress: name })
+    expect((await contractByName.methods.getArg(42)).decodedResult).to.be.equal(42n)
   })
 
   const address = generateKeyPair().publicKey
@@ -95,12 +85,20 @@ contract Identity =
   const pointersNode = Object.entries(pointers).map(([key, id]) => ({ key, id }))
 
   it('updates', async () => {
-    const nameObject = await sdk.aensQuery(name)
+    const nameObject = await aeSdk.aensQuery(name)
     expect(await nameObject.update(pointers)).to.deep.include({ pointers: pointersNode })
   })
 
+  it('throws error on updating names not owned by the account', async () => {
+    const preclaim = await aeSdk.aensPreclaim(randomName(13))
+    await preclaim.claim()
+    const current = await aeSdk.address()
+    const onAccount = aeSdk.addresses().find(acc => acc !== current)
+    return aeSdk.aensUpdate(name, onAccount, { onAccount, blocks: 1 }).should.eventually.be.rejected
+  })
+
   it('updates extending pointers', async () => {
-    const nameObject = await sdk.aensQuery(name)
+    const nameObject = await aeSdk.aensQuery(name)
     const anotherContract = buildContractId(address, 12)
     expect(await nameObject.update({ contract_pubkey: anotherContract }, { extendPointers: true }))
       .to.deep.include({
@@ -111,8 +109,17 @@ contract Identity =
       })
   })
 
+  it('throws error on setting 33 pointers', async () => {
+    const nameObject = await aeSdk.aensQuery(name)
+    const pointers = Object.fromEntries(
+      new Array(33).fill().map((v, i) => [`pointer-${i}`, address])
+    )
+    expect(nameObject.update(pointers))
+      .to.be.rejectedWith('Expected 32 pointers or less, got 33 instead')
+  })
+
   it('Extend name ttl', async () => {
-    const nameObject = await sdk.aensQuery(name)
+    const nameObject = await aeSdk.aensQuery(name)
     const extendResult = await nameObject.extendTtl(10000)
     return extendResult.should.be.deep.include({
       ttl: extendResult.blockHeight + 10000
@@ -120,60 +127,60 @@ contract Identity =
   })
 
   it('Spend by name', async () => {
-    const current = await sdk.address()
-    const onAccount = sdk.addresses().find(acc => acc !== current)
-    await sdk.spend(100, name, { onAccount })
+    const current = await aeSdk.address()
+    const onAccount = aeSdk.addresses().find(acc => acc !== current)
+    await aeSdk.spend(100, name, { onAccount })
   })
 
   it('transfers names', async () => {
-    const claim = await sdk.aensQuery(name)
-    const current = await sdk.address()
-    const onAccount = sdk.addresses().find(acc => acc !== current)
+    const claim = await aeSdk.aensQuery(name)
+    const current = await aeSdk.address()
+    const onAccount = aeSdk.addresses().find(acc => acc !== current)
     await claim.transfer(onAccount)
 
-    const claim2 = await sdk.aensQuery(name)
+    const claim2 = await aeSdk.aensQuery(name)
     expect(await claim2.update({ account_pubkey: onAccount }, { onAccount })).to.deep.include({
       pointers: [{ key: 'account_pubkey', id: onAccount }]
     })
   })
 
   it('revoke names', async () => {
-    const current = await sdk.address()
-    const onAccount = sdk.addresses().find(acc => acc !== current)
-    const aensName = await sdk.aensQuery(name)
+    const current = await aeSdk.address()
+    const onAccount = aeSdk.addresses().find(acc => acc !== current)
+    const aensName = await aeSdk.aensQuery(name)
 
     const revoke = await aensName.revoke({ onAccount })
     revoke.should.be.an('object')
 
-    return sdk.aensQuery(name).should.be.rejectedWith(Error)
+    return aeSdk.aensQuery(name).should.be.rejectedWith(Error)
   })
 
   it('PreClaim name using specific account', async () => {
-    const current = await sdk.address()
-    const onAccount = sdk.addresses().find(acc => acc !== current)
+    const current = await aeSdk.address()
+    const onAccount = aeSdk.addresses().find(acc => acc !== current)
 
-    const preclaim = await sdk.aensPreclaim(name, { onAccount })
+    const preclaim = await aeSdk.aensPreclaim(name, { onAccount })
     preclaim.should.be.an('object')
     preclaim.tx.accountId.should.be.equal(onAccount)
   })
 
   describe('name auctions', function () {
     it('claims names', async () => {
-      const current = await sdk.address()
-      const onAccount = sdk.addresses().find(acc => acc !== current)
+      const current = await aeSdk.address()
+      const onAccount = aeSdk.addresses().find(acc => acc !== current)
       const name = randomName(12)
 
-      const preclaim = await sdk.aensPreclaim(name)
+      const preclaim = await aeSdk.aensPreclaim(name)
       preclaim.should.be.an('object')
 
       const claim = await preclaim.claim()
       claim.should.be.an('object')
 
       const bidFee = computeBidFee(name)
-      const bid = await sdk.aensBid(name, bidFee, { onAccount })
+      const bid = await aeSdk.aensBid(name, bidFee, { onAccount })
       bid.should.be.an('object')
 
-      const isAuctionFinished = await sdk.getName(name).catch(e => false)
+      const isAuctionFinished = await aeSdk.getName(name).catch(e => false)
       isAuctionFinished.should.be.equal(false)
 
       const auctionEndBlock = computeAuctionEndBlock(name, bid.blockHeight)

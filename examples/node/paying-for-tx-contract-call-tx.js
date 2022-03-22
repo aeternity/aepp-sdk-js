@@ -100,7 +100,7 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
   const payerAccount = MemoryAccount({ keypair: PAYER_ACCOUNT_KEYPAIR })
   const newUserAccount = MemoryAccount({ keypair: NEW_USER_KEYPAIR })
   const node = await Node({ url: NODE_URL })
-  const client = await Universal({
+  const aeSdk = await Universal({
     nodes: [{ name: 'testnet', instance: node }],
     compilerUrl: COMPILER_URL,
     accounts: [payerAccount, newUserAccount]
@@ -109,7 +109,7 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
   // The `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp) itself is
   // asynchronous as it determines the node's version and rest interface automatically. Only once
   // the Promise is fulfilled, you know you have a working object instance which is assigned to the
-  // `client` constant in this case.
+  // `aeSdk` constant in this case.
   //
   // Note:
   //
@@ -120,11 +120,11 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
   // `ContractCallTx` by invoking the generated contract method on the contract instance that you
   // typically use for contract calls.
   //
-  // Following 3 steps need to be done:
+  // Following 4 steps need to be done:
   //
-  //  1. Create calldata by calling the http compiler using `contractEncodeCallDataAPI` and
-  //     providing the contract source, the name of the `entrypoint` to call as well as the
-  //     required params.
+  //  1. Initialize a contract instance by the source code and the contract address.
+  //  1. Create calldata by calling the `encode` function providing the contract name, the name of
+  //     the `entrypoint` to call as well as the required params.
   //      - The `entrypoint` with the name `set_latest_caller` doesn't require any params so you
   //        can provide an empty array
   //  1. Create the `ContractCreateTx` by providing all required params.
@@ -134,8 +134,11 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
   //  1. Sign the transaction by providing `innerTx: true` as transaction option.
   //      - The transaction will be signed in a special way that is required for inner transactions.
   //
-  const calldata = await client.contractEncodeCallDataAPI(CONTRACT_SOURCE, 'set_last_caller', [])
-  const contractCallTx = await client.contractCallTx({
+  const contract = await aeSdk.getContractInstance(
+    { source: CONTRACT_SOURCE, contractAddress: CONTRACT_ADDRESS }
+  )
+  const calldata = contract.calldata.encode('PayingForTxExample', 'set_last_caller', [])
+  const contractCallTx = await aeSdk.contractCallTx({
     callerId: await newUserAccount.address(),
     contractId: CONTRACT_ADDRESS,
     amount: 0,
@@ -143,21 +146,17 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
     gasPrice: 1500000000,
     callData: calldata
   })
-  const signedContractCallTx = await client.signTransaction(
+  const signedContractCallTx = await aeSdk.signTransaction(
     contractCallTx, { onAccount: newUserAccount, innerTx: true }
   )
 
   // ## 6. Create, sign & broadcast the `PayingForTx` as payer
-  const payForTx = await client.payForTransaction(signedContractCallTx, { onAccount: payerAccount })
+  const payForTx = await aeSdk.payForTransaction(signedContractCallTx, { onAccount: payerAccount })
   console.log(payForTx)
 
   // ## 7. Check that last caller is the new user
-  // Knowing the contract address and the source code allows you to
-  // initialize a contract instance and interact with the contract in a convenient way.
-  const contractInstance = await client.getContractInstance(
-    { source: CONTRACT_SOURCE, contractAddress: CONTRACT_ADDRESS }
-  )
-  const dryRunTx = await contractInstance.methods.get_last_caller()
+  // Contract instance allows interacting with the contract in a convenient way.
+  const dryRunTx = await contract.methods.get_last_caller()
   console.log(`New user: ${await newUserAccount.address()}`)
   console.log('Last caller:', dryRunTx.decodedResult)
 

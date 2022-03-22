@@ -1,5 +1,5 @@
 {
-  "name": "wallet",
+  "name": "wallet-iframe",
   "version": "0.1.0",
   "private": true,
   "scripts": {

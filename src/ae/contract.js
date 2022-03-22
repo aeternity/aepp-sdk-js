@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2021 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -27,128 +27,10 @@
  */
 
 import Ae from './'
-import ContractCompilerAPI from '../contract/compiler'
-import ContractBase from '../contract'
+import ContractCompilerHttp from '../contract/compiler'
 import getContractInstance from '../contract/aci'
-import NodePool from '../node-pool'
-import { AMOUNT, DEPOSIT, GAS, MIN_GAS_PRICE } from '../tx/builder/schema'
+import { AMOUNT, MIN_GAS_PRICE } from '../tx/builder/schema'
 import { decode, produceNameId } from '../tx/builder/helpers'
-
-/**
- * Static contract call(using dry-run)
- * @function
- * @alias module:@aeternity/aepp-sdk/es/ae/contract
- * @category async
- * @deprecated
- * @param {String} source Contract source code
- * @param {String} contractAddress Contract address
- * @param {String} name Name of function to call
- * @param {Array} args Arguments array for call/deploy transaction
- * @param {Object} [options]
- * @param {Number|String} [options.top] Block height or hash on which you want to call contract
- * @param {String} [options.bytecode] Block hash on which you want to call contract
- * @param {Object} [options.filesystem] Contract external namespaces map
- * @return {Promise<Object>} Result object
- * @example
- * const callResult = await client.contractCallStatic(source, address, fnName, args)
- * {
- *   result: TX_DATA,
- *   decode: (type) => Decode call result
- * }
- */
-async function contractCallStatic (source, contractAddress, name, args = [], options) {
-  const contract = await this.getContractInstance({ ...options, source, contractAddress })
-  return contract.call(name, args, { ...options, callStatic: true })
-}
-
-/**
- * Call contract function
- * @function
- * @alias module:@aeternity/aepp-sdk/es/ae/contract
- * @category async
- * @deprecated
- * @param {String} source Contract source code
- * @param {String} contractAddress Contract address or AENS name
- * @param {String} name Name of function to call
- * @param {Array} args Arguments array for call/deploy transaction
- * @param {Object} [options] Transaction options (fee, ttl, gas, amount, deposit)
- * @param {Object} [options.filesystem] Contract external namespaces map
- * @return {Promise<Object>} Result object
- * @example
- * const callResult = await client.contractCall(source, address, fnName, args = [], options)
- * {
- *   hash: TX_HASH,
- *   result: TX_DATA,
- *   decode: (type) => Decode call result
- * }
- */
-async function contractCall (source, contractAddress, name, args, options) {
-  const contract = await this.getContractInstance({ ...options, source, contractAddress })
-  return contract.call(name, args, options)
-}
-
-/**
- * Deploy contract to the node
- * @function
- * @alias module:@aeternity/aepp-sdk/es/ae/contract
- * @category async
- * @deprecated
- * @param {String} code Compiled contract
- * @param {String} source Contract source code
- * @param {Array} params Arguments of contract constructor(init) function. Can be array of
- * arguments or callData string
- * @param {Object} [options] Transaction options (fee, ttl, gas, amount, deposit)
- * @param {Object} [options.filesystem={}] Contract external namespaces map*
- * @return {Promise<Object>} Result object
- * @example
- * const deployed = await client.contractDeploy(bytecode, source, init = [], options)
- * {
- *   owner: OWNER_PUB_KEY,
- *   transaction: TX_HASH,
- *   address: CONTRACT_ADDRESS,
- *   createdAt: Date,
- *   result: DEPLOY_TX_DATA,
- *   call: (fnName, args = [], options) => Call contract function,
- *   callStatic: (fnName, args = [], options) => Static all contract function
- * }
- */
-async function contractDeploy (code, source, params, options) {
-  const contract = await this.getContractInstance({ ...options, source })
-  contract.bytecode = code
-  return contract.deploy(params, options)
-}
-
-/**
- * Compile contract source code
- * @function
- * @alias module:@aeternity/aepp-sdk/es/ae/contract
- * @category async
- * @param {String} source Contract sourece code
- * @param {Object} [options={}] Transaction options (fee, ttl, gas, amount, deposit)
- * @param {Object} [options.filesystem={}] Contract external namespaces map*
- * @return {Promise<Object>} Result object
- * @example
- * const compiled = await client.contractCompile(SOURCE_CODE)
- * {
- *   bytecode: CONTRACT_BYTE_CODE,
- *   deploy: (init = [], options = {}) => Deploy Contract,
- *   encodeCall: (fnName, args = []) => Prepare callData
- * }
- */
-async function contractCompile (source, options = {}) {
-  const opt = { ...this.Ae.defaults, ...options }
-  const bytecode = await this.compileContractAPI(source, options)
-  return Object.freeze({
-    encodeCall: (name, args) => this.contractEncodeCallDataAPI(source, name, args, opt),
-    deploy: (init, options) => this.contractDeploy(bytecode, source, init, { ...opt, ...options }),
-    deployStatic: (init, options) => this.contractCallStatic(source, null, 'init', init, {
-      ...opt,
-      ...options,
-      bytecode
-    }),
-    bytecode
-  })
-}
 
 /**
  * Utility method to create a delegate signature for a contract
@@ -164,7 +46,6 @@ async function delegateSignatureCommon (ids = [], opt = {}) {
   const signature = await this.sign(
     Buffer.concat([
       Buffer.from(this.getNetworkId(opt)),
-      ...(Object.prototype.hasOwnProperty.call(opt, 'onAccount') ? [decode(await this.address(opt))] : []),
       ...ids.map(e => decode(e))
     ]),
     opt
@@ -183,13 +64,13 @@ async function delegateSignatureCommon (ids = [], opt = {}) {
  * @param {{ onAccount: String | Object }} [opt={}] opt Options
  * @return {Promise<String>} Signature for delegation
  * @example
- * const client = await Universal({ ... })
+ * const aeSdk = await Universal({ ... })
  * const contractId = 'ct_asd2ks...' // contract address
  * const name = 'example.chain' // AENS name
- * const onAccount = await client.address() // Sign with a specific account
+ * const onAccount = await aeSdk.address() // Sign with a specific account
  * // Preclaim signature
  * const params = { contractId }
- * const preclaimSig = await client.createAensDelegationSignature(params, { onAccount: current })
+ * const preclaimSig = await aeSdk.createAensDelegationSignature(params, { onAccount: current })
  * // Claim, transfer and revoke signature
  * const params = { contractId, name }
  * const aensDelegationSig = await contract.createAensDelegationSignature(
@@ -197,7 +78,10 @@ async function delegateSignatureCommon (ids = [], opt = {}) {
  * )
  */
 async function createAensDelegationSignature ({ contractId, name }, opt = {}) {
-  return this.delegateSignatureCommon([...name ? [produceNameId(name)] : [], contractId], opt)
+  return this.delegateSignatureCommon(
+    [await this.address(opt), ...name ? [produceNameId(name)] : [], contractId],
+    opt
+  )
 }
 
 /**
@@ -210,10 +94,10 @@ async function createAensDelegationSignature ({ contractId, name }, opt = {}) {
  * @param {{ onAccount: String | Object }} [opt={}] opt Options
  * @return {Promise<String>} Signature for delegation
  * @example
- * const client = await Universal({ ... })
+ * const aeSdk = await Universal({ ... })
  * const contractId = 'ct_asd2ks...' // contract address
  * const queryId = 'oq_...' // Oracle Query Id
- * const onAccount = await client.address() // Sign with a specific account
+ * const onAccount = await aeSdk.address() // Sign with a specific account
  * // Oracle register and extend signature
  * const params = { contractId }
  * const oracleDelegationSig = await contract.createOracleDelegationSignature(params, { onAccount })
@@ -236,31 +120,16 @@ async function createOracleDelegationSignature ({ contractId, queryId }, opt = {
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Contract instance
  * @example
- * import Transaction from '@aeternity/aepp-sdk/es/tx/tx
- * import MemoryAccount from '@aeternity/aepp-sdk/es/account/memory
- * import ChainNode from '@aeternity/aepp-sdk/es/chain/node
- * import ContractCompilerAPI from '@aeternity/aepp-sdk/es/contract/compiler
- * // or using bundle
- * import {
- *   Transaction,
- *   MemoryAccount,
- *   ChainNode,
- *   ContractCompilerAPI
- * } from '@aeternity/aepp-sdk
+ * import { Transaction, MemoryAccount, ChainNode } from '@aeternity/aepp-sdk
  *
  * const ContractWithAE = await Contract
  *    .compose(Transaction, MemoryAccount, ChainNode) // AE implementation
- *    .compose(ContractCompilerAPI) // ContractBase implementation
  * const client = await ContractWithAe({ url, internalUrl, compilerUrl, keypair, ... })
  *
  */
-export const ContractAPI = Ae.compose(ContractBase, {
+export default Ae.compose(ContractCompilerHttp, {
   methods: {
     getContractInstance,
-    contractCompile,
-    contractCallStatic,
-    contractDeploy,
-    contractCall,
     // Delegation for contract
     delegateSignatureCommon,
     // AENS
@@ -271,15 +140,9 @@ export const ContractAPI = Ae.compose(ContractBase, {
   deepProps: {
     Ae: {
       defaults: {
-        deposit: DEPOSIT,
         gasPrice: MIN_GAS_PRICE,
-        amount: AMOUNT,
-        gas: GAS
+        amount: AMOUNT
       }
     }
   }
 })
-
-export const Contract = ContractAPI.compose(NodePool)
-export const ContractWithCompiler = Contract.compose(ContractCompilerAPI)
-export default ContractWithCompiler

@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2021 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -16,52 +16,53 @@
  */
 
 /**
- * Generalize Account module - routines to use generalize account
+ * Generalized Account module - routines to use generalized account
  *
  * @module @aeternity/aepp-sdk/es/contract/ga
- * @export GeneralizeAccount
- * @example import { GeneralizeAccount } from '@aeternity/aepp-sdk'
+ * @export GeneralizedAccount
+ * @example import { GeneralizedAccount } from '@aeternity/aepp-sdk'
  */
-import { ContractAPI } from '../../ae/contract'
+import Contract from '../../ae/contract'
 import { TX_TYPE } from '../../tx/builder/schema'
 import { buildTx, unpackTx } from '../../tx/builder'
 import { prepareGaParams } from './helpers'
 import { hash } from '../../utils/crypto'
+import { IllegalArgumentError, MissingParamError } from '../../utils/errors'
 
 /**
- * GeneralizeAccount Stamp
+ * GeneralizedAccount Stamp
  *
- * Provide Generalize Account implementation
+ * Provide Generalized Account implementation
  * {@link module:@aeternity/aepp-sdk/es/contract/ga} clients.
  * @function
  * @alias module:@aeternity/aepp-sdk/es/contract/ga
  * @rtype Stamp
  * @param {Object} [options={}] - Initializer object
- * @return {Object} GeneralizeAccount instance
+ * @return {Object} GeneralizedAccount instance
  * @example
  * const authContract = ``
- * await client.createGeneralizeAccount(authFnName, authContract, [...authFnArguments]
+ * await aeSdk.createGeneralizedAccount(authFnName, authContract, [...authFnArguments]
  * // Make spend using GA
  * const callData = 'cb_...' // encoded call data for auth contract
- * await client.spend(10000, receiverPub, { authData: { callData } })
+ * await aeSdk.spend(10000, receiverPub, { authData: { callData } })
  * // or
- * await client.spend(10000, receiverPub, {
+ * await aeSdk.spend(10000, receiverPub, {
  *   authData: { source: authContract, args: [...authContractArgs] }
  * }) // sdk will prepare callData itself
  */
-export const GeneralizeAccount = ContractAPI.compose({
+export const GeneralizedAccount = Contract.compose({
   methods: {
-    createGeneralizeAccount,
+    createGeneralizedAccount,
     createMetaTx,
     isGA
   }
 })
-export default GeneralizeAccount
+export default GeneralizedAccount
 
 /**
  * @alias module:@aeternity/aepp-sdk/es/contract/ga
  * @function
- * Check if account is GA account
+ * Check if account is GA
  * @param {String} address - Account address
  * @return {Boolean}
  */
@@ -71,7 +72,7 @@ async function isGA (address) {
 }
 
 /**
- * Convert current account to GA account
+ * Convert current account to GA
  * @alias module:@aeternity/aepp-sdk/es/contract/ga
  * @function
  * @param {String} authFnName - Authorization function name
@@ -79,20 +80,22 @@ async function isGA (address) {
  * @param {Array} [args] - init arguments
  * @param {Object} [options] - Options
  * @return {Promise<Readonly<{
- *   result: *, owner: *, createdAt: Date, address, rawTx: *, transaction: *
+ *   result: *, owner: *, address, rawTx: *, transaction: *
  * }>>}
  */
-async function createGeneralizeAccount (authFnName, source, args = [], options = {}) {
+async function createGeneralizedAccount (authFnName, source, args = [], options = {}) {
   const opt = { ...this.Ae.defaults, ...options }
   const ownerId = await this.address(opt)
+  if (await this.isGA(ownerId)) throw new IllegalArgumentError(`Account ${ownerId} is already GA`)
 
-  if (await this.isGA(ownerId)) throw new Error(`Account ${ownerId} is already GA`)
-
+  const contract = await this.getContractInstance({ source })
+  await contract.compile()
   const { tx, contractId } = await this.gaAttachTx({
     ...opt,
+    gas: opt.gas ?? await contract._estimateGas('init', args, opt),
     ownerId,
-    code: (await this.contractCompile(source)).bytecode,
-    callData: await this.contractEncodeCallDataAPI(source, 'init', args),
+    code: contract.bytecode,
+    callData: contract.calldata.encode(contract._name, 'init', args),
     authFun: hash(authFnName)
   })
 
@@ -119,7 +122,7 @@ const wrapInEmptySignedTx = (tx) => buildTx({ encodedTx: tx, signatures: [] }, T
  * @return {String}
  */
 async function createMetaTx (rawTransaction, authData, authFnName, options = {}) {
-  if (!authData) throw new Error('authData is required')
+  if (!authData) throw new MissingParamError('authData is required')
   // Check if authData is callData or if it's an object prepare a callData from source and args
   const { authCallData, gas } = await prepareGaParams(this)(authData, authFnName)
   const opt = { ...this.Ae.defaults, ...options }
@@ -132,7 +135,7 @@ async function createMetaTx (rawTransaction, authData, authFnName, options = {})
       tx: wrappedTx.txObject
     },
     gaId: await this.address(opt),
-    abiVersion: abiVersion,
+    abiVersion,
     authData: authCallData,
     gas,
     vsn: 2

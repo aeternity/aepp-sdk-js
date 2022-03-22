@@ -8,6 +8,7 @@
 // # https://github.com/aeternity/protocol/blob/master/serializations.md#binary-serialization
 
 import BigNumber from 'bignumber.js'
+import { Name, NameId, NameFee, Deposit } from './field-types'
 
 export const VSN = 1
 export const VSN_2 = 2
@@ -20,9 +21,8 @@ export const ORACLE_TTL = { type: 'delta', value: 500 }
 export const QUERY_TTL = { type: 'delta', value: 10 }
 export const RESPONSE_TTL = { type: 'delta', value: 10 }
 // # CONTRACT
-export const DEPOSIT = 0
 export const AMOUNT = 0
-export const GAS = 25000
+export const GAS_MAX = 1600000 - 21000
 export const MIN_GAS_PRICE = 1e9
 export const MAX_AUTH_FUN_GAS = 50000
 export const DRY_RUN_ACCOUNT = { pub: 'ak_11111111111111111111111111111111273Yts', amount: '100000000000000000000000000000000000' }
@@ -34,7 +34,6 @@ export const NAME_TTL = 180000
 export const NAME_MAX_TTL = 36000
 export const NAME_MAX_CLIENT_TTL = 84600
 export const CLIENT_TTL = NAME_MAX_CLIENT_TTL
-export const NAME_FEE = 0
 // # see https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L67
 export const NAME_FEE_MULTIPLIER = 1e14 // 100000000000000
 export const NAME_FEE_BID_INCREMENT = 0.05 // # the increment is in percentage
@@ -227,7 +226,6 @@ export const TX_TYPE = {
   nameserviceTree: 'nameserviceTree',
   oraclesTree: 'oraclesTree',
   accountsTree: 'accountsTree',
-  // GA ACCOUNTS
   gaAttach: 'gaAttach',
   gaMeta: 'gaMeta',
   payingFor: 'payingFor',
@@ -327,7 +325,6 @@ export const OBJECT_ID_TX_TYPE = {
   [OBJECT_TAG_NAMESERVICE_TREE]: TX_TYPE.nameserviceTree,
   [OBJECT_TAG_ORACLES_TREE]: TX_TYPE.oraclesTree,
   [OBJECT_TAG_ACCOUNTS_TREE]: TX_TYPE.accountsTree,
-  // GA Accounts
   [OBJECT_TAG_GA_ATTACH]: TX_TYPE.gaAttach,
   [OBJECT_TAG_GA_META]: TX_TYPE.gaMeta,
   [OBJECT_TAG_PAYING_FOR]: TX_TYPE.payingFor,
@@ -421,17 +418,6 @@ export const PREFIX_ID_TAG = {
   ch: ID_TAG.channel
 }
 export const ID_TAG_PREFIX = revertObject(PREFIX_ID_TAG)
-const VALIDATION_ERROR = (msg) => msg
-
-export const VALIDATION_MESSAGE = {
-  [FIELD_TYPES.int]: ({ value, isMinusValue }) => isMinusValue ? VALIDATION_ERROR(`${value} must be >= 0`) : VALIDATION_ERROR(`${value} is not of type Number or BigNumber`),
-  [FIELD_TYPES.amount]: ({ value, isMinusValue }) => isMinusValue ? VALIDATION_ERROR(`${value} must be >= 0`) : VALIDATION_ERROR(`${value} is not of type Number or BigNumber`),
-  [FIELD_TYPES.id]: ({ value, prefix }) => VALIDATION_ERROR(`'${value}' prefix doesn't match expected prefix '${prefix}' or ID_TAG for prefix not found`),
-  [FIELD_TYPES.binary]: ({ prefix, value }) => VALIDATION_ERROR(`'${value}' prefix doesn't match expected prefix '${prefix}'`),
-  [FIELD_TYPES.string]: ({ value }) => VALIDATION_ERROR('Not a string'),
-  [FIELD_TYPES.pointers]: ({ value }) => VALIDATION_ERROR('Value must be of type Array and contains only object\'s like \'{key: "account_pubkey", id: "ak_lkamsflkalsdalksdlasdlasdlamd"}\''),
-  [FIELD_TYPES.ctVersion]: ({ value }) => VALIDATION_ERROR('Value must be an object with "vmVersion" and "abiVersion" fields')
-}
 
 const BASE_TX = [
   TX_FIELD('tag', FIELD_TYPES.int),
@@ -486,9 +472,9 @@ const NAME_CLAIM_TX_2 = [
   ...BASE_TX,
   TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('name', FIELD_TYPES.binary, 'nm'),
+  TX_FIELD('name', Name),
   TX_FIELD('nameSalt', FIELD_TYPES.int),
-  TX_FIELD('nameFee', FIELD_TYPES.amount),
+  TX_FIELD('nameFee', NameFee),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int)
 ]
@@ -497,7 +483,7 @@ const NAME_UPDATE_TX = [
   ...BASE_TX,
   TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('nameId', FIELD_TYPES.id, 'nm'),
+  TX_FIELD('nameId', NameId),
   TX_FIELD('nameTtl', FIELD_TYPES.int),
   TX_FIELD('pointers', FIELD_TYPES.pointers),
   TX_FIELD('clientTtl', FIELD_TYPES.int),
@@ -509,7 +495,7 @@ const NAME_TRANSFER_TX = [
   ...BASE_TX,
   TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('nameId', FIELD_TYPES.id, 'nm'),
+  TX_FIELD('nameId', NameId),
   TX_FIELD('recipientId', FIELD_TYPES.id, ['ak', 'nm']),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int)
@@ -519,7 +505,7 @@ const NAME_REVOKE_TX = [
   ...BASE_TX,
   TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('nameId', FIELD_TYPES.id, 'nm'),
+  TX_FIELD('nameId', NameId),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int)
 ]
@@ -532,7 +518,7 @@ const CONTRACT_TX = [
   TX_FIELD('log', FIELD_TYPES.binary, 'cb'),
   TX_FIELD('active', FIELD_TYPES.bool),
   TX_FIELD('referers', FIELD_TYPES.ids, 'ak'),
-  TX_FIELD('deposit', FIELD_TYPES.amount)
+  TX_FIELD('deposit', Deposit)
 ]
 
 const GA_ATTACH_TX = [
@@ -576,7 +562,7 @@ const CONTRACT_CREATE_TX = [
   TX_FIELD('ctVersion', FIELD_TYPES.ctVersion),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int),
-  TX_FIELD('deposit', FIELD_TYPES.amount),
+  TX_FIELD('deposit', Deposit),
   TX_FIELD('amount', FIELD_TYPES.amount),
   TX_FIELD('gas', FIELD_TYPES.int),
   TX_FIELD('gasPrice', FIELD_TYPES.int),
@@ -752,8 +738,8 @@ const CHANNEL_FORCE_PROGRESS_TX = [
   TX_FIELD('fromId', FIELD_TYPES.id, 'ak'),
   TX_FIELD('payload', FIELD_TYPES.binary, 'tx'),
   TX_FIELD('round', FIELD_TYPES.int),
-  TX_FIELD('update', FIELD_TYPES.binary),
-  TX_FIELD('stateHash', FIELD_TYPES.binary),
+  TX_FIELD('update', FIELD_TYPES.binary, 'cb'),
+  TX_FIELD('stateHash', FIELD_TYPES.binary, 'st'),
   TX_FIELD('offChainTrees', FIELD_TYPES.stateTree),
   TX_FIELD('ttl', FIELD_TYPES.int),
   TX_FIELD('fee', FIELD_TYPES.int),

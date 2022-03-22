@@ -2,18 +2,17 @@ import BigNumber from 'bignumber.js'
 import { decode as rlpDecode, encode as rlpEncode } from 'rlp'
 import { AE_AMOUNT_FORMATS, formatAmount } from '../../utils/amount-formatter'
 import { hash } from '../../utils/crypto'
+import { Field } from './field-types'
 
 import {
   DEFAULT_FEE,
   FIELD_TYPES,
   OBJECT_ID_TX_TYPE,
-  PREFIX_ID_TAG,
   TX_DESERIALIZATION_SCHEMA,
   TX_FEE_BASE_GAS,
   TX_FEE_OTHER_GAS,
   TX_SERIALIZATION_SCHEMA,
   TX_TYPE,
-  VALIDATION_MESSAGE,
   VSN
 } from './schema'
 import {
@@ -28,6 +27,7 @@ import {
 } from './helpers'
 import { toBytes } from '../../utils/bytes'
 import MPTree from '../../utils/mptree'
+import { InvalidTxParamsError, SchemaNotFoundError } from '../../utils/errors'
 
 /**
  * JavaScript-based Transaction builder
@@ -50,7 +50,6 @@ function deserializeField (value, type, prefix) {
       return { vmVersion: readInt(Buffer.from([vm])), abiVersion: readInt(Buffer.from([abi])) }
     }
     case FIELD_TYPES.amount:
-      return readInt(value)
     case FIELD_TYPES.int:
       return readInt(value)
     case FIELD_TYPES.id:
@@ -99,11 +98,12 @@ function deserializeField (value, type, prefix) {
           {}
         )
     default:
+      if (type.prototype instanceof Field) return type.deserialize(value)
       return value
   }
 }
 
-function serializeField (value, type, prefix) {
+function serializeField (value, type, prefix, params) {
   switch (type) {
     case FIELD_TYPES.amount:
     case FIELD_TYPES.int:
@@ -144,40 +144,45 @@ function serializeField (value, type, prefix) {
         default: return value
       }
     default:
+      if (type.prototype instanceof Field) return type.serialize(value, params)
       return value
   }
 }
 
-function validateField (value, key, type, prefix) {
-  const assert = (valid, params) => valid ? {} : { [key]: VALIDATION_MESSAGE[type](params) }
+function validateField (value, type, prefix) {
   // All fields are required
-  if (value === undefined || value === null) return { [key]: 'Field is required' }
+  if (value === undefined || value === null) return 'Field is required'
 
   // Validate type of value
   switch (type) {
     case FIELD_TYPES.amount:
     case FIELD_TYPES.int: {
-      const isMinusValue = (!isNaN(value) || BigNumber.isBigNumber(value)) && BigNumber(value).lt(0)
-      return assert(
-        (!isNaN(value) || BigNumber.isBigNumber(value)) && BigNumber(value).gte(0),
-        { value, isMinusValue }
-      )
+      if (isNaN(value) && !BigNumber.isBigNumber(value)) {
+        return `${value} is not of type Number or BigNumber`
+      }
+      if (new BigNumber(value).lt(0)) return `${value} must be >= 0`
+      return
     }
     case FIELD_TYPES.id: {
       const prefixes = Array.isArray(prefix) ? prefix : [prefix]
-      const p = prefixes.find(p => p === value.split('_')[0])
-      return assert(p && PREFIX_ID_TAG[value.split('_')[0]], { value, prefix })
+      if (!prefixes.includes(value.split('_')[0])) {
+        return `'${value}' prefix doesn't match expected prefix '${prefix}'`
+      }
+      return
     }
-    case FIELD_TYPES.binary:
-      return assert(value.split('_')[0] === prefix, { prefix, value })
-    case FIELD_TYPES.string:
-      return assert(true)
     case FIELD_TYPES.ctVersion:
-      return assert(typeof value === 'object' && Object.prototype.hasOwnProperty.call(value, 'abiVersion') && Object.prototype.hasOwnProperty.call(value, 'vmVersion'))
+      if (!value?.abiVersion || !value?.vmVersion) {
+        return 'Value must be an object with "vmVersion" and "abiVersion" fields'
+      }
+      return
     case FIELD_TYPES.pointers:
-      return assert(Array.isArray(value) && !value.find(e => e !== Object(e)), { value })
-    default:
-      return {}
+      if (!Array.isArray(value)) return 'Value must be of type Array'
+      if (value.some(p => !p?.key || !p?.id)) {
+        return 'Value must contains only object\'s like \'{key: "account_pubkey", id: "ak_lkamsflkalsdalksdlasdlasdlamd"}\''
+      }
+      if (value.length > 32) {
+        return `Expected 32 pointers or less, got ${value.length} instead`
+      }
   }
 }
 
@@ -297,14 +302,14 @@ export function calculateFee (fee = 0, txType, { gas = 0, params, showWarning = 
  * @return {Object} Object with validation errors
  */
 export function validateParams (params, schema, { excludeKeys = [] }) {
-  return schema
-    .filter(([key]) => !excludeKeys.includes(key) && key !== 'payload')
-    .reduce(
-      (acc, [key, type, prefix]) => Object.assign(
-        acc, validateField(params[key], key, type, prefix)
-      ),
-      {}
-    )
+  return Object.fromEntries(
+    schema
+      // TODO: allow optional keys in schema
+      .filter(([key]) => !excludeKeys.includes(key) &&
+        !['payload', 'nameFee', 'deposit'].includes(key))
+      .map(([key, type, prefix]) => [key, validateField(params[key], type, prefix)])
+      .filter(([, message]) => message)
+  )
 }
 
 /**
@@ -331,11 +336,11 @@ export function buildRawTx (
   // Validation
   const valid = validateParams(params, schema, { excludeKeys })
   if (Object.keys(valid).length) {
-    throw new Error('Transaction build error. ' + JSON.stringify(valid))
+    throw new InvalidTxParamsError('Transaction build error. ' + JSON.stringify(valid))
   }
 
   return filteredSchema
-    .map(([key, fieldType, prefix]) => serializeField(params[key], fieldType, prefix))
+    .map(([key, fieldType, prefix]) => serializeField(params[key], fieldType, prefix, params))
 }
 
 /**
@@ -371,10 +376,10 @@ const getSchema = ({ vsn, objId, type }) => {
   const schema = isDeserialize ? TX_DESERIALIZATION_SCHEMA : TX_SERIALIZATION_SCHEMA
 
   if (!schema[firstKey]) {
-    throw new Error(`Transaction ${isDeserialize ? 'deserialization' : 'serialization'} not implemented for ${isDeserialize ? 'tag ' + objId : type}`)
+    throw new SchemaNotFoundError(`Transaction ${isDeserialize ? 'deserialization' : 'serialization'} not implemented for ${isDeserialize ? 'tag ' + objId : type}`)
   }
   if (!schema[firstKey][vsn]) {
-    throw new Error(`Transaction ${isDeserialize ? 'deserialization' : 'serialization'} not implemented for ${isDeserialize ? 'tag ' + objId : type} version ${vsn}`)
+    throw new SchemaNotFoundError(`Transaction ${isDeserialize ? 'deserialization' : 'serialization'} not implemented for ${isDeserialize ? 'tag ' + objId : type} version ${vsn}`)
   }
   return schema[firstKey][vsn]
 }

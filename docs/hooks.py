@@ -6,4 +6,3 @@ def pre_build(**kwargs):
     subprocess.run(['npm', 'install', '--ignore-scripts'], check=True)
   subprocess.run(['npm', 'run', 'docs:examples'], check=True)
   # subprocess.run(['npm', 'run', 'docs:api'], check=True)
-  subprocess.run(['npm', 'run', 'docs:changelog'], check=True)

@@ -52,6 +52,8 @@ nav:
     - guides/contract-events.md
     - guides/oracles.md
     - guides/paying-for-tx.md
+    - guides/batch-requests.md
+    - guides/error-handling.md
     - guides/low-vs-high-usage.md
     - Wallet interaction:
       - guides/connect-aepp-to-wallet.md
@@ -66,8 +68,10 @@ nav:
         - examples/node/paying-for-tx-spend-tx.md
     - tutorials/vuejs/helloworld-blockheight.md
   - api-reference.md
+  - compatibility.md
   - Changelog: CHANGELOG.md
   - Migration Guides:
+    - guides/migration/11.0.0.md
     - guides/migration/10.0.0.md
     - guides/migration/9.0.0.md
     - guides/migration/7.0.0.md

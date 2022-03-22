@@ -27,7 +27,7 @@ import Chain from '../chain/node'
 import Aens from './aens'
 import Transaction from '../tx/tx'
 import Oracle from './oracle'
-import GeneralizeAccount from '../contract/ga'
+import GeneralizedAccount from '../contract/ga'
 import AccountMultiple from '../account/multiple'
 import Contract from './contract'
 
@@ -43,5 +43,5 @@ import Contract from './contract'
  * @return {Object} Universal instance
  */
 export default Ae.compose(
-  AccountMultiple, Chain, Transaction, Aens, Contract, Oracle, GeneralizeAccount
+  AccountMultiple, Chain, Transaction, Aens, Contract, Oracle, GeneralizedAccount
 )

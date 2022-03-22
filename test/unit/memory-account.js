@@ -20,33 +20,34 @@ import { describe, it } from 'mocha'
 import { expect } from 'chai'
 import MemoryAccount from '../../src/account/memory'
 import { generateKeyPair } from '../../src/utils/crypto'
+import { InvalidKeypairError } from '../../src/utils/errors'
 
 const testAcc = generateKeyPair()
 
 describe('MemoryAccount', function () {
   describe('Fail on invalid params', () => {
     it('Fail on empty keypair', async () => {
-      expect(() => MemoryAccount({})).to.throw('KeyPair must be an object')
+      expect(() => MemoryAccount({})).to.throw(InvalidKeypairError, 'KeyPair must be an object')
     })
 
     it('Fail on empty keypair object', async () => {
       expect(() => MemoryAccount({ keypair: {} }))
-        .to.throw('KeyPair must must have "secretKey", "publicKey" properties')
+        .to.throw(InvalidKeypairError, 'KeyPair must must have "secretKey", "publicKey" properties')
     })
 
     it('Fail on invalid secret key', async () => {
       expect(() => MemoryAccount({ keypair: { publicKey: testAcc.publicKey, secretKey: ' ' } }))
-        .to.throw('Secret key must be hex string or Buffer')
+        .to.throw(InvalidKeypairError, 'Secret key must be hex string or Buffer')
     })
 
     it('Fail on invalid publicKey', async () => {
       expect(() => MemoryAccount({ keypair: { publicKey: ' ', secretKey: testAcc.secretKey } }))
-        .to.throw('Public Key must be a base58c string with "ak_" prefix')
+        .to.throw(InvalidKeypairError, 'Public Key must be a base58c string with "ak_" prefix')
     })
 
     it('Fail on invalid publicKey', async () => {
       const keypair = { publicKey: generateKeyPair().publicKey, secretKey: testAcc.secretKey }
-      expect(() => MemoryAccount({ keypair })).to.throw('Invalid Key Pair')
+      expect(() => MemoryAccount({ keypair })).to.throw(InvalidKeypairError, 'Invalid Key Pair')
     })
   })
 

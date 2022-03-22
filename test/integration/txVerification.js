@@ -4,32 +4,33 @@ import { getSdk } from '.'
 import { generateKeyPair } from '../../src/utils/crypto'
 import MemoryAccount from '../../src/account/memory'
 import verifyTransaction from '../../src/tx/validator'
+import { ArgumentError } from '../../src/utils/errors'
 
 describe('Verify Transaction', function () {
-  let sdk, node
+  let aeSdk, node
 
   before(async () => {
-    sdk = await getSdk()
-    node = sdk.selectedNode.instance
-    await sdk.spend(1234, 'ak_LAqgfAAjAbpt4hhyrAfHyVg9xfVQWsk1kaHaii6fYXt6AJAGe')
+    aeSdk = await getSdk()
+    node = aeSdk.selectedNode.instance
+    await aeSdk.spend(1234, 'ak_LAqgfAAjAbpt4hhyrAfHyVg9xfVQWsk1kaHaii6fYXt6AJAGe')
   })
 
   it('validates params in buildRawTx', async () => {
-    return expect(sdk.spendTx({})).to.be.rejectedWith('Value undefined is not type of number')
+    return expect(aeSdk.spendTx({})).to.be.rejectedWith(ArgumentError, 'value should be a number, got undefined instead')
     // TODO: should be /^Transaction build error./ instead
   })
 
   it('returns errors', async () => {
-    const spendTx = await sdk.spendTx({
-      senderId: await sdk.address(),
-      recipientId: await sdk.address(),
+    const spendTx = await aeSdk.spendTx({
+      senderId: await aeSdk.address(),
+      recipientId: await aeSdk.address(),
       amount: 1e30,
       fee: '1000',
       nonce: '1',
       ttl: 2,
       absoluteTtl: true
     })
-    const signedTx = await sdk.signTransaction(
+    const signedTx = await aeSdk.signTransaction(
       spendTx,
       { onAccount: MemoryAccount({ keypair: generateKeyPair() }) }
     )
@@ -40,9 +41,9 @@ describe('Verify Transaction', function () {
   })
 
   it('returns NonceHigh error', async () => {
-    const spendTx = await sdk.spendTx({
-      senderId: await sdk.address(),
-      recipientId: await sdk.address(),
+    const spendTx = await aeSdk.spendTx({
+      senderId: await aeSdk.address(),
+      recipientId: await aeSdk.address(),
       amount: 100,
       nonce: 100
     })
@@ -51,14 +52,14 @@ describe('Verify Transaction', function () {
   })
 
   it('verifies transactions before broadcasting', async () => {
-    const spendTx = await sdk.spendTx({
-      senderId: await sdk.address(),
-      recipientId: await sdk.address(),
+    const spendTx = await aeSdk.spendTx({
+      senderId: await aeSdk.address(),
+      recipientId: await aeSdk.address(),
       amount: 1,
       ttl: 2,
       absoluteTtl: true
     })
-    const error = await sdk.send(spendTx).catch(e => e)
+    const error = await aeSdk.send(spendTx).catch(e => e)
     expect(error.validation).to.have.lengthOf(1)
   })
 
@@ -85,5 +86,11 @@ describe('Verify Transaction', function () {
     const tx = 'tx_+KILAfhCuEAtbc38n/FH8jZHO0DkEkiLZZm8ypEzZEhbjyHtaoEYkENOE9tD+Xp6smFMou9X521oI4gkFBQGwSQaQk6Z7XMNuFr4WCACoQHkWpoidhJW2EZEega88I1P9Ktw1DFBUWwrzkr5jC5zUAORc29tZUF1Y3Rpb24uY2hhaW6HDwTrMteR15AJQ0VVyE5TcqKSstgfbGV6hg9HjghAAAAGpIPS'
     const errors = await verifyTransaction(tx, node)
     expect(errors.map(({ key }) => key)).to.include('InsufficientBalance')
+  })
+
+  it('verifies contractId for contractCall transaction', async () => {
+    const contractCall = 'tx_+GIrAaEBSzqoqjLLKO9NzXLgIBsTC+sNe5ronuTV/lr8IBJNlAECoQV/aqb9TshuuhhzeovvJCD/WmSOnqF8RCu4eY8hXYg/DgOGpYctWWAAAACCE4iEO5rKAIgrEYB4IJIbCmfzF0w='
+    const errors = await verifyTransaction(contractCall, node)
+    expect(errors.map(({ key }) => key)).to.include('ContractNotFound')
   })
 })

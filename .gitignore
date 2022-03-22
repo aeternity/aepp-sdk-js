@@ -10,7 +10,6 @@ node_modules
 /docs/examples
 /docs/public
 /docs/docco.css
-/docs/CHANGELOG.md
 __pycache__
 /.envrc
 /yarn-error.log

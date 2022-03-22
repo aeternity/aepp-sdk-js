@@ -1,43 +1,39 @@
-name: Test, build, and deploy
+name: Test & build
 on: [push, pull_request]
 jobs:
   main:
     runs-on: ubuntu-latest
     steps:
-      - if: github.ref != 'refs/heads/develop'
-        uses: actions/checkout@v2
-        with:
-          ref: develop
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 100
-      - if: github.ref != 'refs/heads/develop'
-        run: git branch develop origin/develop
-
+          fetch-depth: 0
       - uses: actions/setup-node@v2
         with:
-          node-version: 14.x
+          node-version: 16.x
       - uses: actions/cache@v2
         with:
           path: ~/.npm
           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-
       - run: npm ci --ignore-scripts
+      - name: Run Commitlint
+        env:
+          EVENT_TYPE: ${{ github.event_name }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if [ "$EVENT_TYPE" = "push" ]; then
+            npx commitlint --from HEAD~${{ github.event.push.commits }} --to HEAD --verbose
+          else
+            npx commitlint --from $BASE --to $HEAD --verbose
+          fi
       - run: npm run lint
       - run: npm run build
       - run: npm run test:unit
-      - run: npm run report-coverage
-        if: always()
-
       - run: docker-compose up -d
       - name: Ensure that node is running
         run: |
           while [[ `curl -s -o /dev/null -w %{http_code} localhost:3013/api` != 200 ]]; do
             sleep 0.2;
           done
-
       - run: npm run test:integration
-      - run: npm run report-coverage
-        if: always()
       - run: docker-compose logs
-        if: always()

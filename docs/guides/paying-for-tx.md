@@ -1,4 +1,4 @@
-# PayingForTx
+# PayingForTx (Meta-Transactions)
 
 ## Introduction
 This guide explains you how to perform a `PayingForTx` (also known as meta-transaction) using the SDK.

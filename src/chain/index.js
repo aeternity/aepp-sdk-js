@@ -37,13 +37,32 @@ import { required } from '@stamp/required'
  * @return {Object} Chain instance
  */
 const Chain = stampit({
-  deepProps: { Ae: { defaults: { waitMined: true, verify: true } } }
+  deepProps: {
+    Ae: {
+      defaults: {
+        waitMined: true,
+        verify: true,
+        _expectedMineRate: 180000,
+        _microBlockCycle: 3000,
+        _maxPollInterval: 5000
+      }
+    }
+  },
+  methods: {
+    _getPollInterval (type) {
+      const base = {
+        block: this.Ae.defaults._expectedMineRate,
+        microblock: this.Ae.defaults._microBlockCycle
+      }[type]
+      if (!base) throw new Error(`Unknown poll type: ${type}`)
+      return Math.min(base / 3, this.Ae.defaults._maxPollInterval)
+    }
+  }
 }, required({
   methods: {
     sendTransaction: required,
     height: required,
     awaitHeight: required,
-    topBlock: required,
     poll: required,
     balance: required,
     getBalance: required,

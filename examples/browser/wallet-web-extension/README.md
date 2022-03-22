@@ -1,8 +1,17 @@
-# AE-Wallet-Extension-POC
+# WebExtension-based wallet
 
-How to build and install:
+## Overview
+This is a sample wallet as an WebExtension. It works with æpp opened in a browser where it is installed.
 
-1. Do `npm install` after add your keyPair in src/background.js
-2. Build with `npm run build`
-3. Enable developer tools in chrome and load the `dist` folder using `Load unpacked`
-4. You are now all set to Rock 'n' Roll.
+### How it works
+1. Install this wallet to Chrome or Firefox
+2. Start the [sample contract æpp](../aepp), which will start on port `9001`
+3. Visit [localhost:9001](http://localhost:9001)
+4. This wallet should attempt to connect to the æpp
+
+## Installation and running in Google Chrome
+1. Install required dependencies with `npm install`
+2. Start the build server in watch mode `npm run serve`
+3. Open [chrome://extensions](chrome://extensions/)
+4. Enable "Developer mode" at the right top conner
+5. Press "Load unpacked" button and choose the `dist` folder

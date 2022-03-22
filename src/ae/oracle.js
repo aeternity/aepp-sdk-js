@@ -27,11 +27,11 @@
  */
 
 import Ae from './'
-import { decodeBase64Check } from '../utils/crypto'
 import { pause } from '../utils/other'
 import { oracleQueryId, decode } from '../tx/builder/helpers'
 import { unpackTx } from '../tx/builder'
 import { ORACLE_TTL, QUERY_FEE, QUERY_TTL, RESPONSE_TTL } from '../tx/builder/schema'
+import { RequestTimedOutError } from '../utils/errors'
 
 /**
  * Constructor for Oracle Object (helper object for using Oracle)
@@ -67,7 +67,11 @@ async function getOracleObject (oracleId) {
  * @param {Number} [options.interval] Poll interval(default: 5000)
  * @return {Function} stopPolling - Stop polling function
  */
-function pollForQueries (oracleId, onQuery, { interval = 5000 } = {}) {
+function pollForQueries (
+  oracleId,
+  onQuery,
+  { interval = this._getPollInterval('microblock') } = {}
+) {
   const knownQueryIds = new Set()
   const checkNewQueries = async () => {
     const queries = ((await this.api.getOracleQueriesByPubkey(oracleId)).oracleQueries || [])
@@ -76,9 +80,15 @@ function pollForQueries (oracleId, onQuery, { interval = 5000 } = {}) {
     if (queries.length) onQuery(queries)
   }
 
-  checkNewQueries()
-  const intervalId = setInterval(checkNewQueries, interval)
-  return () => clearInterval(intervalId)
+  let stopped
+  (async () => {
+    while (!stopped) { // eslint-disable-line no-unmodified-loop-condition
+      // TODO: allow to handle this error somehow
+      await checkNewQueries().catch(console.error)
+      await pause(interval)
+    }
+  })()
+  return () => { stopped = true }
 }
 
 /**
@@ -95,11 +105,16 @@ async function getQueryObject (oracleId, queryId) {
   const q = await this.api.getOracleQueryByPubkeyAndQueryId(oracleId, queryId)
   return {
     ...q,
-    decodedQuery: decodeBase64Check(q.query.slice(3)).toString(),
-    decodedResponse: decodeBase64Check(q.response.slice(3)).toString(),
+    decodedQuery: decode(q.query).toString(),
+    decodedResponse: decode(q.response).toString(),
     respond: this.respondToQuery.bind(this, oracleId, queryId),
     pollForResponse: this.pollForQueryResponse.bind(this, oracleId, queryId),
-    decode: (data) => decodeBase64Check(data.slice(3))
+    /**
+     * @deprecated use TxBuilderHelper.decode instead
+     * @param data
+     * @returns {Buffer}
+     */
+    decode: (data) => decode(data)
   }
 }
 
@@ -119,7 +134,7 @@ async function getQueryObject (oracleId, queryId) {
 export async function pollForQueryResponse (
   oracleId,
   queryId,
-  { attempts = 20, interval = 5000 } = {}
+  { attempts = 20, interval = this._getPollInterval('microblock') } = {}
 ) {
   for (let i = 0; i < attempts; i++) {
     if (i) await pause(interval)
@@ -129,7 +144,7 @@ export async function pollForQueryResponse (
       return String(responseBuffer)
     }
   }
-  throw new Error(`Giving up after ${(attempts - 1) * interval}ms`)
+  throw new RequestTimedOutError((attempts - 1) * interval)
 }
 
 /**

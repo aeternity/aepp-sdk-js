@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -16,7 +16,6 @@
  */
 
 import stampit from '@stamp/it'
-import * as R from 'ramda'
 
 function asyncInit (options = {}, { stamp, args, instance }) {
   return stamp.compose.deepConfiguration.AsyncInit.initializers.reduce(async (instance, init) => {
@@ -29,13 +28,18 @@ function asyncInit (options = {}, { stamp, args, instance }) {
   }, instance)
 }
 
-const AsyncInit = stampit({
+export default stampit({
   deepConf: { AsyncInit: { initializers: [] } },
   composers ({ stamp, composables }) {
     const conf = stamp.compose.deepConfiguration.AsyncInit
-    conf.initializers = R.without([asyncInit], R.uniqWith(R.identical, R.flatten(composables.map(c => R.path(['compose', 'deepConfiguration', 'AsyncInit', 'initializers'], c) || (c.compose || c).initializers || []))))
+    conf.initializers = composables
+      .map(c =>
+        c?.compose?.deepConfiguration?.AsyncInit?.initializers ||
+        (c.compose || c).initializers ||
+        [])
+      .flat(Infinity)
+      .filter((f, idx, arr) => !arr.slice(0, idx).includes(f))
+      .filter(f => f !== asyncInit)
     stamp.compose.initializers = [asyncInit]
   }
 })
-
-export default AsyncInit

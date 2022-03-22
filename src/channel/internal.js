@@ -20,6 +20,7 @@ import { EventEmitter } from 'events'
 import JsonBig from '../utils/json-big'
 import { pascalToSnake } from '../utils/string'
 import { awaitingConnection, awaitingReconnection, channelOpen } from './handlers'
+import { ChannelCallError, ChannelPingTimedOutError, UnknownChannelStateError } from '../utils/errors'
 
 // Send ping message every 10 seconds
 const PING_TIMEOUT_MS = 10000
@@ -49,7 +50,7 @@ export function emit (channel, ...args) {
 
 function enterState (channel, nextState) {
   if (!nextState) {
-    throw new Error('State Channels FSM entered unknown state')
+    throw new UnknownChannelStateError()
   }
   fsm.set(channel, nextState)
   if (nextState.handler.enter) {
@@ -109,16 +110,21 @@ async function handleMessage (channel, message) {
 }
 
 async function dequeueMessage (channel) {
-  const queue = messageQueue.get(channel)
-  if (messageQueueLocked.get(channel) || !queue.length) {
-    return
-  }
-  const [message, ...remaining] = queue
-  messageQueue.set(channel, remaining || [])
+  if (messageQueueLocked.get(channel)) return
+  const messages = messageQueue.get(channel)
+  if (!messages.length) return
   messageQueueLocked.set(channel, true)
-  await handleMessage(channel, message)
+  while (messages.length) {
+    const message = messages.shift()
+    try {
+      await handleMessage(channel, message)
+    } catch (error) {
+      console.error('Error handling incoming message:')
+      console.error(message)
+      console.error(error)
+    }
+  }
   messageQueueLocked.set(channel, false)
-  dequeueMessage(channel)
 }
 
 function ping (channel) {
@@ -134,7 +140,7 @@ function ping (channel) {
     })
     pongTimeoutId.set(channel, setTimeout(() => {
       disconnect(channel)
-      emit(channel, 'error', new Error('Server pong timed out'))
+      emit(channel, 'error', new ChannelPingTimedOutError())
     }, PONG_TIMEOUT_MS))
   }, PING_TIMEOUT_MS))
 }
@@ -150,9 +156,13 @@ function onMessage (channel, data) {
     } finally {
       rpcCallbacks.get(channel).delete(message.id)
     }
-  } else if (message.method === 'channels.message') {
+    return
+  }
+  if (message.method === 'channels.message') {
     emit(channel, 'message', message.params.data.message)
-  } else if (message.method === 'channels.system.pong') {
+    return
+  }
+  if (message.method === 'channels.system.pong') {
     if (
       (message.params.channel_id === channelId.get(channel)) ||
       // Skip channelId check if channelId is not known yet
@@ -160,18 +170,10 @@ function onMessage (channel, data) {
     ) {
       ping(channel)
     }
-  } else {
-    messageQueue.set(channel, [...(messageQueue.get(channel) || []), message])
-    dequeueMessage(channel)
+    return
   }
-}
-
-function wrapCallErrorMessage (message) {
-  const [{ message: details } = {}] = message.error.data || []
-  if (details) {
-    return new Error(`${message.error.message}: ${details}`)
-  }
-  return new Error(message.error.message)
+  messageQueue.get(channel).push(message)
+  dequeueMessage(channel)
 }
 
 export function call (channel, method, params) {
@@ -179,7 +181,10 @@ export function call (channel, method, params) {
     const id = sequence.set(channel, sequence.get(channel) + 1).get(channel)
     rpcCallbacks.get(channel).set(id, (message) => {
       if (message.result) return resolve(message.result)
-      if (message.error) return reject(wrapCallErrorMessage(message))
+      if (message.error) {
+        const [{ message: details } = {}] = message.error.data || []
+        return reject(new ChannelCallError(message.error.message + (details ? `: ${details}` : '')))
+      }
     })
     send(channel, { jsonrpc: '2.0', method, id, params })
   })
@@ -199,6 +204,7 @@ export async function initialize (channel, { url, ...channelOptions }) {
   eventEmitters.set(channel, new EventEmitter())
   sequence.set(channel, 0)
   rpcCallbacks.set(channel, new Map())
+  messageQueue.set(channel, [])
 
   const wsUrl = new URL(url)
   Object.entries(channelOptions)

@@ -66,7 +66,7 @@ const AMOUNT = 1;
   const payerAccount = MemoryAccount({ keypair: PAYER_ACCOUNT_KEYPAIR })
   const newUserAccount = MemoryAccount({ keypair: NEW_USER_KEYPAIR })
   const node = await Node({ url: NODE_URL })
-  const client = await Universal({
+  const aeSdk = await Universal({
     nodes: [{ name: 'testnet', instance: node }],
     accounts: [payerAccount, newUserAccount]
   })
@@ -74,20 +74,20 @@ const AMOUNT = 1;
   // The `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp) itself is
   // asynchronous as it determines the node's version and rest interface automatically. Only once
   // the Promise is fulfilled, you know you have a working object instance which is assigned to the
-  // `client` constant in this case.
+  // `aeSdk` constant in this case.
   //
   // Note:
   //
   //   - `Universal` is not a constructor but a factory, which means it's *not* invoked with `new`.
 
   // ## 5. Send 1 `aetto` from payer to new user
-  const spendTxResult = await client.spend(
+  const spendTxResult = await aeSdk.spend(
     AMOUNT, await newUserAccount.address(), { onAccount: payerAccount }
   )
   console.log(spendTxResult)
 
   // ## 6. Check balance of new user (before)
-  const newUserBalanceBefore = await client.getBalance(await newUserAccount.address())
+  const newUserBalanceBefore = await aeSdk.getBalance(await newUserAccount.address())
   console.log(`new user balance (before): ${newUserBalanceBefore}`)
 
   // Note:
@@ -95,12 +95,12 @@ const AMOUNT = 1;
   //  - The balance should now be 1
 
   // ## 7. Create and sign `SpendTx` on behalf of new user
-  const spendTx = await client.spendTx({
+  const spendTx = await aeSdk.spendTx({
     senderId: await newUserAccount.address(),
     recipientId: await payerAccount.address(),
     amount: AMOUNT
   })
-  const signedSpendTx = await client.signTransaction(
+  const signedSpendTx = await aeSdk.signTransaction(
     spendTx, { onAccount: newUserAccount, innerTx: true }
   )
 
@@ -110,7 +110,7 @@ const AMOUNT = 1;
   //    the transaction needs to be signed in a special way
 
   // ## 7. Create, sign & broadcast the `PayingForTx` as payer
-  const payForTx = await client.payForTransaction(signedSpendTx, { onAccount: payerAccount })
+  const payForTx = await aeSdk.payForTransaction(signedSpendTx, { onAccount: payerAccount })
   console.log(payForTx)
 
   // Note:
@@ -119,7 +119,7 @@ const AMOUNT = 1;
   //    have to cover the transaction fee.
 
   // ## 8. Check balance of new user (after)
-  const newUserBalanceAfter = await client.getBalance(await newUserAccount.address())
+  const newUserBalanceAfter = await aeSdk.getBalance(await newUserAccount.address())
   console.log(`new user balance (after): ${newUserBalanceAfter}`)
 
   // Note:

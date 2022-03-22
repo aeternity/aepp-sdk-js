@@ -6,14 +6,24 @@
  * @example
  * import WalletRpc from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc'
  */
-import { v4 as uuid } from 'uuid'
+import { v4 as uuid } from '@aeternity/uuid'
 import Ae from '../../../ae'
 import verifyTransaction from '../../../tx/validator'
 import AccountMultiple from '../../../account/multiple'
 import TxObject from '../../../tx/tx-object'
 import RpcClient from './rpc-client'
-import { getBrowserAPI, getHandler, isValidAccounts, message, resolveOnAccount, sendResponseMessage } from '../helpers'
+import { getBrowserAPI, getHandler, isValidAccounts, message, sendResponseMessage } from '../helpers'
 import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE } from '../schema'
+import { ArgumentError, TypeError, UnknownRpcClientError } from '../../errors'
+import { isAccountBase } from '../../../account/base'
+
+const resolveOnAccount = (addresses, onAccount, opt = {}) => {
+  if (!addresses.find(a => a === onAccount)) {
+    if (typeof opt.onAccount !== 'object' || !isAccountBase(opt.onAccount)) throw new TypeError('Provided onAccount should be an AccountBase')
+    onAccount = opt.onAccount
+  }
+  return onAccount
+}
 
 const NOTIFICATIONS = {
   [METHODS.closeConnection]: (instance, { client }) =>
@@ -28,26 +38,36 @@ const RESPONSES = {}
 const REQUESTS = {
   // Store client info and prepare two fn for each client `connect` and `denyConnection`
   // which automatically prepare and send response for that client
-  [METHODS.aepp.connect] (callInstance, instance, client, { name, networkId, version, icons }) {
+  [METHODS.connect] (
+    callInstance,
+    instance,
+    client,
+    { name, networkId, version, icons, connectNode }) {
     // Check if protocol and network is compatible with wallet
     if (version !== VERSION) return { error: ERRORS.unsupportedProtocol() }
-
     // Store new AEPP and wait for connection approve
     client.updateInfo({
       status: RPC_STATUS.WAITING_FOR_CONNECTION_APPROVE,
       name,
       networkId,
       icons,
-      version
+      version,
+      origin: window.location.origin,
+      connectNode
     })
 
     // Call onConnection callBack to notice Wallet about new AEPP
     return callInstance(
       'onConnection',
       { name, networkId, version },
-      () => {
-        client.updateInfo({ status: RPC_STATUS.CONNECTED })
-        return { result: instance.getWalletInfo() }
+      ({ shareNode } = {}) => {
+        client.updateInfo({ status: shareNode ? RPC_STATUS.NODE_BINDED : RPC_STATUS.CONNECTED })
+        return {
+          result: {
+            ...instance.getWalletInfo(),
+            ...(shareNode && { node: instance.selectedNode })
+          }
+        }
       },
       (error) => {
         client.updateInfo({ status: RPC_STATUS.CONNECTION_REJECTED })
@@ -55,7 +75,7 @@ const REQUESTS = {
       }
     )
   },
-  [METHODS.aepp.subscribeAddress] (callInstance, instance, client, { type, value }) {
+  [METHODS.subscribeAddress] (callInstance, instance, client, { type, value }) {
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
 
@@ -65,7 +85,9 @@ const REQUESTS = {
       async ({ accounts } = {}) => {
         try {
           const clientAccounts = accounts || instance.getAccounts()
-          if (!isValidAccounts(clientAccounts)) throw new Error('Invalid provided accounts object')
+          if (!isValidAccounts(clientAccounts)) {
+            throw new TypeError('Invalid provided accounts object')
+          }
           const subscription = client.updateSubscription(type, value)
           client.setAccounts(clientAccounts, { forceNotification: true })
           return {
@@ -76,13 +98,13 @@ const REQUESTS = {
           }
         } catch (e) {
           if (instance.debug) console.error(e)
-          return { error: ERRORS.internalError({ msg: e.message }) }
+          return { error: ERRORS.internalError(e.message) }
         }
       },
       (error) => ({ error: ERRORS.rejectedByUser(error) })
     )
   },
-  [METHODS.aepp.address] (callInstance, instance, client) {
+  [METHODS.address] (callInstance, instance, client) {
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
     if (!client.isSubscribed()) return { error: ERRORS.notAuthorize() }
@@ -97,7 +119,7 @@ const REQUESTS = {
       (error) => ({ error: ERRORS.rejectedByUser(error) })
     )
   },
-  [METHODS.aepp.sign] (callInstance, instance, client, options) {
+  [METHODS.sign] (callInstance, instance, client, options) {
     const { tx, onAccount, networkId, returnSigned = false } = options
     const address = onAccount || client.currentAccount
     // Update client with new networkId
@@ -106,7 +128,7 @@ const REQUESTS = {
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
     // Account permission check
     if (!client.hasAccessToAccount(address)) {
-      return { error: ERRORS.permissionDeny({ account: address }) }
+      return { error: ERRORS.permissionDeny(address) }
     }
     // NetworkId check
     if (!networkId || networkId !== instance.getNetworkId()) {
@@ -122,7 +144,7 @@ const REQUESTS = {
           onAcc = resolveOnAccount(instance.addresses(), address, opt)
         } catch (e) {
           if (instance.debug) console.error(e)
-          return { error: ERRORS.internalError({ msg: e.message }) }
+          return { error: ERRORS.internalError(e.message) }
         }
         try {
           const t = rawTx || tx
@@ -144,12 +166,12 @@ const REQUESTS = {
       (error) => ({ error: ERRORS.rejectedByUser(error) })
     )
   },
-  [METHODS.aepp.signMessage] (callInstance, instance, client, { message, onAccount }) {
+  [METHODS.signMessage] (callInstance, instance, client, { message, onAccount }) {
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
     const address = onAccount || client.currentAccount
     if (!client.hasAccessToAccount(address)) {
-      return { error: ERRORS.permissionDeny({ account: address }) }
+      return { error: ERRORS.permissionDeny(address) }
     }
 
     return callInstance(
@@ -168,7 +190,7 @@ const REQUESTS = {
           }
         } catch (e) {
           if (instance.debug) console.error(e)
-          return { error: ERRORS.internalError({ msg: e.message }) }
+          return { error: ERRORS.internalError(e.message) }
         }
       },
       (error) => ({ error: ERRORS.rejectedByUser(error) })
@@ -221,41 +243,26 @@ const handleMessage = (instance, id) => async (msg, origin) => {
  * @param {Function} onSign Call-back function for incoming AEPP sign request
  * @param {Function} onAskAccounts Call-back function for incoming AEPP get address request
  * @param {Function} onMessageSign Call-back function for incoming AEPP sign message request
- * Second argument of incoming call-backs contain function for accept/deny request
+   * Second argument of incoming call-backs contain function for accept/deny request
  * @param {Function} onDisconnect Call-back function for disconnect event
  * @return {Object}
  */
 export default Ae.compose(AccountMultiple, {
   init ({
     name,
-    onConnection,
-    onSubscription,
-    onSign,
-    onDisconnect,
-    onAskAccounts,
-    onMessageSign,
-    forceValidation = false,
-    debug = false
+    debug = false,
+    ...other
   } = {}) {
-    this.debug = debug
-    const eventsHandlers = [
-      'onConnection', 'onSubscription', 'onSign', 'onDisconnect', 'onMessageSign'
-    ]
-    // CallBacks for events
-    this.onConnection = onConnection
-    this.onSubscription = onSubscription
-    this.onSign = onSign
-    this.onDisconnect = onDisconnect
-    this.onAskAccounts = onAskAccounts
-    this.onMessageSign = onMessageSign
-    this.rpcClients = {}
-
-    eventsHandlers.forEach(event => {
-      if (!forceValidation && typeof this[event] !== 'function') {
-        throw new Error(`Call-back for ${event} must be an function!`)
-      }
+    [
+      'onConnection', 'onSubscription', 'onSign', 'onDisconnect', 'onAskAccounts', 'onMessageSign'
+    ].forEach(event => {
+      const handler = other[event]
+      if (typeof handler !== 'function') throw new ArgumentError(event, 'a function', handler)
+      this[event] = handler
     })
-    //
+
+    this.debug = debug
+    this.rpcClients = {}
     this.name = name
     this.id = uuid()
 
@@ -298,9 +305,13 @@ export default Ae.compose(AccountMultiple, {
       // Send notification 'update.network' to all Aepp which connected
       Object.values(this.rpcClients)
         .filter(client => client.isConnected())
-        .forEach(client => client.sendMessage(
-          message(METHODS.updateNetwork, { networkId: this.getNetworkId() }), true
-        ))
+        .forEach(client => {
+          client.sendMessage(
+            message(METHODS.updateNetwork, {
+              networkId: this.getNetworkId(),
+              ...(client.info.status === RPC_STATUS.NODE_BINDED && { node: this.selectedNode })
+            }), true)
+        })
     }
   },
   methods: {
@@ -315,7 +326,7 @@ export default Ae.compose(AccountMultiple, {
      */
     removeRpcClient (id, { forceConnectionClose = false } = {}) {
       const client = this.rpcClients[id]
-      if (!client) throw new Error(`RpcClient with id ${id} do not exist`)
+      if (!client) throw new UnknownRpcClientError(id)
       client.disconnect(forceConnectionClose)
       delete this.rpcClients[id]
     },
@@ -351,7 +362,7 @@ export default Ae.compose(AccountMultiple, {
     shareWalletInfo (postFn) {
       postFn({
         jsonrpc: '2.0',
-        ...message(METHODS.wallet.readyToConnect, this.getWalletInfo())
+        ...message(METHODS.readyToConnect, this.getWalletInfo())
       })
     },
     /**

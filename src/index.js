@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2021 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -21,9 +21,8 @@ import * as Bytes from './utils/bytes'
 import * as TxBuilder from './tx/builder'
 import * as TxBuilderHelper from './tx/builder/helpers'
 import * as SCHEMA from './tx/builder/schema'
-import * as ACITransformation from './contract/aci/transformation'
 import * as AmountFormatter from './utils/amount-formatter'
-import HdWallet from './utils/hd-wallet'
+import * as HdWallet from './utils/hd-wallet'
 
 import Ae from './ae'
 import Chain from './chain'
@@ -38,8 +37,8 @@ import AccountMultiple from './account/multiple'
 import MemoryAccount from './account/memory'
 import Aens from './ae/aens'
 import Contract from './ae/contract'
-import GeneralizeAccount from './contract/ga'
-import ContractCompilerAPI from './contract/compiler'
+import GeneralizedAccount from './contract/ga'
+import ContractCompilerHttp from './contract/compiler'
 import RpcAepp from './ae/aepp'
 import RpcWallet from './ae/wallet'
 import Oracle from './ae/oracle'
@@ -53,6 +52,7 @@ export * as AeppWalletSchema from './utils/aepp-wallet-communication/schema'
 export { default as WalletDetector } from './utils/aepp-wallet-communication/wallet-detector'
 export { default as BrowserRuntimeConnection } from './utils/aepp-wallet-communication/connection/browser-runtime'
 export { default as BrowserWindowMessageConnection } from './utils/aepp-wallet-communication/connection/browser-window-message'
+export * from './utils/errors'
 
 export const getDefaultPointerKey = TxBuilderHelper.getDefaultPointerKey
 
@@ -64,8 +64,7 @@ export {
   Aens,
   Bytes,
   Contract,
-  ContractCompilerAPI,
-  ACITransformation,
+  ContractCompilerHttp,
   ChainNode,
   RpcAepp,
   RpcWallet,
@@ -73,7 +72,7 @@ export {
   Crypto,
   Keystore,
   Chain,
-  GeneralizeAccount,
+  GeneralizedAccount,
   HdWallet,
   MemoryAccount,
   Node,

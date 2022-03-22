@@ -28,6 +28,11 @@ import stampit from '@stamp/it'
 
 import WalletConnection from '.'
 import { getBrowserAPI } from '../helpers'
+import {
+  RpcConnectionError,
+  AlreadyConnectedError,
+  NoWalletConnectedError
+} from '../../errors'
 
 /**
  * Disconnect
@@ -54,7 +59,7 @@ function disconnect () {
  * @return {void}
  */
 function connect (onMessage, onDisconnect) {
-  if (this.isConnected()) throw new Error('You already connected')
+  if (this.isConnected()) throw new AlreadyConnectedError('You already connected')
   this.handler = (msg, source) => {
     if (this.debug) console.log('Receive message: ', msg)
     onMessage(msg, source)
@@ -75,7 +80,7 @@ function connect (onMessage, onDisconnect) {
  * @return {void}
  */
 function sendMessage (msg) {
-  if (!this.port) throw new Error('You dont have connection. Please connect before')
+  if (!this.port) throw new NoWalletConnectedError('You dont have connection. Please connect before')
   if (this.debug) console.log('Send message: ', msg)
   this.port.postMessage(msg)
 }
@@ -105,7 +110,7 @@ function isConnected () {
  */
 export default stampit({
   init ({ connectionInfo = {}, port, debug = false }) {
-    if (!getBrowserAPI().runtime) throw new Error('Runtime is not accessible in your environment')
+    if (!getBrowserAPI().runtime) throw new RpcConnectionError('Runtime is not accessible in your environment')
     this.debug = debug
     this.connectionInfo = connectionInfo
     this.port = port || getBrowserAPI().runtime.connect(...[connectionInfo.id || undefined])

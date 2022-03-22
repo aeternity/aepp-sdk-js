@@ -22,9 +22,7 @@
 //
 // - deal with the different phases of compiling Sophia contracts to bytecode
 // - deploy the bytecode to get a callable contract address
-// - invoke the deployed contract on the æternity blockchain using `callStatic`
-// - get the contract instance of an already deployed contract
-// - access an `entrypoint` (public contract function) directly without using `call` or `callStatic`
+// - invoke the deployed contract on the æternity blockchain
 
 // ## 1. Specify imports
 //
@@ -37,11 +35,14 @@ const { Universal, Node, MemoryAccount } = require('@aeternity/aepp-sdk')
 
 // ## 2. Define constants
 // The following constants are used in the subsequent code snippets.
-const CONTRACT_CODE = // typically you read the source code from a separate .aes file
+const CONTRACT_SOURCE = // typically you read the source code from a separate .aes file
 `
 contract Multiplier =
   record state = { factor: int }
   entrypoint init(f : int) : state = { factor = f }
+  stateful entrypoint setFactor(f : int): int =
+    put(state{ factor = f })
+    f * 10
   entrypoint multiplyBy(x : int) = x * state.factor
 `
 const ACCOUNT_KEYPAIR = {
@@ -66,7 +67,7 @@ const COMPILER_URL = 'https://compiler.aepps.com';
   // ## 4. Create object instances
   const account = MemoryAccount({ keypair: ACCOUNT_KEYPAIR })
   const node = await Node({ url: NODE_URL })
-  const client = await Universal({
+  const aeSdk = await Universal({
     nodes: [{ name: 'testnet', instance: node }],
     compilerUrl: COMPILER_URL,
     accounts: [account]
@@ -75,76 +76,75 @@ const COMPILER_URL = 'https://compiler.aepps.com';
   // The `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp) itself is
   // asynchronous as it determines the node's version and rest interface automatically. Only once
   // the Promise is fulfilled, you know you have a working object instance
-  // which is assigned to the `client` constant in this case.
+  // which is assigned to the `aeSdk` constant in this case.
   //
   // Note:
   //
   //   - `Universal` is not a constructor but a factory, which means it's *not* invoked with `new`.
 
-  // ## 5. Compile the contract
-  // The `contractCompile` function takes a raw Sophia contract as string and sends it
+  // ## 5. Get contract instance
+  // Knowing the source code allows you to initialize a contract instance and interact with the
+  // contract in a convenient way.
+  console.log(CONTRACT_SOURCE)
+  const contract = await aeSdk.getContractInstance({ source: CONTRACT_SOURCE })
+
+  // ## 6. Compile the contract
+  // The `compile` function sends a raw Sophia contract as string
   // to the HTTP compiler for bytecode compilation. In the future this will be done
   // without talking to the node, but requiring a bytecode compiler
   // implementation directly in the SDK.
-  console.log(CONTRACT_CODE)
-  const bytecode = await client.contractCompile(CONTRACT_CODE)
-  console.log(`Obtained bytecode ${bytecode.bytecode}`)
+  const bytecode = await contract.compile()
+  console.log(`Obtained bytecode ${bytecode}`)
 
-  // ## 6. Deploy the contract
-  // Invoking `deploy` on the bytecode object will result in the `CreateContractTx`
+  // ## 7. Deploy the contract
+  // Invoking `deploy` on the contract instance will result in the `CreateContractTx`
   // being created, signed (using the _secretKey_ of the previously defined `MemoryAccount`) and
   // broadcasted to the network. It will be picked up by the miners and written to the chain.
 
-  const contract = await bytecode.deploy([5])
-  console.log(`Contract deployed at ${contract.address}`)
+  const deployInfo = await contract.deploy([5])
+  console.log(`Contract deployed at ${deployInfo.address}`)
 
   // Note:
   //
   //  - Sophia contracts always have an `init` function which needs to be invoked.
-  //  - The SDK receives the required `calldata` for the provided arguments by calling the HTTP
-  //    compiler.
+  //  - The SDK generates the required `calldata` for the provided arguments by
+  //    `@aeternity/aepp-calldata` package.
 
-  // ## 7. Call a contract function via dry-run
+  // ## 8. Call a contract function
   // Once the `ContractCreateTx` has been successfully mined, you can attempt to invoke
   // any public function (aka `entrypoint` in Sophia) defined within it.
-  // In this case you can use `callStatic` which performs a `dry-run` of the transaction which
-  // allows you to get the result without having to mine a transaction.
 
-  const call = await contract.callStatic('multiplyBy', [7])
+  await contract.methods.setFactor(6)
 
   // **Note**:
   //
-  //    - for `stateful entrypoints` that may apply changes to the contract's state you will always
-  //      have to use `call` which broadcasts the transaction to be mined
+  //  - `setFactor` is a stateful entrypoint that changes to the contract's state so `contract`
+  //    broadcasting the transaction to be mined
 
-  // ## 8. Decode the call result
+  // ## 9. Call a contract function via dry-run
+  // You can use `callStatic` option which performs a `dry-run` of the
+  // transaction which allows you to get the result without having to mine a transaction.
+
+  let call = await contract.methods.setFactor(7, { callStatic: true })
+
+  // ## 10. Decode the call result
   // The execution result, if successful, will be an FATE-encoded result value.
-  // The `decode` function will use the Sophia HTTP compiler to decode the result value.
+  // The `decodedResult` property will contain the result value decoded using calldata package.
 
-  console.log(`Execution result: ${call.decodedResult}`)
+  console.log(`setFactor execution result: ${call.decodedResult}`)
 
-  // ## 9. Get contract instance of a deployed contract
-  // Knowing the contract address and the source code allows you to
-  // initialize a contract instance and interact with the contract in a convenient way.
+  // ## 11. Call a contract non-stateful entrypoint via dry-run
 
-  const contractInstance = await client.getContractInstance(
-    { source: CONTRACT_CODE, contractAddress: contract.address }
-  )
-  const callResult = await contractInstance.methods.multiplyBy(7)
-  console.log(`Execution result (via contractInstance initialized with existing contract): ${callResult.decodedResult}`)
+  call = await contract.methods.multiplyBy(8)
+  console.log(`multiplyBy execution result: ${call.decodedResult}`)
 
-  // Note:
+  // **Note**:
   //
-  //  - The `contractInstance` automatically chooses to perform a dry-run call as `multiplyBy` is a
+  //  - The `contract` automatically chooses to perform a dry-run call as `multiplyBy` is a
   //    non-stateful entrypoint
-  //      - if `multiplyBy` would be a `stateful entrypoint` the transaction would be broadcasted to
-  //        the network and picked up by miners
-  //  - The `decodedResult` is automatically being included in the `callResult`
-  //  - You can also use `getContractInstance` directly to deploy a contract and avoid having to
-  //    call `contractCompile` (step 5),  `call`/`callStatic` (step 7) and `decode` (step 8)
-  //    manually
-  //      - see [Contracts Guide](../../guides/contracts.md)
+  //  - if `multiplyBy` would be a `stateful entrypoint` the transaction would be broadcasted to
+  //    the network and picked up by miners
 
-// ## 10. Close and run async codeblock
+// ## 12. Close and run async codeblock
 // Now you can close the async codeblock and execute it at the same time.
 })()

@@ -16,8 +16,18 @@
  */
 import { expect } from 'chai'
 import { before, describe, it } from 'mocha'
-import { decodeEvents, SOPHIA_TYPES } from '../../src/contract/aci/transformation'
+import BigNumber from 'bignumber.js'
 import { decode } from '../../src/tx/builder/helpers'
+import {
+  BytecodeMismatchError,
+  InvalidAensNameError,
+  InvalidMethodInvocationError,
+  MissingContractAddressError,
+  MissingContractDefError,
+  NotPayableFunctionError,
+  MissingEventDefinitionError,
+  AmbiguousEventDefinitionError
+} from '../../src/utils/errors'
 import { getSdk } from './'
 
 const identityContractSource = `
@@ -29,16 +39,28 @@ const libContractSource = `
 namespace TestLib =
   function sum(x: int, y: int) : int = x + y
 `
+
+const remoteContractSource = `
+contract Remote =
+  datatype event = RemoteEvent1(int) | RemoteEvent2(string, int) | Duplicate(int)
+  stateful entrypoint emitEvents(duplicate: bool) : unit =
+    Chain.event(RemoteEvent2("test-string", 43))
+    switch(duplicate)
+      true => Chain.event(Duplicate(0))
+      false => ()
+`
+
 const testContractSource = `
 namespace Test =
   function double(x: int): int = x*2
 
-
-contract interface Voting =
+contract interface RemoteI =
   type test_type = int
   record state = { value: string, key: test_type, testOption: option(string) }
   record test_record = { value: string, key: list(test_type) }
   entrypoint test : () => int
+  datatype event = RemoteEvent1(int) | RemoteEvent2(string, int) | Duplicate(int)
+  entrypoint emitEvents : (bool) => unit
 
 include "testLib"
 contract StateContract =
@@ -46,15 +68,16 @@ contract StateContract =
   record state = { value: string, key: number, testOption: option(string) }
   record yesEr = { t: number}
 
-  datatype event = TheFirstEvent(int) | AnotherEvent(string, address) | AnotherEvent2(bool, string, int)
+  datatype event = TheFirstEvent(int) | AnotherEvent(string, address) | AnotherEvent2(bool, string, int) | Duplicate(string)
   datatype dateUnit = Year | Month | Day
   datatype one_or_both('a, 'b) = Left('a) | Right('b) | Both('a, 'b)
 
   entrypoint init(value: string, key: int, testOption: option(string)) : state = { value = value, key = key, testOption = testOption }
   entrypoint retrieve() : string*int = (state.value, state.key)
+  stateful entrypoint setKey(key: number) = put(state{key = key})
 
-  entrypoint remoteContract(a: Voting) : int = 1
-  entrypoint remoteArgs(a: Voting.test_record) : Voting.test_type = 1
+  entrypoint remoteContract(a: RemoteI) : int = 1
+  entrypoint remoteArgs(a: RemoteI.test_record) : RemoteI.test_type = 1
   entrypoint intFn(a: int) : int = a
   payable entrypoint stringFn(a: string) : string = a
   entrypoint boolFn(a: bool) : bool = a
@@ -79,7 +102,7 @@ contract StateContract =
   entrypoint listOption(s: option(list(int*string))) : option(list(int*string)) = s
 
   entrypoint testFn(a: list(int), b: bool) : list(int)*bool = (a, b)
-  entrypoint approve(tx_id: int, voting_contract: Voting) : int = tx_id
+  entrypoint approve(tx_id: int, remote_contract: RemoteI) : int = tx_id
 
   entrypoint hashFn(s: hash): hash = s
   entrypoint signatureFn(s: signature): signature = s
@@ -95,12 +118,18 @@ contract StateContract =
       Left(x)    => x
       Right(_)   => abort("asdasd")
       Both(x, _) => x
-  stateful entrypoint emitEvents() : unit =
+
+  stateful entrypoint emitEvents(remote: RemoteI, duplicate: bool) : unit =
     Chain.event(TheFirstEvent(42))
-    Chain.event(AnotherEvent("This is not indexed", Contract.address))
+    Chain.event(AnotherEvent("This is not indexed", ak_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT))
+    remote.emitEvents(duplicate)
     Chain.event(AnotherEvent2(true, "This is not indexed", 1))
 
   entrypoint chainTtlFn(t: Chain.ttl): Chain.ttl = t
+
+  stateful entrypoint recursion(t: string): string =
+    put(state{value = t})
+    recursion(t)
 `
 const filesystem = {
   testLib: libContractSource
@@ -108,22 +137,28 @@ const filesystem = {
 const notExistingContractAddress = 'ct_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT'
 
 describe('Contract instance', function () {
-  let sdk
+  let aeSdk
   let testContract
   let testContractAddress
   let testContractAci
   let testContractBytecode
 
   before(async function () {
-    sdk = await getSdk()
-    testContractAci = await sdk.contractGetACI(testContractSource, { filesystem })
-    testContractBytecode = (await sdk.contractCompile(testContractSource, { filesystem })).bytecode
+    aeSdk = await getSdk()
+    testContractAci = await aeSdk.compilerApi
+      .generateACI({ code: testContractSource, options: { filesystem } })
+    testContractBytecode = (await aeSdk.compilerApi.compileContract({
+      code: testContractSource, options: { filesystem }
+    })).bytecode
   })
 
   it('generates by source code', async () => {
-    testContract = await sdk.getContractInstance({ source: testContractSource, filesystem, ttl: 0 })
-    testContract.should.have.property('interface')
-    testContract.should.have.property('aci')
+    aeSdk.Ae.defaults.testProperty = 'test'
+    testContract = await aeSdk.getContractInstance({
+      source: testContractSource, filesystem, ttl: 0, gas: 15000
+    })
+    delete aeSdk.Ae.defaults.testProperty
+    expect(testContract.options.testProperty).to.be.equal('test')
     testContract.should.have.property('source')
     testContract.should.have.property('bytecode')
     testContract.should.have.property('deployInfo')
@@ -133,23 +168,26 @@ describe('Contract instance', function () {
     testContract.options.ttl.should.be.equal(0)
     testContract.options.should.have.property('filesystem')
     testContract.options.filesystem.should.have.property('testLib')
-    const functionsFromACI = testContract.aci.functions.map(({ name }) => name)
-    const methods = Object.keys(testContract.methods)
-    expect(methods).to.be.eql(functionsFromACI)
+    expect(Object.keys(testContract.methods)).to.be.eql(
+      testContract._aci.encoded_aci.contract.functions.map(({ name }) => name)
+    )
   })
 
   it('compiles', async () => {
     await testContract.compile()
-    expect(testContract.bytecode.startsWith('cb_')).to.be.equal(true)
+    expect(testContract.bytecode).to.satisfy(b => b.startsWith('cb_'))
   })
 
   it('fails on calling without deployment', () => expect(testContract.methods.intFn(2))
-    .to.be.rejectedWith('You need to deploy contract before calling!'))
+    .to.be.rejectedWith(InvalidMethodInvocationError, 'You need to deploy contract before calling!'))
 
   it('deploys', async () => {
-    const deployInfo = await testContract.deploy(['test', 1, 'hahahaha'])
-    expect(deployInfo.address.startsWith('ct_')).to.equal(true)
-    expect(testContract.bytecode.startsWith('cb_')).to.be.equal(true)
+    const deployInfo = await testContract.deploy(['test', 1, 'hahahaha'], { amount: 42 })
+    expect(deployInfo.address).to.satisfy(b => b.startsWith('ct_'))
+    expect(deployInfo.txData.tx.gas).to.be.equal(15000)
+    expect(deployInfo.txData.tx.amount).to.be.equal(42)
+    expect(deployInfo.txData.gasUsed).to.be.equal(209)
+    expect(testContract.bytecode).to.satisfy(b => b.startsWith('cb_'))
     testContractAddress = deployInfo.address
   })
 
@@ -158,69 +196,70 @@ describe('Contract instance', function () {
   })
 
   it('generates by aci', () =>
-    sdk.getContractInstance({ aci: testContractAci, contractAddress: testContractAddress }))
+    aeSdk.getContractInstance({ aci: testContractAci, contractAddress: testContractAddress }))
 
   it('fails on trying to generate with not existing contract address', () =>
-    expect(sdk.getContractInstance(
+    expect(aeSdk.getContractInstance(
       { aci: identityContractSource, contractAddress: notExistingContractAddress }
-    )).to.be.rejectedWith(`Contract with address ${notExistingContractAddress} not found on-chain`))
+    )).to.be.rejectedWith(`v3/contracts/${notExistingContractAddress} error: Contract not found`))
 
   it('fails on trying to generate with invalid address', () =>
-    expect(sdk.getContractInstance(
+    expect(aeSdk.getContractInstance(
       { aci: identityContractSource, contractAddress: 'ct_asdasdasd' }
-    )).to.be.rejectedWith('Invalid name or address: ct_asdasdasd'))
+    )).to.be.rejectedWith(InvalidAensNameError, 'Invalid name or address: ct_asdasdasd'))
 
   it('fails on trying to generate by aci without address', () =>
-    expect(sdk.getContractInstance({ aci: testContractAci }))
-      .to.be.rejectedWith('Can\'t create instance by ACI without address'))
+    expect(aeSdk.getContractInstance({ aci: testContractAci }))
+      .to.be.rejectedWith(MissingContractAddressError, 'Can\'t create instance by ACI without address'))
 
   it('generates by bytecode and aci', () =>
-    sdk.getContractInstance({ bytecode: testContractBytecode, aci: testContractAci }))
+    aeSdk.getContractInstance({ bytecode: testContractBytecode, aci: testContractAci }))
 
   it('fails on generation without arguments', () =>
-    expect(sdk.getContractInstance()).to.be.rejectedWith('Either ACI or source code is required'))
+    expect(aeSdk.getContractInstance()).to.be.rejectedWith(MissingContractDefError, 'Either ACI or source code is required'))
 
   it('calls by aci', async () => {
-    const contract = await sdk.getContractInstance(
+    const contract = await aeSdk.getContractInstance(
       { aci: testContractAci, contractAddress: testContract.deployInfo.address }
     )
     expect((await contract.methods.intFn(3)).decodedResult).to.be.equal(3n)
   })
 
   it('deploys and calls by bytecode and aci', async () => {
-    const contract = await sdk.getContractInstance(
+    const contract = await aeSdk.getContractInstance(
       { bytecode: testContractBytecode, aci: testContractAci }
     )
     await contract.deploy(['test', 1])
     expect((await contract.methods.intFn(3)).decodedResult).to.be.equal(3n)
   })
 
-  it('accepts matching source code with enabled validation', () => sdk.getContractInstance({
+  it('accepts matching source code with enabled validation', () => aeSdk.getContractInstance({
     source: testContractSource,
     filesystem,
     contractAddress: testContractAddress,
     validateBytecode: true
   }))
 
-  it('rejects not matching source code with enabled validation', () => expect(sdk.getContractInstance({
+  it('rejects not matching source code with enabled validation', () => expect(aeSdk.getContractInstance({
     source: identityContractSource,
     contractAddress: testContractAddress,
     validateBytecode: true
-  })).to.be.rejectedWith('Contract source do not correspond to the bytecode deployed on the chain'))
+  })).to.be.rejectedWith(BytecodeMismatchError, 'Contract source do not correspond to the bytecode deployed on the chain'))
 
-  it('accepts matching bytecode with enabled validation', () => sdk.getContractInstance({
+  it('accepts matching bytecode with enabled validation', () => aeSdk.getContractInstance({
     bytecode: testContractBytecode,
     aci: testContractAci,
     contractAddress: testContractAddress,
     validateBytecode: true
   }))
 
-  it('rejects not matching bytecode with enabled validation', async () => expect(sdk.getContractInstance({
-    bytecode: (await sdk.contractCompile(identityContractSource)).bytecode,
-    aci: await sdk.contractGetACI(identityContractSource, { filesystem }),
+  it('rejects not matching bytecode with enabled validation', async () => expect(aeSdk.getContractInstance({
+    bytecode: (await aeSdk.compilerApi.compileContract({ code: identityContractSource })).bytecode,
+    aci: await aeSdk.compilerApi
+      .generateACI({ code: identityContractSource, options: { filesystem } }),
     contractAddress: testContractAddress,
     validateBytecode: true
-  })).to.be.rejectedWith('Contract bytecode do not correspond to the bytecode deployed on the chain'))
+  })).to.be.rejectedWith(BytecodeMismatchError, 'Contract bytecode do not correspond to the bytecode deployed on the chain'))
 
   it('dry-runs init function', async () => {
     const res = await testContract.methods.init.get('test', 1, 'hahahaha')
@@ -230,7 +269,7 @@ describe('Contract instance', function () {
   })
 
   it('dry-runs init function on specific account', async () => {
-    const [, onAccount] = sdk.addresses()
+    const [, onAccount] = aeSdk.addresses()
     const { result } = await testContract.methods.init.get('test', 1, 'hahahaha', { onAccount })
     result.callerId.should.be.equal(onAccount)
   })
@@ -238,88 +277,190 @@ describe('Contract instance', function () {
   it('deploys and calls contract without waiting for mining', async () => {
     testContract.deployInfo = {}
     const deployed = await testContract.methods.init('test', 1, 'hahahaha', { waitMined: false })
-    await sdk.poll(deployed.transaction, { interval: 50, attempts: 1200 })
+    await aeSdk.poll(deployed.transaction)
     expect(deployed.result).to.be.equal(undefined)
     const result = await testContract.methods.intFn.send(2, { waitMined: false })
     expect(result.result).to.be.equal(undefined)
     expect(result.txData).to.not.be.equal(undefined)
-    await sdk.poll(result.hash, { interval: 50, attempts: 1200 })
+    await aeSdk.poll(result.hash)
   })
 
   it('fails on paying to not payable function', async () => {
     const amount = 100
     await expect(testContract.methods.intFn.send(1, { amount }))
-      .to.be.rejectedWith(`You try to pay "${amount}" to function "intFn" which is not payable. Only payable function can accept tokens`)
+      .to.be.rejectedWith(NotPayableFunctionError, `You try to pay "${amount}" to function "intFn" which is not payable. Only payable function can accept coins`)
   })
 
   it('pays to payable function', async () => {
-    const contractBalance = await sdk.balance(testContract.deployInfo.address)
+    const contractBalance = await aeSdk.balance(testContract.deployInfo.address)
     await testContract.methods.stringFn.send('test', { amount: 100 })
-    const balanceAfter = await sdk.balance(testContract.deployInfo.address)
+    const balanceAfter = await aeSdk.balance(testContract.deployInfo.address)
     balanceAfter.should.be.equal(`${+contractBalance + 100}`)
   })
 
   it('calls on specific account', async () => {
-    const [, onAccount] = sdk.addresses()
+    const [, onAccount] = aeSdk.addresses()
     const { result } = await testContract.methods.intFn(123, { onAccount })
     result.callerId.should.be.equal(onAccount)
   })
 
-  describe('Events parsing', async () => {
-    let cInstance
-    let eventResult
-    let decodedEventsWithoutACI
-    let decodedEventsUsingACI
-    let decodedEventsUsingBuildInMethod
+  describe('Gas', () => {
+    let contract
 
     before(async () => {
-      cInstance = await sdk.getContractInstance({ source: testContractSource, filesystem })
-      await cInstance.deploy(['test', 1, 'some'])
-      eventResult = await cInstance.methods.emitEvents()
-      const { log } = await sdk.tx(eventResult.hash)
-      decodedEventsWithoutACI = decodeEvents(log, events)
-      decodedEventsUsingACI = cInstance.decodeEvents(log)
-      decodedEventsUsingBuildInMethod = cInstance.methods.emitEvents.decodeEvents(log)
+      contract = await aeSdk.getContractInstance({ source: testContractSource, filesystem })
     })
 
-    const events = [
-      { name: 'AnotherEvent2', types: [SOPHIA_TYPES.bool, SOPHIA_TYPES.string, SOPHIA_TYPES.int] },
-      { name: 'AnotherEvent', types: [SOPHIA_TYPES.string, SOPHIA_TYPES.address] },
-      { name: 'TheFirstEvent', types: [SOPHIA_TYPES.int] }
-    ]
-    const checkEvents = (event, schema) => {
-      schema.name.should.be.equal(event.name)
-      schema.types.forEach((t, tIndex) => {
-        const value = event.decoded[tIndex]
-        switch (t) {
-          case SOPHIA_TYPES.address:
-            // the address type in sophia is with ak_ prefix
-            // if a ct_ prefix is expected, contract type should be used
-            event.address.replace('ct_', 'ak_').should.be.equal(value)
-            break
-          case SOPHIA_TYPES.int:
-            expect(typeof value === 'string' || typeof value === 'number')
-              .to.be.equal(true)
-            Number.isInteger(+value).should.be.equal(true)
-            break
-          case SOPHIA_TYPES.bool:
-            value.should.be.a('boolean')
-            break
-          case SOPHIA_TYPES.string:
-            value.should.be.a('string')
-            break
+    it('estimates gas by default for contract deployments', async () => {
+      const { tx: { gas }, gasUsed } = (await contract.deploy(['test', 42])).txData
+      expect(gasUsed).to.be.equal(160)
+      expect(gas).to.be.equal(200)
+    })
+
+    it('overrides gas through getContractInstance options for contract deployments', async () => {
+      const ct = await aeSdk.getContractInstance({
+        source: testContractSource, filesystem, gas: 300
+      })
+      const { tx: { gas }, gasUsed } = (await ct.deploy(['test', 42])).txData
+      expect(gasUsed).to.be.equal(160)
+      expect(gas).to.be.equal(300)
+    })
+
+    it('estimates gas by default for contract calls', async () => {
+      const { tx: { gas }, gasUsed } = (await contract.methods.setKey(2)).txData
+      expect(gasUsed).to.be.equal(61)
+      expect(gas).to.be.equal(76)
+    })
+
+    it('overrides gas through options for contract calls', async () => {
+      const { tx: { gas }, gasUsed } = (await contract.methods.setKey(3, { gas: 100 })).txData
+      expect(gasUsed).to.be.equal(61)
+      expect(gas).to.be.equal(100)
+    })
+
+    it('runs out of gas with correct message', async () => {
+      await expect(contract.methods.setKey(42, { gas: 10, callStatic: true }))
+        .to.be.rejectedWith('Invocation failed: "Out of gas"')
+      await expect(contract.methods.setKey(42, { gas: 10 }))
+        .to.be.rejectedWith('Invocation failed')
+      await expect(contract.methods.recursion('infinite'))
+        .to.be.rejectedWith('Invocation failed: "Out of gas"')
+    })
+  })
+
+  describe('Events parsing', () => {
+    let remoteContract
+    let eventResult
+
+    before(async () => {
+      remoteContract = await aeSdk.getContractInstance({ source: remoteContractSource })
+      await remoteContract.deploy()
+      eventResult = await testContract.methods.emitEvents(remoteContract.deployInfo.address, false)
+    })
+
+    it('decodes events', () => {
+      expect(eventResult.decodedEvents).to.be.eql([{
+        name: 'AnotherEvent2',
+        args: [true, 'This is not indexed', 1n],
+        contract: {
+          name: 'StateContract',
+          address: testContract.deployInfo.address
         }
+      }, {
+        name: 'RemoteEvent2',
+        args: [
+          'test-string',
+          43n
+        ],
+        contract: {
+          name: 'RemoteI',
+          address: remoteContract.deployInfo.address
+        }
+      }, {
+        name: 'AnotherEvent',
+        args: [
+          'This is not indexed',
+          'ak_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT'
+        ],
+        contract: {
+          name: 'StateContract',
+          address: testContract.deployInfo.address
+        }
+      }, {
+        name: 'TheFirstEvent',
+        args: [42n],
+        contract: {
+          name: 'StateContract',
+          address: testContract.deployInfo.address
+        }
+      }])
+    })
+
+    it('decodes events using decodeEvents', () => {
+      expect(testContract.decodeEvents(eventResult.result.log)).to.be.eql(eventResult.decodedEvents)
+    })
+
+    it('throws error if can\'t find event definition', () => {
+      const event = eventResult.result.log[0]
+      event.topics[0] = event.topics[0].replace('0', '1')
+      expect(() => testContract.decodeEvents([event])).to.throw(
+        MissingEventDefinitionError,
+        'Can\'t find definition of 7165442193418278913262533136158148486147352807284929017531784742205476270109' +
+        ` event emitted by ${testContract.deployInfo.address}` +
+        ' (use omitUnknown option to ignore events like this)'
+      )
+    })
+
+    it('omits events without definition using omitUnknown option', () => {
+      const event = eventResult.result.log[0]
+      event.topics[0] = event.topics[0].replace('0', '1')
+      expect(testContract.decodeEvents([event], { omitUnknown: true })).to.be.eql([])
+    })
+
+    const getDuplicateLog = () => [{
+      address: remoteContract.deployInfo.address,
+      data: 'cb_Xfbg4g==',
+      topics: [
+        '28631352549432199952459007654025571262660118571086898449909844428770770966435',
+        0
+      ]
+    }]
+
+    it('throws error if found multiple event definitions', () => {
+      expect(() => testContract.decodeEvents(getDuplicateLog())).to.throw(
+        AmbiguousEventDefinitionError,
+        'Found multiple definitions of "Duplicate" event emitted by' +
+        ` ${remoteContract.deployInfo.address} in "StateContract", "RemoteI" contracts` +
+        ' (use contractAddressToName option to specify contract name corresponding to address)'
+      )
+    })
+
+    it('multiple event definitions resolved using contractAddressToName', () => {
+      expect(
+        testContract.decodeEvents(
+          getDuplicateLog(),
+          { contractAddressToName: { [remoteContract.deployInfo.address]: 'RemoteI' } }
+        )
+      ).to.be.eql([{
+        name: 'Duplicate',
+        args: [0n],
+        contract: {
+          address: remoteContract.deployInfo.address,
+          name: 'RemoteI'
+        }
+      }])
+    })
+
+    it('calls a contract that emits events with no defined events', async () => {
+      const contract = await aeSdk.getContractInstance({
+        source:
+          'contract FooContract =\n' +
+          '  entrypoint emitEvents(f: bool) = ()',
+        contractAddress: remoteContract.deployInfo.address
       })
-    }
-    events
-      .forEach((el, i) => {
-        describe(`Correct parse of ${el.name}(${el.types})`, () => {
-          it('ACI call result', () => checkEvents(eventResult.decodedEvents[i], el))
-          it('ACI instance', () => checkEvents(decodedEventsUsingACI[i], el))
-          it('ACI instance methods', () => checkEvents(decodedEventsUsingBuildInMethod[i], el))
-          it('Without ACI', () => checkEvents(decodedEventsWithoutACI[i], el))
-        })
-      })
+      const result = await contract.methods.emitEvents(false, { omitUnknown: true })
+      expect(result.decodedEvents).to.be.eql([])
+    })
   })
 
   describe('Arguments Validation and Casting', function () {
@@ -331,7 +472,18 @@ describe('Contract instance', function () {
 
       it('Valid', async () => {
         const { decodedResult } = await testContract.methods.intFn.get(1)
-        decodedResult.toString().should.be.equal('1')
+        expect(decodedResult).to.be.equal(1n)
+      })
+
+      const unsafeInt = BigInt(Number.MAX_SAFE_INTEGER + '0')
+      it('Supports unsafe integer', async () => {
+        const { decodedResult } = await testContract.methods.intFn.get(unsafeInt)
+        expect(decodedResult).to.be.equal(unsafeInt)
+      })
+
+      it('Supports BigNumber', async () => {
+        const { decodedResult } = await testContract.methods.intFn.get(new BigNumber(unsafeInt))
+        expect(decodedResult).to.be.equal(unsafeInt)
       })
     })
 
@@ -377,8 +529,8 @@ describe('Contract instance', function () {
       })
 
       it('Return address', async () => {
-        const { decodedResult } = await testContract.methods.accountAddress(await sdk.address())
-        decodedResult.should.be.equal(await sdk.address())
+        const { decodedResult } = await testContract.methods.accountAddress(await aeSdk.address())
+        decodedResult.should.be.equal(await aeSdk.address())
       })
 
       it('Valid', async () => {
@@ -529,7 +681,7 @@ describe('Contract instance', function () {
     describe('DATATYPE', function () {
       it('Invalid type', async () => {
         await expect(testContract.methods.datTypeFn({}))
-          .to.be.rejectedWith('Variant should be an object mapping constructor to array of values, got [object Object] instead')
+          .to.be.rejectedWith('Variant should be an object mapping constructor to array of values, got "[object Object]" instead')
       })
 
       it('Call generic datatype', async () => {
@@ -539,7 +691,7 @@ describe('Contract instance', function () {
 
       it('Invalid arguments length', async () => {
         await expect(testContract.methods.datTypeGFn())
-          .to.be.rejectedWith('Non matching number of arguments. Got 0 but expected from 1 to 1')
+          .to.be.rejectedWith('Non matching number of arguments. datTypeGFn expects between 1 and 1 number of arguments but got 0')
       })
 
       it('Invalid variant', async () => {
@@ -560,14 +712,14 @@ describe('Contract instance', function () {
       })
 
       it('Invalid length', async () => {
-        const address = await sdk.address()
+        const address = await aeSdk.address()
         const decoded = Buffer.from(decode(address, 'ak').slice(1))
         await expect(testContract.methods.hashFn(decoded))
           .to.be.rejectedWith('Invalid length: got 31 bytes instead of 32 bytes')
       })
 
       it('Valid', async () => {
-        const address = await sdk.address()
+        const address = await aeSdk.address()
         const decoded = decode(address, 'ak')
         const hashAsBuffer = await testContract.methods.hashFn(decoded)
         const hashAsHex = await testContract.methods.hashFn(decoded.toString('hex'))
@@ -583,16 +735,16 @@ describe('Contract instance', function () {
       })
 
       it('Invalid length', async () => {
-        const address = await sdk.address()
+        const address = await aeSdk.address()
         const decoded = decode(address, 'ak')
         await expect(testContract.methods.signatureFn(decoded))
           .to.be.rejectedWith('Invalid length: got 32 bytes instead of 64 bytes')
       })
 
       it('Valid', async () => {
-        const address = await sdk.address()
+        const address = await aeSdk.address()
         const decoded = decode(address, 'ak')
-        const fakeSignature = Buffer.from(await sdk.sign(decoded))
+        const fakeSignature = Buffer.from(await aeSdk.sign(decoded))
         const hashAsBuffer = await testContract.methods.signatureFn(fakeSignature)
         const hashAsHex = await testContract.methods.signatureFn(fakeSignature.toString('hex'))
         hashAsBuffer.decodedResult.should.be.eql(fakeSignature)
@@ -607,14 +759,14 @@ describe('Contract instance', function () {
       })
 
       it('Invalid length', async () => {
-        const address = await sdk.address()
+        const address = await aeSdk.address()
         const decoded = decode(address, 'ak')
         await expect(testContract.methods.bytesFn(Buffer.from([...decoded, 2])))
           .to.be.rejectedWith('is not of type [{bytes,32}]')
       })
 
       it('Valid', async () => {
-        const address = await sdk.address()
+        const address = await aeSdk.address()
         const decoded = decode(address, 'ak')
         const hashAsBuffer = await testContract.methods.bytesFn(decoded)
         const hashAsHex = await testContract.methods.bytesFn(decoded.toString('hex'))
@@ -639,7 +791,7 @@ describe('Contract instance', function () {
     describe('Chain.ttl variant', function () {
       it('Invalid', async () => {
         await expect(testContract.methods.chainTtlFn(50))
-          .to.be.rejectedWith('Variant should be an object mapping constructor to array of values, got 50 instead')
+          .to.be.rejectedWith('Variant should be an object mapping constructor to array of values, got "50" instead')
       })
 
       it('Valid', async () => {

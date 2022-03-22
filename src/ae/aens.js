@@ -27,11 +27,10 @@
  */
 
 import { salt } from '../utils/crypto'
-import {
-  commitmentHash, ensureNameValid, getMinimumNameFee, isAuctionName, encode, produceNameId
-} from '../tx/builder/helpers'
+import { commitmentHash, ensureNameValid, isAuctionName } from '../tx/builder/helpers'
 import Ae from './'
-import { CLIENT_TTL, NAME_FEE, NAME_TTL } from '../tx/builder/schema'
+import { CLIENT_TTL, NAME_TTL } from '../tx/builder/schema'
+import { ArgumentError } from '../utils/errors'
 
 /**
  * Revoke a name
@@ -61,7 +60,7 @@ async function revoke (name, options = {}) {
 
   const nameRevokeTx = await this.nameRevokeTx({
     ...opt,
-    nameId: produceNameId(name),
+    nameId: name,
     accountId: await this.address(opt)
   })
 
@@ -111,7 +110,7 @@ async function update (name, pointers = {}, options = {}) {
 
   const nameUpdateTx = await this.nameUpdateTx({
     ...opt,
-    nameId: produceNameId(name),
+    nameId: name,
     accountId: await this.address(opt),
     pointers: Object.entries(allPointers).map(([key, id]) => ({ key, id }))
   })
@@ -149,7 +148,7 @@ async function transfer (name, account, options = {}) {
 
   const nameTransferTx = await this.nameTransferTx({
     ...opt,
-    nameId: produceNameId(name),
+    nameId: name,
     accountId: await this.address(opt),
     recipientId: account
   })
@@ -199,7 +198,9 @@ async function query (name, opt = {}) {
     },
     revoke: async (options = {}) => this.aensRevoke(name, { ...opt, ...options }),
     extendTtl: async (nameTtl = NAME_TTL, options = {}) => {
-      if (!nameTtl || typeof nameTtl !== 'number' || nameTtl > NAME_TTL) throw new Error('Ttl must be an number and less then 180000 blocks')
+      if (typeof nameTtl !== 'number' || nameTtl > NAME_TTL || nameTtl <= 0) {
+        throw new ArgumentError('nameTtl', `a number between 1 and ${NAME_TTL} blocks`, nameTtl)
+      }
 
       return {
         ...await this.aensUpdate(name, {}, { ...opt, ...options, nameTtl, extendPointers: true }),
@@ -236,16 +237,11 @@ async function claim (name, salt, options) {
   ensureNameValid(name)
   const opt = { ...this.Ae.defaults, ...options }
 
-  const minNameFee = getMinimumNameFee(name)
-  if (opt.nameFee !== this.Ae.defaults.nameFee && minNameFee.gt(opt.nameFee)) {
-    throw new Error(`the provided fee ${opt.nameFee} is not enough to execute the claim, required: ${minNameFee}`)
-  }
-  opt.nameFee = opt.nameFee !== this.Ae.defaults.nameFee ? opt.nameFee : minNameFee
   const claimTx = await this.nameClaimTx({
     ...opt,
     accountId: await this.address(opt),
     nameSalt: salt,
-    name: encode(name, 'nm')
+    name
   })
 
   const result = await this.send(claimTx, opt)
@@ -327,7 +323,7 @@ async function preclaim (name, options = {}) {
  *
  * await sdkInstance.aensBid(name, 213109412839123, { ttl, fee, nonce })
  */
-async function bid (name, nameFee = NAME_FEE, options = {}) {
+async function bid (name, nameFee, options = {}) {
   return this.aensClaim(name, 0, { ...options, nameFee, vsn: 2 })
 }
 
@@ -356,8 +352,7 @@ const Aens = Ae.compose({
     Ae: {
       defaults: {
         clientTtl: CLIENT_TTL,
-        nameTtl: NAME_TTL, // aec_governance:name_claim_max_expiration() => 50000
-        nameFee: NAME_FEE
+        nameTtl: NAME_TTL // aec_governance:name_claim_max_expiration() => 50000
       }
     }
   }

@@ -21,6 +21,16 @@ import NodePool from '../node-pool'
 import { pause } from '../utils/other'
 import { isNameValid, produceNameId, decode } from '../tx/builder/helpers'
 import { DRY_RUN_ACCOUNT } from '../tx/builder/schema'
+import {
+  AensPointerContextError,
+  DryRunError,
+  InvalidAensNameError,
+  InvalidTxError,
+  RequestTimedOutError,
+  TxTimedOutError,
+  TxNotInChainError,
+  ArgumentError
+} from '../utils/errors'
 
 /**
  * ChainNode module
@@ -32,13 +42,13 @@ import { DRY_RUN_ACCOUNT } from '../tx/builder/schema'
  */
 
 async function sendTransaction (tx, options = {}) {
-  const { waitMined, verify } = { ...this.Ae.defaults, ...options }
-  if (verify) {
+  const opt = { ...this.Ae.defaults, ...options }
+  if (opt.verify) {
     const validation = await verifyTransaction(tx, this.selectedNode.instance)
     if (validation.length) {
       const message = 'Transaction verification errors: ' +
         validation.map(v => v.message).join(', ')
-      throw Object.assign(new Error(message), {
+      throw Object.assign(new InvalidTxError(message), {
         code: 'TX_VERIFICATION_ERROR',
         validation,
         transaction: tx
@@ -47,9 +57,11 @@ async function sendTransaction (tx, options = {}) {
   }
 
   try {
-    const { txHash } = await this.api.postTransaction({ tx })
+    const { txHash } = await this.api.postTransaction({ tx }, {
+      __queue: `tx-${await this.address?.(options).catch(() => '')}`
+    })
 
-    if (waitMined) {
+    if (opt.waitMined) {
       const txData = { ...await this.poll(txHash, options), rawTx: tx }
       // wait for transaction confirmation
       if (options.confirm) {
@@ -68,12 +80,12 @@ async function sendTransaction (tx, options = {}) {
 
 async function waitForTxConfirm (txHash, options = { confirm: 3 }) {
   options.confirm = options.confirm === true ? 3 : options.confirm
-  const { blockHeight } = await this.tx(txHash)
+  const { blockHeight } = await this.api.getTransactionByHash(txHash)
   const height = await this.awaitHeight(blockHeight + options.confirm, options)
-  const { blockHeight: newBlockHeight } = await this.tx(txHash)
+  const { blockHeight: newBlockHeight } = await this.api.getTransactionByHash(txHash)
   switch (newBlockHeight) {
     case -1:
-      throw new Error(`Transaction ${txHash} is removed from chain`)
+      throw new TxNotInChainError(txHash)
     case blockHeight:
       return height
     default:
@@ -103,6 +115,9 @@ async function getBalance (address, { height, hash, format = AE_AMOUNT_FORMATS.A
   return formatAmount(balance, { targetDenomination: format }).toString()
 }
 
+/**
+ * @deprecated use `sdk.api.getTransactionByHash/getTransactionInfoByHash` instead
+ */
 async function tx (hash, info = true) {
   const tx = await this.api.getTransactionByHash(hash)
   if (['ContractCreateTx', 'ContractCallTx', 'ChannelForceProgressTx'].includes(tx.tx.type) && info && tx.blockHeight !== -1) {
@@ -114,45 +129,36 @@ async function tx (hash, info = true) {
 }
 
 async function height () {
-  try {
-    if (!this._heightPromise) {
-      this._heightPromise = this.api.getCurrentKeyBlockHeight()
-    }
-    return (await this._heightPromise).height
-  } finally {
-    delete this._heightPromise
-  }
+  return (await this.api.getCurrentKeyBlockHeight()).height
 }
 
-async function awaitHeight (height, { interval = 5000, attempts = 20 } = {}) {
+async function awaitHeight (
+  height,
+  { interval = this._getPollInterval('block'), attempts = 20 } = {}
+) {
   let currentHeight
   for (let i = 0; i < attempts; i++) {
     if (i) await pause(interval)
     currentHeight = await this.height()
     if (currentHeight >= height) return currentHeight
   }
-  throw new Error(`Giving up after ${(attempts - 1) * interval}ms, current height: ${currentHeight}, desired height: ${height}`)
+  throw new RequestTimedOutError((attempts - 1) * interval, currentHeight, height)
+}
+
+async function poll (th, { blocks = 10, interval = this._getPollInterval('microblock') } = {}) {
+  const max = await this.height() + blocks
+  do {
+    const tx = await this.api.getTransactionByHash(th)
+    if (tx.blockHeight !== -1) return tx
+    await pause(interval)
+  } while (await this.height() < max)
+  const status = this.api.getCheckTxInPool && (await this.api.getCheckTxInPool(th)).status
+  throw new TxTimedOutError(blocks, th, status)
 }
 
 /**
- * @deprecated
+ * @deprecated use `sdk.api.getTransactionInfoByHash` instead
  */
-async function topBlock () {
-  return this.api.getTopHeader()
-}
-
-async function poll (th, { blocks = 10, interval = 500, allowUnsynced = false } = {}) {
-  const max = await this.height() + blocks
-  do {
-    const tx = await this.tx(th).catch(_ => null)
-    if (tx && (tx.blockHeight !== -1 || (allowUnsynced && tx.height))) {
-      return tx
-    }
-    await pause(interval)
-  } while (await this.height() < max)
-  throw new Error(`Giving up after ${blocks} blocks mined, transaction hash: ${th}`)
-}
-
 async function getTxInfo (hash) {
   const result = await this.api.getTransactionInfoByHash(hash)
   return result.callInfo || result
@@ -169,7 +175,7 @@ async function getCurrentGeneration () {
 async function getGeneration (hashOrHeight) {
   if (typeof hashOrHeight === 'string') return this.api.getGenerationByHash(hashOrHeight)
   if (typeof hashOrHeight === 'number') return this.api.getGenerationByHeight(hashOrHeight)
-  throw new Error('Invalid param, param must be hash or height')
+  throw new ArgumentError('hashOrHeight', 'a string or number', hashOrHeight)
 }
 
 async function getMicroBlockTransactions (hash) {
@@ -179,30 +185,53 @@ async function getMicroBlockTransactions (hash) {
 async function getKeyBlock (hashOrHeight) {
   if (typeof hashOrHeight === 'string') return this.api.getKeyBlockByHash(hashOrHeight)
   if (typeof hashOrHeight === 'number') return this.api.getKeyBlockByHeight(hashOrHeight)
-  throw new Error('Invalid param, param must be hash or height')
+  throw new ArgumentError('hashOrHeight', 'a string or number', hashOrHeight)
 }
 
 async function getMicroBlockHeader (hash) {
   return this.api.getMicroBlockHeaderByHash(hash)
 }
 
-async function txDryRun (tx, accountAddress, options) {
-  const { results: [{ result, reason, ...resultPayload }], ...other } =
-    await this.api.protectedDryRunTxs({
-      ...options,
-      txs: [{ tx }],
-      accounts: [{
-        pubKey: accountAddress,
-        amount: DRY_RUN_ACCOUNT.amount
-      }]
+async function txDryRunHandler (key) {
+  const rs = this._txDryRun[key]
+  delete this._txDryRun[key]
+
+  let dryRunRes
+  try {
+    dryRunRes = await this.api.protectedDryRunTxs({
+      top: rs[0].top,
+      txEvents: rs[0].txEvents,
+      txs: rs.map(req => ({ tx: req.tx })),
+      accounts: Array.from(new Set(rs.map(req => req.accountAddress)))
+        .map(pubKey => ({ pubKey, amount: DRY_RUN_ACCOUNT.amount }))
     })
+  } catch (error) {
+    rs.forEach(({ reject }) => reject(error))
+    return
+  }
 
-  if (result === 'ok') return { ...resultPayload, ...other }
+  const { results, txEvents } = dryRunRes
+  results.forEach(({ result, reason, ...resultPayload }, idx) => {
+    const { resolve, reject, tx, options, accountAddress } = rs[idx]
+    if (result === 'ok') return resolve({ ...resultPayload, txEvents })
+    reject(Object.assign(
+      new DryRunError(reason), { tx, accountAddress, options }
+    ))
+  })
+}
 
-  throw Object.assign(
-    new Error('Dry run error, ' + reason),
-    { tx, accountAddress, options }
-  )
+async function txDryRun (tx, accountAddress, { top, txEvents, combine }) {
+  const key = combine ? [top, txEvents].join() : 'immediate'
+  this._txDryRun ??= {}
+  this._txDryRun[key] ??= []
+  return new Promise((resolve, reject) => {
+    this._txDryRun[key].push({ tx, accountAddress, top, txEvents, resolve, reject })
+    if (!combine) {
+      txDryRunHandler.call(this, key)
+      return
+    }
+    this._txDryRun[key].timeout ??= setTimeout(txDryRunHandler.bind(this, key))
+  })
 }
 
 async function getContractByteCode (contractId) {
@@ -229,7 +258,7 @@ async function getName (name) {
  */
 async function resolveName (nameOrId, key, { verify, resolveByNode } = {}) {
   if (!nameOrId || typeof nameOrId !== 'string') {
-    throw new Error(`Name or address should be a string: ${nameOrId}`)
+    throw new InvalidAensNameError(`Name or address should be a string: ${nameOrId}`)
   }
   try {
     decode(nameOrId)
@@ -237,17 +266,16 @@ async function resolveName (nameOrId, key, { verify, resolveByNode } = {}) {
   } catch (error) {}
   if (isNameValid(nameOrId)) {
     if (verify || resolveByNode) {
-      const name = await this.api.getNameEntryByName(nameOrId).catch(_ => null)
-      if (!name) throw new Error(`Name not found: ${nameOrId}`)
+      const name = await this.api.getNameEntryByName(nameOrId)
       const pointer = name.pointers.find(pointer => pointer.key === key)
       if (!pointer) {
-        throw new Error(`Name ${nameOrId} don't have pointers for ${key}`)
+        throw new AensPointerContextError(`Name ${nameOrId} don't have pointers for ${key}`)
       }
       if (resolveByNode) return pointer.id
     }
     return produceNameId(nameOrId)
   }
-  throw new Error(`Invalid name or address: ${nameOrId}`)
+  throw new InvalidAensNameError(`Invalid name or address: ${nameOrId}`)
 }
 
 /**
@@ -269,7 +297,6 @@ const ChainNode = Chain.compose(NodePool, {
     balance,
     getBalance,
     getAccount,
-    topBlock,
     tx,
     height,
     awaitHeight,

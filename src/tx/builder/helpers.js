@@ -1,26 +1,30 @@
-import * as R from 'ramda'
 import BigNumber from 'bignumber.js'
-
-import {
-  decodeBase58Check,
-  decodeBase64Check,
-  encodeBase58Check, encodeBase64Check,
-  hash,
-  salt
-} from '../../utils/crypto'
+import bs58 from 'bs58'
+import { hash, salt, sha256hash } from '../../utils/crypto'
 import { toBytes } from '../../utils/bytes'
 import {
   ID_TAG_PREFIX,
   PREFIX_ID_TAG,
   NAME_BID_RANGES,
-  NAME_BID_MAX_LENGTH,
-  NAME_FEE,
   NAME_FEE_BID_INCREMENT,
   NAME_BID_TIMEOUTS,
   NAME_MAX_LENGTH_FEE,
   POINTER_KEY_BY_PREFIX
 } from './schema'
 import { ceil } from '../../utils/bignumber'
+import {
+  PrefixMismatchError,
+  DecodeError,
+  EncodeError,
+  PayloadLengthError,
+  TagNotFoundError,
+  PrefixNotFoundError,
+  InvalidNameError,
+  IllegalBidFeeError,
+  NoDefaultAensPointerError,
+  ArgumentError,
+  InvalidChecksumError
+} from '../../utils/errors'
 
 /**
  * JavaScript-based Transaction builder helper function's
@@ -30,8 +34,6 @@ import { ceil } from '../../utils/bignumber'
  */
 
 export const createSalt = salt
-
-const base64Types = ['tx', 'st', 'ss', 'pi', 'ov', 'or', 'cb', 'cs', 'ba']
 
 /**
  * Build a contract public key
@@ -78,11 +80,11 @@ export function formatSalt (salt) {
 }
 
 /**
- * Encode a domain name
+ * Encode an AENS name
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param {String} name Name to encode
- * @return {String} `nm_` prefixed encoded domain name
+ * @return {String} `nm_` prefixed encoded AENS name
  */
 export function produceNameId (name) {
   ensureNameValid(name)
@@ -103,7 +105,46 @@ export function produceNameId (name) {
  */
 export function commitmentHash (name, salt = createSalt()) {
   ensureNameValid(name)
-  return `cm_${encodeBase58Check(hash(Buffer.concat([Buffer.from(name.toLowerCase()), formatSalt(salt)])))}`
+  return encode(hash(Buffer.concat([Buffer.from(name.toLowerCase()), formatSalt(salt)])), 'cm')
+}
+
+// based on https://github.com/aeternity/protocol/blob/master/node/api/api_encoding.md
+const base64Types = ['ba', 'cb', 'or', 'ov', 'pi', 'ss', 'cs', 'ck', 'cv', 'st', 'tx']
+const base58Types = ['ak', 'bf', 'bs', 'bx', 'ch', 'cm', 'ct', 'kh', 'mh', 'nm', 'ok', 'oq', 'pp', 'sg', 'th']
+// TODO: add all types with a fixed length
+const typesLength = {
+  ak: 32,
+  ct: 32,
+  ok: 32
+}
+
+function ensureValidLength (data, type) {
+  if (!typesLength[type]) return
+  if (data.length === typesLength[type]) return
+  throw new PayloadLengthError(`Payload should be ${typesLength[type]} bytes, got ${data.length} instead`)
+}
+
+const getChecksum = payload => sha256hash(sha256hash(payload)).slice(0, 4)
+
+const addChecksum = (input) => {
+  const payload = Buffer.from(input)
+  return Buffer.concat([payload, getChecksum(payload)])
+}
+
+function getPayload (buffer) {
+  const payload = buffer.slice(0, -4)
+  if (!getChecksum(payload).equals(buffer.slice(-4))) throw new InvalidChecksumError()
+  return payload
+}
+
+const base64 = {
+  encode: buffer => addChecksum(buffer).toString('base64'),
+  decode: string => getPayload(Buffer.from(string, 'base64'))
+}
+
+const base58 = {
+  encode: buffer => bs58.encode(addChecksum(buffer)),
+  decode: string => getPayload(bs58.decode(string))
 }
 
 /**
@@ -115,13 +156,21 @@ export function commitmentHash (name, salt = createSalt()) {
  * @return {Buffer} Decoded data
  */
 export function decode (data, requiredPrefix) {
-  const [prefix, payload, extra] = data.split('_')
-  if (!payload) throw new Error(`Encoded string missing payload: ${data}`)
-  if (extra) throw new Error(`Encoded string have extra parts: ${data}`)
+  if (typeof data !== 'string') throw new DecodeError(`Encoded should be a string, got ${data} instead`)
+  const [prefix, encodedPayload, extra] = data.split('_')
+  if (!encodedPayload) throw new DecodeError(`Encoded string missing payload: ${data}`)
+  if (extra) throw new DecodeError(`Encoded string have extra parts: ${data}`)
   if (requiredPrefix && requiredPrefix !== prefix) {
-    throw new Error(`Encoded string have a wrong type: ${prefix} (expected: ${requiredPrefix})`)
+    throw new PrefixMismatchError(prefix, requiredPrefix)
   }
-  return (base64Types.includes(prefix) ? decodeBase64Check : decodeBase58Check)(payload)
+  const decoder = (base64Types.includes(prefix) && base64.decode) ||
+    (base58Types.includes(prefix) && base58.decode)
+  if (!decoder) {
+    throw new DecodeError(`Encoded string have unknown type: ${prefix}`)
+  }
+  const payload = decoder(encodedPayload)
+  ensureValidLength(payload, prefix)
+  return payload
 }
 
 /**
@@ -133,9 +182,13 @@ export function decode (data, requiredPrefix) {
  * @return {String} Encoded string Base58check or Base64check data
  */
 export function encode (data, type) {
-  return `${type}_${base64Types.includes(type)
-    ? encodeBase64Check(data)
-    : encodeBase58Check(data)}`
+  const encoder = (base64Types.includes(type) && base64.encode) ||
+    (base58Types.includes(type) && base58.encode)
+  if (!encoder) {
+    throw new EncodeError(`Unknown type: ${type}`)
+  }
+  ensureValidLength(data, type)
+  return `${type}_${encoder(data)}`
 }
 
 /**
@@ -146,12 +199,10 @@ export function encode (data, type) {
  * @return {Buffer} Buffer Buffer with ID tag and decoded HASh
  */
 export function writeId (hashId) {
-  if (typeof hashId !== 'string') {
-    throw new Error(`Address should be a string, got ${hashId} instead`)
-  }
+  if (typeof hashId !== 'string') throw new ArgumentError('hashId', 'a string', hashId)
   const prefix = hashId.slice(0, 2)
   const idTag = PREFIX_ID_TAG[prefix]
-  if (!idTag) throw new Error(`Id tag for prefix ${prefix} not found.`)
+  if (!idTag) throw new TagNotFoundError(prefix)
   return Buffer.from([...toBytes(idTag), ...decode(hashId, prefix)])
 }
 
@@ -163,9 +214,9 @@ export function writeId (hashId) {
  * @return {String} Encoided hash string with prefix
  */
 export function readId (buf) {
-  const tag = buf.readUIntBE(0, 1)
+  const tag = Buffer.from(buf).readUIntBE(0, 1)
   const prefix = ID_TAG_PREFIX[tag]
-  if (!prefix) throw new Error(`Prefix for id-tag ${tag} not found.`)
+  if (!prefix) throw new PrefixNotFoundError(tag)
   return encode(buf.slice(1, buf.length), prefix)
 }
 
@@ -188,7 +239,7 @@ export function writeInt (val) {
  * @return {String} Buffer Buffer from number(BigEndian)
  */
 export function readInt (buf = Buffer.from([])) {
-  return BigNumber(buf.toString('hex'), 16).toString(10)
+  return new BigNumber(Buffer.from(buf).toString('hex'), 16).toString(10)
 }
 
 /**
@@ -225,8 +276,10 @@ export function readPointers (pointers) {
   )
 }
 
+const AENS_SUFFIX = '.chain'
+
 /**
- * Ensure that name is valid
+ * Ensure that AENS name is valid
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param {string} name
@@ -234,12 +287,12 @@ export function readPointers (pointers) {
  * @throws Error
  */
 export function ensureNameValid (name) {
-  if (!name || typeof name !== 'string') throw new Error('Name must be a string')
-  if (!name.endsWith('.chain')) throw new Error(`Name should end with .chain: ${name}`)
+  if (!name || typeof name !== 'string') throw new InvalidNameError('Name must be a string')
+  if (!name.endsWith(AENS_SUFFIX)) throw new InvalidNameError(`Name should end with ${AENS_SUFFIX}: ${name}`)
 }
 
 /**
- * Is name valid
+ * Is AENS name valid
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param {string} name
@@ -263,36 +316,36 @@ export function getDefaultPointerKey (identifier) {
   decode(identifier)
   const prefix = identifier.substr(0, 2)
   return POINTER_KEY_BY_PREFIX[prefix] ||
-    (() => { throw new Error(`Default AENS pointer key is not defined for ${prefix} prefix`) })()
+    (() => { throw new NoDefaultAensPointerError(prefix) })()
 }
 
 /**
- * Get the minimum name fee for a domain
+ * Get the minimum AENS name fee
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {String} domain the domain name to get the fee for
- * @return {String} the minimum fee for the domain auction
+ * @param {String} name the AENS name to get the fee for
+ * @return {String} the minimum fee for the AENS name auction
  */
-export function getMinimumNameFee (domain) {
-  const nameLength = domain.replace('.chain', '').length
-  return NAME_BID_RANGES[nameLength >= NAME_MAX_LENGTH_FEE ? NAME_MAX_LENGTH_FEE : nameLength]
+export function getMinimumNameFee (name) {
+  ensureNameValid(name)
+  const nameLength = name.length - AENS_SUFFIX.length
+  return NAME_BID_RANGES[Math.min(nameLength, NAME_MAX_LENGTH_FEE)]
 }
 
 /**
  * Compute bid fee for AENS auction
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {String} domain the domain name to get the fee for
+ * @param {String} name the AENS name to get the fee for
  * @param {Number|String} startFee Auction start fee
  * @param {Number} [increment=0.5] Bid multiplier(In percentage, must be between 0 and 1)
  * @return {String} Bid fee
  */
-export function computeBidFee (domain, startFee = NAME_FEE, increment = NAME_FEE_BID_INCREMENT) {
-  if (!(Number(increment) === increment && increment % 1 !== 0)) throw new Error(`Increment must be float. Current increment ${increment}`)
-  if (increment < NAME_FEE_BID_INCREMENT) throw new Error(`minimum increment percentage is ${NAME_FEE_BID_INCREMENT}`)
+export function computeBidFee (name, startFee, increment = NAME_FEE_BID_INCREMENT) {
+  if (!(Number(increment) === increment && increment % 1 !== 0)) throw new IllegalBidFeeError(`Increment must be float. Current increment ${increment}`)
+  if (increment < NAME_FEE_BID_INCREMENT) throw new IllegalBidFeeError(`minimum increment percentage is ${NAME_FEE_BID_INCREMENT}`)
   return ceil(
-    BigNumber(BigNumber(startFee).eq(NAME_FEE) ? getMinimumNameFee(domain) : startFee)
-      .times(BigNumber(NAME_FEE_BID_INCREMENT).plus(1))
+    BigNumber(startFee ?? getMinimumNameFee(name)).times(BigNumber(NAME_FEE_BID_INCREMENT).plus(1))
   )
 }
 
@@ -300,26 +353,28 @@ export function computeBidFee (domain, startFee = NAME_FEE, increment = NAME_FEE
  * Compute auction end height
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {String} domain the domain name to get the fee for
+ * @param {String} name
  * @param {Number|String} claimHeight Auction starting height
  * @return {String} Auction end height
  */
-export function computeAuctionEndBlock (domain, claimHeight) {
-  return R.cond([
-    [R.lt(5), R.always(NAME_BID_TIMEOUTS[4].plus(claimHeight))],
-    [R.lt(9), R.always(NAME_BID_TIMEOUTS[8].plus(claimHeight))],
-    [R.lte(NAME_BID_MAX_LENGTH), R.always(NAME_BID_TIMEOUTS[12].plus(claimHeight))],
-    [R.T, R.always(BigNumber(claimHeight))]
-  ])(domain.replace('.chain', '').length).toString(10)
+export function computeAuctionEndBlock (name, claimHeight) {
+  ensureNameValid(name)
+  const length = name.length - AENS_SUFFIX.length
+  const h = (length <= 4 && NAME_BID_TIMEOUTS[4]) ||
+    (length <= 8 && NAME_BID_TIMEOUTS[8]) ||
+    (length <= 12 && NAME_BID_TIMEOUTS[12]) ||
+    NAME_BID_TIMEOUTS[13]
+  return h.plus(claimHeight).toString(10)
 }
 
 /**
  * Is name accept going to auction
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {String} name Transaction abiVersion
+ * @param {String} name
  * @return {Boolean}
  */
 export function isAuctionName (name) {
-  return name.replace('.chain', '').length < 13
+  ensureNameValid(name)
+  return name.length < 13 + AENS_SUFFIX.length
 }

@@ -22,6 +22,8 @@ import { encode as rlpEncode } from 'rlp'
 import { randomName } from '../utils'
 import { salt } from '../../src/utils/crypto'
 import {
+  decode,
+  encode,
   getDefaultPointerKey,
   commitmentHash,
   ensureNameValid,
@@ -31,9 +33,12 @@ import {
 } from '../../src/tx/builder/helpers'
 import BigNumber from 'bignumber.js'
 import { toBytes } from '../../src/utils/bytes'
-import { parseBigNumber } from '../../src/utils/bignumber'
 import { buildTx, unpackTx } from '../../src/tx/builder'
 import { NAME_BID_RANGES } from '../../src/tx/builder/schema'
+import {
+  InvalidNameError,
+  SchemaNotFoundError
+} from '../../src/utils/errors'
 
 describe('Tx', function () {
   it('reproducible commitment hashes can be generated', async () => {
@@ -41,10 +46,6 @@ describe('Tx', function () {
     const hash = await commitmentHash('foobar.chain', _salt)
     hash.should.be.a('string')
     return hash.should.be.equal(await commitmentHash('foobar.chain', _salt))
-  })
-
-  it('Parse big number', async () => {
-    parseBigNumber('123123123123').should.be.a('string')
   })
 
   it('test from big number to bytes', async () => {
@@ -74,11 +75,11 @@ describe('Tx', function () {
 
   describe('ensureNameValid', () => {
     it('validates type', () => {
-      expect(() => ensureNameValid({})).to.throw('Name must be a string')
+      expect(() => ensureNameValid({})).to.throw(InvalidNameError, 'Name must be a string')
     })
 
     it('validates domain', () => {
-      expect(() => ensureNameValid('asdasdasd.unknown')).to.throw('Name should end with .chain:')
+      expect(() => ensureNameValid('asdasdasd.unknown')).to.throw(InvalidNameError, 'Name should end with .chain:')
     })
 
     it('don\'t throws exception', () => ensureNameValid('asdasdasd.chain'))
@@ -99,39 +100,69 @@ describe('Tx', function () {
     it('don\'t throws exception', () => isNameValid('asdasdasd.chain').should.be.equal(true))
   })
 
-  describe('getDefaultPointerKey', () => {
-    it('throws if invalid identifier', () => expect(() => getDefaultPointerKey('aaaaa'))
+  const payload = Buffer.from([1, 2, 42])
+  describe('decode', () => {
+    it('decodes base64check', () => expect(decode('ba_AQIq9Y55kw==')).to.be.eql(payload))
+
+    it('decodes base58check', () => expect(decode('bf_3DZUwMat2')).to.be.eql(payload))
+
+    it('throws if not a string', () => expect(() => decode({}))
+      .to.throw('Encoded should be a string, got [object Object] instead'))
+
+    it('throws if invalid identifier', () => expect(() => decode('aaaaa'))
       .to.throw('Encoded string missing payload: aaaaa'))
 
-    it('throws if invalid checksum', () => expect(() => getDefaultPointerKey('aa_23aaaaa'))
+    it('throws if unknown type', () => expect(() => decode('aa_aaaaa'))
+      .to.throw('Encoded string have unknown type: aa'))
+
+    it('throws if invalid checksum', () => expect(() => decode('ak_23aaaaa'))
       .to.throw('Invalid checksum'))
 
-    it('throws if unknown prefix', () => expect(() => getDefaultPointerKey('aa_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR'))
-      .to.throw('Default AENS pointer key is not defined for aa prefix'))
+    it('throws if not matching type', () => expect(() => decode('cb_DA6sWJo=', 'ak'))
+      .to.throw('Encoded string have a wrong type: cb (expected: ak)'))
 
-    it('returns default pointer key for contract', () => expect(getDefaultPointerKey('ct_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR'))
-      .to.be.equal('contract_pubkey'))
+    it('throws if invalid size', () => expect(() => decode('ak_An6Ui6sE1F'))
+      .to.throw('Payload should be 32 bytes, got 4 instead'))
+  })
+
+  describe('encode', () => {
+    it('encodes base64check', () => expect(encode(payload, 'ba')).to.be.equal('ba_AQIq9Y55kw=='))
+
+    it('encodes base58check', () => expect(encode(payload, 'bf')).to.be.equal('bf_3DZUwMat2'))
+
+    it('throws if unknown type', () => expect(() => encode([1, 2, 3, 4], 'aa'))
+      .to.throw('Unknown type: aa'))
+  })
+
+  describe('getDefaultPointerKey', () => {
+    it('throws if unknown prefix', () =>
+      expect(() => getDefaultPointerKey('th_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR'))
+        .to.throw('Default AENS pointer key is not defined for th prefix'))
+
+    it('returns default pointer key for contract', () =>
+      expect(getDefaultPointerKey('ct_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR'))
+        .to.be.equal('contract_pubkey'))
   })
 
   it('Deserialize tx: invalid tx type', () => {
     const tx = rlpEncode([99, 99])
     expect(() => unpackTx(tx, true))
-      .to.throw('Transaction deserialization not implemented for tag ' + 99)
+      .to.throw(SchemaNotFoundError, 'Transaction deserialization not implemented for tag ' + 99)
   })
 
   it('Deserialize tx: invalid tx VSN', () => {
     const tx = rlpEncode([10, 99])
     expect(() => unpackTx(tx, true))
-      .to.throw('Transaction deserialization not implemented for tag ' + 10 + ' version ' + 99)
+      .to.throw(SchemaNotFoundError, 'Transaction deserialization not implemented for tag ' + 10 + ' version ' + 99)
   })
 
   it('Serialize tx: invalid tx type', () => {
     expect(() => buildTx({}, 'someTx'))
-      .to.throw('Transaction serialization not implemented for someTx')
+      .to.throw(SchemaNotFoundError, 'Transaction serialization not implemented for someTx')
   })
 
   it('Serialize tx: invalid tx VSN', () => {
     expect(() => buildTx({}, 'spendTx', { vsn: 5 }))
-      .to.throw('Transaction serialization not implemented for spendTx version 5')
+      .to.throw(SchemaNotFoundError, 'Transaction serialization not implemented for spendTx version 5')
   })
 })

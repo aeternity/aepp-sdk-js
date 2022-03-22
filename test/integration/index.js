@@ -34,7 +34,14 @@ export const account = Crypto.generateKeyPair()
 
 export const BaseAe = async (params = {}, compose = {}) => Universal
   .compose({
-    deepProps: { Ae: { defaults: { interval: 50, attempts: 1200 } } }
+    deepProps: {
+      Ae: {
+        defaults: {
+          _expectedMineRate: 1000,
+          _microBlockCycle: 300
+        }
+      }
+    }
   })
   .compose(compose)({
     ...params,
@@ -49,7 +56,7 @@ export const BaseAe = async (params = {}, compose = {}) => Universal
 
 const spendPromise = (async () => {
   const ae = await BaseAe({ networkId, withoutGenesisAccount: false })
-  await ae.awaitHeight(2, { interval: 200, attempts: 100 })
+  await ae.awaitHeight(2)
   await ae.spend(1e26, account.publicKey)
 })()
 

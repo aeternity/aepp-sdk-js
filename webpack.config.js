@@ -19,10 +19,7 @@ function configure (filename, opts = {}) {
     resolve: {
       extensions: ['.ts', '.js'],
       fallback: {
-        buffer: require.resolve('buffer/'),
-        path: require.resolve('path-browserify'),
-        stream: require.resolve('stream-browserify'),
-        crypto: require.resolve('crypto-browserify')
+        buffer: require.resolve('buffer/')
       },
       alias: {
         'js-yaml': false
@@ -51,15 +48,10 @@ function configure (filename, opts = {}) {
         type: 'umd'
       }
     },
-    externals: Object
-      .keys(require('./package').dependencies)
-      .reduce((p, dependency) => ({
-        ...p,
-        [dependency]: {
-          commonjs: dependency,
-          commonjs2: dependency
-        }
-      }), {}),
+    externals: Object.fromEntries([
+      ...Object.keys(require('./package').dependencies),
+      '@aeternity/argon2-browser/dist/argon2-bundled.min.js'
+    ].map((dependency) => [dependency, dependency])),
     ...opts
   })
 }

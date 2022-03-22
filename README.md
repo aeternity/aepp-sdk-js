@@ -1,20 +1,15 @@
-# [æternity](https://aeternity.com/)'s JavaScript SDK
+# [æternity](https://aeternity.com)'s JavaScript SDK
 
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/aeternity/aepp-sdk-js.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/aeternity/aepp-sdk-js/context:javascript)
-[![codecov](https://codecov.io/gh/aeternity/aepp-sdk-js/branch/develop/graph/badge.svg)](https://codecov.io/gh/aeternity/aepp-sdk-js)
-[![Build Status](https://travis-ci.com/aeternity/aepp-sdk-js.svg?branch=develop)](http://travis-ci.com/aeternity/aepp-sdk-js?branch=develop)
-[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 [![npm](https://img.shields.io/npm/v/@aeternity/aepp-sdk.svg)](https://www.npmjs.com/package/@aeternity/aepp-sdk)
 [![npm](https://img.shields.io/npm/l/@aeternity/aepp-sdk.svg)](https://www.npmjs.com/package/@aeternity/aepp-sdk)
-[![Greenkeeper badge](https://badges.greenkeeper.io/aeternity/aepp-sdk-js.svg)](https://greenkeeper.io/)
-JavaScript SDK for the revolutionary [æternity] blockchain, targeting the
-[æternity node] implementation. Aepp-sdk is [hosted on GitHub].
 
-[æternity]: https://aeternity.com/
+JavaScript SDK for the revolutionary [æternity] blockchain, targeting the
+[æternity node] implementation. The aepp-sdk is [hosted on GitHub].
+
+[æternity]: https://aeternity.com
 [æternity node]: https://github.com/aeternity/aeternity
 [hosted on GitHub]: https://github.com/aeternity/aepp-sdk-js
-
-[develop branch]: https://github.com/aeternity/aepp-sdk-js/tree/develop
 
 ## Guides & Examples
 
@@ -23,17 +18,23 @@ Introduction
 - [Quick Start](docs/quick-start.md)
 
 Usage guides:
-- [æternity naming system](docs/guides/aens.md)
+- [AENS](docs/guides/aens.md) (æternity naming system)
 - [Contracts](docs/guides/contracts.md)
-- [Contract events](docs/guides/contract-events.md)
+- [Contract Events](docs/guides/contract-events.md)
 - [Oracles](docs/guides/oracles.md)
+- [PayingForTx](docs/guides/paying-for-tx.md) (Meta-Transactions)
+- [Batch Transactions](docs/guides//batch-requests.md)
+- [Error Handling](docs/guides/error-handling.md)
 - [Low vs High level API](docs/guides/low-vs-high-usage.md)
+- Wallet Interaction
+    - [Connect an æpp to a wallet](docs/guides/connect-aepp-to-wallet.md)
+    - [How to build a wallet](docs/guides/build-wallet.md)
 
 There are also [examples](examples/README.md) that you can directly use and play with.
 
-## CLI - Command Line Client
+## CLI - Command Line Interface
 
-To quickly test _all_ of æternity's blockchain features from your terminal, you can install and use our **NodeJS [CLI](https://github.com/aeternity/aepp-cli-js)** by running:
+To quickly test _all_ of æternity's blockchain features from your terminal, you can install and use the [CLI](https://github.com/aeternity/aepp-cli-js) by running:
 
 1. `npm i -g @aeternity/aepp-cli` to globally install the CLI
 2. `aecli --help` to get a list of possible commands
@@ -44,7 +45,7 @@ For advanced use, to get a deeper understanding of the SDK or to contribute to i
 
 ## Changelog
 
-We keep our [Changelog](CHANGELOG.md) up to date.
+We keep our [Changelog](docs/CHANGELOG.md) up to date.
 
 ## License
 

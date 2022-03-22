@@ -7,8 +7,8 @@ The `options` object can be optionally passed to the respective function behind 
 const sender = 'ak_...'
 const recipient = 'ak_...'
 const options = { onAccount: sender, denomination: 'ae' } // optional options object
-// client is an instance of the Universal Stamp
-await client.spend(1, recipient, options) // amount, recipient and (optional) options
+// aeSdk is an instance of the Universal Stamp
+await aeSdk.spend(1, recipient, options) // amount, recipient and (optional) options
 ```
 
 Note:
@@ -28,7 +28,7 @@ These options are common and can be provided to every tx-type:
     - 2 different strategies to use in order to determine the next nonce, See option `strategy` to learn more.
 - `strategy` (default: `max`)
     - The strategy to obtain next nonce for an account via node API
-    - If set to `max`, then the greatest nonce seen in the account or currently in the transaction pool is incremented with 1 and returned. 
+    - If set to `max`, then the greatest nonce seen in the account or currently in the transaction pool is incremented with 1 and returned.
     If the strategy is set to `continuity`, then transactions in the mempool are checked if there are gaps - missing nonces that prevent transactions with greater nonces to get included
 - `ttl` (default: `0`)
     - Should be set if you want the transaction to be only valid until a certain block height is reached.
@@ -51,7 +51,7 @@ The following options are sepcific for each tx-type.
     - To be used for providing `aettos` (or `AE` with respective denomination) to a contract related transaction.
 - `denomination` (default: `aettos`)
     - You can specify the denomination of the `amount` that will be provided to the contract related transaction.
-- `gas` (default: `25000`)
+- `gas`
     - Max. amount of gas to be consumed by the transaction. Learn more on [How to estimate gas?](#how-to-estimate-gas)
 - `gasPrice` (default: `1e9`)
     - To increase chances to get your transaction included quickly you can use a higher gasPrice.
@@ -91,6 +91,4 @@ The following options are sepcific for each tx-type.
 
 ## How to estimate gas?
 - As æpp developer, it is reasonable to estimate the gas consumption for a contract call using the dry-run feature of the node **once** and provide a specific offset (e.g. multiplied by 1.5 or 2) as default in the æpp to ensure that contract calls are mined. Depending on the logic of the contract the gas consumption of a specific contract call can vary and therefore you should monitor the gas consumption and increase the default for the respective contract call accordingly over time.
-- The default `gas` value of `25000` should cover all trivial contract calls. In case transactions start running out of gas you should proceed the way described above and estimate the required gas using the dry-run feature.
-
-
+- By default, SDK estimates `gas` using dry-run endpoint. This means an extra request that makes contract iterations slower, but it is more developer friendly (support of heavy requests without adjustments, and verbose error messages).
