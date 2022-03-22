@@ -52,12 +52,12 @@ nav:
     - guides/contract-events.md
     - guides/oracles.md
     - guides/paying-for-tx.md
+    - guides/batch-requests.md
+    - guides/error-handling.md
     - guides/low-vs-high-usage.md
     - Wallet interaction:
       - guides/connect-aepp-to-wallet.md
       - guides/build-wallet.md
-    - guides/error-handling.md
-    - guides/batch-requests.md
   - transaction-options.md
   - Examples & Tutorials:
     - NodeJS:

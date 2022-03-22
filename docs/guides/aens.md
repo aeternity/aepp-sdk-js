@@ -1,4 +1,4 @@
-# æternity naming system
+# AENS (æternity naming system)
 
 ## Introduction
 This guide shows you how to perform all the operations that you need within the lifecycle of [æternity naming system (AENS)](https://aeternity.com/protocol/AENS.html) using the SDK.
