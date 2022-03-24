@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SDK test in browser</title>
+</head>
+<body>
+Open developer console
+<script src="../../dist/aepp-sdk.browser-script.js"></script>
+<script type="text/javascript">
+const { RpcAepp, WalletDetector, BrowserWindowMessageConnection, Node, Universal, MemoryAccount } = Ae;
+
+(async () => {
+  async function scanForWallets (sdk) {
+    const handleWallets = async function ({ wallets, newWallet }) {
+      newWallet = newWallet || Object.values(wallets)[0]
+      if (confirm(`Do you want to connect to wallet ${newWallet.name} with id ${newWallet.id}`)) {
+        console.log('newWallet', newWallet)
+        detector.stopScan()
+
+        await sdk.connectToWallet(await newWallet.getConnection())
+        console.log('walletConnected')
+        const { address: { current } } = await sdk.subscribeAddress('subscribe', 'connected')
+        console.log('address', Object.keys(current)[0])
+        onConnection()
+      }
+    }
+
+    const scannerConnection = await BrowserWindowMessageConnection({
+      connectionInfo: { id: 'spy' }
+    })
+    const detector = await WalletDetector({ connection: scannerConnection })
+    detector.scan(handleWallets.bind(this))
+  }
+
+  const sdk = await RpcAepp({
+    name: 'Simple æpp',
+    nodes: [],
+    onNetworkChange: ({ networkId }) => {
+      const [{ name }] = sdk.getNodesInPool()
+        .filter(node => node.nodeNetworkId === networkId)
+      sdk.selectNode(name)
+      console.log('networkId', networkId)
+    },
+    onAddressChange: ({ current }) => console.log('address', Object.keys(current)[0]),
+    onDisconnect: () => alert('Aepp is disconnected')
+  })
+
+  await scanForWallets(sdk)
+
+  async function onConnection() {
+    console.log('spending')
+    await sdk.spend(
+      1,
+      'ak_gvxNbZf5CuxYVfcUFoKAP4geZatWaC2Yy4jpx5vZoCKank4Gc',
+      { nonce: 198, networkId: 'ae_mainnet' }
+    )
+    console.log('done')
+  }
+})()
+</script>
+</body>
+</html>

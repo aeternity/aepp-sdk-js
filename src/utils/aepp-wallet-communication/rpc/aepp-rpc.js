@@ -285,7 +285,7 @@ export default Ae.compose({
       }
       return this.rpcClient.request(
         METHODS.sign,
-        { onAccount: opt.onAccount, tx, returnSigned: false, networkId: this.getNetworkId() }
+        { onAccount: opt.onAccount, tx, returnSigned: false, networkId: this.getNetworkId(opt) }
       )
     },
     isConnected () { return (this.rpcClient && this.rpcClient.isConnected()) },
