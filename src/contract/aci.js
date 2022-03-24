@@ -235,7 +235,7 @@ export default async function getContractInstance ({
     if (!fn) throw new MissingFunctionNameError()
     if (fn === 'init' && !opt.callStatic) throw new InvalidMethodInvocationError('"init" can be called only via dryRun')
     if (!contractId && fn !== 'init') throw new InvalidMethodInvocationError('You need to deploy contract before calling!')
-    if (opt.amount > 0 && fnACI.payable === false) throw new NotPayableFunctionError(`You try to pay "${opt.amount}" to function "${fn}" which is not payable. Only payable function can accept coins`)
+    if (fn !== 'init' && opt.amount > 0 && fnACI.payable === false) throw new NotPayableFunctionError(`You try to pay "${opt.amount}" to function "${fn}" which is not payable. Only payable function can accept coins`)
 
     const callerId = await this.address(opt).catch(error => {
       if (opt.callStatic) return DRY_RUN_ACCOUNT.pub
