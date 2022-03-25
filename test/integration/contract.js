@@ -413,7 +413,7 @@ describe('Contract', function () {
     })
 
     it('registers', async () => {
-      delegationSignature = await aeSdk.delegateSignatureCommon([address, contractId])
+      delegationSignature = await aeSdk.createOracleDelegationSignature({ contractId })
       const oracleRegister = await contract.methods.signedRegisterOracle(
         address, delegationSignature, queryFee, ttl
       )
