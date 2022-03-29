@@ -10,7 +10,7 @@ import {
   NAME_BID_TIMEOUTS,
   NAME_MAX_LENGTH_FEE,
   POINTER_KEY_BY_PREFIX
-} from './schema'
+} from './constants'
 import { ceil } from '../../utils/bignumber'
 import {
   TagNotFoundError,
