@@ -34,11 +34,10 @@ import { MissingParamError, UnsupportedVersionError } from './utils/errors'
  * @rtype () => networkId: String
  * @return {String} NetworkId
  */
-export function getNetworkId ({ networkId, force = false } = {}) {
+export function getNetworkId ({ networkId } = {}) {
   const res = networkId || this.networkId || this.selectedNode?.networkId
   if (res) return res
-  if (force) return null
-  else throw new MissingParamError('networkId is not provided')
+  throw new MissingParamError('networkId is not provided')
 }
 
 /**
