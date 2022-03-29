@@ -23,6 +23,7 @@ module.exports = {
       ignoreRegExpLiterals: true,
       ignoreStrings: true,
       ignoreTemplateLiterals: true
-    }]
+    }],
+    'import/no-cycle': 2
   }
 }
