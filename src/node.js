@@ -36,9 +36,9 @@ import { MissingParamError, UnsupportedVersionError } from './utils/errors'
  */
 export function getNetworkId ({ networkId, force = false } = {}) {
   const res = networkId || this.networkId || this.selectedNode?.networkId
-  if (!force && !res) throw new MissingParamError('networkId is not provided')
-  if (force && !res) return null
-  return res
+  if (res) return res
+  if (force) return null
+  else throw new MissingParamError('networkId is not provided')
 }
 
 /**
