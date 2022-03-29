@@ -305,20 +305,7 @@ describe('Contract instance', function () {
   })
 
   describe('Transaction options', async () => {
-    it('deploys with no options', async () => {
-      const testContract = await aeSdk.getContractInstance({
-        source: testContractSource, filesystem
-      })
-      const deployInfo = await testContract.deploy(['test', 1, 'hahahaha'])
-      expect(deployInfo.address).to.satisfy(b => b.startsWith('ct_'))
-      expect(deployInfo.txData.tx.gas).to.be.above(0)
-      expect(deployInfo.txData.tx.amount).to.be.equal(0)
-      expect(deployInfo.txData.gasUsed).to.be.above(0)
-      expect(testContract.bytecode).to.satisfy(b => b.startsWith('cb_'))
-      testContractAddress = deployInfo.address
-    })
-
-    it('deploys with options', async () => {
+    it('deploys', async () => {
       const testContract = await aeSdk.getContractInstance({
         source: testContractSource, filesystem
       })
@@ -332,7 +319,6 @@ describe('Contract instance', function () {
         strategy: 'max'
       })
       expect(deployInfo.address).to.satisfy(b => b.startsWith('ct_'))
-      console.log(deployInfo.txData)
       expect(deployInfo.txData.tx.gas).to.be.equal(15000)
       expect(deployInfo.txData.tx.amount).to.be.equal(42)
       expect(deployInfo.txData.gasUsed).to.be.equal(209)
