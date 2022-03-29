@@ -72,9 +72,5 @@ export const ERRORS = {
   unsupportedProtocol: () => ({
     code: 5,
     message: 'Unsupported Protocol Version'
-  }),
-  unsupportedNetwork: () => ({
-    code: 8,
-    message: 'Unsupported Network'
   })
 }

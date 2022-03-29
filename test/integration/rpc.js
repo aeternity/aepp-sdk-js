@@ -413,23 +413,8 @@ describe('Aepp<->Wallet', function () {
 
     it('Try to connect unsupported protocol', async () => {
       await expect(aepp.rpcClient.request(
-        METHODS.connect, {
-          name: 'test-aepp',
-          version: 2,
-          networkId: aepp.getNetworkId()
-        }
+        METHODS.connect, { name: 'test-aepp', version: 2 }
       )).to.be.eventually.rejectedWith('Unsupported Protocol Version').with.property('code', 5)
-    })
-
-    it.skip('Try to connect unsupported network', async () => {
-      // TODO: fix this assertion
-      await expect(aepp.rpcClient.request(
-        METHODS.connect, {
-          name: 'test-aepp',
-          version: 1,
-          networkId: 'ae_test'
-        }
-      )).to.be.eventually.rejectedWith('Unsupported Network').with.property('code', 8)
     })
 
     it('Process response ', () => {

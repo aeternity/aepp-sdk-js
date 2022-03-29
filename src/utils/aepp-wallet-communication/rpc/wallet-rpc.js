@@ -43,14 +43,13 @@ const REQUESTS = {
     callInstance,
     instance,
     client,
-    { name, networkId, version, icons, connectNode }) {
+    { name, version, icons, connectNode }) {
     // Check if protocol and network is compatible with wallet
     if (version !== VERSION) return { error: ERRORS.unsupportedProtocol() }
     // Store new AEPP and wait for connection approve
     client.updateInfo({
       status: RPC_STATUS.WAITING_FOR_CONNECTION_APPROVE,
       name,
-      networkId,
       icons,
       version,
       origin: window.location.origin,
@@ -60,7 +59,7 @@ const REQUESTS = {
     // Call onConnection callBack to notice Wallet about new AEPP
     return callInstance(
       'onConnection',
-      { name, networkId, version },
+      { name, version },
       ({ shareNode } = {}) => {
         client.updateInfo({ status: shareNode ? RPC_STATUS.NODE_BINDED : RPC_STATUS.CONNECTED })
         return {
@@ -121,19 +120,13 @@ const REQUESTS = {
     )
   },
   [METHODS.sign] (callInstance, instance, client, options) {
-    const { tx, onAccount, networkId, returnSigned = false } = options
+    const { tx, onAccount, returnSigned = false } = options
     const address = onAccount || client.currentAccount
-    // Update client with new networkId
-    networkId && client.updateInfo({ networkId })
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
     // Account permission check
     if (!client.hasAccessToAccount(address)) {
       return { error: ERRORS.permissionDeny(address) }
-    }
-    // NetworkId check
-    if (!networkId || networkId !== instance.getNetworkId()) {
-      return { error: ERRORS.unsupportedNetwork() }
     }
 
     return callInstance(
@@ -308,7 +301,7 @@ export default Ae.compose(AccountMultiple, {
           client.sendMessage(
             message(METHODS.updateNetwork, {
               networkId: this.getNetworkId(),
-              ...(client.info.status === RPC_STATUS.NODE_BINDED && { node: this.selectedNode })
+              ...client.info.status === RPC_STATUS.NODE_BINDED && { node: this.selectedNode }
             }), true)
         })
     }
