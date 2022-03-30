@@ -22,7 +22,7 @@ export default {
     publicAddress: '',
     balance: 0,
     node: null,
-    accounts: null
+    connectedAccounts: null
   }),
 }
 ```
@@ -85,7 +85,7 @@ Append method for wallet connection
 ```js
 async connectToWallet(wallet) {
   await this.aeSdk.connectToWallet(await wallet.getConnection())
-  this.accounts = await this.aeSdk.subscribeAddress('subscribe', 'connected')
+  this.connectedAccounts = await this.aeSdk.subscribeAddress('subscribe', 'connected')
   this.publicAddress = await this.aeSdk.address()
   this.balance = await this.aeSdk.getBalance(this.publicAddress)
   this.node = await this.aeSdk.getNodeInfo()
