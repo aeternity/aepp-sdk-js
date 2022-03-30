@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -16,11 +16,11 @@
  */
 
 import { describe, it, before } from 'mocha'
-import { BaseAe, spendPromise } from './index'
-import { commitmentHash, oracleQueryId } from '../../src/tx/builder/helpers'
+import { expect } from 'chai'
+import { BaseAe, spendPromise, publicKey } from './index'
+import { commitmentHash, oracleQueryId, decode, encode } from '../../src/tx/builder/helpers'
 import { GAS_MAX, MIN_GAS_PRICE } from '../../src/tx/builder/schema'
 import { AE_AMOUNT_FORMATS } from '../../src/utils/amount-formatter'
-import { unpackTx } from '../../src/tx/builder'
 
 const nonce = 1
 const nameTtl = 1
@@ -48,174 +48,123 @@ const contractSource = `
 contract Identity =
   entrypoint getArg(x : int) = x
 `
-let contractId
-const deposit = 0
 
+// Name
 const nameSalt = 4204563566073083
 const commitmentId = commitmentHash(name, nameSalt)
 
-describe('Native Transaction', function () {
-  let aeSdkNative
+describe('Transaction', function () {
   let aeSdk
-  let oracleId
-  let queryId
+  const address = publicKey
+  const oracleId = encode(decode(address, 'ak'), 'ok')
+  let contract
 
   before(async () => {
-    aeSdk = await BaseAe({ nativeMode: false })
-    aeSdkNative = await BaseAe()
+    aeSdk = await BaseAe()
     await spendPromise
-    oracleId = `ok_${(await aeSdk.address()).slice(3)}`
+    contract = await aeSdk.getContractInstance({ source: contractSource })
   })
 
-  it('Build tx using denomination amount', async () => {
+  it('build spend tx using denomination amount', async () => {
     const params = { senderId, recipientId, nonce, payload: 'test' }
-    const spendAe = await aeSdkNative.spendTx(
+    const spendAe = await aeSdk.spendTx(
       { ...params, amount: 1, denomination: AE_AMOUNT_FORMATS.AE }
     )
-    const spendAettos = await aeSdkNative.spendTx({ ...params, amount: 1e18, payload: 'test' })
+    const spendAettos = await aeSdk.spendTx({ ...params, amount: 1e18, payload: 'test' })
     spendAe.should.be.equal(spendAettos)
-    const { tx: { amount } } = unpackTx(spendAe)
-    const { tx: { amount: amount2 } } = unpackTx(spendAettos)
-    amount.should.be.equal(amount2)
   })
 
-  it('native build of spend tx', async () => {
-    const aeAmount = 2
-    const params = { senderId, recipientId, nonce, payload: 'test' }
-    const txFromAPI = 'tx_+F0MAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ChAeEyuPHdt6BOY7f6lkeaVLvFJaUxp/G8DOSSEhkDBn+wiBvBbWdOyAAAhg9e1n8oAAABhHRlc3QLK3OW'
-    const nativeTx = await aeSdkNative.spendTx(
-      { ...params, amount: aeAmount, denomination: AE_AMOUNT_FORMATS.AE }
-    )
-    txFromAPI.should.be.equal(nativeTx)
-  })
-
-  it('native build of name pre-claim tx', async () => {
-    const params = { accountId: senderId, nonce, commitmentId }
-    const txFromAPI = 'tx_+E8hAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ABoQOvDVCf43V7alNbsUvTarXaCf7rjtWX36YLS4+JTa4jn4YPHaUyOAAAxRZ6Sg=='
-    const nativeTx = await aeSdkNative.namePreclaimTx(params)
-    txFromAPI.should.be.equal(nativeTx)
-  })
-
-  it('native build of claim tx', async () => {
-    const params = { accountId: senderId, nonce, name, nameSalt, nameFee }
-    const txFromAPI = 'tx_+FEgAqEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ABkXRlc3QxMjN0ZXN0LmNoYWluhw7wBz3KlPuJNjXJrcXeoAAAhg8m9WHIAABl9JBX'
-    const nativeTx = await aeSdkNative.nameClaimTx(params)
-    txFromAPI.should.be.equal(nativeTx)
-  })
-
-  it('native build of update tx', async () => {
-    const params = { accountId: senderId, nonce, nameId, nameTtl, pointers, clientTtl }
-    const nativeTx = await aeSdkNative.nameUpdateTx(params)
-    const txFromAPI = 'tx_+IQiAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ABoQL1zlEz+3+D5h4MF9POub3zp5zJ2fj6VUWGMNOhCyMYPAHy8Y5hY2NvdW50X3B1YmtleaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ABhhAUch6gAADR52s+'
-    txFromAPI.should.be.equal(nativeTx)
-  })
-
-  it('native build of revoke tx', async () => {
-    const params = { accountId: senderId, nonce, nameId }
-    const txFromAPI = 'tx_+E8jAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ABoQL1zlEz+3+D5h4MF9POub3zp5zJ2fj6VUWGMNOhCyMYPIYPHaUyOAAA94BVgw=='
-    const nativeTx = await aeSdkNative.nameRevokeTx(params)
-    txFromAPI.should.be.equal(nativeTx)
-  })
-
-  it('native build of transfer tx', async () => {
-    const params = { accountId: senderId, nonce, nameId, recipientId }
-    const txFromAPI = 'tx_+HEkAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ABoQL1zlEz+3+D5h4MF9POub3zp5zJ2fj6VUWGMNOhCyMYPKEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7CGD7v4WsgAAL1d+NM='
-    const nativeTx = await aeSdkNative.nameTransferTx(params)
-    txFromAPI.should.be.equal(nativeTx)
-  })
-
-  let contract
-  it('native build of contract create tx', async () => {
-    contract = await aeSdk.getContractInstance({ source: contractSource })
-    await contract.compile()
-    const params = {
-      nonce,
-      ownerId: await aeSdk.address(),
-      code: contract.bytecode,
-      deposit,
-      amount,
-      gasLimit: GAS_MAX,
-      gasPrice: MIN_GAS_PRICE,
-      callData: contract.calldata.encode('Identity', 'init', [])
+  const contractId = 'ct_TCQVoset7Y4qEyV5tgEAJAqa2Foz8J1EXqoGpq3fB6dWH5roe';
+  [[
+    'spend',
+    'tx_+F0MAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ChAeEyuPHdt6BOY7f6lkeaVLvFJaUxp/G8DOSSEhkDBn+wiBvBbWdOyAAAhg9e1n8oAAABhHRlc3QLK3OW',
+    () => aeSdk.spendTx({
+      senderId, recipientId, nonce, payload: 'test', amount: 2, denomination: AE_AMOUNT_FORMATS.AE
+    })
+  ], [
+    'name pre-claim',
+    'tx_+E8hAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ABoQOvDVCf43V7alNbsUvTarXaCf7rjtWX36YLS4+JTa4jn4YPHaUyOAAAxRZ6Sg==',
+    () => aeSdk.namePreclaimTx({ accountId: senderId, nonce, commitmentId })
+  ], [
+    'name claim',
+    'tx_+FEgAqEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ABkXRlc3QxMjN0ZXN0LmNoYWluhw7wBz3KlPuJNjXJrcXeoAAAhg8m9WHIAABl9JBX',
+    () => aeSdk.nameClaimTx({ accountId: senderId, nonce, name, nameSalt, nameFee })
+  ], [
+    'name update',
+    'tx_+IQiAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ABoQL1zlEz+3+D5h4MF9POub3zp5zJ2fj6VUWGMNOhCyMYPAHy8Y5hY2NvdW50X3B1YmtleaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ABhhAUch6gAADR52s+',
+    () => aeSdk.nameUpdateTx({ accountId: senderId, nonce, nameId, nameTtl, pointers, clientTtl })
+  ], [
+    'name revoke',
+    'tx_+E8jAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ABoQL1zlEz+3+D5h4MF9POub3zp5zJ2fj6VUWGMNOhCyMYPIYPHaUyOAAA94BVgw==',
+    () => aeSdk.nameRevokeTx({ accountId: senderId, nonce, nameId })
+  ], [
+    'name transfer',
+    'tx_+HEkAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ABoQL1zlEz+3+D5h4MF9POub3zp5zJ2fj6VUWGMNOhCyMYPKEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7CGD7v4WsgAAL1d+NM=',
+    () => aeSdk.nameTransferTx({ accountId: senderId, nonce, nameId, recipientId })
+  ], [
+    'contract create',
+    'tx_+LAqAaEB1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBuGr4aEYDoKEijZbj/w2AeiWwAbldusME5pm3ZgPuomnZ3TbUbYgrwLg7nv5E1kQfADcANwAaDoI/AQM//oB4IJIANwEHBwEBAJgvAhFE1kQfEWluaXQRgHggkhlnZXRBcmeCLwCFNi4xLjAAgwcAA4ZHcyzkwAAAAACDGBf4hDuaygCHKxFE1kQfP+Jcll0=',
+    async () => {
+      const nativeTx = await aeSdk.contractCreateTx({
+        nonce,
+        ownerId: address,
+        code: await contract.compile(),
+        amount,
+        gasLimit: GAS_MAX,
+        gasPrice: MIN_GAS_PRICE,
+        callData: contract.calldata.encode('Identity', 'init', [])
+      })
+      expect(nativeTx.contractId).to.be.equal(contractId)
+      return nativeTx.tx
     }
-    const txFromAPI = {
-      contractId: 'ct_TCQVoset7Y4qEyV5tgEAJAqa2Foz8J1EXqoGpq3fB6dWH5roe',
-      tx: 'tx_+LAqAaEB1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBuGr4aEYDoKEijZbj/w2AeiWwAbldusME5pm3ZgPuomnZ3TbUbYgrwLg7nv5E1kQfADcANwAaDoI/AQM//oB4IJIANwEHBwEBAJgvAhFE1kQfEWluaXQRgHggkhlnZXRBcmeCLwCFNi4xLjAAgwcAA4ZHcyzkwAAAAACDGBf4hDuaygCHKxFE1kQfP+Jcll0='
-    }
-    const nativeTx = await aeSdkNative.contractCreateTx(params)
-
-    txFromAPI.tx.should.be.equal(nativeTx.tx)
-    txFromAPI.contractId.should.be.equal(nativeTx.contractId)
-    contractId = txFromAPI.contractId
-  })
-
-  it('native build of contract call tx', async () => {
-    const callData = contract.calldata.encode('Identity', 'getArg', [2])
-    const owner = await aeSdk.address()
-
-    const params = {
+  ], [
+    'contract call',
+    'tx_+GMrAaEB1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBoQU7e5ChtHAGM1Nh0MVEV74SbrYb1b5FQ3WBd7OBpwALyQOGpYvVcSgAAACDGBf4hDuaygCIKxGAeCCSGwQL3c3m',
+    () => aeSdk.contractCallTx({
       nonce,
-      callerId: owner,
+      callerId: address,
       contractId,
       amount,
       gasLimit: GAS_MAX,
       gasPrice: MIN_GAS_PRICE,
-      callData
-    }
-    const txFromAPI = 'tx_+GMrAaEB1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBoQU7e5ChtHAGM1Nh0MVEV74SbrYb1b5FQ3WBd7OBpwALyQOGpYvVcSgAAACDGBf4hDuaygCIKxGAeCCSGwQL3c3m'
-    const nativeTx = await aeSdkNative.contractCallTx(params)
-    txFromAPI.should.be.equal(nativeTx)
-  })
-
-  it('native build of oracle create tx', async () => {
-    const accountId = await aeSdk.address()
-    const params = { nonce, accountId, queryFormat, responseFormat, queryFee, oracleTtl }
-
-    const txFromAPI = 'tx_+FAWAaEB1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBjXsnY2l0eSc6IHN0cn2Meyd0bXAnOiBudW19gnUwAIIB9IYPN7jqmAAAAGsRIcw='
-    const nativeTx = await aeSdkNative.oracleRegisterTx(params)
-
-    txFromAPI.should.be.equal(nativeTx)
-  })
-
-  it('native build of oracle extends tx', async () => {
-    const callerId = await aeSdk.address()
-    const params = { nonce, oracleId, callerId, oracleTtl }
-
-    const txFromAPI = 'tx_8RkBoQTVzwhADpiCIvJutLAsj4kHdFdGchGm5tlV7bcHScajOwEAggH0hg6itfGYAADwE/X7'
-    const nativeTx = await aeSdkNative.oracleExtendTx(params)
-
-    txFromAPI.should.be.equal(nativeTx)
-  })
-
-  it('native build of oracle post query tx', async () => {
-    const senderId = await aeSdk.address()
-
-    const params = { nonce, oracleId, responseTtl, query, queryTtl, queryFee, senderId }
-
-    const txFromAPI = 'tx_+GkXAaEB1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBoQTVzwhADpiCIvJutLAsj4kHdFdGchGm5tlV7bcHScajO5J7J2NpdHknOiAnQmVybGluJ32CdTAAZABkhg+bJBmGAAAtn7nr'
-    const nativeTx = await aeSdkNative.oraclePostQueryTx(params)
-    queryId = oracleQueryId(senderId, unpackTx(txFromAPI).tx.nonce, oracleId)
-
-    txFromAPI.should.be.equal(nativeTx)
-  })
-
-  it('native build of oracle respond query tx', async () => {
-    const callerId = await aeSdk.address()
-    const params = { nonce, oracleId, callerId, responseTtl, queryId, response: queryResponse }
-
-    const txFromAPI = 'tx_+F0YAaEE1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBoClgM30zCmbxGvUfzRbIZXGzOT8KCzYAUMRdnxbBX2Q9jHsndG1wJzogMTAxfQBkhg9jQvwmAADfRUs7'
-    const nativeTx = await aeSdkNative.oracleRespondTx(params)
-    txFromAPI.should.be.equal(nativeTx)
-  })
+      callData: contract.calldata.encode('Identity', 'getArg', [2])
+    })
+  ], [
+    'oracle register',
+    'tx_+FAWAaEB1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBjXsnY2l0eSc6IHN0cn2Meyd0bXAnOiBudW19gnUwAIIB9IYPN7jqmAAAAGsRIcw=',
+    () => aeSdk.oracleRegisterTx({
+      nonce, accountId: address, queryFormat, responseFormat, queryFee, oracleTtl
+    })
+  ], [
+    'oracle extend',
+    'tx_8RkBoQTVzwhADpiCIvJutLAsj4kHdFdGchGm5tlV7bcHScajOwEAggH0hg6itfGYAADwE/X7',
+    () => aeSdk.oracleExtendTx({ nonce, oracleId, callerId: address, oracleTtl })
+  ], [
+    'oracle post query',
+    'tx_+GkXAaEB1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBoQTVzwhADpiCIvJutLAsj4kHdFdGchGm5tlV7bcHScajO5J7J2NpdHknOiAnQmVybGluJ32CdTAAZABkhg+bJBmGAAAtn7nr',
+    () => aeSdk.oraclePostQueryTx({
+      nonce, oracleId, responseTtl, query, queryTtl, queryFee, senderId: address
+    })
+  ], [
+    'oracle respond query',
+    'tx_+F0YAaEE1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBoClgM30zCmbxGvUfzRbIZXGzOT8KCzYAUMRdnxbBX2Q9jHsndG1wJzogMTAxfQBkhg9jQvwmAADfRUs7',
+    () => aeSdk.oracleRespondTx({
+      nonce,
+      oracleId,
+      callerId: address,
+      responseTtl,
+      queryId: oracleQueryId(address, nonce, oracleId),
+      response: queryResponse
+    })
+  ]].forEach(([name, expected, getter]) =>
+    it(`build of ${name} transaction`, async () => {
+      expect(await getter()).to.be.equal(expected)
+    }))
 
   it('Get next account nonce', async () => {
-    const accountId = await aeSdk.address()
-    const { nonce: accountNonce } = await aeSdk.api.getAccountByPubkey(accountId)
-      .catch(() => ({ nonce: 0 }))
-    const nonce = await aeSdk.getAccountNonce(await aeSdk.address())
-    nonce.should.be.equal(accountNonce + 1)
-    const nonceCustom = await aeSdk.getAccountNonce(await aeSdk.address(), 1)
-    nonceCustom.should.be.equal(1)
+    const { nonce: accountNonce } = await aeSdk.api.getAccountByPubkey(address)
+    expect(await aeSdk.getAccountNonce(address)).to.be.equal(accountNonce + 1)
+    expect(await aeSdk.getAccountNonce(address, 1)).to.be.equal(1)
   })
 
   it('Destroy instance finishes without error', () => {
