@@ -144,13 +144,12 @@ export default async function getContractInstance ({
     if (options.waitMined === false) return result
     const { callInfo } = await this.api.getTransactionInfoByHash(txData.hash)
     Object.assign(result.txData, callInfo) // TODO: don't duplicate data in result
-    await handleCallError(callInfo)
+    await handleCallError(callInfo, tx)
     return { ...result, result: callInfo }
   }
 
-  const handleCallError = ({ returnType, returnValue }) => {
+  const handleCallError = ({ returnType, returnValue }, transaction) => {
     let message
-    // TODO: ensure that it works correctly https://github.com/aeternity/aepp-calldata-js/issues/88
     switch (returnType) {
       case 'ok': return
       case 'revert':
@@ -161,7 +160,7 @@ export default async function getContractInstance ({
         break
       default: throw new InternalError(`Unknown returnType: ${returnType}`)
     }
-    throw new NodeInvocationError(message)
+    throw new NodeInvocationError(message, transaction)
   }
 
   instance._estimateGas = async (name, params, options) => {
@@ -260,7 +259,7 @@ export default async function getContractInstance ({
         : await this.contractCallTx({ ...txOpt, callerId, contractId })
 
       const { callObj, ...dryRunOther } = await this.txDryRun(tx, callerId, opt)
-      await handleCallError(callObj)
+      await handleCallError(callObj, tx)
       res = { ...dryRunOther, tx: TxObject({ tx }), result: callObj }
     } else {
       const tx = await this.contractCallTx({

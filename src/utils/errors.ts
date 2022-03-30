@@ -388,10 +388,12 @@ export class MissingFunctionNameError extends ContractError {
 }
 
 export class NodeInvocationError extends ContractError {
-  constructor (message?: string) {
-    message = message ?? ''
-    super(`Invocation failed${message === '' ? '' : `: "${message}"`}`)
+  transaction: string
+
+  constructor (message: string, transaction: string) {
+    super(`Invocation failed${message == null ? '' : `: "${message}"`}`)
     this.name = 'NodeInvocationError'
+    this.transaction = transaction
   }
 }
 
