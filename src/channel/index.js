@@ -863,7 +863,12 @@ async function reconnect (options, txParams) {
  */
 const Channel = AsyncInit.compose({
   async init (options) {
-    initialize(this, options)
+    await initialize(
+      this,
+      options.existingFsmId ? handlers.awaitingReconnection : handlers.awaitingConnection,
+      handlers.channelOpen,
+      options
+    )
   },
   methods: {
     on,

@@ -63,7 +63,7 @@ describe('Aepp<->Wallet', function () {
 
     before(async () => {
       wallet = await RpcWallet({
-        compilerUrl: compilerUrl,
+        compilerUrl,
         accounts: [genesisAccount],
         nodes: [{ name: 'local', instance: node }],
         name: 'Wallet',
@@ -545,7 +545,7 @@ describe('Aepp<->Wallet', function () {
 
     before(async () => {
       wallet = await RpcWallet({
-        compilerUrl: compilerUrl,
+        compilerUrl,
         accounts: [genesisAccount],
         nodes: [{ name: 'local', instance: node }],
         name: 'Wallet',

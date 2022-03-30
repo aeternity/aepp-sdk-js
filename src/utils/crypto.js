@@ -23,14 +23,14 @@
 
 import nacl from 'tweetnacl'
 import aesjs from 'aes-js'
-import shajs from 'sha.js'
 
 import { str2buf } from './bytes'
-import { encode, decode } from '../tx/builder/helpers'
+import { encode, decode, sha256hash } from './encoder'
 import { hash } from './crypto-ts'
 import { NotImplementedError } from './errors'
 
 export * from './crypto-ts'
+export { sha256hash }
 
 const Ecb = aesjs.ModeOfOperation.ecb
 
@@ -60,16 +60,6 @@ export function isAddressValid (address, prefix = 'ak') {
   } catch (e) {
     return false
   }
-}
-
-/**
- * Calculate SHA256 hash of `input`
- * @rtype (input: String) => hash: String
- * @param {String} input - Data to hash
- * @return {String} Hash
- */
-export function sha256hash (input) {
-  return shajs('sha256').update(input).digest()
 }
 
 /**

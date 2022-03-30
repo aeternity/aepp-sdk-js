@@ -106,9 +106,6 @@ describe('Tx', function () {
 
     it('decodes base58check', () => expect(decode('bf_3DZUwMat2')).to.be.eql(payload))
 
-    it('throws if not a string', () => expect(() => decode({}))
-      .to.throw('Encoded should be a string, got [object Object] instead'))
-
     it('throws if invalid identifier', () => expect(() => decode('aaaaa'))
       .to.throw('Encoded string missing payload: aaaaa'))
 
@@ -130,7 +127,7 @@ describe('Tx', function () {
 
     it('encodes base58check', () => expect(encode(payload, 'bf')).to.be.equal('bf_3DZUwMat2'))
 
-    it('throws if unknown type', () => expect(() => encode([1, 2, 3, 4], 'aa'))
+    it('throws if unknown type', () => expect(() => encode('test', 'aa'))
       .to.throw('Unknown type: aa'))
   })
 
