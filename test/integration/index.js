@@ -60,14 +60,13 @@ export const spendPromise = (async () => {
   await ae.spend(1e26, account.publicKey)
 })()
 
-export async function getSdk ({ nativeMode = true, withoutAccount } = {}) {
+export async function getSdk ({ withoutAccount } = {}) {
   await spendPromise
 
   return BaseAe({
     ...withoutAccount
       ? { withoutGenesisAccount: true }
       : { accounts: [MemoryAccount({ keypair: account })] },
-    nativeMode,
     networkId
   })
 }
