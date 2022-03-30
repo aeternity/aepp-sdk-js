@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -16,7 +16,7 @@
  */
 
 import Node from '../../src/node'
-import { url, internalUrl, ignoreVersion } from './'
+import { url, ignoreVersion } from './'
 import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
 import NodePool from '../../src/node-pool'
@@ -26,7 +26,7 @@ describe('Node client', function () {
   let node
 
   before(async function () {
-    node = await Node({ url, internalUrl, ignoreVersion })
+    node = await Node({ url, ignoreVersion })
   })
 
   it('determines remote version', () => {
@@ -37,11 +37,6 @@ describe('Node client', function () {
   it('wraps endpoints', () => {
     ['postTransaction', 'getCurrentKeyBlock']
       .map(method => expect(node.api[method]).to.be.a('function'))
-  })
-
-  it('don\'t wraps internal endpoints if internalUrl is not provided', async () => {
-    const node = await Node({ url, ignoreVersion })
-    expect(node.api.getPendingTransactions).to.be.an('undefined')
   })
 
   it('gets key blocks by height for the first 3 blocks', async () => {
@@ -78,7 +73,7 @@ describe('Node client', function () {
     it('Can change Node', async () => {
       const nodes = await NodePool({
         nodes: [
-          { name: 'first', instance: await Node({ url, internalUrl, ignoreVersion }) },
+          { name: 'first', instance: await Node({ url, ignoreVersion }) },
           { name: 'second', instance: node }
         ]
       })
@@ -92,7 +87,7 @@ describe('Node client', function () {
     it('Fail on undefined node', async () => {
       const nodes = await NodePool({
         nodes: [
-          { name: 'first', instance: await Node({ url, internalUrl, ignoreVersion }) },
+          { name: 'first', instance: await Node({ url, ignoreVersion }) },
           { name: 'second', instance: node }
         ]
       })

@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2021 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -124,7 +124,7 @@ async function createOracleDelegationSignature ({ contractId, queryId }, opt = {
  *
  * const ContractWithAE = await Contract
  *    .compose(Transaction, MemoryAccount, ChainNode) // AE implementation
- * const client = await ContractWithAe({ url, internalUrl, compilerUrl, keypair, ... })
+ * const client = await ContractWithAe({ url, compilerUrl, keypair, ... })
  *
  */
 export default Ae.compose(ContractCompilerHttp, {

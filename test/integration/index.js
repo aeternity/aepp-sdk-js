@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright 2018 aeternity developers
+ * Copyright 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -23,7 +23,6 @@ chai.use(chaiAsPromised)
 chai.should()
 
 export const url = process.env.TEST_URL || 'http://localhost:3013'
-export const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
 export const compilerUrl = process.env.COMPILER_URL || 'http://localhost:3080'
 export const publicKey = process.env.PUBLIC_KEY || 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR'
 const secretKey = process.env.SECRET_KEY || 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b'
@@ -51,7 +50,7 @@ export const BaseAe = async (params = {}, compose = {}) => Universal
       ...params.accounts || [],
       ...params.withoutGenesisAccount ? [] : [genesisAccount]
     ],
-    nodes: [{ name: 'test', instance: await Node({ url, internalUrl, ignoreVersion }) }]
+    nodes: [{ name: 'test', instance: await Node({ url, ignoreVersion }) }]
   })
 
 export const spendPromise = (async () => {

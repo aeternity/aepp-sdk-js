@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -68,7 +68,6 @@ const Chain = stampit({
     getBalance: required,
     tx: required,
     getTxInfo: required,
-    mempool: required,
     txDryRun: required,
     getAccount: required
   }
@@ -161,16 +160,6 @@ const Chain = stampit({
  * @rtype (hash: String) => tx: Object
  * @param {String} hash - Transaction hash
  * @return {Object} Transaction
- */
-
-/**
- * Obtain transaction's from mempool
- * @function mempool
- * @instance
- * @abstract
- * @category async
- * @rtype () => txs: [...Object]
- * @return {Object[]} Transactions
  */
 
 /**

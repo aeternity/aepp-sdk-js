@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -152,8 +152,7 @@ async function poll (th, { blocks = 10, interval = this._getPollInterval('microb
     if (tx.blockHeight !== -1) return tx
     await pause(interval)
   } while (await this.height() < max)
-  const status = this.api.getCheckTxInPool && (await this.api.getCheckTxInPool(th)).status
-  throw new TxTimedOutError(blocks, th, status)
+  throw new TxTimedOutError(blocks, th)
 }
 
 /**
@@ -162,10 +161,6 @@ async function poll (th, { blocks = 10, interval = this._getPollInterval('microb
 async function getTxInfo (hash) {
   const result = await this.api.getTransactionInfoByHash(hash)
   return result.callInfo || result
-}
-
-async function mempool () {
-  return this.api.getPendingTransactions()
 }
 
 async function getCurrentGeneration () {
@@ -302,7 +297,6 @@ const ChainNode = Chain.compose(NodePool, {
     awaitHeight,
     poll,
     getTxInfo,
-    mempool,
     getCurrentGeneration,
     getGeneration,
     getMicroBlockHeader,

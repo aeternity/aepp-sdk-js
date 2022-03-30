@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2021 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -28,8 +28,6 @@ import { snakizeKeys, pascalizeKeys, mapObject, filterObject } from './other'
 import { ArgumentCountMismatchError } from './errors'
 import { snakeToPascal } from './string'
 
-let warnedAboutInternalApiUsage = false
-
 /**
  * Generator of Swagger client
  * @function
@@ -38,7 +36,6 @@ let warnedAboutInternalApiUsage = false
  * @param {String} specUrl - Swagger specification URL on external node host
  * @param {Object} options
  * @param {String} [options.spec] - Override OpenAPI definition
- * @param {String} [options.internalUrl] - Node internal URL
  * @param {Boolean} [options.disableBigNumbers]
  * @param {Boolean} [options.disableCaseConversion]
  * @param {Function} [options.responseInterceptor]
@@ -47,58 +44,41 @@ let warnedAboutInternalApiUsage = false
  */
 export default async (
   specUrl,
-  { spec, internalUrl, disableBigNumbers, disableCaseConversion, responseInterceptor } = {}
+  { spec, disableBigNumbers, disableCaseConversion, responseInterceptor } = {}
 ) => {
   spec = spec || await (await fetch(specUrl)).json()
   const jsonImp = disableBigNumbers ? JSON : JsonBig
 
-  const [external, internal] = await Promise.all([specUrl, internalUrl].map((url) => {
-    if (!url) return null
-    const pendingGetRequests = {}
-    return SwaggerClient({
-      url,
-      spec,
-      requestInterceptor: request => {
-        if (request.method !== 'GET') return
-        return {
-          ...request,
-          userFetch: async (url, request) => {
-            const key = JSON.stringify({ ...request, url })
-            pendingGetRequests[key] ??= fetch(url, request)
-            try {
-              return (await pendingGetRequests[key]).clone()
-            } finally {
-              delete pendingGetRequests[key]
-            }
+  const pendingGetRequests = {}
+  const swagger = await SwaggerClient({
+    url: specUrl,
+    spec,
+    requestInterceptor: request => {
+      if (request.method !== 'GET') return
+      return {
+        ...request,
+        userFetch: async (url, request) => {
+          const key = JSON.stringify({ ...request, url })
+          pendingGetRequests[key] ??= fetch(url, request)
+          try {
+            return (await pendingGetRequests[key]).clone()
+          } finally {
+            delete pendingGetRequests[key]
           }
         }
-      },
-      responseInterceptor: response => {
-        if (response.text === '' || response.text?.size === 0) return response
-        const body = jsonImp.parse(response.text)
-        Object.assign(response, {
-          body: disableCaseConversion ? body : pascalizeKeys(body)
-        })
-        return (responseInterceptor && responseInterceptor(response)) || response
       }
-    })
-  }))
+    },
+    responseInterceptor: response => {
+      if (response.text === '' || response.text?.size === 0) return response
+      const body = jsonImp.parse(response.text)
+      Object.assign(response, {
+        body: disableCaseConversion ? body : pascalizeKeys(body)
+      })
+      return (responseInterceptor && responseInterceptor(response)) || response
+    }
+  })
 
-  const combinedApi = Object.assign(
-    {},
-    ...external.apis.external ? [external.apis.external] : Object.values(external.apis),
-    mapObject(internal?.apis.internal || {}, ([key, handler]) => [key, (...args) => {
-      if (!warnedAboutInternalApiUsage) {
-        console.warn(
-          'SDK\'s wrapper of aeternity node internal API is deprecated, please use external ' +
-          'equivalent (for example, "sdk.api.protectedDryRunTxs" instead of "sdk.api.dryRunTxs") ' +
-          'or create a wrapper of internal API by yourself (using "genSwaggerClient")'
-        )
-        warnedAboutInternalApiUsage = true
-      }
-      return handler(...args)
-    }])
-  )
+  const intermediateApi = swagger.apis.external ?? Object.assign({}, ...Object.values(swagger.apis))
 
   const opSpecs = Object.values(spec.paths)
     .map(paths => Object.values(paths))
@@ -106,7 +86,7 @@ export default async (
     .reduce((acc, n) => ({ ...acc, [n.operationId]: n }), {})
 
   const requestQueues = {}
-  const api = mapObject(combinedApi, ([opId, handler]) => {
+  const api = mapObject(intermediateApi, ([opId, handler]) => {
     const functionName = opId.slice(0, 1).toLowerCase() + snakeToPascal(opId.slice(1))
     return [
       functionName,
@@ -152,5 +132,5 @@ export default async (
     ]
   })
 
-  return Object.assign(external, { api })
+  return Object.assign(swagger, { api })
 }

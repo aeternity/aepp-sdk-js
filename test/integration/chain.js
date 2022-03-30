@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -51,11 +51,6 @@ describe('Node Chain', function () {
   it('Can verify transaction from broadcast error', async () => {
     const error = await aeSdk.spend(0, publicKey, { fee: 100, verify: false }).catch(e => e)
     expect(await error.verifyTx()).to.have.lengthOf(1)
-  })
-
-  it('Get pending transaction', async () => {
-    const mempool = await aeSdkWithoutAccount.mempool()
-    mempool.should.has.property('transactions')
   })
 
   it('Get current generation', async () => {
