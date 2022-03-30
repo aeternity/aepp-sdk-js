@@ -52,11 +52,11 @@ Note:
 
 ## 3. Initialize the contract instance
 
-### By sourcecode
+### By source code
 
 ```js
-const CONTRACT_SOURCE = ... // source code of the contract
-const contractInstance = await aeSdk.getContractInstance({ source: CONTRACT_SOURCE })
+const sourceCode = ... // source code of the contract
+const contractInstance = await aeSdk.getContractInstance({ source: sourceCode })
 ```
 
 Note:
@@ -64,7 +64,7 @@ Note:
 - If your contract includes external dependencies which are not part of the [standard library](https://aeternity.com/aesophia/latest/sophia_stdlib) you should initialize the contract using:
   ```js
   const fileSystem = ... // key-value map with name of the include as key and source code of the include as value
-  const contractInstance = await aeSdk.getContractInstance({ source: CONTRACT_SOURCE, fileSystem })
+  const contractInstance = await aeSdk.getContractInstance({ source: sourceCode, fileSystem })
   ```
 
 ### By ACI and bytecode
@@ -104,7 +104,7 @@ const contractInstance = await aeSdk.getContractInstance({ aci, contractAddress 
 
 ## 4. Deploy the contract
 
-If you have a Sophia contract that looks like this:
+If you have a Sophia contract source code that looks like this:
 ```sophia
 contract Increment =
 
@@ -135,7 +135,7 @@ console.log(contractInstance.deployInfo) // { owner, transaction, address, resul
 
 Note:
 
-- Deployment is only possible if the contract instance was initialized by providing sourcecode or bytecode.
+- Deployment is only possible if the contract instance was initialized by providing source code or bytecode.
 - The `init` entrypoint is a special function which is only called once for deployment, initializes the contract's state and doesn't require the `stateful` declaration.
 - In Sophia all `public functions` are called `entrypoints` and need to be declared as `stateful`
 if they should produce changes to the state of the smart contract, see `increment(value: int)`.
