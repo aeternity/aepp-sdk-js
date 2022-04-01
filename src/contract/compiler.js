@@ -24,8 +24,8 @@
  */
 
 import { RestError } from '@azure/core-rest-pipeline'
+import stampit from '@stamp/it'
 import semverSatisfies from '../utils/semver-satisfies'
-import AsyncInit from '../utils/async-init'
 import { Compiler as CompilerApi } from '../apis/compiler/'
 import { MissingParamError, UnsupportedVersionError } from '../utils/errors'
 
@@ -41,17 +41,28 @@ import { MissingParamError, UnsupportedVersionError } from '../utils/errors'
  * @return {Object} Contract compiler instance
  * @example ContractCompilerHttp({ compilerUrl: 'COMPILER_URL' })
  */
-export default AsyncInit.compose({
-  async init ({ compilerUrl, ignoreVersion }) {
+export default stampit({
+  init ({ compilerUrl, ignoreVersion }) {
     if (!compilerUrl) return
-    await this.setCompilerUrl(compilerUrl, { ignoreVersion })
+    this.setCompilerUrl(compilerUrl, { ignoreVersion })
   },
   methods: {
-    async setCompilerUrl (compilerUrl, { ignoreVersion = false } = {}) {
+    setCompilerUrl (compilerUrl, { ignoreVersion = false } = {}) {
       if (!compilerUrl) throw new MissingParamError('compilerUrl required')
-      const compilerApi = new CompilerApi(compilerUrl, {
+      this.compilerApi = new CompilerApi(compilerUrl, {
         allowInsecureConnection: true,
         additionalPolicies: [{
+          policy: {
+            name: 'version-check',
+            async sendRequest (request, next) {
+              if (ignoreVersion || new URL(request.url).pathname === '/api-version') return next(request)
+              const args = [await versionPromise, COMPILER_GE_VERSION, COMPILER_LT_VERSION]
+              if (!semverSatisfies(...args)) throw new UnsupportedVersionError('compiler', ...args)
+              return next(request)
+            }
+          },
+          position: 'perCall'
+        }, {
           policy: {
             name: 'error-formatter',
             async sendRequest (request, next) {
@@ -85,18 +96,10 @@ export default AsyncInit.compose({
           position: 'perCall'
         }]
       })
-      const compilerVersion = (await compilerApi.aPIVersion()).apiVersion
-
-      if (
-        !ignoreVersion &&
-        !semverSatisfies(compilerVersion, COMPILER_GE_VERSION, COMPILER_LT_VERSION)
-      ) {
-        throw new UnsupportedVersionError(
-          'compiler', compilerVersion, COMPILER_GE_VERSION, COMPILER_LT_VERSION
-        )
-      }
-
-      Object.assign(this, { compilerApi, compilerVersion })
+      const versionPromise = this.compilerApi.aPIVersion().then(({ apiVersion }) => {
+        this.compilerVersion = apiVersion
+        return apiVersion
+      })
     }
   },
   props: {

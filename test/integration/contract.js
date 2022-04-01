@@ -17,7 +17,7 @@
 import { expect } from 'chai'
 import { before, describe, it } from 'mocha'
 import { randomName } from '../utils'
-import { BaseAe, getSdk, publicKey } from './'
+import { BaseAe, getSdk, publicKey, compilerUrl } from './'
 import {
   IllegalArgumentError, NodeInvocationError, MemoryAccount, generateKeyPair,
   commitmentHash, decode, encode, DRY_RUN_ACCOUNT, messageToHash, salt
@@ -320,8 +320,10 @@ describe('Contract', function () {
     })
 
     it('Use invalid compiler url', async () => {
-      await expect(aeSdk.setCompilerUrl('https://compiler.aepps.comas'))
+      aeSdk.setCompilerUrl('https://compiler.aepps.comas')
+      await expect(aeSdk.compilerApi.generateACI({ code: 'test' }))
         .to.be.rejectedWith('getaddrinfo ENOTFOUND compiler.aepps.comas')
+      aeSdk.setCompilerUrl(compilerUrl)
     })
   })
 
