@@ -1,7 +1,7 @@
 import nacl from 'tweetnacl'
 import { v4 as uuid } from '@aeternity/uuid'
 import { ArgonType, hash } from '@aeternity/argon2-browser/dist/argon2-bundled.min.js'
-import { encode } from '../tx/builder/helpers'
+import { getAddressFromPriv } from './crypto'
 import { str2buf } from './bytes'
 import {
   ArgumentError, InvalidKeyError, UnsupportedAlgorithmError, InvalidPasswordError
@@ -139,12 +139,6 @@ function marshal (name, derivedKey, privateKey, nonce, salt, options = {}) {
       )
     }
   )
-}
-
-export function getAddressFromPriv (secret) {
-  const keys = nacl.sign.keyPair.fromSecretKey(str2buf(secret))
-  const publicBuffer = Buffer.from(keys.publicKey)
-  return encode(publicBuffer, 'ak')
 }
 
 /**
