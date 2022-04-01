@@ -1,22 +1,22 @@
 # Quick Start
 
 ## 1. Specify imports
-For the following snippets in the guide you need to specify multiple imports. Most imports like `Universal`, `MemoryAccount` & `Node` are [Stamps](https://stampit.js.org/essentials/what-is-a-stamp) that compose certain functionalities. Others like `AmountFormatter` & `Crypto` are util modules with typical function exports.
+For the following snippets in the guide you need to specify multiple imports. Most imports like `Universal`, `MemoryAccount` & `Node` are [Stamps](https://stampit.js.org/essentials/what-is-a-stamp) that compose certain functionalities. Others utility functions like `generateKeyPair` also can be imported.
 
 ```js
 import {
   Universal,
   MemoryAccount,
   Node,
-  AmountFormatter,
-  Crypto
+  AE_AMOUNT_FORMATS,
+  generateKeyPair
 } from '@aeternity/aepp-sdk'
 ```
 
 ## 2. Create a Keypair
 
 ```js
-  const keypair = Crypto.generateKeyPair()
+  const keypair = generateKeyPair()
   console.log(`Secret key: ${keypair.secretKey}`)
   console.log(`Public key: ${keypair.publicKey}`)
 ```
@@ -52,7 +52,7 @@ const account = MemoryAccount({
 
   // spend one AE
   await aeSdk.spend(1, '<RECIPIENT_PUBLIC_KEY>', { // replace <RECIPIENT_PUBLIC_KEY>
-      denomination: AmountFormatter.AE_AMOUNT_FORMATS.AE
+      denomination: AE_AMOUNT_FORMATS.AE
   })
 })()
 ```

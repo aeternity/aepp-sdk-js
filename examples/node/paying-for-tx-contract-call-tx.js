@@ -46,8 +46,8 @@
 
 // ## 1. Specify imports
 // You need to import `Universal`, `Node` and `MemoryAccount` [Stamps](https://stampit.js.org/essentials/what-is-a-stamp) from the SDK.
-// Additionally you import the `Crypto` utility module to generate a new keypair.
-const { Universal, Node, MemoryAccount, Crypto } = require('@aeternity/aepp-sdk')
+// Additionally you import the `generateKeyPair` utility function to generate a new keypair.
+const { Universal, Node, MemoryAccount, generateKeyPair } = require('@aeternity/aepp-sdk')
 
 // **Note**:
 //
@@ -79,7 +79,7 @@ contract PayingForTxExample =
     entrypoint get_last_caller() : option(address) =
         state.last_caller
 `
-const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
+const NEW_USER_KEYPAIR = generateKeyPair();
 
 // Note:
 //

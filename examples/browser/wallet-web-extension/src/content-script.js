@@ -1,7 +1,7 @@
 /* global browser */
 
 import {
-  BrowserRuntimeConnection, BrowserWindowMessageConnection, AeppWalletSchema, ContentScriptBridge
+  BrowserRuntimeConnection, BrowserWindowMessageConnection, MESSAGE_DIRECTION, ContentScriptBridge
 } from '@aeternity/aepp-sdk'
 
 (async () => {
@@ -30,8 +30,8 @@ import {
       origin: window.origin
     },
     origin: window.origin,
-    sendDirection: AeppWalletSchema.MESSAGE_DIRECTION.to_aepp,
-    receiveDirection: AeppWalletSchema.MESSAGE_DIRECTION.to_waellet
+    sendDirection: MESSAGE_DIRECTION.to_aepp,
+    receiveDirection: MESSAGE_DIRECTION.to_waellet
   })
 
   const bridge = ContentScriptBridge({ pageConnection, extConnection })

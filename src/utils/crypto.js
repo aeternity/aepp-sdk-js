@@ -18,7 +18,7 @@
 /**
  * Crypto module
  * @module @aeternity/aepp-sdk/es/utils/crypto
- * @example import { Crypto } from '@aeternity/aepp-sdk'
+ * @example import { getAddressFromPriv } from '@aeternity/aepp-sdk'
  */
 
 import nacl from 'tweetnacl'

@@ -10,8 +10,8 @@ import {
 /**
  * KeyStore module
  * @module @aeternity/aepp-sdk/es/utils/keystore
- * @example import { Keystore } from '@aeternity/aepp-sdk'
- * @example const { Keystore } = require('@aeternity/aepp-sdk')
+ * @example import { recover } from '@aeternity/aepp-sdk'
+ * @example const { recover } = require('@aeternity/aepp-sdk')
  */
 
 const DEFAULTS = {

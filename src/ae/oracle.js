@@ -110,7 +110,7 @@ async function getQueryObject (oracleId, queryId) {
     respond: this.respondToQuery.bind(this, oracleId, queryId),
     pollForResponse: this.pollForQueryResponse.bind(this, oracleId, queryId),
     /**
-     * @deprecated use TxBuilderHelper.decode instead
+     * @deprecated use plain decode instead
      * @param data
      * @returns {Buffer}
      */

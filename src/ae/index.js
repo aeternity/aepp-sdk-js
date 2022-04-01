@@ -26,7 +26,7 @@ import stampit from '@stamp/it'
 import Tx from '../tx'
 import Chain from '../chain'
 import AccountBase from '../account/base'
-import TxBuilder from '../tx/builder'
+import { buildTxHash, unpackTx } from '../tx/builder'
 import BigNumber from 'bignumber.js'
 import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter'
 import { ArgumentError } from '../utils/errors'
@@ -51,7 +51,7 @@ async function send (tx, options = {}) {
     ? await this.signUsingGA(tx, { ...opt, authFun })
     : await this.signTransaction(tx, opt)
   return opt.innerTx
-    ? { hash: TxBuilder.buildTxHash(signed), rawTx: signed }
+    ? { hash: buildTxHash(signed), rawTx: signed }
     : this.sendTransaction(signed, opt)
 }
 
@@ -102,7 +102,7 @@ async function transferFunds (fraction, recipientIdOrName, options) {
   const senderId = await this.address(opt)
   const balance = new BigNumber(await this.balance(senderId))
   const desiredAmount = balance.times(fraction).integerValue(BigNumber.ROUND_HALF_UP)
-  const { tx: { fee } } = TxBuilder.unpackTx(
+  const { tx: { fee } } = unpackTx(
     await this.spendTx({ ...opt, senderId, recipientId, amount: desiredAmount })
   )
   // Reducing of the amount may reduce transaction fee, so this is not completely accurate

@@ -29,8 +29,8 @@
 
 <script>
 import {
-  MemoryAccount, RpcWallet, Node, Crypto,
-  BrowserWindowMessageConnection, AeppWalletSchema
+  MemoryAccount, RpcWallet, Node, generateKeyPair,
+  BrowserWindowMessageConnection, METHODS
 } from '@aeternity/aepp-sdk'
 import Value from './Value'
 
@@ -56,7 +56,7 @@ export default {
     },
     disconnect () {
       Object.values(this.aeSdk.rpcClients).forEach(client => {
-        client.sendMessage({ method: AeppWalletSchema.METHODS.closeConnection }, true)
+        client.sendMessage({ method: METHODS.closeConnection }, true)
         client.disconnect()
       })
     },
@@ -89,7 +89,7 @@ export default {
             secretKey: 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b',
           }
         }),
-        MemoryAccount({ keypair: Crypto.generateKeyPair() })
+        MemoryAccount({ keypair: generateKeyPair() })
       ],
       name: 'Wallet Iframe',
       onConnection: genConfirmCallback(() => 'connect'),

@@ -32,8 +32,7 @@ import { InvalidTxParamsError, SchemaNotFoundError } from '../../utils/errors'
 /**
  * JavaScript-based Transaction builder
  * @module @aeternity/aepp-sdk/es/tx/builder
- * @export TxBuilder
- * @example import { TxBuilder } from '@aeternity/aepp-sdk'
+ * @example import { calculateFee } from '@aeternity/aepp-sdk'
  */
 
 const ORACLE_TTL_TYPES = {

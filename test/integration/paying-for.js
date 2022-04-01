@@ -19,7 +19,7 @@ import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
 import BigNumber from 'bignumber.js'
 import { getSdk, BaseAe } from './'
-import { Crypto, MemoryAccount } from '../../src'
+import { generateKeyPair, MemoryAccount } from '../../src'
 
 describe('Paying for transaction of another account', function () {
   let aeSdk
@@ -29,8 +29,8 @@ describe('Paying for transaction of another account', function () {
   })
 
   it('pays for spend transaction', async () => {
-    const sender = MemoryAccount({ keypair: Crypto.generateKeyPair() })
-    const receiver = MemoryAccount({ keypair: Crypto.generateKeyPair() })
+    const sender = MemoryAccount({ keypair: generateKeyPair() })
+    const receiver = MemoryAccount({ keypair: generateKeyPair() })
     await aeSdk.spend(1e4, await sender.address())
     const spendTx = await aeSdk.spendTx({
       senderId: await sender.address(),
@@ -62,7 +62,7 @@ describe('Paying for transaction of another account', function () {
   it('pays for contract deployment', async () => {
     aeSdkNotPayingFee = await BaseAe({
       withoutGenesisAccount: true,
-      accounts: [MemoryAccount({ keypair: Crypto.generateKeyPair() })]
+      accounts: [MemoryAccount({ keypair: generateKeyPair() })]
     }, {
       deepProps: { Ae: { defaults: { waitMined: false, innerTx: true } } }
     })

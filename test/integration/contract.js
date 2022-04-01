@@ -16,13 +16,12 @@
  */
 import { expect } from 'chai'
 import { before, describe, it } from 'mocha'
-import { commitmentHash, decode, encode } from '../../src/tx/builder/helpers'
-import { DRY_RUN_ACCOUNT } from '../../src/tx/builder/schema'
-import { messageToHash, salt } from '../../src/utils/crypto'
 import { randomName } from '../utils'
 import { BaseAe, getSdk, publicKey } from './'
-import { Crypto, IllegalArgumentError, MemoryAccount } from '../../src'
-import { NodeInvocationError } from '../../src/utils/errors'
+import {
+  IllegalArgumentError, NodeInvocationError, MemoryAccount, generateKeyPair,
+  commitmentHash, decode, encode, DRY_RUN_ACCOUNT, messageToHash, salt
+} from '../../src'
 
 const identityContract = `
 contract Identity =
@@ -124,7 +123,7 @@ describe('Contract', function () {
     aeSdk = await getSdk()
     // TODO: option of getSdk to have accounts without genesis
     aeSdk.removeAccount(aeSdk.addresses()[1])
-    await aeSdk.addAccount(MemoryAccount({ keypair: Crypto.generateKeyPair() }))
+    await aeSdk.addAccount(MemoryAccount({ keypair: generateKeyPair() }))
     await aeSdk.spend(1e18, aeSdk.addresses()[1])
   })
 
