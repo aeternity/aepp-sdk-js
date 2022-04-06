@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js'
-import bs58 from 'bs58'
+import { encode as bs58Encode, decode as bs58Decode } from 'bs58'
 import { hash, salt, sha256hash } from '../../utils/crypto'
 import { toBytes } from '../../utils/bytes'
 import {
@@ -143,8 +143,8 @@ const base64 = {
 }
 
 const base58 = {
-  encode: buffer => bs58.encode(addChecksum(buffer)),
-  decode: string => getPayload(bs58.decode(string))
+  encode: buffer => bs58Encode(addChecksum(buffer)),
+  decode: string => getPayload(bs58Decode(string))
 }
 
 /**
