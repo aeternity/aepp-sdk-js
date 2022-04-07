@@ -139,23 +139,17 @@ export default AccountBase.compose(AsyncInit, {
      * @private
      */
     _resolveAccount (account) {
-      if (account === null) {
-        throw new TypeError(
-          'Account should be an address (ak-prefixed string), ' +
-          'keypair, or instance of account base, got null instead')
-      } else {
-        switch (typeof account) {
-          case 'string':
-            decode(account, 'ak')
-            if (!this.accounts[account]) throw new UnavailableAccountError(account)
-            return this.accounts[account]
-          case 'object':
-            return isAccountBase(account) ? account : MemoryAccount({ keypair: account })
-          default:
-            throw new TypeError(
-              'Account should be an address (ak-prefixed string), ' +
-              `keypair, or instance of account base, got ${account} instead`)
-        }
+      switch (account !== null && typeof account) {
+        case 'string':
+          decode(account, 'ak')
+          if (!this.accounts[account]) throw new UnavailableAccountError(account)
+          return this.accounts[account]
+        case 'object':
+          return isAccountBase(account) ? account : MemoryAccount({ keypair: account })
+        default:
+          throw new TypeError(
+            'Account should be an address (ak-prefixed string), ' +
+            `keypair, or instance of account base, got ${account} instead`)
       }
     }
   }
