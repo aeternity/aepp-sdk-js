@@ -92,7 +92,7 @@ async function createGeneralizedAccount (authFnName, source, args = [], options 
   await contract.compile()
   const { tx, contractId } = await this.gaAttachTx({
     ...opt,
-    gas: opt.gas ?? await contract._estimateGas('init', args, opt),
+    gasLimit: opt.gasLimit ?? await contract._estimateGas('init', args, opt),
     ownerId,
     code: contract.bytecode,
     callData: contract.calldata.encode(contract._name, 'init', args),
@@ -124,7 +124,7 @@ const wrapInEmptySignedTx = (tx) => buildTx({ encodedTx: tx, signatures: [] }, T
 async function createMetaTx (rawTransaction, authData, authFnName, options = {}) {
   if (!authData) throw new MissingParamError('authData is required')
   // Check if authData is callData or if it's an object prepare a callData from source and args
-  const { authCallData, gas } = await prepareGaParams(this)(authData, authFnName)
+  const { authCallData, gasLimit } = await prepareGaParams(this)(authData, authFnName)
   const opt = { ...this.Ae.defaults, ...options }
   const { abiVersion } = await this.getVmVersion(TX_TYPE.contractCall)
   const wrappedTx = wrapInEmptySignedTx(unpackTx(rawTransaction))
@@ -137,7 +137,7 @@ async function createMetaTx (rawTransaction, authData, authFnName, options = {})
     gaId: await this.address(opt),
     abiVersion,
     authData: authCallData,
-    gas,
+    gasLimit,
     vsn: 2
   }
   const { fee } = await this.prepareTxParams(TX_TYPE.gaMeta, params)

@@ -170,7 +170,7 @@ async function nameRevokeTx ({ accountId, nameId }) {
 }
 
 async function contractCreateTx ({
-  ownerId, code, vmVersion, abiVersion, amount, gas, gasPrice = MIN_GAS_PRICE, callData
+  ownerId, code, vmVersion, abiVersion, amount, gasLimit, gasPrice = MIN_GAS_PRICE, callData
 }) {
   // Get VM_ABI version
   const ctVersion = this.getVmVersion(TX_TYPE.contractCreate, arguments[0])
@@ -192,7 +192,7 @@ async function contractCreateTx ({
       nonce,
       ttl,
       fee: parseInt(fee),
-      gas: parseInt(gas),
+      gas: parseInt(gasLimit),
       gasPrice,
       vmVersion: ctVersion.vmVersion,
       abiVersion: ctVersion.abiVersion
@@ -200,7 +200,7 @@ async function contractCreateTx ({
 }
 
 async function contractCallTx ({
-  callerId, contractId, abiVersion, amount, gas, gasPrice = MIN_GAS_PRICE, callData
+  callerId, contractId, abiVersion, amount, gasLimit, gasPrice = MIN_GAS_PRICE, callData
 }) {
   const ctVersion = this.getVmVersion(TX_TYPE.contractCall, arguments[0])
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
@@ -222,7 +222,7 @@ async function contractCallTx ({
       nonce,
       ttl,
       fee: parseInt(fee),
-      gas: parseInt(gas),
+      gas: parseInt(gasLimit),
       gasPrice,
       abiVersion: ctVersion.abiVersion
     })
@@ -466,7 +466,7 @@ async function channelSnapshotSoloTx ({ channelId, fromId, payload }) {
 }
 
 async function gaAttachTx ({
-  ownerId, code, vmVersion, abiVersion, authFun, gas, gasPrice = MIN_GAS_PRICE, callData
+  ownerId, code, vmVersion, abiVersion, authFun, gasLimit, gasPrice = MIN_GAS_PRICE, callData
 }) {
   // Get VM_ABI version
   const ctVersion = this.getVmVersion(TX_TYPE.contractCreate, arguments[0])
@@ -559,7 +559,7 @@ async function getAccountNonce (accountId, nonce) {
  */
 async function prepareTxParams (
   txType,
-  { senderId, nonce: n, ttl: t, fee: f, gas, absoluteTtl, vsn, strategy }
+  { senderId, nonce: n, ttl: t, fee: f, gasLimit, absoluteTtl, vsn, strategy }
 ) {
   n = n || (
     await this.api.getAccountNextNonce(senderId, { strategy }).catch(e => ({ nextNonce: 1 }))
@@ -568,7 +568,7 @@ async function prepareTxParams (
   const fee = calculateFee(
     f,
     txType,
-    { showWarning: this.showWarning, gas, params: { ...arguments[1], nonce: n, ttl }, vsn }
+    { showWarning: this.showWarning, gasLimit, params: { ...arguments[1], nonce: n, ttl }, vsn }
   )
   return { fee, ttl, nonce: n }
 }

@@ -524,7 +524,7 @@ function createContract ({ code, callData, deposit, vmVersion, abiVersion }, sig
  * the result of the contract call.
  *
  * It is worth mentioning that the gas is not consumed, because this is an off-chain
- * contract call. It would be consumed if it were a on-chain one. This could happen
+ * contract call. It would be consumed if it were an on-chain one. This could happen
  * if a call with a similar computation amount is to be forced on-chain.
  *
  * @param {Object} options
@@ -580,8 +580,8 @@ function callContract ({ amount, callData, contract, abiVersion }, sign) {
  * @param {String} [options.callData] - ABI encoded compiled AEVM call data for the code
  * @param {Number} [options.contract] - Address of the contract to call
  * @param {Number} [options.abiVersion] - Version of the ABI
- * @param {Number} [options.gasPrice=1000000000] - Gas price
- * @param {Number} [options.gas=1000000] - Gas limit
+ * @param {Number} [options.gasPrice=1000000000]
+ * @param {Number} [options.gasLimit=1000000]
  * @param {Function} sign - Function which verifies and signs contract force progress transaction
  * @param {{ onOnChainTxL: Function }} callbacks
  * @return {Promise<Object>}
@@ -600,7 +600,7 @@ function callContract ({ amount, callData, contract, abiVersion }, sign) {
  * })
  */
 function forceProgress (
-  { amount, callData, contract, abiVersion, gas = 1000000, gasPrice = 1000000000, nonce },
+  { amount, callData, contract, abiVersion, gasLimit = 1000000, gasPrice = 1000000000, nonce },
   sign,
   { onOnChainTx } = {}
 ) {
@@ -618,7 +618,7 @@ function forceProgress (
             contract_id: contract,
             abi_version: abiVersion,
             gas_price: gasPrice,
-            gas
+            gas: gasLimit
           }
         })
         return {

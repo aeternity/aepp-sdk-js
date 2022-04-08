@@ -151,13 +151,13 @@ describe('Node Chain', function () {
         '  entrypoint foo(x : int) = x * 100'
     })
     await contract.deploy()
-    const { result: { gasUsed: gas } } = await contract.methods.foo(5)
+    const { result: { gasUsed: gasLimit } } = await contract.methods.foo(5)
     const { nextNonce } = await aeSdk.api.getAccountNextNonce(await aeSdk.address())
     spy(http, 'request')
     const numbers = new Array(32).fill().map((v, idx) => idx * 2)
     const results = (await Promise.all(
       numbers.map((v, idx) => contract.methods
-        .foo(v, { nonce: nextNonce + idx, gas, combine: true }))
+        .foo(v, { nonce: nextNonce + idx, gasLimit, combine: true }))
     )).map(r => r.decodedResult)
     expect(results).to.be.eql(numbers.map(v => BigInt(v * 100)))
     expect(http.request.args.length).to.be.equal(1)

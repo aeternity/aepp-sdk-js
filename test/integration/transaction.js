@@ -141,7 +141,7 @@ describe('Native Transaction', function () {
       code: contract.bytecode,
       deposit,
       amount,
-      gas: GAS_MAX,
+      gasLimit: GAS_MAX,
       gasPrice: MIN_GAS_PRICE,
       callData: contract.calldata.encode('Identity', 'init', [])
     }
@@ -163,7 +163,7 @@ describe('Native Transaction', function () {
       callerId: owner,
       contractId,
       amount,
-      gas: GAS_MAX,
+      gasLimit: GAS_MAX,
       gasPrice: MIN_GAS_PRICE,
       callData
     }

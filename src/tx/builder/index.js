@@ -229,23 +229,25 @@ function getOracleRelativeTtl (params, txType) {
  * Calculate min fee
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/index
- * @rtype (txType, { gas = 0, params }) => String
+ * @rtype (txType, { gasLimit = 0, params }) => String
  * @param {String} txType - Transaction type
  * @param {Options} options - Options object
- * @param {String|Number} options.gas - Gas amount
+ * @param {String|Number} options.gasLimit
  * @param {Object} options.params - Tx params
  * @return {String|Number}
- * @example calculateMinFee('spendTx', { gas, params })
+ * @example calculateMinFee('spendTx', { gasLimit, params })
  */
-export function calculateMinFee (txType, { gas = 0, params, vsn }) {
+export function calculateMinFee (txType, { gasLimit = 0, params, vsn }) {
   const multiplier = BigNumber(1e9) // 10^9 GAS_PRICE
   if (!params) return BigNumber(DEFAULT_FEE).times(multiplier).toString(10)
 
-  let actualFee = buildFee(txType, { params: { ...params, fee: 0 }, multiplier, gas, vsn })
+  let actualFee = buildFee(txType, { params: { ...params, fee: 0 }, multiplier, gasLimit, vsn })
   let expected = BigNumber(0)
 
   while (!actualFee.eq(expected)) {
-    actualFee = buildFee(txType, { params: { ...params, fee: actualFee }, multiplier, gas, vsn })
+    actualFee = buildFee(txType, {
+      params: { ...params, fee: actualFee }, multiplier, gasLimit, vsn
+    })
     expected = actualFee
   }
   return expected.toString(10)
@@ -255,12 +257,11 @@ export function calculateMinFee (txType, { gas = 0, params, vsn }) {
  * Calculate fee based on tx type and params
  * @param txType
  * @param params
- * @param gas
  * @param multiplier
  * @param vsn
  * @return {BigNumber}
  */
-function buildFee (txType, { params, gas = 0, multiplier, vsn }) {
+function buildFee (txType, { params, multiplier, vsn }) {
   const { rlpEncoded: txWithOutFee } = buildTx({ ...params }, txType, { vsn })
   const txSize = txWithOutFee.length
   return TX_FEE_BASE_GAS(txType)
@@ -277,19 +278,21 @@ function buildFee (txType, { params, gas = 0, multiplier, vsn }) {
  * Calculate fee
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
- * @rtype (fee, txType, gas = 0) => String
+ * @rtype (fee, txType, gasLimit = 0) => String
  * @param {String|Number} fee - fee
  * @param {String} txType - Transaction type
  * @param {Options} options - Options object
- * @param {String|Number} options.gas - Gas amount
+ * @param {String|Number} options.gasLimit
  * @param {Object} options.params - Tx params
  * @return {String|Number}
- * @example calculateFee(null, 'spendTx', { gas, params })
+ * @example calculateFee(null, 'spendTx', { gasLimit, params })
  */
-export function calculateFee (fee = 0, txType, { gas = 0, params, showWarning = true, vsn } = {}) {
+export function calculateFee (
+  fee = 0, txType, { gasLimit = 0, params, showWarning = true, vsn } = {}
+) {
   if (!params && showWarning) console.warn(`Can't build transaction fee, we will use DEFAULT_FEE(${DEFAULT_FEE})`)
 
-  return fee || calculateMinFee(txType, { params, gas, vsn })
+  return fee || calculateMinFee(txType, { params, gasLimit, vsn })
 }
 
 /**

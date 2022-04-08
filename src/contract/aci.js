@@ -188,7 +188,7 @@ export default async function getContractInstance ({
     const ownerId = await this.address(opt)
     const { tx, contractId } = await this.contractCreateTx({
       ...opt,
-      gas: opt.gas ?? await instance._estimateGas('init', params, opt),
+      gasLimit: opt.gasLimit ?? await instance._estimateGas('init', params, opt),
       callData: instance.calldata.encode(instance._name, 'init', params),
       code: instance.bytecode,
       ownerId
@@ -250,7 +250,7 @@ export default async function getContractInstance ({
       }
       const txOpt = {
         ...opt,
-        gas: opt.gas ?? GAS_MAX,
+        gasLimit: opt.gasLimit ?? GAS_MAX,
         callData,
         nonce: opt.nonce ??
           (opt.top && (await this.getAccount(callerId, { hash: opt.top })).nonce + 1)
@@ -265,7 +265,7 @@ export default async function getContractInstance ({
     } else {
       const tx = await this.contractCallTx({
         ...opt,
-        gas: opt.gas ?? await instance._estimateGas(fn, params, opt),
+        gasLimit: opt.gasLimit ?? await instance._estimateGas(fn, params, opt),
         callerId,
         contractId,
         callData
