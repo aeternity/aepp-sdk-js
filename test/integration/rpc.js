@@ -286,19 +286,6 @@ describe('Aepp<->Wallet', function () {
         .with.property('code', 11)
     })
 
-    it('Sign and broadcast transaction by wallet', async () => {
-      const address = await aepp.address()
-      const tx = await aepp.spendTx({
-        senderId: address,
-        recipientId: address,
-        amount: 0,
-        payload: 'zerospend'
-      })
-
-      const { blockHeight } = await aepp.send(tx)
-      blockHeight.should.be.a('number')
-    })
-
     it('Sign by wallet and broadcast transaction by aepp ', async () => {
       const address = await aepp.address()
       wallet.onSign = (aepp, action) => {
@@ -316,7 +303,7 @@ describe('Aepp<->Wallet', function () {
         amount: 0,
         payload: 'zerospend'
       })
-      const res = await aepp.send(tx, { walletBroadcast: false })
+      const res = await aepp.send(tx)
       decode(res.tx.payload).toString().should.be.equal('zerospend2')
       res.blockHeight.should.be.a('number')
     })
@@ -375,8 +362,8 @@ describe('Aepp<->Wallet', function () {
         payload: 'zerospend'
       })
 
-      await expect(aepp.send(tx)).to.be.eventually
-        .rejectedWith('Invalid transaction').with.property('code', 2)
+      await expect(aepp.send(tx)).to.be
+        .rejectedWith('Transaction verification errors: Fee 123 is too low, minimum fee for this transaction is 16840000000000')
     })
 
     it('Add new account to wallet: receive notification for update accounts', async () => {
@@ -619,7 +606,7 @@ describe('Aepp<->Wallet', function () {
         amount: 0,
         payload: 'zerospend'
       })
-      const res = await aepp.send(tx, { walletBroadcast: false })
+      const res = await aepp.send(tx)
       decode(res.tx.payload).toString().should.be.equal('zerospend2')
       res.blockHeight.should.be.a('number')
     })

@@ -122,7 +122,6 @@ export default Ae.compose({
       await this.connectToWallet(connection)
     }
   },
-  deepProps: { Ae: { defaults: { walletBroadcast: true } } },
   methods: {
     sign () {
     },
@@ -249,32 +248,6 @@ export default Ae.compose({
           networkId: this.getNetworkId({ force: true }),
           connectNode
         }
-      )
-    },
-    /**
-     * Overwriting of `send` AE method
-     * All sdk API which use it will be send notification to wallet and wait for callBack
-     * This method will sign, broadcast and wait until transaction will be accepted using rpc
-     * communication with wallet
-     * @function send
-     * @instance
-     * @rtype (tx: String, options = {}) => Promise
-     * @param {String} tx
-     * @param {Object} [options={}]
-     * @param {Object} [options.walletBroadcast=true]
-     * @return {Promise<Object>} Transaction broadcast result
-     */
-    async send (tx, options = {}) {
-      this._ensureConnected()
-      this._ensureAccountAccess(options.onAccount)
-      const opt = { ...this.Ae.defaults, ...options }
-      if (!opt.walletBroadcast) {
-        const signed = await this.signTransaction(tx, { onAccount: opt.onAccount })
-        return this.sendTransaction(signed, opt)
-      }
-      return this.rpcClient.request(
-        METHODS.sign,
-        { onAccount: opt.onAccount, tx, returnSigned: false, networkId: this.getNetworkId() }
       )
     },
     _ensureConnected () {
