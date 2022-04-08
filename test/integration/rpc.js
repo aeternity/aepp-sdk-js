@@ -24,7 +24,7 @@ import BrowserWindowMessageConnection from '../../src/utils/aepp-wallet-communic
 import { getBrowserAPI, getHandler } from '../../src/utils/aepp-wallet-communication/helpers'
 import { METHODS, RPC_STATUS } from '../../src/utils/aepp-wallet-communication/schema'
 import { generateKeyPair, verify, hash } from '../../src/utils/crypto'
-import { compilerUrl, genesisAccount, internalUrl, networkId, publicKey, url, ignoreVersion } from './'
+import { compilerUrl, account, internalUrl, networkId, url, ignoreVersion, spendPromise } from './'
 import {
   NoBrowserFoundError,
   NoWalletConnectedError,
@@ -62,9 +62,10 @@ describe('Aepp<->Wallet', function () {
     let wallet
 
     before(async () => {
+      await spendPromise
       wallet = await RpcWallet({
         compilerUrl,
-        accounts: [genesisAccount],
+        accounts: [MemoryAccount({ keypair: account })],
         nodes: [{ name: 'local', instance: node }],
         name: 'Wallet',
         onConnection (aepp, { accept, deny }) {
@@ -185,7 +186,7 @@ describe('Aepp<->Wallet', function () {
       subscriptionResponse.subscription.should.be.an('array')
       subscriptionResponse.subscription.filter(e => e === 'connected').length.should.be.equal(1)
       subscriptionResponse.address.current.should.be.an('object')
-      Object.keys(subscriptionResponse.address.current)[0].should.be.equal(publicKey)
+      Object.keys(subscriptionResponse.address.current)[0].should.be.equal(account.publicKey)
       subscriptionResponse.address.connected.should.be.an('object')
       Object.keys(subscriptionResponse.address.connected).length.should.be.equal(1)
     })
@@ -196,8 +197,12 @@ describe('Aepp<->Wallet', function () {
         .to.be.rejectedWith(UnAuthorizedAccountError, `You do not have access to account ${publicKey}`)
     })
 
+    it('aepp accepts key pairs in onAccount', async () => {
+      await aepp.spend(100, await aepp.address(), { onAccount: account })
+    })
+
     it('Get address: subscribed for accounts', async () => {
-      (await aepp.address()).should.be.equal(publicKey)
+      (await aepp.address()).should.be.equal(account.publicKey)
     })
 
     it('Ask for address: subscribed for accounts -> wallet deny', async () => {
@@ -214,7 +219,7 @@ describe('Aepp<->Wallet', function () {
       }
       const addressees = await aepp.askAddresses()
       addressees.length.should.be.equal(2)
-      addressees[0].should.be.equal(publicKey)
+      addressees[0].should.be.equal(account.publicKey)
     })
 
     it('Not authorize', async () => {
@@ -533,7 +538,7 @@ describe('Aepp<->Wallet', function () {
     before(async () => {
       wallet = await RpcWallet({
         compilerUrl,
-        accounts: [genesisAccount],
+        accounts: [MemoryAccount({ keypair: account })],
         nodes: [{ name: 'local', instance: node }],
         name: 'Wallet',
         onConnection (aepp, { accept, deny }) {
@@ -584,7 +589,7 @@ describe('Aepp<->Wallet', function () {
       subscriptionResponse.subscription.should.be.an('array')
       subscriptionResponse.subscription.filter(e => e === 'connected').length.should.be.equal(1)
       subscriptionResponse.address.current.should.be.an('object')
-      Object.keys(subscriptionResponse.address.current)[0].should.be.equal(publicKey)
+      Object.keys(subscriptionResponse.address.current)[0].should.be.equal(account.publicKey)
       subscriptionResponse.address.connected.should.be.an('object')
       Object.keys(subscriptionResponse.address.connected).length.should.be.equal(1)
     })

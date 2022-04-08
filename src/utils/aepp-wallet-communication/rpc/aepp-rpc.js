@@ -8,7 +8,9 @@
  * from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc'
  */
 import { v4 as uuid } from '@aeternity/uuid'
-import Ae from '../../../ae'
+import AccountResolver from '../../../account/resolver'
+import AccountRpc from '../../../account/rpc'
+import { decode } from '../../encoder'
 import RpcClient from './rpc-client'
 import { getHandler, message } from '../helpers'
 import { METHODS, RPC_STATUS, VERSION } from '../schema'
@@ -100,7 +102,7 @@ const handleMessage = (instance) => async (msg) => {
  * @param {Object} connection Wallet connection object
  * @return {Object}
  */
-export default Ae.compose({
+export default AccountResolver.compose({
   async init ({
     name,
     connection,
@@ -117,14 +119,25 @@ export default Ae.compose({
     this.name = name
     this.debug = debug
 
+    const resolveAccountBase = this._resolveAccount
+    this._resolveAccount = (account = this.rpcClient?.currentAccount) => {
+      if (typeof account === 'string') {
+        decode(account, 'ak')
+        if (!this.rpcClient?.hasAccessToAccount(account)) {
+          throw new UnAuthorizedAccountError(account)
+        }
+        account = AccountRpc({ rpcClient: this.rpcClient, address: account })
+      }
+      if (!account) this._ensureAccountAccess()
+      return resolveAccountBase(account)
+    }
+
     if (connection) {
       // Init RPCClient
       await this.connectToWallet(connection)
     }
   },
   methods: {
-    sign () {
-    },
     addresses () {
       this._ensureAccountAccess()
       return [this.rpcClient.currentAccount, ...Object.keys(this.rpcClient.accounts.connected)]
@@ -173,11 +186,6 @@ export default Ae.compose({
       this.rpcClient.disconnect()
       this.rpcClient = null
     },
-    async address ({ onAccount } = {}) {
-      this._ensureConnected()
-      this._ensureAccountAccess(onAccount)
-      return onAccount ?? this.rpcClient.currentAccount
-    },
     /**
      * Ask address from wallet
      * @function askAddresses
@@ -186,7 +194,6 @@ export default Ae.compose({
      * @return {Promise} Address from wallet
      */
     async askAddresses () {
-      this._ensureConnected()
       this._ensureAccountAccess()
       return this.rpcClient.request(METHODS.address)
     },
@@ -202,35 +209,6 @@ export default Ae.compose({
     async subscribeAddress (type, value) {
       this._ensureConnected()
       return this.rpcClient.request(METHODS.subscribeAddress, { type, value })
-    },
-    /**
-     * Overwriting of `signTransaction` AE method
-     * All sdk API which use it will be send notification to wallet and wait for callBack
-     * @function signTransaction
-     * @instance
-     * @rtype (tx: String, options = {}) => Promise
-     * @return {Promise<String>} Signed transaction
-     */
-    async signTransaction (tx, opt = {}) {
-      this._ensureConnected()
-      this._ensureAccountAccess(opt.onAccount)
-      return this.rpcClient.request(
-        METHODS.sign,
-        { ...opt, tx, returnSigned: true, networkId: this.getNetworkId() }
-      )
-    },
-    /**
-     * Overwriting of `signMessage` AE method
-     * All sdk API which use it will be send notification to wallet and wait for callBack
-     * @function signMessage
-     * @instance
-     * @rtype (msg: String, options = {}) => Promise
-     * @return {Promise<String>} Signed transaction
-     */
-    async signMessage (msg, opt = {}) {
-      this._ensureConnected()
-      this._ensureAccountAccess(opt.onAccount)
-      return this.rpcClient.request(METHODS.signMessage, { ...opt, message: msg })
     },
     /**
      * Send connection request to wallet
@@ -254,11 +232,8 @@ export default Ae.compose({
       if (this.rpcClient?.isConnected()) return
       throw new NoWalletConnectedError('You are not connected to Wallet')
     },
-    _ensureAccountAccess (onAccount) {
-      if (onAccount) {
-        if (this.rpcClient?.hasAccessToAccount(onAccount)) return
-        throw new UnAuthorizedAccountError(onAccount)
-      }
+    _ensureAccountAccess () {
+      this._ensureConnected()
       if (this.rpcClient?.currentAccount) return
       throw new UnsubscribedAccountError()
     }
