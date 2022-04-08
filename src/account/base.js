@@ -36,7 +36,8 @@ import { getNetworkId } from '../node'
  * @param {Object} acc - Object to check
  * @return {Boolean}
  */
-export const isAccountBase = (acc) => !['sign', 'address'].find(f => typeof acc[f] !== 'function')
+export const isAccountBase = (acc) => !['sign', 'address', 'signTransaction', 'signMessage']
+  .find(f => typeof acc[f] !== 'function')
 
 /**
  * Sign encoded transaction
