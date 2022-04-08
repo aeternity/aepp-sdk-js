@@ -149,7 +149,7 @@ export default AccountBase.compose(AsyncInit, {
         default:
           throw new TypeError(
             'Account should be an address (ak-prefixed string), ' +
-            `keypair, or instance of account base, got ${account} instead`)
+            `keypair, or instance of AccountBase, got ${account} instead`)
       }
     }
   }

@@ -170,7 +170,7 @@ describe('Accounts', function () {
       return expect(aeSdk.spend(1, await aeSdk.address(), { onAccount: 1 }))
         .to.be.rejectedWith(
           TypeError,
-          'Account should be an address (ak-prefixed string), keypair, or instance of account base, got 1 instead')
+          'Account should be an address (ak-prefixed string), keypair, or instance of AccountBase, got 1 instead')
     })
 
     it('Fail on non exist account', async () => {
@@ -184,14 +184,14 @@ describe('Accounts', function () {
       return expect(aeSdkWithoutAccount.spend(1, await aeSdk.address()))
         .to.be.rejectedWith(
           TypeError,
-          'Account should be an address (ak-prefixed string), keypair, or instance of account base, got null instead')
+          'Account should be an address (ak-prefixed string), keypair, or instance of AccountBase, got null instead')
     })
 
     it('Invalid on account options', () => {
       return expect(aeSdk.sign('tx_Aasdasd', { onAccount: 123 }))
         .to.be.rejectedWith(
           TypeError,
-          'Account should be an address (ak-prefixed string), keypair, or instance of account base, got 123 instead')
+          'Account should be an address (ak-prefixed string), keypair, or instance of AccountBase, got 123 instead')
     })
     it('Make operation on account using keyPair/MemoryAccount', async () => {
       const keypair = generateKeyPair()
