@@ -27,6 +27,7 @@ import { TX_TYPE } from '../../tx/builder/schema'
 import { buildTx, unpackTx } from '../../tx/builder'
 import { prepareGaParams } from './helpers'
 import { hash } from '../../utils/crypto'
+import { decode } from '../../utils/encoder'
 import { IllegalArgumentError, MissingParamError } from '../../utils/errors'
 
 /**
@@ -54,7 +55,8 @@ export const GeneralizedAccount = Contract.compose({
   methods: {
     createGeneralizedAccount,
     createMetaTx,
-    isGA
+    isGA,
+    buildAuthTxHash
   }
 })
 export default GeneralizedAccount
@@ -147,4 +149,18 @@ async function createMetaTx (rawTransaction, authData, authFnName, options = {})
     { vsn: 2 }
   )
   return wrapInEmptySignedTx(metaTxRlp).tx
+}
+
+/**
+ * Build a transaction hash the same as `Auth.tx_hash`
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/contract/ga
+ * @param {String} transaction tx-encoded transaction
+ * @param {Object} [options]
+ * @return {Uint8Array} Transaction hash
+ */
+function buildAuthTxHash (transaction, options) {
+  return new Uint8Array(hash(
+    Buffer.concat([Buffer.from(this.getNetworkId(options)), decode(transaction, 'tx')])
+  ))
 }
