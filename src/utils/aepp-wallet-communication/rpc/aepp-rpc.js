@@ -20,7 +20,7 @@ import {
   ArgumentError,
   RpcConnectionError
 } from '../../errors'
-import { Node } from '../../../index'
+import Node from '../../../node'
 
 const NOTIFICATIONS = {
   [METHODS.updateAddress]: (instance) =>

@@ -106,7 +106,7 @@ async function createAensDelegationSignature ({ contractId, name }, opt = {}) {
  * const respondSig = await contract.createOracleDelegationSignature(params, queryId)
  */
 async function createOracleDelegationSignature ({ contractId, queryId }, opt = {}) {
-  return this.delegateSignatureCommon([...queryId ? [queryId] : [], contractId], opt)
+  return this.delegateSignatureCommon([queryId ?? await this.address(opt), contractId], opt)
 }
 
 /**

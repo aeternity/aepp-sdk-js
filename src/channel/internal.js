@@ -19,7 +19,6 @@ import { w3cwebsocket as W3CWebSocket } from 'websocket'
 import { EventEmitter } from 'events'
 import JsonBig from '../utils/json-big'
 import { pascalToSnake } from '../utils/string'
-import { awaitingConnection, awaitingReconnection, channelOpen } from './handlers'
 import { ChannelCallError, ChannelPingTimedOutError, UnknownChannelStateError } from '../utils/errors'
 
 // Send ping message every 10 seconds
@@ -196,11 +195,11 @@ export function disconnect (channel) {
   clearTimeout(pongTimeoutId.get(channel))
 }
 
-export async function initialize (channel, { url, ...channelOptions }) {
+export async function initialize (
+  channel, connectionHandler, openHandler, { url, ...channelOptions }
+) {
   options.set(channel, channelOptions)
-  fsm.set(channel, {
-    handler: channelOptions.existingFsmId ? awaitingReconnection : awaitingConnection
-  })
+  fsm.set(channel, { handler: connectionHandler })
   eventEmitters.set(channel, new EventEmitter())
   sequence.set(channel, 0)
   rpcCallbacks.set(channel, new Map())
@@ -219,7 +218,7 @@ export async function initialize (channel, { url, ...channelOptions }) {
       resolve()
       changeStatus(channel, 'connected')
       if (channelOptions.reconnectTx) {
-        enterState(channel, { handler: channelOpen })
+        enterState(channel, { handler: openHandler })
         setTimeout(async () => changeState(channel,
           (await call(channel, 'channels.get.offchain_state', {})).signed_tx
         ))
