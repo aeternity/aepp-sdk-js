@@ -1,0 +1,1200 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      <link rel="icon" href="../../images/favicon.png">
+      <meta name="generator" content="mkdocs-1.2.4, mkdocs-material-7.1.9">
+    
+    
+      
+        <title>How to build a wallet - æternity JavaScript SDK</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ca7ac06f.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.f1a3b89f.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+    
+      
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="pink" data-md-color-accent="pink">
+  
+    
+    <script>function __prefix(e){return new URL("../..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+      <script>var palette=__get("__palette");if(null!==palette&&"object"==typeof palette.color)for(var key in palette.color)document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#how-to-build-a-wallet" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="æternity JavaScript SDK" class="md-header__button md-logo" aria-label="æternity JavaScript SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            æternity JavaScript SDK
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              How to build a wallet
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="pink" data-md-color-accent="pink"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3 3.19.09m3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95 2.06.05m-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31z"/></svg>
+            </label>
+          
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="pink" data-md-color-accent="pink"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+          
+            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5c-.84 0-1.65.15-2.39.42L12 2M3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29L3.34 7m.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14L3.36 17M20.65 7l-1.77 3.79a7.023 7.023 0 0 0-2.38-4.15l4.15.36m-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29L20.64 17M12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44L12 22z"/></svg>
+            </label>
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/aeternity/aepp-sdk-js" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="æternity JavaScript SDK" class="md-nav__button md-logo" aria-label="æternity JavaScript SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    æternity JavaScript SDK
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/aeternity/aepp-sdk-js" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Installation
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quick-start/" class="md-nav__link">
+        Quick Start
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+      
+      <label class="md-nav__link" for="__nav_3">
+        Usage Guides
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Usage Guides" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Usage Guides
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../aens/" class="md-nav__link">
+        AENS (æternity naming system)
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contracts/" class="md-nav__link">
+        Contracts
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contract-events/" class="md-nav__link">
+        Contract Events
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../oracles/" class="md-nav__link">
+        Oracles
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../paying-for-tx/" class="md-nav__link">
+        PayingForTx (Meta-Transactions)
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../batch-requests/" class="md-nav__link">
+        Batch Transactions
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../error-handling/" class="md-nav__link">
+        Error Handling
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../low-vs-high-usage/" class="md-nav__link">
+        Low vs High level API
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_9" type="checkbox" id="__nav_3_9" checked>
+      
+      <label class="md-nav__link" for="__nav_3_9">
+        Wallet interaction
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Wallet interaction" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_9">
+          <span class="md-nav__icon md-icon"></span>
+          Wallet interaction
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../connect-aepp-to-wallet/" class="md-nav__link">
+        Connect an æpp to a wallet
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          How to build a wallet
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        How to build a wallet
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#webextension-wallet" class="md-nav__link">
+    WebExtension wallet
+  </a>
+  
+    <nav class="md-nav" aria-label="WebExtension wallet">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-create-bridge-between-extension-and-page" class="md-nav__link">
+    1. Create bridge between extension and page
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-initialize-rpcwallet-stamp" class="md-nav__link">
+    2. Initialize RpcWallet Stamp
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-sharing-wallet-node-with-aepp" class="md-nav__link">
+    2. Sharing wallet node with AEPP
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#iframe-based-wallet" class="md-nav__link">
+    iFrame-based Wallet
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../transaction-options/" class="md-nav__link">
+        Transaction options
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
+      
+      <label class="md-nav__link" for="__nav_5">
+        Examples & Tutorials
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Examples & Tutorials" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          Examples & Tutorials
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_1" type="checkbox" id="__nav_5_1" >
+      
+      <label class="md-nav__link" for="__nav_5_1">
+        NodeJS
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="NodeJS" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_1">
+          <span class="md-nav__icon md-icon"></span>
+          NodeJS
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/node/transfer-ae/" class="md-nav__link">
+        Transfer AE
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/node/contract-interaction/" class="md-nav__link">
+        Compile & Deploy a Sophia Smart Contract
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_1_3" type="checkbox" id="__nav_5_1_3" >
+      
+      <label class="md-nav__link" for="__nav_5_1_3">
+        PayingForTx
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="PayingForTx" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_1_3">
+          <span class="md-nav__icon md-icon"></span>
+          PayingForTx
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/node/paying-for-tx-contract-call-tx/" class="md-nav__link">
+        InnerTx: ContractCallTx
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/node/paying-for-tx-spend-tx/" class="md-nav__link">
+        InnerTx: SpendTx
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/vuejs/helloworld-blockheight/" class="md-nav__link">
+        Vue.js HelloWorld
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api-reference/" class="md-nav__link">
+        API Reference
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../compatibility/" class="md-nav__link">
+        Compatibility Table
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CHANGELOG/" class="md-nav__link">
+        Changelog
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
+      
+      <label class="md-nav__link" for="__nav_9">
+        Migration Guides
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Migration Guides" data-md-level="1">
+        <label class="md-nav__title" for="__nav_9">
+          <span class="md-nav__icon md-icon"></span>
+          Migration Guides
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration/11.0.0/" class="md-nav__link">
+        Migration to 11.0.0
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration/10.0.0/" class="md-nav__link">
+        Migration to 10.0.0
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration/9.0.0/" class="md-nav__link">
+        Migration to 9.0.0
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration/7.0.0/" class="md-nav__link">
+        Migration to 7.0.0
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_10" type="checkbox" id="__nav_10" >
+      
+      <label class="md-nav__link" for="__nav_10">
+        Contribute
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Contribute" data-md-level="1">
+        <label class="md-nav__title" for="__nav_10">
+          <span class="md-nav__icon md-icon"></span>
+          Contribute
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contrib/" class="md-nav__link">
+        Development
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contrib/releases/" class="md-nav__link">
+        Releases
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#webextension-wallet" class="md-nav__link">
+    WebExtension wallet
+  </a>
+  
+    <nav class="md-nav" aria-label="WebExtension wallet">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-create-bridge-between-extension-and-page" class="md-nav__link">
+    1. Create bridge between extension and page
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-initialize-rpcwallet-stamp" class="md-nav__link">
+    2. Initialize RpcWallet Stamp
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-sharing-wallet-node-with-aepp" class="md-nav__link">
+    2. Sharing wallet node with AEPP
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#iframe-based-wallet" class="md-nav__link">
+    iFrame-based Wallet
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                <h1 id="how-to-build-a-wallet">How to build a wallet</h1>
+<p>This guide shows how to build either an <strong>WebExtension Wallet</strong> or a <strong>iFrame-based Wallet</strong>.</p>
+<h2 id="webextension-wallet">WebExtension wallet</h2>
+<p>The full implementation of this example can be found here:</p>
+<ul>
+<li><a href="https://github.com/aeternity/aepp-sdk-js/tree/master/examples/browser/wallet-web-extension">WebExtension Wallet Example</a></li>
+</ul>
+<p>Note:</p>
+<ul>
+<li>If you want to see a more advanced implementation you can take a look into the repository of the <a href="https://github.com/aeternity/superhero-wallet">Superhero Wallet</a></li>
+</ul>
+<h3 id="1-create-bridge-between-extension-and-page">1. Create bridge between extension and page</h3>
+<p>First you need to create a bridge between your extension and the page. This can be done as follows:</p>
+<div class="highlight"><pre><span></span><code><span class="k">import</span> <span class="p">{</span>
+  <span class="nx">BrowserRuntimeConnection</span><span class="p">,</span> <span class="nx">BrowserWindowMessageConnection</span><span class="p">,</span> <span class="nx">AeppWalletSchema</span><span class="p">,</span>
+  <span class="nx">ContentScriptBridge</span><span class="p">,</span> <span class="nx">AeppWalletHelpers</span>
+<span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
+
+<span class="kd">const</span> <span class="nx">readyStateCheckInterval</span> <span class="o">=</span> <span class="nx">setInterval</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">readyState</span> <span class="o">===</span> <span class="s1">&#39;complete&#39;</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">clearInterval</span><span class="p">(</span><span class="nx">readyStateCheckInterval</span><span class="p">)</span>
+
+    <span class="kd">const</span> <span class="nx">port</span> <span class="o">=</span> <span class="nx">AeppWalletHelpers</span><span class="p">.</span><span class="nx">getBrowserAPI</span><span class="p">().</span><span class="nx">runtime</span><span class="p">.</span><span class="nx">connect</span><span class="p">()</span>
+    <span class="kd">const</span> <span class="nx">extConnection</span> <span class="o">=</span> <span class="nx">BrowserRuntimeConnection</span><span class="p">({</span>
+      <span class="nx">connectionInfo</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">description</span><span class="o">:</span> <span class="s1">&#39;Content Script to Extension connection&#39;</span><span class="p">,</span>
+        <span class="nx">origin</span><span class="o">:</span> <span class="nb">window</span><span class="p">.</span><span class="nx">origin</span>
+      <span class="p">},</span>
+      <span class="nx">port</span>
+    <span class="p">})</span>
+    <span class="kd">const</span> <span class="nx">pageConnection</span> <span class="o">=</span> <span class="nx">BrowserWindowMessageConnection</span><span class="p">({</span>
+      <span class="nx">connectionInfo</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">description</span><span class="o">:</span> <span class="s1">&#39;Content Script to Page connection&#39;</span><span class="p">,</span>
+        <span class="nx">origin</span><span class="o">:</span> <span class="nb">window</span><span class="p">.</span><span class="nx">origin</span>
+      <span class="p">},</span>
+      <span class="nx">origin</span><span class="o">:</span> <span class="nb">window</span><span class="p">.</span><span class="nx">origin</span><span class="p">,</span>
+      <span class="nx">sendDirection</span><span class="o">:</span> <span class="nx">AeppWalletSchema</span><span class="p">.</span><span class="nx">MESSAGE_DIRECTION</span><span class="p">.</span><span class="nx">to_aepp</span><span class="p">,</span>
+      <span class="nx">receiveDirection</span><span class="o">:</span> <span class="nx">AeppWalletSchema</span><span class="p">.</span><span class="nx">MESSAGE_DIRECTION</span><span class="p">.</span><span class="nx">to_waellet</span>
+    <span class="p">})</span>
+
+    <span class="kd">const</span> <span class="nx">bridge</span> <span class="o">=</span> <span class="nx">ContentScriptBridge</span><span class="p">({</span> <span class="nx">pageConnection</span><span class="p">,</span> <span class="nx">extConnection</span> <span class="p">})</span>
+    <span class="nx">bridge</span><span class="p">.</span><span class="nx">run</span><span class="p">()</span>
+  <span class="p">}</span>
+<span class="p">},</span> <span class="mf">10</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="2-initialize-rpcwallet-stamp">2. Initialize <code>RpcWallet</code> Stamp</h3>
+<p>Then you need to initialize <code>RpcWallet</code> Stamp in your extension and subscribe for new <code>runtime</code> connections.
+After the connection is established you can share the wallet details with the application.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// ideally this can be configured by the users of the extension</span>
+<span class="kd">const</span> <span class="nx">NODE_URL</span> <span class="o">=</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span>
+<span class="kd">const</span> <span class="nx">COMPILER_URL</span> <span class="o">=</span> <span class="s1">&#39;https://compiler.aepps.com&#39;</span>
+<span class="kd">const</span> <span class="nx">accounts</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="nx">MemoryAccount</span><span class="p">({</span> <span class="nx">keypair</span><span class="o">:</span> <span class="nx">Crypto</span><span class="p">.</span><span class="nx">generateKeyPair</span><span class="p">()</span> <span class="p">}),</span> <span class="c1">// generate keypair for account1</span>
+  <span class="nx">MemoryAccount</span><span class="p">({</span> <span class="nx">keypair</span><span class="o">:</span> <span class="nx">Crypto</span><span class="p">.</span><span class="nx">generateKeyPair</span><span class="p">()</span> <span class="p">})</span>  <span class="c1">// generate keypair for account2</span>
+<span class="p">]</span>
+
+<span class="k">async</span> <span class="kd">function</span> <span class="nx">init</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// Init extension stamp from sdk</span>
+  <span class="nx">RpcWallet</span><span class="p">({</span>
+    <span class="nx">compilerUrl</span><span class="o">:</span> <span class="nx">COMPILER_URL</span><span class="p">,</span>
+    <span class="nx">nodes</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;testnet&#39;</span><span class="p">,</span> <span class="nx">instance</span><span class="o">:</span> <span class="k">await</span> <span class="nx">Node</span><span class="p">({</span> <span class="nx">url</span><span class="o">:</span> <span class="nx">NODE_URL</span> <span class="p">})</span> <span class="p">}],</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;Wallet WebExtension&#39;</span><span class="p">,</span>
+    <span class="c1">// The `ExtensionProvider` uses the first account by default. You can change active account using `selectAccount(address)` function</span>
+    <span class="nx">accounts</span><span class="p">,</span>
+    <span class="c1">// Hook for sdk registration</span>
+    <span class="nx">onConnection</span> <span class="p">(</span><span class="nx">aepp</span><span class="p">,</span> <span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">confirm</span><span class="p">(</span><span class="sb">`Aepp </span><span class="si">${</span><span class="nx">aepp</span><span class="p">.</span><span class="nx">info</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb"> with id </span><span class="si">${</span><span class="nx">aepp</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="sb"> wants to connect`</span><span class="p">))</span> <span class="p">{</span>
+        <span class="nx">action</span><span class="p">.</span><span class="nx">accept</span><span class="p">()</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">action</span><span class="p">.</span><span class="nx">deny</span><span class="p">()</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nx">onDisconnect</span> <span class="p">(</span><span class="nx">msg</span><span class="p">,</span> <span class="nx">client</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Disconnect client: &#39;</span><span class="p">,</span> <span class="nx">client</span><span class="p">)</span>
+    <span class="p">},</span>
+    <span class="nx">onSubscription</span> <span class="p">(</span><span class="nx">aepp</span><span class="p">,</span> <span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">confirm</span><span class="p">(</span><span class="sb">`Aepp </span><span class="si">${</span><span class="nx">aepp</span><span class="p">.</span><span class="nx">info</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb"> with id </span><span class="si">${</span><span class="nx">aepp</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="sb"> wants to subscribe for accounts`</span><span class="p">))</span> <span class="p">{</span>
+        <span class="nx">action</span><span class="p">.</span><span class="nx">accept</span><span class="p">()</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">action</span><span class="p">.</span><span class="nx">deny</span><span class="p">()</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nx">onSign</span> <span class="p">(</span><span class="nx">aepp</span><span class="p">,</span> <span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">confirm</span><span class="p">(</span><span class="sb">`Aepp </span><span class="si">${</span><span class="nx">aepp</span><span class="p">.</span><span class="nx">info</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb"> with id </span><span class="si">${</span><span class="nx">aepp</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="sb"> wants to sign tx </span><span class="si">${</span><span class="nx">action</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">tx</span><span class="si">}</span><span class="sb">`</span><span class="p">))</span> <span class="p">{</span>
+        <span class="nx">action</span><span class="p">.</span><span class="nx">accept</span><span class="p">()</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">action</span><span class="p">.</span><span class="nx">deny</span><span class="p">()</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nx">onAskAccounts</span> <span class="p">(</span><span class="nx">aepp</span><span class="p">,</span> <span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">confirm</span><span class="p">(</span><span class="sb">`Aepp </span><span class="si">${</span><span class="nx">aepp</span><span class="p">.</span><span class="nx">info</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb"> with id </span><span class="si">${</span><span class="nx">aepp</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="sb"> wants to get accounts`</span><span class="p">))</span> <span class="p">{</span>
+        <span class="nx">action</span><span class="p">.</span><span class="nx">accept</span><span class="p">()</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">action</span><span class="p">.</span><span class="nx">deny</span><span class="p">()</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nx">onMessageSign</span> <span class="p">(</span><span class="nx">aepp</span><span class="p">,</span> <span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">confirm</span><span class="p">(</span><span class="sb">`Aepp </span><span class="si">${</span><span class="nx">aepp</span><span class="p">.</span><span class="nx">info</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb"> with id </span><span class="si">${</span><span class="nx">aepp</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="sb"> wants to sign msg </span><span class="si">${</span><span class="nx">action</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">message</span><span class="si">}</span><span class="sb">`</span><span class="p">))</span> <span class="p">{</span>
+        <span class="nx">action</span><span class="p">.</span><span class="nx">accept</span><span class="p">()</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">action</span><span class="p">.</span><span class="nx">deny</span><span class="p">()</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="nx">wallet</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="nx">chrome</span><span class="p">.</span><span class="nx">runtime</span><span class="p">.</span><span class="nx">onConnect</span><span class="p">.</span><span class="nx">addListener</span><span class="p">(</span><span class="k">async</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">port</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// create connection</span>
+      <span class="kd">const</span> <span class="nx">connection</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">BrowserRuntimeConnection</span><span class="p">({</span> <span class="nx">connectionInfo</span><span class="o">:</span> <span class="p">{</span> <span class="nx">id</span><span class="o">:</span> <span class="nx">port</span><span class="p">.</span><span class="nx">sender</span><span class="p">.</span><span class="nx">frameId</span> <span class="p">},</span> <span class="nx">port</span> <span class="p">})</span>
+      <span class="c1">// add new aepp to wallet</span>
+      <span class="nx">wallet</span><span class="p">.</span><span class="nx">addRpcClient</span><span class="p">(</span><span class="nx">connection</span><span class="p">)</span>
+      <span class="c1">// share wallet details</span>
+      <span class="nx">wallet</span><span class="p">.</span><span class="nx">shareWalletInfo</span><span class="p">(</span><span class="nx">port</span><span class="p">.</span><span class="nx">postMessage</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="nx">port</span><span class="p">))</span>
+      <span class="nx">setTimeout</span><span class="p">(()</span> <span class="p">=&gt;</span> <span class="nx">wallet</span><span class="p">.</span><span class="nx">shareWalletInfo</span><span class="p">(</span><span class="nx">port</span><span class="p">.</span><span class="nx">postMessage</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="nx">port</span><span class="p">)),</span> <span class="mf">3000</span><span class="p">)</span>
+    <span class="p">})</span>
+  <span class="p">}).</span><span class="k">catch</span><span class="p">(</span><span class="nx">err</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+  <span class="p">})</span>
+<span class="p">}</span>
+
+<span class="nx">init</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span><span class="nx">_</span> <span class="p">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Wallet initialized!&#39;</span><span class="p">))</span>
+</code></pre></div>
+<h2 id="2-sharing-wallet-node-with-aepp">2. Sharing wallet node with AEPP</h2>
+<p>AEPP can request the wallet for its connected node URLs. Wallet can selectively accept or reject the connection request using the AEPP information(name, id, domain)</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// ideally this can be configured by the users of the extension</span>
+<span class="kd">const</span> <span class="nx">NODE_URL</span> <span class="o">=</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span>
+<span class="kd">const</span> <span class="nx">COMPILER_URL</span> <span class="o">=</span> <span class="s1">&#39;https://compiler.aepps.com&#39;</span>
+<span class="kd">const</span> <span class="nx">accounts</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="nx">MemoryAccount</span><span class="p">({</span> <span class="nx">keypair</span><span class="o">:</span> <span class="nx">Crypto</span><span class="p">.</span><span class="nx">generateKeyPair</span><span class="p">()</span> <span class="p">}),</span> <span class="c1">// generate keypair for account1</span>
+  <span class="nx">MemoryAccount</span><span class="p">({</span> <span class="nx">keypair</span><span class="o">:</span> <span class="nx">Crypto</span><span class="p">.</span><span class="nx">generateKeyPair</span><span class="p">()</span> <span class="p">})</span>  <span class="c1">// generate keypair for account2</span>
+<span class="p">]</span>
+
+<span class="k">async</span> <span class="kd">function</span> <span class="nx">init</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// Init extension stamp from sdk</span>
+  <span class="nx">RpcWallet</span><span class="p">({</span>
+    <span class="nx">compilerUrl</span><span class="o">:</span> <span class="nx">COMPILER_URL</span><span class="p">,</span>
+    <span class="nx">nodes</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;testnet&#39;</span><span class="p">,</span> <span class="nx">instance</span><span class="o">:</span> <span class="k">await</span> <span class="nx">Node</span><span class="p">({</span> <span class="nx">url</span><span class="o">:</span> <span class="nx">NODE_URL</span> <span class="p">})</span> <span class="p">}],</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;Wallet WebExtension&#39;</span><span class="p">,</span>
+    <span class="c1">// The `ExtensionProvider` uses the first account by default. You can change active account using `selectAccount(address)` function</span>
+    <span class="nx">accounts</span><span class="p">,</span>
+    <span class="c1">// Hook for sdk registration</span>
+    <span class="nx">onConnection</span> <span class="p">(</span><span class="nx">aepp</span><span class="p">,</span> <span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">confirm</span><span class="p">(</span><span class="sb">`Aepp </span><span class="si">${</span><span class="nx">aepp</span><span class="p">.</span><span class="nx">info</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb"> with id </span><span class="si">${</span><span class="nx">aepp</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="sb"> wants to connect`</span><span class="p">))</span> <span class="p">{</span>
+        <span class="c1">// Whitelist aepp domains for node connection</span>
+        <span class="kd">const</span> <span class="nx">aepps</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;https://test&#39;</span><span class="p">,</span> <span class="s1">&#39;https://aepp.aeternity.com&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">aepp</span><span class="p">.</span><span class="nx">info</span><span class="p">.</span><span class="nx">connectNode</span> <span class="o">&amp;&amp;</span> <span class="nx">aepps</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="nx">aepp</span><span class="p">.</span><span class="nx">info</span><span class="p">.</span><span class="nx">origin</span><span class="p">))</span> <span class="p">{</span>
+          <span class="nx">action</span><span class="p">.</span><span class="nx">accept</span><span class="p">({</span> <span class="nx">shareNode</span><span class="o">:</span> <span class="kc">true</span> <span class="p">})</span>
+        <span class="p">}</span>
+        <span class="nx">action</span><span class="p">.</span><span class="nx">accept</span><span class="p">()</span> <span class="c1">// Accept wallet connection without sharing node URLs</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">action</span><span class="p">.</span><span class="nx">deny</span><span class="p">()</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nx">onDisconnect</span> <span class="p">(</span><span class="nx">msg</span><span class="p">,</span> <span class="nx">client</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Disconnect client: &#39;</span><span class="p">,</span> <span class="nx">client</span><span class="p">)</span>
+    <span class="p">},</span>
+    <span class="nx">onSubscription</span> <span class="p">(</span><span class="nx">aepp</span><span class="p">,</span> <span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">confirm</span><span class="p">(</span><span class="sb">`Aepp </span><span class="si">${</span><span class="nx">aepp</span><span class="p">.</span><span class="nx">info</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb"> with id </span><span class="si">${</span><span class="nx">aepp</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="sb"> wants to subscribe for accounts`</span><span class="p">))</span> <span class="p">{</span>
+        <span class="nx">action</span><span class="p">.</span><span class="nx">accept</span><span class="p">()</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">action</span><span class="p">.</span><span class="nx">deny</span><span class="p">()</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nx">onSign</span> <span class="p">(</span><span class="nx">aepp</span><span class="p">,</span> <span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">confirm</span><span class="p">(</span><span class="sb">`Aepp </span><span class="si">${</span><span class="nx">aepp</span><span class="p">.</span><span class="nx">info</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb"> with id </span><span class="si">${</span><span class="nx">aepp</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="sb"> wants to sign tx </span><span class="si">${</span><span class="nx">action</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">tx</span><span class="si">}</span><span class="sb">`</span><span class="p">))</span> <span class="p">{</span>
+        <span class="nx">action</span><span class="p">.</span><span class="nx">accept</span><span class="p">()</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">action</span><span class="p">.</span><span class="nx">deny</span><span class="p">()</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nx">onAskAccounts</span> <span class="p">(</span><span class="nx">aepp</span><span class="p">,</span> <span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">confirm</span><span class="p">(</span><span class="sb">`Aepp </span><span class="si">${</span><span class="nx">aepp</span><span class="p">.</span><span class="nx">info</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb"> with id </span><span class="si">${</span><span class="nx">aepp</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="sb"> wants to get accounts`</span><span class="p">))</span> <span class="p">{</span>
+        <span class="nx">action</span><span class="p">.</span><span class="nx">accept</span><span class="p">()</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">action</span><span class="p">.</span><span class="nx">deny</span><span class="p">()</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nx">onMessageSign</span> <span class="p">(</span><span class="nx">aepp</span><span class="p">,</span> <span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">confirm</span><span class="p">(</span><span class="sb">`Aepp </span><span class="si">${</span><span class="nx">aepp</span><span class="p">.</span><span class="nx">info</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb"> with id </span><span class="si">${</span><span class="nx">aepp</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="sb"> wants to sign msg </span><span class="si">${</span><span class="nx">action</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">message</span><span class="si">}</span><span class="sb">`</span><span class="p">))</span> <span class="p">{</span>
+        <span class="nx">action</span><span class="p">.</span><span class="nx">accept</span><span class="p">()</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">action</span><span class="p">.</span><span class="nx">deny</span><span class="p">()</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="nx">wallet</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="nx">chrome</span><span class="p">.</span><span class="nx">runtime</span><span class="p">.</span><span class="nx">onConnect</span><span class="p">.</span><span class="nx">addListener</span><span class="p">(</span><span class="k">async</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">port</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// create connection</span>
+      <span class="kd">const</span> <span class="nx">connection</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">BrowserRuntimeConnection</span><span class="p">({</span> <span class="nx">connectionInfo</span><span class="o">:</span> <span class="p">{</span> <span class="nx">id</span><span class="o">:</span> <span class="nx">port</span><span class="p">.</span><span class="nx">sender</span><span class="p">.</span><span class="nx">frameId</span> <span class="p">},</span> <span class="nx">port</span> <span class="p">})</span>
+      <span class="c1">// add new aepp to wallet</span>
+      <span class="nx">wallet</span><span class="p">.</span><span class="nx">addRpcClient</span><span class="p">(</span><span class="nx">connection</span><span class="p">)</span>
+      <span class="c1">// share wallet details</span>
+      <span class="nx">wallet</span><span class="p">.</span><span class="nx">shareWalletInfo</span><span class="p">(</span><span class="nx">port</span><span class="p">.</span><span class="nx">postMessage</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="nx">port</span><span class="p">))</span>
+      <span class="nx">setTimeout</span><span class="p">(()</span> <span class="p">=&gt;</span> <span class="nx">wallet</span><span class="p">.</span><span class="nx">shareWalletInfo</span><span class="p">(</span><span class="nx">port</span><span class="p">.</span><span class="nx">postMessage</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="nx">port</span><span class="p">)),</span> <span class="mf">3000</span><span class="p">)</span>
+    <span class="p">})</span>
+  <span class="p">}).</span><span class="k">catch</span><span class="p">(</span><span class="nx">err</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+  <span class="p">})</span>
+<span class="p">}</span>
+
+<span class="nx">init</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span><span class="nx">_</span> <span class="p">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Wallet initialized!&#39;</span><span class="p">))</span>
+</code></pre></div>
+<h2 id="iframe-based-wallet">iFrame-based Wallet</h2>
+<p>The <strong>iFrame-based</strong> approach works similar to the <strong>WebExtension</strong> approach except that the <code>ContentScriptBridge</code> in between isn't needed.</p>
+<p>You can take a look into the implementation of the following example to see how it works:</p>
+<ul>
+<li><a href="https://github.com/aeternity/aepp-sdk-js/tree/master/examples/browser/wallet-iframe">iFrame-based Wallet Example</a></li>
+</ul>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../connect-aepp-to-wallet/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Connect an æpp to a wallet" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Connect an æpp to a wallet
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../../transaction-options/" class="md-footer__link md-footer__link--next" aria-label="Next: Transaction options" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Transaction options
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["content.tabs.link", "search.highlight", "search.share", "search.suggest"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.477d984a.min.js", "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.82b56eb2.min.js"></script>
+      
+    
+  </body>
+</html>
