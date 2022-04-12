@@ -34,7 +34,6 @@
   "dependencies": {
     "@aeternity/aepp-calldata": "^1.1.1",
     "@aeternity/argon2-browser": "^0.1.2",
-    "@aeternity/blakejs": "^1.1.2",
     "@aeternity/json-bigint": "^0.3.1",
     "@aeternity/uuid": "^0.0.1",
     "@babel/runtime-corejs3": "^7.17.2",
@@ -43,6 +42,7 @@
     "aes-js": "^3.1.2",
     "bignumber.js": "^9.0.2",
     "bip32-path": "^0.4.2",
+    "blakejs": "^1.2.1",
     "bs58": "^4.0.1",
     "buffer": "^6.0.3",
     "cross-fetch": "^3.1.5",

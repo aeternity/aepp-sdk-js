@@ -15,7 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { blake2b } from '@aeternity/blakejs'
+import { blake2b } from 'blakejs'
 import type { Data } from 'blakejs'
 
 /**
