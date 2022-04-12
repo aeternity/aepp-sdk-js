@@ -1,4 +1,4 @@
-import * as bs58 from 'bs58'
+import { encode as bs58Encode, decode as bs58Decode } from 'bs58'
 import { sha256 } from 'sha.js'
 import {
   DecodeError,
@@ -53,8 +53,8 @@ const base64 = {
 }
 
 const base58 = {
-  encode: (buffer: Buffer | string) => bs58.encode(addChecksum(buffer)),
-  decode: (string: string) => getPayload(bs58.decode(string))
+  encode: (buffer: Buffer | string) => bs58Encode(addChecksum(buffer)),
+  decode: (string: string) => getPayload(bs58Decode(string))
 }
 
 /**
