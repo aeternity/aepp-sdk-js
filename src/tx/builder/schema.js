@@ -433,7 +433,7 @@ const GA_ATTACH_TX = [
   TX_FIELD('ctVersion', FIELD_TYPES.ctVersion),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int),
-  TX_FIELD('gas', FIELD_TYPES.int),
+  TX_FIELD('gasLimit', FIELD_TYPES.int),
   TX_FIELD('gasPrice', FIELD_TYPES.int),
   TX_FIELD('callData', FIELD_TYPES.binary, 'cb')
 ]
@@ -444,7 +444,7 @@ const GA_META_TX_2 = [
   TX_FIELD('authData', FIELD_TYPES.binary, 'cb'),
   TX_FIELD('abiVersion', FIELD_TYPES.int),
   TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('gas', FIELD_TYPES.int),
+  TX_FIELD('gasLimit', FIELD_TYPES.int),
   TX_FIELD('gasPrice', FIELD_TYPES.int),
   TX_FIELD('tx', FIELD_TYPES.rlpBinary)
 ]
@@ -467,7 +467,7 @@ const CONTRACT_CREATE_TX = [
   TX_FIELD('ttl', FIELD_TYPES.int),
   TX_FIELD('deposit', Deposit),
   TX_FIELD('amount', FIELD_TYPES.amount),
-  TX_FIELD('gas', FIELD_TYPES.int),
+  TX_FIELD('gasLimit', FIELD_TYPES.int),
   TX_FIELD('gasPrice', FIELD_TYPES.int),
   TX_FIELD('callData', FIELD_TYPES.binary, 'cb')
 ]
@@ -481,7 +481,7 @@ const CONTRACT_CALL_TX = [
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int),
   TX_FIELD('amount', FIELD_TYPES.amount),
-  TX_FIELD('gas', FIELD_TYPES.int),
+  TX_FIELD('gasLimit', FIELD_TYPES.int),
   TX_FIELD('gasPrice', FIELD_TYPES.int),
   TX_FIELD('callData', FIELD_TYPES.binary, 'cb')
 ]

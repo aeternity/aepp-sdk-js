@@ -25,7 +25,7 @@ import { InvalidTxError, TypeError, UnknownTxError, InvalidSignatureError } from
 const buildTransaction = (type, params, options = {}) => {
   if (typeof params !== 'object') throw new TypeError('tx "params" should be an object')
   if (typeof type !== 'string' || !Object.values(TX_TYPE).includes(type)) throw new UnknownTxError(`Unknown transaction type ${type}`)
-  const fee = calculateFee(params.fee, type, { gas: params.gas, params, vsn: params.vsn })
+  const fee = calculateFee(params.fee, type, { gasLimit: params.gasLimit, params, vsn: params.vsn })
   const { rlpEncoded, binary, tx: encodedTx, txObject } = buildTx(
     { ...params, fee }, type, { vsn: params.vsn, ...options }
   )
@@ -179,7 +179,7 @@ export const TxObject = stampit({
      */
     calculateMinFee (props = {}) {
       const params = { ...this.params, ...props }
-      return calculateFee(0, this.type, { gas: params.gas, params, vsn: params.vsn })
+      return calculateFee(0, this.type, { gasLimit: params.gasLimit, params, vsn: params.vsn })
     }
   }
 })

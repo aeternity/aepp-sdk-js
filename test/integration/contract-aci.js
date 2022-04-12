@@ -155,7 +155,7 @@ describe('Contract instance', function () {
   it('generates by source code', async () => {
     aeSdk.Ae.defaults.testProperty = 'test'
     testContract = await aeSdk.getContractInstance({
-      source: testContractSource, filesystem, ttl: 0, gas: 15000
+      source: testContractSource, filesystem, ttl: 0, gasLimit: 15000
     })
     delete aeSdk.Ae.defaults.testProperty
     expect(testContract.options.testProperty).to.be.equal('test')
@@ -319,7 +319,7 @@ describe('Contract instance', function () {
 
     it('overrides gas through getContractInstance options for contract deployments', async () => {
       const ct = await aeSdk.getContractInstance({
-        source: testContractSource, filesystem, gas: 300
+        source: testContractSource, filesystem, gasLimit: 300
       })
       const { tx: { gas }, gasUsed } = (await ct.deploy(['test', 42])).txData
       expect(gasUsed).to.be.equal(160)
@@ -333,15 +333,15 @@ describe('Contract instance', function () {
     })
 
     it('overrides gas through options for contract calls', async () => {
-      const { tx: { gas }, gasUsed } = (await contract.methods.setKey(3, { gas: 100 })).txData
+      const { tx: { gas }, gasUsed } = (await contract.methods.setKey(3, { gasLimit: 100 })).txData
       expect(gasUsed).to.be.equal(61)
       expect(gas).to.be.equal(100)
     })
 
-    it('runs out of gas with correct message', async () => {
-      await expect(contract.methods.setKey(42, { gas: 10, callStatic: true }))
+    it('runs out of gasLimit with correct message', async () => {
+      await expect(contract.methods.setKey(42, { gasLimit: 10, callStatic: true }))
         .to.be.rejectedWith('Invocation failed: "Out of gas"')
-      await expect(contract.methods.setKey(42, { gas: 10 }))
+      await expect(contract.methods.setKey(42, { gasLimit: 10 }))
         .to.be.rejectedWith('Invocation failed')
       await expect(contract.methods.recursion('infinite'))
         .to.be.rejectedWith('Invocation failed: "Out of gas"')

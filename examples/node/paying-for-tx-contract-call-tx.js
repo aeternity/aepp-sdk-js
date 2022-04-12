@@ -128,7 +128,7 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
   //      - The `entrypoint` with the name `set_latest_caller` doesn't require any params so you
   //        can provide an empty array
   //  1. Create the `ContractCreateTx` by providing all required params.
-  //      - You could omit `amount`, `gas` and `gasPrice` if you choose to stick to the default
+  //      - You could omit `amount`, `gasLimit` and `gasPrice` if you choose to stick to the default
   //        values (see
   //        [transaction options](../../../transaction-options#contractcreatetx-contractcalltx))
   //  1. Sign the transaction by providing `innerTx: true` as transaction option.
@@ -142,7 +142,7 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
     callerId: await newUserAccount.address(),
     contractId: CONTRACT_ADDRESS,
     amount: 0,
-    gas: 1000000,
+    gasLimit: 1000000,
     gasPrice: 1500000000,
     callData: calldata
   })
