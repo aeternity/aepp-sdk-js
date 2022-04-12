@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [11.0.1](https://github.com/aeternity/aepp-sdk-js/compare/v11.0.0...v11.0.1) (2022-04-07)
+
+
+### Bug Fixes
+
+* **contract:** do not check payable if contract call is init ([c09fc0c](https://github.com/aeternity/aepp-sdk-js/commit/c09fc0c40bef8668066697567182a75f7a484886))
+* importing in mjs ([01d493b](https://github.com/aeternity/aepp-sdk-js/commit/01d493b0556897bdeb3bd04796f482702b175b36))
+* **oracle:** do not include address for oracle respond signature ([ad4bddc](https://github.com/aeternity/aepp-sdk-js/commit/ad4bddc43f139e44f33fcde8051ad64f52a734c2))
+
 ## [11.0.0](https://github.com/aeternity/aepp-sdk-js/compare/v10.0.0...v11.0.0) (2022-03-18)
 
 ### Request batching: SDK now supports [batching transactions](guides/batch-requests.md)
