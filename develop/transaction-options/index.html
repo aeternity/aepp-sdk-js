@@ -10,7 +10,7 @@
       
       
       <link rel="icon" href="../images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.1.9">
+      <meta name="generator" content="mkdocs-1.2.4, mkdocs-material-7.1.9">
     
     
       
@@ -1039,8 +1039,8 @@ If the strategy is set to <code>continuity</code>, then transactions in the memp
 <li>You can specify the denomination of the <code>amount</code> that will be provided to the contract related transaction.</li>
 </ul>
 </li>
-<li><code>gas</code><ul>
-<li>Max. amount of gas to be consumed by the transaction. Learn more on <a href="#how-to-estimate-gas">How to estimate gas?</a></li>
+<li><code>gasLimit</code><ul>
+<li>Maximum amount of gas to be consumed by the transaction. Learn more on <a href="#how-to-estimate-gas">How to estimate gas?</a></li>
 </ul>
 </li>
 <li><code>gasPrice</code> (default: <code>1e9</code>)<ul>
@@ -1107,7 +1107,7 @@ If the strategy is set to <code>continuity</code>, then transactions in the memp
 <h2 id="how-to-estimate-gas">How to estimate gas?</h2>
 <ul>
 <li>As æpp developer, it is reasonable to estimate the gas consumption for a contract call using the dry-run feature of the node <strong>once</strong> and provide a specific offset (e.g. multiplied by 1.5 or 2) as default in the æpp to ensure that contract calls are mined. Depending on the logic of the contract the gas consumption of a specific contract call can vary and therefore you should monitor the gas consumption and increase the default for the respective contract call accordingly over time.</li>
-<li>By default, SDK estimates <code>gas</code> using dry-run endpoint. This means an extra request that makes contract iterations slower, but it is more developer friendly (support of heavy requests without adjustments, and verbose error messages).</li>
+<li>By default, SDK estimates <code>gasLimit</code> using dry-run endpoint. This means an extra request that makes contract iterations slower, but it is more developer friendly (support of heavy requests without adjustments, and verbose error messages).</li>
 </ul>
                 
               

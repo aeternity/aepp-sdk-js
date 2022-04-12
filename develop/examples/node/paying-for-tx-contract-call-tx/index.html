@@ -10,7 +10,7 @@
       
       
       <link rel="icon" href="../../../images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.1.9">
+      <meta name="generator" content="mkdocs-1.2.4, mkdocs-material-7.1.9">
     
     
       
@@ -1100,7 +1100,7 @@ typically use for contract calls.</p>
 </ul>
 </li>
 <li>Create the <code>ContractCreateTx</code> by providing all required params.<ul>
-<li>You could omit <code>amount</code>, <code>gas</code> and <code>gasPrice</code> if you choose to stick to the default
+<li>You could omit <code>amount</code>, <code>gasLimit</code> and <code>gasPrice</code> if you choose to stick to the default
    values (see
    <a href="../../../transaction-options#contractcreatetx-contractcalltx">transaction options</a>)</li>
 </ul>
@@ -1118,7 +1118,7 @@ typically use for contract calls.</p>
     <span class="nx">callerId</span><span class="o">:</span> <span class="k">await</span> <span class="nx">newUserAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">(),</span>
     <span class="nx">contractId</span><span class="o">:</span> <span class="nx">CONTRACT_ADDRESS</span><span class="p">,</span>
     <span class="nx">amount</span><span class="o">:</span> <span class="mf">0</span><span class="p">,</span>
-    <span class="nx">gas</span><span class="o">:</span> <span class="mf">1000000</span><span class="p">,</span>
+    <span class="nx">gasLimit</span><span class="o">:</span> <span class="mf">1000000</span><span class="p">,</span>
     <span class="nx">gasPrice</span><span class="o">:</span> <span class="mf">1500000000</span><span class="p">,</span>
     <span class="nx">callData</span><span class="o">:</span> <span class="nx">calldata</span>
   <span class="p">})</span>
