@@ -27,5 +27,11 @@ module.exports = {
     'import/no-cycle': 2,
     'no-unused-vars': 0,
     '@typescript-eslint/no-unused-vars': 2
-  }
+  },
+  overrides: [{
+    files: '*.ts',
+    rules: {
+      'no-undef': 0
+    }
+  }]
 }
