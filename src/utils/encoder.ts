@@ -1,5 +1,5 @@
 import { encode as bs58Encode, decode as bs58Decode } from 'bs58'
-import { sha256 } from 'sha.js'
+import { sha256 as Sha256 } from 'sha.js'
 import {
   DecodeError,
   EncodeError,
@@ -15,7 +15,7 @@ import {
  * @return {String} Hash
  */
 export function sha256hash (input: Buffer | string) {
-  return new sha256().update(input).digest()
+  return new Sha256().update(input).digest()
 }
 
 // based on https://github.com/aeternity/protocol/blob/master/node/api/api_encoding.md

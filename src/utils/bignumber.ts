@@ -19,4 +19,5 @@ export const isBigNumber = (number: string | number | BigNumber): boolean =>
  * @param {BigNumber} bigNumber
  * @return {BigNumber}
  */
-export const ceil = (bigNumber: BigNumber): BigNumber => bigNumber.integerValue(BigNumber.ROUND_CEIL)
+export const ceil = (bigNumber: BigNumber): BigNumber => bigNumber
+  .integerValue(BigNumber.ROUND_CEIL)

@@ -180,7 +180,7 @@ describe('Aens', function () {
       const bid = await aeSdk.aensBid(name, bidFee, { onAccount })
       bid.should.be.an('object')
 
-      const isAuctionFinished = await aeSdk.getName(name).catch(e => false)
+      const isAuctionFinished = await aeSdk.getName(name).catch(() => false)
       isAuctionFinished.should.be.equal(false)
 
       const auctionEndBlock = computeAuctionEndBlock(name, bid.blockHeight)

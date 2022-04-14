@@ -176,7 +176,7 @@ function update (from, to, amount, sign, metadata) {
     enqueueAction(
       this,
       (channel, state) => state.handler === handlers.channelOpen,
-      (channel, state) => {
+      (channel) => {
         send(channel, {
           jsonrpc: '2.0',
           method: 'channels.update.new',
@@ -266,7 +266,7 @@ function leave () {
     enqueueAction(
       this,
       (channel, state) => state.handler === handlers.channelOpen,
-      (channel, state) => {
+      (channel) => {
         send(channel, { jsonrpc: '2.0', method: 'channels.leave', params: {} })
         return {
           handler: handlers.awaitingLeave,
@@ -293,7 +293,7 @@ function shutdown (sign) {
     enqueueAction(
       this,
       (channel, state) => state.handler === handlers.channelOpen,
-      (channel, state) => {
+      (channel) => {
         send(channel, { jsonrpc: '2.0', method: 'channels.shutdown', params: {} })
         return {
           handler: handlers.awaitingShutdownTx,
@@ -360,7 +360,7 @@ function withdraw (amount, sign, { onOnChainTx, onOwnWithdrawLocked, onWithdrawL
     enqueueAction(
       this,
       (channel, state) => state.handler === handlers.channelOpen,
-      (channel, state) => {
+      (channel) => {
         send(channel, { jsonrpc: '2.0', method: 'channels.withdraw', params: { amount } })
         return {
           handler: handlers.awaitingWithdrawTx,
@@ -431,7 +431,7 @@ function deposit (amount, sign, { onOnChainTx, onOwnDepositLocked, onDepositLock
     enqueueAction(
       this,
       (channel, state) => state.handler === handlers.channelOpen,
-      (channel, state) => {
+      (channel) => {
         send(channel, { jsonrpc: '2.0', method: 'channels.deposit', params: { amount } })
         return {
           handler: handlers.awaitingDepositTx,
@@ -486,7 +486,7 @@ function createContract ({ code, callData, deposit, vmVersion, abiVersion }, sig
     enqueueAction(
       this,
       (channel, state) => state.handler === handlers.channelOpen,
-      (channel, state) => {
+      (channel) => {
         send(channel, {
           jsonrpc: '2.0',
           method: 'channels.update.new_contract',
@@ -552,7 +552,7 @@ function callContract ({ amount, callData, contract, abiVersion }, sign) {
     enqueueAction(
       this,
       (channel, state) => state.handler === handlers.channelOpen,
-      (channel, state) => {
+      (channel) => {
         send(channel, {
           jsonrpc: '2.0',
           method: 'channels.update.call_contract',
@@ -600,7 +600,7 @@ function callContract ({ amount, callData, contract, abiVersion }, sign) {
  * })
  */
 function forceProgress (
-  { amount, callData, contract, abiVersion, gasLimit = 1000000, gasPrice = 1000000000, nonce },
+  { amount, callData, contract, abiVersion, gasLimit = 1000000, gasPrice = 1000000000 },
   sign,
   { onOnChainTx } = {}
 ) {
@@ -608,7 +608,7 @@ function forceProgress (
     enqueueAction(
       this,
       (channel, state) => state.handler === handlers.channelOpen,
-      (channel, state) => {
+      (channel) => {
         send(channel, {
           jsonrpc: '2.0',
           method: 'channels.force_progress',
@@ -729,7 +729,7 @@ function cleanContractCalls () {
     enqueueAction(
       this,
       (channel, state) => state.handler === handlers.channelOpen,
-      (channel, state) => {
+      (channel) => {
         send(channel, {
           jsonrpc: '2.0',
           method: 'channels.clean_contract_calls',

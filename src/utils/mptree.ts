@@ -80,7 +80,9 @@ export default class MPTree {
     return this.rootHash === tree.rootHash
   }
 
-  private static parseNode (node: Buffer[]): { type: NodeType, payload: Buffer[], path: string | null } {
+  private static parseNode (node: Buffer[]): {
+    type: NodeType, payload: Buffer[], path: string | null
+  } {
     switch (node.length) {
       case 17:
         return { type: NodeType.Branch, payload: node, path: null }

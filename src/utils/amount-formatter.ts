@@ -79,7 +79,8 @@ export const toAettos = (
  * @param {String|Number|BigNumber} value amount to convert
  * @param {Object} [options={}] options
  * @param {String} [options.denomination='aettos'] denomination of amount, can be ['ae', 'aettos']
- * @param {String} [options.targetDenomination='aettos'] target denomination, can be ['ae', 'aettos']
+ * @param {String} [options.targetDenomination='aettos'] target denomination,
+ * can be ['ae', 'aettos']
  * @return {String}
  */
 export const formatAmount = (
