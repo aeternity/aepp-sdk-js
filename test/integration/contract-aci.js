@@ -185,7 +185,7 @@ describe('Contract instance', function () {
     const deployInfo = await testContract.deploy(['test', 1, 'hahahaha'], {
       amount: 42,
       denomination: 'aettos',
-      gas: 16000,
+      gasLimit: 16000,
       deposit: 0,
       ttl: 0,
       gasPrice: '1e9',
