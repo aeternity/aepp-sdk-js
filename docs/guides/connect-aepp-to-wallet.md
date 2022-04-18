@@ -21,7 +21,7 @@ export default {
     aeSdk: null,
     publicAddress: '',
     balance: 0,
-    node: null,
+    nodeInfo: null,
     connectedAccounts: null
   }),
 }
@@ -40,7 +40,7 @@ async created () {
     compilerUrl: COMPILER_URL,
     onNetworkChange: async ({ networkId }) => {
       this.aeSdk.selectNode(networkId)
-      this.node = await this.aeSdk.getNodeInfo()
+      this.nodeInfo = await this.aeSdk.getNodeInfo()
     },
     onAddressChange: async () => {
       this.publicAddress = await this.aeSdk.address()
@@ -88,7 +88,7 @@ async connectToWallet(wallet) {
   this.connectedAccounts = await this.aeSdk.subscribeAddress('subscribe', 'connected')
   this.publicAddress = await this.aeSdk.address()
   this.balance = await this.aeSdk.getBalance(this.publicAddress)
-  this.node = await this.aeSdk.getNodeInfo()
+  this.nodeInfo = await this.aeSdk.getNodeInfo()
 }
 ```
 
