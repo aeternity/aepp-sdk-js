@@ -64,7 +64,7 @@ methods: {
       if (confirm(`Do you want to connect to wallet ${newWallet.name}`)) {
         detector.stopScan()
         // connect to the wallet, see step 4.
-        await this.connectToWallet(newWallet)
+        await this.connect(newWallet)
       }
     }
 
@@ -83,7 +83,7 @@ methods: {
 Append method for wallet connection
 
 ```js
-async connectToWallet(wallet) {
+async connect(wallet) {
   await this.aeSdk.connectToWallet(await wallet.getConnection())
   this.connectedAccounts = await this.aeSdk.subscribeAddress('subscribe', 'connected')
   this.address = await this.aeSdk.address()
@@ -97,7 +97,7 @@ async connectToWallet(wallet) {
 Aepp can request the wallet to share its connected node URLs if any to interact with the chain.
 
 ```js
-async connectToWallet (wallet) {
+async connect (wallet) {
     await this.aeSdk.connectToWallet(await wallet.getConnection(), { connectNode: true, name: 'wallet-node', select: true })
 }
 ```
