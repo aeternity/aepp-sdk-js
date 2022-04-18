@@ -17,7 +17,7 @@
 
 import { encode as rlpEncode } from 'rlp'
 import type { Input } from 'rlp'
-import { hash } from './crypto-ts'
+import { hash } from './crypto'
 import {
   MerkleTreeHashMismatchError,
   MissingNodeInTreeError,
