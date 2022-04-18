@@ -19,7 +19,7 @@ const COMPILER_URL = 'https://compiler.aepps.com';
 export default {
   data: () => ({
     aeSdk: null,
-    publicAddress: '',
+    address: '',
     balance: 0,
     nodeInfo: null,
     connectedAccounts: null
@@ -43,8 +43,8 @@ async created () {
       this.nodeInfo = await this.aeSdk.getNodeInfo()
     },
     onAddressChange: async () => {
-      this.publicAddress = await this.aeSdk.address()
-      this.balance = await this.aeSdk.balance(this.publicAddress)
+      this.address = await this.aeSdk.address()
+      this.balance = await this.aeSdk.balance(this.address)
     },
     onDisconnect: () => {
       // you may want to reset state here
@@ -86,8 +86,8 @@ Append method for wallet connection
 async connectToWallet(wallet) {
   await this.aeSdk.connectToWallet(await wallet.getConnection())
   this.connectedAccounts = await this.aeSdk.subscribeAddress('subscribe', 'connected')
-  this.publicAddress = await this.aeSdk.address()
-  this.balance = await this.aeSdk.getBalance(this.publicAddress)
+  this.address = await this.aeSdk.address()
+  this.balance = await this.aeSdk.getBalance(this.address)
   this.nodeInfo = await this.aeSdk.getNodeInfo()
 }
 ```
