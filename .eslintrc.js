@@ -24,6 +24,14 @@ module.exports = {
       ignoreStrings: true,
       ignoreTemplateLiterals: true
     }],
-    'import/no-cycle': 2
-  }
+    'import/no-cycle': 2,
+    'no-unused-vars': 0,
+    '@typescript-eslint/no-unused-vars': 2
+  },
+  overrides: [{
+    files: '*.ts',
+    rules: {
+      'no-undef': 0
+    }
+  }]
 }

@@ -67,17 +67,12 @@ describe('Aepp<->Wallet', function () {
         accounts: [genesisAccount],
         nodes: [{ name: 'local', instance: node }],
         name: 'Wallet',
-        onConnection (aepp, { accept, deny }) {
-        },
-        onSubscription (aepp, { accept, deny }) {
-        },
-        onSign (aepp, { accept, deny, params }) {
-        },
-        onAskAccounts (aepp, { accept, deny }) {
-        },
-        onMessageSign (message, { accept }) {
-        },
-        onDisconnect (message, client) {
+        onConnection () {},
+        onSubscription () {},
+        onSign () {},
+        onAskAccounts () {},
+        onMessageSign () {},
+        onDisconnect () {
           this.shareWalletInfo(
             connectionFromWalletToAepp.sendMessage.bind(connectionFromWalletToAepp)
           )
@@ -86,12 +81,9 @@ describe('Aepp<->Wallet', function () {
       aepp = await RpcAepp({
         name: 'AEPP',
         nodes: [{ name: 'test', instance: node }],
-        onNetworkChange (params) {
-        },
-        onAddressChange: (addresses) => {
-        },
-        onDisconnect (a) {
-        }
+        onNetworkChange () {},
+        onAddressChange () {},
+        onDisconnect () {}
       })
     })
 
@@ -107,7 +99,7 @@ describe('Aepp<->Wallet', function () {
     })
 
     it('Should receive `announcePresence` message from wallet', async () => {
-      const isReceived = new Promise((resolve, reject) => {
+      const isReceived = new Promise((resolve) => {
         connections.aeppConnection.addEventListener('message', (msg) => {
           resolve(msg.data.method === 'connection.announcePresence')
         })
@@ -382,7 +374,7 @@ describe('Aepp<->Wallet', function () {
     it('Add new account to wallet: receive notification for update accounts', async () => {
       const keypair = generateKeyPair()
       const connectedLength = Object.keys(aepp.rpcClient.accounts.connected).length
-      const received = await new Promise((resolve, reject) => {
+      const received = await new Promise((resolve) => {
         aepp.onAddressChange = (accounts) => {
           resolve(Object.keys(accounts.connected).length === connectedLength + 1)
         }
@@ -393,7 +385,7 @@ describe('Aepp<->Wallet', function () {
 
     it('Receive update for wallet select account', async () => {
       const connectedAccount = Object.keys(aepp.rpcClient.accounts.connected)[0]
-      const received = await new Promise((resolve, reject) => {
+      const received = await new Promise((resolve) => {
         aepp.onAddressChange = ({ connected, current }) => {
           Object.hasOwnProperty.call(current, connectedAccount).should.be.equal(true)
           resolve(Object.keys(connected)[0] !== connectedAccount)
@@ -404,8 +396,8 @@ describe('Aepp<->Wallet', function () {
     })
 
     it('Aepp: receive notification for network update', async () => {
-      const received = await new Promise((resolve, reject) => {
-        aepp.onNetworkChange = (msg, from) => {
+      const received = await new Promise((resolve) => {
+        aepp.onNetworkChange = (msg) => {
           msg.networkId.should.be.equal(networkId)
           resolve(wallet.selectedNode.name === 'second_node')
         }
@@ -454,7 +446,7 @@ describe('Aepp<->Wallet', function () {
     })
 
     it('Disconnect from wallet', async () => {
-      const received = await new Promise((resolve, reject) => {
+      const received = await new Promise((resolve) => {
         let received = false
         wallet.onDisconnect = (msg, from) => {
           msg.reason.should.be.equal('bye')
@@ -462,7 +454,7 @@ describe('Aepp<->Wallet', function () {
           if (received) resolve(true)
           received = true
         }
-        aepp.onDisconnect = (msg) => {
+        aepp.onDisconnect = () => {
           if (received) resolve(true)
           received = true
         }
@@ -549,18 +541,14 @@ describe('Aepp<->Wallet', function () {
         accounts: [genesisAccount],
         nodes: [{ name: 'local', instance: node }],
         name: 'Wallet',
-        onConnection (aepp, { accept, deny }) {
+        onConnection (aepp, { accept }) {
           accept({ shareNode: true })
         },
-        onSubscription (aepp, { accept, deny }) {
-        },
-        onSign (aepp, { accept, deny, params }) {
-        },
-        onAskAccounts (aepp, { accept, deny }) {
-        },
-        onMessageSign (message, { accept }) {
-        },
-        onDisconnect (message, client) {
+        onSubscription () {},
+        onSign () {},
+        onAskAccounts () {},
+        onMessageSign () {},
+        onDisconnect () {
           this.shareWalletInfo(
             connectionFromWalletToAepp.sendMessage.bind(connectionFromWalletToAepp)
           )
@@ -568,12 +556,9 @@ describe('Aepp<->Wallet', function () {
       })
       aepp = await RpcAepp({
         name: 'AEPP',
-        onNetworkChange (params) {
-        },
-        onAddressChange: (addresses) => {
-        },
-        onDisconnect (a) {
-        }
+        onNetworkChange () {},
+        onAddressChange () {},
+        onDisconnect () {}
       })
       wallet.addRpcClient(connectionFromWalletToAepp)
       await aepp.connectToWallet(
@@ -625,8 +610,8 @@ describe('Aepp<->Wallet', function () {
     })
 
     it('Aepp: receive notification with node for network update', async () => {
-      const received = await new Promise((resolve, reject) => {
-        aepp.onNetworkChange = (msg, from) => {
+      const received = await new Promise((resolve) => {
+        aepp.onNetworkChange = (msg) => {
           msg.networkId.should.be.equal(networkId)
           msg.node.should.be.an('object')
           resolve(wallet.selectedNode.name === 'second_node')
@@ -644,7 +629,7 @@ const WindowPostMessageFake = (name) => ({
   addEventListener (onEvent, listener) {
     this.listener = listener
   },
-  removeEventListener (onEvent, listener) {
+  removeEventListener () {
     return () => null
   },
   postMessage (msg) {

@@ -188,7 +188,7 @@ function validateField (value, type, prefix) {
 
 function transformParams (params, schema, { denomination } = {}) {
   params = schema
-    .filter(([_, t]) => t === FIELD_TYPES.amount)
+    .filter(([, t]) => t === FIELD_TYPES.amount)
     .reduce(
       (acc, [key]) => ({ ...params, [key]: formatAmount(params[key], { denomination }) }),
       params

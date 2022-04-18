@@ -61,17 +61,17 @@ const RESPONSES = {
         }
       }
 
-      instance.rpcClient.processResponse(msg, ({ id, result }) => [result])
+      instance.rpcClient.processResponse(msg, ({ result }) => [result])
     },
   [METHODS.sign]: (instance) =>
     (msg) => {
       instance.rpcClient.processResponse(
-        msg, ({ id, result }) => [result.signedTransaction || result.transactionHash]
+        msg, ({ result }) => [result.signedTransaction || result.transactionHash]
       )
     },
   [METHODS.signMessage]: (instance) =>
     (msg) => {
-      instance.rpcClient.processResponse(msg, ({ id, result }) => [result.signature])
+      instance.rpcClient.processResponse(msg, ({ result }) => [result.signature])
     }
 }
 

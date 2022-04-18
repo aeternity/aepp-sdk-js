@@ -63,7 +63,7 @@ function connect (onMessage) {
   const forceOrigin = this.forceOrigin
   if (this.listener) throw new AlreadyConnectedError('You already connected')
 
-  this.listener = (msg, source) => {
+  this.listener = (msg) => {
     if (!msg || typeof msg.data !== 'object') return
     if (!forceOrigin && origin && origin !== msg.origin) return
     if (debug) console.log('Receive message: ', msg)

@@ -50,7 +50,7 @@ export class NameFee extends Field {
 }
 
 export class Deposit extends Field {
-  static serialize (value, { name }) {
+  static serialize (value) {
     if (+value) throw new IllegalArgumentError(`Contract deposit is not refundable, so it should be equal 0, got ${value} instead`)
     return writeInt(0)
   }

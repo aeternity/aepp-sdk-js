@@ -16,6 +16,7 @@ import { getBrowserAPI, getHandler, isValidAccounts, message, sendResponseMessag
 import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE } from '../schema'
 import { ArgumentError, TypeError, UnknownRpcClientError } from '../../errors'
 import { isAccountBase } from '../../../account/base'
+import { filterObject } from '../../other'
 
 const resolveOnAccount = (addresses, onAccount, opt = {}) => {
   if (!addresses.find(a => a === onAccount)) {
@@ -280,9 +281,7 @@ export default Ae.compose(AccountMultiple, {
           current: { [address]: {} },
           connected: {
             ...client.accounts.current,
-            ...Object.entries(client.accounts.connected)
-              .filter(([k, v]) => k !== address)
-              .reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {})
+            ...filterObject(client.accounts.connected, ([k]) => k !== address)
           }
         }))
     }

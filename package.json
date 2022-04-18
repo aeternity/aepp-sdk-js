@@ -15,7 +15,7 @@
     "build:dev": "webpack --mode=development && npm run build:es",
     "docs:examples": "node tooling/docs/examples-to-md.js examples/node/*.js",
     "docs:api": "node apidoc.js",
-    "lint": "eslint .",
+    "lint": "eslint . --ext .ts,.js",
     "test": "nyc mocha './test/unit/' './test/integration/'",
     "test:integration": "nyc mocha './test/integration/'",
     "test:unit": "nyc mocha './test/unit/'",

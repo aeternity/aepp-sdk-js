@@ -110,7 +110,7 @@ async function balance (address, { height, hash, format = AE_AMOUNT_FORMATS.AETT
 }
 
 async function getBalance (address, { height, hash, format = AE_AMOUNT_FORMATS.AETTOS } = {}) {
-  const { balance } = await this.getAccount(address, { hash, height }).catch(_ => ({ balance: 0 }))
+  const { balance } = await this.getAccount(address, { hash, height }).catch(() => ({ balance: 0 }))
 
   return formatAmount(balance, { targetDenomination: format }).toString()
 }

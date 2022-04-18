@@ -79,7 +79,8 @@ export const toAettos = (
  * @param {String|Number|BigNumber} value amount to convert
  * @param {Object} [options={}] options
  * @param {String} [options.denomination='aettos'] denomination of amount, can be ['ae', 'aettos']
- * @param {String} [options.targetDenomination='aettos'] target denomination, can be ['ae', 'aettos']
+ * @param {String} [options.targetDenomination='aettos'] target denomination,
+ * can be ['ae', 'aettos']
  * @return {String}
  */
 export const formatAmount = (
@@ -89,7 +90,7 @@ export const formatAmount = (
   const denominations = Object.values(AE_AMOUNT_FORMATS)
   if (!denominations.includes(denomination)) throw new InvalidDenominationError(`Invalid denomination: ${denomination}`)
   if (!denominations.includes(targetDenomination)) throw new InvalidDenominationError(`Invalid target denomination: ${targetDenomination}`)
-  if (!isBigNumber(value)) throw new ArgumentError('value', `a number`, value)
+  if (!isBigNumber(value)) throw new ArgumentError('value', 'a number', value)
 
   return new BigNumber(value)
     .shiftedBy(DENOMINATION_MAGNITUDE[denomination] - DENOMINATION_MAGNITUDE[targetDenomination])

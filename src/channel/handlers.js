@@ -59,7 +59,7 @@ function handleUnexpectedMessage (channel, message, state) {
   return { handler: channelOpen }
 }
 
-export function awaitingConnection (channel, message, state) {
+export function awaitingConnection (channel, message) {
   if (message.method === 'channels.info') {
     if (['channel_accept', 'funding_created'].includes(message.params.data.event)) {
       changeStatus(channel, {
@@ -94,7 +94,7 @@ export async function awaitingReconnection (channel, message, state) {
   return handleUnexpectedMessage(channel, message, state)
 }
 
-export async function awaitingChannelCreateTx (channel, message, state) {
+export async function awaitingChannelCreateTx (channel, message) {
   const tag = {
     initiator: 'initiator_sign',
     responder: 'responder_sign'
@@ -113,7 +113,7 @@ export async function awaitingChannelCreateTx (channel, message, state) {
   }
 }
 
-export function awaitingOnChainTx (channel, message, state) {
+export function awaitingOnChainTx (channel, message) {
   if (message.method === 'channels.on_chain_tx') {
     if (
       message.params.data.info === 'funding_signed' &&
@@ -139,7 +139,7 @@ export function awaitingOnChainTx (channel, message, state) {
   }
 }
 
-export function awaitingBlockInclusion (channel, message, state) {
+export function awaitingBlockInclusion (channel, message) {
   if (message.method === 'channels.info') {
     const handler = {
       funding_created: awaitingBlockInclusion,
@@ -159,14 +159,14 @@ export function awaitingBlockInclusion (channel, message, state) {
   }
 }
 
-export function awaitingOpenConfirmation (channel, message, state) {
+export function awaitingOpenConfirmation (channel, message) {
   if (message.method === 'channels.info' && message.params.data.event === 'open') {
     channelId.set(channel, message.params.channel_id)
     return { handler: awaitingInitialState }
   }
 }
 
-export function awaitingInitialState (channel, message, state) {
+export function awaitingInitialState (channel, message) {
   if (message.method === 'channels.update') {
     changeState(channel, message.params.data.state)
     return { handler: channelOpen }

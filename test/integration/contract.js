@@ -206,7 +206,7 @@ describe('Contract', function () {
     const aeSdk = await BaseAe()
     aeSdk.removeAccount(publicKey)
     aeSdk.addresses().length.should.be.equal(0)
-    const address = await aeSdk.address().catch(e => false)
+    const address = await aeSdk.address().catch(() => false)
     address.should.be.equal(false)
     const contract = await aeSdk.getContractInstance({
       source: identityContract, contractAddress: deployed.address

@@ -70,7 +70,7 @@ async function spendTx ({ senderId, recipientId, amount, payload = '' }) {
   return tx
 }
 
-async function namePreclaimTx ({ accountId, commitmentId }) {
+async function namePreclaimTx ({ accountId }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
   const { fee, ttl, nonce } = await this.prepareTxParams(
     TX_TYPE.namePreClaim, { senderId: accountId, ...arguments[0] }
@@ -89,7 +89,7 @@ async function namePreclaimTx ({ accountId, commitmentId }) {
   return tx
 }
 
-async function nameClaimTx ({ accountId, name, nameSalt, vsn = 2 }) {
+async function nameClaimTx ({ accountId, name, vsn = 2 }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
   const { fee, ttl, nonce } = await this.prepareTxParams(
     TX_TYPE.nameClaim, { senderId: accountId, ...arguments[0], vsn }
@@ -110,7 +110,7 @@ async function nameClaimTx ({ accountId, name, nameSalt, vsn = 2 }) {
   return tx
 }
 
-async function nameTransferTx ({ accountId, nameId, recipientId }) {
+async function nameTransferTx ({ accountId, recipientId }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
   const { fee, ttl, nonce } = await this.prepareTxParams(
     TX_TYPE.nameTransfer, { senderId: accountId, ...arguments[0] }
@@ -131,7 +131,7 @@ async function nameTransferTx ({ accountId, nameId, recipientId }) {
   return tx
 }
 
-async function nameUpdateTx ({ accountId, nameId, nameTtl, pointers, clientTtl }) {
+async function nameUpdateTx ({ accountId }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
   const { fee, ttl, nonce } = await this.prepareTxParams(
     TX_TYPE.nameUpdate, { senderId: accountId, ...arguments[0] }
@@ -150,7 +150,7 @@ async function nameUpdateTx ({ accountId, nameId, nameTtl, pointers, clientTtl }
   return tx
 }
 
-async function nameRevokeTx ({ accountId, nameId }) {
+async function nameRevokeTx ({ accountId }) {
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
   const { fee, ttl, nonce } = await this.prepareTxParams(
     TX_TYPE.nameRevoke, { senderId: accountId, ...arguments[0] }
@@ -169,9 +169,7 @@ async function nameRevokeTx ({ accountId, nameId }) {
   return tx
 }
 
-async function contractCreateTx ({
-  ownerId, code, vmVersion, abiVersion, amount, gasLimit, gasPrice = MIN_GAS_PRICE, callData
-}) {
+async function contractCreateTx ({ ownerId, gasLimit, gasPrice = MIN_GAS_PRICE }) {
   // Get VM_ABI version
   const ctVersion = this.getVmVersion(TX_TYPE.contractCreate, arguments[0])
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
@@ -199,9 +197,7 @@ async function contractCreateTx ({
     })
 }
 
-async function contractCallTx ({
-  callerId, contractId, abiVersion, amount, gasLimit, gasPrice = MIN_GAS_PRICE, callData
-}) {
+async function contractCallTx ({ callerId, gasLimit, gasPrice = MIN_GAS_PRICE }) {
   const ctVersion = this.getVmVersion(TX_TYPE.contractCall, arguments[0])
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
   const { fee, ttl, nonce } = await this.prepareTxParams(
@@ -465,9 +461,7 @@ async function channelSnapshotSoloTx ({ channelId, fromId, payload }) {
   return tx
 }
 
-async function gaAttachTx ({
-  ownerId, code, vmVersion, abiVersion, authFun, gasLimit, gasPrice = MIN_GAS_PRICE, callData
-}) {
+async function gaAttachTx ({ ownerId, gasPrice = MIN_GAS_PRICE }) {
   // Get VM_ABI version
   const ctVersion = this.getVmVersion(TX_TYPE.contractCreate, arguments[0])
   // Calculate fee, get absolute ttl (ttl + height), get account nonce
@@ -562,7 +556,7 @@ async function prepareTxParams (
   { senderId, nonce: n, ttl: t, fee: f, gasLimit, absoluteTtl, vsn, strategy }
 ) {
   n = n || (
-    await this.api.getAccountNextNonce(senderId, { strategy }).catch(e => ({ nextNonce: 1 }))
+    await this.api.getAccountNextNonce(senderId, { strategy }).catch(() => ({ nextNonce: 1 }))
   ).nextNonce
   const ttl = await calculateTtl.call(this, t, !absoluteTtl)
   const fee = calculateFee(
