@@ -15,31 +15,13 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import '../'
+import '..'
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
-import { dump, recover, validateKeyObj } from '../../src/utils/keystore'
+import { dump, recover, Keystore } from '../../src/utils/keystore'
 import { getAddressFromPriv } from '../../src/utils/crypto'
-import { InvalidKeyError, InvalidPasswordError } from '../../src/utils/errors'
+import { InvalidPasswordError } from '../../src/utils/errors'
 
-const invalidKeystore = {
-  name: 'test',
-  version: 1,
-  public_key: 'ak_2wc5GeyFTxYEqusWH8UizUQDj6i53ow7fF9WXEPtYVvSHT45xd',
-  id: 'ea6b7079-924e-456c-8100-6305e7235d65',
-  crypto: {
-    secret_type: 'ed25519',
-    cipher_params: {
-      nonce: 'fecd060551378963f5d4d1aa264b665225360775fcd5fa5a'
-    },
-    kdf: 'argon2id',
-    kdf_params: {
-      memlimit: 1024,
-      opslimit: 3,
-      salt: 'aa0885ba58e497ea83cd663d1dd4d002'
-    }
-  }
-}
 const password = 'test'
 const secretKey = Buffer.from('35bdc4b31d75aebea2693760a2c96afe87d99dc571ddc4666db0ac8a2b59b30ef1e0c4e567f3d08eff8330c57d70ad457e9f31fa221e14fcc851273ec9af50ae', 'hex')
 const address = getAddressFromPriv(secretKey)
@@ -64,12 +46,11 @@ const keystoreStatic = {
 }
 
 describe('Keystore', () => {
-  let keystore
+  let keystore: Keystore
 
   it('dump account to keystore object', async () => {
     keystore = await dump('test', password, secretKey)
     expect(keystore.public_key).to.be.equal(address)
-    validateKeyObj(keystore).should.be.equal(true)
   })
 
   it('dump accepts hex', async () => {
@@ -83,9 +64,6 @@ describe('Keystore', () => {
   it('restore account from keystore object', async () =>
     expect(await recover(password, keystore)).to.be.equal(secretKey.toString('hex')))
 
-  it('use invalid keystore json', () => expect(recover(password, invalidKeystore))
-    .to.be.rejectedWith(InvalidKeyError, 'Invalid key file format. Require properties: ciphertext,symmetric_alg'))
-
-  it('use invalid keystore password', () => expect(recover(password + 1, keystore))
+  it('use invalid keystore password', () => expect(recover(password + '1', keystore))
     .to.be.rejectedWith(InvalidPasswordError, 'Invalid password or nonce'))
 })
