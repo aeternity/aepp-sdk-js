@@ -14,7 +14,7 @@ import {
  * @param {Buffer|String} input - Data to hash
  * @return {String} Hash
  */
-export function sha256hash (input: Buffer | string) {
+export function sha256hash (input: Buffer | string): Buffer {
   return new Sha256().update(input).digest()
 }
 
@@ -28,20 +28,21 @@ const typesLength: { [name: string]: number } = {
   ok: 32
 } as const
 
-function ensureValidLength (data: Buffer | string, type: string) {
-  if (!typesLength[type]) return
+function ensureValidLength (data: Buffer | string, type: string): void {
+  if (typesLength[type] == null) return
   if (data.length === typesLength[type]) return
   throw new PayloadLengthError(`Payload should be ${typesLength[type]} bytes, got ${data.length} instead`)
 }
 
-const getChecksum = (payload: Buffer | string) => sha256hash(sha256hash(payload)).slice(0, 4)
+const getChecksum = (payload: Buffer | string): Buffer =>
+  sha256hash(sha256hash(payload)).slice(0, 4)
 
-const addChecksum = (input: Buffer | string) => {
+const addChecksum = (input: Buffer | string): Buffer => {
   const payload = Buffer.from(input)
   return Buffer.concat([payload, getChecksum(payload)])
 }
 
-function getPayload (buffer: Buffer) {
+function getPayload (buffer: Buffer): Buffer {
   const payload = buffer.slice(0, -4)
   if (!getChecksum(payload).equals(buffer.slice(-4))) throw new InvalidChecksumError()
   return payload
@@ -65,16 +66,16 @@ const base58 = {
  * @param {string} [requiredPrefix] Ensure that data have this prefix
  * @return {Buffer} Decoded data
  */
-export function decode (data: string, requiredPrefix?: string) {
+export function decode (data: string, requiredPrefix?: string): Buffer {
   const [prefix, encodedPayload, extra] = data.split('_')
-  if (!encodedPayload) throw new DecodeError(`Encoded string missing payload: ${data}`)
-  if (extra) throw new DecodeError(`Encoded string have extra parts: ${data}`)
-  if (requiredPrefix && requiredPrefix !== prefix) {
+  if (encodedPayload == null) throw new DecodeError(`Encoded string missing payload: ${data}`)
+  if (extra != null) throw new DecodeError(`Encoded string have extra parts: ${data}`)
+  if (requiredPrefix != null && requiredPrefix !== prefix) {
     throw new PrefixMismatchError(prefix, requiredPrefix)
   }
   const decoder = (base64Types.includes(prefix) && base64.decode) ||
     (base58Types.includes(prefix) && base58.decode)
-  if (!decoder) {
+  if (decoder === false) {
     throw new DecodeError(`Encoded string have unknown type: ${prefix}`)
   }
   const payload = decoder(encodedPayload)
@@ -90,10 +91,10 @@ export function decode (data: string, requiredPrefix?: string) {
  * @param {string} type Prefix of Transaction
  * @return {String} Encoded string Base58check or Base64check data
  */
-export function encode (data: Buffer | string, type: string) {
+export function encode (data: Buffer | string, type: string): string {
   const encoder = (base64Types.includes(type) && base64.encode) ||
     (base58Types.includes(type) && base58.encode)
-  if (!encoder) {
+  if (encoder === false) {
     throw new EncodeError(`Unknown type: ${type}`)
   }
   ensureValidLength(data, type)

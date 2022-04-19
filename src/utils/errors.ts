@@ -87,7 +87,7 @@ export class WalletError extends BaseError {
 /* Common error patterns */
 export class ArgumentError extends BaseError {
   constructor (argumentName: string, requirement: string, argumentValue: any) {
-    super(`${argumentName} should be ${requirement}, got ${argumentValue} instead`)
+    super(`${argumentName} should be ${requirement}, got ${String(argumentValue)} instead`)
     this.name = 'ArgumentError'
   }
 }
@@ -164,7 +164,7 @@ export class TxTimedOutError extends BaseError {
     super([
       `Giving up after ${blocks} blocks mined`,
       `transaction hash: ${th}`,
-      ...status ? [`status: ${status}`] : []
+      ...status != null ? [`status: ${status}`] : []
     ].join(', '))
     this.name = 'TxTimedOutError'
   }
