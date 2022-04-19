@@ -16,6 +16,17 @@ export const ProtocolToVmAbi = {
       vmVersion: [], abiVersion: [AbiVersion.NoAbi, AbiVersion.Fate],
     },
   },
+  [ConsensusProtocolVersion.Ceres]: {
+    'contract-create': {
+      vmVersion: [VmVersion.Fate2], abiVersion: [AbiVersion.Fate],
+    },
+    'contract-call': {
+      vmVersion: [], abiVersion: [AbiVersion.Fate],
+    },
+    'oracle-call': {
+      vmVersion: [], abiVersion: [AbiVersion.NoAbi, AbiVersion.Fate],
+    },
+  },
 } as const;
 
 export interface CtVersion {

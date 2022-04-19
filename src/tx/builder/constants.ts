@@ -60,6 +60,7 @@ export const NAME_BID_RANGES = mapObject({
 
 export enum ConsensusProtocolVersion {
   Iris = 5,
+  Ceres = 6,
 }
 
 /**
