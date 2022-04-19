@@ -149,7 +149,7 @@ export class NoSerializerFoundError extends BaseError {
 }
 
 export class RequestTimedOutError extends BaseError {
-  constructor (requestTime: number);
+  constructor (requestTime: number)
   constructor (requestTime: number, currentHeight?: number, height?: number) {
     if (currentHeight !== undefined && height !== undefined) {
       super(`Giving up after ${requestTime}ms, current height: ${currentHeight}, desired height: ${height}`)
@@ -423,7 +423,7 @@ export class MissingEventDefinitionError extends ContractError {
 }
 
 export class AmbiguousEventDefinitionError extends ContractError {
-  constructor (eventAddress: string, matchedEvents: [string, string][]) {
+  constructor (eventAddress: string, matchedEvents: Array<[string, string]>) {
     super(
       `Found multiple definitions of "${matchedEvents[0][1]}" event emitted by ${eventAddress}` +
       ` in ${matchedEvents.map(([name]) => `"${name}"`).join(', ')} contracts` +
