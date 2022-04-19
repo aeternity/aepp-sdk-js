@@ -171,12 +171,33 @@ export const ABI_VERSIONS = {
 }
 
 export const PROTOCOL_VERSIONS = {
-  IRIS: 5
+  IRIS: 5,
+  CERES: 6
 }
 
 // First abi/vm by default
 export const PROTOCOL_VM_ABI = {
   [PROTOCOL_VERSIONS.IRIS]: {
+    [TX_TYPE.contractCreate]: {
+      vmVersion: [VM_VERSIONS.FATE_2], abiVersion: [ABI_VERSIONS.FATE]
+    },
+    // TODO: Ensure that AEVM is still available here
+    [TX_TYPE.contractCall]: {
+      vmVersion: [
+        VM_VERSIONS.FATE_2,
+        VM_VERSIONS.FATE,
+        VM_VERSIONS.SOPHIA_IMPROVEMENTS_LIMA,
+        VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA,
+        VM_VERSIONS.SOPHIA,
+        VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA
+      ],
+      abiVersion: [ABI_VERSIONS.FATE, ABI_VERSIONS.SOPHIA]
+    },
+    [TX_TYPE.oracleRegister]: {
+      vmVersion: [], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA]
+    }
+  },
+  [PROTOCOL_VERSIONS.CERES]: {
     [TX_TYPE.contractCreate]: {
       vmVersion: [VM_VERSIONS.FATE_2], abiVersion: [ABI_VERSIONS.FATE]
     },
