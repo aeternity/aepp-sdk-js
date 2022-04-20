@@ -54,7 +54,7 @@ export const BaseAe = async (params = {}, compose = {}) => Universal
     nodes: [{ name: 'test', instance: await Node({ url, internalUrl, ignoreVersion }) }]
   })
 
-const spendPromise = (async () => {
+export const spendPromise = (async () => {
   const ae = await BaseAe({ networkId, withoutGenesisAccount: false })
   await ae.awaitHeight(2)
   await ae.spend(1e26, account.publicKey)

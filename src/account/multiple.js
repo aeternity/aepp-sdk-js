@@ -22,13 +22,9 @@
  */
 
 import AsyncInit from '../utils/async-init'
-import MemoryAccount from './memory'
-import { decode } from '../tx/builder/helpers'
-import AccountBase, { isAccountBase } from './base'
-import {
-  UnavailableAccountError,
-  TypeError
-} from '../utils/errors'
+import { decode } from '../utils/encoder'
+import AccountResolver from './resolver'
+import { UnavailableAccountError } from '../utils/errors'
 
 /**
  * AccountMultiple stamp
@@ -53,13 +49,23 @@ import {
  * accounts.selectAccount(address) // Select account
  * accounts.addresses() // Get available accounts
  */
-export default AccountBase.compose(AsyncInit, {
+export default AccountResolver.compose(AsyncInit, {
   async init ({ accounts = [], address }) {
     this.accounts = Object.fromEntries(await Promise.all(
       accounts.map(async a => [await a.address(), a])
     ))
     address = address || Object.keys(this.accounts)[0]
     if (address) this.selectAccount(address)
+
+    const resolveAccountBase = this._resolveAccount
+    this._resolveAccount = (account = this.selectedAddress) => {
+      if (typeof account === 'string') {
+        decode(account, 'ak')
+        if (!this.accounts[account]) throw new UnavailableAccountError(account)
+        account = this.accounts[account]
+      }
+      return resolveAccountBase(account)
+    }
   },
   props: {
     accounts: {}
@@ -68,12 +74,6 @@ export default AccountBase.compose(AsyncInit, {
     selectedAddress: null
   },
   methods: {
-    async address ({ onAccount = this.selectedAddress } = {}) {
-      return this._resolveAccount(onAccount).address()
-    },
-    async sign (data, { onAccount = this.selectedAddress } = {}) {
-      return this._resolveAccount(onAccount).sign(data)
-    },
     /**
      * Get accounts addresses
      * @alias module:@aeternity/aepp-sdk/es/accounts/multiple
@@ -131,32 +131,6 @@ export default AccountBase.compose(AsyncInit, {
       decode(address, 'ak')
       if (!this.accounts[address]) throw new UnavailableAccountError(address)
       this.selectedAddress = address
-    },
-    /**
-     * Resolves an account
-     * @param account account address (should exist in sdk instance), MemoryAccount or keypair
-     * @returns {AccountBase}
-     * @private
-     */
-    _resolveAccount (account) {
-      if (account === null) {
-        throw new TypeError(
-          'Account should be an address (ak-prefixed string), ' +
-          'keypair, or instance of account base, got null instead')
-      } else {
-        switch (typeof account) {
-          case 'string':
-            decode(account, 'ak')
-            if (!this.accounts[account]) throw new UnavailableAccountError(account)
-            return this.accounts[account]
-          case 'object':
-            return isAccountBase(account) ? account : MemoryAccount({ keypair: account })
-          default:
-            throw new TypeError(
-              'Account should be an address (ak-prefixed string), ' +
-              `keypair, or instance of account base, got ${account} instead`)
-        }
-      }
     }
   }
 })
