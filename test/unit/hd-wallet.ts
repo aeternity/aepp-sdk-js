@@ -22,7 +22,7 @@ import {
   getMasterKeyFromSeed,
   getSaveHDWalletAccounts
 } from '../../src/utils/hd-wallet'
-import { encode, decode } from '../../src/tx/builder/helpers'
+import { encode, decode } from '../../src/utils/encoder'
 import { InvalidDerivationPathError } from '../../src/utils/errors'
 
 describe('hd wallet', () => {
@@ -178,6 +178,6 @@ describe('hd wallet', () => {
   })
 
   it('Derive child with invalid path', () => {
-    expect(() => derivePathFromSeed('asd')).to.throw(InvalidDerivationPathError, 'Invalid path')
+    expect(() => derivePathFromSeed('asd', Buffer.from([]))).to.throw(InvalidDerivationPathError, 'Invalid path')
   })
 })
