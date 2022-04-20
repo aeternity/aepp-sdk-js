@@ -87,7 +87,7 @@ export class WalletError extends BaseError {
 /* Common error patterns */
 export class ArgumentError extends BaseError {
   constructor (argumentName: string, requirement: string, argumentValue: any) {
-    super(`${argumentName} should be ${requirement}, got ${argumentValue} instead`)
+    super(`${argumentName} should be ${requirement}, got ${String(argumentValue)} instead`)
     this.name = 'ArgumentError'
   }
 }
@@ -149,7 +149,6 @@ export class NoSerializerFoundError extends BaseError {
 }
 
 export class RequestTimedOutError extends BaseError {
-  constructor (requestTime: number);
   constructor (requestTime: number, currentHeight?: number, height?: number) {
     if (currentHeight !== undefined && height !== undefined) {
       super(`Giving up after ${requestTime}ms, current height: ${currentHeight}, desired height: ${height}`)
@@ -165,7 +164,7 @@ export class TxTimedOutError extends BaseError {
     super([
       `Giving up after ${blocks} blocks mined`,
       `transaction hash: ${th}`,
-      ...status ? [`status: ${status}`] : []
+      ...status != null ? [`status: ${status}`] : []
     ].join(', '))
     this.name = 'TxTimedOutError'
   }
@@ -423,7 +422,7 @@ export class MissingEventDefinitionError extends ContractError {
 }
 
 export class AmbiguousEventDefinitionError extends ContractError {
-  constructor (eventAddress: string, matchedEvents: [string, string][]) {
+  constructor (eventAddress: string, matchedEvents: Array<[string, string]>) {
     super(
       `Found multiple definitions of "${matchedEvents[0][1]}" event emitted by ${eventAddress}` +
       ` in ${matchedEvents.map(([name]) => `"${name}"`).join(', ')} contracts` +

@@ -81,7 +81,9 @@ export default class MPTree {
   }
 
   private static parseNode (node: Buffer[]): {
-    type: NodeType, payload: Buffer[], path: string | null
+    type: NodeType
+    payload: Buffer[]
+    path: string | null
   } {
     switch (node.length) {
       case 17:
