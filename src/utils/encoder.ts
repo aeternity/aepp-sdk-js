@@ -78,11 +78,11 @@ const parseType = (maybeType: unknown): [EncodingType, typeof base64] => {
  */
 export function decode (data: EncodedData<EncodingType>, requiredPrefix?: EncodingType): Buffer {
   const [prefix, encodedPayload, extra] = data.split('_')
-  if (encodedPayload == null) throw new DecodeError(`Encoded string missing payload: ${data}`)
-  if (extra != null) throw new DecodeError(`Encoded string have extra parts: ${data}`)
   if (requiredPrefix != null && requiredPrefix !== prefix) {
     throw new PrefixMismatchError(prefix, requiredPrefix)
   }
+  if (encodedPayload == null) throw new DecodeError(`Encoded string missing payload: ${data}`)
+  if (extra != null) throw new DecodeError(`Encoded string have extra parts: ${data}`)
   const [type, { decode }] = parseType(prefix)
   const payload = decode(encodedPayload)
   ensureValidLength(payload, type)
