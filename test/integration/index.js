@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright 2018 aeternity developers
+ * Copyright 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -16,11 +16,7 @@
  */
 
 import { Universal, generateKeyPair, MemoryAccount, Node } from '../../src'
-import chai from 'chai'
-import chaiAsPromised from 'chai-as-promised'
-
-chai.use(chaiAsPromised)
-chai.should()
+import '../'
 
 export const url = process.env.TEST_URL || 'http://localhost:3013'
 export const internalUrl = process.env.TEST_INTERNAL_URL || 'http://localhost:3113'
