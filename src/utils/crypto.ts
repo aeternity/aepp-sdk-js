@@ -22,7 +22,6 @@
  */
 
 import nacl, { SignKeyPair } from 'tweetnacl'
-// @ts-expect-error
 import aesjs from 'aes-js'
 import { blake2b, Data } from 'blakejs'
 
