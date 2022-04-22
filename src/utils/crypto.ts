@@ -167,13 +167,13 @@ export function encryptKey (password: string, binaryData: Uint8Array): Uint8Arra
  * @rtype (password: String, encrypted: String) => Uint8Array
  * @param {String} password - Password to decrypt with
  * @param {Uint8Array} encrypted - Data to decrypt
- * @return {Buffer} Decrypted data
+ * @return {Uint8Array} Decrypted data
  */
-export function decryptKey (password: string, encrypted: Uint8Array): Buffer {
+export function decryptKey (password: string, encrypted: Uint8Array): Uint8Array {
   const encryptedBytes = Buffer.from(encrypted)
   const hashedPasswordBytes = sha256hash(password)
   const aesEcb = new Ecb(hashedPasswordBytes)
-  return Buffer.from(aesEcb.decrypt(encryptedBytes))
+  return aesEcb.decrypt(encryptedBytes)
 }
 
 // SIGNATURES
