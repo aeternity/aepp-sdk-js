@@ -11,6 +11,7 @@ import { v4 as uuid } from '@aeternity/uuid'
 import AccountResolver from '../../../account/resolver'
 import AccountRpc from '../../../account/rpc'
 import { decode } from '../../encoder'
+import AsyncInit from '../../../utils/async-init'
 import RpcClient from './rpc-client'
 import { getHandler, message } from '../helpers'
 import { METHODS, RPC_STATUS, VERSION } from '../schema'
@@ -102,7 +103,7 @@ const handleMessage = (instance) => async (msg) => {
  * @param {Object} connection Wallet connection object
  * @return {Object}
  */
-export default AccountResolver.compose({
+export default AccountResolver.compose(AsyncInit, {
   async init ({
     name,
     connection,

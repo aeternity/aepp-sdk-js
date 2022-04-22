@@ -54,7 +54,7 @@ import { hash } from '../utils/crypto-ts'
  * @param {String} [options.bytecode] Contract bytecode
  * @param {Object} [options.aci] Contract ACI
  * @param {String} [options.contractAddress] Contract address
- * @param {Object} [options.filesystem] Contact source external namespaces map
+ * @param {Object} [options.fileSystem] Contact source external namespaces map
  * @param {Boolean} [options.validateBytecode] Compare source code with on-chain version
  * @return {ContractInstance} JS Contract API
  * @example
@@ -73,12 +73,12 @@ export default async function getContractInstance ({
   bytecode,
   aci: _aci,
   contractAddress,
-  filesystem = {},
+  fileSystem = {},
   validateBytecode,
   ...otherOptions
 } = {}) {
   if (!_aci && source) {
-    _aci = await this.compilerApi.generateACI({ code: source, options: { filesystem } })
+    _aci = await this.compilerApi.generateACI({ code: source, options: { fileSystem } })
   }
   if (!_aci) throw new MissingContractDefError()
   contractAddress = contractAddress && await this.resolveName(
@@ -95,15 +95,15 @@ export default async function getContractInstance ({
 
   const instance = {
     _aci,
-    _name: _aci.encoded_aci.contract.name,
-    calldata: new Calldata([_aci.encoded_aci, ..._aci.external_encoded_aci]),
+    _name: _aci.encodedAci.contract.name,
+    calldata: new Calldata([_aci.encodedAci, ..._aci.externalEncodedAci]),
     source,
     bytecode,
     deployInfo: { address: contractAddress },
     options: {
       ...this.Ae.defaults,
       callStatic: false,
-      filesystem,
+      fileSystem,
       ...otherOptions
     },
     compilerVersion: this.compilerVersion
@@ -115,7 +115,7 @@ export default async function getContractInstance ({
     const isValid = source
       ? await this.compilerApi.validateByteCode(
         { bytecode: onChanBytecode, source, options: instance.options }
-      ).then((res) => Object.entries(res).length === 0, () => false)
+      ).then(() => true, () => false)
       : bytecode === onChanBytecode
     if (!isValid) throw new BytecodeMismatchError(source ? 'source' : 'bytecode')
   }
@@ -210,7 +210,7 @@ export default async function getContractInstance ({
    * @return {Object} function ACI
    */
   function getFunctionACI (name) {
-    const fn = instance._aci.encoded_aci.contract.functions.find(f => f.name === name)
+    const fn = instance._aci.encodedAci.contract.functions.find(f => f.name === name)
     if (fn) return fn
     if (name === 'init') return { payable: false }
     throw new NoSuchContractFunctionError(`Function ${name} doesn't exist in contract`)
@@ -293,8 +293,8 @@ export default async function getContractInstance ({
     if (addressToName[address]) return addressToName[address]
 
     const matchedEvents = [
-      instance._aci.encoded_aci,
-      ...instance._aci.external_encoded_aci
+      instance._aci.encodedAci,
+      ...instance._aci.externalEncodedAci
     ]
       .filter(({ contract }) => contract?.event)
       .map(({ contract }) => [contract.name, contract.event.variant])
@@ -350,7 +350,7 @@ export default async function getContractInstance ({
    * `await contract.methods.testFunction.get()` -> use call-static(dry-run)
    * `await contract.methods.testFunction.send()` -> send tx on-chain
    */
-  instance.methods = Object.fromEntries(instance._aci.encoded_aci.contract.functions
+  instance.methods = Object.fromEntries(instance._aci.encodedAci.contract.functions
     .map(({ name, arguments: aciArgs, stateful }) => {
       const genHandler = callStatic => (...args) => {
         const options = args.length === aciArgs.length + 1 ? args.pop() : {}

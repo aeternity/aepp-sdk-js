@@ -1,0 +1,30 @@
+---
+directive:
+  - from: swagger-document
+    where: $.info.title
+    set: compiler
+    reason: the whole SDK already about aeternity
+
+  - from: swagger-document
+    where: $.paths.*.*.responses
+    transform: >
+      Object.entries($)
+        .filter(([key]) => key !== '200')
+        .forEach(([, value]) => value['x-ms-error-response'] = true)
+    reason: >
+      throw errors even for explained response with not 200 code
+      https://github.com/Azure/autorest.typescript/issues/463#issuecomment-524203041
+
+version: ^3.6.1
+use-extension:
+  '@autorest/typescript': ^6.0.0-beta.18
+  '@autorest/modelerfour': ^4.23.1
+# replace with a link to https://github.com/aeternity/aesophia_http/blob/master/config/swagger.yaml
+# at specific version after fixing https://github.com/aeternity/aesophia_http/issues/87
+input-file: https://compiler.aeternity.io/api
+output-folder: ../../src/apis/compiler
+source-code-folder-path: .
+client-side-validation: true
+generator: typescript
+generate-metadata: false
+add-credentials: false
