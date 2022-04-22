@@ -278,8 +278,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-create-a-keypair" class="md-nav__link">
-    2. Create a Keypair
+  <a href="#2-create-a-keypair-for-sender" class="md-nav__link">
+    2. Create a Keypair for sender
   </a>
   
 </li>
@@ -852,8 +852,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-create-a-keypair" class="md-nav__link">
-    2. Create a Keypair
+  <a href="#2-create-a-keypair-for-sender" class="md-nav__link">
+    2. Create a Keypair for sender
   </a>
   
 </li>
@@ -886,58 +886,58 @@
                 
                 
                 <h1 id="quick-start">Quick Start</h1>
+<p>In this example we will send 1 <em>AE</em> coin from one account to another</p>
 <h2 id="1-specify-imports">1. Specify imports</h2>
 <p>For the following snippets in the guide you need to specify multiple imports. Most imports like <code>Universal</code>, <code>MemoryAccount</code> &amp; <code>Node</code> are <a href="https://stampit.js.org/essentials/what-is-a-stamp">Stamps</a> that compose certain functionalities. Others utility functions like <code>generateKeyPair</code> also can be imported.</p>
-<div class="highlight"><pre><span></span><code><span class="k">import</span> <span class="p">{</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="p">{</span>
   <span class="nx">Universal</span><span class="p">,</span>
   <span class="nx">MemoryAccount</span><span class="p">,</span>
   <span class="nx">Node</span><span class="p">,</span>
   <span class="nx">AE_AMOUNT_FORMATS</span><span class="p">,</span>
   <span class="nx">generateKeyPair</span>
-<span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
+<span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">)</span>
 </code></pre></div>
-<h2 id="2-create-a-keypair">2. Create a Keypair</h2>
-<div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">keypair</span> <span class="o">=</span> <span class="nx">generateKeyPair</span><span class="p">()</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Secret key: </span><span class="si">${</span><span class="nx">keypair</span><span class="p">.</span><span class="nx">secretKey</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Public key: </span><span class="si">${</span><span class="nx">keypair</span><span class="p">.</span><span class="nx">publicKey</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
+<h2 id="2-create-a-keypair-for-sender">2. Create a Keypair for sender</h2>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">keypair</span> <span class="o">=</span> <span class="nx">generateKeyPair</span><span class="p">()</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Secret key: </span><span class="si">${</span><span class="nx">keypair</span><span class="p">.</span><span class="nx">secretKey</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Public key: </span><span class="si">${</span><span class="nx">keypair</span><span class="p">.</span><span class="nx">publicKey</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="3-get-some-ae-using-the-faucet">3. Get some <em>AE</em> using the Faucet</h2>
-<p>To receive some <em>AE</em> you can use the <a href="https://faucet.aepps.com/">Faucet</a>. Just add your publicKey, and you'll immediately get some test coins.</p>
+<p>To receive some <em>AE</em> you can use the <a href="https://faucet.aepps.com/">Faucet</a>. Just paste sender's publicKey, hit <code>Top UP</code> and you'll immediately get some test coins.</p>
 <h2 id="4-interact-with-the-ternity-blockchain">4. Interact with the æternity blockchain</h2>
 <p>This example shows:</p>
 <ul>
 <li>how to create an instance of the SDK using the <code>Universal</code> <a href="https://stampit.js.org/essentials/what-is-a-stamp">Stamp</a></li>
-<li>how to get the current block height</li>
-<li>how to spend 1 AE from the account the SDK instance was initialized with to some other AE address</li>
+<li>how to spend (send) 1 AE from the account the SDK instance was initialized with to some other AE address</li>
 </ul>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">NODE_URL</span> <span class="o">=</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">;</span>
-<span class="kd">const</span> <span class="nx">COMPILER_URL</span> <span class="o">=</span> <span class="s1">&#39;https://compiler.aepps.com&#39;</span><span class="p">;</span> <span class="c1">// required for contract interactions (compiling and creating calldata)</span>
-<span class="kd">const</span> <span class="nx">account</span> <span class="o">=</span> <span class="nx">MemoryAccount</span><span class="p">({</span>
-  <span class="c1">// replace &lt;YOUR_SECRET&gt; and &lt;YOUR_PUBLIC_KEY&gt; with the values from step 2</span>
-  <span class="nx">keypair</span><span class="o">:</span> <span class="p">{</span> <span class="nx">secretKey</span><span class="o">:</span> <span class="s1">&#39;&lt;YOUR_SECRET&gt;&#39;</span><span class="p">,</span> <span class="nx">publicKey</span><span class="o">:</span> <span class="s1">&#39;&lt;YOUR_PUBLIC_KEY&gt;&#39;</span> <span class="p">}</span>
-<span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">NODE_URL</span> <span class="o">=</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span>
+<span class="kd">const</span> <span class="nx">COMPILER_URL</span> <span class="o">=</span> <span class="s1">&#39;https://compiler.aepps.com&#39;</span> <span class="c1">// required for contract interactions</span>
+<span class="kd">const</span> <span class="nx">senderAccount</span> <span class="o">=</span> <span class="nx">MemoryAccount</span><span class="p">({</span>
+  <span class="c1">// replace &lt;SENDER_SECRET&gt; and &lt;SENDER_PUBLIC_KEY&gt; with the generated keypair from step 2</span>
+  <span class="nx">keypair</span><span class="o">:</span> <span class="p">{</span> <span class="nx">secretKey</span><span class="o">:</span> <span class="s1">&#39;&lt;SENDER_SECRET&gt;&#39;</span><span class="p">,</span> <span class="nx">publicKey</span><span class="o">:</span> <span class="s1">&#39;&lt;SENDER_PUBLIC_KEY&gt;&#39;</span> <span class="p">}</span>
+<span class="p">});</span>
 
 <span class="p">(</span><span class="k">async</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="kd">const</span> <span class="nx">node</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Node</span><span class="p">({</span> <span class="nx">url</span><span class="o">:</span> <span class="nx">NODE_URL</span> <span class="p">})</span>
   <span class="kd">const</span> <span class="nx">aeSdk</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span>
-     <span class="nx">compilerUrl</span><span class="o">:</span> <span class="nx">COMPILER_URL</span><span class="p">,</span>
-     <span class="nx">nodes</span><span class="o">:</span> <span class="p">[</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;testnet&#39;</span><span class="p">,</span> <span class="nx">instance</span><span class="o">:</span> <span class="nx">node</span> <span class="p">}</span> <span class="p">],</span>
-     <span class="nx">accounts</span><span class="o">:</span> <span class="p">[</span> <span class="nx">account</span> <span class="p">]</span>
+    <span class="nx">compilerUrl</span><span class="o">:</span> <span class="nx">COMPILER_URL</span><span class="p">,</span>
+    <span class="nx">nodes</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;testnet&#39;</span><span class="p">,</span> <span class="nx">instance</span><span class="o">:</span> <span class="nx">node</span> <span class="p">}],</span>
+    <span class="nx">accounts</span><span class="o">:</span> <span class="p">[</span><span class="nx">senderAccount</span><span class="p">]</span>
   <span class="p">})</span>
 
-  <span class="kd">const</span> <span class="nx">height</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">height</span><span class="p">()</span> <span class="c1">// get top keyblock height</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Current Keyblock Height:&#39;</span><span class="p">,</span> <span class="nx">height</span><span class="p">)</span>
-
   <span class="c1">// spend one AE</span>
-  <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="s1">&#39;&lt;RECIPIENT_PUBLIC_KEY&gt;&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="c1">// replace &lt;RECIPIENT_PUBLIC_KEY&gt;</span>
-      <span class="nx">denomination</span><span class="o">:</span> <span class="nx">AE_AMOUNT_FORMATS</span><span class="p">.</span><span class="nx">AE</span>
+  <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="s1">&#39;&lt;RECIPIENT_PUBLIC_KEY&gt;&#39;</span><span class="p">,</span> <span class="p">{</span>
+    <span class="c1">// replace &lt;RECIPIENT_PUBLIC_KEY&gt;, Ideally you use public key from Superhero Wallet you have created before</span>
+    <span class="nx">denomination</span><span class="o">:</span> <span class="nx">AE_AMOUNT_FORMATS</span><span class="p">.</span><span class="nx">AE</span>
   <span class="p">})</span>
 <span class="p">})()</span>
 </code></pre></div>
 <p>Note:</p>
 <ul>
+<li>You may remove code from Step 2 as this serves only for one-time creation</li>
 <li>By default the <code>spend</code> function expects the amount to be spent in <code>aettos</code> (the smallest possible unit)</li>
 <li>Following the example snippet you would specify <code>AE</code> as denomination</li>
+<li>See <a href="https://explorer.testnet.aeternity.io/">Testnet Explorer</a> and track your transactions</li>
 </ul>
                 
               
