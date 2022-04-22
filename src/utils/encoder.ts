@@ -2,7 +2,7 @@ import { encode as bs58Encode, decode as bs58Decode } from 'bs58'
 import { sha256 as Sha256 } from 'sha.js'
 import {
   DecodeError,
-  EncodeError,
+  ArgumentError,
   InvalidChecksumError,
   PayloadLengthError,
   PrefixMismatchError
@@ -21,17 +21,18 @@ export function sha256hash (input: Uint8Array | string): Buffer {
 // based on https://github.com/aeternity/protocol/blob/master/node/api/api_encoding.md
 const base64Types = ['ba', 'cb', 'or', 'ov', 'pi', 'ss', 'cs', 'ck', 'cv', 'st', 'tx']
 const base58Types = ['ak', 'bf', 'bs', 'bx', 'ch', 'cm', 'ct', 'kh', 'mh', 'nm', 'ok', 'oq', 'pp', 'sg', 'th']
+type EncodingType = typeof base64Types[number] | typeof base58Types[number]
 // TODO: add all types with a fixed length
-const typesLength: { [name: string]: number } = {
+const typesLength: { [name in EncodingType]?: number } = {
   ak: 32,
   ct: 32,
   ok: 32
 } as const
 
-function ensureValidLength (data: Uint8Array, type: string): void {
-  if (typesLength[type] == null) return
-  if (data.length === typesLength[type]) return
-  throw new PayloadLengthError(`Payload should be ${typesLength[type]} bytes, got ${data.length} instead`)
+function ensureValidLength (data: Uint8Array, type: EncodingType): void {
+  const reqLen = typesLength[type]
+  if (reqLen == null || data.length === reqLen) return
+  throw new PayloadLengthError(`Payload should be ${reqLen} bytes, got ${data.length} instead`)
 }
 
 const getChecksum = (payload: Uint8Array): Buffer =>
@@ -57,6 +58,14 @@ const base58 = {
   decode: (string: string) => getPayload(bs58Decode(string))
 }
 
+const parseType = (maybeType: unknown): [EncodingType, typeof base64] => {
+  const base64Type = base64Types.find(t => t === maybeType)
+  if (base64Type != null) return [base64Type, base64]
+  const base58Type = base58Types.find(t => t === maybeType)
+  if (base58Type != null) return [base58Type, base58]
+  throw new ArgumentError('prefix', `one of ${[...base58Types, ...base64Types].join(', ')}`, maybeType)
+}
+
 /**
  * Decode data using the default encoding/decoding algorithm
  * @function
@@ -65,20 +74,16 @@ const base58 = {
  * @param {string} [requiredPrefix] Ensure that data have this prefix
  * @return {Buffer} Decoded data
  */
-export function decode (data: string, requiredPrefix?: string): Buffer {
+export function decode (data: string, requiredPrefix?: EncodingType): Buffer {
   const [prefix, encodedPayload, extra] = data.split('_')
   if (encodedPayload == null) throw new DecodeError(`Encoded string missing payload: ${data}`)
   if (extra != null) throw new DecodeError(`Encoded string have extra parts: ${data}`)
   if (requiredPrefix != null && requiredPrefix !== prefix) {
     throw new PrefixMismatchError(prefix, requiredPrefix)
   }
-  const decoder = (base64Types.includes(prefix) && base64.decode) ||
-    (base58Types.includes(prefix) && base58.decode)
-  if (decoder === false) {
-    throw new DecodeError(`Encoded string have unknown type: ${prefix}`)
-  }
-  const payload = decoder(encodedPayload)
-  ensureValidLength(payload, prefix)
+  const [type, { decode }] = parseType(prefix)
+  const payload = decode(encodedPayload)
+  ensureValidLength(payload, type)
   return payload
 }
 
@@ -90,12 +95,8 @@ export function decode (data: string, requiredPrefix?: string): Buffer {
  * @param {string} type Prefix of Transaction
  * @return {String} Encoded string Base58check or Base64check data
  */
-export function encode (data: Uint8Array, type: string): string {
-  const encoder = (base64Types.includes(type) && base64.encode) ||
-    (base58Types.includes(type) && base58.encode)
-  if (encoder === false) {
-    throw new EncodeError(`Unknown type: ${type}`)
-  }
+export function encode (data: Uint8Array, type: EncodingType): string {
+  const [, { encode }] = parseType(type)
   ensureValidLength(data, type)
-  return `${type}_${encoder(data)}`
+  return `${type}_${encode(data)}`
 }
