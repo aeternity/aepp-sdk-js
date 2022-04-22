@@ -11,10 +11,10 @@ import {
 /**
  * Calculate SHA256 hash of `input`
  * @rtype (input: String) => hash: String
- * @param {Buffer|String} input - Data to hash
+ * @param {Uint8Array|String} input - Data to hash
  * @return {String} Hash
  */
-export function sha256hash (input: Buffer | string): Buffer {
+export function sha256hash (input: Uint8Array | string): Buffer {
   return new Sha256().update(input).digest()
 }
 
@@ -28,17 +28,16 @@ const typesLength: { [name: string]: number } = {
   ok: 32
 } as const
 
-function ensureValidLength (data: Uint8Array | string, type: string): void {
+function ensureValidLength (data: Uint8Array, type: string): void {
   if (typesLength[type] == null) return
   if (data.length === typesLength[type]) return
   throw new PayloadLengthError(`Payload should be ${typesLength[type]} bytes, got ${data.length} instead`)
 }
 
-const getChecksum = (payload: Buffer | string): Buffer =>
+const getChecksum = (payload: Uint8Array): Buffer =>
   sha256hash(sha256hash(payload)).slice(0, 4)
 
-const addChecksum = (input: Uint8Array | string): Buffer => {
-  const payload = Buffer.from(input)
+const addChecksum = (payload: Uint8Array): Buffer => {
   return Buffer.concat([payload, getChecksum(payload)])
 }
 
@@ -49,12 +48,12 @@ function getPayload (buffer: Buffer): Buffer {
 }
 
 const base64 = {
-  encode: (buffer: Uint8Array | string) => addChecksum(buffer).toString('base64'),
+  encode: (buffer: Uint8Array) => addChecksum(buffer).toString('base64'),
   decode: (string: string) => getPayload(Buffer.from(string, 'base64'))
 }
 
 const base58 = {
-  encode: (buffer: Uint8Array | string) => bs58Encode(addChecksum(buffer)),
+  encode: (buffer: Uint8Array) => bs58Encode(addChecksum(buffer)),
   decode: (string: string) => getPayload(bs58Decode(string))
 }
 
@@ -91,7 +90,7 @@ export function decode (data: string, requiredPrefix?: string): Buffer {
  * @param {string} type Prefix of Transaction
  * @return {String} Encoded string Base58check or Base64check data
  */
-export function encode (data: Uint8Array | string, type: string): string {
+export function encode (data: Uint8Array, type: string): string {
   const encoder = (base64Types.includes(type) && base64.encode) ||
     (base58Types.includes(type) && base58.encode)
   if (encoder === false) {
