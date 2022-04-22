@@ -17,15 +17,15 @@ First you need to create a bridge between your extension and the page. This can 
 
 ```js
 import {
-  BrowserRuntimeConnection, BrowserWindowMessageConnection, AeppWalletSchema,
-  ContentScriptBridge, AeppWalletHelpers
+  BrowserRuntimeConnection, BrowserWindowMessageConnection, MESSAGE_DIRECTION,
+  ContentScriptBridge, getBrowserAPI
 } from '@aeternity/aepp-sdk'
 
 const readyStateCheckInterval = setInterval(function () {
   if (document.readyState === 'complete') {
     clearInterval(readyStateCheckInterval)
 
-    const port = AeppWalletHelpers.getBrowserAPI().runtime.connect()
+    const port = getBrowserAPI().runtime.connect()
     const extConnection = BrowserRuntimeConnection({
       connectionInfo: {
         description: 'Content Script to Extension connection',
@@ -39,8 +39,8 @@ const readyStateCheckInterval = setInterval(function () {
         origin: window.origin
       },
       origin: window.origin,
-      sendDirection: AeppWalletSchema.MESSAGE_DIRECTION.to_aepp,
-      receiveDirection: AeppWalletSchema.MESSAGE_DIRECTION.to_waellet
+      sendDirection: MESSAGE_DIRECTION.to_aepp,
+      receiveDirection: MESSAGE_DIRECTION.to_waellet
     })
 
     const bridge = ContentScriptBridge({ pageConnection, extConnection })
@@ -58,8 +58,8 @@ After the connection is established you can share the wallet details with the ap
 const NODE_URL = 'https://testnet.aeternity.io'
 const COMPILER_URL = 'https://compiler.aepps.com'
 const accounts = [
-  MemoryAccount({ keypair: Crypto.generateKeyPair() }), // generate keypair for account1
-  MemoryAccount({ keypair: Crypto.generateKeyPair() })  // generate keypair for account2
+  MemoryAccount({ keypair: generateKeyPair() }), // generate keypair for account1
+  MemoryAccount({ keypair: generateKeyPair() })  // generate keypair for account2
 ]
 
 async function init () {
@@ -135,8 +135,8 @@ AEPP can request the wallet for its connected node URLs. Wallet can selectively 
 const NODE_URL = 'https://testnet.aeternity.io'
 const COMPILER_URL = 'https://compiler.aepps.com'
 const accounts = [
-  MemoryAccount({ keypair: Crypto.generateKeyPair() }), // generate keypair for account1
-  MemoryAccount({ keypair: Crypto.generateKeyPair() })  // generate keypair for account2
+  MemoryAccount({ keypair: generateKeyPair() }), // generate keypair for account1
+  MemoryAccount({ keypair: generateKeyPair() })  // generate keypair for account2
 ]
 
 async function init () {

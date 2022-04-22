@@ -15,7 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { Universal, Crypto, MemoryAccount, Node } from '../../src'
+import { Universal, generateKeyPair, MemoryAccount, Node } from '../../src'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 
@@ -30,7 +30,7 @@ const secretKey = process.env.SECRET_KEY || 'bf66e1c256931870908a649572ed0257876
 export const networkId = process.env.TEST_NETWORK_ID || 'ae_devnet'
 export const ignoreVersion = process.env.IGNORE_VERSION || false
 export const genesisAccount = MemoryAccount({ keypair: { publicKey, secretKey } })
-export const account = Crypto.generateKeyPair()
+export const account = generateKeyPair()
 
 export const BaseAe = async (params = {}, compose = {}) => Universal
   .compose({

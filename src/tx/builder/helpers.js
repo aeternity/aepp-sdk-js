@@ -24,8 +24,7 @@ import {
 /**
  * JavaScript-based Transaction builder helper function's
  * @module @aeternity/aepp-sdk/es/tx/builder/helpers
- * @export TxBuilderHelper
- * @example import { TxBuilderHelper } from '@aeternity/aepp-sdk'
+ * @example import { buildContractId } from '@aeternity/aepp-sdk'
  */
 
 export const createSalt = salt

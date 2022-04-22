@@ -18,7 +18,8 @@
 import '../'
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
-import { dump, recover, getAddressFromPriv, validateKeyObj } from '../../src/utils/keystore'
+import { dump, recover, validateKeyObj } from '../../src/utils/keystore'
+import { getAddressFromPriv } from '../../src/utils/crypto'
 import { InvalidKeyError, InvalidPasswordError } from '../../src/utils/errors'
 
 const invalidKeystore = {

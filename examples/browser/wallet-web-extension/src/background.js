@@ -1,7 +1,7 @@
 /* global browser */
 
 import {
-  RpcWallet, Node, MemoryAccount, Crypto, BrowserRuntimeConnection
+  RpcWallet, Node, MemoryAccount, generateKeyPair, BrowserRuntimeConnection
 } from '@aeternity/aepp-sdk'
 
 (async () => {
@@ -21,7 +21,7 @@ import {
           secretKey: 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b'
         }
       }),
-      MemoryAccount({ keypair: Crypto.generateKeyPair() })
+      MemoryAccount({ keypair: generateKeyPair() })
     ],
     // Hook for sdk registration
     onConnection (aepp, action) {

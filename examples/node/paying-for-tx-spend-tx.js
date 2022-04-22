@@ -32,8 +32,8 @@
 
 // ## 1. Specify imports
 // You need to import `Universal`, `Node` and `MemoryAccount` [Stamps](https://stampit.js.org/essentials/what-is-a-stamp) from the SDK.
-// Additionally you import the `Crypto` utility module to generate a new keypair.
-const { Universal, Node, MemoryAccount, Crypto } = require('@aeternity/aepp-sdk')
+// Additionally you import the `generateKeyPair` utility function to generate a new keypair.
+const { Universal, Node, MemoryAccount, generateKeyPair } = require('@aeternity/aepp-sdk')
 
 // **Note**:
 //
@@ -46,7 +46,7 @@ const PAYER_ACCOUNT_KEYPAIR = {
   secretKey: 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b'
 }
 const NODE_URL = 'https://testnet.aeternity.io'
-const NEW_USER_KEYPAIR = Crypto.generateKeyPair()
+const NEW_USER_KEYPAIR = generateKeyPair()
 const AMOUNT = 1;
 
 // Note:

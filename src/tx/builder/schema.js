@@ -1,8 +1,7 @@
 /**
  * Transaction Schema for TxBuilder
  * @module @aeternity/aepp-sdk/es/tx/builder/schema
- * @export TxSchema
- * @example import { SCHEMA } from '@aeternity/aepp-sdk'
+ * @example import { TX_TYPE } from '@aeternity/aepp-sdk'
  */
 // # RLP version number
 // # https://github.com/aeternity/protocol/blob/master/serializations.md#binary-serialization

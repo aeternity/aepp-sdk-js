@@ -121,7 +121,7 @@ Note:
 In case there is an auction running for a name you want to claim you need to place a bid.
 
 ```js
-import { TxBuilderHelper } from '@aeternity/aepp-sdk'
+import { computeBidFee, computeAuctionEndBlock } from '@aeternity/aepp-sdk'
 
 const name = 'auctiontest1.chain'
 
@@ -131,11 +131,11 @@ const increment = 0.05 // 5%, the minimum required increment
 // startFee is OPTIONAL and defaults to minimum calculated fee for the name in general
 // startFee MUST be at least the nameFee of the last bid
 // increment is OPTIONAL and defaults to 0.05
-const nameFee = TxBuilderHelper.computeBidFee(name, startFee, increment)
+const nameFee = computeBidFee(name, startFee, increment)
 const bidTx = await aeSdk.aensBid(name, nameFee)
 
 console.log(bidTx)
-console.log(`BID PLACED AT ${bidTx.blockHeight} WILL END AT ${TxBuilderHelper.computeAuctionEndBlock(name, bidTx.blockHeight)}`)
+console.log(`BID PLACED AT ${bidTx.blockHeight} WILL END AT ${computeAuctionEndBlock(name, bidTx.blockHeight)}`)
 
 /*
 {

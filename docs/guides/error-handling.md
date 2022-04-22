@@ -117,15 +117,15 @@ const {
   Universal,
   Node,
   MemoryAccount,
-  Crypto,
+  generateKeyPair,
   InvalidTxParamsError,
   InvalidAensNameError
 } = require('@aeternity/aepp-sdk')
 
 // setup
 const NODE_URL = 'https://testnet.aeternity.io'
-const PAYER_ACCOUNT_KEYPAIR = Crypto.generateKeyPair()
-const NEW_USER_KEYPAIR = Crypto.generateKeyPair()
+const PAYER_ACCOUNT_KEYPAIR = generateKeyPair()
+const NEW_USER_KEYPAIR = generateKeyPair()
 
 const payerAccount = MemoryAccount({ keypair: PAYER_ACCOUNT_KEYPAIR })
 const newUserAccount = MemoryAccount({ keypair: NEW_USER_KEYPAIR })
