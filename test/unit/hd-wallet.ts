@@ -20,10 +20,10 @@ import {
   deriveChild, derivePathFromKey, derivePathFromSeed,
   generateSaveHDWalletFromSeed, getHdWalletAccountFromSeed, getKeyPair,
   getMasterKeyFromSeed,
-  getSaveHDWalletAccounts
+  getSaveHDWalletAccounts,
+  DerivationError
 } from '../../src/utils/hd-wallet'
 import { encode, decode } from '../../src/utils/encoder'
-import { InvalidDerivationPathError } from '../../src/utils/errors'
 
 describe('hd wallet', () => {
   const testMnemonicSeed = Buffer.from('Git7bFJkmfC1Ho+6YFSFuxSzmDZydmjzk8FubrPDz4PmrkORlBDlfnPTk02Wq9Pj2ZdQ5cTA0SxHKGrq3xSjOw==', 'base64')
@@ -178,6 +178,6 @@ describe('hd wallet', () => {
   })
 
   it('Derive child with invalid path', () => {
-    expect(() => derivePathFromSeed('asd', Buffer.from([]))).to.throw(InvalidDerivationPathError, 'Invalid path')
+    expect(() => derivePathFromSeed('asd', Buffer.from([]))).to.throw(DerivationError, 'Root element is required')
   })
 })
