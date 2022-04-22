@@ -21,7 +21,7 @@
     "test:unit": "nyc mocha './test/unit/'",
     "test:watch": "mocha './test/unit/' './test/integration/' --watch",
     "prepack": "npm run build",
-    "prepublishOnly": "npm run docs:examples",
+    "prepublishOnly": "test/examples.sh && npm run docs:examples",
     "release": "standard-version --skip.tag --infile docs/CHANGELOG.md"
   },
   "license": "ISC",
