@@ -1118,8 +1118,8 @@
 <p>Note:</p>
 <ul>
 <li>If your contract includes external dependencies which are not part of the <a href="https://aeternity.com/aesophia/latest/sophia_stdlib">standard library</a> you should initialize the contract using:
-  <div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">filesystem</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// key-value map with name of the include as key and source code of the include as value</span>
-<span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span> <span class="nx">source</span><span class="o">:</span> <span class="nx">CONTRACT_SOURCE</span><span class="p">,</span> <span class="nx">filesystem</span> <span class="p">})</span>
+  <div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">fileSystem</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// key-value map with name of the include as key and source code of the include as value</span>
+<span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span> <span class="nx">source</span><span class="o">:</span> <span class="nx">CONTRACT_SOURCE</span><span class="p">,</span> <span class="nx">fileSystem</span> <span class="p">})</span>
 </code></pre></div></li>
 </ul>
 <h3 id="by-aci-and-bytecode">By ACI and bytecode</h3>
@@ -1146,7 +1146,7 @@
 <li>To be used if a contract is already deployed.</li>
 </ul>
 </li>
-<li><code>filesystem</code> (default: {})<ul>
+<li><code>fileSystem</code> (default: {})<ul>
 <li>Key-value map with name of the include as key and source code of the include as value.</li>
 </ul>
 </li>
