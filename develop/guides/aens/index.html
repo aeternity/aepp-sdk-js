@@ -1136,7 +1136,7 @@ the same <code>salt</code> and it should be signed with the same private key as 
 </ul>
 <h3 id="bid-during-an-auction">Bid during an auction</h3>
 <p>In case there is an auction running for a name you want to claim you need to place a bid.</p>
-<div class="highlight"><pre><span></span><code><span class="k">import</span> <span class="p">{</span> <span class="nx">TxBuilderHelper</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
+<div class="highlight"><pre><span></span><code><span class="k">import</span> <span class="p">{</span> <span class="nx">computeBidFee</span><span class="p">,</span> <span class="nx">computeAuctionEndBlock</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
 
 <span class="kd">const</span> <span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;auctiontest1.chain&#39;</span>
 
@@ -1146,11 +1146,11 @@ the same <code>salt</code> and it should be signed with the same private key as 
 <span class="c1">// startFee is OPTIONAL and defaults to minimum calculated fee for the name in general</span>
 <span class="c1">// startFee MUST be at least the nameFee of the last bid</span>
 <span class="c1">// increment is OPTIONAL and defaults to 0.05</span>
-<span class="kd">const</span> <span class="nx">nameFee</span> <span class="o">=</span> <span class="nx">TxBuilderHelper</span><span class="p">.</span><span class="nx">computeBidFee</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">startFee</span><span class="p">,</span> <span class="nx">increment</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">nameFee</span> <span class="o">=</span> <span class="nx">computeBidFee</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">startFee</span><span class="p">,</span> <span class="nx">increment</span><span class="p">)</span>
 <span class="kd">const</span> <span class="nx">bidTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">aensBid</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">nameFee</span><span class="p">)</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">bidTx</span><span class="p">)</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`BID PLACED AT </span><span class="si">${</span><span class="nx">bidTx</span><span class="p">.</span><span class="nx">blockHeight</span><span class="si">}</span><span class="sb"> WILL END AT </span><span class="si">${</span><span class="nx">TxBuilderHelper</span><span class="p">.</span><span class="nx">computeAuctionEndBlock</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">bidTx</span><span class="p">.</span><span class="nx">blockHeight</span><span class="p">)</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`BID PLACED AT </span><span class="si">${</span><span class="nx">bidTx</span><span class="p">.</span><span class="nx">blockHeight</span><span class="si">}</span><span class="sb"> WILL END AT </span><span class="si">${</span><span class="nx">computeAuctionEndBlock</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">bidTx</span><span class="p">.</span><span class="nx">blockHeight</span><span class="p">)</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
 
 <span class="cm">/*</span>
 <span class="cm">{</span>

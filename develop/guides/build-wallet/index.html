@@ -929,15 +929,15 @@
 <h3 id="1-create-bridge-between-extension-and-page">1. Create bridge between extension and page</h3>
 <p>First you need to create a bridge between your extension and the page. This can be done as follows:</p>
 <div class="highlight"><pre><span></span><code><span class="k">import</span> <span class="p">{</span>
-  <span class="nx">BrowserRuntimeConnection</span><span class="p">,</span> <span class="nx">BrowserWindowMessageConnection</span><span class="p">,</span> <span class="nx">AeppWalletSchema</span><span class="p">,</span>
-  <span class="nx">ContentScriptBridge</span><span class="p">,</span> <span class="nx">AeppWalletHelpers</span>
+  <span class="nx">BrowserRuntimeConnection</span><span class="p">,</span> <span class="nx">BrowserWindowMessageConnection</span><span class="p">,</span> <span class="nx">MESSAGE_DIRECTION</span><span class="p">,</span>
+  <span class="nx">ContentScriptBridge</span><span class="p">,</span> <span class="nx">getBrowserAPI</span>
 <span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
 
 <span class="kd">const</span> <span class="nx">readyStateCheckInterval</span> <span class="o">=</span> <span class="nx">setInterval</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">readyState</span> <span class="o">===</span> <span class="s1">&#39;complete&#39;</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">clearInterval</span><span class="p">(</span><span class="nx">readyStateCheckInterval</span><span class="p">)</span>
 
-    <span class="kd">const</span> <span class="nx">port</span> <span class="o">=</span> <span class="nx">AeppWalletHelpers</span><span class="p">.</span><span class="nx">getBrowserAPI</span><span class="p">().</span><span class="nx">runtime</span><span class="p">.</span><span class="nx">connect</span><span class="p">()</span>
+    <span class="kd">const</span> <span class="nx">port</span> <span class="o">=</span> <span class="nx">getBrowserAPI</span><span class="p">().</span><span class="nx">runtime</span><span class="p">.</span><span class="nx">connect</span><span class="p">()</span>
     <span class="kd">const</span> <span class="nx">extConnection</span> <span class="o">=</span> <span class="nx">BrowserRuntimeConnection</span><span class="p">({</span>
       <span class="nx">connectionInfo</span><span class="o">:</span> <span class="p">{</span>
         <span class="nx">description</span><span class="o">:</span> <span class="s1">&#39;Content Script to Extension connection&#39;</span><span class="p">,</span>
@@ -951,8 +951,8 @@
         <span class="nx">origin</span><span class="o">:</span> <span class="nb">window</span><span class="p">.</span><span class="nx">origin</span>
       <span class="p">},</span>
       <span class="nx">origin</span><span class="o">:</span> <span class="nb">window</span><span class="p">.</span><span class="nx">origin</span><span class="p">,</span>
-      <span class="nx">sendDirection</span><span class="o">:</span> <span class="nx">AeppWalletSchema</span><span class="p">.</span><span class="nx">MESSAGE_DIRECTION</span><span class="p">.</span><span class="nx">to_aepp</span><span class="p">,</span>
-      <span class="nx">receiveDirection</span><span class="o">:</span> <span class="nx">AeppWalletSchema</span><span class="p">.</span><span class="nx">MESSAGE_DIRECTION</span><span class="p">.</span><span class="nx">to_waellet</span>
+      <span class="nx">sendDirection</span><span class="o">:</span> <span class="nx">MESSAGE_DIRECTION</span><span class="p">.</span><span class="nx">to_aepp</span><span class="p">,</span>
+      <span class="nx">receiveDirection</span><span class="o">:</span> <span class="nx">MESSAGE_DIRECTION</span><span class="p">.</span><span class="nx">to_waellet</span>
     <span class="p">})</span>
 
     <span class="kd">const</span> <span class="nx">bridge</span> <span class="o">=</span> <span class="nx">ContentScriptBridge</span><span class="p">({</span> <span class="nx">pageConnection</span><span class="p">,</span> <span class="nx">extConnection</span> <span class="p">})</span>
@@ -967,8 +967,8 @@ After the connection is established you can share the wallet details with the ap
 <span class="kd">const</span> <span class="nx">NODE_URL</span> <span class="o">=</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span>
 <span class="kd">const</span> <span class="nx">COMPILER_URL</span> <span class="o">=</span> <span class="s1">&#39;https://compiler.aepps.com&#39;</span>
 <span class="kd">const</span> <span class="nx">accounts</span> <span class="o">=</span> <span class="p">[</span>
-  <span class="nx">MemoryAccount</span><span class="p">({</span> <span class="nx">keypair</span><span class="o">:</span> <span class="nx">Crypto</span><span class="p">.</span><span class="nx">generateKeyPair</span><span class="p">()</span> <span class="p">}),</span> <span class="c1">// generate keypair for account1</span>
-  <span class="nx">MemoryAccount</span><span class="p">({</span> <span class="nx">keypair</span><span class="o">:</span> <span class="nx">Crypto</span><span class="p">.</span><span class="nx">generateKeyPair</span><span class="p">()</span> <span class="p">})</span>  <span class="c1">// generate keypair for account2</span>
+  <span class="nx">MemoryAccount</span><span class="p">({</span> <span class="nx">keypair</span><span class="o">:</span> <span class="nx">generateKeyPair</span><span class="p">()</span> <span class="p">}),</span> <span class="c1">// generate keypair for account1</span>
+  <span class="nx">MemoryAccount</span><span class="p">({</span> <span class="nx">keypair</span><span class="o">:</span> <span class="nx">generateKeyPair</span><span class="p">()</span> <span class="p">})</span>  <span class="c1">// generate keypair for account2</span>
 <span class="p">]</span>
 
 <span class="k">async</span> <span class="kd">function</span> <span class="nx">init</span> <span class="p">()</span> <span class="p">{</span>
@@ -1041,8 +1041,8 @@ After the connection is established you can share the wallet details with the ap
 <span class="kd">const</span> <span class="nx">NODE_URL</span> <span class="o">=</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span>
 <span class="kd">const</span> <span class="nx">COMPILER_URL</span> <span class="o">=</span> <span class="s1">&#39;https://compiler.aepps.com&#39;</span>
 <span class="kd">const</span> <span class="nx">accounts</span> <span class="o">=</span> <span class="p">[</span>
-  <span class="nx">MemoryAccount</span><span class="p">({</span> <span class="nx">keypair</span><span class="o">:</span> <span class="nx">Crypto</span><span class="p">.</span><span class="nx">generateKeyPair</span><span class="p">()</span> <span class="p">}),</span> <span class="c1">// generate keypair for account1</span>
-  <span class="nx">MemoryAccount</span><span class="p">({</span> <span class="nx">keypair</span><span class="o">:</span> <span class="nx">Crypto</span><span class="p">.</span><span class="nx">generateKeyPair</span><span class="p">()</span> <span class="p">})</span>  <span class="c1">// generate keypair for account2</span>
+  <span class="nx">MemoryAccount</span><span class="p">({</span> <span class="nx">keypair</span><span class="o">:</span> <span class="nx">generateKeyPair</span><span class="p">()</span> <span class="p">}),</span> <span class="c1">// generate keypair for account1</span>
+  <span class="nx">MemoryAccount</span><span class="p">({</span> <span class="nx">keypair</span><span class="o">:</span> <span class="nx">generateKeyPair</span><span class="p">()</span> <span class="p">})</span>  <span class="c1">// generate keypair for account2</span>
 <span class="p">]</span>
 
 <span class="k">async</span> <span class="kd">function</span> <span class="nx">init</span> <span class="p">()</span> <span class="p">{</span>

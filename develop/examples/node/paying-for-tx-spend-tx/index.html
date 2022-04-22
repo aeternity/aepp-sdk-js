@@ -1004,8 +1004,8 @@ and this page explains in detail how to:</p>
 </ul>
 <h2 id="1-specify-imports">1. Specify imports</h2>
 <p>You need to import <code>Universal</code>, <code>Node</code> and <code>MemoryAccount</code> <a href="https://stampit.js.org/essentials/what-is-a-stamp">Stamps</a> from the SDK.
-Additionally you import the <code>Crypto</code> utility module to generate a new keypair.
-<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="p">{</span> <span class="nx">Universal</span><span class="p">,</span> <span class="nx">Node</span><span class="p">,</span> <span class="nx">MemoryAccount</span><span class="p">,</span> <span class="nx">Crypto</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">)</span>
+Additionally you import the <code>generateKeyPair</code> utility function to generate a new keypair.
+<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="p">{</span> <span class="nx">Universal</span><span class="p">,</span> <span class="nx">Node</span><span class="p">,</span> <span class="nx">MemoryAccount</span><span class="p">,</span> <span class="nx">generateKeyPair</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">)</span>
 </code></pre></div>
 <strong>Note</strong>:</p>
 <ul>
@@ -1018,7 +1018,7 @@ Additionally you import the <code>Crypto</code> utility module to generate a new
   <span class="nx">secretKey</span><span class="o">:</span> <span class="s1">&#39;bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b&#39;</span>
 <span class="p">}</span>
 <span class="kd">const</span> <span class="nx">NODE_URL</span> <span class="o">=</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span>
-<span class="kd">const</span> <span class="nx">NEW_USER_KEYPAIR</span> <span class="o">=</span> <span class="nx">Crypto</span><span class="p">.</span><span class="nx">generateKeyPair</span><span class="p">()</span>
+<span class="kd">const</span> <span class="nx">NEW_USER_KEYPAIR</span> <span class="o">=</span> <span class="nx">generateKeyPair</span><span class="p">()</span>
 <span class="kd">const</span> <span class="nx">AMOUNT</span> <span class="o">=</span> <span class="mf">1</span><span class="p">;</span>
 </code></pre></div>
 Note:</p>
