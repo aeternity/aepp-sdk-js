@@ -43,7 +43,7 @@ import {
   MissingEventDefinitionError,
   AmbiguousEventDefinitionError
 } from '../utils/errors'
-import { hash } from '../utils/crypto-ts'
+import { hash } from '../utils/crypto'
 
 /**
  * Generate contract ACI object with predefined js methods for contract usage - can be used for

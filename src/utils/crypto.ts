@@ -21,15 +21,14 @@
  * @example import { getAddressFromPriv } from '@aeternity/aepp-sdk'
  */
 
-import nacl from 'tweetnacl'
+import nacl, { SignKeyPair } from 'tweetnacl'
 import aesjs from 'aes-js'
+import { blake2b, Data } from 'blakejs'
 
 import { str2buf } from './bytes'
 import { encode, decode, sha256hash } from './encoder'
-import { hash } from './crypto-ts'
 import { NotImplementedError } from './errors'
 
-export * from './crypto-ts'
 export { sha256hash }
 
 const Ecb = aesjs.ModeOfOperation.ecb
@@ -37,11 +36,12 @@ const Ecb = aesjs.ModeOfOperation.ecb
 /**
  * Generate address from secret key
  * @rtype (secret: String) => tx: Promise[String]
- * @param {String} secret - Private key
+ * @param {String | Buffer} secret - Private key
  * @return {String} Public key
  */
-export function getAddressFromPriv (secret) {
-  const keys = nacl.sign.keyPair.fromSecretKey(str2buf(secret))
+export function getAddressFromPriv (secret: string | Buffer): string {
+  const secretBuffer = Buffer.isBuffer(secret) ? secret : str2buf(secret)
+  const keys = nacl.sign.keyPair.fromSecretKey(secretBuffer)
   const publicBuffer = Buffer.from(keys.publicKey)
   return encode(publicBuffer, 'ak')
 }
@@ -53,7 +53,7 @@ export function getAddressFromPriv (secret) {
  * @param {String} prefix Transaction prefix. Default: 'ak'
  * @return {Boolean} valid
  */
-export function isAddressValid (address, prefix = 'ak') {
+export function isAddressValid (address: string, prefix = 'ak'): boolean {
   try {
     decode(address, prefix)
     return true
@@ -67,7 +67,7 @@ export function isAddressValid (address, prefix = 'ak') {
  * @rtype () => salt: Number
  * @return {Number} random salt
  */
-export function salt () {
+export function salt (): number {
   return Math.floor(Math.random() * Math.floor(Number.MAX_SAFE_INTEGER))
 }
 
@@ -78,10 +78,20 @@ export function salt () {
  * @param {Number} value - Value to encode
  * @return {Buffer} - Encoded data
  */
-export function encodeUnsigned (value) {
+export function encodeUnsigned (value: number): Buffer {
   const binary = Buffer.allocUnsafe(4)
   binary.writeUInt32BE(value)
   return binary.slice(binary.findIndex(i => i !== 0))
+}
+
+/**
+ * Calculate 256bits Blake2b hash of `input`
+ * @rtype (input: String) => hash: String
+ * @param {Data} input - Data to hash
+ * @return {Buffer} Hash
+ */
+export function hash (input: Data): Buffer {
+  return Buffer.from(blake2b(input, undefined, 32)) // 256 bits
 }
 
 // Todo Duplicated in tx builder. remove
@@ -92,7 +102,7 @@ export function encodeUnsigned (value) {
  * @param {Number} nonce - Round when contract was created
  * @return {String} - Contract address
  */
-export function encodeContractAddress (owner, nonce) {
+export function encodeContractAddress (owner: string, nonce: number): string {
   const publicKey = decode(owner, 'ak')
   const binary = Buffer.concat([publicKey, encodeUnsigned(nonce)])
   return encode(hash(binary), 'ct')
@@ -106,7 +116,7 @@ export function encodeContractAddress (owner, nonce) {
  * @param {Uint8Array} secret - secret key
  * @return {Object} - Object with Private(privateKey) and Public(publicKey) keys
  */
-export function generateKeyPairFromSecret (secret) {
+export function generateKeyPairFromSecret (secret: Uint8Array): SignKeyPair {
   return nacl.sign.keyPair.fromSecretKey(secret)
 }
 
@@ -116,7 +126,10 @@ export function generateKeyPairFromSecret (secret) {
  * @param {Boolean} raw - Whether to return raw (binary) keys
  * @return {Object} Key pair
  */
-export function generateKeyPair (raw = false) {
+export function generateKeyPair (raw = false): {
+  publicKey: string | Buffer
+  secretKey: string | Buffer
+} {
   // <node>/apps/aens/test/aens_test_utils.erl
   const keyPair = nacl.sign.keyPair()
 
@@ -140,10 +153,10 @@ export function generateKeyPair (raw = false) {
  * Encrypt given data using `password`
  * @rtype (password: String, binaryData: Buffer) => Uint8Array
  * @param {String} password - Password to encrypt with
- * @param {Buffer} binaryData - Data to encrypt
+ * @param {Uint8Array} binaryData - Data to encrypt
  * @return {Uint8Array} Encrypted data
  */
-export function encryptKey (password, binaryData) {
+export function encryptKey (password: string, binaryData: Uint8Array): Uint8Array {
   const hashedPasswordBytes = sha256hash(password)
   const aesEcb = new Ecb(hashedPasswordBytes)
   return aesEcb.encrypt(binaryData)
@@ -153,10 +166,10 @@ export function encryptKey (password, binaryData) {
  * Decrypt given data using `password`
  * @rtype (password: String, encrypted: String) => Uint8Array
  * @param {String} password - Password to decrypt with
- * @param {String} encrypted - Data to decrypt
+ * @param {Uint8Array} encrypted - Data to decrypt
  * @return {Buffer} Decrypted data
  */
-export function decryptKey (password, encrypted) {
+export function decryptKey (password: string, encrypted: Uint8Array): Buffer {
   const encryptedBytes = Buffer.from(encrypted)
   const hashedPasswordBytes = sha256hash(password)
   const aesEcb = new Ecb(hashedPasswordBytes)
@@ -167,39 +180,42 @@ export function decryptKey (password, encrypted) {
 
 /**
  * Generate signature
- * @rtype (data: String|Buffer, privateKey: Buffer) => Buffer
- * @param {String|Buffer} data - Data to sign
- * @param {String|Buffer} privateKey - Key to sign with
- * @return {Buffer|Uint8Array} Signature
+ * @rtype (data: String | Buffer, privateKey: Buffer) => Buffer
+ * @param {String | Buffer} data - Data to sign
+ * @param {String | Buffer} privateKey - Key to sign with
+ * @return {Uint8Array} Signature
  */
-export function sign (data, privateKey) {
+export function sign (data: string | Buffer, privateKey: string | Buffer): Uint8Array {
   return nacl.sign.detached(Buffer.from(data), Buffer.from(privateKey))
 }
 
 /**
  * Verify that signature was signed by public key
- * @rtype (str: String, signature: Buffer, publicKey: Buffer) => Boolean
- * @param {String|Buffer} str - Data to verify
- * @param {Buffer} signature - Signature to verify
- * @param {Buffer} publicKey - Key to verify against
+ * @rtype (data: Buffer, signature: Buffer, publicKey: Buffer) => Boolean
+ * @param {Buffer} data - Data to verify
+ * @param {Buffer | Uint8Array} signature - Signature to verify
+ * @param {string | Buffer} publicKey - Key to verify against
  * @return {Boolean} Valid?
  */
-export function verify (str, signature, publicKey) {
-  return nacl.sign.detached.verify(new Uint8Array(str), signature, publicKey)
+export function verify (
+  data: Buffer, signature: Buffer | Uint8Array, publicKey: string | Buffer): boolean {
+  const publicKeyBuffer = Buffer.isBuffer(publicKey) ? publicKey : str2buf(publicKey)
+  return nacl.sign.detached.verify(new Uint8Array(data), signature, publicKeyBuffer)
 }
 
-export function messageToHash (message) {
+export function messageToHash (message: string): Buffer {
   const p = Buffer.from('aeternity Signed Message:\n', 'utf8')
   const msg = Buffer.from(message, 'utf8')
   if (msg.length >= 0xFD) throw new NotImplementedError('Message too long')
   return hash(Buffer.concat([Buffer.from([p.length]), p, Buffer.from([msg.length]), msg]))
 }
 
-export function signMessage (message, privateKey) {
+export function signMessage (message: string, privateKey: string | Buffer): Uint8Array {
   return sign(messageToHash(message), privateKey)
 }
 
-export function verifyMessage (str, signature, publicKey) {
+export function verifyMessage (
+  str: string, signature: Buffer, publicKey: string | Buffer): boolean {
   return verify(messageToHash(str), signature, publicKey)
 }
 
@@ -208,11 +224,11 @@ export function verifyMessage (str, signature, publicKey) {
  *
  * Sign a message, and then verifying that signature
  * @rtype (privateKey: Buffer, publicKey: Buffer) => Boolean
- * @param {Buffer} privateKey - Private key to verify
- * @param {Buffer} publicKey - Public key to verify
+ * @param {String | Buffer} privateKey - Private key to verify
+ * @param {String | Buffer} publicKey - Public key to verify
  * @return {Boolean} Valid?
  */
-export function isValidKeypair (privateKey, publicKey) {
+export function isValidKeypair (privateKey: string | Buffer, publicKey: string | Buffer): boolean {
   const message = Buffer.from('TheMessage')
   const signature = sign(message, privateKey)
   return verify(message, signature, publicKey)

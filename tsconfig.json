@@ -6,6 +6,7 @@
     }
   },
   "compilerOptions": {
+    "esModuleInterop": true,
     "emitDeclarationOnly": true,
     "isolatedModules": true,
     "outDir": "./es",

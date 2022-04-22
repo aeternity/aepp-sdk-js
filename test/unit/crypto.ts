@@ -15,7 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import '../'
+import '..'
 import { describe, it } from 'mocha'
 import { assert, expect } from 'chai'
 import * as Crypto from '../../src/utils/crypto'
