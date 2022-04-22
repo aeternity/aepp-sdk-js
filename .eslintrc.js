@@ -17,7 +17,8 @@ const equivalents = [
   'no-useless-constructor',
   'quotes',
   'semi',
-  'space-before-function-paren'
+  'space-before-function-paren',
+  'space-infix-ops'
 ]
 
 const ruleFromStandard = (name) => {
