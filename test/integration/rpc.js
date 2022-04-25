@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2021 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -24,7 +24,7 @@ import BrowserWindowMessageConnection from '../../src/utils/aepp-wallet-communic
 import { getBrowserAPI, getHandler } from '../../src/utils/aepp-wallet-communication/helpers'
 import { METHODS, RPC_STATUS } from '../../src/utils/aepp-wallet-communication/schema'
 import { generateKeyPair, verify, hash } from '../../src/utils/crypto'
-import { compilerUrl, account, internalUrl, networkId, url, ignoreVersion, spendPromise } from './'
+import { compilerUrl, account, networkId, url, ignoreVersion, spendPromise } from './'
 import {
   NoBrowserFoundError,
   NoWalletConnectedError,
@@ -42,7 +42,7 @@ describe('Aepp<->Wallet', function () {
   let connectionFromAeppToWallet
 
   before(async function () {
-    node = await Node({ url, internalUrl, ignoreVersion })
+    node = await Node({ url, ignoreVersion })
     connections = getConnections()
     connectionFromWalletToAepp = BrowserWindowMessageConnection({
       connectionInfo: { id: 'from_wallet_to_aepp' },

@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2021 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -48,7 +48,6 @@ export function getNetworkId ({ networkId, force = false } = {}) {
  * @rtype Stamp
  * @param {Object} [options={}] - Options
  * @param {String} options.url - Base URL for Node
- * @param {String} options.internalUrl - Base URL for internal requests
  * @param {Object} options.axiosConfig - Object with axios configuration
  * @param {Object} options.axiosConfig.config
  * @param {Function} options.axiosConfig.errorHandler - (err) => throw err
@@ -56,12 +55,10 @@ export function getNetworkId ({ networkId, force = false } = {}) {
  * @example Node({url: 'https://testnet.aeternity.io'})
  */
 const Node = AsyncInit.compose({
-  async init ({ url, internalUrl, ignoreVersion }) {
+  async init ({ url, ignoreVersion }) {
     if (!url) throw new MissingParamError('"url" required')
     this.url = url.replace(/\/$/, '')
-    this.internalUrl = internalUrl?.replace(/\/$/, '')
     const client = await genSwaggerClient(`${this.url}/api?oas3`, {
-      internalUrl: this.internalUrl,
       responseInterceptor: response => {
         if (response.ok) return
         return Object.assign(response, {
@@ -96,7 +93,6 @@ const Node = AsyncInit.compose({
     getNodeInfo () {
       return {
         url: this.url,
-        internalUrl: this.internalUrl,
         nodeNetworkId: this.nodeNetworkId,
         version: this.version,
         consensusProtocolVersion: this.consensusProtocolVersion

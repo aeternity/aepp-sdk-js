@@ -53,7 +53,7 @@ export default stampit({
      * @return {void}
      * @example
      * // add and select new node with name 'testNode'
-     * nodePool.addNode('testNode', awaitNode({ url, internalUrl }), true)
+     * nodePool.addNode('testNode', awaitNode({ url }), true)
      */
     addNode (name, node, select = false) {
       if (this.pool.has(name)) throw new DuplicateNodeError(name)
@@ -64,7 +64,6 @@ export default stampit({
         name,
         instance: node,
         url: node.url,
-        internalUrl: node.internalUrl,
         networkId: node.nodeNetworkId,
         version: node.version,
         consensusProtocolVersion: node.consensusProtocolVersion
