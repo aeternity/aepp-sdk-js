@@ -31,6 +31,11 @@ export const createSalt = salt
 
 export { encode, decode }
 
+interface Pointer {
+  key: string
+  id: string
+}
+
 /**
  * Build a contract public key
  * @function
@@ -39,7 +44,7 @@ export { encode, decode }
  * @param {number} nonce the nonce of the transaction
  * @return {string} Contract public key
  */
-export function buildContractId (ownerId, nonce) {
+export function buildContractId (ownerId: string, nonce: number): string {
   const ownerIdAndNonce = Buffer.from([...decode(ownerId, 'ak'), ...toBytes(nonce)])
   const b2bHash = hash(ownerIdAndNonce)
   return encode(b2bHash, 'ct')
@@ -52,10 +57,10 @@ export function buildContractId (ownerId, nonce) {
  * @param {String} senderId The public key of the sender account
  * @param {Number} nonce the nonce of the transaction
  * @param {Number} oracleId The oracle public key
- * @return {string} Contract public key
+ * @return {String} Contract public key
  */
-export function oracleQueryId (senderId, nonce, oracleId) {
-  function _int32 (val) {
+export function oracleQueryId (senderId: string, nonce: number, oracleId: string): string {
+  function _int32 (val: number): Buffer {
     const nonceBE = toBytes(val, true)
     return Buffer.concat([Buffer.alloc(32 - nonceBE.length), nonceBE])
   }
@@ -68,10 +73,10 @@ export function oracleQueryId (senderId, nonce, oracleId) {
  * Format the salt into a 64-byte hex string
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {number} salt
- * @return {string} Zero-padded hex string of salt
+ * @param {Number} salt
+ * @return {Buffer} Zero-padded hex string of salt
  */
-export function formatSalt (salt) {
+export function formatSalt (salt: number): Buffer {
   return Buffer.from(salt.toString(16).padStart(64, '0'), 'hex')
 }
 
@@ -82,7 +87,7 @@ export function formatSalt (salt) {
  * @param {String} name Name to encode
  * @return {String} `nm_` prefixed encoded AENS name
  */
-export function produceNameId (name) {
+export function produceNameId (name: string): string {
   ensureNameValid(name)
   return encode(hash(name.toLowerCase()), 'nm')
 }
@@ -99,7 +104,7 @@ export function produceNameId (name) {
  * @param {Number} salt Random salt
  * @return {String} Commitment hash
  */
-export function commitmentHash (name, salt = createSalt()) {
+export function commitmentHash (name: string, salt: number = createSalt()): string {
   ensureNameValid(name)
   return encode(hash(Buffer.concat([Buffer.from(name.toLowerCase()), formatSalt(salt)])), 'cm')
 }
@@ -108,14 +113,14 @@ export function commitmentHash (name, salt = createSalt()) {
  * Utility function to create and _id type
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {string} hashId Encoded hash
+ * @param {String} hashId Encoded hash
  * @return {Buffer} Buffer Buffer with ID tag and decoded HASh
  */
-export function writeId (hashId) {
+export function writeId (hashId: string): Buffer {
   if (typeof hashId !== 'string') throw new ArgumentError('hashId', 'a string', hashId)
   const prefix = hashId.slice(0, 2)
   const idTag = PREFIX_ID_TAG[prefix]
-  if (!idTag) throw new TagNotFoundError(prefix)
+  if (Number.isNaN(idTag)) throw new TagNotFoundError(prefix)
   return Buffer.from([...toBytes(idTag), ...decode(hashId, prefix)])
 }
 
@@ -126,10 +131,10 @@ export function writeId (hashId) {
  * @param {Buffer} buf Data
  * @return {String} Encoided hash string with prefix
  */
-export function readId (buf) {
+export function readId (buf: Buffer): string {
   const tag = Buffer.from(buf).readUIntBE(0, 1)
   const prefix = ID_TAG_PREFIX[tag]
-  if (!prefix) throw new PrefixNotFoundError(tag)
+  if (prefix === undefined) throw new PrefixNotFoundError(tag)
   return encode(buf.slice(1, buf.length), prefix)
 }
 
@@ -140,7 +145,7 @@ export function readId (buf) {
  * @param {Number|String|BigNumber} val Value
  * @return {Buffer} Buffer Buffer from number(BigEndian)
  */
-export function writeInt (val) {
+export function writeInt (val: number | string | BigNumber): Buffer {
   return toBytes(val, true)
 }
 
@@ -151,7 +156,7 @@ export function writeInt (val) {
  * @param {Buffer} buf Value
  * @return {String} Buffer Buffer from number(BigEndian)
  */
-export function readInt (buf = Buffer.from([])) {
+export function readInt (buf: Buffer = Buffer.from([])): string {
   return new BigNumber(Buffer.from(buf).toString('hex'), 16).toString(10)
 }
 
@@ -163,7 +168,7 @@ export function readInt (buf = Buffer.from([])) {
  * ([ { key: 'account_pubkey', id: 'ak_32klj5j23k23j5423l434l2j3423'} ])
  * @return {Array} Serialized pointers array
  */
-export function buildPointers (pointers) {
+export function buildPointers (pointers: Pointer[]): Buffer[][] {
   return pointers.map(
     p => [
       toBytes(p.key),
@@ -180,7 +185,7 @@ export function buildPointers (pointers) {
  * ([ { key: 'account_pubkey', id: 'ak_32klj5j23k23j5423l434l2j3423'} ])
  * @return {Array} Deserialize pointer array
  */
-export function readPointers (pointers) {
+export function readPointers (pointers: Array<[key: string, id: Buffer]>): Pointer[] {
   return pointers.map(
     ([key, id]) => Object.assign({
       key: key.toString(),
@@ -195,12 +200,12 @@ const AENS_SUFFIX = '.chain'
  * Ensure that AENS name is valid
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {string} name
+ * @param {String} name
  * @return void
  * @throws Error
  */
-export function ensureNameValid (name) {
-  if (!name || typeof name !== 'string') throw new InvalidNameError('Name must be a string')
+export function ensureNameValid (name: string): void {
+  if ((name.length === 0) || typeof name !== 'string') throw new InvalidNameError('Name must be a string')
   if (!name.endsWith(AENS_SUFFIX)) throw new InvalidNameError(`Name should end with ${AENS_SUFFIX}: ${name}`)
 }
 
@@ -208,10 +213,10 @@ export function ensureNameValid (name) {
  * Is AENS name valid
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {string} name
+ * @param {String} name
  * @return Boolean
  */
-export function isNameValid (name) {
+export function isNameValid (name: string): boolean {
   try {
     ensureNameValid(name)
     return true
@@ -225,11 +230,14 @@ export function isNameValid (name) {
  * @returns {String} default AENS pointer key
  * @throws exception when default key not defined
  */
-export function getDefaultPointerKey (identifier) {
+export function getDefaultPointerKey (identifier: string): string {
   decode(identifier)
-  const prefix = identifier.substr(0, 2)
-  return POINTER_KEY_BY_PREFIX[prefix] ||
-    (() => { throw new NoDefaultAensPointerError(prefix) })()
+  const prefix = identifier.substring(0, 2)
+  const pointerKey = POINTER_KEY_BY_PREFIX[prefix]
+  if (pointerKey === undefined) {
+    throw new NoDefaultAensPointerError(prefix)
+  }
+  return POINTER_KEY_BY_PREFIX[prefix]
 }
 
 /**
@@ -237,9 +245,9 @@ export function getDefaultPointerKey (identifier) {
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param {String} name the AENS name to get the fee for
- * @return {String} the minimum fee for the AENS name auction
+ * @return {BigNumber} the minimum fee for the AENS name auction
  */
-export function getMinimumNameFee (name) {
+export function getMinimumNameFee (name: string): BigNumber {
   ensureNameValid(name)
   const nameLength = name.length - AENS_SUFFIX.length
   return NAME_BID_RANGES[Math.min(nameLength, NAME_MAX_LENGTH_FEE)]
@@ -250,15 +258,19 @@ export function getMinimumNameFee (name) {
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param {String} name the AENS name to get the fee for
- * @param {Number|String} startFee Auction start fee
+ * @param {Number} startFee Auction start fee
  * @param {Number} [increment=0.5] Bid multiplier(In percentage, must be between 0 and 1)
- * @return {String} Bid fee
+ * @return {Number} Bid fee
  */
-export function computeBidFee (name, startFee, increment = NAME_FEE_BID_INCREMENT) {
+export function computeBidFee (
+  name: string,
+  startFee: number,
+  increment: number = NAME_FEE_BID_INCREMENT): BigNumber {
   if (!(Number(increment) === increment && increment % 1 !== 0)) throw new IllegalBidFeeError(`Increment must be float. Current increment ${increment}`)
   if (increment < NAME_FEE_BID_INCREMENT) throw new IllegalBidFeeError(`minimum increment percentage is ${NAME_FEE_BID_INCREMENT}`)
   return ceil(
-    BigNumber(startFee ?? getMinimumNameFee(name)).times(BigNumber(NAME_FEE_BID_INCREMENT).plus(1))
+    new BigNumber(
+      startFee ?? getMinimumNameFee(name)).times(new BigNumber(NAME_FEE_BID_INCREMENT).plus(1))
   )
 }
 
@@ -270,7 +282,7 @@ export function computeBidFee (name, startFee, increment = NAME_FEE_BID_INCREMEN
  * @param {Number|String} claimHeight Auction starting height
  * @return {String} Auction end height
  */
-export function computeAuctionEndBlock (name, claimHeight) {
+export function computeAuctionEndBlock (name: string, claimHeight: number): string {
   ensureNameValid(name)
   const length = name.length - AENS_SUFFIX.length
   const h = (length <= 4 && NAME_BID_TIMEOUTS[4]) ||
@@ -287,7 +299,7 @@ export function computeAuctionEndBlock (name, claimHeight) {
  * @param {String} name
  * @return {Boolean}
  */
-export function isAuctionName (name) {
+export function isAuctionName (name: string): boolean {
   ensureNameValid(name)
   return name.length < 13 + AENS_SUFFIX.length
 }

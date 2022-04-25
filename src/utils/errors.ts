@@ -563,7 +563,7 @@ export class PrefixMismatchError extends TransactionError {
 }
 
 export class PrefixNotFoundError extends TransactionError {
-  constructor (tag: string) {
+  constructor (tag: string | number) {
     super(`Prefix for id-tag ${tag} not found.`)
     this.name = 'PrefixNotFoundError'
   }
