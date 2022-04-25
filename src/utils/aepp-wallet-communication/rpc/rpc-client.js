@@ -31,10 +31,10 @@ import {
  * @return {Object}
  */
 export default stampit({
-  init ({ id, name, networkId, icons, connection, handlers: [onMessage, onDisconnect] }) {
+  init ({ id, name, icons, connection, handlers: [onMessage, onDisconnect] }) {
     this.id = id
     this.connection = connection
-    this.info = { name, networkId, icons }
+    this.info = { name, icons }
     // {
     //    [msg.id]: { resolve, reject }
     // }

@@ -40,8 +40,7 @@ export default AccountBase.compose({
         ...options,
         onAccount: this._address,
         tx,
-        returnSigned: true,
-        networkId: this.getNetworkId(options)
+        returnSigned: true
       })
     },
     /**
