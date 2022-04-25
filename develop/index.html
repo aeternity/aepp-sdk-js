@@ -1000,17 +1000,17 @@
 <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
   <span class="cm">&lt;!-- include latest SDK version --&gt;</span>
   <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://unpkg.com/@aeternity/aepp-sdk/dist/aepp-sdk.browser-script.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">script</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text/javascript&quot;</span><span class="p">&gt;</span>
-    <span class="nx">Ae</span><span class="p">.</span><span class="nx">Node</span><span class="p">({</span> <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span> <span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="nx">node</span> <span class="p">=&gt;</span> <span class="p">{</span>
-        <span class="nx">Ae</span><span class="p">.</span><span class="nx">Universal</span><span class="p">({</span>
-              <span class="nx">nodes</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;testnet&#39;</span><span class="p">,</span> <span class="nx">instance</span><span class="o">:</span> <span class="nx">node</span> <span class="p">}]</span>
-            <span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="nx">aeInstance</span> <span class="p">=&gt;</span> <span class="p">{</span>
-              <span class="nx">aeInstance</span><span class="p">.</span><span class="nx">height</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span><span class="nx">height</span> <span class="p">=&gt;</span> <span class="p">{</span>
-                <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;Current Block Height:&quot;</span> <span class="o">+</span> <span class="nx">height</span><span class="p">)</span>
-              <span class="p">})</span>
-            <span class="p">})</span>
-    <span class="p">})</span>
-  <span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">script</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text/javascript&quot;</span><span class="p">&gt;</span><span class="w"></span>
+<span class="w">    </span><span class="nx">Ae</span><span class="p">.</span><span class="nx">Node</span><span class="p">({</span><span class="w"> </span><span class="nx">url</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="w"> </span><span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="nx">node</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nx">Ae</span><span class="p">.</span><span class="nx">Universal</span><span class="p">({</span><span class="w"></span>
+<span class="w">              </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}]</span><span class="w"></span>
+<span class="w">            </span><span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="nx">aeInstance</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">              </span><span class="nx">aeInstance</span><span class="p">.</span><span class="nx">height</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span><span class="nx">height</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;Current Block Height:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">height</span><span class="p">)</span><span class="w"></span>
+<span class="w">              </span><span class="p">})</span><span class="w"></span>
+<span class="w">            </span><span class="p">})</span><span class="w"></span>
+<span class="w">    </span><span class="p">})</span><span class="w"></span>
+<span class="w">  </span><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
 </code></pre></div>

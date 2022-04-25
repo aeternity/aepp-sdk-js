@@ -877,9 +877,9 @@ On this page you will learn how to access and decode the event log of a specific
 <h2 id="decode-events-using-aci">Decode events using ACI</h2>
 <p>When initializing a contract instance using the source code and providing the <a href="https://aeternity.com/aesophia/latest/aeso_aci/">ACI</a>
 or obtaining it via http compiler (default) you will be able to access the <code>emitEvents</code> entrypoint of the Sophia contract above as follows:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// events emitted by contract calls are automatically decoded</span>
-<span class="kd">const</span> <span class="nx">tx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">emitEvents</span><span class="p">(</span><span class="mf">1337</span><span class="p">,</span> <span class="s2">&quot;this message is not indexed&quot;</span><span class="p">)</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">tx</span><span class="p">.</span><span class="nx">decodedEvents</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="c1">// events emitted by contract calls are automatically decoded</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">emitEvents</span><span class="p">(</span><span class="mf">1337</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;this message is not indexed&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">tx</span><span class="p">.</span><span class="nx">decodedEvents</span><span class="p">)</span><span class="w"></span>
 
 <span class="cm">/*</span>
 <span class="cm">[</span>
@@ -903,20 +903,20 @@ or obtaining it via http compiler (default) you will be able to access the <code
 <span class="cm">    }</span>
 <span class="cm">  }</span>
 <span class="cm">]</span>
-<span class="cm">*/</span>
+<span class="cm">*/</span><span class="w"></span>
 </code></pre></div>
 <p>Note:</p>
 <ul>
 <li>As you can see the event log will be automatically decoded in case you perform a <code>ContractCallTx</code> directly</li>
 </ul>
 <p>Of course it is also possible to decode the event log if you request the transaction details from the node for a transaction that has been mined already. You can request the transaction details by providing the tx-hash and then decode the event log using the <code>contractInstance</code> as follows:
-<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">txHash</span> <span class="o">=</span> <span class="s1">&#39;th_2YV3AmAz2kXdTnQxXtR2uxQi3KuLS9wfvXyqKkQQ2Y6dE6RnET&#39;</span><span class="p">;</span>
-<span class="c1">// aeSdk is an instance of the Universal Stamp</span>
-<span class="kd">const</span> <span class="nx">txInfo</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">api</span><span class="p">.</span><span class="nx">getTransactionInfoByHash</span><span class="p">(</span><span class="nx">txHash</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">txHash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;th_2YV3AmAz2kXdTnQxXtR2uxQi3KuLS9wfvXyqKkQQ2Y6dE6RnET&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="c1">// aeSdk is an instance of the Universal Stamp</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">txInfo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">api</span><span class="p">.</span><span class="nx">getTransactionInfoByHash</span><span class="p">(</span><span class="nx">txHash</span><span class="p">)</span><span class="w"></span>
 
-<span class="c1">// decode events using contract instance</span>
-<span class="kd">const</span> <span class="nx">decodedUsingInstance</span> <span class="o">=</span> <span class="nx">contractInstance</span><span class="p">.</span><span class="nx">decodeEvents</span><span class="p">(</span><span class="nx">txInfo</span><span class="p">.</span><span class="nx">callInfo</span><span class="p">.</span><span class="nx">log</span><span class="p">)</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">decodedUsingInstance</span><span class="p">)</span>
+<span class="c1">// decode events using contract instance</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">decodedUsingInstance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">contractInstance</span><span class="p">.</span><span class="nx">decodeEvents</span><span class="p">(</span><span class="nx">txInfo</span><span class="p">.</span><span class="nx">callInfo</span><span class="p">.</span><span class="nx">log</span><span class="p">)</span><span class="w"></span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">decodedUsingInstance</span><span class="p">)</span><span class="w"></span>
 
 <span class="cm">/*</span>
 <span class="cm">[</span>
@@ -940,7 +940,7 @@ or obtaining it via http compiler (default) you will be able to access the <code
 <span class="cm">    }</span>
 <span class="cm">  }</span>
 <span class="cm">]</span>
-<span class="cm">*/</span>
+<span class="cm">*/</span><span class="w"></span>
 </code></pre></div></p>
                 
               

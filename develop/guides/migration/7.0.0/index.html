@@ -1012,43 +1012,43 @@
 <h2 id="step-1">Step 1</h2>
 <p>SDK will not accept <code>url</code>, <code>internalUrl</code> init arguments anymore:</p>
 <h4 id="before">Before</h4>
-<div class="highlight"><pre><span></span><code><span class="nx">Universal</span><span class="p">({</span>
-    <span class="nx">url</span><span class="p">,</span>
-    <span class="nx">internalUrl</span>
-<span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="nx">Universal</span><span class="p">({</span><span class="w"></span>
+<span class="w">    </span><span class="nx">url</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nx">internalUrl</span><span class="w"></span>
+<span class="p">})</span><span class="w"></span>
 </code></pre></div>
 <h4 id="after">After</h4>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">nodeInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Node</span><span class="p">({</span> <span class="nx">url</span><span class="p">,</span> <span class="nx">internalUrl</span> <span class="p">})</span>
-<span class="nx">Universal</span><span class="p">({</span>
-    <span class="nx">nodes</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;testnet&#39;</span><span class="p">,</span> <span class="nx">instance</span><span class="o">:</span> <span class="nx">nodeInstance</span> <span class="p">}]</span>
-<span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">nodeInstance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Node</span><span class="p">({</span><span class="w"> </span><span class="nx">url</span><span class="p">,</span><span class="w"> </span><span class="nx">internalUrl</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
+<span class="nx">Universal</span><span class="p">({</span><span class="w"></span>
+<span class="w">    </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">nodeInstance</span><span class="w"> </span><span class="p">}]</span><span class="w"></span>
+<span class="p">})</span><span class="w"></span>
 </code></pre></div>
 <h2 id="step-2">Step 2</h2>
 <p>Remove deprecated function <code>setKeypair</code> <br />
 <code>SDK</code> will not accept <code>keypair</code> init argument anymore:</p>
 <h4 id="before_1">Before</h4>
-<div class="highlight"><pre><span></span><code><span class="nx">Universal</span><span class="p">({</span> <span class="nx">keypair</span> <span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="nx">Universal</span><span class="p">({</span><span class="w"> </span><span class="nx">keypair</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 </code></pre></div>
 <h4 id="after_1">After</h4>
-<div class="highlight"><pre><span></span><code><span class="nx">Universal</span><span class="p">({</span>
-  <span class="nx">accounts</span><span class="o">:</span> <span class="p">[</span><span class="nx">MemoryAccount</span><span class="p">({</span> <span class="nx">keypair</span> <span class="p">})]</span>
-<span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="nx">Universal</span><span class="p">({</span><span class="w"></span>
+<span class="w">  </span><span class="nx">accounts</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="nx">MemoryAccount</span><span class="p">({</span><span class="w"> </span><span class="nx">keypair</span><span class="w"> </span><span class="p">})]</span><span class="w"></span>
+<span class="p">})</span><span class="w"></span>
 </code></pre></div>
 <h2 id="step-3">Step 3</h2>
 <p>Change all of <code>AENS</code> method's first argument from <code>nameId</code> to <code>name</code></p>
 <h3 id="before_2">Before</h3>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">client</span> <span class="o">=</span> <span class="nx">Universal</span><span class="p">({</span> <span class="p">...</span> <span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Universal</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 
-<span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="s1">&#39;cm_ad1wdsa...&#39;</span><span class="p">,</span> <span class="p">...)</span>
-<span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">aensTransfer</span><span class="p">(</span><span class="s1">&#39;cm_ad1wdsa...&#39;</span><span class="p">,</span> <span class="p">...)</span>
-<span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">aensRevoke</span><span class="p">(</span><span class="s1">&#39;cm_ad1wdsa...&#39;</span><span class="p">,</span> <span class="p">...)</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="s1">&#39;cm_ad1wdsa...&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span><span class="w"></span>
+<span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">aensTransfer</span><span class="p">(</span><span class="s1">&#39;cm_ad1wdsa...&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span><span class="w"></span>
+<span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">aensRevoke</span><span class="p">(</span><span class="s1">&#39;cm_ad1wdsa...&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span><span class="w"></span>
 </code></pre></div>
 <h3 id="after_2">After</h3>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">client</span> <span class="o">=</span> <span class="nx">Universal</span><span class="p">({</span> <span class="p">...</span> <span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Universal</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 
-<span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="s1">&#39;testname.chain&#39;</span><span class="p">,</span> <span class="p">...)</span>
-<span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">aensTransfer</span><span class="p">(</span><span class="s1">&#39;testname.chain&#39;</span><span class="p">,</span> <span class="p">...)</span>
-<span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">aensRevoke</span><span class="p">(</span><span class="s1">&#39;testname.chain&#39;</span><span class="p">,</span> <span class="p">...)</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="s1">&#39;testname.chain&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span><span class="w"></span>
+<span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">aensTransfer</span><span class="p">(</span><span class="s1">&#39;testname.chain&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span><span class="w"></span>
+<span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">aensRevoke</span><span class="p">(</span><span class="s1">&#39;testname.chain&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span><span class="w"></span>
 </code></pre></div>
 <h2 id="other-breaking-changes">Other Breaking Changes</h2>
 <ul>

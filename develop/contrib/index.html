@@ -1024,21 +1024,20 @@ pnpm run build:dev
 </ol>
 <h2 id="composing-new-flavors">Composing new Flavors</h2>
 <p>You can also "compose" your own flavor by mixing 2 or more flavors likes so:</p>
-<div class="highlight"><pre><span></span><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Wallet</span><span class="p">,</span> <span class="nx">Contract</span><span class="p">,</span> <span class="nx">MemoryAccount</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Wallet</span><span class="p">,</span><span class="w"> </span><span class="nx">Contract</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="w"></span>
 
-<span class="c1">// make a &quot;mixed flavor&quot; containing Wallet and Contracts flavors</span>
-<span class="nx">Wallet</span><span class="p">.</span><span class="nx">compose</span><span class="p">(</span><span class="nx">Contract</span><span class="p">)({</span>
-            <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">,</span>
-            <span class="nx">internalUrl</span><span class="o">:</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">,</span>
-            <span class="nx">accounts</span><span class="o">:</span> <span class="p">[</span><span class="nx">MemoryAccount</span><span class="p">({</span><span class="nx">keypair</span><span class="o">:</span> <span class="p">{</span><span class="nx">secretKey</span><span class="o">:</span> <span class="nx">account</span><span class="p">.</span><span class="nx">priv</span><span class="p">,</span> <span class="nx">publicKey</span><span class="o">:</span> <span class="nx">account</span><span class="p">.</span><span class="nx">pub</span><span class="p">}})],</span>
-            <span class="nx">address</span><span class="o">:</span> <span class="nx">account</span><span class="p">.</span><span class="nx">pub</span><span class="p">,</span>
-            <span class="nx">onTx</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="c1">// or a function to Guard the Rpc client</span>
-            <span class="nx">onChain</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="c1">// or a function to Guard the Rpc client</span>
-            <span class="nx">onAccount</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="c1">// or a function to Guard the Rpc client</span>
-            <span class="nx">networkId</span><span class="o">:</span> <span class="s1">&#39;ae_uat&#39;</span>
-          <span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="nx">ae</span> <span class="p">=&gt;</span> <span class="p">{</span>
-            <span class="c1">// ae is your initialised client now! :)</span>
-            <span class="c1">// ...</span>
+<span class="c1">// make a &quot;mixed flavor&quot; containing Wallet and Contracts flavors</span><span class="w"></span>
+<span class="nx">Wallet</span><span class="p">.</span><span class="nx">compose</span><span class="p">(</span><span class="nx">Contract</span><span class="p">)({</span><span class="w"></span>
+<span class="w">            </span><span class="nx">url</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="nx">accounts</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="nx">MemoryAccount</span><span class="p">({</span><span class="nx">keypair</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="nx">secretKey</span><span class="o">:</span><span class="w"> </span><span class="nx">account</span><span class="p">.</span><span class="nx">priv</span><span class="p">,</span><span class="w"> </span><span class="nx">publicKey</span><span class="o">:</span><span class="w"> </span><span class="nx">account</span><span class="p">.</span><span class="nx">pub</span><span class="p">}})],</span><span class="w"></span>
+<span class="w">            </span><span class="nx">address</span><span class="o">:</span><span class="w"> </span><span class="nx">account</span><span class="p">.</span><span class="nx">pub</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="nx">onTx</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="c1">// or a function to Guard the Rpc client</span><span class="w"></span>
+<span class="w">            </span><span class="nx">onChain</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="c1">// or a function to Guard the Rpc client</span><span class="w"></span>
+<span class="w">            </span><span class="nx">onAccount</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="c1">// or a function to Guard the Rpc client</span><span class="w"></span>
+<span class="w">            </span><span class="nx">networkId</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ae_uat&#39;</span><span class="w"></span>
+<span class="w">          </span><span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="nx">ae</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="c1">// ae is your initialised client now! :)</span><span class="w"></span>
+<span class="w">            </span><span class="c1">// ...</span><span class="w"></span>
 </code></pre></div>
 <p>The WebPack compilation provides two different build artifacts in <code>dist/</code>, one
 for Node.js and one for browsers. When referencing aepp-sdk through any modern

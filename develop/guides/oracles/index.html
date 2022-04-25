@@ -1001,20 +1001,20 @@
 <h2 id="1-oracle-register">1. Oracle: register</h2>
 <p>You register an oracle that responds with the temperature of the city that is included in the query.</p>
 <p>To register an oracle you need to provide a <code>queryFormat</code> and a <code>responseFormat</code> to the <code>registerOracle</code> function of the SDK. In addition to the common transaction options you can provide the oracle specific options <code>queryFee</code> and <code>oracleTtl</code>, see <a href="../../transaction-options/#oracleregistertx">transaction options</a>.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// init an instance of the SDK using the Universal Stamp</span>
-<span class="kd">const</span> <span class="nx">aeSdk</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span> <span class="p">...</span> <span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="c1">// init an instance of the SDK using the Universal Stamp</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Universal</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 
-<span class="c1">// set TTL with a delta of 1000 blocks</span>
-<span class="kd">const</span> <span class="nx">oracleTtl</span> <span class="o">=</span> <span class="p">{</span><span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;delta&#39;</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="mf">1000</span><span class="p">}</span>
-<span class="c1">// OR set a specific block height to expire</span>
-<span class="kd">const</span> <span class="nx">oracleTtl</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;block&#39;</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="mf">555555</span> <span class="p">}</span>
+<span class="c1">// set TTL with a delta of 1000 blocks</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">oracleTtl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="nx">type</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;delta&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="o">:</span><span class="w"> </span><span class="mf">1000</span><span class="p">}</span><span class="w"></span>
+<span class="c1">// OR set a specific block height to expire</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">oracleTtl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">type</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;block&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="o">:</span><span class="w"> </span><span class="mf">555555</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
 
-<span class="c1">// queryFee is optional and defaults to 30000</span>
-<span class="c1">// oracleTtl is optional and defaults to { type: &#39;delta&#39;, value: 500 }</span>
-<span class="kd">const</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span><span class="nx">queryFee</span><span class="o">:</span> <span class="mf">1337</span><span class="p">,</span> <span class="nx">oracleTtl</span> <span class="p">}</span>
+<span class="c1">// queryFee is optional and defaults to 30000</span><span class="w"></span>
+<span class="c1">// oracleTtl is optional and defaults to { type: &#39;delta&#39;, value: 500 }</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="nx">queryFee</span><span class="o">:</span><span class="w"> </span><span class="mf">1337</span><span class="p">,</span><span class="w"> </span><span class="nx">oracleTtl</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
 
-<span class="c1">// the first argument is the queryFormat and the second is the responseFormat</span>
-<span class="kd">const</span> <span class="nx">oracle</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">registerOracle</span><span class="p">(</span><span class="s2">&quot;{&#39;city&#39;: string}&quot;</span><span class="p">,</span> <span class="s2">&quot;{&#39;temperature&#39;: int}&quot;</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
+<span class="c1">// the first argument is the queryFormat and the second is the responseFormat</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">oracle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">registerOracle</span><span class="p">(</span><span class="s2">&quot;{&#39;city&#39;: string}&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;{&#39;temperature&#39;: int}&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">)</span><span class="w"></span>
 </code></pre></div>
 <p>Note:</p>
 <ul>
@@ -1027,19 +1027,19 @@
 <h2 id="2-some-party-query-an-oracle-and-poll-for-response">2. Some party: query an oracle and poll for response</h2>
 <h3 id="query">Query</h3>
 <p>After the oracle has been registered and as long as it isn't expired, everybody that knows the <code>oracleId</code> can query it.</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">oracleId</span> <span class="o">=</span> <span class="s1">&#39;ok_...&#39;</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">oracleId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ok_...&#39;</span><span class="p">;</span><span class="w"></span>
 
-<span class="c1">// queryFee should cover the requested fee of the oracle and defaults to 30000</span>
-<span class="c1">// queryTtl is optional and defaults to {type: &#39;delta&#39;, value: 10}</span>
-<span class="c1">// responseTtl is optional and defaults to {type: &#39;delta&#39;, value: 10}</span>
-<span class="kd">const</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span><span class="nx">queryFee</span><span class="o">:</span> <span class="mf">1337</span><span class="p">,</span> <span class="nx">queryTtl</span><span class="o">:</span> <span class="p">{</span><span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;delta&#39;</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="mf">20</span><span class="p">},</span> <span class="nx">responseTtl</span><span class="o">:</span> <span class="p">{</span><span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;delta&#39;</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="mf">50</span><span class="p">}}</span>
+<span class="c1">// queryFee should cover the requested fee of the oracle and defaults to 30000</span><span class="w"></span>
+<span class="c1">// queryTtl is optional and defaults to {type: &#39;delta&#39;, value: 10}</span><span class="w"></span>
+<span class="c1">// responseTtl is optional and defaults to {type: &#39;delta&#39;, value: 10}</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="nx">queryFee</span><span class="o">:</span><span class="w"> </span><span class="mf">1337</span><span class="p">,</span><span class="w"> </span><span class="nx">queryTtl</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="nx">type</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;delta&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="o">:</span><span class="w"> </span><span class="mf">20</span><span class="p">},</span><span class="w"> </span><span class="nx">responseTtl</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="nx">type</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;delta&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="o">:</span><span class="w"> </span><span class="mf">50</span><span class="p">}}</span><span class="w"></span>
 
-<span class="c1">// using the oracle object</span>
-<span class="kd">const</span> <span class="nx">oracle</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getOracleObject</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">)</span> <span class="c1">// in case you need to instantiate the oracle object first</span>
-<span class="kd">const</span> <span class="nx">query</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">oracle</span><span class="p">.</span><span class="nx">postQuery</span><span class="p">(</span><span class="s2">&quot;{&#39;city&#39;: &#39;Berlin&#39;}&quot;</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="c1">// using the oracle instance</span>
+<span class="c1">// using the oracle object</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">oracle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getOracleObject</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">)</span><span class="w"> </span><span class="c1">// in case you need to instantiate the oracle object first</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">oracle</span><span class="p">.</span><span class="nx">postQuery</span><span class="p">(</span><span class="s2">&quot;{&#39;city&#39;: &#39;Berlin&#39;}&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">)</span><span class="w"> </span><span class="c1">// using the oracle instance</span><span class="w"></span>
 
-<span class="c1">// OR using the aeSdk (instance of Universal stamp) directly by providing the oracleId</span>
-<span class="kd">const</span> <span class="nx">query</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">postQueryToOracle</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span> <span class="s2">&quot;{&#39;city&#39;: &#39;Berlin&#39;}&quot;</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
+<span class="c1">// OR using the aeSdk (instance of Universal stamp) directly by providing the oracleId</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">postQueryToOracle</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;{&#39;city&#39;: &#39;Berlin&#39;}&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">)</span><span class="w"></span>
 </code></pre></div>
 <p>Note:</p>
 <ul>
@@ -1047,29 +1047,29 @@
 </ul>
 <h3 id="poll-for-response">Poll for response</h3>
 <p>Now you have access to the query object and can poll for the response to that specific query:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">oracleId</span> <span class="o">=</span> <span class="s1">&#39;ok_...&#39;</span><span class="p">;</span>
-<span class="kd">const</span> <span class="nx">queryId</span> <span class="o">=</span> <span class="s1">&#39;oq_...&#39;</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">oracleId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ok_...&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">queryId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;oq_...&#39;</span><span class="p">;</span><span class="w"></span>
 
-<span class="c1">// using the query instance</span>
-<span class="kd">const</span> <span class="nx">query</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getQueryObject</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span> <span class="nx">queryId</span><span class="p">)</span> <span class="c1">// in case you need to get the query instance first</span>
-<span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">query</span><span class="p">.</span><span class="nx">pollForResponse</span><span class="p">({</span> <span class="nx">attempts</span><span class="o">:</span> <span class="mf">10</span><span class="p">,</span> <span class="nx">interval</span><span class="o">:</span> <span class="mf">6000</span> <span class="p">})</span>
+<span class="c1">// using the query instance</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getQueryObject</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span><span class="w"> </span><span class="nx">queryId</span><span class="p">)</span><span class="w"> </span><span class="c1">// in case you need to get the query instance first</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">query</span><span class="p">.</span><span class="nx">pollForResponse</span><span class="p">({</span><span class="w"> </span><span class="nx">attempts</span><span class="o">:</span><span class="w"> </span><span class="mf">10</span><span class="p">,</span><span class="w"> </span><span class="nx">interval</span><span class="o">:</span><span class="w"> </span><span class="mf">6000</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 
-<span class="c1">// OR using the aeSdk (instance of Universal stamp) directly by providing the oracleId</span>
-<span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">pollForQueryResponse</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span> <span class="nx">queryId</span><span class="p">,</span> <span class="p">{</span> <span class="nx">attempts</span><span class="o">:</span> <span class="mf">10</span><span class="p">,</span> <span class="nx">interval</span><span class="o">:</span> <span class="mf">6000</span> <span class="p">})</span>
+<span class="c1">// OR using the aeSdk (instance of Universal stamp) directly by providing the oracleId</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">pollForQueryResponse</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span><span class="w"> </span><span class="nx">queryId</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">attempts</span><span class="o">:</span><span class="w"> </span><span class="mf">10</span><span class="p">,</span><span class="w"> </span><span class="nx">interval</span><span class="o">:</span><span class="w"> </span><span class="mf">6000</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 
-<span class="c1">// decode the oracle response</span>
-<span class="c1">// the decode function returns a buffer that needs to be converted to a string</span>
-<span class="kd">const</span> <span class="nx">decodedResponse</span> <span class="o">=</span> <span class="nb">String</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">decode</span><span class="p">());</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">decodedResponse</span><span class="p">)</span>
+<span class="c1">// decode the oracle response</span><span class="w"></span>
+<span class="c1">// the decode function returns a buffer that needs to be converted to a string</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">decodedResponse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">decode</span><span class="p">());</span><span class="w"></span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">decodedResponse</span><span class="p">)</span><span class="w"></span>
 </code></pre></div>
 <h2 id="3-oracle-poll-for-queries-and-respond">3. Oracle: poll for queries and respond</h2>
 <h3 id="poll-for-queries">Poll for queries</h3>
 <p>Typically the oracle itself polls for its own queries and responds as soon as possible:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">stopPolling</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">oracle</span><span class="p">.</span><span class="nx">pollQueries</span><span class="p">((</span><span class="nx">queries</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
-   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">queries</span><span class="p">)</span> <span class="c1">// log all new queries</span>
-<span class="p">},</span> <span class="p">{</span> <span class="nx">interval</span><span class="o">:</span> <span class="mf">1000</span> <span class="p">})</span> <span class="c1">// polling interval in milliseconds</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">stopPolling</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">oracle</span><span class="p">.</span><span class="nx">pollQueries</span><span class="p">((</span><span class="nx">queries</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">   </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">queries</span><span class="p">)</span><span class="w"> </span><span class="c1">// log all new queries</span><span class="w"></span>
+<span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">interval</span><span class="o">:</span><span class="w"> </span><span class="mf">1000</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="c1">// polling interval in milliseconds</span><span class="w"></span>
 
-<span class="nx">stopPolling</span><span class="p">()</span> <span class="c1">// stop polling</span>
+<span class="nx">stopPolling</span><span class="p">()</span><span class="w"> </span><span class="c1">// stop polling</span><span class="w"></span>
 </code></pre></div>
 <p>Note:</p>
 <ul>
@@ -1078,16 +1078,16 @@
 <h3 id="respond-to-query">Respond to query</h3>
 <p>If the oracle recognizes that it has been queried it can respond to the query as long as the query's TTL
 has not been expired.</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">oracleId</span> <span class="o">=</span> <span class="s1">&#39;ok_...&#39;</span><span class="p">;</span>
-<span class="kd">const</span> <span class="nx">queryId</span> <span class="o">=</span> <span class="s1">&#39;oq_...&#39;</span><span class="p">;</span>
-<span class="kd">const</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">onAccount</span><span class="o">:</span> <span class="s1">&#39;ak_...&#39;</span> <span class="p">}</span> <span class="c1">// only the account of the oracle can respond to the query</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">oracleId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ok_...&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">queryId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;oq_...&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">onAccount</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ak_...&#39;</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="c1">// only the account of the oracle can respond to the query</span><span class="w"></span>
 
-<span class="c1">// using the query instance</span>
-<span class="kd">const</span> <span class="nx">query</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getQueryObject</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span> <span class="nx">queryId</span><span class="p">)</span>
-<span class="k">await</span> <span class="nx">query</span><span class="p">.</span><span class="nx">respond</span><span class="p">(</span><span class="s1">&#39;{ &quot;temperature&quot;: 27.5 }&#39;</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
+<span class="c1">// using the query instance</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getQueryObject</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span><span class="w"> </span><span class="nx">queryId</span><span class="p">)</span><span class="w"></span>
+<span class="k">await</span><span class="w"> </span><span class="nx">query</span><span class="p">.</span><span class="nx">respond</span><span class="p">(</span><span class="s1">&#39;{ &quot;temperature&quot;: 27.5 }&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">)</span><span class="w"></span>
 
-<span class="c1">// OR using the aeSdk (instance of Universal stamp) directly by providing the oracleId and the queryId</span>
-<span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">respondToQuery</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span> <span class="nx">queryId</span><span class="p">,</span> <span class="s1">&#39;{ &quot;temperature&quot;: 27.5 }&#39;</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
+<span class="c1">// OR using the aeSdk (instance of Universal stamp) directly by providing the oracleId and the queryId</span><span class="w"></span>
+<span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">respondToQuery</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span><span class="w"> </span><span class="nx">queryId</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;{ &quot;temperature&quot;: 27.5 }&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">)</span><span class="w"></span>
 </code></pre></div>
 <p>Note:</p>
 <ul>
@@ -1096,17 +1096,17 @@ has not been expired.</p>
 </ul>
 <h2 id="4-oracle-extend">4. Oracle: extend</h2>
 <p>As mentioned above an Oracle has a certain TTL that can be specified when registering it. You might want to extend the TTL of the oracle before it expires. You can do that as follows:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">oracleId</span> <span class="o">=</span> <span class="s1">&#39;ok_...&#39;</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">oracleId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ok_...&#39;</span><span class="p">;</span><span class="w"></span>
 
-<span class="c1">// extend TTL by additional 500 blocks (based on current expiration height of the oracle)</span>
-<span class="kd">const</span> <span class="nx">oracleTtl</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;delta&#39;</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="mf">500</span> <span class="p">}</span>
+<span class="c1">// extend TTL by additional 500 blocks (based on current expiration height of the oracle)</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">oracleTtl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">type</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;delta&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="o">:</span><span class="w"> </span><span class="mf">500</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
 
-<span class="c1">// using the oracle instance</span>
-<span class="kd">const</span> <span class="nx">oracle</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getOracleObject</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">)</span>
-<span class="kd">const</span> <span class="nx">extendedOracle</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">oracle</span><span class="p">.</span><span class="nx">extendOracle</span><span class="p">(</span><span class="nx">oracleTtl</span><span class="p">)</span>
+<span class="c1">// using the oracle instance</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">oracle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getOracleObject</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">)</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">extendedOracle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">oracle</span><span class="p">.</span><span class="nx">extendOracle</span><span class="p">(</span><span class="nx">oracleTtl</span><span class="p">)</span><span class="w"></span>
 
-<span class="c1">// OR using the aeSdk (instance of Universal stamp) directly by providing the oracleId</span>
-<span class="kd">const</span> <span class="nx">extendedOracle</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">extendOracleTtl</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span> <span class="nx">oracleTtl</span><span class="p">)</span>
+<span class="c1">// OR using the aeSdk (instance of Universal stamp) directly by providing the oracleId</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">extendedOracle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">extendOracleTtl</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span><span class="w"> </span><span class="nx">oracleTtl</span><span class="p">)</span><span class="w"></span>
 </code></pre></div>
 <h2 id="example-applications">Example applications</h2>
 <ul>

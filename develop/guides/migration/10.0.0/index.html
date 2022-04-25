@@ -1079,10 +1079,10 @@
 <h3 id="removed-skipargsconvert-option-of-contract-call-and-deployment-6d4a599">removed <code>skipArgsConvert</code> option of contract call and deployment (<a href="https://github.com/aeternity/aepp-sdk-js/commit/6d4a59986d6833866b6828085fad96b364e5d315">6d4a599</a>)</h3>
 <p>Convert arguments in intermediate Sophia representation to JavaScript types.
 For example:
-<div class="highlight"><pre><span></span><code><span class="nx">contract</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">listFn</span><span class="p">(</span><span class="s1">&#39;[1, 2]&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">skipArgsConvert</span><span class="o">:</span> <span class="kc">false</span> <span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="nx">contract</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">listFn</span><span class="p">(</span><span class="s1">&#39;[1, 2]&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">skipArgsConvert</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 </code></pre></div>
 rewrite to
-<div class="highlight"><pre><span></span><code><span class="nx">contract</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">listFn</span><span class="p">([</span><span class="mf">1</span><span class="p">,</span> <span class="mf">2</span><span class="p">])</span>
+<div class="highlight"><pre><span></span><code><span class="nx">contract</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">listFn</span><span class="p">([</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="mf">2</span><span class="p">])</span><span class="w"></span>
 </code></pre></div></p>
 <h3 id="removed-skiptransformdecoded-option-of-contract-call-and-deployment-bb49239">removed <code>skipTransformDecoded</code> option of contract call and deployment (<a href="https://github.com/aeternity/aepp-sdk-js/commit/bb492396a29d673f02eee7cfec4e114c2fba2f3c">bb49239</a>)</h3>
 <p>Decoding to JavaScript types is enforced, please use it instead.</p>
@@ -1097,10 +1097,10 @@ rewrite to
 <h3 id="contractcallstatic-contractcall-contractdeploy-are-deprecated-now-c4ec019"><code>contractCallStatic</code>, <code>contractCall</code>, <code>contractDeploy</code> are deprecated now (<a href="https://github.com/aeternity/aepp-sdk-js/commit/c4ec019372f5d5745378e781afb1eb6b2b5acfeb">c4ec019</a>)</h3>
 <p>Use <code>getContractInstance</code> instead. Also, these methods will accept JavaScript-type variables instead of
 Sophia-encoded. For example:
-<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">contractCallStatic</span><span class="p">(</span><span class="nx">source</span><span class="p">,</span> <span class="nx">address</span><span class="p">,</span> <span class="nx">methodName</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;42&#39;</span><span class="p">])</span>
+<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">contractCallStatic</span><span class="p">(</span><span class="nx">source</span><span class="p">,</span><span class="w"> </span><span class="nx">address</span><span class="p">,</span><span class="w"> </span><span class="nx">methodName</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;42&#39;</span><span class="p">])</span><span class="w"></span>
 </code></pre></div>
 should be replaced with
-<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">contractCallStatic</span><span class="p">(</span><span class="nx">source</span><span class="p">,</span> <span class="nx">address</span><span class="p">,</span> <span class="nx">methodName</span><span class="p">,</span> <span class="p">[</span><span class="mf">42</span><span class="p">])</span>
+<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">contractCallStatic</span><span class="p">(</span><span class="nx">source</span><span class="p">,</span><span class="w"> </span><span class="nx">address</span><span class="p">,</span><span class="w"> </span><span class="nx">methodName</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">42</span><span class="p">])</span><span class="w"></span>
 </code></pre></div></p>
 <h3 id="dropped-compatibility-with-compiler410-f9cef12">dropped compatibility with compiler@4.1.0 (<a href="https://github.com/aeternity/aepp-sdk-js/commit/f9cef12a7db4b2559519ef7f8380cc9e89630492">f9cef12</a>)</h3>
 <p>Use compiler 6.0.0 and above.</p>
@@ -1126,22 +1126,22 @@ of calldata package for additional info.</p>
 calldata package instead of <code>joi</code>.</p>
 <h3 id="pass-source-in-options-of-sdkgetcontractinstance-5c690d2">pass source in options of <code>sdk.getContractInstance</code> (<a href="https://github.com/aeternity/aepp-sdk-js/commit/5c690d2d77a433c8496ab9cda6fd66e52a6b4b23">5c690d2</a>)</h3>
 <p>For example:
-<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">(</span><span class="nx">contractSource</span><span class="p">,</span> <span class="p">{</span> <span class="nx">contractAddress</span><span class="o">:</span> <span class="s1">&#39;...&#39;</span> <span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">(</span><span class="nx">contractSource</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">contractAddress</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;...&#39;</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 </code></pre></div>
 rewrite to
-<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span> <span class="nx">source</span><span class="o">:</span> <span class="nx">contractSource</span><span class="p">,</span> <span class="nx">contractAddress</span><span class="o">:</span> <span class="s1">&#39;...&#39;</span> <span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span><span class="w"> </span><span class="nx">source</span><span class="o">:</span><span class="w"> </span><span class="nx">contractSource</span><span class="p">,</span><span class="w"> </span><span class="nx">contractAddress</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;...&#39;</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 </code></pre></div></p>
 <p>Contract instance can be generated by ACI and bytecode:
-<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span> <span class="nx">aci</span><span class="p">,</span> <span class="nx">bytecode</span> <span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span><span class="w"> </span><span class="nx">aci</span><span class="p">,</span><span class="w"> </span><span class="nx">bytecode</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 </code></pre></div>
 SDK won't use hosted compiler in this case.</p>
 <p>Also, <code>contract.compiled</code> was renamed to <code>contract.bytecode</code>.</p>
 <h3 id="additional-options-of-getcontractinstance-accepted-as-usual-ones-10fb7ba">additional options of <code>getContractInstance</code> accepted as usual ones (<a href="https://github.com/aeternity/aepp-sdk-js/commit/10fb7bad8f61b973c1be5daec50909d251ec1f90">10fb7ba</a>)</h3>
 <p>For example, replace
-<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">opt</span><span class="o">:</span> <span class="p">{</span> <span class="nx">ttl</span><span class="o">:</span> <span class="mf">1</span> <span class="p">}</span> <span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span><span class="w"> </span><span class="nx">source</span><span class="p">,</span><span class="w"> </span><span class="nx">opt</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">ttl</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 </code></pre></div>
 with
-<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">ttl</span><span class="o">:</span> <span class="mf">1</span> <span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span><span class="w"> </span><span class="nx">source</span><span class="p">,</span><span class="w"> </span><span class="nx">ttl</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 </code></pre></div></p>
 <h3 id="drop-compatibility-with-es5-1331">drop compatibility with es5 (<a href="https://github.com/aeternity/aepp-sdk-js/pull/1331">#1331</a>)</h3>
 <p>To support old environments, you need to set up transpilation of SDK package while building your
@@ -1153,18 +1153,18 @@ app. In Webpack it can be done by <a href="https://webpack.js.org/configuration/
 methods.</p>
 <h3 id="aensupdate-accepts-pointers-as-object-f6b8999"><code>aensUpdate</code> accepts pointers as object (<a href="https://github.com/aeternity/aepp-sdk-js/commit/f6b8999ac70d10c5455e9a45d8ad65e161d28ca4">f6b8999</a>)</h3>
 <p>For example, replace
-<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="s1">&#39;test.chain&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="p">])</span>
+<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="s1">&#39;test.chain&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="p">])</span><span class="w"></span>
 </code></pre></div>
 with
-<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="s1">&#39;test.chain&#39;</span><span class="p">,</span> <span class="p">{</span>
-  <span class="nx">account_pubkey</span><span class="o">:</span> <span class="s1">&#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span>
-<span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="s1">&#39;test.chain&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="nx">account_pubkey</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="w"></span>
+<span class="p">})</span><span class="w"></span>
 </code></pre></div>
 Additionally, <code>getDefaultPointerKey</code> (was named <code>classify</code> before) helper function can be used
-<div class="highlight"><pre><span></span><code><span class="k">import</span> <span class="p">{</span> <span class="nx">getDefaultPointerKey</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">getDefaultPointerKey</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="w"></span>
 
-<span class="kd">const</span> <span class="nx">address</span> <span class="o">=</span> <span class="s1">&#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span>
-<span class="nx">sdk</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="s1">&#39;test.chain&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="p">[</span><span class="nx">getDefaultPointerKey</span><span class="p">(</span><span class="nx">address</span><span class="p">)]</span><span class="o">:</span> <span class="nx">address</span> <span class="p">})</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">address</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="w"></span>
+<span class="nx">sdk</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="s1">&#39;test.chain&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">[</span><span class="nx">getDefaultPointerKey</span><span class="p">(</span><span class="nx">address</span><span class="p">)]</span><span class="o">:</span><span class="w"> </span><span class="nx">address</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 </code></pre></div></p>
                 
               

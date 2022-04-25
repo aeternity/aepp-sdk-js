@@ -931,32 +931,32 @@ You will replace the content of the default <code>HelloWorld</code> component an
 <div class="highlight"><pre><span></span><code>npm install @aeternity/aepp-sdk
 </code></pre></div>
 <h2 id="5-modify-the-helloworld-component">5. Modify the HelloWorld component</h2>
-<div class="highlight"><pre><span></span><code><span class="c">&lt;!--</span> <span class="nx">src</span><span class="o">/</span><span class="nx">components</span><span class="o">/</span><span class="nx">HelloWorld</span><span class="p">.</span><span class="nx">vue</span> <span class="o">--&gt;</span>
+<div class="highlight"><pre><span></span><code><span class="c">&lt;!--</span><span class="w"> </span><span class="nx">src</span><span class="o">/</span><span class="nx">components</span><span class="o">/</span><span class="nx">HelloWorld</span><span class="p">.</span><span class="nx">vue</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"></span>
 
-<span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span>
-<span class="k">import</span> <span class="p">{</span> <span class="nx">Universal</span><span class="p">,</span> <span class="nx">Node</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
+<span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span><span class="w"></span>
+<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Universal</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="w"></span>
 
-<span class="k">export</span> <span class="k">default</span> <span class="p">{</span>
-  <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;HelloWorld&#39;</span><span class="p">,</span>
-  <span class="nx">data</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="p">{</span>
-      <span class="nx">msg</span><span class="o">:</span> <span class="s1">&#39;Loading latest block ...&#39;</span>
-    <span class="p">}</span>
-  <span class="p">},</span>
-  <span class="k">async</span> <span class="nx">mounted</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="c1">// Init required Node stamp</span>
-    <span class="kd">const</span> <span class="nx">node</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Node</span><span class="p">({</span> <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span> <span class="p">})</span>
+<span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;HelloWorld&#39;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nx">data</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="nx">msg</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Loading latest block ...&#39;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="p">},</span><span class="w"></span>
+<span class="w">  </span><span class="k">async</span><span class="w"> </span><span class="nx">mounted</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Init required Node stamp</span><span class="w"></span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Node</span><span class="p">({</span><span class="w"> </span><span class="nx">url</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 
-    <span class="c1">// Init SDK instance with Universal stamp</span>
-    <span class="kd">const</span> <span class="nx">aeSdk</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span>
-       <span class="nx">nodes</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;test-net&#39;</span><span class="p">,</span> <span class="nx">instance</span><span class="o">:</span> <span class="nx">node</span> <span class="p">}],</span>
-    <span class="p">})</span>
-    <span class="c1">// Start using the SDK</span>
-    <span class="kd">const</span> <span class="nx">height</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">height</span><span class="p">()</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">msg</span> <span class="o">=</span> <span class="s1">&#39;Current Block: &#39;</span> <span class="o">+</span> <span class="nx">height</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-<span class="o">&lt;</span><span class="err">/script&gt;</span>
+<span class="w">    </span><span class="c1">// Init SDK instance with Universal stamp</span><span class="w"></span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Universal</span><span class="p">({</span><span class="w"></span>
+<span class="w">       </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;test-net&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}],</span><span class="w"></span>
+<span class="w">    </span><span class="p">})</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Start using the SDK</span><span class="w"></span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">height</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">height</span><span class="p">()</span><span class="w"></span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Current Block: &#39;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">height</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+<span class="o">&lt;</span><span class="err">/script&gt;</span><span class="w"></span>
 </code></pre></div>
 <h2 id="6-run-the-application">6. Run the application</h2>
 <div class="highlight"><pre><span></span><code>npm run serve

@@ -966,54 +966,54 @@
 │   │   RpcConnectionError
 </code></pre></div>
 <h2 id="usage">Usage</h2>
-<div class="highlight"><pre><span></span><code><span class="c1">// import required error classes</span>
-<span class="kd">const</span> <span class="p">{</span>
-  <span class="nx">Universal</span><span class="p">,</span>
-  <span class="nx">Node</span><span class="p">,</span>
-  <span class="nx">MemoryAccount</span><span class="p">,</span>
-  <span class="nx">generateKeyPair</span><span class="p">,</span>
-  <span class="nx">InvalidTxParamsError</span><span class="p">,</span>
-  <span class="nx">InvalidAensNameError</span>
-<span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="c1">// import required error classes</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="nx">Universal</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nx">Node</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nx">generateKeyPair</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nx">InvalidTxParamsError</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nx">InvalidAensNameError</span><span class="w"></span>
+<span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">)</span><span class="w"></span>
 
-<span class="c1">// setup</span>
-<span class="kd">const</span> <span class="nx">NODE_URL</span> <span class="o">=</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span>
-<span class="kd">const</span> <span class="nx">PAYER_ACCOUNT_KEYPAIR</span> <span class="o">=</span> <span class="nx">generateKeyPair</span><span class="p">()</span>
-<span class="kd">const</span> <span class="nx">NEW_USER_KEYPAIR</span> <span class="o">=</span> <span class="nx">generateKeyPair</span><span class="p">()</span>
+<span class="c1">// setup</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">NODE_URL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">PAYER_ACCOUNT_KEYPAIR</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">generateKeyPair</span><span class="p">()</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">NEW_USER_KEYPAIR</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">generateKeyPair</span><span class="p">()</span><span class="w"></span>
 
-<span class="kd">const</span> <span class="nx">payerAccount</span> <span class="o">=</span> <span class="nx">MemoryAccount</span><span class="p">({</span> <span class="nx">keypair</span><span class="o">:</span> <span class="nx">PAYER_ACCOUNT_KEYPAIR</span> <span class="p">})</span>
-<span class="kd">const</span> <span class="nx">newUserAccount</span> <span class="o">=</span> <span class="nx">MemoryAccount</span><span class="p">({</span> <span class="nx">keypair</span><span class="o">:</span> <span class="nx">NEW_USER_KEYPAIR</span> <span class="p">})</span>
-<span class="kd">const</span> <span class="nx">node</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Node</span><span class="p">({</span> <span class="nx">url</span><span class="o">:</span> <span class="nx">NODE_URL</span> <span class="p">})</span>
-<span class="kd">const</span> <span class="nx">aeSdk</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span>
-  <span class="nx">nodes</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;testnet&#39;</span><span class="p">,</span> <span class="nx">instance</span><span class="o">:</span> <span class="nx">node</span> <span class="p">}],</span>
-  <span class="nx">accounts</span><span class="o">:</span> <span class="p">[</span><span class="nx">payerAccount</span><span class="p">,</span> <span class="nx">newUserAccount</span><span class="p">]</span>
-<span class="p">})</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">payerAccount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">({</span><span class="w"> </span><span class="nx">keypair</span><span class="o">:</span><span class="w"> </span><span class="nx">PAYER_ACCOUNT_KEYPAIR</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">newUserAccount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">({</span><span class="w"> </span><span class="nx">keypair</span><span class="o">:</span><span class="w"> </span><span class="nx">NEW_USER_KEYPAIR</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Node</span><span class="p">({</span><span class="w"> </span><span class="nx">url</span><span class="o">:</span><span class="w"> </span><span class="nx">NODE_URL</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Universal</span><span class="p">({</span><span class="w"></span>
+<span class="w">  </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}],</span><span class="w"></span>
+<span class="w">  </span><span class="nx">accounts</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="nx">payerAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">newUserAccount</span><span class="p">]</span><span class="w"></span>
+<span class="p">})</span><span class="w"></span>
 
-<span class="c1">// catch exceptions</span>
-<span class="k">try</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="nx">spendTxResult</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="o">-</span><span class="mf">1</span><span class="p">,</span> <span class="k">await</span> <span class="nx">newUserAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">(),</span> <span class="p">{</span> <span class="nx">onAccount</span><span class="o">:</span> <span class="nx">payerAccount</span><span class="p">})</span>
-<span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">if</span><span class="p">(</span><span class="nx">err</span> <span class="ow">instanceof</span> <span class="nx">InvalidTxParamsError</span><span class="p">){</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Amount specified is not valid, </span><span class="si">${</span><span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="nx">err</span> <span class="ow">instanceof</span> <span class="nx">InvalidAensNameError</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Address specified is not valid, </span><span class="si">${</span><span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
-  <span class="p">}</span>
-<span class="p">}</span>
+<span class="c1">// catch exceptions</span><span class="w"></span>
+<span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">spendTxResult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="o">-</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">newUserAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">(),</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">onAccount</span><span class="o">:</span><span class="w"> </span><span class="nx">payerAccount</span><span class="p">})</span><span class="w"></span>
+<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="k">if</span><span class="p">(</span><span class="nx">err</span><span class="w"> </span><span class="ow">instanceof</span><span class="w"> </span><span class="nx">InvalidTxParamsError</span><span class="p">){</span><span class="w"></span>
+<span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Amount specified is not valid, </span><span class="si">${</span><span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="p">(</span><span class="nx">err</span><span class="w"> </span><span class="ow">instanceof</span><span class="w"> </span><span class="nx">InvalidAensNameError</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Address specified is not valid, </span><span class="si">${</span><span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 
-<span class="c1">// using generic error classes</span>
-<span class="kd">const</span> <span class="p">{</span><span class="nx">AensError</span><span class="p">,</span> <span class="nx">TransactionError</span><span class="p">,</span> <span class="nx">BaseError</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">)</span>
+<span class="c1">// using generic error classes</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="nx">AensError</span><span class="p">,</span><span class="w"> </span><span class="nx">TransactionError</span><span class="p">,</span><span class="w"> </span><span class="nx">BaseError</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">)</span><span class="w"></span>
 
-<span class="k">try</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="nx">spendTxResult</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="s2">&quot;ak_2tv&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">onAccount</span><span class="o">:</span> <span class="nx">payerAccount</span><span class="p">})</span>
-<span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">if</span><span class="p">(</span><span class="nx">err</span> <span class="ow">instanceof</span> <span class="nx">AensError</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// address or AENS related errors</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="nx">err</span> <span class="ow">instanceof</span> <span class="nx">TransactionError</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// transaction errors</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="nx">err</span> <span class="ow">instanceof</span> <span class="nx">BaseError</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// match any errors from the SDK</span>
-  <span class="p">}</span>
-<span class="p">}</span>
+<span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">spendTxResult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;ak_2tv&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">onAccount</span><span class="o">:</span><span class="w"> </span><span class="nx">payerAccount</span><span class="p">})</span><span class="w"></span>
+<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="k">if</span><span class="p">(</span><span class="nx">err</span><span class="w"> </span><span class="ow">instanceof</span><span class="w"> </span><span class="nx">AensError</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// address or AENS related errors</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="p">(</span><span class="nx">err</span><span class="w"> </span><span class="ow">instanceof</span><span class="w"> </span><span class="nx">TransactionError</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// transaction errors</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="p">(</span><span class="nx">err</span><span class="w"> </span><span class="ow">instanceof</span><span class="w"> </span><span class="nx">BaseError</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// match any errors from the SDK</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </code></pre></div>
                 
               

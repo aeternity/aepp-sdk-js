@@ -1025,7 +1025,7 @@
 </ul>
 <h2 id="1-specify-imports">1. Specify imports</h2>
 <p>You need to import <code>Universal</code>, <code>Node</code> and <code>MemoryAccount</code> <a href="https://stampit.js.org/essentials/what-is-a-stamp">Stamps</a> from the SDK.
-<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="p">{</span> <span class="nx">Universal</span><span class="p">,</span> <span class="nx">Node</span><span class="p">,</span> <span class="nx">MemoryAccount</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Universal</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">)</span><span class="w"></span>
 </code></pre></div>
 <strong>Note</strong>:</p>
 <ul>
@@ -1033,7 +1033,7 @@
 </ul>
 <h2 id="2-define-constants">2. Define constants</h2>
 <p>The following constants are used in the subsequent code snippets.
-<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">CONTRACT_SOURCE</span> <span class="o">=</span> <span class="c1">// typically you read the source code from a separate .aes file</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">CONTRACT_SOURCE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="c1">// typically you read the source code from a separate .aes file</span><span class="w"></span>
 <span class="sb">`</span>
 <span class="sb">contract Multiplier =</span>
 <span class="sb">  record state = { factor: int }</span>
@@ -1042,13 +1042,13 @@
 <span class="sb">    put(state{ factor = f })</span>
 <span class="sb">    f * 10</span>
 <span class="sb">  entrypoint multiplyBy(x : int) = x * state.factor</span>
-<span class="sb">`</span>
-<span class="kd">const</span> <span class="nx">ACCOUNT_KEYPAIR</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="nx">publicKey</span><span class="o">:</span> <span class="s1">&#39;ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR&#39;</span><span class="p">,</span>
-  <span class="nx">secretKey</span><span class="o">:</span> <span class="s1">&#39;bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b&#39;</span>
-<span class="p">}</span>
-<span class="kd">const</span> <span class="nx">NODE_URL</span> <span class="o">=</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span>
-<span class="kd">const</span> <span class="nx">COMPILER_URL</span> <span class="o">=</span> <span class="s1">&#39;https://compiler.aepps.com&#39;</span><span class="p">;</span>
+<span class="sb">`</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">ACCOUNT_KEYPAIR</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="nx">publicKey</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR&#39;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nx">secretKey</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b&#39;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">NODE_URL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">COMPILER_URL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;https://compiler.aepps.com&#39;</span><span class="p">;</span><span class="w"></span>
 </code></pre></div>
 Note:</p>
 <ul>
@@ -1063,16 +1063,16 @@ Note:</p>
 <p>Most functions of the SDK return <em>Promises</em>, so the recommended way of
 dealing with subsequent actions is running them one by one using <code>await</code>.
 Therefore you need to put the logic into an <code>async</code> code block
-<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="k">async</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="k">async</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 </code></pre></div></p>
 <h2 id="4-create-object-instances">4. Create object instances</h2>
-<p><div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">account</span> <span class="o">=</span> <span class="nx">MemoryAccount</span><span class="p">({</span> <span class="nx">keypair</span><span class="o">:</span> <span class="nx">ACCOUNT_KEYPAIR</span> <span class="p">})</span>
-  <span class="kd">const</span> <span class="nx">node</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Node</span><span class="p">({</span> <span class="nx">url</span><span class="o">:</span> <span class="nx">NODE_URL</span> <span class="p">})</span>
-  <span class="kd">const</span> <span class="nx">aeSdk</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span>
-    <span class="nx">nodes</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;testnet&#39;</span><span class="p">,</span> <span class="nx">instance</span><span class="o">:</span> <span class="nx">node</span> <span class="p">}],</span>
-    <span class="nx">compilerUrl</span><span class="o">:</span> <span class="nx">COMPILER_URL</span><span class="p">,</span>
-    <span class="nx">accounts</span><span class="o">:</span> <span class="p">[</span><span class="nx">account</span><span class="p">]</span>
-  <span class="p">})</span>
+<p><div class="highlight"><pre><span></span><code><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">account</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">({</span><span class="w"> </span><span class="nx">keypair</span><span class="o">:</span><span class="w"> </span><span class="nx">ACCOUNT_KEYPAIR</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Node</span><span class="p">({</span><span class="w"> </span><span class="nx">url</span><span class="o">:</span><span class="w"> </span><span class="nx">NODE_URL</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Universal</span><span class="p">({</span><span class="w"></span>
+<span class="w">    </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}],</span><span class="w"></span>
+<span class="w">    </span><span class="nx">compilerUrl</span><span class="o">:</span><span class="w"> </span><span class="nx">COMPILER_URL</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nx">accounts</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="nx">account</span><span class="p">]</span><span class="w"></span>
+<span class="w">  </span><span class="p">})</span><span class="w"></span>
 </code></pre></div>
 The <code>Universal</code> <a href="https://stampit.js.org/essentials/what-is-a-stamp">Stamp</a> itself is
 asynchronous as it determines the node's version and rest interface automatically. Only once
@@ -1085,23 +1085,23 @@ which is assigned to the <code>aeSdk</code> constant in this case.</p>
 <h2 id="5-get-contract-instance">5. Get contract instance</h2>
 <p>Knowing the source code allows you to initialize a contract instance and interact with the
 contract in a convenient way.
-<div class="highlight"><pre><span></span><code>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">CONTRACT_SOURCE</span><span class="p">)</span>
-  <span class="kd">const</span> <span class="nx">contract</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span> <span class="nx">source</span><span class="o">:</span> <span class="nx">CONTRACT_SOURCE</span> <span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">CONTRACT_SOURCE</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">contract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span><span class="w"> </span><span class="nx">source</span><span class="o">:</span><span class="w"> </span><span class="nx">CONTRACT_SOURCE</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 </code></pre></div></p>
 <h2 id="6-compile-the-contract">6. Compile the contract</h2>
 <p>The <code>compile</code> function sends a raw Sophia contract as string
 to the HTTP compiler for bytecode compilation. In the future this will be done
 without talking to the node, but requiring a bytecode compiler
 implementation directly in the SDK.
-<div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">bytecode</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">contract</span><span class="p">.</span><span class="nx">compile</span><span class="p">()</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Obtained bytecode </span><span class="si">${</span><span class="nx">bytecode</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">bytecode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">compile</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Obtained bytecode </span><span class="si">${</span><span class="nx">bytecode</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span><span class="w"></span>
 </code></pre></div></p>
 <h2 id="7-deploy-the-contract">7. Deploy the contract</h2>
 <p>Invoking <code>deploy</code> on the contract instance will result in the <code>CreateContractTx</code>
 being created, signed (using the <em>secretKey</em> of the previously defined <code>MemoryAccount</code>) and
 broadcasted to the network. It will be picked up by the miners and written to the chain.
-<div class="highlight"><pre><span></span><code>  <span class="kd">const</span> <span class="nx">deployInfo</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">contract</span><span class="p">.</span><span class="nx">deploy</span><span class="p">([</span><span class="mf">5</span><span class="p">])</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Contract deployed at </span><span class="si">${</span><span class="nx">deployInfo</span><span class="p">.</span><span class="nx">address</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">deployInfo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">deploy</span><span class="p">([</span><span class="mf">5</span><span class="p">])</span><span class="w"></span>
+<span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Contract deployed at </span><span class="si">${</span><span class="nx">deployInfo</span><span class="p">.</span><span class="nx">address</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span><span class="w"></span>
 </code></pre></div>
 Note:</p>
 <ul>
@@ -1112,7 +1112,7 @@ Note:</p>
 <h2 id="8-call-a-contract-function">8. Call a contract function</h2>
 <p>Once the <code>ContractCreateTx</code> has been successfully mined, you can attempt to invoke
 any public function (aka <code>entrypoint</code> in Sophia) defined within it.
-<div class="highlight"><pre><span></span><code>  <span class="k">await</span> <span class="nx">contract</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">setFactor</span><span class="p">(</span><span class="mf">6</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">setFactor</span><span class="p">(</span><span class="mf">6</span><span class="p">)</span><span class="w"></span>
 </code></pre></div>
 <strong>Note</strong>:</p>
 <ul>
@@ -1122,16 +1122,16 @@ any public function (aka <code>entrypoint</code> in Sophia) defined within it.
 <h2 id="9-call-a-contract-function-via-dry-run">9. Call a contract function via dry-run</h2>
 <p>You can use <code>callStatic</code> option which performs a <code>dry-run</code> of the
 transaction which allows you to get the result without having to mine a transaction.
-<div class="highlight"><pre><span></span><code>  <span class="kd">let</span> <span class="nx">call</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">contract</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">setFactor</span><span class="p">(</span><span class="mf">7</span><span class="p">,</span> <span class="p">{</span> <span class="nx">callStatic</span><span class="o">:</span> <span class="kc">true</span> <span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="kd">let</span><span class="w"> </span><span class="nx">call</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">setFactor</span><span class="p">(</span><span class="mf">7</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">callStatic</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 </code></pre></div></p>
 <h2 id="10-decode-the-call-result">10. Decode the call result</h2>
 <p>The execution result, if successful, will be an FATE-encoded result value.
 The <code>decodedResult</code> property will contain the result value decoded using calldata package.
-<div class="highlight"><pre><span></span><code>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`setFactor execution result: </span><span class="si">${</span><span class="nx">call</span><span class="p">.</span><span class="nx">decodedResult</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`setFactor execution result: </span><span class="si">${</span><span class="nx">call</span><span class="p">.</span><span class="nx">decodedResult</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span><span class="w"></span>
 </code></pre></div></p>
 <h2 id="11-call-a-contract-non-stateful-entrypoint-via-dry-run">11. Call a contract non-stateful entrypoint via dry-run</h2>
-<p><div class="highlight"><pre><span></span><code>  <span class="nx">call</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">contract</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">multiplyBy</span><span class="p">(</span><span class="mf">8</span><span class="p">)</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`multiplyBy execution result: </span><span class="si">${</span><span class="nx">call</span><span class="p">.</span><span class="nx">decodedResult</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
+<p><div class="highlight"><pre><span></span><code><span class="w">  </span><span class="nx">call</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">multiplyBy</span><span class="p">(</span><span class="mf">8</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`multiplyBy execution result: </span><span class="si">${</span><span class="nx">call</span><span class="p">.</span><span class="nx">decodedResult</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span><span class="w"></span>
 </code></pre></div>
 <strong>Note</strong>:</p>
 <ul>
@@ -1142,7 +1142,7 @@ The <code>decodedResult</code> property will contain the result value decoded us
 </ul>
 <h2 id="12-close-and-run-async-codeblock">12. Close and run async codeblock</h2>
 <p>Now you can close the async codeblock and execute it at the same time.
-<div class="highlight"><pre><span></span><code><span class="p">})()</span>
+<div class="highlight"><pre><span></span><code><span class="p">})()</span><span class="w"></span>
 </code></pre></div></p>
                 
               

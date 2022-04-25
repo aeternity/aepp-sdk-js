@@ -971,11 +971,11 @@
 <p>For every transaction it is possible to provide an <code>options</code> object with one or multiple of the following attributes to the respective function that builds and broadcasts the transaction.
 Some of these are common and can be provided for each transaction type. Others are transaction specific and only relevant for a specific tx-type.</p>
 <p>The <code>options</code> object can be optionally passed to the respective function behind the last parameter, example:
-<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">sender</span> <span class="o">=</span> <span class="s1">&#39;ak_...&#39;</span>
-<span class="kd">const</span> <span class="nx">recipient</span> <span class="o">=</span> <span class="s1">&#39;ak_...&#39;</span>
-<span class="kd">const</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">onAccount</span><span class="o">:</span> <span class="nx">sender</span><span class="p">,</span> <span class="nx">denomination</span><span class="o">:</span> <span class="s1">&#39;ae&#39;</span> <span class="p">}</span> <span class="c1">// optional options object</span>
-<span class="c1">// aeSdk is an instance of the Universal Stamp</span>
-<span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="nx">recipient</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="c1">// amount, recipient and (optional) options</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">sender</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ak_...&#39;</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">recipient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ak_...&#39;</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">onAccount</span><span class="o">:</span><span class="w"> </span><span class="nx">sender</span><span class="p">,</span><span class="w"> </span><span class="nx">denomination</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ae&#39;</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="c1">// optional options object</span><span class="w"></span>
+<span class="c1">// aeSdk is an instance of the Universal Stamp</span><span class="w"></span>
+<span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="nx">recipient</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">)</span><span class="w"> </span><span class="c1">// amount, recipient and (optional) options</span><span class="w"></span>
 </code></pre></div></p>
 <p>Note:</p>
 <ul>

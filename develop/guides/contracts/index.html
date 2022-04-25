@@ -1079,28 +1079,28 @@
 <li>For production deployments you should <strong><em>always</em></strong> host these services by yourself.</li>
 </ul>
 <h2 id="1-specify-imports">1. Specify imports</h2>
-<div class="highlight"><pre><span></span><code><span class="c1">// node.js import</span>
-<span class="kd">const</span> <span class="p">{</span> <span class="nx">Universal</span><span class="p">,</span> <span class="nx">MemoryAccount</span><span class="p">,</span> <span class="nx">Node</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">)</span>
-<span class="c1">// ES import</span>
-<span class="k">import</span> <span class="p">{</span> <span class="nx">Universal</span><span class="p">,</span> <span class="nx">MemoryAccount</span><span class="p">,</span> <span class="nx">Node</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
+<div class="highlight"><pre><span></span><code><span class="c1">// node.js import</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Universal</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">)</span><span class="w"></span>
+<span class="c1">// ES import</span><span class="w"></span>
+<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Universal</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="w"></span>
 </code></pre></div>
 <h2 id="2-create-an-instance-of-the-sdk">2. Create an instance of the SDK</h2>
 <p>When creating an instance of the SDK you need to provide an account which will be used to sign transactions like <code>ContractCreateTx</code> and <code>ContractCallTx</code> that will be broadcasted to the network.</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">node</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Node</span><span class="p">({</span>
-  <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span> <span class="c1">// ideally host your own node</span>
-<span class="p">})</span>
-<span class="kd">const</span> <span class="nx">account</span> <span class="o">=</span> <span class="nx">MemoryAccount</span><span class="p">({</span>
-  <span class="c1">// provide a valid keypair with your secretKey and publicKey</span>
-  <span class="nx">keypair</span><span class="o">:</span> <span class="p">{</span> <span class="nx">secretKey</span><span class="o">:</span> <span class="nx">SECRET_KEY</span><span class="p">,</span> <span class="nx">publicKey</span><span class="o">:</span> <span class="nx">PUBLIC_KEY</span> <span class="p">}</span>
-<span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Node</span><span class="p">({</span><span class="w"></span>
+<span class="w">  </span><span class="nx">url</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="w"> </span><span class="c1">// ideally host your own node</span><span class="w"></span>
+<span class="p">})</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">account</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">({</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// provide a valid keypair with your secretKey and publicKey</span><span class="w"></span>
+<span class="w">  </span><span class="nx">keypair</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">secretKey</span><span class="o">:</span><span class="w"> </span><span class="nx">SECRET_KEY</span><span class="p">,</span><span class="w"> </span><span class="nx">publicKey</span><span class="o">:</span><span class="w"> </span><span class="nx">PUBLIC_KEY</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="p">})</span><span class="w"></span>
 
-<span class="kd">const</span> <span class="nx">aeSdk</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span>
-  <span class="nx">nodes</span><span class="o">:</span> <span class="p">[</span>
-    <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;testnet&#39;</span><span class="p">,</span> <span class="nx">instance</span><span class="o">:</span> <span class="nx">node</span> <span class="p">}</span>
-  <span class="p">],</span>
-  <span class="nx">compilerUrl</span><span class="o">:</span> <span class="s1">&#39;https://compiler.aepps.com&#39;</span><span class="p">,</span> <span class="c1">// ideally host your own compiler</span>
-  <span class="nx">accounts</span><span class="o">:</span> <span class="p">[</span><span class="nx">account</span><span class="p">]</span>
-<span class="p">})</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Universal</span><span class="p">({</span><span class="w"></span>
+<span class="w">  </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="p">],</span><span class="w"></span>
+<span class="w">  </span><span class="nx">compilerUrl</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;https://compiler.aepps.com&#39;</span><span class="p">,</span><span class="w"> </span><span class="c1">// ideally host your own compiler</span><span class="w"></span>
+<span class="w">  </span><span class="nx">accounts</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="nx">account</span><span class="p">]</span><span class="w"></span>
+<span class="p">})</span><span class="w"></span>
 </code></pre></div>
 <p>Note:</p>
 <ul>
@@ -1112,27 +1112,27 @@
 </ul>
 <h2 id="3-initialize-the-contract-instance">3. Initialize the contract instance</h2>
 <h3 id="by-sourcecode">By sourcecode</h3>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">CONTRACT_SOURCE</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// source code of the contract</span>
-<span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span> <span class="nx">source</span><span class="o">:</span> <span class="nx">CONTRACT_SOURCE</span> <span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">CONTRACT_SOURCE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="c1">// source code of the contract</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">contractInstance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span><span class="w"> </span><span class="nx">source</span><span class="o">:</span><span class="w"> </span><span class="nx">CONTRACT_SOURCE</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 </code></pre></div>
 <p>Note:</p>
 <ul>
 <li>If your contract includes external dependencies which are not part of the <a href="https://aeternity.com/aesophia/latest/sophia_stdlib">standard library</a> you should initialize the contract using:
-  <div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">fileSystem</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// key-value map with name of the include as key and source code of the include as value</span>
-<span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span> <span class="nx">source</span><span class="o">:</span> <span class="nx">CONTRACT_SOURCE</span><span class="p">,</span> <span class="nx">fileSystem</span> <span class="p">})</span>
+  <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">fileSystem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="c1">// key-value map with name of the include as key and source code of the include as value</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">contractInstance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span><span class="w"> </span><span class="nx">source</span><span class="o">:</span><span class="w"> </span><span class="nx">CONTRACT_SOURCE</span><span class="p">,</span><span class="w"> </span><span class="nx">fileSystem</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 </code></pre></div></li>
 </ul>
 <h3 id="by-aci-and-bytecode">By ACI and bytecode</h3>
 <p>If you pre-compiled the contracts you can also initialize a contract instance by providing ACI and bytecode:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">aci</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// ACI of the contract</span>
-<span class="kd">const</span> <span class="nx">bytecode</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// bytecode of the contract</span>
-<span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span> <span class="nx">aci</span><span class="p">,</span> <span class="nx">bytecode</span> <span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">aci</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="c1">// ACI of the contract</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">bytecode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="c1">// bytecode of the contract</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">contractInstance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span><span class="w"> </span><span class="nx">aci</span><span class="p">,</span><span class="w"> </span><span class="nx">bytecode</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 </code></pre></div>
 <h3 id="by-aci-and-contract-address">By ACI and contract address</h3>
 <p>In many cases an application doesn't need to deploy a contract or verify its bytecode. In this case you'd want to initialize the instance by just providing the ACI and the contract address. This is also possible:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">aci</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// ACI of the contract</span>
-<span class="kd">const</span> <span class="nx">contractAddress</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// the address of the contract</span>
-<span class="kd">const</span> <span class="nx">contractInstance</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span> <span class="nx">aci</span><span class="p">,</span> <span class="nx">contractAddress</span> <span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">aci</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="c1">// ACI of the contract</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">contractAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="c1">// the address of the contract</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">contractInstance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span><span class="w"> </span><span class="nx">aci</span><span class="p">,</span><span class="w"> </span><span class="nx">contractAddress</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 </code></pre></div>
 <h3 id="options">Options</h3>
 <ul>
@@ -1180,13 +1180,13 @@
 <span class="w">        </span><span class="nb">state</span><span class="p">.</span><span class="n">count</span><span class="w"></span>
 </code></pre></div></p>
 <p>The contract can be deployed using the <code>contractInstance</code> in two different ways:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">tx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">contractInstance</span><span class="p">.</span><span class="nx">deploy</span><span class="p">([</span><span class="mf">1</span><span class="p">])</span> <span class="c1">// recommended</span>
-<span class="c1">// or</span>
-<span class="kd">const</span> <span class="nx">tx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">init</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contractInstance</span><span class="p">.</span><span class="nx">deploy</span><span class="p">([</span><span class="mf">1</span><span class="p">])</span><span class="w"> </span><span class="c1">// recommended</span><span class="w"></span>
+<span class="c1">// or</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">init</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span><span class="w"></span>
 
-<span class="c1">// after successful deployment you can look up the transaction and the deploy information</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">tx</span><span class="p">)</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">contractInstance</span><span class="p">.</span><span class="nx">deployInfo</span><span class="p">)</span> <span class="c1">// { owner, transaction, address, result, rawTx }</span>
+<span class="c1">// after successful deployment you can look up the transaction and the deploy information</span><span class="w"></span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">tx</span><span class="p">)</span><span class="w"></span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">contractInstance</span><span class="p">.</span><span class="nx">deployInfo</span><span class="p">)</span><span class="w"> </span><span class="c1">// { owner, transaction, address, result, rawTx }</span><span class="w"></span>
 </code></pre></div>
 <p>Note:</p>
 <ul>
@@ -1198,11 +1198,11 @@ if they should produce changes to the state of the smart contract, see <code>inc
 <h2 id="5-call-contract-entrypoints">5. Call contract entrypoints</h2>
 <h3 id="a-stateful-entrypoints">a) Stateful entrypoints</h3>
 <p>According to the example above you can call the <code>stateful</code> entrypoint <code>increment</code> by using one of the following lines:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">tx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">increment</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span> <span class="c1">// recommended</span>
-<span class="c1">// or</span>
-<span class="kd">const</span> <span class="nx">tx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">increment</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
-<span class="c1">// or</span>
-<span class="kd">const</span> <span class="nx">tx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">contractInstance</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="s1">&#39;increment&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mf">3</span><span class="p">])</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">increment</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span><span class="w"> </span><span class="c1">// recommended</span><span class="w"></span>
+<span class="c1">// or</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">increment</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span><span class="w"></span>
+<span class="c1">// or</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contractInstance</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="s1">&#39;increment&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">3</span><span class="p">])</span><span class="w"></span>
 </code></pre></div>
 <p>Note:</p>
 <ul>
@@ -1211,12 +1211,12 @@ if they should produce changes to the state of the smart contract, see <code>inc
 </ul>
 <h3 id="b-regular-entrypoints">b) Regular entrypoints</h3>
 <p>The æternity node can expose an API endpoint that allows to execute a <code>dry-run</code> for a transaction. You can make use of that functionality to get the result of entrypoints that don't execute state changes. Following lines show how you can do that using the SDK for the <code>get_count</code> entrypoint of the example above:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">tx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">get_count</span><span class="p">()</span> <span class="c1">// recommended</span>
-<span class="c1">// or</span>
-<span class="kd">const</span> <span class="nx">tx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">get_count</span><span class="p">.</span><span class="nx">get</span><span class="p">()</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">get_count</span><span class="p">()</span><span class="w"> </span><span class="c1">// recommended</span><span class="w"></span>
+<span class="c1">// or</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">get_count</span><span class="p">.</span><span class="nx">get</span><span class="p">()</span><span class="w"></span>
 
-<span class="c1">// access the decoded result returned by the execution of the entrypoint</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">tx</span><span class="p">.</span><span class="nx">decodedResult</span><span class="p">);</span>
+<span class="c1">// access the decoded result returned by the execution of the entrypoint</span><span class="w"></span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">tx</span><span class="p">.</span><span class="nx">decodedResult</span><span class="p">);</span><span class="w"></span>
 </code></pre></div>
 <p>Note:</p>
 <ul>
@@ -1230,11 +1230,11 @@ if they should produce changes to the state of the smart contract, see <code>inc
 <span class="w">        </span><span class="c1">// further logic ...</span>
 </code></pre></div>
 <p>In order to successfully call the <code>fund_project</code> entrypoint you need to provide at least 50 <code>aettos</code>. You can do this by providing the desired amount of <code>aettos</code> using one of the following lines:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">tx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">fund_project</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="p">{</span> <span class="nx">amount</span><span class="o">:</span> <span class="mf">50</span> <span class="p">})</span> <span class="c1">// recommended</span>
-<span class="c1">// or</span>
-<span class="kd">const</span> <span class="nx">tx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">fund_project</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="p">{</span> <span class="nx">amount</span><span class="o">:</span> <span class="mf">50</span> <span class="p">})</span>
-<span class="c1">// or</span>
-<span class="kd">const</span> <span class="nx">tx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">contractInstance</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="s1">&#39;fund_project&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mf">1</span><span class="p">],</span> <span class="p">{</span> <span class="nx">amount</span><span class="o">:</span> <span class="mf">50</span> <span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">fund_project</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">amount</span><span class="o">:</span><span class="w"> </span><span class="mf">50</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="c1">// recommended</span><span class="w"></span>
+<span class="c1">// or</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">fund_project</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">amount</span><span class="o">:</span><span class="w"> </span><span class="mf">50</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
+<span class="c1">// or</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contractInstance</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="s1">&#39;fund_project&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">1</span><span class="p">],</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">amount</span><span class="o">:</span><span class="w"> </span><span class="mf">50</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 </code></pre></div>
 <h2 id="transaction-options">Transaction options</h2>
 <p>As already stated various times in the guide it is possible to provide <a href="../../transaction-options/">transaction options</a> as object to a function of the SDK that builds and potentially broadcasts a transaction. This object can be passed as additional param to each of these functions and overrides the default settings.</p>

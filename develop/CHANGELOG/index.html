@@ -6566,10 +6566,10 @@ Add <code>getContractByteCode</code> API</li>
 <h3 id="breaking-changes_10">BREAKING CHANGES</h3>
 <ul>
 <li><strong>aci:</strong> Change Sophia option type representation in ACI
-<div class="highlight"><pre><span></span><code><span class="c1">// from</span>
-<span class="k">await</span> <span class="nx">contract</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">optionFn</span><span class="p">(</span><span class="nb">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span> <span class="o">||</span> <span class="nb">Promise</span><span class="p">.</span><span class="nx">reject</span><span class="p">())</span>
-<span class="c1">// to</span>
-<span class="k">await</span> <span class="nx">contract</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">optionFn</span><span class="p">(</span><span class="mf">1</span> <span class="o">||</span> <span class="kc">undefined</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="c1">// from</span><span class="w"></span>
+<span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">optionFn</span><span class="p">(</span><span class="nb">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">Promise</span><span class="p">.</span><span class="nx">reject</span><span class="p">())</span><span class="w"></span>
+<span class="c1">// to</span><span class="w"></span>
+<span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">optionFn</span><span class="p">(</span><span class="mf">1</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="kc">undefined</span><span class="p">)</span><span class="w"></span>
 </code></pre></div></li>
 </ul>
 <h2 id="500-next1-2019-09-10"><a href="https://github.com/aeternity/aepp-sdk-js/compare/4.6.0...4.7.0-next.1">5.0.0-next.1</a> (2019-09-10)</h2>
@@ -6628,20 +6628,20 @@ Add <code>getContractByteCode</code> API</li>
 <li><strong>state channels:</strong> handle BigNumbers with json-bigint (<a href="https://github.com/aeternity/aepp-sdk-js/issues/596">#596</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/14eaa3d">14eaa3d</a>)</li>
 <li><strong>state channels:</strong> send generic messages immediately (<a href="https://github.com/aeternity/aepp-sdk-js/issues/600">#600</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/8ad7583">8ad7583</a>)</li>
 <li><strong>Generalize Account</strong>  Implement Generalized account support (<a href="https://github.com/aeternity/aepp-sdk-js/pull/449">#449</a>)
-    <div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">authContract</span> <span class="o">=</span> <span class="sb">`YOUR_AUTH_CONTRACT`</span>
+    <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">authContract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`YOUR_AUTH_CONTRACT`</span><span class="w"></span>
 
-<span class="c1">// Make current account Generalized</span>
-<span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">createGeneralizeAccount</span><span class="p">(</span><span class="nx">authFnName</span><span class="p">,</span> <span class="nx">authContract</span><span class="p">,</span> <span class="p">[...</span><span class="nx">authFnArguments</span><span class="p">]</span>
+<span class="c1">// Make current account Generalized</span><span class="w"></span>
+<span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">createGeneralizeAccount</span><span class="p">(</span><span class="nx">authFnName</span><span class="p">,</span><span class="w"> </span><span class="nx">authContract</span><span class="p">,</span><span class="w"> </span><span class="p">[...</span><span class="nx">authFnArguments</span><span class="p">]</span><span class="w"></span>
 
-<span class="c1">// Make spend transaction using GA</span>
-<span class="c1">// One Way</span>
-    <span class="c1">// encoded call data for auth contract</span>
-    <span class="kd">const</span> <span class="nx">callData</span> <span class="o">=</span> <span class="s1">&#39;cb_...&#39;</span>
-    <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">10000</span><span class="p">,</span> <span class="nx">receiverPub</span><span class="p">,</span> <span class="p">{</span> <span class="nx">authData</span><span class="o">:</span> <span class="p">{</span> <span class="nx">callData</span> <span class="p">}</span> <span class="p">})</span>
+<span class="c1">// Make spend transaction using GA</span><span class="w"></span>
+<span class="c1">// One Way</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// encoded call data for auth contract</span><span class="w"></span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">callData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;cb_...&#39;</span><span class="w"></span>
+<span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">10000</span><span class="p">,</span><span class="w"> </span><span class="nx">receiverPub</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">authData</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">callData</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 
-<span class="c1">// or</span>
-    <span class="c1">// sdk will prepare callData itself</span>
-    <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">10000</span><span class="p">,</span> <span class="nx">receiverPub</span><span class="p">,</span> <span class="p">{</span> <span class="nx">authData</span><span class="o">:</span> <span class="p">{</span> <span class="nx">source</span><span class="o">:</span> <span class="nx">authContract</span><span class="p">,</span> <span class="nx">args</span><span class="o">:</span> <span class="p">[...</span><span class="nx">authContractArgs</span><span class="p">]</span> <span class="p">}</span> <span class="p">})</span>
+<span class="c1">// or</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// sdk will prepare callData itself</span><span class="w"></span>
+<span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">10000</span><span class="p">,</span><span class="w"> </span><span class="nx">receiverPub</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">authData</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">source</span><span class="o">:</span><span class="w"> </span><span class="nx">authContract</span><span class="p">,</span><span class="w"> </span><span class="nx">args</span><span class="o">:</span><span class="w"> </span><span class="p">[...</span><span class="nx">authContractArgs</span><span class="p">]</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 </code></pre></div></li>
 </ul>
 <h2 id="440-2019-08-09"><a href="https://github.com/aeternity/aepp-sdk-js/compare/4.3.0...4.4.0">4.4.0</a> (2019-08-09)</h2>

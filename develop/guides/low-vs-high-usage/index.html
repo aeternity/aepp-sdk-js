@@ -888,119 +888,89 @@ understand the node's operations. Most real-world requirements involves a series
 of chain operations, so the SDK provides abstractions for these.</p>
 <h2 id="recommended-high-level-sdk-usage">(<strong>Recommended</strong>) High-level SDK usage</h2>
 <p>Example spend function, using æternity's SDK abstraction.</p>
-<div class="highlight"><pre><span></span><code><span class="k">import</span> <span class="p">{</span> <span class="nx">MemoryAccount</span><span class="p">,</span> <span class="nx">Node</span><span class="p">,</span> <span class="nx">Universal</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">Universal</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="w"></span>
 
-<span class="k">async</span> <span class="kd">function</span> <span class="nx">init</span> <span class="p">()</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="nx">node</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Node</span><span class="p">({</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span> <span class="p">})</span> <span class="c1">// ideally host your own node!</span>
+<span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">init</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Node</span><span class="p">({</span><span class="w"> </span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="c1">// ideally host your own node!</span><span class="w"></span>
 
-  <span class="kd">const</span> <span class="nx">aeSdk</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span>
-    <span class="nx">nodes</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;testnet&#39;</span><span class="p">,</span> <span class="nx">instance</span><span class="o">:</span> <span class="nx">node</span> <span class="p">}],</span>
-    <span class="nx">compilerUrl</span><span class="o">:</span> <span class="s1">&#39;https://compiler.aepps.com&#39;</span><span class="p">,</span> <span class="c1">// ideally host your own compiler!</span>
-    <span class="nx">accounts</span><span class="o">:</span> <span class="p">[</span><span class="nx">MemoryAccount</span><span class="p">({</span><span class="nx">keypair</span><span class="o">:</span> <span class="p">{</span><span class="nx">secretKey</span><span class="o">:</span> <span class="s1">&#39;&lt;PRIV_KEY_HERE&gt;&#39;</span><span class="p">,</span> <span class="nx">publicKey</span><span class="o">:</span> <span class="s1">&#39;&lt;PUB_KEY_HERE&gt;&#39;</span><span class="p">}})],</span>
-  <span class="p">})</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Universal</span><span class="p">({</span><span class="w"></span>
+<span class="w">    </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}],</span><span class="w"></span>
+<span class="w">    </span><span class="nx">compilerUrl</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;https://compiler.aepps.com&#39;</span><span class="p">,</span><span class="w"> </span><span class="c1">// ideally host your own compiler!</span><span class="w"></span>
+<span class="w">    </span><span class="nx">accounts</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="nx">MemoryAccount</span><span class="p">({</span><span class="nx">keypair</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="nx">secretKey</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;&lt;PRIV_KEY_HERE&gt;&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">publicKey</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;&lt;PUB_KEY_HERE&gt;&#39;</span><span class="p">}})],</span><span class="w"></span>
+<span class="w">  </span><span class="p">})</span><span class="w"></span>
 
-  <span class="c1">// log transaction info</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">100</span><span class="p">,</span> <span class="s1">&#39;ak_...&#39;</span><span class="p">))</span>
-<span class="p">}</span>
+<span class="w">  </span><span class="c1">// log transaction info</span><span class="w"></span>
+<span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">100</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;ak_...&#39;</span><span class="p">))</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </code></pre></div>
 <h2 id="low-level-sdk-usage-use-api-endpoints-directly">Low-level SDK usage (use <a href="https://aeternity.com/protocol/node/api">API</a> endpoints directly)</h2>
 <p>Example spend function, using the SDK, talking directly to the <a href="https://aeternity.com/protocol/node/api"><strong>API</strong></a>:
-<div class="highlight"><pre><span></span><code><span class="k">import</span> <span class="p">{</span> <span class="nx">MemoryAccount</span><span class="p">,</span> <span class="nx">Node</span><span class="p">,</span> <span class="nx">Universal</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">Universal</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="w"></span>
 
-<span class="k">async</span> <span class="kd">function</span> <span class="nx">spend</span> <span class="p">(</span><span class="nx">amount</span><span class="p">,</span> <span class="nx">recipient</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="nx">node</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Node</span><span class="p">({</span> <span class="s1">&#39;https://testnet.aeternity.io&#39;</span> <span class="p">})</span> <span class="c1">// ideally host your own node!</span>
-  <span class="kd">const</span> <span class="nx">aeSdk</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Universal</span><span class="p">({</span>
-    <span class="nx">nodes</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;testnet&#39;</span><span class="p">,</span> <span class="nx">instance</span><span class="o">:</span> <span class="nx">node</span> <span class="p">}],</span>
-    <span class="nx">compilerUrl</span><span class="o">:</span> <span class="s1">&#39;https://compiler.aepps.com&#39;</span><span class="p">,</span> <span class="c1">// ideally host your own compiler!</span>
-    <span class="nx">accounts</span><span class="o">:</span> <span class="p">[</span><span class="nx">MemoryAccount</span><span class="p">({</span><span class="nx">keypair</span><span class="o">:</span> <span class="p">{</span><span class="nx">secretKey</span><span class="o">:</span> <span class="s1">&#39;&lt;PRIV_KEY_HERE&gt;&#39;</span><span class="p">,</span> <span class="nx">publicKey</span><span class="o">:</span> <span class="s1">&#39;&lt;PUB_KEY_HERE&gt;&#39;</span><span class="p">}})],</span>
-  <span class="p">})</span>
+<span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">spend</span><span class="w"> </span><span class="p">(</span><span class="nx">amount</span><span class="p">,</span><span class="w"> </span><span class="nx">recipient</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Node</span><span class="p">({</span><span class="w"> </span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="c1">// ideally host your own node!</span><span class="w"></span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Universal</span><span class="p">({</span><span class="w"></span>
+<span class="w">    </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}],</span><span class="w"></span>
+<span class="w">    </span><span class="nx">compilerUrl</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;https://compiler.aepps.com&#39;</span><span class="p">,</span><span class="w"> </span><span class="c1">// ideally host your own compiler!</span><span class="w"></span>
+<span class="w">    </span><span class="nx">accounts</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="nx">MemoryAccount</span><span class="p">({</span><span class="nx">keypair</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="nx">secretKey</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;&lt;PRIV_KEY_HERE&gt;&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">publicKey</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;&lt;PUB_KEY_HERE&gt;&#39;</span><span class="p">}})],</span><span class="w"></span>
+<span class="w">  </span><span class="p">})</span><span class="w"></span>
 
-  <span class="c1">// builds an unsigned SpendTx using the debug endpoint of the node&#39;s API</span>
-  <span class="kd">const</span> <span class="nx">spendTxResponse</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">api</span><span class="p">.</span><span class="nx">postSpend</span><span class="p">({</span>
-      <span class="nx">sender_id</span><span class="o">:</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">address</span><span class="p">(),</span>
-      <span class="nx">recipient_id</span><span class="o">:</span> <span class="nx">recipient</span><span class="p">,</span>
-      <span class="nx">fee</span><span class="o">:</span> <span class="mf">18000000000000</span><span class="p">,</span> <span class="c1">// you must provide enough fee</span>
-      <span class="nx">amount</span><span class="p">,</span> <span class="c1">// aettos</span>
-      <span class="nx">payload</span><span class="o">:</span> <span class="s1">&#39;using low-level api is funny&#39;</span>
-  <span class="p">})</span>
+<span class="w">  </span><span class="c1">// builds an unsigned SpendTx using the debug endpoint of the node&#39;s API</span><span class="w"></span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">spendTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spendTx</span><span class="p">({</span><span class="w"></span>
+<span class="w">    </span><span class="nx">senderId</span><span class="o">:</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">address</span><span class="p">(),</span><span class="w"></span>
+<span class="w">    </span><span class="nx">recipientId</span><span class="o">:</span><span class="w"> </span><span class="nx">recipient</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nx">fee</span><span class="o">:</span><span class="w"> </span><span class="mf">18000000000000</span><span class="p">,</span><span class="w"> </span><span class="c1">// you must provide enough fee</span><span class="w"></span>
+<span class="w">    </span><span class="nx">amount</span><span class="p">,</span><span class="w"> </span><span class="c1">// aettos</span><span class="w"></span>
+<span class="w">    </span><span class="nx">payload</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;using low-level api is funny&#39;</span><span class="w"></span>
+<span class="w">  </span><span class="p">})</span><span class="w"></span>
 
-  <span class="c1">// sign the encoded transaction returned by the node</span>
-  <span class="kd">const</span> <span class="nx">signedTx</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">signTransaction</span><span class="p">(</span><span class="nx">spendTxResponse</span><span class="p">.</span><span class="nx">tx</span><span class="p">)</span>
+<span class="w">  </span><span class="c1">// sign the encoded transaction returned by the node</span><span class="w"></span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">signedTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">signTransaction</span><span class="p">(</span><span class="nx">spendTx</span><span class="p">)</span><span class="w"></span>
 
-  <span class="c1">// broadcast the signed tx to the node</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">await</span> <span class="nx">aeSdk</span><span class="p">.</span><span class="nx">api</span><span class="p">.</span><span class="nx">postTransaction</span><span class="p">({</span><span class="nx">tx</span><span class="o">:</span> <span class="nx">signedTx</span><span class="p">}))</span>
-<span class="p">}</span>
+<span class="w">  </span><span class="c1">// broadcast the signed tx to the node</span><span class="w"></span>
+<span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">api</span><span class="p">.</span><span class="nx">postTransaction</span><span class="p">({</span><span class="nx">tx</span><span class="o">:</span><span class="w"> </span><span class="nx">signedTx</span><span class="p">}))</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </code></pre></div></p>
 <p>Following functions are available with the low-level API right now:</p>
-<div class="highlight"><pre><span></span><code><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">api</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">api</span><span class="p">)</span><span class="w"></span>
 <span class="cm">/*</span>
 <span class="cm">{</span>
-<span class="cm">  getTopHeader: [Function (anonymous)],</span>
-<span class="cm">  getCurrentKeyBlock: [Function (anonymous)],</span>
-<span class="cm">  getCurrentKeyBlockHash: [Function (anonymous)],</span>
-<span class="cm">  getCurrentKeyBlockHeight: [Function (anonymous)],</span>
-<span class="cm">  getPendingKeyBlock: [Function (anonymous)],</span>
-<span class="cm">  getKeyBlockByHash: [Function (anonymous)],</span>
-<span class="cm">  getKeyBlockByHeight: [Function (anonymous)],</span>
-<span class="cm">  getMicroBlockHeaderByHash: [Function (anonymous)],</span>
-<span class="cm">  getMicroBlockTransactionsByHash: [Function (anonymous)],</span>
-<span class="cm">  getMicroBlockTransactionByHashAndIndex: [Function (anonymous)],</span>
-<span class="cm">  getMicroBlockTransactionsCountByHash: [Function (anonymous)],</span>
-<span class="cm">  getCurrentGeneration: [Function (anonymous)],</span>
-<span class="cm">  getGenerationByHash: [Function (anonymous)],</span>
-<span class="cm">  getGenerationByHeight: [Function (anonymous)],</span>
-<span class="cm">  getAccountByPubkey: [Function (anonymous)],</span>
-<span class="cm">  getAccountByPubkeyAndHeight: [Function (anonymous)],</span>
-<span class="cm">  getAccountByPubkeyAndHash: [Function (anonymous)],</span>
-<span class="cm">  getPendingAccountTransactionsByPubkey: [Function (anonymous)],</span>
-<span class="cm">  protectedDryRunTxs: [Function (anonymous)],</span>
-<span class="cm">  getTransactionByHash: [Function (anonymous)],</span>
-<span class="cm">  getTransactionInfoByHash: [Function (anonymous)],</span>
-<span class="cm">  postTransaction: [Function (anonymous)],</span>
-<span class="cm">  getContract: [Function (anonymous)],</span>
-<span class="cm">  getContractCode: [Function (anonymous)],</span>
-<span class="cm">  getContractPoI: [Function (anonymous)],</span>
-<span class="cm">  getOracleByPubkey: [Function (anonymous)],</span>
-<span class="cm">  getOracleQueriesByPubkey: [Function (anonymous)],</span>
-<span class="cm">  getOracleQueryByPubkeyAndQueryId: [Function (anonymous)],</span>
-<span class="cm">  getNameEntryByName: [Function (anonymous)],</span>
-<span class="cm">  getChannelByPubkey: [Function (anonymous)],</span>
-<span class="cm">  getPeerPubkey: [Function (anonymous)],</span>
-<span class="cm">  getStatus: [Function (anonymous)],</span>
-<span class="cm">  getChainEnds: [Function (anonymous)],</span>
-<span class="cm">  postKeyBlock: [Function (anonymous)],</span>
-<span class="cm">  postSpend: [Function (anonymous)],</span>
-<span class="cm">  getPendingTransactions: [Function (anonymous)],</span>
-<span class="cm">  postPayingFor: [Function (anonymous)],</span>
-<span class="cm">  postContractCreate: [Function (anonymous)],</span>
-<span class="cm">  postContractCall: [Function (anonymous)],</span>
-<span class="cm">  postOracleRegister: [Function (anonymous)],</span>
-<span class="cm">  postOracleExtend: [Function (anonymous)],</span>
-<span class="cm">  postOracleQuery: [Function (anonymous)],</span>
-<span class="cm">  postOracleRespond: [Function (anonymous)],</span>
-<span class="cm">  postNamePreclaim: [Function (anonymous)],</span>
-<span class="cm">  postNameClaim: [Function (anonymous)],</span>
-<span class="cm">  postNameUpdate: [Function (anonymous)],</span>
-<span class="cm">  postNameTransfer: [Function (anonymous)],</span>
-<span class="cm">  postNameRevoke: [Function (anonymous)],</span>
-<span class="cm">  getCommitmentId: [Function (anonymous)],</span>
-<span class="cm">  postChannelCreate: [Function (anonymous)],</span>
-<span class="cm">  postChannelDeposit: [Function (anonymous)],</span>
-<span class="cm">  postChannelWithdraw: [Function (anonymous)],</span>
-<span class="cm">  postChannelSnapshotSolo: [Function (anonymous)],</span>
-<span class="cm">  postChannelSetDelegates: [Function (anonymous)],</span>
-<span class="cm">  postChannelCloseMutual: [Function (anonymous)],</span>
-<span class="cm">  postChannelCloseSolo: [Function (anonymous)],</span>
-<span class="cm">  postChannelSlash: [Function (anonymous)],</span>
-<span class="cm">  postChannelSettle: [Function (anonymous)],</span>
-<span class="cm">  getNetworkStatus: [Function (anonymous)],</span>
-<span class="cm">  getNodeBeneficiary: [Function (anonymous)],</span>
-<span class="cm">  getNodePubkey: [Function (anonymous)],</span>
-<span class="cm">  getPeers: [Function (anonymous)],</span>
-<span class="cm">  dryRunTxs: [Function (anonymous)],</span>
-<span class="cm">  getTokenSupplyByHeight: [Function (anonymous)]</span>
+<span class="cm">  getTopHeader: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getCurrentKeyBlock: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getCurrentKeyBlockHash: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getCurrentKeyBlockHeight: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getPendingKeyBlock: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getKeyBlockByHash: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getKeyBlockByHeight: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getMicroBlockHeaderByHash: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getMicroBlockTransactionsByHash: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getMicroBlockTransactionByHashAndIndex: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getMicroBlockTransactionsCountByHash: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getCurrentGeneration: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getGenerationByHash: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getGenerationByHeight: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getAccountByPubkey: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getAccountByPubkeyAndHeight: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getAccountByPubkeyAndHash: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getPendingAccountTransactionsByPubkey: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getAccountNextNonce: [AsyncFunction (anonymous)],</span>
+<span class="cm">  protectedDryRunTxs: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getTransactionByHash: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getTransactionInfoByHash: [AsyncFunction (anonymous)],</span>
+<span class="cm">  postTransaction: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getContract: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getContractCode: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getContractPoI: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getOracleByPubkey: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getOracleQueriesByPubkey: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getOracleQueryByPubkeyAndQueryId: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getNameEntryByName: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getChannelByPubkey: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getPeerPubkey: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getStatus: [AsyncFunction (anonymous)],</span>
+<span class="cm">  getChainEnds: [AsyncFunction (anonymous)]</span>
 <span class="cm">}</span>
-<span class="cm">*/</span>
+<span class="cm">*/</span><span class="w"></span>
 </code></pre></div>
                 
               
