@@ -17,7 +17,9 @@ export const NAME_BID_TIMEOUT_BLOCKS = 480 // # ~1 day
 // # this is the max length for a domain that requires a base fee to be paid
 export const NAME_MAX_LENGTH_FEE = 31
 export const NAME_BID_MAX_LENGTH = 12 // # this is the max length for a domain to be part of a bid
-export const POINTER_KEY_BY_PREFIX = {
+export const POINTER_KEY_BY_PREFIX: {
+  [prefix: string]: string
+} = {
   ak: 'account_pubkey',
   ok: 'oracle_pubkey',
   ct: 'contract_pubkey',
@@ -26,7 +28,9 @@ export const POINTER_KEY_BY_PREFIX = {
 // # https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L290
 // # https://github.com/aeternity/protocol/blob/master/AENS.md#protocol-fees-and-protection-times
 // # bid ranges:
-export const NAME_BID_RANGES = mapObject({
+export const NAME_BID_RANGES: {
+  [key: number]: BigNumber
+} = mapObject({
   31: 3,
   30: 5,
   29: 8,
@@ -58,15 +62,17 @@ export const NAME_BID_RANGES = mapObject({
   3: 2178309,
   2: 3524578,
   1: 5702887
-}, ([key, value]) => [key, new BigNumber(value).times(NAME_FEE_MULTIPLIER)])
+}, ([key, value]) => [key, new BigNumber(value).times(NAME_FEE_MULTIPLIER)]
+
+)
 
 // # ref: https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L273
 // # name bid timeouts
 export const NAME_BID_TIMEOUTS = {
-  13: BigNumber(0),
-  12: BigNumber(NAME_BID_TIMEOUT_BLOCKS), // # 480 blocks
-  8: BigNumber(31).times(NAME_BID_TIMEOUT_BLOCKS), // # 14880 blocks
-  4: BigNumber(62).times(NAME_BID_TIMEOUT_BLOCKS) // # 29760 blocks
+  13: new BigNumber(0),
+  12: new BigNumber(NAME_BID_TIMEOUT_BLOCKS), // # 480 blocks
+  8: new BigNumber(31).times(NAME_BID_TIMEOUT_BLOCKS), // # 14880 blocks
+  4: new BigNumber(62).times(NAME_BID_TIMEOUT_BLOCKS) // # 29760 blocks
 }
 
 // # Tag constant for ids (type uint8)
@@ -88,7 +94,9 @@ export const ID_TAG = {
   channel: ID_TAG_CHANNEL
 }
 
-export const PREFIX_ID_TAG = {
+export const PREFIX_ID_TAG: {
+  [prefix: string]: number
+} = {
   ak: ID_TAG.account,
   nm: ID_TAG.name,
   cm: ID_TAG.commitment,

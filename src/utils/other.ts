@@ -5,8 +5,14 @@ export const pause = async (duration: number): Promise<void> =>
 
 export const mapObject = (
   object: object,
-  fn: (value: [string, any], index: number, array: Array<[string, any]>) => Array<[string, any]>
-): object => Object.fromEntries(Object.entries(object).map(fn))
+  fn: (
+    value: [string, any],
+    index: number,
+    array: Array<[string, any]>
+  ) => [string, any]
+): {
+  [key: string]: any
+} => Object.fromEntries(Object.entries(object).map(fn))
 
 export const filterObject = (
   object: object,
