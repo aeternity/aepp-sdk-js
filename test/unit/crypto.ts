@@ -98,6 +98,12 @@ describe('crypto', () => {
     const messageNonASCIISignatureAsHex = 'faa1bdb8a88c529be904036382705ed207bbdde00ece3bdb541f5986d57aebe7babe315a4d95f5882165c28bf41f6149430509ded1cc7dcd9b134e0e1d73cd0b'
     const messageNonASCIISignature = Buffer.from(messageNonASCIISignatureAsHex, 'hex')
 
+    const longMessage = 'test'.repeat(256)
+    const longMessageHash = Buffer.from('J9bibOHrlicf0tYQxe1lW69LdDAxETwPmrafKjjQwvs=', 'base64')
+
+    it('calculates a hash of a long message', () =>
+      expect(Crypto.messageToHash(longMessage)).to.eql(longMessageHash))
+
     describe('sign', () => {
       it('should produce correct signature of message', () => {
         const s = Crypto.signMessage(message, privateKey)

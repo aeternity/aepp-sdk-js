@@ -24,10 +24,10 @@
 import nacl, { SignKeyPair } from 'tweetnacl'
 import aesjs from 'aes-js'
 import { blake2b, Data } from 'blakejs'
+import { encode as varuintEncode } from 'varuint-bitcoin'
 
 import { str2buf } from './bytes'
 import { encode, decode, sha256hash } from './encoder'
-import { NotImplementedError } from './errors'
 
 export { sha256hash }
 
@@ -206,8 +206,7 @@ export function verify (
 export function messageToHash (message: string): Buffer {
   const p = Buffer.from('aeternity Signed Message:\n', 'utf8')
   const msg = Buffer.from(message, 'utf8')
-  if (msg.length >= 0xFD) throw new NotImplementedError('Message too long')
-  return hash(Buffer.concat([Buffer.from([p.length]), p, Buffer.from([msg.length]), msg]))
+  return hash(Buffer.concat([varuintEncode(p.length), p, varuintEncode(msg.length), msg]))
 }
 
 export function signMessage (message: string, privateKey: string | Buffer): Uint8Array {
