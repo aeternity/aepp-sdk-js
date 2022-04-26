@@ -1,4 +1,4 @@
-import JsonBig from '@aeternity/json-bigint'
+import JsonBig from 'json-bigint'
 import BigNumber from 'bignumber.js'
 
 const jsonBig = JsonBig({ storeAsString: true })
