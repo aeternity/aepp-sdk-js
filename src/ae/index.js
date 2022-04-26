@@ -24,12 +24,14 @@
 
 import stampit from '@stamp/it'
 import Tx from '../tx'
-import Chain from '../chain'
-import AccountBase from '../account/base'
+import * as chainMethods from '../chain'
+import NodePool from '../node-pool'
+import AccountResolver from '../account/resolver'
 import { buildTxHash, unpackTx } from '../tx/builder'
 import BigNumber from 'bignumber.js'
 import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter'
 import { ArgumentError } from '../utils/errors'
+import { mapObject } from '../utils/other'
 
 /**
  * Sign and post a transaction to the chain
@@ -160,8 +162,39 @@ function destroyInstance () {
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Ae instance
  */
-const Ae = stampit(Tx, AccountBase, Chain, {
-  methods: { send, spend, transferFunds, payForTransaction, destroyInstance, signUsingGA },
+const Ae = stampit(NodePool, Tx, AccountResolver, {
+  methods: {
+    send,
+    spend,
+    transferFunds,
+    payForTransaction,
+    destroyInstance,
+    signUsingGA,
+    ...mapObject(
+      chainMethods,
+      ([name, handler]) => [
+        name,
+        function (...args) {
+          const instanceOptions = {
+            ...this.Ae.defaults,
+            onNode: this.selectedNode.instance,
+            onAccount: this
+          }
+          const lastArg = args[args.length - 1]
+          if (
+            lastArg && typeof lastArg === 'object' && lastArg.constructor === Object
+          ) {
+            Object.assign(lastArg, {
+              ...instanceOptions,
+              ...lastArg,
+              ...lastArg.onAccount && { onAccount: this._resolveAccount(lastArg.onAccount) }
+            })
+          } else args.push(instanceOptions)
+          return handler(...args)
+        }
+      ]
+    )
+  },
   deepProps: { Ae: { defaults: { denomination: AE_AMOUNT_FORMATS.AETTOS } } }
 })
 

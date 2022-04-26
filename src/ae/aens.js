@@ -246,7 +246,7 @@ async function claim (name, salt, options) {
 
   const result = await this.send(claimTx, opt)
   if (!isAuctionName(name)) {
-    const nameInter = opt.waitMined ? await this.aensQuery(name, opt) : {}
+    const nameInter = result.blockHeight ? await this.aensQuery(name, opt) : {}
     return Object.assign(result, nameInter)
   }
   return { ...result, nameFee: opt.nameFee }

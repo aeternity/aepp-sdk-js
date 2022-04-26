@@ -141,7 +141,7 @@ export default async function getContractInstance ({
     const result = {
       hash: txData.hash, tx: TxObject({ tx: txData.rawTx }), txData, rawTx: txData.rawTx
     }
-    if (options.waitMined === false) return result
+    if (!txData.blockHeight) return result
     const { callInfo } = await this.api.getTransactionInfoByHash(txData.hash)
     Object.assign(result.txData, callInfo) // TODO: don't duplicate data in result
     await handleCallError(callInfo, tx)
@@ -271,7 +271,7 @@ export default async function getContractInstance ({
       })
       res = await sendAndProcess(tx, opt)
     }
-    if (opt.waitMined || opt.callStatic) {
+    if (opt.callStatic || res.txData.blockHeight) {
       res.decodedResult = fnACI.returns && fnACI.returns !== 'unit' && fn !== 'init' &&
         instance.calldata.decode(instance._name, fn, res.result.returnValue)
       res.decodedEvents = instance.decodeEvents(res.result.log, opt)
