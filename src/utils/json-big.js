@@ -1,13 +1,12 @@
 import JsonBig from 'json-bigint'
 import BigNumber from 'bignumber.js'
+import { mapObject } from './other'
 
 const jsonBig = JsonBig({ storeAsString: true })
 
 const convertValuesToBigNumbers = value => {
   if (typeof value === 'object' && value !== null && value.constructor === Object) {
-    return Object.entries(value)
-      .map(([key, value]) => [key, convertValuesToBigNumbers(value)])
-      .reduce((p, [k, v]) => ({ ...p, [k]: v }), {})
+    return mapObject(value, ([key, value]) => [key, convertValuesToBigNumbers(value)])
   }
   if (Array.isArray(value)) {
     return value.map(item => convertValuesToBigNumbers(item))
