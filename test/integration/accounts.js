@@ -49,10 +49,6 @@ describe('Accounts', function () {
       await wallet.addAccount(MemoryAccount({ keypair: generateKeyPair() }), { select: true })
     })
 
-    it('determining the balance using deprecated `balance` method', async () => {
-      return wallet.balance(await wallet.address()).should.be.rejectedWith(Error)
-    })
-
     it('determining the balance', async () => {
       return wallet.getBalance(await wallet.address()).should.eventually.be.equal('0')
     })
@@ -66,14 +62,14 @@ describe('Accounts', function () {
   })
 
   it('determines the balance using `balance`', async () => {
-    return aeSdk.balance(await aeSdk.address()).should.eventually.be.a('string')
+    return aeSdk.getBalance(await aeSdk.address()).should.eventually.be.a('string')
   })
 
   describe('transferFunds', async () => {
     const spend = async fraction => {
-      const balanceBefore = new BigNumber(await aeSdk.balance(await aeSdk.address()))
+      const balanceBefore = new BigNumber(await aeSdk.getBalance(await aeSdk.address()))
       const { tx } = await aeSdk.transferFunds(fraction, receiver)
-      const balanceAfter = new BigNumber(await aeSdk.balance(await aeSdk.address()))
+      const balanceAfter = new BigNumber(await aeSdk.getBalance(await aeSdk.address()))
       return {
         balanceBefore,
         balanceAfter,
@@ -105,7 +101,7 @@ describe('Accounts', function () {
 
     it('accepts onAccount option', async () => {
       await aeSdk.transferFunds(1, await aeSdk.address(), { onAccount: receiverKey })
-      new BigNumber(await aeSdk.balance(receiver)).isZero().should.be.equal(true)
+      new BigNumber(await aeSdk.getBalance(receiver)).isZero().should.be.equal(true)
     })
   })
 
@@ -131,7 +127,7 @@ describe('Accounts', function () {
     const receiverWallet = generateKeyPair()
     const ret = await genesis.spend(bigAmount, receiverWallet.publicKey)
 
-    const balanceAfter = await aeSdk.balance(receiverWallet.publicKey)
+    const balanceAfter = await aeSdk.getBalance(receiverWallet.publicKey)
     balanceAfter.should.be.equal(bigAmount)
     ret.should.have.property('tx')
     ret.tx.should.include({

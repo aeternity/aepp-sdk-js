@@ -99,33 +99,10 @@ async function getAccount (address, { height, hash } = {}) {
   return this.api.getAccountByPubkey(address)
 }
 
-/**
- * @function
- * @deprecated
- */
-async function balance (address, { height, hash, format = AE_AMOUNT_FORMATS.AETTOS } = {}) {
-  const { balance } = await this.getAccount(address, { hash, height })
-
-  return formatAmount(balance, { targetDenomination: format }).toString()
-}
-
 async function getBalance (address, { height, hash, format = AE_AMOUNT_FORMATS.AETTOS } = {}) {
   const { balance } = await this.getAccount(address, { hash, height }).catch(() => ({ balance: 0 }))
 
   return formatAmount(balance, { targetDenomination: format }).toString()
-}
-
-/**
- * @deprecated use `sdk.api.getTransactionByHash/getTransactionInfoByHash` instead
- */
-async function tx (hash, info = true) {
-  const tx = await this.api.getTransactionByHash(hash)
-  if (['ContractCreateTx', 'ContractCallTx', 'ChannelForceProgressTx'].includes(tx.tx.type) && info && tx.blockHeight !== -1) {
-    try {
-      return { ...tx, ...await this.getTxInfo(hash) }
-    } catch (e) {}
-  }
-  return tx
 }
 
 async function height () {
@@ -153,14 +130,6 @@ async function poll (th, { blocks = 10, interval = this._getPollInterval('microb
     await pause(interval)
   } while (await this.height() < max)
   throw new TxTimedOutError(blocks, th)
-}
-
-/**
- * @deprecated use `sdk.api.getTransactionInfoByHash` instead
- */
-async function getTxInfo (hash) {
-  const result = await this.api.getTransactionInfoByHash(hash)
-  return result.callInfo || result
 }
 
 async function getCurrentGeneration () {
@@ -289,14 +258,11 @@ async function resolveName (nameOrId, key, { verify, resolveByNode } = {}) {
 const ChainNode = Chain.compose(NodePool, {
   methods: {
     sendTransaction,
-    balance,
     getBalance,
     getAccount,
-    tx,
     height,
     awaitHeight,
     poll,
-    getTxInfo,
     getCurrentGeneration,
     getGeneration,
     getMicroBlockHeader,

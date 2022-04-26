@@ -100,7 +100,7 @@ async function transferFunds (fraction, recipientIdOrName, options) {
   const opt = { ...this.Ae.defaults, ...options }
   const recipientId = await this.resolveName(recipientIdOrName, 'account_pubkey', opt)
   const senderId = await this.address(opt)
-  const balance = new BigNumber(await this.balance(senderId))
+  const balance = new BigNumber(await this.getBalance(senderId))
   const desiredAmount = balance.times(fraction).integerValue(BigNumber.ROUND_HALF_UP)
   const { tx: { fee } } = unpackTx(
     await this.spendTx({ ...opt, senderId, recipientId, amount: desiredAmount })

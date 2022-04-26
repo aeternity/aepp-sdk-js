@@ -72,7 +72,7 @@ describe('Generalized Account', function () {
     const callData = authContract.calldata.encode('BlindAuth', 'authorize', [r()])
     await aeSdk.spend(10000, publicKey, { authData: { callData } })
     await aeSdk.spend(10000, publicKey, { authData: { source: authContractSource, args: [r()] } })
-    const balanceAfter = await aeSdk.balance(publicKey)
+    const balanceAfter = await aeSdk.getBalance(publicKey)
     balanceAfter.should.be.equal('20000')
   })
 

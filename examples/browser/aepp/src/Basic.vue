@@ -81,7 +81,7 @@ export default {
       ([aeSdk, address]) => {
         if (!aeSdk) return
         this.compilerVersion = aeSdk.compilerVersion
-        this.balancePromise = aeSdk.balance(address)
+        this.balancePromise = aeSdk.getBalance(address)
         this.heightPromise = aeSdk.height()
         this.nodeInfoPromise = aeSdk.getNodeInfo()
       },

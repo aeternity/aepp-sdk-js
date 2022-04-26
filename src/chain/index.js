@@ -64,10 +64,7 @@ const Chain = stampit({
     height: required,
     awaitHeight: required,
     poll: required,
-    balance: required,
     getBalance: required,
-    tx: required,
-    getTxInfo: required,
     txDryRun: required,
     getAccount: required
   }
@@ -124,7 +121,7 @@ const Chain = stampit({
 
 /**
  * Request the balance of specified account
- * @function balance
+ * @function getBalance
  * @instance
  * @abstract
  * @category async
@@ -136,30 +133,6 @@ const Chain = stampit({
  * @param {String} options.hash - The block hash on which to obtain the balance for (default: top
  * of chain)
  * @return {Object} The transaction as it was mined
- */
-
-/**
- * Obtain a transaction based on its hash
- * @function tx
- * @instance
- * @abstract
- * @category async
- * @rtype (hash: String, info = false) => tx: Object
- * @param {String} hash - Transaction hash
- * @param {Boolean} info - Retrieve additional transaction date. Works only for (ContractCreate and
- * ContractCall transaction's)
- * @return {Object} Transaction
- */
-
-/**
- * Obtain a transaction info based on its hash
- * @function getTxInfo
- * @instance
- * @abstract
- * @category async
- * @rtype (hash: String) => tx: Object
- * @param {String} hash - Transaction hash
- * @return {Object} Transaction
  */
 
 /**
