@@ -21,7 +21,8 @@ export function sha256hash (input: Uint8Array | string): Buffer {
 // based on https://github.com/aeternity/protocol/blob/master/node/api/api_encoding.md
 const base64Types = ['ba', 'cb', 'or', 'ov', 'pi', 'ss', 'cs', 'ck', 'cv', 'st', 'tx']
 const base58Types = ['ak', 'bf', 'bs', 'bx', 'ch', 'cm', 'ct', 'kh', 'mh', 'nm', 'ok', 'oq', 'pp', 'sg', 'th']
-type EncodingType = typeof base64Types[number] | typeof base58Types[number]
+export type EncodingType = typeof base64Types[number] | typeof base58Types[number]
+export type EncodedData<Type extends EncodingType> = `${Type}_${string}`
 // TODO: add all types with a fixed length
 const typesLength: { [name in EncodingType]?: number } = {
   ak: 32,
@@ -70,11 +71,12 @@ const parseType = (maybeType: unknown): [EncodingType, typeof base64] => {
  * Decode data using the default encoding/decoding algorithm
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {string} data An Base58/64check encoded and prefixed string (ex tx_..., sg_..., ak_....)
+ * @param {EncodedData<EncodingType>} data An Base58/64check encoded and prefixed string
+ * (ex tx_..., sg_..., ak_....)
  * @param {string} [requiredPrefix] Ensure that data have this prefix
  * @return {Buffer} Decoded data
  */
-export function decode (data: string, requiredPrefix?: EncodingType): Buffer {
+export function decode (data: EncodedData<EncodingType>, requiredPrefix?: EncodingType): Buffer {
   const [prefix, encodedPayload, extra] = data.split('_')
   if (encodedPayload == null) throw new DecodeError(`Encoded string missing payload: ${data}`)
   if (extra != null) throw new DecodeError(`Encoded string have extra parts: ${data}`)
@@ -93,9 +95,9 @@ export function decode (data: string, requiredPrefix?: EncodingType): Buffer {
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param {Buffer|String} data  An decoded data
  * @param {string} type Prefix of Transaction
- * @return {String} Encoded string Base58check or Base64check data
+ * @return {EncodedData<type>>} Encoded string Base58check or Base64check data
  */
-export function encode (data: Uint8Array, type: EncodingType): string {
+export function encode (data: Uint8Array, type: EncodingType): EncodedData<typeof type> {
   const [, { encode }] = parseType(type)
   ensureValidLength(data, type)
   return `${type}_${encode(data)}`

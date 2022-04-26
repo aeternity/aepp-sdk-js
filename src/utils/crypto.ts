@@ -27,7 +27,7 @@ import { blake2b, Data } from 'blakejs'
 import { encode as varuintEncode } from 'varuint-bitcoin'
 
 import { str2buf } from './bytes'
-import { encode, decode, sha256hash } from './encoder'
+import { encode, decode, sha256hash, EncodedData, EncodingType } from './encoder'
 
 export { sha256hash }
 
@@ -53,9 +53,9 @@ export function getAddressFromPriv (secret: string | Buffer): string {
  * @param {String} prefix Transaction prefix. Default: 'ak'
  * @return {Boolean} valid
  */
-export function isAddressValid (address: string, prefix = 'ak'): boolean {
+export function isAddressValid (address: string, prefix: EncodingType = 'ak'): boolean {
   try {
-    decode(address, prefix)
+    decode(address as EncodedData<typeof prefix>, prefix)
     return true
   } catch (e) {
     return false
@@ -98,11 +98,11 @@ export function hash (input: Data): Buffer {
 /**
  * Compute contract address
  * @rtype (owner: String, nonce: Number) => String
- * @param {String} owner - Address of contract owner
+ * @param {EncodedData<'ak'>} owner - Address of contract owner
  * @param {Number} nonce - Round when contract was created
  * @return {String} - Contract address
  */
-export function encodeContractAddress (owner: string, nonce: number): string {
+export function encodeContractAddress (owner: EncodedData<'ak'>, nonce: number): string {
   const publicKey = decode(owner, 'ak')
   const binary = Buffer.concat([publicKey, encodeUnsigned(nonce)])
   return encode(hash(binary), 'ct')
