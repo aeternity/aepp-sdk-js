@@ -10,9 +10,11 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 16.x
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
-          path: ~/.npm
+          path: |
+            ~/.npm
+            ~/.autorest
           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
       - run: npm ci
       - name: Run Commitlint
