@@ -404,7 +404,7 @@ describe('Channel', function () {
     const info = 'hello world'
     initiatorCh.sendMessage(info, recipient)
     const message = await new Promise(resolve => responderCh.on('message', resolve))
-    message.should.eql({
+    expect(message).to.eql({
       channel_id: initiatorCh.id(),
       from: sender,
       to: recipient,
