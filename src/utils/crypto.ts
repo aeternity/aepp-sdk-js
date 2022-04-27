@@ -36,14 +36,13 @@ const Ecb = aesjs.ModeOfOperation.ecb
 /**
  * Generate address from secret key
  * @rtype (secret: String) => tx: Promise[String]
- * @param {String | Buffer} secret - Private key
+ * @param {String | Uint8Array} secret - Private key
  * @return {String} Public key
  */
-export function getAddressFromPriv (secret: string | Buffer): string {
-  const secretBuffer = Buffer.isBuffer(secret) ? secret : str2buf(secret)
+export function getAddressFromPriv (secret: string | Uint8Array): string {
+  const secretBuffer = typeof secret === 'string' ? str2buf(secret) : secret
   const keys = nacl.sign.keyPair.fromSecretKey(secretBuffer)
-  const publicBuffer = Buffer.from(keys.publicKey)
-  return encode(publicBuffer, 'ak')
+  return encode(keys.publicKey, 'ak')
 }
 
 /**

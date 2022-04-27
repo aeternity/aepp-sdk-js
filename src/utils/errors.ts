@@ -448,16 +448,9 @@ export class InvalidDerivationPathError extends CryptographyError {
   }
 }
 
-export class InvalidKeyError extends CryptographyError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'InvalidKeyError'
-  }
-}
-
 export class InvalidPasswordError extends CryptographyError {
-  constructor (message: string) {
-    super(message)
+  constructor () {
+    super('Invalid password or nonce')
     this.name = 'InvalidPasswordError'
   }
 }
@@ -473,13 +466,6 @@ export class MissingNodeInTreeError extends CryptographyError {
   constructor (message: string) {
     super(message)
     this.name = 'MissingNodeInTreeError'
-  }
-}
-
-export class UnsupportedAlgorithmError extends CryptographyError {
-  constructor (algo: string) {
-    super(algo + ' is not available')
-    this.name = 'UnsupportedAlgorithmError'
   }
 }
 
