@@ -350,8 +350,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#by-sourcecode" class="md-nav__link">
-    By sourcecode
+  <a href="#by-source-code" class="md-nav__link">
+    By source code
   </a>
   
 </li>
@@ -965,8 +965,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#by-sourcecode" class="md-nav__link">
-    By sourcecode
+  <a href="#by-source-code" class="md-nav__link">
+    By source code
   </a>
   
 </li>
@@ -1111,15 +1111,15 @@
 </li>
 </ul>
 <h2 id="3-initialize-the-contract-instance">3. Initialize the contract instance</h2>
-<h3 id="by-sourcecode">By sourcecode</h3>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">CONTRACT_SOURCE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="c1">// source code of the contract</span><span class="w"></span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">contractInstance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span><span class="w"> </span><span class="nx">source</span><span class="o">:</span><span class="w"> </span><span class="nx">CONTRACT_SOURCE</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
+<h3 id="by-source-code">By source code</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">sourceCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="c1">// source code of the contract</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">contractInstance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span><span class="w"> </span><span class="nx">source</span><span class="o">:</span><span class="w"> </span><span class="nx">sourceCode</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 </code></pre></div>
 <p>Note:</p>
 <ul>
 <li>If your contract includes external dependencies which are not part of the <a href="https://aeternity.com/aesophia/latest/sophia_stdlib">standard library</a> you should initialize the contract using:
   <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">fileSystem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="c1">// key-value map with name of the include as key and source code of the include as value</span><span class="w"></span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">contractInstance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span><span class="w"> </span><span class="nx">source</span><span class="o">:</span><span class="w"> </span><span class="nx">CONTRACT_SOURCE</span><span class="p">,</span><span class="w"> </span><span class="nx">fileSystem</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">contractInstance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span><span class="w"> </span><span class="nx">source</span><span class="o">:</span><span class="w"> </span><span class="nx">sourceCode</span><span class="p">,</span><span class="w"> </span><span class="nx">fileSystem</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 </code></pre></div></li>
 </ul>
 <h3 id="by-aci-and-bytecode">By ACI and bytecode</h3>
@@ -1164,7 +1164,7 @@
 </li>
 </ul>
 <h2 id="4-deploy-the-contract">4. Deploy the contract</h2>
-<p>If you have a Sophia contract that looks like this:
+<p>If you have a Sophia contract source code that looks like this:
 <div class="highlight"><pre><span></span><code><span class="k">contract</span><span class="w"> </span><span class="nf">Increment</span><span class="w"> </span><span class="ow">=</span><span class="w"></span>
 
 <span class="w">    </span><span class="k">record</span><span class="w"> </span><span class="nb">state</span><span class="w"> </span><span class="ow">=</span><span class="w"></span>
@@ -1190,7 +1190,7 @@
 </code></pre></div>
 <p>Note:</p>
 <ul>
-<li>Deployment is only possible if the contract instance was initialized by providing sourcecode or bytecode.</li>
+<li>Deployment is only possible if the contract instance was initialized by providing source code or bytecode.</li>
 <li>The <code>init</code> entrypoint is a special function which is only called once for deployment, initializes the contract's state and doesn't require the <code>stateful</code> declaration.</li>
 <li>In Sophia all <code>public functions</code> are called <code>entrypoints</code> and need to be declared as <code>stateful</code>
 if they should produce changes to the state of the smart contract, see <code>increment(value: int)</code>.</li>
