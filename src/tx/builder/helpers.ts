@@ -31,7 +31,7 @@ export const createSalt = salt
 
 export { encode, decode }
 
-interface Pointer {
+export interface Pointer {
   key: string
   id: string
 }
