@@ -17,48 +17,141 @@
 
 import { w3cwebsocket as W3CWebSocket } from 'websocket'
 import { EventEmitter } from 'events'
+import BigNumber from 'bignumber.js'
 import JsonBig from '../utils/json-big'
 import { pascalToSnake } from '../utils/string'
+import { EncodedData } from '../utils/encoder'
 import { ChannelCallError, ChannelPingTimedOutError, UnknownChannelStateError } from '../utils/errors'
+
+type Channel = any
+
+interface ChannelAction {
+  guard: (channel: Channel, state?: ChannelFsm) => boolean
+  action: (channel: Channel, state?: ChannelFsm) => ChannelFsm
+}
+
+export type SignTxWithTag = (tag: string, tx: EncodedData<'tx'>, options?: object) => Promise<EncodedData<'tx'>>
+// TODO: SignTx shouldn't return number or null
+export type SignTx = (tx: EncodedData<'tx'>, options?: object) => Promise<EncodedData<'tx'> | number | null>
+
+export interface ChannelOptions {
+  existingFsmId?: string
+  url: string
+  role: 'initiator' | 'responder'
+  initiatorId: EncodedData<'ak'>
+  responderId: EncodedData<'ak'>
+  pushAmount: number
+  initiatorAmount: BigNumber
+  responderAmount: BigNumber
+  channelReserve?: BigNumber | number
+  signedTx?: string
+  ttl?: number
+  host: string
+  port: number
+  lockPeriod: number
+  existingChannelId?: string
+  offChainTx?: string
+  reconnectTx?: string
+  timeoutIdle?: number
+  timeoutFundingCreate?: number
+  timeoutFundingSign?: number
+  timeoutFundingLock?: number
+  timeoutSign?: number
+  timeoutAccept?: number
+  timeoutInitialized?: number
+  timeoutAwaitingOpen?: number
+  statePassword?: string
+  debug: boolean
+  sign: SignTxWithTag
+  offchainTx?: string
+}
+
+export interface ChannelHandler extends Function {
+  enter?: Function
+}
+
+export interface ChannelState {
+  signedTx: any
+  resolve: Function
+  reject: Function
+  sign: SignTx
+  handler?: ChannelHandler
+  onOnChainTx?: Function
+  onOwnWithdrawLocked?: Function
+  onWithdrawLocked?: Function
+  onOwnDepositLocked?: Function
+  onDepositLocked?: Function
+  closeTx?: string
+}
+
+export interface ChannelFsm {
+  handler: ChannelHandler
+  state?: ChannelState | {
+    resolve: Function
+    reject: Function
+  }
+}
+
+export interface ChannelMessage {
+  id?: number
+  jsonrpc: string
+  method: string
+  params: any
+  payload?: any
+  data?: any
+  error?: ChannelMessageError
+}
+
+interface ChannelMessageError {
+  code: number
+  message: string
+  data: [{
+    message: string
+    code: number
+  }]
+  request: ChannelMessage
+}
 
 // Send ping message every 10 seconds
 const PING_TIMEOUT_MS = 10000
 // Close connection if pong message is not received within 5 seconds
 const PONG_TIMEOUT_MS = 5000
 
-export const options = new WeakMap()
-export const status = new WeakMap()
-export const state = new WeakMap()
-const fsm = new WeakMap()
-const websockets = new WeakMap()
-export const eventEmitters = new WeakMap()
-const messageQueue = new WeakMap()
-const messageQueueLocked = new WeakMap()
-const actionQueue = new WeakMap()
-const actionQueueLocked = new WeakMap()
-const sequence = new WeakMap()
-export const channelId = new WeakMap()
-const rpcCallbacks = new WeakMap()
-const pingTimeoutId = new WeakMap()
-const pongTimeoutId = new WeakMap()
-export const fsmId = new WeakMap()
+// TODO: move to Channel instance to avoid is-null checks and for easier debugging
+export const options = new WeakMap<Channel, ChannelOptions>()
+export const status = new WeakMap<Channel, string>()
+export const state = new WeakMap<Channel, string>()
+const fsm = new WeakMap<Channel, ChannelFsm>()
+const websockets = new WeakMap<Channel, W3CWebSocket>()
+export const eventEmitters = new WeakMap<Channel, EventEmitter>()
+const messageQueue = new WeakMap<Channel, string[]>()
+const messageQueueLocked = new WeakMap<Channel, boolean>()
+const actionQueue = new WeakMap<Channel, ChannelAction[]>()
+const actionQueueLocked = new WeakMap<Channel, boolean>()
+const sequence = new WeakMap<Channel, number>()
+export const channelId = new WeakMap<Channel, string>()
+const rpcCallbacks = new WeakMap<Channel, Map<number, Function>>()
+const pingTimeoutId = new WeakMap<Channel, NodeJS.Timeout>()
+const pongTimeoutId = new WeakMap<Channel, NodeJS.Timeout>()
+export const fsmId = new WeakMap<Channel, string>()
 
-export function emit (channel, ...args) {
-  eventEmitters.get(channel).emit(...args)
+export function emit (channel: Channel, ...args: any[]): void {
+  const [eventName, ...rest] = args
+  eventEmitters.get(channel)?.emit(eventName, ...rest)
 }
 
-function enterState (channel, nextState) {
-  if (!nextState) {
+function enterState (channel: Channel, nextState: ChannelFsm): void {
+  if (nextState == null) {
     throw new UnknownChannelStateError()
   }
   fsm.set(channel, nextState)
-  if (nextState.handler.enter) {
+  if (nextState?.handler?.enter != null) {
     nextState.handler.enter(channel)
   }
-  dequeueAction(channel)
+  void dequeueAction(channel)
 }
 
-export function changeStatus (channel, newStatus) {
+export function changeStatus (channel: Channel, newStatus: string): void {
   const prevStatus = status.get(channel)
   if (newStatus !== prevStatus) {
     status.set(channel, newStatus)
@@ -66,55 +159,61 @@ export function changeStatus (channel, newStatus) {
   }
 }
 
-export function changeState (channel, newState) {
+export function changeState (channel: Channel, newState: string): void {
   state.set(channel, newState)
   emit(channel, 'stateChanged', newState)
 }
 
-export function send (channel, message) {
-  const { debug = false } = options.get(channel)
+export function send (channel: Channel, message: ChannelMessage): void {
+  const debug: boolean = options.get(channel)?.debug ?? false
   if (debug) console.log('Send message: ', message)
-  websockets.get(channel).send(JsonBig.stringify(message))
+
+  websockets.get(channel)?.send(JsonBig.stringify(message))
 }
 
-export function enqueueAction (channel, guard, action) {
+export function enqueueAction (channel: Channel, guard: ChannelAction['guard'], action: ChannelAction['action']): void {
+  const queue = actionQueue.get(channel) ?? []
   actionQueue.set(channel, [
-    ...actionQueue.get(channel) || [],
+    ...queue,
     { guard, action }
   ])
-  dequeueAction(channel)
+  void dequeueAction(channel)
 }
 
-async function dequeueAction (channel) {
+async function dequeueAction (channel: Channel): Promise<void> {
   const locked = actionQueueLocked.get(channel)
-  const queue = actionQueue.get(channel) || []
-  if (locked || !queue.length) {
+  const queue = actionQueue.get(channel) ?? []
+  if (Boolean(locked) || queue.length === 0) {
     return
   }
   const state = fsm.get(channel)
-  const index = queue.findIndex(item => item.guard(channel, state))
+  if (state == null) return
+  const index = queue.findIndex((action: ChannelAction) => action.guard(channel, state))
   if (index === -1) {
     return
   }
-  actionQueue.set(channel, queue.filter((_, i) => index !== i))
+  actionQueue.set(channel, queue.filter((_: ChannelAction, i: number) => index !== i))
   actionQueueLocked.set(channel, true)
-  const nextState = await Promise.resolve(queue[index].action(channel, state))
+  const nextState: ChannelFsm = await Promise.resolve(queue[index].action(channel, state))
   actionQueueLocked.set(channel, false)
   enterState(channel, nextState)
 }
 
-async function handleMessage (channel, message) {
-  const { handler, state } = fsm.get(channel)
+async function handleMessage (channel: Channel, message: string): Promise<void> {
+  const fsmState = fsm.get(channel)
+  if (fsmState == null) throw new UnknownChannelStateError()
+  const { handler, state } = fsmState
   enterState(channel, await Promise.resolve(handler(channel, message, state)))
 }
 
-async function dequeueMessage (channel) {
-  if (messageQueueLocked.get(channel)) return
-  const messages = messageQueue.get(channel)
-  if (!messages.length) return
+async function dequeueMessage (channel: Channel): Promise<void> {
+  const locked: boolean = messageQueueLocked.get(channel) ?? false
+  if (locked) return
+  const messages: string[] = messageQueue.get(channel) ?? []
+  if (messages.length === 0) return
   messageQueueLocked.set(channel, true)
-  while (messages.length) {
-    const message = messages.shift()
+  while (messages.length > 0) {
+    const message: string = messages.shift() ?? ''
     try {
       await handleMessage(channel, message)
     } catch (error) {
@@ -126,9 +225,11 @@ async function dequeueMessage (channel) {
   messageQueueLocked.set(channel, false)
 }
 
-function ping (channel) {
-  clearTimeout(pingTimeoutId.get(channel))
-  clearTimeout(pongTimeoutId.get(channel))
+function ping (channel: Channel): void {
+  const pingTimeoutIdValue = pingTimeoutId.get(channel)
+  const pongTimeoutIdValue = pongTimeoutId.get(channel)
+  if (pingTimeoutIdValue != null) clearTimeout(pingTimeoutIdValue)
+  if (pongTimeoutIdValue != null) clearTimeout(pongTimeoutIdValue)
   pingTimeoutId.set(channel, setTimeout(() => {
     send(channel, {
       jsonrpc: '2.0',
@@ -144,16 +245,16 @@ function ping (channel) {
   }, PING_TIMEOUT_MS))
 }
 
-function onMessage (channel, data) {
+function onMessage (channel: Channel, data: string): void {
   const message = JsonBig.parse(data)
-  const { debug = false } = options.get(channel)
+  const debug: boolean = options.get(channel)?.debug ?? false
   if (debug) console.log('Receive message: ', message)
-  if (message.id) {
-    const callback = rpcCallbacks.get(channel).get(message.id)
+  if (message.id != null) {
+    const callback = rpcCallbacks.get(channel)?.get(message.id)
     try {
-      callback(message)
+      callback?.(message)
     } finally {
-      rpcCallbacks.get(channel).delete(message.id)
+      rpcCallbacks.get(channel)?.delete(message.id)
     }
     return
   }
@@ -171,34 +272,42 @@ function onMessage (channel, data) {
     }
     return
   }
-  messageQueue.get(channel).push(message)
-  dequeueMessage(channel)
+  messageQueue.get(channel)?.push(message)
+  void dequeueMessage(channel)
 }
 
-export function call (channel, method, params) {
-  return new Promise((resolve, reject) => {
-    const id = sequence.set(channel, sequence.get(channel) + 1).get(channel)
-    rpcCallbacks.get(channel).set(id, (message) => {
-      if (message.result) return resolve(message.result)
-      if (message.error) {
-        const [{ message: details } = {}] = message.error.data || []
-        return reject(new ChannelCallError(message.error.message + (details ? `: ${details}` : '')))
+export async function call (channel: Channel, method: string, params: any): Promise<any> {
+  return await new Promise((resolve, reject) => {
+    const currentSequence: number = sequence.get(channel) ?? 0
+    const id = sequence.set(channel, currentSequence + 1).get(channel) ?? 1
+    rpcCallbacks.get(channel)?.set(id, (message: {
+      result: PromiseLike<any>
+      error?: ChannelMessageError }) => {
+      if (message.result != null) return resolve(message.result)
+      if (message.error != null) {
+        const [{ message: details } = { message: '' }] = message.error.data ?? []
+        return reject(new ChannelCallError(message.error.message + details))
       }
     })
     send(channel, { jsonrpc: '2.0', method, id, params })
   })
 }
 
-export function disconnect (channel) {
-  websockets.get(channel).close()
-  clearTimeout(pingTimeoutId.get(channel))
-  clearTimeout(pongTimeoutId.get(channel))
+export function disconnect (channel: Channel): void {
+  websockets.get(channel)?.close()
+  const pingTimeoutIdValue = pingTimeoutId.get(channel)
+  const pongTimeoutIdValue = pongTimeoutId.get(channel)
+  if (pingTimeoutIdValue != null) clearTimeout(pingTimeoutIdValue)
+  if (pongTimeoutIdValue != null) clearTimeout(pongTimeoutIdValue)
 }
 
 export async function initialize (
-  channel, connectionHandler, openHandler, { url, ...channelOptions }
-) {
-  options.set(channel, channelOptions)
+  channel: Channel,
+  connectionHandler: Function,
+  openHandler: Function,
+  { url, ...channelOptions }: ChannelOptions
+): Promise<void> {
+  options.set(channel, { url, ...channelOptions })
   fsm.set(channel, { handler: connectionHandler })
   eventEmitters.set(channel, new EventEmitter())
   sequence.set(channel, 0)
@@ -212,25 +321,26 @@ export async function initialize (
   wsUrl.searchParams.set('protocol', 'json-rpc')
   changeStatus(channel, 'connecting')
   const ws = new W3CWebSocket(wsUrl.toString())
-  await new Promise((resolve, reject) => Object.assign(ws, {
+  await new Promise<void>((resolve, reject) => Object.assign(ws, {
     onerror: reject,
-    onopen: () => {
+    onopen: async () => {
       resolve()
       changeStatus(channel, 'connected')
-      if (channelOptions.reconnectTx) {
+      if (channelOptions.reconnectTx != null) {
         enterState(channel, { handler: openHandler })
-        setTimeout(async () => changeState(channel,
-          (await call(channel, 'channels.get.offchain_state', {})).signed_tx
-        ))
+        const signedTx = (await call(channel, 'channels.get.offchain_state', {})).signed_tx
+        changeState(channel, signedTx)
       }
       ping(channel)
     },
     onclose: () => {
       changeStatus(channel, 'disconnected')
-      clearTimeout(pingTimeoutId.get(channel))
-      clearTimeout(pongTimeoutId.get(channel))
+      const pingTimeoutIdValue = pingTimeoutId.get(channel)
+      const pongTimeoutIdValue = pongTimeoutId.get(channel)
+      if (pingTimeoutIdValue != null) clearTimeout(pingTimeoutIdValue)
+      if (pongTimeoutIdValue != null) clearTimeout(pongTimeoutIdValue)
     },
-    onmessage: ({ data }) => onMessage(channel, data)
+    onmessage: ({ data }: {data: string}) => onMessage(channel, data)
   }))
   websockets.set(channel, ws)
 }
