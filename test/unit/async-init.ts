@@ -15,20 +15,20 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import '../'
+import '..'
 import { describe, it } from 'mocha'
 import AsyncInit from '../../src/utils/async-init'
 
 describe('AsyncInit', function () {
   it('composes Stamps', async () => {
     return AsyncInit.compose({
-      async init (val) {
-        return Promise.resolve(val)
+      async init (options: unknown) {
+        return options
       }
     }, {
-      async init (val) {
-        return Promise.resolve(`${val} World`)
+      async init (options: { msg: string }) {
+        return `${options.msg} World`
       }
-    })('Hello').should.eventually.be.equal('Hello World')
+    })({ msg: 'Hello' }).should.eventually.be.equal('Hello World')
   })
 })
