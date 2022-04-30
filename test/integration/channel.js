@@ -748,8 +748,8 @@ describe('Channel', function () {
       accounts: [initiatorAddr, responderAddr]
     })
     const balances = await initiatorCh.balances([initiatorAddr, responderAddr])
-    const initiatorBalanceBeforeClose = await aeSdkInitiatior.balance(initiatorAddr)
-    const responderBalanceBeforeClose = await aeSdkResponder.balance(responderAddr)
+    const initiatorBalanceBeforeClose = await aeSdkInitiatior.getBalance(initiatorAddr)
+    const responderBalanceBeforeClose = await aeSdkResponder.getBalance(responderAddr)
     const closeSoloTx = await aeSdkInitiatior.channelCloseSoloTx({
       channelId: await initiatorCh.id(),
       fromId: initiatorAddr,
@@ -770,8 +770,8 @@ describe('Channel', function () {
     const settleTxFee = unpackTx(settleTx).tx.fee
     await aeSdkInitiatior.sendTransaction(
       await aeSdkInitiatior.signTransaction(settleTx), { waitMined: true })
-    const initiatorBalanceAfterClose = await aeSdkInitiatior.balance(initiatorAddr)
-    const responderBalanceAfterClose = await aeSdkResponder.balance(responderAddr)
+    const initiatorBalanceAfterClose = await aeSdkInitiatior.getBalance(initiatorAddr)
+    const responderBalanceAfterClose = await aeSdkResponder.getBalance(responderAddr)
     new BigNumber(initiatorBalanceAfterClose)
       .minus(initiatorBalanceBeforeClose)
       .plus(closeSoloTxFee)
@@ -804,8 +804,8 @@ describe('Channel', function () {
       port: 3004
     })
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
-    const initiatorBalanceBeforeClose = await aeSdkInitiatior.balance(initiatorAddr)
-    const responderBalanceBeforeClose = await aeSdkResponder.balance(responderAddr)
+    const initiatorBalanceBeforeClose = await aeSdkInitiatior.getBalance(initiatorAddr)
+    const responderBalanceBeforeClose = await aeSdkResponder.getBalance(responderAddr)
     const oldUpdate = await initiatorCh.update(
       initiatorAddr, responderAddr, 100, (tx) => aeSdkInitiatior.signTransaction(tx)
     )
@@ -847,8 +847,8 @@ describe('Channel', function () {
     const settleTxFee = unpackTx(settleTx).tx.fee
     await aeSdkResponder.sendTransaction(
       await aeSdkResponder.signTransaction(settleTx), { waitMined: true })
-    const initiatorBalanceAfterClose = await aeSdkInitiatior.balance(initiatorAddr)
-    const responderBalanceAfterClose = await aeSdkResponder.balance(responderAddr)
+    const initiatorBalanceAfterClose = await aeSdkInitiatior.getBalance(initiatorAddr)
+    const responderBalanceAfterClose = await aeSdkResponder.getBalance(responderAddr)
     new BigNumber(initiatorBalanceAfterClose)
       .minus(initiatorBalanceBeforeClose)
       .plus(closeSoloTxFee)

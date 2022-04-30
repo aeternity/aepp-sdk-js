@@ -15,6 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+export * from './chain'
 export * from './utils/crypto'
 export * from './utils/keystore'
 export * from './utils/bytes'
@@ -25,8 +26,6 @@ export * from './utils/amount-formatter'
 export * from './utils/hd-wallet'
 
 export { default as Ae } from './ae'
-export { default as Chain } from './chain'
-export { default as ChainNode } from './chain/node'
 export { default as Node } from './node'
 export { default as NodePool } from './node-pool'
 export { default as Tx } from './tx'

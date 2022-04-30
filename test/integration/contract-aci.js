@@ -304,9 +304,9 @@ describe('Contract instance', function () {
   })
 
   it('pays to payable function', async () => {
-    const contractBalance = await aeSdk.balance(testContract.deployInfo.address)
+    const contractBalance = await aeSdk.getBalance(testContract.deployInfo.address)
     await testContract.methods.stringFn.send('test', { amount: 100 })
-    const balanceAfter = await aeSdk.balance(testContract.deployInfo.address)
+    const balanceAfter = await aeSdk.getBalance(testContract.deployInfo.address)
     balanceAfter.should.be.equal(`${+contractBalance + 100}`)
   })
 

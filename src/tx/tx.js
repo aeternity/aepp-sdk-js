@@ -22,7 +22,7 @@
  * @example import { Transaction } from '@aeternity/aepp-sdk'
  */
 
-import ChainNode from '../chain/node'
+import Ae from '../ae'
 import Tx from './'
 import { buildTx, calculateFee, unpackTx } from './builder'
 import { ABI_VERSIONS, MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE, TX_TTL } from './builder/schema'
@@ -366,7 +366,7 @@ async function prepareTxParams (
  * @return {Object} Transaction instance
  * @example Transaction({url: 'https://testnet.aeternity.io/'})
  */
-const Transaction = ChainNode.compose(Tx, {
+const Transaction = Ae.compose(Tx, {
   init ({ showWarning = false }) {
     this.showWarning = showWarning
   },

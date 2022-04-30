@@ -44,7 +44,7 @@ async created () {
     },
     onAddressChange: async () => {
       this.address = await this.aeSdk.address()
-      this.balance = await this.aeSdk.balance(this.address)
+      this.balance = await this.aeSdk.getBalance(this.address)
     },
     onDisconnect: () => {
       // you may want to reset state here
@@ -87,7 +87,7 @@ async connect(wallet) {
   await this.aeSdk.connectToWallet(await wallet.getConnection())
   this.connectedAccounts = await this.aeSdk.subscribeAddress('subscribe', 'connected')
   this.address = await this.aeSdk.address()
-  this.balance = await this.aeSdk.balance(this.address).catch(() => '0')
+  this.balance = await this.aeSdk.getBalance(this.address).catch(() => '0')
   this.nodeInfo = await this.aeSdk.getNodeInfo()
 }
 ```
