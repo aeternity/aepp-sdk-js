@@ -31,7 +31,14 @@ interface Account {
   publicKey: string
 }
 
-export function derivePathFromKey (path: string, key: KeyTreeNode): KeyTreeNode {
+type Dec<N extends number> = [-1, 0, 1, 2, 3, 4][N]
+type Bip32PathT<MaxLen extends number, H extends 'H' | 'h' | '\''> = MaxLen extends -1
+  ? `${number}${H}`
+  : Bip32PathT<Dec<MaxLen>, H> | `${Bip32PathT<Dec<MaxLen>, H>}/${number}${H}`
+type Bip32Path<MaxLen extends number> =
+  '' | Bip32PathT<MaxLen, 'H'> | Bip32PathT<MaxLen, 'h'> | Bip32PathT<MaxLen, '\''>
+
+export function derivePathFromKey (path: Bip32Path<5>, key: KeyTreeNode): KeyTreeNode {
   const segments = path === '' ? [] : fromString(path).toPathArray()
   segments.forEach((segment, i) => {
     if (segment < HARDENED_OFFSET) {
@@ -42,12 +49,12 @@ export function derivePathFromKey (path: string, key: KeyTreeNode): KeyTreeNode 
   return segments.reduce((parentKey, segment) => deriveChild(parentKey, segment), key)
 }
 
-export function derivePathFromSeed (path: string, seed: Uint8Array): KeyTreeNode {
+export function derivePathFromSeed (path: 'm' | `m/${Bip32Path<5>}`, seed: Uint8Array): KeyTreeNode {
   if (!['m', 'm/'].includes(path.slice(0, 2))) {
     throw new DerivationError('Root element is required')
   }
   const masterKey = getMasterKeyFromSeed(seed)
-  return derivePathFromKey(path.slice(2), masterKey)
+  return derivePathFromKey(path.slice(2) as Bip32Path<5>, masterKey)
 }
 
 function formatAccount (keys: nacl.SignKeyPair): Account {
