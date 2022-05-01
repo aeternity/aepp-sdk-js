@@ -4,6 +4,7 @@ import { fromString } from 'bip32-path'
 import { decryptKey, encryptKey } from './crypto'
 import { encode } from './encoder'
 import { CryptographyError } from './errors'
+import { bytesToHex } from './bytes'
 
 export class DerivationError extends CryptographyError {
   constructor (message: string) {
@@ -14,8 +15,6 @@ export class DerivationError extends CryptographyError {
 
 const ED25519_CURVE = Buffer.from('ed25519 seed')
 const HARDENED_OFFSET = 0x80000000
-
-const toHex = (buffer: Uint8Array): string => Buffer.from(buffer).toString('hex')
 
 interface KeyTreeNode {
   secretKey: Uint8Array
@@ -54,7 +53,7 @@ export function derivePathFromSeed (path: string, seed: Uint8Array): KeyTreeNode
 function formatAccount (keys: nacl.SignKeyPair): Account {
   const { secretKey, publicKey } = keys
   return {
-    secretKey: toHex(secretKey),
+    secretKey: bytesToHex(secretKey),
     publicKey: encode(publicKey, 'ak')
   }
 }
@@ -94,8 +93,8 @@ export function deriveChild ({ secretKey, chainCode }: KeyTreeNode, index: numbe
 export function generateSaveHDWalletFromSeed (seed: Uint8Array, password: string): HDWallet {
   const walletKey = derivePathFromSeed('m/44h/457h', seed)
   return {
-    secretKey: toHex(encryptKey(password, walletKey.secretKey)),
-    chainCode: toHex(encryptKey(password, walletKey.chainCode))
+    secretKey: bytesToHex(encryptKey(password, walletKey.secretKey)),
+    chainCode: bytesToHex(encryptKey(password, walletKey.chainCode))
   }
 }
 
