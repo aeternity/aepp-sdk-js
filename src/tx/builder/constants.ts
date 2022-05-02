@@ -62,9 +62,7 @@ export const NAME_BID_RANGES: {
   3: 2178309,
   2: 3524578,
   1: 5702887
-}, ([key, value]) => [key, new BigNumber(value).times(NAME_FEE_MULTIPLIER)]
-
-)
+}, ([key, value]) => [key, new BigNumber(value).times(NAME_FEE_MULTIPLIER)])
 
 // # ref: https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L273
 // # name bid timeouts

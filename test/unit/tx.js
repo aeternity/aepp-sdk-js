@@ -74,10 +74,6 @@ describe('Tx', function () {
   })
 
   describe('ensureNameValid', () => {
-    it('validates type', () => {
-      expect(() => ensureNameValid({})).to.throw(InvalidNameError, 'Name must be a string')
-    })
-
     it('validates domain', () => {
       expect(() => ensureNameValid('asdasdasd.unknown')).to.throw(InvalidNameError, 'Name should end with .chain:')
     })
