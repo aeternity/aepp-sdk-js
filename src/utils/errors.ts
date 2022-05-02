@@ -527,13 +527,6 @@ export class DecodeError extends TransactionError {
   }
 }
 
-export class EncodeError extends TransactionError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'EncodeError'
-  }
-}
-
 export class PayloadLengthError extends TransactionError {
   constructor (message: string) {
     super(message)

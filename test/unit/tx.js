@@ -110,7 +110,7 @@ describe('Tx', function () {
       .to.throw('Encoded string missing payload: aaaaa'))
 
     it('throws if unknown type', () => expect(() => decode('aa_aaaaa'))
-      .to.throw('Encoded string have unknown type: aa'))
+      .to.throw('prefix should be one of ak, bf, bs, bx, ch, cm, ct, kh, mh, nm, ok, oq, pp, sg, th, ba, cb, or, ov, pi, ss, cs, ck, cv, st, tx, got aa instead'))
 
     it('throws if invalid checksum', () => expect(() => decode('ak_23aaaaa'))
       .to.throw('Invalid checksum'))
@@ -128,7 +128,7 @@ describe('Tx', function () {
     it('encodes base58check', () => expect(encode(payload, 'bf')).to.be.equal('bf_3DZUwMat2'))
 
     it('throws if unknown type', () => expect(() => encode('test', 'aa'))
-      .to.throw('Unknown type: aa'))
+      .to.throw('prefix should be one of ak, bf, bs, bx, ch, cm, ct, kh, mh, nm, ok, oq, pp, sg, th, ba, cb, or, ov, pi, ss, cs, ck, cv, st, tx, got aa instead'))
   })
 
   describe('getDefaultPointerKey', () => {
