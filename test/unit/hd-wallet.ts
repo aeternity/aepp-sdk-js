@@ -20,10 +20,10 @@ import {
   deriveChild, derivePathFromKey, derivePathFromSeed,
   generateSaveHDWalletFromSeed, getHdWalletAccountFromSeed, getKeyPair,
   getMasterKeyFromSeed,
-  getSaveHDWalletAccounts
+  getSaveHDWalletAccounts,
+  DerivationError
 } from '../../src/utils/hd-wallet'
 import { encode, decode } from '../../src/utils/encoder'
-import { InvalidDerivationPathError } from '../../src/utils/errors'
 
 describe('hd wallet', () => {
   const testMnemonicSeed = Buffer.from('Git7bFJkmfC1Ho+6YFSFuxSzmDZydmjzk8FubrPDz4PmrkORlBDlfnPTk02Wq9Pj2ZdQ5cTA0SxHKGrq3xSjOw==', 'base64')
@@ -81,7 +81,7 @@ describe('hd wallet', () => {
 
   describe('derivePathFromKey', () =>
     it('derives correct child key by path and key', () => {
-      const childKey = derivePathFromKey(testChildPath.replace('m/', ''), testMasterKey)
+      const childKey = derivePathFromKey(testChildPath.replace('m/', '') as '0h', testMasterKey)
       expect(childKey).to.eql(testChildKey)
     }))
 
@@ -92,7 +92,7 @@ describe('hd wallet', () => {
     }))
 
   describe('check on test vectors for ed25519 from SLIP-0010', () =>
-    [{
+    ([{
       seed: Buffer.from('000102030405060708090a0b0c0d0e0f', 'hex'),
       tests: [{
         path: 'm',
@@ -158,7 +158,7 @@ describe('hd wallet', () => {
         prv: Buffer.from('551d333177df541ad876a60ea71f00447931c0a9da16f227c11ea080d7391b8d', 'hex'),
         pub: Buffer.from('0047150c75db263559a70d5778bf36abbab30fb061ad69f69ece61a72b0cfa4fc0', 'hex')
       }]
-    }]
+    }] as const)
       .forEach(({ seed, tests }, idx) => {
         describe(`vector ${idx + 1}`, () =>
           tests.forEach(test =>
@@ -178,6 +178,6 @@ describe('hd wallet', () => {
   })
 
   it('Derive child with invalid path', () => {
-    expect(() => derivePathFromSeed('asd', Buffer.from([]))).to.throw(InvalidDerivationPathError, 'Invalid path')
+    expect(() => derivePathFromSeed('asd' as 'm', Buffer.from([]))).to.throw(DerivationError, 'Root element is required')
   })
 })

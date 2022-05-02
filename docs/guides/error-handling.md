@@ -67,14 +67,12 @@ BaseError
 │
 └───CryptographyError
 │   │   InvalidChecksumError
-│   │   InvalidDerivationPathError
+│   │   DerivationError
 │   │   InvalidPasswordError
 │   │   MerkleTreeHashMismatchError
 │   │   MissingNodeInTreeError
-│   │   NotHardenedSegmentError
 │   │   UnknownNodeLengthError
 │   │   UnknownPathNibbleError
-│   │   UnsupportedChildIndexError
 │
 └───NodeError
 │   │   DisconnectedError

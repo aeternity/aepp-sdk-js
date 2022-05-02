@@ -441,13 +441,6 @@ export class InvalidChecksumError extends CryptographyError {
   }
 }
 
-export class InvalidDerivationPathError extends CryptographyError {
-  constructor () {
-    super('Invalid path')
-    this.name = 'InvalidDerivationPathError'
-  }
-}
-
 export class InvalidPasswordError extends CryptographyError {
   constructor () {
     super('Invalid password or nonce')
@@ -469,13 +462,6 @@ export class MissingNodeInTreeError extends CryptographyError {
   }
 }
 
-export class NotHardenedSegmentError extends CryptographyError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'NotHardenedSegmentError'
-  }
-}
-
 export class UnknownNodeLengthError extends CryptographyError {
   constructor (nodeLength: number) {
     super(`Unknown node length: ${nodeLength}`)
@@ -487,13 +473,6 @@ export class UnknownPathNibbleError extends CryptographyError {
   constructor (nibble: number) {
     super(`Unknown path nibble: ${nibble}`)
     this.name = 'UnknownPathNibbleError'
-  }
-}
-
-export class UnsupportedChildIndexError extends CryptographyError {
-  constructor (index: string) {
-    super(`Child index #${index} is not supported`)
-    this.name = 'UnsupportedChildIndexError'
   }
 }
 

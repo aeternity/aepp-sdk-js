@@ -3,14 +3,18 @@ import { full as hmac } from 'tweetnacl-auth'
 import { fromString } from 'bip32-path'
 import { decryptKey, encryptKey } from './crypto'
 import { encode } from './encoder'
-import {
-  InvalidDerivationPathError, NotHardenedSegmentError, UnsupportedChildIndexError
-} from './errors'
+import { CryptographyError } from './errors'
+import { bytesToHex } from './bytes'
+
+export class DerivationError extends CryptographyError {
+  constructor (message: string) {
+    super(message)
+    this.name = 'DerivationError'
+  }
+}
 
 const ED25519_CURVE = Buffer.from('ed25519 seed')
 const HARDENED_OFFSET = 0x80000000
-
-const toHex = (buffer: Uint8Array): string => Buffer.from(buffer).toString('hex')
 
 interface KeyTreeNode {
   secretKey: Uint8Array
@@ -27,29 +31,36 @@ interface Account {
   publicKey: string
 }
 
-export function derivePathFromKey (path: string, key: KeyTreeNode): KeyTreeNode {
+type Dec<N extends number> = [-1, 0, 1, 2, 3, 4][N]
+type Bip32PathT<MaxLen extends number, H extends 'H' | 'h' | '\''> = MaxLen extends -1
+  ? `${number}${H}`
+  : Bip32PathT<Dec<MaxLen>, H> | `${Bip32PathT<Dec<MaxLen>, H>}/${number}${H}`
+type Bip32Path<MaxLen extends number> =
+  '' | Bip32PathT<MaxLen, 'H'> | Bip32PathT<MaxLen, 'h'> | Bip32PathT<MaxLen, '\''>
+
+export function derivePathFromKey (path: Bip32Path<5>, key: KeyTreeNode): KeyTreeNode {
   const segments = path === '' ? [] : fromString(path).toPathArray()
   segments.forEach((segment, i) => {
     if (segment < HARDENED_OFFSET) {
-      throw new NotHardenedSegmentError(`Segment #${i + 1} is not hardened`)
+      throw new DerivationError(`Segment #${i + 1} is not hardened`)
     }
   })
 
   return segments.reduce((parentKey, segment) => deriveChild(parentKey, segment), key)
 }
 
-export function derivePathFromSeed (path: string, seed: Uint8Array): KeyTreeNode {
+export function derivePathFromSeed (path: 'm' | `m/${Bip32Path<5>}`, seed: Uint8Array): KeyTreeNode {
   if (!['m', 'm/'].includes(path.slice(0, 2))) {
-    throw new InvalidDerivationPathError()
+    throw new DerivationError('Root element is required')
   }
   const masterKey = getMasterKeyFromSeed(seed)
-  return derivePathFromKey(path.slice(2), masterKey)
+  return derivePathFromKey(path.slice(2) as Bip32Path<5>, masterKey)
 }
 
 function formatAccount (keys: nacl.SignKeyPair): Account {
   const { secretKey, publicKey } = keys
   return {
-    secretKey: toHex(secretKey),
+    secretKey: bytesToHex(secretKey),
     publicKey: encode(publicKey, 'ak')
   }
 }
@@ -70,7 +81,7 @@ export function getMasterKeyFromSeed (seed: Uint8Array): KeyTreeNode {
 
 export function deriveChild ({ secretKey, chainCode }: KeyTreeNode, index: number): KeyTreeNode {
   if (index < HARDENED_OFFSET) {
-    throw new UnsupportedChildIndexError(index.toString())
+    throw new DerivationError(`Segment ${index} is not hardened`)
   }
   const indexBuffer = Buffer.allocUnsafe(4)
   indexBuffer.writeUInt32BE(index, 0)
@@ -89,8 +100,8 @@ export function deriveChild ({ secretKey, chainCode }: KeyTreeNode, index: numbe
 export function generateSaveHDWalletFromSeed (seed: Uint8Array, password: string): HDWallet {
   const walletKey = derivePathFromSeed('m/44h/457h', seed)
   return {
-    secretKey: toHex(encryptKey(password, walletKey.secretKey)),
-    chainCode: toHex(encryptKey(password, walletKey.chainCode))
+    secretKey: bytesToHex(encryptKey(password, walletKey.secretKey)),
+    chainCode: bytesToHex(encryptKey(password, walletKey.chainCode))
   }
 }
 
