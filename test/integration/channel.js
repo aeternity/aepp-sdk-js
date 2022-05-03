@@ -22,6 +22,7 @@ import * as sinon from 'sinon'
 import BigNumber from 'bignumber.js'
 import { getSdk, BaseAe, networkId } from './'
 import { generateKeyPair } from '../../src/utils/crypto'
+import { pause } from '../../src/utils/other'
 import { unpackTx, buildTx, buildTxHash } from '../../src/tx/builder'
 import { decode } from '../../src/tx/builder/helpers'
 import Channel from '../../src/channel'
@@ -1128,7 +1129,7 @@ describe('Channel', function () {
     //   ch.on('stateChanged', checkRound)
     // })
     ch.state().should.eventually.be.fulfilled
-    await new Promise(resolve => setTimeout(resolve, 10 * 1000))
+    await pause(10 * 1000)
   })
 
   it('can post backchannel update', async () => {

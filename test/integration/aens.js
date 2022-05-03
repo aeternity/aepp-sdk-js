@@ -22,6 +22,7 @@ import { randomName } from '../utils'
 import { generateKeyPair } from '../../src/utils/crypto'
 import { buildContractId, computeAuctionEndBlock, computeBidFee } from '../../src/tx/builder/helpers'
 import { AensPointerContextError } from '../../src/utils/errors'
+import { pause } from '../../src/utils/other'
 
 describe('Aens', function () {
   let aeSdk
@@ -45,7 +46,7 @@ describe('Aens', function () {
   it('queries names', async () => {
     // For some reason the node will return 404 when name is queried
     // just right after claim tx has been mined so we wait 0.5s
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await pause(500)
     return aeSdk.aensQuery(name).should.eventually.be.an('object')
   })
 
