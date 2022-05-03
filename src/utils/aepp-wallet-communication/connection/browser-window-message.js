@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -112,7 +112,7 @@ const getTarget = () => {
   // When we is the main page we need to decide the target by our self
   // Probably can be implemented some algo for checking DOM for Iframes and somehow decide which
   // Iframe to talk
-  return isInIframe() ? window.parent : undefined
+  return isInIframe() ? window.parent : window
 }
 
 /**
@@ -159,7 +159,7 @@ export default stampit({
     this.receiveDirection = receiveDirection
     this.subscribeFn = (listener) => selfP.addEventListener('message', listener, false)
     this.unsubscribeFn = (listener) => selfP.removeEventListener('message', listener, false)
-    this.postFn = (msg) => targetP.postMessage(msg, this.origin || '*')
+    this.postFn = (msg) => targetP.postMessage(JSON.parse(JSON.stringify(msg)), this.origin || '*')
   },
   methods: { connect, sendMessage, disconnect, isConnected }
 }, WalletConnection)
