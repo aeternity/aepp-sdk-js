@@ -73,7 +73,6 @@ import {
     aeSdk.addRpcClient(connection)
     // share wallet details
     aeSdk.shareWalletInfo(port.postMessage.bind(port))
-    setInterval(() => aeSdk.shareWalletInfo(port.postMessage.bind(port)), 3000)
   })
 
   console.log('Wallet initialized!')
