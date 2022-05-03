@@ -80,7 +80,11 @@ export async function sendTransaction (
 
   try {
     const { txHash } = await onNode.api.postTransaction({ tx }, {
-      __queue: `tx-${await onAccount?.address(options).catch(() => '')}`
+      requestOptions: {
+        customHeaders: {
+          __queue: `tx-${await onAccount?.address(options).catch(() => '')}`
+        }
+      }
     })
 
     if (waitMined) {
