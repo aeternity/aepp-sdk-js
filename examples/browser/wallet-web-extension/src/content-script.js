@@ -1,5 +1,3 @@
-/* global browser */
-
 import {
   BrowserRuntimeConnection, BrowserWindowMessageConnection, MESSAGE_DIRECTION, ContentScriptBridge
 } from '@aeternity/aepp-sdk'
@@ -16,13 +14,11 @@ import {
   })
   console.log('Document is ready')
 
-  const port = browser.runtime.connect()
   const extConnection = BrowserRuntimeConnection({
     connectionInfo: {
       description: 'Content Script to Extension connection',
       origin: window.origin
-    },
-    port
+    }
   })
   const pageConnection = BrowserWindowMessageConnection({
     connectionInfo: {

@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -60,6 +60,7 @@ function disconnect () {
  */
 function connect (onMessage, onDisconnect) {
   if (this.isConnected()) throw new AlreadyConnectedError('You already connected')
+  this.port = this.port ?? getBrowserAPI().runtime.connect(...[this.connectionInfo.id || undefined])
   this.handler = (msg, source) => {
     if (this.debug) console.log('Receive message: ', msg)
     onMessage(msg, source)
@@ -93,7 +94,11 @@ function sendMessage (msg) {
  * @return {Boolean} Is connected
  */
 function isConnected () {
-  return typeof this.port.onMessage.hasListeners === 'function' ? this.port.onMessage.hasListeners() : this.port.onMessage.hasListener(this.handler)
+  if (this.port) {
+    return typeof this.port.onMessage.hasListeners === 'function'
+      ? this.port.onMessage.hasListeners()
+      : this.port.onMessage.hasListener(this.handler)
+  } else return false
 }
 
 /**
@@ -113,7 +118,7 @@ export default stampit({
     if (!getBrowserAPI().runtime) throw new RpcConnectionError('Runtime is not accessible in your environment')
     this.debug = debug
     this.connectionInfo = connectionInfo
-    this.port = port || getBrowserAPI().runtime.connect(...[connectionInfo.id || undefined])
+    this.port = port
   },
   methods: { connect, sendMessage, disconnect, isConnected }
 }, WalletConnection)
