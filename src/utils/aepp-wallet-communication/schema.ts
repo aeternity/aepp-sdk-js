@@ -16,6 +16,7 @@ export const enum SUBSCRIPTION_TYPES {
 }
 
 export const enum METHODS {
+  scan = 'connection.scan',
   readyToConnect = 'connection.announcePresence',
   updateAddress = 'address.update',
   address = 'address.get',

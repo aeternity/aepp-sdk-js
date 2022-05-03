@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -26,6 +26,7 @@
  */
 import stampit from '@stamp/it'
 import { UnsupportedPlatformError, MissingParamError } from '../errors'
+import { METHODS } from './schema'
 
 /**
  * Start message proxy
@@ -35,12 +36,14 @@ import { UnsupportedPlatformError, MissingParamError } from '../errors'
  */
 function run () {
   const allowCrossOrigin = this.allowCrossOrigin
-  // Connect to extension using runtime
-  this.extConnection.connect((msg) => {
-    this.pageConnection.sendMessage(msg)
-  })
   // Connect to page using window.postMessage
   this.pageConnection.connect((msg, origin, source) => {
+    // Connect to extension using runtime
+    if (!this.extConnection.isConnected() && msg.method === METHODS.scan) {
+      this.extConnection.connect((msg) => {
+        this.pageConnection.sendMessage(msg)
+      })
+    }
     if (!allowCrossOrigin && source !== window) return
     this.extConnection.sendMessage(msg)
   })

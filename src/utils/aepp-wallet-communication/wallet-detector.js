@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -77,6 +77,9 @@ export default stampit({
         onDetected({ wallets, newWallet: wallet })
       })
       if (Object.keys(wallets).length) onDetected({ wallets })
+      this.connection.sendMessage({
+        method: METHODS.scan, params: {}, jsonrpc: '2.0'
+      })
     },
 
     /**
