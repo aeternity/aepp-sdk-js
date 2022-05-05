@@ -41,10 +41,7 @@ export class Field {
 export class Name extends Field {
   /**
    * Serialize AENS name to Buffer
-   * @function
-   * @static
-   * @param {String} value - AENS name
-   * @returns {Buffer}
+   * @param value - AENS name
    */
   static serialize (value: string): Buffer {
     ensureNameValid(value)
@@ -53,10 +50,7 @@ export class Name extends Field {
 
   /**
    * Deserialize AENS name from Buffer
-   * @function
-   * @static
-   * @param {Buffer} value - AENS name
-   * @returns {String}
+   * @param value - AENS name
    */
   static deserialize (value: Buffer): string {
     return value.toString()
@@ -65,16 +59,11 @@ export class Name extends Field {
 
 /**
  * NameId Field Type Class
- * @class
- * @extends Field
  */
 export class NameId extends Field {
   /**
    * Serializes AENS name ID to Buffer
-   * @function
-   * @static
-   * @param {String} value - AENS name ID
-   * @returns {Buffer}
+   * @param value - AENS name ID
    */
   static serialize (value: string): Buffer {
     return writeId(isNameValid(value) ? produceNameId(value) : value)
@@ -82,10 +71,7 @@ export class NameId extends Field {
 
   /**
    * Deserializes AENS name ID from Buffer
-   * @function
-   * @static
    * @param value - AENS name ID Buffer
-   * @returns {String}
    */
   static deserialize (value: Buffer): string {
     return readId(value)
@@ -94,18 +80,13 @@ export class NameId extends Field {
 
 /**
  * NameFee Field Type Class
- * @class
- * @extends Field
  */
 export class NameFee extends Field {
   /**
    * Serializes AENS name fee to Buffer
-   * @function
-   * @static
-   * @param {BigNumber} value - AENS name fee Buffer
-   * @param {Object} options - Options
-   * @param {String} options.name - AENS Name in transaction
-   * @returns {Buffer}
+   * @param value - AENS name fee Buffer
+   * @param options - Options
+   * @param options.name - AENS Name in transaction
    */
   static serialize (value: BigNumber, { name }: { name: string }): Buffer {
     const minNameFee = getMinimumNameFee(name)
@@ -118,10 +99,8 @@ export class NameFee extends Field {
 
   /**
    * Deserializes AENS name fee from Buffer
-   * @function
-   * @static
    * @param value - AENS name fee Buffer
-   * @returns {String} AENS name fee
+   * @returns AENS name fee
    */
   static deserialize (value: Buffer): string {
     return readInt(value)
@@ -130,17 +109,13 @@ export class NameFee extends Field {
 
 /**
  * Deposit Field Type Class
- * @class
- * @extends Field
  */
 export class Deposit extends Field {
   /**
    * Serializes deposit value to Buffer.
    * Each numerical value should be 0.
-   * @function
-   * @static
-   * @param {String} [value=0]  - Deposit value in string format. Should be equal to  '0'.
-   * @returns {Buffer} - Deposit value Buffer.
+   * @param value Deposit value in string format. Should be equal to  '0'.
+   * @returns Deposit value Buffer.
    */
   static serialize (value: string): Buffer {
     value ??= '0'
@@ -150,10 +125,8 @@ export class Deposit extends Field {
 
   /**
    * Deserializes deposit value from Buffer.
-   * @function
-   * @static
-   * @param {Buffer} [value]  - Deposit value Buffer.
-   * @returns {String} - Deposit value.
+   * @param value Deposit value Buffer.
+   * @returns Deposit value.
    */
   static deserialize (value: Buffer): string {
     return readInt(value)

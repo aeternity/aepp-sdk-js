@@ -453,14 +453,11 @@ function getOracleRelativeTtl (params: any, txType: string): number {
 
 /**
  * Calculate min fee
- * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/index
- * @rtype (txType, { gasLimit = 0, params }) => String
- * @param {String} txType - Transaction type
- * @param {Options} options - Options object
- * @param {String|Number} options.gasLimit
- * @param {Object} options.params - Tx params
- * @return {String|Number}
+ * @param txType - Transaction type
+ * @param options - Options object
+ * @param options.gasLimit
+ * @param options.params - Tx params
  * @example calculateMinFee('spendTx', { gasLimit, params })
  */
 export function calculateMinFee (txType: string, { params, vsn }: {
@@ -487,10 +484,10 @@ export function calculateMinFee (txType: string, { params, vsn }: {
 
 /**
  * Calculate fee based on tx type and params
- * @param {String} txType
- * @param params
- * @param multiplier
- * @param vsn
+ * @param txType
+ * @param options.params
+ * @param options.multiplier
+ * @param options.vsn
  * @return {BigNumber}
  */
 function buildFee (txType: string, { params, multiplier, vsn }:
@@ -509,15 +506,13 @@ function buildFee (txType: string, { params, multiplier, vsn }:
 
 /**
  * Calculate fee
- * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @rtype (fee, txType, gasLimit = 0) => String
- * @param {String|Number} fee - fee
- * @param {String} txType - Transaction type
- * @param {Options} options - Options object
- * @param {String|Number} options.gasLimit
- * @param {Object} options.params - Tx params
- * @return {String|Number}
+ * @param fee - fee
+ * @param txType - Transaction type
+ * @param options - Options object
+ * @param options.gasLimit
+ * @param options.params - Tx params
  * @example calculateFee(null, 'spendTx', { gasLimit, params })
  */
 export function calculateFee (
@@ -537,10 +532,10 @@ export function calculateFee (
  * Validate transaction params
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
- * @param {Object} params Object with tx params
- * @param {Array} schema Transaction schema
- * @param {Array} excludeKeys  Array of keys to exclude for validation
- * @return {Object} Object with validation errors
+ * @param params Object with tx params
+ * @param schema Transaction schema
+ * @param excludeKeys  Array of keys to exclude for validation
+ * @return Object with validation errors
  */
 export function validateParams (
   params: any, schema: TxField[], { excludeKeys = [] }: {excludeKeys: string[]}): object {
@@ -562,13 +557,13 @@ interface TxOptionsRaw {
  * Build binary transaction
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
- * @param {Object} params Object with tx params
- * @param {Array} schema Transaction schema
- * @param {Object} [options={}] options
- * @param {String[]} [options.excludeKeys=[]] Array of keys to exclude for validation and build
- * @param {String} [options.denomination='aettos'] Denomination of amounts
+ * @param params Object with tx params
+ * @param schema Transaction schema
+ * @param [options={}] options
+ * @param [options.excludeKeys=[]] Array of keys to exclude for validation and build
+ * @param [options.denomination='aettos'] Denomination of amounts
  * @throws {Error} Validation error
- * @return {Array} Array with binary fields of transaction
+ * @return Array with binary fields of transaction
  */
 export function buildRawTx (
   params: any,
@@ -594,9 +589,9 @@ export function buildRawTx (
  * Unpack binary transaction
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
- * @param {Array} binary Array with binary transaction field's
- * @param {Array} schema Transaction schema
- * @return {Object} Object with transaction field's
+ * @param binary Array with binary transaction field's
+ * @param schema Transaction schema
+ * @return Object with transaction field's
  */
 export function unpackRawTx (binary: Uint8Array | NestedUint8Array, schema: TxField[]): TxType {
   return schema
@@ -615,7 +610,7 @@ export function unpackRawTx (binary: Uint8Array | NestedUint8Array, schema: TxFi
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param {{ vsn: String,fieldIndex: string | number, isDeserialized: Boolean }}
  * @throws {Error} Schema not found error
- * @return {Object} Schema
+ * @return Schema
  */
 const getSchema = ({ vsn, objId, type }: {
   vsn: number | string
@@ -648,16 +643,16 @@ interface TxHash {
  * Build transaction hash
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
- * @param {Object} params Object with tx params
- * @param {String} type Transaction type
- * @param {Object} [options={}] options
- * @param {String[]} [options.excludeKeys] Array of keys to exclude for validation and build
- * @param {String} [options.prefix] Prefix of transaction
+ * @param params Object with tx params
+ * @param type Transaction type
+ * @param [options={}] options
+ * @param [options.excludeKeys] Array of keys to exclude for validation and build
+ * @param [options.prefix] Prefix of transaction
  * @throws {Error} Validation error
- * @returns {Object} object
- * @returns {String} object.tx Base64Check transaction hash with 'tx_' prefix
- * @returns {Buffer} object.rlpEncoded rlp encoded transaction
- * @returns {Array<Buffer>} object.binary binary transaction
+ * @returns object
+ * @returns object.tx Base64Check transaction hash with 'tx_' prefix
+ * @returns object.rlpEncoded rlp encoded transaction
+ * @returns object.binary binary transaction
  */
 export function buildTx (
   params: any,
@@ -687,14 +682,14 @@ interface TxHashUnpacked {
  * Unpack transaction hash
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
- * @param {String|Buffer} encodedTx String or RLP encoded transaction array
+ * @param encodedTx String or RLP encoded transaction array
  * (if fromRlpBinary flag is true)
- * @param {Boolean} fromRlpBinary Unpack from RLP encoded transaction (default: false)
- * @param {String} prefix - Prefix of data
- * @returns {Object} object
- * @returns {Object} object.tx Object with transaction param's
- * @returns {Buffer} object.rlpEncoded rlp encoded transaction
- * @returns {Array<Buffer>} object.binary binary transaction
+ * @param fromRlpBinary Unpack from RLP encoded transaction (default: false)
+ * @param prefix - Prefix of data
+ * @returns object
+ * @returns object.tx Object with transaction param's
+ * @returns object.rlpEncoded rlp encoded transaction
+ * @returns object.binary binary transaction
  */
 export function unpackTx (encodedTx: string | Buffer, fromRlpBinary: boolean = false, prefix: string = 'tx'): TxHashUnpacked {
   const rlpEncoded = fromRlpBinary
@@ -718,8 +713,8 @@ export function unpackTx (encodedTx: string | Buffer, fromRlpBinary: boolean = f
  * Build a transaction hash
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
- * @param {String | Buffer} rawTx base64 or rlp encoded transaction
- * @return {String} Transaction hash
+ * @param rawTx base64 or rlp encoded transaction
+ * @return Transaction hash
  */
 export function buildTxHash (rawTx: string | Buffer): string {
   const data = typeof rawTx === 'string' && rawTx.startsWith('tx_')

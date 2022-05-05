@@ -38,11 +38,10 @@ export interface Pointer {
 
 /**
  * Build a contract public key
- * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {string} ownerId The public key of the owner account
- * @param {number} nonce the nonce of the transaction
- * @return {string} Contract public key
+ * @param ownerId The public key of the owner account
+ * @param nonce the nonce of the transaction
+ * @return Contract public key
  */
 export function buildContractId (ownerId: string, nonce: number): string {
   const ownerIdAndNonce = Buffer.from([...decode(ownerId as EncodedData<'ak'>, 'ak'), ...toBytes(nonce)])
@@ -52,12 +51,11 @@ export function buildContractId (ownerId: string, nonce: number): string {
 
 /**
  * Build a oracle query id
- * @function
- * @function* @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {String} senderId The public key of the sender account
- * @param {Number} nonce the nonce of the transaction
- * @param {Number} oracleId The oracle public key
- * @return {String} Contract public key
+ * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
+ * @param senderId The public key of the sender account
+ * @param nonce the nonce of the transaction
+ * @param oracleId The oracle public key
+ * @return Contract public key
  */
 export function oracleQueryId (senderId: string, nonce: number, oracleId: string): string {
   function _int32 (val: number): Buffer {
@@ -71,10 +69,9 @@ export function oracleQueryId (senderId: string, nonce: number, oracleId: string
 
 /**
  * Format the salt into a 64-byte hex string
- * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {Number} salt
- * @return {Buffer} Zero-padded hex string of salt
+ * @param salt
+ * @return Zero-padded hex string of salt
  */
 export function formatSalt (salt: number): Buffer {
   return Buffer.from(salt.toString(16).padStart(64, '0'), 'hex')
@@ -82,10 +79,10 @@ export function formatSalt (salt: number): Buffer {
 
 /**
  * Encode an AENS name
- * @function
+ *
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {String} name Name to encode
- * @return {String} `nm_` prefixed encoded AENS name
+ * @param name Name to encode
+ * @return `nm_` prefixed encoded AENS name
  */
 export function produceNameId (name: string): string {
   ensureNameValid(name)
@@ -97,12 +94,9 @@ export function produceNameId (name: string): string {
  * name, base 58 encoding the result and prepending 'cm_'
  *
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @function commitmentHash
- * @category async
- * @rtype (name: String, salt?: String) => hash: Promise[String]
- * @param {String} name - Name to be registered
- * @param {Number} salt Random salt
- * @return {String} Commitment hash
+ * @param name - Name to be registered
+ * @param salt Random salt
+ * @return Commitment hash
  */
 export function commitmentHash (name: string, salt: number = createSalt()): string {
   ensureNameValid(name)
@@ -111,10 +105,9 @@ export function commitmentHash (name: string, salt: number = createSalt()): stri
 
 /**
  * Utility function to create and _id type
- * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {String} hashId Encoded hash
- * @return {Buffer} Buffer Buffer with ID tag and decoded HASh
+ * @param hashId Encoded hash
+ * @return Buffer Buffer with ID tag and decoded HASh
  */
 export function writeId (hashId: string): Buffer {
   if (typeof hashId !== 'string') throw new ArgumentError('hashId', 'a string', hashId)
@@ -126,10 +119,9 @@ export function writeId (hashId: string): Buffer {
 
 /**
  * Utility function to read and _id type
- * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {Buffer} buf Data
- * @return {String} Encoided hash string with prefix
+ * @param buf Data
+ * @return Encoided hash string with prefix
  */
 export function readId (buf: Buffer): string {
   const tag = Buffer.from(buf).readUIntBE(0, 1)
@@ -140,10 +132,9 @@ export function readId (buf: Buffer): string {
 
 /**
  * Utility function to convert int to bytes
- * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {Number|String|BigNumber} val Value
- * @return {Buffer} Buffer Buffer from number(BigEndian)
+ * @param val Value
+ * @return Buffer Buffer from number(BigEndian)
  */
 export function writeInt (val: number | string | BigNumber): Buffer {
   return toBytes(val, true)
@@ -151,10 +142,9 @@ export function writeInt (val: number | string | BigNumber): Buffer {
 
 /**
  * Utility function to convert bytes to int
- * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {Buffer} buf Value
- * @return {String} Buffer Buffer from number(BigEndian)
+ * @param buf Value
+ * @return Buffer Buffer from number(BigEndian)
  */
 export function readInt (buf: Buffer = Buffer.from([])): string {
   return new BigNumber(Buffer.from(buf).toString('hex'), 16).toString(10)
@@ -162,11 +152,10 @@ export function readInt (buf: Buffer = Buffer.from([])): string {
 
 /**
  * Helper function to build pointers for name update TX
- * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {Array} pointers - Array of pointers
+ * @param pointers - Array of pointers
  * ([ { key: 'account_pubkey', id: 'ak_32klj5j23k23j5423l434l2j3423'} ])
- * @return {Array} Serialized pointers array
+ * @return Serialized pointers array
  */
 export function buildPointers (pointers: Pointer[]): Buffer[][] {
   return pointers.map(
@@ -179,11 +168,9 @@ export function buildPointers (pointers: Pointer[]): Buffer[][] {
 
 /**
  * Helper function to read pointers from name update TX
- * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {Array} pointers - Array of pointers
- * ([ { key: 'account_pubkey', id: 'ak_32klj5j23k23j5423l434l2j3423'} ])
- * @return {Array} Deserialize pointer array
+ * @param pointers - Array of pointers
+ * @return Deserialize pointer array
  */
 export function readPointers (pointers: Array<[key: string, id: Buffer]>): Pointer[] {
   return pointers.map(
@@ -198,10 +185,8 @@ const AENS_SUFFIX = '.chain'
 
 /**
  * Ensure that AENS name is valid
- * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {String} name
- * @return void
+ * @param name
  * @throws Error
  */
 export function ensureNameValid (name: string): void {
@@ -210,10 +195,8 @@ export function ensureNameValid (name: string): void {
 
 /**
  * Is AENS name valid
- * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {String} name
- * @return Boolean
+ * @param name
  */
 export function isNameValid (name: string): boolean {
   try {
@@ -226,7 +209,7 @@ export function isNameValid (name: string): boolean {
 
 /**
  * @param identifier - account/oracle/contract address, or channel
- * @returns {String} default AENS pointer key
+ * @returns default AENS pointer key
  * @throws exception when default key not defined
  */
 export function getDefaultPointerKey (identifier: EncodedData<string>): string {
@@ -241,10 +224,10 @@ export function getDefaultPointerKey (identifier: EncodedData<string>): string {
 
 /**
  * Get the minimum AENS name fee
- * @function
+ *
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {String} name the AENS name to get the fee for
- * @return {BigNumber} the minimum fee for the AENS name auction
+ * @param name the AENS name to get the fee for
+ * @return the minimum fee for the AENS name auction
  */
 export function getMinimumNameFee (name: string): BigNumber {
   ensureNameValid(name)
@@ -254,12 +237,12 @@ export function getMinimumNameFee (name: string): BigNumber {
 
 /**
  * Compute bid fee for AENS auction
- * @function
+ *
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {String} name the AENS name to get the fee for
- * @param {Number | String} startFee Auction start fee
- * @param {Number} [increment=0.5] Bid multiplier(In percentage, must be between 0 and 1)
- * @return {BigNumber} Bid fee
+ * @param name the AENS name to get the fee for
+ * @param startFee Auction start fee
+ * @param increment Bid multiplier(In percentage, must be between 0 and 1)
+ * @return Bid fee
  */
 export function computeBidFee (
   name: string,
@@ -275,11 +258,11 @@ export function computeBidFee (
 
 /**
  * Compute auction end height
- * @function
+ *
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {String} name
- * @param {Number|String} claimHeight Auction starting height
- * @return {String} Auction end height
+ * @param name
+ * @param claimHeight Auction starting height
+ * @return Auction end height
  */
 export function computeAuctionEndBlock (name: string, claimHeight: number | string): string {
   ensureNameValid(name)
@@ -293,10 +276,10 @@ export function computeAuctionEndBlock (name: string, claimHeight: number | stri
 
 /**
  * Is name accept going to auction
- * @function
+ *
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {String} name
- * @return {Boolean}
+ * @param name
+ * @return
  */
 export function isAuctionName (name: string): boolean {
   ensureNameValid(name)

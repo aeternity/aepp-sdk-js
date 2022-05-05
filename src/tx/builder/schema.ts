@@ -93,22 +93,8 @@ type TxSchemaField = (
 const TX_SCHEMA_FIELD: TxSchemaField = (schema, objectId) => [schema, objectId]
 
 /**
- * @constant
  * @description Object with transaction types
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/schema
- * @property {String} signed
- * @property {String} spend
- * @property {String} nameClaim
- * @property {String} namePreClaim
- * @property {String} nameUpdate
- * @property {String} nameRevoke
- * @property {String} nameTransfer
- * @property {String} contractCreate
- * @property {String} contractCall
- * @property {String} oracleRegister
- * @property {String} oracleExtend
- * @property {String} oracleQuery
- * @property {String} oracleResponse
  */
 export const TX_TYPE = {
   account: 'account',
@@ -300,8 +286,8 @@ export const KEY_BLOCK_INTERVAL = 3
 /**
  * Calculate the Base fee gas
  * @see {@link https://github.com/aeternity/protocol/blob/master/consensus/README.md#gas}
- * @param {string} txType - The transaction type
- * @returns {BigNumber} The base fee
+ * @param txType - The transaction type
+ * @returns The base fee
  * @example TX_FEE_BASE('channelForceProgress') => new BigNumber(30 * 15000)
  */
 export const TX_FEE_BASE_GAS = (txType: string): BigNumber => {
@@ -325,12 +311,12 @@ export const TX_FEE_BASE_GAS = (txType: string): BigNumber => {
 /**
  * Calculate fee for Other types of transactions
  * @see {@link https://github.com/aeternity/protocol/blob/master/consensus/README.md#gas}
- * @param {String} txType - The transaction type
- * @param {Number} txSize - The transaction size
- * @returns {Object} parameters - The transaction parameters
- * @returns {Number} parameters.relativeTtl - The relative ttl
- * @returns {Number} parameters.innerTxSize - The size of the inner transaction
- * @returns {BigNumber} The Other fee
+ * @param txType - The transaction type
+ * @param txSize - The transaction size
+ * @returns parameters - The transaction parameters
+ * @returns parameters.relativeTtl - The relative ttl
+ * @returns parameters.innerTxSize - The size of the inner transaction
+ * @returns The Other fee
  * @example TX_FEE_OTHER_GAS('oracleResponse',10, {relativeTtl:10, innerTxSize:10 })
  *  => new BigNumber(10).times(20).plus(Math.ceil(32000 * 10 / Math.floor(60 * 24 * 365 / 2)))
  */
