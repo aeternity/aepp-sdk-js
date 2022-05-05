@@ -78,6 +78,7 @@
     "@types/bn.js": "^5.1.0",
     "@types/bs58": "^4.0.1",
     "@types/chai": "^4.3.0",
+    "@types/chai-as-promised": "^7.1.5",
     "@types/json-bigint": "^1.0.1",
     "@types/mocha": "^9.1.0",
     "@types/node": "^17.0.17",
