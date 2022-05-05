@@ -126,7 +126,7 @@ export function writeId (hashId: string): Buffer {
 export function readId (buf: Buffer): string {
   const tag = Buffer.from(buf).readUIntBE(0, 1)
   const prefix = ID_TAG_PREFIX[tag]
-  if (prefix === undefined) throw new PrefixNotFoundError(tag)
+  if (prefix == null) throw new PrefixNotFoundError(tag)
   return encode(buf.slice(1, buf.length), prefix)
 }
 
@@ -216,7 +216,7 @@ export function getDefaultPointerKey (identifier: EncodedData<string>): string {
   decode(identifier)
   const prefix = identifier.substring(0, 2)
   const pointerKey = POINTER_KEY_BY_PREFIX[prefix]
-  if (pointerKey === undefined) {
+  if (pointerKey == null) {
     throw new NoDefaultAensPointerError(prefix)
   }
   return POINTER_KEY_BY_PREFIX[prefix]

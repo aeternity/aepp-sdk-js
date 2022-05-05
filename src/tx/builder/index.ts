@@ -240,7 +240,7 @@ function deserializeField (
   type: string | typeof Field | Function,
   prefix: string | string[]
 ): any {
-  if (value === undefined || value === null) return ''
+  if (value == null) return ''
   switch (type) {
     case FIELD_TYPES.ctVersion: {
       const [vm, , abi] = value
@@ -328,7 +328,7 @@ function serializeField (value: any,
     case FIELD_TYPES.ids:
       return value.map(writeId)
     case FIELD_TYPES.bool:
-      return Buffer.from([(Boolean(value) !== undefined && value !== null) ? 1 : 0])
+      return Buffer.from([(value === true) ? 1 : 0])
     case FIELD_TYPES.binary:
       return decode(value, prefix)
     case FIELD_TYPES.stateTree:
@@ -373,7 +373,7 @@ function validateField (
   value: any, type: string | Function | typeof Field,
   prefix: string | string[]): string | undefined {
   // All fields are required
-  if (value === undefined || value === null) return 'Field is required'
+  if (value == null) return 'Field is required'
 
   // Validate type of value
   switch (type) {
@@ -466,7 +466,7 @@ export function calculateMinFee (txType: string, { params, vsn }: {
   vsn?: number
 }): string {
   const multiplier = new BigNumber(1e9) // 10^9 GAS_PRICE
-  if (params === null || params === undefined) {
+  if (params == null) {
     return new BigNumber(DEFAULT_FEE).times(multiplier).toString(10)
   }
 
@@ -523,7 +523,7 @@ export function calculateFee (
     vsn?: number
   } = {}
 ): number | string {
-  if ((params === undefined || params === null) && showWarning) console.warn(`Can't build transaction fee, we will use DEFAULT_FEE(${DEFAULT_FEE})`)
+  if ((params == null) && showWarning) console.warn(`Can't build transaction fee, we will use DEFAULT_FEE(${DEFAULT_FEE})`)
 
   return fee > 0 ? fee : calculateMinFee(txType, { params, gasLimit, vsn })
 }
@@ -621,12 +621,11 @@ const getSchema = ({ vsn, objId, type }: {
   const firstKey = isDeserialize ? objId : type
   const schema = isDeserialize ? TX_DESERIALIZATION_SCHEMA : TX_SERIALIZATION_SCHEMA
 
-  if (firstKey !== undefined && schema[firstKey] !== undefined &&
-    schema[firstKey][vsn] !== undefined && Boolean(firstKey) && Boolean(schema[firstKey]) &&
-    Boolean(schema[firstKey][vsn])) {
+  if (firstKey != null && schema[firstKey] != null &&
+    schema[firstKey][vsn] != null) {
     return schema[firstKey][vsn]
   } else {
-    if (firstKey !== undefined && (schema[firstKey] === undefined || schema[firstKey] === null)) {
+    if (firstKey != null && (schema[firstKey] == null)) {
       throw new SchemaNotFoundError(`Transaction ${isDeserialize ? 'deserialization' : 'serialization'} not implemented for ${isDeserialize ? 'tag ' + (objId ?? '') : (type ?? '')}`)
     }
     throw new SchemaNotFoundError(`Transaction ${isDeserialize ? 'deserialization' : 'serialization'} not implemented for ${isDeserialize ? 'tag ' + (objId ?? '') : (type ?? '')} version ${vsn}`)
@@ -664,7 +663,7 @@ export function buildTx (
     { ...params, VSN: vsn, tag },
     schema,
     { excludeKeys, denomination: ('denomination' in params ? params.denomination : undefined) ?? denomination }
-  ).filter((e?: Buffer) => e !== undefined)
+  ).filter((e?: Buffer) => e != null)
 
   const rlpEncoded = Buffer.from(rlpEncode(binary))
   const tx: string = encode(rlpEncoded, prefix)
