@@ -40,7 +40,7 @@ const getChecksum = (payload: Uint8Array): Buffer =>
   sha256hash(sha256hash(payload)).slice(0, 4)
 
 const addChecksum = (payload: Uint8Array): Buffer => {
-  return Buffer.concat([payload, getChecksum(payload)])
+  return Buffer.from(new Uint8Array([...payload, ...getChecksum(payload)]))
 }
 
 function getPayload (buffer: Buffer): Buffer {
