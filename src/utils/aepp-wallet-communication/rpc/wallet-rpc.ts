@@ -7,19 +7,28 @@
  * import WalletRpc from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc'
  */
 import { v4 as uuid } from '@aeternity/uuid'
+// @ts-expect-error TODO remove
 import Ae from '../../../ae'
+// @ts-expect-error TODO remove
 import verifyTransaction from '../../../tx/validator'
+// @ts-expect-error TODO remove
 import AccountMultiple from '../../../account/multiple'
+// @ts-expect-error TODO remove
 import TxObject from '../../../tx/tx-object'
-import RpcClient from './rpc-client'
+import RpcClient, { Accounts, Connection, Message, RpcClientInfo } from './rpc-client'
+// @ts-expect-error TODO remove
 import { getBrowserAPI, getHandler, isValidAccounts, message, sendResponseMessage } from '../helpers'
 import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE } from '../schema'
 import { ArgumentError, TypeError, UnknownRpcClientError } from '../../errors'
+// @ts-expect-error TODO remove
 import { isAccountBase } from '../../../account/base'
 import { filterObject } from '../../other'
 
-const resolveOnAccount = (addresses, onAccount, opt = {}) => {
-  if (!addresses.find(a => a === onAccount)) {
+const resolveOnAccount = (
+  addresses: string[],
+  onAccount: string | object,
+  opt: {onAccount?: object} = {}): string | object => {
+  if (addresses.find(a => a === onAccount) == null) {
     if (typeof opt.onAccount !== 'object' || !isAccountBase(opt.onAccount)) throw new TypeError('Provided onAccount should be an AccountBase')
     onAccount = opt.onAccount
   }
@@ -27,8 +36,8 @@ const resolveOnAccount = (addresses, onAccount, opt = {}) => {
 }
 
 const NOTIFICATIONS = {
-  [METHODS.closeConnection]: (instance, { client }) =>
-    async (msg) => {
+  [METHODS.closeConnection]: (instance: Ae, { client }: {client: RpcClient}) =>
+    async (msg: Message) => {
       client.disconnect(true)
       instance.onDisconnect(msg.params, client)
     }
@@ -40,10 +49,15 @@ const REQUESTS = {
   // Store client info and prepare two fn for each client `connect` and `denyConnection`
   // which automatically prepare and send response for that client
   [METHODS.connect] (
-    callInstance,
-    instance,
-    client,
-    { name, version, icons, connectNode }) {
+    callInstance: Function,
+    instance: Ae,
+    client: RpcClient,
+    { name, version, icons, connectNode }: {
+      name: RpcClientInfo['name']
+      version: RpcClientInfo['version']
+      icons: RpcClientInfo['icons']
+      connectNode: RpcClientInfo['connectNode']
+    }) {
     // Check if protocol and network is compatible with wallet
     if (version !== VERSION) return { error: ERRORS.unsupportedProtocol() }
     // Store new AEPP and wait for connection approve
@@ -60,31 +74,37 @@ const REQUESTS = {
     return callInstance(
       'onConnection',
       { name, version },
-      ({ shareNode } = {}) => {
-        client.updateInfo({ status: shareNode ? RPC_STATUS.NODE_BINDED : RPC_STATUS.CONNECTED })
+      ({ shareNode }: { shareNode?: boolean} = {}) => {
+        client.updateInfo({
+          status: shareNode === true ? RPC_STATUS.NODE_BINDED : RPC_STATUS.CONNECTED
+        })
         return {
           result: {
             ...instance.getWalletInfo(),
-            ...(shareNode && { node: instance.selectedNode })
+            ...(shareNode === true && { node: instance.selectedNode })
           }
         }
       },
-      (error) => {
+      (error: any) => {
         client.updateInfo({ status: RPC_STATUS.CONNECTION_REJECTED })
         return { error: ERRORS.connectionDeny(error) }
       }
     )
   },
-  [METHODS.subscribeAddress] (callInstance, instance, client, { type, value }) {
+  [METHODS.subscribeAddress] (
+    callInstance: Function,
+    instance: Ae,
+    client: RpcClient,
+    { type, value }: { type: string, value: string }) {
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
 
     return callInstance(
       'onSubscription',
       { type, value },
-      async ({ accounts } = {}) => {
+      async ({ accounts }: { accounts?: RpcClient['accounts'] } = {}) => {
         try {
-          const clientAccounts = accounts || instance.getAccounts()
+          const clientAccounts = accounts ?? instance.getAccounts()
           if (!isValidAccounts(clientAccounts)) {
             throw new TypeError('Invalid provided accounts object')
           }
@@ -97,14 +117,14 @@ const REQUESTS = {
             }
           }
         } catch (e) {
-          if (instance.debug) console.error(e)
+          if (instance.debug === true) console.error(e)
           return { error: ERRORS.internalError(e.message) }
         }
       },
-      (error) => ({ error: ERRORS.rejectedByUser(error) })
+      (error: any) => ({ error: ERRORS.rejectedByUser(error) })
     )
   },
-  [METHODS.address] (callInstance, instance, client) {
+  [METHODS.address] (callInstance: Function, instance: Ae, client: RpcClient) {
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
     if (!client.isSubscribed()) return { error: ERRORS.notAuthorize() }
@@ -112,16 +132,21 @@ const REQUESTS = {
     return callInstance(
       'onAskAccounts',
       {},
-      ({ accounts } = {}) => ({
-        result: accounts ||
-          [...Object.keys(client.accounts.current), ...Object.keys(client.accounts.connected)]
+      ({ accounts }: { accounts?: RpcClient['accounts'] } = {}) => ({
+        result: accounts ??
+          [...Object.keys(client.accounts.current ?? {}),
+            ...Object.keys(client.accounts.connected ?? {})]
       }),
-      (error) => ({ error: ERRORS.rejectedByUser(error) })
+      (error: any) => ({ error: ERRORS.rejectedByUser(error) })
     )
   },
-  [METHODS.sign] (callInstance, instance, client, options) {
+  [METHODS.sign] (
+    callInstance: Function,
+    instance: Ae,
+    client: RpcClient,
+    options: {tx: string, onAccount: string, returnSigned: boolean}) {
     const { tx, onAccount, returnSigned = false } = options
-    const address = onAccount || client.currentAccount
+    const address = onAccount ?? client.currentAccount
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
     // Account permission check
@@ -132,16 +157,16 @@ const REQUESTS = {
     return callInstance(
       'onSign',
       { tx, returnSigned, onAccount: address, txObject: TxObject.fromString(tx) },
-      async (rawTx, opt = {}) => {
+      async (rawTx: string, opt = {}) => {
         let onAcc
         try {
           onAcc = resolveOnAccount(instance.addresses(), address, opt)
         } catch (e) {
-          if (instance.debug) console.error(e)
+          if (instance.debug === true) console.error(e)
           return { error: ERRORS.internalError(e.message) }
         }
         try {
-          const t = rawTx || tx
+          const t = rawTx ?? tx
           const result = returnSigned
             ? { signedTransaction: await instance.signTransaction(t, { onAccount: onAcc }) }
             : { transactionHash: await instance.send(t, { onAccount: onAcc, verify: false }) }
@@ -149,21 +174,25 @@ const REQUESTS = {
         } catch (e) {
           if (!returnSigned) {
             // Validate transaction
-            const validation = await verifyTransaction(rawTx || tx, instance.selectedNode.instance)
-            if (validation.length) return { error: ERRORS.invalidTransaction(validation) }
+            const validation = await verifyTransaction(rawTx ?? tx, instance.selectedNode.instance)
+            if (validation.length > 0) return { error: ERRORS.invalidTransaction(validation) }
             // Send broadcast failed error to aepp
             return { error: ERRORS.broadcastFailed(e.message) }
           }
           throw e
         }
       },
-      (error) => ({ error: ERRORS.rejectedByUser(error) })
+      (error: any) => ({ error: ERRORS.rejectedByUser(error) })
     )
   },
-  [METHODS.signMessage] (callInstance, instance, client, { message, onAccount }) {
+  [METHODS.signMessage] (
+    callInstance: Function,
+    instance: Ae,
+    client: RpcClient,
+    { message, onAccount }: { message: string, onAccount: string }) {
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
-    const address = onAccount || client.currentAccount
+    const address = onAccount ?? client.currentAccount
     if (!client.hasAccessToAccount(address)) {
       return { error: ERRORS.permissionDeny(address) }
     }
@@ -183,35 +212,38 @@ const REQUESTS = {
             }
           }
         } catch (e) {
-          if (instance.debug) console.error(e)
+          if (instance.debug === true) console.error(e)
           return { error: ERRORS.internalError(e.message) }
         }
       },
-      (error) => ({ error: ERRORS.rejectedByUser(error) })
+      (error: any) => ({ error: ERRORS.rejectedByUser(error) })
     )
   }
 }
-
-const handleMessage = (instance, id) => async (msg, origin) => {
-  const client = instance.rpcClients[id]
-  if (!msg.id) {
+const handleMessage = (instance: Ae, id: string) => async (msg: Message, origin: string) => {
+  const client: RpcClient = instance.rpcClients[id]
+  if (Number.isNaN(msg.id)) {
     return getHandler(
       NOTIFICATIONS, msg, { debug: instance.debug }
     )(instance, { client })(msg, origin)
   }
-  if (Object.prototype.hasOwnProperty.call(client.callbacks, msg.id)) {
+  if (client.callbacks.has(msg.id)) {
     return getHandler(RESPONSES, msg, { debug: instance.debug })(instance, { client })(msg, origin)
   } else {
     const { id, method } = msg
-    const callInstance = (methodName, params, accept, deny) => () => new Promise(resolve => {
+    const callInstance = (
+      methodName: string,
+      params: any,
+      accept: Function,
+      deny: Function) => async () => await new Promise(resolve => {
       instance[methodName](
         client,
         {
           id,
           method,
           params,
-          accept: (...args) => resolve(accept(...args)),
-          deny: (...args) => resolve(deny(...args))
+          accept: (...args: any[]) => resolve(accept(...args)),
+          deny: (...args: any[]) => resolve(deny(...args))
         },
         origin
       )
@@ -230,22 +262,25 @@ const handleMessage = (instance, id) => async (msg, origin) => {
  * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc
  * @function
  * @rtype Stamp
- * @param {Object} param Init params object
- * @param {String=} [param.name] Wallet name
- * @param {Function} onConnection Call-back function for incoming AEPP connection
- * @param {Function} onSubscription Call-back function for incoming AEPP account subscription
- * @param {Function} onSign Call-back function for incoming AEPP sign request
- * @param {Function} onAskAccounts Call-back function for incoming AEPP get address request
- * @param {Function} onMessageSign Call-back function for incoming AEPP sign message request
+ * @param param Init params object
+ * @param [param.name] Wallet name
+ * @param onConnection Call-back function for incoming AEPP connection
+ * @param onSubscription Call-back function for incoming AEPP account subscription
+ * @param onSign Call-back function for incoming AEPP sign request
+ * @param onAskAccounts Call-back function for incoming AEPP get address request
+ * @param onMessageSign Call-back function for incoming AEPP sign message request
    * Second argument of incoming call-backs contain function for accept/deny request
- * @param {Function} onDisconnect Call-back function for disconnect event
- * @return {Object}
+ * @param onDisconnect Call-back function for disconnect event
  */
 export default Ae.compose(AccountMultiple, {
   init ({
     name,
     debug = false,
     ...other
+  }: {
+    name?: string
+    debug?: boolean
+    [key: string]: any
   } = {}) {
     [
       'onConnection', 'onSubscription', 'onSign', 'onDisconnect', 'onAskAccounts', 'onMessageSign'
@@ -265,39 +300,48 @@ export default Ae.compose(AccountMultiple, {
     const _selectNode = this.selectNode.bind(this)
 
     // Overwrite AE methods
-    this.selectAccount = (address, { condition = () => true } = {}) => {
+    this.selectAccount = (address: string, { condition = () => true } = {}) => {
       _selectAccount(address)
       Object.values(this.rpcClients)
-        .filter(client => client.isConnected() && client.isSubscribed() &&
-          client.hasAccessToAccount(address) && condition(client))
-        .forEach(client => client.setAccounts({
+        .filter((client: RpcClient) => client.isConnected() &&
+         client.isSubscribed() &&
+         client.hasAccessToAccount(address) && condition())
+        .forEach((client: RpcClient) => client.setAccounts({
           current: { [address]: {} },
           connected: {
             ...client.accounts.current,
-            ...filterObject(client.accounts.connected, ([k]) => k !== address)
+            ...filterObject(client.accounts.connected ?? {}, ([k]) => k !== address)
           }
         }))
     }
-    this.addAccount = async (account, { select, meta = {}, condition = () => true } = {}) => {
+    this.addAccount = async (
+      account: {address: Function},
+      { select, meta = {}, condition = () => true }:
+      {
+        select?: boolean
+        meta?: object
+        condition?: () => true
+      } = {}) => {
       await _addAccount(account, { select })
-      const address = await account.address()
+      const address: string = await account.address()
       // Send notification 'update.address' to all Aepp which are subscribed for connected accounts
       Object.values(this.rpcClients)
-        .filter(client => client.isConnected() && client.isSubscribed() && condition(client))
-        .forEach(client => client.setAccounts({
-          current: { ...select ? { [address]: meta } : client.accounts.current },
+        .filter(
+          (client: RpcClient) => client.isConnected() && client.isSubscribed() && condition())
+        .forEach((client: RpcClient) => client.setAccounts({
+          current: { ...select === true ? { [address]: meta } : client.accounts.current },
           connected: {
-            ...select ? client.accounts.current : { [address]: meta },
+            ...select === true ? client.accounts.current : { [address]: meta },
             ...client.accounts.connected
           }
         }))
     }
-    this.selectNode = (name) => {
+    this.selectNode = (name: string) => {
       _selectNode(name)
       // Send notification 'update.network' to all Aepp which connected
       Object.values(this.rpcClients)
-        .filter(client => client.isConnected())
-        .forEach(client => {
+        .filter((client: RpcClient) => client.isConnected())
+        .forEach((client: RpcClient) => {
           client.sendMessage(
             message(METHODS.updateNetwork, {
               networkId: this.getNetworkId(),
@@ -312,14 +356,16 @@ export default Ae.compose(AccountMultiple, {
      * @function removeRpcClient
      * @instance
      * @rtype (id: string) => void
-     * @param {String} id Client ID
-     * @param {Object} [opt = {}]
-     * @return {void}
+     * @param id Client ID
+     * @param [opt = {}]
      */
-    removeRpcClient (id, { forceConnectionClose = false } = {}) {
-      const client = this.rpcClients[id]
-      if (!client) throw new UnknownRpcClientError(id)
+    removeRpcClient (
+      id: string,
+      { forceConnectionClose = false }: { forceConnectionClose?: boolean} = {}): void {
+      const client: RpcClient = this.rpcClients[id]
+      if (client == null) throw new UnknownRpcClientError(id)
       client.disconnect(forceConnectionClose)
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
       delete this.rpcClients[id]
     },
     /**
@@ -330,11 +376,11 @@ export default Ae.compose(AccountMultiple, {
      * @param {Object} clientConnection AEPP connection object
      * @return {String} Client ID
      */
-    addRpcClient (clientConnection) {
+    addRpcClient (clientConnection: Connection): string {
       // @TODO  detect if aepp has some history based on origin????
       // if yes use this instance for connection
       const id = uuid()
-      this.rpcClients[id] = RpcClient({
+      this.rpcClients[id] = new RpcClient({
         id,
         info: { status: RPC_STATUS.WAITING_FOR_CONNECTION_REQUEST },
         connection: clientConnection,
@@ -348,10 +394,9 @@ export default Ae.compose(AccountMultiple, {
      * @function shareWalletInfo
      * @instance
      * @rtype (postFn: Function) => void
-     * @param {Function} postFn Send message function like `(msg) => void`
-     * @return {void}
+     * @param postFn Send message function like `(msg) => void`
      */
-    shareWalletInfo (postFn) {
+    shareWalletInfo (postFn: (msg: Message) => void): void {
       postFn({
         jsonrpc: '2.0',
         ...message(METHODS.readyToConnect, this.getWalletInfo())
@@ -362,16 +407,22 @@ export default Ae.compose(AccountMultiple, {
      * @function getWalletInfo
      * @instance
      * @rtype () => Object
-     * @return {Object} Object with wallet information(id, name, network, ...)
+     * @return Object with wallet information(id, name, network, ...)
      */
-    getWalletInfo () {
+    getWalletInfo (): {
+      id: string
+      name: string
+      networkId: string
+      origin: string
+      type: WALLET_TYPE
+    } {
       const runtime = getBrowserAPI(true).runtime
       return {
-        id: runtime && runtime.id ? runtime.id : this.id,
+        id: runtime?.id ?? this.id,
         name: this.name,
         networkId: this.getNetworkId(),
         origin: window.location.origin,
-        type: runtime && runtime.id ? WALLET_TYPE.extension : WALLET_TYPE.window
+        type: runtime?.id != null ? WALLET_TYPE.extension : WALLET_TYPE.window
       }
     },
     /**
@@ -379,14 +430,14 @@ export default Ae.compose(AccountMultiple, {
      * @function getAccounts
      * @instance
      * @rtype () => Object
-     * @return {Object} Object with accounts information({ connected: Object, current: Object })
+     * @return Object with accounts information({ connected: Object, current: Object })
      */
-    getAccounts () {
+    getAccounts (): Accounts {
       return {
-        current: this.selectedAddress ? { [this.selectedAddress]: {} } : {},
+        current: this.selectedAddress != null ? { [this.selectedAddress]: {} } : {},
         connected: this.addresses()
-          .filter(a => a !== this.selectedAddress)
-          .reduce((acc, a) => ({ ...acc, [a]: {} }), {})
+          .filter((a: string) => a !== this.selectedAddress)
+          .reduce((acc: object, a: string) => ({ ...acc, [a]: {} }), {})
       }
     }
   }
