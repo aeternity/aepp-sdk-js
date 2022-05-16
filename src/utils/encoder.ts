@@ -4,8 +4,7 @@ import {
   DecodeError,
   ArgumentError,
   InvalidChecksumError,
-  PayloadLengthError,
-  PrefixMismatchError
+  PayloadLengthError
 } from './errors'
 
 /**
@@ -19,8 +18,9 @@ export function sha256hash (input: Uint8Array | string): Buffer {
 }
 
 // based on https://github.com/aeternity/protocol/blob/master/node/api/api_encoding.md
-const base64Types = ['ba', 'cb', 'or', 'ov', 'pi', 'ss', 'cs', 'ck', 'cv', 'st', 'tx']
-const base58Types = ['ak', 'bf', 'bs', 'bx', 'ch', 'cm', 'ct', 'kh', 'mh', 'nm', 'ok', 'oq', 'pp', 'sg', 'th']
+const base64Types = ['ba', 'cb', 'or', 'ov', 'pi', 'ss', 'cs', 'ck', 'cv', 'st', 'tx'] as const
+const base58Types = ['ak', 'bf', 'bs', 'bx', 'ch', 'cm', 'ct', 'kh', 'mh', 'nm', 'ok', 'oq', 'pp', 'sg', 'th'] as const
+
 export type EncodingType = typeof base64Types[number] | typeof base58Types[number]
 export type EncodedData<Type extends EncodingType> = `${Type}_${string}`
 // TODO: add all types with a fixed length
@@ -73,14 +73,10 @@ const parseType = (maybeType: unknown): [EncodingType, typeof base64] => {
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param {EncodedData<EncodingType>} data An Base58/64check encoded and prefixed string
  * (ex tx_..., sg_..., ak_....)
- * @param {string} [requiredPrefix] Ensure that data have this prefix
  * @return {Buffer} Decoded data
  */
-export function decode (data: EncodedData<EncodingType>, requiredPrefix?: EncodingType): Buffer {
+export function decode (data: EncodedData<EncodingType>): Buffer {
   const [prefix, encodedPayload, extra] = data.split('_')
-  if (requiredPrefix != null && requiredPrefix !== prefix) {
-    throw new PrefixMismatchError(prefix, requiredPrefix)
-  }
   if (encodedPayload == null) throw new DecodeError(`Encoded string missing payload: ${data}`)
   if (extra != null) throw new DecodeError(`Encoded string have extra parts: ${data}`)
   const [type, { decode }] = parseType(prefix)

@@ -45,7 +45,7 @@ class _AccountMultiple extends _AccountResolver {
   _resolveAccount (account: Account | EncodedData<'ak'> = this.selectedAddress): _AccountBase {
     if (typeof account === 'string') {
       const address = account as EncodedData<'ak'>
-      decode(address, 'ak')
+      decode(address)
       if (this.accounts[address] == null) throw new UnavailableAccountError(account)
       account = this.accounts[address]
     }
@@ -109,7 +109,7 @@ class _AccountMultiple extends _AccountResolver {
    * @example selectAccount('ak_xxxxxxxx')
    */
   selectAccount (address: EncodedData<'ak'>): void {
-    decode(address, 'ak')
+    decode(address)
     if (this.accounts[address] == null) throw new UnavailableAccountError(address)
     this.selectedAddress = address
   }
