@@ -180,7 +180,7 @@ describe('Accounts', function () {
       return expect(aeSdkWithoutAccount.spend(1, await aeSdk.address()))
         .to.be.rejectedWith(
           TypeError,
-          'Account should be an address (ak-prefixed string), keypair, or instance of AccountBase, got null instead')
+          'Account should be an address (ak-prefixed string), keypair, or instance of AccountBase, got undefined instead')
     })
 
     it('Invalid on account options', () => {

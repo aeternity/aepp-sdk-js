@@ -42,5 +42,5 @@ import Contract from './contract'
  * @return {Object} Universal instance
  */
 export default Ae.compose(
-  AccountMultiple, Transaction, Aens, Contract, Oracle, GeneralizedAccount
+  Transaction, Aens, Contract, Oracle, GeneralizedAccount, AccountMultiple
 )

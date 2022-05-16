@@ -180,26 +180,26 @@ export function decryptKey (password: string, encrypted: Uint8Array): Uint8Array
 /**
  * Generate signature
  * @rtype (data: String | Buffer, privateKey: Buffer) => Buffer
- * @param {String | Buffer} data - Data to sign
- * @param {String | Buffer} privateKey - Key to sign with
+ * @param {String | Uint8Array} data - Data to sign
+ * @param {String | Uint8Array} privateKey - Key to sign with
  * @return {Uint8Array} Signature
  */
-export function sign (data: string | Buffer, privateKey: string | Buffer): Uint8Array {
+export function sign (data: string | Uint8Array, privateKey: string | Uint8Array): Uint8Array {
   return nacl.sign.detached(Buffer.from(data), Buffer.from(privateKey))
 }
 
 /**
  * Verify that signature was signed by public key
  * @rtype (data: Buffer, signature: Buffer, publicKey: Buffer) => Boolean
- * @param {Buffer} data - Data to verify
- * @param {Buffer | Uint8Array} signature - Signature to verify
- * @param {string | Buffer} publicKey - Key to verify against
+ * @param {Uint8Array} data - Data to verify
+ * @param {Uint8Array} signature - Signature to verify
+ * @param {string | Uint8Array} publicKey - Key to verify against
  * @return {Boolean} Valid?
  */
 export function verify (
-  data: Buffer, signature: Buffer | Uint8Array, publicKey: string | Buffer): boolean {
-  const publicKeyBuffer = Buffer.isBuffer(publicKey) ? publicKey : str2buf(publicKey)
-  return nacl.sign.detached.verify(new Uint8Array(data), signature, publicKeyBuffer)
+  data: Uint8Array, signature: Uint8Array, publicKey: string | Uint8Array): boolean {
+  const publicKeyBuffer = typeof publicKey === 'string' ? str2buf(publicKey) : publicKey
+  return nacl.sign.detached.verify(data, signature, publicKeyBuffer)
 }
 
 export function messageToHash (message: string): Buffer {
@@ -213,7 +213,7 @@ export function signMessage (message: string, privateKey: string | Buffer): Uint
 }
 
 export function verifyMessage (
-  str: string, signature: Buffer, publicKey: string | Buffer): boolean {
+  str: string, signature: Uint8Array, publicKey: string | Uint8Array): boolean {
   return verify(messageToHash(str), signature, publicKey)
 }
 
@@ -222,11 +222,13 @@ export function verifyMessage (
  *
  * Sign a message, and then verifying that signature
  * @rtype (privateKey: Buffer, publicKey: Buffer) => Boolean
- * @param {String | Buffer} privateKey - Private key to verify
- * @param {String | Buffer} publicKey - Public key to verify
+ * @param {String | Uint8Array} privateKey - Private key to verify
+ * @param {String | Uint8Array} publicKey - Public key to verify
  * @return {Boolean} Valid?
  */
-export function isValidKeypair (privateKey: string | Buffer, publicKey: string | Buffer): boolean {
+export function isValidKeypair (
+  privateKey: string | Uint8Array, publicKey: string | Uint8Array
+): boolean {
   const message = Buffer.from('TheMessage')
   const signature = sign(message, privateKey)
   return verify(message, signature, publicKey)

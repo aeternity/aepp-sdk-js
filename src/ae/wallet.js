@@ -46,4 +46,4 @@ import Aens from './aens'
   address: keypair.publicKey,
 })
  */
-export default Ae.compose(WalletRpc, Tx, Contract, Oracle, Aens, GeneralizedAccount)
+export default Ae.compose(Tx, Contract, Oracle, Aens, GeneralizedAccount, WalletRpc)

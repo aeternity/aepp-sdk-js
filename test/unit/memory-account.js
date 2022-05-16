@@ -20,21 +20,12 @@ import { describe, it } from 'mocha'
 import { expect } from 'chai'
 import MemoryAccount from '../../src/account/memory'
 import { generateKeyPair } from '../../src/utils/crypto'
-import { InvalidKeypairError } from '../../src/utils/errors'
+import { InvalidKeypairError, PrefixMismatchError } from '../../src/utils/errors'
 
 const testAcc = generateKeyPair()
 
 describe('MemoryAccount', function () {
   describe('Fail on invalid params', () => {
-    it('Fail on empty keypair', async () => {
-      expect(() => MemoryAccount({})).to.throw(InvalidKeypairError, 'KeyPair must be an object')
-    })
-
-    it('Fail on empty keypair object', async () => {
-      expect(() => MemoryAccount({ keypair: {} }))
-        .to.throw(InvalidKeypairError, 'KeyPair must must have "secretKey", "publicKey" properties')
-    })
-
     it('Fail on invalid secret key', async () => {
       expect(() => MemoryAccount({ keypair: { publicKey: testAcc.publicKey, secretKey: ' ' } }))
         .to.throw(InvalidKeypairError, 'Secret key must be hex string or Buffer')
@@ -42,7 +33,7 @@ describe('MemoryAccount', function () {
 
     it('Fail on invalid publicKey', async () => {
       expect(() => MemoryAccount({ keypair: { publicKey: ' ', secretKey: testAcc.secretKey } }))
-        .to.throw(InvalidKeypairError, 'Public Key must be a base58c string with "ak_" prefix')
+        .to.throw(PrefixMismatchError, 'Encoded string have a wrong type:   (expected: ak)')
     })
 
     it('Fail on invalid publicKey', async () => {
