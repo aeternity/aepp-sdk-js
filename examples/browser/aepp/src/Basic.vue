@@ -23,7 +23,7 @@
     </div>
   </div>
 
-  <h2>Spend tokens</h2>
+  <h2>Spend coins</h2>
   <div class="group">
     <div>
       <div>Recipient address</div>
@@ -35,7 +35,7 @@
       </div>
     </div>
     <div>
-      <div>Tokens amount</div>
+      <div>Coins amount</div>
       <div><input v-model="spendAmount"></div>
     </div>
     <div>
