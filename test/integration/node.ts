@@ -15,15 +15,17 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+// @ts-expect-error
 import Node from '../../src/node'
-import { url, ignoreVersion } from './'
+// @ts-expect-error
+import { url, ignoreVersion } from '.'
 import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
 import NodePool from '../../src/node-pool'
-import { MissingParamError, NodeNotFoundError, TypeError } from '../../src/utils/errors'
+import { NodeNotFoundError } from '../../src/utils/errors'
 
 describe('Node client', function () {
-  let node
+  let node: Node
 
   before(async function () {
     node = await Node({ url, ignoreVersion })
@@ -51,27 +53,13 @@ describe('Node client', function () {
   })
 
   describe('Node Pool', () => {
-    it('throw error on invalid node object', async () => {
-      const nodes = await NodePool()
-      expect(() => nodes.addNode('test', {})).to.throw(Error)
-      expect(() => nodes.addNode('test', 1)).to.throw(Error)
-      expect(() => nodes.addNode('test', null)).to.throw(Error)
-      expect(() => nodes.addNode('test', {}))
-        .to.throw(TypeError, 'Each node instance should have api (object), consensusProtocolVersion (number), genesisHash (string) fields, got {} instead')
-    })
-
-    it('Throw error on get network without node ', async () => {
-      const nodes = await NodePool()
-      expect(() => nodes.getNetworkId()).to.throw(MissingParamError, 'networkId is not provided')
-    })
-
-    it('Throw error on using API without node', async () => {
-      const nodes = await NodePool()
+    it('Throw error on using API without node', () => {
+      const nodes = NodePool()
       expect(() => nodes.api.someAPIfn()).to.throw(NodeNotFoundError, 'You can\'t use Node API. Node is not connected or not defined!')
     })
 
     it('Can change Node', async () => {
-      const nodes = await NodePool({
+      const nodes = NodePool({
         nodes: [
           { name: 'first', instance: await Node({ url, ignoreVersion }) },
           { name: 'second', instance: node }
@@ -85,7 +73,7 @@ describe('Node client', function () {
     })
 
     it('Fail on undefined node', async () => {
-      const nodes = await NodePool({
+      const nodes = NodePool({
         nodes: [
           { name: 'first', instance: await Node({ url, ignoreVersion }) },
           { name: 'second', instance: node }
@@ -94,8 +82,8 @@ describe('Node client', function () {
       expect(() => nodes.selectNode('asdasd')).to.throw(NodeNotFoundError, 'Node with name asdasd not in pool')
     })
 
-    it('Can get list of nodes', async () => {
-      const nodes = await NodePool({
+    it('Can get list of nodes', () => {
+      const nodes = NodePool({
         nodes: [
           { name: 'first', instance: node }
         ]
