@@ -42,8 +42,7 @@ import {
   ChannelConnectionError,
   UnexpectedChannelMessageError
 } from '../utils/errors'
-
-type Channel = any
+import Channel from '.'
 
 async function appendSignature (
   tx: EncodedData<'tx'>, signFn: SignTx

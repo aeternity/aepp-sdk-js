@@ -18,12 +18,11 @@
 import { w3cwebsocket as W3CWebSocket } from 'websocket'
 import { EventEmitter } from 'events'
 import BigNumber from 'bignumber.js'
+import Channel from '.'
 import JsonBig from '../utils/json-big'
 import { pascalToSnake } from '../utils/string'
 import { EncodedData } from '../utils/encoder'
 import { ChannelCallError, ChannelPingTimedOutError, UnknownChannelStateError } from '../utils/errors'
-
-type Channel = any
 
 interface ChannelAction {
   guard: (channel: Channel, state?: ChannelFsm) => boolean
