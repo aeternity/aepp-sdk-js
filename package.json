@@ -82,6 +82,7 @@
     "@types/mocha": "^9.1.0",
     "@types/node": "^17.0.17",
     "@types/sha.js": "^2.4.0",
+    "@types/sinon": "^10.0.11",
     "@types/uuid": "^8.3.4",
     "@types/websocket": "^1.0.5",
     "@typescript-eslint/eslint-plugin": "^5.11.0",
