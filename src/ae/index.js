@@ -62,7 +62,7 @@ async function signUsingGA (tx, { authData, authFun, ...options } = {}) {
 }
 
 /**
- * Send tokens to another account
+ * Send coins to another account
  * @instance
  * @category async
  * @rtype (amount: Number|String, recipientIdOrName: String, options?: Object) => Promise[String]
@@ -86,7 +86,7 @@ async function spend (amount, recipientIdOrName, options) {
 
 // TODO: Rename to spendFraction
 /**
- * Send a fraction of token balance to another account
+ * Send a fraction of coin balance to another account
  * @instance
  * @category async
  * @rtype (fraction: Number|String, recipientIdOrName: String, options?: Object) => Promise[String]

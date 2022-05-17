@@ -148,7 +148,7 @@ function fsmId () {
 /**
  * Trigger a transfer update
  *
- * The transfer update is moving tokens from one channel account to another.
+ * The transfer update is moving coins from one channel account to another.
  * The update is a change to be applied on top of the latest state.
  *
  * Sender and receiver are the channel parties. Both the initiator and responder
@@ -309,7 +309,7 @@ function shutdown (sign) {
 }
 
 /**
- * Withdraw tokens from the channel
+ * Withdraw coins from the channel
  *
  * After the channel had been opened any of the participants can initiate a withdrawal.
  * The process closely resembles the update. The most notable difference is that the
@@ -335,7 +335,7 @@ function shutdown (sign) {
  * When the other party had confirmed that the block height needed is reached
  * onWithdrawLocked callback is called (without any arguments).
  *
- * @param {Number} amount - Amount of tokens to withdraw
+ * @param {Number} amount - Amount of coins to withdraw
  * @param {Function} sign - Function which verifies and signs withdraw transaction
  * @param {Object} [callbacks]
  * @param {Function} [callbacks.onOnChainTx] - Called when withdraw transaction has been posted
@@ -379,7 +379,7 @@ function withdraw (amount, sign, { onOnChainTx, onOwnWithdrawLocked, onWithdrawL
 }
 
 /**
- * Deposit tokens into the channel
+ * Deposit coins into the channel
  *
  * After the channel had been opened any of the participants can initiate a deposit.
  * The process closely resembles the update. The most notable difference is that the
@@ -405,7 +405,7 @@ function withdraw (amount, sign, { onOnChainTx, onOwnWithdrawLocked, onWithdrawL
  * When the other party had confirmed that the block height needed is reached
  * onDepositLocked callback is called (without any arguments).
  *
- * @param {Number} amount - Amount of tokens to deposit
+ * @param {Number} amount - Amount of coins to deposit
  * @param {Function} sign - Function which verifies and signs deposit transaction
  * @param {Object} [callbacks]
  * @param {Function} [callbacks.onOnChainTx] - Called when deposit transaction has been posted
@@ -456,7 +456,7 @@ function deposit (amount, sign, { onOnChainTx, onOwnDepositLocked, onDepositLock
  * The update is a change to be applied on top of the latest state.
  *
  * That would create a contract with the poster being the owner of it. Poster commits initially
- * a deposit amount of tokens to the new contract.
+ * a deposit amount of coins to the new contract.
  *
  * @param {Object} options
  * @param {String} options.code - Api encoded compiled AEVM byte code
@@ -518,7 +518,7 @@ function createContract ({ code, callData, deposit, vmVersion, abiVersion }, sig
  * internal state tree. The update is a change to be applied on top of the latest state.
  *
  * That would call a contract with the poster being the caller of it. Poster commits
- * an amount of tokens to the contract.
+ * an amount of coins to the contract.
  *
  * The call would also create a call object inside the channel state tree. It contains
  * the result of the contract call.
@@ -806,9 +806,9 @@ async function reconnect (options, txParams) {
  * @param {String} options.initiatorId - Initiator's public key
  * @param {String} options.responderId - Responder's public key
  * @param {Number} options.pushAmount - Initial deposit in favour of the responder by the initiator
- * @param {Number} options.initiatorAmount - Amount of tokens the initiator has committed to
+ * @param {Number} options.initiatorAmount - Amount of coins the initiator has committed to
  * the channel
- * @param {Number} options.responderAmount - Amount of tokens the responder has committed to
+ * @param {Number} options.responderAmount - Amount of coins the responder has committed to
  * the channel
  * @param {Number} options.channelReserve - The minimum amount both peers need to maintain
  * @param {Number} [options.ttl] - Minimum block height to include the channel_create_tx

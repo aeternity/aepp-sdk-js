@@ -407,7 +407,7 @@ export class NotPayableFunctionError extends ContractError {
   constructor (amount: string, fn: string) {
     super(
       `You try to pay "${amount}" to function "${fn}" which is not payable. ` +
-      'Only payable function can accept tokens')
+      'Only payable function can accept coins')
     this.name = 'NotPayableFunctionError'
   }
 }

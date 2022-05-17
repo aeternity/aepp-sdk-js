@@ -53,11 +53,11 @@ describe('Accounts', function () {
       return wallet.getBalance(await wallet.address()).should.eventually.be.equal('0')
     })
 
-    it('spending tokens', async () => {
+    it('spending coins', async () => {
       return wallet.spend(1, receiver).should.be.rejectedWith(Error)
     })
 
-    it('spending negative amount of tokens', () => expect(wallet.spend(-1, receiver))
+    it('spending negative amount of coins', () => expect(wallet.spend(-1, receiver))
       .to.be.rejectedWith(InvalidTxParamsError, 'Transaction build error. {"amount":"-1 must be >= 0"}'))
   })
 
@@ -105,7 +105,7 @@ describe('Accounts', function () {
     })
   })
 
-  it('spends tokens', async () => {
+  it('spends coins', async () => {
     const ret = await aeSdk.spend(1, receiver)
     ret.should.have.property('tx')
     ret.tx.should.include({
@@ -113,7 +113,7 @@ describe('Accounts', function () {
     })
   })
 
-  it('spends tokens in AE format', async () => {
+  it('spends coins in AE format', async () => {
     const ret = await aeSdk.spend(1, receiver, { denomination: AE_AMOUNT_FORMATS.AE })
     ret.should.have.property('tx')
     ret.tx.should.include({
@@ -121,7 +121,7 @@ describe('Accounts', function () {
     })
   })
 
-  it('spends big amount of tokens', async () => {
+  it('spends big amount of coins', async () => {
     const bigAmount = '10000000000000100000000000000000'
     const genesis = await BaseAe({ networkId })
     const receiverWallet = generateKeyPair()
