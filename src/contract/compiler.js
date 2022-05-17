@@ -23,11 +23,11 @@
  * @example import { ContractCompilerHttp } from '@aeternity/aepp-sdk'
  */
 
-import { RestError } from '@azure/core-rest-pipeline'
 import stampit from '@stamp/it'
 import semverSatisfies from '../utils/semver-satisfies'
 import { Compiler as CompilerApi } from '../apis/compiler/'
 import { MissingParamError, UnsupportedVersionError } from '../utils/errors'
+import { genErrorFormatterPolicy } from '../utils/autorest'
 
 /**
  * Contract Compiler Stamp
@@ -62,39 +62,22 @@ export default stampit({
             }
           },
           position: 'perCall'
-        }, {
-          policy: {
-            name: 'error-formatter',
-            async sendRequest (request, next) {
-              try {
-                return await next(request)
-              } catch (error) {
-                if (!(error instanceof RestError)) throw error
-                let body
-                try {
-                  body = JSON.parse(error.response.bodyAsText)
-                } catch (e) {
-                  throw error
-                }
-                error.message = `${new URL(error.request.url).pathname.slice(1)} error`
-                if (body.reason) {
-                  error.message += ': ' + body.reason +
-                    (body.parameter ? ` in ${body.parameter}` : '') +
-                    // TODO: revising after improving documentation https://github.com/aeternity/aesophia_http/issues/78
-                    (body.info ? ` (${JSON.stringify(body.info)})` : '')
-                }
-                if (Array.isArray(body)) {
-                  error.message += ':\n' + body
-                    .map(e => `${e.type}:${e.pos.line}:${e.pos.col}: ${e.message}${e.context ? `(${e.context})` : ''}`)
-                    .map(e => e.trim()) // TODO: remove after fixing https://github.com/aeternity/aesophia_http/issues/80
-                    .join('\n')
-                }
-                throw error
-              }
-            }
-          },
-          position: 'perCall'
-        }]
+        }, genErrorFormatterPolicy(body => {
+          let message = ''
+          if (body.reason) {
+            message += ' ' + body.reason +
+              (body.parameter ? ` in ${body.parameter}` : '') +
+              // TODO: revising after improving documentation https://github.com/aeternity/aesophia_http/issues/78
+              (body.info ? ` (${JSON.stringify(body.info)})` : '')
+          }
+          if (Array.isArray(body)) {
+            message += '\n' + body
+              .map(e => `${e.type}:${e.pos.line}:${e.pos.col}: ${e.message}${e.context ? `(${e.context})` : ''}`)
+              .map(e => e.trim()) // TODO: remove after fixing https://github.com/aeternity/aesophia_http/issues/80
+              .join('\n')
+          }
+          return message
+        })]
       })
       const versionPromise = this.compilerApi.aPIVersion().then(({ apiVersion }) => {
         this.compilerVersion = apiVersion

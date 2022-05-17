@@ -130,9 +130,9 @@ const validators = [
         checkedKeys: ['contractId']
       }]
     } catch (error) {
-      if (!error.response?.body?.reason) throw error
+      if (!error.response?.parsedBody?.reason) throw error
       return [{
-        message: error.response.body.reason,
+        message: error.response.parsedBody.reason,
         key: 'ContractNotFound',
         checkedKeys: ['contractId']
       }]

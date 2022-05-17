@@ -15,7 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 import { describe, it, before } from 'mocha'
-import { expect, assert } from 'chai'
+import { expect } from 'chai'
 import { spy } from 'sinon'
 import http from 'http'
 import { getSdk } from './'
@@ -38,7 +38,7 @@ describe('Node Chain', function () {
     spy(http, 'request')
     const heights = await Promise.all(new Array(5).fill().map(() => aeSdk.height()))
     expect(heights).to.eql(heights.map(() => heights[0]))
-    assert(http.request.calledOnce)
+    expect(http.request.callCount).to.be.equal(1)
     http.request.restore()
   })
 

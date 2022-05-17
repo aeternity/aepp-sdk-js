@@ -28,3 +28,5 @@ client-side-validation: true
 generator: typescript
 generate-metadata: false
 add-credentials: false
+modelerfour:
+  seal-single-value-enum-by-default: false

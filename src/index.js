@@ -41,7 +41,6 @@ export { default as ContractCompilerHttp } from './contract/compiler'
 export { default as RpcAepp } from './ae/aepp'
 export { default as RpcWallet } from './ae/wallet'
 export { default as Oracle } from './ae/oracle'
-export { default as genSwaggerClient } from './utils/swagger'
 export { default as Channel } from './channel'
 export { default as Universal } from './ae/universal'
 
