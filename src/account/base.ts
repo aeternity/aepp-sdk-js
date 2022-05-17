@@ -63,9 +63,9 @@ export abstract class _AccountBase {
    * @return {String} Signed transaction
    */
   async signTransaction (
-    tx: string,
+    tx: EncodedData<'tx'>,
     { innerTx, networkId, ...options }: { innerTx?: boolean, networkId?: string } = {}
-  ): Promise<string> {
+  ): Promise<EncodedData<'tx'>> {
     const prefixes = [this.getNetworkId({ networkId })]
     if (innerTx === true) prefixes.push('inner_tx')
     const rlpBinaryTx = decode(tx, 'tx')

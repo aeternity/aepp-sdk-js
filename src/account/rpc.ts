@@ -36,8 +36,8 @@ class _AccountRpc extends _AccountBase {
    * @return {Promise<String>} Signed transaction
    */
   async signTransaction (
-    tx: string, options: Parameters<_AccountBase['signTransaction']>[1]
-  ): Promise<string> {
+    tx: EncodedData<'tx'>, options: Parameters<_AccountBase['signTransaction']>[1]
+  ): Promise<EncodedData<'tx'>> {
     return this._rpcClient.request(METHODS.sign, {
       ...options,
       onAccount: this._address,
