@@ -10,13 +10,13 @@ import { v4 as uuid } from '@aeternity/uuid'
 import Ae from '../../../ae'
 import verifyTransaction from '../../../tx/validator'
 import AccountMultiple from '../../../account/multiple'
-import TxObject from '../../../tx/tx-object'
 import RpcClient from './rpc-client'
 import { getBrowserAPI, getHandler, isValidAccounts, message, sendResponseMessage } from '../helpers'
 import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE } from '../schema'
 import { ArgumentError, TypeError, UnknownRpcClientError } from '../../errors'
 import { isAccountBase } from '../../../account/base'
 import { filterObject } from '../../other'
+import { unpackTx } from '../../../tx/builder'
 
 const resolveOnAccount = (addresses, onAccount, opt = {}) => {
   if (!addresses.find(a => a === onAccount)) {
@@ -131,7 +131,7 @@ const REQUESTS = {
 
     return callInstance(
       'onSign',
-      { tx, returnSigned, onAccount: address, txObject: TxObject.fromString(tx) },
+      { tx, returnSigned, onAccount: address, txObject: unpackTx(tx) },
       async (rawTx, opt = {}) => {
         let onAcc
         try {

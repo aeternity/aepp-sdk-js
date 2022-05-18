@@ -24,7 +24,6 @@
 
 import { Encoder as Calldata } from '@aeternity/aepp-calldata'
 import { DRY_RUN_ACCOUNT, GAS_MAX } from '../tx/builder/schema'
-import TxObject from '../tx/tx-object'
 import { decode } from '../tx/builder/helpers'
 import {
   MissingContractDefError,
@@ -44,6 +43,7 @@ import {
   AmbiguousEventDefinitionError
 } from '../utils/errors'
 import { hash } from '../utils/crypto'
+import { unpackTx } from '../tx/builder'
 
 /**
  * Generate contract ACI object with predefined js methods for contract usage - can be used for
@@ -139,7 +139,7 @@ export default async function getContractInstance ({
   const sendAndProcess = async (tx, options) => {
     const txData = await this.send(tx, options)
     const result = {
-      hash: txData.hash, tx: TxObject({ tx: txData.rawTx }), txData, rawTx: txData.rawTx
+      hash: txData.hash, tx: unpackTx(txData.rawTx), txData, rawTx: txData.rawTx
     }
     if (!txData.blockHeight) return result
     const { callInfo } = await this.api.getTransactionInfoByHash(txData.hash)
@@ -260,7 +260,7 @@ export default async function getContractInstance ({
 
       const { callObj, ...dryRunOther } = await this.txDryRun(tx, callerId, opt)
       await handleCallError(callObj, tx)
-      res = { ...dryRunOther, tx: TxObject({ tx }), result: callObj }
+      res = { ...dryRunOther, tx: unpackTx(tx), result: callObj }
     } else {
       const tx = await this.contractCallTx({
         ...opt,

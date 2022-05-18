@@ -27,7 +27,6 @@ import Tx from './'
 import { buildTx, calculateFee, unpackTx } from './builder'
 import { ABI_VERSIONS, MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE, TX_TTL } from './builder/schema'
 import { buildContractId } from './builder/helpers'
-import { TxObject } from './tx-object'
 import {
   ArgumentError,
   UnsupportedABIversionError,
@@ -37,70 +36,69 @@ import {
 } from '../utils/errors'
 
 async function spendTx ({ senderId, recipientId, payload = '' }) {
-  const { ttl, nonce } = await this.prepareTxParams(
+  const { ttl, nonce, fee } = await this.prepareTxParams(
     TX_TYPE.spend, { senderId, ...arguments[0], payload }
   )
-  return TxObject({
-    params: {
-      ...arguments[0],
-      recipientId,
-      senderId,
-      nonce,
-      ttl,
-      payload
-    },
-    type: TX_TYPE.spend
-  }).encodedTx
+  return buildTx({
+    ...arguments[0],
+    recipientId,
+    senderId,
+    nonce,
+    ttl,
+    fee,
+    payload
+  }, TX_TYPE.spend).tx
 }
 
 async function namePreclaimTx ({ accountId }) {
   const { fee, ttl, nonce } = await this.prepareTxParams(
     TX_TYPE.namePreClaim, { senderId: accountId, ...arguments[0] }
   )
-  return TxObject({
-    params: { ...arguments[0], nonce, ttl, fee },
-    type: TX_TYPE.namePreClaim
-  }).encodedTx
+  return buildTx(
+    { ...arguments[0], nonce, ttl, fee },
+    TX_TYPE.namePreClaim
+  ).tx
 }
 
 async function nameClaimTx ({ accountId, vsn = 2 }) {
   const { fee, ttl, nonce } = await this.prepareTxParams(
     TX_TYPE.nameClaim, { senderId: accountId, ...arguments[0], vsn }
   )
-  return TxObject({
-    params: { ...arguments[0], nonce, ttl, fee, vsn },
-    type: TX_TYPE.nameClaim
-  }).encodedTx
+  return buildTx(
+    { ...arguments[0], nonce, ttl, fee },
+    TX_TYPE.nameClaim,
+    { vsn }
+  ).tx
 }
 
 async function nameTransferTx ({ accountId, recipientId }) {
   const { fee, ttl, nonce } = await this.prepareTxParams(
     TX_TYPE.nameTransfer, { senderId: accountId, ...arguments[0] }
   )
-  return TxObject({
-    params: { ...arguments[0], recipientId, nonce, ttl, fee },
-    type: TX_TYPE.nameTransfer
-  }).encodedTx
+  return buildTx(
+    { ...arguments[0], recipientId, nonce, ttl, fee },
+    TX_TYPE.nameTransfer
+  ).tx
 }
 
 async function nameUpdateTx ({ accountId }) {
   const { fee, ttl, nonce } = await this.prepareTxParams(
     TX_TYPE.nameUpdate, { senderId: accountId, ...arguments[0] }
   )
-  return TxObject({
-    params: { ...arguments[0], nonce, ttl, fee },
-    type: TX_TYPE.nameUpdate
-  }).encodedTx
+  return buildTx(
+    { ...arguments[0], nonce, ttl, fee },
+    TX_TYPE.nameUpdate
+  ).tx
 }
 
 async function nameRevokeTx ({ accountId }) {
   const { fee, ttl, nonce } = await this.prepareTxParams(
     TX_TYPE.nameRevoke, { senderId: accountId, ...arguments[0] }
   )
-  return TxObject({
-    params: { ...arguments[0], nonce, ttl, fee },
-    type: TX_TYPE.nameRevoke
-  }).encodedTx
+  return buildTx(
+    { ...arguments[0], nonce, ttl, fee },
+    TX_TYPE.nameRevoke
+  ).tx
 }
 
 async function contractCreateTx ({ ownerId, gasPrice = MIN_GAS_PRICE }) {
@@ -109,10 +107,10 @@ async function contractCreateTx ({ ownerId, gasPrice = MIN_GAS_PRICE }) {
     TX_TYPE.contractCreate, { senderId: ownerId, ...arguments[0], ctVersion, gasPrice }
   )
   return {
-    tx: TxObject({
-      params: { ...arguments[0], nonce, ttl, fee, ctVersion, gasPrice },
-      type: TX_TYPE.contractCreate
-    }).encodedTx,
+    tx: buildTx(
+      { ...arguments[0], nonce, ttl, fee, ctVersion, gasPrice },
+      TX_TYPE.contractCreate
+    ).tx,
     contractId: buildContractId(ownerId, nonce)
   }
 }
@@ -123,10 +121,10 @@ async function contractCallTx ({ callerId, gasPrice = MIN_GAS_PRICE }) {
     TX_TYPE.contractCall,
     { senderId: callerId, ...arguments[0], gasPrice, abiVersion: ctVersion.abiVersion }
   )
-  return TxObject({
-    params: { ...arguments[0], nonce, ttl, fee, abiVersion: ctVersion.abiVersion, gasPrice },
-    type: TX_TYPE.contractCall
-  }).encodedTx
+  return buildTx(
+    { ...arguments[0], nonce, ttl, fee, abiVersion: ctVersion.abiVersion, gasPrice },
+    TX_TYPE.contractCall
+  ).tx
 }
 
 async function oracleRegisterTx ({
@@ -135,50 +133,47 @@ async function oracleRegisterTx ({
   const { fee, ttl, nonce } = await this.prepareTxParams(
     TX_TYPE.oracleRegister, { senderId: accountId, ...arguments[0], abiVersion }
   )
-  return TxObject({
-    params: {
-      accountId,
-      queryFee,
-      abiVersion,
-      fee,
-      oracleTtl,
-      nonce,
-      ttl,
-      queryFormat,
-      responseFormat
-    },
-    type: TX_TYPE.oracleRegister
-  }).encodedTx
+  return buildTx({
+    accountId,
+    queryFee,
+    abiVersion,
+    fee,
+    oracleTtl,
+    nonce,
+    ttl,
+    queryFormat,
+    responseFormat
+  }, TX_TYPE.oracleRegister).tx
 }
 
 async function oracleExtendTx ({ oracleId, callerId, oracleTtl }) {
   const { fee, ttl, nonce } = await this.prepareTxParams(
     TX_TYPE.oracleExtend, { senderId: callerId, ...arguments[0] }
   )
-  return TxObject({
-    params: { oracleId, fee, oracleTtl, nonce, ttl },
-    type: TX_TYPE.oracleExtend
-  }).encodedTx
+  return buildTx(
+    { oracleId, fee, oracleTtl, nonce, ttl },
+    TX_TYPE.oracleExtend
+  ).tx
 }
 
 async function oraclePostQueryTx ({ oracleId, responseTtl, query, queryTtl, queryFee, senderId }) {
   const { fee, ttl, nonce } = await this.prepareTxParams(
     TX_TYPE.oracleQuery, { senderId, ...arguments[0] }
   )
-  return TxObject({
-    params: { oracleId, responseTtl, query, queryTtl, fee, queryFee, ttl, nonce, senderId },
-    type: TX_TYPE.oracleQuery
-  }).encodedTx
+  return buildTx(
+    { oracleId, responseTtl, query, queryTtl, fee, queryFee, ttl, nonce, senderId },
+    TX_TYPE.oracleQuery
+  ).tx
 }
 
 async function oracleRespondTx ({ oracleId, callerId, responseTtl, queryId, response }) {
   const { fee, ttl, nonce } = await this.prepareTxParams(
     TX_TYPE.oracleResponse, { senderId: callerId, ...arguments[0] }
   )
-  return TxObject({
-    params: { oracleId, responseTtl, queryId, response, fee, ttl, nonce },
-    type: TX_TYPE.oracleResponse
-  }).encodedTx
+  return buildTx(
+    { oracleId, responseTtl, queryId, response, fee, ttl, nonce },
+    TX_TYPE.oracleResponse
+  ).tx
 }
 
 async function channelCloseSoloTx ({ channelId, fromId, payload, poi }) {
@@ -250,10 +245,10 @@ async function gaAttachTx ({ ownerId, gasPrice = MIN_GAS_PRICE }) {
     TX_TYPE.gaAttach, { senderId: ownerId, ...arguments[0], ctVersion, gasPrice }
   )
   return {
-    tx: TxObject({
-      params: { ...arguments[0], nonce, ttl, fee, ctVersion, gasPrice },
-      type: TX_TYPE.gaAttach
-    }).encodedTx,
+    tx: buildTx(
+      { ...arguments[0], nonce, ttl, fee, ctVersion, gasPrice },
+      TX_TYPE.gaAttach
+    ).tx,
     contractId: buildContractId(ownerId, nonce)
   }
 }
